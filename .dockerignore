@@ -1,0 +1,46 @@
+# Fichiers de développement
+node_modules
+npm-debug.log*
+.npm
+.env
+.env.*
+!.env.example
+
+# Fichiers de build Nuxt
+.nuxt
+.output
+.cache
+dist
+
+# Fichiers système
+.DS_Store
+.git
+.gitignore
+README.md
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Logs
+logs
+*.log
+
+# Fichiers de développement
+.vscode
+.idea
+*.swp
+*.swo
+
+# Fichiers temporaires
+.tmp
+.temp
+
+# Uploads locaux (seront montés en volume)
+public/uploads/*
+
+# Fichiers de test
+coverage
+.nyc_output
+
+# Histoire des fichiers
+.history
