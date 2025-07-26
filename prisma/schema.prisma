@@ -1,0 +1,155 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  pseudo    String   @unique
+  nom       String
+  prenom    String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Conventions created by this user
+  createdConventions Convention[] @relation("CreatedConventions")
+
+  // Conventions favorited by this user
+  favoriteConventions Convention[] @relation("FavoriteConventions")
+
+  // Conventions where this user is a collaborator
+  collaborations ConventionCollaborator[]
+  
+  // Collaborations added by this user
+  addedCollaborators ConventionCollaborator[] @relation("AddedCollaborators")
+  
+  // Carpools offered by this user
+  carpoolOffers CarpoolOffer[]
+  
+  // Carpool requests created by this user
+  carpoolRequests CarpoolRequest[]
+  
+  // Comments on carpools
+  carpoolComments CarpoolComment[]
+}
+
+model Convention {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  imageUrl    String?
+  startDate   DateTime
+  endDate     DateTime
+  addressLine1 String
+  addressLine2 String?
+  postalCode   String
+  city         String
+  region       String?
+  country      String
+  ticketingUrl String?
+  facebookUrl  String?
+  instagramUrl String?
+  hasFastfood    Boolean @default(false)
+  hasKidsZone    Boolean @default(false)
+  acceptsPets    Boolean @default(false)
+  hasTentCamping Boolean @default(false)
+  hasTruckCamping Boolean @default(false)
+  hasGym         Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relation to the user who created this convention
+  creatorId Int
+  creator   User @relation("CreatedConventions", fields: [creatorId], references: [id])
+
+  // Users who favorited this convention
+  favoritedBy User[] @relation("FavoriteConventions")
+
+  // Collaborators with edit permissions
+  collaborators ConventionCollaborator[]
+  
+  // Carpools for this convention
+  carpoolOffers CarpoolOffer[]
+  
+  // Carpool requests for this convention
+  carpoolRequests CarpoolRequest[]
+}
+
+model ConventionCollaborator {
+  id           Int      @id @default(autoincrement())
+  conventionId Int
+  userId       Int
+  canEdit      Boolean  @default(true)
+  addedAt      DateTime @default(now())
+  addedById    Int
+
+  // Relations
+  convention Convention @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addedBy    User       @relation("AddedCollaborators", fields: [addedById], references: [id])
+
+  // Ensure a user can only be added once per convention
+  @@unique([conventionId, userId])
+}
+
+// Carpool offers for conventions
+model CarpoolOffer {
+  id               Int      @id @default(autoincrement())
+  conventionId     Int
+  userId           Int
+  departureDate    DateTime
+  departureCity    String
+  departureAddress String
+  availableSeats   Int
+  description      String?  @db.Text
+  phoneNumber      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  convention Convention       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments   CarpoolComment[]
+}
+
+// Carpool requests for conventions
+model CarpoolRequest {
+  id               Int      @id @default(autoincrement())
+  conventionId     Int
+  userId           Int
+  departureDate    DateTime
+  departureCity    String
+  seatsNeeded      Int      @default(1)
+  description      String?  @db.Text
+  phoneNumber      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  convention Convention @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Comments on carpool offers
+model CarpoolComment {
+  id             Int      @id @default(autoincrement())
+  carpoolOfferId Int
+  userId         Int
+  content        String   @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  carpoolOffer CarpoolOffer @relation(fields: [carpoolOfferId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+

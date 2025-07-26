@@ -1,0 +1,24 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond transparent -->
+  <rect width="100%" height="100%" fill="none"/>
+
+  <!-- Terre stylisée -->
+  <circle cx="170" cy="256" r="80" fill="#2E9AFE" stroke="white" stroke-width="4"/>
+  <path d="M144,240 q20,-20 40,0 q10,10 20,-10" stroke="white" stroke-width="3" fill="none"/>
+  <path d="M174,270 q10,10 30,0" stroke="white" stroke-width="2" fill="none"/>
+
+  <!-- Orbites autour du globe -->
+  <ellipse cx="170" cy="256" rx="110" ry="80" stroke="white" stroke-width="2" fill="none" transform="rotate(20 170 256)"/>
+  <ellipse cx="170" cy="256" rx="110" ry="80" stroke="white" stroke-width="2" fill="none" transform="rotate(-20 170 256)"/>
+  <ellipse cx="170" cy="256" rx="120" ry="50" stroke="white" stroke-width="2" fill="none"/>
+
+  <!-- Balles bien alignées sur les orbites -->
+  <circle cx="290" cy="256" r="8" fill="red"/>
+  <circle cx="124" cy="178" r="8" fill="red"/>
+  <circle cx="104" cy="308" r="8" fill="red"/>
+
+  <!-- Texte CDJ à droite, oblique, avec espacement -->
+  <text x="380" y="268" font-family="Arial Black, sans-serif" font-size="64" fill="white" transform="skewX(-10)">
+    CDJ
+  </text>
+</svg>
