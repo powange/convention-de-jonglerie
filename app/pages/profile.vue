@@ -193,13 +193,6 @@
                 
                 <div class="flex justify-end space-x-2">
                   <UButton 
-                    type="button" 
-                    variant="ghost" 
-                    @click="showPasswordModal = false"
-                  >
-                    Annuler
-                  </UButton>
-                  <UButton 
                     type="submit" 
                     :loading="passwordLoading"
                     color="primary"
