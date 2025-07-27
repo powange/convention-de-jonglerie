@@ -42,10 +42,10 @@
           </UFormField>
           
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <UFormField label="Date de début" name="startDate" required :error="touchedFields.startDate && !state.startDate ? 'La date de début est requise' : undefined">
+            <UFormField label="Date de début" name="startDate" required :error="getStartDateError()">
               <UInput v-model="state.startDate" type="datetime-local" size="lg" @blur="touchedFields.startDate = true" />
             </UFormField>
-            <UFormField label="Date de fin" name="endDate" required :error="touchedFields.endDate && !state.endDate ? 'La date de fin est requise' : undefined">
+            <UFormField label="Date de fin" name="endDate" required :error="getEndDateError()">
               <UInput v-model="state.endDate" type="datetime-local" required size="lg" @blur="touchedFields.endDate = true" />
             </UFormField>
           </div>
@@ -245,6 +245,53 @@ const fileInput = ref<HTMLInputElement>();
 const toast = useToast();
 const { servicesByCategory } = useConventionServices();
 
+// Fonctions de validation des dates
+const validateDates = () => {
+  if (!state.startDate || !state.endDate) return { isValid: true };
+  
+  const startDate = new Date(state.startDate);
+  const endDate = new Date(state.endDate);
+  const now = new Date();
+  
+  // Vérifier que la date de fin est supérieure à la date de début
+  if (endDate <= startDate) {
+    return {
+      isValid: false,
+      error: 'La date de fin doit être strictement supérieure à la date de début'
+    };
+  }
+  
+  // Vérifier que la convention n'est pas déjà terminée
+  if (endDate <= now) {
+    return {
+      isValid: false,
+      error: 'La convention ne peut pas être déjà terminée. La date de fin doit être dans le futur'
+    };
+  }
+  
+  return { isValid: true };
+};
+
+const dateValidation = computed(() => validateDates());
+
+// Fonctions pour obtenir les erreurs de validation des champs de date
+const getStartDateError = () => {
+  if (touchedFields.startDate && !state.startDate) {
+    return 'La date de début est requise';
+  }
+  return undefined;
+};
+
+const getEndDateError = () => {
+  if (touchedFields.endDate && !state.endDate) {
+    return 'La date de fin est requise';
+  }
+  if (touchedFields.endDate && touchedFields.startDate && !dateValidation.value.isValid) {
+    return dateValidation.value.error;
+  }
+  return undefined;
+};
+
 const triggerFileInput = () => {
   fileInput.value?.click();
 };
@@ -331,6 +378,18 @@ const handleNextStep = () => {
       });
       return;
     }
+    
+    // Check date validation
+    if (!dateValidation.value.isValid) {
+      const toast = useToast();
+      toast.add({
+        title: 'Dates invalides',
+        description: dateValidation.value.error,
+        icon: 'i-heroicons-exclamation-triangle',
+        color: 'error'
+      });
+      return;
+    }
   }
   
   currentStep.value++;
@@ -353,8 +412,33 @@ const handleAddressSelected = (address: {
 };
 
 const handleSubmit = () => {
+  // Validation finale avant soumission
+  if (!dateValidation.value.isValid) {
+    const toast = useToast();
+    toast.add({
+      title: 'Dates invalides',
+      description: dateValidation.value.error,
+      icon: 'i-heroicons-exclamation-triangle',
+      color: 'error'
+    });
+    return;
+  }
+  
   emit('submit', state);
 };
+
+// Watchers pour marquer les champs de date comme touchés lors des changements
+watch(() => state.startDate, () => {
+  if (state.startDate) {
+    touchedFields.startDate = true;
+  }
+});
+
+watch(() => state.endDate, () => {
+  if (state.endDate) {
+    touchedFields.endDate = true;
+  }
+});
 
 // Watch for changes in initialData prop to update the form state (e.g., when editing a different convention)
 watch(() => props.initialData, (newVal) => {
