@@ -1,10 +1,12 @@
 <template>
-  <UCard>
-    <template #header>
-      <h1 class="text-2xl font-bold">Ajouter une nouvelle convention</h1>
-    </template>
-    <ConventionForm @submit="handleAddConvention" submit-button-text="Ajouter la convention" :loading="conventionStore.loading" />
-  </UCard>
+  <div class="max-w-6xl mx-auto">
+    <UCard>
+      <template #header>
+        <h1 class="text-2xl font-bold">Ajouter une nouvelle convention</h1>
+      </template>
+      <ConventionForm @submit="handleAddConvention" submit-button-text="Ajouter la convention" :loading="conventionStore.loading" />
+    </UCard>
+  </div>
 </template>
 
 <script setup lang="ts">

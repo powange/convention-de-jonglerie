@@ -13,6 +13,9 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@pinia/nuxt',
   ],
+  ui: {
+    icons: ['heroicons', 'simple-icons']
+  },
   css: [
     '~/assets/css/main.css',
     'flag-icons/css/flag-icons.min.css'

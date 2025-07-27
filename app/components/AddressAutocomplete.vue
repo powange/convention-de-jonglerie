@@ -1,16 +1,19 @@
 <template>
   <UFormField label="Adresse Complète" name="fullAddress">
     <UInput
+      icon="i-lucide-search"
       v-model="searchQuery"
       placeholder="Commencez à taper une adresse..."
+      size="lg"
       @input="_handleInput"
+      class="w-full"
     />
-    <div v-if="suggestions.length > 0" class="mt-2 border rounded-md shadow-lg bg-white">
+    <div v-if="suggestions.length > 0" class="mt-2 border rounded-md">
       <UButton
         v-for="suggestion in suggestions"
         :key="suggestion.place_id"
         variant="ghost"
-        class="w-full text-left px-3 py-2 hover:bg-gray-100"
+        class="w-full text-left px-3 py-2"
         @click="selectAddress(suggestion)"
       >
         {{ suggestion.display_name }}

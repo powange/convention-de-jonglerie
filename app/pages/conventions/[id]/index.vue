@@ -17,18 +17,20 @@
       
       <!-- Contenu des détails -->
       <UCard>
+        
+        <template #header>
           <!-- Image et description -->
           <div class="flex gap-6">
             <div v-if="convention.imageUrl" class="flex-shrink-0">
               <img :src="convention.imageUrl" :alt="convention.name" class="w-48 h-48 object-cover rounded-lg shadow-lg" />
             </div>
             <div class="flex-1">
-              <p class="text-gray-600">{{ convention.description || 'Aucune description disponible' }}</p>
+              <p class="">{{ convention.description || 'Aucune description disponible' }}</p>
             </div>
           </div>
-      </UCard>
+        </template>
+        
 
-      <UCard>
         <div class="space-y-6">
           <!-- Informations pratiques -->
           <div class="space-y-2">

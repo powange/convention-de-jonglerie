@@ -2,12 +2,12 @@
   <UForm :state="state" class="space-y-4" @submit="handleSubmit">
     <UStepper v-model="currentStep" :items="steps" class="mb-4">
       <template #general>
-        <div class="space-y-4">
-          <UFormField label="Nom" name="name" :error="!state.name && currentStep === 0 ? 'Le nom est requis' : undefined">
-            <UInput v-model="state.name" required placeholder="Nom de la convention" />
+        <div class="space-y-6">
+          <UFormField label="Nom" name="name" required :error="touchedFields.name && !state.name ? 'Le nom est requis' : undefined">
+            <UInput v-model="state.name" required placeholder="Nom de la convention" size="lg" @blur="touchedFields.name = true" class="w-full"/>
           </UFormField>
           <UFormField label="Description" name="description">
-            <UTextarea v-model="state.description" placeholder="Description de la convention" />
+            <UTextarea v-model="state.description" placeholder="Description de la convention" :rows="5" class="w-full" />
           </UFormField>
           
           <UFormField label="Affiche de la convention (Optionnel)" name="image">
@@ -41,30 +41,39 @@
             </div>
           </UFormField>
           
-          <UFormField label="Date de début" name="startDate" :error="!state.startDate && currentStep === 0 ? 'La date de début est requise' : undefined">
-            <UInput v-model="state.startDate" type="datetime-local" />
-          </UFormField>
-          <UFormField label="Date de fin" name="endDate" :error="!state.endDate && currentStep === 0 ? 'La date de fin est requise' : undefined">
-            <UInput v-model="state.endDate" type="datetime-local" required />
-          </UFormField>
-          
-          <AddressAutocomplete @address-selected="handleAddressSelected" />
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <UFormField label="Date de début" name="startDate" required :error="touchedFields.startDate && !state.startDate ? 'La date de début est requise' : undefined">
+              <UInput v-model="state.startDate" type="datetime-local" size="lg" @blur="touchedFields.startDate = true" />
+            </UFormField>
+            <UFormField label="Date de fin" name="endDate" required :error="touchedFields.endDate && !state.endDate ? 'La date de fin est requise' : undefined">
+              <UInput v-model="state.endDate" type="datetime-local" required size="lg" @blur="touchedFields.endDate = true" />
+            </UFormField>
+          </div>
 
-          <UFormField label="Adresse Ligne 1" name="addressLine1" :error="!state.addressLine1 && currentStep === 0 ? 'Adresse requise' : undefined">
-            <UInput v-model="state.addressLine1" required />
-          </UFormField>
-          <UFormField label="Adresse Ligne 2 (Optionnel)" name="addressLine2">
-            <UInput v-model="state.addressLine2" />
-          </UFormField>
-          <UFormField label="Code Postal" name="postalCode" :error="!state.postalCode && currentStep === 0 ? 'Le code postal est requis' : undefined">
-            <UInput v-model="state.postalCode" required />
-          </UFormField>
-          <UFormField label="Ville" name="city" :error="!state.city && currentStep === 0 ? 'La ville est requise' : undefined">
-            <UInput v-model="state.city" required />
-          </UFormField>
-          <UFormField label="Pays" name="country" :error="!state.country && currentStep === 0 ? 'Le pays est requis' : undefined">
-            <UInput v-model="state.country" required />
-          </UFormField>
+          <UCard>
+            <template #header>
+              <AddressAutocomplete @address-selected="handleAddressSelected" />
+            </template>
+
+            <UFormField label="Adresse Ligne 1" name="addressLine1" required :error="touchedFields.addressStreet && !state.addressLine1 ? 'Adresse requise' : undefined">
+              <UInput v-model="state.addressLine1" required placeholder="Adresse principale" size="lg" @blur="touchedFields.addressStreet = true" class="w-full" />
+            </UFormField>
+            <UFormField label="Adresse Ligne 2" name="addressLine2">
+              <UInput v-model="state.addressLine2" placeholder="Complément d'adresse (optionnel)" size="lg" class="w-full" />
+            </UFormField>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <UFormField label="Code Postal" name="postalCode" required :error="touchedFields.addressZipCode && !state.postalCode ? 'Le code postal est requis' : undefined" class="md:col-span-1">
+                <UInput v-model="state.postalCode" required placeholder="75001" size="lg" @blur="touchedFields.addressZipCode = true" />
+              </UFormField>
+              <UFormField label="Ville" name="city" required :error="touchedFields.addressCity && !state.city ? 'La ville est requise' : undefined" class="md:col-span-1">
+                <UInput v-model="state.city" required placeholder="Paris" size="lg" @blur="touchedFields.addressCity = true" />
+              </UFormField>
+              <UFormField label="Pays" name="country" required :error="touchedFields.addressCountry && !state.country ? 'Le pays est requis' : undefined" class="md:col-span-1">
+                <UInput v-model="state.country" required placeholder="France" size="lg" @blur="touchedFields.addressCountry = true" />
+              </UFormField>
+            </div>
+            
+          </UCard>
         </div>
       </template>
 
@@ -80,19 +89,43 @@
       </template>
 
       <template #ticketing>
-        <UFormField label="URL Billetterie (Optionnel)" name="ticketingUrl">
-          <UInput v-model="state.ticketingUrl" type="url" placeholder="https://billetterie.com/ma-convention" />
-        </UFormField>
+        <div class="space-y-6">
+          <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Billetterie</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Informations pour l'achat de billets</p>
+            <UFormField label="Lien de la billetterie" name="ticketingUrl">
+              <UInput v-model="state.ticketingUrl" type="url" placeholder="https://billetterie.com/ma-convention">
+                <template #leading>
+                  <UIcon name="i-heroicons-ticket" />
+                </template>
+              </UInput>
+            </UFormField>
+          </div>
+        </div>
       </template>
 
       <template #visibility>
-        <div class="space-y-4">
-          <UFormField label="URL Facebook (Optionnel)" name="facebookUrl">
-            <UInput v-model="state.facebookUrl" type="url" placeholder="https://facebook.com/ma-convention" />
-          </UFormField>
-          <UFormField label="URL Instagram (Optionnel)" name="instagramUrl">
-            <UInput v-model="state.instagramUrl" type="url" placeholder="https://instagram.com/ma-convention" />
-          </UFormField>
+        <div class="space-y-6">
+          <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Réseaux sociaux</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Partagez vos pages pour augmenter la visibilité</p>
+            <div class="space-y-4">
+              <UFormField label="Page Facebook" name="facebookUrl">
+                <UInput v-model="state.facebookUrl" type="url" placeholder="https://facebook.com/ma-convention">
+                  <template #leading>
+                    <UIcon name="i-simple-icons-facebook" class="text-blue-600" />
+                  </template>
+                </UInput>
+              </UFormField>
+              <UFormField label="Compte Instagram" name="instagramUrl">
+                <UInput v-model="state.instagramUrl" type="url" placeholder="https://instagram.com/ma-convention">
+                  <template #leading>
+                    <UIcon name="i-simple-icons-instagram" class="text-pink-600" />
+                  </template>
+                </UInput>
+              </UFormField>
+            </div>
+          </div>
         </div>
       </template>
     </UStepper>
@@ -111,7 +144,7 @@
         variant="solid"
         icon="i-heroicons-arrow-right"
         trailing
-        @click="currentStep++"
+        @click="handleNextStep"
       >Suivant</UButton>
       <UButton
         v-if="currentStep === steps.length - 1"
@@ -143,6 +176,17 @@ const steps = ref<StepperItem[]>([
   { title: 'Billetterie', description: 'Billetterie', icon: 'i-heroicons-ticket', slot: 'ticketing' },
   { title: 'Visibilité (Réseaux Sociaux)', description: 'Réseaux Sociaux', icon: 'i-heroicons-globe-alt', slot: 'visibility' },
 ]);
+
+// Track which fields have been touched
+const touchedFields = reactive({
+  name: false,
+  startDate: false,
+  endDate: false,
+  addressCountry: false,
+  addressCity: false,
+  addressStreet: false,
+  addressZipCode: false
+});
 
 const state = reactive({
   name: props.initialData?.name || '',
@@ -226,6 +270,35 @@ const handleFileUpload = async (event: Event) => {
     // Reset file input
     if (target) target.value = '';
   }
+};
+
+const handleNextStep = () => {
+  // Validate current step before moving forward
+  if (currentStep.value === 0) {
+    // Mark all required fields as touched for validation
+    touchedFields.name = true;
+    touchedFields.startDate = true;
+    touchedFields.endDate = true;
+    touchedFields.addressStreet = true;
+    touchedFields.addressZipCode = true;
+    touchedFields.addressCity = true;
+    touchedFields.addressCountry = true;
+    
+    // Check if required fields are filled
+    if (!state.name || !state.startDate || !state.endDate || 
+        !state.addressLine1 || !state.postalCode || !state.city || !state.country) {
+      const toast = useToast();
+      toast.add({
+        title: 'Formulaire incomplet',
+        description: 'Veuillez remplir tous les champs obligatoires',
+        icon: 'i-heroicons-exclamation-triangle',
+        color: 'error'
+      });
+      return;
+    }
+  }
+  
+  currentStep.value++;
 };
 
 const handleAddressSelected = (address: {

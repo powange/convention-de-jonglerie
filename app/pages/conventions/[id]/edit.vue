@@ -1,16 +1,18 @@
 <template>
-  <UCard>
-    <template #header>
-      <h1 class="text-2xl font-bold">Modifier la convention</h1>
-    </template>
-    <div v-if="conventionStore.loading">
-      <p>Chargement des données de la convention...</p>
-    </div>
-    <div v-else-if="!convention">
-      <p>Convention introuvable.</p>
-    </div>
-    <ConventionForm v-else :initial-data="convention" @submit="handleUpdateConvention" submit-button-text="Mettre à jour la convention" :loading="conventionStore.loading" />
-  </UCard>
+  <div class="max-w-6xl mx-auto">
+    <UCard>
+      <template #header>
+        <h1 class="text-2xl font-bold">Modifier la convention</h1>
+      </template>
+      <div v-if="conventionStore.loading">
+        <p>Chargement des données de la convention...</p>
+      </div>
+      <div v-else-if="!convention">
+        <p>Convention introuvable.</p>
+      </div>
+      <ConventionForm v-else :initial-data="convention" @submit="handleUpdateConvention" submit-button-text="Mettre à jour la convention" :loading="conventionStore.loading" />
+    </UCard>
+  </div>
 </template>
 
 <script setup lang="ts">
