@@ -10,6 +10,17 @@ export const useConventionStore = defineStore('conventions', {
     error: null as string | null,
   }),
   actions: {
+    // Filtrer les conventions futures (date de fin >= aujourd'hui)
+    filterFutureConventions() {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0); // Début de la journée actuelle
+      
+      this.conventions = this.conventions.filter(convention => {
+        const endDate = new Date(convention.endDate);
+        return endDate >= now; // Garder seulement les conventions qui ne sont pas encore terminées
+      });
+    },
+
     // Trier les conventions par date de début (plus récente en premier)
     sortConventions() {
       this.conventions.sort((a, b) => {
@@ -17,6 +28,12 @@ export const useConventionStore = defineStore('conventions', {
         const dateB = new Date(b.startDate);
         return dateB.getTime() - dateA.getTime(); // Tri décroissant (plus récent en premier)
       });
+    },
+
+    // Appliquer le filtrage et le tri des conventions
+    processConventions() {
+      this.filterFutureConventions();
+      this.sortConventions();
     },
     async fetchConventions(filters?: { name?: string; startDate?: string; endDate?: string }) {
       this.loading = true;
@@ -37,7 +54,7 @@ export const useConventionStore = defineStore('conventions', {
           params: queryParams,
         });
         this.conventions = data;
-        this.sortConventions();
+        this.processConventions();
       } catch (e: unknown) {
         this.error = e.statusMessage || 'Failed to fetch conventions';
       } finally {
@@ -72,7 +89,7 @@ export const useConventionStore = defineStore('conventions', {
           body: conventionData,
         });
         this.conventions.push(newConvention);
-        this.sortConventions();
+        this.processConventions();
         return newConvention;
       } catch (e: unknown) {
         this.error = e.statusMessage || 'Failed to add convention';
@@ -99,7 +116,7 @@ export const useConventionStore = defineStore('conventions', {
         const index = this.conventions.findIndex((c) => c.id === id);
         if (index !== -1) {
           this.conventions[index] = updatedConvention;
-          this.sortConventions();
+          this.processConventions();
         }
         return updatedConvention;
       } catch (e: unknown) {
