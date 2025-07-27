@@ -82,13 +82,14 @@
               </div>
               
               <!-- Boutons connexion/inscription pour utilisateurs non connectés -->
-              <div v-else class="flex items-center gap-2">
+              <div v-else class="flex flex-col sm:flex-row items-center gap-2">
                 <UButton 
                   icon="i-heroicons-arrow-left-on-rectangle" 
                   size="sm" 
                   color="neutral" 
                   variant="ghost"
                   to="/login"
+                  class="w-full sm:w-auto"
                 >
                   Connexion
                 </UButton>
@@ -98,6 +99,7 @@
                   color="primary" 
                   variant="solid"
                   to="/register"
+                  class="w-full sm:w-auto"
                 >
                   Inscription
                 </UButton>
