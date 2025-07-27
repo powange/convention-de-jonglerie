@@ -23,7 +23,7 @@ export default defineNuxtConfig({
     ],
   },
   runtimeConfig: {
-    jwtSecret: process.env.JWT_SECRET, // Private keys that are only available on the server
+    jwtSecret: process.env.JWT_SECRET || 'fallback-secret-for-development', // Private keys that are only available on the server
     public: {
       // Public keys that are available on both client and server
     }
