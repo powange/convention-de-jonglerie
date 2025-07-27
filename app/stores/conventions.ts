@@ -35,11 +35,13 @@ export const useConventionStore = defineStore('conventions', {
       this.filterFutureConventions();
       this.sortConventions();
     },
-    async fetchConventions(filters?: { name?: string; startDate?: string; endDate?: string }) {
+    async fetchConventions(filters?: any) {
       this.loading = true;
       this.error = null;
       try {
         const queryParams: { [key: string]: string } = {};
+        
+        // Filtres de base
         if (filters?.name) {
           queryParams.name = filters.name;
         }
@@ -48,6 +50,20 @@ export const useConventionStore = defineStore('conventions', {
         }
         if (filters?.endDate) {
           queryParams.endDate = filters.endDate;
+        }
+        if (filters?.countries && filters.countries.length > 0) {
+          queryParams.countries = JSON.stringify(filters.countries);
+        }
+
+        // Filtres de services - passer tous les services actifs
+        if (filters) {
+          Object.keys(filters).forEach(key => {
+            if (key.startsWith('has') || key === 'acceptsPets') {
+              if (filters[key] === true) {
+                queryParams[key] = 'true';
+              }
+            }
+          });
         }
 
         const data = await $fetch<Convention[]>('/api/conventions', {

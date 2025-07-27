@@ -12,8 +12,14 @@
           </div>
         </template>
         
-        <UForm :state="filters" class="space-y-6" @submit="applyFilters">
+        <div class="space-y-6">
           <div class="space-y-6">
+
+            <!-- Bouton réinitialiser les filtres -->
+            <UButton icon="i-heroicons-arrow-path" type="button" color="neutral" variant="ghost" block @click="resetFilters">
+              Réinitialiser
+            </UButton>
+
             <!-- Filtres de recherche -->
             <div class="space-y-4">
               <UFormField label="Nom de la convention" name="name">
@@ -60,17 +66,7 @@
               </div>
             </div>
           </div>
-          
-          <!-- Boutons d'action -->
-          <div class="flex flex-col gap-2 pt-4 border-t">
-            <UButton icon="i-heroicons-magnifying-glass" type="submit" color="primary" block>
-              Appliquer les filtres
-            </UButton>
-            <UButton icon="i-heroicons-arrow-path" type="button" color="neutral" variant="ghost" block @click="resetFilters">
-              Réinitialiser
-            </UButton>
-          </div>
-        </UForm>
+        </div>
       </UCard>
     </div>
 
@@ -96,7 +92,7 @@
       </div>
 
       <!-- Filtres mobiles en overlay -->
-      <UModal v-model:open="showMobileFilters" variant="subtle">
+      <UModal v-model:open="showMobileFilters" variant="subtle" size="lg" @close="closeMobileFilters">
         <template #header>
           <div class="flex items-center gap-2">
             <h2 class="text-xl font-semibold">Filtres</h2>
@@ -105,9 +101,19 @@
             </UBadge>
           </div>
         </template>
-        
+
         <template #body>
-          <UForm :state="filters" class="space-y-6" @submit="applyFilters">
+          <!-- Boutons de réinitialisation et fermeture -->
+          <div class="flex items-center gap-2 mb-4">
+            <UButton icon="i-heroicons-arrow-path" type="button" color="neutral" variant="ghost" block @click="resetFilters">
+              Réinitialiser
+            </UButton>
+            <UButton icon="i-heroicons-x-mark" type="button" color="neutral" variant="ghost" block @click="closeMobileFilters" class="ml-auto">
+              Fermer
+            </UButton>
+          </div>
+
+          <div class="space-y-6">
             <div class="space-y-6">
               <!-- Filtres de recherche -->
               <div class="space-y-4">
@@ -155,17 +161,7 @@
                 </div>
               </div>
             </div>
-            
-            <!-- Boutons d'action -->
-            <div class="flex flex-col gap-2 pt-4 border-t">
-              <UButton icon="i-heroicons-magnifying-glass" type="submit" color="primary" block @click="applyMobileFilters">
-                Appliquer les filtres
-              </UButton>
-              <UButton icon="i-heroicons-arrow-path" type="button" color="neutral" variant="ghost" block @click="resetFilters">
-                Réinitialiser
-              </UButton>
-            </div>
-          </UForm>
+          </div>
         </template>
       </UModal>
 
@@ -248,7 +244,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, reactive } from 'vue';
+import { onMounted, computed, reactive, watch } from 'vue';
 import { useConventionStore } from '~/stores/conventions';
 import { useAuthStore } from '~/stores/auth';
 import { useRouter } from 'vue-router';
@@ -284,9 +280,10 @@ const filters = reactive({
   ...Object.fromEntries(services.map(service => [service.key, false])),
 });
 
-const applyFilters = () => {
+// Watcher pour appliquer automatiquement les filtres
+watch(filters, () => {
   conventionStore.fetchConventions(filters);
-};
+}, { deep: true, immediate: false });
 
 const resetFilters = () => {
   filters.name = '';
@@ -332,8 +329,7 @@ const deleteConvention = async (id: number) => {
   }
 };
 
-const applyMobileFilters = () => {
-  applyFilters();
+const closeMobileFilters = () => {
   showMobileFilters.value = false;
 };
 
