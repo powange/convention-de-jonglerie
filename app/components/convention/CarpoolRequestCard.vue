@@ -5,7 +5,7 @@
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-3">
           <UAvatar 
-            :src="getUserAvatar(request.user.email, 40)" 
+            :src="getUserAvatar(request.user, 40)" 
             :alt="request.user.pseudo" 
             size="md"
           />
@@ -62,7 +62,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth';
-import { useGravatar } from '~/utils/gravatar';
+import { useAvatar } from '~/utils/avatar';
 
 interface CarpoolRequest {
   id: number;
@@ -85,7 +85,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const authStore = useAuthStore();
-const { getUserAvatar } = useGravatar();
+const { getUserAvatar } = useAvatar();
 
 const formatDate = (date: string) => {
   return new Date(date).toLocaleString('fr-FR', {

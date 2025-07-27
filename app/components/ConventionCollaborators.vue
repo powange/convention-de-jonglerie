@@ -28,7 +28,7 @@
       <div v-for="collaborator in collaborators" :key="collaborator.id" class="flex items-center justify-between p-3 border rounded-lg">
         <div class="flex items-center gap-3">
           <img 
-            :src="getUserAvatar(collaborator.user.email, 40)" 
+            :src="getUserAvatar(collaborator.user, 40)" 
             :alt="`Avatar de ${collaborator.user.pseudo}`"
             class="w-10 h-10 rounded-full border-2 border-gray-200"
           />
@@ -115,7 +115,7 @@ const props = defineProps<Props>();
 const conventionStore = useConventionStore();
 const authStore = useAuthStore();
 const toast = useToast();
-const { getUserAvatar } = useGravatar();
+const { getUserAvatar } = useAvatar();
 
 const loading = ref(true);
 const adding = ref(false);

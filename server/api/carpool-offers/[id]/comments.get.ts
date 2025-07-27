@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { getEmailHash } from '../../../utils/email-hash';
 
 const prisma = new PrismaClient();
 
@@ -21,20 +22,26 @@ export default defineEventHandler(async (event) => {
         carpoolOfferId: offerId,
       },
       include: {
-        user: {
-          select: {
-            id: true,
-            pseudo: true,
-            email: true,
-          },
-        },
+        user: true,
       },
       orderBy: {
         createdAt: 'asc',
       },
     });
 
-    return comments;
+    // Transformer les données pour masquer les emails et ajouter les hash
+    const transformedComments = comments.map(comment => ({
+      ...comment,
+      user: {
+        id: comment.user.id,
+        pseudo: comment.user.pseudo,
+        emailHash: getEmailHash(comment.user.email),
+        profilePicture: comment.user.profilePicture,
+        updatedAt: comment.user.updatedAt,
+      },
+    }));
+
+    return transformedComments;
   } catch (error) {
     console.error('Erreur lors de la récupération des commentaires:', error);
     throw createError({

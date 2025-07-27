@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { getEmailHash } from '../../../utils/email-hash';
 
 const prisma = new PrismaClient();
 
@@ -18,24 +19,10 @@ export default defineEventHandler(async (event) => {
         conventionId,
       },
       include: {
-        user: {
-          select: {
-            id: true,
-            pseudo: true,
-            prenom: true,
-            nom: true,
-            email: true,
-          },
-        },
+        user: true,
         comments: {
           include: {
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                email: true,
-              },
-            },
+            user: true,
           },
           orderBy: {
             createdAt: 'desc',
@@ -47,7 +34,31 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    return carpoolOffers;
+    // Transformer les données pour masquer les emails et ajouter les hash
+    const transformedOffers = carpoolOffers.map(offer => ({
+      ...offer,
+      user: {
+        id: offer.user.id,
+        pseudo: offer.user.pseudo,
+        prenom: offer.user.prenom,
+        nom: offer.user.nom,
+        emailHash: getEmailHash(offer.user.email),
+        profilePicture: offer.user.profilePicture,
+        updatedAt: offer.user.updatedAt,
+      },
+      comments: offer.comments.map(comment => ({
+        ...comment,
+        user: {
+          id: comment.user.id,
+          pseudo: comment.user.pseudo,
+          emailHash: getEmailHash(comment.user.email),
+          profilePicture: comment.user.profilePicture,
+          updatedAt: comment.user.updatedAt,
+        },
+      })),
+    }));
+
+    return transformedOffers;
   } catch (error) {
     console.error('Erreur lors de la récupération des covoiturages:', error);
     throw createError({

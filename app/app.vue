@@ -32,7 +32,7 @@
                 >
                   <div class="flex items-center gap-2">
                     <img 
-                      :src="getUserAvatar(authStore.user.email, 32)" 
+                      :src="getUserAvatar(authStore.user, 32)" 
                       :alt="`Avatar de ${displayName}`"
                       class="w-8 h-8 rounded-full border-2 border-gray-200"
                     />
@@ -120,7 +120,7 @@ import { useGravatar } from './utils/gravatar';
 const authStore = useAuthStore();
 const toast = useToast();
 const router = useRouter();
-const { getUserAvatar } = useGravatar();
+const { getUserAvatar } = useAvatar();
 
 const showUserMenu = ref(false);
 

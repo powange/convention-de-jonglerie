@@ -1,4 +1,26 @@
 
+export interface User {
+  id: number;
+  email: string;
+  pseudo: string;
+  nom: string;
+  prenom: string;
+  profilePicture?: string | null;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// Interface pour les utilisateurs publics (sans email)
+export interface PublicUser {
+  id: number;
+  pseudo: string;
+  nom: string;
+  prenom: string;
+  emailHash: string;
+  profilePicture?: string | null;
+  updatedAt?: string;
+}
+
 export interface Convention {
   id: number;
   name: string;
@@ -22,7 +44,7 @@ export interface Convention {
   hasTruckCamping: boolean;
   hasGym: boolean;
   creatorId: number;
-  creator: { id: number; email: string; pseudo: string };
+  creator: User;
   favoritedBy: { id: number }[];
   collaborators?: ConventionCollaborator[];
 }
@@ -34,6 +56,6 @@ export interface ConventionCollaborator {
   canEdit: boolean;
   addedAt: string;
   addedById: number;
-  user: { id: number; email: string; pseudo: string; prenom: string; nom: string };
+  user: User;
   addedBy: { id: number; pseudo: string };
 }

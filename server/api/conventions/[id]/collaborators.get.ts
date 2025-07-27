@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
+import { getEmailHash } from '../../../utils/email-hash';
 
 const prisma = new PrismaClient();
 
@@ -28,9 +29,7 @@ export default defineEventHandler(async (event) => {
         },
         collaborators: {
           include: {
-            user: {
-              select: { id: true, email: true, pseudo: true, prenom: true, nom: true }
-            },
+            user: true,
             addedBy: {
               select: { id: true, pseudo: true }
             }
@@ -54,7 +53,21 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return convention.collaborators;
+    // Transformer les données pour masquer les emails et ajouter les hash
+    const transformedCollaborators = convention.collaborators.map(collab => ({
+      ...collab,
+      user: {
+        id: collab.user.id,
+        pseudo: collab.user.pseudo,
+        prenom: collab.user.prenom,
+        nom: collab.user.nom,
+        emailHash: getEmailHash(collab.user.email),
+        profilePicture: collab.user.profilePicture,
+        updatedAt: collab.user.updatedAt,
+      },
+    }));
+
+    return transformedCollaborators;
   } catch (error) {
     console.error('Erreur lors de la récupération des collaborateurs:', error);
     throw createError({

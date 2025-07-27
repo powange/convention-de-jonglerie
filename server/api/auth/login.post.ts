@@ -53,5 +53,17 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const token = jwt.sign({ userId: user.id }, config.jwtSecret, { expiresIn: '1h' });
 
-  return { token, user: { id: user.id, email: user.email, pseudo: user.pseudo, nom: user.nom, prenom: user.prenom } };
+  return { 
+    token, 
+    user: { 
+      id: user.id, 
+      email: user.email, 
+      pseudo: user.pseudo, 
+      nom: user.nom, 
+      prenom: user.prenom,
+      profilePicture: user.profilePicture,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    } 
+  };
 });

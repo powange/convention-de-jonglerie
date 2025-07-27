@@ -72,7 +72,7 @@
               <div class="flex flex-wrap gap-2">
                 <div v-for="collaborator in convention.collaborators" :key="collaborator.id" class="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1">
                   <img 
-                    :src="getUserAvatar(collaborator.user.email, 20)" 
+                    :src="getUserAvatar(collaborator.user, 20)" 
                     :alt="`Avatar de ${collaborator.user.pseudo}`"
                     class="w-5 h-5 rounded-full"
                   />
@@ -109,7 +109,7 @@ const router = useRouter();
 const conventionStore = useConventionStore();
 const authStore = useAuthStore();
 const toast = useToast();
-const { getUserAvatar } = useGravatar();
+const { getUserAvatar } = useAvatar();
 
 const conventionId = parseInt(route.params.id as string);
 const convention = ref(null);

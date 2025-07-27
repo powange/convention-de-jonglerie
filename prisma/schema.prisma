@@ -11,14 +11,15 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  pseudo    String   @unique
-  nom       String
-  prenom    String
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  pseudo         String   @unique
+  nom            String
+  prenom         String
+  password       String
+  profilePicture String?  // URL vers la photo de profil
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Conventions created by this user
   createdConventions Convention[] @relation("CreatedConventions")

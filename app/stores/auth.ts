@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
+import type { User } from '~/types';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null as { id: number; email: string; pseudo: string; nom: string; prenom: string } | null,
+    user: null as User | null,
     token: null as string | null,
     tokenExpiry: null as number | null,
     rememberMe: false,
@@ -112,6 +113,18 @@ export const useAuthStore = defineStore('auth', {
         // Rediriger vers la page de connexion
         if (import.meta.client) {
           navigateTo('/login');
+        }
+      }
+    },
+    
+    updateUser(updatedUser: Partial<User>) {
+      if (this.user) {
+        this.user = { ...this.user, ...updatedUser };
+        
+        // Mettre à jour le localStorage/sessionStorage
+        if (import.meta.client) {
+          const storage = this.rememberMe ? localStorage : sessionStorage;
+          storage.setItem('authUser', JSON.stringify(this.user));
         }
       }
     },

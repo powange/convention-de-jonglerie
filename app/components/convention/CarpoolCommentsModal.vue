@@ -23,7 +23,7 @@
         <UCard v-for="comment in comments" :key="comment.id" variant="subtle">
         <div class="flex items-center gap-2 mb-2">
           <UAvatar 
-            :src="getUserAvatar(comment.user.email, 24)" 
+            :src="getUserAvatar(comment.user, 24)" 
             :alt="comment.user.pseudo" 
             size="xs"
           />
@@ -78,7 +78,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth';
-import { useGravatar } from '~/utils/gravatar';
+import { useAvatar } from '~/utils/avatar';
 
 interface Comment {
   id: number;
@@ -105,7 +105,7 @@ const emit = defineEmits<{
 
 const authStore = useAuthStore();
 const toast = useToast();
-const { getUserAvatar } = useGravatar();
+const { getUserAvatar } = useAvatar();
 
 const loading = ref(false);
 const comments = ref<Comment[]>([]);

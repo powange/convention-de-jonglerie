@@ -5,7 +5,7 @@
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-3">
           <UAvatar 
-            :src="getUserAvatar(offer.user.email, 40)" 
+            :src="getUserAvatar(offer.user, 40)" 
             :alt="offer.user.pseudo" 
             size="md"
           />
@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth';
-import { useGravatar } from '~/utils/gravatar';
+import { useAvatar } from '~/utils/avatar';
 import CarpoolCommentsModal from './CarpoolCommentsModal.vue';
 
 interface CarpoolOffer {
@@ -84,7 +84,9 @@ interface CarpoolOffer {
   user: {
     id: number;
     pseudo: string;
-    email: string;
+    emailHash: string;
+    profilePicture?: string | null;
+    updatedAt?: string;
   };
   comments?: Array<{
     id: number;
@@ -93,7 +95,9 @@ interface CarpoolOffer {
     user: {
       id: number;
       pseudo: string;
-      email: string;
+      emailHash: string;
+      profilePicture?: string | null;
+      updatedAt?: string;
     };
   }>;
 }
@@ -108,7 +112,7 @@ const emit = defineEmits<{
 }>();
 
 const authStore = useAuthStore();
-const { getUserAvatar } = useGravatar();
+const { getUserAvatar } = useAvatar();
 
 const formatDate = (date: string) => {
   return new Date(date).toLocaleString('fr-FR', {

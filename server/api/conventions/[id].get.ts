@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
           collaborators: {
             include: {
               user: {
-                select: { id: true, email: true, pseudo: true, prenom: true, nom: true }
+                select: { id: true, email: true, pseudo: true, prenom: true, nom: true, profilePicture: true, updatedAt: true }
               },
               addedBy: {
                 select: { id: true, pseudo: true }
