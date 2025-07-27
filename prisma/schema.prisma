@@ -59,12 +59,24 @@ model Convention {
   ticketingUrl String?
   facebookUrl  String?
   instagramUrl String?
-  hasFastfood    Boolean @default(false)
-  hasKidsZone    Boolean @default(false)
-  acceptsPets    Boolean @default(false)
-  hasTentCamping Boolean @default(false)
-  hasTruckCamping Boolean @default(false)
-  hasGym         Boolean @default(false)
+  hasFoodTrucks     Boolean @default(false)
+  hasKidsZone       Boolean @default(false)
+  acceptsPets       Boolean @default(false)
+  hasTentCamping    Boolean @default(false)
+  hasTruckCamping   Boolean @default(false)
+  hasGym            Boolean @default(false)
+  hasFamilyCamping  Boolean @default(false)
+  hasFireSpace      Boolean @default(false)
+  hasGala           Boolean @default(false)
+  hasOpenStage      Boolean @default(false)
+  hasConcert        Boolean @default(false)
+  hasCantine        Boolean @default(false)
+  hasAerialSpace    Boolean @default(false)
+  hasSlacklineSpace Boolean @default(false)
+  hasToilets        Boolean @default(false)
+  hasShowers        Boolean @default(false)
+  hasAccessibility  Boolean @default(false)
+  hasWorkshops      Boolean @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

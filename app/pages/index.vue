@@ -47,12 +47,12 @@
                 <!-- Filtres services -->
                 <div class="space-y-4">
                   <h4 class="font-medium text-gray-700">Services recherchés :</h4>
-                  <div class="space-y-2">
-                    <UCheckbox v-model="filters.hasFastfood" name="hasFastfood">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <UCheckbox v-model="filters.hasFoodTrucks" name="hasFoodTrucks">
                       <template #label>
                         <div class="flex items-center gap-2">
                           <UIcon name="i-heroicons-building-storefront" class="text-orange-500" size="16" />
-                          <span>Restauration</span>
+                          <span>Food trucks</span>
                         </div>
                       </template>
                     </UCheckbox>
@@ -69,7 +69,7 @@
                     <UCheckbox v-model="filters.acceptsPets" name="acceptsPets">
                       <template #label>
                         <div class="flex items-center gap-2">
-                          <UIcon name="i-heroicons-heart" class="text-red-500" size="16" />
+                          <UIcon name="i-material-symbols:pets" class="text-amber-600" size="16" />
                           <span>Animaux acceptés</span>
                         </div>
                       </template>
@@ -93,11 +93,119 @@
                       </template>
                     </UCheckbox>
                     
+                    <UCheckbox v-model="filters.hasFamilyCamping" name="hasFamilyCamping">
+                      <template #label>
+                        <div class="flex items-center gap-2">
+                          <UIcon name="i-heroicons-users" class="text-indigo-500" size="16" />
+                          <span>Camping famille</span>
+                        </div>
+                      </template>
+                    </UCheckbox>
+                    
                     <UCheckbox v-model="filters.hasGym" name="hasGym">
                       <template #label>
                         <div class="flex items-center gap-2">
                           <UIcon name="i-heroicons-trophy" class="text-purple-500" size="16" />
-                          <span>Salle de sport</span>
+                          <span>Gymnase</span>
+                        </div>
+                      </template>
+                    </UCheckbox>
+                    
+                    <UCheckbox v-model="filters.hasFireSpace" name="hasFireSpace">
+                      <template #label>
+                        <div class="flex items-center gap-2">
+                          <UIcon name="i-heroicons-fire" class="text-red-600" size="16" />
+                          <span>Fire space</span>
+                        </div>
+                      </template>
+                    </UCheckbox>
+                    
+                    <UCheckbox v-model="filters.hasGala" name="hasGala">
+                      <template #label>
+                        <div class="flex items-center gap-2">
+                          <UIcon name="i-heroicons-sparkles" class="text-yellow-500" size="16" />
+                          <span>Gala</span>
+                        </div>
+                      </template>
+                    </UCheckbox>
+                    
+                    <UCheckbox v-model="filters.hasOpenStage" name="hasOpenStage">
+                      <template #label>
+                        <div class="flex items-center gap-2">
+                          <UIcon name="i-heroicons-microphone" class="text-cyan-500" size="16" />
+                          <span>Scène ouverte</span>
+                        </div>
+                      </template>
+                    </UCheckbox>
+                    
+                    <UCheckbox v-model="filters.hasConcert" name="hasConcert">
+                      <template #label>
+                        <div class="flex items-center gap-2">
+                          <UIcon name="i-heroicons-musical-note" class="text-violet-500" size="16" />
+                          <span>Concert</span>
+                        </div>
+                      </template>
+                    </UCheckbox>
+                    
+                    <UCheckbox v-model="filters.hasCantine" name="hasCantine">
+                      <template #label>
+                        <div class="flex items-center gap-2">
+                          <UIcon name="i-heroicons-cake" class="text-amber-500" size="16" />
+                          <span>Cantine</span>
+                        </div>
+                      </template>
+                    </UCheckbox>
+                    
+                    <UCheckbox v-model="filters.hasAerialSpace" name="hasAerialSpace">
+                      <template #label>
+                        <div class="flex items-center gap-2">
+                          <UIcon name="i-heroicons-cloud" class="text-sky-500" size="16" />
+                          <span>Espace aérien</span>
+                        </div>
+                      </template>
+                    </UCheckbox>
+                    
+                    <UCheckbox v-model="filters.hasSlacklineSpace" name="hasSlacklineSpace">
+                      <template #label>
+                        <div class="flex items-center gap-2">
+                          <UIcon name="i-heroicons-minus" class="text-teal-500" size="16" />
+                          <span>Espace slackline</span>
+                        </div>
+                      </template>
+                    </UCheckbox>
+                    
+                    <UCheckbox v-model="filters.hasToilets" name="hasToilets">
+                      <template #label>
+                        <div class="flex items-center gap-2">
+                          <UIcon name="i-heroicons-home-modern" class="text-gray-500" size="16" />
+                          <span>WC</span>
+                        </div>
+                      </template>
+                    </UCheckbox>
+                    
+                    <UCheckbox v-model="filters.hasShowers" name="hasShowers">
+                      <template #label>
+                        <div class="flex items-center gap-2">
+                          <UIcon name="i-heroicons-beaker" class="text-blue-400" size="16" />
+                          <span>Douches</span>
+                        </div>
+                      </template>
+                    </UCheckbox>
+                    
+                    <UCheckbox v-model="filters.hasAccessibility" name="hasAccessibility">
+                      <template #label>
+                        <div class="flex items-center gap-2">
+                          <UIcon name="i-heroicons-check-badge" class="text-emerald-500" size="16" />
+                          <span>Accessibilité handicapé</span>
+                        </div>
+                      </template>
+                    </UCheckbox>
+                    
+                    <UCheckbox v-model="filters.hasWorkshops" name="hasWorkshops">
+                      <template #label>
+                        <div class="flex items-center gap-2">
+                          <UIcon name="i-heroicons-academic-cap" class="text-slate-600" size="16" />
+                          <span>Workshops</span>
                         </div>
                       </template>
                     </UCheckbox>
@@ -150,12 +258,24 @@
         
         <!-- Services avec pictos -->
         <div class="flex flex-wrap gap-1 mt-2">
-          <UIcon v-if="convention.hasFastfood" name="i-heroicons-building-storefront" class="text-orange-500" size="20" title="Restauration" />
+          <UIcon v-if="convention.hasFoodTrucks" name="i-heroicons-building-storefront" class="text-orange-500" size="20" title="Food trucks" />
           <UIcon v-if="convention.hasKidsZone" name="i-heroicons-face-smile" class="text-pink-500" size="20" title="Zone enfants" />
-          <UIcon v-if="convention.acceptsPets" name="i-heroicons-heart" class="text-red-500" size="20" title="Animaux acceptés" />
+          <UIcon v-if="convention.acceptsPets" name="i-material-symbols:pets" class="text-amber-600" size="20" title="Animaux acceptés" />
           <UIcon v-if="convention.hasTentCamping" name="i-heroicons-home" class="text-green-500" size="20" title="Camping tente" />
           <UIcon v-if="convention.hasTruckCamping" name="i-heroicons-truck" class="text-blue-500" size="20" title="Camping camion" />
-          <UIcon v-if="convention.hasGym" name="i-heroicons-trophy" class="text-purple-500" size="20" title="Salle de sport" />
+          <UIcon v-if="convention.hasFamilyCamping" name="i-heroicons-users" class="text-indigo-500" size="20" title="Camping famille" />
+          <UIcon v-if="convention.hasGym" name="i-heroicons-trophy" class="text-purple-500" size="20" title="Gymnase" />
+          <UIcon v-if="convention.hasFireSpace" name="i-heroicons-fire" class="text-red-600" size="20" title="Fire space" />
+          <UIcon v-if="convention.hasGala" name="i-heroicons-sparkles" class="text-yellow-500" size="20" title="Gala" />
+          <UIcon v-if="convention.hasOpenStage" name="i-heroicons-microphone" class="text-cyan-500" size="20" title="Scène ouverte" />
+          <UIcon v-if="convention.hasConcert" name="i-heroicons-musical-note" class="text-violet-500" size="20" title="Concert" />
+          <UIcon v-if="convention.hasCantine" name="i-heroicons-cake" class="text-amber-500" size="20" title="Cantine" />
+          <UIcon v-if="convention.hasAerialSpace" name="i-heroicons-cloud" class="text-sky-500" size="20" title="Espace aérien" />
+          <UIcon v-if="convention.hasSlacklineSpace" name="i-heroicons-minus" class="text-teal-500" size="20" title="Espace slackline" />
+          <UIcon v-if="convention.hasToilets" name="i-heroicons-home-modern" class="text-gray-500" size="20" title="WC" />
+          <UIcon v-if="convention.hasShowers" name="i-heroicons-beaker" class="text-blue-400" size="20" title="Douches" />
+          <UIcon v-if="convention.hasAccessibility" name="i-heroicons-check-badge" class="text-emerald-500" size="20" title="Accessibilité handicapé" />
+          <UIcon v-if="convention.hasWorkshops" name="i-heroicons-academic-cap" class="text-slate-600" size="20" title="Workshops" />
         </div>
         <template #footer>
           <div class="flex justify-end space-x-2">
@@ -215,12 +335,24 @@ const activeFiltersCount = computed(() => {
   if (filters.startDate) count++;
   if (filters.endDate) count++;
   if (filters.countries.length > 0) count++;
-  if (filters.hasFastfood) count++;
+  if (filters.hasFoodTrucks) count++;
   if (filters.hasKidsZone) count++;
   if (filters.acceptsPets) count++;
   if (filters.hasTentCamping) count++;
   if (filters.hasTruckCamping) count++;
+  if (filters.hasFamilyCamping) count++;
   if (filters.hasGym) count++;
+  if (filters.hasFireSpace) count++;
+  if (filters.hasGala) count++;
+  if (filters.hasOpenStage) count++;
+  if (filters.hasConcert) count++;
+  if (filters.hasCantine) count++;
+  if (filters.hasAerialSpace) count++;
+  if (filters.hasSlacklineSpace) count++;
+  if (filters.hasToilets) count++;
+  if (filters.hasShowers) count++;
+  if (filters.hasAccessibility) count++;
+  if (filters.hasWorkshops) count++;
   return count;
 });
 
@@ -229,12 +361,24 @@ const filters = reactive({
   startDate: '',
   endDate: '',
   countries: [] as string[],
-  hasFastfood: false,
+  hasFoodTrucks: false,
   hasKidsZone: false,
   acceptsPets: false,
   hasTentCamping: false,
   hasTruckCamping: false,
+  hasFamilyCamping: false,
   hasGym: false,
+  hasFireSpace: false,
+  hasGala: false,
+  hasOpenStage: false,
+  hasConcert: false,
+  hasCantine: false,
+  hasAerialSpace: false,
+  hasSlacklineSpace: false,
+  hasToilets: false,
+  hasShowers: false,
+  hasAccessibility: false,
+  hasWorkshops: false,
 });
 
 const applyFilters = () => {
@@ -246,12 +390,24 @@ const resetFilters = () => {
   filters.startDate = '';
   filters.endDate = '';
   filters.countries = [];
-  filters.hasFastfood = false;
+  filters.hasFoodTrucks = false;
   filters.hasKidsZone = false;
   filters.acceptsPets = false;
   filters.hasTentCamping = false;
   filters.hasTruckCamping = false;
+  filters.hasFamilyCamping = false;
   filters.hasGym = false;
+  filters.hasFireSpace = false;
+  filters.hasGala = false;
+  filters.hasOpenStage = false;
+  filters.hasConcert = false;
+  filters.hasCantine = false;
+  filters.hasAerialSpace = false;
+  filters.hasSlacklineSpace = false;
+  filters.hasToilets = false;
+  filters.hasShowers = false;
+  filters.hasAccessibility = false;
+  filters.hasWorkshops = false;
   conventionStore.fetchConventions(); // Fetch all conventions again
 };
 

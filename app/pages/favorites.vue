@@ -63,12 +63,24 @@
           
           <!-- Services avec pictos -->
           <div class="flex flex-wrap gap-1 mt-2">
-            <UIcon v-if="convention.hasFastfood" name="i-heroicons-building-storefront" class="text-orange-500" size="20" title="Restauration" />
+            <UIcon v-if="convention.hasFoodTrucks" name="i-heroicons-building-storefront" class="text-orange-500" size="20" title="Food trucks" />
             <UIcon v-if="convention.hasKidsZone" name="i-heroicons-face-smile" class="text-pink-500" size="20" title="Zone enfants" />
-            <UIcon v-if="convention.acceptsPets" name="i-heroicons-heart" class="text-red-500" size="20" title="Animaux acceptés" />
+            <UIcon v-if="convention.acceptsPets" name="i-material-symbols:pets" class="text-amber-600" size="20" title="Animaux acceptés" />
             <UIcon v-if="convention.hasTentCamping" name="i-heroicons-home" class="text-green-500" size="20" title="Camping tente" />
             <UIcon v-if="convention.hasTruckCamping" name="i-heroicons-truck" class="text-blue-500" size="20" title="Camping camion" />
-            <UIcon v-if="convention.hasGym" name="i-heroicons-trophy" class="text-purple-500" size="20" title="Salle de sport" />
+            <UIcon v-if="convention.hasFamilyCamping" name="i-heroicons-users" class="text-indigo-500" size="20" title="Camping famille" />
+            <UIcon v-if="convention.hasGym" name="i-heroicons-trophy" class="text-purple-500" size="20" title="Gymnase" />
+            <UIcon v-if="convention.hasFireSpace" name="i-heroicons-fire" class="text-red-600" size="20" title="Fire space" />
+            <UIcon v-if="convention.hasGala" name="i-heroicons-sparkles" class="text-yellow-500" size="20" title="Gala" />
+            <UIcon v-if="convention.hasOpenStage" name="i-heroicons-microphone" class="text-cyan-500" size="20" title="Scène ouverte" />
+            <UIcon v-if="convention.hasConcert" name="i-heroicons-musical-note" class="text-violet-500" size="20" title="Concert" />
+            <UIcon v-if="convention.hasCantine" name="i-heroicons-cake" class="text-amber-500" size="20" title="Cantine" />
+            <UIcon v-if="convention.hasAerialSpace" name="i-heroicons-cloud" class="text-sky-500" size="20" title="Espace aérien" />
+            <UIcon v-if="convention.hasSlacklineSpace" name="i-heroicons-minus" class="text-teal-500" size="20" title="Espace slackline" />
+            <UIcon v-if="convention.hasToilets" name="i-heroicons-home-modern" class="text-gray-500" size="20" title="WC" />
+            <UIcon v-if="convention.hasShowers" name="i-heroicons-beaker" class="text-blue-400" size="20" title="Douches" />
+            <UIcon v-if="convention.hasAccessibility" name="i-heroicons-check-badge" class="text-emerald-500" size="20" title="Accessibilité handicapé" />
+            <UIcon v-if="convention.hasWorkshops" name="i-heroicons-academic-cap" class="text-slate-600" size="20" title="Workshops" />
           </div>
 
           <template #footer>
