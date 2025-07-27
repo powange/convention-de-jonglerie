@@ -246,7 +246,7 @@
               v-if="authStore.user?.profilePicture"
               icon="i-heroicons-trash" 
               variant="outline" 
-              color="red" 
+              color="error" 
               block
               :loading="pictureLoading"
               @click="deleteProfilePicture"
@@ -267,12 +267,6 @@
             <p>Formats acceptés : JPG, PNG, GIF, WebP</p>
             <p>Taille maximale : 5MB</p>
           </div>
-        </div>
-      </template>
-      
-      <template #footer>
-        <div class="flex justify-end">
-          <UButton label="Fermer" variant="ghost" @click="close" />
         </div>
       </template>
     </UModal>
