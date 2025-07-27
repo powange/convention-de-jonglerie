@@ -29,7 +29,7 @@ services:
       NUXT_PORT: "3000"
       NODE_ENV: "production"
     volumes:
-      - ./public/uploads:/app/public/uploads
+      - uploads_data:/app/public/uploads
     depends_on:
       database:
         condition: service_healthy
@@ -48,6 +48,8 @@ services:
 
 volumes:
   mysql_data:
+    driver: local
+  uploads_data:
     driver: local
 
 networks:
