@@ -4,10 +4,10 @@
       <template #general>
         <div class="space-y-6">
           <UFormField label="Nom" name="name" required :error="touchedFields.name && !state.name ? 'Le nom est requis' : undefined">
-            <UInput v-model="state.name" required placeholder="Nom de la convention" size="lg" class="w-full" @blur="touchedFields.name = true"/>
+            <UInput v-model="state.name" required placeholder="Nom de la convention" size="lg" class="w-full" @blur="touchedFields.name = true; trimField('name')"/>
           </UFormField>
           <UFormField label="Description" name="description">
-            <UTextarea v-model="state.description" placeholder="Description de la convention" :rows="5" class="w-full" />
+            <UTextarea v-model="state.description" placeholder="Description de la convention" :rows="5" class="w-full" @blur="trimField('description')" />
           </UFormField>
           
           <UFormField label="Affiche de la convention (Optionnel)" name="image">
@@ -56,20 +56,20 @@
             </template>
 
             <UFormField label="Adresse Ligne 1" name="addressLine1" required :error="touchedFields.addressStreet && !state.addressLine1 ? 'Adresse requise' : undefined">
-              <UInput v-model="state.addressLine1" required placeholder="Adresse principale" size="lg" class="w-full" @blur="touchedFields.addressStreet = true" />
+              <UInput v-model="state.addressLine1" required placeholder="Adresse principale" size="lg" class="w-full" @blur="touchedFields.addressStreet = true; trimField('addressLine1')" />
             </UFormField>
             <UFormField label="Adresse Ligne 2" name="addressLine2">
-              <UInput v-model="state.addressLine2" placeholder="Complément d'adresse (optionnel)" size="lg" class="w-full" />
+              <UInput v-model="state.addressLine2" placeholder="Complément d'adresse (optionnel)" size="lg" class="w-full" @blur="trimField('addressLine2')" />
             </UFormField>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <UFormField label="Code Postal" name="postalCode" required :error="touchedFields.addressZipCode && !state.postalCode ? 'Le code postal est requis' : undefined" class="md:col-span-1">
-                <UInput v-model="state.postalCode" required placeholder="75001" size="lg" @blur="touchedFields.addressZipCode = true" />
+                <UInput v-model="state.postalCode" required placeholder="75001" size="lg" @blur="touchedFields.addressZipCode = true; trimField('postalCode')" />
               </UFormField>
               <UFormField label="Ville" name="city" required :error="touchedFields.addressCity && !state.city ? 'La ville est requise' : undefined" class="md:col-span-1">
-                <UInput v-model="state.city" required placeholder="Paris" size="lg" @blur="touchedFields.addressCity = true" />
+                <UInput v-model="state.city" required placeholder="Paris" size="lg" @blur="touchedFields.addressCity = true; trimField('city')" />
               </UFormField>
               <UFormField label="Pays" name="country" required :error="touchedFields.addressCountry && !state.country ? 'Le pays est requis' : undefined" class="md:col-span-1">
-                <UInput v-model="state.country" required placeholder="France" size="lg" @blur="touchedFields.addressCountry = true" />
+                <UInput v-model="state.country" required placeholder="France" size="lg" @blur="touchedFields.addressCountry = true; trimField('country')" />
               </UFormField>
             </div>
             
@@ -109,7 +109,7 @@
             <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Billetterie</h3>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Informations pour l'achat de billets</p>
             <UFormField label="Lien de la billetterie" name="ticketingUrl">
-              <UInput v-model="state.ticketingUrl" type="url" placeholder="https://billetterie.com/ma-convention">
+              <UInput v-model="state.ticketingUrl" type="url" placeholder="https://billetterie.com/ma-convention" @blur="trimField('ticketingUrl')">
                 <template #leading>
                   <UIcon name="i-heroicons-ticket" />
                 </template>
@@ -126,14 +126,14 @@
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Partagez vos pages pour augmenter la visibilité</p>
             <div class="space-y-4">
               <UFormField label="Page Facebook" name="facebookUrl">
-                <UInput v-model="state.facebookUrl" type="url" placeholder="https://facebook.com/ma-convention">
+                <UInput v-model="state.facebookUrl" type="url" placeholder="https://facebook.com/ma-convention" @blur="trimField('facebookUrl')">
                   <template #leading>
                     <UIcon name="i-simple-icons-facebook" class="text-blue-600" />
                   </template>
                 </UInput>
               </UFormField>
               <UFormField label="Compte Instagram" name="instagramUrl">
-                <UInput v-model="state.instagramUrl" type="url" placeholder="https://instagram.com/ma-convention">
+                <UInput v-model="state.instagramUrl" type="url" placeholder="https://instagram.com/ma-convention" @blur="trimField('instagramUrl')">
                   <template #leading>
                     <UIcon name="i-simple-icons-instagram" class="text-pink-600" />
                   </template>
@@ -274,6 +274,27 @@ const validateDates = () => {
 
 const dateValidation = computed(() => validateDates());
 
+// Fonctions pour nettoyer les espaces en début/fin des champs texte
+const trimField = (fieldName: string) => {
+  if (state[fieldName] && typeof state[fieldName] === 'string') {
+    state[fieldName] = state[fieldName].trim();
+  }
+};
+
+const trimAllTextFields = () => {
+  trimField('name');
+  trimField('description');
+  trimField('addressLine1');
+  trimField('addressLine2');
+  trimField('postalCode');
+  trimField('city');
+  trimField('region');
+  trimField('country');
+  trimField('ticketingUrl');
+  trimField('facebookUrl');
+  trimField('instagramUrl');
+};
+
 // Fonctions pour obtenir les erreurs de validation des champs de date
 const getStartDateError = () => {
   if (touchedFields.startDate && !state.startDate) {
@@ -412,6 +433,9 @@ const handleAddressSelected = (address: {
 };
 
 const handleSubmit = () => {
+  // Nettoyer tous les champs texte avant validation finale
+  trimAllTextFields();
+  
   // Validation finale avant soumission
   if (!dateValidation.value.isValid) {
     const toast = useToast();

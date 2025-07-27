@@ -12,6 +12,7 @@
       <UInput
         v-model="form.departureCity"
         placeholder="Ex: Paris"
+        @blur="trimField('departureCity')"
       />
     </UFormField>
 
@@ -29,6 +30,7 @@
         v-model="form.phoneNumber"
         type="tel"
         placeholder="Ex: 06 12 34 56 78"
+        @blur="trimField('phoneNumber')"
       />
     </UFormField>
 
@@ -37,6 +39,7 @@
         v-model="form.description"
         placeholder="Précisions sur votre demande, flexibilité horaire, etc."
         :rows="3"
+        @blur="trimField('description')"
       />
     </UFormField>
 
@@ -67,6 +70,19 @@ const emit = defineEmits<{
 
 const toast = useToast();
 const isSubmitting = ref(false);
+
+// Fonctions pour nettoyer les espaces en début/fin des champs texte
+const trimField = (fieldName: keyof typeof form) => {
+  if (form[fieldName] && typeof form[fieldName] === 'string') {
+    form[fieldName] = form[fieldName].trim();
+  }
+};
+
+const trimAllTextFields = () => {
+  trimField('departureCity');
+  trimField('phoneNumber');
+  trimField('description');
+};
 
 // Date minimum = aujourd'hui
 const minDate = new Date().toISOString().slice(0, 16);
@@ -99,6 +115,10 @@ const validate = (state: typeof form) => {
 
 const onSubmit = async () => {
   console.log('Formulaire de demande soumis:', form);
+  
+  // Nettoyer tous les champs texte avant soumission
+  trimAllTextFields();
+  
   isSubmitting.value = true;
   
   try {

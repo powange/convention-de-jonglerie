@@ -50,6 +50,7 @@
           placeholder="Ajouter un commentaire..."
           autoresize
           class="w-full"
+          @blur="newComment = newComment.trim()"
         />
         <div class="flex justify-end">
           <UButton
@@ -161,7 +162,9 @@ const formatRelativeTime = (date: string) => {
 };
 
 const addComment = async () => {
-  if (!newComment.value.trim()) return;
+  // Nettoyer le commentaire et vérifier qu'il n'est pas vide
+  newComment.value = newComment.value.trim();
+  if (!newComment.value) return;
 
   isAddingComment.value = true;
   try {
