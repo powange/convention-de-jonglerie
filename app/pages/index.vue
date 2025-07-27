@@ -1,53 +1,44 @@
 <template>
-  <div>
-    <div class="flex justify-between items-center mb-4">
-      <h1 class="text-3xl font-bold">Conventions de Jonglerie</h1>
-      <UButton v-if="authStore.isAuthenticated" icon="i-heroicons-plus" size="md" color="primary" variant="solid" label="Ajouter une Convention" @click="navigateToAddConvention" />
-    </div>
-
-    <UCard class="mb-4">
-      <UCollapsible v-model:open="showFilters">
-        <template #default="{ open, toggle }">
-          <div class="flex justify-between items-center p-4 cursor-pointer" @click="toggle">
-            <div class="flex items-center gap-2">
-              <h2 class="text-xl font-semibold">Filtrer les Conventions</h2>
-              <UBadge v-if="activeFiltersCount > 0" :color="'primary'" variant="solid" size="xs">
-                {{ activeFiltersCount }}
-              </UBadge>
-            </div>
-            <UIcon 
-              :name="open ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'" 
-              class="transition-transform duration-200"
-            />
+  <div class="flex gap-6">
+    <!-- Panneau de filtres à gauche -->
+    <div class="w-80 flex-shrink-0 hidden lg:block">
+      <UCard class="sticky top-4">
+        <template #header>
+          <div class="flex items-center gap-2">
+            <h2 class="text-xl font-semibold">Filtres</h2>
+            <UBadge v-if="activeFiltersCount > 0" :color="'primary'" variant="solid" size="xs">
+              {{ activeFiltersCount }}
+            </UBadge>
           </div>
         </template>
-        <template #content>
-          <div class="p-4 pt-0">
-            <UForm :state="filters" class="space-y-4" @submit="applyFilters">
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Filtres texte et dates -->
-                <div class="space-y-4">
-                  <UFormField label="Nom de la convention" name="name">
-                    <UInput v-model="filters.name" placeholder="Rechercher par nom" />
-                  </UFormField>
-                  <UFormField label="Pays" name="countries">
-                    <CountryMultiSelect v-model="filters.countries" placeholder="Sélectionner des pays..." />
-                  </UFormField>
-                </div>
-                
-                <div class="space-y-4">
-                  <UFormField label="Date de début (min)" name="startDate">
-                    <UInput v-model="filters.startDate" type="date" />
-                  </UFormField>
-                  <UFormField label="Date de fin (max)" name="endDate">
-                    <UInput v-model="filters.endDate" type="date" />
-                  </UFormField>
-                </div>
-                
-                <!-- Filtres services -->
-                <div class="space-y-4">
-                  <h4 class="font-medium text-gray-700">Services recherchés :</h4>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        
+        <UForm :state="filters" class="space-y-6" @submit="applyFilters">
+          <div class="space-y-6">
+            <!-- Filtres de recherche -->
+            <div class="space-y-4">
+              <UFormField label="Nom de la convention" name="name">
+                <UInput v-model="filters.name" placeholder="Rechercher par nom" />
+              </UFormField>
+              <UFormField label="Pays" name="countries">
+                <CountryMultiSelect v-model="filters.countries" placeholder="Sélectionner des pays..." />
+              </UFormField>
+            </div>
+            
+            <!-- Filtres de dates -->
+            <div class="space-y-4">
+              <h4 class="font-medium text-gray-700">Dates :</h4>
+              <UFormField label="Date de début (min)" name="startDate">
+                <UInput v-model="filters.startDate" type="date" />
+              </UFormField>
+              <UFormField label="Date de fin (max)" name="endDate">
+                <UInput v-model="filters.endDate" type="date" />
+              </UFormField>
+            </div>
+            
+            <!-- Filtres services -->
+            <div class="space-y-4">
+              <h4 class="font-medium text-gray-700">Services recherchés :</h4>
+              <div class="space-y-2">
                     <UCheckbox v-model="filters.hasFoodTrucks" name="hasFoodTrucks">
                       <template #label>
                         <div class="flex items-center gap-2">
@@ -209,23 +200,260 @@
                         </div>
                       </template>
                     </UCheckbox>
-                  </div>
-                </div>
               </div>
-              
-              <div class="flex gap-2 pt-4 border-t">
-                <UButton icon="i-heroicons-magnifying-glass" type="submit" color="primary">
-                  Appliquer les filtres
-                </UButton>
-                <UButton icon="i-heroicons-arrow-path" type="button" color="neutral" variant="ghost" @click="resetFilters">
-                  Réinitialiser
-                </UButton>
-              </div>
-            </UForm>
+            </div>
+          </div>
+          
+          <!-- Boutons d'action -->
+          <div class="flex flex-col gap-2 pt-4 border-t">
+            <UButton icon="i-heroicons-magnifying-glass" type="submit" color="primary" block>
+              Appliquer les filtres
+            </UButton>
+            <UButton icon="i-heroicons-arrow-path" type="button" color="neutral" variant="ghost" block @click="resetFilters">
+              Réinitialiser
+            </UButton>
+          </div>
+        </UForm>
+      </UCard>
+    </div>
+
+    <!-- Contenu principal à droite -->
+    <div class="flex-1 min-w-0">
+      <!-- En-tête avec titre et boutons -->
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h1 class="text-3xl font-bold">Conventions de Jonglerie</h1>
+        <div class="flex items-center gap-3">
+          <!-- Bouton filtres sur mobile -->
+          <UButton 
+            v-if="!showMobileFilters" 
+            icon="i-heroicons-funnel" 
+            size="md" 
+            color="neutral" 
+            variant="outline" 
+            label="Filtres"
+            class="lg:hidden"
+            @click="showMobileFilters = true"
+          />
+          <UButton v-if="authStore.isAuthenticated" icon="i-heroicons-plus" size="md" color="primary" variant="solid" label="Ajouter une Convention" @click="navigateToAddConvention" />
+        </div>
+      </div>
+
+      <!-- Filtres mobiles en overlay -->
+      <UModal v-model:open="showMobileFilters" variant="subtle">
+        <template #header>
+          <div class="flex items-center gap-2">
+            <h2 class="text-xl font-semibold">Filtres</h2>
+            <UBadge v-if="activeFiltersCount > 0" :color="'primary'" variant="solid" size="xs">
+              {{ activeFiltersCount }}
+            </UBadge>
           </div>
         </template>
-      </UCollapsible>
-    </UCard>
+        
+        <template #body>
+          <UForm :state="filters" class="space-y-6" @submit="applyFilters">
+            <div class="space-y-6">
+              <!-- Filtres de recherche -->
+              <div class="space-y-4">
+                <UFormField label="Nom de la convention" name="name">
+                  <UInput v-model="filters.name" placeholder="Rechercher par nom" />
+                </UFormField>
+                <UFormField label="Pays" name="countries">
+                  <CountryMultiSelect v-model="filters.countries" placeholder="Sélectionner des pays..." />
+                </UFormField>
+              </div>
+              
+              <!-- Filtres de dates -->
+              <div class="space-y-4">
+                <h4 class="font-medium text-gray-700">Dates :</h4>
+                <UFormField label="Date de début (min)" name="startDate">
+                  <UInput v-model="filters.startDate" type="date" />
+                </UFormField>
+                <UFormField label="Date de fin (max)" name="endDate">
+                  <UInput v-model="filters.endDate" type="date" />
+                </UFormField>
+              </div>
+              
+              <!-- Filtres services -->
+              <div class="space-y-4">
+                <h4 class="font-medium text-gray-700">Services recherchés :</h4>
+                <div class="grid grid-cols-2 gap-2">
+                  <UCheckbox v-model="filters.hasFoodTrucks" name="hasFoodTrucks">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-mdi:food-outline" class="text-orange-500" size="16" />
+                        <span class="text-sm">Food trucks</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasKidsZone" name="hasKidsZone">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-heroicons-face-smile" class="text-pink-500" size="16" />
+                        <span class="text-sm">Zone enfants</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.acceptsPets" name="acceptsPets">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-material-symbols:pets" class="text-amber-600" size="16" />
+                        <span class="text-sm">Animaux acceptés</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasTentCamping" name="hasTentCamping">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-material-symbols:camping-outline" class="text-green-600" size="16" />
+                        <span class="text-sm">Camping tente</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasTruckCamping" name="hasTruckCamping">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-heroicons-truck" class="text-blue-500" size="16" />
+                        <span class="text-sm">Camping camion</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasFamilyCamping" name="hasFamilyCamping">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-heroicons-users" class="text-indigo-500" size="16" />
+                        <span class="text-sm">Camping famille</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasGym" name="hasGym">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-heroicons-trophy" class="text-purple-500" size="16" />
+                        <span class="text-sm">Gymnase</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasFireSpace" name="hasFireSpace">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-heroicons-fire" class="text-red-600" size="16" />
+                        <span class="text-sm">Fire space</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasGala" name="hasGala">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-heroicons-sparkles" class="text-yellow-500" size="16" />
+                        <span class="text-sm">Gala</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasOpenStage" name="hasOpenStage">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-heroicons-microphone" class="text-cyan-500" size="16" />
+                        <span class="text-sm">Scène ouverte</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasConcert" name="hasConcert">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-heroicons-musical-note" class="text-violet-500" size="16" />
+                        <span class="text-sm">Concert</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasCantine" name="hasCantine">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-heroicons-cake" class="text-amber-500" size="16" />
+                        <span class="text-sm">Cantine</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasAerialSpace" name="hasAerialSpace">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-heroicons-cloud" class="text-sky-500" size="16" />
+                        <span class="text-sm">Espace aérien</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasSlacklineSpace" name="hasSlacklineSpace">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-heroicons-minus" class="text-teal-500" size="16" />
+                        <span class="text-sm">Espace slackline</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasToilets" name="hasToilets">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-guidance:wc" class="text-gray-600" size="16" />
+                        <span class="text-sm">WC</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasShowers" name="hasShowers">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-material-symbols-light:shower-outline" class="text-blue-400" size="16" />
+                        <span class="text-sm">Douches</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasAccessibility" name="hasAccessibility">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-bx:handicap" class="text-blue-600" size="16" />
+                        <span class="text-sm">Accessibilité handicapé</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  
+                  <UCheckbox v-model="filters.hasWorkshops" name="hasWorkshops">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-heroicons-academic-cap" class="text-slate-600" size="16" />
+                        <span class="text-sm">Workshops</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Boutons d'action -->
+            <div class="flex flex-col gap-2 pt-4 border-t">
+              <UButton icon="i-heroicons-magnifying-glass" type="submit" color="primary" block @click="applyMobileFilters">
+                Appliquer les filtres
+              </UButton>
+              <UButton icon="i-heroicons-arrow-path" type="button" color="neutral" variant="ghost" block @click="resetFilters">
+                Réinitialiser
+              </UButton>
+            </div>
+          </UForm>
+        </template>
+      </UModal>
 
     <div v-if="conventionStore.loading">
       <p>Chargement des conventions...</p>
@@ -236,7 +464,7 @@
     <div v-else-if="conventionStore.conventions.length === 0">
       <p>Aucune convention trouvée. Soyez le premier à en ajouter une !</p>
     </div>
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div v-else class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
       <UCard v-for="convention in conventionStore.conventions" :key="convention.id">
         <template #header>
           <div class="flex items-center gap-3">
@@ -311,6 +539,7 @@
         </template>
       </UCard>
     </div>
+    </div>
   </div>
 </template>
 
@@ -326,7 +555,8 @@ const authStore = useAuthStore();
 const toast = useToast();
 const router = useRouter();
 
-const showFilters = ref(false);
+const showMobileFilters = ref(false);
+
 
 // Compteur de filtres actifs
 const activeFiltersCount = computed(() => {
@@ -441,6 +671,11 @@ const deleteConvention = async (id: number) => {
       toast.add({ title: e.statusMessage || 'Échec de la suppression de la convention', icon: 'i-heroicons-x-circle', color: 'error' });
     }
   }
+};
+
+const applyMobileFilters = () => {
+  applyFilters();
+  showMobileFilters.value = false;
 };
 
 const navigateToAddConvention = () => {
