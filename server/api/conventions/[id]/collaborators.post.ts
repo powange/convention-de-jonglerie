@@ -11,7 +11,7 @@ const addCollaboratorSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   try {
-    const conventionId = parseInt(getRouterParam(event, 'id') as string);
+    const editionId = parseInt(getRouterParam(event, 'id') as string);
     const body = await readBody(event);
     
     // Valider les données
@@ -28,20 +28,20 @@ export default defineEventHandler(async (event) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
 
-    // Vérifier que la convention existe et que l'utilisateur est le créateur
-    const convention = await prisma.convention.findUnique({
-      where: { id: conventionId },
+    // Vérifier que l'édition existe et que l'utilisateur est le créateur
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
       select: { id: true, creatorId: true }
     });
 
-    if (!convention) {
+    if (!edition) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Convention introuvable'
+        statusMessage: 'Edition introuvable'
       });
     }
 
-    if (convention.creatorId !== decoded.id) {
+    if (edition.creatorId !== decoded.id) {
       throw createError({
         statusCode: 403,
         statusMessage: 'Seul le créateur peut ajouter des collaborateurs'
@@ -62,10 +62,10 @@ export default defineEventHandler(async (event) => {
     }
 
     // Vérifier que l'utilisateur n'est pas déjà collaborateur
-    const existingCollaborator = await prisma.conventionCollaborator.findUnique({
+    const existingCollaborator = await prisma.editionCollaborator.findUnique({
       where: {
-        conventionId_userId: {
-          conventionId,
+        editionId_userId: {
+          editionId,
           userId: userToAdd.id
         }
       }
@@ -87,9 +87,9 @@ export default defineEventHandler(async (event) => {
     }
 
     // Ajouter le collaborateur
-    const collaborator = await prisma.conventionCollaborator.create({
+    const collaborator = await prisma.editionCollaborator.create({
       data: {
-        conventionId,
+        editionId,
         userId: userToAdd.id,
         canEdit,
         addedById: decoded.id

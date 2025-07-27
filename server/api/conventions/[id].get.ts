@@ -3,12 +3,12 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
-  const conventionId = parseInt(event.context.params?.id as string);
+  const editionId = parseInt(event.context.params?.id as string);
 
-  if (isNaN(conventionId)) {
+  if (isNaN(editionId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Invalid Convention ID',
+      statusMessage: 'Invalid Edition ID',
     });
   }
 
@@ -16,15 +16,15 @@ export default defineEventHandler(async (event) => {
     // Essayer d'inclure les collaborateurs, fallback sans si la table n'existe pas
     let includeCollaborators = false;
     try {
-      await prisma.conventionCollaborator.findFirst();
+      await prisma.editionCollaborator.findFirst();
       includeCollaborators = true;
     } catch (error) {
-      console.log('Table ConventionCollaborator pas encore créée, ignorer les collaborateurs');
+      console.log('Table EditionCollaborator pas encore créée, ignorer les collaborateurs');
     }
 
-    const convention = await prisma.convention.findUnique({
+    const edition = await prisma.edition.findUnique({
       where: {
-        id: conventionId,
+        id: editionId,
       },
       include: {
         creator: {
@@ -48,16 +48,16 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    if (!convention) {
+    if (!edition) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Convention not found',
+        statusMessage: 'Edition not found',
       });
     }
 
-    return convention;
+    return edition;
   } catch (error) {
-    console.error('Erreur API convention:', error);
+    console.error('Erreur API edition:', error);
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal Server Error',

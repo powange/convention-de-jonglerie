@@ -87,7 +87,6 @@
             class="lg:hidden"
             @click="showMobileFilters = true"
           />
-          <UButton v-if="authStore.isAuthenticated" icon="i-heroicons-plus" size="md" color="primary" variant="solid" label="Ajouter une Convention" @click="navigateToAddConvention" />
         </div>
       </div>
 
@@ -175,29 +174,29 @@
       <p>Aucune convention trouvée. Soyez le premier à en ajouter une !</p>
     </div>
     <div v-else class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-      <UCard v-for="convention in conventionStore.conventions" :key="convention.id">
+      <UCard v-for="edition in conventionStore.conventions" :key="edition.id">
         <template #header>
           <div class="flex items-center gap-3">
-            <div v-if="convention.imageUrl" class="flex-shrink-0">
-              <img :src="convention.imageUrl" :alt="convention.name" class="w-16 h-16 object-cover rounded-lg" >
+            <div v-if="edition.imageUrl" class="flex-shrink-0">
+              <img :src="edition.imageUrl" :alt="edition.name" class="w-16 h-16 object-cover rounded-lg" >
             </div>
             <div v-else class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
               <UIcon name="i-heroicons-photo" class="text-gray-400" size="24" />
             </div>
-            <h2 class="text-xl font-semibold">{{ convention.name }}</h2>
+            <h2 class="text-xl font-semibold">{{ edition.name }}</h2>
           </div>
         </template>
-        <p class="text-sm text-gray-500">Du: {{ new Date(convention.startDate).toLocaleDateString() }} au {{ new Date(convention.endDate).toLocaleDateString() }}</p>
+        <p class="text-sm text-gray-500">Du: {{ new Date(edition.startDate).toLocaleDateString() }} au {{ new Date(edition.endDate).toLocaleDateString() }}</p>
         <p class="text-sm text-gray-500 flex items-center gap-1">
           <UIcon name="i-heroicons-map-pin" class="text-gray-400" size="16" />
-          {{ convention.city }}, {{ convention.country }}
+          {{ edition.city }}, {{ edition.country }}
         </p>
-        <p class="text-sm text-gray-500">Créé par: {{ convention.creator?.pseudo || 'Utilisateur inconnu' }}</p>
+        <p class="text-sm text-gray-500">Créé par: {{ edition.creator?.pseudo || 'Utilisateur inconnu' }}</p>
         
         <!-- Services avec pictos -->
         <div class="flex flex-wrap gap-1 mt-2">
           <UIcon 
-            v-for="activeService in getActiveServices(convention)" 
+            v-for="activeService in getActiveServices(edition)" 
             :key="activeService.key"
             :name="activeService.icon" 
             :class="activeService.color" 
@@ -209,31 +208,31 @@
           <div class="flex justify-end space-x-2">
             <UButton
               v-if="authStore.isAuthenticated"
-              :icon="isFavorited(convention.id) ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-              :color="isFavorited(convention.id) ? 'warning' : 'neutral'"
+              :icon="isFavorited(edition.id) ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+              :color="isFavorited(edition.id) ? 'warning' : 'neutral'"
               variant="ghost"
-              @click="toggleFavorite(convention.id)"
+              @click="toggleFavorite(edition.id)"
             />
-            <NuxtLink :to="`/conventions/${convention.id}`">
+            <NuxtLink :to="`/conventions/${edition.id}`">
               <UButton icon="i-heroicons-eye" size="sm" color="info" variant="solid" label="Voir" />
             </NuxtLink>
             <UButton
-              v-if="authStore.user?.id === convention.creatorId"
+              v-if="authStore.user?.id === edition.creatorId"
               icon="i-heroicons-pencil"
               size="sm"
-              color="success"
+              color="warning"
               variant="solid"
               label="Modifier"
-              @click="editConvention(convention.id)"
+              @click="editConvention(edition.id)"
             />
             <UButton
-              v-if="authStore.user?.id === convention.creatorId"
+              v-if="authStore.user?.id === edition.creatorId"
               icon="i-heroicons-trash"
               size="sm"
               color="error"
               variant="solid"
               label="Supprimer"
-              @click="deleteConvention(convention.id)"
+              @click="deleteConvention(edition.id)"
             />
           </div>
         </template>
@@ -301,8 +300,8 @@ onMounted(() => {
   conventionStore.fetchConventions();
 });
 
-const isFavorited = computed(() => (conventionId: number) => {
-  return conventionStore.conventions.find(c => c.id === conventionId)?.favoritedBy.some(u => u.id === authStore.user?.id);
+const isFavorited = computed(() => (editionId: number) => {
+  return conventionStore.conventions.find(c => c.id === editionId)?.favoritedBy.some(u => u.id === authStore.user?.id);
 });
 
 const toggleFavorite = async (id: number) => {
@@ -331,9 +330,5 @@ const deleteConvention = async (id: number) => {
 
 const closeMobileFilters = () => {
   showMobileFilters.value = false;
-};
-
-const navigateToAddConvention = () => {
-  router.push('/conventions/add');
 };
 </script>

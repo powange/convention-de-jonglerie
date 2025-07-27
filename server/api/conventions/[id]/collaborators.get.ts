@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   try {
-    const conventionId = parseInt(getRouterParam(event, 'id') as string);
+    const editionId = parseInt(getRouterParam(event, 'id') as string);
     
     // Vérifier l'authentification
     const token = getCookie(event, 'auth-token') || getHeader(event, 'authorization')?.replace('Bearer ', '');
@@ -20,9 +20,9 @@ export default defineEventHandler(async (event) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
     event.context.user = decoded;
 
-    // Récupérer la convention avec ses collaborateurs
-    const convention = await prisma.convention.findUnique({
-      where: { id: conventionId },
+    // Récupérer l'édition avec ses collaborateurs
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
       include: {
         creator: {
           select: { id: true, pseudo: true }
@@ -38,15 +38,15 @@ export default defineEventHandler(async (event) => {
       }
     });
 
-    if (!convention) {
+    if (!edition) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Convention introuvable'
+        statusMessage: 'Edition introuvable'
       });
     }
 
     // Vérifier que l'utilisateur est le créateur
-    if (convention.creatorId !== decoded.id) {
+    if (edition.creatorId !== decoded.id) {
       throw createError({
         statusCode: 403,
         statusMessage: 'Seul le créateur peut voir les collaborateurs'
@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Transformer les données pour masquer les emails et ajouter les hash
-    const transformedCollaborators = convention.collaborators.map(collab => ({
+    const transformedCollaborators = edition.collaborators.map(collab => ({
       ...collab,
       user: {
         id: collab.user.id,

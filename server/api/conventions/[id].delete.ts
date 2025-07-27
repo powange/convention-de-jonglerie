@@ -10,42 +10,42 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const conventionId = parseInt(event.context.params?.id as string);
+  const editionId = parseInt(event.context.params?.id as string);
 
-  if (isNaN(conventionId)) {
+  if (isNaN(editionId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Invalid Convention ID',
+      statusMessage: 'Invalid Edition ID',
     });
   }
 
   try {
-    const convention = await prisma.convention.findUnique({
+    const edition = await prisma.edition.findUnique({
       where: {
-        id: conventionId,
+        id: editionId,
       },
     });
 
-    if (!convention) {
+    if (!edition) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Convention not found',
+        statusMessage: 'Edition not found',
       });
     }
 
-    if (convention.creatorId !== event.context.user.id) {
+    if (edition.creatorId !== event.context.user.id) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Forbidden: You are not the creator of this convention',
+        statusMessage: 'Forbidden: You are not the creator of this edition',
       });
     }
 
-    await prisma.convention.delete({
+    await prisma.edition.delete({
       where: {
-        id: conventionId,
+        id: editionId,
       },
     });
-    return { message: 'Convention deleted successfully' };
+    return { message: 'Edition deleted successfully' };
   } catch {
     throw createError({
       statusCode: 500,

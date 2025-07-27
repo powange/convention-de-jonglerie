@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { getEmailHash } from '../../utils/email-hash';
 
-import type { Convention } from '~/types';
+import type { Edition } from '~/types';
 
 const prisma = new PrismaClient();
 
@@ -158,14 +158,14 @@ export default defineEventHandler(async (event) => {
     // Essayer d'inclure les collaborateurs, fallback sans si la table n'existe pas
     let includeCollaborators = false;
     try {
-      // Test si la table ConventionCollaborator existe
-      await prisma.conventionCollaborator.findFirst();
+      // Test si la table EditionCollaborator existe
+      await prisma.editionCollaborator.findFirst();
       includeCollaborators = true;
     } catch (error) {
-      console.log('Table ConventionCollaborator pas encore créée, ignorer les collaborateurs');
+      console.log('Table EditionCollaborator pas encore créée, ignorer les collaborateurs');
     }
 
-    const conventions = await prisma.convention.findMany({
+    const editions = await prisma.edition.findMany({
       where,
       include: {
         creator: {
@@ -189,9 +189,9 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    return conventions;
+    return editions;
   } catch (error) {
-    console.error('Erreur API conventions:', error);
+    console.error('Erreur API editions:', error);
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal Server Error',

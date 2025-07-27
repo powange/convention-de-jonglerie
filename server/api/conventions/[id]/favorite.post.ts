@@ -10,19 +10,19 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const conventionId = parseInt(event.context.params?.id as string);
+  const editionId = parseInt(event.context.params?.id as string);
 
-  if (isNaN(conventionId)) {
+  if (isNaN(editionId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Invalid Convention ID',
+      statusMessage: 'Invalid Edition ID',
     });
   }
 
   try {
     const user = await prisma.user.findUnique({
       where: { id: event.context.user.id },
-      include: { favoriteConventions: true },
+      include: { favoriteEditions: true },
     });
 
     if (!user) {
@@ -32,30 +32,30 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const isFavorited = user.favoriteConventions.some(conv => conv.id === conventionId);
+    const isFavorited = user.favoriteEditions.some(edition => edition.id === editionId);
 
     if (isFavorited) {
       // Remove from favorites
       await prisma.user.update({
         where: { id: event.context.user.id },
         data: {
-          favoriteConventions: {
-            disconnect: { id: conventionId },
+          favoriteEditions: {
+            disconnect: { id: editionId },
           },
         },
       });
-      return { message: 'Convention removed from favorites' };
+      return { message: 'Edition removed from favorites' };
     } else {
       // Add to favorites
       await prisma.user.update({
         where: { id: event.context.user.id },
         data: {
-          favoriteConventions: {
-            connect: { id: conventionId },
+          favoriteEditions: {
+            connect: { id: editionId },
           },
         },
       });
-      return { message: 'Convention added to favorites' };
+      return { message: 'Edition added to favorites' };
     }
   } catch {
     throw createError({

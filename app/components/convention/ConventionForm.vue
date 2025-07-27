@@ -175,9 +175,10 @@
 import { reactive, ref, watch } from 'vue';
 import AddressAutocomplete from '~/components/AddressAutocomplete.vue';
 import type { StepperItem } from '@nuxt/ui';
+import type { Edition } from '~/types';
 
 const props = defineProps<{
-  initialData?: Partial<Convention>;
+  initialData?: Partial<Edition>;
   submitButtonText?: string;
   loading?: boolean;
 }>();

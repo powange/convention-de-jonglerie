@@ -30,32 +30,32 @@
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <UCard v-for="convention in myConventions" :key="convention.id">
+      <UCard v-for="edition in myConventions" :key="edition.id">
         <template #header>
           <div class="flex items-center gap-3">
-            <div v-if="convention.imageUrl" class="flex-shrink-0">
-              <img :src="convention.imageUrl" :alt="convention.name" class="w-16 h-16 object-cover rounded-lg" >
+            <div v-if="edition.imageUrl" class="flex-shrink-0">
+              <img :src="edition.imageUrl" :alt="edition.name" class="w-16 h-16 object-cover rounded-lg" >
             </div>
             <div v-else class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
               <UIcon name="i-heroicons-photo" class="text-gray-400" size="24" />
             </div>
             <div class="flex-1">
-              <h2 class="text-xl font-semibold">{{ convention.name }}</h2>
-              <UBadge :color="getStatusColor(convention)" variant="subtle" class="mt-1">
-                {{ getStatusText(convention) }}
+              <h2 class="text-xl font-semibold">{{ edition.name }}</h2>
+              <UBadge :color="getStatusColor(edition)" variant="subtle" class="mt-1">
+                {{ getStatusText(edition) }}
               </UBadge>
             </div>
           </div>
         </template>
         
-        <p class="text-sm text-gray-500 mb-2">Du: {{ new Date(convention.startDate).toLocaleDateString() }} au {{ new Date(convention.endDate).toLocaleDateString() }}</p>
+        <p class="text-sm text-gray-500 mb-2">Du: {{ new Date(edition.startDate).toLocaleDateString() }} au {{ new Date(edition.endDate).toLocaleDateString() }}</p>
         <p class="text-sm text-gray-500 flex items-center gap-1 mb-2">
           <UIcon name="i-heroicons-map-pin" class="text-gray-400" size="16" />
-          {{ convention.city }}, {{ convention.country }}
+          {{ edition.city }}, {{ edition.country }}
         </p>
         <p class="text-sm text-gray-500 flex items-center gap-1">
           <UIcon name="i-heroicons-star" class="text-gray-400" size="16" />
-          {{ convention.favoritedBy.length }} favoris
+          {{ edition.favoritedBy.length }} favoris
         </p>
 
         <template #footer>
@@ -66,25 +66,25 @@
               color="info"
               variant="solid"
               label="Voir"
-              :to="`/conventions/${convention.id}`"
+              :to="`/conventions/${edition.id}`"
             />
             <UButton
-              v-if="conventionStore.canEditConvention(convention, authStore.user?.id || 0)"
+              v-if="conventionStore.canEditConvention(edition, authStore.user?.id || 0)"
               icon="i-heroicons-pencil"
               size="sm"
-              color="yellow"
+              color="warning"
               variant="solid"
               label="Modifier"
-              :to="`/conventions/${convention.id}/edit`"
+              :to="`/conventions/${edition.id}/edit`"
             />
             <UButton
-              v-if="conventionStore.canDeleteConvention(convention, authStore.user?.id || 0)"
+              v-if="conventionStore.canDeleteConvention(edition, authStore.user?.id || 0)"
               icon="i-heroicons-trash"
               size="sm"
               color="error"
               variant="solid"
               label="Supprimer"
-              @click="deleteConvention(convention.id)"
+              @click="deleteConvention(edition.id)"
             />
           </div>
         </template>
@@ -112,25 +112,25 @@ const loading = ref(true);
 // Calculer les conventions de l'utilisateur
 const myConventions = computed(() => {
   return conventionStore.conventions.filter(
-    convention => convention.creatorId === authStore.user?.id
+    edition => edition.creatorId === authStore.user?.id
   );
 });
 
 // Déterminer le statut d'une convention
-const getStatusColor = (convention: any) => {
+const getStatusColor = (edition: any) => {
   const now = new Date();
-  const startDate = new Date(convention.startDate);
-  const endDate = new Date(convention.endDate);
+  const startDate = new Date(edition.startDate);
+  const endDate = new Date(edition.endDate);
   
   if (now < startDate) return 'info';  // À venir
   if (now > endDate) return 'neutral';  // Passée
   return 'success';  // En cours
 };
 
-const getStatusText = (convention: any) => {
+const getStatusText = (edition: any) => {
   const now = new Date();
-  const startDate = new Date(convention.startDate);
-  const endDate = new Date(convention.endDate);
+  const startDate = new Date(edition.startDate);
+  const endDate = new Date(edition.endDate);
   
   if (now < startDate) return 'À venir';
   if (now > endDate) return 'Terminée';

@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import { moveTempImageToConvention } from '../../utils/move-temp-image';
+import { moveTempImageToEdition } from '../../utils/move-temp-image';
 
-import type { Convention } from '~/types';
+import type { Edition } from '~/types';
 
 const prisma = new PrismaClient();
 
@@ -13,16 +13,16 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const conventionId = parseInt(event.context.params?.id as string);
+  const editionId = parseInt(event.context.params?.id as string);
 
-  if (isNaN(conventionId)) {
+  if (isNaN(editionId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Invalid Convention ID',
+      statusMessage: 'Invalid Edition ID',
     });
   }
 
-  const body: Convention = await readBody(event);
+  const body: Edition = await readBody(event);
   const { 
     name, description, imageUrl, startDate, endDate, addressLine1, addressLine2, postalCode, city, region, country, 
     ticketingUrl, facebookUrl, instagramUrl, 
@@ -32,40 +32,40 @@ export default defineEventHandler(async (event) => {
   } = body;
 
   try {
-    const convention = await prisma.convention.findUnique({
+    const edition = await prisma.edition.findUnique({
       where: {
-        id: conventionId,
+        id: editionId,
       },
     });
 
-    if (!convention) {
+    if (!edition) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Convention not found',
+        statusMessage: 'Edition not found',
       });
     }
 
-    if (convention.creatorId !== event.context.user.id) {
+    if (edition.creatorId !== event.context.user.id) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Forbidden: You are not the creator of this convention',
+        statusMessage: 'Forbidden: You are not the creator of this edition',
       });
     }
 
     // Si l'image est temporaire, la déplacer dans le bon dossier
     let finalImageUrl = imageUrl;
     if (imageUrl && imageUrl.includes('/temp/')) {
-      const newImageUrl = await moveTempImageToConvention(imageUrl, conventionId);
+      const newImageUrl = await moveTempImageToEdition(imageUrl, editionId);
       if (newImageUrl) {
         finalImageUrl = newImageUrl;
         
         // Supprimer l'ancienne image si elle existe
-        if (convention.imageUrl && convention.imageUrl.includes(`/conventions/${conventionId}/`)) {
+        if (edition.imageUrl && edition.imageUrl.includes(`/conventions/${editionId}/`)) {
           const { promises: fs } = await import('fs');
           const { join } = await import('path');
-          const oldFilename = convention.imageUrl.split('/').pop();
+          const oldFilename = edition.imageUrl.split('/').pop();
           if (oldFilename && oldFilename.startsWith('convention-')) {
-            const oldFilePath = join(process.cwd(), 'public', 'uploads', 'conventions', conventionId.toString(), oldFilename);
+            const oldFilePath = join(process.cwd(), 'public', 'uploads', 'conventions', editionId.toString(), oldFilename);
             try {
               await fs.unlink(oldFilePath);
               console.log('Ancienne image supprimée:', oldFilePath);
@@ -77,18 +77,18 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    const updatedData: Partial<Convention> = {
-      name: name || convention.name,
-      description: description || convention.description,
-      imageUrl: finalImageUrl !== undefined ? finalImageUrl : convention.imageUrl,
-      startDate: startDate ? new Date(startDate).toISOString() : convention.startDate.toISOString(),
-      endDate: endDate ? new Date(endDate).toISOString() : convention.endDate.toISOString(),
-      addressLine1: addressLine1 || convention.addressLine1,
-      addressLine2: addressLine2 || convention.addressLine2,
-      postalCode: postalCode || convention.postalCode,
-      city: city || convention.city,
-      region: region || convention.region,
-      country: country || convention.country,
+    const updatedData: Partial<Edition> = {
+      name: name || edition.name,
+      description: description || edition.description,
+      imageUrl: finalImageUrl !== undefined ? finalImageUrl : edition.imageUrl,
+      startDate: startDate ? new Date(startDate).toISOString() : edition.startDate.toISOString(),
+      endDate: endDate ? new Date(endDate).toISOString() : edition.endDate.toISOString(),
+      addressLine1: addressLine1 || edition.addressLine1,
+      addressLine2: addressLine2 || edition.addressLine2,
+      postalCode: postalCode || edition.postalCode,
+      city: city || edition.city,
+      region: region || edition.region,
+      country: country || edition.country,
     };
 
     if (ticketingUrl !== undefined) updatedData.ticketingUrl = ticketingUrl;
@@ -113,9 +113,9 @@ export default defineEventHandler(async (event) => {
     if (hasAccessibility !== undefined) updatedData.hasAccessibility = hasAccessibility;
     if (hasWorkshops !== undefined) updatedData.hasWorkshops = hasWorkshops;
 
-    const updatedConvention = await prisma.convention.update({
+    const updatedEdition = await prisma.edition.update({
       where: {
-        id: conventionId,
+        id: editionId,
       },
       data: updatedData,
       include: {
@@ -127,7 +127,7 @@ export default defineEventHandler(async (event) => {
         },
       },
     });
-    return updatedConvention;
+    return updatedEdition;
   } catch {
     throw createError({
       statusCode: 500,

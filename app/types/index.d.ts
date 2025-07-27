@@ -21,7 +21,7 @@ export interface PublicUser {
   updatedAt?: string;
 }
 
-export interface Convention {
+export interface Edition {
   id: number;
   name: string;
   description?: string;
@@ -37,17 +37,34 @@ export interface Convention {
   ticketingUrl?: string;
   facebookUrl?: string;
   instagramUrl?: string;
-  hasFastfood: boolean;
+  hasFoodTrucks: boolean;
   hasKidsZone: boolean;
   acceptsPets: boolean;
   hasTentCamping: boolean;
   hasTruckCamping: boolean;
   hasGym: boolean;
+  hasFamilyCamping: boolean;
+  hasFireSpace: boolean;
+  hasGala: boolean;
+  hasOpenStage: boolean;
+  hasConcert: boolean;
+  hasCantine: boolean;
+  hasAerialSpace: boolean;
+  hasSlacklineSpace: boolean;
+  hasToilets: boolean;
+  hasShowers: boolean;
+  hasAccessibility: boolean;
+  hasWorkshops: boolean;
+  hasCreditCardPayment: boolean;
+  hasAfjTokenPayment: boolean;
   creatorId: number;
   creator: User;
   favoritedBy: { id: number }[];
   collaborators?: ConventionCollaborator[];
 }
+
+// Alias temporaire pour la compatibilité
+export type Convention = Edition;
 
 export interface ConventionCollaborator {
   id: number;

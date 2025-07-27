@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   try {
-    const conventionId = parseInt(getRouterParam(event, 'id') as string);
+    const editionId = parseInt(getRouterParam(event, 'id') as string);
     const collaboratorId = parseInt(getRouterParam(event, 'collaboratorId') as string);
     
     // Vérifier l'authentification
@@ -19,20 +19,20 @@ export default defineEventHandler(async (event) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
 
-    // Vérifier que la convention existe et que l'utilisateur est le créateur
-    const convention = await prisma.convention.findUnique({
-      where: { id: conventionId },
+    // Vérifier que l'édition existe et que l'utilisateur est le créateur
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
       select: { id: true, creatorId: true }
     });
 
-    if (!convention) {
+    if (!edition) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Convention introuvable'
+        statusMessage: 'Edition introuvable'
       });
     }
 
-    if (convention.creatorId !== decoded.id) {
+    if (edition.creatorId !== decoded.id) {
       throw createError({
         statusCode: 403,
         statusMessage: 'Seul le créateur peut retirer des collaborateurs'
@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Vérifier que le collaborateur existe
-    const collaborator = await prisma.conventionCollaborator.findUnique({
+    const collaborator = await prisma.editionCollaborator.findUnique({
       where: { id: collaboratorId },
       include: {
         user: {
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
       }
     });
 
-    if (!collaborator || collaborator.conventionId !== conventionId) {
+    if (!collaborator || collaborator.editionId !== editionId) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Collaborateur introuvable'
@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Supprimer le collaborateur
-    await prisma.conventionCollaborator.delete({
+    await prisma.editionCollaborator.delete({
       where: { id: collaboratorId }
     });
 

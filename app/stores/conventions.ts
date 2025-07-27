@@ -5,7 +5,7 @@ import { useAuthStore } from '../stores/auth'; // Use relative path
 
 export const useConventionStore = defineStore('conventions', {
   state: () => ({
-    conventions: [] as Convention[],
+    conventions: [] as Edition[],
     loading: false,
     error: null as string | null,
   }),
@@ -66,7 +66,7 @@ export const useConventionStore = defineStore('conventions', {
           });
         }
 
-        const data = await $fetch<Convention[]>('/api/conventions', {
+        const data = await $fetch<Edition[]>('/api/conventions', {
           params: queryParams,
         });
         this.conventions = data;
@@ -82,8 +82,8 @@ export const useConventionStore = defineStore('conventions', {
       this.loading = true;
       this.error = null;
       try {
-        const convention = await $fetch<Convention>(`/api/conventions/${id}`);
-        return convention;
+        const edition = await $fetch<Edition>(`/api/conventions/${id}`);
+        return edition;
       } catch (e: unknown) {
         this.error = e.statusMessage || 'Failed to fetch convention';
         throw e;
@@ -92,21 +92,21 @@ export const useConventionStore = defineStore('conventions', {
       }
     },
 
-    async addConvention(conventionData: Omit<Convention, 'id' | 'creator' | 'creatorId' | 'favoritedBy'>) {
+    async addConvention(conventionData: Omit<Edition, 'id' | 'creator' | 'creatorId' | 'favoritedBy'>) {
       this.loading = true;
       this.error = null;
       const authStore = useAuthStore();
       try {
-        const newConvention = await $fetch<Convention>('/api/conventions', {
+        const newEdition = await $fetch<Edition>('/api/conventions', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${authStore.token}`,
           },
           body: conventionData,
         });
-        this.conventions.push(newConvention);
+        this.conventions.push(newEdition);
         this.processConventions();
-        return newConvention;
+        return newEdition;
       } catch (e: unknown) {
         this.error = e.statusMessage || 'Failed to add convention';
         throw e;
@@ -115,12 +115,12 @@ export const useConventionStore = defineStore('conventions', {
       }
     },
 
-    async updateConvention(id: number, conventionData: Convention) {
+    async updateConvention(id: number, conventionData: Edition) {
       this.loading = true;
       this.error = null;
       const authStore = useAuthStore();
       try {
-        const updatedConvention = await $fetch<Convention>(`/api/conventions/${id}`,
+        const updatedEdition = await $fetch<Edition>(`/api/conventions/${id}`,
           {
             method: 'PUT',
             headers: {
@@ -131,10 +131,10 @@ export const useConventionStore = defineStore('conventions', {
         );
         const index = this.conventions.findIndex((c) => c.id === id);
         if (index !== -1) {
-          this.conventions[index] = updatedConvention;
+          this.conventions[index] = updatedEdition;
           this.processConventions();
         }
-        return updatedConvention;
+        return updatedEdition;
       } catch (e: unknown) {
         this.error = e.statusMessage || 'Failed to update convention';
         throw e;
@@ -253,22 +253,22 @@ export const useConventionStore = defineStore('conventions', {
       }
     },
 
-    // Vérifier si l'utilisateur peut modifier une convention
-    canEditConvention(convention: Convention, userId: number): boolean {
+    // Vérifier si l'utilisateur peut modifier une édition
+    canEditConvention(edition: Edition, userId: number): boolean {
       // Le créateur peut toujours modifier
-      if (convention.creatorId === userId) {
+      if (edition.creatorId === userId) {
         return true;
       }
       
       // Vérifier si l'utilisateur est collaborateur avec droits d'édition
-      return convention.collaborators?.some(
+      return edition.collaborators?.some(
         collaborator => collaborator.userId === userId && collaborator.canEdit
       ) || false;
     },
 
-    // Vérifier si l'utilisateur peut supprimer une convention (seul le créateur)
-    canDeleteConvention(convention: Convention, userId: number): boolean {
-      return convention.creatorId === userId;
+    // Vérifier si l'utilisateur peut supprimer une édition (seul le créateur)
+    canDeleteConvention(edition: Edition, userId: number): boolean {
+      return edition.creatorId === userId;
     },
   },
 });

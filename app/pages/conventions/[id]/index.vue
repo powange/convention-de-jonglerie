@@ -3,16 +3,16 @@
     <div v-if="conventionStore.loading">
       <p>Chargement des détails de la convention...</p>
     </div>
-    <div v-else-if="!convention">
+    <div v-else-if="!edition">
       <p>Convention introuvable.</p>
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
       <ConventionHeader 
-        :convention="convention" 
+        :convention="edition" 
         current-page="details" 
-        :is-favorited="isFavorited(convention.id)"
-        @toggle-favorite="toggleFavorite(convention.id)"
+        :is-favorited="isFavorited(edition.id)"
+        @toggle-favorite="toggleFavorite(edition.id)"
       />
       
       <!-- Contenu des détails -->
@@ -21,11 +21,11 @@
         <template #header>
           <!-- Image et description -->
           <div class="flex gap-6">
-            <div v-if="convention.imageUrl" class="flex-shrink-0">
-              <img :src="convention.imageUrl" :alt="convention.name" class="w-48 h-48 object-cover rounded-lg shadow-lg" >
+            <div v-if="edition.imageUrl" class="flex-shrink-0">
+              <img :src="edition.imageUrl" :alt="edition.name" class="w-48 h-48 object-cover rounded-lg shadow-lg" >
             </div>
             <div class="flex-1">
-              <p class="">{{ convention.description || 'Aucune description disponible' }}</p>
+              <p class="">{{ edition.description || 'Aucune description disponible' }}</p>
             </div>
           </div>
         </template>
@@ -38,38 +38,38 @@
             <p class="text-sm text-gray-600">
               <UIcon name="i-heroicons-map-pin" class="inline mr-1" />
               <a 
-                :href="getGoogleMapsUrl(convention)" 
+                :href="getGoogleMapsUrl(edition)" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 class="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
               >
-                {{ convention.addressLine1 }}<span v-if="convention.addressLine2">, {{ convention.addressLine2 }}</span>, {{ convention.postalCode }} {{ convention.city }}<span v-if="convention.region">, {{ convention.region }}</span>, {{ convention.country }}
+                {{ edition.addressLine1 }}<span v-if="edition.addressLine2">, {{ edition.addressLine2 }}</span>, {{ edition.postalCode }} {{ edition.city }}<span v-if="edition.region">, {{ edition.region }}</span>, {{ edition.country }}
               </a>
             </p>
             <p class="text-sm text-gray-600">
               <UIcon name="i-heroicons-calendar" class="inline mr-1" />
-              Du {{ new Date(convention.startDate).toLocaleDateString() }} au {{ new Date(convention.endDate).toLocaleDateString() }}
+              Du {{ new Date(edition.startDate).toLocaleDateString() }} au {{ new Date(edition.endDate).toLocaleDateString() }}
             </p>
           </div>
 
           <!-- Liens externes -->
-          <div v-if="convention.ticketingUrl || convention.facebookUrl || convention.instagramUrl" class="space-y-2">
+          <div v-if="edition.ticketingUrl || edition.facebookUrl || edition.instagramUrl" class="space-y-2">
             <h3 class="text-lg font-semibold">Liens utiles</h3>
             <div class="flex gap-2">
-              <UButton v-if="convention.ticketingUrl" icon="i-heroicons-ticket" :to="convention.ticketingUrl" target="_blank" size="sm">Billetterie</UButton>
-              <UButton v-if="convention.facebookUrl" icon="i-simple-icons-facebook" :to="convention.facebookUrl" target="_blank" size="sm" color="blue">Facebook</UButton>
-              <UButton v-if="convention.instagramUrl" icon="i-simple-icons-instagram" :to="convention.instagramUrl" target="_blank" size="sm" color="pink">Instagram</UButton>
+              <UButton v-if="edition.ticketingUrl" icon="i-heroicons-ticket" :to="edition.ticketingUrl" target="_blank" size="sm">Billetterie</UButton>
+              <UButton v-if="edition.facebookUrl" icon="i-simple-icons-facebook" :to="edition.facebookUrl" target="_blank" size="sm" color="blue">Facebook</UButton>
+              <UButton v-if="edition.instagramUrl" icon="i-simple-icons-instagram" :to="edition.instagramUrl" target="_blank" size="sm" color="pink">Instagram</UButton>
             </div>
           </div>
 
           <!-- Services -->
           <div class="space-y-4">
             <h3 class="text-lg font-semibold">Services proposés</h3>
-            <div v-if="getActiveServicesByCategory(convention).length === 0" class="text-gray-500 text-sm">
+            <div v-if="getActiveServicesByCategory(edition).length === 0" class="text-gray-500 text-sm">
               Aucun service spécifique renseigné
             </div>
             <div v-else class="space-y-4">
-              <div v-for="category in getActiveServicesByCategory(convention)" :key="category.category" class="space-y-2">
+              <div v-for="category in getActiveServicesByCategory(edition)" :key="category.category" class="space-y-2">
                 <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-1">
                   {{ category.label }}
                 </h4>
@@ -108,51 +108,51 @@ const toast = useToast();
 const { servicesByCategory } = useConventionServices();
 
 const conventionId = parseInt(route.params.id as string);
-const convention = ref(null);
+const edition = ref(null);
 
 onMounted(async () => {
   try {
-    convention.value = await conventionStore.fetchConventionById(conventionId);
+    edition.value = await conventionStore.fetchConventionById(conventionId);
   } catch (error) {
     console.error('Failed to fetch convention:', error);
   }
 });
 
-const isFavorited = computed(() => (_conventionId: number) => {
-  return convention.value?.favoritedBy.some(u => u.id === authStore.user?.id);
+const isFavorited = computed(() => (_editionId: number) => {
+  return edition.value?.favoritedBy.some(u => u.id === authStore.user?.id);
 });
 
 const toggleFavorite = async (id: number) => {
   try {
     await conventionStore.toggleFavorite(id);
     // Recharger la convention pour mettre à jour l'état des favoris
-    convention.value = await conventionStore.fetchConventionById(conventionId);
+    edition.value = await conventionStore.fetchConventionById(conventionId);
     toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'green' });
   } catch (e: unknown) {
     toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'red' });
   }
 };
 
-const getGoogleMapsUrl = (convention: any) => {
+const getGoogleMapsUrl = (edition: any) => {
   const addressParts = [
-    convention.addressLine1,
-    convention.addressLine2,
-    convention.postalCode,
-    convention.city,
-    convention.region,
-    convention.country
+    edition.addressLine1,
+    edition.addressLine2,
+    edition.postalCode,
+    edition.city,
+    edition.region,
+    edition.country
   ].filter(Boolean);
   
   const fullAddress = addressParts.join(', ');
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
 };
 
-const getActiveServicesByCategory = (convention: any) => {
-  if (!convention) return [];
+const getActiveServicesByCategory = (edition: any) => {
+  if (!edition) return [];
   
   return servicesByCategory.map(category => ({
     ...category,
-    services: category.services.filter(service => convention[service.key])
+    services: category.services.filter(service => edition[service.key])
   })).filter(category => category.services.length > 0);
 };
 </script>

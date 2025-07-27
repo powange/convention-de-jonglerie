@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { moveTempImageToConvention } from '../../utils/move-temp-image';
+import { moveTempImageToEdition } from '../../utils/move-temp-image';
 
 const prisma = new PrismaClient();
 
@@ -28,8 +28,8 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Créer la convention sans l'image d'abord
-    const convention = await prisma.convention.create({
+    // Créer l'édition sans l'image d'abord
+    const edition = await prisma.edition.create({
       data: {
         name,
         description,
@@ -77,11 +77,11 @@ export default defineEventHandler(async (event) => {
     
     // Si une image temporaire a été fournie, la déplacer dans le bon dossier
     if (imageUrl && imageUrl.includes('/temp/')) {
-      const newImageUrl = await moveTempImageToConvention(imageUrl, convention.id);
+      const newImageUrl = await moveTempImageToEdition(imageUrl, edition.id);
       if (newImageUrl) {
-        // Mettre à jour la convention avec la nouvelle URL
-        const updatedConvention = await prisma.convention.update({
-          where: { id: convention.id },
+        // Mettre à jour l'édition avec la nouvelle URL
+        const updatedEdition = await prisma.edition.update({
+          where: { id: edition.id },
           data: { imageUrl: newImageUrl },
           include: {
             creator: {
@@ -92,11 +92,11 @@ export default defineEventHandler(async (event) => {
             },
           },
         });
-        return updatedConvention;
+        return updatedEdition;
       }
     }
     
-    return convention;
+    return edition;
   } catch {
     throw createError({
       statusCode: 500,

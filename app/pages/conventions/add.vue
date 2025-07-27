@@ -13,7 +13,7 @@
 import { useConventionStore } from '~/stores/conventions';
 import { useRouter } from 'vue-router';
 import ConventionForm from '~/components/convention/ConventionForm.vue';
-import type { Convention } from '~/types';
+import type { Edition } from '~/types';
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -24,7 +24,7 @@ const conventionStore = useConventionStore();
 const toast = useToast();
 const router = useRouter();
 
-const handleAddConvention = async (formData: Convention) => {
+const handleAddConvention = async (formData: Edition) => {
   try {
     await conventionStore.addConvention(formData);
     toast.add({ title: 'Convention ajoutée avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });

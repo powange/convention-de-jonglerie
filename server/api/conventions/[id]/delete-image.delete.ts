@@ -14,19 +14,19 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const conventionId = parseInt(getRouterParam(event, 'id') as string);
+  const editionId = parseInt(getRouterParam(event, 'id') as string);
   
-  if (!conventionId) {
+  if (!editionId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID de convention invalide',
+      statusMessage: 'ID d’édition invalide',
     });
   }
 
   try {
-    // Vérifier que l'utilisateur est autorisé à modifier cette convention
-    const convention = await prisma.convention.findUnique({
-      where: { id: conventionId },
+    // Vérifier que l'utilisateur est autorisé à modifier cette édition
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
       include: {
         collaborators: {
           where: {
@@ -37,32 +37,32 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    if (!convention || (convention.creatorId !== user.id && convention.collaborators.length === 0)) {
+    if (!edition || (edition.creatorId !== user.id && edition.collaborators.length === 0)) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Non autorisé à modifier cette convention',
+        statusMessage: 'Non autorisé à modifier cette édition',
       });
     }
 
     // Supprimer le fichier physique si il existe
-    if (convention.imageUrl) {
+    if (edition.imageUrl) {
       // Extraire le chemin du fichier depuis l'URL
-      const urlParts = convention.imageUrl.split('/');
+      const urlParts = edition.imageUrl.split('/');
       if (urlParts.includes('uploads') && urlParts.includes('conventions')) {
-        const imageConventionId = urlParts[urlParts.indexOf('conventions') + 1];
+        const imageEditionId = urlParts[urlParts.indexOf('conventions') + 1];
         const filename = urlParts[urlParts.length - 1];
         
-        if (imageConventionId === conventionId.toString() && filename.startsWith('convention-')) {
-          const filePath = join(process.cwd(), 'public', 'uploads', 'conventions', imageConventionId, filename);
+        if (imageEditionId === editionId.toString() && (filename.startsWith('convention-') || filename.startsWith('edition-'))) {
+          const filePath = join(process.cwd(), 'public', 'uploads', 'conventions', imageEditionId, filename);
           try {
             await fs.unlink(filePath);
-            console.log('Image de convention supprimée:', filePath);
+            console.log('Image d’édition supprimée:', filePath);
             
             // Essayer de supprimer le dossier s'il est vide
-            const dirPath = join(process.cwd(), 'public', 'uploads', 'conventions', imageConventionId);
+            const dirPath = join(process.cwd(), 'public', 'uploads', 'conventions', imageEditionId);
             try {
               await fs.rmdir(dirPath);
-              console.log('Dossier de convention supprimé:', dirPath);
+              console.log('Dossier d’édition supprimé:', dirPath);
             } catch {
               // Le dossier n'est pas vide ou erreur, on ignore
             }
@@ -73,9 +73,9 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Mettre à jour la convention
-    const updatedConvention = await prisma.convention.update({
-      where: { id: conventionId },
+    // Mettre à jour l'édition
+    const updatedEdition = await prisma.edition.update({
+      where: { id: editionId },
       data: { imageUrl: null },
       include: {
         creator: {
@@ -89,10 +89,10 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      convention: updatedConvention,
+      edition: updatedEdition,
     };
   } catch (error) {
-    console.error('Erreur lors de la suppression de l\'image de convention:', error);
+    console.error('Erreur lors de la suppression de l\'image d’édition:', error);
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur lors de la suppression de l\'image',

@@ -4,19 +4,19 @@ import { getEmailHash } from '../../../utils/email-hash';
 const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
-  const conventionId = parseInt(event.context.params?.id as string);
+  const editionId = parseInt(event.context.params?.id as string);
 
-  if (!conventionId) {
+  if (!editionId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Convention ID invalide',
+      statusMessage: 'Edition ID invalide',
     });
   }
 
   try {
     const carpoolOffers = await prisma.carpoolOffer.findMany({
       where: {
-        conventionId,
+        editionId,
       },
       include: {
         user: true,

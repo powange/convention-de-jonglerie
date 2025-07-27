@@ -21,11 +21,11 @@ model User {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  // Conventions created by this user
-  createdConventions Convention[] @relation("CreatedConventions")
+  // Editions created by this user
+  createdEditions Edition[] @relation("CreatedEditions")
 
-  // Conventions favorited by this user
-  favoriteConventions Convention[] @relation("FavoriteConventions")
+  // Editions favorited by this user
+  favoriteEditions Edition[] @relation("FavoriteEditions")
 
   // Conventions where this user is a collaborator
   collaborations ConventionCollaborator[]
@@ -46,7 +46,7 @@ model User {
   carpoolRequestComments CarpoolRequestComment[]
 }
 
-model Convention {
+model Edition {
   id          Int      @id @default(autoincrement())
   name        String
   description String?
@@ -85,20 +85,20 @@ model Convention {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Relation to the user who created this convention
+  // Relation to the user who created this edition
   creatorId Int
-  creator   User @relation("CreatedConventions", fields: [creatorId], references: [id])
+  creator   User @relation("CreatedEditions", fields: [creatorId], references: [id])
 
-  // Users who favorited this convention
-  favoritedBy User[] @relation("FavoriteConventions")
+  // Users who favorited this edition
+  favoritedBy User[] @relation("FavoriteEditions")
 
   // Collaborators with edit permissions
   collaborators ConventionCollaborator[]
   
-  // Carpools for this convention
+  // Carpools for this edition
   carpoolOffers CarpoolOffer[]
   
-  // Carpool requests for this convention
+  // Carpool requests for this edition
   carpoolRequests CarpoolRequest[]
 }
 
@@ -111,7 +111,7 @@ model ConventionCollaborator {
   addedById    Int
 
   // Relations
-  convention Convention @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  convention Edition    @relation(fields: [conventionId], references: [id], onDelete: Cascade)
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   addedBy    User       @relation("AddedCollaborators", fields: [addedById], references: [id])
 
@@ -119,10 +119,10 @@ model ConventionCollaborator {
   @@unique([conventionId, userId])
 }
 
-// Carpool offers for conventions
+// Carpool offers for editions
 model CarpoolOffer {
   id               Int      @id @default(autoincrement())
-  conventionId     Int
+  editionId        Int
   userId           Int
   departureDate    DateTime
   departureCity    String
@@ -134,15 +134,15 @@ model CarpoolOffer {
   updatedAt        DateTime @updatedAt
 
   // Relations
-  convention Convention       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  edition    Edition          @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments   CarpoolComment[]
 }
 
-// Carpool requests for conventions
+// Carpool requests for editions
 model CarpoolRequest {
   id               Int      @id @default(autoincrement())
-  conventionId     Int
+  editionId        Int
   userId           Int
   departureDate    DateTime
   departureCity    String
@@ -153,7 +153,7 @@ model CarpoolRequest {
   updatedAt        DateTime @updatedAt
 
   // Relations
-  convention Convention           @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  edition    Edition              @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user       User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments   CarpoolRequestComment[]
 }

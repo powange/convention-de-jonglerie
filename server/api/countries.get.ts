@@ -8,8 +8,8 @@ export default defineEventHandler(async (_event) => {
   try {
     const now = new Date();
     
-    // Récupérer tous les pays des conventions non expirées
-    const countries = await prisma.convention.findMany({
+    // Récupérer tous les pays des éditions non expirées
+    const countries = await prisma.edition.findMany({
       where: {
         endDate: {
           gte: now // Conventions non expirées

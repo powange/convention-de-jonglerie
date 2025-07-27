@@ -7,10 +7,10 @@
       <div v-if="conventionStore.loading">
         <p>Chargement des données de la convention...</p>
       </div>
-      <div v-else-if="!convention">
+      <div v-else-if="!edition">
         <p>Convention introuvable.</p>
       </div>
-      <ConventionForm v-else :initial-data="convention" submit-button-text="Mettre à jour la convention" :loading="conventionStore.loading" @submit="handleUpdateConvention" />
+      <ConventionForm v-else :initial-data="edition" submit-button-text="Mettre à jour la convention" :loading="conventionStore.loading" @submit="handleUpdateConvention" />
     </UCard>
   </div>
 </template>
@@ -20,7 +20,7 @@ import { ref, onMounted } from 'vue';
 import { useConventionStore } from '~/stores/conventions';
 import { useRouter } from 'vue-router';
 import ConventionForm from '~/components/convention/ConventionForm.vue';
-import type { Convention } from '~/types';
+import type { Edition } from '~/types';
 import { useAuthStore } from '~/stores/auth';
 
 // Protéger cette page avec le middleware d'authentification
@@ -35,15 +35,15 @@ const route = useRoute();
 const router = useRouter();
 
 const conventionId = parseInt(route.params.id as string);
-const convention = ref(null);
+const edition = ref(null);
 
 onMounted(async () => {
   try {
     // Récupérer la convention spécifique
-    const foundConvention = await conventionStore.fetchConventionById(conventionId);
+    const foundEdition = await conventionStore.fetchConventionById(conventionId);
     
     // Vérifier que l'utilisateur peut modifier cette convention
-    if (!conventionStore.canEditConvention(foundConvention, authStore.user?.id || 0)) {
+    if (!conventionStore.canEditConvention(foundEdition, authStore.user?.id || 0)) {
       toast.add({ 
         title: 'Accès refusé', 
         description: 'Vous n\'avez pas les droits pour modifier cette convention',
@@ -54,7 +54,7 @@ onMounted(async () => {
       return;
     }
     
-    convention.value = foundConvention;
+    edition.value = foundEdition;
   } catch (_error) {
     toast.add({ 
       title: 'Erreur', 
@@ -66,7 +66,7 @@ onMounted(async () => {
   }
 });
 
-const handleUpdateConvention = async (formData: Convention) => {
+const handleUpdateConvention = async (formData: Edition) => {
   try {
     await conventionStore.updateConvention(conventionId, formData);
     toast.add({ title: 'Convention mise à jour avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });

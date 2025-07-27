@@ -26,12 +26,6 @@
       
       <!-- Contenu de gestion -->
       <div class="space-y-6">
-        <!-- Section image -->
-        <ConventionImageManager 
-          :convention="convention" 
-          @image-updated="handleImageUpdate"
-        />
-        
         <!-- Section collaborateurs -->
         <UCard>
           <div class="space-y-6">
@@ -44,30 +38,6 @@
               :convention-id="convention.id" 
               :creator-id="convention.creatorId" 
             /> -->
-          </div>
-
-          <!-- Actions de gestion -->
-          <div class="space-y-4">
-            <h3 class="text-lg font-semibold">Actions</h3>
-            <div class="flex gap-2">
-              <UButton
-                v-if="canEdit"
-                icon="i-heroicons-pencil"
-                color="blue"
-                :to="`/conventions/${convention.id}/edit`"
-              >
-                Modifier la convention
-              </UButton>
-              <UButton
-                v-if="canDelete"
-                icon="i-heroicons-trash"
-                color="red"
-                variant="soft"
-                @click="deleteConvention(convention.id)"
-              >
-                Supprimer la convention
-              </UButton>
-            </div>
           </div>
 
           <!-- Informations sur le créateur et les collaborateurs -->
@@ -94,6 +64,32 @@
           </div>
         </div>
       </UCard>
+
+      <UCard>
+        <!-- Actions de gestion -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold">Actions</h3>
+          <div class="flex gap-2">
+            <UButton
+              v-if="canEdit"
+              icon="i-heroicons-pencil"
+              color="warning"
+              :to="`/conventions/${convention.id}/edit`"
+            >
+              Modifier l'édition
+            </UButton>
+            <UButton
+              v-if="canDelete"
+              icon="i-heroicons-trash"
+              color="error"
+              variant="soft"
+              @click="deleteConvention(convention.id)"
+            >
+              Supprimer l'édition
+            </UButton>
+          </div>
+        </div>
+      </UCard>
       </div>
     </div>
   </div>
@@ -106,7 +102,6 @@ import { useConventionStore } from '~/stores/conventions';
 import { useAuthStore } from '~/stores/auth';
 import { useAvatar } from '~/utils/avatar';
 // import ConventionCollaborators from '~/components/convention/ConventionCollaborators.vue';
-import ConventionImageManager from '~/components/convention/ConventionImageManager.vue';
 import ConventionHeader from '~/components/convention/ConventionHeader.vue';
 
 // TODO: Ajouter le middleware d'authentification plus tard
@@ -158,25 +153,20 @@ const toggleFavorite = async (id: number) => {
     await conventionStore.toggleFavorite(id);
     // Recharger la convention pour mettre à jour l'état des favoris
     convention.value = await conventionStore.fetchConventionById(conventionId);
-    toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'green' });
+    toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'success' });
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'red' });
+    toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'error' });
   }
-};
-
-const handleImageUpdate = (updatedConvention: any) => {
-  // Mettre à jour la convention locale avec les nouvelles données
-  convention.value = updatedConvention;
 };
 
 const deleteConvention = async (id: number) => {
   if (confirm('Êtes-vous sûr de vouloir supprimer cette convention ?')) {
     try {
       await conventionStore.deleteConvention(id);
-      toast.add({ title: 'Convention supprimée avec succès !', icon: 'i-heroicons-check-circle', color: 'green' });
+      toast.add({ title: 'Convention supprimée avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
       router.push('/');
     } catch (e: unknown) {
-      toast.add({ title: e.statusMessage || 'Échec de la suppression de la convention', icon: 'i-heroicons-x-circle', color: 'red' });
+      toast.add({ title: e.statusMessage || 'Échec de la suppression de la convention', icon: 'i-heroicons-x-circle', color: 'error' });
     }
   }
 };

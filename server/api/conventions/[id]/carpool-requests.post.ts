@@ -11,13 +11,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const conventionId = parseInt(event.context.params?.id as string);
+  const editionId = parseInt(event.context.params?.id as string);
   const body = await readBody(event);
 
-  if (!conventionId) {
+  if (!editionId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Convention ID invalide',
+      statusMessage: 'Edition ID invalide',
     });
   }
 
@@ -30,22 +30,22 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Vérifier que la convention existe
-    const convention = await prisma.convention.findUnique({
-      where: { id: conventionId },
+    // Vérifier que l'édition existe
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
     });
 
-    if (!convention) {
+    if (!edition) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Convention non trouvée',
+        statusMessage: 'Edition non trouvée',
       });
     }
 
     // Créer la demande de covoiturage
     const carpoolRequest = await prisma.carpoolRequest.create({
       data: {
-        conventionId,
+        editionId,
         userId: event.context.user.id,
         departureDate: new Date(body.departureDate),
         departureCity: body.departureCity,
