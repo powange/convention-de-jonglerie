@@ -78,168 +78,28 @@
       </template>
 
       <template #services>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <UCheckbox v-model="state.hasFoodTrucks" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-mdi:food-outline" class="text-orange-500" size="20" />
-                <span>Food trucks</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasKidsZone" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-face-smile" class="text-pink-500" size="20" />
-                <span>Zone enfants</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.acceptsPets" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-material-symbols:pets" class="text-amber-600" size="20" />
-                <span>Animaux acceptés</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasTentCamping" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-material-symbols:camping-outline" class="text-green-600" size="20" />
-                <span>Camping tente</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasTruckCamping" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-truck" class="text-blue-500" size="20" />
-                <span>Camping camion</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasFamilyCamping" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-users" class="text-indigo-500" size="20" />
-                <span>Camping famille</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasGym" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-trophy" class="text-purple-500" size="20" />
-                <span>Gymnase</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasFireSpace" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-fire" class="text-red-600" size="20" />
-                <span>Fire space</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasGala" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-sparkles" class="text-yellow-500" size="20" />
-                <span>Gala</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasOpenStage" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-microphone" class="text-cyan-500" size="20" />
-                <span>Scène ouverte</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasConcert" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-musical-note" class="text-violet-500" size="20" />
-                <span>Concert</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasCantine" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-cake" class="text-amber-500" size="20" />
-                <span>Cantine</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasAerialSpace" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-cloud" class="text-sky-500" size="20" />
-                <span>Espace aérien</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasSlacklineSpace" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-minus" class="text-teal-500" size="20" />
-                <span>Espace slackline</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasToilets" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-guidance:wc" class="text-gray-600" size="20" />
-                <span>WC</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasShowers" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-material-symbols-light:shower-outline" class="text-blue-400" size="20" />
-                <span>Douches</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasAccessibility" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-bx:handicap" class="text-blue-600" size="20" />
-                <span>Accessibilité handicapé</span>
-              </div>
-            </template>
-          </UCheckbox>
-          
-          <UCheckbox v-model="state.hasWorkshops" indicator="end" variant="card">
-            <template #label>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-academic-cap" class="text-slate-600" size="20" />
-                <span>Workshops</span>
-              </div>
-            </template>
-          </UCheckbox>
+        <div class="space-y-8">
+          <div v-for="category in servicesByCategory" :key="category.category" class="space-y-4">
+            <div class="border-b border-gray-200 pb-2">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ category.label }}</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <UCheckbox 
+                v-for="service in category.services" 
+                :key="service.key"
+                v-model="state[service.key]" 
+                indicator="end" 
+                variant="card"
+              >
+                <template #label>
+                  <div class="flex items-center gap-2">
+                    <UIcon :name="service.icon" :class="service.color" size="20" />
+                    <span>{{ service.label }}</span>
+                  </div>
+                </template>
+              </UCheckbox>
+            </div>
+          </div>
         </div>
       </template>
 
@@ -376,11 +236,14 @@ const state = reactive({
   hasShowers: props.initialData?.hasShowers || false,
   hasAccessibility: props.initialData?.hasAccessibility || false,
   hasWorkshops: props.initialData?.hasWorkshops || false,
+  hasCreditCardPayment: props.initialData?.hasCreditCardPayment || false,
+  hasAfjTokenPayment: props.initialData?.hasAfjTokenPayment || false,
 });
 
 const uploading = ref(false);
 const fileInput = ref<HTMLInputElement>();
 const toast = useToast();
+const { servicesByCategory } = useConventionServices();
 
 const triggerFileInput = () => {
   fileInput.value?.click();
@@ -527,6 +390,8 @@ watch(() => props.initialData, (newVal) => {
     state.hasShowers = newVal.hasShowers || false;
     state.hasAccessibility = newVal.hasAccessibility || false;
     state.hasWorkshops = newVal.hasWorkshops || false;
+    state.hasCreditCardPayment = newVal.hasCreditCardPayment || false;
+    state.hasAfjTokenPayment = newVal.hasAfjTokenPayment || false;
   }
 }, { deep: true });
 </script>
