@@ -37,7 +37,14 @@
             <h3 class="text-lg font-semibold">Informations pratiques</h3>
             <p class="text-sm text-gray-600">
               <UIcon name="i-heroicons-map-pin" class="inline mr-1" />
-              {{ convention.addressLine1 }}<span v-if="convention.addressLine2">, {{ convention.addressLine2 }}</span>, {{ convention.postalCode }} {{ convention.city }}<span v-if="convention.region">, {{ convention.region }}</span>, {{ convention.country }}
+              <a 
+                :href="getGoogleMapsUrl(convention)" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+              >
+                {{ convention.addressLine1 }}<span v-if="convention.addressLine2">, {{ convention.addressLine2 }}</span>, {{ convention.postalCode }} {{ convention.city }}<span v-if="convention.region">, {{ convention.region }}</span>, {{ convention.country }}
+              </a>
             </p>
             <p class="text-sm text-gray-600">
               <UIcon name="i-heroicons-calendar" class="inline mr-1" />
@@ -176,5 +183,19 @@ const toggleFavorite = async (id: number) => {
   } catch (e: unknown) {
     toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'red' });
   }
+};
+
+const getGoogleMapsUrl = (convention: any) => {
+  const addressParts = [
+    convention.addressLine1,
+    convention.addressLine2,
+    convention.postalCode,
+    convention.city,
+    convention.region,
+    convention.country
+  ].filter(Boolean);
+  
+  const fullAddress = addressParts.join(', ');
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
 };
 </script>
