@@ -72,7 +72,7 @@
               v-if="conventionStore.canEditConvention(convention, authStore.user?.id || 0)"
               icon="i-heroicons-pencil"
               size="sm"
-              color="warning"
+              color="yellow"
               variant="solid"
               label="Modifier"
               :to="`/conventions/${convention.id}/edit`"

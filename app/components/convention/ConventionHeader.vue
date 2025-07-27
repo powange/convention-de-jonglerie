@@ -16,8 +16,8 @@
         <UButton
           v-if="authStore.isAuthenticated"
           :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-          :color="isFavorited ? 'yellow' : 'gray'"
-          variant="soft"
+          :color="isFavorited ? 'warning' : 'neutral'"
+          variant="ghost"
           size="lg"
           @click="$emit('toggle-favorite')"
         >
