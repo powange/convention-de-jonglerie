@@ -82,7 +82,7 @@
           <UCheckbox v-model="state.hasFoodTrucks" indicator="end" variant="card">
             <template #label>
               <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-building-storefront" class="text-orange-500" size="20" />
+                <UIcon name="i-mdi:food-outline" class="text-orange-500" size="20" />
                 <span>Food trucks</span>
               </div>
             </template>
@@ -109,7 +109,7 @@
           <UCheckbox v-model="state.hasTentCamping" indicator="end" variant="card">
             <template #label>
               <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-home" class="text-green-500" size="20" />
+                <UIcon name="i-material-symbols:camping-outline" class="text-green-600" size="20" />
                 <span>Camping tente</span>
               </div>
             </template>
@@ -208,7 +208,7 @@
           <UCheckbox v-model="state.hasToilets" indicator="end" variant="card">
             <template #label>
               <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-home-modern" class="text-gray-500" size="20" />
+                <UIcon name="i-guidance:wc" class="text-gray-600" size="20" />
                 <span>WC</span>
               </div>
             </template>
@@ -217,7 +217,7 @@
           <UCheckbox v-model="state.hasShowers" indicator="end" variant="card">
             <template #label>
               <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-beaker" class="text-blue-400" size="20" />
+                <UIcon name="i-material-symbols-light:shower-outline" class="text-blue-400" size="20" />
                 <span>Douches</span>
               </div>
             </template>
@@ -226,7 +226,7 @@
           <UCheckbox v-model="state.hasAccessibility" indicator="end" variant="card">
             <template #label>
               <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-check-badge" class="text-emerald-500" size="20" />
+                <UIcon name="i-bx:handicap" class="text-blue-600" size="20" />
                 <span>Accessibilité handicapé</span>
               </div>
             </template>

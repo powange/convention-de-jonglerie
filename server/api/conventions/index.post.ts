@@ -12,7 +12,13 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event);
-  const { name, description, imageUrl, startDate, endDate, addressLine1, addressLine2, postalCode, city, region, country, ticketingUrl, facebookUrl, instagramUrl, hasFastfood, hasKidsZone, acceptsPets, hasTentCamping, hasTruckCamping, hasGym } = body;
+  const { 
+    name, description, imageUrl, startDate, endDate, addressLine1, addressLine2, postalCode, city, region, country, 
+    ticketingUrl, facebookUrl, instagramUrl, 
+    hasFoodTrucks, hasKidsZone, acceptsPets, hasTentCamping, hasTruckCamping, hasFamilyCamping, hasGym,
+    hasFireSpace, hasGala, hasOpenStage, hasConcert, hasCantine, hasAerialSpace, hasSlacklineSpace,
+    hasToilets, hasShowers, hasAccessibility, hasWorkshops
+  } = body;
 
   if (!name || !startDate || !endDate || !addressLine1 || !postalCode || !city || !country) {
     throw createError({
@@ -39,12 +45,24 @@ export default defineEventHandler(async (event) => {
         ticketingUrl,
         facebookUrl,
         instagramUrl,
-        hasFastfood: hasFastfood || false,
+        hasFoodTrucks: hasFoodTrucks || false,
         hasKidsZone: hasKidsZone || false,
         acceptsPets: acceptsPets || false,
         hasTentCamping: hasTentCamping || false,
         hasTruckCamping: hasTruckCamping || false,
+        hasFamilyCamping: hasFamilyCamping || false,
         hasGym: hasGym || false,
+        hasFireSpace: hasFireSpace || false,
+        hasGala: hasGala || false,
+        hasOpenStage: hasOpenStage || false,
+        hasConcert: hasConcert || false,
+        hasCantine: hasCantine || false,
+        hasAerialSpace: hasAerialSpace || false,
+        hasSlacklineSpace: hasSlacklineSpace || false,
+        hasToilets: hasToilets || false,
+        hasShowers: hasShowers || false,
+        hasAccessibility: hasAccessibility || false,
+        hasWorkshops: hasWorkshops || false,
         creatorId: event.context.user.id,
       },
       include: {

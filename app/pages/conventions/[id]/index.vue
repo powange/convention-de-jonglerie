@@ -59,29 +59,77 @@
           <div class="space-y-2">
             <h3 class="text-lg font-semibold">Services proposés</h3>
             <div class="flex flex-wrap gap-2">
-              <UBadge v-if="convention.hasFastfood" color="orange" variant="soft">
-                <UIcon name="i-heroicons-building-storefront" class="mr-1" />
-                Restauration
+              <UBadge v-if="convention.hasFoodTrucks" color="orange" variant="soft">
+                <UIcon name="i-mdi:food-outline" class="mr-1 text-orange-500" />
+                Food trucks
               </UBadge>
               <UBadge v-if="convention.hasKidsZone" color="pink" variant="soft">
-                <UIcon name="i-heroicons-face-smile" class="mr-1" />
+                <UIcon name="i-heroicons-face-smile" class="mr-1 text-pink-500" />
                 Zone enfants
               </UBadge>
-              <UBadge v-if="convention.acceptsPets" color="red" variant="soft">
-                <UIcon name="i-heroicons-heart" class="mr-1" />
+              <UBadge v-if="convention.acceptsPets" color="amber" variant="soft">
+                <UIcon name="i-material-symbols:pets" class="mr-1 text-amber-600" />
                 Animaux acceptés
               </UBadge>
               <UBadge v-if="convention.hasTentCamping" color="green" variant="soft">
-                <UIcon name="i-heroicons-home" class="mr-1" />
+                <UIcon name="i-material-symbols:camping-outline" class="mr-1 text-green-600" />
                 Camping tente
               </UBadge>
               <UBadge v-if="convention.hasTruckCamping" color="blue" variant="soft">
-                <UIcon name="i-heroicons-truck" class="mr-1" />
+                <UIcon name="i-heroicons-truck" class="mr-1 text-blue-500" />
                 Camping camion
               </UBadge>
+              <UBadge v-if="convention.hasFamilyCamping" color="indigo" variant="soft">
+                <UIcon name="i-heroicons-users" class="mr-1 text-indigo-500" />
+                Camping famille
+              </UBadge>
               <UBadge v-if="convention.hasGym" color="purple" variant="soft">
-                <UIcon name="i-heroicons-trophy" class="mr-1" />
-                Salle de sport
+                <UIcon name="i-heroicons-trophy" class="mr-1 text-purple-500" />
+                Gymnase
+              </UBadge>
+              <UBadge v-if="convention.hasFireSpace" color="red" variant="soft">
+                <UIcon name="i-heroicons-fire" class="mr-1 text-red-600" />
+                Fire space
+              </UBadge>
+              <UBadge v-if="convention.hasGala" color="yellow" variant="soft">
+                <UIcon name="i-heroicons-sparkles" class="mr-1 text-yellow-500" />
+                Gala
+              </UBadge>
+              <UBadge v-if="convention.hasOpenStage" color="cyan" variant="soft">
+                <UIcon name="i-heroicons-microphone" class="mr-1 text-cyan-500" />
+                Scène ouverte
+              </UBadge>
+              <UBadge v-if="convention.hasConcert" color="violet" variant="soft">
+                <UIcon name="i-heroicons-musical-note" class="mr-1 text-violet-500" />
+                Concert
+              </UBadge>
+              <UBadge v-if="convention.hasCantine" color="amber" variant="soft">
+                <UIcon name="i-heroicons-cake" class="mr-1 text-amber-500" />
+                Cantine
+              </UBadge>
+              <UBadge v-if="convention.hasAerialSpace" color="sky" variant="soft">
+                <UIcon name="i-heroicons-cloud" class="mr-1 text-sky-500" />
+                Espace aérien
+              </UBadge>
+              <UBadge v-if="convention.hasSlacklineSpace" color="teal" variant="soft">
+                <UIcon name="i-heroicons-minus" class="mr-1 text-teal-500" />
+                Espace slackline
+              </UBadge>
+              <UBadge v-if="convention.hasToilets" color="gray" variant="soft">
+                <UIcon name="i-guidance:wc" class="mr-1 text-gray-600" />
+                WC
+              </UBadge>
+              <UBadge v-if="convention.hasShowers" color="blue" variant="soft">
+                <UIcon name="i-material-symbols-light:shower-outline" class="mr-1 text-blue-400" />
+                Douches
+              </UBadge>
+              <UBadge v-if="convention.hasAccessibility" color="blue" variant="soft">
+                <UIcon name="i-bx:handicap" class="mr-1 text-blue-600" />
+                Accessibilité handicapé
+              </UBadge>
+              <UBadge v-if="convention.hasWorkshops" color="slate" variant="soft">
+                <UIcon name="i-heroicons-academic-cap" class="mr-1 text-slate-600" />
+                Workshops
               </UBadge>
             </div>
           </div>

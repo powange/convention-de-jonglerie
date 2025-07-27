@@ -70,7 +70,7 @@ const handleUpdateConvention = async (formData: Convention) => {
   try {
     await conventionStore.updateConvention(conventionId, formData);
     toast.add({ title: 'Convention mise à jour avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
-    router.push('/');
+    router.push(`/conventions/${conventionId}`);
   } catch (e: unknown) {
     toast.add({ title: e.statusMessage || 'Échec de la mise à jour de la convention', icon: 'i-heroicons-x-circle', color: 'error' });
   }

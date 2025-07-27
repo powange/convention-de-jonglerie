@@ -13,12 +13,24 @@ export default defineEventHandler(async (event) => {
       startDate, 
       endDate, 
       countries,
-      hasFastfood,
+      hasFoodTrucks,
       hasKidsZone,
       acceptsPets,
       hasTentCamping,
       hasTruckCamping,
-      hasGym
+      hasFamilyCamping,
+      hasGym,
+      hasFireSpace,
+      hasGala,
+      hasOpenStage,
+      hasConcert,
+      hasCantine,
+      hasAerialSpace,
+      hasSlacklineSpace,
+      hasToilets,
+      hasShowers,
+      hasAccessibility,
+      hasWorkshops
     } = query;
 
     const where: {
@@ -26,12 +38,24 @@ export default defineEventHandler(async (event) => {
       startDate?: { gte: Date };
       endDate?: { lte: Date };
       country?: { in: string[] };
-      hasFastfood?: boolean;
+      hasFoodTrucks?: boolean;
       hasKidsZone?: boolean;
       acceptsPets?: boolean;
       hasTentCamping?: boolean;
       hasTruckCamping?: boolean;
+      hasFamilyCamping?: boolean;
       hasGym?: boolean;
+      hasFireSpace?: boolean;
+      hasGala?: boolean;
+      hasOpenStage?: boolean;
+      hasConcert?: boolean;
+      hasCantine?: boolean;
+      hasAerialSpace?: boolean;
+      hasSlacklineSpace?: boolean;
+      hasToilets?: boolean;
+      hasShowers?: boolean;
+      hasAccessibility?: boolean;
+      hasWorkshops?: boolean;
     } = {};
 
     if (name) {
@@ -76,8 +100,8 @@ export default defineEventHandler(async (event) => {
     }
 
     // Filtres par services (booléens)
-    if (hasFastfood === 'true') {
-      where.hasFastfood = true;
+    if (hasFoodTrucks === 'true') {
+      where.hasFoodTrucks = true;
     }
     if (hasKidsZone === 'true') {
       where.hasKidsZone = true;
@@ -91,8 +115,44 @@ export default defineEventHandler(async (event) => {
     if (hasTruckCamping === 'true') {
       where.hasTruckCamping = true;
     }
+    if (hasFamilyCamping === 'true') {
+      where.hasFamilyCamping = true;
+    }
     if (hasGym === 'true') {
       where.hasGym = true;
+    }
+    if (hasFireSpace === 'true') {
+      where.hasFireSpace = true;
+    }
+    if (hasGala === 'true') {
+      where.hasGala = true;
+    }
+    if (hasOpenStage === 'true') {
+      where.hasOpenStage = true;
+    }
+    if (hasConcert === 'true') {
+      where.hasConcert = true;
+    }
+    if (hasCantine === 'true') {
+      where.hasCantine = true;
+    }
+    if (hasAerialSpace === 'true') {
+      where.hasAerialSpace = true;
+    }
+    if (hasSlacklineSpace === 'true') {
+      where.hasSlacklineSpace = true;
+    }
+    if (hasToilets === 'true') {
+      where.hasToilets = true;
+    }
+    if (hasShowers === 'true') {
+      where.hasShowers = true;
+    }
+    if (hasAccessibility === 'true') {
+      where.hasAccessibility = true;
+    }
+    if (hasWorkshops === 'true') {
+      where.hasWorkshops = true;
     }
 
     // Essayer d'inclure les collaborateurs, fallback sans si la table n'existe pas

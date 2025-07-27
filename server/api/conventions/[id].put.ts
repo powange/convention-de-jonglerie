@@ -23,7 +23,13 @@ export default defineEventHandler(async (event) => {
   }
 
   const body: Convention = await readBody(event);
-  const { name, description, imageUrl, startDate, endDate, addressLine1, addressLine2, postalCode, city, region, country, ticketingUrl, facebookUrl, instagramUrl, hasFastfood, hasKidsZone, acceptsPets, hasTentCamping, hasTruckCamping, hasGym } = body;
+  const { 
+    name, description, imageUrl, startDate, endDate, addressLine1, addressLine2, postalCode, city, region, country, 
+    ticketingUrl, facebookUrl, instagramUrl, 
+    hasFoodTrucks, hasKidsZone, acceptsPets, hasTentCamping, hasTruckCamping, hasFamilyCamping, hasGym,
+    hasFireSpace, hasGala, hasOpenStage, hasConcert, hasCantine, hasAerialSpace, hasSlacklineSpace,
+    hasToilets, hasShowers, hasAccessibility, hasWorkshops
+  } = body;
 
   try {
     const convention = await prisma.convention.findUnique({
@@ -88,18 +94,38 @@ export default defineEventHandler(async (event) => {
     if (ticketingUrl !== undefined) updatedData.ticketingUrl = ticketingUrl;
     if (facebookUrl !== undefined) updatedData.facebookUrl = facebookUrl;
     if (instagramUrl !== undefined) updatedData.instagramUrl = instagramUrl;
-    if (hasFastfood !== undefined) updatedData.hasFastfood = hasFastfood;
+    if (hasFoodTrucks !== undefined) updatedData.hasFoodTrucks = hasFoodTrucks;
     if (hasKidsZone !== undefined) updatedData.hasKidsZone = hasKidsZone;
     if (acceptsPets !== undefined) updatedData.acceptsPets = acceptsPets;
     if (hasTentCamping !== undefined) updatedData.hasTentCamping = hasTentCamping;
     if (hasTruckCamping !== undefined) updatedData.hasTruckCamping = hasTruckCamping;
+    if (hasFamilyCamping !== undefined) updatedData.hasFamilyCamping = hasFamilyCamping;
     if (hasGym !== undefined) updatedData.hasGym = hasGym;
+    if (hasFireSpace !== undefined) updatedData.hasFireSpace = hasFireSpace;
+    if (hasGala !== undefined) updatedData.hasGala = hasGala;
+    if (hasOpenStage !== undefined) updatedData.hasOpenStage = hasOpenStage;
+    if (hasConcert !== undefined) updatedData.hasConcert = hasConcert;
+    if (hasCantine !== undefined) updatedData.hasCantine = hasCantine;
+    if (hasAerialSpace !== undefined) updatedData.hasAerialSpace = hasAerialSpace;
+    if (hasSlacklineSpace !== undefined) updatedData.hasSlacklineSpace = hasSlacklineSpace;
+    if (hasToilets !== undefined) updatedData.hasToilets = hasToilets;
+    if (hasShowers !== undefined) updatedData.hasShowers = hasShowers;
+    if (hasAccessibility !== undefined) updatedData.hasAccessibility = hasAccessibility;
+    if (hasWorkshops !== undefined) updatedData.hasWorkshops = hasWorkshops;
 
     const updatedConvention = await prisma.convention.update({
       where: {
         id: conventionId,
       },
       data: updatedData,
+      include: {
+        creator: {
+          select: { id: true, email: true, pseudo: true },
+        },
+        favoritedBy: {
+          select: { id: true },
+        },
+      },
     });
     return updatedConvention;
   } catch {
