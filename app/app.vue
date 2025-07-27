@@ -5,8 +5,8 @@
         <template #header>
           <div class="flex justify-between items-center">
             <NuxtLink to="/" class="flex items-center">
-              <img src="/logos/logo.svg" alt="Convention de Jonglerie" class="h-30 w-auto" >
-              <span class="ml-2 text-xl font-bold">Convention de Jonglerie</span>
+              <img src="/logos/logo.svg" alt="Conventions de Jonglerie" class="h-30 w-auto" >
+              <span class="ml-2 text-xl font-bold">Conventions de Jonglerie</span>
             </NuxtLink>
             <div class="flex items-center gap-4">
               <!-- Navigation principale -->
