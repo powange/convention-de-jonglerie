@@ -26,3 +26,7 @@ logs
 !.env.docker.example
 
 /app/generated/prisma
+
+# Uploaded files
+public/uploads/
+!public/uploads/.gitkeep

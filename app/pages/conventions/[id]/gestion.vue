@@ -25,9 +25,17 @@
       />
       
       <!-- Contenu de gestion -->
-      <UCard>
-        <div class="space-y-6">
-          <!-- Section collaborateurs -->
+      <div class="space-y-6">
+        <!-- Section image -->
+        <ConventionImageManager 
+          :convention="convention" 
+          @image-updated="handleImageUpdate"
+        />
+        
+        <!-- Section collaborateurs -->
+        <UCard>
+          <div class="space-y-6">
+            <!-- Section collaborateurs -->
           <div v-if="authStore.user?.id === convention.creatorId">
             <h3 class="text-lg font-semibold mb-4">Gestion des collaborateurs</h3>
             <p class="text-gray-500">La gestion des collaborateurs sera disponible prochainement.</p>
@@ -86,6 +94,7 @@
           </div>
         </div>
       </UCard>
+      </div>
     </div>
   </div>
 </template>
@@ -95,8 +104,9 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useConventionStore } from '~/stores/conventions';
 import { useAuthStore } from '~/stores/auth';
-import { useGravatar } from '~/utils/gravatar';
+import { useAvatar } from '~/utils/avatar';
 import ConventionCollaborators from '~/components/ConventionCollaborators.vue';
+import ConventionImageManager from '~/components/convention/ConventionImageManager.vue';
 import ConventionHeader from '~/components/convention/ConventionHeader.vue';
 
 // TODO: Ajouter le middleware d'authentification plus tard
@@ -146,10 +156,17 @@ const isFavorited = computed(() => (conventionId: number) => {
 const toggleFavorite = async (id: number) => {
   try {
     await conventionStore.toggleFavorite(id);
+    // Recharger la convention pour mettre à jour l'état des favoris
+    convention.value = await conventionStore.fetchConventionById(conventionId);
     toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'green' });
   } catch (e: unknown) {
     toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'red' });
   }
+};
+
+const handleImageUpdate = (updatedConvention: any) => {
+  // Mettre à jour la convention locale avec les nouvelles données
+  convention.value = updatedConvention;
 };
 
 const deleteConvention = async (id: number) => {

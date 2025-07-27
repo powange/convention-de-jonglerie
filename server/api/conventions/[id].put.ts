@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { moveTempImageToConvention } from '../../utils/move-temp-image';
 
 import type { Convention } from '~/types';
 
@@ -45,10 +46,35 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // Si l'image est temporaire, la déplacer dans le bon dossier
+    let finalImageUrl = imageUrl;
+    if (imageUrl && imageUrl.includes('/temp/')) {
+      const newImageUrl = await moveTempImageToConvention(imageUrl, conventionId);
+      if (newImageUrl) {
+        finalImageUrl = newImageUrl;
+        
+        // Supprimer l'ancienne image si elle existe
+        if (convention.imageUrl && convention.imageUrl.includes(`/conventions/${conventionId}/`)) {
+          const { promises: fs } = await import('fs');
+          const { join } = await import('path');
+          const oldFilename = convention.imageUrl.split('/').pop();
+          if (oldFilename && oldFilename.startsWith('convention-')) {
+            const oldFilePath = join(process.cwd(), 'public', 'uploads', 'conventions', conventionId.toString(), oldFilename);
+            try {
+              await fs.unlink(oldFilePath);
+              console.log('Ancienne image supprimée:', oldFilePath);
+            } catch (error) {
+              console.error('Erreur lors de la suppression de l\'ancienne image:', error);
+            }
+          }
+        }
+      }
+    }
+
     const updatedData: Partial<Convention> = {
       name: name || convention.name,
       description: description || convention.description,
-      imageUrl: imageUrl !== undefined ? imageUrl : convention.imageUrl,
+      imageUrl: finalImageUrl !== undefined ? finalImageUrl : convention.imageUrl,
       startDate: startDate ? new Date(startDate).toISOString() : convention.startDate.toISOString(),
       endDate: endDate ? new Date(endDate).toISOString() : convention.endDate.toISOString(),
       addressLine1: addressLine1 || convention.addressLine1,

@@ -122,6 +122,8 @@ const isFavorited = computed(() => (conventionId: number) => {
 const toggleFavorite = async (id: number) => {
   try {
     await conventionStore.toggleFavorite(id);
+    // Recharger la convention pour mettre à jour l'état des favoris
+    convention.value = await conventionStore.fetchConventionById(conventionId);
     toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'green' });
   } catch (e: unknown) {
     toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'red' });

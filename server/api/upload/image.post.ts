@@ -13,6 +13,10 @@ export default defineEventHandler(async (event) => {
   try {
     const form = await readMultipartFormData(event);
     const file = form?.find(item => item.name === 'image');
+    const conventionIdField = form?.find(item => item.name === 'conventionId');
+    
+    // Si un conventionId est fourni, c'est pour une convention existante
+    const conventionId = conventionIdField ? conventionIdField.data.toString() : null;
 
     if (!file || !file.data) {
       throw createError({
@@ -30,22 +34,32 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Créer le dossier uploads s'il n'existe pas
-    const uploadsDir = join(process.cwd(), 'public', 'uploads');
+    // Déterminer le dossier de destination
+    let uploadsDir;
+    let fileName;
+    let imageUrl;
+    
+    if (conventionId) {
+      // Pour une convention existante, utiliser le dossier dédié
+      uploadsDir = join(process.cwd(), 'public', 'uploads', 'conventions', conventionId);
+      const fileExtension = file.filename?.split('.').pop() || 'jpg';
+      fileName = `convention-${conventionId}-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
+      imageUrl = `/uploads/conventions/${conventionId}/${fileName}`;
+    } else {
+      // Pour une nouvelle convention, utiliser le dossier temporaire
+      uploadsDir = join(process.cwd(), 'public', 'uploads', 'temp');
+      const fileExtension = file.filename?.split('.').pop() || 'jpg';
+      fileName = `temp-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
+      imageUrl = `/uploads/temp/${fileName}`;
+    }
+    
     await mkdir(uploadsDir, { recursive: true });
-
-    // Générer un nom de fichier unique
-    const fileExtension = file.filename?.split('.').pop() || 'jpg';
-    const fileName = `convention-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
     const filePath = join(uploadsDir, fileName);
 
     // Sauvegarder le fichier
     const writeStream = createWriteStream(filePath);
     writeStream.write(file.data);
     writeStream.end();
-
-    // Retourner l'URL publique
-    const imageUrl = `/uploads/${fileName}`;
     
     return {
       success: true,

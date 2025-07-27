@@ -241,6 +241,11 @@ const handleFileUpload = async (event: Event) => {
   try {
     const formData = new FormData();
     formData.append('image', file);
+    
+    // Si on édite une convention existante, ajouter l'ID
+    if (props.initialData?.id) {
+      formData.append('conventionId', props.initialData.id.toString());
+    }
 
     const response = await $fetch<{ success: boolean; imageUrl: string }>('/api/upload/image', {
       method: 'POST',
