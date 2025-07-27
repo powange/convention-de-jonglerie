@@ -20,6 +20,14 @@ export default defineEventHandler(async (event) => {
       },
       include: {
         user: true,
+        comments: {
+          include: {
+            user: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
       },
       orderBy: {
         departureDate: 'asc',
@@ -38,6 +46,16 @@ export default defineEventHandler(async (event) => {
         profilePicture: request.user.profilePicture,
         updatedAt: request.user.updatedAt,
       },
+      comments: request.comments.map(comment => ({
+        ...comment,
+        user: {
+          id: comment.user.id,
+          pseudo: comment.user.pseudo,
+          emailHash: getEmailHash(comment.user.email),
+          profilePicture: comment.user.profilePicture,
+          updatedAt: comment.user.updatedAt,
+        },
+      })),
     }));
 
     return transformedRequests;

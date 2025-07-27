@@ -8,7 +8,7 @@
       icon="i-heroicons-chat-bubble-left"
       @click="showCommentsModal = true"
     >
-      Voir les commentaires ({{ commentCount }})
+      Voir les commentaires ({{ comments.length }})
     </UButton>
     
     <template #body>
@@ -40,7 +40,7 @@
       <div v-else class="text-center py-8 text-gray-500">
         <UIcon name="i-heroicons-chat-bubble-left" class="mx-auto h-12 w-12 text-gray-300 mb-4" />
         <p class="text-lg font-medium">Aucun commentaire</p>
-        <p class="text-sm">Soyez le premier à commenter cette offre !</p>
+        <p class="text-sm">Soyez le premier à commenter cette {{ type === 'offer' ? 'offre' : 'demande' }} !</p>
       </div>
 
       <!-- Formulaire pour ajouter un commentaire -->
@@ -92,8 +92,8 @@ interface Comment {
 }
 
 interface Props {
-  offerId: number;
-  commentCount?: number;
+  id: number;
+  type: 'offer' | 'request';
 }
 
 const showCommentsModal = ref(false);
@@ -112,6 +112,11 @@ const comments = ref<Comment[]>([]);
 const newComment = ref('');
 const isAddingComment = ref(false);
 
+// Charger le nombre de commentaires au montage
+onMounted(async () => {
+  await loadComments();
+});
+
 // Charger les commentaires quand la modal s'ouvre
 watch(showCommentsModal, async (open) => {
   if (open) {
@@ -122,7 +127,11 @@ watch(showCommentsModal, async (open) => {
 const loadComments = async () => {
   loading.value = true;
   try {
-    const response = await $fetch(`/api/carpool-offers/${props.offerId}/comments`, {
+    const endpoint = props.type === 'offer' 
+      ? `/api/carpool-offers/${props.id}/comments`
+      : `/api/carpool-requests/${props.id}/comments`;
+    
+    const response = await $fetch(endpoint, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`,
       },
@@ -156,7 +165,11 @@ const addComment = async () => {
 
   isAddingComment.value = true;
   try {
-    await $fetch(`/api/carpool-offers/${props.offerId}/comments`, {
+    const endpoint = props.type === 'offer' 
+      ? `/api/carpool-offers/${props.id}/comments`
+      : `/api/carpool-requests/${props.id}/comments`;
+    
+    await $fetch(endpoint, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${authStore.token}`,

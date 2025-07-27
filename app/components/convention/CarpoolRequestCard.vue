@@ -56,6 +56,19 @@
           Contacter {{ request.user.pseudo }}
         </UButton>
       </div>
+
+      <!-- Section commentaires -->
+      <div class="pt-4">
+        <div class="flex items-center justify-between">
+          <!-- Modal des commentaires -->
+          <CarpoolCommentsModal
+            :id="request.id"
+            type="request"
+            @comment-added="emit('comment-added')"
+          />
+        </div>
+      </div>
+
     </div>
   </UCard>
 </template>
@@ -63,6 +76,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth';
 import { useAvatar } from '~/utils/avatar';
+import CarpoolCommentsModal from './CarpoolCommentsModal.vue';
 
 interface CarpoolRequest {
   id: number;
@@ -77,6 +91,18 @@ interface CarpoolRequest {
     pseudo: string;
     email: string;
   };
+  comments?: Array<{
+    id: number;
+    content: string;
+    createdAt: string;
+    user: {
+      id: number;
+      pseudo: string;
+      emailHash: string;
+      profilePicture?: string | null;
+      updatedAt?: string;
+    };
+  }>;
 }
 
 interface Props {
@@ -84,6 +110,10 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits<{
+  'comment-added': [];
+}>();
+
 const authStore = useAuthStore();
 const { getUserAvatar } = useAvatar();
 

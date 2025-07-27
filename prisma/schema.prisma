@@ -41,6 +41,9 @@ model User {
   
   // Comments on carpools
   carpoolComments CarpoolComment[]
+  
+  // Comments on carpool requests
+  carpoolRequestComments CarpoolRequestComment[]
 }
 
 model Convention {
@@ -148,8 +151,9 @@ model CarpoolRequest {
   updatedAt        DateTime @updatedAt
 
   // Relations
-  convention Convention @relation(fields: [conventionId], references: [id], onDelete: Cascade)
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  convention Convention           @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  user       User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments   CarpoolRequestComment[]
 }
 
 // Comments on carpool offers
@@ -164,5 +168,19 @@ model CarpoolComment {
   // Relations
   carpoolOffer CarpoolOffer @relation(fields: [carpoolOfferId], references: [id], onDelete: Cascade)
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Comments on carpool requests
+model CarpoolRequestComment {
+  id               Int      @id @default(autoincrement())
+  carpoolRequestId Int
+  userId           Int
+  content          String   @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  carpoolRequest CarpoolRequest @relation(fields: [carpoolRequestId], references: [id], onDelete: Cascade)
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 

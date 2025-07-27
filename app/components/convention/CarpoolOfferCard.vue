@@ -56,8 +56,8 @@
         <div class="flex items-center justify-between">
           <!-- Modal des commentaires -->
           <CarpoolCommentsModal
-            :offer-id="offer.id"
-            :comment-count="offer.comments?.length || 0"
+            :id="offer.id"
+            type="offer"
             @comment-added="emit('comment-added')"
           />
         </div>
