@@ -15,7 +15,7 @@
             :src="convention.imageUrl" 
             :alt="convention.name" 
             class="w-full max-w-md h-64 object-cover rounded-lg shadow-lg"
-          />
+          >
           <UButton 
             icon="i-heroicons-trash" 
             color="red" 
@@ -54,7 +54,7 @@
           accept="image/*"
           class="hidden"
           @change="handleFileUpload"
-        />
+        >
         
         <p class="text-sm text-gray-500">
           Formats acceptés : JPG, PNG, GIF, WebP (max 10MB)

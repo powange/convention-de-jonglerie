@@ -1,5 +1,5 @@
 <template>
-  <span :class="`fi fi-${code}`" class="flag-icon"></span>
+  <span :class="`fi fi-${code}`" class="flag-icon"/>
 </template>
 
 <script setup lang="ts">

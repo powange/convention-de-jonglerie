@@ -12,7 +12,7 @@
         color="primary"
         size="lg"
       />
-      <template #description></template>
+      <template #description/>
       <template #body>
         <CarpoolOfferForm
           :convention-id="conventionId"
@@ -31,7 +31,7 @@
         variant="soft"
         size="lg"
       />
-      <template #description></template>
+      <template #description/>
       <template #body>
         <CarpoolRequestForm
           :convention-id="conventionId"

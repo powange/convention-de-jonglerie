@@ -37,7 +37,7 @@
           <template #header>
             <div class="flex items-center gap-3">
               <div v-if="convention.imageUrl" class="flex-shrink-0">
-                <img :src="convention.imageUrl" :alt="convention.name" class="w-16 h-16 object-cover rounded-lg" />
+                <img :src="convention.imageUrl" :alt="convention.name" class="w-16 h-16 object-cover rounded-lg" >
               </div>
               <div v-else class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
                 <UIcon name="i-heroicons-photo" class="text-gray-400" size="24" />
@@ -89,8 +89,8 @@
                 icon="i-heroicons-star-solid"
                 color="warning"
                 variant="ghost"
-                @click="removeFavorite(convention.id)"
                 title="Retirer des favoris"
+                @click="removeFavorite(convention.id)"
               />
               <div class="flex space-x-2">
                 <UButton
@@ -123,6 +123,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import { useConventionStore } from '~/stores/conventions';
+import type { Convention } from '~/types';
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -143,7 +144,7 @@ const favoriteConventions = computed(() => {
 });
 
 // Déterminer le statut d'une convention
-const getStatusColor = (convention: any) => {
+const getStatusColor = (convention: Convention) => {
   const now = new Date();
   const startDate = new Date(convention.startDate);
   const endDate = new Date(convention.endDate);
@@ -153,7 +154,7 @@ const getStatusColor = (convention: any) => {
   return 'success';  // En cours
 };
 
-const getStatusText = (convention: any) => {
+const getStatusText = (convention: Convention) => {
   const now = new Date();
   const startDate = new Date(convention.startDate);
   const endDate = new Date(convention.endDate);
@@ -171,7 +172,7 @@ const removeFavorite = async (id: number) => {
       icon: 'i-heroicons-star', 
       color: 'warning' 
     });
-  } catch (e: any) {
+  } catch (_e: unknown) {
     toast.add({ 
       title: 'Erreur', 
       description: 'Impossible de retirer des favoris',
@@ -184,7 +185,7 @@ const removeFavorite = async (id: number) => {
 onMounted(async () => {
   try {
     await conventionStore.fetchConventions();
-  } catch (error) {
+  } catch (_error) {
     toast.add({ 
       title: 'Erreur', 
       description: 'Impossible de charger les conventions',

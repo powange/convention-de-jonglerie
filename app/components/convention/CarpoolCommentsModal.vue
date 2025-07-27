@@ -53,10 +53,10 @@
         />
         <div class="flex justify-end">
           <UButton
-            @click="addComment"
             :disabled="!newComment.trim()"
             :loading="isAddingComment"
             color="primary"
+            @click="addComment"
           >
             Publier
           </UButton>

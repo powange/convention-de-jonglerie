@@ -42,7 +42,7 @@ const toast = useToast();
 const conventionId = parseInt(route.params.id as string);
 const convention = ref(null);
 
-const isFavorited = computed(() => (conventionId: number) => {
+const isFavorited = computed(() => (_conventionId: number) => {
   return convention.value?.favoritedBy.some(u => u.id === authStore.user?.id);
 });
 

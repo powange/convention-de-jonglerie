@@ -44,7 +44,7 @@ const emit = defineEmits<{
 const selectedCountries = ref<string[]>([]);
 
 // Utiliser useFetch qui est plus adapté pour Nuxt
-const { data: rawCountries, pending, error, status } = await useFetch<string[]>('/api/countries');
+const { data: rawCountries, pending } = await useFetch<string[]>('/api/countries');
 
 // Transformer les pays en objets avec icônes
 const data = computed(() => {

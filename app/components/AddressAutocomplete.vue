@@ -1,12 +1,12 @@
 <template>
   <UFormField label="Adresse Complète" name="fullAddress">
     <UInput
-      icon="i-lucide-search"
       v-model="searchQuery"
+      icon="i-lucide-search"
       placeholder="Commencez à taper une adresse..."
       size="lg"
-      @input="_handleInput"
       class="w-full"
+      @input="_handleInput"
     />
     <div v-if="suggestions.length > 0" class="mt-2 border rounded-md">
       <UButton

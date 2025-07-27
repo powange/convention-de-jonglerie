@@ -10,7 +10,7 @@
       <div v-else-if="!convention">
         <p>Convention introuvable.</p>
       </div>
-      <ConventionForm v-else :initial-data="convention" @submit="handleUpdateConvention" submit-button-text="Mettre à jour la convention" :loading="conventionStore.loading" />
+      <ConventionForm v-else :initial-data="convention" submit-button-text="Mettre à jour la convention" :loading="conventionStore.loading" @submit="handleUpdateConvention" />
     </UCard>
   </div>
 </template>
@@ -19,7 +19,7 @@
 import { ref, onMounted } from 'vue';
 import { useConventionStore } from '~/stores/conventions';
 import { useRouter } from 'vue-router';
-import ConventionForm from '~/components/ConventionForm.vue';
+import ConventionForm from '~/components/convention/ConventionForm.vue';
 import type { Convention } from '~/types';
 import { useAuthStore } from '~/stores/auth';
 
@@ -55,7 +55,7 @@ onMounted(async () => {
     }
     
     convention.value = foundConvention;
-  } catch (error) {
+  } catch (_error) {
     toast.add({ 
       title: 'Erreur', 
       description: 'Convention introuvable',

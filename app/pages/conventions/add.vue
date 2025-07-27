@@ -4,7 +4,7 @@
       <template #header>
         <h1 class="text-2xl font-bold">Ajouter une nouvelle convention</h1>
       </template>
-      <ConventionForm @submit="handleAddConvention" submit-button-text="Ajouter la convention" :loading="conventionStore.loading" />
+      <ConventionForm submit-button-text="Ajouter la convention" :loading="conventionStore.loading" @submit="handleAddConvention" />
     </UCard>
   </div>
 </template>
@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { useConventionStore } from '~/stores/conventions';
 import { useRouter } from 'vue-router';
-import ConventionForm from '~/components/ConventionForm.vue';
+import ConventionForm from '~/components/convention/ConventionForm.vue';
 import type { Convention } from '~/types';
 
 // Protéger cette page avec le middleware d'authentification

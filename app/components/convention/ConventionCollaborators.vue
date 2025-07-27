@@ -6,8 +6,8 @@
         <UButton 
           icon="i-heroicons-user-plus" 
           size="sm" 
-          @click="showAddModal = true"
           :disabled="!isCreator"
+          @click="showAddModal = true"
         >
           Ajouter
         </UButton>
@@ -31,7 +31,7 @@
             :src="getUserAvatar(collaborator.user, 40)" 
             :alt="`Avatar de ${collaborator.user.pseudo}`"
             class="w-10 h-10 rounded-full border-2 border-gray-200"
-          />
+          >
           <div>
             <p class="font-medium">{{ collaborator.user.pseudo }}</p>
             <p class="text-sm text-gray-500">{{ collaborator.user.prenom }} {{ collaborator.user.nom }}</p>

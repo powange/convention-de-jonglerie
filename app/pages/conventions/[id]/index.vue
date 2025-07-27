@@ -22,7 +22,7 @@
           <!-- Image et description -->
           <div class="flex gap-6">
             <div v-if="convention.imageUrl" class="flex-shrink-0">
-              <img :src="convention.imageUrl" :alt="convention.name" class="w-48 h-48 object-cover rounded-lg shadow-lg" />
+              <img :src="convention.imageUrl" :alt="convention.name" class="w-48 h-48 object-cover rounded-lg shadow-lg" >
             </div>
             <div class="flex-1">
               <p class="">{{ convention.description || 'Aucune description disponible' }}</p>
@@ -163,7 +163,7 @@ onMounted(async () => {
   }
 });
 
-const isFavorited = computed(() => (conventionId: number) => {
+const isFavorited = computed(() => (_conventionId: number) => {
   return convention.value?.favoritedBy.some(u => u.id === authStore.user?.id);
 });
 

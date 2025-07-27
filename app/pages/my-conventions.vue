@@ -34,7 +34,7 @@
         <template #header>
           <div class="flex items-center gap-3">
             <div v-if="convention.imageUrl" class="flex-shrink-0">
-              <img :src="convention.imageUrl" :alt="convention.name" class="w-16 h-16 object-cover rounded-lg" />
+              <img :src="convention.imageUrl" :alt="convention.name" class="w-16 h-16 object-cover rounded-lg" >
             </div>
             <div v-else class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
               <UIcon name="i-heroicons-photo" class="text-gray-400" size="24" />

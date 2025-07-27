@@ -1,5 +1,5 @@
 <template>
-  <UForm :state="form" :validate="validate" @submit="onSubmit" class="space-y-4">
+  <UForm :state="form" :validate="validate" class="space-y-4" @submit="onSubmit">
     <UFormField label="Date et heure souhaitées" name="departureDate" required>
       <UInput
         v-model="form.departureDate"

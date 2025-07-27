@@ -4,7 +4,7 @@
       <template #general>
         <div class="space-y-6">
           <UFormField label="Nom" name="name" required :error="touchedFields.name && !state.name ? 'Le nom est requis' : undefined">
-            <UInput v-model="state.name" required placeholder="Nom de la convention" size="lg" @blur="touchedFields.name = true" class="w-full"/>
+            <UInput v-model="state.name" required placeholder="Nom de la convention" size="lg" class="w-full" @blur="touchedFields.name = true"/>
           </UFormField>
           <UFormField label="Description" name="description">
             <UTextarea v-model="state.description" placeholder="Description de la convention" :rows="5" class="w-full" />
@@ -13,7 +13,7 @@
           <UFormField label="Affiche de la convention (Optionnel)" name="image">
             <div class="space-y-2">
               <div v-if="state.imageUrl" class="relative">
-                <img :src="state.imageUrl" alt="Aperçu" class="w-32 h-32 object-cover rounded-lg" />
+                <img :src="state.imageUrl" alt="Aperçu" class="w-32 h-32 object-cover rounded-lg" >
                 <UButton 
                   icon="i-heroicons-x-mark" 
                   color="error" 
@@ -37,7 +37,7 @@
                 accept="image/*" 
                 class="hidden" 
                 @change="handleFileUpload" 
-              />
+              >
             </div>
           </UFormField>
           
@@ -56,7 +56,7 @@
             </template>
 
             <UFormField label="Adresse Ligne 1" name="addressLine1" required :error="touchedFields.addressStreet && !state.addressLine1 ? 'Adresse requise' : undefined">
-              <UInput v-model="state.addressLine1" required placeholder="Adresse principale" size="lg" @blur="touchedFields.addressStreet = true" class="w-full" />
+              <UInput v-model="state.addressLine1" required placeholder="Adresse principale" size="lg" class="w-full" @blur="touchedFields.addressStreet = true" />
             </UFormField>
             <UFormField label="Adresse Ligne 2" name="addressLine2">
               <UInput v-model="state.addressLine2" placeholder="Complément d'adresse (optionnel)" size="lg" class="w-full" />
@@ -313,7 +313,7 @@
 
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue';
-import AddressAutocomplete from './AddressAutocomplete.vue';
+import AddressAutocomplete from '~/components/AddressAutocomplete.vue';
 import type { StepperItem } from '@nuxt/ui';
 
 const props = defineProps<{

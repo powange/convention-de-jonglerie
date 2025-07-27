@@ -7,7 +7,7 @@
           :src="currentAvatar" 
           :alt="`Avatar de ${authStore.user.pseudo || authStore.user.prenom}`"
           class="w-20 h-20 rounded-full border-4 border-primary-200 shadow-lg object-cover"
-        />
+        >
         <UButton 
           icon="i-heroicons-camera" 
           size="xs" 
@@ -226,7 +226,7 @@
               :src="currentAvatar" 
               :alt="'Avatar actuel'"
               class="w-32 h-32 rounded-full border-4 border-gray-200 object-cover"
-            />
+            >
           </div>
 
           <!-- Actions -->
@@ -260,7 +260,7 @@
               accept="image/*"
               class="hidden"
               @change="handleFileUpload"
-            />
+            >
           </div>
 
           <div class="text-xs text-gray-500 text-center">

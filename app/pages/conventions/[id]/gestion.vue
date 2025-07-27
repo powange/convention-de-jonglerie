@@ -83,7 +83,7 @@
                     :src="getUserAvatar(collaborator.user, 20)" 
                     :alt="`Avatar de ${collaborator.user.pseudo}`"
                     class="w-5 h-5 rounded-full"
-                  />
+                  >
                   <span class="text-sm">{{ collaborator.user.pseudo }}</span>
                   <UBadge :color="collaborator.canEdit ? 'green' : 'gray'" variant="subtle" size="xs">
                     {{ collaborator.canEdit ? 'Éditeur' : 'Lecture' }}
@@ -105,7 +105,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useConventionStore } from '~/stores/conventions';
 import { useAuthStore } from '~/stores/auth';
 import { useAvatar } from '~/utils/avatar';
-import ConventionCollaborators from '~/components/ConventionCollaborators.vue';
+// import ConventionCollaborators from '~/components/convention/ConventionCollaborators.vue';
 import ConventionImageManager from '~/components/convention/ConventionImageManager.vue';
 import ConventionHeader from '~/components/convention/ConventionHeader.vue';
 
@@ -149,7 +149,7 @@ const canDelete = computed(() => {
   return conventionStore.canDeleteConvention(convention.value, authStore.user.id);
 });
 
-const isFavorited = computed(() => (conventionId: number) => {
+const isFavorited = computed(() => (_conventionId: number) => {
   return convention.value?.favoritedBy.some(u => u.id === authStore.user?.id);
 });
 
