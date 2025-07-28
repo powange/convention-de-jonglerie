@@ -1,5 +1,5 @@
 <template>
-  <UForm :state="form" :validate="validate" class="space-y-4" @submit="onSubmit">
+  <UForm :state="form" :validate="validate" class="space-y-4" @submit="handleSubmit">
     <UFormField label="Date et heure souhaitées" name="departureDate" required>
       <UInput
         v-model="form.departureDate"
@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth';
+import { useCarpoolForm } from '~/composables/useCarpoolForm';
 
 interface Props {
   editionId: number;
@@ -68,96 +68,18 @@ const emit = defineEmits<{
   cancel: [];
 }>();
 
-const toast = useToast();
-const isSubmitting = ref(false);
-
-// Fonctions pour nettoyer les espaces en début/fin des champs texte
-const trimField = (fieldName: keyof typeof form) => {
-  if (form[fieldName] && typeof form[fieldName] === 'string') {
-    form[fieldName] = form[fieldName].trim();
-  }
-};
-
-const trimAllTextFields = () => {
-  trimField('departureCity');
-  trimField('phoneNumber');
-  trimField('description');
-};
-
-// Date minimum = aujourd'hui
-const minDate = new Date().toISOString().slice(0, 16);
-
-const form = reactive({
-  departureDate: '',
-  departureCity: '',
-  seatsNeeded: 1,
-  phoneNumber: '',
-  description: '',
+// Utiliser le composable avec la configuration pour les demandes
+const { form, isSubmitting, minDate, trimField, validate, onSubmit } = useCarpoolForm({
+  type: 'request',
+  editionId: props.editionId,
+  endpoint: `/api/editions/${props.editionId}/carpool-requests`,
+  submitText: 'Publier la demande',
+  successTitle: 'Demande publiée',
+  successDescription: 'Votre demande de covoiturage a été publiée',
+  errorDescription: 'Impossible de créer la demande de covoiturage',
 });
 
-const validate = (state: typeof form) => {
-  const errors = [];
-  
-  if (!state.departureDate) {
-    errors.push({ path: 'departureDate', message: 'La date souhaitée est requise' });
-  }
-  
-  if (!state.departureCity) {
-    errors.push({ path: 'departureCity', message: 'La ville de départ est requise' });
-  }
-  
-  if (!state.seatsNeeded || state.seatsNeeded < 1) {
-    errors.push({ path: 'seatsNeeded', message: 'Le nombre de places doit être au moins 1' });
-  }
-  
-  return errors;
-};
-
-const onSubmit = async () => {
-  console.log('Formulaire de demande soumis:', form);
-  
-  // Nettoyer tous les champs texte avant soumission
-  trimAllTextFields();
-  
-  isSubmitting.value = true;
-  
-  try {
-    const authStore = useAuthStore();
-    const response = await $fetch(`/api/editions/${props.editionId}/carpool-requests`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
-      body: form,
-    });
-    
-    console.log('Réponse API demande:', response);
-    
-    toast.add({
-      title: 'Demande publiée',
-      description: 'Votre demande de covoiturage a été publiée',
-      color: 'green',
-    });
-    
-    // Réinitialiser le formulaire
-    Object.assign(form, {
-      departureDate: '',
-      departureCity: '',
-      seatsNeeded: 1,
-      phoneNumber: '',
-      description: '',
-    });
-    
-    emit('success');
-  } catch (error) {
-    console.error('Erreur API demande:', error);
-    toast.add({
-      title: 'Erreur',
-      description: 'Impossible de créer la demande de covoiturage',
-      color: 'red',
-    });
-  } finally {
-    isSubmitting.value = false;
-  }
+const handleSubmit = () => {
+  onSubmit(emit);
 };
 </script>

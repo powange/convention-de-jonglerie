@@ -1,5 +1,5 @@
 <template>
-  <UForm :state="form" :validate="validate" class="space-y-4" @submit="onSubmit">
+  <UForm :state="form" :validate="validate" class="space-y-4" @submit="handleSubmit">
     <UFormField label="Date et heure de départ" name="departureDate" required>
       <UInput
         v-model="form.departureDate"
@@ -56,7 +56,6 @@
         type="submit"
         color="primary"
         :loading="isSubmitting"
-        @click="() => console.log('Bouton cliqué')"
       >
         Proposer le covoiturage
       </UButton>
@@ -65,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth';
+import { useCarpoolForm } from '~/composables/useCarpoolForm';
 
 interface Props {
   editionId: number;
@@ -77,106 +76,18 @@ const emit = defineEmits<{
   cancel: [];
 }>();
 
-const toast = useToast();
-const isSubmitting = ref(false);
-
-// Fonctions pour nettoyer les espaces en début/fin des champs texte
-const trimField = (fieldName: keyof typeof form) => {
-  if (form[fieldName] && typeof form[fieldName] === 'string') {
-    form[fieldName] = form[fieldName].trim();
-  }
-};
-
-const trimAllTextFields = () => {
-  trimField('departureCity');
-  trimField('departureAddress');
-  trimField('phoneNumber');
-  trimField('description');
-};
-
-// Date minimum = aujourd'hui
-const minDate = new Date().toISOString().slice(0, 16);
-
-const form = reactive({
-  departureDate: '',
-  departureCity: '',
-  departureAddress: '',
-  availableSeats: 1,
-  phoneNumber: '',
-  description: '',
+// Utiliser le composable avec la configuration pour les offres
+const { form, isSubmitting, minDate, trimField, validate, onSubmit } = useCarpoolForm({
+  type: 'offer',
+  editionId: props.editionId,
+  endpoint: `/api/editions/${props.editionId}/carpool-offers`,
+  submitText: 'Proposer le covoiturage',
+  successTitle: 'Covoiturage proposé',
+  successDescription: 'Votre offre de covoiturage a été publiée',
+  errorDescription: 'Impossible de créer l\'offre de covoiturage',
 });
 
-const validate = (state: typeof form) => {
-  console.log('Validation appelée:', state);
-  const errors = [];
-  
-  if (!state.departureDate) {
-    errors.push({ path: 'departureDate', message: 'La date de départ est requise' });
-  }
-  
-  if (!state.departureCity) {
-    errors.push({ path: 'departureCity', message: 'La ville de départ est requise' });
-  }
-  
-  if (!state.departureAddress) {
-    errors.push({ path: 'departureAddress', message: 'L\'adresse de départ est requise' });
-  }
-  
-  if (!state.availableSeats || state.availableSeats < 1) {
-    errors.push({ path: 'availableSeats', message: 'Le nombre de places doit être au moins 1' });
-  }
-  
-  console.log('Erreurs de validation:', errors);
-  return errors;
-};
-
-const onSubmit = async (event) => {
-  console.log('onSubmit appelé:', event);
-  console.log('Formulaire soumis:', form);
-  
-  // Nettoyer tous les champs texte avant soumission
-  trimAllTextFields();
-  
-  isSubmitting.value = true;
-  
-  try {
-    const authStore = useAuthStore();
-    const response = await $fetch(`/api/editions/${props.editionId}/carpool-offers`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
-      body: form,
-    });
-    
-    console.log('Réponse API:', response);
-    
-    toast.add({
-      title: 'Covoiturage proposé',
-      description: 'Votre offre de covoiturage a été publiée',
-      color: 'green',
-    });
-    
-    // Réinitialiser le formulaire
-    Object.assign(form, {
-      departureDate: '',
-      departureCity: '',
-      departureAddress: '',
-      availableSeats: 1,
-      phoneNumber: '',
-      description: '',
-    });
-    
-    emit('success');
-  } catch (error) {
-    console.error('Erreur API:', error);
-    toast.add({
-      title: 'Erreur',
-      description: 'Impossible de créer l\'offre de covoiturage',
-      color: 'red',
-    });
-  } finally {
-    isSubmitting.value = false;
-  }
+const handleSubmit = () => {
+  onSubmit(emit);
 };
 </script>
