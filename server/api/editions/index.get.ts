@@ -83,13 +83,31 @@ export default defineEventHandler(async (event) => {
       if (typeof countries === 'string') {
         // Si c'est une string, essayer de la parser comme JSON ou la traiter comme un seul pays
         try {
-          countryList = JSON.parse(countries);
+          const parsed = JSON.parse(countries);
+          if (Array.isArray(parsed)) {
+            // Si c'est un array d'objets avec une propriété 'value', extraire les valeurs
+            countryList = parsed.map(item => 
+              typeof item === 'object' && item !== null && 'value' in item 
+                ? item.value 
+                : item
+            );
+          } else {
+            countryList = [parsed];
+          }
         } catch {
           countryList = [countries];
         }
       } else if (Array.isArray(countries)) {
-        countryList = countries;
+        // Si c'est déjà un array, extraire les valeurs si ce sont des objets
+        countryList = countries.map(item => 
+          typeof item === 'object' && item !== null && 'value' in item 
+            ? item.value 
+            : item
+        );
       }
+      
+      // Filtrer les valeurs vides et les doublons
+      countryList = [...new Set(countryList.filter(Boolean))];
       
       if (countryList.length > 0) {
         where.country = {

@@ -51,12 +51,12 @@ export const useEditionStore = defineStore('editions', {
       });
     },
 
-    // Trier les éditions par date de début (plus récente en premier)
+    // Trier les éditions par ordre chronologique (plus ancienne en premier)
     sortEditions() {
       this.editions.sort((a, b) => {
         const dateA = new Date(a.startDate);
         const dateB = new Date(b.startDate);
-        return dateB.getTime() - dateA.getTime(); // Tri décroissant (plus récent en premier)
+        return dateA.getTime() - dateB.getTime(); // Tri croissant (plus ancien en premier)
       });
     },
 
