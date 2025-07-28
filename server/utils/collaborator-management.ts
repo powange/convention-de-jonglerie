@@ -1,31 +1,25 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, CollaboratorRole } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export interface CollaboratorDeletionOptions {
-  entityType: 'convention' | 'edition';
-  entityId: number;
-  collaboratorId: number;
-  userId: number;
-}
-
-export interface CollaboratorDeletionResult {
-  success: boolean;
-  message: string;
+export interface CollaboratorPermissionCheck {
+  hasPermission: boolean;
+  userRole?: CollaboratorRole;
+  isOwner: boolean;
+  isCollaborator: boolean;
 }
 
 /**
- * Vérifie les permissions pour supprimer un collaborateur d'une convention
+ * Vérifie les permissions d'un utilisateur sur une convention
  */
-export async function checkConventionCollaboratorPermission(
+export async function checkUserConventionPermission(
   conventionId: number,
-  collaboratorId: number,
   userId: number
-): Promise<{ convention: any; collaborator: any }> {
-  // Vérifier que la convention existe et que l'utilisateur est le créateur
+): Promise<CollaboratorPermissionCheck> {
+  // Vérifier si l'utilisateur est le créateur
   const convention = await prisma.convention.findUnique({
     where: { id: conventionId },
-    select: { id: true, authorId: true }
+    select: { authorId: true }
   });
 
   if (!convention) {
@@ -35,10 +29,171 @@ export async function checkConventionCollaboratorPermission(
     });
   }
 
-  if (convention.authorId !== userId) {
+  const isOwner = convention.authorId === userId;
+
+  // Vérifier si l'utilisateur est un collaborateur
+  const collaborator = await prisma.conventionCollaborator.findUnique({
+    where: {
+      conventionId_userId: {
+        conventionId,
+        userId
+      }
+    }
+  });
+
+  return {
+    hasPermission: isOwner || !!collaborator,
+    userRole: collaborator?.role,
+    isOwner,
+    isCollaborator: !!collaborator
+  };
+}
+
+/**
+ * Vérifie si un utilisateur peut gérer les collaborateurs d'une convention
+ */
+export async function canManageCollaborators(
+  conventionId: number,
+  userId: number
+): Promise<boolean> {
+  const permission = await checkUserConventionPermission(conventionId, userId);
+  
+  // Seuls le propriétaire et les administrateurs peuvent gérer les collaborateurs
+  return permission.isOwner || permission.userRole === CollaboratorRole.ADMINISTRATOR;
+}
+
+/**
+ * Vérifie si un utilisateur peut éditer une convention
+ */
+export async function canEditConvention(
+  conventionId: number,
+  userId: number
+): Promise<boolean> {
+  const permission = await checkUserConventionPermission(conventionId, userId);
+  
+  // Seuls le propriétaire et les administrateurs peuvent éditer la convention
+  return permission.isOwner || permission.userRole === CollaboratorRole.ADMINISTRATOR;
+}
+
+/**
+ * Vérifie si un utilisateur peut éditer une édition
+ */
+export async function canEditEdition(
+  editionId: number,
+  userId: number
+): Promise<boolean> {
+  // Récupérer l'édition avec sa convention
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    select: { 
+      creatorId: true,
+      conventionId: true 
+    }
+  });
+
+  if (!edition) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Édition introuvable'
+    });
+  }
+
+  // Vérifier si l'utilisateur est le créateur de l'édition
+  if (edition.creatorId === userId) {
+    return true;
+  }
+
+  // Vérifier les permissions sur la convention
+  const permission = await checkUserConventionPermission(edition.conventionId, userId);
+  
+  // Tous les collaborateurs peuvent éditer les éditions (modérateurs et administrateurs)
+  return permission.hasPermission;
+}
+
+/**
+ * Ajoute un collaborateur à une convention
+ */
+export async function addConventionCollaborator(
+  conventionId: number,
+  userToAddId: number,
+  role: CollaboratorRole,
+  addedById: number
+): Promise<any> {
+  // Vérifier les permissions
+  const canManage = await canManageCollaborators(conventionId, addedById);
+  
+  if (!canManage) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Seul le créateur peut retirer des collaborateurs'
+      statusMessage: 'Seuls les administrateurs peuvent ajouter des collaborateurs'
+    });
+  }
+
+  // Vérifier que l'utilisateur existe
+  const userToAdd = await prisma.user.findUnique({
+    where: { id: userToAddId },
+    select: { id: true, pseudo: true }
+  });
+
+  if (!userToAdd) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Utilisateur introuvable'
+    });
+  }
+
+  // Créer le collaborateur
+  return await prisma.conventionCollaborator.create({
+    data: {
+      conventionId,
+      userId: userToAddId,
+      role,
+      addedById
+    },
+    include: {
+      user: {
+        select: { id: true, pseudo: true, email: true }
+      }
+    }
+  });
+}
+
+/**
+ * Recherche un utilisateur par pseudo ou email
+ */
+export async function findUserByPseudoOrEmail(
+  searchTerm: string
+): Promise<any> {
+  return await prisma.user.findFirst({
+    where: {
+      OR: [
+        { pseudo: searchTerm },
+        { email: searchTerm }
+      ]
+    },
+    select: {
+      id: true,
+      pseudo: true,
+      email: true
+    }
+  });
+}
+
+/**
+ * Supprime un collaborateur d'une convention
+ */
+export async function deleteConventionCollaborator(
+  conventionId: number,
+  collaboratorId: number,
+  userId: number
+): Promise<{ success: boolean; message: string }> {
+  // Vérifier les permissions
+  const canManage = await canManageCollaborators(conventionId, userId);
+  
+  if (!canManage) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Seuls les administrateurs peuvent retirer des collaborateurs'
     });
   }
 
@@ -59,136 +214,90 @@ export async function checkConventionCollaboratorPermission(
     });
   }
 
-  return { convention, collaborator };
+  // Supprimer le collaborateur
+  await prisma.conventionCollaborator.delete({
+    where: { id: collaboratorId }
+  });
+
+  return {
+    success: true,
+    message: `${collaborator.user.pseudo} a été retiré des collaborateurs`
+  };
 }
 
 /**
- * Vérifie les permissions pour supprimer un collaborateur d'une édition
+ * Récupère tous les collaborateurs d'une convention
  */
-export async function checkEditionCollaboratorPermission(
-  editionId: number,
-  collaboratorId: number,
-  userId: number
-): Promise<{ edition: any; collaborator: any }> {
-  // Vérifier que l'édition existe et que l'utilisateur est le créateur
-  const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
-    select: { id: true, creatorId: true }
+export async function getConventionCollaborators(
+  conventionId: number
+): Promise<any[]> {
+  return await prisma.conventionCollaborator.findMany({
+    where: { conventionId },
+    include: {
+      user: {
+        select: {
+          id: true,
+          pseudo: true,
+          email: true,
+          nom: true,
+          prenom: true
+        }
+      },
+      addedBy: {
+        select: {
+          pseudo: true
+        }
+      }
+    },
+    orderBy: {
+      addedAt: 'desc'
+    }
   });
+}
 
-  if (!edition) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Edition introuvable'
-    });
-  }
-
-  if (edition.creatorId !== userId) {
+/**
+ * Met à jour le rôle d'un collaborateur
+ */
+export async function updateCollaboratorRole(
+  conventionId: number,
+  collaboratorId: number,
+  newRole: CollaboratorRole,
+  userId: number
+): Promise<any> {
+  // Vérifier les permissions
+  const canManage = await canManageCollaborators(conventionId, userId);
+  
+  if (!canManage) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Seul le créateur peut retirer des collaborateurs'
+      statusMessage: 'Seuls les administrateurs peuvent modifier les rôles'
     });
   }
 
   // Vérifier que le collaborateur existe
-  const collaborator = await prisma.editionCollaborator.findUnique({
-    where: { id: collaboratorId },
-    include: {
-      user: {
-        select: { pseudo: true }
-      }
-    }
+  const collaborator = await prisma.conventionCollaborator.findUnique({
+    where: { id: collaboratorId }
   });
 
-  if (!collaborator || collaborator.editionId !== editionId) {
+  if (!collaborator || collaborator.conventionId !== conventionId) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Collaborateur introuvable'
     });
   }
 
-  return { edition, collaborator };
-}
-
-/**
- * Supprime un collaborateur de l'entité
- */
-export async function deleteCollaboratorFromEntity(
-  options: CollaboratorDeletionOptions
-): Promise<CollaboratorDeletionResult> {
-  try {
-    let collaborator: any;
-
-    // Vérifier les permissions selon le type d'entité
-    if (options.entityType === 'convention') {
-      const result = await checkConventionCollaboratorPermission(
-        options.entityId,
-        options.collaboratorId,
-        options.userId
-      );
-      collaborator = result.collaborator;
-
-      // Supprimer le collaborateur de la convention
-      await prisma.conventionCollaborator.delete({
-        where: { id: options.collaboratorId }
-      });
-    } else {
-      const result = await checkEditionCollaboratorPermission(
-        options.entityId,
-        options.collaboratorId,
-        options.userId
-      );
-      collaborator = result.collaborator;
-
-      // Supprimer le collaborateur de l'édition
-      await prisma.editionCollaborator.delete({
-        where: { id: options.collaboratorId }
-      });
+  // Mettre à jour le rôle
+  return await prisma.conventionCollaborator.update({
+    where: { id: collaboratorId },
+    data: { role: newRole },
+    include: {
+      user: {
+        select: {
+          id: true,
+          pseudo: true,
+          email: true
+        }
+      }
     }
-
-    return {
-      success: true,
-      message: `${collaborator.user.pseudo} a été retiré des collaborateurs`
-    };
-
-  } catch (error: any) {
-    if (error.statusCode) {
-      throw error;
-    }
-    
-    console.error('Erreur lors de la suppression du collaborateur:', error);
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erreur serveur'
-    });
-  }
-}
-
-/**
- * Fonctions spécialisées pour chaque type d'entité
- */
-export async function deleteConventionCollaborator(
-  conventionId: number,
-  collaboratorId: number,
-  userId: number
-): Promise<CollaboratorDeletionResult> {
-  return deleteCollaboratorFromEntity({
-    entityType: 'convention',
-    entityId: conventionId,
-    collaboratorId,
-    userId
-  });
-}
-
-export async function deleteEditionCollaborator(
-  editionId: number,
-  collaboratorId: number,
-  userId: number
-): Promise<CollaboratorDeletionResult> {
-  return deleteCollaboratorFromEntity({
-    entityType: 'edition',
-    entityId: editionId,
-    collaboratorId,
-    userId
   });
 }

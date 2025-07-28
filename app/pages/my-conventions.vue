@@ -42,15 +42,6 @@
               </div>
               <div class="flex gap-2 ml-4">
                 <UButton
-                  icon="i-heroicons-plus"
-                  size="xs"
-                  color="primary"
-                  variant="ghost"
-                  label="Ajouter une édition"
-                  title="Ajouter une édition"
-                  :to="`/conventions/${convention.id}/editions/add`"
-                />
-                <UButton
                   icon="i-heroicons-pencil"
                   size="xs"
                   color="warning"
@@ -75,30 +66,38 @@
           </p>
           <p v-else class="text-sm text-gray-400 italic mb-4">Aucune description</p>
           
-          <!-- Tableau des éditions -->
-          <div v-if="convention.editions && convention.editions.length > 0" class="mt-4">
-            <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Éditions ({{ convention.editions.length }})</h4>
-            <div class="overflow-x-auto">
-              <UTable 
-                :data="convention.editions" 
-                :columns="getEditionsColumns()"
-                class="text-sm"
-                @select="onEditionAction"
-              />
+          <!-- Section éditions -->
+          <div class="mt-4">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="text-sm font-medium text-gray-900 dark:text-white">
+                Éditions ({{ convention.editions?.length || 0 }})
+              </h4>
+              <UButton 
+                size="xs" 
+                variant="outline" 
+                icon="i-heroicons-plus"
+                :to="`/conventions/${convention.id}/editions/add`"
+              >
+                Ajouter une édition
+              </UButton>
             </div>
-          </div>
-          
-          <div v-else class="mt-4 text-center py-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <UIcon name="i-heroicons-calendar-days" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
-            <p class="text-sm text-gray-500">Aucune édition</p>
-            <UButton 
-              size="xs" 
-              variant="outline" 
-              class="mt-2"
-              :to="`/conventions/${convention.id}/editions/add`"
-            >
-              Créer une édition
-            </UButton>
+            
+            <!-- Tableau des éditions -->
+            <div v-if="convention.editions && convention.editions.length > 0">
+              <div class="overflow-x-auto">
+                <UTable 
+                  :data="convention.editions" 
+                  :columns="getEditionsColumns()"
+                  @select="onEditionAction"
+                />
+              </div>
+            </div>
+            
+            <!-- Message quand pas d'éditions -->
+            <div v-else class="text-center py-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <UIcon name="i-heroicons-calendar-days" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
+              <p class="text-sm text-gray-500">Aucune édition pour cette convention</p>
+            </div>
           </div>
         </UCard>
       </div>
@@ -113,6 +112,7 @@ import type { Convention } from '~/types';
 import { getEditionDisplayNameWithConvention } from '~/utils/editionName';
 
 const UButton = resolveComponent('UButton')
+const UBadge = resolveComponent('UBadge')
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -137,6 +137,9 @@ const formatDate = (dateString: string) => {
   });
 };
 
+// Utiliser le composable pour le statut des éditions
+const { getStatusColor, getStatusText } = useEditionStatus();
+
 // Colonnes pour le tableau des éditions
 const getEditionsColumns = () => [
   {
@@ -155,14 +158,14 @@ const getEditionsColumns = () => [
           ? h('img', { 
               src: normalizeImageUrl(edition.imageUrl), 
               alt: displayName, 
-              class: 'w-8 h-8 object-cover rounded flex-shrink-0' 
+              class: 'w-10 h-10 object-cover rounded flex-shrink-0' 
             })
           : h('div', { 
-              class: 'w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center flex-shrink-0' 
+              class: 'w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center flex-shrink-0' 
             }, [
-              h('UIcon', { name: 'i-heroicons-calendar-days', class: 'text-gray-400', size: '16' })
+              h('UIcon', { name: 'i-heroicons-calendar-days', class: 'text-gray-400', size: '20' })
             ]),
-        h('span', { class: 'font-medium' }, displayName)
+        h('span', { class: 'font-medium text-sm' }, displayName)
       ]);
     }
   },
@@ -171,9 +174,9 @@ const getEditionsColumns = () => [
     header: 'Dates',
     cell: ({ row }: any) => {
       const edition = row.original;
-      return h('div', { class: 'text-xs' }, [
+      return h('div', { class: 'text-sm' }, [
         h('div', {}, formatDate(edition.startDate)),
-        h('div', { class: 'text-gray-400' }, formatDate(edition.endDate))
+        h('div', { class: 'text-gray-400 text-xs' }, formatDate(edition.endDate))
       ]);
     }
   },
@@ -182,10 +185,22 @@ const getEditionsColumns = () => [
     header: 'Lieu',
     cell: ({ row }: any) => {
       const edition = row.original;
-      return h('div', { class: 'text-xs' }, [
+      return h('div', { class: 'text-sm' }, [
         h('div', {}, edition.city),
-        h('div', { class: 'text-gray-400' }, edition.country)
+        h('div', { class: 'text-gray-400 text-xs' }, edition.country)
       ]);
+    }
+  },
+  {
+    accessorKey: 'status',
+    header: 'État',
+    cell: ({ row }: any) => {
+      const edition = row.original;
+      return h(UBadge, {
+        color: getStatusColor(edition),
+        variant: 'subtle',
+        size: 'sm'
+      }, () => getStatusText(edition));
     }
   },
   {

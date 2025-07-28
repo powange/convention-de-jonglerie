@@ -137,26 +137,8 @@ const favoriteEditions = computed(() => {
   );
 });
 
-// Déterminer le statut d'une édition
-const getStatusColor = (edition: Edition) => {
-  const now = new Date();
-  const startDate = new Date(edition.startDate);
-  const endDate = new Date(edition.endDate);
-
-  if (now < startDate) return 'info';  // À venir
-  if (now > endDate) return 'neutral';  // Passée
-  return 'success';  // En cours
-};
-
-const getStatusText = (edition: Edition) => {
-  const now = new Date();
-  const startDate = new Date(edition.startDate);
-  const endDate = new Date(edition.endDate);
-
-  if (now < startDate) return 'À venir';
-  if (now > endDate) return 'Terminée';
-  return 'En cours';
-};
+// Utiliser le composable pour le statut des éditions
+const { getStatusColor, getStatusText } = useEditionStatus();
 
 const removeFavorite = async (id: number) => {
   try {

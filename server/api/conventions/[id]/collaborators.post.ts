@@ -1,111 +1,59 @@
-import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
+import { CollaboratorRole } from '@prisma/client';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
+import { addConventionCollaborator, findUserByPseudoOrEmail } from '../../../utils/collaborator-management';
 
 const addCollaboratorSchema = z.object({
-  userEmail: z.string().email('Email invalide'),
-  canEdit: z.boolean().default(true)
+  userIdentifier: z.string().min(1, 'Pseudo ou email requis'),
+  role: z.nativeEnum(CollaboratorRole).default(CollaboratorRole.MODERATOR)
 });
 
 export default defineEventHandler(async (event) => {
   try {
-    const editionId = parseInt(getRouterParam(event, 'id') as string);
+    const conventionId = parseInt(getRouterParam(event, 'id') as string);
     const body = await readBody(event);
     
     // Valider les données
-    const { userEmail, canEdit } = addCollaboratorSchema.parse(body);
+    const { userIdentifier, role } = addCollaboratorSchema.parse(body);
     
-    // Vérifier l'authentification
-    const token = getCookie(event, 'auth-token') || getHeader(event, 'authorization')?.replace('Bearer ', '');
-    if (!token) {
+    // Vérifier l'authentification (le middleware s'en charge déjà)
+    if (!event.context.user) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Token manquant'
+        statusMessage: 'Non authentifié'
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-
-    // Vérifier que l'édition existe et que l'utilisateur est le créateur
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      select: { id: true, creatorId: true }
-    });
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Edition introuvable'
-      });
-    }
-
-    if (edition.creatorId !== decoded.id) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Seul le créateur peut ajouter des collaborateurs'
-      });
-    }
-
-    // Trouver l'utilisateur à ajouter
-    const userToAdd = await prisma.user.findUnique({
-      where: { email: userEmail },
-      select: { id: true, email: true, pseudo: true }
-    });
+    // Rechercher l'utilisateur par pseudo ou email
+    const userToAdd = await findUserByPseudoOrEmail(userIdentifier);
 
     if (!userToAdd) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Utilisateur introuvable'
+        statusMessage: 'Utilisateur introuvable avec ce pseudo ou cet email'
       });
     }
 
-    // Vérifier que l'utilisateur n'est pas déjà collaborateur
-    const existingCollaborator = await prisma.editionCollaborator.findUnique({
-      where: {
-        editionId_userId: {
-          editionId,
-          userId: userToAdd.id
-        }
-      }
-    });
-
-    if (existingCollaborator) {
-      throw createError({
-        statusCode: 409,
-        statusMessage: 'Cet utilisateur est déjà collaborateur'
-      });
-    }
-
-    // Empêcher le créateur de s'ajouter comme collaborateur
-    if (userToAdd.id === decoded.id) {
+    // Empêcher l'utilisateur de s'ajouter lui-même
+    if (userToAdd.id === event.context.user.id) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Vous ne pouvez pas vous ajouter comme collaborateur'
       });
     }
 
-    // Ajouter le collaborateur
-    const collaborator = await prisma.editionCollaborator.create({
-      data: {
-        editionId,
-        userId: userToAdd.id,
-        canEdit,
-        addedById: decoded.id
-      },
-      include: {
-        user: {
-          select: { id: true, email: true, pseudo: true, prenom: true, nom: true }
-        },
-        addedBy: {
-          select: { id: true, pseudo: true }
-        }
-      }
-    });
+    // Ajouter le collaborateur (la fonction gère les permissions et les vérifications)
+    const collaborator = await addConventionCollaborator(
+      conventionId,
+      userToAdd.id,
+      role,
+      event.context.user.id
+    );
 
-    return collaborator;
-  } catch (error) {
+    return {
+      success: true,
+      collaborator
+    };
+  } catch (error: any) {
     if (error.statusCode) {
       throw error;
     }

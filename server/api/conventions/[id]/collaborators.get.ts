@@ -1,60 +1,33 @@
-import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
+import { getConventionCollaborators, checkUserConventionPermission } from '../../../utils/collaborator-management';
 import { getEmailHash } from '../../../utils/email-hash';
-
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   try {
-    const editionId = parseInt(getRouterParam(event, 'id') as string);
+    const conventionId = parseInt(getRouterParam(event, 'id') as string);
     
-    // Vérifier l'authentification
-    const token = getCookie(event, 'auth-token') || getHeader(event, 'authorization')?.replace('Bearer ', '');
-    if (!token) {
+    // Vérifier l'authentification (le middleware s'en charge déjà)
+    if (!event.context.user) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Token manquant'
+        statusMessage: 'Non authentifié'
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    event.context.user = decoded;
-
-    // Récupérer l'édition avec ses collaborateurs
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      include: {
-        creator: {
-          select: { id: true, pseudo: true }
-        },
-        collaborators: {
-          include: {
-            user: true,
-            addedBy: {
-              select: { id: true, pseudo: true }
-            }
-          }
-        }
-      }
-    });
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Edition introuvable'
-      });
-    }
-
-    // Vérifier que l'utilisateur est le créateur
-    if (edition.creatorId !== decoded.id) {
+    // Vérifier les permissions de l'utilisateur sur la convention
+    const permission = await checkUserConventionPermission(conventionId, event.context.user.id);
+    
+    if (!permission.hasPermission) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Seul le créateur peut voir les collaborateurs'
+        statusMessage: 'Vous n\'avez pas accès à cette convention'
       });
     }
 
+    // Récupérer les collaborateurs de la convention
+    const collaborators = await getConventionCollaborators(conventionId);
+
     // Transformer les données pour masquer les emails et ajouter les hash
-    const transformedCollaborators = edition.collaborators.map(collab => ({
+    const transformedCollaborators = collaborators.map(collab => ({
       ...collab,
       user: {
         id: collab.user.id,
@@ -62,13 +35,16 @@ export default defineEventHandler(async (event) => {
         prenom: collab.user.prenom,
         nom: collab.user.nom,
         emailHash: getEmailHash(collab.user.email),
-        profilePicture: collab.user.profilePicture,
-        updatedAt: collab.user.updatedAt,
+        // Masquer l'email sauf pour les administrateurs
+        email: permission.isOwner || permission.userRole === 'ADMINISTRATOR' ? collab.user.email : undefined
       },
     }));
 
     return transformedCollaborators;
-  } catch (error) {
+  } catch (error: any) {
+    if (error.statusCode) {
+      throw error;
+    }
     console.error('Erreur lors de la récupération des collaborateurs:', error);
     throw createError({
       statusCode: 500,

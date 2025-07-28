@@ -7,6 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum CollaboratorRole {
+  MODERATOR     // Peut gérer uniquement les éditions
+  ADMINISTRATOR // Peut gérer la convention, les éditions et ajouter des collaborateurs
+}
+
 model User {
   id                     Int                      @id @default(autoincrement())
   email                  String                   @unique
@@ -70,7 +75,6 @@ model Edition {
   hasCreditCardPayment Boolean                  @default(false)
   carpoolOffers        CarpoolOffer[]
   carpoolRequests      CarpoolRequest[]
-  collaborators        ConventionCollaborator[]
   creator              User                     @relation("CreatedEditions", fields: [creatorId], references: [id])
   favoritedBy          User[]                   @relation("FavoriteEditions")
   convention           Convention               @relation(fields: [conventionId], references: [id])
@@ -80,15 +84,15 @@ model Edition {
 }
 
 model ConventionCollaborator {
-  id           Int      @id @default(autoincrement())
+  id           Int              @id @default(autoincrement())
   conventionId Int
   userId       Int
-  canEdit      Boolean  @default(true)
-  addedAt      DateTime @default(now())
+  role         CollaboratorRole @default(MODERATOR)
+  addedAt      DateTime         @default(now())
   addedById    Int
-  addedBy      User     @relation("AddedCollaborators", fields: [addedById], references: [id])
-  convention   Edition  @relation(fields: [conventionId], references: [id], onDelete: Cascade)
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addedBy      User             @relation("AddedCollaborators", fields: [addedById], references: [id])
+  convention   Convention       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([conventionId, userId])
   @@index([addedById], map: "ConventionCollaborator_addedById_fkey")
@@ -172,6 +176,7 @@ model Convention {
   authorId    Int
   author      User      @relation(fields: [authorId], references: [id])
   editions    Edition[]
+  collaborators ConventionCollaborator[]
 
   @@index([authorId], map: "Convention_authorId_fkey")
 }
