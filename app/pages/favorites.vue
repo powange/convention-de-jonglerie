@@ -61,7 +61,7 @@
             </div>
           </template>
           
-          <p class="text-sm text-gray-500 mb-2">Du: {{ new Date(edition.startDate).toLocaleDateString() }} au {{ new Date(edition.endDate).toLocaleDateString() }}</p>
+          <p class="text-sm text-gray-500 mb-2">{{ formatDateTimeRange(edition.startDate, edition.endDate) }}</p>
           <p class="text-sm text-gray-500 flex items-center gap-1 mb-2">
             <UIcon name="i-heroicons-map-pin" class="text-gray-400" size="16" />
             {{ edition.city }}, {{ edition.country }}
@@ -112,6 +112,7 @@
 </template>
 
 <script setup lang="ts">
+const { formatDateTimeRange } = useDateFormat();
 import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import { useEditionStore } from '~/stores/editions';

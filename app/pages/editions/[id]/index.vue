@@ -54,7 +54,7 @@
             </p>
             <p class="text-sm text-gray-600">
               <UIcon name="i-heroicons-calendar" class="inline mr-1" />
-              Du {{ new Date(edition.startDate).toLocaleDateString() }} au {{ new Date(edition.endDate).toLocaleDateString() }}
+              {{ formatDateTimeRange(edition.startDate, edition.endDate) }}
             </p>
           </div>
 
@@ -141,6 +141,8 @@ import { useRoute } from 'vue-router';
 import type { Edition } from '~/types';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
+
+const { formatDateTimeRange } = useDateFormat();
 import EditionHeader from '~/components/edition/EditionHeader.vue';
 import { getEditionDisplayName } from '~/utils/editionName';
 

@@ -200,7 +200,7 @@
             </div>
           </template>
           
-          <p class="text-sm text-gray-500">Du: {{ new Date(edition.startDate).toLocaleDateString() }} au {{ new Date(edition.endDate).toLocaleDateString() }}</p>
+          <p class="text-sm text-gray-500">{{ formatDateTimeRange(edition.startDate, edition.endDate) }}</p>
           <p class="text-sm text-gray-500 flex items-center gap-1">
             <UIcon name="i-heroicons-map-pin" class="text-gray-400" size="16" />
             {{ edition.city }}, {{ edition.country }}
@@ -238,6 +238,7 @@ import { useAuthStore } from '~/stores/auth';
 import { useRouter } from 'vue-router';
 import CountryMultiSelect from '~/components/CountryMultiSelect.vue';
 import { getEditionDisplayName } from '~/utils/editionName';
+const { formatDateTimeRange } = useDateFormat();
 
 const editionStore = useEditionStore();
 const authStore = useAuthStore();

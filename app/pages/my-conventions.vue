@@ -134,15 +134,8 @@ const conventionsLoading = ref(true);
 const myConventions = ref<Convention[]>([]);
 
 
-// Fonction pour formater les dates
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  });
-};
+// Utiliser le composable pour formater les dates
+const { formatDateTime } = useDateFormat();
 
 // Utiliser le composable pour le statut des éditions
 const { getStatusColor, getStatusText } = useEditionStatus();
@@ -182,8 +175,8 @@ const getEditionsColumns = () => [
     cell: ({ row }: TableCellParams) => {
       const edition = row.original;
       return h('div', { class: 'text-sm' }, [
-        h('div', {}, formatDate(edition.startDate)),
-        h('div', { class: 'text-gray-400 text-xs' }, formatDate(edition.endDate))
+        h('div', {}, formatDateTime(edition.startDate)),
+        h('div', { class: 'text-gray-400 text-xs' }, formatDateTime(edition.endDate))
       ]);
     }
   },
