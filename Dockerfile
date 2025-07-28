@@ -1,5 +1,5 @@
 # Dockerfile simplifié pour Convention de Jonglerie
-FROM node:20-alpine
+FROM node:22-alpine
 
 # Installer les dépendances système
 RUN apk add --no-cache libc6-compat curl
