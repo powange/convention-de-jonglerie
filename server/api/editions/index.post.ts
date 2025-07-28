@@ -13,17 +13,36 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event);
   const { 
-    name, description, imageUrl, startDate, endDate, addressLine1, addressLine2, postalCode, city, region, country, 
+    conventionId, name, description, imageUrl, startDate, endDate, addressLine1, addressLine2, postalCode, city, region, country, 
     ticketingUrl, facebookUrl, instagramUrl, 
     hasFoodTrucks, hasKidsZone, acceptsPets, hasTentCamping, hasTruckCamping, hasFamilyCamping, hasGym,
     hasFireSpace, hasGala, hasOpenStage, hasConcert, hasCantine, hasAerialSpace, hasSlacklineSpace,
     hasToilets, hasShowers, hasAccessibility, hasWorkshops
   } = body;
 
-  if (!name || !startDate || !endDate || !addressLine1 || !postalCode || !city || !country) {
+  if (!conventionId || !startDate || !endDate || !addressLine1 || !postalCode || !city || !country) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Name, start date, end date, address line 1, postal code, city, and country are required',
+      message: 'Convention, start date, end date, address line 1, postal code, city, and country are required',
+    });
+  }
+
+  // Vérifier que la convention existe et que l'utilisateur en est l'auteur
+  const convention = await prisma.convention.findUnique({
+    where: { id: conventionId },
+  });
+
+  if (!convention) {
+    throw createError({
+      statusCode: 404,
+      message: 'Convention not found',
+    });
+  }
+
+  if (convention.authorId !== event.context.user.id) {
+    throw createError({
+      statusCode: 403,
+      message: 'You can only create editions for your own conventions',
     });
   }
 
@@ -31,7 +50,8 @@ export default defineEventHandler(async (event) => {
     // Créer l'édition sans l'image d'abord
     const edition = await prisma.edition.create({
       data: {
-        name,
+        conventionId,
+        name: name?.trim() || null,
         description,
         imageUrl: null, // On met null d'abord
         startDate: new Date(startDate),

@@ -3,12 +3,20 @@
     <!-- En-tête avec le nom de l'édition -->
     <div class="mb-4">
       <div class="flex items-start justify-between">
-        <div>
-          <h1 class="text-3xl font-bold">{{ edition.name }}</h1>
-          <div class="flex items-center gap-4 mt-2 text-gray-500">
-            <span>{{ edition.city }}, {{ edition.country }}</span>
-            <span>•</span>
-            <span>{{ formatDateRange(edition.startDate, edition.endDate) }}</span>
+        <div class="flex items-start gap-4">
+          <div v-if="edition.convention?.logo" class="flex-shrink-0">
+            <img :src="edition.convention.logo" :alt="edition.convention.name" class="w-16 h-16 object-cover rounded-lg shadow-md" >
+          </div>
+          <div v-else class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center shadow-md">
+            <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold">{{ getEditionDisplayName(edition) }}</h1>
+            <div class="flex items-center gap-4 mt-2 text-gray-500">
+              <span>{{ edition.city }}, {{ edition.country }}</span>
+              <span>•</span>
+              <span>{{ formatDateRange(edition.startDate, edition.endDate) }}</span>
+            </div>
           </div>
         </div>
         
@@ -78,6 +86,7 @@
 import { computed } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import { useEditionStore } from '~/stores/editions';
+import { getEditionDisplayName } from '~/utils/editionName';
 
 interface Props {
   edition: any;

@@ -23,7 +23,7 @@ export interface PublicUser {
 
 export interface Edition {
   id: number;
-  name: string;
+  name?: string | null;
   description?: string;
   imageUrl?: string;
   startDate: string;
@@ -59,6 +59,8 @@ export interface Edition {
   hasAfjTokenPayment: boolean;
   creatorId: number;
   creator: User;
+  conventionId: number;
+  convention?: Convention;
   favoritedBy: { id: number }[];
   collaborators?: ConventionCollaborator[];
 }
@@ -72,6 +74,15 @@ export interface Convention {
   updatedAt: string;
   authorId: number;
   author?: User;
+  editions?: {
+    id: number;
+    name?: string | null;
+    startDate: string;
+    endDate: string;
+    city: string;
+    country: string;
+    imageUrl?: string | null;
+  }[];
 }
 
 export interface ConventionCollaborator {

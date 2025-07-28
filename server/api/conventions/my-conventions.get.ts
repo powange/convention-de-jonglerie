@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     });
   }
 
@@ -25,6 +25,20 @@ export default defineEventHandler(async (event) => {
             email: true,
           },
         },
+        editions: {
+          select: {
+            id: true,
+            name: true,
+            startDate: true,
+            endDate: true,
+            city: true,
+            country: true,
+            imageUrl: true,
+          },
+          orderBy: {
+            startDate: 'asc',
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',
@@ -36,7 +50,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la récupération des conventions:', error);
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur',
+      message: 'Erreur serveur',
     });
   }
 });

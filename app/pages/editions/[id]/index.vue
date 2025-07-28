@@ -19,13 +19,14 @@
       <UCard>
         
         <template #header>
-          <!-- Image et description -->
+          <!-- Affiche de l'édition et description -->
           <div class="flex gap-6">
             <div v-if="edition.imageUrl" class="flex-shrink-0">
-              <img :src="edition.imageUrl" :alt="edition.name" class="w-48 h-48 object-cover rounded-lg shadow-lg" >
+              <img :src="edition.imageUrl" :alt="`Affiche de ${getEditionDisplayName(edition)}`" class="w-48 h-48 object-cover rounded-lg shadow-lg" >
             </div>
             <div class="flex-1">
-              <p class="">{{ edition.description || 'Aucune description disponible' }}</p>
+              <h3 class="text-lg font-semibold mb-2">À propos de cette édition</h3>
+              <p class="text-gray-700 dark:text-gray-300">{{ edition.description || 'Aucune description disponible' }}</p>
             </div>
           </div>
         </template>
@@ -100,6 +101,7 @@ import { useRoute } from 'vue-router';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
 import EditionHeader from '~/components/edition/EditionHeader.vue';
+import { getEditionDisplayName } from '~/utils/editionName';
 
 const route = useRoute();
 const editionStore = useEditionStore();

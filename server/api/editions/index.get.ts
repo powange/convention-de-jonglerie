@@ -174,6 +174,9 @@ export default defineEventHandler(async (event) => {
         favoritedBy: {
           select: { id: true },
         },
+        convention: {
+          select: { id: true, name: true, description: true, logo: true },
+        },
         ...(includeCollaborators && {
           collaborators: {
             include: {

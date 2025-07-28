@@ -18,13 +18,21 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  // Public GET /api/conventions (listing all conventions)
-  if (path.startsWith('/api/conventions') && requestMethod === 'GET') {
+  // Public GET routes pour conventions et éditions
+  const publicGetRoutes = [
+    '/api/conventions',  // Liste des conventions
+    '/api/editions',     // Liste des éditions
+  ];
+  
+  // Routes publiques pour récupérer des détails spécifiques (avec pattern [id])
+  const isPublicEditionDetail = path.match(/^\/api\/editions\/\d+$/) && requestMethod === 'GET';
+  const isPublicConventionDetail = path.match(/^\/api\/conventions\/\d+$/) && requestMethod === 'GET';
+  
+  if (publicGetRoutes.includes(path) && requestMethod === 'GET') {
     return;
   }
-
-  // Public GET /api/editions (listing all editions)
-  if (path.startsWith('/api/editions') && requestMethod === 'GET') {
+  
+  if (isPublicEditionDetail || isPublicConventionDetail) {
     return;
   }
 

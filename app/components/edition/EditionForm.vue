@@ -3,8 +3,36 @@
     <UStepper v-model="currentStep" :items="steps" class="mb-4">
       <template #general>
         <div class="space-y-6">
-          <UFormField label="Nom" name="name" required :error="touchedFields.name && !state.name ? 'Le nom est requis' : undefined">
-            <UInput v-model="state.name" required placeholder="Nom de la convention" size="lg" class="w-full" @blur="touchedFields.name = true; trimField('name')"/>
+          <UFormField label="Convention" name="conventionId" required :error="touchedFields.conventionId && !state.conventionId ? 'La convention est requise' : undefined">
+            <USelect
+              v-model="state.conventionId"
+              :items="conventionOptions"
+              placeholder="Sélectionnez une convention"
+              size="lg"
+              class="w-full"
+              :loading="loadingConventions"
+              value-key="value"
+              @change="touchedFields.conventionId = true"
+            >
+              <template #option="{ option }">
+                <div class="flex items-center gap-3">
+                  <div v-if="option.logo" class="flex-shrink-0">
+                    <img :src="option.logo" :alt="option.label" class="w-6 h-6 object-cover rounded" >
+                  </div>
+                  <div v-else class="w-6 h-6 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center flex-shrink-0">
+                    <UIcon name="i-heroicons-building-library" class="text-gray-400" size="14" />
+                  </div>
+                  <span>{{ option.label }}</span>
+                </div>
+              </template>
+            </USelect>
+          </UFormField>
+          
+          <UFormField label="Nom de l'édition (optionnel)" name="name">
+            <UInput v-model="state.name" placeholder="Nom de l'édition (ex: EJC 2024)" size="lg" class="w-full" @blur="trimField('name')"/>
+            <template #help>
+              <p class="text-xs text-gray-500">Si aucun nom n'est spécifié, le nom de la convention sera utilisé</p>
+            </template>
           </UFormField>
           <UFormField label="Description" name="description">
             <UTextarea v-model="state.description" placeholder="Description de la convention" :rows="5" class="w-full" @blur="trimField('description')" />
@@ -172,10 +200,11 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref, watch, computed, onMounted, nextTick } from 'vue';
 import AddressAutocomplete from '~/components/AddressAutocomplete.vue';
 import type { StepperItem } from '@nuxt/ui';
-import type { Edition } from '~/types';
+import type { Edition, Convention } from '~/types';
+import { useAuthStore } from '~/stores/auth';
 
 const props = defineProps<{
   initialData?: Partial<Edition>;
@@ -195,7 +224,7 @@ const steps = ref<StepperItem[]>([
 
 // Track which fields have been touched
 const touchedFields = reactive({
-  name: false,
+  conventionId: false,
   startDate: false,
   endDate: false,
   addressCountry: false,
@@ -205,6 +234,7 @@ const touchedFields = reactive({
 });
 
 const state = reactive({
+  conventionId: props.initialData?.conventionId || null,
   name: props.initialData?.name || '',
   description: props.initialData?.description || '',
   imageUrl: props.initialData?.imageUrl || '',
@@ -245,6 +275,50 @@ const uploading = ref(false);
 const fileInput = ref<HTMLInputElement>();
 const toast = useToast();
 const { servicesByCategory } = useConventionServices();
+const authStore = useAuthStore();
+
+// Gestion des conventions
+const conventions = ref<Convention[]>([]);
+const loadingConventions = ref(true);
+
+// Options pour le sélecteur de convention
+const conventionOptions = computed(() => {
+  return conventions.value.map(convention => ({
+    value: convention.id,
+    label: convention.name,
+    logo: convention.logo
+  }));
+});
+
+// Fonction pour charger les conventions de l'utilisateur
+const fetchUserConventions = async () => {
+  try {
+    loadingConventions.value = true;
+    
+    if (!authStore.token) {
+      conventions.value = [];
+      return;
+    }
+    
+    const data = await $fetch<Convention[]>('/api/conventions/my-conventions', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`,
+      },
+    });
+    
+    conventions.value = data || [];
+  } catch (error) {
+    console.error('Erreur lors du chargement des conventions:', error);
+    toast.add({
+      title: 'Erreur',
+      description: 'Impossible de charger vos conventions',
+      icon: 'i-heroicons-exclamation-triangle',
+      color: 'error'
+    });
+  } finally {
+    loadingConventions.value = false;
+  }
+};
 
 // Fonctions de validation des dates
 const validateDates = () => {
@@ -380,7 +454,7 @@ const handleNextStep = () => {
   // Validate current step before moving forward
   if (currentStep.value === 0) {
     // Mark all required fields as touched for validation
-    touchedFields.name = true;
+    touchedFields.conventionId = true;
     touchedFields.startDate = true;
     touchedFields.endDate = true;
     touchedFields.addressStreet = true;
@@ -388,8 +462,8 @@ const handleNextStep = () => {
     touchedFields.addressCity = true;
     touchedFields.addressCountry = true;
     
-    // Check if required fields are filled
-    if (!state.name || !state.startDate || !state.endDate || 
+    // Check if required fields are filled (nom n'est plus obligatoire)
+    if (!state.conventionId || !state.startDate || !state.endDate || 
         !state.addressLine1 || !state.postalCode || !state.city || !state.country) {
       const toast = useToast();
       toast.add({
@@ -465,9 +539,33 @@ watch(() => state.endDate, () => {
   }
 });
 
+// Charger les conventions au montage du composant
+onMounted(() => {
+  fetchUserConventions();
+});
+
+// Watcher pour s'assurer que conventionId est bien défini après le chargement des conventions
+watch([() => conventions.value, () => props.initialData], ([newConventions, newInitialData]) => {
+  if (newConventions.length > 0 && newInitialData?.conventionId) {
+    // Forcer la mise à jour même si la valeur existe déjà pour synchroniser le USelect
+    state.conventionId = newInitialData.conventionId;
+  }
+}, { immediate: true });
+
+// Watcher spécifique pour réinitialiser la valeur quand les conventions sont chargées
+watch(() => conventions.value.length, (newLength) => {
+  if (newLength > 0 && props.initialData?.conventionId) {
+    // Utiliser nextTick pour s'assurer que le DOM est mis à jour
+    nextTick(() => {
+      state.conventionId = props.initialData.conventionId;
+    });
+  }
+});
+
 // Watch for changes in initialData prop to update the form state (e.g., when editing a different convention)
 watch(() => props.initialData, (newVal) => {
   if (newVal) {
+    state.conventionId = newVal.conventionId || null;
     state.name = newVal.name || '';
     state.description = newVal.description || '';
     state.startDate = newVal.startDate ? new Date(newVal.startDate).toISOString().slice(0, 16) : '';

@@ -36,14 +36,14 @@
         <UCard v-for="edition in favoriteEditions" :key="edition.id">
           <template #header>
             <div class="flex items-center gap-3">
-              <div v-if="edition.imageUrl" class="flex-shrink-0">
-                <img :src="edition.imageUrl" :alt="edition.name" class="w-16 h-16 object-cover rounded-lg" >
+              <div v-if="edition.convention?.logo" class="flex-shrink-0">
+                <img :src="edition.convention.logo" :alt="edition.convention.name" class="w-16 h-16 object-cover rounded-lg" >
               </div>
               <div v-else class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                <UIcon name="i-heroicons-photo" class="text-gray-400" size="24" />
+                <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />
               </div>
               <div class="flex-1">
-                <h2 class="text-xl font-semibold">{{ edition.name }}</h2>
+                <h2 class="text-xl font-semibold">{{ getEditionDisplayName(edition) }}</h2>
                 <UBadge :color="getStatusColor(edition)" variant="subtle" class="mt-1">
                   {{ getStatusText(edition) }}
                 </UBadge>
@@ -124,6 +124,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import { useEditionStore } from '~/stores/editions';
 import type { Edition } from '~/types';
+import { getEditionDisplayName } from '~/utils/editionName';
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({

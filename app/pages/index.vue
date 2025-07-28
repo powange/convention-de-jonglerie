@@ -177,13 +177,13 @@
       <UCard v-for="edition in editionStore.editions" :key="edition.id">
         <template #header>
           <div class="flex items-center gap-3">
-            <div v-if="edition.imageUrl" class="flex-shrink-0">
-              <img :src="edition.imageUrl" :alt="edition.name" class="w-16 h-16 object-cover rounded-lg" >
+            <div v-if="edition.convention?.logo" class="flex-shrink-0">
+              <img :src="edition.convention.logo" :alt="edition.convention.name" class="w-16 h-16 object-cover rounded-lg" >
             </div>
             <div v-else class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-              <UIcon name="i-heroicons-photo" class="text-gray-400" size="24" />
+              <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />
             </div>
-            <h2 class="text-xl font-semibold">{{ edition.name }}</h2>
+            <h2 class="text-xl font-semibold">{{ getEditionDisplayName(edition) }}</h2>
           </div>
         </template>
         <p class="text-sm text-gray-500">Du: {{ new Date(edition.startDate).toLocaleDateString() }} au {{ new Date(edition.endDate).toLocaleDateString() }}</p>
@@ -248,6 +248,7 @@ import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
 import { useRouter } from 'vue-router';
 import CountryMultiSelect from '~/components/CountryMultiSelect.vue';
+import { getEditionDisplayName } from '~/utils/editionName';
 
 const editionStore = useEditionStore();
 const authStore = useAuthStore();

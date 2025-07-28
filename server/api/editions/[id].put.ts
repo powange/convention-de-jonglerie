@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
 
   const body: Edition = await readBody(event);
   const { 
-    name, description, imageUrl, startDate, endDate, addressLine1, addressLine2, postalCode, city, region, country, 
+    conventionId, name, description, imageUrl, startDate, endDate, addressLine1, addressLine2, postalCode, city, region, country, 
     ticketingUrl, facebookUrl, instagramUrl, 
     hasFoodTrucks, hasKidsZone, acceptsPets, hasTentCamping, hasTruckCamping, hasFamilyCamping, hasGym,
     hasFireSpace, hasGala, hasOpenStage, hasConcert, hasCantine, hasAerialSpace, hasSlacklineSpace,
@@ -50,6 +50,27 @@ export default defineEventHandler(async (event) => {
         statusCode: 403,
         statusMessage: 'Forbidden: You are not the creator of this edition',
       });
+    }
+
+    // Si une convention est spécifiée, vérifier qu'elle existe et que l'utilisateur en est l'auteur
+    if (conventionId && conventionId !== edition.conventionId) {
+      const convention = await prisma.convention.findUnique({
+        where: { id: conventionId },
+      });
+
+      if (!convention) {
+        throw createError({
+          statusCode: 404,
+          message: 'Convention not found',
+        });
+      }
+
+      if (convention.authorId !== event.context.user.id) {
+        throw createError({
+          statusCode: 403,
+          message: 'You can only assign editions to your own conventions',
+        });
+      }
     }
 
     // Si l'image est temporaire, la déplacer dans le bon dossier
@@ -81,7 +102,8 @@ export default defineEventHandler(async (event) => {
     }
 
     const updatedData: Partial<Edition> = {
-      name: name || edition.name,
+      conventionId: conventionId !== undefined ? conventionId : edition.conventionId,
+      name: name !== undefined ? (name?.trim() || null) : edition.name,
       description: description || edition.description,
       imageUrl: finalImageUrl !== undefined ? finalImageUrl : edition.imageUrl,
       startDate: startDate ? new Date(startDate) : edition.startDate,
