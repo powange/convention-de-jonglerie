@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client';
 import { getEmailHash } from '../../../utils/email-hash';
+import { prisma } from '../../../utils/prisma';
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   const editionId = parseInt(event.context.params?.id as string);

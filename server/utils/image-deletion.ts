@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { deleteFromBothLocations } from './copy-to-output';
-
-const prisma = new PrismaClient();
+import { prisma } from './prisma';
 
 export interface ImageDeletionOptions {
   entityType: 'convention' | 'edition' | 'user';

@@ -1,11 +1,10 @@
-import { PrismaClient } from '@prisma/client';
 import { 
   handleImageUpload, 
   updateEntityWithImage,
   deleteOldImage
 } from '../../utils/image-upload';
+import { prisma } from '../../utils/prisma';
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user;

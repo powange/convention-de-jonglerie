@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 import { copyToOutputPublic } from './copy-to-output';
-
-const prisma = new PrismaClient();
+import { prisma } from './prisma';
 
 export interface ImageUploadOptions {
   allowedTypes?: string[];

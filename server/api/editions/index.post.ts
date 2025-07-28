@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client';
 import { moveTempImageToEdition } from '../../utils/move-temp-image';
+import { prisma } from '../../utils/prisma';
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) {
