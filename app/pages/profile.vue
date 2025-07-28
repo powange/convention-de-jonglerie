@@ -127,7 +127,7 @@
               variant="outline" 
               color="primary" 
               block
-              to="/conventions/add"
+              to="/editions/add"
             >
               Créer une convention
             </UButton>
@@ -270,7 +270,7 @@
 import { reactive, ref, computed, onMounted } from 'vue';
 import { z } from 'zod';
 import { useAuthStore } from '~/stores/auth';
-import { useConventionStore } from '~/stores/conventions';
+import { useEditionStore } from '~/stores/editions';
 import { useAvatar } from '~/utils/avatar';
 
 // Protéger cette page avec le middleware d'authentification
@@ -279,7 +279,7 @@ definePageMeta({
 });
 
 const authStore = useAuthStore();
-const conventionStore = useConventionStore();
+const editionStore = useEditionStore();
 const toast = useToast();
 const { getUserAvatar } = useAvatar();
 
@@ -344,19 +344,19 @@ const hasChanges = computed(() => {
 
 // Statistiques calculées
 const myConventionsCount = computed(() => {
-  return conventionStore.conventions.filter(
+  return editionStore.editions.filter(
     convention => convention.creatorId === authStore.user?.id
   ).length;
 });
 
 const favoritesCount = computed(() => {
-  return conventionStore.conventions.filter(
+  return editionStore.editions.filter(
     convention => convention.favoritedBy.some(user => user.id === authStore.user?.id)
   ).length;
 });
 
 const totalFavoritesReceived = computed(() => {
-  return conventionStore.conventions
+  return editionStore.editions
     .filter(convention => convention.creatorId === authStore.user?.id)
     .reduce((total, convention) => total + convention.favoritedBy.length, 0);
 });
@@ -536,6 +536,6 @@ const deleteProfilePicture = async () => {
 };
 
 onMounted(async () => {
-  await conventionStore.fetchConventions();
+  await editionStore.fetchEditions();
 });
 </script>

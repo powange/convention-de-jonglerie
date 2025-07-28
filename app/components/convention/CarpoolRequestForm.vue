@@ -123,7 +123,7 @@ const onSubmit = async () => {
   
   try {
     const authStore = useAuthStore();
-    const response = await $fetch(`/api/conventions/${props.conventionId}/carpool-requests`, {
+    const response = await $fetch(`/api/editions/${props.conventionId}/carpool-requests`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${authStore.token}`,

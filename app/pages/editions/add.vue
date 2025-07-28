@@ -2,15 +2,15 @@
   <div class="max-w-6xl mx-auto">
     <UCard>
       <template #header>
-        <h1 class="text-2xl font-bold">Ajouter une nouvelle convention</h1>
+        <h1 class="text-2xl font-bold">Ajouter une nouvelle édition</h1>
       </template>
-      <ConventionForm submit-button-text="Ajouter la convention" :loading="conventionStore.loading" @submit="handleAddConvention" />
+      <ConventionForm submit-button-text="Ajouter l'édition" :loading="editionStore.loading" @submit="handleAddConvention" />
     </UCard>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useConventionStore } from '~/stores/conventions';
+import { useEditionStore } from '~/stores/editions';
 import { useRouter } from 'vue-router';
 import ConventionForm from '~/components/convention/ConventionForm.vue';
 import type { Edition } from '~/types';
@@ -20,17 +20,17 @@ definePageMeta({
   middleware: 'auth-client'
 });
 
-const conventionStore = useConventionStore();
+const editionStore = useEditionStore();
 const toast = useToast();
 const router = useRouter();
 
 const handleAddConvention = async (formData: Edition) => {
   try {
-    await conventionStore.addConvention(formData);
-    toast.add({ title: 'Convention ajoutée avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
+    await editionStore.addEdition(formData);
+    toast.add({ title: 'Édition ajoutée avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
     router.push('/');
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || "Échec de l'ajout de la convention", icon: 'i-heroicons-x-circle', color: 'error' });
+    toast.add({ title: e.statusMessage || "Échec de l'ajout de l'édition", icon: 'i-heroicons-x-circle', color: 'error' });
   }
 };
 </script>

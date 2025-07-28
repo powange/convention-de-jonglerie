@@ -23,6 +23,11 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
+  // Public GET /api/editions (listing all editions)
+  if (path.startsWith('/api/editions') && requestMethod === 'GET') {
+    return;
+  }
+
   // Public GET /api/countries (listing available countries)
   if (path === '/api/countries' && requestMethod === 'GET') {
     return;

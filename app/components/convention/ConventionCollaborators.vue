@@ -100,7 +100,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive } from 'vue';
 import { z } from 'zod';
-import { useConventionStore } from '~/stores/conventions';
+import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
 import { useGravatar } from '~/utils/gravatar';
 import type { ConventionCollaborator } from '~/types';
@@ -112,7 +112,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const conventionStore = useConventionStore();
+const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
 const { getUserAvatar } = useAvatar();
@@ -149,7 +149,7 @@ const loadCollaborators = async () => {
   
   loading.value = true;
   try {
-    collaborators.value = await conventionStore.getCollaborators(props.conventionId);
+    collaborators.value = await editionStore.getCollaborators(props.conventionId);
   } catch (error) {
     toast.add({
       title: 'Erreur',
@@ -165,7 +165,7 @@ const loadCollaborators = async () => {
 const addCollaborator = async () => {
   adding.value = true;
   try {
-    const newCollaborator = await conventionStore.addCollaborator(
+    const newCollaborator = await editionStore.addCollaborator(
       props.conventionId,
       addForm.userEmail,
       addForm.canEdit
@@ -199,7 +199,7 @@ const removeCollaborator = async (collaborator: ConventionCollaborator) => {
   }
   
   try {
-    await conventionStore.removeCollaborator(props.conventionId, collaborator.id);
+    await editionStore.removeCollaborator(props.conventionId, collaborator.id);
     collaborators.value = collaborators.value.filter(c => c.id !== collaborator.id);
     
     toast.add({

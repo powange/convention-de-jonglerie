@@ -3,39 +3,39 @@ import { useAuthStore } from '../stores/auth'; // Use relative path
 
 
 
-export const useConventionStore = defineStore('conventions', {
+export const useEditionStore = defineStore('editions', {
   state: () => ({
-    conventions: [] as Edition[],
+    editions: [] as Edition[],
     loading: false,
     error: null as string | null,
   }),
   actions: {
-    // Filtrer les conventions futures (date de fin >= aujourd'hui)
-    filterFutureConventions() {
+    // Filtrer les éditions futures (date de fin >= aujourd'hui)
+    filterFutureEditions() {
       const now = new Date();
       now.setHours(0, 0, 0, 0); // Début de la journée actuelle
       
-      this.conventions = this.conventions.filter(convention => {
-        const endDate = new Date(convention.endDate);
-        return endDate >= now; // Garder seulement les conventions qui ne sont pas encore terminées
+      this.editions = this.editions.filter(edition => {
+        const endDate = new Date(edition.endDate);
+        return endDate >= now; // Garder seulement les éditions qui ne sont pas encore terminées
       });
     },
 
-    // Trier les conventions par date de début (plus récente en premier)
-    sortConventions() {
-      this.conventions.sort((a, b) => {
+    // Trier les éditions par date de début (plus récente en premier)
+    sortEditions() {
+      this.editions.sort((a, b) => {
         const dateA = new Date(a.startDate);
         const dateB = new Date(b.startDate);
         return dateB.getTime() - dateA.getTime(); // Tri décroissant (plus récent en premier)
       });
     },
 
-    // Appliquer le filtrage et le tri des conventions
-    processConventions() {
-      this.filterFutureConventions();
-      this.sortConventions();
+    // Appliquer le filtrage et le tri des éditions
+    processEditions() {
+      this.filterFutureEditions();
+      this.sortEditions();
     },
-    async fetchConventions(filters?: any) {
+    async fetchEditions(filters?: any) {
       this.loading = true;
       this.error = null;
       try {
@@ -66,97 +66,97 @@ export const useConventionStore = defineStore('conventions', {
           });
         }
 
-        const data = await $fetch<Edition[]>('/api/conventions', {
+        const data = await $fetch<Edition[]>('/api/editions', {
           params: queryParams,
         });
-        this.conventions = data;
-        this.processConventions();
+        this.editions = data;
+        this.processEditions();
       } catch (e: unknown) {
-        this.error = e.statusMessage || 'Failed to fetch conventions';
+        this.error = e.statusMessage || 'Failed to fetch editions';
       } finally {
         this.loading = false;
       }
     },
 
-    async fetchConventionById(id: number) {
+    async fetchEditionById(id: number) {
       this.loading = true;
       this.error = null;
       try {
-        const edition = await $fetch<Edition>(`/api/conventions/${id}`);
+        const edition = await $fetch<Edition>(`/api/editions/${id}`);
         return edition;
       } catch (e: unknown) {
-        this.error = e.statusMessage || 'Failed to fetch convention';
+        this.error = e.statusMessage || 'Failed to fetch edition';
         throw e;
       } finally {
         this.loading = false;
       }
     },
 
-    async addConvention(conventionData: Omit<Edition, 'id' | 'creator' | 'creatorId' | 'favoritedBy'>) {
+    async addEdition(editionData: Omit<Edition, 'id' | 'creator' | 'creatorId' | 'favoritedBy'>) {
       this.loading = true;
       this.error = null;
       const authStore = useAuthStore();
       try {
-        const newEdition = await $fetch<Edition>('/api/conventions', {
+        const newEdition = await $fetch<Edition>('/api/editions', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${authStore.token}`,
           },
-          body: conventionData,
+          body: editionData,
         });
-        this.conventions.push(newEdition);
-        this.processConventions();
+        this.editions.push(newEdition);
+        this.processEditions();
         return newEdition;
       } catch (e: unknown) {
-        this.error = e.statusMessage || 'Failed to add convention';
+        this.error = e.statusMessage || 'Failed to add edition';
         throw e;
       } finally {
         this.loading = false;
       }
     },
 
-    async updateConvention(id: number, conventionData: Edition) {
+    async updateEdition(id: number, editionData: Edition) {
       this.loading = true;
       this.error = null;
       const authStore = useAuthStore();
       try {
-        const updatedEdition = await $fetch<Edition>(`/api/conventions/${id}`,
+        const updatedEdition = await $fetch<Edition>(`/api/editions/${id}`,
           {
             method: 'PUT',
             headers: {
               Authorization: `Bearer ${authStore.token}`,
             },
-            body: conventionData,
+            body: editionData,
           },
         );
-        const index = this.conventions.findIndex((c) => c.id === id);
+        const index = this.editions.findIndex((c) => c.id === id);
         if (index !== -1) {
-          this.conventions[index] = updatedEdition;
-          this.processConventions();
+          this.editions[index] = updatedEdition;
+          this.processEditions();
         }
         return updatedEdition;
       } catch (e: unknown) {
-        this.error = e.statusMessage || 'Failed to update convention';
+        this.error = e.statusMessage || 'Failed to update edition';
         throw e;
       } finally {
         this.loading = false;
       }
     },
 
-    async deleteConvention(id: number) {
+    async deleteEdition(id: number) {
       this.loading = true;
       this.error = null;
       const authStore = useAuthStore();
       try {
-        await $fetch(`/api/conventions/${id}`, {
+        await $fetch(`/api/editions/${id}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${authStore.token}`,
           },
         });
-        this.conventions = this.conventions.filter((c) => c.id !== id);
+        this.editions = this.editions.filter((c) => c.id !== id);
       } catch (e: unknown) {
-        this.error = e.statusMessage || 'Failed to delete convention';
+        this.error = e.statusMessage || 'Failed to delete edition';
         throw e;
       } finally {
         this.loading = false;
@@ -168,14 +168,14 @@ export const useConventionStore = defineStore('conventions', {
       this.error = null;
       const authStore = useAuthStore();
       try {
-        await $fetch(`/api/conventions/${id}/favorite`, {
+        await $fetch(`/api/editions/${id}/favorite`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${authStore.token}`,
           },
         });
-        // Re-fetch conventions to update favorite status
-        await this.fetchConventions();
+        // Re-fetch editions to update favorite status
+        await this.fetchEditions();
       } catch (e: unknown) {
         this.error = e.statusMessage || 'Failed to toggle favorite';
         throw e;
@@ -185,11 +185,11 @@ export const useConventionStore = defineStore('conventions', {
     },
 
     // Méthodes pour gérer les collaborateurs
-    async getCollaborators(conventionId: number) {
+    async getCollaborators(editionId: number) {
       this.error = null;
       const authStore = useAuthStore();
       try {
-        const collaborators = await $fetch<ConventionCollaborator[]>(`/api/conventions/${conventionId}/collaborators`, {
+        const collaborators = await $fetch<ConventionCollaborator[]>(`/api/editions/${editionId}/collaborators`, {
           headers: {
             Authorization: `Bearer ${authStore.token}`,
           },
@@ -201,11 +201,11 @@ export const useConventionStore = defineStore('conventions', {
       }
     },
 
-    async addCollaborator(conventionId: number, userEmail: string, canEdit: boolean = true) {
+    async addCollaborator(editionId: number, userEmail: string, canEdit: boolean = true) {
       this.error = null;
       const authStore = useAuthStore();
       try {
-        const collaborator = await $fetch<ConventionCollaborator>(`/api/conventions/${conventionId}/collaborators`, {
+        const collaborator = await $fetch<ConventionCollaborator>(`/api/editions/${editionId}/collaborators`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${authStore.token}`,
@@ -213,13 +213,13 @@ export const useConventionStore = defineStore('conventions', {
           body: { userEmail, canEdit },
         });
         
-        // Mettre à jour la convention locale avec le nouveau collaborateur
-        const conventionIndex = this.conventions.findIndex(c => c.id === conventionId);
-        if (conventionIndex !== -1) {
-          if (!this.conventions[conventionIndex].collaborators) {
-            this.conventions[conventionIndex].collaborators = [];
+        // Mettre à jour l'édition locale avec le nouveau collaborateur
+        const editionIndex = this.editions.findIndex(c => c.id === editionId);
+        if (editionIndex !== -1) {
+          if (!this.editions[editionIndex].collaborators) {
+            this.editions[editionIndex].collaborators = [];
           }
-          this.conventions[conventionIndex].collaborators!.push(collaborator);
+          this.editions[editionIndex].collaborators!.push(collaborator);
         }
         
         return collaborator;
@@ -229,21 +229,21 @@ export const useConventionStore = defineStore('conventions', {
       }
     },
 
-    async removeCollaborator(conventionId: number, collaboratorId: number) {
+    async removeCollaborator(editionId: number, collaboratorId: number) {
       this.error = null;
       const authStore = useAuthStore();
       try {
-        await $fetch(`/api/conventions/${conventionId}/collaborators/${collaboratorId}`, {
+        await $fetch(`/api/editions/${editionId}/collaborators/${collaboratorId}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${authStore.token}`,
           },
         });
         
-        // Mettre à jour la convention locale
-        const conventionIndex = this.conventions.findIndex(c => c.id === conventionId);
-        if (conventionIndex !== -1 && this.conventions[conventionIndex].collaborators) {
-          this.conventions[conventionIndex].collaborators = this.conventions[conventionIndex].collaborators!.filter(
+        // Mettre à jour l'édition locale
+        const editionIndex = this.editions.findIndex(c => c.id === editionId);
+        if (editionIndex !== -1 && this.editions[editionIndex].collaborators) {
+          this.editions[editionIndex].collaborators = this.editions[editionIndex].collaborators!.filter(
             c => c.id !== collaboratorId
           );
         }
@@ -254,7 +254,7 @@ export const useConventionStore = defineStore('conventions', {
     },
 
     // Vérifier si l'utilisateur peut modifier une édition
-    canEditConvention(edition: Edition, userId: number): boolean {
+    canEditEdition(edition: Edition, userId: number): boolean {
       // Le créateur peut toujours modifier
       if (edition.creatorId === userId) {
         return true;
@@ -267,7 +267,7 @@ export const useConventionStore = defineStore('conventions', {
     },
 
     // Vérifier si l'utilisateur peut supprimer une édition (seul le créateur)
-    canDeleteConvention(edition: Edition, userId: number): boolean {
+    canDeleteEdition(edition: Edition, userId: number): boolean {
       return edition.creatorId === userId;
     },
   },

@@ -119,12 +119,12 @@ const tabs = computed(() => [
 
 // Charger les offres de covoiturage
 const { data: carpoolOffers, refresh: refreshOffers } = await useFetch(
-  `/api/conventions/${props.conventionId}/carpool-offers`
+  `/api/editions/${props.conventionId}/carpool-offers`
 );
 
 // Charger les demandes de covoiturage
 const { data: carpoolRequests, refresh: refreshRequests } = await useFetch(
-  `/api/conventions/${props.conventionId}/carpool-requests`
+  `/api/editions/${props.conventionId}/carpool-requests`
 );
 
 // Computed pour s'assurer que les données sont des tableaux

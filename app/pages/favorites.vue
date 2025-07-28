@@ -99,16 +99,16 @@
                   color="info"
                   variant="solid"
                   label="Voir"
-                  :to="`/conventions/${convention.id}`"
+                  :to="`/editions/${convention.id}`"
                 />
                 <UButton
-                  v-if="conventionStore.canEditConvention(convention, authStore.user?.id || 0)"
+                  v-if="editionStore.canEditEdition(convention, authStore.user?.id || 0)"
                   icon="i-heroicons-pencil"
                   size="sm"
                   color="warning"
                   variant="solid"
                   label="Modifier"
-                  :to="`/conventions/${convention.id}/edit`"
+                  :to="`/editions/${convention.id}/edit`"
                 />
               </div>
             </div>
@@ -122,7 +122,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '~/stores/auth';
-import { useConventionStore } from '~/stores/conventions';
+import { useEditionStore } from '~/stores/editions';
 import type { Convention } from '~/types';
 
 // Protéger cette page avec le middleware d'authentification
@@ -131,14 +131,14 @@ definePageMeta({
 });
 
 const authStore = useAuthStore();
-const conventionStore = useConventionStore();
+const editionStore = useEditionStore();
 const toast = useToast();
 
 const loading = ref(true);
 
 // Calculer les conventions favorites de l'utilisateur
 const favoriteConventions = computed(() => {
-  return conventionStore.conventions.filter(
+  return editionStore.editions.filter(
     convention => convention.favoritedBy.some(user => user.id === authStore.user?.id)
   );
 });
@@ -166,7 +166,7 @@ const getStatusText = (convention: Convention) => {
 
 const removeFavorite = async (id: number) => {
   try {
-    await conventionStore.toggleFavorite(id);
+    await editionStore.toggleFavorite(id);
     toast.add({ 
       title: 'Retiré des favoris', 
       icon: 'i-heroicons-star', 
@@ -184,7 +184,7 @@ const removeFavorite = async (id: number) => {
 
 onMounted(async () => {
   try {
-    await conventionStore.fetchConventions();
+    await editionStore.fetchEditions();
   } catch (_error) {
     toast.add({ 
       title: 'Erreur', 

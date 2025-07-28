@@ -164,17 +164,17 @@
         </template>
       </UModal>
 
-    <div v-if="conventionStore.loading">
+    <div v-if="editionStore.loading">
       <p>Chargement des conventions...</p>
     </div>
-    <div v-else-if="conventionStore.error">
-      <p class="text-red-500">Erreur: {{ conventionStore.error }}</p>
+    <div v-else-if="editionStore.error">
+      <p class="text-red-500">Erreur: {{ editionStore.error }}</p>
     </div>
-    <div v-else-if="conventionStore.conventions.length === 0">
+    <div v-else-if="editionStore.editions.length === 0">
       <p>Aucune convention trouvée. Soyez le premier à en ajouter une !</p>
     </div>
     <div v-else class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-      <UCard v-for="edition in conventionStore.conventions" :key="edition.id">
+      <UCard v-for="edition in editionStore.editions" :key="edition.id">
         <template #header>
           <div class="flex items-center gap-3">
             <div v-if="edition.imageUrl" class="flex-shrink-0">
@@ -213,7 +213,7 @@
               variant="ghost"
               @click="toggleFavorite(edition.id)"
             />
-            <NuxtLink :to="`/conventions/${edition.id}`">
+            <NuxtLink :to="`/editions/${edition.id}`">
               <UButton icon="i-heroicons-eye" size="sm" color="info" variant="solid" label="Voir" />
             </NuxtLink>
             <UButton
@@ -232,7 +232,7 @@
               color="error"
               variant="solid"
               label="Supprimer"
-              @click="deleteConvention(edition.id)"
+              @click="deleteEdition(edition.id)"
             />
           </div>
         </template>
@@ -244,12 +244,12 @@
 
 <script setup lang="ts">
 import { onMounted, computed, reactive, watch } from 'vue';
-import { useConventionStore } from '~/stores/conventions';
+import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
 import { useRouter } from 'vue-router';
 import CountryMultiSelect from '~/components/CountryMultiSelect.vue';
 
-const conventionStore = useConventionStore();
+const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
 const router = useRouter();
@@ -281,7 +281,7 @@ const filters = reactive({
 
 // Watcher pour appliquer automatiquement les filtres
 watch(filters, () => {
-  conventionStore.fetchConventions(filters);
+  editionStore.fetchEditions(filters);
 }, { deep: true, immediate: false });
 
 const resetFilters = () => {
@@ -293,20 +293,20 @@ const resetFilters = () => {
   services.forEach(service => {
     filters[service.key] = false;
   });
-  conventionStore.fetchConventions(); // Fetch all conventions again
+  editionStore.fetchEditions(); // Fetch all conventions again
 };
 
 onMounted(() => {
-  conventionStore.fetchConventions();
+  editionStore.fetchEditions();
 });
 
 const isFavorited = computed(() => (editionId: number) => {
-  return conventionStore.conventions.find(c => c.id === editionId)?.favoritedBy.some(u => u.id === authStore.user?.id);
+  return editionStore.editions.find(c => c.id === editionId)?.favoritedBy.some(u => u.id === authStore.user?.id);
 });
 
 const toggleFavorite = async (id: number) => {
   try {
-    await conventionStore.toggleFavorite(id);
+    await editionStore.toggleFavorite(id);
     toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'success' });
   } catch (e: unknown) {
     toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'error' });
@@ -314,13 +314,13 @@ const toggleFavorite = async (id: number) => {
 };
 
 const editConvention = (id: number) => {
-  router.push(`/conventions/${id}/edit`);
+  router.push(`/editions/${id}/edit`);
 };
 
 const deleteConvention = async (id: number) => {
   if (confirm('Êtes-vous sûr de vouloir supprimer cette convention ?')) {
     try {
-      await conventionStore.deleteConvention(id);
+      await editionStore.deleteEdition(id);
       toast.add({ title: 'Convention supprimée avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
     } catch (e: unknown) {
       toast.add({ title: e.statusMessage || 'Échec de la suppression de la convention', icon: 'i-heroicons-x-circle', color: 'error' });

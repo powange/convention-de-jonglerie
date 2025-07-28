@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="conventionStore.loading">
+    <div v-if="editionStore.loading">
       <p>Chargement des détails de la convention...</p>
     </div>
     <div v-else-if="!convention">
@@ -74,7 +74,7 @@
               v-if="canEdit"
               icon="i-heroicons-pencil"
               color="warning"
-              :to="`/conventions/${convention.id}/edit`"
+              :to="`/editions/${convention.id}/edit`"
             >
               Modifier l'édition
             </UButton>
@@ -83,7 +83,7 @@
               icon="i-heroicons-trash"
               color="error"
               variant="soft"
-              @click="deleteConvention(convention.id)"
+              @click="deleteEdition(convention.id)"
             >
               Supprimer l'édition
             </UButton>
@@ -98,7 +98,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useConventionStore } from '~/stores/conventions';
+import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
 import { useAvatar } from '~/utils/avatar';
 // import ConventionCollaborators from '~/components/convention/ConventionCollaborators.vue';
@@ -111,7 +111,7 @@ import ConventionHeader from '~/components/convention/ConventionHeader.vue';
 
 const route = useRoute();
 const router = useRouter();
-const conventionStore = useConventionStore();
+const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
 const { getUserAvatar } = useAvatar();
@@ -121,7 +121,7 @@ const convention = ref(null);
 
 onMounted(async () => {
   try {
-    convention.value = await conventionStore.fetchConventionById(conventionId);
+    convention.value = await editionStore.fetchEditionById(conventionId);
   } catch (error) {
     console.error('Failed to fetch convention:', error);
   }
@@ -136,12 +136,12 @@ const canAccess = computed(() => {
 // Permissions calculées
 const canEdit = computed(() => {
   if (!convention.value || !authStore.user?.id) return false;
-  return conventionStore.canEditConvention(convention.value, authStore.user.id);
+  return editionStore.canEditEdition(convention.value, authStore.user.id);
 });
 
 const canDelete = computed(() => {
   if (!convention.value || !authStore.user?.id) return false;
-  return conventionStore.canDeleteConvention(convention.value, authStore.user.id);
+  return editionStore.canDeleteEdition(convention.value, authStore.user.id);
 });
 
 const isFavorited = computed(() => (_conventionId: number) => {
@@ -150,9 +150,9 @@ const isFavorited = computed(() => (_conventionId: number) => {
 
 const toggleFavorite = async (id: number) => {
   try {
-    await conventionStore.toggleFavorite(id);
+    await editionStore.toggleFavorite(id);
     // Recharger la convention pour mettre à jour l'état des favoris
-    convention.value = await conventionStore.fetchConventionById(conventionId);
+    convention.value = await editionStore.fetchEditionById(conventionId);
     toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'success' });
   } catch (e: unknown) {
     toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'error' });
@@ -162,7 +162,7 @@ const toggleFavorite = async (id: number) => {
 const deleteConvention = async (id: number) => {
   if (confirm('Êtes-vous sûr de vouloir supprimer cette convention ?')) {
     try {
-      await conventionStore.deleteConvention(id);
+      await editionStore.deleteEdition(id);
       toast.add({ title: 'Convention supprimée avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
       router.push('/');
     } catch (e: unknown) {

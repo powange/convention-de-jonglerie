@@ -67,7 +67,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useAuthStore } from '~/stores/auth';
-import { useConventionStore } from '~/stores/conventions';
+import { useEditionStore } from '~/stores/editions';
 import type { Convention } from '~/types';
 
 interface Props {
@@ -80,7 +80,7 @@ const emit = defineEmits<{
 }>();
 
 const authStore = useAuthStore();
-const conventionStore = useConventionStore();
+const editionStore = useEditionStore();
 const toast = useToast();
 
 const uploading = ref(false);
@@ -102,7 +102,7 @@ const handleFileUpload = async (event: Event) => {
     const formData = new FormData();
     formData.append('image', file);
     
-    const response = await $fetch(`/api/conventions/${props.convention.id}/upload-image`, {
+    const response = await $fetch(`/api/editions/${props.convention.id}/upload-image`, {
       method: 'POST',
       body: formData,
       headers: {
@@ -112,7 +112,7 @@ const handleFileUpload = async (event: Event) => {
     
     if (response.success && response.convention) {
       // Mettre à jour le store
-      await conventionStore.fetchConventions();
+      await editionStore.fetchEditions();
       
       emit('image-updated', response.convention);
       
@@ -140,7 +140,7 @@ const handleFileUpload = async (event: Event) => {
 const deleteImage = async () => {
   deleting.value = true;
   try {
-    const response = await $fetch(`/api/conventions/${props.convention.id}/delete-image`, {
+    const response = await $fetch(`/api/editions/${props.convention.id}/delete-image`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${authStore.token}`,
@@ -149,7 +149,7 @@ const deleteImage = async () => {
     
     if (response.success && response.convention) {
       // Mettre à jour le store
-      await conventionStore.fetchConventions();
+      await editionStore.fetchEditions();
       
       emit('image-updated', response.convention);
       

@@ -30,7 +30,7 @@
     <div class="border-b border-gray-200">
       <nav class="flex space-x-8" aria-label="Tabs">
         <NuxtLink 
-          :to="`/conventions/${convention.id}`"
+          :to="`/editions/${convention.id}`"
           :class="[
             'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm',
             currentPage === 'details' 
@@ -44,7 +44,7 @@
         
         <NuxtLink 
           v-if="authStore.isAuthenticated"
-          :to="`/conventions/${convention.id}/covoiturage`"
+          :to="`/editions/${convention.id}/covoiturage`"
           :class="[
             'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm',
             currentPage === 'covoiturage' 
@@ -58,7 +58,7 @@
         
         <NuxtLink 
           v-if="canAccess"
-          :to="`/conventions/${convention.id}/gestion`"
+          :to="`/editions/${convention.id}/gestion`"
           :class="[
             'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm',
             currentPage === 'gestion' 
@@ -77,7 +77,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useAuthStore } from '~/stores/auth';
-import { useConventionStore } from '~/stores/conventions';
+import { useEditionStore } from '~/stores/editions';
 
 interface Props {
   convention: any;
@@ -90,12 +90,12 @@ const emit = defineEmits<{
   'toggle-favorite': [];
 }>();
 const authStore = useAuthStore();
-const conventionStore = useConventionStore();
+const editionStore = useEditionStore();
 
 // Vérifier l'accès à la page gestion
 const canAccess = computed(() => {
   if (!props.convention || !authStore.user?.id) return false;
-  const canEdit = conventionStore.canEditConvention(props.convention, authStore.user.id);
+  const canEdit = editionStore.canEditEdition(props.convention, authStore.user.id);
   return canEdit || authStore.user?.id === props.convention?.creatorId;
 });
 

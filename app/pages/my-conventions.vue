@@ -8,7 +8,7 @@
         color="primary" 
         variant="solid" 
         label="Créer une Convention" 
-        to="/conventions/add"
+        to="/editions/add"
       />
     </div>
 
@@ -25,7 +25,7 @@
         color="primary" 
         variant="solid" 
         label="Créer ma première convention"
-        to="/conventions/add"
+        to="/editions/add"
       />
     </div>
 
@@ -66,25 +66,25 @@
               color="info"
               variant="solid"
               label="Voir"
-              :to="`/conventions/${edition.id}`"
+              :to="`/editions/${edition.id}`"
             />
             <UButton
-              v-if="conventionStore.canEditConvention(edition, authStore.user?.id || 0)"
+              v-if="editionStore.canEditEdition(edition, authStore.user?.id || 0)"
               icon="i-heroicons-pencil"
               size="sm"
               color="warning"
               variant="solid"
               label="Modifier"
-              :to="`/conventions/${edition.id}/edit`"
+              :to="`/editions/${edition.id}/edit`"
             />
             <UButton
-              v-if="conventionStore.canDeleteConvention(edition, authStore.user?.id || 0)"
+              v-if="editionStore.canDeleteEdition(edition, authStore.user?.id || 0)"
               icon="i-heroicons-trash"
               size="sm"
               color="error"
               variant="solid"
               label="Supprimer"
-              @click="deleteConvention(edition.id)"
+              @click="deleteEdition(edition.id)"
             />
           </div>
         </template>
@@ -96,7 +96,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '~/stores/auth';
-import { useConventionStore } from '~/stores/conventions';
+import { useEditionStore } from '~/stores/editions';
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -104,14 +104,14 @@ definePageMeta({
 });
 
 const authStore = useAuthStore();
-const conventionStore = useConventionStore();
+const editionStore = useEditionStore();
 const toast = useToast();
 
 const loading = ref(true);
 
 // Calculer les conventions de l'utilisateur
 const myConventions = computed(() => {
-  return conventionStore.conventions.filter(
+  return editionStore.editions.filter(
     edition => edition.creatorId === authStore.user?.id
   );
 });
@@ -140,7 +140,7 @@ const getStatusText = (edition: any) => {
 const deleteConvention = async (id: number) => {
   if (confirm('Êtes-vous sûr de vouloir supprimer cette convention ?')) {
     try {
-      await conventionStore.deleteConvention(id);
+      await editionStore.deleteEdition(id);
       toast.add({ 
         title: 'Convention supprimée avec succès !', 
         icon: 'i-heroicons-check-circle', 
@@ -159,7 +159,7 @@ const deleteConvention = async (id: number) => {
 
 onMounted(async () => {
   try {
-    await conventionStore.fetchConventions();
+    await editionStore.fetchEditions();
   } catch (error) {
     toast.add({ 
       title: 'Erreur', 

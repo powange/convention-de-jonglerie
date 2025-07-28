@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="conventionStore.loading">
+    <div v-if="editionStore.loading">
       <p>Chargement des détails de la convention...</p>
     </div>
     <div v-else-if="!edition">
@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { useConventionStore } from '~/stores/conventions';
+import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
 import CarpoolSection from '~/components/convention/CarpoolSection.vue';
 import ConventionHeader from '~/components/convention/ConventionHeader.vue';
@@ -35,7 +35,7 @@ import ConventionHeader from '~/components/convention/ConventionHeader.vue';
 // });
 
 const route = useRoute();
-const conventionStore = useConventionStore();
+const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
 
@@ -48,9 +48,9 @@ const isFavorited = computed(() => (_editionId: number) => {
 
 const toggleFavorite = async (id: number) => {
   try {
-    await conventionStore.toggleFavorite(id);
+    await editionStore.toggleFavorite(id);
     // Recharger la convention pour mettre à jour l'état des favoris
-    edition.value = await conventionStore.fetchConventionById(conventionId);
+    edition.value = await editionStore.fetchEditionById(conventionId);
     toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'green' });
   } catch (e: unknown) {
     toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'red' });
@@ -65,7 +65,7 @@ onMounted(async () => {
   }
   
   try {
-    edition.value = await conventionStore.fetchConventionById(conventionId);
+    edition.value = await editionStore.fetchEditionById(conventionId);
   } catch (error) {
     console.error('Failed to fetch convention:', error);
   }

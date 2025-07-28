@@ -61,7 +61,7 @@
                     
                     <!-- Navigation mobile -->
                     <div class="md:hidden">
-                      <NuxtLink to="/conventions/add" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" @click="showUserMenu = false">
+                      <NuxtLink to="/editions/add" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" @click="showUserMenu = false">
                         <UIcon name="i-heroicons-plus" class="w-4 h-4" />
                         Ajouter une convention
                       </NuxtLink>

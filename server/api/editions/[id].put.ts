@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
     ticketingUrl, facebookUrl, instagramUrl, 
     hasFoodTrucks, hasKidsZone, acceptsPets, hasTentCamping, hasTruckCamping, hasFamilyCamping, hasGym,
     hasFireSpace, hasGala, hasOpenStage, hasConcert, hasCantine, hasAerialSpace, hasSlacklineSpace,
-    hasToilets, hasShowers, hasAccessibility, hasWorkshops
+    hasToilets, hasShowers, hasAccessibility, hasWorkshops, hasCreditCardPayment, hasAfjTokenPayment
   } = body;
 
   try {
@@ -60,12 +60,15 @@ export default defineEventHandler(async (event) => {
         finalImageUrl = newImageUrl;
         
         // Supprimer l'ancienne image si elle existe
-        if (edition.imageUrl && edition.imageUrl.includes(`/conventions/${editionId}/`)) {
+        if (edition.imageUrl && (edition.imageUrl.includes(`/editions/${editionId}/`) || edition.imageUrl.includes(`/conventions/${editionId}/`))) {
           const { promises: fs } = await import('fs');
           const { join } = await import('path');
           const oldFilename = edition.imageUrl.split('/').pop();
-          if (oldFilename && oldFilename.startsWith('convention-')) {
-            const oldFilePath = join(process.cwd(), 'public', 'uploads', 'conventions', editionId.toString(), oldFilename);
+          if (oldFilename && (oldFilename.startsWith('edition-') || oldFilename.startsWith('convention-'))) {
+            // Gérer les deux chemins possibles (ancien et nouveau)
+            const isOldPath = edition.imageUrl.includes('/conventions/');
+            const dirName = isOldPath ? 'conventions' : 'editions';
+            const oldFilePath = join(process.cwd(), 'public', 'uploads', dirName, editionId.toString(), oldFilename);
             try {
               await fs.unlink(oldFilePath);
               console.log('Ancienne image supprimée:', oldFilePath);
@@ -81,8 +84,8 @@ export default defineEventHandler(async (event) => {
       name: name || edition.name,
       description: description || edition.description,
       imageUrl: finalImageUrl !== undefined ? finalImageUrl : edition.imageUrl,
-      startDate: startDate ? new Date(startDate).toISOString() : edition.startDate.toISOString(),
-      endDate: endDate ? new Date(endDate).toISOString() : edition.endDate.toISOString(),
+      startDate: startDate ? new Date(startDate) : edition.startDate,
+      endDate: endDate ? new Date(endDate) : edition.endDate,
       addressLine1: addressLine1 || edition.addressLine1,
       addressLine2: addressLine2 || edition.addressLine2,
       postalCode: postalCode || edition.postalCode,
@@ -112,6 +115,8 @@ export default defineEventHandler(async (event) => {
     if (hasShowers !== undefined) updatedData.hasShowers = hasShowers;
     if (hasAccessibility !== undefined) updatedData.hasAccessibility = hasAccessibility;
     if (hasWorkshops !== undefined) updatedData.hasWorkshops = hasWorkshops;
+    if (hasCreditCardPayment !== undefined) updatedData.hasCreditCardPayment = hasCreditCardPayment;
+    if (hasAfjTokenPayment !== undefined) updatedData.hasAfjTokenPayment = hasAfjTokenPayment;
 
     const updatedEdition = await prisma.edition.update({
       where: {
