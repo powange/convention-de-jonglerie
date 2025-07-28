@@ -65,10 +65,6 @@ export default defineEventHandler(async (event) => {
       data: {
         name: validatedData.name,
         description: validatedData.description || null,
-        website: validatedData.website || null,
-        facebook: validatedData.facebook || null,
-        instagram: validatedData.instagram || null,
-        youtube: validatedData.youtube || null,
       },
       include: {
         author: {
