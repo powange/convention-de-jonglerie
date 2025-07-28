@@ -1,4 +1,6 @@
 import { prisma } from '../../utils/prisma';
+import { updateConventionSchema, validateAndSanitize, handleValidationError } from '../../utils/validation-schemas';
+import { z } from 'zod';
 
 
 export default defineEventHandler(async (event) => {
@@ -22,6 +24,17 @@ export default defineEventHandler(async (event) => {
 
     const body = await readBody(event);
 
+    // Validation et sanitisation des données avec Zod
+    let validatedData;
+    try {
+      validatedData = validateAndSanitize(updateConventionSchema, body);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        handleValidationError(error);
+      }
+      throw error;
+    }
+
     // Vérifier que la convention existe et que l'utilisateur est l'auteur
     const existingConvention = await prisma.convention.findUnique({
       where: {
@@ -43,46 +56,6 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Validation des données
-    if (!body.name || typeof body.name !== 'string' || body.name.trim().length === 0) {
-      throw createError({
-        statusCode: 400,
-        message: 'Le nom de la convention est requis',
-      });
-    }
-
-    if (body.name.trim().length < 3) {
-      throw createError({
-        statusCode: 400,
-        message: 'Le nom doit contenir au moins 3 caractères',
-      });
-    }
-
-    if (body.name.trim().length > 100) {
-      throw createError({
-        statusCode: 400,
-        message: 'Le nom ne peut pas dépasser 100 caractères',
-      });
-    }
-
-    if (body.description && body.description.length > 1000) {
-      throw createError({
-        statusCode: 400,
-        message: 'La description ne peut pas dépasser 1000 caractères',
-      });
-    }
-
-    // Validation de l'URL du logo si fournie
-    if (body.logo && body.logo.trim()) {
-      try {
-        new URL(body.logo.trim());
-      } catch {
-        throw createError({
-          statusCode: 400,
-          message: 'L\'URL du logo n\'est pas valide',
-        });
-      }
-    }
 
     // Mettre à jour la convention
     const updatedConvention = await prisma.convention.update({
@@ -90,9 +63,12 @@ export default defineEventHandler(async (event) => {
         id: conventionId,
       },
       data: {
-        name: body.name.trim(),
-        description: body.description?.trim() || null,
-        logo: body.logo?.trim() || null,
+        name: validatedData.name,
+        description: validatedData.description || null,
+        website: validatedData.website || null,
+        facebook: validatedData.facebook || null,
+        instagram: validatedData.instagram || null,
+        youtube: validatedData.youtube || null,
       },
       include: {
         author: {

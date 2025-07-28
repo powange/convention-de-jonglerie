@@ -1,65 +1,39 @@
+import { z } from 'zod';
 import { prisma } from '../../utils/prisma';
-
+import { conventionSchema, handleValidationError } from '../../utils/validation-schemas';
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      message: 'Non authentifié',
+      statusMessage: 'Non authentifié',
     });
   }
 
   try {
     const body = await readBody(event);
     
-    // Validation des données
-    if (!body.name || typeof body.name !== 'string' || body.name.trim().length === 0) {
-      throw createError({
-        statusCode: 400,
-        message: 'Le nom de la convention est requis',
-      });
-    }
-
-    if (body.name.trim().length < 3) {
-      throw createError({
-        statusCode: 400,
-        message: 'Le nom doit contenir au moins 3 caractères',
-      });
-    }
-
-    if (body.name.trim().length > 100) {
-      throw createError({
-        statusCode: 400,
-        message: 'Le nom ne peut pas dépasser 100 caractères',
-      });
-    }
-
-    if (body.description && body.description.length > 1000) {
-      throw createError({
-        statusCode: 400,
-        message: 'La description ne peut pas dépasser 1000 caractères',
-      });
-    }
-
-    // Validation de l'URL du logo si fournie
-    if (body.logo && body.logo.trim()) {
-      try {
-        new URL(body.logo.trim());
-      } catch {
-        throw createError({
-          statusCode: 400,
-          message: 'L\'URL du logo n\'est pas valide',
-        });
-      }
-    }
+    // Validation avec Zod
+    const validatedData = conventionSchema.parse(body);
+    
+    // Sanitisation
+    const cleanName = validatedData.name.trim();
+    const cleanDescription = validatedData.description?.trim() || null;
+    const cleanWebsite = validatedData.website?.trim() || null;
+    const cleanFacebook = validatedData.facebook?.trim() || null;
+    const cleanInstagram = validatedData.instagram?.trim() || null;
+    const cleanYoutube = validatedData.youtube?.trim() || null;
 
     // Créer la convention
     const convention = await prisma.convention.create({
       data: {
-        name: body.name.trim(),
-        description: body.description?.trim() || null,
-        logo: body.logo?.trim() || null,
+        name: cleanName,
+        description: cleanDescription,
+        website: cleanWebsite,
+        facebook: cleanFacebook,
+        instagram: cleanInstagram,
+        youtube: cleanYoutube,
         authorId: event.context.user.id,
       },
       include: {
@@ -75,15 +49,20 @@ export default defineEventHandler(async (event) => {
 
     return convention;
   } catch (error) {
+    // Gestion des erreurs de validation Zod
+    if (error instanceof z.ZodError) {
+      return handleValidationError(error);
+    }
+    
     // Si c'est déjà une erreur HTTP, la relancer
-    if (error.statusCode) {
+    if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error;
     }
     
     console.error('Erreur lors de la création de la convention:', error);
     throw createError({
       statusCode: 500,
-      message: 'Erreur serveur lors de la création de la convention',
+      statusMessage: 'Erreur serveur lors de la création de la convention',
     });
   }
 });

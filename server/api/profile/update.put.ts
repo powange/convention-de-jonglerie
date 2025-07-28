@@ -1,5 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from '../../utils/prisma';
+import { updateProfileSchema, validateAndSanitize, handleValidationError } from '../../utils/validation-schemas';
+import { z } from 'zod';
 
 
 export default defineEventHandler(async (event) => {
@@ -13,14 +15,19 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event);
-  const { email, pseudo, nom, prenom } = body;
 
-  if (!email || !pseudo || !nom || !prenom) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Tous les champs sont requis',
-    });
+  // Validation et sanitisation des données avec Zod
+  let validatedData;
+  try {
+    validatedData = validateAndSanitize(updateProfileSchema, body);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      handleValidationError(error);
+    }
+    throw error;
   }
+
+  const { email, pseudo, nom, prenom, telephone } = validatedData;
 
   try {
     // Vérifier si l'email est déjà utilisé par un autre utilisateur
@@ -59,6 +66,7 @@ export default defineEventHandler(async (event) => {
         pseudo,
         nom,
         prenom,
+        telephone,
       },
       select: {
         id: true,
@@ -66,6 +74,7 @@ export default defineEventHandler(async (event) => {
         pseudo: true,
         nom: true,
         prenom: true,
+        telephone: true,
         profilePicture: true,
         createdAt: true,
         updatedAt: true,
@@ -75,6 +84,11 @@ export default defineEventHandler(async (event) => {
     return updatedUser;
   } catch (error) {
     console.error('Erreur lors de la mise à jour du profil:', error);
+    
+    if (error.statusCode) {
+      throw error;
+    }
+    
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur lors de la mise à jour du profil',

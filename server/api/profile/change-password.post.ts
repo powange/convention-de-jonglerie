@@ -1,5 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from '../../utils/prisma';
+import { changePasswordSchema, validateAndSanitize, handleValidationError } from '../../utils/validation-schemas';
+import { z } from 'zod';
 
 
 export default defineEventHandler(async (event) => {
@@ -13,14 +15,19 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event);
-  const { currentPassword, newPassword } = body;
 
-  if (!currentPassword || !newPassword) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Mot de passe actuel et nouveau mot de passe requis',
-    });
+  // Validation et sanitisation des données avec Zod
+  let validatedData;
+  try {
+    validatedData = validateAndSanitize(changePasswordSchema, body);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      handleValidationError(error);
+    }
+    throw error;
   }
+
+  const { currentPassword, newPassword } = validatedData;
 
   try {
     // Récupérer l'utilisateur avec son mot de passe

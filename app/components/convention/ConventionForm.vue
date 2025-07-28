@@ -117,8 +117,8 @@
             color="error"
             size="xs"
             icon="i-heroicons-trash"
-            @click="deleteCurrentImage"
             :loading="deletingImage"
+            @click="deleteCurrentImage"
           >
             Supprimer
           </UButton>

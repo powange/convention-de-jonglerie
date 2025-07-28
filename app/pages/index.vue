@@ -107,7 +107,7 @@
             <UButton icon="i-heroicons-arrow-path" type="button" color="neutral" variant="ghost" block @click="resetFilters">
               Réinitialiser
             </UButton>
-            <UButton icon="i-heroicons-x-mark" type="button" color="neutral" variant="ghost" block @click="closeMobileFilters" class="ml-auto">
+            <UButton icon="i-heroicons-x-mark" type="button" color="neutral" variant="ghost" block class="ml-auto" @click="closeMobileFilters">
               Fermer
             </UButton>
           </div>
@@ -182,7 +182,7 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <div v-if="edition.convention?.logo" class="flex-shrink-0">
-                  <img :src="normalizeImageUrl(edition.convention.logo)" :alt="edition.convention.name" class="w-16 h-16 object-cover rounded-lg" />
+                  <img :src="normalizeImageUrl(edition.convention.logo)" :alt="edition.convention.name" class="w-16 h-16 object-cover rounded-lg" >
                 </div>
                 <div v-else class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
                   <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />

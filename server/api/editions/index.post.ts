@@ -1,30 +1,37 @@
 import { moveTempImageToEdition } from '../../utils/move-temp-image';
 import { prisma } from '../../utils/prisma';
+import { editionSchema, validateAndSanitize, handleValidationError } from '../../utils/validation-schemas';
+import { z } from 'zod';
 
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Unauthorized',
+      statusMessage: 'Non authentifié',
     });
   }
 
   const body = await readBody(event);
+
+  // Validation et sanitisation des données avec Zod
+  let validatedData;
+  try {
+    validatedData = validateAndSanitize(editionSchema, body);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      handleValidationError(error);
+    }
+    throw error;
+  }
+
   const { 
     conventionId, name, description, imageUrl, startDate, endDate, addressLine1, addressLine2, postalCode, city, region, country, 
     ticketingUrl, facebookUrl, instagramUrl, 
     hasFoodTrucks, hasKidsZone, acceptsPets, hasTentCamping, hasTruckCamping, hasFamilyCamping, hasGym,
     hasFireSpace, hasGala, hasOpenStage, hasConcert, hasCantine, hasAerialSpace, hasSlacklineSpace,
-    hasToilets, hasShowers, hasAccessibility, hasWorkshops
-  } = body;
-
-  if (!conventionId || !startDate || !endDate || !addressLine1 || !postalCode || !city || !country) {
-    throw createError({
-      statusCode: 400,
-      message: 'Convention, start date, end date, address line 1, postal code, city, and country are required',
-    });
-  }
+    hasToilets, hasShowers, hasAccessibility, hasWorkshops, hasCreditCardPayment, hasAfjTokenPayment
+  } = validatedData;
 
   // Vérifier que la convention existe et que l'utilisateur en est l'auteur
   const convention = await prisma.convention.findUnique({
@@ -34,14 +41,14 @@ export default defineEventHandler(async (event) => {
   if (!convention) {
     throw createError({
       statusCode: 404,
-      message: 'Convention not found',
+      statusMessage: 'Convention introuvable',
     });
   }
 
   if (convention.authorId !== event.context.user.id) {
     throw createError({
       statusCode: 403,
-      message: 'You can only create editions for your own conventions',
+      statusMessage: 'Vous ne pouvez créer des éditions que pour vos propres conventions',
     });
   }
 
@@ -82,6 +89,8 @@ export default defineEventHandler(async (event) => {
         hasShowers: hasShowers || false,
         hasAccessibility: hasAccessibility || false,
         hasWorkshops: hasWorkshops || false,
+        hasCreditCardPayment: hasCreditCardPayment || false,
+        hasAfjTokenPayment: hasAfjTokenPayment || false,
         creatorId: event.context.user.id,
       },
       include: {
@@ -116,10 +125,16 @@ export default defineEventHandler(async (event) => {
     }
     
     return edition;
-  } catch {
+  } catch (error) {
+    console.error('Erreur lors de la création de l\'édition:', error);
+    
+    if (error.statusCode) {
+      throw error;
+    }
+    
     throw createError({
       statusCode: 500,
-      statusMessage: 'Internal Server Error',
+      statusMessage: 'Erreur lors de la création de l\'édition',
     });
   }
 });
