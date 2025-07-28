@@ -67,7 +67,7 @@
       <!-- Message pour utilisateurs non connectés -->
       <div v-else class="pt-4 border-t text-center text-gray-500">
         <p class="text-sm">
-          <NuxtLink to="/login" class="text-primary-600 hover:underline">
+          <NuxtLink :to="`/login?returnTo=${encodeURIComponent($route.fullPath)}`" class="text-primary-600 hover:underline">
             Connectez-vous
           </NuxtLink>
           pour ajouter un commentaire

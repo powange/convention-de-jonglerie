@@ -178,7 +178,7 @@
         <template #header>
           <div class="flex items-center gap-3">
             <div v-if="edition.convention?.logo" class="flex-shrink-0">
-              <NuxtImg :src="edition.convention.logo" :alt="edition.convention.name" class="w-16 h-16 object-cover rounded-lg" />
+              <img :src="normalizeImageUrl(edition.convention.logo)" :alt="edition.convention.name" class="w-16 h-16 object-cover rounded-lg" />
             </div>
             <div v-else class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
               <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />
@@ -257,6 +257,7 @@ const router = useRouter();
 
 const showMobileFilters = ref(false);
 const { services, servicesByCategory, getActiveServices } = useConventionServices();
+const { normalizeImageUrl } = useImageUrl();
 
 
 // Compteur de filtres actifs

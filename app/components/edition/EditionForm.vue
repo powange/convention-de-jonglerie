@@ -17,7 +17,7 @@
               <template #option="{ option }">
                 <div class="flex items-center gap-3">
                   <div v-if="option.logo" class="flex-shrink-0">
-                    <img :src="option.logo" :alt="option.label" class="w-6 h-6 object-cover rounded" >
+                    <img :src="normalizeImageUrl(option.logo)" :alt="option.label" class="w-6 h-6 object-cover rounded" >
                   </div>
                   <div v-else class="w-6 h-6 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center flex-shrink-0">
                     <UIcon name="i-heroicons-building-library" class="text-gray-400" size="14" />
@@ -41,7 +41,7 @@
           <UFormField label="Affiche de la convention (Optionnel)" name="image">
             <div class="space-y-2">
               <div v-if="state.imageUrl" class="relative">
-                <img :src="state.imageUrl" alt="Aperçu" class="w-32 h-32 object-cover rounded-lg" >
+                <img :src="normalizeImageUrl(state.imageUrl)" alt="Aperçu" class="w-32 h-32 object-cover rounded-lg" >
                 <UButton 
                   icon="i-heroicons-x-mark" 
                   color="error" 
@@ -276,6 +276,7 @@ const fileInput = ref<HTMLInputElement>();
 const toast = useToast();
 const { servicesByCategory } = useConventionServices();
 const authStore = useAuthStore();
+const { normalizeImageUrl } = useImageUrl();
 
 // Gestion des conventions
 const conventions = ref<Convention[]>([]);

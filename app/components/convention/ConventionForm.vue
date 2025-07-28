@@ -182,6 +182,7 @@ const emit = defineEmits<{
 
 const authStore = useAuthStore();
 const toast = useToast();
+const { normalizeImageUrl } = useImageUrl();
 
 const logoError = ref(false);
 const uploadMode = ref<'file' | 'url'>('file');
@@ -204,7 +205,7 @@ const previewUrl = computed(() => {
     return form.logo;
   }
   if (form.logo && !selectedFile.value) {
-    return form.logo;
+    return normalizeImageUrl(form.logo);
   }
   return null;
 });

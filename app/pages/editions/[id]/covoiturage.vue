@@ -43,7 +43,7 @@ const editionId = parseInt(route.params.id as string);
 const edition = ref(null);
 
 const isFavorited = computed(() => (_editionId: number) => {
-  return edition.value?.favoritedBy.some(u => u.id === authStore.user?.id);
+  return edition.value?.favoritedBy?.some(u => u.id === authStore.user?.id) || false;
 });
 
 const toggleFavorite = async (id: number) => {
@@ -58,12 +58,6 @@ const toggleFavorite = async (id: number) => {
 };
 
 onMounted(async () => {
-  // Vérifier l'authentification
-  if (!authStore.isAuthenticated) {
-    await navigateTo(`/login?returnTo=${encodeURIComponent(route.fullPath)}`);
-    return;
-  }
-  
   try {
     edition.value = await editionStore.fetchEditionById(editionId);
   } catch (error) {

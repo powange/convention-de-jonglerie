@@ -23,7 +23,7 @@
           <div class="flex gap-6">
             <div v-if="edition.imageUrl" class="flex-shrink-0">
               <img 
-                :src="edition.imageUrl" 
+                :src="normalizeImageUrl(edition.imageUrl)" 
                 :alt="`Affiche de ${getEditionDisplayName(edition)}`" 
                 class="w-48 h-48 object-cover rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity" 
                 @click="showImageOverlay = true"
@@ -115,7 +115,7 @@
         >
           <div class="relative max-w-6xl max-h-[90vh]">
             <img 
-              :src="edition.imageUrl" 
+              :src="normalizeImageUrl(edition.imageUrl)" 
               :alt="`Affiche de ${getEditionDisplayName(edition)}`" 
               class="max-w-full max-h-[90vh] object-contain rounded-lg"
               @click.stop
@@ -152,6 +152,7 @@ const { servicesByCategory } = useConventionServices();
 const editionId = parseInt(route.params.id as string);
 const edition = ref(null);
 const showImageOverlay = ref(false);
+const { normalizeImageUrl } = useImageUrl();
 
 onMounted(async () => {
   try {

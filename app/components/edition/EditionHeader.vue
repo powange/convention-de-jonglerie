@@ -5,7 +5,7 @@
       <div class="flex items-start justify-between">
         <div class="flex items-start gap-4">
           <div v-if="edition.convention?.logo" class="flex-shrink-0">
-            <img :src="edition.convention.logo" :alt="edition.convention.name" class="w-16 h-16 object-cover rounded-lg shadow-md" >
+            <img :src="normalizeImageUrl(edition.convention.logo)" :alt="edition.convention.name" class="w-16 h-16 object-cover rounded-lg shadow-md" >
           </div>
           <div v-else class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center shadow-md">
             <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />
@@ -51,7 +51,6 @@
         </NuxtLink>
         
         <NuxtLink 
-          v-if="authStore.isAuthenticated"
           :to="`/editions/${edition.id}/covoiturage`"
           :class="[
             'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm',
@@ -87,6 +86,8 @@ import { computed } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import { useEditionStore } from '~/stores/editions';
 import { getEditionDisplayName } from '~/utils/editionName';
+
+const { normalizeImageUrl } = useImageUrl();
 
 interface Props {
   edition: any;

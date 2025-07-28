@@ -41,6 +41,23 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
+  // Public GET /api/uploads/* (static file serving)
+  if (path.startsWith('/api/uploads/') && requestMethod === 'GET') {
+    return;
+  }
+
+  // Public GET routes pour covoiturage (consultation des offres et demandes)
+  const isPublicCarpoolOffers = path.match(/^\/api\/editions\/\d+\/carpool-offers$/) && requestMethod === 'GET';
+  const isPublicCarpoolRequests = path.match(/^\/api\/editions\/\d+\/carpool-requests$/) && requestMethod === 'GET';
+  
+  // Public GET routes pour les commentaires de covoiturage
+  const isPublicCarpoolOfferComments = path.match(/^\/api\/carpool-offers\/\d+\/comments$/) && requestMethod === 'GET';
+  const isPublicCarpoolRequestComments = path.match(/^\/api\/carpool-requests\/\d+\/comments$/) && requestMethod === 'GET';
+  
+  if (isPublicCarpoolOffers || isPublicCarpoolRequests || isPublicCarpoolOfferComments || isPublicCarpoolRequestComments) {
+    return;
+  }
+
   // --- Protect all other API routes --- //
   // Only apply token check if the path starts with /api/
   if (path.startsWith('/api/')) {

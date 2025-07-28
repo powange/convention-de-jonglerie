@@ -2,6 +2,7 @@ import { useGravatar } from './gravatar';
 
 export const useAvatar = () => {
   const { getUserAvatar: getGravatarAvatar } = useGravatar();
+  const { normalizeImageUrl } = useImageUrl();
 
   const getUserAvatar = (user: { email?: string; emailHash?: string; profilePicture?: string | null; updatedAt?: string }, size: number = 80) => {
     // Vérification de sécurité
@@ -14,16 +15,13 @@ export const useAvatar = () => {
       // Utiliser updatedAt comme version pour éviter le cache, sinon timestamp actuel
       const version = user.updatedAt ? new Date(user.updatedAt).getTime() : Date.now();
       
-      // Construire l'URL complète si c'est un chemin relatif
-      let profileUrl = user.profilePicture;
-      if (profileUrl.startsWith('/')) {
-        // Si on est côté client, utiliser l'origine actuelle
-        if (import.meta.client) {
-          profileUrl = `${window.location.origin}${profileUrl}`;
-        }
+      // Normaliser l'URL via l'API
+      const normalizedUrl = normalizeImageUrl(user.profilePicture);
+      if (!normalizedUrl) {
+        return 'https://www.gravatar.com/avatar/default?s=80&d=mp';
       }
       
-      return `${profileUrl}?v=${version}`;
+      return `${normalizedUrl}?v=${version}`;
     }
     
     // Sinon, utiliser Gravatar

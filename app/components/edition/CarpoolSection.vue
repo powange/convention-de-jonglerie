@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-6">
-    <!-- Boutons d'actions -->
-    <div class="flex gap-4 justify-center">
+    <!-- Boutons d'actions (uniquement pour les utilisateurs connectés) -->
+    <div v-if="authStore.isAuthenticated" class="flex gap-4 justify-center">
       
     <!-- Modal pour proposer un covoiturage -->
     <UModal v-model:open="showOfferModal" title="Proposer un covoiturage">

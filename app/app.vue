@@ -88,7 +88,7 @@
                   size="sm" 
                   color="neutral" 
                   variant="ghost"
-                  to="/login"
+                  :to="`/login?returnTo=${encodeURIComponent($route.fullPath)}`"
                   class="w-full sm:w-auto"
                 >
                   Connexion
@@ -150,7 +150,8 @@ onUnmounted(() => {
 const handleLogout = () => {
   authStore.logout();
   toast.add({ title: 'Déconnexion réussie !', icon: 'i-heroicons-check-circle', color: 'success' });
-  router.push('/');
+  // Rester sur la page actuelle après déconnexion
+  // router.push('/');
 };
 
 // Calculer le nom d'affichage

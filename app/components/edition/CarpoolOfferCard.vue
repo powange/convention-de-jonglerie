@@ -41,7 +41,7 @@
           <span>{{ offer.departureAddress }}</span>
         </div>
 
-        <div v-if="offer.phoneNumber" class="flex items-center gap-2">
+        <div v-if="authStore.isAuthenticated && offer.phoneNumber" class="flex items-center gap-2">
           <UIcon name="i-heroicons-phone" class="text-gray-400" />
           <span class="font-medium">Contact :</span>
           <span>{{ offer.phoneNumber }}</span>

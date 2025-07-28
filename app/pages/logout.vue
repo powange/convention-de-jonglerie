@@ -14,6 +14,9 @@ const router = useRouter();
 onMounted(() => {
   authStore.logout();
   toast.add({ title: 'Déconnexion réussie !', icon: 'i-heroicons-check-circle', color: 'success' });
-  router.push('/login');
+  
+  // Rediriger vers la page spécifiée dans returnTo ou vers l'accueil
+  const returnTo = useRoute().query.returnTo as string;
+  router.push(returnTo || '/');
 });
 </script>

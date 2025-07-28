@@ -35,7 +35,7 @@
 
       <!-- Détails de la demande -->
       <div class="space-y-2">
-        <div v-if="request.phoneNumber" class="flex items-center gap-2">
+        <div v-if="authStore.isAuthenticated && request.phoneNumber" class="flex items-center gap-2">
           <UIcon name="i-heroicons-phone" class="text-gray-400" />
           <span class="font-medium">Contact :</span>
           <span>{{ request.phoneNumber }}</span>
@@ -46,7 +46,7 @@
       <p v-if="request.description" class="text-sm text-gray-600">{{ request.description }}</p>
 
       <!-- Bouton de contact -->
-      <div v-if="authStore.isLoggedIn && request.phoneNumber" class="pt-2">
+      <div v-if="authStore.isAuthenticated && request.phoneNumber" class="pt-2">
         <UButton
           size="sm"
           variant="soft"
