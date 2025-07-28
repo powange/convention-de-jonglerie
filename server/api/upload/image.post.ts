@@ -1,88 +1,57 @@
-import { createWriteStream } from 'fs';
-import { mkdir } from 'fs/promises';
-import { join } from 'path';
-import { copyToOutputPublic } from '../../utils/copy-to-output';
+import { handleImageUpload } from '../../utils/image-upload';
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Unauthorized',
+      statusMessage: 'Non authentifié',
     });
   }
 
   try {
+    // Lire les données du formulaire pour déterminer le contexte
     const form = await readMultipartFormData(event);
-    const file = form?.find(item => item.name === 'image');
     const conventionIdField = form?.find(item => item.name === 'conventionId');
-    
-    // Si un conventionId est fourni, c'est pour une convention existante
     const conventionId = conventionIdField ? conventionIdField.data.toString() : null;
 
-    if (!file || !file.data) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'No image file provided',
-      });
-    }
+    // Configurer l'upload selon le contexte
+    const uploadOptions = conventionId 
+      ? {
+          // Pour une convention existante
+          allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+          maxSize: 5 * 1024 * 1024, // 5MB
+          prefix: 'convention',
+          destinationFolder: 'conventions',
+          entityId: conventionId,
+          fieldName: 'image',
+          copyToOutput: true,
+        }
+      : {
+          // Pour une nouvelle convention (temporaire)
+          allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+          maxSize: 5 * 1024 * 1024, // 5MB
+          prefix: 'temp',
+          destinationFolder: 'temp',
+          fieldName: 'image',
+          copyToOutput: true,
+        };
 
-    // Vérifier le type de fichier
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type || '')) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Invalid file type. Only JPEG, PNG and WebP are allowed',
-      });
-    }
-
-    // Déterminer le dossier de destination
-    let uploadsDir;
-    let fileName;
-    let imageUrl;
-    
-    if (conventionId) {
-      // Pour une convention existante, utiliser le dossier dédié
-      uploadsDir = join(process.cwd(), 'public', 'uploads', 'conventions', conventionId);
-      const fileExtension = file.filename?.split('.').pop() || 'jpg';
-      fileName = `convention-${conventionId}-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
-      imageUrl = `/uploads/conventions/${conventionId}/${fileName}`;
-    } else {
-      // Pour une nouvelle convention, utiliser le dossier temporaire
-      uploadsDir = join(process.cwd(), 'public', 'uploads', 'temp');
-      const fileExtension = file.filename?.split('.').pop() || 'jpg';
-      fileName = `temp-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
-      imageUrl = `/uploads/temp/${fileName}`;
-    }
-    
-    await mkdir(uploadsDir, { recursive: true });
-    const filePath = join(uploadsDir, fileName);
-
-    // Sauvegarder le fichier
-    const writeStream = createWriteStream(filePath);
-    writeStream.write(file.data);
-    writeStream.end();
-    
-    // Attendre que l'écriture soit terminée
-    await new Promise((resolve, reject) => {
-      writeStream.on('finish', resolve);
-      writeStream.on('error', reject);
-    });
-    
-    // Copier vers .output/public en production
-    if (conventionId) {
-      await copyToOutputPublic(`uploads/conventions/${conventionId}/${fileName}`);
-    } else {
-      await copyToOutputPublic(`uploads/temp/${fileName}`);
-    }
+    // Effectuer l'upload
+    const uploadResult = await handleImageUpload(event, uploadOptions);
     
     return {
       success: true,
-      imageUrl,
+      imageUrl: uploadResult.imageUrl,
     };
-  } catch (error) {
+  } catch (error: any) {
+    if (error.statusCode) {
+      throw error;
+    }
+    
+    console.error('Erreur lors de l\'upload d\'image:', error);
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to upload image',
+      statusMessage: 'Erreur lors de l\'upload de l\'image',
     });
   }
 });
