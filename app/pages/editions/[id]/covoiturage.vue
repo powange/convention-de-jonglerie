@@ -9,7 +9,7 @@
     <div v-else>
       <!-- En-tête avec navigation -->
       <EditionHeader 
-        :convention="edition" 
+        :edition="edition" 
         current-page="covoiturage" 
         :is-favorited="isFavorited(edition.id)"
         @toggle-favorite="toggleFavorite(edition.id)"
@@ -39,7 +39,7 @@ const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
 
-const conventionId = parseInt(route.params.id as string);
+const editionId = parseInt(route.params.id as string);
 const edition = ref(null);
 
 const isFavorited = computed(() => (_editionId: number) => {
@@ -50,7 +50,7 @@ const toggleFavorite = async (id: number) => {
   try {
     await editionStore.toggleFavorite(id);
     // Recharger l'édition pour mettre à jour l'état des favoris
-    edition.value = await editionStore.fetchEditionById(conventionId);
+    edition.value = await editionStore.fetchEditionById(editionId);
     toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'green' });
   } catch (e: unknown) {
     toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'red' });
@@ -65,7 +65,7 @@ onMounted(async () => {
   }
   
   try {
-    edition.value = await editionStore.fetchEditionById(conventionId);
+    edition.value = await editionStore.fetchEditionById(editionId);
   } catch (error) {
     console.error('Failed to fetch edition:', error);
   }

@@ -198,7 +198,7 @@ const myEditions = computed(() => {
   );
 });
 
-// Déterminer le statut d'une convention
+// Déterminer le statut d'une edition
 const getStatusColor = (edition: any) => {
   const now = new Date();
   const startDate = new Date(edition.startDate);

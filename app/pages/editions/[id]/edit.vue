@@ -34,13 +34,13 @@ const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 
-const conventionId = parseInt(route.params.id as string);
+const editionId = parseInt(route.params.id as string);
 const edition = ref(null);
 
 onMounted(async () => {
   try {
     // Récupérer l'édition spécifique
-    const foundEdition = await editionStore.fetchEditionById(conventionId);
+    const foundEdition = await editionStore.fetchEditionById(editionId);
     
     // Vérifier que l'utilisateur peut modifier cette édition
     if (!editionStore.canEditEdition(foundEdition, authStore.user?.id || 0)) {
@@ -68,9 +68,9 @@ onMounted(async () => {
 
 const handleUpdateConvention = async (formData: Edition) => {
   try {
-    await editionStore.updateEdition(conventionId, formData);
+    await editionStore.updateEdition(editionId, formData);
     toast.add({ title: 'Édition mise à jour avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
-    router.push(`/editions/${conventionId}`);
+    router.push(`/editions/${editionId}`);
   } catch (e: unknown) {
     toast.add({ title: e.statusMessage || 'Échec de la mise à jour de l\'édition', icon: 'i-heroicons-x-circle', color: 'error' });
   }

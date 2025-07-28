@@ -4,7 +4,7 @@
       <template #header>
         <h1 class="text-2xl font-bold">Ajouter une nouvelle édition</h1>
       </template>
-      <EditionForm submit-button-text="Ajouter l'édition" :loading="editionStore.loading" @submit="handleAddConvention" />
+      <EditionForm submit-button-text="Ajouter l'édition" :loading="editionStore.loading" @submit="handleAddEdition" />
     </UCard>
   </div>
 </template>
@@ -24,7 +24,7 @@ const editionStore = useEditionStore();
 const toast = useToast();
 const router = useRouter();
 
-const handleAddConvention = async (formData: Edition) => {
+const handleAddEdition = async (formData: Edition) => {
   try {
     await editionStore.addEdition(formData);
     toast.add({ title: 'Édition ajoutée avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });

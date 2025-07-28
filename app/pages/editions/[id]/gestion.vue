@@ -3,7 +3,7 @@
     <div v-if="editionStore.loading">
       <p>Chargement des détails de l'édition...</p>
     </div>
-    <div v-else-if="!convention">
+    <div v-else-if="!edition">
       <p>Édition introuvable.</p>
     </div>
     <div v-else-if="!canAccess">
@@ -18,10 +18,10 @@
     <div v-else>
       <!-- En-tête avec navigation -->
       <EditionHeader 
-        :convention="convention" 
+        :edition="edition" 
         current-page="gestion" 
-        :is-favorited="isFavorited(convention.id)"
-        @toggle-favorite="toggleFavorite(convention.id)"
+        :is-favorited="isFavorited(edition.id)"
+        @toggle-favorite="toggleFavorite(edition.id)"
       />
       
       <!-- Contenu de gestion -->
@@ -30,7 +30,7 @@
         <UCard>
           <div class="space-y-6">
             <!-- Section collaborateurs -->
-          <div v-if="authStore.user?.id === convention.creatorId">
+          <div v-if="authStore.user?.id === edition.creatorId">
             <h3 class="text-lg font-semibold mb-4">Gestion des collaborateurs</h3>
             <p class="text-gray-500">La gestion des collaborateurs sera disponible prochainement.</p>
             <!-- TODO: Réactiver ConventionCollaborators une fois l'API corrigée -->
@@ -43,12 +43,12 @@
           <!-- Informations sur le créateur et les collaborateurs -->
           <div class="space-y-2 pt-4 border-t">
             <p class="text-sm text-gray-600">
-              <span class="font-medium">Créé par :</span> {{ convention.creator.pseudo }}
+              <span class="font-medium">Créé par :</span> {{ edition.creator.pseudo }}
             </p>
-            <div v-if="convention.collaborators && convention.collaborators.length > 0">
+            <div v-if="edition.collaborators && edition.collaborators.length > 0">
               <p class="text-sm font-medium text-gray-600 mb-2">Collaborateurs :</p>
               <div class="flex flex-wrap gap-2">
-                <div v-for="collaborator in convention.collaborators" :key="collaborator.id" class="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1">
+                <div v-for="collaborator in edition.collaborators" :key="collaborator.id" class="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1">
                   <img 
                     :src="getUserAvatar(collaborator.user, 20)" 
                     :alt="`Avatar de ${collaborator.user.pseudo}`"
@@ -74,7 +74,7 @@
               v-if="canEdit"
               icon="i-heroicons-pencil"
               color="warning"
-              :to="`/editions/${convention.id}/edit`"
+              :to="`/editions/${edition.id}/edit`"
             >
               Modifier l'édition
             </UButton>
@@ -83,7 +83,7 @@
               icon="i-heroicons-trash"
               color="error"
               variant="soft"
-              @click="deleteEdition(convention.id)"
+              @click="deleteEdition(edition.id)"
             >
               Supprimer l'édition
             </UButton>
@@ -116,12 +116,12 @@ const authStore = useAuthStore();
 const toast = useToast();
 const { getUserAvatar } = useAvatar();
 
-const conventionId = parseInt(route.params.id as string);
-const convention = ref(null);
+const editionId = parseInt(route.params.id as string);
+const edition = ref(null);
 
 onMounted(async () => {
   try {
-    convention.value = await editionStore.fetchEditionById(conventionId);
+    edition.value = await editionStore.fetchEditionById(editionId);
   } catch (error) {
     console.error('Failed to fetch edition:', error);
   }
@@ -129,44 +129,44 @@ onMounted(async () => {
 
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
-  if (!convention.value || !authStore.user?.id) return false;
-  return canEdit.value || authStore.user?.id === convention.value?.creatorId;
+  if (!edition.value || !authStore.user?.id) return false;
+  return canEdit.value || authStore.user?.id === edition.value?.creatorId;
 });
 
 // Permissions calculées
 const canEdit = computed(() => {
-  if (!convention.value || !authStore.user?.id) return false;
-  return editionStore.canEditEdition(convention.value, authStore.user.id);
+  if (!edition.value || !authStore.user?.id) return false;
+  return editionStore.canEditEdition(edition.value, authStore.user.id);
 });
 
 const canDelete = computed(() => {
-  if (!convention.value || !authStore.user?.id) return false;
-  return editionStore.canDeleteEdition(convention.value, authStore.user.id);
+  if (!edition.value || !authStore.user?.id) return false;
+  return editionStore.canDeleteEdition(edition.value, authStore.user.id);
 });
 
-const isFavorited = computed(() => (_conventionId: number) => {
-  return convention.value?.favoritedBy.some(u => u.id === authStore.user?.id);
+const isFavorited = computed(() => (_editionId: number) => {
+  return edition.value?.favoritedBy.some(u => u.id === authStore.user?.id);
 });
 
 const toggleFavorite = async (id: number) => {
   try {
     await editionStore.toggleFavorite(id);
-    // Recharger la convention pour mettre à jour l'état des favoris
-    convention.value = await editionStore.fetchEditionById(conventionId);
+    // Recharger l'édition pour mettre à jour l'état des favoris
+    edition.value = await editionStore.fetchEditionById(editionId);
     toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'success' });
   } catch (e: unknown) {
     toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'error' });
   }
 };
 
-const deleteConvention = async (id: number) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette convention ?')) {
+const deleteEdition = async (id: number) => {
+  if (confirm('Êtes-vous sûr de vouloir supprimer cette édition ?')) {
     try {
       await editionStore.deleteEdition(id);
-      toast.add({ title: 'Convention supprimée avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
+      toast.add({ title: 'Édition supprimée avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
       router.push('/');
     } catch (e: unknown) {
-      toast.add({ title: e.statusMessage || 'Échec de la suppression de la convention', icon: 'i-heroicons-x-circle', color: 'error' });
+      toast.add({ title: e.statusMessage || 'Échec de la suppression de l\'édition', icon: 'i-heroicons-x-circle', color: 'error' });
     }
   }
 };
