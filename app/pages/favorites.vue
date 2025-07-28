@@ -35,19 +35,29 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <UCard v-for="edition in favoriteEditions" :key="edition.id" variant="subtle">
           <template #header>
-            <div class="flex items-center gap-3">
-              <div v-if="edition.convention?.logo" class="flex-shrink-0">
-                <img :src="normalizeImageUrl(edition.convention.logo)" :alt="edition.convention.name" class="w-16 h-16 object-cover rounded-lg" >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div v-if="edition.convention?.logo" class="flex-shrink-0">
+                  <img :src="normalizeImageUrl(edition.convention.logo)" :alt="edition.convention.name" class="w-16 h-16 object-cover rounded-lg" >
+                </div>
+                <div v-else class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />
+                </div>
+                <div class="flex-1">
+                  <h2 class="text-xl font-semibold">{{ getEditionDisplayName(edition) }}</h2>
+                  <UBadge :color="getStatusColor(edition)" variant="subtle" class="mt-1">
+                    {{ getStatusText(edition) }}
+                  </UBadge>
+                </div>
               </div>
-              <div v-else class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />
-              </div>
-              <div class="flex-1">
-                <h2 class="text-xl font-semibold">{{ getEditionDisplayName(edition) }}</h2>
-                <UBadge :color="getStatusColor(edition)" variant="subtle" class="mt-1">
-                  {{ getStatusText(edition) }}
-                </UBadge>
-              </div>
+              <UButton
+                icon="i-heroicons-star-solid"
+                color="warning"
+                variant="ghost"
+                size="sm"
+                title="Retirer des favoris"
+                @click="removeFavorite(edition.id)"
+              />
             </div>
           </template>
           
@@ -84,33 +94,15 @@
           </div>
 
           <template #footer>
-            <div class="flex justify-between items-center">
+            <div class="flex justify-end">
               <UButton
-                icon="i-heroicons-star-solid"
-                color="warning"
-                variant="ghost"
-                title="Retirer des favoris"
-                @click="removeFavorite(edition.id)"
+                icon="i-heroicons-eye"
+                size="sm"
+                color="info"
+                variant="solid"
+                label="Voir"
+                :to="`/editions/${edition.id}`"
               />
-              <div class="flex space-x-2">
-                <UButton
-                  icon="i-heroicons-eye"
-                  size="sm"
-                  color="info"
-                  variant="solid"
-                  label="Voir"
-                  :to="`/editions/${edition.id}`"
-                />
-                <UButton
-                  v-if="editionStore.canEditEdition(edition, authStore.user?.id || 0)"
-                  icon="i-heroicons-pencil"
-                  size="sm"
-                  color="warning"
-                  variant="solid"
-                  label="Modifier"
-                  :to="`/editions/${edition.id}/edit`"
-                />
-              </div>
             </div>
           </template>
         </UCard>

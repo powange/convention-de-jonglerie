@@ -164,80 +164,69 @@
         </template>
       </UModal>
 
-    <div v-if="editionStore.loading">
-      <p>Chargement des conventions...</p>
-    </div>
-    <div v-else-if="editionStore.error">
-      <p class="text-red-500">Erreur: {{ editionStore.error }}</p>
-    </div>
-    <div v-else-if="editionStore.editions.length === 0">
-      <p>Aucune convention trouvée. Soyez le premier à en ajouter une !</p>
-    </div>
-    <div v-else class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-      <UCard v-for="edition in editionStore.editions" :key="edition.id" variant="subtle">
-        <template #header>
-          <div class="flex items-center gap-3">
-            <div v-if="edition.convention?.logo" class="flex-shrink-0">
-              <img :src="normalizeImageUrl(edition.convention.logo)" :alt="edition.convention.name" class="w-16 h-16 object-cover rounded-lg" />
+      <div v-if="editionStore.loading">
+        <p>Chargement des conventions...</p>
+      </div>
+
+      <div v-else-if="editionStore.error">
+        <p class="text-red-500">Erreur: {{ editionStore.error }}</p>
+      </div>
+
+      <div v-else-if="editionStore.editions.length === 0">
+        <p>Aucune convention trouvée. Soyez le premier à en ajouter une !</p>
+      </div>
+
+      <div v-else class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+        <UCard v-for="edition in editionStore.editions" :key="edition.id" variant="subtle">
+          <template #header>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div v-if="edition.convention?.logo" class="flex-shrink-0">
+                  <img :src="normalizeImageUrl(edition.convention.logo)" :alt="edition.convention.name" class="w-16 h-16 object-cover rounded-lg" />
+                </div>
+                <div v-else class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />
+                </div>
+                <h2 class="text-xl font-semibold">{{ getEditionDisplayName(edition) }}</h2>
+              </div>
+              <UButton
+                v-if="authStore.isAuthenticated"
+                :icon="isFavorited(edition.id) ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+                :color="isFavorited(edition.id) ? 'warning' : 'neutral'"
+                variant="ghost"
+                size="sm"
+                @click="toggleFavorite(edition.id)"
+              />
             </div>
-            <div v-else class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-              <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />
-            </div>
-            <h2 class="text-xl font-semibold">{{ getEditionDisplayName(edition) }}</h2>
-          </div>
-        </template>
-        <p class="text-sm text-gray-500">Du: {{ new Date(edition.startDate).toLocaleDateString() }} au {{ new Date(edition.endDate).toLocaleDateString() }}</p>
-        <p class="text-sm text-gray-500 flex items-center gap-1">
-          <UIcon name="i-heroicons-map-pin" class="text-gray-400" size="16" />
-          {{ edition.city }}, {{ edition.country }}
-        </p>
-        <p class="text-sm text-gray-500">Créé par: {{ edition.creator?.pseudo || 'Utilisateur inconnu' }}</p>
-        
-        <!-- Services avec pictos -->
-        <div class="flex flex-wrap gap-1 mt-2">
-          <UIcon 
-            v-for="activeService in getActiveServices(edition)" 
-            :key="activeService.key"
-            :name="activeService.icon" 
-            :class="activeService.color" 
-            size="20" 
-            :title="activeService.label" 
-          />
-        </div>
-        <template #footer>
-          <div class="flex justify-end space-x-2">
-            <UButton
-              v-if="authStore.isAuthenticated"
-              :icon="isFavorited(edition.id) ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-              :color="isFavorited(edition.id) ? 'warning' : 'neutral'"
-              variant="ghost"
-              @click="toggleFavorite(edition.id)"
-            />
-            <NuxtLink :to="`/editions/${edition.id}`">
-              <UButton icon="i-heroicons-eye" size="sm" color="info" variant="solid" label="Voir" />
-            </NuxtLink>
-            <UButton
-              v-if="authStore.user?.id === edition.creatorId"
-              icon="i-heroicons-pencil"
-              size="sm"
-              color="warning"
-              variant="solid"
-              label="Modifier"
-              @click="editConvention(edition.id)"
-            />
-            <UButton
-              v-if="authStore.user?.id === edition.creatorId"
-              icon="i-heroicons-trash"
-              size="sm"
-              color="error"
-              variant="solid"
-              label="Supprimer"
-              @click="deleteEdition(edition.id)"
+          </template>
+          
+          <p class="text-sm text-gray-500">Du: {{ new Date(edition.startDate).toLocaleDateString() }} au {{ new Date(edition.endDate).toLocaleDateString() }}</p>
+          <p class="text-sm text-gray-500 flex items-center gap-1">
+            <UIcon name="i-heroicons-map-pin" class="text-gray-400" size="16" />
+            {{ edition.city }}, {{ edition.country }}
+          </p>
+          <p class="text-sm text-gray-500">Créé par: {{ edition.creator?.pseudo || 'Utilisateur inconnu' }}</p>
+          
+          <!-- Services avec pictos -->
+          <div class="flex flex-wrap gap-1 mt-2">
+            <UIcon 
+              v-for="activeService in getActiveServices(edition)" 
+              :key="activeService.key"
+              :name="activeService.icon" 
+              :class="activeService.color" 
+              size="20" 
+              :title="activeService.label" 
             />
           </div>
-        </template>
-      </UCard>
-    </div>
+          <template #footer>
+            <div class="flex justify-end">
+              <NuxtLink :to="`/editions/${edition.id}`">
+                <UButton icon="i-heroicons-eye" size="sm" color="info" variant="solid" label="Voir" />
+              </NuxtLink>
+            </div>
+          </template>
+        </UCard>
+      </div>
     </div>
   </div>
 </template>
@@ -312,21 +301,6 @@ const toggleFavorite = async (id: number) => {
     toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'success' });
   } catch (e: unknown) {
     toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'error' });
-  }
-};
-
-const editConvention = (id: number) => {
-  router.push(`/editions/${id}/edit`);
-};
-
-const deleteConvention = async (id: number) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette convention ?')) {
-    try {
-      await editionStore.deleteEdition(id);
-      toast.add({ title: 'Convention supprimée avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
-    } catch (e: unknown) {
-      toast.add({ title: e.statusMessage || 'Échec de la suppression de la convention', icon: 'i-heroicons-x-circle', color: 'error' });
-    }
   }
 };
 

@@ -122,7 +122,7 @@
             >
             <UButton
               icon="i-heroicons-x-mark"
-              color="white"
+              color="neutral"
               variant="ghost"
               size="lg"
               class="absolute top-4 right-4"
