@@ -91,7 +91,9 @@ export const editionSchema = z.object({
   hasAccessibility: z.boolean().optional(),
   hasWorkshops: z.boolean().optional(),
   hasCreditCardPayment: z.boolean().optional(),
-  hasAfjTokenPayment: z.boolean().optional()
+  hasAfjTokenPayment: z.boolean().optional(),
+  hasLongShow: z.boolean().optional(),
+  hasATM: z.boolean().optional()
 }).refine((data) => {
   const startDate = new Date(data.startDate);
   const endDate = new Date(data.endDate);
@@ -137,7 +139,9 @@ export const updateEditionSchema = z.object({
   hasAccessibility: z.boolean().optional(),
   hasWorkshops: z.boolean().optional(),
   hasCreditCardPayment: z.boolean().optional(),
-  hasAfjTokenPayment: z.boolean().optional()
+  hasAfjTokenPayment: z.boolean().optional(),
+  hasLongShow: z.boolean().optional(),
+  hasATM: z.boolean().optional()
 }).refine((data) => {
   if (data.startDate && data.endDate) {
     const startDate = new Date(data.startDate);
@@ -153,11 +157,9 @@ export const updateEditionSchema = z.object({
 // Schémas de covoiturage
 export const carpoolOfferSchema = z.object({
   departureCity: z.string().min(1, 'Ville de départ requise').max(100),
-  departureAddress: z.string().optional(),
+  departureAddress: z.string().min(1, 'Adresse de départ requise').max(200),
   departureDate: dateSchema,
-  returnDate: dateSchema.optional(),
   availableSeats: z.number().int().min(1, 'Au moins 1 place disponible').max(8, 'Maximum 8 places'),
-  pricePerPerson: z.number().min(0, 'Le prix ne peut pas être négatif').optional(),
   description: z.string().optional(),
   phoneNumber: phoneSchema
 });
@@ -165,9 +167,7 @@ export const carpoolOfferSchema = z.object({
 export const carpoolRequestSchema = z.object({
   departureCity: z.string().min(1, 'Ville de départ requise').max(100),
   departureDate: dateSchema,
-  returnDate: dateSchema.optional(),
-  numberOfPeople: z.number().int().min(1, 'Au moins 1 personne').max(8, 'Maximum 8 personnes'),
-  maxPricePerPerson: z.number().min(0, 'Le prix ne peut pas être négatif').optional(),
+  seatsNeeded: z.number().int().min(1, 'Au moins 1 personne').max(8, 'Maximum 8 personnes').default(1),
   description: z.string().optional(),
   phoneNumber: phoneSchema
 });

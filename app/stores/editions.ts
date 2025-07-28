@@ -29,6 +29,8 @@ interface EditionFilters {
   hasWorkshops?: boolean;
   hasCreditCardPayment?: boolean;
   hasAfjTokenPayment?: boolean;
+  hasLongShow?: boolean;
+  hasATM?: boolean;
 }
 
 

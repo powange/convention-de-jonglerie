@@ -29,7 +29,9 @@ export default defineEventHandler(async (event) => {
       hasToilets,
       hasShowers,
       hasAccessibility,
-      hasWorkshops
+      hasWorkshops,
+      hasLongShow,
+      hasATM
     } = query;
 
     const where: {
@@ -55,6 +57,8 @@ export default defineEventHandler(async (event) => {
       hasShowers?: boolean;
       hasAccessibility?: boolean;
       hasWorkshops?: boolean;
+      hasLongShow?: boolean;
+      hasATM?: boolean;
     } = {};
 
     if (name) {
@@ -170,6 +174,12 @@ export default defineEventHandler(async (event) => {
     }
     if (hasWorkshops === 'true') {
       where.hasWorkshops = true;
+    }
+    if (hasLongShow === 'true') {
+      where.hasLongShow = true;
+    }
+    if (hasATM === 'true') {
+      where.hasATM = true;
     }
 
     // Essayer d'inclure les collaborateurs, fallback sans si la table n'existe pas

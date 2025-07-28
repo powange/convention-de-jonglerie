@@ -73,6 +73,8 @@ model Edition {
   hasWorkshops         Boolean                  @default(false)
   hasAfjTokenPayment   Boolean                  @default(false)
   hasCreditCardPayment Boolean                  @default(false)
+  hasLongShow          Boolean                  @default(false)
+  hasATM               Boolean                  @default(false)
   carpoolOffers        CarpoolOffer[]
   carpoolRequests      CarpoolRequest[]
   creator              User                     @relation("CreatedEditions", fields: [creatorId], references: [id])
