@@ -15,7 +15,6 @@ export default defineEventHandler(async (event) => {
     const cleanPseudo = validatedData.pseudo.trim();
     const cleanNom = validatedData.nom.trim();
     const cleanPrenom = validatedData.prenom.trim();
-    const cleanTelephone = validatedData.telephone?.trim() || null;
 
     const hashedPassword = await bcrypt.hash(validatedData.password, 10);
 
@@ -26,7 +25,6 @@ export default defineEventHandler(async (event) => {
         pseudo: cleanPseudo,
         nom: cleanNom,
         prenom: cleanPrenom,
-        telephone: cleanTelephone,
       },
     });
     
@@ -37,8 +35,7 @@ export default defineEventHandler(async (event) => {
         email: user.email, 
         pseudo: user.pseudo, 
         nom: user.nom, 
-        prenom: user.prenom,
-        telephone: user.telephone
+        prenom: user.prenom
       } 
     };
   } catch (error) {

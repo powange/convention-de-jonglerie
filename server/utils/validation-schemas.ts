@@ -26,8 +26,7 @@ export const registerSchema = z.object({
   password: passwordSchema,
   pseudo: pseudoSchema,
   prenom: nameSchema,
-  nom: nameSchema,
-  telephone: phoneSchema
+  nom: nameSchema
 });
 
 export const changePasswordSchema = z.object({
@@ -44,7 +43,6 @@ export const updateProfileSchema = z.object({
   pseudo: pseudoSchema,
   prenom: nameSchema,
   nom: nameSchema,
-  telephone: phoneSchema,
   email: emailSchema
 });
 

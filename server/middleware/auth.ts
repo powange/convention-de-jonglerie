@@ -3,7 +3,8 @@ import { prisma } from '../utils/prisma';
 
 
 export default defineEventHandler(async (event) => {
-  const path = event.path;
+  const fullPath = event.path;
+  const path = fullPath.split('?')[0]; // Extraire seulement la partie avant les paramètres de requête
   const requestMethod = event.node.req.method;
 
   // --- Public API Routes --- //
