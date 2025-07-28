@@ -20,11 +20,6 @@ export default defineNuxtConfig({
     '~/assets/css/main.css',
     'flag-icons/css/flag-icons.min.css'
   ],
-  vite: {
-    plugins: [
-      tsconfigPaths(),
-    ],
-  },
   runtimeConfig: {
     jwtSecret: process.env.JWT_SECRET || 'fallback-secret-for-development', // Private keys that are only available on the server
     public: {
