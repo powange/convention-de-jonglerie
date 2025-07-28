@@ -19,13 +19,10 @@ COPY . .
 # Générer le client Prisma
 RUN npx prisma generate
 
-# Construire l'application
-RUN npm run build
-
 # Créer le dossier uploads
 RUN mkdir -p /app/public/uploads
 
 EXPOSE 3000
 
 # Script de démarrage
-CMD ["sh", "-c", "npx prisma migrate deploy && node .output/server/index.mjs"]
+CMD ["sh", "-c", "npm run build && npx prisma migrate deploy && node .output/server/index.mjs"]
