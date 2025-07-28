@@ -121,7 +121,7 @@ const handleAddEdition = async (data: EditionFormData) => {
   submitting.value = true;
   
   try {
-    await editionStore.createEdition(data);
+    await editionStore.addEdition(data);
     
     toast.add({
       title: 'Édition créée !',
