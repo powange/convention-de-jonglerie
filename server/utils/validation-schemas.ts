@@ -107,7 +107,44 @@ export const editionSchema = z.object({
   path: ['endDate']
 });
 
-export const updateEditionSchema = editionSchema.partial().refine((data) => {
+export const updateEditionSchema = z.object({
+  conventionId: z.number().int().positive('ID de convention requis').optional(),
+  name: z.string().min(1, 'Nom de l\'édition requis').max(200, 'Le nom ne peut pas dépasser 200 caractères').optional(),
+  description: z.string().optional(),
+  imageUrl: z.string().optional(),
+  startDate: dateSchema.optional(),
+  endDate: dateSchema.optional(),
+  addressLine1: z.string().min(1, 'Adresse ligne 1 requise').max(200, 'L\'adresse ne peut pas dépasser 200 caractères').optional(),
+  addressLine2: z.string().optional(),
+  postalCode: z.string().min(1, 'Code postal requis').max(20, 'Le code postal ne peut pas dépasser 20 caractères').optional(),
+  city: z.string().min(1, 'Ville requise').max(100, 'La ville ne peut pas dépasser 100 caractères').optional(),
+  region: z.string().optional(),
+  country: z.string().min(1, 'Pays requis').max(100, 'Le pays ne peut pas dépasser 100 caractères').optional(),
+  ticketingUrl: urlSchema,
+  facebookUrl: urlSchema,
+  instagramUrl: urlSchema,
+  // Services booléens
+  hasFoodTrucks: z.boolean().optional(),
+  hasKidsZone: z.boolean().optional(),
+  acceptsPets: z.boolean().optional(),
+  hasTentCamping: z.boolean().optional(),
+  hasTruckCamping: z.boolean().optional(),
+  hasFamilyCamping: z.boolean().optional(),
+  hasGym: z.boolean().optional(),
+  hasFireSpace: z.boolean().optional(),
+  hasGala: z.boolean().optional(),
+  hasOpenStage: z.boolean().optional(),
+  hasConcert: z.boolean().optional(),
+  hasCantine: z.boolean().optional(),
+  hasAerialSpace: z.boolean().optional(),
+  hasSlacklineSpace: z.boolean().optional(),
+  hasToilets: z.boolean().optional(),
+  hasShowers: z.boolean().optional(),
+  hasAccessibility: z.boolean().optional(),
+  hasWorkshops: z.boolean().optional(),
+  hasCreditCardPayment: z.boolean().optional(),
+  hasAfjTokenPayment: z.boolean().optional()
+}).refine((data) => {
   if (data.startDate && data.endDate) {
     const startDate = new Date(data.startDate);
     const endDate = new Date(data.endDate);

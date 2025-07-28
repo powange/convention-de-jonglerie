@@ -46,7 +46,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '~/stores/auth';
 import { useEditionStore } from '~/stores/editions';
 import EditionForm from '~/components/edition/EditionForm.vue';
-import type { Convention } from '~/types';
+import type { Convention, EditionFormData, HttpError } from '~/types';
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -86,17 +86,18 @@ onMounted(async () => {
         message: 'Vous n\'avez pas les droits pour ajouter une édition à cette convention'
       };
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors du chargement de la convention:', error);
     
-    if (error.status === 404) {
+    const httpError = error as HttpError;
+    if (httpError.status === 404) {
       toast.add({
         title: 'Convention introuvable',
         description: 'La convention que vous cherchez n\'existe pas',
         icon: 'i-heroicons-exclamation-triangle',
         color: 'error'
       });
-    } else if (error.status === 403) {
+    } else if (httpError.status === 403) {
       toast.add({
         title: 'Accès refusé',
         description: 'Vous n\'avez pas les droits pour ajouter une édition à cette convention',
@@ -116,7 +117,7 @@ onMounted(async () => {
   }
 });
 
-const handleAddEdition = async (data: any) => {
+const handleAddEdition = async (data: EditionFormData) => {
   submitting.value = true;
   
   try {
@@ -131,10 +132,11 @@ const handleAddEdition = async (data: any) => {
     
     // Rediriger vers la page des conventions de l'utilisateur
     router.push('/my-conventions');
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la création de l\'édition:', error);
     
-    const errorMessage = error.data?.message || error.message || 'Une erreur est survenue lors de la création de l\'édition';
+    const httpError = error as HttpError;
+    const errorMessage = httpError.data?.message || httpError.message || 'Une erreur est survenue lors de la création de l\'édition';
     
     toast.add({
       title: 'Erreur lors de la création',

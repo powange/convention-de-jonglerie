@@ -28,9 +28,10 @@ export default defineEventHandler(async (event) => {
       convention: result.entity,
     };
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Si c'est déjà une erreur HTTP, la relancer
-    if (error.statusCode) {
+    const httpError = error as { statusCode?: number; message?: string };
+    if (httpError.statusCode) {
       throw error;
     }
     

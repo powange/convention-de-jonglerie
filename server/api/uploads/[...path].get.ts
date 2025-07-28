@@ -72,8 +72,9 @@ export default defineEventHandler(async (event) => {
     // Créer un stream et l'envoyer
     const stream = createReadStream(filePath);
     return sendStream(event, stream);
-  } catch (error: any) {
-    if (error.statusCode) {
+  } catch (error: unknown) {
+    const httpError = error as { statusCode?: number; message?: string };
+    if (httpError.statusCode) {
       throw error;
     }
     

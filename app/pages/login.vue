@@ -25,6 +25,7 @@
 import { reactive, ref } from 'vue';
 import { z } from 'zod';
 import { useAuthStore } from '../stores/auth';
+import type { HttpError } from '~/types';
 
 const authStore = useAuthStore();
 const toast = useToast();
@@ -52,12 +53,13 @@ const handleLogin = async () => {
     // Navigation intelligente : retourner à la page précédente ou à l'accueil
     const returnTo = useRoute().query.returnTo as string;
     router.push(returnTo || '/');
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const error = e as HttpError;
     let errorMessage = 'Échec de la connexion';
-    if (e.statusCode === 401) {
+    if (error.statusCode === 401 || error.status === 401) {
       errorMessage = 'Email/pseudo ou mot de passe incorrect';
-    } else if (e.statusMessage) {
-      errorMessage = e.statusMessage;
+    } else if (error.message || error.data?.message) {
+      errorMessage = error.message || error.data?.message || errorMessage;
     }
     toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' });
   } finally {

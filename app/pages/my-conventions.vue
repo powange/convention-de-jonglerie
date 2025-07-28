@@ -108,11 +108,18 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
 import { useAuthStore } from '~/stores/auth';
-import type { Convention } from '~/types';
+import type { Convention, HttpError, Edition } from '~/types';
 import { getEditionDisplayNameWithConvention } from '~/utils/editionName';
 
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
+
+// Type pour les paramètres des cellules du tableau
+interface TableCellParams {
+  row: {
+    original: Edition;
+  };
+}
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -145,7 +152,7 @@ const getEditionsColumns = () => [
   {
     accessorKey: 'name',
     header: 'Nom',
-    cell: ({ row }: any) => {
+    cell: ({ row }: TableCellParams) => {
       const edition = row.original;
       // Récupérer la convention depuis le contexte parent
       const convention = myConventions.value.find(conv => 
@@ -172,7 +179,7 @@ const getEditionsColumns = () => [
   {
     accessorKey: 'dates',
     header: 'Dates',
-    cell: ({ row }: any) => {
+    cell: ({ row }: TableCellParams) => {
       const edition = row.original;
       return h('div', { class: 'text-sm' }, [
         h('div', {}, formatDate(edition.startDate)),
@@ -183,7 +190,7 @@ const getEditionsColumns = () => [
   {
     accessorKey: 'location',
     header: 'Lieu',
-    cell: ({ row }: any) => {
+    cell: ({ row }: TableCellParams) => {
       const edition = row.original;
       return h('div', { class: 'text-sm' }, [
         h('div', {}, edition.city),
@@ -194,7 +201,7 @@ const getEditionsColumns = () => [
   {
     accessorKey: 'status',
     header: 'État',
-    cell: ({ row }: any) => {
+    cell: ({ row }: TableCellParams) => {
       const edition = row.original;
       return h(UBadge, {
         color: getStatusColor(edition),
@@ -205,7 +212,7 @@ const getEditionsColumns = () => [
   },
   {
     id: 'actions',
-    cell: ({ row }: any) => {
+    cell: ({ row }: TableCellParams) => {
       const edition = row.original;
       return h('div', { class: 'flex items-center gap-2' }, [
         h(UButton, {
@@ -238,7 +245,7 @@ const getEditionsColumns = () => [
 ];
 
 // Gestionnaire d'événement pour les actions
-const onEditionAction = (action: any) => {
+const onEditionAction = (action: unknown) => {
   // Cette fonction est appelée automatiquement par UTable
 };
 
@@ -252,10 +259,11 @@ const deleteEdition = async (id: number) => {
         icon: 'i-heroicons-check-circle', 
         color: 'success' 
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const error = e as HttpError;
       toast.add({ 
         title: 'Erreur lors de la suppression', 
-        description: e.message || 'Une erreur est survenue',
+        description: error.message || error.data?.message || 'Une erreur est survenue',
         icon: 'i-heroicons-x-circle', 
         color: 'error' 
       });
@@ -315,11 +323,12 @@ const deleteConvention = async (id: number) => {
       
       // Recharger la liste des conventions
       await fetchMyConventions();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const httpError = error as HttpError;
       console.error('Erreur lors de la suppression de la convention:', error);
       toast.add({ 
         title: 'Erreur lors de la suppression', 
-        description: error.data?.message || error.message || 'Une erreur est survenue',
+        description: httpError.data?.message || httpError.message || 'Une erreur est survenue',
         icon: 'i-heroicons-x-circle', 
         color: 'error' 
       });

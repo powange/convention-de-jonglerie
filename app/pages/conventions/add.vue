@@ -26,7 +26,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '~/stores/auth';
 import ConventionForm from '~/components/convention/ConventionForm.vue';
-import type { Convention } from '~/types';
+import type { Convention, ConventionFormData, HttpError } from '~/types';
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -39,7 +39,7 @@ const toast = useToast();
 
 const loading = ref(false);
 
-const handleAddConvention = async (formData: Omit<Convention, 'id' | 'createdAt' | 'updatedAt' | 'authorId' | 'author'>, file?: File | null) => {
+const handleAddConvention = async (formData: ConventionFormData, file?: File | null) => {
   if (!authStore.token) {
     toast.add({
       title: 'Erreur d\'authentification',
@@ -78,7 +78,7 @@ const handleAddConvention = async (formData: Omit<Convention, 'id' | 'createdAt'
         });
         
         finalConvention = uploadResponse.convention;
-      } catch (uploadError: any) {
+      } catch (uploadError: unknown) {
         console.error('Erreur lors de l\'upload de l\'image:', uploadError);
         toast.add({
           title: 'Avertissement',
@@ -98,10 +98,11 @@ const handleAddConvention = async (formData: Omit<Convention, 'id' | 'createdAt'
 
     // Rediriger vers la page des conventions de l'utilisateur
     router.push('/my-conventions');
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la création de la convention:', error);
     
-    const errorMessage = error.data?.message || error.message || 'Une erreur est survenue lors de la création de la convention';
+    const httpError = error as HttpError;
+    const errorMessage = httpError.data?.message || httpError.message || 'Une erreur est survenue lors de la création de la convention';
     
     toast.add({
       title: 'Erreur lors de la création',

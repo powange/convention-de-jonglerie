@@ -34,6 +34,7 @@
 import { reactive, ref } from 'vue';
 import { z } from 'zod';
 import { useAuthStore } from '../stores/auth';
+import type { HttpError } from '~/types';
 
 const authStore = useAuthStore();
 const toast = useToast();
@@ -70,12 +71,13 @@ const handleRegister = async () => {
     await authStore.register(state.email, state.password, state.pseudo, state.nom, state.prenom);
     toast.add({ title: 'Inscription réussie ! Veuillez vous connecter.', icon: 'i-heroicons-check-circle', color: 'success' });
     router.push('/login');
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const error = e as HttpError;
     let errorMessage = "Échec de l'inscription";
-    if (e.statusCode === 409) {
+    if (error.statusCode === 409 || error.status === 409) {
       errorMessage = 'Cet email ou pseudo est déjà utilisé';
-    } else if (e.statusMessage) {
-      errorMessage = e.statusMessage;
+    } else if (error.message || error.data?.message) {
+      errorMessage = error.message || error.data?.message || errorMessage;
     }
     toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' });
   } finally {

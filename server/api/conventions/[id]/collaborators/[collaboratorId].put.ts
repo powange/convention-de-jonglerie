@@ -35,8 +35,9 @@ export default defineEventHandler(async (event) => {
       success: true,
       collaborator: updatedCollaborator
     };
-  } catch (error: any) {
-    if (error.statusCode) {
+  } catch (error: unknown) {
+    const httpError = error as { statusCode?: number; message?: string };
+    if (httpError.statusCode) {
       throw error;
     }
     console.error('Erreur lors de la mise à jour du rôle:', error);

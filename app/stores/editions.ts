@@ -1,5 +1,35 @@
 import { defineStore } from 'pinia';
 import { useAuthStore } from '../stores/auth'; // Use relative path
+import type { Edition, ConventionCollaborator, HttpError } from '~/types';
+
+// Interface pour les filtres d'éditions
+interface EditionFilters {
+  name?: string;
+  startDate?: string;
+  endDate?: string;
+  countries?: string[];
+  // Services/équipements
+  hasFoodTrucks?: boolean;
+  hasKidsZone?: boolean;
+  acceptsPets?: boolean;
+  hasTentCamping?: boolean;
+  hasTruckCamping?: boolean;
+  hasGym?: boolean;
+  hasFamilyCamping?: boolean;
+  hasFireSpace?: boolean;
+  hasGala?: boolean;
+  hasOpenStage?: boolean;
+  hasConcert?: boolean;
+  hasCantine?: boolean;
+  hasAerialSpace?: boolean;
+  hasSlacklineSpace?: boolean;
+  hasToilets?: boolean;
+  hasShowers?: boolean;
+  hasAccessibility?: boolean;
+  hasWorkshops?: boolean;
+  hasCreditCardPayment?: boolean;
+  hasAfjTokenPayment?: boolean;
+}
 
 
 
@@ -35,7 +65,7 @@ export const useEditionStore = defineStore('editions', {
       this.filterFutureEditions();
       this.sortEditions();
     },
-    async fetchEditions(filters?: any) {
+    async fetchEditions(filters?: EditionFilters) {
       this.loading = true;
       this.error = null;
       try {
@@ -72,7 +102,8 @@ export const useEditionStore = defineStore('editions', {
         this.editions = data;
         this.processEditions();
       } catch (e: unknown) {
-        this.error = e.statusMessage || 'Failed to fetch editions';
+        const error = e as HttpError;
+        this.error = error.message || error.data?.message || 'Failed to fetch editions';
       } finally {
         this.loading = false;
       }
@@ -85,7 +116,8 @@ export const useEditionStore = defineStore('editions', {
         const edition = await $fetch<Edition>(`/api/editions/${id}`);
         return edition;
       } catch (e: unknown) {
-        this.error = e.statusMessage || 'Failed to fetch edition';
+        const error = e as HttpError;
+        this.error = error.message || error.data?.message || 'Failed to fetch edition';
         throw e;
       } finally {
         this.loading = false;
@@ -108,7 +140,8 @@ export const useEditionStore = defineStore('editions', {
         this.processEditions();
         return newEdition;
       } catch (e: unknown) {
-        this.error = e.statusMessage || 'Failed to add edition';
+        const error = e as HttpError;
+        this.error = error.message || error.data?.message || 'Failed to add edition';
         throw e;
       } finally {
         this.loading = false;
@@ -136,7 +169,8 @@ export const useEditionStore = defineStore('editions', {
         }
         return updatedEdition;
       } catch (e: unknown) {
-        this.error = e.statusMessage || 'Failed to update edition';
+        const error = e as HttpError;
+        this.error = error.message || error.data?.message || 'Failed to update edition';
         throw e;
       } finally {
         this.loading = false;
@@ -156,7 +190,8 @@ export const useEditionStore = defineStore('editions', {
         });
         this.editions = this.editions.filter((c) => c.id !== id);
       } catch (e: unknown) {
-        this.error = e.statusMessage || 'Failed to delete edition';
+        const error = e as HttpError;
+        this.error = error.message || error.data?.message || 'Failed to delete edition';
         throw e;
       } finally {
         this.loading = false;
@@ -177,7 +212,8 @@ export const useEditionStore = defineStore('editions', {
         // Re-fetch editions to update favorite status
         await this.fetchEditions();
       } catch (e: unknown) {
-        this.error = e.statusMessage || 'Failed to toggle favorite';
+        const error = e as HttpError;
+        this.error = error.message || error.data?.message || 'Failed to toggle favorite';
         throw e;
       } finally {
         this.loading = false;
@@ -196,7 +232,8 @@ export const useEditionStore = defineStore('editions', {
         });
         return collaborators;
       } catch (e: unknown) {
-        this.error = e.statusMessage || 'Failed to fetch collaborators';
+        const error = e as HttpError;
+        this.error = error.message || error.data?.message || 'Failed to fetch collaborators';
         throw e;
       }
     },
@@ -224,7 +261,8 @@ export const useEditionStore = defineStore('editions', {
         
         return collaborator;
       } catch (e: unknown) {
-        this.error = e.statusMessage || 'Failed to add collaborator';
+        const error = e as HttpError;
+        this.error = error.message || error.data?.message || 'Failed to add collaborator';
         throw e;
       }
     },
@@ -248,7 +286,8 @@ export const useEditionStore = defineStore('editions', {
           );
         }
       } catch (e: unknown) {
-        this.error = e.statusMessage || 'Failed to remove collaborator';
+        const error = e as HttpError;
+        this.error = error.message || error.data?.message || 'Failed to remove collaborator';
         throw e;
       }
     },

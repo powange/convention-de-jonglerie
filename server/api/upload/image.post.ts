@@ -43,8 +43,9 @@ export default defineEventHandler(async (event) => {
       success: true,
       imageUrl: uploadResult.imageUrl,
     };
-  } catch (error: any) {
-    if (error.statusCode) {
+  } catch (error: unknown) {
+    const httpError = error as { statusCode?: number; message?: string };
+    if (httpError.statusCode) {
       throw error;
     }
     

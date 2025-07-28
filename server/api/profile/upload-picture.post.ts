@@ -64,8 +64,9 @@ export default defineEventHandler(async (event) => {
       profilePicture: uploadResult.imageUrl,
       user: updatedUser,
     };
-  } catch (error: any) {
-    if (error.statusCode) {
+  } catch (error: unknown) {
+    const httpError = error as { statusCode?: number; message?: string };
+    if (httpError.statusCode) {
       throw error;
     }
     

@@ -272,6 +272,7 @@ import { z } from 'zod';
 import { useAuthStore } from '~/stores/auth';
 import { useEditionStore } from '~/stores/editions';
 import { useAvatar } from '~/utils/avatar';
+import type { HttpError, User } from '~/types';
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -373,7 +374,7 @@ const updateProfile = async () => {
   
   loading.value = true;
   try {
-    const updatedUser = await $fetch('/api/profile/update', {
+    const updatedUser = await $fetch<User>('/api/profile/update', {
       method: 'PUT',
       body: {
         email: state.email,
@@ -395,10 +396,11 @@ const updateProfile = async () => {
       icon: 'i-heroicons-check-circle', 
       color: 'success' 
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const httpError = error as HttpError;
     toast.add({ 
       title: 'Erreur', 
-      description: error.data?.message || 'Impossible de sauvegarder le profil',
+      description: httpError.data?.message || httpError.message || 'Impossible de sauvegarder le profil',
       icon: 'i-heroicons-x-circle', 
       color: 'error' 
     });
@@ -432,10 +434,11 @@ const changePassword = async () => {
       icon: 'i-heroicons-check-circle', 
       color: 'success' 
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const httpError = error as HttpError;
     toast.add({ 
       title: 'Erreur', 
-      description: error.data?.message || 'Impossible de changer le mot de passe',
+      description: httpError.data?.message || httpError.message || 'Impossible de changer le mot de passe',
       icon: 'i-heroicons-x-circle', 
       color: 'error' 
     });
@@ -459,7 +462,7 @@ const handleFileUpload = async (event: Event) => {
     const formData = new FormData();
     formData.append('profilePicture', file);
     
-    const response = await $fetch('/api/profile/upload-picture', {
+    const response = await $fetch<{ user: User }>('/api/profile/upload-picture', {
       method: 'POST',
       body: formData,
       headers: {
@@ -483,10 +486,11 @@ const handleFileUpload = async (event: Event) => {
       icon: 'i-heroicons-check-circle', 
       color: 'success' 
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const httpError = error as HttpError;
     toast.add({ 
       title: 'Erreur', 
-      description: error.data?.message || 'Impossible de changer la photo',
+      description: httpError.data?.message || httpError.message || 'Impossible de changer la photo',
       icon: 'i-heroicons-x-circle', 
       color: 'error' 
     });
@@ -500,7 +504,7 @@ const handleFileUpload = async (event: Event) => {
 const deleteProfilePicture = async () => {
   pictureLoading.value = true;
   try {
-    const response = await $fetch('/api/profile/delete-picture', {
+    const response = await $fetch<{ user: User }>('/api/profile/delete-picture', {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${authStore.token}`,
@@ -523,10 +527,11 @@ const deleteProfilePicture = async () => {
       icon: 'i-heroicons-check-circle', 
       color: 'success' 
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const httpError = error as HttpError;
     toast.add({ 
       title: 'Erreur', 
-      description: error.data?.message || 'Impossible de supprimer la photo',
+      description: httpError.data?.message || httpError.message || 'Impossible de supprimer la photo',
       icon: 'i-heroicons-x-circle', 
       color: 'error' 
     });

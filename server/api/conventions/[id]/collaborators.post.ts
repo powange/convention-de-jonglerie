@@ -53,8 +53,9 @@ export default defineEventHandler(async (event) => {
       success: true,
       collaborator
     };
-  } catch (error: any) {
-    if (error.statusCode) {
+  } catch (error: unknown) {
+    const httpError = error as { statusCode?: number; message?: string };
+    if (httpError.statusCode) {
       throw error;
     }
     console.error('Erreur lors de l\'ajout du collaborateur:', error);

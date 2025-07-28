@@ -41,8 +41,9 @@ export default defineEventHandler(async (event) => {
     }));
 
     return transformedCollaborators;
-  } catch (error: any) {
-    if (error.statusCode) {
+  } catch (error: unknown) {
+    const httpError = error as { statusCode?: number; message?: string };
+    if (httpError.statusCode) {
       throw error;
     }
     console.error('Erreur lors de la récupération des collaborateurs:', error);
