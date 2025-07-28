@@ -1,4 +1,5 @@
 import { CollaboratorRole } from '@prisma/client';
+import type { ConventionCollaborator, User } from '~/app/types';
 import { prisma } from './prisma';
 
 export interface CollaboratorPermissionCheck {
@@ -117,7 +118,7 @@ export async function addConventionCollaborator(
   userToAddId: number,
   role: CollaboratorRole,
   addedById: number
-): Promise<any> {
+): Promise<ConventionCollaborator & { user: Pick<User, 'id' | 'pseudo' | 'email'> }> {
   // Vérifier les permissions
   const canManage = await canManageCollaborators(conventionId, addedById);
   
@@ -162,7 +163,7 @@ export async function addConventionCollaborator(
  */
 export async function findUserByPseudoOrEmail(
   searchTerm: string
-): Promise<any> {
+): Promise<Pick<User, 'id' | 'pseudo' | 'email'> | null> {
   return await prisma.user.findFirst({
     where: {
       OR: [
@@ -229,7 +230,10 @@ export async function deleteConventionCollaborator(
  */
 export async function getConventionCollaborators(
   conventionId: number
-): Promise<any[]> {
+): Promise<(ConventionCollaborator & {
+  user: Pick<User, 'id' | 'pseudo' | 'email' | 'nom' | 'prenom'>;
+  addedBy: Pick<User, 'pseudo'>;
+})[]> {
   return await prisma.conventionCollaborator.findMany({
     where: { conventionId },
     include: {
@@ -262,7 +266,9 @@ export async function updateCollaboratorRole(
   collaboratorId: number,
   newRole: CollaboratorRole,
   userId: number
-): Promise<any> {
+): Promise<ConventionCollaborator & {
+  user: Pick<User, 'id' | 'pseudo' | 'email'>;
+}> {
   // Vérifier les permissions
   const canManage = await canManageCollaborators(conventionId, userId);
   

@@ -161,20 +161,20 @@ export const updateCollaboratorRoleSchema = z.object({
 });
 
 // Fonction utilitaire pour sanitiser les données avant validation
-export function sanitizeData(data: any): any {
+export function sanitizeData(data: unknown): unknown {
   if (typeof data !== 'object' || data === null) {
     return data;
   }
 
-  const sanitized = { ...data };
+  const sanitized = { ...data as Record<string, unknown> };
 
   // Trim des chaînes de caractères
   Object.keys(sanitized).forEach(key => {
     if (typeof sanitized[key] === 'string') {
-      sanitized[key] = sanitized[key].trim();
+      sanitized[key] = (sanitized[key] as string).trim();
       // Conversion en minuscules pour les emails
       if (key === 'email') {
-        sanitized[key] = sanitized[key].toLowerCase();
+        sanitized[key] = (sanitized[key] as string).toLowerCase();
       }
     }
   });

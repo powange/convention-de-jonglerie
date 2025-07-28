@@ -1,3 +1,5 @@
+import type { HasDates, BadgeColor, EditionStatus } from '~/types';
+
 /**
  * Composable pour gérer le statut des éditions
  */
@@ -5,7 +7,7 @@ export const useEditionStatus = () => {
   /**
    * Détermine la couleur du badge selon l'état de l'édition
    */
-  const getStatusColor = (edition: any): string => {
+  const getStatusColor = (edition: HasDates): BadgeColor => {
     const now = new Date();
     const startDate = new Date(edition.startDate);
     const endDate = new Date(edition.endDate);
@@ -18,7 +20,7 @@ export const useEditionStatus = () => {
   /**
    * Détermine le texte du statut selon l'état de l'édition
    */
-  const getStatusText = (edition: any): string => {
+  const getStatusText = (edition: HasDates): EditionStatus => {
     const now = new Date();
     const startDate = new Date(edition.startDate);
     const endDate = new Date(edition.endDate);
@@ -31,7 +33,7 @@ export const useEditionStatus = () => {
   /**
    * Détermine si une édition est en cours
    */
-  const isEditionActive = (edition: any): boolean => {
+  const isEditionActive = (edition: HasDates): boolean => {
     const now = new Date();
     const startDate = new Date(edition.startDate);
     const endDate = new Date(edition.endDate);
@@ -42,7 +44,7 @@ export const useEditionStatus = () => {
   /**
    * Détermine si une édition est à venir
    */
-  const isEditionUpcoming = (edition: any): boolean => {
+  const isEditionUpcoming = (edition: HasDates): boolean => {
     const now = new Date();
     const startDate = new Date(edition.startDate);
 
@@ -52,7 +54,7 @@ export const useEditionStatus = () => {
   /**
    * Détermine si une édition est terminée
    */
-  const isEditionFinished = (edition: any): boolean => {
+  const isEditionFinished = (edition: HasDates): boolean => {
     const now = new Date();
     const endDate = new Date(edition.endDate);
 

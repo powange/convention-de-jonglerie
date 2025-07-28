@@ -53,7 +53,7 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
   const trimField = (fieldName: keyof CarpoolFormData) => {
     const value = form[fieldName];
     if (value && typeof value === 'string') {
-      (form as any)[fieldName] = value.trim();
+      (form as Record<string, unknown>)[fieldName] = value.trim();
     }
   };
 

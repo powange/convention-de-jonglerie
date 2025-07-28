@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
+import type { Convention, Edition, User } from '~/app/types';
 import { deleteFromBothLocations } from './copy-to-output';
 import { prisma } from './prisma';
 
@@ -14,7 +15,7 @@ export interface ImageDeletionOptions {
 export interface ImageDeletionResult {
   success: boolean;
   message: string;
-  entity: any;
+  entity: Convention | Edition | User;
 }
 
 /**
@@ -23,7 +24,7 @@ export interface ImageDeletionResult {
 export async function checkConventionDeletionPermission(
   conventionId: number,
   userId: number
-): Promise<any> {
+): Promise<Convention> {
   const convention = await prisma.convention.findUnique({
     where: { id: conventionId },
   });
@@ -51,7 +52,7 @@ export async function checkConventionDeletionPermission(
 export async function checkEditionDeletionPermission(
   editionId: number,
   userId: number
-): Promise<any> {
+): Promise<Edition & { collaborators: { userId: number; canEdit: boolean }[] }> {
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },
     include: {
@@ -156,7 +157,7 @@ function extractFilePath(imageUrl: string, options: ImageDeletionOptions): strin
  */
 export async function updateEntityRemoveImage(
   options: ImageDeletionOptions
-): Promise<any> {
+): Promise<Convention | Edition | User> {
   const prismaModel = {
     convention: prisma.convention,
     edition: prisma.edition,
@@ -210,7 +211,7 @@ export async function handleImageDeletion(
   userId: number
 ): Promise<ImageDeletionResult> {
   try {
-    let entity: any;
+    let entity: Convention | Edition | (User & Record<string, unknown>) | null;
     let imageUrl: string | null = null;
 
     // Vérifier les permissions et récupérer l'entité
@@ -253,8 +254,8 @@ export async function handleImageDeletion(
       entity: updatedEntity,
     };
 
-  } catch (error: any) {
-    if (error.statusCode) {
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error;
     }
     

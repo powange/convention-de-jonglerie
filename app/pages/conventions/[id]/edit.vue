@@ -85,17 +85,19 @@ onMounted(async () => {
         message: 'Vous n\'avez pas les droits pour modifier cette convention'
       };
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors du chargement de la convention:', error);
     
-    if (error.status === 404) {
+    const errorStatus = (error && typeof error === 'object' && 'status' in error) ? error.status : null;
+    
+    if (errorStatus === 404) {
       toast.add({
         title: 'Convention introuvable',
         description: 'La convention que vous cherchez n\'existe pas',
         icon: 'i-heroicons-exclamation-triangle',
         color: 'error'
       });
-    } else if (error.status === 403) {
+    } else if (errorStatus === 403) {
       toast.add({
         title: 'Accès refusé',
         description: 'Vous n\'avez pas les droits pour modifier cette convention',
@@ -154,7 +156,7 @@ const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'created
         });
         
         finalConvention = uploadResponse.convention;
-      } catch (uploadError: any) {
+      } catch (uploadError: unknown) {
         console.error('Erreur lors de l\'upload de l\'image:', uploadError);
         toast.add({
           title: 'Avertissement',
@@ -176,10 +178,17 @@ const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'created
 
     // Rediriger vers la page des conventions de l'utilisateur
     router.push('/my-conventions');
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la mise à jour de la convention:', error);
     
-    const errorMessage = error.data?.message || error.message || 'Une erreur est survenue lors de la mise à jour de la convention';
+    let errorMessage = 'Une erreur est survenue lors de la mise à jour de la convention';
+    if (error && typeof error === 'object') {
+      if ('data' in error && error.data && typeof error.data === 'object' && 'message' in error.data) {
+        errorMessage = String(error.data.message);
+      } else if ('message' in error && typeof error.message === 'string') {
+        errorMessage = error.message;
+      }
+    }
     
     toast.add({
       title: 'Erreur lors de la mise à jour',

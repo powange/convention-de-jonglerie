@@ -138,6 +138,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
+import type { Edition } from '~/types';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
 import EditionHeader from '~/components/edition/EditionHeader.vue';
@@ -150,7 +151,7 @@ const toast = useToast();
 const { servicesByCategory } = useConventionServices();
 
 const editionId = parseInt(route.params.id as string);
-const edition = ref(null);
+const edition = ref<Edition | null>(null);
 const showImageOverlay = ref(false);
 const { normalizeImageUrl } = useImageUrl();
 
@@ -173,11 +174,14 @@ const toggleFavorite = async (id: number) => {
     edition.value = await editionStore.fetchEditionById(editionId);
     toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'green' });
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'red' });
+    const errorMessage = (e && typeof e === 'object' && 'statusMessage' in e && typeof e.statusMessage === 'string') 
+                        ? e.statusMessage 
+                        : 'Échec de la mise à jour du statut de favori';
+    toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'red' });
   }
 };
 
-const getGoogleMapsUrl = (edition: any) => {
+const getGoogleMapsUrl = (edition: Edition) => {
   const addressParts = [
     edition.addressLine1,
     edition.addressLine2,
@@ -191,7 +195,7 @@ const getGoogleMapsUrl = (edition: any) => {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
 };
 
-const getActiveServicesByCategory = (edition: any) => {
+const getActiveServicesByCategory = (edition: Edition) => {
   if (!edition) return [];
   
   return servicesByCategory.map(category => ({

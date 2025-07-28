@@ -298,11 +298,15 @@ const uploadImage = async (conventionId: number): Promise<string | null> => {
     });
     
     return response.imageUrl;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de l\'upload:', error);
+    const errorMessage = (error && typeof error === 'object' && 'data' in error && 
+                         error.data && typeof error.data === 'object' && 'message' in error.data) 
+                        ? String(error.data.message) 
+                        : 'Impossible d\'uploader l\'image';
     toast.add({
       title: 'Erreur d\'upload',
-      description: error.data?.message || 'Impossible d\'uploader l\'image',
+      description: errorMessage,
       icon: 'i-heroicons-x-circle',
       color: 'error'
     });
@@ -332,11 +336,15 @@ const deleteCurrentImage = async () => {
       icon: 'i-heroicons-check-circle',
       color: 'success'
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la suppression:', error);
+    const errorMessage = (error && typeof error === 'object' && 'data' in error && 
+                         error.data && typeof error.data === 'object' && 'message' in error.data) 
+                        ? String(error.data.message) 
+                        : 'Impossible de supprimer l\'image';
     toast.add({
       title: 'Erreur de suppression',
-      description: error.data?.message || 'Impossible de supprimer l\'image',
+      description: errorMessage,
       icon: 'i-heroicons-x-circle',
       color: 'error'
     });

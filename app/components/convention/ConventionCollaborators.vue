@@ -181,10 +181,13 @@ const addCollaborator = async () => {
       icon: 'i-heroicons-check-circle',
       color: 'success'
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = (error && typeof error === 'object' && 'statusMessage' in error && typeof error.statusMessage === 'string') 
+                        ? error.statusMessage 
+                        : 'Impossible d\'ajouter le collaborateur';
     toast.add({
       title: 'Erreur',
-      description: error.statusMessage || 'Impossible d\'ajouter le collaborateur',
+      description: errorMessage,
       icon: 'i-heroicons-x-circle',
       color: 'error'
     });
@@ -208,10 +211,13 @@ const removeCollaborator = async (collaborator: ConventionCollaborator) => {
       icon: 'i-heroicons-check-circle',
       color: 'success'
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = (error && typeof error === 'object' && 'statusMessage' in error && typeof error.statusMessage === 'string') 
+                        ? error.statusMessage 
+                        : 'Impossible de retirer le collaborateur';
     toast.add({
       title: 'Erreur',
-      description: error.statusMessage || 'Impossible de retirer le collaborateur',
+      description: errorMessage,
       icon: 'i-heroicons-x-circle',
       color: 'error'
     });

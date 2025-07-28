@@ -83,6 +83,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import type { Edition } from '~/types';
 import { useAuthStore } from '~/stores/auth';
 import { useEditionStore } from '~/stores/editions';
 import { getEditionDisplayName } from '~/utils/editionName';
@@ -90,7 +91,7 @@ import { getEditionDisplayName } from '~/utils/editionName';
 const { normalizeImageUrl } = useImageUrl();
 
 interface Props {
-  edition: any;
+  edition: Edition;
   currentPage: 'details' | 'covoiturage' | 'gestion';
   isFavorited?: boolean;
 }

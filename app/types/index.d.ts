@@ -95,3 +95,15 @@ export interface ConventionCollaborator {
   user: User;
   addedBy: { id: number; pseudo: string };
 }
+
+// Interface pour les objets qui ont seulement des dates (pour les composables)
+export interface HasDates {
+  startDate: string;
+  endDate: string;
+}
+
+// Type pour les couleurs de badge Nuxt UI
+export type BadgeColor = 'info' | 'success' | 'neutral' | 'warning' | 'error';
+
+// Type pour les status d'édition
+export type EditionStatus = 'À venir' | 'En cours' | 'Terminée';

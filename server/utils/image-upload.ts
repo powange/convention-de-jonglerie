@@ -1,6 +1,8 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
+import type { MultiPartData } from 'h3';
+import type { Convention, Edition, User } from '~/app/types';
 import { copyToOutputPublic } from './copy-to-output';
 import { prisma } from './prisma';
 
@@ -25,7 +27,7 @@ export interface ImageUploadResult {
  * Valide un fichier image selon les critères fournis
  */
 export async function validateImageFile(
-  file: any,
+  file: MultiPartData,
   options: ImageUploadOptions
 ): Promise<void> {
   if (!file || !file.data) {
@@ -68,7 +70,7 @@ export async function validateImageFile(
  * Génère un nom de fichier unique
  */
 export function generateUniqueFilename(
-  file: any,
+  file: MultiPartData,
   prefix: string,
   entityId?: string | number
 ): string {
@@ -121,7 +123,7 @@ export async function deleteOldImage(
  * Effectue l'upload d'une image avec toutes les validations et traitements
  */
 export async function handleImageUpload(
-  event: any,
+  event: Parameters<typeof readMultipartFormData>[0],
   options: ImageUploadOptions
 ): Promise<ImageUploadResult> {
   try {
@@ -181,8 +183,8 @@ export async function handleImageUpload(
       filename,
     };
 
-  } catch (error: any) {
-    if (error.statusCode) {
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error;
     }
     
@@ -200,7 +202,7 @@ export async function handleImageUpload(
 export async function checkConventionUploadPermission(
   conventionId: number,
   userId: number
-): Promise<any> {
+): Promise<Convention> {
   const convention = await prisma.convention.findUnique({
     where: { id: conventionId },
   });
@@ -228,7 +230,7 @@ export async function checkConventionUploadPermission(
 export async function checkEditionUploadPermission(
   editionId: number,
   userId: number
-): Promise<any> {
+): Promise<Edition & { collaborators: { userId: number; canEdit: boolean }[] }> {
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },
     include: {
@@ -254,7 +256,7 @@ export async function checkEditionUploadPermission(
 /**
  * Met à jour l'entité avec la nouvelle URL d'image
  */
-export async function updateEntityWithImage<T = any>(
+export async function updateEntityWithImage<T = Convention | Edition | User>(
   entityType: 'convention' | 'edition' | 'user',
   entityId: number,
   imageUrl: string,
