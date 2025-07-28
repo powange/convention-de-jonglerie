@@ -174,7 +174,7 @@
       <p>Aucune convention trouvée. Soyez le premier à en ajouter une !</p>
     </div>
     <div v-else class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-      <UCard v-for="edition in editionStore.editions" :key="edition.id">
+      <UCard v-for="edition in editionStore.editions" :key="edition.id" variant="subtle">
         <template #header>
           <div class="flex items-center gap-3">
             <div v-if="edition.convention?.logo" class="flex-shrink-0">

@@ -25,7 +25,7 @@
       </div>
 
       <div v-else class="space-y-4 mb-8">
-        <UCard v-for="convention in myConventions" :key="convention.id" class="hover:shadow-lg transition-shadow w-full">
+        <UCard v-for="convention in myConventions" :key="convention.id" class="hover:shadow-lg transition-shadow w-full"  variant="subtle">
           <template #header>
             <div class="flex items-center justify-between w-full">
               <div class="flex items-center gap-3">

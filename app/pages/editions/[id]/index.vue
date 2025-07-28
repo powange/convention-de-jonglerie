@@ -16,7 +16,7 @@
       />
       
       <!-- Contenu des détails -->
-      <UCard>
+      <UCard variant="subtle">
         
         <template #header>
           <!-- Affiche de l'édition et description -->
