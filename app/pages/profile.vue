@@ -127,7 +127,7 @@
               variant="outline" 
               color="primary" 
               block
-              to="/editions/add"
+              to="/conventions/add"
             >
               Créer une convention
             </UButton>
