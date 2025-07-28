@@ -20,20 +20,12 @@ export default defineEventHandler(async (event) => {
     // Sanitisation
     const cleanName = validatedData.name.trim();
     const cleanDescription = validatedData.description?.trim() || null;
-    const cleanWebsite = validatedData.website?.trim() || null;
-    const cleanFacebook = validatedData.facebook?.trim() || null;
-    const cleanInstagram = validatedData.instagram?.trim() || null;
-    const cleanYoutube = validatedData.youtube?.trim() || null;
 
     // Créer la convention
     const convention = await prisma.convention.create({
       data: {
         name: cleanName,
         description: cleanDescription,
-        website: cleanWebsite,
-        facebook: cleanFacebook,
-        instagram: cleanInstagram,
-        youtube: cleanYoutube,
         authorId: event.context.user.id,
       },
       include: {

@@ -162,8 +162,4 @@ export interface EditionFormData {
 export interface ConventionFormData {
   name: string;
   description?: string | null;
-  website?: string | null;
-  facebook?: string | null;
-  instagram?: string | null;
-  youtube?: string | null;
 }
