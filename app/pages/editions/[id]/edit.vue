@@ -2,15 +2,15 @@
   <div class="max-w-6xl mx-auto">
     <UCard>
       <template #header>
-        <h1 class="text-2xl font-bold">Modifier la convention</h1>
+        <h1 class="text-2xl font-bold">Modifier l'édition</h1>
       </template>
       <div v-if="editionStore.loading">
-        <p>Chargement des données de la convention...</p>
+        <p>Chargement des données de l'édition...</p>
       </div>
       <div v-else-if="!edition">
-        <p>Convention introuvable.</p>
+        <p>Édition introuvable.</p>
       </div>
-      <ConventionForm v-else :initial-data="edition" submit-button-text="Mettre à jour la convention" :loading="editionStore.loading" @submit="handleUpdateConvention" />
+      <EditionForm v-else :initial-data="edition" submit-button-text="Mettre à jour l'édition" :loading="editionStore.loading" @submit="handleUpdateConvention" />
     </UCard>
   </div>
 </template>
@@ -19,7 +19,7 @@
 import { ref, onMounted } from 'vue';
 import { useEditionStore } from '~/stores/editions';
 import { useRouter } from 'vue-router';
-import ConventionForm from '~/components/convention/ConventionForm.vue';
+import EditionForm from '~/components/edition/EditionForm.vue';
 import type { Edition } from '~/types';
 import { useAuthStore } from '~/stores/auth';
 
@@ -39,14 +39,14 @@ const edition = ref(null);
 
 onMounted(async () => {
   try {
-    // Récupérer la convention spécifique
+    // Récupérer l'édition spécifique
     const foundEdition = await editionStore.fetchEditionById(conventionId);
     
-    // Vérifier que l'utilisateur peut modifier cette convention
+    // Vérifier que l'utilisateur peut modifier cette édition
     if (!editionStore.canEditEdition(foundEdition, authStore.user?.id || 0)) {
       toast.add({ 
         title: 'Accès refusé', 
-        description: 'Vous n\'avez pas les droits pour modifier cette convention',
+        description: 'Vous n\'avez pas les droits pour modifier cette édition',
         icon: 'i-heroicons-exclamation-triangle', 
         color: 'error' 
       });
@@ -58,7 +58,7 @@ onMounted(async () => {
   } catch (_error) {
     toast.add({ 
       title: 'Erreur', 
-      description: 'Convention introuvable',
+      description: 'Édition introuvable',
       icon: 'i-heroicons-exclamation-triangle', 
       color: 'error' 
     });
@@ -69,10 +69,10 @@ onMounted(async () => {
 const handleUpdateConvention = async (formData: Edition) => {
   try {
     await editionStore.updateEdition(conventionId, formData);
-    toast.add({ title: 'Convention mise à jour avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
+    toast.add({ title: 'Édition mise à jour avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
     router.push(`/editions/${conventionId}`);
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || 'Échec de la mise à jour de la convention', icon: 'i-heroicons-x-circle', color: 'error' });
+    toast.add({ title: e.statusMessage || 'Échec de la mise à jour de l\'édition', icon: 'i-heroicons-x-circle', color: 'error' });
   }
 };
 </script>

@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>Chargement des détails de la convention...</p>
+      <p>Chargement des détails de l'édition...</p>
     </div>
     <div v-else-if="!convention">
-      <p>Convention introuvable.</p>
+      <p>Édition introuvable.</p>
     </div>
     <div v-else-if="!canAccess">
       <UAlert 
@@ -17,7 +17,7 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <ConventionHeader 
+      <EditionHeader 
         :convention="convention" 
         current-page="gestion" 
         :is-favorited="isFavorited(convention.id)"
@@ -102,7 +102,7 @@ import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
 import { useAvatar } from '~/utils/avatar';
 // import ConventionCollaborators from '~/components/convention/ConventionCollaborators.vue';
-import ConventionHeader from '~/components/convention/ConventionHeader.vue';
+import EditionHeader from '~/components/edition/EditionHeader.vue';
 
 // TODO: Ajouter le middleware d'authentification plus tard
 // definePageMeta({
@@ -123,7 +123,7 @@ onMounted(async () => {
   try {
     convention.value = await editionStore.fetchEditionById(conventionId);
   } catch (error) {
-    console.error('Failed to fetch convention:', error);
+    console.error('Failed to fetch edition:', error);
   }
 });
 

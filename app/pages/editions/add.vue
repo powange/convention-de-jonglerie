@@ -4,7 +4,7 @@
       <template #header>
         <h1 class="text-2xl font-bold">Ajouter une nouvelle édition</h1>
       </template>
-      <ConventionForm submit-button-text="Ajouter l'édition" :loading="editionStore.loading" @submit="handleAddConvention" />
+      <EditionForm submit-button-text="Ajouter l'édition" :loading="editionStore.loading" @submit="handleAddConvention" />
     </UCard>
   </div>
 </template>
@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { useEditionStore } from '~/stores/editions';
 import { useRouter } from 'vue-router';
-import ConventionForm from '~/components/convention/ConventionForm.vue';
+import EditionForm from '~/components/edition/EditionForm.vue';
 import type { Edition } from '~/types';
 
 // Protéger cette page avec le middleware d'authentification

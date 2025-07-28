@@ -59,7 +59,7 @@
 import { useAuthStore } from '~/stores/auth';
 
 interface Props {
-  conventionId: number;
+  editionId: number;
 }
 
 const props = defineProps<Props>();
@@ -123,7 +123,7 @@ const onSubmit = async () => {
   
   try {
     const authStore = useAuthStore();
-    const response = await $fetch(`/api/editions/${props.conventionId}/carpool-requests`, {
+    const response = await $fetch(`/api/editions/${props.editionId}/carpool-requests`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${authStore.token}`,

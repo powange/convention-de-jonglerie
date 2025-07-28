@@ -15,7 +15,7 @@
       <template #description/>
       <template #body>
         <CarpoolOfferForm
-          :convention-id="conventionId"
+          :edition-id="editionId"
           @success="onOfferCreated"
         />
       </template>
@@ -34,9 +34,9 @@
       <template #description/>
       <template #body>
         <CarpoolRequestForm
-          :convention-id="conventionId"
+          :edition-id="editionId"
           @success="onRequestCreated"
-        />z
+        />
       </template>
     </UModal>
     </div>
@@ -57,7 +57,7 @@
           <div v-else class="text-center py-8 text-gray-500">
             <UIcon name="i-heroicons-truck" class="mx-auto h-12 w-12 text-gray-300 mb-4" />
             <p class="text-lg font-medium">Aucune offre de covoiturage</p>
-            <p class="text-sm">Soyez le premier à proposer un covoiturage pour cette convention !</p>
+            <p class="text-sm">Soyez le premier à proposer un covoiturage pour cette édition !</p>
           </div>
         </div>
       </template>
@@ -92,7 +92,7 @@ import CarpoolOfferForm from './CarpoolOfferForm.vue';
 import CarpoolRequestForm from './CarpoolRequestForm.vue';
 
 interface Props {
-  conventionId: number;
+  editionId: number;
 }
 
 const props = defineProps<Props>();
@@ -119,12 +119,12 @@ const tabs = computed(() => [
 
 // Charger les offres de covoiturage
 const { data: carpoolOffers, refresh: refreshOffers } = await useFetch(
-  `/api/editions/${props.conventionId}/carpool-offers`
+  `/api/editions/${props.editionId}/carpool-offers`
 );
 
 // Charger les demandes de covoiturage
 const { data: carpoolRequests, refresh: refreshRequests } = await useFetch(
-  `/api/editions/${props.conventionId}/carpool-requests`
+  `/api/editions/${props.editionId}/carpool-requests`
 );
 
 // Computed pour s'assurer que les données sont des tableaux

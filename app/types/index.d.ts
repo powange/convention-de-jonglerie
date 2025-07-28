@@ -63,8 +63,16 @@ export interface Edition {
   collaborators?: ConventionCollaborator[];
 }
 
-// Alias temporaire pour la compatibilité
-export type Convention = Edition;
+export interface Convention {
+  id: number;
+  name: string;
+  description?: string | null;
+  logo?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  authorId: number;
+  author?: User;
+}
 
 export interface ConventionCollaborator {
   id: number;

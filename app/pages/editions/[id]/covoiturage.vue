@@ -1,14 +1,14 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>Chargement des détails de la convention...</p>
+      <p>Chargement des détails de l'édition...</p>
     </div>
     <div v-else-if="!edition">
-      <p>Convention introuvable.</p>
+      <p>Édition introuvable.</p>
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <ConventionHeader 
+      <EditionHeader 
         :convention="edition" 
         current-page="covoiturage" 
         :is-favorited="isFavorited(edition.id)"
@@ -16,7 +16,7 @@
       />
       
       <!-- Contenu du covoiturage -->
-      <CarpoolSection :convention-id="edition.id" />
+      <CarpoolSection :edition-id="edition.id" />
     </div>
   </div>
 </template>
@@ -26,8 +26,8 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
-import CarpoolSection from '~/components/convention/CarpoolSection.vue';
-import ConventionHeader from '~/components/convention/ConventionHeader.vue';
+import CarpoolSection from '~/components/edition/CarpoolSection.vue';
+import EditionHeader from '~/components/edition/EditionHeader.vue';
 
 // TODO: Ajouter le middleware d'authentification plus tard
 // definePageMeta({
@@ -49,7 +49,7 @@ const isFavorited = computed(() => (_editionId: number) => {
 const toggleFavorite = async (id: number) => {
   try {
     await editionStore.toggleFavorite(id);
-    // Recharger la convention pour mettre à jour l'état des favoris
+    // Recharger l'édition pour mettre à jour l'état des favoris
     edition.value = await editionStore.fetchEditionById(conventionId);
     toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'green' });
   } catch (e: unknown) {
@@ -67,7 +67,7 @@ onMounted(async () => {
   try {
     edition.value = await editionStore.fetchEditionById(conventionId);
   } catch (error) {
-    console.error('Failed to fetch convention:', error);
+    console.error('Failed to fetch edition:', error);
   }
 });
 </script>

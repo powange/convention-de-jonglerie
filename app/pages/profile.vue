@@ -40,7 +40,7 @@
             <UInput v-model="state.email" type="email" required placeholder="votre.email@example.com" size="lg" />
           </UFormField>
           
-          <UFormField label="Pseudo" name="pseudo" hint="Visible publiquement sur vos conventions">
+          <UFormField label="Pseudo" name="pseudo" hint="Visible publiquement par les autres utilisateurs">
             <UInput v-model="state.pseudo" required placeholder="Votre pseudo unique" size="lg" />
           </UFormField>
           
@@ -345,20 +345,20 @@ const hasChanges = computed(() => {
 // Statistiques calculées
 const myConventionsCount = computed(() => {
   return editionStore.editions.filter(
-    convention => convention.creatorId === authStore.user?.id
+    edition => edition.creatorId === authStore.user?.id
   ).length;
 });
 
 const favoritesCount = computed(() => {
   return editionStore.editions.filter(
-    convention => convention.favoritedBy.some(user => user.id === authStore.user?.id)
+    edition => edition.favoritedBy.some(user => user.id === authStore.user?.id)
   ).length;
 });
 
 const totalFavoritesReceived = computed(() => {
   return editionStore.editions
-    .filter(convention => convention.creatorId === authStore.user?.id)
-    .reduce((total, convention) => total + convention.favoritedBy.length, 0);
+    .filter(edition => edition.creatorId === authStore.user?.id)
+    .reduce((total, edition) => total + edition.favoritedBy.length, 0);
 });
 
 const resetForm = () => {
