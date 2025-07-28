@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
+import { copyToOutputPublic } from './copy-to-output';
 
 /**
  * Déplace une image temporaire vers le dossier final de l'édition
@@ -34,6 +35,9 @@ export async function moveTempImageToConvention(tempImageUrl: string, convention
     
     // Déplacer le fichier
     await fs.rename(tempPath, newPath);
+    
+    // Copier vers .output/public en production
+    await copyToOutputPublic(`uploads/editions/${conventionId}/${newFilename}`);
     
     // Retourner la nouvelle URL
     return `/uploads/editions/${conventionId}/${newFilename}`;

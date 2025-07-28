@@ -1,6 +1,7 @@
 import { createWriteStream } from 'fs';
 import { mkdir } from 'fs/promises';
 import { join } from 'path';
+import { copyToOutputPublic } from '../../utils/copy-to-output';
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) {
@@ -60,6 +61,19 @@ export default defineEventHandler(async (event) => {
     const writeStream = createWriteStream(filePath);
     writeStream.write(file.data);
     writeStream.end();
+    
+    // Attendre que l'écriture soit terminée
+    await new Promise((resolve, reject) => {
+      writeStream.on('finish', resolve);
+      writeStream.on('error', reject);
+    });
+    
+    // Copier vers .output/public en production
+    if (conventionId) {
+      await copyToOutputPublic(`uploads/conventions/${conventionId}/${fileName}`);
+    } else {
+      await copyToOutputPublic(`uploads/temp/${fileName}`);
+    }
     
     return {
       success: true,

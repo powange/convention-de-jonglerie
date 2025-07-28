@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { copyToOutputPublic } from '../../../utils/copy-to-output';
 
 const prisma = new PrismaClient();
 
@@ -90,6 +91,9 @@ export default defineEventHandler(async (event) => {
     // Sauvegarder le fichier
     const filePath = join(uploadDir, filename);
     await writeFile(filePath, file.data);
+
+    // Copier vers .output/public en production
+    await copyToOutputPublic(`uploads/conventions/${conventionId}/${filename}`);
 
     // Construire l'URL publique
     const imageUrl = `/uploads/conventions/${conventionId}/${filename}`;

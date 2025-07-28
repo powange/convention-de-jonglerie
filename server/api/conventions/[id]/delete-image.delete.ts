@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { unlink } from 'node:fs/promises';
-import { join } from 'node:path';
+import { deleteFromBothLocations } from '../../../utils/copy-to-output';
 
 const prisma = new PrismaClient();
 
@@ -50,12 +49,16 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Supprimer le fichier physique s'il existe
+    // Supprimer le fichier physique des deux emplacements
     try {
-      const filePath = join(process.cwd(), 'public', convention.logo);
-      await unlink(filePath);
+      // Extraire le chemin relatif (enlever le slash initial)
+      const relativePath = convention.logo.startsWith('/') 
+        ? convention.logo.substring(1) 
+        : convention.logo;
+      
+      await deleteFromBothLocations(relativePath);
     } catch (fileError) {
-      console.warn('Fichier image introuvable ou déjà supprimé:', fileError);
+      console.warn('Erreur lors de la suppression du fichier:', fileError);
       // On continue même si le fichier n'existe pas
     }
 
