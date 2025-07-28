@@ -30,7 +30,7 @@
             <div class="flex items-center justify-between w-full">
               <div class="flex items-center gap-3">
                 <div v-if="convention.logo" class="flex-shrink-0">
-                  <img :src="convention.logo" :alt="convention.name" class="w-12 h-12 object-cover rounded-lg" >
+                  <NuxtImg :src="convention.logo" :alt="convention.name" class="w-12 h-12 object-cover rounded-lg" />
                 </div>
                 <div v-else class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
                   <UIcon name="i-heroicons-building-library" class="text-gray-400" size="20" />
@@ -113,6 +113,7 @@ import type { Convention } from '~/types';
 import { getEditionDisplayNameWithConvention } from '~/utils/editionName';
 
 const UButton = resolveComponent('UButton')
+const NuxtImg = resolveComponent('NuxtImg')
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -151,7 +152,7 @@ const getEditionsColumns = () => [
       
       return h('div', { class: 'flex items-center gap-2' }, [
         edition.imageUrl 
-          ? h('img', { 
+          ? h(NuxtImg, { 
               src: edition.imageUrl, 
               alt: displayName, 
               class: 'w-8 h-8 object-cover rounded flex-shrink-0' 
