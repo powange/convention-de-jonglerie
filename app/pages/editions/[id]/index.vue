@@ -22,7 +22,12 @@
           <!-- Affiche de l'édition et description -->
           <div class="flex gap-6">
             <div v-if="edition.imageUrl" class="flex-shrink-0">
-              <img :src="edition.imageUrl" :alt="`Affiche de ${getEditionDisplayName(edition)}`" class="w-48 h-48 object-cover rounded-lg shadow-lg" >
+              <img 
+                :src="edition.imageUrl" 
+                :alt="`Affiche de ${getEditionDisplayName(edition)}`" 
+                class="w-48 h-48 object-cover rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity" 
+                @click="showImageOverlay = true"
+              >
             </div>
             <div class="flex-1">
               <h3 class="text-lg font-semibold mb-2">À propos de cette édition</h3>
@@ -92,6 +97,41 @@
         </div>
       </UCard>
     </div>
+    
+    <!-- Overlay pour l'affiche en grand -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-opacity duration-300"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-300"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div 
+          v-if="showImageOverlay && edition?.imageUrl" 
+          class="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center p-4"
+          @click="showImageOverlay = false"
+        >
+          <div class="relative max-w-6xl max-h-[90vh]">
+            <img 
+              :src="edition.imageUrl" 
+              :alt="`Affiche de ${getEditionDisplayName(edition)}`" 
+              class="max-w-full max-h-[90vh] object-contain rounded-lg"
+              @click.stop
+            >
+            <UButton
+              icon="i-heroicons-x-mark"
+              color="white"
+              variant="ghost"
+              size="lg"
+              class="absolute top-4 right-4"
+              @click="showImageOverlay = false"
+            />
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -111,6 +151,7 @@ const { servicesByCategory } = useConventionServices();
 
 const editionId = parseInt(route.params.id as string);
 const edition = ref(null);
+const showImageOverlay = ref(false);
 
 onMounted(async () => {
   try {
