@@ -41,6 +41,7 @@
                   required 
                   placeholder="Votre prénom"
                   icon="i-heroicons-user"
+                  class="w-full"
                 />
               </UFormField>
               <UFormField label="Nom" name="nom">
@@ -49,6 +50,7 @@
                   required 
                   placeholder="Votre nom"
                   icon="i-heroicons-user"
+                  class="w-full"
                 />
               </UFormField>
             </div>
@@ -67,6 +69,7 @@
                 required 
                 placeholder="votre.email@example.com"
                 icon="i-heroicons-envelope"
+                class="w-full"
               />
             </UFormField>
             
@@ -76,6 +79,7 @@
                 required 
                 placeholder="Votre pseudo unique"
                 icon="i-heroicons-at-symbol"
+                class="w-full"
               />
             </UFormField>
           </div>
@@ -93,6 +97,7 @@
                 required 
                 placeholder="Choisissez un mot de passe sécurisé"
                 icon="i-heroicons-lock-closed"
+                class="w-full"
               />
               <!-- Indicateur de force du mot de passe -->
               <div v-if="state.password" class="mt-2">
@@ -117,6 +122,7 @@
                 required 
                 placeholder="Confirmez votre mot de passe"
                 icon="i-heroicons-shield-check"
+                class="w-full"
               />
             </UFormField>
           </div>

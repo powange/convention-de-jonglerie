@@ -21,6 +21,7 @@
                 required 
                 placeholder="votre.email@example.com ou votre pseudo"
                 icon="i-heroicons-user"
+                class="w-full"
               />
             </UFormField>
             
@@ -31,6 +32,7 @@
                 required 
                 placeholder="Votre mot de passe"
                 icon="i-heroicons-lock-closed"
+                class="w-full"
               />
             </UFormField>
           </div>
