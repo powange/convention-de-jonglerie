@@ -1,13 +1,14 @@
 <template>
   <div class="space-y-6">
     <!-- Boutons d'actions (uniquement pour les utilisateurs connectés) -->
-    <div v-if="authStore.isAuthenticated" class="flex gap-4 justify-center">
+    <div v-if="authStore.isAuthenticated" class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
       <!-- Bouton pour proposer un covoiturage -->
       <UButton
         label="Proposer un covoiturage"
         icon="i-heroicons-plus"
         color="primary"
         size="lg"
+        class="w-full sm:w-auto"
         @click="showOfferModal = true"
       />
       
@@ -18,6 +19,7 @@
         color="primary"
         variant="soft"
         size="lg"
+        class="w-full sm:w-auto"
         @click="showRequestModal = true"
       />
     </div>
@@ -134,6 +136,9 @@ interface Props {
 const props = defineProps<Props>();
 const authStore = useAuthStore();
 
+// Détection de la taille d'écran
+const isSmallScreen = ref(false);
+
 // États des modals
 const showOfferModal = ref(false);
 const showRequestModal = ref(false);
@@ -147,13 +152,13 @@ const editingRequest = ref(null);
 const tabs = computed(() => [
   {
     value: 'offers',
-    label: `Offres de covoiturage (${offers.value.length})`,
+    label: `Offres${isSmallScreen.value ? '' : ' de covoiturage'} (${offers.value.length})`,
     icon: 'i-heroicons-truck',
     slot: 'offers',
   },
   {
     value: 'requests',
-    label: `Demandes de covoiturage (${requests.value.length})`,
+    label: `Demandes${isSmallScreen.value ? '' : ' de covoiturage'} (${requests.value.length})`,
     icon: 'i-heroicons-magnifying-glass',
     slot: 'requests',
   },
@@ -172,6 +177,27 @@ const { data: carpoolRequests, refresh: refreshRequests } = await useFetch(
 // Computed pour s'assurer que les données sont des tableaux
 const offers = computed(() => Array.isArray(carpoolOffers.value) ? carpoolOffers.value : []);
 const requests = computed(() => Array.isArray(carpoolRequests.value) ? carpoolRequests.value : []);
+
+// Fonction pour vérifier la taille d'écran
+const checkScreenSize = () => {
+  if (process.client) {
+    isSmallScreen.value = window.innerWidth < 640;
+  }
+};
+
+// Initialiser et écouter les changements de taille
+onMounted(() => {
+  checkScreenSize();
+  if (process.client) {
+    window.addEventListener('resize', checkScreenSize);
+  }
+});
+
+onUnmounted(() => {
+  if (process.client) {
+    window.removeEventListener('resize', checkScreenSize);
+  }
+});
 
 const onOfferCreated = () => {
   console.log('onOfferCreated appelé');
