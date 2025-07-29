@@ -9,7 +9,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "geocode": "node scripts/run-geocoding.mjs"
   },
   "dependencies": {
     "@nuxt/eslint": "^1.7.1",

@@ -34,6 +34,8 @@ export interface Edition {
   city: string;
   region?: string;
   country: string;
+  latitude?: number | null;
+  longitude?: number | null;
   ticketingUrl?: string;
   facebookUrl?: string;
   instagramUrl?: string;

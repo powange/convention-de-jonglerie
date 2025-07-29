@@ -1,6 +1,7 @@
 import { moveTempImageToEdition } from '../../utils/move-temp-image';
 import { prisma } from '../../utils/prisma';
 import { editionSchema, validateAndSanitize, handleValidationError } from '../../utils/validation-schemas';
+import { geocodeEdition } from '../../utils/geocoding';
 import { z } from 'zod';
 
 
@@ -53,6 +54,15 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
+    // Géocoder l'adresse pour obtenir les coordonnées
+    const geoCoords = await geocodeEdition({
+      addressLine1,
+      addressLine2,
+      city,
+      postalCode,
+      country
+    });
+
     // Créer l'édition sans l'image d'abord
     const edition = await prisma.edition.create({
       data: {
@@ -68,6 +78,8 @@ export default defineEventHandler(async (event) => {
         city,
         region,
         country,
+        latitude: geoCoords.latitude,
+        longitude: geoCoords.longitude,
         ticketingUrl,
         facebookUrl,
         instagramUrl,

@@ -49,6 +49,8 @@ model Edition {
   country              String
   postalCode           String
   region               String?
+  latitude             Float?
+  longitude            Float?
   facebookUrl          String?
   instagramUrl         String?
   ticketingUrl         String?

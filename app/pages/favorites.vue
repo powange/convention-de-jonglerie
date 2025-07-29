@@ -30,9 +30,34 @@
     </div>
 
     <div v-else>
-      <p class="text-gray-600 mb-4">{{ favoriteEditions.length }} édition{{ favoriteEditions.length > 1 ? 's' : '' }} en favoris</p>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+        <p class="text-gray-600 mb-4 lg:mb-0">{{ favoriteEditions.length }} édition{{ favoriteEditions.length > 1 ? 's' : '' }} en favoris</p>
+        
+        <!-- Boutons de vue -->
+        <div class="flex gap-2">
+          <UButton
+            :color="viewMode === 'grid' ? 'primary' : 'gray'"
+            :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
+            icon="i-heroicons-squares-2x2"
+            size="sm"
+            @click="viewMode = 'grid'"
+          >
+            Grille
+          </UButton>
+          <UButton
+            :color="viewMode === 'map' ? 'primary' : 'gray'"
+            :variant="viewMode === 'map' ? 'solid' : 'ghost'"
+            icon="i-heroicons-map"
+            size="sm"
+            @click="viewMode = 'map'"
+          >
+            Carte
+          </UButton>
+        </div>
+      </div>
+
+      <!-- Vue en grille (par défaut) -->
+      <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <EditionCard 
           v-for="edition in favoriteEditions" 
           :key="edition.id" 
@@ -50,6 +75,11 @@
             />
           </template>
         </EditionCard>
+      </div>
+
+      <!-- Vue en carte -->
+      <div v-else-if="viewMode === 'map'">
+        <FavoritesMap :editions="favoriteEditions" />
       </div>
     </div>
   </div>
@@ -70,6 +100,7 @@ const editionStore = useEditionStore();
 const toast = useToast();
 
 const loading = ref(true);
+const viewMode = ref<'grid' | 'map'>('grid');
 
 // Calculer les éditions favorites de l'utilisateur
 const favoriteEditions = computed(() => {

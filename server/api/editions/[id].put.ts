@@ -1,6 +1,7 @@
 import { moveTempImageToEdition } from '../../utils/move-temp-image';
 import { prisma } from '../../utils/prisma';
 import { updateEditionSchema, validateAndSanitize, handleValidationError } from '../../utils/validation-schemas';
+import { geocodeEdition } from '../../utils/geocoding';
 import { z } from 'zod';
 
 import type { Edition } from '~/types';
@@ -152,6 +153,23 @@ export default defineEventHandler(async (event) => {
     if (hasWorkshops !== undefined) updatedData.hasWorkshops = hasWorkshops;
     if (hasCreditCardPayment !== undefined) updatedData.hasCreditCardPayment = hasCreditCardPayment;
     if (hasAfjTokenPayment !== undefined) updatedData.hasAfjTokenPayment = hasAfjTokenPayment;
+
+    // Si l'adresse a été modifiée, recalculer les coordonnées
+    const addressChanged = addressLine1 !== undefined || addressLine2 !== undefined || 
+                          city !== undefined || postalCode !== undefined || country !== undefined;
+    
+    if (addressChanged) {
+      const geoCoords = await geocodeEdition({
+        addressLine1: addressLine1 || edition.addressLine1,
+        addressLine2: addressLine2 !== undefined ? addressLine2 : edition.addressLine2,
+        city: city || edition.city,
+        postalCode: postalCode || edition.postalCode,
+        country: country || edition.country
+      });
+      
+      updatedData.latitude = geoCoords.latitude;
+      updatedData.longitude = geoCoords.longitude;
+    }
 
     const updatedEdition = await prisma.edition.update({
       where: {
