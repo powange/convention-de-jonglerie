@@ -31,17 +31,24 @@
       
       <!-- Légende et contrôles -->
       <div class="absolute top-4 right-4 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-[1000] space-y-2">
-        <div v-if="authStore.isAuthenticated" class="flex items-center gap-2 text-sm">
-          <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
-          <span class="text-gray-700 dark:text-gray-300">Mes favoris</span>
+        <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Statut temporel :</div>
+        <div class="flex items-center gap-2 text-sm">
+          <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+          <span class="text-gray-700 dark:text-gray-300">En cours</span>
         </div>
         <div class="flex items-center gap-2 text-sm">
           <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-          <span class="text-gray-700 dark:text-gray-300">Éditions à venir</span>
+          <span class="text-gray-700 dark:text-gray-300">À venir</span>
         </div>
         <div class="flex items-center gap-2 text-sm">
           <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
-          <span class="text-gray-700 dark:text-gray-300">Éditions passées</span>
+          <span class="text-gray-700 dark:text-gray-300">Passées</span>
+        </div>
+        <div v-if="authStore.isAuthenticated" class="pt-2 border-t border-gray-200 dark:border-gray-600">
+          <div class="flex items-center gap-2 text-sm">
+            <div class="w-3 h-3 rounded-full border-2 border-yellow-500 bg-transparent"></div>
+            <span class="text-gray-700 dark:text-gray-300">Contour jaune = Favori</span>
+          </div>
         </div>
       </div>
     </div>
@@ -52,6 +59,7 @@
 import type { Edition } from '~/types';
 import { getEditionDisplayName } from '~/utils/editionName';
 import { useAuthStore } from '~/stores/auth';
+import { createCustomMarkerIcon, getEditionStatus } from '~/utils/mapMarkers';
 
 // Déclaration de type pour Leaflet global
 declare global {
@@ -161,36 +169,14 @@ const initMap = async () => {
     // Ajouter un marqueur pour chaque édition
     editionsWithCoordinates.value.forEach(edition => {
       if (edition.latitude && edition.longitude) {
-        const startDate = new Date(edition.startDate);
-        const isUpcoming = startDate >= now;
         const isFav = isFavorited(edition);
+        const status = getEditionStatus(edition.startDate, edition.endDate);
         
-        // Déterminer la couleur de l'icône (priorité aux favoris)
-        let iconUrl, iconRetinaUrl;
-        
-        if (isFav) {
-          // Marqueur jaune/doré pour les favoris
-          iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-gold.png';
-          iconRetinaUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png';
-        } else if (isUpcoming) {
-          // Marqueur bleu pour les éditions à venir
-          iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png';
-          iconRetinaUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png';
-        } else {
-          // Marqueur gris pour les éditions passées
-          iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png';
-          iconRetinaUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png';
-        }
-
-        // Créer l'icône
-        const icon = L.icon({
-          iconUrl: iconUrl,
-          iconRetinaUrl: iconRetinaUrl,
-          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowSize: [41, 41]
+        // Créer l'icône personnalisée
+        const icon = createCustomMarkerIcon(L, {
+          isUpcoming: status.isUpcoming,
+          isOngoing: status.isOngoing,
+          isFavorite: isFav
         });
 
         const marker = L.marker([edition.latitude, edition.longitude], { icon });

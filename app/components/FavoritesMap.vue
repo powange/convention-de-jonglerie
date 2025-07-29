@@ -26,10 +26,25 @@
       </div>
       
       <!-- Légende -->
-      <div class="absolute top-4 right-4 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-[1000]">
+      <div class="absolute top-4 right-4 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-[1000] space-y-2">
+        <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Statut temporel :</div>
         <div class="flex items-center gap-2 text-sm">
-          <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-          <span class="text-gray-700 dark:text-gray-300">Éditions favorites</span>
+          <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+          <span class="text-gray-700 dark:text-gray-300">En cours</span>
+        </div>
+        <div class="flex items-center gap-2 text-sm">
+          <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+          <span class="text-gray-700 dark:text-gray-300">À venir</span>
+        </div>
+        <div class="flex items-center gap-2 text-sm">
+          <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
+          <span class="text-gray-700 dark:text-gray-300">Passées</span>
+        </div>
+        <div class="pt-2 border-t border-gray-200 dark:border-gray-600">
+          <div class="flex items-center gap-2 text-sm">
+            <div class="w-3 h-3 rounded-full border-2 border-yellow-500 bg-transparent"></div>
+            <span class="text-gray-700 dark:text-gray-300">Toutes sont favorites</span>
+          </div>
         </div>
       </div>
     </div>
@@ -39,6 +54,7 @@
 <script setup lang="ts">
 import type { Edition } from '~/types';
 import { getEditionDisplayName } from '~/utils/editionName';
+import { createCustomMarkerIcon, getEditionStatus } from '~/utils/mapMarkers';
 
 // Déclaration de type pour Leaflet global
 declare global {
@@ -142,18 +158,16 @@ const initMap = async () => {
     // Ajouter un marqueur pour chaque édition
     upcomingFavorites.value.forEach(edition => {
       if (edition.latitude && edition.longitude) {
-        // Créer une icône personnalisée rouge
-        const redIcon = L.icon({
-          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-          iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowSize: [41, 41]
+        const status = getEditionStatus(edition.startDate, edition.endDate);
+        
+        // Créer l'icône personnalisée (toutes les éditions sont favorites ici)
+        const icon = createCustomMarkerIcon(L, {
+          isUpcoming: status.isUpcoming,
+          isOngoing: status.isOngoing,
+          isFavorite: true // Toutes les éditions dans favoris sont favorites
         });
 
-        const marker = L.marker([edition.latitude, edition.longitude], { icon: redIcon });
+        const marker = L.marker([edition.latitude, edition.longitude], { icon });
         
         // Créer le contenu du popup
         const popupContent = `
