@@ -108,10 +108,6 @@
             </div>
           </div>
           
-          <UFormField label="Description" name="description" :error="getDescriptionError()">
-            <UTextarea v-model="state.description" placeholder="Description de la convention" :rows="5" class="w-full" @blur="touchedFields.description = true; trimField('description')" maxlength="1000" />
-          </UFormField>
-          
           <UFormField label="Affiche de la convention (Optionnel)" name="image">
             <div class="space-y-2">
               <div v-if="state.imageUrl" class="relative">
@@ -143,30 +139,121 @@
             </div>
           </UFormField>
 
-          <UCard>
-            <template #header>
-              <AddressAutocomplete @address-selected="handleAddressSelected" />
-            </template>
-
-            <UFormField label="Adresse Ligne 1" name="addressLine1" required :error="touchedFields.addressStreet && !state.addressLine1 ? 'Adresse requise' : undefined">
-              <UInput v-model="state.addressLine1" required placeholder="Adresse principale" size="lg" class="w-full" @blur="touchedFields.addressStreet = true; trimField('addressLine1')" />
-            </UFormField>
-            <UFormField label="Adresse Ligne 2" name="addressLine2">
-              <UInput v-model="state.addressLine2" placeholder="Complément d'adresse (optionnel)" size="lg" class="w-full" @blur="trimField('addressLine2')" />
-            </UFormField>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <UFormField label="Code Postal" name="postalCode" required :error="touchedFields.addressZipCode && !state.postalCode ? 'Le code postal est requis' : undefined" class="md:col-span-1">
-                <UInput v-model="state.postalCode" required placeholder="75001" size="lg" @blur="touchedFields.addressZipCode = true; trimField('postalCode')" />
-              </UFormField>
-              <UFormField label="Ville" name="city" required :error="touchedFields.addressCity && !state.city ? 'La ville est requise' : undefined" class="md:col-span-1">
-                <UInput v-model="state.city" required placeholder="Paris" size="lg" @blur="touchedFields.addressCity = true; trimField('city')" />
-              </UFormField>
-              <UFormField label="Pays" name="country" required :error="touchedFields.addressCountry && !state.country ? 'Le pays est requis' : undefined" class="md:col-span-1">
-                <UInput v-model="state.country" required placeholder="France" size="lg" @blur="touchedFields.addressCountry = true; trimField('country')" />
-              </UFormField>
+          <div class="space-y-4">
+            <div class="flex items-center gap-2 mb-2">
+              <UIcon name="i-heroicons-map-pin" class="text-primary-500" />
+              <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300">Adresse du lieu</h4>
             </div>
             
-          </UCard>
+            <UAlert
+              icon="i-heroicons-light-bulb"
+              color="blue"
+              variant="soft"
+              title="Conseil"
+              description="Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte."
+            />
+            
+            <UCard>
+              <template #header>
+                <AddressAutocomplete @address-selected="handleAddressSelected" />
+              </template>
+
+              <div class="space-y-4">
+                <UFormField label="Adresse" name="addressLine1" required :error="touchedFields.addressStreet && !state.addressLine1 ? 'L\'adresse est requise' : undefined">
+                  <UInput 
+                    v-model="state.addressLine1" 
+                    required 
+                    placeholder="123 rue de la Jonglerie" 
+                    size="lg" 
+                    class="w-full" 
+                    @blur="touchedFields.addressStreet = true; trimField('addressLine1')"
+                  >
+                    <template #leading>
+                      <UIcon name="i-heroicons-home" />
+                    </template>
+                  </UInput>
+                </UFormField>
+                
+                <UFormField label="Complément d'adresse" name="addressLine2">
+                  <UInput 
+                    v-model="state.addressLine2" 
+                    placeholder="Bâtiment A, Salle des fêtes..." 
+                    size="lg" 
+                    class="w-full" 
+                    @blur="trimField('addressLine2')"
+                  >
+                    <template #leading>
+                      <UIcon name="i-heroicons-building-office-2" />
+                    </template>
+                  </UInput>
+                </UFormField>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <UFormField label="Code postal" name="postalCode" required :error="touchedFields.addressZipCode && !state.postalCode ? 'Requis' : undefined" class="col-span-1">
+                    <UInput 
+                      v-model="state.postalCode" 
+                      required 
+                      placeholder="75001" 
+                      size="lg"
+                      pattern="[0-9]{5}"
+                      maxlength="5"
+                      @blur="touchedFields.addressZipCode = true; trimField('postalCode')" 
+                    />
+                  </UFormField>
+                  
+                  <UFormField label="Ville" name="city" required :error="touchedFields.addressCity && !state.city ? 'Requise' : undefined" class="col-span-1 md:col-span-2">
+                    <UInput 
+                      v-model="state.city" 
+                      required 
+                      placeholder="Paris" 
+                      size="lg" 
+                      @blur="touchedFields.addressCity = true; trimField('city')" 
+                    />
+                  </UFormField>
+                  
+                  <UFormField label="Pays" name="country" required :error="touchedFields.addressCountry && !state.country ? 'Requis' : undefined" class="col-span-2 md:col-span-1">
+                    <UInput
+                      v-if="showCustomCountry"
+                      v-model="state.country"
+                      required
+                      placeholder="Nom du pays"
+                      size="lg"
+                      @blur="touchedFields.addressCountry = true; trimField('country')"
+                    >
+                      <template #leading>
+                        <UIcon name="i-heroicons-globe-europe-africa" />
+                      </template>
+                      <template #trailing>
+                        <UButton
+                          icon="i-heroicons-x-mark"
+                          color="gray"
+                          variant="link"
+                          size="xs"
+                          @click="showCustomCountry = false; state.country = 'France'"
+                        />
+                      </template>
+                    </UInput>
+                    <USelect
+                      v-else
+                      v-model="state.country"
+                      :items="countryOptions"
+                      placeholder="Sélectionner"
+                      size="lg"
+                      @change="handleCountryChange"
+                    >
+                      <template #leading>
+                        <UIcon name="i-heroicons-globe-europe-africa" />
+                      </template>
+                    </USelect>
+                  </UFormField>
+                </div>
+              </div>
+            </UCard>
+          </div>
+          
+          <UFormField label="Description" name="description" :error="getDescriptionError()">
+            <UTextarea v-model="state.description" placeholder="Description de la convention" :rows="5" class="w-full" @blur="touchedFields.description = true; trimField('description')" maxlength="1000" />
+          </UFormField>
         </div>
       </template>
 
@@ -345,6 +432,7 @@ const toast = useToast();
 const { servicesByCategory } = useConventionServices();
 const authStore = useAuthStore();
 const { normalizeImageUrl } = useImageUrl();
+const showCustomCountry = ref(false);
 
 // Date formatter pour l'affichage
 const df = new DateFormatter('fr-FR', { dateStyle: 'medium' });
@@ -356,6 +444,26 @@ const calendarEndDate = ref<CalendarDate | null>(null);
 // Heures séparées
 const startTime = ref('09:00');
 const endTime = ref('18:00');
+
+// Options de pays les plus courants pour les conventions de jonglerie
+const countryOptions = [
+  { label: 'France', value: 'France' },
+  { label: 'Belgique', value: 'Belgique' },
+  { label: 'Suisse', value: 'Suisse' },
+  { label: 'Allemagne', value: 'Allemagne' },
+  { label: 'Pays-Bas', value: 'Pays-Bas' },
+  { label: 'Italie', value: 'Italie' },
+  { label: 'Espagne', value: 'Espagne' },
+  { label: 'Royaume-Uni', value: 'Royaume-Uni' },
+  { label: 'Luxembourg', value: 'Luxembourg' },
+  { label: 'Autriche', value: 'Autriche' },
+  { label: 'Portugal', value: 'Portugal' },
+  { label: 'Pologne', value: 'Pologne' },
+  { label: 'République Tchèque', value: 'République Tchèque' },
+  { label: 'Canada', value: 'Canada' },
+  { label: 'États-Unis', value: 'États-Unis' },
+  { label: 'Autre', value: 'Autre' }
+];
 
 // Options d'heures (de 00:00 à 23:30 par intervalles de 30 min)
 const timeOptions = computed(() => {
@@ -627,6 +735,23 @@ const handleAddressSelected = (address: {
   state.city = address.city;
   state.region = address.region || '';
   state.country = address.country;
+  
+  // Vérifier si le pays est dans la liste
+  const countryExists = countryOptions.some(option => option.value === address.country);
+  showCustomCountry.value = !countryExists && address.country !== '';
+};
+
+const handleCountryChange = (value: string) => {
+  touchedFields.addressCountry = true;
+  if (value === 'Autre') {
+    showCustomCountry.value = true;
+    state.country = '';
+    // Focus sur le champ personnalisé après le prochain tick
+    nextTick(() => {
+      const input = document.querySelector('input[name="country"]') as HTMLInputElement;
+      if (input) input.focus();
+    });
+  }
 };
 
 const handleSubmit = () => {
