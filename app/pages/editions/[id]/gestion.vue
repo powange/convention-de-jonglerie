@@ -26,31 +26,57 @@
       
       <!-- Contenu de gestion -->
       <div class="space-y-6">
-        <UCard>
         <!-- Actions de gestion -->
-        <div class="space-y-4">
-          <h3 class="text-lg font-semibold">Actions</h3>
-          <div class="flex gap-2">
-            <UButton
-              v-if="canEdit"
-              icon="i-heroicons-pencil"
-              color="warning"
-              :to="`/editions/${edition.id}/edit`"
-            >
-              Modifier l'édition
-            </UButton>
-            <UButton
-              v-if="canDelete"
-              icon="i-heroicons-trash"
-              color="error"
-              variant="soft"
-              @click="deleteEdition(edition.id)"
-            >
-              Supprimer l'édition
-            </UButton>
+        <UCard>
+          <div class="space-y-4">
+            <h3 class="text-lg font-semibold">Actions</h3>
+            <div class="flex gap-2">
+              <UButton
+                v-if="canEdit"
+                icon="i-heroicons-pencil"
+                color="warning"
+                :to="`/editions/${edition.id}/edit`"
+              >
+                Modifier l'édition
+              </UButton>
+              <UButton
+                v-if="canDelete"
+                icon="i-heroicons-trash"
+                color="error"
+                variant="soft"
+                @click="deleteEdition(edition.id)"
+              >
+                Supprimer l'édition
+              </UButton>
+            </div>
           </div>
-        </div>
-      </UCard>
+        </UCard>
+
+        <!-- Gestion des bénévoles -->
+        <UCard>
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-users" class="text-primary-500" />
+              <h3 class="text-lg font-semibold">Gestion des bénévoles</h3>
+            </div>
+            
+            <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div class="flex items-start gap-3">
+                <UIcon name="i-heroicons-information-circle" class="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" size="20" />
+                <div class="space-y-2">
+                  <h4 class="text-sm font-medium text-blue-900 dark:text-blue-100">Fonctionnalité à venir</h4>
+                  <p class="text-sm text-blue-800 dark:text-blue-200">
+                    La gestion des bénévoles permettra de recruter, organiser et coordonner l'équipe de bénévoles pour votre édition. 
+                    Cette fonctionnalité inclura la création de postes, l'inscription des bénévoles, la planification des créneaux et la communication d'équipe.
+                  </p>
+                  <div class="mt-3">
+                    <UBadge color="blue" variant="soft">En développement</UBadge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </UCard>
       </div>
     </div>
   </div>
