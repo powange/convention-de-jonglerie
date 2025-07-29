@@ -13,6 +13,7 @@
     "geocode": "node scripts/run-geocoding.mjs"
   },
   "dependencies": {
+    "@internationalized/date": "^3.8.2",
     "@nuxt/eslint": "^1.7.1",
     "@nuxt/image": "^1.10.0",
     "@nuxt/scripts": "^0.11.10",
