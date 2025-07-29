@@ -51,6 +51,19 @@
         </NuxtLink>
         
         <NuxtLink 
+          :to="`/editions/${edition.id}/commentaires`"
+          :class="[
+            'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm',
+            currentPage === 'commentaires' 
+              ? 'border-primary-500 text-primary-600' 
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]"
+        >
+          <UIcon name="i-heroicons-chat-bubble-left-right" class="mr-1" />
+          Commentaires
+        </NuxtLink>
+        
+        <NuxtLink 
           :to="`/editions/${edition.id}/covoiturage`"
           :class="[
             'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm',
@@ -92,7 +105,7 @@ const { normalizeImageUrl } = useImageUrl();
 
 interface Props {
   edition: Edition;
-  currentPage: 'details' | 'covoiturage' | 'gestion';
+  currentPage: 'details' | 'commentaires' | 'covoiturage' | 'gestion';
   isFavorited?: boolean;
 }
 

@@ -41,6 +41,11 @@ export const useEditionStore = defineStore('editions', {
     loading: false,
     error: null as string | null,
   }),
+  getters: {
+    getEditionById: (state) => (id: number) => {
+      return state.editions.find(edition => edition.id === id);
+    }
+  },
   actions: {
     // Filtrer les éditions futures (date de fin >= aujourd'hui)
     filterFutureEditions() {

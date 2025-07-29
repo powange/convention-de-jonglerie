@@ -54,7 +54,10 @@ export default defineEventHandler(async (event) => {
   const isPublicCarpoolOfferComments = path.match(/^\/api\/carpool-offers\/\d+\/comments$/) && requestMethod === 'GET';
   const isPublicCarpoolRequestComments = path.match(/^\/api\/carpool-requests\/\d+\/comments$/) && requestMethod === 'GET';
   
-  if (isPublicCarpoolOffers || isPublicCarpoolRequests || isPublicCarpoolOfferComments || isPublicCarpoolRequestComments) {
+  // Public GET routes pour les posts et commentaires d'édition
+  const isPublicEditionPosts = path.match(/^\/api\/editions\/\d+\/posts$/) && requestMethod === 'GET';
+  
+  if (isPublicCarpoolOffers || isPublicCarpoolRequests || isPublicCarpoolOfferComments || isPublicCarpoolRequestComments || isPublicEditionPosts) {
     return;
   }
 

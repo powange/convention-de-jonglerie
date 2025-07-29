@@ -187,6 +187,15 @@ export const commentSchema = z.object({
   content: z.string().min(1, 'Le commentaire ne peut pas être vide').max(1000, 'Le commentaire ne peut pas dépasser 1000 caractères')
 });
 
+// Schémas de posts et commentaires d'édition
+export const editionPostSchema = z.object({
+  content: z.string().min(1, 'Le contenu ne peut pas être vide').max(2000, 'Le contenu ne peut pas dépasser 2000 caractères')
+});
+
+export const editionPostCommentSchema = z.object({
+  content: z.string().min(1, 'Le commentaire ne peut pas être vide').max(1000, 'Le commentaire ne peut pas dépasser 1000 caractères')
+});
+
 // Schémas de collaborateurs
 export const addCollaboratorSchema = z.object({
   userIdentifier: z.string().min(1, 'Pseudo ou email requis'), // pseudo ou email

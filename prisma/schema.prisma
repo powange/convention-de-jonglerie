@@ -29,6 +29,8 @@ model User {
   carpoolOffers          CarpoolOffer[]
   carpoolRequests        CarpoolRequest[]
   carpoolRequestComments CarpoolRequestComment[]
+  editionPosts           EditionPost[]
+  editionPostComments    EditionPostComment[]
   createdConventions     Convention[]
   addedCollaborators     ConventionCollaborator[] @relation("AddedCollaborators")
   collaborations         ConventionCollaborator[]
@@ -82,6 +84,7 @@ model Edition {
   hasATM               Boolean                  @default(false)
   carpoolOffers        CarpoolOffer[]
   carpoolRequests      CarpoolRequest[]
+  editionPosts         EditionPost[]
   creator              User                     @relation("CreatedEditions", fields: [creatorId], references: [id])
   favoritedBy          User[]                   @relation("FavoriteEditions")
   convention           Convention               @relation(fields: [conventionId], references: [id])
@@ -186,4 +189,33 @@ model Convention {
   collaborators ConventionCollaborator[]
 
   @@index([authorId], map: "Convention_authorId_fkey")
+}
+
+model EditionPost {
+  id          Int              @id @default(autoincrement())
+  editionId   Int
+  userId      Int
+  content     String           @db.Text
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  edition     Edition          @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments    EditionPostComment[]
+
+  @@index([editionId], map: "EditionPost_editionId_fkey")
+  @@index([userId], map: "EditionPost_userId_fkey")
+}
+
+model EditionPostComment {
+  id            Int         @id @default(autoincrement())
+  editionPostId Int
+  userId        Int
+  content       String      @db.Text
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  editionPost   EditionPost @relation(fields: [editionPostId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([editionPostId], map: "EditionPostComment_editionPostId_fkey")
+  @@index([userId], map: "EditionPostComment_userId_fkey")
 }
