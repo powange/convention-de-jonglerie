@@ -41,6 +41,7 @@ export const conventionServices: ConventionService[] = [
   { key: 'hasFireSpace', label: 'Fire space', icon: 'i-heroicons-fire', color: 'text-red-600' },
   { key: 'hasGala', label: 'Gala', icon: 'i-heroicons-sparkles', color: 'text-yellow-500' },
   { key: 'hasOpenStage', label: 'Scène ouverte', icon: 'i-heroicons-microphone', color: 'text-cyan-500' },
+  { key: 'hasLongShow', label: 'Spectacle long', icon: 'i-heroicons-play-circle', color: 'text-purple-600' },
   { key: 'hasConcert', label: 'Concert', icon: 'i-heroicons-musical-note', color: 'text-violet-500' },
   { key: 'hasCantine', label: 'Cantine', icon: 'i-heroicons-cake', color: 'text-amber-500' },
   { key: 'hasAerialSpace', label: 'Espace aérien', icon: 'i-heroicons-cloud', color: 'text-sky-500' },
@@ -51,7 +52,6 @@ export const conventionServices: ConventionService[] = [
   { key: 'hasWorkshops', label: 'Workshops', icon: 'i-heroicons-academic-cap', color: 'text-slate-600' },
   { key: 'hasCreditCardPayment', label: 'Paiement CB', icon: 'i-heroicons-credit-card', color: 'text-emerald-600' },
   { key: 'hasAfjTokenPayment', label: 'Paiement jetons AFJ', icon: 'i-heroicons-currency-dollar', color: 'text-orange-600' },
-  { key: 'hasLongShow', label: 'Spectacle long', icon: 'i-heroicons-play-circle', color: 'text-purple-600' },
   { key: 'hasATM', label: 'Distributeur automatique de billets', icon: 'i-heroicons-banknotes', color: 'text-green-600' },
 ];
 
@@ -87,11 +87,11 @@ export const getServicesGrouped = () => {
         'hasFireSpace',
         'hasGala',
         'hasOpenStage',
+        'hasLongShow',
         'hasConcert',
         'hasWorkshops',
         'hasAerialSpace',
         'hasSlacklineSpace',
-        'hasLongShow',
       ],
     },
     amenities: {
