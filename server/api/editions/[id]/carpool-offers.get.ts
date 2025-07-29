@@ -19,6 +19,14 @@ export default defineEventHandler(async (event) => {
       },
       include: {
         user: true,
+        passengers: {
+          include: {
+            user: true,
+          },
+          orderBy: {
+            addedAt: 'asc',
+          },
+        },
         comments: {
           include: {
             user: true,
@@ -45,6 +53,17 @@ export default defineEventHandler(async (event) => {
         profilePicture: offer.user.profilePicture,
         updatedAt: offer.user.updatedAt,
       },
+      passengers: offer.passengers.map(passenger => ({
+        id: passenger.id,
+        addedAt: passenger.addedAt,
+        user: {
+          id: passenger.user.id,
+          pseudo: passenger.user.pseudo,
+          emailHash: getEmailHash(passenger.user.email),
+          profilePicture: passenger.user.profilePicture,
+          updatedAt: passenger.user.updatedAt,
+        },
+      })),
       comments: offer.comments.map(comment => ({
         ...comment,
         user: {

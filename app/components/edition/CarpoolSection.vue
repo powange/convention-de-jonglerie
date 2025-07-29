@@ -85,6 +85,7 @@
               :key="offer.id"
               :offer="offer"
               @comment-added="refreshOffers"
+              @passenger-added="refreshOffers"
               @edit="editOffer(offer)"
               @deleted="refreshOffers"
             />
