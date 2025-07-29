@@ -34,6 +34,80 @@
               <p class="text-xs text-gray-500">Si aucun nom n'est spécifié, le nom de la convention sera utilisé</p>
             </template>
           </UFormField>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Date de début -->
+            <div class="space-y-4">
+              <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Date et heure de début</h4>
+              <div class="grid grid-cols-2 gap-3">
+                <UFormField label="Date" name="startDate" required :error="getStartDateError()">
+                  <UPopover :popper="{ placement: 'bottom-start' }">
+                    <UButton 
+                      color="neutral" 
+                      variant="outline" 
+                      icon="i-heroicons-calendar-days"
+                      :label="displayStartDate || 'Sélectionner'"
+                      block
+                      size="lg"
+                    />
+                    <template #content>
+                      <UCalendar 
+                        v-model="calendarStartDate" 
+                        class="p-2"
+                        @update:model-value="updateStartDate"
+                      />
+                    </template>
+                  </UPopover>
+                </UFormField>
+                <UFormField label="Heure" name="startTime" required>
+                  <USelect
+                    v-model="startTime"
+                    :items="timeOptions"
+                    placeholder="00:00"
+                    size="lg"
+                    @change="updateStartDateTime"
+                  />
+                </UFormField>
+              </div>
+            </div>
+
+            <!-- Date de fin -->
+            <div class="space-y-4">
+              <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Date et heure de fin</h4>
+              <div class="grid grid-cols-2 gap-3">
+                <UFormField label="Date" name="endDate" required :error="getEndDateError()">
+                  <UPopover :popper="{ placement: 'bottom-start' }">
+                    <UButton 
+                      color="neutral" 
+                      variant="outline" 
+                      icon="i-heroicons-calendar-days"
+                      :label="displayEndDate || 'Sélectionner'"
+                      block
+                      size="lg"
+                    />
+                    <template #content>
+                      <UCalendar 
+                        v-model="calendarEndDate" 
+                        class="p-2"
+                        :is-date-disabled="(date) => calendarStartDate && date < calendarStartDate"
+                        @update:model-value="updateEndDate"
+                      />
+                    </template>
+                  </UPopover>
+                </UFormField>
+                <UFormField label="Heure" name="endTime" required>
+                  <USelect
+                    v-model="endTime"
+                    :items="timeOptions"
+                    placeholder="00:00"
+                    size="lg"
+                    @change="updateEndDateTime"
+                  />
+                </UFormField>
+              </div>
+            </div>
+          </div>
+          
           <UFormField label="Description" name="description" :error="getDescriptionError()">
             <UTextarea v-model="state.description" placeholder="Description de la convention" :rows="5" class="w-full" @blur="touchedFields.description = true; trimField('description')" maxlength="1000" />
           </UFormField>
@@ -68,15 +142,6 @@
               >
             </div>
           </UFormField>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <UFormField label="Date de début" name="startDate" required :error="getStartDateError()">
-              <UInput v-model="state.startDate" type="datetime-local" size="lg" @blur="touchedFields.startDate = true" />
-            </UFormField>
-            <UFormField label="Date de fin" name="endDate" required :error="getEndDateError()">
-              <UInput v-model="state.endDate" type="datetime-local" required size="lg" @blur="touchedFields.endDate = true" />
-            </UFormField>
-          </div>
 
           <UCard>
             <template #header>
@@ -202,6 +267,7 @@
 <script setup lang="ts">
 import { reactive, ref, watch, computed, onMounted, nextTick } from 'vue';
 import AddressAutocomplete from '~/components/AddressAutocomplete.vue';
+import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date';
 import type { StepperItem } from '@nuxt/ui';
 import type { Edition, Convention } from '~/types';
 import { useAuthStore } from '~/stores/auth';
@@ -279,6 +345,40 @@ const toast = useToast();
 const { servicesByCategory } = useConventionServices();
 const authStore = useAuthStore();
 const { normalizeImageUrl } = useImageUrl();
+
+// Date formatter pour l'affichage
+const df = new DateFormatter('fr-FR', { dateStyle: 'medium' });
+
+// CalendarDate objects pour les sélecteurs de date
+const calendarStartDate = ref<CalendarDate | null>(null);
+const calendarEndDate = ref<CalendarDate | null>(null);
+
+// Heures séparées
+const startTime = ref('09:00');
+const endTime = ref('18:00');
+
+// Options d'heures (de 00:00 à 23:30 par intervalles de 30 min)
+const timeOptions = computed(() => {
+  const options = [];
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute of [0, 30]) {
+      const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      options.push({ label: time, value: time });
+    }
+  }
+  return options;
+});
+
+// Affichage des dates sélectionnées
+const displayStartDate = computed(() => {
+  if (!calendarStartDate.value) return '';
+  return df.format(calendarStartDate.value.toDate(getLocalTimeZone()));
+});
+
+const displayEndDate = computed(() => {
+  if (!calendarEndDate.value) return '';
+  return df.format(calendarEndDate.value.toDate(getLocalTimeZone()));
+});
 
 // Gestion des conventions
 const conventions = ref<Convention[]>([]);
@@ -564,7 +664,61 @@ watch(() => state.endDate, () => {
 // Charger les conventions au montage du composant
 onMounted(() => {
   fetchUserConventions();
+  
+  // Initialiser les dates et heures si elles existent
+  if (state.startDate) {
+    const startDateTime = new Date(state.startDate);
+    const year = startDateTime.getFullYear();
+    const month = startDateTime.getMonth() + 1;
+    const day = startDateTime.getDate();
+    calendarStartDate.value = new CalendarDate(year, month, day);
+    startTime.value = `${startDateTime.getHours().toString().padStart(2, '0')}:${startDateTime.getMinutes().toString().padStart(2, '0')}`;
+  }
+  
+  if (state.endDate) {
+    const endDateTime = new Date(state.endDate);
+    const year = endDateTime.getFullYear();
+    const month = endDateTime.getMonth() + 1;
+    const day = endDateTime.getDate();
+    calendarEndDate.value = new CalendarDate(year, month, day);
+    endTime.value = `${endDateTime.getHours().toString().padStart(2, '0')}:${endDateTime.getMinutes().toString().padStart(2, '0')}`;
+  }
 });
+
+// Fonctions pour mettre à jour les dates
+const updateStartDate = (date: CalendarDate | null) => {
+  if (date && startTime.value) {
+    const [hours, minutes] = startTime.value.split(':').map(Number);
+    const dateTime = new Date(date.year, date.month - 1, date.day, hours, minutes);
+    state.startDate = dateTime.toISOString().slice(0, 16);
+    touchedFields.startDate = true;
+  }
+};
+
+const updateEndDate = (date: CalendarDate | null) => {
+  if (date && endTime.value) {
+    const [hours, minutes] = endTime.value.split(':').map(Number);
+    const dateTime = new Date(date.year, date.month - 1, date.day, hours, minutes);
+    state.endDate = dateTime.toISOString().slice(0, 16);
+    touchedFields.endDate = true;
+  }
+};
+
+const updateStartDateTime = () => {
+  if (calendarStartDate.value && startTime.value) {
+    const [hours, minutes] = startTime.value.split(':').map(Number);
+    const dateTime = new Date(calendarStartDate.value.year, calendarStartDate.value.month - 1, calendarStartDate.value.day, hours, minutes);
+    state.startDate = dateTime.toISOString().slice(0, 16);
+  }
+};
+
+const updateEndDateTime = () => {
+  if (calendarEndDate.value && endTime.value) {
+    const [hours, minutes] = endTime.value.split(':').map(Number);
+    const dateTime = new Date(calendarEndDate.value.year, calendarEndDate.value.month - 1, calendarEndDate.value.day, hours, minutes);
+    state.endDate = dateTime.toISOString().slice(0, 16);
+  }
+};
 
 // Watcher pour s'assurer que conventionId est bien défini après le chargement des conventions
 watch([() => conventions.value, () => props.initialData], ([newConventions, newInitialData]) => {
