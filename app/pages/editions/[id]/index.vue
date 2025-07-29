@@ -20,12 +20,12 @@
         
         <template #header>
           <!-- Affiche de l'édition et description -->
-          <div class="flex gap-6">
-            <div v-if="edition.imageUrl" class="flex-shrink-0">
+          <div class="flex flex-col sm:flex-row gap-6">
+            <div v-if="edition.imageUrl" class="flex-shrink-0 self-center sm:self-start">
               <img 
                 :src="normalizeImageUrl(edition.imageUrl)" 
                 :alt="`Affiche de ${getEditionDisplayName(edition)}`" 
-                class="w-48 h-48 object-cover rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity" 
+                class="w-full sm:w-48 h-auto sm:h-48 max-w-xs object-cover rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity" 
                 @click="showImageOverlay = true"
               >
             </div>
