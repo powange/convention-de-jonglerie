@@ -103,10 +103,29 @@
 
     <!-- Contenu principal à droite -->
     <div class="flex-1 min-w-0">
-      <!-- En-tête avec titre et boutons -->
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h1 class="text-3xl font-bold">Conventions de Jonglerie</h1>
-        <div class="flex items-center gap-3">
+      <!-- En-tête avec boutons -->
+      <div class="flex justify-end items-center gap-3 mb-6">
+          <!-- Sélecteur de vue -->
+          <div class="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+            <UButton
+              :color="viewMode === 'grid' ? 'primary' : 'gray'"
+              :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
+              icon="i-heroicons-squares-2x2"
+              size="sm"
+              @click="viewMode = 'grid'"
+            >
+              Grille
+            </UButton>
+            <UButton
+              :color="viewMode === 'map' ? 'primary' : 'gray'"
+              :variant="viewMode === 'map' ? 'solid' : 'ghost'"
+              icon="i-heroicons-map"
+              size="sm"
+              @click="viewMode = 'map'"
+            >
+              Carte
+            </UButton>
+          </div>
           <!-- Bouton filtres sur mobile -->
           <UButton 
             v-if="!showMobileFilters" 
@@ -118,7 +137,6 @@
             class="lg:hidden"
             @click="showMobileFilters = true"
           />
-        </div>
       </div>
 
       <!-- Filtres mobiles en overlay -->
@@ -238,23 +256,31 @@
         <p>Aucune convention trouvée. Soyez le premier à en ajouter une !</p>
       </div>
 
-      <div v-else class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-        <EditionCard 
-          v-for="edition in editionStore.editions" 
-          :key="edition.id" 
-          :edition="edition"
-        >
-          <template #actions="{ edition }">
-            <UButton
-              v-if="authStore.isAuthenticated"
-              :icon="isFavorited(edition.id) ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-              :color="isFavorited(edition.id) ? 'warning' : 'neutral'"
-              variant="ghost"
-              size="sm"
-              @click="toggleFavorite(edition.id)"
-            />
-          </template>
-        </EditionCard>
+      <div v-else>
+        <!-- Vue en grille -->
+        <div v-if="viewMode === 'grid'" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+          <EditionCard 
+            v-for="edition in editionStore.editions" 
+            :key="edition.id" 
+            :edition="edition"
+          >
+            <template #actions="{ edition }">
+              <UButton
+                v-if="authStore.isAuthenticated"
+                :icon="isFavorited(edition.id) ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+                :color="isFavorited(edition.id) ? 'warning' : 'neutral'"
+                variant="ghost"
+                size="sm"
+                @click="toggleFavorite(edition.id)"
+              />
+            </template>
+          </EditionCard>
+        </div>
+
+        <!-- Vue carte -->
+        <div v-else-if="viewMode === 'map'">
+          <HomeMap :editions="editionsWithCoordinates" />
+        </div>
       </div>
     </div>
   </div>
@@ -275,6 +301,7 @@ const router = useRouter();
 
 const showMobileFilters = ref(false);
 const { services, servicesByCategory } = useConventionServices();
+const viewMode = ref<'grid' | 'map'>('grid');
 
 // Date formatter pour l'affichage
 const df = new DateFormatter('fr-FR', { dateStyle: 'medium' });
@@ -373,6 +400,13 @@ onMounted(() => {
 
 const isFavorited = computed(() => (editionId: number) => {
   return editionStore.editions.find(c => c.id === editionId)?.favoritedBy.some(u => u.id === authStore.user?.id);
+});
+
+// Éditions avec coordonnées pour la carte
+const editionsWithCoordinates = computed(() => {
+  return editionStore.editions.filter(edition => 
+    edition.latitude !== null && edition.longitude !== null
+  );
 });
 
 const toggleFavorite = async (id: number) => {
