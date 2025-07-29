@@ -18,39 +18,17 @@
     <!-- Date et heure avec calendrier et select -->
     <div>
       <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Date et heure de départ</h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <UFormField label="Date" name="departureDate" required class="w-full">
-          <UPopover :popper="{ placement: 'bottom-start' }" class="w-full">
-            <UButton 
-              icon="i-heroicons-calendar-days" 
-              size="lg" 
-              color="neutral" 
-              variant="outline"
-              class="w-full justify-start text-left font-normal"
-              :label="calendarDate ? formatDate(calendarDate) : 'Sélectionner une date'"
-              block
-            />
-            <template #content>
-              <UCalendar 
-                v-model="calendarDate" 
-                class="p-2"
-                :is-date-disabled="(date) => date < new Date()"
-                @update:model-value="updateDateTime"
-              />
-            </template>
-          </UPopover>
-        </UFormField>
-        <UFormField label="Heure" name="departureTime" required class="w-full">
-          <USelect
-            v-model="departureTime"
-            :items="timeOptions"
-            placeholder="00:00"
-            size="lg"
-            class="w-full"
-            @change="updateDateTime"
-          />
-        </UFormField>
-      </div>
+      <DateTimePicker
+        v-model="form.departureDate"
+        date-label="Date"
+        time-label="Heure"
+        date-field-name="departureDate"
+        time-field-name="departureTime"
+        placeholder="Sélectionner une date"
+        time-placeholder="00:00"
+        :min-date="new Date()"
+        required
+      />
     </div>
 
     <!-- Ville de départ avec icône -->
@@ -178,7 +156,7 @@
 
 <script setup lang="ts">
 import { useCarpoolForm } from '~/composables/useCarpoolForm';
-import { ref, computed, watch } from 'vue';
+import DateTimePicker from '~/components/ui/DateTimePicker.vue';
 
 interface Props {
   editionId: number;
@@ -191,7 +169,7 @@ const emit = defineEmits<{
 }>();
 
 // Utiliser le composable avec la configuration pour les offres
-const { form, isSubmitting, minDate, trimField, validate, onSubmit } = useCarpoolForm({
+const { form, isSubmitting, trimField, validate, onSubmit } = useCarpoolForm({
   type: 'offer',
   editionId: props.editionId,
   endpoint: `/api/editions/${props.editionId}/carpool-offers`,
@@ -200,54 +178,6 @@ const { form, isSubmitting, minDate, trimField, validate, onSubmit } = useCarpoo
   successDescription: 'Votre offre de covoiturage a été publiée',
   errorDescription: 'Impossible de créer l\'offre de covoiturage',
 });
-
-// Variables pour le calendrier et l'heure
-const calendarDate = ref<Date | null>(null);
-const departureTime = ref('');
-
-// Options d'heures
-const timeOptions = computed(() => {
-  const times = [];
-  for (let hour = 0; hour < 24; hour++) {
-    for (let minute = 0; minute < 60; minute += 30) {
-      const h = hour.toString().padStart(2, '0');
-      const m = minute.toString().padStart(2, '0');
-      times.push(`${h}:${m}`);
-    }
-  }
-  return times;
-});
-
-// Initialiser la date et l'heure depuis le formulaire
-watch(() => form.departureDate, (newDate) => {
-  if (newDate) {
-    const date = new Date(newDate);
-    calendarDate.value = date;
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    departureTime.value = `${hours}:${minutes}`;
-  }
-}, { immediate: true });
-
-// Mettre à jour le formulaire quand la date ou l'heure change
-const updateDateTime = () => {
-  if (calendarDate.value && departureTime.value) {
-    const [hours, minutes] = departureTime.value.split(':');
-    const dateTime = new Date(calendarDate.value);
-    dateTime.setHours(parseInt(hours), parseInt(minutes), 0);
-    form.departureDate = dateTime.toISOString().slice(0, 16);
-  }
-};
-
-// Formater la date pour l'affichage
-const formatDate = (date: Date) => {
-  return new Intl.DateTimeFormat('fr-FR', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }).format(date);
-};
 
 const handleSubmit = () => {
   onSubmit(emit);
