@@ -3,8 +3,11 @@ import { z } from 'zod';
 import { addConventionCollaborator, findUserByPseudoOrEmail } from '../../../utils/collaborator-management';
 
 const addCollaboratorSchema = z.object({
-  userIdentifier: z.string().min(1, 'Pseudo ou email requis'),
+  userIdentifier: z.string().min(1, 'Pseudo ou email requis').optional(),
+  userId: z.number().positive().optional(),
   role: z.nativeEnum(CollaboratorRole).default(CollaboratorRole.MODERATOR)
+}).refine(data => data.userIdentifier || data.userId, {
+  message: 'userIdentifier ou userId est requis'
 });
 
 export default defineEventHandler(async (event) => {
@@ -13,7 +16,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     
     // Valider les données
-    const { userIdentifier, role } = addCollaboratorSchema.parse(body);
+    const { userIdentifier, userId, role } = addCollaboratorSchema.parse(body);
     
     // Vérifier l'authentification (le middleware s'en charge déjà)
     if (!event.context.user) {
@@ -23,13 +26,37 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Rechercher l'utilisateur par pseudo ou email
-    const userToAdd = await findUserByPseudoOrEmail(userIdentifier);
-
-    if (!userToAdd) {
+    let userToAdd;
+    
+    // Si userId est fourni, l'utiliser directement
+    if (userId) {
+      const { PrismaClient } = await import('@prisma/client');
+      const prisma = new PrismaClient();
+      userToAdd = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, email: true, pseudo: true }
+      });
+      
+      if (!userToAdd) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Utilisateur introuvable'
+        });
+      }
+    } else if (userIdentifier) {
+      // Sinon, rechercher par pseudo ou email (comportement existant)
+      userToAdd = await findUserByPseudoOrEmail(userIdentifier);
+      
+      if (!userToAdd) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Utilisateur introuvable avec ce pseudo ou cet email'
+        });
+      }
+    } else {
       throw createError({
-        statusCode: 404,
-        statusMessage: 'Utilisateur introuvable avec ce pseudo ou cet email'
+        statusCode: 400,
+        statusMessage: 'userIdentifier ou userId est requis'
       });
     }
 

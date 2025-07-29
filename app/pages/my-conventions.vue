@@ -349,6 +349,14 @@ const fetchMyConventions = async () => {
     });
     
     myConventions.value = data || [];
+    
+    // Mettre à jour la convention sélectionnée si la modal est ouverte
+    if (selectedConvention.value && collaboratorsModalOpen.value) {
+      const updatedConvention = myConventions.value.find(c => c.id === selectedConvention.value!.id);
+      if (updatedConvention) {
+        selectedConvention.value = updatedConvention;
+      }
+    }
   } catch (error) {
     console.error('Erreur lors de la récupération des conventions:', error);
     toast.add({ 

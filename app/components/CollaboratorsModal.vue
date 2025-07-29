@@ -78,26 +78,55 @@
           <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
             Ajouter un collaborateur
           </h4>
-          <UButtonGroup>
-            <UInput 
-              v-model="newCollaboratorEmail" 
-              placeholder="Email ou pseudo de l'utilisateur"
-              :disabled="loading"
-            />
-            <USelect 
-              v-model="newCollaboratorRole" 
-              value-key="id"  
-              :items="collaboratorRoles" 
-              :disabled="loading"
-            />
-            <UButton 
-              @click="handleAddCollaborator"
-              :disabled="!newCollaboratorEmail.trim() || loading"
-              :loading="loading"
-              label="Ajouter" 
-              color="primary"
-            />
-          </UButtonGroup>
+          <div class="space-y-3">
+            <UButtonGroup>
+              <UInputMenu
+                v-model="selectedUser"
+                v-model:search-term="searchTerm"
+                :items="userItems"
+                :avatar="selectedUser?.avatar"
+                placeholder="Rechercher un utilisateur..."
+                :loading="searchLoading"
+                size="lg"
+              >
+                <template #option="{ option }">
+                  <div class="flex items-center gap-3 w-full">
+                    <div v-if="option.avatar" class="flex-shrink-0">
+                      <img 
+                        :src="option.avatar.src" 
+                        :alt="option.avatar.alt" 
+                        class="w-8 h-8 object-cover rounded-full" 
+                      >
+                    </div>
+                    <div v-else class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <UIcon name="i-heroicons-user" class="text-gray-500 dark:text-gray-400" size="16" />
+                    </div>
+                    <div class="flex-1 text-left">
+                      <p class="text-sm font-medium">{{ option.label }}</p>
+                    </div>
+                  </div>
+                </template>
+              </UInputMenu>
+            
+              <div class="flex gap-2">
+                <USelect 
+                  v-model="newCollaboratorRole" 
+                  value-key="id"  
+                  :items="collaboratorRoles" 
+                  :disabled="loading"
+                  class="flex-1"
+                />
+                <UButton 
+                  @click="handleAddCollaborator"
+                  :disabled="!selectedUser || loading"
+                  :loading="loading"
+                  icon="i-heroicons-plus"
+                  label="Ajouter" 
+                  color="primary"
+                />
+              </div>
+            </UButtonGroup>
+          </div>
         </div>
       </div>
     </template>
@@ -106,6 +135,7 @@
 
 <script setup lang="ts">
 import type { Convention } from '~/types';
+import type { InputMenuItem } from '@nuxt/ui';
 
 interface Props {
   modelValue: boolean;
@@ -119,6 +149,15 @@ interface Emits {
   (e: 'collaborator-removed'): void;
 }
 
+interface UserItem extends InputMenuItem {
+  value: number;
+  label: string;
+  avatar?: {
+    src: string;
+    alt: string;
+  };
+}
+
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
@@ -127,9 +166,12 @@ const authStore = useAuthStore();
 const toast = useToast();
 
 // État local
-const newCollaboratorEmail = ref('');
+const selectedUser = ref<UserItem | null>(null);
+const searchTerm = ref('');
 const newCollaboratorRole = ref<'MODERATOR' | 'ADMINISTRATOR'>('MODERATOR');
 const loading = ref(false);
+const searchLoading = ref(false);
+const userItems = ref<UserItem[]>([]);
 
 // Rôles des collaborateurs
 const collaboratorRoles = [
@@ -152,14 +194,76 @@ const isOpen = computed({
 // Réinitialiser le formulaire quand la modal s'ouvre
 watch(() => props.modelValue, (newValue) => {
   if (newValue) {
-    newCollaboratorEmail.value = '';
+    selectedUser.value = null;
+    searchTerm.value = '';
     newCollaboratorRole.value = 'MODERATOR';
+    userItems.value = [];
   }
 });
 
+// Watcher pour déclencher la recherche quand searchTerm change
+watch(searchTerm, (newValue) => {
+  console.log('searchTerm changed:', newValue);
+  debouncedSearch(newValue);
+});
+
+// Fonction pour rechercher des utilisateurs
+const searchUsers = async (query: string) => {
+  console.log('Recherche d\'utilisateurs avec query:', query);
+  
+  if (!query || query.length < 2) {
+    userItems.value = [];
+    return;
+  }
+
+  try {
+    searchLoading.value = true;
+    const users = await $fetch<Array<{
+      id: number;
+      pseudo: string;
+      profilePicture?: string;
+    }>>(`/api/users/search`, {
+      query: {
+        q: query
+      },
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`,
+      },
+    });
+
+    console.log('Résultats de recherche:', users);
+
+    userItems.value = users.map(user => ({
+      value: user.id,
+      label: user.pseudo,
+      avatar: user.profilePicture ? {
+        src: normalizeImageUrl(user.profilePicture),
+        alt: user.pseudo
+      } : undefined
+    }));
+    
+    console.log('Items formatés:', userItems.value);
+  } catch (error) {
+    console.error('Erreur lors de la recherche:', error);
+    userItems.value = [];
+  } finally {
+    searchLoading.value = false;
+  }
+};
+
+// Debounce la recherche
+let searchTimeout: NodeJS.Timeout;
+const debouncedSearch = (query: string) => {
+  console.log('debouncedSearch appelé avec:', query);
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    searchUsers(query);
+  }, 300);
+};
+
 // Ajouter un collaborateur
 const handleAddCollaborator = async () => {
-  if (!props.convention || !newCollaboratorEmail.value.trim()) return;
+  if (!props.convention || !selectedUser.value) return;
 
   try {
     loading.value = true;
@@ -170,7 +274,7 @@ const handleAddCollaborator = async () => {
         'Authorization': `Bearer ${authStore.token}`,
       },
       body: {
-        userIdentifier: newCollaboratorEmail.value.trim(),
+        userId: selectedUser.value.value,
         role: newCollaboratorRole.value,
       },
     });
@@ -183,8 +287,10 @@ const handleAddCollaborator = async () => {
     });
 
     // Réinitialiser le formulaire
-    newCollaboratorEmail.value = '';
+    selectedUser.value = null;
+    searchTerm.value = '';
     newCollaboratorRole.value = 'MODERATOR';
+    userItems.value = [];
     
     // Émettre l'événement pour recharger les données
     emit('collaborator-added');
