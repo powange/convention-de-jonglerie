@@ -253,7 +253,25 @@
       </div>
 
       <div v-else-if="editionStore.editions.length === 0">
-        <p>Aucune convention trouvée. Soyez le premier à en ajouter une !</p>
+        <div class="text-center py-8">
+          <UIcon name="i-heroicons-magnifying-glass" class="text-gray-400 text-4xl mb-4" />
+          <p v-if="activeFiltersCount > 0" class="text-gray-600">
+            Aucune convention ne correspond à vos critères de recherche.
+          </p>
+          <p v-else class="text-gray-600">
+            Aucune convention trouvée. Soyez le premier à en ajouter une !
+          </p>
+          <UButton 
+            v-if="activeFiltersCount > 0" 
+            color="neutral" 
+            variant="outline" 
+            icon="i-heroicons-arrow-path" 
+            class="mt-4"
+            @click="resetFilters"
+          >
+            Réinitialiser les filtres
+          </UButton>
+        </div>
       </div>
 
       <div v-else>
