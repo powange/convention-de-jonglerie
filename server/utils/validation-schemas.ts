@@ -58,7 +58,7 @@ export const updateConventionSchema = conventionSchema.partial();
 // Schémas d'édition
 export const editionSchema = z.object({
   conventionId: z.number().int().positive('ID de convention requis'),
-  name: z.string().min(1, 'Nom de l\'édition requis').max(200, 'Le nom ne peut pas dépasser 200 caractères').optional(),
+  name: z.string().max(200, 'Le nom ne peut pas dépasser 200 caractères').optional(),
   description: z.string().optional(),
   imageUrl: z.string().optional(),
   startDate: dateSchema,
@@ -106,7 +106,7 @@ export const editionSchema = z.object({
 
 export const updateEditionSchema = z.object({
   conventionId: z.number().int().positive('ID de convention requis').optional(),
-  name: z.string().min(1, 'Nom de l\'édition requis').max(200, 'Le nom ne peut pas dépasser 200 caractères').optional(),
+  name: z.string().max(200, 'Le nom ne peut pas dépasser 200 caractères').optional(),
   description: z.string().optional(),
   imageUrl: z.string().optional(),
   startDate: dateSchema.optional(),
