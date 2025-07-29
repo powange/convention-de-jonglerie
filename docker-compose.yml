@@ -6,10 +6,10 @@ services:
     container_name: convention-db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: convention_db
-      MYSQL_USER: convention_user
-      MYSQL_PASSWORD: convention_password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-convention_db}
+      MYSQL_USER: ${MYSQL_USER:-convention_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-convention_password}
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -23,11 +23,14 @@ services:
     container_name: convention-app
     restart: unless-stopped
     environment:
-      DATABASE_URL: "mysql://convention_user:convention_password@database:3306/convention_db"
-      JWT_SECRET: "mon_secret_jwt_de_convention_de_jonglerie_super_long"
+      DATABASE_URL: "mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}"
+      JWT_SECRET: "${JWT_SECRET:-mon_secret_jwt_de_convention_de_jonglerie_super_long}"
       NUXT_HOST: "0.0.0.0"
       NUXT_PORT: "3000"
       NODE_ENV: "production"
+      SEND_EMAILS: "${SEND_EMAILS:-false}"
+      SMTP_USER: "${SMTP_USER:-}"
+      SMTP_PASS: "${SMTP_PASS:-}"
     volumes:
       - uploads_data:/app/public/uploads
     depends_on:

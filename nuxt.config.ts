@@ -22,6 +22,9 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     jwtSecret: process.env.JWT_SECRET || 'fallback-secret-for-development', // Private keys that are only available on the server
+    emailEnabled: process.env.SEND_EMAILS || 'false', // Enable/disable real email sending
+    smtpUser: process.env.SMTP_USER || '', // SMTP username for email sending
+    smtpPass: process.env.SMTP_PASS || '', // SMTP password for email sending
     public: {
       // Public keys that are available on both client and server
     }

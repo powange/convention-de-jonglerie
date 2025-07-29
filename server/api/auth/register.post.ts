@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { prisma } from '../../utils/prisma';
 import { registerSchema, handleValidationError } from '../../utils/validation-schemas';
+import { sendEmail, generateVerificationCode, generateVerificationEmailHtml } from '../../utils/emailService';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -17,6 +18,10 @@ export default defineEventHandler(async (event) => {
     const cleanPrenom = validatedData.prenom.trim();
 
     const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+    
+    // Générer le code de vérification
+    const verificationCode = generateVerificationCode();
+    const verificationExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     const user = await prisma.user.create({
       data: {
@@ -25,18 +30,29 @@ export default defineEventHandler(async (event) => {
         pseudo: cleanPseudo,
         nom: cleanNom,
         prenom: cleanPrenom,
+        isEmailVerified: false,
+        emailVerificationCode: verificationCode,
+        verificationCodeExpiry: verificationExpiry,
       },
     });
     
+    // Envoyer l'email de vérification
+    const emailHtml = generateVerificationEmailHtml(verificationCode, cleanPrenom);
+    const emailSent = await sendEmail({
+      to: cleanEmail,
+      subject: '🤹 Vérifiez votre compte - Conventions de Jonglerie',
+      html: emailHtml,
+      text: `Bonjour ${cleanPrenom}, votre code de vérification est : ${verificationCode}`
+    });
+    
+    if (!emailSent) {
+      console.warn(`Échec de l'envoi d'email pour ${cleanEmail}`);
+    }
+    
     return { 
-      message: 'Utilisateur créé avec succès', 
-      user: { 
-        id: user.id, 
-        email: user.email, 
-        pseudo: user.pseudo, 
-        nom: user.nom, 
-        prenom: user.prenom
-      } 
+      message: 'Compte créé avec succès. Veuillez vérifier votre email pour activer votre compte.',
+      requiresVerification: true,
+      email: cleanEmail
     };
   } catch (error) {
     // Gestion des erreurs de validation Zod

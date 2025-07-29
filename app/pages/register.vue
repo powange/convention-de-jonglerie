@@ -8,6 +8,21 @@
         </div>
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Créer un compte</h1>
         <p class="text-gray-600 dark:text-gray-400">Rejoignez la communauté des jongleurs</p>
+        
+        <!-- Message important pour l'accès email -->
+        <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div class="flex items-start gap-3">
+            <UIcon name="i-heroicons-envelope" class="text-blue-600 dark:text-blue-400 mt-0.5" size="20" />
+            <div>
+              <p class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
+                Accès à votre boîte email requis
+              </p>
+              <p class="text-xs text-blue-700 dark:text-blue-300">
+                Vous recevrez un code de vérification par email pour finaliser votre inscription.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Card principale -->
@@ -249,9 +264,27 @@ const getPasswordStrengthBarColor = (barIndex: number) => {
 const handleRegister = async () => {
   loading.value = true;
   try {
-    await authStore.register(state.email, state.password, state.pseudo, state.nom, state.prenom);
-    toast.add({ title: 'Inscription réussie ! Veuillez vous connecter.', icon: 'i-heroicons-check-circle', color: 'success' });
-    router.push('/login');
+    const response = await $fetch('/api/auth/register', {
+      method: 'POST',
+      body: {
+        email: state.email,
+        password: state.password,
+        pseudo: state.pseudo,
+        nom: state.nom,
+        prenom: state.prenom
+      }
+    });
+    
+    if (response.requiresVerification) {
+      // Rediriger vers la page de vérification avec l'email
+      router.push(`/verify-email?email=${encodeURIComponent(response.email)}`);
+      toast.add({ 
+        title: 'Compte créé ! Vérifiez votre email.', 
+        description: 'Un code de vérification vous a été envoyé.',
+        icon: 'i-heroicons-envelope', 
+        color: 'success' 
+      });
+    }
   } catch (e: unknown) {
     const error = e as HttpError;
     let errorMessage = "Échec de l'inscription";

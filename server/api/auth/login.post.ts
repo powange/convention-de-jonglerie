@@ -55,6 +55,18 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // Vérifier si l'email est vérifié
+    if (!user.isEmailVerified) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Email non vérifié. Veuillez vérifier votre email avant de vous connecter.',
+        data: {
+          requiresEmailVerification: true,
+          email: user.email
+        }
+      });
+    }
+
     // Generate JWT token
     const config = useRuntimeConfig();
     const token = jwt.sign({ userId: user.id }, config.jwtSecret, { expiresIn: '1h' });
@@ -69,7 +81,8 @@ export default defineEventHandler(async (event) => {
         prenom: user.prenom,
         profilePicture: user.profilePicture,
         createdAt: user.createdAt,
-        updatedAt: user.updatedAt
+        updatedAt: user.updatedAt,
+        isEmailVerified: user.isEmailVerified
       } 
     };
   } catch (error) {

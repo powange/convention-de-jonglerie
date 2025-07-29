@@ -114,11 +114,29 @@ const handleLogin = async () => {
   } catch (e: unknown) {
     const error = e as HttpError;
     let errorMessage = 'Échec de la connexion';
+    
     if (error.statusCode === 401 || error.status === 401) {
       errorMessage = 'Email/pseudo ou mot de passe incorrect';
+    } else if (error.statusCode === 403 || error.status === 403) {
+      // Email non vérifié
+      if (error.data?.requiresEmailVerification && error.data?.email) {
+        toast.add({ 
+          title: 'Email non vérifié', 
+          description: 'Vous devez vérifier votre email avant de vous connecter.',
+          icon: 'i-heroicons-envelope-open', 
+          color: 'warning' 
+        });
+        
+        // Rediriger vers la page de vérification
+        router.push(`/verify-email?email=${encodeURIComponent(error.data.email)}`);
+        return;
+      } else {
+        errorMessage = error.statusMessage || 'Accès non autorisé';
+      }
     } else if (error.message || error.data?.message) {
       errorMessage = error.message || error.data?.message || errorMessage;
     }
+    
     toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' });
   } finally {
     loading.value = false;
