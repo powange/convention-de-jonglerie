@@ -1,13 +1,9 @@
 <template>
   <div class="space-y-4">
-    <!-- En-tête de la carte -->
-    <div class="flex items-center justify-between">
-      <h3 class="text-lg font-semibold flex items-center gap-2">
-        <UIcon name="i-heroicons-map" class="text-primary-500" />
-        Carte des favoris à venir
-      </h3>
-      <UBadge v-if="upcomingFavorites.length > 0" :color="'primary'" variant="soft">
-        {{ upcomingFavorites.length }} édition{{ upcomingFavorites.length > 1 ? 's' : '' }}
+    <!-- Badge des éditions -->
+    <div v-if="upcomingFavorites.length > 0" class="flex justify-end mb-4">
+      <UBadge :color="'primary'" variant="soft">
+        {{ upcomingFavorites.length }} édition{{ upcomingFavorites.length > 1 ? 's' : '' }} avec localisation
       </UBadge>
     </div>
 

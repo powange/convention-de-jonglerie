@@ -34,7 +34,9 @@ L'application permet aux utilisateurs de :
     *   **CRUD complet :** Création, lecture, mise à jour et suppression de conventions.
     *   **Détails riches :** Nom, description, dates, adresse complète, liens externes (billetterie, réseaux sociaux), et services disponibles (restauration, zone enfants, animaux, camping, salle de sport).
     *   **Filtrage :** Recherche et filtrage des conventions par nom et dates.
+    *   **Géolocalisation :** Géocodage automatique des adresses pour affichage sur carte.
 *   **Favoris :** Possibilité pour les utilisateurs authentifiés de marquer des conventions comme favorites.
+*   **Carte Interactive :** Visualisation géographique des éditions favorites à venir avec Leaflet.
 *   **Interface Utilisateur :** Navigation intuitive et réactive, notifications via toasts.
 *   **Sécurité :** Middleware d'authentification pour protéger les routes et les API.
 

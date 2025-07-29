@@ -12,7 +12,7 @@ export async function geocodeAddress(
   addressLine2?: string
 ): Promise<GeocodingResult | null> {
   try {
-    // Construire l'adresse complète
+    // Première tentative avec l'adresse complète
     const addressParts = [addressLine1];
     if (addressLine2) {
       addressParts.push(addressLine2);
@@ -20,9 +20,36 @@ export async function geocodeAddress(
     addressParts.push(city, postalCode, country);
     const fullAddress = addressParts.join(', ');
 
-    // Pour le développement, on utilise l'API de géocodage gratuite de Nominatim (OpenStreetMap)
-    // En production, il serait mieux d'utiliser Google Maps Geocoding API ou Mapbox
-    const encodedAddress = encodeURIComponent(fullAddress);
+    let result = await makeGeocodingRequest(fullAddress);
+    
+    if (result) {
+      console.log('Géocodage réussi avec adresse complète:', fullAddress);
+      return result;
+    }
+
+    // Fallback avec seulement ville, code postal et pays
+    console.log('Tentative fallback pour:', city, postalCode, country);
+    const simpleAddress = [city, postalCode, country].join(', ');
+    result = await makeGeocodingRequest(simpleAddress);
+    
+    if (result) {
+      console.log('Géocodage réussi avec adresse simplifiée:', simpleAddress);
+      return result;
+    }
+
+    console.log('Aucun résultat de géocodage pour:', fullAddress);
+    return null;
+
+  } catch (error) {
+    console.error('Erreur lors du géocodage:', error);
+    return null;
+  }
+}
+
+// Fonction commune pour faire les requêtes de géocodage
+async function makeGeocodingRequest(address: string): Promise<GeocodingResult | null> {
+  try {
+    const encodedAddress = encodeURIComponent(address);
     const response = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=1&q=${encodedAddress}`,
       {
@@ -40,7 +67,6 @@ export async function geocodeAddress(
     const data = await response.json();
     
     if (!data || data.length === 0) {
-      console.log('Aucun résultat de géocodage pour:', fullAddress);
       return null;
     }
 
@@ -52,7 +78,7 @@ export async function geocodeAddress(
     };
 
   } catch (error) {
-    console.error('Erreur lors du géocodage:', error);
+    console.error('Erreur lors de la requête de géocodage:', error);
     return null;
   }
 }
