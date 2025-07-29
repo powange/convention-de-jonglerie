@@ -16,10 +16,12 @@ export interface CarpoolFormConfig {
   type: CarpoolType;
   editionId: number;
   endpoint: string;
+  method?: string;
   submitText: string;
   successTitle: string;
   successDescription: string;
   errorDescription: string;
+  initialData?: any;
 }
 
 export function useCarpoolForm(config: CarpoolFormConfig) {
@@ -30,8 +32,8 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
   const minDate = new Date().toISOString().slice(0, 16);
 
   // Initialiser le formulaire selon le type
-  const form = reactive<CarpoolFormData>(
-    config.type === 'offer'
+  const getInitialFormData = () => {
+    const baseData = config.type === 'offer'
       ? {
           departureDate: '',
           departureCity: '',
@@ -46,8 +48,27 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
           seatsNeeded: 1,
           phoneNumber: '',
           description: '',
+        };
+
+    // Si on a des données initiales (mode édition), les utiliser
+    if (config.initialData) {
+      const data = { ...baseData };
+      Object.keys(data).forEach(key => {
+        if (config.initialData[key] !== undefined) {
+          data[key] = config.initialData[key];
         }
-  );
+      });
+      // Formater la date pour l'input datetime-local
+      if (config.initialData.departureDate) {
+        data.departureDate = new Date(config.initialData.departureDate).toISOString().slice(0, 16);
+      }
+      return data;
+    }
+
+    return baseData;
+  };
+
+  const form = reactive<CarpoolFormData>(getInitialFormData());
 
   // Fonctions pour nettoyer les espaces en début/fin des champs texte
   const trimField = (fieldName: keyof CarpoolFormData) => {
@@ -152,7 +173,7 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
     try {
       const authStore = useAuthStore();
       const response = await $fetch(config.endpoint, {
-        method: 'POST',
+        method: config.method || 'POST',
         headers: {
           'Authorization': `Bearer ${authStore.token}`,
         },
@@ -167,8 +188,10 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
         color: 'green',
       });
       
-      // Réinitialiser le formulaire
-      resetForm();
+      // Réinitialiser le formulaire uniquement en mode création
+      if (!config.initialData) {
+        resetForm();
+      }
       
       emit('success');
     } catch (error) {

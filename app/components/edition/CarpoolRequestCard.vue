@@ -3,7 +3,7 @@
     <div class="space-y-4">
       <!-- En-tête avec les infos utilisateur -->
       <div class="flex items-start justify-between">
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 flex-1">
           <img 
             :src="getUserAvatar(request.user, 20)" 
             :alt="`Avatar de ${request.user.pseudo}`"
@@ -15,6 +15,26 @@
               Demandé le {{ new Date(request.createdAt).toLocaleDateString() }}
             </p>
           </div>
+        </div>
+        
+        <!-- Boutons d'action pour le créateur -->
+        <div v-if="canEdit" class="flex gap-1">
+          <UButton
+            icon="i-heroicons-pencil"
+            size="xs"
+            color="warning"
+            variant="ghost"
+            title="Modifier la demande"
+            @click="emit('edit')"
+          />
+          <UButton
+            icon="i-heroicons-trash"
+            size="xs"
+            color="error"
+            variant="ghost"
+            title="Supprimer la demande"
+            @click="handleDelete"
+          />
         </div>
         <div class="text-right">
           <UBadge color="orange" variant="soft" class="mb-2">
@@ -112,10 +132,18 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{
   'comment-added': [];
+  'edit': [];
+  'deleted': [];
 }>();
 
 const authStore = useAuthStore();
 const { getUserAvatar } = useAvatar();
+const toast = useToast();
+
+// Vérifier si l'utilisateur peut éditer cette demande
+const canEdit = computed(() => {
+  return authStore.user && authStore.user.id === props.request.user.id;
+});
 
 const formatDate = (date: string) => {
   return new Date(date).toLocaleString('fr-FR', {
@@ -125,5 +153,37 @@ const formatDate = (date: string) => {
     hour: '2-digit',
     minute: '2-digit',
   });
+};
+
+const handleDelete = async () => {
+  if (!confirm('Êtes-vous sûr de vouloir supprimer cette demande de covoiturage ?')) {
+    return;
+  }
+
+  try {
+    await $fetch(`/api/carpool-requests/${props.request.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`,
+      },
+    });
+
+    toast.add({
+      title: 'Demande supprimée',
+      description: 'Votre demande de covoiturage a été supprimée avec succès',
+      icon: 'i-heroicons-check-circle',
+      color: 'success'
+    });
+
+    emit('deleted');
+  } catch (error: unknown) {
+    const httpError = error as { data?: { message?: string }; message?: string };
+    toast.add({
+      title: 'Erreur lors de la suppression',
+      description: httpError.data?.message || httpError.message || 'Une erreur est survenue',
+      icon: 'i-heroicons-x-circle',
+      color: 'error'
+    });
+  }
 };
 </script>

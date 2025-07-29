@@ -2,27 +2,15 @@
   <div class="space-y-6">
     <!-- Boutons d'actions (uniquement pour les utilisateurs connectés) -->
     <div v-if="authStore.isAuthenticated" class="flex gap-4 justify-center">
-      
-    <!-- Modal pour proposer un covoiturage -->
-    <UModal v-model:open="showOfferModal" title="Proposer un covoiturage">
       <!-- Bouton pour proposer un covoiturage -->
       <UButton
         label="Proposer un covoiturage"
         icon="i-heroicons-plus"
         color="primary"
         size="lg"
+        @click="showOfferModal = true"
       />
-      <template #description/>
-      <template #body>
-        <CarpoolOfferForm
-          :edition-id="editionId"
-          @success="onOfferCreated"
-        />
-      </template>
-    </UModal>
       
-    <!-- Modal pour demander un covoiturage -->
-    <UModal v-model:open="showRequestModal" title="Demander un covoiturage">
       <!-- Bouton pour demander un covoiturage -->
       <UButton
         label="Demander un covoiturage"
@@ -30,16 +18,59 @@
         color="primary"
         variant="soft"
         size="lg"
+        @click="showRequestModal = true"
       />
-      <template #description/>
+    </div>
+
+    <!-- Modal pour proposer un covoiturage -->
+    <UModal v-model:open="showOfferModal" title="Proposer un covoiturage">
+      <template #body>
+        <CarpoolOfferForm
+          :edition-id="editionId"
+          @success="onOfferCreated"
+          @cancel="showOfferModal = false"
+        />
+      </template>
+    </UModal>
+      
+    <!-- Modal pour demander un covoiturage -->
+    <UModal v-model:open="showRequestModal" title="Demander un covoiturage">
       <template #body>
         <CarpoolRequestForm
           :edition-id="editionId"
           @success="onRequestCreated"
+          @cancel="showRequestModal = false"
         />
       </template>
     </UModal>
-    </div>
+    
+    <!-- Modal pour éditer une offre de covoiturage -->
+    <UModal v-model:open="showEditOfferModal" title="Modifier l'offre de covoiturage">
+      <template #body>
+        <CarpoolOfferForm
+          v-if="editingOffer"
+          :edition-id="editionId"
+          :initial-data="editingOffer"
+          :is-editing="true"
+          @success="onOfferUpdated"
+          @cancel="showEditOfferModal = false"
+        />
+      </template>
+    </UModal>
+    
+    <!-- Modal pour éditer une demande de covoiturage -->
+    <UModal v-model:open="showEditRequestModal" title="Modifier la demande de covoiturage">
+      <template #body>
+        <CarpoolRequestForm
+          v-if="editingRequest"
+          :edition-id="editionId"
+          :initial-data="editingRequest"
+          :is-editing="true"
+          @success="onRequestUpdated"
+          @cancel="showEditRequestModal = false"
+        />
+      </template>
+    </UModal>
 
     <!-- Onglets pour afficher les listes -->
     <UTabs :items="tabs" default-value="offers" variant="link">
@@ -52,6 +83,8 @@
               :key="offer.id"
               :offer="offer"
               @comment-added="refreshOffers"
+              @edit="editOffer(offer)"
+              @deleted="refreshOffers"
             />
           </div>
           <div v-else class="text-center py-8 text-gray-500">
@@ -70,6 +103,9 @@
               v-for="request in requests"
               :key="request.id"
               :request="request"
+              @comment-added="refreshRequests"
+              @edit="editRequest(request)"
+              @deleted="refreshRequests"
             />
           </div>
           <div v-else class="text-center py-8 text-gray-500">
@@ -101,6 +137,12 @@ const authStore = useAuthStore();
 // États des modals
 const showOfferModal = ref(false);
 const showRequestModal = ref(false);
+const showEditOfferModal = ref(false);
+const showEditRequestModal = ref(false);
+
+// États pour l'édition
+const editingOffer = ref(null);
+const editingRequest = ref(null);
 
 const tabs = computed(() => [
   {
@@ -145,5 +187,28 @@ const onRequestCreated = () => {
   // Fermer la modal après succès
   showRequestModal.value = false;
   console.log('Modal fermée:', showRequestModal.value);
+};
+
+// Fonctions pour l'édition
+const editOffer = (offer) => {
+  editingOffer.value = offer;
+  showEditOfferModal.value = true;
+};
+
+const editRequest = (request) => {
+  editingRequest.value = request;
+  showEditRequestModal.value = true;
+};
+
+const onOfferUpdated = () => {
+  refreshOffers();
+  showEditOfferModal.value = false;
+  editingOffer.value = null;
+};
+
+const onRequestUpdated = () => {
+  refreshRequests();
+  showEditRequestModal.value = false;
+  editingRequest.value = null;
 };
 </script>

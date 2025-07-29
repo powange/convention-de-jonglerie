@@ -128,7 +128,7 @@
         :loading="isSubmitting"
         icon="i-heroicons-paper-airplane"
       >
-        {{ isSubmitting ? 'Publication...' : 'Publier la demande' }}
+        {{ isSubmitting ? (isEditing ? 'Modification...' : 'Publication...') : (isEditing ? 'Modifier la demande' : 'Publier la demande') }}
       </UButton>
     </div>
   </UForm>
@@ -140,6 +140,8 @@ import DateTimePicker from '~/components/ui/DateTimePicker.vue';
 
 interface Props {
   editionId: number;
+  initialData?: any;
+  isEditing?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -148,15 +150,22 @@ const emit = defineEmits<{
   cancel: [];
 }>();
 
+// Variable pour vérifier le mode d'édition
+const isEditing = computed(() => props.isEditing || false);
+
 // Utiliser le composable avec la configuration pour les demandes
 const { form, isSubmitting, trimField, validate, onSubmit } = useCarpoolForm({
   type: 'request',
   editionId: props.editionId,
-  endpoint: `/api/editions/${props.editionId}/carpool-requests`,
-  submitText: 'Publier la demande',
-  successTitle: 'Demande publiée',
-  successDescription: 'Votre demande de covoiturage a été publiée',
-  errorDescription: 'Impossible de créer la demande de covoiturage',
+  endpoint: props.isEditing 
+    ? `/api/carpool-requests/${props.initialData?.id}` 
+    : `/api/editions/${props.editionId}/carpool-requests`,
+  method: props.isEditing ? 'PUT' : 'POST',
+  submitText: props.isEditing ? 'Modifier la demande' : 'Publier la demande',
+  successTitle: props.isEditing ? 'Demande modifiée' : 'Demande publiée',
+  successDescription: props.isEditing ? 'Votre demande a été modifiée avec succès' : 'Votre demande de covoiturage a été publiée',
+  errorDescription: props.isEditing ? 'Impossible de modifier la demande' : 'Impossible de créer la demande de covoiturage',
+  initialData: props.initialData,
 });
 
 const handleSubmit = () => {
