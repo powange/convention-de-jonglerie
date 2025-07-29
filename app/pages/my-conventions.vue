@@ -42,6 +42,7 @@
               </div>
               <div class="flex gap-2 ml-4">
                 <UButton
+                  v-if="canEditConvention(convention)"
                   icon="i-heroicons-pencil"
                   size="xs"
                   color="warning"
@@ -50,6 +51,7 @@
                   :to="`/conventions/${convention.id}/edit`"
                 />
                 <UButton
+                  v-if="canDeleteConvention(convention)"
                   icon="i-heroicons-trash"
                   size="xs"
                   color="error"
@@ -401,6 +403,32 @@ const deleteConvention = async (id: number) => {
       });
     }
   }
+};
+
+// Vérifier si l'utilisateur peut modifier une convention
+const canEditConvention = (convention: Convention) => {
+  if (!authStore.user) return false;
+  
+  // L'auteur peut toujours modifier
+  if (convention.authorId === authStore.user.id) return true;
+  
+  // Les collaborateurs ADMINISTRATOR peuvent modifier
+  return convention.collaborators?.some(
+    collab => collab.user.id === authStore.user.id && collab.role === 'ADMINISTRATOR'
+  ) || false;
+};
+
+// Vérifier si l'utilisateur peut supprimer une convention
+const canDeleteConvention = (convention: Convention) => {
+  if (!authStore.user) return false;
+  
+  // L'auteur peut toujours supprimer
+  if (convention.authorId === authStore.user.id) return true;
+  
+  // Les collaborateurs ADMINISTRATOR peuvent supprimer
+  return convention.collaborators?.some(
+    collab => collab.user.id === authStore.user.id && collab.role === 'ADMINISTRATOR'
+  ) || false;
 };
 
 onMounted(async () => {

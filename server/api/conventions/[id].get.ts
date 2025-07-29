@@ -28,6 +28,17 @@ export default defineEventHandler(async (event) => {
             email: true,
           },
         },
+        collaborators: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                profilePicture: true,
+              },
+            },
+          },
+        },
       },
     });
 

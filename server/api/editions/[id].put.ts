@@ -50,6 +50,21 @@ export default defineEventHandler(async (event) => {
       where: {
         id: editionId,
       },
+      include: {
+        convention: {
+          include: {
+            collaborators: {
+              where: {
+                userId: event.context.user.id,
+                OR: [
+                  { role: 'MODERATOR' },
+                  { role: 'ADMINISTRATOR' }
+                ]
+              }
+            }
+          }
+        }
+      }
     });
 
     if (!edition) {
@@ -59,17 +74,30 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    if (edition.creatorId !== event.context.user.id) {
+    // Vérifier les permissions : créateur de l'édition, auteur de la convention, ou collaborateur
+    const isCreator = edition.creatorId === event.context.user.id;
+    const isConventionAuthor = edition.convention.authorId === event.context.user.id;
+    const isCollaborator = edition.convention.collaborators.length > 0;
+
+    if (!isCreator && !isConventionAuthor && !isCollaborator) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Vous n\'êtes pas le créateur de cette édition',
+        statusMessage: 'Vous n\'avez pas les droits pour modifier cette édition',
       });
     }
 
-    // Si une convention est spécifiée, vérifier qu'elle existe et que l'utilisateur en est l'auteur
+    // Si une convention est spécifiée, vérifier qu'elle existe et que l'utilisateur a les droits
     if (conventionId && conventionId !== edition.conventionId) {
       const convention = await prisma.convention.findUnique({
         where: { id: conventionId },
+        include: {
+          collaborators: {
+            where: {
+              userId: event.context.user.id,
+              role: 'ADMINISTRATOR'
+            }
+          }
+        }
       });
 
       if (!convention) {
@@ -79,10 +107,14 @@ export default defineEventHandler(async (event) => {
         });
       }
 
-      if (convention.authorId !== event.context.user.id) {
+      // Seuls l'auteur et les administrateurs peuvent changer la convention d'une édition
+      const canChangeConvention = convention.authorId === event.context.user.id || 
+                                  convention.collaborators.length > 0;
+
+      if (!canChangeConvention) {
         throw createError({
           statusCode: 403,
-          statusMessage: 'Vous ne pouvez assigner des éditions qu\'à vos propres conventions',
+          statusMessage: 'Vous ne pouvez assigner des éditions qu\'aux conventions que vous gérez',
         });
       }
     }

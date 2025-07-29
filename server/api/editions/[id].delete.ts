@@ -23,6 +23,21 @@ export default defineEventHandler(async (event) => {
       where: {
         id: editionId,
       },
+      include: {
+        convention: {
+          include: {
+            collaborators: {
+              where: {
+                userId: event.context.user.id,
+                OR: [
+                  { role: 'MODERATOR' },
+                  { role: 'ADMINISTRATOR' }
+                ]
+              }
+            }
+          }
+        }
+      }
     });
 
     if (!edition) {
@@ -32,10 +47,15 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    if (edition.creatorId !== event.context.user.id) {
+    // Vérifier les permissions : créateur de l'édition, auteur de la convention, ou collaborateur
+    const isCreator = edition.creatorId === event.context.user.id;
+    const isConventionAuthor = edition.convention.authorId === event.context.user.id;
+    const isCollaborator = edition.convention.collaborators.length > 0;
+
+    if (!isCreator && !isConventionAuthor && !isCollaborator) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Forbidden: You are not the creator of this edition',
+        statusMessage: 'Vous n\'avez pas les droits pour supprimer cette édition',
       });
     }
 

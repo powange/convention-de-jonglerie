@@ -301,20 +301,48 @@ export const useEditionStore = defineStore('editions', {
 
     // Vérifier si l'utilisateur peut modifier une édition
     canEditEdition(edition: Edition, userId: number): boolean {
-      // Le créateur peut toujours modifier
+      // Le créateur de l'édition peut toujours modifier
       if (edition.creatorId === userId) {
         return true;
       }
       
-      // Vérifier si l'utilisateur est collaborateur avec droits d'édition
-      return edition.collaborators?.some(
-        collaborator => collaborator.userId === userId && collaborator.canEdit
+      // Vérifier si la convention a des collaborateurs
+      if (!edition.convention || !edition.convention.collaborators) {
+        return false;
+      }
+      
+      // L'auteur de la convention peut modifier toutes les éditions
+      if (edition.convention.authorId === userId) {
+        return true;
+      }
+      
+      // Les collaborateurs (MODERATOR ou ADMINISTRATOR) peuvent modifier
+      return edition.convention.collaborators.some(
+        collab => collab.user.id === userId && (collab.role === 'MODERATOR' || collab.role === 'ADMINISTRATOR')
       ) || false;
     },
 
-    // Vérifier si l'utilisateur peut supprimer une édition (seul le créateur)
+    // Vérifier si l'utilisateur peut supprimer une édition
     canDeleteEdition(edition: Edition, userId: number): boolean {
-      return edition.creatorId === userId;
+      // Le créateur de l'édition peut supprimer
+      if (edition.creatorId === userId) {
+        return true;
+      }
+      
+      // Vérifier si la convention a des collaborateurs
+      if (!edition.convention || !edition.convention.collaborators) {
+        return false;
+      }
+      
+      // L'auteur de la convention peut supprimer toutes les éditions
+      if (edition.convention.authorId === userId) {
+        return true;
+      }
+      
+      // Les collaborateurs (MODERATOR ou ADMINISTRATOR) peuvent supprimer
+      return edition.convention.collaborators.some(
+        collab => collab.user.id === userId && (collab.role === 'MODERATOR' || collab.role === 'ADMINISTRATOR')
+      ) || false;
     },
   },
 });

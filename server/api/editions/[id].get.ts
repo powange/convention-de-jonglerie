@@ -33,7 +33,19 @@ export default defineEventHandler(async (event) => {
           select: { id: true },
         },
         convention: {
-          select: { id: true, name: true, description: true, logo: true },
+          include: {
+            collaborators: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    pseudo: true,
+                    profilePicture: true,
+                  },
+                },
+              },
+            },
+          },
         },
         ...(includeCollaborators && {
           collaborators: {

@@ -78,8 +78,13 @@ onMounted(async () => {
   try {
     convention.value = await $fetch(`/api/conventions/${conventionId}`);
     
-    // Vérifier que l'utilisateur est l'auteur de la convention
-    if (convention.value.authorId !== authStore.user?.id) {
+    // Vérifier que l'utilisateur est l'auteur ou un collaborateur ADMINISTRATOR
+    const isAuthor = convention.value.authorId === authStore.user?.id;
+    const isAdmin = convention.value.collaborators?.some(
+      collab => collab.user.id === authStore.user?.id && collab.role === 'ADMINISTRATOR'
+    );
+    
+    if (!isAuthor && !isAdmin) {
       throw {
         status: 403,
         message: 'Vous n\'avez pas les droits pour modifier cette convention'

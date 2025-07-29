@@ -39,7 +39,6 @@ export default defineEventHandler(async (event) => {
               select: {
                 id: true,
                 pseudo: true,
-                email: true,
                 profilePicture: true,
               },
             },
