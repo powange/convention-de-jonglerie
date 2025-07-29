@@ -84,7 +84,7 @@
               <!-- Boutons connexion/inscription pour utilisateurs non connectés -->
               <div v-else class="flex flex-col sm:flex-row items-center gap-2">
                 <UButton 
-                  icon="i-heroicons-arrow-left-on-rectangle" 
+                  icon="i-heroicons-key" 
                   size="sm" 
                   color="neutral" 
                   variant="ghost"

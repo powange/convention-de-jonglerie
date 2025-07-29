@@ -49,7 +49,8 @@ export const updateProfileSchema = z.object({
 // Schémas de convention
 export const conventionSchema = z.object({
   name: z.string().min(1, 'Nom de la convention requis').max(200, 'Le nom ne peut pas dépasser 200 caractères'),
-  description: z.string().optional()
+  description: z.string().nullable().optional(),
+  logo: z.string().nullable().optional()
 });
 
 export const updateConventionSchema = conventionSchema.partial();

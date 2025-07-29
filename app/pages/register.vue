@@ -1,33 +1,139 @@
 <template>
-  <UCard>
-    <template #header>
-      <h1 class="text-2xl font-bold">Inscription</h1>
-    </template>
-    <UForm :state="state" :schema="schema" class="space-y-4" @submit="handleRegister">
-      <UFormField label="Adresse e-mail" name="email">
-        <UInput v-model="state.email" type="email" required placeholder="votre.email@example.com" />
-      </UFormField>
-      <UFormField label="Pseudo" name="pseudo">
-        <UInput v-model="state.pseudo" required placeholder="Votre pseudo unique (min. 3 caractères)" />
-      </UFormField>
-      <UFormField label="Nom" name="nom">
-        <UInput v-model="state.nom" required placeholder="Votre nom de famille" />
-      </UFormField>
-      <UFormField label="Prénom" name="prenom">
-        <UInput v-model="state.prenom" required placeholder="Votre prénom" />
-      </UFormField>
-      <UFormField label="Mot de passe" name="password">
-        <UInput v-model="state.password" type="password" required placeholder="Min. 8 caractères, 1 majuscule, 1 chiffre" />
-      </UFormField>
-      <UFormField label="Confirmer le mot de passe" name="confirmPassword">
-        <UInput v-model="state.confirmPassword" type="password" required placeholder="Retapez votre mot de passe" />
-      </UFormField>
-      <UButton type="submit" :loading="loading">S'inscrire</UButton>
-    </UForm>
-    <p class="mt-4 text-center">
-      Déjà un compte ? <NuxtLink to="/login" class="text-primary-500 hover:underline">Se connecter</NuxtLink>
-    </p>
-  </UCard>
+  <div class="flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+      <!-- En-tête avec logo/icône -->
+      <div class="text-center mb-8">
+        <div class="mx-auto w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
+          <UIcon name="i-heroicons-user-plus" class="text-white" size="32" />
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Créer un compte</h1>
+        <p class="text-gray-600 dark:text-gray-400">Rejoignez la communauté des jongleurs</p>
+      </div>
+
+      <!-- Card principale -->
+      <UCard class="shadow-xl border-0 backdrop-blur-sm bg-white/80 dark:bg-gray-800/80">
+        <UForm :state="state" :schema="schema" class="space-y-6" @submit="handleRegister">
+          <!-- Section Informations personnelles -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
+              Informations personnelles
+            </h3>
+            
+            <div class="grid grid-cols-2 gap-4">
+              <UFormField label="Prénom" name="prenom">
+                <UInput 
+                  v-model="state.prenom" 
+                  required 
+                  placeholder="Votre prénom"
+                  icon="i-heroicons-user"
+                />
+              </UFormField>
+              <UFormField label="Nom" name="nom">
+                <UInput 
+                  v-model="state.nom" 
+                  required 
+                  placeholder="Votre nom"
+                  icon="i-heroicons-user"
+                />
+              </UFormField>
+            </div>
+          </div>
+
+          <!-- Section Compte -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
+              Informations de compte
+            </h3>
+            
+            <UFormField label="Adresse e-mail" name="email">
+              <UInput 
+                v-model="state.email" 
+                type="email" 
+                required 
+                placeholder="votre.email@example.com"
+                icon="i-heroicons-envelope"
+              />
+            </UFormField>
+            
+            <UFormField label="Pseudo" name="pseudo">
+              <UInput 
+                v-model="state.pseudo" 
+                required 
+                placeholder="Votre pseudo unique"
+                icon="i-heroicons-at-symbol"
+              />
+            </UFormField>
+          </div>
+
+          <!-- Section Sécurité -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
+              Mot de passe
+            </h3>
+            
+            <UFormField label="Mot de passe" name="password">
+              <UInput 
+                v-model="state.password" 
+                type="password" 
+                required 
+                placeholder="Choisissez un mot de passe sécurisé"
+                icon="i-heroicons-lock-closed"
+              />
+              <!-- Indicateur de force du mot de passe -->
+              <div v-if="state.password" class="mt-2">
+                <div class="flex gap-1 mb-1">
+                  <div 
+                    v-for="i in 4" 
+                    :key="i"
+                    class="h-1 flex-1 rounded"
+                    :class="getPasswordStrengthBarColor(i)"
+                  ></div>
+                </div>
+                <p class="text-xs" :class="getPasswordStrengthTextColor()">
+                  {{ getPasswordStrengthText() }}
+                </p>
+              </div>
+            </UFormField>
+            
+            <UFormField label="Confirmer le mot de passe" name="confirmPassword">
+              <UInput 
+                v-model="state.confirmPassword" 
+                type="password" 
+                required 
+                placeholder="Confirmez votre mot de passe"
+                icon="i-heroicons-shield-check"
+              />
+            </UFormField>
+          </div>
+
+          <!-- Bouton d'inscription -->
+          <UButton 
+            type="submit" 
+            :loading="loading" 
+            size="lg"
+            block
+            class="mt-8"
+            icon="i-heroicons-user-plus"
+          >
+            {{ loading ? 'Création en cours...' : 'Créer mon compte' }}
+          </UButton>
+        </UForm>
+
+        <!-- Lien de connexion -->
+        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <p class="text-center text-sm text-gray-600 dark:text-gray-400">
+            Déjà un compte ? 
+            <NuxtLink 
+              to="/login" 
+              class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+            >
+              Se connecter
+            </NuxtLink>
+          </p>
+        </div>
+      </UCard>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -64,6 +170,81 @@ const state = reactive({
   confirmPassword: '',
 });
 const loading = ref(false);
+
+// Fonctions pour l'indicateur de force du mot de passe
+const getPasswordStrength = () => {
+  const password = state.password;
+  if (!password) return 0;
+  
+  let strength = 0;
+  
+  // Longueur
+  if (password.length >= 8) strength++;
+  
+  // Majuscule
+  if (/[A-Z]/.test(password)) strength++;
+  
+  // Chiffre
+  if (/\d/.test(password)) strength++;
+  
+  // Caractère spécial ou longueur > 12
+  if (/[!@#$%^&*(),.?":{}|<>]/.test(password) || password.length > 12) strength++;
+  
+  return strength;
+};
+
+const getPasswordStrengthText = () => {
+  const strength = getPasswordStrength();
+  switch (strength) {
+    case 0:
+    case 1:
+      return 'Mot de passe faible';
+    case 2:
+      return 'Mot de passe moyen';
+    case 3:
+      return 'Mot de passe fort';
+    case 4:
+      return 'Mot de passe très fort';
+    default:
+      return '';
+  }
+};
+
+const getPasswordStrengthTextColor = () => {
+  const strength = getPasswordStrength();
+  switch (strength) {
+    case 0:
+    case 1:
+      return 'text-red-500';
+    case 2:
+      return 'text-orange-500';
+    case 3:
+      return 'text-green-500';
+    case 4:
+      return 'text-emerald-500';
+    default:
+      return 'text-gray-500';
+  }
+};
+
+const getPasswordStrengthBarColor = (barIndex: number) => {
+  const strength = getPasswordStrength();
+  if (barIndex <= strength) {
+    switch (strength) {
+      case 1:
+        return 'bg-red-500';
+      case 2:
+        return 'bg-orange-500';
+      case 3:
+        return 'bg-green-500';
+      case 4:
+        return 'bg-emerald-500';
+      default:
+        return 'bg-gray-200 dark:bg-gray-700';
+    }
+  }
+  return 'bg-gray-200 dark:bg-gray-700';
+};
 
 const handleRegister = async () => {
   loading.value = true;

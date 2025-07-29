@@ -22,11 +22,11 @@
       <div v-else-if="comments.length > 0" class="space-y-3 max-h-96 overflow-y-auto">
         <UCard v-for="comment in comments" :key="comment.id" variant="subtle">
         <div class="flex items-center gap-2 mb-2">
-          <UAvatar 
-            :src="getUserAvatar(comment.user, 24)" 
-            :alt="comment.user.pseudo" 
-            size="xs"
-          />
+          <img 
+            :src="getUserAvatar(comment.user, 20)" 
+            :alt="`Avatar de ${comment.user.pseudo}`"
+            class="w-5 h-5 rounded-full"
+          >
           <span class="font-medium text-sm">{{ comment.user.pseudo }}</span>
           <span class="text-xs text-gray-500">
             {{ formatRelativeTime(comment.createdAt) }}

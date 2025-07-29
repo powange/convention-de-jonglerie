@@ -42,7 +42,7 @@
     </div>
 
     <!-- Onglets pour afficher les listes -->
-    <UTabs :items="tabs" default-value="offers">
+    <UTabs :items="tabs" default-value="offers" variant="link">
       <template #offers>
         <div class="space-y-4">
           <!-- Liste des offres -->

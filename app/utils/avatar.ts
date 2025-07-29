@@ -12,10 +12,15 @@ export const useAvatar = () => {
     
     // Si l'utilisateur a une photo de profil, l'utiliser avec cache-busting
     if (user.profilePicture) {
+      // Si c'est déjà une URL absolue, l'utiliser directement
+      if (user.profilePicture.startsWith('http://') || user.profilePicture.startsWith('https://')) {
+        return user.profilePicture;
+      }
+      
       // Utiliser updatedAt comme version pour éviter le cache, sinon timestamp actuel
       const version = user.updatedAt ? new Date(user.updatedAt).getTime() : Date.now();
       
-      // Normaliser l'URL via l'API
+      // Sinon, normaliser l'URL via l'API
       const normalizedUrl = normalizeImageUrl(user.profilePicture);
       if (!normalizedUrl) {
         return 'https://www.gravatar.com/avatar/default?s=80&d=mp';

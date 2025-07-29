@@ -1,24 +1,82 @@
 <template>
-  <UCard>
-    <template #header>
-      <h1 class="text-2xl font-bold">Connexion</h1>
-    </template>
-    <UForm :state="state" :schema="schema" class="space-y-4" @submit="handleLogin">
-      <UFormField label="Email ou Pseudo" name="identifier">
-        <UInput v-model="state.identifier" required placeholder="votre.email@example.com ou votre pseudo" />
-      </UFormField>
-      <UFormField label="Mot de passe" name="password">
-        <UInput v-model="state.password" type="password" required placeholder="Votre mot de passe" />
-      </UFormField>
-      <UFormField name="rememberMe">
-        <UCheckbox v-model="state.rememberMe" label="Se souvenir de moi" />
-      </UFormField>
-      <UButton type="submit" :loading="loading">Se connecter</UButton>
-    </UForm>
-    <p class="mt-4 text-center">
-      Pas encore de compte ? <NuxtLink to="/register" class="text-primary-500 hover:underline">S'inscrire</NuxtLink>
-    </p>
-  </UCard>
+  <div class="flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+      <!-- En-tête avec logo/icône -->
+      <div class="text-center mb-8">
+        <div class="mx-auto w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
+          <UIcon name="i-heroicons-key" class="text-white" size="32" />
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Connexion</h1>
+        <p class="text-gray-600 dark:text-gray-400">Accédez à votre compte</p>
+      </div>
+
+      <!-- Card principale -->
+      <UCard class="shadow-xl border-0 backdrop-blur-sm bg-white/80 dark:bg-gray-800/80">
+        <UForm :state="state" :schema="schema" class="space-y-6" @submit="handleLogin">
+          <!-- Section Authentification -->
+          <div class="space-y-4">
+            <UFormField label="Email ou Pseudo" name="identifier">
+              <UInput 
+                v-model="state.identifier" 
+                required 
+                placeholder="votre.email@example.com ou votre pseudo"
+                icon="i-heroicons-user"
+              />
+            </UFormField>
+            
+            <UFormField label="Mot de passe" name="password">
+              <UInput 
+                v-model="state.password" 
+                type="password" 
+                required 
+                placeholder="Votre mot de passe"
+                icon="i-heroicons-lock-closed"
+              />
+            </UFormField>
+          </div>
+
+          <!-- Options -->
+          <div class="space-y-4">
+            <UFormField name="rememberMe">
+              <UCheckbox v-model="state.rememberMe" label="Se souvenir de moi" />
+            </UFormField>
+          </div>
+
+          <!-- Bouton de connexion -->
+          <UButton 
+            type="submit" 
+            :loading="loading" 
+            size="lg"
+            block
+            class="mt-8"
+            icon="i-heroicons-arrow-right-on-rectangle"
+          >
+            {{ loading ? 'Connexion en cours...' : 'Se connecter' }}
+          </UButton>
+        </UForm>
+
+        <!-- Lien d'inscription -->
+        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <p class="text-center text-sm text-gray-600 dark:text-gray-400">
+            Pas encore de compte ? 
+            <NuxtLink 
+              to="/register" 
+              class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+            >
+              S'inscrire
+            </NuxtLink>
+          </p>
+        </div>
+      </UCard>
+
+      <!-- Footer -->
+      <div class="mt-8 text-center">
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          Problème de connexion ? Contactez le support.
+        </p>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">

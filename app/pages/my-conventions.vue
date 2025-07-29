@@ -66,6 +66,52 @@
           </p>
           <p v-else class="text-sm text-gray-400 italic mb-4">Aucune description</p>
           
+          <!-- Section collaborateurs -->
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="text-sm font-medium text-gray-900 dark:text-white">
+                Collaborateurs ({{ convention.collaborators?.length || 0 }})
+              </h4>
+              <UButton 
+                size="xs" 
+                variant="outline" 
+                icon="i-heroicons-user-plus"
+                @click="openCollaboratorsModal(convention)"
+              >
+                Gérer
+              </UButton>
+            </div>
+            <div v-if="convention.collaborators && convention.collaborators.length > 0">
+            <div class="flex flex-wrap gap-2">
+              <UBadge 
+                v-for="collaborator in convention.collaborators" 
+                :key="collaborator.id"
+                :color="collaborator.role === 'ADMINISTRATOR' ? 'red' : 'blue'"
+                variant="subtle"
+                size="sm"
+                class="flex items-center gap-2"
+              >
+                <div class="flex items-center gap-1.5">
+                  <div v-if="collaborator.user.profilePicture" class="flex-shrink-0">
+                    <img 
+                      :src="normalizeImageUrl(collaborator.user.profilePicture)" 
+                      :alt="collaborator.user.pseudo" 
+                      class="w-4 h-4 object-cover rounded-full" 
+                    >
+                  </div>
+                  <div v-else class="w-4 h-4 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <UIcon name="i-heroicons-user" class="text-gray-500 dark:text-gray-400" size="10" />
+                  </div>
+                  <span>{{ collaborator.user.pseudo }}</span>
+                  <span class="text-xs opacity-75">
+                    ({{ collaborator.role === 'ADMINISTRATOR' ? 'Admin' : 'Modo' }})
+                  </span>
+                </div>
+              </UBadge>
+            </div>
+            </div>
+          </div>
+          
           <!-- Section éditions -->
           <div class="mt-4">
             <div class="flex items-center justify-between mb-3">
@@ -102,6 +148,15 @@
         </UCard>
       </div>
     </div>
+
+    <!-- Modal de gestion des collaborateurs -->
+    <CollaboratorsModal 
+      v-model="collaboratorsModalOpen"
+      :convention="selectedConvention"
+      :current-user-id="authStore.user?.id"
+      @collaborator-added="fetchMyConventions"
+      @collaborator-removed="fetchMyConventions"
+    />
   </div>
 </template>
 
@@ -133,12 +188,17 @@ const { normalizeImageUrl } = useImageUrl();
 const conventionsLoading = ref(true);
 const myConventions = ref<Convention[]>([]);
 
+// Modal collaborateurs
+const collaboratorsModalOpen = ref(false);
+const selectedConvention = ref<Convention | null>(null);
+
 
 // Utiliser le composable pour formater les dates
 const { formatDateTime } = useDateFormat();
 
 // Utiliser le composable pour le statut des éditions
 const { getStatusColor, getStatusText } = useEditionStatus();
+
 
 // Colonnes pour le tableau des éditions
 const getEditionsColumns = () => [
@@ -240,6 +300,12 @@ const getEditionsColumns = () => [
 // Gestionnaire d'événement pour les actions
 const onEditionAction = (action: unknown) => {
   // Cette fonction est appelée automatiquement par UTable
+};
+
+// Fonctions pour gérer les collaborateurs
+const openCollaboratorsModal = (convention: Convention) => {
+  selectedConvention.value = convention;
+  collaboratorsModalOpen.value = true;
 };
 
 const deleteEdition = async (id: number) => {

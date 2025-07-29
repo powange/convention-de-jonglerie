@@ -214,6 +214,14 @@ export async function deleteConventionCollaborator(
     });
   }
 
+  // Empêcher l'utilisateur de se supprimer lui-même
+  if (collaborator.userId === userId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Vous ne pouvez pas vous retirer vous-même des collaborateurs'
+    });
+  }
+
   // Supprimer le collaborateur
   await prisma.conventionCollaborator.delete({
     where: { id: collaboratorId }

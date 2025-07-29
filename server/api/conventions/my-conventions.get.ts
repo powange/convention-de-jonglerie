@@ -11,10 +11,19 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Récupérer les conventions créées par l'utilisateur
+    // Récupérer les conventions où l'utilisateur est auteur OU collaborateur
     const conventions = await prisma.convention.findMany({
       where: {
-        authorId: event.context.user.id,
+        OR: [
+          { authorId: event.context.user.id },
+          { 
+            collaborators: {
+              some: {
+                userId: event.context.user.id,
+              }
+            }
+          }
+        ]
       },
       include: {
         author: {
@@ -22,6 +31,21 @@ export default defineEventHandler(async (event) => {
             id: true,
             pseudo: true,
             email: true,
+          },
+        },
+        collaborators: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                email: true,
+                profilePicture: true,
+              },
+            },
+          },
+          orderBy: {
+            addedAt: 'asc',
           },
         },
         editions: {

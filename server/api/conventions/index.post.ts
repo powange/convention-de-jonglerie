@@ -20,12 +20,14 @@ export default defineEventHandler(async (event) => {
     // Sanitisation
     const cleanName = validatedData.name.trim();
     const cleanDescription = validatedData.description?.trim() || null;
+    const cleanLogo = validatedData.logo?.trim() || null;
 
     // Créer la convention
     const convention = await prisma.convention.create({
       data: {
         name: cleanName,
         description: cleanDescription,
+        logo: cleanLogo,
         authorId: event.context.user.id,
       },
       include: {

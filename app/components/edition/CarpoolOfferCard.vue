@@ -4,11 +4,11 @@
       <!-- En-tête avec les infos utilisateur -->
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-3">
-          <UAvatar 
-            :src="getUserAvatar(offer.user, 40)" 
-            :alt="offer.user.pseudo" 
-            size="md"
-          />
+          <img 
+            :src="getUserAvatar(offer.user, 20)" 
+            :alt="`Avatar de ${offer.user.pseudo}`"
+            class="w-10 h-10 rounded-full"
+          >
           <div>
             <p class="font-semibold">{{ offer.user.pseudo }}</p>
             <p class="text-sm text-gray-500">
