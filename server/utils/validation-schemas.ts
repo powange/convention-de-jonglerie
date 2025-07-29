@@ -2,8 +2,11 @@ import { z } from 'zod';
 
 // Schémas de base réutilisables
 export const emailSchema = z.string().email('Email invalide').min(1, 'Email requis');
-export const passwordSchema = z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères');
-export const pseudoSchema = z.string().min(2, 'Le pseudo doit contenir au moins 2 caractères').max(50, 'Le pseudo ne peut pas dépasser 50 caractères');
+export const passwordSchema = z.string()
+  .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
+  .regex(/(?=.*[A-Z])/, 'Le mot de passe doit contenir au moins une majuscule')
+  .regex(/(?=.*\d)/, 'Le mot de passe doit contenir au moins un chiffre');
+export const pseudoSchema = z.string().min(3, 'Le pseudo doit contenir au moins 3 caractères').max(50, 'Le pseudo ne peut pas dépasser 50 caractères');
 export const nameSchema = z.string().min(1, 'Ce champ est requis').max(100, 'Ce champ ne peut pas dépasser 100 caractères');
 export const phoneSchema = z.string().optional().refine(
   (val) => !val || /^[\+]?[0-9\s\-\(\)]+$/.test(val),
@@ -48,8 +51,8 @@ export const updateProfileSchema = z.object({
 
 // Schémas de convention
 export const conventionSchema = z.object({
-  name: z.string().min(1, 'Nom de la convention requis').max(200, 'Le nom ne peut pas dépasser 200 caractères'),
-  description: z.string().nullable().optional(),
+  name: z.string().min(3, 'Le nom doit contenir au moins 3 caractères').max(100, 'Le nom ne peut pas dépasser 100 caractères'),
+  description: z.string().max(1000, 'La description ne peut pas dépasser 1000 caractères').nullable().optional(),
   logo: z.string().nullable().optional()
 });
 
@@ -58,8 +61,11 @@ export const updateConventionSchema = conventionSchema.partial();
 // Schémas d'édition
 export const editionSchema = z.object({
   conventionId: z.number().int().positive('ID de convention requis'),
-  name: z.string().max(200, 'Le nom ne peut pas dépasser 200 caractères').optional(),
-  description: z.string().optional(),
+  name: z.string().max(200, 'Le nom ne peut pas dépasser 200 caractères').optional().refine(
+    (val) => !val || val.length >= 3,
+    'Le nom doit contenir au moins 3 caractères'
+  ),
+  description: z.string().max(1000, 'La description ne peut pas dépasser 1000 caractères').optional(),
   imageUrl: z.string().optional(),
   startDate: dateSchema,
   endDate: dateSchema,
@@ -106,8 +112,11 @@ export const editionSchema = z.object({
 
 export const updateEditionSchema = z.object({
   conventionId: z.number().int().positive('ID de convention requis').optional(),
-  name: z.string().max(200, 'Le nom ne peut pas dépasser 200 caractères').optional(),
-  description: z.string().optional(),
+  name: z.string().max(200, 'Le nom ne peut pas dépasser 200 caractères').optional().refine(
+    (val) => !val || val.length >= 3,
+    'Le nom doit contenir au moins 3 caractères'
+  ),
+  description: z.string().max(1000, 'La description ne peut pas dépasser 1000 caractères').optional(),
   imageUrl: z.string().optional(),
   startDate: dateSchema.optional(),
   endDate: dateSchema.optional(),
@@ -157,19 +166,19 @@ export const updateEditionSchema = z.object({
 
 // Schémas de covoiturage
 export const carpoolOfferSchema = z.object({
-  departureCity: z.string().min(1, 'Ville de départ requise').max(100),
-  departureAddress: z.string().min(1, 'Adresse de départ requise').max(200),
+  departureCity: z.string().min(1, 'Ville de départ requise').max(100, 'La ville ne peut pas dépasser 100 caractères'),
+  departureAddress: z.string().min(1, 'Adresse de départ requise').max(200, 'L\'adresse ne peut pas dépasser 200 caractères'),
   departureDate: dateSchema,
   availableSeats: z.number().int().min(1, 'Au moins 1 place disponible').max(8, 'Maximum 8 places'),
-  description: z.string().optional(),
+  description: z.string().max(500, 'La description ne peut pas dépasser 500 caractères').optional(),
   phoneNumber: phoneSchema
 });
 
 export const carpoolRequestSchema = z.object({
-  departureCity: z.string().min(1, 'Ville de départ requise').max(100),
+  departureCity: z.string().min(1, 'Ville de départ requise').max(100, 'La ville ne peut pas dépasser 100 caractères'),
   departureDate: dateSchema,
   seatsNeeded: z.number().int().min(1, 'Au moins 1 personne').max(8, 'Maximum 8 personnes').default(1),
-  description: z.string().optional(),
+  description: z.string().max(500, 'La description ne peut pas dépasser 500 caractères').optional(),
   phoneNumber: phoneSchema
 });
 

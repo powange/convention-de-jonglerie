@@ -28,14 +28,14 @@
             </USelect>
           </UFormField>
           
-          <UFormField label="Nom de l'édition (optionnel)" name="name">
-            <UInput v-model="state.name" placeholder="Nom de l'édition (ex: EJC 2024)" size="lg" class="w-full" @blur="trimField('name')"/>
+          <UFormField label="Nom de l'édition (optionnel)" name="name" :error="getNameError()">
+            <UInput v-model="state.name" placeholder="Nom de l'édition (ex: EJC 2024)" size="lg" class="w-full" @blur="touchedFields.name = true; trimField('name')" maxlength="200"/>
             <template #help>
               <p class="text-xs text-gray-500">Si aucun nom n'est spécifié, le nom de la convention sera utilisé</p>
             </template>
           </UFormField>
-          <UFormField label="Description" name="description">
-            <UTextarea v-model="state.description" placeholder="Description de la convention" :rows="5" class="w-full" @blur="trimField('description')" />
+          <UFormField label="Description" name="description" :error="getDescriptionError()">
+            <UTextarea v-model="state.description" placeholder="Description de la convention" :rows="5" class="w-full" @blur="touchedFields.description = true; trimField('description')" maxlength="1000" />
           </UFormField>
           
           <UFormField label="Affiche de la convention (Optionnel)" name="image">
@@ -225,6 +225,8 @@ const steps = ref<StepperItem[]>([
 // Track which fields have been touched
 const touchedFields = reactive({
   conventionId: false,
+  name: false,
+  description: false,
   startDate: false,
   endDate: false,
   addressCountry: false,
@@ -385,6 +387,25 @@ const getEndDateError = () => {
   }
   if (touchedFields.endDate && touchedFields.startDate && !dateValidation.value.isValid) {
     return dateValidation.value.error;
+  }
+  return undefined;
+};
+
+const getNameError = () => {
+  if (touchedFields.name && state.name) {
+    if (state.name.length < 3) {
+      return 'Le nom doit contenir au moins 3 caractères';
+    }
+    if (state.name.length > 200) {
+      return 'Le nom ne peut pas dépasser 200 caractères';
+    }
+  }
+  return undefined;
+};
+
+const getDescriptionError = () => {
+  if (touchedFields.description && state.description && state.description.length > 1000) {
+    return 'La description ne peut pas dépasser 1000 caractères';
   }
   return undefined;
 };

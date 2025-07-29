@@ -79,16 +79,32 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
     
     if (!state.departureCity) {
       errors.push({ path: 'departureCity', message: 'La ville de départ est requise' });
+    } else if (state.departureCity.length > 100) {
+      errors.push({ path: 'departureCity', message: 'La ville ne peut pas dépasser 100 caractères' });
+    }
+    
+    // Validation du numéro de téléphone
+    if (state.phoneNumber && !/^[\+]?[0-9\s\-\(\)]+$/.test(state.phoneNumber)) {
+      errors.push({ path: 'phoneNumber', message: 'Numéro de téléphone invalide' });
+    }
+    
+    // Validation de la description
+    if (state.description && state.description.length > 500) {
+      errors.push({ path: 'description', message: 'La description ne peut pas dépasser 500 caractères' });
     }
     
     // Validation spécifique aux offres
     if (config.type === 'offer') {
       if (!state.departureAddress) {
         errors.push({ path: 'departureAddress', message: 'L\'adresse de départ est requise' });
+      } else if (state.departureAddress.length > 200) {
+        errors.push({ path: 'departureAddress', message: 'L\'adresse ne peut pas dépasser 200 caractères' });
       }
       
       if (!state.availableSeats || state.availableSeats < 1) {
         errors.push({ path: 'availableSeats', message: 'Le nombre de places doit être au moins 1' });
+      } else if (state.availableSeats > 8) {
+        errors.push({ path: 'availableSeats', message: 'Maximum 8 places' });
       }
     }
     
@@ -96,6 +112,8 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
     if (config.type === 'request') {
       if (!state.seatsNeeded || state.seatsNeeded < 1) {
         errors.push({ path: 'seatsNeeded', message: 'Le nombre de places doit être au moins 1' });
+      } else if (state.seatsNeeded > 8) {
+        errors.push({ path: 'seatsNeeded', message: 'Maximum 8 personnes' });
       }
     }
     
