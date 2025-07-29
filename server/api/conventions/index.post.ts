@@ -39,7 +39,48 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    return convention;
+    // Ajouter automatiquement le créateur comme collaborateur ADMINISTRATOR
+    await prisma.conventionCollaborator.create({
+      data: {
+        conventionId: convention.id,
+        userId: event.context.user.id,
+        role: 'ADMINISTRATOR',
+        addedById: event.context.user.id,
+      },
+    });
+
+    // Retourner la convention avec les collaborateurs inclus
+    const conventionWithCollaborators = await prisma.convention.findUnique({
+      where: { id: convention.id },
+      include: {
+        author: {
+          select: {
+            id: true,
+            pseudo: true,
+            email: true,
+          },
+        },
+        collaborators: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                email: true,
+              },
+            },
+            addedBy: {
+              select: {
+                id: true,
+                pseudo: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return conventionWithCollaborators;
   } catch (error) {
     // Gestion des erreurs de validation Zod
     if (error instanceof z.ZodError) {
