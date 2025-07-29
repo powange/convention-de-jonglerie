@@ -26,46 +26,7 @@
       
       <!-- Contenu de gestion -->
       <div class="space-y-6">
-        <!-- Section collaborateurs -->
         <UCard>
-          <div class="space-y-6">
-            <!-- Section collaborateurs -->
-          <div v-if="authStore.user?.id === edition.creatorId">
-            <h3 class="text-lg font-semibold mb-4">Gestion des collaborateurs</h3>
-            <p class="text-gray-500">La gestion des collaborateurs sera disponible prochainement.</p>
-            <!-- TODO: Réactiver ConventionCollaborators une fois l'API corrigée -->
-            <!-- <ConventionCollaborators 
-              :convention-id="convention.id" 
-              :creator-id="convention.creatorId" 
-            /> -->
-          </div>
-
-          <!-- Informations sur le créateur et les collaborateurs -->
-          <div class="space-y-2 pt-4 border-t">
-            <p class="text-sm text-gray-600">
-              <span class="font-medium">Créé par :</span> {{ edition.creator.pseudo }}
-            </p>
-            <div v-if="edition.collaborators && edition.collaborators.length > 0">
-              <p class="text-sm font-medium text-gray-600 mb-2">Collaborateurs :</p>
-              <div class="flex flex-wrap gap-2">
-                <div v-for="collaborator in edition.collaborators" :key="collaborator.id" class="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1">
-                  <img 
-                    :src="getUserAvatar(collaborator.user, 20)" 
-                    :alt="`Avatar de ${collaborator.user.pseudo}`"
-                    class="w-5 h-5 rounded-full"
-                  >
-                  <span class="text-sm">{{ collaborator.user.pseudo }}</span>
-                  <UBadge :color="collaborator.canEdit ? 'green' : 'gray'" variant="subtle" size="xs">
-                    {{ collaborator.canEdit ? 'Éditeur' : 'Lecture' }}
-                  </UBadge>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </UCard>
-
-      <UCard>
         <!-- Actions de gestion -->
         <div class="space-y-4">
           <h3 class="text-lg font-semibold">Actions</h3>
@@ -100,8 +61,6 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
-import { useAvatar } from '~/utils/avatar';
-// import ConventionCollaborators from '~/components/convention/ConventionCollaborators.vue';
 import EditionHeader from '~/components/edition/EditionHeader.vue';
 
 // TODO: Ajouter le middleware d'authentification plus tard
@@ -114,7 +73,6 @@ const router = useRouter();
 const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
-const { getUserAvatar } = useAvatar();
 
 const editionId = parseInt(route.params.id as string);
 const edition = ref(null);
