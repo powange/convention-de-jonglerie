@@ -105,7 +105,29 @@ const loading = ref(false);
 const handleLogin = async () => {
   loading.value = true;
   try {
-    await authStore.login(state.identifier, state.password, state.rememberMe);
+    // Appel direct à l'API au lieu du store pour capturer l'erreur complète
+    const response = await $fetch('/api/auth/login', {
+      method: 'POST',
+      body: { 
+        identifier: state.identifier, 
+        password: state.password 
+      }
+    });
+    
+    // Si succès, mettre à jour le store manuellement
+    authStore.token = response.token;
+    authStore.user = response.user;
+    authStore.rememberMe = state.rememberMe;
+    authStore.tokenExpiry = Date.now() + (60 * 60 * 1000);
+    
+    if (import.meta.client) {
+      const storage = state.rememberMe ? localStorage : sessionStorage;
+      storage.setItem('authToken', response.token);
+      storage.setItem('authUser', JSON.stringify(response.user));
+      storage.setItem('tokenExpiry', authStore.tokenExpiry.toString());
+      storage.setItem('rememberMe', state.rememberMe.toString());
+    }
+    
     toast.add({ title: 'Connexion réussie !', icon: 'i-heroicons-check-circle', color: 'success' });
     
     // Navigation intelligente : retourner à la page précédente ou à l'accueil
@@ -119,7 +141,16 @@ const handleLogin = async () => {
       errorMessage = 'Email/pseudo ou mot de passe incorrect';
     } else if (error.statusCode === 403 || error.status === 403) {
       // Email non vérifié
-      if (error.data?.requiresEmailVerification && error.data?.email) {
+      const isEmailNotVerified = error.statusMessage?.includes('Email non vérifié') || 
+                                error.message?.includes('Email non vérifié');
+      
+      // Récupérer les données depuis la structure d'erreur Nuxt
+      const errorData = error.data;
+      const actualData = errorData?.data || errorData;
+      
+      if (isEmailNotVerified && (actualData?.email || state.identifier.includes('@'))) {
+        const email = actualData?.email || state.identifier;
+        
         toast.add({ 
           title: 'Email non vérifié', 
           description: 'Vous devez vérifier votre email avant de vous connecter.',
@@ -128,7 +159,17 @@ const handleLogin = async () => {
         });
         
         // Rediriger vers la page de vérification
-        router.push(`/verify-email?email=${encodeURIComponent(error.data.email)}`);
+        await router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+        return;
+      } else if (actualData?.requiresEmailVerification && actualData?.email) {
+        toast.add({ 
+          title: 'Email non vérifié', 
+          description: 'Vous devez vérifier votre email avant de vous connecter.',
+          icon: 'i-heroicons-envelope-open', 
+          color: 'warning' 
+        });
+        
+        await router.push(`/verify-email?email=${encodeURIComponent(actualData.email)}`);
         return;
       } else {
         errorMessage = error.statusMessage || 'Accès non autorisé';
