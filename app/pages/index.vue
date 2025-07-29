@@ -33,11 +33,42 @@
             <!-- Filtres de dates -->
             <div class="space-y-4">
               <h4 class="font-medium text-gray-700">Dates :</h4>
-              <UFormField label="Date de début (min)" name="startDate">
-                <UInput v-model="filters.startDate" type="date" />
+              <UFormField label="À partir du" name="startDate">
+                <UPopover :popper="{ placement: 'bottom-start' }">
+                  <UButton 
+                    color="neutral" 
+                    variant="outline" 
+                    icon="i-heroicons-calendar-days"
+                    :label="filters.startDate ? formatDateForDisplay(filters.startDate) : 'Sélectionner une date'"
+                    block
+                  />
+                  <template #content>
+                    <UCalendar 
+                      v-model="calendarStartDate" 
+                      class="p-2"
+                      @update:model-value="updateStartDate"
+                    />
+                  </template>
+                </UPopover>
               </UFormField>
-              <UFormField label="Date de fin (max)" name="endDate">
-                <UInput v-model="filters.endDate" type="date" />
+              <UFormField label="Jusqu'au" name="endDate">
+                <UPopover :popper="{ placement: 'bottom-start' }">
+                  <UButton 
+                    color="neutral" 
+                    variant="outline" 
+                    icon="i-heroicons-calendar-days"
+                    :label="filters.endDate ? formatDateForDisplay(filters.endDate) : 'Sélectionner une date'"
+                    block
+                  />
+                  <template #content>
+                    <UCalendar 
+                      v-model="calendarEndDate" 
+                      class="p-2"
+                      :is-date-disabled="(date) => calendarStartDate && date < calendarStartDate"
+                      @update:model-value="updateEndDate"
+                    />
+                  </template>
+                </UPopover>
               </UFormField>
             </div>
             
@@ -127,11 +158,42 @@
               <!-- Filtres de dates -->
               <div class="space-y-4">
                 <h4 class="font-medium text-gray-700">Dates :</h4>
-                <UFormField label="Date de début (min)" name="startDate">
-                  <UInput v-model="filters.startDate" type="date" />
+                <UFormField label="À partir du" name="startDate">
+                  <UPopover :popper="{ placement: 'bottom-start' }">
+                    <UButton 
+                      color="neutral" 
+                      variant="outline" 
+                      icon="i-heroicons-calendar-days"
+                      :label="filters.startDate ? formatDateForDisplay(filters.startDate) : 'Sélectionner une date'"
+                      block
+                    />
+                    <template #content>
+                      <UCalendar 
+                        v-model="calendarStartDate" 
+                        class="p-2"
+                        @update:model-value="updateStartDate"
+                      />
+                    </template>
+                  </UPopover>
                 </UFormField>
-                <UFormField label="Date de fin (max)" name="endDate">
-                  <UInput v-model="filters.endDate" type="date" />
+                <UFormField label="Jusqu'au" name="endDate">
+                  <UPopover :popper="{ placement: 'bottom-start' }">
+                    <UButton 
+                      color="neutral" 
+                      variant="outline" 
+                      icon="i-heroicons-calendar-days"
+                      :label="filters.endDate ? formatDateForDisplay(filters.endDate) : 'Sélectionner une date'"
+                      block
+                    />
+                    <template #content>
+                      <UCalendar 
+                        v-model="calendarEndDate" 
+                        class="p-2"
+                        :is-date-disabled="(date) => calendarStartDate && date < calendarStartDate"
+                        @update:model-value="updateEndDate"
+                      />
+                    </template>
+                  </UPopover>
                 </UFormField>
               </div>
               
@@ -199,10 +261,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, reactive, watch } from 'vue';
+import { onMounted, computed, reactive, watch, ref } from 'vue';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
 import { useRouter } from 'vue-router';
+import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date';
 import CountryMultiSelect from '~/components/CountryMultiSelect.vue';
 
 const editionStore = useEditionStore();
@@ -213,6 +276,12 @@ const router = useRouter();
 const showMobileFilters = ref(false);
 const { services, servicesByCategory } = useConventionServices();
 
+// Date formatter pour l'affichage
+const df = new DateFormatter('fr-FR', { dateStyle: 'medium' });
+
+// CalendarDate objects pour les sélecteurs de date
+const calendarStartDate = ref<CalendarDate | null>(null);
+const calendarEndDate = ref<CalendarDate | null>(null);
 
 // Compteur de filtres actifs
 const activeFiltersCount = computed(() => {
@@ -240,11 +309,57 @@ watch(filters, () => {
   editionStore.fetchEditions(filters);
 }, { deep: true, immediate: false });
 
+// Fonctions pour gérer les dates
+const formatDateForDisplay = (dateString: string): string => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return df.format(date);
+};
+
+const updateStartDate = (date: CalendarDate | null) => {
+  if (date) {
+    // Convertir CalendarDate en string ISO
+    filters.startDate = date.toString();
+  } else {
+    filters.startDate = '';
+  }
+};
+
+const updateEndDate = (date: CalendarDate | null) => {
+  if (date) {
+    // Convertir CalendarDate en string ISO
+    filters.endDate = date.toString();
+  } else {
+    filters.endDate = '';
+  }
+};
+
+// Initialiser les CalendarDate quand les filtres changent
+watch(() => filters.startDate, (newValue) => {
+  if (newValue) {
+    const [year, month, day] = newValue.split('-').map(Number);
+    calendarStartDate.value = new CalendarDate(year, month, day);
+  } else {
+    calendarStartDate.value = null;
+  }
+});
+
+watch(() => filters.endDate, (newValue) => {
+  if (newValue) {
+    const [year, month, day] = newValue.split('-').map(Number);
+    calendarEndDate.value = new CalendarDate(year, month, day);
+  } else {
+    calendarEndDate.value = null;
+  }
+});
+
 const resetFilters = () => {
   filters.name = '';
   filters.startDate = '';
   filters.endDate = '';
   filters.countries = [];
+  calendarStartDate.value = null;
+  calendarEndDate.value = null;
   // Réinitialiser tous les services
   services.forEach(service => {
     filters[service.key] = false;
