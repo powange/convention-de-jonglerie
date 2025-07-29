@@ -31,6 +31,10 @@
       
       <!-- Légende et contrôles -->
       <div class="absolute top-4 right-4 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-[1000] space-y-2">
+        <div v-if="authStore.isAuthenticated" class="flex items-center gap-2 text-sm">
+          <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+          <span class="text-gray-700 dark:text-gray-300">Mes favoris</span>
+        </div>
         <div class="flex items-center gap-2 text-sm">
           <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
           <span class="text-gray-700 dark:text-gray-300">Éditions à venir</span>
@@ -38,10 +42,6 @@
         <div class="flex items-center gap-2 text-sm">
           <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
           <span class="text-gray-700 dark:text-gray-300">Éditions passées</span>
-        </div>
-        <div v-if="authStore.isAuthenticated" class="flex items-center gap-2 text-sm">
-          <UIcon name="i-heroicons-star-solid" class="text-yellow-500" size="16" />
-          <span class="text-gray-700 dark:text-gray-300">Mes favoris</span>
         </div>
       </div>
     </div>
@@ -165,14 +165,22 @@ const initMap = async () => {
         const isUpcoming = startDate >= now;
         const isFav = isFavorited(edition);
         
-        // Déterminer la couleur de l'icône
-        let iconColor = isUpcoming ? 'blue' : 'gray';
-        let iconUrl = isUpcoming 
-          ? 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png'
-          : 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png';
-        let iconRetinaUrl = isUpcoming
-          ? 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png'
-          : 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png';
+        // Déterminer la couleur de l'icône (priorité aux favoris)
+        let iconUrl, iconRetinaUrl;
+        
+        if (isFav) {
+          // Marqueur jaune/doré pour les favoris
+          iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-gold.png';
+          iconRetinaUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png';
+        } else if (isUpcoming) {
+          // Marqueur bleu pour les éditions à venir
+          iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png';
+          iconRetinaUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png';
+        } else {
+          // Marqueur gris pour les éditions passées
+          iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png';
+          iconRetinaUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png';
+        }
 
         // Créer l'icône
         const icon = L.icon({
