@@ -37,7 +37,7 @@
           />
         </div>
         <div class="text-right">
-          <UBadge color="orange" variant="soft" class="mb-2">
+          <UBadge color="warning" variant="soft" class="mb-2">
             {{ request.seatsNeeded }} place{{ request.seatsNeeded > 1 ? 's' : '' }} recherchée{{ request.seatsNeeded > 1 ? 's' : '' }}
           </UBadge>
           <div class="text-sm">

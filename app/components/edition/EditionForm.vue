@@ -147,7 +147,7 @@
             
             <UAlert
               icon="i-heroicons-light-bulb"
-              color="blue"
+              color="info"
               variant="soft"
               title="Conseil"
               description="Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte."
@@ -226,7 +226,7 @@
                       <template #trailing>
                         <UButton
                           icon="i-heroicons-x-mark"
-                          color="gray"
+                          color="neutral"
                           variant="link"
                           size="xs"
                           @click="showCustomCountry = false; state.country = 'France'"
@@ -285,11 +285,13 @@
 
       <template #ticketing>
         <div class="space-y-6">
-          <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
-            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Billetterie</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Informations pour l'achat de billets</p>
+          <div class="space-y-4">
+            <div class="border-b border-gray-200 pb-2">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Billetterie</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400">Informations pour l'achat de billets</p>
+            </div>
             <UFormField label="Lien de la billetterie" name="ticketingUrl">
-              <UInput v-model="state.ticketingUrl" type="url" placeholder="https://billetterie.com/ma-convention" @blur="trimField('ticketingUrl')">
+              <UInput v-model="state.ticketingUrl" type="url" placeholder="https://billetterie.com/ma-convention" class="w-full" @blur="trimField('ticketingUrl')">
                 <template #leading>
                   <UIcon name="i-heroicons-ticket" />
                 </template>
@@ -301,19 +303,21 @@
 
       <template #visibility>
         <div class="space-y-6">
-          <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
-            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Réseaux sociaux</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Partagez vos pages pour augmenter la visibilité</p>
+          <div class="space-y-4">
+            <div class="border-b border-gray-200 pb-2">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Réseaux sociaux</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400">Partagez vos pages pour augmenter la visibilité</p>
+            </div>
             <div class="space-y-4">
               <UFormField label="Page Facebook" name="facebookUrl">
-                <UInput v-model="state.facebookUrl" type="url" placeholder="https://facebook.com/ma-convention" @blur="trimField('facebookUrl')">
+                <UInput v-model="state.facebookUrl" type="url" placeholder="https://facebook.com/ma-convention" class="w-full" @blur="trimField('facebookUrl')">
                   <template #leading>
                     <UIcon name="i-simple-icons-facebook" class="text-blue-600" />
                   </template>
                 </UInput>
               </UFormField>
               <UFormField label="Compte Instagram" name="instagramUrl">
-                <UInput v-model="state.instagramUrl" type="url" placeholder="https://instagram.com/ma-convention" @blur="trimField('instagramUrl')">
+                <UInput v-model="state.instagramUrl" type="url" placeholder="https://instagram.com/ma-convention" class="w-full" @blur="trimField('instagramUrl')">
                   <template #leading>
                     <UIcon name="i-simple-icons-instagram" class="text-pink-600" />
                   </template>
@@ -814,8 +818,13 @@ onMounted(() => {
 const updateStartDate = (date: CalendarDate | null) => {
   if (date && startTime.value) {
     const [hours, minutes] = startTime.value.split(':').map(Number);
-    const dateTime = new Date(date.year, date.month - 1, date.day, hours, minutes);
-    state.startDate = dateTime.toISOString().slice(0, 16);
+    // Créer un format datetime-local en évitant les conversions UTC
+    const year = date.year.toString().padStart(4, '0');
+    const month = date.month.toString().padStart(2, '0');
+    const day = date.day.toString().padStart(2, '0');
+    const hoursStr = hours.toString().padStart(2, '0');
+    const minutesStr = minutes.toString().padStart(2, '0');
+    state.startDate = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`;
     touchedFields.startDate = true;
   }
 };
@@ -823,8 +832,13 @@ const updateStartDate = (date: CalendarDate | null) => {
 const updateEndDate = (date: CalendarDate | null) => {
   if (date && endTime.value) {
     const [hours, minutes] = endTime.value.split(':').map(Number);
-    const dateTime = new Date(date.year, date.month - 1, date.day, hours, minutes);
-    state.endDate = dateTime.toISOString().slice(0, 16);
+    // Créer un format datetime-local en évitant les conversions UTC
+    const year = date.year.toString().padStart(4, '0');
+    const month = date.month.toString().padStart(2, '0');
+    const day = date.day.toString().padStart(2, '0');
+    const hoursStr = hours.toString().padStart(2, '0');
+    const minutesStr = minutes.toString().padStart(2, '0');
+    state.endDate = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`;
     touchedFields.endDate = true;
   }
 };
@@ -832,16 +846,26 @@ const updateEndDate = (date: CalendarDate | null) => {
 const updateStartDateTime = () => {
   if (calendarStartDate.value && startTime.value) {
     const [hours, minutes] = startTime.value.split(':').map(Number);
-    const dateTime = new Date(calendarStartDate.value.year, calendarStartDate.value.month - 1, calendarStartDate.value.day, hours, minutes);
-    state.startDate = dateTime.toISOString().slice(0, 16);
+    // Créer un format datetime-local en évitant les conversions UTC
+    const year = calendarStartDate.value.year.toString().padStart(4, '0');
+    const month = calendarStartDate.value.month.toString().padStart(2, '0');
+    const day = calendarStartDate.value.day.toString().padStart(2, '0');
+    const hoursStr = hours.toString().padStart(2, '0');
+    const minutesStr = minutes.toString().padStart(2, '0');
+    state.startDate = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`;
   }
 };
 
 const updateEndDateTime = () => {
   if (calendarEndDate.value && endTime.value) {
     const [hours, minutes] = endTime.value.split(':').map(Number);
-    const dateTime = new Date(calendarEndDate.value.year, calendarEndDate.value.month - 1, calendarEndDate.value.day, hours, minutes);
-    state.endDate = dateTime.toISOString().slice(0, 16);
+    // Créer un format datetime-local en évitant les conversions UTC
+    const year = calendarEndDate.value.year.toString().padStart(4, '0');
+    const month = calendarEndDate.value.month.toString().padStart(2, '0');
+    const day = calendarEndDate.value.day.toString().padStart(2, '0');
+    const hoursStr = hours.toString().padStart(2, '0');
+    const minutesStr = minutes.toString().padStart(2, '0');
+    state.endDate = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`;
   }
 };
 

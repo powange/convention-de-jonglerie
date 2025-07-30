@@ -36,7 +36,7 @@
         <!-- Boutons de vue -->
         <div class="flex gap-2">
           <UButton
-            :color="viewMode === 'grid' ? 'primary' : 'gray'"
+            :color="viewMode === 'grid' ? 'primary' : 'neutral'"
             :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
             icon="i-heroicons-squares-2x2"
             size="sm"
@@ -45,7 +45,7 @@
             Grille
           </UButton>
           <UButton
-            :color="viewMode === 'map' ? 'primary' : 'gray'"
+            :color="viewMode === 'map' ? 'primary' : 'neutral'"
             :variant="viewMode === 'map' ? 'solid' : 'ghost'"
             icon="i-heroicons-map"
             size="sm"

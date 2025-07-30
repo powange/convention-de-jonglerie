@@ -20,6 +20,7 @@ model User {
   prenom                 String
   password               String
   isEmailVerified        Boolean                  @default(false)
+  isGlobalAdmin          Boolean                  @default(false)
   emailVerificationCode  String?
   verificationCodeExpiry DateTime?
   createdAt              DateTime                 @default(now())

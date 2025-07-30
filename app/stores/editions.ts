@@ -301,6 +301,13 @@ export const useEditionStore = defineStore('editions', {
 
     // Vérifier si l'utilisateur peut modifier une édition
     canEditEdition(edition: Edition, userId: number): boolean {
+      const authStore = useAuthStore();
+      
+      // Les admins globaux en mode admin peuvent tout modifier
+      if (authStore.isAdminModeActive) {
+        return true;
+      }
+      
       // Le créateur de l'édition peut toujours modifier
       if (edition.creatorId === userId) {
         return true;
@@ -324,6 +331,13 @@ export const useEditionStore = defineStore('editions', {
 
     // Vérifier si l'utilisateur peut supprimer une édition
     canDeleteEdition(edition: Edition, userId: number): boolean {
+      const authStore = useAuthStore();
+      
+      // Les admins globaux en mode admin peuvent tout supprimer
+      if (authStore.isAdminModeActive) {
+        return true;
+      }
+      
       // Le créateur de l'édition peut supprimer
       if (edition.creatorId === userId) {
         return true;

@@ -37,7 +37,7 @@
           />
         </div>
         <div class="text-right">
-          <UBadge :color="remainingSeats > 0 ? 'primary' : 'gray'" variant="soft" class="mb-2">
+          <UBadge :color="remainingSeats > 0 ? 'primary' : 'neutral'" variant="soft" class="mb-2">
             {{ remainingSeats }} place{{ remainingSeats > 1 ? 's' : '' }} {{ remainingSeats > 0 ? 'disponible' : 'restante' }}{{ remainingSeats > 1 ? 's' : '' }}
           </UBadge>
           <div class="text-sm">

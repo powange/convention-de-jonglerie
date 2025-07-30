@@ -74,12 +74,13 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Vérifier les permissions : créateur de l'édition, auteur de la convention, ou collaborateur
+    // Vérifier les permissions : créateur de l'édition, auteur de la convention, collaborateur, ou admin global
     const isCreator = edition.creatorId === event.context.user.id;
     const isConventionAuthor = edition.convention.authorId === event.context.user.id;
     const isCollaborator = edition.convention.collaborators.length > 0;
+    const isGlobalAdmin = event.context.user.isGlobalAdmin || false;
 
-    if (!isCreator && !isConventionAuthor && !isCollaborator) {
+    if (!isCreator && !isConventionAuthor && !isCollaborator && !isGlobalAdmin) {
       throw createError({
         statusCode: 403,
         statusMessage: 'Vous n\'avez pas les droits pour modifier cette édition',
@@ -107,9 +108,10 @@ export default defineEventHandler(async (event) => {
         });
       }
 
-      // Seuls l'auteur et les administrateurs peuvent changer la convention d'une édition
+      // Seuls l'auteur, les administrateurs, ou les admins globaux peuvent changer la convention d'une édition
       const canChangeConvention = convention.authorId === event.context.user.id || 
-                                  convention.collaborators.length > 0;
+                                  convention.collaborators.length > 0 ||
+                                  event.context.user.isGlobalAdmin;
 
       if (!canChangeConvention) {
         throw createError({

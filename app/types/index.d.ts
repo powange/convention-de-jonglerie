@@ -6,6 +6,7 @@ export interface User {
   nom: string;
   prenom: string;
   profilePicture?: string | null;
+  isGlobalAdmin?: boolean;
   createdAt: string;
   updatedAt?: string;
 }

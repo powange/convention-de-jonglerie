@@ -47,12 +47,13 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Vérifier les permissions : créateur de l'édition, auteur de la convention, ou collaborateur
+    // Vérifier les permissions : créateur de l'édition, auteur de la convention, collaborateur, ou admin global
     const isCreator = edition.creatorId === event.context.user.id;
     const isConventionAuthor = edition.convention.authorId === event.context.user.id;
     const isCollaborator = edition.convention.collaborators.length > 0;
+    const isGlobalAdmin = event.context.user.isGlobalAdmin || false;
 
-    if (!isCreator && !isConventionAuthor && !isCollaborator) {
+    if (!isCreator && !isConventionAuthor && !isCollaborator && !isGlobalAdmin) {
       throw createError({
         statusCode: 403,
         statusMessage: 'Vous n\'avez pas les droits pour supprimer cette édition',

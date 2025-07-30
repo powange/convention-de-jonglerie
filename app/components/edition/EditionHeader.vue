@@ -144,6 +144,12 @@ const editionStore = useEditionStore();
 // Vérifier l'accès à la page gestion
 const canAccess = computed(() => {
   if (!props.edition || !authStore.user?.id) return false;
+  
+  // Les admins globaux en mode admin peuvent accéder à la gestion
+  if (authStore.isAdminModeActive) {
+    return true;
+  }
+  
   const canEdit = editionStore.canEditEdition(props.edition, authStore.user.id);
   return canEdit || authStore.user?.id === props.edition?.creatorId;
 });

@@ -87,7 +87,7 @@
                   <UBadge
                     v-else-if="collaborator.role === 'ADMINISTRATOR'"
                     size="xs"
-                    color="orange"
+                    color="warning"
                     variant="soft"
                   >
                     Admin
@@ -95,7 +95,7 @@
                   <UBadge
                     v-else-if="collaborator.role === 'MODERATOR'"
                     size="xs"
-                    color="blue"
+                    color="info"
                     variant="soft"
                   >
                     Modérateur
@@ -110,8 +110,8 @@
             <h3 class="text-lg font-semibold">Liens utiles</h3>
             <div class="flex gap-2">
               <UButton v-if="edition.ticketingUrl" icon="i-heroicons-ticket" :to="edition.ticketingUrl" target="_blank" size="sm">Billetterie</UButton>
-              <UButton v-if="edition.facebookUrl" icon="i-simple-icons-facebook" :to="edition.facebookUrl" target="_blank" size="sm" color="blue">Facebook</UButton>
-              <UButton v-if="edition.instagramUrl" icon="i-simple-icons-instagram" :to="edition.instagramUrl" target="_blank" size="sm" color="pink">Instagram</UButton>
+              <UButton v-if="edition.facebookUrl" icon="i-simple-icons-facebook" :to="edition.facebookUrl" target="_blank" size="sm" color="info">Facebook</UButton>
+              <UButton v-if="edition.instagramUrl" icon="i-simple-icons-instagram" :to="edition.instagramUrl" target="_blank" size="sm" color="error">Instagram</UButton>
             </div>
           </div>
 

@@ -74,18 +74,20 @@ export const useDateTimePicker = (options: UseDateTimePickerOptions = {}) => {
         selectedTime.value) {
       
       const [hours, minutes] = selectedTime.value.split(':');
-      const dateTime = new Date(calendarDate.value);
-      dateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
       
-      // Vérifier que la date résultante est valide
-      if (!isNaN(dateTime.getTime())) {
-        const isoString = dateTime.toISOString().slice(0, 16);
-        combinedDateTime.value = isoString;
-        
-        // Appeler le callback si fourni
-        if (onChange) {
-          onChange(isoString);
-        }
+      // Créer un format datetime-local en évitant les conversions UTC
+      const year = calendarDate.value.getFullYear().toString().padStart(4, '0');
+      const month = (calendarDate.value.getMonth() + 1).toString().padStart(2, '0');
+      const day = calendarDate.value.getDate().toString().padStart(2, '0');
+      const hoursStr = hours.padStart(2, '0');
+      const minutesStr = minutes.padStart(2, '0');
+      const isoString = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`;
+      
+      combinedDateTime.value = isoString;
+      
+      // Appeler le callback si fourni
+      if (onChange) {
+        onChange(isoString);
       }
     }
   };

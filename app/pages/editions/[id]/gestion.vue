@@ -9,7 +9,7 @@
     <div v-else-if="!canAccess">
       <UAlert 
         icon="i-heroicons-exclamation-triangle" 
-        color="red" 
+        color="error" 
         variant="soft"
         title="Accès refusé"
         description="Vous n'avez pas les permissions pour accéder à cette page."
@@ -70,7 +70,7 @@
                     Cette fonctionnalité inclura la création de postes, l'inscription des bénévoles, la planification des créneaux et la communication d'équipe.
                   </p>
                   <div class="mt-3">
-                    <UBadge color="blue" variant="soft">En développement</UBadge>
+                    <UBadge color="info" variant="soft">En développement</UBadge>
                   </div>
                 </div>
               </div>

@@ -88,7 +88,7 @@
               <UBadge 
                 v-for="collaborator in convention.collaborators" 
                 :key="collaborator.id"
-                :color="collaborator.role === 'ADMINISTRATOR' ? 'red' : 'blue'"
+                :color="collaborator.role === 'ADMINISTRATOR' ? 'error' : 'info'"
                 variant="subtle"
                 size="sm"
                 class="flex items-center gap-2"

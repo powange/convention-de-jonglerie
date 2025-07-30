@@ -36,7 +36,18 @@
                       :alt="`Avatar de ${displayName}`"
                       class="w-8 h-8 rounded-full border-2 border-gray-200"
                     >
-                    <span class="hidden sm:block text-sm font-medium">{{ displayName }}</span>
+                    <div class="hidden sm:flex flex-col items-start">
+                      <span class="text-sm font-medium">{{ displayName }}</span>
+                      <UBadge 
+                        v-if="authStore.isAdminModeActive" 
+                        color="warning" 
+                        variant="soft" 
+                        size="xs"
+                        class="px-1"
+                      >
+                        👑 Admin
+                      </UBadge>
+                    </div>
                     <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 text-gray-400" />
                   </div>
                 </UButton>

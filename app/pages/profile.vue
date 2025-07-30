@@ -130,7 +130,7 @@
                 v-if="hasChanges"
                 type="button"
                 variant="outline"
-                color="gray"
+                color="neutral"
                 size="lg"
                 icon="i-heroicons-arrow-path"
                 @click="resetForm"
@@ -179,7 +179,7 @@
                   </div>
                   <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Favoris</span>
                 </div>
-                <UBadge color="yellow" variant="soft" size="lg">{{ favoritesCount }}</UBadge>
+                <UBadge color="warning" variant="soft" size="lg">{{ favoritesCount }}</UBadge>
               </div>
             </div>
             
@@ -191,7 +191,7 @@
                   </div>
                   <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Favoris reçus</span>
                 </div>
-                <UBadge color="red" variant="soft" size="lg">{{ totalFavoritesReceived }}</UBadge>
+                <UBadge color="error" variant="soft" size="lg">{{ totalFavoritesReceived }}</UBadge>
               </div>
             </div>
           </div>
@@ -226,7 +226,7 @@
             <UButton 
               icon="i-heroicons-calendar-days" 
               variant="soft" 
-              color="blue" 
+              color="info" 
               size="lg"
               block
               to="/my-conventions"
@@ -238,7 +238,7 @@
             <UButton 
               icon="i-heroicons-star" 
               variant="soft" 
-              color="yellow" 
+              color="warning" 
               size="lg"
               block
               to="/favorites"
@@ -266,7 +266,7 @@
           <UButton 
             icon="i-heroicons-key" 
             variant="soft" 
-            color="red" 
+            color="error" 
             size="lg"
             block
             @click="showPasswordModal = true"
@@ -274,6 +274,81 @@
           >
             Changer le mot de passe
           </UButton>
+        </UCard>
+
+        <!-- Administration globale -->
+        <UCard v-if="authStore.isGlobalAdmin" class="shadow-lg border-0 bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20">
+          <template #header>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                <UIcon name="i-heroicons-shield-exclamation" class="w-5 h-5 text-orange-600 dark:text-orange-400" />
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Administration</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Gestion des privilèges d'administrateur</p>
+              </div>
+            </div>
+          </template>
+
+          <div class="space-y-4">
+            <!-- Statut actuel -->
+            <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border border-orange-200 dark:border-orange-800">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-orange-100 dark:bg-orange-800 rounded-lg flex items-center justify-center">
+                  <UIcon name="i-heroicons-crown" class="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">Administrateur global</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Mode {{ authStore.isAdminModeActive ? 'Administrateur' : 'Utilisateur normal' }}
+                  </p>
+                </div>
+              </div>
+              <UBadge 
+                :color="authStore.isAdminModeActive ? 'warning' : 'gray'" 
+                variant="soft" 
+                size="lg"
+              >
+                {{ authStore.isAdminModeActive ? '👑 Admin actif' : '👤 Mode normal' }}
+              </UBadge>
+            </div>
+
+            <!-- Switch toggle -->
+            <div class="p-4 bg-white dark:bg-gray-800 rounded-lg border border-orange-200 dark:border-orange-800">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="font-medium text-gray-900 dark:text-white">Mode administrateur</h4>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    {{ authStore.isAdminModeActive 
+                      ? 'Vous avez accès à toutes les fonctionnalités administrateur' 
+                      : 'Activez pour accéder aux privilèges d\'administrateur' 
+                    }}
+                  </p>
+                </div>
+                <USwitch 
+                  v-model="adminModeToggle"
+                  color="warning"
+                  size="lg"
+                  @update:model-value="toggleAdminMode"
+                />
+              </div>
+            </div>
+
+            <!-- Avertissement -->
+            <div class="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4 border border-orange-200 dark:border-orange-800">
+              <div class="flex items-start gap-3">
+                <UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p class="text-sm font-medium text-orange-800 dark:text-orange-200 mb-1">Utilisation responsable</p>
+                  <ul class="text-xs text-orange-700 dark:text-orange-300 space-y-1">
+                    <li>• En mode admin, vous pouvez modifier toutes les conventions</li>
+                    <li>• Utilisez ces privilèges avec précaution</li>
+                    <li>• Basculez en mode normal pour tester l'expérience utilisateur</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
         </UCard>
       </div>
     </div>
@@ -334,7 +409,7 @@
             <UButton 
               type="button"
               variant="outline"
-              color="gray"
+              color="neutral"
               size="lg"
               @click="showPasswordModal = false"
               class="transition-all duration-200 hover:transform hover:scale-105"
@@ -344,7 +419,7 @@
             <UButton 
               type="submit" 
               :loading="passwordLoading"
-              color="red"
+              color="error"
               size="lg"
               icon="i-heroicons-key"
               class="transition-all duration-200 hover:transform hover:scale-105"
@@ -405,7 +480,7 @@
               v-if="authStore.user?.profilePicture"
               icon="i-heroicons-trash" 
               variant="soft" 
-              color="red" 
+              color="error" 
               size="lg"
               block
               :loading="pictureLoading"
@@ -469,6 +544,9 @@ const showPasswordModal = ref(false);
 const showProfilePictureModal = ref(false);
 const fileInput = ref<HTMLInputElement>();
 const avatarKey = ref(Date.now()); // Pour forcer le rechargement de l'avatar
+
+// Gestion du mode administrateur
+const adminModeToggle = ref(authStore.isAdminModeActive);
 
 // Schéma de validation pour le profil
 const schema = z.object({
@@ -715,6 +793,27 @@ const deleteProfilePicture = async () => {
     });
   } finally {
     pictureLoading.value = false;
+  }
+};
+
+// Fonction pour basculer le mode administrateur
+const toggleAdminMode = (enabled: boolean) => {
+  if (enabled) {
+    authStore.enableAdminMode();
+    toast.add({
+      title: 'Mode administrateur activé',
+      description: 'Vous avez maintenant accès à tous les privilèges d\'administrateur',
+      icon: 'i-heroicons-shield-check',
+      color: 'warning'
+    });
+  } else {
+    authStore.disableAdminMode();
+    toast.add({
+      title: 'Mode administrateur désactivé',
+      description: 'Vous utilisez maintenant l\'interface utilisateur normale',
+      icon: 'i-heroicons-user',
+      color: 'info'
+    });
   }
 };
 

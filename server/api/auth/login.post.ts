@@ -80,6 +80,7 @@ export default defineEventHandler(async (event) => {
         nom: user.nom, 
         prenom: user.prenom,
         profilePicture: user.profilePicture,
+        isGlobalAdmin: user.isGlobalAdmin,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         isEmailVerified: user.isEmailVerified

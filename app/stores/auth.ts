@@ -7,12 +7,19 @@ export const useAuthStore = defineStore('auth', {
     token: null as string | null,
     tokenExpiry: null as number | null,
     rememberMe: false,
+    adminMode: false,
   }),
   getters: {
     isAuthenticated: (state) => {
       if (!state.token || !state.tokenExpiry) return false;
       // Vérifier si le token n'est pas expiré
       return Date.now() < state.tokenExpiry;
+    },
+    isGlobalAdmin: (state) => {
+      return state.user?.isGlobalAdmin || false;
+    },
+    isAdminModeActive: (state) => {
+      return state.user?.isGlobalAdmin && state.adminMode;
     },
   },
   actions: {
@@ -60,6 +67,7 @@ export const useAuthStore = defineStore('auth', {
       this.token = null;
       this.tokenExpiry = null;
       this.rememberMe = false;
+      this.adminMode = false;
       
       if (import.meta.client) {
         // Nettoyer les deux storages
@@ -67,10 +75,12 @@ export const useAuthStore = defineStore('auth', {
         localStorage.removeItem('authUser');
         localStorage.removeItem('tokenExpiry');
         localStorage.removeItem('rememberMe');
+        localStorage.removeItem('adminMode');
         sessionStorage.removeItem('authToken');
         sessionStorage.removeItem('authUser');
         sessionStorage.removeItem('tokenExpiry');
         sessionStorage.removeItem('rememberMe');
+        sessionStorage.removeItem('adminMode');
       }
     },
     initializeAuth() {
@@ -98,6 +108,12 @@ export const useAuthStore = defineStore('auth', {
               this.user = JSON.parse(user);
               this.tokenExpiry = expiry;
               this.rememberMe = rememberMe;
+              
+              // Restaurer l'état du mode admin
+              const adminMode = storage.getItem('adminMode') === 'true';
+              if (this.user?.isGlobalAdmin && adminMode) {
+                this.adminMode = true;
+              }
             } else {
               // Token expiré, nettoyer
               this.logout();
@@ -126,6 +142,26 @@ export const useAuthStore = defineStore('auth', {
           const storage = this.rememberMe ? localStorage : sessionStorage;
           storage.setItem('authUser', JSON.stringify(this.user));
         }
+      }
+    },
+    
+    enableAdminMode() {
+      if (this.user?.isGlobalAdmin) {
+        this.adminMode = true;
+        // Sauvegarder l'état du mode admin
+        if (import.meta.client) {
+          const storage = this.rememberMe ? localStorage : sessionStorage;
+          storage.setItem('adminMode', 'true');
+        }
+      }
+    },
+    
+    disableAdminMode() {
+      this.adminMode = false;
+      // Supprimer l'état du mode admin
+      if (import.meta.client) {
+        localStorage.removeItem('adminMode');
+        sessionStorage.removeItem('adminMode');
       }
     },
   },
