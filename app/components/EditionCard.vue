@@ -18,8 +18,9 @@
             <UBadge 
               v-if="showStatus" 
               :color="getStatusColor(edition)" 
-              variant="subtle" 
-              class="mt-1"
+              variant="soft" 
+              size="lg"
+              class="mt-2 px-3 py-1"
             >
               {{ getStatusText(edition) }}
             </UBadge>

@@ -25,9 +25,9 @@ export const useEditionStatus = () => {
     const startDate = new Date(edition.startDate);
     const endDate = new Date(edition.endDate);
 
-    if (now < startDate) return 'À venir';
-    if (now > endDate) return 'Terminée';
-    return 'En cours';
+    if (now < startDate) return '🔄 À venir';
+    if (now > endDate) return '✅ Terminée';
+    return '🔥 En cours';
   };
 
   /**

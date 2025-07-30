@@ -281,6 +281,7 @@
             v-for="edition in editionStore.editions" 
             :key="edition.id" 
             :edition="edition"
+            :show-status="true"
           >
             <template #actions="{ edition }">
               <UButton
