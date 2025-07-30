@@ -39,7 +39,7 @@
 
         <div class="space-y-6">
           <!-- Informations pratiques -->
-          <div class="space-y-2">
+          <div class="space-y-3">
             <h3 class="text-lg font-semibold">Informations pratiques</h3>
             <p class="text-sm text-gray-600">
               <UIcon name="i-heroicons-map-pin" class="inline mr-1" />
@@ -56,6 +56,53 @@
               <UIcon name="i-heroicons-calendar" class="inline mr-1" />
               {{ formatDateTimeRange(edition.startDate, edition.endDate) }}
             </p>
+            
+            <!-- Collaborateurs -->
+            <div v-if="getAllCollaborators(edition).length > 0" class="pt-2">
+              <div class="flex items-center gap-2 mb-2">
+                <UIcon name="i-heroicons-users" class="text-gray-400" />
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Équipe organisatrice</span>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <div
+                  v-for="collaborator in getAllCollaborators(edition)"
+                  :key="collaborator.id"
+                  class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-full text-sm"
+                  :title="getCollaboratorTitle(collaborator)"
+                >
+                  <img 
+                    :src="getUserAvatar(collaborator, 16)" 
+                    :alt="`Avatar de ${collaborator.pseudo}`"
+                    class="w-4 h-4 rounded-full"
+                  >
+                  <span class="text-gray-700 dark:text-gray-300">{{ collaborator.pseudo }}</span>
+                  <UBadge
+                    v-if="collaborator.isCreator"
+                    size="xs"
+                    color="primary"
+                    variant="soft"
+                  >
+                    Créateur
+                  </UBadge>
+                  <UBadge
+                    v-else-if="collaborator.role === 'ADMINISTRATOR'"
+                    size="xs"
+                    color="orange"
+                    variant="soft"
+                  >
+                    Admin
+                  </UBadge>
+                  <UBadge
+                    v-else-if="collaborator.role === 'MODERATOR'"
+                    size="xs"
+                    color="blue"
+                    variant="soft"
+                  >
+                    Modérateur
+                  </UBadge>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Liens externes -->
@@ -75,19 +122,21 @@
               Aucun service spécifique renseigné
             </div>
             <div v-else class="space-y-4">
-              <div v-for="category in getActiveServicesByCategory(edition)" :key="category.category" class="space-y-2">
-                <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-1">
+              <div v-for="category in getActiveServicesByCategory(edition)" :key="category.category" class="space-y-3">
+                <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2">
                   {{ category.label }}
                 </h4>
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-3">
                   <UBadge 
                     v-for="service in category.services" 
                     :key="service.key"
                     color="neutral" 
                     variant="soft"
+                    size="xl"
+                    class="px-4 py-3"
                   >
-                    <UIcon :name="service.icon" :class="service.color" class="mr-1" />
-                    {{ service.label }}
+                    <UIcon :name="service.icon" :class="service.color" size="24" class="mr-2" />
+                    <span class="text-base font-medium">{{ service.label }}</span>
                   </UBadge>
                 </div>
               </div>
@@ -141,6 +190,7 @@ import { useRoute } from 'vue-router';
 import type { Edition } from '~/types';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
+import { useAvatar } from '~/utils/avatar';
 
 const { formatDateTimeRange } = useDateFormat();
 import EditionHeader from '~/components/edition/EditionHeader.vue';
@@ -151,6 +201,7 @@ const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
 const { servicesByCategory } = useConventionServices();
+const { getUserAvatar } = useAvatar();
 
 const editionId = parseInt(route.params.id as string);
 const edition = ref<Edition | null>(null);
@@ -204,5 +255,62 @@ const getActiveServicesByCategory = (edition: Edition) => {
     ...category,
     services: category.services.filter(service => edition[service.key])
   })).filter(category => category.services.length > 0);
+};
+
+// Obtenir tous les collaborateurs (créateur + collaborateurs de la convention)
+const getAllCollaborators = (edition: Edition) => {
+  if (!edition) return [];
+  
+  const collaborators = [];
+  
+  // Ajouter le créateur
+  if (edition.creator) {
+    const creator = {
+      id: edition.creator.id,
+      pseudo: edition.creator.pseudo,
+      email: edition.creator.email || '',
+      profilePicture: edition.creator.profilePicture || null,
+      updatedAt: edition.creator.updatedAt || new Date().toISOString(),
+      isCreator: true,
+      role: null
+    };
+    collaborators.push(creator);
+  }
+  
+  // Ajouter les collaborateurs de la convention
+  if (edition.convention?.collaborators) {
+    edition.convention.collaborators.forEach(collab => {
+      // Éviter les doublons si le créateur est aussi collaborateur
+      if (!collaborators.some(c => c.id === collab.user.id)) {
+        const collaborator = {
+          id: collab.user.id,
+          pseudo: collab.user.pseudo,
+          email: collab.user.email || '',
+          profilePicture: collab.user.profilePicture || null,
+          updatedAt: collab.user.updatedAt || new Date().toISOString(),
+          isCreator: false,
+          role: collab.role
+        };
+        collaborators.push(collaborator);
+      }
+    });
+  }
+  
+  return collaborators;
+};
+
+// Obtenir le titre du collaborateur pour le tooltip
+const getCollaboratorTitle = (collaborator: any) => {
+  if (collaborator.isCreator) {
+    return `${collaborator.pseudo} - Créateur de l'édition`;
+  }
+  
+  const roleNames = {
+    'ADMINISTRATOR': 'Administrateur',
+    'MODERATOR': 'Modérateur'
+  };
+  
+  const roleName = roleNames[collaborator.role] || 'Collaborateur';
+  return `${collaborator.pseudo} - ${roleName} de la convention`;
 };
 </script>

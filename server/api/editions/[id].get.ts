@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
       },
       include: {
         creator: {
-          select: { id: true, email: true, pseudo: true },
+          select: { id: true, email: true, pseudo: true, profilePicture: true, updatedAt: true },
         },
         favoritedBy: {
           select: { id: true },
@@ -40,7 +40,9 @@ export default defineEventHandler(async (event) => {
                   select: {
                     id: true,
                     pseudo: true,
+                    email: true,
                     profilePicture: true,
+                    updatedAt: true,
                   },
                 },
               },
