@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { prisma } from '../../utils/prisma';
 import { handleValidationError } from '../../utils/validation-schemas';
+import { authRateLimiter } from '../../utils/rate-limiter';
 
 // Schéma de validation pour le login
 const loginSchema = z.object({
@@ -12,6 +13,9 @@ const loginSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   try {
+    // Appliquer le rate limiting
+    await authRateLimiter(event);
+    
     const body = await readBody(event);
     
     // Validation des données d'entrée
@@ -69,7 +73,7 @@ export default defineEventHandler(async (event) => {
 
     // Generate JWT token
     const config = useRuntimeConfig();
-    const token = jwt.sign({ userId: user.id }, config.jwtSecret, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id }, config.jwtSecret, { expiresIn: '7d' });
 
     return { 
       token, 

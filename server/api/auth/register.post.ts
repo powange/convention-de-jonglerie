@@ -3,9 +3,13 @@ import { z } from 'zod';
 import { prisma } from '../../utils/prisma';
 import { registerSchema, handleValidationError } from '../../utils/validation-schemas';
 import { sendEmail, generateVerificationCode, generateVerificationEmailHtml } from '../../utils/emailService';
+import { registerRateLimiter } from '../../utils/rate-limiter';
 
 export default defineEventHandler(async (event) => {
   try {
+    // Appliquer le rate limiting
+    await registerRateLimiter(event);
+    
     const body = await readBody(event);
     
     // Validation et sanitisation des données

@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { prisma } from '../../utils/prisma';
 import { handleValidationError } from '../../utils/validation-schemas';
 import { sendEmail, generateVerificationCode, generateVerificationEmailHtml } from '../../utils/emailService';
+import { emailRateLimiter } from '../../utils/rate-limiter';
 
 const resendVerificationSchema = z.object({
   email: z.string().email('Adresse email invalide')
@@ -10,6 +11,12 @@ const resendVerificationSchema = z.object({
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
+    
+    // Stocker l'email dans le contexte pour le rate limiter
+    event.context.body = body;
+    
+    // Appliquer le rate limiting
+    await emailRateLimiter(event);
     
     // Validation des données
     const validatedData = resendVerificationSchema.parse(body);

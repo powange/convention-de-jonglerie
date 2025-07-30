@@ -4,6 +4,7 @@ import {
   updateEntityWithImage,
   deleteOldImage
 } from '../../../utils/image-upload';
+import { uploadRateLimiter } from '../../../utils/api-rate-limiter';
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
@@ -13,6 +14,9 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Non authentifié',
     });
   }
+
+  // Appliquer le rate limiting
+  await uploadRateLimiter(event);
 
   try {
     const conventionId = parseInt(getRouterParam(event, 'id') as string);

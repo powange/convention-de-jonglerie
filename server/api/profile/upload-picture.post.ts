@@ -4,6 +4,7 @@ import {
   deleteOldImage
 } from '../../utils/image-upload';
 import { prisma } from '../../utils/prisma';
+import { uploadRateLimiter } from '../../utils/api-rate-limiter';
 
 
 export default defineEventHandler(async (event) => {
@@ -15,6 +16,9 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Non authentifié',
     });
   }
+
+  // Appliquer le rate limiting
+  await uploadRateLimiter(event);
 
   try {
     // Récupérer l'utilisateur actuel pour avoir l'ancienne photo
