@@ -268,9 +268,9 @@ const getAllCollaborators = (edition: Edition) => {
     const creator = {
       id: edition.creator.id,
       pseudo: edition.creator.pseudo,
-      email: edition.creator.email || '',
       profilePicture: edition.creator.profilePicture || null,
       updatedAt: edition.creator.updatedAt || new Date().toISOString(),
+      emailHash: edition.creator.emailHash || '',
       isCreator: true,
       role: null
     };
@@ -285,9 +285,9 @@ const getAllCollaborators = (edition: Edition) => {
         const collaborator = {
           id: collab.user.id,
           pseudo: collab.user.pseudo,
-          email: collab.user.email || '',
           profilePicture: collab.user.profilePicture || null,
           updatedAt: collab.user.updatedAt || new Date().toISOString(),
+          emailHash: collab.user.emailHash || '',
           isCreator: false,
           role: collab.role
         };
