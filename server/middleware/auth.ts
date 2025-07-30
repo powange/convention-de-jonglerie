@@ -13,8 +13,8 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  // Auth API routes (register, login, verify-email, resend-verification) are public for POST requests
-  if (['/api/auth/register', '/api/auth/login', '/api/auth/verify-email', '/api/auth/resend-verification'].includes(path) && requestMethod === 'POST') {
+  // Auth API routes (register, login, verify-email, resend-verification, password reset) are public for POST requests
+  if (['/api/auth/register', '/api/auth/login', '/api/auth/verify-email', '/api/auth/resend-verification', '/api/auth/request-password-reset', '/api/auth/reset-password'].includes(path) && requestMethod === 'POST') {
     return;
   }
 
