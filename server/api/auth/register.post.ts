@@ -4,6 +4,7 @@ import { prisma } from '../../utils/prisma';
 import { registerSchema, handleValidationError } from '../../utils/validation-schemas';
 import { sendEmail, generateVerificationCode, generateVerificationEmailHtml } from '../../utils/emailService';
 import { registerRateLimiter } from '../../utils/rate-limiter';
+import { createFutureDate, TOKEN_DURATIONS } from '../../utils/date-utils';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -25,7 +26,7 @@ export default defineEventHandler(async (event) => {
     
     // Générer le code de vérification
     const verificationCode = generateVerificationCode();
-    const verificationExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    const verificationExpiry = createFutureDate(TOKEN_DURATIONS.EMAIL_VERIFICATION);
 
     const user = await prisma.user.create({
       data: {

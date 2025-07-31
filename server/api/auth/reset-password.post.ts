@@ -1,10 +1,11 @@
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { prisma } from '../../utils/prisma'
+import { passwordSchema } from '../../utils/validation-schemas'
 
 const resetPasswordSchema = z.object({
   token: z.string(),
-  newPassword: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères')
+  newPassword: passwordSchema
 })
 
 export default defineEventHandler(async (event) => {
@@ -26,7 +27,11 @@ export default defineEventHandler(async (event) => {
     }
 
     // Vérifier si le token a expiré
-    if (resetToken.expiresAt < new Date()) {
+    // Comparer en UTC car les dates en BDD sont en UTC
+    const nowUTC = new Date();
+    const expiresAtUTC = new Date(resetToken.expiresAt);
+    
+    if (nowUTC.getTime() > expiresAtUTC.getTime()) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Le token de réinitialisation a expiré'

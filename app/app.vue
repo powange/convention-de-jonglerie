@@ -155,10 +155,9 @@ onUnmounted(() => {
 });
 
 const handleLogout = () => {
-  authStore.logout();
-  toast.add({ title: 'Déconnexion réussie !', icon: 'i-heroicons-check-circle', color: 'success' });
-  // Rester sur la page actuelle après déconnexion
-  // router.push('/');
+  // Rediriger vers la page de logout avec la route actuelle comme returnTo
+  const currentPath = useRoute().fullPath;
+  navigateTo(`/logout?returnTo=${encodeURIComponent(currentPath)}`);
 };
 
 // Calculer le nom d'affichage

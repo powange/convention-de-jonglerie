@@ -354,7 +354,7 @@
     </div>
 
     <!-- Modal pour changement de mot de passe -->
-    <UModal v-model="showPasswordModal" size="md">
+    <UModal v-model:open="showPasswordModal" size="md">
       <template #header>
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">

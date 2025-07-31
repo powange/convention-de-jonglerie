@@ -141,7 +141,17 @@ const handleLogin = async () => {
     
     // Navigation intelligente : retourner à la page précédente ou à l'accueil
     const returnTo = useRoute().query.returnTo as string;
-    router.push(returnTo || '/');
+    
+    // Ne pas rediriger vers les pages de reset password ou autres pages d'auth
+    const shouldNotReturnTo = returnTo && (
+      returnTo.includes('/auth/reset-password') ||
+      returnTo.includes('/auth/forgot-password') ||
+      returnTo.includes('/login') ||
+      returnTo.includes('/register') ||
+      returnTo.includes('/verify-email')
+    );
+    
+    router.push(shouldNotReturnTo ? '/' : (returnTo || '/'));
   } catch (e: unknown) {
     const error = e as HttpError;
     let errorMessage = 'Échec de la connexion';

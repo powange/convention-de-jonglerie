@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { prisma } from '../../utils/prisma'
 import { randomBytes } from 'node:crypto'
 import { sendEmail, generatePasswordResetEmailHtml } from '../../utils/emailService'
+import { createFutureDate, TOKEN_DURATIONS } from '../../utils/date-utils'
 
 const requestPasswordResetSchema = z.object({
   email: z.string().email()
@@ -35,7 +36,7 @@ export default defineEventHandler(async (event) => {
       data: {
         token,
         userId: user.id,
-        expiresAt: new Date(Date.now() + 60 * 60 * 1000) // 1 heure
+        expiresAt: createFutureDate(TOKEN_DURATIONS.PASSWORD_RESET)
       }
     })
 

@@ -148,7 +148,10 @@ const router = useRouter();
 const toast = useToast();
 
 const schema = z.object({
-  newPassword: z.string().min(8, 'Minimum 8 caractères requis'),
+  newPassword: z.string()
+    .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
+    .regex(/(?=.*[A-Z])/, 'Le mot de passe doit contenir au moins une majuscule')
+    .regex(/(?=.*\d)/, 'Le mot de passe doit contenir au moins un chiffre'),
   confirmPassword: z.string().min(1, 'Confirmation requise'),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: "Les mots de passe ne correspondent pas",
@@ -204,9 +207,38 @@ const getPasswordStrengthText = (strength: number) => {
   }
 };
 
-// Vérifier la présence du token
-onMounted(() => {
+// Vérifier la présence et la validité du token
+onMounted(async () => {
   if (!token.value) {
+    invalidToken.value = true;
+    return;
+  }
+
+  try {
+    const response = await $fetch('/api/auth/verify-reset-token', {
+      params: { token: token.value }
+    });
+
+    if (!response.valid) {
+      invalidToken.value = true;
+      
+      // Message spécifique selon la raison
+      let message = 'Lien de réinitialisation invalide';
+      if (response.reason === 'expired') {
+        message = 'Ce lien de réinitialisation a expiré';
+      } else if (response.reason === 'used') {
+        message = 'Ce lien a déjà été utilisé pour réinitialiser le mot de passe';
+      }
+      
+      toast.add({
+        title: 'Lien invalide',
+        description: message,
+        icon: 'i-heroicons-exclamation-triangle',
+        color: 'error'
+      });
+    }
+  } catch (error) {
+    console.error('Erreur lors de la vérification du token:', error);
     invalidToken.value = true;
   }
 });

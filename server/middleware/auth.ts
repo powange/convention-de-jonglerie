@@ -18,6 +18,11 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
+  // Auth API routes for GET requests (verify reset token)
+  if (['/api/auth/verify-reset-token'].includes(path) && requestMethod === 'GET') {
+    return;
+  }
+
   // Public GET routes pour conventions et éditions
   const publicGetRoutes = [
     '/api/conventions',  // Liste des conventions

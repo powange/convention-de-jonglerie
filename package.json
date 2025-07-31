@@ -10,7 +10,8 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "geocode": "node scripts/run-geocoding.mjs"
+    "geocode": "node scripts/run-geocoding.mjs",
+    "db:clean-tokens": "npx tsx scripts/clean-expired-tokens.ts"
   },
   "dependencies": {
     "@internationalized/date": "^3.8.2",

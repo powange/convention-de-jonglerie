@@ -117,6 +117,19 @@ export const useAuthStore = defineStore('auth', {
             } else {
               // Token expiré, nettoyer
               this.logout();
+              // Rediriger vers login si on est sur une page protégée
+              if (import.meta.client) {
+                const route = useRoute();
+                const protectedRoutes = ['/profile', '/favorites', '/my-conventions', '/conventions/add', '/editions/add'];
+                const protectedPatterns = ['/edit', '/gestion', '/covoiturage', '/editions/add'];
+                
+                const isProtectedRoute = protectedRoutes.some(r => route.path.startsWith(r)) ||
+                                       protectedPatterns.some(p => route.path.includes(p));
+                
+                if (isProtectedRoute) {
+                  navigateTo('/login');
+                }
+              }
             }
           }
         }
@@ -126,9 +139,18 @@ export const useAuthStore = defineStore('auth', {
     checkTokenExpiry() {
       if (this.token && this.tokenExpiry && Date.now() >= this.tokenExpiry) {
         this.logout();
-        // Rediriger vers la page de connexion
+        // Rediriger vers la page de connexion si on est sur une page protégée
         if (import.meta.client) {
-          navigateTo('/login');
+          const route = useRoute();
+          const protectedRoutes = ['/profile', '/favorites', '/my-conventions', '/conventions/add', '/editions/add'];
+          const protectedPatterns = ['/edit', '/gestion', '/covoiturage', '/editions/add'];
+          
+          const isProtectedRoute = protectedRoutes.some(r => route.path.startsWith(r)) ||
+                                 protectedPatterns.some(p => route.path.includes(p));
+          
+          if (isProtectedRoute) {
+            navigateTo('/login');
+          }
         }
       }
     },
