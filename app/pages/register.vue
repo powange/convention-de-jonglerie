@@ -35,7 +35,7 @@
                   Compte personnel uniquement
                 </p>
                 <p class="text-xs text-amber-700 dark:text-amber-300">
-                  Ce compte doit représenter une personne réelle, non une structure ou association.
+                  Ce compte doit représenter une personne physique, non une structure ou association.
                 </p>
               </div>
             </div>
