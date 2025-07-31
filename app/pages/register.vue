@@ -9,17 +9,35 @@
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Créer un compte</h1>
         <p class="text-gray-600 dark:text-gray-400">Rejoignez la communauté des jongleurs</p>
         
-        <!-- Message important pour l'accès email -->
-        <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <div class="flex items-start gap-3">
-            <UIcon name="i-heroicons-envelope" class="text-blue-600 dark:text-blue-400 mt-0.5" size="20" />
-            <div>
-              <p class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
-                Accès à votre boîte email requis
-              </p>
-              <p class="text-xs text-blue-700 dark:text-blue-300">
-                Vous recevrez un code de vérification par email pour finaliser votre inscription.
-              </p>
+        <!-- Messages importants -->
+        <div class="mt-4 space-y-3">
+          <!-- Message pour l'accès email -->
+          <div class="p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div class="flex items-start gap-3">
+              <UIcon name="i-heroicons-envelope" class="text-blue-600 dark:text-blue-400 mt-0.5" size="20" />
+              <div>
+                <p class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
+                  Accès à votre boîte email requis
+                </p>
+                <p class="text-xs text-blue-700 dark:text-blue-300">
+                  Vous recevrez un code de vérification par email pour finaliser votre inscription.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Message pour compte personnel -->
+          <div class="p-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+            <div class="flex items-start gap-3">
+              <UIcon name="i-heroicons-user-circle" class="text-amber-600 dark:text-amber-400 mt-0.5" size="20" />
+              <div>
+                <p class="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">
+                  Compte personnel uniquement
+                </p>
+                <p class="text-xs text-amber-700 dark:text-amber-300">
+                  Ce compte doit représenter une personne réelle, non une structure ou association.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -30,9 +48,20 @@
         <UForm :state="state" :schema="schema" class="space-y-6" @submit="handleRegister">
           <!-- Section Informations personnelles -->
           <div class="space-y-4">
-            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
-              Informations personnelles
-            </h3>
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                Informations personnelles
+              </h3>
+              <div class="flex items-center gap-1">
+                <UIcon name="i-heroicons-eye-slash" class="w-3 h-3 text-gray-400" />
+                <span class="text-xs text-gray-500 dark:text-gray-400">Privé</span>
+              </div>
+            </div>
+            <div class="border-b border-gray-200 dark:border-gray-700 pb-2 mb-4">
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                Ces informations ne seront pas visibles publiquement
+              </p>
+            </div>
             
             <div class="grid grid-cols-2 gap-4">
               <UFormField label="Prénom" name="prenom">
@@ -58,11 +87,14 @@
 
           <!-- Section Compte -->
           <div class="space-y-4">
-            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
-              Informations de compte
-            </h3>
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                Informations de compte
+              </h3>
+            </div>
+            <div class="border-b border-gray-200 dark:border-gray-700 pb-2 mb-4"></div>
             
-            <UFormField label="Adresse e-mail" name="email">
+            <UFormField label="Adresse e-mail" name="email" hint="Privée - non visible publiquement">
               <UInput 
                 v-model="state.email" 
                 type="email" 
@@ -73,7 +105,7 @@
               />
             </UFormField>
             
-            <UFormField label="Pseudo" name="pseudo">
+            <UFormField label="Pseudo" name="pseudo" hint="Visible publiquement par les autres utilisateurs">
               <UInput 
                 v-model="state.pseudo" 
                 required 
