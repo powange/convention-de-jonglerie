@@ -11,7 +11,7 @@ services:
       MYSQL_USER: ${MYSQL_USER:-convention_user}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-convention_password}
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql_data_prod:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
@@ -32,9 +32,9 @@ services:
       SMTP_USER: "${SMTP_USER:-}"
       SMTP_PASS: "${SMTP_PASS:-}"
     volumes:
-      - uploads_data:/app/public/uploads
+      - uploads_data_prod:/app/public/uploads
     depends_on:
-      database:
+      database-prod:
         condition: service_healthy
 
   # Interface d'administration base de données
@@ -47,7 +47,7 @@ services:
     environment:
       ADMINER_DEFAULT_SERVER: database
     depends_on:
-      - database
+      - database-prod
 
 volumes:
   mysql_data_prod:
