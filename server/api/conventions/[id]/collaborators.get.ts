@@ -1,5 +1,4 @@
 import { getConventionCollaborators, checkUserConventionPermission } from '../../../utils/collaborator-management';
-import { getEmailHash } from '../../../utils/email-hash';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -26,21 +25,10 @@ export default defineEventHandler(async (event) => {
     // Récupérer les collaborateurs de la convention
     const collaborators = await getConventionCollaborators(conventionId);
 
-    // Transformer les données pour masquer les emails et ajouter les hash
-    const transformedCollaborators = collaborators.map(collab => ({
-      ...collab,
-      user: {
-        id: collab.user.id,
-        pseudo: collab.user.pseudo,
-        prenom: collab.user.prenom,
-        nom: collab.user.nom,
-        emailHash: getEmailHash(collab.user.email),
-        // Masquer l'email sauf pour les administrateurs
-        email: permission.isOwner || permission.userRole === 'ADMINISTRATOR' ? collab.user.email : undefined
-      },
-    }));
+    // Les données sont déjà filtrées par l'utilitaire getConventionCollaborators
+    // Plus besoin de transformation car il n'y a plus d'email à masquer
 
-    return transformedCollaborators;
+    return collaborators;
   } catch (error: unknown) {
     const httpError = error as { statusCode?: number; message?: string };
     if (httpError.statusCode) {

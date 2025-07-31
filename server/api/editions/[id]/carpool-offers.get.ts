@@ -47,8 +47,6 @@ export default defineEventHandler(async (event) => {
       user: {
         id: offer.user.id,
         pseudo: offer.user.pseudo,
-        prenom: offer.user.prenom,
-        nom: offer.user.nom,
         emailHash: getEmailHash(offer.user.email),
         profilePicture: offer.user.profilePicture,
         updatedAt: offer.user.updatedAt,

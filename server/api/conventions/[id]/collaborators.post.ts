@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
       const prisma = new PrismaClient();
       userToAdd = await prisma.user.findUnique({
         where: { id: userId },
-        select: { id: true, email: true, pseudo: true }
+        select: { id: true, pseudo: true }
       });
       
       if (!userToAdd) {

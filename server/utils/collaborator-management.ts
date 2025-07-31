@@ -118,7 +118,7 @@ export async function addConventionCollaborator(
   userToAddId: number,
   role: CollaboratorRole,
   addedById: number
-): Promise<ConventionCollaborator & { user: Pick<User, 'id' | 'pseudo' | 'email'> }> {
+): Promise<ConventionCollaborator & { user: Pick<User, 'id' | 'pseudo'> }> {
   // Vérifier les permissions
   const canManage = await canManageCollaborators(conventionId, addedById);
   
@@ -152,7 +152,7 @@ export async function addConventionCollaborator(
     },
     include: {
       user: {
-        select: { id: true, pseudo: true, email: true }
+        select: { id: true, pseudo: true }
       }
     }
   });
@@ -163,7 +163,7 @@ export async function addConventionCollaborator(
  */
 export async function findUserByPseudoOrEmail(
   searchTerm: string
-): Promise<Pick<User, 'id' | 'pseudo' | 'email'> | null> {
+): Promise<Pick<User, 'id' | 'pseudo'> | null> {
   return await prisma.user.findFirst({
     where: {
       OR: [
@@ -173,8 +173,7 @@ export async function findUserByPseudoOrEmail(
     },
     select: {
       id: true,
-      pseudo: true,
-      email: true
+      pseudo: true
     }
   });
 }
@@ -239,7 +238,7 @@ export async function deleteConventionCollaborator(
 export async function getConventionCollaborators(
   conventionId: number
 ): Promise<(ConventionCollaborator & {
-  user: Pick<User, 'id' | 'pseudo' | 'email' | 'nom' | 'prenom'>;
+  user: Pick<User, 'id' | 'pseudo'>;
   addedBy: Pick<User, 'pseudo'>;
 })[]> {
   return await prisma.conventionCollaborator.findMany({
@@ -248,10 +247,7 @@ export async function getConventionCollaborators(
       user: {
         select: {
           id: true,
-          pseudo: true,
-          email: true,
-          nom: true,
-          prenom: true
+          pseudo: true
         }
       },
       addedBy: {
@@ -275,7 +271,7 @@ export async function updateCollaboratorRole(
   newRole: CollaboratorRole,
   userId: number
 ): Promise<ConventionCollaborator & {
-  user: Pick<User, 'id' | 'pseudo' | 'email'>;
+  user: Pick<User, 'id' | 'pseudo'>;
 }> {
   // Vérifier les permissions
   const canManage = await canManageCollaborators(conventionId, userId);
@@ -307,8 +303,7 @@ export async function updateCollaboratorRole(
       user: {
         select: {
           id: true,
-          pseudo: true,
-          email: true
+          pseudo: true
         }
       }
     }

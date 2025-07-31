@@ -1,10 +1,4 @@
 import { prisma } from '../../utils/prisma';
-import crypto from 'crypto';
-
-// Fonction pour calculer le hash MD5 d'un email
-const getEmailHash = (email: string): string => {
-  return crypto.createHash('md5').update(email.toLowerCase().trim()).digest('hex');
-};
 
 export default defineEventHandler(async (event) => {
   const editionId = parseInt(event.context.params?.id as string);
@@ -32,7 +26,7 @@ export default defineEventHandler(async (event) => {
       },
       include: {
         creator: {
-          select: { id: true, pseudo: true, profilePicture: true, updatedAt: true, email: true },
+          select: { id: true, pseudo: true, profilePicture: true, updatedAt: true },
         },
         favoritedBy: {
           select: { id: true },
@@ -47,7 +41,6 @@ export default defineEventHandler(async (event) => {
                     pseudo: true,
                     profilePicture: true,
                     updatedAt: true,
-                    email: true,
                   },
                 },
               },
@@ -58,7 +51,7 @@ export default defineEventHandler(async (event) => {
           collaborators: {
             include: {
               user: {
-                select: { id: true, email: true, pseudo: true, prenom: true, nom: true, profilePicture: true, updatedAt: true }
+                select: { id: true, pseudo: true, profilePicture: true, updatedAt: true }
               },
               addedBy: {
                 select: { id: true, pseudo: true }
@@ -76,39 +69,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Transformer les emails en emailHash pour préserver l'anonymat
-    const transformedEdition = {
-      ...edition,
-      creator: edition.creator ? {
-        ...edition.creator,
-        emailHash: getEmailHash(edition.creator.email),
-        email: undefined // Retirer l'email de la réponse
-      } : null,
-      convention: edition.convention ? {
-        ...edition.convention,
-        collaborators: edition.convention.collaborators?.map(collab => ({
-          ...collab,
-          user: {
-            ...collab.user,
-            emailHash: getEmailHash(collab.user.email),
-            email: undefined // Retirer l'email de la réponse
-          }
-        }))
-      } : null
-    };
-
-    // Nettoyer les propriétés undefined
-    if (transformedEdition.creator) {
-      delete transformedEdition.creator.email;
-    }
-    
-    if (transformedEdition.convention?.collaborators) {
-      transformedEdition.convention.collaborators.forEach(collab => {
-        delete collab.user.email;
-      });
-    }
-
-    return transformedEdition;
+    return edition;
   } catch (error) {
     console.error('Erreur API edition:', error);
     throw createError({

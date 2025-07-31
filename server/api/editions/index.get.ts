@@ -196,7 +196,7 @@ export default defineEventHandler(async (event) => {
       where,
       include: {
         creator: {
-          select: { id: true, email: true, pseudo: true },
+          select: { id: true, pseudo: true },
         },
         favoritedBy: {
           select: { id: true },
@@ -208,7 +208,7 @@ export default defineEventHandler(async (event) => {
           collaborators: {
             include: {
               user: {
-                select: { id: true, email: true, pseudo: true, prenom: true, nom: true, profilePicture: true, updatedAt: true }
+                select: { id: true, pseudo: true, profilePicture: true, updatedAt: true }
               },
               addedBy: {
                 select: { id: true, pseudo: true }

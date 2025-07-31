@@ -107,7 +107,7 @@ export default defineEventHandler(async (event) => {
       },
       include: {
         creator: {
-          select: { id: true, email: true, pseudo: true },
+          select: { id: true, pseudo: true },
         },
         favoritedBy: {
           select: { id: true },
@@ -125,7 +125,7 @@ export default defineEventHandler(async (event) => {
           data: { imageUrl: newImageUrl },
           include: {
             creator: {
-              select: { id: true, email: true, pseudo: true },
+              select: { id: true, pseudo: true },
             },
             favoritedBy: {
               select: { id: true },

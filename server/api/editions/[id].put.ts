@@ -212,7 +212,7 @@ export default defineEventHandler(async (event) => {
       data: updatedData,
       include: {
         creator: {
-          select: { id: true, email: true, pseudo: true },
+          select: { id: true, pseudo: true },
         },
         favoritedBy: {
           select: { id: true },
