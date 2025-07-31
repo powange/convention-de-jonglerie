@@ -38,10 +38,17 @@
           </div>
 
           <!-- Options -->
-          <div class="space-y-4">
+          <div class="flex items-center justify-between">
             <UFormField name="rememberMe">
               <UCheckbox v-model="state.rememberMe" label="Se souvenir de moi" />
             </UFormField>
+            
+            <NuxtLink 
+              to="/auth/forgot-password" 
+              class="text-sm text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+            >
+              Mot de passe oublié ?
+            </NuxtLink>
           </div>
 
           <!-- Bouton de connexion -->

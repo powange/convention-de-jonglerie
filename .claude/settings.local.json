@@ -11,7 +11,11 @@
       "Bash(curl:*)",
       "Bash(find:*)",
       "Bash(npx tsc:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(grep:*)",
+      "Bash(rm:*)",
+      "Bash(npx nuxi:*)",
+      "Bash(node:*)"
     ],
     "deny": []
   }

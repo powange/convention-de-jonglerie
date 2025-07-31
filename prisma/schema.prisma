@@ -38,6 +38,7 @@ model User {
   collaborations         ConventionCollaborator[]
   createdEditions        Edition[]                @relation("CreatedEditions")
   favoriteEditions       Edition[]                @relation("FavoriteEditions")
+  passwordResetTokens    PasswordResetToken[]
 }
 
 model Edition {
@@ -235,4 +236,17 @@ model EditionPostComment {
 
   @@index([editionPostId], map: "EditionPostComment_editionPostId_fkey")
   @@index([userId], map: "EditionPostComment_userId_fkey")
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  used      Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "PasswordResetToken_userId_fkey")
+  @@index([token], map: "PasswordResetToken_token_idx")
 }
