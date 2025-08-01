@@ -91,7 +91,7 @@ import EditionHeader from '~/components/edition/EditionHeader.vue';
 
 // TODO: Ajouter le middleware d'authentification plus tard
 // definePageMeta({
-//   middleware: 'auth-client'
+//   middleware: 'auth-protected'
 // });
 
 const route = useRoute();

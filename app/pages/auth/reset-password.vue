@@ -19,25 +19,53 @@
             <UFormField label="Nouveau mot de passe" name="newPassword" help="Minimum 8 caractères">
               <UInput 
                 v-model="state.newPassword" 
-                type="password"
+                :type="showNewPassword ? 'text' : 'password'"
                 required 
                 placeholder="••••••••"
                 icon="i-heroicons-lock-closed"
                 class="w-full"
                 :disabled="loading"
-              />
+                :ui="{ trailing: 'pe-1' }"
+              >
+                <template #trailing>
+                  <UButton
+                    color="neutral"
+                    variant="link"
+                    size="sm"
+                    :icon="showNewPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
+                    :aria-label="showNewPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                    :aria-pressed="showNewPassword"
+                    :disabled="loading"
+                    @click="showNewPassword = !showNewPassword"
+                  />
+                </template>
+              </UInput>
             </UFormField>
             
             <UFormField label="Confirmer le mot de passe" name="confirmPassword">
               <UInput 
                 v-model="state.confirmPassword" 
-                type="password"
+                :type="showConfirmPassword ? 'text' : 'password'"
                 required 
                 placeholder="••••••••"
                 icon="i-heroicons-lock-closed"
                 class="w-full"
                 :disabled="loading"
-              />
+                :ui="{ trailing: 'pe-1' }"
+              >
+                <template #trailing>
+                  <UButton
+                    color="neutral"
+                    variant="link"
+                    size="sm"
+                    :icon="showConfirmPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
+                    :aria-label="showConfirmPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                    :aria-pressed="showConfirmPassword"
+                    :disabled="loading"
+                    @click="showConfirmPassword = !showConfirmPassword"
+                  />
+                </template>
+              </UInput>
             </UFormField>
           </div>
 
@@ -166,6 +194,10 @@ const state = reactive({
 const loading = ref(false);
 const invalidToken = ref(false);
 const passwordReset = ref(false);
+
+// États pour l'affichage des mots de passe
+const showNewPassword = ref(false);
+const showConfirmPassword = ref(false);
 
 const token = computed(() => route.query.token as string);
 

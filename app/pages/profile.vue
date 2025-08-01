@@ -529,7 +529,7 @@ import type { HttpError, User } from '~/types';
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
-  middleware: 'auth-client'
+  middleware: 'auth-protected'
 });
 
 const authStore = useAuthStore();

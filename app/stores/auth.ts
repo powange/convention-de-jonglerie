@@ -55,6 +55,16 @@ export const useAuthStore = defineStore('auth', {
           storage.setItem('authUser', JSON.stringify(response.user));
           storage.setItem('tokenExpiry', this.tokenExpiry.toString());
           storage.setItem('rememberMe', rememberMe.toString());
+          
+          // Également stocker le token dans un cookie pour les requêtes serveur
+          const cookieExpiry = rememberMe ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : undefined; // 30 jours si "se souvenir"
+          const cookieToken = useCookie('auth-token', {
+            expires: cookieExpiry,
+            httpOnly: false,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax'
+          });
+          cookieToken.value = response.token;
         }
         
         return response;
@@ -81,6 +91,10 @@ export const useAuthStore = defineStore('auth', {
         sessionStorage.removeItem('tokenExpiry');
         sessionStorage.removeItem('rememberMe');
         sessionStorage.removeItem('adminMode');
+        
+        // Supprimer le cookie d'authentification
+        const cookieToken = useCookie('auth-token');
+        cookieToken.value = null;
       }
     },
     initializeAuth() {

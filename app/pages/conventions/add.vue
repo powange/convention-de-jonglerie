@@ -30,7 +30,7 @@ import type { Convention, ConventionFormData, HttpError } from '~/types';
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
-  middleware: 'auth-client'
+  middleware: 'auth-protected'
 });
 
 const router = useRouter();

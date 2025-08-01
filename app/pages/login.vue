@@ -28,12 +28,25 @@
             <UFormField label="Mot de passe" name="password">
               <UInput 
                 v-model="state.password" 
-                type="password" 
+                :type="showPassword ? 'text' : 'password'" 
                 required 
                 placeholder="Votre mot de passe"
                 icon="i-heroicons-lock-closed"
                 class="w-full"
-              />
+                :ui="{ trailing: 'pe-1' }"
+              >
+                <template #trailing>
+                  <UButton
+                    color="neutral"
+                    variant="link"
+                    size="sm"
+                    :icon="showPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
+                    :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                    :aria-pressed="showPassword"
+                    @click="showPassword = !showPassword"
+                  />
+                </template>
+              </UInput>
             </UFormField>
           </div>
 
@@ -109,6 +122,9 @@ const state = reactive({
   password: '',
   rememberMe: false,
 });
+
+// État pour l'affichage du mot de passe
+const showPassword = ref(false);
 const loading = ref(false);
 
 const handleLogin = async () => {

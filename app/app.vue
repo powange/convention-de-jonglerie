@@ -28,7 +28,7 @@
                   variant="ghost" 
                   color="neutral" 
                   class="rounded-full hover:bg-gray-100 transition-colors"
-                  @click="showUserMenu = !showUserMenu"
+                  @click="toggleDropdown"
                 >
                   <div class="flex items-center gap-2">
                     <img 
@@ -48,44 +48,83 @@
                         👑 Admin
                       </UBadge>
                     </div>
-                    <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 text-gray-400" />
+                    <UIcon 
+                      name="i-heroicons-chevron-down" 
+                      class="w-4 h-4 text-gray-400 transition-transform"
+                      :class="{ 'rotate-180': isDropdownOpen }"
+                    />
                   </div>
                 </UButton>
                 
-                <!-- Menu dropdown personnalisé -->
-                <div v-if="showUserMenu" class="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
-                  <div class="py-1">
-                    <!-- Profil -->
-                    <NuxtLink to="/profile" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" @click="showUserMenu = false">
+                <!-- Menu dropdown -->
+                <div 
+                  v-if="isDropdownOpen"
+                  class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
+                  @click.stop
+                >
+                  <div class="p-1">
+                    <!-- Mon profil -->
+                    <NuxtLink 
+                      to="/profile" 
+                      class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                      @click="closeDropdown"
+                    >
                       <UIcon name="i-heroicons-user" class="w-4 h-4" />
                       Mon profil
                     </NuxtLink>
                     
                     <!-- Mes conventions -->
-                    <NuxtLink to="/my-conventions" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" @click="showUserMenu = false">
+                    <NuxtLink 
+                      to="/my-conventions" 
+                      class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                      @click="closeDropdown"
+                    >
                       <UIcon name="i-heroicons-calendar-days" class="w-4 h-4" />
                       Mes conventions
                     </NuxtLink>
                     
-                    <!-- Séparateur -->
-                    <hr class="border-gray-200 dark:border-gray-600 my-1">
+                    <!-- Dashboard admin (si super admin) -->
+                    <NuxtLink 
+                      v-if="authStore.user?.isGlobalAdmin"
+                      to="/admin" 
+                      class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                      @click="closeDropdown"
+                    >
+                      <UIcon name="i-heroicons-squares-2x2" class="w-4 h-4" />
+                      Dashboard
+                    </NuxtLink>
                     
-                    <!-- Navigation mobile -->
-                    <div class="md:hidden">
-                      <NuxtLink to="/favorites" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" @click="showUserMenu = false">
-                        <UIcon name="i-heroicons-star" class="w-4 h-4" />
-                        Mes favoris
-                      </NuxtLink>
-                      <hr class="border-gray-200 dark:border-gray-600 my-1">
-                    </div>
+                    <!-- Mes favoris (mobile uniquement) -->
+                    <NuxtLink 
+                      v-if="isMobile"
+                      to="/favorites" 
+                      class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors md:hidden"
+                      @click="closeDropdown"
+                    >
+                      <UIcon name="i-heroicons-star" class="w-4 h-4" />
+                      Mes favoris
+                    </NuxtLink>
+                    
+                    <!-- Séparateur -->
+                    <hr class="my-1 border-gray-200 dark:border-gray-600" />
                     
                     <!-- Déconnexion -->
-                    <button class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 w-full text-left" @click="handleLogout(); showUserMenu = false">
+                    <button 
+                      @click="handleLogout"
+                      class="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                    >
                       <UIcon name="i-heroicons-arrow-right-on-rectangle" class="w-4 h-4" />
                       Déconnexion
                     </button>
                   </div>
                 </div>
+                
+                <!-- Overlay pour fermer le dropdown en cliquant à l'extérieur -->
+                <div 
+                  v-if="isDropdownOpen"
+                  class="fixed inset-0 z-40"
+                  @click="closeDropdown"
+                ></div>
               </div>
               
               <!-- Boutons connexion/inscription pour utilisateurs non connectés -->
@@ -130,28 +169,34 @@ const toast = useToast();
 const router = useRouter();
 const { getUserAvatar } = useAvatar();
 
-const showUserMenu = ref(false);
+// État réactif pour la taille d'écran et dropdown
+const isMobile = ref(false);
+const isDropdownOpen = ref(false);
 
-// Fermer le menu quand on clique ailleurs
-const handleClickOutside = (event: Event) => {
-  const target = event.target as HTMLElement;
-  if (!target.closest('.relative')) {
-    showUserMenu.value = false;
-  }
+// Fonctions pour gérer le dropdown
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const closeDropdown = () => {
+  isDropdownOpen.value = false;
 };
 
 onMounted(() => {
-  // Ensure auth state is initialized on client-side after component mounts
-  if (!authStore.isAuthenticated) {
-    authStore.initializeAuth();
-  }
+  // Le plugin auth.client.ts s'occupe maintenant de l'initialisation de l'authentification
   
-  // Ajouter l'écouteur pour fermer le menu
-  document.addEventListener('click', handleClickOutside);
-});
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
+  // Gérer le responsive
+  const checkMobile = () => {
+    isMobile.value = window.innerWidth < 768;
+  };
+  
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+  
+  // Cleanup
+  onUnmounted(() => {
+    window.removeEventListener('resize', checkMobile);
+  });
 });
 
 const handleLogout = () => {

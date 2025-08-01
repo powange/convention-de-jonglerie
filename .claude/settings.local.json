@@ -25,7 +25,8 @@
       "Bash(npm uninstall:*)",
       "WebFetch(domain:www.prisma.io)",
       "Bash(set TEST_WITH_DB=true)",
-      "Bash(npx vitest run:*)"
+      "Bash(npx vitest run:*)",
+      "WebFetch(domain:ui2.nuxt.com)"
     ],
     "deny": []
   }

@@ -92,7 +92,7 @@ import { useEditionStore } from '~/stores/editions';
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
-  middleware: 'auth-client'
+  middleware: 'auth-protected'
 });
 
 const authStore = useAuthStore();

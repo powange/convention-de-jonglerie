@@ -125,12 +125,25 @@
             <UFormField label="Mot de passe" name="password">
               <UInput 
                 v-model="state.password" 
-                type="password" 
+                :type="showPassword ? 'text' : 'password'" 
                 required 
                 placeholder="Choisissez un mot de passe sécurisé"
                 icon="i-heroicons-lock-closed"
                 class="w-full"
-              />
+                :ui="{ trailing: 'pe-1' }"
+              >
+                <template #trailing>
+                  <UButton
+                    color="neutral"
+                    variant="link"
+                    size="sm"
+                    :icon="showPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
+                    :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                    :aria-pressed="showPassword"
+                    @click="showPassword = !showPassword"
+                  />
+                </template>
+              </UInput>
               <!-- Indicateur de force du mot de passe -->
               <div v-if="state.password" class="mt-2">
                 <div class="flex gap-1 mb-1">
@@ -150,12 +163,25 @@
             <UFormField label="Confirmer le mot de passe" name="confirmPassword">
               <UInput 
                 v-model="state.confirmPassword" 
-                type="password" 
+                :type="showConfirmPassword ? 'text' : 'password'" 
                 required 
                 placeholder="Confirmez votre mot de passe"
                 icon="i-heroicons-shield-check"
                 class="w-full"
-              />
+                :ui="{ trailing: 'pe-1' }"
+              >
+                <template #trailing>
+                  <UButton
+                    color="neutral"
+                    variant="link"
+                    size="sm"
+                    :icon="showConfirmPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
+                    :aria-label="showConfirmPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                    :aria-pressed="showConfirmPassword"
+                    @click="showConfirmPassword = !showConfirmPassword"
+                  />
+                </template>
+              </UInput>
             </UFormField>
           </div>
 
@@ -223,6 +249,10 @@ const state = reactive({
   confirmPassword: '',
 });
 const loading = ref(false);
+
+// États pour l'affichage des mots de passe
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
 
 // Fonctions pour l'indicateur de force du mot de passe
 const getPasswordStrength = () => {

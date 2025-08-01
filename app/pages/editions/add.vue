@@ -23,7 +23,7 @@ import { computed } from 'vue';
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
-  middleware: 'auth-client'
+  middleware: 'auth-protected'
 });
 
 const editionStore = useEditionStore();
