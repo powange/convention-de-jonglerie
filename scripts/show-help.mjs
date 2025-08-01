@@ -50,6 +50,15 @@ const sections = [
     ]
   },
   {
+    title: '👤 Gestion des super administrateurs',
+    color: colors.yellow,
+    scripts: [
+      { name: 'admin:list', desc: 'Liste tous les super administrateurs' },
+      { name: 'admin:add <email>', desc: 'Promouvoir un utilisateur en super admin' },
+      { name: 'admin:remove <email>', desc: 'Rétrograder un super admin' }
+    ]
+  },
+  {
     title: '🧪 Tests unitaires (rapides, sans DB)',
     color: colors.cyan,
     scripts: [
