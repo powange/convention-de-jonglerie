@@ -1,14 +1,13 @@
-import { beforeAll, afterAll, beforeEach } from 'vitest'
-import { execSync } from 'child_process'
+import { beforeAll, afterAll } from 'vitest'
 
 // Import dynamique de Prisma pour éviter les problèmes de résolution
-let PrismaClient: any
-let prismaTest: any
+let PrismaClient: typeof import('@prisma/client').PrismaClient
+let prismaTest: import('@prisma/client').PrismaClient
 
 try {
   const prismaModule = await import('@prisma/client')
   PrismaClient = prismaModule.PrismaClient
-} catch (error) {
+} catch {
   console.warn('Prisma Client non disponible, les tests DB seront skippés')
 }
 
@@ -36,16 +35,17 @@ if (process.env.TEST_WITH_DB === 'true') {
       // Attendre que MySQL soit prêt (la DB est déjà démarrée par le script)
       await waitForDatabase()
       console.log('✅ Connexion à la base de données de test réussie')
+      
+      // Nettoyage initial
+      await cleanDatabase()
+      console.log('🧹 Base de données nettoyée pour les tests')
     } catch (error) {
       console.error('❌ Erreur lors de la connexion à la DB de test:', error)
       throw error
     }
   }, 30000)
 
-  beforeEach(async () => {
-    // Nettoyer les données entre chaque test
-    await cleanDatabase()
-  })
+  // Pas de nettoyage entre les tests - les IDs uniques évitent les conflits
 
   afterAll(async () => {
     // Déconnecter Prisma
@@ -87,7 +87,7 @@ async function cleanDatabase() {
     await prismaTest.edition.deleteMany({})
     await prismaTest.convention.deleteMany({})
     await prismaTest.user.deleteMany({})
-  } catch (error) {
-    console.warn('Erreur lors du nettoyage de la DB:', error)
+  } catch {
+    console.warn('Erreur lors du nettoyage de la DB:')
   }
 }

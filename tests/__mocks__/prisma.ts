@@ -17,6 +17,7 @@ export const prismaMock = {
   
   // Modèles principaux
   convention: createModelMock(),
+  conventionCollaborator: createModelMock(),
   edition: createModelMock(),
   
   // Méthodes Prisma

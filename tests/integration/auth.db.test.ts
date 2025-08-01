@@ -1,20 +1,19 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import bcrypt from 'bcryptjs'
 import { prismaTest } from '../setup-db'
 
 // Ce fichier ne s'exécute que si TEST_WITH_DB=true
 describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB', () => {
   
-  beforeEach(async () => {
-    // Le nettoyage est fait automatiquement par setup-db.ts
-  })
+  // Le nettoyage est géré globalement par setup-db.ts
 
   describe('Inscription', () => {
     it('devrait créer un nouvel utilisateur dans la DB', async () => {
+      const timestamp = Date.now()
       const userData = {
-        email: 'test@example.com',
+        email: `test-${timestamp}@example.com`,
         password: await bcrypt.hash('Password123!', 10),
-        pseudo: 'testuser',
+        pseudo: `testuser-${timestamp}`,
         nom: 'Test',
         prenom: 'User',
         isEmailVerified: false,
@@ -27,12 +26,12 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
       })
 
       expect(user.id).toBeDefined()
-      expect(user.email).toBe('test@example.com')
-      expect(user.pseudo).toBe('testuser')
+      expect(user.email).toBe(`test-${timestamp}@example.com`)
+      expect(user.pseudo).toBe(`testuser-${timestamp}`)
       
       // Vérifier que l'utilisateur existe dans la DB
       const foundUser = await prismaTest.user.findUnique({
-        where: { email: 'test@example.com' }
+        where: { email: `test-${timestamp}@example.com` }
       })
       
       expect(foundUser).toBeDefined()
@@ -40,10 +39,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
     })
 
     it('devrait empêcher les doublons d\'email', async () => {
+      const timestamp = Date.now()
       const userData = {
-        email: 'duplicate@example.com',
+        email: `duplicate-${timestamp}@example.com`,
         password: await bcrypt.hash('Password123!', 10),
-        pseudo: 'user1',
+        pseudo: `user1-${timestamp}`,
         nom: 'Test',
         prenom: 'User'
       }
@@ -54,7 +54,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
       // Tenter de créer un second avec le même email
       await expect(
         prismaTest.user.create({
-          data: { ...userData, pseudo: 'user2' }
+          data: { ...userData, pseudo: `user2-${timestamp}` }
         })
       ).rejects.toThrow()
     })
@@ -64,12 +64,13 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
     it('devrait vérifier le mot de passe correctement', async () => {
       const plainPassword = 'SecurePass123!'
       const hashedPassword = await bcrypt.hash(plainPassword, 10)
+      const uniqueEmail = `login-${Date.now()}@example.com`
 
-      const user = await prismaTest.user.create({
+      await prismaTest.user.create({
         data: {
-          email: 'login@example.com',
+          email: uniqueEmail,
           password: hashedPassword,
-          pseudo: 'loginuser',
+          pseudo: `loginuser-${Date.now()}`,
           nom: 'Login',
           prenom: 'User',
           isEmailVerified: true
@@ -78,10 +79,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
 
       // Trouver l'utilisateur
       const foundUser = await prismaTest.user.findUnique({
-        where: { email: 'login@example.com' }
+        where: { email: uniqueEmail }
       })
 
       expect(foundUser).toBeDefined()
+      expect(foundUser).not.toBeNull()
       
       // Vérifier le mot de passe
       const isValid = await bcrypt.compare(plainPassword, foundUser!.password)
@@ -95,12 +97,13 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
 
   describe('Reset de mot de passe', () => {
     it('devrait créer et utiliser un token de reset', async () => {
+      const timestamp = Date.now()
       // Créer un utilisateur
       const user = await prismaTest.user.create({
         data: {
-          email: 'reset@example.com',
+          email: `reset-${timestamp}@example.com`,
           password: await bcrypt.hash('OldPassword123!', 10),
-          pseudo: 'resetuser',
+          pseudo: `resetuser-${timestamp}`,
           nom: 'Reset',
           prenom: 'User'
         }
@@ -109,7 +112,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
       // Créer un token de reset
       const resetToken = await prismaTest.passwordResetToken.create({
         data: {
-          token: 'test-reset-token-123',
+          token: `test-reset-token-${timestamp}`,
           userId: user.id,
           expiresAt: new Date(Date.now() + 3600000), // 1 heure
           used: false
@@ -120,12 +123,12 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
 
       // Vérifier que le token existe
       const foundToken = await prismaTest.passwordResetToken.findUnique({
-        where: { token: 'test-reset-token-123' },
+        where: { token: `test-reset-token-${timestamp}` },
         include: { user: true }
       })
 
       expect(foundToken).toBeDefined()
-      expect(foundToken?.user.email).toBe('reset@example.com')
+      expect(foundToken?.user.email).toBe(`reset-${timestamp}@example.com`)
       expect(foundToken?.used).toBe(false)
 
       // Marquer le token comme utilisé
@@ -142,22 +145,27 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
     })
 
     it('devrait nettoyer les tokens expirés', async () => {
+      const timestamp = Date.now()
       const user = await prismaTest.user.create({
         data: {
-          email: 'cleanup@example.com',
+          email: `cleanup-${timestamp}@example.com`,
           password: 'hash',
-          pseudo: 'cleanupuser',
+          pseudo: `cleanupuser-${timestamp}`,
           nom: 'Clean',
           prenom: 'Up'
         }
       })
+
+      const now = new Date()
+      const expiredDate = new Date(now.getTime() - 3600000) // 1 heure dans le passé
+      const validDate = new Date(now.getTime() + 3600000) // 1 heure dans le futur
 
       // Créer des tokens expirés et valides
       await prismaTest.passwordResetToken.create({
         data: {
           token: 'expired-token',
           userId: user.id,
-          expiresAt: new Date(Date.now() - 3600000), // Expiré
+          expiresAt: expiredDate,
           used: false
         }
       })
@@ -166,16 +174,16 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
         data: {
           token: 'valid-token',
           userId: user.id,
-          expiresAt: new Date(Date.now() + 3600000), // Valide
+          expiresAt: validDate,
           used: false
         }
       })
 
-      // Nettoyer les tokens expirés
+      // Nettoyer les tokens expirés (utiliser une date fixe pour être sûr)
       const deleted = await prismaTest.passwordResetToken.deleteMany({
         where: {
           expiresAt: {
-            lt: new Date()
+            lt: now
           }
         }
       })
