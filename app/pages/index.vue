@@ -72,6 +72,37 @@
               </UFormField>
             </div>
             
+            <!-- Filtre temporel -->
+            <div class="space-y-4">
+              <h4 class="font-medium text-gray-700">Période :</h4>
+              <div class="space-y-3">
+                <UCheckbox v-model="filters.showPast" name="showPast">
+                  <template #label>
+                    <div class="flex items-center gap-2">
+                      <span class="text-base">✅</span>
+                      <span>Éditions passées</span>
+                    </div>
+                  </template>
+                </UCheckbox>
+                <UCheckbox v-model="filters.showCurrent" name="showCurrent">
+                  <template #label>
+                    <div class="flex items-center gap-2">
+                      <span class="text-base">🔥</span>
+                      <span>Éditions en cours</span>
+                    </div>
+                  </template>
+                </UCheckbox>
+                <UCheckbox v-model="filters.showFuture" name="showFuture">
+                  <template #label>
+                    <div class="flex items-center gap-2">
+                      <span class="text-base">🔄</span>
+                      <span>Éditions à venir</span>
+                    </div>
+                  </template>
+                </UCheckbox>
+              </div>
+            </div>
+            
             <!-- Filtres services -->
             <div class="space-y-4">
               <h4 class="font-medium text-gray-700">Services recherchés :</h4>
@@ -336,6 +367,8 @@ const activeFiltersCount = computed(() => {
   if (filters.startDate) count++;
   if (filters.endDate) count++;
   if (filters.countries.length > 0) count++;
+  // Compter le filtre temporel si pas tous cochés (par défaut showPast=false, showCurrent=true, showFuture=true)
+  if (!(filters.showPast === false && filters.showCurrent === true && filters.showFuture === true)) count++;
   // Compter les services actifs
   count += services.filter(service => filters[service.key]).length;
   return count;
@@ -346,6 +379,10 @@ const filters = reactive({
   startDate: '',
   endDate: '',
   countries: [] as string[],
+  // Filtre temporel - par défaut : en cours et à venir cochés
+  showPast: false,
+  showCurrent: true,
+  showFuture: true,
   // Initialiser tous les services à false
   ...Object.fromEntries(services.map(service => [service.key, false])),
 });

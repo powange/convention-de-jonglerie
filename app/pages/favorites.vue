@@ -102,11 +102,15 @@ const toast = useToast();
 const loading = ref(true);
 const viewMode = ref<'grid' | 'map'>('grid');
 
-// Calculer les éditions favorites de l'utilisateur
+// Calculer les éditions favorites de l'utilisateur triées par date de début
 const favoriteEditions = computed(() => {
-  return editionStore.editions.filter(
-    edition => edition.favoritedBy.some(user => user.id === authStore.user?.id)
-  );
+  return editionStore.editions
+    .filter(edition => edition.favoritedBy.some(user => user.id === authStore.user?.id))
+    .sort((a, b) => {
+      const dateA = new Date(a.startDate);
+      const dateB = new Date(b.startDate);
+      return dateA.getTime() - dateB.getTime(); // Tri croissant (plus proche en premier)
+    });
 });
 
 

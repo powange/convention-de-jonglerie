@@ -12,6 +12,9 @@ export default defineEventHandler(async (event) => {
       startDate, 
       endDate, 
       countries,
+      showPast,
+      showCurrent,
+      showFuture,
       hasFoodTrucks,
       hasKidsZone,
       acceptsPets,
@@ -182,6 +185,55 @@ export default defineEventHandler(async (event) => {
       where.hasATM = true;
     }
 
+    // Construire la condition finale avec les filtres temporels
+    let finalWhere: any = where;
+    
+    // Filtres temporels
+    if (showPast !== undefined || showCurrent !== undefined || showFuture !== undefined) {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // Début de la journée
+      
+      const timeFilters = [];
+      
+      if (showPast === 'true') {
+        // Éditions passées: endDate < aujourd'hui
+        timeFilters.push({ endDate: { lt: today } });
+      }
+      
+      if (showCurrent === 'true') {
+        // Éditions en cours: startDate <= maintenant AND endDate >= aujourd'hui
+        timeFilters.push({
+          startDate: { lte: now },
+          endDate: { gte: today }
+        });
+      }
+      
+      if (showFuture === 'true') {
+        // Éditions à venir: startDate > aujourd'hui
+        timeFilters.push({ startDate: { gt: now } });
+      }
+      
+      // Si au moins un filtre temporel est actif, créer un filtre AND avec les autres conditions
+      if (timeFilters.length > 0) {
+        // Si il y a d'autres conditions, combiner avec AND
+        if (Object.keys(where).length > 0) {
+          finalWhere = {
+            AND: [
+              where,
+              { OR: timeFilters }
+            ]
+          };
+        } else {
+          // Si pas d'autres conditions, utiliser seulement le filtre temporel
+          finalWhere = { OR: timeFilters };
+        }
+      }
+      // Si aucun filtre temporel n'est coché, ne rien afficher
+      else if (showPast === 'false' && showCurrent === 'false' && showFuture === 'false') {
+        finalWhere = { id: -1 }; // Condition impossible pour ne rien retourner
+      }
+    }
+
     // Essayer d'inclure les collaborateurs, fallback sans si la table n'existe pas
     let includeCollaborators = false;
     try {
@@ -193,7 +245,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const editions = await prisma.edition.findMany({
-      where,
+      where: finalWhere,
       include: {
         creator: {
           select: { id: true, pseudo: true },
@@ -217,14 +269,18 @@ export default defineEventHandler(async (event) => {
           }
         }),
       },
+      orderBy: {
+        startDate: 'asc' // Tri croissant par date de début (plus proche en premier)
+      }
     });
 
     return editions;
   } catch (error) {
     console.error('Erreur API editions:', error);
+    console.error('Query params:', query);
     throw createError({
       statusCode: 500,
-      statusMessage: 'Internal Server Error',
+      statusMessage: `Erreur lors de la récupération des éditions: ${error.message}`,
     });
   }
 });

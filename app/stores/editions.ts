@@ -8,6 +8,10 @@ interface EditionFilters {
   startDate?: string;
   endDate?: string;
   countries?: string[];
+  // Filtres temporels
+  showPast?: boolean;
+  showCurrent?: boolean;
+  showFuture?: boolean;
   // Services/équipements
   hasFoodTrucks?: boolean;
   hasKidsZone?: boolean;
@@ -47,15 +51,10 @@ export const useEditionStore = defineStore('editions', {
     }
   },
   actions: {
-    // Filtrer les éditions futures (date de fin >= aujourd'hui)
+    // Filtrer les éditions futures (date de fin >= aujourd'hui) - OBSOLÈTE: géré par le filtre temporel
     filterFutureEditions() {
-      const now = new Date();
-      now.setHours(0, 0, 0, 0); // Début de la journée actuelle
-      
-      this.editions = this.editions.filter(edition => {
-        const endDate = new Date(edition.endDate);
-        return endDate >= now; // Garder seulement les éditions qui ne sont pas encore terminées
-      });
+      // Cette méthode est maintenant obsolète car le filtrage temporel est géré par l'API
+      // et les filtres utilisateur (showPast, showCurrent, showFuture)
     },
 
     // Trier les éditions par ordre chronologique (plus ancienne en premier)
@@ -90,6 +89,17 @@ export const useEditionStore = defineStore('editions', {
         }
         if (filters?.countries && filters.countries.length > 0) {
           queryParams.countries = JSON.stringify(filters.countries);
+        }
+
+        // Filtres temporels
+        if (filters?.showPast !== undefined) {
+          queryParams.showPast = filters.showPast.toString();
+        }
+        if (filters?.showCurrent !== undefined) {
+          queryParams.showCurrent = filters.showCurrent.toString();
+        }
+        if (filters?.showFuture !== undefined) {
+          queryParams.showFuture = filters.showFuture.toString();
         }
 
         // Filtres de services - passer tous les services actifs
