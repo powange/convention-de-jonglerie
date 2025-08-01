@@ -166,52 +166,6 @@
       </UCard>
     </div>
 
-    <!-- Liens rapides -->
-    <div>
-      <h2 class="text-xl font-semibold mb-4">Liens Rapides</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <UButton
-          to="/admin/users"
-          color="blue"
-          variant="outline"
-          class="justify-center"
-          icon="i-heroicons-users"
-        >
-          Tous les utilisateurs
-        </UButton>
-        
-        <UButton
-          to="/my-conventions"
-          color="purple"
-          variant="outline"
-          class="justify-center"
-          icon="i-heroicons-building-library"
-        >
-          Mes conventions
-        </UButton>
-        
-        <UButton
-          to="/"
-          color="green"
-          variant="outline"
-          class="justify-center"
-          icon="i-heroicons-home"
-        >
-          Retour accueil
-        </UButton>
-        
-        <UButton
-          color="gray"
-          variant="outline"
-          class="justify-center"
-          icon="i-heroicons-arrow-path"
-          @click="refreshData"
-          :loading="loading"
-        >
-          Actualiser
-        </UButton>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -222,6 +176,7 @@ definePageMeta({
 })
 
 const authStore = useAuthStore()
+const toast = useToast()
 
 // Métadonnées de la page
 useSeoMeta({
@@ -284,62 +239,70 @@ const getActivityIconClass = (type: string) => {
 // Fonction pour charger les statistiques
 const loadStats = async () => {
   try {
-    // Temporairement désactivé - API à créer plus tard
-    // const data = await $fetch('/api/admin/stats')
-    // stats.value = data
-    
-    // Valeurs par défaut pour le développement
-    stats.value = {
-      totalUsers: 156,
-      newUsersThisMonth: 12,
-      totalConventions: 45,
-      newConventionsThisMonth: 3,
-      totalEditions: 134,
-      newEditionsThisMonth: 8,
-      totalAdmins: 2
-    }
+    const data = await $fetch('/api/admin/stats', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    stats.value = data
   } catch (error) {
     console.error('Erreur lors du chargement des statistiques:', error)
+    
+    // Si erreur d'authentification, rediriger vers login
+    if (error?.statusCode === 401 || error?.status === 401) {
+      navigateTo('/login')
+      return
+    }
+    
     // Valeurs par défaut en cas d'erreur
     stats.value = {
-      totalUsers: 156,
-      newUsersThisMonth: 12,
-      totalConventions: 45,
-      newConventionsThisMonth: 3,
-      totalEditions: 134,
-      newEditionsThisMonth: 8,
-      totalAdmins: 2
+      totalUsers: 0,
+      newUsersThisMonth: 0,
+      totalConventions: 0,
+      newConventionsThisMonth: 0,
+      totalEditions: 0,
+      newEditionsThisMonth: 0,
+      totalAdmins: 0
     }
+    
+    toast.add({
+      color: 'error',
+      title: 'Erreur',
+      description: 'Impossible de charger les statistiques'
+    })
   }
 }
 
 // Fonction pour charger l'activité récente
 const loadRecentActivity = async () => {
-  // Temporairement désactivé - API à créer plus tard
-  // try {
-  //   const data = await $fetch('/api/admin/activity')
-  //   recentActivity.value = data
-  // } catch (error) {
-  //   console.error('Erreur lors du chargement de l\'activité:', error)
-  // }
-  
-  // Données d'exemple pour le développement
-  recentActivity.value = [
-    {
-      id: 1,
-      type: 'user_registered',
-      title: 'Nouvel utilisateur inscrit',
-      description: 'Marie Dupont s\'est inscrite sur la plateforme',
-      createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString()
-    },
-    {
-      id: 2,
-      type: 'convention_created',
-      title: 'Nouvelle convention créée',
-      description: 'Convention de Printemps 2025 créée par Jean Martin',
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+  try {
+    const data = await $fetch('/api/admin/activity', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      },
+      query: {
+        limit: 10
+      }
+    })
+    recentActivity.value = data
+  } catch (error) {
+    console.error('Erreur lors du chargement de l\'activité:', error)
+    
+    // Si erreur d'authentification, rediriger vers login
+    if (error?.statusCode === 401 || error?.status === 401) {
+      navigateTo('/login')
+      return
     }
-  ]
+    
+    // Laisser la liste vide en cas d'erreur
+    recentActivity.value = []
+    
+    toast.add({
+      color: 'error',
+      title: 'Erreur',
+      description: 'Impossible de charger l\'activité récente'
+    })
+  }
 }
 
 // Fonction pour actualiser toutes les données
