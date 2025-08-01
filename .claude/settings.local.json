@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
       "WebFetch(domain:ui.nuxt.com)",
@@ -15,7 +16,16 @@
       "Bash(grep:*)",
       "Bash(rm:*)",
       "Bash(npx nuxi:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npm install:*)",
+      "WebFetch(domain:nuxt.com)",
+      "Bash(docker:*)",
+      "Bash(npx wait-on:*)",
+      "Bash($env:TEST_WITH_DB=\"true\")",
+      "Bash(npm uninstall:*)",
+      "WebFetch(domain:www.prisma.io)",
+      "Bash(set TEST_WITH_DB=true)",
+      "Bash(npx vitest run:*)"
     ],
     "deny": []
   }

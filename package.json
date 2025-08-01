@@ -11,7 +11,17 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "geocode": "node scripts/run-geocoding.mjs",
-    "db:clean-tokens": "npx tsx scripts/clean-expired-tokens.ts"
+    "db:clean-tokens": "npx tsx scripts/clean-expired-tokens.ts",
+    "help": "node scripts/show-help.mjs",
+    "test": "vitest --config vitest.config.simple.ts",
+    "test:ui": "vitest --ui --config vitest.config.simple.ts",
+    "test:run": "vitest run --config vitest.config.simple.ts",
+    "test:nuxt": "vitest",
+    "test:nuxt:run": "vitest run",
+    "test:db": "cross-env TEST_WITH_DB=true vitest",
+    "test:db:run": "node scripts/test-db-run.js",
+    "test:setup": "docker-compose -f docker-compose.test.yml up -d --wait && node scripts/migrate-test.js",
+    "test:teardown": "docker-compose -f docker-compose.test.yml down"
   },
   "dependencies": {
     "@internationalized/date": "^3.8.2",
@@ -38,7 +48,15 @@
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.2",
+    "@testing-library/vue": "^8.1.0",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vitest/ui": "^3.2.4",
+    "@vue/test-utils": "^2.4.6",
+    "cross-env": "^10.0.0",
+    "happy-dom": "^18.0.1",
     "prisma": "^6.13.0",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4",
+    "wait-on": "^8.0.4"
   }
 }
