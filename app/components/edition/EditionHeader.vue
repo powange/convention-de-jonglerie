@@ -96,6 +96,21 @@
         </NuxtLink>
         
         <NuxtLink 
+          v-if="isEditionFinished"
+          :to="`/editions/${edition.id}/objets-trouves`"
+          :class="[
+            'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
+            currentPage === 'objets-trouves' 
+              ? 'border-primary-500 text-primary-600' 
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]"
+          :title="'Objets trouvés'"
+        >
+          <UIcon name="i-heroicons-magnifying-glass" :class="['sm:mr-1']" size="24" class="sm:!w-4 sm:!h-4" />
+          <span class="hidden sm:inline">Objets trouvés</span>
+        </NuxtLink>
+        
+        <NuxtLink 
           v-if="canAccess"
           :to="`/editions/${edition.id}/gestion`"
           :class="[
@@ -130,7 +145,7 @@ const { normalizeImageUrl } = useImageUrl();
 
 interface Props {
   edition: Edition;
-  currentPage: 'details' | 'commentaires' | 'covoiturage' | 'gestion';
+  currentPage: 'details' | 'commentaires' | 'covoiturage' | 'gestion' | 'objets-trouves';
   isFavorited?: boolean;
 }
 
@@ -154,6 +169,12 @@ const canAccess = computed(() => {
   return canEdit || authStore.user?.id === props.edition?.creatorId;
 });
 
+// Vérifier si l'édition est terminée
+const isEditionFinished = computed(() => {
+  if (!props.edition) return false;
+  return new Date() > new Date(props.edition.endDate);
+});
+
 // Formatter la plage de dates
 const formatDateRange = (start: string, end: string) => {
   const startDate = new Date(start);
@@ -173,6 +194,7 @@ const getPageTitle = (page: string) => {
     'details': 'Détails',
     'commentaires': 'Commentaires',
     'covoiturage': 'Covoiturage',
+    'objets-trouves': 'Objets trouvés',
     'gestion': 'Gestion'
   };
   return titles[page] || 'Détails';

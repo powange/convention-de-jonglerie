@@ -80,7 +80,7 @@
                   <template #label>
                     <div class="flex items-center gap-2">
                       <span class="text-base">✅</span>
-                      <span>Éditions passées</span>
+                      <span>Éditions terminées</span>
                     </div>
                   </template>
                 </UCheckbox>
@@ -443,15 +443,19 @@ const resetFilters = () => {
   filters.countries = [];
   calendarStartDate.value = null;
   calendarEndDate.value = null;
+  // Réinitialiser les filtres temporels aux valeurs par défaut
+  filters.showPast = false;
+  filters.showCurrent = true;
+  filters.showFuture = true;
   // Réinitialiser tous les services
   services.forEach(service => {
     filters[service.key] = false;
   });
-  editionStore.fetchEditions(); // Fetch all conventions again
+  editionStore.fetchEditions(filters); // Fetch all conventions again
 };
 
 onMounted(() => {
-  editionStore.fetchEditions();
+  editionStore.fetchEditions(filters);
 });
 
 const isFavorited = computed(() => (editionId: number) => {

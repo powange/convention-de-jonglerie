@@ -77,6 +77,54 @@
             </div>
           </div>
         </UCard>
+
+        <!-- Objets trouvés -->
+        <UCard>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-magnifying-glass" class="text-amber-500" />
+                <h3 class="text-lg font-semibold">Objets trouvés</h3>
+              </div>
+              <UButton
+                v-if="isEditionFinished"
+                size="sm"
+                color="amber"
+                variant="soft"
+                icon="i-heroicons-arrow-right"
+                :to="`/editions/${edition.id}/objets-trouves`"
+              >
+                Gérer
+              </UButton>
+            </div>
+            
+            <div v-if="!isEditionFinished" class="bg-gray-50 dark:bg-gray-900/20 p-4 rounded-lg border border-gray-200 dark:border-gray-800">
+              <div class="flex items-start gap-3">
+                <UIcon name="i-heroicons-clock" class="text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5" size="20" />
+                <div class="space-y-2">
+                  <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">Disponible après l'événement</h4>
+                  <p class="text-sm text-gray-700 dark:text-gray-300">
+                    La gestion des objets trouvés sera disponible une fois l'édition terminée. 
+                    Les collaborateurs pourront alors publier des annonces d'objets trouvés pour aider les participants à récupérer leurs affaires.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div v-else class="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+              <div class="flex items-start gap-3">
+                <UIcon name="i-heroicons-magnifying-glass" class="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" size="20" />
+                <div class="space-y-2">
+                  <h4 class="text-sm font-medium text-amber-900 dark:text-amber-100">Gérez les objets trouvés</h4>
+                  <p class="text-sm text-amber-800 dark:text-amber-200">
+                    Publiez des annonces d'objets trouvés avec photos et descriptions. 
+                    Les participants pourront consulter les annonces et commenter pour récupérer leurs affaires.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </UCard>
       </div>
     </div>
   </div>
@@ -126,6 +174,12 @@ const canEdit = computed(() => {
 const canDelete = computed(() => {
   if (!edition.value || !authStore.user?.id) return false;
   return editionStore.canDeleteEdition(edition.value, authStore.user.id);
+});
+
+// Vérifier si l'édition est terminée
+const isEditionFinished = computed(() => {
+  if (!edition.value) return false;
+  return new Date() > new Date(edition.value.endDate);
 });
 
 const isFavorited = computed(() => (_editionId: number) => {

@@ -39,6 +39,8 @@ model User {
   createdEditions        Edition[]                @relation("CreatedEditions")
   favoriteEditions       Edition[]                @relation("FavoriteEditions")
   passwordResetTokens    PasswordResetToken[]
+  lostFoundItems         LostFoundItem[]
+  lostFoundComments      LostFoundComment[]
 }
 
 model Edition {
@@ -88,6 +90,7 @@ model Edition {
   carpoolOffers        CarpoolOffer[]
   carpoolRequests      CarpoolRequest[]
   editionPosts         EditionPost[]
+  lostFoundItems       LostFoundItem[]
   creator              User                     @relation("CreatedEditions", fields: [creatorId], references: [id])
   favoritedBy          User[]                   @relation("FavoriteEditions")
   convention           Convention               @relation(fields: [conventionId], references: [id])
@@ -249,4 +252,40 @@ model PasswordResetToken {
 
   @@index([userId], map: "PasswordResetToken_userId_fkey")
   @@index([token], map: "PasswordResetToken_token_idx")
+}
+
+enum LostFoundStatus {
+  LOST      // Objet perdu
+  RETURNED  // Objet restitué
+}
+
+model LostFoundItem {
+  id          Int                    @id @default(autoincrement())
+  editionId   Int
+  userId      Int                    // Utilisateur qui a créé l'annonce (doit être collaborateur)
+  description String                 @db.Text
+  imageUrl    String?
+  status      LostFoundStatus        @default(LOST)
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  edition     Edition                @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments    LostFoundComment[]
+
+  @@index([editionId], map: "LostFoundItem_editionId_fkey")
+  @@index([userId], map: "LostFoundItem_userId_fkey")
+}
+
+model LostFoundComment {
+  id              Int            @id @default(autoincrement())
+  lostFoundItemId Int
+  userId          Int
+  content         String         @db.Text
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  lostFoundItem   LostFoundItem  @relation(fields: [lostFoundItemId], references: [id], onDelete: Cascade)
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([lostFoundItemId], map: "LostFoundComment_lostFoundItemId_fkey")
+  @@index([userId], map: "LostFoundComment_userId_fkey")
 }
