@@ -72,7 +72,7 @@ export function generateVerificationCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-export function generateVerificationEmailHtml(code: string, prenom: string): string {
+export function generateVerificationEmailHtml(code: string, prenom: string, email: string): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -86,6 +86,8 @@ export function generateVerificationEmailHtml(code: string, prenom: string): str
             .header { background: #3b82f6; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
             .content { background: #f8fafc; padding: 30px; border-radius: 0 0 8px 8px; }
             .code { background: #1f2937; color: #fbbf24; padding: 15px; font-size: 28px; font-weight: bold; text-align: center; border-radius: 8px; letter-spacing: 3px; margin: 20px 0; }
+            .button { display: inline-block; background: #3b82f6; color: white !important; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+            .button:hover { background: #2563eb; }
             .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
         </style>
     </head>
@@ -99,7 +101,17 @@ export function generateVerificationEmailHtml(code: string, prenom: string): str
                 
                 <p>Bienvenue dans la communauté des conventions de jonglerie ! 🎪</p>
                 
-                <p>Pour finaliser votre inscription, veuillez utiliser le code de vérification ci-dessous :</p>
+                <p>Pour finaliser votre inscription, vous pouvez :</p>
+                
+                <div style="text-align: center;">
+                    <a href="${process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/verify-email?email=${encodeURIComponent(email)}" class="button">Vérifier mon compte</a>
+                </div>
+                
+                <p style="text-align: center; margin: 20px 0; color: #6b7280;">
+                    <strong>OU</strong>
+                </p>
+                
+                <p>Saisir manuellement ce code de vérification :</p>
                 
                 <div class="code">${code}</div>
                 

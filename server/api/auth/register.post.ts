@@ -42,12 +42,12 @@ export default defineEventHandler(async (event) => {
     });
     
     // Envoyer l'email de vérification
-    const emailHtml = generateVerificationEmailHtml(verificationCode, cleanPrenom);
+    const emailHtml = generateVerificationEmailHtml(verificationCode, cleanPrenom, cleanEmail);
     const emailSent = await sendEmail({
       to: cleanEmail,
       subject: '🤹 Vérifiez votre compte - Conventions de Jonglerie',
       html: emailHtml,
-      text: `Bonjour ${cleanPrenom}, votre code de vérification est : ${verificationCode}`
+      text: `Bonjour ${cleanPrenom}, votre code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier : ${process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/verify-email?email=${encodeURIComponent(cleanEmail)}`
     });
     
     if (!emailSent) {
