@@ -28,5 +28,16 @@ export default defineNuxtConfig({
     public: {
       // Public keys that are available on both client and server
     }
+  },
+  vite: {
+    css: {
+      devSourcemap: true
+    },
+    build: {
+      sourcemap: process.env.NODE_ENV === 'development' // Sourcemaps seulement en dev
+    },
+    plugins: [
+      tsconfigPaths()
+    ]
   }
 })
