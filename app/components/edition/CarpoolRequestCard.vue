@@ -4,11 +4,11 @@
       <!-- En-tête avec les infos utilisateur -->
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-3 flex-1">
-          <img 
-            :src="getUserAvatar(request.user, 20)" 
-            :alt="`Avatar de ${request.user.pseudo}`"
-            class="w-10 h-10 rounded-full"
-          >
+          <UserAvatar
+            :user="request.user"
+            size="sm"
+            class="w-10 h-10"
+          />
           <div>
             <p class="font-semibold">{{ request.user.pseudo }}</p>
             <p class="text-sm text-gray-500">
@@ -95,7 +95,6 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth';
-import { useAvatar } from '~/utils/avatar';
 import CarpoolCommentsModal from './CarpoolCommentsModal.vue';
 
 interface CarpoolRequest {
@@ -137,7 +136,6 @@ const emit = defineEmits<{
 }>();
 
 const authStore = useAuthStore();
-const { getUserAvatar } = useAvatar();
 const toast = useToast();
 
 // Vérifier si l'utilisateur peut éditer cette demande

@@ -70,11 +70,11 @@
                   class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-full text-sm"
                   :title="getCollaboratorTitle(collaborator)"
                 >
-                  <img 
-                    :src="getUserAvatar(collaborator, 16)" 
-                    :alt="`Avatar de ${collaborator.pseudo}`"
-                    class="w-4 h-4 rounded-full"
-                  >
+                  <UserAvatar
+                    :user="collaborator"
+                    size="xs"
+                    class="w-4 h-4"
+                  />
                   <span class="text-gray-700 dark:text-gray-300">{{ collaborator.pseudo }}</span>
                   <UBadge
                     v-if="collaborator.isCreator"
@@ -190,7 +190,6 @@ import { useRoute } from 'vue-router';
 import type { Edition } from '~/types';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
-import { useAvatar } from '~/utils/avatar';
 
 const { formatDateTimeRange } = useDateFormat();
 import EditionHeader from '~/components/edition/EditionHeader.vue';
@@ -201,7 +200,6 @@ const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
 const { servicesByCategory } = useConventionServices();
-const { getUserAvatar } = useAvatar();
 
 const editionId = parseInt(route.params.id as string);
 const edition = ref<Edition | null>(null);

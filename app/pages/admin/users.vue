@@ -132,8 +132,6 @@ definePageMeta({
 import { useAuthStore } from '~/stores/auth'
 import { h, resolveComponent } from 'vue'
 
-// Import des utilitaires avatar
-const { getUserAvatar } = useAvatar()
 
 // Types pour les utilisateurs
 interface UserCount {
@@ -220,10 +218,11 @@ const columns = [
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUser
       return h('div', { class: 'flex items-center gap-3' }, [
-        h('img', {
-          src: getUserAvatar(user, 32),
-          alt: `Avatar de ${user.prenom} ${user.nom}`,
-          class: 'w-8 h-8 rounded-full border-2 border-gray-200'
+        h(resolveComponent('UserAvatar'), {
+          user: user,
+          size: 'md',
+          border: true,
+          class: 'w-8 h-8'
         }),
         h('div', [
           h('div', { class: 'font-medium' }, `${user.prenom} ${user.nom}`),

@@ -27,11 +27,12 @@
     <div v-else class="space-y-3">
       <div v-for="collaborator in collaborators" :key="collaborator.id" class="flex items-center justify-between p-3 border rounded-lg">
         <div class="flex items-center gap-3">
-          <img 
-            :src="getUserAvatar(collaborator.user, 40)" 
-            :alt="`Avatar de ${collaborator.user.pseudo}`"
-            class="w-10 h-10 rounded-full border-2 border-gray-200"
-          >
+          <UserAvatar
+            :user="collaborator.user"
+            size="lg"
+            border
+            class="w-10 h-10"
+          />
           <div>
             <p class="font-medium">{{ collaborator.user.pseudo }}</p>
             <p class="text-sm text-gray-500">{{ collaborator.user.prenom }} {{ collaborator.user.nom }}</p>
@@ -102,7 +103,6 @@ import { ref, computed, onMounted, reactive } from 'vue';
 import { z } from 'zod';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
-import { useGravatar } from '~/utils/gravatar';
 import type { ConventionCollaborator } from '~/types';
 
 interface Props {
@@ -115,7 +115,6 @@ const props = defineProps<Props>();
 const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
-const { getUserAvatar } = useAvatar();
 
 const loading = ref(true);
 const adding = ref(false);

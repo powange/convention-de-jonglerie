@@ -3,11 +3,14 @@ import { vi, beforeEach } from 'vitest'
 // Mock centralisé de Prisma pour tests unitaires
 const createModelMock = () => ({
   findUnique: vi.fn(),
+  findFirst: vi.fn(),
   findMany: vi.fn(),
   create: vi.fn(),
+  createMany: vi.fn(),
   update: vi.fn(),
   delete: vi.fn(),
-  deleteMany: vi.fn()
+  deleteMany: vi.fn(),
+  groupBy: vi.fn()
 })
 
 export const prismaMock = {
@@ -19,6 +22,10 @@ export const prismaMock = {
   convention: createModelMock(),
   conventionCollaborator: createModelMock(),
   edition: createModelMock(),
+  
+  // Modèles objets trouvés
+  lostFoundItem: createModelMock(),
+  lostFoundComment: createModelMock(),
   
   // Méthodes Prisma
   $connect: vi.fn(),

@@ -23,11 +23,11 @@
         <UCard v-for="comment in comments" :key="comment.id" variant="subtle">
         <div class="flex items-start justify-between mb-2">
           <div class="flex items-center gap-2">
-            <img 
-              :src="getUserAvatar(comment.user, 20)" 
-              :alt="`Avatar de ${comment.user.pseudo}`"
-              class="w-5 h-5 rounded-full"
-            >
+            <UserAvatar
+              :user="comment.user"
+              size="sm"
+              class="w-5 h-5"
+            />
             <span class="font-medium text-sm">{{ comment.user.pseudo }}</span>
             <span class="text-xs text-gray-500">
               {{ formatRelativeTime(comment.createdAt) }}
@@ -93,7 +93,6 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth';
-import { useAvatar } from '~/utils/avatar';
 
 interface Comment {
   id: number;
@@ -122,7 +121,6 @@ const emit = defineEmits<{
 
 const authStore = useAuthStore();
 const toast = useToast();
-const { getUserAvatar } = useAvatar();
 
 const loading = ref(false);
 const comments = ref<Comment[]>([]);

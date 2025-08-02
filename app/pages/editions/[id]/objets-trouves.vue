@@ -45,13 +45,10 @@
         <template #header>
           <div class="flex items-start justify-between">
             <div class="flex items-center gap-3">
-              <img 
-                v-if="item.user.profilePicture"
-                :src="item.user.profilePicture" 
-                :alt="item.user.pseudo"
-                class="w-10 h-10 rounded-full"
-              >
-              <UAvatar v-else :label="item.user.pseudo" size="md" />
+              <UserAvatar 
+                :user="item.user" 
+                size="lg"
+              />
               <div>
                 <p class="font-medium">{{ item.user.prenom }} {{ item.user.nom }}</p>
                 <p class="text-sm text-gray-500">{{ formatDate(item.createdAt) }}</p>
@@ -99,13 +96,11 @@
                 :key="comment.id"
                 class="flex gap-3"
               >
-                <img 
-                  v-if="comment.user.profilePicture"
-                  :src="comment.user.profilePicture" 
-                  :alt="comment.user.pseudo"
-                  class="w-8 h-8 rounded-full flex-shrink-0"
-                >
-                <UAvatar v-else :label="comment.user.pseudo" size="sm" class="flex-shrink-0" />
+                <UserAvatar 
+                  :user="comment.user" 
+                  size="md" 
+                  shrink
+                />
                 <div class="flex-1">
                   <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
                     <p class="text-sm font-medium">{{ comment.user.prenom }} {{ comment.user.nom }}</p>

@@ -4,12 +4,13 @@
     <div class="bg-gradient-to-r from-primary-50 to-blue-50 dark:from-primary-900/20 dark:to-blue-900/20 rounded-2xl p-6 sm:p-8 mb-8">
       <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
         <div class="relative group">
-          <img 
-            v-if="authStore.user?.email"
-            :src="currentAvatar" 
-            :alt="`Avatar de ${authStore.user.pseudo || authStore.user.prenom}`"
-            class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-white shadow-xl object-cover transition-transform group-hover:scale-105"
-          >
+          <UserAvatar
+            v-if="authStore.user"
+            :user="authStore.user"
+            size="xl"
+            border
+            class="w-24 h-24 sm:w-28 sm:h-28 shadow-xl transition-transform group-hover:scale-105"
+          />
           <UButton 
             icon="i-heroicons-camera" 
             size="sm" 
@@ -450,11 +451,13 @@
           <!-- Aperçu actuel -->
           <div class="flex justify-center">
             <div class="relative group">
-              <img 
-                :src="currentAvatar" 
-                :alt="'Avatar actuel'"
-                class="w-32 h-32 rounded-full border-4 border-primary-200 dark:border-primary-700 object-cover shadow-xl transition-transform group-hover:scale-105"
-              >
+              <UserAvatar
+                v-if="authStore.user"
+                :user="authStore.user"
+                size="xl"
+                border
+                class="w-32 h-32 border-primary-200 dark:border-primary-700 shadow-xl transition-transform group-hover:scale-105"
+              />
               <div class="absolute inset-0 rounded-full bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
                 <UIcon name="i-heroicons-camera" class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
               </div>
@@ -524,7 +527,6 @@ import { reactive, ref, computed, onMounted } from 'vue';
 import { z } from 'zod';
 import { useAuthStore } from '~/stores/auth';
 import { useEditionStore } from '~/stores/editions';
-import { useAvatar } from '~/utils/avatar';
 import type { HttpError, User } from '~/types';
 
 // Protéger cette page avec le middleware d'authentification
@@ -535,7 +537,6 @@ definePageMeta({
 const authStore = useAuthStore();
 const editionStore = useEditionStore();
 const toast = useToast();
-const { getUserAvatar } = useAvatar();
 
 const loading = ref(false);
 const passwordLoading = ref(false);
@@ -584,12 +585,6 @@ const passwordState = reactive({
   confirmPassword: '',
 });
 
-// Avatar avec cache-busting
-const currentAvatar = computed(() => {
-  if (!authStore.user) return '';
-  const baseUrl = getUserAvatar(authStore.user, 120);
-  return `${baseUrl}&refresh=${avatarKey.value}`;
-});
 
 // Détection des changements
 const hasChanges = computed(() => {

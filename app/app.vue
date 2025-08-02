@@ -31,11 +31,11 @@
                   @click="toggleDropdown"
                 >
                   <div class="flex items-center gap-2">
-                    <img 
-                      :src="getUserAvatar(authStore.user, 32)" 
-                      :alt="`Avatar de ${displayName}`"
-                      class="w-8 h-8 rounded-full border-2 border-gray-200"
-                    >
+                    <UserAvatar 
+                      :user="authStore.user" 
+                      size="md" 
+                      border
+                    />
                     <div class="hidden sm:flex flex-col items-start">
                       <span class="text-sm font-medium">{{ displayName }}</span>
                       <UBadge 
@@ -167,7 +167,6 @@ import { useAuthStore } from './stores/auth';
 const authStore = useAuthStore();
 const toast = useToast();
 const router = useRouter();
-const { getUserAvatar } = useAvatar();
 
 // État réactif pour la taille d'écran et dropdown
 const isMobile = ref(false);

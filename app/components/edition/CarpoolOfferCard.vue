@@ -4,11 +4,11 @@
       <!-- En-tête avec les infos utilisateur -->
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-3 flex-1">
-          <img 
-            :src="getUserAvatar(offer.user, 20)" 
-            :alt="`Avatar de ${offer.user.pseudo}`"
-            class="w-10 h-10 rounded-full"
-          >
+          <UserAvatar
+            :user="offer.user"
+            size="sm"
+            class="w-10 h-10"
+          />
           <div>
             <p class="font-semibold">{{ offer.user.pseudo }}</p>
             <p class="text-sm text-gray-500">
@@ -81,11 +81,11 @@
             class="flex items-center gap-2 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full text-sm"
             :title="`Ajouté le ${new Date(passenger.addedAt).toLocaleDateString()}`"
           >
-            <img 
-              :src="getUserAvatar(passenger.user, 16)" 
-              :alt="`Avatar de ${passenger.user.pseudo}`"
-              class="w-4 h-4 rounded-full"
-            >
+            <UserAvatar
+              :user="passenger.user"
+              size="xs"
+              class="w-4 h-4"
+            />
             <span class="text-green-700 dark:text-green-300">{{ passenger.user.pseudo }}</span>
             <UButton
               v-if="canEdit"
@@ -120,7 +120,6 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth';
-import { useAvatar } from '~/utils/avatar';
 import CarpoolCommentsModal from './CarpoolCommentsModal.vue';
 
 interface CarpoolOffer {
@@ -166,7 +165,6 @@ const emit = defineEmits<{
 }>();
 
 const authStore = useAuthStore();
-const { getUserAvatar } = useAvatar();
 const toast = useToast();
 
 // Vérifier si l'utilisateur peut éditer cette offre

@@ -4,10 +4,9 @@
     <template #header>
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-3">
-          <UAvatar
-            :src="post.user.profilePicture"
-            :alt="post.user.pseudo"
-            size="md"
+          <UserAvatar 
+            :user="post.user" 
+            size="lg"
           />
           <div>
             <p class="font-medium text-gray-900 dark:text-gray-100">
@@ -111,10 +110,10 @@
         :key="comment.id"
         class="flex gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
       >
-        <UAvatar
-          :src="comment.user.profilePicture"
-          :alt="comment.user.pseudo"
-          size="sm"
+        <UserAvatar 
+          :user="comment.user" 
+          size="md" 
+          shrink
         />
         <div class="flex-1 min-w-0">
           <div class="flex items-center justify-between">
