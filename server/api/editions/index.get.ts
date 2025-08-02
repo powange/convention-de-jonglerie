@@ -191,25 +191,24 @@ export default defineEventHandler(async (event) => {
     // Filtres temporels
     if (showPast !== undefined || showCurrent !== undefined || showFuture !== undefined) {
       const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // Début de la journée
       
       const timeFilters = [];
       
       if (showPast === 'true') {
-        // Éditions passées: endDate < aujourd'hui
-        timeFilters.push({ endDate: { lt: today } });
+        // Éditions terminées: endDate < maintenant
+        timeFilters.push({ endDate: { lt: now } });
       }
       
       if (showCurrent === 'true') {
-        // Éditions en cours: startDate <= maintenant AND endDate >= aujourd'hui
+        // Éditions en cours: startDate <= maintenant AND endDate >= maintenant
         timeFilters.push({
           startDate: { lte: now },
-          endDate: { gte: today }
+          endDate: { gte: now }
         });
       }
       
       if (showFuture === 'true') {
-        // Éditions à venir: startDate > aujourd'hui
+        // Éditions à venir: startDate > maintenant
         timeFilters.push({ startDate: { gt: now } });
       }
       
