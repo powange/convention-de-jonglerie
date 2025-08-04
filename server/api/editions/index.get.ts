@@ -259,7 +259,7 @@ export default defineEventHandler(async (event) => {
           collaborators: {
             include: {
               user: {
-                select: { id: true, pseudo: true, profilePicture: true, updatedAt: true }
+                select: { id: true, pseudo: true, profilePicture: true, updatedAt: true, email: true }
               },
               addedBy: {
                 select: { id: true, pseudo: true }
@@ -273,7 +273,22 @@ export default defineEventHandler(async (event) => {
       }
     });
 
-    return editions;
+    // Transformer les emails en emailHash pour les collaborateurs
+    const transformedEditions = editions.map(edition => {
+      if (edition.collaborators) {
+        edition.collaborators = edition.collaborators.map(collab => ({
+          ...collab,
+          user: {
+            ...collab.user,
+            emailHash: getEmailHash(collab.user.email),
+            email: undefined
+          } as any
+        }));
+      }
+      return edition;
+    });
+
+    return transformedEditions;
   } catch (error) {
     console.error('Erreur API editions:', error);
     console.error('Query params:', query);

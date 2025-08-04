@@ -31,7 +31,6 @@
             :user="collaborator.user"
             size="lg"
             border
-            class="w-10 h-10"
           />
           <div>
             <p class="font-medium">{{ collaborator.user.pseudo }}</p>
@@ -104,6 +103,7 @@ import { z } from 'zod';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
 import type { ConventionCollaborator } from '~/types';
+import UserAvatar from '~/components/ui/UserAvatar.vue';
 
 interface Props {
   conventionId: number;

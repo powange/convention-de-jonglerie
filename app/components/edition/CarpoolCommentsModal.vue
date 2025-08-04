@@ -26,7 +26,6 @@
             <UserAvatar
               :user="comment.user"
               size="sm"
-              class="w-5 h-5"
             />
             <span class="font-medium text-sm">{{ comment.user.pseudo }}</span>
             <span class="text-xs text-gray-500">
@@ -93,6 +92,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth';
+import UserAvatar from '~/components/ui/UserAvatar.vue';
 
 interface Comment {
   id: number;

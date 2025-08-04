@@ -7,9 +7,9 @@
           <UserAvatar
             v-if="authStore.user"
             :user="authStore.user"
-            size="xl"
+            :size="120"
             border
-            class="w-24 h-24 sm:w-28 sm:h-28 shadow-xl transition-transform group-hover:scale-105"
+            class="shadow-xl transition-transform group-hover:scale-105"
           />
           <UButton 
             icon="i-heroicons-camera" 
@@ -454,9 +454,9 @@
               <UserAvatar
                 v-if="authStore.user"
                 :user="authStore.user"
-                size="xl"
+                :size="128"
                 border
-                class="w-32 h-32 border-primary-200 dark:border-primary-700 shadow-xl transition-transform group-hover:scale-105"
+                class="border-primary-200 dark:border-primary-700 shadow-xl transition-transform group-hover:scale-105"
               />
               <div class="absolute inset-0 rounded-full bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
                 <UIcon name="i-heroicons-camera" class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
@@ -528,6 +528,7 @@ import { z } from 'zod';
 import { useAuthStore } from '~/stores/auth';
 import { useEditionStore } from '~/stores/editions';
 import type { HttpError, User } from '~/types';
+import UserAvatar from '~/components/ui/UserAvatar.vue';
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({

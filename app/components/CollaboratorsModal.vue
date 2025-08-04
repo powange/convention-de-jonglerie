@@ -40,16 +40,10 @@
               class="flex items-center justify-between p-2 border border-gray-200 dark:border-gray-700 rounded-lg"
             >
               <div class="flex items-center gap-3">
-                <div v-if="collaborator.user.profilePicture" class="flex-shrink-0">
-                  <img 
-                    :src="normalizeImageUrl(collaborator.user.profilePicture)" 
-                    :alt="collaborator.user.pseudo" 
-                    class="w-8 h-8 object-cover rounded-full" 
-                  >
-                </div>
-                <div v-else class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <UIcon name="i-heroicons-user" class="text-gray-500 dark:text-gray-400" size="16" />
-                </div>
+                <UserAvatar 
+                  :user="collaborator.user" 
+                  size="md"
+                />
                 <div>
                   <p class="text-sm font-medium">{{ collaborator.user.pseudo }}</p>
                 </div>
@@ -91,16 +85,10 @@
               >
                 <template #option="{ option }">
                   <div class="flex items-center gap-3 w-full">
-                    <div v-if="option.avatar" class="flex-shrink-0">
-                      <img 
-                        :src="option.avatar.src" 
-                        :alt="option.avatar.alt" 
-                        class="w-8 h-8 object-cover rounded-full" 
-                      >
-                    </div>
-                    <div v-else class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
-                      <UIcon name="i-heroicons-user" class="text-gray-500 dark:text-gray-400" size="16" />
-                    </div>
+                    <UserAvatar 
+                      :user="option.user" 
+                      size="md"
+                    />
                     <div class="flex-1 text-left">
                       <p class="text-sm font-medium">{{ option.label }}</p>
                     </div>
@@ -136,6 +124,7 @@
 <script setup lang="ts">
 import type { Convention } from '~/types';
 import type { InputMenuItem } from '@nuxt/ui';
+import UserAvatar from '~/components/ui/UserAvatar.vue';
 
 interface Props {
   modelValue: boolean;
@@ -155,6 +144,12 @@ interface UserItem extends InputMenuItem {
   avatar?: {
     src: string;
     alt: string;
+  };
+  user: {
+    id: number;
+    pseudo: string;
+    profilePicture?: string;
+    emailHash?: string;
   };
 }
 
@@ -222,6 +217,7 @@ const searchUsers = async (query: string) => {
       id: number;
       pseudo: string;
       profilePicture?: string;
+      emailHash?: string;
     }>>(`/api/users/search`, {
       query: {
         q: query
@@ -239,7 +235,8 @@ const searchUsers = async (query: string) => {
       avatar: user.profilePicture ? {
         src: normalizeImageUrl(user.profilePicture),
         alt: user.pseudo
-      } : undefined
+      } : undefined,
+      user: user
     }));
     
     console.log('Items formatés:', userItems.value);

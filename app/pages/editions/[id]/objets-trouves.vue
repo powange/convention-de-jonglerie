@@ -228,6 +228,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import EditionHeader from '~/components/edition/EditionHeader.vue'
+import UserAvatar from '~/components/ui/UserAvatar.vue'
 
 // Props et route
 const route = useRoute()

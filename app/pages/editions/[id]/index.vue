@@ -71,9 +71,8 @@
                   :title="getCollaboratorTitle(collaborator)"
                 >
                   <UserAvatar
-                    :user="collaborator"
+                    :user="collaborator.user"
                     size="xs"
-                    class="w-4 h-4"
                   />
                   <span class="text-gray-700 dark:text-gray-300">{{ collaborator.pseudo }}</span>
                   <UBadge
@@ -190,6 +189,7 @@ import { useRoute } from 'vue-router';
 import type { Edition } from '~/types';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
+import UserAvatar from '~/components/ui/UserAvatar.vue';
 
 const { formatDateTimeRange } = useDateFormat();
 import EditionHeader from '~/components/edition/EditionHeader.vue';
@@ -265,10 +265,8 @@ const getAllCollaborators = (edition: Edition) => {
   if (edition.creator) {
     const creator = {
       id: edition.creator.id,
+      user: edition.creator, // Garder la référence complète
       pseudo: edition.creator.pseudo,
-      profilePicture: edition.creator.profilePicture || null,
-      updatedAt: edition.creator.updatedAt || new Date().toISOString(),
-      emailHash: edition.creator.emailHash || '',
       isCreator: true,
       role: null
     };
@@ -282,10 +280,8 @@ const getAllCollaborators = (edition: Edition) => {
       if (!collaborators.some(c => c.id === collab.user.id)) {
         const collaborator = {
           id: collab.user.id,
+          user: collab.user, // Garder la référence complète
           pseudo: collab.user.pseudo,
-          profilePicture: collab.user.profilePicture || null,
-          updatedAt: collab.user.updatedAt || new Date().toISOString(),
-          emailHash: collab.user.emailHash || '',
           isCreator: false,
           role: collab.role
         };

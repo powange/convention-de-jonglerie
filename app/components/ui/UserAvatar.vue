@@ -3,6 +3,7 @@
     :src="avatarUrl" 
     :alt="altText"
     :class="avatarClasses"
+    :style="customSizeStyle"
   >
 </template>
 
@@ -51,7 +52,7 @@ const cssClassMap = {
   'sm': 'w-5 h-5',
   'md': 'w-8 h-8', 
   'lg': 'w-10 h-10',
-  'xl': 'w-30 h-30'
+  'xl': 'w-32 h-32'
 } as const
 
 const avatarUrl = computed(() => {
@@ -72,12 +73,9 @@ const altText = computed(() => {
 const avatarClasses = computed(() => {
   const classes = ['rounded-full']
   
-  // Taille CSS
+  // Taille CSS seulement pour les tailles prédéfinies
   if (typeof props.size === 'string') {
     classes.push(cssClassMap[props.size])
-  } else {
-    // Pour les tailles custom en nombre, utiliser style inline
-    classes.push(`w-[${props.size}px] h-[${props.size}px]`)
   }
   
   // Bordure optionnelle
@@ -96,5 +94,16 @@ const avatarClasses = computed(() => {
   }
   
   return classes.join(' ')
+})
+
+// Style inline pour les tailles custom
+const customSizeStyle = computed(() => {
+  if (typeof props.size === 'number') {
+    return {
+      width: `${props.size}px`,
+      height: `${props.size}px`
+    }
+  }
+  return {}
 })
 </script>

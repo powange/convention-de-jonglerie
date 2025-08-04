@@ -1,4 +1,5 @@
 import { prisma } from '../../utils/prisma';
+import { getEmailHash } from '../../utils/email-hash';
 
 
 export default defineEventHandler(async (event) => {
@@ -40,6 +41,7 @@ export default defineEventHandler(async (event) => {
                 id: true,
                 pseudo: true,
                 profilePicture: true,
+                email: true,
               },
             },
           },
@@ -67,7 +69,25 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    return conventions;
+    // Transformer les emails en emailHash pour les auteurs et collaborateurs
+    const transformedConventions = conventions.map(convention => ({
+      ...convention,
+      author: {
+        ...convention.author,
+        emailHash: getEmailHash(convention.author.email),
+        email: undefined
+      } as any,
+      collaborators: convention.collaborators.map(collab => ({
+        ...collab,
+        user: {
+          ...collab.user,
+          emailHash: getEmailHash(collab.user.email),
+          email: undefined
+        } as any
+      }))
+    }));
+
+    return transformedConventions;
   } catch (error) {
     console.error('Erreur lors de la récupération des conventions:', error);
     throw createError({

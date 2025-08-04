@@ -147,6 +147,7 @@
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue';
 import { useAuthStore } from '~/stores/auth';
+import UserAvatar from '~/components/ui/UserAvatar.vue';
 
 interface User {
   id: number;

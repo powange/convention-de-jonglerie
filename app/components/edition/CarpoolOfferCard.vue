@@ -6,8 +6,7 @@
         <div class="flex items-center gap-3 flex-1">
           <UserAvatar
             :user="offer.user"
-            size="sm"
-            class="w-10 h-10"
+            size="lg"
           />
           <div>
             <p class="font-semibold">{{ offer.user.pseudo }}</p>
@@ -84,7 +83,6 @@
             <UserAvatar
               :user="passenger.user"
               size="xs"
-              class="w-4 h-4"
             />
             <span class="text-green-700 dark:text-green-300">{{ passenger.user.pseudo }}</span>
             <UButton
@@ -121,6 +119,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth';
 import CarpoolCommentsModal from './CarpoolCommentsModal.vue';
+import UserAvatar from '~/components/ui/UserAvatar.vue';
 
 interface CarpoolOffer {
   id: number;

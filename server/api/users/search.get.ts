@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+import { getEmailHash } from '../../utils/email-hash';
 
 const prisma = new PrismaClient();
 
@@ -46,13 +47,21 @@ export default defineEventHandler(async (event) => {
       select: {
         id: true,
         pseudo: true,
-        profilePicture: true
+        profilePicture: true,
+        email: true
       },
       take: 10, // Limiter à 10 résultats
       orderBy: { pseudo: 'asc' }
     });
 
-    return users;
+    // Transformer les emails en emailHash
+    const transformedUsers = users.map(user => ({
+      ...user,
+      emailHash: getEmailHash(user.email),
+      email: undefined
+    } as any));
+
+    return transformedUsers;
 
   } catch (error) {
     console.error('Erreur lors de la recherche d\'utilisateurs:', error);

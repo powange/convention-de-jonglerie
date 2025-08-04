@@ -163,6 +163,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted } from 'vue';
 import { useAuthStore } from './stores/auth';
+import UserAvatar from '~/components/ui/UserAvatar.vue';
 
 const authStore = useAuthStore();
 const toast = useToast();

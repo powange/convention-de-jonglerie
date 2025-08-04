@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { getEmailHash } from '../../../../utils/email-hash'
 
 const prisma = new PrismaClient()
 
@@ -33,7 +34,8 @@ export default defineEventHandler(async (event) => {
           select: {
             id: true,
             pseudo: true,
-            profilePicture: true
+            profilePicture: true,
+            email: true
           }
         },
         comments: {
@@ -42,7 +44,8 @@ export default defineEventHandler(async (event) => {
               select: {
                 id: true,
                 pseudo: true,
-                profilePicture: true
+                profilePicture: true,
+                email: true
               }
             }
           },
@@ -52,7 +55,25 @@ export default defineEventHandler(async (event) => {
       orderBy: { createdAt: 'desc' }
     })
 
-    return posts
+    // Transformer les emails en emailHash
+    const transformedPosts = posts.map(post => ({
+      ...post,
+      user: {
+        ...post.user,
+        emailHash: getEmailHash(post.user.email),
+        email: undefined
+      } as any,
+      comments: post.comments.map(comment => ({
+        ...comment,
+        user: {
+          ...comment.user,
+          emailHash: getEmailHash(comment.user.email),
+          email: undefined
+        } as any
+      }))
+    }))
+
+    return transformedPosts
   } catch (error: any) {
     if (error.statusCode) {
       throw error

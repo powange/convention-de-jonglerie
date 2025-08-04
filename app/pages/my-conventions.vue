@@ -94,16 +94,10 @@
                 class="flex items-center gap-2"
               >
                 <div class="flex items-center gap-1.5">
-                  <div v-if="collaborator.user.profilePicture" class="flex-shrink-0">
-                    <img 
-                      :src="normalizeImageUrl(collaborator.user.profilePicture)" 
-                      :alt="collaborator.user.pseudo" 
-                      class="w-4 h-4 object-cover rounded-full" 
-                    >
-                  </div>
-                  <div v-else class="w-4 h-4 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <UIcon name="i-heroicons-user" class="text-gray-500 dark:text-gray-400" size="10" />
-                  </div>
+                  <UserAvatar 
+                    :user="collaborator.user" 
+                    size="xs"
+                  />
                   <span>{{ collaborator.user.pseudo }}</span>
                   <span class="text-xs opacity-75">
                     ({{ collaborator.role === 'ADMINISTRATOR' ? 'Admin' : 'Modo' }})
@@ -167,6 +161,7 @@ import { ref, onMounted, h } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import type { Convention, HttpError, Edition } from '~/types';
 import { getEditionDisplayNameWithConvention } from '~/utils/editionName';
+import UserAvatar from '~/components/ui/UserAvatar.vue';
 
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')

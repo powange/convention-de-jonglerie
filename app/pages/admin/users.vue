@@ -131,6 +131,7 @@ definePageMeta({
 // Import du store d'authentification
 import { useAuthStore } from '~/stores/auth'
 import { h, resolveComponent } from 'vue'
+import UserAvatar from '~/components/ui/UserAvatar.vue'
 
 
 // Types pour les utilisateurs
@@ -221,8 +222,7 @@ const columns = [
         h(resolveComponent('UserAvatar'), {
           user: user,
           size: 'md',
-          border: true,
-          class: 'w-8 h-8'
+          border: true
         }),
         h('div', [
           h('div', { class: 'font-medium' }, `${user.prenom} ${user.nom}`),

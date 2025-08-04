@@ -6,8 +6,7 @@
         <div class="flex items-center gap-3 flex-1">
           <UserAvatar
             :user="request.user"
-            size="sm"
-            class="w-10 h-10"
+            size="lg"
           />
           <div>
             <p class="font-semibold">{{ request.user.pseudo }}</p>
@@ -96,6 +95,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth';
 import CarpoolCommentsModal from './CarpoolCommentsModal.vue';
+import UserAvatar from '~/components/ui/UserAvatar.vue';
 
 interface CarpoolRequest {
   id: number;
