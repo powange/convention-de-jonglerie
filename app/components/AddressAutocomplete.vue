@@ -1,9 +1,9 @@
 <template>
-  <UFormField label="Adresse Complète" name="fullAddress">
+  <UFormField :label="$t('forms.labels.full_address')" name="fullAddress">
     <UInput
       v-model="searchQuery"
       icon="i-lucide-search"
-      placeholder="Commencez à taper une adresse..."
+      :placeholder="$t('forms.placeholders.start_typing_address')"
       size="lg"
       class="w-full"
       @input="_handleInput"
@@ -24,6 +24,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+
+const { $t } = useI18n();
 
 interface NominatimAddress {
   house_number?: string;

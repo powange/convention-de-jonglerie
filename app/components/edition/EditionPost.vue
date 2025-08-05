@@ -45,7 +45,7 @@
         :icon="showReplyForm ? 'i-heroicons-x-mark' : 'i-heroicons-chat-bubble-left'"
         @click="toggleReplyForm"
       >
-        {{ showReplyForm ? 'Annuler' : 'Répondre' }}
+        {{ showReplyForm ? $t('common.cancel') : $t('components.posts.reply') }}
       </UButton>
       
       <UButton
@@ -56,24 +56,24 @@
         :icon="showComments ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
         @click="showComments = !showComments"
       >
-        {{ post.comments.length }} {{ post.comments.length === 1 ? 'réponse' : 'réponses' }}
+        {{ $t('components.posts.replies_count', { count: post.comments.length }) }}
       </UButton>
     </div>
 
     <!-- Formulaire de réponse -->
     <div v-if="showReplyForm && authStore.isAuthenticated" class="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
       <UForm :state="replyForm" :validate="validateReply" @submit="submitReply">
-        <UFormField label="Votre réponse" name="content" required>
+        <UFormField :label="$t('components.posts.your_reply')" name="content" required>
           <UTextarea
             v-model="replyForm.content"
-            placeholder="Votre réponse..."
+            :placeholder="$t('components.posts.your_reply_placeholder')"
             :rows="3"
             :maxlength="1000"
             class="w-full"
           />
           <template #help>
             <div class="flex justify-between text-xs">
-              <span>Répondez à ce commentaire</span>
+              <span>{{ $t('components.posts.reply_to_comment') }}</span>
               <span :class="replyForm.content.length > 900 ? 'text-warning-500' : 'text-gray-500'">
                 {{ replyForm.content.length }}/1000
               </span>
@@ -89,7 +89,7 @@
             size="sm"
             @click="toggleReplyForm"
           >
-            Annuler
+            {{ $t('common.cancel') }}
           </UButton>
           <UButton 
             type="submit" 
@@ -97,7 +97,7 @@
             :loading="isSubmittingReply"
             :disabled="!replyForm.content.trim()"
           >
-            Publier
+            {{ $t('components.posts.publish') }}
           </UButton>
         </div>
       </UForm>
@@ -148,6 +148,8 @@
 import { ref, computed, reactive } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import UserAvatar from '~/components/ui/UserAvatar.vue';
+
+const { t } = useI18n();
 
 interface User {
   id: number;
@@ -207,10 +209,10 @@ const canDeleteComment = (comment: Comment) => {
 const validateReply = (state: any) => {
   const errors = [];
   if (!state.content || !state.content.trim()) {
-    errors.push({ path: 'content', message: 'Le contenu est requis' });
+    errors.push({ path: 'content', message: t('errors.content_required') });
   }
   if (state.content && state.content.length > 1000) {
-    errors.push({ path: 'content', message: 'Le contenu ne peut pas dépasser 1000 caractères' });
+    errors.push({ path: 'content', message: t('errors.content_too_long', { max: 1000 }) });
   }
   return errors;
 };
@@ -256,13 +258,13 @@ const formatDate = (dateString: string) => {
   const diffInDays = Math.floor(diffInHours / 24);
 
   if (diffInMinutes < 1) {
-    return 'À l\'instant';
+    return t('common.time_just_now');
   } else if (diffInMinutes < 60) {
-    return `il y a ${diffInMinutes} min`;
+    return t('common.time_minutes_ago', { count: diffInMinutes });
   } else if (diffInHours < 24) {
-    return `il y a ${diffInHours}h`;
+    return t('common.time_hours_ago', { count: diffInHours });
   } else if (diffInDays < 7) {
-    return `il y a ${diffInDays}j`;
+    return t('common.time_days_ago', { count: diffInDays });
   } else {
     return date.toLocaleDateString('fr-FR', {
       day: 'numeric',

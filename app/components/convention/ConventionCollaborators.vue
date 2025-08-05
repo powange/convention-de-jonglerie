@@ -64,12 +64,12 @@
         </template>
         
         <UForm :state="addForm" :schema="addSchema" class="space-y-4" @submit="addCollaborator">
-          <UFormField label="Adresse email" name="userEmail">
+          <UFormField :label="t('common.email')" name="userEmail">
             <UInput v-model="addForm.userEmail" type="email" required placeholder="email@example.com" />
           </UFormField>
           
-          <UFormField label="Permissions" name="canEdit">
-            <UCheckbox v-model="addForm.canEdit" label="Autoriser la modification" />
+          <UFormField :label="t('components.collaborators_modal.permissions')" name="canEdit">
+            <UCheckbox v-model="addForm.canEdit" :label="t('components.collaborators_modal.allow_modification')" />
             <p class="text-xs text-gray-500 mt-1">
               Les collaborateurs peuvent modifier la convention mais pas la supprimer
             </p>
@@ -115,6 +115,7 @@ const props = defineProps<Props>();
 const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
+const { t } = useI18n();
 
 const loading = ref(true);
 const adding = ref(false);
@@ -128,7 +129,7 @@ const isCreator = computed(() => {
 
 // Schéma de validation pour l'ajout
 const addSchema = z.object({
-  userEmail: z.string().email('Email invalide'),
+  userEmail: z.string().email(t('errors.invalid_email')),
   canEdit: z.boolean().default(true)
 });
 

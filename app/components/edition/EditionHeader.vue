@@ -45,14 +45,14 @@
           class="hidden sm:flex"
           @click="$emit('toggle-favorite')"
         >
-          {{ isFavorited ? 'Favoris' : 'Ajouter' }}
+          {{ isFavorited ? t('profile.favorites') : t('common.add') }}
         </UButton>
       </div>
     </div>
 
     <!-- Navigation par onglets -->
     <div class="border-b border-gray-200">
-      <nav class="flex justify-center sm:justify-start space-x-2 sm:space-x-8" aria-label="Tabs">
+      <nav class="flex justify-center sm:justify-start space-x-2 sm:space-x-8" :aria-label="$t('navigation.tabs')">
         <NuxtLink 
           :to="`/editions/${edition.id}`"
           :class="[
@@ -61,10 +61,10 @@
               ? 'border-primary-500 text-primary-600' 
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
           ]"
-          :title="'Détails'"
+          :title="t('editions.about_this_edition')"
         >
           <UIcon name="i-heroicons-information-circle" :class="['sm:mr-1']" size="24" class="sm:!w-4 sm:!h-4" />
-          <span class="hidden sm:inline">Détails</span>
+          <span class="hidden sm:inline">{{ t('editions.about_this_edition') }}</span>
         </NuxtLink>
         
         <NuxtLink 
@@ -75,10 +75,10 @@
               ? 'border-primary-500 text-primary-600' 
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
           ]"
-          :title="'Commentaires'"
+          :title="t('editions.posts')"
         >
           <UIcon name="i-heroicons-chat-bubble-left-right" :class="['sm:mr-1']" size="24" class="sm:!w-4 sm:!h-4" />
-          <span class="hidden sm:inline">Commentaires</span>
+          <span class="hidden sm:inline">{{ t('editions.posts') }}</span>
         </NuxtLink>
         
         <NuxtLink 
@@ -89,10 +89,10 @@
               ? 'border-primary-500 text-primary-600' 
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
           ]"
-          :title="'Covoiturage'"
+          :title="t('editions.carpool')"
         >
           <UIcon name="i-heroicons-truck" :class="['sm:mr-1']" size="24" class="sm:!w-4 sm:!h-4" />
-          <span class="hidden sm:inline">Covoiturage</span>
+          <span class="hidden sm:inline">{{ t('editions.carpool') }}</span>
         </NuxtLink>
         
         <NuxtLink 
@@ -104,10 +104,10 @@
               ? 'border-primary-500 text-primary-600' 
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
           ]"
-          :title="'Objets trouvés'"
+          :title="t('editions.lost_found')"
         >
           <UIcon name="i-heroicons-magnifying-glass" :class="['sm:mr-1']" size="24" class="sm:!w-4 sm:!h-4" />
-          <span class="hidden sm:inline">Objets trouvés</span>
+          <span class="hidden sm:inline">{{ t('editions.lost_found') }}</span>
         </NuxtLink>
         
         <NuxtLink 
@@ -119,10 +119,10 @@
               ? 'border-primary-500 text-primary-600' 
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
           ]"
-          :title="'Gestion'"
+          :title="t('editions.management')"
         >
           <UIcon name="i-heroicons-cog" :class="['sm:mr-1']" size="24" class="sm:!w-4 sm:!h-4" />
-          <span class="hidden sm:inline">Gestion</span>
+          <span class="hidden sm:inline">{{ t('editions.management') }}</span>
         </NuxtLink>
       </nav>
       
@@ -140,6 +140,8 @@ import type { Edition } from '~/types';
 import { useAuthStore } from '~/stores/auth';
 import { useEditionStore } from '~/stores/editions';
 import { getEditionDisplayName } from '~/utils/editionName';
+
+const { t } = useI18n();
 
 const { normalizeImageUrl } = useImageUrl();
 
@@ -191,12 +193,12 @@ const formatDateRange = (start: string, end: string) => {
 // Obtenir le titre de la page selon la page courante
 const getPageTitle = (page: string) => {
   const titles = {
-    'details': 'Détails',
-    'commentaires': 'Commentaires',
-    'covoiturage': 'Covoiturage',
-    'objets-trouves': 'Objets trouvés',
-    'gestion': 'Gestion'
+    'details': t('editions.about_this_edition'),
+    'commentaires': t('editions.posts'),
+    'covoiturage': t('editions.carpool'),
+    'objets-trouves': t('editions.lost_found'),
+    'gestion': t('editions.management')
   };
-  return titles[page] || 'Détails';
+  return titles[page] || t('editions.about_this_edition');
 };
 </script>

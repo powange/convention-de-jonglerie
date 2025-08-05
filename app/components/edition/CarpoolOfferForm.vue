@@ -6,10 +6,10 @@
         <UIcon name="i-heroicons-hand-raised" class="text-green-600 dark:text-green-400 mt-0.5" size="20" />
         <div>
           <p class="text-sm font-medium text-green-800 dark:text-green-200 mb-1">
-            Proposez des places dans votre véhicule
+            {{ $t('components.carpool.offer_vehicle_places') }}
           </p>
           <p class="text-xs text-green-700 dark:text-green-300">
-            Partagez votre trajet avec d'autres jongleurs et réduisez vos frais de transport.
+            {{ $t('components.carpool.share_journey') }}
           </p>
         </div>
       </div>
@@ -17,14 +17,14 @@
 
     <!-- Date et heure avec calendrier et select -->
     <div>
-      <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Date et heure de départ</h3>
+      <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{{ $t('components.carpool.departure_date_time') }}</h3>
       <DateTimePicker
         v-model="form.departureDate"
-        date-label="Date"
-        time-label="Heure"
+        :date-label="$t('common.date')"
+        :time-label="$t('common.time')"
         date-field-name="departureDate"
         time-field-name="departureTime"
-        placeholder="Sélectionner une date"
+        :placeholder="$t('forms.placeholders.select_date')"
         time-placeholder="00:00"
         :min-date="new Date()"
         required
@@ -32,10 +32,10 @@
     </div>
 
     <!-- Ville de départ avec icône -->
-    <UFormField label="Ville de départ" name="departureCity" required>
+    <UFormField :label="$t('forms.labels.departure_city')" name="departureCity" required>
       <UInput
         v-model="form.departureCity"
-        placeholder="Ex: Paris, Lyon, Marseille..."
+        :placeholder="$t('forms.placeholders.departure_city')"
         size="lg"
         class="w-full"
         @blur="trimField('departureCity')"
@@ -47,10 +47,10 @@
     </UFormField>
 
     <!-- Adresse précise avec icône -->
-    <UFormField label="Lieu de rendez-vous" name="departureAddress" required>
+    <UFormField :label="$t('components.carpool.meeting_location')" name="departureAddress" required>
       <UInput
         v-model="form.departureAddress"
-        placeholder="Ex: Gare de Lyon, Place de la République, Péage A6..."
+        :placeholder="$t('forms.placeholders.departure_details')"
         size="lg"
         class="w-full"
         @blur="trimField('departureAddress')"
@@ -60,12 +60,12 @@
         </template>
       </UInput>
       <template #help>
-        <p class="text-xs text-gray-500">Précisez le lieu exact pour faciliter le rendez-vous</p>
+        <p class="text-xs text-gray-500">{{ $t('components.carpool.specify_exact_location') }}</p>
       </template>
     </UFormField>
 
     <!-- Nombre de places avec sélecteur visuel -->
-    <UFormField label="Nombre de places disponibles" name="availableSeats" required>
+    <UFormField :label="$t('components.carpool.available_seats')" name="availableSeats" required>
       <div class="space-y-3">
         <div class="flex flex-wrap gap-2">
           <UButton
@@ -82,34 +82,34 @@
         </div>
         <div class="flex items-center gap-2 text-xs text-gray-500">
           <UIcon name="i-heroicons-information-circle" size="16" />
-          <span>Ne comptez pas le conducteur dans les places disponibles</span>
+          <span>{{ $t('components.carpool.driver_not_counted') }}</span>
         </div>
       </div>
     </UFormField>
 
     <!-- Contact avec indication recommandé -->
-    <UFormField label="Votre numéro de téléphone" name="phoneNumber">
+    <UFormField :label="$t('forms.labels.phone_number')" name="phoneNumber">
       <div class="relative">
         <UIcon name="i-heroicons-phone" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size="20" />
         <UInput
           v-model="form.phoneNumber"
           type="tel"
-          placeholder="Ex: 06 12 34 56 78"
+          :placeholder="$t('forms.placeholders.phone_example')"
           class="pl-10"
           @blur="trimField('phoneNumber')"
         />
       </div>
       <p class="text-xs text-gray-500 mt-1">
         <UIcon name="i-heroicons-shield-check" size="16" class="inline mr-1" />
-        Recommandé pour faciliter l'organisation du trajet
+        {{ $t('components.carpool.recommended_for_organization') }}
       </p>
     </UFormField>
 
     <!-- Description avec suggestions -->
-    <UFormField label="Informations sur votre trajet" name="description">
+    <UFormField :label="$t('components.carpool.journey_info')" name="description">
       <UTextarea
         v-model="form.description"
-        placeholder="Ex: Je pars de la porte d'Orléans, possibilité de récupérer sur l'A6. Véhicule non-fumeur. De la place pour du matériel de jonglage."
+        :placeholder="$t('forms.placeholders.carpool_offer_details')"
         :rows="4"
         size="lg"
         class="w-full"
@@ -117,9 +117,9 @@
       />
       <template #help>
         <div class="mt-2 flex flex-wrap gap-2">
-          <span class="text-xs text-gray-500">Suggestions :</span>
+          <span class="text-xs text-gray-500">{{ $t('components.carpool.suggestions') }} :</span>
           <UBadge
-            v-for="suggestion in ['Véhicule non-fumeur', 'Place pour matériel', 'Musique OK', 'Pauses régulières', 'Participation essence']"
+            v-for="suggestion in [$t('components.carpool.non_smoker_vehicle'), $t('components.carpool.space_for_equipment'), $t('components.carpool.music_ok'), $t('components.carpool.regular_breaks'), $t('components.carpool.fuel_contribution')]"
             :key="suggestion"
             color="neutral"
             variant="soft"
@@ -140,7 +140,7 @@
         variant="ghost"
         @click="emit('cancel')"
       >
-        Annuler
+        {{ $t('forms.buttons.cancel') }}
       </UButton>
       <UButton
         type="submit"
@@ -148,7 +148,7 @@
         :loading="isSubmitting"
         icon="i-heroicons-truck"
       >
-        {{ isSubmitting ? (isEditing ? 'Modification...' : 'Publication...') : (isEditing ? 'Modifier l\'offre' : 'Publier l\'offre') }}
+        {{ isSubmitting ? (isEditing ? $t('forms.buttons.updating') : $t('forms.buttons.publishing')) : (isEditing ? $t('components.carpool.modify_offer') : $t('components.carpool.publish_offer')) }}
       </UButton>
     </div>
   </UForm>
@@ -173,6 +173,8 @@ const emit = defineEmits<{
 // Variable pour vérifier le mode d'édition
 const isEditing = computed(() => props.isEditing || false);
 
+const { t } = useI18n();
+
 // Utiliser le composable avec la configuration pour les offres
 const { form, isSubmitting, trimField, validate, onSubmit } = useCarpoolForm({
   type: 'offer',
@@ -181,10 +183,10 @@ const { form, isSubmitting, trimField, validate, onSubmit } = useCarpoolForm({
     ? `/api/carpool-offers/${props.initialData?.id}` 
     : `/api/editions/${props.editionId}/carpool-offers`,
   method: props.isEditing ? 'PUT' : 'POST',
-  submitText: props.isEditing ? 'Modifier l\'offre' : 'Proposer le covoiturage',
-  successTitle: props.isEditing ? 'Offre modifiée' : 'Covoiturage proposé',
-  successDescription: props.isEditing ? 'Votre offre a été modifiée avec succès' : 'Votre offre de covoiturage a été publiée',
-  errorDescription: props.isEditing ? 'Impossible de modifier l\'offre' : 'Impossible de créer l\'offre de covoiturage',
+  submitText: props.isEditing ? t('components.carpool.modify_offer') : t('components.carpool.propose_carpool'),
+  successTitle: props.isEditing ? t('messages.offer_updated') : t('messages.carpool_proposed'),
+  successDescription: props.isEditing ? t('messages.offer_updated_successfully') : t('messages.carpool_offer_published'),
+  errorDescription: props.isEditing ? t('errors.cannot_update_offer') : t('errors.cannot_create_carpool_offer'),
   initialData: props.initialData,
 });
 

@@ -7,7 +7,7 @@
         size="md" 
         color="primary" 
         variant="outline" 
-        label="Découvrir des éditions" 
+        :label="t('navigation.discover_editions')" 
         to="/"
       />
     </div>
@@ -19,19 +19,19 @@
     <div v-else-if="favoriteEditions.length === 0" class="text-center py-12">
       <UIcon name="i-heroicons-star" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
       <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun favori</h3>
-      <p class="text-gray-500 mb-4">Vous n'avez pas encore ajouté d'édition à vos favoris.</p>
+      <p class="text-gray-500 mb-4">{{ $t('pages.favorites.no_favorites_added') }}</p>
       <UButton 
         icon="i-heroicons-magnifying-glass" 
         color="primary" 
         variant="solid" 
-        label="Découvrir des éditions"
+        :label="t('navigation.discover_editions')"
         to="/"
       />
     </div>
 
     <div v-else>
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
-        <p class="text-gray-600 mb-4 lg:mb-0">{{ favoriteEditions.length }} édition{{ favoriteEditions.length > 1 ? 's' : '' }} en favoris</p>
+        <p class="text-gray-600 mb-4 lg:mb-0">{{ favoriteEditions.length }} {{ $t('pages.favorites.editions_in_favorites', { count: favoriteEditions.length }) }}</p>
         
         <!-- Boutons de vue -->
         <div class="flex gap-2">
@@ -98,6 +98,7 @@ definePageMeta({
 const authStore = useAuthStore();
 const editionStore = useEditionStore();
 const toast = useToast();
+const { t } = useI18n();
 
 const loading = ref(true);
 const viewMode = ref<'grid' | 'map'>('grid');
@@ -118,14 +119,14 @@ const removeFavorite = async (id: number) => {
   try {
     await editionStore.toggleFavorite(id);
     toast.add({ 
-      title: 'Retiré des favoris', 
+      title: t('messages.removed_from_favorites'), 
       icon: 'i-heroicons-star', 
       color: 'warning' 
     });
   } catch (_e: unknown) {
     toast.add({ 
-      title: 'Erreur', 
-      description: 'Impossible de retirer des favoris',
+      title: t('common.error'), 
+      description: t('errors.cannot_remove_favorite'),
       icon: 'i-heroicons-x-circle', 
       color: 'error' 
     });

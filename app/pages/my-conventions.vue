@@ -3,25 +3,25 @@
     <!-- Section Conventions -->
     <div class="mb-12">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Mes Conventions</h2>
+        <h2 class="text-2xl font-bold">{{ $t('conventions.my_conventions') }}</h2>
         <UButton 
           icon="i-heroicons-plus" 
           size="sm" 
           color="primary" 
           variant="outline" 
-          label="Créer une Convention" 
+          :label="t('conventions.create')" 
           to="/conventions/add"
         />
       </div>
 
       <div v-if="conventionsLoading" class="text-center py-8">
-        <p>Chargement de vos conventions...</p>
+        <p>{{ $t('common.loading') }}</p>
       </div>
 
       <div v-else-if="myConventions.length === 0" class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <UIcon name="i-heroicons-building-library" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-        <p class="text-gray-500 mb-2">Aucune convention créée</p>
-        <p class="text-sm text-gray-400">Les conventions vous permettront de regrouper plusieurs éditions.</p>
+        <p class="text-gray-500 mb-2">{{ $t('conventions.no_conventions') }}</p>
+        <p class="text-sm text-gray-400">{{ $t('conventions.no_conventions_description') }}</p>
       </div>
 
       <div v-else class="space-y-4 mb-8">
@@ -37,7 +37,7 @@
                 </div>
                 <div class="flex-1">
                   <h3 class="text-lg font-semibold">{{ convention.name }}</h3>
-                  <p class="text-xs text-gray-500">Créée le {{ new Date(convention.createdAt).toLocaleDateString() }}</p>
+                  <p class="text-xs text-gray-500">{{ $t('conventions.created_at') }} {{ new Date(convention.createdAt).toLocaleDateString() }}</p>
                 </div>
               </div>
               <div class="flex gap-2 ml-4">
@@ -47,7 +47,7 @@
                   size="xs"
                   color="warning"
                   variant="ghost"
-                  title="Modifier la convention"
+                  :title="t('conventions.edit')"
                   :to="`/conventions/${convention.id}/edit`"
                 />
                 <UButton
@@ -56,7 +56,7 @@
                   size="xs"
                   color="error"
                   variant="ghost"
-                  title="Supprimer la convention"
+                  :title="t('conventions.delete')"
                   @click="deleteConvention(convention.id)"
                 />
               </div>
@@ -66,13 +66,13 @@
           <p v-if="convention.description" class="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-4">
             {{ convention.description }}
           </p>
-          <p v-else class="text-sm text-gray-400 italic mb-4">Aucune description</p>
+          <p v-else class="text-sm text-gray-400 italic mb-4">{{ $t('conventions.no_description') }}</p>
           
           <!-- Section collaborateurs -->
           <div class="mb-4">
             <div class="flex items-center justify-between mb-2">
               <h4 class="text-sm font-medium text-gray-900 dark:text-white">
-                Collaborateurs ({{ convention.collaborators?.length || 0 }})
+                {{ $t('conventions.collaborators') }} ({{ convention.collaborators?.length || 0 }})
               </h4>
               <UButton 
                 size="xs" 
@@ -80,7 +80,7 @@
                 icon="i-heroicons-user-plus"
                 @click="openCollaboratorsModal(convention)"
               >
-                Gérer
+                {{ $t('conventions.manage') }}
               </UButton>
             </div>
             <div v-if="convention.collaborators && convention.collaborators.length > 0">
@@ -100,7 +100,7 @@
                   />
                   <span>{{ collaborator.user.pseudo }}</span>
                   <span class="text-xs opacity-75">
-                    ({{ collaborator.role === 'ADMINISTRATOR' ? 'Admin' : 'Modo' }})
+                    ({{ collaborator.role === 'ADMINISTRATOR' ? t('conventions.admin') : t('conventions.moderator') }})
                   </span>
                 </div>
               </UBadge>
@@ -112,7 +112,7 @@
           <div class="mt-4">
             <div class="flex items-center justify-between mb-3">
               <h4 class="text-sm font-medium text-gray-900 dark:text-white">
-                Éditions ({{ convention.editions?.length || 0 }})
+                {{ $t('conventions.editions') }} ({{ convention.editions?.length || 0 }})
               </h4>
               <UButton 
                 size="xs" 
@@ -120,7 +120,7 @@
                 icon="i-heroicons-plus"
                 :to="`/conventions/${convention.id}/editions/add`"
               >
-                Ajouter une édition
+                {{ $t('conventions.add_edition') }}
               </UButton>
             </div>
             
@@ -138,7 +138,7 @@
             <!-- Message quand pas d'éditions -->
             <div v-else class="text-center py-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <UIcon name="i-heroicons-calendar-days" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
-              <p class="text-sm text-gray-500">Aucune édition pour cette convention</p>
+              <p class="text-sm text-gray-500">{{ $t('conventions.no_editions') }}</p>
             </div>
           </div>
         </UCard>
@@ -181,6 +181,7 @@ definePageMeta({
 const authStore = useAuthStore();
 const toast = useToast();
 const { normalizeImageUrl } = useImageUrl();
+const { t } = useI18n();
 
 const conventionsLoading = ref(true);
 const myConventions = ref<Convention[]>([]);
@@ -201,7 +202,7 @@ const { getStatusColor, getStatusText } = useEditionStatus();
 const getEditionsColumns = () => [
   {
     accessorKey: 'name',
-    header: 'Nom',
+    header: t('common.name'),
     cell: ({ row }: TableCellParams) => {
       const edition = row.original;
       // Récupérer la convention depuis le contexte parent
@@ -228,7 +229,7 @@ const getEditionsColumns = () => [
   },
   {
     accessorKey: 'dates',
-    header: 'Dates',
+    header: t('common.dates'),
     cell: ({ row }: TableCellParams) => {
       const edition = row.original;
       return h('div', { class: 'text-sm' }, [
@@ -239,7 +240,7 @@ const getEditionsColumns = () => [
   },
   {
     accessorKey: 'location',
-    header: 'Lieu',
+    header: t('common.location'),
     cell: ({ row }: TableCellParams) => {
       const edition = row.original;
       return h('div', { class: 'text-sm' }, [
@@ -250,7 +251,7 @@ const getEditionsColumns = () => [
   },
   {
     accessorKey: 'status',
-    header: 'État',
+    header: t('common.status'),
     cell: ({ row }: TableCellParams) => {
       const edition = row.original;
       return h(UBadge, {
@@ -270,7 +271,7 @@ const getEditionsColumns = () => [
           size: 'xs',
           color: 'info',
           variant: 'ghost',
-          label: 'Voir',
+          label: t('common.view'),
           onClick: () => navigateTo(`/editions/${edition.id}`)
         }),
         h(UButton, {
@@ -278,7 +279,7 @@ const getEditionsColumns = () => [
           size: 'xs',
           color: 'warning',
           variant: 'ghost',
-          label: 'Modifier',
+          label: t('common.edit'),
           onClick: () => navigateTo(`/editions/${edition.id}/edit`)
         }),
         h(UButton, {
@@ -286,7 +287,7 @@ const getEditionsColumns = () => [
           size: 'xs',
           color: 'error',
           variant: 'ghost',
-          label: 'Supprimer',
+          label: t('common.delete'),
           onClick: () => deleteEdition(edition.id)
         })
       ]);
@@ -306,20 +307,20 @@ const openCollaboratorsModal = (convention: Convention) => {
 };
 
 const deleteEdition = async (id: number) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette édition ?')) {
+  if (confirm(t('conventions.confirm_delete_edition'))) {
     try {
       // Recharger les conventions après suppression pour mettre à jour les tableaux
       await fetchMyConventions();
       toast.add({ 
-        title: 'Édition supprimée avec succès !', 
+        title: t('messages.edition_deleted'), 
         icon: 'i-heroicons-check-circle', 
         color: 'success' 
       });
     } catch (e: unknown) {
       const error = e as HttpError;
       toast.add({ 
-        title: 'Erreur lors de la suppression', 
-        description: error.message || error.data?.message || 'Une erreur est survenue',
+        title: t('errors.deletion_error'), 
+        description: error.message || error.data?.message || t('errors.server_error'),
         icon: 'i-heroicons-x-circle', 
         color: 'error' 
       });
@@ -334,7 +335,7 @@ const fetchMyConventions = async () => {
     
     // Vérifier que l'utilisateur est connecté et a un token
     if (!authStore.token) {
-      console.warn('Aucun token d\'authentification disponible');
+      console.warn(t('errors.no_auth_token'));
       myConventions.value = [];
       return;
     }
@@ -358,7 +359,7 @@ const fetchMyConventions = async () => {
     console.error('Erreur lors de la récupération des conventions:', error);
     toast.add({ 
       title: 'Erreur', 
-      description: 'Impossible de charger vos conventions',
+      description: t('conventions.cannot_load_conventions'),
       icon: 'i-heroicons-exclamation-triangle', 
       color: 'error' 
     });
@@ -369,7 +370,7 @@ const fetchMyConventions = async () => {
 
 // Fonction pour supprimer une convention
 const deleteConvention = async (id: number) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette convention ?')) {
+  if (confirm(t('conventions.confirm_delete_convention'))) {
     try {
       await $fetch(`/api/conventions/${id}`, {
         method: 'DELETE',
@@ -379,8 +380,8 @@ const deleteConvention = async (id: number) => {
       });
       
       toast.add({ 
-        title: 'Convention supprimée', 
-        description: 'La convention a été supprimée avec succès',
+        title: t('conventions.convention_deleted'), 
+        description: t('conventions.convention_deleted_success'),
         icon: 'i-heroicons-check-circle', 
         color: 'success' 
       });
@@ -391,8 +392,8 @@ const deleteConvention = async (id: number) => {
       const httpError = error as HttpError;
       console.error('Erreur lors de la suppression de la convention:', error);
       toast.add({ 
-        title: 'Erreur lors de la suppression', 
-        description: httpError.data?.message || httpError.message || 'Une erreur est survenue',
+        title: t('errors.deletion_error'), 
+        description: httpError.data?.message || httpError.message || t('errors.server_error'),
         icon: 'i-heroicons-x-circle', 
         color: 'error' 
       });

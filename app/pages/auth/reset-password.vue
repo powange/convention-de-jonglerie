@@ -6,8 +6,8 @@
         <div class="mx-auto w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
           <UIcon name="i-heroicons-lock-closed" class="text-white" size="32" />
         </div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Nouveau mot de passe</h1>
-        <p class="text-gray-600 dark:text-gray-400">Définissez votre nouveau mot de passe</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ $t('auth.reset_password_title') }}</h1>
+        <p class="text-gray-600 dark:text-gray-400">{{ $t('auth.reset_password_subtitle') }}</p>
       </div>
 
       <!-- Card principale -->
@@ -16,7 +16,7 @@
         <UForm v-if="!invalidToken && !passwordReset" :state="state" :schema="schema" class="space-y-6" @submit="handleSubmit">
           <!-- Section Mots de passe -->
           <div class="space-y-4">
-            <UFormField label="Nouveau mot de passe" name="newPassword" help="Minimum 8 caractères">
+            <UFormField :label="t('auth.new_password')" name="newPassword" :help="t('auth.min_characters')">
               <UInput 
                 v-model="state.newPassword" 
                 :type="showNewPassword ? 'text' : 'password'"
@@ -33,7 +33,7 @@
                     variant="link"
                     size="sm"
                     :icon="showNewPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
-                    :aria-label="showNewPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                    :aria-label="showNewPassword ? t('auth.hide_password') : t('auth.show_password')"
                     :aria-pressed="showNewPassword"
                     :disabled="loading"
                     @click="showNewPassword = !showNewPassword"
@@ -42,7 +42,7 @@
               </UInput>
             </UFormField>
             
-            <UFormField label="Confirmer le mot de passe" name="confirmPassword">
+            <UFormField :label="t('auth.confirm_new_password')" name="confirmPassword">
               <UInput 
                 v-model="state.confirmPassword" 
                 :type="showConfirmPassword ? 'text' : 'password'"
@@ -59,7 +59,7 @@
                     variant="link"
                     size="sm"
                     :icon="showConfirmPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
-                    :aria-label="showConfirmPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                    :aria-label="showConfirmPassword ? t('auth.hide_password') : t('auth.show_password')"
                     :aria-pressed="showConfirmPassword"
                     :disabled="loading"
                     @click="showConfirmPassword = !showConfirmPassword"
@@ -71,7 +71,7 @@
 
           <!-- Indicateur de force du mot de passe -->
           <div v-if="state.newPassword" class="space-y-2">
-            <div class="text-sm text-gray-600 dark:text-gray-400">Force du mot de passe :</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">{{ $t('auth.password_strength') }}</div>
             <div class="flex space-x-1">
               <div 
                 v-for="i in 4" 
@@ -94,7 +94,7 @@
             class="mt-8"
             icon="i-heroicons-check"
           >
-            {{ loading ? 'Réinitialisation...' : 'Confirmer le nouveau mot de passe' }}
+            {{ loading ? t('auth.resetting') : t('auth.confirm_new_password') }}
           </UButton>
         </UForm>
 
@@ -107,8 +107,8 @@
           <UAlert 
             icon="i-heroicons-check-circle"
             color="success"
-            title="Mot de passe réinitialisé"
-            description="Votre mot de passe a été modifié avec succès. Vous pouvez maintenant vous connecter."
+            :title="t('auth.password_reset_success')"
+            :description="t('auth.password_reset_description')"
           />
 
           <UButton 
@@ -117,7 +117,7 @@
             block
             icon="i-heroicons-arrow-right-on-rectangle"
           >
-            Se connecter
+            {{ $t('navigation.login') }}
           </UButton>
         </div>
 
@@ -130,8 +130,8 @@
           <UAlert 
             icon="i-heroicons-exclamation-triangle"
             color="error"
-            title="Lien invalide ou expiré"
-            description="Ce lien de réinitialisation n'est plus valide. Veuillez en demander un nouveau."
+            :title="t('auth.invalid_link')"
+            :description="t('auth.invalid_link_description')"
           />
 
           <div class="space-y-3">
@@ -141,7 +141,7 @@
               block
               icon="i-heroicons-envelope"
             >
-              Demander un nouveau lien
+              {{ $t('auth.request_new_link') }}
             </UButton>
             
             <UButton 
@@ -151,7 +151,7 @@
               block
               icon="i-heroicons-arrow-left"
             >
-              Retour à la connexion
+              {{ $t('auth.back_to_login') }}
             </UButton>
           </div>
         </div>
@@ -160,7 +160,7 @@
       <!-- Footer -->
       <div class="mt-8 text-center">
         <p class="text-xs text-gray-500 dark:text-gray-400">
-          Votre mot de passe doit être sécurisé et unique.
+          {{ $t('auth.password_security_tip') }}
         </p>
       </div>
     </div>
@@ -174,13 +174,14 @@ import { z } from 'zod';
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
+const { t } = useI18n();
 
 const schema = z.object({
   newPassword: z.string()
-    .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
+    .min(8, t('errors.password_too_short'))
     .regex(/(?=.*[A-Z])/, 'Le mot de passe doit contenir au moins une majuscule')
     .regex(/(?=.*\d)/, 'Le mot de passe doit contenir au moins un chiffre'),
-  confirmPassword: z.string().min(1, 'Confirmation requise'),
+  confirmPassword: z.string().min(1, t('errors.required_field')),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: "Les mots de passe ne correspondent pas",
   path: ["confirmPassword"],
@@ -230,11 +231,11 @@ const getPasswordStrengthColor = (index: number, strength: number) => {
 
 const getPasswordStrengthText = (strength: number) => {
   switch (strength) {
-    case 0: return 'Très faible';
-    case 1: return 'Faible';
-    case 2: return 'Moyen';
-    case 3: return 'Bon';
-    case 4: return 'Excellent';
+    case 0: return t('auth.strength_very_weak');
+    case 1: return t('auth.strength_weak');
+    case 2: return t('auth.strength_medium');
+    case 3: return t('auth.strength_good');
+    case 4: return t('auth.strength_excellent');
     default: return '';
   }
 };
@@ -255,7 +256,7 @@ onMounted(async () => {
       invalidToken.value = true;
       
       // Message spécifique selon la raison
-      let message = 'Lien de réinitialisation invalide';
+      let message = t('auth.invalid_link');
       if (response.reason === 'expired') {
         message = 'Ce lien de réinitialisation a expiré';
       } else if (response.reason === 'used') {
@@ -263,7 +264,7 @@ onMounted(async () => {
       }
       
       toast.add({
-        title: 'Lien invalide',
+        title: t('auth.invalid_link'),
         description: message,
         icon: 'i-heroicons-exclamation-triangle',
         color: 'error'
@@ -290,8 +291,8 @@ const handleSubmit = async () => {
     passwordReset.value = true;
     
     toast.add({ 
-      title: 'Succès', 
-      description: 'Votre mot de passe a été réinitialisé avec succès',
+      title: t('common.success'), 
+      description: t('auth.password_reset_description'),
       icon: 'i-heroicons-check-circle', 
       color: 'success' 
     });
@@ -302,8 +303,8 @@ const handleSubmit = async () => {
       invalidToken.value = true;
     } else {
       toast.add({ 
-        title: 'Erreur', 
-        description: error.data?.statusMessage || 'Une erreur est survenue',
+        title: t('common.error'), 
+        description: error.data?.statusMessage || t('errors.server_error'),
         icon: 'i-heroicons-x-circle', 
         color: 'error' 
       });

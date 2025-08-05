@@ -6,8 +6,8 @@
         <div class="mx-auto w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
           <UIcon name="i-heroicons-envelope" class="text-white" size="32" />
         </div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Mot de passe oublié</h1>
-        <p class="text-gray-600 dark:text-gray-400">Recevez un lien de réinitialisation par email</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ $t('auth.forgot_password_title') }}</h1>
+        <p class="text-gray-600 dark:text-gray-400">{{ $t('auth.forgot_password_subtitle') }}</p>
       </div>
 
       <!-- Card principale -->
@@ -15,12 +15,12 @@
         <UForm :state="state" :schema="schema" class="space-y-6" @submit="handleSubmit">
           <!-- Section Email -->
           <div class="space-y-4">
-            <UFormField label="Adresse email" name="email">
+            <UFormField :label="t('common.email')" name="email">
               <UInput 
                 v-model="state.email" 
                 type="email"
                 required 
-                placeholder="votre.email@example.com"
+                :placeholder="t('auth.email_or_username_placeholder')"
                 icon="i-heroicons-envelope"
                 class="w-full"
                 :disabled="loading || emailSent"
@@ -33,8 +33,8 @@
             v-if="emailSent" 
             icon="i-heroicons-check-circle"
             color="success"
-            title="Email envoyé avec succès"
-            description="Si un compte existe avec cet email, vous recevrez un lien de réinitialisation dans quelques minutes."
+            :title="t('auth.email_sent_success')"
+            :description="t('auth.email_sent_description')"
           />
 
           <!-- Bouton d'envoi -->
@@ -47,7 +47,7 @@
             class="mt-8"
             icon="i-heroicons-paper-airplane"
           >
-            {{ loading ? 'Envoi en cours...' : 'Envoyer le lien' }}
+            {{ loading ? t('auth.sending') : t('auth.send_link') }}
           </UButton>
 
           <!-- Bouton de retour après succès -->
@@ -60,19 +60,19 @@
             class="mt-8"
             icon="i-heroicons-arrow-left"
           >
-            Retour à la connexion
+            {{ $t('auth.back_to_login') }}
           </UButton>
         </UForm>
 
         <!-- Lien de retour -->
         <div v-if="!emailSent" class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
           <p class="text-center text-sm text-gray-600 dark:text-gray-400">
-            Vous vous souvenez de votre mot de passe ? 
+            {{ $t('auth.remember_password') }} 
             <NuxtLink 
               to="/login" 
               class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
             >
-              Se connecter
+              {{ $t('navigation.login') }}
             </NuxtLink>
           </p>
         </div>
@@ -81,7 +81,7 @@
       <!-- Footer -->
       <div class="mt-8 text-center">
         <p class="text-xs text-gray-500 dark:text-gray-400">
-          Vérifiez votre dossier spam si vous ne recevez pas l'email.
+          {{ $t('auth.check_spam') }}
         </p>
       </div>
     </div>
@@ -93,9 +93,10 @@ import { reactive, ref } from 'vue';
 import { z } from 'zod';
 
 const toast = useToast();
+const { t } = useI18n();
 
 const schema = z.object({
-  email: z.string().email('Email invalide').min(1, 'Email requis'),
+  email: z.string().email(t('errors.invalid_email')).min(1, t('errors.required_field')),
 });
 
 const state = reactive({
@@ -119,7 +120,7 @@ const handleSubmit = async () => {
     emailSent.value = true;
     
     toast.add({ 
-      title: 'Email envoyé', 
+      title: t('auth.email_sent_success'), 
       description: response.message,
       icon: 'i-heroicons-check-circle', 
       color: 'success' 
@@ -127,8 +128,8 @@ const handleSubmit = async () => {
     
   } catch (error: any) {
     toast.add({ 
-      title: 'Erreur', 
-      description: error.data?.statusMessage || 'Une erreur est survenue',
+      title: t('common.error'), 
+      description: error.data?.statusMessage || t('errors.server_error'),
       icon: 'i-heroicons-x-circle', 
       color: 'error' 
     });

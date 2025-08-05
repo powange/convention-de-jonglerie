@@ -6,15 +6,31 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   modules: [
-    '@nuxt/eslint',
-    '@nuxt/image',
-    '@nuxt/scripts',
-    '@nuxt/test-utils/module',
-    '@nuxt/ui',
-    '@pinia/nuxt',
+    '@nuxt/eslint', 
+    '@nuxt/image', 
+    '@nuxt/scripts', 
+    '@nuxt/test-utils/module', 
+    '@nuxt/ui', 
+    '@pinia/nuxt', 
+    '@nuxtjs/i18n'
   ],
   ui: {
     icons: ['heroicons', 'simple-icons']
+  },
+  i18n: {
+    defaultLocale: 'fr',
+    locales: [
+      { code: 'fr', name: 'Français', file: 'fr.json' },
+      { code: 'en', name: 'English', file: 'en.json' }
+    ],
+    langDir: 'locales/',
+    lazyLoading: true,
+    strategy: 'prefix_and_default',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root' // recommended
+    }
   },
   css: [
     '~/assets/css/main.css',
@@ -39,5 +55,8 @@ export default defineNuxtConfig({
     plugins: [
       tsconfigPaths()
     ]
+  },
+  experimental: {
+    appManifest: false,
   }
 })

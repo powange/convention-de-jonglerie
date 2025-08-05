@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p>Déconnexion en cours...</p>
+    <p>{{ $t('auth.logging_out') }}</p>
   </div>
 </template>
 
@@ -10,6 +10,7 @@ import { useAuthStore } from '~/stores/auth';
 const authStore = useAuthStore();
 const toast = useToast();
 const router = useRouter();
+const { t } = useI18n();
 
 onMounted(async () => {
   // Récupérer la route actuelle avant la déconnexion
@@ -40,7 +41,7 @@ onMounted(async () => {
   );
   
   authStore.logout();
-  toast.add({ title: 'Déconnexion réussie !', icon: 'i-heroicons-check-circle', color: 'success' });
+  toast.add({ title: t('auth.logout_success_message'), icon: 'i-heroicons-check-circle', color: 'success' });
   
   // Si on vient d'une page protégée, rediriger vers login avec returnTo
   if (isProtectedRoute) {

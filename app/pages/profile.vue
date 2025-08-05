@@ -22,19 +22,19 @@
         </div>
         <div class="text-center sm:text-left flex-1">
           <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            Bonjour, {{ authStore.user?.prenom || authStore.user?.pseudo }} ! 👋
+            {{ $t('profile.hello', { name: authStore.user?.prenom || authStore.user?.pseudo }) }}
           </h1>
           <div class="space-y-2">
             <div class="flex items-center justify-center sm:justify-start gap-2 text-gray-600 dark:text-gray-300">
               <UIcon name="i-heroicons-calendar-days" class="w-4 h-4" />
               <span class="text-sm">
-                Membre depuis {{ new Date(authStore.user?.createdAt || Date.now()).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' }) }}
+                {{ $t('profile.member_since', { date: formatMemberSince }) }}
               </span>
             </div>
             <div class="flex items-center justify-center sm:justify-start gap-2 text-gray-500 dark:text-gray-400">
               <UIcon name="i-heroicons-photo" class="w-4 h-4" />
               <span class="text-xs">
-                {{ authStore.user?.profilePicture ? 'Photo de profil personnalisée' : 'Avatar fourni par Gravatar' }}
+                {{ authStore.user?.profilePicture ? t('profile.custom_profile_picture') : t('profile.gravatar_avatar') }}
               </span>
             </div>
           </div>
@@ -51,49 +51,49 @@
               <UIcon name="i-heroicons-user" class="w-5 h-5 text-primary-600 dark:text-primary-400" />
             </div>
             <div>
-              <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Informations personnelles</h2>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Gérez vos informations de profil</p>
+              <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $t('profile.personal_info') }}</h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ $t('profile.manage_profile_info') }}</p>
             </div>
           </div>
         </template>
         
         <UForm :state="state" :schema="schema" class="space-y-6" @submit="updateProfile">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <UFormField label="Prénom" name="prenom" class="md:col-span-1">
+            <UFormField :label="t('auth.first_name')" name="prenom" class="md:col-span-1">
               <UInput 
                 v-model="state.prenom" 
                 icon="i-heroicons-user"
                 required 
-                placeholder="Votre prénom" 
+                :placeholder="t('profile.first_name_placeholder')" 
                 size="lg"
                 class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]" 
               />
             </UFormField>
             
-            <UFormField label="Nom" name="nom" class="md:col-span-1">
+            <UFormField :label="t('auth.last_name')" name="nom" class="md:col-span-1">
               <UInput 
                 v-model="state.nom" 
                 icon="i-heroicons-user"
                 required 
-                placeholder="Votre nom de famille" 
+                :placeholder="t('profile.last_name_placeholder')" 
                 size="lg"
                 class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]" 
               />
             </UFormField>
           </div>
           
-          <UFormField label="Pseudo" name="pseudo" hint="Visible publiquement par les autres utilisateurs">
+          <UFormField :label="t('auth.username')" name="pseudo" :hint="t('profile.username_hint')">
             <UInput 
               v-model="state.pseudo" 
               icon="i-heroicons-at-symbol"
               required 
-              placeholder="Votre pseudo unique" 
+              :placeholder="t('profile.username_placeholder')" 
               size="lg"
               class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]" 
             />
           </UFormField>
           
-          <UFormField label="Adresse e-mail" name="email">
+          <UFormField :label="t('common.email')" name="email">
             <UInput 
               v-model="state.email" 
               type="email" 
@@ -110,7 +110,7 @@
             <div v-if="hasChanges" class="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
               <div class="flex items-center gap-2 text-amber-800 dark:text-amber-200">
                 <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
-                <span class="text-sm font-medium">Vous avez des modifications non sauvegardées</span>
+                <span class="text-sm font-medium">{{ $t('profile.unsaved_changes') }}</span>
               </div>
             </div>
             
@@ -124,7 +124,7 @@
                 size="lg"
                 class="transition-all duration-200 hover:transform hover:scale-105"
               >
-                {{ loading ? 'Sauvegarde...' : 'Sauvegarder les modifications' }}
+                {{ loading ? t('profile.saving') : t('profile.save_changes') }}
               </UButton>
               
               <UButton 
@@ -137,7 +137,7 @@
                 @click="resetForm"
                 class="transition-all duration-200 hover:transform hover:scale-105"
               >
-                Annuler
+                {{ $t('common.cancel') }}
               </UButton>
             </div>
           </div>
@@ -153,8 +153,8 @@
                 <UIcon name="i-heroicons-chart-bar" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Mes statistiques</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Votre activité sur la plateforme</p>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('profile.my_statistics') }}</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $t('profile.platform_activity') }}</p>
               </div>
             </div>
           </template>
@@ -166,7 +166,7 @@
                   <div class="w-8 h-8 bg-primary-100 dark:bg-primary-800 rounded-lg flex items-center justify-center">
                     <UIcon name="i-heroicons-calendar-days" class="w-4 h-4 text-primary-600 dark:text-primary-400" />
                   </div>
-                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Conventions créées</span>
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('profile.conventions_created') }}</span>
                 </div>
                 <UBadge color="primary" variant="soft" size="lg">{{ myConventionsCount }}</UBadge>
               </div>
@@ -178,7 +178,7 @@
                   <div class="w-8 h-8 bg-yellow-100 dark:bg-yellow-800 rounded-lg flex items-center justify-center">
                     <UIcon name="i-heroicons-star" class="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
                   </div>
-                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Favoris</span>
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('profile.favorites') }}</span>
                 </div>
                 <UBadge color="warning" variant="soft" size="lg">{{ favoritesCount }}</UBadge>
               </div>
@@ -190,7 +190,7 @@
                   <div class="w-8 h-8 bg-red-100 dark:bg-red-800 rounded-lg flex items-center justify-center">
                     <UIcon name="i-heroicons-heart" class="w-4 h-4 text-red-600 dark:text-red-400" />
                   </div>
-                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Favoris reçus</span>
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('profile.favorites_received') }}</span>
                 </div>
                 <UBadge color="error" variant="soft" size="lg">{{ totalFavoritesReceived }}</UBadge>
               </div>
@@ -205,8 +205,8 @@
                 <UIcon name="i-heroicons-bolt" class="w-5 h-5 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Actions rapides</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Accès direct aux fonctionnalités</p>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('profile.quick_actions') }}</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $t('profile.direct_access') }}</p>
               </div>
             </div>
           </template>
@@ -221,7 +221,7 @@
               to="/conventions/add"
               class="transition-all duration-200 hover:transform hover:scale-105 justify-start"
             >
-              Créer une convention
+              {{ $t('conventions.create') }}
             </UButton>
             
             <UButton 
@@ -233,7 +233,7 @@
               to="/my-conventions"
               class="transition-all duration-200 hover:transform hover:scale-105 justify-start"
             >
-              Mes conventions
+              {{ $t('conventions.my_conventions') }}
             </UButton>
             
             <UButton 
@@ -245,7 +245,7 @@
               to="/favorites"
               class="transition-all duration-200 hover:transform hover:scale-105 justify-start"
             >
-              Mes favoris
+              {{ $t('navigation.my_favorites') }}
             </UButton>
           </div>
         </UCard>
@@ -258,8 +258,8 @@
                 <UIcon name="i-heroicons-shield-check" class="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Sécurité</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Gérez votre mot de passe</p>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('profile.security') }}</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $t('profile.manage_password') }}</p>
               </div>
             </div>
           </template>
@@ -273,7 +273,7 @@
             @click="showPasswordModal = true"
             class="transition-all duration-200 hover:transform hover:scale-105 justify-start"
           >
-            Changer le mot de passe
+            {{ $t('profile.change_password') }}
           </UButton>
         </UCard>
 
@@ -285,8 +285,8 @@
                 <UIcon name="i-heroicons-shield-exclamation" class="w-5 h-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Administration</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Gestion des privilèges d'administrateur</p>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('profile.administration') }}</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $t('profile.admin_privileges') }}</p>
               </div>
             </div>
           </template>
@@ -299,9 +299,9 @@
                   <UIcon name="i-heroicons-crown" class="w-4 h-4 text-orange-600 dark:text-orange-400" />
                 </div>
                 <div>
-                  <p class="font-medium text-gray-900 dark:text-white">Administrateur global</p>
+                  <p class="font-medium text-gray-900 dark:text-white">{{ $t('profile.global_admin') }}</p>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Mode {{ authStore.isAdminModeActive ? 'Administrateur' : 'Utilisateur normal' }}
+                    {{ $t('profile.mode') }} {{ authStore.isAdminModeActive ? t('profile.admin_mode') : t('profile.normal_mode') }}
                   </p>
                 </div>
               </div>
@@ -310,7 +310,7 @@
                 variant="soft" 
                 size="lg"
               >
-                {{ authStore.isAdminModeActive ? '👑 Admin actif' : '👤 Mode normal' }}
+                {{ authStore.isAdminModeActive ? t('profile.admin_active') : t('profile.normal_active') }}
               </UBadge>
             </div>
 
@@ -318,11 +318,11 @@
             <div class="p-4 bg-white dark:bg-gray-800 rounded-lg border border-orange-200 dark:border-orange-800">
               <div class="flex items-center justify-between">
                 <div>
-                  <h4 class="font-medium text-gray-900 dark:text-white">Mode administrateur</h4>
+                  <h4 class="font-medium text-gray-900 dark:text-white">{{ $t('profile.admin_mode') }}</h4>
                   <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     {{ authStore.isAdminModeActive 
-                      ? 'Vous avez accès à toutes les fonctionnalités administrateur' 
-                      : 'Activez pour accéder aux privilèges d\'administrateur' 
+                      ? t('profile.admin_access_all') 
+                      : t('profile.activate_admin_privileges') 
                     }}
                   </p>
                 </div>
@@ -340,11 +340,11 @@
               <div class="flex items-start gap-3">
                 <UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p class="text-sm font-medium text-orange-800 dark:text-orange-200 mb-1">Utilisation responsable</p>
+                  <p class="text-sm font-medium text-orange-800 dark:text-orange-200 mb-1">{{ $t('profile.responsible_use') }}</p>
                   <ul class="text-xs text-orange-700 dark:text-orange-300 space-y-1">
-                    <li>• En mode admin, vous pouvez modifier toutes les conventions</li>
-                    <li>• Utilisez ces privilèges avec précaution</li>
-                    <li>• Basculez en mode normal pour tester l'expérience utilisateur</li>
+                    <li>{{ $t('profile.admin_warning_1') }}</li>
+                    <li>{{ $t('profile.admin_warning_2') }}</li>
+                    <li>{{ $t('profile.admin_warning_3') }}</li>
                   </ul>
                 </div>
               </div>
@@ -362,45 +362,45 @@
             <UIcon name="i-heroicons-key" class="w-5 h-5 text-red-600 dark:text-red-400" />
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Changer le mot de passe</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Saisissez votre mot de passe actuel et le nouveau</p>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('profile.change_password') }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ $t('profile.enter_current_new_password') }}</p>
           </div>
         </div>
       </template>
       
       <template #body>
         <UForm :state="passwordState" :schema="passwordSchema" class="space-y-6" @submit="changePassword">
-          <UFormField label="Mot de passe actuel" name="currentPassword">
+          <UFormField :label="t('profile.current_password')" name="currentPassword">
             <UInput 
               v-model="passwordState.currentPassword" 
               type="password" 
               icon="i-heroicons-lock-closed"
               required 
-              placeholder="Votre mot de passe actuel"
+              :placeholder="t('profile.current_password_placeholder')"
               size="lg"
               class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
             />
           </UFormField>
           
-          <UFormField label="Nouveau mot de passe" name="newPassword">
+          <UFormField :label="t('profile.new_password')" name="newPassword">
             <UInput 
               v-model="passwordState.newPassword" 
               type="password" 
               icon="i-heroicons-key"
               required 
-              placeholder="Votre nouveau mot de passe"
+              :placeholder="t('profile.new_password_placeholder')"
               size="lg"
               class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
             />
           </UFormField>
           
-          <UFormField label="Confirmer le nouveau mot de passe" name="confirmPassword">
+          <UFormField :label="t('auth.confirm_new_password')" name="confirmPassword">
             <UInput 
               v-model="passwordState.confirmPassword" 
               type="password" 
               icon="i-heroicons-shield-check"
               required 
-              placeholder="Confirmez votre nouveau mot de passe"
+              :placeholder="t('profile.confirm_new_password_placeholder')"
               size="lg"
               class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
             />
@@ -415,7 +415,7 @@
               @click="showPasswordModal = false"
               class="transition-all duration-200 hover:transform hover:scale-105"
             >
-              Annuler
+              {{ $t('common.cancel') }}
             </UButton>
             <UButton 
               type="submit" 
@@ -425,7 +425,7 @@
               icon="i-heroicons-key"
               class="transition-all duration-200 hover:transform hover:scale-105"
             >
-              {{ passwordLoading ? 'Modification...' : 'Changer le mot de passe' }}
+              {{ passwordLoading ? t('profile.changing') : t('profile.change_password') }}
             </UButton>
           </div>
         </UForm>
@@ -440,8 +440,8 @@
             <UIcon name="i-heroicons-camera" class="w-5 h-5 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Photo de profil</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Personnalisez votre avatar</p>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('profile.picture') }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ $t('profile.customize_avatar') }}</p>
           </div>
         </div>
       </template>
@@ -476,7 +476,7 @@
               @click="triggerFileInput"
               class="transition-all duration-200 hover:transform hover:scale-105 justify-start"
             >
-              {{ pictureLoading ? 'Téléchargement...' : 'Changer la photo' }}
+              {{ pictureLoading ? t('profile.uploading') : t('profile.change_photo') }}
             </UButton>
             
             <UButton 
@@ -490,7 +490,7 @@
               @click="deleteProfilePicture"
               class="transition-all duration-200 hover:transform hover:scale-105 justify-start"
             >
-              {{ pictureLoading ? 'Suppression...' : 'Supprimer la photo' }}
+              {{ pictureLoading ? t('profile.deleting') : t('profile.remove_picture') }}
             </UButton>
             
             <input 
@@ -507,11 +507,11 @@
             <div class="flex items-start gap-3">
               <UIcon name="i-heroicons-information-circle" class="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
               <div>
-                <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">Informations importantes</p>
+                <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">{{ $t('profile.important_info') }}</p>
                 <ul class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                  <li>• Formats acceptés : JPG, PNG, GIF, WebP</li>
-                  <li>• Taille maximale : 5MB</li>
-                  <li>• Résolution recommandée : 400x400px minimum</li>
+                  <li>{{ $t('profile.formats_accepted') }}</li>
+                  <li>{{ $t('profile.max_size') }}</li>
+                  <li>{{ $t('profile.recommended_resolution') }}</li>
                 </ul>
               </div>
             </div>
@@ -538,6 +538,15 @@ definePageMeta({
 const authStore = useAuthStore();
 const editionStore = useEditionStore();
 const toast = useToast();
+const { locale, t } = useI18n();
+
+// Computed pour formater la date d'inscription
+const formatMemberSince = computed(() => {
+  const createdAt = authStore.user?.createdAt || Date.now();
+  const date = new Date(createdAt);
+  const localeCode = locale.value === 'fr' ? 'fr-FR' : 'en-US';
+  return date.toLocaleDateString(localeCode, { year: 'numeric', month: 'long' });
+});
 
 const loading = ref(false);
 const passwordLoading = ref(false);
@@ -552,22 +561,22 @@ const adminModeToggle = ref(authStore.isAdminModeActive);
 
 // Schéma de validation pour le profil
 const schema = z.object({
-  email: z.string().email('Email invalide'),
-  pseudo: z.string().min(3, 'Le pseudo doit contenir au moins 3 caractères'),
-  nom: z.string().min(1, 'Le nom est requis'),
-  prenom: z.string().min(1, 'Le prénom est requis'),
+  email: z.string().email(t('errors.invalid_email')),
+  pseudo: z.string().min(3, t('profile.username_min_3')),
+  nom: z.string().min(1, t('profile.last_name_required')),
+  prenom: z.string().min(1, t('profile.first_name_required')),
 });
 
 // Schéma pour le changement de mot de passe
 const passwordSchema = z.object({
-  currentPassword: z.string().min(1, 'Mot de passe actuel requis'),
+  currentPassword: z.string().min(1, t('profile.current_password_required')),
   newPassword: z.string()
-    .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
-    .regex(/(?=.*[A-Z])/, 'Le mot de passe doit contenir au moins une majuscule')
-    .regex(/(?=.*\d)/, 'Le mot de passe doit contenir au moins un chiffre'),
+    .min(8, t('errors.password_too_short'))
+    .regex(/(?=.*[A-Z])/, t('profile.password_uppercase_required'))
+    .regex(/(?=.*\d)/, t('profile.password_digit_required')),
   confirmPassword: z.string()
 }).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Les mots de passe ne correspondent pas",
+  message: t('profile.passwords_dont_match'),
   path: ["confirmPassword"],
 });
 
@@ -643,16 +652,16 @@ const updateProfile = async () => {
     authStore.updateUser(updatedUser);
     
     toast.add({ 
-      title: 'Profil mis à jour', 
-      description: 'Vos informations ont été sauvegardées',
+      title: t('profile.profile_updated'), 
+      description: t('profile.info_saved'),
       icon: 'i-heroicons-check-circle', 
       color: 'success' 
     });
   } catch (error: unknown) {
     const httpError = error as HttpError;
     toast.add({ 
-      title: 'Erreur', 
-      description: httpError.data?.message || httpError.message || 'Impossible de sauvegarder le profil',
+      title: t('common.error'), 
+      description: httpError.data?.message || httpError.message || t('profile.cannot_save_profile'),
       icon: 'i-heroicons-x-circle', 
       color: 'error' 
     });
@@ -681,16 +690,16 @@ const changePassword = async () => {
     passwordState.confirmPassword = '';
     
     toast.add({ 
-      title: 'Mot de passe changé', 
-      description: 'Votre mot de passe a été mis à jour',
+      title: t('profile.password_changed'), 
+      description: t('profile.password_updated'),
       icon: 'i-heroicons-check-circle', 
       color: 'success' 
     });
   } catch (error: unknown) {
     const httpError = error as HttpError;
     toast.add({ 
-      title: 'Erreur', 
-      description: httpError.data?.message || httpError.message || 'Impossible de changer le mot de passe',
+      title: t('common.error'), 
+      description: httpError.data?.message || httpError.message || t('profile.cannot_change_password'),
       icon: 'i-heroicons-x-circle', 
       color: 'error' 
     });
@@ -733,16 +742,16 @@ const handleFileUpload = async (event: Event) => {
     showProfilePictureModal.value = false;
     
     toast.add({ 
-      title: 'Photo mise à jour', 
-      description: 'Votre photo de profil a été changée',
+      title: t('profile.photo_updated'), 
+      description: t('profile.profile_picture_changed'),
       icon: 'i-heroicons-check-circle', 
       color: 'success' 
     });
   } catch (error: unknown) {
     const httpError = error as HttpError;
     toast.add({ 
-      title: 'Erreur', 
-      description: httpError.data?.message || httpError.message || 'Impossible de changer la photo',
+      title: t('common.error'), 
+      description: httpError.data?.message || httpError.message || t('profile.cannot_change_photo'),
       icon: 'i-heroicons-x-circle', 
       color: 'error' 
     });
@@ -774,16 +783,16 @@ const deleteProfilePicture = async () => {
     showProfilePictureModal.value = false;
     
     toast.add({ 
-      title: 'Photo supprimée', 
-      description: 'Votre photo de profil a été supprimée',
+      title: t('profile.photo_deleted'), 
+      description: t('profile.profile_picture_deleted'),
       icon: 'i-heroicons-check-circle', 
       color: 'success' 
     });
   } catch (error: unknown) {
     const httpError = error as HttpError;
     toast.add({ 
-      title: 'Erreur', 
-      description: httpError.data?.message || httpError.message || 'Impossible de supprimer la photo',
+      title: t('common.error'), 
+      description: httpError.data?.message || httpError.message || t('profile.cannot_delete_photo'),
       icon: 'i-heroicons-x-circle', 
       color: 'error' 
     });
@@ -797,16 +806,16 @@ const toggleAdminMode = (enabled: boolean) => {
   if (enabled) {
     authStore.enableAdminMode();
     toast.add({
-      title: 'Mode administrateur activé',
-      description: 'Vous avez maintenant accès à tous les privilèges d\'administrateur',
+      title: t('profile.admin_mode_enabled'),
+      description: t('profile.admin_mode_enabled_desc'),
       icon: 'i-heroicons-shield-check',
       color: 'warning'
     });
   } else {
     authStore.disableAdminMode();
     toast.add({
-      title: 'Mode administrateur désactivé',
-      description: 'Vous utilisez maintenant l\'interface utilisateur normale',
+      title: t('profile.admin_mode_disabled'),
+      description: t('profile.admin_mode_disabled_desc'),
       icon: 'i-heroicons-user',
       color: 'info'
     });

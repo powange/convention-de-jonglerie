@@ -13,20 +13,20 @@
       <!-- Actions et message d'information -->
       <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
-          <h1 class="text-3xl font-bold">Objets trouvés</h1>
+          <h1 class="text-3xl font-bold">{{ $t('editions.lost_found') }}</h1>
           <UButton 
             v-if="canAddLostFound"
             icon="i-heroicons-plus" 
             color="primary" 
             @click="showAddModal = true"
           >
-            Ajouter un objet
+            {{ $t('editions.add_lost_item') }}
           </UButton>
         </div>
 
         <!-- Message d'information -->
         <UAlert v-if="!isEditionFinished" icon="i-heroicons-information-circle" color="blue">
-          Les objets trouvés seront disponibles après la fin de l'édition.
+          {{ $t('editions.lost_found_after_edition') }}
         </UAlert>
       </div>
 
@@ -59,7 +59,7 @@
                 :color="item.status === 'RETURNED' ? 'success' : 'warning'" 
                 :variant="item.status === 'RETURNED' ? 'soft' : 'solid'"
               >
-                {{ item.status === 'RETURNED' ? '✅ Restitué' : '🔍 Perdu' }}
+                {{ item.status === 'RETURNED' ? t('editions.returned') : t('editions.lost') }}
               </UBadge>
               <UButton
                 v-if="canEditLostFound"
@@ -67,7 +67,7 @@
                 size="xs"
                 variant="ghost"
                 @click="toggleStatus(item.id)"
-                :title="item.status === 'RETURNED' ? 'Marquer comme perdu' : 'Marquer comme restitué'"
+                :title="item.status === 'RETURNED' ? t('editions.mark_as_lost') : t('editions.mark_as_returned')"
               />
             </div>
           </div>
@@ -115,7 +115,7 @@
             <div v-if="authStore.isAuthenticated" class="flex gap-3">
               <UInput 
                 v-model="commentContents[item.id]"
-                placeholder="Ajouter un commentaire..."
+                :placeholder="t('editions.add_comment_placeholder')"
                 class="flex-1"
                 @keyup.enter="postComment(item.id)"
               />
@@ -135,30 +135,30 @@
     <div v-else class="text-center py-12">
       <UIcon name="i-heroicons-magnifying-glass" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
       <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-        Aucun objet trouvé
+        {{ $t('editions.no_lost_items') }}
       </h3>
       <p class="text-gray-500">
-        {{ isEditionFinished ? 'Aucun objet n\'a été signalé pour cette édition.' : 'Les objets trouvés apparaîtront après la fin de l\'édition.' }}
+        {{ isEditionFinished ? t('editions.no_items_reported') : t('editions.items_appear_after_edition') }}
       </p>
     </div>
 
     <!-- Modal d'ajout d'objet trouvé -->
     <UModal v-model:open="showAddModal">
       <template #header>
-        <h3 class="text-lg font-semibold">Ajouter un objet trouvé</h3>
+        <h3 class="text-lg font-semibold">{{ $t('editions.add_lost_item') }}</h3>
       </template>
       
       <template #body>
         <div class="space-y-4">
-          <UFormField label="Description" required>
+          <UFormField :label="t('common.description')" required>
             <UTextarea 
               v-model="newItem.description"
-              placeholder="Décrivez l'objet trouvé..."
+              :placeholder="t('editions.describe_lost_item')"
               rows="3"
             />
           </UFormField>
 
-          <UFormField label="Photo (optionnel)">
+          <UFormField :label="t('editions.photo_optional')">
             <div class="space-y-3">
               <input
                 ref="fileInput"
@@ -175,7 +175,7 @@
                 @click="$refs.fileInput.click()"
                 :loading="uploadingImage"
               >
-                {{ uploadingImage ? 'Upload en cours...' : 'Choisir une photo' }}
+                {{ uploadingImage ? t('editions.uploading') : t('editions.choose_photo') }}
               </UButton>
 
               <img 
@@ -195,7 +195,7 @@
             variant="ghost"
             @click="showAddModal = false"
           >
-            Annuler
+            {{ $t('common.cancel') }}
           </UButton>
           <UButton 
             color="primary"
@@ -203,7 +203,7 @@
             :loading="submittingItem"
             @click="submitNewItem"
           >
-            Ajouter
+            {{ $t('common.add') }}
           </UButton>
         </div>
       </template>
@@ -236,6 +236,7 @@ const router = useRouter()
 const toast = useToast()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
+const { t } = useI18n()
 
 const editionId = computed(() => parseInt(route.params.id as string))
 
@@ -282,13 +283,13 @@ const toggleFavorite = async (id: number) => {
     await editionStore.toggleFavorite(id)
     await editionStore.fetchEditionById(editionId.value)
     toast.add({ 
-      title: 'Statut de favori mis à jour !', 
+      title: t('messages.favorite_status_updated'), 
       icon: 'i-heroicons-check-circle', 
       color: 'success' 
     })
   } catch (e: any) {
     toast.add({ 
-      title: e.statusMessage || 'Échec de la mise à jour du statut de favori', 
+      title: e.statusMessage || t('errors.favorite_update_failed'), 
       icon: 'i-heroicons-x-circle', 
       color: 'error' 
     })
@@ -315,8 +316,8 @@ const fetchLostFoundItems = async () => {
     console.error('Erreur lors du chargement des objets trouvés:', error)
     toast.add({
       color: 'error',
-      title: 'Erreur',
-      description: 'Impossible de charger les objets trouvés'
+      title: t('common.error'),
+      description: t('editions.cannot_load_lost_items')
     })
   } finally {
     loading.value = false
@@ -347,13 +348,13 @@ const postComment = async (itemId: number) => {
 
     toast.add({
       color: 'success',
-      title: 'Commentaire ajouté'
+      title: t('editions.comment_added')
     })
   } catch (error) {
     toast.add({
       color: 'error',
-      title: 'Erreur',
-      description: 'Impossible d\'ajouter le commentaire'
+      title: t('common.error'),
+      description: t('editions.cannot_add_comment')
     })
   }
 }
@@ -375,13 +376,13 @@ const toggleStatus = async (itemId: number) => {
 
     toast.add({
       color: 'success',
-      title: updatedItem.status === 'RETURNED' ? 'Objet marqué comme restitué' : 'Objet marqué comme perdu'
+      title: updatedItem.status === 'RETURNED' ? t('editions.item_marked_returned') : t('editions.item_marked_lost')
     })
   } catch (error) {
     toast.add({
       color: 'error',
-      title: 'Erreur',
-      description: 'Impossible de modifier le statut'
+      title: t('common.error'),
+      description: t('editions.cannot_change_status')
     })
   }
 }
@@ -408,13 +409,13 @@ const handleFileSelect = async (event: Event) => {
     newItem.value.imageUrl = imageUrl
     toast.add({
       color: 'success',
-      title: 'Photo uploadée'
+      title: t('editions.photo_uploaded')
     })
   } catch (error) {
     toast.add({
       color: 'error',
-      title: 'Erreur',
-      description: 'Impossible d\'uploader la photo'
+      title: t('common.error'),
+      description: t('editions.cannot_upload_photo')
     })
   } finally {
     uploadingImage.value = false
@@ -446,13 +447,13 @@ const submitNewItem = async () => {
 
     toast.add({
       color: 'success',
-      title: 'Objet trouvé ajouté'
+      title: t('editions.lost_item_added')
     })
   } catch (error: any) {
     toast.add({
       color: 'error',
-      title: 'Erreur',
-      description: error.data?.statusMessage || 'Impossible d\'ajouter l\'objet'
+      title: t('common.error'),
+      description: error.data?.statusMessage || t('editions.cannot_add_item')
     })
   } finally {
     submittingItem.value = false

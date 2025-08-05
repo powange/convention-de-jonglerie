@@ -4,10 +4,10 @@
     <div class="mb-8">
       <h1 class="text-3xl font-bold flex items-center gap-3">
         <UIcon name="i-heroicons-shield-check" class="text-blue-600" />
-        Dashboard Administrateur
+        {{ $t('admin.dashboard') }}
       </h1>
       <p class="text-gray-600 dark:text-gray-400 mt-2">
-        Tableau de bord et outils d'administration de la plateforme
+        {{ $t('admin.dashboard_subtitle') }}
       </p>
     </div>
 
@@ -16,9 +16,9 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Utilisateurs</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('admin.total_users') }}</p>
             <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.totalUsers }}</p>
-            <p class="text-xs text-green-600">+{{ stats.newUsersThisMonth }} ce mois</p>
+            <p class="text-xs text-green-600">{{ $t('admin.new_users_this_month', { count: stats.newUsersThisMonth }) }}</p>
           </div>
           <UIcon name="i-heroicons-users" class="h-8 w-8 text-blue-500" />
         </div>

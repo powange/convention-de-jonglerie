@@ -4,35 +4,35 @@
       <template #header>
         <div class="flex items-center gap-3">
           <UIcon name="i-heroicons-calendar-days" class="text-primary-500" size="24" />
-          <h1 class="text-2xl font-bold">Ajouter une nouvelle édition</h1>
+          <h1 class="text-2xl font-bold">{{ $t('pages.add_edition.title') }}</h1>
         </div>
         <p v-if="convention" class="text-gray-600 mt-2">
-          Pour la convention "{{ convention.name }}"
+          {{ $t('pages.add_edition_for_convention.for_convention', { name: convention.name }) }}
         </p>
       </template>
       
       <div v-if="loading" class="text-center py-8">
         <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto mb-4" size="24" />
-        <p>Chargement des données de la convention...</p>
+        <p>{{ $t('pages.add_edition_for_convention.loading_convention') }}</p>
       </div>
       
       <div v-else-if="!convention" class="text-center py-8">
         <UIcon name="i-heroicons-exclamation-triangle" class="mx-auto mb-4 text-error-500" size="24" />
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Convention introuvable</h3>
-        <p class="text-gray-500 mb-4">La convention que vous cherchez n'existe pas ou vous n'avez pas les droits pour y ajouter une édition.</p>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ $t('conventions.convention_not_found') }}</h3>
+        <p class="text-gray-500 mb-4">{{ $t('pages.add_edition_for_convention.convention_not_found_description') }}</p>
         <UButton 
           icon="i-heroicons-arrow-left" 
           variant="outline" 
           @click="router.back()"
         >
-          Retour
+          {{ $t('common.back') }}
         </UButton>
       </div>
       
       <EditionForm 
         v-else
         :initial-data="{ conventionId: convention.id }"
-        submit-button-text="Créer l'édition" 
+        :submit-button-text="$t('pages.add_edition_for_convention.submit_button')" 
         :loading="submitting" 
         @submit="handleAddEdition" 
       />
@@ -58,6 +58,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 const editionStore = useEditionStore();
 const toast = useToast();
+const { t } = useI18n();
 
 const conventionId = parseInt(route.params.id as string);
 const convention = ref<Convention | null>(null);
@@ -67,8 +68,8 @@ const submitting = ref(false);
 onMounted(async () => {
   if (!authStore.token) {
     toast.add({
-      title: 'Erreur d\'authentification',
-      description: 'Vous devez être connecté pour ajouter une édition',
+      title: t('errors.authentication_error'),
+      description: t('errors.login_required_edition'),
       icon: 'i-heroicons-exclamation-triangle',
       color: 'error'
     });
@@ -83,7 +84,7 @@ onMounted(async () => {
     if (convention.value.authorId !== authStore.user?.id) {
       throw {
         status: 403,
-        message: 'Vous n\'avez pas les droits pour ajouter une édition à cette convention'
+        message: t('errors.edition_add_denied')
       };
     }
   } catch (error: unknown) {
@@ -92,22 +93,22 @@ onMounted(async () => {
     const httpError = error as HttpError;
     if (httpError.status === 404) {
       toast.add({
-        title: 'Convention introuvable',
-        description: 'La convention que vous cherchez n\'existe pas',
+        title: t('conventions.convention_not_found'),
+        description: t('conventions.convention_not_found_description'),
         icon: 'i-heroicons-exclamation-triangle',
         color: 'error'
       });
     } else if (httpError.status === 403) {
       toast.add({
-        title: 'Accès refusé',
-        description: 'Vous n\'avez pas les droits pour ajouter une édition à cette convention',
+        title: t('pages.access_denied.title'),
+        description: t('errors.edition_add_denied'),
         icon: 'i-heroicons-exclamation-triangle',
         color: 'error'
       });
     } else {
       toast.add({
-        title: 'Erreur de chargement',
-        description: 'Impossible de charger les données de la convention',
+        title: t('errors.loading_error'),
+        description: t('errors.cannot_load_convention'),
         icon: 'i-heroicons-exclamation-triangle',
         color: 'error'
       });
@@ -124,8 +125,8 @@ const handleAddEdition = async (data: EditionFormData) => {
     await editionStore.addEdition(data);
     
     toast.add({
-      title: 'Édition créée !',
-      description: 'L\'édition a été créée avec succès',
+      title: t('messages.edition_created'),
+      description: t('messages.edition_created_successfully'),
       icon: 'i-heroicons-check-circle',
       color: 'success'
     });
@@ -136,10 +137,10 @@ const handleAddEdition = async (data: EditionFormData) => {
     console.error('Erreur lors de la création de l\'édition:', error);
     
     const httpError = error as HttpError;
-    const errorMessage = httpError.data?.message || httpError.message || 'Une erreur est survenue lors de la création de l\'édition';
+    const errorMessage = httpError.data?.message || httpError.message || t('errors.edition_creation_error');
     
     toast.add({
-      title: 'Erreur lors de la création',
+      title: t('errors.creation_error'),
       description: errorMessage,
       icon: 'i-heroicons-x-circle',
       color: 'error'

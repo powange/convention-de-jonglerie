@@ -3,11 +3,11 @@
     <UStepper v-model="currentStep" :items="steps" class="mb-4">
       <template #general>
         <div class="space-y-6">
-          <UFormField label="Convention" name="conventionId" required :error="touchedFields.conventionId && !state.conventionId ? 'La convention est requise' : undefined">
+          <UFormField :label="$t('common.convention')" name="conventionId" required :error="touchedFields.conventionId && !state.conventionId ? $t('errors.convention_required') : undefined">
             <USelect
               v-model="state.conventionId"
               :items="conventionOptions"
-              placeholder="Sélectionnez une convention"
+              :placeholder="$t('forms.placeholders.select_convention')"
               size="lg"
               class="w-full"
               :loading="loadingConventions"
@@ -28,8 +28,8 @@
             </USelect>
           </UFormField>
           
-          <UFormField label="Nom de l'édition (optionnel)" name="name" :error="getNameError()">
-            <UInput v-model="state.name" placeholder="Nom de l'édition (ex: EJC 2024)" size="lg" class="w-full" @blur="touchedFields.name = true; trimField('name')" maxlength="200"/>
+          <UFormField :label="$t('forms.labels.edition_name_optional')" name="name" :error="getNameError()">
+            <UInput v-model="state.name" :placeholder="$t('forms.placeholders.edition_name_example')" size="lg" class="w-full" @blur="touchedFields.name = true; trimField('name')" maxlength="200"/>
             <template #help>
               <p class="text-xs text-gray-500">Si aucun nom n'est spécifié, le nom de la convention sera utilisé</p>
             </template>
@@ -40,13 +40,13 @@
             <div class="space-y-4">
               <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Date et heure de début</h4>
               <div class="grid grid-cols-2 gap-3">
-                <UFormField label="Date" name="startDate" required :error="getStartDateError()">
+                <UFormField :label="$t('common.date')" name="startDate" required :error="getStartDateError()">
                   <UPopover :popper="{ placement: 'bottom-start' }">
                     <UButton 
                       color="neutral" 
                       variant="outline" 
                       icon="i-heroicons-calendar-days"
-                      :label="displayStartDate || 'Sélectionner'"
+                      :label="displayStartDate || $t('common.select')"
                       block
                       size="lg"
                     />
@@ -59,7 +59,7 @@
                     </template>
                   </UPopover>
                 </UFormField>
-                <UFormField label="Heure" name="startTime" required>
+                <UFormField :label="$t('common.time')" name="startTime" required>
                   <USelect
                     v-model="startTime"
                     :items="timeOptions"
@@ -75,13 +75,13 @@
             <div class="space-y-4">
               <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Date et heure de fin</h4>
               <div class="grid grid-cols-2 gap-3">
-                <UFormField label="Date" name="endDate" required :error="getEndDateError()">
+                <UFormField :label="$t('common.date')" name="endDate" required :error="getEndDateError()">
                   <UPopover :popper="{ placement: 'bottom-start' }">
                     <UButton 
                       color="neutral" 
                       variant="outline" 
                       icon="i-heroicons-calendar-days"
-                      :label="displayEndDate || 'Sélectionner'"
+                      :label="displayEndDate || $t('common.select')"
                       block
                       size="lg"
                     />
@@ -95,7 +95,7 @@
                     </template>
                   </UPopover>
                 </UFormField>
-                <UFormField label="Heure" name="endTime" required>
+                <UFormField :label="$t('common.time')" name="endTime" required>
                   <USelect
                     v-model="endTime"
                     :items="timeOptions"
@@ -108,10 +108,10 @@
             </div>
           </div>
           
-          <UFormField label="Affiche de la convention (Optionnel)" name="image">
+          <UFormField :label="$t('components.edition_form.convention_poster_optional')" name="image">
             <div class="space-y-2">
               <div v-if="state.imageUrl" class="relative">
-                <img :src="normalizeImageUrl(state.imageUrl)" alt="Aperçu" class="w-32 h-32 object-cover rounded-lg" >
+                <img :src="normalizeImageUrl(state.imageUrl)" :alt="$t('common.preview')" class="w-32 h-32 object-cover rounded-lg" >
                 <UButton 
                   icon="i-heroicons-x-mark" 
                   color="error" 
@@ -149,7 +149,7 @@
               icon="i-heroicons-light-bulb"
               color="info"
               variant="soft"
-              title="Conseil"
+              :title="$t('common.tip')"
               description="Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte."
             />
             
@@ -159,7 +159,7 @@
               </template>
 
               <div class="space-y-4">
-                <UFormField label="Adresse" name="addressLine1" required :error="touchedFields.addressStreet && !state.addressLine1 ? 'L\'adresse est requise' : undefined">
+                <UFormField :label="$t('common.address')" name="addressLine1" required :error="touchedFields.addressStreet && !state.addressLine1 ? $t('errors.address_required') : undefined">
                   <UInput 
                     v-model="state.addressLine1" 
                     required 
@@ -174,10 +174,10 @@
                   </UInput>
                 </UFormField>
                 
-                <UFormField label="Complément d'adresse" name="addressLine2">
+                <UFormField :label="$t('forms.labels.address_complement')" name="addressLine2">
                   <UInput 
                     v-model="state.addressLine2" 
-                    placeholder="Bâtiment A, Salle des fêtes..." 
+                    :placeholder="$t('forms.placeholders.address_complement')" 
                     size="lg" 
                     class="w-full" 
                     @blur="trimField('addressLine2')"
@@ -189,7 +189,7 @@
                 </UFormField>
                 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <UFormField label="Code postal" name="postalCode" required :error="touchedFields.addressZipCode && !state.postalCode ? 'Requis' : undefined" class="col-span-1">
+                  <UFormField :label="$t('common.postal_code')" name="postalCode" required :error="touchedFields.addressZipCode && !state.postalCode ? $t('errors.required_field') : undefined" class="col-span-1">
                     <UInput 
                       v-model="state.postalCode" 
                       required 
@@ -201,17 +201,17 @@
                     />
                   </UFormField>
                   
-                  <UFormField label="Ville" name="city" required :error="touchedFields.addressCity && !state.city ? 'Requise' : undefined" class="col-span-1 md:col-span-2">
+                  <UFormField :label="$t('common.city')" name="city" required :error="touchedFields.addressCity && !state.city ? $t('errors.required_field') : undefined" class="col-span-1 md:col-span-2">
                     <UInput 
                       v-model="state.city" 
                       required 
-                      placeholder="Paris" 
+                      :placeholder="$t('forms.placeholders.city_example')" 
                       size="lg" 
                       @blur="touchedFields.addressCity = true; trimField('city')" 
                     />
                   </UFormField>
                   
-                  <UFormField label="Pays" name="country" required :error="touchedFields.addressCountry && !state.country ? 'Requis' : undefined" class="col-span-2 md:col-span-1">
+                  <UFormField :label="$t('common.country')" name="country" required :error="touchedFields.addressCountry && !state.country ? $t('errors.required_field') : undefined" class="col-span-2 md:col-span-1">
                     <UInput
                       v-if="showCustomCountry"
                       v-model="state.country"
@@ -237,7 +237,7 @@
                       v-else
                       v-model="state.country"
                       :items="countryOptions"
-                      placeholder="Sélectionner"
+                      :placeholder="$t('common.select')"
                       size="lg"
                       @change="handleCountryChange"
                     >
@@ -251,7 +251,7 @@
             </UCard>
           </div>
           
-          <UFormField label="Description" name="description" :error="getDescriptionError()">
+          <UFormField :label="$t('common.description')" name="description" :error="getDescriptionError()">
             <UTextarea v-model="state.description" placeholder="Description de la convention" :rows="5" class="w-full" @blur="touchedFields.description = true; trimField('description')" maxlength="1000" />
           </UFormField>
         </div>
@@ -290,7 +290,7 @@
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Billetterie</h3>
               <p class="text-sm text-gray-600 dark:text-gray-400">Informations pour l'achat de billets</p>
             </div>
-            <UFormField label="Lien de la billetterie" name="ticketingUrl">
+            <UFormField :label="$t('components.edition_form.ticketing_link')" name="ticketingUrl">
               <UInput v-model="state.ticketingUrl" type="url" placeholder="https://billetterie.com/ma-convention" class="w-full" @blur="trimField('ticketingUrl')">
                 <template #leading>
                   <UIcon name="i-heroicons-ticket" />
@@ -309,14 +309,14 @@
               <p class="text-sm text-gray-600 dark:text-gray-400">Partagez vos pages pour augmenter la visibilité</p>
             </div>
             <div class="space-y-4">
-              <UFormField label="Page Facebook" name="facebookUrl">
+              <UFormField :label="$t('components.edition_form.facebook_page')" name="facebookUrl">
                 <UInput v-model="state.facebookUrl" type="url" placeholder="https://facebook.com/ma-convention" class="w-full" @blur="trimField('facebookUrl')">
                   <template #leading>
                     <UIcon name="i-simple-icons-facebook" class="text-blue-600" />
                   </template>
                 </UInput>
               </UFormField>
-              <UFormField label="Compte Instagram" name="instagramUrl">
+              <UFormField :label="$t('components.edition_form.instagram_account')" name="instagramUrl">
                 <UInput v-model="state.instagramUrl" type="url" placeholder="https://instagram.com/ma-convention" class="w-full" @blur="trimField('instagramUrl')">
                   <template #leading>
                     <UIcon name="i-simple-icons-instagram" class="text-pink-600" />
@@ -336,7 +336,7 @@
         variant="solid"
         icon="i-heroicons-arrow-left"
         @click="currentStep--"
-      >Précédent</UButton>
+      >{{ $t('components.edition_form.previous') }}</UButton>
       <UButton
         v-if="currentStep < steps.length - 1"
         color="primary"
@@ -344,7 +344,7 @@
         icon="i-heroicons-arrow-right"
         trailing
         @click="handleNextStep"
-      >Suivant</UButton>
+      >{{ $t('components.edition_form.next') }}</UButton>
       <UButton
         v-if="currentStep === steps.length - 1"
         type="submit"
@@ -362,6 +362,7 @@ import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalize
 import type { StepperItem } from '@nuxt/ui';
 import type { Edition, Convention } from '~/types';
 import { useAuthStore } from '~/stores/auth';
+import { useTranslatedConventionServices } from '~/composables/useConventionServices';
 
 const props = defineProps<{
   initialData?: Partial<Edition>;
@@ -433,7 +434,8 @@ const state = reactive({
 const uploading = ref(false);
 const fileInput = ref<HTMLInputElement>();
 const toast = useToast();
-const { servicesByCategory } = useConventionServices();
+const { getTranslatedServicesByCategory } = useTranslatedConventionServices();
+const servicesByCategory = getTranslatedServicesByCategory();
 const authStore = useAuthStore();
 const { normalizeImageUrl } = useImageUrl();
 const showCustomCountry = ref(false);

@@ -26,6 +26,7 @@ export interface CarpoolFormConfig {
 
 export function useCarpoolForm(config: CarpoolFormConfig) {
   const toast = useToast();
+  const { t } = useI18n();
   const isSubmitting = ref(false);
 
   // Date minimum = aujourd'hui
@@ -93,48 +94,48 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
     
     if (!state.departureDate) {
       const message = config.type === 'offer' 
-        ? 'La date de départ est requise' 
-        : 'La date souhaitée est requise';
+        ? t('errors.departure_date_required') 
+        : t('errors.desired_date_required');
       errors.push({ path: 'departureDate', message });
     }
     
     if (!state.departureCity) {
-      errors.push({ path: 'departureCity', message: 'La ville de départ est requise' });
+      errors.push({ path: 'departureCity', message: t('errors.departure_city_required') });
     } else if (state.departureCity.length > 100) {
-      errors.push({ path: 'departureCity', message: 'La ville ne peut pas dépasser 100 caractères' });
+      errors.push({ path: 'departureCity', message: t('errors.city_too_long', { max: 100 }) });
     }
     
     // Validation du numéro de téléphone
     if (state.phoneNumber && !/^[\+]?[0-9\s\-\(\)]+$/.test(state.phoneNumber)) {
-      errors.push({ path: 'phoneNumber', message: 'Numéro de téléphone invalide' });
+      errors.push({ path: 'phoneNumber', message: t('errors.invalid_phone_number') });
     }
     
     // Validation de la description
     if (state.description && state.description.length > 500) {
-      errors.push({ path: 'description', message: 'La description ne peut pas dépasser 500 caractères' });
+      errors.push({ path: 'description', message: t('errors.description_too_long', { max: 500 }) });
     }
     
     // Validation spécifique aux offres
     if (config.type === 'offer') {
       if (!state.departureAddress) {
-        errors.push({ path: 'departureAddress', message: 'L\'adresse de départ est requise' });
+        errors.push({ path: 'departureAddress', message: t('errors.departure_address_required') });
       } else if (state.departureAddress.length > 200) {
-        errors.push({ path: 'departureAddress', message: 'L\'adresse ne peut pas dépasser 200 caractères' });
+        errors.push({ path: 'departureAddress', message: t('errors.address_too_long', { max: 200 }) });
       }
       
       if (!state.availableSeats || state.availableSeats < 1) {
-        errors.push({ path: 'availableSeats', message: 'Le nombre de places doit être au moins 1' });
+        errors.push({ path: 'availableSeats', message: t('errors.seats_minimum_one') });
       } else if (state.availableSeats > 8) {
-        errors.push({ path: 'availableSeats', message: 'Maximum 8 places' });
+        errors.push({ path: 'availableSeats', message: t('errors.seats_maximum', { max: 8 }) });
       }
     }
     
     // Validation spécifique aux demandes
     if (config.type === 'request') {
       if (!state.seatsNeeded || state.seatsNeeded < 1) {
-        errors.push({ path: 'seatsNeeded', message: 'Le nombre de places doit être au moins 1' });
+        errors.push({ path: 'seatsNeeded', message: t('errors.seats_minimum_one') });
       } else if (state.seatsNeeded > 8) {
-        errors.push({ path: 'seatsNeeded', message: 'Maximum 8 personnes' });
+        errors.push({ path: 'seatsNeeded', message: t('errors.people_maximum', { max: 8 }) });
       }
     }
     
@@ -196,8 +197,9 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
       emit('success');
     } catch (error) {
       console.error('Erreur API:', error);
+      const { t } = useI18n();
       toast.add({
-        title: 'Erreur',
+        title: t('common.error'),
         description: config.errorDescription,
         color: 'red',
       });

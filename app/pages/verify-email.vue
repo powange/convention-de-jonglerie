@@ -6,9 +6,9 @@
         <div class="mx-auto w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
           <UIcon name="i-heroicons-envelope-open" class="text-white" size="32" />
         </div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Vérifiez votre email</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ $t('auth.verify_email_title') }}</h1>
         <p class="text-gray-600 dark:text-gray-400">
-          Un code de vérification a été envoyé à <br>
+          {{ $t('auth.verification_sent_to') }} <br>
           <span class="font-medium text-gray-800 dark:text-gray-200">{{ email }}</span>
         </p>
       </div>
@@ -19,7 +19,7 @@
           <!-- Instructions -->
           <div class="text-center">
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Saisissez le code à 6 chiffres que vous avez reçu par email
+              {{ $t('auth.enter_6_digit_code') }}
             </p>
           </div>
 
@@ -51,7 +51,7 @@
             <!-- Expiration timer -->
             <div v-if="timeRemaining > 0" class="text-center">
               <p class="text-xs text-gray-500">
-                Code valide pendant encore {{ Math.floor(timeRemaining / 60) }}:{{ String(timeRemaining % 60).padStart(2, '0') }}
+                {{ $t('auth.code_valid_for') }} {{ Math.floor(timeRemaining / 60) }}:{{ String(timeRemaining % 60).padStart(2, '0') }}
               </p>
             </div>
           </div>
@@ -66,7 +66,7 @@
             icon="i-heroicons-check-circle"
             @click="handleVerification"
           >
-            {{ loading ? 'Vérification...' : 'Vérifier le code' }}
+            {{ loading ? t('auth.verifying') : t('auth.verify_code') }}
           </UButton>
 
           <!-- Actions supplémentaires -->
@@ -80,11 +80,11 @@
                 @click="handleResendCode"
               >
                 <template v-if="resendCooldown > 0">
-                  Renvoyer dans {{ resendCooldown }}s
+                  {{ $t('auth.resend_in') }} {{ resendCooldown }}s
                 </template>
                 <template v-else>
                   <UIcon name="i-heroicons-arrow-path" class="mr-1" />
-                  Renvoyer le code
+                  {{ $t('auth.resend_code') }}
                 </template>
               </UButton>
             </div>
@@ -95,7 +95,7 @@
                 to="/register" 
                 class="text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
               >
-                ← Retour à l'inscription
+                {{ $t('auth.back_to_register') }}
               </NuxtLink>
             </div>
           </div>
@@ -112,6 +112,7 @@ import type { HttpError } from '~/types';
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
+const { t } = useI18n();
 
 // Email depuis la query string
 const email = computed(() => route.query.email as string || '');
@@ -218,8 +219,8 @@ const handleVerification = async () => {
     });
     
     toast.add({
-      title: 'Email vérifié avec succès !',
-      description: 'Votre compte est maintenant actif. Vous pouvez vous connecter.',
+      title: t('auth.email_verified_success'),
+      description: t('auth.account_now_active'),
       icon: 'i-heroicons-check-circle',
       color: 'success'
     });
@@ -231,14 +232,14 @@ const handleVerification = async () => {
     
     if (error.statusCode === 400) {
       if (error.statusMessage?.includes('expiré')) {
-        errorMessage.value = 'Le code a expiré. Demandez un nouveau code.';
+        errorMessage.value = t('auth.code_expired');
       } else if (error.statusMessage?.includes('incorrect')) {
-        errorMessage.value = 'Code incorrect. Vérifiez votre email.';
+        errorMessage.value = t('auth.code_incorrect');
       } else {
         errorMessage.value = error.statusMessage || 'Code invalide';
       }
     } else {
-      errorMessage.value = 'Erreur de vérification. Réessayez.';
+      errorMessage.value = t('errors.server_error');
     }
   } finally {
     loading.value = false;
@@ -256,8 +257,8 @@ const handleResendCode = async () => {
     });
     
     toast.add({
-      title: 'Code renvoyé !',
-      description: 'Un nouveau code a été envoyé à votre email.',
+      title: t('auth.code_resent'),
+      description: t('auth.new_code_sent'),
       icon: 'i-heroicons-envelope',
       color: 'success'
     });
@@ -268,8 +269,8 @@ const handleResendCode = async () => {
     startResendCooldown();
   } catch (e: unknown) {
     toast.add({
-      title: 'Erreur',
-      description: 'Impossible de renvoyer le code. Réessayez plus tard.',
+      title: t('common.error'),
+      description: t('errors.server_error'),
       icon: 'i-heroicons-x-circle',
       color: 'error'
     });

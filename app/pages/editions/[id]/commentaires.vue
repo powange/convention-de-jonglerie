@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>Chargement des détails de l'édition...</p>
+      <p>{{ $t('editions.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>Édition introuvable.</p>
+      <p>{{ $t('editions.not_found') }}</p>
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
@@ -20,21 +20,21 @@
         <!-- Formulaire pour ajouter un nouveau post -->
         <UCard v-if="authStore.isAuthenticated" variant="subtle">
           <template #header>
-            <h3 class="text-lg font-semibold">Écrire un commentaire</h3>
+            <h3 class="text-lg font-semibold">{{ $t('pages.comments.write_comment') }}</h3>
           </template>
           
           <UForm :state="newPostForm" :validate="validateNewPost" @submit="submitNewPost">
-            <UFormField label="Votre commentaire" name="content" required>
+            <UFormField :label="$t('pages.comments.your_comment')" name="content" required>
               <UTextarea
                 v-model="newPostForm.content"
-                placeholder="Partagez votre expérience, posez vos questions..."
+                :placeholder="$t('pages.comments.comment_placeholder')"
                 :rows="4"
                 :maxlength="2000"
                 class="w-full"
               />
               <template #help>
                 <div class="flex justify-between text-xs">
-                  <span>Partagez votre expérience ou posez vos questions</span>
+                  <span>{{ $t('pages.comments.share_experience') }}</span>
                   <span :class="newPostForm.content.length > 1800 ? 'text-warning-500' : 'text-gray-500'">
                     {{ newPostForm.content.length }}/2000
                   </span>
@@ -49,14 +49,14 @@
                 variant="ghost"
                 @click="newPostForm.content = ''"
               >
-                Annuler
+                {{ $t('common.cancel') }}
               </UButton>
               <UButton 
                 type="submit" 
                 :loading="isSubmittingPost"
                 :disabled="!newPostForm.content.trim()"
               >
-                Publier
+                {{ $t('components.posts.publish') }}
               </UButton>
             </div>
           </UForm>
@@ -66,9 +66,9 @@
         <UCard v-else variant="subtle">
           <div class="text-center py-4">
             <UIcon name="i-heroicons-chat-bubble-left-right" class="text-gray-400 text-4xl mb-2" />
-            <p class="text-gray-600 mb-4">Connectez-vous pour participer à la discussion</p>
+            <p class="text-gray-600 mb-4">{{ $t('pages.comments.login_to_participate') }}</p>
             <UButton to="/login" color="primary">
-              Se connecter
+              {{ $t('navigation.login') }}
             </UButton>
           </div>
         </UCard>
@@ -80,8 +80,8 @@
         
         <div v-else-if="posts.length === 0" class="text-center py-8">
           <UIcon name="i-heroicons-chat-bubble-left-ellipsis" class="text-gray-400 text-4xl mb-4" />
-          <p class="text-gray-600">Aucun commentaire pour le moment.</p>
-          <p class="text-gray-500 text-sm">Soyez le premier à partager votre expérience !</p>
+          <p class="text-gray-600">{{ $t('pages.comments.no_comments') }}</p>
+          <p class="text-gray-500 text-sm">{{ $t('pages.comments.be_first_to_comment') }}</p>
         </div>
         
         <div v-else class="space-y-6">
@@ -111,6 +111,7 @@ const route = useRoute();
 const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
+const { t } = useI18n();
 
 const editionId = parseInt(route.params.id as string);
 const loading = ref(false);
@@ -131,10 +132,10 @@ const isFavorited = computed(() => (editionId: number) => {
 const validateNewPost = (state: any) => {
   const errors = [];
   if (!state.content || !state.content.trim()) {
-    errors.push({ path: 'content', message: 'Le contenu est requis' });
+    errors.push({ path: 'content', message: t('errors.content_required') });
   }
   if (state.content && state.content.length > 2000) {
-    errors.push({ path: 'content', message: 'Le contenu ne peut pas dépasser 2000 caractères' });
+    errors.push({ path: 'content', message: t('errors.content_too_long', { max: 2000 }) });
   }
   return errors;
 };
@@ -148,8 +149,8 @@ const loadPosts = async () => {
   } catch (error: any) {
     console.error('Erreur lors du chargement des posts:', error);
     toast.add({
-      title: 'Erreur de chargement',
-      description: 'Impossible de charger les commentaires',
+      title: t('errors.loading_error'),
+      description: t('errors.cannot_load_comments'),
       color: 'error'
     });
   } finally {
@@ -177,15 +178,15 @@ const submitNewPost = async () => {
     newPostForm.content = '';
     
     toast.add({
-      title: 'Commentaire publié',
-      description: 'Votre commentaire a été publié avec succès',
+      title: t('messages.comment_published'),
+      description: t('messages.comment_published_successfully'),
       color: 'success'
     });
   } catch (error: any) {
     console.error('Erreur lors de la création du post:', error);
     toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible de publier le commentaire',
+      title: t('common.error'),
+      description: error.data?.message || t('errors.cannot_publish_comment'),
       color: 'error'
     });
   } finally {
@@ -206,15 +207,15 @@ const deletePost = async (postId: number) => {
     posts.value = posts.value.filter(p => p.id !== postId);
     
     toast.add({
-      title: 'Commentaire supprimé',
-      description: 'Le commentaire a été supprimé avec succès',
+      title: t('messages.comment_deleted'),
+      description: t('messages.comment_deleted_successfully'),
       color: 'success'
     });
   } catch (error: any) {
     console.error('Erreur lors de la suppression du post:', error);
     toast.add({
-      title: 'Erreur',
-      description: 'Impossible de supprimer le commentaire',
+      title: t('common.error'),
+      description: t('errors.cannot_delete_comment'),
       color: 'error'
     });
   }
@@ -238,15 +239,15 @@ const addComment = async (postId: number, content: string) => {
     }
     
     toast.add({
-      title: 'Réponse publiée',
-      description: 'Votre réponse a été publiée avec succès',
+      title: t('messages.reply_published'),
+      description: t('messages.reply_published_successfully'),
       color: 'success'
     });
   } catch (error: any) {
     console.error('Erreur lors de la création du commentaire:', error);
     toast.add({
-      title: 'Erreur',
-      description: 'Impossible de publier la réponse',
+      title: t('common.error'),
+      description: t('errors.cannot_publish_reply'),
       color: 'error'
     });
   }
@@ -269,15 +270,15 @@ const deleteComment = async (postId: number, commentId: number) => {
     }
     
     toast.add({
-      title: 'Réponse supprimée',
-      description: 'La réponse a été supprimée avec succès',
+      title: t('messages.reply_deleted'),
+      description: t('messages.reply_deleted_successfully'),
       color: 'success'
     });
   } catch (error: any) {
     console.error('Erreur lors de la suppression du commentaire:', error);
     toast.add({
-      title: 'Erreur',
-      description: 'Impossible de supprimer la réponse',
+      title: t('common.error'),
+      description: t('errors.cannot_delete_reply'),
       color: 'error'
     });
   }
@@ -286,9 +287,9 @@ const deleteComment = async (postId: number, commentId: number) => {
 const toggleFavorite = async (id: number) => {
   try {
     await editionStore.toggleFavorite(id);
-    toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'success' });
+    toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'success' });
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'error' });
+    toast.add({ title: e.statusMessage || t('errors.favorite_update_failed'), icon: 'i-heroicons-x-circle', color: 'error' });
   }
 };
 

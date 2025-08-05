@@ -3,14 +3,14 @@
     <!-- Badge des éditions -->
     <div v-if="upcomingFavorites.length > 0" class="flex justify-end mb-4">
       <UBadge :color="'primary'" variant="soft">
-        {{ upcomingFavorites.length }} édition{{ upcomingFavorites.length > 1 ? 's' : '' }} avec localisation
+        {{ $t('components.favorites_map.editions_with_location', { count: upcomingFavorites.length }) }}
       </UBadge>
     </div>
 
     <!-- Message si aucune édition avec coordonnées -->
     <div v-if="upcomingFavorites.length === 0" class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
       <UIcon name="i-heroicons-map-pin" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
-      <p class="text-gray-600 dark:text-gray-400">Aucune édition favorite à venir avec localisation disponible</p>
+      <p class="text-gray-600 dark:text-gray-400">{{ $t('components.favorites_map.no_upcoming_favorites') }}</p>
     </div>
 
     <!-- Conteneur de la carte -->
@@ -20,30 +20,30 @@
         <div v-if="!mapReady" class="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800">
           <div class="text-center">
             <UIcon name="i-heroicons-arrow-path" class="animate-spin text-primary-500 mx-auto mb-2" size="24" />
-            <p class="text-sm text-gray-600 dark:text-gray-400">Chargement de la carte...</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $t('components.map.loading') }}</p>
           </div>
         </div>
       </div>
       
       <!-- Légende -->
       <div class="absolute top-4 right-4 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-[1000] space-y-2">
-        <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Statut temporel :</div>
+        <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">{{ $t('components.map.temporal_status') }} :</div>
         <div class="flex items-center gap-2 text-sm">
           <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-          <span class="text-gray-700 dark:text-gray-300">En cours</span>
+          <span class="text-gray-700 dark:text-gray-300">{{ $t('components.map.ongoing') }}</span>
         </div>
         <div class="flex items-center gap-2 text-sm">
           <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-          <span class="text-gray-700 dark:text-gray-300">À venir</span>
+          <span class="text-gray-700 dark:text-gray-300">{{ $t('components.favorites_map.upcoming') }}</span>
         </div>
         <div class="flex items-center gap-2 text-sm">
           <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
-          <span class="text-gray-700 dark:text-gray-300">Passées</span>
+          <span class="text-gray-700 dark:text-gray-300">{{ $t('components.favorites_map.past') }}</span>
         </div>
         <div class="pt-2 border-t border-gray-200 dark:border-gray-600">
           <div class="flex items-center gap-2 text-sm">
             <div class="w-3 h-3 rounded-full border-2 border-yellow-500 bg-transparent"></div>
-            <span class="text-gray-700 dark:text-gray-300">Toutes sont favorites</span>
+            <span class="text-gray-700 dark:text-gray-300">{{ $t('components.favorites_map.all_favorites') }}</span>
           </div>
         </div>
       </div>
@@ -68,6 +68,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { t } = useI18n();
 
 // Références
 const mapContainer = ref<HTMLElement>();
@@ -119,10 +120,10 @@ const loadLeaflet = async () => {
         if (L) {
           resolve(L);
         } else {
-          reject(new Error('Leaflet non disponible'));
+          reject(new Error(t('errors.leaflet_unavailable')));
         }
       };
-      script.onerror = () => reject(new Error('Erreur de chargement de Leaflet'));
+      script.onerror = () => reject(new Error(t('errors.leaflet_loading_error')));
       document.head.appendChild(script);
     });
     

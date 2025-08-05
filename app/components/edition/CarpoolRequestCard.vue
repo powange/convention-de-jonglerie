@@ -11,7 +11,7 @@
           <div>
             <p class="font-semibold">{{ request.user.pseudo }}</p>
             <p class="text-sm text-gray-500">
-              Demandé le {{ new Date(request.createdAt).toLocaleDateString() }}
+              {{ $t('components.carpool.requested_on', { date: new Date(request.createdAt).toLocaleDateString() }) }}
             </p>
           </div>
         </div>
@@ -23,7 +23,7 @@
             size="xs"
             color="warning"
             variant="ghost"
-            title="Modifier la demande"
+            :title="$t('components.carpool.edit_request')"
             @click="emit('edit')"
           />
           <UButton
@@ -31,13 +31,13 @@
             size="xs"
             color="error"
             variant="ghost"
-            title="Supprimer la demande"
+            :title="$t('components.carpool.delete_request')"
             @click="handleDelete"
           />
         </div>
         <div class="text-right">
           <UBadge color="warning" variant="soft" class="mb-2">
-            {{ request.seatsNeeded }} place{{ request.seatsNeeded > 1 ? 's' : '' }} recherchée{{ request.seatsNeeded > 1 ? 's' : '' }}
+            {{ $t('components.carpool.seats_needed', { count: request.seatsNeeded }) }}
           </UBadge>
           <div class="text-sm">
             <div class="flex items-center gap-1 justify-end mb-1">
@@ -56,7 +56,7 @@
       <div class="space-y-2">
         <div v-if="authStore.isAuthenticated && request.phoneNumber" class="flex items-center gap-2">
           <UIcon name="i-heroicons-phone" class="text-gray-400" />
-          <span class="font-medium">Contact :</span>
+          <span class="font-medium">{{ $t('components.carpool.contact') }} :</span>
           <span>{{ request.phoneNumber }}</span>
         </div>
       </div>
@@ -72,7 +72,7 @@
           icon="i-heroicons-chat-bubble-left-right"
           :href="`tel:${request.phoneNumber}`"
         >
-          Contacter {{ request.user.pseudo }}
+          {{ $t('components.carpool.contact_user', { name: request.user.pseudo }) }}
         </UButton>
       </div>
 
@@ -137,6 +137,7 @@ const emit = defineEmits<{
 
 const authStore = useAuthStore();
 const toast = useToast();
+const { t } = useI18n();
 
 // Vérifier si l'utilisateur peut éditer cette demande
 const canEdit = computed(() => {
@@ -154,7 +155,7 @@ const formatDate = (date: string) => {
 };
 
 const handleDelete = async () => {
-  if (!confirm('Êtes-vous sûr de vouloir supprimer cette demande de covoiturage ?')) {
+  if (!confirm(t('components.carpool.confirm_delete_request'))) {
     return;
   }
 
@@ -167,8 +168,8 @@ const handleDelete = async () => {
     });
 
     toast.add({
-      title: 'Demande supprimée',
-      description: 'Votre demande de covoiturage a été supprimée avec succès',
+      title: t('messages.request_deleted'),
+      description: t('messages.request_deleted_successfully'),
       icon: 'i-heroicons-check-circle',
       color: 'success'
     });
@@ -177,8 +178,8 @@ const handleDelete = async () => {
   } catch (error: unknown) {
     const httpError = error as { data?: { message?: string }; message?: string };
     toast.add({
-      title: 'Erreur lors de la suppression',
-      description: httpError.data?.message || httpError.message || 'Une erreur est survenue',
+      title: t('errors.deletion_error'),
+      description: httpError.data?.message || httpError.message || t('errors.generic_error'),
       icon: 'i-heroicons-x-circle',
       color: 'error'
     });

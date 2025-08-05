@@ -4,7 +4,7 @@
     <div v-if="authStore.isAuthenticated" class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
       <!-- Bouton pour proposer un covoiturage -->
       <UButton
-        label="Proposer un covoiturage"
+        :label="$t('components.carpool.propose_carpool')"
         icon="i-heroicons-plus"
         color="primary"
         size="lg"
@@ -14,7 +14,7 @@
       
       <!-- Bouton pour demander un covoiturage -->
       <UButton
-        label="Demander un covoiturage"
+        :label="$t('components.carpool.request_carpool')"
         icon="i-heroicons-magnifying-glass"
         color="primary"
         variant="soft"
@@ -25,7 +25,7 @@
     </div>
 
     <!-- Modal pour proposer un covoiturage -->
-    <UModal v-model:open="showOfferModal" title="Proposer un covoiturage">
+    <UModal v-model:open="showOfferModal" :title="$t('components.carpool.propose_carpool')">
       <template #body>
         <CarpoolOfferForm
           :edition-id="editionId"
@@ -36,7 +36,7 @@
     </UModal>
       
     <!-- Modal pour demander un covoiturage -->
-    <UModal v-model:open="showRequestModal" title="Demander un covoiturage">
+    <UModal v-model:open="showRequestModal" :title="$t('components.carpool.request_carpool')">
       <template #body>
         <CarpoolRequestForm
           :edition-id="editionId"
@@ -47,7 +47,7 @@
     </UModal>
     
     <!-- Modal pour éditer une offre de covoiturage -->
-    <UModal v-model:open="showEditOfferModal" title="Modifier l'offre de covoiturage">
+    <UModal v-model:open="showEditOfferModal" :title="$t('components.carpool.edit_offer')">
       <template #body>
         <CarpoolOfferForm
           v-if="editingOffer"
@@ -61,7 +61,7 @@
     </UModal>
     
     <!-- Modal pour éditer une demande de covoiturage -->
-    <UModal v-model:open="showEditRequestModal" title="Modifier la demande de covoiturage">
+    <UModal v-model:open="showEditRequestModal" :title="$t('components.carpool.edit_request')">
       <template #body>
         <CarpoolRequestForm
           v-if="editingRequest"
@@ -92,8 +92,8 @@
           </div>
           <div v-else class="text-center py-8 text-gray-500">
             <UIcon name="i-heroicons-truck" class="mx-auto h-12 w-12 text-gray-300 mb-4" />
-            <p class="text-lg font-medium">Aucune offre de covoiturage</p>
-            <p class="text-sm">Soyez le premier à proposer un covoiturage pour cette édition !</p>
+            <p class="text-lg font-medium">{{ $t('components.carpool.no_offers') }}</p>
+            <p class="text-sm">{{ $t('components.carpool.be_first_to_offer') }}</p>
           </div>
         </div>
       </template>
@@ -113,8 +113,8 @@
           </div>
           <div v-else class="text-center py-8 text-gray-500">
             <UIcon name="i-heroicons-magnifying-glass" class="mx-auto h-12 w-12 text-gray-300 mb-4" />
-            <p class="text-lg font-medium">Aucune demande de covoiturage</p>
-            <p class="text-sm">Aucune demande n'a été publiée pour le moment.</p>
+            <p class="text-lg font-medium">{{ $t('components.carpool.no_requests') }}</p>
+            <p class="text-sm">{{ $t('components.carpool.no_requests_published') }}</p>
           </div>
         </div>
       </template>
@@ -150,16 +150,18 @@ const showEditRequestModal = ref(false);
 const editingOffer = ref(null);
 const editingRequest = ref(null);
 
+const { t } = useI18n();
+
 const tabs = computed(() => [
   {
     value: 'offers',
-    label: `Offres${isSmallScreen.value ? '' : ' de covoiturage'} (${offers.value.length})`,
+    label: `${isSmallScreen.value ? t('components.carpool.offers_short') : t('components.carpool.offers_long')} (${offers.value.length})`,
     icon: 'i-heroicons-truck',
     slot: 'offers',
   },
   {
     value: 'requests',
-    label: `Demandes${isSmallScreen.value ? '' : ' de covoiturage'} (${requests.value.length})`,
+    label: `${isSmallScreen.value ? t('components.carpool.requests_short') : t('components.carpool.requests_long')} (${requests.value.length})`,
     icon: 'i-heroicons-magnifying-glass',
     slot: 'requests',
   },

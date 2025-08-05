@@ -5,7 +5,7 @@
       <UCard class="sticky top-4">
         <template #header>
           <div class="flex items-center gap-2">
-            <h2 class="text-xl font-semibold">Filtres</h2>
+            <h2 class="text-xl font-semibold">{{ $t('homepage.filters') }}</h2>
             <UBadge v-if="activeFiltersCount > 0" :color="'primary'" variant="solid" size="xs">
               {{ activeFiltersCount }}
             </UBadge>
@@ -17,7 +17,7 @@
 
             <!-- Bouton réinitialiser les filtres -->
             <UButton icon="i-heroicons-arrow-path" type="button" color="neutral" variant="ghost" block @click="resetFilters">
-              Réinitialiser
+              {{ $t('homepage.reset_filters') }}
             </UButton>
 
             <!-- Filtres de recherche -->
@@ -26,20 +26,20 @@
                 <UInput v-model="filters.name" placeholder="Rechercher par nom" />
               </UFormField>
               <UFormField label="Pays" name="countries">
-                <CountryMultiSelect v-model="filters.countries" placeholder="Sélectionner des pays..." />
+                <CountryMultiSelect v-model="filters.countries" :placeholder="$t('forms.placeholders.select_countries')" />
               </UFormField>
             </div>
             
             <!-- Filtres de dates -->
             <div class="space-y-4">
               <h4 class="font-medium text-gray-700">Dates :</h4>
-              <UFormField label="À partir du" name="startDate">
+              <UFormField :label="$t('forms.labels.from_date')" name="startDate">
                 <UPopover :popper="{ placement: 'bottom-start' }">
                   <UButton 
                     color="neutral" 
                     variant="outline" 
                     icon="i-heroicons-calendar-days"
-                    :label="filters.startDate ? formatDateForDisplay(filters.startDate) : 'Sélectionner une date'"
+                    :label="filters.startDate ? formatDateForDisplay(filters.startDate) : $t('forms.labels.select_date')"
                     block
                   />
                   <template #content>
@@ -57,7 +57,7 @@
                     color="neutral" 
                     variant="outline" 
                     icon="i-heroicons-calendar-days"
-                    :label="filters.endDate ? formatDateForDisplay(filters.endDate) : 'Sélectionner une date'"
+                    :label="filters.endDate ? formatDateForDisplay(filters.endDate) : $t('forms.labels.select_date')"
                     block
                   />
                   <template #content>
@@ -164,7 +164,7 @@
             size="md" 
             color="neutral" 
             variant="outline" 
-            label="Filtres"
+            :label="$t('homepage.filters')"
             class="lg:hidden"
             @click="showMobileFilters = true"
           />
@@ -174,7 +174,7 @@
       <UModal v-model:open="showMobileFilters" variant="subtle" size="lg" @close="closeMobileFilters">
         <template #header>
           <div class="flex items-center gap-2">
-            <h2 class="text-xl font-semibold">Filtres</h2>
+            <h2 class="text-xl font-semibold">{{ $t('homepage.filters') }}</h2>
             <UBadge v-if="activeFiltersCount > 0" :color="'primary'" variant="solid" size="xs">
               {{ activeFiltersCount }}
             </UBadge>
@@ -185,7 +185,7 @@
           <!-- Boutons de réinitialisation et fermeture -->
           <div class="flex items-center gap-2 mb-4">
             <UButton icon="i-heroicons-arrow-path" type="button" color="neutral" variant="ghost" block @click="resetFilters">
-              Réinitialiser
+              {{ $t('homepage.reset_filters') }}
             </UButton>
             <UButton icon="i-heroicons-x-mark" type="button" color="neutral" variant="ghost" block class="ml-auto" @click="closeMobileFilters">
               Fermer
@@ -200,20 +200,20 @@
                   <UInput v-model="filters.name" placeholder="Rechercher par nom" />
                 </UFormField>
                 <UFormField label="Pays" name="countries">
-                  <CountryMultiSelect v-model="filters.countries" placeholder="Sélectionner des pays..." />
+                  <CountryMultiSelect v-model="filters.countries" :placeholder="$t('forms.placeholders.select_countries')" />
                 </UFormField>
               </div>
               
               <!-- Filtres de dates -->
               <div class="space-y-4">
                 <h4 class="font-medium text-gray-700">Dates :</h4>
-                <UFormField label="À partir du" name="startDate">
+                <UFormField :label="$t('forms.labels.from_date')" name="startDate">
                   <UPopover :popper="{ placement: 'bottom-start' }">
                     <UButton 
                       color="neutral" 
                       variant="outline" 
                       icon="i-heroicons-calendar-days"
-                      :label="filters.startDate ? formatDateForDisplay(filters.startDate) : 'Sélectionner une date'"
+                      :label="filters.startDate ? formatDateForDisplay(filters.startDate) : $t('forms.labels.select_date')"
                       block
                     />
                     <template #content>
@@ -231,7 +231,7 @@
                       color="neutral" 
                       variant="outline" 
                       icon="i-heroicons-calendar-days"
-                      :label="filters.endDate ? formatDateForDisplay(filters.endDate) : 'Sélectionner une date'"
+                      :label="filters.endDate ? formatDateForDisplay(filters.endDate) : $t('forms.labels.select_date')"
                       block
                     />
                     <template #content>
@@ -300,7 +300,7 @@
             class="mt-4"
             @click="resetFilters"
           >
-            Réinitialiser les filtres
+            {{ $t('homepage.reset_filters') }} les filtres
           </UButton>
         </div>
       </div>
@@ -342,6 +342,7 @@ import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
 import { useRouter } from 'vue-router';
 import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date';
+import { useTranslatedConventionServices } from '~/composables/useConventionServices';
 import CountryMultiSelect from '~/components/CountryMultiSelect.vue';
 
 const editionStore = useEditionStore();
@@ -350,7 +351,9 @@ const toast = useToast();
 const router = useRouter();
 
 const showMobileFilters = ref(false);
-const { services, servicesByCategory } = useConventionServices();
+const { getTranslatedServices, getTranslatedServicesByCategory } = useTranslatedConventionServices();
+const services = getTranslatedServices();
+const servicesByCategory = getTranslatedServicesByCategory();
 const viewMode = ref<'grid' | 'map'>('grid');
 
 // Date formatter pour l'affichage

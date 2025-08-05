@@ -6,8 +6,8 @@
         <div class="mx-auto w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
           <UIcon name="i-heroicons-user-plus" class="text-white" size="32" />
         </div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Créer un compte</h1>
-        <p class="text-gray-600 dark:text-gray-400">Rejoignez la communauté des jongleurs</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ $t('auth.register_title') }}</h1>
+        <p class="text-gray-600 dark:text-gray-400">{{ $t('auth.register_subtitle') }}</p>
         
         <!-- Messages importants -->
         <div class="mt-4 space-y-3">
@@ -17,10 +17,10 @@
               <UIcon name="i-heroicons-envelope" class="text-blue-600 dark:text-blue-400 mt-0.5" size="20" />
               <div>
                 <p class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
-                  Accès à votre boîte email requis
+                  {{ $t('auth.email_access_required') }}
                 </p>
                 <p class="text-xs text-blue-700 dark:text-blue-300">
-                  Vous recevrez un code de vérification par email pour finaliser votre inscription.
+                  {{ $t('auth.verification_email_notice') }}
                 </p>
               </div>
             </div>
@@ -32,10 +32,10 @@
               <UIcon name="i-heroicons-user-circle" class="text-amber-600 dark:text-amber-400 mt-0.5" size="20" />
               <div>
                 <p class="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">
-                  Compte personnel uniquement
+                  {{ $t('auth.personal_account_only') }}
                 </p>
                 <p class="text-xs text-amber-700 dark:text-amber-300">
-                  Ce compte doit représenter une personne physique, non une structure ou association.
+                  {{ $t('auth.personal_account_description') }}
                 </p>
               </div>
             </div>
@@ -64,11 +64,11 @@
             </div>
             
             <div class="grid grid-cols-2 gap-4">
-              <UFormField label="Prénom" name="prenom">
+              <UFormField :label="$t('auth.first_name')" name="prenom">
                 <UInput 
                   v-model="state.prenom" 
                   required 
-                  placeholder="Votre prénom"
+                  :placeholder="$t('auth.first_name_placeholder')"
                   icon="i-heroicons-user"
                   class="w-full"
                 />
@@ -127,7 +127,7 @@
                 v-model="state.password" 
                 :type="showPassword ? 'text' : 'password'" 
                 required 
-                placeholder="Choisissez un mot de passe sécurisé"
+                :placeholder="$t('auth.password_placeholder_secure')"
                 icon="i-heroicons-lock-closed"
                 class="w-full"
                 :ui="{ trailing: 'pe-1' }"
@@ -224,19 +224,20 @@ import type { HttpError } from '~/types';
 const authStore = useAuthStore();
 const toast = useToast();
 const router = useRouter();
+const { t } = useI18n();
 
 const schema = z.object({
-  email: z.string().email('Email invalide'),
-  pseudo: z.string().min(3, 'Le pseudo doit contenir au moins 3 caractères'),
-  nom: z.string().min(1, 'Le nom est requis'),
-  prenom: z.string().min(1, 'Le prénom est requis'),
+  email: z.string().email(t('errors.invalid_email')),
+  pseudo: z.string().min(3, t('errors.username_min_3_chars')),
+  nom: z.string().min(1, t('errors.last_name_required')),
+  prenom: z.string().min(1, t('errors.first_name_required')),
   password: z.string()
-    .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
-    .regex(/(?=.*[A-Z])/, 'Le mot de passe doit contenir au moins une majuscule')
-    .regex(/(?=.*\d)/, 'Le mot de passe doit contenir au moins un chiffre'),
+    .min(8, t('errors.password_too_short'))
+    .regex(/(?=.*[A-Z])/, t('errors.password_uppercase_required'))
+    .regex(/(?=.*\d)/, t('errors.password_digit_required')),
   confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Les mots de passe ne correspondent pas",
+  message: t('errors.passwords_dont_match'),
   path: ["confirmPassword"],
 });
 
@@ -347,17 +348,17 @@ const handleRegister = async () => {
       // Rediriger vers la page de vérification avec l'email
       router.push(`/verify-email?email=${encodeURIComponent(response.email)}`);
       toast.add({ 
-        title: 'Compte créé ! Vérifiez votre email.', 
-        description: 'Un code de vérification vous a été envoyé.',
+        title: t('messages.account_created'), 
+        description: t('messages.verification_code_sent'),
         icon: 'i-heroicons-envelope', 
         color: 'success' 
       });
     }
   } catch (e: unknown) {
     const error = e as HttpError;
-    let errorMessage = "Échec de l'inscription";
+    let errorMessage = t('errors.registration_failed');
     if (error.statusCode === 409 || error.status === 409) {
-      errorMessage = 'Cet email ou pseudo est déjà utilisé';
+      errorMessage = t('errors.email_or_username_taken');
     } else if (error.message || error.data?.message) {
       errorMessage = error.message || error.data?.message || errorMessage;
     }

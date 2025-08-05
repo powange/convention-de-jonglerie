@@ -4,15 +4,15 @@
       <template #header>
         <div class="flex items-center gap-3">
           <UIcon name="i-heroicons-building-library" class="text-primary-500" size="24" />
-          <h1 class="text-2xl font-bold">Créer une nouvelle convention</h1>
+          <h1 class="text-2xl font-bold">{{ $t('pages.add_convention.title') }}</h1>
         </div>
         <p class="text-gray-600 mt-2">
-          Une convention regroupe plusieurs éditions d'un même événement de jonglerie.
+          {{ $t('pages.add_convention.description') }}
         </p>
       </template>
       
       <ConventionForm 
-        submit-button-text="Créer la convention" 
+        :submit-button-text="$t('pages.add_convention.submit_button')" 
         :loading="loading" 
         @submit="handleAddConvention"
         @cancel="handleCancel"
@@ -36,14 +36,15 @@ definePageMeta({
 const router = useRouter();
 const authStore = useAuthStore();
 const toast = useToast();
+const { t } = useI18n();
 
 const loading = ref(false);
 
 const handleAddConvention = async (formData: ConventionFormData, file?: File | null) => {
   if (!authStore.token) {
     toast.add({
-      title: 'Erreur d\'authentification',
-      description: 'Vous devez être connecté pour créer une convention',
+      title: t('errors.authentication_error'),
+      description: t('errors.login_required_convention'),
       icon: 'i-heroicons-exclamation-triangle',
       color: 'error'
     });
@@ -81,8 +82,8 @@ const handleAddConvention = async (formData: ConventionFormData, file?: File | n
       } catch (uploadError: unknown) {
         console.error('Erreur lors de l\'upload de l\'image:', uploadError);
         toast.add({
-          title: 'Avertissement',
-          description: 'La convention a été créée mais l\'image n\'a pas pu être uploadée',
+          title: t('common.warning'),
+          description: t('errors.convention_created_image_failed'),
           icon: 'i-heroicons-exclamation-triangle',
           color: 'warning'
         });
@@ -90,8 +91,8 @@ const handleAddConvention = async (formData: ConventionFormData, file?: File | n
     }
 
     toast.add({
-      title: 'Convention créée !',
-      description: `La convention "${finalConvention.name}" a été créée avec succès`,
+      title: t('messages.convention_created'),
+      description: t('messages.convention_created_desc', { name: finalConvention.name }),
       icon: 'i-heroicons-check-circle',
       color: 'success'
     });
@@ -105,7 +106,7 @@ const handleAddConvention = async (formData: ConventionFormData, file?: File | n
     const errorMessage = httpError.data?.message || httpError.message || 'Une erreur est survenue lors de la création de la convention';
     
     toast.add({
-      title: 'Erreur lors de la création',
+      title: t('errors.creation_error'),
       description: errorMessage,
       icon: 'i-heroicons-x-circle',
       color: 'error'

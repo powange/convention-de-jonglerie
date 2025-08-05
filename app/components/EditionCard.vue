@@ -58,7 +58,7 @@
       <div class="flex justify-end">
         <slot name="footer-actions" :edition="edition">
           <NuxtLink :to="`/editions/${edition.id}`">
-            <UButton icon="i-heroicons-eye" size="sm" color="info" variant="solid" label="Voir" />
+            <UButton icon="i-heroicons-eye" size="sm" color="info" variant="solid" :label="$t('common.view')" />
           </NuxtLink>
         </slot>
       </div>
@@ -69,6 +69,7 @@
 <script setup lang="ts">
 import type { Edition } from '~/types';
 import { getEditionDisplayName } from '~/utils/editionName';
+import { useTranslatedConventionServices } from '~/composables/useConventionServices';
 
 interface Props {
   edition: Edition;
@@ -81,6 +82,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const { formatDateTimeRange } = useDateFormat();
 const { getStatusColor, getStatusText } = useEditionStatus();
-const { getActiveServices } = useConventionServices();
+const { getTranslatedServices } = useTranslatedConventionServices();
 const { normalizeImageUrl } = useImageUrl();
+
+// Fonction pour obtenir les services actifs traduits
+const getActiveServices = (edition: any) => {
+  const services = getTranslatedServices();
+  return services.filter(service => edition[service.key]);
+};
 </script>

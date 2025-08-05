@@ -4,10 +4,10 @@
       v-model="selectedCountries"
       :items="data || []"
       multiple
-      :placeholder="placeholder"
+      :placeholder="dynamicPlaceholder"
       :loading="pending"
       searchable
-      searchable-placeholder="Rechercher un pays..."
+      :searchable-placeholder="$t('components.country_select.search_country_placeholder')"
       value-attribute="value"
       option-attribute="label"
     >
@@ -18,7 +18,7 @@
         </div>
       </template>
       <template #option-empty>
-        <span class="text-sm text-gray-500">Aucun pays trouvé</span>
+        <span class="text-sm text-gray-500">{{ $t('components.country_select.no_countries_found') }}</span>
       </template>
     </USelectMenu>
   </div>
@@ -35,6 +35,13 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   placeholder: 'Sélectionner des pays...'
+});
+
+const { t } = useI18n();
+
+// Utiliser la traduction dynamiquement pour le placeholder
+const dynamicPlaceholder = computed(() => {
+  return props.placeholder === 'Sélectionner des pays...' ? t('forms.placeholders.select_countries') : props.placeholder;
 });
 
 const emit = defineEmits<{

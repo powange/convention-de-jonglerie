@@ -18,7 +18,7 @@
                   variant="ghost"
                   to="/favorites"
                 >
-                  Mes favoris
+                  {{ $t('navigation.my_favorites') }}
                 </UButton>
               </div>
 
@@ -70,7 +70,7 @@
                       @click="closeDropdown"
                     >
                       <UIcon name="i-heroicons-user" class="w-4 h-4" />
-                      Mon profil
+                      {{ $t('navigation.profile') }}
                     </NuxtLink>
                     
                     <!-- Mes conventions -->
@@ -80,7 +80,7 @@
                       @click="closeDropdown"
                     >
                       <UIcon name="i-heroicons-calendar-days" class="w-4 h-4" />
-                      Mes conventions
+                      {{ $t('navigation.my_conventions') }}
                     </NuxtLink>
                     
                     <!-- Dashboard admin (si super admin) -->
@@ -91,7 +91,7 @@
                       @click="closeDropdown"
                     >
                       <UIcon name="i-heroicons-squares-2x2" class="w-4 h-4" />
-                      Dashboard
+                      {{ $t('navigation.admin') }}
                     </NuxtLink>
                     
                     <!-- Mes favoris (mobile uniquement) -->
@@ -102,7 +102,7 @@
                       @click="closeDropdown"
                     >
                       <UIcon name="i-heroicons-star" class="w-4 h-4" />
-                      Mes favoris
+                      {{ $t('navigation.my_favorites') }}
                     </NuxtLink>
                     
                     <!-- Séparateur -->
@@ -114,7 +114,7 @@
                       class="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
                     >
                       <UIcon name="i-heroicons-arrow-right-on-rectangle" class="w-4 h-4" />
-                      Déconnexion
+                      {{ $t('navigation.logout') }}
                     </button>
                   </div>
                 </div>
@@ -137,7 +137,7 @@
                   :to="`/login?returnTo=${encodeURIComponent($route.fullPath)}`"
                   class="w-full sm:w-auto"
                 >
-                  Connexion
+                  {{ $t('navigation.login') }}
                 </UButton>
                 <UButton 
                   icon="i-heroicons-user-plus" 
@@ -147,7 +147,7 @@
                   to="/register"
                   class="w-full sm:w-auto"
                 >
-                  Inscription
+                  {{ $t('navigation.register') }}
                 </UButton>
               </div>
             </div>
@@ -156,6 +156,7 @@
         <NuxtPage />
       </UCard>
     </ClientOnly>
+    <AppFooter />
     <UToast />
   </UApp>
 </template>
@@ -164,6 +165,7 @@
 import { computed, onMounted, onUnmounted } from 'vue';
 import { useAuthStore } from './stores/auth';
 import UserAvatar from '~/components/ui/UserAvatar.vue';
+import AppFooter from '~/components/ui/AppFooter.vue';
 
 const authStore = useAuthStore();
 const toast = useToast();

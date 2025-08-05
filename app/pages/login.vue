@@ -6,8 +6,8 @@
         <div class="mx-auto w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
           <UIcon name="i-heroicons-key" class="text-white" size="32" />
         </div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Connexion</h1>
-        <p class="text-gray-600 dark:text-gray-400">Accédez à votre compte</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ $t('auth.login_title') }}</h1>
+        <p class="text-gray-600 dark:text-gray-400">{{ $t('auth.login_subtitle') }}</p>
       </div>
 
       <!-- Card principale -->
@@ -15,22 +15,22 @@
         <UForm :state="state" :schema="schema" class="space-y-6" @submit="handleLogin">
           <!-- Section Authentification -->
           <div class="space-y-4">
-            <UFormField label="Email ou Pseudo" name="identifier">
+            <UFormField :label="t('auth.email_or_username')" name="identifier">
               <UInput 
                 v-model="state.identifier" 
                 required 
-                placeholder="votre.email@example.com ou votre pseudo"
+                :placeholder="t('auth.email_or_username_placeholder')"
                 icon="i-heroicons-user"
                 class="w-full"
               />
             </UFormField>
             
-            <UFormField label="Mot de passe" name="password">
+            <UFormField :label="t('common.password')" name="password">
               <UInput 
                 v-model="state.password" 
                 :type="showPassword ? 'text' : 'password'" 
                 required 
-                placeholder="Votre mot de passe"
+                :placeholder="t('auth.password_placeholder')"
                 icon="i-heroicons-lock-closed"
                 class="w-full"
                 :ui="{ trailing: 'pe-1' }"
@@ -41,7 +41,7 @@
                     variant="link"
                     size="sm"
                     :icon="showPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
-                    :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                    :aria-label="showPassword ? t('auth.hide_password') : t('auth.show_password')"
                     :aria-pressed="showPassword"
                     @click="showPassword = !showPassword"
                   />
@@ -53,14 +53,14 @@
           <!-- Options -->
           <div class="flex items-center justify-between">
             <UFormField name="rememberMe">
-              <UCheckbox v-model="state.rememberMe" label="Se souvenir de moi" />
+              <UCheckbox v-model="state.rememberMe" :label="$t('auth.remember_me')" />
             </UFormField>
             
             <NuxtLink 
               to="/auth/forgot-password" 
               class="text-sm text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
             >
-              Mot de passe oublié ?
+              {{ $t('auth.forgot_password_link') }}
             </NuxtLink>
           </div>
 
@@ -73,19 +73,19 @@
             class="mt-8"
             icon="i-heroicons-arrow-right-on-rectangle"
           >
-            {{ loading ? 'Connexion en cours...' : 'Se connecter' }}
+            {{ loading ? $t('auth.login_button_loading') : $t('auth.login_button') }}
           </UButton>
         </UForm>
 
         <!-- Lien d'inscription -->
         <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
           <p class="text-center text-sm text-gray-600 dark:text-gray-400">
-            Pas encore de compte ? 
+            {{ $t('auth.no_account_question') }} 
             <NuxtLink 
               to="/register" 
               class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
             >
-              S'inscrire
+              {{ $t('auth.register_link') }}
             </NuxtLink>
           </p>
         </div>
@@ -94,7 +94,7 @@
       <!-- Footer -->
       <div class="mt-8 text-center">
         <p class="text-xs text-gray-500 dark:text-gray-400">
-          Problème de connexion ? Contactez le support.
+          {{ $t('auth.connection_problem') }}
         </p>
       </div>
     </div>
@@ -110,10 +110,11 @@ import type { HttpError } from '~/types';
 const authStore = useAuthStore();
 const toast = useToast();
 const router = useRouter();
+const { t } = useI18n();
 
 const schema = z.object({
-  identifier: z.string().min(1, 'Email ou pseudo requis'),
-  password: z.string().min(1, 'Mot de passe requis'),
+  identifier: z.string().min(1, t('errors.email_or_username_required')),
+  password: z.string().min(1, t('errors.password_required')),
   rememberMe: z.boolean().optional()
 });
 
@@ -153,7 +154,7 @@ const handleLogin = async () => {
       storage.setItem('rememberMe', state.rememberMe.toString());
     }
     
-    toast.add({ title: 'Connexion réussie !', icon: 'i-heroicons-check-circle', color: 'success' });
+    toast.add({ title: t('messages.login_success'), icon: 'i-heroicons-check-circle', color: 'success' });
     
     // Navigation intelligente : retourner à la page précédente ou à l'accueil
     const returnTo = useRoute().query.returnTo as string;
@@ -170,10 +171,10 @@ const handleLogin = async () => {
     router.push(shouldNotReturnTo ? '/' : (returnTo || '/'));
   } catch (e: unknown) {
     const error = e as HttpError;
-    let errorMessage = 'Échec de la connexion';
+    let errorMessage = t('errors.login_failed');
     
     if (error.statusCode === 401 || error.status === 401) {
-      errorMessage = 'Email/pseudo ou mot de passe incorrect';
+      errorMessage = t('errors.invalid_credentials');
     } else if (error.statusCode === 403 || error.status === 403) {
       // Email non vérifié
       const isEmailNotVerified = error.statusMessage?.includes('Email non vérifié') || 
@@ -187,8 +188,8 @@ const handleLogin = async () => {
         const email = actualData?.email || state.identifier;
         
         toast.add({ 
-          title: 'Email non vérifié', 
-          description: 'Vous devez vérifier votre email avant de vous connecter.',
+          title: t('errors.email_not_verified'), 
+          description: t('errors.email_verification_required'),
           icon: 'i-heroicons-envelope-open', 
           color: 'warning' 
         });
@@ -198,8 +199,8 @@ const handleLogin = async () => {
         return;
       } else if (actualData?.requiresEmailVerification && actualData?.email) {
         toast.add({ 
-          title: 'Email non vérifié', 
-          description: 'Vous devez vérifier votre email avant de vous connecter.',
+          title: t('errors.email_not_verified'), 
+          description: t('errors.email_verification_required'),
           icon: 'i-heroicons-envelope-open', 
           color: 'warning' 
         });
@@ -207,7 +208,7 @@ const handleLogin = async () => {
         await router.push(`/verify-email?email=${encodeURIComponent(actualData.email)}`);
         return;
       } else {
-        errorMessage = error.statusMessage || 'Accès non autorisé';
+        errorMessage = error.statusMessage || t('errors.access_denied');
       }
     } else if (error.message || error.data?.message) {
       errorMessage = error.message || error.data?.message || errorMessage;

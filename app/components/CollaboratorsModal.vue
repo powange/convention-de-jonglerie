@@ -1,12 +1,12 @@
 <template>
-  <UModal v-model:open="isOpen" title="Gérer les collaborateurs" close-icon="i-heroicons-x-mark-20-solid">
+  <UModal v-model:open="isOpen" :title="$t('components.collaborators_modal.title')" close-icon="i-heroicons-x-mark-20-solid">
     <template #body>
       <div class="space-y-6">
         <!-- Notice de développement -->
         <div class="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
           <UIcon name="i-heroicons-wrench-screwdriver" class="text-amber-600 dark:text-amber-400 flex-shrink-0" size="18" />
           <p class="text-sm text-amber-800 dark:text-amber-200">
-            <strong>En cours de développement :</strong> Cette fonctionnalité est actuellement en cours d'amélioration.
+            {{ $t('components.collaborators_modal.in_development') }}
           </p>
         </div>
 
@@ -16,14 +16,14 @@
             <UIcon name="i-heroicons-information-circle" class="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" size="20" />
             <div class="space-y-2">
               <h4 class="text-sm font-medium text-blue-900 dark:text-blue-100">
-                À propos des collaborateurs
+                {{ $t('components.collaborators_modal.about_collaborators') }}
               </h4>
               <p class="text-sm text-blue-800 dark:text-blue-200">
-                Les collaborateurs peuvent vous aider à gérer vos conventions. Vous pouvez leur attribuer différents rôles :
+                {{ $t('components.collaborators_modal.about_collaborators_desc') }}
               </p>
               <ul class="text-sm text-blue-800 dark:text-blue-200 space-y-1 ml-4">
-                <li>• <strong>Modérateur :</strong> Peut gérer les éditions de la convention</li>
-                <li>• <strong>Administrateur :</strong> Peut gérer la convention, les éditions, ajouter/supprimer des collaborateurs</li>
+                <li>{{ $t('components.collaborators_modal.moderator_description') }}</li>
+                <li>{{ $t('components.collaborators_modal.admin_description') }}</li>
               </ul>
             </div>
           </div>
@@ -31,7 +31,7 @@
         <!-- Liste des collaborateurs existants -->
         <div v-if="convention?.collaborators && convention.collaborators.length > 0">
           <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
-            Collaborateurs actuels
+            {{ $t('components.collaborators_modal.current_collaborators') }}
           </h4>
           <div class="space-y-2">
             <div 
@@ -52,7 +52,7 @@
                   variant="subtle"
                   size="sm"
                 >
-                  {{ collaborator.role === 'ADMINISTRATOR' ? 'Admin' : 'Modo' }}
+                  {{ collaborator.role === 'ADMINISTRATOR' ? $t('components.collaborators_modal.admin') : $t('components.collaborators_modal.moderator') }}
                 </UBadge>
               </div>
               <UButton
@@ -70,7 +70,7 @@
         <!-- Formulaire d'ajout -->
         <div>
           <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
-            Ajouter un collaborateur
+            {{ $t('components.collaborators_modal.add_collaborator') }}
           </h4>
           <div class="space-y-3">
             <UButtonGroup>
@@ -79,7 +79,7 @@
                 v-model:search-term="searchTerm"
                 :items="userItems"
                 :avatar="selectedUser?.avatar"
-                placeholder="Rechercher un utilisateur..."
+                :placeholder="$t('components.collaborators_modal.search_user_placeholder')"
                 :loading="searchLoading"
                 size="lg"
               >
@@ -109,7 +109,7 @@
                   :disabled="!selectedUser || loading"
                   :loading="loading"
                   icon="i-heroicons-plus"
-                  label="Ajouter" 
+                  :label="t('common.add')" 
                   color="primary"
                 />
               </div>
@@ -159,6 +159,7 @@ const emit = defineEmits<Emits>();
 const { normalizeImageUrl } = useImageUrl();
 const authStore = useAuthStore();
 const toast = useToast();
+const { t } = useI18n();
 
 // État local
 const selectedUser = ref<UserItem | null>(null);
@@ -169,16 +170,16 @@ const searchLoading = ref(false);
 const userItems = ref<UserItem[]>([]);
 
 // Rôles des collaborateurs
-const collaboratorRoles = [
+const collaboratorRoles = computed(() => [
   {
-    label: 'Modérateur',
+    label: t('components.collaborators_modal.moderator'),
     id: 'MODERATOR'
   },
   {
-    label: 'Administrateur',
+    label: t('components.collaborators_modal.administrator'),
     id: 'ADMINISTRATOR'
   }
-];
+]);
 
 // Computed pour gérer l'état de la modal
 const isOpen = computed({
@@ -277,8 +278,8 @@ const handleAddCollaborator = async () => {
     });
 
     toast.add({
-      title: 'Collaborateur ajouté',
-      description: 'Le collaborateur a été ajouté avec succès',
+      title: t('messages.collaborator_added'),
+      description: t('messages.collaborator_added_successfully'),
       icon: 'i-heroicons-check-circle',
       color: 'success'
     });
@@ -295,8 +296,8 @@ const handleAddCollaborator = async () => {
   } catch (error: unknown) {
     const httpError = error as { data?: { message?: string }; message?: string };
     toast.add({
-      title: 'Erreur lors de l\'ajout',
-      description: httpError.data?.message || httpError.message || 'Une erreur est survenue',
+      title: t('errors.addition_error'),
+      description: httpError.data?.message || httpError.message || t('errors.generic_error'),
       icon: 'i-heroicons-x-circle',
       color: 'error'
     });
@@ -309,7 +310,7 @@ const handleAddCollaborator = async () => {
 const handleRemoveCollaborator = async (collaboratorId: number) => {
   if (!props.convention) return;
 
-  if (confirm('Êtes-vous sûr de vouloir retirer ce collaborateur ?')) {
+  if (confirm(t('components.collaborators_modal.confirm_remove'))) {
     try {
       await $fetch(`/api/conventions/${props.convention.id}/collaborators/${collaboratorId}`, {
         method: 'DELETE',
@@ -319,8 +320,8 @@ const handleRemoveCollaborator = async (collaboratorId: number) => {
       });
 
       toast.add({
-        title: 'Collaborateur retiré',
-        description: 'Le collaborateur a été retiré avec succès',
+        title: t('messages.collaborator_removed'),
+        description: t('messages.collaborator_removed_successfully'),
         icon: 'i-heroicons-check-circle',
         color: 'success'
       });
@@ -331,8 +332,8 @@ const handleRemoveCollaborator = async (collaboratorId: number) => {
     } catch (error: unknown) {
       const httpError = error as { data?: { message?: string }; message?: string };
       toast.add({
-        title: 'Erreur lors du retrait',
-        description: httpError.data?.message || httpError.message || 'Une erreur est survenue',
+        title: t('errors.removal_error'),
+        description: httpError.data?.message || httpError.message || t('errors.generic_error'),
         icon: 'i-heroicons-x-circle',
         color: 'error'
       });

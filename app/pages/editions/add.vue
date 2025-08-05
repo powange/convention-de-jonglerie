@@ -2,10 +2,10 @@
   <div class="max-w-6xl mx-auto">
     <UCard>
       <template #header>
-        <h1 class="text-2xl font-bold">Ajouter une nouvelle édition</h1>
+        <h1 class="text-2xl font-bold">{{ $t('pages.add_edition.title') }}</h1>
       </template>
       <EditionForm 
-        submit-button-text="Ajouter l'édition" 
+        :submit-button-text="$t('pages.add_edition.submit_button')" 
         :loading="editionStore.loading" 
         :initial-data="initialData"
         @submit="handleAddEdition" 
@@ -30,6 +30,7 @@ const editionStore = useEditionStore();
 const toast = useToast();
 const router = useRouter();
 const route = useRoute();
+const { t } = useI18n();
 
 // Pré-remplir avec la convention si passée en paramètre
 const initialData = computed(() => {
@@ -45,10 +46,10 @@ const initialData = computed(() => {
 const handleAddEdition = async (formData: Edition) => {
   try {
     await editionStore.addEdition(formData);
-    toast.add({ title: 'Édition ajoutée avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
+    toast.add({ title: t('messages.edition_created'), icon: 'i-heroicons-check-circle', color: 'success' });
     router.push('/');
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || "Échec de l'ajout de l'édition", icon: 'i-heroicons-x-circle', color: 'error' });
+    toast.add({ title: e.statusMessage || t('errors.edition_creation_failed'), icon: 'i-heroicons-x-circle', color: 'error' });
   }
 };
 </script>

@@ -1,18 +1,18 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>Chargement des détails de l'édition...</p>
+      <p>{{ $t('editions.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>Édition introuvable.</p>
+      <p>{{ $t('editions.not_found') }}</p>
     </div>
     <div v-else-if="!canAccess">
       <UAlert 
         icon="i-heroicons-exclamation-triangle" 
         color="error" 
         variant="soft"
-        title="Accès refusé"
-        description="Vous n'avez pas les permissions pour accéder à cette page."
+        :title="$t('pages.access_denied.title')"
+        :description="$t('pages.access_denied.description')"
       />
     </div>
     <div v-else>
@@ -29,7 +29,7 @@
         <!-- Actions de gestion -->
         <UCard>
           <div class="space-y-4">
-            <h3 class="text-lg font-semibold">Actions</h3>
+            <h3 class="text-lg font-semibold">{{ $t('pages.management.actions') }}</h3>
             <div class="flex gap-2">
               <UButton
                 v-if="canEdit"
@@ -37,7 +37,7 @@
                 color="warning"
                 :to="`/editions/${edition.id}/edit`"
               >
-                Modifier l'édition
+                {{ $t('pages.management.edit_edition') }}
               </UButton>
               <UButton
                 v-if="canDelete"
@@ -46,7 +46,7 @@
                 variant="soft"
                 @click="deleteEdition(edition.id)"
               >
-                Supprimer l'édition
+                {{ $t('pages.management.delete_edition') }}
               </UButton>
             </div>
           </div>
@@ -57,20 +57,19 @@
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-users" class="text-primary-500" />
-              <h3 class="text-lg font-semibold">Gestion des bénévoles</h3>
+              <h3 class="text-lg font-semibold">{{ $t('pages.management.volunteer_management') }}</h3>
             </div>
             
             <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
               <div class="flex items-start gap-3">
                 <UIcon name="i-heroicons-information-circle" class="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" size="20" />
                 <div class="space-y-2">
-                  <h4 class="text-sm font-medium text-blue-900 dark:text-blue-100">Fonctionnalité à venir</h4>
+                  <h4 class="text-sm font-medium text-blue-900 dark:text-blue-100">{{ $t('pages.management.upcoming_feature') }}</h4>
                   <p class="text-sm text-blue-800 dark:text-blue-200">
-                    La gestion des bénévoles permettra de recruter, organiser et coordonner l'équipe de bénévoles pour votre édition. 
-                    Cette fonctionnalité inclura la création de postes, l'inscription des bénévoles, la planification des créneaux et la communication d'équipe.
+                    {{ $t('pages.management.volunteer_description') }}
                   </p>
                   <div class="mt-3">
-                    <UBadge color="info" variant="soft">En développement</UBadge>
+                    <UBadge color="info" variant="soft">{{ $t('pages.management.in_development') }}</UBadge>
                   </div>
                 </div>
               </div>
@@ -84,7 +83,7 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-magnifying-glass" class="text-amber-500" />
-                <h3 class="text-lg font-semibold">Objets trouvés</h3>
+                <h3 class="text-lg font-semibold">{{ $t('editions.lost_found') }}</h3>
               </div>
               <UButton
                 v-if="isEditionFinished"
@@ -94,7 +93,7 @@
                 icon="i-heroicons-arrow-right"
                 :to="`/editions/${edition.id}/objets-trouves`"
               >
-                Gérer
+                {{ $t('pages.management.manage') }}
               </UButton>
             </div>
             
@@ -102,10 +101,9 @@
               <div class="flex items-start gap-3">
                 <UIcon name="i-heroicons-clock" class="text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5" size="20" />
                 <div class="space-y-2">
-                  <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">Disponible après l'événement</h4>
+                  <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $t('pages.management.available_after_event') }}</h4>
                   <p class="text-sm text-gray-700 dark:text-gray-300">
-                    La gestion des objets trouvés sera disponible une fois l'édition terminée. 
-                    Les collaborateurs pourront alors publier des annonces d'objets trouvés pour aider les participants à récupérer leurs affaires.
+                    {{ $t('pages.management.lost_found_after_description') }}
                   </p>
                 </div>
               </div>
@@ -115,10 +113,9 @@
               <div class="flex items-start gap-3">
                 <UIcon name="i-heroicons-magnifying-glass" class="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" size="20" />
                 <div class="space-y-2">
-                  <h4 class="text-sm font-medium text-amber-900 dark:text-amber-100">Gérez les objets trouvés</h4>
+                  <h4 class="text-sm font-medium text-amber-900 dark:text-amber-100">{{ $t('pages.management.manage_lost_found') }}</h4>
                   <p class="text-sm text-amber-800 dark:text-amber-200">
-                    Publiez des annonces d'objets trouvés avec photos et descriptions. 
-                    Les participants pourront consulter les annonces et commenter pour récupérer leurs affaires.
+                    {{ $t('pages.management.lost_found_active_description') }}
                   </p>
                 </div>
               </div>
@@ -147,6 +144,7 @@ const router = useRouter();
 const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
+const { t } = useI18n();
 
 const editionId = parseInt(route.params.id as string);
 const edition = ref(null);
@@ -191,20 +189,20 @@ const toggleFavorite = async (id: number) => {
     await editionStore.toggleFavorite(id);
     // Recharger l'édition pour mettre à jour l'état des favoris
     edition.value = await editionStore.fetchEditionById(editionId);
-    toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'success' });
+    toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'success' });
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || 'Échec de la mise à jour du statut de favori', icon: 'i-heroicons-x-circle', color: 'error' });
+    toast.add({ title: e.statusMessage || t('errors.favorite_update_failed'), icon: 'i-heroicons-x-circle', color: 'error' });
   }
 };
 
 const deleteEdition = async (id: number) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette édition ?')) {
+  if (confirm(t('pages.access_denied.confirm_delete_edition'))) {
     try {
       await editionStore.deleteEdition(id);
-      toast.add({ title: 'Édition supprimée avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
+      toast.add({ title: t('messages.edition_deleted'), icon: 'i-heroicons-check-circle', color: 'success' });
       router.push('/');
     } catch (e: unknown) {
-      toast.add({ title: e.statusMessage || 'Échec de la suppression de l\'édition', icon: 'i-heroicons-x-circle', color: 'error' });
+      toast.add({ title: e.statusMessage || t('errors.edition_deletion_failed'), icon: 'i-heroicons-x-circle', color: 'error' });
     }
   }
 };

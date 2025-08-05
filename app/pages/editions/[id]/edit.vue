@@ -2,15 +2,15 @@
   <div class="max-w-6xl mx-auto">
     <UCard>
       <template #header>
-        <h1 class="text-2xl font-bold">Modifier l'édition</h1>
+        <h1 class="text-2xl font-bold">{{ $t('editions.edit') }}</h1>
       </template>
       <div v-if="editionStore.loading">
-        <p>Chargement des données de l'édition...</p>
+        <p>{{ $t('editions.loading_details') }}</p>
       </div>
       <div v-else-if="!edition">
-        <p>Édition introuvable.</p>
+        <p>{{ $t('editions.not_found') }}</p>
       </div>
-      <EditionForm v-else :initial-data="edition" submit-button-text="Mettre à jour l'édition" :loading="editionStore.loading" @submit="handleUpdateConvention" />
+      <EditionForm v-else :initial-data="edition" :submit-button-text="$t('pages.edit_edition.submit_button')" :loading="editionStore.loading" @submit="handleUpdateConvention" />
     </UCard>
   </div>
 </template>
@@ -33,6 +33,7 @@ const authStore = useAuthStore();
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 
 const editionId = parseInt(route.params.id as string);
 const edition = ref(null);
@@ -45,8 +46,8 @@ onMounted(async () => {
     // Vérifier que l'utilisateur peut modifier cette édition
     if (!editionStore.canEditEdition(foundEdition, authStore.user?.id || 0)) {
       toast.add({ 
-        title: 'Accès refusé', 
-        description: 'Vous n\'avez pas les droits pour modifier cette édition',
+        title: t('pages.access_denied.title'), 
+        description: t('errors.edition_edit_denied'),
         icon: 'i-heroicons-exclamation-triangle', 
         color: 'error' 
       });
@@ -57,8 +58,8 @@ onMounted(async () => {
     edition.value = foundEdition;
   } catch (_error) {
     toast.add({ 
-      title: 'Erreur', 
-      description: 'Édition introuvable',
+      title: t('common.error'), 
+      description: t('editions.not_found'),
       icon: 'i-heroicons-exclamation-triangle', 
       color: 'error' 
     });
@@ -69,10 +70,10 @@ onMounted(async () => {
 const handleUpdateConvention = async (formData: Edition) => {
   try {
     await editionStore.updateEdition(editionId, formData);
-    toast.add({ title: 'Édition mise à jour avec succès !', icon: 'i-heroicons-check-circle', color: 'success' });
+    toast.add({ title: t('messages.edition_updated'), icon: 'i-heroicons-check-circle', color: 'success' });
     router.push(`/editions/${editionId}`);
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || 'Échec de la mise à jour de l\'édition', icon: 'i-heroicons-x-circle', color: 'error' });
+    toast.add({ title: e.statusMessage || t('errors.edition_update_failed'), icon: 'i-heroicons-x-circle', color: 'error' });
   }
 };
 </script>

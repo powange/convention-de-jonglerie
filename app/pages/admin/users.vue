@@ -6,22 +6,22 @@
         <li class="inline-flex items-center">
           <NuxtLink to="/admin" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
             <UIcon name="i-heroicons-squares-2x2" class="w-4 h-4 mr-2" />
-            Dashboard
+            {{ $t('admin.dashboard') }}
           </NuxtLink>
         </li>
         <li>
           <div class="flex items-center">
             <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400" />
-            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">Gestion des utilisateurs</span>
+            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">{{ $t('admin.user_management') }}</span>
           </div>
         </li>
       </ol>
     </nav>
 
     <div class="mb-6">
-      <h1 class="text-3xl font-bold">Gestion des Utilisateurs</h1>
+      <h1 class="text-3xl font-bold">{{ $t('admin.user_management') }}</h1>
       <p class="text-gray-600 dark:text-gray-400 mt-2">
-        Liste complète des utilisateurs inscrits sur la plateforme
+        {{ $t('admin.user_management_description') }}
       </p>
     </div>
 
@@ -32,7 +32,7 @@
         <div class="flex-1">
           <UInput
             v-model="searchQuery"
-            placeholder="Rechercher par email, pseudo, nom ou prénom..."
+            :placeholder="t('admin.search_users_placeholder')"
             icon="i-heroicons-magnifying-glass"
             size="sm"
             @input="debouncedSearch"
@@ -75,25 +75,25 @@
         <UCard>
           <div class="text-center">
             <div class="text-2xl font-bold text-primary">{{ stats.total }}</div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">Total utilisateurs</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">{{ $t('admin.total_users') }}</div>
           </div>
         </UCard>
         <UCard>
           <div class="text-center">
             <div class="text-2xl font-bold text-green-600">{{ stats.verified }}</div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">Email vérifié</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">{{ $t('admin.email_verified') }}</div>
           </div>
         </UCard>
         <UCard>
           <div class="text-center">
             <div class="text-2xl font-bold text-blue-600">{{ stats.admins }}</div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">Super admins</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">{{ $t('admin.super_admins') }}</div>
           </div>
         </UCard>
         <UCard>
           <div class="text-center">
             <div class="text-2xl font-bold text-purple-600">{{ stats.creators }}</div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">Ont créé du contenu</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">{{ $t('admin.content_creators') }}</div>
           </div>
         </UCard>
       </div>
@@ -132,6 +132,8 @@ definePageMeta({
 import { useAuthStore } from '~/stores/auth'
 import { h, resolveComponent } from 'vue'
 import UserAvatar from '~/components/ui/UserAvatar.vue'
+
+const { t } = useI18n()
 
 
 // Types pour les utilisateurs
@@ -177,8 +179,8 @@ interface DropdownMenuItem {
 
 // Métadonnées de la page
 useSeoMeta({
-  title: 'Gestion des Utilisateurs - Admin',
-  description: 'Interface d\'administration pour gérer les utilisateurs'
+  title: t('admin.user_management') + ' - Admin',
+  description: t('admin.user_management_description')
 })
 
 // État réactif
@@ -215,7 +217,7 @@ const stats = computed(() => {
 const columns = [
   {
     accessorKey: 'identity',
-    header: 'Utilisateur',
+    header: t('admin.user_column'),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUser
       return h('div', { class: 'flex items-center gap-3' }, [
@@ -233,31 +235,31 @@ const columns = [
   },
   {
     accessorKey: 'email',
-    header: 'Email',
+    header: t('common.email'),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUser
       return h('div', { class: 'flex items-center gap-2' }, [
         h('span', user.email),
         user.isEmailVerified 
-          ? h(resolveComponent('UBadge'), { color: 'success', variant: 'soft', size: 'xs' }, () => 'Vérifié')
-          : h(resolveComponent('UBadge'), { color: 'warning', variant: 'soft', size: 'xs' }, () => 'Non vérifié')
+          ? h(resolveComponent('UBadge'), { color: 'success', variant: 'soft', size: 'xs' }, () => t('admin.verified'))
+          : h(resolveComponent('UBadge'), { color: 'warning', variant: 'soft', size: 'xs' }, () => t('admin.not_verified'))
       ])
     }
   },
   {
     accessorKey: 'role', 
-    header: 'Rôle',
+    header: t('admin.role'),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUser
       return h(resolveComponent('UBadge'), {
         color: user.isGlobalAdmin ? 'error' : 'neutral',
         variant: user.isGlobalAdmin ? 'solid' : 'soft'
-      }, () => user.isGlobalAdmin ? 'Super Admin' : 'Utilisateur')
+      }, () => user.isGlobalAdmin ? t('admin.super_admin') : t('admin.user'))
     }
   },
   {
     accessorKey: 'activity',
-    header: 'Activité', 
+    header: t('admin.activity'), 
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUser
       const activities = []
@@ -265,26 +267,26 @@ const columns = [
       if (user._count.createdConventions > 0) {
         activities.push(h('div', { class: 'flex items-center gap-1' }, [
           h(resolveComponent('UIcon'), { name: 'i-heroicons-building-library', class: 'w-4 h-4 text-blue-500' }),
-          h('span', `${user._count.createdConventions} convention(s)`)
+          h('span', `${user._count.createdConventions} ${t('admin.conventions_count')}`)
         ]))
       }
       
       if (user._count.createdEditions > 0) {
         activities.push(h('div', { class: 'flex items-center gap-1' }, [
           h(resolveComponent('UIcon'), { name: 'i-heroicons-calendar', class: 'w-4 h-4 text-green-500' }),
-          h('span', `${user._count.createdEditions} édition(s)`)
+          h('span', `${user._count.createdEditions} ${t('admin.editions_count')}`)
         ]))
       }
       
       if (user._count.favoriteEditions > 0) {
         activities.push(h('div', { class: 'flex items-center gap-1' }, [
           h(resolveComponent('UIcon'), { name: 'i-heroicons-heart', class: 'w-4 h-4 text-red-500' }),
-          h('span', `${user._count.favoriteEditions} favori(s)`)
+          h('span', `${user._count.favoriteEditions} ${t('admin.favorites_count')}`)
         ]))
       }
       
       if (activities.length === 0) {
-        activities.push(h('div', { class: 'text-gray-400' }, 'Aucune activité'))
+        activities.push(h('div', { class: 'text-gray-400' }, t('admin.no_activity')))
       }
       
       return h('div', { class: 'text-sm space-y-1' }, activities)
@@ -292,7 +294,7 @@ const columns = [
   },
   {
     accessorKey: 'createdAt',
-    header: 'Inscription',
+    header: t('admin.registration'),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUser
       return h('div', { class: 'text-sm' }, [
@@ -303,7 +305,7 @@ const columns = [
   },
   {
     accessorKey: 'actions',
-    header: 'Actions',
+    header: t('admin.actions'),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUser
       return h(resolveComponent('UDropdownMenu'), {
@@ -322,24 +324,24 @@ const columns = [
 
 // Options de filtrage
 const adminFilterOptions = [
-  { label: 'Tous les utilisateurs', value: 'all' },
-  { label: 'Utilisateurs normaux', value: 'users' },
-  { label: 'Super administrateurs', value: 'admins' }
+  { label: t('admin.all_users'), value: 'all' },
+  { label: t('admin.normal_users'), value: 'users' },
+  { label: t('admin.super_administrators'), value: 'admins' }
 ]
 
 const emailFilterOptions = [
-  { label: 'Tous les emails', value: 'all' },
-  { label: 'Emails vérifiés', value: 'verified' },
-  { label: 'Emails non vérifiés', value: 'unverified' }
+  { label: t('admin.all_emails'), value: 'all' },
+  { label: t('admin.verified_emails'), value: 'verified' },
+  { label: t('admin.unverified_emails'), value: 'unverified' }
 ]
 
 const sortOptions = [
-  { label: 'Plus récents d\'abord', value: 'createdAt:desc' },
-  { label: 'Plus anciens d\'abord', value: 'createdAt:asc' },
-  { label: 'Par nom (A-Z)', value: 'nom:asc' },
-  { label: 'Par nom (Z-A)', value: 'nom:desc' },
-  { label: 'Par email (A-Z)', value: 'email:asc' },
-  { label: 'Par email (Z-A)', value: 'email:desc' }
+  { label: t('admin.newest_first'), value: 'createdAt:desc' },
+  { label: t('admin.oldest_first'), value: 'createdAt:asc' },
+  { label: t('admin.name_a_z'), value: 'nom:asc' },
+  { label: t('admin.name_z_a'), value: 'nom:desc' },
+  { label: t('admin.email_a_z'), value: 'email:asc' },
+  { label: t('admin.email_z_a'), value: 'email:desc' }
 ]
 
 // Fonctions utilitaires
@@ -356,19 +358,19 @@ const formatRelativeTime = (date: string) => {
   const target = new Date(date)
   const diffInDays = Math.floor((now.getTime() - target.getTime()) / (1000 * 60 * 60 * 24))
   
-  if (diffInDays === 0) return 'Aujourd\'hui'
-  if (diffInDays === 1) return 'Hier'
-  if (diffInDays < 7) return `Il y a ${diffInDays} jours`
-  if (diffInDays < 30) return `Il y a ${Math.floor(diffInDays / 7)} semaines`
-  if (diffInDays < 365) return `Il y a ${Math.floor(diffInDays / 30)} mois`
-  return `Il y a ${Math.floor(diffInDays / 365)} ans`
+  if (diffInDays === 0) return t('admin.today')
+  if (diffInDays === 1) return t('admin.yesterday')
+  if (diffInDays < 7) return t('admin.days_ago', { count: diffInDays })
+  if (diffInDays < 30) return t('admin.weeks_ago', { count: Math.floor(diffInDays / 7) })
+  if (diffInDays < 365) return t('admin.months_ago', { count: Math.floor(diffInDays / 30) })
+  return t('admin.years_ago', { count: Math.floor(diffInDays / 365) })
 }
 
 const getUserActions = (user: AdminUser): DropdownMenuItem[] => {
   const actions: DropdownMenuItem[] = [
     // Action pour voir le profil
     {
-      label: 'Voir le profil',
+      label: t('admin.view_profile'),
       icon: 'i-heroicons-user',
       onSelect: () => navigateTo(`/profile/${user.id}`)
     }
@@ -377,13 +379,13 @@ const getUserActions = (user: AdminUser): DropdownMenuItem[] => {
   // Actions d'administration
   if (!user.isGlobalAdmin) {
     actions.push({
-      label: 'Promouvoir en super admin',
+      label: t('admin.promote_to_admin'),
       icon: 'i-heroicons-shield-check',
       onSelect: () => promoteToAdmin(user)
     })
   } else {
     actions.push({
-      label: 'Rétrograder',
+      label: t('admin.demote'),
       icon: 'i-heroicons-shield-exclamation',
       color: 'error' as const,
       onSelect: () => demoteFromAdmin(user)
@@ -461,8 +463,8 @@ const fetchUsers = async () => {
     
     useToast().add({
       color: 'red',
-      title: 'Erreur',
-      description: 'Impossible de charger les utilisateurs'
+      title: t('common.error'),
+      description: t('admin.cannot_load_users')
     })
   } finally {
     loading.value = false

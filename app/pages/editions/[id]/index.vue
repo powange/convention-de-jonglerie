@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="editionStore.loading">
-      <p>Chargement des détails de l'édition...</p>
+      <p>{{ $t('editions.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
-      <p>Édition introuvable.</p>
+      <p>{{ $t('editions.not_found') }}</p>
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
@@ -30,8 +30,8 @@
               >
             </div>
             <div class="flex-1">
-              <h3 class="text-lg font-semibold mb-2">À propos de cette édition</h3>
-              <p class="text-gray-700 dark:text-gray-300">{{ edition.description || 'Aucune description disponible' }}</p>
+              <h3 class="text-lg font-semibold mb-2">{{ $t('editions.about_this_edition') }}</h3>
+              <p class="text-gray-700 dark:text-gray-300">{{ edition.description || t('editions.no_description_available') }}</p>
             </div>
           </div>
         </template>
@@ -40,7 +40,7 @@
         <div class="space-y-6">
           <!-- Informations pratiques -->
           <div class="space-y-3">
-            <h3 class="text-lg font-semibold">Informations pratiques</h3>
+            <h3 class="text-lg font-semibold">{{ $t('editions.practical_info') }}</h3>
             <p class="text-sm text-gray-600">
               <UIcon name="i-heroicons-map-pin" class="inline mr-1" />
               <a 
@@ -61,7 +61,7 @@
             <div v-if="getAllCollaborators(edition).length > 0" class="pt-2">
               <div class="flex items-center gap-2 mb-2">
                 <UIcon name="i-heroicons-users" class="text-gray-400" />
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Équipe organisatrice</span>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('editions.organizing_team') }}</span>
               </div>
               <div class="flex flex-wrap gap-2">
                 <div
@@ -81,7 +81,7 @@
                     color="primary"
                     variant="soft"
                   >
-                    Créateur
+                    {{ $t('editions.creator') }}
                   </UBadge>
                   <UBadge
                     v-else-if="collaborator.role === 'ADMINISTRATOR'"
@@ -89,7 +89,7 @@
                     color="warning"
                     variant="soft"
                   >
-                    Admin
+                    {{ $t('editions.admin') }}
                   </UBadge>
                   <UBadge
                     v-else-if="collaborator.role === 'MODERATOR'"
@@ -97,7 +97,7 @@
                     color="info"
                     variant="soft"
                   >
-                    Modérateur
+                    {{ $t('editions.moderator') }}
                   </UBadge>
                 </div>
               </div>
@@ -106,9 +106,9 @@
 
           <!-- Liens externes -->
           <div v-if="edition.ticketingUrl || edition.facebookUrl || edition.instagramUrl" class="space-y-2">
-            <h3 class="text-lg font-semibold">Liens utiles</h3>
+            <h3 class="text-lg font-semibold">{{ $t('editions.useful_links') }}</h3>
             <div class="flex gap-2">
-              <UButton v-if="edition.ticketingUrl" icon="i-heroicons-ticket" :to="edition.ticketingUrl" target="_blank" size="sm">Billetterie</UButton>
+              <UButton v-if="edition.ticketingUrl" icon="i-heroicons-ticket" :to="edition.ticketingUrl" target="_blank" size="sm">{{ $t('editions.ticketing') }}</UButton>
               <UButton v-if="edition.facebookUrl" icon="i-simple-icons-facebook" :to="edition.facebookUrl" target="_blank" size="sm" color="info">Facebook</UButton>
               <UButton v-if="edition.instagramUrl" icon="i-simple-icons-instagram" :to="edition.instagramUrl" target="_blank" size="sm" color="error">Instagram</UButton>
             </div>
@@ -116,9 +116,9 @@
 
           <!-- Services -->
           <div class="space-y-4">
-            <h3 class="text-lg font-semibold">Services proposés</h3>
+            <h3 class="text-lg font-semibold">{{ $t('editions.services_offered') }}</h3>
             <div v-if="getActiveServicesByCategory(edition).length === 0" class="text-gray-500 text-sm">
-              Aucun service spécifique renseigné
+              {{ $t('editions.no_services') }}
             </div>
             <div v-else class="space-y-4">
               <div v-for="category in getActiveServicesByCategory(edition)" :key="category.category" class="space-y-3">
@@ -189,6 +189,7 @@ import { useRoute } from 'vue-router';
 import type { Edition } from '~/types';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
+import { useTranslatedConventionServices } from '~/composables/useConventionServices';
 import UserAvatar from '~/components/ui/UserAvatar.vue';
 
 const { formatDateTimeRange } = useDateFormat();
@@ -199,7 +200,8 @@ const route = useRoute();
 const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
-const { servicesByCategory } = useConventionServices();
+const { t } = useI18n();
+const { getTranslatedServicesByCategory } = useTranslatedConventionServices();
 
 const editionId = parseInt(route.params.id as string);
 const edition = ref<Edition | null>(null);
@@ -223,11 +225,11 @@ const toggleFavorite = async (id: number) => {
     await editionStore.toggleFavorite(id);
     // Recharger l'édition pour mettre à jour l'état des favoris
     edition.value = await editionStore.fetchEditionById(editionId);
-    toast.add({ title: 'Statut de favori mis à jour !', icon: 'i-heroicons-check-circle', color: 'green' });
+    toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'green' });
   } catch (e: unknown) {
     const errorMessage = (e && typeof e === 'object' && 'statusMessage' in e && typeof e.statusMessage === 'string') 
                         ? e.statusMessage 
-                        : 'Échec de la mise à jour du statut de favori';
+                        : t('errors.favorite_update_failed');
     toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'red' });
   }
 };
@@ -249,6 +251,7 @@ const getGoogleMapsUrl = (edition: Edition) => {
 const getActiveServicesByCategory = (edition: Edition) => {
   if (!edition) return [];
   
+  const servicesByCategory = getTranslatedServicesByCategory();
   return servicesByCategory.map(category => ({
     ...category,
     services: category.services.filter(service => edition[service.key])
@@ -296,15 +299,15 @@ const getAllCollaborators = (edition: Edition) => {
 // Obtenir le titre du collaborateur pour le tooltip
 const getCollaboratorTitle = (collaborator: any) => {
   if (collaborator.isCreator) {
-    return `${collaborator.pseudo} - Créateur de l'édition`;
+    return `${collaborator.pseudo} - ${t('editions.edition_creator')}`;
   }
   
   const roleNames = {
-    'ADMINISTRATOR': 'Administrateur',
-    'MODERATOR': 'Modérateur'
+    'ADMINISTRATOR': t('editions.administrator'),
+    'MODERATOR': t('editions.moderator')
   };
   
-  const roleName = roleNames[collaborator.role] || 'Collaborateur';
-  return `${collaborator.pseudo} - ${roleName} de la convention`;
+  const roleName = roleNames[collaborator.role] || t('editions.collaborator');
+  return `${collaborator.pseudo} - ${roleName} ${t('editions.of_convention')}`;
 };
 </script>

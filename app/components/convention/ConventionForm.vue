@@ -1,20 +1,20 @@
 <template>
   <UForm :state="form" :validate="validate" class="space-y-6" @submit="onSubmit">
     <!-- Nom de la convention -->
-    <UFormField label="Nom de la convention" name="name" required>
+    <UFormField :label="$t('components.convention_form.convention_name')" name="name" required>
       <UInput
         v-model="form.name"
-        placeholder="Ex: Convention Européenne de Jonglerie"
+        :placeholder="$t('forms.placeholders.convention_name_example')"
         class="w-full"
         @blur="trimField('name')"
       />
     </UFormField>
 
     <!-- Description -->
-    <UFormField label="Description" name="description">
+    <UFormField :label="$t('common.description')" name="description">
       <UTextarea
         v-model="form.description"
-        placeholder="Décrivez la convention, son histoire, ses spécificités..."
+        :placeholder="$t('forms.placeholders.convention_description')"
         :rows="4"
         class="w-full"
         @blur="trimField('description')"
@@ -22,7 +22,7 @@
     </UFormField>
 
     <!-- Logo -->
-    <UFormField label="Logo de la convention" name="logo">
+    <UFormField :label="$t('components.convention_form.convention_logo')" name="logo">
       <div class="space-y-4">
         <!-- Mode upload de fichier ou URL -->
         <div class="flex gap-2">
@@ -33,7 +33,7 @@
             size="sm"
             @click="uploadMode = 'file'"
           >
-            Upload fichier
+            {{ $t('components.convention_form.upload_file') }}
           </UButton>
           <UButton
             type="button"
@@ -42,7 +42,7 @@
             size="sm"
             @click="uploadMode = 'url'"
           >
-            URL externe
+            {{ $t('components.convention_form.external_url') }}
           </UButton>
         </div>
 
@@ -58,7 +58,7 @@
           
           <div v-if="!selectedFile && !form.logo" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
             <UIcon name="i-heroicons-photo" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <p class="text-sm text-gray-600 mb-2">Cliquez pour sélectionner une image</p>
+            <p class="text-sm text-gray-600 mb-2">{{ $t('components.convention_form.click_to_select_image') }}</p>
             <UButton
               type="button"
               variant="outline"
@@ -109,7 +109,7 @@
     <div v-if="previewUrl" class="flex justify-center">
       <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
         <div class="flex justify-between items-center mb-2">
-          <p class="text-sm text-gray-600">Aperçu du logo :</p>
+          <p class="text-sm text-gray-600">{{ $t('components.convention_form.logo_preview') }}</p>
           <UButton
             v-if="form.logo && initialData?.id"
             type="button"

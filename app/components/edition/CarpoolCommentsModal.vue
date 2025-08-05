@@ -1,6 +1,6 @@
 <template>
   <!-- Modal -->
-  <UModal v-model="showCommentsModal" title="Commentaires">
+  <UModal v-model="showCommentsModal" :title="$t('components.carpool.comments')">
     <!-- Bouton déclencheur -->
     <UButton
       size="sm"
@@ -8,14 +8,14 @@
       icon="i-heroicons-chat-bubble-left"
       @click="showCommentsModal = true"
     >
-      Voir les commentaires ({{ comments.length }})
+      {{ $t('components.carpool.view_comments', { count: comments.length }) }}
     </UButton>
     
     <template #body>
         <!-- Chargement -->
       <div v-if="loading" class="text-center py-4">
         <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto mb-2 w-6 h-6" />
-        <p>Chargement des commentaires...</p>
+        <p>{{ $t('components.carpool.loading_comments') }}</p>
       </div>
 
       <!-- Liste des commentaires -->
@@ -42,7 +42,7 @@
             icon="i-heroicons-plus"
             :loading="addingPassenger === comment.user.id"
             @click="addPassenger(comment.user.id)"
-            title="Ajouter comme covoitureur"
+            :title="$t('components.carpool.add_as_passenger')"
           />
         </div>
         <p class="text-sm">{{ comment.content }}</p>
@@ -52,15 +52,15 @@
       <!-- Aucun commentaire -->
       <div v-else class="text-center py-8 text-gray-500">
         <UIcon name="i-heroicons-chat-bubble-left" class="mx-auto h-12 w-12 text-gray-300 mb-4" />
-        <p class="text-lg font-medium">Aucun commentaire</p>
-        <p class="text-sm">Soyez le premier à commenter cette {{ type === 'offer' ? 'offre' : 'demande' }} !</p>
+        <p class="text-lg font-medium">{{ $t('components.carpool.no_comments') }}</p>
+        <p class="text-sm">{{ $t('components.carpool.be_first_to_comment', { type: $t(`components.carpool.${type}`) }) }}</p>
       </div>
 
       <!-- Formulaire pour ajouter un commentaire -->
       <div v-if="authStore.isAuthenticated" class="pt-4">
         <UTextarea
           v-model="newComment"
-          placeholder="Ajouter un commentaire..."
+          :placeholder="$t('components.carpool.add_comment_placeholder')"
           autoresize
           class="w-full"
           @blur="newComment = newComment.trim()"
@@ -72,7 +72,7 @@
             color="primary"
             @click="addComment"
           >
-            Publier
+            {{ $t('components.carpool.publish') }}
           </UButton>
         </div>
       </div>
@@ -81,9 +81,9 @@
       <div v-else class="pt-4 border-t text-center text-gray-500">
         <p class="text-sm">
           <NuxtLink :to="`/login?returnTo=${encodeURIComponent($route.fullPath)}`" class="text-primary-600 hover:underline">
-            Connectez-vous
+            {{ $t('auth.login') }}
           </NuxtLink>
-          pour ajouter un commentaire
+          {{ $t('components.carpool.to_add_comment') }}
         </p>
       </div>
     </template>
@@ -121,6 +121,7 @@ const emit = defineEmits<{
 
 const authStore = useAuthStore();
 const toast = useToast();
+const { t } = useI18n();
 
 const loading = ref(false);
 const comments = ref<Comment[]>([]);
@@ -156,8 +157,8 @@ const loadComments = async () => {
   } catch (error) {
     console.error('Erreur lors du chargement des commentaires:', error);
     toast.add({
-      title: 'Erreur',
-      description: 'Impossible de charger les commentaires',
+      title: t('common.error'),
+      description: t('errors.cannot_load_comments'),
       color: 'red',
     });
   } finally {
@@ -170,10 +171,10 @@ const formatRelativeTime = (date: string) => {
   const then = new Date(date);
   const diffInMinutes = Math.floor((now.getTime() - then.getTime()) / 60000);
 
-  if (diffInMinutes < 1) return 'à l\'instant';
-  if (diffInMinutes < 60) return `il y a ${diffInMinutes} min`;
-  if (diffInMinutes < 1440) return `il y a ${Math.floor(diffInMinutes / 60)} h`;
-  return `il y a ${Math.floor(diffInMinutes / 1440)} j`;
+  if (diffInMinutes < 1) return t('common.time_just_now');
+  if (diffInMinutes < 60) return t('common.time_minutes_ago', { count: diffInMinutes });
+  if (diffInMinutes < 1440) return t('common.time_hours_ago', { count: Math.floor(diffInMinutes / 60) });
+  return t('common.time_days_ago', { count: Math.floor(diffInMinutes / 1440) });
 };
 
 const addComment = async () => {
@@ -201,14 +202,14 @@ const addComment = async () => {
     await loadComments(); // Recharger les commentaires
     emit('comment-added');
     toast.add({
-      title: 'Commentaire ajouté',
+      title: t('messages.comment_added'),
       color: 'green',
     });
   } catch (error) {
     console.error('Erreur lors de l\'ajout du commentaire:', error);
     toast.add({
-      title: 'Erreur',
-      description: 'Impossible d\'ajouter le commentaire',
+      title: t('common.error'),
+      description: t('errors.cannot_add_comment'),
       color: 'red',
     });
   } finally {
@@ -253,15 +254,15 @@ const addPassenger = async (userId: number) => {
 
     emit('passenger-added');
     toast.add({
-      title: 'Covoitureur ajouté',
-      description: 'L\'utilisateur a été ajouté comme covoitureur',
+      title: t('messages.passenger_added'),
+      description: t('messages.user_added_as_passenger'),
       color: 'green',
     });
   } catch (error: any) {
     console.error('Erreur lors de l\'ajout du covoitureur:', error);
     toast.add({
-      title: 'Erreur',
-      description: error.data?.message || 'Impossible d\'ajouter le covoitureur',
+      title: t('common.error'),
+      description: error.data?.message || t('errors.cannot_add_passenger'),
       color: 'red',
     });
   } finally {
