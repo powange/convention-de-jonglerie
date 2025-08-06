@@ -222,7 +222,8 @@ const isLanguageDropdownOpen = ref(false);
 const languageConfig = {
   fr: { name: 'Français', flag: 'fi fi-fr' },
   en: { name: 'English', flag: 'fi fi-gb' },
-  es: { name: 'Español', flag: 'fi fi-es' }
+  es: { name: 'Español', flag: 'fi fi-es' },
+  de: { name: 'Deutsch', flag: 'fi fi-de' }
 };
 
 // Langue courante avec son drapeau
