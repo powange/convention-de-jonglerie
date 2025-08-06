@@ -772,6 +772,14 @@
       "yellow_border_favorite": "Borde amarillo = Favorito"
     }
   },
+  "renegade": {
+    "title": "RENEGADE",
+    "countdown_title": "Cuenta regresiva hasta el 7 de agosto de 2025 - 01:00",
+    "days": "Días",
+    "hours": "Horas",
+    "minutes": "Minutos",
+    "seconds": "Segundos"
+  },
   "pages": {
     "favorites": {
       "no_favorites_added": "Aún no has agregado ninguna edición a tus favoritos.",

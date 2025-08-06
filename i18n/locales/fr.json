@@ -781,6 +781,14 @@
       "yellow_border_favorite": "Contour jaune = Favori"
     }
   },
+  "renegade": {
+    "title": "RENEGADE",
+    "countdown_title": "Compte à rebours jusqu'au 7 août 2025 - 01:00",
+    "days": "Jours",
+    "hours": "Heures",
+    "minutes": "Minutes",
+    "seconds": "Secondes"
+  },
   "pages": {
     "favorites": {
       "no_favorites_added": "Vous n'avez pas encore ajouté d'édition à vos favoris.",

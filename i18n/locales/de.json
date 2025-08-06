@@ -774,6 +774,14 @@
       "yellow_border_favorite": "Gelber Rand = Favorit"
     }
   },
+  "renegade": {
+    "title": "RENEGADE",
+    "countdown_title": "Countdown bis 7. August 2025 - 01:00 Uhr",
+    "days": "Tage",
+    "hours": "Stunden",
+    "minutes": "Minuten",
+    "seconds": "Sekunden"
+  },
   "pages": {
     "favorites": {
       "no_favorites_added": "Du hast noch keine Auflage zu deinen Favoriten hinzugefügt.",

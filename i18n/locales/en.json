@@ -692,6 +692,14 @@
       "payment": "Payment"
     }
   },
+  "renegade": {
+    "title": "RENEGADE",
+    "countdown_title": "Countdown to August 7, 2025 - 01:00 AM",
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds"
+  },
   "pages": {
     "favorites": {
       "no_favorites_added": "You haven't added any edition to your favorites yet.",
