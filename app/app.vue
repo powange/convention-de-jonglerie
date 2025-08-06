@@ -170,6 +170,7 @@ import AppFooter from '~/components/ui/AppFooter.vue';
 const authStore = useAuthStore();
 const toast = useToast();
 const router = useRouter();
+// const localePath = useLocalePath(); // Pas nécessaire avec strategy: 'no_prefix'
 
 // État réactif pour la taille d'écran et dropdown
 const isMobile = ref(false);

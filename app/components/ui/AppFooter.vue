@@ -52,8 +52,10 @@ const languageItems = computed(() =>
 )
 
 // Fonction pour changer de langue
-const changeLanguage = (newLocale: string) => {
-  setLocale(newLocale)
+const changeLanguage = async (newLocale: string) => {
+  await setLocale(newLocale)
+  // Forcer le rafraîchissement pour s'assurer que la langue est bien appliquée
+  refreshNuxtData()
 }
 </script>
 

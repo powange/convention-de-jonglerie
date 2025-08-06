@@ -84,6 +84,7 @@ const { formatDateTimeRange } = useDateFormat();
 const { getStatusColor, getStatusText } = useEditionStatus();
 const { getTranslatedServices } = useTranslatedConventionServices();
 const { normalizeImageUrl } = useImageUrl();
+// const localePath = useLocalePath(); // Pas nécessaire avec strategy: 'no_prefix'
 
 // Fonction pour obtenir les services actifs traduits
 const getActiveServices = (edition: any) => {

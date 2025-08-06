@@ -24,13 +24,21 @@ export default defineNuxtConfig({
       { code: 'en', name: 'English', file: 'en.json' }
     ],
     langDir: 'locales/',
-    lazyLoading: true,
-    strategy: 'prefix_and_default',
+    lazy: true,
+    strategy: 'no_prefix',
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'i18n_redirected',
-      redirectOn: 'root' // recommended
-    }
+      cookieDomain: null,
+      cookieSecure: false,
+      cookieCrossOrigin: false,
+      cookieSameSite: 'lax',
+      cookieHttpOnly: false,
+      redirectOn: 'no redirect',
+      alwaysRedirect: false,
+      fallbackLocale: 'fr'
+    },
+    vueI18n: './i18n/i18n.config.ts'
   },
   css: [
     '~/assets/css/main.css',
