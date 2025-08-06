@@ -1,42 +1,37 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-black via-orange-900 to-yellow-900 flex flex-col items-center justify-center p-4">
+  <div class="min-h-screen bg-gradient-to-br from-black via-orange-900 to-yellow-900 flex flex-col items-center justify-start pt-8 p-4">
     <!-- Titre -->
-    <h1 class="text-4xl md:text-6xl font-bold text-yellow-400 mb-8 text-center animate-pulse drop-shadow-[0_0_30px_rgba(251,191,36,0.5)]">
+    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-yellow-400 mb-4 sm:mb-6 md:mb-8 text-center animate-pulse drop-shadow-[0_0_30px_rgba(251,191,36,0.5)]">
       {{ $t('renegade.title') }}
     </h1>
     
     <!-- Compte à rebours -->
-    <div class="bg-black/50 backdrop-blur-md rounded-2xl p-8 mb-8 shadow-2xl border border-orange-800/30">
-      <h2 class="text-xl md:text-2xl text-orange-200 mb-6 text-center">
+    <div class="bg-black/50 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8 shadow-2xl border border-orange-800/30 w-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-4xl">
+      <h2 class="text-base sm:text-lg md:text-xl lg:text-2xl text-orange-200 mb-3 sm:mb-4 md:mb-6 text-center px-2">
         {{ $t('renegade.countdown_title') }}
       </h2>
       
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-        <div class="bg-gradient-to-b from-orange-800/50 to-red-900/50 rounded-lg p-4 border border-orange-600/30">
-          <div class="text-3xl md:text-5xl font-bold text-yellow-400 drop-shadow-lg">{{ timeRemaining.days }}</div>
-          <div class="text-sm md:text-base text-orange-200 mt-1">{{ $t('renegade.days') }}</div>
+      <div class="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-6 text-center">
+        <div class="bg-gradient-to-b from-orange-800/50 to-red-900/50 rounded-lg p-2 sm:p-3 md:p-4 border border-orange-600/30">
+          <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-yellow-400 drop-shadow-lg whitespace-nowrap">{{ timeRemaining.hours }}</div>
+          <div class="text-xs sm:text-sm md:text-base lg:text-lg text-orange-200 mt-0.5 sm:mt-1">{{ $t('renegade.hours') }}</div>
         </div>
         
-        <div class="bg-gradient-to-b from-orange-800/50 to-red-900/50 rounded-lg p-4 border border-orange-600/30">
-          <div class="text-3xl md:text-5xl font-bold text-yellow-400 drop-shadow-lg">{{ timeRemaining.hours }}</div>
-          <div class="text-sm md:text-base text-orange-200 mt-1">{{ $t('renegade.hours') }}</div>
+        <div class="bg-gradient-to-b from-orange-800/50 to-red-900/50 rounded-lg p-2 sm:p-3 md:p-4 border border-orange-600/30">
+          <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-yellow-400 drop-shadow-lg whitespace-nowrap">{{ timeRemaining.minutes }}</div>
+          <div class="text-xs sm:text-sm md:text-base lg:text-lg text-orange-200 mt-0.5 sm:mt-1">{{ $t('renegade.minutes') }}</div>
         </div>
         
-        <div class="bg-gradient-to-b from-orange-800/50 to-red-900/50 rounded-lg p-4 border border-orange-600/30">
-          <div class="text-3xl md:text-5xl font-bold text-yellow-400 drop-shadow-lg">{{ timeRemaining.minutes }}</div>
-          <div class="text-sm md:text-base text-orange-200 mt-1">{{ $t('renegade.minutes') }}</div>
-        </div>
-        
-        <div class="bg-gradient-to-b from-orange-800/50 to-red-900/50 rounded-lg p-4 border border-orange-600/30">
-          <div class="text-3xl md:text-5xl font-bold text-yellow-400 drop-shadow-lg">{{ timeRemaining.seconds }}</div>
-          <div class="text-sm md:text-base text-orange-200 mt-1">{{ $t('renegade.seconds') }}</div>
+        <div class="bg-gradient-to-b from-orange-800/50 to-red-900/50 rounded-lg p-2 sm:p-3 md:p-4 border border-orange-600/30">
+          <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-yellow-400 drop-shadow-lg whitespace-nowrap">{{ timeRemaining.seconds }}</div>
+          <div class="text-xs sm:text-sm md:text-base lg:text-lg text-orange-200 mt-0.5 sm:mt-1">{{ $t('renegade.seconds') }}</div>
         </div>
       </div>
     </div>
     
     <!-- Vidéo YouTube -->
-    <div class="w-full max-w-4xl mx-auto px-4">
-      <div class="relative aspect-video w-full rounded-2xl shadow-2xl overflow-hidden bg-black border border-orange-800/30">
+    <div class="w-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-4xl mx-auto px-2 sm:px-4">
+      <div class="relative aspect-video w-full rounded-lg sm:rounded-xl md:rounded-2xl shadow-2xl overflow-hidden bg-black border border-orange-800/30">
         <iframe
           class="absolute inset-0 w-full h-full"
           src="https://www.youtube.com/embed/947Bhwl4rAI?rel=0"
