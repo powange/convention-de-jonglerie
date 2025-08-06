@@ -223,7 +223,11 @@ const languageConfig = {
   fr: { name: 'Français', flag: 'fi fi-fr' },
   en: { name: 'English', flag: 'fi fi-gb' },
   es: { name: 'Español', flag: 'fi fi-es' },
-  de: { name: 'Deutsch', flag: 'fi fi-de' }
+  de: { name: 'Deutsch', flag: 'fi fi-de' },
+  it: { name: 'Italiano', flag: 'fi fi-it' },
+  pt: { name: 'Português', flag: 'fi fi-pt' },
+  da: { name: 'Dansk', flag: 'fi fi-dk' },
+  pl: { name: 'Polski', flag: 'fi fi-pl' }
 };
 
 // Langue courante avec son drapeau
