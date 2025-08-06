@@ -204,15 +204,17 @@ const { t } = useI18n();
 const { getTranslatedServicesByCategory } = useTranslatedConventionServices();
 
 const editionId = parseInt(route.params.id as string);
-const edition = ref<Edition | null>(null);
+const edition = computed(() => editionStore.getEditionById(editionId));
 const showImageOverlay = ref(false);
 const { normalizeImageUrl } = useImageUrl();
 
 onMounted(async () => {
-  try {
-    edition.value = await editionStore.fetchEditionById(editionId);
-  } catch (error) {
-    console.error('Failed to fetch edition:', error);
+  if (!edition.value) {
+    try {
+      await editionStore.fetchEditionById(editionId);
+    } catch (error) {
+      console.error('Failed to fetch edition:', error);
+    }
   }
 });
 
@@ -223,8 +225,6 @@ const isFavorited = computed(() => (_editionId: number) => {
 const toggleFavorite = async (id: number) => {
   try {
     await editionStore.toggleFavorite(id);
-    // Recharger l'édition pour mettre à jour l'état des favoris
-    edition.value = await editionStore.fetchEditionById(editionId);
     toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'green' });
   } catch (e: unknown) {
     const errorMessage = (e && typeof e === 'object' && 'statusMessage' in e && typeof e.statusMessage === 'string') 

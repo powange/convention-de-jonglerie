@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
           },
         },
       });
-      return { message: 'Edition removed from favorites' };
+      return { message: 'Edition removed from favorites', isFavorited: false };
     } else {
       // Add to favorites
       await prisma.user.update({
@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
           },
         },
       });
-      return { message: 'Edition added to favorites' };
+      return { message: 'Edition added to favorites', isFavorited: true };
     }
   } catch {
     throw createError({

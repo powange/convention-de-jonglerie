@@ -281,7 +281,6 @@ const isFavorited = (editionId: number) => {
 const toggleFavorite = async (id: number) => {
   try {
     await editionStore.toggleFavorite(id)
-    await editionStore.fetchEditionById(editionId.value)
     toast.add({ 
       title: t('messages.favorite_status_updated'), 
       icon: 'i-heroicons-check-circle', 

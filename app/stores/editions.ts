@@ -216,24 +216,67 @@ export const useEditionStore = defineStore('editions', {
     },
 
     async toggleFavorite(id: number) {
-      this.loading = true;
       this.error = null;
       const authStore = useAuthStore();
+      const currentUser = authStore.user;
+      
+      // Optimistic update - mise à jour locale immédiate
+      const editionIndex = this.editions.findIndex(e => e.id === id);
+      if (editionIndex !== -1 && currentUser) {
+        const edition = this.editions[editionIndex];
+        const isFavorited = edition.favoritedBy.some(u => u.id === currentUser.id);
+        
+        if (isFavorited) {
+          // Retirer des favoris
+          edition.favoritedBy = edition.favoritedBy.filter(u => u.id !== currentUser.id);
+        } else {
+          // Ajouter aux favoris
+          edition.favoritedBy.push({
+            id: currentUser.id,
+            email: currentUser.email,
+            pseudo: currentUser.pseudo
+          });
+        }
+      }
+      
       try {
-        await $fetch(`/api/editions/${id}/favorite`, {
+        // Appel API en arrière-plan
+        const response = await $fetch(`/api/editions/${id}/favorite`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${authStore.token}`,
           },
         });
-        // Re-fetch editions to update favorite status
-        await this.fetchEditions();
+        
+        // Mettre à jour avec la réponse du serveur si nécessaire
+        if (response && editionIndex !== -1) {
+          // Si le serveur renvoie l'édition mise à jour, l'utiliser
+          if (response.edition) {
+            this.editions[editionIndex] = response.edition;
+          }
+        }
       } catch (e: unknown) {
+        // En cas d'erreur, annuler l'optimistic update
+        if (editionIndex !== -1 && currentUser) {
+          const edition = this.editions[editionIndex];
+          const isFavorited = edition.favoritedBy.some(u => u.id === currentUser.id);
+          
+          if (isFavorited) {
+            // Si on avait ajouté, on retire
+            edition.favoritedBy = edition.favoritedBy.filter(u => u.id !== currentUser.id);
+          } else {
+            // Si on avait retiré, on remet
+            edition.favoritedBy.push({
+              id: currentUser.id,
+              email: currentUser.email,
+              pseudo: currentUser.pseudo
+            });
+          }
+        }
+        
         const error = e as HttpError;
         this.error = error.message || error.data?.message || 'Failed to toggle favorite';
         throw e;
-      } finally {
-        this.loading = false;
       }
     },
 
