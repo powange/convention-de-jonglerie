@@ -223,21 +223,22 @@ const cleanupMap = () => {
 const { formatDateTimeRange } = useDateFormat();
 
 const formatDateRange = (startDate: string, endDate: string) => {
+  const { locale } = useI18n();
   const start = new Date(startDate);
   const end = new Date(endDate);
   
   if (start.toDateString() === end.toDateString()) {
-    return start.toLocaleDateString('fr-FR', { 
+    return start.toLocaleDateString(locale.value, { 
       day: 'numeric', 
       month: 'short', 
       year: 'numeric' 
     });
   }
   
-  return `${start.toLocaleDateString('fr-FR', { 
+  return `${start.toLocaleDateString(locale.value, { 
     day: 'numeric', 
     month: 'short' 
-  })} - ${end.toLocaleDateString('fr-FR', { 
+  })} - ${end.toLocaleDateString(locale.value, { 
     day: 'numeric', 
     month: 'short', 
     year: 'numeric' 

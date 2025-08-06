@@ -24,7 +24,7 @@
             <div v-if="edition.imageUrl" class="flex-shrink-0 self-center sm:self-start">
               <img 
                 :src="normalizeImageUrl(edition.imageUrl)" 
-                :alt="`Affiche de ${getEditionDisplayName(edition)}`" 
+                :alt="t('editions.poster_of', { name: getEditionDisplayName(edition) })" 
                 class="w-full sm:w-48 h-auto sm:h-48 max-w-xs object-cover rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity" 
                 @click="showImageOverlay = true"
               >
@@ -164,7 +164,7 @@
           <div class="relative max-w-6xl max-h-[90vh]">
             <img 
               :src="normalizeImageUrl(edition.imageUrl)" 
-              :alt="`Affiche de ${getEditionDisplayName(edition)}`" 
+              :alt="t('editions.poster_of', { name: getEditionDisplayName(edition) })" 
               class="max-w-full max-h-[90vh] object-contain rounded-lg"
               @click.stop
             >

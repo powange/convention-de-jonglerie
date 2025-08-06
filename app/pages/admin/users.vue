@@ -346,7 +346,7 @@ const sortOptions = [
 
 // Fonctions utilitaires
 const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString('fr-FR', {
+  return new Date(date).toLocaleDateString(undefined, {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'
@@ -398,12 +398,12 @@ const getUserActions = (user: AdminUser): DropdownMenuItem[] => {
 // Fonctions d'action
 const promoteToAdmin = async (user: AdminUser) => {
   // TODO: Implémenter la promotion
-  console.log('Promouvoir:', user)
+  console.log('Promote:', user)
 }
 
 const demoteFromAdmin = async (user: AdminUser) => {
   // TODO: Implémenter la rétrogradation
-  console.log('Rétrograder:', user)
+  console.log('Demote:', user)
 }
 
 // Recherche avec debounce
@@ -453,7 +453,7 @@ const fetchUsers = async () => {
     pagination.value = data.pagination
     
   } catch (error: any) {
-    console.error('Erreur lors du chargement des utilisateurs:', error)
+    console.error('Error loading users:', error)
     
     // Si erreur d'authentification, rediriger vers login
     if (error?.statusCode === 401 || error?.status === 401) {

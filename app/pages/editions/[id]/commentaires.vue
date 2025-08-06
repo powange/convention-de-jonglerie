@@ -183,7 +183,7 @@ const submitNewPost = async () => {
       color: 'success'
     });
   } catch (error: any) {
-    console.error('Erreur lors de la création du post:', error);
+    console.error('Error creating post:', error);
     toast.add({
       title: t('common.error'),
       description: error.data?.message || t('errors.cannot_publish_comment'),
@@ -244,7 +244,7 @@ const addComment = async (postId: number, content: string) => {
       color: 'success'
     });
   } catch (error: any) {
-    console.error('Erreur lors de la création du commentaire:', error);
+    console.error('Error creating comment:', error);
     toast.add({
       title: t('common.error'),
       description: t('errors.cannot_publish_reply'),
@@ -305,7 +305,7 @@ onMounted(async () => {
         editionStore.editions[existingIndex] = fetchedEdition;
       }
     } catch (error) {
-      console.error('Erreur lors du chargement de l\'édition:', error);
+      console.error('Error loading edition:', error);
     }
   }
   await loadPosts();

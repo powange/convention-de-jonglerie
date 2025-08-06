@@ -8,6 +8,9 @@
     "dashboard_subtitle": "Dashboard and platform administration tools",
     "total_users": "Total Users",
     "new_users_this_month": "+{count} this month",
+    "new_conventions_this_month": "+{count} this month",
+    "new_editions_this_month": "+{count} this month",
+    "active_administrators": "Active administrators",
     "conventions": "Conventions",
     "editions": "Editions",
     "user_management": "User management",
@@ -53,7 +56,19 @@
     "cannot_load_users": "Cannot load users",
     "view_all_users": "View all users",
     "recent_activity": "Recent activity",
-    "view_activity": "View activity"
+    "view_activity": "View activity",
+    "administration_tools": "Administration Tools",
+    "view_profiles": "View profiles",
+    "filter_sort": "Filter and sort",
+    "system_settings": "System Settings",
+    "system_settings_description": "General platform configuration",
+    "advanced_statistics": "Advanced Statistics",
+    "advanced_statistics_description": "Detailed reports and analytics",
+    "coming_soon": "Coming soon",
+    "loading_activity": "Loading recent activity...",
+    "no_recent_activity": "No recent activity",
+    "cannot_load_stats": "Cannot load statistics",
+    "cannot_load_activity": "Cannot load recent activity"
   },
   "navigation": {
     "home": "Home",
@@ -86,7 +101,15 @@
     "upcoming_editions": "Upcoming editions",
     "no_editions_found": "No editions found",
     "no_editions_description": "No editions match your search criteria.",
-    "loading_editions": "Loading editions..."
+    "loading_editions": "Loading editions...",
+    "period": "Period",
+    "finished_editions": "Finished editions",
+    "current_editions": "Current editions",
+    "searched_services": "Searched services",
+    "grid": "Grid",
+    "map": "Map",
+    "no_conventions_match_criteria": "No conventions match your search criteria",
+    "no_conventions_found": "No conventions found. Be the first to add one!"
   },
   "common": {
     "welcome": "Welcome",
@@ -133,7 +156,13 @@
     "tip": "Tip",
     "favorite": "Favorite",
     "view_details": "View details",
-    "back": "Back"
+    "back": "Back",
+    "private": "Private"
+  },
+  "dates": {
+    "same_day_with_time": "On {date} from {startTime} to {endTime}",
+    "date_range_with_time": "From {startDate} to {endDate}",
+    "date_range": "From {startDate} to {endDate}"
   },
   "auth": {
     "login_title": "Login",
@@ -152,6 +181,12 @@
     "password_placeholder": "Your password",
     "show_password": "Show password",
     "hide_password": "Hide password",
+    "forgot_password_link": "Forgot password?",
+    "login_button": "Sign In",
+    "login_button_loading": "Signing in...",
+    "no_account_question": "Don't have an account yet?",
+    "register_link": "Sign up",
+    "connection_problem": "Connection problem? Contact support.",
     "register_subtitle": "Join the juggling community",
     "email_access_required": "Access to your email box required",
     "verification_email_notice": "You will receive a verification code by email to complete your registration.",
@@ -199,7 +234,25 @@
     "logging_out": "Logging out...",
     "logout_success_message": "Logout successful!",
     "personal_account_only": "Personal account only",
-    "personal_account_description": "This account must represent a natural person, not a structure or association."
+    "personal_account_description": "This account must represent a natural person, not a structure or association.",
+    "personal_information": "Personal Information",
+    "account_information": "Account Information",
+    "private_info_notice": "This information will not be publicly visible",
+    "last_name_placeholder": "Your last name",
+    "password_placeholder_secure": "Choose a secure password",
+    "email_placeholder": "your.email{'@'}example.com",
+    "username_public_hint": "Publicly visible to other users",
+    "email_private_hint": "Private - not publicly visible",
+    "confirm_password_placeholder": "Confirm your password",
+    "create_account": "Create my account",
+    "creating_account": "Creating account...",
+    "password_weak": "Weak password",
+    "password_medium": "Medium password",
+    "password_strong": "Strong password",
+    "password_very_strong": "Very strong password",
+    "reset_link_expired": "This reset link has expired",
+    "reset_link_used": "This link has already been used to reset the password",
+    "invalid_code": "Invalid code"
   },
   "editions": {
     "title": "Editions",
@@ -255,7 +308,9 @@
     "admin": "Admin",
     "edition_creator": "Edition creator",
     "collaborator": "Collaborator",
-    "of_convention": "of the convention"
+    "of_convention": "of the convention",
+    "enlarged_image": "Enlarged image",
+    "poster_of": "Poster of {name}"
   },
   "conventions": {
     "title": "Conventions",
@@ -428,7 +483,9 @@
     "reply_published_successfully": "Your reply has been successfully published",
     "reply_deleted": "Reply deleted",
     "reply_deleted_successfully": "The reply has been successfully deleted",
-    "edition_created_successfully": "The edition has been successfully created"
+    "edition_created_successfully": "The edition has been successfully created",
+    "convention_updated": "Convention updated!",
+    "convention_updated_desc": "The convention \"{name}\" has been successfully updated"
   },
   "forms": {
     "placeholders": {
@@ -441,6 +498,7 @@
       "address_complement": "Building A, Function room...",
       "select_date": "Select a date",
       "departure_details": "e.g.: Lyon Station, Republic Square, A6 Toll...",
+      "search_by_name": "Search by name",
       "carpool_offer_details": "e.g.: I'm leaving from Porte d'Orléans, possibility to pick up on A6. Non-smoking vehicle. Space for juggling equipment.",
       "carpool_request_details": "e.g.: I'm flexible on schedule, can leave Friday evening or Saturday morning. I travel light with just a backpack.",
       "departure_city": "e.g.: Paris, Lyon, Marseille...",
@@ -456,7 +514,9 @@
       "phone_number": "Your phone number",
       "additional_info": "Additional information",
       "edition_name_optional": "Edition name (optional)",
-      "address_complement": "Address complement"
+      "address_complement": "Address complement",
+      "convention_name": "Convention name",
+      "until_date": "Until"
     },
     "buttons": {
       "cancel": "Cancel",
@@ -647,6 +707,7 @@
     },
     "access_denied": {
       "title": "Access denied",
+      "description": "You don't have the rights to access this page.",
       "confirm_delete_edition": "Are you sure you want to delete this edition?"
     },
     "comments": {
@@ -680,6 +741,12 @@
       "loading_convention": "Loading convention data...",
       "convention_not_found_description": "The convention you are looking for does not exist or you don't have the rights to add an edition to it.",
       "submit_button": "Create edition"
+    },
+    "edit_convention": {
+      "editing_convention": "Editing convention \"{name}\"",
+      "loading_convention_data": "Loading convention data...",
+      "convention_not_found_or_no_rights": "The convention you are looking for does not exist or you don't have the rights to edit it.",
+      "submit_button": "Update convention"
     }
   },
   "errors": {
@@ -724,6 +791,7 @@
     "generic_error": "An error occurred",
     "removal_error": "Removal error",
     "leaflet_unavailable": "Leaflet unavailable",
+    "cannot_load_editions": "Cannot load editions",
     "leaflet_loading_error": "Leaflet loading error",
     "addition_error": "Addition error",
     "content_required": "Content is required",
@@ -754,6 +822,11 @@
     "login_required_edition": "You must be logged in to add an edition",
     "edition_add_denied": "You don't have the rights to add an edition to this convention",
     "cannot_load_convention": "Cannot load convention data",
-    "edition_creation_error": "An error occurred while creating the edition"
+    "edition_creation_error": "An error occurred while creating the edition",
+    "convention_creation_error": "An error occurred while creating the convention",
+    "convention_edit_denied": "You don't have the rights to edit this convention",
+    "convention_update_error": "An error occurred while updating the convention",
+    "convention_updated_image_failed": "The convention was updated but the image could not be uploaded",
+    "update_error": "Update error"
   }
 }

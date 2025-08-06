@@ -177,7 +177,9 @@ const handleLogin = async () => {
       errorMessage = t('errors.invalid_credentials');
     } else if (error.statusCode === 403 || error.status === 403) {
       // Email non vérifié
-      const isEmailNotVerified = error.statusMessage?.includes('Email non vérifié') || 
+      const isEmailNotVerified = error.statusMessage?.includes('email not verified') || 
+                                error.message?.includes('email not verified') ||
+                                error.statusMessage?.includes('Email non vérifié') ||
                                 error.message?.includes('Email non vérifié');
       
       // Récupérer les données depuis la structure d'erreur Nuxt

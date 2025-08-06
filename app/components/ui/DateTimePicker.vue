@@ -102,7 +102,11 @@ const {
 const calendarDateValue = shallowRef<CalendarDate | null>(null);
 
 // Formatter pour l'affichage de la date
-const df = new DateFormatter('fr-FR', { dateStyle: 'medium' });
+const { locale } = useI18n();
+const df = computed(() => {
+  const localeCode = locale.value === 'fr' ? 'fr-FR' : 'en-US';
+  return new DateFormatter(localeCode, { dateStyle: 'medium' });
+});
 
 // Synchroniser calendarDate (JS Date) avec calendarDateValue (CalendarDate)
 watch(calendarDate, (newDate) => {

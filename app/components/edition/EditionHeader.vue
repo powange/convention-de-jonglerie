@@ -179,15 +179,16 @@ const isEditionFinished = computed(() => {
 
 // Formatter la plage de dates
 const formatDateRange = (start: string, end: string) => {
+  const { locale } = useI18n();
   const startDate = new Date(start);
   const endDate = new Date(end);
   const options = { day: 'numeric', month: 'long', year: 'numeric' };
   
   if (startDate.toDateString() === endDate.toDateString()) {
-    return startDate.toLocaleDateString('fr-FR', options);
+    return startDate.toLocaleDateString(locale.value, options);
   }
   
-  return `${startDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })} - ${endDate.toLocaleDateString('fr-FR', options)}`;
+  return `${startDate.toLocaleDateString(locale.value, { day: 'numeric', month: 'long' })} - ${endDate.toLocaleDateString(locale.value, options)}`;
 };
 
 // Obtenir le titre de la page selon la page courante

@@ -179,11 +179,11 @@ const { t } = useI18n();
 const schema = z.object({
   newPassword: z.string()
     .min(8, t('errors.password_too_short'))
-    .regex(/(?=.*[A-Z])/, 'Le mot de passe doit contenir au moins une majuscule')
-    .regex(/(?=.*\d)/, 'Le mot de passe doit contenir au moins un chiffre'),
+    .regex(/(?=.*[A-Z])/, t('errors.password_uppercase_required'))
+    .regex(/(?=.*\d)/, t('errors.password_digit_required')),
   confirmPassword: z.string().min(1, t('errors.required_field')),
 }).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Les mots de passe ne correspondent pas",
+  message: t('errors.passwords_dont_match'),
   path: ["confirmPassword"],
 });
 
@@ -258,9 +258,9 @@ onMounted(async () => {
       // Message spécifique selon la raison
       let message = t('auth.invalid_link');
       if (response.reason === 'expired') {
-        message = 'Ce lien de réinitialisation a expiré';
+        message = t('auth.reset_link_expired');
       } else if (response.reason === 'used') {
-        message = 'Ce lien a déjà été utilisé pour réinitialiser le mot de passe';
+        message = t('auth.reset_link_used');
       }
       
       toast.add({
@@ -271,7 +271,7 @@ onMounted(async () => {
       });
     }
   } catch (error) {
-    console.error('Erreur lors de la vérification du token:', error);
+    console.error('Error verifying token:', error);
     invalidToken.value = true;
   }
 });
@@ -299,7 +299,9 @@ const handleSubmit = async () => {
     
   } catch (error: any) {
     if (error.data?.statusMessage?.includes('invalide') || 
-        error.data?.statusMessage?.includes('expiré')) {
+        error.data?.statusMessage?.includes('expiré') ||
+        error.data?.statusMessage?.includes('invalid') ||
+        error.data?.statusMessage?.includes('expired')) {
       invalidToken.value = true;
     } else {
       toast.add({ 

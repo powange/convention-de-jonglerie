@@ -4,15 +4,18 @@
     "description": "Plateforme de découverte et gestion de conventions de jonglerie"
   },
   "admin": {
-    "dashboard": "Dashboard Administrateur",
+    "dashboard": "Tableau de bord Administrateur",
     "dashboard_subtitle": "Tableau de bord et outils d'administration de la plateforme",
-    "total_users": "Total Utilisateurs",
+    "total_users": "Utilisateurs totaux",
     "new_users_this_month": "+{count} ce mois",
+    "new_conventions_this_month": "+{count} ce mois",
+    "new_editions_this_month": "+{count} ce mois",
+    "active_administrators": "Administrateurs actifs",
     "conventions": "Conventions",
     "editions": "Éditions",
     "user_management": "Gestion des utilisateurs",
     "user_management_description": "Liste complète des utilisateurs inscrits sur la plateforme",
-    "search_users_placeholder": "Rechercher par email, pseudo, nom ou prénom...",
+    "search_users_placeholder": "Rechercher par email, pseudo, prénom ou nom...",
     "email_verified": "Email vérifié",
     "super_admins": "Super admins",
     "content_creators": "Ont créé du contenu",
@@ -48,12 +51,24 @@
     "months_ago": "Il y a {count} mois",
     "years_ago": "Il y a {count} ans",
     "view_profile": "Voir le profil",
-    "promote_to_admin": "Promouvoir en super admin",
+    "promote_to_admin": "Promouvoir super admin",
     "demote": "Rétrograder",
     "cannot_load_users": "Impossible de charger les utilisateurs",
     "view_all_users": "Voir tous les utilisateurs",
     "recent_activity": "Activité récente",
-    "view_activity": "Voir l'activité"
+    "view_activity": "Voir l'activité",
+    "administration_tools": "Outils d'Administration",
+    "view_profiles": "Voir les profils",
+    "filter_sort": "Filtrer et trier",
+    "system_settings": "Paramètres Système",
+    "system_settings_description": "Configuration générale de la plateforme",
+    "advanced_statistics": "Statistiques Avancées",
+    "advanced_statistics_description": "Rapports détaillés et analytiques",
+    "coming_soon": "Bientôt disponible",
+    "loading_activity": "Chargement de l'activité récente...",
+    "no_recent_activity": "Aucune activité récente",
+    "cannot_load_stats": "Impossible de charger les statistiques",
+    "cannot_load_activity": "Impossible de charger l'activité récente"
   },
   "navigation": {
     "home": "Accueil",
@@ -86,7 +101,15 @@
     "upcoming_editions": "Éditions à venir",
     "no_editions_found": "Aucune édition trouvée",
     "no_editions_description": "Aucune édition ne correspond à vos critères de recherche.",
-    "loading_editions": "Chargement des éditions..."
+    "loading_editions": "Chargement des éditions...",
+    "period": "Période",
+    "finished_editions": "Éditions terminées",
+    "current_editions": "Éditions en cours",
+    "searched_services": "Services recherchés",
+    "grid": "Grille",
+    "map": "Carte",
+    "no_conventions_match_criteria": "Aucune convention ne correspond à vos critères de recherche",
+    "no_conventions_found": "Aucune convention trouvée. Soyez le premier à en ajouter une !"
   },
   "common": {
     "welcome": "Bienvenue",
@@ -133,7 +156,13 @@
     "tip": "Conseil",
     "favorite": "Favori",
     "view_details": "Voir les détails",
-    "back": "Retour"
+    "back": "Retour",
+    "private": "Privé"
+  },
+  "dates": {
+    "same_day_with_time": "Le {date} de {startTime} à {endTime}",
+    "date_range_with_time": "Du {startDate} au {endDate}",
+    "date_range": "Du {startDate} au {endDate}"
   },
   "auth": {
     "login_title": "Connexion",
@@ -208,7 +237,24 @@
     "first_name_placeholder": "Votre prénom",
     "password_placeholder_secure": "Choisissez un mot de passe sécurisé",
     "personal_account_only": "Compte personnel uniquement",
-    "personal_account_description": "Ce compte doit représenter une personne physique, non une structure ou association."
+    "personal_account_description": "Ce compte doit représenter une personne physique, non une structure ou association.",
+    "personal_information": "Informations personnelles",
+    "account_information": "Informations de compte",
+    "private_info_notice": "Ces informations ne seront pas visibles publiquement",
+    "last_name_placeholder": "Votre nom",
+    "email_placeholder": "votre.email{'@'}example.com",
+    "username_public_hint": "Visible publiquement par les autres utilisateurs",
+    "email_private_hint": "Privée - non visible publiquement",
+    "confirm_password_placeholder": "Confirmez votre mot de passe",
+    "create_account": "Créer mon compte",
+    "creating_account": "Création en cours...",
+    "password_weak": "Mot de passe faible",
+    "password_medium": "Mot de passe moyen",
+    "password_strong": "Mot de passe fort",
+    "password_very_strong": "Mot de passe très fort",
+    "reset_link_expired": "Ce lien de réinitialisation a expiré",
+    "reset_link_used": "Ce lien a déjà été utilisé pour réinitialiser le mot de passe",
+    "invalid_code": "Code invalide"
   },
   "editions": {
     "title": "Éditions",
@@ -264,7 +310,9 @@
     "admin": "Admin",
     "edition_creator": "Créateur de l'édition",
     "collaborator": "Collaborateur",
-    "of_convention": "de la convention"
+    "of_convention": "de la convention",
+    "enlarged_image": "Image agrandie",
+    "poster_of": "Affiche de {name}"
   },
   "conventions": {
     "title": "Conventions",
@@ -437,7 +485,9 @@
     "reply_published_successfully": "Votre réponse a été publiée avec succès",
     "reply_deleted": "Réponse supprimée",
     "reply_deleted_successfully": "La réponse a été supprimée avec succès",
-    "edition_created_successfully": "L'édition a été créée avec succès"
+    "edition_created_successfully": "L'édition a été créée avec succès",
+    "convention_updated": "Convention mise à jour !",
+    "convention_updated_desc": "La convention \"{name}\" a été mise à jour avec succès"
   },
   "errors": {
     "login_failed": "Échec de la connexion",
@@ -520,6 +570,7 @@
     "generic_error": "Une erreur est survenue",
     "removal_error": "Erreur lors du retrait",
     "leaflet_unavailable": "Leaflet non disponible",
+    "cannot_load_editions": "Impossible de charger les éditions",
     "leaflet_loading_error": "Erreur de chargement de Leaflet",
     "addition_error": "Erreur lors de l'ajout",
     "content_required": "Le contenu est requis",
@@ -550,7 +601,12 @@
     "login_required_edition": "Vous devez être connecté pour ajouter une édition",
     "edition_add_denied": "Vous n'avez pas les droits pour ajouter une édition à cette convention",
     "cannot_load_convention": "Impossible de charger les données de la convention",
-    "edition_creation_error": "Une erreur est survenue lors de la création de l'édition"
+    "edition_creation_error": "Une erreur est survenue lors de la création de l'édition",
+    "convention_creation_error": "Une erreur est survenue lors de la création de la convention",
+    "convention_edit_denied": "Vous n'avez pas les droits pour modifier cette convention",
+    "convention_update_error": "Une erreur est survenue lors de la mise à jour de la convention",
+    "convention_updated_image_failed": "La convention a été mise à jour mais l'image n'a pas pu être uploadée",
+    "update_error": "Erreur lors de la mise à jour"
   },
   "forms": {
     "placeholders": {
@@ -563,6 +619,7 @@
       "address_complement": "Bâtiment A, Salle des fêtes...",
       "select_date": "Sélectionner une date",
       "departure_details": "Ex: Gare de Lyon, Place de la République, Péage A6...",
+      "search_by_name": "Rechercher par nom",
       "carpool_offer_details": "Ex: Je pars de la porte d'Orléans, possibilité de récupérer sur l'A6. Véhicule non-fumeur. De la place pour du matériel de jonglage.",
       "carpool_request_details": "Ex: Je suis flexible sur l'horaire, je peux partir le vendredi soir ou samedi matin. Je voyage léger avec juste un sac à dos.",
       "departure_city": "Ex: Paris, Lyon, Marseille...",
@@ -578,7 +635,9 @@
       "phone_number": "Votre numéro de téléphone",
       "additional_info": "Informations complémentaires",
       "edition_name_optional": "Nom de l'édition (optionnel)",
-      "address_complement": "Complément d'adresse"
+      "address_complement": "Complément d'adresse",
+      "convention_name": "Nom de la convention",
+      "until_date": "Jusqu'au"
     },
     "buttons": {
       "cancel": "Annuler",
@@ -738,6 +797,7 @@
     },
     "access_denied": {
       "title": "Accès refusé",
+      "description": "Vous n'avez pas les droits pour accéder à cette page.",
       "confirm_delete_edition": "Êtes-vous sûr de vouloir supprimer cette édition ?"
     },
     "comments": {
@@ -771,6 +831,12 @@
       "loading_convention": "Chargement des données de la convention...",
       "convention_not_found_description": "La convention que vous cherchez n'existe pas ou vous n'avez pas les droits pour y ajouter une édition.",
       "submit_button": "Créer l'édition"
+    },
+    "edit_convention": {
+      "editing_convention": "Modification de la convention \"{name}\"",
+      "loading_convention_data": "Chargement des données de la convention...",
+      "convention_not_found_or_no_rights": "La convention que vous cherchez n'existe pas ou vous n'avez pas les droits pour la modifier.",
+      "submit_button": "Mettre à jour la convention"
     }
   }
 }

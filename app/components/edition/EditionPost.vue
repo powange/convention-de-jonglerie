@@ -266,7 +266,8 @@ const formatDate = (dateString: string) => {
   } else if (diffInDays < 7) {
     return t('common.time_days_ago', { count: diffInDays });
   } else {
-    return date.toLocaleDateString('fr-FR', {
+    const { locale } = useI18n();
+    return date.toLocaleDateString(locale.value, {
       day: 'numeric',
       month: 'short',
       year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined

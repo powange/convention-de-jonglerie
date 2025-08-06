@@ -80,7 +80,7 @@ const handleAddConvention = async (formData: ConventionFormData, file?: File | n
         
         finalConvention = uploadResponse.convention;
       } catch (uploadError: unknown) {
-        console.error('Erreur lors de l\'upload de l\'image:', uploadError);
+        console.error('Error uploading image:', uploadError);
         toast.add({
           title: t('common.warning'),
           description: t('errors.convention_created_image_failed'),
@@ -100,10 +100,10 @@ const handleAddConvention = async (formData: ConventionFormData, file?: File | n
     // Rediriger vers la page des conventions de l'utilisateur
     router.push('/my-conventions');
   } catch (error: unknown) {
-    console.error('Erreur lors de la création de la convention:', error);
+    console.error('Error creating convention:', error);
     
     const httpError = error as HttpError;
-    const errorMessage = httpError.data?.message || httpError.message || 'Une erreur est survenue lors de la création de la convention';
+    const errorMessage = httpError.data?.message || httpError.message || t('errors.convention_creation_error');
     
     toast.add({
       title: t('errors.creation_error'),

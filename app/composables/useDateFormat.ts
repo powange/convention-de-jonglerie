@@ -2,12 +2,14 @@
  * Composable pour formatter les dates avec horaires
  */
 export const useDateFormat = () => {
+  const { locale, t } = useI18n();
+
   /**
    * Formate une date avec l'heure
    */
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleString('fr-FR', {
+    return date.toLocaleString(locale.value, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -21,7 +23,7 @@ export const useDateFormat = () => {
    */
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', {
+    return date.toLocaleDateString(locale.value, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
@@ -37,21 +39,28 @@ export const useDateFormat = () => {
     
     // Si même jour
     if (startDate.toDateString() === endDate.toDateString()) {
-      return `Le ${startDate.toLocaleDateString('fr-FR', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: 'numeric' 
-      })} de ${startDate.toLocaleTimeString('fr-FR', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      })} à ${endDate.toLocaleTimeString('fr-FR', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      })}`;
+      return t('dates.same_day_with_time', {
+        date: startDate.toLocaleDateString(locale.value, { 
+          day: '2-digit', 
+          month: '2-digit', 
+          year: 'numeric' 
+        }),
+        startTime: startDate.toLocaleTimeString(locale.value, { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        }),
+        endTime: endDate.toLocaleTimeString(locale.value, { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        })
+      });
     }
     
     // Si différents jours
-    return `Du ${formatDateTime(startString)} au ${formatDateTime(endString)}`;
+    return t('dates.date_range_with_time', {
+      startDate: formatDateTime(startString),
+      endDate: formatDateTime(endString)
+    });
   };
 
   /**
@@ -65,7 +74,10 @@ export const useDateFormat = () => {
       return formatDate(startString);
     }
     
-    return `Du ${formatDate(startString)} au ${formatDate(endString)}`;
+    return t('dates.date_range', {
+      startDate: formatDate(startString),
+      endDate: formatDate(endString)
+    });
   };
 
   return {

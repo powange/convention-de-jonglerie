@@ -145,7 +145,8 @@ const canEdit = computed(() => {
 });
 
 const formatDate = (date: string) => {
-  return new Date(date).toLocaleString('fr-FR', {
+  const { locale } = useI18n();
+  return new Date(date).toLocaleString(locale.value, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',

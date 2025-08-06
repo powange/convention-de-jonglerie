@@ -50,16 +50,16 @@
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
-                Informations personnelles
+                {{ $t('auth.personal_information') }}
               </h3>
               <div class="flex items-center gap-1">
                 <UIcon name="i-heroicons-eye-slash" class="w-3 h-3 text-gray-400" />
-                <span class="text-xs text-gray-500 dark:text-gray-400">Privé</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">{{ $t('common.private') }}</span>
               </div>
             </div>
             <div class="border-b border-gray-200 dark:border-gray-700 pb-2 mb-4">
               <p class="text-xs text-gray-500 dark:text-gray-400">
-                Ces informations ne seront pas visibles publiquement
+                {{ $t('auth.private_info_notice') }}
               </p>
             </div>
             
@@ -73,11 +73,11 @@
                   class="w-full"
                 />
               </UFormField>
-              <UFormField label="Nom" name="nom">
+              <UFormField :label="$t('auth.last_name')" name="nom">
                 <UInput 
                   v-model="state.nom" 
                   required 
-                  placeholder="Votre nom"
+                  :placeholder="$t('auth.last_name_placeholder')"
                   icon="i-heroicons-user"
                   class="w-full"
                 />
@@ -89,27 +89,27 @@
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
-                Informations de compte
+                {{ $t('auth.account_information') }}
               </h3>
             </div>
             <div class="border-b border-gray-200 dark:border-gray-700 pb-2 mb-4"></div>
             
-            <UFormField label="Adresse e-mail" name="email" hint="Privée - non visible publiquement">
+            <UFormField :label="$t('common.email')" name="email" :hint="$t('auth.email_private_hint')">
               <UInput 
                 v-model="state.email" 
                 type="email" 
                 required 
-                placeholder="votre.email@example.com"
+                :placeholder="$t('auth.email_placeholder')"
                 icon="i-heroicons-envelope"
                 class="w-full"
               />
             </UFormField>
             
-            <UFormField label="Pseudo" name="pseudo" hint="Visible publiquement par les autres utilisateurs">
+            <UFormField :label="$t('auth.username')" name="pseudo" :hint="$t('auth.username_public_hint')">
               <UInput 
                 v-model="state.pseudo" 
                 required 
-                placeholder="Votre pseudo unique"
+                :placeholder="$t('auth.username_placeholder')"
                 icon="i-heroicons-at-symbol"
                 class="w-full"
               />
@@ -119,10 +119,10 @@
           <!-- Section Sécurité -->
           <div class="space-y-4">
             <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
-              Mot de passe
+              {{ $t('common.password') }}
             </h3>
             
-            <UFormField label="Mot de passe" name="password">
+            <UFormField :label="$t('common.password')" name="password">
               <UInput 
                 v-model="state.password" 
                 :type="showPassword ? 'text' : 'password'" 
@@ -138,7 +138,7 @@
                     variant="link"
                     size="sm"
                     :icon="showPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
-                    :aria-label="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                    :aria-label="showPassword ? $t('auth.hide_password') : $t('auth.show_password')"
                     :aria-pressed="showPassword"
                     @click="showPassword = !showPassword"
                   />
@@ -160,12 +160,12 @@
               </div>
             </UFormField>
             
-            <UFormField label="Confirmer le mot de passe" name="confirmPassword">
+            <UFormField :label="$t('auth.confirm_password')" name="confirmPassword">
               <UInput 
                 v-model="state.confirmPassword" 
                 :type="showConfirmPassword ? 'text' : 'password'" 
                 required 
-                placeholder="Confirmez votre mot de passe"
+                :placeholder="$t('auth.confirm_password_placeholder')"
                 icon="i-heroicons-shield-check"
                 class="w-full"
                 :ui="{ trailing: 'pe-1' }"
@@ -176,7 +176,7 @@
                     variant="link"
                     size="sm"
                     :icon="showConfirmPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
-                    :aria-label="showConfirmPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                    :aria-label="showConfirmPassword ? $t('auth.hide_password') : $t('auth.show_password')"
                     :aria-pressed="showConfirmPassword"
                     @click="showConfirmPassword = !showConfirmPassword"
                   />
@@ -194,19 +194,19 @@
             class="mt-8"
             icon="i-heroicons-user-plus"
           >
-            {{ loading ? 'Création en cours...' : 'Créer mon compte' }}
+            {{ loading ? $t('auth.creating_account') : $t('auth.create_account') }}
           </UButton>
         </UForm>
 
         <!-- Lien de connexion -->
         <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
           <p class="text-center text-sm text-gray-600 dark:text-gray-400">
-            Déjà un compte ? 
+            {{ $t('auth.already_account') }} 
             <NuxtLink 
               to="/login" 
               class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
             >
-              Se connecter
+              {{ $t('navigation.login') }}
             </NuxtLink>
           </p>
         </div>
@@ -282,13 +282,13 @@ const getPasswordStrengthText = () => {
   switch (strength) {
     case 0:
     case 1:
-      return 'Mot de passe faible';
+      return t('auth.password_weak');
     case 2:
-      return 'Mot de passe moyen';
+      return t('auth.password_medium');
     case 3:
-      return 'Mot de passe fort';
+      return t('auth.password_strong');
     case 4:
-      return 'Mot de passe très fort';
+      return t('auth.password_very_strong');
     default:
       return '';
   }

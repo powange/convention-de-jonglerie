@@ -356,9 +356,9 @@ const fetchMyConventions = async () => {
       }
     }
   } catch (error) {
-    console.error('Erreur lors de la récupération des conventions:', error);
+    console.error('Error fetching conventions:', error);
     toast.add({ 
-      title: 'Erreur', 
+      title: t('common.error'), 
       description: t('conventions.cannot_load_conventions'),
       icon: 'i-heroicons-exclamation-triangle', 
       color: 'error' 
@@ -390,7 +390,7 @@ const deleteConvention = async (id: number) => {
       await fetchMyConventions();
     } catch (error: unknown) {
       const httpError = error as HttpError;
-      console.error('Erreur lors de la suppression de la convention:', error);
+      console.error('Error deleting convention:', error);
       toast.add({ 
         title: t('errors.deletion_error'), 
         description: httpError.data?.message || httpError.message || t('errors.server_error'),

@@ -4,35 +4,35 @@
       <template #header>
         <div class="flex items-center gap-3">
           <UIcon name="i-heroicons-pencil" class="text-warning-500" size="24" />
-          <h1 class="text-2xl font-bold">Modifier la convention</h1>
+          <h1 class="text-2xl font-bold">{{ $t('conventions.edit') }}</h1>
         </div>
         <p v-if="convention" class="text-gray-600 mt-2">
-          Modification de la convention "{{ convention.name }}"
+          {{ $t('pages.edit_convention.editing_convention', { name: convention.name }) }}
         </p>
       </template>
       
       <div v-if="loading" class="text-center py-8">
         <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto mb-4" size="24" />
-        <p>Chargement des données de la convention...</p>
+        <p>{{ $t('pages.edit_convention.loading_convention_data') }}</p>
       </div>
       
       <div v-else-if="!convention" class="text-center py-8">
         <UIcon name="i-heroicons-exclamation-triangle" class="mx-auto mb-4 text-error-500" size="24" />
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Convention introuvable</h3>
-        <p class="text-gray-500 mb-4">La convention que vous cherchez n'existe pas ou vous n'avez pas les droits pour la modifier.</p>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ $t('conventions.convention_not_found') }}</h3>
+        <p class="text-gray-500 mb-4">{{ $t('pages.edit_convention.convention_not_found_or_no_rights') }}</p>
         <UButton 
           icon="i-heroicons-arrow-left" 
           variant="outline" 
           @click="router.back()"
         >
-          Retour
+          {{ $t('common.back') }}
         </UButton>
       </div>
       
       <ConventionForm 
         v-else
         :initial-data="convention"
-        submit-button-text="Mettre à jour la convention" 
+        :submit-button-text="$t('pages.edit_convention.submit_button')" 
         :loading="updating" 
         @submit="handleUpdateConvention"
         @cancel="handleCancel"
@@ -57,6 +57,7 @@ const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 const toast = useToast();
+const { t } = useI18n();
 
 const conventionId = parseInt(route.params.id as string);
 const convention = ref<Convention | null>(null);
@@ -66,8 +67,8 @@ const updating = ref(false);
 onMounted(async () => {
   if (!authStore.token) {
     toast.add({
-      title: 'Erreur d\'authentification',
-      description: 'Vous devez être connecté pour modifier une convention',
+      title: t('errors.authentication_error'),
+      description: t('errors.login_required_convention'),
       icon: 'i-heroicons-exclamation-triangle',
       color: 'error'
     });
@@ -97,22 +98,22 @@ onMounted(async () => {
     
     if (errorStatus === 404) {
       toast.add({
-        title: 'Convention introuvable',
-        description: 'La convention que vous cherchez n\'existe pas',
+        title: t('conventions.convention_not_found'),
+        description: t('conventions.convention_not_found_description'),
         icon: 'i-heroicons-exclamation-triangle',
         color: 'error'
       });
     } else if (errorStatus === 403) {
       toast.add({
-        title: 'Accès refusé',
-        description: 'Vous n\'avez pas les droits pour modifier cette convention',
+        title: t('pages.access_denied.title'),
+        description: t('errors.convention_edit_denied'),
         icon: 'i-heroicons-exclamation-triangle',
         color: 'error'
       });
     } else {
       toast.add({
-        title: 'Erreur de chargement',
-        description: 'Impossible de charger les données de la convention',
+        title: t('errors.loading_error'),
+        description: t('errors.cannot_load_convention'),
         icon: 'i-heroicons-exclamation-triangle',
         color: 'error'
       });
@@ -125,8 +126,8 @@ onMounted(async () => {
 const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'createdAt' | 'updatedAt' | 'authorId' | 'author'>, file?: File | null) => {
   if (!authStore.token) {
     toast.add({
-      title: 'Erreur d\'authentification',
-      description: 'Vous devez être connecté pour modifier une convention',
+      title: t('errors.authentication_error'),
+      description: t('errors.login_required_convention'),
       icon: 'i-heroicons-exclamation-triangle',
       color: 'error'
     });
@@ -162,10 +163,10 @@ const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'created
         
         finalConvention = uploadResponse.convention;
       } catch (uploadError: unknown) {
-        console.error('Erreur lors de l\'upload de l\'image:', uploadError);
+        console.error('Error uploading image:', uploadError);
         toast.add({
-          title: 'Avertissement',
-          description: 'La convention a été mise à jour mais l\'image n\'a pas pu être uploadée',
+          title: t('common.warning'),
+          description: t('errors.convention_updated_image_failed'),
           icon: 'i-heroicons-exclamation-triangle',
           color: 'warning'
         });
@@ -175,8 +176,8 @@ const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'created
     convention.value = finalConvention;
 
     toast.add({
-      title: 'Convention mise à jour !',
-      description: `La convention "${finalConvention.name}" a été mise à jour avec succès`,
+      title: t('messages.convention_updated'),
+      description: t('messages.convention_updated_desc', { name: finalConvention.name }),
       icon: 'i-heroicons-check-circle',
       color: 'success'
     });
@@ -184,9 +185,9 @@ const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'created
     // Rediriger vers la page des conventions de l'utilisateur
     router.push('/my-conventions');
   } catch (error: unknown) {
-    console.error('Erreur lors de la mise à jour de la convention:', error);
+    console.error('Error updating convention:', error);
     
-    let errorMessage = 'Une erreur est survenue lors de la mise à jour de la convention';
+    let errorMessage = t('errors.convention_update_error');
     if (error && typeof error === 'object') {
       if ('data' in error && error.data && typeof error.data === 'object' && 'message' in error.data) {
         errorMessage = String(error.data.message);
@@ -196,7 +197,7 @@ const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'created
     }
     
     toast.add({
-      title: 'Erreur lors de la mise à jour',
+      title: t('errors.update_error'),
       description: errorMessage,
       icon: 'i-heroicons-x-circle',
       color: 'error'

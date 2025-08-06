@@ -134,7 +134,7 @@ const handleAddEdition = async (data: EditionFormData) => {
     // Rediriger vers la page des conventions de l'utilisateur
     router.push('/my-conventions');
   } catch (error: unknown) {
-    console.error('Erreur lors de la création de l\'édition:', error);
+    console.error('Error creating edition:', error);
     
     const httpError = error as HttpError;
     const errorMessage = httpError.data?.message || httpError.message || t('errors.edition_creation_error');

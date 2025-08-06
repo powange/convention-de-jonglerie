@@ -245,18 +245,20 @@ const formatDateRange = (startDate: string, endDate: string) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
   
+  const { locale } = useI18n();
+  
   if (start.toDateString() === end.toDateString()) {
-    return start.toLocaleDateString('fr-FR', { 
+    return start.toLocaleDateString(locale.value, { 
       day: 'numeric', 
       month: 'long', 
       year: 'numeric' 
     });
   }
   
-  return `${start.toLocaleDateString('fr-FR', { 
+  return `${start.toLocaleDateString(locale.value, { 
     day: 'numeric', 
     month: 'short' 
-  })} - ${end.toLocaleDateString('fr-FR', { 
+  })} - ${end.toLocaleDateString(locale.value, { 
     day: 'numeric', 
     month: 'short', 
     year: 'numeric' 

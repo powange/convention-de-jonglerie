@@ -22,17 +22,17 @@
 
             <!-- Filtres de recherche -->
             <div class="space-y-4">
-              <UFormField label="Nom de la convention" name="name">
-                <UInput v-model="filters.name" placeholder="Rechercher par nom" />
+              <UFormField :label="$t('forms.labels.convention_name')" name="name">
+                <UInput v-model="filters.name" :placeholder="$t('forms.placeholders.search_by_name')" />
               </UFormField>
-              <UFormField label="Pays" name="countries">
+              <UFormField :label="$t('common.country')" name="countries">
                 <CountryMultiSelect v-model="filters.countries" :placeholder="$t('forms.placeholders.select_countries')" />
               </UFormField>
             </div>
             
             <!-- Filtres de dates -->
             <div class="space-y-4">
-              <h4 class="font-medium text-gray-700">Dates :</h4>
+              <h4 class="font-medium text-gray-700">{{ $t('common.dates') }} :</h4>
               <UFormField :label="$t('forms.labels.from_date')" name="startDate">
                 <UPopover :popper="{ placement: 'bottom-start' }">
                   <UButton 
@@ -51,7 +51,7 @@
                   </template>
                 </UPopover>
               </UFormField>
-              <UFormField label="Jusqu'au" name="endDate">
+              <UFormField :label="$t('forms.labels.until_date')" name="endDate">
                 <UPopover :popper="{ placement: 'bottom-start' }">
                   <UButton 
                     color="neutral" 
@@ -74,13 +74,13 @@
             
             <!-- Filtre temporel -->
             <div class="space-y-4">
-              <h4 class="font-medium text-gray-700">Période :</h4>
+              <h4 class="font-medium text-gray-700">{{ $t('homepage.period') }} :</h4>
               <div class="space-y-3">
                 <UCheckbox v-model="filters.showPast" name="showPast">
                   <template #label>
                     <div class="flex items-center gap-2">
                       <span class="text-base">✅</span>
-                      <span>Éditions terminées</span>
+                      <span>{{ $t('homepage.finished_editions') }}</span>
                     </div>
                   </template>
                 </UCheckbox>
@@ -88,7 +88,7 @@
                   <template #label>
                     <div class="flex items-center gap-2">
                       <span class="text-base">🔥</span>
-                      <span>Éditions en cours</span>
+                      <span>{{ $t('homepage.current_editions') }}</span>
                     </div>
                   </template>
                 </UCheckbox>
@@ -96,7 +96,7 @@
                   <template #label>
                     <div class="flex items-center gap-2">
                       <span class="text-base">🔄</span>
-                      <span>Éditions à venir</span>
+                      <span>{{ $t('homepage.upcoming_editions') }}</span>
                     </div>
                   </template>
                 </UCheckbox>
@@ -105,7 +105,7 @@
             
             <!-- Filtres services -->
             <div class="space-y-4">
-              <h4 class="font-medium text-gray-700">Services recherchés :</h4>
+              <h4 class="font-medium text-gray-700">{{ $t('homepage.searched_services') }} :</h4>
               <div class="space-y-6">
                 <div v-for="category in servicesByCategory" :key="category.category" class="space-y-3">
                   <h5 class="text-sm font-medium text-gray-600">{{ category.label }}</h5>
@@ -145,7 +145,7 @@
               size="sm"
               @click="viewMode = 'grid'"
             >
-              Grille
+              {{ $t('homepage.grid') }}
             </UButton>
             <UButton
               :color="viewMode === 'map' ? 'primary' : 'neutral'"
@@ -154,7 +154,7 @@
               size="sm"
               @click="viewMode = 'map'"
             >
-              Carte
+              {{ $t('homepage.map') }}
             </UButton>
           </div>
           <!-- Bouton filtres sur mobile -->
@@ -188,7 +188,7 @@
               {{ $t('homepage.reset_filters') }}
             </UButton>
             <UButton icon="i-heroicons-x-mark" type="button" color="neutral" variant="ghost" block class="ml-auto" @click="closeMobileFilters">
-              Fermer
+              {{ $t('common.close') }}
             </UButton>
           </div>
 
@@ -199,14 +199,14 @@
                 <UFormField label="Nom de la convention" name="name">
                   <UInput v-model="filters.name" placeholder="Rechercher par nom" />
                 </UFormField>
-                <UFormField label="Pays" name="countries">
+                <UFormField :label="$t('common.country')" name="countries">
                   <CountryMultiSelect v-model="filters.countries" :placeholder="$t('forms.placeholders.select_countries')" />
                 </UFormField>
               </div>
               
               <!-- Filtres de dates -->
               <div class="space-y-4">
-                <h4 class="font-medium text-gray-700">Dates :</h4>
+                <h4 class="font-medium text-gray-700">{{ $t('common.dates') }} :</h4>
                 <UFormField :label="$t('forms.labels.from_date')" name="startDate">
                   <UPopover :popper="{ placement: 'bottom-start' }">
                     <UButton 
@@ -225,7 +225,7 @@
                     </template>
                   </UPopover>
                 </UFormField>
-                <UFormField label="Jusqu'au" name="endDate">
+                <UFormField :label="$t('forms.labels.until_date')" name="endDate">
                   <UPopover :popper="{ placement: 'bottom-start' }">
                     <UButton 
                       color="neutral" 
@@ -248,7 +248,7 @@
               
               <!-- Filtres services -->
               <div class="space-y-4">
-                <h4 class="font-medium text-gray-700">Services recherchés :</h4>
+                <h4 class="font-medium text-gray-700">{{ $t('homepage.searched_services') }} :</h4>
                 <div class="space-y-4">
                   <div v-for="category in servicesByCategory" :key="category.category" class="space-y-2">
                     <h5 class="text-sm font-medium text-gray-600">{{ category.label }}</h5>
@@ -276,21 +276,21 @@
       </UModal>
 
       <div v-if="editionStore.loading">
-        <p>Chargement des conventions...</p>
+        <p>{{ $t('common.loading') }}...</p>
       </div>
 
       <div v-else-if="editionStore.error">
-        <p class="text-red-500">Erreur: {{ editionStore.error }}</p>
+        <p class="text-red-500">{{ $t('common.error') }}: {{ editionStore.error }}</p>
       </div>
 
       <div v-else-if="editionStore.editions.length === 0">
         <div class="text-center py-8">
           <UIcon name="i-heroicons-magnifying-glass" class="text-gray-400 text-4xl mb-4" />
           <p v-if="activeFiltersCount > 0" class="text-gray-600">
-            Aucune convention ne correspond à vos critères de recherche.
+            {{ $t('homepage.no_conventions_match_criteria') }}
           </p>
           <p v-else class="text-gray-600">
-            Aucune convention trouvée. Soyez le premier à en ajouter une !
+            {{ $t('homepage.no_conventions_found') }}
           </p>
           <UButton 
             v-if="activeFiltersCount > 0" 
@@ -300,7 +300,7 @@
             class="mt-4"
             @click="resetFilters"
           >
-            {{ $t('homepage.reset_filters') }} les filtres
+            {{ $t('homepage.reset_filters') }}
           </UButton>
         </div>
       </div>
@@ -349,6 +349,7 @@ const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
 const router = useRouter();
+const { t, locale } = useI18n();
 
 const showMobileFilters = ref(false);
 const { getTranslatedServices, getTranslatedServicesByCategory } = useTranslatedConventionServices();
@@ -357,7 +358,10 @@ const servicesByCategory = getTranslatedServicesByCategory();
 const viewMode = ref<'grid' | 'map'>('grid');
 
 // Date formatter pour l'affichage
-const df = new DateFormatter('fr-FR', { dateStyle: 'medium' });
+const df = computed(() => {
+  const localeCode = locale.value === 'fr' ? 'fr-FR' : 'en-US';
+  return new DateFormatter(localeCode, { dateStyle: 'medium' });
+});
 
 // CalendarDate objects pour les sélecteurs de date
 const calendarStartDate = ref<CalendarDate | null>(null);
@@ -399,7 +403,7 @@ watch(filters, () => {
 const formatDateForDisplay = (dateString: string): string => {
   if (!dateString) return '';
   const date = new Date(dateString);
-  return df.format(date);
+  return df.value.format(date);
 };
 
 const updateStartDate = (date: CalendarDate | null) => {

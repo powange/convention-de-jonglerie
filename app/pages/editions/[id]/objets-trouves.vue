@@ -181,7 +181,7 @@
               <img 
                 v-if="newItem.imageUrl"
                 :src="newItem.imageUrl"
-                alt="Aperçu"
+                :alt="t('common.preview')"
                 class="max-w-full rounded-lg"
               >
             </div>
@@ -214,7 +214,7 @@
       <template #body>
         <img 
           :src="currentImageUrl"
-          alt="Image agrandie"
+          :alt="t('editions.enlarged_image')"
           class="w-full"
         >
       </template>
@@ -297,7 +297,8 @@ const toggleFavorite = async (id: number) => {
 
 // Fonctions
 const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString('fr-FR', {
+  const { locale } = useI18n()
+  return new Date(date).toLocaleDateString(locale.value, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -312,7 +313,7 @@ const fetchLostFoundItems = async () => {
     const data = await $fetch(`/api/editions/${editionId.value}/lost-found`)
     lostFoundItems.value = data
   } catch (error) {
-    console.error('Erreur lors du chargement des objets trouvés:', error)
+    console.error('Error loading lost items:', error)
     toast.add({
       color: 'error',
       title: t('common.error'),

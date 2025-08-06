@@ -12,6 +12,7 @@ export interface UseDateTimePickerOptions {
 }
 
 export const useDateTimePicker = (options: UseDateTimePickerOptions = {}) => {
+  const { locale } = useI18n();
   const {
     initialValue,
     minDate,
@@ -54,7 +55,8 @@ export const useDateTimePicker = (options: UseDateTimePickerOptions = {}) => {
     }
     
     try {
-      return new Intl.DateTimeFormat('fr-FR', {
+      const localeCode = locale.value === 'fr' ? 'fr-FR' : 'en-US';
+      return new Intl.DateTimeFormat(localeCode, {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -154,11 +156,14 @@ export const useDateTimePicker = (options: UseDateTimePickerOptions = {}) => {
     isDateDisabled,
     
     // Utilitaires
-    formatDate: (date: Date) => new Intl.DateTimeFormat('fr-FR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }).format(date)
+    formatDate: (date: Date) => {
+      const localeCode = locale.value === 'fr' ? 'fr-FR' : 'en-US';
+      return new Intl.DateTimeFormat(localeCode, {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }).format(date);
+    }
   };
 };

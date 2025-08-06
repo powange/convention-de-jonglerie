@@ -441,7 +441,11 @@ const { normalizeImageUrl } = useImageUrl();
 const showCustomCountry = ref(false);
 
 // Date formatter pour l'affichage
-const df = new DateFormatter('fr-FR', { dateStyle: 'medium' });
+const { locale } = useI18n();
+const df = computed(() => {
+  const localeCode = locale.value === 'fr' ? 'fr-FR' : 'en-US';
+  return new DateFormatter(localeCode, { dateStyle: 'medium' });
+});
 
 // CalendarDate objects pour les sélecteurs de date
 const calendarStartDate = ref<CalendarDate | null>(null);
@@ -486,12 +490,12 @@ const timeOptions = computed(() => {
 // Affichage des dates sélectionnées
 const displayStartDate = computed(() => {
   if (!calendarStartDate.value) return '';
-  return df.format(calendarStartDate.value.toDate(getLocalTimeZone()));
+  return df.value.format(calendarStartDate.value.toDate(getLocalTimeZone()));
 });
 
 const displayEndDate = computed(() => {
   if (!calendarEndDate.value) return '';
-  return df.format(calendarEndDate.value.toDate(getLocalTimeZone()));
+  return df.value.format(calendarEndDate.value.toDate(getLocalTimeZone()));
 });
 
 // Gestion des conventions

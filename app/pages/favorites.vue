@@ -138,8 +138,8 @@ onMounted(async () => {
     await editionStore.fetchEditions();
   } catch (_error) {
     toast.add({ 
-      title: 'Erreur', 
-      description: 'Impossible de charger les éditions',
+      title: t('common.error'), 
+      description: t('errors.cannot_load_editions'),
       icon: 'i-heroicons-exclamation-triangle', 
       color: 'error' 
     });

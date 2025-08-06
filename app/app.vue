@@ -5,10 +5,51 @@
         <template #header>
           <div class="flex justify-between items-center">
             <NuxtLink to="/" class="flex items-center">
-              <img src="/logos/logo.svg" alt="Conventions de Jonglerie" class="h-16 sm:h-30 w-auto" >
-              <span class="ml-2 text-sm sm:text-xl font-bold">Conventions de Jonglerie</span>
+              <img src="/logos/logo.svg" :alt="$t('app.title')" class="h-16 sm:h-30 w-auto" >
+              <span class="ml-2 text-sm sm:text-xl font-bold">{{ $t('app.title') }}</span>
             </NuxtLink>
             <div class="flex items-center gap-4">
+              <!-- Sélecteur de langue discret -->
+              <div class="relative">
+                <UButton
+                  :icon="currentLanguage?.flag"
+                  variant="ghost"
+                  color="gray"
+                  size="sm"
+                  square
+                  @click="toggleLanguageDropdown"
+                  class="w-8 h-8"
+                  :title="$t('footer.language_selector')"
+                />
+                
+                <!-- Menu dropdown langues -->
+                <div 
+                  v-if="isLanguageDropdownOpen"
+                  class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
+                  @click.stop
+                >
+                  <div class="p-1">
+                    <button 
+                      v-for="lang in locales" 
+                      :key="lang.code"
+                      @click="changeLanguage(lang.code)"
+                      class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                      :class="{ 'bg-gray-100 dark:bg-gray-700': locale === lang.code }"
+                    >
+                      <span :class="languageConfig[lang.code as keyof typeof languageConfig]?.flag" class="w-4 h-3"></span>
+                      {{ languageConfig[lang.code as keyof typeof languageConfig]?.name }}
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Overlay pour fermer le dropdown en cliquant à l'extérieur -->
+                <div 
+                  v-if="isLanguageDropdownOpen"
+                  class="fixed inset-0 z-40"
+                  @click="closeLanguageDropdown"
+                ></div>
+              </div>
+
               <!-- Navigation principale -->
               <div v-if="authStore.isAuthenticated" class="hidden md:flex items-center gap-2">
                 <UButton 
@@ -170,19 +211,56 @@ import AppFooter from '~/components/ui/AppFooter.vue';
 const authStore = useAuthStore();
 const toast = useToast();
 const router = useRouter();
-// const localePath = useLocalePath(); // Pas nécessaire avec strategy: 'no_prefix'
+const { locale, locales, setLocale } = useI18n();
 
-// État réactif pour la taille d'écran et dropdown
+// État réactif pour la taille d'écran et dropdowns
 const isMobile = ref(false);
 const isDropdownOpen = ref(false);
+const isLanguageDropdownOpen = ref(false);
 
-// Fonctions pour gérer le dropdown
+// Configuration des langues avec leurs drapeaux
+const languageConfig = {
+  fr: { name: 'Français', flag: 'fi fi-fr' },
+  en: { name: 'English', flag: 'fi fi-gb' },
+  es: { name: 'Español', flag: 'fi fi-es' }
+};
+
+// Langue courante avec son drapeau
+const currentLanguage = computed(() => {
+  return languageConfig[locale.value as keyof typeof languageConfig];
+});
+
+// Fonctions pour gérer les dropdowns
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
+  // Fermer l'autre dropdown s'il est ouvert
+  if (isDropdownOpen.value) {
+    isLanguageDropdownOpen.value = false;
+  }
 };
 
 const closeDropdown = () => {
   isDropdownOpen.value = false;
+};
+
+const toggleLanguageDropdown = () => {
+  isLanguageDropdownOpen.value = !isLanguageDropdownOpen.value;
+  // Fermer l'autre dropdown s'il est ouvert
+  if (isLanguageDropdownOpen.value) {
+    isDropdownOpen.value = false;
+  }
+};
+
+const closeLanguageDropdown = () => {
+  isLanguageDropdownOpen.value = false;
+};
+
+// Fonction pour changer de langue
+const changeLanguage = async (newLocale: string) => {
+  await setLocale(newLocale);
+  isLanguageDropdownOpen.value = false;
+  // Forcer le rafraîchissement pour s'assurer que la langue est bien appliquée
+  refreshNuxtData();
 };
 
 onMounted(() => {

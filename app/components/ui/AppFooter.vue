@@ -6,57 +6,13 @@
         <div class="text-sm text-gray-600 dark:text-gray-400">
           {{ $t('footer.copyright', { year: new Date().getFullYear() }) }}
         </div>
-        
-        <!-- Sélecteur de langue -->
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600 dark:text-gray-400">{{ $t('footer.language_selector') }}:</span>
-          <UDropdownMenu 
-            :items="languageItems"
-          >
-            <UButton
-              :label="currentLanguage?.name"
-              :icon="currentLanguage?.flag"
-              variant="ghost"
-              color="gray"
-              size="sm"
-              trailing-icon="i-heroicons-chevron-down-20-solid"
-            />
-          </UDropdownMenu>
-        </div>
       </div>
     </div>
   </footer>
 </template>
 
 <script setup lang="ts">
-const { locale, locales, setLocale } = useI18n()
-
-// Mapping des langues avec leurs drapeaux
-const languageConfig = {
-  fr: { name: 'Français', flag: 'fi fi-fr' },
-  en: { name: 'English', flag: 'fi fi-gb' }
-}
-
-// Langue courante avec son drapeau
-const currentLanguage = computed(() => {
-  return languageConfig[locale.value as keyof typeof languageConfig]
-})
-
-// Items pour le dropdown menu
-const languageItems = computed(() => 
-  locales.value.map(lang => ({
-    label: languageConfig[lang.code as keyof typeof languageConfig]?.name || lang.name,
-    icon: languageConfig[lang.code as keyof typeof languageConfig]?.flag,
-    onSelect: () => changeLanguage(lang.code)
-  }))
-)
-
-// Fonction pour changer de langue
-const changeLanguage = async (newLocale: string) => {
-  await setLocale(newLocale)
-  // Forcer le rafraîchissement pour s'assurer que la langue est bien appliquée
-  refreshNuxtData()
-}
+// Le footer ne contient plus que le copyright
 </script>
 
 <style scoped>
