@@ -238,6 +238,7 @@
     "personal_information": "Personal Information",
     "account_information": "Account Information",
     "private_info_notice": "This information will not be publicly visible",
+    "first_name_placeholder": "Your first name",
     "last_name_placeholder": "Your last name",
     "password_placeholder_secure": "Choose a secure password",
     "email_placeholder": "your.email{'@'}example.com",
