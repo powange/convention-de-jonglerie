@@ -10,6 +10,7 @@ const createModelMock = () => ({
   update: vi.fn(),
   delete: vi.fn(),
   deleteMany: vi.fn(),
+  count: vi.fn(),
   groupBy: vi.fn()
 })
 

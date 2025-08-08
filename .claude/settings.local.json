@@ -32,7 +32,8 @@
       "Bash(mv:*)",
       "WebFetch(domain:localhost)",
       "Bash(rg:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npm test:*)"
     ],
     "deny": []
   }
