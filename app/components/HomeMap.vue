@@ -74,7 +74,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const authStore = useAuthStore();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 // Références
 const mapContainer = ref<HTMLElement>();
@@ -245,20 +245,28 @@ const formatDateRange = (startDate: string, endDate: string) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
   
-  const { locale } = useI18n();
+  // Utiliser la locale définie au top-level
+  const localeCode = locale.value === 'fr' ? 'fr-FR' : 
+                     locale.value === 'en' ? 'en-US' :
+                     locale.value === 'es' ? 'es-ES' :
+                     locale.value === 'de' ? 'de-DE' :
+                     locale.value === 'it' ? 'it-IT' :
+                     locale.value === 'pt' ? 'pt-PT' :
+                     locale.value === 'da' ? 'da-DK' :
+                     locale.value === 'pl' ? 'pl-PL' : 'fr-FR';
   
   if (start.toDateString() === end.toDateString()) {
-    return start.toLocaleDateString(locale.value, { 
+    return start.toLocaleDateString(localeCode, { 
       day: 'numeric', 
       month: 'long', 
       year: 'numeric' 
     });
   }
   
-  return `${start.toLocaleDateString(locale.value, { 
+  return `${start.toLocaleDateString(localeCode, { 
     day: 'numeric', 
     month: 'short' 
-  })} - ${end.toLocaleDateString(locale.value, { 
+  })} - ${end.toLocaleDateString(localeCode, { 
     day: 'numeric', 
     month: 'short', 
     year: 'numeric' 
