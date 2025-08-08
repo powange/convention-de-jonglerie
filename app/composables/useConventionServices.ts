@@ -18,7 +18,7 @@ export const useConventionServices = () => {
 export const useTranslatedConventionServices = () => {
   const { t } = useI18n();
 
-  const getTranslatedServices = () => [
+  const getTranslatedServices = computed(() => [
     { key: 'hasFoodTrucks', label: t('services.food_trucks'), icon: 'i-mdi:food-outline', color: 'text-orange-500' },
     { key: 'hasKidsZone', label: t('services.kids_zone'), icon: 'i-heroicons-face-smile', color: 'text-pink-500' },
     { key: 'acceptsPets', label: t('services.pets_accepted'), icon: 'i-material-symbols:pets', color: 'text-amber-600' },
@@ -41,16 +41,16 @@ export const useTranslatedConventionServices = () => {
     { key: 'hasCreditCardPayment', label: t('services.credit_card_payment'), icon: 'i-heroicons-credit-card', color: 'text-emerald-600' },
     { key: 'hasAfjTokenPayment', label: t('services.afj_token_payment'), icon: 'i-heroicons-currency-dollar', color: 'text-orange-600' },
     { key: 'hasATM', label: t('services.atm'), icon: 'i-heroicons-banknotes', color: 'text-green-600' },
-  ];
+  ]);
 
-  const getTranslatedServicesByCategory = () => {
+  const getTranslatedServicesByCategory = computed(() => {
     // Vérifier que t est disponible
     if (!t) {
       console.warn('i18n t function not available');
-      return {};
+      return [];
     }
     
-    const services = getTranslatedServices();
+    const services = getTranslatedServices.value;
     const grouped = {
       accommodation: {
         label: t('services.categories.accommodation'),
@@ -87,7 +87,7 @@ export const useTranslatedConventionServices = () => {
     }
 
     return result;
-  };
+  });
 
   return {
     getTranslatedServices,

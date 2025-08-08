@@ -31,7 +31,8 @@
       "WebFetch(domain:i18n.nuxtjs.org)",
       "Bash(mv:*)",
       "WebFetch(domain:localhost)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }

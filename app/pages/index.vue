@@ -353,8 +353,8 @@ const { t, locale } = useI18n();
 
 const showMobileFilters = ref(false);
 const { getTranslatedServices, getTranslatedServicesByCategory } = useTranslatedConventionServices();
-const services = getTranslatedServices();
-const servicesByCategory = getTranslatedServicesByCategory();
+const services = getTranslatedServices;
+const servicesByCategory = getTranslatedServicesByCategory;
 const viewMode = ref<'grid' | 'map'>('grid');
 
 // Date formatter pour l'affichage
@@ -377,7 +377,7 @@ const activeFiltersCount = computed(() => {
   // Compter le filtre temporel si pas tous cochés (par défaut showPast=false, showCurrent=true, showFuture=true)
   if (!(filters.showPast === false && filters.showCurrent === true && filters.showFuture === true)) count++;
   // Compter les services actifs
-  count += services.filter(service => filters[service.key]).length;
+  count += services.value.filter(service => filters[service.key]).length;
   return count;
 });
 
@@ -391,7 +391,7 @@ const filters = reactive({
   showCurrent: true,
   showFuture: true,
   // Initialiser tous les services à false
-  ...Object.fromEntries(services.map(service => [service.key, false])),
+  ...Object.fromEntries(services.value.map(service => [service.key, false])),
 });
 
 // Watcher pour appliquer automatiquement les filtres
@@ -455,7 +455,7 @@ const resetFilters = () => {
   filters.showCurrent = true;
   filters.showFuture = true;
   // Réinitialiser tous les services
-  services.forEach(service => {
+  services.value.forEach(service => {
     filters[service.key] = false;
   });
   editionStore.fetchEditions(filters); // Fetch all conventions again
