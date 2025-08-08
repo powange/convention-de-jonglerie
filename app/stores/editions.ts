@@ -131,6 +131,15 @@ export const useEditionStore = defineStore('editions', {
       this.error = null;
       try {
         const edition = await $fetch<Edition>(`/api/editions/${id}`);
+        
+        // Ajouter l'édition au store si elle n'y est pas déjà
+        const existingIndex = this.editions.findIndex(e => e.id === id);
+        if (existingIndex !== -1) {
+          this.editions[existingIndex] = edition;
+        } else {
+          this.editions.push(edition);
+        }
+        
         return edition;
       } catch (e: unknown) {
         const error = e as HttpError;

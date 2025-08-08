@@ -204,19 +204,18 @@ const { t } = useI18n();
 const { getTranslatedServicesByCategory } = useTranslatedConventionServices();
 
 const editionId = parseInt(route.params.id as string);
-const edition = computed(() => editionStore.getEditionById(editionId));
 const showImageOverlay = ref(false);
 const { normalizeImageUrl } = useImageUrl();
 
-onMounted(async () => {
-  if (!edition.value) {
-    try {
-      await editionStore.fetchEditionById(editionId);
-    } catch (error) {
-      console.error('Failed to fetch edition:', error);
-    }
-  }
-});
+// Charger l'édition côté serveur ET client
+try {
+  await editionStore.fetchEditionById(editionId);
+} catch (error) {
+  console.error('Failed to fetch edition:', error);
+}
+
+// Maintenant utiliser directement le store qui est réactif
+const edition = computed(() => editionStore.getEditionById(editionId));
 
 const isFavorited = computed(() => (_editionId: number) => {
   return edition.value?.favoritedBy.some(u => u.id === authStore.user?.id);
