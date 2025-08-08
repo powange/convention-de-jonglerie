@@ -251,7 +251,7 @@ const getGoogleMapsUrl = (edition: Edition) => {
 const getActiveServicesByCategory = (edition: Edition) => {
   if (!edition) return [];
   
-  const servicesByCategory = getTranslatedServicesByCategory();
+  const servicesByCategory = getTranslatedServicesByCategory.value;
   return servicesByCategory.map(category => ({
     ...category,
     services: category.services.filter(service => edition[service.key])

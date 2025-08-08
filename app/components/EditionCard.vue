@@ -88,7 +88,7 @@ const { normalizeImageUrl } = useImageUrl();
 
 // Fonction pour obtenir les services actifs traduits
 const getActiveServices = (edition: any) => {
-  const services = getTranslatedServices();
+  const services = getTranslatedServices.value;
   return services.filter(service => edition[service.key]);
 };
 </script>
