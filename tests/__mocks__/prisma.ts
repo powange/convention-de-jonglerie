@@ -23,10 +23,17 @@ export const prismaMock = {
   convention: createModelMock(),
   conventionCollaborator: createModelMock(),
   edition: createModelMock(),
+  editionCollaborator: createModelMock(),
+  editionPost: createModelMock(),
+  editionPostComment: createModelMock(),
   
   // Modèles objets trouvés
   lostFoundItem: createModelMock(),
   lostFoundComment: createModelMock(),
+  
+  // Modèles covoiturage
+  carpoolOffer: createModelMock(),
+  carpoolRequest: createModelMock(),
   
   // Méthodes Prisma
   $connect: vi.fn(),
