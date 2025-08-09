@@ -30,7 +30,8 @@ const sections = [
       { name: 'dev', desc: 'Lance le serveur de développement sur http://localhost:3000' },
       { name: 'build', desc: 'Compile l\'application optimisée pour la production' },
       { name: 'preview', desc: 'Teste la version build localement' },
-      { name: 'generate', desc: 'Génère un site statique (SSG)' }
+      { name: 'generate', desc: 'Génère un site statique (SSG)' },
+      { name: 'kill-servers', desc: 'Arrête tous les serveurs de développement du projet' }
     ]
   },
   {
