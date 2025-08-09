@@ -75,8 +75,65 @@ export default defineNuxtConfig({
     css: {
       devSourcemap: true
     },
+    optimizeDeps: {
+      // Pré-bundler ces dépendances pour améliorer les performances
+      include: [
+        'vue',
+        '@vue/runtime-core',
+        '@vue/runtime-dom',
+        '@vue/shared'
+      ]
+    },
     build: {
-      sourcemap: process.env.NODE_ENV === 'development' // Sourcemaps seulement en dev
+      sourcemap: process.env.NODE_ENV === 'development', // Sourcemaps seulement en dev
+      chunkSizeWarningLimit: 600, // Augmenter la limite d'avertissement à 600KB
+      // Optimisation du code splitting
+      rollupOptions: {
+        output: {
+          // Séparer les chunks admin des chunks publics et les vendor libraries
+          manualChunks: (id) => {
+            // Séparer le code admin dans son propre chunk
+            if (id.includes('/admin/') || id.includes('\\admin\\')) {
+              return 'admin';
+            }
+            
+            // Séparer les grandes bibliothèques dans des chunks individuels
+            if (id.includes('node_modules')) {
+              // Bibliothèques de carte
+              if (id.includes('leaflet')) {
+                return 'vendor-leaflet';
+              }
+              // Bibliothèques UI
+              if (id.includes('@nuxt/ui') || id.includes('@headlessui')) {
+                return 'vendor-ui';
+              }
+              // Internationalisation
+              if (id.includes('vue-i18n') || id.includes('@intlify')) {
+                return 'vendor-i18n';
+              }
+              // Date utilities
+              if (id.includes('@internationalized/date')) {
+                return 'vendor-date';
+              }
+              // VueUse
+              if (id.includes('@vueuse')) {
+                return 'vendor-vueuse';
+              }
+              // Vue core et associés
+              if (id.includes('vue') || id.includes('@vue')) {
+                return 'vendor-vue';
+              }
+              // Autres vendor libraries
+              return 'vendor-misc';
+            }
+          },
+          // Configuration pour optimiser la taille des chunks
+          chunkFileNames: (chunkInfo) => {
+            const facadeModuleId = chunkInfo.facadeModuleId ? chunkInfo.facadeModuleId.split('/').pop() : 'chunk';
+            return `_nuxt/${chunkInfo.name || facadeModuleId}-[hash].js`;
+          }
+        }
+      }
     },
     plugins: [
       tsconfigPaths()
@@ -84,5 +141,24 @@ export default defineNuxtConfig({
   },
   experimental: {
     appManifest: false,
+    // Optimisation du rendu et du préchargement
+    payloadExtraction: false,
+    renderJsonPayloads: true
+  },
+  // Optimisation du routeur
+  nitro: {
+    prerender: {
+      // Ne pas prérender les pages admin
+      ignore: ['/admin', '/admin/**']
+    },
+    // Compression des assets
+    compressPublicAssets: true,
+    // Optimisation de la minification
+    minify: true
+  },
+  // Optimisations supplémentaires
+  typescript: {
+    strict: true,
+    shim: false // Désactiver le shim TypeScript en production
   }
 })

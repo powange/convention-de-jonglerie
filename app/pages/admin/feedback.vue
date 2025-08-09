@@ -365,7 +365,8 @@
 
 <script setup lang="ts">
 definePageMeta({
-  middleware: ['super-admin']
+  middleware: ['super-admin'],
+  layout: 'admin'
 })
 
 const { t } = useI18n()

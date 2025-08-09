@@ -202,7 +202,8 @@
 <script setup lang="ts">
 // Middleware de protection pour super admin
 definePageMeta({
-  middleware: ['auth-protected', 'super-admin']
+  middleware: ['auth-protected', 'super-admin'],
+  layout: 'admin'
 })
 
 const authStore = useAuthStore()
