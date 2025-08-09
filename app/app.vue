@@ -68,7 +68,7 @@
                 <UButton 
                   variant="ghost" 
                   color="neutral" 
-                  class="rounded-full hover:bg-gray-100 transition-colors"
+                  class="rounded-full"
                   @click="toggleDropdown"
                 >
                   <div class="flex items-center gap-2">
