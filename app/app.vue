@@ -11,16 +11,13 @@
             <div class="flex items-center gap-4">
               <!-- Sélecteur de langue discret -->
               <div class="relative">
-                <UButton
-                  :icon="currentLanguage?.flag"
-                  variant="ghost"
-                  color="gray"
-                  size="sm"
-                  square
+                <button
                   @click="toggleLanguageDropdown"
-                  class="w-8 h-8"
+                  class="w-8 h-8 rounded-md flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                   :title="$t('footer.language_selector')"
-                />
+                >
+                  <span v-if="currentLanguage?.flag" :class="currentLanguage.flag" class="w-4 h-3"></span>
+                </button>
                 
                 <!-- Menu dropdown langues -->
                 <div 
