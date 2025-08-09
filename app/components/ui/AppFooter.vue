@@ -27,6 +27,11 @@
 </template>
 
 <script setup lang="ts">
+import { defineAsyncComponent } from 'vue';
+
+// Lazy loading du composant FeedbackModal
+const FeedbackModal = defineAsyncComponent(() => import('~/components/feedback/FeedbackModal.vue'));
+
 const showFeedbackModal = ref(false)
 
 function openFeedbackModal() {

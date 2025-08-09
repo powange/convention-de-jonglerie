@@ -86,9 +86,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import { useEditionStore } from '~/stores/editions';
+
+// Lazy loading du composant FavoritesMap
+const FavoritesMap = defineAsyncComponent(() => import('~/components/FavoritesMap.vue'));
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({

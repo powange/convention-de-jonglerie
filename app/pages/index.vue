@@ -337,13 +337,17 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, reactive, watch, ref } from 'vue';
+import { onMounted, computed, reactive, watch, ref, defineAsyncComponent } from 'vue';
+import { useDebounceFn } from '@vueuse/core';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
 import { useRouter } from 'vue-router';
 import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date';
 import { useTranslatedConventionServices } from '~/composables/useConventionServices';
 import CountryMultiSelect from '~/components/CountryMultiSelect.vue';
+
+// Lazy loading du composant HomeMap
+const HomeMap = defineAsyncComponent(() => import('~/components/HomeMap.vue'));
 
 const editionStore = useEditionStore();
 const authStore = useAuthStore();
@@ -394,9 +398,29 @@ const filters = reactive({
   ...Object.fromEntries(services.value.map(service => [service.key, false])),
 });
 
+// Créer une fonction debounced pour éviter les appels API trop fréquents
+// Délai de 300ms pour tous les changements de filtres pour éviter la surcharge
+const debouncedFetchEditions = useDebounceFn((newFilters) => {
+  editionStore.fetchEditions(newFilters);
+}, 300);
+
+// Variable pour tracker le dernier nom recherché
+let lastNameFilter = '';
+
 // Watcher pour appliquer automatiquement les filtres
-watch(filters, () => {
-  editionStore.fetchEditions(filters);
+watch(filters, (newFilters) => {
+  // Si c'est uniquement le champ name qui a changé, utiliser le debounce
+  // Sinon (checkbox, dates, etc.), appliquer immédiatement pour une meilleure réactivité
+  const nameChanged = filters.name !== lastNameFilter;
+  lastNameFilter = filters.name;
+  
+  if (nameChanged && filters.name !== '') {
+    // Debounce pour le champ de recherche texte
+    debouncedFetchEditions(newFilters);
+  } else {
+    // Application immédiate pour les autres filtres (checkbox, dates, pays)
+    editionStore.fetchEditions(newFilters);
+  }
 }, { deep: true, immediate: false });
 
 // Fonctions pour gérer les dates

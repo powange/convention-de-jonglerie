@@ -12,7 +12,8 @@ export default defineNuxtConfig({
     '@nuxt/test-utils/module', 
     '@nuxt/ui', 
     '@pinia/nuxt', 
-    '@nuxtjs/i18n'
+    '@nuxtjs/i18n',
+    '@vueuse/nuxt'
   ],
   ui: {
     icons: ['heroicons', 'simple-icons']
