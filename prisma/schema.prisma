@@ -41,6 +41,7 @@ model User {
   passwordResetTokens    PasswordResetToken[]
   lostFoundItems         LostFoundItem[]
   lostFoundComments      LostFoundComment[]
+  feedbacks              Feedback[]
 }
 
 model Edition {
@@ -288,4 +289,32 @@ model LostFoundComment {
 
   @@index([lostFoundItemId], map: "LostFoundComment_lostFoundItemId_fkey")
   @@index([userId], map: "LostFoundComment_userId_fkey")
+}
+
+enum FeedbackType {
+  BUG          // Signalement de bug
+  SUGGESTION   // Suggestion d'amélioration
+  GENERAL      // Commentaire général
+  COMPLAINT    // Plainte ou problème
+}
+
+model Feedback {
+  id          Int          @id @default(autoincrement())
+  type        FeedbackType
+  subject     String
+  message     String       @db.Text
+  email       String?      // Email pour les utilisateurs non connectés
+  name        String?      // Nom pour les utilisateurs non connectés
+  userId      Int?         // Utilisateur connecté (optionnel)
+  userAgent   String?      // Navigateur/OS pour debug
+  url         String?      // Page où le feedback a été soumis
+  resolved    Boolean      @default(false)
+  adminNotes  String?      @db.Text
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId], map: "Feedback_userId_fkey")
+  @@index([type], map: "Feedback_type_idx")
+  @@index([resolved], map: "Feedback_resolved_idx")
 }

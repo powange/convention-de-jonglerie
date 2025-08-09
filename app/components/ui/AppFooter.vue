@@ -6,13 +6,34 @@
         <div class="text-sm text-gray-600 dark:text-gray-400">
           {{ $t('footer.copyright', { year: new Date().getFullYear() }) }}
         </div>
+
+        <!-- Liens footer -->
+        <div class="flex items-center gap-4 text-sm">
+          <UButton 
+            variant="ghost" 
+            color="gray" 
+            size="sm"
+            @click="openFeedbackModal"
+          >
+            {{ $t('footer.feedback') }}
+          </UButton>
+        </div>
       </div>
     </div>
+
+    <!-- Modal de feedback -->
+    <FeedbackModal v-model:open="showFeedbackModal" />
   </footer>
 </template>
 
 <script setup lang="ts">
-// Le footer ne contient plus que le copyright
+const showFeedbackModal = ref(false)
+
+function openFeedbackModal() {
+  console.log('Ouverture de la modal feedback')
+  showFeedbackModal.value = true
+  console.log('showFeedbackModal.value:', showFeedbackModal.value)
+}
 </script>
 
 <style scoped>

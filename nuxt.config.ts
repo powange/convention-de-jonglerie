@@ -18,7 +18,7 @@ export default defineNuxtConfig({
     icons: ['heroicons', 'simple-icons']
   },
   i18n: {
-    defaultLocale: 'fr',
+    defaultLocale: 'en',
     locales: [
       { code: 'fr', name: 'Français', file: 'fr.json' },
       { code: 'en', name: 'English', file: 'en.json' },
@@ -55,8 +55,10 @@ export default defineNuxtConfig({
     emailEnabled: process.env.SEND_EMAILS || 'false', // Enable/disable real email sending
     smtpUser: process.env.SMTP_USER || '', // SMTP username for email sending
     smtpPass: process.env.SMTP_PASS || '', // SMTP password for email sending
+    recaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY || '', // reCAPTCHA secret key for server-side verification
     public: {
       // Public keys that are available on both client and server
+      recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY || '' // reCAPTCHA site key for client-side widget
     }
   },
   vite: {

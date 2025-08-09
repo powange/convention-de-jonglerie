@@ -68,7 +68,63 @@
     "loading_activity": "Lade aktuelle Aktivität...",
     "no_recent_activity": "Keine aktuelle Aktivität",
     "cannot_load_stats": "Statistiken können nicht geladen werden",
-    "cannot_load_activity": "Aktuelle Aktivität kann nicht geladen werden"
+    "cannot_load_activity": "Aktuelle Aktivität kann nicht geladen werden",
+    "feedback": {
+      "title": "Verwaltung von Benutzerfeedback",
+      "description": "Sehen und verwalten Sie Benutzerfeedback, Vorschläge und Fehlerberichte.",
+      "search": "Feedback durchsuchen...",
+      "empty": "Noch kein Feedback vorhanden",
+      "stats": {
+        "total": "Feedback insgesamt",
+        "pending": "Ausstehend",
+        "resolved": "Gelöst",
+        "bugs": "Gemeldete Fehler"
+      },
+      "filter": {
+        "type": "Nach Typ filtern",
+        "status": "Nach Status filtern",
+        "all_types": "Alle Typen",
+        "all_status": "Alle Status"
+      },
+      "types": {
+        "bug": "Fehler",
+        "suggestion": "Vorschlag",
+        "general": "Allgemein",
+        "complaint": "Beschwerde"
+      },
+      "pending": "Ausstehend",
+      "resolved": "Gelöst",
+      "resolve": "Lösen",
+      "unresolve": "Wieder öffnen",
+      "mark_resolved": "Als gelöst markieren",
+      "mark_unresolved": "Als ungelöst markieren",
+      "admin_notes": "Admin-Notizen",
+      "admin_notes_placeholder": "Fügen Sie Ihre Notizen zur Lösung dieses Feedbacks hinzu...",
+      "view": "Details anzeigen",
+      "details": "Feedback-Details",
+      "type": {
+        "label": "Typ"
+      },
+      "subject": {
+        "label": "Betreff"
+      },
+      "message": {
+        "label": "Nachricht"
+      },
+      "user": "Benutzer",
+      "status": "Status",
+      "created_at": "Erstellungsdatum",
+      "url": "Verwandte Seite",
+      "user_agent": "Browser/OS",
+      "success": {
+        "resolve": "Feedback als gelöst markiert",
+        "unresolve": "Feedback als ungelöst markiert"
+      },
+      "error": {
+        "load": "Fehler beim Laden des Feedbacks",
+        "resolve": "Fehler beim Aktualisieren des Feedbacks"
+      }
+    }
   },
   "navigation": {
     "home": "Startseite",
@@ -439,7 +495,8 @@
   },
   "footer": {
     "language_selector": "Sprache wechseln",
-    "copyright": "© {year} Jonglier-Convention. Alle Rechte vorbehalten."
+    "copyright": "© {year} Jonglier-Convention. Alle Rechte vorbehalten.",
+    "feedback": "Feedback geben"
   },
   "messages": {
     "login_success": "Anmeldung erfolgreich!",
@@ -838,6 +895,73 @@
       "loading_convention_data": "Lade Convention-Daten...",
       "convention_not_found_or_no_rights": "Die Convention, die du suchst, existiert nicht oder du hast keine Berechtigung, sie zu bearbeiten.",
       "submit_button": "Convention aktualisieren"
+    }
+  },
+  "feedback": {
+    "title": "Wir schätzen Ihr Feedback",
+    "description": "Helfen Sie uns, die Plattform zu verbessern, indem Sie uns Ihre Kommentare, Vorschläge oder Fehlerberichte mitteilen.",
+    "type": {
+      "label": "Feedback-Typ",
+      "placeholder": "Einen Typ auswählen"
+    },
+    "types": {
+      "bug": "Fehler melden",
+      "suggestion": "Verbesserungsvorschlag",
+      "general": "Allgemeiner Kommentar",
+      "complaint": "Problem melden"
+    },
+    "subject": {
+      "label": "Betreff",
+      "placeholder": "Beschreiben Sie kurz Ihr Feedback"
+    },
+    "message": {
+      "label": "Detaillierte Nachricht",
+      "placeholder": "Beschreiben Sie detailliert Ihr Feedback, Ihren Vorschlag oder das aufgetretene Problem..."
+    },
+    "name": {
+      "label": "Ihr Name",
+      "placeholder": "Ihr Vor- und Nachname"
+    },
+    "email": {
+      "label": "Ihre E-Mail",
+      "placeholder": "ihre{'@'}email.com"
+    },
+    "url": {
+      "label": "Verwandte Seite (automatisch)",
+      "placeholder": "Seiten-URL"
+    },
+    "guest": {
+      "info": "Als Besucher geben Sie bitte Ihre Kontaktdaten für eine mögliche Nachverfolgung an."
+    },
+    "submit": "Feedback senden",
+    "success": {
+      "title": "Vielen Dank für Ihr Feedback!",
+      "message": "Ihre Nachricht wurde an unser Team gesendet. Wir werden sie so schnell wie möglich prüfen.",
+      "toast": "Ihr Feedback wurde erfolgreich gesendet"
+    },
+    "error": {
+      "title": "Fehler beim Senden des Feedbacks",
+      "submit": "Beim Senden Ihres Feedbacks ist ein Fehler aufgetreten",
+      "required_fields": "Bitte füllen Sie alle Pflichtfelder aus",
+      "captcha_required": "Bitte vervollständigen Sie das Captcha",
+      "captcha_not_loaded": "Das Captcha ist noch nicht geladen, bitte warten Sie"
+    },
+    "validation": {
+      "subject": {
+        "min": "Der Betreff muss mindestens 5 Zeichen haben",
+        "max": "Der Betreff darf 200 Zeichen nicht überschreiten"
+      },
+      "message": {
+        "min": "Die Nachricht muss mindestens 20 Zeichen haben",
+        "max": "Die Nachricht darf 5000 Zeichen nicht überschreiten"
+      },
+      "name": {
+        "min": "Der Name muss mindestens 2 Zeichen haben",
+        "max": "Der Name darf 100 Zeichen nicht überschreiten"
+      },
+      "email": {
+        "invalid": "Ungültige E-Mail"
+      }
     }
   }
 }

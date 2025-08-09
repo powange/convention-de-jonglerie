@@ -68,7 +68,63 @@
     "loading_activity": "Chargement de l'activité récente...",
     "no_recent_activity": "Aucune activité récente",
     "cannot_load_stats": "Impossible de charger les statistiques",
-    "cannot_load_activity": "Impossible de charger l'activité récente"
+    "cannot_load_activity": "Impossible de charger l'activité récente",
+    "feedback": {
+      "title": "Gestion des retours utilisateurs",
+      "description": "Consultez et gérez les retours, suggestions et signalements des utilisateurs.",
+      "search": "Rechercher dans les retours...",
+      "empty": "Aucun retour pour le moment",
+      "stats": {
+        "total": "Total des retours",
+        "pending": "En attente",
+        "resolved": "Résolus",
+        "bugs": "Bugs signalés"
+      },
+      "filter": {
+        "type": "Filtrer par type",
+        "status": "Filtrer par statut",
+        "all_types": "Tous les types",
+        "all_status": "Tous les statuts"
+      },
+      "types": {
+        "bug": "Bug",
+        "suggestion": "Suggestion",
+        "general": "Général",
+        "complaint": "Plainte"
+      },
+      "pending": "En attente",
+      "resolved": "Résolu",
+      "resolve": "Résoudre",
+      "unresolve": "Rouvrir",
+      "mark_resolved": "Marquer comme résolu",
+      "mark_unresolved": "Marquer comme non résolu",
+      "admin_notes": "Notes admin",
+      "admin_notes_placeholder": "Ajoutez vos notes sur la résolution de ce retour...",
+      "view": "Voir détails",
+      "details": "Détails du retour",
+      "type": {
+        "label": "Type"
+      },
+      "subject": {
+        "label": "Sujet"
+      },
+      "message": {
+        "label": "Message"
+      },
+      "user": "Utilisateur",
+      "status": "Statut",
+      "created_at": "Date de création",
+      "url": "Page concernée",
+      "user_agent": "Navigateur/OS",
+      "success": {
+        "resolve": "Retour marqué comme résolu",
+        "unresolve": "Retour marqué comme non résolu"
+      },
+      "error": {
+        "load": "Erreur lors du chargement des retours",
+        "resolve": "Erreur lors de la mise à jour"
+      }
+    }
   },
   "navigation": {
     "home": "Accueil",
@@ -846,5 +902,78 @@
       "convention_not_found_or_no_rights": "La convention que vous cherchez n'existe pas ou vous n'avez pas les droits pour la modifier.",
       "submit_button": "Mettre à jour la convention"
     }
+  },
+  "feedback": {
+    "title": "Votre avis nous intéresse",
+    "description": "Aidez-nous à améliorer la plateforme en nous faisant part de vos commentaires, suggestions ou signalements de bugs.",
+    "type": {
+      "label": "Type de retour",
+      "placeholder": "Sélectionner un type"
+    },
+    "types": {
+      "bug": "Signaler un bug",
+      "suggestion": "Suggestion d'amélioration", 
+      "general": "Commentaire général",
+      "complaint": "Signaler un problème"
+    },
+    "subject": {
+      "label": "Sujet",
+      "placeholder": "Décrivez brièvement votre retour"
+    },
+    "message": {
+      "label": "Message détaillé",
+      "placeholder": "Décrivez en détail votre retour, suggestion ou le problème rencontré..."
+    },
+    "name": {
+      "label": "Votre nom",
+      "placeholder": "Votre prénom et nom"
+    },
+    "email": {
+      "label": "Votre email",
+      "placeholder": "votre{'@'}email.com"
+    },
+    "url": {
+      "label": "Page concernée (automatique)",
+      "placeholder": "URL de la page"
+    },
+    "guest": {
+      "info": "En tant que visiteur, merci de nous laisser vos coordonnées pour un éventuel suivi."
+    },
+    "submit": "Envoyer le retour",
+    "success": {
+      "title": "Merci pour votre retour !",
+      "message": "Votre message a été transmis à notre équipe. Nous l'examinerons dans les plus brefs délais.",
+      "toast": "Votre feedback a été envoyé avec succès"
+    },
+    "error": {
+      "title": "Erreur lors de l'envoi",
+      "submit": "Une erreur est survenue lors de l'envoi de votre retour",
+      "required_fields": "Veuillez remplir tous les champs obligatoires",
+      "name_required": "Le nom est obligatoire",
+      "name_required_desc": "Veuillez indiquer votre nom pour que nous puissions identifier votre feedback",
+      "captcha_required": "Veuillez compléter le captcha",
+      "captcha_not_loaded": "Le captcha n'est pas encore chargé, veuillez patienter"
+    },
+    "validation": {
+      "subject": {
+        "min": "Le sujet doit faire au moins 5 caractères",
+        "max": "Le sujet ne peut pas dépasser 200 caractères"
+      },
+      "message": {
+        "min": "Le message doit faire au moins 20 caractères",
+        "max": "Le message ne peut pas dépasser 5000 caractères"
+      },
+      "name": {
+        "min": "Le nom doit faire au moins 2 caractères",
+        "max": "Le nom ne peut pas dépasser 100 caractères"
+      },
+      "email": {
+        "invalid": "Email invalide"
+      }
+    }
+  },
+  "footer": {
+    "copyright": "© {year} Convention de Jonglerie. Tous droits réservés.",
+    "feedback": "Nous faire un retour"
   }
 }

@@ -68,7 +68,63 @@
     "loading_activity": "Ładowanie ostatniej aktywności...",
     "no_recent_activity": "Brak ostatniej aktywności",
     "cannot_load_stats": "Nie można załadować statystyk",
-    "cannot_load_activity": "Nie można załadować ostatniej aktywności"
+    "cannot_load_activity": "Nie można załadować ostatniej aktywności",
+    "feedback": {
+      "title": "Zarządzanie Opiniami Użytkowników",
+      "description": "Przeglądaj i zarządzaj opiniami użytkowników, sugestiami i zgłoszeniami błędów.",
+      "search": "Szukaj w opiniach...",
+      "empty": "Jeszcze brak opinii",
+      "stats": {
+        "total": "Całkowita liczba opinii",
+        "pending": "Oczekujące",
+        "resolved": "Rozwiązane",
+        "bugs": "Zgłoszone błędy"
+      },
+      "filter": {
+        "type": "Filtruj wg typu",
+        "status": "Filtruj wg statusu",
+        "all_types": "Wszystkie typy",
+        "all_status": "Wszystkie statusy"
+      },
+      "types": {
+        "bug": "Błąd",
+        "suggestion": "Sugestia",
+        "general": "Ogólny",
+        "complaint": "Skarga"
+      },
+      "pending": "Oczekujące",
+      "resolved": "Rozwiązane",
+      "resolve": "Rozwiąż",
+      "unresolve": "Otwórz ponownie",
+      "mark_resolved": "Oznacz jako rozwiązane",
+      "mark_unresolved": "Oznacz jako nierozwiązane",
+      "admin_notes": "Notatki admina",
+      "admin_notes_placeholder": "Dodaj swoje notatki o rozwiązaniu tej opinii...",
+      "view": "Zobacz szczegóły",
+      "details": "Szczegóły opinii",
+      "type": {
+        "label": "Typ"
+      },
+      "subject": {
+        "label": "Temat"
+      },
+      "message": {
+        "label": "Wiadomość"
+      },
+      "user": "Użytkownik",
+      "status": "Status",
+      "created_at": "Data utworzenia",
+      "url": "Powiązana strona",
+      "user_agent": "Przeglądarka/System",
+      "success": {
+        "resolve": "Opinia oznaczona jako rozwiązana",
+        "unresolve": "Opinia oznaczona jako nierozwiązana"
+      },
+      "error": {
+        "load": "Błąd ładowania opinii",
+        "resolve": "Błąd aktualizacji opinii"
+      }
+    }
   },
   "navigation": {
     "home": "Strona główna",
@@ -439,7 +495,8 @@
   },
   "footer": {
     "language_selector": "Zmień język",
-    "copyright": "© {year} Konwencja Żonglerska. Wszelkie prawa zastrzeżone."
+    "copyright": "© {year} Konwencja Żonglerska. Wszelkie prawa zastrzeżone.",
+    "feedback": "Podziel się opinią"
   },
   "messages": {
     "login_success": "Logowanie pomyślne!",
@@ -845,6 +902,73 @@
       "loading_convention_data": "Ładowanie danych konwencji...",
       "convention_not_found_or_no_rights": "Konwencja, której szukasz, nie istnieje lub nie masz uprawnień do jej edytowania.",
       "submit_button": "Zaktualizuj konwencję"
+    }
+  },
+  "feedback": {
+    "title": "Cenimy Twoją opinię",
+    "description": "Pomóż nam udoskonalić platformę, dzieląc się swoimi komentarzami, sugestiami lub zgłoszeniami błędów.",
+    "type": {
+      "label": "Typ opinii",
+      "placeholder": "Wybierz typ"
+    },
+    "types": {
+      "bug": "Zgłoś błąd",
+      "suggestion": "Sugestia ulepszenia",
+      "general": "Ogólny komentarz",
+      "complaint": "Zgłoś problem"
+    },
+    "subject": {
+      "label": "Temat",
+      "placeholder": "Krótko opisz swoją opinię"
+    },
+    "message": {
+      "label": "Szczegółowa wiadomość",
+      "placeholder": "Opisz szczegółowo swoją opinię, sugestię lub napotkany problem..."
+    },
+    "name": {
+      "label": "Twoje imię",
+      "placeholder": "Twoje imię i nazwisko"
+    },
+    "email": {
+      "label": "Twój email",
+      "placeholder": "twoj{'@'}email.com"
+    },
+    "url": {
+      "label": "Powiązana strona (automatyczne)",
+      "placeholder": "URL strony"
+    },
+    "guest": {
+      "info": "Jako gość, podaj swoje dane kontaktowe w celu ewentualnego kontaktu zwrotnego."
+    },
+    "submit": "Wyślij opinię",
+    "success": {
+      "title": "Dziękujemy za Twoją opinię!",
+      "message": "Twoja wiadomość została wysłana do naszego zespołu. Przeanalizujemy ją jak najszybciej.",
+      "toast": "Twoja opinia została pomyślnie wysłana"
+    },
+    "error": {
+      "title": "Błąd podczas wysyłania opinii",
+      "submit": "Wystąpił błąd podczas wysyłania Twojej opinii",
+      "required_fields": "Proszę wypełnić wszystkie wymagane pola",
+      "captcha_required": "Proszę uzupełnić captcha",
+      "captcha_not_loaded": "Captcha nie została jeszcze załadowana, proszę czekać"
+    },
+    "validation": {
+      "subject": {
+        "min": "Temat musi mieć co najmniej 5 znaków",
+        "max": "Temat nie może przekroczyć 200 znaków"
+      },
+      "message": {
+        "min": "Wiadomość musi mieć co najmniej 20 znaków",
+        "max": "Wiadomość nie może przekroczyć 5000 znaków"
+      },
+      "name": {
+        "min": "Imię musi mieć co najmniej 2 znaki",
+        "max": "Imię nie może przekroczyć 100 znaków"
+      },
+      "email": {
+        "invalid": "Nieprawidłowy email"
+      }
     }
   }
 }

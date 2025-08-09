@@ -68,7 +68,63 @@
     "loading_activity": "Caricamento attività recente...",
     "no_recent_activity": "Nessuna attività recente",
     "cannot_load_stats": "Impossibile caricare le statistiche",
-    "cannot_load_activity": "Impossibile caricare l'attività recente"
+    "cannot_load_activity": "Impossibile caricare l'attività recente",
+    "feedback": {
+      "title": "Gestione Feedback Utenti",
+      "description": "Visualizza e gestisci feedback, suggerimenti e segnalazioni di bug degli utenti.",
+      "search": "Cerca nei feedback...",
+      "empty": "Ancora nessun feedback",
+      "stats": {
+        "total": "Feedback totali",
+        "pending": "In attesa",
+        "resolved": "Risolti",
+        "bugs": "Bug segnalati"
+      },
+      "filter": {
+        "type": "Filtra per tipo",
+        "status": "Filtra per stato",
+        "all_types": "Tutti i tipi",
+        "all_status": "Tutti gli stati"
+      },
+      "types": {
+        "bug": "Bug",
+        "suggestion": "Suggerimento",
+        "general": "Generale",
+        "complaint": "Reclamo"
+      },
+      "pending": "In attesa",
+      "resolved": "Risolto",
+      "resolve": "Risolvi",
+      "unresolve": "Riapri",
+      "mark_resolved": "Segna come risolto",
+      "mark_unresolved": "Segna come non risolto",
+      "admin_notes": "Note admin",
+      "admin_notes_placeholder": "Aggiungi le tue note sulla risoluzione di questo feedback...",
+      "view": "Vedi dettagli",
+      "details": "Dettagli feedback",
+      "type": {
+        "label": "Tipo"
+      },
+      "subject": {
+        "label": "Oggetto"
+      },
+      "message": {
+        "label": "Messaggio"
+      },
+      "user": "Utente",
+      "status": "Stato",
+      "created_at": "Data di creazione",
+      "url": "Pagina correlata",
+      "user_agent": "Browser/OS",
+      "success": {
+        "resolve": "Feedback segnato come risolto",
+        "unresolve": "Feedback segnato come non risolto"
+      },
+      "error": {
+        "load": "Errore nel caricamento dei feedback",
+        "resolve": "Errore nell'aggiornamento del feedback"
+      }
+    }
   },
   "navigation": {
     "home": "Home",
@@ -439,7 +495,8 @@
   },
   "footer": {
     "language_selector": "Cambia lingua",
-    "copyright": "© {year} Convegni di Giocoleria. Tutti i diritti riservati."
+    "copyright": "© {year} Convegni di Giocoleria. Tutti i diritti riservati.",
+    "feedback": "Dacci un feedback"
   },
   "messages": {
     "login_success": "Accesso riuscito!",
@@ -845,6 +902,73 @@
       "loading_convention_data": "Caricamento dati convegno...",
       "convention_not_found_or_no_rights": "Il convegno che stai cercando non esiste o non hai i diritti per modificarlo.",
       "submit_button": "Aggiorna il convegno"
+    }
+  },
+  "feedback": {
+    "title": "Apprezziamo il tuo feedback",
+    "description": "Aiutaci a migliorare la piattaforma condividendo i tuoi commenti, suggerimenti o segnalazioni di bug.",
+    "type": {
+      "label": "Tipo di feedback",
+      "placeholder": "Seleziona un tipo"
+    },
+    "types": {
+      "bug": "Segnala un bug",
+      "suggestion": "Suggerimento di miglioramento",
+      "general": "Commento generale",
+      "complaint": "Segnala un problema"
+    },
+    "subject": {
+      "label": "Oggetto",
+      "placeholder": "Descrivi brevemente il tuo feedback"
+    },
+    "message": {
+      "label": "Messaggio dettagliato",
+      "placeholder": "Descrivi in dettaglio il tuo feedback, suggerimento o il problema riscontrato..."
+    },
+    "name": {
+      "label": "Il tuo nome",
+      "placeholder": "Il tuo nome e cognome"
+    },
+    "email": {
+      "label": "La tua email",
+      "placeholder": "tua{'@'}email.com"
+    },
+    "url": {
+      "label": "Pagina correlata (automatico)",
+      "placeholder": "URL della pagina"
+    },
+    "guest": {
+      "info": "Come visitatore, fornisci i tuoi dati di contatto per un eventuale follow-up."
+    },
+    "submit": "Invia feedback",
+    "success": {
+      "title": "Grazie per il tuo feedback!",
+      "message": "Il tuo messaggio è stato inviato al nostro team. Lo esamineremo il prima possibile.",
+      "toast": "Il tuo feedback è stato inviato con successo"
+    },
+    "error": {
+      "title": "Errore nell'invio del feedback",
+      "submit": "È verificato un errore durante l'invio del tuo feedback",
+      "required_fields": "Compila tutti i campi obbligatori",
+      "captcha_required": "Completa il captcha",
+      "captcha_not_loaded": "Il captcha non è ancora caricato, attendi"
+    },
+    "validation": {
+      "subject": {
+        "min": "L'oggetto deve avere almeno 5 caratteri",
+        "max": "L'oggetto non può superare i 200 caratteri"
+      },
+      "message": {
+        "min": "Il messaggio deve avere almeno 20 caratteri",
+        "max": "Il messaggio non può superare i 5000 caratteri"
+      },
+      "name": {
+        "min": "Il nome deve avere almeno 2 caratteri",
+        "max": "Il nome non può superare i 100 caratteri"
+      },
+      "email": {
+        "invalid": "Email non valida"
+      }
     }
   }
 }

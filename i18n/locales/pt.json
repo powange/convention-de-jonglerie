@@ -68,7 +68,63 @@
     "loading_activity": "A carregar actividade recente...",
     "no_recent_activity": "Nenhuma actividade recente",
     "cannot_load_stats": "Impossível carregar as estatísticas",
-    "cannot_load_activity": "Impossível carregar a actividade recente"
+    "cannot_load_activity": "Impossível carregar a actividade recente",
+    "feedback": {
+      "title": "Gestão de Feedback dos Utilizadores",
+      "description": "Visualize e gira feedback, sugestões e relatórios de bugs dos utilizadores.",
+      "search": "Pesquisar feedback...",
+      "empty": "Ainda sem feedback",
+      "stats": {
+        "total": "Total de feedback",
+        "pending": "Pendentes",
+        "resolved": "Resolvidos",
+        "bugs": "Bugs reportados"
+      },
+      "filter": {
+        "type": "Filtrar por tipo",
+        "status": "Filtrar por estado",
+        "all_types": "Todos os tipos",
+        "all_status": "Todos os estados"
+      },
+      "types": {
+        "bug": "Bug",
+        "suggestion": "Sugestão",
+        "general": "Geral",
+        "complaint": "Reclamação"
+      },
+      "pending": "Pendente",
+      "resolved": "Resolvido",
+      "resolve": "Resolver",
+      "unresolve": "Reabrir",
+      "mark_resolved": "Marcar como resolvido",
+      "mark_unresolved": "Marcar como não resolvido",
+      "admin_notes": "Notas do admin",
+      "admin_notes_placeholder": "Adicione as suas notas sobre a resolução deste feedback...",
+      "view": "Ver detalhes",
+      "details": "Detalhes do feedback",
+      "type": {
+        "label": "Tipo"
+      },
+      "subject": {
+        "label": "Assunto"
+      },
+      "message": {
+        "label": "Mensagem"
+      },
+      "user": "Utilizador",
+      "status": "Estado",
+      "created_at": "Data de criação",
+      "url": "Página relacionada",
+      "user_agent": "Navegador/SO",
+      "success": {
+        "resolve": "Feedback marcado como resolvido",
+        "unresolve": "Feedback marcado como não resolvido"
+      },
+      "error": {
+        "load": "Erro ao carregar feedback",
+        "resolve": "Erro ao actualizar feedback"
+      }
+    }
   },
   "navigation": {
     "home": "Início",
@@ -439,7 +495,8 @@
   },
   "footer": {
     "language_selector": "Alterar idioma",
-    "copyright": "© {year} Convenção de Malabarismo. Todos os direitos reservados."
+    "copyright": "© {year} Convenção de Malabarismo. Todos os direitos reservados.",
+    "feedback": "Dar-nos feedback"
   },
   "messages": {
     "login_success": "Sessão iniciada com sucesso!",
@@ -845,6 +902,73 @@
       "loading_convention_data": "A carregar dados da convenção...",
       "convention_not_found_or_no_rights": "A convenção que procura não existe ou não tem permissões para a editar.",
       "submit_button": "Actualizar a convenção"
+    }
+  },
+  "feedback": {
+    "title": "Valorizamos o seu feedback",
+    "description": "Ajude-nos a melhorar a plataforma partilhando os seus comentários, sugestões ou relatórios de bugs.",
+    "type": {
+      "label": "Tipo de feedback",
+      "placeholder": "Seleccione um tipo"
+    },
+    "types": {
+      "bug": "Reportar um bug",
+      "suggestion": "Sugestão de melhoria",
+      "general": "Comentário geral",
+      "complaint": "Reportar um problema"
+    },
+    "subject": {
+      "label": "Assunto",
+      "placeholder": "Descreva brevemente o seu feedback"
+    },
+    "message": {
+      "label": "Mensagem detalhada",
+      "placeholder": "Descreva em detalhe o seu feedback, sugestão ou o problema encontrado..."
+    },
+    "name": {
+      "label": "O seu nome",
+      "placeholder": "O seu nome próprio e apelido"
+    },
+    "email": {
+      "label": "O seu email",
+      "placeholder": "o.seu{'@'}email.com"
+    },
+    "url": {
+      "label": "Página relacionada (automático)",
+      "placeholder": "URL da página"
+    },
+    "guest": {
+      "info": "Como visitante, forneça os seus dados de contacto para um possível seguimento."
+    },
+    "submit": "Enviar feedback",
+    "success": {
+      "title": "Obrigado pelo seu feedback!",
+      "message": "A sua mensagem foi enviada à nossa equipa. Iremos analisá-la o mais rápido possível.",
+      "toast": "O seu feedback foi enviado com sucesso"
+    },
+    "error": {
+      "title": "Erro ao enviar feedback",
+      "submit": "Ocorreu um erro ao enviar o seu feedback",
+      "required_fields": "Por favor preencha todos os campos obrigatórios",
+      "captcha_required": "Por favor complete o captcha",
+      "captcha_not_loaded": "O captcha ainda não carregou, aguarde"
+    },
+    "validation": {
+      "subject": {
+        "min": "O assunto deve ter pelo menos 5 caracteres",
+        "max": "O assunto não pode exceder 200 caracteres"
+      },
+      "message": {
+        "min": "A mensagem deve ter pelo menos 20 caracteres",
+        "max": "A mensagem não pode exceder 5000 caracteres"
+      },
+      "name": {
+        "min": "O nome deve ter pelo menos 2 caracteres",
+        "max": "O nome não pode exceder 100 caracteres"
+      },
+      "email": {
+        "invalid": "Email inválido"
+      }
     }
   }
 }

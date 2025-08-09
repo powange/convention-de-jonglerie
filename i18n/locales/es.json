@@ -68,7 +68,63 @@
     "loading_activity": "Cargando actividad reciente...",
     "no_recent_activity": "Sin actividad reciente",
     "cannot_load_stats": "No se pueden cargar las estadísticas",
-    "cannot_load_activity": "No se puede cargar la actividad reciente"
+    "cannot_load_activity": "No se puede cargar la actividad reciente",
+    "feedback": {
+      "title": "Gestión de Comentarios de Usuarios",
+      "description": "Ve y gestiona comentarios, sugerencias y reportes de errores de usuarios.",
+      "search": "Buscar comentarios...",
+      "empty": "Sin comentarios aún",
+      "stats": {
+        "total": "Total de comentarios",
+        "pending": "Pendientes",
+        "resolved": "Resueltos",
+        "bugs": "Errores reportados"
+      },
+      "filter": {
+        "type": "Filtrar por tipo",
+        "status": "Filtrar por estado",
+        "all_types": "Todos los tipos",
+        "all_status": "Todos los estados"
+      },
+      "types": {
+        "bug": "Error",
+        "suggestion": "Sugerencia",
+        "general": "General",
+        "complaint": "Queja"
+      },
+      "pending": "Pendiente",
+      "resolved": "Resuelto",
+      "resolve": "Resolver",
+      "unresolve": "Reabrir",
+      "mark_resolved": "Marcar como resuelto",
+      "mark_unresolved": "Marcar como no resuelto",
+      "admin_notes": "Notas del administrador",
+      "admin_notes_placeholder": "Agrega tus notas sobre la resolución de este comentario...",
+      "view": "Ver detalles",
+      "details": "Detalles del comentario",
+      "type": {
+        "label": "Tipo"
+      },
+      "subject": {
+        "label": "Asunto"
+      },
+      "message": {
+        "label": "Mensaje"
+      },
+      "user": "Usuario",
+      "status": "Estado",
+      "created_at": "Fecha de creación",
+      "url": "Página relacionada",
+      "user_agent": "Navegador/SO",
+      "success": {
+        "resolve": "Comentario marcado como resuelto",
+        "unresolve": "Comentario marcado como no resuelto"
+      },
+      "error": {
+        "load": "Error cargando comentarios",
+        "resolve": "Error actualizando comentario"
+      }
+    }
   },
   "navigation": {
     "home": "Inicio",
@@ -438,7 +494,8 @@
   },
   "footer": {
     "language_selector": "Cambiar idioma",
-    "copyright": "© {year} Convención de Malabares. Todos los derechos reservados."
+    "copyright": "© {year} Convención de Malabares. Todos los derechos reservados.",
+    "feedback": "Danos tu opinión"
   },
   "messages": {
     "login_success": "¡Inicio de sesión exitoso!",
@@ -836,6 +893,73 @@
       "loading_convention_data": "Cargando datos de la convención...",
       "convention_not_found_or_no_rights": "La convención que buscas no existe o no tienes permisos para editarla.",
       "submit_button": "Actualizar convención"
+    }
+  },
+  "feedback": {
+    "title": "Valoramos tus comentarios",
+    "description": "Ayúdanos a mejorar la plataforma compartiendo tus comentarios, sugerencias o reportes de errores.",
+    "type": {
+      "label": "Tipo de comentario",
+      "placeholder": "Selecciona un tipo"
+    },
+    "types": {
+      "bug": "Reportar un error",
+      "suggestion": "Sugerencia de mejora",
+      "general": "Comentario general",
+      "complaint": "Reportar un problema"
+    },
+    "subject": {
+      "label": "Asunto",
+      "placeholder": "Describe brevemente tu comentario"
+    },
+    "message": {
+      "label": "Mensaje detallado",
+      "placeholder": "Describe en detalle tu comentario, sugerencia o el problema encontrado..."
+    },
+    "name": {
+      "label": "Tu nombre",
+      "placeholder": "Tu nombre y apellido"
+    },
+    "email": {
+      "label": "Tu email",
+      "placeholder": "tu{'@'}email.com"
+    },
+    "url": {
+      "label": "Página relacionada (automático)",
+      "placeholder": "URL de la página"
+    },
+    "guest": {
+      "info": "Como visitante, por favor proporciona tus datos de contacto para un posible seguimiento."
+    },
+    "submit": "Enviar comentario",
+    "success": {
+      "title": "¡Gracias por tu comentario!",
+      "message": "Tu mensaje ha sido enviado a nuestro equipo. Lo revisaremos lo antes posible.",
+      "toast": "Tu comentario ha sido enviado exitosamente"
+    },
+    "error": {
+      "title": "Error al enviar comentario",
+      "submit": "Ha ocurrido un error al enviar tu comentario",
+      "required_fields": "Por favor completa todos los campos obligatorios",
+      "captcha_required": "Por favor completa el captcha",
+      "captcha_not_loaded": "El captcha no se ha cargado aún, por favor espera"
+    },
+    "validation": {
+      "subject": {
+        "min": "El asunto debe tener al menos 5 caracteres",
+        "max": "El asunto no puede exceder 200 caracteres"
+      },
+      "message": {
+        "min": "El mensaje debe tener al menos 20 caracteres",
+        "max": "El mensaje no puede exceder 5000 caracteres"
+      },
+      "name": {
+        "min": "El nombre debe tener al menos 2 caracteres",
+        "max": "El nombre no puede exceder 100 caracteres"
+      },
+      "email": {
+        "invalid": "Email inválido"
+      }
     }
   }
 }

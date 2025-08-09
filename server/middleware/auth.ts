@@ -23,6 +23,29 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
+  // Feedback API route - public for POST (allows both authenticated and anonymous users)
+  if (path === '/api/feedback' && requestMethod === 'POST') {
+    // Pour les utilisateurs connectés, on essaie de récupérer leur info via le token
+    const token = event.node.req.headers.authorization?.split(' ')[1];
+    if (token) {
+      try {
+        const config = useRuntimeConfig();
+        const decoded = jwt.verify(token, config.jwtSecret) as { userId: number };
+        event.context.user = await prisma.user.findUnique({
+          where: { id: decoded.userId },
+          select: { id: true, email: true, pseudo: true, nom: true, prenom: true, isGlobalAdmin: true },
+        });
+      } catch {
+        // Si le token est invalide, on continue sans utilisateur (feedback anonyme)
+        event.context.user = null;
+      }
+    }
+    return;
+  }
+  
+  // Note: GET /api/feedback et autres routes admin feedback restent protégées
+  // Elles nécessitent une authentification (gérées plus bas dans le middleware)
+
   // Public GET routes pour conventions et éditions
   const publicGetRoutes = [
     '/api/conventions',  // Liste des conventions

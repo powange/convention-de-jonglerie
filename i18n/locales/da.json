@@ -68,7 +68,63 @@
     "loading_activity": "Indlæser seneste aktivitet...",
     "no_recent_activity": "Ingen seneste aktivitet",
     "cannot_load_stats": "Kan ikke indlæse statistikker",
-    "cannot_load_activity": "Kan ikke indlæse seneste aktivitet"
+    "cannot_load_activity": "Kan ikke indlæse seneste aktivitet",
+    "feedback": {
+      "title": "Brugerfeedback Administration",
+      "description": "Se og administrer brugerfeedback, forslag og fejlrapporter.",
+      "search": "Søg i feedback...",
+      "empty": "Ingen feedback endnu",
+      "stats": {
+        "total": "Samlet feedback",
+        "pending": "Afventer",
+        "resolved": "Løst",
+        "bugs": "Rapporterede fejl"
+      },
+      "filter": {
+        "type": "Filtrer efter type",
+        "status": "Filtrer efter status",
+        "all_types": "Alle typer",
+        "all_status": "Alle status"
+      },
+      "types": {
+        "bug": "Fejl",
+        "suggestion": "Forslag",
+        "general": "Generel",
+        "complaint": "Klage"
+      },
+      "pending": "Afventer",
+      "resolved": "Løst",
+      "resolve": "Løs",
+      "unresolve": "Åbn igen",
+      "mark_resolved": "Markér som løst",
+      "mark_unresolved": "Markér som uløst",
+      "admin_notes": "Admin-noter",
+      "admin_notes_placeholder": "Tilføj dine noter om løsning af denne feedback...",
+      "view": "Se detaljer",
+      "details": "Feedback-detaljer",
+      "type": {
+        "label": "Type"
+      },
+      "subject": {
+        "label": "Emne"
+      },
+      "message": {
+        "label": "Besked"
+      },
+      "user": "Bruger",
+      "status": "Status",
+      "created_at": "Oprettet den",
+      "url": "Relateret side",
+      "user_agent": "Browser/OS",
+      "success": {
+        "resolve": "Feedback markeret som løst",
+        "unresolve": "Feedback markeret som uløst"
+      },
+      "error": {
+        "load": "Fejl ved indlæsning af feedback",
+        "resolve": "Fejl ved opdatering af feedback"
+      }
+    }
   },
   "navigation": {
     "home": "Hjem",
@@ -439,7 +495,8 @@
   },
   "footer": {
     "language_selector": "Skift sprog",
-    "copyright": "© {year} Jonglørkonvention. Alle rettigheder forbeholdes."
+    "copyright": "© {year} Jonglørkonvention. Alle rettigheder forbeholdes.",
+    "feedback": "Giv os feedback"
   },
   "messages": {
     "login_success": "Login vellykket!",
@@ -845,6 +902,73 @@
       "loading_convention_data": "Indlæser konventionsdata...",
       "convention_not_found_or_no_rights": "Konventionen, du leder efter, eksisterer ikke, eller du har ikke rettigheder til at redigere den.",
       "submit_button": "Opdater konventionen"
+    }
+  },
+  "feedback": {
+    "title": "Vi værdsætter din feedback",
+    "description": "Hjælp os med at forbedre platformen ved at dele dine kommentarer, forslag eller fejlrapporter.",
+    "type": {
+      "label": "Feedback-type",
+      "placeholder": "Vælg en type"
+    },
+    "types": {
+      "bug": "Rapporter en fejl",
+      "suggestion": "Forbedringsforslag",
+      "general": "Generel kommentar",
+      "complaint": "Rapporter et problem"
+    },
+    "subject": {
+      "label": "Emne",
+      "placeholder": "Beskriv kort din feedback"
+    },
+    "message": {
+      "label": "Detaljeret besked",
+      "placeholder": "Beskriv detaljeret din feedback, forslag eller problemet du stødte på..."
+    },
+    "name": {
+      "label": "Dit navn",
+      "placeholder": "Dit for- og efternavn"
+    },
+    "email": {
+      "label": "Din email",
+      "placeholder": "din{'@'}email.com"
+    },
+    "url": {
+      "label": "Relateret side (automatisk)",
+      "placeholder": "Side-URL"
+    },
+    "guest": {
+      "info": "Som gæst bedes du oplyse dine kontaktoplysninger for mulig opfølgning."
+    },
+    "submit": "Send feedback",
+    "success": {
+      "title": "Tak for din feedback!",
+      "message": "Din besked er sendt til vores team. Vi vil gennemgå den hurtigst muligt.",
+      "toast": "Din feedback er sendt succesfuldt"
+    },
+    "error": {
+      "title": "Fejl ved afsendelse af feedback",
+      "submit": "Der opstod en fejl ved afsendelse af din feedback",
+      "required_fields": "Udfyld venligst alle påkrævede felter",
+      "captcha_required": "Udfyld venligst captcha'en",
+      "captcha_not_loaded": "Captcha'en er ikke indlæst endnu, vent venligst"
+    },
+    "validation": {
+      "subject": {
+        "min": "Emnet skal være mindst 5 tegn",
+        "max": "Emnet kan ikke overstige 200 tegn"
+      },
+      "message": {
+        "min": "Beskeden skal være mindst 20 tegn",
+        "max": "Beskeden kan ikke overstige 5000 tegn"
+      },
+      "name": {
+        "min": "Navnet skal være mindst 2 tegn",
+        "max": "Navnet kan ikke overstige 100 tegn"
+      },
+      "email": {
+        "invalid": "Ugyldig email"
+      }
     }
   }
 }

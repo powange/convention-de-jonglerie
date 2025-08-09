@@ -68,7 +68,63 @@
     "loading_activity": "Loading recent activity...",
     "no_recent_activity": "No recent activity",
     "cannot_load_stats": "Cannot load statistics",
-    "cannot_load_activity": "Cannot load recent activity"
+    "cannot_load_activity": "Cannot load recent activity",
+    "feedback": {
+      "title": "User Feedback Management",
+      "description": "View and manage user feedback, suggestions and bug reports.",
+      "search": "Search feedback...",
+      "empty": "No feedback yet",
+      "stats": {
+        "total": "Total feedback",
+        "pending": "Pending",
+        "resolved": "Resolved",
+        "bugs": "Bugs reported"
+      },
+      "filter": {
+        "type": "Filter by type",
+        "status": "Filter by status",
+        "all_types": "All types",
+        "all_status": "All status"
+      },
+      "types": {
+        "bug": "Bug",
+        "suggestion": "Suggestion",
+        "general": "General",
+        "complaint": "Complaint"
+      },
+      "pending": "Pending",
+      "resolved": "Resolved",
+      "resolve": "Resolve",
+      "unresolve": "Reopen",
+      "mark_resolved": "Mark as resolved",
+      "mark_unresolved": "Mark as unresolved",
+      "admin_notes": "Admin notes",
+      "admin_notes_placeholder": "Add your notes about resolving this feedback...",
+      "view": "View details",
+      "details": "Feedback details",
+      "type": {
+        "label": "Type"
+      },
+      "subject": {
+        "label": "Subject"
+      },
+      "message": {
+        "label": "Message"
+      },
+      "user": "User",
+      "status": "Status",
+      "created_at": "Created at",
+      "url": "Related page",
+      "user_agent": "Browser/OS",
+      "success": {
+        "resolve": "Feedback marked as resolved",
+        "unresolve": "Feedback marked as unresolved"
+      },
+      "error": {
+        "load": "Error loading feedback",
+        "resolve": "Error updating feedback"
+      }
+    }
   },
   "navigation": {
     "home": "Home",
@@ -438,7 +494,8 @@
   },
   "footer": {
     "language_selector": "Change language",
-    "copyright": "© {year} Juggling Convention. All rights reserved."
+    "copyright": "© {year} Juggling Convention. All rights reserved.",
+    "feedback": "Give us feedback"
   },
   "messages": {
     "login_success": "Login successful!",
@@ -756,6 +813,75 @@
       "loading_convention_data": "Loading convention data...",
       "convention_not_found_or_no_rights": "The convention you are looking for does not exist or you don't have the rights to edit it.",
       "submit_button": "Update convention"
+    }
+  },
+  "feedback": {
+    "title": "We value your feedback",
+    "description": "Help us improve the platform by sharing your comments, suggestions or bug reports.",
+    "type": {
+      "label": "Feedback type",
+      "placeholder": "Select a type"
+    },
+    "types": {
+      "bug": "Report a bug",
+      "suggestion": "Improvement suggestion", 
+      "general": "General comment",
+      "complaint": "Report a problem"
+    },
+    "subject": {
+      "label": "Subject",
+      "placeholder": "Briefly describe your feedback"
+    },
+    "message": {
+      "label": "Detailed message",
+      "placeholder": "Describe in detail your feedback, suggestion or the problem encountered..."
+    },
+    "name": {
+      "label": "Your name",
+      "placeholder": "Your first and last name"
+    },
+    "email": {
+      "label": "Your email",
+      "placeholder": "your{'@'}email.com"
+    },
+    "url": {
+      "label": "Related page (automatic)",
+      "placeholder": "Page URL"
+    },
+    "guest": {
+      "info": "As a visitor, please provide your contact details for potential follow-up."
+    },
+    "submit": "Send feedback",
+    "success": {
+      "title": "Thank you for your feedback!",
+      "message": "Your message has been sent to our team. We will review it as soon as possible.",
+      "toast": "Your feedback has been sent successfully"
+    },
+    "error": {
+      "title": "Error sending feedback",
+      "submit": "An error occurred while sending your feedback",
+      "required_fields": "Please fill in all required fields",
+      "name_required": "Name is required",
+      "name_required_desc": "Please provide your name so we can identify your feedback",
+      "captcha_required": "Please complete the captcha",
+      "captcha_not_loaded": "The captcha is not loaded yet, please wait"
+    },
+    "validation": {
+      "subject": {
+        "min": "Subject must be at least 5 characters",
+        "max": "Subject cannot exceed 200 characters"
+      },
+      "message": {
+        "min": "Message must be at least 20 characters",
+        "max": "Message cannot exceed 5000 characters"
+      },
+      "name": {
+        "min": "Name must be at least 2 characters",
+        "max": "Name cannot exceed 100 characters"
+      },
+      "email": {
+        "invalid": "Invalid email"
+      }
     }
   },
   "errors": {
