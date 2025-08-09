@@ -136,7 +136,9 @@ export default defineNuxtConfig({
       }
     },
     plugins: [
-      tsconfigPaths()
+      tsconfigPaths({
+        ignoreConfigErrors: true
+      })
     ]
   },
   experimental: {
