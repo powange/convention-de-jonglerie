@@ -3,10 +3,11 @@
     v-model:open="open"
     :title="t('feedback.title')"
     :description="t('feedback.description')"
+    :class="{ 'sm:max-w-2xl': !isMobile }"
   >
     <template #content>
       <UCard v-if="!submitted" class="shadow-xl border-0">
-        <div class="p-6">
+        <div class="p-4 sm:p-6 max-h-[80vh] sm:max-h-[80vh] overflow-y-auto pb-8 scroll-smooth overscroll-contain">
           <!-- En-tête avec icône -->
           <div class="text-center mb-6">
             <div class="mx-auto w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center mb-3 shadow-lg">
@@ -166,6 +167,14 @@ const authStore = useAuthStore()
 const { t } = useI18n()
 const toast = useToast()
 const route = useRoute()
+
+// Détection mobile pour fullscreen sur petits écrans
+const isMobile = computed(() => {
+  if (import.meta.client) {
+    return window.innerWidth < 768
+  }
+  return false
+})
 
 // État local
 const loading = ref(false)
