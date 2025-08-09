@@ -35,6 +35,10 @@ export default defineNuxtConfig({
     ],
     langDir: 'locales/',
     lazy: true,
+    compilation: {
+      strictMessage: false,
+      escapeHtml: false
+    },
     strategy: 'no_prefix',
     detectBrowserLanguage: {
       useCookie: true,
@@ -48,6 +52,8 @@ export default defineNuxtConfig({
       alwaysRedirect: false,
       fallbackLocale: 'fr'
     },
+    // Optimisation: précharger uniquement les langues principales
+    preloadLocales: ['en', 'fr'],
     vueI18n: './i18n/i18n.config.ts'
   },
   css: [

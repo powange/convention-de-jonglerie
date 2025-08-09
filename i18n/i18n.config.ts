@@ -5,5 +5,11 @@ export default defineI18nConfig(() => ({
   globalInjection: true,
   missingWarn: false,
   fallbackWarn: false,
-  warnHtmlMessage: false
+  warnHtmlMessage: false,
+  // Optimisations pour le lazy loading
+  lazy: true,
+  // Ne pas précharger toutes les locales
+  precompiledMessages: false,
+  // Charger uniquement la locale active
+  messages: {}
 }))
