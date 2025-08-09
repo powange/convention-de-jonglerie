@@ -220,15 +220,17 @@ const isLanguageDropdownOpen = ref(false);
 
 // Configuration des langues avec leurs drapeaux
 const languageConfig = {
-  fr: { name: 'Français', flag: 'fi fi-fr' },
   en: { name: 'English', flag: 'fi fi-gb' },
-  es: { name: 'Español', flag: 'fi fi-es' },
-  de: { name: 'Deutsch', flag: 'fi fi-de' },
-  it: { name: 'Italiano', flag: 'fi fi-it' },
-  pt: { name: 'Português', flag: 'fi fi-pt' },
   da: { name: 'Dansk', flag: 'fi fi-dk' },
+  de: { name: 'Deutsch', flag: 'fi fi-de' },
+  es: { name: 'Español', flag: 'fi fi-es' },
+  fr: { name: 'Français', flag: 'fi fi-fr' },
+  it: { name: 'Italiano', flag: 'fi fi-it' },
+  nl: { name: 'Nederlands', flag: 'fi fi-nl' },
   pl: { name: 'Polski', flag: 'fi fi-pl' },
-  nl: { name: 'Nederlands', flag: 'fi fi-nl' }
+  pt: { name: 'Português', flag: 'fi fi-pt' },
+  ru: { name: 'Русский', flag: 'fi fi-ru' },
+  uk: { name: 'Українська', flag: 'fi fi-ua' }
 };
 
 // Langue courante avec son drapeau
