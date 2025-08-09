@@ -227,7 +227,8 @@ const languageConfig = {
   it: { name: 'Italiano', flag: 'fi fi-it' },
   pt: { name: 'Português', flag: 'fi fi-pt' },
   da: { name: 'Dansk', flag: 'fi fi-dk' },
-  pl: { name: 'Polski', flag: 'fi fi-pl' }
+  pl: { name: 'Polski', flag: 'fi fi-pl' },
+  nl: { name: 'Nederlands', flag: 'fi fi-nl' }
 };
 
 // Langue courante avec son drapeau
