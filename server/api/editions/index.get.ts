@@ -34,8 +34,16 @@ export default defineEventHandler(async (event) => {
       hasAccessibility,
       hasWorkshops,
       hasLongShow,
-      hasATM
+      hasATM,
+      // Paramètres de pagination
+      page = '1',
+      limit = '20'
     } = query;
+
+    // Validation et conversion des paramètres de pagination
+    const pageNum = Math.max(1, parseInt(page as string) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit as string) || 20)); // Max 100 items par page
+    const offset = (pageNum - 1) * limitNum;
 
     const where: {
       name?: { contains: string };
@@ -243,35 +251,43 @@ export default defineEventHandler(async (event) => {
       console.log('Table EditionCollaborator pas encore créée, ignorer les collaborateurs');
     }
 
-    const editions = await prisma.edition.findMany({
-      where: finalWhere,
-      include: {
-        creator: {
-          select: { id: true, pseudo: true },
-        },
-        favoritedBy: {
-          select: { id: true },
-        },
-        convention: {
-          select: { id: true, name: true, description: true, logo: true },
-        },
-        ...(includeCollaborators && {
-          collaborators: {
-            include: {
-              user: {
-                select: { id: true, pseudo: true, profilePicture: true, updatedAt: true, email: true }
-              },
-              addedBy: {
-                select: { id: true, pseudo: true }
+    // Exécuter en parallèle la récupération des données et le comptage total
+    const [editions, totalCount] = await Promise.all([
+      prisma.edition.findMany({
+        where: finalWhere,
+        include: {
+          creator: {
+            select: { id: true, pseudo: true },
+          },
+          favoritedBy: {
+            select: { id: true },
+          },
+          convention: {
+            select: { id: true, name: true, description: true, logo: true },
+          },
+          ...(includeCollaborators && {
+            collaborators: {
+              include: {
+                user: {
+                  select: { id: true, pseudo: true, profilePicture: true, updatedAt: true, email: true }
+                },
+                addedBy: {
+                  select: { id: true, pseudo: true }
+                }
               }
             }
-          }
-        }),
-      },
-      orderBy: {
-        startDate: 'asc' // Tri croissant par date de début (plus proche en premier)
-      }
-    });
+          }),
+        },
+        orderBy: {
+          startDate: 'asc' // Tri croissant par date de début (plus proche en premier)
+        },
+        skip: offset,
+        take: limitNum
+      }),
+      prisma.edition.count({
+        where: finalWhere
+      })
+    ]);
 
     // Transformer les emails en emailHash pour les collaborateurs
     const transformedEditions = editions.map(edition => {
@@ -288,7 +304,21 @@ export default defineEventHandler(async (event) => {
       return edition;
     });
 
-    return transformedEditions;
+    // Calculer les informations de pagination
+    const totalPages = Math.ceil(totalCount / limitNum);
+
+    // Retourner les données avec les informations de pagination
+    return {
+      data: transformedEditions,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total: totalCount,
+        totalPages,
+        hasNextPage: pageNum < totalPages,
+        hasPrevPage: pageNum > 1
+      }
+    };
   } catch (error) {
     console.error('Erreur API editions:', error);
     console.error('Query params:', query);

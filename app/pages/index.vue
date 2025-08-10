@@ -171,7 +171,13 @@
       </div>
 
       <!-- Filtres mobiles en overlay -->
-      <UModal v-model:open="showMobileFilters" variant="subtle" size="lg" @close="closeMobileFilters">
+      <UModal 
+        v-model:open="showMobileFilters" 
+        variant="subtle" 
+        size="lg" 
+        :description="$t('homepage.filters_description')"
+        @close="closeMobileFilters"
+      >
         <template #header>
           <div class="flex items-center gap-2">
             <h2 class="text-xl font-semibold">{{ $t('homepage.filters') }}</h2>
@@ -246,6 +252,37 @@
                 </UFormField>
               </div>
               
+              <!-- Filtre temporel -->
+              <div class="space-y-4">
+                <h4 class="font-medium text-gray-700">{{ $t('homepage.period') }} :</h4>
+                <div class="space-y-3">
+                  <UCheckbox v-model="filters.showPast" name="showPast">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <span class="text-base">✅</span>
+                        <span>{{ $t('homepage.finished_editions') }}</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  <UCheckbox v-model="filters.showCurrent" name="showCurrent">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <span class="text-base">🔥</span>
+                        <span>{{ $t('homepage.current_editions') }}</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                  <UCheckbox v-model="filters.showFuture" name="showFuture">
+                    <template #label>
+                      <div class="flex items-center gap-2">
+                        <span class="text-base">🔄</span>
+                        <span>{{ $t('homepage.upcoming_editions') }}</span>
+                      </div>
+                    </template>
+                  </UCheckbox>
+                </div>
+              </div>
+              
               <!-- Filtres services -->
               <div class="space-y-4">
                 <h4 class="font-medium text-gray-700">{{ $t('homepage.searched_services') }} :</h4>
@@ -307,24 +344,48 @@
 
       <div v-else>
         <!-- Vue en grille -->
-        <div v-if="viewMode === 'grid'" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-          <EditionCard 
-            v-for="edition in editionStore.editions" 
-            :key="edition.id" 
-            :edition="edition"
-            :show-status="true"
-          >
-            <template #actions="{ edition }">
-              <UButton
-                v-if="authStore.isAuthenticated"
-                :icon="isFavorited(edition.id) ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-                :color="isFavorited(edition.id) ? 'warning' : 'neutral'"
-                variant="ghost"
-                size="sm"
-                @click="toggleFavorite(edition.id)"
-              />
-            </template>
-          </EditionCard>
+        <div v-if="viewMode === 'grid'">
+          <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
+            <EditionCard 
+              v-for="edition in editionStore.editions" 
+              :key="edition.id" 
+              :edition="edition"
+              :show-status="true"
+            >
+              <template #actions="{ edition }">
+                <UButton
+                  v-if="authStore.isAuthenticated"
+                  :icon="isFavorited(edition.id) ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+                  :color="isFavorited(edition.id) ? 'warning' : 'neutral'"
+                  variant="ghost"
+                  size="sm"
+                  @click="toggleFavorite(edition.id)"
+                />
+              </template>
+            </EditionCard>
+          </div>
+          
+          <!-- Informations de pagination (toujours affichées si il y a des résultats) -->
+          <div v-if="editionStore.pagination.total > 0" class="flex flex-col items-center gap-4">
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('common.showing') }} {{ ((editionStore.pagination.page - 1) * editionStore.pagination.limit) + 1 }} 
+              {{ $t('common.to') }} 
+              {{ Math.min(editionStore.pagination.page * editionStore.pagination.limit, editionStore.pagination.total) }}
+              {{ $t('common.of') }} 
+              {{ editionStore.pagination.total }}
+              {{ $t('common.results') }}
+            </div>
+            
+            <!-- Composant de pagination (seulement si plusieurs pages) -->
+            <UPagination 
+              v-if="editionStore.pagination.totalPages > 1"
+              v-model:page="currentPage"
+              :total="editionStore.pagination.total"
+              :items-per-page="editionStore.pagination.limit"
+              show-edges
+              size="sm"
+            />
+          </div>
         </div>
 
         <!-- Vue carte -->
@@ -398,6 +459,15 @@ const filters = reactive({
   ...Object.fromEntries(services.value.map(service => [service.key, false])),
 });
 
+// Variable réactive pour la page courante
+const currentPage = ref(1);
+
+// Watcher pour la pagination
+watch(currentPage, (newPage) => {
+  const paginatedFilters = { ...filters, page: newPage };
+  editionStore.fetchEditions(paginatedFilters);
+});
+
 // Créer une fonction debounced pour éviter les appels API trop fréquents
 // Délai de 300ms pour tous les changements de filtres pour éviter la surcharge
 const debouncedFetchEditions = useDebounceFn((newFilters) => {
@@ -409,6 +479,12 @@ let lastNameFilter = '';
 
 // Watcher pour appliquer automatiquement les filtres
 watch(filters, (newFilters) => {
+  // Réinitialiser la page à 1 quand les filtres changent
+  currentPage.value = 1;
+  
+  // Ajouter la page aux filtres
+  const filtersWithPagination = { ...newFilters, page: 1 };
+  
   // Si c'est uniquement le champ name qui a changé, utiliser le debounce
   // Sinon (checkbox, dates, etc.), appliquer immédiatement pour une meilleure réactivité
   const nameChanged = filters.name !== lastNameFilter;
@@ -416,10 +492,10 @@ watch(filters, (newFilters) => {
   
   if (nameChanged && filters.name !== '') {
     // Debounce pour le champ de recherche texte
-    debouncedFetchEditions(newFilters);
+    debouncedFetchEditions(filtersWithPagination);
   } else {
     // Application immédiate pour les autres filtres (checkbox, dates, pays)
-    editionStore.fetchEditions(newFilters);
+    editionStore.fetchEditions(filtersWithPagination);
   }
 }, { deep: true, immediate: false });
 

@@ -35,6 +35,22 @@ interface EditionFilters {
   hasAfjTokenPayment?: boolean;
   hasLongShow?: boolean;
   hasATM?: boolean;
+  // Pagination
+  page?: number;
+  limit?: number;
+}
+
+// Interface pour la réponse de l'API avec pagination
+interface EditionsApiResponse {
+  data: Edition[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
 }
 
 
@@ -44,6 +60,15 @@ export const useEditionStore = defineStore('editions', {
     editions: [] as Edition[],
     loading: false,
     error: null as string | null,
+    // Informations de pagination
+    pagination: {
+      page: 1,
+      limit: 20,
+      total: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPrevPage: false
+    }
   }),
   getters: {
     getEditionById: (state) => (id: number) => {
@@ -113,17 +138,36 @@ export const useEditionStore = defineStore('editions', {
           });
         }
 
-        const data = await $fetch<Edition[]>('/api/editions', {
+        // Paramètres de pagination
+        if (filters?.page) {
+          queryParams.page = filters.page.toString();
+        }
+        if (filters?.limit) {
+          queryParams.limit = filters.limit.toString();
+        }
+
+        const response = await $fetch<EditionsApiResponse>('/api/editions', {
           params: queryParams,
         });
-        this.editions = data;
-        this.processEditions();
+        
+        // Mettre à jour les éditions et les informations de pagination
+        this.editions = response.data;
+        this.pagination = response.pagination;
+        
+        // Note: processEditions() est maintenant géré côté serveur avec le tri
+        // this.processEditions();
       } catch (e: unknown) {
         const error = e as HttpError;
         this.error = error.message || error.data?.message || 'Failed to fetch editions';
       } finally {
         this.loading = false;
       }
+    },
+
+    // Méthode pour changer de page avec les mêmes filtres
+    async goToPage(page: number, filters?: EditionFilters) {
+      const newFilters = { ...filters, page };
+      await this.fetchEditions(newFilters);
     },
 
     async fetchEditionById(id: number) {
