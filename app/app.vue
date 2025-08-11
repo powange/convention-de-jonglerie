@@ -9,43 +9,29 @@
               <span class="ml-2 text-sm sm:text-xl font-bold">{{ $t('app.title') }}</span>
             </NuxtLink>
             <div class="flex items-center gap-4">
-              <!-- Sélecteur de langue discret -->
-              <div class="relative">
-                <button
-                  @click="toggleLanguageDropdown"
-                  class="w-8 h-8 rounded-md flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              <!-- Sélecteur de langue -->
+              <UDropdownMenu :items="languageItems">
+                <UButton
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
                   :title="$t('footer.language_selector')"
                 >
                   <span v-if="currentLanguage?.flag" :class="currentLanguage.flag" class="w-4 h-3"></span>
-                </button>
+                </UButton>
                 
-                <!-- Menu dropdown langues -->
-                <div 
-                  v-if="isLanguageDropdownOpen"
-                  class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
-                  @click.stop
+                <!-- Slots pour les drapeaux de chaque langue -->
+                <template 
+                  v-for="lang in locales" 
+                  :key="lang.code"
+                  #[`lang-${lang.code}-leading`]
                 >
-                  <div class="p-1">
-                    <button 
-                      v-for="lang in locales" 
-                      :key="lang.code"
-                      @click="changeLanguage(lang.code)"
-                      class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-                      :class="{ 'bg-gray-100 dark:bg-gray-700': locale === lang.code }"
-                    >
-                      <span :class="languageConfig[lang.code as keyof typeof languageConfig]?.flag" class="w-4 h-3"></span>
-                      {{ languageConfig[lang.code as keyof typeof languageConfig]?.name }}
-                    </button>
-                  </div>
-                </div>
-                
-                <!-- Overlay pour fermer le dropdown en cliquant à l'extérieur -->
-                <div 
-                  v-if="isLanguageDropdownOpen"
-                  class="fixed inset-0 z-40"
-                  @click="closeLanguageDropdown"
-                ></div>
-              </div>
+                  <span 
+                    :class="languageConfig[lang.code as keyof typeof languageConfig]?.flag" 
+                    class="w-4 h-3 shrink-0"
+                  ></span>
+                </template>
+              </UDropdownMenu>
 
               <!-- Navigation principale -->
               <div v-if="authStore.isAuthenticated" class="hidden md:flex items-center gap-2">
@@ -61,12 +47,11 @@
               </div>
 
               <!-- Dropdown utilisateur ou boutons connexion -->
-              <div v-if="authStore.isAuthenticated && authStore.user?.email" class="relative">
+              <UDropdownMenu v-if="authStore.isAuthenticated && authStore.user?.email" :items="userMenuItems">
                 <UButton 
                   variant="ghost" 
                   color="neutral" 
                   class="rounded-full"
-                  @click="toggleDropdown"
                 >
                   <div class="flex items-center gap-2">
                     <UserAvatar 
@@ -88,82 +73,11 @@
                     </div>
                     <UIcon 
                       name="i-heroicons-chevron-down" 
-                      class="w-4 h-4 text-gray-400 transition-transform"
-                      :class="{ 'rotate-180': isDropdownOpen }"
+                      class="w-4 h-4 text-gray-400"
                     />
                   </div>
                 </UButton>
-                
-                <!-- Menu dropdown -->
-                <div 
-                  v-if="isDropdownOpen"
-                  class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
-                  @click.stop
-                >
-                  <div class="p-1">
-                    <!-- Mon profil -->
-                    <NuxtLink 
-                      to="/profile" 
-                      class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-                      @click="closeDropdown"
-                    >
-                      <UIcon name="i-heroicons-user" class="w-4 h-4" />
-                      {{ $t('navigation.profile') }}
-                    </NuxtLink>
-                    
-                    <!-- Mes conventions -->
-                    <NuxtLink 
-                      to="/my-conventions" 
-                      class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-                      @click="closeDropdown"
-                    >
-                      <UIcon name="i-heroicons-calendar-days" class="w-4 h-4" />
-                      {{ $t('navigation.my_conventions') }}
-                    </NuxtLink>
-                    
-                    <!-- Dashboard admin (si super admin) -->
-                    <NuxtLink 
-                      v-if="authStore.user?.isGlobalAdmin"
-                      to="/admin" 
-                      class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-                      @click="closeDropdown"
-                    >
-                      <UIcon name="i-heroicons-squares-2x2" class="w-4 h-4" />
-                      {{ $t('navigation.admin') }}
-                    </NuxtLink>
-                    
-                    <!-- Mes favoris (mobile uniquement) -->
-                    <NuxtLink 
-                      v-if="isMobile"
-                      to="/favorites" 
-                      class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors md:hidden"
-                      @click="closeDropdown"
-                    >
-                      <UIcon name="i-heroicons-star" class="w-4 h-4" />
-                      {{ $t('navigation.my_favorites') }}
-                    </NuxtLink>
-                    
-                    <!-- Séparateur -->
-                    <hr class="my-1 border-gray-200 dark:border-gray-600" />
-                    
-                    <!-- Déconnexion -->
-                    <button 
-                      @click="handleLogout"
-                      class="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
-                    >
-                      <UIcon name="i-heroicons-arrow-right-on-rectangle" class="w-4 h-4" />
-                      {{ $t('navigation.logout') }}
-                    </button>
-                  </div>
-                </div>
-                
-                <!-- Overlay pour fermer le dropdown en cliquant à l'extérieur -->
-                <div 
-                  v-if="isDropdownOpen"
-                  class="fixed inset-0 z-40"
-                  @click="closeDropdown"
-                ></div>
-              </div>
+              </UDropdownMenu>
               
               <!-- Boutons connexion/inscription pour utilisateurs non connectés -->
               <div v-else class="flex flex-col sm:flex-row items-center gap-2">
@@ -208,12 +122,10 @@ import AppFooter from '~/components/ui/AppFooter.vue';
 const authStore = useAuthStore();
 const toast = useToast();
 const router = useRouter();
-const { locale, locales, setLocale } = useI18n();
+const { locale, locales, setLocale, t } = useI18n();
 
-// État réactif pour la taille d'écran et dropdowns
+// État réactif pour la taille d'écran
 const isMobile = ref(false);
-const isDropdownOpen = ref(false);
-const isLanguageDropdownOpen = ref(false);
 
 // Configuration des langues avec leurs drapeaux
 const languageConfig = {
@@ -235,35 +147,67 @@ const currentLanguage = computed(() => {
   return languageConfig[locale.value as keyof typeof languageConfig];
 });
 
-// Fonctions pour gérer les dropdowns
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
-  // Fermer l'autre dropdown s'il est ouvert
-  if (isDropdownOpen.value) {
-    isLanguageDropdownOpen.value = false;
+// Configuration des items du dropdown de langues
+const languageItems = computed(() => {
+  return locales.value.map(lang => ({
+    label: languageConfig[lang.code as keyof typeof languageConfig]?.name,
+    onSelect: () => changeLanguage(lang.code),
+    class: locale.value === lang.code ? 'bg-gray-100 dark:bg-gray-700' : '',
+    slot: `lang-${lang.code}`,
+    flagClass: languageConfig[lang.code as keyof typeof languageConfig]?.flag
+  }));
+});
+
+// Configuration des items du dropdown utilisateur
+const userMenuItems = computed(() => {
+  const items = [
+    {
+      label: t('navigation.profile'),
+      icon: 'i-heroicons-user',
+      to: '/profile'
+    },
+    {
+      label: t('navigation.my_conventions'),
+      icon: 'i-heroicons-calendar-days',
+      to: '/my-conventions'
+    }
+  ];
+
+  // Ajouter le dashboard admin si super admin
+  if (authStore.user?.isGlobalAdmin) {
+    items.push({
+      label: t('navigation.admin'),
+      icon: 'i-heroicons-squares-2x2',
+      to: '/admin'
+    });
   }
-};
 
-const closeDropdown = () => {
-  isDropdownOpen.value = false;
-};
-
-const toggleLanguageDropdown = () => {
-  isLanguageDropdownOpen.value = !isLanguageDropdownOpen.value;
-  // Fermer l'autre dropdown s'il est ouvert
-  if (isLanguageDropdownOpen.value) {
-    isDropdownOpen.value = false;
+  // Ajouter les favoris en mobile
+  if (isMobile.value) {
+    items.push({
+      label: t('navigation.my_favorites'),
+      icon: 'i-heroicons-star',
+      to: '/favorites'
+    });
   }
-};
 
-const closeLanguageDropdown = () => {
-  isLanguageDropdownOpen.value = false;
-};
+  // Ajouter le séparateur et la déconnexion
+  items.push(
+    { label: '─────────────────', disabled: true },
+    {
+      label: t('navigation.logout'),
+      icon: 'i-heroicons-arrow-right-on-rectangle',
+      onSelect: handleLogout,
+      color: 'red'
+    }
+  );
+
+  return items;
+});
 
 // Fonction pour changer de langue
 const changeLanguage = async (newLocale: string) => {
   await setLocale(newLocale);
-  isLanguageDropdownOpen.value = false;
   // Forcer le rafraîchissement pour s'assurer que la langue est bien appliquée
   refreshNuxtData();
 };
