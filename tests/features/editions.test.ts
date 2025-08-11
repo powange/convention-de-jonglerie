@@ -493,6 +493,7 @@ describe('Système d\'éditions', () => {
         { ...mockEdition, id: 2, name: 'Edition 2025' }
       ]
 
+      prismaMock.edition.count.mockResolvedValue(2)
       prismaMock.edition.findMany.mockResolvedValue(editions)
 
       // Simuler getQuery pour le handler
@@ -502,9 +503,14 @@ describe('Système d\'éditions', () => {
 
       const result = await getEditionsHandler(mockEvent as any)
 
-      expect(result).toHaveLength(2)
-      expect(result[0].id).toBe(1)
-      expect(result[1].name).toBe('Edition 2025')
+      expect(result).toHaveProperty('data')
+      expect(result).toHaveProperty('pagination')
+      expect(result.data).toHaveLength(2)
+      expect(result.data[0].id).toBe(1)
+      expect(result.data[1].name).toBe('Edition 2025')
+      expect(result.pagination.total).toBe(2)
+      expect(result.pagination.page).toBe(1)
+      expect(result.pagination.limit).toBe(12)
     })
 
     it('devrait filtrer les éditions futures', async () => {

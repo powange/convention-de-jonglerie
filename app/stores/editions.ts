@@ -4,6 +4,8 @@ import type { Edition, ConventionCollaborator, HttpError } from '~/types';
 
 // Interface pour les filtres d'éditions
 interface EditionFilters {
+  page?: number;
+  limit?: number;
   name?: string;
   startDate?: string;
   endDate?: string;
@@ -39,11 +41,28 @@ interface EditionFilters {
 
 
 
+// Interface pour la réponse paginée
+interface PaginatedResponse {
+  data: Edition[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 export const useEditionStore = defineStore('editions', {
   state: () => ({
     editions: [] as Edition[],
     loading: false,
     error: null as string | null,
+    pagination: {
+      total: 0,
+      page: 1,
+      limit: 12,
+      totalPages: 0
+    }
   }),
   getters: {
     getEditionById: (state) => (id: number) => {
@@ -76,6 +95,10 @@ export const useEditionStore = defineStore('editions', {
       this.error = null;
       try {
         const queryParams: { [key: string]: string } = {};
+        
+        // Paramètres de pagination
+        queryParams.page = (filters?.page || 1).toString();
+        queryParams.limit = (filters?.limit || 12).toString();
         
         // Filtres de base
         if (filters?.name) {
@@ -113,10 +136,11 @@ export const useEditionStore = defineStore('editions', {
           });
         }
 
-        const data = await $fetch<Edition[]>('/api/editions', {
+        const response = await $fetch<PaginatedResponse>('/api/editions', {
           params: queryParams,
         });
-        this.editions = data;
+        this.editions = response.data;
+        this.pagination = response.pagination;
         this.processEditions();
       } catch (e: unknown) {
         const error = e as HttpError;

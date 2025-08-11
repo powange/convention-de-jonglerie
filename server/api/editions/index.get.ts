@@ -34,8 +34,13 @@ export default defineEventHandler(async (event) => {
       hasAccessibility,
       hasWorkshops,
       hasLongShow,
-      hasATM
+      hasATM,
+      page = '1',
+      limit = '12'
     } = query;
+
+    const pageNumber = parseInt(page as string, 10);
+    const limitNumber = parseInt(limit as string, 10);
 
     const where: {
       name?: { contains: string };
@@ -243,6 +248,14 @@ export default defineEventHandler(async (event) => {
       console.log('Table EditionCollaborator pas encore créée, ignorer les collaborateurs');
     }
 
+    // Calculer le skip et take pour la pagination
+    const skip = (pageNumber - 1) * limitNumber;
+
+    // Obtenir le total pour la pagination
+    const totalCount = await prisma.edition.count({
+      where: finalWhere
+    });
+
     const editions = await prisma.edition.findMany({
       where: finalWhere,
       include: {
@@ -270,7 +283,9 @@ export default defineEventHandler(async (event) => {
       },
       orderBy: {
         startDate: 'asc' // Tri croissant par date de début (plus proche en premier)
-      }
+      },
+      skip,
+      take: limitNumber
     });
 
     // Transformer les emails en emailHash pour les collaborateurs
@@ -288,7 +303,16 @@ export default defineEventHandler(async (event) => {
       return edition;
     });
 
-    return transformedEditions;
+    // Retourner les résultats avec les métadonnées de pagination
+    return {
+      data: transformedEditions,
+      pagination: {
+        total: totalCount,
+        page: pageNumber,
+        limit: limitNumber,
+        totalPages: Math.ceil(totalCount / limitNumber)
+      }
+    };
   } catch (error) {
     console.error('Erreur API editions:', error);
     console.error('Query params:', query);

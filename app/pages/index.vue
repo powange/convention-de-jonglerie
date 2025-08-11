@@ -338,24 +338,38 @@
 
       <div v-else>
         <!-- Vue en grille -->
-        <div v-if="viewMode === 'grid'" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-          <EditionCard 
-            v-for="edition in editionStore.editions" 
-            :key="edition.id" 
-            :edition="edition"
-            :show-status="true"
-          >
-            <template #actions="{ edition }">
-              <UButton
-                v-if="authStore.isAuthenticated"
-                :icon="isFavorited(edition.id) ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-                :color="isFavorited(edition.id) ? 'warning' : 'neutral'"
-                variant="ghost"
-                size="sm"
-                @click="toggleFavorite(edition.id)"
-              />
-            </template>
-          </EditionCard>
+        <div v-if="viewMode === 'grid'">
+          <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+            <EditionCard 
+              v-for="edition in editionStore.editions" 
+              :key="edition.id" 
+              :edition="edition"
+              :show-status="true"
+            >
+              <template #actions="{ edition }">
+                <UButton
+                  v-if="authStore.isAuthenticated"
+                  :icon="isFavorited(edition.id) ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+                  :color="isFavorited(edition.id) ? 'warning' : 'neutral'"
+                  variant="ghost"
+                  size="sm"
+                  @click="toggleFavorite(edition.id)"
+                />
+              </template>
+            </EditionCard>
+          </div>
+          
+          <!-- Pagination -->
+          <div v-if="editionStore.pagination.totalPages > 1" class="mt-8 flex justify-center">
+            <UPagination 
+              v-model:page="currentPage"
+              :total="editionStore.pagination.total"
+              :items-per-page="itemsPerPage"
+              :sibling-count="1"
+              :show-edges="true"
+              size="md"
+            />
+          </div>
         </div>
 
         <!-- Vue carte -->
@@ -391,6 +405,10 @@ const { getTranslatedServices, getTranslatedServicesByCategory } = useTranslated
 const services = getTranslatedServices;
 const servicesByCategory = getTranslatedServicesByCategory;
 const viewMode = ref<'grid' | 'map'>('grid');
+
+// Pagination
+const currentPage = ref(1);
+const itemsPerPage = ref(12);
 
 // Date formatter pour l'affichage
 const df = computed(() => {
@@ -439,18 +457,20 @@ const debouncedFetchEditions = useDebounceFn((newFilters) => {
 let lastNameFilter = '';
 
 // Watcher pour appliquer automatiquement les filtres
-watch(filters, (newFilters) => {
+watch([filters, currentPage], ([newFilters, newPage]) => {
   // Si c'est uniquement le champ name qui a changé, utiliser le debounce
   // Sinon (checkbox, dates, etc.), appliquer immédiatement pour une meilleure réactivité
   const nameChanged = filters.name !== lastNameFilter;
   lastNameFilter = filters.name;
   
+  const filtersWithPage = { ...newFilters, page: newPage, limit: itemsPerPage.value };
+  
   if (nameChanged && filters.name !== '') {
     // Debounce pour le champ de recherche texte
-    debouncedFetchEditions(newFilters);
+    debouncedFetchEditions(filtersWithPage);
   } else {
     // Application immédiate pour les autres filtres (checkbox, dates, pays)
-    editionStore.fetchEditions(newFilters);
+    editionStore.fetchEditions(filtersWithPage);
   }
 }, { deep: true, immediate: false });
 
@@ -513,11 +533,11 @@ const resetFilters = () => {
   services.value.forEach(service => {
     filters[service.key] = false;
   });
-  editionStore.fetchEditions(filters); // Fetch all conventions again
+  editionStore.fetchEditions({ ...filters, page: currentPage.value, limit: itemsPerPage.value }); // Fetch all conventions again
 };
 
 onMounted(() => {
-  editionStore.fetchEditions(filters);
+  editionStore.fetchEditions({ ...filters, page: currentPage.value, limit: itemsPerPage.value });
 });
 
 const isFavorited = computed(() => (editionId: number) => {
@@ -530,6 +550,11 @@ const editionsWithCoordinates = computed(() => {
     edition.latitude !== null && edition.longitude !== null
   );
 });
+
+// Réinitialiser la page courante quand les filtres changent
+watch(filters, () => {
+  currentPage.value = 1;
+}, { deep: true });
 
 const toggleFavorite = async (id: number) => {
   try {
