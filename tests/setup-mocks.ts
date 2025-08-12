@@ -28,9 +28,8 @@ global.createError = vi.fn((options) => {
   const error = new Error(options.statusMessage || options.message)
   error.statusCode = options.statusCode
   error.data = options.data
-  // Dans un contexte Nuxt/H3, createError est censé retourner l'erreur
-  // mais quand elle est lancée avec throw, elle doit vraiment être lancée
-  return error
+  // Dans un contexte Nuxt/H3, createError lance directement l'erreur
+  throw error
 })
 
 // Mock de getRequestURL

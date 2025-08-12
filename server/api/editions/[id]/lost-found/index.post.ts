@@ -24,7 +24,16 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const decoded = jwt.verify(token, useRuntimeConfig().jwtSecret) as any;
+    let decoded;
+    try {
+      decoded = jwt.verify(token, useRuntimeConfig().jwtSecret) as any;
+    } catch (error) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: 'Token invalide',
+      });
+    }
+    
     const userId = decoded.userId;
 
     if (!userId) {
