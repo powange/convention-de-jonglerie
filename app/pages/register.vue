@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center justify-center p-4">
-    <div class="w-full max-w-md">
+    <div class="w-full max-w-lg">
       <!-- En-tête avec logo/icône -->
       <div class="text-center mb-8">
         <div class="mx-auto w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
