@@ -65,7 +65,13 @@ export default defineEventHandler(async (event) => {
       message: 'Votre mot de passe a été réinitialisé avec succès'
     }
   } catch (error) {
-    console.error('Erreur lors de la réinitialisation du mot de passe:', error)
+    // Ne log que les vraies erreurs serveur, pas les erreurs utilisateur
+    // Les erreurs ZodError et createError avec statusCode < 500 sont des erreurs utilisateur
+    const isUserError = error.statusCode || error.name === 'ZodError'
+    
+    if (!isUserError || (error.statusCode && error.statusCode >= 500)) {
+      console.error('Erreur lors de la réinitialisation du mot de passe:', error)
+    }
     
     if (error.statusCode) {
       throw error

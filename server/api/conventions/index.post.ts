@@ -86,7 +86,7 @@ export default defineEventHandler(async (event) => {
   } catch (error) {
     // Gestion des erreurs de validation Zod
     if (error instanceof z.ZodError) {
-      return handleValidationError(error);
+      handleValidationError(error);
     }
     
     // Si c'est déjà une erreur HTTP, la relancer

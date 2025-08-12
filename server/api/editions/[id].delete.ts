@@ -66,7 +66,12 @@ export default defineEventHandler(async (event) => {
       },
     });
     return { message: 'Edition deleted successfully' };
-  } catch {
+  } catch (error: any) {
+    // Si c'est déjà une erreur HTTP (createError), on la relance
+    if (error.statusCode) {
+      throw error;
+    }
+    // Sinon, on transforme en erreur interne
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal Server Error',

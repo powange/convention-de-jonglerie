@@ -38,12 +38,13 @@ describe('API Login', () => {
   it('devrait connecter un utilisateur avec email valide', async () => {
     prismaMock.user.findUnique.mockResolvedValueOnce(mockUser)
 
-    const mockEvent = {
-      body: {
+    const requestBody = {
         identifier: 'test@example.com',
         password: 'Password123!'
-      }
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     const result = await loginHandler(mockEvent)
 
@@ -73,12 +74,13 @@ describe('API Login', () => {
       .mockResolvedValueOnce(null) // Pas trouvé par email
       .mockResolvedValueOnce(mockUser) // Trouvé par pseudo
 
-    const mockEvent = {
-      body: {
+    const requestBody = {
         identifier: 'testuser',
         password: 'Password123!'
-      }
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     const result = await loginHandler(mockEvent)
 
@@ -91,12 +93,13 @@ describe('API Login', () => {
   it('devrait rejeter si l\'utilisateur n\'existe pas', async () => {
     prismaMock.user.findUnique.mockResolvedValue(null)
 
-    const mockEvent = {
-      body: {
+    const requestBody = {
         identifier: 'nonexistent@example.com',
         password: 'Password123!'
-      }
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(loginHandler(mockEvent)).rejects.toThrow('Identifiants invalides')
   })
@@ -104,12 +107,13 @@ describe('API Login', () => {
   it('devrait rejeter si le mot de passe est incorrect', async () => {
     prismaMock.user.findUnique.mockResolvedValueOnce(mockUser)
 
-    const mockEvent = {
-      body: {
+    const requestBody = {
         identifier: 'test@example.com',
         password: 'WrongPassword'
-      }
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(loginHandler(mockEvent)).rejects.toThrow('Identifiants invalides')
   })
@@ -118,23 +122,25 @@ describe('API Login', () => {
     const unverifiedUser = { ...mockUser, isEmailVerified: false }
     prismaMock.user.findUnique.mockResolvedValueOnce(unverifiedUser)
 
-    const mockEvent = {
-      body: {
+    const requestBody = {
         identifier: 'test@example.com',
         password: 'Password123!'
-      }
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(loginHandler(mockEvent)).rejects.toThrow('Email non vérifié')
   })
 
   it('devrait valider les champs requis', async () => {
-    const mockEvent = {
-      body: {
+    const requestBody = {
         identifier: '',
         password: ''
-      }
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(loginHandler(mockEvent)).rejects.toThrow()
   })
@@ -142,12 +148,13 @@ describe('API Login', () => {
   it('devrait nettoyer les espaces dans les identifiants', async () => {
     prismaMock.user.findUnique.mockResolvedValueOnce(mockUser)
 
-    const mockEvent = {
-      body: {
-        identifier: '  test@example.com  ',
-        password: '  Password123!  '
-      }
+    const requestBody = {
+      identifier: '  test@example.com  ',
+      password: '  Password123!  '
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await loginHandler(mockEvent)
 
@@ -159,12 +166,13 @@ describe('API Login', () => {
   it('devrait générer un token JWT valide', async () => {
     prismaMock.user.findUnique.mockResolvedValueOnce(mockUser)
 
-    const mockEvent = {
-      body: {
-        identifier: 'test@example.com',
-        password: 'Password123!'
-      }
+    const requestBody = {
+      identifier: 'test@example.com',
+      password: 'Password123!'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await loginHandler(mockEvent)
 
@@ -179,12 +187,13 @@ describe('API Login', () => {
     const { authRateLimiter } = await import('../../../../server/utils/rate-limiter')
     prismaMock.user.findUnique.mockResolvedValueOnce(mockUser)
 
-    const mockEvent = {
-      body: {
-        identifier: 'test@example.com',
-        password: 'Password123!'
-      }
+    const requestBody = {
+      identifier: 'test@example.com',
+      password: 'Password123!'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await loginHandler(mockEvent)
 

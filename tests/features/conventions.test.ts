@@ -62,6 +62,9 @@ describe('Système de conventions', () => {
         collaborators: []
       })
 
+      // Mock readBody pour retourner les données de convention
+      global.readBody = vi.fn().mockResolvedValue(conventionData)
+
       const mockEvent = {
         context: { user: mockUser },
         body: conventionData
@@ -116,6 +119,9 @@ describe('Système de conventions', () => {
         description: 'A'.repeat(5001) // Description trop longue
       }
 
+      // Mock readBody pour retourner les données invalides
+      global.readBody = vi.fn().mockResolvedValue(invalidData)
+
       const mockEvent = {
         context: { user: mockUser },
         body: invalidData
@@ -140,6 +146,9 @@ describe('Système de conventions', () => {
       prismaMock.convention.create.mockResolvedValue(createdConvention)
       prismaMock.conventionCollaborator.create.mockResolvedValue({} as any)
       prismaMock.convention.findUnique.mockResolvedValue(createdConvention)
+
+      // Mock readBody pour retourner les données avec espaces
+      global.readBody = vi.fn().mockResolvedValue(dataWithSpaces)
 
       const mockEvent = {
         context: { user: mockUser },

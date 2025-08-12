@@ -55,14 +55,16 @@ describe('API Convention - Mise à jour', () => {
     })
     prismaMock.convention.update.mockResolvedValue(mockUpdatedConvention)
 
+    const requestBody = {
+      name: 'Convention Mise à Jour',
+      description: 'Description mise à jour'
+    }
+
     const mockEvent = {
       context: { user: mockUser },
-      params: { id: '1' },
-      body: {
-        name: 'Convention Mise à Jour',
-        description: 'Description mise à jour'
-      }
+      params: { id: '1' }
     }
+    global.readBody.mockResolvedValue(requestBody)
 
     const result = await updateConventionHandler(mockEvent)
 
@@ -98,14 +100,16 @@ describe('API Convention - Mise à jour', () => {
     })
     prismaMock.convention.update.mockResolvedValue(mockUpdatedConvention)
 
+    const requestBody = {
+      name: 'Convention Mise à Jour',
+      description: 'Description mise à jour'
+    }
+
     const mockEvent = {
       context: { user: mockUser },
-      params: { id: '1' },
-      body: {
-        name: 'Convention Mise à Jour',
-        description: 'Description mise à jour'
-      }
+      params: { id: '1' }
     }
+    global.readBody.mockResolvedValue(requestBody)
 
     const result = await updateConventionHandler(mockEvent)
 
@@ -162,14 +166,16 @@ describe('API Convention - Mise à jour', () => {
       collaborators: []
     })
 
+    const requestBody = {
+      name: '', // Nom vide invalide
+      description: 'Test'
+    }
+
     const mockEvent = {
       context: { user: mockUser },
-      params: { id: '1' },
-      body: {
-        name: '', // Nom vide invalide
-        description: 'Test'
-      }
+      params: { id: '1' }
     }
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(updateConventionHandler(mockEvent)).rejects.toThrow()
   })

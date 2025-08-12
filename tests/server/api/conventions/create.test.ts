@@ -52,13 +52,15 @@ describe('API Convention - Création', () => {
       }]
     })
 
-    const mockEvent = {
-      context: { user: mockUser },
-      body: {
-        name: 'Convention de Test',
-        description: 'Une convention pour les tests'
-      }
+    const requestBody = {
+      name: 'Convention de Test',
+      description: 'Une convention pour les tests'
     }
+
+    const mockEvent = {
+      context: { user: mockUser }
+    }
+    global.readBody.mockResolvedValue(requestBody)
 
     const result = await createConventionHandler(mockEvent)
 
@@ -93,24 +95,28 @@ describe('API Convention - Création', () => {
   })
 
   it('devrait rejeter les utilisateurs non authentifiés', async () => {
-    const mockEvent = {
-      context: { user: null },
-      body: {
-        name: 'Convention Test'
-      }
+    const requestBody = {
+      name: 'Convention Test'
     }
+
+    const mockEvent = {
+      context: { user: null }
+    }
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(createConventionHandler(mockEvent)).rejects.toThrow()
   })
 
   it('devrait valider le nom de convention', async () => {
-    const mockEvent = {
-      context: { user: mockUser },
-      body: {
-        name: '', // Nom vide
-        description: 'Test'
-      }
+    const requestBody = {
+      name: '', // Nom vide
+      description: 'Test'
     }
+
+    const mockEvent = {
+      context: { user: mockUser }
+    }
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(createConventionHandler(mockEvent)).rejects.toThrow()
   })
@@ -130,14 +136,16 @@ describe('API Convention - Création', () => {
       collaborators: []
     })
 
-    const mockEvent = {
-      context: { user: mockUser },
-      body: {
-        name: '  Convention avec espaces  ',
-        description: '  Description avec espaces  ',
-        logo: '  '
-      }
+    const requestBody = {
+      name: '  Convention avec espaces  ',
+      description: '  Description avec espaces  ',
+      logo: '  '
     }
+
+    const mockEvent = {
+      context: { user: mockUser }
+    }
+    global.readBody.mockResolvedValue(requestBody)
 
     await createConventionHandler(mockEvent)
 
@@ -163,13 +171,15 @@ describe('API Convention - Création', () => {
   it('devrait gérer les erreurs de base de données', async () => {
     prismaMock.convention.create.mockRejectedValue(new Error('Database error'))
 
-    const mockEvent = {
-      context: { user: mockUser },
-      body: {
-        name: 'Convention Test',
-        description: 'Test'
-      }
+    const requestBody = {
+      name: 'Convention Test',
+      description: 'Test'
     }
+
+    const mockEvent = {
+      context: { user: mockUser }
+    }
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(createConventionHandler(mockEvent)).rejects.toThrow()
   })

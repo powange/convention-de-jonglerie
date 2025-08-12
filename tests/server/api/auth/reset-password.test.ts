@@ -27,13 +27,14 @@ describe('API Reset Password', () => {
 
   it('devrait réinitialiser le mot de passe avec un token valide', async () => {
     prismaMock.passwordResetToken.findUnique.mockResolvedValue(mockToken)
-
-    const mockEvent = {
-      body: {
-        token: 'valid-reset-token',
-        newPassword: 'NewPassword123!'
-      }
+    
+    const requestBody = {
+      token: 'valid-reset-token',
+      newPassword: 'NewPassword123!'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     const result = await resetPasswordHandler(mockEvent)
 
@@ -55,12 +56,13 @@ describe('API Reset Password', () => {
   it('devrait rejeter un token invalide', async () => {
     prismaMock.passwordResetToken.findUnique.mockResolvedValue(null)
 
-    const mockEvent = {
-      body: {
-        token: 'invalid-token',
-        newPassword: 'NewPassword123!'
-      }
+    const requestBody = {
+      token: 'invalid-token',
+      newPassword: 'NewPassword123!'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(resetPasswordHandler(mockEvent)).rejects.toThrow('Token de réinitialisation invalide')
   })
@@ -72,12 +74,13 @@ describe('API Reset Password', () => {
     }
     prismaMock.passwordResetToken.findUnique.mockResolvedValue(expiredToken)
 
-    const mockEvent = {
-      body: {
-        token: 'expired-token',
-        newPassword: 'NewPassword123!'
-      }
+    const requestBody = {
+      token: 'expired-token',
+      newPassword: 'NewPassword123!'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(resetPasswordHandler(mockEvent)).rejects.toThrow('Le token de réinitialisation a expiré')
   })
@@ -89,12 +92,13 @@ describe('API Reset Password', () => {
     }
     prismaMock.passwordResetToken.findUnique.mockResolvedValue(usedToken)
 
-    const mockEvent = {
-      body: {
-        token: 'used-token',
-        newPassword: 'NewPassword123!'
-      }
+    const requestBody = {
+      token: 'used-token',
+      newPassword: 'NewPassword123!'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(resetPasswordHandler(mockEvent)).rejects.toThrow('Ce token a déjà été utilisé')
   })
@@ -102,12 +106,13 @@ describe('API Reset Password', () => {
   it('devrait valider la force du nouveau mot de passe', async () => {
     prismaMock.passwordResetToken.findUnique.mockResolvedValue(mockToken)
 
-    const mockEvent = {
-      body: {
-        token: 'valid-reset-token',
-        newPassword: 'weak'
-      }
+    const requestBody = {
+      token: 'valid-reset-token',
+      newPassword: 'weak'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(resetPasswordHandler(mockEvent)).rejects.toThrow()
   })
@@ -116,12 +121,13 @@ describe('API Reset Password', () => {
     prismaMock.passwordResetToken.findUnique.mockResolvedValue(mockToken)
     const hashSpy = vi.spyOn(bcrypt, 'hash')
 
-    const mockEvent = {
-      body: {
-        token: 'valid-reset-token',
-        newPassword: 'NewPassword123!'
-      }
+    const requestBody = {
+      token: 'valid-reset-token',
+      newPassword: 'NewPassword123!'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await resetPasswordHandler(mockEvent)
 
@@ -139,12 +145,13 @@ describe('API Reset Password', () => {
     }
     prismaMock.passwordResetToken.findUnique.mockResolvedValue(tokenWithUTCDate)
 
-    const mockEvent = {
-      body: {
-        token: 'valid-reset-token',
-        newPassword: 'NewPassword123!'
-      }
+    const requestBody = {
+      token: 'valid-reset-token',
+      newPassword: 'NewPassword123!'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     const result = await resetPasswordHandler(mockEvent)
 
@@ -157,12 +164,13 @@ describe('API Reset Password', () => {
     prismaMock.passwordResetToken.findUnique.mockResolvedValue(mockToken)
     prismaMock.user.update.mockRejectedValue(new Error('Database error'))
 
-    const mockEvent = {
-      body: {
-        token: 'valid-reset-token',
-        newPassword: 'NewPassword123!'
-      }
+    const requestBody = {
+      token: 'valid-reset-token',
+      newPassword: 'NewPassword123!'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(resetPasswordHandler(mockEvent)).rejects.toThrow('Erreur lors de la réinitialisation du mot de passe')
   })

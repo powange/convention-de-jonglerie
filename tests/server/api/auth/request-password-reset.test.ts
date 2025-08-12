@@ -33,14 +33,16 @@ describe('API Request Password Reset', () => {
       expiresAt: new Date(Date.now() + 3600000) // 1 heure
     })
 
+    const requestBody = {
+      email: 'test@example.com'
+    }
+
     const mockEvent = {
-      body: {
-        email: 'test@example.com'
-      },
       request: {
         url: 'http://localhost:3000/api/auth/request-password-reset'
       }
     }
+    global.readBody.mockResolvedValue(requestBody)
 
     const result = await requestPasswordResetHandler(mockEvent)
 
@@ -67,11 +69,12 @@ describe('API Request Password Reset', () => {
   it('devrait retourner le même message pour un email inexistant', async () => {
     prismaMock.user.findUnique.mockResolvedValue(null)
 
-    const mockEvent = {
-      body: {
-        email: 'nonexistent@example.com'
-      }
+    const requestBody = {
+      email: 'nonexistent@example.com'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     const result = await requestPasswordResetHandler(mockEvent)
 
@@ -84,11 +87,12 @@ describe('API Request Password Reset', () => {
   })
 
   it('devrait valider le format de l\'email', async () => {
-    const mockEvent = {
-      body: {
-        email: 'invalid-email'
-      }
+    const requestBody = {
+      email: 'invalid-email'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(requestPasswordResetHandler(mockEvent)).rejects.toThrow()
   })
@@ -102,14 +106,16 @@ describe('API Request Password Reset', () => {
       expiresAt: new Date(Date.now() + 3600000)
     })
 
+    const requestBody = {
+      email: 'test@example.com'
+    }
+
     const mockEvent = {
-      body: {
-        email: 'test@example.com'
-      },
       request: {
         url: 'http://localhost:3000/api/auth/request-password-reset'
       }
     }
+    global.readBody.mockResolvedValue(requestBody)
 
     await requestPasswordResetHandler(mockEvent)
 
@@ -130,14 +136,16 @@ describe('API Request Password Reset', () => {
       expiresAt: new Date(Date.now() + 3600000)
     })
 
+    const requestBody = {
+      email: 'test@example.com'
+    }
+
     const mockEvent = {
-      body: {
-        email: 'test@example.com'
-      },
       request: {
         url: 'http://localhost:3000/api/auth/request-password-reset'
       }
     }
+    global.readBody.mockResolvedValue(requestBody)
 
     await requestPasswordResetHandler(mockEvent)
 
@@ -154,14 +162,16 @@ describe('API Request Password Reset', () => {
     prismaMock.user.findUnique.mockResolvedValue(mockUser)
     sendEmail.mockRejectedValue(new Error('Email service error'))
 
+    const requestBody = {
+      email: 'test@example.com'
+    }
+
     const mockEvent = {
-      body: {
-        email: 'test@example.com'
-      },
       request: {
         url: 'http://localhost:3000/api/auth/request-password-reset'
       }
     }
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(requestPasswordResetHandler(mockEvent)).rejects.toThrow('Erreur lors de la demande de réinitialisation')
   })

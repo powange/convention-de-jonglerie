@@ -21,11 +21,11 @@ global.useRuntimeConfig = vi.fn(() => ({
 }))
 
 // Mock de readBody
-global.readBody = vi.fn((event) => event.body)
+global.readBody = vi.fn()
 
 // Mock de createError
 global.createError = vi.fn((options) => {
-  const error = new Error(options.statusMessage)
+  const error = new Error(options.statusMessage || options.message)
   error.statusCode = options.statusCode
   error.data = options.data
   // Dans un contexte Nuxt/H3, createError est censé retourner l'erreur
@@ -35,6 +35,11 @@ global.createError = vi.fn((options) => {
 
 // Mock de getRequestURL
 global.getRequestURL = vi.fn((event) => new URL(event.request?.url || 'http://localhost:3000'))
+
+// Mock de getRouterParam
+global.getRouterParam = vi.fn((event, param) => {
+  return event.context?.params?.[param] || undefined
+})
 
 // Mock du rate limiter
 vi.mock('../server/utils/rate-limiter', () => ({

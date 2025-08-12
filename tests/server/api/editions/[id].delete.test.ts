@@ -100,7 +100,7 @@ describe('/api/editions/[id] DELETE', () => {
       }
     }
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Internal Server Error')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Edition not found')
   })
 
   it('devrait rejeter si l\'utilisateur n\'est pas autorisé', async () => {
@@ -125,7 +125,7 @@ describe('/api/editions/[id] DELETE', () => {
       }
     }
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Internal Server Error')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Vous n\'avez pas les droits pour supprimer cette édition')
   })
 
   it('devrait permettre au créateur de l\'édition de supprimer', async () => {
@@ -258,7 +258,7 @@ describe('/api/editions/[id] DELETE', () => {
       }
     }
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Internal Server Error')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Vous n\'avez pas les droits pour supprimer cette édition')
   })
 
   it('devrait gérer les erreurs de base de données', async () => {

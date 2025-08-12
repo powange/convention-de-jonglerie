@@ -18,6 +18,7 @@ import registerHandler from '../../../../server/api/auth/register.post'
 describe('API Register', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    global.readBody = vi.fn()
   })
 
   it('devrait créer un nouvel utilisateur avec succès', async () => {
@@ -32,15 +33,16 @@ describe('API Register', () => {
 
     prismaMock.user.create.mockResolvedValue(mockUser)
     
-    const mockEvent = {
-      body: {
-        email: 'test@example.com',
-        password: 'Password123!',
-        pseudo: 'testuser',
-        nom: 'Nom',
-        prenom: 'Prenom'
-      }
+    const requestBody = {
+      email: 'test@example.com',
+      password: 'Password123!',
+      pseudo: 'testuser',
+      nom: 'Nom',
+      prenom: 'Prenom'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     const result = await registerHandler(mockEvent)
 
@@ -70,29 +72,31 @@ describe('API Register', () => {
   })
 
   it('devrait valider le format de l\'email', async () => {
-    const mockEvent = {
-      body: {
-        email: 'invalid-email',
-        password: 'Password123!',
-        pseudo: 'testuser',
-        nom: 'Nom',
-        prenom: 'Prenom'
-      }
+    const requestBody = {
+      email: 'invalid-email',
+      password: 'Password123!',
+      pseudo: 'testuser',
+      nom: 'Nom',
+      prenom: 'Prenom'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(registerHandler(mockEvent)).rejects.toThrow()
   })
 
   it('devrait valider la force du mot de passe', async () => {
-    const mockEvent = {
-      body: {
-        email: 'test@example.com',
-        password: 'weak',
-        pseudo: 'testuser',
-        nom: 'Nom',
-        prenom: 'Prenom'
-      }
+    const requestBody = {
+      email: 'test@example.com',
+      password: 'weak',
+      pseudo: 'testuser',
+      nom: 'Nom',
+      prenom: 'Prenom'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(registerHandler(mockEvent)).rejects.toThrow()
   })
@@ -103,15 +107,16 @@ describe('API Register', () => {
       meta: { target: ['email'] }
     })
 
-    const mockEvent = {
-      body: {
-        email: 'existing@example.com',
-        password: 'Password123!',
-        pseudo: 'testuser',
-        nom: 'Nom',
-        prenom: 'Prenom'
-      }
+    const requestBody = {
+      email: 'existing@example.com',
+      password: 'Password123!',
+      pseudo: 'testuser',
+      nom: 'Nom',
+      prenom: 'Prenom'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await expect(registerHandler(mockEvent)).rejects.toThrow('Email ou pseudo déjà utilisé')
   })
@@ -128,15 +133,16 @@ describe('API Register', () => {
     prismaMock.user.create.mockResolvedValue(mockUser)
     const hashSpy = vi.spyOn(bcrypt, 'hash')
 
-    const mockEvent = {
-      body: {
-        email: 'test@example.com',
-        password: 'Password123!',
-        pseudo: 'testuser',
-        nom: 'Nom',
-        prenom: 'Prenom'
-      }
+    const requestBody = {
+      email: 'test@example.com',
+      password: 'Password123!',
+      pseudo: 'testuser',
+      nom: 'Nom',
+      prenom: 'Prenom'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await registerHandler(mockEvent)
 
@@ -154,15 +160,16 @@ describe('API Register', () => {
 
     prismaMock.user.create.mockResolvedValue(mockUser)
 
-    const mockEvent = {
-      body: {
-        email: 'TEST@EXAMPLE.COM',
-        password: 'Password123!',
-        pseudo: 'testuser',
-        nom: 'Nom',
-        prenom: 'Prenom'
-      }
+    const requestBody = {
+      email: 'TEST@EXAMPLE.COM',
+      password: 'Password123!',
+      pseudo: 'testuser',
+      nom: 'Nom',
+      prenom: 'Prenom'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     await registerHandler(mockEvent)
 
@@ -185,15 +192,16 @@ describe('API Register', () => {
     prismaMock.user.create.mockResolvedValue(mockUser)
     sendEmail.mockResolvedValue(false)
 
-    const mockEvent = {
-      body: {
-        email: 'test@example.com',
-        password: 'Password123!',
-        pseudo: 'testuser',
-        nom: 'Nom',
-        prenom: 'Prenom'
-      }
+    const requestBody = {
+      email: 'test@example.com',
+      password: 'Password123!',
+      pseudo: 'testuser',
+      nom: 'Nom',
+      prenom: 'Prenom'
     }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
 
     const result = await registerHandler(mockEvent)
 
