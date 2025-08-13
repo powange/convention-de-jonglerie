@@ -614,11 +614,9 @@ const getDescriptionError = () => {
 
 // Gestionnaires d'événements pour l'upload d'image
 const onImageUploaded = (result: { success: boolean; imageUrl?: string; edition?: any }) => {
-  console.log('onImageUploaded called with:', result);
   if (result.success) {
     // L'API d'upload d'édition peut retourner soit imageUrl directement, soit dans l'objet edition
     const newImageUrl = result.imageUrl || result.edition?.imageUrl;
-    console.log('Setting state.imageUrl to:', newImageUrl);
     if (newImageUrl) {
       state.imageUrl = newImageUrl;
     }
@@ -756,8 +754,6 @@ watch(() => state.endDate, () => {
 
 // Charger les conventions au montage du composant
 onMounted(() => {
-  console.log('EditionForm mounted. Initial imageUrl:', state.imageUrl);
-  console.log('Props initialData:', props.initialData);
   fetchUserConventions();
   
   // Initialiser les dates et heures si elles existent
