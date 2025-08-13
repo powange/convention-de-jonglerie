@@ -15,6 +15,11 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@vueuse/nuxt'
   ],
+  // Optimisations de build
+  build: {
+    extractCSS: process.env.NODE_ENV === 'production',
+    optimizeCSS: process.env.NODE_ENV === 'production'
+  },
   ui: {
     icons: ['heroicons', 'simple-icons']
   },
@@ -54,6 +59,13 @@ export default defineNuxtConfig({
     },
     // Optimisation: précharger uniquement les langues principales
     preloadLocales: ['en', 'fr'],
+    // Optimiser les traductions pour réduire la taille des bundles
+    bundle: {
+      compositionOnly: true,
+      runtimeOnly: false,
+      fullInstall: false,
+      dropMessageCompiler: process.env.NODE_ENV === 'production'
+    },
     vueI18n: './i18n/i18n.config.ts'
   },
   css: [
@@ -76,7 +88,13 @@ export default defineNuxtConfig({
       devSourcemap: true
     },
     build: {
-      sourcemap: process.env.NODE_ENV === 'development' // Sourcemaps seulement en dev
+      sourcemap: process.env.NODE_ENV === 'development', // Sourcemaps seulement en dev
+      chunkSizeWarningLimit: 800, // Seuil optimal pour les performances
+      // Optimisation des imports
+      dynamicImportVarsOptions: {
+        warnOnError: true,
+        exclude: [/node_modules/]
+      }
     },
     plugins: [
       tsconfigPaths()
@@ -84,5 +102,9 @@ export default defineNuxtConfig({
   },
   experimental: {
     appManifest: false,
+    // Améliorer les performances avec la lazy hydration
+    lazyHydration: true,
+    // Optimiser la gestion d'erreur des chunks
+    emitRouteChunkError: 'automatic'
   }
 })
