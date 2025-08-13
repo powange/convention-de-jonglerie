@@ -117,7 +117,9 @@
                   maxSize: 5 * 1024 * 1024, // 5MB
                   allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
                   allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp']
-                }
+                },
+                autoUpload: true,
+                resetAfterUpload: false
               }"
               alt="Poster de l'édition"
               placeholder="Cliquez pour sélectionner le poster de l'édition"
@@ -612,7 +614,9 @@ const getDescriptionError = () => {
 
 // Gestionnaires d'événements pour l'upload d'image
 const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
+  console.log('onImageUploaded called with:', result);
   if (result.success && result.imageUrl) {
+    console.log('Setting state.imageUrl to:', result.imageUrl);
     state.imageUrl = result.imageUrl;
     toast.add({
       title: 'Image uploadée avec succès !',
@@ -748,6 +752,8 @@ watch(() => state.endDate, () => {
 
 // Charger les conventions au montage du composant
 onMounted(() => {
+  console.log('EditionForm mounted. Initial imageUrl:', state.imageUrl);
+  console.log('Props initialData:', props.initialData);
   fetchUserConventions();
   
   // Initialiser les dates et heures si elles existent
