@@ -234,6 +234,9 @@
     "login_subtitle": "Zaloguj się do swojego konta",
     "email_or_username": "Email lub Pseudonim",
     "email_or_username_placeholder": "twój email lub pseudonim",
+    "username_placeholder": "Twoja nazwa użytkownika",
+    "login": "Zaloguj się",
+    "new_password": "Nowe hasło",
     "password_placeholder": "Twoje hasło",
     "show_password": "Pokaż hasło",
     "hide_password": "Ukryj hasło",
@@ -410,6 +413,7 @@
   },
   "profile": {
     "title": "Mój Profil",
+    "uploading": "Przesyłanie...",
     "edit": "Edytuj mój profil",
     "picture": "Zdjęcie profilowe",
     "personal_info": "Informacje osobiste",
@@ -577,7 +581,30 @@
     "cannot_add_comment": "Nie można dodać komentarza",
     "cannot_add_passenger": "Nie można dodać pasażera",
     "convention_required": "Konwencja jest wymagana",
-    "address_required": "Adres jest wymagany"
+    "address_required": "Adres jest wymagany",
+    "email_not_verified": "Email nie jest zweryfikowany",
+    "email_verification_required": "Musisz zweryfikować swój email przed zalogowaniem",
+    "access_denied": "Dostęp odrzucony",
+    "email_or_username_required": "Email lub nazwa użytkownika wymagana",
+    "password_required": "Hasło wymagane",
+    "registration_failed": "Rejestracja nie powiodła się",
+    "email_or_username_taken": "Ten email lub nazwa użytkownika jest już zajęta",
+    "username_min_3_chars": "Nazwa użytkownika musi mieć co najmniej 3 znaki",
+    "last_name_required": "Nazwisko jest wymagane",
+    "first_name_required": "Imię jest wymagane",
+    "password_uppercase_required": "Hasło musi zawierać co najmniej jedną wielką literę",
+    "password_digit_required": "Hasło musi zawierać co najmniej jedną cyfrę",
+    "passwords_dont_match": "Hasła nie pasują",
+    "confirm_password_required": "Potwierdzenie hasła jest wymagane",
+    "edition_creation_failed": "Tworzenie edycji nie powiodło się",
+    "authentication_error": "Błąd uwierzytelniania",
+    "login_required_convention": "Musisz być zalogowany, aby utworzyć konwencję",
+    "convention_created_image_failed": "Konwencja została utworzona, ale obraz nie mógł zostać przesłany",
+    "creation_error": "Błąd tworzenia",
+    "cannot_remove_favorite": "Nie można usunąć z ulubionych",
+    "cannot_load_comments": "Nie można załadować komentarzy",
+    "cannot_add_comment": "Nie można dodać komentarza",
+    "cannot_add_passenger": "Nie można dodać pasażera"
   },
   "services": {
     "food_trucks": "Food trucki",
@@ -663,7 +690,32 @@
     "convention_edit_denied": "Nie masz uprawnień do edytowania tej konwencji",
     "convention_update_error": "Wystąpił błąd podczas aktualizacji konwencji",
     "convention_updated_image_failed": "Konwencja została zaktualizowana, ale obrazek nie mógł zostać przesłany",
-    "update_error": "Błąd podczas aktualizacji"
+    "update_error": "Błąd podczas aktualizacji",
+    "email_not_verified": "Email nie jest zweryfikowany",
+    "email_verification_required": "Musisz zweryfikować swój email przed zalogowaniem",
+    "access_denied": "Dostęp odrzucony",
+    "email_or_username_required": "Email lub nazwa użytkownika wymagana",
+    "password_required": "Hasło wymagane",
+    "registration_failed": "Rejestracja nie powiodła się",
+    "email_or_username_taken": "Ten email lub nazwa użytkownika jest już zajęta",
+    "username_min_3_chars": "Nazwa użytkownika musi mieć co najmniej 3 znaki",
+    "last_name_required": "Nazwisko jest wymagane",
+    "first_name_required": "Imię jest wymagane",
+    "password_uppercase_required": "Hasło musi zawierać co najmniej jedną wielką literę",
+    "password_digit_required": "Hasło musi zawierać co najmniej jedną cyfrę",
+    "passwords_dont_match": "Hasła nie pasują",
+    "confirm_password_required": "Potwierdzenie hasła jest wymagane",
+    "edition_creation_failed": "Tworzenie edycji nie powiodło się",
+    "authentication_error": "Błąd uwierzytelniania",
+    "login_required_convention": "Musisz być zalogowany, aby utworzyć konwencję",
+    "convention_created_image_failed": "Konwencja została utworzona, ale obraz nie mógł zostać przesłany",
+    "creation_error": "Błąd tworzenia",
+    "cannot_remove_favorite": "Nie można usunąć z ulubionych",
+    "cannot_load_comments": "Nie można załadować komentarzy",
+    "cannot_add_comment": "Nie można dodać komentarza",
+    "cannot_add_passenger": "Nie można dodać pasażera",
+    "convention_required": "Konwencja jest wymagana",
+    "address_required": "Adres jest wymagany"
   },
   "forms": {
     "placeholders": {
@@ -838,14 +890,6 @@
       "yellow_border_favorite": "Żółta ramka = Ulubione"
     }
   },
-  "renegade": {
-    "title": "FRENCH RENEGADE",
-    "countdown_title": "Odliczanie do 7 sierpnia 2025 - 01:00",
-    "days": "Dni",
-    "hours": "Godziny",
-    "minutes": "Minuty",
-    "seconds": "Sekundy"
-  },
   "pages": {
     "favorites": {
       "no_favorites_added": "Nie dodałeś jeszcze żadnej edycji do ulubionych.",
@@ -902,6 +946,42 @@
       "loading_convention_data": "Ładowanie danych konwencji...",
       "convention_not_found_or_no_rights": "Konwencja, której szukasz, nie istnieje lub nie masz uprawnień do jej edytowania.",
       "submit_button": "Zaktualizuj konwencję"
+    }
+  },
+  "upload": {
+    "success": "Sukces",
+    "upload_error": "Błąd przesyłania",
+    "delete_error": "Błąd usuwania",
+    "validation_error": "Błąd walidacji",
+    "image_uploaded_successfully": "Obraz przesłany pomyślnie",
+    "image_deleted_successfully": "Obraz usunięty pomyślnie",
+    "uploading": "Przesyłanie...",
+    "deleting": "Usuwanie...",
+    "select_file": "Wybierz plik",
+    "upload": "Prześlij",
+    "formats_accepted": "Akceptowane formaty",
+    "max_size": "Maksymalny rozmiar",
+    "demo_title": "Demo przesyłania obrazów",
+    "convention_logo_alt": "Logo konwencji",
+    "click_select_convention_logo": "Kliknij, aby wybrać logo konwencji",
+    "logo_url_label": "URL logo",
+    "logo_url_placeholder": "https://przykład.com/logo.jpg",
+    "logo_url_optional_placeholder": "URL logo konwencji (opcjonalne)",
+    "logo_preview_alt": "Podgląd logo",
+    "loading_error_title": "Błąd ładowania obrazu",
+    "image_configured": "Obraz skonfigurowany",
+    "errors": {
+      "file_too_large": "Plik za duży. Maksymalny rozmiar: {maxSize}",
+      "invalid_file_type": "Nieprawidłowy typ pliku. Akceptowane formaty: {allowedTypes}",
+      "invalid_file_extension": "Nieprawidłowe rozszerzenie pliku. Akceptowane rozszerzenia: {allowedExtensions}",
+      "validation_failed": "Walidacja nie powiodła się",
+      "no_file_selected": "Nie wybrano pliku",
+      "no_auth_token": "Brak uwierzytelnienia",
+      "upload_failed": "Błąd przesyłania",
+      "delete_failed": "Błąd usuwania",
+      "edition_id_required": "Wymagane ID edycji",
+      "convention_id_required": "Wymagane ID konwencji",
+      "unsupported_delete_endpoint": "Nieobsługiwany endpoint usuwania"
     }
   },
   "feedback": {
@@ -969,6 +1049,15 @@
       "email": {
         "invalid": "Nieprawidłowy email"
       }
+    },
+    "error": {
+      "title": "Błąd podczas wysyłania",
+      "submit": "Wystąpił błąd podczas wysyłania opinii",
+      "required_fields": "Proszę wypełnić wszystkie wymagane pola",
+      "name_required": "Imię jest wymagane",
+      "name_required_desc": "Proszę podać swoje imię",
+      "captcha_required": "Proszę wypełnić captcha",
+      "captcha_not_loaded": "Captcha nie została jeszcze załadowana, proszę czekać"
     }
   }
 }

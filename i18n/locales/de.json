@@ -234,6 +234,9 @@
     "login_subtitle": "Zugang zu deinem Konto",
     "email_or_username": "E-Mail oder Benutzername",
     "email_or_username_placeholder": "deine E-Mail oder dein Benutzername",
+    "username_placeholder": "Dein Benutzername",
+    "login": "Anmelden",
+    "new_password": "Neues Passwort",
     "password_placeholder": "Dein Passwort",
     "show_password": "Passwort anzeigen",
     "hide_password": "Passwort verbergen",
@@ -410,6 +413,7 @@
   },
   "profile": {
     "title": "Mein Profil",
+    "uploading": "Wird hochgeladen...",
     "edit": "Mein Profil bearbeiten",
     "picture": "Profilbild",
     "personal_info": "Persönliche Informationen",
@@ -545,6 +549,20 @@
     "edition_created_successfully": "Die Auflage wurde erfolgreich erstellt",
     "convention_updated": "Convention aktualisiert!",
     "convention_updated_desc": "Die Convention \"{name}\" wurde erfolgreich aktualisiert"
+  },
+  "upload": {
+    "success": "Erfolg",
+    "upload_error": "Upload-Fehler",
+    "delete_error": "Löschfehler",
+    "validation_error": "Validierungsfehler",
+    "image_uploaded_successfully": "Bild erfolgreich hochgeladen",
+    "image_deleted_successfully": "Bild erfolgreich gelöscht",
+    "uploading": "Wird hochgeladen...",
+    "deleting": "Wird gelöscht...",
+    "select_file": "Datei auswählen",
+    "upload": "Hochladen",
+    "formats_accepted": "Akzeptierte Formate",
+    "max_size": "Max. Größe"
   },
   "errors": {
     "login_failed": "Anmeldung fehlgeschlagen",
@@ -831,14 +849,6 @@
       "yellow_border_favorite": "Gelber Rand = Favorit"
     }
   },
-  "renegade": {
-    "title": "FRENCH RENEGADE",
-    "countdown_title": "Countdown bis 7. August 2025 - 01:00 Uhr",
-    "days": "Tage",
-    "hours": "Stunden",
-    "minutes": "Minuten",
-    "seconds": "Sekunden"
-  },
   "pages": {
     "favorites": {
       "no_favorites_added": "Du hast noch keine Auflage zu deinen Favoriten hinzugefügt.",
@@ -897,6 +907,42 @@
       "submit_button": "Convention aktualisieren"
     }
   },
+  "upload": {
+    "upload_error": "Upload-Fehler",
+    "delete_error": "Löschen fehlgeschlagen",
+    "validation_error": "Validierungsfehler",
+    "image_uploaded_successfully": "Bild erfolgreich hochgeladen",
+    "image_deleted_successfully": "Bild erfolgreich gelöscht",
+    "deleting": "Wird gelöscht...",
+    "upload": "Hochladen",
+    "success": "Erfolg",
+    "uploading": "Wird hochgeladen...",
+    "select_file": "Datei auswählen",
+    "formats_accepted": "Akzeptierte Formate",
+    "max_size": "Maximale Größe",
+    "demo_title": "Bild-Upload Demo",
+    "convention_logo_alt": "Convention-Logo",
+    "click_select_convention_logo": "Klicken Sie, um ein Convention-Logo auszuwählen",
+    "logo_url_label": "Logo-URL",
+    "logo_url_placeholder": "https://beispiel.com/logo.jpg",
+    "logo_url_optional_placeholder": "URL des Convention-Logos (optional)",
+    "logo_preview_alt": "Logo-Vorschau",
+    "loading_error_title": "Fehler beim Laden des Bildes",
+    "image_configured": "Bild konfiguriert",
+    "errors": {
+      "validation_failed": "Validierung fehlgeschlagen",
+      "no_file_selected": "Keine Datei ausgewählt",
+      "no_auth_token": "Keine Authentifizierung",
+      "edition_id_required": "Auflagen-ID erforderlich",
+      "upload_failed": "Upload fehlgeschlagen",
+      "convention_id_required": "Convention-ID erforderlich",
+      "unsupported_delete_endpoint": "Nicht unterstützter Lösch-Endpunkt",
+      "delete_failed": "Löschen fehlgeschlagen",
+      "file_too_large": "Datei zu groß",
+      "invalid_file_type": "Ungültiger Dateityp",
+      "invalid_file_extension": "Ungültige Dateierweiterung"
+    }
+  },
   "feedback": {
     "title": "Wir schätzen Ihr Feedback",
     "description": "Helfen Sie uns, die Plattform zu verbessern, indem Sie uns Ihre Kommentare, Vorschläge oder Fehlerberichte mitteilen.",
@@ -944,7 +990,9 @@
       "submit": "Beim Senden Ihres Feedbacks ist ein Fehler aufgetreten",
       "required_fields": "Bitte füllen Sie alle Pflichtfelder aus",
       "captcha_required": "Bitte vervollständigen Sie das Captcha",
-      "captcha_not_loaded": "Das Captcha ist noch nicht geladen, bitte warten Sie"
+      "captcha_not_loaded": "Das Captcha ist noch nicht geladen, bitte warten Sie",
+      "name_required": "Name ist erforderlich",
+      "name_required_desc": "Bitte geben Sie Ihren Namen ein"
     },
     "validation": {
       "subject": {

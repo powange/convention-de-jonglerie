@@ -230,6 +230,7 @@
     "first_name": "First name",
     "last_name": "Last name",
     "username": "Username",
+    "username_placeholder": "Your unique username",
     "confirm_password": "Confirm password",
     "login_subtitle": "Access your account",
     "email_or_username": "Email or Username",
@@ -239,6 +240,7 @@
     "hide_password": "Hide password",
     "forgot_password_link": "Forgot password?",
     "login_button": "Sign In",
+    "login": "Login",
     "login_button_loading": "Signing in...",
     "no_account_question": "Don't have an account yet?",
     "register_link": "Sign up",
@@ -256,6 +258,7 @@
     "remember_password": "Do you remember your password?",
     "check_spam": "Check your spam folder if you don't receive the email.",
     "reset_password_title": "New Password",
+    "new_password": "New Password",
     "reset_password_subtitle": "Set your new password",
     "min_characters": "Minimum 8 characters",
     "password_strength": "Password strength:",
@@ -464,6 +467,7 @@
     "changing": "Changing...",
     "customize_avatar": "Customize your avatar",
     "deleting": "Deleting...",
+    "uploading": "Uploading...",
     "important_info": "Important information",
     "formats_accepted": "• Accepted formats: JPG, PNG, GIF, WebP",
     "max_size": "• Maximum size: 5MB",
@@ -749,14 +753,6 @@
       "payment": "Payment"
     }
   },
-  "renegade": {
-    "title": "FRENCH RENEGADE",
-    "countdown_title": "Countdown to August 7, 2025 - 01:00 AM",
-    "days": "Days",
-    "hours": "Hours",
-    "minutes": "Minutes",
-    "seconds": "Seconds"
-  },
   "pages": {
     "favorites": {
       "no_favorites_added": "You haven't added any edition to your favorites yet.",
@@ -882,6 +878,42 @@
       "email": {
         "invalid": "Invalid email"
       }
+    }
+  },
+  "upload": {
+    "success": "Success",
+    "upload_error": "Upload error",
+    "delete_error": "Delete error",
+    "validation_error": "Validation error",
+    "image_uploaded_successfully": "Image uploaded successfully",
+    "image_deleted_successfully": "Image deleted successfully",
+    "uploading": "Uploading...",
+    "deleting": "Deleting...",
+    "select_file": "Select file",
+    "upload": "Upload",
+    "formats_accepted": "Accepted formats",
+    "max_size": "Max size",
+    "demo_title": "ImageUpload Demo",
+    "convention_logo_alt": "Convention logo",
+    "click_select_convention_logo": "Click to select convention logo",
+    "logo_url_label": "Logo URL",
+    "logo_url_placeholder": "https://example.com/logo.jpg",
+    "logo_url_optional_placeholder": "Logo URL (optional)",
+    "logo_preview_alt": "Logo preview",
+    "loading_error_title": "Loading Error",
+    "image_configured": "Image configured",
+    "errors": {
+      "validation_failed": "Validation failed",
+      "no_file_selected": "No file selected",
+      "no_auth_token": "Authentication token missing",
+      "edition_id_required": "Edition ID required",
+      "upload_failed": "Upload failed",
+      "convention_id_required": "Convention ID required",
+      "unsupported_delete_endpoint": "Delete endpoint not supported",
+      "delete_failed": "Delete failed",
+      "file_too_large": "File too large",
+      "invalid_file_type": "Invalid file type",
+      "invalid_file_extension": "Invalid file extension"
     }
   },
   "errors": {

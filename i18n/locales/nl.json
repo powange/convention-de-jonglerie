@@ -233,6 +233,9 @@
     "login_subtitle": "Toegang tot je account",
     "email_or_username": "E-mail of Gebruikersnaam",
     "email_or_username_placeholder": "je e-mail of je gebruikersnaam",
+    "username_placeholder": "Je gebruikersnaam",
+    "login": "Inloggen",
+    "new_password": "Nieuw wachtwoord",
     "password_placeholder": "Je wachtwoord",
     "show_password": "Wachtwoord tonen",
     "hide_password": "Wachtwoord verbergen",
@@ -408,6 +411,7 @@
   },
   "profile": {
     "title": "Mijn Profiel",
+    "uploading": "Uploaden...",
     "edit": "Mijn profiel bewerken",
     "picture": "Profielfoto",
     "personal_info": "Persoonlijke informatie",
@@ -747,14 +751,6 @@
       "payment": "Betaling"
     }
   },
-  "renegade": {
-    "title": "FRENCH RENEGADE",
-    "countdown_title": "Aftellen tot 7 augustus 2025 - 01:00 uur",
-    "days": "Dagen",
-    "hours": "Uren",
-    "minutes": "Minuten",
-    "seconds": "Seconden"
-  },
   "pages": {
     "favorites": {
       "no_favorites_added": "Je hebt nog geen editie aan je favorieten toegevoegd.",
@@ -811,6 +807,42 @@
       "loading_convention_data": "Conventiegegevens laden...",
       "convention_not_found_or_no_rights": "De conventie die je zoekt bestaat niet of je hebt niet de rechten om deze te bewerken.",
       "submit_button": "Conventie bijwerken"
+    }
+  },
+  "upload": {
+    "success": "Succes",
+    "upload_error": "Upload fout",
+    "delete_error": "Verwijderingsfout",
+    "validation_error": "Validatiefout",
+    "image_uploaded_successfully": "Afbeelding succesvol geüpload",
+    "image_deleted_successfully": "Afbeelding succesvol verwijderd",
+    "uploading": "Upload bezig...",
+    "deleting": "Verwijderen...",
+    "select_file": "Bestand selecteren",
+    "upload": "Uploaden",
+    "formats_accepted": "Geaccepteerde formaten",
+    "max_size": "Maximale grootte",
+    "demo_title": "Afbeelding upload demo",
+    "convention_logo_alt": "Conventie logo",
+    "click_select_convention_logo": "Klik om een conventie logo te selecteren",
+    "logo_url_label": "Logo URL",
+    "logo_url_placeholder": "https://voorbeeld.com/logo.jpg",
+    "logo_url_optional_placeholder": "URL van het conventie logo (optioneel)",
+    "logo_preview_alt": "Logo voorvertoning",
+    "loading_error_title": "Fout bij laden van afbeelding",
+    "image_configured": "Afbeelding geconfigureerd",
+    "errors": {
+      "file_too_large": "Bestand te groot. Maximale grootte: {maxSize}",
+      "invalid_file_type": "Ongeldig bestandstype. Geaccepteerde formaten: {allowedTypes}",
+      "invalid_file_extension": "Ongeldige bestandsextensie. Geaccepteerde extensies: {allowedExtensions}",
+      "validation_failed": "Validatie mislukt",
+      "no_file_selected": "Geen bestand geselecteerd",
+      "no_auth_token": "Geen authenticatie",
+      "upload_failed": "Upload mislukt",
+      "delete_failed": "Verwijdering mislukt",
+      "edition_id_required": "Editie ID vereist",
+      "convention_id_required": "Conventie ID vereist",
+      "unsupported_delete_endpoint": "Niet-ondersteund verwijder endpoint"
     }
   },
   "feedback": {

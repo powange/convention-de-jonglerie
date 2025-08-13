@@ -230,6 +230,7 @@
     "first_name": "Имя",
     "last_name": "Фамилия",
     "username": "Имя пользователя",
+    "username_placeholder": "Ваше уникальное имя пользователя",
     "confirm_password": "Подтвердить пароль",
     "login_subtitle": "Доступ к вашему аккаунту",
     "email_or_username": "Email или Имя пользователя",
@@ -239,6 +240,7 @@
     "hide_password": "Скрыть пароль",
     "forgot_password_link": "Забыли пароль?",
     "login_button": "Войти",
+    "login": "Вход",
     "login_button_loading": "Вход...",
     "no_account_question": "Еще нет аккаунта?",
     "register_link": "Зарегистрироваться",
@@ -256,6 +258,7 @@
     "remember_password": "Помните свой пароль?",
     "check_spam": "Проверьте папку спама, если не получаете email.",
     "reset_password_title": "Новый Пароль",
+    "new_password": "Новый пароль",
     "reset_password_subtitle": "Установите ваш новый пароль",
     "min_characters": "Минимум 8 символов",
     "password_strength": "Надежность пароля:",
@@ -424,6 +427,7 @@
     "profile_stats": "Статистика профиля",
     "update_profile": "Обновить профиль",
     "upload_picture": "Загрузить фото",
+    "uploading": "Загрузка...",
     "remove_picture": "Удалить фото",
     "change_photo": "Изменить фото",
     "manage_profile_info": "Управляйте информацией вашего профиля",
@@ -749,14 +753,6 @@
       "payment": "Оплата"
     }
   },
-  "renegade": {
-    "title": "ФРАНЦУЗСКИЙ РЕНЕГАТ",
-    "countdown_title": "Обратный отсчет до 7 августа 2025 - 01:00",
-    "days": "Дней",
-    "hours": "Часов",
-    "minutes": "Минут",
-    "seconds": "Секунд"
-  },
   "pages": {
     "favorites": {
       "no_favorites_added": "Вы еще не добавили ни одного издания в избранные.",
@@ -963,5 +959,41 @@
     "convention_update_error": "Произошла ошибка при обновлении конвенции",
     "convention_updated_image_failed": "Конвенция обновлена, но изображение не удалось загрузить",
     "update_error": "Ошибка обновления"
+  },
+  "upload": {
+    "success": "Успешно",
+    "upload_error": "Ошибка загрузки",
+    "delete_error": "Ошибка удаления",
+    "validation_error": "Ошибка валидации",
+    "image_uploaded_successfully": "Изображение успешно загружено",
+    "image_deleted_successfully": "Изображение успешно удалено",
+    "uploading": "Загрузка...",
+    "deleting": "Удаление...",
+    "select_file": "Выбрать файл",
+    "upload": "Загрузить",
+    "formats_accepted": "Принимаемые форматы",
+    "max_size": "Максимальный размер",
+    "demo_title": "Демо загрузки изображения",
+    "convention_logo_alt": "Логотип конвенции",
+    "click_select_convention_logo": "Нажмите, чтобы выбрать логотип конвенции",
+    "logo_url_label": "URL логотипа",
+    "logo_url_placeholder": "https://example.com/logo.jpg",
+    "logo_url_optional_placeholder": "URL логотипа конвенции (необязательно)",
+    "logo_preview_alt": "Предварительный просмотр логотипа",
+    "loading_error_title": "Ошибка загрузки изображения",
+    "image_configured": "Изображение настроено",
+    "errors": {
+      "file_too_large": "Файл слишком большой. Максимальный размер: {maxSize}",
+      "invalid_file_type": "Недопустимый тип файла. Принимаемые форматы: {allowedTypes}",
+      "invalid_file_extension": "Недопустимое расширение файла. Принимаемые расширения: {allowedExtensions}",
+      "validation_failed": "Ошибка валидации",
+      "no_file_selected": "Файл не выбран",
+      "no_auth_token": "Отсутствует токен аутентификации",
+      "upload_failed": "Ошибка загрузки",
+      "delete_failed": "Ошибка удаления",
+      "edition_id_required": "Требуется ID издания",
+      "convention_id_required": "Требуется ID конвенции",
+      "unsupported_delete_endpoint": "Неподдерживаемый endpoint удаления"
+    }
   }
 }

@@ -230,6 +230,7 @@
     "first_name": "Nome próprio",
     "last_name": "Apelido",
     "username": "Nome de utilizador",
+    "username_placeholder": "O seu nome de utilizador único",
     "confirm_password": "Confirmar palavra-passe",
     "login_subtitle": "Aceda à sua conta",
     "email_or_username": "Email ou Alcunha",
@@ -240,6 +241,7 @@
     "remember_me": "Lembrar-me",
     "forgot_password_link": "Esqueceu a palavra-passe?",
     "login_button": "Iniciar sessão",
+    "login": "Iniciar sessão",
     "login_button_loading": "A iniciar sessão...",
     "no_account_question": "Ainda não tem conta?",
     "register_link": "Registar-se",
@@ -257,6 +259,7 @@
     "remember_password": "Lembra-se da sua palavra-passe?",
     "check_spam": "Verifique a sua pasta de spam se não receber o email.",
     "reset_password_title": "Nova palavra-passe",
+    "new_password": "Nova palavra-passe",
     "reset_password_subtitle": "Defina a sua nova palavra-passe",
     "min_characters": "Mínimo 8 caracteres",
     "password_strength": "Força da palavra-passe:",
@@ -425,6 +428,7 @@
     "profile_stats": "Estatísticas do perfil",
     "update_profile": "Actualizar perfil",
     "upload_picture": "Carregar uma foto",
+    "uploading": "Enviando...",
     "remove_picture": "Remover foto",
     "change_photo": "Alterar foto",
     "manage_profile_info": "Gira as suas informações de perfil",
@@ -663,7 +667,32 @@
     "convention_edit_denied": "Não tem permissões para editar esta convenção",
     "convention_update_error": "Ocorreu um erro na actualização da convenção",
     "convention_updated_image_failed": "A convenção foi actualizada mas a imagem não pôde ser carregada",
-    "update_error": "Erro na actualização"
+    "update_error": "Erro na actualização",
+    "email_not_verified": "Email não verificado",
+    "email_verification_required": "Deve verificar o seu email antes de iniciar sessão",
+    "access_denied": "Acesso negado",
+    "email_or_username_required": "Email ou nome de utilizador obrigatório",
+    "password_required": "Palavra-passe obrigatória",
+    "registration_failed": "Falha no registo",
+    "email_or_username_taken": "Este email ou nome de utilizador já está em uso",
+    "username_min_3_chars": "O nome de utilizador deve ter pelo menos 3 caracteres",
+    "last_name_required": "Apelido obrigatório",
+    "first_name_required": "Nome próprio obrigatório",
+    "password_uppercase_required": "A palavra-passe deve conter pelo menos uma letra maiúscula",
+    "password_digit_required": "A palavra-passe deve conter pelo menos um dígito",
+    "passwords_dont_match": "As palavras-passe não coincidem",
+    "confirm_password_required": "Confirmação da palavra-passe obrigatória",
+    "edition_creation_failed": "Falha na criação da edição",
+    "authentication_error": "Erro de autenticação",
+    "login_required_convention": "Deve iniciar sessão para criar uma convenção",
+    "convention_created_image_failed": "A convenção foi criada mas a imagem não pôde ser carregada",
+    "creation_error": "Erro na criação",
+    "cannot_remove_favorite": "Não é possível remover dos favoritos",
+    "cannot_load_comments": "Não é possível carregar comentários",
+    "cannot_add_comment": "Não é possível adicionar comentário",
+    "cannot_add_passenger": "Não é possível adicionar passageiro",
+    "convention_required": "Convenção obrigatória",
+    "address_required": "Morada obrigatória"
   },
   "forms": {
     "placeholders": {
@@ -838,14 +867,6 @@
       "yellow_border_favorite": "Contorno amarelo = Favorito"
     }
   },
-  "renegade": {
-    "title": "FRENCH RENEGADE",
-    "countdown_title": "Contagem decrescente até 7 de agosto de 2025 - 01:00",
-    "days": "Dias",
-    "hours": "Horas",
-    "minutes": "Minutos",
-    "seconds": "Segundos"
-  },
   "pages": {
     "favorites": {
       "no_favorites_added": "Ainda não adicionou nenhuma edição aos seus favoritos.",
@@ -950,6 +971,8 @@
       "title": "Erro ao enviar feedback",
       "submit": "Ocorreu um erro ao enviar o seu feedback",
       "required_fields": "Por favor preencha todos os campos obrigatórios",
+      "name_required": "O nome é obrigatório",
+      "name_required_desc": "Por favor indique o seu nome",
       "captcha_required": "Por favor complete o captcha",
       "captcha_not_loaded": "O captcha ainda não carregou, aguarde"
     },
@@ -969,6 +992,42 @@
       "email": {
         "invalid": "Email inválido"
       }
+    }
+  },
+  "upload": {
+    "success": "Sucesso",
+    "upload_error": "Erro de upload",
+    "delete_error": "Erro de exclusão",
+    "validation_error": "Erro de validação",
+    "image_uploaded_successfully": "Imagem enviada com sucesso",
+    "image_deleted_successfully": "Imagem excluída com sucesso",
+    "uploading": "Enviando...",
+    "deleting": "Excluindo...",
+    "select_file": "Selecionar arquivo",
+    "upload": "Enviar",
+    "formats_accepted": "Formatos aceitos",
+    "max_size": "Tamanho máximo",
+    "demo_title": "Demo de upload de imagem",
+    "convention_logo_alt": "Logo da convenção",
+    "click_select_convention_logo": "Clique para selecionar logo da convenção",
+    "logo_url_label": "URL do logo",
+    "logo_url_placeholder": "https://exemplo.com/logo.jpg",
+    "logo_url_optional_placeholder": "URL do logo da convenção (opcional)",
+    "logo_preview_alt": "Pré-visualização do logo",
+    "loading_error_title": "Erro ao carregar imagem",
+    "image_configured": "Imagem configurada",
+    "errors": {
+      "file_too_large": "Arquivo muito grande. Tamanho máximo: {maxSize}",
+      "invalid_file_type": "Tipo de arquivo inválido. Formatos aceitos: {allowedTypes}",
+      "invalid_file_extension": "Extensão de arquivo inválida. Extensões aceitas: {allowedExtensions}",
+      "validation_failed": "Falha na validação",
+      "no_file_selected": "Nenhum arquivo selecionado",
+      "no_auth_token": "Token de autenticação ausente",
+      "upload_failed": "Falha no upload",
+      "delete_failed": "Falha na exclusão",
+      "edition_id_required": "ID da edição obrigatório",
+      "convention_id_required": "ID da convenção obrigatório",
+      "unsupported_delete_endpoint": "Endpoint de exclusão não suportado"
     }
   }
 }

@@ -230,6 +230,7 @@
     "first_name": "Fornavn",
     "last_name": "Efternavn",
     "username": "Brugernavn",
+    "username_placeholder": "Dit unikke brugernavn",
     "confirm_password": "Bekræft adgangskode",
     "login_subtitle": "Få adgang til din konto",
     "email_or_username": "Email eller brugernavn",
@@ -240,6 +241,7 @@
     "remember_me": "Husk mig",
     "forgot_password_link": "Glemt adgangskode?",
     "login_button": "Log ind",
+    "login": "Log ind",
     "login_button_loading": "Logger ind...",
     "no_account_question": "Har du ikke en konto endnu?",
     "register_link": "Registrer",
@@ -257,6 +259,7 @@
     "remember_password": "Husker du din adgangskode?",
     "check_spam": "Tjek din spam-mappe, hvis du ikke modtager emailen.",
     "reset_password_title": "Ny adgangskode",
+    "new_password": "Ny adgangskode",
     "reset_password_subtitle": "Indstil din nye adgangskode",
     "min_characters": "Minimum 8 tegn",
     "password_strength": "Adgangskodestyrke:",
@@ -425,6 +428,7 @@
     "profile_stats": "Profilstatistikker",
     "update_profile": "Opdater profil",
     "upload_picture": "Upload et billede",
+    "uploading": "Uploader...",
     "remove_picture": "Fjern billede",
     "change_photo": "Skift foto",
     "manage_profile_info": "Administrer dine profiloplysninger",
@@ -663,7 +667,32 @@
     "convention_edit_denied": "Du har ikke rettigheder til at redigere denne konvention",
     "convention_update_error": "Der opstod en fejl under opdateringen af konventionen",
     "convention_updated_image_failed": "Konventionen blev opdateret, men billedet kunne ikke uploades",
-    "update_error": "Fejl under opdatering"
+    "update_error": "Fejl under opdatering",
+    "email_not_verified": "Email ikke bekræftet",
+    "email_verification_required": "Du skal bekræfte din email før du kan logge ind",
+    "access_denied": "Adgang nægtet",
+    "email_or_username_required": "Email eller brugernavn påkrævet",
+    "password_required": "Adgangskode påkrævet",
+    "registration_failed": "Registrering mislykkedes",
+    "email_or_username_taken": "Denne email eller dette brugernavn er allerede i brug",
+    "username_min_3_chars": "Brugernavnet skal have mindst 3 tegn",
+    "last_name_required": "Efternavn påkrævet",
+    "first_name_required": "Fornavn påkrævet",
+    "password_uppercase_required": "Adgangskoden skal indeholde mindst et stort bogstav",
+    "password_digit_required": "Adgangskoden skal indeholde mindst et tal",
+    "passwords_dont_match": "Adgangskoderne stemmer ikke overens",
+    "confirm_password_required": "Bekræftelse af adgangskode påkrævet",
+    "edition_creation_failed": "Oprettelse af udgave mislykkedes",
+    "authentication_error": "Autentificeringsfejl",
+    "login_required_convention": "Du skal være logget ind for at oprette en konvention",
+    "convention_created_image_failed": "Konventionen blev oprettet, men billedet kunne ikke uploades",
+    "creation_error": "Fejl under oprettelse",
+    "cannot_remove_favorite": "Kan ikke fjerne fra favoritter",
+    "cannot_load_comments": "Kan ikke indlæse kommentarer",
+    "cannot_add_comment": "Kan ikke tilføje kommentar",
+    "cannot_add_passenger": "Kan ikke tilføje passager",
+    "convention_required": "Konvention påkrævet",
+    "address_required": "Adresse påkrævet"
   },
   "forms": {
     "placeholders": {
@@ -838,14 +867,6 @@
       "yellow_border_favorite": "Gul kant = Favorit"
     }
   },
-  "renegade": {
-    "title": "FRENCH RENEGADE",
-    "countdown_title": "Nedtælling til 7. august 2025 - 01:00",
-    "days": "Dage",
-    "hours": "Timer",
-    "minutes": "Minutter",
-    "seconds": "Sekunder"
-  },
   "pages": {
     "favorites": {
       "no_favorites_added": "Du har endnu ikke tilføjet nogen udgaver til dine favoritter.",
@@ -950,6 +971,8 @@
       "title": "Fejl ved afsendelse af feedback",
       "submit": "Der opstod en fejl ved afsendelse af din feedback",
       "required_fields": "Udfyld venligst alle påkrævede felter",
+      "name_required": "Navn er påkrævet",
+      "name_required_desc": "Angiv venligst dit navn",
       "captcha_required": "Udfyld venligst captcha'en",
       "captcha_not_loaded": "Captcha'en er ikke indlæst endnu, vent venligst"
     },
@@ -969,6 +992,42 @@
       "email": {
         "invalid": "Ugyldig email"
       }
+    }
+  },
+  "upload": {
+    "success": "Succes",
+    "upload_error": "Upload fejl",
+    "delete_error": "Sletningsfejl",
+    "validation_error": "Valideringsfejl",
+    "image_uploaded_successfully": "Billede uploadet med succes",
+    "image_deleted_successfully": "Billede slettet med succes",
+    "uploading": "Uploader...",
+    "deleting": "Sletter...",
+    "select_file": "Vælg fil",
+    "upload": "Upload",
+    "formats_accepted": "Accepterede formater",
+    "max_size": "Maksimal størrelse",
+    "demo_title": "Billede upload demo",
+    "convention_logo_alt": "Convention logo",
+    "click_select_convention_logo": "Klik for at vælge convention logo",
+    "logo_url_label": "Logo URL",
+    "logo_url_placeholder": "https://eksempel.com/logo.jpg",
+    "logo_url_optional_placeholder": "URL til convention logo (valgfrit)",
+    "logo_preview_alt": "Logo forhåndsvisning",
+    "loading_error_title": "Fejl ved indlæsning af billede",
+    "image_configured": "Billede konfigureret",
+    "errors": {
+      "file_too_large": "Fil for stor. Maksimal størrelse: {maxSize}",
+      "invalid_file_type": "Ugyldig filtype. Accepterede formater: {allowedTypes}",
+      "invalid_file_extension": "Ugyldig filendelse. Accepterede endelser: {allowedExtensions}",
+      "validation_failed": "Validering mislykkedes",
+      "no_file_selected": "Ingen fil valgt",
+      "no_auth_token": "Manglende autentificeringstoken",
+      "upload_failed": "Upload mislykkedes",
+      "delete_failed": "Sletning mislykkedes",
+      "edition_id_required": "Edition ID påkrævet",
+      "convention_id_required": "Convention ID påkrævet",
+      "unsupported_delete_endpoint": "Ikke-understøttet sletnings-endpoint"
     }
   }
 }

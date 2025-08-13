@@ -230,6 +230,7 @@
     "first_name": "Ім'я",
     "last_name": "Прізвище",
     "username": "Ім'я користувача",
+    "username_placeholder": "Ваше унікальне ім'я користувача",
     "confirm_password": "Підтвердити пароль",
     "login_subtitle": "Доступ до вашого облікового запису",
     "email_or_username": "Електронна пошта або ім'я користувача",
@@ -239,6 +240,7 @@
     "hide_password": "Приховати пароль",
     "forgot_password_link": "Забули пароль?",
     "login_button": "Увійти",
+    "login": "Вхід",
     "login_button_loading": "Вхід...",
     "no_account_question": "Ще немає облікового запису?",
     "register_link": "Зареєструватися",
@@ -256,6 +258,7 @@
     "remember_password": "Пам'ятаєте свій пароль?",
     "check_spam": "Перевірте папку спам, якщо не отримали лист.",
     "reset_password_title": "Новий пароль",
+    "new_password": "Новий пароль",
     "reset_password_subtitle": "Встановіть свій новий пароль",
     "min_characters": "Мінімум 8 символів",
     "password_strength": "Надійність пароля:",
@@ -424,6 +427,7 @@
     "profile_stats": "Статистика профілю",
     "update_profile": "Оновити профіль",
     "upload_picture": "Завантажити фото",
+    "uploading": "Завантаження...",
     "remove_picture": "Видалити фото",
     "change_photo": "Змінити фото",
     "manage_profile_info": "Керувати інформацією профілю",
@@ -749,14 +753,6 @@
       "payment": "Оплата"
     }
   },
-  "renegade": {
-    "title": "ФРАНЦУЗЬКИЙ РЕНЕГАТ",
-    "countdown_title": "Відлік до 7 серпня 2025 року - 01:00 ранку",
-    "days": "Днів",
-    "hours": "Годин",
-    "minutes": "Хвилин",
-    "seconds": "Секунд"
-  },
   "pages": {
     "favorites": {
       "no_favorites_added": "Ви ще не додали жодного видання до улюблених.",
@@ -963,5 +959,41 @@
     "convention_update_error": "Сталася помилка при оновленні конвенції",
     "convention_updated_image_failed": "Конвенцію оновлено, але зображення не вдалося завантажити",
     "update_error": "Помилка оновлення"
+  },
+  "upload": {
+    "success": "Успішно",
+    "upload_error": "Помилка завантаження",
+    "delete_error": "Помилка видалення",
+    "validation_error": "Помилка валідації",
+    "image_uploaded_successfully": "Зображення успішно завантажено",
+    "image_deleted_successfully": "Зображення успішно видалено",
+    "uploading": "Завантаження...",
+    "deleting": "Видалення...",
+    "select_file": "Вибрати файл",
+    "upload": "Завантажити",
+    "formats_accepted": "Прийнятні формати",
+    "max_size": "Максимальний розмір",
+    "demo_title": "Демо завантаження зображення",
+    "convention_logo_alt": "Логотип конвенції",
+    "click_select_convention_logo": "Натисніть, щоб вибрати логотип конвенції",
+    "logo_url_label": "URL логотипу",
+    "logo_url_placeholder": "https://example.com/logo.jpg",
+    "logo_url_optional_placeholder": "URL логотипу конвенції (необов'язково)",
+    "logo_preview_alt": "Попередній перегляд логотипу",
+    "loading_error_title": "Помилка завантаження зображення",
+    "image_configured": "Зображення налаштовано",
+    "errors": {
+      "file_too_large": "Файл занадто великий. Максимальний розмір: {maxSize}",
+      "invalid_file_type": "Недопустимий тип файлу. Прийнятні формати: {allowedTypes}",
+      "invalid_file_extension": "Недопустиме розширення файлу. Прийнятні розширення: {allowedExtensions}",
+      "validation_failed": "Помилка валідації",
+      "no_file_selected": "Файл не вибрано",
+      "no_auth_token": "Відсутній токен автентифікації",
+      "upload_failed": "Помилка завантаження",
+      "delete_failed": "Помилка видалення",
+      "edition_id_required": "Потрібен ID видання",
+      "convention_id_required": "Потрібен ID конвенції",
+      "unsupported_delete_endpoint": "Непідтримуваний endpoint видалення"
+    }
   }
 }
