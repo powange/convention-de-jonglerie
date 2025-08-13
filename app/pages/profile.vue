@@ -529,6 +529,7 @@ import { useAuthStore } from '~/stores/auth';
 import { useEditionStore } from '~/stores/editions';
 import type { HttpError, User } from '~/types';
 import UserAvatar from '~/components/ui/UserAvatar.vue';
+import ImageUpload from '~/components/ui/ImageUpload.vue';
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -550,10 +551,9 @@ const formatMemberSince = computed(() => {
 
 const loading = ref(false);
 const passwordLoading = ref(false);
-const pictureLoading = ref(false);
 const showPasswordModal = ref(false);
 const showProfilePictureModal = ref(false);
-const fileInput = ref<HTMLInputElement>();
+const profilePictureUrl = ref(authStore.user?.profilePicture || '');
 const avatarKey = ref(Date.now()); // Pour forcer le rechargement de l'avatar
 
 // Gestion du mode administrateur
@@ -708,32 +708,15 @@ const changePassword = async () => {
   }
 };
 
-const triggerFileInput = () => {
-  fileInput.value?.click();
-};
-
-const handleFileUpload = async (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  
-  if (!file) return;
-  
-  pictureLoading.value = true;
-  try {
-    const formData = new FormData();
-    formData.append('profilePicture', file);
+// Gestionnaires d'événements pour ImageUpload
+const onProfilePictureUploaded = (result: { success: boolean; imageUrl?: string; user?: User }) => {
+  if (result.success) {
+    // Mettre à jour l'URL locale
+    profilePictureUrl.value = result.imageUrl || result.user?.profilePicture || '';
     
-    const response = await $fetch<{ user: User }>('/api/profile/upload-picture', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
-    });
-    
-    // Mettre à jour les données utilisateur
-    if (response.user) {
-      authStore.updateUser(response.user);
+    // Mettre à jour les données utilisateur si fournies
+    if (result.user) {
+      authStore.updateUser(result.user);
     }
     
     // Forcer le rechargement de l'avatar
@@ -747,58 +730,38 @@ const handleFileUpload = async (event: Event) => {
       icon: 'i-heroicons-check-circle', 
       color: 'green' 
     });
-  } catch (error: unknown) {
-    const httpError = error as HttpError;
-    toast.add({ 
-      title: t('common.error'), 
-      description: httpError.data?.message || httpError.message || t('profile.cannot_change_photo'),
-      icon: 'i-heroicons-x-circle', 
-      color: 'red' 
-    });
-  } finally {
-    pictureLoading.value = false;
-    // Reset file input
-    if (target) target.value = '';
   }
 };
 
-const deleteProfilePicture = async () => {
-  pictureLoading.value = true;
-  try {
-    const response = await $fetch<{ user: User }>('/api/profile/delete-picture', {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
-    });
-    
-    // Mettre à jour les données utilisateur
-    if (response.user) {
-      authStore.updateUser(response.user);
-    }
-    
-    // Forcer le rechargement de l'avatar
-    avatarKey.value++;
-    
-    showProfilePictureModal.value = false;
-    
-    toast.add({ 
-      title: t('profile.photo_deleted'), 
-      description: t('profile.profile_picture_deleted'),
-      icon: 'i-heroicons-check-circle', 
-      color: 'green' 
-    });
-  } catch (error: unknown) {
-    const httpError = error as HttpError;
-    toast.add({ 
-      title: t('common.error'), 
-      description: httpError.data?.message || httpError.message || t('profile.cannot_delete_photo'),
-      icon: 'i-heroicons-x-circle', 
-      color: 'red' 
-    });
-  } finally {
-    pictureLoading.value = false;
+const onProfilePictureDeleted = () => {
+  profilePictureUrl.value = '';
+  
+  // Mettre à jour les données utilisateur (supprimer la photo)
+  if (authStore.user) {
+    const updatedUser = { ...authStore.user, profilePicture: null };
+    authStore.updateUser(updatedUser);
   }
+  
+  // Forcer le rechargement de l'avatar
+  avatarKey.value++;
+  
+  showProfilePictureModal.value = false;
+  
+  toast.add({ 
+    title: t('profile.photo_deleted'), 
+    description: t('profile.profile_picture_deleted'),
+    icon: 'i-heroicons-check-circle', 
+    color: 'green' 
+  });
+};
+
+const onProfilePictureError = (error: string) => {
+  toast.add({ 
+    title: t('common.error'), 
+    description: error || t('profile.cannot_change_photo'),
+    icon: 'i-heroicons-x-circle', 
+    color: 'red' 
+  });
 };
 
 // Fonction pour basculer le mode administrateur
