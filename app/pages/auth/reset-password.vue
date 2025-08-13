@@ -267,7 +267,7 @@ onMounted(async () => {
         title: t('auth.invalid_link'),
         description: message,
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'error'
+        color: 'red'
       });
     }
   } catch (error) {
@@ -294,7 +294,7 @@ const handleSubmit = async () => {
       title: t('common.success'), 
       description: t('auth.password_reset_description'),
       icon: 'i-heroicons-check-circle', 
-      color: 'success' 
+      color: 'green' 
     });
     
   } catch (error: any) {
@@ -308,7 +308,7 @@ const handleSubmit = async () => {
         title: t('common.error'), 
         description: error.data?.statusMessage || t('errors.server_error'),
         icon: 'i-heroicons-x-circle', 
-        color: 'error' 
+        color: 'red' 
       });
     }
   } finally {

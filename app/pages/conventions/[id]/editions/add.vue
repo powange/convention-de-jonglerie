@@ -71,7 +71,7 @@ onMounted(async () => {
       title: t('errors.authentication_error'),
       description: t('errors.login_required_edition'),
       icon: 'i-heroicons-exclamation-triangle',
-      color: 'error'
+      color: 'red'
     });
     router.push('/login');
     return;
@@ -96,21 +96,21 @@ onMounted(async () => {
         title: t('conventions.convention_not_found'),
         description: t('conventions.convention_not_found_description'),
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'error'
+        color: 'red'
       });
     } else if (httpError.status === 403) {
       toast.add({
         title: t('pages.access_denied.title'),
         description: t('errors.edition_add_denied'),
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'error'
+        color: 'red'
       });
     } else {
       toast.add({
         title: t('errors.loading_error'),
         description: t('errors.cannot_load_convention'),
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'error'
+        color: 'red'
       });
     }
   } finally {
@@ -128,7 +128,7 @@ const handleAddEdition = async (data: EditionFormData) => {
       title: t('messages.edition_created'),
       description: t('messages.edition_created_successfully'),
       icon: 'i-heroicons-check-circle',
-      color: 'success'
+      color: 'green'
     });
     
     // Rediriger vers la page des conventions de l'utilisateur
@@ -143,7 +143,7 @@ const handleAddEdition = async (data: EditionFormData) => {
       title: t('errors.creation_error'),
       description: errorMessage,
       icon: 'i-heroicons-x-circle',
-      color: 'error'
+      color: 'red'
     });
   } finally {
     submitting.value = false;

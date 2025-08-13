@@ -222,7 +222,7 @@ const handleVerification = async () => {
       title: t('auth.email_verified_success'),
       description: t('auth.account_now_active'),
       icon: 'i-heroicons-check-circle',
-      color: 'success'
+      color: 'green'
     });
     
     router.push('/login');
@@ -260,7 +260,7 @@ const handleResendCode = async () => {
       title: t('auth.code_resent'),
       description: t('auth.new_code_sent'),
       icon: 'i-heroicons-envelope',
-      color: 'success'
+      color: 'green'
     });
     
     // Réinitialiser le timer et démarrer le cooldown
@@ -272,7 +272,7 @@ const handleResendCode = async () => {
       title: t('common.error'),
       description: t('errors.server_error'),
       icon: 'i-heroicons-x-circle',
-      color: 'error'
+      color: 'red'
     });
   }
 };

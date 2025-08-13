@@ -161,7 +161,7 @@ const removeFavorite = async (id: number) => {
       title: t('common.error'), 
       description: t('errors.cannot_remove_favorite'),
       icon: 'i-heroicons-x-circle', 
-      color: 'error' 
+      color: 'red' 
     });
   }
 };
@@ -176,7 +176,7 @@ onMounted(async () => {
       title: t('common.error'), 
       description: t('errors.cannot_load_editions'),
       icon: 'i-heroicons-exclamation-triangle', 
-      color: 'error' 
+      color: 'red' 
     });
   } finally {
     loading.value = false;

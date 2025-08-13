@@ -281,7 +281,7 @@ const handleAddCollaborator = async () => {
       title: t('messages.collaborator_added'),
       description: t('messages.collaborator_added_successfully'),
       icon: 'i-heroicons-check-circle',
-      color: 'success'
+      color: 'green'
     });
 
     // Réinitialiser le formulaire
@@ -299,7 +299,7 @@ const handleAddCollaborator = async () => {
       title: t('errors.addition_error'),
       description: httpError.data?.message || httpError.message || t('errors.generic_error'),
       icon: 'i-heroicons-x-circle',
-      color: 'error'
+      color: 'red'
     });
   } finally {
     loading.value = false;
@@ -323,7 +323,7 @@ const handleRemoveCollaborator = async (collaboratorId: number) => {
         title: t('messages.collaborator_removed'),
         description: t('messages.collaborator_removed_successfully'),
         icon: 'i-heroicons-check-circle',
-        color: 'success'
+        color: 'green'
       });
 
       // Émettre l'événement pour recharger les données
@@ -335,7 +335,7 @@ const handleRemoveCollaborator = async (collaboratorId: number) => {
         title: t('errors.removal_error'),
         description: httpError.data?.message || httpError.message || t('errors.generic_error'),
         icon: 'i-heroicons-x-circle',
-        color: 'error'
+        color: 'red'
       });
     }
   }

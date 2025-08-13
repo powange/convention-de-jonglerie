@@ -189,9 +189,9 @@ const isFavorited = computed(() => (_editionId: number) => {
 const toggleFavorite = async (id: number) => {
   try {
     await editionStore.toggleFavorite(id);
-    toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'success' });
+    toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'green' });
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || t('errors.favorite_update_failed'), icon: 'i-heroicons-x-circle', color: 'error' });
+    toast.add({ title: e.statusMessage || t('errors.favorite_update_failed'), icon: 'i-heroicons-x-circle', color: 'red' });
   }
 };
 
@@ -199,10 +199,10 @@ const deleteEdition = async (id: number) => {
   if (confirm(t('pages.access_denied.confirm_delete_edition'))) {
     try {
       await editionStore.deleteEdition(id);
-      toast.add({ title: t('messages.edition_deleted'), icon: 'i-heroicons-check-circle', color: 'success' });
+      toast.add({ title: t('messages.edition_deleted'), icon: 'i-heroicons-check-circle', color: 'green' });
       router.push('/');
     } catch (e: unknown) {
-      toast.add({ title: e.statusMessage || t('errors.edition_deletion_failed'), icon: 'i-heroicons-x-circle', color: 'error' });
+      toast.add({ title: e.statusMessage || t('errors.edition_deletion_failed'), icon: 'i-heroicons-x-circle', color: 'red' });
     }
   }
 };

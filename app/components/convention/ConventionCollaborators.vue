@@ -155,7 +155,7 @@ const loadCollaborators = async () => {
       title: 'Erreur',
       description: 'Impossible de charger les collaborateurs',
       icon: 'i-heroicons-exclamation-triangle',
-      color: 'error'
+      color: 'red'
     });
   } finally {
     loading.value = false;
@@ -179,7 +179,7 @@ const addCollaborator = async () => {
       title: 'Collaborateur ajouté',
       description: `${newCollaborator.user.pseudo} peut maintenant modifier cette convention`,
       icon: 'i-heroicons-check-circle',
-      color: 'success'
+      color: 'green'
     });
   } catch (error: unknown) {
     const errorMessage = (error && typeof error === 'object' && 'statusMessage' in error && typeof error.statusMessage === 'string') 
@@ -189,7 +189,7 @@ const addCollaborator = async () => {
       title: 'Erreur',
       description: errorMessage,
       icon: 'i-heroicons-x-circle',
-      color: 'error'
+      color: 'red'
     });
   } finally {
     adding.value = false;
@@ -209,7 +209,7 @@ const removeCollaborator = async (collaborator: ConventionCollaborator) => {
       title: 'Collaborateur retiré',
       description: `${collaborator.user.pseudo} ne peut plus modifier cette convention`,
       icon: 'i-heroicons-check-circle',
-      color: 'success'
+      color: 'green'
     });
   } catch (error: unknown) {
     const errorMessage = (error && typeof error === 'object' && 'statusMessage' in error && typeof error.statusMessage === 'string') 
@@ -219,7 +219,7 @@ const removeCollaborator = async (collaborator: ConventionCollaborator) => {
       title: 'Erreur',
       description: errorMessage,
       icon: 'i-heroicons-x-circle',
-      color: 'error'
+      color: 'red'
     });
   }
 };

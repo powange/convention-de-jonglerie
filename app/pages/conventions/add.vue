@@ -46,7 +46,7 @@ const handleAddConvention = async (formData: ConventionFormData, file?: File | n
       title: t('errors.authentication_error'),
       description: t('errors.login_required_convention'),
       icon: 'i-heroicons-exclamation-triangle',
-      color: 'error'
+      color: 'red'
     });
     return;
   }
@@ -94,7 +94,7 @@ const handleAddConvention = async (formData: ConventionFormData, file?: File | n
       title: t('messages.convention_created'),
       description: t('messages.convention_created_desc', { name: finalConvention.name }),
       icon: 'i-heroicons-check-circle',
-      color: 'success'
+      color: 'green'
     });
 
     // Rediriger vers la page des conventions de l'utilisateur
@@ -109,7 +109,7 @@ const handleAddConvention = async (formData: ConventionFormData, file?: File | n
       title: t('errors.creation_error'),
       description: errorMessage,
       icon: 'i-heroicons-x-circle',
-      color: 'error'
+      color: 'red'
     });
   } finally {
     loading.value = false;

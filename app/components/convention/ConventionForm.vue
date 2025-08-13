@@ -48,50 +48,29 @@
 
         <!-- Upload de fichier -->
         <div v-if="uploadMode === 'file'">
-          <input
-            ref="fileInput"
-            type="file"
-            accept="image/jpeg,image/png,image/jpg,image/webp"
-            class="hidden"
-            @change="handleFileSelect"
-          >
-          
-          <div v-if="!selectedFile && !form.logo" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-            <UIcon name="i-heroicons-photo" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <p class="text-sm text-gray-600 mb-2">{{ $t('components.convention_form.click_to_select_image') }}</p>
-            <UButton
-              type="button"
-              variant="outline"
-              @click="$refs.fileInput?.click()"
-            >
-              Choisir un fichier
-            </UButton>
-            <p class="text-xs text-gray-500 mt-2">
-              Formats acceptés: JPG, PNG, WEBP (max. 5MB)
-            </p>
-          </div>
-
-          <div v-else-if="selectedFile" class="border border-gray-200 rounded-lg p-4">
-            <div class="flex items-center gap-3">
-              <UIcon name="i-heroicons-document" class="text-gray-400" />
-              <div class="flex-1">
-                <p class="text-sm font-medium">{{ selectedFile.name }}</p>
-                <p class="text-xs text-gray-500">{{ formatFileSize(selectedFile.size) }}</p>
-              </div>
-              <UButton
-                type="button"
-                variant="ghost"
-                color="error"
-                size="sm"
-                icon="i-heroicons-trash"
-                @click="removeSelectedFile"
-              />
-            </div>
-          </div>
+          <ImageUpload
+            v-model="form.logo"
+            :endpoint="{ type: 'convention', id: initialData?.id }"
+            :options="{
+              validation: {
+                maxSize: 5 * 1024 * 1024,
+                allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+                allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp']
+              },
+              autoUpload: false,
+              resetAfterUpload: false
+            }"
+            alt="Logo de la convention"
+            :placeholder="$t('components.convention_form.click_to_select_image')"
+            :allow-delete="!!initialData?.id"
+            @uploaded="onImageUploaded"
+            @deleted="onImageDeleted"
+            @error="onImageError"
+          />
         </div>
 
         <!-- URL externe -->
-        <div v-if="uploadMode === 'url'">
+        <div v-else>
           <UInput
             v-model="form.logo"
             :placeholder="$t('upload.logo_url_optional_placeholder')"
@@ -101,40 +80,29 @@
           <p class="text-sm text-gray-500 mt-1">
             URL vers l'image du logo de la convention
           </p>
+          
+          <!-- Aperçu de l'URL -->
+          <div v-if="form.logo" class="mt-3">
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ $t('components.convention_form.logo_preview') }}</p>
+            <img 
+              :src="form.logo" 
+              :alt="form.name || 'Logo de la convention'"
+              class="w-24 h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
+              @error="logoError = true"
+              @load="logoError = false"
+            />
+            <UAlert
+              v-if="logoError"
+              color="red"
+              variant="subtle"
+              title="Erreur de chargement"
+              description="Impossible de charger l'image depuis cette URL"
+              class="mt-2"
+            />
+          </div>
         </div>
       </div>
     </UFormField>
-
-    <!-- Preview du logo -->
-    <div v-if="previewUrl" class="flex justify-center">
-      <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
-        <div class="flex justify-between items-center mb-2">
-          <p class="text-sm text-gray-600">{{ $t('components.convention_form.logo_preview') }}</p>
-          <UButton
-            v-if="form.logo && initialData?.id"
-            type="button"
-            variant="ghost"
-            color="error"
-            size="xs"
-            icon="i-heroicons-trash"
-            :loading="deletingImage"
-            @click="deleteCurrentImage"
-          >
-            Supprimer
-          </UButton>
-        </div>
-        <img 
-          :src="previewUrl" 
-          :alt="form.name || 'Logo de la convention'" 
-          class="w-24 h-24 object-cover rounded-lg mx-auto"
-          @error="logoError = true"
-          @load="logoError = false"
-        >
-        <p v-if="logoError" class="text-xs text-red-500 mt-1 text-center">
-          Impossible de charger l'image
-        </p>
-      </div>
-    </div>
 
     <!-- Boutons d'action -->
     <div class="flex gap-3 pt-4">
@@ -160,9 +128,10 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted, computed } from 'vue';
+import { reactive, ref, onMounted } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import type { Convention } from '~/types';
+import ImageUpload from '~/components/ui/ImageUpload.vue';
 
 interface Props {
   initialData?: Convention;
@@ -182,13 +151,9 @@ const emit = defineEmits<{
 
 const authStore = useAuthStore();
 const toast = useToast();
-const { normalizeImageUrl } = useImageUrl();
 
 const logoError = ref(false);
 const uploadMode = ref<'file' | 'url'>('file');
-const selectedFile = ref<File | null>(null);
-const fileInput = ref<HTMLInputElement>();
-const deletingImage = ref(false);
 
 const form = reactive({
   name: '',
@@ -196,19 +161,6 @@ const form = reactive({
   logo: '',
 });
 
-// Computed pour l'aperçu de l'image
-const previewUrl = computed(() => {
-  if (uploadMode.value === 'file' && selectedFile.value) {
-    return URL.createObjectURL(selectedFile.value);
-  }
-  if (uploadMode.value === 'url' && form.logo && isValidUrl(form.logo)) {
-    return form.logo;
-  }
-  if (form.logo && !selectedFile.value) {
-    return normalizeImageUrl(form.logo);
-  }
-  return null;
-});
 
 // Fonctions utilitaires
 const trimField = (fieldName: keyof typeof form) => {
@@ -232,125 +184,33 @@ const isValidUrl = (url: string): boolean => {
   }
 };
 
-const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-};
-
-// Gestion des fichiers
-const handleFileSelect = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  
-  if (!file) return;
-  
-  // Vérifier le type de fichier
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-  if (!allowedTypes.includes(file.type)) {
+// Gestionnaires d'événements pour ImageUpload
+const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
+  if (result.success && result.imageUrl) {
+    form.logo = result.imageUrl;
     toast.add({
-      title: 'Format non supporté',
-      description: 'Formats acceptés: JPG, PNG, WEBP',
-      icon: 'i-heroicons-exclamation-triangle',
-      color: 'error'
+      title: 'Image uploadée',
+      description: 'L\'image a été uploadée avec succès',
+      color: 'green'
     });
-    return;
-  }
-  
-  // Vérifier la taille (5MB max)
-  if (file.size > 5 * 1024 * 1024) {
-    toast.add({
-      title: 'Fichier trop volumineux',
-      description: 'La taille maximum est de 5MB',
-      icon: 'i-heroicons-exclamation-triangle',
-      color: 'error'
-    });
-    return;
-  }
-  
-  selectedFile.value = file;
-  form.logo = ''; // Reset l'URL si on sélectionne un fichier
-};
-
-const removeSelectedFile = () => {
-  selectedFile.value = null;
-  if (fileInput.value) {
-    fileInput.value.value = '';
   }
 };
 
-// Upload de l'image
-const uploadImage = async (conventionId: number): Promise<string | null> => {
-  if (!selectedFile.value || !authStore.token) return null;
-  
-  const formData = new FormData();
-  formData.append('image', selectedFile.value);
-  
-  try {
-    const response = await $fetch(`/api/conventions/${conventionId}/upload-image`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
-      body: formData,
-    });
-    
-    return response.imageUrl;
-  } catch (error: unknown) {
-    console.error('Erreur lors de l\'upload:', error);
-    const errorMessage = (error && typeof error === 'object' && 'data' in error && 
-                         error.data && typeof error.data === 'object' && 'message' in error.data) 
-                        ? String(error.data.message) 
-                        : 'Impossible d\'uploader l\'image';
-    toast.add({
-      title: 'Erreur d\'upload',
-      description: errorMessage,
-      icon: 'i-heroicons-x-circle',
-      color: 'error'
-    });
-    return null;
-  }
+const onImageDeleted = () => {
+  form.logo = '';
+  toast.add({
+    title: 'Image supprimée',
+    description: 'L\'image a été supprimée avec succès',
+    color: 'green'
+  });
 };
 
-// Suppression de l'image actuelle
-const deleteCurrentImage = async () => {
-  if (!props.initialData?.id || !authStore.token) return;
-  
-  deletingImage.value = true;
-  
-  try {
-    await $fetch(`/api/conventions/${props.initialData.id}/delete-image`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
-    });
-    
-    form.logo = '';
-    
-    toast.add({
-      title: 'Image supprimée',
-      description: 'L\'image a été supprimée avec succès',
-      icon: 'i-heroicons-check-circle',
-      color: 'success'
-    });
-  } catch (error: unknown) {
-    console.error('Erreur lors de la suppression:', error);
-    const errorMessage = (error && typeof error === 'object' && 'data' in error && 
-                         error.data && typeof error.data === 'object' && 'message' in error.data) 
-                        ? String(error.data.message) 
-                        : 'Impossible de supprimer l\'image';
-    toast.add({
-      title: 'Erreur de suppression',
-      description: errorMessage,
-      icon: 'i-heroicons-x-circle',
-      color: 'error'
-    });
-  } finally {
-    deletingImage.value = false;
-  }
+const onImageError = (error: string) => {
+  toast.add({
+    title: 'Erreur',
+    description: error,
+    color: 'red'
+  });
 };
 
 // Validation
@@ -387,7 +247,7 @@ const onSubmit = async () => {
     logo: uploadMode.value === 'url' ? (form.logo.trim() || null) : (form.logo || null),
   };
   
-  emit('submit', formData, uploadMode.value === 'file' ? selectedFile.value : null);
+  emit('submit', formData, null);
 };
 
 // Initialisation avec les données existantes

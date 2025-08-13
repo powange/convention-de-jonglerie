@@ -159,32 +159,24 @@
           </UFormField>
 
           <UFormField :label="t('editions.photo_optional')">
-            <div class="space-y-3">
-              <input
-                ref="fileInput"
-                type="file"
-                accept="image/*"
-                class="hidden"
-                @change="handleFileSelect"
-              >
-              
-              <UButton 
-                icon="i-heroicons-camera"
-                variant="outline"
-                block
-                @click="$refs.fileInput.click()"
-                :loading="uploadingImage"
-              >
-                {{ uploadingImage ? t('editions.uploading') : t('editions.choose_photo') }}
-              </UButton>
-
-              <img 
-                v-if="newItem.imageUrl"
-                :src="newItem.imageUrl"
-                :alt="t('common.preview')"
-                class="max-w-full rounded-lg"
-              >
-            </div>
+            <ImageUpload
+              v-model="newItem.imageUrl"
+              :endpoint="{ type: 'lost-found', id: editionId }"
+              :options="{
+                validation: {
+                  maxSize: 5 * 1024 * 1024,
+                  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+                  allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp']
+                },
+                autoUpload: true,
+                resetAfterUpload: false
+              }"
+              alt="Photo de l'objet trouvé"
+              :placeholder="t('editions.choose_photo')"
+              :allow-delete="false"
+              @uploaded="onImageUploaded"
+              @error="onImageError"
+            />
           </UFormField>
         </div>
       </template>
@@ -229,6 +221,7 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import EditionHeader from '~/components/edition/EditionHeader.vue'
 import UserAvatar from '~/components/ui/UserAvatar.vue'
+import ImageUpload from '~/components/ui/ImageUpload.vue'
 
 // Props et route
 const route = useRoute()
@@ -247,7 +240,6 @@ const commentContents = ref<Record<number, string>>({})
 const showAddModal = ref(false)
 const showImageModalState = ref(false)
 const currentImageUrl = ref('')
-const uploadingImage = ref(false)
 const submittingItem = ref(false)
 
 const newItem = ref({
@@ -284,13 +276,13 @@ const toggleFavorite = async (id: number) => {
     toast.add({ 
       title: t('messages.favorite_status_updated'), 
       icon: 'i-heroicons-check-circle', 
-      color: 'success' 
+      color: 'green' 
     })
   } catch (e: any) {
     toast.add({ 
       title: e.statusMessage || t('errors.favorite_update_failed'), 
       icon: 'i-heroicons-x-circle', 
-      color: 'error' 
+      color: 'red' 
     })
   }
 }
@@ -315,7 +307,7 @@ const fetchLostFoundItems = async () => {
   } catch (error) {
     console.error('Error loading lost items:', error)
     toast.add({
-      color: 'error',
+      color: 'red',
       title: t('common.error'),
       description: t('editions.cannot_load_lost_items')
     })
@@ -347,12 +339,12 @@ const postComment = async (itemId: number) => {
     commentContents.value[itemId] = ''
 
     toast.add({
-      color: 'success',
+      color: 'green',
       title: t('editions.comment_added')
     })
   } catch (error) {
     toast.add({
-      color: 'error',
+      color: 'red',
       title: t('common.error'),
       description: t('editions.cannot_add_comment')
     })
@@ -375,52 +367,36 @@ const toggleStatus = async (itemId: number) => {
     }
 
     toast.add({
-      color: 'success',
+      color: 'green',
       title: updatedItem.status === 'RETURNED' ? t('editions.item_marked_returned') : t('editions.item_marked_lost')
     })
   } catch (error) {
     toast.add({
-      color: 'error',
+      color: 'red',
       title: t('common.error'),
       description: t('editions.cannot_change_status')
     })
   }
 }
 
-const handleFileSelect = async (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  
-  if (!file) return
-
-  uploadingImage.value = true
-  try {
-    const formData = new FormData()
-    formData.append('image', file)
-
-    const { imageUrl } = await $fetch(`/api/editions/${editionId.value}/lost-found/upload-image`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`
-      },
-      body: formData
-    })
-
-    newItem.value.imageUrl = imageUrl
+// Gestionnaires d'événements pour ImageUpload
+const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
+  if (result.success && result.imageUrl) {
+    newItem.value.imageUrl = result.imageUrl;
     toast.add({
-      color: 'success',
+      color: 'green',
       title: t('editions.photo_uploaded')
-    })
-  } catch (error) {
-    toast.add({
-      color: 'error',
-      title: t('common.error'),
-      description: t('editions.cannot_upload_photo')
-    })
-  } finally {
-    uploadingImage.value = false
+    });
   }
-}
+};
+
+const onImageError = (error: string) => {
+  toast.add({
+    color: 'red',
+    title: t('common.error'),
+    description: error || t('editions.cannot_upload_photo')
+  });
+};
 
 const submitNewItem = async () => {
   if (!newItem.value.description?.trim()) return
@@ -446,12 +422,12 @@ const submitNewItem = async () => {
     showAddModal.value = false
 
     toast.add({
-      color: 'success',
+      color: 'green',
       title: t('editions.lost_item_added')
     })
   } catch (error: any) {
     toast.add({
-      color: 'error',
+      color: 'red',
       title: t('common.error'),
       description: error.data?.statusMessage || t('editions.cannot_add_item')
     })

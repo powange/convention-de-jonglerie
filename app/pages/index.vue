@@ -559,9 +559,9 @@ watch(filters, () => {
 const toggleFavorite = async (id: number) => {
   try {
     await editionStore.toggleFavorite(id);
-    toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'success' });
+    toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'green' });
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || t('errors.favorite_update_failed'), icon: 'i-heroicons-x-circle', color: 'error' });
+    toast.add({ title: e.statusMessage || t('errors.favorite_update_failed'), icon: 'i-heroicons-x-circle', color: 'red' });
   }
 };
 

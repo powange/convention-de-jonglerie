@@ -172,7 +172,7 @@ const handleDelete = async () => {
       title: t('messages.request_deleted'),
       description: t('messages.request_deleted_successfully'),
       icon: 'i-heroicons-check-circle',
-      color: 'success'
+      color: 'green'
     });
 
     emit('deleted');
@@ -182,7 +182,7 @@ const handleDelete = async () => {
       title: t('errors.deletion_error'),
       description: httpError.data?.message || httpError.message || t('errors.generic_error'),
       icon: 'i-heroicons-x-circle',
-      color: 'error'
+      color: 'red'
     });
   }
 };

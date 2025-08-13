@@ -70,7 +70,7 @@ onMounted(async () => {
       title: t('errors.authentication_error'),
       description: t('errors.login_required_convention'),
       icon: 'i-heroicons-exclamation-triangle',
-      color: 'error'
+      color: 'red'
     });
     router.push('/login');
     return;
@@ -101,21 +101,21 @@ onMounted(async () => {
         title: t('conventions.convention_not_found'),
         description: t('conventions.convention_not_found_description'),
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'error'
+        color: 'red'
       });
     } else if (errorStatus === 403) {
       toast.add({
         title: t('pages.access_denied.title'),
         description: t('errors.convention_edit_denied'),
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'error'
+        color: 'red'
       });
     } else {
       toast.add({
         title: t('errors.loading_error'),
         description: t('errors.cannot_load_convention'),
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'error'
+        color: 'red'
       });
     }
   } finally {
@@ -129,7 +129,7 @@ const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'created
       title: t('errors.authentication_error'),
       description: t('errors.login_required_convention'),
       icon: 'i-heroicons-exclamation-triangle',
-      color: 'error'
+      color: 'red'
     });
     return;
   }
@@ -179,7 +179,7 @@ const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'created
       title: t('messages.convention_updated'),
       description: t('messages.convention_updated_desc', { name: finalConvention.name }),
       icon: 'i-heroicons-check-circle',
-      color: 'success'
+      color: 'green'
     });
 
     // Rediriger vers la page des conventions de l'utilisateur
@@ -200,7 +200,7 @@ const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'created
       title: t('errors.update_error'),
       description: errorMessage,
       icon: 'i-heroicons-x-circle',
-      color: 'error'
+      color: 'red'
     });
   } finally {
     updating.value = false;

@@ -49,7 +49,7 @@ onMounted(async () => {
         title: t('pages.access_denied.title'), 
         description: t('errors.edition_edit_denied'),
         icon: 'i-heroicons-exclamation-triangle', 
-        color: 'error' 
+        color: 'red' 
       });
       router.push('/');
       return;
@@ -61,7 +61,7 @@ onMounted(async () => {
       title: t('common.error'), 
       description: t('editions.not_found'),
       icon: 'i-heroicons-exclamation-triangle', 
-      color: 'error' 
+      color: 'red' 
     });
     router.push('/');
   }
@@ -70,10 +70,10 @@ onMounted(async () => {
 const handleUpdateConvention = async (formData: Edition) => {
   try {
     await editionStore.updateEdition(editionId, formData);
-    toast.add({ title: t('messages.edition_updated'), icon: 'i-heroicons-check-circle', color: 'success' });
+    toast.add({ title: t('messages.edition_updated'), icon: 'i-heroicons-check-circle', color: 'green' });
     router.push(`/editions/${editionId}`);
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || t('errors.edition_update_failed'), icon: 'i-heroicons-x-circle', color: 'error' });
+    toast.add({ title: e.statusMessage || t('errors.edition_update_failed'), icon: 'i-heroicons-x-circle', color: 'red' });
   }
 };
 </script>

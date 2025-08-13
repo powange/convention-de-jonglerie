@@ -154,7 +154,7 @@ const handleLogin = async () => {
       storage.setItem('rememberMe', state.rememberMe.toString());
     }
     
-    toast.add({ title: t('messages.login_success'), icon: 'i-heroicons-check-circle', color: 'success' });
+    toast.add({ title: t('messages.login_success'), icon: 'i-heroicons-check-circle', color: 'green' });
     
     // Navigation intelligente : retourner à la page précédente ou à l'accueil
     const returnTo = useRoute().query.returnTo as string;
@@ -216,7 +216,7 @@ const handleLogin = async () => {
       errorMessage = error.message || error.data?.message || errorMessage;
     }
     
-    toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' });
+    toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'red' });
   } finally {
     loading.value = false;
   }

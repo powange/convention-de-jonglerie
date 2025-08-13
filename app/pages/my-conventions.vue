@@ -285,7 +285,7 @@ const getEditionsColumns = () => [
         h(UButton, {
           icon: 'i-heroicons-trash',
           size: 'xs',
-          color: 'error',
+          color: 'red',
           variant: 'ghost',
           label: t('common.delete'),
           onClick: () => deleteEdition(edition.id)
@@ -314,7 +314,7 @@ const deleteEdition = async (id: number) => {
       toast.add({ 
         title: t('messages.edition_deleted'), 
         icon: 'i-heroicons-check-circle', 
-        color: 'success' 
+        color: 'green' 
       });
     } catch (e: unknown) {
       const error = e as HttpError;
@@ -322,7 +322,7 @@ const deleteEdition = async (id: number) => {
         title: t('errors.deletion_error'), 
         description: error.message || error.data?.message || t('errors.server_error'),
         icon: 'i-heroicons-x-circle', 
-        color: 'error' 
+        color: 'red' 
       });
     }
   }
@@ -361,7 +361,7 @@ const fetchMyConventions = async () => {
       title: t('common.error'), 
       description: t('conventions.cannot_load_conventions'),
       icon: 'i-heroicons-exclamation-triangle', 
-      color: 'error' 
+      color: 'red' 
     });
   } finally {
     conventionsLoading.value = false;
@@ -383,7 +383,7 @@ const deleteConvention = async (id: number) => {
         title: t('conventions.convention_deleted'), 
         description: t('conventions.convention_deleted_success'),
         icon: 'i-heroicons-check-circle', 
-        color: 'success' 
+        color: 'green' 
       });
       
       // Recharger la liste des conventions
@@ -395,7 +395,7 @@ const deleteConvention = async (id: number) => {
         title: t('errors.deletion_error'), 
         description: httpError.data?.message || httpError.message || t('errors.server_error'),
         icon: 'i-heroicons-x-circle', 
-        color: 'error' 
+        color: 'red' 
       });
     }
   }

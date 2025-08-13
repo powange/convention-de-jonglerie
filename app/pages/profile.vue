@@ -655,7 +655,7 @@ const updateProfile = async () => {
       title: t('profile.profile_updated'), 
       description: t('profile.info_saved'),
       icon: 'i-heroicons-check-circle', 
-      color: 'success' 
+      color: 'green' 
     });
   } catch (error: unknown) {
     const httpError = error as HttpError;
@@ -663,7 +663,7 @@ const updateProfile = async () => {
       title: t('common.error'), 
       description: httpError.data?.message || httpError.message || t('profile.cannot_save_profile'),
       icon: 'i-heroicons-x-circle', 
-      color: 'error' 
+      color: 'red' 
     });
   } finally {
     loading.value = false;
@@ -693,7 +693,7 @@ const changePassword = async () => {
       title: t('profile.password_changed'), 
       description: t('profile.password_updated'),
       icon: 'i-heroicons-check-circle', 
-      color: 'success' 
+      color: 'green' 
     });
   } catch (error: unknown) {
     const httpError = error as HttpError;
@@ -701,7 +701,7 @@ const changePassword = async () => {
       title: t('common.error'), 
       description: httpError.data?.message || httpError.message || t('profile.cannot_change_password'),
       icon: 'i-heroicons-x-circle', 
-      color: 'error' 
+      color: 'red' 
     });
   } finally {
     passwordLoading.value = false;
@@ -745,7 +745,7 @@ const handleFileUpload = async (event: Event) => {
       title: t('profile.photo_updated'), 
       description: t('profile.profile_picture_changed'),
       icon: 'i-heroicons-check-circle', 
-      color: 'success' 
+      color: 'green' 
     });
   } catch (error: unknown) {
     const httpError = error as HttpError;
@@ -753,7 +753,7 @@ const handleFileUpload = async (event: Event) => {
       title: t('common.error'), 
       description: httpError.data?.message || httpError.message || t('profile.cannot_change_photo'),
       icon: 'i-heroicons-x-circle', 
-      color: 'error' 
+      color: 'red' 
     });
   } finally {
     pictureLoading.value = false;
@@ -786,7 +786,7 @@ const deleteProfilePicture = async () => {
       title: t('profile.photo_deleted'), 
       description: t('profile.profile_picture_deleted'),
       icon: 'i-heroicons-check-circle', 
-      color: 'success' 
+      color: 'green' 
     });
   } catch (error: unknown) {
     const httpError = error as HttpError;
@@ -794,7 +794,7 @@ const deleteProfilePicture = async () => {
       title: t('common.error'), 
       description: httpError.data?.message || httpError.message || t('profile.cannot_delete_photo'),
       icon: 'i-heroicons-x-circle', 
-      color: 'error' 
+      color: 'red' 
     });
   } finally {
     pictureLoading.value = false;

@@ -14,7 +14,7 @@
           <UButton
             v-if="!uploading && (previewUrl || (modelValue && allowDelete))"
             icon="i-heroicons-trash"
-            color="red"
+            color="error"
             variant="solid"
             size="xs"
             @click="handleDelete"
@@ -88,11 +88,11 @@
     <!-- Messages d'erreur -->
     <UAlert
       v-if="error"
-      color="red"
+      color="error"
       variant="subtle"
       :title="t('upload.upload_error')"
       :description="error"
-      :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'gray', variant: 'link', padded: false }"
+      :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'neutral', variant: 'link', padded: false }"
       @close="error = null"
     />
 

@@ -351,7 +351,7 @@ const handleRegister = async () => {
         title: t('messages.account_created'), 
         description: t('messages.verification_code_sent'),
         icon: 'i-heroicons-envelope', 
-        color: 'success' 
+        color: 'green' 
       });
     }
   } catch (e: unknown) {
@@ -362,7 +362,7 @@ const handleRegister = async () => {
     } else if (error.message || error.data?.message) {
       errorMessage = error.message || error.data?.message || errorMessage;
     }
-    toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' });
+    toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'red' });
   } finally {
     loading.value = false;
   }

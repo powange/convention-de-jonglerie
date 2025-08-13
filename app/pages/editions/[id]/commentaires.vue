@@ -151,7 +151,7 @@ const loadPosts = async () => {
     toast.add({
       title: t('errors.loading_error'),
       description: t('errors.cannot_load_comments'),
-      color: 'error'
+      color: 'red'
     });
   } finally {
     loading.value = false;
@@ -180,14 +180,14 @@ const submitNewPost = async () => {
     toast.add({
       title: t('messages.comment_published'),
       description: t('messages.comment_published_successfully'),
-      color: 'success'
+      color: 'green'
     });
   } catch (error: any) {
     console.error('Error creating post:', error);
     toast.add({
       title: t('common.error'),
       description: error.data?.message || t('errors.cannot_publish_comment'),
-      color: 'error'
+      color: 'red'
     });
   } finally {
     isSubmittingPost.value = false;
@@ -209,14 +209,14 @@ const deletePost = async (postId: number) => {
     toast.add({
       title: t('messages.comment_deleted'),
       description: t('messages.comment_deleted_successfully'),
-      color: 'success'
+      color: 'green'
     });
   } catch (error: any) {
     console.error('Erreur lors de la suppression du post:', error);
     toast.add({
       title: t('common.error'),
       description: t('errors.cannot_delete_comment'),
-      color: 'error'
+      color: 'red'
     });
   }
 };
@@ -241,14 +241,14 @@ const addComment = async (postId: number, content: string) => {
     toast.add({
       title: t('messages.reply_published'),
       description: t('messages.reply_published_successfully'),
-      color: 'success'
+      color: 'green'
     });
   } catch (error: any) {
     console.error('Error creating comment:', error);
     toast.add({
       title: t('common.error'),
       description: t('errors.cannot_publish_reply'),
-      color: 'error'
+      color: 'red'
     });
   }
 };
@@ -272,14 +272,14 @@ const deleteComment = async (postId: number, commentId: number) => {
     toast.add({
       title: t('messages.reply_deleted'),
       description: t('messages.reply_deleted_successfully'),
-      color: 'success'
+      color: 'green'
     });
   } catch (error: any) {
     console.error('Erreur lors de la suppression du commentaire:', error);
     toast.add({
       title: t('common.error'),
       description: t('errors.cannot_delete_reply'),
-      color: 'error'
+      color: 'red'
     });
   }
 };
@@ -287,9 +287,9 @@ const deleteComment = async (postId: number, commentId: number) => {
 const toggleFavorite = async (id: number) => {
   try {
     await editionStore.toggleFavorite(id);
-    toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'success' });
+    toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'green' });
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || t('errors.favorite_update_failed'), icon: 'i-heroicons-x-circle', color: 'error' });
+    toast.add({ title: e.statusMessage || t('errors.favorite_update_failed'), icon: 'i-heroicons-x-circle', color: 'red' });
   }
 };
 

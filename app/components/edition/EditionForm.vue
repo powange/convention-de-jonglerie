@@ -521,7 +521,7 @@ const fetchUserConventions = async () => {
       title: 'Erreur',
       description: 'Impossible de charger vos conventions',
       icon: 'i-heroicons-exclamation-triangle',
-      color: 'error'
+      color: 'red'
     });
   } finally {
     loadingConventions.value = false;
@@ -617,7 +617,7 @@ const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
     toast.add({
       title: 'Image uploadée avec succès !',
       icon: 'i-heroicons-check-circle',
-      color: 'success'
+      color: 'green'
     });
   }
 };
@@ -627,7 +627,7 @@ const onImageDeleted = () => {
   toast.add({
     title: 'Image supprimée',
     icon: 'i-heroicons-check-circle',
-    color: 'success'
+    color: 'green'
   });
 };
 
@@ -636,7 +636,7 @@ const onImageError = (error: string) => {
     title: 'Erreur d\'upload',
     description: error,
     icon: 'i-heroicons-exclamation-triangle',
-    color: 'error'
+    color: 'red'
   });
 };
 
@@ -660,7 +660,7 @@ const handleNextStep = () => {
         title: 'Formulaire incomplet',
         description: 'Veuillez remplir tous les champs obligatoires',
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'error'
+        color: 'red'
       });
       return;
     }
@@ -672,7 +672,7 @@ const handleNextStep = () => {
         title: 'Dates invalides',
         description: dateValidation.value.error,
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'error'
+        color: 'red'
       });
       return;
     }
@@ -725,7 +725,7 @@ const handleSubmit = () => {
       title: 'Dates invalides',
       description: dateValidation.value.error,
       icon: 'i-heroicons-exclamation-triangle',
-      color: 'error'
+      color: 'red'
     });
     return;
   }

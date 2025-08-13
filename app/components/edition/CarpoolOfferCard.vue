@@ -206,7 +206,7 @@ const handleDelete = async () => {
       title: t('messages.offer_deleted'),
       description: t('messages.offer_deleted_successfully'),
       icon: 'i-heroicons-check-circle',
-      color: 'success'
+      color: 'green'
     });
 
     emit('deleted');
@@ -216,7 +216,7 @@ const handleDelete = async () => {
       title: t('errors.deletion_error'),
       description: httpError.data?.message || httpError.message || t('errors.generic_error'),
       icon: 'i-heroicons-x-circle',
-      color: 'error'
+      color: 'red'
     });
   }
 };
@@ -238,7 +238,7 @@ const removePassenger = async (userId: number) => {
       title: t('messages.passenger_removed'),
       description: t('messages.passenger_removed_successfully'),
       icon: 'i-heroicons-check-circle',
-      color: 'success'
+      color: 'green'
     });
 
     emit('passenger-added'); // Utiliser le même événement pour rafraîchir
@@ -248,7 +248,7 @@ const removePassenger = async (userId: number) => {
       title: t('errors.removal_error'),
       description: httpError.data?.message || httpError.message || t('errors.generic_error'),
       icon: 'i-heroicons-x-circle',
-      color: 'error'
+      color: 'red'
     });
   }
 };

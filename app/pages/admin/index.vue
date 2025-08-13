@@ -297,7 +297,7 @@ const loadStats = async () => {
     }
     
     toast.add({
-      color: 'error',
+      color: 'red',
       title: t('common.error'),
       description: t('admin.cannot_load_stats')
     })
@@ -329,7 +329,7 @@ const loadRecentActivity = async () => {
     recentActivity.value = []
     
     toast.add({
-      color: 'error',
+      color: 'red',
       title: t('common.error'),
       description: t('admin.cannot_load_activity')
     })
