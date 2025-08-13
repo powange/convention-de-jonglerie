@@ -176,6 +176,17 @@ const trimAllFields = () => {
 };
 
 const isValidUrl = (url: string): boolean => {
+  // Accepter les chaînes vides
+  if (!url || url.trim() === '') {
+    return true;
+  }
+  
+  // Accepter les URLs relatives (commençant par / ou ./)
+  if (url.startsWith('/') || url.startsWith('./')) {
+    return true;
+  }
+  
+  // Vérifier les URLs absolues
   try {
     new URL(url);
     return true;
@@ -230,6 +241,7 @@ const validate = (state: typeof form) => {
     errors.push({ path: 'description', message: 'La description ne peut pas dépasser 1000 caractères' });
   }
   
+  // Valider l'URL du logo seulement en mode URL et si elle n'est pas vide
   if (state.logo && state.logo.trim() && !isValidUrl(state.logo.trim())) {
     errors.push({ path: 'logo', message: 'L\'URL du logo n\'est pas valide' });
   }
