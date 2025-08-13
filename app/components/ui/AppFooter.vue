@@ -4,7 +4,7 @@
       <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
         <!-- Copyright -->
         <div class="text-sm text-gray-600 dark:text-gray-400">
-          {{ $t('footer.copyright', { year: new Date().getFullYear() }) }}
+          {{ t('footer.copyright', { year: new Date().getFullYear() }) }}
         </div>
 
         <!-- Liens footer -->
@@ -15,7 +15,7 @@
             size="sm"
             @click="openFeedbackModal"
           >
-            {{ $t('footer.feedback') }}
+            {{ t('footer.feedback') }}
           </UButton>
         </div>
       </div>
@@ -31,6 +31,9 @@ import { defineAsyncComponent } from 'vue';
 
 // Lazy loading du composant FeedbackModal
 const FeedbackModal = defineAsyncComponent(() => import('~/components/feedback/FeedbackModal.vue'));
+
+// Composables
+const { t } = useI18n()
 
 const showFeedbackModal = ref(false)
 

@@ -58,7 +58,7 @@
       <div class="flex justify-end">
         <slot name="footer-actions" :edition="edition">
           <NuxtLink :to="`/editions/${edition.id}`">
-            <UButton icon="i-heroicons-eye" size="sm" color="info" variant="solid" :label="$t('common.view')" />
+            <UButton icon="i-heroicons-eye" size="sm" color="info" variant="solid" :label="t('common.view')" />
           </NuxtLink>
         </slot>
       </div>
@@ -84,6 +84,7 @@ const { formatDateTimeRange } = useDateFormat();
 const { getStatusColor, getStatusText } = useEditionStatus();
 const { getTranslatedServices } = useTranslatedConventionServices();
 const { normalizeImageUrl } = useImageUrl();
+const { t } = useI18n();
 // const localePath = useLocalePath(); // Pas nécessaire avec strategy: 'no_prefix'
 
 // Fonction pour obtenir les services actifs traduits

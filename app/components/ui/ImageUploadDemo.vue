@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-md mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-    <h3 class="text-lg font-semibold mb-4">Démonstration ImageUpload</h3>
+    <h3 class="text-lg font-semibold mb-4">{{ t('upload.demo_title') }}</h3>
     
     <!-- Mode de sélection -->
     <div class="flex gap-2 mb-4">
@@ -10,7 +10,7 @@
         size="sm"
         @click="uploadMode = 'file'"
       >
-        {{ $t('components.convention_form.upload_file') }}
+        {{ t('components.convention_form.upload_file') }}
       </UButton>
       <UButton
         :variant="uploadMode === 'url' ? 'solid' : 'outline'"
@@ -18,7 +18,7 @@
         size="sm"
         @click="uploadMode = 'url'"
       >
-        {{ $t('components.convention_form.external_url') }}
+        {{ t('components.convention_form.external_url') }}
       </UButton>
     </div>
 
@@ -36,8 +36,8 @@
           autoUpload: true,
           resetAfterUpload: false
         }"
-        alt="Logo de la convention"
-        placeholder="Cliquez pour sélectionner le logo de la convention"
+        :alt="t('upload.convention_logo_alt')"
+        :placeholder="t('upload.click_select_convention_logo')"
         @uploaded="onUploaded"
         @deleted="onDeleted"
         @error="onError"
@@ -46,20 +46,20 @@
 
     <!-- URL externe -->
     <div v-else>
-      <UFormField label="URL du logo">
+      <UFormField :label="t('upload.logo_url_label')">
         <UInput
           v-model="logoUrl"
-          placeholder="https://example.com/logo.jpg"
+          :placeholder="t('upload.logo_url_placeholder')"
           type="url"
         />
       </UFormField>
       
       <!-- Aperçu de l'URL -->
       <div v-if="logoUrl" class="mt-3">
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ $t('components.convention_form.logo_preview') }}</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ t('components.convention_form.logo_preview') }}</p>
         <img 
           :src="logoUrl" 
-          alt="Logo preview"
+          :alt="t('upload.logo_preview_alt')"
           class="w-full h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
           @error="logoError = true"
           @load="logoError = false"
@@ -68,7 +68,7 @@
           v-if="logoError"
           color="red"
           variant="subtle"
-          title="Erreur de chargement"
+          :title="t('upload.loading_error_title')"
           description="Impossible de charger l'image depuis cette URL"
           class="mt-2"
         />
@@ -79,7 +79,7 @@
     <div v-if="logoUrl" class="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
       <div class="flex items-center space-x-2 text-sm">
         <UIcon name="i-heroicons-check-circle" class="text-green-500" />
-        <span class="text-gray-700 dark:text-gray-300">Image configurée</span>
+        <span class="text-gray-700 dark:text-gray-300">{{ t('upload.image_configured') }}</span>
       </div>
       <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 break-all">{{ logoUrl }}</p>
     </div>
@@ -99,6 +99,9 @@
 
 <script setup lang="ts">
 import ImageUpload from './ImageUpload.vue'
+
+// Composables
+const { t } = useI18n()
 
 // États réactifs
 const uploadMode = ref<'file' | 'url'>('file')

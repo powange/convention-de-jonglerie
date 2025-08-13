@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold">Mes Favoris</h1>
+      <h1 class="text-3xl font-bold">{{ $t('navigation.my_favorites') }}</h1>
       <UButton 
         icon="i-heroicons-magnifying-glass" 
         size="md" 
@@ -13,12 +13,12 @@
     </div>
 
     <div v-if="loading" class="text-center py-8">
-      <p>Chargement de vos favoris...</p>
+      <p>{{ $t('navigation.loading_favorites') }}</p>
     </div>
 
     <div v-else-if="favoriteEditions.length === 0" class="text-center py-12">
       <UIcon name="i-heroicons-star" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-      <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun favori</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">{{ $t('navigation.no_favorites') }}</h3>
       <p class="text-gray-500 mb-4">{{ $t('pages.favorites.no_favorites_added') }}</p>
       <UButton 
         icon="i-heroicons-magnifying-glass" 
@@ -76,7 +76,7 @@
               color="warning"
               variant="ghost"
               size="sm"
-              title="Retirer des favoris"
+              :title="$t('common.favorite')"
               @click="removeFavorite(edition.id)"
             />
           </template>

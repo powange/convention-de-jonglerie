@@ -2,7 +2,7 @@
   <UCard>
     <template #header>
       <div class="flex justify-between items-center">
-        <h3 class="text-lg font-semibold">Collaborateurs</h3>
+        <h3 class="text-lg font-semibold">{{ $t('conventions.collaborators') }}</h3>
         <UButton 
           icon="i-heroicons-user-plus" 
           size="sm" 

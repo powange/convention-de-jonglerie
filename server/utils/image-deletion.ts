@@ -1,5 +1,5 @@
 import { promises as fs } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
 import type { Convention, Edition, User } from '~/app/types';
 import { deleteFromBothLocations } from './copy-to-output';
 import { prisma } from './prisma';
@@ -52,20 +52,12 @@ export async function checkConventionDeletionPermission(
 export async function checkEditionDeletionPermission(
   editionId: number,
   userId: number
-): Promise<Edition & { collaborators: { userId: number; canEdit: boolean }[] }> {
+): Promise<Edition> {
   const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
-    include: {
-      collaborators: {
-        where: {
-          userId: userId,
-          canEdit: true,
-        },
-      },
-    },
+    where: { id: editionId }
   });
 
-  if (!edition || (edition.creatorId !== userId && edition.collaborators.length === 0)) {
+  if (!edition || edition.creatorId !== userId) {
     throw createError({
       statusCode: 403,
       statusMessage: 'Non autorisé à modifier cette édition',
@@ -101,9 +93,9 @@ export async function deletePhysicalImageFile(
         console.log('Image supprimée:', filePath);
 
         // Pour les éditions : essayer de supprimer le dossier s'il est vide
-        if (options.pathExtraction === 'edition') {
+        if (options.pathExtraction === 'edition' && filePath) {
           try {
-            const dirPath = join(process.cwd(), 'public', 'uploads', 'conventions', options.entityId.toString());
+            const dirPath = dirname(filePath);
             await fs.rmdir(dirPath);
             console.log('Dossier d\'édition supprimé:', dirPath);
           } catch {
@@ -128,11 +120,12 @@ function extractFilePath(imageUrl: string, options: ImageDeletionOptions): strin
   switch (options.pathExtraction) {
     case 'edition': {
       if (urlParts.includes('uploads') && urlParts.includes('conventions')) {
-        const imageEditionId = urlParts[urlParts.indexOf('conventions') + 1];
+        const folderName = urlParts[urlParts.indexOf('conventions') + 1];
         
-        if (imageEditionId === options.entityId.toString() && 
-            (filename.startsWith('convention-') || filename.startsWith('edition-'))) {
-          return join(process.cwd(), 'public', 'uploads', 'conventions', imageEditionId, filename);
+        // Pour les éditions, le dossier peut être soit l'ID de l'édition, soit l'ID de la convention
+        // On vérifie que le nom de fichier commence par 'edition-' et que le dossier correspond
+        if (filename.startsWith('edition-') || filename.startsWith('convention-')) {
+          return join(process.cwd(), 'public', 'uploads', 'conventions', folderName, filename);
         }
       }
       break;

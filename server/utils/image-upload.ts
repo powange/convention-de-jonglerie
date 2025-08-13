@@ -230,20 +230,12 @@ export async function checkConventionUploadPermission(
 export async function checkEditionUploadPermission(
   editionId: number,
   userId: number
-): Promise<Edition & { collaborators: { userId: number; canEdit: boolean }[] }> {
+): Promise<Edition> {
   const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
-    include: {
-      collaborators: {
-        where: {
-          userId: userId,
-          canEdit: true,
-        },
-      },
-    },
+    where: { id: editionId }
   });
 
-  if (!edition || (edition.creatorId !== userId && edition.collaborators.length === 0)) {
+  if (!edition || edition.creatorId !== userId) {
     throw createError({
       statusCode: 403,
       statusMessage: 'Non autorisé à modifier cette édition',

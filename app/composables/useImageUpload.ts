@@ -127,6 +127,9 @@ export const useImageUpload = (options: UploadOptions = {}) => {
     progress.value = 0
     error.value = null
 
+    // Simuler la progression
+    let progressInterval: NodeJS.Timeout | null = null
+    
     try {
       const formData = new FormData()
       formData.append('image', selectedFile.value)
@@ -176,18 +179,26 @@ export const useImageUpload = (options: UploadOptions = {}) => {
           break
       }
 
+      progressInterval = setInterval(() => {
+        if (progress.value < 90) {
+          progress.value += 10
+        }
+      }, 100)
+
       const response = await $fetch<UploadResult>(uploadUrl, {
         method: 'POST',
         body: formData,
         headers: {
           'Authorization': `Bearer ${authStore.token}`
-        },
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            progress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-          }
         }
       })
+
+      // Finaliser la progression
+      if (progressInterval) {
+        clearInterval(progressInterval)
+        progressInterval = null
+      }
+      progress.value = 100
 
       if (options.showToast !== false) {
         toast.add({
@@ -205,6 +216,12 @@ export const useImageUpload = (options: UploadOptions = {}) => {
       return response
 
     } catch (uploadError: any) {
+      // Nettoyer l'interval de progression en cas d'erreur
+      if (progressInterval) {
+        clearInterval(progressInterval)
+        progressInterval = null
+      }
+      
       const errorMessage = uploadError?.data?.message || 
                           uploadError?.message || 
                           t('upload.errors.upload_failed')

@@ -27,7 +27,7 @@
         >
           <div class="text-center text-white">
             <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl mb-2" />
-            <div class="text-sm">{{ $t('upload.uploading') }}</div>
+            <div class="text-sm">{{ t('upload.uploading') }}</div>
             <div v-if="progress > 0" class="text-xs mt-1">{{ progress }}%</div>
           </div>
         </div>
@@ -45,13 +45,13 @@
       >
         <UIcon name="i-heroicons-photo" class="text-4xl text-gray-400 dark:text-gray-500 mb-3" />
         <p class="text-gray-600 dark:text-gray-400 mb-2">
-          {{ placeholder || $t('components.convention_form.click_to_select_image') }}
+          {{ placeholder || t('components.convention_form.click_to_select_image') }}
         </p>
         <p class="text-xs text-gray-500 dark:text-gray-400">
-          {{ $t('upload.formats_accepted') }}: {{ validation.allowedExtensions.join(', ') }}
+          {{ t('upload.formats_accepted') }}: {{ validation.allowedExtensions.join(', ') }}
         </p>
         <p class="text-xs text-gray-500 dark:text-gray-400">
-          {{ $t('upload.max_size') }}: {{ formatFileSize(validation.maxSize) }}
+          {{ t('upload.max_size') }}: {{ formatFileSize(validation.maxSize) }}
         </p>
       </div>
 
@@ -71,7 +71,7 @@
           icon="i-heroicons-photo"
           @click="triggerFileInput"
         >
-          {{ $t('upload.select_file') }}
+          {{ t('upload.select_file') }}
         </UButton>
         
         <UButton
@@ -80,7 +80,7 @@
           icon="i-heroicons-arrow-up-tray"
           @click="upload"
         >
-          {{ $t('upload.upload') }}
+          {{ t('upload.upload') }}
         </UButton>
       </div>
     </div>
@@ -90,7 +90,7 @@
       v-if="error"
       color="red"
       variant="subtle"
-      :title="$t('upload.upload_error')"
+      :title="t('upload.upload_error')"
       :description="error"
       :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'gray', variant: 'link', padded: false }"
       @close="error = null"
@@ -141,6 +141,9 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<Emits>()
+
+// Composables
+const { t } = useI18n()
 
 // Composable d'upload
 const { 

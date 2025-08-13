@@ -39,7 +39,16 @@ const sections = [
     color: colors.yellow,
     scripts: [
       { name: 'lint', desc: 'Vérifie les erreurs et le style du code' },
-      { name: 'lint:fix', desc: 'Corrige automatiquement les problèmes détectés' }
+      { name: 'lint:fix', desc: 'Corrige automatiquement les problèmes détectés' },
+      { name: 'check-i18n', desc: 'Vérifie les traductions (clés manquantes, inutilisées, doublons)' },
+      { name: 'check-i18n -- -s 1', desc: 'Vérifie uniquement les clés manquantes' },
+      { name: 'check-i18n -- -s 2', desc: 'Vérifie uniquement les clés inutilisées' },
+      { name: 'check-i18n -- -s 3', desc: 'Vérifie uniquement les valeurs dupliquées' },
+      { name: 'check-i18n -- -s 4', desc: 'Vérifie uniquement les textes hardcodés' },
+      { name: 'check-i18n -- -h', desc: 'Affiche l\'aide détaillée du script' },
+      { name: 'check-translations', desc: 'Compare les traductions entre les langues' },
+      { name: 'check-translations -- -l es', desc: 'Vérifie uniquement les traductions espagnoles' },
+      { name: 'check-translations -- -s', desc: 'Affiche uniquement le résumé des traductions' }
     ]
   },
   {

@@ -109,34 +109,22 @@
           </div>
           
           <UFormField :label="$t('components.edition_form.convention_poster_optional')" name="image">
-            <div class="space-y-2">
-              <div v-if="state.imageUrl" class="relative">
-                <img :src="normalizeImageUrl(state.imageUrl)" :alt="$t('common.preview')" class="w-32 h-32 object-cover rounded-lg" >
-                <UButton 
-                  icon="i-heroicons-x-mark" 
-                  color="error" 
-                  variant="solid" 
-                  size="xs" 
-                  class="absolute -top-2 -right-2"
-                  @click="state.imageUrl = ''"
-                />
-              </div>
-              <UButton 
-                icon="i-heroicons-photo" 
-                variant="outline" 
-                :loading="uploading"
-                @click="triggerFileInput"
-              >
-                {{ state.imageUrl ? 'Changer l\'image' : 'Ajouter une image' }}
-              </UButton>
-              <input 
-                ref="fileInput" 
-                type="file" 
-                accept="image/*" 
-                class="hidden" 
-                @change="handleFileUpload" 
-              >
-            </div>
+            <ImageUpload
+              v-model="state.imageUrl"
+              :endpoint="{ type: 'edition', id: props.initialData?.id }"
+              :options="{
+                validation: {
+                  maxSize: 5 * 1024 * 1024, // 5MB
+                  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+                  allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp']
+                }
+              }"
+              alt="Poster de l'édition"
+              placeholder="Cliquez pour sélectionner le poster de l'édition"
+              @uploaded="onImageUploaded"
+              @deleted="onImageDeleted"
+              @error="onImageError"
+            />
           </UFormField>
 
           <div class="space-y-4">
@@ -358,6 +346,7 @@
 <script setup lang="ts">
 import { reactive, ref, watch, computed, onMounted, nextTick } from 'vue';
 import AddressAutocomplete from '~/components/AddressAutocomplete.vue';
+import ImageUpload from '~/components/ui/ImageUpload.vue';
 import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date';
 import type { StepperItem } from '@nuxt/ui';
 import type { Edition, Convention } from '~/types';
@@ -431,8 +420,6 @@ const state = reactive({
   hasAfjTokenPayment: props.initialData?.hasAfjTokenPayment || false,
 });
 
-const uploading = ref(false);
-const fileInput = ref<HTMLInputElement>();
 const toast = useToast();
 const { getTranslatedServicesByCategory } = useTranslatedConventionServices();
 const servicesByCategory = getTranslatedServicesByCategory;
@@ -557,13 +544,8 @@ const validateDates = () => {
     };
   }
   
-  // Vérifier que la convention n'est pas déjà terminée
-  if (endDate <= now) {
-    return {
-      isValid: false,
-      error: 'La convention ne peut pas être déjà terminée. La date de fin doit être dans le futur'
-    };
-  }
+  // Permettre les éditions passées pour alimenter l'historique
+  // Suppression de la contrainte de date future
   
   return { isValid: true };
 };
@@ -628,66 +610,34 @@ const getDescriptionError = () => {
   return undefined;
 };
 
-const triggerFileInput = () => {
-  fileInput.value?.click();
+// Gestionnaires d'événements pour l'upload d'image
+const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
+  if (result.success && result.imageUrl) {
+    state.imageUrl = result.imageUrl;
+    toast.add({
+      title: 'Image uploadée avec succès !',
+      icon: 'i-heroicons-check-circle',
+      color: 'success'
+    });
+  }
 };
 
-const handleFileUpload = async (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  
-  if (!file) return;
+const onImageDeleted = () => {
+  state.imageUrl = '';
+  toast.add({
+    title: 'Image supprimée',
+    icon: 'i-heroicons-check-circle',
+    color: 'success'
+  });
+};
 
-  // Vérifier la taille du fichier (max 5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    toast.add({
-      title: 'Fichier trop volumineux',
-      description: 'La taille maximale autorisée est de 5MB',
-      icon: 'i-heroicons-exclamation-triangle',
-      color: 'error'
-    });
-    return;
-  }
-
-  uploading.value = true;
-  
-  try {
-    const formData = new FormData();
-    formData.append('image', file);
-    
-    // Si on édite une convention existante, ajouter l'ID
-    if (props.initialData?.id) {
-      formData.append('conventionId', props.initialData.id.toString());
-    }
-
-    const response = await $fetch<{ success: boolean; imageUrl: string }>('/api/upload/image', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${useAuthStore().token}`,
-      },
-    });
-
-    if (response.success) {
-      state.imageUrl = response.imageUrl;
-      toast.add({
-        title: 'Image uploadée avec succès !',
-        icon: 'i-heroicons-check-circle',
-        color: 'success'
-      });
-    }
-  } catch (error) {
-    toast.add({
-      title: 'Erreur lors de l\'upload',
-      description: 'Impossible de télécharger l\'image',
-      icon: 'i-heroicons-exclamation-triangle',
-      color: 'error'
-    });
-  } finally {
-    uploading.value = false;
-    // Reset file input
-    if (target) target.value = '';
-  }
+const onImageError = (error: string) => {
+  toast.add({
+    title: 'Erreur d\'upload',
+    description: error,
+    icon: 'i-heroicons-exclamation-triangle',
+    color: 'error'
+  });
 };
 
 const handleNextStep = () => {

@@ -94,7 +94,7 @@
         <div v-if="uploadMode === 'url'">
           <UInput
             v-model="form.logo"
-            placeholder="URL du logo (optionnel)"
+            :placeholder="$t('upload.logo_url_optional_placeholder')"
             class="w-full"
             @blur="trimField('logo')"
           />
