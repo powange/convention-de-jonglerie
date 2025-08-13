@@ -145,7 +145,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  submit: [data: Omit<Convention, 'id' | 'createdAt' | 'updatedAt' | 'authorId' | 'author'>, file?: File | null];
+  submit: [data: Omit<Convention, 'id' | 'createdAt' | 'updatedAt' | 'authorId' | 'author'>];
   cancel: [];
 }>();
 
@@ -215,6 +215,7 @@ const onImageError = (error: string) => {
 
 // Validation
 const validate = (state: typeof form) => {
+  console.log('Validation called with state:', state);
   const errors = [];
   
   if (!state.name || state.name.trim().length === 0) {
@@ -233,11 +234,13 @@ const validate = (state: typeof form) => {
     errors.push({ path: 'logo', message: 'L\'URL du logo n\'est pas valide' });
   }
   
+  console.log('Validation errors:', errors);
   return errors;
 };
 
 // Soumission du formulaire
 const onSubmit = async () => {
+  console.log('ConventionForm onSubmit called');
   trimAllFields();
   
   // Données du formulaire sans l'image
@@ -247,7 +250,8 @@ const onSubmit = async () => {
     logo: uploadMode.value === 'url' ? (form.logo.trim() || null) : (form.logo || null),
   };
   
-  emit('submit', formData, null);
+  console.log('Emitting submit with data:', formData);
+  emit('submit', formData);
 };
 
 // Initialisation avec les données existantes

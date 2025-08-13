@@ -123,7 +123,8 @@ onMounted(async () => {
   }
 });
 
-const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'createdAt' | 'updatedAt' | 'authorId' | 'author'>, file?: File | null) => {
+const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'createdAt' | 'updatedAt' | 'authorId' | 'author'>) => {
+  console.log('handleUpdateConvention called with:', formData);
   if (!authStore.token) {
     toast.add({
       title: t('errors.authentication_error'),
@@ -137,7 +138,7 @@ const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'created
   updating.value = true;
 
   try {
-    // 1. Mettre à jour la convention
+    // Mettre à jour la convention (l'upload d'image se fait automatiquement via ImageUpload)
     const updatedConvention = await $fetch(`/api/conventions/${conventionId}`, {
       method: 'PUT',
       headers: {
@@ -146,38 +147,11 @@ const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'created
       body: formData,
     });
 
-    // 2. Upload de l'image si un fichier est fourni
-    let finalConvention = updatedConvention;
-    if (file) {
-      const formDataUpload = new FormData();
-      formDataUpload.append('image', file);
-      
-      try {
-        const uploadResponse = await $fetch(`/api/conventions/${conventionId}/upload-image`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${authStore.token}`,
-          },
-          body: formDataUpload,
-        });
-        
-        finalConvention = uploadResponse.convention;
-      } catch (uploadError: unknown) {
-        console.error('Error uploading image:', uploadError);
-        toast.add({
-          title: t('common.warning'),
-          description: t('errors.convention_updated_image_failed'),
-          icon: 'i-heroicons-exclamation-triangle',
-          color: 'warning'
-        });
-      }
-    }
-
-    convention.value = finalConvention;
+    convention.value = updatedConvention;
 
     toast.add({
       title: t('messages.convention_updated'),
-      description: t('messages.convention_updated_desc', { name: finalConvention.name }),
+      description: t('messages.convention_updated_desc', { name: updatedConvention.name }),
       icon: 'i-heroicons-check-circle',
       color: 'green'
     });

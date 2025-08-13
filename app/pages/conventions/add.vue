@@ -40,7 +40,7 @@ const { t } = useI18n();
 
 const loading = ref(false);
 
-const handleAddConvention = async (formData: ConventionFormData, file?: File | null) => {
+const handleAddConvention = async (formData: ConventionFormData) => {
   if (!authStore.token) {
     toast.add({
       title: t('errors.authentication_error'),
@@ -54,7 +54,7 @@ const handleAddConvention = async (formData: ConventionFormData, file?: File | n
   loading.value = true;
 
   try {
-    // 1. Créer la convention
+    // Créer la convention (l'upload d'image se fait automatiquement via ImageUpload)
     const convention = await $fetch('/api/conventions', {
       method: 'POST',
       headers: {
@@ -63,36 +63,9 @@ const handleAddConvention = async (formData: ConventionFormData, file?: File | n
       body: formData,
     });
 
-    // 2. Upload de l'image si un fichier est fourni
-    let finalConvention = convention;
-    if (file) {
-      const formDataUpload = new FormData();
-      formDataUpload.append('image', file);
-      
-      try {
-        const uploadResponse = await $fetch(`/api/conventions/${convention.id}/upload-image`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${authStore.token}`,
-          },
-          body: formDataUpload,
-        });
-        
-        finalConvention = uploadResponse.convention;
-      } catch (uploadError: unknown) {
-        console.error('Error uploading image:', uploadError);
-        toast.add({
-          title: t('common.warning'),
-          description: t('errors.convention_created_image_failed'),
-          icon: 'i-heroicons-exclamation-triangle',
-          color: 'warning'
-        });
-      }
-    }
-
     toast.add({
       title: t('messages.convention_created'),
-      description: t('messages.convention_created_desc', { name: finalConvention.name }),
+      description: t('messages.convention_created_desc', { name: convention.name }),
       icon: 'i-heroicons-check-circle',
       color: 'green'
     });
