@@ -464,42 +464,27 @@
             </div>
           </div>
 
-          <!-- Actions -->
-          <div class="space-y-3">
-            <UButton 
-              icon="i-heroicons-arrow-up-tray" 
-              variant="soft" 
-              color="primary" 
-              size="lg"
-              block
-              :loading="pictureLoading"
-              @click="triggerFileInput"
-              class="transition-all duration-200 hover:transform hover:scale-105 justify-start"
-            >
-              {{ pictureLoading ? t('profile.uploading') : t('profile.change_photo') }}
-            </UButton>
-            
-            <UButton 
-              v-if="authStore.user?.profilePicture"
-              icon="i-heroicons-trash" 
-              variant="soft" 
-              color="error" 
-              size="lg"
-              block
-              :loading="pictureLoading"
-              @click="deleteProfilePicture"
-              class="transition-all duration-200 hover:transform hover:scale-105 justify-start"
-            >
-              {{ pictureLoading ? t('profile.deleting') : t('profile.remove_picture') }}
-            </UButton>
-            
-            <input 
-              ref="fileInput"
-              type="file"
-              accept="image/*"
-              class="hidden"
-              @change="handleFileUpload"
-            >
+          <!-- Upload de photo -->
+          <div>
+            <ImageUpload
+              v-model="profilePictureUrl"
+              :endpoint="{ type: 'profile' }"
+              :options="{
+                validation: {
+                  maxSize: 5 * 1024 * 1024,
+                  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+                  allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp']
+                },
+                autoUpload: true,
+                resetAfterUpload: false
+              }"
+              alt="Photo de profil"
+              placeholder="Cliquez pour changer votre photo de profil"
+              :allow-delete="!!authStore.user?.profilePicture"
+              @uploaded="onProfilePictureUploaded"
+              @deleted="onProfilePictureDeleted"
+              @error="onProfilePictureError"
+            />
           </div>
 
           <!-- Informations -->
