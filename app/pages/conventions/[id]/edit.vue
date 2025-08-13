@@ -124,7 +124,6 @@ onMounted(async () => {
 });
 
 const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'createdAt' | 'updatedAt' | 'authorId' | 'author'>) => {
-  console.log('handleUpdateConvention called with:', formData);
   if (!authStore.token) {
     toast.add({
       title: t('errors.authentication_error'),
