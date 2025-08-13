@@ -32,6 +32,9 @@ export interface UploadResult {
   filename?: string
   /** Message de retour */
   message?: string
+  /** Objet retourné par certaines APIs (convention, edition) */
+  convention?: any
+  edition?: any
 }
 
 export interface FileValidationResult {

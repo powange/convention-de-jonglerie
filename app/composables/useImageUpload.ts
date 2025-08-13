@@ -200,6 +200,12 @@ export const useImageUpload = (options: UploadOptions = {}) => {
       }
       progress.value = 100
 
+      // Normaliser la réponse pour extraire l'imageUrl si elle est dans un objet imbriqué
+      if (!response.imageUrl && (response.edition || response.convention)) {
+        const entity = response.edition || response.convention
+        response.imageUrl = entity.imageUrl || entity.logo
+      }
+
       if (options.showToast !== false) {
         toast.add({
           title: t('upload.success'),

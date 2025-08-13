@@ -613,11 +613,15 @@ const getDescriptionError = () => {
 };
 
 // Gestionnaires d'événements pour l'upload d'image
-const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
+const onImageUploaded = (result: { success: boolean; imageUrl?: string; edition?: any }) => {
   console.log('onImageUploaded called with:', result);
-  if (result.success && result.imageUrl) {
-    console.log('Setting state.imageUrl to:', result.imageUrl);
-    state.imageUrl = result.imageUrl;
+  if (result.success) {
+    // L'API d'upload d'édition peut retourner soit imageUrl directement, soit dans l'objet edition
+    const newImageUrl = result.imageUrl || result.edition?.imageUrl;
+    console.log('Setting state.imageUrl to:', newImageUrl);
+    if (newImageUrl) {
+      state.imageUrl = newImageUrl;
+    }
     toast.add({
       title: 'Image uploadée avec succès !',
       icon: 'i-heroicons-check-circle',
