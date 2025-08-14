@@ -1,4 +1,5 @@
 import tsconfigPaths from 'vite-tsconfig-paths';
+import { fileURLToPath } from 'node:url'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -97,6 +98,11 @@ export default defineNuxtConfig({
     }
   },
   vite: {
+    resolve: {
+      alias: {
+        '.prisma/client/index-browser': './node_modules/.prisma/client/index-browser.js',
+      }
+    },
     css: {
       devSourcemap: true
     },
@@ -107,19 +113,18 @@ export default defineNuxtConfig({
       dynamicImportVarsOptions: {
         warnOnError: true,
         exclude: [/node_modules/]
-      },
-      // Empêcher le bundle client de résoudre @prisma/client et les chemins .prisma
-      rollupOptions: {
-        external: ['@prisma/client', 'prisma', /^\.prisma(\/.*)?$/]
       }
     },
-    // Empêcher la pré-optimisation de @prisma/client côté client
-    optimizeDeps: {
-      exclude: ['@prisma/client', 'prisma']
-    },
+    // Laisser Vite gérer les deps normalement côté client
     plugins: [
       tsconfigPaths()
     ]
+  },
+  
+  // Configuration du module Prisma
+  prisma: {
+    installStudio: false,
+    autoSetupPrisma: true
   },
   experimental: {
     appManifest: false,

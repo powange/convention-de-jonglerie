@@ -48,4 +48,5 @@
 - **Nuxt Icon** : https://nuxt.com/modules/icon
 - **Nuxt Image** : https://image.nuxt.com/get-started/installation
 - **Nuxt Prisma** : https://nuxt.com/modules/prisma
+- **Prisma Nuxt Module (Documentation officielle)** : https://www.prisma.io/docs/orm/more/help-and-troubleshooting/prisma-nuxt-module
 - **Nuxt ESLint** : https://eslint.nuxt.com/packages/module

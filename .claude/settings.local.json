@@ -33,7 +33,9 @@
       "Bash(rg:*)",
       "Bash(git commit:*)",
       "Bash(npm test:*)",
-      "WebFetch(domain:ui3.nuxt.com)"
+      "WebFetch(domain:ui3.nuxt.com)",
+      "Bash(npm ls:*)",
+      "Bash(npx prisma generate:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"
