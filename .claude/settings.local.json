@@ -35,6 +35,7 @@
       "Bash(npm test:*)",
       "WebFetch(domain:ui3.nuxt.com)"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   }
 }

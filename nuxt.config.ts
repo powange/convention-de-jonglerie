@@ -3,25 +3,43 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
+  // Active en dev uniquement
+  devtools: { enabled: process.env.NODE_ENV !== 'production' },
 
   modules: [
     '@nuxt/eslint', 
     '@nuxt/image', 
     '@nuxt/scripts', 
-    '@nuxt/test-utils/module', 
+    // Module de tests uniquement en dev
+    process.env.NODE_ENV === 'development' ? '@nuxt/test-utils/module' : undefined,
     '@nuxt/ui', 
     '@pinia/nuxt', 
+    '@prisma/nuxt',
     '@nuxtjs/i18n',
     '@vueuse/nuxt'
-  ],
-  // Optimisations de build
-  build: {
-    extractCSS: process.env.NODE_ENV === 'production',
-    optimizeCSS: process.env.NODE_ENV === 'production'
+  ].filter(Boolean),
+
+  // Restreindre les collections d'icônes empaquetées côté serveur
+  icon: {
+  // Utiliser le mode `remote` pour éviter d'empaqueter les collections locales volumineuses
+  // et ne récupérer que les icônes utilisées à l'exécution (taille serveur fortement réduite)
+  serverBundle: 'remote'
   },
-  ui: {
-    icons: ['heroicons', 'simple-icons']
+  nitro: {
+    ignore: [
+        '**/*.spec.ts',
+        '**/*.test.ts',
+        'tests/**',
+        '__tests__/**'
+      ],
+    // Évite d'empaqueter Prisma avec Nitro (reste chargé au runtime)
+    externals: {
+      external: ['@prisma/client', 'prisma']
+    },
+    // Empêche Rollup de résoudre les chemins internes ".prisma/..."
+    rollupConfig: {
+      external: [/^\.prisma(\/.*)?$/]
+    }
   },
   i18n: {
     defaultLocale: 'en',
@@ -38,8 +56,7 @@ export default defineNuxtConfig({
       { code: 'ru', name: 'Русский', file: 'ru.json' },
       { code: 'uk', name: 'Українська', file: 'uk.json' }
     ],
-    langDir: 'locales/',
-    lazy: true,
+  langDir: 'locales/',
     compilation: {
       strictMessage: false,
       escapeHtml: false
@@ -51,14 +68,10 @@ export default defineNuxtConfig({
       cookieDomain: null,
       cookieSecure: false,
       cookieCrossOrigin: false,
-      cookieSameSite: 'lax',
-      cookieHttpOnly: false,
-      redirectOn: 'no redirect',
+      redirectOn: 'root',
       alwaysRedirect: false,
       fallbackLocale: 'fr'
     },
-    // Optimisation: précharger uniquement les langues principales
-    preloadLocales: ['en', 'fr'],
     // Optimiser les traductions pour réduire la taille des bundles
     bundle: {
       compositionOnly: true,
@@ -88,13 +101,21 @@ export default defineNuxtConfig({
       devSourcemap: true
     },
     build: {
-      sourcemap: process.env.NODE_ENV === 'development', // Sourcemaps seulement en dev
+  sourcemap: process.env.NODE_ENV !== 'production', // Sourcemaps en dev et preview
       chunkSizeWarningLimit: 800, // Seuil optimal pour les performances
       // Optimisation des imports
       dynamicImportVarsOptions: {
         warnOnError: true,
         exclude: [/node_modules/]
+      },
+      // Empêcher le bundle client de résoudre @prisma/client et les chemins .prisma
+      rollupOptions: {
+        external: ['@prisma/client', 'prisma', /^\.prisma(\/.*)?$/]
       }
+    },
+    // Empêcher la pré-optimisation de @prisma/client côté client
+    optimizeDeps: {
+      exclude: ['@prisma/client', 'prisma']
     },
     plugins: [
       tsconfigPaths()

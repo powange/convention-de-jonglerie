@@ -6,6 +6,9 @@ RUN apk add --no-cache libc6-compat curl
 
 WORKDIR /app
 
+# Créer le dossier uploads
+RUN mkdir -p /app/public/uploads
+
 # Copier les fichiers de configuration
 COPY package*.json ./
 COPY prisma ./prisma/
@@ -16,13 +19,7 @@ RUN npm ci
 # Copier le code source
 COPY . .
 
-# Générer le client Prisma
-RUN npx prisma generate
-
-# Créer le dossier uploads
-RUN mkdir -p /app/public/uploads
-
 EXPOSE 3000
 
 # Script de démarrage
-CMD ["sh", "-c", "npm run build && npx prisma migrate deploy && node .output/server/index.mjs"]
+CMD ["sh", "-c", "npm run build && node .output/server/index.mjs"]

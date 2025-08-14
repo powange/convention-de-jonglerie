@@ -22,5 +22,11 @@ export default defineVitestConfig({
         external: ['@prisma/client']
       }
     }
+  },
+  build: {
+    rollupOptions: {
+      external: ['**/*.spec.ts', '**/*.test.ts']
+    }
   }
+
 })

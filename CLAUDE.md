@@ -37,3 +37,15 @@
 - `server/api/` : API backend (auth, conventions)
 - `prisma/` : Schéma DB et migrations
 - Structure full-stack TypeScript moderne
+
+## Documentation de référence
+
+**Liens de documentation officiels :**
+- **Nuxt 4.x** : https://nuxt.com/docs/4.x/getting-started/introduction
+- **Nuxt 4.x Testing** : https://nuxt.com/docs/4.x/getting-started/testing
+- **Nuxt UI** : https://ui.nuxt.com/getting-started
+- **Nuxt i18n** : https://i18n.nuxtjs.org/docs/getting-started
+- **Nuxt Icon** : https://nuxt.com/modules/icon
+- **Nuxt Image** : https://image.nuxt.com/get-started/installation
+- **Nuxt Prisma** : https://nuxt.com/modules/prisma
+- **Nuxt ESLint** : https://eslint.nuxt.com/packages/module
