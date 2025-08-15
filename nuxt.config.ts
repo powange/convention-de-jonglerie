@@ -31,16 +31,9 @@ export default defineNuxtConfig({
         '**/*.spec.ts',
         '**/*.test.ts',
         'tests/**',
-        '__tests__/**'
-      ],
-    // Évite d'empaqueter Prisma avec Nitro (reste chargé au runtime)
-    externals: {
-      external: ['@prisma/client', 'prisma']
-    },
-    // Empêche Rollup de résoudre les chemins internes ".prisma/..."
-    rollupConfig: {
-      external: [/^\.prisma(\/.*)?$/]
-    }
+        '__tests__/**',
+        'scripts/**'
+      ]
   },
   i18n: {
     defaultLocale: 'en',
@@ -78,7 +71,8 @@ export default defineNuxtConfig({
       compositionOnly: true,
       runtimeOnly: false,
       fullInstall: false,
-      dropMessageCompiler: process.env.NODE_ENV === 'production'
+      // Garder le compilateur de messages même en prod pour éviter les erreurs SSR (intlify)
+      dropMessageCompiler: false
     },
     vueI18n: './i18n/i18n.config.ts'
   },
@@ -98,16 +92,11 @@ export default defineNuxtConfig({
     }
   },
   vite: {
-    resolve: {
-      alias: {
-        '.prisma/client/index-browser': './node_modules/.prisma/client/index-browser.js',
-      }
-    },
     css: {
       devSourcemap: true
     },
     build: {
-  sourcemap: process.env.NODE_ENV !== 'production', // Sourcemaps en dev et preview
+      sourcemap: process.env.NODE_ENV !== 'production', // Sourcemaps en dev et preview
       chunkSizeWarningLimit: 800, // Seuil optimal pour les performances
       // Optimisation des imports
       dynamicImportVarsOptions: {
@@ -115,10 +104,16 @@ export default defineNuxtConfig({
         exclude: [/node_modules/]
       }
     },
-    // Laisser Vite gérer les deps normalement côté client
     plugins: [
       tsconfigPaths()
-    ]
+    ],
+    // Configuration Vite pour le hot reload dans Docker sur Windows
+    server: {
+      watch: {
+        usePolling: true,
+        interval: 1000
+      }
+    }
   },
   
   // Configuration du module Prisma

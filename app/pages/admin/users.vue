@@ -124,14 +124,13 @@
 
 <script setup lang="ts">
 // Middleware de protection pour super admin
-definePageMeta({
-  middleware: ['auth-protected', 'super-admin']
-})
-
 // Import du store d'authentification
 import { useAuthStore } from '~/stores/auth'
 import { h, resolveComponent } from 'vue'
-import UserAvatar from '~/components/ui/UserAvatar.vue'
+
+definePageMeta({
+  middleware: ['auth-protected', 'super-admin']
+})
 
 const { t } = useI18n()
 
@@ -221,7 +220,7 @@ const columns = [
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUser
       return h('div', { class: 'flex items-center gap-3' }, [
-        h(resolveComponent('UserAvatar'), {
+        h(resolveComponent('UiUserAvatar'), {
           user: user,
           size: 'md',
           border: true
@@ -241,7 +240,7 @@ const columns = [
       return h('div', { class: 'flex items-center gap-2' }, [
         h('span', user.email),
         user.isEmailVerified 
-          ? h(resolveComponent('UBadge'), { color: 'green', variant: 'soft', size: 'xs' }, () => t('admin.verified'))
+          ? h(resolveComponent('UBadge'), { color: 'success', variant: 'soft', size: 'xs' }, () => t('admin.verified'))
           : h(resolveComponent('UBadge'), { color: 'warning', variant: 'soft', size: 'xs' }, () => t('admin.not_verified'))
       ])
     }
@@ -387,7 +386,7 @@ const getUserActions = (user: AdminUser): DropdownMenuItem[] => {
     actions.push({
       label: t('admin.demote'),
       icon: 'i-heroicons-shield-exclamation',
-      color: 'red' as const,
+      color: 'error' as const,
       onSelect: () => demoteFromAdmin(user)
     })
   }
@@ -462,7 +461,7 @@ const fetchUsers = async () => {
     }
     
     useToast().add({
-      color: 'red',
+      color: 'error' as const,
       title: t('common.error'),
       description: t('admin.cannot_load_users')
     })

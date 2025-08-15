@@ -10,6 +10,8 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-convention_db}
       MYSQL_USER: ${MYSQL_USER:-convention_user}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-convention_password}
+    ports:
+      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -17,22 +19,29 @@ services:
       timeout: 20s
       retries: 10
 
-  # Application Nuxt.js
+  # Application Nuxt.js (mode développement)
   app:
-    build: .
-    container_name: convention-app
-    restart: unless-stopped
+    image: node:22-alpine
+    container_name: convention-app-dev
+    working_dir: /app
+    command: npm run dev
     environment:
       DATABASE_URL: "mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}"
       JWT_SECRET: "${JWT_SECRET:-mon_secret_jwt_de_convention_de_jonglerie_super_long}"
       NUXT_HOST: "0.0.0.0"
       NUXT_PORT: "3000"
-      NODE_ENV: "production"
+      NODE_ENV: "development"
       SEND_EMAILS: "${SEND_EMAILS:-false}"
       SMTP_USER: "${SMTP_USER:-}"
       SMTP_PASS: "${SMTP_PASS:-}"
+      # Force le polling pour Windows
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "1000"
     volumes:
-      - uploads_data:/app/public/uploads
+      - .:/app
+    ports:
+      - "3000:3000"
+      - "24678:24678"
     depends_on:
       database:
         condition: service_healthy
@@ -54,8 +63,3 @@ volumes:
     driver: local
   uploads_data:
     driver: local
-
-networks:
-  default:
-    external: true
-    name: proxy-network
