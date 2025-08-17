@@ -9,7 +9,7 @@ try {
   
   // S'assurer que la DB est démarrée et les migrations appliquées
   console.log('🐳 Vérification de la base de données de test...');
-  execSync('docker-compose -f docker-compose.test.yml up -d --wait', { stdio: 'inherit' });
+  execSync('docker compose -f docker-compose.test.yml up -d --wait', { stdio: 'inherit' });
   
   console.log('📋 Application des migrations...');
   execSync('node scripts/migrate-test.js', { stdio: 'inherit' });
