@@ -1,9 +1,8 @@
 #!/usr/bin/env node
+import { execSync } from 'child_process';
 
 // Lancement des tests d'intégration avec DB
 process.env.TEST_WITH_DB = 'true';
-
-import { execSync } from 'child_process';
 
 try {
   console.log('🧪 Lancement des tests d\'intégration avec DB...');
@@ -16,7 +15,7 @@ try {
   execSync('node scripts/migrate-test.js', { stdio: 'inherit' });
   
   // Lancer les tests
-  execSync('npx vitest run --config vitest.integration.config.ts', { stdio: 'inherit' });
+  execSync('npx vitest run --config vitest.config.integration.ts', { stdio: 'inherit' });
   console.log('✅ Tests d\'intégration terminés !');
 } catch (error) {
   console.error('❌ Erreur lors des tests d\'intégration:', error.message);

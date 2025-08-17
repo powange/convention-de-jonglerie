@@ -34,11 +34,12 @@ export default defineEventHandler(async (event) => {
     }
 
     const token = authHeader.substring(7);
-    const runtimeConfig = useRuntimeConfig();
+    
     let decoded;
     try {
-      decoded = jwt.verify(token, runtimeConfig.jwtSecret) as any;
-    } catch (error) {
+  const { getJwtSecret } = await import('../../../../utils/jwt')
+      decoded = jwt.verify(token, getJwtSecret()) as { userId?: number };
+    } catch {
       throw createError({
         statusCode: 401,
         statusMessage: 'Token invalide'

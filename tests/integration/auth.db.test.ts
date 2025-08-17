@@ -48,15 +48,18 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
         prenom: 'User'
       }
 
-      // Créer le premier utilisateur
-      await prismaTest.user.create({ data: userData })
-
-      // Tenter de créer un second avec le même email
+      // Utiliser une transaction explicite pour s'assurer que tout est dans le même contexte
       await expect(
-        prismaTest.user.create({
-          data: { ...userData, pseudo: `user2-${timestamp}` }
+        prismaTest.$transaction(async (tx) => {
+          // Créer le premier utilisateur
+          await tx.user.create({ data: userData })
+
+          // Tenter de créer un second avec le même email dans la même transaction
+          await tx.user.create({
+            data: { ...userData, pseudo: `user2-${timestamp}` }
+          })
         })
-      ).rejects.toThrow()
+      ).rejects.toThrow(/Unique constraint failed/)
     })
   })
 

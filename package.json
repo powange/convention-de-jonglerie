@@ -18,16 +18,37 @@
     "help": "node scripts/show-help.mjs",
     "check-i18n": "node scripts/check-i18n.js",
     "check-translations": "node scripts/check-i18n-translations.js",
-    "test": "vitest --config vitest.config.simple.ts",
-    "test:ui": "vitest --ui --config vitest.config.simple.ts",
-    "test:run": "vitest run --config vitest.config.simple.ts",
-    "test:nuxt": "vitest",
-    "test:nuxt:run": "vitest run",
-    "test:db": "cross-env TEST_WITH_DB=true vitest",
+    "test": "vitest --config vitest.config.unit.ts",
+    "test:unit": "vitest --config vitest.config.unit.ts",
+    "test:unit:run": "vitest run --config vitest.config.unit.ts --silent",
+    "test:ui": "vitest --ui --config vitest.config.unit.ts --silent",
+    "test:nuxt": "vitest --config vitest.config.nuxt.ts --silent",
+    "test:nuxt:run": "vitest run --config vitest.config.nuxt.ts --silent",
+    "test:e2e": "vitest --config vitest.config.e2e.ts --silent",
+  "test:e2e:run": "vitest run --config vitest.config.e2e.ts --silent",
+  "test:all": "npm run test:unit:run && npm run test:nuxt:run && npm run test:e2e:run",
+    "test:run": "vitest run --config vitest.config.unit.ts --silent",
+    "test:db": "cross-env TEST_WITH_DB=true vitest --config vitest.config.integration.ts",
     "test:db:run": "node scripts/test-db-run.js",
     "test:setup": "docker-compose -f docker-compose.test.yml up -d --wait && node scripts/migrate-test.js",
     "test:teardown": "docker-compose -f docker-compose.test.yml down",
-    "kill-servers": "node scripts/kill-servers.js"
+    "kill-servers": "node scripts/kill-servers.js",
+    "docker:test": "docker-compose -f docker-compose.test-all.yml up test-runner --build --abort-on-container-exit",
+    "docker:test:ui": "docker-compose -f docker-compose.test-ui.yml up --build",
+    "docker:test:clean": "docker-compose -f docker-compose.test-all.yml down -v",
+    "docker:test:rebuild": "docker-compose -f docker-compose.test-all.yml build --no-cache",
+    "docker:test:unit": "docker-compose -f docker-compose.test-simple.yml up --build --abort-on-container-exit",
+    "docker:test:integration": "docker-compose -f docker-compose.test-integration.yml up --build --abort-on-container-exit --no-attach test-db",
+    "docker:test:unit:clean": "docker-compose -f docker-compose.test-simple.yml down -v",
+    "docker:test:integration:clean": "docker-compose -f docker-compose.test-integration.yml down -v",
+    "docker:test:ui:clean": "docker-compose -f docker-compose.test-ui.yml down -v",
+    "docker:dev": "docker compose -f docker-compose.dev.yml up --build",
+    "docker:dev:detached": "docker compose -f docker-compose.dev.yml up -d --build",
+    "docker:dev:down": "docker compose -f docker-compose.dev.yml down",
+    "docker:dev:logs": "docker compose -f docker-compose.dev.yml logs -f app",
+    "docker:dev:exec": "docker compose -f docker-compose.dev.yml exec app sh",
+    "docker:release:up": "docker compose -f docker-compose.release.yml up -d --build",
+    "docker:release:down": "docker compose -f docker-compose.release.yml down"
   },
   "dependencies": {
     "@internationalized/date": "^3.8.2",
@@ -73,5 +94,8 @@
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
     "wait-on": "^8.0.4"
+  },
+  "engines": {
+    "node": ">=22 <23"
   }
 }

@@ -10,9 +10,9 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint', 
     '@nuxt/image', 
-    '@nuxt/scripts', 
-    // Module de tests uniquement en dev
-    process.env.NODE_ENV === 'development' ? '@nuxt/test-utils/module' : undefined,
+  '@nuxt/scripts', 
+  // Activer le module de test-utils sur tous les environnements non-production (incl. test)
+  process.env.NODE_ENV !== 'production' ? '@nuxt/test-utils/module' : undefined,
     '@nuxt/ui', 
     '@pinia/nuxt', 
     '@prisma/nuxt',

@@ -17,7 +17,8 @@ export default defineEventHandler(async (event) => {
     }
 
     const token = authorization.replace('Bearer ', '');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number };
+  const { getJwtSecret } = await import('../../utils/jwt')
+  const decoded = jwt.verify(token, getJwtSecret()) as { userId: number };
 
     if (!decoded.userId) {
       throw createError({

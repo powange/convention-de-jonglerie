@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { prisma } from '../utils/prisma';
+import { getJwtSecret } from '../utils/jwt';
 
 
 export default defineEventHandler(async (event) => {
@@ -29,8 +30,7 @@ export default defineEventHandler(async (event) => {
     const token = event.node.req.headers.authorization?.split(' ')[1];
     if (token) {
       try {
-        const config = useRuntimeConfig();
-        const decoded = jwt.verify(token, config.jwtSecret) as { userId: number };
+  const decoded = jwt.verify(token, getJwtSecret()) as { userId: number };
         event.context.user = await prisma.user.findUnique({
           where: { id: decoded.userId },
           select: { id: true, email: true, pseudo: true, nom: true, prenom: true, isGlobalAdmin: true },
@@ -102,8 +102,7 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
-      const config = useRuntimeConfig();
-      const decoded = jwt.verify(token, config.jwtSecret) as { userId: number };
+  const decoded = jwt.verify(token, getJwtSecret()) as { userId: number };
       
       event.context.user = await prisma.user.findUnique({
         where: { id: decoded.userId },

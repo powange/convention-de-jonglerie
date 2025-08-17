@@ -15,6 +15,14 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // Vérifier les tentatives de path traversal AVANT la normalisation
+    if (path.includes('..') || path.includes('//')) {
+      throw createError({
+        statusCode: 403,
+        message: 'Access denied'
+      });
+    }
+
     // Construire le chemin complet du fichier
     const filePath = join(process.cwd(), 'public', 'uploads', path);
     

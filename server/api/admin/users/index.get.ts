@@ -15,8 +15,9 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const decoded = jwt.verify(token, useRuntimeConfig().jwtSecret) as any
-    const userId = decoded.userId
+  const { getJwtSecret } = await import('../../utils/jwt')
+  const decoded = jwt.verify(token, getJwtSecret()) as { userId?: number }
+  const userId = decoded.userId as number | undefined
 
     if (!userId) {
       throw createError({
@@ -47,7 +48,7 @@ export default defineEventHandler(async (event) => {
     const sortOrder = (query.sortOrder as string === 'asc') ? 'asc' : 'desc'
 
     // Construire les conditions de recherche et de filtrage
-    const searchConditions: any = {}
+  const searchConditions: Record<string, unknown> = {}
     
     // Filtrage par recherche textuelle
     if (search) {
@@ -135,21 +136,22 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la récupération des utilisateurs:', error)
+    const err = error as { message?: string; stack?: string; code?: unknown; statusCode?: number }
     console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      code: error.code
+      message: err.message,
+      stack: err.stack,
+      code: err.code
     })
     
-    if (error.statusCode) {
+    if (err.statusCode) {
       throw error
     }
     
     throw createError({
       statusCode: 500,
-      statusMessage: `Erreur interne du serveur: ${error.message}`
+      statusMessage: `Erreur interne du serveur: ${err.message}`
     })
   }
 })

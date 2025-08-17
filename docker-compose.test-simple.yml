@@ -1,0 +1,32 @@
+# Docker Compose pour lancer uniquement les tests unitaires simples
+version: '3.8'
+
+services:
+  # Container pour les tests unitaires uniquement (sans DB)
+  test-unit:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: convention-test-unit
+    environment:
+      NODE_ENV: "test"
+      CI: "true"
+    volumes:
+      - ./app:/app/app:cached
+      - ./server:/app/server:cached
+      - ./tests:/app/tests:cached
+      - ./scripts:/app/scripts:cached
+      - ./prisma:/app/prisma:cached
+      - ./public:/app/public:cached
+      - ./nuxt.config.ts:/app/nuxt.config.ts:cached
+      - ./vitest.config.ts:/app/vitest.config.ts:cached
+      - ./vitest.config.simple.ts:/app/vitest.config.simple.ts:cached
+      - node_modules:/app/node_modules
+    command:
+      - sh
+      - -c
+      - npm run test:run
+
+volumes:
+  node_modules:
+    driver: local

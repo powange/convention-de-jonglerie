@@ -11,15 +11,18 @@ try {
   console.warn('Prisma Client non disponible, les tests DB seront skippés')
 }
 
-// Forcer l'utilisation de la base de données de test
-process.env.DATABASE_URL = 'mysql://testuser:testpassword@localhost:3307/convention_jonglerie_test'
+// Forcer l'utilisation de la base de données de test 
+// En environnement Docker, utiliser l'URL fournie par l'environnement
+if (!process.env.TEST_DATABASE_URL && !process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = 'mysql://testuser:testpassword@localhost:3307/convention_jonglerie_test'
+}
 
 // Instance Prisma pour les tests
 if (PrismaClient) {
   prismaTest = new PrismaClient({
     datasources: {
       db: {
-        url: process.env.DATABASE_URL
+        url: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
       }
     }
   })

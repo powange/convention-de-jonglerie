@@ -1,0 +1,33 @@
+# Dockerfile pour l'environnement de test
+FROM node:22-alpine
+
+# Installer les dépendances système nécessaires
+RUN apk add --no-cache libc6-compat curl python3 make g++
+
+WORKDIR /app
+
+# Copier les fichiers de configuration
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# Installer toutes les dépendances (dev + prod)
+RUN npm ci
+
+# Copier le reste du code
+COPY . .
+
+# Générer le client Prisma
+RUN npx prisma generate
+
+# Créer les dossiers nécessaires
+RUN mkdir -p /app/public/uploads /app/.nuxt /app/.output
+
+# Variables d'environnement pour les tests
+ENV NODE_ENV=test
+ENV CI=true
+
+# Exposer les ports pour les tests
+EXPOSE 3000 9229
+
+# Par défaut, lancer les tests
+CMD ["npm", "run", "test:run"]

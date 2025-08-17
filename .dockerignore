@@ -18,7 +18,9 @@ dist
 .gitignore
 README.md
 Dockerfile
+Dockerfile.test
 docker-compose.yml
+docker-compose*.yml
 .dockerignore
 
 # Logs

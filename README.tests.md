@@ -1,105 +1,77 @@
-# Guide des Tests
+# Guide des tests
 
-## Vue d'ensemble
+## Suites et usages
 
-Le projet utilise Vitest avec plusieurs types de tests :
+Le projet sépare clairement les suites pour de meilleures perfs et une maintenance simple.
 
-### 1. Tests unitaires (sans DB)
-Tests rapides qui mockent les dépendances externes.
+1) Unit (sans Nuxt complet, sans DB)
+- Fichier config: `vitest.config.unit.ts`
+- Setup: `tests/setup-common.ts`, `tests/setup-mocks.ts`
+- Scripts:
+  - `npm run test:unit` (watch)
+  - `npm run test:unit:run` (one-shot)
+  - `npm run test:ui` (UI)
 
-```bash
-npm run test        # Mode watch
-npm run test:run    # Exécution unique
-npm run test:ui     # Interface graphique
-```
+2) Nuxt (runtime Nuxt, DB mockée)
+- Fichier config: `vitest.config.nuxt.ts`
+- Setup: `tests/setup-common.ts`, `tests/setup.ts`
+- Scripts:
+  - `npm run test:nuxt` (watch)
+  - `npm run test:nuxt:run` (one-shot)
 
-### 2. Tests d'intégration (avec DB)
-Tests avec une vraie base de données MySQL dans Docker.
+3) Intégration/DB (Prisma + MySQL réels)
+- Fichier config: `vitest.config.integration.ts`
+- Setup: `tests/setup-common.ts`, `tests/setup-integration.ts`, `tests/setup-db.ts`
+- Exécution mono-thread pour éviter les conflits DB
+- Scripts:
+  - `npm run test:db` (watch si DB déjà prête)
+  - `npm run test:db:run` (prépare Docker + migrations + run)
+  - `npm run test:setup` / `npm run test:teardown` (DB de test)
 
-```bash
-# Démarrer manuellement la DB de test
-npm run test:setup
+4) E2E (Nuxt lancé + $fetch boîte noire)
+- Fichier config: `vitest.config.e2e.ts`
+- Setup: `tests/e2e/setup.ts`
+- Scripts:
+  - `npm run test:e2e` / `npm run test:e2e:run`
 
-# Lancer les tests avec DB
-npm run test:db      # Mode watch avec DB
-npm run test:db:run  # Exécution unique avec DB
+Raccourci pour tout lancer (hors DB):
+- `npm run test:all` → unit + nuxt + e2e
 
-# Arrêter la DB de test
-npm run test:teardown
-```
+## Environnement DB de test
 
-## Configuration de la DB de test
+- MySQL via Docker Compose, port 3307
+- Base: `convention_jonglerie_test`
+- Utilisateur: `testuser` / `testpassword`
+- URL par défaut si aucune n’est fournie: `mysql://testuser:testpassword@localhost:3307/convention_jonglerie_test`
+- Nettoyage et migrations gérés par `tests/setup-db.ts` et les scripts npm
 
-### Docker Compose
-- Port : 3307 (pour ne pas confliter avec la DB de dev)
-- Base : `convention_jonglerie_test`
-- Utilisateur : `testuser` / `testpassword`
-- Optimisée pour la performance (tmpfs, flush désactivé)
-
-### Environnement
-Le fichier `.env.test` contient la configuration :
-```env
-DATABASE_URL="mysql://testuser:testpassword@localhost:3307/convention_jonglerie_test"
-```
-
-### Nettoyage automatique
-- La DB est nettoyée entre chaque test
-- Les migrations sont appliquées automatiquement
-- Les conteneurs sont arrêtés après les tests
-
-## Structure des tests
+## Arborescence utile
 
 ```
 tests/
-├── server/           # Tests unitaires API (mockés)
-├── components/       # Tests de composants Vue
-├── integration/      # Tests avec vraie DB
-├── e2e/             # Tests end-to-end
-├── setup.ts         # Configuration globale
-└── setup-db.ts      # Configuration DB de test
+├── __mocks__/             # Mocks partagés
+├── e2e/                   # E2E
+├── integration/           # Tests DB (suffixe .db.test.ts)
+├── nuxt/                  # Tests Nuxt (handlers, composables…)
+├── composables/, stores/, utils/, feedback/  # Unitaires
+├── setup-common.ts        # Fallbacks H3/Nitro partagés
+├── setup-integration.ts   # Mocks min sans Nuxt pour l’intégration
+├── setup-mocks.ts         # Mocks unitaires
+└── setup.ts               # Setup Nuxt
 ```
 
-## Bonnes pratiques
+## CI/CD (exemple)
 
-1. **Tests unitaires** : Pour la logique métier isolée
-2. **Tests d'intégration** : Pour vérifier les interactions DB
-3. **Isolation** : Chaque test nettoie ses données
-4. **Performance** : La DB utilise la RAM (tmpfs)
-
-## Exemples
-
-### Test unitaire (mocké)
-```typescript
-// tests/server/api/auth/login.test.ts
-vi.mock('../../../../server/utils/prisma', () => ({
-  prisma: {
-    user: {
-      findUnique: vi.fn()
-    }
-  }
-}))
-```
-
-### Test d'intégration (vraie DB)
-```typescript
-// tests/integration/auth.db.test.ts
-import { prismaTest } from '../setup-db'
-
-const user = await prismaTest.user.create({
-  data: { /* ... */ }
-})
-```
-
-## CI/CD
-
-Pour l'intégration continue :
 ```yaml
-- name: Start test database
+- name: Setup test DB
   run: npm run test:setup
-  
-- name: Run all tests
+
+- name: Run unit + nuxt + e2e
+  run: npm run test:all
+
+- name: Run DB integration
   run: npm run test:db:run
-  
-- name: Stop test database
+
+- name: Teardown test DB
   run: npm run test:teardown
 ```

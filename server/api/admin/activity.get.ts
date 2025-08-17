@@ -15,7 +15,8 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const decoded = jwt.verify(token, useRuntimeConfig().jwtSecret) as any
+  const { getJwtSecret } = await import('../../utils/jwt')
+  const decoded = jwt.verify(token, getJwtSecret()) as { userId?: number }
     const userId = decoded.userId
 
     if (!userId) {
