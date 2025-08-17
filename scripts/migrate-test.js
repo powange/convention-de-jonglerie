@@ -8,6 +8,8 @@ process.env.DATABASE_URL = process.env.DATABASE_URL || "mysql://convention_user:
 try {
   console.log('🔄 Application des migrations sur la base de données de test...');
   execSync('npx prisma migrate deploy', { stdio: 'inherit' });
+  console.log('🛠️ Génération du client Prisma...');
+  execSync('npx prisma generate', { stdio: 'inherit' });
   console.log('✅ Migrations appliquées avec succès !');
 } catch (error) {
   console.error('❌ Erreur lors de l\'application des migrations:', error.message);
