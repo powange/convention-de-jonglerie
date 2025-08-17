@@ -60,13 +60,13 @@ npm install
 **Option 2 : Via Docker**
 ```bash
 # Utiliser le service dédié pour l'installation
-docker-compose -f docker-compose.dev-install.yml run --rm npm-install
+docker compose -f docker-compose.dev-install.yml run --rm npm-install
 ```
 
 #### Démarrer les services
 ```bash
 # Les node_modules doivent déjà être installés
-docker-compose -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.dev.yml up -d
 ```
 
 **Note importante** : Le `docker-compose.dev.yml` a été optimisé pour ne plus faire `npm install` à chaque démarrage. Les `node_modules` sont partagés avec l'hôte, ce qui permet :
@@ -86,32 +86,32 @@ docker-compose -f docker-compose.dev.yml up -d
 #### Commandes utiles
 ```bash
 # Voir les logs
-docker-compose -f docker-compose.dev.yml logs -f app
+docker compose -f docker-compose.dev.yml logs -f app
 
 # Redémarrer l'application
-docker-compose -f docker-compose.dev.yml restart app
+docker compose -f docker-compose.dev.yml restart app
 
 # Exécuter des commandes dans le conteneur
-docker-compose -f docker-compose.dev.yml exec app sh
+docker compose -f docker-compose.dev.yml exec app sh
 
 # Installer de nouvelles dépendances (depuis l'hôte)
 npm install <package>
 
 # Ou via Docker
-docker-compose -f docker-compose.dev-install.yml run --rm npm-install
+docker compose -f docker-compose.dev-install.yml run --rm npm-install
 
 # Exécuter les migrations Prisma
-docker-compose -f docker-compose.dev.yml exec app npx prisma migrate dev
+docker compose -f docker-compose.dev.yml exec app npx prisma migrate dev
 
 # Générer le client Prisma
-docker-compose -f docker-compose.dev.yml exec app npx prisma generate
+docker compose -f docker-compose.dev.yml exec app npx prisma generate
 ```
 
 ### 3. Environnement de test
 
 #### Lancer les tests
 ```bash
-docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+docker compose -f docker-compose.test.yml up --abort-on-container-exit
 ```
 
 #### Caractéristiques
@@ -130,7 +130,7 @@ docker build -t convention-app:latest .
 ```bash
 # Pour un déploiement avec proxy externe
 docker network create proxy-network
-docker-compose -f docker-compose.release.yml up -d
+docker compose -f docker-compose.release.yml up -d
 ```
 
 #### Caractéristiques
@@ -193,16 +193,16 @@ mysql://convention_user:convention_password@localhost:3306/convention_db
 
 ```bash
 # Créer une nouvelle migration
-docker-compose -f docker-compose.dev.yml exec app npx prisma migrate dev --name nom_migration
+docker compose -f docker-compose.dev.yml exec app npx prisma migrate dev --name nom_migration
 
 # Appliquer les migrations en production
-docker-compose -f docker-compose.release.yml exec app npx prisma migrate deploy
+docker compose -f docker-compose.release.yml exec app npx prisma migrate deploy
 
 # Réinitialiser la base de données (DEV uniquement)
-docker-compose -f docker-compose.dev.yml exec app npx prisma migrate reset
+docker compose -f docker-compose.dev.yml exec app npx prisma migrate reset
 
 # Visualiser le schéma
-docker-compose -f docker-compose.dev.yml exec app npx prisma studio
+docker compose -f docker-compose.dev.yml exec app npx prisma studio
 ```
 
 ## Sauvegarde et restauration
@@ -210,7 +210,7 @@ docker-compose -f docker-compose.dev.yml exec app npx prisma studio
 ### Sauvegarder la base de données
 ```bash
 # Créer une sauvegarde
-docker-compose -f docker-compose.release.yml exec database \
+docker compose -f docker-compose.release.yml exec database \
   mysqldump -u convention_user -p convention_db > backup_$(date +%Y%m%d).sql
 
 # Sauvegarder les uploads
@@ -221,7 +221,7 @@ docker run --rm -v convention-de-jonglerie-gemini-code_uploads_data:/data \
 ### Restaurer depuis une sauvegarde
 ```bash
 # Restaurer la base de données
-docker-compose -f docker-compose.release.yml exec -T database \
+docker compose -f docker-compose.release.yml exec -T database \
   mysql -u convention_user -p convention_db < backup_20240101.sql
 
 # Restaurer les uploads
@@ -234,13 +234,13 @@ docker run --rm -v convention-de-jonglerie-gemini-code_uploads_data:/data \
 ### Consulter les logs
 ```bash
 # Tous les services
-docker-compose -f docker-compose.dev.yml logs -f
+docker compose -f docker-compose.dev.yml logs -f
 
 # Service spécifique
-docker-compose -f docker-compose.dev.yml logs -f app
+docker compose -f docker-compose.dev.yml logs -f app
 
 # Dernières 100 lignes
-docker-compose -f docker-compose.dev.yml logs --tail=100 app
+docker compose -f docker-compose.dev.yml logs --tail=100 app
 ```
 
 ### Monitoring des ressources
@@ -249,10 +249,10 @@ docker-compose -f docker-compose.dev.yml logs --tail=100 app
 docker stats
 
 # État des conteneurs
-docker-compose -f docker-compose.dev.yml ps
+docker compose -f docker-compose.dev.yml ps
 
 # Santé des services
-docker-compose -f docker-compose.dev.yml exec database mysqladmin ping
+docker compose -f docker-compose.dev.yml exec database mysqladmin ping
 ```
 
 ## Dépannage
@@ -263,13 +263,13 @@ docker-compose -f docker-compose.dev.yml exec database mysqladmin ping
 Le hot reload est configuré pour utiliser le polling sur Windows. Si cela ne fonctionne toujours pas :
 ```bash
 # Redémarrer le conteneur de l'application
-docker-compose -f docker-compose.dev.yml restart app
+docker compose -f docker-compose.dev.yml restart app
 
 # Vérifier que les variables d'environnement sont bien définies
-docker-compose -f docker-compose.dev.yml exec app env | grep CHOKIDAR
+docker compose -f docker-compose.dev.yml exec app env | grep CHOKIDAR
 
 # Si le problème persiste, reconstruire l'image
-docker-compose -f docker-compose.dev.yml up -d --build app
+docker compose -f docker-compose.dev.yml up -d --build app
 ```
 
 **Note** : Le polling peut augmenter légèrement l'utilisation CPU. C'est normal sur Windows avec Docker.
@@ -277,13 +277,13 @@ docker-compose -f docker-compose.dev.yml up -d --build app
 #### 1. Erreur de connexion à la base de données
 ```bash
 # Vérifier que la base est bien démarrée
-docker-compose -f docker-compose.dev.yml ps database
+docker compose -f docker-compose.dev.yml ps database
 
 # Vérifier les logs
-docker-compose -f docker-compose.dev.yml logs database
+docker compose -f docker-compose.dev.yml logs database
 
 # Recréer le conteneur
-docker-compose -f docker-compose.dev.yml up -d --force-recreate database
+docker compose -f docker-compose.dev.yml up -d --force-recreate database
 ```
 
 #### 2. Port déjà utilisé
@@ -315,13 +315,13 @@ docker volume prune
 ### Reset complet
 ```bash
 # Arrêter tous les services
-docker-compose -f docker-compose.dev.yml down
+docker compose -f docker-compose.dev.yml down
 
 # Supprimer les volumes (ATTENTION : supprime les données)
-docker-compose -f docker-compose.dev.yml down -v
+docker compose -f docker-compose.dev.yml down -v
 
 # Reconstruire et redémarrer
-docker-compose -f docker-compose.dev.yml up -d --build
+docker compose -f docker-compose.dev.yml up -d --build
 ```
 
 ## Optimisation
@@ -354,7 +354,7 @@ Pour accélérer les builds :
 DOCKER_BUILDKIT=1 docker build -t convention-app:latest .
 
 # Avec docker-compose
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose build
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose build
 ```
 
 ## Sécurité

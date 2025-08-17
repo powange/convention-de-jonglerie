@@ -202,7 +202,7 @@ Dans Docker Desktop :
 ```powershell
 # Version de Docker
 docker --version
-docker-compose --version
+docker compose version
 
 # Infos système Docker
 docker system info
@@ -254,10 +254,10 @@ notepad .env
 npm install
 
 # Démarrer les services Docker
-docker-compose -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.dev.yml up -d
 
 # Vérifier que tout fonctionne
-docker-compose -f docker-compose.dev.yml ps
+docker compose -f docker-compose.dev.yml ps
 ```
 
 ### 4. Accès aux services
@@ -296,14 +296,14 @@ docker run --rm -v convention-de-jonglerie-gemini-code_uploads_data:/data -v D:\
 ```batch
 @echo off
 echo Démarrage de l'environnement de développement...
-docker-compose -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.dev.yml up -d
 echo.
 echo Services démarrés :
 echo - Application : http://localhost:3000
 echo - Adminer : http://localhost:8080
 echo - MySQL : localhost:3306
 echo.
-docker-compose -f docker-compose.dev.yml ps
+docker compose -f docker-compose.dev.yml ps
 pause
 ```
 
@@ -311,7 +311,7 @@ pause
 ```batch
 @echo off
 echo Arrêt de l'environnement de développement...
-docker-compose -f docker-compose.dev.yml down
+docker compose -f docker-compose.dev.yml down
 echo Services arrêtés.
 pause
 ```
@@ -320,7 +320,7 @@ pause
 ```batch
 @echo off
 echo Redémarrage de l'application...
-docker-compose -f docker-compose.dev.yml restart app
+docker compose -f docker-compose.dev.yml restart app
 echo Application redémarrée.
 pause
 ```
@@ -328,7 +328,7 @@ pause
 ### Créer logs.bat
 ```batch
 @echo off
-docker-compose -f docker-compose.dev.yml logs -f --tail=100 app
+docker compose -f docker-compose.dev.yml logs -f --tail=100 app
 ```
 
 ## Ressources et aide
