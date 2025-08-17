@@ -10,6 +10,8 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-convention_db}
       MYSQL_USER: ${MYSQL_USER:-convention_user}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-convention_password}
+    ports:
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
