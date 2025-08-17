@@ -19,7 +19,9 @@ services:
 
   # Application Nuxt.js
   app:
-    build: .
+    build:
+      context: .
+      target: runtime
     container_name: convention-app-release
     restart: unless-stopped
     environment:

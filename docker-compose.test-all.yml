@@ -51,8 +51,8 @@ services:
       - ./prisma:/app/prisma:cached
       - ./public:/app/public:cached
       - ./nuxt.config.ts:/app/nuxt.config.ts:cached
-  - ./vitest.config.unit.ts:/app/vitest.config.unit.ts:cached
-  - ./vitest.config.ui.ts:/app/vitest.config.ui.ts:cached
+      - ./vitest.config.unit.ts:/app/vitest.config.unit.ts:cached
+      - ./vitest.config.ui.ts:/app/vitest.config.ui.ts:cached
       
       # Volumes pour les caches et dépendances
       - node_modules:/app/node_modules
@@ -90,8 +90,8 @@ services:
       - ./prisma:/app/prisma:cached
       - ./public:/app/public:cached
       - ./nuxt.config.ts:/app/nuxt.config.ts:cached
-  - ./vitest.config.unit.ts:/app/vitest.config.unit.ts:cached
-  - ./vitest.config.ui.ts:/app/vitest.config.ui.ts:cached
+      - ./vitest.config.unit.ts:/app/vitest.config.unit.ts:cached
+      - ./vitest.config.ui.ts:/app/vitest.config.ui.ts:cached
       - node_modules:/app/node_modules
       - nuxt_cache:/app/.nuxt
       - output_cache:/app/.output
