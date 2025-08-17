@@ -12,6 +12,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-convention_password}
     volumes:
       - mysql_data:/var/lib/mysql
+    ports:
+      - "3308:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
