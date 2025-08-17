@@ -3,7 +3,7 @@ services:
   # Base de données MySQL
   database:
     image: mysql:8.0
-    container_name: convention-db
+    container_name: convention-db-release
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
@@ -20,7 +20,7 @@ services:
   # Application Nuxt.js
   app:
     build: .
-    container_name: convention-app
+    container_name: convention-app-release
     restart: unless-stopped
     environment:
       DATABASE_URL: "mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}"
@@ -40,7 +40,7 @@ services:
   # Interface d'administration base de données
   adminer:
     image: adminer:latest
-    container_name: convention-adminer
+    container_name: convention-adminer-release
     restart: unless-stopped
     ports:
       - "8080:8080"
