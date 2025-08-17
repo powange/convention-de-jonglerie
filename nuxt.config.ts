@@ -10,9 +10,9 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint', 
     '@nuxt/image', 
-  '@nuxt/scripts', 
-  // Activer le module de test-utils sur tous les environnements non-production (incl. test)
-  process.env.NODE_ENV !== 'production' ? '@nuxt/test-utils/module' : undefined,
+    '@nuxt/scripts', 
+    // Activer le module de test-utils sur tous les environnements non-production (incl. test)
+    process.env.NODE_ENV !== 'production' ? '@nuxt/test-utils/module' : undefined,
     '@nuxt/ui', 
     '@pinia/nuxt', 
     '@prisma/nuxt',
@@ -113,13 +113,16 @@ export default defineNuxtConfig({
         usePolling: true,
         interval: 1000
       }
+    },
+    resolve: {
+      alias: {
+        '.prisma/client/index-browser': './node_modules/.prisma/client/index-browser.js',
+      }
     }
   },
-  
   // Configuration du module Prisma
   prisma: {
-    installStudio: false,
-    autoSetupPrisma: true
+    installStudio: false
   },
   experimental: {
     appManifest: false,
