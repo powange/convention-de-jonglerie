@@ -14,7 +14,7 @@ try {
 // Forcer l'utilisation de la base de données de test 
 // En environnement Docker, utiliser l'URL fournie par l'environnement
 if (!process.env.TEST_DATABASE_URL && !process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = 'mysql://testuser:testpassword@localhost:3307/convention_jonglerie_test'
+  process.env.DATABASE_URL = 'mysql://convention_user:convention_password@localhost:3307/convention_db'
 }
 
 // Instance Prisma pour les tests
@@ -42,9 +42,9 @@ if (process.env.TEST_WITH_DB === 'true') {
       // Nettoyage initial
       await cleanDatabase()
       console.log('🧹 Base de données nettoyée pour les tests')
-    } catch (error) {
-      console.error('❌ Erreur lors de la connexion à la DB de test:', error)
-      throw error
+    } catch (err) {
+      console.error('❌ Erreur lors de la connexion à la DB de test:', err)
+      throw err
     }
   }, 30000)
 
@@ -64,7 +64,7 @@ async function waitForDatabase(maxRetries = 30) {
       await prismaTest.$connect()
       await prismaTest.$queryRaw`SELECT 1`
       return
-    } catch (error) {
+    } catch {
       console.log(`⏳ Attente de la base de données... (${i + 1}/${maxRetries})`)
       await new Promise(resolve => setTimeout(resolve, 1000))
     }
