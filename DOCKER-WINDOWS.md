@@ -80,7 +80,7 @@ Exemple de configuration optimale :
 #### Resources → File Sharing
 Ajouter le dossier du projet :
 1. Cliquer sur le **+**
-2. Naviguer vers `D:\projet\convention-de-jonglerie-gemini-code`
+2. Naviguer vers `D:\projet\convention-de-jonglerie`
 3. Cliquer **Apply & Restart**
 
 **Important** : Ceci est OBLIGATOIRE pour que les volumes Docker fonctionnent !
@@ -122,12 +122,12 @@ Ajouter des exclusions pour améliorer les performances :
 4. Ajouter ces dossiers :
    - `C:\Program Files\Docker`
    - `C:\ProgramData\Docker`
-   - `D:\projet\convention-de-jonglerie-gemini-code`
+  - `D:\projet\convention-de-jonglerie`
    - `%USERPROFILE%\.docker`
 
 #### Désactiver l'indexation Windows
 Pour le dossier du projet :
-1. Clic droit sur `D:\projet\convention-de-jonglerie-gemini-code`
+1. Clic droit sur `D:\projet\convention-de-jonglerie`
 2. **Propriétés** → **Avancé**
 3. Décocher **Autoriser l'indexation du contenu...**
 4. Appliquer aux sous-dossiers
@@ -235,8 +235,8 @@ docker ps -a
 ```powershell
 # Se placer dans D:\projet
 cd D:\projet
-git clone [URL_DU_REPO] convention-de-jonglerie-gemini-code
-cd convention-de-jonglerie-gemini-code
+git clone [URL_DU_REPO] convention-de-jonglerie
+cd convention-de-jonglerie
 ```
 
 ### 2. Créer le fichier .env
@@ -285,9 +285,9 @@ docker system prune -a --volumes
 ### Sauvegarde des données
 ```powershell
 # Sauvegarder les volumes Docker
-docker run --rm -v convention-de-jonglerie-gemini-code_mysql_data:/data -v D:\backups:/backup alpine tar czf /backup/mysql_backup_%date:~-4,4%%date:~-10,2%%date:~-7,2%.tar.gz -C /data .
+docker run --rm -v convention-de-jonglerie_mysql_data:/data -v D:\backups:/backup alpine tar czf /backup/mysql_backup_%date:~-4,4%%date:~-10,2%%date:~-7,2%.tar.gz -C /data .
 
-docker run --rm -v convention-de-jonglerie-gemini-code_uploads_data:/data -v D:\backups:/backup alpine tar czf /backup/uploads_backup_%date:~-4,4%%date:~-10,2%%date:~-7,2%.tar.gz -C /data .
+docker run --rm -v convention-de-jonglerie_uploads_data:/data -v D:\backups:/backup alpine tar czf /backup/uploads_backup_%date:~-4,4%%date:~-10,2%%date:~-7,2%.tar.gz -C /data .
 ```
 
 ## Scripts utiles pour Windows

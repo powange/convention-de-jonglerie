@@ -50,7 +50,7 @@ CMD ["node", ".output/server/index.mjs"]
 # -------------------------
 FROM base AS dev
 # Ce stage sert d’image de dev si souhaité. En pratique, on monte le code en volume
-# et on utilise npm run dev dans docker-compose.dev.yml
+# et on utilise npm run dev dans docker compose (docker-compose.dev.yml)
 COPY package*.json ./
 RUN npm ci || true
 ENV NODE_ENV=development NUXT_HOST=0.0.0.0 NUXT_PORT=3000

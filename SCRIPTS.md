@@ -25,5 +25,12 @@
 - `npm run test:setup` - Démarre MySQL + migrations
 - `npm run test:teardown` - Arrête et nettoie tout
 
+## 🐳 Aides Docker pour les tests (optionnel)
+- `npm run docker:test` - Lance tout le pack de tests dans Docker (base + runner)
+- `npm run docker:test:unit` - Lance uniquement les tests unitaires dans Docker
+- `npm run docker:test:integration` - Lance uniquement l’intégration DB dans Docker
+- `npm run docker:test:ui` - Ouvre l’UI Vitest dans Docker
+- `npm run docker:test:clean` - Nettoie les conteneurs/volumes des tests
+
 ## ⚙️ Scripts automatiques
 - `postinstall` - S'exécute automatiquement après `npm install` pour préparer Nuxt

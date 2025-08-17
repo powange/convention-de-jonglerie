@@ -62,7 +62,7 @@ Assurez-vous d'avoir Node.js, npm (ou pnpm, yarn, bun) et MySQL installés.
 1.  **Cloner le dépôt :**
     ```bash
     git clone <URL_DU_DEPOT>
-    cd convention-de-jonglerie-gemini-code
+    cd convention-de-jonglerie
     ```
 
 2.  **Installation des dépendances :**

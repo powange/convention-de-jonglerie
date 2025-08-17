@@ -69,7 +69,7 @@ docker compose -f docker-compose.dev-install.yml run --rm npm-install
 docker compose -f docker-compose.dev.yml up -d
 ```
 
-**Note importante** : Le `docker-compose.dev.yml` a été optimisé pour ne plus faire `npm install` à chaque démarrage. Les `node_modules` sont partagés avec l'hôte, ce qui permet :
+**Note importante** : Le `docker-compose.dev.yml` a été optimisé pour ne plus faire `npm install` à chaque démarrage. Les `node_modules` sont partagés avec l'hôte (via un volume Docker), ce qui permet :
 - Démarrage plus rapide des conteneurs
 - Installation des dépendances une seule fois
 - Possibilité d'utiliser les outils de développement locaux (VSCode, etc.)
@@ -128,8 +128,8 @@ docker build -t convention-app:latest .
 
 #### Déployer en production
 ```bash
-# Pour un déploiement avec proxy externe
-docker network create proxy-network
+# Créer le réseau externe si vous utilisez un reverse proxy
+docker network create proxy-network || true
 docker compose -f docker-compose.release.yml up -d
 ```
 
@@ -153,7 +153,7 @@ labels:
 
 ### Connexion depuis un logiciel externe (DBeaver, TablePlus, MySQL Workbench, etc.)
 
-Le port MySQL est exposé sur votre machine locale. Utilisez ces paramètres :
+Le port MySQL est exposé sur votre machine locale. Utilisez ces paramètres (développement) :
 - **Hôte** : `localhost` ou `127.0.0.1`
 - **Port** : `3306`
 - **Base de données** : `convention_db`
@@ -171,15 +171,19 @@ Password: convention_password
 Database: convention_db
 ```
 
-**Ligne de commande MySQL :**
+**Ligne de commande MySQL (développement) :**
 ```bash
 mysql -h localhost -P 3306 -u convention_user -p convention_db
 ```
 
-**URL de connexion (pour certains outils) :**
+**URL de connexion (développement) :**
 ```
 mysql://convention_user:convention_password@localhost:3306/convention_db
 ```
+
+Pour l'environnement de tests (docker-compose.test.yml), MySQL est exposé sur le port 3307 pour éviter les conflits locaux :
+- **Port** : `3307`
+- **URL** : `mysql://convention_user:convention_password@localhost:3307/convention_db`
 
 ### Accès via Adminer (interface web)
 1. Naviguer vers http://localhost:8080
@@ -214,7 +218,7 @@ docker compose -f docker-compose.release.yml exec database \
   mysqldump -u convention_user -p convention_db > backup_$(date +%Y%m%d).sql
 
 # Sauvegarder les uploads
-docker run --rm -v convention-de-jonglerie-gemini-code_uploads_data:/data \
+docker run --rm -v convention-de-jonglerie_uploads_data:/data \
   -v $(pwd):/backup alpine tar czf /backup/uploads_$(date +%Y%m%d).tar.gz -C /data .
 ```
 
@@ -225,7 +229,7 @@ docker compose -f docker-compose.release.yml exec -T database \
   mysql -u convention_user -p convention_db < backup_20240101.sql
 
 # Restaurer les uploads
-docker run --rm -v convention-de-jonglerie-gemini-code_uploads_data:/data \
+docker run --rm -v convention-de-jonglerie_uploads_data:/data \
   -v $(pwd):/backup alpine tar xzf /backup/uploads_20240101.tar.gz -C /data
 ```
 
@@ -300,7 +304,7 @@ ports:
 #### 3. Problèmes de permissions sur les volumes
 ```bash
 # Réparer les permissions
-docker-compose -f docker-compose.dev.yml exec app chown -R node:node /app
+docker compose -f docker-compose.dev.yml exec app chown -R node:node /app
 ```
 
 #### 4. Espace disque insuffisant

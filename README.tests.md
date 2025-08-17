@@ -39,11 +39,11 @@ Raccourci pour tout lancer (hors DB):
 
 ## Environnement DB de test
 
-- MySQL via Docker Compose, port 3307
-- Base: `convention_jonglerie_test`
-- Utilisateur: `testuser` / `testpassword`
-- URL par défaut si aucune n’est fournie: `mysql://testuser:testpassword@localhost:3307/convention_jonglerie_test`
-- Nettoyage et migrations gérés par `tests/setup-db.ts` et les scripts npm
+- MySQL via Docker Compose, port 3307 (voir `docker-compose.test.yml`)
+- Base: `convention_db` (valeur par défaut)
+- Utilisateur: `convention_user` / `convention_password` (valeurs par défaut)
+- URL par défaut si aucune n’est fournie: `mysql://convention_user:convention_password@localhost:3307/convention_db`
+- Migrations gérées par `scripts/migrate-test.js` et `tests/setup-db.ts`
 
 ## Arborescence utile
 

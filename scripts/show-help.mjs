@@ -1,12 +1,6 @@
 #!/usr/bin/env node
 
-import { readFileSync } from 'fs'
-import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-const rootDir = join(__dirname, '..')
+// Note: Ce script n'a pas besoin de __filename/__dirname
 
 // Couleurs pour le terminal
 const colors = {
@@ -72,9 +66,22 @@ const sections = [
     title: '🧪 Tests unitaires (rapides, sans DB)',
     color: colors.cyan,
     scripts: [
-      { name: 'test', desc: 'Mode watch, relance automatiquement' },
+  { name: 'test', desc: 'Mode watch, relance automatiquement' },
+  { name: 'test:unit', desc: 'Alias de test (watch)' },
       { name: 'test:ui', desc: 'Interface graphique dans le navigateur' },
-      { name: 'test:run', desc: 'Une seule exécution (CI/CD)' }
+  { name: 'test:run', desc: 'Une seule exécution (CI/CD)' },
+  { name: 'test:unit:run', desc: 'Alias de test:run (CI/CD)' }
+    ]
+  },
+  {
+    title: '🧩 Tests Nuxt & E2E',
+    color: colors.cyan,
+    scripts: [
+      { name: 'test:nuxt', desc: 'Tests avec runtime Nuxt (watch)' },
+      { name: 'test:nuxt:run', desc: 'Tests Nuxt (one-shot)' },
+      { name: 'test:e2e', desc: 'Tests end-to-end (watch)' },
+      { name: 'test:e2e:run', desc: 'Tests end-to-end (one-shot)' },
+      { name: 'test:all', desc: 'Raccourci: unit + nuxt + e2e (one-shot)' }
     ]
   },
   {
@@ -85,6 +92,28 @@ const sections = [
       { name: 'test:db:run', desc: 'Tests avec DB une fois' },
       { name: 'test:setup', desc: 'Démarre MySQL + migrations' },
       { name: 'test:teardown', desc: 'Arrête et nettoie tout' }
+    ]
+  },
+  {
+    title: '🐳 Docker & Compose',
+    color: colors.blue,
+    scripts: [
+      { name: 'docker:dev', desc: 'Démarre l\'env de développement (iso release)' },
+      { name: 'docker:dev:detached', desc: 'Démarre en arrière-plan' },
+      { name: 'docker:dev:down', desc: 'Arrête les services de dev' },
+      { name: 'docker:dev:logs', desc: 'Affiche les logs de l\'app (suivi)' },
+      { name: 'docker:dev:exec', desc: 'Ouvre un shell dans l\'app' },
+      { name: 'docker:release:up', desc: 'Démarre l\'environnement de production local' },
+      { name: 'docker:release:down', desc: 'Arrête l\'environnement de production local' },
+      { name: 'docker:test', desc: 'Lance tous les tests dans Docker (avec DB)' },
+      { name: 'docker:test:rebuild', desc: 'Reconstruit les images de test (no-cache)' },
+      { name: 'docker:test:clean', desc: 'Nettoie les conteneurs/volumes de test' },
+      { name: 'docker:test:unit', desc: 'Lance uniquement les tests unitaires dans Docker' },
+      { name: 'docker:test:unit:clean', desc: 'Nettoie l\'env de tests unitaires' },
+      { name: 'docker:test:integration', desc: 'Lance uniquement les tests d\'intégration DB dans Docker' },
+      { name: 'docker:test:integration:clean', desc: 'Nettoie l\'env de tests d\'intégration' },
+      { name: 'docker:test:ui', desc: 'Ouvre l\'UI Vitest dans Docker' },
+      { name: 'docker:test:ui:clean', desc: 'Nettoie l\'env de tests UI' }
     ]
   }
 ]

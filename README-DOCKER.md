@@ -4,7 +4,11 @@
 
 1. **Démarrer l'application**
    ```bash
-   docker compose up -d
+   # Développement (iso release)
+   docker compose -f docker-compose.dev.yml up -d
+
+   # OU Production locale (build + run optimisés)
+   # docker compose -f docker-compose.release.yml up -d --build
    ```
 
 2. **Accéder aux services**
@@ -13,7 +17,9 @@
 
 ## Configuration
 
-Pour changer les mots de passe et configurations, modifiez directement `docker-compose.yml` avant de lancer.
+Pour changer les mots de passe et configurations, modifiez les fichiers correspondants selon le contexte :
+- `docker-compose.dev.yml` pour le développement
+- `docker-compose.release.yml` pour la production
 
 ## Commandes utiles
 
@@ -34,12 +40,12 @@ docker compose up -d --build
 ## Portainer
 
 Pour utiliser avec Portainer :
-1. Copiez le contenu de `docker-compose.yml`
+1. Copiez le contenu du fichier de votre choix (`docker-compose.dev.yml` ou `docker-compose.release.yml`)
 2. Dans Portainer : Stacks → Add stack → Web editor
 3. Collez le contenu et déployez
 
 ## Dépannage
 
 Si erreur JWT :
-- Vérifiez que `JWT_SECRET` est bien défini dans `docker-compose.yml`
+- Vérifiez que `JWT_SECRET` est bien défini dans le fichier Compose que vous utilisez (`docker-compose.dev.yml` ou `docker-compose.release.yml`)
 - Reconstruisez : `docker compose up -d --build`

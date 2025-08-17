@@ -20,8 +20,6 @@ services:
       - ./prisma:/app/prisma:cached
       - ./public:/app/public:cached
       - ./nuxt.config.ts:/app/nuxt.config.ts:cached
-      - ./vitest.config.ts:/app/vitest.config.ts:cached
-      - ./vitest.config.simple.ts:/app/vitest.config.simple.ts:cached
       - ./vitest.config.ui.ts:/app/vitest.config.ui.ts:cached
       - node_modules:/app/node_modules
     ports:

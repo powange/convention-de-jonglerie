@@ -11,9 +11,4 @@ npx prisma generate >/dev/null 2>&1
 export TEST_WITH_DB=true
 
 # Lancer les tests avec la configuration d'intégration
-if [ -f vitest.config.integration.ts ]; then
-	npx vitest run --config vitest.config.integration.ts --reporter=dot --silent
-else
-	# fallback
-	TEST_WITH_DB=true npx vitest run --config vitest.config.ts --reporter=dot --silent
-fi
+TEST_WITH_DB=true npx vitest run --config vitest.config.integration.ts --reporter=dot --silent
