@@ -30,9 +30,11 @@ services:
       NUXT_HOST: "0.0.0.0"
       NUXT_PORT: "3000"
       NODE_ENV: "production"
-      SEND_EMAILS: "${SEND_EMAILS:-false}"
-      SMTP_USER: "${SMTP_USER:-}"
-      SMTP_PASS: "${SMTP_PASS:-}"
+      SEND_EMAILS: "${SEND_EMAILS}"
+      SMTP_USER: "${SMTP_USER}"
+      SMTP_PASS: "${SMTP_PASS}"
+  RECAPTCHA_SITE_KEY: "${RECAPTCHA_SITE_KEY}"
+  RECAPTCHA_SECRET_KEY: "${RECAPTCHA_SECRET_KEY}"
     volumes:
       - uploads_data:/app/public/uploads
     depends_on:
