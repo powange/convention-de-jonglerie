@@ -1,4 +1,5 @@
 import { prisma } from '../../utils/prisma';
+import { getRequestIP } from 'h3';
 import { z } from 'zod';
 import { validateAndSanitize, handleValidationError } from '../../utils/validation-schemas';
 
@@ -39,7 +40,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Vérifier le captcha avec Google reCAPTCHA v2
+    // Vérifier le captcha avec Google reCAPTCHA v3
     const config = useRuntimeConfig();
     const recaptchaSecret = config.recaptchaSecretKey;
     if (!recaptchaSecret) {
@@ -50,19 +51,35 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
-      const recaptchaResponse = await $fetch('https://www.google.com/recaptcha/api/siteverify', {
+      const remoteip = getRequestIP(event) || undefined;
+      interface RecaptchaV3Response {
+        success: boolean;
+        score?: number;
+        action?: string;
+        challenge_ts?: string;
+        hostname?: string;
+        'error-codes'?: string[];
+      }
+      const params = new URLSearchParams({
+        secret: recaptchaSecret,
+        response: captchaToken
+      });
+      if (remoteip) params.set('remoteip', remoteip);
+      const verification = await $fetch<RecaptchaV3Response>('https://www.google.com/recaptcha/api/siteverify', {
         method: 'POST',
-        body: new URLSearchParams({
-          secret: recaptchaSecret,
-          response: captchaToken
-        })
+        body: params
       });
 
-      if (!recaptchaResponse.success) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Captcha invalide'
-        });
+      // Attendus v3: success vrai, action correspondante, score >= seuil
+      const minScore = Number((config as unknown as { recaptchaMinScore?: number }).recaptchaMinScore ?? 0.5);
+      if (!verification?.success) {
+        throw createError({ statusCode: 400, statusMessage: 'Captcha invalide' });
+      }
+      if (verification?.action && verification.action !== 'feedback') {
+        throw createError({ statusCode: 400, statusMessage: 'Captcha action invalide' });
+      }
+      if (typeof verification?.score === 'number' && verification.score < minScore) {
+        throw createError({ statusCode: 400, statusMessage: 'Captcha score insuffisant' });
       }
     } catch (error) {
       console.error('Erreur lors de la vérification du captcha:', error);

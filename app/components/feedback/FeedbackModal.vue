@@ -15,7 +15,7 @@
             </div>
           </div>
 
-          <UForm :schema="feedbackSchema" :state="form" @submit="submitFeedback" class="space-y-6">
+          <UForm :schema="feedbackSchema" :state="form" class="space-y-6" @submit="submitFeedback">
             <!-- Section principale -->
             <div class="space-y-4">
               <!-- Type de feedback -->
@@ -88,8 +88,22 @@
                 </UFormField>
               </div>
 
-              <!-- Captcha pour utilisateurs non connectés -->
-              <div id="recaptcha-container" class="flex justify-center"></div>
+              <!-- reCAPTCHA v3: attribution requise -->
+              <div class="text-[11px] leading-snug text-gray-500 dark:text-gray-400">
+                Ce site est protégé par reCAPTCHA et la <a
+                  href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer"
+                  class="underline hover:text-gray-700 dark:hover:text-gray-300">Politique de confidentialité</a>
+                et les
+                <a
+                  href="https://policies.google.com/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="underline hover:text-gray-700 dark:hover:text-gray-300"
+                >
+                  Conditions d’utilisation
+                </a>
+                de Google s’appliquent.
+              </div>
             </div>
 
             <!-- URL (optionnel, auto-rempli) -->
@@ -108,9 +122,9 @@
               <UButton 
                 color="gray" 
                 variant="outline" 
-                @click="closeModal"
                 class="order-2 sm:order-1"
                 icon="i-heroicons-x-mark"
+                @click="closeModal"
               >
                 {{ t('common.cancel') }}
               </UButton>
@@ -144,10 +158,10 @@
           </p>
           
           <UButton 
-            @click="closeModal"
             size="lg"
             icon="i-heroicons-hand-thumb-up"
             class="shadow-lg"
+            @click="closeModal"
           >
             {{ t('common.close') }}
           </UButton>
@@ -166,7 +180,7 @@ const open = defineModel<boolean>('open', { default: false })
 const authStore = useAuthStore()
 const { t } = useI18n()
 const toast = useToast()
-const route = useRoute()
+// const _route = useRoute() // non utilisé
 
 // Détection mobile pour fullscreen sur petits écrans
 const isMobile = computed(() => {
@@ -179,7 +193,8 @@ const isMobile = computed(() => {
 // État local
 const loading = ref(false)
 const submitted = ref(false)
-let recaptchaWidgetId: number | null = null
+// reCAPTCHA v3 (pas de widget)
+let recaptchaLoaded = false
 
 // Schéma de validation - utiliser des computed ou les valeurs par défaut
 const feedbackSchema = computed(() => {
@@ -235,7 +250,7 @@ const feedbackOptions = computed(() =>
 )
 
 // Référence pour le premier champ du formulaire
-const firstFieldRef = ref<HTMLElement>()
+// const _firstFieldRef = ref<HTMLElement>()
 const isRecaptchaReady = ref(false)
 
 // Initialiser l'URL actuelle
@@ -249,25 +264,10 @@ watch(open, (isOpen) => {
     // Mettre à jour l'URL
     form.url = window.location.href
     
-    // Charger et rendre le captcha pour les utilisateurs non connectés
+    // Charger le script reCAPTCHA v3 pour les utilisateurs non connectés
     if (!authStore.user) {
       nextTick(() => {
-        if (!window.grecaptcha) {
-          console.log('Chargement du script reCAPTCHA...')
-          loadRecaptcha()
-        } else {
-          console.log('Script déjà chargé, rendu du widget...')
-          // Reset et re-render si nécessaire
-          if (recaptchaWidgetId !== null) {
-            try {
-              window.grecaptcha.reset(recaptchaWidgetId)
-            } catch (e) {
-              console.log('Reset du widget précédent échoué, création d\'un nouveau')
-              recaptchaWidgetId = null
-            }
-          }
-          renderRecaptcha()
-        }
+        ensureRecaptchaScript()
       })
     }
     
@@ -278,73 +278,35 @@ watch(open, (isOpen) => {
         firstInput.focus()
       }
     })
-  } else {
-    // Reset le captcha quand la modal se ferme
-    if (window.grecaptcha && recaptchaWidgetId !== null) {
-      try {
-        window.grecaptcha.reset(recaptchaWidgetId)
-      } catch (e) {
-        console.log('Impossible de reset le captcha')
-      }
-    }
   }
 })
 
-// Nettoyer le reCAPTCHA au démontage
-onBeforeUnmount(() => {
-  if (window.grecaptcha && recaptchaWidgetId !== null) {
-    window.grecaptcha.reset(recaptchaWidgetId)
-  }
-})
+// Pas de nettoyage nécessaire pour v3 (pas de widget)
 
-// Charger reCAPTCHA
-function loadRecaptcha() {
-  if (window.grecaptcha) {
-    renderRecaptcha()
+// Charger le script reCAPTCHA v3 (une seule fois)
+function ensureRecaptchaScript() {
+  if (typeof window === 'undefined') return
+  const siteKey = useRuntimeConfig().public.recaptchaSiteKey
+  if (!siteKey) {
+    console.warn('reCAPTCHA site key manquante (public.recaptchaSiteKey)')
     return
   }
-
-  console.log('Ajout du script reCAPTCHA...')
-  const script = document.createElement('script')
-  script.src = 'https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit'
-  script.async = true
-  document.head.appendChild(script)
-
-  window.onRecaptchaLoad = () => {
-    console.log('Script reCAPTCHA chargé')
-    renderRecaptcha()
+  if (recaptchaLoaded || window.grecaptcha) {
+    isRecaptchaReady.value = true
+    return
   }
-}
-
-function renderRecaptcha() {
-  if (!window.grecaptcha || authStore.user) return
-
-  // Attendre un peu que le DOM soit prêt
-  setTimeout(() => {
-    const container = document.getElementById('recaptcha-container')
-    const siteKey = useRuntimeConfig().public.recaptchaSiteKey
-    
-    console.log('Container trouvé:', !!container)
-    console.log('Site key:', siteKey)
-    
-    if (container && siteKey) {
-      // Vider le container avant de rendre
-      container.innerHTML = ''
-      
-      try {
-        recaptchaWidgetId = window.grecaptcha.render(container, {
-          sitekey: siteKey,
-          theme: 'light',
-          size: 'normal'
-        })
-        console.log('reCAPTCHA rendu avec succès, widget ID:', recaptchaWidgetId)
-        isRecaptchaReady.value = true
-      } catch (error) {
-        console.error('Erreur lors du rendu du reCAPTCHA:', error)
-        isRecaptchaReady.value = false
-      }
-    }
-  }, 200)
+  const script = document.createElement('script')
+  script.src = 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(siteKey)
+  script.async = true
+  script.onload = () => {
+    recaptchaLoaded = true
+    isRecaptchaReady.value = true
+  }
+  script.onerror = () => {
+    console.error('Échec du chargement du script reCAPTCHA v3')
+    isRecaptchaReady.value = false
+  }
+  document.head.appendChild(script)
 }
 
 async function submitFeedback() {
@@ -353,7 +315,7 @@ async function submitFeedback() {
   loading.value = true
 
   try {
-    // Validation des champs requis pour les utilisateurs non connectés
+  // Validation des champs requis pour les utilisateurs non connectés
     if (!authStore.user) {
       if (!form.name) {
         toast.add({
@@ -365,34 +327,31 @@ async function submitFeedback() {
         return
       }
 
-      // Vérifier le captcha
-      if (window.grecaptcha && recaptchaWidgetId !== null) {
-        try {
-          const captchaResponse = window.grecaptcha.getResponse(recaptchaWidgetId)
-          if (!captchaResponse) {
-            toast.add({
-              title: t('feedback.error.captcha_required'),
-              color: 'red'
-            })
-            loading.value = false
-            return
-          }
-          form.captchaToken = captchaResponse
-        } catch (error) {
-          console.error('Erreur avec le captcha:', error)
-          toast.add({
-            title: t('feedback.error.captcha_not_loaded'),
-            color: 'red'
-          })
+      // Obtenir un token reCAPTCHA v3 à la volée
+      try {
+        ensureRecaptchaScript()
+        const siteKey = useRuntimeConfig().public.recaptchaSiteKey
+        if (!window.grecaptcha || !siteKey) {
+          toast.add({ title: t('feedback.error.captcha_not_loaded'), color: 'red' })
           loading.value = false
           return
         }
-      } else {
-        // Si le captcha n'est pas chargé mais requis
-        toast.add({
-          title: t('feedback.error.captcha_not_loaded'),
-          color: 'red'
+        const token: string = await new Promise((resolve, reject) => {
+          window.grecaptcha.ready(() => {
+            window.grecaptcha.execute(siteKey, { action: 'feedback' })
+              .then(resolve)
+              .catch(reject)
+          })
         })
+        if (!token) {
+          toast.add({ title: t('feedback.error.captcha_required'), color: 'red' })
+          loading.value = false
+          return
+        }
+        form.captchaToken = token
+      } catch (error) {
+        console.error('Erreur avec reCAPTCHA v3:', error)
+        toast.add({ title: t('feedback.error.captcha_not_loaded'), color: 'red' })
         loading.value = false
         return
       }
@@ -420,7 +379,7 @@ async function submitFeedback() {
       color: 'green'
     })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de l\'envoi du feedback:', error)
     
     let errorMessage = t('feedback.error.submit')
@@ -434,10 +393,7 @@ async function submitFeedback() {
       color: 'red'
     })
 
-    // Reset captcha en cas d'erreur
-    if (!authStore.user && window.grecaptcha && recaptchaWidgetId !== null) {
-      window.grecaptcha.reset(recaptchaWidgetId)
-    }
+  // Pas de reset nécessaire pour v3
 
   } finally {
     loading.value = false
@@ -460,22 +416,19 @@ function closeModal() {
       captchaToken: ''
     })
     
-    // Ne pas détruire le widget, juste le reset
-    if (!authStore.user && window.grecaptcha && recaptchaWidgetId !== null) {
-      try {
-        window.grecaptcha.reset(recaptchaWidgetId)
-      } catch (e) {
-        console.log('Impossible de reset le captcha lors de la fermeture')
-      }
-    }
+  // Pas de widget à reset pour v3
   }, 300)
 }
 
 // Type global pour reCAPTCHA
+type Grecaptcha = {
+  ready: (cb: () => void) => void
+  execute: (siteKey: string, options: { action: string }) => Promise<string>
+}
+
 declare global {
   interface Window {
-    grecaptcha: any
-    onRecaptchaLoad: () => void
+    grecaptcha: Grecaptcha
   }
 }
 </script>
