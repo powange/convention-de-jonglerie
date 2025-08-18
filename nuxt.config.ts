@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     '@nuxt/ui', 
     '@pinia/nuxt', 
     '@prisma/nuxt',
+    'nuxt-auth-utils',
     '@nuxtjs/i18n',
     '@vueuse/nuxt'
   ].filter(Boolean),
@@ -81,6 +82,7 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     jwtSecret: process.env.JWT_SECRET || 'fallback-secret-for-development', // Private keys that are only available on the server
+  sessionPassword: process.env.NUXT_SESSION_PASSWORD || '',
     emailEnabled: process.env.SEND_EMAILS || 'false', // Enable/disable real email sending
     smtpUser: process.env.SMTP_USER || '', // SMTP username for email sending
     smtpPass: process.env.SMTP_PASS || '', // SMTP password for email sending

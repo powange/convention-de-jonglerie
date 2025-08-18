@@ -1,31 +1,13 @@
-import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { getEmailHash } from '../../utils/email-hash';
+import { requireUserSession } from '#auth-utils'
 
 const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   try {
-    // Vérifier l'authentification
-    const authorization = getCookie(event, 'authToken') || getHeader(event, 'authorization');
-    
-    if (!authorization) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Non autorisé',
-      });
-    }
-
-    const token = authorization.replace('Bearer ', '');
-  const { getJwtSecret } = await import('../../utils/jwt')
-  const decoded = jwt.verify(token, getJwtSecret()) as { userId: number };
-
-    if (!decoded.userId) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token invalide',
-      });
-    }
+  // Vérifier l'authentification via la session scellée
+  const { user } = await requireUserSession(event)
 
     // Récupérer le paramètre de recherche
     const query = getQuery(event);
@@ -42,8 +24,8 @@ export default defineEventHandler(async (event) => {
           { email: { contains: searchQuery } },
           { pseudo: { contains: searchQuery } }
         ],
-        // Exclure l'utilisateur actuel
-        NOT: { id: decoded.userId }
+  // Exclure l'utilisateur actuel
+  NOT: { id: user.id }
       },
       select: {
         id: true,
@@ -56,11 +38,12 @@ export default defineEventHandler(async (event) => {
     });
 
     // Transformer les emails en emailHash
-    const transformedUsers = users.map(user => ({
-      ...user,
-      emailHash: getEmailHash(user.email),
-      email: undefined
-    } as any));
+    const transformedUsers = users.map(u => ({
+      id: u.id,
+      pseudo: u.pseudo,
+      profilePicture: u.profilePicture,
+      emailHash: getEmailHash(u.email)
+    }));
 
     return transformedUsers;
 

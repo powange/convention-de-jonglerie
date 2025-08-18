@@ -1,6 +1,7 @@
 import * as jwt from 'jsonwebtoken';
 import { prisma } from '../utils/prisma';
 import { getJwtSecret } from '../utils/jwt';
+import { getUserSession } from '#auth-utils'
 
 
 export default defineEventHandler(async (event) => {
@@ -92,6 +93,12 @@ export default defineEventHandler(async (event) => {
   // --- Protect all other API routes --- //
   // Only apply token check if the path starts with /api/
   if (path.startsWith('/api/')) {
+    // Si une session utilisateur scellée est active, hydrater event.context.user et continuer
+    const session = await getUserSession(event)
+    if (session?.user) {
+      event.context.user = session.user
+      return
+    }
     // Récupérer le token depuis l'en-tête Authorization ou le cookie (fallback)
     const headerToken = event.node.req.headers.authorization?.split(' ')[1];
     const cookieToken = getCookie(event, 'auth-token');
