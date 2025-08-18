@@ -84,7 +84,8 @@ export default defineNuxtConfig({
     emailEnabled: process.env.SEND_EMAILS || 'false', // Enable/disable real email sending
     smtpUser: process.env.SMTP_USER || '', // SMTP username for email sending
     smtpPass: process.env.SMTP_PASS || '', // SMTP password for email sending
-    recaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY || '', // reCAPTCHA secret key for server-side verification
+    // Supporte aussi la convention Nuxt NUXT_*
+    recaptchaSecretKey: process.env.NUXT_RECAPTCHA_SECRET_KEY || process.env.RECAPTCHA_SECRET_KEY || '', // reCAPTCHA secret key for server-side verification
     public: {
       // Public keys that are available on both client and server
       // Supporte aussi la convention Nuxt NUXT_PUBLIC_*
