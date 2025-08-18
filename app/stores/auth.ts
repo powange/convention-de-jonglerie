@@ -45,8 +45,8 @@ export const useAuthStore = defineStore('auth', {
         this.user = response.user;
         this.rememberMe = rememberMe;
         
-        // Calculer l'expiration (1h par défaut)
-        this.tokenExpiry = Date.now() + (60 * 60 * 1000); // 1 heure
+  // Calculer l'expiration (aligné avec le JWT signé côté serveur: 7 jours)
+  this.tokenExpiry = Date.now() + (7 * 24 * 60 * 60 * 1000); // 7 jours
         
         // Store in localStorage ou sessionStorage selon "Se souvenir de moi"
         if (import.meta.client) {

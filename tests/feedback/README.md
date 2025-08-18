@@ -184,7 +184,7 @@ TEST_DATABASE_URL="mysql://test:test@localhost:3306/juggling_test"
 
 # reCAPTCHA (clés de test Google)
 RECAPTCHA_SITE_KEY="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
-RECAPTCHA_SECRET_KEY="6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
+NUXT_PUBLIC_RECAPTCHA_SITE_KEY="6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
 
 # JWT pour tests
 JWT_SECRET="test-jwt-secret-key"

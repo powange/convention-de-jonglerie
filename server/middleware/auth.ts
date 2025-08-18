@@ -92,7 +92,10 @@ export default defineEventHandler(async (event) => {
   // --- Protect all other API routes --- //
   // Only apply token check if the path starts with /api/
   if (path.startsWith('/api/')) {
-    const token = event.node.req.headers.authorization?.split(' ')[1];
+    // Récupérer le token depuis l'en-tête Authorization ou le cookie (fallback)
+    const headerToken = event.node.req.headers.authorization?.split(' ')[1];
+    const cookieToken = getCookie(event, 'auth-token');
+    const token = headerToken || cookieToken || undefined;
 
     if (!token) {
       throw createError({
@@ -115,7 +118,11 @@ export default defineEventHandler(async (event) => {
           statusMessage: 'Unauthorized: User not found',
         });
       }
-    } catch {
+    } catch (err) {
+      if (process.env.DEBUG_AUTH === 'true') {
+        // Journalisation minimale de debug sans exposer le token
+        console.warn('[auth-middleware] JWT verification failed:', (err as Error)?.name || 'Error');
+      }
       throw createError({
         statusCode: 401,
         statusMessage: 'Unauthorized: Invalid token',

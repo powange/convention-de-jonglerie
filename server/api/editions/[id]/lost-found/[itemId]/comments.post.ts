@@ -1,5 +1,6 @@
 import { prisma } from '../../../../../utils/prisma';
 import jwt from 'jsonwebtoken';
+import { getJwtSecret } from '../../../../../utils/jwt';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -24,8 +25,8 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const decoded = jwt.verify(token, useRuntimeConfig().jwtSecret) as any;
-    const userId = decoded.userId;
+  const decoded = jwt.verify(token, getJwtSecret()) as { userId?: number };
+  const userId = decoded.userId;
 
     if (!userId) {
       throw createError({
