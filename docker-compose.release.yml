@@ -37,6 +37,9 @@ services:
       SMTP_PASS: "${SMTP_PASS}"
       RECAPTCHA_SITE_KEY: "${RECAPTCHA_SITE_KEY}"
       RECAPTCHA_SECRET_KEY: "${RECAPTCHA_SECRET_KEY}"
+      # Exposition Nuxt (public/secret) basée sur les mêmes valeurs
+      NUXT_PUBLIC_RECAPTCHA_SITE_KEY: "${RECAPTCHA_SITE_KEY}"
+      NUXT_RECAPTCHA_SECRET_KEY: "${RECAPTCHA_SECRET_KEY}"
     volumes:
       - uploads_data:/app/public/uploads
     depends_on:
