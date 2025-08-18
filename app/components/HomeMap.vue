@@ -33,20 +33,20 @@
       <div class="absolute top-4 right-4 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-[1000] space-y-2">
         <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">{{ $t('components.map.temporal_status') }} :</div>
         <div class="flex items-center gap-2 text-sm">
-          <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+          <div class="w-3 h-3 bg-green-500 rounded-full" />
           <span class="text-gray-700 dark:text-gray-300">{{ $t('components.map.ongoing') }}</span>
         </div>
         <div class="flex items-center gap-2 text-sm">
-          <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+          <div class="w-3 h-3 bg-blue-500 rounded-full" />
           <span class="text-gray-700 dark:text-gray-300">{{ $t('components.map.upcoming') }}</span>
         </div>
         <div class="flex items-center gap-2 text-sm">
-          <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
+          <div class="w-3 h-3 bg-gray-500 rounded-full" />
           <span class="text-gray-700 dark:text-gray-300">{{ $t('components.map.past') }}</span>
         </div>
         <div v-if="authStore.isAuthenticated" class="pt-2 border-t border-gray-200 dark:border-gray-600">
           <div class="flex items-center gap-2 text-sm">
-            <div class="w-3 h-3 rounded-full border-2 border-yellow-500 bg-transparent"></div>
+            <div class="w-3 h-3 rounded-full border-2 border-yellow-500 bg-transparent" />
             <span class="text-gray-700 dark:text-gray-300">{{ $t('components.map.yellow_border_favorite') }}</span>
           </div>
         </div>
@@ -64,7 +64,8 @@ import { createCustomMarkerIcon, getEditionStatus } from '~/utils/mapMarkers';
 // Déclaration de type pour Leaflet global
 declare global {
   interface Window {
-    L: any;
+  // Leaflet global chargé dynamiquement
+  L: unknown;
   }
 }
 
@@ -80,7 +81,6 @@ const { t, locale } = useI18n();
 const mapContainer = ref<HTMLElement>();
 const mapReady = ref(false);
 let map: any = null;
-let leaflet: any = null;
 
 // Filtrer les éditions avec coordonnées
 const editionsWithCoordinates = computed(() => {
@@ -91,7 +91,7 @@ const editionsWithCoordinates = computed(() => {
 
 // Charger Leaflet dynamiquement (côté client uniquement)
 const loadLeaflet = async () => {
-  if (process.server) return;
+  if (import.meta.server) return;
   
   // Si Leaflet est déjà chargé, le retourner directement
   if (window.L) {
@@ -149,23 +149,23 @@ const initMap = async () => {
 
   const L = await loadLeaflet();
   if (!L) return;
+  const Lany = L as any;
 
   try {
     // Créer la carte
-    map = L.map(mapContainer.value, {
+  map = Lany.map(mapContainer.value, {
       zoomControl: true,
       attributionControl: true
     });
 
     // Ajouter les tuiles OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  Lany.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 19
     }).addTo(map);
 
     // Créer un groupe pour tous les marqueurs
-    const markers: any[] = [];
-    const now = new Date();
+  const markers: any[] = [];
 
     // Ajouter un marqueur pour chaque édition
     editionsWithCoordinates.value.forEach(edition => {
@@ -174,13 +174,13 @@ const initMap = async () => {
         const status = getEditionStatus(edition.startDate, edition.endDate);
         
         // Créer l'icône personnalisée
-        const icon = createCustomMarkerIcon(L, {
+  const icon = createCustomMarkerIcon(Lany, {
           isUpcoming: status.isUpcoming,
           isOngoing: status.isOngoing,
           isFavorite: isFav
         });
 
-        const marker = L.marker([edition.latitude, edition.longitude], { icon });
+  const marker = Lany.marker([edition.latitude, edition.longitude], { icon });
         
         // Créer le contenu du popup
         const popupContent = `
@@ -214,7 +214,7 @@ const initMap = async () => {
 
     // Ajuster la vue pour inclure tous les marqueurs
     if (markers.length > 0) {
-      const group = L.featureGroup(markers);
+  const group = Lany.featureGroup(markers);
       const bounds = group.getBounds();
       
       if (bounds.isValid()) {

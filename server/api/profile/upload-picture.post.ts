@@ -1,6 +1,5 @@
 import { 
   handleImageUpload, 
-  updateEntityWithImage,
   deleteOldImage
 } from '../../utils/image-upload';
 import { prisma } from '../../utils/prisma';

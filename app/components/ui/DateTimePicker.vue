@@ -38,8 +38,8 @@
 </template>
 
 <script setup lang="ts">
-import { watch, shallowRef, computed } from 'vue';
-import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date';
+import { watch, shallowRef } from 'vue';
+import { CalendarDate, getLocalTimeZone } from '@internationalized/date';
 import { useDateTimePicker } from '~/composables/useDateTimePicker';
 
 interface Props {
@@ -102,11 +102,7 @@ const {
 const calendarDateValue = shallowRef<CalendarDate | null>(null);
 
 // Formatter pour l'affichage de la date
-const { locale } = useI18n();
-const df = computed(() => {
-  const localeCode = locale.value === 'fr' ? 'fr-FR' : 'en-US';
-  return new DateFormatter(localeCode, { dateStyle: 'medium' });
-});
+// Formatter inutilisé retiré pour éviter un avertissement ESLint
 
 // Synchroniser calendarDate (JS Date) avec calendarDateValue (CalendarDate)
 watch(calendarDate, (newDate) => {

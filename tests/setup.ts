@@ -45,27 +45,27 @@ vi.mock('h3', async () => {
 // (les routes exportent directement defineEventHandler(...))
 // Nuxt devrait les injecter, mais on ajoute une sauvegarde ici pour les imports directs.
 declare global {
-  // eslint-disable-next-line no-var
+   
   var defineEventHandler: <T>(fn: T) => T
   // optional helpers that some tests set on global
-  // eslint-disable-next-line no-var
+   
   var readBody: ((...args: unknown[]) => unknown) | undefined
   // h3 helpers as globals (Nitro exposes these globally at runtime)
-  // eslint-disable-next-line no-var
+   
   var getRouterParam: ((event: unknown, name: string) => unknown) | undefined
-  // eslint-disable-next-line no-var
+   
   var getRouterParams: ((event: unknown) => Record<string, unknown>) | undefined
-  // eslint-disable-next-line no-var
+   
   var getHeader: ((event: unknown, name: string) => string | undefined) | undefined
-  // eslint-disable-next-line no-var
+   
   var setHeader: ((event: unknown, name: string, value: string) => void) | undefined
-  // eslint-disable-next-line no-var
+   
   var getCookie: ((event: unknown, name: string) => string | undefined) | undefined
-  // eslint-disable-next-line no-var
+   
   var setCookie: ((event: unknown, name: string, value: string) => void) | undefined
-  // eslint-disable-next-line no-var
+   
   var deleteCookie: ((event: unknown, name: string) => void) | undefined
-  // eslint-disable-next-line no-var
+   
   var getRequestURL: ((event: unknown) => URL) | undefined
 }
 // Rendre mockable par les tests (mockImplementation, etc.)
@@ -74,9 +74,9 @@ globalThis.defineEventHandler = vi.fn((fn) => fn) as unknown as typeof globalThi
 
 // Exposer createError global comme mock déléguant au vrai createError pour permettre aux tests de le surcharger
 // Si déjà défini par un test, ne pas l’écraser
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 if (!(globalThis as any).createError) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   ;(globalThis as any).createError = vi.fn((input: any) => h3CreateError(input))
 }
 
@@ -101,7 +101,10 @@ vi.mock('#imports', async () => {
   const actual = await vi.importActual<any>('#imports')
   return {
     ...actual,
-    useRuntimeConfig: vi.fn(() => ({ jwtSecret: 'test-secret' }))
+  useRuntimeConfig: vi.fn(() => ({})),
+  // Stubs par défaut pour l'auth par session (nuxt-auth-utils)
+  requireUserSession: vi.fn(async () => ({ user: { id: 1 } })),
+  getUserSession: vi.fn(async () => ({ user: { id: 1 } })),
   }
 })
 
@@ -117,7 +120,6 @@ vi.mock('../server/utils/rate-limiter', () => {
 })
 
 // Fournir également une implémentation globale de useRuntimeConfig pour les routes serveur qui l'appellent en global
-;(globalThis as any).useRuntimeConfig = vi.fn(() => ({ jwtSecret: 'test-secret' }))
+;(globalThis as any).useRuntimeConfig = vi.fn(() => ({}))
 
 // Forcer la valeur utilisée par nuxt.config.ts au cas où le runtime lirait la config réelle
-process.env.JWT_SECRET = 'test-secret'

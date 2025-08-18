@@ -1,7 +1,7 @@
 import { getEmailHash } from '../../utils/email-hash';
 import { prisma } from '../../utils/prisma';
 
-import type { Edition } from '~/types';
+// import type { Edition } from '~/types';
 
 
 export default defineEventHandler(async (event) => {
@@ -191,7 +191,8 @@ export default defineEventHandler(async (event) => {
     }
 
     // Construire la condition finale avec les filtres temporels
-    let finalWhere: any = where;
+  // Prisma where clause; fallback to unknown and narrow to object
+  let finalWhere: Record<string, unknown> = where;
     
     // Filtres temporels
     if (showPast !== undefined || showCurrent !== undefined || showFuture !== undefined) {
@@ -244,7 +245,7 @@ export default defineEventHandler(async (event) => {
       // Test si la table EditionCollaborator existe
       await prisma.editionCollaborator.findFirst();
       includeCollaborators = true;
-    } catch (error) {
+  } catch {
       console.log('Table EditionCollaborator pas encore créée, ignorer les collaborateurs');
     }
 
@@ -297,7 +298,7 @@ export default defineEventHandler(async (event) => {
             ...collab.user,
             emailHash: getEmailHash(collab.user.email),
             email: undefined
-          } as any
+          } as unknown
         }));
       }
       return edition;

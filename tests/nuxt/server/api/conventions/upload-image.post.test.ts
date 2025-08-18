@@ -2,6 +2,15 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import handler from '../../../../server/api/conventions/[id]/upload-image.post';
 import { prismaMock } from '../../../../__mocks__/prisma';
 
+// Import des mocks après la déclaration
+import { 
+  handleImageUpload, 
+  checkConventionUploadPermission, 
+  updateEntityWithImage,
+  deleteOldImage 
+} from '../../../../../server/utils/image-upload';
+import { uploadRateLimiter } from '../../../../../server/utils/api-rate-limiter';
+
 // Mock des utilitaires d'upload
 vi.mock('../../../../server/utils/image-upload', () => ({
   handleImageUpload: vi.fn(),
@@ -24,15 +33,6 @@ const mockEvent = {
     },
   },
 };
-
-// Import des mocks après la déclaration
-import { 
-  handleImageUpload, 
-  checkConventionUploadPermission, 
-  updateEntityWithImage,
-  deleteOldImage 
-} from '../../../../../server/utils/image-upload';
-import { uploadRateLimiter } from '../../../../../server/utils/api-rate-limiter';
 
 const mockHandleImageUpload = handleImageUpload as ReturnType<typeof vi.fn>;
 const mockCheckPermission = checkConventionUploadPermission as ReturnType<typeof vi.fn>;

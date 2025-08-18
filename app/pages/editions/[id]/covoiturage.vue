@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
@@ -50,9 +50,12 @@ const isFavorited = computed(() => (_editionId: number) => {
 const toggleFavorite = async (id: number) => {
   try {
     await editionStore.toggleFavorite(id);
-    toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'green' });
+    toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'success' });
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || t('errors.favorite_update_failed'), icon: 'i-heroicons-x-circle', color: 'red' });
+    const title = e && typeof e === 'object' && 'statusMessage' in e && typeof (e as any).statusMessage === 'string'
+      ? (e as any).statusMessage
+      : t('errors.favorite_update_failed')
+    toast.add({ title, icon: 'i-heroicons-x-circle', color: 'error' });
   }
 };
 

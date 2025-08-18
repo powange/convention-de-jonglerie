@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { H3Event } from 'h3';
 
+// Import après les mocks
+import { uploadRateLimiter, contentCreationRateLimiter, commentRateLimiter, searchRateLimiter } from '../../../../server/utils/api-rate-limiter';
+
 // Mock de createError
 const mockCreateError = vi.fn();
 
@@ -19,9 +22,6 @@ vi.mock('../../../server/utils/api-rate-limiter', async (importOriginal) => {
 vi.mock('#imports', () => ({
   createError: mockCreateError,
 }));
-
-// Import après les mocks
-import { uploadRateLimiter, contentCreationRateLimiter, commentRateLimiter, searchRateLimiter } from '../../../../server/utils/api-rate-limiter';
 
 describe('API Rate Limiters', () => {
   beforeEach(() => {

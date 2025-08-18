@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
+import { requireUserSession } from '#imports';
 
 const prisma = new PrismaClient();
 
@@ -25,26 +25,8 @@ export default defineEventHandler(async (event) => {
     }
 
     // Vérifier l'authentification
-    const authHeader = getHeader(event, 'authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token d\'authentification requis'
-      });
-    }
-
-    const token = authHeader.substring(7);
-    
-    let decoded;
-    try {
-  const { getJwtSecret } = await import('../../../../utils/jwt')
-      decoded = jwt.verify(token, getJwtSecret()) as { userId?: number };
-    } catch {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token invalide'
-      });
-    }
+    const { user } = await requireUserSession(event)
+    const requesterId = user.id;
 
     // Vérifier que l'offre existe
     const offer = await prisma.carpoolOffer.findUnique({
@@ -59,7 +41,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Vérifier que l'utilisateur authentifié est le créateur de l'offre
-    if (offer.userId !== decoded.userId) {
+    if (offer.userId !== requesterId) {
       throw createError({
         statusCode: 403,
         statusMessage: 'Seul le créateur de l\'offre peut retirer des covoitureurs'

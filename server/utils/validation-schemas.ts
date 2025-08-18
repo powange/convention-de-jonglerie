@@ -9,7 +9,7 @@ export const passwordSchema = z.string()
 export const pseudoSchema = z.string().min(3, 'Le pseudo doit contenir au moins 3 caractères').max(50, 'Le pseudo ne peut pas dépasser 50 caractères');
 export const nameSchema = z.string().min(1, 'Ce champ est requis').max(100, 'Ce champ ne peut pas dépasser 100 caractères');
 export const phoneSchema = z.string().optional().refine(
-  (val) => !val || /^[\+]?[0-9\s\-\(\)]+$/.test(val),
+  (val) => !val || /^\+?[0-9\s\-()]+$/.test(val),
   'Numéro de téléphone invalide'
 );
 export const urlSchema = z.string().url('URL invalide').optional().or(z.literal(''));

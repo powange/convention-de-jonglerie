@@ -63,7 +63,7 @@
           class="w-full h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
           @error="logoError = true"
           @load="logoError = false"
-        />
+        >
         <UAlert
           v-if="logoError"
           color="red"

@@ -2,6 +2,11 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { validateImageFile, generateUniqueFilename, handleImageUpload } from '../../../../server/utils/image-upload';
 import type { MultiPartData } from 'h3';
 
+// Import des mocks
+import { promises as fs } from 'fs';
+import { copyToOutputPublic } from '../../../../server/utils/copy-to-output';
+import { randomUUID } from 'crypto';
+
 // Mock des modules externes
 vi.mock('fs', () => {
   const mkdir = vi.fn()
@@ -24,11 +29,6 @@ vi.mock('crypto', () => {
   const mod = { randomUUID: vi.fn() };
   return { ...mod, default: { ...mod } };
 });
-
-// Import des mocks
-import { promises as fs } from 'fs';
-import { copyToOutputPublic } from '../../../../server/utils/copy-to-output';
-import { randomUUID } from 'crypto';
 
 const mockFs = fs as any;
 const mockCopyToOutputPublic = copyToOutputPublic as ReturnType<typeof vi.fn>;

@@ -1,6 +1,5 @@
 import { prisma } from '../../../../../utils/prisma';
-import * as jwt from 'jsonwebtoken';
-import { getJwtSecret } from '../../../../../utils/jwt';
+import { requireUserSession } from '#imports';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -16,17 +15,8 @@ export default defineEventHandler(async (event) => {
     }
 
     // Vérifier l'authentification
-    const token = getCookie(event, 'auth-token') || getHeader(event, 'authorization')?.replace('Bearer ', '');
-    
-    if (!token) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token d\'authentification requis',
-      });
-    }
-
-  const decoded = jwt.verify(token, getJwtSecret()) as { userId?: number };
-  const userId = decoded.userId;
+  const { user } = await requireUserSession(event)
+  const userId = user.id
 
     if (!userId) {
       throw createError({

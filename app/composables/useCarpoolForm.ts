@@ -1,4 +1,3 @@
-import { useAuthStore } from '~/stores/auth';
 
 export type CarpoolType = 'offer' | 'request';
 
@@ -21,7 +20,7 @@ export interface CarpoolFormConfig {
   successTitle: string;
   successDescription: string;
   errorDescription: string;
-  initialData?: any;
+  initialData?: Partial<CarpoolFormData> & { id?: number | string };
 }
 
 export function useCarpoolForm(config: CarpoolFormConfig) {
@@ -106,7 +105,7 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
     }
     
     // Validation du numéro de téléphone
-    if (state.phoneNumber && !/^[\+]?[0-9\s\-\(\)]+$/.test(state.phoneNumber)) {
+  if (state.phoneNumber && !/^\+?[0-9\s\-()]+$/.test(state.phoneNumber)) {
       errors.push({ path: 'phoneNumber', message: t('errors.invalid_phone_number') });
     }
     
@@ -172,12 +171,8 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
     isSubmitting.value = true;
     
     try {
-      const authStore = useAuthStore();
       const response = await $fetch(config.endpoint, {
         method: config.method || 'POST',
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`,
-        },
         body: form,
       });
       
@@ -186,7 +181,7 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
       toast.add({
         title: config.successTitle,
         description: config.successDescription,
-        color: 'green',
+        color: 'success',
       });
       
       // Réinitialiser le formulaire uniquement en mode création
@@ -195,13 +190,13 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
       }
       
       emit('success');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Erreur API:', error);
       const { t } = useI18n();
       toast.add({
         title: t('common.error'),
         description: config.errorDescription,
-        color: 'red',
+        color: 'error',
       });
     } finally {
       isSubmitting.value = false;

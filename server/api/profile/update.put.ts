@@ -1,4 +1,3 @@
-import bcrypt from 'bcryptjs';
 import { prisma } from '../../utils/prisma';
 import { updateProfileSchema, validateAndSanitize, handleValidationError } from '../../utils/validation-schemas';
 import { z } from 'zod';

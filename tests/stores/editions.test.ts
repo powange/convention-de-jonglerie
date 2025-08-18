@@ -2,10 +2,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useEditionStore } from '../../app/stores/editions'
 import { useAuthStore } from '../../app/stores/auth'
-import type { Edition, User, HttpError, ConventionCollaborator } from '~/types'
 
 // Mock des fonctions Nuxt
-global.$fetch = vi.fn()
+global.$fetch = vi.fn() as any
 global.useCookie = vi.fn()
 global.useRoute = vi.fn()
 global.navigateTo = vi.fn()
@@ -23,7 +22,7 @@ describe('useEditionStore', () => {
   let editionStore: ReturnType<typeof useEditionStore>
   let authStore: ReturnType<typeof useAuthStore>
   
-  const mockUser: User = {
+  const mockUser = {
     id: 1,
     email: 'test@example.com',
     pseudo: 'testuser',
@@ -32,7 +31,7 @@ describe('useEditionStore', () => {
     isGlobalAdmin: false
   }
 
-  const mockEdition: Edition = {
+  const mockEdition = {
     id: 1,
     name: 'Test Edition',
     startDate: '2024-06-01',
@@ -78,7 +77,6 @@ describe('useEditionStore', () => {
     
     // Mock des valeurs par défaut
     authStore.user = mockUser
-    authStore.token = 'test-token'
   })
 
   afterEach(() => {
@@ -169,10 +167,10 @@ describe('useEditionStore', () => {
     })
 
     it('devrait gérer les erreurs de récupération', async () => {
-      const mockError = {
+  const mockError = {
         message: 'Network error',
         data: { message: 'Failed to fetch' }
-      } as HttpError
+  }
       vi.mocked($fetch).mockRejectedValue(mockError)
 
       await editionStore.fetchEditions()
@@ -230,7 +228,7 @@ describe('useEditionStore', () => {
   })
 
   describe('Action addEdition', () => {
-    const newEditionData = {
+  const newEditionData = {
       name: 'New Edition',
       startDate: '2024-07-01',
       endDate: '2024-07-03',
@@ -254,9 +252,6 @@ describe('useEditionStore', () => {
 
       expect($fetch).toHaveBeenCalledWith('/api/editions', {
         method: 'POST',
-        headers: {
-          Authorization: 'Bearer test-token'
-        },
         body: newEditionData
       })
       expect(result).toEqual(newEditionCopy)
@@ -265,10 +260,10 @@ describe('useEditionStore', () => {
     })
 
     it('devrait propager les erreurs d\'ajout', async () => {
-      const mockError = {
+  const mockError = {
         message: 'Validation error',
         data: { message: 'Invalid data' }
-      } as HttpError
+  }
       vi.mocked($fetch).mockRejectedValue(mockError)
 
       await expect(editionStore.addEdition(newEditionData))
@@ -290,9 +285,6 @@ describe('useEditionStore', () => {
 
       expect($fetch).toHaveBeenCalledWith('/api/editions/1', {
         method: 'PUT',
-        headers: {
-          Authorization: 'Bearer test-token'
-        },
         body: updatedEdition
       })
       expect(result).toEqual(updatedEdition)
@@ -311,10 +303,10 @@ describe('useEditionStore', () => {
     })
 
     it('devrait propager les erreurs de mise à jour', async () => {
-      const mockError = {
+  const mockError = {
         message: 'Permission denied',
         data: { message: 'Unauthorized' }
-      } as HttpError
+  }
       vi.mocked($fetch).mockRejectedValue(mockError)
 
       await expect(editionStore.updateEdition(1, mockEdition))
@@ -334,20 +326,17 @@ describe('useEditionStore', () => {
       await editionStore.deleteEdition(1)
 
       expect($fetch).toHaveBeenCalledWith('/api/editions/1', {
-        method: 'DELETE',
-        headers: {
-          Authorization: 'Bearer test-token'
-        }
+        method: 'DELETE'
       })
       expect(editionStore.editions).toHaveLength(1)
       expect(editionStore.editions[0].id).toBe(2)
     })
 
     it('devrait propager les erreurs de suppression', async () => {
-      const mockError = {
+  const mockError = {
         message: 'Permission denied',
         data: { message: 'Cannot delete' }
-      } as HttpError
+  }
       vi.mocked($fetch).mockRejectedValue(mockError)
 
       await expect(editionStore.deleteEdition(1))
@@ -368,10 +357,7 @@ describe('useEditionStore', () => {
       await editionStore.toggleFavorite(1)
 
       expect($fetch).toHaveBeenCalledWith('/api/editions/1/favorite', {
-        method: 'POST',
-        headers: {
-          Authorization: 'Bearer test-token'
-        }
+        method: 'POST'
       })
       
       // Vérifier l'optimistic update
@@ -396,7 +382,7 @@ describe('useEditionStore', () => {
     })
 
     it('devrait annuler l\'optimistic update en cas d\'erreur', async () => {
-      const mockError = { message: 'Network error' } as HttpError
+  const mockError = { message: 'Network error' }
       vi.mocked($fetch).mockRejectedValue(mockError)
 
       // Commencer avec favori non ajouté
@@ -411,7 +397,7 @@ describe('useEditionStore', () => {
   })
 
   describe('Actions collaborateurs', () => {
-    const mockCollaborator: ConventionCollaborator = {
+  const mockCollaborator = {
       id: 1,
       user: mockUser,
       role: 'MODERATOR',
@@ -426,16 +412,12 @@ describe('useEditionStore', () => {
 
         const result = await editionStore.getCollaborators(1)
 
-        expect($fetch).toHaveBeenCalledWith('/api/editions/1/collaborators', {
-          headers: {
-            Authorization: 'Bearer test-token'
-          }
-        })
+  expect($fetch).toHaveBeenCalledWith('/api/editions/1/collaborators')
         expect(result).toEqual([mockCollaborator])
       })
 
       it('devrait propager les erreurs', async () => {
-        const mockError = { message: 'Unauthorized' } as HttpError
+  const mockError = { message: 'Unauthorized' }
         vi.mocked($fetch).mockRejectedValue(mockError)
 
         await expect(editionStore.getCollaborators(1))
@@ -457,9 +439,6 @@ describe('useEditionStore', () => {
 
         expect($fetch).toHaveBeenCalledWith('/api/editions/1/collaborators', {
           method: 'POST',
-          headers: {
-            Authorization: 'Bearer test-token'
-          },
           body: { userEmail: 'collab@test.com', canEdit: true }
         })
         expect(result).toEqual(collaboratorCopy)
@@ -482,10 +461,7 @@ describe('useEditionStore', () => {
         await editionStore.removeCollaborator(1, 1)
 
         expect($fetch).toHaveBeenCalledWith('/api/editions/1/collaborators/1', {
-          method: 'DELETE',
-          headers: {
-            Authorization: 'Bearer test-token'
-          }
+          method: 'DELETE'
         })
         expect(editionStore.editions[0].collaborators).toHaveLength(0)
       })
@@ -493,7 +469,7 @@ describe('useEditionStore', () => {
   })
 
   describe('Méthodes de permission', () => {
-    const mockEditionWithConvention: Edition = {
+  const mockEditionWithConvention = {
       ...mockEdition,
       convention: {
         id: 1,

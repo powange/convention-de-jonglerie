@@ -1,10 +1,8 @@
-import * as jwt from 'jsonwebtoken';
-import { prisma } from '../utils/prisma';
-import { getJwtSecret } from '../utils/jwt';
-import { getUserSession } from '#auth-utils'
+// Note: on charge getUserSession dynamiquement pour faciliter le mocking dans les tests
 
 
 export default defineEventHandler(async (event) => {
+  const { getUserSession } = await import('#imports')
   const fullPath = event.path;
   const path = fullPath.split('?')[0]; // Extraire seulement la partie avant les paramètres de requête
   const requestMethod = event.node.req.method;
@@ -27,20 +25,9 @@ export default defineEventHandler(async (event) => {
 
   // Feedback API route - public for POST (allows both authenticated and anonymous users)
   if (path === '/api/feedback' && requestMethod === 'POST') {
-    // Pour les utilisateurs connectés, on essaie de récupérer leur info via le token
-    const token = event.node.req.headers.authorization?.split(' ')[1];
-    if (token) {
-      try {
-  const decoded = jwt.verify(token, getJwtSecret()) as { userId: number };
-        event.context.user = await prisma.user.findUnique({
-          where: { id: decoded.userId },
-          select: { id: true, email: true, pseudo: true, nom: true, prenom: true, isGlobalAdmin: true },
-        });
-      } catch {
-        // Si le token est invalide, on continue sans utilisateur (feedback anonyme)
-        event.context.user = null;
-      }
-    }
+    // Autoriser anonymes; si session existante, lier user au contexte
+  const session = await getUserSession(event)
+    event.context.user = session?.user || null
     return;
   }
   
@@ -93,48 +80,13 @@ export default defineEventHandler(async (event) => {
   // --- Protect all other API routes --- //
   // Only apply token check if the path starts with /api/
   if (path.startsWith('/api/')) {
-    // Si une session utilisateur scellée est active, hydrater event.context.user et continuer
-    const session = await getUserSession(event)
+    // Hydrater depuis la session uniquement
+  const session = await getUserSession(event)
     if (session?.user) {
       event.context.user = session.user
       return
     }
-    // Récupérer le token depuis l'en-tête Authorization ou le cookie (fallback)
-    const headerToken = event.node.req.headers.authorization?.split(' ')[1];
-    const cookieToken = getCookie(event, 'auth-token');
-    const token = headerToken || cookieToken || undefined;
-
-    if (!token) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Unauthorized: No token provided',
-      });
-    }
-
-    try {
-  const decoded = jwt.verify(token, getJwtSecret()) as { userId: number };
-      
-      event.context.user = await prisma.user.findUnique({
-        where: { id: decoded.userId },
-        select: { id: true, email: true, pseudo: true, nom: true, prenom: true, isGlobalAdmin: true },
-      });
-
-      if (!event.context.user) {
-        throw createError({
-          statusCode: 401,
-          statusMessage: 'Unauthorized: User not found',
-        });
-      }
-    } catch (err) {
-      if (process.env.DEBUG_AUTH === 'true') {
-        // Journalisation minimale de debug sans exposer le token
-        console.warn('[auth-middleware] JWT verification failed:', (err as Error)?.name || 'Error');
-      }
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Unauthorized: Invalid token',
-      });
-    }
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
 
   // --- Page Routes (not API routes) --- //

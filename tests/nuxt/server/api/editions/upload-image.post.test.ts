@@ -1,6 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import handler from '../../../../server/api/editions/[id]/upload-image.post';
 
+// Import des mocks après la déclaration
+import { 
+  handleImageUpload, 
+  checkEditionUploadPermission, 
+  updateEntityWithImage,
+  deleteOldImage 
+} from '../../../../../server/utils/image-upload';
+import { uploadRateLimiter } from '../../../../../server/utils/api-rate-limiter';
+
 // Mock des utilitaires d'upload
 vi.mock('../../../../server/utils/image-upload', () => ({
   handleImageUpload: vi.fn(),
@@ -23,15 +32,6 @@ const mockEvent = {
     },
   },
 };
-
-// Import des mocks après la déclaration
-import { 
-  handleImageUpload, 
-  checkEditionUploadPermission, 
-  updateEntityWithImage,
-  deleteOldImage 
-} from '../../../../../server/utils/image-upload';
-import { uploadRateLimiter } from '../../../../../server/utils/api-rate-limiter';
 
 const mockHandleImageUpload = handleImageUpload as ReturnType<typeof vi.fn>;
 const mockCheckPermission = checkEditionUploadPermission as ReturnType<typeof vi.fn>;

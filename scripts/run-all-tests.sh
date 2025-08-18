@@ -4,6 +4,12 @@ sleep 5
 mkdir -p /app/public/uploads
 npx prisma migrate deploy >/dev/null 2>&1 || true
 
+# Vérifier la présence des dépendances critiques et installer si nécessaire
+node -e "require.resolve('nuxt-auth-utils')" >/dev/null 2>&1 || {
+  echo "nuxt-auth-utils manquant: exécution de npm ci..."
+  npm ci
+}
+
 echo "==================================="
 echo "     Lancement de tous les tests    "
 echo "==================================="

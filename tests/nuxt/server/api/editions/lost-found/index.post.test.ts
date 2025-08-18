@@ -1,16 +1,17 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import handler from '../../../../../server/api/editions/[id]/lost-found/index.post';
 import { prismaMock } from '../../../../../__mocks__/prisma';
+import { hasEditionEditPermission } from '../../../../../../server/utils/permissions';
+// S'assurer que requireUserSession est bien un mock vi.fn dans ce fichier
+vi.mock('#imports', async () => {
+  const actual = await vi.importActual<any>('#imports')
+  return { ...actual, requireUserSession: vi.fn(async () => ({ user: { id: 1 } })) }
+})
+import { requireUserSession } from '#imports';
 
 // Mock des utilitaires
 vi.mock('../../../../../server/utils/permissions', () => ({
   hasEditionEditPermission: vi.fn(),
-}));
-
-vi.mock('jsonwebtoken', () => ({
-  default: {
-    verify: vi.fn(),
-  },
 }));
 
 const mockEvent = {
@@ -53,26 +54,19 @@ const mockLostFoundItem = {
   comments: [],
 };
 
-// Import des mocks après la déclaration
-import { hasEditionEditPermission } from '../../../../../../server/utils/permissions';
-import jwt from 'jsonwebtoken';
-
 const mockHasPermission = hasEditionEditPermission as ReturnType<typeof vi.fn>;
-const mockJwtVerify = jwt.verify as ReturnType<typeof vi.fn>;
+let mockRequireUserSession: ReturnType<typeof vi.fn>;
 
 describe('/api/editions/[id]/lost-found POST', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     mockHasPermission.mockReset();
-    mockJwtVerify.mockReset();
+    const importsMod: any = await import('#imports')
+    mockRequireUserSession = importsMod.requireUserSession as ReturnType<typeof vi.fn>
+    mockRequireUserSession.mockReset?.();
     prismaMock.edition.findUnique.mockReset();
     prismaMock.lostFoundItem.create.mockReset();
     global.readBody = vi.fn();
     global.getRouterParam = vi.fn().mockReturnValue('1');
-    global.getCookie = vi.fn().mockReturnValue('valid-token');
-    global.getHeader = vi.fn();
-    global.useRuntimeConfig = vi.fn().mockReturnValue({
-      jwtSecret: 'test-secret',
-    });
   });
 
   it('devrait créer un objet trouvé avec succès', async () => {
@@ -81,8 +75,8 @@ describe('/api/editions/[id]/lost-found POST', () => {
       imageUrl: '/uploads/lost-found/item-123.jpg',
     };
 
-    global.readBody.mockResolvedValue(requestBody);
-    mockJwtVerify.mockReturnValue({ userId: 1 });
+  global.readBody.mockResolvedValue(requestBody);
+  (mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } });
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
     mockHasPermission.mockResolvedValue(true);
     prismaMock.lostFoundItem.create.mockResolvedValue(mockLostFoundItem);
@@ -110,8 +104,8 @@ describe('/api/editions/[id]/lost-found POST', () => {
       description: 'Clés trouvées dans les toilettes',
     };
 
-    global.readBody.mockResolvedValue(requestBody);
-    mockJwtVerify.mockReturnValue({ userId: 1 });
+  global.readBody.mockResolvedValue(requestBody);
+  (mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } });
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
     mockHasPermission.mockResolvedValue(true);
     prismaMock.lostFoundItem.create.mockResolvedValue({
@@ -140,43 +134,14 @@ describe('/api/editions/[id]/lost-found POST', () => {
     await expect(handler(mockEvent as any)).rejects.toThrow('ID d\'édition invalide');
   });
 
-  it('devrait rejeter si pas de token d\'authentification', async () => {
-    global.getCookie.mockReturnValue(null);
-    global.getHeader.mockReturnValue(null);
+  it('devrait rejeter si non authentifié (pas de session)', async () => {
+  (mockRequireUserSession as any).mockRejectedValueOnce(Object.assign(new Error('Unauthorized'), { statusCode: 401 }));
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Token d\'authentification requis');
-  });
-
-  it('devrait accepter un token dans les headers', async () => {
-    global.getCookie.mockReturnValue(null);
-    global.getHeader.mockReturnValue('Bearer valid-token');
-    mockJwtVerify.mockReturnValue({ userId: 1 });
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    mockHasPermission.mockResolvedValue(true);
-    prismaMock.lostFoundItem.create.mockResolvedValue(mockLostFoundItem);
-    global.readBody.mockResolvedValue({ description: 'Test item' });
-
-    await handler(mockEvent as any);
-
-    expect(mockJwtVerify).toHaveBeenCalledWith('valid-token', 'test-secret');
-  });
-
-  it('devrait rejeter si token invalide', async () => {
-    mockJwtVerify.mockImplementation(() => {
-      throw new Error('Invalid token');
-    });
-
-    await expect(handler(mockEvent as any)).rejects.toThrow('Token invalide');
-  });
-
-  it('devrait rejeter si userId manquant dans le token', async () => {
-    mockJwtVerify.mockReturnValue({});
-
-    await expect(handler(mockEvent as any)).rejects.toThrow('Token invalide');
+    await expect(handler(mockEvent as any)).rejects.toThrow('Unauthorized');
   });
 
   it('devrait rejeter si édition non trouvée', async () => {
-    mockJwtVerify.mockReturnValue({ userId: 1 });
+  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
     prismaMock.edition.findUnique.mockResolvedValue(null);
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Édition non trouvée');
@@ -188,7 +153,7 @@ describe('/api/editions/[id]/lost-found POST', () => {
       endDate: new Date(Date.now() + 86400000), // Demain
     };
 
-    mockJwtVerify.mockReturnValue({ userId: 1 });
+  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
     prismaMock.edition.findUnique.mockResolvedValue(ongoingEdition);
 
     await expect(handler(mockEvent as any)).rejects.toThrow(
@@ -197,7 +162,7 @@ describe('/api/editions/[id]/lost-found POST', () => {
   });
 
   it('devrait rejeter si utilisateur n\'est pas collaborateur', async () => {
-    mockJwtVerify.mockReturnValue({ userId: 1 });
+  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
     mockHasPermission.mockResolvedValue(false);
 
@@ -211,8 +176,8 @@ describe('/api/editions/[id]/lost-found POST', () => {
       imageUrl: '/uploads/test.jpg',
     };
 
-    global.readBody.mockResolvedValue(requestBody);
-    mockJwtVerify.mockReturnValue({ userId: 1 });
+  global.readBody.mockResolvedValue(requestBody);
+  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
     mockHasPermission.mockResolvedValue(true);
 
@@ -224,8 +189,8 @@ describe('/api/editions/[id]/lost-found POST', () => {
       description: '   ',
     };
 
-    global.readBody.mockResolvedValue(requestBody);
-    mockJwtVerify.mockReturnValue({ userId: 1 });
+  global.readBody.mockResolvedValue(requestBody);
+  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
     mockHasPermission.mockResolvedValue(true);
 
@@ -238,7 +203,7 @@ describe('/api/editions/[id]/lost-found POST', () => {
     };
 
     global.readBody.mockResolvedValue(requestBody);
-    mockJwtVerify.mockReturnValue({ userId: 1 });
+  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
     mockHasPermission.mockResolvedValue(true);
 
@@ -250,8 +215,8 @@ describe('/api/editions/[id]/lost-found POST', () => {
       description: '  Objet avec espaces  ',
     };
 
-    global.readBody.mockResolvedValue(requestBody);
-    mockJwtVerify.mockReturnValue({ userId: 1 });
+  global.readBody.mockResolvedValue(requestBody);
+  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
     mockHasPermission.mockResolvedValue(true);
     prismaMock.lostFoundItem.create.mockResolvedValue(mockLostFoundItem);
@@ -267,8 +232,8 @@ describe('/api/editions/[id]/lost-found POST', () => {
   });
 
   it('devrait gérer les erreurs de base de données', async () => {
-    global.readBody.mockResolvedValue({ description: 'Test item' });
-    mockJwtVerify.mockReturnValue({ userId: 1 });
+  global.readBody.mockResolvedValue({ description: 'Test item' });
+  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
     mockHasPermission.mockResolvedValue(true);
     prismaMock.lostFoundItem.create.mockRejectedValue(new Error('DB Error'));
@@ -282,7 +247,7 @@ describe('/api/editions/[id]/lost-found POST', () => {
       message: 'Permission denied',
     };
 
-    mockJwtVerify.mockReturnValue({ userId: 1 });
+  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
     mockHasPermission.mockRejectedValue(httpError);
 

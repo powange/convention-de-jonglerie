@@ -5,7 +5,7 @@
         <template #header>
           <div class="flex justify-between items-center">
             <NuxtLink to="/" class="flex items-center">
-              <img src="/logos/logo.svg" :alt="$t('app.title')" class="h-16 sm:h-30 w-auto" >
+              <img src="/logos/logo.svg" :alt="$t('app.title')" class="h-16 sm:h-30 w-auto">
               <span class="ml-2 text-sm sm:text-xl font-bold">{{ $t('app.title') }}</span>
             </NuxtLink>
             <div class="flex items-center gap-4">
@@ -17,7 +17,7 @@
                   size="sm"
                   :title="$t('footer.language_selector')"
                 >
-                  <span v-if="currentLanguage?.flag" :class="currentLanguage.flag" class="w-4 h-3"></span>
+                  <span v-if="currentLanguage?.flag" :class="currentLanguage.flag" class="w-4 h-3" />
                 </UButton>
                 
                 <!-- Slots pour les drapeaux de chaque langue -->
@@ -29,7 +29,7 @@
                   <span 
                     :class="languageConfig[lang.code as keyof typeof languageConfig]?.flag" 
                     class="w-4 h-3 shrink-0"
-                  ></span>
+                  />
                 </template>
               </UDropdownMenu>
 
@@ -120,8 +120,6 @@ import UserAvatar from '~/components/ui/UserAvatar.vue';
 import AppFooter from '~/components/ui/AppFooter.vue';
 
 const authStore = useAuthStore();
-const toast = useToast();
-const router = useRouter();
 const { locale, locales, setLocale, t } = useI18n();
 
 // État réactif pour la taille d'écran

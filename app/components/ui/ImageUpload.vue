@@ -8,7 +8,7 @@
           :src="previewUrl || modelValue" 
           :alt="alt" 
           class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-700"
-        />
+        >
         <div class="absolute top-2 right-2 flex space-x-2">
           <!-- Bouton de suppression -->
           <UButton
@@ -37,11 +37,11 @@
       <div 
         v-else
         class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
-        @click="triggerFileInput"
-        @dragover.prevent="onDragOver"
-        @dragleave.prevent="onDragLeave" 
-        @drop.prevent="onDrop"
         :class="{ 'border-blue-400 bg-blue-50 dark:bg-blue-900/20': isDragOver }"
+        @click="triggerFileInput"
+        @dragover.prevent="onDragOver" 
+        @dragleave.prevent="onDragLeave"
+        @drop.prevent="onDrop"
       >
         <UIcon name="i-heroicons-photo" class="text-4xl text-gray-400 dark:text-gray-500 mb-3" />
         <p class="text-gray-600 dark:text-gray-400 mb-2">
@@ -62,7 +62,7 @@
         :accept="validation.allowedTypes.join(',')"
         class="hidden"
         @change="handleFileSelect"
-      />
+      >
 
       <!-- Boutons d'action -->
       <div v-if="!uploading" class="flex justify-center space-x-2">
@@ -214,8 +214,9 @@ const upload = async () => {
     const result = await uploadFile(props.endpoint)
     emit('update:modelValue', result.imageUrl || null)
     emit('uploaded', result)
-  } catch (uploadError: any) {
-    emit('error', uploadError.message || 'Upload failed')
+  } catch (uploadError: unknown) {
+    const message = uploadError instanceof Error ? uploadError.message : 'Upload failed'
+    emit('error', message)
   }
 }
 
@@ -231,8 +232,9 @@ const handleDelete = async () => {
       await deleteImage(props.endpoint)
       emit('update:modelValue', null)
       emit('deleted')
-    } catch (deleteError: any) {
-      emit('error', deleteError.message || 'Delete failed')
+    } catch (deleteError: unknown) {
+      const message = deleteError instanceof Error ? deleteError.message : 'Delete failed'
+      emit('error', message)
     }
   }
 }

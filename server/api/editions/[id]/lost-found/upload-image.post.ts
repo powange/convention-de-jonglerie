@@ -1,9 +1,10 @@
-import jwt from 'jsonwebtoken';
+// Import dynamique pour compat tests/mocks (#imports)
 import { hasEditionEditPermission } from '../../../../utils/permissions';
 import { handleImageUpload } from '../../../../utils/image-upload';
 
 export default defineEventHandler(async (event) => {
   try {
+  const { requireUserSession } = await import('#imports')
     const editionId = parseInt(getRouterParam(event, 'id') as string);
 
     if (!editionId || isNaN(editionId)) {
@@ -14,27 +15,8 @@ export default defineEventHandler(async (event) => {
     }
 
     // Vérifier l'authentification
-    const token = getCookie(event, 'auth-token') || getHeader(event, 'authorization')?.replace('Bearer ', '');
-    
-    if (!token) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token d\'authentification requis',
-      });
-    }
-
-    let decoded;
-    try {
-      const { getJwtSecret } = await import('../../../../utils/jwt');
-      decoded = jwt.verify(token, getJwtSecret()) as { userId?: number };
-    } catch {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token invalide',
-      });
-    }
-    
-    const userId = decoded.userId;
+  const { user } = await requireUserSession(event)
+    const userId = user.id
 
     if (!userId) {
       throw createError({
@@ -71,11 +53,11 @@ export default defineEventHandler(async (event) => {
     }
 
     return { imageUrl: uploadResult.imageUrl };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Erreur lors de l\'upload de l\'image:', error);
-    
-    if (error.statusCode) {
-      throw error;
+    const httpError = error as { statusCode?: number }
+    if (httpError?.statusCode) {
+      throw error
     }
     
     throw createError({

@@ -187,7 +187,7 @@ RECAPTCHA_SITE_KEY="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
 NUXT_PUBLIC_RECAPTCHA_SITE_KEY="6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
 
 # JWT pour tests
-JWT_SECRET="test-jwt-secret-key"
+NUXT_SESSION_PASSWORD="test-session-secret-key"
 ```
 
 ### Configuration Vitest

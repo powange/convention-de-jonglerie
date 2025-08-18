@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
+import { requireUserSession } from '#imports';
 
 const prisma = new PrismaClient();
 
@@ -23,32 +23,16 @@ export default defineEventHandler(async (event) => {
     }
 
     // Vérifier l'authentification
-    const authHeader = getHeader(event, 'authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token d\'authentification requis'
-      });
-    }
 
-    const token = authHeader.substring(7);
     
-    let decoded;
-    try {
-  const { getJwtSecret } = await import('../../../utils/jwt')
-      decoded = jwt.verify(token, getJwtSecret()) as { userId?: number };
-    } catch {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token invalide'
-      });
-    }
+    const { user } = await requireUserSession(event)
+    const userId = user.id
 
     // Récupérer les données du body
-    const body = await readBody(event);
-    const { userId } = body;
+  const body = await readBody(event);
+  const { userId: targetUserId } = body;
 
-    if (!userId) {
+  if (!targetUserId) {
       throw createError({
         statusCode: 400,
         statusMessage: 'ID utilisateur requis'
@@ -72,7 +56,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Vérifier que l'utilisateur authentifié est le créateur de l'offre
-    if (offer.userId !== decoded.userId) {
+  if (offer.userId !== userId) {
       throw createError({
         statusCode: 403,
         statusMessage: 'Seul le créateur de l\'offre peut ajouter des covoitureurs'
@@ -81,7 +65,7 @@ export default defineEventHandler(async (event) => {
 
     // Vérifier que l'utilisateur à ajouter existe
     const userToAdd = await prisma.user.findUnique({
-      where: { id: userId }
+  where: { id: targetUserId }
     });
 
     if (!userToAdd) {
@@ -96,7 +80,7 @@ export default defineEventHandler(async (event) => {
       where: {
         carpoolOfferId_userId: {
           carpoolOfferId: offerId,
-          userId: userId
+          userId: targetUserId
         }
       }
     });
@@ -118,7 +102,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Vérifier que ce n'est pas le créateur de l'offre qui s'ajoute lui-même
-    if (userId === offer.userId) {
+  if (targetUserId === offer.userId) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Le créateur de l\'offre ne peut pas s\'ajouter comme passager'
@@ -129,8 +113,8 @@ export default defineEventHandler(async (event) => {
     const passenger = await prisma.carpoolPassenger.create({
       data: {
         carpoolOfferId: offerId,
-        userId: userId,
-        addedById: decoded.userId
+  userId: targetUserId,
+  addedById: userId
       },
       include: {
         user: {

@@ -19,6 +19,12 @@ Le projet sépare clairement les suites pour de meilleures perfs et une maintena
   - `npm run test:nuxt` (watch)
   - `npm run test:nuxt:run` (one-shot)
 
+Notes Auth (nuxt-auth-utils):
+- Les helpers `getUserSession` et `requireUserSession` sont moqués via `#imports`.
+- Dans le code serveur, on privilégie les imports dynamiques (`await import('#imports')`) pour garantir que les mocks Vitest soient appliqués.
+- Dans les tests, récupérez une référence stable au mock dans `beforeEach` pour utiliser `mockResolvedValueOnce` et `mockRejectedValueOnce` proprement.
+- Simulez les erreurs HTTP en ajoutant `statusCode` à l'Error: `Object.assign(new Error('Unauthorized'), { statusCode: 401 })`.
+
 3) Intégration/DB (Prisma + MySQL réels)
 - Fichier config: `vitest.config.integration.ts`
 - Setup: `tests/setup-common.ts`, `tests/setup-integration.ts`, `tests/setup-db.ts`

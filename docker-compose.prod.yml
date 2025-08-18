@@ -26,7 +26,6 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: "mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database-prod:3306/${MYSQL_DATABASE:-convention_db}"
-      JWT_SECRET: "${JWT_SECRET}"
       NUXT_HOST: "0.0.0.0"
       NUXT_PORT: "3000"
       NODE_ENV: "production"

@@ -2,6 +2,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import handler from '../../../../../server/api/auth/resend-verification.post';
 import { prismaMock } from '../../../../__mocks__/prisma';
 
+// Import des mocks après la déclaration
+import { sendEmail, generateVerificationCode, generateVerificationEmailHtml } from '../../../../../server/utils/emailService';
+import { emailRateLimiter } from '../../../../../server/utils/rate-limiter';
+
 // Mock des utilitaires d'email et rate limiting
 vi.mock('../../../../server/utils/emailService', () => ({
   sendEmail: vi.fn(),
@@ -27,10 +31,6 @@ const mockUser = {
   emailVerificationCode: '123456',
   verificationCodeExpiry: new Date(Date.now() + 15 * 60 * 1000),
 };
-
-// Import des mocks après la déclaration
-import { sendEmail, generateVerificationCode, generateVerificationEmailHtml } from '../../../../../server/utils/emailService';
-import { emailRateLimiter } from '../../../../../server/utils/rate-limiter';
 
 const mockSendEmail = sendEmail as ReturnType<typeof vi.fn>;
 const mockGenerateVerificationCode = generateVerificationCode as ReturnType<typeof vi.fn>;

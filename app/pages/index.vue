@@ -346,14 +346,14 @@
               :edition="edition"
               :show-status="true"
             >
-              <template #actions="{ edition }">
+        <template #actions="{ edition: ed }">
                 <UButton
                   v-if="authStore.isAuthenticated"
-                  :icon="isFavorited(edition.id) ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-                  :color="isFavorited(edition.id) ? 'warning' : 'neutral'"
+          :icon="isFavorited(ed.id) ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+          :color="isFavorited(ed.id) ? 'warning' : 'neutral'"
                   variant="ghost"
                   size="sm"
-                  @click="toggleFavorite(edition.id)"
+          @click="toggleFavorite(ed.id)"
                 />
               </template>
             </EditionCard>
@@ -386,8 +386,7 @@ import { onMounted, computed, reactive, watch, ref, defineAsyncComponent } from 
 import { useDebounceFn } from '@vueuse/core';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
-import { useRouter } from 'vue-router';
-import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date';
+import { CalendarDate, DateFormatter } from '@internationalized/date';
 import { useTranslatedConventionServices } from '~/composables/useConventionServices';
 import CountryMultiSelect from '~/components/CountryMultiSelect.vue';
 
@@ -397,7 +396,6 @@ const HomeMap = defineAsyncComponent(() => import('~/components/HomeMap.vue'));
 const editionStore = useEditionStore();
 const authStore = useAuthStore();
 const toast = useToast();
-const router = useRouter();
 const { t, locale } = useI18n();
 
 const showMobileFilters = ref(false);

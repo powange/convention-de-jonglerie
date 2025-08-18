@@ -105,12 +105,12 @@
                   class="flex-1"
                 />
                 <UButton 
-                  @click="handleAddCollaborator"
                   :disabled="!selectedUser || loading"
                   :loading="loading"
                   icon="i-heroicons-plus"
                   :label="t('common.add')" 
                   color="primary"
+                  @click="handleAddCollaborator"
                 />
               </div>
             </UButtonGroup>
@@ -132,11 +132,6 @@ interface Props {
   currentUserId?: number;
 }
 
-interface Emits {
-  (e: 'update:modelValue', value: boolean): void;
-  (e: 'collaborator-added'): void;
-  (e: 'collaborator-removed'): void;
-}
 
 interface UserItem extends InputMenuItem {
   value: number;
@@ -154,10 +149,13 @@ interface UserItem extends InputMenuItem {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
+const emit = defineEmits<
+  ((e: 'update:modelValue', value: boolean) => void) |
+  ((e: 'collaborator-added' | 'collaborator-removed') => void)
+>();
 
 const { normalizeImageUrl } = useImageUrl();
-const authStore = useAuthStore();
+// const authStore = useAuthStore();
 const toast = useToast();
 const { t } = useI18n();
 
@@ -220,12 +218,7 @@ const searchUsers = async (query: string) => {
       profilePicture?: string;
       emailHash?: string;
     }>>(`/api/users/search`, {
-      query: {
-        q: query
-      },
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
+      query: { q: query }
     });
 
     console.log('Résultats de recherche:', users);
@@ -268,9 +261,6 @@ const handleAddCollaborator = async () => {
     
     await $fetch(`/api/conventions/${props.convention.id}/collaborators`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
       body: {
         userId: selectedUser.value.value,
         role: newCollaboratorRole.value,
@@ -281,7 +271,7 @@ const handleAddCollaborator = async () => {
       title: t('messages.collaborator_added'),
       description: t('messages.collaborator_added_successfully'),
       icon: 'i-heroicons-check-circle',
-      color: 'green'
+  color: 'success'
     });
 
     // Réinitialiser le formulaire
@@ -295,11 +285,11 @@ const handleAddCollaborator = async () => {
     
   } catch (error: unknown) {
     const httpError = error as { data?: { message?: string }; message?: string };
-    toast.add({
+      toast.add({
       title: t('errors.addition_error'),
       description: httpError.data?.message || httpError.message || t('errors.generic_error'),
       icon: 'i-heroicons-x-circle',
-      color: 'red'
+        color: 'error'
     });
   } finally {
     loading.value = false;
@@ -314,16 +304,13 @@ const handleRemoveCollaborator = async (collaboratorId: number) => {
     try {
       await $fetch(`/api/conventions/${props.convention.id}/collaborators/${collaboratorId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`,
-        },
       });
 
       toast.add({
         title: t('messages.collaborator_removed'),
         description: t('messages.collaborator_removed_successfully'),
         icon: 'i-heroicons-check-circle',
-        color: 'green'
+    color: 'success'
       });
 
       // Émettre l'événement pour recharger les données
@@ -335,7 +322,7 @@ const handleRemoveCollaborator = async (collaboratorId: number) => {
         title: t('errors.removal_error'),
         description: httpError.data?.message || httpError.message || t('errors.generic_error'),
         icon: 'i-heroicons-x-circle',
-        color: 'red'
+        color: 'error'
       });
     }
   }

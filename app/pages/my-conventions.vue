@@ -285,7 +285,7 @@ const getEditionsColumns = () => [
         h(UButton, {
           icon: 'i-heroicons-trash',
           size: 'xs',
-          color: 'red',
+          color: 'error',
           variant: 'ghost',
           label: t('common.delete'),
           onClick: () => deleteEdition(edition.id)
@@ -296,7 +296,7 @@ const getEditionsColumns = () => [
 ];
 
 // Gestionnaire d'événement pour les actions
-const onEditionAction = (action: unknown) => {
+const onEditionAction = (_action: unknown) => {
   // Cette fonction est appelée automatiquement par UTable
 };
 
@@ -306,7 +306,7 @@ const openCollaboratorsModal = (convention: Convention) => {
   collaboratorsModalOpen.value = true;
 };
 
-const deleteEdition = async (id: number) => {
+const deleteEdition = async (_id: number) => {
   if (confirm(t('conventions.confirm_delete_edition'))) {
     try {
       // Recharger les conventions après suppression pour mettre à jour les tableaux
@@ -314,7 +314,7 @@ const deleteEdition = async (id: number) => {
       toast.add({ 
         title: t('messages.edition_deleted'), 
         icon: 'i-heroicons-check-circle', 
-        color: 'green' 
+  color: 'success' 
       });
     } catch (e: unknown) {
       const error = e as HttpError;
@@ -322,7 +322,7 @@ const deleteEdition = async (id: number) => {
         title: t('errors.deletion_error'), 
         description: error.message || error.data?.message || t('errors.server_error'),
         icon: 'i-heroicons-x-circle', 
-        color: 'red' 
+  color: 'error' 
       });
     }
   }
@@ -333,18 +333,7 @@ const fetchMyConventions = async () => {
   try {
     conventionsLoading.value = true;
     
-    // Vérifier que l'utilisateur est connecté et a un token
-    if (!authStore.token) {
-      console.warn(t('errors.no_auth_token'));
-      myConventions.value = [];
-      return;
-    }
-    
-    const data = await $fetch<Convention[]>('/api/conventions/my-conventions', {
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
-    });
+  const data = await $fetch<Convention[]>('/api/conventions/my-conventions');
     
     myConventions.value = data || [];
     
@@ -360,8 +349,8 @@ const fetchMyConventions = async () => {
     toast.add({ 
       title: t('common.error'), 
       description: t('conventions.cannot_load_conventions'),
-      icon: 'i-heroicons-exclamation-triangle', 
-      color: 'red' 
+  icon: 'i-heroicons-exclamation-triangle', 
+  color: 'error' 
     });
   } finally {
     conventionsLoading.value = false;
@@ -374,16 +363,13 @@ const deleteConvention = async (id: number) => {
     try {
       await $fetch(`/api/conventions/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`,
-        },
       });
       
       toast.add({ 
         title: t('conventions.convention_deleted'), 
         description: t('conventions.convention_deleted_success'),
         icon: 'i-heroicons-check-circle', 
-        color: 'green' 
+    color: 'success' 
       });
       
       // Recharger la liste des conventions
@@ -395,7 +381,7 @@ const deleteConvention = async (id: number) => {
         title: t('errors.deletion_error'), 
         description: httpError.data?.message || httpError.message || t('errors.server_error'),
         icon: 'i-heroicons-x-circle', 
-        color: 'red' 
+    color: 'error' 
       });
     }
   }

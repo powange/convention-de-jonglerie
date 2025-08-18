@@ -1,17 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
 import { prismaMock } from '../../../../__mocks__/prisma';
-
-// Mock de jsonwebtoken
-vi.mock('jsonwebtoken', () => ({
-  default: {
-    sign: vi.fn().mockReturnValue('fake-jwt-token')
-  }
-}))
 
 // Import du handler après les mocks
 import loginHandler from '../../../../../server/api/auth/login.post'
+vi.mock('nuxt-auth-utils', () => ({
+  setUserSession: vi.fn()
+}))
 
 describe('API Login', () => {
   const mockUser = {
@@ -49,7 +44,6 @@ describe('API Login', () => {
     const result = await loginHandler(mockEvent)
 
     expect(result).toEqual({
-      token: 'fake-jwt-token',
       user: {
         id: mockUser.id,
         email: mockUser.email,
@@ -84,7 +78,7 @@ describe('API Login', () => {
 
     const result = await loginHandler(mockEvent)
 
-    expect(result.token).toBe('fake-jwt-token')
+  expect(result.user.id).toBe(mockUser.id)
     expect(prismaMock.user.findUnique).toHaveBeenNthCalledWith(2, {
       where: { pseudo: 'testuser' }
     })
@@ -163,25 +157,7 @@ describe('API Login', () => {
     })
   })
 
-  it('devrait générer un token JWT valide', async () => {
-    prismaMock.user.findUnique.mockResolvedValueOnce(mockUser)
-
-    const requestBody = {
-      identifier: 'test@example.com',
-      password: 'Password123!'
-    }
-
-    const mockEvent = {}
-    global.readBody.mockResolvedValue(requestBody)
-
-    await loginHandler(mockEvent)
-
-    expect(jwt.sign).toHaveBeenCalledWith(
-      { userId: mockUser.id },
-      expect.any(String),
-      { expiresIn: '7d' }
-    )
-  })
+  // plus de génération de JWT: la session est utilisée
 
   it('devrait appliquer le rate limiting', async () => {
     const { authRateLimiter } = await import('../../../../../server/utils/rate-limiter')

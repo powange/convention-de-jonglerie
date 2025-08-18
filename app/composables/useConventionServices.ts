@@ -1,4 +1,4 @@
-import { conventionServices, getServiceByKey, getActiveServices, getServicesGrouped, getServicesByCategory, type ConventionService, type ConventionServiceKeys } from '~/utils/convention-services';
+import { conventionServices, getServiceByKey, getActiveServices, getServicesGrouped, getServicesByCategory } from '~/utils/convention-services';
 
 export const useConventionServices = () => {
   const services = readonly(conventionServices);

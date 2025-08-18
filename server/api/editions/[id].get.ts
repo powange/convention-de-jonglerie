@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     try {
       await prisma.editionCollaborator.findFirst();
       includeCollaborators = true;
-    } catch (error) {
+  } catch {
       console.log('Table EditionCollaborator pas encore créée, ignorer les collaborateurs');
     }
 
@@ -79,7 +79,7 @@ export default defineEventHandler(async (event) => {
           ...edition.creator,
           emailHash: getEmailHash(edition.creator.email),
           email: undefined
-        } as any;
+  } as unknown;
       }
 
       // Transformer les collaborateurs de la convention
@@ -90,7 +90,7 @@ export default defineEventHandler(async (event) => {
             ...collab.user,
             emailHash: getEmailHash(collab.user.email),
             email: undefined
-          } as any
+          } as unknown
         }));
       }
 
@@ -102,7 +102,7 @@ export default defineEventHandler(async (event) => {
             ...collab.user,
             emailHash: getEmailHash(collab.user.email),
             email: undefined
-          } as any
+          } as unknown
         }));
       }
     }

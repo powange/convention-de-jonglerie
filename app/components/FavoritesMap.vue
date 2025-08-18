@@ -29,20 +29,20 @@
       <div class="absolute top-4 right-4 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-[1000] space-y-2">
         <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">{{ $t('components.map.temporal_status') }} :</div>
         <div class="flex items-center gap-2 text-sm">
-          <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+          <div class="w-3 h-3 bg-green-500 rounded-full"/>
           <span class="text-gray-700 dark:text-gray-300">{{ $t('components.map.ongoing') }}</span>
         </div>
         <div class="flex items-center gap-2 text-sm">
-          <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+          <div class="w-3 h-3 bg-blue-500 rounded-full"/>
           <span class="text-gray-700 dark:text-gray-300">{{ $t('components.favorites_map.upcoming') }}</span>
         </div>
         <div class="flex items-center gap-2 text-sm">
-          <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
+          <div class="w-3 h-3 bg-gray-500 rounded-full"/>
           <span class="text-gray-700 dark:text-gray-300">{{ $t('components.favorites_map.past') }}</span>
         </div>
         <div class="pt-2 border-t border-gray-200 dark:border-gray-600">
           <div class="flex items-center gap-2 text-sm">
-            <div class="w-3 h-3 rounded-full border-2 border-yellow-500 bg-transparent"></div>
+            <div class="w-3 h-3 rounded-full border-2 border-yellow-500 bg-transparent"/>
             <span class="text-gray-700 dark:text-gray-300">{{ $t('components.favorites_map.all_favorites') }}</span>
           </div>
         </div>
@@ -58,9 +58,7 @@ import { createCustomMarkerIcon, getEditionStatus } from '~/utils/mapMarkers';
 
 // Déclaration de type pour Leaflet global
 declare global {
-  interface Window {
-    L: any;
-  }
+  interface Window { L: unknown }
 }
 
 interface Props {
@@ -73,8 +71,7 @@ const { t, locale } = useI18n();
 // Références
 const mapContainer = ref<HTMLElement>();
 const mapReady = ref(false);
-let map: any = null;
-let leaflet: any = null;
+let map: unknown = null;
 
 // Filtrer les éditions favorites à venir avec coordonnées
 const upcomingFavorites = computed(() => {
@@ -86,8 +83,8 @@ const upcomingFavorites = computed(() => {
 });
 
 // Charger Leaflet dynamiquement (côté client uniquement)
-const loadLeaflet = async () => {
-  if (process.server) return;
+const loadLeaflet = async (): Promise<unknown | null> => {
+  if (import.meta.server) return;
   
   // Si Leaflet est déjà chargé, le retourner directement
   if (window.L) {
@@ -154,7 +151,7 @@ const initMap = async () => {
     }).addTo(map);
 
     // Créer un groupe pour tous les marqueurs
-    const markers: any[] = [];
+  const markers: unknown[] = [];
 
     // Ajouter un marqueur pour chaque édition
     upcomingFavorites.value.forEach(edition => {
@@ -220,7 +217,7 @@ const cleanupMap = () => {
 };
 
 // Utilitaires
-const { formatDateTimeRange } = useDateFormat();
+const { formatDateTimeRange: _formatDateTimeRange } = useDateFormat();
 
 const formatDateRange = (startDate: string, endDate: string) => {
   const start = new Date(startDate);

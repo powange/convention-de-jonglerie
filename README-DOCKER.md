@@ -47,5 +47,5 @@ Pour utiliser avec Portainer :
 ## Dépannage
 
 Si erreur JWT :
-- Vérifiez que `JWT_SECRET` est bien défini dans le fichier Compose que vous utilisez (`docker-compose.dev.yml` ou `docker-compose.release.yml`)
+- Configurez `NUXT_SESSION_PASSWORD` (en prod) pour sécuriser les sessions côté serveur dans les fichiers Compose
 - Reconstruisez : `docker compose up -d --build`

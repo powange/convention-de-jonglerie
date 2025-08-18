@@ -41,7 +41,7 @@ onMounted(async () => {
   );
   
   authStore.logout();
-  toast.add({ title: t('auth.logout_success_message'), icon: 'i-heroicons-check-circle', color: 'green' });
+  toast.add({ title: t('auth.logout_success_message'), icon: 'i-heroicons-check-circle', color: 'success' });
   
   // Si on vient d'une page protégée, rediriger vers login avec returnTo
   if (isProtectedRoute) {

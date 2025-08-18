@@ -1,13 +1,13 @@
 import { PrismaClient } from '@prisma/client'
-import { requireUserSession } from '#auth-utils'
+import { requireUserSession } from '#imports'
 
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   try {
   // Vérifier l'authentification via la session scellée
-  const { user } = await requireUserSession(event)
-  const userId = user.id
+    const { user } = await requireUserSession(event)
+    const userId = user.id
 
     if (!userId) {
       throw createError({

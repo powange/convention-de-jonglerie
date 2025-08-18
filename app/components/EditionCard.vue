@@ -76,7 +76,7 @@ interface Props {
   showStatus?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   showStatus: false
 });
 
@@ -88,7 +88,7 @@ const { t } = useI18n();
 // const localePath = useLocalePath(); // Pas nécessaire avec strategy: 'no_prefix'
 
 // Fonction pour obtenir les services actifs traduits
-const getActiveServices = (edition: any) => {
+const getActiveServices = (edition: Edition) => {
   const services = getTranslatedServices.value;
   return services.filter(service => edition[service.key]);
 };

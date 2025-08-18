@@ -2,6 +2,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import handler from '../../../../../server/api/upload/image.post';
 import { prismaMock } from '../../../../__mocks__/prisma';
 
+// Import des mocks après la déclaration
+import { handleImageUpload } from '../../../../../server/utils/image-upload';
+import { copyToOutputPublic } from '../../../../../server/utils/copy-to-output';
+
 // Mock des modules externes
 vi.mock('../../../../server/utils/image-upload', () => ({
   handleImageUpload: vi.fn(),
@@ -28,10 +32,6 @@ const mockEvent = {
 const mockEventWithoutUser = {
   context: {},
 };
-
-// Import des mocks après la déclaration
-import { handleImageUpload } from '../../../../../server/utils/image-upload';
-import { copyToOutputPublic } from '../../../../../server/utils/copy-to-output';
 
 const mockHandleImageUpload = handleImageUpload as ReturnType<typeof vi.fn>;
 const mockCopyToOutputPublic = copyToOutputPublic as ReturnType<typeof vi.fn>;

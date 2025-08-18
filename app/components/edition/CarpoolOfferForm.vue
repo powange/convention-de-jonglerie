@@ -160,7 +160,15 @@ import DateTimePicker from '~/components/ui/DateTimePicker.vue';
 
 interface Props {
   editionId: number;
-  initialData?: any;
+  initialData?: Partial<{
+    id: number | string;
+    departureDate: string;
+    departureCity: string;
+    departureAddress?: string;
+    availableSeats?: number;
+    phoneNumber: string;
+    description: string;
+  }>;
   isEditing?: boolean;
 }
 

@@ -33,9 +33,9 @@ export interface UploadResult {
   /** Message de retour */
   message?: string
   /** Objet retourné par certaines APIs (convention, edition, user) */
-  convention?: any
-  edition?: any
-  user?: any
+  convention?: import('~/types').Convention
+  edition?: import('~/types').Edition
+  user?: import('~/types').User
 }
 
 export interface FileValidationResult {

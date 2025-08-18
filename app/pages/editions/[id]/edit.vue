@@ -44,24 +44,24 @@ onMounted(async () => {
     const foundEdition = await editionStore.fetchEditionById(editionId);
     
     // Vérifier que l'utilisateur peut modifier cette édition
-    if (!editionStore.canEditEdition(foundEdition, authStore.user?.id || 0)) {
+  if (!editionStore.canEditEdition(foundEdition, authStore.user?.id || 0)) {
       toast.add({ 
         title: t('pages.access_denied.title'), 
         description: t('errors.edition_edit_denied'),
         icon: 'i-heroicons-exclamation-triangle', 
-        color: 'red' 
+    color: 'error' 
       });
       router.push('/');
       return;
     }
     
     edition.value = foundEdition;
-  } catch (_error) {
+  } catch {
     toast.add({ 
       title: t('common.error'), 
       description: t('editions.not_found'),
       icon: 'i-heroicons-exclamation-triangle', 
-      color: 'red' 
+      color: 'error' 
     });
     router.push('/');
   }
@@ -70,10 +70,11 @@ onMounted(async () => {
 const handleUpdateConvention = async (formData: Edition) => {
   try {
     await editionStore.updateEdition(editionId, formData);
-    toast.add({ title: t('messages.edition_updated'), icon: 'i-heroicons-check-circle', color: 'green' });
+  toast.add({ title: t('messages.edition_updated'), icon: 'i-heroicons-check-circle', color: 'success' });
     router.push(`/editions/${editionId}`);
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || t('errors.edition_update_failed'), icon: 'i-heroicons-x-circle', color: 'red' });
+  const err = e as { statusMessage?: string }
+  toast.add({ title: err?.statusMessage || t('errors.edition_update_failed'), icon: 'i-heroicons-x-circle', color: 'error' });
   }
 };
 </script>

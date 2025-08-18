@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { describe, it, expect, beforeEach } from 'vitest';
 import handler from '../../../../server/api/conventions/[id]/collaborators.post';
 import { prismaMock } from '../../../../__mocks__/prisma';
@@ -30,7 +30,7 @@ const mockEvent = {
 };
 
 // Import des mocks après la déclaration
-// eslint-disable-next-line import/first
+ 
 import { addConventionCollaborator, findUserByPseudoOrEmail } from '../../../../server/utils/collaborator-management';
 const mockAddCollaborator = addConventionCollaborator as ReturnType<typeof vi.fn>;
 const mockFindUser = findUserByPseudoOrEmail as ReturnType<typeof vi.fn>;

@@ -10,9 +10,9 @@
     >
       {{ $t('components.carpool.view_comments', { count: comments.length }) }}
     </UButton>
-    
+
     <template #body>
-        <!-- Chargement -->
+      <!-- Chargement -->
       <div v-if="loading" class="text-center py-4">
         <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto mb-2 w-6 h-6" />
         <p>{{ $t('components.carpool.loading_comments') }}</p>
@@ -21,32 +21,27 @@
       <!-- Liste des commentaires -->
       <div v-else-if="comments.length > 0" class="space-y-3 max-h-96 overflow-y-auto">
         <UCard v-for="comment in comments" :key="comment.id" variant="subtle">
-        <div class="flex items-start justify-between mb-2">
-          <div class="flex items-center gap-2">
-            <UserAvatar
-              :user="comment.user"
-              size="sm"
+          <div class="flex items-start justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <UserAvatar :user="comment.user" size="sm" />
+              <span class="font-medium text-sm">{{ comment.user.pseudo }}</span>
+              <span class="text-xs text-gray-500">{{ formatRelativeTime(comment.createdAt) }}</span>
+            </div>
+
+            <!-- Bouton pour ajouter comme covoitureur (uniquement pour les offres et si l'utilisateur est le créateur) -->
+            <UButton
+              v-if="type === 'offer' && canAddPassenger(comment.user.id)"
+              size="xs"
+              color="primary"
+              variant="ghost"
+              icon="i-heroicons-plus"
+              :loading="addingPassenger === comment.user.id"
+              :title="$t('components.carpool.add_as_passenger')"
+              @click="addPassenger(comment.user.id)"
             />
-            <span class="font-medium text-sm">{{ comment.user.pseudo }}</span>
-            <span class="text-xs text-gray-500">
-              {{ formatRelativeTime(comment.createdAt) }}
-            </span>
           </div>
-          
-          <!-- Bouton pour ajouter comme covoitureur (uniquement pour les offres et si l'utilisateur est le créateur) -->
-          <UButton
-            v-if="type === 'offer' && canAddPassenger(comment.user.id)"
-            size="xs"
-            color="primary"
-            variant="ghost"
-            icon="i-heroicons-plus"
-            :loading="addingPassenger === comment.user.id"
-            @click="addPassenger(comment.user.id)"
-            :title="$t('components.carpool.add_as_passenger')"
-          />
-        </div>
-        <p class="text-sm">{{ comment.content }}</p>
-      </UCard>
+          <p class="text-sm">{{ comment.content }}</p>
+        </UCard>
       </div>
 
       <!-- Aucun commentaire -->
@@ -66,12 +61,7 @@
           @blur="newComment = newComment.trim()"
         />
         <div class="flex justify-end">
-          <UButton
-            :disabled="!newComment.trim()"
-            :loading="isAddingComment"
-            color="primary"
-            @click="addComment"
-          >
+          <UButton :disabled="!newComment.trim()" :loading="isAddingComment" color="primary" @click="addComment">
             {{ $t('components.carpool.publish') }}
           </UButton>
         </div>
@@ -105,10 +95,11 @@ interface Comment {
   };
 }
 
+interface PassengerItem { user: { id: number } }
 interface Props {
   id: number;
   type: 'offer' | 'request';
-  offer?: any; // Pour accéder aux informations de l'offre (créateur, passagers, etc.)
+  offer?: { user: { id: number }; passengers?: PassengerItem[]; availableSeats: number };
 }
 
 const showCommentsModal = ref(false);
@@ -144,22 +135,18 @@ watch(showCommentsModal, async (open) => {
 const loadComments = async () => {
   loading.value = true;
   try {
-    const endpoint = props.type === 'offer' 
+    const endpoint = props.type === 'offer'
       ? `/api/carpool-offers/${props.id}/comments`
       : `/api/carpool-requests/${props.id}/comments`;
-    
-    const response = await $fetch(endpoint, {
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
-    });
+
+    const response = await $fetch(endpoint);
     comments.value = response;
   } catch (error) {
     console.error('Erreur lors du chargement des commentaires:', error);
     toast.add({
       title: t('common.error'),
       description: t('errors.cannot_load_comments'),
-      color: 'red',
+      color: 'error',
     });
   } finally {
     loading.value = false;
@@ -184,18 +171,13 @@ const addComment = async () => {
 
   isAddingComment.value = true;
   try {
-    const endpoint = props.type === 'offer' 
+    const endpoint = props.type === 'offer'
       ? `/api/carpool-offers/${props.id}/comments`
       : `/api/carpool-requests/${props.id}/comments`;
-    
+
     await $fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
-      body: {
-        content: newComment.value,
-      },
+      body: { content: newComment.value },
     });
 
     newComment.value = '';
@@ -203,14 +185,14 @@ const addComment = async () => {
     emit('comment-added');
     toast.add({
       title: t('messages.comment_added'),
-      color: 'green',
+      color: 'success',
     });
   } catch (error) {
-    console.error('Erreur lors de l\'ajout du commentaire:', error);
+    console.error("Erreur lors de l'ajout du commentaire:", error);
     toast.add({
       title: t('common.error'),
       description: t('errors.cannot_add_comment'),
-      color: 'red',
+      color: 'error',
     });
   } finally {
     isAddingComment.value = false;
@@ -220,17 +202,17 @@ const addComment = async () => {
 // Vérifier si l'utilisateur peut être ajouté comme passager
 const canAddPassenger = (userId: number) => {
   if (!props.offer || !authStore.user) return false;
-  
+
   // Seulement le créateur de l'offre peut ajouter des passagers
   if (props.offer.user.id !== authStore.user.id) return false;
-  
+
   // L'utilisateur ne peut pas s'ajouter lui-même
   if (userId === authStore.user.id) return false;
-  
+
   // Vérifier que l'utilisateur n'est pas déjà passager
-  const isAlreadyPassenger = props.offer.passengers?.some((p: any) => p.user.id === userId);
+  const isAlreadyPassenger = props.offer.passengers?.some((p: PassengerItem) => p.user.id === userId);
   if (isAlreadyPassenger) return false;
-  
+
   // Vérifier qu'il reste des places
   const currentPassengers = props.offer.passengers?.length || 0;
   return currentPassengers < props.offer.availableSeats;
@@ -239,31 +221,27 @@ const canAddPassenger = (userId: number) => {
 // Ajouter un passager
 const addPassenger = async (userId: number) => {
   if (!canAddPassenger(userId)) return;
-  
+
   addingPassenger.value = userId;
   try {
     await $fetch(`/api/carpool-offers/${props.id}/passengers`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
-      body: {
-        userId: userId,
-      },
+      body: { userId },
     });
 
     emit('passenger-added');
     toast.add({
       title: t('messages.passenger_added'),
       description: t('messages.user_added_as_passenger'),
-      color: 'green',
+      color: 'success',
     });
-  } catch (error: any) {
-    console.error('Erreur lors de l\'ajout du covoitureur:', error);
+  } catch (error: unknown) {
+    const httpError = error as { data?: { message?: string } } | undefined;
+    console.error("Erreur lors de l'ajout du covoitureur:", error);
     toast.add({
       title: t('common.error'),
-      description: error.data?.message || t('errors.cannot_add_passenger'),
-      color: 'red',
+      description: httpError?.data?.message || t('errors.cannot_add_passenger'),
+      color: 'error',
     });
   } finally {
     addingPassenger.value = null;

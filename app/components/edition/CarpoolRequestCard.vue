@@ -163,16 +163,13 @@ const handleDelete = async () => {
   try {
     await $fetch(`/api/carpool-requests/${props.request.id}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
     });
 
     toast.add({
       title: t('messages.request_deleted'),
       description: t('messages.request_deleted_successfully'),
       icon: 'i-heroicons-check-circle',
-      color: 'green'
+  color: 'success'
     });
 
     emit('deleted');
@@ -182,7 +179,7 @@ const handleDelete = async () => {
       title: t('errors.deletion_error'),
       description: httpError.data?.message || httpError.message || t('errors.generic_error'),
       icon: 'i-heroicons-x-circle',
-      color: 'red'
+      color: 'error'
     });
   }
 };

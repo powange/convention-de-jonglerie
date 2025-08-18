@@ -30,6 +30,7 @@
                 <UInput
                   v-for="(digit, index) in codeDigits"
                   :key="index"
+                  :ref="(el) => setDigitRef(index, el)"
                   v-model="codeDigits[index]"
                   type="text"
                   maxlength="1"
@@ -38,7 +39,6 @@
                   @input="handleDigitInput(index, $event)"
                   @keydown="handleKeyDown(index, $event)"
                   @paste="handlePaste"
-                  :ref="(el) => setDigitRef(index, el)"
                 />
               </div>
             </div>
@@ -210,7 +210,7 @@ const handleVerification = async () => {
   hasError.value = false;
   
   try {
-    const response = await $fetch('/api/auth/verify-email', {
+  await $fetch('/api/auth/verify-email', {
       method: 'POST',
       body: {
         email: email.value,
@@ -222,7 +222,7 @@ const handleVerification = async () => {
       title: t('auth.email_verified_success'),
       description: t('auth.account_now_active'),
       icon: 'i-heroicons-check-circle',
-      color: 'green'
+  color: 'success'
     });
     
     router.push('/login');
@@ -251,7 +251,7 @@ const handleResendCode = async () => {
   if (resendCooldown.value > 0) return;
   
   try {
-    await $fetch('/api/auth/resend-verification', {
+  await $fetch('/api/auth/resend-verification', {
       method: 'POST',
       body: { email: email.value }
     });
@@ -260,19 +260,19 @@ const handleResendCode = async () => {
       title: t('auth.code_resent'),
       description: t('auth.new_code_sent'),
       icon: 'i-heroicons-envelope',
-      color: 'green'
+  color: 'success'
     });
     
     // Réinitialiser le timer et démarrer le cooldown
     timeRemaining.value = 15 * 60;
     resendCooldown.value = 60;
     startResendCooldown();
-  } catch (e: unknown) {
+  } catch {
     toast.add({
       title: t('common.error'),
       description: t('errors.server_error'),
       icon: 'i-heroicons-x-circle',
-      color: 'red'
+      color: 'error'
     });
   }
 };

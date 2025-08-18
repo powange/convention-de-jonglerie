@@ -25,7 +25,7 @@
         </div>
 
         <!-- Message d'information -->
-        <UAlert v-if="!isEditionFinished" icon="i-heroicons-information-circle" color="blue">
+  <UAlert v-if="!isEditionFinished" icon="i-heroicons-information-circle" color="info">
           {{ $t('editions.lost_found_after_edition') }}
         </UAlert>
       </div>
@@ -66,8 +66,8 @@
                 icon="i-heroicons-arrow-path"
                 size="xs"
                 variant="ghost"
-                @click="toggleStatus(item.id)"
                 :title="item.status === 'RETURNED' ? t('editions.mark_as_lost') : t('editions.mark_as_returned')"
+                @click="toggleStatus(item.id)"
               />
             </div>
           </div>
@@ -154,7 +154,7 @@
             <UTextarea 
               v-model="newItem.description"
               :placeholder="t('editions.describe_lost_item')"
-              rows="3"
+              :rows="3"
             />
           </UFormField>
 
@@ -168,7 +168,6 @@
                   allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
                   allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp']
                 },
-                autoUpload: true,
                 resetAfterUpload: false
               }"
               alt="Photo de l'objet trouvé"
@@ -225,7 +224,6 @@ import ImageUpload from '~/components/ui/ImageUpload.vue'
 
 // Props et route
 const route = useRoute()
-const router = useRouter()
 const toast = useToast()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
@@ -235,7 +233,10 @@ const editionId = computed(() => parseInt(route.params.id as string))
 
 // État local
 const loading = ref(true)
-const lostFoundItems = ref<any[]>([])
+type LostFoundUser = { id: number; pseudo: string; prenom: string; nom: string; profilePicture?: string | null }
+type LostFoundComment = { id: number; content: string; createdAt: string; user: LostFoundUser }
+type LostFoundItem = { id: number; description: string; imageUrl?: string | null; status: 'LOST' | 'RETURNED'; createdAt: string; user: LostFoundUser; comments: LostFoundComment[] }
+const lostFoundItems = ref<LostFoundItem[]>([])
 const commentContents = ref<Record<number, string>>({})
 const showAddModal = ref(false)
 const showImageModalState = ref(false)
@@ -266,7 +267,7 @@ const canAddLostFound = computed(() => {
 const canEditLostFound = computed(() => canAddLostFound.value)
 
 // Fonction pour les favoris
-const isFavorited = (editionId: number) => {
+const isFavorited = (_editionId: number) => {
   return edition.value?.favoritedBy?.some(u => u.id === authStore.user?.id) || false
 }
 
@@ -276,13 +277,13 @@ const toggleFavorite = async (id: number) => {
     toast.add({ 
       title: t('messages.favorite_status_updated'), 
       icon: 'i-heroicons-check-circle', 
-      color: 'green' 
+  color: 'success' 
     })
-  } catch (e: any) {
+  } catch (e: unknown) {
     toast.add({ 
       title: e.statusMessage || t('errors.favorite_update_failed'), 
       icon: 'i-heroicons-x-circle', 
-      color: 'red' 
+  color: 'error' 
     })
   }
 }
@@ -304,10 +305,10 @@ const fetchLostFoundItems = async () => {
   try {
     const data = await $fetch(`/api/editions/${editionId.value}/lost-found`)
     lostFoundItems.value = data
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error loading lost items:', error)
     toast.add({
-      color: 'red',
+      color: 'error',
       title: t('common.error'),
       description: t('editions.cannot_load_lost_items')
     })
@@ -323,9 +324,6 @@ const postComment = async (itemId: number) => {
   try {
     const comment = await $fetch(`/api/editions/${editionId.value}/lost-found/${itemId}/comments`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`
-      },
       body: { content }
     })
 
@@ -339,12 +337,12 @@ const postComment = async (itemId: number) => {
     commentContents.value[itemId] = ''
 
     toast.add({
-      color: 'green',
+      color: 'success',
       title: t('editions.comment_added')
     })
-  } catch (error) {
+  } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: t('common.error'),
       description: t('editions.cannot_add_comment')
     })
@@ -355,9 +353,6 @@ const toggleStatus = async (itemId: number) => {
   try {
     const updatedItem = await $fetch(`/api/editions/${editionId.value}/lost-found/${itemId}/return`, {
       method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`
-      }
     })
 
     // Mettre à jour l'item dans la liste
@@ -367,12 +362,12 @@ const toggleStatus = async (itemId: number) => {
     }
 
     toast.add({
-      color: 'green',
+  color: 'success',
       title: updatedItem.status === 'RETURNED' ? t('editions.item_marked_returned') : t('editions.item_marked_lost')
     })
-  } catch (error) {
+  } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: t('common.error'),
       description: t('editions.cannot_change_status')
     })
@@ -384,7 +379,7 @@ const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
   if (result.success && result.imageUrl) {
     newItem.value.imageUrl = result.imageUrl;
     toast.add({
-      color: 'green',
+  color: 'success',
       title: t('editions.photo_uploaded')
     });
   }
@@ -392,7 +387,7 @@ const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
 
 const onImageError = (error: string) => {
   toast.add({
-    color: 'red',
+  color: 'error',
     title: t('common.error'),
     description: error || t('editions.cannot_upload_photo')
   });
@@ -405,9 +400,6 @@ const submitNewItem = async () => {
   try {
     const item = await $fetch(`/api/editions/${editionId.value}/lost-found`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`
-      },
       body: {
         description: newItem.value.description.trim(),
         imageUrl: newItem.value.imageUrl || undefined
@@ -422,14 +414,15 @@ const submitNewItem = async () => {
     showAddModal.value = false
 
     toast.add({
-      color: 'green',
+      color: 'success',
       title: t('editions.lost_item_added')
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { data?: { statusMessage?: string } } | undefined
     toast.add({
-      color: 'red',
+      color: 'error',
       title: t('common.error'),
-      description: error.data?.statusMessage || t('editions.cannot_add_item')
+      description: err?.data?.statusMessage || t('editions.cannot_add_item')
     })
   } finally {
     submittingItem.value = false

@@ -75,7 +75,7 @@
 
         <!-- Liste des posts -->
         <div v-if="loading" class="space-y-4">
-          <USkeleton class="h-32" v-for="i in 3" :key="i" />
+          <USkeleton v-for="i in 3" :key="i" class="h-32" />
         </div>
         
         <div v-else-if="posts.length === 0" class="text-center py-8">
@@ -105,7 +105,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
-import type { Edition } from '~/types';
+// import type { Edition } from '~/types';
 
 const route = useRoute();
 const editionStore = useEditionStore();
@@ -129,7 +129,7 @@ const isFavorited = computed(() => (editionId: number) => {
 });
 
 // Validation du nouveau post
-const validateNewPost = (state: any) => {
+const validateNewPost = (state: { content: string }) => {
   const errors = [];
   if (!state.content || !state.content.trim()) {
     errors.push({ path: 'content', message: t('errors.content_required') });
@@ -146,12 +146,12 @@ const loadPosts = async () => {
   try {
     const response = await $fetch(`/api/editions/${editionId}/posts`);
     posts.value = response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors du chargement des posts:', error);
     toast.add({
       title: t('errors.loading_error'),
       description: t('errors.cannot_load_comments'),
-      color: 'red'
+      color: 'error'
     });
   } finally {
     loading.value = false;
@@ -166,12 +166,7 @@ const submitNewPost = async () => {
   try {
     const newPost = await $fetch(`/api/editions/${editionId}/posts`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`
-      },
-      body: {
-        content: newPostForm.content.trim()
-      }
+      body: { content: newPostForm.content.trim() }
     });
     
     posts.value.unshift(newPost);
@@ -180,14 +175,15 @@ const submitNewPost = async () => {
     toast.add({
       title: t('messages.comment_published'),
       description: t('messages.comment_published_successfully'),
-      color: 'green'
+      color: 'success'
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating post:', error);
+    const httpError = error as { data?: { message?: string } } | undefined
     toast.add({
       title: t('common.error'),
-      description: error.data?.message || t('errors.cannot_publish_comment'),
-      color: 'red'
+      description: httpError?.data?.message || t('errors.cannot_publish_comment'),
+      color: 'error'
     });
   } finally {
     isSubmittingPost.value = false;
@@ -197,26 +193,21 @@ const submitNewPost = async () => {
 // Supprimer un post
 const deletePost = async (postId: number) => {
   try {
-    await $fetch(`/api/editions/${editionId}/posts/${postId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    });
+  await $fetch(`/api/editions/${editionId}/posts/${postId}`, { method: 'DELETE' });
     
     posts.value = posts.value.filter(p => p.id !== postId);
     
     toast.add({
       title: t('messages.comment_deleted'),
       description: t('messages.comment_deleted_successfully'),
-      color: 'green'
+      color: 'success'
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la suppression du post:', error);
     toast.add({
       title: t('common.error'),
       description: t('errors.cannot_delete_comment'),
-      color: 'red'
+      color: 'error'
     });
   }
 };
@@ -226,9 +217,6 @@ const addComment = async (postId: number, content: string) => {
   try {
     const newComment = await $fetch(`/api/editions/${editionId}/posts/${postId}/comments`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`
-      },
       body: { content }
     });
     
@@ -241,14 +229,15 @@ const addComment = async (postId: number, content: string) => {
     toast.add({
       title: t('messages.reply_published'),
       description: t('messages.reply_published_successfully'),
-      color: 'green'
+      color: 'success'
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating comment:', error);
+    const httpError = error as { data?: { message?: string } } | undefined
     toast.add({
       title: t('common.error'),
-      description: t('errors.cannot_publish_reply'),
-      color: 'red'
+      description: httpError?.data?.message || t('errors.cannot_publish_reply'),
+      color: 'error'
     });
   }
 };
@@ -256,12 +245,7 @@ const addComment = async (postId: number, content: string) => {
 // Supprimer un commentaire
 const deleteComment = async (postId: number, commentId: number) => {
   try {
-    await $fetch(`/api/editions/${editionId}/posts/${postId}/comments/${commentId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    });
+  await $fetch(`/api/editions/${editionId}/posts/${postId}/comments/${commentId}`, { method: 'DELETE' });
     
     // Trouver le post et supprimer le commentaire
     const post = posts.value.find(p => p.id === postId);
@@ -272,14 +256,14 @@ const deleteComment = async (postId: number, commentId: number) => {
     toast.add({
       title: t('messages.reply_deleted'),
       description: t('messages.reply_deleted_successfully'),
-      color: 'green'
+      color: 'success'
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la suppression du commentaire:', error);
     toast.add({
       title: t('common.error'),
       description: t('errors.cannot_delete_reply'),
-      color: 'red'
+      color: 'error'
     });
   }
 };
@@ -287,9 +271,10 @@ const deleteComment = async (postId: number, commentId: number) => {
 const toggleFavorite = async (id: number) => {
   try {
     await editionStore.toggleFavorite(id);
-    toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'green' });
+    toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'success' });
   } catch (e: unknown) {
-    toast.add({ title: e.statusMessage || t('errors.favorite_update_failed'), icon: 'i-heroicons-x-circle', color: 'red' });
+    const err = e as { statusMessage?: string } | undefined
+    toast.add({ title: err?.statusMessage || t('errors.favorite_update_failed'), icon: 'i-heroicons-x-circle', color: 'error' });
   }
 };
 

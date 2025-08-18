@@ -5,7 +5,7 @@ import type { UploadEndpoint, UploadOptions, UploadResult, ValidationOptions } f
  * Centralise la logique d'upload, validation et gestion d'états
  */
 export const useImageUpload = (options: UploadOptions = {}) => {
-  const authStore = useAuthStore()
+  // const authStore = useAuthStore()
   const toast = useToast()
   const { t } = useI18n()
 
@@ -85,7 +85,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
         toast.add({
           title: t('upload.validation_error'),
           description: error.value,
-          color: 'red'
+          color: 'error'
         })
       }
       return false
@@ -117,10 +117,6 @@ export const useImageUpload = (options: UploadOptions = {}) => {
   ): Promise<UploadResult> => {
     if (!selectedFile.value) {
       throw new Error(t('upload.errors.no_file_selected'))
-    }
-
-    if (!authStore.token) {
-      throw new Error(t('upload.errors.no_auth_token'))
     }
 
     uploading.value = true
@@ -187,10 +183,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
 
       const response = await $fetch<UploadResult>(uploadUrl, {
         method: 'POST',
-        body: formData,
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`
-        }
+        body: formData
       })
 
       // Finaliser la progression
@@ -210,7 +203,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
         toast.add({
           title: t('upload.success'),
           description: t('upload.image_uploaded_successfully'),
-          color: 'green'
+          color: 'success'
         })
       }
 
@@ -221,15 +214,16 @@ export const useImageUpload = (options: UploadOptions = {}) => {
 
       return response
 
-    } catch (uploadError: any) {
+  } catch (uploadError: unknown) {
       // Nettoyer l'interval de progression en cas d'erreur
       if (progressInterval) {
         clearInterval(progressInterval)
         progressInterval = null
       }
       
-      const errorMessage = uploadError?.data?.message || 
-                          uploadError?.message || 
+  const err = uploadError as { data?: { message?: string }, message?: string } | undefined
+  const errorMessage = err?.data?.message || 
+          err?.message || 
                           t('upload.errors.upload_failed')
       
       error.value = errorMessage
@@ -267,9 +261,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
    * Supprime une image
    */
   const deleteImage = async (endpoint: UploadEndpoint): Promise<void> => {
-    if (!authStore.token) {
-      throw new Error(t('upload.errors.no_auth_token'))
-    }
+  // Auth assurée par la session côté serveur
 
     try {
       let deleteUrl: string
@@ -292,12 +284,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
           throw new Error(t('upload.errors.unsupported_delete_endpoint'))
       }
 
-      await $fetch(deleteUrl, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`
-        }
-      })
+  await $fetch(deleteUrl, { method: 'DELETE' })
 
       if (options.showToast !== false) {
         toast.add({
@@ -307,9 +294,10 @@ export const useImageUpload = (options: UploadOptions = {}) => {
         })
       }
 
-    } catch (deleteError: any) {
-      const errorMessage = deleteError?.data?.message || 
-                          deleteError?.message || 
+    } catch (deleteError: unknown) {
+      const err = deleteError as { data?: { message?: string }, message?: string } | undefined
+      const errorMessage = err?.data?.message || 
+                          err?.message || 
                           t('upload.errors.delete_failed')
 
       if (options.showToast !== false) {

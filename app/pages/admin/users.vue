@@ -125,7 +125,6 @@
 <script setup lang="ts">
 // Middleware de protection pour super admin
 // Import du store d'authentification
-import { useAuthStore } from '~/stores/auth'
 import { h, resolveComponent } from 'vue'
 
 definePageMeta({
@@ -435,17 +434,8 @@ const fetchUsers = async () => {
       emailFilter: emailFilter.value
     }
     
-    // Ajouter le token d'authentification depuis le store
-    const authStore = useAuthStore()
-    const headers: Record<string, string> = {}
-    
-    if (authStore.token) {
-      headers.Authorization = `Bearer ${authStore.token}`
-    }
-    
     const data = await $fetch<UsersApiResponse>('/api/admin/users', {
-      query: params,
-      headers
+  query: params
     })
     
     users.value = data.users

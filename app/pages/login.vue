@@ -131,30 +131,9 @@ const loading = ref(false);
 const handleLogin = async () => {
   loading.value = true;
   try {
-    // Appel direct à l'API au lieu du store pour capturer l'erreur complète
-    const response = await $fetch('/api/auth/login', {
-      method: 'POST',
-      body: { 
-        identifier: state.identifier, 
-        password: state.password 
-      }
-    });
+  await authStore.login(state.identifier, state.password, state.rememberMe)
     
-    // Si succès, mettre à jour le store manuellement
-    authStore.token = response.token;
-    authStore.user = response.user;
-    authStore.rememberMe = state.rememberMe;
-    authStore.tokenExpiry = Date.now() + (60 * 60 * 1000);
-    
-    if (import.meta.client) {
-      const storage = state.rememberMe ? localStorage : sessionStorage;
-      storage.setItem('authToken', response.token);
-      storage.setItem('authUser', JSON.stringify(response.user));
-      storage.setItem('tokenExpiry', authStore.tokenExpiry.toString());
-      storage.setItem('rememberMe', state.rememberMe.toString());
-    }
-    
-    toast.add({ title: t('messages.login_success'), icon: 'i-heroicons-check-circle', color: 'green' });
+  toast.add({ title: t('messages.login_success'), icon: 'i-heroicons-check-circle', color: 'success' });
     
     // Navigation intelligente : retourner à la page précédente ou à l'accueil
     const returnTo = useRoute().query.returnTo as string;
@@ -173,7 +152,7 @@ const handleLogin = async () => {
     const error = e as HttpError;
     let errorMessage = t('errors.login_failed');
     
-    if (error.statusCode === 401 || error.status === 401) {
+  if (error.statusCode === 401 || error.status === 401) {
       errorMessage = t('errors.invalid_credentials');
     } else if (error.statusCode === 403 || error.status === 403) {
       // Email non vérifié
@@ -216,7 +195,7 @@ const handleLogin = async () => {
       errorMessage = error.message || error.data?.message || errorMessage;
     }
     
-    toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'red' });
+  toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' });
   } finally {
     loading.value = false;
   }

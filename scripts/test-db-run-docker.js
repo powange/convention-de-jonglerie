@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 // Lancement des tests d'intégration avec DB (depuis Docker)
-process.env.TEST_WITH_DB = 'true';
-
 import { execSync } from 'child_process';
+
+process.env.TEST_WITH_DB = 'true';
 
 try {
   // Lancer directement les tests avec la config d'intégration

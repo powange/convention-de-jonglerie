@@ -57,7 +57,6 @@
                 allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
                 allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp']
               },
-              autoUpload: false,
               resetAfterUpload: false
             }"
             alt="Logo de la convention"
@@ -90,10 +89,10 @@
               class="w-24 h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
               @error="logoError = true"
               @load="logoError = false"
-            />
+            >
             <UAlert
               v-if="logoError"
-              color="red"
+              color="error"
               variant="subtle"
               title="Erreur de chargement"
               description="Impossible de charger l'image depuis cette URL"
@@ -129,7 +128,6 @@
 
 <script setup lang="ts">
 import { reactive, ref, onMounted } from 'vue';
-import { useAuthStore } from '~/stores/auth';
 import type { Convention } from '~/types';
 import ImageUpload from '~/components/ui/ImageUpload.vue';
 
@@ -141,7 +139,8 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   submitButtonText: 'Enregistrer',
-  loading: false
+  loading: false,
+  initialData: undefined
 });
 
 const emit = defineEmits<{
@@ -149,7 +148,6 @@ const emit = defineEmits<{
   cancel: [];
 }>();
 
-const authStore = useAuthStore();
 const toast = useToast();
 
 const logoError = ref(false);
@@ -202,7 +200,7 @@ const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
     toast.add({
       title: 'Image uploadée',
       description: 'L\'image a été uploadée avec succès',
-      color: 'green'
+  color: 'success'
     });
   }
 };
@@ -212,7 +210,7 @@ const onImageDeleted = () => {
   toast.add({
     title: 'Image supprimée',
     description: 'L\'image a été supprimée avec succès',
-    color: 'green'
+  color: 'success'
   });
 };
 
@@ -220,7 +218,7 @@ const onImageError = (error: string) => {
   toast.add({
     title: 'Erreur',
     description: error,
-    color: 'red'
+  color: 'error'
   });
 };
 

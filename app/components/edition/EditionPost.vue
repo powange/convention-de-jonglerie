@@ -206,8 +206,9 @@ const canDeleteComment = (comment: Comment) => {
 
 
 // Validation de la réponse
-const validateReply = (state: any) => {
-  const errors = [];
+interface ReplyFormState { content: string }
+const validateReply = (state: ReplyFormState) => {
+  const errors: { path: string; message: string }[] = [];
   if (!state.content || !state.content.trim()) {
     errors.push({ path: 'content', message: t('errors.content_required') });
   }

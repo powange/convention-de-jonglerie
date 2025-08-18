@@ -19,7 +19,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-      "~/*": ["./*"]
+  "~/*": ["./*"],
+  "~/types": ["./app/types/index.d.ts"],
+  "~/types/*": ["./app/types/*"]
     }
-  }
+  },
+  "include": [
+    "types/**/*.d.ts"
+  ]
 }

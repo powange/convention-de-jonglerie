@@ -27,7 +27,7 @@ L'application permet aux utilisateurs de :
 *   **Langage :**
     *   [TypeScript](https://www.typescriptlang.org/) : Langage de programmation typé pour une meilleure maintenabilité.
 *   **Authentification :**
-    *   JWT (JSON Web Tokens) : Mécanisme d'authentification sécurisé.
+    *   Sessions scellées via nuxt-auth-utils (remplace JWT). Voir `docs/AUTH_SESSIONS.md`.
 
 ## Fonctionnalités Clés
 
@@ -77,8 +77,9 @@ Assurez-vous d'avoir Node.js, npm (ou pnpm, yarn, bun) et MySQL installés.
         # Base de données
         DATABASE_URL="mysql://user:password@host:port/database_name"
         
-        # Authentification
-        JWT_SECRET="votre_secret_jwt_tres_securise"
+    # Authentification par session (nuxt-auth-utils)
+    # Obligatoire en prod: mot de passe de session robuste (32+ chars)
+    NUXT_SESSION_PASSWORD="change_me_very_secret_32_chars_min"
         
         # Configuration des emails
         SEND_EMAILS=false                    # true pour envoi réel, false pour simulation

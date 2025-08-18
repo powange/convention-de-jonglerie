@@ -197,16 +197,13 @@ const handleDelete = async () => {
   try {
     await $fetch(`/api/carpool-offers/${props.offer.id}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
     });
 
     toast.add({
       title: t('messages.offer_deleted'),
       description: t('messages.offer_deleted_successfully'),
       icon: 'i-heroicons-check-circle',
-      color: 'green'
+  color: 'success'
     });
 
     emit('deleted');
@@ -216,7 +213,7 @@ const handleDelete = async () => {
       title: t('errors.deletion_error'),
       description: httpError.data?.message || httpError.message || t('errors.generic_error'),
       icon: 'i-heroicons-x-circle',
-      color: 'red'
+      color: 'error'
     });
   }
 };
@@ -229,16 +226,13 @@ const removePassenger = async (userId: number) => {
   try {
     await $fetch(`/api/carpool-offers/${props.offer.id}/passengers/${userId}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
     });
 
     toast.add({
       title: t('messages.passenger_removed'),
       description: t('messages.passenger_removed_successfully'),
       icon: 'i-heroicons-check-circle',
-      color: 'green'
+  color: 'success'
     });
 
     emit('passenger-added'); // Utiliser le même événement pour rafraîchir
@@ -248,7 +242,7 @@ const removePassenger = async (userId: number) => {
       title: t('errors.removal_error'),
       description: httpError.data?.message || httpError.message || t('errors.generic_error'),
       icon: 'i-heroicons-x-circle',
-      color: 'red'
+      color: 'error'
     });
   }
 };

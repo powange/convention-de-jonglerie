@@ -66,22 +66,12 @@ const loading = ref(true);
 const submitting = ref(false);
 
 onMounted(async () => {
-  if (!authStore.token) {
-    toast.add({
-      title: t('errors.authentication_error'),
-      description: t('errors.login_required_edition'),
-      icon: 'i-heroicons-exclamation-triangle',
-      color: 'red'
-    });
-    router.push('/login');
-    return;
-  }
 
   try {
     convention.value = await $fetch(`/api/conventions/${conventionId}`);
     
     // Vérifier que l'utilisateur est l'auteur de la convention
-    if (convention.value.authorId !== authStore.user?.id) {
+  if (convention.value.authorId !== authStore.user?.id) {
       throw {
         status: 403,
         message: t('errors.edition_add_denied')

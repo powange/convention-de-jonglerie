@@ -70,14 +70,14 @@
             :edition="edition"
             show-status
           >
-          <template #actions="{ edition }">
+      <template #actions="{ edition: ed }">
             <UButton
               icon="i-heroicons-star-solid"
               color="warning"
               variant="ghost"
               size="sm"
-              :title="$t('common.favorite')"
-              @click="removeFavorite(edition.id)"
+        :title="$t('common.favorite')"
+        @click="removeFavorite(ed.id)"
             />
           </template>
         </EditionCard>
@@ -156,12 +156,12 @@ const removeFavorite = async (id: number) => {
       icon: 'i-heroicons-star', 
       color: 'warning' 
     });
-  } catch (_e: unknown) {
+  } catch {
     toast.add({ 
       title: t('common.error'), 
       description: t('errors.cannot_remove_favorite'),
       icon: 'i-heroicons-x-circle', 
-      color: 'red' 
+      color: 'error' 
     });
   }
 };
@@ -171,12 +171,12 @@ onMounted(async () => {
     // Charger toutes les éditions pour filtrer les favoris côté client
     // Note: Pour les favoris, on charge toutes les pages car le filtrage se fait côté client
     await editionStore.fetchEditions({ limit: 1000 });
-  } catch (_error) {
+  } catch {
     toast.add({ 
       title: t('common.error'), 
       description: t('errors.cannot_load_editions'),
       icon: 'i-heroicons-exclamation-triangle', 
-      color: 'red' 
+      color: 'error' 
     });
   } finally {
     loading.value = false;

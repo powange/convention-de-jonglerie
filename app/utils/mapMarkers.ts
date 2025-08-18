@@ -7,7 +7,7 @@ export interface MarkerOptions {
 }
 
 // Générer une icône SVG personnalisée avec couleur et contour conditionnel
-export function createCustomMarkerIcon(L: any, options: MarkerOptions): any {
+export function createCustomMarkerIcon(L: unknown, options: MarkerOptions): unknown {
   const { isUpcoming, isOngoing, isFavorite } = options;
   
   // Déterminer la couleur principale basée sur le statut temporel
@@ -39,7 +39,7 @@ export function createCustomMarkerIcon(L: any, options: MarkerOptions): any {
   const svgBlob = new Blob([svgIcon], { type: 'image/svg+xml' });
   const svgUrl = URL.createObjectURL(svgBlob);
   
-  return L.icon({
+  return (L as any).icon({
     iconUrl: svgUrl,
     iconSize: [25, 41],
     iconAnchor: [12, 41],

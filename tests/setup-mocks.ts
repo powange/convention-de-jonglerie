@@ -4,7 +4,6 @@ import { vi } from 'vitest'
 vi.mock('#app', () => ({
   useRuntimeConfig: vi.fn(() => ({
     public: {},
-    jwtSecret: 'test-secret',
     emailEnabled: 'false'
   })),
   navigateTo: vi.fn(),
@@ -33,14 +32,13 @@ vi.mock('#app', () => ({
 // Mock de #imports pour les tests unitaires
 vi.mock('#imports', () => ({
   createError: vi.fn((options) => {
-    const error = new Error(options.statusMessage || options.message)
+    const error: any = new Error(options.statusMessage || options.message)
     error.statusCode = options.statusCode
     error.data = options.data
     throw error
   }),
   defineEventHandler: vi.fn((handler) => handler),
   useRuntimeConfig: vi.fn(() => ({
-    jwtSecret: 'test-jwt-secret',
     emailEnabled: 'false',
     smtpUser: '',
     smtpPass: '',
@@ -68,7 +66,6 @@ global.defineEventHandler = vi.fn((handler) => handler)
 
 // Mock de useRuntimeConfig
 global.useRuntimeConfig = vi.fn(() => ({
-  jwtSecret: 'test-jwt-secret',
   emailEnabled: 'false',
   smtpUser: '',
   smtpPass: '',
@@ -80,7 +77,7 @@ global.readBody = vi.fn()
 
 // Mock de createError
 global.createError = vi.fn((options) => {
-  const error = new Error(options.statusMessage || options.message)
+  const error: any = new Error(options.statusMessage || options.message)
   error.statusCode = options.statusCode
   error.data = options.data
   // Dans un contexte Nuxt/H3, createError lance directement l'erreur

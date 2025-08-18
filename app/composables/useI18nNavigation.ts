@@ -1,6 +1,8 @@
 /**
  * Composable pour garantir la persistance de la langue lors des navigations
  */
+import type { NavigateToOptions } from 'nuxt/app'
+
 export const useI18nNavigation = () => {
   const { locale } = useI18n()
   const router = useRouter()
@@ -8,7 +10,7 @@ export const useI18nNavigation = () => {
   /**
    * Navigation avec préservation de la langue
    */
-  const navigateToWithLocale = (path: string, options?: any) => {
+  const navigateToWithLocale = (path: string, options?: NavigateToOptions) => {
     // Avec strategy: 'no_prefix', la langue est gérée par cookie
     // donc navigateTo standard devrait suffire
     return navigateTo(path, options)

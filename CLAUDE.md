@@ -24,7 +24,7 @@
 - **MySQL** - Base de données relationnelle
 
 **Authentification & Sécurité :**
-- **JWT** (jsonwebtoken v9.0.2) - Tokens d'authentification
+ - Auth par session (nuxt-auth-utils) - Cookies de session scellés
 - **bcryptjs** v3.0.2 - Hachage des mots de passe
 
 **Outils de développement :**

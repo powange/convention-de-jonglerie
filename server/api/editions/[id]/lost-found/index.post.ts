@@ -1,9 +1,10 @@
 import { prisma } from '../../../../utils/prisma';
-import jwt from 'jsonwebtoken';
 import { hasEditionEditPermission } from '../../../../utils/permissions';
+// Import dynamique pour compat tests/mocks (#imports)
 
 export default defineEventHandler(async (event) => {
   try {
+  const { requireUserSession } = await import('#imports')
     const editionId = parseInt(getRouterParam(event, 'id') as string);
     const body = await readBody(event);
 
@@ -14,35 +15,9 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Vérifier l'authentification
-    const token = getCookie(event, 'auth-token') || getHeader(event, 'authorization')?.replace('Bearer ', '');
-    
-    if (!token) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token d\'authentification requis',
-      });
-    }
-
-    let decoded;
-    try {
-  const { getJwtSecret } = await import('../../../../utils/jwt');
-      decoded = jwt.verify(token, getJwtSecret()) as { userId?: number };
-    } catch {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token invalide',
-      });
-    }
-    
-  const userId = decoded.userId;
-
-    if (!userId) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token invalide',
-      });
-    }
+  // Vérifier l'authentification via la session scellée
+  const { user } = await requireUserSession(event)
+  const userId = user.id
 
     // Vérifier que l'édition existe et est terminée
     const edition = await prisma.edition.findUnique({
@@ -129,13 +104,12 @@ export default defineEventHandler(async (event) => {
     });
 
     return lostFoundItem;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la création de l\'objet trouvé:', error);
-    
-    if (error.statusCode) {
-      throw error;
+    const httpError = error as { statusCode?: number }
+    if (httpError?.statusCode) {
+      throw error
     }
-    
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur interne du serveur',

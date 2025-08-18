@@ -1,23 +1,13 @@
 import { PrismaClient } from '@prisma/client'
-import jwt from 'jsonwebtoken'
+import { requireUserSession } from '#imports'
 
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   try {
-    // Vérifier l'authentification
-    const token = getCookie(event, 'auth-token') || getHeader(event, 'authorization')?.replace('Bearer ', '')
-    
-    if (!token) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token d\'authentification requis'
-      })
-    }
-
-  const { getJwtSecret } = await import('../../utils/jwt')
-  const decoded = jwt.verify(token, getJwtSecret()) as { userId?: number }
-    const userId = decoded.userId
+  // Vérifier l'authentification via la session scellée
+  const { user } = await requireUserSession(event)
+  const userId = user.id
 
     if (!userId) {
       throw createError({

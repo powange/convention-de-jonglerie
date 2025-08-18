@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { describe, it, expect, beforeEach } from 'vitest';
 import handler from '../../../../server/api/conventions/[id]/collaborators/[collaboratorId].put';
 
@@ -19,7 +19,7 @@ const mockEvent = {
 };
 
 // Import des mocks après la déclaration
-// eslint-disable-next-line import/first
+ 
 import { updateCollaboratorRole } from '../../../../server/utils/collaborator-management';
 const mockUpdateRole = updateCollaboratorRole as ReturnType<typeof vi.fn>;
 

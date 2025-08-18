@@ -65,16 +65,7 @@ const loading = ref(true);
 const updating = ref(false);
 
 onMounted(async () => {
-  if (!authStore.token) {
-    toast.add({
-      title: t('errors.authentication_error'),
-      description: t('errors.login_required_convention'),
-      icon: 'i-heroicons-exclamation-triangle',
-      color: 'red'
-    });
-    router.push('/login');
-    return;
-  }
+  // La protection est gérée côté serveur par session et par middleware 'auth-protected'.
 
   try {
     convention.value = await $fetch(`/api/conventions/${conventionId}`);
@@ -124,15 +115,6 @@ onMounted(async () => {
 });
 
 const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'createdAt' | 'updatedAt' | 'authorId' | 'author'>) => {
-  if (!authStore.token) {
-    toast.add({
-      title: t('errors.authentication_error'),
-      description: t('errors.login_required_convention'),
-      icon: 'i-heroicons-exclamation-triangle',
-      color: 'red'
-    });
-    return;
-  }
 
   updating.value = true;
 
@@ -140,9 +122,6 @@ const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'created
     // Mettre à jour la convention (l'upload d'image se fait automatiquement via ImageUpload)
     const updatedConvention = await $fetch(`/api/conventions/${conventionId}`, {
       method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
       body: formData,
     });
 
@@ -152,7 +131,7 @@ const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'created
       title: t('messages.convention_updated'),
       description: t('messages.convention_updated_desc', { name: updatedConvention.name }),
       icon: 'i-heroicons-check-circle',
-      color: 'green'
+  color: 'success'
     });
 
     // Rediriger vers la page des conventions de l'utilisateur
@@ -173,7 +152,7 @@ const handleUpdateConvention = async (formData: Omit<Convention, 'id' | 'created
       title: t('errors.update_error'),
       description: errorMessage,
       icon: 'i-heroicons-x-circle',
-      color: 'red'
+  color: 'error'
     });
   } finally {
     updating.value = false;

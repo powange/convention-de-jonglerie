@@ -4,11 +4,8 @@ export default defineNuxtRouteMiddleware((to, _from) => {
   if (import.meta.client) {
     const authStore = useAuthStore();
 
-    // Le plugin auth.client.ts a déjà initialisé l'authentification au démarrage
-    // Vérifier seulement l'expiration du token
-    authStore.checkTokenExpiry();
-
-    // Si pas authentifié, rediriger vers login
+  // Le plugin auth.client.ts a déjà initialisé l'authentification au démarrage
+  // Si pas authentifié, rediriger vers login
     if (!authStore.isAuthenticated) {
       // Ajouter le paramètre returnTo pour rediriger après connexion
       const returnTo = to.fullPath;

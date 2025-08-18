@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+// Import du handler après les mocks
+import handler from '../../../../server/api/editions/[id]/carpool-offers.get';
+// Import des mocks
+import { getEmailHash } from '../../../../../server/utils/email-hash';
+import { prisma } from '../../../../../server/utils/prisma';
+
 // Mock des utilitaires
 vi.mock('../../../../server/utils/email-hash', () => ({
   getEmailHash: vi.fn(),
@@ -18,12 +24,6 @@ vi.mock('#imports', () => ({
   createError: vi.fn(),
   defineEventHandler: vi.fn(),
 }));
-
-// Import du handler après les mocks
-import handler from '../../../../server/api/editions/[id]/carpool-offers.get';
-// Import des mocks
-import { getEmailHash } from '../../../../../server/utils/email-hash';
-import { prisma } from '../../../../../server/utils/prisma';
 
 // Cast des mocks  
 const createError = global.createError as ReturnType<typeof vi.fn>;

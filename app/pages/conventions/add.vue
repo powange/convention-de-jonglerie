@@ -26,7 +26,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '~/stores/auth';
 import ConventionForm from '~/components/convention/ConventionForm.vue';
-import type { Convention, ConventionFormData, HttpError } from '~/types';
+import type { ConventionFormData, HttpError } from '~/types';
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -41,12 +41,12 @@ const { t } = useI18n();
 const loading = ref(false);
 
 const handleAddConvention = async (formData: ConventionFormData) => {
-  if (!authStore.token) {
+  if (!authStore.user) {
     toast.add({
       title: t('errors.authentication_error'),
       description: t('errors.login_required_convention'),
       icon: 'i-heroicons-exclamation-triangle',
-      color: 'red'
+  color: 'error'
     });
     return;
   }
@@ -57,9 +57,6 @@ const handleAddConvention = async (formData: ConventionFormData) => {
     // Créer la convention (l'upload d'image se fait automatiquement via ImageUpload)
     const convention = await $fetch('/api/conventions', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
       body: formData,
     });
 
@@ -67,7 +64,7 @@ const handleAddConvention = async (formData: ConventionFormData) => {
       title: t('messages.convention_created'),
       description: t('messages.convention_created_desc', { name: convention.name }),
       icon: 'i-heroicons-check-circle',
-      color: 'green'
+  color: 'success'
     });
 
     // Rediriger vers la page des conventions de l'utilisateur
@@ -82,7 +79,7 @@ const handleAddConvention = async (formData: ConventionFormData) => {
       title: t('errors.creation_error'),
       description: errorMessage,
       icon: 'i-heroicons-x-circle',
-      color: 'red'
+  color: 'error'
     });
   } finally {
     loading.value = false;

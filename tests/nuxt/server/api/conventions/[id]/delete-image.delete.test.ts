@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import handler from '../../../../../../server/api/conventions/[id]/delete-image.delete';
 
+// Import des mocks après la déclaration
+import { deleteConventionImage } from '../../../../../../server/utils/image-deletion';
+
 // Mock des modules externes
 vi.mock('../../../../../server/utils/image-deletion', () => ({
   deleteConventionImage: vi.fn(),
@@ -15,9 +18,6 @@ const mockEvent = {
 const mockEventWithoutUser = {
   context: {},
 };
-
-// Import des mocks après la déclaration
-import { deleteConventionImage } from '../../../../../../server/utils/image-deletion';
 
 const mockDeleteConventionImage = deleteConventionImage as ReturnType<typeof vi.fn>;
 

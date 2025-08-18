@@ -92,7 +92,7 @@
                 {{ $t('auth.account_information') }}
               </h3>
             </div>
-            <div class="border-b border-gray-200 dark:border-gray-700 pb-2 mb-4"></div>
+            <div class="border-b border-gray-200 dark:border-gray-700 pb-2 mb-4" />
             
             <UFormField :label="$t('common.email')" name="email" :hint="$t('auth.email_private_hint')">
               <UInput 
@@ -152,7 +152,7 @@
                     :key="i"
                     class="h-1 flex-1 rounded"
                     :class="getPasswordStrengthBarColor(i)"
-                  ></div>
+                  />
                 </div>
                 <p class="text-xs" :class="getPasswordStrengthTextColor()">
                   {{ getPasswordStrengthText() }}
@@ -218,12 +218,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import { z } from 'zod';
-import { useAuthStore } from '../stores/auth';
 import type { HttpError } from '~/types';
 
-const authStore = useAuthStore();
 const toast = useToast();
-const router = useRouter();
 const { t } = useI18n();
 
 const schema = z.object({

@@ -1,6 +1,3 @@
-# Docker Compose pour lancer uniquement les tests unitaires simples
-version: '3.8'
-
 services:
   # Container pour les tests unitaires uniquement (sans DB)
   test-unit:
@@ -24,7 +21,13 @@ services:
     command:
       - sh
       - -c
-      - npx vitest run --config vitest.config.unit.ts --silent
+      - |
+        # Si le volume node_modules est vide (cache frais), installer les deps
+        if [ ! -x node_modules/.bin/vitest ]; then
+          echo "node_modules absent: installation des dépendances..."
+          npm ci
+        fi
+        npx vitest run --config vitest.config.unit.ts --silent
 
 volumes:
   node_modules:

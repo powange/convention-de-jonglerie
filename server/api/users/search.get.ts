@@ -1,13 +1,14 @@
 import { PrismaClient } from '@prisma/client';
+import type { H3Error } from 'h3'
 import { getEmailHash } from '../../utils/email-hash';
-import { requireUserSession } from '#auth-utils'
+import { requireUserSession } from '#imports'
 
 const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   try {
-  // Vérifier l'authentification via la session scellée
-  const { user } = await requireUserSession(event)
+    // Vérifier l'authentification via la session scellée
+    const { user } = await requireUserSession(event)
 
     // Récupérer le paramètre de recherche
     const query = getQuery(event);
@@ -24,8 +25,8 @@ export default defineEventHandler(async (event) => {
           { email: { contains: searchQuery } },
           { pseudo: { contains: searchQuery } }
         ],
-  // Exclure l'utilisateur actuel
-  NOT: { id: user.id }
+        // Exclure l'utilisateur actuel
+        NOT: { id: user.id }
       },
       select: {
         id: true,
@@ -47,16 +48,9 @@ export default defineEventHandler(async (event) => {
 
     return transformedUsers;
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la recherche d\'utilisateurs:', error);
-    
-    if (error instanceof jwt.JsonWebTokenError) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token invalide',
-      });
-    }
-
+    if ((error as H3Error)?.statusCode) throw error
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur lors de la recherche',

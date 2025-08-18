@@ -177,13 +177,9 @@ export const useEditionStore = defineStore('editions', {
     async addEdition(editionData: Omit<Edition, 'id' | 'creator' | 'creatorId' | 'favoritedBy'>) {
       this.loading = true;
       this.error = null;
-      const authStore = useAuthStore();
       try {
         const newEdition = await $fetch<Edition>('/api/editions', {
           method: 'POST',
-          headers: {
-            Authorization: `Bearer ${authStore.token}`,
-          },
           body: editionData,
         });
         this.editions.push(newEdition);
@@ -201,14 +197,10 @@ export const useEditionStore = defineStore('editions', {
     async updateEdition(id: number, editionData: Edition) {
       this.loading = true;
       this.error = null;
-      const authStore = useAuthStore();
       try {
         const updatedEdition = await $fetch<Edition>(`/api/editions/${id}`,
           {
             method: 'PUT',
-            headers: {
-              Authorization: `Bearer ${authStore.token}`,
-            },
             body: editionData,
           },
         );
@@ -230,13 +222,9 @@ export const useEditionStore = defineStore('editions', {
     async deleteEdition(id: number) {
       this.loading = true;
       this.error = null;
-      const authStore = useAuthStore();
       try {
         await $fetch(`/api/editions/${id}`, {
           method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${authStore.token}`,
-          },
         });
         this.editions = this.editions.filter((c) => c.id !== id);
       } catch (e: unknown) {
@@ -250,8 +238,8 @@ export const useEditionStore = defineStore('editions', {
 
     async toggleFavorite(id: number) {
       this.error = null;
-      const authStore = useAuthStore();
-      const currentUser = authStore.user;
+  const authStore = useAuthStore();
+  const currentUser = authStore.user;
       
       // Optimistic update - mise à jour locale immédiate
       const editionIndex = this.editions.findIndex(e => e.id === id);
@@ -276,9 +264,6 @@ export const useEditionStore = defineStore('editions', {
         // Appel API en arrière-plan
         const response = await $fetch(`/api/editions/${id}/favorite`, {
           method: 'POST',
-          headers: {
-            Authorization: `Bearer ${authStore.token}`,
-          },
         });
         
         // Mettre à jour avec la réponse du serveur si nécessaire
@@ -316,13 +301,8 @@ export const useEditionStore = defineStore('editions', {
     // Méthodes pour gérer les collaborateurs
     async getCollaborators(editionId: number) {
       this.error = null;
-      const authStore = useAuthStore();
       try {
-        const collaborators = await $fetch<ConventionCollaborator[]>(`/api/editions/${editionId}/collaborators`, {
-          headers: {
-            Authorization: `Bearer ${authStore.token}`,
-          },
-        });
+  const collaborators = await $fetch<ConventionCollaborator[]>(`/api/editions/${editionId}/collaborators`);
         return collaborators;
       } catch (e: unknown) {
         const error = e as HttpError;
@@ -333,13 +313,9 @@ export const useEditionStore = defineStore('editions', {
 
     async addCollaborator(editionId: number, userEmail: string, canEdit: boolean = true) {
       this.error = null;
-      const authStore = useAuthStore();
       try {
         const collaborator = await $fetch<ConventionCollaborator>(`/api/editions/${editionId}/collaborators`, {
           method: 'POST',
-          headers: {
-            Authorization: `Bearer ${authStore.token}`,
-          },
           body: { userEmail, canEdit },
         });
         
@@ -362,13 +338,9 @@ export const useEditionStore = defineStore('editions', {
 
     async removeCollaborator(editionId: number, collaboratorId: number) {
       this.error = null;
-      const authStore = useAuthStore();
       try {
         await $fetch(`/api/editions/${editionId}/collaborators/${collaboratorId}`, {
           method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${authStore.token}`,
-          },
         });
         
         // Mettre à jour l'édition locale

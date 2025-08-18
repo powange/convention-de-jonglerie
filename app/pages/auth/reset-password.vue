@@ -78,7 +78,7 @@
                 :key="i"
                 class="h-2 flex-1 rounded-full"
                 :class="getPasswordStrengthColor(i, passwordStrength)"
-              ></div>
+              />
             </div>
             <div class="text-xs text-gray-500 dark:text-gray-400">
               {{ getPasswordStrengthText(passwordStrength) }}
@@ -172,7 +172,6 @@ import { reactive, ref, computed } from 'vue';
 import { z } from 'zod';
 
 const route = useRoute();
-const router = useRouter();
 const toast = useToast();
 const { t } = useI18n();
 

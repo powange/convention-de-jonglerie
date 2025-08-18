@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useAuthStore } from '../../app/stores/auth'
-import type { User } from '~/types'
+import type { User } from '../../app/types'
 
 // Mock des fonctions Nuxt
-global.$fetch = vi.fn()
-global.useCookie = vi.fn()
+global.$fetch = vi.fn() as any
+// plus de cookie JWT à gérer côté client
 global.useRoute = vi.fn()
 global.navigateTo = vi.fn()
 
@@ -60,12 +60,12 @@ describe('useAuthStore', () => {
     pseudo: 'testuser',
     nom: 'Test',
     prenom: 'User',
-    isGlobalAdmin: false
+    isGlobalAdmin: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 
-  const mockCookie = {
-    value: null
-  }
+  // plus de cookie géré explicitement par le store
 
   beforeEach(() => {
     setActivePinia(createPinia())
@@ -80,8 +80,7 @@ describe('useAuthStore', () => {
     sessionStorageMock.setItem.mockImplementation(() => {})
     sessionStorageMock.removeItem.mockImplementation(() => {})
     
-    // Mock du cookie par défaut
-    vi.mocked(useCookie).mockReturnValue(mockCookie)
+  // aucun cookie à mocker
   })
 
   afterEach(() => {
@@ -91,29 +90,18 @@ describe('useAuthStore', () => {
   describe('État initial', () => {
     it('devrait avoir un état initial correct', () => {
       expect(authStore.user).toBeNull()
-      expect(authStore.token).toBeNull()
-      expect(authStore.tokenExpiry).toBeNull()
       expect(authStore.rememberMe).toBe(false)
       expect(authStore.adminMode).toBe(false)
     })
   })
 
   describe('Getters', () => {
-    it('isAuthenticated devrait retourner false sans token', () => {
+    it('isAuthenticated devrait retourner false sans utilisateur', () => {
       expect(authStore.isAuthenticated).toBe(false)
     })
 
-    it('isAuthenticated devrait retourner false avec token expiré', () => {
-      authStore.token = 'test-token'
-      authStore.tokenExpiry = Date.now() - 1000 // Expiré
-
-      expect(authStore.isAuthenticated).toBe(false)
-    })
-
-    it('isAuthenticated devrait retourner true avec token valide', () => {
-      authStore.token = 'test-token'
-      authStore.tokenExpiry = Date.now() + 1000 // Valide
-
+    it('isAuthenticated devrait retourner true avec utilisateur défini', () => {
+      authStore.user = { ...mockUser }
       expect(authStore.isAuthenticated).toBe(true)
     })
 
@@ -172,8 +160,7 @@ describe('useAuthStore', () => {
 
   describe('Action login', () => {
     const mockLoginResponse = {
-      user: mockUser,
-      token: 'test-token-123'
+  user: mockUser
     }
 
     beforeEach(() => {
@@ -189,9 +176,7 @@ describe('useAuthStore', () => {
       })
 
       expect(authStore.user).toEqual(mockUser)
-      expect(authStore.token).toBe('test-token-123')
       expect(authStore.rememberMe).toBe(false)
-      expect(authStore.tokenExpiry).toBeGreaterThan(Date.now())
       expect(result).toEqual(mockLoginResponse)
     })
 
@@ -212,7 +197,6 @@ describe('useAuthStore', () => {
 
       // En environnement de test, les fonctions côté client ne sont pas appelées
       // On vérifie juste que l'état du store est correct
-      expect(authStore.token).toBe('test-token-123')
       expect(authStore.user).toEqual(mockUser)
     })
 
@@ -229,43 +213,35 @@ describe('useAuthStore', () => {
     beforeEach(() => {
       // Simuler un utilisateur connecté
       authStore.user = mockUser
-      authStore.token = 'test-token'
-      authStore.tokenExpiry = Date.now() + 1000
       authStore.rememberMe = true
       authStore.adminMode = true
     })
 
-    it('devrait réinitialiser l\'état du store', () => {
-      authStore.logout()
+    it('devrait réinitialiser l\'état du store', async () => {
+      await authStore.logout()
 
       expect(authStore.user).toBeNull()
-      expect(authStore.token).toBeNull()
-      expect(authStore.tokenExpiry).toBeNull()
       expect(authStore.rememberMe).toBe(false)
       expect(authStore.adminMode).toBe(false)
     })
 
-    it('devrait être appelé côté client seulement', () => {
-      authStore.logout()
+    it('devrait être appelé côté client seulement', async () => {
+      await authStore.logout()
       
       // Le logout devrait fonctionner même sans storage côté client
       expect(authStore.user).toBeNull()
-      expect(authStore.token).toBeNull()
     })
 
-    it('devrait supprimer le cookie d\'authentification', () => {
+    it("devrait appeler l'API de logout", () => {
       authStore.logout()
-
-      expect(mockCookie.value).toBeNull()
+      expect($fetch).toHaveBeenCalledWith('/api/auth/logout', { method: 'POST' })
     })
   })
 
   describe('Action initializeAuth', () => {
-    it('devrait ne rien faire côté serveur', () => {
-      authStore.initializeAuth()
-
-      // En environnement de test (côté serveur), initializeAuth ne devrait rien faire
-      expect(authStore.token).toBeNull()
+    it('devrait ne rien faire côté serveur (en test)', async () => {
+      await authStore.initializeAuth()
+      await Promise.resolve()
       expect(authStore.user).toBeNull()
     })
   })
@@ -343,32 +319,5 @@ describe('useAuthStore', () => {
     })
   })
 
-  describe('Action checkTokenExpiry', () => {
-    it('devrait faire logout si le token est expiré', () => {
-      authStore.token = 'test-token'
-      authStore.tokenExpiry = Date.now() - 1000 // Expiré
-
-      const logoutSpy = vi.spyOn(authStore, 'logout')
-      authStore.checkTokenExpiry()
-
-      expect(logoutSpy).toHaveBeenCalled()
-    })
-
-    it('ne devrait rien faire si le token est valide', () => {
-      authStore.token = 'test-token'
-      authStore.tokenExpiry = Date.now() + 1000 // Valide
-
-      const logoutSpy = vi.spyOn(authStore, 'logout')
-      authStore.checkTokenExpiry()
-
-      expect(logoutSpy).not.toHaveBeenCalled()
-    })
-
-    it('ne devrait rien faire si pas de token', () => {
-      const logoutSpy = vi.spyOn(authStore, 'logout')
-      authStore.checkTokenExpiry()
-
-      expect(logoutSpy).not.toHaveBeenCalled()
-    })
-  })
+  // Plus de checkTokenExpiry: la logique JWT a été retirée
 })

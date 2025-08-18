@@ -205,7 +205,7 @@ definePageMeta({
   middleware: ['auth-protected', 'super-admin']
 })
 
-const authStore = useAuthStore()
+// const authStore = useAuthStore()
 const toast = useToast()
 
 // Métadonnées de la page
@@ -270,11 +270,7 @@ const getActivityIconClass = (type: string) => {
 // Fonction pour charger les statistiques
 const loadStats = async () => {
   try {
-    const data = await $fetch('/api/admin/stats', {
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
+  const data = await $fetch('/api/admin/stats')
     stats.value = data
   } catch (error) {
     console.error('Error loading statistics:', error)
@@ -297,7 +293,7 @@ const loadStats = async () => {
     }
     
     toast.add({
-      color: 'red',
+      color: 'error',
       title: t('common.error'),
       description: t('admin.cannot_load_stats')
     })
@@ -307,14 +303,7 @@ const loadStats = async () => {
 // Fonction pour charger l'activité récente
 const loadRecentActivity = async () => {
   try {
-    const data = await $fetch('/api/admin/activity', {
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`
-      },
-      query: {
-        limit: 10
-      }
-    })
+  const data = await $fetch('/api/admin/activity', { query: { limit: 10 } })
     recentActivity.value = data
   } catch (error) {
     console.error('Error loading activity:', error)
@@ -329,7 +318,7 @@ const loadRecentActivity = async () => {
     recentActivity.value = []
     
     toast.add({
-      color: 'red',
+      color: 'error',
       title: t('common.error'),
       description: t('admin.cannot_load_activity')
     })

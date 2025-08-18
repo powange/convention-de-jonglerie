@@ -4,7 +4,7 @@ import { vi } from 'vitest'
 vi.mock('#app', () => ({
   useRuntimeConfig: () => ({
     public: {},
-    jwtSecret: 'test-secret',
+    
     emailEnabled: 'false'
   }),
   navigateTo: vi.fn(),
@@ -34,22 +34,22 @@ vi.mock('@nuxtjs/i18n', () => ({}))
 
 // Mock global de $fetch pour les tests d'intégration
 // On garde une implémentation neutre pour ne pas casser les tests qui l'invoquent
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-global.$fetch = vi.fn(async (_req?: any, _options?: any) => ({ ok: true }))
+ 
+global.$fetch = vi.fn(async (_req?: any, _options?: any) => ({ ok: true })) as any
 
 // Mock des composables Nuxt courants utilisés dans le code côté serveur éventuellement importé
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 global.useCookie = vi.fn(() => ({ value: null })) as any
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 global.useRoute = vi.fn(() => ({ path: '/test' })) as any
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 global.useRouter = vi.fn(() => ({ push: vi.fn(), replace: vi.fn() })) as any
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 global.navigateTo = vi.fn() as any
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 global.useRuntimeConfig = vi.fn(() => ({
   public: {},
-  jwtSecret: 'test-secret',
+  
   emailEnabled: 'false'
 })) as any
 

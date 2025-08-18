@@ -152,7 +152,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{
+defineEmits<{
   'toggle-favorite': [];
 }>();
 const authStore = useAuthStore();

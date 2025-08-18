@@ -5,6 +5,15 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   // Active en dev uniquement
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
+  // Enregistre explicitement les helpers de session pour l'alias #imports (utile en environnement de test)
+  imports: {
+    imports: [
+      { from: 'nuxt-auth-utils', name: 'getUserSession' },
+      { from: 'nuxt-auth-utils', name: 'requireUserSession' },
+      { from: 'nuxt-auth-utils', name: 'setUserSession' },
+      { from: 'nuxt-auth-utils', name: 'clearUserSession' }
+    ]
+  },
 
   modules: [
     '@nuxt/eslint', 
@@ -81,7 +90,6 @@ export default defineNuxtConfig({
     'flag-icons/css/flag-icons.min.css'
   ],
   runtimeConfig: {
-    jwtSecret: process.env.JWT_SECRET || 'fallback-secret-for-development', // Private keys that are only available on the server
   sessionPassword: process.env.NUXT_SESSION_PASSWORD || '',
     emailEnabled: process.env.SEND_EMAILS || 'false', // Enable/disable real email sending
     smtpUser: process.env.SMTP_USER || '', // SMTP username for email sending

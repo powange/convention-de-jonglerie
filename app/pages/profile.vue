@@ -134,8 +134,8 @@
                 color="neutral"
                 size="lg"
                 icon="i-heroicons-arrow-path"
-                @click="resetForm"
                 class="transition-all duration-200 hover:transform hover:scale-105"
+                @click="resetForm"
               >
                 {{ $t('common.cancel') }}
               </UButton>
@@ -270,8 +270,8 @@
             color="error" 
             size="lg"
             block
-            @click="showPasswordModal = true"
             class="transition-all duration-200 hover:transform hover:scale-105 justify-start"
+            @click="showPasswordModal = true"
           >
             {{ $t('profile.change_password') }}
           </UButton>
@@ -412,8 +412,8 @@
               variant="outline"
               color="neutral"
               size="lg"
-              @click="showPasswordModal = false"
               class="transition-all duration-200 hover:transform hover:scale-105"
+              @click="showPasswordModal = false"
             >
               {{ $t('common.cancel') }}
             </UButton>
@@ -608,16 +608,13 @@ const updateProfile = async () => {
   
   loading.value = true;
   try {
-    const updatedUser = await $fetch<User>('/api/profile/update', {
+  const updatedUser = await $fetch<User>('/api/profile/update', {
       method: 'PUT',
       body: {
         email: state.email,
         pseudo: state.pseudo,
         nom: state.nom,
         prenom: state.prenom,
-      },
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
       },
     });
     
@@ -628,7 +625,7 @@ const updateProfile = async () => {
       title: t('profile.profile_updated'), 
       description: t('profile.info_saved'),
       icon: 'i-heroicons-check-circle', 
-      color: 'green' 
+  color: 'success' 
     });
   } catch (error: unknown) {
     const httpError = error as HttpError;
@@ -636,7 +633,7 @@ const updateProfile = async () => {
       title: t('common.error'), 
       description: httpError.data?.message || httpError.message || t('profile.cannot_save_profile'),
       icon: 'i-heroicons-x-circle', 
-      color: 'red' 
+  color: 'error' 
     });
   } finally {
     loading.value = false;
@@ -646,14 +643,11 @@ const updateProfile = async () => {
 const changePassword = async () => {
   passwordLoading.value = true;
   try {
-    await $fetch('/api/profile/change-password', {
+  await $fetch('/api/profile/change-password', {
       method: 'POST',
       body: {
         currentPassword: passwordState.currentPassword,
         newPassword: passwordState.newPassword,
-      },
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
       },
     });
     
@@ -666,7 +660,7 @@ const changePassword = async () => {
       title: t('profile.password_changed'), 
       description: t('profile.password_updated'),
       icon: 'i-heroicons-check-circle', 
-      color: 'green' 
+  color: 'success' 
     });
   } catch (error: unknown) {
     const httpError = error as HttpError;
@@ -674,7 +668,7 @@ const changePassword = async () => {
       title: t('common.error'), 
       description: httpError.data?.message || httpError.message || t('profile.cannot_change_password'),
       icon: 'i-heroicons-x-circle', 
-      color: 'red' 
+  color: 'error' 
     });
   } finally {
     passwordLoading.value = false;
@@ -733,7 +727,7 @@ const onProfilePictureError = (error: string) => {
     title: t('common.error'), 
     description: error || t('profile.cannot_change_photo'),
     icon: 'i-heroicons-x-circle', 
-    color: 'red' 
+  color: 'error' 
   });
 };
 

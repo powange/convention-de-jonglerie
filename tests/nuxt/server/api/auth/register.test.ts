@@ -2,18 +2,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import bcrypt from 'bcryptjs'
 import { prismaMock } from '../../../../__mocks__/prisma';
 
+// Import des mocks après leur définition
+import { sendEmail } from '../../../../../server/utils/emailService'
+
+// Import du handler après les mocks
+import registerHandler from '../../../../../server/api/auth/register.post'
+
 // Mock des modules spécifiques
 vi.mock('../../../../server/utils/emailService', () => ({
   sendEmail: vi.fn().mockResolvedValue(true),
   generateVerificationCode: vi.fn().mockReturnValue('123456'),
   generateVerificationEmailHtml: vi.fn().mockReturnValue('<html>Code: 123456</html>')
 }))
-
-// Import des mocks après leur définition
-import { sendEmail } from '../../../../../server/utils/emailService'
-
-// Import du handler après les mocks
-import registerHandler from '../../../../../server/api/auth/register.post'
 
 describe('API Register', () => {
   beforeEach(() => {

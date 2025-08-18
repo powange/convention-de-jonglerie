@@ -1,34 +1,17 @@
 import { PrismaClient } from '@prisma/client'
-import jwt from 'jsonwebtoken'
+import { requireUserSession } from '#imports'
+import type { H3Error } from 'h3'
 
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   try {
-    // Vérifier l'authentification
-    const token = getCookie(event, 'auth-token') || getHeader(event, 'authorization')?.replace('Bearer ', '')
-    
-    if (!token) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token d\'authentification requis'
-      })
-    }
-
-  const { getJwtSecret } = await import('../../utils/jwt')
-  const decoded = jwt.verify(token, getJwtSecret()) as { userId?: number }
-    const userId = decoded.userId
-
-    if (!userId) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token invalide'
-      })
-    }
+    // Vérifier l'authentification via la session scellée
+    const { user } = await requireUserSession(event)
 
     // Vérifier que l'utilisateur est un super administrateur
     const currentUser = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: user.id },
       select: { isGlobalAdmin: true }
     })
 
@@ -39,10 +22,10 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const limit = parseInt(getQuery(event).limit as string) || 10
+  const limit = parseInt(getQuery(event).limit as string) || 10
 
     // Récupérer les activités récentes en parallèle
-    const [
+  const [
       recentUsers,
       recentConventions,
       recentEditions,
@@ -123,7 +106,16 @@ export default defineEventHandler(async (event) => {
     ])
 
     // Combiner et formater les activités
-    const activities = []
+    type Activity = {
+      id: string
+      type: 'user_registered' | 'convention_created' | 'edition_created' | 'admin_promoted'
+      title: string
+      description: string
+      createdAt: string
+      relatedId: number
+      relatedType: 'user' | 'convention' | 'edition'
+    }
+    const activities: Activity[] = []
 
     // Ajouter les nouveaux utilisateurs
     recentUsers.forEach(user => {
@@ -185,13 +177,9 @@ export default defineEventHandler(async (event) => {
 
     return sortedActivities
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la récupération de l\'activité récente:', error)
-    
-    if (error.statusCode) {
-      throw error
-    }
-    
+    if ((error as H3Error)?.statusCode) throw error
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur interne du serveur'

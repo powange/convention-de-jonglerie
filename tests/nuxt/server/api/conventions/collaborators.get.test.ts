@@ -2,6 +2,9 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import handler from '../../../../server/api/conventions/[id]/collaborators.get';
 import { prismaMock } from '../../../../__mocks__/prisma';
 
+// Import des mocks après la déclaration
+import { checkUserConventionPermission, getConventionCollaborators } from '../../../../../server/utils/collaborator-management';
+
 // Mock des utilitaires de collaborateur
 vi.mock('../../../../server/utils/collaborator-management', () => ({
   checkUserConventionPermission: vi.fn(),
@@ -18,9 +21,6 @@ const mockEvent = {
     },
   },
 };
-
-// Import des mocks après la déclaration
-import { checkUserConventionPermission, getConventionCollaborators } from '../../../../../server/utils/collaborator-management';
 const mockCheckPermission = checkUserConventionPermission as ReturnType<typeof vi.fn>;
 const mockGetCollaborators = getConventionCollaborators as ReturnType<typeof vi.fn>;
 

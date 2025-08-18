@@ -1,9 +1,7 @@
 import bcrypt from 'bcryptjs';
-import * as jwt from 'jsonwebtoken';
-import { setUserSession } from '#auth-utils';
+import { setUserSession } from '#imports';
 import { z } from 'zod';
 import { prisma } from '../../utils/prisma';
-import { getJwtSecret } from '../../utils/jwt';
 import { handleValidationError } from '../../utils/validation-schemas';
 import { authRateLimiter } from '../../utils/rate-limiter';
 
@@ -73,26 +71,22 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-        // Définir la session côté serveur (cookies scellés via nuxt-auth-utils)
-        await setUserSession(event, {
-          user: {
-            id: user.id,
-            email: user.email,
-            pseudo: user.pseudo,
-            nom: user.nom,
-            prenom: user.prenom,
-            isGlobalAdmin: user.isGlobalAdmin,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt,
-            isEmailVerified: user.isEmailVerified
-          }
-        })
-
-        // Conserver le JWT pour compatibilité temporaire (migration progressive)
-        const token = jwt.sign({ userId: user.id }, getJwtSecret(), { expiresIn: '7d' });
+    // Définir la session côté serveur (cookies scellés via nuxt-auth-utils)
+    await setUserSession(event, {
+      user: {
+        id: user.id,
+        email: user.email,
+        pseudo: user.pseudo,
+        nom: user.nom,
+        prenom: user.prenom,
+        isGlobalAdmin: user.isGlobalAdmin,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        isEmailVerified: user.isEmailVerified
+      }
+    })
 
     return { 
-      token, 
       user: { 
         id: user.id, 
         email: user.email, 

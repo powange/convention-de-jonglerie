@@ -1,4 +1,4 @@
-import type { Edition, Convention } from '~/types';
+// Types importés non utilisés supprimés
 
 /**
  * Retourne le nom à afficher pour une édition.

@@ -183,7 +183,7 @@ const requests = computed(() => Array.isArray(carpoolRequests.value) ? carpoolRe
 
 // Fonction pour vérifier la taille d'écran
 const checkScreenSize = () => {
-  if (process.client) {
+  if (import.meta.client) {
     isSmallScreen.value = window.innerWidth < 640;
   }
 };
@@ -191,13 +191,13 @@ const checkScreenSize = () => {
 // Initialiser et écouter les changements de taille
 onMounted(() => {
   checkScreenSize();
-  if (process.client) {
+  if (import.meta.client) {
     window.addEventListener('resize', checkScreenSize);
   }
 });
 
 onUnmounted(() => {
-  if (process.client) {
+  if (import.meta.client) {
     window.removeEventListener('resize', checkScreenSize);
   }
 });

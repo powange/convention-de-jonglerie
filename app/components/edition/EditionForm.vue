@@ -29,7 +29,7 @@
           </UFormField>
           
           <UFormField :label="$t('forms.labels.edition_name_optional')" name="name" :error="getNameError()">
-            <UInput v-model="state.name" :placeholder="$t('forms.placeholders.edition_name_example')" size="lg" class="w-full" @blur="touchedFields.name = true; trimField('name')" maxlength="200"/>
+            <UInput v-model="state.name" :placeholder="$t('forms.placeholders.edition_name_example')" size="lg" class="w-full" maxlength="200" @blur="touchedFields.name = true; trimField('name')"/>
             <template #help>
               <p class="text-xs text-gray-500">Si aucun nom n'est spécifié, le nom de la convention sera utilisé</p>
             </template>
@@ -242,7 +242,7 @@
           </div>
           
           <UFormField :label="$t('common.description')" name="description" :error="getDescriptionError()">
-            <UTextarea v-model="state.description" placeholder="Description de la convention" :rows="5" class="w-full" @blur="touchedFields.description = true; trimField('description')" maxlength="1000" />
+            <UTextarea v-model="state.description" placeholder="Description de la convention" :rows="5" class="w-full" maxlength="1000" @blur="touchedFields.description = true; trimField('description')" />
           </UFormField>
         </div>
       </template>
@@ -352,7 +352,7 @@ import ImageUpload from '~/components/ui/ImageUpload.vue';
 import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date';
 import type { StepperItem } from '@nuxt/ui';
 import type { Edition, Convention } from '~/types';
-import { useAuthStore } from '~/stores/auth';
+// import { useAuthStore } from '~/stores/auth';
 import { useTranslatedConventionServices } from '~/composables/useConventionServices';
 
 const props = defineProps<{
@@ -425,7 +425,7 @@ const state = reactive({
 const toast = useToast();
 const { getTranslatedServicesByCategory } = useTranslatedConventionServices();
 const servicesByCategory = getTranslatedServicesByCategory;
-const authStore = useAuthStore();
+// const authStore = useAuthStore();
 const { normalizeImageUrl } = useImageUrl();
 const showCustomCountry = ref(false);
 
@@ -468,7 +468,7 @@ const countryOptions = [
 const timeOptions = computed(() => {
   const options = [];
   for (let hour = 0; hour < 24; hour++) {
-    for (let minute of [0, 30]) {
+    for (const minute of [0, 30]) {
       const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
       options.push({ label: time, value: time });
     }
@@ -505,16 +505,7 @@ const fetchUserConventions = async () => {
   try {
     loadingConventions.value = true;
     
-    if (!authStore.token) {
-      conventions.value = [];
-      return;
-    }
-    
-    const data = await $fetch<Convention[]>('/api/conventions/my-conventions', {
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-      },
-    });
+  const data = await $fetch<Convention[]>('/api/conventions/my-conventions');
     
     conventions.value = data || [];
   } catch (error) {
@@ -523,7 +514,7 @@ const fetchUserConventions = async () => {
       title: 'Erreur',
       description: 'Impossible de charger vos conventions',
       icon: 'i-heroicons-exclamation-triangle',
-      color: 'red'
+  color: 'error'
     });
   } finally {
     loadingConventions.value = false;
@@ -536,7 +527,7 @@ const validateDates = () => {
   
   const startDate = new Date(state.startDate);
   const endDate = new Date(state.endDate);
-  const now = new Date();
+  // const now = new Date();
   
   // Vérifier que la date de fin est supérieure à la date de début
   if (endDate <= startDate) {
@@ -613,7 +604,7 @@ const getDescriptionError = () => {
 };
 
 // Gestionnaires d'événements pour l'upload d'image
-const onImageUploaded = (result: { success: boolean; imageUrl?: string; edition?: any }) => {
+const onImageUploaded = (result: { success: boolean; imageUrl?: string; edition?: { imageUrl?: string } }) => {
   if (result.success) {
     // L'API d'upload d'édition peut retourner soit imageUrl directement, soit dans l'objet edition
     const newImageUrl = result.imageUrl || result.edition?.imageUrl;

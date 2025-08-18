@@ -2,6 +2,9 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import handler from '../../../../../server/api/conventions/my-conventions.get';
 import { prismaMock } from '../../../../__mocks__/prisma';
 
+// Import du mock après la déclaration
+import { getEmailHash } from '../../../../../server/utils/email-hash';
+
 // Mock du module getEmailHash
 vi.mock('../../../../server/utils/email-hash', () => ({
   getEmailHash: vi.fn(),
@@ -16,9 +19,6 @@ const mockEvent = {
     },
   },
 };
-
-// Import du mock après la déclaration
-import { getEmailHash } from '../../../../../server/utils/email-hash';
 const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>;
 
 describe('/api/conventions/my-conventions GET', () => {

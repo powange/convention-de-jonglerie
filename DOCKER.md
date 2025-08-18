@@ -39,7 +39,7 @@ MYSQL_USER=convention_user
 MYSQL_PASSWORD=votre_mot_de_passe_db
 
 # Application
-JWT_SECRET=votre_secret_jwt_tres_long_et_securise
+NUXT_SESSION_PASSWORD=votre_super_mot_de_passe_de_session_tres_long
 
 # Email (optionnel)
 SEND_EMAILS=false

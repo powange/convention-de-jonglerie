@@ -29,7 +29,6 @@ services:
     command: npm run dev
     environment:
       DATABASE_URL: "mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}"
-      JWT_SECRET: "${JWT_SECRET:-mon_secret_jwt_de_convention_de_jonglerie_super_long}"
       NUXT_HOST: "0.0.0.0"
       NUXT_PORT: "3000"
       NODE_ENV: "development"

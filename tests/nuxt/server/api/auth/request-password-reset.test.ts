@@ -1,17 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { prismaMock } from '../../../../__mocks__/prisma';
 
-// Mock des modules spécifiques
-vi.mock('../../../../server/utils/emailService', () => ({
-  sendEmail: vi.fn().mockResolvedValue(true),
-  generatePasswordResetEmailHtml: vi.fn().mockReturnValue('<html>Reset link</html>')
-}))
-
 // Import des mocks après leur définition
 import { sendEmail } from '../../../../../server/utils/emailService'
 
 // Import du handler après les mocks
 import requestPasswordResetHandler from '../../../../../server/api/auth/request-password-reset.post'
+
+// Mock des modules spécifiques
+vi.mock('../../../../server/utils/emailService', () => ({
+  sendEmail: vi.fn().mockResolvedValue(true),
+  generatePasswordResetEmailHtml: vi.fn().mockReturnValue('<html>Reset link</html>')
+}))
 
 describe('API Request Password Reset', () => {
   const mockUser = {

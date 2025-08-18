@@ -184,17 +184,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { Edition } from '~/types';
 import { useEditionStore } from '~/stores/editions';
 import { useAuthStore } from '~/stores/auth';
 import { useTranslatedConventionServices } from '~/composables/useConventionServices';
 import UserAvatar from '~/components/ui/UserAvatar.vue';
-
-const { formatDateTimeRange } = useDateFormat();
 import EditionHeader from '~/components/edition/EditionHeader.vue';
 import { getEditionDisplayName } from '~/utils/editionName';
+
+const { formatDateTimeRange } = useDateFormat();
 
 const route = useRoute();
 const editionStore = useEditionStore();

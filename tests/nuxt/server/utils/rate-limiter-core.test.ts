@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { H3Event } from 'h3';
 
+// Import après les mocks
+import { createRateLimiter, authRateLimiter, registerRateLimiter, emailRateLimiter } from '../../../../server/utils/rate-limiter';
+
 // Mock de createError
 const mockCreateError = vi.fn();
 
@@ -14,9 +17,6 @@ vi.mock('../../../server/utils/rate-limiter', async (importOriginal) => {
 vi.mock('#imports', () => ({
   createError: mockCreateError,
 }));
-
-// Import après les mocks
-import { createRateLimiter, authRateLimiter, registerRateLimiter, emailRateLimiter } from '../../../../server/utils/rate-limiter';
 
 describe('Rate Limiter Core', () => {
   beforeEach(() => {

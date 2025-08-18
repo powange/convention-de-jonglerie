@@ -150,12 +150,12 @@ const loadCollaborators = async () => {
   loading.value = true;
   try {
     collaborators.value = await editionStore.getCollaborators(props.conventionId);
-  } catch (error) {
+  } catch {
     toast.add({
       title: 'Erreur',
       description: 'Impossible de charger les collaborateurs',
       icon: 'i-heroicons-exclamation-triangle',
-      color: 'red'
+      color: 'error'
     });
   } finally {
     loading.value = false;
@@ -179,7 +179,7 @@ const addCollaborator = async () => {
       title: 'Collaborateur ajouté',
       description: `${newCollaborator.user.pseudo} peut maintenant modifier cette convention`,
       icon: 'i-heroicons-check-circle',
-      color: 'green'
+      color: 'success'
     });
   } catch (error: unknown) {
     const errorMessage = (error && typeof error === 'object' && 'statusMessage' in error && typeof error.statusMessage === 'string') 
