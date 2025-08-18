@@ -1,5 +1,5 @@
 import { prisma } from '../../../../../utils/prisma';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { getJwtSecret } from '../../../../../utils/jwt';
 
 export default defineEventHandler(async (event) => {
@@ -81,11 +81,11 @@ export default defineEventHandler(async (event) => {
     });
 
     return comment;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la création du commentaire:', error);
     
-    if (error.statusCode) {
-      throw error;
+    if (error && typeof error === 'object' && 'statusCode' in error) {
+      throw (error as unknown) as Error;
     }
     
     throw createError({

@@ -24,53 +24,50 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     async register(email: string, password: string, pseudo: string, nom: string, prenom: string) {
-      try {
-        const response = await $fetch('/api/auth/register', {
-          method: 'POST',
-          body: { email, password, pseudo, nom, prenom },
-        });
-        return response;
-      } catch (error) {
-        throw error;
-      }
+      const response = await $fetch('/api/auth/register', {
+        method: 'POST',
+        body: { email, password, pseudo, nom, prenom },
+      });
+      return response;
     },
     async login(identifier: string, password: string, rememberMe: boolean = false) {
-      try {
-        const response = await $fetch('/api/auth/login', {
+      const response = await $fetch<{ token: string; user: User }>(
+        '/api/auth/login',
+        {
           method: 'POST',
           body: { identifier, password },
-        });
-        
-        this.token = response.token;
-        this.user = response.user;
-        this.rememberMe = rememberMe;
-        
-  // Calculer l'expiration (aligné avec le JWT signé côté serveur: 7 jours)
-  this.tokenExpiry = Date.now() + (7 * 24 * 60 * 60 * 1000); // 7 jours
-        
-        // Store in localStorage ou sessionStorage selon "Se souvenir de moi"
-        if (import.meta.client) {
-          const storage = rememberMe ? localStorage : sessionStorage;
-          storage.setItem('authToken', response.token);
-          storage.setItem('authUser', JSON.stringify(response.user));
-          storage.setItem('tokenExpiry', this.tokenExpiry.toString());
-          storage.setItem('rememberMe', rememberMe.toString());
-          
-          // Également stocker le token dans un cookie pour les requêtes serveur
-          const cookieExpiry = rememberMe ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : undefined; // 30 jours si "se souvenir"
-          const cookieToken = useCookie('auth-token', {
-            expires: cookieExpiry,
-            httpOnly: false,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax'
-          });
-          cookieToken.value = response.token;
         }
-        
-        return response;
-      } catch (error) {
-        throw error;
+      );
+
+      this.token = response.token;
+      this.user = response.user;
+      this.rememberMe = rememberMe;
+
+      // Calculer l'expiration (aligné avec le JWT côté serveur: 7 jours)
+      this.tokenExpiry = Date.now() + 7 * 24 * 60 * 60 * 1000;
+
+      // Store in localStorage ou sessionStorage selon "Se souvenir de moi"
+      if (import.meta.client) {
+        const storage = rememberMe ? localStorage : sessionStorage;
+        storage.setItem('authToken', response.token);
+        storage.setItem('authUser', JSON.stringify(response.user));
+        storage.setItem('tokenExpiry', String(this.tokenExpiry));
+        storage.setItem('rememberMe', String(rememberMe));
+
+        // Également stocker le token dans un cookie pour les requêtes serveur
+        const cookieExpiry = rememberMe
+          ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+          : undefined; // 30 jours si "se souvenir"
+        const cookieToken = useCookie('auth-token', {
+          expires: cookieExpiry,
+          httpOnly: false,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+        });
+        cookieToken.value = response.token;
       }
+
+      return response;
     },
     logout() {
       this.user = null;

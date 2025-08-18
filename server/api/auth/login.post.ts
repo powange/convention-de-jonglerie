@@ -1,7 +1,8 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { prisma } from '../../utils/prisma';
+import { getJwtSecret } from '../../utils/jwt';
 import { handleValidationError } from '../../utils/validation-schemas';
 import { authRateLimiter } from '../../utils/rate-limiter';
 
@@ -72,8 +73,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Generate JWT token
-    const config = useRuntimeConfig();
-    const token = jwt.sign({ userId: user.id }, config.jwtSecret, { expiresIn: '7d' });
+  const token = jwt.sign({ userId: user.id }, getJwtSecret(), { expiresIn: '7d' });
 
     return { 
       token, 

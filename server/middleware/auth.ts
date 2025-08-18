@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { prisma } from '../utils/prisma';
 import { getJwtSecret } from '../utils/jwt';
 
