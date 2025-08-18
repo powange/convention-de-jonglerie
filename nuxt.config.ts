@@ -1,5 +1,4 @@
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { fileURLToPath } from 'node:url'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -88,7 +87,8 @@ export default defineNuxtConfig({
     recaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY || '', // reCAPTCHA secret key for server-side verification
     public: {
       // Public keys that are available on both client and server
-      recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY || '' // reCAPTCHA site key for client-side widget
+      // Supporte aussi la convention Nuxt NUXT_PUBLIC_*
+      recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || process.env.RECAPTCHA_SITE_KEY || '' // reCAPTCHA site key for client-side widget
     }
   },
   vite: {
