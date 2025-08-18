@@ -40,8 +40,13 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Vérifier le captcha avec Google reCAPTCHA v3
+    // Bypass reCAPTCHA en dev si activé
     const config = useRuntimeConfig();
+    if (config.recaptchaDevBypass) {
+      // Continuer sans vérifier auprès de Google
+      // Optionnel: on pourrait journaliser ou marquer le feedback comme issu d'un bypass
+    } else {
+      // Vérifier le captcha avec Google reCAPTCHA v3
     const recaptchaSecret = config.recaptchaSecretKey;
     if (!recaptchaSecret) {
       throw createError({
@@ -71,7 +76,9 @@ export default defineEventHandler(async (event) => {
       });
 
       // Attendus v3: success vrai, action correspondante, score >= seuil
-      const minScore = Number((config as unknown as { recaptchaMinScore?: number }).recaptchaMinScore ?? 0.5);
+  const cfg = config as unknown as { recaptchaMinScore?: number; recaptchaExpectedHostname?: string };
+  const minScore = Number(cfg.recaptchaMinScore ?? 0.5);
+  const expectedHost = (cfg.recaptchaExpectedHostname || '').trim();
       if (!verification?.success) {
         throw createError({ statusCode: 400, statusMessage: 'Captcha invalide' });
       }
@@ -81,12 +88,16 @@ export default defineEventHandler(async (event) => {
       if (typeof verification?.score === 'number' && verification.score < minScore) {
         throw createError({ statusCode: 400, statusMessage: 'Captcha score insuffisant' });
       }
-    } catch (error) {
+      if (expectedHost && verification?.hostname && verification.hostname !== expectedHost) {
+        throw createError({ statusCode: 400, statusMessage: 'Captcha hostname invalide' });
+      }
+      } catch (error) {
       console.error('Erreur lors de la vérification du captcha:', error);
       throw createError({
         statusCode: 400,
         statusMessage: 'Erreur lors de la vérification du captcha'
       });
+      }
     }
 
     // Vérifier que le nom est fourni pour les utilisateurs non connectés (email optionnel)
