@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output = "../node_modules/.prisma/client"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -9,7 +9,7 @@ datasource db {
 }
 
 enum CollaboratorRole {
-  MODERATOR     // Peut gérer uniquement les éditions
+  MODERATOR // Peut gérer uniquement les éditions
   ADMINISTRATOR // Peut gérer la convention, les éditions et ajouter des collaborateurs
 }
 
@@ -43,14 +43,15 @@ model User {
   lostFoundItems         LostFoundItem[]
   lostFoundComments      LostFoundComment[]
   feedbacks              Feedback[]
+  carpoolBookings        CarpoolBooking[]
 }
 
 model Edition {
-  id                   Int                      @id @default(autoincrement())
+  id                   Int              @id @default(autoincrement())
   name                 String?
   description          String?
-  createdAt            DateTime                 @default(now())
-  updatedAt            DateTime                 @updatedAt
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
   creatorId            Int
   conventionId         Int
   endDate              DateTime
@@ -66,36 +67,36 @@ model Edition {
   facebookUrl          String?
   instagramUrl         String?
   ticketingUrl         String?
-  acceptsPets          Boolean                  @default(false)
-  hasFoodTrucks        Boolean                  @default(false)
-  hasGym               Boolean                  @default(false)
-  hasKidsZone          Boolean                  @default(false)
-  hasTentCamping       Boolean                  @default(false)
-  hasTruckCamping      Boolean                  @default(false)
+  acceptsPets          Boolean          @default(false)
+  hasFoodTrucks        Boolean          @default(false)
+  hasGym               Boolean          @default(false)
+  hasKidsZone          Boolean          @default(false)
+  hasTentCamping       Boolean          @default(false)
+  hasTruckCamping      Boolean          @default(false)
   imageUrl             String?
-  hasAccessibility     Boolean                  @default(false)
-  hasAerialSpace       Boolean                  @default(false)
-  hasCantine           Boolean                  @default(false)
-  hasConcert           Boolean                  @default(false)
-  hasFamilyCamping     Boolean                  @default(false)
-  hasFireSpace         Boolean                  @default(false)
-  hasGala              Boolean                  @default(false)
-  hasOpenStage         Boolean                  @default(false)
-  hasShowers           Boolean                  @default(false)
-  hasSlacklineSpace    Boolean                  @default(false)
-  hasToilets           Boolean                  @default(false)
-  hasWorkshops         Boolean                  @default(false)
-  hasAfjTokenPayment   Boolean                  @default(false)
-  hasCreditCardPayment Boolean                  @default(false)
-  hasLongShow          Boolean                  @default(false)
-  hasATM               Boolean                  @default(false)
+  hasAccessibility     Boolean          @default(false)
+  hasAerialSpace       Boolean          @default(false)
+  hasCantine           Boolean          @default(false)
+  hasConcert           Boolean          @default(false)
+  hasFamilyCamping     Boolean          @default(false)
+  hasFireSpace         Boolean          @default(false)
+  hasGala              Boolean          @default(false)
+  hasOpenStage         Boolean          @default(false)
+  hasShowers           Boolean          @default(false)
+  hasSlacklineSpace    Boolean          @default(false)
+  hasToilets           Boolean          @default(false)
+  hasWorkshops         Boolean          @default(false)
+  hasAfjTokenPayment   Boolean          @default(false)
+  hasCreditCardPayment Boolean          @default(false)
+  hasLongShow          Boolean          @default(false)
+  hasATM               Boolean          @default(false)
   carpoolOffers        CarpoolOffer[]
   carpoolRequests      CarpoolRequest[]
   editionPosts         EditionPost[]
   lostFoundItems       LostFoundItem[]
-  creator              User                     @relation("CreatedEditions", fields: [creatorId], references: [id])
-  favoritedBy          User[]                   @relation("FavoriteEditions")
-  convention           Convention               @relation(fields: [conventionId], references: [id])
+  creator              User             @relation("CreatedEditions", fields: [creatorId], references: [id])
+  favoritedBy          User[]           @relation("FavoriteEditions")
+  convention           Convention       @relation(fields: [conventionId], references: [id])
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -131,6 +132,7 @@ model CarpoolOffer {
   editionId        Int
   comments         CarpoolComment[]
   passengers       CarpoolPassenger[]
+  bookings         CarpoolBooking[]
   edition          Edition            @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -152,6 +154,7 @@ model CarpoolRequest {
   edition       Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user          User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments      CarpoolRequestComment[]
+  bookings      CarpoolBooking[]
 
   @@index([editionId], map: "CarpoolRequest_editionId_fkey")
   @@index([userId], map: "CarpoolRequest_userId_fkey")
@@ -199,31 +202,59 @@ model CarpoolPassenger {
   @@index([userId], map: "CarpoolPassenger_userId_fkey")
 }
 
+// Réservations de covoiturage (un utilisateur peut réserver plusieurs places, avec workflow d'acceptation)
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+model CarpoolBooking {
+  id             Int           @id @default(autoincrement())
+  carpoolOfferId Int
+  requestId      Int? // Lien optionnel vers une demande existante
+  requesterId    Int // Utilisateur qui réserve
+  seats          Int // Nombre de places demandées
+  message        String?       @db.Text
+  status         BookingStatus @default(PENDING)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  carpoolOffer   CarpoolOffer    @relation(fields: [carpoolOfferId], references: [id], onDelete: Cascade)
+  requester      User            @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+  carpoolRequest CarpoolRequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+
+  @@index([carpoolOfferId], map: "CarpoolBooking_carpoolOfferId_fkey")
+  @@index([requesterId], map: "CarpoolBooking_requesterId_fkey")
+  @@index([requestId], map: "CarpoolBooking_requestId_fkey")
+}
+
 model Convention {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String?   @db.Text
-  logo        String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  authorId    Int
-  author      User      @relation(fields: [authorId], references: [id])
-  editions    Edition[]
+  id            Int                      @id @default(autoincrement())
+  name          String
+  description   String?                  @db.Text
+  logo          String?
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
+  authorId      Int
+  author        User                     @relation(fields: [authorId], references: [id])
+  editions      Edition[]
   collaborators ConventionCollaborator[]
 
   @@index([authorId], map: "Convention_authorId_fkey")
 }
 
 model EditionPost {
-  id          Int              @id @default(autoincrement())
-  editionId   Int
-  userId      Int
-  content     String           @db.Text
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  edition     Edition          @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  comments    EditionPostComment[]
+  id        Int                  @id @default(autoincrement())
+  editionId Int
+  userId    Int
+  content   String               @db.Text
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  edition   Edition              @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments  EditionPostComment[]
 
   @@index([editionId], map: "EditionPost_editionId_fkey")
   @@index([userId], map: "EditionPost_userId_fkey")
@@ -257,21 +288,21 @@ model PasswordResetToken {
 }
 
 enum LostFoundStatus {
-  LOST      // Objet perdu
-  RETURNED  // Objet restitué
+  LOST // Objet perdu
+  RETURNED // Objet restitué
 }
 
 model LostFoundItem {
-  id          Int                    @id @default(autoincrement())
+  id          Int                @id @default(autoincrement())
   editionId   Int
-  userId      Int                    // Utilisateur qui a créé l'annonce (doit être collaborateur)
-  description String                 @db.Text
+  userId      Int // Utilisateur qui a créé l'annonce (doit être collaborateur)
+  description String             @db.Text
   imageUrl    String?
-  status      LostFoundStatus        @default(LOST)
-  createdAt   DateTime               @default(now())
-  updatedAt   DateTime               @updatedAt
-  edition     Edition                @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  user        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status      LostFoundStatus    @default(LOST)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  edition     Edition            @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments    LostFoundComment[]
 
   @@index([editionId], map: "LostFoundItem_editionId_fkey")
@@ -279,41 +310,41 @@ model LostFoundItem {
 }
 
 model LostFoundComment {
-  id              Int            @id @default(autoincrement())
+  id              Int           @id @default(autoincrement())
   lostFoundItemId Int
   userId          Int
-  content         String         @db.Text
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  lostFoundItem   LostFoundItem  @relation(fields: [lostFoundItemId], references: [id], onDelete: Cascade)
-  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content         String        @db.Text
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  lostFoundItem   LostFoundItem @relation(fields: [lostFoundItemId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([lostFoundItemId], map: "LostFoundComment_lostFoundItemId_fkey")
   @@index([userId], map: "LostFoundComment_userId_fkey")
 }
 
 enum FeedbackType {
-  BUG          // Signalement de bug
-  SUGGESTION   // Suggestion d'amélioration
-  GENERAL      // Commentaire général
-  COMPLAINT    // Plainte ou problème
+  BUG // Signalement de bug
+  SUGGESTION // Suggestion d'amélioration
+  GENERAL // Commentaire général
+  COMPLAINT // Plainte ou problème
 }
 
 model Feedback {
-  id          Int          @id @default(autoincrement())
-  type        FeedbackType
-  subject     String
-  message     String       @db.Text
-  email       String?      // Email pour les utilisateurs non connectés
-  name        String?      // Nom pour les utilisateurs non connectés
-  userId      Int?         // Utilisateur connecté (optionnel)
-  userAgent   String?      // Navigateur/OS pour debug
-  url         String?      // Page où le feedback a été soumis
-  resolved    Boolean      @default(false)
-  adminNotes  String?      @db.Text
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  id         Int          @id @default(autoincrement())
+  type       FeedbackType
+  subject    String
+  message    String       @db.Text
+  email      String? // Email pour les utilisateurs non connectés
+  name       String? // Nom pour les utilisateurs non connectés
+  userId     Int? // Utilisateur connecté (optionnel)
+  userAgent  String? // Navigateur/OS pour debug
+  url        String? // Page où le feedback a été soumis
+  resolved   Boolean      @default(false)
+  adminNotes String?      @db.Text
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  user       User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId], map: "Feedback_userId_fkey")
   @@index([type], map: "Feedback_type_idx")
