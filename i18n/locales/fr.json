@@ -248,7 +248,7 @@
     "verifying": "Vérification...",
     "verify_code": "Vérifier le code",
     "resend_in": "Renvoyer dans",
-  "resend_code": "Renvoyer le code",
+    "resend_code": "Renvoyer le code",
     "email_verified_success": "Email vérifié avec succès !",
     "account_now_active": "Votre compte est maintenant actif. Vous pouvez vous connecter.",
     "code_expired": "Le code a expiré. Demandez un nouveau code.",
@@ -278,7 +278,8 @@
     "reset_link_expired": "Ce lien de réinitialisation a expiré",
     "reset_link_used": "Ce lien a déjà été utilisé pour réinitialiser le mot de passe",
     "invalid_code": "Code invalide",
-    "continue_with_google": "Continuer avec Google"
+  "continue_with_google": "Continuer avec Google",
+  "continue_with_facebook": "Continuer avec Facebook"
   },
   "editions": {
     "edit": "Modifier l'édition",

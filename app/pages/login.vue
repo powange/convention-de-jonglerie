@@ -48,7 +48,7 @@
           </div>
 
           <!-- Continuer avec Google -->
-          <div>
+          <div class="space-y-3">
             <UButton
               block
               color="neutral"
@@ -57,6 +57,15 @@
               @click="onGoogleLogin"
             >
               {{ $t('auth.continue_with_google') }}
+            </UButton>
+            <UButton
+              block
+              color="neutral"
+              variant="soft"
+              icon="i-simple-icons-facebook"
+              @click="onFacebookLogin"
+            >
+              {{ $t('auth.continue_with_facebook') }}
             </UButton>
           </div>
         </template>
@@ -278,6 +287,11 @@ import type { HttpError } from '~/types';
 const onGoogleLogin = async () => {
   // Navigation externe pour forcer l'appel de la route serveur (/server/routes/auth/google.get.ts)
   await navigateTo('/auth/google', { external: true })
+}
+
+const onFacebookLogin = async () => {
+  // Navigation externe pour forcer l'appel de la route serveur (/server/routes/auth/facebook.get.ts)
+  await navigateTo('/auth/facebook', { external: true })
 }
 
 const authStore = useAuthStore();

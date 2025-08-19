@@ -24,8 +24,8 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  // OAuth callback/redirect route must be public
-  if (path === '/auth/google' && requestMethod === 'GET') {
+  // OAuth callback/redirect routes must be public
+  if ((path === '/auth/google' || path === '/auth/facebook') && requestMethod === 'GET') {
     return;
   }
 
