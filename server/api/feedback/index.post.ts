@@ -40,14 +40,17 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Bypass reCAPTCHA en dev si activé
-    const config = useRuntimeConfig();
-    if (config.recaptchaDevBypass) {
+  // Bypass reCAPTCHA en dev si activé
+  const config = useRuntimeConfig();
+  // Lire au runtime avec priorité aux env vars et conversion booléenne sûre
+  const recaptchaBypassEnv = process.env.NUXT_RECAPTCHA_DEV_BYPASS;
+  const recaptchaDevBypass = (recaptchaBypassEnv ?? String(config.recaptchaDevBypass)) === 'true';
+  if (recaptchaDevBypass) {
       // Continuer sans vérifier auprès de Google
       // Optionnel: on pourrait journaliser ou marquer le feedback comme issu d'un bypass
     } else {
       // Vérifier le captcha avec Google reCAPTCHA v3
-    const recaptchaSecret = config.recaptchaSecretKey;
+    const recaptchaSecret = process.env.NUXT_RECAPTCHA_SECRET_KEY || config.recaptchaSecretKey;
     if (!recaptchaSecret) {
       throw createError({
         statusCode: 500,
@@ -75,10 +78,10 @@ export default defineEventHandler(async (event) => {
         body: params
       });
 
-      // Attendus v3: success vrai, action correspondante, score >= seuil
-  const cfg = config as unknown as { recaptchaMinScore?: number; recaptchaExpectedHostname?: string };
-  const minScore = Number(cfg.recaptchaMinScore ?? 0.5);
-  const expectedHost = (cfg.recaptchaExpectedHostname || '').trim();
+    // Attendus v3: success vrai, action correspondante, score >= seuil
+  const cfg = config as unknown as { recaptchaMinScore?: number | string; recaptchaExpectedHostname?: string };
+  const minScore = Number(process.env.NUXT_RECAPTCHA_MIN_SCORE ?? cfg.recaptchaMinScore ?? 0.5);
+  const expectedHost = (process.env.NUXT_RECAPTCHA_EXPECTED_HOSTNAME ?? cfg.recaptchaExpectedHostname ?? '').toString().trim();
       if (!verification?.success) {
         throw createError({ statusCode: 400, statusMessage: 'Captcha invalide' });
       }
