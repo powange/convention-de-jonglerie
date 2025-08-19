@@ -38,6 +38,11 @@ services:
       SEND_EMAILS: "${SEND_EMAILS:-false}"
       SMTP_USER: "${SMTP_USER:-}"
       SMTP_PASS: "${SMTP_PASS:-}"
+      # Google OAuth
+      NUXT_OAUTH_GOOGLE_CLIENT_ID: "${NUXT_OAUTH_GOOGLE_CLIENT_ID:-}"
+      NUXT_OAUTH_GOOGLE_CLIENT_SECRET: "${NUXT_OAUTH_GOOGLE_CLIENT_SECRET:-}"
+      # Optionnel si vous avez une URL publique
+      NUXT_OAUTH_GOOGLE_REDIRECT_URL: "${NUXT_OAUTH_GOOGLE_REDIRECT_URL:-}"
       # Exposition Nuxt (public/secret) basée sur les mêmes valeurs
       NUXT_PUBLIC_RECAPTCHA_SITE_KEY: "${NUXT_PUBLIC_RECAPTCHA_SITE_KEY}"
       NUXT_RECAPTCHA_SECRET_KEY: "${NUXT_RECAPTCHA_SECRET_KEY}"

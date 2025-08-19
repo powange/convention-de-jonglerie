@@ -120,7 +120,8 @@ import { z } from 'zod';
 import { useAuthStore } from '../stores/auth';
 import type { HttpError } from '~/types';
 const onGoogleLogin = async () => {
-  await navigateTo('/auth/google')
+  // Navigation externe pour forcer l'appel de la route serveur (/server/routes/auth/google.get.ts)
+  await navigateTo('/auth/google', { external: true })
 }
 
 const authStore = useAuthStore();

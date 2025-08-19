@@ -91,6 +91,9 @@ export default defineEventHandler(async (event) => {
 
   const email = userInfo?.email as string | undefined
   const name = (userInfo?.name as string | undefined) || ''
+  const givenName = (userInfo?.given_name as string | undefined) || ''
+  const familyName = (userInfo?.family_name as string | undefined) || ''
+  const picture = (userInfo?.picture as string | undefined) || ''
   if (!email) {
     console.error('Google OAuth: email manquant dans userinfo')
     return sendRedirect(event, '/login')
@@ -102,8 +105,8 @@ export default defineEventHandler(async (event) => {
   // Créer l'utilisateur si inexistant
   if (!dbUser) {
     const [prenomRaw, ...rest] = name.trim().split(/\s+/)
-    const prenom = prenomRaw || email.split('@')[0]
-    const nom = rest.join(' ') || 'Google'
+    const prenom = (givenName || prenomRaw || email.split('@')[0]).trim()
+    const nom = (familyName || rest.join(' ') || 'Google').trim()
     const basePseudo = email.split('@')[0]
     const pseudo = await uniquePseudo(basePseudo)
 
@@ -118,9 +121,22 @@ export default defineEventHandler(async (event) => {
         nom,
         prenom,
         password: hashed,
-        isEmailVerified: true
+        isEmailVerified: true,
+        ...(picture ? { profilePicture: picture } : {})
       }
     })
+  }
+
+  // Mettre à jour la photo de profil si elle est vide et que Google fournit une image
+  if (dbUser && !dbUser.profilePicture && picture) {
+    try {
+      dbUser = await prisma.user.update({
+        where: { id: dbUser.id },
+        data: { profilePicture: picture }
+      })
+    } catch (e) {
+      console.warn('Impossible de mettre à jour la photo de profil depuis Google:', e)
+    }
   }
 
   // Ouvrir la session utilisateur
@@ -132,6 +148,7 @@ export default defineEventHandler(async (event) => {
       pseudo: dbUser.pseudo,
       nom: dbUser.nom,
       prenom: dbUser.prenom,
+  profilePicture: dbUser.profilePicture,
       isGlobalAdmin: dbUser.isGlobalAdmin,
       createdAt: dbUser.createdAt,
       updatedAt: dbUser.updatedAt,
