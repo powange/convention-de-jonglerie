@@ -10,7 +10,11 @@ export interface EmailOptions {
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   const config = useRuntimeConfig();
-  const isEmailEnabled = config.emailEnabled === 'true';
+  // Priorité aux variables d'environnement runtime (conteneur) pour éviter les valeurs figées au build
+  const sendEmailsEnv = process.env.SEND_EMAILS;
+  const isEmailEnabled = (sendEmailsEnv ?? (config.emailEnabled as string)) === 'true';
+  const smtpUser = process.env.SMTP_USER || (config.smtpUser as string) || '';
+  const smtpPass = process.env.SMTP_PASS || (config.smtpPass as string) || '';
   
   try {
     if (!isEmailEnabled) {
@@ -36,7 +40,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     }
     
     // Mode envoi réel
-    if (!config.smtpUser || !config.smtpPass) {
+    if (!smtpUser || !smtpPass) {
       console.error('❌ Variables SMTP manquantes (SMTP_USER, SMTP_PASS)');
       return false;
     }
@@ -44,13 +48,13 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: config.smtpUser,
-        pass: config.smtpPass
+        user: smtpUser,
+        pass: smtpPass
       }
     });
 
     const mailOptions = {
-      from: `"Conventions de Jonglerie" <${config.smtpUser}>`,
+      from: `"Conventions de Jonglerie" <${smtpUser}>`,
       to: options.to,
       subject: options.subject,
       html: options.html,
