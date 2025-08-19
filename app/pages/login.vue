@@ -409,7 +409,6 @@ const handlePasswordSubmit = async () => {
       returnTo.includes('/auth/reset-password') ||
       returnTo.includes('/auth/forgot-password') ||
       returnTo.includes('/login') ||
-      returnTo.includes('/register') ||
       returnTo.includes('/verify-email')
     )
     router.push(shouldNotReturnTo ? '/' : (returnTo || '/'))

@@ -92,10 +92,10 @@
             <!-- Retour -->
             <div class="text-center">
               <NuxtLink 
-                to="/register" 
+                to="/login" 
                 class="text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
               >
-                {{ $t('auth.back_to_register') }}
+                {{ $t('auth.back_to_login') }}
               </NuxtLink>
             </div>
           </div>
@@ -305,7 +305,7 @@ const startResendCooldown = () => {
 onMounted(() => {
   // Vérifier que l'email est présent
   if (!email.value) {
-    router.push('/register');
+    router.push('/login');
     return;
   }
   
