@@ -90,15 +90,15 @@ export default defineNuxtConfig({
     'flag-icons/css/flag-icons.min.css'
   ],
   runtimeConfig: {
-  sessionPassword: process.env.NUXT_SESSION_PASSWORD || '',
+    sessionPassword: process.env.NUXT_SESSION_PASSWORD || '',
     emailEnabled: process.env.SEND_EMAILS || 'false', // Enable/disable real email sending
     smtpUser: process.env.SMTP_USER || '', // SMTP username for email sending
     smtpPass: process.env.SMTP_PASS || '', // SMTP password for email sending
     // Supporte aussi la convention Nuxt NUXT_*
     recaptchaSecretKey: process.env.NUXT_RECAPTCHA_SECRET_KEY || '', // reCAPTCHA secret key for server-side verification
-  recaptchaMinScore: Number(process.env.NUXT_RECAPTCHA_MIN_SCORE || '0.5'), // seuil configurable pour v3
-  recaptchaExpectedHostname: process.env.NUXT_RECAPTCHA_EXPECTED_HOSTNAME || '', // optionnel: valider le hostname retourné par Google
-  recaptchaDevBypass: process.env.NUXT_RECAPTCHA_DEV_BYPASS === 'true' || process.env.NODE_ENV !== 'production', // bypass en dev par défaut
+    recaptchaMinScore: Number(process.env.NUXT_RECAPTCHA_MIN_SCORE || '0.5'), // seuil configurable pour v3
+    recaptchaExpectedHostname: process.env.NUXT_RECAPTCHA_EXPECTED_HOSTNAME || '', // optionnel: valider le hostname retourné par Google
+    recaptchaDevBypass: process.env.NUXT_RECAPTCHA_DEV_BYPASS === 'true' || process.env.NODE_ENV !== 'production', // bypass en dev par défaut
     public: {
       // Public keys that are available on both client and server
       // Supporte aussi la convention Nuxt NUXT_PUBLIC_*
