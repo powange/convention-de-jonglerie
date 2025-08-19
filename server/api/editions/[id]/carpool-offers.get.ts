@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const carpoolOffers = await prisma.carpoolOffer.findMany({
+  const carpoolOffers = await prisma.carpoolOffer.findMany({
       where: {
         editionId,
       },
@@ -27,6 +27,7 @@ export default defineEventHandler(async (event) => {
             addedAt: 'asc',
           },
         },
+    bookings: true,
         comments: {
           include: {
             user: true,
@@ -44,6 +45,7 @@ export default defineEventHandler(async (event) => {
     // Transformer les données pour masquer les emails et ajouter les hash
     const transformedOffers = carpoolOffers.map(offer => ({
       ...offer,
+      remainingSeats: Math.max(0, offer.availableSeats - offer.bookings.filter(b => b.status === 'ACCEPTED').reduce((s, b) => s + (b.seats || 0), 0)),
       user: {
         id: offer.user.id,
         pseudo: offer.user.pseudo,
@@ -62,7 +64,7 @@ export default defineEventHandler(async (event) => {
           updatedAt: passenger.user.updatedAt,
         },
       })),
-      comments: offer.comments.map(comment => ({
+  comments: offer.comments.map(comment => ({
         ...comment,
         user: {
           id: comment.user.id,

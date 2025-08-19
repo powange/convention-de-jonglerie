@@ -42,9 +42,9 @@ const sections = [
       { name: 'check-i18n -- -h', desc: 'Affiche l\'aide détaillée du script' },
       { name: 'check-translations', desc: 'Compare les traductions entre les langues' },
       { name: 'check-translations -- -l es', desc: 'Vérifie uniquement les traductions espagnoles' },
-  { name: 'check-translations -- -s', desc: 'Affiche uniquement le résumé des traductions' },
-  { name: 'normalize-locales', desc: 'Normalise la structure et l\'ordre des fichiers de locales' },
-  { name: 'prune-i18n', desc: 'Supprime les clés i18n inutilisées (selon le dernier check-i18n)' }
+      { name: 'check-translations -- -s', desc: 'Affiche uniquement le résumé des traductions' },
+      { name: 'normalize-locales', desc: 'Normalise la structure et l\'ordre des fichiers de locales' },
+      { name: 'prune-i18n', desc: 'Supprime les clés i18n inutilisées (selon le dernier check-i18n)' }
     ]
   },
   {

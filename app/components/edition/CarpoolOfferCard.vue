@@ -101,6 +101,17 @@
       <!-- Section commentaires -->
       <div class="pt-4">
         <div class="flex items-center justify-between">
+          <div v-if="authStore.isAuthenticated" class="flex gap-2">
+            <UButton
+              :disabled="remainingSeats <= 0"
+              color="primary"
+              icon="i-heroicons-ticket"
+              size="sm"
+              @click="showBookingModal = true"
+            >
+              {{ $t('components.carpool.book_seats') }}
+            </UButton>
+          </div>
           <!-- Modal des commentaires -->
           <CarpoolCommentsModal
             :id="offer.id"
@@ -112,6 +123,38 @@
         </div>
       </div>
 
+      <!-- Réservations en attente (visible au propriétaire) -->
+      <div v-if="canEdit" class="pt-2">
+        <CarpoolBookingsList :offer-id="offer.id" @updated="emit('passenger-added')" />
+      </div>
+
+      <!-- Modal de réservation -->
+      <UModal v-model:open="showBookingModal" :title="$t('components.carpool.book_seats')">
+        <template #body>
+          <div class="space-y-4">
+            <UFormField :label="$t('components.carpool.how_many_seats_needed')">
+              <div class="flex gap-2">
+                <UButton
+                  v-for="n in Math.min(8, Math.max(1, remainingSeats))"
+                  :key="n"
+                  :color="bookingSeats === n ? 'primary' : 'neutral'"
+                  :variant="bookingSeats === n ? 'solid' : 'outline'"
+                  size="sm"
+                  @click="bookingSeats = n"
+                >
+                  <UIcon name="i-heroicons-user" />
+                  {{ n }}
+                </UButton>
+              </div>
+            </UFormField>
+            <div class="flex justify-end gap-2">
+              <UButton variant="ghost" @click="showBookingModal = false">{{ $t('forms.buttons.cancel') }}</UButton>
+              <UButton color="primary" :disabled="isBooking || bookingSeats < 1" @click="submitBooking">{{ isBooking ? $t('forms.buttons.submitting') : $t('components.carpool.confirm_booking') }}</UButton>
+            </div>
+          </div>
+        </template>
+      </UModal>
+
     </div>
   </UCard>
 </template>
@@ -119,6 +162,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth';
 import CarpoolCommentsModal from './CarpoolCommentsModal.vue';
+import CarpoolBookingsList from './CarpoolBookingsList.vue';
 import UserAvatar from '~/components/ui/UserAvatar.vue';
 
 interface CarpoolOffer {
@@ -127,6 +171,7 @@ interface CarpoolOffer {
   departureCity: string;
   departureAddress: string;
   availableSeats: number;
+  remainingSeats?: number;
   description?: string;
   phoneNumber?: string;
   createdAt: string;
@@ -172,9 +217,10 @@ const canEdit = computed(() => {
   return authStore.user && authStore.user.id === props.offer.user.id;
 });
 
-// Calculer les places restantes
+// Calculer les places restantes: si fourni par l'API via bookings ACCEPTED, sinon fallback sur passagers
 const remainingSeats = computed(() => {
-  const passengers = props.offer.passengers || [];
+  if (typeof props.offer.remainingSeats === 'number') return props.offer.remainingSeats;
+  const passengers = (props.offer as any).passengers || [];
   return props.offer.availableSeats - passengers.length;
 });
 
@@ -244,6 +290,39 @@ const removePassenger = async (userId: number) => {
       icon: 'i-heroicons-x-circle',
       color: 'error'
     });
+  }
+};
+
+// Réservation
+const showBookingModal = ref(false);
+const bookingSeats = ref(1);
+const isBooking = ref(false);
+
+const submitBooking = async () => {
+  if (bookingSeats.value < 1) return;
+  try {
+    isBooking.value = true;
+    await $fetch(`/api/carpool-offers/${props.offer.id}/bookings`, {
+      method: 'POST',
+      body: { seats: bookingSeats.value }
+    } as any);
+    toast.add({
+      title: t('messages.booking_requested'),
+      description: t('messages.booking_requested_successfully'),
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    });
+    showBookingModal.value = false;
+  } catch (error: unknown) {
+    const httpError = error as { data?: { message?: string }; message?: string };
+    toast.add({
+      title: t('common.error'),
+      description: httpError.data?.message || httpError.message || t('errors.generic_error'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle'
+    });
+  } finally {
+    isBooking.value = false;
   }
 };
 </script>
