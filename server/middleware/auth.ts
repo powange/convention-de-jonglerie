@@ -2,7 +2,8 @@
 
 
 export default defineEventHandler(async (event) => {
-  const { getUserSession } = await import('#imports')
+  const imports: any = await import('#imports')
+  const getUserSession = imports.getUserSession
   const fullPath = event.path;
   const path = fullPath.split('?')[0]; // Extraire seulement la partie avant les paramètres de requête
   const requestMethod = event.node.req.method;
@@ -14,7 +15,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Auth API routes (register, login, verify-email, resend-verification, password reset) are public for POST requests
-  if (['/api/auth/register', '/api/auth/login', '/api/auth/verify-email', '/api/auth/resend-verification', '/api/auth/request-password-reset', '/api/auth/reset-password'].includes(path) && requestMethod === 'POST') {
+  if (['/api/auth/register', '/api/auth/login', '/api/auth/verify-email', '/api/auth/resend-verification', '/api/auth/request-password-reset', '/api/auth/reset-password', '/api/auth/check-email'].includes(path) && requestMethod === 'POST') {
     return;
   }
 
@@ -22,7 +23,7 @@ export default defineEventHandler(async (event) => {
   if (['/api/auth/verify-reset-token'].includes(path) && requestMethod === 'GET') {
     return;
   }
-  
+
   // OAuth callback/redirect route must be public
   if (path === '/auth/google' && requestMethod === 'GET') {
     return;

@@ -136,7 +136,7 @@ function extractI18nKeysFromFile(filePath) {
     // - Exclure les propriétés d'objets JavaScript communes
     const jsObjectPatterns = [
       'state', 'props', 'data', 'form', 'filters', 'pagination',
-      'authStore', 'editionStore', 'favoriteEditions', 'passwordState',
+  'authStore', 'editionStore', 'favoriteEditions', 'passwordState', 'registerState', 'emailState',
       'convention', 'edition', 'user', 'collaborator', 'post', 'comment',
       'offer', 'request', 'passenger', 'item', 'newItem', 'option',
       'suggestion', 'activity', 'feedback', 'resolveModal', 'detailsModal',

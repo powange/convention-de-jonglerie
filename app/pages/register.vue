@@ -198,6 +198,28 @@
           </UButton>
         </UForm>
 
+        <!-- Séparateur OU -->
+        <div class="my-6">
+          <div class="flex items-center">
+            <div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+            <span class="mx-3 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ $t('common.or') }}</span>
+            <div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+          </div>
+        </div>
+
+        <!-- Inscription via Google -->
+        <div>
+          <UButton
+            block
+            color="neutral"
+            variant="soft"
+            icon="i-simple-icons-google"
+            @click="onGoogleRegister"
+          >
+            {{ $t('auth.continue_with_google') }}
+          </UButton>
+        </div>
+
         <!-- Lien de connexion -->
         <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
           <p class="text-center text-sm text-gray-600 dark:text-gray-400">
@@ -308,6 +330,11 @@ const getPasswordStrengthTextColor = () => {
   }
 };
 
+const onGoogleRegister = async () => {
+  // Navigation externe pour forcer l'appel de la route serveur (/auth/google)
+  await navigateTo('/auth/google', { external: true })
+}
+
 const getPasswordStrengthBarColor = (barIndex: number) => {
   const strength = getPasswordStrength();
   if (barIndex <= strength) {
@@ -343,12 +370,12 @@ const handleRegister = async () => {
     
     if (response.requiresVerification) {
       // Rediriger vers la page de vérification avec l'email
-      router.push(`/verify-email?email=${encodeURIComponent(response.email)}`);
+      await navigateTo(`/verify-email?email=${encodeURIComponent(response.email)}`);
       toast.add({ 
         title: t('messages.account_created'), 
         description: t('messages.verification_code_sent'),
         icon: 'i-heroicons-envelope', 
-        color: 'green' 
+        color: 'success' 
       });
     }
   } catch (e: unknown) {
@@ -359,7 +386,7 @@ const handleRegister = async () => {
     } else if (error.message || error.data?.message) {
       errorMessage = error.message || error.data?.message || errorMessage;
     }
-    toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'red' });
+  toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' });
   } finally {
     loading.value = false;
   }

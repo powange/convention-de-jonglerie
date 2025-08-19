@@ -79,28 +79,18 @@
                 </UButton>
               </UDropdownMenu>
               
-              <!-- Boutons connexion/inscription pour utilisateurs non connectés -->
-              <div v-else class="flex flex-col sm:flex-row items-center gap-2">
-                <UButton 
-                  icon="i-heroicons-key" 
-                  size="sm" 
-                  color="neutral" 
-                  variant="ghost"
-                  :to="`/login?returnTo=${encodeURIComponent($route.fullPath)}`"
-                  class="w-full sm:w-auto"
-                >
-                  {{ $t('navigation.login') }}
-                </UButton>
-                <UButton 
-                  icon="i-heroicons-user-plus" 
-                  size="sm" 
-                  color="primary" 
-                  variant="solid"
-                  to="/register"
-                  class="w-full sm:w-auto"
-                >
-                  {{ $t('navigation.register') }}
-                </UButton>
+              <!-- Bouton connexion unique pour utilisateurs non connectés -->
+              <div v-else class="flex items-center gap-2">
+                <NuxtLink :to="{ path: '/login', query: { returnTo: $route.fullPath } }" class="w-full sm:w-auto">
+                  <UButton 
+                    icon="i-heroicons-key" 
+                    size="sm" 
+                    color="neutral" 
+                    variant="ghost"
+                  >
+                    {{ $t('navigation.login') }}
+                  </UButton>
+                </NuxtLink>
               </div>
             </div>
           </div>
@@ -191,12 +181,11 @@ const userMenuItems = computed(() => {
 
   // Ajouter le séparateur et la déconnexion
   items.push(
-    { label: '─────────────────', disabled: true },
+    { label: '─────────────────', icon: 'i-heroicons-minus', to: '#' },
     {
       label: t('navigation.logout'),
       icon: 'i-heroicons-arrow-right-on-rectangle',
-      onSelect: handleLogout,
-      color: 'red'
+      to: `/logout?returnTo=${encodeURIComponent(useRoute().fullPath)}`
     }
   );
 
@@ -205,7 +194,7 @@ const userMenuItems = computed(() => {
 
 // Fonction pour changer de langue
 const changeLanguage = async (newLocale: string) => {
-  await setLocale(newLocale);
+  await setLocale(newLocale as any);
   // Forcer le rafraîchissement pour s'assurer que la langue est bien appliquée
   refreshNuxtData();
 };
@@ -226,12 +215,6 @@ onMounted(() => {
     window.removeEventListener('resize', checkMobile);
   });
 });
-
-const handleLogout = () => {
-  // Rediriger vers la page de logout avec la route actuelle comme returnTo
-  const currentPath = useRoute().fullPath;
-  navigateTo(`/logout?returnTo=${encodeURIComponent(currentPath)}`);
-};
 
 // Calculer le nom d'affichage
 const displayName = computed(() => {

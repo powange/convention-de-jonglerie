@@ -16,6 +16,10 @@ declare module '#auth-utils' {
 // Augmentation de '#imports' pour la complétion/typage côté serveur
 declare module '#imports' {
   import type { H3Event } from 'h3'
+  export function requireUserSession(event: H3Event): Promise<{ user: any }>
+  export function getUserSession(event: H3Event): Promise<{ user?: any }>
+  export function setUserSession(event: H3Event, data: { user: any }): Promise<void>
+  export function clearUserSession(event: H3Event): Promise<void>
   export const defineOAuthGoogleEventHandler: (handler: {
     config?: Record<string, any>
     onSuccess: (event: H3Event, payload: { user?: { id?: string; email?: string; name?: string; image?: string } }) => any | Promise<any>
