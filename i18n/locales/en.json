@@ -250,7 +250,6 @@
     "verify_code": "Verify code",
     "resend_in": "Resend in",
     "resend_code": "Resend code",
-    "back_to_register": "← Back to registration",
     "email_verified_success": "Email verified successfully!",
     "account_now_active": "Your account is now active. You can log in.",
     "code_expired": "The code has expired. Request a new code.",
