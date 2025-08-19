@@ -22,6 +22,10 @@ export default defineEventHandler(async (event) => {
   if (['/api/auth/verify-reset-token'].includes(path) && requestMethod === 'GET') {
     return;
   }
+    // OAuth callback/redirect route must be public
+    if (path === '/auth/google' && requestMethod === 'GET') {
+      return;
+    }
 
   // Feedback API route - public for POST (allows both authenticated and anonymous users)
   if (path === '/api/feedback' && requestMethod === 'POST') {

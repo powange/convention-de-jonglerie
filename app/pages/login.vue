@@ -79,6 +79,19 @@
 
         <!-- Lien d'inscription -->
         <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <!-- Bouton OAuth Google -->
+      <div class="mb-4">
+            <UButton
+              block
+              color="neutral"
+              variant="soft"
+              icon="i-simple-icons-google"
+        @click="onGoogleLogin"
+            >
+              {{ $t('auth.continue_with_google') || 'Continuer avec Google' }}
+            </UButton>
+          </div>
+
           <p class="text-center text-sm text-gray-600 dark:text-gray-400">
             {{ $t('auth.no_account_question') }} 
             <NuxtLink 
@@ -106,6 +119,9 @@ import { reactive, ref } from 'vue';
 import { z } from 'zod';
 import { useAuthStore } from '../stores/auth';
 import type { HttpError } from '~/types';
+const onGoogleLogin = async () => {
+  await navigateTo('/auth/google')
+}
 
 const authStore = useAuthStore();
 const toast = useToast();
@@ -152,17 +168,18 @@ const handleLogin = async () => {
     const error = e as HttpError;
     let errorMessage = t('errors.login_failed');
     
-  if (error.statusCode === 401 || error.status === 401) {
+  if ((error as any).statusCode === 401 || (error as any).status === 401) {
       errorMessage = t('errors.invalid_credentials');
     } else if (error.statusCode === 403 || error.status === 403) {
       // Email non vérifié
-      const isEmailNotVerified = error.statusMessage?.includes('email not verified') || 
-                                error.message?.includes('email not verified') ||
-                                error.statusMessage?.includes('Email non vérifié') ||
-                                error.message?.includes('Email non vérifié');
+  const errAny = error as any
+  const isEmailNotVerified = errAny.statusMessage?.includes('email not verified') || 
+            errAny.message?.includes('email not verified') ||
+            errAny.statusMessage?.includes('Email non vérifié') ||
+            errAny.message?.includes('Email non vérifié');
       
       // Récupérer les données depuis la structure d'erreur Nuxt
-      const errorData = error.data;
+  const errorData = (error as any).data;
       const actualData = errorData?.data || errorData;
       
       if (isEmailNotVerified && (actualData?.email || state.identifier.includes('@'))) {
@@ -189,7 +206,7 @@ const handleLogin = async () => {
         await router.push(`/verify-email?email=${encodeURIComponent(actualData.email)}`);
         return;
       } else {
-        errorMessage = error.statusMessage || t('errors.access_denied');
+  errorMessage = (error as any).statusMessage || t('errors.access_denied');
       }
     } else if (error.message || error.data?.message) {
       errorMessage = error.message || error.data?.message || errorMessage;
