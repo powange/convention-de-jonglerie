@@ -278,7 +278,8 @@
     "reset_link_expired": "Dette nulstillingslink er udløbet",
     "reset_link_used": "Dette link er allerede brugt til at nulstille adgangskoden",
   "invalid_code": "Ugyldig kode",
-  "continue_with_google": "Fortsæt med Google"
+  "continue_with_google": "Fortsæt med Google",
+  "continue_with_facebook": "Fortsæt med Facebook"
   },
   "editions": {
     "edit": "Rediger udgaven",

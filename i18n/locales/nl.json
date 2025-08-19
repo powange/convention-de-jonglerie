@@ -278,7 +278,8 @@
     "reset_link_expired": "Deze resetlink is verlopen",
     "reset_link_used": "Deze link is al gebruikt om het wachtwoord te resetten",
   "invalid_code": "Ongeldige code",
-  "continue_with_google": "Doorgaan met Google"
+  "continue_with_google": "Doorgaan met Google",
+  "continue_with_facebook": "Doorgaan met Facebook"
   },
   "editions": {
     "edit": "Editie bewerken",

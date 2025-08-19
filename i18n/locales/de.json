@@ -278,7 +278,8 @@
     "reset_link_expired": "Dieser Zurücksetzungslink ist abgelaufen",
     "reset_link_used": "Dieser Link wurde bereits zum Zurücksetzen des Passworts verwendet",
   "invalid_code": "Ungültiger Code",
-  "continue_with_google": "Mit Google fortfahren"
+  "continue_with_google": "Mit Google fortfahren",
+  "continue_with_facebook": "Mit Facebook fortfahren"
   },
   "editions": {
     "edit": "Auflage bearbeiten",

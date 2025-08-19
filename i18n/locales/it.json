@@ -278,7 +278,8 @@
     "reset_link_expired": "Questo link di reimpostazione è scaduto",
     "reset_link_used": "Questo link è già stato utilizzato per reimpostare la password",
   "invalid_code": "Codice non valido",
-  "continue_with_google": "Continua con Google"
+  "continue_with_google": "Continua con Google",
+  "continue_with_facebook": "Continua con Facebook"
   },
   "editions": {
     "edit": "Modifica l'edizione",

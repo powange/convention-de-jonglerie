@@ -278,7 +278,8 @@
     "reset_link_expired": "Este enlace de restablecimiento ha expirado",
     "reset_link_used": "Este enlace ya ha sido utilizado para restablecer la contraseña",
   "invalid_code": "Código inválido",
-  "continue_with_google": "Continuar con Google"
+  "continue_with_google": "Continuar con Google",
+  "continue_with_facebook": "Continuar con Facebook"
   },
   "editions": {
     "edit": "Editar edición",

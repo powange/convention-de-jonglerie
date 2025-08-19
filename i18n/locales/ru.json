@@ -278,7 +278,8 @@
     "reset_link_expired": "Эта ссылка для сброса истекла",
     "reset_link_used": "Эта ссылка уже использовалась для сброса пароля",
   "invalid_code": "Недействительный код",
-  "continue_with_google": "Продолжить с Google"
+  "continue_with_google": "Продолжить с Google",
+  "continue_with_facebook": "Продолжить с Facebook"
   },
   "editions": {
     "edit": "Редактировать издание",

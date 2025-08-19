@@ -278,7 +278,8 @@
     "reset_link_expired": "Ten link resetujący wygasł",
     "reset_link_used": "Ten link został już użyty do resetowania hasła",
   "invalid_code": "Nieprawidłowy kod",
-  "continue_with_google": "Kontynuuj z Google"
+  "continue_with_google": "Kontynuuj z Google",
+  "continue_with_facebook": "Kontynuuj z Facebookiem"
   },
   "editions": {
     "edit": "Edytuj edycję",
