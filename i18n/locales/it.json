@@ -151,7 +151,8 @@
   "common": {
     "loading": "Caricamento...",
     "error": "Errore",
-    "success": "Successo",
+  "success": "Successo",
+  "cancelled": "Cancelled",
     "cancel": "Annulla",
     "delete": "Elimina",
     "edit": "Modifica",
@@ -446,13 +447,14 @@
     "verification_code_sent": "Ti è stato inviato un codice di verifica.",
     "convention_created_desc": "Il convegno \"{name}\" è stato creato con successo",
     "removed_from_favorites": "Rimosso dai preferiti",
-    "comment_added": "Commento aggiunto",
-    "passenger_added": "Passeggero aggiunto",
-    "user_added_as_passenger": "L'utente è stato aggiunto come passeggero",
+  "comment_added": "Commento aggiunto",
+  "booking_requested": "Booking requested",
+  "booking_requested_successfully": "Your booking request has been sent to the driver",
+  "booking_cancelled": "Booking cancelled",
+    
     "offer_deleted": "Offerta eliminata",
     "offer_deleted_successfully": "La tua offerta di condivisione auto è stata eliminata con successo",
-    "passenger_removed": "Passeggero rimosso",
-    "passenger_removed_successfully": "Il passeggero è stato rimosso con successo",
+    
     "request_deleted": "Richiesta eliminata",
     "request_deleted_successfully": "La tua richiesta di condivisione auto è stata eliminata con successo",
     "collaborator_added": "Collaboratore aggiunto",
@@ -535,7 +537,6 @@
     "server_error": "Errore server",
     "cannot_load_comments": "Impossibile caricare i commenti",
     "cannot_add_comment": "Impossibile aggiungere il commento",
-    "cannot_add_passenger": "Impossibile aggiungere il passeggero",
     "convention_required": "Il convegno è richiesto",
     "address_required": "L'indirizzo è richiesto",
     "network_error": "Errore di rete",
@@ -614,7 +615,8 @@
     "buttons": {
       "cancel": "Annulla",
       "updating": "Modifica...",
-      "publishing": "Pubblicazione..."
+  "publishing": "Pubblicazione...",
+  "submitting": "Submitting..."
     }
   },
   "components": {
@@ -717,7 +719,7 @@
       "add_comment_placeholder": "Aggiungi un commento...",
       "publish": "Pubblica",
       "to_add_comment": "per aggiungere un commento",
-      "add_as_passenger": "Aggiungi come passeggero",
+      
       "offered_on": "Offerto il {date}",
       "requested_on": "Richiesto il {date}",
       "seats_available": "{count} posto disponibile | {count} posti disponibili",
@@ -728,7 +730,15 @@
       "added_on": "Aggiunto il {date}",
       "remove_passenger": "Rimuovi {name}",
       "confirm_delete_request": "Sei sicuro di voler eliminare questa richiesta di condivisione auto?",
-      "contact_user": "Contatta {name}",
+  "contact_user": "Contatta {name}",
+  "book_seats": "Book",
+  "confirm_booking": "Confirm booking",
+  "my_booking": "My booking",
+  "pending_bookings": "Pending bookings",
+  "no_pending_bookings": "No pending bookings",
+  "requested_seats": "{count} seat requested | {count} seats requested",
+  "accept": "Accept",
+  "reject": "Reject",
       "delete_offer": "Elimina offerta",
       "delete_request": "Elimina richiesta"
     },

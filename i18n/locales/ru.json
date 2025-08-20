@@ -151,7 +151,8 @@
   "common": {
     "loading": "Загрузка...",
     "error": "Ошибка",
-    "success": "Успех",
+  "success": "Успех",
+  "cancelled": "Cancelled",
     "cancel": "Отмена",
     "delete": "Удалить",
     "edit": "Редактировать",
@@ -446,13 +447,14 @@
     "verification_code_sent": "Код подтверждения отправлен вам.",
     "convention_created_desc": "Конвенция \"{name}\" успешно создана",
     "removed_from_favorites": "Удалено из избранных",
-    "comment_added": "Комментарий добавлен",
-    "passenger_added": "Пассажир добавлен",
-    "user_added_as_passenger": "Пользователь добавлен как пассажир",
+  "comment_added": "Комментарий добавлен",
+  "booking_requested": "Booking requested",
+  "booking_requested_successfully": "Your booking request has been sent to the driver",
+  "booking_cancelled": "Booking cancelled",
+    
     "offer_deleted": "Предложение удалено",
     "offer_deleted_successfully": "Ваше предложение совместной поездки успешно удалено",
-    "passenger_removed": "Пассажир удален",
-    "passenger_removed_successfully": "Пассажир успешно удален",
+    
     "request_deleted": "Запрос удален",
     "request_deleted_successfully": "Ваш запрос совместной поездки успешно удален",
     "collaborator_added": "Сотрудник добавлен",
@@ -512,7 +514,8 @@
     "buttons": {
       "cancel": "Отмена",
       "updating": "Обновление...",
-      "publishing": "Публикация..."
+  "publishing": "Публикация...",
+  "submitting": "Submitting..."
     }
   },
   "components": {
@@ -615,7 +618,7 @@
       "add_comment_placeholder": "Добавить комментарий...",
       "publish": "Опубликовать",
       "to_add_comment": "чтобы добавить комментарий",
-      "add_as_passenger": "Добавить как пассажира",
+      
       "offered_on": "Предложено {date}",
       "requested_on": "Запрошено {date}",
       "seats_available": "{count} место доступно | {count} мест доступно",
@@ -626,7 +629,15 @@
       "added_on": "Добавлено {date}",
       "remove_passenger": "Удалить {name}",
       "confirm_delete_request": "Вы уверены, что хотите удалить этот запрос совместной поездки?",
-      "contact_user": "Связаться с {name}",
+  "contact_user": "Связаться с {name}",
+  "book_seats": "Book",
+  "confirm_booking": "Confirm booking",
+  "my_booking": "My booking",
+  "pending_bookings": "Pending bookings",
+  "no_pending_bookings": "No pending bookings",
+  "requested_seats": "{count} seat requested | {count} seats requested",
+  "accept": "Accept",
+  "reject": "Reject",
       "delete_offer": "Удалить предложение",
       "delete_request": "Удалить запрос"
     },
@@ -837,7 +848,6 @@
     "deletion_error": "Ошибка удаления",
     "cannot_load_comments": "Невозможно загрузить комментарии",
     "cannot_add_comment": "Невозможно добавить комментарий",
-    "cannot_add_passenger": "Невозможно добавить пассажира",
     "convention_required": "Конвенция обязательна",
     "address_required": "Адрес обязателен",
     "generic_error": "Произошла ошибка",

@@ -151,7 +151,8 @@
   "common": {
     "loading": "Cargando...",
     "error": "Error",
-    "success": "Éxito",
+  "success": "Éxito",
+  "cancelled": "Cancelled",
     "cancel": "Cancelar",
     "delete": "Eliminar",
     "edit": "Editar",
@@ -446,13 +447,14 @@
     "verification_code_sent": "Se te ha enviado un código de verificación.",
     "convention_created_desc": "La convención \"{name}\" ha sido creada exitosamente",
     "removed_from_favorites": "Eliminado de favoritos",
-    "comment_added": "Comentario agregado",
-    "passenger_added": "Pasajero agregado",
-    "user_added_as_passenger": "El usuario ha sido agregado como pasajero",
+  "comment_added": "Comentario agregado",
+  "booking_requested": "Booking requested",
+  "booking_requested_successfully": "Your booking request has been sent to the driver",
+  "booking_cancelled": "Booking cancelled",
+    
     "offer_deleted": "Oferta eliminada",
     "offer_deleted_successfully": "Tu oferta de viaje compartido ha sido eliminada exitosamente",
-    "passenger_removed": "Pasajero eliminado",
-    "passenger_removed_successfully": "El pasajero ha sido eliminado exitosamente",
+    
     "request_deleted": "Solicitud eliminada",
     "request_deleted_successfully": "Tu solicitud de viaje compartido ha sido eliminada exitosamente",
     "collaborator_added": "Colaborador agregado",
@@ -579,7 +581,6 @@
     "update_error": "Error durante la actualización",
     "cannot_load_comments": "No se pueden cargar los comentarios",
     "cannot_add_comment": "No se puede agregar el comentario",
-    "cannot_add_passenger": "No se puede agregar el pasajero",
     "convention_required": "La convención es requerida",
     "address_required": "La dirección es requerida"
   },
@@ -648,7 +649,8 @@
     "buttons": {
       "cancel": "Cancelar",
       "updating": "Actualizando...",
-      "publishing": "Publicando..."
+  "publishing": "Publicando...",
+  "submitting": "Submitting..."
     }
   },
   "components": {
@@ -751,7 +753,7 @@
       "add_comment_placeholder": "Agregar comentario...",
       "publish": "Publicar",
       "to_add_comment": "para agregar un comentario",
-      "add_as_passenger": "Agregar como pasajero",
+      
       "offered_on": "Ofrecido el {date}",
       "requested_on": "Solicitado el {date}",
       "seats_available": "{count} asiento disponible | {count} asientos disponibles",
@@ -762,7 +764,15 @@
       "added_on": "Agregado el {date}",
       "remove_passenger": "Eliminar {name}",
       "confirm_delete_request": "¿Estás seguro de que quieres eliminar esta solicitud de viaje compartido?",
-      "contact_user": "Contactar {name}",
+  "contact_user": "Contactar {name}",
+  "book_seats": "Book",
+  "confirm_booking": "Confirm booking",
+  "my_booking": "My booking",
+  "pending_bookings": "Pending bookings",
+  "no_pending_bookings": "No pending bookings",
+  "requested_seats": "{count} seat requested | {count} seats requested",
+  "accept": "Accept",
+  "reject": "Reject",
       "delete_offer": "Eliminar oferta",
       "delete_request": "Eliminar solicitud"
     },

@@ -151,7 +151,8 @@
   "common": {
     "loading": "Laden...",
     "error": "Fout",
-    "success": "Succes",
+  "success": "Succes",
+  "cancelled": "Cancelled",
     "cancel": "Annuleren",
     "delete": "Verwijderen",
     "edit": "Bewerken",
@@ -447,12 +448,13 @@
     "convention_created_desc": "De conventie \"{name}\" is succesvol aangemaakt",
     "removed_from_favorites": "Verwijderd uit favorieten",
     "comment_added": "Opmerking toegevoegd",
-    "passenger_added": "Passagier toegevoegd",
-    "user_added_as_passenger": "Gebruiker is toegevoegd als passagier",
+  "booking_requested": "Booking requested",
+  "booking_requested_successfully": "Your booking request has been sent to the driver",
+  "booking_cancelled": "Booking cancelled",
+    
     "offer_deleted": "Aanbieding verwijderd",
     "offer_deleted_successfully": "Je meerijdaanbieding is succesvol verwijderd",
-    "passenger_removed": "Passagier verwijderd",
-    "passenger_removed_successfully": "De passagier is succesvol verwijderd",
+    
     "request_deleted": "Verzoek verwijderd",
     "request_deleted_successfully": "Je meerijdverzoek is succesvol verwijderd",
     "collaborator_added": "Medewerker toegevoegd",
@@ -512,7 +514,8 @@
     "buttons": {
       "cancel": "Annuleren",
       "updating": "Bijwerken...",
-      "publishing": "Publiceren..."
+  "publishing": "Publiceren...",
+  "submitting": "Submitting..."
     }
   },
   "components": {
@@ -615,7 +618,7 @@
       "add_comment_placeholder": "Voeg een opmerking toe...",
       "publish": "Publiceren",
       "to_add_comment": "om een opmerking toe te voegen",
-      "add_as_passenger": "Toevoegen als passagier",
+      
       "offered_on": "Aangeboden op {date}",
       "requested_on": "Aangevraagd op {date}",
       "seats_available": "{count} plaats beschikbaar | {count} plaatsen beschikbaar",
@@ -628,7 +631,15 @@
       "confirm_delete_request": "Weet je zeker dat je dit meerijdverzoek wilt verwijderen?",
       "contact_user": "Contact {name}",
       "delete_offer": "Aanbieding verwijderen",
-      "delete_request": "Verzoek verwijderen"
+  "delete_request": "Verzoek verwijderen",
+  "book_seats": "Plaatsen reserveren",
+  "confirm_booking": "Reservering bevestigen",
+  "my_booking": "Mijn reservering",
+  "pending_bookings": "In afwachting van reserveringen",
+  "no_pending_bookings": "Geen reserveringen in afwachting",
+  "requested_seats": "Aangevraagde plaatsen",
+  "accept": "Accepteren",
+  "reject": "Weigeren"
     },
     "posts": {
       "your_reply": "Je antwoord",
@@ -871,7 +882,6 @@
     "deletion_error": "Verwijderfout",
     "cannot_load_comments": "Kan opmerkingen niet laden",
     "cannot_add_comment": "Kan opmerking niet toevoegen",
-    "cannot_add_passenger": "Kan passagier niet toevoegen",
     "convention_required": "Conventie is vereist",
     "address_required": "Adres is vereist",
     "generic_error": "Er is een fout opgetreden",

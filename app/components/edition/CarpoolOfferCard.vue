@@ -70,30 +70,39 @@
       <!-- Description -->
       <p v-if="offer.description" class="text-sm text-gray-600">{{ offer.description }}</p>
 
-      <!-- Covoitureurs -->
-      <div v-if="offer.passengers && offer.passengers.length > 0" class="space-y-2">
+      <!-- Ma réservation (pour l'utilisateur connecté non propriétaire) -->
+      <div v-if="authStore.isAuthenticated && !canEdit && myBooking" class="border rounded p-3 bg-gray-50 dark:bg-gray-900/30">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-ticket" class="text-primary-500" />
+            <span class="font-medium">{{ $t('components.carpool.my_booking') }}</span>
+          </div>
+          <UBadge :color="myBooking.status === 'ACCEPTED' ? 'success' : myBooking.status === 'REJECTED' ? 'error' : myBooking.status === 'CANCELLED' ? 'neutral' : 'warning'" variant="soft">{{ myBooking.status }}</UBadge>
+        </div>
+        <div class="mt-1 text-sm text-gray-700 dark:text-gray-300">
+          {{ $t('components.carpool.requested_seats', { count: myBooking.seats }) }}
+        </div>
+        <div v-if="myBooking.status === 'PENDING' || myBooking.status === 'ACCEPTED'" class="mt-2 text-right">
+          <UButton size="xs" color="error" variant="soft" :loading="isCancelling" @click="cancelMyBooking">{{ $t('common.cancel') }}</UButton>
+        </div>
+      </div>
+
+      <!-- Réservations acceptées -->
+      <div v-if="acceptedBookings.length > 0" class="space-y-2">
         <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('components.carpool.confirmed_passengers') }} :</h4>
         <div class="flex flex-wrap gap-2">
           <div
-            v-for="passenger in offer.passengers"
-            :key="passenger.id"
+            v-for="b in acceptedBookings"
+            :key="b.id"
             class="flex items-center gap-2 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full text-sm"
-            :title="$t('components.carpool.added_on', { date: new Date(passenger.addedAt).toLocaleDateString() })"
+            :title="$t('components.carpool.added_on', { date: new Date(b.createdAt).toLocaleDateString() })"
           >
             <UserAvatar
-              :user="passenger.user"
+              :user="b.requester"
               size="xs"
             />
-            <span class="text-green-700 dark:text-green-300">{{ passenger.user.pseudo }}</span>
-            <UButton
-              v-if="canEdit"
-              icon="i-heroicons-x-mark"
-              size="2xs"
-              color="error"
-              variant="ghost"
-              :title="$t('components.carpool.remove_passenger', { name: passenger.user.pseudo })"
-              @click="removePassenger(passenger.user.id)"
-            />
+            <span class="text-green-700 dark:text-green-300">{{ b.requester.pseudo }}</span>
+            <UBadge color="success" variant="soft">+{{ b.seats }}</UBadge>
           </div>
         </div>
       </div>
@@ -116,9 +125,7 @@
           <CarpoolCommentsModal
             :id="offer.id"
             type="offer"
-            :offer="offer"
             @comment-added="emit('comment-added')"
-            @passenger-added="emit('passenger-added')"
           />
         </div>
       </div>
@@ -182,6 +189,19 @@ interface CarpoolOffer {
     profilePicture?: string | null;
     updatedAt?: string;
   };
+  bookings?: Array<{
+    id: number;
+    seats: number;
+    status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED';
+    createdAt: string;
+    requester: {
+      id: number;
+      pseudo: string;
+      emailHash: string;
+      profilePicture?: string | null;
+      updatedAt?: string;
+    };
+  }>;
   comments?: Array<{
     id: number;
     content: string;
@@ -220,8 +240,9 @@ const canEdit = computed(() => {
 // Calculer les places restantes: si fourni par l'API via bookings ACCEPTED, sinon fallback sur passagers
 const remainingSeats = computed(() => {
   if (typeof props.offer.remainingSeats === 'number') return props.offer.remainingSeats;
-  const passengers = (props.offer as any).passengers || [];
-  return props.offer.availableSeats - passengers.length;
+  const bookings = props.offer.bookings || [];
+  const accepted = bookings.filter(b => b.status === 'ACCEPTED').reduce((s, b) => s + (b.seats || 0), 0);
+  return Math.max(0, props.offer.availableSeats - accepted);
 });
 
 const formatDate = (date: string) => {
@@ -264,34 +285,28 @@ const handleDelete = async () => {
   }
 };
 
-const removePassenger = async (userId: number) => {
-  if (!confirm(t('components.carpool.confirm_remove_passenger'))) {
-    return;
-  }
+const acceptedBookings = computed(() => (props.offer.bookings || []).filter(b => b.status === 'ACCEPTED'));
 
+// Ma réservation sur cette offre (dernier en date si plusieurs)
+const myBookings = ref<Array<{ id: number; seats: number; status: string; createdAt: string }>>([]);
+const myBooking = computed(() => {
+  if (!myBookings.value.length) return null as any;
+  return [...myBookings.value].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+});
+
+const loadMyBookings = async () => {
+  if (!authStore.isAuthenticated || canEdit.value) return; // pas pour le propriétaire
   try {
-    await $fetch(`/api/carpool-offers/${props.offer.id}/passengers/${userId}`, {
-      method: 'DELETE',
-    });
-
-    toast.add({
-      title: t('messages.passenger_removed'),
-      description: t('messages.passenger_removed_successfully'),
-      icon: 'i-heroicons-check-circle',
-  color: 'success'
-    });
-
-    emit('passenger-added'); // Utiliser le même événement pour rafraîchir
-  } catch (error: unknown) {
-    const httpError = error as { data?: { message?: string }; message?: string };
-    toast.add({
-      title: t('errors.removal_error'),
-      description: httpError.data?.message || httpError.message || t('errors.generic_error'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error'
-    });
+    const data = await $fetch(`/api/carpool-offers/${props.offer.id}/bookings`);
+    // L'API renvoie déjà seulement mes réservations si je ne suis pas propriétaire
+    myBookings.value = Array.isArray(data) ? data : [];
+  } catch {
+    // silencieux
   }
 };
+
+onMounted(loadMyBookings);
+watch(() => authStore.isAuthenticated, () => loadMyBookings());
 
 // Réservation
 const showBookingModal = ref(false);
@@ -313,6 +328,7 @@ const submitBooking = async () => {
       icon: 'i-heroicons-check-circle'
     });
     showBookingModal.value = false;
+  await loadMyBookings();
   } catch (error: unknown) {
     const httpError = error as { data?: { message?: string }; message?: string };
     toast.add({
@@ -323,6 +339,22 @@ const submitBooking = async () => {
     });
   } finally {
     isBooking.value = false;
+  }
+};
+
+const isCancelling = ref(false);
+const cancelMyBooking = async () => {
+  if (!myBooking.value) return;
+  try {
+    isCancelling.value = true;
+    await $fetch(`/api/carpool-offers/${props.offer.id}/bookings/${myBooking.value.id}`, { method: 'PUT', body: { action: 'CANCEL' } } as any);
+    await loadMyBookings();
+    toast.add({ title: t('messages.booking_cancelled') || t('common.cancelled') || 'Réservation annulée', color: 'success' });
+  } catch (error: unknown) {
+    const httpError = error as { data?: { message?: string }; message?: string };
+    toast.add({ title: t('common.error'), description: httpError.data?.message || httpError.message || t('errors.generic_error'), color: 'error' });
+  } finally {
+    isCancelling.value = false;
   }
 };
 </script>

@@ -151,7 +151,8 @@
   "common": {
     "loading": "Завантаження...",
     "error": "Помилка",
-    "success": "Успіх",
+  "success": "Успіх",
+  "cancelled": "Cancelled",
     "cancel": "Скасувати",
     "delete": "Видалити",
     "edit": "Редагувати",
@@ -446,13 +447,14 @@
     "verification_code_sent": "Вам надіслано код підтвердження.",
     "convention_created_desc": "Конвенцію \"{name}\" успішно створено",
     "removed_from_favorites": "Видалено з улюблених",
-    "comment_added": "Коментар додано",
-    "passenger_added": "Пасажира додано",
-    "user_added_as_passenger": "Користувача додано як пасажира",
+  "comment_added": "Коментар додано",
+  "booking_requested": "Booking requested",
+  "booking_requested_successfully": "Your booking request has been sent to the driver",
+  "booking_cancelled": "Booking cancelled",
+    
     "offer_deleted": "Пропозицію видалено",
     "offer_deleted_successfully": "Вашу пропозицію сумісної поїздки успішно видалено",
-    "passenger_removed": "Пасажира видалено",
-    "passenger_removed_successfully": "Пасажира успішно видалено",
+    
     "request_deleted": "Запит видалено",
     "request_deleted_successfully": "Ваш запит на сумісну поїздку успішно видалено",
     "collaborator_added": "Співробітника додано",
@@ -512,7 +514,8 @@
     "buttons": {
       "cancel": "Скасувати",
       "updating": "Оновлення...",
-      "publishing": "Публікація..."
+  "publishing": "Публікація...",
+  "submitting": "Submitting..."
     }
   },
   "components": {
@@ -615,7 +618,7 @@
       "add_comment_placeholder": "Додати коментар...",
       "publish": "Опублікувати",
       "to_add_comment": "щоб додати коментар",
-      "add_as_passenger": "Додати як пасажира",
+      
       "offered_on": "Запропоновано {date}",
       "requested_on": "Запитано {date}",
       "seats_available": "{count} доступне місце | {count} доступних місць",
@@ -626,7 +629,15 @@
       "added_on": "Додано {date}",
       "remove_passenger": "Видалити {name}",
       "confirm_delete_request": "Ви впевнені, що хочете видалити цей запит сумісної поїздки?",
-      "contact_user": "Зв'язатися з {name}",
+  "contact_user": "Зв'язатися з {name}",
+  "book_seats": "Book",
+  "confirm_booking": "Confirm booking",
+  "my_booking": "My booking",
+  "pending_bookings": "Pending bookings",
+  "no_pending_bookings": "No pending bookings",
+  "requested_seats": "{count} seat requested | {count} seats requested",
+  "accept": "Accept",
+  "reject": "Reject",
       "delete_offer": "Видалити пропозицію",
       "delete_request": "Видалити запит"
     },
@@ -837,7 +848,6 @@
     "deletion_error": "Помилка видалення",
     "cannot_load_comments": "Неможливо завантажити коментарі",
     "cannot_add_comment": "Неможливо додати коментар",
-    "cannot_add_passenger": "Неможливо додати пасажира",
     "convention_required": "Конвенція обов'язкова",
     "address_required": "Адреса обов'язкова",
     "generic_error": "Сталася помилка",

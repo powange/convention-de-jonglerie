@@ -184,7 +184,8 @@
     "view_details": "View details",
     "back": "Back",
     "private": "Private",
-    "or": "Or"
+  "or": "Or",
+  "cancelled": "Cancelled"
   },
   "dates": {
     "same_day_with_time": "On {date} from {startTime} to {endTime}",
@@ -446,13 +447,12 @@
     "verification_code_sent": "A verification code has been sent to you.",
     "convention_created_desc": "The convention \"{name}\" has been created successfully",
     "removed_from_favorites": "Removed from favorites",
-    "comment_added": "Comment added",
-    "passenger_added": "Passenger added",
-    "user_added_as_passenger": "User has been added as passenger",
+  "comment_added": "Comment added",
+  "booking_requested": "Booking requested",
+  "booking_requested_successfully": "Your booking request has been sent to the driver",
+  "booking_cancelled": "Booking cancelled",
     "offer_deleted": "Offer deleted",
     "offer_deleted_successfully": "Your carpool offer has been successfully deleted",
-    "passenger_removed": "Passenger removed",
-    "passenger_removed_successfully": "The passenger has been successfully removed",
     "request_deleted": "Request deleted",
     "request_deleted_successfully": "Your carpool request has been successfully deleted",
     "collaborator_added": "Collaborator added",
@@ -512,7 +512,8 @@
     "buttons": {
       "cancel": "Cancel",
       "updating": "Updating...",
-      "publishing": "Publishing..."
+      "publishing": "Publishing...",
+      "submitting": "Submitting..."
     }
   },
   "components": {
@@ -615,7 +616,7 @@
       "add_comment_placeholder": "Add a comment...",
       "publish": "Publish",
       "to_add_comment": "to add a comment",
-      "add_as_passenger": "Add as passenger",
+      
       "offered_on": "Offered on {date}",
       "requested_on": "Requested on {date}",
       "seats_available": "{count} seat available | {count} seats available",
@@ -627,18 +628,18 @@
       "remove_passenger": "Remove {name}",
       "confirm_delete_request": "Are you sure you want to delete this carpool request?",
       "contact_user": "Contact {name}",
-      "book_seats": "Book",
-      "confirm_booking": "Confirm booking",
-      "pending_bookings": "Pending bookings",
-      "no_pending_bookings": "No pending bookings",
-      "requested_seats": "{count} seat requested | {count} seats requested",
-      "accept": "Accept",
-      "reject": "Reject",
+  "book_seats": "Book",
+  "confirm_booking": "Confirm booking",
+  "my_booking": "My booking",
+  "pending_bookings": "Pending bookings",
+  "no_pending_bookings": "No pending bookings",
+  "requested_seats": "{count} seat requested | {count} seats requested",
+  "accept": "Accept",
+  "reject": "Reject",
       "delete_offer": "Delete offer",
       "delete_request": "Delete request"
     },
-  "booking_requested": "Booking requested",
-  "booking_requested_successfully": "Your booking request has been sent to the driver",
+    
     "posts": {
       "your_reply": "Your reply",
       "your_reply_placeholder": "Your reply...",
@@ -880,7 +881,6 @@
     "deletion_error": "Deletion error",
     "cannot_load_comments": "Cannot load comments",
     "cannot_add_comment": "Cannot add comment",
-    "cannot_add_passenger": "Cannot add passenger",
     "convention_required": "Convention is required",
     "address_required": "Address is required",
     "generic_error": "An error occurred",

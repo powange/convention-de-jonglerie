@@ -80,6 +80,14 @@ export default defineEventHandler(async (event) => {
   const isPublicEditionPosts = path.match(/^\/api\/editions\/\d+\/posts$/) && requestMethod === 'GET';
   
   if (isPublicCarpoolOffers || isPublicCarpoolRequests || isPublicCarpoolOfferComments || isPublicCarpoolRequestComments || isPublicEditionPosts) {
+    // Ces routes sont publiques, mais on hydrate tout de même la session si présente
+    // pour permettre un rendu conditionnel côté API (ex: téléphone visible si réservation ACCEPTED)
+    try {
+      const session = await getUserSession(event)
+      event.context.user = session?.user || null
+    } catch {
+      // Ignorer les erreurs de session sur routes publiques
+    }
     return;
   }
 

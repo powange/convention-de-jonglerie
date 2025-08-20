@@ -1,20 +1,20 @@
 {
   "app": {
-    "title": "Jonglørkonvention"
+    "title": "Juggling Convention"
   },
   "admin": {
-    "dashboard": "Administrator Dashboard",
+  "dashboard": "Administrator Dashboard",
+  "new_conventions_this_month": "+{count} denne måned",
+  "active_administrators": "Aktive administratorer",
+  "search_users_placeholder": "Søg via email, brugernavn, fornavn eller efternavn...",
     "dashboard_subtitle": "Dashboard og administrative værktøjer til platformen",
     "total_users": "Samlede brugere",
     "new_users_this_month": "+{count} denne måned",
-    "new_conventions_this_month": "+{count} denne måned",
     "new_editions_this_month": "+{count} denne måned",
-    "active_administrators": "Aktive administratorer",
     "conventions": "Konventioner",
     "editions": "Udgaver",
     "user_management": "Brugerstyring",
     "user_management_description": "Komplet liste over registrerede brugere på platformen",
-    "search_users_placeholder": "Søg efter email, brugernavn, fornavn eller efternavn...",
     "email_verified": "Email bekræftet",
     "super_admins": "Superadministratorer",
     "content_creators": "Har skabt indhold",
@@ -151,7 +151,8 @@
   "common": {
     "loading": "Indlæser...",
     "error": "Fejl",
-    "success": "Succes",
+  "success": "Succes",
+  "cancelled": "Cancelled",
     "cancel": "Annuller",
     "delete": "Slet",
     "edit": "Rediger",
@@ -446,13 +447,14 @@
     "verification_code_sent": "En bekræftelseskode er sendt til dig.",
     "convention_created_desc": "Konventionen \"{name}\" blev oprettet med succes",
     "removed_from_favorites": "Fjernet fra favoritter",
-    "comment_added": "Kommentar tilføjet",
-    "passenger_added": "Medpassager tilføjet",
-    "user_added_as_passenger": "Brugeren blev tilføjet som medpassager",
+  "comment_added": "Kommentar tilføjet",
+  "booking_requested": "Booking requested",
+  "booking_requested_successfully": "Your booking request has been sent to the driver",
+  "booking_cancelled": "Booking cancelled",
+    
     "offer_deleted": "Tilbud slettet",
     "offer_deleted_successfully": "Dit samkørselstilbud blev slettet med succes",
-    "passenger_removed": "Medpassager fjernet",
-    "passenger_removed_successfully": "Medpassageren blev fjernet med succes",
+    
     "request_deleted": "Anmodning slettet",
     "request_deleted_successfully": "Din samkørselsanmodning blev slettet med succes",
     "collaborator_added": "Medarbejder tilføjet",
@@ -545,7 +547,6 @@
     "cannot_remove_favorite": "Kan ikke fjerne fra favoritter",
     "cannot_load_comments": "Kan ikke indlæse kommentarer",
     "cannot_add_comment": "Kan ikke tilføje kommentar",
-    "cannot_add_passenger": "Kan ikke tilføje passager",
     "convention_required": "Konvention påkrævet",
     "address_required": "Adresse påkrævet"
   },
@@ -612,9 +613,10 @@
       "until_date": "Til"
     },
     "buttons": {
-      "cancel": "Annuller",
-      "updating": "Ændrer...",
-      "publishing": "Offentliggør..."
+  "cancel": "Annuller",
+  "updating": "Ændrer...",
+  "publishing": "Offentliggør...",
+  "submitting": "Submitting..."
     }
   },
   "components": {
@@ -717,7 +719,7 @@
       "add_comment_placeholder": "Tilføj en kommentar...",
       "publish": "Offentliggør",
       "to_add_comment": "for at tilføje en kommentar",
-      "add_as_passenger": "Tilføj som medpassager",
+      
       "offered_on": "Tilbudt den {date}",
       "requested_on": "Anmodet den {date}",
       "seats_available": "{count} ledig plads | {count} ledige pladser",
@@ -729,6 +731,14 @@
       "remove_passenger": "Fjern {name}",
       "confirm_delete_request": "Er du sikker på, at du vil slette denne samkørselsanmodning?",
       "contact_user": "Kontakt {name}",
+  "book_seats": "Book",
+  "confirm_booking": "Confirm booking",
+  "my_booking": "My booking",
+  "pending_bookings": "Pending bookings",
+  "no_pending_bookings": "No pending bookings",
+  "requested_seats": "{count} seat requested | {count} seats requested",
+  "accept": "Accept",
+  "reject": "Reject",
       "delete_offer": "Slet tilbud",
       "delete_request": "Slet anmodning"
     },

@@ -156,11 +156,14 @@ function extractI18nKeysFromFile(filePath) {
       'feedback.email.'
     ];
     
-    // Exclure les fichiers de traduction (.json)
+  // Exclure les fichiers de traduction (.json)
     const isJsonFile = potentialKey.endsWith('.json');
     
-    // Exclure les nombres et les propriétés qui commencent par des nombres
+  // Exclure les nombres et les propriétés qui commencent par des nombres
     const isNumeric = /^\d/.test(potentialKey) || /^\d+(\.\d+)?$/.test(potentialKey);
+
+  // Exclure les accès de propriétés de variables courtes (ex: b.id, b.requester)
+  const isShortVarProperty = /^[a-zA-Z]\.(id|requester|user|email|status|seats)$/.test(potentialKey);
     
     // Vérifier si c'est une clé i18n valide malgré le préfixe
     const isValidI18nKey = validI18nPatterns.some(pattern => potentialKey.startsWith(pattern));
@@ -176,10 +179,11 @@ function extractI18nKeysFromFile(filePath) {
     // - Pas numérique
     // - Pas une propriété JS connue
     // - Commence par une lettre minuscule (convention i18n)
-    if (parts.length >= 2 && 
+  if (parts.length >= 2 && 
         !isJsonFile && 
         !isNumeric && 
-        !isJsProperty &&
+    !isJsProperty &&
+    !isShortVarProperty &&
         /^[a-z]/.test(potentialKey)) {
       keys.add(potentialKey);
     }

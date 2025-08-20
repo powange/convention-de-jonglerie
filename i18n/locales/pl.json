@@ -151,7 +151,8 @@
   "common": {
     "loading": "Ładowanie...",
     "error": "Błąd",
-    "success": "Sukces",
+  "success": "Sukces",
+  "cancelled": "Cancelled",
     "cancel": "Anuluj",
     "delete": "Usuń",
     "edit": "Edytuj",
@@ -445,14 +446,15 @@
     "account_created": "Konto utworzone! Sprawdź swój email.",
     "verification_code_sent": "Kod weryfikacyjny został do ciebie wysłany.",
     "convention_created_desc": "Konwencja \"{name}\" została pomyślnie utworzona",
-    "removed_from_favorites": "Usunięte z ulubionych",
-    "comment_added": "Komentarz dodany",
-    "passenger_added": "Pasażer dodany",
-    "user_added_as_passenger": "Użytkownik został dodany jako pasażer",
+  "removed_from_favorites": "Usunięte z ulubionych",
+  "comment_added": "Komentarz dodany",
+  "booking_requested": "Booking requested",
+  "booking_requested_successfully": "Your booking request has been sent to the driver",
+  "booking_cancelled": "Booking cancelled",
+    
     "offer_deleted": "Oferta usunięta",
     "offer_deleted_successfully": "Twoja oferta wspólnego przejazdu została pomyślnie usunięta",
-    "passenger_removed": "Pasażer usunięty",
-    "passenger_removed_successfully": "Pasażer został pomyślnie usunięty",
+    
     "request_deleted": "Prośba usunięta",
     "request_deleted_successfully": "Twoja prośba o wspólny przejazd została pomyślnie usunięta",
     "collaborator_added": "Współpracownik dodany",
@@ -545,7 +547,6 @@
     "cannot_remove_favorite": "Nie można usunąć z ulubionych",
     "cannot_load_comments": "Nie można załadować komentarzy",
     "cannot_add_comment": "Nie można dodać komentarza",
-    "cannot_add_passenger": "Nie można dodać pasażera",
     "convention_required": "Konwencja jest wymagana",
     "address_required": "Adres jest wymagany"
   },
@@ -614,7 +615,8 @@
     "buttons": {
       "cancel": "Anuluj",
       "updating": "Modyfikacja...",
-      "publishing": "Publikowanie..."
+  "publishing": "Publikowanie...",
+  "submitting": "Submitting..."
     }
   },
   "components": {
@@ -717,7 +719,7 @@
       "add_comment_placeholder": "Dodaj komentarz...",
       "publish": "Opublikuj",
       "to_add_comment": "aby dodać komentarz",
-      "add_as_passenger": "Dodaj jako pasażera",
+      
       "offered_on": "Zaoferowane {date}",
       "requested_on": "Poproszono {date}",
       "seats_available": "{count} dostępne miejsce | {count} dostępnych miejsc",
@@ -727,8 +729,16 @@
       "confirmed_passengers": "Potwierdzeni pasażerowie",
       "added_on": "Dodano {date}",
       "remove_passenger": "Usuń {name}",
-      "confirm_delete_request": "Czy na pewno chcesz usunąć tę prośbę o wspólny przejazd?",
-      "contact_user": "Skontaktuj się z {name}",
+  "confirm_delete_request": "Czy na pewno chcesz usunąć tę prośbę o wspólny przejazd?",
+  "contact_user": "Skontaktuj się z {name}",
+  "book_seats": "Book",
+  "confirm_booking": "Confirm booking",
+  "my_booking": "My booking",
+  "pending_bookings": "Pending bookings",
+  "no_pending_bookings": "No pending bookings",
+  "requested_seats": "{count} seat requested | {count} seats requested",
+  "accept": "Accept",
+  "reject": "Reject",
       "delete_offer": "Usuń ofertę",
       "delete_request": "Usuń prośbę"
     },
