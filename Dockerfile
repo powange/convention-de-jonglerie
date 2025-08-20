@@ -41,9 +41,13 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package*.json ./
 
+# Script d'entrée: appliquer les migrations Prisma avant de démarrer Nuxt
+COPY docker/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 ENV NODE_ENV=production
 EXPOSE 3000
-CMD ["node", ".output/server/index.mjs"]
+CMD ["/app/entrypoint.sh"]
 
 # -------------------------
 # Stage dev (optionnel pour iso image)
