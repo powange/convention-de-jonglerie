@@ -151,8 +151,8 @@
   "common": {
     "loading": "Cargando...",
     "error": "Error",
-  "success": "Éxito",
-  "cancelled": "Cancelled",
+    "success": "Éxito",
+    "cancelled": "Cancelled",
     "cancel": "Cancelar",
     "delete": "Eliminar",
     "edit": "Editar",
@@ -184,8 +184,8 @@
     "favorite": "Favorito",
     "view_details": "Ver detalles",
     "back": "Volver",
-  "private": "Privado",
-  "or": "O"
+    "private": "Privado",
+    "or": "O"
   },
   "dates": {
     "same_day_with_time": "El {date} de {startTime} a {endTime}",
@@ -278,9 +278,9 @@
     "password_very_strong": "Contraseña muy fuerte",
     "reset_link_expired": "Este enlace de restablecimiento ha expirado",
     "reset_link_used": "Este enlace ya ha sido utilizado para restablecer la contraseña",
-  "invalid_code": "Código inválido",
-  "continue_with_google": "Continuar con Google",
-  "continue_with_facebook": "Continuar con Facebook"
+    "invalid_code": "Código inválido",
+    "continue_with_google": "Continuar con Google",
+    "continue_with_facebook": "Continuar con Facebook"
   },
   "editions": {
     "edit": "Editar edición",
@@ -447,14 +447,12 @@
     "verification_code_sent": "Se te ha enviado un código de verificación.",
     "convention_created_desc": "La convención \"{name}\" ha sido creada exitosamente",
     "removed_from_favorites": "Eliminado de favoritos",
-  "comment_added": "Comentario agregado",
-  "booking_requested": "Booking requested",
-  "booking_requested_successfully": "Your booking request has been sent to the driver",
-  "booking_cancelled": "Booking cancelled",
-    
+    "comment_added": "Comentario agregado",
+    "booking_requested": "Booking requested",
+    "booking_requested_successfully": "Your booking request has been sent to the driver",
+    "booking_cancelled": "Booking cancelled",
     "offer_deleted": "Oferta eliminada",
     "offer_deleted_successfully": "Tu oferta de viaje compartido ha sido eliminada exitosamente",
-    
     "request_deleted": "Solicitud eliminada",
     "request_deleted_successfully": "Tu solicitud de viaje compartido ha sido eliminada exitosamente",
     "collaborator_added": "Colaborador agregado",
@@ -649,8 +647,8 @@
     "buttons": {
       "cancel": "Cancelar",
       "updating": "Actualizando...",
-  "publishing": "Publicando...",
-  "submitting": "Submitting..."
+      "publishing": "Publicando...",
+      "submitting": "Submitting..."
     }
   },
   "components": {
@@ -681,7 +679,11 @@
       "convention_name": "Nombre de la convención",
       "convention_logo": "Logo de la convención",
       "upload_file": "Subir archivo",
-      "external_url": "URL externa"
+      "external_url": "URL externa",
+      "convention_logo_alt": "Logo de la convención",
+      "loading_error_title": "Error de carga",
+      "loading_error_description": "No se puede cargar la imagen desde esta URL",
+      "logo_url_description": "URL de la imagen del logo de la convención"
     },
     "favorites_map": {
       "no_upcoming_favorites": "Sin ediciones favoritas próximas con ubicación disponible",
@@ -753,7 +755,6 @@
       "add_comment_placeholder": "Agregar comentario...",
       "publish": "Publicar",
       "to_add_comment": "para agregar un comentario",
-      
       "offered_on": "Ofrecido el {date}",
       "requested_on": "Solicitado el {date}",
       "seats_available": "{count} asiento disponible | {count} asientos disponibles",
@@ -764,15 +765,15 @@
       "added_on": "Agregado el {date}",
       "remove_passenger": "Eliminar {name}",
       "confirm_delete_request": "¿Estás seguro de que quieres eliminar esta solicitud de viaje compartido?",
-  "contact_user": "Contactar {name}",
-  "book_seats": "Book",
-  "confirm_booking": "Confirm booking",
-  "my_booking": "My booking",
-  "pending_bookings": "Pending bookings",
-  "no_pending_bookings": "No pending bookings",
-  "requested_seats": "{count} seat requested | {count} seats requested",
-  "accept": "Accept",
-  "reject": "Reject",
+      "contact_user": "Contactar {name}",
+      "book_seats": "Reservar",
+      "confirm_booking": "Confirmar reserva",
+      "my_booking": "Mi reserva",
+      "pending_bookings": "Reservas pendientes",
+      "no_pending_bookings": "Sin reservas pendientes",
+      "requested_seats": "{count} asiento solicitado | {count} asientos solicitados",
+      "accept": "Aceptar",
+      "reject": "Rechazar",
       "delete_offer": "Eliminar oferta",
       "delete_request": "Eliminar solicitud"
     },

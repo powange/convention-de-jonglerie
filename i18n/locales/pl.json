@@ -151,8 +151,8 @@
   "common": {
     "loading": "Ładowanie...",
     "error": "Błąd",
-  "success": "Sukces",
-  "cancelled": "Cancelled",
+    "success": "Sukces",
+    "cancelled": "Cancelled",
     "cancel": "Anuluj",
     "delete": "Usuń",
     "edit": "Edytuj",
@@ -184,8 +184,8 @@
     "favorite": "Ulubione",
     "view_details": "Zobacz szczegóły",
     "back": "Powrót",
-  "private": "Prywatne",
-  "or": "Lub"
+    "private": "Prywatne",
+    "or": "Lub"
   },
   "dates": {
     "same_day_with_time": "{date} od {startTime} do {endTime}",
@@ -278,9 +278,9 @@
     "password_very_strong": "Bardzo silne hasło",
     "reset_link_expired": "Ten link resetujący wygasł",
     "reset_link_used": "Ten link został już użyty do resetowania hasła",
-  "invalid_code": "Nieprawidłowy kod",
-  "continue_with_google": "Kontynuuj z Google",
-  "continue_with_facebook": "Kontynuuj z Facebookiem"
+    "invalid_code": "Nieprawidłowy kod",
+    "continue_with_google": "Kontynuuj z Google",
+    "continue_with_facebook": "Kontynuuj z Facebookiem"
   },
   "editions": {
     "edit": "Edytuj edycję",
@@ -446,15 +446,13 @@
     "account_created": "Konto utworzone! Sprawdź swój email.",
     "verification_code_sent": "Kod weryfikacyjny został do ciebie wysłany.",
     "convention_created_desc": "Konwencja \"{name}\" została pomyślnie utworzona",
-  "removed_from_favorites": "Usunięte z ulubionych",
-  "comment_added": "Komentarz dodany",
-  "booking_requested": "Booking requested",
-  "booking_requested_successfully": "Your booking request has been sent to the driver",
-  "booking_cancelled": "Booking cancelled",
-    
+    "removed_from_favorites": "Usunięte z ulubionych",
+    "comment_added": "Komentarz dodany",
+    "booking_requested": "Booking requested",
+    "booking_requested_successfully": "Your booking request has been sent to the driver",
+    "booking_cancelled": "Booking cancelled",
     "offer_deleted": "Oferta usunięta",
     "offer_deleted_successfully": "Twoja oferta wspólnego przejazdu została pomyślnie usunięta",
-    
     "request_deleted": "Prośba usunięta",
     "request_deleted_successfully": "Twoja prośba o wspólny przejazd została pomyślnie usunięta",
     "collaborator_added": "Współpracownik dodany",
@@ -615,8 +613,8 @@
     "buttons": {
       "cancel": "Anuluj",
       "updating": "Modyfikacja...",
-  "publishing": "Publikowanie...",
-  "submitting": "Submitting..."
+      "publishing": "Publikowanie...",
+      "submitting": "Submitting..."
     }
   },
   "components": {
@@ -647,7 +645,11 @@
       "convention_name": "Nazwa konwencji",
       "convention_logo": "Logo konwencji",
       "upload_file": "Prześlij plik",
-      "external_url": "Zewnętrzny URL"
+      "external_url": "Zewnętrzny URL",
+      "convention_logo_alt": "Logo konwencji",
+      "loading_error_title": "Błąd ładowania",
+      "loading_error_description": "Nie można załadować obrazu z tego adresu URL",
+      "logo_url_description": "URL obrazu logo konwencji"
     },
     "favorites_map": {
       "no_upcoming_favorites": "Brak nadchodzących ulubionych edycji z dostępną lokalizacją",
@@ -719,7 +721,6 @@
       "add_comment_placeholder": "Dodaj komentarz...",
       "publish": "Opublikuj",
       "to_add_comment": "aby dodać komentarz",
-      
       "offered_on": "Zaoferowane {date}",
       "requested_on": "Poproszono {date}",
       "seats_available": "{count} dostępne miejsce | {count} dostępnych miejsc",
@@ -729,16 +730,16 @@
       "confirmed_passengers": "Potwierdzeni pasażerowie",
       "added_on": "Dodano {date}",
       "remove_passenger": "Usuń {name}",
-  "confirm_delete_request": "Czy na pewno chcesz usunąć tę prośbę o wspólny przejazd?",
-  "contact_user": "Skontaktuj się z {name}",
-  "book_seats": "Book",
-  "confirm_booking": "Confirm booking",
-  "my_booking": "My booking",
-  "pending_bookings": "Pending bookings",
-  "no_pending_bookings": "No pending bookings",
-  "requested_seats": "{count} seat requested | {count} seats requested",
-  "accept": "Accept",
-  "reject": "Reject",
+      "confirm_delete_request": "Czy na pewno chcesz usunąć tę prośbę o wspólny przejazd?",
+      "contact_user": "Skontaktuj się z {name}",
+      "book_seats": "Zarezerwuj",
+      "confirm_booking": "Potwierdź rezerwację",
+      "my_booking": "Moja rezerwacja",
+      "pending_bookings": "Oczekujące rezerwacje",
+      "no_pending_bookings": "Brak oczekujących rezerwacji",
+      "requested_seats": "{count} miejsce wymagane | {count} miejsca wymagane | {count} miejsc wymaganych",
+      "accept": "Zaakceptuj",
+      "reject": "Odrzuć",
       "delete_offer": "Usuń ofertę",
       "delete_request": "Usuń prośbę"
     },

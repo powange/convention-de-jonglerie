@@ -3,10 +3,10 @@
     "title": "Juggling Convention"
   },
   "admin": {
-  "dashboard": "Administrator Dashboard",
-  "new_conventions_this_month": "+{count} denne måned",
-  "active_administrators": "Aktive administratorer",
-  "search_users_placeholder": "Søg via email, brugernavn, fornavn eller efternavn...",
+    "dashboard": "Administrator Dashboard",
+    "new_conventions_this_month": "+{count} denne måned",
+    "active_administrators": "Aktive administratorer",
+    "search_users_placeholder": "Søg via email, brugernavn, fornavn eller efternavn...",
     "dashboard_subtitle": "Dashboard og administrative værktøjer til platformen",
     "total_users": "Samlede brugere",
     "new_users_this_month": "+{count} denne måned",
@@ -151,8 +151,8 @@
   "common": {
     "loading": "Indlæser...",
     "error": "Fejl",
-  "success": "Succes",
-  "cancelled": "Cancelled",
+    "success": "Succes",
+    "cancelled": "Cancelled",
     "cancel": "Annuller",
     "delete": "Slet",
     "edit": "Rediger",
@@ -184,8 +184,8 @@
     "favorite": "Favorit",
     "view_details": "Se detaljer",
     "back": "Tilbage",
-  "private": "Privat",
-  "or": "Eller"
+    "private": "Privat",
+    "or": "Eller"
   },
   "dates": {
     "same_day_with_time": "Den {date} fra {startTime} til {endTime}",
@@ -278,9 +278,9 @@
     "password_very_strong": "Meget stærk adgangskode",
     "reset_link_expired": "Dette nulstillingslink er udløbet",
     "reset_link_used": "Dette link er allerede brugt til at nulstille adgangskoden",
-  "invalid_code": "Ugyldig kode",
-  "continue_with_google": "Fortsæt med Google",
-  "continue_with_facebook": "Fortsæt med Facebook"
+    "invalid_code": "Ugyldig kode",
+    "continue_with_google": "Fortsæt med Google",
+    "continue_with_facebook": "Fortsæt med Facebook"
   },
   "editions": {
     "edit": "Rediger udgaven",
@@ -447,14 +447,12 @@
     "verification_code_sent": "En bekræftelseskode er sendt til dig.",
     "convention_created_desc": "Konventionen \"{name}\" blev oprettet med succes",
     "removed_from_favorites": "Fjernet fra favoritter",
-  "comment_added": "Kommentar tilføjet",
-  "booking_requested": "Booking requested",
-  "booking_requested_successfully": "Your booking request has been sent to the driver",
-  "booking_cancelled": "Booking cancelled",
-    
+    "comment_added": "Kommentar tilføjet",
+    "booking_requested": "Booking requested",
+    "booking_requested_successfully": "Your booking request has been sent to the driver",
+    "booking_cancelled": "Booking cancelled",
     "offer_deleted": "Tilbud slettet",
     "offer_deleted_successfully": "Dit samkørselstilbud blev slettet med succes",
-    
     "request_deleted": "Anmodning slettet",
     "request_deleted_successfully": "Din samkørselsanmodning blev slettet med succes",
     "collaborator_added": "Medarbejder tilføjet",
@@ -613,10 +611,10 @@
       "until_date": "Til"
     },
     "buttons": {
-  "cancel": "Annuller",
-  "updating": "Ændrer...",
-  "publishing": "Offentliggør...",
-  "submitting": "Submitting..."
+      "cancel": "Annuller",
+      "updating": "Ændrer...",
+      "publishing": "Offentliggør...",
+      "submitting": "Submitting..."
     }
   },
   "components": {
@@ -647,7 +645,11 @@
       "convention_name": "Konventionsnavn",
       "convention_logo": "Konventionslogo",
       "upload_file": "Upload fil",
-      "external_url": "Ekstern URL"
+      "external_url": "Ekstern URL",
+      "convention_logo_alt": "Konventionslogo",
+      "loading_error_title": "Indlæsningsfejl",
+      "loading_error_description": "Kan ikke indlæse billede fra denne URL",
+      "logo_url_description": "URL til konventionslogoets billede"
     },
     "favorites_map": {
       "no_upcoming_favorites": "Ingen kommende favoritudgaver med tilgængelig placering",
@@ -719,7 +721,6 @@
       "add_comment_placeholder": "Tilføj en kommentar...",
       "publish": "Offentliggør",
       "to_add_comment": "for at tilføje en kommentar",
-      
       "offered_on": "Tilbudt den {date}",
       "requested_on": "Anmodet den {date}",
       "seats_available": "{count} ledig plads | {count} ledige pladser",
@@ -731,14 +732,14 @@
       "remove_passenger": "Fjern {name}",
       "confirm_delete_request": "Er du sikker på, at du vil slette denne samkørselsanmodning?",
       "contact_user": "Kontakt {name}",
-  "book_seats": "Book",
-  "confirm_booking": "Confirm booking",
-  "my_booking": "My booking",
-  "pending_bookings": "Pending bookings",
-  "no_pending_bookings": "No pending bookings",
-  "requested_seats": "{count} seat requested | {count} seats requested",
-  "accept": "Accept",
-  "reject": "Reject",
+      "book_seats": "Reserver",
+      "confirm_booking": "Bekræft reservation",
+      "my_booking": "Min reservation",
+      "pending_bookings": "Afventende reservationer",
+      "no_pending_bookings": "Ingen afventende reservationer",
+      "requested_seats": "{count} anmodet plads | {count} anmodede pladser",
+      "accept": "Accepter",
+      "reject": "Afvis",
       "delete_offer": "Slet tilbud",
       "delete_request": "Slet anmodning"
     },

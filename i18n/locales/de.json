@@ -152,12 +152,12 @@
     "loading": "Laden...",
     "error": "Fehler",
     "success": "Erfolg",
-  "cancelled": "Cancelled",
+    "cancelled": "Cancelled",
     "cancel": "Abbrechen",
     "delete": "Löschen",
-  "edit": "Bearbeiten",
-  "add": "Hinzufügen",
-  "view": "Anzeigen",
+    "edit": "Bearbeiten",
+    "add": "Hinzufügen",
+    "view": "Anzeigen",
     "close": "Schließen",
     "confirm": "Bestätigen",
     "optional": "Optional",
@@ -184,8 +184,8 @@
     "favorite": "Favorit",
     "view_details": "Details anzeigen",
     "back": "Zurück",
-  "private": "Privat",
-  "or": "Oder"
+    "private": "Privat",
+    "or": "Oder"
   },
   "dates": {
     "same_day_with_time": "Am {date} von {startTime} bis {endTime}",
@@ -278,9 +278,9 @@
     "password_very_strong": "Sehr starkes Passwort",
     "reset_link_expired": "Dieser Zurücksetzungslink ist abgelaufen",
     "reset_link_used": "Dieser Link wurde bereits zum Zurücksetzen des Passworts verwendet",
-  "invalid_code": "Ungültiger Code",
-  "continue_with_google": "Mit Google fortfahren",
-  "continue_with_facebook": "Mit Facebook fortfahren"
+    "invalid_code": "Ungültiger Code",
+    "continue_with_google": "Mit Google fortfahren",
+    "continue_with_facebook": "Mit Facebook fortfahren"
   },
   "editions": {
     "edit": "Auflage bearbeiten",
@@ -310,7 +310,7 @@
     "photo_optional": "Foto (optional)",
     "choose_photo": "Foto auswählen",
     "cannot_load_lost_items": "Fundsachen können nicht geladen werden",
-  "comment_added": "Kommentar hinzugefügt",
+    "comment_added": "Kommentar hinzugefügt",
     "cannot_add_comment": "Kommentar kann nicht hinzugefügt werden",
     "item_marked_returned": "Gegenstand als zurückgegeben markiert",
     "item_marked_lost": "Gegenstand als verloren markiert",
@@ -447,14 +447,12 @@
     "verification_code_sent": "Ein Bestätigungscode wurde dir gesendet.",
     "convention_created_desc": "Die Convention \"{name}\" wurde erfolgreich erstellt",
     "removed_from_favorites": "Aus Favoriten entfernt",
-  "comment_added": "Kommentar hinzugefügt",
-  "booking_requested": "Buchung angefragt",
-  "booking_requested_successfully": "Deine Buchungsanfrage wurde an den Fahrer gesendet",
-  "booking_cancelled": "Buchung storniert",
-    
+    "comment_added": "Kommentar hinzugefügt",
+    "booking_requested": "Buchung angefragt",
+    "booking_requested_successfully": "Deine Buchungsanfrage wurde an den Fahrer gesendet",
+    "booking_cancelled": "Buchung storniert",
     "offer_deleted": "Angebot gelöscht",
     "offer_deleted_successfully": "Dein Fahrgemeinschafts-Angebot wurde erfolgreich gelöscht",
-    
     "request_deleted": "Anfrage gelöscht",
     "request_deleted_successfully": "Deine Fahrgemeinschafts-Anfrage wurde erfolgreich gelöscht",
     "collaborator_added": "Mitarbeiter hinzugefügt",
@@ -649,8 +647,8 @@
     "buttons": {
       "cancel": "Abbrechen",
       "updating": "Änderung...",
-  "publishing": "Veröffentlichung...",
-  "submitting": "Submitting..."
+      "publishing": "Veröffentlichung...",
+      "submitting": "Submitting..."
     }
   },
   "components": {
@@ -681,7 +679,11 @@
       "convention_name": "Name der Convention",
       "convention_logo": "Logo der Convention",
       "upload_file": "Datei hochladen",
-      "external_url": "Externe URL"
+      "external_url": "Externe URL",
+      "convention_logo_alt": "Convention-Logo",
+      "loading_error_title": "Ladefehler",
+      "loading_error_description": "Bild kann nicht von dieser URL geladen werden",
+      "logo_url_description": "URL zum Convention-Logo-Bild"
     },
     "favorites_map": {
       "no_upcoming_favorites": "Keine kommenden Favoriten-Auflagen mit verfügbarem Standort",
@@ -753,7 +755,6 @@
       "add_comment_placeholder": "Kommentar hinzufügen...",
       "publish": "Veröffentlichen",
       "to_add_comment": "um einen Kommentar hinzuzufügen",
-      
       "offered_on": "Angeboten am {date}",
       "requested_on": "Angefragt am {date}",
       "seats_available": "{count} Platz verfügbar | {count} Plätze verfügbar",
@@ -764,15 +765,15 @@
       "added_on": "Hinzugefügt am {date}",
       "remove_passenger": "{name} entfernen",
       "confirm_delete_request": "Bist du sicher, dass du diese Fahrgemeinschafts-Anfrage löschen möchtest?",
-  "contact_user": "{name} kontaktieren",
-  "book_seats": "Book",
-  "confirm_booking": "Confirm booking",
-  "my_booking": "My booking",
-  "pending_bookings": "Pending bookings",
-  "no_pending_bookings": "No pending bookings",
-  "requested_seats": "{count} seat requested | {count} seats requested",
-  "accept": "Accept",
-  "reject": "Reject",
+      "contact_user": "{name} kontaktieren",
+      "book_seats": "Buchen",
+      "confirm_booking": "Buchung bestätigen",
+      "my_booking": "Meine Buchung",
+      "pending_bookings": "Ausstehende Buchungen",
+      "no_pending_bookings": "Keine ausstehenden Buchungen",
+      "requested_seats": "{count} angefragter Platz | {count} angefragte Plätze",
+      "accept": "Akzeptieren",
+      "reject": "Ablehnen",
       "delete_offer": "Angebot löschen",
       "delete_request": "Anfrage löschen"
     },

@@ -151,8 +151,8 @@
   "common": {
     "loading": "Загрузка...",
     "error": "Ошибка",
-  "success": "Успех",
-  "cancelled": "Cancelled",
+    "success": "Успех",
+    "cancelled": "Cancelled",
     "cancel": "Отмена",
     "delete": "Удалить",
     "edit": "Редактировать",
@@ -184,8 +184,8 @@
     "favorite": "Избранное",
     "view_details": "Просмотреть детали",
     "back": "Назад",
-  "private": "Частный",
-  "or": "Или"
+    "private": "Частный",
+    "or": "Или"
   },
   "dates": {
     "same_day_with_time": "{date} с {startTime} до {endTime}",
@@ -249,7 +249,7 @@
     "verifying": "Подтверждение...",
     "verify_code": "Подтвердить код",
     "resend_in": "Повторная отправка через",
-  "resend_code": "Повторно отправить код",
+    "resend_code": "Повторно отправить код",
     "email_verified_success": "Email успешно подтвержден!",
     "account_now_active": "Ваш аккаунт теперь активен. Вы можете войти.",
     "code_expired": "Код истек. Запросите новый код.",
@@ -278,9 +278,9 @@
     "password_very_strong": "Очень сильный пароль",
     "reset_link_expired": "Эта ссылка для сброса истекла",
     "reset_link_used": "Эта ссылка уже использовалась для сброса пароля",
-  "invalid_code": "Недействительный код",
-  "continue_with_google": "Продолжить с Google",
-  "continue_with_facebook": "Продолжить с Facebook"
+    "invalid_code": "Недействительный код",
+    "continue_with_google": "Продолжить с Google",
+    "continue_with_facebook": "Продолжить с Facebook"
   },
   "editions": {
     "edit": "Редактировать издание",
@@ -447,14 +447,12 @@
     "verification_code_sent": "Код подтверждения отправлен вам.",
     "convention_created_desc": "Конвенция \"{name}\" успешно создана",
     "removed_from_favorites": "Удалено из избранных",
-  "comment_added": "Комментарий добавлен",
-  "booking_requested": "Booking requested",
-  "booking_requested_successfully": "Your booking request has been sent to the driver",
-  "booking_cancelled": "Booking cancelled",
-    
+    "comment_added": "Комментарий добавлен",
+    "booking_requested": "Booking requested",
+    "booking_requested_successfully": "Your booking request has been sent to the driver",
+    "booking_cancelled": "Booking cancelled",
     "offer_deleted": "Предложение удалено",
     "offer_deleted_successfully": "Ваше предложение совместной поездки успешно удалено",
-    
     "request_deleted": "Запрос удален",
     "request_deleted_successfully": "Ваш запрос совместной поездки успешно удален",
     "collaborator_added": "Сотрудник добавлен",
@@ -514,8 +512,8 @@
     "buttons": {
       "cancel": "Отмена",
       "updating": "Обновление...",
-  "publishing": "Публикация...",
-  "submitting": "Submitting..."
+      "publishing": "Публикация...",
+      "submitting": "Submitting..."
     }
   },
   "components": {
@@ -546,7 +544,11 @@
       "convention_name": "Название конвенции",
       "convention_logo": "Логотип конвенции",
       "upload_file": "Загрузить файл",
-      "external_url": "Внешняя URL"
+      "external_url": "Внешняя URL",
+      "convention_logo_alt": "Логотип конвенции",
+      "loading_error_title": "Ошибка загрузки",
+      "loading_error_description": "Не удается загрузить изображение с этого URL",
+      "logo_url_description": "URL изображения логотипа конвенции"
     },
     "favorites_map": {
       "no_upcoming_favorites": "Нет предстоящих избранных изданий с доступным местоположением",
@@ -618,7 +620,6 @@
       "add_comment_placeholder": "Добавить комментарий...",
       "publish": "Опубликовать",
       "to_add_comment": "чтобы добавить комментарий",
-      
       "offered_on": "Предложено {date}",
       "requested_on": "Запрошено {date}",
       "seats_available": "{count} место доступно | {count} мест доступно",
@@ -629,15 +630,15 @@
       "added_on": "Добавлено {date}",
       "remove_passenger": "Удалить {name}",
       "confirm_delete_request": "Вы уверены, что хотите удалить этот запрос совместной поездки?",
-  "contact_user": "Связаться с {name}",
-  "book_seats": "Book",
-  "confirm_booking": "Confirm booking",
-  "my_booking": "My booking",
-  "pending_bookings": "Pending bookings",
-  "no_pending_bookings": "No pending bookings",
-  "requested_seats": "{count} seat requested | {count} seats requested",
-  "accept": "Accept",
-  "reject": "Reject",
+      "contact_user": "Связаться с {name}",
+      "book_seats": "Забронировать",
+      "confirm_booking": "Подтвердить бронирование",
+      "my_booking": "Моё бронирование",
+      "pending_bookings": "Ожидающие бронирования",
+      "no_pending_bookings": "Нет ожидающих бронирований",
+      "requested_seats": "{count} запрошенное место | {count} запрошенных места | {count} запрошенных мест",
+      "accept": "Принять",
+      "reject": "Отклонить",
       "delete_offer": "Удалить предложение",
       "delete_request": "Удалить запрос"
     },

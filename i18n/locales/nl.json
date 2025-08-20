@@ -151,8 +151,8 @@
   "common": {
     "loading": "Laden...",
     "error": "Fout",
-  "success": "Succes",
-  "cancelled": "Cancelled",
+    "success": "Succes",
+    "cancelled": "Cancelled",
     "cancel": "Annuleren",
     "delete": "Verwijderen",
     "edit": "Bewerken",
@@ -184,8 +184,8 @@
     "favorite": "Favoriet",
     "view_details": "Details bekijken",
     "back": "Terug",
-  "private": "Privé",
-  "or": "Of"
+    "private": "Privé",
+    "or": "Of"
   },
   "dates": {
     "same_day_with_time": "Op {date} van {startTime} tot {endTime}",
@@ -278,9 +278,9 @@
     "password_very_strong": "Zeer sterk wachtwoord",
     "reset_link_expired": "Deze resetlink is verlopen",
     "reset_link_used": "Deze link is al gebruikt om het wachtwoord te resetten",
-  "invalid_code": "Ongeldige code",
-  "continue_with_google": "Doorgaan met Google",
-  "continue_with_facebook": "Doorgaan met Facebook"
+    "invalid_code": "Ongeldige code",
+    "continue_with_google": "Doorgaan met Google",
+    "continue_with_facebook": "Doorgaan met Facebook"
   },
   "editions": {
     "edit": "Editie bewerken",
@@ -448,13 +448,11 @@
     "convention_created_desc": "De conventie \"{name}\" is succesvol aangemaakt",
     "removed_from_favorites": "Verwijderd uit favorieten",
     "comment_added": "Opmerking toegevoegd",
-  "booking_requested": "Booking requested",
-  "booking_requested_successfully": "Your booking request has been sent to the driver",
-  "booking_cancelled": "Booking cancelled",
-    
+    "booking_requested": "Booking requested",
+    "booking_requested_successfully": "Your booking request has been sent to the driver",
+    "booking_cancelled": "Booking cancelled",
     "offer_deleted": "Aanbieding verwijderd",
     "offer_deleted_successfully": "Je meerijdaanbieding is succesvol verwijderd",
-    
     "request_deleted": "Verzoek verwijderd",
     "request_deleted_successfully": "Je meerijdverzoek is succesvol verwijderd",
     "collaborator_added": "Medewerker toegevoegd",
@@ -514,8 +512,8 @@
     "buttons": {
       "cancel": "Annuleren",
       "updating": "Bijwerken...",
-  "publishing": "Publiceren...",
-  "submitting": "Submitting..."
+      "publishing": "Publiceren...",
+      "submitting": "Submitting..."
     }
   },
   "components": {
@@ -546,7 +544,11 @@
       "convention_name": "Conventienaam",
       "convention_logo": "Conventielogo",
       "upload_file": "Bestand uploaden",
-      "external_url": "Externe URL"
+      "external_url": "Externe URL",
+      "convention_logo_alt": "Conventielogo",
+      "loading_error_title": "Laadfout",
+      "loading_error_description": "Kan afbeelding niet laden vanaf deze URL",
+      "logo_url_description": "URL van het conventielogo-afbeelding"
     },
     "favorites_map": {
       "no_upcoming_favorites": "Geen aankomende favoriete edities met beschikbare locatie",
@@ -618,7 +620,6 @@
       "add_comment_placeholder": "Voeg een opmerking toe...",
       "publish": "Publiceren",
       "to_add_comment": "om een opmerking toe te voegen",
-      
       "offered_on": "Aangeboden op {date}",
       "requested_on": "Aangevraagd op {date}",
       "seats_available": "{count} plaats beschikbaar | {count} plaatsen beschikbaar",
@@ -631,15 +632,15 @@
       "confirm_delete_request": "Weet je zeker dat je dit meerijdverzoek wilt verwijderen?",
       "contact_user": "Contact {name}",
       "delete_offer": "Aanbieding verwijderen",
-  "delete_request": "Verzoek verwijderen",
-  "book_seats": "Plaatsen reserveren",
-  "confirm_booking": "Reservering bevestigen",
-  "my_booking": "Mijn reservering",
-  "pending_bookings": "In afwachting van reserveringen",
-  "no_pending_bookings": "Geen reserveringen in afwachting",
-  "requested_seats": "Aangevraagde plaatsen",
-  "accept": "Accepteren",
-  "reject": "Weigeren"
+      "delete_request": "Verzoek verwijderen",
+      "book_seats": "Plaatsen reserveren",
+      "confirm_booking": "Reservering bevestigen",
+      "my_booking": "Mijn reservering",
+      "pending_bookings": "In afwachting van reserveringen",
+      "no_pending_bookings": "Geen reserveringen in afwachting",
+      "requested_seats": "{count} aangevraagde plaats | {count} aangevraagde plaatsen",
+      "accept": "Accepteren",
+      "reject": "Weigeren"
     },
     "posts": {
       "your_reply": "Je antwoord",

@@ -59,7 +59,7 @@
               },
               resetAfterUpload: false
             }"
-            alt="Logo de la convention"
+            :alt="$t('components.convention_form.convention_logo_alt')"
             :placeholder="$t('components.convention_form.click_to_select_image')"
             :allow-delete="!!initialData?.id"
             @uploaded="onImageUploaded"
@@ -77,7 +77,7 @@
             @blur="trimField('logo')"
           />
           <p class="text-sm text-gray-500 mt-1">
-            URL vers l'image du logo de la convention
+            {{ $t('components.convention_form.logo_url_description') }}
           </p>
           
           <!-- Aperçu de l'URL -->
@@ -85,7 +85,7 @@
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ $t('components.convention_form.logo_preview') }}</p>
             <img 
               :src="form.logo" 
-              :alt="form.name || 'Logo de la convention'"
+              :alt="form.name || $t('components.convention_form.convention_logo_alt')"
               class="w-24 h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
               @error="logoError = true"
               @load="logoError = false"
@@ -94,8 +94,8 @@
               v-if="logoError"
               color="error"
               variant="subtle"
-              title="Erreur de chargement"
-              description="Impossible de charger l'image depuis cette URL"
+              :title="$t('components.convention_form.loading_error_title')"
+              :description="$t('components.convention_form.loading_error_description')"
               class="mt-2"
             />
           </div>

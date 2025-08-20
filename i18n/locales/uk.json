@@ -151,8 +151,8 @@
   "common": {
     "loading": "Завантаження...",
     "error": "Помилка",
-  "success": "Успіх",
-  "cancelled": "Cancelled",
+    "success": "Успіх",
+    "cancelled": "Cancelled",
     "cancel": "Скасувати",
     "delete": "Видалити",
     "edit": "Редагувати",
@@ -184,8 +184,8 @@
     "favorite": "Улюблене",
     "view_details": "Переглянути деталі",
     "back": "Назад",
-  "private": "Приватний",
-  "or": "Або"
+    "private": "Приватний",
+    "or": "Або"
   },
   "dates": {
     "same_day_with_time": "{date} з {startTime} до {endTime}",
@@ -279,8 +279,8 @@
     "reset_link_expired": "Це посилання для скидання прострочене",
     "reset_link_used": "Це посилання вже використовувалося для скидання пароля",
     "invalid_code": "Недійсний код",
-  "continue_with_google": "Продовжити з Google",
-  "continue_with_facebook": "Продовжити з Facebook"
+    "continue_with_google": "Продовжити з Google",
+    "continue_with_facebook": "Продовжити з Facebook"
   },
   "editions": {
     "edit": "Редагувати видання",
@@ -447,14 +447,12 @@
     "verification_code_sent": "Вам надіслано код підтвердження.",
     "convention_created_desc": "Конвенцію \"{name}\" успішно створено",
     "removed_from_favorites": "Видалено з улюблених",
-  "comment_added": "Коментар додано",
-  "booking_requested": "Booking requested",
-  "booking_requested_successfully": "Your booking request has been sent to the driver",
-  "booking_cancelled": "Booking cancelled",
-    
+    "comment_added": "Коментар додано",
+    "booking_requested": "Booking requested",
+    "booking_requested_successfully": "Your booking request has been sent to the driver",
+    "booking_cancelled": "Booking cancelled",
     "offer_deleted": "Пропозицію видалено",
     "offer_deleted_successfully": "Вашу пропозицію сумісної поїздки успішно видалено",
-    
     "request_deleted": "Запит видалено",
     "request_deleted_successfully": "Ваш запит на сумісну поїздку успішно видалено",
     "collaborator_added": "Співробітника додано",
@@ -514,8 +512,8 @@
     "buttons": {
       "cancel": "Скасувати",
       "updating": "Оновлення...",
-  "publishing": "Публікація...",
-  "submitting": "Submitting..."
+      "publishing": "Публікація...",
+      "submitting": "Submitting..."
     }
   },
   "components": {
@@ -546,7 +544,11 @@
       "convention_name": "Назва конвенції",
       "convention_logo": "Логотип конвенції",
       "upload_file": "Завантажити файл",
-      "external_url": "Зовнішнє посилання"
+      "external_url": "Зовнішнє посилання",
+      "convention_logo_alt": "Логотип конвенції",
+      "loading_error_title": "Помилка завантаження",
+      "loading_error_description": "Не вдається завантажити зображення з цього URL",
+      "logo_url_description": "URL зображення логотипу конвенції"
     },
     "favorites_map": {
       "no_upcoming_favorites": "Немає майбутніх улюблених видань з доступним розташуванням",
@@ -618,7 +620,6 @@
       "add_comment_placeholder": "Додати коментар...",
       "publish": "Опублікувати",
       "to_add_comment": "щоб додати коментар",
-      
       "offered_on": "Запропоновано {date}",
       "requested_on": "Запитано {date}",
       "seats_available": "{count} доступне місце | {count} доступних місць",
@@ -629,15 +630,15 @@
       "added_on": "Додано {date}",
       "remove_passenger": "Видалити {name}",
       "confirm_delete_request": "Ви впевнені, що хочете видалити цей запит сумісної поїздки?",
-  "contact_user": "Зв'язатися з {name}",
-  "book_seats": "Book",
-  "confirm_booking": "Confirm booking",
-  "my_booking": "My booking",
-  "pending_bookings": "Pending bookings",
-  "no_pending_bookings": "No pending bookings",
-  "requested_seats": "{count} seat requested | {count} seats requested",
-  "accept": "Accept",
-  "reject": "Reject",
+      "contact_user": "Зв'язатися з {name}",
+      "book_seats": "Забронювати",
+      "confirm_booking": "Підтвердити бронювання",
+      "my_booking": "Моє бронювання",
+      "pending_bookings": "Очікувані бронювання",
+      "no_pending_bookings": "Немає очікуваних бронювань",
+      "requested_seats": "{count} запитане місце | {count} запитаних місця | {count} запитаних місць",
+      "accept": "Прийняти",
+      "reject": "Відхилити",
       "delete_offer": "Видалити пропозицію",
       "delete_request": "Видалити запит"
     },

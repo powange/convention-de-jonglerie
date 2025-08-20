@@ -674,7 +674,11 @@
       "convention_name": "Nom de la convention",
       "convention_logo": "Logo de la convention",
       "upload_file": "Upload fichier",
-      "external_url": "URL externe"
+      "external_url": "URL externe",
+      "convention_logo_alt": "Logo de la convention",
+      "loading_error_title": "Erreur de chargement",
+      "loading_error_description": "Impossible de charger l'image depuis cette URL",
+      "logo_url_description": "URL vers l'image du logo de la convention"
     },
     "favorites_map": {
       "no_upcoming_favorites": "Aucune édition favorite à venir avec localisation disponible",
@@ -759,7 +763,7 @@
       "contact_user": "Contacter {name}",
       "book_seats": "Réserver",
       "confirm_booking": "Confirmer la réservation",
-  "my_booking": "Ma réservation",
+      "my_booking": "Ma réservation",
       "pending_bookings": "Réservations en attente",
       "no_pending_bookings": "Aucune réservation en attente",
       "requested_seats": "{count} place demandée | {count} places demandées",
