@@ -133,7 +133,8 @@
     "admin": "Administração",
     "login": "Iniciar Sessão",
     "logout": "Terminar Sessão",
-    "tabs": "Separadores de navegação"
+    "tabs": "Separadores de navegação",
+    "breadcrumb": "Breadcrumb"
   },
   "homepage": {
     "filters": "Filtros",
@@ -185,7 +186,8 @@
     "view_details": "Ver detalhes",
     "back": "Voltar",
     "private": "Privado",
-    "or": "Ou"
+    "or": "Ou",
+    "create": "Criar"
   },
   "dates": {
     "same_day_with_time": "No dia {date} das {startTime} às {endTime}",
@@ -355,7 +357,43 @@
     "convention_not_found": "Convenção não encontrada",
     "convention_not_found_description": "A convenção que procura não existe"
   },
-  "carpool": {},
+  "carpool": {
+    "offer": {
+      "create": "Criar oferta de carona",
+      "available_seats": "Lugares disponíveis",
+      "seats_placeholder": "ex.: 3",
+      "price_per_seat": "Preço por lugar (€)",
+      "price_placeholder": "ex.: 10",
+      "created": "Oferta de carona criada"
+    },
+    "request": {
+      "create": "Criar pedido de carona",
+      "required_seats": "Lugares necessários",
+      "seats_placeholder": "ex.: 2",
+      "created": "Pedido de carona criado"
+    },
+    "route": "Rota",
+    "from": "De",
+    "departure_placeholder": "Cidade ou endereço de partida",
+    "to": "Para",
+    "arrival_placeholder": "Cidade ou endereço de chegada",
+    "departure_date": "Data e hora de partida",
+    "select_date_time": "Selecionar data e hora",
+    "details": "Detalhes",
+    "details_placeholder": "Informações úteis sobre a viagem (bagagem, ponto de encontro, etc.)",
+    "options": "Opções",
+    "smoking_allowed": "Fumar permitido",
+    "pets_allowed": "Animais permitidos",
+    "music_allowed": "Música permitida",
+    "validation": {
+      "departure_required": "Cidade de partida é obrigatória",
+      "arrival_required": "Cidade de chegada é obrigatória",
+      "date_required": "Data de partida é obrigatória",
+      "date_invalid": "Data inválida",
+      "seats_min": "Pelo menos 1 lugar",
+      "seats_max": "Máximo de 8 lugares"
+    }
+  },
   "profile": {
     "picture": "Foto de perfil",
     "personal_info": "Informações pessoais",
@@ -489,6 +527,7 @@
     "favorite_update_failed": "Falha na actualização do estado de favorito",
     "deletion_error": "Erro na eliminação",
     "generic_error": "Ocorreu um erro",
+    "generic": "Ocorreu um erro",
     "removal_error": "Erro na remoção",
     "leaflet_unavailable": "Leaflet não disponível",
     "cannot_load_editions": "Impossível carregar as edições",
@@ -888,6 +927,13 @@
       "email": {
         "invalid": "Email inválido"
       }
+    },
+    "recaptcha": {
+      "protected_by": "Este site está protegido pelo reCAPTCHA e aplicam-se a",
+      "privacy_policy": "Política de Privacidade",
+      "and": "e os",
+      "terms_of_service": "Termos de Serviço",
+      "apply": "da Google"
     }
   },
   "upload": {

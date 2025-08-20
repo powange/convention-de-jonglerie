@@ -133,7 +133,8 @@
     "admin": "Administration",
     "login": "Connexion",
     "logout": "Déconnexion",
-    "tabs": "Onglets de navigation"
+    "tabs": "Onglets de navigation",
+    "breadcrumb": "Fil d'Ariane"
   },
   "homepage": {
     "filters": "Filtres",
@@ -152,7 +153,7 @@
     "loading": "Chargement...",
     "error": "Erreur",
     "success": "Succès",
-  "cancelled": "Annulé",
+    "cancelled": "Annulé",
     "cancel": "Annuler",
     "delete": "Supprimer",
     "edit": "Modifier",
@@ -185,7 +186,8 @@
     "view_details": "Voir les détails",
     "back": "Retour",
     "private": "Privé",
-    "or": "Ou"
+    "or": "Ou",
+    "create": "Créer"
   },
   "dates": {
     "same_day_with_time": "Le {date} de {startTime} à {endTime}",
@@ -355,7 +357,42 @@
     "convention_not_found": "Convention introuvable",
     "convention_not_found_description": "La convention que vous cherchez n'existe pas"
   },
-  "carpool": {},
+  "carpool": {
+    "offer": {
+      "create": "Créer une offre de covoiturage",
+      "available_seats": "Nombre de places disponibles",
+      "seats_placeholder": "Ex: 3",
+      "price_per_seat": "Prix par place (€)",
+      "price_placeholder": "Ex: 10",
+      "created": "Offre de covoiturage créée"
+    },
+    "request": {
+      "create": "Créer une demande de covoiturage",
+      "required_seats": "Nombre de places recherchées",
+      "seats_placeholder": "Ex: 2",
+      "created": "Demande de covoiturage créée"
+    },
+    "route": "Trajet",
+    "from": "De",
+    "departure_placeholder": "Ville ou adresse de départ",
+    "to": "À",
+    "arrival_placeholder": "Ville ou adresse d'arrivée",
+    "select_date_time": "Sélectionner une date et une heure",
+    "details": "Détails",
+    "details_placeholder": "Infos utiles sur le trajet (bagages, point de rendez-vous, etc.)",
+    "options": "Options",
+    "smoking_allowed": "Fumeur accepté",
+    "pets_allowed": "Animaux acceptés",
+    "music_allowed": "Musique acceptée",
+    "validation": {
+      "departure_required": "La ville de départ est requise",
+      "arrival_required": "La ville d'arrivée est requise",
+      "date_required": "La date de départ est requise",
+      "date_invalid": "Date invalide",
+      "seats_min": "Au moins 1 place",
+      "seats_max": "Maximum 8 places"
+    }
+  },
   "profile": {
     "picture": "Photo de profil",
     "personal_info": "Informations personnelles",
@@ -447,21 +484,13 @@
     "offer_deleted_successfully": "Votre offre de covoiturage a été supprimée avec succès",
     "booking_requested": "Réservation envoyée",
     "booking_requested_successfully": "Votre demande de réservation a été transmise au conducteur",
-  "booking_cancelled": "Réservation annulée",
+    "booking_cancelled": "Réservation annulée",
     "request_deleted": "Demande supprimée",
     "request_deleted_successfully": "Votre demande de covoiturage a été supprimée avec succès",
     "collaborator_added": "Collaborateur ajouté",
     "collaborator_added_successfully": "Le collaborateur a été ajouté avec succès",
     "collaborator_removed": "Collaborateur retiré",
     "collaborator_removed_successfully": "Le collaborateur a été retiré avec succès",
-    "offer_updated": "Offre modifiée",
-    "carpool_proposed": "Covoiturage proposé",
-    "offer_updated_successfully": "Votre offre a été modifiée avec succès",
-    "carpool_offer_published": "Votre offre de covoiturage a été publiée",
-    "request_updated": "Demande modifiée",
-    "request_published": "Demande publiée",
-    "request_updated_successfully": "Votre demande a été modifiée avec succès",
-    "carpool_request_published": "Votre demande de covoiturage a été publiée",
     "comment_published": "Commentaire publié",
     "comment_published_successfully": "Votre commentaire a été publié avec succès",
     "comment_deleted": "Commentaire supprimé",
@@ -571,9 +600,7 @@
     "deletion_error": "Erreur lors de la suppression",
     "generic_error": "Une erreur est survenue",
     "removal_error": "Erreur lors du retrait",
-    "leaflet_unavailable": "Leaflet non disponible",
     "cannot_load_editions": "Impossible de charger les éditions",
-    "leaflet_loading_error": "Erreur de chargement de Leaflet",
     "addition_error": "Erreur lors de l'ajout",
     "content_required": "Le contenu est requis",
     "content_too_long": "Le contenu ne peut pas dépasser {max} caractères",
@@ -588,10 +615,6 @@
     "seats_minimum_one": "Le nombre de places doit être au moins 1",
     "seats_maximum": "Maximum {max} places",
     "people_maximum": "Maximum {max} personnes",
-    "cannot_update_offer": "Impossible de modifier l'offre",
-    "cannot_create_carpool_offer": "Impossible de créer l'offre de covoiturage",
-    "cannot_update_request": "Impossible de modifier la demande",
-    "cannot_create_carpool_request": "Impossible de créer la demande de covoiturage",
     "loading_error": "Erreur de chargement",
     "cannot_publish_comment": "Impossible de publier le commentaire",
     "cannot_delete_comment": "Impossible de supprimer le commentaire",
@@ -606,7 +629,8 @@
     "convention_creation_error": "Une erreur est survenue lors de la création de la convention",
     "convention_edit_denied": "Vous n'avez pas les droits pour modifier cette convention",
     "convention_update_error": "Une erreur est survenue lors de la mise à jour de la convention",
-    "update_error": "Erreur lors de la mise à jour"
+    "update_error": "Erreur lors de la mise à jour",
+    "generic": "Une erreur est survenue"
   },
   "forms": {
     "placeholders": {
@@ -617,23 +641,13 @@
       "select_convention": "Sélectionnez une convention",
       "edition_name_example": "Nom de l'édition (ex: EJC 2024)",
       "address_complement": "Bâtiment A, Salle des fêtes...",
-      "select_date": "Sélectionner une date",
-      "departure_details": "Ex: Gare de Lyon, Place de la République, Péage A6...",
       "search_by_name": "Rechercher par nom",
-      "carpool_offer_details": "Ex: Je pars de la porte d'Orléans, possibilité de récupérer sur l'A6. Véhicule non-fumeur. De la place pour du matériel de jonglage.",
-      "carpool_request_details": "Ex: Je suis flexible sur l'horaire, je peux partir le vendredi soir ou samedi matin. Je voyage léger avec juste un sac à dos.",
-      "departure_city": "Ex: Paris, Lyon, Marseille...",
-      "phone_example": "Ex: 06 12 34 56 78",
       "city_example": "Paris"
     },
     "labels": {
       "full_address": "Adresse Complète",
       "from_date": "À partir du",
       "select_date": "Sélectionner une date",
-      "departure_city": "Ville de départ",
-      "departure_location": "D'où partez-vous ?",
-      "phone_number": "Votre numéro de téléphone",
-      "additional_info": "Informations complémentaires",
       "edition_name_optional": "Nom de l'édition (optionnel)",
       "address_complement": "Complément d'adresse",
       "convention_name": "Nom de la convention",
@@ -641,9 +655,8 @@
     },
     "buttons": {
       "cancel": "Annuler",
-      "updating": "Modification...",
-  "publishing": "Publication...",
-  "submitting": "Envoi..."
+      "publishing": "Publication...",
+      "submitting": "Envoi..."
     }
   },
   "components": {
@@ -917,6 +930,13 @@
       "email": {
         "invalid": "Email invalide"
       }
+    },
+    "recaptcha": {
+      "protected_by": "Ce site est protégé par reCAPTCHA et la",
+      "privacy_policy": "Politique de confidentialité",
+      "and": "et les",
+      "terms_of_service": "Conditions d'utilisation",
+      "apply": "s'appliquent"
     }
   },
   "footer": {

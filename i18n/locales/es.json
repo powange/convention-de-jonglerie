@@ -133,7 +133,8 @@
     "admin": "Administración",
     "login": "Iniciar sesión",
     "logout": "Cerrar sesión",
-    "tabs": "Pestañas de navegación"
+    "tabs": "Pestañas de navegación",
+    "breadcrumb": "Migas de pan"
   },
   "homepage": {
     "filters": "Filtros",
@@ -185,7 +186,8 @@
     "view_details": "Ver detalles",
     "back": "Volver",
     "private": "Privado",
-    "or": "O"
+    "or": "O",
+    "create": "Crear"
   },
   "dates": {
     "same_day_with_time": "El {date} de {startTime} a {endTime}",
@@ -355,7 +357,43 @@
     "convention_not_found": "Convención no encontrada",
     "convention_not_found_description": "La convención que buscas no existe"
   },
-  "carpool": {},
+  "carpool": {
+    "offer": {
+      "create": "Crear oferta de viaje compartido",
+      "available_seats": "Plazas disponibles",
+      "seats_placeholder": "p. ej., 3",
+      "price_per_seat": "Precio por plaza (€)",
+      "price_placeholder": "p. ej., 10",
+      "created": "Oferta de viaje creada"
+    },
+    "request": {
+      "create": "Crear solicitud de viaje compartido",
+      "required_seats": "Plazas requeridas",
+      "seats_placeholder": "p. ej., 2",
+      "created": "Solicitud de viaje creada"
+    },
+    "route": "Ruta",
+    "from": "Desde",
+    "departure_placeholder": "Ciudad o dirección de salida",
+    "to": "Hasta",
+    "arrival_placeholder": "Ciudad o dirección de llegada",
+    "departure_date": "Fecha y hora de salida",
+    "select_date_time": "Seleccionar fecha y hora",
+    "details": "Detalles",
+    "details_placeholder": "Información útil del viaje (equipaje, punto de encuentro, etc.)",
+    "options": "Opciones",
+    "smoking_allowed": "Se permite fumar",
+    "pets_allowed": "Se permiten mascotas",
+    "music_allowed": "Música permitida",
+    "validation": {
+      "departure_required": "La ciudad de salida es obligatoria",
+      "arrival_required": "La ciudad de llegada es obligatoria",
+      "date_required": "La fecha de salida es obligatoria",
+      "date_invalid": "Fecha inválida",
+      "seats_min": "Al menos 1 plaza",
+      "seats_max": "Máximo 8 plazas"
+    }
+  },
   "profile": {
     "picture": "Foto de perfil",
     "personal_info": "Información personal",
@@ -577,6 +615,7 @@
     "convention_edit_denied": "No tienes permisos para editar esta convención",
     "convention_update_error": "Ha ocurrido un error al actualizar la convención",
     "update_error": "Error durante la actualización",
+    "generic": "Ha ocurrido un error",
     "cannot_load_comments": "No se pueden cargar los comentarios",
     "cannot_add_comment": "No se puede agregar el comentario",
     "convention_required": "La convención es requerida",
@@ -922,6 +961,13 @@
       "email": {
         "invalid": "Email inválido"
       }
+    },
+    "recaptcha": {
+      "protected_by": "Este sitio está protegido por reCAPTCHA y se aplican la",
+      "privacy_policy": "Política de privacidad",
+      "and": "y los",
+      "terms_of_service": "Términos de servicio",
+      "apply": "de Google"
     }
   }
 }

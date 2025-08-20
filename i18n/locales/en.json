@@ -133,7 +133,8 @@
     "admin": "Administration",
     "login": "Login",
     "logout": "Logout",
-    "tabs": "Navigation tabs"
+    "tabs": "Navigation tabs",
+    "breadcrumb": "Breadcrumb"
   },
   "homepage": {
     "filters": "Filters",
@@ -185,7 +186,8 @@
     "back": "Back",
     "private": "Private",
     "or": "Or",
-    "cancelled": "Cancelled"
+    "cancelled": "Cancelled",
+    "create": "Create"
   },
   "dates": {
     "same_day_with_time": "On {date} from {startTime} to {endTime}",
@@ -355,7 +357,42 @@
     "convention_not_found": "Convention not found",
     "convention_not_found_description": "The convention you are looking for does not exist"
   },
-  "carpool": {},
+  "carpool": {
+    "offer": {
+      "create": "Create carpool offer",
+      "available_seats": "Available seats",
+      "seats_placeholder": "e.g., 3",
+      "price_per_seat": "Price per seat (€)",
+      "price_placeholder": "e.g., 10",
+      "created": "Carpool offer created"
+    },
+    "request": {
+      "create": "Create carpool request",
+      "required_seats": "Required seats",
+      "seats_placeholder": "e.g., 2",
+      "created": "Carpool request created"
+    },
+    "route": "Route",
+    "from": "From",
+    "departure_placeholder": "Departure city or address",
+    "to": "To",
+    "arrival_placeholder": "Arrival city or address",
+    "select_date_time": "Select a date and time",
+    "details": "Details",
+    "details_placeholder": "Useful info about the trip (luggage, meeting point, etc.)",
+    "options": "Options",
+    "smoking_allowed": "Smoking allowed",
+    "pets_allowed": "Pets allowed",
+    "music_allowed": "Music allowed",
+    "validation": {
+      "departure_required": "Departure city is required",
+      "arrival_required": "Arrival city is required",
+      "date_required": "Departure date is required",
+      "date_invalid": "Invalid date",
+      "seats_min": "At least 1 seat",
+      "seats_max": "Maximum 8 seats"
+    }
+  },
   "profile": {
     "picture": "Profile picture",
     "personal_info": "Personal information",
@@ -459,14 +496,6 @@
     "collaborator_added_successfully": "The collaborator has been successfully added",
     "collaborator_removed": "Collaborator removed",
     "collaborator_removed_successfully": "The collaborator has been successfully removed",
-    "offer_updated": "Offer updated",
-    "carpool_proposed": "Carpool proposed",
-    "offer_updated_successfully": "Your offer has been successfully updated",
-    "carpool_offer_published": "Your carpool offer has been published",
-    "request_updated": "Request updated",
-    "request_published": "Request published",
-    "request_updated_successfully": "Your request has been successfully updated",
-    "carpool_request_published": "Your carpool request has been published",
     "comment_published": "Comment published",
     "comment_published_successfully": "Your comment has been successfully published",
     "comment_deleted": "Comment deleted",
@@ -487,23 +516,13 @@
       "select_convention": "Select a convention",
       "edition_name_example": "Edition name (e.g.: EJC 2024)",
       "address_complement": "Building A, Function room...",
-      "select_date": "Select a date",
-      "departure_details": "e.g.: Lyon Station, Republic Square, A6 Toll...",
       "search_by_name": "Search by name",
-      "carpool_offer_details": "e.g.: I'm leaving from Porte d'Orléans, possibility to pick up on A6. Non-smoking vehicle. Space for juggling equipment.",
-      "carpool_request_details": "e.g.: I'm flexible on schedule, can leave Friday evening or Saturday morning. I travel light with just a backpack.",
-      "departure_city": "e.g.: Paris, Lyon, Marseille...",
-      "phone_example": "e.g.: +33 6 12 34 56 78",
       "city_example": "Paris"
     },
     "labels": {
       "full_address": "Full Address",
       "from_date": "From",
       "select_date": "Select a date",
-      "departure_city": "Departure city",
-      "departure_location": "Where are you leaving from?",
-      "phone_number": "Your phone number",
-      "additional_info": "Additional information",
       "edition_name_optional": "Edition name (optional)",
       "address_complement": "Address complement",
       "convention_name": "Convention name",
@@ -511,7 +530,6 @@
     },
     "buttons": {
       "cancel": "Cancel",
-      "updating": "Updating...",
       "publishing": "Publishing...",
       "submitting": "Submitting..."
     }
@@ -818,6 +836,13 @@
       "email": {
         "invalid": "Invalid email"
       }
+    },
+    "recaptcha": {
+      "protected_by": "This site is protected by reCAPTCHA and the",
+      "privacy_policy": "Privacy Policy",
+      "and": "and",
+      "terms_of_service": "Terms of Service",
+      "apply": "apply"
     }
   },
   "upload": {
@@ -885,11 +910,10 @@
     "cannot_add_comment": "Cannot add comment",
     "convention_required": "Convention is required",
     "address_required": "Address is required",
+    "generic": "An error occurred",
     "generic_error": "An error occurred",
     "removal_error": "Removal error",
-    "leaflet_unavailable": "Leaflet unavailable",
     "cannot_load_editions": "Cannot load editions",
-    "leaflet_loading_error": "Leaflet loading error",
     "addition_error": "Addition error",
     "content_required": "Content is required",
     "content_too_long": "Content cannot exceed {max} characters",
@@ -904,10 +928,6 @@
     "seats_minimum_one": "Number of seats must be at least 1",
     "seats_maximum": "Maximum {max} seats",
     "people_maximum": "Maximum {max} people",
-    "cannot_update_offer": "Cannot update offer",
-    "cannot_create_carpool_offer": "Cannot create carpool offer",
-    "cannot_update_request": "Cannot update request",
-    "cannot_create_carpool_request": "Cannot create carpool request",
     "loading_error": "Loading error",
     "cannot_publish_comment": "Cannot publish comment",
     "cannot_delete_comment": "Cannot delete comment",

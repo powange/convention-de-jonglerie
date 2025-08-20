@@ -21,7 +21,7 @@
                 v-model="state.newPassword" 
                 :type="showNewPassword ? 'text' : 'password'"
                 required 
-                placeholder="••••••••"
+                :placeholder="$t('profile.new_password_placeholder')"
                 icon="i-heroicons-lock-closed"
                 class="w-full"
                 :disabled="loading"
@@ -47,7 +47,7 @@
                 v-model="state.confirmPassword" 
                 :type="showConfirmPassword ? 'text' : 'password'"
                 required 
-                placeholder="••••••••"
+                :placeholder="$t('profile.confirm_new_password_placeholder')"
                 icon="i-heroicons-lock-closed"
                 class="w-full"
                 :disabled="loading"

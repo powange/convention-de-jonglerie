@@ -133,7 +133,8 @@
     "admin": "Administratie",
     "login": "Inloggen",
     "logout": "Uitloggen",
-    "tabs": "Navigatietabs"
+    "tabs": "Navigatietabs",
+    "breadcrumb": "Kruimelpad"
   },
   "homepage": {
     "filters": "Filters",
@@ -185,7 +186,8 @@
     "view_details": "Details bekijken",
     "back": "Terug",
     "private": "Privé",
-    "or": "Of"
+    "or": "Of",
+    "create": "Aanmaken"
   },
   "dates": {
     "same_day_with_time": "Op {date} van {startTime} tot {endTime}",
@@ -355,7 +357,43 @@
     "convention_not_found": "Conventie niet gevonden",
     "convention_not_found_description": "De conventie die je zoekt bestaat niet"
   },
-  "carpool": {},
+  "carpool": {
+    "offer": {
+      "create": "Carpoolaanbod maken",
+      "available_seats": "Beschikbare plaatsen",
+      "seats_placeholder": "bijv. 3",
+      "price_per_seat": "Prijs per plaats (€)",
+      "price_placeholder": "bijv. 10",
+      "created": "Carpoolaanbod aangemaakt"
+    },
+    "request": {
+      "create": "Carpoolaanvraag maken",
+      "required_seats": "Benodigde plaatsen",
+      "seats_placeholder": "bijv. 2",
+      "created": "Carpoolaanvraag aangemaakt"
+    },
+    "route": "Route",
+    "from": "Van",
+    "departure_placeholder": "Vertrekplaats of adres",
+    "to": "Naar",
+    "arrival_placeholder": "Aankomstplaats of adres",
+    "departure_date": "Vertrekdatum en -tijd",
+    "select_date_time": "Selecteer datum en tijd",
+    "details": "Details",
+    "details_placeholder": "Nuttige info over de rit (bagage, ontmoetingspunt, etc.)",
+    "options": "Opties",
+    "smoking_allowed": "Roken toegestaan",
+    "pets_allowed": "Huisdieren toegestaan",
+    "music_allowed": "Muziek toegestaan",
+    "validation": {
+      "departure_required": "Vertrekplaats is vereist",
+      "arrival_required": "Aankomstplaats is vereist",
+      "date_required": "Vertrekdatum is vereist",
+      "date_invalid": "Ongeldige datum",
+      "seats_min": "Minimaal 1 plaats",
+      "seats_max": "Maximaal 8 plaatsen"
+    }
+  },
   "profile": {
     "picture": "Profielfoto",
     "personal_info": "Persoonlijke informatie",
@@ -852,6 +890,13 @@
       "email": {
         "invalid": "Ongeldig e-mailadres"
       }
+    },
+    "recaptcha": {
+      "protected_by": "Deze site wordt beschermd door reCAPTCHA en de",
+      "privacy_policy": "Privacybeleid",
+      "and": "en",
+      "terms_of_service": "Servicevoorwaarden",
+      "apply": "zijn van toepassing"
     }
   },
   "errors": {
@@ -922,6 +967,7 @@
     "convention_creation_error": "Er is een fout opgetreden bij het aanmaken van de conventie",
     "convention_edit_denied": "Je hebt niet de rechten om deze conventie te bewerken",
     "convention_update_error": "Er is een fout opgetreden bij het bijwerken van de conventie",
-    "update_error": "Bijwerkfout"
+    "update_error": "Bijwerkfout",
+    "generic": "Er is een fout opgetreden"
   }
 }

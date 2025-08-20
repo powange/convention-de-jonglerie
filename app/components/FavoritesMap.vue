@@ -17,7 +17,7 @@
     <div v-else class="relative">
       <div ref="mapContainer" class="h-96 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <!-- Message de chargement -->
-        <div v-if="!mapReady" class="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800">
+        <div v-if="isLoading" class="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800">
           <div class="text-center">
             <UIcon name="i-heroicons-arrow-path" class="animate-spin text-primary-500 mx-auto mb-2" size="24" />
             <p class="text-sm text-gray-600 dark:text-gray-400">{{ $t('components.map.loading') }}</p>
@@ -53,25 +53,35 @@
 
 <script setup lang="ts">
 import type { Edition } from '~/types';
+import type { MapMarker } from '~/composables/useLeafletMap';
 import { getEditionDisplayName } from '~/utils/editionName';
 import { createCustomMarkerIcon, getEditionStatus } from '~/utils/mapMarkers';
-
-// Déclaration de type pour Leaflet global
-declare global {
-  interface Window { L: unknown }
-}
 
 interface Props {
   editions: Edition[];
 }
 
 const props = defineProps<Props>();
-const { t, locale } = useI18n();
+const { t } = useI18n();
 
 // Références
-const mapContainer = ref<HTMLElement>();
-const mapReady = ref(false);
-let map: unknown = null;
+const mapContainer = ref<HTMLElement | null>(null);
+
+// Utilitaire local pour formater les dates (évite de référencer mapUtils depuis markers)
+const formatDateRangeLocal = (startDate: string, endDate: string) => {
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+  const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' }
+  if (start.getTime() === end.getTime()) return start.toLocaleDateString('fr-FR', options)
+  if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+    return `${start.getDate()} - ${end.toLocaleDateString('fr-FR', options)}`
+  }
+  if (start.getFullYear() === end.getFullYear()) {
+    const startOptions: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long' }
+    return `${start.toLocaleDateString('fr-FR', startOptions)} - ${end.toLocaleDateString('fr-FR', options)}`
+  }
+  return `${start.toLocaleDateString('fr-FR', options)} - ${end.toLocaleDateString('fr-FR', options)}`
+}
 
 // Filtrer les éditions favorites à venir avec coordonnées
 const upcomingFavorites = computed(() => {
@@ -82,199 +92,81 @@ const upcomingFavorites = computed(() => {
   });
 });
 
-// Charger Leaflet dynamiquement (côté client uniquement)
-const loadLeaflet = async (): Promise<unknown | null> => {
-  if (import.meta.server) return;
+// Préparer les marqueurs pour le composable
+const markers = computed<MapMarker[]>(() => {
+  if (!import.meta.client || !(window as any).L) return [];
   
-  // Si Leaflet est déjà chargé, le retourner directement
-  if (window.L) {
-    return window.L;
-  }
-  
-  try {
-    // Vérifier si le CSS est déjà chargé
-    const existingLink = document.querySelector('link[href*="leaflet.css"]');
-    if (!existingLink) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-      document.head.appendChild(link);
-    }
-
-    // Vérifier si le script est déjà chargé
-    const existingScript = document.querySelector('script[src*="leaflet.js"]');
-    if (existingScript && window.L) {
-      return window.L;
-    }
-
-    // Charger Leaflet depuis le CDN
-    const script = document.createElement('script');
-    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  return upcomingFavorites.value.map(edition => {
+    const status = getEditionStatus(edition.startDate, edition.endDate);
+    const Lany = (window as any).L as any;
     
-    return new Promise((resolve, reject) => {
-      script.onload = () => {
-        const L = window.L;
-        if (L) {
-          resolve(L);
-        } else {
-          reject(new Error(t('errors.leaflet_unavailable')));
-        }
-      };
-      script.onerror = () => reject(new Error(t('errors.leaflet_loading_error')));
-      document.head.appendChild(script);
-    });
-    
-  } catch (error) {
-    console.error('Erreur lors du chargement de Leaflet:', error);
-    return null;
-  }
-};
-
-// Initialiser la carte
-const initMap = async () => {
-  if (!mapContainer.value || upcomingFavorites.value.length === 0) return;
-
-  const L = await loadLeaflet();
-  if (!L) return;
-
-  try {
-    // Créer la carte
-    map = L.map(mapContainer.value, {
-      zoomControl: true,
-      attributionControl: true
+    // Créer l'icône personnalisée - tous les favoris ont isFavorite: true
+    const icon = createCustomMarkerIcon(Lany, {
+      isUpcoming: status.isUpcoming,
+      isOngoing: status.isOngoing,
+      isFavorite: true
     });
 
-    // Ajouter les tuiles OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19
-    }).addTo(map);
+    // Créer le contenu du popup
+    const popupContent = `
+      <div class="p-3 min-w-[200px]">
+        ${edition.imageUrl ? `<img src="${edition.imageUrl}" alt="${getEditionDisplayName(edition)}" class="w-full h-24 object-cover rounded mb-2">` : ''}
+        <div class="flex items-start justify-between gap-2 mb-1">
+          <h4 class="font-semibold text-gray-900 text-sm">${getEditionDisplayName(edition)}</h4>
+          <span class="text-yellow-500 text-sm" title="${t('common.favorite')}">★</span>
+        </div>
+        <p class="text-xs text-gray-600 mb-1">${edition.city}, ${edition.country}</p>
+  <p class="text-xs text-gray-500 mb-2">${formatDateRangeLocal(edition.startDate, edition.endDate)}</p>
+        <a href="/editions/${edition.id}" class="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          ${t('common.view_details')}
+        </a>
+      </div>
+    `;
 
-    // Créer un groupe pour tous les marqueurs
-  const markers: unknown[] = [];
-
-    // Ajouter un marqueur pour chaque édition
-    upcomingFavorites.value.forEach(edition => {
-      if (edition.latitude && edition.longitude) {
-        const status = getEditionStatus(edition.startDate, edition.endDate);
-        
-        // Créer l'icône personnalisée (toutes les éditions sont favorites ici)
-        const icon = createCustomMarkerIcon(L, {
-          isUpcoming: status.isUpcoming,
-          isOngoing: status.isOngoing,
-          isFavorite: true // Toutes les éditions dans favoris sont favorites
-        });
-
-        const marker = L.marker([edition.latitude, edition.longitude], { icon });
-        
-        // Créer le contenu du popup
-        const popupContent = `
-          <div class="p-2 min-w-[200px]">
-            <h4 class="font-semibold text-gray-900 mb-1">${getEditionDisplayName(edition)}</h4>
-            <p class="text-sm text-gray-600 mb-2">${edition.city}, ${edition.country}</p>
-            <p class="text-xs text-gray-500 mb-2">${formatDateRange(edition.startDate, edition.endDate)}</p>
-            <a href="/editions/${edition.id}" class="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              Voir les détails
-            </a>
-          </div>
-        `;
-        
-        marker.bindPopup(popupContent);
-        markers.push(marker);
-        marker.addTo(map);
-      }
-    });
-
-    // Ajuster la vue pour inclure tous les marqueurs
-    if (markers.length > 0) {
-      const group = L.featureGroup(markers);
-      const bounds = group.getBounds();
-      
-      if (bounds.isValid()) {
-        map.fitBounds(bounds, { 
-          padding: [20, 20],
-          maxZoom: 10
-        });
-      }
-    }
-
-    mapReady.value = true;
-  } catch (error) {
-    console.error('Erreur lors de l\'initialisation de la carte:', error);
-  }
-};
-
-// Nettoyer la carte
-const cleanupMap = () => {
-  if (map) {
-    map.remove();
-    map = null;
-  }
-  mapReady.value = false;
-};
-
-// Utilitaires
-const { formatDateTimeRange: _formatDateTimeRange } = useDateFormat();
-
-const formatDateRange = (startDate: string, endDate: string) => {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  
-  // Utiliser la locale définie au top-level
-  const localeCode = locale.value === 'fr' ? 'fr-FR' : 
-                     locale.value === 'en' ? 'en-US' :
-                     locale.value === 'es' ? 'es-ES' :
-                     locale.value === 'de' ? 'de-DE' :
-                     locale.value === 'it' ? 'it-IT' :
-                     locale.value === 'pt' ? 'pt-PT' :
-                     locale.value === 'da' ? 'da-DK' :
-                     locale.value === 'pl' ? 'pl-PL' : 'fr-FR';
-  
-  if (start.toDateString() === end.toDateString()) {
-    return start.toLocaleDateString(localeCode, { 
-      day: 'numeric', 
-      month: 'short', 
-      year: 'numeric' 
-    });
-  }
-  
-  return `${start.toLocaleDateString(localeCode, { 
-    day: 'numeric', 
-    month: 'short' 
-  })} - ${end.toLocaleDateString(localeCode, { 
-    day: 'numeric', 
-    month: 'short', 
-    year: 'numeric' 
-  })}`;
-};
-
-// Lifecycle
-onMounted(() => {
-  nextTick(() => {
-    if (upcomingFavorites.value.length > 0) {
-      initMap();
-    }
+    return {
+      id: edition.id,
+      position: [edition.latitude!, edition.longitude!] as [number, number],
+      popupContent,
+      icon
+    };
   });
 });
 
-onUnmounted(() => {
-  cleanupMap();
-});
+// Utiliser le composable uniquement côté client
+const mapUtils = import.meta.client ? useLeafletMap(mapContainer, {
+  center: [46.603354, 1.888334],
+  zoom: 6,
+  markers: markers.value
+}) : {
+  isLoading: ref(false),
+  formatDateRange: (_start: string, _end: string) => '',
+  // stubs SSR pour correspondre à l'API du composable
+  addMarkers: (_m: MapMarker[]) => {},
+  clearMarkers: () => {},
+  updateMarkers: (_m: MapMarker[]) => {},
+  fitBounds: (_b: any, _o?: any) => {},
+  setView: (_c: any, _z?: number) => {},
+};
 
-// Watcher pour réinitialiser la carte quand les données changent
-watch(() => upcomingFavorites.value, (newFavorites) => {
-  cleanupMap();
-  if (newFavorites.length > 0) {
-    nextTick(() => {
-      initMap();
-    });
-  }
-}, { deep: true });
+const { isLoading } = mapUtils;
+
+// Watcher pour mettre à jour les marqueurs
+if (import.meta.client) {
+  watch(markers, (newMarkers) => {
+    if (mapUtils.updateMarkers) {
+      mapUtils.updateMarkers(newMarkers);
+    }
+    
+    // Ajuster la vue si nécessaire
+    if (newMarkers.length > 0 && mapUtils.fitBounds && (window as any).L) {
+      const Lany = (window as any).L as any;
+      const bounds = newMarkers.map(m => m.position);
+      const leafletBounds = Lany.latLngBounds(bounds);
+      mapUtils.fitBounds(leafletBounds.pad(0.1));
+    }
+  });
+}
 </script>
-
-<style scoped>
-/* Styles supplémentaires pour la carte si nécessaire */
-</style>

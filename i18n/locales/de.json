@@ -133,7 +133,8 @@
     "admin": "Administration",
     "login": "Anmeldung",
     "logout": "Abmeldung",
-    "tabs": "Navigationsregisterkarten"
+    "tabs": "Navigationsregisterkarten",
+    "breadcrumb": "Brotkrümelnavigation"
   },
   "homepage": {
     "filters": "Filter",
@@ -185,7 +186,8 @@
     "view_details": "Details anzeigen",
     "back": "Zurück",
     "private": "Privat",
-    "or": "Oder"
+    "or": "Oder",
+    "create": "Erstellen"
   },
   "dates": {
     "same_day_with_time": "Am {date} von {startTime} bis {endTime}",
@@ -355,7 +357,43 @@
     "convention_not_found": "Convention nicht gefunden",
     "convention_not_found_description": "Die Convention, die du suchst, existiert nicht"
   },
-  "carpool": {},
+  "carpool": {
+    "offer": {
+      "create": "Mitfahrangebot erstellen",
+      "available_seats": "Verfügbare Plätze",
+      "seats_placeholder": "z. B. 3",
+      "price_per_seat": "Preis pro Platz (€)",
+      "price_placeholder": "z. B. 10",
+      "created": "Mitfahrangebot erstellt"
+    },
+    "request": {
+      "create": "Mitfahrgesuch erstellen",
+      "required_seats": "Benötigte Plätze",
+      "seats_placeholder": "z. B. 2",
+      "created": "Mitfahrgesuch erstellt"
+    },
+    "route": "Route",
+    "from": "Von",
+    "departure_placeholder": "Abfahrtsstadt oder -adresse",
+    "to": "Nach",
+    "arrival_placeholder": "Ankunftsstadt oder -adresse",
+    "departure_date": "Abfahrtsdatum und -zeit",
+    "select_date_time": "Datum und Uhrzeit wählen",
+    "details": "Details",
+    "details_placeholder": "Nützliche Infos zur Fahrt (Gepäck, Treffpunkt usw.)",
+    "options": "Optionen",
+    "smoking_allowed": "Rauchen erlaubt",
+    "pets_allowed": "Haustiere erlaubt",
+    "music_allowed": "Musik erlaubt",
+    "validation": {
+      "departure_required": "Abfahrtsstadt ist erforderlich",
+      "arrival_required": "Ankunftsstadt ist erforderlich",
+      "date_required": "Abfahrtsdatum ist erforderlich",
+      "date_invalid": "Ungültiges Datum",
+      "seats_min": "Mindestens 1 Platz",
+      "seats_max": "Maximal 8 Plätze"
+    }
+  },
   "profile": {
     "picture": "Profilbild",
     "personal_info": "Persönliche Informationen",
@@ -580,7 +618,8 @@
     "convention_creation_error": "Ein Fehler ist beim Erstellen der Convention aufgetreten",
     "convention_edit_denied": "Du hast keine Berechtigung, diese Convention zu bearbeiten",
     "convention_update_error": "Ein Fehler ist beim Aktualisieren der Convention aufgetreten",
-    "update_error": "Fehler beim Aktualisieren"
+    "update_error": "Fehler beim Aktualisieren",
+    "generic": "Ein Fehler ist aufgetreten"
   },
   "services": {
     "food_trucks": "Food Trucks",
@@ -922,6 +961,13 @@
       "email": {
         "invalid": "Ungültige E-Mail"
       }
+    },
+    "recaptcha": {
+      "protected_by": "Diese Website wird durch reCAPTCHA geschützt und es gelten die",
+      "privacy_policy": "Datenschutzerklärung",
+      "and": "und die",
+      "terms_of_service": "Nutzungsbedingungen",
+      "apply": "von Google"
     }
   }
 }

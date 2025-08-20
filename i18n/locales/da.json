@@ -133,7 +133,8 @@
     "admin": "Administration",
     "login": "Log ind",
     "logout": "Log ud",
-    "tabs": "Navigationsfaner"
+    "tabs": "Navigationsfaner",
+    "breadcrumb": "Brødkrumme"
   },
   "homepage": {
     "filters": "Filtre",
@@ -185,7 +186,8 @@
     "view_details": "Se detaljer",
     "back": "Tilbage",
     "private": "Privat",
-    "or": "Eller"
+    "or": "Eller",
+    "create": "Opret"
   },
   "dates": {
     "same_day_with_time": "Den {date} fra {startTime} til {endTime}",
@@ -355,7 +357,43 @@
     "convention_not_found": "Konvention ikke fundet",
     "convention_not_found_description": "Den konvention, du leder efter, eksisterer ikke"
   },
-  "carpool": {},
+  "carpool": {
+    "offer": {
+      "create": "Opret samkørselstilbud",
+      "available_seats": "Ledige pladser",
+      "seats_placeholder": "fx 3",
+      "price_per_seat": "Pris pr. sæde (€)",
+      "price_placeholder": "fx 10",
+      "created": "Samkørselstilbud oprettet"
+    },
+    "request": {
+      "create": "Opret samkørselsanmodning",
+      "required_seats": "Ønskede pladser",
+      "seats_placeholder": "fx 2",
+      "created": "Samkørselsanmodning oprettet"
+    },
+    "route": "Rute",
+    "from": "Fra",
+    "departure_placeholder": "Afrejseby eller -adresse",
+    "to": "Til",
+    "arrival_placeholder": "Ankomstby eller -adresse",
+    "departure_date": "Afrejsetidspunkt",
+    "select_date_time": "Vælg dato og tidspunkt",
+    "details": "Detaljer",
+    "details_placeholder": "Nyttig info om turen (bagage, mødested mv.)",
+    "options": "Valgmuligheder",
+    "smoking_allowed": "Rygning tilladt",
+    "pets_allowed": "Kæledyr tilladt",
+    "music_allowed": "Musik tilladt",
+    "validation": {
+      "departure_required": "Afrejseby er påkrævet",
+      "arrival_required": "Ankomstby er påkrævet",
+      "date_required": "Afrejsedato er påkrævet",
+      "date_invalid": "Ugyldig dato",
+      "seats_min": "Mindst 1 plads",
+      "seats_max": "Maksimalt 8 pladser"
+    }
+  },
   "profile": {
     "picture": "Profilbillede",
     "personal_info": "Personlige oplysninger",
@@ -489,6 +527,7 @@
     "favorite_update_failed": "Opdatering af favoritstatus mislykkedes",
     "deletion_error": "Fejl under sletning",
     "generic_error": "Der opstod en fejl",
+    "generic": "Der opstod en fejl",
     "removal_error": "Fejl under fjernelse",
     "leaflet_unavailable": "Leaflet ikke tilgængelig",
     "cannot_load_editions": "Kan ikke indlæse udgaver",
@@ -888,6 +927,13 @@
       "email": {
         "invalid": "Ugyldig email"
       }
+    },
+    "recaptcha": {
+      "protected_by": "Dette websted er beskyttet af reCAPTCHA, og Googles",
+      "privacy_policy": "Privatlivspolitik",
+      "and": "og",
+      "terms_of_service": "Servicevilkår",
+      "apply": "gælder"
     }
   },
   "upload": {

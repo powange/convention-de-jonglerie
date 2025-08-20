@@ -133,7 +133,8 @@
     "admin": "Amministrazione",
     "login": "Accesso",
     "logout": "Disconnessione",
-    "tabs": "Schede di navigazione"
+    "tabs": "Schede di navigazione",
+    "breadcrumb": "Breadcrumb"
   },
   "homepage": {
     "filters": "Filtri",
@@ -185,7 +186,8 @@
     "view_details": "Visualizza dettagli",
     "back": "Indietro",
     "private": "Privato",
-    "or": "Oppure"
+    "or": "Oppure",
+    "create": "Crea"
   },
   "dates": {
     "same_day_with_time": "Il {date} dalle {startTime} alle {endTime}",
@@ -355,7 +357,43 @@
     "convention_not_found": "Convegno non trovato",
     "convention_not_found_description": "Il convegno che stai cercando non esiste"
   },
-  "carpool": {},
+  "carpool": {
+    "offer": {
+      "create": "Crea offerta di car pooling",
+      "available_seats": "Posti disponibili",
+      "seats_placeholder": "es. 3",
+      "price_per_seat": "Prezzo per posto (€)",
+      "price_placeholder": "es. 10",
+      "created": "Offerta di car pooling creata"
+    },
+    "request": {
+      "create": "Crea richiesta di car pooling",
+      "required_seats": "Posti richiesti",
+      "seats_placeholder": "es. 2",
+      "created": "Richiesta di car pooling creata"
+    },
+    "route": "Percorso",
+    "from": "Da",
+    "departure_placeholder": "Città o indirizzo di partenza",
+    "to": "A",
+    "arrival_placeholder": "Città o indirizzo di arrivo",
+    "departure_date": "Data e ora di partenza",
+    "select_date_time": "Seleziona data e ora",
+    "details": "Dettagli",
+    "details_placeholder": "Informazioni utili sul viaggio (bagagli, punto d'incontro, ecc.)",
+    "options": "Opzioni",
+    "smoking_allowed": "Fumo consentito",
+    "pets_allowed": "Animali ammessi",
+    "music_allowed": "Musica consentita",
+    "validation": {
+      "departure_required": "La città di partenza è obbligatoria",
+      "arrival_required": "La città di arrivo è obbligatoria",
+      "date_required": "La data di partenza è obbligatoria",
+      "date_invalid": "Data non valida",
+      "seats_min": "Almeno 1 posto",
+      "seats_max": "Massimo 8 posti"
+    }
+  },
   "profile": {
     "picture": "Foto profilo",
     "personal_info": "Informazioni personali",
@@ -577,7 +615,8 @@
     "convention_creation_error": "Si è verificato un errore durante la creazione del convegno",
     "convention_edit_denied": "Non hai i diritti per modificare questo convegno",
     "convention_update_error": "Si è verificato un errore durante l'aggiornamento del convegno",
-    "update_error": "Errore durante l'aggiornamento"
+    "update_error": "Errore durante l'aggiornamento",
+    "generic": "Si è verificato un errore"
   },
   "forms": {
     "placeholders": {
@@ -922,6 +961,13 @@
       "email": {
         "invalid": "Email non valida"
       }
+    },
+    "recaptcha": {
+      "protected_by": "Questo sito è protetto da reCAPTCHA e si applicano la",
+      "privacy_policy": "Privacy Policy",
+      "and": "e i",
+      "terms_of_service": "Termini di servizio",
+      "apply": "di Google"
     }
   }
 }

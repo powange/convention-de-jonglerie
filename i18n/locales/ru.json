@@ -133,7 +133,8 @@
     "admin": "Администрирование",
     "login": "Войти",
     "logout": "Выйти",
-    "tabs": "Вкладки навигации"
+    "tabs": "Вкладки навигации",
+    "breadcrumb": "Хлебные крошки"
   },
   "homepage": {
     "filters": "Фильтры",
@@ -185,7 +186,8 @@
     "view_details": "Просмотреть детали",
     "back": "Назад",
     "private": "Частный",
-    "or": "Или"
+    "or": "Или",
+    "create": "Создать"
   },
   "dates": {
     "same_day_with_time": "{date} с {startTime} до {endTime}",
@@ -355,7 +357,43 @@
     "convention_not_found": "Конвенция не найдена",
     "convention_not_found_description": "Конвенция, которую вы ищете, не существует"
   },
-  "carpool": {},
+  "carpool": {
+    "offer": {
+      "create": "Создать предложение попутки",
+      "available_seats": "Доступные места",
+      "seats_placeholder": "напр., 3",
+      "price_per_seat": "Цена за место (€)",
+      "price_placeholder": "напр., 10",
+      "created": "Предложение попутки создано"
+    },
+    "request": {
+      "create": "Создать запрос на попутку",
+      "required_seats": "Требуемые места",
+      "seats_placeholder": "напр., 2",
+      "created": "Запрос на попутку создан"
+    },
+    "route": "Маршрут",
+    "from": "Из",
+    "departure_placeholder": "Город или адрес отправления",
+    "to": "В",
+    "arrival_placeholder": "Город или адрес прибытия",
+    "departure_date": "Дата и время отправления",
+    "select_date_time": "Выберите дату и время",
+    "details": "Детали",
+    "details_placeholder": "Полезная информация о поездке (багаж, место встречи и т. д.)",
+    "options": "Параметры",
+    "smoking_allowed": "Разрешено курение",
+    "pets_allowed": "Разрешены животные",
+    "music_allowed": "Музыка разрешена",
+    "validation": {
+      "departure_required": "Требуется город отправления",
+      "arrival_required": "Требуется город прибытия",
+      "date_required": "Требуется дата отправления",
+      "date_invalid": "Недействительная дата",
+      "seats_min": "Как минимум 1 место",
+      "seats_max": "Максимум 8 мест"
+    }
+  },
   "profile": {
     "picture": "Фото профиля",
     "personal_info": "Личная информация",
@@ -818,6 +856,13 @@
       "email": {
         "invalid": "Недействительный email"
       }
+    },
+    "recaptcha": {
+      "protected_by": "Этот сайт защищен reCAPTCHA и применяются",
+      "privacy_policy": "Политика конфиденциальности",
+      "and": "и",
+      "terms_of_service": "Условия использования",
+      "apply": "Google"
     }
   },
   "errors": {
@@ -888,7 +933,8 @@
     "convention_creation_error": "Произошла ошибка при создании конвенции",
     "convention_edit_denied": "У вас нет прав редактировать эту конвенцию",
     "convention_update_error": "Произошла ошибка при обновлении конвенции",
-    "update_error": "Ошибка обновления"
+    "update_error": "Ошибка обновления",
+    "generic": "Произошла ошибка"
   },
   "upload": {
     "success": "Успешно",

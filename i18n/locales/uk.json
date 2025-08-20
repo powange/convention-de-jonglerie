@@ -133,7 +133,8 @@
     "admin": "Адміністрування",
     "login": "Увійти",
     "logout": "Вийти",
-    "tabs": "Вкладки навігації"
+    "tabs": "Вкладки навігації",
+    "breadcrumb": "Хлібні крихти"
   },
   "homepage": {
     "filters": "Фільтри",
@@ -185,7 +186,8 @@
     "view_details": "Переглянути деталі",
     "back": "Назад",
     "private": "Приватний",
-    "or": "Або"
+    "or": "Або",
+    "create": "Створити"
   },
   "dates": {
     "same_day_with_time": "{date} з {startTime} до {endTime}",
@@ -355,7 +357,43 @@
     "convention_not_found": "Конвенцію не знайдено",
     "convention_not_found_description": "Конвенція, яку ви шукаєте, не існує"
   },
-  "carpool": {},
+  "carpool": {
+    "offer": {
+      "create": "Створити пропозицію спільної поїздки",
+      "available_seats": "Доступні місця",
+      "seats_placeholder": "напр., 3",
+      "price_per_seat": "Ціна за місце (€)",
+      "price_placeholder": "напр., 10",
+      "created": "Пропозицію спільної поїздки створено"
+    },
+    "request": {
+      "create": "Створити запит на спільну поїздку",
+      "required_seats": "Потрібні місця",
+      "seats_placeholder": "напр., 2",
+      "created": "Запит на спільну поїздку створено"
+    },
+    "route": "Маршрут",
+    "from": "З",
+    "departure_placeholder": "Місто або адреса відправлення",
+    "to": "До",
+    "arrival_placeholder": "Місто або адреса прибуття",
+    "departure_date": "Дата і час відправлення",
+    "select_date_time": "Виберіть дату і час",
+    "details": "Деталі",
+    "details_placeholder": "Корисна інформація про поїздку (багаж, місце зустрічі тощо)",
+    "options": "Параметри",
+    "smoking_allowed": "Куріння дозволено",
+    "pets_allowed": "Домашні тварини дозволені",
+    "music_allowed": "Музика дозволена",
+    "validation": {
+      "departure_required": "Потрібне місто відправлення",
+      "arrival_required": "Потрібне місто прибуття",
+      "date_required": "Потрібна дата відправлення",
+      "date_invalid": "Недійсна дата",
+      "seats_min": "Щонайменше 1 місце",
+      "seats_max": "Максимум 8 місць"
+    }
+  },
   "profile": {
     "picture": "Фото профілю",
     "personal_info": "Особиста інформація",
@@ -818,6 +856,13 @@
       "email": {
         "invalid": "Недійсна електронна пошта"
       }
+    },
+    "recaptcha": {
+      "protected_by": "Цей сайт захищено reCAPTCHA і застосовуються",
+      "privacy_policy": "Політика конфіденційності",
+      "and": "та",
+      "terms_of_service": "Умови використання",
+      "apply": "Google"
     }
   },
   "errors": {
@@ -888,7 +933,8 @@
     "convention_creation_error": "Сталася помилка при створенні конвенції",
     "convention_edit_denied": "У вас немає прав редагувати цю конвенцію",
     "convention_update_error": "Сталася помилка при оновленні конвенції",
-    "update_error": "Помилка оновлення"
+    "update_error": "Помилка оновлення",
+    "generic": "Сталася помилка"
   },
   "upload": {
     "success": "Успішно",

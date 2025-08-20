@@ -90,19 +90,19 @@
 
               <!-- reCAPTCHA v3: attribution requise -->
               <div class="text-[11px] leading-snug text-gray-500 dark:text-gray-400">
-                Ce site est protégé par reCAPTCHA et la <a
+                {{ $t('feedback.recaptcha.protected_by') }} <a
                   href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer"
-                  class="underline hover:text-gray-700 dark:hover:text-gray-300">Politique de confidentialité</a>
-                et les
+                  class="underline hover:text-gray-700 dark:hover:text-gray-300">{{ $t('feedback.recaptcha.privacy_policy') }}</a>
+                {{ $t('feedback.recaptcha.and') }}
                 <a
                   href="https://policies.google.com/terms"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="underline hover:text-gray-700 dark:hover:text-gray-300"
                 >
-                  Conditions d’utilisation
+                  {{ $t('feedback.recaptcha.terms_of_service') }}
                 </a>
-                de Google s’appliquent.
+                {{ $t('feedback.recaptcha.apply') }}.
               </div>
             </div>
 
