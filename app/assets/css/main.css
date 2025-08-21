@@ -1,40 +1,68 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-:root {
-  --background: 255 255 255;
-  --foreground: 15 23 42;
-  --card: 255 255 255;
-  --card-foreground: 15 23 42;
-  --primary: 59 130 246;
-  --primary-foreground: 248 250 252;
-  --secondary: 241 245 249;
-  --secondary-foreground: 15 23 42;
-  --muted: 241 245 249;
-  --muted-foreground: 100 116 139;
-  --accent: 241 245 249;
-  --accent-foreground: 15 23 42;
-  --border: 226 232 240;
-  --input: 226 232 240;
+/* Thème Midnight Circus - Override pour le mode sombre */
+
+/* Mode sombre Midnight Circus */
+html.dark {
+  /* Override des couleurs grises pour un thème violet/indigo */
+  --color-gray-50: 237 233 254;  /* Violet très clair */
+  --color-gray-100: 221 214 254; /* Violet clair */
+  --color-gray-200: 196 181 253; /* Violet doux */
+  --color-gray-300: 165 145 251; /* Violet moyen */
+  --color-gray-400: 129 102 249; /* Violet */
+  --color-gray-500: 103 75 215;  /* Violet foncé */
+  --color-gray-600: 79 55 183;   /* Indigo foncé */
+  --color-gray-700: 55 48 163;   /* Indigo très foncé */
+  --color-gray-800: 49 35 129;   /* Indigo profond */
+  --color-gray-900: 20 24 55;    /* Bleu nuit */
+  --color-gray-950: 10 14 39;    /* Bleu nuit profond */
 }
 
-.dark {
-  --background: 15 23 42;
-  --foreground: 248 250 252;
-  --card: 30 41 59;
-  --card-foreground: 248 250 252;
-  --primary: 96 165 250;
-  --primary-foreground: 15 23 42;
-  --secondary: 51 65 85;
-  --secondary-foreground: 248 250 252;
-  --muted: 51 65 85;
-  --muted-foreground: 148 163 184;
-  --accent: 51 65 85;
-  --accent-foreground: 248 250 252;
-  --border: 51 65 85;
-  --input: 51 65 85;
-}
-
+/* Application du fond Midnight Circus */
 body {
-  @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+  background-color: white;
+  color: rgb(15 23 42);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark body {
+  background-color: #0A0E27;
+  color: rgb(237 233 254);
+}
+
+/* Override spécifique pour les composants Nuxt UI en mode sombre */
+html.dark .bg-gray-900 {
+  background-color: #0A0E27 !important;
+}
+
+html.dark .bg-gray-800 {
+  background-color: #141837 !important;
+}
+
+html.dark .bg-gray-700 {
+  background-color: #1A1F4A !important;
+}
+
+html.dark .bg-gray-950 {
+  background-color: #0A0E27 !important;
+}
+
+/* Effets visuels Midnight Circus pour le mode sombre */
+.dark button:hover,
+.dark a:hover {
+  filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.25));
+  transition: filter 0.2s ease;
+}
+
+/* Animation subtile */
+@keyframes sparkle {
+  0%, 100% { 
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1);
+  }
 }
