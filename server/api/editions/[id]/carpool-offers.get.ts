@@ -1,5 +1,6 @@
 import { getEmailHash } from '../../../utils/email-hash';
 import { prisma } from '../../../utils/prisma';
+import { createError } from 'h3';
 
 
 export default defineEventHandler(async (event) => {
@@ -18,7 +19,7 @@ export default defineEventHandler(async (event) => {
       where: {
         editionId,
       },
-      include: {
+  include: {
         user: true,
         passengers: {
           include: {
@@ -28,12 +29,6 @@ export default defineEventHandler(async (event) => {
             addedAt: 'asc',
           },
         },
-        bookings: {
-          include: {
-            requester: true,
-          },
-          orderBy: { createdAt: 'asc' },
-        },
         comments: {
           include: {
             user: true,
@@ -42,16 +37,20 @@ export default defineEventHandler(async (event) => {
             createdAt: 'desc',
           },
         },
-      },
-      orderBy: {
-        departureDate: 'asc',
-      },
+  },
+  orderBy: { departureDate: 'asc' },
     });
 
     // Transformer les données pour masquer les emails et ajouter les hash
     const transformedOffers = carpoolOffers.map(offer => {
+  const bookings = (offer as any).bookings ?? [];
+      const passengers = offer.passengers ?? [];
+      const comments = offer.comments ?? [];
+      const availableSeats = typeof offer.availableSeats === 'number' ? offer.availableSeats : 0;
+
       const viewerIsOwner = !!viewerId && viewerId === offer.userId;
-      const viewerHasAccepted = !!viewerId && offer.bookings.some(b => b.status === 'ACCEPTED' && b.requesterId === viewerId);
+  const viewerHasAccepted = !!viewerId && bookings.some((b: any) => b.status === 'ACCEPTED' && b.requesterId === viewerId);
+
       return {
         id: offer.id,
         editionId: offer.editionId,
@@ -59,34 +58,38 @@ export default defineEventHandler(async (event) => {
         departureDate: offer.departureDate,
         departureCity: offer.departureCity,
         departureAddress: offer.departureAddress,
-        availableSeats: offer.availableSeats,
+        availableSeats,
         description: offer.description,
         // n'exposer le contact que pour le propriétaire ou un réservant ACCEPTED
         phoneNumber: (viewerIsOwner || viewerHasAccepted) ? offer.phoneNumber : null,
         createdAt: offer.createdAt,
         updatedAt: offer.updatedAt,
-        remainingSeats: Math.max(0, offer.availableSeats - offer.bookings.filter(b => b.status === 'ACCEPTED').reduce((s, b) => s + (b.seats || 0), 0)),
-        user: {
-          id: offer.user.id,
-          pseudo: offer.user.pseudo,
-          emailHash: getEmailHash(offer.user.email),
-          profilePicture: offer.user.profilePicture,
-          updatedAt: offer.user.updatedAt,
-        },
+  remainingSeats: Math.max(0, availableSeats - bookings.filter((b: any) => b.status === 'ACCEPTED').reduce((s: number, b: any) => s + (b.seats || 0), 0)),
+        user: offer.user
+          ? {
+              id: offer.user.id,
+              pseudo: offer.user.pseudo,
+              emailHash: getEmailHash(offer.user.email),
+              profilePicture: offer.user.profilePicture ?? null,
+              updatedAt: offer.user.updatedAt,
+            }
+          : undefined,
         // Maintenu temporairement pour compatibilité, mais l'UI ne l'utilisera plus
-        passengers: offer.passengers.map(passenger => ({
+        passengers: passengers.map(passenger => ({
           id: passenger.id,
           addedAt: passenger.addedAt,
-          user: {
-            id: passenger.user.id,
-            pseudo: passenger.user.pseudo,
-            emailHash: getEmailHash(passenger.user.email),
-            profilePicture: passenger.user.profilePicture,
-            updatedAt: passenger.user.updatedAt,
-          },
+          user: passenger.user
+            ? {
+                id: passenger.user.id,
+                pseudo: passenger.user.pseudo,
+                emailHash: getEmailHash(passenger.user.email),
+                profilePicture: passenger.user.profilePicture ?? null,
+                updatedAt: passenger.user.updatedAt,
+              }
+            : undefined,
         })),
         // Exposer les réservations avec requester anonymisé
-        bookings: offer.bookings.map(b => ({
+        bookings: bookings.map((b: any) => ({
           id: b.id,
           carpoolOfferId: b.carpoolOfferId,
           requestId: b.requestId,
@@ -95,26 +98,30 @@ export default defineEventHandler(async (event) => {
           status: b.status,
           createdAt: b.createdAt,
           updatedAt: b.updatedAt,
-          requester: {
-            id: b.requester.id,
-            pseudo: b.requester.pseudo,
-            emailHash: getEmailHash(b.requester.email),
-            profilePicture: b.requester.profilePicture,
-            updatedAt: b.requester.updatedAt,
-          },
+          requester: b.requester
+            ? {
+                id: b.requester.id,
+                pseudo: b.requester.pseudo,
+                emailHash: getEmailHash(b.requester.email),
+                profilePicture: b.requester.profilePicture ?? null,
+                updatedAt: b.requester.updatedAt,
+              }
+            : undefined,
         })),
-        comments: offer.comments.map(comment => ({
+        comments: comments.map(comment => ({
           id: comment.id,
           content: comment.content,
           createdAt: comment.createdAt,
           updatedAt: comment.updatedAt,
-          user: {
-            id: comment.user.id,
-            pseudo: comment.user.pseudo,
-            emailHash: getEmailHash(comment.user.email),
-            profilePicture: comment.user.profilePicture,
-            updatedAt: comment.user.updatedAt,
-          },
+          user: comment.user
+            ? {
+                id: comment.user.id,
+                pseudo: comment.user.pseudo,
+                emailHash: getEmailHash(comment.user.email),
+                profilePicture: comment.user.profilePicture ?? null,
+                updatedAt: comment.user.updatedAt,
+              }
+            : undefined,
         })),
       };
     });

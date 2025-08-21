@@ -26,7 +26,9 @@ services:
       target: dev
     container_name: convention-app-dev
     working_dir: /app
-    command: npm run dev
+    # Exécuter les migrations Prisma (idempotent) puis démarrer Nuxt en mode dev.
+    # Utilise migrate deploy pour appliquer les migrations existantes sans interaction.
+    command: sh -lc "npx prisma generate >/dev/null 2>&1 || true && npx prisma migrate deploy || true && npm run dev"
     environment:
       DATABASE_URL: "mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}"
       NUXT_HOST: "0.0.0.0"

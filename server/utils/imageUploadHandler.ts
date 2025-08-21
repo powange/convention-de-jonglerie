@@ -1,5 +1,7 @@
 import type { H3Event } from 'h3'
-import { authenticateUser } from './auth'
+import { createError, getRouterParam } from 'h3'
+// Utilise les helpers de session exposés via `#imports` (getUserSession / requireUserSession)
+// Import dynamique effectué dans la fonction pour permettre le mocking dans les tests.
 
 export interface ImageUploadConfig {
   entityName: string
@@ -22,9 +24,12 @@ export async function createImageUploadHandler(
   const mergedConfig = { ...defaultConfig, ...config }
   
   try {
-    // Authentification
-    const user = await authenticateUser(event)
+    // Authentification via les helpers exposés par le module d'auth (moquables en tests)
+    const { requireUserSession } = await import('#imports')
+    const { user } = await requireUserSession(event)
     if (!user) {
+      // requireUserSession devrait déjà lancer une erreur 401 si non authentifié,
+      // mais on garde une vérification défensive.
       throw createError({
         statusCode: 401,
         statusMessage: 'Authentification requise'

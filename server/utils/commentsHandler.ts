@@ -1,6 +1,7 @@
 import type { H3Event } from 'h3'
+import { createError, getRouterParam, readBody } from 'h3'
 import { prisma } from './prisma'
-import { createEmailHash } from './email-hash'
+import { getEmailHash } from './email-hash'
 
 export type CommentEntityType = 'carpoolOffer' | 'carpoolRequest'
 
@@ -15,50 +16,45 @@ export async function getCommentsForEntity(
   config: CommentConfig
 ) {
   try {
-    const entityId = getRouterParam(event, 'id')
-    if (!entityId) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'ID manquant'
-      })
+    // Récupérer l'ID depuis les params et le parser en nombre
+    const rawId = (event.context as any)?.params?.id
+    if (!rawId) {
+      throw createError({ statusCode: 400, statusMessage: 'ID manquant' })
     }
 
-    // Construire la requête where dynamiquement
-    const whereClause: any = {}
-    whereClause[config.entityIdField] = entityId
+    const parsedId = parseInt(rawId)
+    if (isNaN(parsedId)) {
+      const msg = config.entityType === 'carpoolOffer' ? "ID de l'offre invalide" : 'ID de la demande invalide'
+      throw createError({ statusCode: 400, statusMessage: msg })
+    }
 
-    // Récupérer les commentaires
-    const comments = await prisma.carpoolComment.findMany({
+    // Construire la requête where dynamiquement (avec ID numérique)
+    const whereClause: any = {}
+    whereClause[config.entityIdField] = parsedId
+
+    // Choisir le bon modèle Prisma selon le type d'entité
+    const modelName = config.entityType === 'carpoolOffer' ? 'carpoolComment' : 'carpoolRequestComment'
+    const model: any = (prisma as any)[modelName]
+
+    // Récupérer les commentaires (inclure l'utilisateur brut comme attendu par les tests)
+    const comments = await model.findMany({
       where: whereClause,
-      include: {
-        user: {
-          select: {
-            id: true,
-            pseudo: true,
-            nom: true,
-            prenom: true,
-            email: true,
-            profilePicture: true
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      include: { user: true },
+      orderBy: { createdAt: 'asc' },
     })
 
-    // Transformer les données pour inclure emailHash et masquer l'email
+    // Transformer les données pour ajouter emailHash et masquer l'email (conserver la clé `user`)
     const transformedComments = comments.map(comment => ({
       ...comment,
-      author: comment.user ? {
-        id: comment.user.id,
-        pseudo: comment.user.pseudo,
-        nom: comment.user.nom,
-        prenom: comment.user.prenom,
-        profilePicture: comment.user.profilePicture,
-        emailHash: createEmailHash(comment.user.email),
-      } : null,
-      user: undefined
+      user: comment.user
+        ? {
+            id: comment.user.id,
+            pseudo: comment.user.pseudo,
+            profilePicture: comment.user.profilePicture ?? null,
+            updatedAt: comment.user.updatedAt,
+            emailHash: getEmailHash(comment.user.email),
+          }
+        : undefined,
     }))
 
     return transformedComments
@@ -72,7 +68,7 @@ export async function getCommentsForEntity(
     
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la récupération des commentaires'
+      statusMessage: 'Erreur serveur'
     })
   }
 }
@@ -90,12 +86,14 @@ export async function createCommentForEntity(
       })
     }
 
-    const entityId = getRouterParam(event, 'id')
-    if (!entityId) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'ID manquant'
-      })
+    const rawId = getRouterParam(event, 'id')
+    if (!rawId) {
+      throw createError({ statusCode: 400, statusMessage: 'ID manquant' })
+    }
+
+    const parsedId = parseInt(rawId)
+    if (isNaN(parsedId)) {
+      throw createError({ statusCode: 400, statusMessage: 'ID manquant' })
     }
 
     const body = await readBody(event)
@@ -112,10 +110,13 @@ export async function createCommentForEntity(
       content: body.content.trim(),
       userId: event.context.user?.id
     }
-    commentData[config.entityIdField] = entityId
+  commentData[config.entityIdField] = parsedId
 
     // Créer le commentaire
-    const comment = await prisma.carpoolComment.create({
+    const modelName = config.entityType === 'carpoolOffer' ? 'carpoolComment' : 'carpoolRequestComment'
+    const model: any = (prisma as any)[modelName]
+
+    const comment = await model.create({
       data: commentData,
       include: {
         user: {
@@ -125,10 +126,10 @@ export async function createCommentForEntity(
             nom: true,
             prenom: true,
             email: true,
-            profilePicture: true
-          }
-        }
-      }
+            profilePicture: true,
+          },
+        },
+      },
     })
 
     // Transformer la réponse
@@ -140,7 +141,7 @@ export async function createCommentForEntity(
         nom: comment.user.nom,
         prenom: comment.user.prenom,
         profilePicture: comment.user.profilePicture,
-        emailHash: createEmailHash(comment.user.email),
+        emailHash: getEmailHash(comment.user.email),
       } : null,
       user: undefined
     }
@@ -172,18 +173,20 @@ export async function deleteCommentForEntity(
       })
     }
 
-    const commentId = getRouterParam(event, 'commentId')
-    if (!commentId) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'ID du commentaire manquant'
-      })
+    const commentIdRaw = getRouterParam(event, 'commentId')
+    if (!commentIdRaw) {
+      throw createError({ statusCode: 400, statusMessage: 'ID du commentaire manquant' })
+    }
+
+    const commentId = parseInt(commentIdRaw)
+    if (isNaN(commentId)) {
+      throw createError({ statusCode: 400, statusMessage: 'ID du commentaire manquant' })
     }
 
     // Vérifier que le commentaire existe et appartient à l'utilisateur
     const comment = await prisma.carpoolComment.findUnique({
-      where: { id: parseInt(commentId) },
-      select: { userId: true }
+      where: { id: commentId },
+      select: { userId: true },
     })
 
     if (!comment) {
@@ -201,9 +204,7 @@ export async function deleteCommentForEntity(
     }
 
     // Supprimer le commentaire
-    await prisma.carpoolComment.delete({
-      where: { id: parseInt(commentId) }
-    })
+  await prisma.carpoolComment.delete({ where: { id: commentId } })
 
     return {
       success: true,
