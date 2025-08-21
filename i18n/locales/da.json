@@ -134,6 +134,8 @@
     "login": "Log ind",
     "logout": "Log ud",
     "tabs": "Navigationsfaner",
+    "dark_mode": "Mørk tilstand",
+    "light_mode": "Lys tilstand",
     "breadcrumb": "Brødkrumme"
   },
   "homepage": {

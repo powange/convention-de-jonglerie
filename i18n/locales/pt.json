@@ -134,6 +134,8 @@
     "login": "Iniciar Sessão",
     "logout": "Terminar Sessão",
     "tabs": "Separadores de navegação",
+    "dark_mode": "Modo escuro",
+    "light_mode": "Modo claro",
     "breadcrumb": "Breadcrumb"
   },
   "homepage": {

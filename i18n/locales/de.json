@@ -134,7 +134,9 @@
     "login": "Anmeldung",
     "logout": "Abmeldung",
     "tabs": "Navigationsregisterkarten",
-    "breadcrumb": "Brotkrümelnavigation"
+    "breadcrumb": "Brotkrümelnavigation",
+    "dark_mode": "Dunkler Modus",
+    "light_mode": "Heller Modus"
   },
   "homepage": {
     "filters": "Filter",

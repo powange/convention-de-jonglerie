@@ -134,7 +134,9 @@
     "login": "Login",
     "logout": "Logout",
     "tabs": "Navigation tabs",
-    "breadcrumb": "Breadcrumb"
+    "breadcrumb": "Breadcrumb",
+    "dark_mode": "Dark mode",
+    "light_mode": "Light mode"
   },
   "homepage": {
     "filters": "Filters",

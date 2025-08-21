@@ -134,7 +134,9 @@
     "login": "Connexion",
     "logout": "Déconnexion",
     "tabs": "Onglets de navigation",
-    "breadcrumb": "Fil d'Ariane"
+    "breadcrumb": "Fil d'Ariane",
+    "dark_mode": "Mode sombre",
+    "light_mode": "Mode clair"
   },
   "homepage": {
     "filters": "Filtres",

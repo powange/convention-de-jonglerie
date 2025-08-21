@@ -134,7 +134,9 @@
     "login": "Iniciar sesión",
     "logout": "Cerrar sesión",
     "tabs": "Pestañas de navegación",
-    "breadcrumb": "Migas de pan"
+    "breadcrumb": "Migas de pan",
+    "dark_mode": "Modo oscuro",
+    "light_mode": "Modo claro"
   },
   "homepage": {
     "filters": "Filtros",

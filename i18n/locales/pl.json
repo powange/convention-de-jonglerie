@@ -134,6 +134,8 @@
     "login": "Logowanie",
     "logout": "Wyloguj",
     "tabs": "Zakładki nawigacyjne",
+    "dark_mode": "Tryb ciemny",
+    "light_mode": "Tryb jasny",
     "breadcrumb": "Okruszki nawigacyjne"
   },
   "homepage": {

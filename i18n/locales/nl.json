@@ -134,6 +134,8 @@
     "login": "Inloggen",
     "logout": "Uitloggen",
     "tabs": "Navigatietabs",
+    "dark_mode": "Donkere modus",
+    "light_mode": "Lichte modus",
     "breadcrumb": "Kruimelpad"
   },
   "homepage": {

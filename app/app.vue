@@ -8,30 +8,50 @@
               <img src="/logos/logo.svg" :alt="$t('app.title')" class="h-16 sm:h-30 w-auto">
               <span class="ml-2 text-sm sm:text-xl font-bold">{{ $t('app.title') }}</span>
             </NuxtLink>
-            <div class="flex items-center gap-4">
-              <!-- Sélecteur de langue -->
-              <UDropdownMenu :items="languageItems">
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  size="sm"
-                  :title="$t('footer.language_selector')"
-                >
-                  <span v-if="currentLanguage?.flag" :class="currentLanguage.flag" class="w-4 h-3" />
-                </UButton>
-                
-                <!-- Slots pour les drapeaux de chaque langue -->
-                <template 
-                  v-for="lang in locales" 
-                  :key="lang.code"
-                  #[`lang-${lang.code}-leading`]
-                >
-                  <span 
-                    :class="languageConfig[lang.code as keyof typeof languageConfig]?.flag" 
-                    class="w-4 h-3 shrink-0"
+            <div class="flex items-center gap-2 sm:gap-4">
+              <!-- Groupe de boutons superposés sur mobile -->
+              <div class="flex flex-col sm:flex-row gap-1 sm:gap-2">
+                <!-- Bouton de bascule clair/sombre -->
+                <ClientOnly>
+                  <UButton
+                    :icon="isDark ? 'i-heroicons-moon' : 'i-heroicons-sun'"
+                    color="neutral"
+                    variant="ghost"
+                    size="xs"
+                    class="sm:!size-sm"
+                    :title="isDark ? $t('navigation.light_mode') : $t('navigation.dark_mode')"
+                    @click="toggleColorMode"
                   />
-                </template>
-              </UDropdownMenu>
+                  <template #fallback>
+                    <div class="w-6 h-6 sm:w-8 sm:h-8" />
+                  </template>
+                </ClientOnly>
+
+                <!-- Sélecteur de langue -->
+                <UDropdownMenu :items="languageItems">
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    size="xs"
+                    class="sm:!size-sm"
+                    :title="$t('footer.language_selector')"
+                  >
+                    <span v-if="currentLanguage?.flag" :class="currentLanguage.flag" class="w-4 h-3" />
+                  </UButton>
+                  
+                  <!-- Slots pour les drapeaux de chaque langue -->
+                  <template 
+                    v-for="lang in locales" 
+                    :key="lang.code"
+                    #[`lang-${lang.code}-leading`]
+                  >
+                    <span 
+                      :class="languageConfig[lang.code as keyof typeof languageConfig]?.flag" 
+                      class="w-4 h-3 shrink-0"
+                    />
+                  </template>
+                </UDropdownMenu>
+              </div>
 
               <!-- Navigation principale -->
               <div v-if="authStore.isAuthenticated" class="hidden md:flex items-center gap-2">
@@ -111,9 +131,25 @@ import AppFooter from '~/components/ui/AppFooter.vue';
 
 const authStore = useAuthStore();
 const { locale, locales, setLocale, t } = useI18n();
+const colorMode = useColorMode();
 
 // État réactif pour la taille d'écran
 const isMobile = ref(false);
+
+// État du mode sombre
+const isDark = computed({
+  get() {
+    return colorMode.value === 'dark';
+  },
+  set(value) {
+    colorMode.preference = value ? 'dark' : 'light';
+  }
+});
+
+// Fonction pour basculer le mode couleur
+const toggleColorMode = () => {
+  isDark.value = !isDark.value;
+};
 
 // Configuration des langues avec leurs drapeaux
 const languageConfig = {

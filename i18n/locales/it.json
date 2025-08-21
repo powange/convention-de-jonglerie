@@ -134,6 +134,8 @@
     "login": "Accesso",
     "logout": "Disconnessione",
     "tabs": "Schede di navigazione",
+    "dark_mode": "Modalità scura",
+    "light_mode": "Modalità chiara",
     "breadcrumb": "Breadcrumb"
   },
   "homepage": {
