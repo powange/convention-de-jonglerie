@@ -165,6 +165,9 @@ import UserAvatar from '~/components/ui/UserAvatar.vue';
 
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
+const USwitch = resolveComponent('USwitch')
+const UButtonGroup = resolveComponent('UButtonGroup')
+const UTooltip = resolveComponent('UTooltip')
 
 // Type pour les paramètres des cellules du tableau
 interface TableCellParams {
@@ -262,34 +265,49 @@ const getEditionsColumns = () => [
     }
   },
   {
+    accessorKey: 'online',
+    header: t('editions.online_status'),
+    cell: ({ row }: TableCellParams) => {
+      const edition = row.original;
+      return h('div', { class: 'flex justify-center' }, [
+        h(USwitch, {
+          modelValue: edition.isOnline,
+          color: 'primary',
+          size: 'sm',
+          'onUpdate:modelValue': (value: boolean) => toggleEditionOnlineStatus(edition.id, value)
+        })
+      ]);
+    }
+  },
+  {
     id: 'actions',
     cell: ({ row }: TableCellParams) => {
       const edition = row.original;
-      return h('div', { class: 'flex items-center gap-2' }, [
-        h(UButton, {
-          icon: 'i-heroicons-eye',
-          size: 'xs',
-          color: 'info',
-          variant: 'ghost',
-          label: t('common.view'),
-          onClick: () => navigateTo(`/editions/${edition.id}`)
-        }),
-        h(UButton, {
-          icon: 'i-heroicons-pencil',
-          size: 'xs',
-          color: 'warning',
-          variant: 'ghost',
-          label: t('common.edit'),
-          onClick: () => navigateTo(`/editions/${edition.id}/edit`)
-        }),
-        h(UButton, {
-          icon: 'i-heroicons-trash',
-          size: 'xs',
-          color: 'error',
-          variant: 'ghost',
-          label: t('common.delete'),
-          onClick: () => deleteEdition(edition.id)
-        })
+      return h(UButtonGroup, { size: 'xs' }, [
+        h(UTooltip, { text: t('common.view') }, () =>
+          h(UButton, {
+            icon: 'i-heroicons-eye',
+            color: 'info',
+            variant: 'ghost',
+            onClick: () => navigateTo(`/editions/${edition.id}`)
+          })
+        ),
+        h(UTooltip, { text: t('common.edit') }, () =>
+          h(UButton, {
+            icon: 'i-heroicons-pencil',
+            color: 'warning',
+            variant: 'ghost',
+            onClick: () => navigateTo(`/editions/${edition.id}/edit`)
+          })
+        ),
+        h(UTooltip, { text: t('common.delete') }, () =>
+          h(UButton, {
+            icon: 'i-heroicons-trash',
+            color: 'error',
+            variant: 'ghost',
+            onClick: () => deleteEdition(edition.id)
+          })
+        )
       ]);
     }
   }
@@ -411,6 +429,33 @@ const canDeleteConvention = (convention: Convention) => {
   return convention.collaborators?.some(
     collab => collab.user.id === authStore.user.id && collab.role === 'ADMINISTRATOR'
   ) || false;
+};
+
+// Toggle edition online status
+const toggleEditionOnlineStatus = async (editionId: number, isOnline: boolean) => {
+  try {
+    await $fetch(`/api/editions/${editionId}/status`, {
+      method: 'PATCH',
+      body: { isOnline }
+    });
+    
+    const message = isOnline ? t('editions.edition_published') : t('editions.edition_set_offline');
+    toast.add({ 
+      title: message, 
+      icon: 'i-heroicons-check-circle', 
+      color: 'success' 
+    });
+    
+    // Reload conventions to update the status
+    await fetchMyConventions();
+  } catch (error) {
+    console.error('Failed to toggle edition status:', error);
+    toast.add({ 
+      title: t('errors.status_update_failed'), 
+      icon: 'i-heroicons-x-circle', 
+      color: 'error' 
+    });
+  }
 };
 
 onMounted(async () => {

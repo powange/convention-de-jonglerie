@@ -50,6 +50,7 @@ describe('/api/conventions/my-conventions GET', () => {
             city: 'Paris',
             country: 'France',
             imageUrl: 'image.jpg',
+            isOnline: false,
           },
         ],
       },
@@ -83,6 +84,7 @@ describe('/api/conventions/my-conventions GET', () => {
           city: 'Paris',
           country: 'France',
           imageUrl: 'image.jpg',
+          isOnline: false,
         },
       ],
     });
@@ -132,6 +134,7 @@ describe('/api/conventions/my-conventions GET', () => {
             city: true,
             country: true,
             imageUrl: true,
+            isOnline: true,
           },
           orderBy: {
             startDate: 'asc',

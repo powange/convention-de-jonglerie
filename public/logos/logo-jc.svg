@@ -1,0 +1,6 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+<!-- Lettre J -->
+<path d="M120 80 Q120 280 200 280 Q240 280 240 240" stroke="white" stroke-width="20" fill="none" stroke-linecap="round"/>
+<!-- Lettre C -->
+<path d="M280 120 Q220 120 220 240 Q220 360 300 360" stroke="white" stroke-width="20" fill="none" stroke-linecap="round"/>
+</svg>

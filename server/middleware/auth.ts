@@ -55,6 +55,15 @@ export default defineEventHandler(async (event) => {
   }
   
   if (isPublicEditionDetail || isPublicConventionDetail) {
+    // Hydrater la session si présente pour permettre aux utilisateurs
+    // authentifiés (ex: collaborateurs) d'accéder aux ressources même
+    // si la route est déclarée publique au niveau du middleware.
+    try {
+      const session = await getUserSession(event)
+      event.context.user = session?.user || null
+    } catch {
+      // Ignorer les erreurs de session
+    }
     return;
   }
 

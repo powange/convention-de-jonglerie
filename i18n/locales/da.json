@@ -293,6 +293,14 @@
     "lost_found": "Hittegods",
     "management": "Administration",
     "useful_links": "Nyttige links",
+    "online_status": "Online",
+    "set_offline": "Sæt offline",
+    "set_online": "Sæt online",
+    "offline_edition": "Offline udgave",
+    "offline_edition_message": "Denne udgave er endnu ikke offentligt synlig",
+    "publish_edition": "Publicer udgave",
+    "edition_published": "Udgave publiceret med succes",
+    "edition_set_offline": "Udgave sat offline",
     "ticketing": "Billetsalg",
     "services_offered": "Tilbudte tjenester",
     "no_services": "Ingen specifikke tjenester angivet",
@@ -587,7 +595,9 @@
     "cannot_load_comments": "Kan ikke indlæse kommentarer",
     "cannot_add_comment": "Kan ikke tilføje kommentar",
     "convention_required": "Konvention påkrævet",
-    "address_required": "Adresse påkrævet"
+    "address_required": "Adresse påkrævet",
+    "publish_edition_failed": "Kunne ikke publicere udgave",
+    "status_update_failed": "Kunne ikke opdatere status"
   },
   "services": {
     "food_trucks": "Food trucks",

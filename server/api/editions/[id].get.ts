@@ -40,14 +40,14 @@ export default defineEventHandler(async (event) => {
                   select: {
                     id: true,
                     pseudo: true,
+                    email: true,
                     profilePicture: true,
                     updatedAt: true,
-                    email: true,
-                  },
-                },
-              },
-            },
-          },
+                  }
+                }
+              }
+            }
+          }
         },
         ...(includeCollaborators && {
           collaborators: {
@@ -69,6 +69,44 @@ export default defineEventHandler(async (event) => {
         statusCode: 404,
         statusMessage: 'Edition not found',
       });
+    }
+
+  // Check if edition is offline and user has permission to view it
+  // Only consider it offline when isOnline is explicitly false. If undefined
+  // (legacy records / tests), treat it as online.
+  if (edition.isOnline === false) {
+      // Check if user is authenticated
+      if (!event.context.user) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Edition not found',
+        });
+      }
+
+      // Normalize user id to number to avoid string/number mismatches
+      const userId = Number(event.context.user.id);
+      const isCreator = edition.creatorId === userId;
+      const isConventionAuthor = edition.convention.authorId === userId;
+      const isCollaborator = edition.convention.collaborators?.some(
+        (c) => c.userId === userId
+      );
+
+      console.log('[DEBUG] Permission check for offline edition:', {
+        userId,
+        editionCreatorId: edition.creatorId,
+        conventionAuthorId: edition.convention.authorId,
+        isCreator,
+        isConventionAuthor,
+        isCollaborator,
+        collaborators: edition.convention.collaborators?.map((c) => ({ userId: c.userId, role: c.role }))
+      });
+
+      if (!isCreator && !isConventionAuthor && !isCollaborator) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Edition not found',
+        });
+      }
     }
 
     // Transformer les emails en emailHash
@@ -108,7 +146,11 @@ export default defineEventHandler(async (event) => {
     }
 
     return edition;
-  } catch (error) {
+  } catch (error: any) {
+    // If the handler already threw an HTTP error (createError), rethrow it to preserve status
+    if (error && (error.statusCode || error.status)) {
+      throw error;
+    }
     console.error('Erreur API edition:', error);
     throw createError({
       statusCode: 500,

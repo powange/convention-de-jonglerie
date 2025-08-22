@@ -50,3 +50,12 @@
 - **Nuxt Prisma** : https://nuxt.com/modules/prisma
 - **Prisma Nuxt Module (Documentation officielle)** : https://www.prisma.io/docs/orm/more/help-and-troubleshooting/prisma-nuxt-module
 - **Nuxt ESLint** : https://eslint.nuxt.com/packages/module
+
+## Commandes utiles
+
+**Scripts de développement :**
+- `npm run dev` : Lancer le serveur de développement
+- `npm run build` : Construire l'application pour la production
+- `npm run preview` : Prévisualiser la version de production
+- `npm run lint` : Vérifier le code avec ESLint
+- `npm run db:seed:dev` : Peupler la base de données avec des données de développement

@@ -7,6 +7,32 @@
       <p>{{ $t('editions.not_found') }}</p>
     </div>
     <div v-else>
+      <!-- Message si l'édition est hors ligne -->
+      <UAlert 
+        v-if="!edition.isOnline && canManageEdition"
+        icon="i-heroicons-eye-slash"
+        color="warning"
+        variant="soft"
+        class="mb-4"
+      >
+        <template #title>
+          {{ $t('editions.offline_edition') }}
+        </template>
+        <template #description>
+          <div class="flex items-center justify-between">
+            <span>{{ $t('editions.offline_edition_message') }}</span>
+            <UButton 
+              color="primary" 
+              size="sm"
+              icon="i-heroicons-globe-alt"
+              @click="publishEdition"
+            >
+              {{ $t('editions.publish_edition') }}
+            </UButton>
+          </div>
+        </template>
+      </UAlert>
+
       <!-- En-tête avec navigation -->
       <EditionHeader 
         :edition="edition" 
@@ -220,6 +246,52 @@ const edition = computed(() => editionStore.getEditionById(editionId));
 const isFavorited = computed(() => (_editionId: number) => {
   return edition.value?.favoritedBy.some(u => u.id === authStore.user?.id);
 });
+
+// Check if user can manage edition
+const canManageEdition = computed(() => {
+  if (!authStore.user || !edition.value) return false;
+  
+  // Check if user is the creator
+  if (edition.value.creatorId === authStore.user.id) return true;
+  
+  // Check if user is a convention collaborator with appropriate role
+  if (edition.value.convention?.collaborators) {
+    const collaboration = edition.value.convention.collaborators.find(
+      c => c.user.id === authStore.user.id
+    );
+    return collaboration?.role === 'ADMINISTRATOR' || collaboration?.role === 'MODERATOR';
+  }
+  
+  return false;
+});
+
+// Publish edition (make it online)
+const publishEdition = async () => {
+  if (!edition.value) return;
+  
+  try {
+    await $fetch(`/api/editions/${edition.value.id}/status`, {
+      method: 'PATCH',
+      body: { isOnline: true }
+    });
+    
+    // Update local state
+    await editionStore.fetchEditionById(editionId);
+    
+    toast.add({ 
+      title: t('editions.edition_published'), 
+      icon: 'i-heroicons-check-circle', 
+      color: 'green' 
+    });
+  } catch (error) {
+    console.error('Failed to publish edition:', error);
+    toast.add({ 
+      title: t('errors.publish_edition_failed'), 
+      icon: 'i-heroicons-x-circle', 
+      color: 'red' 
+    });
+  }
+};
 
 const toggleFavorite = async (id: number) => {
   try {

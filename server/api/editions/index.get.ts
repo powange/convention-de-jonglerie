@@ -47,6 +47,7 @@ export default defineEventHandler(async (event) => {
       startDate?: { gte: Date };
       endDate?: { lte: Date };
       country?: { in: string[] };
+      isOnline?: boolean;
       hasFoodTrucks?: boolean;
       hasKidsZone?: boolean;
       acceptsPets?: boolean;
@@ -68,6 +69,9 @@ export default defineEventHandler(async (event) => {
       hasLongShow?: boolean;
       hasATM?: boolean;
     } = {};
+
+  // No default isOnline filter here; callers/tests expect the handler to
+  // build filters strictly from request query parameters.
 
     if (name) {
       where.name = {

@@ -11,9 +11,20 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  try {
+    try {
+      // Editions must include isOnline (non-nullable boolean with default false)
+      const editionsSelect: any = {
+        id: true,
+        name: true,
+        startDate: true,
+        endDate: true,
+        city: true,
+        country: true,
+        imageUrl: true,
+        isOnline: true,
+      }
     // Récupérer les conventions où l'utilisateur est auteur OU collaborateur
-    const conventions = await prisma.convention.findMany({
+  const conventions = await prisma.convention.findMany({
       where: {
         OR: [
           { authorId: event.context.user.id },
@@ -50,15 +61,7 @@ export default defineEventHandler(async (event) => {
           },
         },
         editions: {
-          select: {
-            id: true,
-            name: true,
-            startDate: true,
-            endDate: true,
-            city: true,
-            country: true,
-            imageUrl: true,
-          },
+          select: editionsSelect,
           orderBy: {
             startDate: 'asc',
           },

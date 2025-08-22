@@ -293,6 +293,14 @@
     "lost_found": "Lost & Found",
     "management": "Management",
     "useful_links": "Useful links",
+    "online_status": "Online",
+    "set_offline": "Set offline",
+    "set_online": "Set online",
+    "offline_edition": "Offline edition",
+    "offline_edition_message": "This edition is not yet publicly visible",
+    "publish_edition": "Publish edition",
+    "edition_published": "Edition published successfully",
+    "edition_set_offline": "Edition set offline",
     "ticketing": "Ticketing",
     "services_offered": "Services offered",
     "no_services": "No specific services provided",
@@ -944,6 +952,8 @@
     "convention_creation_error": "An error occurred while creating the convention",
     "convention_edit_denied": "You don't have the rights to edit this convention",
     "convention_update_error": "An error occurred while updating the convention",
-    "update_error": "Update error"
+    "update_error": "Update error",
+    "publish_edition_failed": "Failed to publish edition",
+    "status_update_failed": "Failed to update status"
   }
 }

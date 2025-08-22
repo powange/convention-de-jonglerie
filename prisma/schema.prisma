@@ -90,6 +90,7 @@ model Edition {
   hasCreditCardPayment Boolean          @default(false)
   hasLongShow          Boolean          @default(false)
   hasATM               Boolean          @default(false)
+  isOnline             Boolean          @default(false)
   carpoolOffers        CarpoolOffer[]
   carpoolRequests      CarpoolRequest[]
   editionPosts         EditionPost[]

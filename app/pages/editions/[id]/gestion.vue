@@ -30,7 +30,7 @@
         <UCard>
           <div class="space-y-4">
             <h3 class="text-lg font-semibold">{{ $t('pages.management.actions') }}</h3>
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-2">
               <UButton
                 v-if="canEdit"
                 icon="i-heroicons-pencil"
@@ -38,6 +38,23 @@
                 :to="`/editions/${edition.id}/edit`"
               >
                 {{ $t('pages.management.edit_edition') }}
+              </UButton>
+              <UButton
+                v-if="edition.isOnline"
+                :icon="'i-heroicons-eye-slash'"
+                color="gray"
+                variant="soft"
+                @click="toggleOnlineStatus(false)"
+              >
+                {{ $t('editions.set_offline') }}
+              </UButton>
+              <UButton
+                v-else
+                :icon="'i-heroicons-globe-alt'"
+                color="primary"
+                @click="toggleOnlineStatus(true)"
+              >
+                {{ $t('editions.set_online') }}
               </UButton>
               <UButton
                 v-if="canDelete"
@@ -203,6 +220,34 @@ const deleteEdition = async (id: number) => {
     } catch (e: unknown) {
   toast.add({ title: e.statusMessage || t('errors.edition_deletion_failed'), icon: 'i-heroicons-x-circle', color: 'error' });
     }
+  }
+};
+
+const toggleOnlineStatus = async (isOnline: boolean) => {
+  if (!edition.value) return;
+  
+  try {
+    await $fetch(`/api/editions/${edition.value.id}/status`, {
+      method: 'PATCH',
+      body: { isOnline }
+    });
+    
+    // Update local state
+    await editionStore.fetchEditionById(editionId);
+    
+    const message = isOnline ? t('editions.edition_published') : t('editions.edition_set_offline');
+    toast.add({ 
+      title: message, 
+      icon: 'i-heroicons-check-circle', 
+      color: 'success' 
+    });
+  } catch (error) {
+    console.error('Failed to toggle edition status:', error);
+    toast.add({ 
+      title: t('errors.status_update_failed'), 
+      icon: 'i-heroicons-x-circle', 
+      color: 'error' 
+    });
   }
 };
 </script>

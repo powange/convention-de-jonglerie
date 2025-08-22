@@ -293,6 +293,14 @@
     "lost_found": "Objetos perdidos",
     "management": "Gestión",
     "useful_links": "Enlaces útiles",
+    "online_status": "En línea",
+    "set_offline": "Poner fuera de línea",
+    "set_online": "Poner en línea",
+    "offline_edition": "Edición fuera de línea",
+    "offline_edition_message": "Esta edición aún no es visible públicamente",
+    "publish_edition": "Publicar edición",
+    "edition_published": "Edición publicada con éxito",
+    "edition_set_offline": "Edición puesta fuera de línea",
     "ticketing": "Venta de entradas",
     "services_offered": "Servicios ofrecidos",
     "no_services": "Ningún servicio específico proporcionado",
@@ -621,7 +629,9 @@
     "cannot_load_comments": "No se pueden cargar los comentarios",
     "cannot_add_comment": "No se puede agregar el comentario",
     "convention_required": "La convención es requerida",
-    "address_required": "La dirección es requerida"
+    "address_required": "La dirección es requerida",
+    "publish_edition_failed": "Error al publicar la edición",
+    "status_update_failed": "Error al actualizar el estado"
   },
   "services": {
     "food_trucks": "Food trucks",

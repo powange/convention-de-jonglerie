@@ -104,6 +104,7 @@ export default defineEventHandler(async (event) => {
         hasCreditCardPayment: hasCreditCardPayment || false,
         hasAfjTokenPayment: hasAfjTokenPayment || false,
         creatorId: event.context.user.id,
+        isOnline: false, // Nouvelle édition créée hors ligne par défaut
       },
       include: {
         creator: {
