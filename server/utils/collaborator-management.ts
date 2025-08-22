@@ -1,5 +1,5 @@
 import { CollaboratorRole } from '@prisma/client';
-import type { ConventionCollaborator, User } from '~/app/types';
+// Removed unused types import (frontend types not needed server-side)
 import { prisma } from './prisma';
 
 export interface CollaboratorPermissionCheck {
@@ -52,62 +52,60 @@ export async function checkUserConventionPermission(
 /**
  * Vérifie si un utilisateur peut gérer les collaborateurs d'une convention
  */
-export async function canManageCollaborators(
-  conventionId: number,
-  userId: number
-): Promise<boolean> {
-  const permission = await checkUserConventionPermission(conventionId, userId);
-  
-  // Seuls le propriétaire et les administrateurs peuvent gérer les collaborateurs
-  return permission.isOwner || permission.userRole === CollaboratorRole.ADMINISTRATOR;
+export async function canManageCollaborators(conventionId: number, userId: number): Promise<boolean> {
+  const convention = await prisma.convention.findUnique({
+    where: { id: conventionId },
+    select: { authorId: true, collaborators: { where: { userId }, select: { canManageCollaborators: true, role: true } } }
+  });
+  if (!convention) return false;
+  if (convention.authorId === userId) return true;
+  const collab = convention.collaborators[0];
+  return !!(collab && (collab.canManageCollaborators || collab.role === CollaboratorRole.ADMINISTRATOR));
 }
 
 /**
  * Vérifie si un utilisateur peut éditer une convention
  */
-export async function canEditConvention(
-  conventionId: number,
-  userId: number
-): Promise<boolean> {
-  const permission = await checkUserConventionPermission(conventionId, userId);
-  
-  // Seuls le propriétaire et les administrateurs peuvent éditer la convention
-  return permission.isOwner || permission.userRole === CollaboratorRole.ADMINISTRATOR;
+export async function canEditConvention(conventionId: number, userId: number): Promise<boolean> {
+  const convention = await prisma.convention.findUnique({
+    where: { id: conventionId },
+    select: { authorId: true, collaborators: { where: { userId }, select: { canEditConvention: true, role: true } } }
+  });
+  if (!convention) return false;
+  if (convention.authorId === userId) return true;
+  const collab = convention.collaborators[0];
+  return !!(collab && (collab.canEditConvention || collab.role === CollaboratorRole.ADMINISTRATOR));
 }
 
 /**
  * Vérifie si un utilisateur peut éditer une édition
  */
-export async function canEditEdition(
-  editionId: number,
-  userId: number
-): Promise<boolean> {
-  // Récupérer l'édition avec sa convention
+export async function canEditEdition(editionId: number, userId: number): Promise<boolean> {
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },
-    select: { 
-      creatorId: true,
-      conventionId: true 
+    select: { creatorId: true, conventionId: true, id: true }
+  });
+  if (!edition) throw createError({ statusCode: 404, statusMessage: 'Édition introuvable' });
+  if (edition.creatorId === userId) return true;
+  const convention = await prisma.convention.findUnique({
+    where: { id: edition.conventionId },
+    select: {
+      authorId: true,
+      collaborators: { where: { userId }, select: { canEditAllEditions: true, role: true, id: true } },
+      editions: { where: { id: editionId }, select: { id: true } }
     }
   });
-
-  if (!edition) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Édition introuvable'
-    });
-  }
-
-  // Vérifier si l'utilisateur est le créateur de l'édition
-  if (edition.creatorId === userId) {
-    return true;
-  }
-
-  // Vérifier les permissions sur la convention
-  const permission = await checkUserConventionPermission(edition.conventionId, userId);
-  
-  // Tous les collaborateurs peuvent éditer les éditions (modérateurs et administrateurs)
-  return permission.hasPermission;
+  if (!convention) return false;
+  if (convention.authorId === userId) return true;
+  const collab = convention.collaborators[0];
+  if (!collab) return false;
+  if (collab.canEditAllEditions || collab.role === CollaboratorRole.ADMINISTRATOR) return true;
+  // Vérifier per-edition permission
+  const per = await prisma.editionCollaboratorPermission.findUnique({
+    where: { collaboratorId_editionId: { collaboratorId: collab.id, editionId } },
+    select: { canEdit: true }
+  });
+  return !!per?.canEdit;
 }
 
 /**
@@ -118,7 +116,7 @@ export async function addConventionCollaborator(
   userToAddId: number,
   role: CollaboratorRole,
   addedById: number
-): Promise<ConventionCollaborator & { user: Pick<User, 'id' | 'pseudo'> }> {
+) {
   // Vérifier les permissions
   const canManage = await canManageCollaborators(conventionId, addedById);
   
@@ -163,7 +161,7 @@ export async function addConventionCollaborator(
  */
 export async function findUserByPseudoOrEmail(
   searchTerm: string
-): Promise<Pick<User, 'id' | 'pseudo'> | null> {
+) {
   return await prisma.user.findFirst({
     where: {
       OR: [
@@ -235,12 +233,7 @@ export async function deleteConventionCollaborator(
 /**
  * Récupère tous les collaborateurs d'une convention
  */
-export async function getConventionCollaborators(
-  conventionId: number
-): Promise<(ConventionCollaborator & {
-  user: Pick<User, 'id' | 'pseudo'>;
-  addedBy: Pick<User, 'pseudo'>;
-})[]> {
+export async function getConventionCollaborators(conventionId: number) {
   return await prisma.conventionCollaborator.findMany({
     where: { conventionId },
     include: {
@@ -270,9 +263,7 @@ export async function updateCollaboratorRole(
   collaboratorId: number,
   newRole: CollaboratorRole,
   userId: number
-): Promise<ConventionCollaborator & {
-  user: Pick<User, 'id' | 'pseudo'>;
-}> {
+) {
   // Vérifier les permissions
   const canManage = await canManageCollaborators(conventionId, userId);
   

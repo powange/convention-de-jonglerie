@@ -34,9 +34,10 @@ export default defineEventHandler(async (event) => {
     hasToilets, hasShowers, hasAccessibility, hasWorkshops, hasCreditCardPayment, hasAfjTokenPayment
   } = validatedData;
 
-  // Vérifier que la convention existe et que l'utilisateur en est l'auteur
+  // Vérifier que la convention existe
   const convention = await prisma.convention.findUnique({
     where: { id: conventionId },
+    include: { collaborators: { where: { userId: event.context.user.id } } }
   });
 
   if (!convention) {
@@ -46,11 +47,16 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if (convention.authorId !== event.context.user.id) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Vous ne pouvez créer des éditions que pour vos propres conventions',
-    });
+  // Bloquer si archivée
+  if (convention.isArchived) {
+    throw createError({ statusCode: 409, statusMessage: 'Convention archivée: création d\'édition impossible' });
+  }
+
+  // Vérifier droit: auteur ou collaborateur avec canAddEdition
+  const collab = convention.collaborators[0];
+  const canAdd = convention.authorId === event.context.user.id || (collab && collab.canAddEdition);
+  if (!canAdd) {
+    throw createError({ statusCode: 403, statusMessage: 'Droit insuffisant pour créer une édition' });
   }
 
   try {
@@ -138,16 +144,11 @@ export default defineEventHandler(async (event) => {
     }
     
     return edition;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la création de l\'édition:', error);
-    
-    if (error.statusCode) {
-      throw error;
+    if (typeof error === 'object' && error && 'statusCode' in error) {
+      throw error as any;
     }
-    
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erreur lors de la création de l\'édition',
-    });
+    throw createError({ statusCode: 500, statusMessage: 'Erreur lors de la création de l\'édition' });
   }
 });
