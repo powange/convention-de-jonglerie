@@ -1,4 +1,5 @@
-import { getConventionCollaborators, checkUserConventionPermission } from '../../../utils/collaborator-management';
+import { checkUserConventionPermission } from '../../../utils/collaborator-management';
+import { prisma } from '../../../utils/prisma';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -22,13 +23,34 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Récupérer les collaborateurs de la convention
-    const collaborators = await getConventionCollaborators(conventionId);
+    // Récupérer avec nouvelles permissions
+    const collaborators = await prisma.conventionCollaborator.findMany({
+      where: { conventionId },
+      include: {
+        user: { select: { id: true, pseudo: true } },
+        addedBy: { select: { pseudo: true } },
+        perEditionPermissions: true
+      },
+      orderBy: { addedAt: 'desc' }
+    });
 
-    // Les données sont déjà filtrées par l'utilitaire getConventionCollaborators
-    // Plus besoin de transformation car il n'y a plus d'email à masquer
-
-    return collaborators;
+    return collaborators.map(c => ({
+      id: c.id,
+      user: c.user,
+      addedBy: c.addedBy,
+      addedAt: c.addedAt,
+      title: c.title,
+      role: c.role, // encore présent pendant transition
+      rights: {
+        editConvention: c.canEditConvention,
+        deleteConvention: c.canDeleteConvention,
+        manageCollaborators: c.canManageCollaborators,
+        addEdition: c.canAddEdition,
+        editAllEditions: c.canEditAllEditions,
+        deleteAllEditions: c.canDeleteAllEditions
+      },
+      perEdition: c.perEditionPermissions.map(p => ({ editionId: p.editionId, canEdit: p.canEdit, canDelete: p.canDelete }))
+    }));
   } catch (error: unknown) {
     const httpError = error as { statusCode?: number; message?: string };
     if (httpError.statusCode) {
