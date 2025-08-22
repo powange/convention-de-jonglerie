@@ -13,6 +13,16 @@ enum CollaboratorRole {
   ADMINISTRATOR // Peut gérer la convention, les éditions et ajouter des collaborateurs
 }
 
+// Historique des changements de permissions collaborateurs
+enum CollaboratorPermissionChangeType {
+  CREATED
+  RIGHTS_UPDATED
+  PER_EDITIONS_UPDATED
+  ARCHIVED
+  UNARCHIVED
+  REMOVED
+}
+
 model User {
   id                     Int                      @id @default(autoincrement())
   email                  String                   @unique
@@ -44,6 +54,7 @@ model User {
   lostFoundComments      LostFoundComment[]
   feedbacks              Feedback[]
   carpoolBookings        CarpoolBooking[]
+  permissionHistoryActions CollaboratorPermissionHistory[] @relation("CollaboratorPermissionHistory_actorId")
 }
 
 model Edition {
@@ -98,6 +109,7 @@ model Edition {
   creator              User             @relation("CreatedEditions", fields: [creatorId], references: [id])
   favoritedBy          User[]           @relation("FavoriteEditions")
   convention           Convention       @relation(fields: [conventionId], references: [id])
+  collaboratorPermissions EditionCollaboratorPermission[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -108,11 +120,21 @@ model ConventionCollaborator {
   conventionId Int
   userId       Int
   role         CollaboratorRole @default(MODERATOR)
+  // Nouveau système de droits granulaires (transition: conserver 'role' pour migration douce)
+  title                   String? // Titre libre (ex: Responsable bénévoles)
+  canEditConvention       Boolean  @default(false)
+  canDeleteConvention     Boolean  @default(false) // Si éditions existent: transforme l'action en archivage
+  canManageCollaborators  Boolean  @default(false)
+  canAddEdition           Boolean  @default(false)
+  canEditAllEditions      Boolean  @default(false)
+  canDeleteAllEditions    Boolean  @default(false)
   addedAt      DateTime         @default(now())
   addedById    Int
   addedBy      User             @relation("AddedCollaborators", fields: [addedById], references: [id])
   convention   Convention       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
   user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  perEditionPermissions EditionCollaboratorPermission[]
+  permissionHistory     CollaboratorPermissionHistory[]
 
   @@unique([conventionId, userId])
   @@index([addedById], map: "ConventionCollaborator_addedById_fkey")
@@ -242,8 +264,45 @@ model Convention {
   author        User                     @relation(fields: [authorId], references: [id])
   editions      Edition[]
   collaborators ConventionCollaborator[]
+  isArchived    Boolean                  @default(false)
+  archivedAt    DateTime?
+  permissionHistory CollaboratorPermissionHistory[]
 
   @@index([authorId], map: "Convention_authorId_fkey")
+}
+
+// Permissions spécifiques par édition (complément aux droits globaux)
+model EditionCollaboratorPermission {
+  id             Int                     @id @default(autoincrement())
+  collaboratorId Int
+  editionId      Int
+  canEdit        Boolean                 @default(false)
+  canDelete      Boolean                 @default(false)
+  collaborator   ConventionCollaborator  @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
+  edition        Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
+
+  @@unique([collaboratorId, editionId])
+  @@index([editionId])
+}
+
+// Historique des modifications de permissions et d'archivage
+model CollaboratorPermissionHistory {
+  id             Int                               @id @default(autoincrement())
+  conventionId   Int
+  collaboratorId Int?
+  actorId        Int
+  changeType     CollaboratorPermissionChangeType
+  before         Json?
+  after          Json?
+  createdAt      DateTime                          @default(now())
+  convention     Convention                        @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  collaborator   ConventionCollaborator?           @relation(fields: [collaboratorId], references: [id], onDelete: SetNull)
+  actor          User                              @relation("CollaboratorPermissionHistory_actorId", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([conventionId])
+  @@index([actorId])
+  @@index([collaboratorId])
+  @@index([changeType])
 }
 
 model EditionPost {
