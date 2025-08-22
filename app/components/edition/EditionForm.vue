@@ -84,6 +84,7 @@
                       :label="displayEndDate || $t('common.select')"
                       block
                       size="lg"
+                      @click="prepareEndCalendar"
                     />
                     <template #content>
                       <UCalendar 
@@ -819,6 +820,15 @@ const updateEndDateTime = () => {
     const hoursStr = hours.toString().padStart(2, '0');
     const minutesStr = minutes.toString().padStart(2, '0');
     state.endDate = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`;
+  }
+};
+
+// Préparer le calendrier de fin : se placer sur la date de début si définie
+const prepareEndCalendar = () => {
+  if (calendarStartDate.value && !calendarEndDate.value) {
+    // Clone logique: créer un nouvel objet CalendarDate
+    const d = calendarStartDate.value;
+    calendarEndDate.value = new CalendarDate(d.year, d.month, d.day);
   }
 };
 
