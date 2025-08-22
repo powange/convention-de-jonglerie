@@ -156,6 +156,13 @@ async function main() {
           userId: convDef.authorId,
           role: 'ADMINISTRATOR',
           addedById: convDef.authorId,
+          title: 'Organisateur',
+          canEditConvention: true,
+          canDeleteConvention: true,
+          canManageCollaborators: true,
+          canAddEdition: true,
+          canEditAllEditions: true,
+          canDeleteAllEditions: true,
         },
       })
       console.log(`  → Auteur ajouté comme collaborateur ADMINISTRATOR`)
@@ -177,6 +184,13 @@ async function main() {
             userId: conv.authorId,
             role: 'ADMINISTRATOR',
             addedById: conv.authorId,
+            title: 'Organisateur',
+            canEditConvention: true,
+            canDeleteConvention: true,
+            canManageCollaborators: true,
+            canAddEdition: true,
+            canEditAllEditions: true,
+            canDeleteAllEditions: true,
           },
         })
         console.log(`  → Auteur ajouté comme collaborateur ADMINISTRATOR`)
@@ -208,6 +222,14 @@ async function main() {
               userId: randomUser.id,
               role: role,
               addedById: conv.authorId,
+              title: role === 'ADMINISTRATOR' ? 'Co-organisateur' : undefined,
+              // Mapping rôle -> nouveaux droits
+              canEditConvention: role === 'ADMINISTRATOR',
+              canDeleteConvention: role === 'ADMINISTRATOR',
+              canManageCollaborators: role === 'ADMINISTRATOR',
+              canAddEdition: true, // MODERATOR et ADMIN peuvent ajouter
+              canEditAllEditions: true, // les deux peuvent éditer toutes les éditions
+              canDeleteAllEditions: true, // per spec: MODERATOR => canDeleteAllEditions true
             },
           })
           console.log(`  → Collaborateur ajouté: ${randomUser.pseudo} (${role})`)
@@ -271,6 +293,25 @@ async function main() {
       } else {
         console.log(`Edition existante: ${edition.name} (id=${edition.id})`)
         createdEditions.push(edition)
+      }
+    }
+
+    // Exemple: ajouter quelques permissions spécifiques par édition pour le premier collaborateur non-auteur si présent
+    const extraCollaborators = await prisma.conventionCollaborator.findMany({
+      where: { conventionId: conv.id, userId: { not: conv.authorId } },
+      take: 1,
+      orderBy: { addedAt: 'asc' },
+    })
+    if (extraCollaborators.length && createdEditions.length) {
+      const targetCollab = extraCollaborators[0]
+      // Sélectionner 1 à 2 éditions pour des droits spécifiques si pas déjà globalement admin
+      const editionSample = createdEditions.filter(e => e.conventionId === conv.id).slice(0, 2)
+      for (const ed of editionSample) {
+        await prisma.editionCollaboratorPermission.upsert({
+          where: { collaboratorId_editionId: { collaboratorId: targetCollab.id, editionId: ed.id } },
+          create: { collaboratorId: targetCollab.id, editionId: ed.id, canEdit: true, canDelete: false },
+          update: {},
+        })
       }
     }
   }
