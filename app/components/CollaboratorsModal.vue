@@ -102,30 +102,54 @@
           </ul>
         </div>
 
-        <!-- Ajout -->
+        <!-- Ajout collaborateur (droits granulaires) -->
         <div class="pt-2 border-t border-gray-100 dark:border-gray-800">
           <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
             {{ $t('components.collaborators_modal.add_collaborator') }}
           </h4>
-          <div class="space-y-3">
-            <UButtonGroup>
-              <UInputMenu
-                v-model="selectedUser"
-                v-model:search="searchTerm"
-                :items="userItems"
-                :avatar="selectedUser?.avatar"
-                :placeholder="$t('components.collaborators_modal.search_user_placeholder')"
-                :loading="searchLoading"
-                size="lg"
+          <div class="space-y-4">
+            <UInputMenu
+              v-model="selectedUser"
+              v-model:search="searchTerm"
+              :items="userItems"
+              :avatar="selectedUser?.avatar"
+              :placeholder="$t('components.collaborators_modal.search_user_placeholder')"
+              :loading="searchLoading"
+              size="lg"
+            />
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <label class="flex items-center gap-2">
+                <UCheckbox v-model="newRights.editConvention" />
+                <span>{{ $t('permissions.edit_convention') }}</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <UCheckbox v-model="newRights.deleteConvention" />
+                <span>{{ $t('permissions.delete_convention') }}</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <UCheckbox v-model="newRights.manageCollaborators" />
+                <span>{{ $t('permissions.manage_collaborators') }}</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <UCheckbox v-model="newRights.addEdition" />
+                <span>{{ $t('permissions.add_edition') }}</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <UCheckbox v-model="newRights.editAllEditions" />
+                <span>{{ $t('permissions.edit_all_editions') }}</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <UCheckbox v-model="newRights.deleteAllEditions" />
+                <span>{{ $t('permissions.delete_all_editions') }}</span>
+              </label>
+            </div>
+            <div class="flex flex-col gap-2">
+              <UInput
+                v-model="newCollaboratorTitle"
+                :placeholder="$t('components.collaborators_modal.optional_title_placeholder')"
+                size="sm"
               />
-              <div class="flex gap-2">
-                <USelect
-                  v-model="newCollaboratorRole"
-                  value-key="id"
-                  :items="collaboratorRoles"
-                  :disabled="loading"
-                  class="flex-1"
-                />
+              <div class="flex justify-end">
                 <UButton
                   :disabled="!selectedUser || loading"
                   :loading="loading"
@@ -135,7 +159,7 @@
                   @click="handleAddCollaborator"
                 />
               </div>
-            </UButtonGroup>
+            </div>
           </div>
         </div>
       </div>
@@ -180,7 +204,16 @@ const { t } = useI18n()
 const selectedUser = ref<UserItem | undefined>(undefined)
 const searchTerm = ref('')
 // Champ legacy (sélection d'un rôle) supprimé: on gardera bientôt un formulaire de droits granulaires direct.
-const newCollaboratorRole = ref<'MODERATOR' | 'ADMINISTRATOR'>('MODERATOR')
+// Formulaire nouveaux droits
+const newRights = reactive<{ [k: string]: boolean }>({
+  editConvention: false,
+  deleteConvention: false,
+  manageCollaborators: false,
+  addEdition: false,
+  editAllEditions: false,
+  deleteAllEditions: false,
+})
+const newCollaboratorTitle = ref<string>('')
 const loading = ref(false)
 const searchLoading = ref(false)
 const userItems = ref<UserItem[]>([])
@@ -193,11 +226,7 @@ const isOpen = computed<boolean>({
   set: (v) => emit('update:modelValue', v),
 })
 
-// Roles list
-const collaboratorRoles = computed(() => [
-  { label: t('components.collaborators_modal.moderator'), id: 'MODERATOR' },
-  { label: t('components.collaborators_modal.administrator'), id: 'ADMINISTRATOR' },
-])
+// Ancien sélecteur de rôles supprimé (remplacé par droits granularisés)
 
 async function fetchCollaborators() {
   if (!props.convention) return
@@ -223,7 +252,8 @@ watch(
       // Reset add form
       selectedUser.value = undefined
       searchTerm.value = ''
-      newCollaboratorRole.value = 'MODERATOR'
+  Object.keys(newRights).forEach((k) => (newRights[k] = false))
+  newCollaboratorTitle.value = ''
       userItems.value = []
     }
   }
@@ -272,7 +302,11 @@ async function handleAddCollaborator() {
     loading.value = true
     await $fetch(`/api/conventions/${props.convention.id}/collaborators`, {
       method: 'POST',
-      body: { userId: selectedUser.value.value, role: newCollaboratorRole.value },
+      body: {
+        userId: selectedUser.value.value,
+        rights: { ...newRights },
+        title: newCollaboratorTitle.value || undefined,
+      },
     })
     toast.add({
       title: t('messages.collaborator_added'),
@@ -285,7 +319,8 @@ async function handleAddCollaborator() {
     // reset form
     selectedUser.value = undefined
     searchTerm.value = ''
-    newCollaboratorRole.value = 'MODERATOR'
+  Object.keys(newRights).forEach((k) => (newRights[k] = false))
+  newCollaboratorTitle.value = ''
     userItems.value = []
   } catch (error: any) {
     toast.add({
