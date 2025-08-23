@@ -54,7 +54,18 @@ const sections = [
       { name: 'geocode', desc: 'Ajoute les coordonnées GPS aux conventions' },
   { name: 'db:clean-tokens', desc: 'Supprime les tokens expirés de la base' },
   { name: 'migrate:collaborators:dry', desc: 'Simulation migration rôles -> droits collaborateurs' },
-  { name: 'migrate:collaborators', desc: 'Applique migration (confirmation requise, --yes pour bypass)' }
+  { name: 'migrate:collaborators', desc: 'Applique migration (confirmation requise, --yes pour bypass)' },
+  { name: 'migrate:collaborators:legacy:dry', desc: 'Dry-run migration legacy (colonne role encore présente)' },
+  { name: 'migrate:collaborators:legacy', desc: 'Applique migration legacy rôles -> droits (après backup)' },
+  { name: 'db:seed:dev', desc: 'Peuple des données de développement (faker)' }
+    ]
+  },
+  {
+    title: '🧾 Formatage',
+    color: colors.yellow,
+    scripts: [
+      { name: 'format', desc: 'Formate tout le code avec Prettier' },
+      { name: 'format:check', desc: 'Vérifie le formatage sans modifier les fichiers' }
     ]
   },
   {
