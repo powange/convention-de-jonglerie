@@ -1,5 +1,5 @@
-import { checkUserConventionPermission } from 'server/utils/collaborator-management'
-import { prisma } from 'server/utils/prisma'
+import { checkUserConventionPermission } from '../../../utils/collaborator-management'
+import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const conventionId = parseInt(getRouterParam(event, 'id') || '0')
