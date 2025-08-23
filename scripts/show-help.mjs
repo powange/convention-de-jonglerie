@@ -61,6 +61,13 @@ const sections = [
     ]
   },
   {
+    title: '🌱 Seed options',
+    color: colors.green,
+    scripts: [
+      { name: 'db:seed:dev -- --reset', desc: 'Réinitialise les tables puis seed (DEV UNIQUEMENT)' }
+    ]
+  },
+  {
     title: '🧾 Formatage',
     color: colors.yellow,
     scripts: [

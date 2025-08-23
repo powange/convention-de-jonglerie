@@ -32,6 +32,47 @@ function getRandomComment(): string {
 async function main() {
   console.log('Démarrage du seed dev...')
 
+  const args = process.argv.slice(2)
+  const doReset = args.includes('--reset') || args.includes('--clear')
+  if (doReset) {
+    console.log('⚠️  Option --reset détectée: vidage des tables avant réinsertion (DEV seulement).')
+    try {
+      await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS=0')
+      const tables = [
+        'CollaboratorPermissionHistory',
+        'EditionCollaboratorPermission',
+        'CarpoolComment',
+        'CarpoolRequestComment',
+        'CarpoolPassenger',
+        'CarpoolBooking',
+        'CarpoolOffer',
+        'CarpoolRequest',
+        'EditionPostComment',
+        'EditionPost',
+        'LostFoundComment',
+        'LostFoundItem',
+        'Feedback',
+        'PasswordResetToken',
+        'ConventionCollaborator',
+        'Edition',
+        'Convention',
+        'User',
+        '_FavoriteEditions'
+      ]
+      for (const t of tables) {
+        try {
+          await prisma.$executeRawUnsafe(`TRUNCATE TABLE \`${t}\``)
+          console.log(`  → TRUNCATE ${t}`)
+        } catch (e) {
+          console.warn(`  (ignore) Impossible de tronquer ${t}:`, (e as any)?.code || e)
+        }
+      }
+    } finally {
+      await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS=1')
+    }
+    console.log('✅ Reset terminé, insertion des données de seed...')
+  }
+
   // Créer / récupérer un user seed qui sera auteur des conventions/éditions
   const adminEmail = process.env.SEED_ADMIN_EMAIL || 'seed-admin@example.com'
   const adminPseudo = process.env.SEED_ADMIN_PSEUDO || 'seedadmin'
@@ -176,7 +217,6 @@ async function main() {
         data: {
           conventionId: conv.id,
           userId: convDef.authorId,
-          role: 'ADMINISTRATOR',
           addedById: convDef.authorId,
           title: 'Organisateur',
           canEditConvention: true,
@@ -204,7 +244,6 @@ async function main() {
           data: {
             conventionId: conv.id,
             userId: conv.authorId,
-            role: 'ADMINISTRATOR',
             addedById: conv.authorId,
             title: 'Organisateur',
             canEditConvention: true,
@@ -242,7 +281,6 @@ async function main() {
             data: {
               conventionId: conv.id,
               userId: randomUser.id,
-              role: role,
               addedById: conv.authorId,
               title: role === 'ADMINISTRATOR' ? 'Co-organisateur' : undefined,
               // Mapping rôle -> nouveaux droits
@@ -506,6 +544,7 @@ async function main() {
   }
 
   console.log('Seed dev terminé avec succès !')
+  if (doReset) console.log('(Reset préalable exécuté)')
   console.log(`- ${createdUsers.length} utilisateurs créés/vérifiés (dont 1 superadmin)`)
   console.log(`- ${conventions.length} conventions créées/vérifiées`)
   console.log(`- ${createdEditions.length} éditions créées avec dates variées`)
