@@ -17,6 +17,8 @@
     "admin:list": "npx tsx scripts/manage-admin.ts list",
     "migrate:collaborators": "npx tsx scripts/migrate-collaborator-rights.ts",
     "migrate:collaborators:dry": "npx tsx scripts/migrate-collaborator-rights.ts --dry",
+  "migrate:collaborators:legacy": "npx tsx scripts/migrate-collaborator-rights-legacy-role.ts --yes",
+  "migrate:collaborators:legacy:dry": "npx tsx scripts/migrate-collaborator-rights-legacy-role.ts --dry",
     "help": "node scripts/show-help.mjs",
     "check-i18n": "node scripts/check-i18n.js",
     "prune-i18n": "node scripts/prune-i18n.cjs",
