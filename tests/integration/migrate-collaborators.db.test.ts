@@ -8,7 +8,11 @@ import { prismaTest } from '../setup-db'
 // Test d'intégration de la migration des droits collaborateurs
 // Nécessite TEST_WITH_DB=true et une base de test prête
 
-describe.skipIf(!process.env.TEST_WITH_DB)('Migration droits collaborateurs (script)', () => {
+// LEGACY: ce test vérifiait la migration depuis l'ancien champ `role` (ADMINISTRATOR / MODERATOR)
+// Le champ a été supprimé du modèle `ConventionCollaborator`. On ignore désormais ce scénario.
+// Si une migration rétro-compatible est encore nécessaire sur une base existante pré-migration,
+// exécuter manuellement `npx tsx scripts/migrate-collaborator-rights.ts --dry` puis `--yes` hors tests.
+describe.skip('Migration droits collaborateurs (script) - ignoré (champ role supprimé)', () => {
   let adminUser: any
   let moderatorUser: any
   let convention: any
@@ -43,7 +47,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Migration droits collaborateurs (scr
       data: {
         conventionId: convention.id,
         userId: adminUser.id,
-        role: 'ADMINISTRATOR',
+        // role supprimé
         addedById: adminUser.id,
       },
     })
@@ -52,7 +56,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Migration droits collaborateurs (scr
       data: {
         conventionId: convention.id,
         userId: moderatorUser.id,
-        role: 'MODERATOR',
+        // role supprimé
         addedById: adminUser.id,
       },
     })

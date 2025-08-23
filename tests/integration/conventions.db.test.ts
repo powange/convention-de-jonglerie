@@ -57,12 +57,19 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
         data: {
           conventionId: convention.id,
           userId: testUser.id,
-          role: 'ADMINISTRATOR',
+          // Plus d'attribut role: on simule un administrateur via booléens
+          canEditConvention: true,
+          canDeleteConvention: true,
+          canManageCollaborators: true,
+          canAddEdition: true,
+          canEditAllEditions: true,
+          canDeleteAllEditions: true,
           addedById: testUser.id,
         },
       })
 
-      expect(collaborator.role).toBe('ADMINISTRATOR')
+      expect(collaborator.canManageCollaborators).toBe(true)
+      expect(collaborator.canDeleteConvention).toBe(true)
       expect(collaborator.userId).toBe(testUser.id)
     })
 
@@ -131,7 +138,12 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
         data: {
           conventionId: testConvention.id,
           userId: testUser.id,
-          role: 'ADMINISTRATOR',
+          canEditConvention: true,
+          canDeleteConvention: true,
+          canManageCollaborators: true,
+          canAddEdition: true,
+          canEditAllEditions: true,
+          canDeleteAllEditions: true,
           addedById: testUser.id,
         },
       })
@@ -143,12 +155,14 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
         data: {
           conventionId: testConvention.id,
           userId: adminUser.id,
-          role: 'MODERATOR',
+          canAddEdition: true,
+          canEditAllEditions: true,
           addedById: testUser.id,
         },
       })
 
-      expect(moderator.role).toBe('MODERATOR')
+      expect(moderator.canAddEdition).toBe(true)
+      expect(moderator.canEditAllEditions).toBe(true)
       expect(moderator.userId).toBe(adminUser.id)
       expect(moderator.addedById).toBe(testUser.id)
 
@@ -177,7 +191,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
         data: {
           conventionId: testConvention.id,
           userId: adminUser.id,
-          role: 'MODERATOR',
+          canAddEdition: true,
+          canEditAllEditions: true,
           addedById: testUser.id,
         },
       })
@@ -201,18 +216,25 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
         data: {
           conventionId: testConvention.id,
           userId: adminUser.id,
-          role: 'MODERATOR',
+          canAddEdition: true,
+          canEditAllEditions: true,
           addedById: testUser.id,
         },
       })
 
-      // Promouvoir au rôle ADMINISTRATOR
+      // "Promotion" = activer tous les droits restants
       const updatedCollaborator = await prismaTest.conventionCollaborator.update({
         where: { id: collaborator.id },
-        data: { role: 'ADMINISTRATOR' },
+        data: {
+          canEditConvention: true,
+          canDeleteConvention: true,
+          canManageCollaborators: true,
+          canDeleteAllEditions: true,
+        },
       })
 
-      expect(updatedCollaborator.role).toBe('ADMINISTRATOR')
+      expect(updatedCollaborator.canManageCollaborators).toBe(true)
+      expect(updatedCollaborator.canDeleteConvention).toBe(true)
       expect(updatedCollaborator.userId).toBe(adminUser.id)
     })
   })
@@ -234,13 +256,19 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
           {
             conventionId: convention.id,
             userId: testUser.id,
-            role: 'ADMINISTRATOR',
+            canEditConvention: true,
+            canDeleteConvention: true,
+            canManageCollaborators: true,
+            canAddEdition: true,
+            canEditAllEditions: true,
+            canDeleteAllEditions: true,
             addedById: testUser.id,
           },
           {
             conventionId: convention.id,
             userId: adminUser.id,
-            role: 'MODERATOR',
+            canAddEdition: true,
+            canEditAllEditions: true,
             addedById: testUser.id,
           },
         ],
@@ -280,8 +308,24 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       expect(fullConvention).toBeDefined()
       expect(fullConvention!.author.pseudo).toContain('testcreator')
       expect(fullConvention!.collaborators).toHaveLength(2)
-      expect(fullConvention!.collaborators.some((c) => c.role === 'ADMINISTRATOR')).toBeTruthy()
-      expect(fullConvention!.collaborators.some((c) => c.role === 'MODERATOR')).toBeTruthy()
+      // Vérifier un collaborateur "admin" (tous les droits)
+      expect(
+        fullConvention!.collaborators.some(
+          (c) =>
+            c.canManageCollaborators &&
+            c.canDeleteConvention &&
+            c.canEditConvention &&
+            c.canAddEdition &&
+            c.canEditAllEditions &&
+            c.canDeleteAllEditions
+        )
+      ).toBeTruthy()
+      // Vérifier un collaborateur "modérateur" (droits partiels)
+      expect(
+        fullConvention!.collaborators.some(
+          (c) => c.canAddEdition && c.canEditAllEditions && !c.canManageCollaborators
+        )
+      ).toBeTruthy()
     })
 
     it('devrait compter les conventions par utilisateur', async () => {
@@ -339,7 +383,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
         data: {
           conventionId: convention.id,
           userId: adminUser.id,
-          role: 'MODERATOR',
+          canAddEdition: true,
+          canEditAllEditions: true,
           addedById: testUser.id,
         },
       })
