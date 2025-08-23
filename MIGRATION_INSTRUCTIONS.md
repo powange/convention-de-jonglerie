@@ -91,7 +91,7 @@ Cette étape est nécessaire uniquement si la colonne `role` existe encore en pr
 6. Lancer ensuite la migration Prisma qui supprime la colonne `role` (ou appliquer la migration SQL correspondante).
 7. Supprimer le script `scripts/migrate-collaborator-rights-legacy-role.ts` une fois terminé pour éviter ré-exécution accidentelle.
   
-> NOTE: La migration automatique qui supprimait `role` a été volontairement retirée du dossier `prisma/migrations` pour éviter une suppression prématurée en production. Créez une nouvelle migration (ex: `npx prisma migrate dev --name drop_collaborator_role`) uniquement après exécution réussie du script legacy et vérification des données.
+> NOTE: La migration de suppression `role` est de nouveau présente (`drop_collaborator_role`). Appliquez-la uniquement après exécution réussie du script legacy et vérifications manuelles.
 
 ### Scripts NPM disponibles
 
