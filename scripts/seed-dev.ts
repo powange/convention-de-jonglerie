@@ -1,4 +1,6 @@
 #!/usr/bin/env tsx
+import { spawn } from 'node:child_process'
+
 import bcrypt from 'bcryptjs'
 
 import { prisma } from '../server/utils/prisma'
@@ -35,42 +37,19 @@ async function main() {
   const args = process.argv.slice(2)
   const doReset = args.includes('--reset') || args.includes('--clear')
   if (doReset) {
-    console.log('⚠️  Option --reset détectée: vidage des tables avant réinsertion (DEV seulement).')
-    try {
-      await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS=0')
-      const tables = [
-        'CollaboratorPermissionHistory',
-        'EditionCollaboratorPermission',
-        'CarpoolComment',
-        'CarpoolRequestComment',
-        'CarpoolPassenger',
-        'CarpoolBooking',
-        'CarpoolOffer',
-        'CarpoolRequest',
-        'EditionPostComment',
-        'EditionPost',
-        'LostFoundComment',
-        'LostFoundItem',
-        'Feedback',
-        'PasswordResetToken',
-        'ConventionCollaborator',
-        'Edition',
-        'Convention',
-        'User',
-        '_FavoriteEditions'
-      ]
-      for (const t of tables) {
-        try {
-          await prisma.$executeRawUnsafe(`TRUNCATE TABLE \`${t}\``)
-          console.log(`  → TRUNCATE ${t}`)
-        } catch (e) {
-          console.warn(`  (ignore) Impossible de tronquer ${t}:`, (e as any)?.code || e)
-        }
-      }
-    } finally {
-      await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS=1')
-    }
-    console.log('✅ Reset terminé, insertion des données de seed...')
+    console.log('⚠️  Option --reset: exécution de prisma migrate reset (DEV uniquement).')
+    await new Promise<void>((resolve, reject) => {
+      const proc = spawn('npx', ['prisma', 'migrate', 'reset', '--force', '--skip-generate', '--skip-seed'], {
+        stdio: 'inherit',
+        env: process.env,
+      })
+      proc.on('exit', (code) => {
+        if (code === 0) resolve()
+        else reject(new Error(`prisma migrate reset exited with code ${code}`))
+      })
+      proc.on('error', reject)
+    })
+    console.log('✅ Reset Prisma terminé, insertion des données de seed...')
   }
 
   // Créer / récupérer un user seed qui sera auteur des conventions/éditions
