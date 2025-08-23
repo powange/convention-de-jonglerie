@@ -40,6 +40,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/scripts ./scripts
 
 # Script d'entrée: appliquer les migrations Prisma avant de démarrer Nuxt
 COPY docker/entrypoint.sh /app/entrypoint.sh
