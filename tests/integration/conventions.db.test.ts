@@ -181,8 +181,22 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
       })
 
       expect(collaborators).toHaveLength(2) // Auteur + collaborateur
-      expect(collaborators.some((c) => c.role === 'ADMINISTRATOR')).toBeTruthy()
-      expect(collaborators.some((c) => c.role === 'MODERATOR')).toBeTruthy()
+      expect(
+        collaborators.some(
+          (c) =>
+            c.canManageCollaborators &&
+            c.canDeleteConvention &&
+            c.canEditConvention &&
+            c.canAddEdition &&
+            c.canEditAllEditions &&
+            c.canDeleteAllEditions
+        )
+      ).toBeTruthy()
+      expect(
+        collaborators.some(
+          (c) => c.canAddEdition && c.canEditAllEditions && !c.canManageCollaborators
+        )
+      ).toBeTruthy()
     })
 
     it('devrait empêcher les collaborateurs en double', async () => {
@@ -203,7 +217,12 @@ describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Conventions ave
           data: {
             conventionId: testConvention.id,
             userId: adminUser.id,
-            role: 'ADMINISTRATOR',
+            canEditConvention: true,
+            canDeleteConvention: true,
+            canManageCollaborators: true,
+            canAddEdition: true,
+            canEditAllEditions: true,
+            canDeleteAllEditions: true,
             addedById: testUser.id,
           },
         })
