@@ -110,7 +110,7 @@
           <div class="space-y-3">
             <UButtonGroup>
               <UInputMenu
-                v-model="selectedUser as any"
+                v-model="selectedUser"
                 v-model:search="searchTerm"
                 :items="userItems"
                 :avatar="selectedUser?.avatar"

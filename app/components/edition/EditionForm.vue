@@ -22,26 +22,7 @@
               :loading="loadingConventions"
               value-key="value"
               @change="touchedFields.conventionId = true"
-            >
-              <template #option="{ option }">
-                <div class="flex items-center gap-3">
-                  <div v-if="option.logo" class="flex-shrink-0">
-                    <img
-                      :src="normalizeImageUrl(option.logo)"
-                      :alt="option.label"
-                      class="w-6 h-6 object-cover rounded"
-                    />
-                  </div>
-                  <div
-                    v-else
-                    class="w-6 h-6 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center flex-shrink-0"
-                  >
-                    <UIcon name="i-heroicons-building-library" class="text-gray-400" size="14" />
-                  </div>
-                  <span>{{ option.label }}</span>
-                </div>
-              </template>
-            </USelect>
+            />
           </UFormField>
 
           <UFormField
@@ -55,10 +36,7 @@
               size="lg"
               class="w-full"
               maxlength="200"
-              @blur="
-                touchedFields.name = true
-                trimField('name')
-              "
+              @blur="touchedFields.name = true; trimField('name')"
             />
             <template #help>
               <p class="text-xs text-gray-500">
@@ -91,9 +69,9 @@
                     />
                     <template #content>
                       <UCalendar
-                        v-model="calendarStartDate"
+                        v-model="(calendarStartDate as any)"
                         class="p-2"
-                        @update:model-value="updateStartDate"
+                        @update:model-value="(d:any) => updateStartDate(d as CalendarDate)"
                       />
                     </template>
                   </UPopover>
@@ -134,10 +112,10 @@
                     />
                     <template #content>
                       <UCalendar
-                        v-model="calendarEndDate"
+                        v-model="(calendarEndDate as any)"
                         class="p-2"
-                        :is-date-disabled="(date) => calendarStartDate && date < calendarStartDate"
-                        @update:model-value="updateEndDate"
+                        :is-date-disabled="(date: any) => !!calendarStartDate && date < (calendarStartDate as any)"
+                        @update:model-value="(d:any) => updateEndDate(d as CalendarDate)"
                       />
                     </template>
                   </UPopover>
@@ -168,7 +146,6 @@
                   allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
                   allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
                 },
-                autoUpload: true,
                 resetAfterUpload: false,
               }"
               alt="Poster de l'édition"
@@ -215,10 +192,7 @@
                     placeholder="123 rue de la Jonglerie"
                     size="lg"
                     class="w-full"
-                    @blur="
-                      touchedFields.addressStreet = true
-                      trimField('addressLine1')
-                    "
+                    @blur="touchedFields.addressStreet = true; trimField('addressLine1')"
                   >
                     <template #leading>
                       <UIcon name="i-heroicons-home" />
@@ -259,10 +233,7 @@
                       size="lg"
                       pattern="[0-9]{5}"
                       maxlength="5"
-                      @blur="
-                        touchedFields.addressZipCode = true
-                        trimField('postalCode')
-                      "
+                      @blur="touchedFields.addressZipCode = true; trimField('postalCode')"
                     />
                   </UFormField>
 
@@ -282,10 +253,7 @@
                       required
                       :placeholder="$t('forms.placeholders.city_example')"
                       size="lg"
-                      @blur="
-                        touchedFields.addressCity = true
-                        trimField('city')
-                      "
+                      @blur="touchedFields.addressCity = true; trimField('city')"
                     />
                   </UFormField>
 
@@ -306,10 +274,7 @@
                       required
                       placeholder="Nom du pays"
                       size="lg"
-                      @blur="
-                        touchedFields.addressCountry = true
-                        trimField('country')
-                      "
+                      @blur="touchedFields.addressCountry = true; trimField('country')"
                     >
                       <template #leading>
                         <UIcon name="i-heroicons-globe-europe-africa" />
@@ -320,10 +285,7 @@
                           color="neutral"
                           variant="link"
                           size="xs"
-                          @click="
-                            showCustomCountry = false
-                            state.country = 'France'
-                          "
+                          @click="showCustomCountry = false; state.country = 'France'"
                         />
                       </template>
                     </UInput>
@@ -356,10 +318,7 @@
               :rows="5"
               class="w-full"
               maxlength="1000"
-              @blur="
-                touchedFields.description = true
-                trimField('description')
-              "
+              @blur="touchedFields.description = true; trimField('description')"
             />
           </UFormField>
         </div>
@@ -377,7 +336,7 @@
               <UCheckbox
                 v-for="service in category.services"
                 :key="service.key"
-                v-model="state[service.key]"
+                v-model="(state as any)[service.key]"
                 indicator="end"
                 variant="card"
               >
@@ -556,7 +515,7 @@ const touchedFields = reactive({
 })
 
 const state = reactive({
-  conventionId: props.initialData?.conventionId || null,
+  conventionId: props.initialData?.conventionId,
   name: props.initialData?.name || '',
   description: props.initialData?.description || '',
   imageUrl: props.initialData?.imageUrl || '',
@@ -601,7 +560,6 @@ const toast = useToast()
 const { getTranslatedServicesByCategory } = useTranslatedConventionServices()
 const servicesByCategory = getTranslatedServicesByCategory
 // const authStore = useAuthStore();
-const { normalizeImageUrl } = useImageUrl()
 const showCustomCountry = ref(false)
 
 // Date formatter pour l'affichage
@@ -722,8 +680,9 @@ const dateValidation = computed(() => validateDates())
 
 // Fonctions pour nettoyer les espaces en début/fin des champs texte
 const trimField = (fieldName: string) => {
-  if (state[fieldName] && typeof state[fieldName] === 'string') {
-    state[fieldName] = state[fieldName].trim()
+  const val = (state as any)[fieldName]
+  if (typeof val === 'string') {
+    ;(state as any)[fieldName] = val.trim()
   }
 }
 
@@ -793,7 +752,7 @@ const onImageUploaded = (result: {
     toast.add({
       title: 'Image uploadée avec succès !',
       icon: 'i-heroicons-check-circle',
-      color: 'green',
+  color: 'success',
     })
   }
 }
@@ -803,7 +762,7 @@ const onImageDeleted = () => {
   toast.add({
     title: 'Image supprimée',
     icon: 'i-heroicons-check-circle',
-    color: 'green',
+    color: 'success',
   })
 }
 
@@ -812,7 +771,7 @@ const onImageError = (error: string) => {
     title: "Erreur d'upload",
     description: error,
     icon: 'i-heroicons-exclamation-triangle',
-    color: 'red',
+  color: 'error',
   })
 }
 
@@ -843,7 +802,7 @@ const handleNextStep = () => {
         title: 'Formulaire incomplet',
         description: 'Veuillez remplir tous les champs obligatoires',
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'red',
+  color: 'error',
       })
       return
     }
@@ -855,7 +814,7 @@ const handleNextStep = () => {
         title: 'Dates invalides',
         description: dateValidation.value.error,
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'red',
+  color: 'error',
       })
       return
     }
@@ -884,7 +843,7 @@ const handleAddressSelected = (address: {
   showCustomCountry.value = !countryExists && address.country !== ''
 }
 
-const handleCountryChange = (value: string) => {
+const handleCountryChange = (value: any) => {
   touchedFields.addressCountry = true
   if (value === 'Autre') {
     showCustomCountry.value = true
@@ -908,7 +867,7 @@ const handleSubmit = () => {
       title: 'Dates invalides',
       description: dateValidation.value.error,
       icon: 'i-heroicons-exclamation-triangle',
-      color: 'red',
+  color: 'error',
     })
     return
   }
@@ -962,13 +921,13 @@ onMounted(() => {
 // Fonctions pour mettre à jour les dates
 const updateStartDate = (date: CalendarDate | null) => {
   if (date && startTime.value) {
-    const [hours, minutes] = startTime.value.split(':').map(Number)
+  const [hours, minutes] = (startTime.value || '').split(':').map(Number)
     // Créer un format datetime-local en évitant les conversions UTC
     const year = date.year.toString().padStart(4, '0')
     const month = date.month.toString().padStart(2, '0')
     const day = date.day.toString().padStart(2, '0')
-    const hoursStr = hours.toString().padStart(2, '0')
-    const minutesStr = minutes.toString().padStart(2, '0')
+  const hoursStr = Number.isFinite(hours) ? hours!.toString().padStart(2, '0') : '00'
+  const minutesStr = Number.isFinite(minutes) ? minutes!.toString().padStart(2, '0') : '00'
     state.startDate = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`
     touchedFields.startDate = true
   }
@@ -976,13 +935,13 @@ const updateStartDate = (date: CalendarDate | null) => {
 
 const updateEndDate = (date: CalendarDate | null) => {
   if (date && endTime.value) {
-    const [hours, minutes] = endTime.value.split(':').map(Number)
+  const [hours, minutes] = (endTime.value || '').split(':').map(Number)
     // Créer un format datetime-local en évitant les conversions UTC
     const year = date.year.toString().padStart(4, '0')
     const month = date.month.toString().padStart(2, '0')
     const day = date.day.toString().padStart(2, '0')
-    const hoursStr = hours.toString().padStart(2, '0')
-    const minutesStr = minutes.toString().padStart(2, '0')
+  const hoursStr = Number.isFinite(hours) ? hours!.toString().padStart(2, '0') : '00'
+  const minutesStr = Number.isFinite(minutes) ? minutes!.toString().padStart(2, '0') : '00'
     state.endDate = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`
     touchedFields.endDate = true
   }
@@ -990,26 +949,26 @@ const updateEndDate = (date: CalendarDate | null) => {
 
 const updateStartDateTime = () => {
   if (calendarStartDate.value && startTime.value) {
-    const [hours, minutes] = startTime.value.split(':').map(Number)
+  const [hours, minutes] = (startTime.value || '').split(':').map(Number)
     // Créer un format datetime-local en évitant les conversions UTC
     const year = calendarStartDate.value.year.toString().padStart(4, '0')
     const month = calendarStartDate.value.month.toString().padStart(2, '0')
     const day = calendarStartDate.value.day.toString().padStart(2, '0')
-    const hoursStr = hours.toString().padStart(2, '0')
-    const minutesStr = minutes.toString().padStart(2, '0')
+  const hoursStr = Number.isFinite(hours) ? hours!.toString().padStart(2, '0') : '00'
+  const minutesStr = Number.isFinite(minutes) ? minutes!.toString().padStart(2, '0') : '00'
     state.startDate = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`
   }
 }
 
 const updateEndDateTime = () => {
   if (calendarEndDate.value && endTime.value) {
-    const [hours, minutes] = endTime.value.split(':').map(Number)
+  const [hours, minutes] = (endTime.value || '').split(':').map(Number)
     // Créer un format datetime-local en évitant les conversions UTC
     const year = calendarEndDate.value.year.toString().padStart(4, '0')
     const month = calendarEndDate.value.month.toString().padStart(2, '0')
     const day = calendarEndDate.value.day.toString().padStart(2, '0')
-    const hoursStr = hours.toString().padStart(2, '0')
-    const minutesStr = minutes.toString().padStart(2, '0')
+  const hoursStr = Number.isFinite(hours) ? hours!.toString().padStart(2, '0') : '00'
+  const minutesStr = Number.isFinite(minutes) ? minutes!.toString().padStart(2, '0') : '00'
     state.endDate = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`
   }
 }
@@ -1027,8 +986,7 @@ const prepareEndCalendar = () => {
 watch(
   [() => conventions.value, () => props.initialData],
   ([newConventions, newInitialData]) => {
-    if (newConventions.length > 0 && newInitialData?.conventionId) {
-      // Forcer la mise à jour même si la valeur existe déjà pour synchroniser le USelect
+    if (newConventions.length > 0 && newInitialData?.conventionId !== undefined) {
       state.conventionId = newInitialData.conventionId
     }
   },
@@ -1039,10 +997,10 @@ watch(
 watch(
   () => conventions.value.length,
   (newLength) => {
-    if (newLength > 0 && props.initialData?.conventionId) {
+  if (newLength > 0 && props.initialData?.conventionId !== undefined) {
       // Utiliser nextTick pour s'assurer que le DOM est mis à jour
       nextTick(() => {
-        state.conventionId = props.initialData.conventionId
+  state.conventionId = props.initialData?.conventionId
       })
     }
   }
@@ -1053,7 +1011,7 @@ watch(
   () => props.initialData,
   (newVal) => {
     if (newVal) {
-      state.conventionId = newVal.conventionId || null
+      state.conventionId = newVal.conventionId
       state.name = newVal.name || ''
       state.description = newVal.description || ''
       state.startDate = newVal.startDate
