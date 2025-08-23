@@ -1,4 +1,4 @@
-import { PrismaClient, CollaboratorRole, CollaboratorPermissionChangeType } from '@prisma/client'
+import { PrismaClient, CollaboratorPermissionChangeType } from '@prisma/client'
 
 /*
   Script de migration douce des anciens rôles vers le nouveau système de droits granulaires.
@@ -34,7 +34,6 @@ async function main() {
   // Première passe: plan
   type PlanItem = {
     id: number
-    role: CollaboratorRole
     conventionId: number
     addedById: number
     changes: Record<string, boolean>
@@ -44,21 +43,27 @@ async function main() {
   const plan: PlanItem[] = []
   for (const c of collaborators) {
     const changes: Record<string, boolean> = {}
-    if (c.role === CollaboratorRole.ADMINISTRATOR) {
+    // Legacy: c.role supprimé du schéma. On déduit un ancien "profil" via ses droits existants
+    const isLegacyAdmin =
+      c.canManageCollaborators ||
+      c.canDeleteConvention ||
+      c.canEditConvention ||
+      (c.canAddEdition && c.canEditAllEditions && c.canDeleteAllEditions)
+    const isLegacyModerator = !isLegacyAdmin && (c.canAddEdition || c.canEditAllEditions)
+    if (isLegacyAdmin) {
       if (!c.canEditConvention) changes.canEditConvention = true
       if (!c.canDeleteConvention) changes.canDeleteConvention = true
       if (!c.canManageCollaborators) changes.canManageCollaborators = true
       if (!c.canAddEdition) changes.canAddEdition = true
       if (!c.canEditAllEditions) changes.canEditAllEditions = true
       if (!c.canDeleteAllEditions) changes.canDeleteAllEditions = true
-    } else if (c.role === CollaboratorRole.MODERATOR) {
+    } else if (isLegacyModerator) {
       if (!c.canAddEdition) changes.canAddEdition = true
       if (!c.canEditAllEditions) changes.canEditAllEditions = true
     }
     const needsHistory = c.permissionHistory.length === 0
     plan.push({
       id: c.id,
-      role: c.role,
       conventionId: c.conventionId,
       addedById: c.addedById,
       changes,
@@ -79,7 +84,7 @@ async function main() {
       .filter((p) => Object.keys(p.changes).length)
       .slice(0, 10)
       .forEach((p) => {
-        console.log(`   - #${p.id} (${p.role}) -> ${Object.keys(p.changes).join(', ')}`)
+  console.log(`   - #${p.id} -> ${Object.keys(p.changes).join(', ')}`)
       })
     if (willUpdate > 10) console.log(`   ... (+${willUpdate - 10} autres)`)
   }
@@ -107,7 +112,7 @@ async function main() {
       }
       updated++
       console.log(
-        `✅ Collaborateur ${id} (${item.role}) droits appliqués: ${Object.keys(changes).join(', ')}`
+        `✅ Collaborateur ${id} droits appliqués: ${Object.keys(changes).join(', ')}`
       )
     }
     if (needsHistory) {
