@@ -64,7 +64,8 @@ const sections = [
     title: '🌱 Seed options',
     color: colors.green,
     scripts: [
-      { name: 'db:seed:dev -- --reset', desc: 'Réinitialise les tables puis seed (DEV UNIQUEMENT)' }
+  { name: 'db:reset:dev', desc: 'Reset complet (drop/recreate) via Prisma migrate reset (DEV UNIQUEMENT)' },
+  { name: 'db:seed:dev -- --reset', desc: 'Ancienne méthode TRUNCATE avant seed (toujours dispo)' }
     ]
   },
   {
