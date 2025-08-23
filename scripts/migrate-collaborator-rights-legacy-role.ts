@@ -29,6 +29,15 @@ async function main() {
   const { dry, yes } = parseArgs()
   console.log(`🚀 Migration legacy role -> droits (dry=${dry})`)
 
+  // Vérifier si la colonne legacy `role` existe encore
+  const roleColumn: Array<any> = await prisma.$queryRawUnsafe(
+    "SHOW COLUMNS FROM `ConventionCollaborator` LIKE 'role'"
+  )
+  if (!roleColumn.length) {
+    console.log('ℹ️ Colonne `role` absente: aucune migration legacy nécessaire. \nUtilisez éventuellement le script standard (npm run migrate:collaborators:dry) si vous souhaitez vérifier les droits.')
+    return
+  }
+
   // Collecter stats de base (utilise SQL brut car colonne role peut ne plus être dans le client généré)
   const rows: Array<any> = await prisma.$queryRawUnsafe(
     'SELECT id, conventionId, addedById, role, canEditConvention, canDeleteConvention, canManageCollaborators, canAddEdition, canEditAllEditions, canDeleteAllEditions FROM ConventionCollaborator'
