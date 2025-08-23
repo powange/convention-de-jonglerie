@@ -1,5 +1,4 @@
-import { prisma } from '../../../utils/prisma';
-
+import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
@@ -7,17 +6,17 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 401,
       statusMessage: 'Non authentifié',
-    });
+    })
   }
 
-  const editionId = parseInt(event.context.params?.id as string);
-  const body = await readBody(event);
+  const editionId = parseInt(event.context.params?.id as string)
+  const body = await readBody(event)
 
   if (!editionId) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Edition ID invalide',
-    });
+    })
   }
 
   // Validation des données
@@ -25,20 +24,20 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: 'Données manquantes',
-    });
+    })
   }
 
   try {
     // Vérifier que l'édition existe
     const edition = await prisma.edition.findUnique({
       where: { id: editionId },
-    });
+    })
 
     if (!edition) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Edition non trouvée',
-      });
+      })
     }
 
     // Créer la demande de covoiturage
@@ -62,14 +61,14 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-    });
+    })
 
-    return carpoolRequest;
+    return carpoolRequest
   } catch (error) {
-    console.error('Erreur lors de la création de la demande:', error);
+    console.error('Erreur lors de la création de la demande:', error)
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur serveur',
-    });
+    })
   }
-});
+})

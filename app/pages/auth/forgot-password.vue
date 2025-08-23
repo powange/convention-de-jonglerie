@@ -3,10 +3,14 @@
     <div class="w-full max-w-md">
       <!-- En-tête avec logo/icône -->
       <div class="text-center mb-8">
-        <div class="mx-auto w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
+        <div
+          class="mx-auto w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mb-4 shadow-lg"
+        >
           <UIcon name="i-heroicons-envelope" class="text-white" size="32" />
         </div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ $t('auth.forgot_password_title') }}</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          {{ $t('auth.forgot_password_title') }}
+        </h1>
         <p class="text-gray-600 dark:text-gray-400">{{ $t('auth.forgot_password_subtitle') }}</p>
       </div>
 
@@ -16,10 +20,10 @@
           <!-- Section Email -->
           <div class="space-y-4">
             <UFormField :label="t('common.email')" name="email">
-              <UInput 
-                v-model="state.email" 
+              <UInput
+                v-model="state.email"
                 type="email"
-                required 
+                required
                 :placeholder="t('auth.email_or_username_placeholder')"
                 icon="i-heroicons-envelope"
                 class="w-full"
@@ -29,8 +33,8 @@
           </div>
 
           <!-- Message de succès -->
-          <UAlert 
-            v-if="emailSent" 
+          <UAlert
+            v-if="emailSent"
             icon="i-heroicons-check-circle"
             color="success"
             :title="t('auth.email_sent_success')"
@@ -38,10 +42,10 @@
           />
 
           <!-- Bouton d'envoi -->
-          <UButton 
+          <UButton
             v-if="!emailSent"
-            type="submit" 
-            :loading="loading" 
+            type="submit"
+            :loading="loading"
             size="lg"
             block
             class="mt-8"
@@ -51,7 +55,7 @@
           </UButton>
 
           <!-- Bouton de retour après succès -->
-          <UButton 
+          <UButton
             v-if="emailSent"
             to="/login"
             variant="soft"
@@ -67,9 +71,9 @@
         <!-- Lien de retour -->
         <div v-if="!emailSent" class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
           <p class="text-center text-sm text-gray-600 dark:text-gray-400">
-            {{ $t('auth.remember_password') }} 
-            <NuxtLink 
-              to="/login" 
+            {{ $t('auth.remember_password') }}
+            <NuxtLink
+              to="/login"
               class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
             >
               {{ $t('navigation.login') }}
@@ -89,52 +93,51 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
-import { z } from 'zod';
+import { reactive, ref } from 'vue'
+import { z } from 'zod'
 
-const toast = useToast();
-const { t } = useI18n();
+const toast = useToast()
+const { t } = useI18n()
 
 const schema = z.object({
   email: z.string().email(t('errors.invalid_email')).min(1, t('errors.required_field')),
-});
+})
 
 const state = reactive({
   email: '',
-});
+})
 
-const loading = ref(false);
-const emailSent = ref(false);
+const loading = ref(false)
+const emailSent = ref(false)
 
 const handleSubmit = async () => {
-  loading.value = true;
-  
+  loading.value = true
+
   try {
     const response = await $fetch('/api/auth/request-password-reset', {
       method: 'POST',
       body: {
-        email: state.email
-      }
-    });
+        email: state.email,
+      },
+    })
 
-    emailSent.value = true;
-    
-    toast.add({ 
-      title: t('auth.email_sent_success'), 
+    emailSent.value = true
+
+    toast.add({
+      title: t('auth.email_sent_success'),
       description: response.message,
-      icon: 'i-heroicons-check-circle', 
-      color: 'green' 
-    });
-    
+      icon: 'i-heroicons-check-circle',
+      color: 'green',
+    })
   } catch (error: any) {
-    toast.add({ 
-      title: t('common.error'), 
+    toast.add({
+      title: t('common.error'),
       description: error.data?.statusMessage || t('errors.server_error'),
-      icon: 'i-heroicons-x-circle', 
-      color: 'red' 
-    });
+      icon: 'i-heroicons-x-circle',
+      color: 'red',
+    })
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 </script>

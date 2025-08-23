@@ -1,15 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../../__mocks__/prisma';
+
+import favoriteHandler from '../../../server/api/editions/[id]/favorite.post'
+import { prismaMock } from '../../__mocks__/prisma'
 
 // Mock du handler favoris
-import favoriteHandler from '../../../server/api/editions/[id]/favorite.post'
 
 describe('Système de favoris', () => {
   const mockUser = {
     id: 1,
     email: 'user@example.com',
     pseudo: 'testuser',
-    favoriteEditions: []
+    favoriteEditions: [],
   }
 
   const mockEdition = {
@@ -18,7 +19,7 @@ describe('Système de favoris', () => {
     endDate: new Date('2024-06-03'),
     city: 'Paris',
     conventionId: 1,
-    createdBy: 1
+    createdBy: 1,
   }
 
   beforeEach(() => {
@@ -30,8 +31,8 @@ describe('Système de favoris', () => {
       const mockEvent = {
         context: {
           user: null,
-          params: { id: '1' }
-        }
+          params: { id: '1' },
+        },
       }
 
       await expect(favoriteHandler(mockEvent as any)).rejects.toThrow()
@@ -41,8 +42,8 @@ describe('Système de favoris', () => {
       const mockEvent = {
         context: {
           user: mockUser,
-          params: { id: 'invalid' }
-        }
+          params: { id: 'invalid' },
+        },
       }
 
       await expect(favoriteHandler(mockEvent as any)).rejects.toThrow()
@@ -51,72 +52,72 @@ describe('Système de favoris', () => {
     it('devrait ajouter une édition aux favoris', async () => {
       const userWithoutFavorites = {
         ...mockUser,
-        favoriteEditions: []
+        favoriteEditions: [],
       }
 
       prismaMock.user.findUnique.mockResolvedValue(userWithoutFavorites)
       prismaMock.user.update.mockResolvedValue({
         ...userWithoutFavorites,
-        favoriteEditions: [mockEdition]
+        favoriteEditions: [mockEdition],
       })
 
       const mockEvent = {
         context: {
           user: mockUser,
-          params: { id: '1' }
-        }
+          params: { id: '1' },
+        },
       }
 
       const result = await favoriteHandler(mockEvent as any)
 
       expect(result).toEqual({
         message: 'Edition added to favorites',
-        isFavorited: true
+        isFavorited: true,
       })
 
       expect(prismaMock.user.update).toHaveBeenCalledWith({
         where: { id: mockUser.id },
         data: {
           favoriteEditions: {
-            connect: { id: 1 }
-          }
-        }
+            connect: { id: 1 },
+          },
+        },
       })
     })
 
     it('devrait retirer une édition des favoris', async () => {
       const userWithFavorites = {
         ...mockUser,
-        favoriteEditions: [mockEdition]
+        favoriteEditions: [mockEdition],
       }
 
       prismaMock.user.findUnique.mockResolvedValue(userWithFavorites)
       prismaMock.user.update.mockResolvedValue({
         ...userWithFavorites,
-        favoriteEditions: []
+        favoriteEditions: [],
       })
 
       const mockEvent = {
         context: {
           user: mockUser,
-          params: { id: '1' }
-        }
+          params: { id: '1' },
+        },
       }
 
       const result = await favoriteHandler(mockEvent as any)
 
       expect(result).toEqual({
         message: 'Edition removed from favorites',
-        isFavorited: false
+        isFavorited: false,
       })
 
       expect(prismaMock.user.update).toHaveBeenCalledWith({
         where: { id: mockUser.id },
         data: {
           favoriteEditions: {
-            disconnect: { id: 1 }
-          }
-        }
+            disconnect: { id: 1 },
+          },
+        },
       })
     })
 
@@ -126,8 +127,8 @@ describe('Système de favoris', () => {
       const mockEvent = {
         context: {
           user: mockUser,
-          params: { id: '1' }
-        }
+          params: { id: '1' },
+        },
       }
 
       await expect(favoriteHandler(mockEvent as any)).rejects.toThrow()
@@ -139,8 +140,8 @@ describe('Système de favoris', () => {
       const mockEvent = {
         context: {
           user: mockUser,
-          params: { id: '1' }
-        }
+          params: { id: '1' },
+        },
       }
 
       await expect(favoriteHandler(mockEvent as any)).rejects.toThrow()
@@ -155,22 +156,22 @@ describe('Système de favoris', () => {
           {
             id: 1,
             name: 'Convention Test',
-            favoritedBy: []
-          }
+            favoritedBy: [],
+          },
         ],
-        toggleFavorite: vi.fn()
+        toggleFavorite: vi.fn(),
       }
 
       const mockFetch = vi.fn().mockResolvedValue({
         message: 'Edition added to favorites',
-        isFavorited: true
+        isFavorited: true,
       })
 
       // Simuler l'ajout optimiste
       const editionId = 1
       const userId = 1
-      const edition = mockStore.editions.find(e => e.id === editionId)
-      
+      const edition = mockStore.editions.find((e) => e.id === editionId)
+
       if (edition) {
         // Ajout optimiste
         edition.favoritedBy.push({ id: userId, pseudo: 'testuser' } as any)
@@ -180,26 +181,26 @@ describe('Système de favoris', () => {
       expect(edition?.favoritedBy[0].id).toBe(userId)
     })
 
-    it('devrait annuler la mise à jour optimiste en cas d\'erreur', async () => {
+    it("devrait annuler la mise à jour optimiste en cas d'erreur", async () => {
       const mockStore = {
         editions: [
           {
             id: 1,
             name: 'Convention Test',
-            favoritedBy: [{ id: 1, pseudo: 'testuser' }]
-          }
-        ]
+            favoritedBy: [{ id: 1, pseudo: 'testuser' }],
+          },
+        ],
       }
 
       const mockFetch = vi.fn().mockRejectedValue(new Error('Network error'))
 
       const editionId = 1
       const userId = 1
-      const edition = mockStore.editions.find(e => e.id === editionId)
-      
+      const edition = mockStore.editions.find((e) => e.id === editionId)
+
       // Simuler la suppression optimiste
       if (edition) {
-        const userIndex = edition.favoritedBy.findIndex(u => u.id === userId)
+        const userIndex = edition.favoritedBy.findIndex((u) => u.id === userId)
         if (userIndex > -1) {
           edition.favoritedBy.splice(userIndex, 1)
         }
@@ -222,28 +223,28 @@ describe('Système de favoris', () => {
   })
 
   describe('Validation et sécurité', () => {
-    it('devrait valider que l\'édition existe avant de l\'ajouter aux favoris', async () => {
+    it("devrait valider que l'édition existe avant de l'ajouter aux favoris", async () => {
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
       prismaMock.edition.findUnique.mockResolvedValue(null)
 
       // Simuler une validation d'existence d'édition
       const editionExists = await prismaMock.edition.findUnique({
-        where: { id: 999 }
+        where: { id: 999 },
       })
 
       expect(editionExists).toBeNull()
     })
 
-    it('devrait empêcher un utilisateur d\'ajouter la même édition plusieurs fois', async () => {
+    it("devrait empêcher un utilisateur d'ajouter la même édition plusieurs fois", async () => {
       const userWithFavorites = {
         ...mockUser,
-        favoriteEditions: [mockEdition]
+        favoriteEditions: [mockEdition],
       }
 
       prismaMock.user.findUnique.mockResolvedValue(userWithFavorites)
 
       const isAlreadyFavorited = userWithFavorites.favoriteEditions.some(
-        edition => edition.id === mockEdition.id
+        (edition) => edition.id === mockEdition.id
       )
 
       expect(isAlreadyFavorited).toBe(true)
@@ -253,12 +254,12 @@ describe('Système de favoris', () => {
       const maxFavorites = 100
       const tooManyFavorites = Array.from({ length: 101 }, (_, i) => ({
         id: i + 1,
-        name: `Edition ${i + 1}`
+        name: `Edition ${i + 1}`,
       }))
 
       const userWithTooManyFavorites = {
         ...mockUser,
-        favoriteEditions: tooManyFavorites
+        favoriteEditions: tooManyFavorites,
       }
 
       const canAddMoreFavorites = userWithTooManyFavorites.favoriteEditions.length < maxFavorites
@@ -273,17 +274,17 @@ describe('Système de favoris', () => {
       const editionWithFavorite = {
         id: 1,
         name: 'Convention Test',
-        favoritedBy: [user]
+        favoritedBy: [user],
       }
 
       const editionWithoutFavorite = {
         id: 2,
         name: 'Convention Test 2',
-        favoritedBy: []
+        favoritedBy: [],
       }
 
-      const isFavorited1 = editionWithFavorite.favoritedBy.some(u => u.id === user.id)
-      const isFavorited2 = editionWithoutFavorite.favoritedBy.some(u => u.id === user.id)
+      const isFavorited1 = editionWithFavorite.favoritedBy.some((u) => u.id === user.id)
+      const isFavorited2 = editionWithoutFavorite.favoritedBy.some((u) => u.id === user.id)
 
       expect(isFavorited1).toBe(true)
       expect(isFavorited2).toBe(false)
@@ -293,7 +294,7 @@ describe('Système de favoris', () => {
       const messages = {
         added: 'Édition ajoutée aux favoris',
         removed: 'Édition retirée des favoris',
-        error: 'Erreur lors de la mise à jour des favoris'
+        error: 'Erreur lors de la mise à jour des favoris',
       }
 
       expect(messages.added).toBe('Édition ajoutée aux favoris')
@@ -307,12 +308,12 @@ describe('Système de favoris', () => {
       const allEditions = [
         { id: 1, name: 'Convention A', favoritedBy: [{ id: 1 }] },
         { id: 2, name: 'Convention B', favoritedBy: [] },
-        { id: 3, name: 'Convention C', favoritedBy: [{ id: 1 }] }
+        { id: 3, name: 'Convention C', favoritedBy: [{ id: 1 }] },
       ]
 
       const userId = 1
-      const favoriteEditions = allEditions.filter(edition => 
-        edition.favoritedBy.some(u => u.id === userId)
+      const favoriteEditions = allEditions.filter((edition) =>
+        edition.favoritedBy.some((u) => u.id === userId)
       )
 
       expect(favoriteEditions).toHaveLength(2)
@@ -324,11 +325,11 @@ describe('Système de favoris', () => {
       const favoriteEditions = [
         { id: 1, name: 'Convention Jonglerie Paris' },
         { id: 2, name: 'Festival Cirque Lyon' },
-        { id: 3, name: 'Convention Jonglage Toulouse' }
+        { id: 3, name: 'Convention Jonglage Toulouse' },
       ]
 
       const searchTerm = 'jongl'
-      const filteredFavorites = favoriteEditions.filter(edition =>
+      const filteredFavorites = favoriteEditions.filter((edition) =>
         edition.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
 
@@ -343,7 +344,7 @@ describe('Système de favoris', () => {
       const cacheKey = 'user_1_favorites'
       const favorites = [
         { id: 1, name: 'Convention A' },
-        { id: 2, name: 'Convention B' }
+        { id: 2, name: 'Convention B' },
       ]
 
       // Mock d'un simple cache en mémoire
@@ -357,7 +358,7 @@ describe('Système de favoris', () => {
     it('devrait invalider le cache après modification', () => {
       const cache = new Map()
       const cacheKey = 'user_1_favorites'
-      
+
       // Ajouter au cache
       cache.set(cacheKey, [{ id: 1, name: 'Convention A' }])
       expect(cache.has(cacheKey)).toBe(true)
@@ -368,7 +369,7 @@ describe('Système de favoris', () => {
     })
   })
 
-  describe('Intégration avec d\'autres fonctionnalités', () => {
+  describe("Intégration avec d'autres fonctionnalités", () => {
     it('devrait synchroniser les favoris avec les notifications', () => {
       const user = { id: 1, notifications: [] }
       const favoriteEdition = { id: 1, name: 'Convention Test' }
@@ -377,7 +378,7 @@ describe('Système de favoris', () => {
       const notification = {
         type: 'favorite_added',
         message: `${favoriteEdition.name} ajoutée aux favoris`,
-        timestamp: new Date()
+        timestamp: new Date(),
       }
 
       user.notifications.push(notification)
@@ -389,12 +390,12 @@ describe('Système de favoris', () => {
     it('devrait exporter les favoris', () => {
       const favorites = [
         { id: 1, name: 'Convention Paris', startDate: '2024-06-01' },
-        { id: 2, name: 'Convention Lyon', startDate: '2024-07-01' }
+        { id: 2, name: 'Convention Lyon', startDate: '2024-07-01' },
       ]
 
       // Simuler export CSV
       const csvHeaders = 'id,name,startDate\n'
-      const csvData = favorites.map(f => `${f.id},"${f.name}",${f.startDate}`).join('\n')
+      const csvData = favorites.map((f) => `${f.id},"${f.name}",${f.startDate}`).join('\n')
       const csvExport = csvHeaders + csvData
 
       expect(csvExport).toContain('Convention Paris')

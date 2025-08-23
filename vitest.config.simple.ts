@@ -14,7 +14,7 @@ export default defineConfig({
       '**/e2e/**',
       '**/integration/**',
       '**/*.nuxt.test.ts',
-      '**/*.db.test.ts'
-    ]
-  }
+      '**/*.db.test.ts',
+    ],
+  },
 })

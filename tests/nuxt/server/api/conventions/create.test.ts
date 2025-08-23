@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../../../../__mocks__/prisma';
 
 // Import du handler après les mocks
 import createConventionHandler from '../../../../../server/api/conventions/index.post'
 import { getEmailHash } from '../../../../../server/utils/email-hash'
+import { prismaMock } from '../../../../__mocks__/prisma'
 
 describe('API Convention - Création', () => {
   const mockUser = {
@@ -11,7 +11,7 @@ describe('API Convention - Création', () => {
     email: 'creator@example.com',
     pseudo: 'creator',
     nom: 'Creator',
-    prenom: 'Test'
+    prenom: 'Test',
   }
 
   const rawConvention = {
@@ -25,8 +25,8 @@ describe('API Convention - Création', () => {
     author: {
       id: 1,
       pseudo: 'creator',
-      email: 'creator@example.com'
-    }
+      email: 'creator@example.com',
+    },
   }
   const transformedExpectation = () => ({
     ...rawConvention,
@@ -34,7 +34,7 @@ describe('API Convention - Création', () => {
       id: rawConvention.author.id,
       pseudo: rawConvention.author.pseudo,
       email: undefined,
-      emailHash: getEmailHash(rawConvention.author.email)
+      emailHash: getEmailHash(rawConvention.author.email),
     },
     collaborators: [
       {
@@ -47,78 +47,80 @@ describe('API Convention - Création', () => {
           manageCollaborators: true,
           addEdition: true,
           editAllEditions: true,
-          deleteAllEditions: true
+          deleteAllEditions: true,
         },
         user: {
           id: mockUser.id,
           pseudo: mockUser.pseudo,
           email: undefined,
-          emailHash: getEmailHash(mockUser.email)
+          emailHash: getEmailHash(mockUser.email),
         },
-        addedBy: { id: mockUser.id, pseudo: mockUser.pseudo }
-      }
-    ]
-  });
+        addedBy: { id: mockUser.id, pseudo: mockUser.pseudo },
+      },
+    ],
+  })
 
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   it('devrait créer une nouvelle convention avec succès', async () => {
-  prismaMock.convention.create.mockResolvedValue(rawConvention as any)
+    prismaMock.convention.create.mockResolvedValue(rawConvention as any)
     prismaMock.conventionCollaborator.create.mockResolvedValue({
       id: 1,
       conventionId: 1,
       userId: 1,
       addedById: 1,
-      createdAt: new Date()
+      createdAt: new Date(),
     })
     prismaMock.convention.findUnique.mockResolvedValue({
       ...rawConvention,
-      collaborators: [{
-        id: 1,
-        title: 'Créateur',
-        addedAt: new Date(),
-        canEditConvention: true,
-        canDeleteConvention: true,
-        canManageCollaborators: true,
-        canAddEdition: true,
-        canEditAllEditions: true,
-        canDeleteAllEditions: true,
-        user: { ...mockUser },
-        addedBy: { id: 1, pseudo: 'creator' }
-      }]
+      collaborators: [
+        {
+          id: 1,
+          title: 'Créateur',
+          addedAt: new Date(),
+          canEditConvention: true,
+          canDeleteConvention: true,
+          canManageCollaborators: true,
+          canAddEdition: true,
+          canEditAllEditions: true,
+          canDeleteAllEditions: true,
+          user: { ...mockUser },
+          addedBy: { id: 1, pseudo: 'creator' },
+        },
+      ],
     } as any)
 
     const requestBody = {
       name: 'Convention de Test',
-      description: 'Une convention pour les tests'
+      description: 'Une convention pour les tests',
     }
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
     global.readBody.mockResolvedValue(requestBody)
 
     const result = await createConventionHandler(mockEvent)
 
-  expect(result).toEqual(transformedExpectation())
+    expect(result).toEqual(transformedExpectation())
     expect(prismaMock.convention.create).toHaveBeenCalledWith({
       data: {
         name: 'Convention de Test',
         description: 'Une convention pour les tests',
         logo: null,
-        authorId: mockUser.id
+        authorId: mockUser.id,
       },
       include: {
         author: {
           select: {
             id: true,
             pseudo: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     })
     expect(prismaMock.conventionCollaborator.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
@@ -132,17 +134,17 @@ describe('API Convention - Création', () => {
         canAddEdition: true,
         canEditAllEditions: true,
         canDeleteAllEditions: true,
-      })
+      }),
     })
   })
 
   it('devrait rejeter les utilisateurs non authentifiés', async () => {
     const requestBody = {
-      name: 'Convention Test'
+      name: 'Convention Test',
     }
 
     const mockEvent = {
-      context: { user: null }
+      context: { user: null },
     }
     global.readBody.mockResolvedValue(requestBody)
 
@@ -152,46 +154,46 @@ describe('API Convention - Création', () => {
   it('devrait valider le nom de convention', async () => {
     const requestBody = {
       name: '', // Nom vide
-      description: 'Test'
+      description: 'Test',
     }
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(createConventionHandler(mockEvent)).rejects.toThrow()
   })
 
-  it('devrait sanitiser les données d\'entrée', async () => {
-  prismaMock.convention.create.mockResolvedValue(rawConvention as any)
+  it("devrait sanitiser les données d'entrée", async () => {
+    prismaMock.convention.create.mockResolvedValue(rawConvention as any)
     prismaMock.conventionCollaborator.create.mockResolvedValue({
       id: 1,
       conventionId: 1,
       userId: 1,
       role: 'ADMINISTRATOR',
       addedById: 1,
-      createdAt: new Date()
+      createdAt: new Date(),
     })
     prismaMock.convention.findUnique.mockResolvedValue({
       ...rawConvention,
-      collaborators: []
+      collaborators: [],
     } as any)
 
     const requestBody = {
       name: '  Convention avec espaces  ',
       description: '  Description avec espaces  ',
-      logo: '  '
+      logo: '  ',
     }
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
     global.readBody.mockResolvedValue(requestBody)
 
     await createConventionHandler(mockEvent)
 
-  expect(prismaMock.convention.create).toHaveBeenCalled()
+    expect(prismaMock.convention.create).toHaveBeenCalled()
   })
 
   it('devrait gérer les erreurs de base de données', async () => {
@@ -199,11 +201,11 @@ describe('API Convention - Création', () => {
 
     const requestBody = {
       name: 'Convention Test',
-      description: 'Test'
+      description: 'Test',
     }
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
     global.readBody.mockResolvedValue(requestBody)
 

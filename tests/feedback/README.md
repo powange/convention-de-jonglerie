@@ -11,13 +11,15 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 ### 1. Tests unitaires API (`tests/server/api/feedback/`)
 
 **Fichier**: `tests/server/api/feedback/index.post.test.ts`
+
 - ✅ Tests de création de feedback pour utilisateurs connectés
 - ✅ Tests de création de feedback pour utilisateurs anonymes
 - ✅ Validation reCAPTCHA pour visiteurs non connectés
 - ✅ Validation des données d'entrée (types, longueurs, formats)
 - ✅ Gestion des erreurs et cas limites
 
-**Couverture**: 
+**Couverture**:
+
 - Création de feedback avec/sans authentification
 - Validation des schémas Zod
 - Intégration reCAPTCHA Google v2
@@ -26,6 +28,7 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 ### 2. Tests unitaires Admin API (`tests/server/api/admin/feedback/`)
 
 **Fichier**: `tests/server/api/admin/feedback/index.get.test.ts`
+
 - ✅ Tests d'autorisation admin (403 pour non-admin)
 - ✅ Récupération paginée des feedbacks
 - ✅ Filtres de recherche et tri
@@ -33,6 +36,7 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 - ✅ Gestion des erreurs
 
 **Fichier**: `tests/server/api/admin/feedback/resolve.put.test.ts`
+
 - ✅ Résolution/réouverture de feedbacks
 - ✅ Ajout de notes d'administration
 - ✅ Validation des paramètres (ID, données)
@@ -42,6 +46,7 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 ### 3. Tests d'intégration composant (`tests/components/`)
 
 **Fichier**: `tests/components/FeedbackModal.nuxt.test.ts`
+
 - ✅ Rendu conditionnel selon l'état d'authentification
 - ✅ Validation du formulaire côté client
 - ✅ Intégration reCAPTCHA pour visiteurs
@@ -52,6 +57,7 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 ### 4. Tests de page admin (`tests/pages/admin/`)
 
 **Fichier**: `tests/pages/admin/feedback.nuxt.test.ts`
+
 - ✅ Rendu de l'interface d'administration
 - ✅ Affichage des statistiques
 - ✅ Fonctionnalité de recherche avec debounce
@@ -63,6 +69,7 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 ### 5. Tests d'intégration base de données (`tests/integration/`)
 
 **Fichier**: `tests/integration/feedback.db.test.ts`
+
 - ✅ CRUD complet avec Prisma et MySQL
 - ✅ Relations utilisateur <-> feedback
 - ✅ Contraintes de base de données
@@ -73,6 +80,7 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 ### 6. Tests de sécurité (`tests/security/`)
 
 **Fichier**: `tests/security/feedback-security.test.ts`
+
 - ✅ Contrôle d'accès et permissions
 - ✅ Validation et sanitisation des entrées
 - ✅ Prévention injection SQL/NoSQL
@@ -83,21 +91,25 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 ## Types de tests par niveau
 
 ### Tests unitaires
+
 - **Cible**: Fonctions isolées et handlers API
 - **Mocks**: Base de données (Prisma), services externes
 - **Focalisés sur**: Logique métier, validation, cas limites
 
 ### Tests d'intégration
+
 - **Cible**: Composants Vue avec leurs dépendances
 - **Mocks**: APIs externes, mais composables Nuxt réels
 - **Focalisés sur**: Interactions utilisateur, rendu conditionnel
 
 ### Tests de base de données
+
 - **Cible**: Requêtes Prisma avec vraie base MySQL
 - **Mocks**: Aucun (base de données de test)
 - **Focalisés sur**: Intégrité des données, performances
 
 ### Tests de sécurité
+
 - **Cible**: Vulnérabilités et vecteurs d'attaque
 - **Mocks**: Selon le contexte
 - **Focalisés sur**: Authentification, autorisation, validation
@@ -105,8 +117,9 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 ## Couverture de tests
 
 ### Fonctionnalités testées
+
 - [x] Création feedback utilisateurs connectés
-- [x] Création feedback utilisateurs anonymes  
+- [x] Création feedback utilisateurs anonymes
 - [x] Validation reCAPTCHA pour anonymes
 - [x] Interface administration complète
 - [x] Résolution/réouverture feedbacks
@@ -119,6 +132,7 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 - [x] Relations base de données
 
 ### Scénarios testés
+
 - [x] Utilisateur connecté soumet bug report
 - [x] Visiteur anonyme soumet suggestion avec CAPTCHA
 - [x] Admin visualise tous les feedbacks
@@ -132,11 +146,13 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 ## Lancement des tests
 
 ### Tous les tests
+
 ```bash
 npm run test:run
 ```
 
 ### Tests spécifiques au feedback
+
 ```bash
 # Tests unitaires API seulement
 npm run test -- tests/server/api/feedback/
@@ -157,6 +173,7 @@ npm run test -- --grep "feedback"
 ```
 
 ### Tests avec base de données
+
 ```bash
 # Démarrer MySQL pour tests
 npm run test:db
@@ -167,6 +184,7 @@ npm run test -- tests/integration/feedback.db.test.ts
 ```
 
 ### Mode développement
+
 ```bash
 # Watch mode pour développer les tests
 npm run test -- --watch
@@ -178,6 +196,7 @@ npm run test:ui
 ## Environnement de test
 
 ### Variables d'environnement requises
+
 ```env
 # Base de données de test
 TEST_DATABASE_URL="mysql://test:test@localhost:3306/juggling_test"
@@ -191,6 +210,7 @@ NUXT_SESSION_PASSWORD="test-session-secret-key"
 ```
 
 ### Configuration Vitest
+
 - **Environment**: `nuxt` pour tests composants
 - **Setup**: Mocks Prisma, composables Nuxt
 - **Timeout**: 30s pour tests DB
@@ -199,12 +219,14 @@ NUXT_SESSION_PASSWORD="test-session-secret-key"
 ## Mocks et utilitaires
 
 ### Mocks principaux
+
 - `prismaMock`: Prisma Client simulé
-- `$fetch`: Requêtes HTTP simulées  
+- `$fetch`: Requêtes HTTP simulées
 - `useI18n`, `useToast`, `useAuthStore`: Composables Nuxt
 - `grecaptcha`: reCAPTCHA Google
 
 ### Données de test
+
 - Utilisateurs: normal, admin, anonyme
 - Feedbacks: tous types (BUG, SUGGESTION, GENERAL, COMPLAINT)
 - Scénarios: résolus/non résolus, avec/sans notes admin
@@ -212,20 +234,23 @@ NUXT_SESSION_PASSWORD="test-session-secret-key"
 ## Métriques de qualité
 
 ### Objectifs de couverture
+
 - **Statements**: > 90%
 - **Branches**: > 85%
 - **Functions**: > 95%
 - **Lines**: > 90%
 
 ### Performance
+
 - Tests unitaires: < 100ms chacun
-- Tests intégration: < 5s chacun  
+- Tests intégration: < 5s chacun
 - Tests DB: < 10s chacun
 - Suite complète: < 2min
 
 ## Maintenance
 
 ### Ajouter de nouveaux tests
+
 1. Identifier la fonctionnalité à tester
 2. Choisir le type de test approprié
 3. Utiliser les mocks existants
@@ -233,6 +258,7 @@ NUXT_SESSION_PASSWORD="test-session-secret-key"
 5. Documenter les scénarios complexes
 
 ### Debugging
+
 ```bash
 # Mode verbose
 npm run test -- --verbose
@@ -245,7 +271,9 @@ npm run test:watch
 ```
 
 ### CI/CD
+
 Les tests sont exécutés automatiquement sur:
+
 - Pull requests
 - Push sur main
 - Release tags

@@ -1,31 +1,32 @@
 import { PrismaClient } from '@prisma/client'
+
 import { requireUserSession } from '#imports'
 
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   try {
-  // Vérifier l'authentification via la session scellée
-  const { user } = await requireUserSession(event)
-  const userId = user.id
+    // Vérifier l'authentification via la session scellée
+    const { user } = await requireUserSession(event)
+    const userId = user.id
 
     if (!userId) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Token invalide'
+        statusMessage: 'Token invalide',
       })
     }
 
     // Vérifier que l'utilisateur est un super administrateur
     const currentUser = await prisma.user.findUnique({
       where: { id: userId },
-      select: { isGlobalAdmin: true }
+      select: { isGlobalAdmin: true },
     })
 
     if (!currentUser?.isGlobalAdmin) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Accès refusé - Droits super administrateur requis'
+        statusMessage: 'Accès refusé - Droits super administrateur requis',
       })
     }
 
@@ -41,50 +42,50 @@ export default defineEventHandler(async (event) => {
       newConventionsThisMonth,
       totalEditions,
       newEditionsThisMonth,
-      totalAdmins
+      totalAdmins,
     ] = await Promise.all([
       // Total utilisateurs
       prisma.user.count(),
-      
+
       // Nouveaux utilisateurs ce mois
       prisma.user.count({
         where: {
           createdAt: {
-            gte: startOfMonth
-          }
-        }
+            gte: startOfMonth,
+          },
+        },
       }),
-      
+
       // Total conventions
       prisma.convention.count(),
-      
+
       // Nouvelles conventions ce mois
       prisma.convention.count({
         where: {
           createdAt: {
-            gte: startOfMonth
-          }
-        }
+            gte: startOfMonth,
+          },
+        },
       }),
-      
+
       // Total éditions
       prisma.edition.count(),
-      
+
       // Nouvelles éditions ce mois
       prisma.edition.count({
         where: {
           createdAt: {
-            gte: startOfMonth
-          }
-        }
+            gte: startOfMonth,
+          },
+        },
       }),
-      
+
       // Total super administrateurs
       prisma.user.count({
         where: {
-          isGlobalAdmin: true
-        }
-      })
+          isGlobalAdmin: true,
+        },
+      }),
     ])
 
     return {
@@ -94,19 +95,18 @@ export default defineEventHandler(async (event) => {
       newConventionsThisMonth,
       totalEditions,
       newEditionsThisMonth,
-      totalAdmins
+      totalAdmins,
     }
-
   } catch (error) {
     console.error('Erreur lors de la récupération des statistiques:', error)
-    
+
     if (error.statusCode) {
       throw error
     }
-    
+
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur interne du serveur'
+      statusMessage: 'Erreur interne du serveur',
     })
   }
 })

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock du module prisma
 const mockPrisma = {
@@ -8,45 +8,46 @@ const mockPrisma = {
   edition: {
     findUnique: vi.fn(),
   },
-};
+}
 
 vi.mock('../../../../server/utils/prisma', () => ({
   prisma: mockPrisma,
-}));
+}))
 
 // Import des fonctions après les mocks
-const { hasEditionEditPermission, hasEditionDeletePermission } = 
-  await import('../../../../server/utils/permissions');
+const { hasEditionEditPermission, hasEditionDeletePermission } = await import(
+  '../../../../server/utils/permissions'
+)
 
 describe('Permissions', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-  });
+    vi.clearAllMocks()
+  })
 
   describe('hasEditionEditPermission', () => {
-    const userId = 1;
-    const editionId = 100;
+    const userId = 1
+    const editionId = 100
 
-    it('devrait retourner true si l\'utilisateur est admin global', async () => {
+    it("devrait retourner true si l'utilisateur est admin global", async () => {
       mockPrisma.user.findUnique.mockResolvedValue({
         isGlobalAdmin: true,
-      });
+      })
 
-      const result = await hasEditionEditPermission(userId, editionId);
+      const result = await hasEditionEditPermission(userId, editionId)
 
-      expect(result).toBe(true);
+      expect(result).toBe(true)
       expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
         where: { id: userId },
         select: { isGlobalAdmin: true },
-      });
+      })
       // Ne devrait pas vérifier l'édition si admin global
-      expect(mockPrisma.edition.findUnique).not.toHaveBeenCalled();
-    });
+      expect(mockPrisma.edition.findUnique).not.toHaveBeenCalled()
+    })
 
-    it('devrait retourner true si l\'utilisateur est le créateur de l\'édition', async () => {
+    it("devrait retourner true si l'utilisateur est le créateur de l'édition", async () => {
       mockPrisma.user.findUnique.mockResolvedValue({
         isGlobalAdmin: false,
-      });
+      })
 
       mockPrisma.edition.findUnique.mockResolvedValue({
         id: editionId,
@@ -55,11 +56,11 @@ describe('Permissions', () => {
           authorId: 999,
           collaborators: [],
         },
-      });
+      })
 
-      const result = await hasEditionEditPermission(userId, editionId);
+      const result = await hasEditionEditPermission(userId, editionId)
 
-      expect(result).toBe(true);
+      expect(result).toBe(true)
       expect(mockPrisma.edition.findUnique).toHaveBeenCalledWith({
         where: { id: editionId },
         include: {
@@ -69,13 +70,13 @@ describe('Permissions', () => {
             },
           },
         },
-      });
-    });
+      })
+    })
 
-    it('devrait retourner true si l\'utilisateur est l\'auteur de la convention', async () => {
+    it("devrait retourner true si l'utilisateur est l'auteur de la convention", async () => {
       mockPrisma.user.findUnique.mockResolvedValue({
         isGlobalAdmin: false,
-      });
+      })
 
       mockPrisma.edition.findUnique.mockResolvedValue({
         id: editionId,
@@ -84,17 +85,17 @@ describe('Permissions', () => {
           authorId: userId, // L'utilisateur est l'auteur de la convention
           collaborators: [],
         },
-      });
+      })
 
-      const result = await hasEditionEditPermission(userId, editionId);
+      const result = await hasEditionEditPermission(userId, editionId)
 
-      expect(result).toBe(true);
-    });
+      expect(result).toBe(true)
+    })
 
-    it('devrait retourner true si l\'utilisateur est un collaborateur', async () => {
+    it("devrait retourner true si l'utilisateur est un collaborateur", async () => {
       mockPrisma.user.findUnique.mockResolvedValue({
         isGlobalAdmin: false,
-      });
+      })
 
       mockPrisma.edition.findUnique.mockResolvedValue({
         id: editionId,
@@ -107,17 +108,17 @@ describe('Permissions', () => {
             { userId: 666, role: 'MODERATOR' },
           ],
         },
-      });
+      })
 
-      const result = await hasEditionEditPermission(userId, editionId);
+      const result = await hasEditionEditPermission(userId, editionId)
 
-      expect(result).toBe(true);
-    });
+      expect(result).toBe(true)
+    })
 
-    it('devrait retourner false si l\'utilisateur n\'a aucune permission', async () => {
+    it("devrait retourner false si l'utilisateur n'a aucune permission", async () => {
       mockPrisma.user.findUnique.mockResolvedValue({
         isGlobalAdmin: false,
-      });
+      })
 
       mockPrisma.edition.findUnique.mockResolvedValue({
         id: editionId,
@@ -129,27 +130,27 @@ describe('Permissions', () => {
             { userId: 666, role: 'ADMINISTRATOR' },
           ],
         },
-      });
+      })
 
-      const result = await hasEditionEditPermission(userId, editionId);
+      const result = await hasEditionEditPermission(userId, editionId)
 
-      expect(result).toBe(false);
-    });
+      expect(result).toBe(false)
+    })
 
-    it('devrait retourner false si l\'édition n\'existe pas', async () => {
+    it("devrait retourner false si l'édition n'existe pas", async () => {
       mockPrisma.user.findUnique.mockResolvedValue({
         isGlobalAdmin: false,
-      });
+      })
 
-      mockPrisma.edition.findUnique.mockResolvedValue(null);
+      mockPrisma.edition.findUnique.mockResolvedValue(null)
 
-      const result = await hasEditionEditPermission(userId, editionId);
+      const result = await hasEditionEditPermission(userId, editionId)
 
-      expect(result).toBe(false);
-    });
+      expect(result).toBe(false)
+    })
 
-    it('devrait continuer à vérifier les permissions même si l\'utilisateur n\'existe pas', async () => {
-      mockPrisma.user.findUnique.mockResolvedValue(null);
+    it("devrait continuer à vérifier les permissions même si l'utilisateur n'existe pas", async () => {
+      mockPrisma.user.findUnique.mockResolvedValue(null)
 
       // Si l'utilisateur n'existe pas mais qu'il est créateur de l'édition, la fonction retourne true
       // (ce qui peut être un cas limite dans les données)
@@ -160,17 +161,17 @@ describe('Permissions', () => {
           authorId: 888,
           collaborators: [],
         },
-      });
+      })
 
-      const result = await hasEditionEditPermission(userId, editionId);
+      const result = await hasEditionEditPermission(userId, editionId)
 
-      expect(result).toBe(true); // Car creatorId === userId
-    });
+      expect(result).toBe(true) // Car creatorId === userId
+    })
 
     it('devrait gérer les cas avec des collaborateurs vides', async () => {
       mockPrisma.user.findUnique.mockResolvedValue({
         isGlobalAdmin: false,
-      });
+      })
 
       mockPrisma.edition.findUnique.mockResolvedValue({
         id: editionId,
@@ -179,19 +180,19 @@ describe('Permissions', () => {
           authorId: 888,
           collaborators: [], // Pas de collaborateurs
         },
-      });
+      })
 
-      const result = await hasEditionEditPermission(userId, editionId);
+      const result = await hasEditionEditPermission(userId, editionId)
 
-      expect(result).toBe(false);
-    });
+      expect(result).toBe(false)
+    })
 
-    it('devrait vérifier toutes les conditions dans l\'ordre', async () => {
-      const testUser = 2;
-      
+    it("devrait vérifier toutes les conditions dans l'ordre", async () => {
+      const testUser = 2
+
       mockPrisma.user.findUnique.mockResolvedValue({
         isGlobalAdmin: false,
-      });
+      })
 
       mockPrisma.edition.findUnique.mockResolvedValue({
         id: editionId,
@@ -202,45 +203,45 @@ describe('Permissions', () => {
             { userId: testUser, role: 'ADMINISTRATOR' }, // ET collaborateur
           ],
         },
-      });
+      })
 
-      const result = await hasEditionEditPermission(testUser, editionId);
+      const result = await hasEditionEditPermission(testUser, editionId)
 
       // Devrait retourner true dès la première condition remplie (créateur)
-      expect(result).toBe(true);
-    });
+      expect(result).toBe(true)
+    })
 
     it('devrait gérer les erreurs de base de données', async () => {
-      mockPrisma.user.findUnique.mockRejectedValue(new Error('DB Error'));
+      mockPrisma.user.findUnique.mockRejectedValue(new Error('DB Error'))
 
-      await expect(hasEditionEditPermission(userId, editionId)).rejects.toThrow('DB Error');
-    });
-  });
+      await expect(hasEditionEditPermission(userId, editionId)).rejects.toThrow('DB Error')
+    })
+  })
 
   describe('hasEditionDeletePermission', () => {
     it('devrait utiliser les mêmes permissions que hasEditionEditPermission', async () => {
-      const userId = 1;
-      const editionId = 100;
+      const userId = 1
+      const editionId = 100
 
       // Test avec admin global
       mockPrisma.user.findUnique.mockResolvedValue({
         isGlobalAdmin: true,
-      });
+      })
 
-      const deleteResult = await hasEditionDeletePermission(userId, editionId);
-      const editResult = await hasEditionEditPermission(userId, editionId);
+      const deleteResult = await hasEditionDeletePermission(userId, editionId)
+      const editResult = await hasEditionEditPermission(userId, editionId)
 
-      expect(deleteResult).toBe(editResult);
-      expect(deleteResult).toBe(true);
-    });
+      expect(deleteResult).toBe(editResult)
+      expect(deleteResult).toBe(true)
+    })
 
     it('devrait retourner false pour un utilisateur sans permissions', async () => {
-      const userId = 1;
-      const editionId = 100;
+      const userId = 1
+      const editionId = 100
 
       mockPrisma.user.findUnique.mockResolvedValue({
         isGlobalAdmin: false,
-      });
+      })
 
       mockPrisma.edition.findUnique.mockResolvedValue({
         id: editionId,
@@ -249,20 +250,20 @@ describe('Permissions', () => {
           authorId: 888,
           collaborators: [],
         },
-      });
+      })
 
-      const result = await hasEditionDeletePermission(userId, editionId);
+      const result = await hasEditionDeletePermission(userId, editionId)
 
-      expect(result).toBe(false);
-    });
+      expect(result).toBe(false)
+    })
 
-    it('devrait retourner true pour le créateur de l\'édition', async () => {
-      const userId = 1;
-      const editionId = 100;
+    it("devrait retourner true pour le créateur de l'édition", async () => {
+      const userId = 1
+      const editionId = 100
 
       mockPrisma.user.findUnique.mockResolvedValue({
         isGlobalAdmin: false,
-      });
+      })
 
       mockPrisma.edition.findUnique.mockResolvedValue({
         id: editionId,
@@ -271,13 +272,13 @@ describe('Permissions', () => {
           authorId: 999,
           collaborators: [],
         },
-      });
+      })
 
-      const result = await hasEditionDeletePermission(userId, editionId);
+      const result = await hasEditionDeletePermission(userId, editionId)
 
-      expect(result).toBe(true);
-    });
-  });
+      expect(result).toBe(true)
+    })
+  })
 
   describe('Intégration des permissions', () => {
     it('devrait vérifier correctement les permissions multiples', async () => {
@@ -289,7 +290,7 @@ describe('Permissions', () => {
           expected: true,
         },
         {
-          name: 'Créateur de l\'édition',
+          name: "Créateur de l'édition",
           user: { isGlobalAdmin: false },
           edition: {
             creatorId: 1,
@@ -327,15 +328,15 @@ describe('Permissions', () => {
           },
           expected: false,
         },
-      ];
+      ]
 
       for (const scenario of scenarios) {
-        mockPrisma.user.findUnique.mockResolvedValue(scenario.user);
-        mockPrisma.edition.findUnique.mockResolvedValue(scenario.edition);
+        mockPrisma.user.findUnique.mockResolvedValue(scenario.user)
+        mockPrisma.edition.findUnique.mockResolvedValue(scenario.edition)
 
-        const result = await hasEditionEditPermission(1, 100);
-        expect(result).toBe(scenario.expected);
+        const result = await hasEditionEditPermission(1, 100)
+        expect(result).toBe(scenario.expected)
       }
-    });
-  });
-});
+    })
+  })
+})

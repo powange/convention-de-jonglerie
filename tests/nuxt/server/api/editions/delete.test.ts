@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import handler from '../../../../server/api/editions/[id].delete';
-import { prismaMock } from '../../../../__mocks__/prisma';
+import { describe, it, expect, beforeEach } from 'vitest'
+
+import { prismaMock } from '../../../../__mocks__/prisma'
+import handler from '../../../../server/api/editions/[id].delete'
 
 const mockEvent = {
   context: {
@@ -11,13 +12,13 @@ const mockEvent = {
       pseudo: 'admin',
     },
   },
-};
+}
 
 describe('/api/editions/[id] DELETE', () => {
   beforeEach(() => {
-    prismaMock.edition.findUnique.mockReset();
-    prismaMock.edition.delete.mockReset();
-  });
+    prismaMock.edition.findUnique.mockReset()
+    prismaMock.edition.delete.mockReset()
+  })
 
   it('devrait supprimer une édition en tant que créateur', async () => {
     const mockEdition = {
@@ -29,22 +30,22 @@ describe('/api/editions/[id] DELETE', () => {
         authorId: 2,
         collaborators: [],
       },
-    };
+    }
 
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    prismaMock.edition.delete.mockResolvedValue(mockEdition);
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    prismaMock.edition.delete.mockResolvedValue(mockEdition)
 
-    const result = await handler(mockEvent as any);
+    const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
       message: 'Edition deleted successfully',
-    });
+    })
     expect(prismaMock.edition.delete).toHaveBeenCalledWith({
       where: { id: 1 },
-    });
-  });
+    })
+  })
 
-  it('devrait supprimer une édition en tant qu\'auteur de la convention', async () => {
+  it("devrait supprimer une édition en tant qu'auteur de la convention", async () => {
     const mockEdition = {
       id: 1,
       name: 'Edition Test',
@@ -54,17 +55,17 @@ describe('/api/editions/[id] DELETE', () => {
         authorId: 1, // Mais il est l'auteur de la convention
         collaborators: [],
       },
-    };
+    }
 
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    prismaMock.edition.delete.mockResolvedValue(mockEdition);
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    prismaMock.edition.delete.mockResolvedValue(mockEdition)
 
-    const result = await handler(mockEvent as any);
+    const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
       message: 'Edition deleted successfully',
-    });
-  });
+    })
+  })
 
   it('devrait supprimer une édition en tant que collaborateur MODERATOR', async () => {
     const mockEdition = {
@@ -81,17 +82,17 @@ describe('/api/editions/[id] DELETE', () => {
           },
         ],
       },
-    };
+    }
 
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    prismaMock.edition.delete.mockResolvedValue(mockEdition);
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    prismaMock.edition.delete.mockResolvedValue(mockEdition)
 
-    const result = await handler(mockEvent as any);
+    const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
       message: 'Edition deleted successfully',
-    });
-  });
+    })
+  })
 
   it('devrait supprimer une édition en tant que collaborateur ADMINISTRATOR', async () => {
     const mockEdition = {
@@ -108,25 +109,25 @@ describe('/api/editions/[id] DELETE', () => {
           },
         ],
       },
-    };
+    }
 
-      prismaMock.edition.findUnique.mockResolvedValue({
-        ...mockEdition,
-        convention: {
-          ...mockEdition.convention,
-          collaborators: [{ userId: 1, canDeleteConvention: true }],
-        },
-      });
-    prismaMock.edition.delete.mockResolvedValue(mockEdition);
+    prismaMock.edition.findUnique.mockResolvedValue({
+      ...mockEdition,
+      convention: {
+        ...mockEdition.convention,
+        collaborators: [{ userId: 1, canDeleteConvention: true }],
+      },
+    })
+    prismaMock.edition.delete.mockResolvedValue(mockEdition)
 
-    const result = await handler(mockEvent as any);
+    const result = await handler(mockEvent as any)
 
     expect(result).toEqual({
       message: 'Edition deleted successfully',
-    });
-  });
+    })
+  })
 
-  it('devrait supprimer une édition en tant qu\'admin global', async () => {
+  it("devrait supprimer une édition en tant qu'admin global", async () => {
     const mockEdition = {
       id: 1,
       name: 'Edition Test',
@@ -136,7 +137,7 @@ describe('/api/editions/[id] DELETE', () => {
         authorId: 3,
         collaborators: [],
       },
-    };
+    }
 
     const eventWithGlobalAdmin = {
       ...mockEvent,
@@ -147,41 +148,41 @@ describe('/api/editions/[id] DELETE', () => {
           isGlobalAdmin: true,
         },
       },
-    };
+    }
 
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    prismaMock.edition.delete.mockResolvedValue(mockEdition);
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    prismaMock.edition.delete.mockResolvedValue(mockEdition)
 
-    const result = await handler(eventWithGlobalAdmin as any);
+    const result = await handler(eventWithGlobalAdmin as any)
 
     expect(result).toEqual({
       message: 'Edition deleted successfully',
-    });
-  });
+    })
+  })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
     const eventWithoutUser = {
       ...mockEvent,
       context: { ...mockEvent.context, user: null },
-    };
+    }
 
-    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Unauthorized');
-  });
+    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Unauthorized')
+  })
 
-  it('devrait rejeter un ID d\'édition invalide', async () => {
+  it("devrait rejeter un ID d'édition invalide", async () => {
     const eventWithBadId = {
       ...mockEvent,
       context: { ...mockEvent.context, params: { id: 'invalid' } },
-    };
+    }
 
-    await expect(handler(eventWithBadId as any)).rejects.toThrow('Invalid Edition ID');
-  });
+    await expect(handler(eventWithBadId as any)).rejects.toThrow('Invalid Edition ID')
+  })
 
   it('devrait rejeter si édition introuvable', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(null);
+    prismaMock.edition.findUnique.mockResolvedValue(null)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Edition not found');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow('Edition not found')
+  })
 
   it('devrait rejeter si utilisateur sans droits', async () => {
     const mockEdition = {
@@ -193,7 +194,7 @@ describe('/api/editions/[id] DELETE', () => {
         authorId: 3, // Ni l'auteur de la convention
         collaborators: [], // Ni un collaborateur
       },
-    };
+    }
 
     const eventWithoutGlobalAdmin = {
       ...mockEvent,
@@ -204,14 +205,14 @@ describe('/api/editions/[id] DELETE', () => {
           isGlobalAdmin: false,
         },
       },
-    };
+    }
 
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
 
     await expect(handler(eventWithoutGlobalAdmin as any)).rejects.toThrow(
-      'Vous n\'avez pas les droits pour supprimer cette édition'
-    );
-  });
+      "Vous n'avez pas les droits pour supprimer cette édition"
+    )
+  })
 
   it('devrait rejeter si collaborateur VIEWER uniquement', async () => {
     const mockEdition = {
@@ -222,20 +223,20 @@ describe('/api/editions/[id] DELETE', () => {
         authorId: 3,
         collaborators: [], // VIEWER ne correspond pas aux critères de la requête (MODERATOR/ADMINISTRATOR seulement)
       },
-    };
+    }
 
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
 
     await expect(handler(mockEvent as any)).rejects.toThrow(
-      'Vous n\'avez pas les droits pour supprimer cette édition'
-    );
-  });
+      "Vous n'avez pas les droits pour supprimer cette édition"
+    )
+  })
 
   it('devrait gérer les erreurs de base de données', async () => {
-    prismaMock.edition.findUnique.mockRejectedValue(new Error('Database error'));
+    prismaMock.edition.findUnique.mockRejectedValue(new Error('Database error'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Internal Server Error');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow('Internal Server Error')
+  })
 
   it('devrait gérer les erreurs de suppression', async () => {
     const mockEdition = {
@@ -246,19 +247,19 @@ describe('/api/editions/[id] DELETE', () => {
         authorId: 1,
         collaborators: [],
       },
-    };
+    }
 
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    prismaMock.edition.delete.mockRejectedValue(new Error('Delete failed'));
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    prismaMock.edition.delete.mockRejectedValue(new Error('Delete failed'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Internal Server Error');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow('Internal Server Error')
+  })
 
-  it('devrait traiter correctement l\'ID numérique', async () => {
+  it("devrait traiter correctement l'ID numérique", async () => {
     const eventWithStringId = {
       ...mockEvent,
       context: { ...mockEvent.context, params: { id: '123' } },
-    };
+    }
 
     const mockEdition = {
       id: 123,
@@ -268,12 +269,12 @@ describe('/api/editions/[id] DELETE', () => {
         authorId: 1,
         collaborators: [],
       },
-    };
+    }
 
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    prismaMock.edition.delete.mockResolvedValue(mockEdition);
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    prismaMock.edition.delete.mockResolvedValue(mockEdition)
 
-    await handler(eventWithStringId as any);
+    await handler(eventWithStringId as any)
 
     expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
       where: { id: 123 },
@@ -286,18 +287,18 @@ describe('/api/editions/[id] DELETE', () => {
                 OR: [
                   { canDeleteAllEditions: true },
                   { canDeleteConvention: true },
-                  { canEditAllEditions: true }
+                  { canEditAllEditions: true },
                 ],
               },
             },
           },
         },
       },
-    });
+    })
     expect(prismaMock.edition.delete).toHaveBeenCalledWith({
       where: { id: 123 },
-    });
-  });
+    })
+  })
 
   it('devrait vérifier toutes les conditions de permission', async () => {
     // Test avec tous les cas de permission possibles
@@ -335,7 +336,7 @@ describe('/api/editions/[id] DELETE', () => {
         user: { id: 1, isGlobalAdmin: false },
         shouldPass: false,
       },
-    ];
+    ]
 
     for (const testCase of testCases) {
       const event = {
@@ -343,22 +344,22 @@ describe('/api/editions/[id] DELETE', () => {
           params: { id: '1' },
           user: testCase.user,
         },
-      };
+      }
 
       prismaMock.edition.findUnique.mockResolvedValue({
         id: 1,
         ...testCase.edition,
-      });
+      })
 
       if (testCase.shouldPass) {
-        prismaMock.edition.delete.mockResolvedValue({});
-        const result = await handler(event as any);
-        expect(result.message).toContain('deleted successfully');
+        prismaMock.edition.delete.mockResolvedValue({})
+        const result = await handler(event as any)
+        expect(result.message).toContain('deleted successfully')
       } else {
         await expect(handler(event as any)).rejects.toThrow(
-          'Vous n\'avez pas les droits pour supprimer cette édition'
-        );
+          "Vous n'avez pas les droits pour supprimer cette édition"
+        )
       }
     }
-  });
-});
+  })
+})

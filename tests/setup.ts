@@ -1,6 +1,6 @@
 import { config } from '@vue/test-utils'
-import { vi } from 'vitest'
 import { createError as h3CreateError } from 'h3'
+import { vi } from 'vitest'
 
 // Configuration globale pour les tests
 config.global.stubs = {
@@ -21,9 +21,9 @@ vi.mock('h3', async () => {
   const actual = await vi.importActual<typeof import('h3')>('h3')
   return {
     ...actual,
-  defineEventHandler: vi.fn((handler) => handler),
-  getRouterParam: vi.fn((event: any, name: string) => event?.context?.params?.[name]),
-  getRouterParams: vi.fn((event: any) => event?.context?.params ?? {}),
+    defineEventHandler: vi.fn((handler) => handler),
+    getRouterParam: vi.fn((event: any, name: string) => event?.context?.params?.[name]),
+    getRouterParams: vi.fn((event: any) => event?.context?.params ?? {}),
     readBody: vi.fn(),
     sendError: vi.fn(),
     // IMPORTANT: garder le vrai createError sinon Nuxt plante dans app/composables/error
@@ -37,7 +37,7 @@ vi.mock('h3', async () => {
     setHeader: vi.fn(),
     readMultipartFormData: vi.fn(),
     getRequestURL: vi.fn(() => new URL('http://localhost:3000')),
-    sendRedirect: vi.fn()
+    sendRedirect: vi.fn(),
   }
 })
 
@@ -45,27 +45,26 @@ vi.mock('h3', async () => {
 // (les routes exportent directement defineEventHandler(...))
 // Nuxt devrait les injecter, mais on ajoute une sauvegarde ici pour les imports directs.
 declare global {
-   
   var defineEventHandler: <T>(fn: T) => T
   // optional helpers that some tests set on global
-   
+
   var readBody: ((...args: unknown[]) => unknown) | undefined
   // h3 helpers as globals (Nitro exposes these globally at runtime)
-   
+
   var getRouterParam: ((event: unknown, name: string) => unknown) | undefined
-   
+
   var getRouterParams: ((event: unknown) => Record<string, unknown>) | undefined
-   
+
   var getHeader: ((event: unknown, name: string) => string | undefined) | undefined
-   
+
   var setHeader: ((event: unknown, name: string, value: string) => void) | undefined
-   
+
   var getCookie: ((event: unknown, name: string) => string | undefined) | undefined
-   
+
   var setCookie: ((event: unknown, name: string, value: string) => void) | undefined
-   
+
   var deleteCookie: ((event: unknown, name: string) => void) | undefined
-   
+
   var getRequestURL: ((event: unknown) => URL) | undefined
 }
 // Rendre mockable par les tests (mockImplementation, etc.)
@@ -74,9 +73,8 @@ globalThis.defineEventHandler = vi.fn((fn) => fn) as unknown as typeof globalThi
 
 // Exposer createError global comme mock déléguant au vrai createError pour permettre aux tests de le surcharger
 // Si déjà défini par un test, ne pas l’écraser
- 
+
 if (!(globalThis as any).createError) {
-   
   ;(globalThis as any).createError = vi.fn((input: any) => h3CreateError(input))
 }
 
@@ -85,14 +83,19 @@ if (!(globalThis as any).createError) {
 if (!globalThis.readBody) globalThis.readBody = vi.fn()
 
 // Installer des sauvegardes globales pour les helpers h3 utilisés en global dans le code serveur
-if (!globalThis.getRouterParam) (globalThis as any).getRouterParam = vi.fn((event: any, name: string) => event?.context?.params?.[name])
-if (!globalThis.getRouterParams) (globalThis as any).getRouterParams = vi.fn((event: any) => event?.context?.params ?? {})
+if (!globalThis.getRouterParam)
+  (globalThis as any).getRouterParam = vi.fn(
+    (event: any, name: string) => event?.context?.params?.[name]
+  )
+if (!globalThis.getRouterParams)
+  (globalThis as any).getRouterParams = vi.fn((event: any) => event?.context?.params ?? {})
 if (!globalThis.getHeader) (globalThis as any).getHeader = vi.fn()
 if (!globalThis.setHeader) (globalThis as any).setHeader = vi.fn()
 if (!globalThis.getCookie) (globalThis as any).getCookie = vi.fn()
 if (!globalThis.setCookie) (globalThis as any).setCookie = vi.fn()
 if (!globalThis.deleteCookie) (globalThis as any).deleteCookie = vi.fn()
-if (!globalThis.getRequestURL) (globalThis as any).getRequestURL = vi.fn(() => new URL('http://localhost:3000'))
+if (!globalThis.getRequestURL)
+  (globalThis as any).getRequestURL = vi.fn(() => new URL('http://localhost:3000'))
 
 // Fournir un useRuntimeConfig par défaut pour les tests Nuxt
 // (les tests peuvent le surcharger via vi.mock('#imports') ou global.useRuntimeConfig)
@@ -101,10 +104,10 @@ vi.mock('#imports', async () => {
   const actual = await vi.importActual<any>('#imports')
   return {
     ...actual,
-  useRuntimeConfig: vi.fn(() => ({})),
-  // Stubs par défaut pour l'auth par session (nuxt-auth-utils)
-  requireUserSession: vi.fn(async () => ({ user: { id: 1 } })),
-  getUserSession: vi.fn(async () => ({ user: { id: 1 } })),
+    useRuntimeConfig: vi.fn(() => ({})),
+    // Stubs par défaut pour l'auth par session (nuxt-auth-utils)
+    requireUserSession: vi.fn(async () => ({ user: { id: 1 } })),
+    getUserSession: vi.fn(async () => ({ user: { id: 1 } })),
   }
 })
 

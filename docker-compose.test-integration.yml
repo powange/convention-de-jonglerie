@@ -12,9 +12,9 @@ services:
       MYSQL_USER: test_user
       MYSQL_PASSWORD: test_password
     ports:
-      - "3307:3306"
+      - '3307:3306'
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       timeout: 20s
       retries: 10
       interval: 5s
@@ -28,14 +28,14 @@ services:
       dockerfile: Dockerfile.test
     container_name: convention-test-integration
     environment:
-      DATABASE_URL: "mysql://test_user:test_password@test-db:3306/test_convention_db"
-      TEST_DATABASE_URL: "mysql://test_user:test_password@test-db:3306/test_convention_db"
-      NUXT_HOST: "0.0.0.0"
-      NUXT_PORT: "3000"
-      NODE_ENV: "test"
-      TEST_WITH_DB: "true"
-      CI: "true"
-      SEND_EMAILS: "false"
+      DATABASE_URL: 'mysql://test_user:test_password@test-db:3306/test_convention_db'
+      TEST_DATABASE_URL: 'mysql://test_user:test_password@test-db:3306/test_convention_db'
+      NUXT_HOST: '0.0.0.0'
+      NUXT_PORT: '3000'
+      NODE_ENV: 'test'
+      TEST_WITH_DB: 'true'
+      CI: 'true'
+      SEND_EMAILS: 'false'
     volumes:
       - ./app:/app/app:cached
       - ./server:/app/server:cached

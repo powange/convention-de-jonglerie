@@ -1,53 +1,54 @@
-import { prisma } from '../../../../../utils/prisma';
-import { requireUserSession } from '#imports';
+import { requireUserSession } from '#imports'
+
+import { prisma } from '../../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   try {
-    const editionId = parseInt(getRouterParam(event, 'id') as string);
-    const itemId = parseInt(getRouterParam(event, 'itemId') as string);
-    const body = await readBody(event);
+    const editionId = parseInt(getRouterParam(event, 'id') as string)
+    const itemId = parseInt(getRouterParam(event, 'itemId') as string)
+    const body = await readBody(event)
 
     if (!editionId || isNaN(editionId) || !itemId || isNaN(itemId)) {
       throw createError({
         statusCode: 400,
         statusMessage: 'ID invalide',
-      });
+      })
     }
 
     // Vérifier l'authentification
-  const { user } = await requireUserSession(event)
-  const userId = user.id
+    const { user } = await requireUserSession(event)
+    const userId = user.id
 
     if (!userId) {
       throw createError({
         statusCode: 401,
         statusMessage: 'Token invalide',
-      });
+      })
     }
 
     // Vérifier que l'objet trouvé existe et appartient à l'édition
     const lostFoundItem = await prisma.lostFoundItem.findFirst({
       where: {
         id: itemId,
-        editionId: editionId
-      }
-    });
+        editionId: editionId,
+      },
+    })
 
     if (!lostFoundItem) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Objet trouvé non trouvé',
-      });
+      })
     }
 
     // Valider le contenu
-    const { content } = body;
+    const { content } = body
 
     if (!content || typeof content !== 'string' || content.trim().length === 0) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Le contenu du commentaire est requis',
-      });
+      })
     }
 
     // Créer le commentaire
@@ -55,7 +56,7 @@ export default defineEventHandler(async (event) => {
       data: {
         lostFoundItemId: itemId,
         userId,
-        content: content.trim()
+        content: content.trim(),
       },
       include: {
         user: {
@@ -64,23 +65,23 @@ export default defineEventHandler(async (event) => {
             pseudo: true,
             prenom: true,
             nom: true,
-            profilePicture: true
-          }
-        }
-      }
-    });
+            profilePicture: true,
+          },
+        },
+      },
+    })
 
-    return comment;
+    return comment
   } catch (error: unknown) {
-    console.error('Erreur lors de la création du commentaire:', error);
-    
+    console.error('Erreur lors de la création du commentaire:', error)
+
     if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw (error as unknown) as Error;
+      throw error as unknown as Error
     }
-    
+
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur interne du serveur',
-    });
+    })
   }
-});
+})

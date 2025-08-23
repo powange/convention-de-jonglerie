@@ -1,6 +1,7 @@
-import { z } from 'zod';
-import { prisma } from '../../utils/prisma';
-import { conventionSchema, handleValidationError } from '../../utils/validation-schemas';
+import { z } from 'zod'
+
+import { prisma } from '../../utils/prisma'
+import { conventionSchema, handleValidationError } from '../../utils/validation-schemas'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
@@ -8,19 +9,19 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 401,
       statusMessage: 'Non authentifié',
-    });
+    })
   }
 
   try {
-    const body = await readBody(event);
-    
+    const body = await readBody(event)
+
     // Validation avec Zod
-    const validatedData = conventionSchema.parse(body);
-    
+    const validatedData = conventionSchema.parse(body)
+
     // Sanitisation
-    const cleanName = validatedData.name.trim();
-    const cleanDescription = validatedData.description?.trim() || null;
-    const cleanLogo = validatedData.logo?.trim() || null;
+    const cleanName = validatedData.name.trim()
+    const cleanDescription = validatedData.description?.trim() || null
+    const cleanLogo = validatedData.logo?.trim() || null
 
     // Créer la convention
     const convention = await prisma.convention.create({
@@ -39,7 +40,7 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-    });
+    })
 
     // Ajouter automatiquement le créateur comme collaborateur avec tous les droits
     await prisma.conventionCollaborator.create({
@@ -55,9 +56,9 @@ export default defineEventHandler(async (event) => {
         canEditAllEditions: true,
         canDeleteAllEditions: true,
       },
-    });
+    })
 
-  // Retourner la convention transformée (pas d'exposition d'email)
+    // Retourner la convention transformée (pas d'exposition d'email)
     const conventionWithCollaborators = await prisma.convention.findUnique({
       where: { id: convention.id },
       include: {
@@ -86,15 +87,19 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-    });
-    const { getEmailHash } = await import('../../utils/email-hash');
+    })
+    const { getEmailHash } = await import('../../utils/email-hash')
     const transformed = {
       ...conventionWithCollaborators,
-      author: conventionWithCollaborators?.author ? {
-        ...conventionWithCollaborators.author,
-        emailHash: conventionWithCollaborators.author.email ? getEmailHash(conventionWithCollaborators.author.email) : undefined,
-        email: undefined
-      } : null,
+      author: conventionWithCollaborators?.author
+        ? {
+            ...conventionWithCollaborators.author,
+            emailHash: conventionWithCollaborators.author.email
+              ? getEmailHash(conventionWithCollaborators.author.email)
+              : undefined,
+            email: undefined,
+          }
+        : null,
       collaborators: (conventionWithCollaborators?.collaborators || []).map((c: any) => ({
         id: c.id,
         addedAt: c.addedAt,
@@ -105,34 +110,36 @@ export default defineEventHandler(async (event) => {
           manageCollaborators: c.canManageCollaborators,
           addEdition: c.canAddEdition,
           editAllEditions: c.canEditAllEditions,
-          deleteAllEditions: c.canDeleteAllEditions
+          deleteAllEditions: c.canDeleteAllEditions,
         },
-        user: c.user ? {
-          id: c.user.id,
-          pseudo: c.user.pseudo,
-          emailHash: c.user.email ? getEmailHash(c.user.email) : undefined,
-          email: undefined
-        } : null,
-        addedBy: c.addedBy
-      }))
-    };
+        user: c.user
+          ? {
+              id: c.user.id,
+              pseudo: c.user.pseudo,
+              emailHash: c.user.email ? getEmailHash(c.user.email) : undefined,
+              email: undefined,
+            }
+          : null,
+        addedBy: c.addedBy,
+      })),
+    }
 
-    return transformed;
+    return transformed
   } catch (error) {
     // Gestion des erreurs de validation Zod
     if (error instanceof z.ZodError) {
-      handleValidationError(error);
+      handleValidationError(error)
     }
-    
+
     // Si c'est déjà une erreur HTTP, la relancer
     if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error;
+      throw error
     }
-    
-    console.error('Erreur lors de la création de la convention:', error);
+
+    console.error('Erreur lors de la création de la convention:', error)
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur serveur lors de la création de la convention',
-    });
+    })
   }
-});
+})

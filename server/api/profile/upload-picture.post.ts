@@ -1,38 +1,30 @@
-import { 
-  handleImageUpload, 
-  deleteOldImage
-} from '../../utils/image-upload';
-import { prisma } from '../../utils/prisma';
-import { uploadRateLimiter } from '../../utils/api-rate-limiter';
-
+import { uploadRateLimiter } from '../../utils/api-rate-limiter'
+import { handleImageUpload, deleteOldImage } from '../../utils/image-upload'
+import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user;
-  
+  const user = event.context.user
+
   if (!user) {
     throw createError({
       statusCode: 401,
       statusMessage: 'Non authentifié',
-    });
+    })
   }
 
   // Appliquer le rate limiting
-  await uploadRateLimiter(event);
+  await uploadRateLimiter(event)
 
   try {
     // Récupérer l'utilisateur actuel pour avoir l'ancienne photo
     const currentUser = await prisma.user.findUnique({
       where: { id: user.id },
       select: { profilePicture: true },
-    });
-    
+    })
+
     // Supprimer l'ancienne photo si elle existe
     if (currentUser?.profilePicture) {
-      await deleteOldImage(
-        currentUser.profilePicture,
-        'public/uploads/profiles',
-        'profile-'
-      );
+      await deleteOldImage(currentUser.profilePicture, 'public/uploads/profiles', 'profile-')
     }
 
     // Effectuer l'upload
@@ -44,7 +36,7 @@ export default defineEventHandler(async (event) => {
       entityId: user.id,
       fieldName: 'profilePicture',
       copyToOutput: false, // Pas de copie vers output pour les profils
-    });
+    })
 
     // Mettre à jour l'utilisateur
     const updatedUser = await prisma.user.update({
@@ -60,23 +52,23 @@ export default defineEventHandler(async (event) => {
         createdAt: true,
         updatedAt: true,
       },
-    });
+    })
 
     return {
       success: true,
       profilePicture: uploadResult.imageUrl,
       user: updatedUser,
-    };
-  } catch (error: unknown) {
-    const httpError = error as { statusCode?: number; message?: string };
-    if (httpError.statusCode) {
-      throw error;
     }
-    
-    console.error('Erreur lors de l\'upload de la photo de profil:', error);
+  } catch (error: unknown) {
+    const httpError = error as { statusCode?: number; message?: string }
+    if (httpError.statusCode) {
+      throw error
+    }
+
+    console.error("Erreur lors de l'upload de la photo de profil:", error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de l\'upload de la photo de profil',
-    });
+      statusMessage: "Erreur lors de l'upload de la photo de profil",
+    })
   }
-});
+})

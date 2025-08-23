@@ -14,7 +14,10 @@
       <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
         <div class="flex items-center">
           <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-            <UIcon name="i-heroicons-chat-bubble-left-ellipsis" class="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <UIcon
+              name="i-heroicons-chat-bubble-left-ellipsis"
+              class="h-6 w-6 text-blue-600 dark:text-blue-400"
+            />
           </div>
           <div class="ml-4">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -46,7 +49,10 @@
       <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
         <div class="flex items-center">
           <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-            <UIcon name="i-heroicons-check-circle" class="h-6 w-6 text-green-600 dark:text-green-400" />
+            <UIcon
+              name="i-heroicons-check-circle"
+              class="h-6 w-6 text-green-600 dark:text-green-400"
+            />
           </div>
           <div class="ml-4">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -130,7 +136,9 @@
                   />
                   <UBadge
                     :color="feedback.resolved ? 'green' : 'yellow'"
-                    :label="feedback.resolved ? t('admin.feedback.resolved') : t('admin.feedback.pending')"
+                    :label="
+                      feedback.resolved ? t('admin.feedback.resolved') : t('admin.feedback.pending')
+                    "
                   />
                 </div>
 
@@ -148,9 +156,7 @@
                     <span v-if="feedback.user">
                       {{ feedback.user.pseudo }} ({{ feedback.user.email }})
                     </span>
-                    <span v-else>
-                      {{ feedback.name }} ({{ feedback.email }})
-                    </span>
+                    <span v-else> {{ feedback.name }} ({{ feedback.email }}) </span>
                   </div>
                   <div class="flex items-center gap-1">
                     <UIcon name="i-heroicons-calendar" class="h-4 w-4" />
@@ -158,15 +164,25 @@
                   </div>
                   <div v-if="feedback.url" class="flex items-center gap-1">
                     <UIcon name="i-heroicons-link" class="h-4 w-4" />
-                    <a :href="feedback.url" target="_blank" class="hover:underline truncate max-w-xs">
+                    <a
+                      :href="feedback.url"
+                      target="_blank"
+                      class="hover:underline truncate max-w-xs"
+                    >
                       {{ feedback.url }}
                     </a>
                   </div>
                 </div>
 
-                <div v-if="feedback.adminNotes" class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg mt-3">
+                <div
+                  v-if="feedback.adminNotes"
+                  class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg mt-3"
+                >
                   <div class="flex items-center gap-2 mb-1">
-                    <UIcon name="i-heroicons-user-circle" class="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <UIcon
+                      name="i-heroicons-user-circle"
+                      class="h-4 w-4 text-blue-600 dark:text-blue-400"
+                    />
                     <span class="text-sm font-medium text-blue-800 dark:text-blue-200">
                       {{ t('admin.feedback.admin_notes') }}
                     </span>
@@ -196,12 +212,7 @@
                 >
                   {{ t('admin.feedback.unresolve') }}
                 </UButton>
-                <UButton
-                  color="blue"
-                  variant="soft"
-                  size="sm"
-                  @click="openDetailsModal(feedback)"
-                >
+                <UButton color="blue" variant="soft" size="sm" @click="openDetailsModal(feedback)">
                   {{ t('admin.feedback.view') }}
                 </UButton>
               </div>
@@ -222,16 +233,22 @@
     </UCard>
 
     <!-- Modal de résolution -->
-    <UModal 
+    <UModal
       v-model:open="resolveModal.isOpen"
-      :title="resolveModal.feedback?.resolved ? t('admin.feedback.unresolve') : t('admin.feedback.resolve')"
+      :title="
+        resolveModal.feedback?.resolved
+          ? t('admin.feedback.unresolve')
+          : t('admin.feedback.resolve')
+      "
     >
       <template #content>
         <UCard>
           <div class="space-y-4 p-4">
             <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <h4 class="font-medium mb-2">{{ resolveModal.feedback?.subject }}</h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">{{ resolveModal.feedback?.message }}</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                {{ resolveModal.feedback?.message }}
+              </p>
             </div>
 
             <UFormField :label="t('admin.feedback.admin_notes')">
@@ -246,11 +263,12 @@
               <UButton color="gray" variant="outline" @click="resolveModal.isOpen = false">
                 {{ t('common.cancel') }}
               </UButton>
-              <UButton
-                :loading="resolveModal.loading"
-                @click="resolveFeedback"
-              >
-                {{ resolveModal.feedback?.resolved ? t('admin.feedback.mark_unresolved') : t('admin.feedback.mark_resolved') }}
+              <UButton :loading="resolveModal.loading" @click="resolveFeedback">
+                {{
+                  resolveModal.feedback?.resolved
+                    ? t('admin.feedback.mark_unresolved')
+                    : t('admin.feedback.mark_resolved')
+                }}
               </UButton>
             </div>
           </div>
@@ -259,11 +277,7 @@
     </UModal>
 
     <!-- Modal de détails -->
-    <UModal 
-      v-model:open="detailsModal.isOpen"
-      :title="t('admin.feedback.details')"
-      size="lg"
-    >
+    <UModal v-model:open="detailsModal.isOpen" :title="t('admin.feedback.details')" size="lg">
       <template #content>
         <UCard>
           <div v-if="detailsModal.feedback" class="space-y-6 p-4">
@@ -283,7 +297,11 @@
                 </label>
                 <UBadge
                   :color="detailsModal.feedback.resolved ? 'green' : 'yellow'"
-                  :label="detailsModal.feedback.resolved ? t('admin.feedback.resolved') : t('admin.feedback.pending')"
+                  :label="
+                    detailsModal.feedback.resolved
+                      ? t('admin.feedback.resolved')
+                      : t('admin.feedback.pending')
+                  "
                 />
               </div>
             </div>
@@ -300,7 +318,9 @@
                 {{ t('admin.feedback.message.label') }}
               </label>
               <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                <p class="text-gray-900 dark:text-white whitespace-pre-wrap">{{ detailsModal.feedback.message }}</p>
+                <p class="text-gray-900 dark:text-white whitespace-pre-wrap">
+                  {{ detailsModal.feedback.message }}
+                </p>
               </div>
             </div>
 
@@ -322,7 +342,9 @@
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {{ t('admin.feedback.created_at') }}
                 </label>
-                <p class="text-gray-900 dark:text-white">{{ formatDate(detailsModal.feedback.createdAt) }}</p>
+                <p class="text-gray-900 dark:text-white">
+                  {{ formatDate(detailsModal.feedback.createdAt) }}
+                </p>
               </div>
             </div>
 
@@ -330,7 +352,11 @@
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ t('admin.feedback.url') }}
               </label>
-              <a :href="detailsModal.feedback.url" target="_blank" class="text-blue-600 hover:underline break-all">
+              <a
+                :href="detailsModal.feedback.url"
+                target="_blank"
+                class="text-blue-600 hover:underline break-all"
+              >
                 {{ detailsModal.feedback.url }}
               </a>
             </div>
@@ -339,7 +365,9 @@
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ t('admin.feedback.user_agent') }}
               </label>
-              <p class="text-sm text-gray-600 dark:text-gray-400 break-all">{{ detailsModal.feedback.userAgent }}</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400 break-all">
+                {{ detailsModal.feedback.userAgent }}
+              </p>
             </div>
 
             <div v-if="detailsModal.feedback.adminNotes">
@@ -347,7 +375,9 @@
                 {{ t('admin.feedback.admin_notes') }}
               </label>
               <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                <p class="text-blue-900 dark:text-blue-100 whitespace-pre-wrap">{{ detailsModal.feedback.adminNotes }}</p>
+                <p class="text-blue-900 dark:text-blue-100 whitespace-pre-wrap">
+                  {{ detailsModal.feedback.adminNotes }}
+                </p>
               </div>
             </div>
 
@@ -365,7 +395,7 @@
 
 <script setup lang="ts">
 definePageMeta({
-  middleware: ['super-admin']
+  middleware: ['super-admin'],
 })
 
 const { t } = useI18n()
@@ -379,14 +409,14 @@ const pagination = ref({
   page: 1,
   limit: 20,
   total: 0,
-  pages: 1
+  pages: 1,
 })
 
 // Filtres
 const filters = reactive({
   search: '',
   type: '',
-  resolved: ''
+  resolved: '',
 })
 
 // Options pour les filtres
@@ -395,13 +425,13 @@ const typeOptions = computed(() => [
   { value: 'BUG', label: t('admin.feedback.types.bug') },
   { value: 'SUGGESTION', label: t('admin.feedback.types.suggestion') },
   { value: 'GENERAL', label: t('admin.feedback.types.general') },
-  { value: 'COMPLAINT', label: t('admin.feedback.types.complaint') }
+  { value: 'COMPLAINT', label: t('admin.feedback.types.complaint') },
 ])
 
 const statusOptions = computed(() => [
   { value: '', label: t('admin.feedback.filter.all_status') },
   { value: 'false', label: t('admin.feedback.pending') },
-  { value: 'true', label: t('admin.feedback.resolved') }
+  { value: 'true', label: t('admin.feedback.resolved') },
 ])
 
 // Modals
@@ -409,12 +439,12 @@ const resolveModal = reactive({
   isOpen: false,
   feedback: null,
   adminNotes: '',
-  loading: false
+  loading: false,
 })
 
 const detailsModal = reactive({
   isOpen: false,
-  feedback: null
+  feedback: null,
 })
 
 // Fonctions
@@ -423,7 +453,7 @@ async function fetchFeedbacks() {
   try {
     const query = new URLSearchParams({
       page: pagination.value.page.toString(),
-      limit: pagination.value.limit.toString()
+      limit: pagination.value.limit.toString(),
     })
 
     if (filters.search) query.append('search', filters.search)
@@ -431,16 +461,15 @@ async function fetchFeedbacks() {
     if (filters.resolved) query.append('resolved', filters.resolved)
 
     const response = await $fetch(`/api/admin/feedback?${query.toString()}`)
-    
+
     feedbacks.value = response.feedbacks
     pagination.value = response.pagination
     stats.value = response.stats
-
   } catch (error) {
     console.error('Erreur lors du chargement des feedbacks:', error)
     toast.add({
       title: t('admin.feedback.error.load'),
-      color: 'red'
+      color: 'red',
     })
   } finally {
     loading.value = false
@@ -477,25 +506,24 @@ async function resolveFeedback() {
       method: 'PUT',
       body: {
         resolved: !resolveModal.feedback.resolved,
-        adminNotes: resolveModal.adminNotes
-      }
+        adminNotes: resolveModal.adminNotes,
+      },
     })
 
     toast.add({
-      title: resolveModal.feedback.resolved 
+      title: resolveModal.feedback.resolved
         ? t('admin.feedback.success.unresolve')
         : t('admin.feedback.success.resolve'),
-      color: 'green'
+      color: 'green',
     })
 
     resolveModal.isOpen = false
     await fetchFeedbacks()
-
   } catch (error) {
     console.error('Erreur lors de la mise à jour:', error)
     toast.add({
       title: t('admin.feedback.error.resolve'),
-      color: 'red'
+      color: 'red',
     })
   } finally {
     resolveModal.loading = false
@@ -507,7 +535,7 @@ function getTypeColor(type: string) {
     BUG: 'red',
     SUGGESTION: 'blue',
     GENERAL: 'gray',
-    COMPLAINT: 'orange'
+    COMPLAINT: 'orange',
   }
   return colors[type] || 'gray'
 }
@@ -518,7 +546,7 @@ function formatDate(dateString: string) {
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 

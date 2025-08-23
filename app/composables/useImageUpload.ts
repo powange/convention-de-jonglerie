@@ -20,7 +20,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
   const defaultValidation: ValidationOptions = {
     maxSize: 5 * 1024 * 1024, // 5MB
     allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
-    allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp']
+    allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
   }
 
   const validation = { ...defaultValidation, ...options.validation }
@@ -34,7 +34,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
       const maxSizeMB = Math.round(validation.maxSize / (1024 * 1024))
       return {
         valid: false,
-        error: t('upload.errors.file_too_large', { maxSize: `${maxSizeMB}MB` })
+        error: t('upload.errors.file_too_large', { maxSize: `${maxSizeMB}MB` }),
       }
     }
 
@@ -42,9 +42,9 @@ export const useImageUpload = (options: UploadOptions = {}) => {
     if (!validation.allowedTypes.includes(file.type)) {
       return {
         valid: false,
-        error: t('upload.errors.invalid_file_type', { 
-          allowedTypes: validation.allowedTypes.join(', ') 
-        })
+        error: t('upload.errors.invalid_file_type', {
+          allowedTypes: validation.allowedTypes.join(', '),
+        }),
       }
     }
 
@@ -53,9 +53,9 @@ export const useImageUpload = (options: UploadOptions = {}) => {
     if (extension && !validation.allowedExtensions.includes(extension)) {
       return {
         valid: false,
-        error: t('upload.errors.invalid_file_extension', { 
-          allowedExtensions: validation.allowedExtensions.join(', ') 
-        })
+        error: t('upload.errors.invalid_file_extension', {
+          allowedExtensions: validation.allowedExtensions.join(', '),
+        }),
       }
     }
 
@@ -85,7 +85,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
         toast.add({
           title: t('upload.validation_error'),
           description: error.value,
-          color: 'error'
+          color: 'error',
         })
       }
       return false
@@ -102,7 +102,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
   const handleFileSelect = (event: Event) => {
     const target = event.target as HTMLInputElement
     const file = target.files?.[0]
-    
+
     if (file) {
       selectFile(file)
     }
@@ -125,7 +125,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
 
     // Simuler la progression
     let progressInterval: NodeJS.Timeout | null = null
-    
+
     try {
       const formData = new FormData()
       formData.append('image', selectedFile.value)
@@ -141,14 +141,14 @@ export const useImageUpload = (options: UploadOptions = {}) => {
       let uploadUrl: string
       switch (endpoint.type) {
         case 'convention':
-          uploadUrl = endpoint.id 
+          uploadUrl = endpoint.id
             ? `/api/conventions/${endpoint.id}/upload-image`
             : '/api/upload/image'
           if (endpoint.id && additionalData) {
             additionalData.conventionId = endpoint.id
           }
           break
-        
+
         case 'edition':
           uploadUrl = endpoint.id
             ? `/api/editions/${endpoint.id}/upload-image`
@@ -157,18 +157,18 @@ export const useImageUpload = (options: UploadOptions = {}) => {
             additionalData.editionId = endpoint.id
           }
           break
-        
+
         case 'lost-found':
           if (!endpoint.id) {
             throw new Error(t('upload.errors.edition_id_required'))
           }
           uploadUrl = `/api/editions/${endpoint.id}/lost-found/upload-image`
           break
-        
+
         case 'profile':
           uploadUrl = '/api/profile/upload-picture'
           break
-        
+
         case 'generic':
         default:
           uploadUrl = '/api/upload/image'
@@ -183,7 +183,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
 
       const response = await $fetch<UploadResult>(uploadUrl, {
         method: 'POST',
-        body: formData
+        body: formData,
       })
 
       // Finaliser la progression
@@ -203,7 +203,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
         toast.add({
           title: t('upload.success'),
           description: t('upload.image_uploaded_successfully'),
-          color: 'success'
+          color: 'success',
         })
       }
 
@@ -213,26 +213,23 @@ export const useImageUpload = (options: UploadOptions = {}) => {
       }
 
       return response
-
-  } catch (uploadError: unknown) {
+    } catch (uploadError: unknown) {
       // Nettoyer l'interval de progression en cas d'erreur
       if (progressInterval) {
         clearInterval(progressInterval)
         progressInterval = null
       }
-      
-  const err = uploadError as { data?: { message?: string }, message?: string } | undefined
-  const errorMessage = err?.data?.message || 
-          err?.message || 
-                          t('upload.errors.upload_failed')
-      
+
+      const err = uploadError as { data?: { message?: string }; message?: string } | undefined
+      const errorMessage = err?.data?.message || err?.message || t('upload.errors.upload_failed')
+
       error.value = errorMessage
 
       if (options.showToast !== false) {
         toast.add({
           title: t('upload.upload_error'),
           description: errorMessage,
-          color: 'red'
+          color: 'red',
         })
       }
 
@@ -250,7 +247,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
     selectedFile.value = null
     error.value = null
     progress.value = 0
-    
+
     if (previewUrl.value) {
       URL.revokeObjectURL(previewUrl.value)
       previewUrl.value = null
@@ -261,7 +258,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
    * Supprime une image
    */
   const deleteImage = async (endpoint: UploadEndpoint): Promise<void> => {
-  // Auth assurée par la session côté serveur
+    // Auth assurée par la session côté serveur
 
     try {
       let deleteUrl: string
@@ -270,41 +267,38 @@ export const useImageUpload = (options: UploadOptions = {}) => {
           if (!endpoint.id) throw new Error(t('upload.errors.convention_id_required'))
           deleteUrl = `/api/conventions/${endpoint.id}/delete-image`
           break
-        
+
         case 'edition':
           if (!endpoint.id) throw new Error(t('upload.errors.edition_id_required'))
           deleteUrl = `/api/editions/${endpoint.id}/delete-image`
           break
-        
+
         case 'profile':
           deleteUrl = '/api/profile/delete-picture'
           break
-        
+
         default:
           throw new Error(t('upload.errors.unsupported_delete_endpoint'))
       }
 
-  await $fetch(deleteUrl, { method: 'DELETE' })
+      await $fetch(deleteUrl, { method: 'DELETE' })
 
       if (options.showToast !== false) {
         toast.add({
           title: t('upload.success'),
           description: t('upload.image_deleted_successfully'),
-          color: 'green'
+          color: 'green',
         })
       }
-
     } catch (deleteError: unknown) {
-      const err = deleteError as { data?: { message?: string }, message?: string } | undefined
-      const errorMessage = err?.data?.message || 
-                          err?.message || 
-                          t('upload.errors.delete_failed')
+      const err = deleteError as { data?: { message?: string }; message?: string } | undefined
+      const errorMessage = err?.data?.message || err?.message || t('upload.errors.delete_failed')
 
       if (options.showToast !== false) {
         toast.add({
           title: t('upload.delete_error'),
           description: errorMessage,
-          color: 'red'
+          color: 'red',
         })
       }
 
@@ -326,7 +320,7 @@ export const useImageUpload = (options: UploadOptions = {}) => {
     selectedFile: readonly(selectedFile),
     previewUrl: readonly(previewUrl),
     error: readonly(error),
-    
+
     // Méthodes
     selectFile,
     handleFileSelect,
@@ -334,8 +328,8 @@ export const useImageUpload = (options: UploadOptions = {}) => {
     deleteImage,
     reset,
     validateFile,
-    
+
     // Configuration
-    validation: readonly(validation)
+    validation: readonly(validation),
   }
 }

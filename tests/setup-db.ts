@@ -11,10 +11,11 @@ try {
   console.warn('Prisma Client non disponible, les tests DB seront skippés')
 }
 
-// Forcer l'utilisation de la base de données de test 
+// Forcer l'utilisation de la base de données de test
 // En environnement Docker, utiliser l'URL fournie par l'environnement
 if (!process.env.TEST_DATABASE_URL && !process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = 'mysql://convention_user:convention_password@localhost:3307/convention_db'
+  process.env.DATABASE_URL =
+    'mysql://convention_user:convention_password@localhost:3307/convention_db'
 }
 
 // Instance Prisma pour les tests
@@ -22,9 +23,9 @@ if (PrismaClient) {
   prismaTest = new PrismaClient({
     datasources: {
       db: {
-        url: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
-      }
-    }
+        url: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
+      },
+    },
   })
 }
 
@@ -33,12 +34,12 @@ export { prismaTest }
 // Configuration globale pour les tests avec DB
 if (process.env.TEST_WITH_DB === 'true') {
   beforeAll(async () => {
-    console.log('🔄 Initialisation des tests d\'intégration...')
+    console.log("🔄 Initialisation des tests d'intégration...")
     try {
       // Attendre que MySQL soit prêt (la DB est déjà démarrée par le script)
       await waitForDatabase()
       console.log('✅ Connexion à la base de données de test réussie')
-      
+
       // Nettoyage initial
       await cleanDatabase()
       console.log('🧹 Base de données nettoyée pour les tests')
@@ -66,21 +67,21 @@ async function waitForDatabase(maxRetries = 30) {
       return
     } catch {
       console.log(`⏳ Attente de la base de données... (${i + 1}/${maxRetries})`)
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
     }
   }
-  throw new Error('La base de données n\'est pas disponible')
+  throw new Error("La base de données n'est pas disponible")
 }
 
 // Fonction pour nettoyer la base de données
 async function cleanDatabase() {
   if (!prismaTest) return
-  
+
   try {
     // Supprimer dans l'ordre des dépendances (enfants avant parents)
     await prismaTest.passwordResetToken.deleteMany({})
     await prismaTest.carpoolPassenger.deleteMany({})
-    await prismaTest.carpoolRequestComment.deleteMany({})  
+    await prismaTest.carpoolRequestComment.deleteMany({})
     await prismaTest.carpoolComment.deleteMany({})
     await prismaTest.carpoolRequest.deleteMany({})
     await prismaTest.carpoolOffer.deleteMany({})

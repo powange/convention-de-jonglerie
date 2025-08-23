@@ -5,7 +5,7 @@ await setup({
   nuxt: {
     // Configuration du serveur de test
     server: {
-      port: 3001
-    }
-  }
+      port: 3001,
+    },
+  },
 })

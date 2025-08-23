@@ -1,25 +1,25 @@
-import { getEmailHash } from '../../../utils/email-hash';
-import { prisma } from '../../../utils/prisma';
-import { createError } from 'h3';
+import { createError } from 'h3'
 
+import { getEmailHash } from '../../../utils/email-hash'
+import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  const editionId = parseInt(event.context.params?.id as string);
-  const viewerId = event.context.user?.id as number | undefined;
+  const editionId = parseInt(event.context.params?.id as string)
+  const viewerId = event.context.user?.id as number | undefined
 
   if (!editionId) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Edition ID invalide',
-    });
+    })
   }
 
   try {
-  const carpoolOffers = await prisma.carpoolOffer.findMany({
+    const carpoolOffers = await prisma.carpoolOffer.findMany({
       where: {
         editionId,
       },
-  include: {
+      include: {
         user: true,
         passengers: {
           include: {
@@ -37,19 +37,21 @@ export default defineEventHandler(async (event) => {
             createdAt: 'desc',
           },
         },
-  },
-  orderBy: { departureDate: 'asc' },
-    });
+      },
+      orderBy: { departureDate: 'asc' },
+    })
 
     // Transformer les données pour masquer les emails et ajouter les hash
-    const transformedOffers = carpoolOffers.map(offer => {
-  const bookings = (offer as any).bookings ?? [];
-      const passengers = offer.passengers ?? [];
-      const comments = offer.comments ?? [];
-      const availableSeats = typeof offer.availableSeats === 'number' ? offer.availableSeats : 0;
+    const transformedOffers = carpoolOffers.map((offer) => {
+      const bookings = (offer as any).bookings ?? []
+      const passengers = offer.passengers ?? []
+      const comments = offer.comments ?? []
+      const availableSeats = typeof offer.availableSeats === 'number' ? offer.availableSeats : 0
 
-      const viewerIsOwner = !!viewerId && viewerId === offer.userId;
-  const viewerHasAccepted = !!viewerId && bookings.some((b: any) => b.status === 'ACCEPTED' && b.requesterId === viewerId);
+      const viewerIsOwner = !!viewerId && viewerId === offer.userId
+      const viewerHasAccepted =
+        !!viewerId &&
+        bookings.some((b: any) => b.status === 'ACCEPTED' && b.requesterId === viewerId)
 
       return {
         id: offer.id,
@@ -61,10 +63,16 @@ export default defineEventHandler(async (event) => {
         availableSeats,
         description: offer.description,
         // n'exposer le contact que pour le propriétaire ou un réservant ACCEPTED
-        phoneNumber: (viewerIsOwner || viewerHasAccepted) ? offer.phoneNumber : null,
+        phoneNumber: viewerIsOwner || viewerHasAccepted ? offer.phoneNumber : null,
         createdAt: offer.createdAt,
         updatedAt: offer.updatedAt,
-  remainingSeats: Math.max(0, availableSeats - bookings.filter((b: any) => b.status === 'ACCEPTED').reduce((s: number, b: any) => s + (b.seats || 0), 0)),
+        remainingSeats: Math.max(
+          0,
+          availableSeats -
+            bookings
+              .filter((b: any) => b.status === 'ACCEPTED')
+              .reduce((s: number, b: any) => s + (b.seats || 0), 0)
+        ),
         user: offer.user
           ? {
               id: offer.user.id,
@@ -75,7 +83,7 @@ export default defineEventHandler(async (event) => {
             }
           : undefined,
         // Maintenu temporairement pour compatibilité, mais l'UI ne l'utilisera plus
-        passengers: passengers.map(passenger => ({
+        passengers: passengers.map((passenger) => ({
           id: passenger.id,
           addedAt: passenger.addedAt,
           user: passenger.user
@@ -108,7 +116,7 @@ export default defineEventHandler(async (event) => {
               }
             : undefined,
         })),
-        comments: comments.map(comment => ({
+        comments: comments.map((comment) => ({
           id: comment.id,
           content: comment.content,
           createdAt: comment.createdAt,
@@ -123,15 +131,15 @@ export default defineEventHandler(async (event) => {
               }
             : undefined,
         })),
-      };
-    });
+      }
+    })
 
-    return transformedOffers;
+    return transformedOffers
   } catch (error) {
-    console.error('Erreur lors de la récupération des covoiturages:', error);
+    console.error('Erreur lors de la récupération des covoiturages:', error)
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur serveur',
-    });
+    })
   }
-});
+})

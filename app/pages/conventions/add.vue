@@ -10,10 +10,10 @@
           {{ $t('pages.add_convention.description') }}
         </p>
       </template>
-      
-      <ConventionForm 
-        :submit-button-text="$t('pages.add_convention.submit_button')" 
-        :loading="loading" 
+
+      <ConventionForm
+        :submit-button-text="$t('pages.add_convention.submit_button')"
+        :loading="loading"
         @submit="handleAddConvention"
         @cancel="handleCancel"
       />
@@ -22,23 +22,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '~/stores/auth';
-import ConventionForm from '~/components/convention/ConventionForm.vue';
-import type { ConventionFormData, HttpError } from '~/types';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+import ConventionForm from '~/components/convention/ConventionForm.vue'
+import { useAuthStore } from '~/stores/auth'
+import type { ConventionFormData, HttpError } from '~/types'
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
-  middleware: 'auth-protected'
-});
+  middleware: 'auth-protected',
+})
 
-const router = useRouter();
-const authStore = useAuthStore();
-const toast = useToast();
-const { t } = useI18n();
+const router = useRouter()
+const authStore = useAuthStore()
+const toast = useToast()
+const { t } = useI18n()
 
-const loading = ref(false);
+const loading = ref(false)
 
 const handleAddConvention = async (formData: ConventionFormData) => {
   if (!authStore.user) {
@@ -46,47 +47,48 @@ const handleAddConvention = async (formData: ConventionFormData) => {
       title: t('errors.authentication_error'),
       description: t('errors.login_required_convention'),
       icon: 'i-heroicons-exclamation-triangle',
-  color: 'error'
-    });
-    return;
+      color: 'error',
+    })
+    return
   }
 
-  loading.value = true;
+  loading.value = true
 
   try {
     // Créer la convention (l'upload d'image se fait automatiquement via ImageUpload)
     const convention = await $fetch('/api/conventions', {
       method: 'POST',
       body: formData,
-    });
+    })
 
     toast.add({
       title: t('messages.convention_created'),
       description: t('messages.convention_created_desc', { name: convention.name }),
       icon: 'i-heroicons-check-circle',
-  color: 'success'
-    });
+      color: 'success',
+    })
 
     // Rediriger vers la page des conventions de l'utilisateur
-    router.push('/my-conventions');
+    router.push('/my-conventions')
   } catch (error: unknown) {
-    console.error('Error creating convention:', error);
-    
-    const httpError = error as HttpError;
-    const errorMessage = httpError.data?.message || httpError.message || t('errors.convention_creation_error');
-    
+    console.error('Error creating convention:', error)
+
+    const httpError = error as HttpError
+    const errorMessage =
+      httpError.data?.message || httpError.message || t('errors.convention_creation_error')
+
     toast.add({
       title: t('errors.creation_error'),
       description: errorMessage,
       icon: 'i-heroicons-x-circle',
-  color: 'error'
-    });
+      color: 'error',
+    })
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handleCancel = () => {
-  router.back();
-};
+  router.back()
+}
 </script>

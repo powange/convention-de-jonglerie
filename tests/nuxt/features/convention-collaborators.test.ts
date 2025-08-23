@@ -1,5 +1,5 @@
+import { prismaMock } from '@@/tests/__mocks__/prisma'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '@@/tests/__mocks__/prisma';
 
 describe('Collaborateurs de convention', () => {
   const mockUser = {
@@ -7,7 +7,7 @@ describe('Collaborateurs de convention', () => {
     email: 'admin@example.com',
     pseudo: 'admin',
     nom: 'Admin',
-    prenom: 'User'
+    prenom: 'User',
   }
 
   const mockCollaborator = {
@@ -15,14 +15,14 @@ describe('Collaborateurs de convention', () => {
     email: 'collaborator@example.com',
     pseudo: 'collaborator',
     nom: 'Collaborator',
-    prenom: 'User'
+    prenom: 'User',
   }
 
   const mockConvention = {
     id: 1,
     name: 'Convention Test',
     authorId: 1,
-    collaborators: []
+    collaborators: [],
   }
 
   beforeEach(() => {
@@ -30,16 +30,16 @@ describe('Collaborateurs de convention', () => {
   })
 
   describe('Ajout de collaborateurs', () => {
-    it('devrait permettre à l\'auteur d\'ajouter un collaborateur', async () => {
+    it("devrait permettre à l'auteur d'ajouter un collaborateur", async () => {
       const collaboratorData = {
         email: 'new@example.com',
-        role: 'MODERATOR'
+        role: 'MODERATOR',
       }
 
       const existingUser = {
         id: 3,
         email: 'new@example.com',
-        pseudo: 'newuser'
+        pseudo: 'newuser',
       }
 
       const createdCollaborator = {
@@ -48,35 +48,42 @@ describe('Collaborateurs de convention', () => {
         userId: 3,
         role: 'MODERATOR',
         addedById: 1,
-        user: existingUser
+        user: existingUser,
       }
 
       prismaMock.convention.findUnique.mockResolvedValue({
         ...mockConvention,
-        collaborators: [{ userId: 1, role: 'ADMINISTRATOR' }]
+        collaborators: [{ userId: 1, role: 'ADMINISTRATOR' }],
       })
       prismaMock.user.findUnique.mockResolvedValue(existingUser)
       prismaMock.conventionCollaborator.create.mockResolvedValue(createdCollaborator)
 
       // Simuler l'appel API d'ajout de collaborateur
-      const addCollaborator = async (conventionId: number, data: typeof collaboratorData, userId: number) => {
+      const addCollaborator = async (
+        conventionId: number,
+        data: typeof collaboratorData,
+        userId: number
+      ) => {
         // Vérifier permissions
         const convention = await prismaMock.convention.findUnique({
           where: { id: conventionId },
           include: {
             collaborators: {
-              where: { userId, role: 'ADMINISTRATOR' }
-            }
-          }
+              where: { userId, role: 'ADMINISTRATOR' },
+            },
+          },
         })
 
-        if (!convention || (convention.authorId !== userId && convention.collaborators.length === 0)) {
+        if (
+          !convention ||
+          (convention.authorId !== userId && convention.collaborators.length === 0)
+        ) {
           throw new Error('Unauthorized')
         }
 
         // Trouver l'utilisateur
         const user = await prismaMock.user.findUnique({
-          where: { email: data.email }
+          where: { email: data.email },
         })
 
         if (!user) {
@@ -89,9 +96,9 @@ describe('Collaborateurs de convention', () => {
             conventionId,
             userId: user.id,
             role: data.role as any,
-            addedById: userId
+            addedById: userId,
           },
-          include: { user: true }
+          include: { user: true },
         })
       }
 
@@ -104,17 +111,17 @@ describe('Collaborateurs de convention', () => {
           conventionId: 1,
           userId: 3,
           role: 'MODERATOR',
-          addedById: 1
+          addedById: 1,
         },
-        include: { user: true }
+        include: { user: true },
       })
     })
 
-    it('devrait rejeter si l\'utilisateur n\'a pas les droits', async () => {
+    it("devrait rejeter si l'utilisateur n'a pas les droits", async () => {
       prismaMock.convention.findUnique.mockResolvedValue({
         ...mockConvention,
         authorId: 2, // Différent utilisateur
-        collaborators: []
+        collaborators: [],
       })
 
       const addCollaborator = async (conventionId: number, data: any, userId: number) => {
@@ -122,26 +129,30 @@ describe('Collaborateurs de convention', () => {
           where: { id: conventionId },
           include: {
             collaborators: {
-              where: { userId, role: 'ADMINISTRATOR' }
-            }
-          }
+              where: { userId, role: 'ADMINISTRATOR' },
+            },
+          },
         })
 
-        if (!convention || (convention.authorId !== userId && convention.collaborators.length === 0)) {
+        if (
+          !convention ||
+          (convention.authorId !== userId && convention.collaborators.length === 0)
+        ) {
           throw new Error('Unauthorized')
         }
 
         return null
       }
 
-      await expect(addCollaborator(1, { email: 'test@example.com', role: 'MODERATOR' }, 1))
-        .rejects.toThrow('Unauthorized')
+      await expect(
+        addCollaborator(1, { email: 'test@example.com', role: 'MODERATOR' }, 1)
+      ).rejects.toThrow('Unauthorized')
     })
 
-    it('devrait rejeter si l\'utilisateur à ajouter n\'existe pas', async () => {
+    it("devrait rejeter si l'utilisateur à ajouter n'existe pas", async () => {
       prismaMock.convention.findUnique.mockResolvedValue({
         ...mockConvention,
-        collaborators: [{ userId: 1, role: 'ADMINISTRATOR' }]
+        collaborators: [{ userId: 1, role: 'ADMINISTRATOR' }],
       })
       prismaMock.user.findUnique.mockResolvedValue(null)
 
@@ -150,13 +161,13 @@ describe('Collaborateurs de convention', () => {
           where: { id: conventionId },
           include: {
             collaborators: {
-              where: { userId, role: 'ADMINISTRATOR' }
-            }
-          }
+              where: { userId, role: 'ADMINISTRATOR' },
+            },
+          },
         })
 
         const user = await prismaMock.user.findUnique({
-          where: { email: data.email }
+          where: { email: data.email },
         })
 
         if (!user) {
@@ -166,35 +177,36 @@ describe('Collaborateurs de convention', () => {
         return null
       }
 
-      await expect(addCollaborator(1, { email: 'nonexistent@example.com', role: 'MODERATOR' }, 1))
-        .rejects.toThrow('User not found')
+      await expect(
+        addCollaborator(1, { email: 'nonexistent@example.com', role: 'MODERATOR' }, 1)
+      ).rejects.toThrow('User not found')
     })
 
-    it('devrait empêcher l\'ajout du même utilisateur deux fois', async () => {
+    it("devrait empêcher l'ajout du même utilisateur deux fois", async () => {
       prismaMock.convention.findUnique.mockResolvedValue({
         ...mockConvention,
         collaborators: [
           { userId: 1, role: 'ADMINISTRATOR' },
-          { userId: 2, role: 'MODERATOR' }
-        ]
+          { userId: 2, role: 'MODERATOR' },
+        ],
       })
       prismaMock.user.findUnique.mockResolvedValue(mockCollaborator)
       prismaMock.conventionCollaborator.findFirst.mockResolvedValue({
         id: 1,
         userId: 2,
-        conventionId: 1
+        conventionId: 1,
       })
 
       const addCollaborator = async (conventionId: number, data: any, userId: number) => {
         const user = await prismaMock.user.findUnique({
-          where: { email: data.email }
+          where: { email: data.email },
         })
 
         const existing = await prismaMock.conventionCollaborator.findFirst({
           where: {
             conventionId,
-            userId: user!.id
-          }
+            userId: user!.id,
+          },
         })
 
         if (existing) {
@@ -204,35 +216,40 @@ describe('Collaborateurs de convention', () => {
         return null
       }
 
-      await expect(addCollaborator(1, { email: 'collaborator@example.com', role: 'MODERATOR' }, 1))
-        .rejects.toThrow('User already collaborator')
+      await expect(
+        addCollaborator(1, { email: 'collaborator@example.com', role: 'MODERATOR' }, 1)
+      ).rejects.toThrow('User already collaborator')
     })
   })
 
   describe('Modification de collaborateurs', () => {
-    it('devrait permettre de changer le rôle d\'un collaborateur', async () => {
+    it("devrait permettre de changer le rôle d'un collaborateur", async () => {
       const existingCollaborator = {
         id: 1,
         conventionId: 1,
         userId: 2,
-        role: 'MODERATOR'
+        role: 'MODERATOR',
       }
 
       const updatedCollaborator = {
         ...existingCollaborator,
-        role: 'ADMINISTRATOR'
+        role: 'ADMINISTRATOR',
       }
 
       prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
       prismaMock.convention.findUnique.mockResolvedValue({
         ...mockConvention,
-        collaborators: [{ userId: 1, role: 'ADMINISTRATOR' }]
+        collaborators: [{ userId: 1, role: 'ADMINISTRATOR' }],
       })
       prismaMock.conventionCollaborator.update.mockResolvedValue(updatedCollaborator)
 
-      const updateCollaborator = async (collaboratorId: number, newRole: string, userId: number) => {
+      const updateCollaborator = async (
+        collaboratorId: number,
+        newRole: string,
+        userId: number
+      ) => {
         const collaborator = await prismaMock.conventionCollaborator.findUnique({
-          where: { id: collaboratorId }
+          where: { id: collaboratorId },
         })
 
         if (!collaborator) {
@@ -243,18 +260,21 @@ describe('Collaborateurs de convention', () => {
           where: { id: collaborator.conventionId },
           include: {
             collaborators: {
-              where: { userId, role: 'ADMINISTRATOR' }
-            }
-          }
+              where: { userId, role: 'ADMINISTRATOR' },
+            },
+          },
         })
 
-        if (!convention || (convention.authorId !== userId && convention.collaborators.length === 0)) {
+        if (
+          !convention ||
+          (convention.authorId !== userId && convention.collaborators.length === 0)
+        ) {
           throw new Error('Unauthorized')
         }
 
         return await prismaMock.conventionCollaborator.update({
           where: { id: collaboratorId },
-          data: { role: newRole }
+          data: { role: newRole },
         })
       }
 
@@ -263,7 +283,7 @@ describe('Collaborateurs de convention', () => {
       expect(result.role).toBe('ADMINISTRATOR')
       expect(prismaMock.conventionCollaborator.update).toHaveBeenCalledWith({
         where: { id: 1 },
-        data: { role: 'ADMINISTRATOR' }
+        data: { role: 'ADMINISTRATOR' },
       })
     })
 
@@ -272,7 +292,7 @@ describe('Collaborateurs de convention', () => {
         id: 1,
         conventionId: 1,
         userId: 1,
-        role: 'ADMINISTRATOR'
+        role: 'ADMINISTRATOR',
       }
 
       prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
@@ -280,15 +300,15 @@ describe('Collaborateurs de convention', () => {
 
       const updateCollaborator = async (collaboratorId: number, newRole: string) => {
         const collaborator = await prismaMock.conventionCollaborator.findUnique({
-          where: { id: collaboratorId }
+          where: { id: collaboratorId },
         })
 
         if (collaborator!.role === 'ADMINISTRATOR' && newRole !== 'ADMINISTRATOR') {
           const adminCount = await prismaMock.conventionCollaborator.count({
             where: {
               conventionId: collaborator!.conventionId,
-              role: 'ADMINISTRATOR'
-            }
+              role: 'ADMINISTRATOR',
+            },
           })
 
           if (adminCount <= 1) {
@@ -299,8 +319,9 @@ describe('Collaborateurs de convention', () => {
         return null
       }
 
-      await expect(updateCollaborator(1, 'MODERATOR'))
-        .rejects.toThrow('Cannot remove last administrator')
+      await expect(updateCollaborator(1, 'MODERATOR')).rejects.toThrow(
+        'Cannot remove last administrator'
+      )
     })
   })
 
@@ -310,19 +331,19 @@ describe('Collaborateurs de convention', () => {
         id: 1,
         conventionId: 1,
         userId: 2,
-        role: 'MODERATOR'
+        role: 'MODERATOR',
       }
 
       prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
       prismaMock.convention.findUnique.mockResolvedValue({
         ...mockConvention,
-        collaborators: [{ userId: 1, role: 'ADMINISTRATOR' }]
+        collaborators: [{ userId: 1, role: 'ADMINISTRATOR' }],
       })
       prismaMock.conventionCollaborator.delete.mockResolvedValue(existingCollaborator)
 
       const removeCollaborator = async (collaboratorId: number, userId: number) => {
         const collaborator = await prismaMock.conventionCollaborator.findUnique({
-          where: { id: collaboratorId }
+          where: { id: collaboratorId },
         })
 
         if (!collaborator) {
@@ -333,17 +354,20 @@ describe('Collaborateurs de convention', () => {
           where: { id: collaborator.conventionId },
           include: {
             collaborators: {
-              where: { userId, role: 'ADMINISTRATOR' }
-            }
-          }
+              where: { userId, role: 'ADMINISTRATOR' },
+            },
+          },
         })
 
-        if (!convention || (convention.authorId !== userId && convention.collaborators.length === 0)) {
+        if (
+          !convention ||
+          (convention.authorId !== userId && convention.collaborators.length === 0)
+        ) {
           throw new Error('Unauthorized')
         }
 
         return await prismaMock.conventionCollaborator.delete({
-          where: { id: collaboratorId }
+          where: { id: collaboratorId },
         })
       }
 
@@ -351,7 +375,7 @@ describe('Collaborateurs de convention', () => {
 
       expect(result.id).toBe(1)
       expect(prismaMock.conventionCollaborator.delete).toHaveBeenCalledWith({
-        where: { id: 1 }
+        where: { id: 1 },
       })
     })
 
@@ -360,14 +384,14 @@ describe('Collaborateurs de convention', () => {
         id: 1,
         conventionId: 1,
         userId: 2,
-        role: 'MODERATOR'
+        role: 'MODERATOR',
       }
 
       prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
 
       const removeCollaborator = async (collaboratorId: number, userId: number) => {
         const collaborator = await prismaMock.conventionCollaborator.findUnique({
-          where: { id: collaboratorId }
+          where: { id: collaboratorId },
         })
 
         if (collaborator!.userId === userId) {
@@ -377,8 +401,7 @@ describe('Collaborateurs de convention', () => {
         return null
       }
 
-      await expect(removeCollaborator(1, 2))
-        .rejects.toThrow('Cannot remove yourself')
+      await expect(removeCollaborator(1, 2)).rejects.toThrow('Cannot remove yourself')
     })
 
     it('devrait empêcher de supprimer le dernier administrateur', async () => {
@@ -386,7 +409,7 @@ describe('Collaborateurs de convention', () => {
         id: 1,
         conventionId: 1,
         userId: 1,
-        role: 'ADMINISTRATOR'
+        role: 'ADMINISTRATOR',
       }
 
       prismaMock.conventionCollaborator.findUnique.mockResolvedValue(existingCollaborator)
@@ -394,15 +417,15 @@ describe('Collaborateurs de convention', () => {
 
       const removeCollaborator = async (collaboratorId: number, userId: number) => {
         const collaborator = await prismaMock.conventionCollaborator.findUnique({
-          where: { id: collaboratorId }
+          where: { id: collaboratorId },
         })
 
         if (collaborator!.role === 'ADMINISTRATOR') {
           const adminCount = await prismaMock.conventionCollaborator.count({
             where: {
               conventionId: collaborator!.conventionId,
-              role: 'ADMINISTRATOR'
-            }
+              role: 'ADMINISTRATOR',
+            },
           })
 
           if (adminCount <= 1) {
@@ -413,13 +436,12 @@ describe('Collaborateurs de convention', () => {
         return null
       }
 
-      await expect(removeCollaborator(1, 2))
-        .rejects.toThrow('Cannot remove last administrator')
+      await expect(removeCollaborator(1, 2)).rejects.toThrow('Cannot remove last administrator')
     })
   })
 
   describe('Récupération des collaborateurs', () => {
-    it('devrait lister tous les collaborateurs d\'une convention', async () => {
+    it("devrait lister tous les collaborateurs d'une convention", async () => {
       const collaborators = [
         {
           id: 1,
@@ -430,12 +452,12 @@ describe('Collaborateurs de convention', () => {
             id: 1,
             pseudo: 'admin',
             email: 'admin@example.com',
-            profilePicture: null
+            profilePicture: null,
           },
           addedBy: {
             id: 1,
-            pseudo: 'admin'
-          }
+            pseudo: 'admin',
+          },
         },
         {
           id: 2,
@@ -446,13 +468,13 @@ describe('Collaborateurs de convention', () => {
             id: 2,
             pseudo: 'moderator',
             email: 'moderator@example.com',
-            profilePicture: null
+            profilePicture: null,
           },
           addedBy: {
             id: 1,
-            pseudo: 'admin'
-          }
-        }
+            pseudo: 'admin',
+          },
+        },
       ]
 
       prismaMock.conventionCollaborator.findMany.mockResolvedValue(collaborators)
@@ -466,16 +488,16 @@ describe('Collaborateurs de convention', () => {
                 id: true,
                 pseudo: true,
                 email: true,
-                profilePicture: true
-              }
+                profilePicture: true,
+              },
             },
             addedBy: {
               select: {
                 id: true,
-                pseudo: true
-              }
-            }
-          }
+                pseudo: true,
+              },
+            },
+          },
         })
       }
 
@@ -493,11 +515,11 @@ describe('Collaborateurs de convention', () => {
         { id: 1, role: 'ADMINISTRATOR', user: { pseudo: 'admin1' } },
         { id: 2, role: 'MODERATOR', user: { pseudo: 'mod1' } },
         { id: 3, role: 'ADMINISTRATOR', user: { pseudo: 'admin2' } },
-        { id: 4, role: 'MODERATOR', user: { pseudo: 'mod2' } }
+        { id: 4, role: 'MODERATOR', user: { pseudo: 'mod2' } },
       ]
 
-      const admins = allCollaborators.filter(c => c.role === 'ADMINISTRATOR')
-      const moderators = allCollaborators.filter(c => c.role === 'MODERATOR')
+      const admins = allCollaborators.filter((c) => c.role === 'ADMINISTRATOR')
+      const moderators = allCollaborators.filter((c) => c.role === 'MODERATOR')
 
       expect(admins).toHaveLength(2)
       expect(moderators).toHaveLength(2)
@@ -513,15 +535,10 @@ describe('Collaborateurs de convention', () => {
           'manage_collaborators',
           'edit_convention',
           'delete_convention',
-          'manage_editions'
+          'manage_editions',
         ],
-        MODERATOR: [
-          'edit_convention',
-          'manage_editions'
-        ],
-        VIEWER: [
-          'view_convention'
-        ]
+        MODERATOR: ['edit_convention', 'manage_editions'],
+        VIEWER: ['view_convention'],
       }
 
       const hasPermission = (role: string, permission: string) => {
@@ -536,7 +553,7 @@ describe('Collaborateurs de convention', () => {
 
     it('devrait vérifier les permissions avant les actions', () => {
       const userRole = 'MODERATOR'
-      
+
       const canManageCollaborators = userRole === 'ADMINISTRATOR'
       const canEditConvention = ['ADMINISTRATOR', 'MODERATOR'].includes(userRole)
       const canViewConvention = ['ADMINISTRATOR', 'MODERATOR', 'VIEWER'].includes(userRole)
@@ -548,11 +565,11 @@ describe('Collaborateurs de convention', () => {
   })
 
   describe('Notifications et historique', () => {
-    it('devrait enregistrer l\'historique des ajouts de collaborateurs', () => {
+    it("devrait enregistrer l'historique des ajouts de collaborateurs", () => {
       const history: Array<{
-        action: string,
-        collaboratorId: number,
-        addedBy: number,
+        action: string
+        collaboratorId: number
+        addedBy: number
         timestamp: Date
       }> = []
 
@@ -561,7 +578,7 @@ describe('Collaborateurs de convention', () => {
           action,
           collaboratorId,
           addedBy,
-          timestamp: new Date()
+          timestamp: new Date(),
         })
       }
 
@@ -577,8 +594,8 @@ describe('Collaborateurs de convention', () => {
 
     it('devrait notifier les collaborateurs des changements', () => {
       const notifications: Array<{
-        userId: number,
-        message: string,
+        userId: number
+        message: string
         type: string
       }> = []
 
@@ -586,13 +603,13 @@ describe('Collaborateurs de convention', () => {
         const messages = {
           ADDED: `Vous avez été ajouté comme collaborateur à ${conventionName}`,
           ROLE_CHANGED: `Votre rôle a été modifié dans ${conventionName}`,
-          REMOVED: `Vous avez été retiré de ${conventionName}`
+          REMOVED: `Vous avez été retiré de ${conventionName}`,
         }
 
         notifications.push({
           userId,
           message: messages[action as keyof typeof messages],
-          type: 'COLLABORATOR_UPDATE'
+          type: 'COLLABORATOR_UPDATE',
         })
       }
 
@@ -628,20 +645,15 @@ describe('Collaborateurs de convention', () => {
       expect(canAddMoreCollaborators).toBe(false)
     })
 
-    it('devrait empêcher l\'ajout de collaborateurs avec des emails invalides', () => {
-      const invalidEmails = [
-        'invalid-email',
-        '@domain.com',
-        'user@',
-        'user name@domain.com'
-      ]
+    it("devrait empêcher l'ajout de collaborateurs avec des emails invalides", () => {
+      const invalidEmails = ['invalid-email', '@domain.com', 'user@', 'user name@domain.com']
 
       const isValidEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         return emailRegex.test(email)
       }
 
-      invalidEmails.forEach(email => {
+      invalidEmails.forEach((email) => {
         expect(isValidEmail(email)).toBe(false)
       })
 

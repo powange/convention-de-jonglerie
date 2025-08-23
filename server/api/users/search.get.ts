@@ -1,9 +1,12 @@
-import { PrismaClient } from '@prisma/client';
-import type { H3Error } from 'h3'
-import { getEmailHash } from '../../utils/email-hash';
+import { PrismaClient } from '@prisma/client'
+
 import { requireUserSession } from '#imports'
 
-const prisma = new PrismaClient();
+import { getEmailHash } from '../../utils/email-hash'
+
+import type { H3Error } from 'h3'
+
+const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   try {
@@ -11,49 +14,45 @@ export default defineEventHandler(async (event) => {
     const { user } = await requireUserSession(event)
 
     // Récupérer le paramètre de recherche
-    const query = getQuery(event);
-    const searchQuery = query.q as string;
+    const query = getQuery(event)
+    const searchQuery = query.q as string
 
     if (!searchQuery || searchQuery.length < 2) {
-      return [];
+      return []
     }
 
     // Rechercher les utilisateurs par email ou pseudo
     const users = await prisma.user.findMany({
       where: {
-        OR: [
-          { email: { contains: searchQuery } },
-          { pseudo: { contains: searchQuery } }
-        ],
+        OR: [{ email: { contains: searchQuery } }, { pseudo: { contains: searchQuery } }],
         // Exclure l'utilisateur actuel
-        NOT: { id: user.id }
+        NOT: { id: user.id },
       },
       select: {
         id: true,
         pseudo: true,
         profilePicture: true,
-        email: true
+        email: true,
       },
       take: 10, // Limiter à 10 résultats
-      orderBy: { pseudo: 'asc' }
-    });
+      orderBy: { pseudo: 'asc' },
+    })
 
     // Transformer les emails en emailHash
-    const transformedUsers = users.map(u => ({
+    const transformedUsers = users.map((u) => ({
       id: u.id,
       pseudo: u.pseudo,
       profilePicture: u.profilePicture,
-      emailHash: getEmailHash(u.email)
-    }));
+      emailHash: getEmailHash(u.email),
+    }))
 
-    return transformedUsers;
-
+    return transformedUsers
   } catch (error: unknown) {
-    console.error('Erreur lors de la recherche d\'utilisateurs:', error);
+    console.error("Erreur lors de la recherche d'utilisateurs:", error)
     if ((error as H3Error)?.statusCode) throw error
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur lors de la recherche',
-    });
+    })
   }
-});
+})

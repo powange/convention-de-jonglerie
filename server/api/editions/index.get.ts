@@ -1,16 +1,15 @@
-import { getEmailHash } from '../../utils/email-hash';
-import { prisma } from '../../utils/prisma';
+import { getEmailHash } from '../../utils/email-hash'
+import { prisma } from '../../utils/prisma'
 
 // import type { Edition } from '~/types';
 
-
 export default defineEventHandler(async (event) => {
   try {
-    const query = getQuery(event);
-    const { 
-      name, 
-      startDate, 
-      endDate, 
+    const query = getQuery(event)
+    const {
+      name,
+      startDate,
+      endDate,
       countries,
       showPast,
       showCurrent,
@@ -36,230 +35,223 @@ export default defineEventHandler(async (event) => {
       hasLongShow,
       hasATM,
       page = '1',
-      limit = '12'
-    } = query;
+      limit = '12',
+    } = query
 
-    const pageNumber = parseInt(page as string, 10);
-    const limitNumber = parseInt(limit as string, 10);
+    const pageNumber = parseInt(page as string, 10)
+    const limitNumber = parseInt(limit as string, 10)
 
     const where: {
-      name?: { contains: string };
-      startDate?: { gte: Date };
-      endDate?: { lte: Date };
-      country?: { in: string[] };
-      isOnline?: boolean;
-      hasFoodTrucks?: boolean;
-      hasKidsZone?: boolean;
-      acceptsPets?: boolean;
-      hasTentCamping?: boolean;
-      hasTruckCamping?: boolean;
-      hasFamilyCamping?: boolean;
-      hasGym?: boolean;
-      hasFireSpace?: boolean;
-      hasGala?: boolean;
-      hasOpenStage?: boolean;
-      hasConcert?: boolean;
-      hasCantine?: boolean;
-      hasAerialSpace?: boolean;
-      hasSlacklineSpace?: boolean;
-      hasToilets?: boolean;
-      hasShowers?: boolean;
-      hasAccessibility?: boolean;
-      hasWorkshops?: boolean;
-      hasLongShow?: boolean;
-      hasATM?: boolean;
-    } = {};
+      name?: { contains: string }
+      startDate?: { gte: Date }
+      endDate?: { lte: Date }
+      country?: { in: string[] }
+      isOnline?: boolean
+      hasFoodTrucks?: boolean
+      hasKidsZone?: boolean
+      acceptsPets?: boolean
+      hasTentCamping?: boolean
+      hasTruckCamping?: boolean
+      hasFamilyCamping?: boolean
+      hasGym?: boolean
+      hasFireSpace?: boolean
+      hasGala?: boolean
+      hasOpenStage?: boolean
+      hasConcert?: boolean
+      hasCantine?: boolean
+      hasAerialSpace?: boolean
+      hasSlacklineSpace?: boolean
+      hasToilets?: boolean
+      hasShowers?: boolean
+      hasAccessibility?: boolean
+      hasWorkshops?: boolean
+      hasLongShow?: boolean
+      hasATM?: boolean
+    } = {}
 
-  // No default isOnline filter here; callers/tests expect the handler to
-  // build filters strictly from request query parameters.
+    // No default isOnline filter here; callers/tests expect the handler to
+    // build filters strictly from request query parameters.
 
     if (name) {
       where.name = {
         contains: name as string,
-      };
+      }
     }
 
     if (startDate) {
       where.startDate = {
         gte: new Date(startDate as string),
-      };
+      }
     }
 
     if (endDate) {
       where.endDate = {
         lte: new Date(endDate as string),
-      };
+      }
     }
 
     // Filtre par pays (support multiselect)
     if (countries) {
-      let countryList: string[] = [];
-      
+      let countryList: string[] = []
+
       // Gérer le cas où countries peut être une string ou un array
       if (typeof countries === 'string') {
         // Si c'est une string, essayer de la parser comme JSON ou la traiter comme un seul pays
         try {
-          const parsed = JSON.parse(countries);
+          const parsed = JSON.parse(countries)
           if (Array.isArray(parsed)) {
             // Si c'est un array d'objets avec une propriété 'value', extraire les valeurs
-            countryList = parsed.map(item => 
-              typeof item === 'object' && item !== null && 'value' in item 
-                ? item.value 
-                : item
-            );
+            countryList = parsed.map((item) =>
+              typeof item === 'object' && item !== null && 'value' in item ? item.value : item
+            )
           } else {
-            countryList = [parsed];
+            countryList = [parsed]
           }
         } catch {
-          countryList = [countries];
+          countryList = [countries]
         }
       } else if (Array.isArray(countries)) {
         // Si c'est déjà un array, extraire les valeurs si ce sont des objets
-        countryList = countries.map(item => 
-          typeof item === 'object' && item !== null && 'value' in item 
-            ? item.value 
-            : item
-        );
+        countryList = countries.map((item) =>
+          typeof item === 'object' && item !== null && 'value' in item ? item.value : item
+        )
       }
-      
+
       // Filtrer les valeurs vides et les doublons
-      countryList = [...new Set(countryList.filter(Boolean))];
-      
+      countryList = [...new Set(countryList.filter(Boolean))]
+
       if (countryList.length > 0) {
         where.country = {
-          in: countryList
-        };
+          in: countryList,
+        }
       }
     }
 
     // Filtres par services (booléens)
     if (hasFoodTrucks === 'true') {
-      where.hasFoodTrucks = true;
+      where.hasFoodTrucks = true
     }
     if (hasKidsZone === 'true') {
-      where.hasKidsZone = true;
+      where.hasKidsZone = true
     }
     if (acceptsPets === 'true') {
-      where.acceptsPets = true;
+      where.acceptsPets = true
     }
     if (hasTentCamping === 'true') {
-      where.hasTentCamping = true;
+      where.hasTentCamping = true
     }
     if (hasTruckCamping === 'true') {
-      where.hasTruckCamping = true;
+      where.hasTruckCamping = true
     }
     if (hasFamilyCamping === 'true') {
-      where.hasFamilyCamping = true;
+      where.hasFamilyCamping = true
     }
     if (hasGym === 'true') {
-      where.hasGym = true;
+      where.hasGym = true
     }
     if (hasFireSpace === 'true') {
-      where.hasFireSpace = true;
+      where.hasFireSpace = true
     }
     if (hasGala === 'true') {
-      where.hasGala = true;
+      where.hasGala = true
     }
     if (hasOpenStage === 'true') {
-      where.hasOpenStage = true;
+      where.hasOpenStage = true
     }
     if (hasConcert === 'true') {
-      where.hasConcert = true;
+      where.hasConcert = true
     }
     if (hasCantine === 'true') {
-      where.hasCantine = true;
+      where.hasCantine = true
     }
     if (hasAerialSpace === 'true') {
-      where.hasAerialSpace = true;
+      where.hasAerialSpace = true
     }
     if (hasSlacklineSpace === 'true') {
-      where.hasSlacklineSpace = true;
+      where.hasSlacklineSpace = true
     }
     if (hasToilets === 'true') {
-      where.hasToilets = true;
+      where.hasToilets = true
     }
     if (hasShowers === 'true') {
-      where.hasShowers = true;
+      where.hasShowers = true
     }
     if (hasAccessibility === 'true') {
-      where.hasAccessibility = true;
+      where.hasAccessibility = true
     }
     if (hasWorkshops === 'true') {
-      where.hasWorkshops = true;
+      where.hasWorkshops = true
     }
     if (hasLongShow === 'true') {
-      where.hasLongShow = true;
+      where.hasLongShow = true
     }
     if (hasATM === 'true') {
-      where.hasATM = true;
+      where.hasATM = true
     }
 
     // Construire la condition finale avec les filtres temporels
-  // Prisma where clause; fallback to unknown and narrow to object
-  let finalWhere: Record<string, unknown> = where;
-    
+    // Prisma where clause; fallback to unknown and narrow to object
+    let finalWhere: Record<string, unknown> = where
+
     // Filtres temporels
     if (showPast !== undefined || showCurrent !== undefined || showFuture !== undefined) {
-      const now = new Date();
-      
-      const timeFilters = [];
-      
+      const now = new Date()
+
+      const timeFilters = []
+
       if (showPast === 'true') {
         // Éditions terminées: endDate < maintenant
-        timeFilters.push({ endDate: { lt: now } });
+        timeFilters.push({ endDate: { lt: now } })
       }
-      
+
       if (showCurrent === 'true') {
         // Éditions en cours: startDate <= maintenant AND endDate >= maintenant
         timeFilters.push({
           startDate: { lte: now },
-          endDate: { gte: now }
-        });
+          endDate: { gte: now },
+        })
       }
-      
+
       if (showFuture === 'true') {
         // Éditions à venir: startDate > maintenant
-        timeFilters.push({ startDate: { gt: now } });
+        timeFilters.push({ startDate: { gt: now } })
       }
-      
+
       // Si au moins un filtre temporel est actif, créer un filtre AND avec les autres conditions
       if (timeFilters.length > 0) {
         // Si il y a d'autres conditions, combiner avec AND
         if (Object.keys(where).length > 0) {
           finalWhere = {
-            AND: [
-              where,
-              { OR: timeFilters }
-            ]
-          };
+            AND: [where, { OR: timeFilters }],
+          }
         } else {
           // Si pas d'autres conditions, utiliser seulement le filtre temporel
-          finalWhere = { OR: timeFilters };
+          finalWhere = { OR: timeFilters }
         }
       }
       // Si aucun filtre temporel n'est coché, ne rien afficher
       else if (showPast === 'false' && showCurrent === 'false' && showFuture === 'false') {
-        finalWhere = { id: -1 }; // Condition impossible pour ne rien retourner
+        finalWhere = { id: -1 } // Condition impossible pour ne rien retourner
       }
     }
 
     // Essayer d'inclure les collaborateurs, fallback sans si la table n'existe pas
-    let includeCollaborators = false;
+    let includeCollaborators = false
     try {
       // Test si la table EditionCollaborator existe
-      await prisma.editionCollaborator.findFirst();
-      includeCollaborators = true;
-  } catch {
-      console.log('Table EditionCollaborator pas encore créée, ignorer les collaborateurs');
+      await prisma.editionCollaborator.findFirst()
+      includeCollaborators = true
+    } catch {
+      console.log('Table EditionCollaborator pas encore créée, ignorer les collaborateurs')
     }
 
     // Calculer le skip et take pour la pagination
-    const skip = (pageNumber - 1) * limitNumber;
+    const skip = (pageNumber - 1) * limitNumber
 
     // Obtenir le total pour la pagination
     const totalCount = await prisma.edition.count({
-      where: finalWhere
-    });
+      where: finalWhere,
+    })
 
     const editions = await prisma.edition.findMany({
       where: finalWhere,
@@ -277,36 +269,42 @@ export default defineEventHandler(async (event) => {
           collaborators: {
             include: {
               user: {
-                select: { id: true, pseudo: true, profilePicture: true, updatedAt: true, email: true }
+                select: {
+                  id: true,
+                  pseudo: true,
+                  profilePicture: true,
+                  updatedAt: true,
+                  email: true,
+                },
               },
               addedBy: {
-                select: { id: true, pseudo: true }
-              }
-            }
-          }
+                select: { id: true, pseudo: true },
+              },
+            },
+          },
         }),
       },
       orderBy: {
-        startDate: 'asc' // Tri croissant par date de début (plus proche en premier)
+        startDate: 'asc', // Tri croissant par date de début (plus proche en premier)
       },
       skip,
-      take: limitNumber
-    });
+      take: limitNumber,
+    })
 
     // Transformer les emails en emailHash pour les collaborateurs
-    const transformedEditions = editions.map(edition => {
+    const transformedEditions = editions.map((edition) => {
       if (edition.collaborators) {
-        edition.collaborators = edition.collaborators.map(collab => ({
+        edition.collaborators = edition.collaborators.map((collab) => ({
           ...collab,
           user: {
             ...collab.user,
             emailHash: getEmailHash(collab.user.email),
-            email: undefined
-          } as unknown
-        }));
+            email: undefined,
+          } as unknown,
+        }))
       }
-      return edition;
-    });
+      return edition
+    })
 
     // Retourner les résultats avec les métadonnées de pagination
     return {
@@ -315,15 +313,15 @@ export default defineEventHandler(async (event) => {
         total: totalCount,
         page: pageNumber,
         limit: limitNumber,
-        totalPages: Math.ceil(totalCount / limitNumber)
-      }
-    };
+        totalPages: Math.ceil(totalCount / limitNumber),
+      },
+    }
   } catch (error) {
-    console.error('Erreur API editions:', error);
-    console.error('Query params:', query);
+    console.error('Erreur API editions:', error)
+    console.error('Query params:', query)
     throw createError({
       statusCode: 500,
       statusMessage: `Erreur lors de la récupération des éditions: ${error.message}`,
-    });
+    })
   }
-});
+})

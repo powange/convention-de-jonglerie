@@ -1,13 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { prismaMock } from '../__mocks__/prisma';
+import { describe, it, expect, beforeEach } from 'vitest'
+
+import { prismaMock } from '../__mocks__/prisma'
 
 // Mock Prisma pour les tests d'intégration
-const prisma = prismaMock;
+const prisma = prismaMock
 
 describe('Lost Found System - Database Integration', () => {
   beforeEach(() => {
     // Les mocks sont automatiquement réinitialisés
-  });
+  })
 
   describe('LostFoundItem CRUD', () => {
     it('devrait pouvoir créer un objet trouvé', async () => {
@@ -20,9 +21,9 @@ describe('Lost Found System - Database Integration', () => {
         status: 'LOST',
         createdAt: new Date(),
         updatedAt: new Date(),
-      };
+      }
 
-      prisma.lostFoundItem.create.mockResolvedValue(mockLostFoundItem);
+      prisma.lostFoundItem.create.mockResolvedValue(mockLostFoundItem)
 
       const result = await prisma.lostFoundItem.create({
         data: {
@@ -32,9 +33,9 @@ describe('Lost Found System - Database Integration', () => {
           imageUrl: '/uploads/lost-found/1/image.jpg',
           status: 'LOST',
         },
-      });
+      })
 
-      expect(result).toEqual(mockLostFoundItem);
+      expect(result).toEqual(mockLostFoundItem)
       expect(prisma.lostFoundItem.create).toHaveBeenCalledWith({
         data: {
           editionId: 123,
@@ -43,8 +44,8 @@ describe('Lost Found System - Database Integration', () => {
           imageUrl: '/uploads/lost-found/1/image.jpg',
           status: 'LOST',
         },
-      });
-    });
+      })
+    })
 
     it('devrait pouvoir récupérer des objets trouvés', async () => {
       const mockItems = [
@@ -60,9 +61,9 @@ describe('Lost Found System - Database Integration', () => {
           status: 'RETURNED',
           user: { id: 2, pseudo: 'testuser2' },
         },
-      ];
+      ]
 
-      prisma.lostFoundItem.findMany.mockResolvedValue(mockItems);
+      prisma.lostFoundItem.findMany.mockResolvedValue(mockItems)
 
       const result = await prisma.lostFoundItem.findMany({
         where: { editionId: 123 },
@@ -71,33 +72,33 @@ describe('Lost Found System - Database Integration', () => {
             select: { id: true, pseudo: true },
           },
         },
-      });
+      })
 
-      expect(result).toEqual(mockItems);
-      expect(result).toHaveLength(2);
-    });
+      expect(result).toEqual(mockItems)
+      expect(result).toHaveLength(2)
+    })
 
     it('devrait pouvoir mettre à jour le statut', async () => {
       const mockUpdatedItem = {
         id: 1,
         status: 'RETURNED',
         updatedAt: new Date(),
-      };
+      }
 
-      prisma.lostFoundItem.update.mockResolvedValue(mockUpdatedItem);
+      prisma.lostFoundItem.update.mockResolvedValue(mockUpdatedItem)
 
       const result = await prisma.lostFoundItem.update({
         where: { id: 1 },
         data: { status: 'RETURNED' },
-      });
+      })
 
-      expect(result.status).toBe('RETURNED');
+      expect(result.status).toBe('RETURNED')
       expect(prisma.lostFoundItem.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: { status: 'RETURNED' },
-      });
-    });
-  });
+      })
+    })
+  })
 
   describe('LostFoundComment CRUD', () => {
     it('devrait pouvoir créer un commentaire', async () => {
@@ -105,7 +106,7 @@ describe('Lost Found System - Database Integration', () => {
         id: 1,
         lostFoundItemId: 1,
         userId: 2,
-        content: 'Je pense que c\'est le mien',
+        content: "Je pense que c'est le mien",
         createdAt: new Date(),
         user: {
           id: 2,
@@ -113,15 +114,15 @@ describe('Lost Found System - Database Integration', () => {
           prenom: 'Test2',
           nom: 'User2',
         },
-      };
+      }
 
-      prisma.lostFoundComment.create.mockResolvedValue(mockComment);
+      prisma.lostFoundComment.create.mockResolvedValue(mockComment)
 
       const result = await prisma.lostFoundComment.create({
         data: {
           lostFoundItemId: 1,
           userId: 2,
-          content: 'Je pense que c\'est le mien',
+          content: "Je pense que c'est le mien",
         },
         include: {
           user: {
@@ -133,11 +134,11 @@ describe('Lost Found System - Database Integration', () => {
             },
           },
         },
-      });
+      })
 
-      expect(result).toEqual(mockComment);
-      expect(result.content).toBe('Je pense que c\'est le mien');
-    });
+      expect(result).toEqual(mockComment)
+      expect(result.content).toBe("Je pense que c'est le mien")
+    })
 
     it('devrait pouvoir lister les commentaires par objet', async () => {
       const mockComments = [
@@ -151,9 +152,9 @@ describe('Lost Found System - Database Integration', () => {
           content: 'Deuxième commentaire',
           user: { pseudo: 'user2' },
         },
-      ];
+      ]
 
-      prisma.lostFoundComment.findMany.mockResolvedValue(mockComments);
+      prisma.lostFoundComment.findMany.mockResolvedValue(mockComments)
 
       const result = await prisma.lostFoundComment.findMany({
         where: { lostFoundItemId: 1 },
@@ -161,12 +162,12 @@ describe('Lost Found System - Database Integration', () => {
           user: { select: { pseudo: true } },
         },
         orderBy: { createdAt: 'asc' },
-      });
+      })
 
-      expect(result).toEqual(mockComments);
-      expect(result).toHaveLength(2);
-    });
-  });
+      expect(result).toEqual(mockComments)
+      expect(result).toHaveLength(2)
+    })
+  })
 
   describe('Opérations complexes', () => {
     it('devrait pouvoir récupérer des objets avec commentaires', async () => {
@@ -183,9 +184,9 @@ describe('Lost Found System - Database Integration', () => {
             },
           ],
         },
-      ];
+      ]
 
-      prisma.lostFoundItem.findMany.mockResolvedValue(mockItemsWithComments);
+      prisma.lostFoundItem.findMany.mockResolvedValue(mockItemsWithComments)
 
       const result = await prisma.lostFoundItem.findMany({
         where: { editionId: 123 },
@@ -197,34 +198,34 @@ describe('Lost Found System - Database Integration', () => {
             },
           },
         },
-      });
+      })
 
-      expect(result).toEqual(mockItemsWithComments);
-      expect(result[0].comments).toHaveLength(1);
-    });
+      expect(result).toEqual(mockItemsWithComments)
+      expect(result[0].comments).toHaveLength(1)
+    })
 
     it('devrait pouvoir grouper par utilisateur', async () => {
       const mockGroupedData = [
         { userId: 1, _count: { id: 2 } },
         { userId: 2, _count: { id: 1 } },
-      ];
+      ]
 
-      prisma.lostFoundItem.groupBy.mockResolvedValue(mockGroupedData);
+      prisma.lostFoundItem.groupBy.mockResolvedValue(mockGroupedData)
 
       const result = await prisma.lostFoundItem.groupBy({
         by: ['userId'],
         where: { editionId: 123 },
         _count: { id: true },
-      });
+      })
 
-      expect(result).toEqual(mockGroupedData);
-      expect(result).toHaveLength(2);
-    });
-  });
+      expect(result).toEqual(mockGroupedData)
+      expect(result).toHaveLength(2)
+    })
+  })
 
   describe('Validation des appels Prisma', () => {
-    it('devrait vérifier les paramètres de création d\'objet trouvé', async () => {
-      prisma.lostFoundItem.create.mockResolvedValue({ id: 1 });
+    it("devrait vérifier les paramètres de création d'objet trouvé", async () => {
+      prisma.lostFoundItem.create.mockResolvedValue({ id: 1 })
 
       await prisma.lostFoundItem.create({
         data: {
@@ -244,7 +245,7 @@ describe('Lost Found System - Database Integration', () => {
             },
           },
         },
-      });
+      })
 
       expect(prisma.lostFoundItem.create).toHaveBeenCalledWith({
         data: {
@@ -264,11 +265,11 @@ describe('Lost Found System - Database Integration', () => {
             },
           },
         },
-      });
-    });
+      })
+    })
 
     it('devrait vérifier les paramètres de recherche avec filtres', async () => {
-      prisma.lostFoundItem.findMany.mockResolvedValue([]);
+      prisma.lostFoundItem.findMany.mockResolvedValue([])
 
       await prisma.lostFoundItem.findMany({
         where: {
@@ -280,7 +281,7 @@ describe('Lost Found System - Database Integration', () => {
           comments: { orderBy: { createdAt: 'asc' } },
         },
         orderBy: { createdAt: 'desc' },
-      });
+      })
 
       expect(prisma.lostFoundItem.findMany).toHaveBeenCalledWith({
         where: {
@@ -292,7 +293,7 @@ describe('Lost Found System - Database Integration', () => {
           comments: { orderBy: { createdAt: 'asc' } },
         },
         orderBy: { createdAt: 'desc' },
-      });
-    });
-  });
-});
+      })
+    })
+  })
+})

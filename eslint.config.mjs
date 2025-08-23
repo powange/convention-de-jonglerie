@@ -5,7 +5,7 @@ import withNuxt from './.nuxt/eslint.config.mjs'
 export default withNuxt(
   // Règles globales légères pour réduire le bruit sans masquer les erreurs importantes
   {
-    files: ['**/*.{js,ts,vue}'],
+  files: ['**/*.{js,cjs,mjs,ts,tsx,vue}'],
     rules: {
       // Les props par défaut ne sont pas nécessaires en script setup + TS
       'vue/require-default-prop': 'off',
@@ -15,6 +15,21 @@ export default withNuxt(
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
   // Trop strict pour une migration en cours ; préférer améliorer progressivement
   '@typescript-eslint/no-explicit-any': 'off',
+  'no-unused-vars': 'off',
+      // Style d'import unifié (mode warn pour adoption progressive)
+      'import/order': ['warn', {
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
+        'newlines-between': 'always',
+        alphabetize: { order: 'asc', caseInsensitive: true },
+        pathGroups: [
+          { pattern: '~/**', group: 'internal', position: 'after' },
+          { pattern: '@/**', group: 'internal', position: 'after' },
+          { pattern: '#**', group: 'internal', position: 'after' }
+        ],
+        pathGroupsExcludedImportTypes: ['builtin']
+      }],
+      'import/newline-after-import': ['warn', { count: 1 }],
+      'import/no-duplicates': 'warn'
     },
   },
   // Tests (Vitest) : relâcher no-explicit-any + règles import/unused
@@ -34,18 +49,18 @@ export default withNuxt(
       },
     },
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       'import/first': 'off',
   'import/no-mutable-exports': 'off',
   'no-useless-escape': 'off',
+  'import/order': 'off',
+  'import/newline-after-import': 'off',
     },
   },
   // Scripts utilitaires Node
   {
     files: ['scripts/**/*.{js,ts,mjs}'],
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
     },

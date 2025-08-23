@@ -11,14 +11,14 @@ const createModelMock = () => ({
   delete: vi.fn(),
   deleteMany: vi.fn(),
   count: vi.fn(),
-  groupBy: vi.fn()
+  groupBy: vi.fn(),
 })
 
 export const prismaMock = {
   // Modèles d'authentification
   user: createModelMock(),
   passwordResetToken: createModelMock(),
-  
+
   // Modèles principaux
   convention: createModelMock(),
   conventionCollaborator: createModelMock(),
@@ -28,24 +28,24 @@ export const prismaMock = {
   editionPost: createModelMock(),
   editionPostComment: createModelMock(),
   collaboratorPermissionHistory: createModelMock(),
-  
+
   // Modèles objets trouvés
   lostFoundItem: createModelMock(),
   lostFoundComment: createModelMock(),
-  
+
   // Modèles covoiturage
   carpoolOffer: createModelMock(),
   carpoolRequest: createModelMock(),
   carpoolComment: createModelMock(),
   carpoolRequestComment: createModelMock(),
-  
+
   // Méthodes Prisma
   $connect: vi.fn(),
   $disconnect: vi.fn(),
   $transaction: vi.fn(),
   $queryRaw: vi.fn(),
   $executeRaw: vi.fn(),
-  $executeRawUnsafe: vi.fn()
+  $executeRawUnsafe: vi.fn(),
 }
 
 // Reset automatique avant chaque test

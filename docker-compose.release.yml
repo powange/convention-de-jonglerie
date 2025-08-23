@@ -13,9 +13,9 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
-      - "3308:3306"
+      - '3308:3306'
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       timeout: 20s
       retries: 10
 
@@ -27,26 +27,26 @@ services:
     container_name: convention-app-release
     restart: unless-stopped
     environment:
-      DATABASE_URL: "mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}"
-      NUXT_HOST: "0.0.0.0"
-      NUXT_PORT: "3000"
-      NODE_ENV: "production"
-      NUXT_SESSION_PASSWORD: "${NUXT_SESSION_PASSWORD}"
-      SEND_EMAILS: "${SEND_EMAILS}"
-      SMTP_USER: "${SMTP_USER}"
-      SMTP_PASS: "${SMTP_PASS}"
+      DATABASE_URL: 'mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}'
+      NUXT_HOST: '0.0.0.0'
+      NUXT_PORT: '3000'
+      NODE_ENV: 'production'
+      NUXT_SESSION_PASSWORD: '${NUXT_SESSION_PASSWORD}'
+      SEND_EMAILS: '${SEND_EMAILS}'
+      SMTP_USER: '${SMTP_USER}'
+      SMTP_PASS: '${SMTP_PASS}'
       # Google OAuth
-      NUXT_OAUTH_GOOGLE_CLIENT_ID: "${NUXT_OAUTH_GOOGLE_CLIENT_ID}"
-      NUXT_OAUTH_GOOGLE_CLIENT_SECRET: "${NUXT_OAUTH_GOOGLE_CLIENT_SECRET}"
+      NUXT_OAUTH_GOOGLE_CLIENT_ID: '${NUXT_OAUTH_GOOGLE_CLIENT_ID}'
+      NUXT_OAUTH_GOOGLE_CLIENT_SECRET: '${NUXT_OAUTH_GOOGLE_CLIENT_SECRET}'
       # Optionnel si vous avez une URL publique
-      NUXT_OAUTH_GOOGLE_REDIRECT_URL: "${NUXT_OAUTH_GOOGLE_REDIRECT_URL}"
+      NUXT_OAUTH_GOOGLE_REDIRECT_URL: '${NUXT_OAUTH_GOOGLE_REDIRECT_URL}'
       # Facebook OAuth
-      NUXT_OAUTH_FACEBOOK_CLIENT_ID: "${NUXT_OAUTH_FACEBOOK_CLIENT_ID}"
-      NUXT_OAUTH_FACEBOOK_CLIENT_SECRET: "${NUXT_OAUTH_FACEBOOK_CLIENT_SECRET}"
-      NUXT_OAUTH_FACEBOOK_REDIRECT_URL: "${NUXT_OAUTH_FACEBOOK_REDIRECT_URL}"
+      NUXT_OAUTH_FACEBOOK_CLIENT_ID: '${NUXT_OAUTH_FACEBOOK_CLIENT_ID}'
+      NUXT_OAUTH_FACEBOOK_CLIENT_SECRET: '${NUXT_OAUTH_FACEBOOK_CLIENT_SECRET}'
+      NUXT_OAUTH_FACEBOOK_REDIRECT_URL: '${NUXT_OAUTH_FACEBOOK_REDIRECT_URL}'
       # Exposition Nuxt (public/secret) basée sur les mêmes valeurs
-      NUXT_PUBLIC_RECAPTCHA_SITE_KEY: "${NUXT_PUBLIC_RECAPTCHA_SITE_KEY}"
-      NUXT_RECAPTCHA_SECRET_KEY: "${NUXT_RECAPTCHA_SECRET_KEY}"
+      NUXT_PUBLIC_RECAPTCHA_SITE_KEY: '${NUXT_PUBLIC_RECAPTCHA_SITE_KEY}'
+      NUXT_RECAPTCHA_SECRET_KEY: '${NUXT_RECAPTCHA_SECRET_KEY}'
     volumes:
       - uploads_data:/app/public/uploads
     depends_on:
@@ -59,7 +59,7 @@ services:
     container_name: convention-adminer-release
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - '8080:8080'
     environment:
       ADMINER_DEFAULT_SERVER: database
     depends_on:

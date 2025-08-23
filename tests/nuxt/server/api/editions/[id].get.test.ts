@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../../../../__mocks__/prisma';
+
+import { prismaMock } from '../../../../__mocks__/prisma'
 import handler from '../../../../server/api/editions/[id].get'
 
 // Mock des utilitaires
 vi.mock('../../../../server/utils/email-hash', () => ({
-  getEmailHash: vi.fn((email: string) => email ? `hash_${email}` : '')
+  getEmailHash: vi.fn((email: string) => (email ? `hash_${email}` : '')),
 }))
 
 describe('/api/editions/[id] GET', () => {
@@ -52,11 +53,9 @@ describe('/api/editions/[id] GET', () => {
       pseudo: 'testuser',
       email: 'creator@example.com',
       profilePicture: null,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     },
-    favoritedBy: [
-      { id: 2, email: 'fan@example.com', pseudo: 'fan' }
-    ],
+    favoritedBy: [{ id: 2, email: 'fan@example.com', pseudo: 'fan' }],
     convention: {
       id: 1,
       name: 'Convention Test',
@@ -74,11 +73,11 @@ describe('/api/editions/[id] GET', () => {
             pseudo: 'collaborator',
             email: 'collab@example.com',
             profilePicture: null,
-            updatedAt: new Date()
-          }
-        }
-      ]
-    }
+            updatedAt: new Date(),
+          },
+        },
+      ],
+    },
   }
 
   beforeEach(() => {
@@ -92,7 +91,7 @@ describe('/api/editions/[id] GET', () => {
     prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {
-      context: { params: { id: '1' } }
+      context: { params: { id: '1' } },
     }
 
     const result = await handler(mockEvent as any)
@@ -107,8 +106,8 @@ describe('/api/editions/[id] GET', () => {
       include: expect.objectContaining({
         creator: expect.any(Object),
         favoritedBy: expect.any(Object),
-        convention: expect.any(Object)
-      })
+        convention: expect.any(Object),
+      }),
     })
   })
 
@@ -118,7 +117,7 @@ describe('/api/editions/[id] GET', () => {
     prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {
-      context: { params: { id: '1' } }
+      context: { params: { id: '1' } },
     }
 
     const result = await handler(mockEvent as any)
@@ -126,7 +125,7 @@ describe('/api/editions/[id] GET', () => {
     // Vérifier que les emails sont masqués
     expect(result.creator.email).toBeUndefined()
     expect(result.creator.emailHash).toBe('hash_creator@example.com')
-    
+
     // Vérifier qu'il y a au moins un collaborateur
     expect(result.convention.collaborators).toHaveLength(1)
     expect(result.convention.collaborators[0].user.email).toBeUndefined()
@@ -134,7 +133,7 @@ describe('/api/editions/[id] GET', () => {
     expect(result.convention.collaborators[0].user.emailHash).toBeDefined()
   })
 
-  it('devrait inclure les collaborateurs d\'édition si disponible', async () => {
+  it("devrait inclure les collaborateurs d'édition si disponible", async () => {
     const editionWithCollaborators = {
       ...mockEdition,
       collaborators: [
@@ -145,14 +144,14 @@ describe('/api/editions/[id] GET', () => {
             pseudo: 'edition_collab',
             email: 'ed_collab@example.com',
             profilePicture: null,
-            updatedAt: new Date()
+            updatedAt: new Date(),
           },
           addedBy: {
             id: 1,
-            pseudo: 'creator'
-          }
-        }
-      ]
+            pseudo: 'creator',
+          },
+        },
+      ],
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -160,7 +159,7 @@ describe('/api/editions/[id] GET', () => {
     prismaMock.editionCollaborator.findFirst.mockResolvedValue({}) // Table existe
 
     const mockEvent = {
-      context: { params: { id: '1' } }
+      context: { params: { id: '1' } },
     }
 
     const result = await handler(mockEvent as any)
@@ -176,7 +175,7 @@ describe('/api/editions/[id] GET', () => {
     global.getRouterParam.mockReturnValue('invalid')
 
     const mockEvent = {
-      context: { params: { id: 'invalid' } }
+      context: { params: { id: 'invalid' } },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Invalid Edition ID')
@@ -188,7 +187,7 @@ describe('/api/editions/[id] GET', () => {
     prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {
-      context: { params: { id: '999' } }
+      context: { params: { id: '999' } },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow()
@@ -199,19 +198,19 @@ describe('/api/editions/[id] GET', () => {
     prismaMock.edition.findUnique.mockRejectedValue(new Error('Database error'))
 
     const mockEvent = {
-      context: { params: { id: '1' } }
+      context: { params: { id: '1' } },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow()
   })
 
-  it('devrait fonctionner même si la table EditionCollaborator n\'existe pas', async () => {
+  it("devrait fonctionner même si la table EditionCollaborator n'existe pas", async () => {
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {
-      context: { params: { id: '1' } }
+      context: { params: { id: '1' } },
     }
 
     const result = await handler(mockEvent as any)
@@ -226,7 +225,7 @@ describe('/api/editions/[id] GET', () => {
     prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
 
     const mockEvent = {
-      context: { params: { id: '1' } }
+      context: { params: { id: '1' } },
     }
 
     await handler(mockEvent as any)
@@ -240,13 +239,13 @@ describe('/api/editions/[id] GET', () => {
             pseudo: true,
             email: true,
             profilePicture: true,
-            updatedAt: true
-          }
+            updatedAt: true,
+          },
         },
         favoritedBy: {
           select: {
-            id: true
-          }
+            id: true,
+          },
         },
         convention: {
           include: {
@@ -258,14 +257,14 @@ describe('/api/editions/[id] GET', () => {
                     pseudo: true,
                     email: true,
                     profilePicture: true,
-                    updatedAt: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      })
+                    updatedAt: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      }),
     })
   })
 })

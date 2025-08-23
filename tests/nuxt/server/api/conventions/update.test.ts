@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../../../../__mocks__/prisma';
+
+import { prismaMock } from '../../../../__mocks__/prisma'
 
 // Import du handler après les mocks
 import updateConventionHandler from '../../../../server/api/conventions/[id].put'
@@ -10,7 +11,7 @@ describe('API Convention - Mise à jour', () => {
     email: 'creator@example.com',
     pseudo: 'creator',
     nom: 'Creator',
-    prenom: 'Test'
+    prenom: 'Test',
   }
 
   const mockCollaboratorUser = {
@@ -18,7 +19,7 @@ describe('API Convention - Mise à jour', () => {
     email: 'collaborator@example.com',
     pseudo: 'collaborator',
     nom: 'Collaborator',
-    prenom: 'Test'
+    prenom: 'Test',
   }
 
   const mockConvention = {
@@ -29,7 +30,7 @@ describe('API Convention - Mise à jour', () => {
     authorId: 1,
     createdAt: new Date(),
     updatedAt: new Date(),
-    collaborators: []
+    collaborators: [],
   }
 
   const mockUpdatedConvention = {
@@ -39,8 +40,8 @@ describe('API Convention - Mise à jour', () => {
     author: {
       id: 1,
       pseudo: 'creator',
-      email: 'creator@example.com'
-    }
+      email: 'creator@example.com',
+    },
   }
 
   beforeEach(() => {
@@ -48,21 +49,21 @@ describe('API Convention - Mise à jour', () => {
     global.getRouterParam = vi.fn((event, param) => event.params?.[param])
   })
 
-  it('devrait permettre à l\'auteur de modifier sa convention', async () => {
+  it("devrait permettre à l'auteur de modifier sa convention", async () => {
     prismaMock.convention.findUnique.mockResolvedValue({
       ...mockConvention,
-      collaborators: []
+      collaborators: [],
     })
     prismaMock.convention.update.mockResolvedValue(mockUpdatedConvention)
 
     const requestBody = {
       name: 'Convention Mise à Jour',
-      description: 'Description mise à jour'
+      description: 'Description mise à jour',
     }
 
     const mockEvent = {
       context: { user: mockUser },
-      params: { id: '1' }
+      params: { id: '1' },
     }
     global.readBody.mockResolvedValue(requestBody)
 
@@ -73,17 +74,17 @@ describe('API Convention - Mise à jour', () => {
       where: { id: 1 },
       data: {
         name: 'Convention Mise à Jour',
-        description: 'Description mise à jour'
+        description: 'Description mise à jour',
       },
       include: {
         author: {
           select: {
             id: true,
             pseudo: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     })
   })
 
@@ -94,20 +95,20 @@ describe('API Convention - Mise à jour', () => {
       collaborators: [
         {
           userId: mockUser.id,
-          canEditConvention: true
-        }
-      ]
+          canEditConvention: true,
+        },
+      ],
     })
     prismaMock.convention.update.mockResolvedValue(mockUpdatedConvention)
 
     const requestBody = {
       name: 'Convention Mise à Jour',
-      description: 'Description mise à jour'
+      description: 'Description mise à jour',
     }
 
     const mockEvent = {
       context: { user: mockUser },
-      params: { id: '1' }
+      params: { id: '1' },
     }
     global.readBody.mockResolvedValue(requestBody)
 
@@ -121,8 +122,8 @@ describe('API Convention - Mise à jour', () => {
       context: { user: null },
       params: { id: '1' },
       body: {
-        name: 'Test'
-      }
+        name: 'Test',
+      },
     }
 
     await expect(updateConventionHandler(mockEvent)).rejects.toThrow()
@@ -132,15 +133,15 @@ describe('API Convention - Mise à jour', () => {
     prismaMock.convention.findUnique.mockResolvedValue({
       ...mockConvention,
       authorId: 2, // Autre auteur
-      collaborators: [] // Pas de collaborateur
+      collaborators: [], // Pas de collaborateur
     })
 
     const mockEvent = {
       context: { user: mockUser },
       params: { id: '1' },
       body: {
-        name: 'Test'
-      }
+        name: 'Test',
+      },
     }
 
     await expect(updateConventionHandler(mockEvent)).rejects.toThrow()
@@ -153,40 +154,40 @@ describe('API Convention - Mise à jour', () => {
       context: { user: mockUser },
       params: { id: '999' },
       body: {
-        name: 'Test'
-      }
+        name: 'Test',
+      },
     }
 
     await expect(updateConventionHandler(mockEvent)).rejects.toThrow()
   })
 
-  it('devrait valider les données d\'entrée', async () => {
+  it("devrait valider les données d'entrée", async () => {
     prismaMock.convention.findUnique.mockResolvedValue({
       ...mockConvention,
-      collaborators: []
+      collaborators: [],
     })
 
     const requestBody = {
       name: '', // Nom vide invalide
-      description: 'Test'
+      description: 'Test',
     }
 
     const mockEvent = {
       context: { user: mockUser },
-      params: { id: '1' }
+      params: { id: '1' },
     }
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(updateConventionHandler(mockEvent)).rejects.toThrow()
   })
 
-  it('devrait valider l\'ID de convention', async () => {
+  it("devrait valider l'ID de convention", async () => {
     const mockEvent = {
       context: { user: mockUser },
       params: { id: 'invalid' },
       body: {
-        name: 'Test'
-      }
+        name: 'Test',
+      },
     }
 
     await expect(updateConventionHandler(mockEvent)).rejects.toThrow()
@@ -200,8 +201,8 @@ describe('API Convention - Mise à jour', () => {
       params: { id: '1' },
       body: {
         name: 'Test',
-        description: 'Test'
-      }
+        description: 'Test',
+      },
     }
 
     await expect(updateConventionHandler(mockEvent)).rejects.toThrow()

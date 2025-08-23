@@ -1,10 +1,15 @@
-import { prisma } from '../../utils/prisma'
-import { sendRedirect, getQuery, setCookie, getCookie, getRequestURL, createError } from 'h3'
 import bcrypt from 'bcryptjs'
+import { sendRedirect, getQuery, setCookie, getCookie, getRequestURL, createError } from 'h3'
 import { $fetch } from 'ofetch'
 
+import { prisma } from '../../utils/prisma'
+
 function slugifyPseudo(base: string) {
-  const clean = base.toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 30) || 'user'
+  const clean =
+    base
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, '')
+      .slice(0, 30) || 'user'
   return clean
 }
 
@@ -23,7 +28,9 @@ export default defineEventHandler(async (event) => {
   const clientId = process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID
   const clientSecret = process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET
   if (!clientId || !clientSecret) {
-    console.error('Google OAuth non configuré: définir NUXT_OAUTH_GOOGLE_CLIENT_ID et NUXT_OAUTH_GOOGLE_CLIENT_SECRET')
+    console.error(
+      'Google OAuth non configuré: définir NUXT_OAUTH_GOOGLE_CLIENT_ID et NUXT_OAUTH_GOOGLE_CLIENT_SECRET'
+    )
     return sendRedirect(event, '/login')
   }
 
@@ -40,7 +47,7 @@ export default defineEventHandler(async (event) => {
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       path: '/',
-      maxAge: 600
+      maxAge: 600,
     })
 
     const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth')
@@ -75,7 +82,7 @@ export default defineEventHandler(async (event) => {
   const tokenRes = await $fetch<any>(tokenEndpoint, {
     method: 'POST',
     body: form,
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   })
 
   const accessToken = tokenRes.access_token as string | undefined
@@ -86,7 +93,7 @@ export default defineEventHandler(async (event) => {
 
   // Récupérer le profil utilisateur
   const userInfo = await $fetch<any>('https://openidconnect.googleapis.com/v1/userinfo', {
-    headers: { Authorization: `Bearer ${accessToken}` }
+    headers: { Authorization: `Bearer ${accessToken}` },
   })
 
   const email = userInfo?.email as string | undefined
@@ -122,8 +129,8 @@ export default defineEventHandler(async (event) => {
         prenom,
         password: hashed,
         isEmailVerified: true,
-        ...(picture ? { profilePicture: picture } : {})
-      }
+        ...(picture ? { profilePicture: picture } : {}),
+      },
     })
   }
 
@@ -132,7 +139,7 @@ export default defineEventHandler(async (event) => {
     try {
       dbUser = await prisma.user.update({
         where: { id: dbUser.id },
-        data: { profilePicture: picture }
+        data: { profilePicture: picture },
       })
     } catch (e) {
       console.warn('Impossible de mettre à jour la photo de profil depuis Google:', e)
@@ -148,12 +155,12 @@ export default defineEventHandler(async (event) => {
       pseudo: dbUser.pseudo,
       nom: dbUser.nom,
       prenom: dbUser.prenom,
-  profilePicture: dbUser.profilePicture,
+      profilePicture: dbUser.profilePicture,
       isGlobalAdmin: dbUser.isGlobalAdmin,
       createdAt: dbUser.createdAt,
       updatedAt: dbUser.updatedAt,
-      isEmailVerified: dbUser.isEmailVerified
-    }
+      isEmailVerified: dbUser.isEmailVerified,
+    },
   })
 
   return sendRedirect(event, '/')

@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 import { useAuthStore } from '../../../app/stores/auth'
 
 vi.mock('../../../app/stores/auth', () => ({
-  useAuthStore: vi.fn(() => ({ isAuthenticated: false }))
+  useAuthStore: vi.fn(() => ({ isAuthenticated: false })),
 }))
 
-describe('Middleware d\'authentification (client)', () => {
+describe("Middleware d'authentification (client)", () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })

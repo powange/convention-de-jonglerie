@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../../../../__mocks__/prisma';
+
 import handler from '../../../../../server/api/editions/index.get'
+import { prismaMock } from '../../../../__mocks__/prisma'
 
 // Mock des utilitaires
 vi.mock('../../../../server/utils/email-hash', () => ({
-  getEmailHash: vi.fn((email: string) => `hash_${email}`)
+  getEmailHash: vi.fn((email: string) => `hash_${email}`),
 }))
 
 describe('/api/editions GET', () => {
@@ -49,15 +50,15 @@ describe('/api/editions GET', () => {
     hasATM: true,
     creator: {
       id: 1,
-      pseudo: 'testuser'
+      pseudo: 'testuser',
     },
     favoritedBy: [],
     convention: {
       id: 1,
       name: 'Convention Test',
       description: 'Description convention',
-      logo: null
-    }
+      logo: null,
+    },
   }
 
   beforeEach(() => {
@@ -95,13 +96,13 @@ describe('/api/editions GET', () => {
     expect(result.pagination.page).toBe(2)
     expect(result.pagination.limit).toBe(10)
     expect(result.pagination.totalPages).toBe(5)
-    
+
     expect(prismaMock.edition.findMany).toHaveBeenCalledWith({
       where: {},
       include: expect.any(Object),
       orderBy: { startDate: 'asc' },
       skip: 10, // (page 2 - 1) * limit 10
-      take: 10
+      take: 10,
     })
   })
 
@@ -116,8 +117,8 @@ describe('/api/editions GET', () => {
 
     expect(prismaMock.edition.count).toHaveBeenCalledWith({
       where: {
-        name: { contains: 'Test Convention' }
-      }
+        name: { contains: 'Test Convention' },
+      },
     })
   })
 
@@ -132,8 +133,8 @@ describe('/api/editions GET', () => {
 
     expect(prismaMock.edition.count).toHaveBeenCalledWith({
       where: {
-        country: { in: ['France', 'Belgium'] }
-      }
+        country: { in: ['France', 'Belgium'] },
+      },
     })
   })
 
@@ -151,16 +152,16 @@ describe('/api/editions GET', () => {
     expect(prismaMock.edition.count).toHaveBeenCalledWith({
       where: {
         startDate: { gte: new Date(startDate) },
-        endDate: { lte: new Date(endDate) }
-      }
+        endDate: { lte: new Date(endDate) },
+      },
     })
   })
 
   it('devrait filtrer par services', async () => {
-    global.getQuery.mockReturnValue({ 
+    global.getQuery.mockReturnValue({
       hasFoodTrucks: 'true',
       hasToilets: 'true',
-      acceptsPets: 'true'
+      acceptsPets: 'true',
     })
     prismaMock.edition.count.mockResolvedValue(2)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
@@ -173,16 +174,16 @@ describe('/api/editions GET', () => {
       where: {
         hasFoodTrucks: true,
         hasToilets: true,
-        acceptsPets: true
-      }
+        acceptsPets: true,
+      },
     })
   })
 
   it('devrait filtrer par période temporelle', async () => {
-    global.getQuery.mockReturnValue({ 
+    global.getQuery.mockReturnValue({
       showPast: 'true',
       showCurrent: 'false',
-      showFuture: 'true'
+      showFuture: 'true',
     })
     prismaMock.edition.count.mockResolvedValue(15)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
@@ -194,35 +195,39 @@ describe('/api/editions GET', () => {
     const expectedWhere = expect.objectContaining({
       OR: expect.arrayContaining([
         { endDate: { lt: expect.any(Date) } }, // showPast
-        { startDate: { gt: expect.any(Date) } }  // showFuture
-      ])
+        { startDate: { gt: expect.any(Date) } }, // showFuture
+      ]),
     })
 
     expect(prismaMock.edition.count).toHaveBeenCalledWith({
-      where: expectedWhere
+      where: expectedWhere,
     })
   })
 
-  it('devrait gérer les collaborateurs d\'édition si disponible', async () => {
+  it("devrait gérer les collaborateurs d'édition si disponible", async () => {
     global.getQuery.mockReturnValue({})
     prismaMock.edition.count.mockResolvedValue(1)
-    prismaMock.edition.findMany.mockResolvedValue([{
-      ...mockEdition,
-      collaborators: [{
-        id: 1,
-        user: {
-          id: 2,
-          pseudo: 'collaborator',
-          profilePicture: null,
-          updatedAt: new Date(),
-          email: 'collab@example.com'
-        },
-        addedBy: {
-          id: 1,
-          pseudo: 'creator'
-        }
-      }]
-    }])
+    prismaMock.edition.findMany.mockResolvedValue([
+      {
+        ...mockEdition,
+        collaborators: [
+          {
+            id: 1,
+            user: {
+              id: 2,
+              pseudo: 'collaborator',
+              profilePicture: null,
+              updatedAt: new Date(),
+              email: 'collab@example.com',
+            },
+            addedBy: {
+              id: 1,
+              pseudo: 'creator',
+            },
+          },
+        ],
+      },
+    ])
     prismaMock.editionCollaborator.findFirst.mockResolvedValue({}) // Table existe
 
     const mockEvent = {}
@@ -256,15 +261,15 @@ describe('/api/editions GET', () => {
       include: expect.any(Object),
       orderBy: { startDate: 'asc' },
       skip: 0,
-      take: 12
+      take: 12,
     })
   })
 
   it('ne devrait rien retourner si aucun filtre temporel actif', async () => {
-    global.getQuery.mockReturnValue({ 
+    global.getQuery.mockReturnValue({
       showPast: 'false',
       showCurrent: 'false',
-      showFuture: 'false'
+      showFuture: 'false',
     })
     prismaMock.edition.count.mockResolvedValue(0)
     prismaMock.edition.findMany.mockResolvedValue([])
@@ -275,7 +280,7 @@ describe('/api/editions GET', () => {
 
     expect(result.data).toHaveLength(0)
     expect(prismaMock.edition.count).toHaveBeenCalledWith({
-      where: { id: -1 } // Condition impossible
+      where: { id: -1 }, // Condition impossible
     })
   })
 })

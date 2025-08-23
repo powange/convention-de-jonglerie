@@ -1,23 +1,23 @@
-import { prisma } from '../../../../utils/prisma';
-import { hasEditionEditPermission } from '../../../../utils/permissions';
+import { hasEditionEditPermission } from '../../../../utils/permissions'
+import { prisma } from '../../../../utils/prisma'
 // Import dynamique pour compat tests/mocks (#imports)
 
 export default defineEventHandler(async (event) => {
   try {
-  const { requireUserSession } = await import('#imports')
-    const editionId = parseInt(getRouterParam(event, 'id') as string);
-    const body = await readBody(event);
+    const { requireUserSession } = await import('#imports')
+    const editionId = parseInt(getRouterParam(event, 'id') as string)
+    const body = await readBody(event)
 
     if (!editionId || isNaN(editionId)) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'ID d\'édition invalide',
-      });
+        statusMessage: "ID d'édition invalide",
+      })
     }
 
-  // Vérifier l'authentification via la session scellée
-  const { user } = await requireUserSession(event)
-  const userId = user.id
+    // Vérifier l'authentification via la session scellée
+    const { user } = await requireUserSession(event)
+    const userId = user.id
 
     // Vérifier que l'édition existe et est terminée
     const edition = await prisma.edition.findUnique({
@@ -26,46 +26,46 @@ export default defineEventHandler(async (event) => {
         convention: {
           include: {
             collaborators: {
-              include: { user: true }
-            }
-          }
-        }
-      }
-    });
+              include: { user: true },
+            },
+          },
+        },
+      },
+    })
 
     if (!edition) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Édition non trouvée',
-      });
+      })
     }
 
     // Vérifier que l'édition est terminée
-    const now = new Date();
+    const now = new Date()
     if (now <= new Date(edition.endDate)) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Les objets trouvés ne peuvent être ajoutés qu\'après la fin de l\'édition',
-      });
+        statusMessage: "Les objets trouvés ne peuvent être ajoutés qu'après la fin de l'édition",
+      })
     }
 
     // Vérifier que l'utilisateur est un collaborateur
-    const hasPermission = await hasEditionEditPermission(userId, editionId);
+    const hasPermission = await hasEditionEditPermission(userId, editionId)
     if (!hasPermission) {
       throw createError({
         statusCode: 403,
         statusMessage: 'Vous devez être collaborateur pour ajouter un objet trouvé',
-      });
+      })
     }
 
     // Valider les données
-    const { description, imageUrl } = body;
+    const { description, imageUrl } = body
 
     if (!description || typeof description !== 'string' || description.trim().length === 0) {
       throw createError({
         statusCode: 400,
         statusMessage: 'La description est requise',
-      });
+      })
     }
 
     // Créer l'objet trouvé
@@ -75,7 +75,7 @@ export default defineEventHandler(async (event) => {
         userId,
         description: description.trim(),
         imageUrl: imageUrl || null,
-        status: 'LOST'
+        status: 'LOST',
       },
       include: {
         user: {
@@ -84,8 +84,8 @@ export default defineEventHandler(async (event) => {
             pseudo: true,
             prenom: true,
             nom: true,
-            profilePicture: true
-          }
+            profilePicture: true,
+          },
         },
         comments: {
           include: {
@@ -95,17 +95,17 @@ export default defineEventHandler(async (event) => {
                 pseudo: true,
                 prenom: true,
                 nom: true,
-                profilePicture: true
-              }
-            }
-          }
-        }
-      }
-    });
+                profilePicture: true,
+              },
+            },
+          },
+        },
+      },
+    })
 
-    return lostFoundItem;
+    return lostFoundItem
   } catch (error: unknown) {
-    console.error('Erreur lors de la création de l\'objet trouvé:', error);
+    console.error("Erreur lors de la création de l'objet trouvé:", error)
     const httpError = error as { statusCode?: number }
     if (httpError?.statusCode) {
       throw error
@@ -113,6 +113,6 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur interne du serveur',
-    });
+    })
   }
-});
+})

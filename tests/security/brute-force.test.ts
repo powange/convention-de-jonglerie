@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 import { prismaMock } from '../../__mocks__/prisma'
 
 describe('Tests de sécurité', () => {
@@ -15,7 +16,7 @@ describe('Tests de sécurité', () => {
       const checkRateLimit = (ip: string) => {
         const now = new Date()
         const attempts = loginAttempts.get(ip)
-        
+
         if (!attempts) {
           loginAttempts.set(ip, { count: 1, lastAttempt: now })
           return true
@@ -43,7 +44,7 @@ describe('Tests de sécurité', () => {
 
       // 5ème tentative - devrait passer mais atteindre la limite
       expect(checkRateLimit('192.168.1.1')).toBe(true)
-      
+
       // 6ème tentative - devrait être bloquée
       expect(checkRateLimit('192.168.1.1')).toBe(false)
     })
@@ -60,7 +61,7 @@ describe('Tests de sécurité', () => {
       const checkRateLimit = (ip: string) => {
         const now = new Date()
         const attempts = loginAttempts.get(ip)
-        
+
         if (!attempts) return true
 
         // Vérifier si le blocage a expiré
@@ -96,7 +97,7 @@ describe('Tests de sécurité', () => {
 
       // Tester limite par utilisateur
       expect(checkUserAndIPLimits('user1', '192.168.1.1')).toBe(true) // 1
-      expect(checkUserAndIPLimits('user1', '192.168.1.1')).toBe(true) // 2  
+      expect(checkUserAndIPLimits('user1', '192.168.1.1')).toBe(true) // 2
       expect(checkUserAndIPLimits('user1', '192.168.1.1')).toBe(true) // 3
       expect(checkUserAndIPLimits('user1', '192.168.1.2')).toBe(false) // Bloqué par utilisateur
 
@@ -106,25 +107,25 @@ describe('Tests de sécurité', () => {
   })
 
   describe('Validation des entrées', () => {
-    it('devrait détecter les tentatives d\'injection SQL', async () => {
+    it("devrait détecter les tentatives d'injection SQL", async () => {
       const maliciousInputs = [
         "'; DROP TABLE users; --",
         "1' OR '1'='1",
         "admin'/*",
-        "1; DELETE FROM users WHERE 1=1; --",
-        "' UNION SELECT * FROM users --"
+        '1; DELETE FROM users WHERE 1=1; --',
+        "' UNION SELECT * FROM users --",
       ]
 
       const containsSQLInjection = (input: string) => {
         const sqlPatterns = [
           /['";\\%*+|()-]/i,
           /(union|select|insert|delete|update|drop|create|alter|exec|script)/i,
-          /(\w*(%27|')(%6F|o|%4F)(%72|r|%52))/i
+          /(\w*(%27|')(%6F|o|%4F)(%72|r|%52))/i,
         ]
-        return sqlPatterns.some(pattern => pattern.test(input))
+        return sqlPatterns.some((pattern) => pattern.test(input))
       }
 
-      maliciousInputs.forEach(input => {
+      maliciousInputs.forEach((input) => {
         expect(containsSQLInjection(input)).toBe(true)
       })
 
@@ -139,7 +140,7 @@ describe('Tests de sécurité', () => {
         'javascript:alert("XSS")',
         '<img src="x" onerror="alert(1)">',
         '<svg onload="alert(1)">',
-        '"><script>alert(document.cookie)</script>'
+        '"><script>alert(document.cookie)</script>',
       ]
 
       const containsXSS = (input: string) => {
@@ -147,12 +148,12 @@ describe('Tests de sécurité', () => {
           /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
           /javascript:/gi,
           /on\w+\s*=/gi,
-          /<iframe|<object|<embed|<form/gi
+          /<iframe|<object|<embed|<form/gi,
         ]
-        return xssPatterns.some(pattern => pattern.test(input))
+        return xssPatterns.some((pattern) => pattern.test(input))
       }
 
-      xssInputs.forEach(input => {
+      xssInputs.forEach((input) => {
         expect(containsXSS(input)).toBe(true)
       })
 
@@ -161,19 +162,19 @@ describe('Tests de sécurité', () => {
       expect(containsXSS('Description normale avec des mots')).toBe(false)
     })
 
-    it('devrait valider les formats d\'email', async () => {
+    it("devrait valider les formats d'email", async () => {
       const invalidEmails = [
         'plainaddress',
         '@missingdomain.com',
         'missing@.com',
         'missing@domain',
-        'spaces in@email.com'
+        'spaces in@email.com',
       ]
 
       const validEmails = [
         'user@example.com',
         'test.email+tag@domain.co.uk',
-        'user123@subdomain.example.org'
+        'user123@subdomain.example.org',
       ]
 
       const isValidEmail = (email: string) => {
@@ -181,11 +182,11 @@ describe('Tests de sécurité', () => {
         return emailRegex.test(email) && email.length <= 254 && !email.includes(' ')
       }
 
-      invalidEmails.forEach(email => {
+      invalidEmails.forEach((email) => {
         expect(isValidEmail(email)).toBe(false)
       })
 
-      validEmails.forEach(email => {
+      validEmails.forEach((email) => {
         expect(isValidEmail(email)).toBe(true)
       })
     })
@@ -199,14 +200,10 @@ describe('Tests de sécurité', () => {
         'azerty',
         'abc123',
         '11111111',
-        'Password' // Pas de chiffre ni caractère spécial
+        'Password', // Pas de chiffre ni caractère spécial
       ]
 
-      const strongPasswords = [
-        'MyStr0ng!Pass',
-        'C0mplex&Secure#123',
-        'Un1qu3*P@ssw0rd'
-      ]
+      const strongPasswords = ['MyStr0ng!Pass', 'C0mplex&Secure#123', 'Un1qu3*P@ssw0rd']
 
       const isStrongPassword = (password: string) => {
         const minLength = 8
@@ -215,18 +212,20 @@ describe('Tests de sécurité', () => {
         const hasNumbers = /\d/.test(password)
         const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password)
 
-        return password.length >= minLength && 
-               hasUpperCase && 
-               hasLowerCase && 
-               hasNumbers && 
-               hasSpecialChar
+        return (
+          password.length >= minLength &&
+          hasUpperCase &&
+          hasLowerCase &&
+          hasNumbers &&
+          hasSpecialChar
+        )
       }
 
-      weakPasswords.forEach(password => {
+      weakPasswords.forEach((password) => {
         expect(isStrongPassword(password)).toBe(false)
       })
 
-      strongPasswords.forEach(password => {
+      strongPasswords.forEach((password) => {
         expect(isStrongPassword(password)).toBe(true)
       })
     })
@@ -240,18 +239,26 @@ describe('Tests de sécurité', () => {
         'qwerty',
         'letmein',
         'welcome',
-        'monkey'
+        'monkey',
       ]
 
       const isCommonPassword = (password: string) => {
         const commonList = [
-          'password', '123456', 'password123', 'admin', 'qwerty',
-          'letmein', 'welcome', 'monkey', '1234567890', 'abc123'
+          'password',
+          '123456',
+          'password123',
+          'admin',
+          'qwerty',
+          'letmein',
+          'welcome',
+          'monkey',
+          '1234567890',
+          'abc123',
         ]
         return commonList.includes(password.toLowerCase())
       }
 
-      commonPasswords.forEach(password => {
+      commonPasswords.forEach((password) => {
         expect(isCommonPassword(password)).toBe(true)
       })
 
@@ -261,32 +268,28 @@ describe('Tests de sécurité', () => {
 
   describe('Sécurité des sessions', () => {
     it('devrait valider la structure des tokens JWT', async () => {
-      const validJWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
-      const invalidJWTs = [
-        'invalid.token',
-        'too.many.parts.here.invalid',
-        '',
-        'not-a-jwt-at-all'
-      ]
+      const validJWT =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+      const invalidJWTs = ['invalid.token', 'too.many.parts.here.invalid', '', 'not-a-jwt-at-all']
 
       const isValidJWTFormat = (token: string) => {
         const parts = token.split('.')
-        return parts.length === 3 && parts.every(part => part.length > 0)
+        return parts.length === 3 && parts.every((part) => part.length > 0)
       }
 
       expect(isValidJWTFormat(validJWT)).toBe(true)
-      
-      invalidJWTs.forEach(token => {
+
+      invalidJWTs.forEach((token) => {
         expect(isValidJWTFormat(token)).toBe(false)
       })
     })
 
     it('devrait détecter les tokens expirés', async () => {
       const now = Math.floor(Date.now() / 1000)
-      
+
       const expiredToken = { exp: now - 3600 } // Expiré il y a 1 heure
-      const validToken = { exp: now + 3600 }   // Expire dans 1 heure
-      const noExpToken = {}                     // Pas d'expiration
+      const validToken = { exp: now + 3600 } // Expire dans 1 heure
+      const noExpToken = {} // Pas d'expiration
 
       const isTokenExpired = (tokenPayload: any) => {
         if (!tokenPayload.exp) return false
@@ -303,22 +306,16 @@ describe('Tests de sécurité', () => {
     it('devrait valider les tokens CSRF', async () => {
       const validCSRFToken = 'csrf-token-123456789'
       const sessionCSRFToken = 'csrf-token-123456789'
-      
-      const invalidTokens = [
-        '',
-        'wrong-token',
-        'csrf-token-987654321',
-        null,
-        undefined
-      ]
+
+      const invalidTokens = ['', 'wrong-token', 'csrf-token-987654321', null, undefined]
 
       const isValidCSRFToken = (token: string | null | undefined, sessionToken: string) => {
         return token != null && sessionToken && token === sessionToken && token !== ''
       }
 
       expect(isValidCSRFToken(validCSRFToken, sessionCSRFToken)).toBe(true)
-      
-      invalidTokens.forEach(token => {
+
+      invalidTokens.forEach((token) => {
         expect(isValidCSRFToken(token as string, sessionCSRFToken)).toBe(false)
       })
     })
@@ -328,10 +325,10 @@ describe('Tests de sécurité', () => {
     it('devrait limiter la taille des uploads', async () => {
       const maxFileSize = 5 * 1024 * 1024 // 5MB
       const fileSizes = [
-        1024 * 1024,     // 1MB - OK
-        3 * 1024 * 1024, // 3MB - OK  
+        1024 * 1024, // 1MB - OK
+        3 * 1024 * 1024, // 3MB - OK
         6 * 1024 * 1024, // 6MB - Trop gros
-        10 * 1024 * 1024 // 10MB - Trop gros
+        10 * 1024 * 1024, // 10MB - Trop gros
       ]
 
       const isValidFileSize = (size: number) => {
@@ -350,7 +347,7 @@ describe('Tests de sécurité', () => {
 
       const checkRequestLimit = (userId: string) => {
         const currentCount = requestCounts.get(userId) || 0
-        
+
         if (currentCount >= maxRequestsPerMinute) {
           return false
         }
@@ -366,7 +363,7 @@ describe('Tests de sécurité', () => {
 
       // 100ème requête - OK
       expect(checkRequestLimit('user1')).toBe(true)
-      
+
       // 101ème requête - Bloquée
       expect(checkRequestLimit('user1')).toBe(false)
     })
@@ -375,14 +372,14 @@ describe('Tests de sécurité', () => {
   describe('Journalisation de sécurité', () => {
     it('devrait enregistrer les tentatives de connexion échouées', async () => {
       const securityLogs: any[] = []
-      
+
       const logFailedLogin = (identifier: string, ip: string, reason: string) => {
         securityLogs.push({
           type: 'FAILED_LOGIN',
           identifier,
           ip,
           reason,
-          timestamp: new Date()
+          timestamp: new Date(),
         })
       }
 
@@ -396,19 +393,19 @@ describe('Tests de sécurité', () => {
 
     it('devrait enregistrer les activités suspectes', async () => {
       const suspiciousActivities: any[] = []
-      
+
       const logSuspiciousActivity = (userId: string, activity: string, details: any) => {
         suspiciousActivities.push({
           type: 'SUSPICIOUS_ACTIVITY',
           userId,
           activity,
           details,
-          timestamp: new Date()
+          timestamp: new Date(),
         })
       }
 
-      logSuspiciousActivity('user123', 'SQL_INJECTION_ATTEMPT', { 
-        input: "'; DROP TABLE users; --" 
+      logSuspiciousActivity('user123', 'SQL_INJECTION_ATTEMPT', {
+        input: "'; DROP TABLE users; --",
       })
 
       expect(suspiciousActivities).toHaveLength(1)

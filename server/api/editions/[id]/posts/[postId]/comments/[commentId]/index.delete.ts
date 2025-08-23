@@ -7,47 +7,47 @@ export default defineEventHandler(async (event) => {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié'
+      statusMessage: 'Non authentifié',
     })
   }
   const user = event.context.user
-  
+
   const editionId = parseInt(getRouterParam(event, 'id')!)
   const postId = parseInt(getRouterParam(event, 'postId')!)
   const commentId = parseInt(getRouterParam(event, 'commentId')!)
-  
+
   if (isNaN(editionId) || isNaN(postId) || isNaN(commentId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID invalide'
+      statusMessage: 'ID invalide',
     })
   }
 
   try {
     // Vérifier que le commentaire existe et appartient à l'utilisateur
     const comment = await prisma.editionPostComment.findFirst({
-      where: { 
+      where: {
         id: commentId,
         editionPostId: postId,
-        userId: user.id
+        userId: user.id,
       },
       include: {
         editionPost: {
-          select: { editionId: true }
-        }
-      }
+          select: { editionId: true },
+        },
+      },
     })
 
     if (!comment || comment.editionPost.editionId !== editionId) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Commentaire non trouvé ou vous n\'êtes pas autorisé à le supprimer'
+        statusMessage: "Commentaire non trouvé ou vous n'êtes pas autorisé à le supprimer",
       })
     }
 
     // Supprimer le commentaire
     await prisma.editionPostComment.delete({
-      where: { id: commentId }
+      where: { id: commentId },
     })
 
     return { success: true, message: 'Commentaire supprimé avec succès' }
@@ -55,11 +55,11 @@ export default defineEventHandler(async (event) => {
     if (error.statusCode) {
       throw error
     }
-    
+
     console.error('Erreur lors de la suppression du commentaire:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur interne du serveur'
+      statusMessage: 'Erreur interne du serveur',
     })
   }
 })

@@ -1,62 +1,103 @@
-import { moveTempImageToEdition } from '../../utils/move-temp-image';
-import { prisma } from '../../utils/prisma';
-import { editionSchema, validateAndSanitize, handleValidationError } from '../../utils/validation-schemas';
-import { geocodeEdition } from '../../utils/geocoding';
-import { z } from 'zod';
+import { z } from 'zod'
 
+import { geocodeEdition } from '../../utils/geocoding'
+import { moveTempImageToEdition } from '../../utils/move-temp-image'
+import { prisma } from '../../utils/prisma'
+import {
+  editionSchema,
+  validateAndSanitize,
+  handleValidationError,
+} from '../../utils/validation-schemas'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
       statusMessage: 'Non authentifié',
-    });
+    })
   }
 
-  const body = await readBody(event);
+  const body = await readBody(event)
 
   // Validation et sanitisation des données avec Zod
-  let validatedData;
+  let validatedData
   try {
-    validatedData = validateAndSanitize(editionSchema, body);
+    validatedData = validateAndSanitize(editionSchema, body)
   } catch (error) {
     if (error instanceof z.ZodError) {
-      handleValidationError(error);
+      handleValidationError(error)
     }
-    throw error;
+    throw error
   }
 
-  const { 
-    conventionId, name, description, imageUrl, startDate, endDate, addressLine1, addressLine2, postalCode, city, region, country, 
-    ticketingUrl, facebookUrl, instagramUrl, 
-    hasFoodTrucks, hasKidsZone, acceptsPets, hasTentCamping, hasTruckCamping, hasFamilyCamping, hasGym,
-    hasFireSpace, hasGala, hasOpenStage, hasConcert, hasCantine, hasAerialSpace, hasSlacklineSpace,
-    hasToilets, hasShowers, hasAccessibility, hasWorkshops, hasCreditCardPayment, hasAfjTokenPayment
-  } = validatedData;
+  const {
+    conventionId,
+    name,
+    description,
+    imageUrl,
+    startDate,
+    endDate,
+    addressLine1,
+    addressLine2,
+    postalCode,
+    city,
+    region,
+    country,
+    ticketingUrl,
+    facebookUrl,
+    instagramUrl,
+    hasFoodTrucks,
+    hasKidsZone,
+    acceptsPets,
+    hasTentCamping,
+    hasTruckCamping,
+    hasFamilyCamping,
+    hasGym,
+    hasFireSpace,
+    hasGala,
+    hasOpenStage,
+    hasConcert,
+    hasCantine,
+    hasAerialSpace,
+    hasSlacklineSpace,
+    hasToilets,
+    hasShowers,
+    hasAccessibility,
+    hasWorkshops,
+    hasCreditCardPayment,
+    hasAfjTokenPayment,
+  } = validatedData
 
   // Vérifier que la convention existe
   const convention = await prisma.convention.findUnique({
     where: { id: conventionId },
-    include: { collaborators: { where: { userId: event.context.user.id } } }
-  });
+    include: { collaborators: { where: { userId: event.context.user.id } } },
+  })
 
   if (!convention) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Convention introuvable',
-    });
+    })
   }
 
   // Bloquer si archivée
   if (convention.isArchived) {
-    throw createError({ statusCode: 409, statusMessage: 'Convention archivée: création d\'édition impossible' });
+    throw createError({
+      statusCode: 409,
+      statusMessage: "Convention archivée: création d'édition impossible",
+    })
   }
 
   // Vérifier droit: auteur ou collaborateur avec canAddEdition (ajusté pour tolérer absence de tableau dans anciens tests)
-  const collab = (convention as any).collaborators?.[0];
-  const canAdd = convention.authorId === event.context.user.id || (!!collab && !!collab.canAddEdition);
+  const collab = (convention as any).collaborators?.[0]
+  const canAdd =
+    convention.authorId === event.context.user.id || (!!collab && !!collab.canAddEdition)
   if (!canAdd) {
-    throw createError({ statusCode: 403, statusMessage: 'Droit insuffisant pour créer une édition' });
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Droit insuffisant pour créer une édition',
+    })
   }
 
   try {
@@ -66,8 +107,8 @@ export default defineEventHandler(async (event) => {
       addressLine2,
       city,
       postalCode,
-      country
-    });
+      country,
+    })
 
     // Créer l'édition sans l'image d'abord
     const edition = await prisma.edition.create({
@@ -120,11 +161,11 @@ export default defineEventHandler(async (event) => {
           select: { id: true },
         },
       },
-    });
-    
+    })
+
     // Si une image temporaire a été fournie, la déplacer dans le bon dossier
     if (imageUrl && imageUrl.includes('/temp/')) {
-      const newImageUrl = await moveTempImageToEdition(imageUrl, edition.id);
+      const newImageUrl = await moveTempImageToEdition(imageUrl, edition.id)
       if (newImageUrl) {
         // Mettre à jour l'édition avec la nouvelle URL
         const updatedEdition = await prisma.edition.update({
@@ -138,17 +179,17 @@ export default defineEventHandler(async (event) => {
               select: { id: true },
             },
           },
-        });
-        return updatedEdition;
+        })
+        return updatedEdition
       }
     }
-    
-    return edition;
+
+    return edition
   } catch (error: unknown) {
-    console.error('Erreur lors de la création de l\'édition:', error);
+    console.error("Erreur lors de la création de l'édition:", error)
     if (typeof error === 'object' && error && 'statusCode' in error) {
-      throw error as any;
+      throw error as any
     }
-    throw createError({ statusCode: 500, statusMessage: 'Erreur lors de la création de l\'édition' });
+    throw createError({ statusCode: 500, statusMessage: "Erreur lors de la création de l'édition" })
   }
-});
+})

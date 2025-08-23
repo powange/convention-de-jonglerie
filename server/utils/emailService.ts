@@ -1,79 +1,78 @@
 // Service d'envoi d'emails avec support simulation/réel
-import nodemailer from 'nodemailer';
+import nodemailer from 'nodemailer'
 
 export interface EmailOptions {
-  to: string;
-  subject: string;
-  html: string;
-  text?: string;
+  to: string
+  subject: string
+  html: string
+  text?: string
 }
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
-  const config = useRuntimeConfig();
+  const config = useRuntimeConfig()
   // Priorité aux variables d'environnement runtime (conteneur) pour éviter les valeurs figées au build
-  const sendEmailsEnv = process.env.SEND_EMAILS;
-  const isEmailEnabled = (sendEmailsEnv ?? (config.emailEnabled as string)) === 'true';
-  const smtpUser = process.env.SMTP_USER || (config.smtpUser as string) || '';
-  const smtpPass = process.env.SMTP_PASS || (config.smtpPass as string) || '';
-  
+  const sendEmailsEnv = process.env.SEND_EMAILS
+  const isEmailEnabled = (sendEmailsEnv ?? (config.emailEnabled as string)) === 'true'
+  const smtpUser = process.env.SMTP_USER || (config.smtpUser as string) || ''
+  const smtpPass = process.env.SMTP_PASS || (config.smtpPass as string) || ''
+
   try {
     if (!isEmailEnabled) {
       // Mode simulation
       console.log('📧 EMAIL SIMULÉ (SEND_EMAILS=false):', {
         to: options.to,
         subject: options.subject,
-        text: options.text
-      });
-      
+        text: options.text,
+      })
+
       // Extraire le code ou le lien selon le type d'email
-      const codeMatch = options.html.match(/class="code">(\d{6})</);
+      const codeMatch = options.html.match(/class="code">(\d{6})</)
       if (codeMatch) {
-        console.log('🔑 CODE DANS LE CONTENU:', codeMatch[1]);
+        console.log('🔑 CODE DANS LE CONTENU:', codeMatch[1])
       }
-      
-      const linkMatch = options.html.match(/href="([^"]+)"/);
+
+      const linkMatch = options.html.match(/href="([^"]+)"/)
       if (linkMatch && options.subject.includes('mot de passe')) {
-        console.log('🔗 LIEN DE RÉINITIALISATION:', linkMatch[1]);
+        console.log('🔗 LIEN DE RÉINITIALISATION:', linkMatch[1])
       }
-      
-      return true;
+
+      return true
     }
-    
+
     // Mode envoi réel
     if (!smtpUser || !smtpPass) {
-      console.error('❌ Variables SMTP manquantes (SMTP_USER, SMTP_PASS)');
-      return false;
+      console.error('❌ Variables SMTP manquantes (SMTP_USER, SMTP_PASS)')
+      return false
     }
-    
+
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: smtpUser,
-        pass: smtpPass
-      }
-    });
+        pass: smtpPass,
+      },
+    })
 
     const mailOptions = {
       from: `"Conventions de Jonglerie" <${smtpUser}>`,
       to: options.to,
       subject: options.subject,
       html: options.html,
-      text: options.text
-    };
+      text: options.text,
+    }
 
-    await transporter.sendMail(mailOptions);
-    console.log(`✅ Email envoyé à ${options.to}`);
-    return true;
-    
+    await transporter.sendMail(mailOptions)
+    console.log(`✅ Email envoyé à ${options.to}`)
+    return true
   } catch (error) {
-    console.error('❌ Erreur envoi email:', error);
-    return false;
+    console.error('❌ Erreur envoi email:', error)
+    return false
   }
 }
 
 export function generateVerificationCode(): string {
   // Générer un code à 6 chiffres
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return Math.floor(100000 + Math.random() * 900000).toString()
 }
 
 export function generateVerificationEmailHtml(code: string, prenom: string, email: string): string {
@@ -132,7 +131,7 @@ export function generateVerificationEmailHtml(code: string, prenom: string, emai
         </div>
     </body>
     </html>
-  `;
+  `
 }
 
 export function generatePasswordResetEmailHtml(resetLink: string, prenom: string): string {
@@ -186,5 +185,5 @@ export function generatePasswordResetEmailHtml(resetLink: string, prenom: string
         </div>
     </body>
     </html>
-  `;
+  `
 }

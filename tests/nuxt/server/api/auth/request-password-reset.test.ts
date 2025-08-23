@@ -1,23 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../../../../__mocks__/prisma';
+
+import requestPasswordResetHandler from '../../../../../server/api/auth/request-password-reset.post'
+import { sendEmail } from '../../../../../server/utils/emailService'
+import { prismaMock } from '../../../../__mocks__/prisma'
 
 // Import des mocks après leur définition
-import { sendEmail } from '../../../../../server/utils/emailService'
 
 // Import du handler après les mocks
-import requestPasswordResetHandler from '../../../../../server/api/auth/request-password-reset.post'
 
 // Mock des modules spécifiques
 vi.mock('../../../../server/utils/emailService', () => ({
   sendEmail: vi.fn().mockResolvedValue(true),
-  generatePasswordResetEmailHtml: vi.fn().mockReturnValue('<html>Reset link</html>')
+  generatePasswordResetEmailHtml: vi.fn().mockReturnValue('<html>Reset link</html>'),
 }))
 
 describe('API Request Password Reset', () => {
   const mockUser = {
     id: 1,
     email: 'test@example.com',
-    prenom: 'Jean'
+    prenom: 'Jean',
   }
 
   beforeEach(() => {
@@ -30,38 +31,39 @@ describe('API Request Password Reset', () => {
       id: 1,
       token: 'mock-reset-token-12345',
       userId: mockUser.id,
-      expiresAt: new Date(Date.now() + 3600000) // 1 heure
+      expiresAt: new Date(Date.now() + 3600000), // 1 heure
     })
 
     const requestBody = {
-      email: 'test@example.com'
+      email: 'test@example.com',
     }
 
     const mockEvent = {
       request: {
-        url: 'http://localhost:3000/api/auth/request-password-reset'
-      }
+        url: 'http://localhost:3000/api/auth/request-password-reset',
+      },
     }
     global.readBody.mockResolvedValue(requestBody)
 
     const result = await requestPasswordResetHandler(mockEvent)
 
     expect(result).toEqual({
-      message: "Si un compte existe avec cet email, vous recevrez un lien de réinitialisation dans quelques minutes."
+      message:
+        'Si un compte existe avec cet email, vous recevrez un lien de réinitialisation dans quelques minutes.',
     })
 
     expect(prismaMock.passwordResetToken.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         userId: mockUser.id,
-        expiresAt: expect.any(Date)
-      })
+        expiresAt: expect.any(Date),
+      }),
     })
 
     expect(sendEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         to: mockUser.email,
         subject: 'Réinitialisation de votre mot de passe - Conventions de Jonglerie',
-        html: expect.stringContaining('Reset link')
+        html: expect.stringContaining('Reset link'),
       })
     )
   })
@@ -70,7 +72,7 @@ describe('API Request Password Reset', () => {
     prismaMock.user.findUnique.mockResolvedValue(null)
 
     const requestBody = {
-      email: 'nonexistent@example.com'
+      email: 'nonexistent@example.com',
     }
 
     const mockEvent = {}
@@ -79,16 +81,17 @@ describe('API Request Password Reset', () => {
     const result = await requestPasswordResetHandler(mockEvent)
 
     expect(result).toEqual({
-      message: "Si un compte existe avec cet email, vous recevrez un lien de réinitialisation dans quelques minutes."
+      message:
+        'Si un compte existe avec cet email, vous recevrez un lien de réinitialisation dans quelques minutes.',
     })
 
     expect(prismaMock.passwordResetToken.create).not.toHaveBeenCalled()
     expect(sendEmail).not.toHaveBeenCalled()
   })
 
-  it('devrait valider le format de l\'email', async () => {
+  it("devrait valider le format de l'email", async () => {
     const requestBody = {
-      email: 'invalid-email'
+      email: 'invalid-email',
     }
 
     const mockEvent = {}
@@ -103,17 +106,17 @@ describe('API Request Password Reset', () => {
       id: 1,
       token: 'generated-token',
       userId: mockUser.id,
-      expiresAt: new Date(Date.now() + 3600000)
+      expiresAt: new Date(Date.now() + 3600000),
     })
 
     const requestBody = {
-      email: 'test@example.com'
+      email: 'test@example.com',
     }
 
     const mockEvent = {
       request: {
-        url: 'http://localhost:3000/api/auth/request-password-reset'
-      }
+        url: 'http://localhost:3000/api/auth/request-password-reset',
+      },
     }
     global.readBody.mockResolvedValue(requestBody)
 
@@ -122,8 +125,8 @@ describe('API Request Password Reset', () => {
     // Vérifier que le token a été créé avec un userId
     expect(prismaMock.passwordResetToken.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
-        userId: mockUser.id
-      })
+        userId: mockUser.id,
+      }),
     })
   })
 
@@ -133,17 +136,17 @@ describe('API Request Password Reset', () => {
       id: 1,
       token: 'test-token',
       userId: mockUser.id,
-      expiresAt: new Date(Date.now() + 3600000)
+      expiresAt: new Date(Date.now() + 3600000),
     })
 
     const requestBody = {
-      email: 'test@example.com'
+      email: 'test@example.com',
     }
 
     const mockEvent = {
       request: {
-        url: 'http://localhost:3000/api/auth/request-password-reset'
-      }
+        url: 'http://localhost:3000/api/auth/request-password-reset',
+      },
     }
     global.readBody.mockResolvedValue(requestBody)
 
@@ -153,26 +156,28 @@ describe('API Request Password Reset', () => {
       expect.objectContaining({
         to: mockUser.email,
         subject: 'Réinitialisation de votre mot de passe - Conventions de Jonglerie',
-        text: expect.stringContaining('http://localhost:3000/auth/reset-password?token=')
+        text: expect.stringContaining('http://localhost:3000/auth/reset-password?token='),
       })
     )
   })
 
-  it('devrait gérer les erreurs lors de l\'envoi d\'email', async () => {
+  it("devrait gérer les erreurs lors de l'envoi d'email", async () => {
     prismaMock.user.findUnique.mockResolvedValue(mockUser)
     sendEmail.mockRejectedValue(new Error('Email service error'))
 
     const requestBody = {
-      email: 'test@example.com'
+      email: 'test@example.com',
     }
 
     const mockEvent = {
       request: {
-        url: 'http://localhost:3000/api/auth/request-password-reset'
-      }
+        url: 'http://localhost:3000/api/auth/request-password-reset',
+      },
     }
     global.readBody.mockResolvedValue(requestBody)
 
-    await expect(requestPasswordResetHandler(mockEvent)).rejects.toThrow('Erreur lors de la demande de réinitialisation')
+    await expect(requestPasswordResetHandler(mockEvent)).rejects.toThrow(
+      'Erreur lors de la demande de réinitialisation'
+    )
   })
 })

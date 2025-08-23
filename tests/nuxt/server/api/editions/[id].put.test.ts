@@ -1,17 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../../../../__mocks__/prisma';
+
+import { prismaMock } from '../../../../__mocks__/prisma'
 import handler from '../../../../server/api/editions/[id].put'
 
 // Mock des utilitaires
 vi.mock('../../../../../server/utils/geocoding', () => ({
   geocodeEdition: vi.fn().mockResolvedValue({
     latitude: 48.8566,
-    longitude: 2.3522
-  })
+    longitude: 2.3522,
+  }),
 }))
 
 vi.mock('../../../../../server/utils/move-temp-image', () => ({
-  moveTempImageToEdition: vi.fn().mockResolvedValue('/uploads/editions/1/image.jpg')
+  moveTempImageToEdition: vi.fn().mockResolvedValue('/uploads/editions/1/image.jpg'),
 }))
 
 describe('/api/editions/[id] PUT', () => {
@@ -20,7 +21,7 @@ describe('/api/editions/[id] PUT', () => {
     email: 'user@example.com',
     pseudo: 'testuser',
     nom: 'Test',
-    prenom: 'User'
+    prenom: 'User',
   }
 
   const mockEdition = {
@@ -47,8 +48,8 @@ describe('/api/editions/[id] PUT', () => {
       id: 1,
       name: 'Convention Test',
       authorId: 1,
-      collaborators: []
-    }
+      collaborators: [],
+    },
   }
 
   beforeEach(() => {
@@ -63,14 +64,14 @@ describe('/api/editions/[id] PUT', () => {
       description: 'Nouvelle description',
       city: 'Lyon',
       hasFoodTrucks: true,
-      hasToilets: true
+      hasToilets: true,
     }
 
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.edition.update.mockResolvedValue({
       ...mockEdition,
-      ...updateData
+      ...updateData,
     })
 
     global.readBody.mockResolvedValue(updateData)
@@ -78,8 +79,8 @@ describe('/api/editions/[id] PUT', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     const result = await handler(mockEvent as any)
@@ -95,9 +96,9 @@ describe('/api/editions/[id] PUT', () => {
         description: updateData.description,
         city: updateData.city,
         hasFoodTrucks: true,
-        hasToilets: true
+        hasToilets: true,
       }),
-      include: expect.any(Object)
+      include: expect.any(Object),
     })
   })
 
@@ -105,8 +106,8 @@ describe('/api/editions/[id] PUT', () => {
     const mockEvent = {
       context: {
         user: null,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Non authentifié')
@@ -118,11 +119,11 @@ describe('/api/editions/[id] PUT', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: 'invalid' }
-      }
+        params: { id: 'invalid' },
+      },
     }
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('ID d\'édition invalide')
+    await expect(handler(mockEvent as any)).rejects.toThrow("ID d'édition invalide")
   })
 
   it('devrait rejeter si édition non trouvée', async () => {
@@ -132,14 +133,14 @@ describe('/api/editions/[id] PUT', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '999' }
-      }
+        params: { id: '999' },
+      },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
   })
 
-  it('devrait rejeter si l\'utilisateur n\'a pas les droits', async () => {
+  it("devrait rejeter si l'utilisateur n'a pas les droits", async () => {
     const otherUserEdition = {
       ...mockEdition,
       creatorId: 2,
@@ -147,8 +148,8 @@ describe('/api/editions/[id] PUT', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: []
-      }
+        collaborators: [],
+      },
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -159,22 +160,24 @@ describe('/api/editions/[id] PUT', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Vous n\'avez pas les droits pour modifier cette édition')
+    await expect(handler(mockEvent as any)).rejects.toThrow(
+      "Vous n'avez pas les droits pour modifier cette édition"
+    )
   })
 
-  it('devrait permettre à l\'auteur de la convention de modifier', async () => {
+  it("devrait permettre à l'auteur de la convention de modifier", async () => {
     const conventionAuthorEdition = {
       ...mockEdition,
       creatorId: 2, // Créé par quelqu'un d'autre
       creator: { id: 2 },
       convention: {
         ...mockEdition.convention,
-        authorId: 1 // Mais convention appartient à l'utilisateur
-      }
+        authorId: 1, // Mais convention appartient à l'utilisateur
+      },
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -186,8 +189,8 @@ describe('/api/editions/[id] PUT', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     const result = await handler(mockEvent as any)
@@ -204,13 +207,15 @@ describe('/api/editions/[id] PUT', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [{
-          userId: 1,
-          canEditConvention: true,
-          canEditAllEditions: true,
-          canManageCollaborators: true
-        }]
-      }
+        collaborators: [
+          {
+            userId: 1,
+            canEditConvention: true,
+            canEditAllEditions: true,
+            canManageCollaborators: true,
+          },
+        ],
+      },
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -222,8 +227,8 @@ describe('/api/editions/[id] PUT', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     const result = await handler(mockEvent as any)
@@ -239,11 +244,13 @@ describe('/api/editions/[id] PUT', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [{
-          userId: 1,
-          canEditConvention: true
-        }]
-      }
+        collaborators: [
+          {
+            userId: 1,
+            canEditConvention: true,
+          },
+        ],
+      },
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -255,8 +262,8 @@ describe('/api/editions/[id] PUT', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     const result = await handler(mockEvent as any)
@@ -272,8 +279,8 @@ describe('/api/editions/[id] PUT', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [] // L'API filtre les VIEWER, donc ils n'apparaissent pas dans les résultats
-      }
+        collaborators: [], // L'API filtre les VIEWER, donc ils n'apparaissent pas dans les résultats
+      },
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -284,28 +291,30 @@ describe('/api/editions/[id] PUT', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Vous n\'avez pas les droits pour modifier cette édition')
+    await expect(handler(mockEvent as any)).rejects.toThrow(
+      "Vous n'avez pas les droits pour modifier cette édition"
+    )
   })
 
-  it('devrait géocoder lors du changement d\'adresse', async () => {
+  it("devrait géocoder lors du changement d'adresse", async () => {
     const { geocodeEdition } = await import('../../../../../server/utils/geocoding')
-    
+
     const updateData = {
       addressLine1: '456 rue Nouvelle',
       city: 'Marseille',
       postalCode: '13001',
-      country: 'France'
+      country: 'France',
     }
 
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.edition.update.mockResolvedValue({
       ...mockEdition,
-      ...updateData
+      ...updateData,
     })
 
     global.readBody.mockResolvedValue(updateData)
@@ -313,8 +322,8 @@ describe('/api/editions/[id] PUT', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     await handler(mockEvent as any)
@@ -324,16 +333,16 @@ describe('/api/editions/[id] PUT', () => {
       addressLine2: null,
       city: updateData.city,
       postalCode: updateData.postalCode,
-      country: updateData.country
+      country: updateData.country,
     })
   })
 
-  it('devrait gérer l\'upload d\'image', async () => {
+  it("devrait gérer l'upload d'image", async () => {
     const { moveTempImageToEdition } = await import('../../../../../server/utils/move-temp-image')
 
     const updateData = {
       name: 'Edition Modifiée',
-      imageUrl: '/temp/789012.jpg'
+      imageUrl: '/temp/789012.jpg',
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -341,7 +350,7 @@ describe('/api/editions/[id] PUT', () => {
     prismaMock.edition.update.mockResolvedValue({
       ...mockEdition,
       ...updateData,
-      imageUrl: '/uploads/editions/1/image.jpg' // L'API utilise finalImageUrl dans updatedData
+      imageUrl: '/uploads/editions/1/image.jpg', // L'API utilise finalImageUrl dans updatedData
     })
 
     global.readBody.mockResolvedValue(updateData)
@@ -349,8 +358,8 @@ describe('/api/editions/[id] PUT', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     const result = await handler(mockEvent as any)
@@ -362,7 +371,7 @@ describe('/api/editions/[id] PUT', () => {
   it('devrait valider que la date de fin est après la date de début', async () => {
     const invalidData = {
       startDate: '2024-06-10',
-      endDate: '2024-06-05' // Date de fin avant date de début
+      endDate: '2024-06-05', // Date de fin avant date de début
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -372,8 +381,8 @@ describe('/api/editions/[id] PUT', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
@@ -389,26 +398,26 @@ describe('/api/editions/[id] PUT', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow()
   })
 
-  it('ne devrait pas géocoder si l\'adresse n\'a pas changé', async () => {
+  it("ne devrait pas géocoder si l'adresse n'a pas changé", async () => {
     const { geocodeEdition } = await import('../../../../../server/utils/geocoding')
-    
+
     const updateData = {
       name: 'Nouveau nom seulement',
-      description: 'Nouvelle description'
+      description: 'Nouvelle description',
     }
 
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.edition.update.mockResolvedValue({
       ...mockEdition,
-      ...updateData
+      ...updateData,
     })
 
     global.readBody.mockResolvedValue(updateData)
@@ -416,8 +425,8 @@ describe('/api/editions/[id] PUT', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     await handler(mockEvent as any)

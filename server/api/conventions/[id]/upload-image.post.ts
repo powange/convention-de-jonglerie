@@ -1,10 +1,10 @@
-import { 
-  handleImageUpload, 
-  checkConventionUploadPermission, 
+import { uploadRateLimiter } from '../../../utils/api-rate-limiter'
+import {
+  handleImageUpload,
+  checkConventionUploadPermission,
   updateEntityWithImage,
-  deleteOldImage
-} from '../../../utils/image-upload';
-import { uploadRateLimiter } from '../../../utils/api-rate-limiter';
+  deleteOldImage,
+} from '../../../utils/image-upload'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
@@ -12,32 +12,28 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 401,
       statusMessage: 'Non authentifié',
-    });
+    })
   }
 
   // Appliquer le rate limiting
-  await uploadRateLimiter(event);
+  await uploadRateLimiter(event)
 
   try {
-    const conventionId = parseInt(getRouterParam(event, 'id') as string);
-    
+    const conventionId = parseInt(getRouterParam(event, 'id') as string)
+
     if (isNaN(conventionId)) {
       throw createError({
         statusCode: 400,
         statusMessage: 'ID de convention invalide',
-      });
+      })
     }
 
     // Vérifier les permissions
-    const convention = await checkConventionUploadPermission(conventionId, event.context.user.id);
+    const convention = await checkConventionUploadPermission(conventionId, event.context.user.id)
 
     // Supprimer l'ancienne image si elle existe
     if (convention.logo) {
-      await deleteOldImage(
-        convention.logo,
-        `public/uploads/conventions/${conventionId}`,
-        'logo-'
-      );
+      await deleteOldImage(convention.logo, `public/uploads/conventions/${conventionId}`, 'logo-')
     }
 
     // Effectuer l'upload
@@ -49,7 +45,7 @@ export default defineEventHandler(async (event) => {
       entityId: conventionId,
       fieldName: 'image',
       copyToOutput: true,
-    });
+    })
 
     // Mettre à jour la convention
     const updatedConvention = await updateEntityWithImage(
@@ -57,25 +53,24 @@ export default defineEventHandler(async (event) => {
       conventionId,
       uploadResult.imageUrl,
       'logo'
-    );
+    )
 
     return {
       success: true,
       imageUrl: uploadResult.imageUrl,
       convention: updatedConvention,
-    };
-
+    }
   } catch (error: unknown) {
     // Si c'est déjà une erreur HTTP, la relancer
-    const httpError = error as { statusCode?: number; message?: string };
+    const httpError = error as { statusCode?: number; message?: string }
     if (httpError.statusCode) {
-      throw error;
+      throw error
     }
-    
-    console.error('Erreur lors de l\'upload de l\'image:', error);
+
+    console.error("Erreur lors de l'upload de l'image:", error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur lors de l\'upload de l\'image',
-    });
+      statusMessage: "Erreur serveur lors de l'upload de l'image",
+    })
   }
-});
+})

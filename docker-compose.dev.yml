@@ -11,11 +11,11 @@ services:
       MYSQL_USER: ${MYSQL_USER:-convention_user}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-convention_password}
     ports:
-      - "3306:3306"
+      - '3306:3306'
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       timeout: 20s
       retries: 10
 
@@ -30,31 +30,31 @@ services:
     # Utilise migrate deploy pour appliquer les migrations existantes sans interaction.
     command: sh -lc "npx prisma generate >/dev/null 2>&1 || true && npx prisma migrate deploy || true && npm run dev"
     environment:
-      DATABASE_URL: "mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}"
-      NUXT_HOST: "0.0.0.0"
-      NUXT_PORT: "3000"
-      NODE_ENV: "development"
+      DATABASE_URL: 'mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}'
+      NUXT_HOST: '0.0.0.0'
+      NUXT_PORT: '3000'
+      NODE_ENV: 'development'
       # Secret de session requis par nuxt-auth-utils (32+ caractères)
       # Remplacez via un fichier .env local: NUXT_SESSION_PASSWORD=...
-      NUXT_SESSION_PASSWORD: "${NUXT_SESSION_PASSWORD:-dev_session_password_change_me_at_least_32_chars}"
-      SEND_EMAILS: "${SEND_EMAILS:-false}"
-      SMTP_USER: "${SMTP_USER:-}"
-      SMTP_PASS: "${SMTP_PASS:-}"
+      NUXT_SESSION_PASSWORD: '${NUXT_SESSION_PASSWORD:-dev_session_password_change_me_at_least_32_chars}'
+      SEND_EMAILS: '${SEND_EMAILS:-false}'
+      SMTP_USER: '${SMTP_USER:-}'
+      SMTP_PASS: '${SMTP_PASS:-}'
       # Google OAuth
-      NUXT_OAUTH_GOOGLE_CLIENT_ID: "${NUXT_OAUTH_GOOGLE_CLIENT_ID:-}"
-      NUXT_OAUTH_GOOGLE_CLIENT_SECRET: "${NUXT_OAUTH_GOOGLE_CLIENT_SECRET:-}"
+      NUXT_OAUTH_GOOGLE_CLIENT_ID: '${NUXT_OAUTH_GOOGLE_CLIENT_ID:-}'
+      NUXT_OAUTH_GOOGLE_CLIENT_SECRET: '${NUXT_OAUTH_GOOGLE_CLIENT_SECRET:-}'
       # Optionnel si vous avez une URL publique
-      NUXT_OAUTH_GOOGLE_REDIRECT_URL: "${NUXT_OAUTH_GOOGLE_REDIRECT_URL:-}"
+      NUXT_OAUTH_GOOGLE_REDIRECT_URL: '${NUXT_OAUTH_GOOGLE_REDIRECT_URL:-}'
       # Facebook OAuth
-      NUXT_OAUTH_FACEBOOK_CLIENT_ID: "${NUXT_OAUTH_FACEBOOK_CLIENT_ID:-}"
-      NUXT_OAUTH_FACEBOOK_CLIENT_SECRET: "${NUXT_OAUTH_FACEBOOK_CLIENT_SECRET:-}"
-      NUXT_OAUTH_FACEBOOK_REDIRECT_URL: "${NUXT_OAUTH_FACEBOOK_REDIRECT_URL:-}"
+      NUXT_OAUTH_FACEBOOK_CLIENT_ID: '${NUXT_OAUTH_FACEBOOK_CLIENT_ID:-}'
+      NUXT_OAUTH_FACEBOOK_CLIENT_SECRET: '${NUXT_OAUTH_FACEBOOK_CLIENT_SECRET:-}'
+      NUXT_OAUTH_FACEBOOK_REDIRECT_URL: '${NUXT_OAUTH_FACEBOOK_REDIRECT_URL:-}'
       # Exposition Nuxt (public/secret) basée sur les mêmes valeurs
-      NUXT_PUBLIC_RECAPTCHA_SITE_KEY: "${NUXT_PUBLIC_RECAPTCHA_SITE_KEY}"
-      NUXT_RECAPTCHA_SECRET_KEY: "${NUXT_RECAPTCHA_SECRET_KEY}"
+      NUXT_PUBLIC_RECAPTCHA_SITE_KEY: '${NUXT_PUBLIC_RECAPTCHA_SITE_KEY}'
+      NUXT_RECAPTCHA_SECRET_KEY: '${NUXT_RECAPTCHA_SECRET_KEY}'
       # Force le polling pour Windows
-      CHOKIDAR_USEPOLLING: "true"
-      CHOKIDAR_INTERVAL: "1000"
+      CHOKIDAR_USEPOLLING: 'true'
+      CHOKIDAR_INTERVAL: '1000'
     volumes:
       # Monter uniquement le code pour ne pas écraser node_modules
       - ./app:/app/app:cached
@@ -72,8 +72,8 @@ services:
       - nuxt_cache:/app/.nuxt
       - output_cache:/app/.output
     ports:
-      - "3000:3000"
-      - "24678:24678"
+      - '3000:3000'
+      - '24678:24678'
     depends_on:
       database:
         condition: service_healthy
@@ -84,7 +84,7 @@ services:
     container_name: convention-adminer
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - '8080:8080'
     environment:
       ADMINER_DEFAULT_SERVER: database
     depends_on:

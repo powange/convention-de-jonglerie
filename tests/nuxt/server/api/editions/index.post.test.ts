@@ -1,17 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../../../../__mocks__/prisma';
-import handler from '../../../../../server/api/editions/index.post';
+
+import handler from '../../../../../server/api/editions/index.post'
+import { prismaMock } from '../../../../__mocks__/prisma'
 
 // Mock des utilitaires
 vi.mock('../../../../../server/utils/geocoding', () => ({
   geocodeEdition: vi.fn().mockResolvedValue({
     latitude: 48.8566,
-    longitude: 2.3522
-  })
+    longitude: 2.3522,
+  }),
 }))
 
 vi.mock('../../../../../server/utils/move-temp-image', () => ({
-  moveTempImageToEdition: vi.fn().mockResolvedValue('/uploads/editions/1/image.jpg')
+  moveTempImageToEdition: vi.fn().mockResolvedValue('/uploads/editions/1/image.jpg'),
 }))
 
 describe('/api/editions POST', () => {
@@ -20,14 +21,14 @@ describe('/api/editions POST', () => {
     email: 'user@example.com',
     pseudo: 'testuser',
     nom: 'Test',
-    prenom: 'User'
+    prenom: 'User',
   }
 
   const mockConvention = {
     id: 1,
     name: 'Convention Test',
     authorId: 1,
-    author: mockUser
+    author: mockUser,
   }
 
   const mockEdition = {
@@ -50,7 +51,7 @@ describe('/api/editions POST', () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     creator: { id: 1, pseudo: 'testuser' },
-    favoritedBy: []
+    favoritedBy: [],
   }
 
   beforeEach(() => {
@@ -71,7 +72,7 @@ describe('/api/editions POST', () => {
       country: 'France',
       hasFoodTrucks: true,
       hasToilets: true,
-      hasShowers: false
+      hasShowers: false,
     }
 
     prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
@@ -79,13 +80,13 @@ describe('/api/editions POST', () => {
       ...mockEdition,
       ...editionData,
       creator: { id: 1, pseudo: 'testuser' },
-      favoritedBy: []
+      favoritedBy: [],
     })
 
     global.readBody.mockResolvedValue(editionData)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     const result = await handler(mockEvent as any)
@@ -97,7 +98,9 @@ describe('/api/editions POST', () => {
     expect(result.hasToilets).toBe(true)
     expect(result.hasShowers).toBe(false)
 
-  expect(prismaMock.convention.findUnique).toHaveBeenCalledWith(expect.objectContaining({ where: { id: editionData.conventionId } }))
+    expect(prismaMock.convention.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: editionData.conventionId } })
+    )
 
     expect(prismaMock.edition.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
@@ -109,58 +112,58 @@ describe('/api/editions POST', () => {
         longitude: 2.3522,
         hasFoodTrucks: true,
         hasToilets: true,
-        hasShowers: false
+        hasShowers: false,
       }),
-      include: expect.any(Object)
+      include: expect.any(Object),
     })
   })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
     const mockEvent = {
-      context: { user: null }
+      context: { user: null },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Non authentifié')
   })
 
-  it('devrait rejeter si la convention n\'existe pas', async () => {
+  it("devrait rejeter si la convention n'existe pas", async () => {
     prismaMock.convention.findUnique.mockResolvedValue(null)
 
     global.readBody.mockResolvedValue({
       conventionId: 999,
-      name: 'Edition Test'
+      name: 'Edition Test',
     })
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
   })
 
-  it('devrait rejeter si l\'utilisateur n\'est pas autorisé à créer des éditions pour cette convention', async () => {
+  it("devrait rejeter si l'utilisateur n'est pas autorisé à créer des éditions pour cette convention", async () => {
     const otherConvention = {
       ...mockConvention,
-      authorId: 2 // Différent utilisateur
+      authorId: 2, // Différent utilisateur
     }
 
     prismaMock.convention.findUnique.mockResolvedValue(otherConvention)
 
     global.readBody.mockResolvedValue({
       conventionId: 1,
-      name: 'Edition Test'
+      name: 'Edition Test',
     })
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
   })
 
-  it('devrait géocoder l\'adresse pour obtenir les coordonnées', async () => {
+  it("devrait géocoder l'adresse pour obtenir les coordonnées", async () => {
     const { geocodeEdition } = await import('../../../../../server/utils/geocoding')
-    
+
     const editionData = {
       conventionId: 1,
       name: 'Edition 2024',
@@ -169,20 +172,20 @@ describe('/api/editions POST', () => {
       addressLine1: '123 rue Test',
       postalCode: '75001',
       city: 'Paris',
-      country: 'France'
+      country: 'France',
     }
 
     prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
     prismaMock.edition.create.mockResolvedValue({
       ...mockEdition,
       creator: { id: 1, pseudo: 'testuser' },
-      favoritedBy: []
+      favoritedBy: [],
     })
 
     global.readBody.mockResolvedValue(editionData)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await handler(mockEvent as any)
@@ -192,11 +195,11 @@ describe('/api/editions POST', () => {
       addressLine2: undefined,
       city: editionData.city,
       postalCode: editionData.postalCode,
-      country: editionData.country
+      country: editionData.country,
     })
   })
 
-  it('devrait gérer l\'upload d\'image', async () => {
+  it("devrait gérer l'upload d'image", async () => {
     const { moveTempImageToEdition } = await import('../../../../../server/utils/move-temp-image')
 
     const editionData = {
@@ -208,7 +211,7 @@ describe('/api/editions POST', () => {
       addressLine1: '123 rue Test',
       postalCode: '75001',
       city: 'Paris',
-      country: 'France'
+      country: 'France',
     }
 
     prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
@@ -216,19 +219,19 @@ describe('/api/editions POST', () => {
       ...mockEdition,
       id: 1,
       creator: { id: 1, pseudo: 'testuser' },
-      favoritedBy: []
+      favoritedBy: [],
     })
     prismaMock.edition.update.mockResolvedValue({
       ...mockEdition,
       imageUrl: '/uploads/editions/1/image.jpg',
       creator: { id: 1, pseudo: 'testuser' },
-      favoritedBy: []
+      favoritedBy: [],
     })
 
     global.readBody.mockResolvedValue(editionData)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     const result = await handler(mockEvent as any)
@@ -239,14 +242,14 @@ describe('/api/editions POST', () => {
 
   it('devrait valider les champs requis', async () => {
     const incompleteData = {
-      conventionId: 1
+      conventionId: 1,
       // manque name, dates, adresse
     }
 
     global.readBody.mockResolvedValue(incompleteData)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow()
@@ -260,14 +263,14 @@ describe('/api/editions POST', () => {
       endDate: '2024-06-05', // Date de fin avant date de début
       addressLine1: '123 rue Test',
       city: 'Paris',
-      country: 'France'
+      country: 'France',
     }
 
     prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
     global.readBody.mockResolvedValue(invalidData)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
@@ -282,7 +285,7 @@ describe('/api/editions POST', () => {
       addressLine1: '123 rue Test',
       postalCode: '75001',
       city: 'Paris',
-      country: 'France'
+      country: 'France',
       // Aucun service spécifié
     }
 
@@ -292,34 +295,34 @@ describe('/api/editions POST', () => {
     global.readBody.mockResolvedValue(editionData)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await handler(mockEvent as any)
 
-    const createCall = prismaMock.edition.create.mock.calls[0][0];
-    
+    const createCall = prismaMock.edition.create.mock.calls[0][0]
+
     // Vérifier que tous les services ont des valeurs par défaut à false
-    expect(createCall.data.hasFoodTrucks).toBe(false);
-    expect(createCall.data.hasKidsZone).toBe(false);
-    expect(createCall.data.acceptsPets).toBe(false);
-    expect(createCall.data.hasTentCamping).toBe(false);
-    expect(createCall.data.hasTruckCamping).toBe(false);
-    expect(createCall.data.hasFamilyCamping).toBe(false);
-    expect(createCall.data.hasGym).toBe(false);
-    expect(createCall.data.hasFireSpace).toBe(false);
-    expect(createCall.data.hasGala).toBe(false);
-    expect(createCall.data.hasOpenStage).toBe(false);
-    expect(createCall.data.hasConcert).toBe(false);
-    expect(createCall.data.hasCantine).toBe(false);
-    expect(createCall.data.hasAerialSpace).toBe(false);
-    expect(createCall.data.hasSlacklineSpace).toBe(false);
-    expect(createCall.data.hasToilets).toBe(false);
-    expect(createCall.data.hasShowers).toBe(false);
-    expect(createCall.data.hasAccessibility).toBe(false);
-    expect(createCall.data.hasWorkshops).toBe(false);
-    expect(createCall.data.hasCreditCardPayment).toBe(false);
-    expect(createCall.data.hasAfjTokenPayment).toBe(false);
+    expect(createCall.data.hasFoodTrucks).toBe(false)
+    expect(createCall.data.hasKidsZone).toBe(false)
+    expect(createCall.data.acceptsPets).toBe(false)
+    expect(createCall.data.hasTentCamping).toBe(false)
+    expect(createCall.data.hasTruckCamping).toBe(false)
+    expect(createCall.data.hasFamilyCamping).toBe(false)
+    expect(createCall.data.hasGym).toBe(false)
+    expect(createCall.data.hasFireSpace).toBe(false)
+    expect(createCall.data.hasGala).toBe(false)
+    expect(createCall.data.hasOpenStage).toBe(false)
+    expect(createCall.data.hasConcert).toBe(false)
+    expect(createCall.data.hasCantine).toBe(false)
+    expect(createCall.data.hasAerialSpace).toBe(false)
+    expect(createCall.data.hasSlacklineSpace).toBe(false)
+    expect(createCall.data.hasToilets).toBe(false)
+    expect(createCall.data.hasShowers).toBe(false)
+    expect(createCall.data.hasAccessibility).toBe(false)
+    expect(createCall.data.hasWorkshops).toBe(false)
+    expect(createCall.data.hasCreditCardPayment).toBe(false)
+    expect(createCall.data.hasAfjTokenPayment).toBe(false)
   })
 
   it('devrait gérer les erreurs de géocodage', async () => {
@@ -336,11 +339,11 @@ describe('/api/editions POST', () => {
       addressLine1: 'Invalid Address',
       city: 'Unknown City',
       postalCode: '00000',
-      country: 'Unknown'
+      country: 'Unknown',
     })
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow()

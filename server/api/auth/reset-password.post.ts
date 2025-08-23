@@ -1,11 +1,12 @@
-import { z } from 'zod'
 import bcrypt from 'bcryptjs'
+import { z } from 'zod'
+
 import { prisma } from '../../utils/prisma'
 import { passwordSchema } from '../../utils/validation-schemas'
 
 const resetPasswordSchema = z.object({
   token: z.string(),
-  newPassword: passwordSchema
+  newPassword: passwordSchema,
 })
 
 export default defineEventHandler(async (event) => {
@@ -16,25 +17,25 @@ export default defineEventHandler(async (event) => {
     // Vérifier le token
     const resetToken = await prisma.passwordResetToken.findUnique({
       where: { token },
-      include: { user: true }
+      include: { user: true },
     })
 
     if (!resetToken) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Token de réinitialisation invalide'
+        statusMessage: 'Token de réinitialisation invalide',
       })
     }
 
     // Vérifier si le token a expiré
     // Comparer en UTC car les dates en BDD sont en UTC
-    const nowUTC = new Date();
-    const expiresAtUTC = new Date(resetToken.expiresAt);
-    
+    const nowUTC = new Date()
+    const expiresAtUTC = new Date(resetToken.expiresAt)
+
     if (nowUTC.getTime() > expiresAtUTC.getTime()) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Le token de réinitialisation a expiré'
+        statusMessage: 'Le token de réinitialisation a expiré',
       })
     }
 
@@ -42,7 +43,7 @@ export default defineEventHandler(async (event) => {
     if (resetToken.used) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Ce token a déjà été utilisé'
+        statusMessage: 'Ce token a déjà été utilisé',
       })
     }
 
@@ -52,34 +53,34 @@ export default defineEventHandler(async (event) => {
     // Mettre à jour le mot de passe de l'utilisateur
     await prisma.user.update({
       where: { id: resetToken.userId },
-      data: { password: hashedPassword }
+      data: { password: hashedPassword },
     })
 
     // Marquer le token comme utilisé
     await prisma.passwordResetToken.update({
       where: { id: resetToken.id },
-      data: { used: true }
+      data: { used: true },
     })
 
     return {
-      message: 'Votre mot de passe a été réinitialisé avec succès'
+      message: 'Votre mot de passe a été réinitialisé avec succès',
     }
   } catch (error) {
     // Ne log que les vraies erreurs serveur, pas les erreurs utilisateur
     // Les erreurs ZodError et createError avec statusCode < 500 sont des erreurs utilisateur
     const isUserError = error.statusCode || error.name === 'ZodError'
-    
+
     if (!isUserError || (error.statusCode && error.statusCode >= 500)) {
       console.error('Erreur lors de la réinitialisation du mot de passe:', error)
     }
-    
+
     if (error.statusCode) {
       throw error
     }
-    
+
     throw createError({
       statusCode: 400,
-      statusMessage: 'Erreur lors de la réinitialisation du mot de passe'
+      statusMessage: 'Erreur lors de la réinitialisation du mot de passe',
     })
   }
 })

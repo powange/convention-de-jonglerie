@@ -1,5 +1,5 @@
-import { defineConfig } from 'vitest/config'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import { defineConfig } from 'vitest/config'
 
 // Tests unitaires (utils, composables, stores, etc.) sans environnement Nuxt complet
 export default defineConfig({
@@ -8,7 +8,7 @@ export default defineConfig({
     environment: 'happy-dom',
     globals: true,
     testTimeout: 10000,
-  setupFiles: ['./tests/setup-common.ts', './tests/setup-mocks.ts'],
+    setupFiles: ['./tests/setup-common.ts', './tests/setup-mocks.ts'],
     reporters: ['dot'],
     silent: true,
     include: [
@@ -16,7 +16,7 @@ export default defineConfig({
       'tests/composables/**/*.test.ts',
       'tests/stores/**/*.test.ts',
       'tests/feedback/**/*.test.ts',
-      'tests/**/*.unit.test.ts'
+      'tests/**/*.unit.test.ts',
     ],
     exclude: [
       '**/node_modules/**',
@@ -25,7 +25,7 @@ export default defineConfig({
       'tests/integration/**',
       'tests/server/**',
       '**/*.nuxt.test.ts',
-      '**/*.db.test.ts'
-    ]
-  }
+      '**/*.db.test.ts',
+    ],
+  },
 })

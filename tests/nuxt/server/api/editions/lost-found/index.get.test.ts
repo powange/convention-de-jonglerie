@@ -1,13 +1,14 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import handler from '../../../../../server/api/editions/[id]/lost-found/index.get';
-import { prismaMock } from '../../../../../__mocks__/prisma';
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-const mockEvent = {};
+import { prismaMock } from '../../../../../__mocks__/prisma'
+import handler from '../../../../../server/api/editions/[id]/lost-found/index.get'
+
+const mockEvent = {}
 
 const mockEdition = {
   id: 1,
   endDate: new Date('2024-01-03'),
-};
+}
 
 const mockLostFoundItems = [
   {
@@ -28,7 +29,7 @@ const mockLostFoundItems = [
     comments: [
       {
         id: 1,
-        content: 'Je pense que c\'est à moi',
+        content: "Je pense que c'est à moi",
         createdAt: new Date('2024-01-04T11:00:00Z'),
         user: {
           id: 2,
@@ -57,26 +58,26 @@ const mockLostFoundItems = [
     },
     comments: [],
   },
-];
+]
 
 describe('/api/editions/[id]/lost-found GET', () => {
   beforeEach(() => {
-    prismaMock.edition.findUnique.mockReset();
-    prismaMock.lostFoundItem.findMany.mockReset();
-    global.getRouterParam = vi.fn().mockReturnValue('1');
-  });
+    prismaMock.edition.findUnique.mockReset()
+    prismaMock.lostFoundItem.findMany.mockReset()
+    global.getRouterParam = vi.fn().mockReturnValue('1')
+  })
 
-  it('devrait récupérer tous les objets trouvés d\'une édition', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems);
+  it("devrait récupérer tous les objets trouvés d'une édition", async () => {
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
 
-    const result = await handler(mockEvent as any);
+    const result = await handler(mockEvent as any)
 
-    expect(result).toEqual(mockLostFoundItems);
+    expect(result).toEqual(mockLostFoundItems)
     expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
       select: { id: true, endDate: true },
-    });
+    })
     expect(prismaMock.lostFoundItem.findMany).toHaveBeenCalledWith({
       where: { editionId: 1 },
       include: {
@@ -105,87 +106,87 @@ describe('/api/editions/[id]/lost-found GET', () => {
         },
       },
       orderBy: { createdAt: 'desc' },
-    });
-  });
+    })
+  })
 
   it('devrait retourner une liste vide si aucun objet trouvé', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    prismaMock.lostFoundItem.findMany.mockResolvedValue([]);
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    prismaMock.lostFoundItem.findMany.mockResolvedValue([])
 
-    const result = await handler(mockEvent as any);
+    const result = await handler(mockEvent as any)
 
-    expect(result).toEqual([]);
-  });
+    expect(result).toEqual([])
+  })
 
-  it('devrait rejeter si ID d\'édition invalide', async () => {
-    global.getRouterParam.mockReturnValue('invalid');
+  it("devrait rejeter si ID d'édition invalide", async () => {
+    global.getRouterParam.mockReturnValue('invalid')
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('ID d\'édition invalide');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow("ID d'édition invalide")
+  })
 
-  it('devrait rejeter si ID d\'édition est NaN', async () => {
-    global.getRouterParam.mockReturnValue('abc');
+  it("devrait rejeter si ID d'édition est NaN", async () => {
+    global.getRouterParam.mockReturnValue('abc')
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('ID d\'édition invalide');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow("ID d'édition invalide")
+  })
 
-  it('devrait rejeter si ID d\'édition est 0', async () => {
-    global.getRouterParam.mockReturnValue('0');
+  it("devrait rejeter si ID d'édition est 0", async () => {
+    global.getRouterParam.mockReturnValue('0')
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('ID d\'édition invalide');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow("ID d'édition invalide")
+  })
 
   it('devrait rejeter si édition non trouvée', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(null);
+    prismaMock.edition.findUnique.mockResolvedValue(null)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Édition non trouvée');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow('Édition non trouvée')
+  })
 
   it('devrait inclure tous les détails utilisateur', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems);
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
 
-    const result = await handler(mockEvent as any);
+    const result = await handler(mockEvent as any)
 
-    expect(result[0].user).toHaveProperty('id');
-    expect(result[0].user).toHaveProperty('pseudo');
-    expect(result[0].user).toHaveProperty('prenom');
-    expect(result[0].user).toHaveProperty('nom');
-    expect(result[0].user).toHaveProperty('profilePicture');
-  });
+    expect(result[0].user).toHaveProperty('id')
+    expect(result[0].user).toHaveProperty('pseudo')
+    expect(result[0].user).toHaveProperty('prenom')
+    expect(result[0].user).toHaveProperty('nom')
+    expect(result[0].user).toHaveProperty('profilePicture')
+  })
 
   it('devrait inclure les commentaires avec les détails utilisateur', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems);
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
 
-    const result = await handler(mockEvent as any);
+    const result = await handler(mockEvent as any)
 
-    expect(result[0].comments).toHaveLength(1);
-    expect(result[0].comments[0].user).toHaveProperty('id');
-    expect(result[0].comments[0].user).toHaveProperty('pseudo');
-    expect(result[0].comments[0].user).toHaveProperty('prenom');
-    expect(result[0].comments[0].user).toHaveProperty('nom');
-    expect(result[0].comments[0].user).toHaveProperty('profilePicture');
-  });
+    expect(result[0].comments).toHaveLength(1)
+    expect(result[0].comments[0].user).toHaveProperty('id')
+    expect(result[0].comments[0].user).toHaveProperty('pseudo')
+    expect(result[0].comments[0].user).toHaveProperty('prenom')
+    expect(result[0].comments[0].user).toHaveProperty('nom')
+    expect(result[0].comments[0].user).toHaveProperty('profilePicture')
+  })
 
   it('devrait trier les objets par date de création décroissante', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems);
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
 
-    await handler(mockEvent as any);
+    await handler(mockEvent as any)
 
     expect(prismaMock.lostFoundItem.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         orderBy: { createdAt: 'desc' },
       })
-    );
-  });
+    )
+  })
 
   it('devrait trier les commentaires par date de création croissante', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems);
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
 
-    await handler(mockEvent as any);
+    await handler(mockEvent as any)
 
     expect(prismaMock.lostFoundItem.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -195,43 +196,43 @@ describe('/api/editions/[id]/lost-found GET', () => {
           }),
         }),
       })
-    );
-  });
+    )
+  })
 
   it('devrait gérer les erreurs de base de données', async () => {
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    prismaMock.lostFoundItem.findMany.mockRejectedValue(new Error('DB Error'));
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    prismaMock.lostFoundItem.findMany.mockRejectedValue(new Error('DB Error'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur interne du serveur');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur interne du serveur')
+  })
 
   it('devrait relancer les erreurs HTTP', async () => {
     const httpError = {
       statusCode: 403,
       statusMessage: 'Access denied',
-    };
+    }
 
-    prismaMock.edition.findUnique.mockRejectedValue(httpError);
+    prismaMock.edition.findUnique.mockRejectedValue(httpError)
 
-    await expect(handler(mockEvent as any)).rejects.toEqual(httpError);
-  });
+    await expect(handler(mockEvent as any)).rejects.toEqual(httpError)
+  })
 
-  it('devrait traiter correctement l\'ID numérique', async () => {
-    global.getRouterParam.mockReturnValue('123');
+  it("devrait traiter correctement l'ID numérique", async () => {
+    global.getRouterParam.mockReturnValue('123')
 
-    prismaMock.edition.findUnique.mockResolvedValue({ id: 123, endDate: new Date() });
-    prismaMock.lostFoundItem.findMany.mockResolvedValue([]);
+    prismaMock.edition.findUnique.mockResolvedValue({ id: 123, endDate: new Date() })
+    prismaMock.lostFoundItem.findMany.mockResolvedValue([])
 
-    await handler(mockEvent as any);
+    await handler(mockEvent as any)
 
     expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
       where: { id: 123 },
       select: { id: true, endDate: true },
-    });
+    })
     expect(prismaMock.lostFoundItem.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { editionId: 123 },
       })
-    );
-  });
-});
+    )
+  })
+})

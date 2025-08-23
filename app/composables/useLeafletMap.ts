@@ -1,5 +1,5 @@
-import type { Ref } from 'vue'
 import type { Map as LeafletMap, Marker, LatLngExpression } from 'leaflet'
+import type { Ref } from 'vue'
 
 export interface MapMarker {
   id: string | number
@@ -19,12 +19,7 @@ export const useLeafletMap = (
   mapContainer: Ref<HTMLElement | null>,
   options: UseLeafletMapOptions = {}
 ) => {
-  const {
-    center = [46.603354, 1.888334],
-    zoom = 6,
-    markers = [],
-    onMarkerClick
-  } = options
+  const { center = [46.603354, 1.888334], zoom = 6, markers = [], onMarkerClick } = options
 
   const map = ref<LeafletMap | null>(null)
   const leafletMarkers = ref<Map<string | number, Marker>>(new Map())
@@ -37,7 +32,7 @@ export const useLeafletMap = (
     const options: Intl.DateTimeFormatOptions = {
       day: 'numeric',
       month: 'long',
-      year: 'numeric'
+      year: 'numeric',
     }
 
     if (start.getTime() === end.getTime()) {
@@ -59,7 +54,7 @@ export const useLeafletMap = (
   const loadLeaflet = async () => {
     try {
       isLoading.value = true
-      
+
       // Vérifier si Leaflet est déjà chargé
       if (typeof window !== 'undefined' && window.L) {
         return window.L
@@ -122,7 +117,8 @@ export const useLeafletMap = (
 
       // Ajouter le layer de tuiles
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution:
+          '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map.value)
 
       // Ajouter les marqueurs initiaux
@@ -131,28 +127,30 @@ export const useLeafletMap = (
       }
     } catch (err) {
       console.error('Error initializing map:', err)
-      error.value = 'Erreur lors de l\'initialisation de la carte'
+      error.value = "Erreur lors de l'initialisation de la carte"
     }
   }
 
   const addMarkers = (newMarkers: MapMarker[]) => {
     if (!map.value || !window.L) return
 
-    newMarkers.forEach(markerData => {
+    newMarkers.forEach((markerData) => {
       const marker = window.L.marker(markerData.position, {
-        icon: markerData.icon || window.L.icon({
-          iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-          iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowSize: [41, 41]
-        })
+        icon:
+          markerData.icon ||
+          window.L.icon({
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41],
+          }),
       })
 
       marker.bindPopup(markerData.popupContent)
-      
+
       if (onMarkerClick) {
         marker.on('click', () => onMarkerClick(markerData))
       }
@@ -163,7 +161,7 @@ export const useLeafletMap = (
   }
 
   const clearMarkers = () => {
-    leafletMarkers.value.forEach(marker => {
+    leafletMarkers.value.forEach((marker) => {
       if (map.value) {
         map.value.removeLayer(marker)
       }
@@ -212,6 +210,6 @@ export const useLeafletMap = (
     fitBounds,
     setView,
     formatDateRange,
-    destroy
+    destroy,
   }
 }

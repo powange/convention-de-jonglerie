@@ -11,7 +11,10 @@ import { PrismaClient, CollaboratorRole, CollaboratorPermissionChangeType } from
 
 const prisma = new PrismaClient()
 
-interface Args { dry: boolean; yes: boolean }
+interface Args {
+  dry: boolean
+  yes: boolean
+}
 
 function parseArgs(): Args {
   const dry = process.argv.includes('--dry')
@@ -24,12 +27,20 @@ async function main() {
   console.log(`🚀 Migration droits collaborateurs (dry=${dry})`)
 
   const collaborators = await prisma.conventionCollaborator.findMany({
-    include: { permissionHistory: { select: { id: true }, take: 1, orderBy: { id: 'asc' } } }
+    include: { permissionHistory: { select: { id: true }, take: 1, orderBy: { id: 'asc' } } },
   })
   console.log(`🔍 ${collaborators.length} collaborateurs trouvés`)
 
   // Première passe: plan
-  type PlanItem = { id: number; role: CollaboratorRole; conventionId: number; addedById: number; changes: Record<string, boolean>; needsHistory: boolean; current: typeof collaborators[number] }
+  type PlanItem = {
+    id: number
+    role: CollaboratorRole
+    conventionId: number
+    addedById: number
+    changes: Record<string, boolean>
+    needsHistory: boolean
+    current: (typeof collaborators)[number]
+  }
   const plan: PlanItem[] = []
   for (const c of collaborators) {
     const changes: Record<string, boolean> = {}
@@ -45,21 +56,32 @@ async function main() {
       if (!c.canEditAllEditions) changes.canEditAllEditions = true
     }
     const needsHistory = c.permissionHistory.length === 0
-    plan.push({ id: c.id, role: c.role, conventionId: c.conventionId, addedById: c.addedById, changes, needsHistory, current: c })
+    plan.push({
+      id: c.id,
+      role: c.role,
+      conventionId: c.conventionId,
+      addedById: c.addedById,
+      changes,
+      needsHistory,
+      current: c,
+    })
   }
 
-  const willUpdate = plan.filter(p => Object.keys(p.changes).length).length
-  const willHistory = plan.filter(p => p.needsHistory).length
+  const willUpdate = plan.filter((p) => Object.keys(p.changes).length).length
+  const willHistory = plan.filter((p) => p.needsHistory).length
 
   console.log('--- Plan ---')
   console.log(`  ✏️  Collaborateurs à mettre à jour: ${willUpdate}`)
   console.log(`  🗂  Historiques baseline à créer: ${willHistory}`)
   if (willUpdate) {
     console.log('  Détails (max 10):')
-    plan.filter(p => Object.keys(p.changes).length).slice(0, 10).forEach(p => {
-      console.log(`   - #${p.id} (${p.role}) -> ${Object.keys(p.changes).join(', ')}`)
-    })
-    if (willUpdate > 10) console.log(`   ... (+${willUpdate - 10} autres)`)    
+    plan
+      .filter((p) => Object.keys(p.changes).length)
+      .slice(0, 10)
+      .forEach((p) => {
+        console.log(`   - #${p.id} (${p.role}) -> ${Object.keys(p.changes).join(', ')}`)
+      })
+    if (willUpdate > 10) console.log(`   ... (+${willUpdate - 10} autres)`)
   }
 
   if (!dry && !yes) {
@@ -67,14 +89,15 @@ async function main() {
       console.error('❌ Terminal non interactif. Utilisez --yes pour confirmer.')
       process.exit(1)
     }
-    const confirmed = await askConfirmation('Confirmer l\'application du plan ? (y/N) ')
+    const confirmed = await askConfirmation("Confirmer l'application du plan ? (y/N) ")
     if (!confirmed) {
       console.log('Opération annulée.')
       return
     }
   }
 
-  let updated = 0, historyCreated = 0
+  let updated = 0,
+    historyCreated = 0
   for (const item of plan) {
     const { id, changes, needsHistory, current } = item
     // Appliquer modifications
@@ -83,7 +106,9 @@ async function main() {
         await prisma.conventionCollaborator.update({ where: { id }, data: changes })
       }
       updated++
-      console.log(`✅ Collaborateur ${id} (${item.role}) droits appliqués: ${Object.keys(changes).join(', ')}`)
+      console.log(
+        `✅ Collaborateur ${id} (${item.role}) droits appliqués: ${Object.keys(changes).join(', ')}`
+      )
     }
     if (needsHistory) {
       if (!dry) {
@@ -98,14 +123,16 @@ async function main() {
               rights: {
                 canEditConvention: current.canEditConvention || !!changes.canEditConvention,
                 canDeleteConvention: current.canDeleteConvention || !!changes.canDeleteConvention,
-                canManageCollaborators: current.canManageCollaborators || !!changes.canManageCollaborators,
+                canManageCollaborators:
+                  current.canManageCollaborators || !!changes.canManageCollaborators,
                 canAddEdition: current.canAddEdition || !!changes.canAddEdition,
                 canEditAllEditions: current.canEditAllEditions || !!changes.canEditAllEditions,
-                canDeleteAllEditions: current.canDeleteAllEditions || !!changes.canDeleteAllEditions
+                canDeleteAllEditions:
+                  current.canDeleteAllEditions || !!changes.canDeleteAllEditions,
               },
-              perEdition: []
-            }
-          }
+              perEdition: [],
+            },
+          },
         })
       }
       historyCreated++
@@ -120,7 +147,7 @@ async function main() {
 
 async function askConfirmation(question: string): Promise<boolean> {
   const { createInterface } = await import('readline')
-  return await new Promise(resolve => {
+  return await new Promise((resolve) => {
     const rl = createInterface({ input: process.stdin, output: process.stdout })
     rl.question(question, (answer: string) => {
       rl.close()
@@ -130,9 +157,11 @@ async function askConfirmation(question: string): Promise<boolean> {
   })
 }
 
-main().catch(e => {
-  console.error('❌ Erreur migration', e)
-  process.exit(1)
-}).finally(async () => {
-  await prisma.$disconnect()
-})
+main()
+  .catch((e) => {
+    console.error('❌ Erreur migration', e)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })

@@ -6,8 +6,8 @@ services:
       dockerfile: Dockerfile.test
     container_name: convention-test-unit
     environment:
-      NODE_ENV: "test"
-      CI: "true"
+      NODE_ENV: 'test'
+      CI: 'true'
     volumes:
       - ./app:/app/app:cached
       - ./server:/app/server:cached

@@ -5,12 +5,12 @@
   Action: Nettoie i18n/locales/fr.json et i18n/locales/en.json
 */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require('fs')
+const path = require('path')
 
-const ROOT = path.resolve(__dirname, '..');
-const FR_PATH = path.join(ROOT, 'i18n', 'locales', 'fr.json');
-const EN_PATH = path.join(ROOT, 'i18n', 'locales', 'en.json');
+const ROOT = path.resolve(__dirname, '..')
+const FR_PATH = path.join(ROOT, 'i18n', 'locales', 'fr.json')
+const EN_PATH = path.join(ROOT, 'i18n', 'locales', 'en.json')
 
 // Liste figée issue du dernier `npm run check-i18n`
 const UNUSED_KEYS = [
@@ -95,50 +95,50 @@ const UNUSED_KEYS = [
   'errors.no_auth_token',
   'errors.login_required_edition',
   'errors.convention_updated_image_failed',
-  'feedback.error.required_fields'
-];
+  'feedback.error.required_fields',
+]
 
 function loadJson(p) {
-  const raw = fs.readFileSync(p, 'utf8');
-  return JSON.parse(raw);
+  const raw = fs.readFileSync(p, 'utf8')
+  return JSON.parse(raw)
 }
 
 function saveJson(p, obj) {
-  const content = JSON.stringify(obj, null, 2) + '\n';
-  fs.writeFileSync(p, content, 'utf8');
+  const content = JSON.stringify(obj, null, 2) + '\n'
+  fs.writeFileSync(p, content, 'utf8')
 }
 
 function deleteByPath(obj, dottedPath) {
-  const parts = dottedPath.split('.');
-  let cur = obj;
+  const parts = dottedPath.split('.')
+  let cur = obj
   for (let i = 0; i < parts.length - 1; i++) {
     if (cur && typeof cur === 'object' && parts[i] in cur) {
-      cur = cur[parts[i]];
+      cur = cur[parts[i]]
     } else {
-      return false; // rien à supprimer
+      return false // rien à supprimer
     }
   }
-  const last = parts[parts.length - 1];
+  const last = parts[parts.length - 1]
   if (cur && typeof cur === 'object' && last in cur) {
-    delete cur[last];
-    return true;
+    delete cur[last]
+    return true
   }
-  return false;
+  return false
 }
 
 function prune(filePath) {
-  const exists = fs.existsSync(filePath);
-  if (!exists) return { filePath, removed: 0 };
-  const data = loadJson(filePath);
-  let removed = 0;
+  const exists = fs.existsSync(filePath)
+  if (!exists) return { filePath, removed: 0 }
+  const data = loadJson(filePath)
+  let removed = 0
   for (const key of UNUSED_KEYS) {
-    if (deleteByPath(data, key)) removed++;
+    if (deleteByPath(data, key)) removed++
   }
-  saveJson(filePath, data);
-  return { filePath, removed };
+  saveJson(filePath, data)
+  return { filePath, removed }
 }
 
-const results = [prune(FR_PATH), prune(EN_PATH)];
+const results = [prune(FR_PATH), prune(EN_PATH)]
 for (const r of results) {
-  console.log(`Pruned ${r.removed} key(s) from ${path.relative(ROOT, r.filePath)}`);
+  console.log(`Pruned ${r.removed} key(s) from ${path.relative(ROOT, r.filePath)}`)
 }

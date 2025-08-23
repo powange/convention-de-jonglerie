@@ -7,15 +7,15 @@ export default defineVitestConfig({
     environmentOptions: {
       nuxt: {
         overrides: {
-          server: { port: 3001 }
-        }
-      }
+          server: { port: 3001 },
+        },
+      },
     },
     setupFiles: ['./tests/e2e/setup.ts'],
     testTimeout: 60000,
     hookTimeout: 60000,
     globals: true,
     include: ['tests/e2e/**/*.test.ts'],
-    exclude: ['**/node_modules/**', '**/dist/**']
-  }
+    exclude: ['**/node_modules/**', '**/dist/**'],
+  },
 })

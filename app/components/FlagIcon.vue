@@ -1,11 +1,11 @@
 <template>
-  <span :class="`fi fi-${code}`" class="flag-icon"/>
+  <span :class="`fi fi-${code}`" class="flag-icon" />
 </template>
 
 <script setup lang="ts">
 defineProps<{
-  code: string;
-}>();
+  code: string
+}>()
 </script>
 
 <style scoped>

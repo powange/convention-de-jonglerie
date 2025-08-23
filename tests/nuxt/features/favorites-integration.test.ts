@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-describe('Système de favoris - Tests d\'intégration', () => {
+describe("Système de favoris - Tests d'intégration", () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -8,7 +8,7 @@ describe('Système de favoris - Tests d\'intégration', () => {
   // Contexte fictif supprimé car non utilisé
 
   describe('Fonctionnalités côté client', () => {
-    it('devrait gérer l\'état des favoris de manière réactive', () => {
+    it("devrait gérer l'état des favoris de manière réactive", () => {
       // Mock d'un état réactif simple
       const favorites = new Set<number>()
       const toggleFavorite = (editionId: number) => {
@@ -35,7 +35,7 @@ describe('Système de favoris - Tests d\'intégration', () => {
       const localFavorites = new Set([1, 2, 4])
 
       // Simuler synchronisation
-  const syncFavorites = (server: number[], _local: Set<number>) => {
+      const syncFavorites = (server: number[], _local: Set<number>) => {
         const synced = new Set(server)
         return synced
       }
@@ -61,14 +61,14 @@ describe('Système de favoris - Tests d\'intégration', () => {
 
   describe('Performances et cache', () => {
     it('devrait utiliser un cache pour éviter les appels répétés', () => {
-  type CacheEntry = { data: number[]; timestamp: number }
-  const cache = new Map<string, CacheEntry>()
+      type CacheEntry = { data: number[]; timestamp: number }
+      const cache = new Map<string, CacheEntry>()
       const cacheTimeout = 5000 // 5 secondes
 
       const getCachedFavorites = (userId: number) => {
         const cacheKey = `favorites_${userId}`
         const cached = cache.get(cacheKey)
-        
+
         if (cached && Date.now() - cached.timestamp < cacheTimeout) {
           return cached.data
         }
@@ -77,7 +77,7 @@ describe('Système de favoris - Tests d\'intégration', () => {
         const data = [1, 2, 3]
         cache.set(cacheKey, {
           data,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         })
 
         return data
@@ -95,15 +95,14 @@ describe('Système de favoris - Tests d\'intégration', () => {
     })
 
     it('devrait invalider le cache après modification', () => {
-  const cache = new Map<string, unknown>()
+      const cache = new Map<string, unknown>()
 
       const invalidateUserCache = (userId: number) => {
-        const cacheKeys = [...cache.keys()].filter(key => 
-          key.startsWith(`favorites_${userId}`) || 
-          key.startsWith(`user_${userId}`)
+        const cacheKeys = [...cache.keys()].filter(
+          (key) => key.startsWith(`favorites_${userId}`) || key.startsWith(`user_${userId}`)
         )
-        
-        cacheKeys.forEach(key => cache.delete(key))
+
+        cacheKeys.forEach((key) => cache.delete(key))
       }
 
       // Ajouter des entrées au cache
@@ -122,9 +121,9 @@ describe('Système de favoris - Tests d\'intégration', () => {
   })
 
   describe('Interface utilisateur', () => {
-    it('devrait calculer correctement l\'état du bouton favori', () => {
+    it("devrait calculer correctement l'état du bouton favori", () => {
       const userFavorites = [1, 3, 5]
-      
+
       const isFavorited = (editionId: number) => {
         return userFavorites.includes(editionId)
       }
@@ -136,27 +135,29 @@ describe('Système de favoris - Tests d\'intégration', () => {
 
     it('devrait formatter correctement les messages de confirmation', () => {
       const getConfirmationMessage = (editionName: string, isFavorited: boolean) => {
-        return isFavorited 
+        return isFavorited
           ? `${editionName} ajoutée aux favoris`
           : `${editionName} retirée des favoris`
       }
 
-      expect(getConfirmationMessage('Convention Paris', true))
-        .toBe('Convention Paris ajoutée aux favoris')
-      
-      expect(getConfirmationMessage('Convention Lyon', false))
-        .toBe('Convention Lyon retirée des favoris')
+      expect(getConfirmationMessage('Convention Paris', true)).toBe(
+        'Convention Paris ajoutée aux favoris'
+      )
+
+      expect(getConfirmationMessage('Convention Lyon', false)).toBe(
+        'Convention Lyon retirée des favoris'
+      )
     })
 
-    it('devrait gérer l\'état de chargement', () => {
+    it("devrait gérer l'état de chargement", () => {
       let isLoading = false
-      
-  const toggleFavoriteWithLoading = async (_editionId: number) => {
+
+      const toggleFavoriteWithLoading = async (_editionId: number) => {
         isLoading = true
-        
+
         try {
           // Simuler appel API
-          await new Promise(resolve => setTimeout(resolve, 10))
+          await new Promise((resolve) => setTimeout(resolve, 10))
           return true
         } finally {
           isLoading = false
@@ -176,7 +177,7 @@ describe('Système de favoris - Tests d\'intégration', () => {
       const networkError = new Error('Network error')
       let errorMessage = ''
 
-  const handleToggleFavorite = async (_editionId: number) => {
+      const handleToggleFavorite = async (_editionId: number) => {
         try {
           throw networkError
         } catch (error) {
@@ -196,10 +197,10 @@ describe('Système de favoris - Tests d\'intégration', () => {
       let attemptCount = 0
       const maxRetries = 3
 
-  const retryToggleFavorite = async (_editionId: number): Promise<boolean> => {
+      const retryToggleFavorite = async (_editionId: number): Promise<boolean> => {
         for (let i = 0; i < maxRetries; i++) {
           attemptCount++
-          
+
           try {
             if (i < 2) {
               throw new Error('Temporary error')
@@ -210,10 +211,10 @@ describe('Système de favoris - Tests d\'intégration', () => {
               throw error
             }
             // Attendre avant de réessayer
-            await new Promise(resolve => setTimeout(resolve, 100 * i))
+            await new Promise((resolve) => setTimeout(resolve, 100 * i))
           }
         }
-        
+
         return false
       }
 
@@ -226,14 +227,14 @@ describe('Système de favoris - Tests d\'intégration', () => {
   describe('Optimisations UX', () => {
     it('devrait implémenter une mise à jour optimiste', () => {
       let favorites = [1, 2]
-  const pendingChanges = new Set<number>()
+      const pendingChanges = new Set<number>()
 
       const optimisticToggle = (editionId: number) => {
         const isCurrentlyFavorited = favorites.includes(editionId)
         pendingChanges.add(editionId)
 
         if (isCurrentlyFavorited) {
-          favorites = favorites.filter(id => id !== editionId)
+          favorites = favorites.filter((id) => id !== editionId)
         } else {
           favorites = [...favorites, editionId]
         }
@@ -247,7 +248,7 @@ describe('Système de favoris - Tests d\'intégration', () => {
       }
 
       expect(favorites).toEqual([1, 2])
-      
+
       // Ajouter l'édition 3
       const result1 = optimisticToggle(3)
       expect(result1).toBe(true)
@@ -298,18 +299,16 @@ describe('Système de favoris - Tests d\'intégration', () => {
   })
 
   describe('Accessibilité', () => {
-    it('devrait fournir des labels appropriés pour les lecteurs d\'écran', () => {
+    it("devrait fournir des labels appropriés pour les lecteurs d'écran", () => {
       const getAriaLabel = (editionName: string, isFavorited: boolean) => {
         return isFavorited
           ? `Retirer ${editionName} des favoris`
           : `Ajouter ${editionName} aux favoris`
       }
 
-      expect(getAriaLabel('Convention Paris', true))
-        .toBe('Retirer Convention Paris des favoris')
-      
-      expect(getAriaLabel('Convention Lyon', false))
-        .toBe('Ajouter Convention Lyon aux favoris')
+      expect(getAriaLabel('Convention Paris', true)).toBe('Retirer Convention Paris des favoris')
+
+      expect(getAriaLabel('Convention Lyon', false)).toBe('Ajouter Convention Lyon aux favoris')
     })
 
     it('devrait gérer la navigation au clavier', () => {
@@ -328,13 +327,13 @@ describe('Système de favoris - Tests d\'intégration', () => {
 
   describe('Analytics et métriques', () => {
     it('devrait tracker les interactions avec les favoris', () => {
-      const analytics: Array<{action: string, editionId: number, timestamp: Date}> = []
-      
+      const analytics: Array<{ action: string; editionId: number; timestamp: Date }> = []
+
       const trackFavoriteAction = (action: 'add' | 'remove', editionId: number) => {
         analytics.push({
           action,
           editionId,
-          timestamp: new Date()
+          timestamp: new Date(),
         })
       }
 
@@ -346,18 +345,18 @@ describe('Système de favoris - Tests d\'intégration', () => {
       expect(analytics[1].action).toBe('remove')
     })
 
-    it('devrait calculer les statistiques d\'usage', () => {
+    it("devrait calculer les statistiques d'usage", () => {
       const favoriteStats = [
         { userId: 1, favoriteCount: 5 },
         { userId: 2, favoriteCount: 3 },
-        { userId: 3, favoriteCount: 8 }
+        { userId: 3, favoriteCount: 8 },
       ]
 
       const calculateStats = (stats: typeof favoriteStats) => {
         const total = stats.reduce((sum, user) => sum + user.favoriteCount, 0)
         const average = total / stats.length
-        const max = Math.max(...stats.map(user => user.favoriteCount))
-        const min = Math.min(...stats.map(user => user.favoriteCount))
+        const max = Math.max(...stats.map((user) => user.favoriteCount))
+        const min = Math.min(...stats.map((user) => user.favoriteCount))
 
         return { total, average, max, min }
       }

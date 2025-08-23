@@ -1,18 +1,19 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import bcrypt from 'bcryptjs'
-import { prismaMock } from '../../../../__mocks__/prisma';
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+import registerHandler from '../../../../../server/api/auth/register.post'
+import { sendEmail } from '../../../../../server/utils/emailService'
+import { prismaMock } from '../../../../__mocks__/prisma'
 
 // Import des mocks après leur définition
-import { sendEmail } from '../../../../../server/utils/emailService'
 
 // Import du handler après les mocks
-import registerHandler from '../../../../../server/api/auth/register.post'
 
 // Mock des modules spécifiques
 vi.mock('../../../../server/utils/emailService', () => ({
   sendEmail: vi.fn().mockResolvedValue(true),
   generateVerificationCode: vi.fn().mockReturnValue('123456'),
-  generateVerificationEmailHtml: vi.fn().mockReturnValue('<html>Code: 123456</html>')
+  generateVerificationEmailHtml: vi.fn().mockReturnValue('<html>Code: 123456</html>'),
 }))
 
 describe('API Register', () => {
@@ -28,17 +29,17 @@ describe('API Register', () => {
       pseudo: 'testuser',
       nom: 'Nom',
       prenom: 'Prenom',
-      isEmailVerified: false
+      isEmailVerified: false,
     }
 
     prismaMock.user.create.mockResolvedValue(mockUser)
-    
+
     const requestBody = {
       email: 'test@example.com',
       password: 'Password123!',
       pseudo: 'testuser',
       nom: 'Nom',
-      prenom: 'Prenom'
+      prenom: 'Prenom',
     }
 
     const mockEvent = {}
@@ -49,7 +50,7 @@ describe('API Register', () => {
     expect(result).toEqual({
       message: 'Compte créé avec succès. Veuillez vérifier votre email pour activer votre compte.',
       requiresVerification: true,
-      email: 'test@example.com'
+      email: 'test@example.com',
     })
 
     expect(prismaMock.user.create).toHaveBeenCalledWith({
@@ -59,25 +60,25 @@ describe('API Register', () => {
         nom: 'Nom',
         prenom: 'Prenom',
         isEmailVerified: false,
-        emailVerificationCode: '123456'
-      })
+        emailVerificationCode: '123456',
+      }),
     })
 
     expect(sendEmail).toHaveBeenCalledWith({
       to: 'test@example.com',
       subject: '🤹 Vérifiez votre compte - Conventions de Jonglerie',
       html: expect.stringContaining('123456'),
-      text: expect.stringContaining('123456')
+      text: expect.stringContaining('123456'),
     })
   })
 
-  it('devrait valider le format de l\'email', async () => {
+  it("devrait valider le format de l'email", async () => {
     const requestBody = {
       email: 'invalid-email',
       password: 'Password123!',
       pseudo: 'testuser',
       nom: 'Nom',
-      prenom: 'Prenom'
+      prenom: 'Prenom',
     }
 
     const mockEvent = {}
@@ -92,7 +93,7 @@ describe('API Register', () => {
       password: 'weak',
       pseudo: 'testuser',
       nom: 'Nom',
-      prenom: 'Prenom'
+      prenom: 'Prenom',
     }
 
     const mockEvent = {}
@@ -104,7 +105,7 @@ describe('API Register', () => {
   it('devrait gérer les emails déjà utilisés', async () => {
     prismaMock.user.create.mockRejectedValue({
       code: 'P2002',
-      meta: { target: ['email'] }
+      meta: { target: ['email'] },
     })
 
     const requestBody = {
@@ -112,7 +113,7 @@ describe('API Register', () => {
       password: 'Password123!',
       pseudo: 'testuser',
       nom: 'Nom',
-      prenom: 'Prenom'
+      prenom: 'Prenom',
     }
 
     const mockEvent = {}
@@ -127,7 +128,7 @@ describe('API Register', () => {
       email: 'test@example.com',
       pseudo: 'testuser',
       nom: 'Nom',
-      prenom: 'Prenom'
+      prenom: 'Prenom',
     }
 
     prismaMock.user.create.mockResolvedValue(mockUser)
@@ -138,7 +139,7 @@ describe('API Register', () => {
       password: 'Password123!',
       pseudo: 'testuser',
       nom: 'Nom',
-      prenom: 'Prenom'
+      prenom: 'Prenom',
     }
 
     const mockEvent = {}
@@ -149,13 +150,13 @@ describe('API Register', () => {
     expect(hashSpy).toHaveBeenCalledWith('Password123!', 10)
   })
 
-  it('devrait normaliser l\'email en minuscules', async () => {
+  it("devrait normaliser l'email en minuscules", async () => {
     const mockUser = {
       id: 1,
       email: 'test@example.com',
       pseudo: 'testuser',
       nom: 'Nom',
-      prenom: 'Prenom'
+      prenom: 'Prenom',
     }
 
     prismaMock.user.create.mockResolvedValue(mockUser)
@@ -165,7 +166,7 @@ describe('API Register', () => {
       password: 'Password123!',
       pseudo: 'testuser',
       nom: 'Nom',
-      prenom: 'Prenom'
+      prenom: 'Prenom',
     }
 
     const mockEvent = {}
@@ -175,18 +176,18 @@ describe('API Register', () => {
 
     expect(prismaMock.user.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
-        email: 'test@example.com'
-      })
+        email: 'test@example.com',
+      }),
     })
   })
 
-  it('devrait continuer même si l\'envoi d\'email échoue', async () => {
+  it("devrait continuer même si l'envoi d'email échoue", async () => {
     const mockUser = {
       id: 1,
       email: 'test@example.com',
       pseudo: 'testuser',
       nom: 'Nom',
-      prenom: 'Prenom'
+      prenom: 'Prenom',
     }
 
     prismaMock.user.create.mockResolvedValue(mockUser)
@@ -197,7 +198,7 @@ describe('API Register', () => {
       password: 'Password123!',
       pseudo: 'testuser',
       nom: 'Nom',
-      prenom: 'Prenom'
+      prenom: 'Prenom',
     }
 
     const mockEvent = {}
@@ -208,7 +209,7 @@ describe('API Register', () => {
     expect(result).toEqual({
       message: 'Compte créé avec succès. Veuillez vérifier votre email pour activer votre compte.',
       requiresVerification: true,
-      email: 'test@example.com'
+      email: 'test@example.com',
     })
   })
 })

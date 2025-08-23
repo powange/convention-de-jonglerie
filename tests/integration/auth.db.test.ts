@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest'
 import bcrypt from 'bcryptjs'
+import { describe, it, expect } from 'vitest'
+
 import { prismaTest } from '../setup-db'
 
 // Ce fichier ne s'exécute que si TEST_WITH_DB=true
-describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB', () => {
-  
+describe.skipIf(!process.env.TEST_WITH_DB)("Tests d'intégration Auth avec DB", () => {
   // Le nettoyage est géré globalement par setup-db.ts
 
   describe('Inscription', () => {
@@ -18,34 +18,34 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
         prenom: 'User',
         isEmailVerified: false,
         emailVerificationCode: '123456',
-        verificationCodeExpiry: new Date(Date.now() + 3600000)
+        verificationCodeExpiry: new Date(Date.now() + 3600000),
       }
 
       const user = await prismaTest.user.create({
-        data: userData
+        data: userData,
       })
 
       expect(user.id).toBeDefined()
       expect(user.email).toBe(`test-${timestamp}@example.com`)
       expect(user.pseudo).toBe(`testuser-${timestamp}`)
-      
+
       // Vérifier que l'utilisateur existe dans la DB
       const foundUser = await prismaTest.user.findUnique({
-        where: { email: `test-${timestamp}@example.com` }
+        where: { email: `test-${timestamp}@example.com` },
       })
-      
+
       expect(foundUser).toBeDefined()
       expect(foundUser?.id).toBe(user.id)
     })
 
-    it('devrait empêcher les doublons d\'email', async () => {
+    it("devrait empêcher les doublons d'email", async () => {
       const timestamp = Date.now()
       const userData = {
         email: `duplicate-${timestamp}@example.com`,
         password: await bcrypt.hash('Password123!', 10),
         pseudo: `user1-${timestamp}`,
         nom: 'Test',
-        prenom: 'User'
+        prenom: 'User',
       }
 
       // Utiliser une transaction explicite pour s'assurer que tout est dans le même contexte
@@ -56,7 +56,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
 
           // Tenter de créer un second avec le même email dans la même transaction
           await tx.user.create({
-            data: { ...userData, pseudo: `user2-${timestamp}` }
+            data: { ...userData, pseudo: `user2-${timestamp}` },
           })
         })
       ).rejects.toThrow(/Unique constraint failed/)
@@ -76,18 +76,18 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
           pseudo: `loginuser-${Date.now()}`,
           nom: 'Login',
           prenom: 'User',
-          isEmailVerified: true
-        }
+          isEmailVerified: true,
+        },
       })
 
       // Trouver l'utilisateur
       const foundUser = await prismaTest.user.findUnique({
-        where: { email: uniqueEmail }
+        where: { email: uniqueEmail },
       })
 
       expect(foundUser).toBeDefined()
       expect(foundUser).not.toBeNull()
-      
+
       // Vérifier le mot de passe
       const isValid = await bcrypt.compare(plainPassword, foundUser!.password)
       expect(isValid).toBe(true)
@@ -108,8 +108,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
           password: await bcrypt.hash('OldPassword123!', 10),
           pseudo: `resetuser-${timestamp}`,
           nom: 'Reset',
-          prenom: 'User'
-        }
+          prenom: 'User',
+        },
       })
 
       // Créer un token de reset
@@ -118,8 +118,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
           token: `test-reset-token-${timestamp}`,
           userId: user.id,
           expiresAt: new Date(Date.now() + 3600000), // 1 heure
-          used: false
-        }
+          used: false,
+        },
       })
 
       expect(resetToken.id).toBeDefined()
@@ -127,7 +127,7 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
       // Vérifier que le token existe
       const foundToken = await prismaTest.passwordResetToken.findUnique({
         where: { token: `test-reset-token-${timestamp}` },
-        include: { user: true }
+        include: { user: true },
       })
 
       expect(foundToken).toBeDefined()
@@ -137,11 +137,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
       // Marquer le token comme utilisé
       await prismaTest.passwordResetToken.update({
         where: { id: resetToken.id },
-        data: { used: true }
+        data: { used: true },
       })
 
       const usedToken = await prismaTest.passwordResetToken.findUnique({
-        where: { id: resetToken.id }
+        where: { id: resetToken.id },
       })
 
       expect(usedToken?.used).toBe(true)
@@ -155,8 +155,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
           password: 'hash',
           pseudo: `cleanupuser-${timestamp}`,
           nom: 'Clean',
-          prenom: 'Up'
-        }
+          prenom: 'Up',
+        },
       })
 
       const now = new Date()
@@ -169,8 +169,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
           token: 'expired-token',
           userId: user.id,
           expiresAt: expiredDate,
-          used: false
-        }
+          used: false,
+        },
       })
 
       await prismaTest.passwordResetToken.create({
@@ -178,24 +178,24 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Tests d\'intégration Auth avec DB',
           token: 'valid-token',
           userId: user.id,
           expiresAt: validDate,
-          used: false
-        }
+          used: false,
+        },
       })
 
       // Nettoyer les tokens expirés (utiliser une date fixe pour être sûr)
       const deleted = await prismaTest.passwordResetToken.deleteMany({
         where: {
           expiresAt: {
-            lt: now
-          }
-        }
+            lt: now,
+          },
+        },
       })
 
       expect(deleted.count).toBe(1)
 
       // Vérifier qu'il ne reste que le token valide
       const remainingTokens = await prismaTest.passwordResetToken.findMany({
-        where: { userId: user.id }
+        where: { userId: user.id },
       })
 
       expect(remainingTokens).toHaveLength(1)

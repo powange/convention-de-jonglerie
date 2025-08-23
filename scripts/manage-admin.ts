@@ -4,7 +4,7 @@ const prisma = new PrismaClient()
 
 async function manageAdmin() {
   const args = process.argv.slice(2)
-  
+
   if (args.length !== 2) {
     console.log(`
 🔧 Script de gestion des super administrateurs
@@ -49,7 +49,7 @@ Exemples:
 
 async function addAdmin(email: string) {
   console.log(`🔍 Recherche de l'utilisateur avec l'email: ${email}`)
-  
+
   const user = await prisma.user.findUnique({
     where: { email },
     select: {
@@ -58,8 +58,8 @@ async function addAdmin(email: string) {
       pseudo: true,
       nom: true,
       prenom: true,
-      isGlobalAdmin: true
-    }
+      isGlobalAdmin: true,
+    },
   })
 
   if (!user) {
@@ -74,15 +74,17 @@ async function addAdmin(email: string) {
 
   await prisma.user.update({
     where: { email },
-    data: { isGlobalAdmin: true }
+    data: { isGlobalAdmin: true },
   })
 
-  console.log(`✅ L'utilisateur ${user.pseudo} (${user.nom} ${user.prenom}) a été promu super administrateur`)
+  console.log(
+    `✅ L'utilisateur ${user.pseudo} (${user.nom} ${user.prenom}) a été promu super administrateur`
+  )
 }
 
 async function removeAdmin(email: string) {
   console.log(`🔍 Recherche de l'utilisateur avec l'email: ${email}`)
-  
+
   const user = await prisma.user.findUnique({
     where: { email },
     select: {
@@ -91,8 +93,8 @@ async function removeAdmin(email: string) {
       pseudo: true,
       nom: true,
       prenom: true,
-      isGlobalAdmin: true
-    }
+      isGlobalAdmin: true,
+    },
   })
 
   if (!user) {
@@ -105,20 +107,22 @@ async function removeAdmin(email: string) {
     return
   }
 
-  // Note: Pas de vérification du nombre d'admins restants car le script 
+  // Note: Pas de vérification du nombre d'admins restants car le script
   // peut toujours être utilisé pour en rajouter même s'il n'y en a plus
 
   await prisma.user.update({
     where: { email },
-    data: { isGlobalAdmin: false }
+    data: { isGlobalAdmin: false },
   })
 
-  console.log(`✅ L'utilisateur ${user.pseudo} (${user.nom} ${user.prenom}) a été rétrogradé en utilisateur normal`)
+  console.log(
+    `✅ L'utilisateur ${user.pseudo} (${user.nom} ${user.prenom}) a été rétrogradé en utilisateur normal`
+  )
 }
 
 async function listAdmins() {
   console.log('🔍 Liste des super administrateurs:')
-  
+
   const admins = await prisma.user.findMany({
     where: { isGlobalAdmin: true },
     select: {
@@ -127,9 +131,9 @@ async function listAdmins() {
       pseudo: true,
       nom: true,
       prenom: true,
-      createdAt: true
+      createdAt: true,
     },
-    orderBy: { createdAt: 'asc' }
+    orderBy: { createdAt: 'asc' },
   })
 
   if (admins.length === 0) {
@@ -138,7 +142,7 @@ async function listAdmins() {
   }
 
   console.log(`\n📋 ${admins.length} super administrateur(s) trouvé(s):\n`)
-  
+
   admins.forEach((admin, index) => {
     console.log(`${index + 1}. ${admin.pseudo} (${admin.nom} ${admin.prenom})`)
     console.log(`   📧 Email: ${admin.email}`)
@@ -152,7 +156,7 @@ if (process.argv.includes('list')) {
   const args = process.argv.slice(2)
   if (args.length === 1 && args[0] === 'list') {
     listAdmins()
-      .catch(error => {
+      .catch((error) => {
         console.error('❌ Erreur:', error instanceof Error ? error.message : error)
         process.exit(1)
       })

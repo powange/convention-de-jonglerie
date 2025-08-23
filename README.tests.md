@@ -4,7 +4,8 @@
 
 Le projet sépare clairement les suites pour de meilleures perfs et une maintenance simple.
 
-1) Unit (sans Nuxt complet, sans DB)
+1. Unit (sans Nuxt complet, sans DB)
+
 - Fichier config: `vitest.config.unit.ts`
 - Setup: `tests/setup-common.ts`, `tests/setup-mocks.ts`
 - Scripts:
@@ -12,7 +13,8 @@ Le projet sépare clairement les suites pour de meilleures perfs et une maintena
   - `npm run test:unit:run` (one-shot)
   - `npm run test:ui` (UI)
 
-2) Nuxt (runtime Nuxt, DB mockée)
+2. Nuxt (runtime Nuxt, DB mockée)
+
 - Fichier config: `vitest.config.nuxt.ts`
 - Setup: `tests/setup-common.ts`, `tests/setup.ts`
 - Scripts:
@@ -20,12 +22,14 @@ Le projet sépare clairement les suites pour de meilleures perfs et une maintena
   - `npm run test:nuxt:run` (one-shot)
 
 Notes Auth (nuxt-auth-utils):
+
 - Les helpers `getUserSession` et `requireUserSession` sont moqués via `#imports`.
 - Dans le code serveur, on privilégie les imports dynamiques (`await import('#imports')`) pour garantir que les mocks Vitest soient appliqués.
 - Dans les tests, récupérez une référence stable au mock dans `beforeEach` pour utiliser `mockResolvedValueOnce` et `mockRejectedValueOnce` proprement.
 - Simulez les erreurs HTTP en ajoutant `statusCode` à l'Error: `Object.assign(new Error('Unauthorized'), { statusCode: 401 })`.
 
-3) Intégration/DB (Prisma + MySQL réels)
+3. Intégration/DB (Prisma + MySQL réels)
+
 - Fichier config: `vitest.config.integration.ts`
 - Setup: `tests/setup-common.ts`, `tests/setup-integration.ts`, `tests/setup-db.ts`
 - Exécution mono-thread pour éviter les conflits DB
@@ -34,13 +38,15 @@ Notes Auth (nuxt-auth-utils):
   - `npm run test:db:run` (prépare Docker + migrations + run)
   - `npm run test:setup` / `npm run test:teardown` (DB de test)
 
-4) E2E (Nuxt lancé + $fetch boîte noire)
+4. E2E (Nuxt lancé + $fetch boîte noire)
+
 - Fichier config: `vitest.config.e2e.ts`
 - Setup: `tests/e2e/setup.ts`
 - Scripts:
   - `npm run test:e2e` / `npm run test:e2e:run`
 
 Raccourci pour tout lancer (hors DB):
+
 - `npm run test:all` → unit + nuxt + e2e
 
 ## Environnement DB de test

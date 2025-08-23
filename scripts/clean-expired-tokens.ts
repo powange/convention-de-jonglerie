@@ -4,7 +4,7 @@ const prisma = new PrismaClient()
 
 async function cleanExpiredTokens() {
   console.log('🧹 Nettoyage des tokens expirés...')
-  
+
   try {
     // Nettoyer les tokens de réinitialisation de mot de passe expirés
     const deletedPasswordTokens = await prisma.passwordResetToken.deleteMany({
@@ -12,51 +12,56 @@ async function cleanExpiredTokens() {
         OR: [
           {
             expiresAt: {
-              lt: new Date()
-            }
+              lt: new Date(),
+            },
           },
           {
-            used: true
-          }
-        ]
-      }
+            used: true,
+          },
+        ],
+      },
     })
-    
-    console.log(`✅ ${deletedPasswordTokens.count} token(s) de réinitialisation de mot de passe supprimé(s)`)
-    
+
+    console.log(
+      `✅ ${deletedPasswordTokens.count} token(s) de réinitialisation de mot de passe supprimé(s)`
+    )
+
     // Nettoyer les codes de vérification email expirés (si applicable)
     const expiredVerificationCodes = await prisma.user.updateMany({
       where: {
         AND: [
           {
             verificationCodeExpiry: {
-              lt: new Date()
-            }
+              lt: new Date(),
+            },
           },
           {
             emailVerificationCode: {
-              not: null
-            }
+              not: null,
+            },
           },
           {
-            isEmailVerified: false
-          }
-        ]
+            isEmailVerified: false,
+          },
+        ],
       },
       data: {
         emailVerificationCode: null,
-        verificationCodeExpiry: null
-      }
+        verificationCodeExpiry: null,
+      },
     })
-    
-    console.log(`✅ ${expiredVerificationCodes.count} code(s) de vérification email expiré(s) nettoyé(s)`)
-    
+
+    console.log(
+      `✅ ${expiredVerificationCodes.count} code(s) de vérification email expiré(s) nettoyé(s)`
+    )
+
     // Afficher un résumé
     console.log('\n📊 Résumé du nettoyage:')
     console.log(`- Tokens de réinitialisation: ${deletedPasswordTokens.count}`)
     console.log(`- Codes de vérification: ${expiredVerificationCodes.count}`)
-    console.log(`- Total: ${deletedPasswordTokens.count + expiredVerificationCodes.count} entrée(s) nettoyée(s)`)
-    
+    console.log(
+      `- Total: ${deletedPasswordTokens.count + expiredVerificationCodes.count} entrée(s) nettoyée(s)`
+    )
   } catch (error) {
     console.error('❌ Erreur lors du nettoyage:', error)
     process.exit(1)

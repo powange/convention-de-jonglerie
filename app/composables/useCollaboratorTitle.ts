@@ -5,18 +5,26 @@
 // sinon => "permissions.viewer"
 
 export function useCollaboratorTitle() {
-  const { t } = useI18n();
+  const { t } = useI18n()
 
   function formatRightsTitle(collab: { rights?: Record<string, boolean>; title?: string | null }) {
-    if (!collab.rights) return collab.title || t('permissions.viewer');
-    const r = collab.rights;
-    const allKeys = ['editConvention','deleteConvention','manageCollaborators','addEdition','editAllEditions','deleteAllEditions'];
-    const allTrue = allKeys.every(k => r[k]);
-    if (allTrue) return t('permissions.admin');
-    if (r.manageCollaborators || (r.editConvention && r.deleteConvention)) return t('permissions.manager');
-    if (r.addEdition || r.editAllEditions || r.deleteAllEditions) return t('permissions.editor');
-    return t('permissions.viewer');
+    if (!collab.rights) return collab.title || t('permissions.viewer')
+    const r = collab.rights
+    const allKeys = [
+      'editConvention',
+      'deleteConvention',
+      'manageCollaborators',
+      'addEdition',
+      'editAllEditions',
+      'deleteAllEditions',
+    ]
+    const allTrue = allKeys.every((k) => r[k])
+    if (allTrue) return t('permissions.admin')
+    if (r.manageCollaborators || (r.editConvention && r.deleteConvention))
+      return t('permissions.manager')
+    if (r.addEdition || r.editAllEditions || r.deleteAllEditions) return t('permissions.editor')
+    return t('permissions.viewer')
   }
 
-  return { formatRightsTitle };
+  return { formatRightsTitle }
 }

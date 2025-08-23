@@ -1,61 +1,65 @@
-import { z } from 'zod';
-import { prisma } from '../../utils/prisma';
-import { handleValidationError } from '../../utils/validation-schemas';
+import { z } from 'zod'
+
+import { prisma } from '../../utils/prisma'
+import { handleValidationError } from '../../utils/validation-schemas'
 
 const verifyEmailSchema = z.object({
   email: z.string().email('Adresse email invalide'),
-  code: z.string().length(6, 'Le code doit contenir exactement 6 chiffres').regex(/^\d{6}$/, 'Le code doit contenir uniquement des chiffres')
-});
+  code: z
+    .string()
+    .length(6, 'Le code doit contenir exactement 6 chiffres')
+    .regex(/^\d{6}$/, 'Le code doit contenir uniquement des chiffres'),
+})
 
 export default defineEventHandler(async (event) => {
   try {
-    const body = await readBody(event);
-    
+    const body = await readBody(event)
+
     // Validation des données
-    const validatedData = verifyEmailSchema.parse(body);
-    
+    const validatedData = verifyEmailSchema.parse(body)
+
     // Rechercher l'utilisateur
     const user = await prisma.user.findUnique({
-      where: { email: validatedData.email.toLowerCase().trim() }
-    });
-    
+      where: { email: validatedData.email.toLowerCase().trim() },
+    })
+
     if (!user) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Utilisateur non trouvé',
-      });
+      })
     }
-    
+
     if (user.isEmailVerified) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Email déjà vérifié',
-      });
+      })
     }
-    
+
     if (!user.emailVerificationCode || !user.verificationCodeExpiry) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Aucun code de vérification actif',
-      });
+      })
     }
-    
+
     // Vérifier l'expiration
     if (new Date() > user.verificationCodeExpiry) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Code de vérification expiré',
-      });
+      })
     }
-    
+
     // Vérifier le code
     if (user.emailVerificationCode !== validatedData.code) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Code de vérification incorrect',
-      });
+      })
     }
-    
+
     // Activer le compte
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
@@ -63,9 +67,9 @@ export default defineEventHandler(async (event) => {
         isEmailVerified: true,
         emailVerificationCode: null,
         verificationCodeExpiry: null,
-      }
-    });
-    
+      },
+    })
+
     return {
       message: 'Email vérifié avec succès ! Votre compte est maintenant actif.',
       user: {
@@ -74,25 +78,24 @@ export default defineEventHandler(async (event) => {
         pseudo: updatedUser.pseudo,
         nom: updatedUser.nom,
         prenom: updatedUser.prenom,
-        isEmailVerified: updatedUser.isEmailVerified
-      }
-    };
-    
+        isEmailVerified: updatedUser.isEmailVerified,
+      },
+    }
   } catch (error) {
     // Gestion des erreurs de validation Zod
     if (error instanceof z.ZodError) {
-      return handleValidationError(error);
+      return handleValidationError(error)
     }
-    
+
     // Re-lancer les erreurs déjà formatées
     if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error;
+      throw error
     }
-    
-    console.error('Erreur lors de la vérification email:', error);
+
+    console.error('Erreur lors de la vérification email:', error)
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur serveur interne',
-    });
+    })
   }
-});
+})

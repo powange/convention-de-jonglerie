@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
 import { $fetch } from '@nuxt/test-utils/e2e'
+import { describe, it, expect } from 'vitest'
 
 // Tests E2E simplifiés qui utilisent directement les API
 describe.skip('Authentication E2E', () => {
@@ -10,23 +10,23 @@ describe.skip('Authentication E2E', () => {
           method: 'POST',
           body: {
             identifier: 'invalid@example.com',
-            password: 'wrongpassword'
-          }
+            password: 'wrongpassword',
+          },
         })
       ).rejects.toThrow()
     })
 
-    it('devrait rejeter l\'inscription avec un email invalide', async () => {
+    it("devrait rejeter l'inscription avec un email invalide", async () => {
       await expect(
         $fetch('/api/auth/register', {
-          method: 'POST', 
+          method: 'POST',
           body: {
             email: 'invalid-email',
             password: 'Password123!',
             pseudo: 'testuser',
             nom: 'Test',
-            prenom: 'User'
-          }
+            prenom: 'User',
+          },
         })
       ).rejects.toThrow()
     })
@@ -35,8 +35,8 @@ describe.skip('Authentication E2E', () => {
       const response = await $fetch('/api/auth/request-password-reset', {
         method: 'POST',
         body: {
-          email: 'test@example.com'
-        }
+          email: 'test@example.com',
+        },
       })
 
       expect(response.message).toContain('Si un compte existe')

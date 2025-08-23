@@ -1,5 +1,4 @@
-import { prisma } from '../../../utils/prisma';
-
+import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
@@ -7,38 +6,43 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 401,
       statusMessage: 'Non authentifié',
-    });
+    })
   }
 
-  const editionId = parseInt(event.context.params?.id as string);
-  const body = await readBody(event);
+  const editionId = parseInt(event.context.params?.id as string)
+  const body = await readBody(event)
 
   if (!editionId) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Edition ID invalide',
-    });
+    })
   }
 
   // Validation des données
-  if (!body.departureDate || !body.departureCity || !body.departureAddress || !body.availableSeats) {
+  if (
+    !body.departureDate ||
+    !body.departureCity ||
+    !body.departureAddress ||
+    !body.availableSeats
+  ) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Données manquantes',
-    });
+    })
   }
 
   try {
     // Vérifier que l'édition existe
     const edition = await prisma.edition.findUnique({
       where: { id: editionId },
-    });
+    })
 
     if (!edition) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Edition non trouvée',
-      });
+      })
     }
 
     // Créer l'offre de covoiturage
@@ -63,14 +67,14 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-    });
+    })
 
-    return carpoolOffer;
+    return carpoolOffer
   } catch (error) {
-    console.error('Erreur lors de la création du covoiturage:', error);
+    console.error('Erreur lors de la création du covoiturage:', error)
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur serveur',
-    });
+    })
   }
-});
+})

@@ -1,7 +1,9 @@
-import type { H3Event } from 'h3'
 import { createError, getRouterParam, readBody } from 'h3'
-import { prisma } from './prisma'
+
 import { getEmailHash } from './email-hash'
+import { prisma } from './prisma'
+
+import type { H3Event } from 'h3'
 
 export type CommentEntityType = 'carpoolOffer' | 'carpoolRequest'
 
@@ -11,10 +13,7 @@ export interface CommentConfig {
   includeQuery?: any
 }
 
-export async function getCommentsForEntity(
-  event: H3Event,
-  config: CommentConfig
-) {
+export async function getCommentsForEntity(event: H3Event, config: CommentConfig) {
   try {
     // Récupérer l'ID depuis les params et le parser en nombre
     const rawId = (event.context as any)?.params?.id
@@ -24,7 +23,10 @@ export async function getCommentsForEntity(
 
     const parsedId = parseInt(rawId)
     if (isNaN(parsedId)) {
-      const msg = config.entityType === 'carpoolOffer' ? "ID de l'offre invalide" : 'ID de la demande invalide'
+      const msg =
+        config.entityType === 'carpoolOffer'
+          ? "ID de l'offre invalide"
+          : 'ID de la demande invalide'
       throw createError({ statusCode: 400, statusMessage: msg })
     }
 
@@ -33,7 +35,8 @@ export async function getCommentsForEntity(
     whereClause[config.entityIdField] = parsedId
 
     // Choisir le bon modèle Prisma selon le type d'entité
-    const modelName = config.entityType === 'carpoolOffer' ? 'carpoolComment' : 'carpoolRequestComment'
+    const modelName =
+      config.entityType === 'carpoolOffer' ? 'carpoolComment' : 'carpoolRequestComment'
     const model: any = (prisma as any)[modelName]
 
     // Récupérer les commentaires (inclure l'utilisateur brut comme attendu par les tests)
@@ -44,7 +47,7 @@ export async function getCommentsForEntity(
     })
 
     // Transformer les données pour ajouter emailHash et masquer l'email (conserver la clé `user`)
-    const transformedComments = comments.map(comment => ({
+    const transformedComments = comments.map((comment) => ({
       ...comment,
       user: comment.user
         ? {
@@ -58,17 +61,19 @@ export async function getCommentsForEntity(
     }))
 
     return transformedComments
-
   } catch (error: any) {
-    console.error(`Erreur lors de la récupération des commentaires pour ${config.entityType}:`, error)
-    
+    console.error(
+      `Erreur lors de la récupération des commentaires pour ${config.entityType}:`,
+      error
+    )
+
     if (error.statusCode) {
       throw error
     }
-    
+
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur'
+      statusMessage: 'Erreur serveur',
     })
   }
 }
@@ -82,7 +87,7 @@ export async function createCommentForEntity(
     if (config.requireAuth && !event.context.user) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Authentification requise'
+        statusMessage: 'Authentification requise',
       })
     }
 
@@ -97,23 +102,24 @@ export async function createCommentForEntity(
     }
 
     const body = await readBody(event)
-    
+
     if (!body.content || !body.content.trim()) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Le contenu du commentaire est requis'
+        statusMessage: 'Le contenu du commentaire est requis',
       })
     }
 
     // Construire les données du commentaire dynamiquement
     const commentData: any = {
       content: body.content.trim(),
-      userId: event.context.user?.id
+      userId: event.context.user?.id,
     }
-  commentData[config.entityIdField] = parsedId
+    commentData[config.entityIdField] = parsedId
 
     // Créer le commentaire
-    const modelName = config.entityType === 'carpoolOffer' ? 'carpoolComment' : 'carpoolRequestComment'
+    const modelName =
+      config.entityType === 'carpoolOffer' ? 'carpoolComment' : 'carpoolRequestComment'
     const model: any = (prisma as any)[modelName]
 
     const comment = await model.create({
@@ -135,27 +141,28 @@ export async function createCommentForEntity(
     // Transformer la réponse
     return {
       ...comment,
-      author: comment.user ? {
-        id: comment.user.id,
-        pseudo: comment.user.pseudo,
-        nom: comment.user.nom,
-        prenom: comment.user.prenom,
-        profilePicture: comment.user.profilePicture,
-        emailHash: getEmailHash(comment.user.email),
-      } : null,
-      user: undefined
+      author: comment.user
+        ? {
+            id: comment.user.id,
+            pseudo: comment.user.pseudo,
+            nom: comment.user.nom,
+            prenom: comment.user.prenom,
+            profilePicture: comment.user.profilePicture,
+            emailHash: getEmailHash(comment.user.email),
+          }
+        : null,
+      user: undefined,
     }
-
   } catch (error: any) {
     console.error(`Erreur lors de la création du commentaire pour ${config.entityType}:`, error)
-    
+
     if (error.statusCode) {
       throw error
     }
-    
+
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la création du commentaire'
+      statusMessage: 'Erreur lors de la création du commentaire',
     })
   }
 }
@@ -169,7 +176,7 @@ export async function deleteCommentForEntity(
     if (config.requireAuth && !event.context.user) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Authentification requise'
+        statusMessage: 'Authentification requise',
       })
     }
 
@@ -192,35 +199,34 @@ export async function deleteCommentForEntity(
     if (!comment) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Commentaire non trouvé'
+        statusMessage: 'Commentaire non trouvé',
       })
     }
 
     if (comment.userId !== event.context.user?.id) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Vous ne pouvez supprimer que vos propres commentaires'
+        statusMessage: 'Vous ne pouvez supprimer que vos propres commentaires',
       })
     }
 
     // Supprimer le commentaire
-  await prisma.carpoolComment.delete({ where: { id: commentId } })
+    await prisma.carpoolComment.delete({ where: { id: commentId } })
 
     return {
       success: true,
-      message: 'Commentaire supprimé avec succès'
+      message: 'Commentaire supprimé avec succès',
     }
-
   } catch (error: any) {
     console.error(`Erreur lors de la suppression du commentaire:`, error)
-    
+
     if (error.statusCode) {
       throw error
     }
-    
+
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la suppression du commentaire'
+      statusMessage: 'Erreur lors de la suppression du commentaire',
     })
   }
 }

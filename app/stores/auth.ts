@@ -1,5 +1,6 @@
-import { defineStore } from 'pinia';
-import type { User } from '~/types';
+import { defineStore } from 'pinia'
+
+import type { User } from '~/types'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -9,13 +10,13 @@ export const useAuthStore = defineStore('auth', {
   }),
   getters: {
     isAuthenticated: (state) => {
-  return !!state.user;
+      return !!state.user
     },
     isGlobalAdmin: (state) => {
-      return state.user?.isGlobalAdmin || false;
+      return state.user?.isGlobalAdmin || false
     },
     isAdminModeActive: (state) => {
-      return state.user?.isGlobalAdmin && state.adminMode;
+      return state.user?.isGlobalAdmin && state.adminMode
     },
   },
   actions: {
@@ -23,48 +24,45 @@ export const useAuthStore = defineStore('auth', {
       const response = await $fetch('/api/auth/register', {
         method: 'POST',
         body: { email, password, pseudo, nom, prenom },
-      });
-      return response;
+      })
+      return response
     },
     async login(identifier: string, password: string, rememberMe: boolean = false) {
-      const response = await $fetch<{ user: User }>(
-        '/api/auth/login',
-        {
-          method: 'POST',
-          body: { identifier, password },
-        }
-      );
+      const response = await $fetch<{ user: User }>('/api/auth/login', {
+        method: 'POST',
+        body: { identifier, password },
+      })
 
-      this.user = response.user;
-      this.rememberMe = rememberMe;
+      this.user = response.user
+      this.rememberMe = rememberMe
 
       // Mémoriser l’utilisateur si nécessaire (pure UX; l’auth reste en session serveur)
       if (import.meta.client) {
-        const storage = rememberMe ? localStorage : sessionStorage;
-        storage.setItem('authUser', JSON.stringify(response.user));
-        storage.setItem('rememberMe', String(rememberMe));
+        const storage = rememberMe ? localStorage : sessionStorage
+        storage.setItem('authUser', JSON.stringify(response.user))
+        storage.setItem('rememberMe', String(rememberMe))
       }
 
-      return response;
+      return response
     },
     async logout() {
       try {
         await $fetch('/api/auth/logout', { method: 'POST' })
-  } catch {
+      } catch {
         // ignore network/log out errors
       }
-      this.user = null;
-      this.rememberMe = false;
-      this.adminMode = false;
-      
+      this.user = null
+      this.rememberMe = false
+      this.adminMode = false
+
       if (import.meta.client) {
         // Nettoyer les deux storages
-        localStorage.removeItem('authUser');
-        localStorage.removeItem('rememberMe');
-        localStorage.removeItem('adminMode');
-        sessionStorage.removeItem('authUser');
-        sessionStorage.removeItem('rememberMe');
-        sessionStorage.removeItem('adminMode');
+        localStorage.removeItem('authUser')
+        localStorage.removeItem('rememberMe')
+        localStorage.removeItem('adminMode')
+        sessionStorage.removeItem('authUser')
+        sessionStorage.removeItem('rememberMe')
+        sessionStorage.removeItem('adminMode')
       }
     },
     initializeAuth() {
@@ -73,7 +71,8 @@ export const useAuthStore = defineStore('auth', {
         $fetch<{ user: User }>('/api/session/me')
           .then((res) => {
             this.user = res.user
-            const storage = localStorage.getItem('rememberMe') === 'true' ? localStorage : sessionStorage
+            const storage =
+              localStorage.getItem('rememberMe') === 'true' ? localStorage : sessionStorage
             storage.setItem('authUser', JSON.stringify(res.user))
           })
           .catch(() => {
@@ -81,37 +80,37 @@ export const useAuthStore = defineStore('auth', {
           })
       }
     },
-    
+
     updateUser(updatedUser: Partial<User>) {
       if (this.user) {
-        this.user = { ...this.user, ...updatedUser };
-        
+        this.user = { ...this.user, ...updatedUser }
+
         // Mettre à jour le localStorage/sessionStorage
         if (import.meta.client) {
-          const storage = this.rememberMe ? localStorage : sessionStorage;
-          storage.setItem('authUser', JSON.stringify(this.user));
+          const storage = this.rememberMe ? localStorage : sessionStorage
+          storage.setItem('authUser', JSON.stringify(this.user))
         }
       }
     },
-    
+
     enableAdminMode() {
       if (this.user?.isGlobalAdmin) {
-        this.adminMode = true;
+        this.adminMode = true
         // Sauvegarder l'état du mode admin
         if (import.meta.client) {
-          const storage = this.rememberMe ? localStorage : sessionStorage;
-          storage.setItem('adminMode', 'true');
+          const storage = this.rememberMe ? localStorage : sessionStorage
+          storage.setItem('adminMode', 'true')
         }
       }
     },
-    
+
     disableAdminMode() {
-      this.adminMode = false;
+      this.adminMode = false
       // Supprimer l'état du mode admin
       if (import.meta.client) {
-        localStorage.removeItem('adminMode');
-        sessionStorage.removeItem('adminMode');
+        localStorage.removeItem('adminMode')
+        sessionStorage.removeItem('adminMode')
       }
     },
   },
-});
+})

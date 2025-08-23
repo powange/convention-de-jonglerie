@@ -4,10 +4,7 @@
     <template #header>
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-3">
-          <UserAvatar 
-            :user="post.user" 
-            size="lg"
-          />
+          <UserAvatar :user="post.user" size="lg" />
           <div>
             <p class="font-medium text-gray-900 dark:text-gray-100">
               {{ post.user.pseudo }}
@@ -17,7 +14,7 @@
             </p>
           </div>
         </div>
-        
+
         <!-- Menu d'actions -->
         <UButton
           v-if="canDeletePost"
@@ -47,7 +44,7 @@
       >
         {{ showReplyForm ? $t('common.cancel') : $t('components.posts.reply') }}
       </UButton>
-      
+
       <UButton
         v-if="post.comments.length > 0"
         color="neutral"
@@ -61,7 +58,10 @@
     </div>
 
     <!-- Formulaire de réponse -->
-    <div v-if="showReplyForm && authStore.isAuthenticated" class="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+    <div
+      v-if="showReplyForm && authStore.isAuthenticated"
+      class="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+    >
       <UForm :state="replyForm" :validate="validateReply" @submit="submitReply">
         <UFormField :label="$t('components.posts.your_reply')" name="content" required>
           <UTextarea
@@ -80,19 +80,13 @@
             </div>
           </template>
         </UFormField>
-        
+
         <div class="flex justify-end gap-2 mt-3">
-          <UButton 
-            type="button" 
-            color="neutral" 
-            variant="ghost"
-            size="sm"
-            @click="toggleReplyForm"
-          >
+          <UButton type="button" color="neutral" variant="ghost" size="sm" @click="toggleReplyForm">
             {{ $t('common.cancel') }}
           </UButton>
-          <UButton 
-            type="submit" 
+          <UButton
+            type="submit"
             size="sm"
             :loading="isSubmittingReply"
             :disabled="!replyForm.content.trim()"
@@ -110,11 +104,7 @@
         :key="comment.id"
         class="flex gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
       >
-        <UserAvatar 
-          :user="comment.user" 
-          size="md" 
-          shrink
-        />
+        <UserAvatar :user="comment.user" size="md" shrink />
         <div class="flex-1 min-w-0">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -124,7 +114,7 @@
               <span class="text-xs text-gray-500">•</span>
               <span class="text-xs text-gray-500">{{ formatDate(comment.createdAt) }}</span>
             </div>
-            
+
             <!-- Menu d'actions pour le commentaire -->
             <UButton
               v-if="canDeleteComment(comment)"
@@ -145,134 +135,136 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue';
-import { useAuthStore } from '~/stores/auth';
-import UserAvatar from '~/components/ui/UserAvatar.vue';
+import { ref, computed, reactive } from 'vue'
 
-const { t } = useI18n();
+import UserAvatar from '~/components/ui/UserAvatar.vue'
+import { useAuthStore } from '~/stores/auth'
+
+const { t } = useI18n()
 
 interface User {
-  id: number;
-  pseudo: string;
-  profilePicture?: string;
+  id: number
+  pseudo: string
+  profilePicture?: string
 }
 
 interface Comment {
-  id: number;
-  content: string;
-  createdAt: string;
-  user: User;
+  id: number
+  content: string
+  createdAt: string
+  user: User
 }
 
 interface Post {
-  id: number;
-  content: string;
-  createdAt: string;
-  user: User;
-  comments: Comment[];
+  id: number
+  content: string
+  createdAt: string
+  user: User
+  comments: Comment[]
 }
 
 interface Props {
-  post: Post;
-  currentUserId?: number;
+  post: Post
+  currentUserId?: number
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 const emit = defineEmits<{
-  'delete-post': [postId: number];
-  'add-comment': [postId: number, content: string];
-  'delete-comment': [postId: number, commentId: number];
-}>();
+  'delete-post': [postId: number]
+  'add-comment': [postId: number, content: string]
+  'delete-comment': [postId: number, commentId: number]
+}>()
 
-const authStore = useAuthStore();
+const authStore = useAuthStore()
 
-const showReplyForm = ref(false);
-const showComments = ref(false);
-const isSubmittingReply = ref(false);
+const showReplyForm = ref(false)
+const showComments = ref(false)
+const isSubmittingReply = ref(false)
 
 const replyForm = reactive({
-  content: ''
-});
+  content: '',
+})
 
 // Vérifier si l'utilisateur peut supprimer le post
 const canDeletePost = computed(() => {
-  return props.currentUserId === props.post.user.id;
-});
+  return props.currentUserId === props.post.user.id
+})
 
 // Vérifier si l'utilisateur peut supprimer un commentaire
 const canDeleteComment = (comment: Comment) => {
-  return props.currentUserId === comment.user.id;
-};
-
+  return props.currentUserId === comment.user.id
+}
 
 // Validation de la réponse
-interface ReplyFormState { content: string }
+interface ReplyFormState {
+  content: string
+}
 const validateReply = (state: ReplyFormState) => {
-  const errors: { path: string; message: string }[] = [];
+  const errors: { path: string; message: string }[] = []
   if (!state.content || !state.content.trim()) {
-    errors.push({ path: 'content', message: t('errors.content_required') });
+    errors.push({ path: 'content', message: t('errors.content_required') })
   }
   if (state.content && state.content.length > 1000) {
-    errors.push({ path: 'content', message: t('errors.content_too_long', { max: 1000 }) });
+    errors.push({ path: 'content', message: t('errors.content_too_long', { max: 1000 }) })
   }
-  return errors;
-};
+  return errors
+}
 
 // Basculer le formulaire de réponse
 const toggleReplyForm = () => {
-  showReplyForm.value = !showReplyForm.value;
+  showReplyForm.value = !showReplyForm.value
   if (!showReplyForm.value) {
-    replyForm.content = '';
+    replyForm.content = ''
   }
-};
+}
 
 // Soumettre une réponse
 const submitReply = async () => {
-  isSubmittingReply.value = true;
+  isSubmittingReply.value = true
   try {
-    await emit('add-comment', props.post.id, replyForm.content.trim());
-    replyForm.content = '';
-    showReplyForm.value = false;
-    showComments.value = true; // Ouvrir les commentaires pour voir la nouvelle réponse
+    await emit('add-comment', props.post.id, replyForm.content.trim())
+    replyForm.content = ''
+    showReplyForm.value = false
+    showComments.value = true // Ouvrir les commentaires pour voir la nouvelle réponse
   } finally {
-    isSubmittingReply.value = false;
+    isSubmittingReply.value = false
   }
-};
+}
 
 // Supprimer le post
 const deletePost = () => {
-  emit('delete-post', props.post.id);
-};
+  emit('delete-post', props.post.id)
+}
 
 // Supprimer un commentaire
 const deleteComment = (commentId: number) => {
-  emit('delete-comment', props.post.id, commentId);
-};
+  emit('delete-comment', props.post.id, commentId)
+}
 
 // Formater la date
 const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInMs = now.getTime() - date.getTime();
-  const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  const diffInDays = Math.floor(diffInHours / 24);
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffInMs = now.getTime() - date.getTime()
+  const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
+  const diffInHours = Math.floor(diffInMinutes / 60)
+  const diffInDays = Math.floor(diffInHours / 24)
 
   if (diffInMinutes < 1) {
-    return t('common.time_just_now');
+    return t('common.time_just_now')
   } else if (diffInMinutes < 60) {
-    return t('common.time_minutes_ago', { count: diffInMinutes });
+    return t('common.time_minutes_ago', { count: diffInMinutes })
   } else if (diffInHours < 24) {
-    return t('common.time_hours_ago', { count: diffInHours });
+    return t('common.time_hours_ago', { count: diffInHours })
   } else if (diffInDays < 7) {
-    return t('common.time_days_ago', { count: diffInDays });
+    return t('common.time_days_ago', { count: diffInDays })
   } else {
-    const { locale } = useI18n();
+    const { locale } = useI18n()
     return date.toLocaleDateString(locale.value, {
       day: 'numeric',
       month: 'short',
-      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-    });
+      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+    })
   }
-};
+}
 </script>

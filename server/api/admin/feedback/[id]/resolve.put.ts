@@ -1,58 +1,62 @@
-import { prisma } from '../../../../utils/prisma';
-import { z } from 'zod';
-import { validateAndSanitize, handleValidationError } from '../../../../utils/validation-schemas';
+import { z } from 'zod'
+
+import { prisma } from '../../../../utils/prisma'
+import { validateAndSanitize, handleValidationError } from '../../../../utils/validation-schemas'
 
 const resolveSchema = z.object({
   resolved: z.boolean(),
-  adminNotes: z.string().max(2000, 'Les notes admin ne peuvent pas dépasser 2000 caractères').optional()
-});
+  adminNotes: z
+    .string()
+    .max(2000, 'Les notes admin ne peuvent pas dépasser 2000 caractères')
+    .optional(),
+})
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user;
+  const user = event.context.user
 
   // Vérifier que l'utilisateur est admin global
   if (!user || !user.isGlobalAdmin) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Accès refusé. Droits d\'administrateur requis.'
-    });
+      statusMessage: "Accès refusé. Droits d'administrateur requis.",
+    })
   }
 
-  const feedbackId = parseInt(event.context.params?.id as string);
+  const feedbackId = parseInt(event.context.params?.id as string)
 
   if (isNaN(feedbackId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID de feedback invalide'
-    });
+      statusMessage: 'ID de feedback invalide',
+    })
   }
 
-  const body = await readBody(event);
+  const body = await readBody(event)
 
   // Validation des données
-  let validatedData;
+  let validatedData
   try {
-    validatedData = validateAndSanitize(resolveSchema, body);
+    validatedData = validateAndSanitize(resolveSchema, body)
   } catch (error) {
     if (error instanceof z.ZodError) {
-      handleValidationError(error);
+      handleValidationError(error)
     }
-    throw error;
+    throw error
   }
 
-  const { resolved, adminNotes } = validatedData;
+  const { resolved, adminNotes } = validatedData
 
   try {
     // Vérifier que le feedback existe
     const existingFeedback = await prisma.feedback.findUnique({
-      where: { id: feedbackId }
-    });
+      where: { id: feedbackId },
+    })
 
     if (!existingFeedback) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Feedback introuvable'
-      });
+        statusMessage: 'Feedback introuvable',
+      })
     }
 
     // Mettre à jour le feedback
@@ -61,35 +65,34 @@ export default defineEventHandler(async (event) => {
       data: {
         resolved,
         adminNotes,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       include: {
         user: {
           select: {
             id: true,
             pseudo: true,
-            email: true
-          }
-        }
-      }
-    });
+            email: true,
+          },
+        },
+      },
+    })
 
     return {
       success: true,
       message: resolved ? 'Feedback marqué comme résolu' : 'Feedback marqué comme non résolu',
-      feedback: updatedFeedback
-    };
-
+      feedback: updatedFeedback,
+    }
   } catch (error) {
-    console.error('Erreur lors de la mise à jour du feedback:', error);
-    
+    console.error('Erreur lors de la mise à jour du feedback:', error)
+
     if (error.statusCode) {
-      throw error;
+      throw error
     }
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la mise à jour du feedback'
-    });
+      statusMessage: 'Erreur lors de la mise à jour du feedback',
+    })
   }
-});
+})

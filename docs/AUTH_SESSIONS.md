@@ -3,12 +3,14 @@
 Ce projet utilise des sessions scellées (nuxt-auth-utils) au lieu de JWT. Cette note résume l’usage côté serveur et la stratégie de tests/mocks.
 
 ## Prérequis
+
 - Variable d’environnement obligatoire: `NUXT_SESSION_PASSWORD` (32+ caractères, robuste).
 - Plus de dépendances JWT; aucun en-tête Authorization n’est attendu côté client.
 
 ## Utilisation côté serveur
 
 ### Middleware serveur `server/middleware/auth.ts`
+
 - Objectif: autoriser quelques routes publiques (GET) et protéger toutes les autres routes `/api/*`.
 - Hydratation du contexte serveur uniquement via la session:
 
@@ -28,9 +30,11 @@ export default defineEventHandler(async (event) => {
 ```
 
 Pourquoi import dynamique ?
+
 - En tests Nuxt, `#imports` est moqué via Vitest. L’import dynamique garantit que le mock est résolu au runtime, évitant les erreurs du type "getUserSession is not a function".
 
 ### Handlers API
+
 - Pour exiger l’auth, utilisez `requireUserSession(event)` et récupérez `user.id`.
 - Import dynamique également recommandé dans les handlers:
 
@@ -54,9 +58,11 @@ event.context.user = session?.user || null
 ## Stratégie de tests (Vitest / @nuxt/test-utils)
 
 ### Mocks globaux
+
 - `tests/setup.ts` étend `#imports` et fournit des stubs par défaut pour `getUserSession` et `requireUserSession`.
 
 ### Mocks locaux par fichier de test
+
 - Vous pouvez surcharger localement:
 
 ```ts
@@ -89,6 +95,7 @@ mockRequireUserSession.mockRejectedValueOnce(
 - Pour éviter les fuites d’état entre tests, préférez `mockResolvedValueOnce`/`mockRejectedValueOnce` plutôt que `mockResolvedValue` global.
 
 ## Pièges fréquents et solutions
+
 - Erreur "getUserSession is not a function":
   - Assurez-vous d’un mock local `vi.mock('#imports', ...)` qui retourne bien une `vi.fn` et privilégiez les imports dynamiques (`await import('#imports')`) dans le code serveur testé.
 
@@ -99,6 +106,7 @@ mockRequireUserSession.mockRejectedValueOnce(
   - Un mock local remplace le mock global. Si vous en définissez un, fournissez toutes les fonctions dont le test a besoin (au minimum celles que vous utilisez) ou récupérez le module réel avec `vi.importActual` puis surchargez.
 
 ## Bonnes pratiques
+
 - Utiliser `getUserSession` pour hydrater contextuellement (middleware, endpoints optionnels).
 - Utiliser `requireUserSession` dans les endpoints protégés, et relayer les erreurs HTTP (ne pas écraser les `statusCode`).
 - Préférer les imports dynamiques pour `#imports` côté serveur.

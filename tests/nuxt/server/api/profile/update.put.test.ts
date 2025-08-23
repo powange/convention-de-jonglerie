@@ -1,37 +1,38 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../../../../__mocks__/prisma';
+
+import { prismaMock } from '../../../../__mocks__/prisma'
 
 // Créer un handler simplifié pour les tests
 const mockHandler = async (event: any) => {
-  const user = event.context.user;
-  
+  const user = event.context.user
+
   if (!user) {
-    const error = new Error('Non authentifié');
-    (error as any).statusCode = 401;
-    throw error;
+    const error = new Error('Non authentifié')
+    ;(error as any).statusCode = 401
+    throw error
   }
 
-  const body = await readBody(event);
-  
+  const body = await readBody(event)
+
   // Validation simplifiée
   if (!body.email || !body.pseudo) {
-    const error = new Error('Données invalides');
-    (error as any).statusCode = 400;
-    throw error;
+    const error = new Error('Données invalides')
+    ;(error as any).statusCode = 400
+    throw error
   }
 
-  const { email, pseudo, nom, prenom, telephone } = body;
+  const { email, pseudo, nom, prenom, telephone } = body
 
   // Vérifier si l'email est déjà utilisé par un autre utilisateur
   if (email !== user.email) {
     const existingUser = await prismaMock.user.findUnique({
       where: { email },
-    });
+    })
 
     if (existingUser && existingUser.id !== user.id) {
-      const error = new Error('Cette adresse email est déjà utilisée');
-      (error as any).statusCode = 400;
-      throw error;
+      const error = new Error('Cette adresse email est déjà utilisée')
+      ;(error as any).statusCode = 400
+      throw error
     }
   }
 
@@ -39,12 +40,12 @@ const mockHandler = async (event: any) => {
   if (pseudo !== user.pseudo) {
     const existingUser = await prismaMock.user.findUnique({
       where: { pseudo },
-    });
+    })
 
     if (existingUser && existingUser.id !== user.id) {
-      const error = new Error('Ce pseudo est déjà utilisé');
-      (error as any).statusCode = 400;
-      throw error;
+      const error = new Error('Ce pseudo est déjà utilisé')
+      ;(error as any).statusCode = 400
+      throw error
     }
   }
 
@@ -69,13 +70,13 @@ const mockHandler = async (event: any) => {
       createdAt: true,
       updatedAt: true,
     },
-  });
+  })
 
-  return updatedUser;
-};
+  return updatedUser
+}
 
 // Mock des fonctions globales
-global.readBody = vi.fn();
+global.readBody = vi.fn()
 
 describe('API Profile Update', () => {
   const mockUser = {
@@ -85,7 +86,7 @@ describe('API Profile Update', () => {
     nom: 'Test',
     prenom: 'User',
     telephone: '0123456789',
-    isGlobalAdmin: false
+    isGlobalAdmin: false,
   }
 
   const mockUpdatedUser = {
@@ -97,7 +98,7 @@ describe('API Profile Update', () => {
     telephone: '0987654321',
     profilePicture: null,
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
   }
 
   beforeEach(() => {
@@ -110,13 +111,13 @@ describe('API Profile Update', () => {
       pseudo: 'newpseudo',
       nom: 'NewNom',
       prenom: 'NewPrenom',
-      telephone: '0987654321'
+      telephone: '0987654321',
     })
     prismaMock.user.findUnique.mockResolvedValue(null) // Pas de conflit email/pseudo
     prismaMock.user.update.mockResolvedValue(mockUpdatedUser)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     const result = await mockHandler(mockEvent)
@@ -128,7 +129,7 @@ describe('API Profile Update', () => {
         pseudo: 'newpseudo',
         nom: 'NewNom',
         prenom: 'NewPrenom',
-        telephone: '0987654321'
+        telephone: '0987654321',
       },
       select: {
         id: true,
@@ -139,40 +140,40 @@ describe('API Profile Update', () => {
         telephone: true,
         profilePicture: true,
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     })
     expect(result).toEqual(mockUpdatedUser)
   })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
     const mockEvent = {
-      context: { user: null }
+      context: { user: null },
     }
 
     await expect(mockHandler(mockEvent)).rejects.toMatchObject({
       statusCode: 401,
-      message: 'Non authentifié'
+      message: 'Non authentifié',
     })
   })
 
-  it('devrait rejeter si l\'email est déjà utilisé par un autre utilisateur', async () => {
+  it("devrait rejeter si l'email est déjà utilisé par un autre utilisateur", async () => {
     vi.mocked(readBody).mockResolvedValue({
       email: 'newemail@example.com',
       pseudo: 'testuser',
       nom: 'Test',
-      prenom: 'User'
+      prenom: 'User',
     })
     const existingUser = { id: 2, email: 'newemail@example.com' }
     prismaMock.user.findUnique.mockResolvedValue(existingUser as any)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await expect(mockHandler(mockEvent)).rejects.toMatchObject({
       statusCode: 400,
-      message: 'Cette adresse email est déjà utilisée'
+      message: 'Cette adresse email est déjà utilisée',
     })
   })
 
@@ -181,19 +182,19 @@ describe('API Profile Update', () => {
       email: 'test@example.com', // Même email, donc pas de vérification
       pseudo: 'newpseudo', // Pseudo différent
       nom: 'Test',
-      prenom: 'User'
+      prenom: 'User',
     })
     const existingUser = { id: 2, pseudo: 'newpseudo' }
     // Comme l'email est identique, seule la vérification du pseudo aura lieu
     prismaMock.user.findUnique.mockResolvedValueOnce(existingUser as any) // Conflit pseudo
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await expect(mockHandler(mockEvent)).rejects.toMatchObject({
       statusCode: 400,
-      message: 'Ce pseudo est déjà utilisé'
+      message: 'Ce pseudo est déjà utilisé',
     })
   })
 
@@ -202,25 +203,25 @@ describe('API Profile Update', () => {
       email: 'test@example.com', // Même email
       pseudo: 'newpseudo',
       nom: 'NewNom',
-      prenom: 'NewPrenom'
+      prenom: 'NewPrenom',
     })
     // Mock pour la vérification du pseudo (nouveau pseudo, donc vérification nécessaire)
     prismaMock.user.findUnique.mockResolvedValueOnce(null) // Pas de conflit pseudo
     prismaMock.user.update.mockResolvedValue(mockUpdatedUser)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await mockHandler(mockEvent)
 
     // La vérification d'email ne devrait pas avoir lieu car c'est le même
     expect(prismaMock.user.findUnique).not.toHaveBeenCalledWith({
-      where: { email: 'test@example.com' }
+      where: { email: 'test@example.com' },
     })
     // Mais la vérification du pseudo devrait avoir lieu car il est différent
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
-      where: { pseudo: 'newpseudo' }
+      where: { pseudo: 'newpseudo' },
     })
   })
 
@@ -229,20 +230,20 @@ describe('API Profile Update', () => {
       email: 'newemail@example.com',
       pseudo: 'testuser', // Même pseudo
       nom: 'NewNom',
-      prenom: 'NewPrenom'
+      prenom: 'NewPrenom',
     })
     prismaMock.user.findUnique.mockResolvedValueOnce(null) // Pas de conflit email
     prismaMock.user.update.mockResolvedValue(mockUpdatedUser)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await mockHandler(mockEvent)
 
     // La vérification de pseudo ne devrait pas avoir lieu car c'est le même
     expect(prismaMock.user.findUnique).not.toHaveBeenCalledWith({
-      where: { pseudo: 'testuser' }
+      where: { pseudo: 'testuser' },
     })
   })
 
@@ -251,16 +252,16 @@ describe('API Profile Update', () => {
       email: '', // Email vide
       pseudo: '', // Pseudo vide
       nom: 'Test',
-      prenom: 'User'
+      prenom: 'User',
     })
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await expect(mockHandler(mockEvent)).rejects.toMatchObject({
       statusCode: 400,
-      message: 'Données invalides'
+      message: 'Données invalides',
     })
   })
 })

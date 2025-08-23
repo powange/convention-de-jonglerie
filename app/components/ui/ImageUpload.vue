@@ -4,11 +4,11 @@
     <div class="flex flex-col space-y-3">
       <!-- Preview actuelle ou placeholder -->
       <div v-if="modelValue || previewUrl" class="relative">
-        <img 
-          :src="previewUrl || modelValue" 
-          :alt="alt" 
+        <img
+          :src="previewUrl || modelValue"
+          :alt="alt"
           class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-700"
-        >
+        />
         <div class="absolute top-2 right-2 flex space-x-2">
           <!-- Bouton de suppression -->
           <UButton
@@ -21,8 +21,8 @@
           />
         </div>
         <!-- Overlay de progression -->
-        <div 
-          v-if="uploading" 
+        <div
+          v-if="uploading"
           class="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center"
         >
           <div class="text-center text-white">
@@ -34,12 +34,12 @@
       </div>
 
       <!-- Zone de drop ou bouton si pas d'image -->
-      <div 
+      <div
         v-else
         class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
         :class="{ 'border-blue-400 bg-blue-50 dark:bg-blue-900/20': isDragOver }"
         @click="triggerFileInput"
-        @dragover.prevent="onDragOver" 
+        @dragover.prevent="onDragOver"
         @dragleave.prevent="onDragLeave"
         @drop.prevent="onDrop"
       >
@@ -62,18 +62,14 @@
         :accept="validation.allowedTypes.join(',')"
         class="hidden"
         @change="handleFileSelect"
-      >
+      />
 
       <!-- Boutons d'action -->
       <div v-if="!uploading" class="flex justify-center space-x-2">
-        <UButton
-          variant="outline"
-          icon="i-heroicons-photo"
-          @click="triggerFileInput"
-        >
+        <UButton variant="outline" icon="i-heroicons-photo" @click="triggerFileInput">
           {{ t('upload.select_file') }}
         </UButton>
-        
+
         <UButton
           v-if="selectedFile && !autoUpload"
           color="primary"
@@ -92,7 +88,12 @@
       variant="subtle"
       :title="t('upload.upload_error')"
       :description="error"
-      :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'neutral', variant: 'link', padded: false }"
+      :close-button="{
+        icon: 'i-heroicons-x-mark-20-solid',
+        color: 'neutral',
+        variant: 'link',
+        padded: false,
+      }"
       @close="error = null"
     />
 
@@ -137,7 +138,7 @@ interface Emits {
 const props = withDefaults(defineProps<Props>(), {
   alt: 'Uploaded image',
   autoUpload: true,
-  allowDelete: true
+  allowDelete: true,
 })
 
 const emit = defineEmits<Emits>()
@@ -146,17 +147,17 @@ const emit = defineEmits<Emits>()
 const { t } = useI18n()
 
 // Composable d'upload
-const { 
-  uploading, 
-  progress, 
-  selectedFile, 
-  previewUrl, 
+const {
+  uploading,
+  progress,
+  selectedFile,
+  previewUrl,
   error,
   selectFile,
   uploadFile,
   deleteImage,
   reset,
-  validation 
+  validation,
 } = useImageUpload(props.options)
 
 // États réactifs
@@ -180,7 +181,7 @@ const triggerFileInput = () => {
 const handleFileSelect = (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
-  
+
   if (file && selectFile(file)) {
     if (props.autoUpload) {
       upload()
@@ -200,7 +201,7 @@ const onDragLeave = () => {
 const onDrop = (event: DragEvent) => {
   isDragOver.value = false
   const files = event.dataTransfer?.files
-  
+
   if (files && files.length > 0) {
     const file = files[0]
     if (selectFile(file) && props.autoUpload) {

@@ -55,9 +55,9 @@
               validation: {
                 maxSize: 5 * 1024 * 1024,
                 allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
-                allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp']
+                allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
               },
-              resetAfterUpload: false
+              resetAfterUpload: false,
             }"
             :alt="$t('components.convention_form.convention_logo_alt')"
             :placeholder="$t('components.convention_form.click_to_select_image')"
@@ -79,17 +79,19 @@
           <p class="text-sm text-gray-500 mt-1">
             {{ $t('components.convention_form.logo_url_description') }}
           </p>
-          
+
           <!-- Aperçu de l'URL -->
           <div v-if="form.logo" class="mt-3">
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ $t('components.convention_form.logo_preview') }}</p>
-            <img 
-              :src="form.logo" 
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              {{ $t('components.convention_form.logo_preview') }}
+            </p>
+            <img
+              :src="form.logo"
               :alt="form.name || $t('components.convention_form.convention_logo_alt')"
               class="w-24 h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
               @error="logoError = true"
               @load="logoError = false"
-            >
+            />
             <UAlert
               v-if="logoError"
               color="error"
@@ -105,21 +107,11 @@
 
     <!-- Boutons d'action -->
     <div class="flex gap-3 pt-4">
-      <UButton
-        type="submit"
-        color="primary"
-        :loading="loading"
-        :disabled="loading"
-      >
+      <UButton type="submit" color="primary" :loading="loading" :disabled="loading">
         {{ submitButtonText }}
       </UButton>
-      
-      <UButton
-        type="button"
-        color="neutral"
-        variant="outline"
-        @click="$emit('cancel')"
-      >
+
+      <UButton type="button" color="neutral" variant="outline" @click="$emit('cancel')">
         Annuler
       </UButton>
     </div>
@@ -127,145 +119,148 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue';
-import type { Convention } from '~/types';
-import ImageUpload from '~/components/ui/ImageUpload.vue';
+import { reactive, ref, onMounted } from 'vue'
+
+import ImageUpload from '~/components/ui/ImageUpload.vue'
+import type { Convention } from '~/types'
 
 interface Props {
-  initialData?: Convention;
-  submitButtonText?: string;
-  loading?: boolean;
+  initialData?: Convention
+  submitButtonText?: string
+  loading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   submitButtonText: 'Enregistrer',
   loading: false,
-  initialData: undefined
-});
+  initialData: undefined,
+})
 
 const emit = defineEmits<{
-  submit: [data: Omit<Convention, 'id' | 'createdAt' | 'updatedAt' | 'authorId' | 'author'>];
-  cancel: [];
-}>();
+  submit: [data: Omit<Convention, 'id' | 'createdAt' | 'updatedAt' | 'authorId' | 'author'>]
+  cancel: []
+}>()
 
-const toast = useToast();
+const toast = useToast()
 
-const logoError = ref(false);
-const uploadMode = ref<'file' | 'url'>('file');
+const logoError = ref(false)
+const uploadMode = ref<'file' | 'url'>('file')
 
 const form = reactive({
   name: '',
   description: '',
   logo: '',
-});
-
+})
 
 // Fonctions utilitaires
 const trimField = (fieldName: keyof typeof form) => {
   if (form[fieldName] && typeof form[fieldName] === 'string') {
-    form[fieldName] = form[fieldName].trim();
+    form[fieldName] = form[fieldName].trim()
   }
-};
+}
 
 const trimAllFields = () => {
-  trimField('name');
-  trimField('description');
-  trimField('logo');
-};
+  trimField('name')
+  trimField('description')
+  trimField('logo')
+}
 
 const isValidUrl = (url: string): boolean => {
   // Accepter les chaînes vides
   if (!url || url.trim() === '') {
-    return true;
+    return true
   }
-  
+
   // Accepter les URLs relatives (commençant par / ou ./)
   if (url.startsWith('/') || url.startsWith('./')) {
-    return true;
+    return true
   }
-  
+
   // Vérifier les URLs absolues
   try {
-    new URL(url);
-    return true;
+    new URL(url)
+    return true
   } catch {
-    return false;
+    return false
   }
-};
+}
 
 // Gestionnaires d'événements pour ImageUpload
 const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
   if (result.success && result.imageUrl) {
-    form.logo = result.imageUrl;
+    form.logo = result.imageUrl
     toast.add({
       title: 'Image uploadée',
-      description: 'L\'image a été uploadée avec succès',
-  color: 'success'
-    });
+      description: "L'image a été uploadée avec succès",
+      color: 'success',
+    })
   }
-};
+}
 
 const onImageDeleted = () => {
-  form.logo = '';
+  form.logo = ''
   toast.add({
     title: 'Image supprimée',
-    description: 'L\'image a été supprimée avec succès',
-  color: 'success'
-  });
-};
+    description: "L'image a été supprimée avec succès",
+    color: 'success',
+  })
+}
 
 const onImageError = (error: string) => {
   toast.add({
     title: 'Erreur',
     description: error,
-  color: 'error'
-  });
-};
+    color: 'error',
+  })
+}
 
 // Validation
 const validate = (state: typeof form) => {
-  const errors = [];
-  
+  const errors = []
+
   if (!state.name || state.name.trim().length === 0) {
-    errors.push({ path: 'name', message: 'Le nom de la convention est requis' });
+    errors.push({ path: 'name', message: 'Le nom de la convention est requis' })
   } else if (state.name.trim().length < 3) {
-    errors.push({ path: 'name', message: 'Le nom doit contenir au moins 3 caractères' });
+    errors.push({ path: 'name', message: 'Le nom doit contenir au moins 3 caractères' })
   } else if (state.name.trim().length > 100) {
-    errors.push({ path: 'name', message: 'Le nom ne peut pas dépasser 100 caractères' });
+    errors.push({ path: 'name', message: 'Le nom ne peut pas dépasser 100 caractères' })
   }
-  
+
   if (state.description && state.description.length > 1000) {
-    errors.push({ path: 'description', message: 'La description ne peut pas dépasser 1000 caractères' });
+    errors.push({
+      path: 'description',
+      message: 'La description ne peut pas dépasser 1000 caractères',
+    })
   }
-  
+
   // Valider l'URL du logo seulement en mode URL et si elle n'est pas vide
   if (state.logo && state.logo.trim() && !isValidUrl(state.logo.trim())) {
-    errors.push({ path: 'logo', message: 'L\'URL du logo n\'est pas valide' });
+    errors.push({ path: 'logo', message: "L'URL du logo n'est pas valide" })
   }
-  
-  return errors;
-};
+
+  return errors
+}
 
 // Soumission du formulaire
 const onSubmit = async () => {
-  trimAllFields();
-  
+  trimAllFields()
+
   // Données du formulaire sans l'image
   const formData = {
     name: form.name.trim(),
     description: form.description.trim() || null,
-    logo: uploadMode.value === 'url' ? (form.logo.trim() || null) : (form.logo || null),
-  };
-  
-  emit('submit', formData);
-};
+    logo: uploadMode.value === 'url' ? form.logo.trim() || null : form.logo || null,
+  }
+
+  emit('submit', formData)
+}
 
 // Initialisation avec les données existantes
 onMounted(() => {
   if (props.initialData) {
-    form.name = props.initialData.name || '';
-    form.description = props.initialData.description || '';
-    form.logo = props.initialData.logo || '';
+    form.name = props.initialData.name || ''
+    form.description = props.initialData.description || ''
+    form.logo = props.initialData.logo || ''
   }
-});
+})
 </script>

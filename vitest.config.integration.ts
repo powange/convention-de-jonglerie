@@ -1,5 +1,5 @@
-import { defineConfig } from 'vitest/config'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
@@ -13,27 +13,25 @@ export default defineConfig({
     // Configuration pour résoudre les modules Prisma
     server: {
       deps: {
-        external: ['@prisma/client']
-      }
+        external: ['@prisma/client'],
+      },
     },
     // Auto-import des fonctions H3/Nitro
-  globals: true,
-  // Sortie plus concise
-  reporters: ['dot'],
-  silent: true,
-  watch: false,
-  // Exécution mono-thread pour éviter les conflits DB (verrous, ordre)
-  pool: 'threads',
-  poolOptions: { threads: { minThreads: 1, maxThreads: 1 } },
-  sequence: { concurrent: false },
+    globals: true,
+    // Sortie plus concise
+    reporters: ['dot'],
+    silent: true,
+    watch: false,
+    // Exécution mono-thread pour éviter les conflits DB (verrous, ordre)
+    pool: 'threads',
+    poolOptions: { threads: { minThreads: 1, maxThreads: 1 } },
+    sequence: { concurrent: false },
     // Inclure seulement les vrais tests d'intégration (avec DB)
-    include: [
-      'tests/integration/**/*.db.test.ts'
-    ]
+    include: ['tests/integration/**/*.db.test.ts'],
   },
   build: {
     rollupOptions: {
-      external: ['**/*.spec.ts', '**/*.test.ts']
-    }
-  }
+      external: ['**/*.spec.ts', '**/*.test.ts'],
+    },
+  },
 })

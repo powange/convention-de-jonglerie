@@ -4,7 +4,10 @@
     <nav class="flex mb-4" :aria-label="$t('navigation.breadcrumb')">
       <ol class="inline-flex items-center space-x-1 md:space-x-3">
         <li class="inline-flex items-center">
-          <NuxtLink to="/admin" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+          <NuxtLink
+            to="/admin"
+            class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
+          >
             <UIcon name="i-heroicons-squares-2x2" class="w-4 h-4 mr-2" />
             {{ $t('admin.dashboard') }}
           </NuxtLink>
@@ -12,7 +15,9 @@
         <li>
           <div class="flex items-center">
             <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400" />
-            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">{{ $t('admin.user_management') }}</span>
+            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">{{
+              $t('admin.user_management')
+            }}</span>
           </div>
         </li>
       </ol>
@@ -38,7 +43,7 @@
             @input="debouncedSearch"
           />
         </div>
-        
+
         <!-- Filtre par statut admin -->
         <USelect
           v-model="adminFilter"
@@ -48,7 +53,7 @@
           class="w-full sm:w-48"
           @change="fetchUsers"
         />
-        
+
         <!-- Filtre par email vérifié -->
         <USelect
           v-model="emailFilter"
@@ -58,7 +63,7 @@
           class="w-full sm:w-48"
           @change="fetchUsers"
         />
-        
+
         <!-- Tri -->
         <USelect
           v-model="sortOption"
@@ -69,31 +74,39 @@
           @change="fetchUsers"
         />
       </div>
-      
+
       <!-- Statistiques rapides -->
       <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <UCard>
           <div class="text-center">
             <div class="text-2xl font-bold text-primary">{{ stats.total }}</div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">{{ $t('admin.total_users') }}</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('admin.total_users') }}
+            </div>
           </div>
         </UCard>
         <UCard>
           <div class="text-center">
             <div class="text-2xl font-bold text-green-600">{{ stats.verified }}</div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">{{ $t('admin.email_verified') }}</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('admin.email_verified') }}
+            </div>
           </div>
         </UCard>
         <UCard>
           <div class="text-center">
             <div class="text-2xl font-bold text-blue-600">{{ stats.admins }}</div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">{{ $t('admin.super_admins') }}</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('admin.super_admins') }}
+            </div>
           </div>
         </UCard>
         <UCard>
           <div class="text-center">
             <div class="text-2xl font-bold text-purple-600">{{ stats.creators }}</div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">{{ $t('admin.content_creators') }}</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('admin.content_creators') }}
+            </div>
           </div>
         </UCard>
       </div>
@@ -101,12 +114,7 @@
 
     <!-- Tableau des utilisateurs -->
     <UCard>
-      <UTable
-        :data="users"
-        :columns="columns"
-        :loading="loading"
-        class="w-full"
-      />
+      <UTable :data="users" :columns="columns" :loading="loading" class="w-full" />
 
       <!-- Pagination -->
       <div v-if="pagination.totalPages > 1" class="flex justify-center mt-6">
@@ -128,11 +136,10 @@
 import { h, resolveComponent } from 'vue'
 
 definePageMeta({
-  middleware: ['auth-protected', 'super-admin']
+  middleware: ['auth-protected', 'super-admin'],
 })
 
 const { t } = useI18n()
-
 
 // Types pour les utilisateurs
 interface UserCount {
@@ -178,7 +185,7 @@ interface DropdownMenuItem {
 // Métadonnées de la page
 useSeoMeta({
   title: t('admin.user_management') + ' - Admin',
-  description: t('admin.user_management_description')
+  description: t('admin.user_management_description'),
 })
 
 // État réactif
@@ -190,7 +197,7 @@ const pagination = ref<PaginationData>({
   totalCount: 0,
   totalPages: 0,
   hasNextPage: false,
-  hasPrevPage: false
+  hasPrevPage: false,
 })
 
 const searchQuery = ref('')
@@ -204,10 +211,10 @@ const stats = computed(() => {
   const total = pagination.value.totalCount
   const verified = users.value.filter((u: AdminUser) => u.isEmailVerified).length
   const admins = users.value.filter((u: AdminUser) => u.isGlobalAdmin).length
-  const creators = users.value.filter((u: AdminUser) => 
-    u._count.createdConventions > 0 || u._count.createdEditions > 0
+  const creators = users.value.filter(
+    (u: AdminUser) => u._count.createdConventions > 0 || u._count.createdEditions > 0
   ).length
-  
+
   return { total, verified, admins, creators }
 })
 
@@ -222,14 +229,14 @@ const columns = [
         h(resolveComponent('UiUserAvatar'), {
           user: user,
           size: 'md',
-          border: true
+          border: true,
         }),
         h('div', [
           h('div', { class: 'font-medium' }, `${user.prenom} ${user.nom}`),
-          h('div', { class: 'text-sm text-gray-500' }, `@${user.pseudo}`)
-        ])
+          h('div', { class: 'text-sm text-gray-500' }, `@${user.pseudo}`),
+        ]),
       ])
-    }
+    },
   },
   {
     accessorKey: 'email',
@@ -238,57 +245,80 @@ const columns = [
       const user = row.original as AdminUser
       return h('div', { class: 'flex items-center gap-2' }, [
         h('span', user.email),
-        user.isEmailVerified 
-          ? h(resolveComponent('UBadge'), { color: 'success', variant: 'soft', size: 'xs' }, () => t('admin.verified'))
-          : h(resolveComponent('UBadge'), { color: 'warning', variant: 'soft', size: 'xs' }, () => t('admin.not_verified'))
+        user.isEmailVerified
+          ? h(resolveComponent('UBadge'), { color: 'success', variant: 'soft', size: 'xs' }, () =>
+              t('admin.verified')
+            )
+          : h(resolveComponent('UBadge'), { color: 'warning', variant: 'soft', size: 'xs' }, () =>
+              t('admin.not_verified')
+            ),
       ])
-    }
+    },
   },
   {
-    accessorKey: 'role', 
+    accessorKey: 'role',
     header: t('admin.role'),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUser
-      return h(resolveComponent('UBadge'), {
-        color: user.isGlobalAdmin ? 'error' : 'neutral',
-        variant: user.isGlobalAdmin ? 'solid' : 'soft'
-      }, () => user.isGlobalAdmin ? t('admin.super_admin') : t('admin.user'))
-    }
+      return h(
+        resolveComponent('UBadge'),
+        {
+          color: user.isGlobalAdmin ? 'error' : 'neutral',
+          variant: user.isGlobalAdmin ? 'solid' : 'soft',
+        },
+        () => (user.isGlobalAdmin ? t('admin.super_admin') : t('admin.user'))
+      )
+    },
   },
   {
     accessorKey: 'activity',
-    header: t('admin.activity'), 
+    header: t('admin.activity'),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUser
       const activities = []
-      
+
       if (user._count.createdConventions > 0) {
-        activities.push(h('div', { class: 'flex items-center gap-1' }, [
-          h(resolveComponent('UIcon'), { name: 'i-heroicons-building-library', class: 'w-4 h-4 text-blue-500' }),
-          h('span', `${user._count.createdConventions} ${t('admin.conventions_count')}`)
-        ]))
+        activities.push(
+          h('div', { class: 'flex items-center gap-1' }, [
+            h(resolveComponent('UIcon'), {
+              name: 'i-heroicons-building-library',
+              class: 'w-4 h-4 text-blue-500',
+            }),
+            h('span', `${user._count.createdConventions} ${t('admin.conventions_count')}`),
+          ])
+        )
       }
-      
+
       if (user._count.createdEditions > 0) {
-        activities.push(h('div', { class: 'flex items-center gap-1' }, [
-          h(resolveComponent('UIcon'), { name: 'i-heroicons-calendar', class: 'w-4 h-4 text-green-500' }),
-          h('span', `${user._count.createdEditions} ${t('admin.editions_count')}`)
-        ]))
+        activities.push(
+          h('div', { class: 'flex items-center gap-1' }, [
+            h(resolveComponent('UIcon'), {
+              name: 'i-heroicons-calendar',
+              class: 'w-4 h-4 text-green-500',
+            }),
+            h('span', `${user._count.createdEditions} ${t('admin.editions_count')}`),
+          ])
+        )
       }
-      
+
       if (user._count.favoriteEditions > 0) {
-        activities.push(h('div', { class: 'flex items-center gap-1' }, [
-          h(resolveComponent('UIcon'), { name: 'i-heroicons-heart', class: 'w-4 h-4 text-red-500' }),
-          h('span', `${user._count.favoriteEditions} ${t('admin.favorites_count')}`)
-        ]))
+        activities.push(
+          h('div', { class: 'flex items-center gap-1' }, [
+            h(resolveComponent('UIcon'), {
+              name: 'i-heroicons-heart',
+              class: 'w-4 h-4 text-red-500',
+            }),
+            h('span', `${user._count.favoriteEditions} ${t('admin.favorites_count')}`),
+          ])
+        )
       }
-      
+
       if (activities.length === 0) {
         activities.push(h('div', { class: 'text-gray-400' }, t('admin.no_activity')))
       }
-      
+
       return h('div', { class: 'text-sm space-y-1' }, activities)
-    }
+    },
   },
   {
     accessorKey: 'createdAt',
@@ -297,40 +327,45 @@ const columns = [
       const user = row.original as AdminUser
       return h('div', { class: 'text-sm' }, [
         h('div', formatDate(user.createdAt)),
-        h('div', { class: 'text-gray-500' }, formatRelativeTime(user.createdAt))
+        h('div', { class: 'text-gray-500' }, formatRelativeTime(user.createdAt)),
       ])
-    }
+    },
   },
   {
     accessorKey: 'actions',
     header: t('admin.actions'),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUser
-      return h(resolveComponent('UDropdownMenu'), {
-        items: getUserActions(user)
-      }, {
-        default: () => h(resolveComponent('UButton'), {
-          color: 'neutral',
-          variant: 'ghost', 
-          icon: 'i-heroicons-ellipsis-horizontal',
-          size: 'sm'
-        })
-      })
-    }
-  }
+      return h(
+        resolveComponent('UDropdownMenu'),
+        {
+          items: getUserActions(user),
+        },
+        {
+          default: () =>
+            h(resolveComponent('UButton'), {
+              color: 'neutral',
+              variant: 'ghost',
+              icon: 'i-heroicons-ellipsis-horizontal',
+              size: 'sm',
+            }),
+        }
+      )
+    },
+  },
 ]
 
 // Options de filtrage
 const adminFilterOptions = [
   { label: t('admin.all_users'), value: 'all' },
   { label: t('admin.normal_users'), value: 'users' },
-  { label: t('admin.super_administrators'), value: 'admins' }
+  { label: t('admin.super_administrators'), value: 'admins' },
 ]
 
 const emailFilterOptions = [
   { label: t('admin.all_emails'), value: 'all' },
   { label: t('admin.verified_emails'), value: 'verified' },
-  { label: t('admin.unverified_emails'), value: 'unverified' }
+  { label: t('admin.unverified_emails'), value: 'unverified' },
 ]
 
 const sortOptions = [
@@ -339,7 +374,7 @@ const sortOptions = [
   { label: t('admin.name_a_z'), value: 'nom:asc' },
   { label: t('admin.name_z_a'), value: 'nom:desc' },
   { label: t('admin.email_a_z'), value: 'email:asc' },
-  { label: t('admin.email_z_a'), value: 'email:desc' }
+  { label: t('admin.email_z_a'), value: 'email:desc' },
 ]
 
 // Fonctions utilitaires
@@ -347,7 +382,7 @@ const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString(undefined, {
     day: '2-digit',
     month: '2-digit',
-    year: 'numeric'
+    year: 'numeric',
   })
 }
 
@@ -355,7 +390,7 @@ const formatRelativeTime = (date: string) => {
   const now = new Date()
   const target = new Date(date)
   const diffInDays = Math.floor((now.getTime() - target.getTime()) / (1000 * 60 * 60 * 24))
-  
+
   if (diffInDays === 0) return t('admin.today')
   if (diffInDays === 1) return t('admin.yesterday')
   if (diffInDays < 7) return t('admin.days_ago', { count: diffInDays })
@@ -370,26 +405,26 @@ const getUserActions = (user: AdminUser): DropdownMenuItem[] => {
     {
       label: t('admin.view_profile'),
       icon: 'i-heroicons-user',
-      onSelect: () => navigateTo(`/profile/${user.id}`)
-    }
+      onSelect: () => navigateTo(`/profile/${user.id}`),
+    },
   ]
-  
+
   // Actions d'administration
   if (!user.isGlobalAdmin) {
     actions.push({
       label: t('admin.promote_to_admin'),
       icon: 'i-heroicons-shield-check',
-      onSelect: () => promoteToAdmin(user)
+      onSelect: () => promoteToAdmin(user),
     })
   } else {
     actions.push({
       label: t('admin.demote'),
       icon: 'i-heroicons-shield-exclamation',
       color: 'error' as const,
-      onSelect: () => demoteFromAdmin(user)
+      onSelect: () => demoteFromAdmin(user),
     })
   }
-  
+
   return actions
 }
 
@@ -420,10 +455,10 @@ const debouncedSearch = () => {
 // Fonction pour récupérer les utilisateurs
 const fetchUsers = async () => {
   loading.value = true
-  
+
   try {
     const [sortBy, sortOrder] = sortOption.value.split(':')
-    
+
     const params = {
       page: currentPage.value,
       limit: pagination.value.limit,
@@ -431,29 +466,28 @@ const fetchUsers = async () => {
       sortBy,
       sortOrder,
       adminFilter: adminFilter.value,
-      emailFilter: emailFilter.value
+      emailFilter: emailFilter.value,
     }
-    
+
     const data = await $fetch<UsersApiResponse>('/api/admin/users', {
-  query: params
+      query: params,
     })
-    
+
     users.value = data.users
     pagination.value = data.pagination
-    
   } catch (error: any) {
     console.error('Error loading users:', error)
-    
+
     // Si erreur d'authentification, rediriger vers login
     if (error?.statusCode === 401 || error?.status === 401) {
       navigateTo('/login')
       return
     }
-    
+
     useToast().add({
       color: 'error' as const,
       title: t('common.error'),
-      description: t('admin.cannot_load_users')
+      description: t('admin.cannot_load_users'),
     })
   } finally {
     loading.value = false

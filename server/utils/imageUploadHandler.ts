@@ -1,5 +1,6 @@
-import type { H3Event } from 'h3'
 import { createError, getRouterParam } from 'h3'
+
+import type { H3Event } from 'h3'
 // Utilise les helpers de session exposés via `#imports` (getUserSession / requireUserSession)
 // Import dynamique effectué dans la fonction pour permettre le mocking dans les tests.
 
@@ -14,15 +15,12 @@ export interface ImageUploadConfig {
 
 const defaultConfig: Partial<ImageUploadConfig> = {
   maxFileSize: 5 * 1024 * 1024, // 5 MB
-  allowedFormats: ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+  allowedFormats: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
 }
 
-export async function createImageUploadHandler(
-  event: H3Event,
-  config: ImageUploadConfig
-) {
+export async function createImageUploadHandler(event: H3Event, config: ImageUploadConfig) {
   const mergedConfig = { ...defaultConfig, ...config }
-  
+
   try {
     // Authentification via les helpers exposés par le module d'auth (moquables en tests)
     const { requireUserSession } = await import('#imports')
@@ -32,7 +30,7 @@ export async function createImageUploadHandler(
       // mais on garde une vérification défensive.
       throw createError({
         statusCode: 401,
-        statusMessage: 'Authentification requise'
+        statusMessage: 'Authentification requise',
       })
     }
 
@@ -44,7 +42,7 @@ export async function createImageUploadHandler(
     if (!id) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'ID manquant'
+        statusMessage: 'ID manquant',
       })
     }
 
@@ -55,7 +53,7 @@ export async function createImageUploadHandler(
       if (!entity) {
         throw createError({
           statusCode: 404,
-          statusMessage: `${mergedConfig.entityName} non trouvé(e)`
+          statusMessage: `${mergedConfig.entityName} non trouvé(e)`,
         })
       }
     }
@@ -65,7 +63,7 @@ export async function createImageUploadHandler(
       if (!mergedConfig.checkPermission(user.id, entity)) {
         throw createError({
           statusCode: 403,
-          statusMessage: `Vous n'avez pas la permission de modifier ce/cette ${mergedConfig.entityName}`
+          statusMessage: `Vous n'avez pas la permission de modifier ce/cette ${mergedConfig.entityName}`,
         })
       }
     }
@@ -86,19 +84,18 @@ export async function createImageUploadHandler(
     return {
       success: true,
       imageUrl,
-      message: `Image de ${mergedConfig.entityName} uploadée avec succès`
+      message: `Image de ${mergedConfig.entityName} uploadée avec succès`,
     }
-
   } catch (error: any) {
     console.error(`Erreur lors de l'upload de l'image de ${mergedConfig.entityName}:`, error)
-    
+
     if (error.statusCode) {
       throw error
     }
-    
+
     throw createError({
       statusCode: 500,
-      statusMessage: `Erreur lors de l'upload de l'image de ${mergedConfig.entityName}`
+      statusMessage: `Erreur lors de l'upload de l'image de ${mergedConfig.entityName}`,
     })
   }
 }

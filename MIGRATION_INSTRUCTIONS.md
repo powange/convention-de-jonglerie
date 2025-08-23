@@ -25,6 +25,7 @@ ALTER TABLE `_FavoriteConventions` RENAME TO `_FavoriteEditions`;
    - Cliquez sur "Exécuter"
 
 2. **Via MySQL en ligne de commande :**
+
    ```bash
    mysql -h 192.168.0.13 -u [votre_username] -p conventions-jonglerie
    # Puis exécutez les commandes SQL une par une
@@ -37,6 +38,7 @@ ALTER TABLE `_FavoriteConventions` RENAME TO `_FavoriteEditions`;
 ## Vérification après migration
 
 Après avoir exécuté le script, vérifiez que :
+
 - La table `Convention` n'existe plus
 - La table `Edition` existe avec toutes les données
 - La table `_FavoriteEditions` existe
@@ -44,6 +46,7 @@ Après avoir exécuté le script, vérifiez que :
 ## En cas de problème
 
 Si quelque chose ne fonctionne pas :
+
 1. Vérifiez que toutes les contraintes de clés étrangères pointent correctement vers la table `Edition`
 2. Redémarrez votre application
 3. Vérifiez les logs pour d'éventuelles erreurs

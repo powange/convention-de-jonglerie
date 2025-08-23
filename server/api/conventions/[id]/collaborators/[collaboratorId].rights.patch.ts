@@ -1,51 +1,55 @@
-import { z } from 'zod';
-import { prisma } from '../../../../utils/prisma';
-import { canManageCollaborators } from '../../../../utils/collaborator-management';
+import { z } from 'zod'
+
+import { canManageCollaborators } from '../../../../utils/collaborator-management'
+import { prisma } from '../../../../utils/prisma'
 
 // Schema d'entrée
 const perEditionSchema = z.object({
   editionId: z.number().int().positive(),
   canEdit: z.boolean().optional().default(false),
-  canDelete: z.boolean().optional().default(false)
-});
+  canDelete: z.boolean().optional().default(false),
+})
 
 const rightsSchema = z.object({
   title: z.string().min(1).max(120).optional().nullable(),
-  rights: z.object({
-    editConvention: z.boolean().optional(),
-    deleteConvention: z.boolean().optional(),
-    manageCollaborators: z.boolean().optional(),
-    addEdition: z.boolean().optional(),
-    editAllEditions: z.boolean().optional(),
-    deleteAllEditions: z.boolean().optional()
-  }).partial().optional(),
-  perEdition: z.array(perEditionSchema).optional()
-});
+  rights: z
+    .object({
+      editConvention: z.boolean().optional(),
+      deleteConvention: z.boolean().optional(),
+      manageCollaborators: z.boolean().optional(),
+      addEdition: z.boolean().optional(),
+      editAllEditions: z.boolean().optional(),
+      deleteAllEditions: z.boolean().optional(),
+    })
+    .partial()
+    .optional(),
+  perEdition: z.array(perEditionSchema).optional(),
+})
 
 export default defineEventHandler(async (event) => {
-  const conventionId = parseInt(getRouterParam(event, 'id') || '0');
-  const collaboratorId = parseInt(getRouterParam(event, 'collaboratorId') || '0');
+  const conventionId = parseInt(getRouterParam(event, 'id') || '0')
+  const collaboratorId = parseInt(getRouterParam(event, 'collaboratorId') || '0')
 
   if (!event.context.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' });
+    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
   }
 
-  const body = await readBody(event).catch(() => ({}));
-  const parsed = rightsSchema.parse(body || {});
+  const body = await readBody(event).catch(() => ({}))
+  const parsed = rightsSchema.parse(body || {})
 
   // Vérifier permission gestion
-  const canManage = await canManageCollaborators(conventionId, event.context.user.id);
+  const canManage = await canManageCollaborators(conventionId, event.context.user.id)
   if (!canManage) {
-    throw createError({ statusCode: 403, statusMessage: 'Permission insuffisante' });
+    throw createError({ statusCode: 403, statusMessage: 'Permission insuffisante' })
   }
 
   // Charger collaborateur + état précédent
   const collaborator = await prisma.conventionCollaborator.findUnique({
     where: { id: collaboratorId },
-    include: { perEditionPermissions: true }
-  });
+    include: { perEditionPermissions: true },
+  })
   if (!collaborator || collaborator.conventionId !== conventionId) {
-    throw createError({ statusCode: 404, statusMessage: 'Collaborateur introuvable' });
+    throw createError({ statusCode: 404, statusMessage: 'Collaborateur introuvable' })
   }
 
   const beforeSnapshot = {
@@ -56,50 +60,59 @@ export default defineEventHandler(async (event) => {
       canManageCollaborators: collaborator.canManageCollaborators,
       canAddEdition: collaborator.canAddEdition,
       canEditAllEditions: collaborator.canEditAllEditions,
-      canDeleteAllEditions: collaborator.canDeleteAllEditions
+      canDeleteAllEditions: collaborator.canDeleteAllEditions,
     },
-    perEdition: collaborator.perEditionPermissions.map(p => ({
+    perEdition: collaborator.perEditionPermissions.map((p) => ({
       editionId: p.editionId,
       canEdit: p.canEdit,
-      canDelete: p.canDelete
-    }))
-  };
-
-  // Construire data update
-  const updateData: any = {};
-  if (parsed.title !== undefined) updateData.title = parsed.title || null;
-  if (parsed.rights) {
-    if (parsed.rights.editConvention !== undefined) updateData.canEditConvention = parsed.rights.editConvention;
-    if (parsed.rights.deleteConvention !== undefined) updateData.canDeleteConvention = parsed.rights.deleteConvention;
-    if (parsed.rights.manageCollaborators !== undefined) updateData.canManageCollaborators = parsed.rights.manageCollaborators;
-    if (parsed.rights.addEdition !== undefined) updateData.canAddEdition = parsed.rights.addEdition;
-    if (parsed.rights.editAllEditions !== undefined) updateData.canEditAllEditions = parsed.rights.editAllEditions;
-    if (parsed.rights.deleteAllEditions !== undefined) updateData.canDeleteAllEditions = parsed.rights.deleteAllEditions;
+      canDelete: p.canDelete,
+    })),
   }
 
-  const perEditionInput = parsed.perEdition || [];
+  // Construire data update
+  const updateData: any = {}
+  if (parsed.title !== undefined) updateData.title = parsed.title || null
+  if (parsed.rights) {
+    if (parsed.rights.editConvention !== undefined)
+      updateData.canEditConvention = parsed.rights.editConvention
+    if (parsed.rights.deleteConvention !== undefined)
+      updateData.canDeleteConvention = parsed.rights.deleteConvention
+    if (parsed.rights.manageCollaborators !== undefined)
+      updateData.canManageCollaborators = parsed.rights.manageCollaborators
+    if (parsed.rights.addEdition !== undefined) updateData.canAddEdition = parsed.rights.addEdition
+    if (parsed.rights.editAllEditions !== undefined)
+      updateData.canEditAllEditions = parsed.rights.editAllEditions
+    if (parsed.rights.deleteAllEditions !== undefined)
+      updateData.canDeleteAllEditions = parsed.rights.deleteAllEditions
+  }
+
+  const perEditionInput = parsed.perEdition || []
 
   const result = await prisma.$transaction(async (tx) => {
     // Update principal
     const updated = Object.keys(updateData).length
       ? await tx.conventionCollaborator.update({ where: { id: collaboratorId }, data: updateData })
-      : collaborator;
+      : collaborator
 
     // Gérer per-edition: simpliste => effacer puis recréer (dataset restreint)
-    let newPerEdition = collaborator.perEditionPermissions;
+    let newPerEdition = collaborator.perEditionPermissions
     if (parsed.perEdition) {
-      await tx.editionCollaboratorPermission.deleteMany({ where: { collaboratorId } });
+      await tx.editionCollaboratorPermission.deleteMany({ where: { collaboratorId } })
       if (perEditionInput.length) {
-        newPerEdition = await Promise.all(perEditionInput.map(p => tx.editionCollaboratorPermission.create({
-          data: {
-            collaboratorId,
-            editionId: p.editionId,
-            canEdit: !!p.canEdit,
-            canDelete: !!p.canDelete
-          }
-        })));
+        newPerEdition = await Promise.all(
+          perEditionInput.map((p) =>
+            tx.editionCollaboratorPermission.create({
+              data: {
+                collaboratorId,
+                editionId: p.editionId,
+                canEdit: !!p.canEdit,
+                canDelete: !!p.canDelete,
+              },
+            })
+          )
+        )
       } else {
-        newPerEdition = [];
+        newPerEdition = []
       }
     }
 
@@ -111,31 +124,31 @@ export default defineEventHandler(async (event) => {
         canManageCollaborators: updated.canManageCollaborators,
         canAddEdition: updated.canAddEdition,
         canEditAllEditions: updated.canEditAllEditions,
-        canDeleteAllEditions: updated.canDeleteAllEditions
+        canDeleteAllEditions: updated.canDeleteAllEditions,
       },
-      perEdition: newPerEdition.map(p => ({
+      perEdition: newPerEdition.map((p) => ({
         editionId: p.editionId,
         canEdit: p.canEdit,
-        canDelete: p.canDelete
-      }))
-    };
+        canDelete: p.canDelete,
+      })),
+    }
 
-    const rightsChanged = JSON.stringify(beforeSnapshot) !== JSON.stringify(afterSnapshot);
+    const rightsChanged = JSON.stringify(beforeSnapshot) !== JSON.stringify(afterSnapshot)
     if (rightsChanged) {
       await tx.collaboratorPermissionHistory.create({
         data: {
           conventionId,
           collaboratorId,
-            actorId: event.context.user!.id,
+          actorId: event.context.user!.id,
           changeType: parsed.perEdition ? 'PER_EDITIONS_UPDATED' : 'RIGHTS_UPDATED',
           before: beforeSnapshot as any,
-          after: afterSnapshot as any
-        }
-      });
+          after: afterSnapshot as any,
+        },
+      })
     }
 
-    return { updated, perEdition: afterSnapshot.perEdition };
-  });
+    return { updated, perEdition: afterSnapshot.perEdition }
+  })
 
   return {
     success: true,
@@ -148,9 +161,9 @@ export default defineEventHandler(async (event) => {
         manageCollaborators: result.updated.canManageCollaborators,
         addEdition: result.updated.canAddEdition,
         editAllEditions: result.updated.canEditAllEditions,
-        deleteAllEditions: result.updated.canDeleteAllEditions
+        deleteAllEditions: result.updated.canDeleteAllEditions,
       },
-      perEdition: result.perEdition
-    }
-  };
-});
+      perEdition: result.perEdition,
+    },
+  }
+})

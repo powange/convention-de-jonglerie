@@ -1,39 +1,39 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../../__mocks__/prisma'
 
 // Mock des handlers d'API
-import createEditionHandler from '../../../server/api/editions/index.post'
+import deleteEditionHandler from '../../../server/api/editions/[id].delete'
 import getEditionHandler from '../../../server/api/editions/[id].get'
 import updateEditionHandler from '../../../server/api/editions/[id].put'
-import deleteEditionHandler from '../../../server/api/editions/[id].delete'
 import getEditionsHandler from '../../../server/api/editions/index.get'
+import createEditionHandler from '../../../server/api/editions/index.post'
+import { prismaMock } from '../../__mocks__/prisma'
 
 // Mock des modules utilitaires
 vi.mock('../../../server/utils/geocoding', () => ({
   geocodeEdition: vi.fn().mockResolvedValue({
     latitude: 48.8566,
-    longitude: 2.3522
-  })
+    longitude: 2.3522,
+  }),
 }))
 
 vi.mock('../../../server/utils/move-temp-image', () => ({
-  moveTempImageToEdition: vi.fn().mockResolvedValue('/uploads/editions/1/image.jpg')
+  moveTempImageToEdition: vi.fn().mockResolvedValue('/uploads/editions/1/image.jpg'),
 }))
 
-describe('Système d\'éditions', () => {
+describe("Système d'éditions", () => {
   const mockUser = {
     id: 1,
     email: 'user@example.com',
     pseudo: 'testuser',
     nom: 'Test',
-    prenom: 'User'
+    prenom: 'User',
   }
 
   const mockConvention = {
     id: 1,
     name: 'Convention Test',
     authorId: 1,
-    author: mockUser
+    author: mockUser,
   }
 
   const mockEdition = {
@@ -54,7 +54,7 @@ describe('Système d\'éditions', () => {
     imageUrl: null,
     creatorId: 1,
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
   }
 
   beforeEach(() => {
@@ -62,7 +62,7 @@ describe('Système d\'éditions', () => {
     global.readBody = vi.fn()
   })
 
-  describe('Création d\'édition', () => {
+  describe("Création d'édition", () => {
     it('devrait créer une édition avec succès', async () => {
       const editionData = {
         conventionId: 1,
@@ -76,7 +76,7 @@ describe('Système d\'éditions', () => {
         country: 'France',
         hasFoodTrucks: true,
         hasToilets: true,
-        hasShowers: false
+        hasShowers: false,
       }
 
       prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
@@ -84,13 +84,13 @@ describe('Système d\'éditions', () => {
         ...mockEdition,
         ...editionData,
         creator: { id: 1, pseudo: 'testuser' },
-        favoritedBy: []
+        favoritedBy: [],
       })
 
       global.readBody.mockResolvedValue(editionData)
 
       const mockEvent = {
-        context: { user: mockUser }
+        context: { user: mockUser },
       }
 
       const result = await createEditionHandler(mockEvent as any)
@@ -99,59 +99,61 @@ describe('Système d\'éditions', () => {
       expect(result.description).toBe(editionData.description)
       expect(result.city).toBe(editionData.city)
 
-      expect(prismaMock.convention.findUnique).toHaveBeenCalledWith(expect.objectContaining({
-        where: { id: editionData.conventionId }
-      }))
+      expect(prismaMock.convention.findUnique).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: editionData.conventionId },
+        })
+      )
 
       expect(prismaMock.edition.create).toHaveBeenCalled()
     })
 
     it('devrait rejeter si utilisateur non authentifié', async () => {
       const mockEvent = {
-        context: { user: null }
+        context: { user: null },
       }
 
       await expect(createEditionHandler(mockEvent as any)).rejects.toThrow()
     })
 
-    it('devrait rejeter si la convention n\'existe pas', async () => {
+    it("devrait rejeter si la convention n'existe pas", async () => {
       prismaMock.convention.findUnique.mockResolvedValue(null)
 
       global.readBody.mockResolvedValue({
         conventionId: 999,
-        name: 'Edition Test'
+        name: 'Edition Test',
       })
 
       const mockEvent = {
-        context: { user: mockUser }
+        context: { user: mockUser },
       }
 
       await expect(createEditionHandler(mockEvent as any)).rejects.toThrow()
     })
 
-    it('devrait rejeter si l\'utilisateur n\'est pas l\'auteur de la convention', async () => {
+    it("devrait rejeter si l'utilisateur n'est pas l'auteur de la convention", async () => {
       const otherConvention = {
         ...mockConvention,
-        authorId: 2 // Différent utilisateur
+        authorId: 2, // Différent utilisateur
       }
 
       prismaMock.convention.findUnique.mockResolvedValue(otherConvention)
 
       global.readBody.mockResolvedValue({
         conventionId: 1,
-        name: 'Edition Test'
+        name: 'Edition Test',
       })
 
       const mockEvent = {
-        context: { user: mockUser }
+        context: { user: mockUser },
       }
 
       await expect(createEditionHandler(mockEvent as any)).rejects.toThrow()
     })
 
-    it('devrait géocoder l\'adresse pour obtenir les coordonnées', async () => {
+    it("devrait géocoder l'adresse pour obtenir les coordonnées", async () => {
       const { geocodeEdition } = await import('../../../server/utils/geocoding')
-      
+
       const editionData = {
         conventionId: 1,
         name: 'Edition 2024',
@@ -160,20 +162,20 @@ describe('Système d\'éditions', () => {
         addressLine1: '123 rue Test',
         postalCode: '75001',
         city: 'Paris',
-        country: 'France'
+        country: 'France',
       }
 
       prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
       prismaMock.edition.create.mockResolvedValue({
         ...mockEdition,
         creator: { id: 1, pseudo: 'testuser' },
-        favoritedBy: []
+        favoritedBy: [],
       })
 
       global.readBody.mockResolvedValue(editionData)
 
       const mockEvent = {
-        context: { user: mockUser }
+        context: { user: mockUser },
       }
 
       await createEditionHandler(mockEvent as any)
@@ -183,11 +185,11 @@ describe('Système d\'éditions', () => {
         addressLine2: undefined,
         city: editionData.city,
         postalCode: editionData.postalCode,
-        country: editionData.country
+        country: editionData.country,
       })
     })
 
-    it('devrait gérer l\'upload d\'image', async () => {
+    it("devrait gérer l'upload d'image", async () => {
       const { moveTempImageToEdition } = await import('../../../server/utils/move-temp-image')
 
       const editionData = {
@@ -199,7 +201,7 @@ describe('Système d\'éditions', () => {
         addressLine1: '123 rue Test',
         postalCode: '75001',
         city: 'Paris',
-        country: 'France'
+        country: 'France',
       }
 
       prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
@@ -207,19 +209,19 @@ describe('Système d\'éditions', () => {
         ...mockEdition,
         id: 1,
         creator: { id: 1, pseudo: 'testuser' },
-        favoritedBy: []
+        favoritedBy: [],
       })
       prismaMock.edition.update.mockResolvedValue({
         ...mockEdition,
         imageUrl: '/uploads/editions/1/image.jpg',
         creator: { id: 1, pseudo: 'testuser' },
-        favoritedBy: []
+        favoritedBy: [],
       })
 
       global.readBody.mockResolvedValue(editionData)
 
       const mockEvent = {
-        context: { user: mockUser }
+        context: { user: mockUser },
       }
 
       const result = await createEditionHandler(mockEvent as any)
@@ -229,7 +231,7 @@ describe('Système d\'éditions', () => {
     })
   })
 
-  describe('Récupération d\'édition', () => {
+  describe("Récupération d'édition", () => {
     it('devrait récupérer une édition par ID', async () => {
       const editionWithDetails = {
         ...mockEdition,
@@ -238,20 +240,20 @@ describe('Système d\'éditions', () => {
           pseudo: 'testuser',
           email: 'test@example.com',
           profilePicture: null,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
         favoritedBy: [],
         convention: {
           ...mockConvention,
-          collaborators: []
-        }
+          collaborators: [],
+        },
       }
 
       prismaMock.edition.findUnique.mockResolvedValue(editionWithDetails)
       prismaMock.editionCollaborator.findFirst.mockResolvedValue(null)
 
       const mockEvent = {
-        context: { params: { id: '1' } }
+        context: { params: { id: '1' } },
       }
 
       const result = await getEditionHandler(mockEvent as any)
@@ -265,14 +267,14 @@ describe('Système d\'éditions', () => {
         include: expect.objectContaining({
           creator: expect.any(Object),
           favoritedBy: expect.any(Object),
-          convention: expect.any(Object)
-        })
+          convention: expect.any(Object),
+        }),
       })
     })
 
     it('devrait rejeter pour un ID invalide', async () => {
       const mockEvent = {
-        context: { params: { id: 'invalid' } }
+        context: { params: { id: 'invalid' } },
       }
 
       await expect(getEditionHandler(mockEvent as any)).rejects.toThrow()
@@ -283,7 +285,7 @@ describe('Système d\'éditions', () => {
       prismaMock.editionCollaborator.findFirst.mockResolvedValue(null)
 
       const mockEvent = {
-        context: { params: { id: '999' } }
+        context: { params: { id: '999' } },
       }
 
       await expect(getEditionHandler(mockEvent as any)).rejects.toThrow()
@@ -297,28 +299,30 @@ describe('Système d\'éditions', () => {
           pseudo: 'testuser',
           email: 'test@example.com',
           profilePicture: null,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
         favoritedBy: [],
         convention: {
           ...mockConvention,
-          collaborators: [{
-            user: {
-              id: 2,
-              pseudo: 'collab',
-              email: 'collab@example.com',
-              profilePicture: null,
-              updatedAt: new Date()
-            }
-          }]
-        }
+          collaborators: [
+            {
+              user: {
+                id: 2,
+                pseudo: 'collab',
+                email: 'collab@example.com',
+                profilePicture: null,
+                updatedAt: new Date(),
+              },
+            },
+          ],
+        },
       }
 
       prismaMock.edition.findUnique.mockResolvedValue(editionWithEmail)
       prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
 
       const mockEvent = {
-        context: { params: { id: '1' } }
+        context: { params: { id: '1' } },
       }
 
       const result = await getEditionHandler(mockEvent as any)
@@ -331,12 +335,12 @@ describe('Système d\'éditions', () => {
     })
   })
 
-  describe('Mise à jour d\'édition', () => {
+  describe("Mise à jour d'édition", () => {
     it('devrait permettre de modifier une édition', async () => {
       const updateData = {
         name: 'Edition 2024 Modifiée',
         description: 'Nouvelle description',
-        city: 'Lyon'
+        city: 'Lyon',
       }
 
       prismaMock.edition.findUnique.mockResolvedValue({
@@ -344,12 +348,12 @@ describe('Système d\'éditions', () => {
         creator: mockUser,
         convention: {
           ...mockConvention,
-          collaborators: [] // Ajouter le tableau collaborators requis
-        }
+          collaborators: [], // Ajouter le tableau collaborators requis
+        },
       })
       prismaMock.edition.update.mockResolvedValue({
         ...mockEdition,
-        ...updateData
+        ...updateData,
       })
 
       global.readBody.mockResolvedValue(updateData)
@@ -358,8 +362,8 @@ describe('Système d\'éditions', () => {
       const mockEvent = {
         context: {
           user: mockUser,
-          params: { id: '1' }
-        }
+          params: { id: '1' },
+        },
       }
 
       const result = await updateEditionHandler(mockEvent as any)
@@ -374,7 +378,7 @@ describe('Système d\'éditions', () => {
       expect(callArgs.data.description).toBe(updateData.description)
     })
 
-    it('devrait rejeter si l\'utilisateur n\'a pas les droits', async () => {
+    it("devrait rejeter si l'utilisateur n'a pas les droits", async () => {
       prismaMock.edition.findUnique.mockResolvedValue({
         ...mockEdition,
         creatorId: 2, // Différent utilisateur
@@ -382,8 +386,8 @@ describe('Système d\'éditions', () => {
         convention: {
           ...mockConvention,
           authorId: 2,
-          collaborators: []
-        }
+          collaborators: [],
+        },
       })
 
       global.readBody.mockResolvedValue({ name: 'Test' })
@@ -392,8 +396,8 @@ describe('Système d\'éditions', () => {
       const mockEvent = {
         context: {
           user: mockUser,
-          params: { id: '1' }
-        }
+          params: { id: '1' },
+        },
       }
 
       await expect(updateEditionHandler(mockEvent as any)).rejects.toThrow()
@@ -407,11 +411,13 @@ describe('Système d\'éditions', () => {
         convention: {
           ...mockConvention,
           authorId: 2,
-          collaborators: [{
-            userId: 1,
-            role: 'ADMINISTRATOR'
-          }]
-        }
+          collaborators: [
+            {
+              userId: 1,
+              role: 'ADMINISTRATOR',
+            },
+          ],
+        },
       })
       prismaMock.edition.update.mockResolvedValue(mockEdition)
 
@@ -421,8 +427,8 @@ describe('Système d\'éditions', () => {
       const mockEvent = {
         context: {
           user: mockUser,
-          params: { id: '1' }
-        }
+          params: { id: '1' },
+        },
       }
 
       const result = await updateEditionHandler(mockEvent as any)
@@ -431,15 +437,15 @@ describe('Système d\'éditions', () => {
     })
   })
 
-  describe('Suppression d\'édition', () => {
+  describe("Suppression d'édition", () => {
     it('devrait permettre de supprimer une édition', async () => {
       prismaMock.edition.findUnique.mockResolvedValue({
         ...mockEdition,
         creator: mockUser,
         convention: {
           ...mockConvention,
-          collaborators: []
-        }
+          collaborators: [],
+        },
       })
       prismaMock.edition.delete.mockResolvedValue(mockEdition)
 
@@ -448,8 +454,8 @@ describe('Système d\'éditions', () => {
       const mockEvent = {
         context: {
           user: mockUser,
-          params: { id: '1' }
-        }
+          params: { id: '1' },
+        },
       }
 
       const result = await deleteEditionHandler(mockEvent as any)
@@ -457,11 +463,11 @@ describe('Système d\'éditions', () => {
       expect(result.message).toBeDefined()
       expect(result.message.toLowerCase()).toMatch(/supprim|delet/)
       expect(prismaMock.edition.delete).toHaveBeenCalledWith({
-        where: { id: 1 }
+        where: { id: 1 },
       })
     })
 
-    it('devrait rejeter si l\'utilisateur n\'est pas autorisé', async () => {
+    it("devrait rejeter si l'utilisateur n'est pas autorisé", async () => {
       prismaMock.edition.findUnique.mockResolvedValue({
         ...mockEdition,
         creatorId: 2,
@@ -469,8 +475,8 @@ describe('Système d\'éditions', () => {
         convention: {
           ...mockConvention,
           authorId: 2,
-          collaborators: []
-        }
+          collaborators: [],
+        },
       })
 
       global.getRouterParam = vi.fn().mockReturnValue('1')
@@ -478,8 +484,8 @@ describe('Système d\'éditions', () => {
       const mockEvent = {
         context: {
           user: mockUser,
-          params: { id: '1' }
-        }
+          params: { id: '1' },
+        },
       }
 
       await expect(deleteEditionHandler(mockEvent as any)).rejects.toThrow()
@@ -490,7 +496,7 @@ describe('Système d\'éditions', () => {
     it('devrait récupérer toutes les éditions', async () => {
       const editions = [
         { ...mockEdition, id: 1 },
-        { ...mockEdition, id: 2, name: 'Edition 2025' }
+        { ...mockEdition, id: 2, name: 'Edition 2025' },
       ]
 
       prismaMock.edition.count.mockResolvedValue(2)
@@ -520,10 +526,10 @@ describe('Système d\'éditions', () => {
 
       const editions = [
         { ...mockEdition, id: 1, startDate: futureDate },
-        { ...mockEdition, id: 2, startDate: pastDate }
+        { ...mockEdition, id: 2, startDate: pastDate },
       ]
 
-      const futureEditions = editions.filter(e => e.startDate > now)
+      const futureEditions = editions.filter((e) => e.startDate > now)
 
       expect(futureEditions).toHaveLength(1)
       expect(futureEditions[0].id).toBe(1)
@@ -533,10 +539,10 @@ describe('Système d\'éditions', () => {
       const editions = [
         { ...mockEdition, id: 1, country: 'France' },
         { ...mockEdition, id: 2, country: 'Belgium' },
-        { ...mockEdition, id: 3, country: 'France' }
+        { ...mockEdition, id: 3, country: 'France' },
       ]
 
-      const frenchEditions = editions.filter(e => e.country === 'France')
+      const frenchEditions = editions.filter((e) => e.country === 'France')
 
       expect(frenchEditions).toHaveLength(2)
       expect(frenchEditions[0].country).toBe('France')
@@ -547,12 +553,12 @@ describe('Système d\'éditions', () => {
       const editions = [
         { ...mockEdition, id: 1, hasFoodTrucks: true, hasShowers: true },
         { ...mockEdition, id: 2, hasFoodTrucks: false, hasShowers: true },
-        { ...mockEdition, id: 3, hasFoodTrucks: true, hasShowers: false }
+        { ...mockEdition, id: 3, hasFoodTrucks: true, hasShowers: false },
       ]
 
-      const withFoodTrucks = editions.filter(e => e.hasFoodTrucks)
-      const withShowers = editions.filter(e => e.hasShowers)
-      const withBoth = editions.filter(e => e.hasFoodTrucks && e.hasShowers)
+      const withFoodTrucks = editions.filter((e) => e.hasFoodTrucks)
+      const withShowers = editions.filter((e) => e.hasShowers)
+      const withBoth = editions.filter((e) => e.hasFoodTrucks && e.hasShowers)
 
       expect(withFoodTrucks).toHaveLength(2)
       expect(withShowers).toHaveLength(2)
@@ -579,7 +585,9 @@ describe('Système d\'éditions', () => {
       const earlierDate = new Date('2025-05-30')
 
       expect(() => validateDates(futureDate, laterDate)).not.toThrow()
-      expect(() => validateDates(futureDate, earlierDate)).toThrow('End date must be after start date')
+      expect(() => validateDates(futureDate, earlierDate)).toThrow(
+        'End date must be after start date'
+      )
     })
 
     it('devrait valider les URLs', () => {
@@ -607,7 +615,7 @@ describe('Système d\'éditions', () => {
         const patterns: Record<string, RegExp> = {
           France: /^\d{5}$/,
           Belgium: /^\d{4}$/,
-          Switzerland: /^\d{4}$/
+          Switzerland: /^\d{4}$/,
         }
 
         const pattern = patterns[country]
@@ -620,7 +628,7 @@ describe('Système d\'éditions', () => {
       expect(validatePostalCode('ABC', 'France')).toBe(false)
     })
 
-    it('devrait limiter le nombre d\'éditions par convention', () => {
+    it("devrait limiter le nombre d'éditions par convention", () => {
       const maxEditionsPerConvention = 20
       const editionCount = 21
 
@@ -652,7 +660,7 @@ describe('Système d\'éditions', () => {
         hasAccessibility: true,
         hasWorkshops: true,
         hasCreditCardPayment: false,
-        hasAfjTokenPayment: true
+        hasAfjTokenPayment: true,
       }
 
       const activeServices = Object.entries(services)
@@ -668,16 +676,21 @@ describe('Système d\'éditions', () => {
     it('devrait grouper les services par catégorie', () => {
       const categorizeServices = (services: Record<string, boolean>) => {
         return {
-          accommodation: ['hasTentCamping', 'hasTruckCamping', 'hasFamilyCamping']
-            .filter(key => services[key]),
-          facilities: ['hasToilets', 'hasShowers', 'hasGym', 'hasAccessibility']
-            .filter(key => services[key]),
-          activities: ['hasGala', 'hasOpenStage', 'hasConcert', 'hasWorkshops', 'hasFireSpace']
-            .filter(key => services[key]),
-          food: ['hasFoodTrucks', 'hasCantine']
-            .filter(key => services[key]),
-          payment: ['hasCreditCardPayment', 'hasAfjTokenPayment']
-            .filter(key => services[key])
+          accommodation: ['hasTentCamping', 'hasTruckCamping', 'hasFamilyCamping'].filter(
+            (key) => services[key]
+          ),
+          facilities: ['hasToilets', 'hasShowers', 'hasGym', 'hasAccessibility'].filter(
+            (key) => services[key]
+          ),
+          activities: [
+            'hasGala',
+            'hasOpenStage',
+            'hasConcert',
+            'hasWorkshops',
+            'hasFireSpace',
+          ].filter((key) => services[key]),
+          food: ['hasFoodTrucks', 'hasCantine'].filter((key) => services[key]),
+          payment: ['hasCreditCardPayment', 'hasAfjTokenPayment'].filter((key) => services[key]),
         }
       }
 
@@ -687,7 +700,7 @@ describe('Système d\'éditions', () => {
         hasShowers: true,
         hasGala: true,
         hasFoodTrucks: true,
-        hasCreditCardPayment: true
+        hasCreditCardPayment: true,
       }
 
       const categorized = categorizeServices(services as any)
@@ -705,19 +718,21 @@ describe('Système d\'éditions', () => {
     it('devrait calculer la distance entre deux éditions', () => {
       const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
         const R = 6371 // Rayon de la Terre en km
-        const dLat = (lat2 - lat1) * Math.PI / 180
-        const dLon = (lon2 - lon1) * Math.PI / 180
-        const a = 
-          Math.sin(dLat/2) * Math.sin(dLat/2) +
-          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-          Math.sin(dLon/2) * Math.sin(dLon/2)
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+        const dLat = ((lat2 - lat1) * Math.PI) / 180
+        const dLon = ((lon2 - lon1) * Math.PI) / 180
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos((lat1 * Math.PI) / 180) *
+            Math.cos((lat2 * Math.PI) / 180) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2)
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
         return R * c
       }
 
       // Paris to Lyon (environ 400km)
       const distance = calculateDistance(48.8566, 2.3522, 45.764, 4.8357)
-      
+
       expect(distance).toBeGreaterThan(390)
       expect(distance).toBeLessThan(410)
     })
@@ -726,23 +741,25 @@ describe('Système d\'éditions', () => {
       const editions = [
         { id: 1, city: 'Paris', latitude: 48.8566, longitude: 2.3522 },
         { id: 2, city: 'Versailles', latitude: 48.8048, longitude: 2.1203 },
-        { id: 3, city: 'Lyon', latitude: 45.764, longitude: 4.8357 }
+        { id: 3, city: 'Lyon', latitude: 45.764, longitude: 4.8357 },
       ]
 
       const findNearbyEditions = (lat: number, lon: number, maxDistance: number) => {
         const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
           const R = 6371
-          const dLat = (lat2 - lat1) * Math.PI / 180
-          const dLon = (lon2 - lon1) * Math.PI / 180
-          const a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon/2) * Math.sin(dLon/2)
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+          const dLat = ((lat2 - lat1) * Math.PI) / 180
+          const dLon = ((lon2 - lon1) * Math.PI) / 180
+          const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos((lat1 * Math.PI) / 180) *
+              Math.cos((lat2 * Math.PI) / 180) *
+              Math.sin(dLon / 2) *
+              Math.sin(dLon / 2)
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
           return R * c
         }
 
-        return editions.filter(edition => {
+        return editions.filter((edition) => {
           const distance = calculateDistance(lat, lon, edition.latitude, edition.longitude)
           return distance <= maxDistance
         })
@@ -752,9 +769,9 @@ describe('Système d\'éditions', () => {
       const nearby = findNearbyEditions(48.8566, 2.3522, 50)
 
       expect(nearby).toHaveLength(2) // Paris et Versailles
-      expect(nearby.map(e => e.city)).toContain('Paris')
-      expect(nearby.map(e => e.city)).toContain('Versailles')
-      expect(nearby.map(e => e.city)).not.toContain('Lyon')
+      expect(nearby.map((e) => e.city)).toContain('Paris')
+      expect(nearby.map((e) => e.city)).toContain('Versailles')
+      expect(nearby.map((e) => e.city)).not.toContain('Lyon')
     })
   })
 
@@ -773,11 +790,11 @@ describe('Système d\'éditions', () => {
         addressLine1: 'Invalid Address',
         city: 'Unknown City',
         postalCode: '00000',
-        country: 'Unknown'
+        country: 'Unknown',
       })
 
       const mockEvent = {
-        context: { user: mockUser }
+        context: { user: mockUser },
       }
 
       await expect(createEditionHandler(mockEvent as any)).rejects.toThrow()
@@ -787,20 +804,22 @@ describe('Système d\'éditions', () => {
       const existingEdition = {
         ...mockEdition,
         startDate: new Date('2024-06-01'),
-        endDate: new Date('2024-06-03')
+        endDate: new Date('2024-06-03'),
       }
 
       prismaMock.edition.findMany.mockResolvedValue([existingEdition])
 
       const checkDateConflict = async (conventionId: number, startDate: Date, endDate: Date) => {
         const editions = await prismaMock.edition.findMany({
-          where: { conventionId }
+          where: { conventionId },
         })
 
-        const hasConflict = editions.some(edition => {
-          return (startDate >= edition.startDate && startDate <= edition.endDate) ||
-                 (endDate >= edition.startDate && endDate <= edition.endDate) ||
-                 (startDate <= edition.startDate && endDate >= edition.endDate)
+        const hasConflict = editions.some((edition) => {
+          return (
+            (startDate >= edition.startDate && startDate <= edition.endDate) ||
+            (endDate >= edition.startDate && endDate <= edition.endDate) ||
+            (startDate <= edition.startDate && endDate >= edition.endDate)
+          )
         })
 
         if (hasConflict) {

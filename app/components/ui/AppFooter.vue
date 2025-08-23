@@ -9,12 +9,7 @@
 
         <!-- Liens footer -->
         <div class="flex items-center gap-4 text-sm">
-          <UButton 
-            variant="ghost" 
-            color="gray" 
-            size="sm"
-            @click="openFeedbackModal"
-          >
+          <UButton variant="ghost" color="gray" size="sm" @click="openFeedbackModal">
             {{ t('footer.feedback') }}
           </UButton>
         </div>
@@ -27,10 +22,10 @@
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent } from 'vue'
 
 // Lazy loading du composant FeedbackModal
-const FeedbackModal = defineAsyncComponent(() => import('~/components/feedback/FeedbackModal.vue'));
+const FeedbackModal = defineAsyncComponent(() => import('~/components/feedback/FeedbackModal.vue'))
 
 // Composables
 const { t } = useI18n()

@@ -11,5 +11,5 @@ export default defineI18nConfig(() => ({
   // Ne pas précharger toutes les locales
   precompiledMessages: false,
   // Charger uniquement la locale active
-  messages: {}
+  messages: {},
 }))

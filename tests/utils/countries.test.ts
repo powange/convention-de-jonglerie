@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { countryToCode, getCountryCode, formatCountriesForSelect } from '../../app/utils/countries'
 
 describe('countries utils', () => {
@@ -19,15 +20,15 @@ describe('countries utils', () => {
       expect(countryToCode['Pays-Bas']).toBe('nl')
     })
 
-    it('devrait contenir des pays d\'Afrique', () => {
+    it("devrait contenir des pays d'Afrique", () => {
       expect(countryToCode['Maroc']).toBe('ma')
       expect(countryToCode['Tunisie']).toBe('tn')
       expect(countryToCode['Afrique du Sud']).toBe('za')
       expect(countryToCode['Sénégal']).toBe('sn')
-      expect(countryToCode['Côte d\'Ivoire']).toBe('ci')
+      expect(countryToCode["Côte d'Ivoire"]).toBe('ci')
     })
 
-    it('devrait contenir des pays d\'Asie', () => {
+    it("devrait contenir des pays d'Asie", () => {
       expect(countryToCode['Japon']).toBe('jp')
       expect(countryToCode['Chine']).toBe('cn')
       expect(countryToCode['Corée du Sud']).toBe('kr')
@@ -35,20 +36,20 @@ describe('countries utils', () => {
       expect(countryToCode['Thaïlande']).toBe('th')
     })
 
-    it('devrait contenir des pays d\'Amérique', () => {
+    it("devrait contenir des pays d'Amérique", () => {
       expect(countryToCode['Brésil']).toBe('br')
       expect(countryToCode['Argentine']).toBe('ar')
       expect(countryToCode['Mexique']).toBe('mx')
       expect(countryToCode['Chili']).toBe('cl')
     })
 
-    it('devrait contenir des pays d\'Océanie', () => {
+    it("devrait contenir des pays d'Océanie", () => {
       expect(countryToCode['Australie']).toBe('au')
       expect(countryToCode['Nouvelle-Zélande']).toBe('nz')
     })
 
     it('devrait utiliser des codes ISO 3166-1 alpha-2 valides', () => {
-      Object.values(countryToCode).forEach(code => {
+      Object.values(countryToCode).forEach((code) => {
         expect(code).toMatch(/^[a-z]{2}$/) // 2 lettres minuscules
       })
     })
@@ -84,7 +85,7 @@ describe('countries utils', () => {
     })
 
     it('devrait gérer les caractères spéciaux', () => {
-      expect(getCountryCode('Côte d\'Ivoire')).toBe('ci')
+      expect(getCountryCode("Côte d'Ivoire")).toBe('ci')
       expect(getCountryCode('États-Unis')).toBe('us')
     })
 
@@ -104,11 +105,11 @@ describe('countries utils', () => {
     it('devrait formater une liste de pays pour le select', () => {
       const countries = ['France', 'Belgique', 'Suisse']
       const result = formatCountriesForSelect(countries)
-      
+
       expect(result).toEqual([
         { label: 'France', value: 'France', flag: 'fr' },
         { label: 'Belgique', value: 'Belgique', flag: 'be' },
-        { label: 'Suisse', value: 'Suisse', flag: 'ch' }
+        { label: 'Suisse', value: 'Suisse', flag: 'ch' },
       ])
     })
 
@@ -120,17 +121,17 @@ describe('countries utils', () => {
     it('devrait gérer des pays inexistants', () => {
       const countries = ['France', 'Pays Inexistant']
       const result = formatCountriesForSelect(countries)
-      
+
       expect(result).toEqual([
         { label: 'France', value: 'France', flag: 'fr' },
-        { label: 'Pays Inexistant', value: 'Pays Inexistant', flag: 'xx' }
+        { label: 'Pays Inexistant', value: 'Pays Inexistant', flag: 'xx' },
       ])
     })
 
-    it('devrait préserver l\'ordre des pays', () => {
+    it("devrait préserver l'ordre des pays", () => {
       const countries = ['Suisse', 'France', 'Belgique']
       const result = formatCountriesForSelect(countries)
-      
+
       expect(result[0].label).toBe('Suisse')
       expect(result[1].label).toBe('France')
       expect(result[2].label).toBe('Belgique')
@@ -139,7 +140,7 @@ describe('countries utils', () => {
     it('devrait avoir la bonne structure pour chaque élément', () => {
       const countries = ['France']
       const result = formatCountriesForSelect(countries)
-      
+
       expect(result[0]).toHaveProperty('label')
       expect(result[0]).toHaveProperty('value')
       expect(result[0]).toHaveProperty('flag')
@@ -149,9 +150,9 @@ describe('countries utils', () => {
     it('devrait gérer une grande liste de pays', () => {
       const allCountries = Object.keys(countryToCode)
       const result = formatCountriesForSelect(allCountries)
-      
+
       expect(result).toHaveLength(allCountries.length)
-      
+
       result.forEach((item, index) => {
         expect(item.label).toBe(allCountries[index])
         expect(item.value).toBe(allCountries[index])
@@ -162,25 +163,28 @@ describe('countries utils', () => {
     it('devrait gérer les doublons', () => {
       const countries = ['France', 'France', 'Belgique']
       const result = formatCountriesForSelect(countries)
-      
+
       expect(result).toHaveLength(3) // Ne supprime pas les doublons
       expect(result[0]).toEqual(result[1]) // Doublons identiques
     })
 
     it('devrait supporter tous les pays définis', () => {
       const testCountries = [
-        'France', 'États-Unis', 'Côte d\'Ivoire', 
-        'Corée du Sud', 'Nouvelle-Zélande'
+        'France',
+        'États-Unis',
+        "Côte d'Ivoire",
+        'Corée du Sud',
+        'Nouvelle-Zélande',
       ]
-      
+
       const result = formatCountriesForSelect(testCountries)
-      
+
       expect(result).toEqual([
         { label: 'France', value: 'France', flag: 'fr' },
         { label: 'États-Unis', value: 'États-Unis', flag: 'us' },
-        { label: 'Côte d\'Ivoire', value: 'Côte d\'Ivoire', flag: 'ci' },
+        { label: "Côte d'Ivoire", value: "Côte d'Ivoire", flag: 'ci' },
         { label: 'Corée du Sud', value: 'Corée du Sud', flag: 'kr' },
-        { label: 'Nouvelle-Zélande', value: 'Nouvelle-Zélande', flag: 'nz' }
+        { label: 'Nouvelle-Zélande', value: 'Nouvelle-Zélande', flag: 'nz' },
       ])
     })
   })

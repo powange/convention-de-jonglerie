@@ -1,94 +1,95 @@
-import { createReadStream } from 'fs';
-import { stat } from 'fs/promises';
-import { join } from 'path';
-import { sendStream } from 'h3';
+import { createReadStream } from 'fs'
+import { stat } from 'fs/promises'
+import { join } from 'path'
+
+import { sendStream } from 'h3'
 
 export default defineEventHandler(async (event) => {
   try {
     // Récupérer le chemin depuis l'URL
-    const path = getRouterParam(event, 'path');
-    
+    const path = getRouterParam(event, 'path')
+
     if (!path) {
       throw createError({
         statusCode: 400,
-        message: 'Invalid path'
-      });
+        message: 'Invalid path',
+      })
     }
 
     // Vérifier les tentatives de path traversal AVANT la normalisation
     if (path.includes('..') || path.includes('//')) {
       throw createError({
         statusCode: 403,
-        message: 'Access denied'
-      });
+        message: 'Access denied',
+      })
     }
 
     // Construire le chemin complet du fichier
-    const filePath = join(process.cwd(), 'public', 'uploads', path);
-    
+    const filePath = join(process.cwd(), 'public', 'uploads', path)
+
     // Vérifier que le chemin ne sort pas du dossier uploads (sécurité)
-    const normalizedPath = join(process.cwd(), 'public', 'uploads', path);
-    const uploadsDir = join(process.cwd(), 'public', 'uploads');
-    
+    const normalizedPath = join(process.cwd(), 'public', 'uploads', path)
+    const uploadsDir = join(process.cwd(), 'public', 'uploads')
+
     if (!normalizedPath.startsWith(uploadsDir)) {
       throw createError({
         statusCode: 403,
-        message: 'Access denied'
-      });
+        message: 'Access denied',
+      })
     }
 
     // Vérifier que le fichier existe
     try {
-      const stats = await stat(filePath);
+      const stats = await stat(filePath)
       if (!stats.isFile()) {
-        throw new Error('Not a file');
+        throw new Error('Not a file')
       }
     } catch {
       throw createError({
         statusCode: 404,
-        message: 'File not found'
-      });
+        message: 'File not found',
+      })
     }
 
     // Déterminer le type MIME en fonction de l'extension
-    const ext = filePath.split('.').pop()?.toLowerCase();
-    let contentType = 'application/octet-stream';
-    
+    const ext = filePath.split('.').pop()?.toLowerCase()
+    let contentType = 'application/octet-stream'
+
     switch (ext) {
       case 'jpg':
       case 'jpeg':
-        contentType = 'image/jpeg';
-        break;
+        contentType = 'image/jpeg'
+        break
       case 'png':
-        contentType = 'image/png';
-        break;
+        contentType = 'image/png'
+        break
       case 'gif':
-        contentType = 'image/gif';
-        break;
+        contentType = 'image/gif'
+        break
       case 'webp':
-        contentType = 'image/webp';
-        break;
+        contentType = 'image/webp'
+        break
       case 'svg':
-        contentType = 'image/svg+xml';
-        break;
+        contentType = 'image/svg+xml'
+        break
     }
 
     // Définir les headers
-    setHeader(event, 'Content-Type', contentType);
-    setHeader(event, 'Cache-Control', 'public, max-age=31536000'); // Cache d'un an
+    setHeader(event, 'Content-Type', contentType)
+    setHeader(event, 'Cache-Control', 'public, max-age=31536000') // Cache d'un an
 
     // Créer un stream et l'envoyer
-    const stream = createReadStream(filePath);
-    return sendStream(event, stream);
+    const stream = createReadStream(filePath)
+    return sendStream(event, stream)
   } catch (error: unknown) {
-    const httpError = error as { statusCode?: number; message?: string };
+    const httpError = error as { statusCode?: number; message?: string }
     if (httpError.statusCode) {
-      throw error;
+      throw error
     }
-    
+
     throw createError({
       statusCode: 500,
-      message: 'Internal server error'
-    });
+      message: 'Internal server error',
+    })
   }
-});
+})

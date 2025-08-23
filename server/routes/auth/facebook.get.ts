@@ -1,10 +1,15 @@
-import { prisma } from '../../utils/prisma'
-import { sendRedirect, getQuery, setCookie, getCookie, getRequestURL, createError } from 'h3'
 import bcrypt from 'bcryptjs'
+import { sendRedirect, getQuery, setCookie, getCookie, getRequestURL, createError } from 'h3'
 import { $fetch } from 'ofetch'
 
+import { prisma } from '../../utils/prisma'
+
 function slugifyPseudo(base: string) {
-  const clean = base.toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 30) || 'user'
+  const clean =
+    base
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, '')
+      .slice(0, 30) || 'user'
   return clean
 }
 
@@ -23,7 +28,9 @@ export default defineEventHandler(async (event) => {
   const clientId = process.env.NUXT_OAUTH_FACEBOOK_CLIENT_ID
   const clientSecret = process.env.NUXT_OAUTH_FACEBOOK_CLIENT_SECRET
   if (!clientId || !clientSecret) {
-    console.error('Facebook OAuth non configuré: définir NUXT_OAUTH_FACEBOOK_CLIENT_ID et NUXT_OAUTH_FACEBOOK_CLIENT_SECRET')
+    console.error(
+      'Facebook OAuth non configuré: définir NUXT_OAUTH_FACEBOOK_CLIENT_ID et NUXT_OAUTH_FACEBOOK_CLIENT_SECRET'
+    )
     return sendRedirect(event, '/login')
   }
 
@@ -40,7 +47,7 @@ export default defineEventHandler(async (event) => {
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       path: '/',
-      maxAge: 600
+      maxAge: 600,
     })
 
     const authUrl = new URL('https://www.facebook.com/v18.0/dialog/oauth')
@@ -69,7 +76,7 @@ export default defineEventHandler(async (event) => {
   tokenParams.set('redirect_uri', redirectUri)
 
   const tokenRes = await $fetch<any>(`${tokenEndpoint}?${tokenParams.toString()}`, {
-    method: 'GET'
+    method: 'GET',
   })
 
   const accessToken = tokenRes.access_token as string | undefined
@@ -80,7 +87,9 @@ export default defineEventHandler(async (event) => {
 
   // Récupérer le profil utilisateur
   const fields = ['id', 'name', 'first_name', 'last_name', 'email', 'picture.type(large)'].join(',')
-  const userInfo = await $fetch<any>(`https://graph.facebook.com/me?fields=${encodeURIComponent(fields)}&access_token=${encodeURIComponent(accessToken)}`)
+  const userInfo = await $fetch<any>(
+    `https://graph.facebook.com/me?fields=${encodeURIComponent(fields)}&access_token=${encodeURIComponent(accessToken)}`
+  )
 
   const email = userInfo?.email as string | undefined
   const name = (userInfo?.name as string | undefined) || ''
@@ -116,8 +125,8 @@ export default defineEventHandler(async (event) => {
         prenom,
         password: hashed,
         isEmailVerified: true,
-        ...(picture ? { profilePicture: picture } : {})
-      }
+        ...(picture ? { profilePicture: picture } : {}),
+      },
     })
   }
 
@@ -126,7 +135,7 @@ export default defineEventHandler(async (event) => {
     try {
       dbUser = await prisma.user.update({
         where: { id: dbUser.id },
-        data: { profilePicture: picture }
+        data: { profilePicture: picture },
       })
     } catch (e) {
       console.warn('Impossible de mettre à jour la photo de profil depuis Facebook:', e)
@@ -146,8 +155,8 @@ export default defineEventHandler(async (event) => {
       isGlobalAdmin: dbUser.isGlobalAdmin,
       createdAt: dbUser.createdAt,
       updatedAt: dbUser.updatedAt,
-      isEmailVerified: dbUser.isEmailVerified
-    }
+      isEmailVerified: dbUser.isEmailVerified,
+    },
   })
 
   return sendRedirect(event, '/')

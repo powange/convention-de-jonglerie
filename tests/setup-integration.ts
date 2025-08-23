@@ -4,8 +4,8 @@ import { vi } from 'vitest'
 vi.mock('#app', () => ({
   useRuntimeConfig: () => ({
     public: {},
-    
-    emailEnabled: 'false'
+
+    emailEnabled: 'false',
   }),
   navigateTo: vi.fn(),
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
@@ -16,8 +16,8 @@ vi.mock('#app', () => ({
     vueApp: {},
     // Certains modules appellent nuxtApp.runWithContext
     runWithContext: (fn: any) => fn(),
-    hook: vi.fn()
-  })
+    hook: vi.fn(),
+  }),
 }))
 
 vi.mock('#imports', () => ({
@@ -26,7 +26,7 @@ vi.mock('#imports', () => ({
     error.statusCode = options.statusCode
     error.data = options.data
     return error
-  }
+  },
 }))
 
 // Eviter le chargement réel de @nuxtjs/i18n pendant ces tests
@@ -34,23 +34,23 @@ vi.mock('@nuxtjs/i18n', () => ({}))
 
 // Mock global de $fetch pour les tests d'intégration
 // On garde une implémentation neutre pour ne pas casser les tests qui l'invoquent
- 
+
 global.$fetch = vi.fn(async (_req?: any, _options?: any) => ({ ok: true })) as any
 
 // Mock des composables Nuxt courants utilisés dans le code côté serveur éventuellement importé
- 
+
 global.useCookie = vi.fn(() => ({ value: null })) as any
- 
+
 global.useRoute = vi.fn(() => ({ path: '/test' })) as any
- 
+
 global.useRouter = vi.fn(() => ({ push: vi.fn(), replace: vi.fn() })) as any
- 
+
 global.navigateTo = vi.fn() as any
- 
+
 global.useRuntimeConfig = vi.fn(() => ({
   public: {},
-  
-  emailEnabled: 'false'
+
+  emailEnabled: 'false',
 })) as any
 
 export {}

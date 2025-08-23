@@ -5,22 +5,22 @@ const mockDeleteProfilePicture = vi.fn()
 
 // Créer un handler simplifié pour les tests
 const mockHandler = async (event: any) => {
-  const user = event.context.user;
-  
+  const user = event.context.user
+
   if (!user) {
-    const error = new Error('Non authentifié');
-    (error as any).statusCode = 401;
-    throw error;
+    const error = new Error('Non authentifié')
+    ;(error as any).statusCode = 401
+    throw error
   }
 
   // Utiliser l'utilitaire de suppression
-  const result = await mockDeleteProfilePicture(user.id);
+  const result = await mockDeleteProfilePicture(user.id)
 
   return {
     success: result.success,
     user: result.entity,
-  };
-};
+  }
+}
 
 describe('API Profile Delete Picture', () => {
   const mockUser = {
@@ -29,7 +29,7 @@ describe('API Profile Delete Picture', () => {
     pseudo: 'testuser',
     nom: 'Test',
     prenom: 'User',
-    isGlobalAdmin: false
+    isGlobalAdmin: false,
   }
 
   const mockDeleteResult = {
@@ -42,8 +42,8 @@ describe('API Profile Delete Picture', () => {
       prenom: 'User',
       profilePicture: null,
       createdAt: new Date(),
-      updatedAt: new Date()
-    }
+      updatedAt: new Date(),
+    },
   }
 
   beforeEach(() => {
@@ -54,7 +54,7 @@ describe('API Profile Delete Picture', () => {
     mockDeleteProfilePicture.mockResolvedValue(mockDeleteResult)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     const result = await mockHandler(mockEvent)
@@ -62,18 +62,18 @@ describe('API Profile Delete Picture', () => {
     expect(mockDeleteProfilePicture).toHaveBeenCalledWith(1)
     expect(result).toEqual({
       success: true,
-      user: mockDeleteResult.entity
+      user: mockDeleteResult.entity,
     })
   })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
     const mockEvent = {
-      context: { user: null }
+      context: { user: null },
     }
 
     await expect(mockHandler(mockEvent)).rejects.toMatchObject({
       statusCode: 401,
-      message: 'Non authentifié'
+      message: 'Non authentifié',
     })
   })
 
@@ -81,7 +81,7 @@ describe('API Profile Delete Picture', () => {
     mockDeleteProfilePicture.mockRejectedValue(new Error('Delete failed'))
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await expect(mockHandler(mockEvent)).rejects.toThrow('Delete failed')
@@ -90,19 +90,19 @@ describe('API Profile Delete Picture', () => {
   it('devrait gérer les cas où la suppression échoue', async () => {
     const failedResult = {
       success: false,
-      entity: null
+      entity: null,
     }
     mockDeleteProfilePicture.mockResolvedValue(failedResult)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     const result = await mockHandler(mockEvent)
 
     expect(result).toEqual({
       success: false,
-      user: null
+      user: null,
     })
   })
 
@@ -117,13 +117,13 @@ describe('API Profile Delete Picture', () => {
         prenom: 'Updated First Name',
         profilePicture: null,
         createdAt: new Date('2023-01-01'),
-        updatedAt: new Date('2024-01-01')
-      }
+        updatedAt: new Date('2024-01-01'),
+      },
     }
     mockDeleteProfilePicture.mockResolvedValue(customResult)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     const result = await mockHandler(mockEvent)

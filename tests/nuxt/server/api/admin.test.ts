@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../../../__mocks__/prisma';
+
+import { prismaMock } from '../../../__mocks__/prisma'
 
 describe('Tests du mode admin', () => {
   const adminUser = {
@@ -9,7 +10,7 @@ describe('Tests du mode admin', () => {
     nom: 'Admin',
     prenom: 'Super',
     isGlobalAdmin: true,
-    isEmailVerified: true
+    isEmailVerified: true,
   }
 
   const regularUser = {
@@ -19,7 +20,7 @@ describe('Tests du mode admin', () => {
     nom: 'User',
     prenom: 'Regular',
     isGlobalAdmin: false,
-    isEmailVerified: true
+    isEmailVerified: true,
   }
 
   beforeEach(() => {
@@ -31,24 +32,24 @@ describe('Tests du mode admin', () => {
       prismaMock.user.findUnique.mockResolvedValue(adminUser)
 
       const hasAdminAccess = adminUser.isGlobalAdmin
-      
+
       expect(hasAdminAccess).toBe(true)
     })
 
-    it('devrait rejeter l\'accès aux utilisateurs normaux', async () => {
+    it("devrait rejeter l'accès aux utilisateurs normaux", async () => {
       prismaMock.user.findUnique.mockResolvedValue(regularUser)
 
       const hasAdminAccess = regularUser.isGlobalAdmin
-      
+
       expect(hasAdminAccess).toBe(false)
     })
 
-    it('devrait rejeter l\'accès aux utilisateurs non authentifiés', async () => {
+    it("devrait rejeter l'accès aux utilisateurs non authentifiés", async () => {
       prismaMock.user.findUnique.mockResolvedValue(null)
 
       const user = null
       const hasAdminAccess = user?.isGlobalAdmin || false
-      
+
       expect(hasAdminAccess).toBe(false)
     })
   })
@@ -67,8 +68,8 @@ describe('Tests du mode admin', () => {
           prenom: true,
           isGlobalAdmin: true,
           isEmailVerified: true,
-          createdAt: true
-        }
+          createdAt: true,
+        },
       })
 
       expect(users).toHaveLength(2)
@@ -81,8 +82,8 @@ describe('Tests du mode admin', () => {
           prenom: true,
           isGlobalAdmin: true,
           isEmailVerified: true,
-          createdAt: true
-        }
+          createdAt: true,
+        },
       })
     })
 
@@ -92,13 +93,13 @@ describe('Tests du mode admin', () => {
 
       const result = await prismaMock.user.update({
         where: { id: 2 },
-        data: { isGlobalAdmin: true }
+        data: { isGlobalAdmin: true },
       })
 
       expect(result.isGlobalAdmin).toBe(true)
       expect(prismaMock.user.update).toHaveBeenCalledWith({
         where: { id: 2 },
-        data: { isGlobalAdmin: true }
+        data: { isGlobalAdmin: true },
       })
     })
 
@@ -108,13 +109,13 @@ describe('Tests du mode admin', () => {
 
       const result = await prismaMock.user.update({
         where: { id: 1 },
-        data: { isGlobalAdmin: false }
+        data: { isGlobalAdmin: false },
       })
 
       expect(result.isGlobalAdmin).toBe(false)
       expect(prismaMock.user.update).toHaveBeenCalledWith({
         where: { id: 1 },
-        data: { isGlobalAdmin: false }
+        data: { isGlobalAdmin: false },
       })
     })
 
@@ -122,12 +123,12 @@ describe('Tests du mode admin', () => {
       prismaMock.user.delete.mockResolvedValue(regularUser)
 
       const result = await prismaMock.user.delete({
-        where: { id: 2 }
+        where: { id: 2 },
       })
 
       expect(result).toEqual(regularUser)
       expect(prismaMock.user.delete).toHaveBeenCalledWith({
-        where: { id: 2 }
+        where: { id: 2 },
       })
     })
 
@@ -147,7 +148,7 @@ describe('Tests du mode admin', () => {
       name: 'Convention Test',
       description: 'Description test',
       createdBy: 2,
-      isActive: true
+      isActive: true,
     }
 
     it('devrait permettre de lister toutes les conventions', async () => {
@@ -159,17 +160,17 @@ describe('Tests du mode admin', () => {
             select: {
               id: true,
               pseudo: true,
-              email: true
-            }
+              email: true,
+            },
           },
           editions: {
             select: {
               id: true,
               startDate: true,
-              endDate: true
-            }
-          }
-        }
+              endDate: true,
+            },
+          },
+        },
       })
 
       expect(conventions).toHaveLength(1)
@@ -179,17 +180,17 @@ describe('Tests du mode admin', () => {
             select: {
               id: true,
               pseudo: true,
-              email: true
-            }
+              email: true,
+            },
           },
           editions: {
             select: {
               id: true,
               startDate: true,
-              endDate: true
-            }
-          }
-        }
+              endDate: true,
+            },
+          },
+        },
       })
     })
 
@@ -199,13 +200,13 @@ describe('Tests du mode admin', () => {
 
       const result = await prismaMock.convention.update({
         where: { id: 1 },
-        data: { isActive: false }
+        data: { isActive: false },
       })
 
       expect(result.isActive).toBe(false)
       expect(prismaMock.convention.update).toHaveBeenCalledWith({
         where: { id: 1 },
-        data: { isActive: false }
+        data: { isActive: false },
       })
     })
 
@@ -213,12 +214,12 @@ describe('Tests du mode admin', () => {
       prismaMock.convention.delete.mockResolvedValue(mockConvention)
 
       const result = await prismaMock.convention.delete({
-        where: { id: 1 }
+        where: { id: 1 },
       })
 
       expect(result).toEqual(mockConvention)
       expect(prismaMock.convention.delete).toHaveBeenCalledWith({
-        where: { id: 1 }
+        where: { id: 1 },
       })
     })
   })
@@ -231,7 +232,7 @@ describe('Tests du mode admin', () => {
       city: 'Paris',
       conventionId: 1,
       createdBy: 2,
-      isActive: true
+      isActive: true,
     }
 
     it('devrait permettre de lister toutes les éditions', async () => {
@@ -242,17 +243,17 @@ describe('Tests du mode admin', () => {
           convention: {
             select: {
               id: true,
-              name: true
-            }
+              name: true,
+            },
           },
           creator: {
             select: {
               id: true,
               pseudo: true,
-              email: true
-            }
-          }
-        }
+              email: true,
+            },
+          },
+        },
       })
 
       expect(editions).toHaveLength(1)
@@ -261,17 +262,17 @@ describe('Tests du mode admin', () => {
           convention: {
             select: {
               id: true,
-              name: true
-            }
+              name: true,
+            },
           },
           creator: {
             select: {
               id: true,
               pseudo: true,
-              email: true
-            }
-          }
-        }
+              email: true,
+            },
+          },
+        },
       })
     })
 
@@ -281,13 +282,13 @@ describe('Tests du mode admin', () => {
 
       const result = await prismaMock.edition.update({
         where: { id: 1 },
-        data: { isActive: false }
+        data: { isActive: false },
       })
 
       expect(result.isActive).toBe(false)
       expect(prismaMock.edition.update).toHaveBeenCalledWith({
         where: { id: 1 },
-        data: { isActive: false }
+        data: { isActive: false },
       })
     })
 
@@ -295,12 +296,12 @@ describe('Tests du mode admin', () => {
       prismaMock.edition.delete.mockResolvedValue(mockEdition)
 
       const result = await prismaMock.edition.delete({
-        where: { id: 1 }
+        where: { id: 1 },
       })
 
       expect(result).toEqual(mockEdition)
       expect(prismaMock.edition.delete).toHaveBeenCalledWith({
-        where: { id: 1 }
+        where: { id: 1 },
       })
     })
   })
@@ -310,23 +311,23 @@ describe('Tests du mode admin', () => {
       // Mock des différents appels de count
       prismaMock.user.count
         .mockResolvedValueOnce(150) // Total utilisateurs
-        .mockResolvedValueOnce(5)   // Admins
+        .mockResolvedValueOnce(5) // Admins
         .mockResolvedValueOnce(140) // Emails vérifiés
-        .mockResolvedValueOnce(25)  // Nouveaux ce mois
+        .mockResolvedValueOnce(25) // Nouveaux ce mois
 
       const totalUsers = await prismaMock.user.count()
-      const totalAdmins = await prismaMock.user.count({ 
-        where: { isGlobalAdmin: true } 
+      const totalAdmins = await prismaMock.user.count({
+        where: { isGlobalAdmin: true },
       })
-      const verifiedUsers = await prismaMock.user.count({ 
-        where: { isEmailVerified: true } 
+      const verifiedUsers = await prismaMock.user.count({
+        where: { isEmailVerified: true },
       })
-      const newUsersThisMonth = await prismaMock.user.count({ 
-        where: { 
-          createdAt: { 
-            gte: new Date(new Date().setDate(1)) 
-          } 
-        } 
+      const newUsersThisMonth = await prismaMock.user.count({
+        where: {
+          createdAt: {
+            gte: new Date(new Date().setDate(1)),
+          },
+        },
       })
 
       expect(totalUsers).toBe(150)
@@ -342,19 +343,19 @@ describe('Tests du mode admin', () => {
         .mockResolvedValueOnce(42) // Conventions actives
       prismaMock.edition.count
         .mockResolvedValueOnce(120) // Total éditions
-        .mockResolvedValueOnce(15)  // Éditions à venir
+        .mockResolvedValueOnce(15) // Éditions à venir
 
       const totalConventions = await prismaMock.convention.count()
-      const activeConventions = await prismaMock.convention.count({ 
-        where: { isActive: true } 
+      const activeConventions = await prismaMock.convention.count({
+        where: { isActive: true },
       })
       const totalEditions = await prismaMock.edition.count()
-      const upcomingEditions = await prismaMock.edition.count({ 
-        where: { 
-          startDate: { 
-            gte: new Date() 
-          } 
-        } 
+      const upcomingEditions = await prismaMock.edition.count({
+        where: {
+          startDate: {
+            gte: new Date(),
+          },
+        },
       })
 
       expect(totalConventions).toBe(45)
@@ -369,7 +370,7 @@ describe('Tests du mode admin', () => {
       const invalidUserData = {
         email: 'invalid-email',
         pseudo: '',
-        isGlobalAdmin: 'not-boolean'
+        isGlobalAdmin: 'not-boolean',
       }
 
       const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(invalidUserData.email)
@@ -385,7 +386,7 @@ describe('Tests du mode admin', () => {
       const validUserData = {
         email: 'valid@example.com',
         pseudo: 'validpseudo',
-        isGlobalAdmin: true
+        isGlobalAdmin: true,
       }
 
       const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(validUserData.email)
@@ -405,7 +406,7 @@ describe('Tests du mode admin', () => {
         action: 'USER_PROMOTED',
         targetId: 2,
         timestamp: new Date(),
-        details: 'User promoted to admin'
+        details: 'User promoted to admin',
       }
 
       // Mock d'un système de logs (si implémenté)
@@ -422,7 +423,7 @@ describe('Tests du mode admin', () => {
         targetId: 1,
         beforeValue: { name: 'Convention Test', isActive: true },
         afterValue: null,
-        timestamp: new Date()
+        timestamp: new Date(),
       }
 
       // Mock d'un système d'audit

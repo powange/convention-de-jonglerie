@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../../../../__mocks__/prisma';
+
+import { prismaMock } from '../../../../__mocks__/prisma'
 import handler from '../../../../server/api/editions/[id].delete'
 
 describe('/api/editions/[id] DELETE', () => {
@@ -8,7 +9,7 @@ describe('/api/editions/[id] DELETE', () => {
     email: 'user@example.com',
     pseudo: 'testuser',
     nom: 'Test',
-    prenom: 'User'
+    prenom: 'User',
   }
 
   const mockEdition = {
@@ -35,8 +36,8 @@ describe('/api/editions/[id] DELETE', () => {
       id: 1,
       name: 'Convention Test',
       authorId: 1,
-      collaborators: []
-    }
+      collaborators: [],
+    },
   }
 
   beforeEach(() => {
@@ -52,8 +53,8 @@ describe('/api/editions/[id] DELETE', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     const result = await handler(mockEvent as any)
@@ -61,7 +62,7 @@ describe('/api/editions/[id] DELETE', () => {
     expect(result.message).toBeDefined()
     expect(result.message.toLowerCase()).toMatch(/supprim|delet/)
     expect(prismaMock.edition.delete).toHaveBeenCalledWith({
-      where: { id: 1 }
+      where: { id: 1 },
     })
   })
 
@@ -69,8 +70,8 @@ describe('/api/editions/[id] DELETE', () => {
     const mockEvent = {
       context: {
         user: null,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Unauthorized')
@@ -82,8 +83,8 @@ describe('/api/editions/[id] DELETE', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: 'invalid' }
-      }
+        params: { id: 'invalid' },
+      },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Invalid Edition ID')
@@ -96,14 +97,14 @@ describe('/api/editions/[id] DELETE', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '999' }
-      }
+        params: { id: '999' },
+      },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Edition not found')
   })
 
-  it('devrait rejeter si l\'utilisateur n\'est pas autorisé', async () => {
+  it("devrait rejeter si l'utilisateur n'est pas autorisé", async () => {
     const otherUserEdition = {
       ...mockEdition,
       creatorId: 2,
@@ -111,8 +112,8 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: []
-      }
+        collaborators: [],
+      },
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -121,14 +122,16 @@ describe('/api/editions/[id] DELETE', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Vous n\'avez pas les droits pour supprimer cette édition')
+    await expect(handler(mockEvent as any)).rejects.toThrow(
+      "Vous n'avez pas les droits pour supprimer cette édition"
+    )
   })
 
-  it('devrait permettre au créateur de l\'édition de supprimer', async () => {
+  it("devrait permettre au créateur de l'édition de supprimer", async () => {
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.edition.delete.mockResolvedValue(mockEdition)
@@ -136,8 +139,8 @@ describe('/api/editions/[id] DELETE', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     const result = await handler(mockEvent as any)
@@ -146,15 +149,15 @@ describe('/api/editions/[id] DELETE', () => {
     expect(prismaMock.edition.delete).toHaveBeenCalled()
   })
 
-  it('devrait permettre à l\'auteur de la convention de supprimer', async () => {
+  it("devrait permettre à l'auteur de la convention de supprimer", async () => {
     const conventionAuthorEdition = {
       ...mockEdition,
       creatorId: 2, // Créé par quelqu'un d'autre
       creator: { id: 2 },
       convention: {
         ...mockEdition.convention,
-        authorId: 1 // Mais convention appartient à l'utilisateur
-      }
+        authorId: 1, // Mais convention appartient à l'utilisateur
+      },
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -164,8 +167,8 @@ describe('/api/editions/[id] DELETE', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     const result = await handler(mockEvent as any)
@@ -182,12 +185,14 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [{
-          userId: 1,
-          canDeleteConvention: true,
-          canDeleteAllEditions: true
-        }]
-      }
+        collaborators: [
+          {
+            userId: 1,
+            canDeleteConvention: true,
+            canDeleteAllEditions: true,
+          },
+        ],
+      },
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -197,8 +202,8 @@ describe('/api/editions/[id] DELETE', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     const result = await handler(mockEvent as any)
@@ -214,11 +219,13 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [{
-          userId: 1,
-          canDeleteConvention: true
-        }]
-      }
+        collaborators: [
+          {
+            userId: 1,
+            canDeleteConvention: true,
+          },
+        ],
+      },
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -228,8 +235,8 @@ describe('/api/editions/[id] DELETE', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     const result = await handler(mockEvent as any)
@@ -245,8 +252,8 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: [] // Le viewer n'apparaît pas car filtré par la requête (role MODERATOR/ADMINISTRATOR seulement)
-      }
+        collaborators: [], // Le viewer n'apparaît pas car filtré par la requête (role MODERATOR/ADMINISTRATOR seulement)
+      },
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -255,11 +262,13 @@ describe('/api/editions/[id] DELETE', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Vous n\'avez pas les droits pour supprimer cette édition')
+    await expect(handler(mockEvent as any)).rejects.toThrow(
+      "Vous n'avez pas les droits pour supprimer cette édition"
+    )
   })
 
   it('devrait gérer les erreurs de base de données', async () => {
@@ -270,8 +279,8 @@ describe('/api/editions/[id] DELETE', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     await expect(handler(mockEvent as any)).rejects.toThrow()
@@ -285,16 +294,14 @@ describe('/api/editions/[id] DELETE', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     await handler(mockEvent as any)
 
     // Vérifier que findUnique est appelé avant delete pour vérifier les permissions
-    expect(prismaMock.edition.findUnique).toHaveBeenCalledBefore(
-      prismaMock.edition.delete as any
-    )
+    expect(prismaMock.edition.findUnique).toHaveBeenCalledBefore(prismaMock.edition.delete as any)
 
     expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
@@ -307,13 +314,13 @@ describe('/api/editions/[id] DELETE', () => {
                 OR: [
                   { canDeleteAllEditions: true },
                   { canDeleteConvention: true },
-                  { canEditAllEditions: true }
-                ]
-              }
-            }
-          }
-        }
-      }
+                  { canEditAllEditions: true },
+                ],
+              },
+            },
+          },
+        },
+      },
     })
   })
 
@@ -325,8 +332,8 @@ describe('/api/editions/[id] DELETE', () => {
     const mockEvent = {
       context: {
         user: mockUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     const result = await handler(mockEvent as any)
@@ -334,10 +341,10 @@ describe('/api/editions/[id] DELETE', () => {
     expect(result).toHaveProperty('message', 'Edition deleted successfully')
   })
 
-  it('devrait permettre à un super admin de supprimer n\'importe quelle édition', async () => {
+  it("devrait permettre à un super admin de supprimer n'importe quelle édition", async () => {
     const superAdminUser = {
       ...mockUser,
-      isGlobalAdmin: true
+      isGlobalAdmin: true,
     }
 
     const otherUserEdition = {
@@ -347,8 +354,8 @@ describe('/api/editions/[id] DELETE', () => {
       convention: {
         ...mockEdition.convention,
         authorId: 2,
-        collaborators: []
-      }
+        collaborators: [],
+      },
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -358,8 +365,8 @@ describe('/api/editions/[id] DELETE', () => {
     const mockEvent = {
       context: {
         user: superAdminUser,
-        params: { id: '1' }
-      }
+        params: { id: '1' },
+      },
     }
 
     const result = await handler(mockEvent as any)

@@ -6,7 +6,7 @@ import type { NavigateToOptions } from 'nuxt/app'
 export const useI18nNavigation = () => {
   const { locale } = useI18n()
   const router = useRouter()
-  
+
   /**
    * Navigation avec préservation de la langue
    */
@@ -15,7 +15,7 @@ export const useI18nNavigation = () => {
     // donc navigateTo standard devrait suffire
     return navigateTo(path, options)
   }
-  
+
   /**
    * Router push avec préservation de la langue
    */
@@ -23,7 +23,7 @@ export const useI18nNavigation = () => {
     // Idem, le cookie gère la persistance
     return router.push(path)
   }
-  
+
   /**
    * Redirection complète avec préservation de la langue
    */
@@ -31,14 +31,14 @@ export const useI18nNavigation = () => {
     // Pour les redirections complètes, s'assurer que le cookie est bien défini
     const cookie = useCookie('i18n_redirected')
     cookie.value = locale.value
-    
+
     // Puis rediriger
     window.location.href = url
   }
-  
+
   return {
     navigateToWithLocale,
     routerPushWithLocale,
-    redirectWithLocale
+    redirectWithLocale,
   }
 }

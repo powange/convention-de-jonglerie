@@ -1,11 +1,13 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import bcrypt from 'bcryptjs'
-import { prismaMock } from '../../../../__mocks__/prisma';
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+import loginHandler from '../../../../../server/api/auth/login.post'
+import { prismaMock } from '../../../../__mocks__/prisma'
 
 // Import du handler après les mocks
-import loginHandler from '../../../../../server/api/auth/login.post'
+
 vi.mock('nuxt-auth-utils', () => ({
-  setUserSession: vi.fn()
+  setUserSession: vi.fn(),
 }))
 
 describe('API Login', () => {
@@ -20,7 +22,7 @@ describe('API Login', () => {
     isGlobalAdmin: false,
     isEmailVerified: true,
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
   }
 
   beforeEach(() => {
@@ -34,8 +36,8 @@ describe('API Login', () => {
     prismaMock.user.findUnique.mockResolvedValueOnce(mockUser)
 
     const requestBody = {
-        identifier: 'test@example.com',
-        password: 'Password123!'
+      identifier: 'test@example.com',
+      password: 'Password123!',
     }
 
     const mockEvent = {}
@@ -54,12 +56,12 @@ describe('API Login', () => {
         isGlobalAdmin: mockUser.isGlobalAdmin,
         isEmailVerified: mockUser.isEmailVerified,
         createdAt: mockUser.createdAt,
-        updatedAt: mockUser.updatedAt
-      }
+        updatedAt: mockUser.updatedAt,
+      },
     })
 
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
-      where: { email: 'test@example.com' }
+      where: { email: 'test@example.com' },
     })
   })
 
@@ -69,8 +71,8 @@ describe('API Login', () => {
       .mockResolvedValueOnce(mockUser) // Trouvé par pseudo
 
     const requestBody = {
-        identifier: 'testuser',
-        password: 'Password123!'
+      identifier: 'testuser',
+      password: 'Password123!',
     }
 
     const mockEvent = {}
@@ -78,18 +80,18 @@ describe('API Login', () => {
 
     const result = await loginHandler(mockEvent)
 
-  expect(result.user.id).toBe(mockUser.id)
+    expect(result.user.id).toBe(mockUser.id)
     expect(prismaMock.user.findUnique).toHaveBeenNthCalledWith(2, {
-      where: { pseudo: 'testuser' }
+      where: { pseudo: 'testuser' },
     })
   })
 
-  it('devrait rejeter si l\'utilisateur n\'existe pas', async () => {
+  it("devrait rejeter si l'utilisateur n'existe pas", async () => {
     prismaMock.user.findUnique.mockResolvedValue(null)
 
     const requestBody = {
-        identifier: 'nonexistent@example.com',
-        password: 'Password123!'
+      identifier: 'nonexistent@example.com',
+      password: 'Password123!',
     }
 
     const mockEvent = {}
@@ -102,8 +104,8 @@ describe('API Login', () => {
     prismaMock.user.findUnique.mockResolvedValueOnce(mockUser)
 
     const requestBody = {
-        identifier: 'test@example.com',
-        password: 'WrongPassword'
+      identifier: 'test@example.com',
+      password: 'WrongPassword',
     }
 
     const mockEvent = {}
@@ -112,13 +114,13 @@ describe('API Login', () => {
     await expect(loginHandler(mockEvent)).rejects.toThrow('Identifiants invalides')
   })
 
-  it('devrait rejeter si l\'email n\'est pas vérifié', async () => {
+  it("devrait rejeter si l'email n'est pas vérifié", async () => {
     const unverifiedUser = { ...mockUser, isEmailVerified: false }
     prismaMock.user.findUnique.mockResolvedValueOnce(unverifiedUser)
 
     const requestBody = {
-        identifier: 'test@example.com',
-        password: 'Password123!'
+      identifier: 'test@example.com',
+      password: 'Password123!',
     }
 
     const mockEvent = {}
@@ -129,8 +131,8 @@ describe('API Login', () => {
 
   it('devrait valider les champs requis', async () => {
     const requestBody = {
-        identifier: '',
-        password: ''
+      identifier: '',
+      password: '',
     }
 
     const mockEvent = {}
@@ -144,7 +146,7 @@ describe('API Login', () => {
 
     const requestBody = {
       identifier: '  test@example.com  ',
-      password: '  Password123!  '
+      password: '  Password123!  ',
     }
 
     const mockEvent = {}
@@ -153,7 +155,7 @@ describe('API Login', () => {
     await loginHandler(mockEvent)
 
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
-      where: { email: 'test@example.com' }
+      where: { email: 'test@example.com' },
     })
   })
 
@@ -165,7 +167,7 @@ describe('API Login', () => {
 
     const requestBody = {
       identifier: 'test@example.com',
-      password: 'Password123!'
+      password: 'Password123!',
     }
 
     const mockEvent = {}

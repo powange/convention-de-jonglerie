@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../../../../__mocks__/prisma';
+
+import { prismaMock } from '../../../../__mocks__/prisma'
 
 // Mock des fonctions d'upload
 const mockHandleImageUpload = vi.fn()
@@ -8,30 +9,26 @@ const mockUploadRateLimiter = vi.fn()
 
 // Créer un handler simplifié pour les tests
 const mockHandler = async (event: any) => {
-  const user = event.context.user;
-  
+  const user = event.context.user
+
   if (!user) {
-    const error = new Error('Non authentifié');
-    (error as any).statusCode = 401;
-    throw error;
+    const error = new Error('Non authentifié')
+    ;(error as any).statusCode = 401
+    throw error
   }
 
   // Appliquer le rate limiting
-  await mockUploadRateLimiter(event);
+  await mockUploadRateLimiter(event)
 
   // Récupérer l'utilisateur actuel pour avoir l'ancienne photo
   const currentUser = await prismaMock.user.findUnique({
     where: { id: user.id },
     select: { profilePicture: true },
-  });
-  
+  })
+
   // Supprimer l'ancienne photo si elle existe
   if (currentUser?.profilePicture) {
-    await mockDeleteOldImage(
-      currentUser.profilePicture,
-      'public/uploads/profiles',
-      'profile-'
-    );
+    await mockDeleteOldImage(currentUser.profilePicture, 'public/uploads/profiles', 'profile-')
   }
 
   // Effectuer l'upload
@@ -43,7 +40,7 @@ const mockHandler = async (event: any) => {
     entityId: user.id,
     fieldName: 'profilePicture',
     copyToOutput: false, // Pas de copie vers output pour les profils
-  });
+  })
 
   // Mettre à jour l'utilisateur
   const updatedUser = await prismaMock.user.update({
@@ -59,14 +56,14 @@ const mockHandler = async (event: any) => {
       createdAt: true,
       updatedAt: true,
     },
-  });
+  })
 
   return {
     success: true,
     profilePicture: uploadResult.imageUrl,
     user: updatedUser,
-  };
-};
+  }
+}
 
 describe('API Profile Upload Picture', () => {
   const mockUser = {
@@ -75,11 +72,11 @@ describe('API Profile Upload Picture', () => {
     pseudo: 'testuser',
     nom: 'Test',
     prenom: 'User',
-    isGlobalAdmin: false
+    isGlobalAdmin: false,
   }
 
   const mockCurrentUser = {
-    profilePicture: 'old-profile-picture.jpg'
+    profilePicture: 'old-profile-picture.jpg',
   }
 
   const mockUpdatedUser = {
@@ -90,11 +87,11 @@ describe('API Profile Upload Picture', () => {
     prenom: 'User',
     profilePicture: 'profile-1-12345.jpg',
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
   }
 
   const mockUploadResult = {
-    imageUrl: 'profile-1-12345.jpg'
+    imageUrl: 'profile-1-12345.jpg',
   }
 
   beforeEach(() => {
@@ -109,7 +106,7 @@ describe('API Profile Upload Picture', () => {
     prismaMock.user.update.mockResolvedValue(mockUpdatedUser)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     const result = await mockHandler(mockEvent)
@@ -117,7 +114,7 @@ describe('API Profile Upload Picture', () => {
     expect(mockUploadRateLimiter).toHaveBeenCalledWith(mockEvent)
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
-      select: { profilePicture: true }
+      select: { profilePicture: true },
     })
     expect(mockDeleteOldImage).toHaveBeenCalledWith(
       'old-profile-picture.jpg',
@@ -131,7 +128,7 @@ describe('API Profile Upload Picture', () => {
       destinationFolder: 'profiles',
       entityId: 1,
       fieldName: 'profilePicture',
-      copyToOutput: false
+      copyToOutput: false,
     })
     expect(prismaMock.user.update).toHaveBeenCalledWith({
       where: { id: 1 },
@@ -144,34 +141,34 @@ describe('API Profile Upload Picture', () => {
         prenom: true,
         profilePicture: true,
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     })
     expect(result).toEqual({
       success: true,
       profilePicture: 'profile-1-12345.jpg',
-      user: mockUpdatedUser
+      user: mockUpdatedUser,
     })
   })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
     const mockEvent = {
-      context: { user: null }
+      context: { user: null },
     }
 
     await expect(mockHandler(mockEvent)).rejects.toMatchObject({
       statusCode: 401,
-      message: 'Non authentifié'
+      message: 'Non authentifié',
     })
   })
 
-  it('devrait gérer l\'upload sans photo existante', async () => {
+  it("devrait gérer l'upload sans photo existante", async () => {
     prismaMock.user.findUnique.mockResolvedValue({ profilePicture: null })
     mockHandleImageUpload.mockResolvedValue(mockUploadResult)
     prismaMock.user.update.mockResolvedValue(mockUpdatedUser)
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await mockHandler(mockEvent)
@@ -185,18 +182,18 @@ describe('API Profile Upload Picture', () => {
     mockUploadRateLimiter.mockRejectedValue(new Error('Rate limit exceeded'))
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await expect(mockHandler(mockEvent)).rejects.toThrow('Rate limit exceeded')
   })
 
-  it('devrait gérer les erreurs d\'upload', async () => {
+  it("devrait gérer les erreurs d'upload", async () => {
     prismaMock.user.findUnique.mockResolvedValue({ profilePicture: null })
     mockHandleImageUpload.mockRejectedValue(new Error('Upload failed'))
 
     const mockEvent = {
-      context: { user: mockUser }
+      context: { user: mockUser },
     }
 
     await expect(mockHandler(mockEvent)).rejects.toThrow('Upload failed')

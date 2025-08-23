@@ -5,6 +5,7 @@ Ce guide explique comment utiliser le nouveau système d'upload d'images central
 ## Vue d'ensemble
 
 Le système d'upload d'images comprend :
+
 - **Composable `useImageUpload`** : Logique métier et gestion d'état
 - **Composant `ImageUpload`** : Interface utilisateur réutilisable
 - **Types TypeScript** : Définitions de types pour la sécurité de type
@@ -13,12 +14,14 @@ Le système d'upload d'images comprend :
 ## Fonctionnalités
 
 ### ✅ Sécurité
+
 - Validation des types MIME (protection contre exécutables, scripts, SVG/XSS)
 - Validation des tailles de fichier (protection DoS)
 - Nettoyage des noms de fichiers (protection path traversal)
 - Validation des extensions de fichiers
 
 ### ✅ UX/UI
+
 - Drag & drop
 - Prévisualisation d'images
 - Barre de progression
@@ -26,6 +29,7 @@ Le système d'upload d'images comprend :
 - Interface responsive
 
 ### ✅ Développeur
+
 - TypeScript complet
 - Composable réutilisable
 - Configuration flexible
@@ -40,16 +44,16 @@ Le système d'upload d'images comprend :
 import { useImageUpload } from '~/composables/useImageUpload'
 
 // Configuration basique
-const { 
-  uploading, 
-  progress, 
-  selectedFile, 
-  previewUrl, 
+const {
+  uploading,
+  progress,
+  selectedFile,
+  previewUrl,
   error,
   selectFile,
   uploadFile,
   deleteImage,
-  reset 
+  reset,
 } = useImageUpload()
 
 // Configuration personnalisée
@@ -57,10 +61,10 @@ const customUpload = useImageUpload({
   validation: {
     maxSize: 2 * 1024 * 1024, // 2MB au lieu de 5MB
     allowedTypes: ['image/png'], // PNG seulement
-    allowedExtensions: ['.png']
+    allowedExtensions: ['.png'],
   },
   showToast: false, // Désactiver les notifications
-  resetAfterUpload: true // Réinitialiser après upload
+  resetAfterUpload: true, // Réinitialiser après upload
 })
 ```
 
@@ -74,8 +78,8 @@ const customUpload = useImageUpload({
     :options="{
       validation: {
         maxSize: 5 * 1024 * 1024, // 5MB
-        allowedTypes: ['image/jpeg', 'image/png', 'image/webp']
-      }
+        allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
+      },
     }"
     alt="Logo de la convention"
     placeholder="Sélectionnez le logo de votre convention"
@@ -108,6 +112,7 @@ const onError = (error) => {
 ## Types d'endpoints
 
 ### Convention
+
 ```typescript
 // Upload vers une convention existante
 { type: 'convention', id: conventionId }
@@ -117,6 +122,7 @@ const onError = (error) => {
 ```
 
 ### Édition
+
 ```typescript
 // Upload vers une édition existante
 { type: 'edition', id: editionId }
@@ -126,21 +132,28 @@ const onError = (error) => {
 ```
 
 ### Objets trouvés
+
 ```typescript
 // Upload pour les objets trouvés (ID d'édition requis)
 { type: 'lost-found', id: editionId }
 ```
 
 ### Profil utilisateur
+
 ```typescript
 // Upload de photo de profil
-{ type: 'profile' }
+{
+  type: 'profile'
+}
 ```
 
 ### Générique
+
 ```typescript
 // Upload générique vers /api/upload/image
-{ type: 'generic' }
+{
+  type: 'generic'
+}
 ```
 
 ## Configuration avancée
@@ -151,13 +164,13 @@ const onError = (error) => {
 const customValidation = {
   maxSize: 10 * 1024 * 1024, // 10MB
   allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
-  allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp']
+  allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
 }
 
 const upload = useImageUpload({
   validation: customValidation,
   showToast: false, // Gérer les notifications manuellement
-  resetAfterUpload: false // Garder le fichier sélectionné
+  resetAfterUpload: false, // Garder le fichier sélectionné
 })
 ```
 
@@ -165,20 +178,20 @@ const upload = useImageUpload({
 
 ```typescript
 const upload = useImageUpload({
-  showToast: false // Désactiver les toasts automatiques
+  showToast: false, // Désactiver les toasts automatiques
 })
 
 // Gérer les erreurs manuellement
 watch(upload.error, (error) => {
   if (error) {
     // Logique personnalisée d'erreur
-    console.error('Erreur d\'upload:', error)
-    
+    console.error("Erreur d'upload:", error)
+
     // Afficher une notification personnalisée
     toast.add({
-      title: 'Erreur d\'upload',
+      title: "Erreur d'upload",
       description: error,
-      color: 'red'
+      color: 'red',
     })
   }
 })
@@ -190,15 +203,8 @@ watch(upload.error, (error) => {
 
 ```vue
 <template>
-  <input 
-    ref="fileInput"
-    type="file"
-    accept="image/jpeg,image/png"
-    @change="handleFileSelect"
-  />
-  <button @click="$refs.fileInput?.click()">
-    Choisir un fichier
-  </button>
+  <input ref="fileInput" type="file" accept="image/jpeg,image/png" @change="handleFileSelect" />
+  <button @click="$refs.fileInput?.click()">Choisir un fichier</button>
   <div v-if="uploading">Upload en cours...</div>
 </template>
 
@@ -209,27 +215,27 @@ const selectedFile = ref(null)
 const handleFileSelect = async (event) => {
   const file = event.target.files?.[0]
   if (!file) return
-  
+
   // Validation manuelle
   if (file.size > 5 * 1024 * 1024) {
     alert('Fichier trop volumineux')
     return
   }
-  
+
   // Upload manuel
   uploading.value = true
   try {
     const formData = new FormData()
     formData.append('image', file)
-    
+
     const result = await $fetch('/api/upload/image', {
       method: 'POST',
       body: formData,
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     })
-    
+
     emit('update:modelValue', result.imageUrl)
   } catch (error) {
     console.error('Erreur:', error)
@@ -275,7 +281,7 @@ import { useImageUpload } from '~/composables/useImageUpload'
 test('validation de fichier', () => {
   const upload = useImageUpload()
   const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' })
-  
+
   const result = upload.validateFile(file)
   expect(result.valid).toBe(true)
 })
@@ -285,11 +291,7 @@ test('validation de fichier', () => {
 
 ```vue
 <template>
-  <ImageUpload
-    v-model="url"
-    :endpoint="{ type: 'generic' }"
-    data-testid="image-upload"
-  />
+  <ImageUpload v-model="url" :endpoint="{ type: 'generic' }" data-testid="image-upload" />
 </template>
 ```
 
@@ -298,11 +300,13 @@ test('validation de fichier', () => {
 ### `useImageUpload(options?)`
 
 #### Paramètres
+
 - `options.validation` - Configuration de validation
 - `options.showToast` - Afficher les notifications (défaut: true)
 - `options.resetAfterUpload` - Réinitialiser après upload (défaut: true)
 
 #### Retour
+
 - `uploading` - État d'upload (readonly)
 - `progress` - Progression 0-100 (readonly)
 - `selectedFile` - Fichier sélectionné (readonly)
@@ -336,7 +340,7 @@ test('validation de fichier', () => {
 Le système inclut plusieurs protections de sécurité :
 
 1. **Validation des types MIME** - Prévient l'upload de fichiers exécutables
-2. **Validation des extensions** - Double vérification de sécurité  
+2. **Validation des extensions** - Double vérification de sécurité
 3. **Limites de taille** - Protection contre les attaques DoS
 4. **Nettoyage des noms** - Protection contre path traversal
 5. **Rejection SVG** - Prévention des attaques XSS via SVG

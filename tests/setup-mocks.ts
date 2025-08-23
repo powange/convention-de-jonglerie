@@ -4,21 +4,21 @@ import { vi } from 'vitest'
 vi.mock('#app', () => ({
   useRuntimeConfig: vi.fn(() => ({
     public: {},
-    emailEnabled: 'false'
+    emailEnabled: 'false',
   })),
   navigateTo: vi.fn(),
   useRouter: vi.fn(() => ({
     push: vi.fn(),
-    replace: vi.fn()
+    replace: vi.fn(),
   })),
   useRoute: vi.fn(() => ({
     params: {},
-    query: {}
+    query: {},
   })),
   defineNuxtPlugin: vi.fn((plugin) => plugin),
   useNuxtApp: vi.fn(() => ({
     $pinia: {},
-    vueApp: {}
+    vueApp: {},
   })),
   useAsyncData: vi.fn(),
   useFetch: vi.fn(),
@@ -26,7 +26,7 @@ vi.mock('#app', () => ({
   useCookie: vi.fn(),
   useRequestHeaders: vi.fn(() => ({})),
   useHead: vi.fn(),
-  useSeoMeta: vi.fn()
+  useSeoMeta: vi.fn(),
 }))
 
 // Mock de #imports pour les tests unitaires
@@ -42,7 +42,7 @@ vi.mock('#imports', () => ({
     emailEnabled: 'false',
     smtpUser: '',
     smtpPass: '',
-    public: {}
+    public: {},
   })),
   readBody: vi.fn(),
   getRequestURL: vi.fn((event) => new URL(event.request?.url || 'http://localhost:3000')),
@@ -50,14 +50,14 @@ vi.mock('#imports', () => ({
     return event.context?.params?.[param] || undefined
   }),
   setHeader: vi.fn(),
-  sendStream: vi.fn()
+  sendStream: vi.fn(),
 }))
 
 // Mock global de Prisma centralisé
 vi.mock('../server/utils/prisma', async () => {
   const { prismaMock } = await import('./__mocks__/prisma')
   return {
-    prisma: prismaMock
+    prisma: prismaMock,
   }
 })
 
@@ -69,7 +69,7 @@ global.useRuntimeConfig = vi.fn(() => ({
   emailEnabled: 'false',
   smtpUser: '',
   smtpPass: '',
-  public: {}
+  public: {},
 }))
 
 // Mock de readBody
@@ -92,7 +92,7 @@ global.getRouterParam = vi.fn((event, param) => {
   return event.context?.params?.[param] || undefined
 })
 
-// Mock de getRouterParams  
+// Mock de getRouterParams
 global.getRouterParams = vi.fn((event) => {
   return event.context?.params || {}
 })
@@ -120,7 +120,7 @@ global.getHeader = vi.fn()
 // Mock de setHeader
 global.setHeader = vi.fn()
 
-// Mock de sendStream  
+// Mock de sendStream
 global.sendStream = vi.fn()
 
 // Mock de sendError
@@ -136,7 +136,7 @@ global.sendRedirect = vi.fn()
 vi.mock('../server/utils/rate-limiter', () => ({
   authRateLimiter: vi.fn().mockResolvedValue(undefined),
   registerRateLimiter: vi.fn().mockResolvedValue(undefined),
-  resetPasswordRateLimiter: vi.fn().mockResolvedValue(undefined)
+  resetPasswordRateLimiter: vi.fn().mockResolvedValue(undefined),
 }))
 
 export {}

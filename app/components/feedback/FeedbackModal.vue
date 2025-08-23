@@ -1,5 +1,5 @@
 <template>
-  <UModal 
+  <UModal
     v-model:open="open"
     :title="t('feedback.title')"
     :description="t('feedback.description')"
@@ -7,10 +7,14 @@
   >
     <template #content>
       <UCard v-if="!submitted" class="shadow-xl border-0">
-        <div class="p-4 sm:p-6 max-h-[80vh] sm:max-h-[80vh] overflow-y-auto pb-8 scroll-smooth overscroll-contain">
+        <div
+          class="p-4 sm:p-6 max-h-[80vh] sm:max-h-[80vh] overflow-y-auto pb-8 scroll-smooth overscroll-contain"
+        >
           <!-- En-tête avec icône -->
           <div class="text-center mb-6">
-            <div class="mx-auto w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center mb-3 shadow-lg">
+            <div
+              class="mx-auto w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center mb-3 shadow-lg"
+            >
               <UIcon name="i-heroicons-chat-bubble-left-right" class="text-white" size="24" />
             </div>
           </div>
@@ -57,14 +61,17 @@
             </div>
 
             <!-- Section pour utilisateurs non connectés -->
-            <div v-if="!user" class="space-y-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div
+              v-if="!user"
+              class="space-y-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700"
+            >
               <div class="flex items-center gap-2 mb-3">
                 <UIcon name="i-heroicons-user-circle" class="text-gray-500" size="20" />
                 <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {{ t('feedback.guest.info') }}
                 </p>
               </div>
-              
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <UFormField :label="t('feedback.name.label')" name="name" required>
                   <UInput
@@ -77,7 +84,10 @@
                   />
                 </UFormField>
 
-                <UFormField :label="t('feedback.email.label') + ' (' + t('common.optional') + ')'" name="email">
+                <UFormField
+                  :label="t('feedback.email.label') + ' (' + t('common.optional') + ')'"
+                  name="email"
+                >
                   <UInput
                     v-model="form.email"
                     type="email"
@@ -90,9 +100,14 @@
 
               <!-- reCAPTCHA v3: attribution requise -->
               <div class="text-[11px] leading-snug text-gray-500 dark:text-gray-400">
-                {{ $t('feedback.recaptcha.protected_by') }} <a
-                  href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer"
-                  class="underline hover:text-gray-700 dark:hover:text-gray-300">{{ $t('feedback.recaptcha.privacy_policy') }}</a>
+                {{ $t('feedback.recaptcha.protected_by') }}
+                <a
+                  href="https://policies.google.com/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="underline hover:text-gray-700 dark:hover:text-gray-300"
+                  >{{ $t('feedback.recaptcha.privacy_policy') }}</a
+                >
                 {{ $t('feedback.recaptcha.and') }}
                 <a
                   href="https://policies.google.com/terms"
@@ -119,17 +134,17 @@
 
             <!-- Boutons d'action -->
             <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4">
-              <UButton 
-                color="gray" 
-                variant="outline" 
+              <UButton
+                color="gray"
+                variant="outline"
                 class="order-2 sm:order-1"
                 icon="i-heroicons-x-mark"
                 @click="closeModal"
               >
                 {{ t('common.cancel') }}
               </UButton>
-              <UButton 
-                type="submit" 
+              <UButton
+                type="submit"
                 :loading="loading"
                 size="lg"
                 class="order-1 sm:order-2"
@@ -146,23 +161,24 @@
       <UCard v-else class="shadow-xl border-0">
         <div class="p-8 text-center">
           <!-- Animation de succès -->
-          <div class="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mb-6 shadow-lg">
-            <UIcon name="i-heroicons-check-circle" class="text-green-600 dark:text-green-400" size="32" />
+          <div
+            class="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mb-6 shadow-lg"
+          >
+            <UIcon
+              name="i-heroicons-check-circle"
+              class="text-green-600 dark:text-green-400"
+              size="32"
+            />
           </div>
-          
+
           <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">
             {{ t('feedback.success.title') }}
           </h3>
           <p class="text-gray-600 dark:text-gray-400 mb-8 max-w-sm mx-auto">
             {{ t('feedback.success.message') }}
           </p>
-          
-          <UButton 
-            size="lg"
-            icon="i-heroicons-hand-thumb-up"
-            class="shadow-lg"
-            @click="closeModal"
-          >
+
+          <UButton size="lg" icon="i-heroicons-hand-thumb-up" class="shadow-lg" @click="closeModal">
             {{ t('common.close') }}
           </UButton>
         </div>
@@ -202,20 +218,35 @@ const feedbackSchema = computed(() => {
   if (!authStore.user) {
     return z.object({
       type: z.enum(['BUG', 'SUGGESTION', 'GENERAL', 'COMPLAINT']),
-      subject: z.string().min(5, t('feedback.validation.subject.min')).max(200, t('feedback.validation.subject.max')),
-      message: z.string().min(20, t('feedback.validation.message.min')).max(5000, t('feedback.validation.message.max')),
-      name: z.string().min(2, t('feedback.validation.name.min')).max(100, t('feedback.validation.name.max')),
+      subject: z
+        .string()
+        .min(5, t('feedback.validation.subject.min'))
+        .max(200, t('feedback.validation.subject.max')),
+      message: z
+        .string()
+        .min(20, t('feedback.validation.message.min'))
+        .max(5000, t('feedback.validation.message.max')),
+      name: z
+        .string()
+        .min(2, t('feedback.validation.name.min'))
+        .max(100, t('feedback.validation.name.max')),
       email: z.string().email(t('feedback.validation.email.invalid')).optional().or(z.literal('')),
-      url: z.string().optional()
+      url: z.string().optional(),
     })
   }
-  
+
   // Pour les utilisateurs connectés
   return z.object({
     type: z.enum(['BUG', 'SUGGESTION', 'GENERAL', 'COMPLAINT']),
-    subject: z.string().min(5, t('feedback.validation.subject.min')).max(200, t('feedback.validation.subject.max')),
-    message: z.string().min(20, t('feedback.validation.message.min')).max(5000, t('feedback.validation.message.max')),
-    url: z.string().optional()
+    subject: z
+      .string()
+      .min(5, t('feedback.validation.subject.min'))
+      .max(200, t('feedback.validation.subject.max')),
+    message: z
+      .string()
+      .min(20, t('feedback.validation.message.min'))
+      .max(5000, t('feedback.validation.message.max')),
+    url: z.string().optional(),
   })
 })
 
@@ -227,7 +258,7 @@ const form = reactive({
   name: '',
   email: '',
   url: '',
-  captchaToken: ''
+  captchaToken: '',
 })
 
 // Computed pour l'utilisateur (pour simplifier dans le template)
@@ -238,14 +269,14 @@ const feedbackTypes = [
   { value: 'BUG', label: 'feedback.types.bug' },
   { value: 'SUGGESTION', label: 'feedback.types.suggestion' },
   { value: 'GENERAL', label: 'feedback.types.general' },
-  { value: 'COMPLAINT', label: 'feedback.types.complaint' }
+  { value: 'COMPLAINT', label: 'feedback.types.complaint' },
 ]
 
 // Options de feedback traduites
-const feedbackOptions = computed(() => 
-  feedbackTypes.map(type => ({
+const feedbackOptions = computed(() =>
+  feedbackTypes.map((type) => ({
     value: type.value,
-    label: t(type.label)
+    label: t(type.label),
   }))
 )
 
@@ -263,17 +294,19 @@ watch(open, (isOpen) => {
   if (isOpen) {
     // Mettre à jour l'URL
     form.url = window.location.href
-    
+
     // Charger le script reCAPTCHA v3 pour les utilisateurs non connectés
     if (!authStore.user) {
       nextTick(() => {
         ensureRecaptchaScript()
       })
     }
-    
+
     // Focus sur le premier champ après l'ouverture
     nextTick(() => {
-      const firstInput = document.querySelector('.feedback-modal-content input, .feedback-modal-content select') as HTMLElement
+      const firstInput = document.querySelector(
+        '.feedback-modal-content input, .feedback-modal-content select'
+      ) as HTMLElement
       if (firstInput) {
         firstInput.focus()
       }
@@ -315,13 +348,13 @@ async function submitFeedback() {
   loading.value = true
 
   try {
-  // Validation des champs requis pour les utilisateurs non connectés
+    // Validation des champs requis pour les utilisateurs non connectés
     if (!authStore.user) {
       if (!form.name) {
         toast.add({
           title: t('feedback.error.name_required'),
           description: t('feedback.error.name_required_desc'),
-          color: 'red'
+          color: 'red',
         })
         loading.value = false
         return
@@ -338,9 +371,7 @@ async function submitFeedback() {
         }
         const token: string = await new Promise((resolve, reject) => {
           window.grecaptcha.ready(() => {
-            window.grecaptcha.execute(siteKey, { action: 'feedback' })
-              .then(resolve)
-              .catch(reject)
+            window.grecaptcha.execute(siteKey, { action: 'feedback' }).then(resolve).catch(reject)
           })
         })
         if (!token) {
@@ -367,21 +398,20 @@ async function submitFeedback() {
         name: authStore.user ? undefined : form.name,
         email: authStore.user ? undefined : form.email,
         url: form.url,
-        captchaToken: form.captchaToken
-      }
+        captchaToken: form.captchaToken,
+      },
     })
 
     submitted.value = true
-    
+
     toast.add({
       title: t('feedback.success.title'),
       description: t('feedback.success.toast'),
-      color: 'green'
+      color: 'green',
     })
-
   } catch (error: unknown) {
-    console.error('Erreur lors de l\'envoi du feedback:', error)
-    
+    console.error("Erreur lors de l'envoi du feedback:", error)
+
     let errorMessage = t('feedback.error.submit')
     if (error.data?.statusMessage) {
       errorMessage = error.data.statusMessage
@@ -390,11 +420,10 @@ async function submitFeedback() {
     toast.add({
       title: t('feedback.error.title'),
       description: errorMessage,
-      color: 'red'
+      color: 'red',
     })
 
-  // Pas de reset nécessaire pour v3
-
+    // Pas de reset nécessaire pour v3
   } finally {
     loading.value = false
   }
@@ -402,7 +431,7 @@ async function submitFeedback() {
 
 function closeModal() {
   open.value = false
-  
+
   // Reset du formulaire après fermeture
   setTimeout(() => {
     submitted.value = false
@@ -413,10 +442,10 @@ function closeModal() {
       name: '',
       email: '',
       url: window.location.href,
-      captchaToken: ''
+      captchaToken: '',
     })
-    
-  // Pas de widget à reset pour v3
+
+    // Pas de widget à reset pour v3
   }, 300)
 }
 

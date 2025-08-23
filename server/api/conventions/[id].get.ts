@@ -1,18 +1,17 @@
-import { prisma } from '../../utils/prisma';
-
+import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   // Cette route est publique pour permettre la consultation des conventions
   // L'authentification et les droits d'édition sont vérifiés côté client
 
   try {
-    const conventionId = parseInt(getRouterParam(event, 'id') as string);
-    
+    const conventionId = parseInt(getRouterParam(event, 'id') as string)
+
     if (isNaN(conventionId)) {
       throw createError({
         statusCode: 400,
         message: 'ID de convention invalide',
-      });
+      })
     }
 
     // Récupérer la convention
@@ -40,23 +39,27 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-    });
+    })
 
     if (!convention) {
       throw createError({
         statusCode: 404,
         message: 'Convention introuvable',
-      });
+      })
     }
 
     // Transformer auteur (emailHash) et collaborateurs avec nouveaux droits
     const transformed = {
       ...convention,
-      author: convention.author ? {
-        ...convention.author,
-        emailHash: convention.author.email ? (await import('../../utils/email-hash')).getEmailHash(convention.author.email) : undefined,
-        email: undefined
-      } : null,
+      author: convention.author
+        ? {
+            ...convention.author,
+            emailHash: convention.author.email
+              ? (await import('../../utils/email-hash')).getEmailHash(convention.author.email)
+              : undefined,
+            email: undefined,
+          }
+        : null,
       collaborators: convention.collaborators.map((c: any) => ({
         id: c.id,
         addedAt: c.addedAt,
@@ -67,23 +70,23 @@ export default defineEventHandler(async (event) => {
           manageCollaborators: c.canManageCollaborators,
           addEdition: c.canAddEdition,
           editAllEditions: c.canEditAllEditions,
-          deleteAllEditions: c.canDeleteAllEditions
+          deleteAllEditions: c.canDeleteAllEditions,
         },
         user: c.user,
-      }))
-    } as any;
+      })),
+    } as any
 
-    return transformed;
+    return transformed
   } catch (error) {
     // Si c'est déjà une erreur HTTP, la relancer
     if ((error as any)?.statusCode) {
-      throw error;
+      throw error
     }
-    
-    console.error('Erreur lors de la récupération de la convention:', error);
+
+    console.error('Erreur lors de la récupération de la convention:', error)
     throw createError({
       statusCode: 500,
       message: 'Erreur serveur',
-    });
+    })
   }
-});
+})

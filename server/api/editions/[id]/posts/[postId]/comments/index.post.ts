@@ -1,6 +1,11 @@
 import { PrismaClient } from '@prisma/client'
-import { editionPostCommentSchema, validateAndSanitize, handleValidationError } from '../../../../../../../server/utils/validation-schemas'
 import { z } from 'zod'
+
+import {
+  editionPostCommentSchema,
+  validateAndSanitize,
+  handleValidationError,
+} from '../../../../../../../server/utils/validation-schemas'
 
 const prisma = new PrismaClient()
 
@@ -9,34 +14,34 @@ export default defineEventHandler(async (event) => {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié'
+      statusMessage: 'Non authentifié',
     })
   }
   const user = event.context.user
-  
+
   const editionId = parseInt(getRouterParam(event, 'id')!)
   const postId = parseInt(getRouterParam(event, 'postId')!)
-  
+
   if (isNaN(editionId) || isNaN(postId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID invalide'
+      statusMessage: 'ID invalide',
     })
   }
 
   try {
     // Vérifier que le post existe
     const post = await prisma.editionPost.findFirst({
-      where: { 
+      where: {
         id: postId,
-        editionId
-      }
+        editionId,
+      },
     })
 
     if (!post) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Post non trouvé'
+        statusMessage: 'Post non trouvé',
       })
     }
 
@@ -49,17 +54,17 @@ export default defineEventHandler(async (event) => {
       data: {
         content: validatedData.content,
         editionPostId: postId,
-        userId: user.id
+        userId: user.id,
       },
       include: {
         user: {
           select: {
             id: true,
             pseudo: true,
-            profilePicture: true
-          }
-        }
-      }
+            profilePicture: true,
+          },
+        },
+      },
     })
 
     return newComment
@@ -67,15 +72,15 @@ export default defineEventHandler(async (event) => {
     if (error instanceof z.ZodError) {
       handleValidationError(error)
     }
-    
+
     if (error.statusCode) {
       throw error
     }
-    
+
     console.error('Erreur lors de la création du commentaire:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur interne du serveur'
+      statusMessage: 'Erreur interne du serveur',
     })
   }
 })

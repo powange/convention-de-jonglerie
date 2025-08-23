@@ -1,45 +1,49 @@
-import { prisma } from '../../utils/prisma';
-import { updateProfileSchema, validateAndSanitize, handleValidationError } from '../../utils/validation-schemas';
-import { z } from 'zod';
+import { z } from 'zod'
 
+import { prisma } from '../../utils/prisma'
+import {
+  updateProfileSchema,
+  validateAndSanitize,
+  handleValidationError,
+} from '../../utils/validation-schemas'
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user;
-  
+  const user = event.context.user
+
   if (!user) {
     throw createError({
       statusCode: 401,
       statusMessage: 'Non authentifié',
-    });
+    })
   }
 
-  const body = await readBody(event);
+  const body = await readBody(event)
 
   // Validation et sanitisation des données avec Zod
-  let validatedData;
+  let validatedData
   try {
-    validatedData = validateAndSanitize(updateProfileSchema, body);
+    validatedData = validateAndSanitize(updateProfileSchema, body)
   } catch (error) {
     if (error instanceof z.ZodError) {
-      handleValidationError(error);
+      handleValidationError(error)
     }
-    throw error;
+    throw error
   }
 
-  const { email, pseudo, nom, prenom, telephone } = validatedData;
+  const { email, pseudo, nom, prenom, telephone } = validatedData
 
   try {
     // Vérifier si l'email est déjà utilisé par un autre utilisateur
     if (email !== user.email) {
       const existingUser = await prisma.user.findUnique({
         where: { email },
-      });
+      })
 
       if (existingUser && existingUser.id !== user.id) {
         throw createError({
           statusCode: 400,
           statusMessage: 'Cette adresse email est déjà utilisée',
-        });
+        })
       }
     }
 
@@ -47,13 +51,13 @@ export default defineEventHandler(async (event) => {
     if (pseudo !== user.pseudo) {
       const existingUser = await prisma.user.findUnique({
         where: { pseudo },
-      });
+      })
 
       if (existingUser && existingUser.id !== user.id) {
         throw createError({
           statusCode: 400,
           statusMessage: 'Ce pseudo est déjà utilisé',
-        });
+        })
       }
     }
 
@@ -78,19 +82,19 @@ export default defineEventHandler(async (event) => {
         createdAt: true,
         updatedAt: true,
       },
-    });
+    })
 
-    return updatedUser;
+    return updatedUser
   } catch (error) {
-    console.error('Erreur lors de la mise à jour du profil:', error);
-    
+    console.error('Erreur lors de la mise à jour du profil:', error)
+
     if (error.statusCode) {
-      throw error;
+      throw error
     }
-    
+
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur lors de la mise à jour du profil',
-    });
+    })
   }
-});
+})

@@ -6,32 +6,61 @@
         {{ $t('components.map.editions_on_map', { count: editionsWithCoordinates.length }) }}
       </UBadge>
       <p class="text-sm text-gray-500">
-        {{ editions.length - editionsWithCoordinates.length > 0 ? $t('components.map.without_coordinates', { count: editions.length - editionsWithCoordinates.length }) : '' }}
+        {{
+          editions.length - editionsWithCoordinates.length > 0
+            ? $t('components.map.without_coordinates', {
+                count: editions.length - editionsWithCoordinates.length,
+              })
+            : ''
+        }}
       </p>
     </div>
 
     <!-- Message si aucune édition avec coordonnées -->
-    <div v-if="editionsWithCoordinates.length === 0" class="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
+    <div
+      v-if="editionsWithCoordinates.length === 0"
+      class="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg"
+    >
       <UIcon name="i-heroicons-map-pin" class="mx-auto h-12 w-12 text-gray-400 mb-3" />
-      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">{{ $t('components.map.no_editions_with_location') }}</h3>
-      <p class="text-gray-600 dark:text-gray-400">{{ $t('components.map.incomplete_address_warning') }}</p>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+        {{ $t('components.map.no_editions_with_location') }}
+      </h3>
+      <p class="text-gray-600 dark:text-gray-400">
+        {{ $t('components.map.incomplete_address_warning') }}
+      </p>
     </div>
 
     <!-- Conteneur de la carte -->
     <div v-else class="relative">
-      <div ref="mapContainer" class="h-[600px] rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div
+        ref="mapContainer"
+        class="h-[600px] rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+      >
         <!-- Message de chargement -->
-        <div v-if="isLoading" class="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800">
+        <div
+          v-if="isLoading"
+          class="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800"
+        >
           <div class="text-center">
-            <UIcon name="i-heroicons-arrow-path" class="animate-spin text-primary-500 mx-auto mb-2" size="24" />
-            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $t('components.map.loading') }}</p>
+            <UIcon
+              name="i-heroicons-arrow-path"
+              class="animate-spin text-primary-500 mx-auto mb-2"
+              size="24"
+            />
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('components.map.loading') }}
+            </p>
           </div>
         </div>
       </div>
-      
+
       <!-- Légende et contrôles -->
-      <div class="absolute top-4 right-4 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-[1000] space-y-2">
-        <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">{{ $t('components.map.temporal_status') }} :</div>
+      <div
+        class="absolute top-4 right-4 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-[1000] space-y-2"
+      >
+        <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+          {{ $t('components.map.temporal_status') }} :
+        </div>
         <div class="flex items-center gap-2 text-sm">
           <div class="w-3 h-3 bg-green-500 rounded-full" />
           <span class="text-gray-700 dark:text-gray-300">{{ $t('components.map.ongoing') }}</span>
@@ -44,10 +73,15 @@
           <div class="w-3 h-3 bg-gray-500 rounded-full" />
           <span class="text-gray-700 dark:text-gray-300">{{ $t('components.map.past') }}</span>
         </div>
-        <div v-if="authStore.isAuthenticated" class="pt-2 border-t border-gray-200 dark:border-gray-600">
+        <div
+          v-if="authStore.isAuthenticated"
+          class="pt-2 border-t border-gray-200 dark:border-gray-600"
+        >
           <div class="flex items-center gap-2 text-sm">
             <div class="w-3 h-3 rounded-full border-2 border-yellow-500 bg-transparent" />
-            <span class="text-gray-700 dark:text-gray-300">{{ $t('components.map.yellow_border_favorite') }}</span>
+            <span class="text-gray-700 dark:text-gray-300">{{
+              $t('components.map.yellow_border_favorite')
+            }}</span>
           </div>
         </div>
       </div>
@@ -56,19 +90,19 @@
 </template>
 
 <script setup lang="ts">
-import type { Edition } from '~/types';
-import type { MapMarker } from '~/composables/useLeafletMap';
-import { getEditionDisplayName } from '~/utils/editionName';
-import { useAuthStore } from '~/stores/auth';
-import { createCustomMarkerIcon, getEditionStatus } from '~/utils/mapMarkers';
+import type { MapMarker } from '~/composables/useLeafletMap'
+import { useAuthStore } from '~/stores/auth'
+import type { Edition } from '~/types'
+import { getEditionDisplayName } from '~/utils/editionName'
+import { createCustomMarkerIcon, getEditionStatus } from '~/utils/mapMarkers'
 
 interface Props {
-  editions: Edition[];
+  editions: Edition[]
 }
 
-const props = defineProps<Props>();
-const authStore = useAuthStore();
-const { t } = useI18n();
+const props = defineProps<Props>()
+const authStore = useAuthStore()
+const { t } = useI18n()
 
 // Utilitaire local pour éviter une dépendance circulaire avec mapUtils
 const formatDateRangeLocal = (startDate: string, endDate: string) => {
@@ -87,36 +121,34 @@ const formatDateRangeLocal = (startDate: string, endDate: string) => {
 }
 
 // Références
-const mapContainer = ref<HTMLElement | null>(null);
+const mapContainer = ref<HTMLElement | null>(null)
 
 // Filtrer les éditions avec coordonnées
 const editionsWithCoordinates = computed(() => {
-  return props.editions.filter(edition => 
-    edition.latitude !== null && edition.longitude !== null
-  );
-});
+  return props.editions.filter((edition) => edition.latitude !== null && edition.longitude !== null)
+})
 
 // Vérifier si l'utilisateur a mis en favori cette édition
 const isFavorited = (edition: Edition): boolean => {
-  if (!authStore.user?.id) return false;
-  return edition.favoritedBy.some(user => user.id === authStore.user?.id);
-};
+  if (!authStore.user?.id) return false
+  return edition.favoritedBy.some((user) => user.id === authStore.user?.id)
+}
 
 // Préparer les marqueurs pour le composable
 const markers = computed<MapMarker[]>(() => {
-  if (!import.meta.client || !(window as any).L) return [];
-  
-  return editionsWithCoordinates.value.map(edition => {
-    const isFav = isFavorited(edition);
-    const status = getEditionStatus(edition.startDate, edition.endDate);
-    const Lany = (window as any).L as any;
-    
+  if (!import.meta.client || !(window as any).L) return []
+
+  return editionsWithCoordinates.value.map((edition) => {
+    const isFav = isFavorited(edition)
+    const status = getEditionStatus(edition.startDate, edition.endDate)
+    const Lany = (window as any).L as any
+
     // Créer l'icône personnalisée
     const icon = createCustomMarkerIcon(Lany, {
       isUpcoming: status.isUpcoming,
       isOngoing: status.isOngoing,
-      isFavorite: isFav
-    });
+      isFavorite: isFav,
+    })
 
     // Créer le contenu du popup
     const popupContent = `
@@ -136,57 +168,59 @@ const markers = computed<MapMarker[]>(() => {
           ${t('common.view_details')}
         </a>
       </div>
-    `;
+    `
 
     return {
       id: edition.id,
       position: [edition.latitude!, edition.longitude!] as [number, number],
       popupContent,
-      icon
-    };
-  });
-});
+      icon,
+    }
+  })
+})
 
 // Utiliser le composable uniquement côté client
-const mapUtils = import.meta.client ? useLeafletMap(mapContainer, {
-  center: [46.603354, 1.888334],
-  zoom: 6,
-  markers: markers.value
-}) : {
-  isLoading: ref(false),
-  formatDateRange: (_start: string, _end: string) => '',
-  // no-op stubs to align types during SSR
-  addMarkers: (_m: MapMarker[]) => {},
-  clearMarkers: () => {},
-  updateMarkers: (_m: MapMarker[]) => {},
-  fitBounds: (_b: any, _o?: any) => {},
-  setView: (_c: any, _z?: number) => {},
-};
+const mapUtils = import.meta.client
+  ? useLeafletMap(mapContainer, {
+      center: [46.603354, 1.888334],
+      zoom: 6,
+      markers: markers.value,
+    })
+  : {
+      isLoading: ref(false),
+      formatDateRange: (_start: string, _end: string) => '',
+      // no-op stubs to align types during SSR
+      addMarkers: (_m: MapMarker[]) => {},
+      clearMarkers: () => {},
+      updateMarkers: (_m: MapMarker[]) => {},
+      fitBounds: (_b: any, _o?: any) => {},
+      setView: (_c: any, _z?: number) => {},
+    }
 
-const { isLoading } = mapUtils;
+const { isLoading } = mapUtils
 
 // Watcher pour mettre à jour les marqueurs
 if (import.meta.client) {
   watch(markers, (newMarkers) => {
     if (mapUtils.updateMarkers) {
-      mapUtils.updateMarkers(newMarkers);
+      mapUtils.updateMarkers(newMarkers)
     }
-    
+
     // Ajuster la vue si nécessaire
     if (newMarkers.length > 0 && mapUtils.fitBounds && (window as any).L) {
-      const Lany = (window as any).L as any;
-      const bounds = newMarkers.map(m => m.position);
-      const leafletBounds = Lany.latLngBounds(bounds);
-      mapUtils.fitBounds(leafletBounds.pad(0.1));
+      const Lany = (window as any).L as any
+      const bounds = newMarkers.map((m) => m.position)
+      const leafletBounds = Lany.latLngBounds(bounds)
+      mapUtils.fitBounds(leafletBounds.pad(0.1))
     }
-  });
+  })
 }
 </script>
 
 <style scoped>
 /* Force la hauteur minimale de la carte sur mobile */
 @media (max-width: 640px) {
-  [ref="mapContainer"] {
+  [ref='mapContainer'] {
     min-height: 400px;
   }
 }

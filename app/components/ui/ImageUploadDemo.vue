@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-md mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
     <h3 class="text-lg font-semibold mb-4">{{ t('upload.demo_title') }}</h3>
-    
+
     <!-- Mode de sélection -->
     <div class="flex gap-2 mb-4">
       <UButton
@@ -31,10 +31,10 @@
           validation: {
             maxSize: 5 * 1024 * 1024, // 5MB
             allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
-            allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp']
+            allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
           },
           autoUpload: true,
-          resetAfterUpload: false
+          resetAfterUpload: false,
         }"
         :alt="t('upload.convention_logo_alt')"
         :placeholder="t('upload.click_select_convention_logo')"
@@ -47,23 +47,21 @@
     <!-- URL externe -->
     <div v-else>
       <UFormField :label="t('upload.logo_url_label')">
-        <UInput
-          v-model="logoUrl"
-          :placeholder="t('upload.logo_url_placeholder')"
-          type="url"
-        />
+        <UInput v-model="logoUrl" :placeholder="t('upload.logo_url_placeholder')" type="url" />
       </UFormField>
-      
+
       <!-- Aperçu de l'URL -->
       <div v-if="logoUrl" class="mt-3">
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ t('components.convention_form.logo_preview') }}</p>
-        <img 
-          :src="logoUrl" 
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+          {{ t('components.convention_form.logo_preview') }}
+        </p>
+        <img
+          :src="logoUrl"
           :alt="t('upload.logo_preview_alt')"
           class="w-full h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
           @error="logoError = true"
           @load="logoError = false"
-        >
+        />
         <UAlert
           v-if="logoError"
           color="red"
@@ -90,7 +88,12 @@
         :color="messageType"
         variant="subtle"
         :title="message"
-        :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'gray', variant: 'link', padded: false }"
+        :close-button="{
+          icon: 'i-heroicons-x-mark-20-solid',
+          color: 'gray',
+          variant: 'link',
+          padded: false,
+        }"
         @close="message = ''"
       />
     </div>

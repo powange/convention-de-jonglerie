@@ -1,30 +1,31 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import handler from '../../../../../server/api/editions/[id]/lost-found/index.post';
-import { prismaMock } from '../../../../../__mocks__/prisma';
-import { hasEditionEditPermission } from '../../../../../../server/utils/permissions';
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { prismaMock } from '../../../../../__mocks__/prisma'
+import { hasEditionEditPermission } from '../../../../../../server/utils/permissions'
+import handler from '../../../../../server/api/editions/[id]/lost-found/index.post'
+
 // S'assurer que requireUserSession est bien un mock vi.fn dans ce fichier
 vi.mock('#imports', async () => {
   const actual = await vi.importActual<any>('#imports')
   return { ...actual, requireUserSession: vi.fn(async () => ({ user: { id: 1 } })) }
 })
-import { requireUserSession } from '#imports';
+import { requireUserSession } from '#imports'
 
 // Mock des utilitaires
 vi.mock('../../../../../server/utils/permissions', () => ({
   hasEditionEditPermission: vi.fn(),
-}));
+}))
 
 const mockEvent = {
   context: {
     params: { id: '1' },
   },
-};
+}
 
 const mockUser = {
   id: 1,
   pseudo: 'testuser',
   email: 'test@example.com',
-};
+}
 
 const mockEdition = {
   id: 1,
@@ -35,7 +36,7 @@ const mockEdition = {
     id: 1,
     collaborators: [],
   },
-};
+}
 
 const mockLostFoundItem = {
   id: 1,
@@ -52,38 +53,38 @@ const mockLostFoundItem = {
     profilePicture: null,
   },
   comments: [],
-};
+}
 
-const mockHasPermission = hasEditionEditPermission as ReturnType<typeof vi.fn>;
-let mockRequireUserSession: ReturnType<typeof vi.fn>;
+const mockHasPermission = hasEditionEditPermission as ReturnType<typeof vi.fn>
+let mockRequireUserSession: ReturnType<typeof vi.fn>
 
 describe('/api/editions/[id]/lost-found POST', () => {
   beforeEach(async () => {
-    mockHasPermission.mockReset();
+    mockHasPermission.mockReset()
     const importsMod: any = await import('#imports')
     mockRequireUserSession = importsMod.requireUserSession as ReturnType<typeof vi.fn>
-    mockRequireUserSession.mockReset?.();
-    prismaMock.edition.findUnique.mockReset();
-    prismaMock.lostFoundItem.create.mockReset();
-    global.readBody = vi.fn();
-    global.getRouterParam = vi.fn().mockReturnValue('1');
-  });
+    mockRequireUserSession.mockReset?.()
+    prismaMock.edition.findUnique.mockReset()
+    prismaMock.lostFoundItem.create.mockReset()
+    global.readBody = vi.fn()
+    global.getRouterParam = vi.fn().mockReturnValue('1')
+  })
 
   it('devrait créer un objet trouvé avec succès', async () => {
     const requestBody = {
       description: 'Gants noirs trouvés près de la scène',
       imageUrl: '/uploads/lost-found/item-123.jpg',
-    };
+    }
 
-  global.readBody.mockResolvedValue(requestBody);
-  (mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } });
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    mockHasPermission.mockResolvedValue(true);
-    prismaMock.lostFoundItem.create.mockResolvedValue(mockLostFoundItem);
+    global.readBody.mockResolvedValue(requestBody)
+    ;(mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } })
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    mockHasPermission.mockResolvedValue(true)
+    prismaMock.lostFoundItem.create.mockResolvedValue(mockLostFoundItem)
 
-    const result = await handler(mockEvent as any);
+    const result = await handler(mockEvent as any)
 
-    expect(result).toEqual(mockLostFoundItem);
+    expect(result).toEqual(mockLostFoundItem)
     expect(prismaMock.lostFoundItem.create).toHaveBeenCalledWith({
       data: {
         editionId: 1,
@@ -96,25 +97,25 @@ describe('/api/editions/[id]/lost-found POST', () => {
         user: expect.any(Object),
         comments: expect.any(Object),
       }),
-    });
-  });
+    })
+  })
 
   it('devrait créer un objet trouvé sans image', async () => {
     const requestBody = {
       description: 'Clés trouvées dans les toilettes',
-    };
+    }
 
-  global.readBody.mockResolvedValue(requestBody);
-  (mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } });
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    mockHasPermission.mockResolvedValue(true);
+    global.readBody.mockResolvedValue(requestBody)
+    ;(mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } })
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.create.mockResolvedValue({
       ...mockLostFoundItem,
       description: 'Clés trouvées dans les toilettes',
       imageUrl: null,
-    });
+    })
 
-    const result = await handler(mockEvent as any);
+    const result = await handler(mockEvent as any)
 
     expect(prismaMock.lostFoundItem.create).toHaveBeenCalledWith({
       data: {
@@ -125,132 +126,134 @@ describe('/api/editions/[id]/lost-found POST', () => {
         status: 'LOST',
       },
       include: expect.any(Object),
-    });
-  });
+    })
+  })
 
-  it('devrait rejeter si ID d\'édition invalide', async () => {
-    global.getRouterParam.mockReturnValue('invalid');
+  it("devrait rejeter si ID d'édition invalide", async () => {
+    global.getRouterParam.mockReturnValue('invalid')
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('ID d\'édition invalide');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow("ID d'édition invalide")
+  })
 
   it('devrait rejeter si non authentifié (pas de session)', async () => {
-  (mockRequireUserSession as any).mockRejectedValueOnce(Object.assign(new Error('Unauthorized'), { statusCode: 401 }));
+    ;(mockRequireUserSession as any).mockRejectedValueOnce(
+      Object.assign(new Error('Unauthorized'), { statusCode: 401 })
+    )
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Unauthorized');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow('Unauthorized')
+  })
 
   it('devrait rejeter si édition non trouvée', async () => {
-  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
-    prismaMock.edition.findUnique.mockResolvedValue(null);
+    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
+    prismaMock.edition.findUnique.mockResolvedValue(null)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Édition non trouvée');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow('Édition non trouvée')
+  })
 
   it('devrait rejeter si édition pas encore terminée', async () => {
     const ongoingEdition = {
       ...mockEdition,
       endDate: new Date(Date.now() + 86400000), // Demain
-    };
+    }
 
-  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
-    prismaMock.edition.findUnique.mockResolvedValue(ongoingEdition);
+    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
+    prismaMock.edition.findUnique.mockResolvedValue(ongoingEdition)
 
     await expect(handler(mockEvent as any)).rejects.toThrow(
-      'Les objets trouvés ne peuvent être ajoutés qu\'après la fin de l\'édition'
-    );
-  });
+      "Les objets trouvés ne peuvent être ajoutés qu'après la fin de l'édition"
+    )
+  })
 
-  it('devrait rejeter si utilisateur n\'est pas collaborateur', async () => {
-  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    mockHasPermission.mockResolvedValue(false);
+  it("devrait rejeter si utilisateur n'est pas collaborateur", async () => {
+    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    mockHasPermission.mockResolvedValue(false)
 
     await expect(handler(mockEvent as any)).rejects.toThrow(
       'Vous devez être collaborateur pour ajouter un objet trouvé'
-    );
-  });
+    )
+  })
 
   it('devrait rejeter si description manquante', async () => {
     const requestBody = {
       imageUrl: '/uploads/test.jpg',
-    };
+    }
 
-  global.readBody.mockResolvedValue(requestBody);
-  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    mockHasPermission.mockResolvedValue(true);
+    global.readBody.mockResolvedValue(requestBody)
+    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    mockHasPermission.mockResolvedValue(true)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('La description est requise');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow('La description est requise')
+  })
 
   it('devrait rejeter si description vide', async () => {
     const requestBody = {
       description: '   ',
-    };
+    }
 
-  global.readBody.mockResolvedValue(requestBody);
-  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    mockHasPermission.mockResolvedValue(true);
+    global.readBody.mockResolvedValue(requestBody)
+    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    mockHasPermission.mockResolvedValue(true)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('La description est requise');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow('La description est requise')
+  })
 
-  it('devrait rejeter si description n\'est pas une string', async () => {
+  it("devrait rejeter si description n'est pas une string", async () => {
     const requestBody = {
       description: 123,
-    };
+    }
 
-    global.readBody.mockResolvedValue(requestBody);
-  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    mockHasPermission.mockResolvedValue(true);
+    global.readBody.mockResolvedValue(requestBody)
+    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    mockHasPermission.mockResolvedValue(true)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('La description est requise');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow('La description est requise')
+  })
 
   it('devrait trimmer la description', async () => {
     const requestBody = {
       description: '  Objet avec espaces  ',
-    };
+    }
 
-  global.readBody.mockResolvedValue(requestBody);
-  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    mockHasPermission.mockResolvedValue(true);
-    prismaMock.lostFoundItem.create.mockResolvedValue(mockLostFoundItem);
+    global.readBody.mockResolvedValue(requestBody)
+    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    mockHasPermission.mockResolvedValue(true)
+    prismaMock.lostFoundItem.create.mockResolvedValue(mockLostFoundItem)
 
-    await handler(mockEvent as any);
+    await handler(mockEvent as any)
 
     expect(prismaMock.lostFoundItem.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         description: 'Objet avec espaces',
       }),
       include: expect.any(Object),
-    });
-  });
+    })
+  })
 
   it('devrait gérer les erreurs de base de données', async () => {
-  global.readBody.mockResolvedValue({ description: 'Test item' });
-  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    mockHasPermission.mockResolvedValue(true);
-    prismaMock.lostFoundItem.create.mockRejectedValue(new Error('DB Error'));
+    global.readBody.mockResolvedValue({ description: 'Test item' })
+    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    mockHasPermission.mockResolvedValue(true)
+    prismaMock.lostFoundItem.create.mockRejectedValue(new Error('DB Error'))
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur interne du serveur');
-  });
+    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur interne du serveur')
+  })
 
   it('devrait relancer les erreurs HTTP', async () => {
     const httpError = {
       statusCode: 403,
       message: 'Permission denied',
-    };
+    }
 
-  (mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } });
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
-    mockHasPermission.mockRejectedValue(httpError);
+    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
+    prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+    mockHasPermission.mockRejectedValue(httpError)
 
-    await expect(handler(mockEvent as any)).rejects.toEqual(httpError);
-  });
-});
+    await expect(handler(mockEvent as any)).rejects.toEqual(httpError)
+  })
+})

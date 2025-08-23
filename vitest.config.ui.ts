@@ -14,17 +14,17 @@ export default defineConfig({
       '**/e2e/**',
       '**/integration/**',
       '**/*.nuxt.test.ts',
-      '**/*.db.test.ts'
+      '**/*.db.test.ts',
     ],
     // Configuration UI pour Docker
     ui: {
       port: 5173,
-      host: '0.0.0.0'
-    }
+      host: '0.0.0.0',
+    },
   },
   server: {
     host: '0.0.0.0',
     port: 5173,
-    strictPort: true
-  }
+    strictPort: true,
+  },
 })

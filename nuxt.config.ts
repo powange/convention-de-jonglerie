@@ -1,4 +1,4 @@
-import tsconfigPaths from 'vite-tsconfig-paths';
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -11,38 +11,32 @@ export default defineNuxtConfig({
       { from: 'nuxt-auth-utils', name: 'getUserSession' },
       { from: 'nuxt-auth-utils', name: 'requireUserSession' },
       { from: 'nuxt-auth-utils', name: 'setUserSession' },
-      { from: 'nuxt-auth-utils', name: 'clearUserSession' }
-    ]
+      { from: 'nuxt-auth-utils', name: 'clearUserSession' },
+    ],
   },
 
   modules: [
-    '@nuxt/eslint', 
-    '@nuxt/image', 
-    '@nuxt/scripts', 
+    '@nuxt/eslint',
+    '@nuxt/image',
+    '@nuxt/scripts',
     // Activer le module de test-utils sur tous les environnements non-production (incl. test)
     process.env.NODE_ENV !== 'production' ? '@nuxt/test-utils/module' : undefined,
-    '@nuxt/ui', 
-    '@pinia/nuxt', 
+    '@nuxt/ui',
+    '@pinia/nuxt',
     '@prisma/nuxt',
     'nuxt-auth-utils',
     '@nuxtjs/i18n',
-    '@vueuse/nuxt'
+    '@vueuse/nuxt',
   ].filter(Boolean),
 
   // Restreindre les collections d'icônes empaquetées côté serveur
   icon: {
-  // Utiliser le mode `remote` pour éviter d'empaqueter les collections locales volumineuses
-  // et ne récupérer que les icônes utilisées à l'exécution (taille serveur fortement réduite)
-  serverBundle: 'remote'
+    // Utiliser le mode `remote` pour éviter d'empaqueter les collections locales volumineuses
+    // et ne récupérer que les icônes utilisées à l'exécution (taille serveur fortement réduite)
+    serverBundle: 'remote',
   },
   nitro: {
-    ignore: [
-        '**/*.spec.ts',
-        '**/*.test.ts',
-        'tests/**',
-        '__tests__/**',
-        'scripts/**'
-      ]
+    ignore: ['**/*.spec.ts', '**/*.test.ts', 'tests/**', '__tests__/**', 'scripts/**'],
   },
   i18n: {
     defaultLocale: 'en',
@@ -57,12 +51,12 @@ export default defineNuxtConfig({
       { code: 'pl', name: 'Polski', file: 'pl.json' },
       { code: 'pt', name: 'Português', file: 'pt.json' },
       { code: 'ru', name: 'Русский', file: 'ru.json' },
-      { code: 'uk', name: 'Українська', file: 'uk.json' }
+      { code: 'uk', name: 'Українська', file: 'uk.json' },
     ],
-  langDir: 'locales/',
+    langDir: 'locales/',
     compilation: {
       strictMessage: false,
-      escapeHtml: false
+      escapeHtml: false,
     },
     strategy: 'no_prefix',
     detectBrowserLanguage: {
@@ -73,7 +67,7 @@ export default defineNuxtConfig({
       cookieCrossOrigin: false,
       redirectOn: 'root',
       alwaysRedirect: false,
-      fallbackLocale: 'fr'
+      fallbackLocale: 'fr',
     },
     // Optimiser les traductions pour réduire la taille des bundles
     bundle: {
@@ -81,14 +75,11 @@ export default defineNuxtConfig({
       runtimeOnly: false,
       fullInstall: false,
       // Garder le compilateur de messages même en prod pour éviter les erreurs SSR (intlify)
-      dropMessageCompiler: false
+      dropMessageCompiler: false,
     },
-    vueI18n: './i18n/i18n.config.ts'
+    vueI18n: './i18n/i18n.config.ts',
   },
-  css: [
-    '~/assets/css/main.css',
-    'flag-icons/css/flag-icons.min.css'
-  ],
+  css: ['~/assets/css/main.css', 'flag-icons/css/flag-icons.min.css'],
   runtimeConfig: {
     sessionPassword: process.env.NUXT_SESSION_PASSWORD || '',
     emailEnabled: process.env.SEND_EMAILS || 'false', // Enable/disable real email sending
@@ -98,16 +89,17 @@ export default defineNuxtConfig({
     recaptchaSecretKey: process.env.NUXT_RECAPTCHA_SECRET_KEY || '', // reCAPTCHA secret key for server-side verification
     recaptchaMinScore: Number(process.env.NUXT_RECAPTCHA_MIN_SCORE || '0.5'), // seuil configurable pour v3
     recaptchaExpectedHostname: process.env.NUXT_RECAPTCHA_EXPECTED_HOSTNAME || '', // optionnel: valider le hostname retourné par Google
-    recaptchaDevBypass: process.env.NUXT_RECAPTCHA_DEV_BYPASS === 'true' || process.env.NODE_ENV !== 'production', // bypass en dev par défaut
+    recaptchaDevBypass:
+      process.env.NUXT_RECAPTCHA_DEV_BYPASS === 'true' || process.env.NODE_ENV !== 'production', // bypass en dev par défaut
     public: {
       // Public keys that are available on both client and server
       // Supporte aussi la convention Nuxt NUXT_PUBLIC_*
-      recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '' // reCAPTCHA site key for client-side widget
-    }
+      recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '', // reCAPTCHA site key for client-side widget
+    },
   },
   vite: {
     css: {
-      devSourcemap: true
+      devSourcemap: true,
     },
     build: {
       sourcemap: process.env.NODE_ENV !== 'production', // Sourcemaps en dev et preview
@@ -115,34 +107,32 @@ export default defineNuxtConfig({
       // Optimisation des imports
       dynamicImportVarsOptions: {
         warnOnError: true,
-        exclude: [/node_modules/]
-      }
+        exclude: [/node_modules/],
+      },
     },
-    plugins: [
-      tsconfigPaths()
-    ],
+    plugins: [tsconfigPaths()],
     // Configuration Vite pour le hot reload dans Docker sur Windows
     server: {
       watch: {
         usePolling: true,
-        interval: 1000
-      }
+        interval: 1000,
+      },
     },
     resolve: {
       alias: {
         '.prisma/client/index-browser': './node_modules/.prisma/client/index-browser.js',
-      }
-    }
+      },
+    },
   },
   // Configuration du module Prisma
   prisma: {
-    installStudio: false
+    installStudio: false,
   },
   experimental: {
     appManifest: false,
     // Améliorer les performances avec la lazy hydration
     lazyHydration: true,
     // Optimiser la gestion d'erreur des chunks
-    emitRouteChunkError: 'automatic'
-  }
+    emitRouteChunkError: 'automatic',
+  },
 })

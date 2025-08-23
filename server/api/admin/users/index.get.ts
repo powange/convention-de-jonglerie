@@ -1,31 +1,32 @@
 import { PrismaClient } from '@prisma/client'
+
 import { requireUserSession } from '#imports'
 
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   try {
-  // Vérifier l'authentification via la session scellée
+    // Vérifier l'authentification via la session scellée
     const { user } = await requireUserSession(event)
     const userId = user.id
 
     if (!userId) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Token invalide'
+        statusMessage: 'Token invalide',
       })
     }
 
     // Vérifier que l'utilisateur est un super administrateur
     const currentUser = await prisma.user.findUnique({
       where: { id: userId },
-      select: { isGlobalAdmin: true }
+      select: { isGlobalAdmin: true },
     })
 
     if (!currentUser?.isGlobalAdmin) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Accès refusé - Droits super administrateur requis'
+        statusMessage: 'Accès refusé - Droits super administrateur requis',
       })
     }
 
@@ -33,33 +34,33 @@ export default defineEventHandler(async (event) => {
     const query = getQuery(event)
     const page = parseInt(query.page as string) || 1
     const limit = parseInt(query.limit as string) || 20
-    const search = query.search as string || ''
-    const sortBy = query.sortBy as string || 'createdAt'
-    const sortOrder = (query.sortOrder as string === 'asc') ? 'asc' : 'desc'
+    const search = (query.search as string) || ''
+    const sortBy = (query.sortBy as string) || 'createdAt'
+    const sortOrder = (query.sortOrder as string) === 'asc' ? 'asc' : 'desc'
 
     // Construire les conditions de recherche et de filtrage
-  const searchConditions: Record<string, unknown> = {}
-    
+    const searchConditions: Record<string, unknown> = {}
+
     // Filtrage par recherche textuelle
     if (search) {
       searchConditions.OR = [
         { email: { contains: search } },
         { pseudo: { contains: search } },
         { nom: { contains: search } },
-        { prenom: { contains: search } }
+        { prenom: { contains: search } },
       ]
     }
-    
+
     // Filtrage par statut admin
-    const adminFilter = query.adminFilter as string || 'all'
+    const adminFilter = (query.adminFilter as string) || 'all'
     if (adminFilter === 'admins') {
       searchConditions.isGlobalAdmin = true
     } else if (adminFilter === 'users') {
       searchConditions.isGlobalAdmin = false
     }
-    
+
     // Filtrage par email vérifié
-    const emailFilter = query.emailFilter as string || 'all'
+    const emailFilter = (query.emailFilter as string) || 'all'
     if (emailFilter === 'verified') {
       searchConditions.isEmailVerified = true
     } else if (emailFilter === 'unverified') {
@@ -88,20 +89,24 @@ export default defineEventHandler(async (event) => {
             select: {
               createdConventions: true,
               createdEditions: true,
-              favoriteEditions: true
-            }
-          }
+              favoriteEditions: true,
+            },
+          },
         },
-        orderBy: sortBy === 'createdAt' ? { createdAt: sortOrder } :
-                 sortBy === 'email' ? { email: sortOrder } :
-                 sortBy === 'nom' ? { nom: sortOrder } :
-                 { createdAt: sortOrder },
+        orderBy:
+          sortBy === 'createdAt'
+            ? { createdAt: sortOrder }
+            : sortBy === 'email'
+              ? { email: sortOrder }
+              : sortBy === 'nom'
+                ? { nom: sortOrder }
+                : { createdAt: sortOrder },
         skip: offset,
-        take: limit
+        take: limit,
       }),
       prisma.user.count({
-        where: searchConditions
-      })
+        where: searchConditions,
+      }),
     ])
 
     // Calculer les métadonnées de pagination
@@ -117,31 +122,30 @@ export default defineEventHandler(async (event) => {
         totalCount,
         totalPages,
         hasNextPage,
-        hasPrevPage
+        hasPrevPage,
       },
       filters: {
         search,
         sortBy,
-        sortOrder
-      }
+        sortOrder,
+      },
     }
-
   } catch (error: unknown) {
     console.error('Erreur lors de la récupération des utilisateurs:', error)
     const err = error as { message?: string; stack?: string; code?: unknown; statusCode?: number }
     console.error('Error details:', {
       message: err.message,
       stack: err.stack,
-      code: err.code
+      code: err.code,
     })
-    
+
     if (err.statusCode) {
       throw error
     }
-    
+
     throw createError({
       statusCode: 500,
-      statusMessage: `Erreur interne du serveur: ${err.message}`
+      statusMessage: `Erreur interne du serveur: ${err.message}`,
     })
   }
 })

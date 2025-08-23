@@ -5,16 +5,19 @@ Ce script permet de gérer les utilisateurs ayant le statut de super administrat
 ## Utilisation
 
 ### Lister tous les super administrateurs
+
 ```bash
 npm run admin:list
 ```
 
 ### Promouvoir un utilisateur en super administrateur
+
 ```bash
 npm run admin:add <email>
 ```
 
 ### Rétrograder un super administrateur
+
 ```bash
 npm run admin:remove <email>
 ```

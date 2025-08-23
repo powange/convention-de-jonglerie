@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { useEditionStore } from '../../app/stores/editions'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
 import { useAuthStore } from '../../app/stores/auth'
+import { useEditionStore } from '../../app/stores/editions'
 
 // Mock des fonctions Nuxt
 global.$fetch = vi.fn() as any
@@ -13,22 +14,22 @@ global.navigateTo = vi.fn()
 Object.defineProperty(global, 'import', {
   value: {
     meta: {
-      client: true
-    }
-  }
+      client: true,
+    },
+  },
 })
 
 describe('useEditionStore', () => {
   let editionStore: ReturnType<typeof useEditionStore>
   let authStore: ReturnType<typeof useAuthStore>
-  
+
   const mockUser = {
     id: 1,
     email: 'test@example.com',
     pseudo: 'testuser',
     nom: 'Test',
     prenom: 'User',
-    isGlobalAdmin: false
+    isGlobalAdmin: false,
   }
 
   const mockEdition = {
@@ -53,8 +54,8 @@ describe('useEditionStore', () => {
       id: 1,
       name: 'Test Convention',
       authorId: 1,
-      collaborators: []
-    }
+      collaborators: [],
+    },
   }
 
   const mockPaginatedResponse = {
@@ -63,18 +64,18 @@ describe('useEditionStore', () => {
       total: 1,
       page: 1,
       limit: 12,
-      totalPages: 1
-    }
+      totalPages: 1,
+    },
   }
 
   beforeEach(() => {
     setActivePinia(createPinia())
     editionStore = useEditionStore()
     authStore = useAuthStore()
-    
+
     // Reset tous les mocks
     vi.clearAllMocks()
-    
+
     // Mock des valeurs par défaut
     authStore.user = mockUser
   })
@@ -92,15 +93,15 @@ describe('useEditionStore', () => {
         total: 0,
         page: 1,
         limit: 12,
-        totalPages: 0
+        totalPages: 0,
       })
     })
   })
 
   describe('Getters', () => {
-    it('getEditionById devrait retourner l\'édition correspondante', () => {
+    it("getEditionById devrait retourner l'édition correspondante", () => {
       editionStore.editions = [mockEdition]
-      
+
       const result = editionStore.getEditionById(1)
       expect(result).toEqual(mockEdition)
     })
@@ -120,8 +121,8 @@ describe('useEditionStore', () => {
       expect($fetch).toHaveBeenCalledWith('/api/editions', {
         params: {
           page: '1',
-          limit: '12'
-        }
+          limit: '12',
+        },
       })
       expect(editionStore.editions).toEqual([mockEdition])
       expect(editionStore.pagination).toEqual(mockPaginatedResponse.pagination)
@@ -144,7 +145,7 @@ describe('useEditionStore', () => {
         showFuture: true,
         hasFoodTrucks: true,
         hasKidsZone: false,
-        acceptsPets: true
+        acceptsPets: true,
       }
 
       await editionStore.fetchEditions(filters)
@@ -161,16 +162,16 @@ describe('useEditionStore', () => {
           showCurrent: 'false',
           showFuture: 'true',
           hasFoodTrucks: 'true',
-          acceptsPets: 'true'
-        }
+          acceptsPets: 'true',
+        },
       })
     })
 
     it('devrait gérer les erreurs de récupération', async () => {
-  const mockError = {
+      const mockError = {
         message: 'Network error',
-        data: { message: 'Failed to fetch' }
-  }
+        data: { message: 'Failed to fetch' },
+      }
       vi.mocked($fetch).mockRejectedValue(mockError)
 
       await editionStore.fetchEditions()
@@ -180,9 +181,11 @@ describe('useEditionStore', () => {
       expect(editionStore.editions).toEqual([])
     })
 
-    it('devrait définir l\'état de chargement correctement', async () => {
+    it("devrait définir l'état de chargement correctement", async () => {
       let resolvePromise: (value: any) => void
-      const promise = new Promise(resolve => { resolvePromise = resolve })
+      const promise = new Promise((resolve) => {
+        resolvePromise = resolve
+      })
       vi.mocked($fetch).mockReturnValue(promise)
 
       const fetchPromise = editionStore.fetchEditions()
@@ -221,14 +224,13 @@ describe('useEditionStore', () => {
       const mockError = new Error('Edition not found')
       vi.mocked($fetch).mockRejectedValue(mockError)
 
-      await expect(editionStore.fetchEditionById(999))
-        .rejects.toThrow('Edition not found')
+      await expect(editionStore.fetchEditionById(999)).rejects.toThrow('Edition not found')
       expect(editionStore.error).toBe('Edition not found')
     })
   })
 
   describe('Action addEdition', () => {
-  const newEditionData = {
+    const newEditionData = {
       name: 'New Edition',
       startDate: '2024-07-01',
       endDate: '2024-07-03',
@@ -240,7 +242,7 @@ describe('useEditionStore', () => {
       price: 75,
       description: 'New description',
       website: 'http://new.com',
-      conventionId: 1
+      conventionId: 1,
     }
 
     it('devrait ajouter une nouvelle édition', async () => {
@@ -252,22 +254,21 @@ describe('useEditionStore', () => {
 
       expect($fetch).toHaveBeenCalledWith('/api/editions', {
         method: 'POST',
-        body: newEditionData
+        body: newEditionData,
       })
       expect(result).toEqual(newEditionCopy)
       expect(editionStore.editions.length).toBe(1)
       expect(editionStore.editions[0]).toEqual(newEditionCopy)
     })
 
-    it('devrait propager les erreurs d\'ajout', async () => {
-  const mockError = {
+    it("devrait propager les erreurs d'ajout", async () => {
+      const mockError = {
         message: 'Validation error',
-        data: { message: 'Invalid data' }
-  }
+        data: { message: 'Invalid data' },
+      }
       vi.mocked($fetch).mockRejectedValue(mockError)
 
-      await expect(editionStore.addEdition(newEditionData))
-        .rejects.toEqual(mockError)
+      await expect(editionStore.addEdition(newEditionData)).rejects.toEqual(mockError)
       expect(editionStore.error).toBe('Validation error')
     })
   })
@@ -285,13 +286,13 @@ describe('useEditionStore', () => {
 
       expect($fetch).toHaveBeenCalledWith('/api/editions/1', {
         method: 'PUT',
-        body: updatedEdition
+        body: updatedEdition,
       })
       expect(result).toEqual(updatedEdition)
       expect(editionStore.editions[0]).toEqual(updatedEdition)
     })
 
-    it('devrait gérer l\'édition non trouvée localement', async () => {
+    it("devrait gérer l'édition non trouvée localement", async () => {
       const updatedEdition = { ...mockEdition, name: 'Updated Edition' }
       vi.mocked($fetch).mockResolvedValue(updatedEdition)
 
@@ -303,14 +304,13 @@ describe('useEditionStore', () => {
     })
 
     it('devrait propager les erreurs de mise à jour', async () => {
-  const mockError = {
+      const mockError = {
         message: 'Permission denied',
-        data: { message: 'Unauthorized' }
-  }
+        data: { message: 'Unauthorized' },
+      }
       vi.mocked($fetch).mockRejectedValue(mockError)
 
-      await expect(editionStore.updateEdition(1, mockEdition))
-        .rejects.toEqual(mockError)
+      await expect(editionStore.updateEdition(1, mockEdition)).rejects.toEqual(mockError)
       expect(editionStore.error).toBe('Permission denied')
     })
   })
@@ -326,21 +326,20 @@ describe('useEditionStore', () => {
       await editionStore.deleteEdition(1)
 
       expect($fetch).toHaveBeenCalledWith('/api/editions/1', {
-        method: 'DELETE'
+        method: 'DELETE',
       })
       expect(editionStore.editions).toHaveLength(1)
       expect(editionStore.editions[0].id).toBe(2)
     })
 
     it('devrait propager les erreurs de suppression', async () => {
-  const mockError = {
+      const mockError = {
         message: 'Permission denied',
-        data: { message: 'Cannot delete' }
-  }
+        data: { message: 'Cannot delete' },
+      }
       vi.mocked($fetch).mockRejectedValue(mockError)
 
-      await expect(editionStore.deleteEdition(1))
-        .rejects.toEqual(mockError)
+      await expect(editionStore.deleteEdition(1)).rejects.toEqual(mockError)
       expect(editionStore.error).toBe('Permission denied')
       expect(editionStore.editions).toHaveLength(2) // Pas de suppression
     })
@@ -357,9 +356,9 @@ describe('useEditionStore', () => {
       await editionStore.toggleFavorite(1)
 
       expect($fetch).toHaveBeenCalledWith('/api/editions/1/favorite', {
-        method: 'POST'
+        method: 'POST',
       })
-      
+
       // Vérifier l'optimistic update
       const edition = editionStore.editions[0]
       expect(edition.favoritedBy).toHaveLength(1)
@@ -367,11 +366,13 @@ describe('useEditionStore', () => {
     })
 
     it('devrait retirer des favoris (optimistic update)', async () => {
-      editionStore.editions[0].favoritedBy = [{
-        id: mockUser.id,
-        email: mockUser.email,
-        pseudo: mockUser.pseudo
-      }]
+      editionStore.editions[0].favoritedBy = [
+        {
+          id: mockUser.id,
+          email: mockUser.email,
+          pseudo: mockUser.pseudo,
+        },
+      ]
       vi.mocked($fetch).mockResolvedValue({ success: true })
 
       await editionStore.toggleFavorite(1)
@@ -381,8 +382,8 @@ describe('useEditionStore', () => {
       expect(edition.favoritedBy).toHaveLength(0)
     })
 
-    it('devrait annuler l\'optimistic update en cas d\'erreur', async () => {
-  const mockError = { message: 'Network error' }
+    it("devrait annuler l'optimistic update en cas d'erreur", async () => {
+      const mockError = { message: 'Network error' }
       vi.mocked($fetch).mockRejectedValue(mockError)
 
       // Commencer avec favori non ajouté
@@ -397,13 +398,13 @@ describe('useEditionStore', () => {
   })
 
   describe('Actions collaborateurs', () => {
-  const mockCollaborator = {
+    const mockCollaborator = {
       id: 1,
       user: mockUser,
       role: 'MODERATOR',
       canEdit: true,
       canDelete: false,
-      conventionId: 1
+      conventionId: 1,
     }
 
     describe('getCollaborators', () => {
@@ -412,16 +413,15 @@ describe('useEditionStore', () => {
 
         const result = await editionStore.getCollaborators(1)
 
-  expect($fetch).toHaveBeenCalledWith('/api/editions/1/collaborators')
+        expect($fetch).toHaveBeenCalledWith('/api/editions/1/collaborators')
         expect(result).toEqual([mockCollaborator])
       })
 
       it('devrait propager les erreurs', async () => {
-  const mockError = { message: 'Unauthorized' }
+        const mockError = { message: 'Unauthorized' }
         vi.mocked($fetch).mockRejectedValue(mockError)
 
-        await expect(editionStore.getCollaborators(1))
-          .rejects.toEqual(mockError)
+        await expect(editionStore.getCollaborators(1)).rejects.toEqual(mockError)
         expect(editionStore.error).toBe('Unauthorized')
       })
     })
@@ -439,7 +439,7 @@ describe('useEditionStore', () => {
 
         expect($fetch).toHaveBeenCalledWith('/api/editions/1/collaborators', {
           method: 'POST',
-          body: { userEmail: 'collab@test.com', canEdit: true }
+          body: { userEmail: 'collab@test.com', canEdit: true },
         })
         expect(result).toEqual(collaboratorCopy)
         expect(editionStore.editions[0].collaborators!.length).toBe(1)
@@ -449,10 +449,12 @@ describe('useEditionStore', () => {
 
     describe('removeCollaborator', () => {
       beforeEach(() => {
-        editionStore.editions = [{ 
-          ...mockEdition, 
-          collaborators: [mockCollaborator] 
-        }]
+        editionStore.editions = [
+          {
+            ...mockEdition,
+            collaborators: [mockCollaborator],
+          },
+        ]
       })
 
       it('devrait supprimer un collaborateur', async () => {
@@ -461,7 +463,7 @@ describe('useEditionStore', () => {
         await editionStore.removeCollaborator(1, 1)
 
         expect($fetch).toHaveBeenCalledWith('/api/editions/1/collaborators/1', {
-          method: 'DELETE'
+          method: 'DELETE',
         })
         expect(editionStore.editions[0].collaborators).toHaveLength(0)
       })
@@ -469,25 +471,27 @@ describe('useEditionStore', () => {
   })
 
   describe('Méthodes de permission', () => {
-  const mockEditionWithConvention = {
+    const mockEditionWithConvention = {
       ...mockEdition,
       convention: {
         id: 1,
         name: 'Test Convention',
         authorId: 2,
-        collaborators: [{
-          id: 1,
-          user: mockUser,
-          role: 'MODERATOR',
-          canEdit: true,
-          canDelete: true,
-          conventionId: 1
-        }]
-      }
+        collaborators: [
+          {
+            id: 1,
+            user: mockUser,
+            role: 'MODERATOR',
+            canEdit: true,
+            canDelete: true,
+            conventionId: 1,
+          },
+        ],
+      },
     }
 
     describe('canEditEdition', () => {
-      it('devrait autoriser l\'admin global en mode admin', () => {
+      it("devrait autoriser l'admin global en mode admin", () => {
         authStore.user = { ...mockUser, isGlobalAdmin: true }
         authStore.adminMode = true
 
@@ -495,12 +499,12 @@ describe('useEditionStore', () => {
         expect(canEdit).toBe(true)
       })
 
-      it('devrait autoriser le créateur de l\'édition', () => {
+      it("devrait autoriser le créateur de l'édition", () => {
         const canEdit = editionStore.canEditEdition(mockEdition, 1)
         expect(canEdit).toBe(true)
       })
 
-      it('devrait autoriser l\'auteur de la convention', () => {
+      it("devrait autoriser l'auteur de la convention", () => {
         const canEdit = editionStore.canEditEdition(mockEditionWithConvention, 2)
         expect(canEdit).toBe(true)
       })
@@ -517,7 +521,7 @@ describe('useEditionStore', () => {
     })
 
     describe('canDeleteEdition', () => {
-      it('devrait autoriser l\'admin global en mode admin', () => {
+      it("devrait autoriser l'admin global en mode admin", () => {
         authStore.user = { ...mockUser, isGlobalAdmin: true }
         authStore.adminMode = true
 
@@ -525,7 +529,7 @@ describe('useEditionStore', () => {
         expect(canDelete).toBe(true)
       })
 
-      it('devrait autoriser le créateur de l\'édition', () => {
+      it("devrait autoriser le créateur de l'édition", () => {
         const canDelete = editionStore.canDeleteEdition(mockEdition, 1)
         expect(canDelete).toBe(true)
       })
@@ -543,7 +547,7 @@ describe('useEditionStore', () => {
         const edition1 = { ...mockEdition, id: 1, startDate: '2024-06-03' }
         const edition2 = { ...mockEdition, id: 2, startDate: '2024-06-01' }
         const edition3 = { ...mockEdition, id: 3, startDate: '2024-06-02' }
-        
+
         editionStore.editions = [edition1, edition2, edition3]
         editionStore.sortEditions()
 

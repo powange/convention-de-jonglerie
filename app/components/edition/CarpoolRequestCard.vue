@@ -4,18 +4,19 @@
       <!-- En-tête avec les infos utilisateur -->
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-3 flex-1">
-          <UserAvatar
-            :user="request.user"
-            size="lg"
-          />
+          <UserAvatar :user="request.user" size="lg" />
           <div>
             <p class="font-semibold">{{ request.user.pseudo }}</p>
             <p class="text-sm text-gray-500">
-              {{ $t('components.carpool.requested_on', { date: new Date(request.createdAt).toLocaleDateString() }) }}
+              {{
+                $t('components.carpool.requested_on', {
+                  date: new Date(request.createdAt).toLocaleDateString(),
+                })
+              }}
             </p>
           </div>
         </div>
-        
+
         <!-- Boutons d'action pour le créateur -->
         <div v-if="canEdit" class="flex gap-1">
           <UButton
@@ -54,7 +55,10 @@
 
       <!-- Détails de la demande -->
       <div class="space-y-2">
-        <div v-if="authStore.isAuthenticated && request.phoneNumber" class="flex items-center gap-2">
+        <div
+          v-if="authStore.isAuthenticated && request.phoneNumber"
+          class="flex items-center gap-2"
+        >
           <UIcon name="i-heroicons-phone" class="text-gray-400" />
           <span class="font-medium">{{ $t('components.carpool.contact') }} :</span>
           <span>{{ request.phoneNumber }}</span>
@@ -87,100 +91,100 @@
           />
         </div>
       </div>
-
     </div>
   </UCard>
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth';
-import CarpoolCommentsModal from './CarpoolCommentsModal.vue';
-import UserAvatar from '~/components/ui/UserAvatar.vue';
+import UserAvatar from '~/components/ui/UserAvatar.vue'
+import { useAuthStore } from '~/stores/auth'
+
+import CarpoolCommentsModal from './CarpoolCommentsModal.vue'
 
 interface CarpoolRequest {
-  id: number;
-  departureDate: string;
-  departureCity: string;
-  seatsNeeded: number;
-  description?: string;
-  phoneNumber?: string;
-  createdAt: string;
+  id: number
+  departureDate: string
+  departureCity: string
+  seatsNeeded: number
+  description?: string
+  phoneNumber?: string
+  createdAt: string
   user: {
-    id: number;
-    pseudo: string;
-    email: string;
-  };
+    id: number
+    pseudo: string
+    email: string
+  }
   comments?: Array<{
-    id: number;
-    content: string;
-    createdAt: string;
+    id: number
+    content: string
+    createdAt: string
     user: {
-      id: number;
-      pseudo: string;
-      emailHash: string;
-      profilePicture?: string | null;
-      updatedAt?: string;
-    };
-  }>;
+      id: number
+      pseudo: string
+      emailHash: string
+      profilePicture?: string | null
+      updatedAt?: string
+    }
+  }>
 }
 
 interface Props {
-  request: CarpoolRequest;
+  request: CarpoolRequest
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 const emit = defineEmits<{
-  'comment-added': [];
-  'edit': [];
-  'deleted': [];
-}>();
+  'comment-added': []
+  edit: []
+  deleted: []
+}>()
 
-const authStore = useAuthStore();
-const toast = useToast();
-const { t } = useI18n();
+const authStore = useAuthStore()
+const toast = useToast()
+const { t } = useI18n()
 
 // Vérifier si l'utilisateur peut éditer cette demande
 const canEdit = computed(() => {
-  return authStore.user && authStore.user.id === props.request.user.id;
-});
+  return authStore.user && authStore.user.id === props.request.user.id
+})
 
 const formatDate = (date: string) => {
-  const { locale } = useI18n();
+  const { locale } = useI18n()
   return new Date(date).toLocaleString(locale.value, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
     hour: '2-digit',
     minute: '2-digit',
-  });
-};
+  })
+}
 
 const handleDelete = async () => {
   if (!confirm(t('components.carpool.confirm_delete_request'))) {
-    return;
+    return
   }
 
   try {
     await $fetch(`/api/carpool-requests/${props.request.id}`, {
       method: 'DELETE',
-    });
+    })
 
     toast.add({
       title: t('messages.request_deleted'),
       description: t('messages.request_deleted_successfully'),
       icon: 'i-heroicons-check-circle',
-  color: 'success'
-    });
+      color: 'success',
+    })
 
-    emit('deleted');
+    emit('deleted')
   } catch (error: unknown) {
-    const httpError = error as { data?: { message?: string }; message?: string };
+    const httpError = error as { data?: { message?: string }; message?: string }
     toast.add({
       title: t('errors.deletion_error'),
       description: httpError.data?.message || httpError.message || t('errors.generic_error'),
       icon: 'i-heroicons-x-circle',
-      color: 'error'
-    });
+      color: 'error',
+    })
   }
-};
+}
 </script>
