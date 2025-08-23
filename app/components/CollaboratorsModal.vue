@@ -111,11 +111,12 @@
             <UInputMenu
               v-model="selectedUser"
               v-model:search="searchTerm"
-              :items="userItems"
+              :items="userItems"  
               :avatar="selectedUser?.avatar"
               :placeholder="$t('components.collaborators_modal.search_user_placeholder')"
               :loading="searchLoading"
               size="lg"
+              @update:search="onSearchUpdate"
             />
             <div class="grid grid-cols-2 gap-3 text-xs">
               <label class="flex items-center gap-2">
@@ -282,6 +283,8 @@ const searchUsers = async (query: string) => {
         : undefined,
       user: u,
     }))
+  // Debug temporaire
+  console.log('[CollaboratorsModal] résultats recherche', query, userItems.value)
   } catch {
     userItems.value = []
   } finally {
@@ -293,6 +296,10 @@ let searchTimeout: NodeJS.Timeout
 function debouncedSearch(q: string) {
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => searchUsers(q), 300)
+}
+
+function onSearchUpdate(v: string) {
+  searchTerm.value = v
 }
 
 // Add collaborator
