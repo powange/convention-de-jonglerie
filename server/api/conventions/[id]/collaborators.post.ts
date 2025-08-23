@@ -1,11 +1,19 @@
-import { CollaboratorRole } from '@prisma/client';
 import { z } from 'zod';
 import { addConventionCollaborator, findUserByPseudoOrEmail } from '../../../utils/collaborator-management';
 
 const addCollaboratorSchema = z.object({
   userIdentifier: z.string().min(1, 'Pseudo ou email requis').optional(),
   userId: z.number().positive().optional(),
-  role: z.nativeEnum(CollaboratorRole).default(CollaboratorRole.MODERATOR)
+  // Droits optionnels (sinon valeurs par défaut côté service)
+  rights: z.object({
+    editConvention: z.boolean().optional(),
+    deleteConvention: z.boolean().optional(),
+    manageCollaborators: z.boolean().optional(),
+    addEdition: z.boolean().optional(),
+    editAllEditions: z.boolean().optional(),
+    deleteAllEditions: z.boolean().optional(),
+  }).partial().optional(),
+  title: z.string().max(100).optional().nullable()
 }).refine(data => data.userIdentifier || data.userId, {
   message: 'userIdentifier ou userId est requis'
 });
@@ -16,7 +24,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     
     // Valider les données
-    const { userIdentifier, userId, role } = addCollaboratorSchema.parse(body);
+  const { userIdentifier, userId, rights, title } = addCollaboratorSchema.parse(body);
     
     // Vérifier l'authentification (le middleware s'en charge déjà)
     if (!event.context.user) {
@@ -69,12 +77,13 @@ export default defineEventHandler(async (event) => {
     }
 
     // Ajouter le collaborateur (la fonction gère les permissions et les vérifications)
-    const collaborator = await addConventionCollaborator(
+    const collaborator = await addConventionCollaborator({
       conventionId,
-      userToAdd.id,
-      role,
-      event.context.user.id
-    );
+      userId: userToAdd.id,
+      addedById: event.context.user.id,
+      rights,
+      title: title ?? undefined
+    });
 
     return {
       success: true,

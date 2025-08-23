@@ -189,7 +189,9 @@
     "back": "Terug",
     "private": "Privé",
     "or": "Of",
-    "create": "Aanmaken"
+    "create": "Aanmaken",
+    "refresh": "Vernieuwen",
+    "save": "Opslaan"
   },
   "dates": {
     "same_day_with_time": "Op {date} van {startTime} tot {endTime}",
@@ -304,8 +306,6 @@
     "ticketing": "Ticketverkoop",
     "services_offered": "Aangeboden diensten",
     "no_services": "Geen specifieke diensten verstrekt",
-    "administrator": "Beheerder",
-    "moderator": "Moderator",
     "loading_details": "Editiedetails laden...",
     "not_found": "Editie niet gevonden.",
     "add_lost_item": "Verloren voorwerp toevoegen",
@@ -336,9 +336,7 @@
     "practical_info": "Praktische informatie",
     "organizing_team": "Organisatieteam",
     "creator": "Maker",
-    "admin": "Beheerder",
     "edition_creator": "Editiemaker",
-    "collaborator": "Medewerker",
     "of_convention": "van de conventie",
     "enlarged_image": "Vergroot beeld",
     "poster_of": "Poster van {name}"
@@ -354,8 +352,6 @@
     "no_description": "Geen beschrijving",
     "collaborators": "Medewerkers",
     "manage": "Beheren",
-    "admin": "Beheerder",
-    "moderator": "Mod",
     "editions": "Edities",
     "add_edition": "Editie toevoegen",
     "no_editions": "Geen edities voor deze conventie",
@@ -387,7 +383,6 @@
     "departure_placeholder": "Vertrekplaats of adres",
     "to": "Naar",
     "arrival_placeholder": "Aankomstplaats of adres",
-    "departure_date": "Vertrekdatum en -tijd",
     "select_date_time": "Selecteer datum en tijd",
     "details": "Details",
     "details_placeholder": "Nuttige info over de rit (bagage, ontmoetingspunt, etc.)",
@@ -507,14 +502,6 @@
     "collaborator_added_successfully": "De medewerker is succesvol toegevoegd",
     "collaborator_removed": "Medewerker verwijderd",
     "collaborator_removed_successfully": "De medewerker is succesvol verwijderd",
-    "offer_updated": "Aanbieding bijgewerkt",
-    "carpool_proposed": "Meerijden voorgesteld",
-    "offer_updated_successfully": "Je aanbieding is succesvol bijgewerkt",
-    "carpool_offer_published": "Je meerijdaanbieding is gepubliceerd",
-    "request_updated": "Verzoek bijgewerkt",
-    "request_published": "Verzoek gepubliceerd",
-    "request_updated_successfully": "Je verzoek is succesvol bijgewerkt",
-    "carpool_request_published": "Je meerijdverzoek is gepubliceerd",
     "comment_published": "Opmerking gepubliceerd",
     "comment_published_successfully": "Je opmerking is succesvol gepubliceerd",
     "comment_deleted": "Opmerking verwijderd",
@@ -535,23 +522,13 @@
       "select_convention": "Selecteer een conventie",
       "edition_name_example": "Editienaam (bijv.: EJC 2024)",
       "address_complement": "Gebouw A, Functiezaal...",
-      "select_date": "Selecteer een datum",
-      "departure_details": "bijv.: Station Lyon, Plein van de Republiek, Tol A6...",
       "search_by_name": "Zoeken op naam",
-      "carpool_offer_details": "bijv.: Ik vertrek vanaf Porte d'Orléans, mogelijkheid om op te pikken op A6. Niet-roken voertuig. Ruimte voor jongleermateriaal.",
-      "carpool_request_details": "bijv.: Ik ben flexibel met het schema, kan vrijdagavond of zaterdagochtend vertrekken. Ik reis licht met alleen een rugzak.",
-      "departure_city": "bijv.: Amsterdam, Rotterdam, Utrecht...",
-      "phone_example": "bijv.: +31 6 12 34 56 78",
       "city_example": "Amsterdam"
     },
     "labels": {
       "full_address": "Volledig Adres",
       "from_date": "Van",
       "select_date": "Selecteer een datum",
-      "departure_city": "Vertrekstad",
-      "departure_location": "Waar vertrek je vandaan?",
-      "phone_number": "Je telefoonnummer",
-      "additional_info": "Aanvullende informatie",
       "edition_name_optional": "Editienaam (optioneel)",
       "address_complement": "Adresaanvulling",
       "convention_name": "Conventienaam",
@@ -559,7 +536,6 @@
     },
     "buttons": {
       "cancel": "Annuleren",
-      "updating": "Bijwerken...",
       "publishing": "Publiceren...",
       "submitting": "Submitting..."
     }
@@ -567,20 +543,16 @@
   "components": {
     "collaborators_modal": {
       "title": "Medewerkers beheren",
-      "in_development": "In ontwikkeling: Deze functie wordt momenteel verbeterd.",
-      "moderator_description": "• Moderator: Kan conventie-edities beheren",
-      "admin_description": "• Beheerder: Kan de conventie, edities beheren, medewerkers toevoegen/verwijderen",
       "confirm_remove": "Weet je zeker dat je deze medewerker wilt verwijderen?",
       "permissions": "Rechten",
       "allow_modification": "Wijziging toestaan",
-      "about_collaborators": "Over medewerkers",
-      "about_collaborators_desc": "Medewerkers kunnen je helpen je conventies te beheren. Je kunt ze verschillende rollen toewijzen:",
       "current_collaborators": "Huidige medewerkers",
       "add_collaborator": "Medewerker toevoegen",
       "search_user_placeholder": "Zoek een gebruiker...",
-      "admin": "Beheerder",
       "moderator": "Moderator",
-      "administrator": "Administrator"
+      "administrator": "Administrator",
+      "refresh": "Vernieuwen",
+      "no_collaborators": "Nog geen medewerkers"
     },
     "country_select": {
       "no_countries_found": "Geen landen gevonden",
@@ -709,6 +681,19 @@
       "upcoming": "Aankomend",
       "past": "Afgelopen",
       "yellow_border_favorite": "Gele rand = Favoriet"
+    },
+    "collaborators_rights_panel": {
+      "title": "Medewerkersrechten (bèta)",
+      "no_collaborators": "Geen medewerkers",
+      "title_placeholder": "Titel of rol (optioneel)",
+      "saved": "Rechten bijgewerkt",
+      "per_edition": "Rechten per editie",
+      "no_editions": "Geen edities",
+      "history_title": "Wijzigingsgeschiedenis",
+      "refresh_history": "Vernieuwen",
+      "load_history": "Geschiedenis laden",
+      "no_history": "Geen wijzigingen geregistreerd",
+      "by_user": "Door {user}"
     }
   },
   "services": {
@@ -942,11 +927,9 @@
     "address_required": "Adres is vereist",
     "generic_error": "Er is een fout opgetreden",
     "removal_error": "Verwijderfout",
-    "leaflet_unavailable": "Leaflet niet beschikbaar",
     "publish_edition_failed": "Publiceren van editie mislukt",
     "status_update_failed": "Status bijwerken mislukt",
     "cannot_load_editions": "Kan edities niet laden",
-    "leaflet_loading_error": "Leaflet laadfout",
     "addition_error": "Toevoegfout",
     "content_required": "Inhoud is vereist",
     "content_too_long": "Inhoud mag niet meer dan {max} tekens bevatten",
@@ -961,10 +944,6 @@
     "seats_minimum_one": "Aantal plaatsen moet minimaal 1 zijn",
     "seats_maximum": "Maximaal {max} plaatsen",
     "people_maximum": "Maximaal {max} personen",
-    "cannot_update_offer": "Kan aanbieding niet bijwerken",
-    "cannot_create_carpool_offer": "Kan meerijdaanbieding niet maken",
-    "cannot_update_request": "Kan verzoek niet bijwerken",
-    "cannot_create_carpool_request": "Kan meerijdverzoek niet maken",
     "loading_error": "Laadfout",
     "cannot_publish_comment": "Kan opmerking niet publiceren",
     "cannot_delete_comment": "Kan opmerking niet verwijderen",
@@ -981,5 +960,37 @@
     "convention_update_error": "Er is een fout opgetreden bij het bijwerken van de conventie",
     "update_error": "Bijwerkfout",
     "generic": "Er is een fout opgetreden"
+  },
+  "permissions": {
+    "editConvention": "Conventie bewerken",
+    "deleteConvention": "Conventie verwijderen",
+    "manageCollaborators": "Medewerkers beheren",
+    "addEdition": "Edities toevoegen",
+    "editAllEditions": "Alle edities bewerken",
+    "deleteAllEditions": "Alle edities verwijderen",
+    "admin": "Beheerder",
+    "manager": "Manager",
+    "editor": "Redacteur",
+    "viewer": "Kijker",
+    "moderator": "Moderator",
+    "history": {
+      "RIGHTS_UPDATED": "Rechten bijgewerkt",
+      "PER_EDITIONS_UPDATED": "Rechten per editie bijgewerkt",
+      "ARCHIVED": "Gearchiveerd",
+      "UNARCHIVED": "Hersteld"
+    }
+  },
+  "c": {
+    "user": {
+      "pseudo": "Gebruikersnaam"
+    },
+    "rights": "Rechten",
+    "title": "Titel"
+  },
+  "p": {
+    "key": "Sleutel"
+  },
+  "ed": {
+    "id": "ID"
   }
 }

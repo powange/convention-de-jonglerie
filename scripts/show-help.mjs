@@ -52,7 +52,9 @@ const sections = [
     color: colors.magenta,
     scripts: [
       { name: 'geocode', desc: 'Ajoute les coordonnées GPS aux conventions' },
-      { name: 'db:clean-tokens', desc: 'Supprime les tokens expirés de la base' }
+  { name: 'db:clean-tokens', desc: 'Supprime les tokens expirés de la base' },
+  { name: 'migrate:collaborators:dry', desc: 'Simulation migration rôles -> droits collaborateurs' },
+  { name: 'migrate:collaborators', desc: 'Applique migration (confirmation requise, --yes pour bypass)' }
     ]
   },
   {

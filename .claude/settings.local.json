@@ -46,7 +46,8 @@
       "Bash(./scripts/fix-remaining-invalid-aliases.sh:*)",
       "Bash(./scripts/fix-remaining-utils-imports.sh:*)",
       "Bash(echo:*)",
-      "Bash(/home/pcomble/projets/convention-de-jonglerie/scripts/add-color-mode-translations.sh)"
+      "Bash(/home/pcomble/projets/convention-de-jonglerie/scripts/add-color-mode-translations.sh)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

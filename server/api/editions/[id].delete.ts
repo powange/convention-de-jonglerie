@@ -30,8 +30,9 @@ export default defineEventHandler(async (event) => {
               where: {
                 userId: event.context.user.id,
                 OR: [
-                  { role: 'MODERATOR' },
-                  { role: 'ADMINISTRATOR' }
+                  { canDeleteAllEditions: true },
+                  { canDeleteConvention: true },
+                  { canEditAllEditions: true }
                 ]
               }
             }
@@ -50,7 +51,7 @@ export default defineEventHandler(async (event) => {
     // Vérifier les permissions : créateur de l'édition, auteur de la convention, collaborateur, ou admin global
     const isCreator = edition.creatorId === event.context.user.id;
     const isConventionAuthor = edition.convention.authorId === event.context.user.id;
-    const isCollaborator = edition.convention.collaborators.length > 0;
+  const isCollaborator = edition.convention.collaborators.length > 0; // déjà filtré sur droits suffisants
     const isGlobalAdmin = event.context.user.isGlobalAdmin || false;
 
     if (!isCreator && !isConventionAuthor && !isCollaborator && !isGlobalAdmin) {

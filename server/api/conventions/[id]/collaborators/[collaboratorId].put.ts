@@ -1,9 +1,16 @@
-import { CollaboratorRole } from '@prisma/client';
 import { z } from 'zod';
-import { updateCollaboratorRole } from '../../../../utils/collaborator-management';
+import { updateCollaboratorRights } from '../../../../utils/collaborator-management';
 
-const updateRoleSchema = z.object({
-  role: z.nativeEnum(CollaboratorRole)
+const updateRightsSchema = z.object({
+  rights: z.object({
+    editConvention: z.boolean().optional(),
+    deleteConvention: z.boolean().optional(),
+    manageCollaborators: z.boolean().optional(),
+    addEdition: z.boolean().optional(),
+    editAllEditions: z.boolean().optional(),
+    deleteAllEditions: z.boolean().optional(),
+  }).partial().optional(),
+  title: z.string().max(100).optional().nullable()
 });
 
 export default defineEventHandler(async (event) => {
@@ -13,7 +20,15 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     
     // Valider les données
-    const { role } = updateRoleSchema.parse(body);
+    const { rights, title } = updateRightsSchema.parse(body);
+    
+    // Empêcher une mise à jour vide (aucun champ fourni)
+    if (!rights && (title === undefined || title === null)) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Aucune donnée à mettre à jour'
+      });
+    }
     
     // Vérifier l'authentification (le middleware s'en charge déjà)
     if (!event.context.user) {
@@ -24,12 +39,13 @@ export default defineEventHandler(async (event) => {
     }
 
     // Mettre à jour le rôle (la fonction gère les permissions)
-    const updatedCollaborator = await updateCollaboratorRole(
+    const updatedCollaborator = await updateCollaboratorRights({
       conventionId,
       collaboratorId,
-      role,
-      event.context.user.id
-    );
+      userId: event.context.user.id,
+      rights,
+      title: title ?? undefined
+    });
 
     return {
       success: true,

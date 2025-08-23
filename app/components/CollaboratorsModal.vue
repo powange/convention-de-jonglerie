@@ -1,117 +1,55 @@
 <template>
   <UModal v-model:open="isOpen" :title="$t('components.collaborators_modal.title')" close-icon="i-heroicons-x-mark-20-solid">
     <template #body>
-      <div class="space-y-6">
-        <!-- Notice de développement -->
-        <div class="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
-          <UIcon name="i-heroicons-wrench-screwdriver" class="text-amber-600 dark:text-amber-400 flex-shrink-0" size="18" />
-          <p class="text-sm text-amber-800 dark:text-amber-200">
-            {{ $t('components.collaborators_modal.in_development') }}
-          </p>
-        </div>
-
-        <!-- Texte explicatif -->
-        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-          <div class="flex items-start gap-3">
-            <UIcon name="i-heroicons-information-circle" class="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" size="20" />
-            <div class="space-y-2">
-              <h4 class="text-sm font-medium text-blue-900 dark:text-blue-100">
-                {{ $t('components.collaborators_modal.about_collaborators') }}
-              </h4>
-              <p class="text-sm text-blue-800 dark:text-blue-200">
-                {{ $t('components.collaborators_modal.about_collaborators_desc') }}
-              </p>
-              <ul class="text-sm text-blue-800 dark:text-blue-200 space-y-1 ml-4">
-                <li>{{ $t('components.collaborators_modal.moderator_description') }}</li>
-                <li>{{ $t('components.collaborators_modal.admin_description') }}</li>
-              </ul>
-            </div>
+      <div class="space-y-8">
+        <!-- Section expérimentale gestion des droits granulaires -->
+  <details v-if="props.convention" class="border border-amber-300/60 dark:border-amber-600/40 rounded p-3 bg-amber-50/60 dark:bg-amber-900/20">
+          <summary class="cursor-pointer text-sm font-medium text-amber-800 dark:text-amber-200 flex items-center gap-2">
+            <UIcon name="i-heroicons-beaker" /> {{ $t('components.collaborators_rights_panel.title') }}
+          </summary>
+          <div class="mt-3">
+            <CollaboratorsRightsPanel :convention-id="props.convention?.id || null" />
           </div>
-        </div>
-        <!-- Liste des collaborateurs existants -->
-        <div v-if="convention?.collaborators && convention.collaborators.length > 0">
-          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
-            {{ $t('components.collaborators_modal.current_collaborators') }}
-          </h4>
-          <div class="space-y-2">
-            <div 
-              v-for="collaborator in convention.collaborators" 
-              :key="collaborator.id"
-              class="flex items-center justify-between p-2 border border-gray-200 dark:border-gray-700 rounded-lg"
-            >
-              <div class="flex items-center gap-3">
-                <UserAvatar 
-                  :user="collaborator.user" 
-                  size="md"
-                />
-                <div>
-                  <p class="text-sm font-medium">{{ collaborator.user.pseudo }}</p>
-                </div>
-                <UBadge 
-                  :color="collaborator.role === 'ADMINISTRATOR' ? 'warning' : 'info'"
-                  variant="subtle"
-                  size="sm"
-                >
-                  {{ collaborator.role === 'ADMINISTRATOR' ? $t('components.collaborators_modal.admin') : $t('components.collaborators_modal.moderator') }}
-                </UBadge>
-              </div>
-              <UButton
-                v-if="collaborator.user.id !== currentUserId"
-                icon="i-heroicons-trash"
-                size="xs"
-                color="error"
-                variant="ghost"
-                @click="handleRemoveCollaborator(collaborator.id)"
-              />
-            </div>
-          </div>
-        </div>
+        </details>
 
-        <!-- Formulaire d'ajout -->
+        <!-- Liste des collaborateurs -->
         <div>
-          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
-            {{ $t('components.collaborators_modal.add_collaborator') }}
-          </h4>
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ $t('components.collaborators_modal.current_collaborators') }} ({{ collaborators.length }})</h4>
+            <UButton size="xs" variant="outline" icon="i-heroicons-arrow-path" :loading="collaboratorsLoading" @click="fetchCollaborators">{{ $t('components.collaborators_modal.refresh') }}</UButton>
+          </div>
+          <div v-if="collaboratorsLoading" class="text-center py-6 text-sm text-gray-500">{{ $t('common.loading') }}</div>
+          <div v-else-if="!collaborators.length" class="text-sm text-gray-500 italic">{{ $t('components.collaborators_modal.no_collaborators') }}</div>
+          <ul v-else class="space-y-2">
+            <li v-for="c in collaborators" :key="c.id" class="flex items-center justify-between gap-3 border border-gray-200 dark:border-gray-700 rounded p-3 bg-white/60 dark:bg-gray-900/40">
+              <div class="flex items-center gap-3 min-w-0">
+                <UserAvatar :user="c.user" size="md" />
+                <div class="min-w-0">
+                  <p class="text-sm font-medium flex items-center gap-2">
+                    <span class="truncate max-w-[160px]" :title="c.user.pseudo">{{ c.user.pseudo }}</span>
+                    <UBadge v-if="c.rights" :color="c.rights.manageCollaborators ? 'warning' : (c.rights.editConvention ? 'info' : 'neutral')" size="xs" variant="subtle">
+                      {{ c.rights.manageCollaborators ? $t('permissions.admin') : (c.rights.editConvention ? $t('permissions.moderator') : $t('permissions.viewer')) }}
+                    </UBadge>
+                  </p>
+                  <p v-if="c.title" class="text-[11px] text-gray-500 dark:text-gray-400 truncate max-w-[180px]">{{ c.title }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <UButton v-if="c.user.id !== currentUserId" size="xs" color="error" variant="ghost" icon="i-heroicons-trash" :aria-label="$t('common.delete')" @click="handleRemoveCollaborator(c.id)" />
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Ajout -->
+        <div class="pt-2 border-t border-gray-100 dark:border-gray-800">
+          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">{{ $t('components.collaborators_modal.add_collaborator') }}</h4>
           <div class="space-y-3">
             <UButtonGroup>
-              <UInputMenu
-                v-model="selectedUser"
-                v-model:search-term="searchTerm"
-                :items="userItems"
-                :avatar="selectedUser?.avatar"
-                :placeholder="$t('components.collaborators_modal.search_user_placeholder')"
-                :loading="searchLoading"
-                size="lg"
-              >
-                <template #option="{ option }">
-                  <div class="flex items-center gap-3 w-full">
-                    <UserAvatar 
-                      :user="option.user" 
-                      size="md"
-                    />
-                    <div class="flex-1 text-left">
-                      <p class="text-sm font-medium">{{ option.label }}</p>
-                    </div>
-                  </div>
-                </template>
-              </UInputMenu>
-            
+              <UInputMenu v-model="(selectedUser as any)" v-model:search="searchTerm" :items="userItems" :avatar="selectedUser?.avatar" :placeholder="$t('components.collaborators_modal.search_user_placeholder')" :loading="searchLoading" size="lg" />
               <div class="flex gap-2">
-                <USelect 
-                  v-model="newCollaboratorRole" 
-                  value-key="id"  
-                  :items="collaboratorRoles" 
-                  :disabled="loading"
-                  class="flex-1"
-                />
-                <UButton 
-                  :disabled="!selectedUser || loading"
-                  :loading="loading"
-                  icon="i-heroicons-plus"
-                  :label="t('common.add')" 
-                  color="primary"
-                  @click="handleAddCollaborator"
-                />
+                <USelect v-model="newCollaboratorRole" value-key="id" :items="collaboratorRoles" :disabled="loading" class="flex-1" />
+                <UButton :disabled="!selectedUser || loading" :loading="loading" icon="i-heroicons-plus" :label="t('common.add')" color="primary" @click="handleAddCollaborator" />
               </div>
             </UButtonGroup>
           </div>
@@ -126,205 +64,110 @@ import type { Convention } from '~/types';
 import type { InputMenuItem } from '@nuxt/ui';
 import UserAvatar from '~/components/ui/UserAvatar.vue';
 
-interface Props {
-  modelValue: boolean;
-  convention: Convention | null;
-  currentUserId?: number;
-}
-
-
-interface UserItem extends InputMenuItem {
-  value: number;
-  label: string;
-  avatar?: {
-    src: string;
-    alt: string;
-  };
-  user: {
-    id: number;
-    pseudo: string;
-    profilePicture?: string;
-    emailHash?: string;
-  };
-}
+interface Props { modelValue: boolean; convention: Convention | null; currentUserId?: number }
+type UserItem = InputMenuItem & { value: number; label: string; avatar?: { src: string; alt: string }; user: { id: number; pseudo: string; profilePicture?: string; emailHash?: string } }
+interface CollaboratorItem { id: number; user: { id: number; pseudo: string }; title?: string | null; rights?: Record<string, boolean> }
 
 const props = defineProps<Props>();
-const emit = defineEmits<
-  ((e: 'update:modelValue', value: boolean) => void) |
-  ((e: 'collaborator-added' | 'collaborator-removed') => void)
->();
+const emit = defineEmits<{ (e:'update:modelValue', value:boolean):void; (e:'collaborator-added' | 'collaborator-removed'):void }>();
 
 const { normalizeImageUrl } = useImageUrl();
-// const authStore = useAuthStore();
 const toast = useToast();
 const { t } = useI18n();
 
-// État local
-const selectedUser = ref<UserItem | null>(null);
+const selectedUser = ref<UserItem | undefined>(undefined);
 const searchTerm = ref('');
+// Champ legacy (sélection d'un rôle) supprimé: on gardera bientôt un formulaire de droits granulaires direct.
 const newCollaboratorRole = ref<'MODERATOR' | 'ADMINISTRATOR'>('MODERATOR');
 const loading = ref(false);
 const searchLoading = ref(false);
 const userItems = ref<UserItem[]>([]);
+const collaborators = ref<CollaboratorItem[]>([]);
+const collaboratorsLoading = ref(false);
 
-// Rôles des collaborateurs
+// Modal open state
+const isOpen = computed<boolean>({ get: () => props.modelValue, set: v => emit('update:modelValue', v) });
+
+// Roles list
 const collaboratorRoles = computed(() => [
-  {
-    label: t('components.collaborators_modal.moderator'),
-    id: 'MODERATOR'
-  },
-  {
-    label: t('components.collaborators_modal.administrator'),
-    id: 'ADMINISTRATOR'
-  }
+  { label: t('components.collaborators_modal.moderator'), id: 'MODERATOR' },
+  { label: t('components.collaborators_modal.administrator'), id: 'ADMINISTRATOR' }
 ]);
 
-// Computed pour gérer l'état de la modal
-const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value: boolean) => emit('update:modelValue', value)
-});
+async function fetchCollaborators() {
+  if (!props.convention) return;
+  collaboratorsLoading.value = true;
+  try {
+    const data = await $fetch<CollaboratorItem[]>(`/api/conventions/${props.convention.id}/collaborators`);
+    collaborators.value = data;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    collaboratorsLoading.value = false;
+  }
+}
 
-// Réinitialiser le formulaire quand la modal s'ouvre
-watch(() => props.modelValue, (newValue) => {
-  if (newValue) {
-    selectedUser.value = null;
+// Open watcher
+watch(() => props.modelValue, async (open) => {
+  if (open) {
+    await fetchCollaborators();
+    // Reset add form
+  selectedUser.value = undefined;
     searchTerm.value = '';
     newCollaboratorRole.value = 'MODERATOR';
     userItems.value = [];
   }
 });
 
-// Watcher pour déclencher la recherche quand searchTerm change
-watch(searchTerm, (newValue) => {
-  console.log('searchTerm changed:', newValue);
-  debouncedSearch(newValue);
-});
+// User search
+watch(searchTerm, (q) => { debouncedSearch(q); });
 
-// Fonction pour rechercher des utilisateurs
 const searchUsers = async (query: string) => {
-  console.log('Recherche d\'utilisateurs avec query:', query);
-  
-  if (!query || query.length < 2) {
-    userItems.value = [];
-    return;
-  }
-
+  if (!query || query.length < 2) { userItems.value = []; return; }
   try {
     searchLoading.value = true;
-    const users = await $fetch<Array<{
-      id: number;
-      pseudo: string;
-      profilePicture?: string;
-      emailHash?: string;
-    }>>(`/api/users/search`, {
-      query: { q: query }
-    });
-
-    console.log('Résultats de recherche:', users);
-
-    userItems.value = users.map(user => ({
-      value: user.id,
-      label: user.pseudo,
-      avatar: user.profilePicture ? {
-        src: normalizeImageUrl(user.profilePicture),
-        alt: user.pseudo
-      } : undefined,
-      user: user
+    const users = await $fetch<Array<{ id:number; pseudo:string; profilePicture?:string; emailHash?:string }>>('/api/users/search', { query: { q: query } });
+    userItems.value = users.map(u => ({
+      value: u.id,
+      label: u.pseudo,
+      avatar: u.profilePicture ? { src: normalizeImageUrl(u.profilePicture) || '', alt: u.pseudo } : undefined,
+      user: u
     }));
-    
-    console.log('Items formatés:', userItems.value);
-  } catch (error) {
-    console.error('Erreur lors de la recherche:', error);
+  } catch {
     userItems.value = [];
-  } finally {
-    searchLoading.value = false;
-  }
+  } finally { searchLoading.value = false; }
 };
 
-// Debounce la recherche
 let searchTimeout: NodeJS.Timeout;
-const debouncedSearch = (query: string) => {
-  console.log('debouncedSearch appelé avec:', query);
-  clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => {
-    searchUsers(query);
-  }, 300);
-};
+function debouncedSearch(q: string) { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => searchUsers(q), 300); }
 
-// Ajouter un collaborateur
-const handleAddCollaborator = async () => {
+// Add collaborator
+async function handleAddCollaborator() {
   if (!props.convention || !selectedUser.value) return;
-
   try {
     loading.value = true;
-    
-    await $fetch(`/api/conventions/${props.convention.id}/collaborators`, {
-      method: 'POST',
-      body: {
-        userId: selectedUser.value.value,
-        role: newCollaboratorRole.value,
-      },
-    });
-
-    toast.add({
-      title: t('messages.collaborator_added'),
-      description: t('messages.collaborator_added_successfully'),
-      icon: 'i-heroicons-check-circle',
-  color: 'success'
-    });
-
-    // Réinitialiser le formulaire
-    selectedUser.value = null;
-    searchTerm.value = '';
-    newCollaboratorRole.value = 'MODERATOR';
-    userItems.value = [];
-    
-    // Émettre l'événement pour recharger les données
+    await $fetch(`/api/conventions/${props.convention.id}/collaborators`, { method: 'POST', body: { userId: selectedUser.value.value, role: newCollaboratorRole.value } });
+    toast.add({ title: t('messages.collaborator_added'), description: t('messages.collaborator_added_successfully'), icon: 'i-heroicons-check-circle', color: 'success' });
     emit('collaborator-added');
-    
-  } catch (error: unknown) {
-    const httpError = error as { data?: { message?: string }; message?: string };
-      toast.add({
-      title: t('errors.addition_error'),
-      description: httpError.data?.message || httpError.message || t('errors.generic_error'),
-      icon: 'i-heroicons-x-circle',
-        color: 'error'
-    });
-  } finally {
-    loading.value = false;
-  }
-};
+    await fetchCollaborators();
+    // reset form
+  selectedUser.value = undefined; searchTerm.value = ''; newCollaboratorRole.value = 'MODERATOR'; userItems.value = [];
+  } catch (error:any) {
+    toast.add({ title: t('errors.addition_error'), description: error?.data?.message || error?.message || t('errors.generic_error'), icon: 'i-heroicons-x-circle', color: 'error' });
+  } finally { loading.value = false; }
+}
 
-// Supprimer un collaborateur
-const handleRemoveCollaborator = async (collaboratorId: number) => {
+// Remove collaborator
+async function handleRemoveCollaborator(collaboratorId: number) {
   if (!props.convention) return;
-
-  if (confirm(t('components.collaborators_modal.confirm_remove'))) {
-    try {
-      await $fetch(`/api/conventions/${props.convention.id}/collaborators/${collaboratorId}`, {
-        method: 'DELETE',
-      });
-
-      toast.add({
-        title: t('messages.collaborator_removed'),
-        description: t('messages.collaborator_removed_successfully'),
-        icon: 'i-heroicons-check-circle',
-    color: 'success'
-      });
-
-      // Émettre l'événement pour recharger les données
-      emit('collaborator-removed');
-      
-    } catch (error: unknown) {
-      const httpError = error as { data?: { message?: string }; message?: string };
-      toast.add({
-        title: t('errors.removal_error'),
-        description: httpError.data?.message || httpError.message || t('errors.generic_error'),
-        icon: 'i-heroicons-x-circle',
-        color: 'error'
-      });
-    }
+  if (!confirm(t('components.collaborators_modal.confirm_remove'))) return;
+  try {
+    await $fetch(`/api/conventions/${props.convention.id}/collaborators/${collaboratorId}`, { method: 'DELETE' });
+    toast.add({ title: t('messages.collaborator_removed'), description: t('messages.collaborator_removed_successfully'), icon: 'i-heroicons-check-circle', color: 'success' });
+    emit('collaborator-removed');
+    await fetchCollaborators();
+  } catch (error:any) {
+    toast.add({ title: t('errors.removal_error'), description: error?.data?.message || error?.message || t('errors.generic_error'), icon: 'i-heroicons-x-circle', color: 'error' });
   }
-};
+}
 </script>

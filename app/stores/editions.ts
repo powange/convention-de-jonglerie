@@ -381,10 +381,18 @@ export const useEditionStore = defineStore('editions', {
         return true;
       }
       
-      // Les collaborateurs (MODERATOR ou ADMINISTRATOR) peuvent modifier
-      return edition.convention.collaborators.some(
-        collab => collab.user.id === userId && (collab.role === 'MODERATOR' || collab.role === 'ADMINISTRATOR')
-      ) || false;
+      // Collaborateur avec droits explicites
+      return edition.convention.collaborators.some(collab => {
+        if (collab.user.id !== userId) return false;
+        // Droit global d'éditer la convention implique édition des éditions
+        if (collab.rights?.editConvention || collab.rights?.editAllEditions) return true;
+        // Droit spécifique sur cette édition (perEditionRights)
+        if (collab.perEditionRights) {
+          const per = collab.perEditionRights.find(r => r.editionId === edition.id);
+            if (per?.canEdit) return true;
+        }
+        return false;
+      });
     },
 
     // Vérifier si l'utilisateur peut supprimer une édition
@@ -411,10 +419,16 @@ export const useEditionStore = defineStore('editions', {
         return true;
       }
       
-      // Les collaborateurs (MODERATOR ou ADMINISTRATOR) peuvent supprimer
-      return edition.convention.collaborators.some(
-        collab => collab.user.id === userId && (collab.role === 'MODERATOR' || collab.role === 'ADMINISTRATOR')
-      ) || false;
+      // Collaborateur avec droits explicites
+      return edition.convention.collaborators.some(collab => {
+        if (collab.user.id !== userId) return false;
+        if (collab.rights?.deleteConvention || collab.rights?.deleteAllEditions) return true;
+        if (collab.perEditionRights) {
+          const per = collab.perEditionRights.find(r => r.editionId === edition.id);
+          if (per?.canDelete) return true;
+        }
+        return false;
+      });
     },
   },
 });

@@ -110,7 +110,6 @@
       },
       "user": "Utilisateur",
       "status": "Statut",
-      "created_at": "Date de création",
       "url": "Page concernée",
       "user_agent": "Navigateur/OS",
       "success": {
@@ -120,7 +119,8 @@
       "error": {
         "load": "Erreur lors du chargement des retours",
         "resolve": "Erreur lors de la mise à jour"
-      }
+      },
+      "created_at": "Créé le"
     }
   },
   "navigation": {
@@ -189,7 +189,9 @@
     "back": "Retour",
     "private": "Privé",
     "or": "Ou",
-    "create": "Créer"
+    "create": "Créer",
+    "refresh": "Rafraîchir",
+    "save": "Enregistrer"
   },
   "dates": {
     "same_day_with_time": "Le {date} de {startTime} à {endTime}",
@@ -304,8 +306,6 @@
     "ticketing": "Billetterie",
     "services_offered": "Services proposés",
     "no_services": "Aucun service spécifique renseigné",
-    "administrator": "Administrateur",
-    "moderator": "Modérateur",
     "loading_details": "Chargement des détails de l'édition...",
     "not_found": "Édition introuvable.",
     "add_lost_item": "Ajouter un objet trouvé",
@@ -336,9 +336,7 @@
     "practical_info": "Informations pratiques",
     "organizing_team": "Équipe organisatrice",
     "creator": "Créateur",
-    "admin": "Admin",
     "edition_creator": "Créateur de l'édition",
-    "collaborator": "Collaborateur",
     "of_convention": "de la convention",
     "enlarged_image": "Image agrandie",
     "poster_of": "Affiche de {name}"
@@ -354,8 +352,6 @@
     "no_description": "Aucune description",
     "collaborators": "Collaborateurs",
     "manage": "Gérer",
-    "admin": "Admin",
-    "moderator": "Modo",
     "editions": "Éditions",
     "add_edition": "Ajouter une édition",
     "no_editions": "Aucune édition pour cette convention",
@@ -674,20 +670,29 @@
   "components": {
     "collaborators_modal": {
       "title": "Gérer les collaborateurs",
-      "in_development": "En cours de développement : Cette fonctionnalité est actuellement en cours d'amélioration.",
-      "moderator_description": "• Modérateur : Peut gérer les éditions de la convention",
-      "admin_description": "• Administrateur : Peut gérer la convention, les éditions, ajouter/supprimer des collaborateurs",
       "confirm_remove": "Êtes-vous sûr de vouloir retirer ce collaborateur ?",
       "permissions": "Permissions",
       "allow_modification": "Autoriser la modification",
-      "about_collaborators": "À propos des collaborateurs",
-      "about_collaborators_desc": "Les collaborateurs peuvent vous aider à gérer vos conventions. Vous pouvez leur attribuer différents rôles :",
       "current_collaborators": "Collaborateurs actuels",
       "add_collaborator": "Ajouter un collaborateur",
       "search_user_placeholder": "Rechercher un utilisateur...",
-      "admin": "Admin",
       "moderator": "Modérateur",
-      "administrator": "Administrateur"
+      "administrator": "Administrateur",
+      "refresh": "Rafraîchir",
+      "no_collaborators": "Aucun collaborateur pour le moment"
+    },
+    "collaborators_rights_panel": {
+      "title": "Droits des collaborateurs (bêta)",
+      "no_collaborators": "Aucun collaborateur pour le moment",
+      "title_placeholder": "Titre / fonction (optionnel)",
+      "saved": "Droits mis à jour",
+      "per_edition": "Droits par édition",
+      "no_editions": "Aucune édition",
+      "history_title": "Historique des changements",
+      "refresh_history": "Rafraîchir",
+      "load_history": "Charger l'historique",
+      "no_history": "Aucun changement enregistré",
+      "by_user": "Par {user}"
     },
     "country_select": {
       "no_countries_found": "Aucun pays trouvé",
@@ -817,6 +822,38 @@
       "past": "Passées",
       "yellow_border_favorite": "Contour jaune = Favori"
     }
+  },
+  "permissions": {
+    "editConvention": "Modifier la convention",
+    "deleteConvention": "Supprimer la convention",
+    "manageCollaborators": "Gérer les collaborateurs",
+    "addEdition": "Ajouter des éditions",
+    "editAllEditions": "Modifier toutes les éditions",
+    "deleteAllEditions": "Supprimer toutes les éditions",
+    "admin": "Administrateur",
+    "manager": "Gestion avancée",
+    "editor": "Éditeur",
+    "viewer": "Lecteur",
+    "moderator": "Modérateur",
+    "history": {
+      "RIGHTS_UPDATED": "Droits mis à jour",
+      "PER_EDITIONS_UPDATED": "Droits par édition mis à jour",
+      "ARCHIVED": "Archivé",
+      "UNARCHIVED": "Désarchivé"
+    }
+  },
+  "c": {
+    "user": {
+      "pseudo": "Pseudo"
+    },
+    "rights": "Droits",
+    "title": "Titre"
+  },
+  "p": {
+    "key": "Clé"
+  },
+  "ed": {
+    "id": "ID"
   },
   "pages": {
     "favorites": {

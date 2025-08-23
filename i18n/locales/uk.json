@@ -189,7 +189,9 @@
     "back": "Назад",
     "private": "Приватний",
     "or": "Або",
-    "create": "Створити"
+    "create": "Створити",
+    "refresh": "Оновити",
+    "save": "Зберегти"
   },
   "dates": {
     "same_day_with_time": "{date} з {startTime} до {endTime}",
@@ -304,8 +306,6 @@
     "ticketing": "Квитки",
     "services_offered": "Пропоновані послуги",
     "no_services": "Не надаються специфічні послуги",
-    "administrator": "Адміністратор",
-    "moderator": "Модератор",
     "loading_details": "Завантаження деталей видання...",
     "not_found": "Видання не знайдено.",
     "add_lost_item": "Додати загублений предмет",
@@ -336,9 +336,7 @@
     "practical_info": "Практична інформація",
     "organizing_team": "Організаційна команда",
     "creator": "Створювач",
-    "admin": "Адмін",
     "edition_creator": "Створювач видання",
-    "collaborator": "Співробітник",
     "of_convention": "конвенції",
     "enlarged_image": "Збільшене зображення",
     "poster_of": "Постер {name}"
@@ -354,8 +352,6 @@
     "no_description": "Немає опису",
     "collaborators": "Співробітники",
     "manage": "Керувати",
-    "admin": "Адмін",
-    "moderator": "Мод",
     "editions": "Видання",
     "add_edition": "Додати видання",
     "no_editions": "Немає видань для цієї конвенції",
@@ -387,7 +383,6 @@
     "departure_placeholder": "Місто або адреса відправлення",
     "to": "До",
     "arrival_placeholder": "Місто або адреса прибуття",
-    "departure_date": "Дата і час відправлення",
     "select_date_time": "Виберіть дату і час",
     "details": "Деталі",
     "details_placeholder": "Корисна інформація про поїздку (багаж, місце зустрічі тощо)",
@@ -507,14 +502,6 @@
     "collaborator_added_successfully": "Співробітника успішно додано",
     "collaborator_removed": "Співробітника видалено",
     "collaborator_removed_successfully": "Співробітника успішно видалено",
-    "offer_updated": "Пропозицію оновлено",
-    "carpool_proposed": "Сумісну поїздку запропоновано",
-    "offer_updated_successfully": "Вашу пропозицію успішно оновлено",
-    "carpool_offer_published": "Вашу пропозицію сумісної поїздки опубліковано",
-    "request_updated": "Запит оновлено",
-    "request_published": "Запит опубліковано",
-    "request_updated_successfully": "Ваш запит успішно оновлено",
-    "carpool_request_published": "Ваш запит на сумісну поїздку опубліковано",
     "comment_published": "Коментар опубліковано",
     "comment_published_successfully": "Ваш коментар успішно опубліковано",
     "comment_deleted": "Коментар видалено",
@@ -535,23 +522,13 @@
       "select_convention": "Вибрати конвенцію",
       "edition_name_example": "Назва видання (наприклад: EJC 2024)",
       "address_complement": "Будівля A, зал для заходів...",
-      "select_date": "Вибрати дату",
-      "departure_details": "наприклад: Львівський вокзал, площа Ринок, траса М06...",
       "search_by_name": "Пошук за назвою",
-      "carpool_offer_details": "наприклад: Виїжджаю з Поштової площі, можливість підбору на М06. Автомобіль для некурців. Місце для жонглерського обладнання.",
-      "carpool_request_details": "наприклад: Я гнучкий в часі, можу виїхати в п'ятницю ввечері або в суботу вранці. Подорожую легко тільки з рюкзаком.",
-      "departure_city": "наприклад: Київ, Львів, Одеса...",
-      "phone_example": "наприклад: +380 66 123 45 67",
       "city_example": "Київ"
     },
     "labels": {
       "full_address": "Повна адреса",
       "from_date": "Від",
       "select_date": "Вибрати дату",
-      "departure_city": "Місто відправлення",
-      "departure_location": "Звідки ви виїжджаєте?",
-      "phone_number": "Ваш номер телефону",
-      "additional_info": "Додаткова інформація",
       "edition_name_optional": "Назва видання (необов'язково)",
       "address_complement": "Доповнення до адреси",
       "convention_name": "Назва конвенції",
@@ -559,7 +536,6 @@
     },
     "buttons": {
       "cancel": "Скасувати",
-      "updating": "Оновлення...",
       "publishing": "Публікація...",
       "submitting": "Submitting..."
     }
@@ -567,20 +543,16 @@
   "components": {
     "collaborators_modal": {
       "title": "Керувати співробітниками",
-      "in_development": "В розробці: Ця функція в даний час покращується.",
-      "moderator_description": "• Модератор: Може керувати виданнями конвенції",
-      "admin_description": "• Адміністратор: Може керувати конвенцією, виданнями, додавати/видаляти співробітників",
       "confirm_remove": "Ви впевнені, що хочете видалити цього співробітника?",
       "permissions": "Дозволи",
       "allow_modification": "Дозволити модифікацію",
-      "about_collaborators": "Про співробітників",
-      "about_collaborators_desc": "Співробітники можуть допомогти вам керувати вашими конвенціями. Ви можете призначити їм різні ролі:",
       "current_collaborators": "Поточні співробітники",
       "add_collaborator": "Додати співробітника",
       "search_user_placeholder": "Пошук користувача...",
-      "admin": "Адмін",
       "moderator": "Модератор",
-      "administrator": "Адміністратор"
+      "administrator": "Адміністратор",
+      "refresh": "Оновити",
+      "no_collaborators": "Поки немає співавторів"
     },
     "country_select": {
       "no_countries_found": "Країни не знайдено",
@@ -709,6 +681,19 @@
       "upcoming": "Майбутні",
       "past": "Минулі",
       "yellow_border_favorite": "Жовта рамка = Улюблене"
+    },
+    "collaborators_rights_panel": {
+      "title": "Права співавторів (бета)",
+      "no_collaborators": "Немає співавторів",
+      "title_placeholder": "Назва або роль (необов'язково)",
+      "saved": "Права оновлено",
+      "per_edition": "Права за виданнями",
+      "no_editions": "Немає видань",
+      "history_title": "Історія змін",
+      "refresh_history": "Оновити",
+      "load_history": "Завантажити історію",
+      "no_history": "Немає записаних змін",
+      "by_user": "Від {user}"
     }
   },
   "services": {
@@ -908,11 +893,9 @@
     "address_required": "Адреса обов'язкова",
     "generic_error": "Сталася помилка",
     "removal_error": "Помилка видалення",
-    "leaflet_unavailable": "Leaflet недоступний",
     "publish_edition_failed": "Не вдалося опублікувати видання",
     "status_update_failed": "Не вдалося оновити статус",
     "cannot_load_editions": "Неможливо завантажити видання",
-    "leaflet_loading_error": "Помилка завантаження Leaflet",
     "addition_error": "Помилка додавання",
     "content_required": "Контент обов'язковий",
     "content_too_long": "Контент не може перевищувати {max} символів",
@@ -927,10 +910,6 @@
     "seats_minimum_one": "Кількість місць повинна бути принаймні 1",
     "seats_maximum": "Максимум {max} місць",
     "people_maximum": "Максимум {max} людей",
-    "cannot_update_offer": "Неможливо оновити пропозицію",
-    "cannot_create_carpool_offer": "Неможливо створити пропозицію сумісної поїздки",
-    "cannot_update_request": "Неможливо оновити запит",
-    "cannot_create_carpool_request": "Неможливо створити запит сумісної поїздки",
     "loading_error": "Помилка завантаження",
     "cannot_publish_comment": "Неможливо опублікувати коментар",
     "cannot_delete_comment": "Неможливо видалити коментар",
@@ -981,5 +960,37 @@
       "convention_id_required": "Потрібен ID конвенції",
       "unsupported_delete_endpoint": "Непідтримуваний endpoint видалення"
     }
+  },
+  "permissions": {
+    "editConvention": "Редагувати конвенцію",
+    "deleteConvention": "Видалити конвенцію",
+    "manageCollaborators": "Керувати співавторами",
+    "addEdition": "Додати видання",
+    "editAllEditions": "Редагувати всі видання",
+    "deleteAllEditions": "Видалити всі видання",
+    "admin": "Адміністратор",
+    "manager": "Менеджер",
+    "editor": "Редактор",
+    "viewer": "Глядач",
+    "moderator": "Модератор",
+    "history": {
+      "RIGHTS_UPDATED": "Права оновлено",
+      "PER_EDITIONS_UPDATED": "Права за виданнями оновлено",
+      "ARCHIVED": "Архівовано",
+      "UNARCHIVED": "Відновлено"
+    }
+  },
+  "c": {
+    "user": {
+      "pseudo": "Ім'я користувача"
+    },
+    "rights": "Права",
+    "title": "Назва"
+  },
+  "p": {
+    "key": "Ключ"
+  },
+  "ed": {
+    "id": "ID"
   }
 }

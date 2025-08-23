@@ -3,7 +3,7 @@ export interface User {
   id: number;
   email: string;
   pseudo: string;
-  nom: string;
+  imageUrl?: string | null;
   prenom: string;
   profilePicture?: string | null;
   isGlobalAdmin?: boolean;
@@ -26,20 +26,27 @@ export interface Edition {
   id: number;
   name?: string | null;
   description?: string;
-  imageUrl?: string;
+  imageUrl?: string | null;
   startDate: string;
   endDate: string;
   addressLine1: string;
-  addressLine2?: string;
+  addressLine2?: string | null;
   postalCode: string;
   city: string;
-  region?: string;
+  region?: string | null;
   country: string;
   latitude?: number | null;
   longitude?: number | null;
-  ticketingUrl?: string;
-  facebookUrl?: string;
-  instagramUrl?: string;
+  isOnline?: boolean;
+  creatorId: number;
+  creator?: PublicUser;
+  conventionId: number;
+  convention?: ConventionWithCollaborators;
+  favoritedBy: { id: number }[];
+  collaborators?: EditionCollaborator[];
+  ticketingUrl?: string | null;
+  facebookUrl?: string | null;
+  instagramUrl?: string | null;
   hasFoodTrucks: boolean;
   hasKidsZone: boolean;
   acceptsPets: boolean;
@@ -60,12 +67,6 @@ export interface Edition {
   hasWorkshops: boolean;
   hasCreditCardPayment: boolean;
   hasAfjTokenPayment: boolean;
-  creatorId: number;
-  creator: User;
-  conventionId: number;
-  convention?: Convention;
-  favoritedBy: { id: number }[];
-  collaborators?: ConventionCollaborator[];
 }
 
 export interface Convention {
@@ -86,6 +87,7 @@ export interface Convention {
     country: string;
     imageUrl?: string | null;
   }[];
+  collaborators?: ConventionCollaboratorWithRights[]; // ajouté pour my-conventions
 }
 
 export interface ConventionCollaborator {
@@ -97,6 +99,26 @@ export interface ConventionCollaborator {
   addedById: number;
   user: User;
   addedBy: { id: number; pseudo: string };
+}
+
+export interface ConventionCollaboratorWithRights {
+  id: number;
+  user: PublicUser;
+  rights?: Record<string, boolean>; // ex: editConvention, deleteConvention...
+  perEditionRights?: { editionId: number; canEdit?: boolean; canDelete?: boolean }[];
+  title?: string | null; // résumé (ex: Administrateur, Éditeur...)
+}
+
+export interface EditionCollaborator {
+  id: number;
+  user: PublicUser;
+  rights?: Record<string, boolean>;
+  perEditionRights?: { editionId: number; canEdit?: boolean; canDelete?: boolean }[];
+  title?: string | null;
+}
+
+export interface ConventionWithCollaborators extends Convention {
+  collaborators?: ConventionCollaboratorWithRights[];
 }
 
 // Interface pour les objets qui ont seulement des dates (pour les composables)

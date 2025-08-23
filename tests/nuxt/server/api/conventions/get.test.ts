@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { prismaMock } from '../../../../__mocks__/prisma';
+import { getEmailHash } from '../../../../../server/utils/email-hash';
 
 // Import du handler après les mocks
 import getConventionHandler from '../../../../../server/api/conventions/[id].get'
 
 describe('API Convention - Récupération', () => {
-  const mockConvention = {
+  // Données brutes renvoyées par Prisma (avant transformation dans le handler)
+  const rawConvention = {
     id: 1,
     name: 'Convention de Test',
     description: 'Une convention pour les tests',
@@ -21,7 +23,14 @@ describe('API Convention - Récupération', () => {
     collaborators: [
       {
         id: 1,
-        role: 'ADMINISTRATOR',
+        title: 'Admin',
+        addedAt: new Date('2025-01-01'),
+        canEditConvention: true,
+        canDeleteConvention: true,
+        canManageCollaborators: true,
+        canAddEdition: true,
+        canEditAllEditions: true,
+        canDeleteAllEditions: true,
         user: {
           id: 1,
           pseudo: 'creator',
@@ -31,12 +40,45 @@ describe('API Convention - Récupération', () => {
     ]
   }
 
+  // Forme attendue après transformation
+  const expectedTransformed = () => ({
+    id: rawConvention.id,
+    name: rawConvention.name,
+    description: rawConvention.description,
+    logo: rawConvention.logo,
+    authorId: rawConvention.authorId,
+    createdAt: rawConvention.createdAt,
+    updatedAt: rawConvention.updatedAt,
+    author: {
+      id: rawConvention.author.id,
+      pseudo: rawConvention.author.pseudo,
+      email: undefined,
+      emailHash: getEmailHash(rawConvention.author.email)
+    },
+    collaborators: [
+      {
+        id: rawConvention.collaborators[0].id,
+        addedAt: rawConvention.collaborators[0].addedAt,
+        title: rawConvention.collaborators[0].title,
+        rights: {
+          editConvention: true,
+          deleteConvention: true,
+          manageCollaborators: true,
+          addEdition: true,
+          editAllEditions: true,
+          deleteAllEditions: true
+        },
+        user: rawConvention.collaborators[0].user
+      }
+    ]
+  });
+
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   it('devrait récupérer une convention existante', async () => {
-    prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
+  prismaMock.convention.findUnique.mockResolvedValue(rawConvention as any)
 
     const mockEvent = {
       context: {},
@@ -48,7 +90,7 @@ describe('API Convention - Récupération', () => {
 
     const result = await getConventionHandler(mockEvent)
 
-    expect(result).toEqual(mockConvention)
+  expect(result).toEqual(expectedTransformed())
     expect(prismaMock.convention.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
       include: {
@@ -99,7 +141,7 @@ describe('API Convention - Récupération', () => {
   })
 
   it('devrait être accessible sans authentification', async () => {
-    prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
+  prismaMock.convention.findUnique.mockResolvedValue(rawConvention as any)
 
     const mockEvent = {
       context: { user: null }, // Pas d'utilisateur connecté
@@ -110,7 +152,7 @@ describe('API Convention - Récupération', () => {
 
     const result = await getConventionHandler(mockEvent)
 
-    expect(result).toEqual(mockConvention)
+  expect(result).toEqual(expectedTransformed())
   })
 
   it('devrait gérer les erreurs de base de données', async () => {

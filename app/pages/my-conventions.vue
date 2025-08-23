@@ -30,7 +30,7 @@
             <div class="flex items-center justify-between w-full">
               <div class="flex items-center gap-3">
                 <div v-if="convention.logo" class="flex-shrink-0">
-                  <img :src="normalizeImageUrl(convention.logo)" :alt="convention.name" class="w-12 h-12 object-cover rounded-lg" >
+                  <img :src="(normalizeImageUrl(convention.logo || '') || '')" :alt="convention.name" class="w-12 h-12 object-cover rounded-lg" >
                 </div>
                 <div v-else class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
                   <UIcon name="i-heroicons-building-library" class="text-gray-400" size="20" />
@@ -88,7 +88,7 @@
               <UBadge 
                 v-for="collaborator in convention.collaborators" 
                 :key="collaborator.id"
-                :color="collaborator.role === 'ADMINISTRATOR' ? 'error' : 'info'"
+                :color="rightsSummary(collaborator).color === 'warning' ? 'error' : rightsSummary(collaborator).color"
                 variant="subtle"
                 size="sm"
                 class="flex items-center gap-2"
@@ -100,7 +100,7 @@
                   />
                   <span>{{ collaborator.user.pseudo }}</span>
                   <span class="text-xs opacity-75">
-                    ({{ collaborator.role === 'ADMINISTRATOR' ? t('conventions.admin') : t('conventions.moderator') }})
+                    ({{ $t(rightsSummary(collaborator).labelKey) }})
                   </span>
                 </div>
               </UBadge>
@@ -128,7 +128,7 @@
             <div v-if="convention.editions && convention.editions.length > 0">
               <div class="overflow-x-auto">
                 <UTable 
-                  :data="convention.editions" 
+                  :data="(convention.editions as any)" 
                   :columns="getEditionsColumns()"
                   @select="onEditionAction"
                 />
@@ -158,6 +158,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
+import { summarizeRights } from '~/utils/collaboratorRights';
 import { useAuthStore } from '~/stores/auth';
 import type { Convention, HttpError, Edition } from '~/types';
 import { getEditionDisplayNameWithConvention } from '~/utils/editionName';
@@ -405,31 +406,21 @@ const deleteConvention = async (id: number) => {
   }
 };
 
-// Vérifier si l'utilisateur peut modifier une convention
+// Vérifier si l'utilisateur peut modifier / supprimer via nouveaux droits
 const canEditConvention = (convention: Convention) => {
   if (!authStore.user) return false;
-  
-  // L'auteur peut toujours modifier
   if (convention.authorId === authStore.user.id) return true;
-  
-  // Les collaborateurs ADMINISTRATOR peuvent modifier
-  return convention.collaborators?.some(
-    collab => collab.user.id === authStore.user.id && collab.role === 'ADMINISTRATOR'
-  ) || false;
+  return convention.collaborators?.some((c: any) => authStore.user && c.user.id === authStore.user.id && c.rights?.editConvention) || false;
 };
-
-// Vérifier si l'utilisateur peut supprimer une convention
 const canDeleteConvention = (convention: Convention) => {
   if (!authStore.user) return false;
-  
-  // L'auteur peut toujours supprimer
   if (convention.authorId === authStore.user.id) return true;
-  
-  // Les collaborateurs ADMINISTRATOR peuvent supprimer
-  return convention.collaborators?.some(
-    collab => collab.user.id === authStore.user.id && collab.role === 'ADMINISTRATOR'
-  ) || false;
+  return convention.collaborators?.some((c: any) => authStore.user && c.user.id === authStore.user.id && c.rights?.deleteConvention) || false;
 };
+
+function rightsSummary(collaborator: any){
+  return summarizeRights(collaborator.rights || {});
+}
 
 // Toggle edition online status
 const toggleEditionOnlineStatus = async (editionId: number, isOnline: boolean) => {

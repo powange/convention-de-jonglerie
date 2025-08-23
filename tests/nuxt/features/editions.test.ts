@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../__mocks__/prisma'
+import { prismaMock } from '../../__mocks__/prisma'
 
 // Mock des handlers d'API
-import createEditionHandler from '../../server/api/editions/index.post'
-import getEditionHandler from '../../server/api/editions/[id].get'
-import updateEditionHandler from '../../server/api/editions/[id].put'
-import deleteEditionHandler from '../../server/api/editions/[id].delete'
-import getEditionsHandler from '../../server/api/editions/index.get'
+import createEditionHandler from '../../../server/api/editions/index.post'
+import getEditionHandler from '../../../server/api/editions/[id].get'
+import updateEditionHandler from '../../../server/api/editions/[id].put'
+import deleteEditionHandler from '../../../server/api/editions/[id].delete'
+import getEditionsHandler from '../../../server/api/editions/index.get'
 
 // Mock des modules utilitaires
 vi.mock('../../../server/utils/geocoding', () => ({
@@ -99,9 +99,9 @@ describe('Système d\'éditions', () => {
       expect(result.description).toBe(editionData.description)
       expect(result.city).toBe(editionData.city)
 
-      expect(prismaMock.convention.findUnique).toHaveBeenCalledWith({
+      expect(prismaMock.convention.findUnique).toHaveBeenCalledWith(expect.objectContaining({
         where: { id: editionData.conventionId }
-      })
+      }))
 
       expect(prismaMock.edition.create).toHaveBeenCalled()
     })

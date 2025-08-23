@@ -189,7 +189,9 @@
     "back": "Indietro",
     "private": "Privato",
     "or": "Oppure",
-    "create": "Crea"
+    "create": "Crea",
+    "refresh": "Aggiorna",
+    "save": "Salva"
   },
   "dates": {
     "same_day_with_time": "Il {date} dalle {startTime} alle {endTime}",
@@ -304,8 +306,6 @@
     "ticketing": "Biglietteria",
     "services_offered": "Servizi offerti",
     "no_services": "Nessun servizio specifico indicato",
-    "administrator": "Amministratore",
-    "moderator": "Moderatore",
     "loading_details": "Caricamento dettagli edizione...",
     "not_found": "Edizione non trovata.",
     "add_lost_item": "Aggiungi oggetto smarrito",
@@ -336,9 +336,7 @@
     "practical_info": "Informazioni pratiche",
     "organizing_team": "Team organizzatore",
     "creator": "Creatore",
-    "admin": "Admin",
     "edition_creator": "Creatore dell'edizione",
-    "collaborator": "Collaboratore",
     "of_convention": "del convegno",
     "enlarged_image": "Immagine ingrandita",
     "poster_of": "Poster di {name}"
@@ -354,8 +352,6 @@
     "no_description": "Nessuna descrizione",
     "collaborators": "Collaboratori",
     "manage": "Gestisci",
-    "admin": "Admin",
-    "moderator": "Mod",
     "editions": "Edizioni",
     "add_edition": "Aggiungi edizione",
     "no_editions": "Nessuna edizione per questo convegno",
@@ -387,7 +383,6 @@
     "departure_placeholder": "Città o indirizzo di partenza",
     "to": "A",
     "arrival_placeholder": "Città o indirizzo di arrivo",
-    "departure_date": "Data e ora di partenza",
     "select_date_time": "Seleziona data e ora",
     "details": "Dettagli",
     "details_placeholder": "Informazioni utili sul viaggio (bagagli, punto d'incontro, ecc.)",
@@ -507,14 +502,6 @@
     "collaborator_added_successfully": "Il collaboratore è stato aggiunto con successo",
     "collaborator_removed": "Collaboratore rimosso",
     "collaborator_removed_successfully": "Il collaboratore è stato rimosso con successo",
-    "offer_updated": "Offerta modificata",
-    "carpool_proposed": "Condivisione auto proposta",
-    "offer_updated_successfully": "La tua offerta è stata modificata con successo",
-    "carpool_offer_published": "La tua offerta di condivisione auto è stata pubblicata",
-    "request_updated": "Richiesta modificata",
-    "request_published": "Richiesta pubblicata",
-    "request_updated_successfully": "La tua richiesta è stata modificata con successo",
-    "carpool_request_published": "La tua richiesta di condivisione auto è stata pubblicata",
     "comment_published": "Commento pubblicato",
     "comment_published_successfully": "Il tuo commento è stato pubblicato con successo",
     "comment_deleted": "Commento eliminato",
@@ -592,9 +579,7 @@
     "status_update_failed": "Impossibile aggiornare lo stato",
     "generic_error": "Si è verificato un errore",
     "removal_error": "Errore durante la rimozione",
-    "leaflet_unavailable": "Leaflet non disponibile",
     "cannot_load_editions": "Impossibile caricare le edizioni",
-    "leaflet_loading_error": "Errore caricamento Leaflet",
     "addition_error": "Errore durante l'aggiunta",
     "content_required": "Il contenuto è richiesto",
     "content_too_long": "Il contenuto non può superare {max} caratteri",
@@ -609,10 +594,6 @@
     "seats_minimum_one": "Il numero di posti deve essere almeno 1",
     "seats_maximum": "Massimo {max} posti",
     "people_maximum": "Massimo {max} persone",
-    "cannot_update_offer": "Impossibile modificare l'offerta",
-    "cannot_create_carpool_offer": "Impossibile creare l'offerta di condivisione auto",
-    "cannot_update_request": "Impossibile modificare la richiesta",
-    "cannot_create_carpool_request": "Impossibile creare la richiesta di condivisione auto",
     "loading_error": "Errore di caricamento",
     "cannot_publish_comment": "Impossibile pubblicare il commento",
     "cannot_delete_comment": "Impossibile eliminare il commento",
@@ -639,23 +620,13 @@
       "select_convention": "Seleziona un convegno",
       "edition_name_example": "Nome dell'edizione (es: EJC 2024)",
       "address_complement": "Edificio A, Sala delle feste...",
-      "select_date": "Seleziona una data",
-      "departure_details": "Es: Stazione Termini, Piazza della Repubblica, Casello A1...",
       "search_by_name": "Cerca per nome",
-      "carpool_offer_details": "Es: Parto da Porta Pia, possibilità di raccogliere sulla A1. Veicolo non fumatori. Spazio per attrezzatura da giocoleria.",
-      "carpool_request_details": "Es: Sono flessibile sull'orario, posso partire venerdì sera o sabato mattina. Viaggio leggero con solo uno zaino.",
-      "departure_city": "Es: Roma, Milano, Napoli...",
-      "phone_example": "Es: 333 123 4567",
       "city_example": "Roma"
     },
     "labels": {
       "full_address": "Indirizzo Completo",
       "from_date": "Dal",
       "select_date": "Seleziona una data",
-      "departure_city": "Città di partenza",
-      "departure_location": "Da dove parti?",
-      "phone_number": "Il tuo numero di telefono",
-      "additional_info": "Informazioni aggiuntive",
       "edition_name_optional": "Nome dell'edizione (opzionale)",
       "address_complement": "Complemento indirizzo",
       "convention_name": "Nome del convegno",
@@ -663,7 +634,6 @@
     },
     "buttons": {
       "cancel": "Annulla",
-      "updating": "Modifica...",
       "publishing": "Pubblicazione...",
       "submitting": "Submitting..."
     }
@@ -671,20 +641,16 @@
   "components": {
     "collaborators_modal": {
       "title": "Gestisci collaboratori",
-      "in_development": "In corso di sviluppo: Questa funzionalità è attualmente in corso di miglioramento.",
-      "moderator_description": "• Moderatore: Può gestire le edizioni del convegno",
-      "admin_description": "• Amministratore: Può gestire il convegno, le edizioni, aggiungere/rimuovere collaboratori",
       "confirm_remove": "Sei sicuro di voler rimuovere questo collaboratore?",
       "permissions": "Permessi",
       "allow_modification": "Consenti modifica",
-      "about_collaborators": "A proposito dei collaboratori",
-      "about_collaborators_desc": "I collaboratori possono aiutarti a gestire i tuoi convegni. Puoi assegnare loro diversi ruoli:",
       "current_collaborators": "Collaboratori attuali",
       "add_collaborator": "Aggiungi collaboratore",
       "search_user_placeholder": "Cerca un utente...",
-      "admin": "Admin",
       "moderator": "Moderatore",
-      "administrator": "Amministratore"
+      "administrator": "Amministratore",
+      "refresh": "Aggiorna",
+      "no_collaborators": "Ancora nessun collaboratore"
     },
     "country_select": {
       "no_countries_found": "Nessun paese trovato",
@@ -813,6 +779,19 @@
       "upcoming": "Future",
       "past": "Passate",
       "yellow_border_favorite": "Contorno giallo = Preferito"
+    },
+    "collaborators_rights_panel": {
+      "title": "Diritti collaboratori (beta)",
+      "no_collaborators": "Nessun collaboratore",
+      "title_placeholder": "Titolo o ruolo (opzionale)",
+      "saved": "Diritti aggiornati",
+      "per_edition": "Diritti per edizione",
+      "no_editions": "Nessuna edizione",
+      "history_title": "Cronologia modifiche",
+      "refresh_history": "Aggiorna",
+      "load_history": "Carica cronologia",
+      "no_history": "Nessuna modifica registrata",
+      "by_user": "Da {user}"
     }
   },
   "pages": {
@@ -981,5 +960,37 @@
       "terms_of_service": "Termini di servizio",
       "apply": "di Google"
     }
+  },
+  "permissions": {
+    "editConvention": "Modifica convenzione",
+    "deleteConvention": "Elimina convenzione",
+    "manageCollaborators": "Gestisci collaboratori",
+    "addEdition": "Aggiungi edizioni",
+    "editAllEditions": "Modifica tutte le edizioni",
+    "deleteAllEditions": "Elimina tutte le edizioni",
+    "admin": "Amministratore",
+    "manager": "Manager",
+    "editor": "Editore",
+    "viewer": "Visualizzatore",
+    "moderator": "Moderatore",
+    "history": {
+      "RIGHTS_UPDATED": "Diritti aggiornati",
+      "PER_EDITIONS_UPDATED": "Diritti per edizione aggiornati",
+      "ARCHIVED": "Archiviato",
+      "UNARCHIVED": "Ripristinato"
+    }
+  },
+  "c": {
+    "user": {
+      "pseudo": "Nome utente"
+    },
+    "rights": "Diritti",
+    "title": "Titolo"
+  },
+  "p": {
+    "key": "Chiave"
+  },
+  "ed": {
+    "id": "ID"
   }
 }

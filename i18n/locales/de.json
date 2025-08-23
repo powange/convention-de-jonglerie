@@ -189,7 +189,9 @@
     "back": "Zurück",
     "private": "Privat",
     "or": "Oder",
-    "create": "Erstellen"
+    "create": "Erstellen",
+    "refresh": "Aktualisieren",
+    "save": "Speichern"
   },
   "dates": {
     "same_day_with_time": "Am {date} von {startTime} bis {endTime}",
@@ -304,8 +306,6 @@
     "ticketing": "Ticketing",
     "services_offered": "Angebotene Services",
     "no_services": "Keine spezifischen Services angegeben",
-    "administrator": "Administrator",
-    "moderator": "Moderator",
     "loading_details": "Lade Details der Auflage...",
     "not_found": "Auflage nicht gefunden.",
     "add_lost_item": "Fundsache hinzufügen",
@@ -336,9 +336,7 @@
     "practical_info": "Praktische Informationen",
     "organizing_team": "Organisationsteam",
     "creator": "Ersteller",
-    "admin": "Admin",
     "edition_creator": "Ersteller der Auflage",
-    "collaborator": "Mitarbeiter",
     "of_convention": "der Convention",
     "enlarged_image": "Vergrößertes Bild",
     "poster_of": "Poster von {name}"
@@ -354,8 +352,6 @@
     "no_description": "Keine Beschreibung",
     "collaborators": "Mitarbeiter",
     "manage": "Verwalten",
-    "admin": "Admin",
-    "moderator": "Mod",
     "editions": "Auflagen",
     "add_edition": "Eine Auflage hinzufügen",
     "no_editions": "Keine Auflage für diese Convention",
@@ -387,7 +383,6 @@
     "departure_placeholder": "Abfahrtsstadt oder -adresse",
     "to": "Nach",
     "arrival_placeholder": "Ankunftsstadt oder -adresse",
-    "departure_date": "Abfahrtsdatum und -zeit",
     "select_date_time": "Datum und Uhrzeit wählen",
     "details": "Details",
     "details_placeholder": "Nützliche Infos zur Fahrt (Gepäck, Treffpunkt usw.)",
@@ -507,14 +502,6 @@
     "collaborator_added_successfully": "Der Mitarbeiter wurde erfolgreich hinzugefügt",
     "collaborator_removed": "Mitarbeiter entfernt",
     "collaborator_removed_successfully": "Der Mitarbeiter wurde erfolgreich entfernt",
-    "offer_updated": "Angebot geändert",
-    "carpool_proposed": "Fahrgemeinschaft vorgeschlagen",
-    "offer_updated_successfully": "Dein Angebot wurde erfolgreich geändert",
-    "carpool_offer_published": "Dein Fahrgemeinschafts-Angebot wurde veröffentlicht",
-    "request_updated": "Anfrage geändert",
-    "request_published": "Anfrage veröffentlicht",
-    "request_updated_successfully": "Deine Anfrage wurde erfolgreich geändert",
-    "carpool_request_published": "Deine Fahrgemeinschafts-Anfrage wurde veröffentlicht",
     "comment_published": "Kommentar veröffentlicht",
     "comment_published_successfully": "Dein Kommentar wurde erfolgreich veröffentlicht",
     "comment_deleted": "Kommentar gelöscht",
@@ -595,9 +582,7 @@
     "status_update_failed": "Fehler beim Aktualisieren des Status",
     "generic_error": "Ein Fehler ist aufgetreten",
     "removal_error": "Fehler beim Entfernen",
-    "leaflet_unavailable": "Leaflet nicht verfügbar",
     "cannot_load_editions": "Auflagen können nicht geladen werden",
-    "leaflet_loading_error": "Leaflet-Ladefehler",
     "addition_error": "Fehler beim Hinzufügen",
     "content_required": "Inhalt ist erforderlich",
     "content_too_long": "Der Inhalt darf nicht länger als {max} Zeichen sein",
@@ -612,10 +597,6 @@
     "seats_minimum_one": "Die Anzahl der Plätze muss mindestens 1 sein",
     "seats_maximum": "Maximum {max} Plätze",
     "people_maximum": "Maximum {max} Personen",
-    "cannot_update_offer": "Angebot kann nicht geändert werden",
-    "cannot_create_carpool_offer": "Fahrgemeinschafts-Angebot kann nicht erstellt werden",
-    "cannot_update_request": "Anfrage kann nicht geändert werden",
-    "cannot_create_carpool_request": "Fahrgemeinschafts-Anfrage kann nicht erstellt werden",
     "loading_error": "Ladefehler",
     "cannot_publish_comment": "Kommentar kann nicht veröffentlicht werden",
     "cannot_delete_comment": "Kommentar kann nicht gelöscht werden",
@@ -673,23 +654,13 @@
       "select_convention": "Eine Convention auswählen",
       "edition_name_example": "Name der Auflage (z.B. EJC 2024)",
       "address_complement": "Gebäude A, Festsaal...",
-      "select_date": "Datum auswählen",
-      "departure_details": "Z.B: Hauptbahnhof, Marktplatz, Autobahnraststätte A6...",
       "search_by_name": "Nach Name suchen",
-      "carpool_offer_details": "Z.B. Ich fahre vom Ostbahnhof ab, kann an der A6 abholen. Nichtrauchfahrzeug. Platz für Jonglier-Material.",
-      "carpool_request_details": "Z.B. Ich bin flexibel mit der Zeit, kann Freitagabend oder Samstagmorgen fahren. Ich reise leicht mit nur einem Rucksack.",
-      "departure_city": "Z.B: Berlin, München, Hamburg...",
-      "phone_example": "Z.B: 0162 12 34 56 78",
       "city_example": "Berlin"
     },
     "labels": {
       "full_address": "Vollständige Adresse",
       "from_date": "Ab dem",
       "select_date": "Datum auswählen",
-      "departure_city": "Abfahrtsstadt",
-      "departure_location": "Von wo fährst du ab?",
-      "phone_number": "Deine Telefonnummer",
-      "additional_info": "Zusätzliche Informationen",
       "edition_name_optional": "Name der Auflage (optional)",
       "address_complement": "Adresszusatz",
       "convention_name": "Name der Convention",
@@ -697,7 +668,6 @@
     },
     "buttons": {
       "cancel": "Abbrechen",
-      "updating": "Änderung...",
       "publishing": "Veröffentlichung...",
       "submitting": "Submitting..."
     }
@@ -705,20 +675,16 @@
   "components": {
     "collaborators_modal": {
       "title": "Mitarbeiter verwalten",
-      "in_development": "In Entwicklung: Diese Funktion wird gerade verbessert.",
-      "moderator_description": "• Moderator: Kann die Auflagen der Convention verwalten",
-      "admin_description": "• Administrator: Kann die Convention, die Auflagen verwalten, Mitarbeiter hinzufügen/entfernen",
       "confirm_remove": "Bist du sicher, dass du diesen Mitarbeiter entfernen möchtest?",
       "permissions": "Berechtigungen",
       "allow_modification": "Änderung erlauben",
-      "about_collaborators": "Über Mitarbeiter",
-      "about_collaborators_desc": "Mitarbeiter können dir bei der Verwaltung deiner Conventions helfen. Du kannst ihnen verschiedene Rollen zuweisen:",
       "current_collaborators": "Aktuelle Mitarbeiter",
       "add_collaborator": "Mitarbeiter hinzufügen",
       "search_user_placeholder": "Benutzer suchen...",
-      "admin": "Admin",
       "moderator": "Moderator",
-      "administrator": "Administrator"
+      "administrator": "Administrator",
+      "refresh": "Aktualisieren",
+      "no_collaborators": "Noch keine Mitarbeiter"
     },
     "country_select": {
       "no_countries_found": "Keine Länder gefunden",
@@ -847,6 +813,19 @@
       "upcoming": "Kommende",
       "past": "Vergangene",
       "yellow_border_favorite": "Gelber Rand = Favorit"
+    },
+    "collaborators_rights_panel": {
+      "title": "Mitarbeiterrechte (Beta)",
+      "no_collaborators": "Keine Mitarbeiter",
+      "title_placeholder": "Titel oder Rolle (optional)",
+      "saved": "Rechte aktualisiert",
+      "per_edition": "Rechte pro Ausgabe",
+      "no_editions": "Keine Ausgaben",
+      "history_title": "Änderungsverlauf",
+      "refresh_history": "Aktualisieren",
+      "load_history": "Verlauf laden",
+      "no_history": "Keine Änderungen aufgezeichnet",
+      "by_user": "Von {user}"
     }
   },
   "pages": {
@@ -981,5 +960,37 @@
       "terms_of_service": "Nutzungsbedingungen",
       "apply": "von Google"
     }
+  },
+  "permissions": {
+    "editConvention": "Konvention bearbeiten",
+    "deleteConvention": "Konvention löschen",
+    "manageCollaborators": "Mitarbeiter verwalten",
+    "addEdition": "Ausgaben hinzufügen",
+    "editAllEditions": "Alle Ausgaben bearbeiten",
+    "deleteAllEditions": "Alle Ausgaben löschen",
+    "admin": "Administrator",
+    "manager": "Manager",
+    "editor": "Redakteur",
+    "viewer": "Betrachter",
+    "moderator": "Moderator",
+    "history": {
+      "RIGHTS_UPDATED": "Rechte aktualisiert",
+      "PER_EDITIONS_UPDATED": "Rechte pro Ausgabe aktualisiert",
+      "ARCHIVED": "Archiviert",
+      "UNARCHIVED": "Wiederhergestellt"
+    }
+  },
+  "c": {
+    "user": {
+      "pseudo": "Benutzername"
+    },
+    "rights": "Rechte",
+    "title": "Titel"
+  },
+  "p": {
+    "key": "Schlüssel"
+  },
+  "ed": {
+    "id": "ID"
   }
 }

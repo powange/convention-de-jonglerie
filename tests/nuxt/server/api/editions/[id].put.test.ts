@@ -206,7 +206,9 @@ describe('/api/editions/[id] PUT', () => {
         authorId: 2,
         collaborators: [{
           userId: 1,
-          role: 'ADMINISTRATOR'
+          canEditConvention: true,
+          canEditAllEditions: true,
+          canManageCollaborators: true
         }]
       }
     }
@@ -239,7 +241,7 @@ describe('/api/editions/[id] PUT', () => {
         authorId: 2,
         collaborators: [{
           userId: 1,
-          role: 'MODERATOR'
+          canEditConvention: true
         }]
       }
     }

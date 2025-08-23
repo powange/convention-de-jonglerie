@@ -110,7 +110,13 @@ describe('/api/editions/[id] DELETE', () => {
       },
     };
 
-    prismaMock.edition.findUnique.mockResolvedValue(mockEdition);
+      prismaMock.edition.findUnique.mockResolvedValue({
+        ...mockEdition,
+        convention: {
+          ...mockEdition.convention,
+          collaborators: [{ userId: 1, canDeleteConvention: true }],
+        },
+      });
     prismaMock.edition.delete.mockResolvedValue(mockEdition);
 
     const result = await handler(mockEvent as any);
@@ -277,7 +283,11 @@ describe('/api/editions/[id] DELETE', () => {
             collaborators: {
               where: {
                 userId: 1,
-                OR: [{ role: 'MODERATOR' }, { role: 'ADMINISTRATOR' }],
+                OR: [
+                  { canDeleteAllEditions: true },
+                  { canDeleteConvention: true },
+                  { canEditAllEditions: true }
+                ],
               },
             },
           },
@@ -308,7 +318,7 @@ describe('/api/editions/[id] DELETE', () => {
         name: 'collaborateur ADMIN',
         edition: {
           creatorId: 2,
-          convention: { authorId: 3, collaborators: [{ userId: 1, role: 'ADMINISTRATOR' }] },
+          convention: { authorId: 3, collaborators: [{ userId: 1, canDeleteConvention: true }] },
         },
         user: { id: 1, isGlobalAdmin: false },
         shouldPass: true,

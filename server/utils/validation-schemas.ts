@@ -196,18 +196,23 @@ export const editionPostCommentSchema = z.object({
   content: z.string().min(1, 'Le commentaire ne peut pas être vide').max(1000, 'Le commentaire ne peut pas dépasser 1000 caractères')
 });
 
-// Schémas de collaborateurs
+// Schémas de collaborateurs (nouveau modèle droits granulaire)
+export const collaboratorRightsSchema = z.object({
+  editConvention: z.boolean().optional(),
+  deleteConvention: z.boolean().optional(),
+  manageCollaborators: z.boolean().optional(),
+  addEdition: z.boolean().optional(),
+  editAllEditions: z.boolean().optional(),
+  deleteAllEditions: z.boolean().optional()
+}).partial();
+
 export const addCollaboratorSchema = z.object({
-  userIdentifier: z.string().min(1, 'Pseudo ou email requis'), // pseudo ou email
-  role: z.enum(['MODERATOR', 'ADMINISTRATOR'], {
-    errorMap: () => ({ message: 'Rôle invalide' })
-  })
+  userIdentifier: z.string().min(1, 'Pseudo ou email requis')
 });
 
-export const updateCollaboratorRoleSchema = z.object({
-  role: z.enum(['MODERATOR', 'ADMINISTRATOR'], {
-    errorMap: () => ({ message: 'Rôle invalide' })
-  })
+export const updateCollaboratorRightsSchema = z.object({
+  rights: collaboratorRightsSchema.optional(),
+  title: z.string().max(100).optional().nullable()
 });
 
 // Fonction utilitaire pour sanitiser les données avant validation

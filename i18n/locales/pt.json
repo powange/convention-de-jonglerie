@@ -189,7 +189,9 @@
     "back": "Voltar",
     "private": "Privado",
     "or": "Ou",
-    "create": "Criar"
+    "create": "Criar",
+    "refresh": "Atualizar",
+    "save": "Salvar"
   },
   "dates": {
     "same_day_with_time": "No dia {date} das {startTime} às {endTime}",
@@ -304,8 +306,6 @@
     "ticketing": "Bilheteira",
     "services_offered": "Serviços oferecidos",
     "no_services": "Nenhum serviço específico indicado",
-    "administrator": "Administrador",
-    "moderator": "Moderador",
     "loading_details": "A carregar detalhes da edição...",
     "not_found": "Edição não encontrada.",
     "add_lost_item": "Adicionar objecto encontrado",
@@ -336,9 +336,7 @@
     "practical_info": "Informações práticas",
     "organizing_team": "Equipa organizadora",
     "creator": "Criador",
-    "admin": "Admin",
     "edition_creator": "Criador da edição",
-    "collaborator": "Colaborador",
     "of_convention": "da convenção",
     "enlarged_image": "Imagem ampliada",
     "poster_of": "Cartaz de {name}"
@@ -354,8 +352,6 @@
     "no_description": "Nenhuma descrição",
     "collaborators": "Colaboradores",
     "manage": "Gerir",
-    "admin": "Admin",
-    "moderator": "Moderador",
     "editions": "Edições",
     "add_edition": "Adicionar uma edição",
     "no_editions": "Nenhuma edição para esta convenção",
@@ -387,7 +383,6 @@
     "departure_placeholder": "Cidade ou endereço de partida",
     "to": "Para",
     "arrival_placeholder": "Cidade ou endereço de chegada",
-    "departure_date": "Data e hora de partida",
     "select_date_time": "Selecionar data e hora",
     "details": "Detalhes",
     "details_placeholder": "Informações úteis sobre a viagem (bagagem, ponto de encontro, etc.)",
@@ -507,14 +502,6 @@
     "collaborator_added_successfully": "O colaborador foi adicionado com sucesso",
     "collaborator_removed": "Colaborador removido",
     "collaborator_removed_successfully": "O colaborador foi removido com sucesso",
-    "offer_updated": "Oferta alterada",
-    "carpool_proposed": "Boleia proposta",
-    "offer_updated_successfully": "A sua oferta foi alterada com sucesso",
-    "carpool_offer_published": "A sua oferta de boleia foi publicada",
-    "request_updated": "Pedido alterado",
-    "request_published": "Pedido publicado",
-    "request_updated_successfully": "O seu pedido foi alterado com sucesso",
-    "carpool_request_published": "O seu pedido de boleia foi publicado",
     "comment_published": "Comentário publicado",
     "comment_published_successfully": "O seu comentário foi publicado com sucesso",
     "comment_deleted": "Comentário eliminado",
@@ -539,9 +526,7 @@
     "generic_error": "Ocorreu um erro",
     "generic": "Ocorreu um erro",
     "removal_error": "Erro na remoção",
-    "leaflet_unavailable": "Leaflet não disponível",
     "cannot_load_editions": "Impossível carregar as edições",
-    "leaflet_loading_error": "Erro no carregamento do Leaflet",
     "addition_error": "Erro na adição",
     "content_required": "O conteúdo é obrigatório",
     "content_too_long": "O conteúdo não pode exceder {max} caracteres",
@@ -556,10 +541,6 @@
     "seats_minimum_one": "O número de lugares deve ser pelo menos 1",
     "seats_maximum": "Máximo {max} lugares",
     "people_maximum": "Máximo {max} pessoas",
-    "cannot_update_offer": "Impossível alterar a oferta",
-    "cannot_create_carpool_offer": "Impossível criar a oferta de boleia",
-    "cannot_update_request": "Impossível alterar o pedido",
-    "cannot_create_carpool_request": "Impossível criar o pedido de boleia",
     "loading_error": "Erro de carregamento",
     "cannot_publish_comment": "Impossível publicar o comentário",
     "cannot_delete_comment": "Impossível eliminar o comentário",
@@ -639,23 +620,13 @@
       "select_convention": "Seleccione uma convenção",
       "edition_name_example": "Nome da edição (ex: EJC 2024)",
       "address_complement": "Edifício A, Salão de festas...",
-      "select_date": "Seleccionar uma data",
-      "departure_details": "Ex: Estação do Oriente, Praça do Comércio, Portagem A1...",
       "search_by_name": "Procurar por nome",
-      "carpool_offer_details": "Ex: Parto da Porta de Benfica, possibilidade de recolher na A1. Veículo para não fumadores. Espaço para material de malabarismo.",
-      "carpool_request_details": "Ex: Sou flexível no horário, posso partir na sexta à noite ou sábado de manhã. Viajo com pouca bagagem, apenas uma mochila.",
-      "departure_city": "Ex: Lisboa, Porto, Coimbra...",
-      "phone_example": "Ex: 91 234 56 78",
       "city_example": "Lisboa"
     },
     "labels": {
       "full_address": "Morada Completa",
       "from_date": "A partir de",
       "select_date": "Seleccionar uma data",
-      "departure_city": "Cidade de partida",
-      "departure_location": "De onde parte?",
-      "phone_number": "O seu número de telefone",
-      "additional_info": "Informações complementares",
       "edition_name_optional": "Nome da edição (opcional)",
       "address_complement": "Complemento de morada",
       "convention_name": "Nome da convenção",
@@ -663,7 +634,6 @@
     },
     "buttons": {
       "cancel": "Cancelar",
-      "updating": "A alterar...",
       "publishing": "A publicar...",
       "submitting": "Submitting..."
     }
@@ -671,20 +641,16 @@
   "components": {
     "collaborators_modal": {
       "title": "Gerir colaboradores",
-      "in_development": "Em desenvolvimento: Esta funcionalidade está actualmente a ser melhorada.",
-      "moderator_description": "• Moderador: Pode gerir as edições da convenção",
-      "admin_description": "• Administrador: Pode gerir a convenção, as edições, adicionar/remover colaboradores",
       "confirm_remove": "Tem a certeza de que quer remover este colaborador?",
       "permissions": "Permissões",
       "allow_modification": "Permitir alteração",
-      "about_collaborators": "Sobre os colaboradores",
-      "about_collaborators_desc": "Os colaboradores podem ajudá-lo a gerir as suas convenções. Pode atribuir-lhes diferentes funções:",
       "current_collaborators": "Colaboradores actuais",
       "add_collaborator": "Adicionar um colaborador",
       "search_user_placeholder": "Procurar um utilizador...",
-      "admin": "Admin",
       "moderator": "Moderador",
-      "administrator": "Administrador"
+      "administrator": "Administrador",
+      "refresh": "Atualizar",
+      "no_collaborators": "Ainda sem colaboradores"
     },
     "country_select": {
       "no_countries_found": "Nenhum país encontrado",
@@ -813,6 +779,19 @@
       "upcoming": "Próximas",
       "past": "Passadas",
       "yellow_border_favorite": "Contorno amarelo = Favorito"
+    },
+    "collaborators_rights_panel": {
+      "title": "Direitos de colaboradores (beta)",
+      "no_collaborators": "Sem colaboradores",
+      "title_placeholder": "Título ou função (opcional)",
+      "saved": "Direitos atualizados",
+      "per_edition": "Direitos por edição",
+      "no_editions": "Sem edições",
+      "history_title": "Histórico de alterações",
+      "refresh_history": "Atualizar",
+      "load_history": "Carregar histórico",
+      "no_history": "Sem alterações registradas",
+      "by_user": "Por {user}"
     }
   },
   "pages": {
@@ -981,5 +960,37 @@
       "convention_id_required": "ID da convenção obrigatório",
       "unsupported_delete_endpoint": "Endpoint de exclusão não suportado"
     }
+  },
+  "permissions": {
+    "editConvention": "Editar convenção",
+    "deleteConvention": "Excluir convenção",
+    "manageCollaborators": "Gerenciar colaboradores",
+    "addEdition": "Adicionar edições",
+    "editAllEditions": "Editar todas as edições",
+    "deleteAllEditions": "Excluir todas as edições",
+    "admin": "Administrador",
+    "manager": "Gerente",
+    "editor": "Editor",
+    "viewer": "Visualizador",
+    "moderator": "Moderador",
+    "history": {
+      "RIGHTS_UPDATED": "Direitos atualizados",
+      "PER_EDITIONS_UPDATED": "Direitos por edição atualizados",
+      "ARCHIVED": "Arquivado",
+      "UNARCHIVED": "Restaurado"
+    }
+  },
+  "c": {
+    "user": {
+      "pseudo": "Nome de usuário"
+    },
+    "rights": "Direitos",
+    "title": "Título"
+  },
+  "p": {
+    "key": "Chave"
+  },
+  "ed": {
+    "id": "ID"
   }
 }

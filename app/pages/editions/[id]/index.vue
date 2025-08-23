@@ -49,7 +49,7 @@
           <div class="flex flex-col sm:flex-row gap-6">
             <div v-if="edition.imageUrl" class="flex-shrink-0 self-center sm:self-start">
               <img 
-                :src="normalizeImageUrl(edition.imageUrl)" 
+                  :src="(normalizeImageUrl(edition.imageUrl || '') || '')" 
                 :alt="t('editions.poster_of', { name: getEditionDisplayName(edition) })" 
                 class="w-full sm:w-48 h-auto sm:h-48 max-w-xs object-cover rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity" 
                 @click="showImageOverlay = true"
@@ -110,20 +110,12 @@
                     {{ $t('editions.creator') }}
                   </UBadge>
                   <UBadge
-                    v-else-if="collaborator.role === 'ADMINISTRATOR'"
+                    v-else
                     size="xs"
-                    color="warning"
+                    :color="mapSummary(getRightsSummary(collaborator)).color"
                     variant="soft"
                   >
-                    {{ $t('editions.admin') }}
-                  </UBadge>
-                  <UBadge
-                    v-else-if="collaborator.role === 'MODERATOR'"
-                    size="xs"
-                    color="info"
-                    variant="soft"
-                  >
-                    {{ $t('editions.moderator') }}
+                    {{ $t(mapSummary(getRightsSummary(collaborator)).labelKey) }}
                   </UBadge>
                 </div>
               </div>
@@ -189,7 +181,7 @@
         >
           <div class="relative max-w-6xl max-h-[90vh]">
             <img 
-              :src="normalizeImageUrl(edition.imageUrl)" 
+                :src="(normalizeImageUrl(edition.imageUrl || '') || '')" 
               :alt="t('editions.poster_of', { name: getEditionDisplayName(edition) })" 
               class="max-w-full max-h-[90vh] object-contain rounded-lg"
               @click.stop
@@ -211,6 +203,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { summarizeRights } from '~/utils/collaboratorRights';
 import { useRoute } from 'vue-router';
 import type { Edition } from '~/types';
 import { useEditionStore } from '~/stores/editions';
@@ -250,19 +243,11 @@ const isFavorited = computed(() => (_editionId: number) => {
 // Check if user can manage edition
 const canManageEdition = computed(() => {
   if (!authStore.user || !edition.value) return false;
-  
-  // Check if user is the creator
   if (edition.value.creatorId === authStore.user.id) return true;
-  
-  // Check if user is a convention collaborator with appropriate role
-  if (edition.value.convention?.collaborators) {
-    const collaboration = edition.value.convention.collaborators.find(
-      c => c.user.id === authStore.user.id
-    );
-    return collaboration?.role === 'ADMINISTRATOR' || collaboration?.role === 'MODERATOR';
-  }
-  
-  return false;
+  const collab = edition.value.convention?.collaborators?.find((c: any) => authStore.user && c.user.id === authStore.user.id);
+  if (!collab) return false;
+  const rights = collab.rights || {};
+  return !!(rights.editAllEditions || rights.deleteAllEditions || rights.manageCollaborators || rights.editConvention);
 });
 
 // Publish edition (make it online)
@@ -278,30 +263,22 @@ const publishEdition = async () => {
     // Update local state
     await editionStore.fetchEditionById(editionId);
     
-    toast.add({ 
-      title: t('editions.edition_published'), 
-      icon: 'i-heroicons-check-circle', 
-      color: 'green' 
-    });
+  toast.add({ title: t('editions.edition_published'), icon: 'i-heroicons-check-circle', color: 'success' });
   } catch (error) {
     console.error('Failed to publish edition:', error);
-    toast.add({ 
-      title: t('errors.publish_edition_failed'), 
-      icon: 'i-heroicons-x-circle', 
-      color: 'red' 
-    });
+  toast.add({ title: t('errors.publish_edition_failed'), icon: 'i-heroicons-x-circle', color: 'error' });
   }
 };
 
 const toggleFavorite = async (id: number) => {
   try {
     await editionStore.toggleFavorite(id);
-    toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'green' });
+  toast.add({ title: t('messages.favorite_status_updated'), icon: 'i-heroicons-check-circle', color: 'success' });
   } catch (e: unknown) {
     const errorMessage = (e && typeof e === 'object' && 'statusMessage' in e && typeof e.statusMessage === 'string') 
                         ? e.statusMessage 
                         : t('errors.favorite_update_failed');
-    toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'red' });
+  toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' });
   }
 };
 
@@ -325,7 +302,7 @@ const getActiveServicesByCategory = (edition: Edition) => {
   const servicesByCategory = getTranslatedServicesByCategory.value;
   return servicesByCategory.map(category => ({
     ...category,
-    services: category.services.filter(service => edition[service.key])
+  services: category.services.filter(service => (edition as any)[service.key])
   })).filter(category => category.services.length > 0);
 };
 
@@ -333,7 +310,7 @@ const getActiveServicesByCategory = (edition: Edition) => {
 const getAllCollaborators = (edition: Edition) => {
   if (!edition) return [];
   
-  const collaborators = [];
+  const collaborators: any[] = [];
   
   // Ajouter le créateur
   if (edition.creator) {
@@ -350,16 +327,14 @@ const getAllCollaborators = (edition: Edition) => {
   // Ajouter les collaborateurs de la convention
   if (edition.convention?.collaborators) {
     edition.convention.collaborators.forEach(collab => {
-      // Éviter les doublons si le créateur est aussi collaborateur
       if (!collaborators.some(c => c.id === collab.user.id)) {
-        const collaborator = {
+        collaborators.push({
           id: collab.user.id,
-          user: collab.user, // Garder la référence complète
+          user: collab.user,
           pseudo: collab.user.pseudo,
           isCreator: false,
-          role: collab.role
-        };
-        collaborators.push(collaborator);
+          rights: collab.rights || {}
+        } as any);
       }
     });
   }
@@ -373,12 +348,18 @@ const getCollaboratorTitle = (collaborator: any) => {
     return `${collaborator.pseudo} - ${t('editions.edition_creator')}`;
   }
   
-  const roleNames = {
-    'ADMINISTRATOR': t('editions.administrator'),
-    'MODERATOR': t('editions.moderator')
-  };
-  
-  const roleName = roleNames[collaborator.role] || t('editions.collaborator');
-  return `${collaborator.pseudo} - ${roleName} ${t('editions.of_convention')}`;
+  const summary = getRightsSummary(collaborator);
+  return `${collaborator.pseudo} - ${t(summary.labelKey)} ${t('editions.of_convention')}`;
 };
+
+function getRightsSummary(collaborator:any){
+  return summarizeRights(collaborator.rights || {});
+}
+function mapSummary(summary:any){
+  // adapter le mapping couleur aux badges existants
+  return {
+    labelKey: summary.labelKey.replace('permissions.', 'editions.'),
+  color: (summary.level === 'admin' ? 'warning' : summary.level === 'moderator' ? 'info' : 'neutral') as any
+  };
+}
 </script>

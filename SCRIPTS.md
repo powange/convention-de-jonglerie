@@ -11,12 +11,29 @@
 - `npm run lint:fix` - Corrige automatiquement les problèmes détectés
 
 ## 🛠️ Scripts métier
-- `npm run geocode` - Ajoute les coordonnées GPS aux conventions
-- `npm run db:clean-tokens` - Supprime les tokens expirés de la base
 
-## 🧪 Tests unitaires (rapides, sans DB)
-- `npm run test` - Mode watch, relance automatiquement
-- `npm run test:ui` - Interface graphique dans le navigateur
+### Migration droits collaborateurs
+
+Exécuter une migration douce des anciens rôles vers les nouveaux booléens de droits.
+
+Dry-run (simulation):
+```
+npx ts-node scripts/migrate-collaborator-rights.ts --dry
+```
+
+Appliquer réellement:
+```
+npx ts-node scripts/migrate-collaborator-rights.ts
+```
+
+Règles de mapping:
+- ADMINISTRATOR => active tous les droits (edit/delete convention, manageCollaborators, add/edit/delete éditions)
+- MODERATOR => addEdition + editAllEditions seulement
+- Ne réécrit pas un droit déjà à true
+- Crée une entrée history CREATED si aucune n'existe encore
+ - Confirmation interactive avant application (utiliser --yes ou -y pour bypass)
+
+
 - `npm run test:run` - Une seule exécution (CI/CD)
 
 ## 🗄️ Tests d'intégration (avec vraie DB)

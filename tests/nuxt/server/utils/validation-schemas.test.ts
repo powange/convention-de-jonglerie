@@ -374,27 +374,13 @@ describe('Validation Schemas', () => {
 
   describe('Schémas de collaborateurs', () => {
     describe('addCollaboratorSchema', () => {
-      it('devrait valider l\'ajout d\'un collaborateur valide', () => {
-        const validData = {
-          userIdentifier: 'user@example.com',
-          role: 'MODERATOR',
-        };
-
+      it("devrait valider l'ajout d'un collaborateur valide (userIdentifier seul)", () => {
+        const validData = { userIdentifier: 'user@example.com' };
         expect(() => schemas.addCollaboratorSchema.parse(validData)).not.toThrow();
       });
 
-      it('devrait accepter les rôles valides', () => {
-        expect(() => schemas.addCollaboratorSchema.parse({
-          userIdentifier: 'user',
-          role: 'ADMINISTRATOR',
-        })).not.toThrow();
-      });
-
-      it('devrait rejeter un rôle invalide', () => {
-        expect(() => schemas.addCollaboratorSchema.parse({
-          userIdentifier: 'user',
-          role: 'INVALID_ROLE',
-        })).toThrow();
+      it('devrait rejeter un userIdentifier vide', () => {
+        expect(() => schemas.addCollaboratorSchema.parse({ userIdentifier: '' })).toThrow();
       });
     });
   });

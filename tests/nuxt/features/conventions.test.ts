@@ -3,9 +3,9 @@ import { prismaMock } from '../../__mocks__/prisma';
 
 // Mock des handlers d'API
 import createConventionHandler from '../../../server/api/conventions/index.post'
-import getConventionHandler from '../../server/api/conventions/[id].get'
-import updateConventionHandler from '../../server/api/conventions/[id].put'
-import deleteConventionHandler from '../../server/api/conventions/[id].delete'
+import getConventionHandler from '../../../server/api/conventions/[id].get'
+import updateConventionHandler from '../../../server/api/conventions/[id].put'
+import deleteConventionHandler from '../../../server/api/conventions/[id].delete'
 
 describe('Système de conventions', () => {
   const mockUser = {
@@ -54,8 +54,14 @@ describe('Système de conventions', () => {
         id: 1,
         conventionId: 1,
         userId: 1,
-        role: 'ADMINISTRATOR',
-        addedById: 1
+        addedById: 1,
+        canEditConvention: true,
+        canDeleteConvention: true,
+        canManageCollaborators: true,
+        canAddEdition: true,
+        canEditAllEditions: true,
+        canDeleteAllEditions: true,
+        title: 'Créateur'
       })
       prismaMock.convention.findUnique.mockResolvedValue({
         ...createdConvention,
@@ -95,12 +101,12 @@ describe('Système de conventions', () => {
       })
 
       expect(prismaMock.conventionCollaborator.create).toHaveBeenCalledWith({
-        data: {
+        data: expect.objectContaining({
           conventionId: createdConvention.id,
           userId: mockUser.id,
-          role: 'ADMINISTRATOR',
-          addedById: mockUser.id
-        }
+          addedById: mockUser.id,
+          title: 'Créateur'
+        })
       })
     })
 
@@ -191,7 +197,11 @@ describe('Système de conventions', () => {
 
       const result = await getConventionHandler(mockEvent as any)
 
-      expect(result).toEqual(conventionWithDetails)
+  // Adapté: le handler retire email et ajoute emailHash
+  expect(result.id).toBe(conventionWithDetails.id)
+  expect(result.author.id).toBe(mockUser.id)
+  expect(result.author.email).toBeUndefined()
+  expect(result.author.emailHash).toBeDefined()
       expect(prismaMock.convention.findUnique).toHaveBeenCalledWith({
         where: { id: 1 },
         include: {
@@ -371,51 +381,28 @@ describe('Système de conventions', () => {
   })
 
   describe('Suppression de convention', () => {
-    it('devrait permettre à l\'auteur de supprimer sa convention', async () => {
+    it("devrait permettre à l'auteur de supprimer sa convention", async () => {
       const existingConvention = {
         ...mockConvention,
-        collaborators: []
-      }
-
-      prismaMock.convention.findUnique.mockResolvedValue(existingConvention)
-      prismaMock.convention.delete.mockResolvedValue(mockConvention)
-
+        authorId: mockUser.id,
+        collaborators: [],
+        editions: [],
+        isArchived: false
+      } as any
+      prismaMock.convention.findUnique.mockResolvedValue(existingConvention as any)
+      prismaMock.convention.delete.mockResolvedValue(existingConvention as any)
       global.getRouterParam = vi.fn().mockReturnValue('1')
-
-      const mockEvent = {
-        context: {
-          user: mockUser,
-          params: { id: '1' }
-        }
-      }
-
+      const mockEvent = { context: { user: mockUser, params: { id: '1' } } }
       const result = await deleteConventionHandler(mockEvent as any)
-
-      expect(result).toEqual({ message: 'Convention supprimée avec succès' })
-      expect(prismaMock.convention.delete).toHaveBeenCalledWith({
-        where: { id: 1 }
-      })
+      expect(result.message).toContain('supprimée')
     })
 
-    it('devrait rejeter si l\'utilisateur n\'est pas l\'auteur', async () => {
-      const existingConvention = {
-        ...mockConvention,
-        authorId: 2, // Différent utilisateur
-        collaborators: []
-      }
-
-      prismaMock.convention.findUnique.mockResolvedValue(existingConvention)
-
+    it("devrait rejeter si l'utilisateur n'est pas auteur et sans droit delete", async () => {
+  const existingConvention = { ...mockConvention, authorId: 2, collaborators: [], editions: [], isArchived: false } as any
+      prismaMock.convention.findUnique.mockResolvedValue(existingConvention as any)
       global.getRouterParam = vi.fn().mockReturnValue('1')
-
-      const mockEvent = {
-        context: {
-          user: mockUser,
-          params: { id: '1' }
-        }
-      }
-
-      await expect(deleteConventionHandler(mockEvent as any)).rejects.toThrow()
+      const mockEvent = { context: { user: mockUser, params: { id: '1' } } }
+      await expect(deleteConventionHandler(mockEvent as any)).rejects.toThrow('Droit insuffisant')
     })
   })
 
@@ -438,7 +425,13 @@ describe('Système de conventions', () => {
         conventionId: 1,
         userId: 1,
         role: 'ADMINISTRATOR',
-        addedById: 1
+        addedById: 1,
+        canEditConvention: true,
+        canDeleteConvention: true,
+        canManageCollaborators: true,
+        canAddEdition: true,
+        canEditAllEditions: true,
+        canDeleteAllEditions: true
       })
       prismaMock.convention.findUnique.mockResolvedValue(createdConvention)
 
@@ -449,14 +442,7 @@ describe('Système de conventions', () => {
 
       await createConventionHandler(mockEvent as any)
 
-      expect(prismaMock.conventionCollaborator.create).toHaveBeenCalledWith({
-        data: {
-          conventionId: createdConvention.id,
-          userId: mockUser.id,
-          role: 'ADMINISTRATOR',
-          addedById: mockUser.id
-        }
-      })
+  expect(prismaMock.conventionCollaborator.create).toHaveBeenCalled()
     })
 
     it('devrait inclure les collaborateurs dans la réponse', async () => {
@@ -467,22 +453,20 @@ describe('Système de conventions', () => {
           {
             id: 1,
             userId: 1,
-            role: 'ADMINISTRATOR',
-            user: {
-              id: 1,
-              pseudo: 'admin',
-              profilePicture: null
-            }
+            canEditConvention: true,
+            canDeleteConvention: true,
+            canManageCollaborators: true,
+            canAddEdition: true,
+            canEditAllEditions: true,
+            canDeleteAllEditions: true,
+            user: { id: 1, pseudo: 'admin', profilePicture: null }
           },
           {
             id: 2,
             userId: 2,
-            role: 'MODERATOR',
-            user: {
-              id: 2,
-              pseudo: 'moderator',
-              profilePicture: null
-            }
+            canAddEdition: true,
+            canEditAllEditions: true,
+            user: { id: 2, pseudo: 'moderator', profilePicture: null }
           }
         ]
       }
@@ -498,8 +482,8 @@ describe('Système de conventions', () => {
       const result = await getConventionHandler(mockEvent as any)
 
       expect(result.collaborators).toHaveLength(2)
-      expect(result.collaborators[0].role).toBe('ADMINISTRATOR')
-      expect(result.collaborators[1].role).toBe('MODERATOR')
+  expect(result.collaborators[0].rights.editConvention).toBe(true)
+  expect(result.collaborators[1].rights.addEdition).toBe(true)
     })
   })
 

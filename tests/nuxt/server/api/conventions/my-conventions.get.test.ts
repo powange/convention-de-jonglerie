@@ -91,15 +91,10 @@ describe('/api/conventions/my-conventions GET', () => {
 
     expect(prismaMock.convention.findMany).toHaveBeenCalledWith({
       where: {
+        isArchived: false,
         OR: [
           { authorId: 1 },
-          {
-            collaborators: {
-              some: {
-                userId: 1,
-              },
-            },
-          },
+          { collaborators: { some: { userId: 1 } } },
         ],
       },
       include: {
@@ -162,7 +157,7 @@ describe('/api/conventions/my-conventions GET', () => {
           {
             id: 1,
             userId: 1,
-            role: 'MODERATOR',
+            canAddEdition: true,
             addedAt: new Date('2024-01-02'),
             user: {
               id: 1,
@@ -186,7 +181,7 @@ describe('/api/conventions/my-conventions GET', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].collaborators).toHaveLength(1);
-    expect(result[0].collaborators[0].user.emailHash).toBe('user-hash');
+  expect(result[0].collaborators[0].user.emailHash).toBe('user-hash');
     expect(result[0].author.emailHash).toBe('author-hash');
   });
 

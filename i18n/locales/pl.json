@@ -189,7 +189,9 @@
     "back": "Powrót",
     "private": "Prywatne",
     "or": "Lub",
-    "create": "Utwórz"
+    "create": "Utwórz",
+    "refresh": "Odśwież",
+    "save": "Zapisz"
   },
   "dates": {
     "same_day_with_time": "{date} od {startTime} do {endTime}",
@@ -304,8 +306,6 @@
     "ticketing": "Bilety",
     "services_offered": "Oferowane usługi",
     "no_services": "Brak określonych usług",
-    "administrator": "Administrator",
-    "moderator": "Moderator",
     "loading_details": "Ładowanie szczegółów edycji...",
     "not_found": "Edycja nie została znaleziona.",
     "add_lost_item": "Dodaj znalezioną rzecz",
@@ -336,9 +336,7 @@
     "practical_info": "Informacje praktyczne",
     "organizing_team": "Zespół organizacyjny",
     "creator": "Twórca",
-    "admin": "Administrator",
     "edition_creator": "Twórca edycji",
-    "collaborator": "Współpracownik",
     "of_convention": "konwencji",
     "enlarged_image": "Powiększone zdjęcie",
     "poster_of": "Plakat {name}"
@@ -354,8 +352,6 @@
     "no_description": "Brak opisu",
     "collaborators": "Współpracownicy",
     "manage": "Zarządzaj",
-    "admin": "Administrator",
-    "moderator": "Moderator",
     "editions": "Edycje",
     "add_edition": "Dodaj edycję",
     "no_editions": "Brak edycji dla tej konwencji",
@@ -387,7 +383,6 @@
     "departure_placeholder": "Miasto lub adres wyjazdu",
     "to": "Do",
     "arrival_placeholder": "Miasto lub adres przyjazdu",
-    "departure_date": "Data i godzina wyjazdu",
     "select_date_time": "Wybierz datę i godzinę",
     "details": "Szczegóły",
     "details_placeholder": "Przydatne informacje o podróży (bagaż, miejsce spotkania itp.)",
@@ -507,14 +502,6 @@
     "collaborator_added_successfully": "Współpracownik został pomyślnie dodany",
     "collaborator_removed": "Współpracownik usunięty",
     "collaborator_removed_successfully": "Współpracownik został pomyślnie usunięty",
-    "offer_updated": "Oferta zmodyfikowana",
-    "carpool_proposed": "Wspólny przejazd zaproponowany",
-    "offer_updated_successfully": "Twoja oferta została pomyślnie zmodyfikowana",
-    "carpool_offer_published": "Twoja oferta wspólnego przejazdu została opublikowana",
-    "request_updated": "Prośba zmodyfikowana",
-    "request_published": "Prośba opublikowana",
-    "request_updated_successfully": "Twoja prośba została pomyślnie zmodyfikowana",
-    "carpool_request_published": "Twoja prośba o wspólny przejazd została opublikowana",
     "comment_published": "Komentarz opublikowany",
     "comment_published_successfully": "Twój komentarz został pomyślnie opublikowany",
     "comment_deleted": "Komentarz usunięty",
@@ -538,9 +525,7 @@
     "deletion_error": "Błąd podczas usuwania",
     "generic_error": "Wystąpił błąd",
     "removal_error": "Błąd podczas usuwania",
-    "leaflet_unavailable": "Leaflet niedostępny",
     "cannot_load_editions": "Nie można załadować edycji",
-    "leaflet_loading_error": "Błąd ładowania Leaflet",
     "addition_error": "Błąd podczas dodawania",
     "content_required": "Treść jest wymagana",
     "content_too_long": "Treść nie może przekroczyć {max} znaków",
@@ -555,10 +540,6 @@
     "seats_minimum_one": "Liczba miejsc musi wynosić co najmniej 1",
     "seats_maximum": "Maksimum {max} miejsc",
     "people_maximum": "Maksimum {max} osób",
-    "cannot_update_offer": "Nie można zmodyfikować oferty",
-    "cannot_create_carpool_offer": "Nie można utworzyć oferty wspólnego przejazdu",
-    "cannot_update_request": "Nie można zmodyfikować prośby",
-    "cannot_create_carpool_request": "Nie można utworzyć prośby o wspólny przejazd",
     "loading_error": "Błąd ładowania",
     "cannot_publish_comment": "Nie można opublikować komentarza",
     "cannot_delete_comment": "Nie można usunąć komentarza",
@@ -639,23 +620,13 @@
       "select_convention": "Wybierz konwencję",
       "edition_name_example": "Nazwa edycji (np. EJC 2024)",
       "address_complement": "Budynek A, Sala balowa...",
-      "select_date": "Wybierz datę",
-      "departure_details": "Np.: Dworzec Centralny, Plac Konstytucji, Bramka A4...",
       "search_by_name": "Szukaj po nazwie",
-      "carpool_offer_details": "Np.: Wyjeżdżam z Warszawy Śródmieście, możliwość odbioru na A2. Pojazd dla niepalących. Miejsce na sprzęt do żonglowania.",
-      "carpool_request_details": "Np.: Jestem elastyczny co do godzin, mogę wyjechać w piątek wieczorem lub w sobotę rano. Podróżuję z lekkim bagażem.",
-      "departure_city": "Np.: Warszawa, Kraków, Wrocław...",
-      "phone_example": "Np.: 48 123 456 789",
       "city_example": "Warszawa"
     },
     "labels": {
       "full_address": "Pełny Adres",
       "from_date": "Od",
       "select_date": "Wybierz datę",
-      "departure_city": "Miasto wyjazdu",
-      "departure_location": "Skąd wyjeżdżasz?",
-      "phone_number": "Twój numer telefonu",
-      "additional_info": "Informacje dodatkowe",
       "edition_name_optional": "Nazwa edycji (opcjonalna)",
       "address_complement": "Uzupełnienie adresu",
       "convention_name": "Nazwa konwencji",
@@ -663,7 +634,6 @@
     },
     "buttons": {
       "cancel": "Anuluj",
-      "updating": "Modyfikacja...",
       "publishing": "Publikowanie...",
       "submitting": "Submitting..."
     }
@@ -671,20 +641,16 @@
   "components": {
     "collaborators_modal": {
       "title": "Zarządzaj współpracownikami",
-      "in_development": "W trakcie rozwoju: Ta funkcja jest obecnie ulepszana.",
-      "moderator_description": "• Moderator: Może zarządzać edycjami konwencji",
-      "admin_description": "• Administrator: Może zarządzać konwencją, edycjami, dodawać/usuwać współpracowników",
       "confirm_remove": "Czy na pewno chcesz usunąć tego współpracownika?",
       "permissions": "Uprawnienia",
       "allow_modification": "Zezwól na modyfikację",
-      "about_collaborators": "O współpracownikach",
-      "about_collaborators_desc": "Współpracownicy mogą pomóc ci zarządzać konwencjami. Możesz przypisać im różne role:",
       "current_collaborators": "Obecni współpracownicy",
       "add_collaborator": "Dodaj współpracownika",
       "search_user_placeholder": "Szukaj użytkownika...",
-      "admin": "Administrator",
       "moderator": "Moderator",
-      "administrator": "Administrator"
+      "administrator": "Administrator",
+      "refresh": "Odśwież",
+      "no_collaborators": "Brak współpracowników"
     },
     "country_select": {
       "no_countries_found": "Nie znaleziono krajów",
@@ -813,6 +779,19 @@
       "upcoming": "Nadchodzące",
       "past": "Przeszłe",
       "yellow_border_favorite": "Żółta ramka = Ulubione"
+    },
+    "collaborators_rights_panel": {
+      "title": "Prawa współpracowników (beta)",
+      "no_collaborators": "Brak współpracowników",
+      "title_placeholder": "Tytuł lub rola (opcjonalnie)",
+      "saved": "Prawa zaktualizowane",
+      "per_edition": "Prawa na edycję",
+      "no_editions": "Brak edycji",
+      "history_title": "Historia zmian",
+      "refresh_history": "Odśwież",
+      "load_history": "Załaduj historię",
+      "no_history": "Brak zarejestrowanych zmian",
+      "by_user": "Przez {user}"
     }
   },
   "pages": {
@@ -981,5 +960,37 @@
       "terms_of_service": "Warunki korzystania",
       "apply": "Google"
     }
+  },
+  "permissions": {
+    "editConvention": "Edytuj konwencję",
+    "deleteConvention": "Usuń konwencję",
+    "manageCollaborators": "Zarządzaj współpracownikami",
+    "addEdition": "Dodaj edycje",
+    "editAllEditions": "Edytuj wszystkie edycje",
+    "deleteAllEditions": "Usuń wszystkie edycje",
+    "admin": "Administrator",
+    "manager": "Menedżer",
+    "editor": "Redaktor",
+    "viewer": "Przeglądający",
+    "moderator": "Moderator",
+    "history": {
+      "RIGHTS_UPDATED": "Prawa zaktualizowane",
+      "PER_EDITIONS_UPDATED": "Prawa na edycję zaktualizowane",
+      "ARCHIVED": "Zarchiwizowane",
+      "UNARCHIVED": "Przywrócone"
+    }
+  },
+  "c": {
+    "user": {
+      "pseudo": "Nazwa użytkownika"
+    },
+    "rights": "Prawa",
+    "title": "Tytuł"
+  },
+  "p": {
+    "key": "Klucz"
+  },
+  "ed": {
+    "id": "ID"
   }
 }

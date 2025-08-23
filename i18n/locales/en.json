@@ -189,7 +189,9 @@
     "private": "Private",
     "or": "Or",
     "cancelled": "Cancelled",
-    "create": "Create"
+    "create": "Create",
+    "refresh": "Refresh",
+    "save": "Save"
   },
   "dates": {
     "same_day_with_time": "On {date} from {startTime} to {endTime}",
@@ -304,8 +306,6 @@
     "ticketing": "Ticketing",
     "services_offered": "Services offered",
     "no_services": "No specific services provided",
-    "administrator": "Administrator",
-    "moderator": "Moderator",
     "loading_details": "Loading edition details...",
     "not_found": "Edition not found.",
     "add_lost_item": "Add lost item",
@@ -336,9 +336,7 @@
     "practical_info": "Practical information",
     "organizing_team": "Organizing team",
     "creator": "Creator",
-    "admin": "Admin",
     "edition_creator": "Edition creator",
-    "collaborator": "Collaborator",
     "of_convention": "of the convention",
     "enlarged_image": "Enlarged image",
     "poster_of": "Poster of {name}"
@@ -354,8 +352,6 @@
     "no_description": "No description",
     "collaborators": "Collaborators",
     "manage": "Manage",
-    "admin": "Admin",
-    "moderator": "Mod",
     "editions": "Editions",
     "add_edition": "Add edition",
     "no_editions": "No editions for this convention",
@@ -547,20 +543,29 @@
   "components": {
     "collaborators_modal": {
       "title": "Manage collaborators",
-      "in_development": "In development: This feature is currently being improved.",
-      "moderator_description": "• Moderator: Can manage convention editions",
-      "admin_description": "• Administrator: Can manage the convention, editions, add/remove collaborators",
       "confirm_remove": "Are you sure you want to remove this collaborator?",
       "permissions": "Permissions",
       "allow_modification": "Allow modification",
-      "about_collaborators": "About collaborators",
-      "about_collaborators_desc": "Collaborators can help you manage your conventions. You can assign them different roles:",
       "current_collaborators": "Current collaborators",
       "add_collaborator": "Add collaborator",
       "search_user_placeholder": "Search for a user...",
-      "admin": "Admin",
       "moderator": "Moderator",
-      "administrator": "Administrator"
+      "administrator": "Administrator",
+      "refresh": "Refresh",
+      "no_collaborators": "No collaborators yet"
+    },
+    "collaborators_rights_panel": {
+      "title": "Collaborator rights (beta)",
+      "no_collaborators": "No collaborators",
+      "title_placeholder": "Title or role (optional)",
+      "saved": "Rights updated",
+      "per_edition": "Per-edition rights",
+      "no_editions": "No editions",
+      "history_title": "Change history",
+      "refresh_history": "Refresh",
+      "load_history": "Load history",
+      "no_history": "No changes recorded",
+      "by_user": "By {user}"
     },
     "country_select": {
       "no_countries_found": "No countries found",
@@ -689,6 +694,25 @@
       "upcoming": "Upcoming",
       "past": "Past",
       "yellow_border_favorite": "Yellow border = Favorite"
+    }
+  },
+  "permissions": {
+    "editConvention": "Edit convention",
+    "deleteConvention": "Delete convention",
+    "manageCollaborators": "Manage collaborators",
+    "addEdition": "Add editions",
+    "editAllEditions": "Edit all editions",
+    "deleteAllEditions": "Delete all editions",
+    "admin": "Administrator",
+    "manager": "Manager",
+    "editor": "Editor",
+    "viewer": "Viewer",
+    "moderator": "Moderator",
+    "history": {
+      "RIGHTS_UPDATED": "Rights updated",
+      "PER_EDITIONS_UPDATED": "Per-edition rights updated",
+      "ARCHIVED": "Archived",
+      "UNARCHIVED": "Unarchived"
     }
   },
   "services": {
@@ -955,5 +979,18 @@
     "update_error": "Update error",
     "publish_edition_failed": "Failed to publish edition",
     "status_update_failed": "Failed to update status"
+  },
+  "c": {
+    "user": {
+      "pseudo": "Username"
+    },
+    "rights": "Rights",
+    "title": "Title"
+  },
+  "p": {
+    "key": "Key"
+  },
+  "ed": {
+    "id": "ID"
   }
 }

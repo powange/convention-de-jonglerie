@@ -98,7 +98,7 @@ export default defineEventHandler(async (event) => {
         isCreator,
         isConventionAuthor,
         isCollaborator,
-        collaborators: edition.convention.collaborators?.map((c) => ({ userId: c.userId, role: c.role }))
+        collaborators: edition.convention.collaborators?.map((c) => ({ userId: c.userId }))
       });
 
       if (!isCreator && !isConventionAuthor && !isCollaborator) {
@@ -124,6 +124,15 @@ export default defineEventHandler(async (event) => {
       if (edition.convention?.collaborators) {
         edition.convention.collaborators = edition.convention.collaborators.map(collab => ({
           ...collab,
+          // Construire un objet rights cohérent (si les colonnes existent)
+          rights: {
+            editConvention: (collab as any).canEditConvention ?? false,
+            deleteConvention: (collab as any).canDeleteConvention ?? false,
+            manageCollaborators: (collab as any).canManageCollaborators ?? false,
+            addEdition: (collab as any).canAddEdition ?? false,
+            editAllEditions: (collab as any).canEditAllEditions ?? false,
+            deleteAllEditions: (collab as any).canDeleteAllEditions ?? false
+          },
           user: {
             ...collab.user,
             emailHash: getEmailHash(collab.user.email),

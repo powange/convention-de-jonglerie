@@ -8,10 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum CollaboratorRole {
-  MODERATOR // Peut gérer uniquement les éditions
-  ADMINISTRATOR // Peut gérer la convention, les éditions et ajouter des collaborateurs
-}
 
 // Historique des changements de permissions collaborateurs
 enum CollaboratorPermissionChangeType {
@@ -116,23 +112,21 @@ model Edition {
 }
 
 model ConventionCollaborator {
-  id           Int              @id @default(autoincrement())
-  conventionId Int
-  userId       Int
-  role         CollaboratorRole @default(MODERATOR)
-  // Nouveau système de droits granulaires (transition: conserver 'role' pour migration douce)
-  title                   String? // Titre libre (ex: Responsable bénévoles)
-  canEditConvention       Boolean  @default(false)
-  canDeleteConvention     Boolean  @default(false) // Si éditions existent: transforme l'action en archivage
-  canManageCollaborators  Boolean  @default(false)
-  canAddEdition           Boolean  @default(false)
-  canEditAllEditions      Boolean  @default(false)
-  canDeleteAllEditions    Boolean  @default(false)
-  addedAt      DateTime         @default(now())
-  addedById    Int
-  addedBy      User             @relation("AddedCollaborators", fields: [addedById], references: [id])
-  convention   Convention       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
-  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                   Int       @id @default(autoincrement())
+  conventionId         Int
+  userId               Int
+  title                String?
+  canEditConvention    Boolean   @default(false)
+  canDeleteConvention  Boolean   @default(false)
+  canManageCollaborators Boolean @default(false)
+  canAddEdition        Boolean   @default(false)
+  canEditAllEditions   Boolean   @default(false)
+  canDeleteAllEditions Boolean   @default(false)
+  addedAt              DateTime  @default(now())
+  addedById            Int
+  addedBy              User      @relation("AddedCollaborators", fields: [addedById], references: [id])
+  convention           Convention @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  user                 User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   perEditionPermissions EditionCollaboratorPermission[]
   permissionHistory     CollaboratorPermissionHistory[]
 

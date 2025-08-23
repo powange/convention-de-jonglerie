@@ -48,6 +48,49 @@ L'application permet aux utilisateurs de :
 *   **Interface Utilisateur :** Navigation intuitive et réactive, notifications via toasts.
 *   **Sécurité :** Middleware d'authentification pour protéger les routes et les API.
 
+### Modèle de Permissions Collaborateurs
+
+Le système ne repose plus sur des rôles (ex: ADMINISTRATOR / MODERATOR) mais sur un ensemble de droits granulaires appliqués aux collaborateurs d'une convention.
+
+Champs de droits stockés sur `ConventionCollaborator` :
+
+| Droit | Colonne | Description |
+|-------|---------|-------------|
+| editConvention | canEditConvention | Modifier les métadonnées de la convention |
+| deleteConvention | canDeleteConvention | Supprimer la convention |
+| manageCollaborators | canManageCollaborators | Ajouter / retirer des collaborateurs et modifier leurs droits |
+| addEdition | canAddEdition | Créer de nouvelles éditions |
+| editAllEditions | canEditAllEditions | Modifier n'importe quelle édition (sinon seulement celles créées ou permissions spécifiques) |
+| deleteAllEditions | canDeleteAllEditions | Supprimer n'importe quelle édition |
+
+Une permission par édition (table `EditionCollaboratorPermission`) permet d'accorder `canEdit` / `canDelete` sur une édition précise lorsqu'un collaborateur ne possède pas les droits globaux.
+
+Format d'un collaborateur retourné par l'API :
+```jsonc
+{
+    "id": 12,
+    "addedAt": "2025-08-23T10:11:12.000Z",
+    "title": "Créateur",
+    "rights": {
+        "editConvention": true,
+        "deleteConvention": true,
+        "manageCollaborators": true,
+        "addEdition": true,
+        "editAllEditions": true,
+        "deleteAllEditions": true
+    },
+    "user": { "id": 5, "pseudo": "alice", "emailHash": "..." },
+    "addedBy": { "id": 5, "pseudo": "alice" }
+}
+```
+
+Endpoints principaux (extraits) :
+
+* `POST /api/conventions/:id/collaborators` body : `{ userIdentifier | userId, rights?: { ... }, title?: string }`
+* `PUT /api/conventions/:id/collaborators/:collaboratorId` body : `{ rights?: { ... }, title?: string }`
+
+Les handlers ignorent désormais tout champ `role` legacy. Les tests garantissent l'absence de régression. Pour l'affichage, un titre synthétique peut être dérivé côté frontend via un composable (`useCollaboratorTitle`) qui mappe la densité des droits vers des labels i18n (`permissions.admin`, `permissions.manager`, etc.).
+
 ## Structure du Projet
 
 *   `app/` : Contient le code source du frontend Nuxt.js (pages, composants, stores Pinia, middleware).

@@ -1,14 +1,13 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import handler from '../../../../server/api/conventions/[id]/collaborators.get';
 import { prismaMock } from '../../../../__mocks__/prisma';
 
 // Import des mocks après la déclaration
-import { checkUserConventionPermission, getConventionCollaborators } from '../../../../../server/utils/collaborator-management';
+import { checkUserConventionPermission } from '../../../../../server/utils/collaborator-management';
 
 // Mock des utilitaires de collaborateur
 vi.mock('../../../../server/utils/collaborator-management', () => ({
   checkUserConventionPermission: vi.fn(),
-  getConventionCollaborators: vi.fn(),
 }));
 
 const mockEvent = {
@@ -22,22 +21,28 @@ const mockEvent = {
   },
 };
 const mockCheckPermission = checkUserConventionPermission as ReturnType<typeof vi.fn>;
-const mockGetCollaborators = getConventionCollaborators as ReturnType<typeof vi.fn>;
 
 describe('/api/conventions/[id]/collaborators GET', () => {
   beforeEach(() => {
-    mockCheckPermission.mockReset();
-    mockGetCollaborators.mockReset();
+  mockCheckPermission.mockReset();
+  prismaMock.conventionCollaborator.findMany.mockReset();
   });
 
   it('devrait retourner les collaborateurs avec succès', async () => {
     const mockCollaborators = [
       {
         id: 1,
-        conventionId: 1,
-        userId: 1,
-        role: 'ADMINISTRATOR',
         addedAt: new Date('2024-01-01'),
+        title: 'Admin',
+        rights: {
+          editConvention: true,
+          deleteConvention: true,
+          manageCollaborators: true,
+          addEdition: true,
+          editAllEditions: true,
+          deleteAllEditions: true,
+        },
+        perEdition: [],
         user: {
           id: 1,
           pseudo: 'admin',
@@ -50,10 +55,17 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       },
       {
         id: 2,
-        conventionId: 1,
-        userId: 2,
-        role: 'MODERATOR',
         addedAt: new Date('2024-01-02'),
+        title: 'Mod',
+        rights: {
+          editConvention: false,
+          deleteConvention: false,
+          manageCollaborators: false,
+          addEdition: true,
+          editAllEditions: true,
+          deleteAllEditions: false,
+        },
+        perEdition: [],
         user: {
           id: 2,
           pseudo: 'moderator',
@@ -72,13 +84,28 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       isOwner: true,
       isCollaborator: false,
     });
-    mockGetCollaborators.mockResolvedValue(mockCollaborators);
+    // données brutes renvoyées par Prisma avant mapping
+    const raw = mockCollaborators.map(c => ({
+      id: c.id,
+      addedAt: c.addedAt,
+      title: c.title,
+      canEditConvention: c.rights.editConvention,
+      canDeleteConvention: c.rights.deleteConvention,
+      canManageCollaborators: c.rights.manageCollaborators,
+      canAddEdition: c.rights.addEdition,
+      canEditAllEditions: c.rights.editAllEditions,
+      canDeleteAllEditions: c.rights.deleteAllEditions,
+      perEditionPermissions: [],
+      user: c.user,
+      addedBy: c.addedBy,
+    }));
+    prismaMock.conventionCollaborator.findMany.mockResolvedValue(raw as any);
 
     const result = await handler(mockEvent as any);
 
     expect(result).toEqual(mockCollaborators);
     expect(mockCheckPermission).toHaveBeenCalledWith(1, 1);
-    expect(mockGetCollaborators).toHaveBeenCalledWith(1);
+    expect(prismaMock.conventionCollaborator.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { conventionId: 1 } }));
   });
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
@@ -123,10 +150,19 @@ describe('/api/conventions/[id]/collaborators GET', () => {
     const mockCollaborators = [
       {
         id: 1,
-        conventionId: 1,
-        userId: 2,
-        role: 'MODERATOR',
+        addedAt: new Date(),
+        title: 'Mod',
+        rights: {
+          editConvention: false,
+          deleteConvention: false,
+          manageCollaborators: false,
+          addEdition: true,
+          editAllEditions: true,
+          deleteAllEditions: false,
+        },
+        perEdition: [],
         user: { id: 2, pseudo: 'moderator' },
+        addedBy: { id: 99, pseudo: 'creator' }
       },
     ];
 
@@ -136,7 +172,21 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       isOwner: false,
       isCollaborator: true,
     });
-    mockGetCollaborators.mockResolvedValue(mockCollaborators);
+    const raw = mockCollaborators.map(c => ({
+      id: c.id,
+      addedAt: c.addedAt,
+      title: c.title,
+      canEditConvention: c.rights.editConvention,
+      canDeleteConvention: c.rights.deleteConvention,
+      canManageCollaborators: c.rights.manageCollaborators,
+      canAddEdition: c.rights.addEdition,
+      canEditAllEditions: c.rights.editAllEditions,
+      canDeleteAllEditions: c.rights.deleteAllEditions,
+      perEditionPermissions: [],
+      user: c.user,
+      addedBy: c.addedBy,
+    }));
+    prismaMock.conventionCollaborator.findMany.mockResolvedValue(raw as any);
 
     const eventAsModerator = {
       ...mockEvent,
@@ -156,12 +206,12 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       isOwner: true,
       isCollaborator: false,
     });
-    mockGetCollaborators.mockResolvedValue([]);
+  prismaMock.conventionCollaborator.findMany.mockResolvedValue([]);
 
     const result = await handler(mockEvent as any);
 
     expect(result).toEqual([]);
-    expect(mockGetCollaborators).toHaveBeenCalledWith(1);
+  expect(prismaMock.conventionCollaborator.findMany).toHaveBeenCalled();
   });
 
   it('devrait traiter correctement l\'ID numérique', async () => {
@@ -176,12 +226,12 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       isOwner: true,
       isCollaborator: false,
     });
-    mockGetCollaborators.mockResolvedValue([]);
+  prismaMock.conventionCollaborator.findMany.mockResolvedValue([]);
 
     await handler(eventWithStringId as any);
 
     expect(mockCheckPermission).toHaveBeenCalledWith(123, 1);
-    expect(mockGetCollaborators).toHaveBeenCalledWith(123);
+  expect(prismaMock.conventionCollaborator.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { conventionId: 123 } }));
   });
 
   it('devrait gérer les erreurs HTTP spécifiques', async () => {

@@ -4,7 +4,6 @@ import { updateEditionSchema, validateAndSanitize, handleValidationError } from 
 import { geocodeEdition } from '../../utils/geocoding';
 import { z } from 'zod';
 
-import type { Edition } from '~/types';
 
 
 export default defineEventHandler(async (event) => {
@@ -57,8 +56,8 @@ export default defineEventHandler(async (event) => {
               where: {
                 userId: event.context.user.id,
                 OR: [
-                  { role: 'MODERATOR' },
-                  { role: 'ADMINISTRATOR' }
+                  { canEditAllEditions: true },
+                  { canEditConvention: true }
                 ]
               }
             }
@@ -77,7 +76,7 @@ export default defineEventHandler(async (event) => {
     // Vérifier les permissions : créateur de l'édition, auteur de la convention, collaborateur, ou admin global
     const isCreator = edition.creatorId === event.context.user.id;
     const isConventionAuthor = edition.convention.authorId === event.context.user.id;
-    const isCollaborator = edition.convention.collaborators.length > 0;
+  const isCollaborator = edition.convention.collaborators.length > 0; // collaborateur avec droits suffisants déjà filtré
     const isGlobalAdmin = event.context.user.isGlobalAdmin || false;
 
     if (!isCreator && !isConventionAuthor && !isCollaborator && !isGlobalAdmin) {
@@ -95,7 +94,7 @@ export default defineEventHandler(async (event) => {
           collaborators: {
             where: {
               userId: event.context.user.id,
-              role: 'ADMINISTRATOR'
+              canManageCollaborators: true
             }
           }
         }
@@ -109,9 +108,9 @@ export default defineEventHandler(async (event) => {
       }
 
       // Seuls l'auteur, les administrateurs, ou les admins globaux peuvent changer la convention d'une édition
-      const canChangeConvention = convention.authorId === event.context.user.id || 
-                                  convention.collaborators.length > 0 ||
-                                  event.context.user.isGlobalAdmin;
+  const canChangeConvention = convention.authorId === event.context.user.id || 
+              convention.collaborators.length > 0 ||
+              event.context.user.isGlobalAdmin;
 
       if (!canChangeConvention) {
         throw createError({
@@ -149,7 +148,7 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    const updatedData: Partial<Edition> = {
+  const updatedData: any = {
       conventionId: conventionId !== undefined ? conventionId : edition.conventionId,
       name: name !== undefined ? (name?.trim() || null) : edition.name,
       description: description || edition.description,
@@ -157,7 +156,6 @@ export default defineEventHandler(async (event) => {
       startDate: startDate ? new Date(startDate) : edition.startDate,
       endDate: endDate ? new Date(endDate) : edition.endDate,
       addressLine1: addressLine1 || edition.addressLine1,
-      addressLine2: addressLine2 || edition.addressLine2,
       postalCode: postalCode || edition.postalCode,
       city: city || edition.city,
       region: region || edition.region,
@@ -195,7 +193,7 @@ export default defineEventHandler(async (event) => {
     if (addressChanged) {
       const geoCoords = await geocodeEdition({
         addressLine1: addressLine1 || edition.addressLine1,
-        addressLine2: addressLine2 !== undefined ? addressLine2 : edition.addressLine2,
+        addressLine2: addressLine2 !== undefined ? addressLine2 : edition.addressLine2 ?? null,
         city: city || edition.city,
         postalCode: postalCode || edition.postalCode,
         country: country || edition.country
@@ -205,7 +203,7 @@ export default defineEventHandler(async (event) => {
       updatedData.longitude = geoCoords.longitude;
     }
 
-    const updatedEdition = await prisma.edition.update({
+  const updatedEdition = await prisma.edition.update({
       where: {
         id: editionId,
       },
@@ -223,7 +221,7 @@ export default defineEventHandler(async (event) => {
   } catch (error) {
     console.error('Erreur lors de la mise à jour de l\'édition:', error);
     
-    if (error.statusCode) {
+    if ((error as any)?.statusCode) {
       throw error;
     }
     

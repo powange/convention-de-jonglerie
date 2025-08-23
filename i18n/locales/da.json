@@ -189,7 +189,9 @@
     "back": "Tilbage",
     "private": "Privat",
     "or": "Eller",
-    "create": "Opret"
+    "create": "Opret",
+    "refresh": "Opdater",
+    "save": "Gem"
   },
   "dates": {
     "same_day_with_time": "Den {date} fra {startTime} til {endTime}",
@@ -304,8 +306,6 @@
     "ticketing": "Billetsalg",
     "services_offered": "Tilbudte tjenester",
     "no_services": "Ingen specifikke tjenester angivet",
-    "administrator": "Administrator",
-    "moderator": "Moderator",
     "loading_details": "Indlæser udgavens detaljer...",
     "not_found": "Udgave ikke fundet.",
     "add_lost_item": "Tilføj hittegods",
@@ -336,9 +336,7 @@
     "practical_info": "Praktiske oplysninger",
     "organizing_team": "Arrangerende team",
     "creator": "Skaber",
-    "admin": "Admin",
     "edition_creator": "Udgavens skaber",
-    "collaborator": "Medarbejder",
     "of_convention": "af konventionen",
     "enlarged_image": "Forstørret billede",
     "poster_of": "Plakat for {name}"
@@ -354,8 +352,6 @@
     "no_description": "Ingen beskrivelse",
     "collaborators": "Medarbejdere",
     "manage": "Administrer",
-    "admin": "Admin",
-    "moderator": "Moderator",
     "editions": "Udgaver",
     "add_edition": "Tilføj en udgave",
     "no_editions": "Ingen udgaver for denne konvention",
@@ -387,7 +383,6 @@
     "departure_placeholder": "Afrejseby eller -adresse",
     "to": "Til",
     "arrival_placeholder": "Ankomstby eller -adresse",
-    "departure_date": "Afrejsetidspunkt",
     "select_date_time": "Vælg dato og tidspunkt",
     "details": "Detaljer",
     "details_placeholder": "Nyttig info om turen (bagage, mødested mv.)",
@@ -507,14 +502,6 @@
     "collaborator_added_successfully": "Medarbejderen blev tilføjet med succes",
     "collaborator_removed": "Medarbejder fjernet",
     "collaborator_removed_successfully": "Medarbejderen blev fjernet med succes",
-    "offer_updated": "Tilbud ændret",
-    "carpool_proposed": "Samkørsel foreslået",
-    "offer_updated_successfully": "Dit tilbud blev ændret med succes",
-    "carpool_offer_published": "Dit samkørselstilbud er blevet offentliggjort",
-    "request_updated": "Anmodning ændret",
-    "request_published": "Anmodning offentliggjort",
-    "request_updated_successfully": "Din anmodning blev ændret med succes",
-    "carpool_request_published": "Din samkørselsanmodning er blevet offentliggjort",
     "comment_published": "Kommentar offentliggjort",
     "comment_published_successfully": "Din kommentar blev offentliggjort med succes",
     "comment_deleted": "Kommentar slettet",
@@ -539,9 +526,7 @@
     "generic_error": "Der opstod en fejl",
     "generic": "Der opstod en fejl",
     "removal_error": "Fejl under fjernelse",
-    "leaflet_unavailable": "Leaflet ikke tilgængelig",
     "cannot_load_editions": "Kan ikke indlæse udgaver",
-    "leaflet_loading_error": "Fejl ved indlæsning af Leaflet",
     "addition_error": "Fejl under tilføjelse",
     "content_required": "Indhold er påkrævet",
     "content_too_long": "Indholdet må ikke overstige {max} tegn",
@@ -556,10 +541,6 @@
     "seats_minimum_one": "Antallet af pladser skal være mindst 1",
     "seats_maximum": "Maksimum {max} pladser",
     "people_maximum": "Maksimum {max} personer",
-    "cannot_update_offer": "Kan ikke ændre tilbud",
-    "cannot_create_carpool_offer": "Kan ikke oprette samkørselstilbud",
-    "cannot_update_request": "Kan ikke ændre anmodning",
-    "cannot_create_carpool_request": "Kan ikke oprette samkørselsanmodning",
     "loading_error": "Indlæsningsfejl",
     "cannot_publish_comment": "Kan ikke offentliggøre kommentar",
     "cannot_delete_comment": "Kan ikke slette kommentar",
@@ -639,23 +620,13 @@
       "select_convention": "Vælg en konvention",
       "edition_name_example": "Udgavenavn (f.eks: EJC 2024)",
       "address_complement": "Bygning A, Festsal...",
-      "select_date": "Vælg en dato",
-      "departure_details": "F.eks: København H, Amagertorv, A1 betalingsring...",
       "search_by_name": "Søg efter navn",
-      "carpool_offer_details": "F.eks: Jeg kører fra Nørreport, mulighed for afhentning på motorvejen. Ikke-ryger bil. Plads til jongløringsudstyr.",
-      "carpool_request_details": "F.eks: Jeg er fleksibel med tidspunktet, kan køre fredag aften eller lørdag morgen. Jeg rejser let med kun en rygsæk.",
-      "departure_city": "F.eks: København, Aarhus, Odense...",
-      "phone_example": "F.eks: 20 12 34 56",
       "city_example": "København"
     },
     "labels": {
       "full_address": "Fuldstændig adresse",
       "from_date": "Fra",
       "select_date": "Vælg en dato",
-      "departure_city": "Afrejseby",
-      "departure_location": "Hvor kører du fra?",
-      "phone_number": "Dit telefonnummer",
-      "additional_info": "Yderligere oplysninger",
       "edition_name_optional": "Udgavenavn (valgfrit)",
       "address_complement": "Adressetillæg",
       "convention_name": "Konventionsnavn",
@@ -663,7 +634,6 @@
     },
     "buttons": {
       "cancel": "Annuller",
-      "updating": "Ændrer...",
       "publishing": "Offentliggør...",
       "submitting": "Submitting..."
     }
@@ -671,20 +641,16 @@
   "components": {
     "collaborators_modal": {
       "title": "Administrer medarbejdere",
-      "in_development": "Under udvikling: Denne funktion forbedres i øjeblikket.",
-      "moderator_description": "• Moderator: Kan administrere konventionens udgaver",
-      "admin_description": "• Administrator: Kan administrere konventionen, udgaver, tilføje/fjerne medarbejdere",
       "confirm_remove": "Er du sikker på, at du vil fjerne denne medarbejder?",
       "permissions": "Tilladelser",
       "allow_modification": "Tillad ændringer",
-      "about_collaborators": "Om medarbejdere",
-      "about_collaborators_desc": "Medarbejdere kan hjælpe dig med at administrere dine konventioner. Du kan tildele dem forskellige roller:",
       "current_collaborators": "Nuværende medarbejdere",
       "add_collaborator": "Tilføj medarbejder",
       "search_user_placeholder": "Søg efter en bruger...",
-      "admin": "Admin",
       "moderator": "Moderator",
-      "administrator": "Administrator"
+      "administrator": "Administrator",
+      "refresh": "Opdater",
+      "no_collaborators": "Ingen samarbejdspartnere endnu"
     },
     "country_select": {
       "no_countries_found": "Ingen lande fundet",
@@ -813,6 +779,19 @@
       "upcoming": "Kommende",
       "past": "Tidligere",
       "yellow_border_favorite": "Gul kant = Favorit"
+    },
+    "collaborators_rights_panel": {
+      "title": "Samarbejdspartnerrettigheder (beta)",
+      "no_collaborators": "Ingen samarbejdspartnere",
+      "title_placeholder": "Titel eller rolle (valgfrit)",
+      "saved": "Rettigheder opdateret",
+      "per_edition": "Rettigheder pr. udgave",
+      "no_editions": "Ingen udgaver",
+      "history_title": "Ændringshistorik",
+      "refresh_history": "Opdater",
+      "load_history": "Indlæs historik",
+      "no_history": "Ingen ændringer registreret",
+      "by_user": "Af {user}"
     }
   },
   "pages": {
@@ -981,5 +960,37 @@
       "convention_id_required": "Convention ID påkrævet",
       "unsupported_delete_endpoint": "Ikke-understøttet sletnings-endpoint"
     }
+  },
+  "permissions": {
+    "editConvention": "Rediger konvention",
+    "deleteConvention": "Slet konvention",
+    "manageCollaborators": "Administrer samarbejdspartnere",
+    "addEdition": "Tilføj udgaver",
+    "editAllEditions": "Rediger alle udgaver",
+    "deleteAllEditions": "Slet alle udgaver",
+    "admin": "Administrator",
+    "manager": "Manager",
+    "editor": "Redaktør",
+    "viewer": "Læser",
+    "moderator": "Moderator",
+    "history": {
+      "RIGHTS_UPDATED": "Rettigheder opdateret",
+      "PER_EDITIONS_UPDATED": "Rettigheder pr. udgave opdateret",
+      "ARCHIVED": "Arkiveret",
+      "UNARCHIVED": "Genaktiveret"
+    }
+  },
+  "c": {
+    "user": {
+      "pseudo": "Brugernavn"
+    },
+    "rights": "Rettigheder",
+    "title": "Titel"
+  },
+  "p": {
+    "key": "Nøgle"
+  },
+  "ed": {
+    "id": "ID"
   }
 }

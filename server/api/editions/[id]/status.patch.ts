@@ -6,7 +6,6 @@ const statusSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  // Check authentication
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
@@ -15,7 +14,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const editionId = parseInt(event.context.params?.id as string);
-  
   if (isNaN(editionId)) {
     throw createError({
       statusCode: 400,
@@ -23,11 +21,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Validate body
   const body = await readBody(event);
   const validatedData = statusSchema.parse(body);
 
-  // Get edition with convention and collaborators
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },
     include: {
@@ -35,7 +31,9 @@ export default defineEventHandler(async (event) => {
         include: {
           collaborators: {
             include: {
-              user: true
+              user: {
+                select: { id: true, pseudo: true, emailHash: true }
+              }
             }
           }
         }
@@ -50,13 +48,17 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Check permissions
   const userId = event.context.user.id;
   const isCreator = edition.creatorId === userId;
   const isConventionAuthor = edition.convention.authorId === userId;
   const collaboration = edition.convention.collaborators.find(c => c.userId === userId);
-  const canManage = isCreator || isConventionAuthor || 
-    (collaboration && (collaboration.role === 'ADMINISTRATOR' || collaboration.role === 'MODERATOR'));
+  const canManage = isCreator || isConventionAuthor || (
+    collaboration && (
+      collaboration.canEditAllEditions ||
+      collaboration.canEditConvention ||
+      collaboration.canManageCollaborators
+    )
+  );
 
   if (!canManage) {
     throw createError({
@@ -65,30 +67,23 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Update edition status
   const updatedEdition = await prisma.edition.update({
     where: { id: editionId },
-    data: {
-      isOnline: validatedData.isOnline
-    },
+    data: { isOnline: validatedData.isOnline },
     include: {
-      creator: {
-        select: { id: true, pseudo: true }
-      },
+      creator: { select: { id: true, pseudo: true } },
       convention: {
         include: {
           collaborators: {
             include: {
               user: {
-                select: { id: true, pseudo: true, email: true }
+                select: { id: true, pseudo: true, emailHash: true } // email supprimé
               }
             }
           }
         }
       },
-      favoritedBy: {
-        select: { id: true }
-      }
+      favoritedBy: { select: { id: true } }
     }
   });
 

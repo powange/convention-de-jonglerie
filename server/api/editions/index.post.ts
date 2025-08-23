@@ -52,9 +52,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 409, statusMessage: 'Convention archivée: création d\'édition impossible' });
   }
 
-  // Vérifier droit: auteur ou collaborateur avec canAddEdition
-  const collab = convention.collaborators[0];
-  const canAdd = convention.authorId === event.context.user.id || (collab && collab.canAddEdition);
+  // Vérifier droit: auteur ou collaborateur avec canAddEdition (ajusté pour tolérer absence de tableau dans anciens tests)
+  const collab = (convention as any).collaborators?.[0];
+  const canAdd = convention.authorId === event.context.user.id || (!!collab && !!collab.canAddEdition);
   if (!canAdd) {
     throw createError({ statusCode: 403, statusMessage: 'Droit insuffisant pour créer une édition' });
   }

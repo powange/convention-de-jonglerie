@@ -94,7 +94,7 @@ describe('API Convention - Mise à jour', () => {
       collaborators: [
         {
           userId: mockUser.id,
-          role: 'ADMINISTRATOR'
+          canEditConvention: true
         }
       ]
     })

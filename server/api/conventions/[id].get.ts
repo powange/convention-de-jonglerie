@@ -49,10 +49,34 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return convention;
+    // Transformer auteur (emailHash) et collaborateurs avec nouveaux droits
+    const transformed = {
+      ...convention,
+      author: convention.author ? {
+        ...convention.author,
+        emailHash: convention.author.email ? (await import('../../utils/email-hash')).getEmailHash(convention.author.email) : undefined,
+        email: undefined
+      } : null,
+      collaborators: convention.collaborators.map((c: any) => ({
+        id: c.id,
+        addedAt: c.addedAt,
+        title: c.title ?? null,
+        rights: {
+          editConvention: c.canEditConvention,
+          deleteConvention: c.canDeleteConvention,
+          manageCollaborators: c.canManageCollaborators,
+          addEdition: c.canAddEdition,
+          editAllEditions: c.canEditAllEditions,
+          deleteAllEditions: c.canDeleteAllEditions
+        },
+        user: c.user,
+      }))
+    } as any;
+
+    return transformed;
   } catch (error) {
     // Si c'est déjà une erreur HTTP, la relancer
-    if (error.statusCode) {
+    if ((error as any)?.statusCode) {
       throw error;
     }
     

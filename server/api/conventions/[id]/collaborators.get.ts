@@ -40,7 +40,6 @@ export default defineEventHandler(async (event) => {
       addedBy: c.addedBy,
       addedAt: c.addedAt,
       title: c.title,
-      role: c.role, // encore présent pendant transition
       rights: {
         editConvention: c.canEditConvention,
         deleteConvention: c.canDeleteConvention,

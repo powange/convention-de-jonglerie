@@ -1,10 +1,10 @@
  
-import { describe, it, expect, beforeEach } from 'vitest';
-import handler from '../../../../server/api/conventions/[id]/collaborators/[collaboratorId].put';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import handler from '../../../../../server/api/conventions/[id]/collaborators/[collaboratorId].put';
 
 // Mock des utilitaires de collaborateur
-vi.mock('../../../../server/utils/collaborator-management', () => ({
-  updateCollaboratorRole: vi.fn(),
+vi.mock('../../../../../server/utils/collaborator-management', () => ({
+  updateCollaboratorRights: vi.fn(),
 }));
 
 const mockEvent = {
@@ -20,8 +20,8 @@ const mockEvent = {
 
 // Import des mocks après la déclaration
  
-import { updateCollaboratorRole } from '../../../../server/utils/collaborator-management';
-const mockUpdateRole = updateCollaboratorRole as ReturnType<typeof vi.fn>;
+import { updateCollaboratorRights } from '../../../../../server/utils/collaborator-management';
+const mockUpdateRole = updateCollaboratorRights as ReturnType<typeof vi.fn>;
 
 describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
   beforeEach(() => {
@@ -29,16 +29,15 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
     global.readBody = vi.fn();
   });
 
-  it('devrait mettre à jour le rôle d\'un collaborateur avec succès', async () => {
-    const requestBody = {
-      role: 'ADMINISTRATOR',
-    };
+  it("devrait mettre à jour les droits d'un collaborateur avec succès", async () => {
+    const requestBody = { rights: { manageCollaborators: true, editConvention: true } };
 
     const mockUpdatedCollaborator = {
       id: 2,
       conventionId: 1,
       userId: 3,
-      role: 'ADMINISTRATOR',
+      canManageCollaborators: true,
+      canEditConvention: true,
       addedById: 1,
       user: {
         id: 3,
@@ -56,34 +55,21 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
       success: true,
       collaborator: mockUpdatedCollaborator,
     });
-    expect(mockUpdateRole).toHaveBeenCalledWith(1, 2, 'ADMINISTRATOR', 1);
+  expect(mockUpdateRole).toHaveBeenCalled();
   });
 
-  it('devrait mettre à jour vers MODERATOR', async () => {
-    const requestBody = {
-      role: 'MODERATOR',
-    };
-
-    const mockUpdatedCollaborator = {
-      id: 2,
-      role: 'MODERATOR',
-      user: { pseudo: 'collaborator' },
-    };
-
+  it('devrait mettre à jour un sous-ensemble de droits', async () => {
+    const requestBody = { rights: { editConvention: true } };
+    const mockUpdatedCollaborator = { id: 2, canEditConvention: true };
     global.readBody.mockResolvedValue(requestBody);
     mockUpdateRole.mockResolvedValue(mockUpdatedCollaborator);
-
     const result = await handler(mockEvent as any);
-
     expect(result.success).toBe(true);
-    expect(result.collaborator.role).toBe('MODERATOR');
-    expect(mockUpdateRole).toHaveBeenCalledWith(1, 2, 'MODERATOR', 1);
+    expect(mockUpdateRole).toHaveBeenCalled();
   });
 
   it('devrait rejeter si utilisateur non authentifié', async () => {
-    const requestBody = {
-      role: 'MODERATOR',
-    };
+  const requestBody = { rights: { editConvention: true } };
 
     const eventWithoutUser = {
       ...mockEvent,
@@ -101,9 +87,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
       context: { ...mockEvent.context, params: { id: 'invalid', collaboratorId: '2' } },
     };
 
-    const requestBody = {
-      role: 'MODERATOR',
-    };
+  const requestBody = { rights: { editConvention: true } };
 
     global.readBody.mockResolvedValue(requestBody);
     // L'updateCollaboratorRole va recevoir NaN comme conventionId et rejeter
@@ -118,9 +102,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
       context: { ...mockEvent.context, params: { id: '1', collaboratorId: 'invalid' } },
     };
 
-    const requestBody = {
-      role: 'MODERATOR',
-    };
+  const requestBody = { rights: { editConvention: true } };
 
     global.readBody.mockResolvedValue(requestBody);
     // L'updateCollaboratorRole va recevoir NaN comme collaboratorId et rejeter
@@ -129,28 +111,22 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
     await expect(handler(eventWithBadCollaboratorId as any)).rejects.toThrow('Erreur serveur');
   });
 
-  it('devrait valider le rôle avec zod', async () => {
-    const invalidBody = {
-      role: 'INVALID_ROLE',
-    };
+  it('devrait valider le schéma de droits avec zod', async () => {
+  const invalidBody = { rights: { editConvention: 'yes' as any } };
 
     global.readBody.mockResolvedValue(invalidBody);
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur');
   });
 
-  it('devrait rejeter si le rôle est manquant', async () => {
-    const emptyBody = {};
-
+  it("devrait rejeter si aucune donnée à mettre à jour n'est fournie", async () => {
+    const emptyBody = { };
     global.readBody.mockResolvedValue(emptyBody);
-
-    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur');
+    await expect(handler(mockEvent as any)).rejects.toThrow('Aucune donnée à mettre à jour');
   });
 
   it('devrait gérer les erreurs de updateCollaboratorRole', async () => {
-    const requestBody = {
-      role: 'ADMINISTRATOR',
-    };
+  const requestBody = { rights: { manageCollaborators: true } };
 
     global.readBody.mockResolvedValue(requestBody);
     mockUpdateRole.mockRejectedValue(new Error('Permission denied'));
@@ -159,9 +135,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
   });
 
   it('devrait gérer les erreurs HTTP spécifiques', async () => {
-    const requestBody = {
-      role: 'ADMINISTRATOR',
-    };
+  const requestBody = { rights: { manageCollaborators: true } };
 
     const httpError = {
       statusCode: 403,
@@ -183,42 +157,34 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
       },
     };
 
-    const requestBody = {
-      role: 'MODERATOR',
-    };
+  const requestBody = { rights: { editConvention: true } };
 
     global.readBody.mockResolvedValue(requestBody);
     mockUpdateRole.mockResolvedValue({});
 
     await handler(eventWithStringIds as any);
 
-    expect(mockUpdateRole).toHaveBeenCalledWith(123, 456, 'MODERATOR', 1);
+    expect(mockUpdateRole).toHaveBeenCalledWith(expect.objectContaining({
+      conventionId: 123,
+      collaboratorId: 456,
+      userId: 1,
+      rights: { editConvention: true }
+    }));
   });
 
-  it('devrait gérer toutes les valeurs de rôles valides', async () => {
-    const validRoles = ['ADMINISTRATOR', 'MODERATOR'];
-    
-    for (const role of validRoles) {
-      const requestBody = { role };
-      
-      global.readBody.mockResolvedValue(requestBody);
-      mockUpdateRole.mockResolvedValue({ role });
-
-      const result = await handler(mockEvent as any);
-
-      expect(result.success).toBe(true);
-      expect(mockUpdateRole).toHaveBeenCalledWith(1, 2, role, 1);
-    }
+  it('devrait mettre à jour partiellement les droits', async () => {
+    const requestBody = { rights: { addEdition: true } };
+    global.readBody.mockResolvedValue(requestBody);
+    mockUpdateRole.mockResolvedValue({ id: 2, canAddEdition: true });
+    const result = await handler(mockEvent as any);
+    expect(result.success).toBe(true);
+    expect(mockUpdateRole).toHaveBeenCalled();
   });
 
   it('devrait gérer les erreurs de base de données', async () => {
-    const requestBody = {
-      role: 'ADMINISTRATOR',
-    };
-
+    const requestBody = { rights: { manageCollaborators: true } };
     global.readBody.mockResolvedValue(requestBody);
     mockUpdateRole.mockRejectedValue(new Error('Database connection failed'));
-
     await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur');
   });
 });

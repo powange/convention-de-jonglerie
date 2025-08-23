@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { prismaMock } from '../../../../__mocks__/prisma';
-import handler from '../../../../../server/api/editions/index.post'
+import handler from '../../../../../server/api/editions/index.post';
 
 // Mock des utilitaires
 vi.mock('../../../../../server/utils/geocoding', () => ({
@@ -97,9 +97,7 @@ describe('/api/editions POST', () => {
     expect(result.hasToilets).toBe(true)
     expect(result.hasShowers).toBe(false)
 
-    expect(prismaMock.convention.findUnique).toHaveBeenCalledWith({
-      where: { id: editionData.conventionId }
-    })
+  expect(prismaMock.convention.findUnique).toHaveBeenCalledWith(expect.objectContaining({ where: { id: editionData.conventionId } }))
 
     expect(prismaMock.edition.create).toHaveBeenCalledWith({
       data: expect.objectContaining({

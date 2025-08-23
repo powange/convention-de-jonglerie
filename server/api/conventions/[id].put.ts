@@ -44,7 +44,10 @@ export default defineEventHandler(async (event) => {
         collaborators: {
           where: {
             userId: event.context.user.id,
-            role: 'ADMINISTRATOR'
+            OR: [
+              { canEditConvention: true },
+              { canManageCollaborators: true }
+            ]
           }
         }
       }
@@ -57,7 +60,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Vérifier que l'utilisateur est soit l'auteur, soit un collaborateur ADMINISTRATOR
+  // Vérifier que l'utilisateur est soit l'auteur, soit un collaborateur avec droits d'édition
     const isAuthor = existingConvention.authorId === event.context.user.id;
     const isAdmin = existingConvention.collaborators.length > 0;
 
@@ -92,7 +95,7 @@ export default defineEventHandler(async (event) => {
     return updatedConvention;
   } catch (error) {
     // Si c'est déjà une erreur HTTP, la relancer
-    if (error.statusCode) {
+  if ((error as any)?.statusCode) {
       throw error;
     }
     

@@ -15,6 +15,8 @@
     "admin:add": "npx tsx scripts/manage-admin.ts add",
     "admin:remove": "npx tsx scripts/manage-admin.ts remove",
     "admin:list": "npx tsx scripts/manage-admin.ts list",
+  "migrate:collaborators": "npx tsx scripts/migrate-collaborator-rights.ts",
+  "migrate:collaborators:dry": "npx tsx scripts/migrate-collaborator-rights.ts --dry",
     "help": "node scripts/show-help.mjs",
     "check-i18n": "node scripts/check-i18n.js",
     "prune-i18n": "node scripts/prune-i18n.cjs",
@@ -95,8 +97,9 @@
     "cross-env": "^10.0.0",
     "happy-dom": "^18.0.1",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4",
-    "wait-on": "^8.0.4"
+  "vitest": "^3.2.4",
+  "wait-on": "^8.0.4",
+  "tsx": "^4.19.1"
   },
   "engines": {
     "node": ">=22 <23"

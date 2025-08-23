@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import handler from '../../../../server/api/conventions/[id].delete';
+import handler from '../../../../../server/api/conventions/[id].delete';
 import { prismaMock } from '../../../../__mocks__/prisma';
 
 const mockEvent = {
@@ -25,9 +25,11 @@ describe('/api/conventions/[id] DELETE', () => {
       name: 'Convention Test',
       authorId: 1, // Utilisateur connecté est l'auteur
       collaborators: [],
-    };
+      editions: [],
+      isArchived: false
+    } as any;
 
-    prismaMock.convention.findUnique.mockResolvedValue(mockConvention);
+  prismaMock.convention.findUnique.mockResolvedValue(mockConvention as any);
     prismaMock.convention.delete.mockResolvedValue(mockConvention);
 
     const result = await handler(mockEvent as any);
@@ -35,17 +37,7 @@ describe('/api/conventions/[id] DELETE', () => {
     expect(result).toEqual({
       message: 'Convention supprimée avec succès',
     });
-    expect(prismaMock.convention.findUnique).toHaveBeenCalledWith({
-      where: { id: 1 },
-      include: {
-        collaborators: {
-          where: {
-            userId: 1,
-            role: 'ADMINISTRATOR',
-          },
-        },
-      },
-    });
+  expect(prismaMock.convention.findUnique).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 1 } }));
     expect(prismaMock.convention.delete).toHaveBeenCalledWith({
       where: { id: 1 },
     });
@@ -56,15 +48,12 @@ describe('/api/conventions/[id] DELETE', () => {
       id: 1,
       name: 'Convention Test',
       authorId: 2, // Utilisateur connecté n'est pas l'auteur
-      collaborators: [
-        {
-          userId: 1,
-          role: 'ADMINISTRATOR',
-        },
-      ],
-    };
+      collaborators: [ { userId: 1, canDeleteConvention: true } ],
+      editions: [],
+      isArchived: false
+    } as any;
 
-    prismaMock.convention.findUnique.mockResolvedValue(mockConvention);
+  prismaMock.convention.findUnique.mockResolvedValue(mockConvention as any);
     prismaMock.convention.delete.mockResolvedValue(mockConvention);
 
     const result = await handler(mockEvent as any);
@@ -106,14 +95,14 @@ describe('/api/conventions/[id] DELETE', () => {
       id: 1,
       name: 'Convention Test',
       authorId: 2, // Utilisateur connecté n'est pas l'auteur
-      collaborators: [], // Pas de collaborateurs ADMINISTRATOR
-    };
+      collaborators: [], // Pas de collaborateurs avec droits
+      editions: [],
+      isArchived: false
+    } as any;
 
-    prismaMock.convention.findUnique.mockResolvedValue(mockConvention);
+  prismaMock.convention.findUnique.mockResolvedValue(mockConvention as any);
 
-    await expect(handler(mockEvent as any)).rejects.toThrow(
-      'Vous n\'avez pas les droits pour supprimer cette convention'
-    );
+  await expect(handler(mockEvent as any)).rejects.toThrow('Droit insuffisant');
   });
 
   it('devrait rejeter si collaborateur MODERATOR uniquement', async () => {
@@ -121,22 +110,20 @@ describe('/api/conventions/[id] DELETE', () => {
       id: 1,
       name: 'Convention Test',
       authorId: 2,
-      collaborators: [], // L'API filtre sur ADMINISTRATOR, donc pas de collaborateurs retournés
-    };
+      collaborators: [],
+      editions: [],
+      isArchived: false
+    } as any;
 
-    prismaMock.convention.findUnique.mockResolvedValue(mockConvention);
+  prismaMock.convention.findUnique.mockResolvedValue(mockConvention as any);
 
-    await expect(handler(mockEvent as any)).rejects.toThrow(
-      'Vous n\'avez pas les droits pour supprimer cette convention'
-    );
+  await expect(handler(mockEvent as any)).rejects.toThrow('Droit insuffisant');
   });
 
   it('devrait gérer les erreurs de base de données lors de la recherche', async () => {
     prismaMock.convention.findUnique.mockRejectedValue(new Error('Database error'));
 
-    await expect(handler(mockEvent as any)).rejects.toThrow(
-      'Erreur serveur lors de la suppression de la convention'
-    );
+  await expect(handler(mockEvent as any)).rejects.toThrow('suppression/archivage');
   });
 
   it('devrait gérer les erreurs de base de données lors de la suppression', async () => {
@@ -144,14 +131,14 @@ describe('/api/conventions/[id] DELETE', () => {
       id: 1,
       authorId: 1,
       collaborators: [],
-    };
+      editions: [],
+      isArchived: false
+    } as any;
 
-    prismaMock.convention.findUnique.mockResolvedValue(mockConvention);
+  prismaMock.convention.findUnique.mockResolvedValue(mockConvention as any);
     prismaMock.convention.delete.mockRejectedValue(new Error('Database error'));
 
-    await expect(handler(mockEvent as any)).rejects.toThrow(
-      'Erreur serveur lors de la suppression de la convention'
-    );
+  await expect(handler(mockEvent as any)).rejects.toThrow('suppression/archivage');
   });
 
   it('devrait gérer les erreurs HTTP spécifiques', async () => {
@@ -175,24 +162,16 @@ describe('/api/conventions/[id] DELETE', () => {
       id: 123,
       authorId: 1,
       collaborators: [],
-    };
+      editions: [],
+      isArchived: false
+    } as any;
 
     prismaMock.convention.findUnique.mockResolvedValue(mockConvention);
     prismaMock.convention.delete.mockResolvedValue(mockConvention);
 
     await handler(eventWithStringId as any);
 
-    expect(prismaMock.convention.findUnique).toHaveBeenCalledWith({
-      where: { id: 123 },
-      include: {
-        collaborators: {
-          where: {
-            userId: 1,
-            role: 'ADMINISTRATOR',
-          },
-        },
-      },
-    });
+  expect(prismaMock.convention.findUnique).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 123 } }));
     expect(prismaMock.convention.delete).toHaveBeenCalledWith({
       where: { id: 123 },
     });
@@ -202,13 +181,10 @@ describe('/api/conventions/[id] DELETE', () => {
     const mockConvention = {
       id: 1,
       authorId: 1, // Utilisateur est l'auteur
-      collaborators: [
-        {
-          userId: 1, // ET aussi collaborateur ADMIN
-          role: 'ADMINISTRATOR',
-        },
-      ],
-    };
+      collaborators: [ { userId: 1, canDeleteConvention: true } ],
+      editions: [],
+      isArchived: false
+    } as any;
 
     prismaMock.convention.findUnique.mockResolvedValue(mockConvention);
     prismaMock.convention.delete.mockResolvedValue(mockConvention);

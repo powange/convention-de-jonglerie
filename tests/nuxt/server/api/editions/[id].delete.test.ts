@@ -184,7 +184,8 @@ describe('/api/editions/[id] DELETE', () => {
         authorId: 2,
         collaborators: [{
           userId: 1,
-          role: 'ADMINISTRATOR'
+          canDeleteConvention: true,
+          canDeleteAllEditions: true
         }]
       }
     }
@@ -215,7 +216,7 @@ describe('/api/editions/[id] DELETE', () => {
         authorId: 2,
         collaborators: [{
           userId: 1,
-          role: 'MODERATOR'
+          canDeleteConvention: true
         }]
       }
     }
@@ -304,8 +305,9 @@ describe('/api/editions/[id] DELETE', () => {
               where: {
                 userId: 1,
                 OR: [
-                  { role: 'MODERATOR' },
-                  { role: 'ADMINISTRATOR' }
+                  { canDeleteAllEditions: true },
+                  { canDeleteConvention: true },
+                  { canEditAllEditions: true }
                 ]
               }
             }
