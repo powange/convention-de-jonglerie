@@ -360,7 +360,7 @@
                 :model-value="state[service.key]"
                 indicator="end"
                 variant="card"
-                @update:model-value="val => (state as any)[service.key] = val"
+                @update:model-value="val => setServiceValue(service.key, val)"
               >
                 <template #label>
                   <div class="flex items-center gap-2">
@@ -993,6 +993,11 @@ const updateEndDateTime = () => {
     const minutesStr = Number.isFinite(minutes) ? minutes!.toString().padStart(2, '0') : '00'
     state.endDate = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`
   }
+}
+
+// Mise à jour d'un service booléen (évite syntaxe TS dans template)
+function setServiceValue(key: string, value: boolean) {
+  ;(state as any)[key] = value
 }
 
 // Préparer le calendrier de fin : se placer sur la date de début si définie
