@@ -51,9 +51,27 @@ export default defineEventHandler(async (event) => {
       title: title ?? undefined,
     })
 
+    const anyCollab: any = updatedCollaborator as any
     return {
       success: true,
-      collaborator: updatedCollaborator,
+      collaborator: {
+        id: anyCollab.id,
+        title: anyCollab.title,
+        rights: {
+          editConvention: anyCollab.canEditConvention,
+          deleteConvention: anyCollab.canDeleteConvention,
+          manageCollaborators: anyCollab.canManageCollaborators,
+          addEdition: anyCollab.canAddEdition,
+          editAllEditions: anyCollab.canEditAllEditions,
+          deleteAllEditions: anyCollab.canDeleteAllEditions,
+        },
+        perEdition: (anyCollab.perEditionPermissions || []).map((p: any) => ({
+          editionId: p.editionId,
+          canEdit: p.canEdit,
+          canDelete: p.canDelete,
+        })),
+        user: anyCollab.user,
+      },
     }
   } catch (error: unknown) {
     const httpError = error as { statusCode?: number; message?: string }

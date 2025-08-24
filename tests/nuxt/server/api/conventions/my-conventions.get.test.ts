@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import handler from '../../../../../server/api/conventions/my-conventions.get'
 import { getEmailHash } from '../../../../../server/utils/email-hash'
@@ -90,7 +90,7 @@ describe('/api/conventions/my-conventions GET', () => {
       ],
     })
 
-    expect(prismaMock.convention.findMany).toHaveBeenCalledWith({
+  expect(prismaMock.convention.findMany).toHaveBeenCalledWith({
       where: {
         isArchived: false,
         OR: [{ authorId: 1 }, { collaborators: { some: { userId: 1 } } }],
@@ -113,6 +113,7 @@ describe('/api/conventions/my-conventions GET', () => {
                 email: true,
               },
             },
+      perEditionPermissions: true,
           },
           orderBy: {
             addedAt: 'asc',

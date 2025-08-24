@@ -49,6 +49,7 @@ export default defineEventHandler(async (event) => {
                 email: true,
               },
             },
+            perEditionPermissions: true,
           },
           orderBy: {
             addedAt: 'asc',
@@ -74,13 +75,28 @@ export default defineEventHandler(async (event) => {
         emailHash: getEmailHash(convention.author.email),
         email: undefined,
       } as any,
-      collaborators: convention.collaborators.map((collab) => ({
-        ...collab,
+      collaborators: convention.collaborators.map((collab: any) => ({
+        id: collab.id,
+        title: collab.title,
+        addedAt: collab.addedAt,
         user: {
           ...collab.user,
           emailHash: getEmailHash(collab.user.email),
           email: undefined,
         } as any,
+        rights: {
+          editConvention: collab.canEditConvention,
+          deleteConvention: collab.canDeleteConvention,
+            manageCollaborators: collab.canManageCollaborators,
+            addEdition: collab.canAddEdition,
+            editAllEditions: collab.canEditAllEditions,
+            deleteAllEditions: collab.canDeleteAllEditions,
+        },
+        perEdition: (collab.perEditionPermissions || []).map((p: any) => ({
+          editionId: p.editionId,
+          canEdit: p.canEdit,
+          canDelete: p.canDelete,
+        })),
       })),
     }))
 

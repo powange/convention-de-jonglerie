@@ -63,6 +63,12 @@ describe('/api/conventions/[id]/collaborators POST', () => {
       conventionId: 1,
       userId: 2,
       canEditConvention: true,
+      canDeleteConvention: false,
+      canManageCollaborators: false,
+      canAddEdition: false,
+      canEditAllEditions: false,
+      canDeleteAllEditions: false,
+      perEditionPermissions: [],
       addedById: 1,
       user: mockUser,
     }
@@ -73,9 +79,12 @@ describe('/api/conventions/[id]/collaborators POST', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual({
-      success: true,
-      collaborator: mockCollaborator,
+    expect(result.success).toBe(true)
+    expect(result.collaborator).toMatchObject({
+      id: mockCollaborator.id,
+      rights: { editConvention: true },
+      perEdition: [],
+      user: { id: mockUser.id, pseudo: mockUser.pseudo },
     })
     expect(mockFindUser).toHaveBeenCalledWith('newuser@test.com')
     expect(mockAddCollaborator).toHaveBeenCalled()
@@ -97,6 +106,12 @@ describe('/api/conventions/[id]/collaborators POST', () => {
       conventionId: 1,
       userId: 2,
       canManageCollaborators: true,
+      canEditConvention: false,
+      canDeleteConvention: false,
+      canAddEdition: false,
+      canEditAllEditions: false,
+      canDeleteAllEditions: false,
+      perEditionPermissions: [],
       addedById: 1,
       user: mockUser,
     }
@@ -109,10 +124,8 @@ describe('/api/conventions/[id]/collaborators POST', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual({
-      success: true,
-      collaborator: mockCollaborator,
-    })
+  expect(result.success).toBe(true)
+  expect(result.collaborator.rights.manageCollaborators).toBe(true)
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
       where: { id: 2 },
       select: { id: true, pseudo: true },

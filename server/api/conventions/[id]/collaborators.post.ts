@@ -104,15 +104,8 @@ export default defineEventHandler(async (event) => {
       perEdition,
     })
 
-    // Rétro‑compatibilité des tests existants : si le service mocké ne retourne pas
-    // perEditionPermissions (cas des tests actuels), renvoyer directement l'objet
-    // collaborateur tel quel (ancienne forme attendue par les tests).
     const anyCollab: any = collaborator as any
-    if (!Array.isArray(anyCollab.perEditionPermissions)) {
-      return { success: true, collaborator }
-    }
-
-    // Nouvelle structure normalisée (avec sous‑objet rights et tableau perEdition)
+    // Structure normalisée (avec sous‑objet rights et tableau perEdition)
     return {
       success: true,
       collaborator: {
@@ -126,7 +119,7 @@ export default defineEventHandler(async (event) => {
           editAllEditions: collaborator.canEditAllEditions,
           deleteAllEditions: collaborator.canDeleteAllEditions,
         },
-        perEdition: anyCollab.perEditionPermissions.map((p: any) => ({
+        perEdition: (anyCollab.perEditionPermissions || []).map((p: any) => ({
           editionId: p.editionId,
           canEdit: p.canEdit,
           canDelete: p.canDelete,
