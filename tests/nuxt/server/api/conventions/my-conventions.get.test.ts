@@ -90,7 +90,7 @@ describe('/api/conventions/my-conventions GET', () => {
       ],
     })
 
-  expect(prismaMock.convention.findMany).toHaveBeenCalledWith({
+    expect(prismaMock.convention.findMany).toHaveBeenCalledWith({
       where: {
         isArchived: false,
         OR: [{ authorId: 1 }, { collaborators: { some: { userId: 1 } } }],
@@ -113,7 +113,7 @@ describe('/api/conventions/my-conventions GET', () => {
                 email: true,
               },
             },
-      perEditionPermissions: true,
+            perEditionPermissions: true,
           },
           orderBy: {
             addedAt: 'asc',

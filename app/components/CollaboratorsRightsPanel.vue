@@ -58,7 +58,7 @@
               {{ c.title }}
             </p>
           </div>
-          <div>
+          <div class="flex items-center gap-1">
             <UButton
               size="xs"
               variant="ghost"
@@ -68,7 +68,17 @@
                   ? 'i-heroicons-chevron-up'
                   : 'i-heroicons-adjustments-horizontal'
               "
+              :disabled="deletingId === c.id"
               @click="toggle(c.id)"
+            />
+            <UButton
+              size="xs"
+              variant="ghost"
+              color="error"
+              icon="i-heroicons-trash"
+              :loading="deletingId === c.id"
+              :disabled="deletingId === c.id || savingId === c.id"
+              @click="removeCollaborator(c)"
             />
           </div>
         </div>
@@ -77,72 +87,14 @@
           v-if="expandedId === c.id"
           class="mt-3 border-t border-gray-100 dark:border-gray-700 pt-3 space-y-3"
         >
-          <!-- Global rights form -->
-          <form class="space-y-2" @submit.prevent="save(c)">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div v-for="p in permissionList" :key="p.key" class="flex items-center justify-between gap-2 py-1 px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                <span class="text-xs font-medium">{{ $t(p.label) }}</span>
-                <USwitch
-                  v-if="draft[c.id]"
-                  :model-value="draft[c.id]?.rights[p.key]"
-                  size="xs"
-                  color="primary"
-                  @update:model-value="(val) => updateRight(c.id, p.key, val)"
-                />
-              </div>
-            </div>
-            <div>
-              <UInput
-                v-if="draft[c.id]"
-                v-model="draft[c.id]!.title"
-                size="xs"
-                :placeholder="$t('components.collaborators_rights_panel.title_placeholder')"
-              />
-            </div>
-            <!-- Per-edition rights -->
-            <div class="mt-4">
-              <h6
-                class="text-[11px] uppercase font-semibold tracking-wide text-gray-500 dark:text-gray-400 mb-2"
-              >
-                {{ $t('components.collaborators_rights_panel.per_edition') }}
-              </h6>
-              <div v-if="!editions.length" class="text-[11px] italic text-gray-500">
-                {{ $t('components.collaborators_rights_panel.no_editions') }}
-              </div>
-              <div v-else class="max-h-48 overflow-y-auto pr-1 space-y-2">
-                <div
-                  v-for="ed in editions"
-                  :key="ed.id"
-                  class="border border-gray-100 dark:border-gray-700 rounded p-2 flex items-center justify-between"
-                >
-                  <span
-                    class="text-[11px] font-medium truncate max-w-[140px]"
-                    :title="ed.name || '#' + ed.id"
-                    >{{ ed.name || '#' + ed.id }}</span
-                  >
-                  <div class="flex gap-4 items-center">
-                    <div class="flex items-center gap-1">
-                      <span class="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ $t('common.edit') }}</span>
-                      <USwitch
-                        size="xs"
-                        color="primary"
-                        :model-value="draft[c.id]?.perEdition.some((p) => p.editionId === ed.id && p.canEdit)"
-                        @update:model-value="(val) => togglePerEdition(c.id, ed.id, 'canEdit', val)"
-                      />
-                    </div>
-                    <div class="flex items-center gap-1">
-                      <span class="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ $t('common.delete') }}</span>
-                      <USwitch
-                        size="xs"
-                        color="primary"
-                        :model-value="draft[c.id]?.perEdition.some((p) => p.editionId === ed.id && p.canDelete)"
-                        @update:model-value="(val) => togglePerEdition(c.id, ed.id, 'canDelete', val)"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <!-- Rights form extracted into reusable component -->
+          <form class="space-y-4" @submit.prevent="save(c)">
+            <CollaboratorRightsFields
+              v-if="draft[c.id]"
+              v-model="draft[c.id]"
+              :editions="editions"
+              size="xs"
+            />
             <div class="flex justify-end gap-2">
               <UButton size="xs" color="neutral" variant="ghost" @click="cancel(c.id)">{{
                 $t('common.cancel')
@@ -243,6 +195,7 @@ const collaborators = ref<CollaboratorItem[]>([])
 const editions = ref<EditionLite[]>([])
 const loading = ref(false)
 const savingId = ref<number | null>(null)
+const deletingId = ref<number | null>(null)
 const expandedId = ref<number | null>(null)
 const draft = reactive<Record<number, DraftEntry>>({})
 // History state
@@ -318,27 +271,6 @@ function toggle(id: number) {
   ensureDraft(c)
   expandedId.value = id
 }
-function updateRight(id: number, key: string, value: any) {
-  if (!draft[id]) return
-  draft[id].rights[key] = !!value
-}
-function togglePerEdition(
-  collabId: number,
-  editionId: number,
-  field: 'canEdit' | 'canDelete',
-  value: any
-) {
-  const d = draft[collabId]
-  if (!d) return
-  let entry = d.perEdition.find((p) => p.editionId === editionId)
-  if (!entry) {
-    entry = { editionId, canEdit: false, canDelete: false }
-    d.perEdition.push(entry)
-  }
-  ;(entry as any)[field] = !!value
-  // Nettoyage: retirer lignes vides
-  d.perEdition = d.perEdition.filter((p) => p.canEdit || p.canDelete)
-}
 function cancel(id: number) {
   draft[id] = undefined as any
   if (expandedId.value === id) expandedId.value = null
@@ -393,6 +325,45 @@ async function save(c: CollaboratorItem) {
   }
 }
 
+async function removeCollaborator(c: CollaboratorItem) {
+  if (!props.conventionId) return
+  // Confirmation simple (i18n si clé existante sinon fallback)
+  const confirmMsg =
+    t?.('components.collaborators_rights_panel.delete_confirm') || 'Supprimer ce collaborateur ?'
+  if (!window.confirm(confirmMsg)) return
+  deletingId.value = c.id
+  try {
+    const res: any = await $fetch(`/api/conventions/${props.conventionId}/collaborators/${c.id}`, {
+      method: 'DELETE' as any,
+    })
+    if (!res?.success) {
+      toast.add({
+        title: t('errors.delete_error'),
+        description: res?.message || 'Erreur',
+        color: 'error',
+        icon: 'i-heroicons-x-circle',
+      })
+    } else {
+      toast.add({
+        title: t('common.deleted') || 'Supprimé',
+        description: res?.message,
+        color: 'success',
+        icon: 'i-heroicons-trash',
+      })
+    }
+    await refresh()
+  } catch (e: any) {
+    toast.add({
+      title: t('errors.delete_error'),
+      description: e?.data?.message || e?.message,
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
+  } finally {
+    deletingId.value = null
+  }
+}
+
 watch(
   () => props.conventionId,
   (v) => {
@@ -400,4 +371,7 @@ watch(
   },
   { immediate: true }
 )
+
+// Expose pour que le parent puisse forcer un refresh après ajout/suppression externe
+defineExpose({ refresh })
 </script>

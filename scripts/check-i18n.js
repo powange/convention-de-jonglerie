@@ -174,6 +174,7 @@ function extractI18nKeysFromFile(filePath) {
       'activeService',
       'service',
       'category',
+      'localValue',
     ]
 
     // Exceptions - ces patterns sont valides même s'ils commencent par un mot réservé

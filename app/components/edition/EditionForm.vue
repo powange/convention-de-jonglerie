@@ -36,7 +36,10 @@
               size="lg"
               class="w-full"
               maxlength="200"
-              @blur="touchedFields.name = true; trimField('name')"
+              @blur="
+                touchedFields.name = true
+                trimField('name')
+              "
             />
             <template #help>
               <p class="text-xs text-gray-500">
@@ -114,7 +117,9 @@
                       <UCalendar
                         v-model="calendarEndDate"
                         class="p-2"
-                        :is-date-disabled="date => !!calendarStartDate && date < calendarStartDate"
+                        :is-date-disabled="
+                          (date) => !!calendarStartDate && date < calendarStartDate
+                        "
                         @update:model-value="updateEndDate"
                       />
                     </template>
@@ -192,7 +197,10 @@
                     placeholder="123 rue de la Jonglerie"
                     size="lg"
                     class="w-full"
-                    @blur="touchedFields.addressStreet = true; trimField('addressLine1')"
+                    @blur="
+                      touchedFields.addressStreet = true
+                      trimField('addressLine1')
+                    "
                   >
                     <template #leading>
                       <UIcon name="i-heroicons-home" />
@@ -233,7 +241,10 @@
                       size="lg"
                       pattern="[0-9]{5}"
                       maxlength="5"
-                      @blur="touchedFields.addressZipCode = true; trimField('postalCode')"
+                      @blur="
+                        touchedFields.addressZipCode = true
+                        trimField('postalCode')
+                      "
                     />
                   </UFormField>
 
@@ -253,7 +264,10 @@
                       required
                       :placeholder="$t('forms.placeholders.city_example')"
                       size="lg"
-                      @blur="touchedFields.addressCity = true; trimField('city')"
+                      @blur="
+                        touchedFields.addressCity = true
+                        trimField('city')
+                      "
                     />
                   </UFormField>
 
@@ -274,7 +288,10 @@
                       required
                       placeholder="Nom du pays"
                       size="lg"
-                      @blur="touchedFields.addressCountry = true; trimField('country')"
+                      @blur="
+                        touchedFields.addressCountry = true
+                        trimField('country')
+                      "
                     >
                       <template #leading>
                         <UIcon name="i-heroicons-globe-europe-africa" />
@@ -285,7 +302,10 @@
                           color="neutral"
                           variant="link"
                           size="xs"
-                          @click="showCustomCountry = false; state.country = 'France'"
+                          @click="
+                            showCustomCountry = false
+                            state.country = 'France'
+                          "
                         />
                       </template>
                     </UInput>
@@ -318,7 +338,10 @@
               :rows="5"
               class="w-full"
               maxlength="1000"
-              @blur="touchedFields.description = true; trimField('description')"
+              @blur="
+                touchedFields.description = true
+                trimField('description')
+              "
             />
           </UFormField>
         </div>
@@ -339,7 +362,7 @@
                 :model-value="state[service.key]"
                 indicator="end"
                 variant="card"
-                @update:model-value="val => setServiceValue(service.key, val)"
+                @update:model-value="(val) => setServiceValue(service.key, val)"
               >
                 <template #label>
                   <div class="flex items-center gap-2">

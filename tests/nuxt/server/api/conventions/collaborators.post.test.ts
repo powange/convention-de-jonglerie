@@ -124,8 +124,8 @@ describe('/api/conventions/[id]/collaborators POST', () => {
 
     const result = await handler(mockEvent as any)
 
-  expect(result.success).toBe(true)
-  expect(result.collaborator.rights.manageCollaborators).toBe(true)
+    expect(result.success).toBe(true)
+    expect(result.collaborator.rights.manageCollaborators).toBe(true)
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
       where: { id: 2 },
       select: { id: true, pseudo: true },

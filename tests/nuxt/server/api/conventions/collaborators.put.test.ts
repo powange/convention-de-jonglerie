@@ -57,14 +57,17 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
 
     const result = await handler(mockEvent as any)
 
-  expect(result.success).toBe(true)
-  expect(result.collaborator.rights).toMatchObject({ manageCollaborators: true, editConvention: true })
+    expect(result.success).toBe(true)
+    expect(result.collaborator.rights).toMatchObject({
+      manageCollaborators: true,
+      editConvention: true,
+    })
     expect(mockUpdateRole).toHaveBeenCalled()
   })
 
   it('devrait mettre à jour un sous-ensemble de droits', async () => {
     const requestBody = { rights: { editConvention: true } }
-  const mockUpdatedCollaborator = { id: 2, canEditConvention: true, perEditionPermissions: [] }
+    const mockUpdatedCollaborator = { id: 2, canEditConvention: true, perEditionPermissions: [] }
     global.readBody.mockResolvedValue(requestBody)
     mockUpdateRole.mockResolvedValue(mockUpdatedCollaborator)
     const result = await handler(mockEvent as any)

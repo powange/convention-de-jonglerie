@@ -87,10 +87,10 @@ export default defineEventHandler(async (event) => {
         rights: {
           editConvention: collab.canEditConvention,
           deleteConvention: collab.canDeleteConvention,
-            manageCollaborators: collab.canManageCollaborators,
-            addEdition: collab.canAddEdition,
-            editAllEditions: collab.canEditAllEditions,
-            deleteAllEditions: collab.canDeleteAllEditions,
+          manageCollaborators: collab.canManageCollaborators,
+          addEdition: collab.canAddEdition,
+          editAllEditions: collab.canEditAllEditions,
+          deleteAllEditions: collab.canDeleteAllEditions,
         },
         perEdition: (collab.perEditionPermissions || []).map((p: any) => ({
           editionId: p.editionId,

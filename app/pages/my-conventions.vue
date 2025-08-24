@@ -308,20 +308,20 @@ const getEditionsColumns = () => [
     header: t('editions.online_status'),
     cell: ({ row }: TableCellParams) => {
       const edition = row.original
-          const convention = myConventions.value.find((conv) =>
-            conv.editions?.some((ed) => ed.id === edition.id)
-          )
-          const allowed = convention && canEditEdition(convention, edition.id)
-          return h('div', { class: 'flex justify-center' }, [
-            h(USwitch, {
-              modelValue: edition.isOnline,
-              color: 'primary',
-              size: 'sm',
-              disabled: !allowed,
-              'onUpdate:modelValue': (value: boolean) =>
-                allowed && toggleEditionOnlineStatus(edition.id, value),
-            }),
-          ])
+      const convention = myConventions.value.find((conv) =>
+        conv.editions?.some((ed) => ed.id === edition.id)
+      )
+      const allowed = convention && canEditEdition(convention, edition.id)
+      return h('div', { class: 'flex justify-center' }, [
+        h(USwitch, {
+          modelValue: edition.isOnline,
+          color: 'primary',
+          size: 'sm',
+          disabled: !allowed,
+          'onUpdate:modelValue': (value: boolean) =>
+            allowed && toggleEditionOnlineStatus(edition.id, value),
+        }),
+      ])
     },
   },
   {
@@ -479,27 +479,16 @@ function findCurrentCollab(convention: Convention) {
   if (!uid) return undefined
   return convention.collaborators?.find((c: any) => c.user.id === uid)
 }
-const isAuthor = (convention: Convention) => currentUserId() && convention.authorId === currentUserId()
+const isAuthor = (convention: Convention) =>
+  currentUserId() && convention.authorId === currentUserId()
 const canManageCollaborators = (convention: Convention) =>
-  !!(
-    isAuthor(convention) ||
-    findCurrentCollab(convention)?.rights?.manageCollaborators
-  )
+  !!(isAuthor(convention) || findCurrentCollab(convention)?.rights?.manageCollaborators)
 const canAddEdition = (convention: Convention) =>
-  !!(
-    isAuthor(convention) ||
-    findCurrentCollab(convention)?.rights?.addEdition
-  )
+  !!(isAuthor(convention) || findCurrentCollab(convention)?.rights?.addEdition)
 const canEditConvention = (convention: Convention) =>
-  !!(
-    isAuthor(convention) ||
-    findCurrentCollab(convention)?.rights?.editConvention
-  )
+  !!(isAuthor(convention) || findCurrentCollab(convention)?.rights?.editConvention)
 const canDeleteConvention = (convention: Convention) =>
-  !!(
-    isAuthor(convention) ||
-    findCurrentCollab(convention)?.rights?.deleteConvention
-  )
+  !!(isAuthor(convention) || findCurrentCollab(convention)?.rights?.deleteConvention)
 const canEditEdition = (convention: Convention, editionId: number) => {
   if (isAuthor(convention)) return true
   const collab = findCurrentCollab(convention)

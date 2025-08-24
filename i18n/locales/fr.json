@@ -194,7 +194,8 @@
     "create": "Créer",
     "refresh": "Rafraîchir",
     "save": "Enregistrer",
-    "reset": "Réinitialiser"
+    "reset": "Réinitialiser",
+    "deleted": "Supprimé"
   },
   "dates": {
     "same_day_with_time": "Le {date} de {startTime} à {endTime}",
@@ -499,8 +500,6 @@
     "request_deleted_successfully": "Votre demande de covoiturage a été supprimée avec succès",
     "collaborator_added": "Collaborateur ajouté",
     "collaborator_added_successfully": "Le collaborateur a été ajouté avec succès",
-    "collaborator_removed": "Collaborateur retiré",
-    "collaborator_removed_successfully": "Le collaborateur a été retiré avec succès",
     "comment_published": "Commentaire publié",
     "comment_published_successfully": "Votre commentaire a été publié avec succès",
     "comment_deleted": "Commentaire supprimé",
@@ -578,6 +577,7 @@
     }
   },
   "errors": {
+    "delete_error": "Erreur lors de la suppression",
     "login_failed": "Échec de la connexion",
     "invalid_credentials": "Email/pseudo ou mot de passe incorrect",
     "email_not_verified": "Email non vérifié",
@@ -611,7 +611,6 @@
     "publish_edition_failed": "Échec de la publication de l'édition",
     "status_update_failed": "Échec de la mise à jour du statut",
     "generic_error": "Une erreur est survenue",
-    "removal_error": "Erreur lors du retrait",
     "cannot_load_editions": "Impossible de charger les éditions",
     "addition_error": "Erreur lors de l'ajout",
     "content_required": "Le contenu est requis",
@@ -675,36 +674,24 @@
     "collaborators_modal": {
       "title": "Gérer les collaborateurs",
       "description": "Gérer les collaborateurs de cette convention",
-      "confirm_remove": "Êtes-vous sûr de vouloir retirer ce collaborateur ?",
       "permissions": "Permissions",
       "allow_modification": "Autoriser la modification",
-      "current_collaborators": "Collaborateurs actuels",
       "add_collaborator": "Ajouter un collaborateur",
-      "search_user_placeholder": "Rechercher un utilisateur...",
-      "refresh": "Rafraîchir",
-      "no_collaborators": "Aucun collaborateur pour le moment",
-      "optional_title_placeholder": "Titre / fonction (optionnel)",
-      "per_edition_hint": "Cochez des droits spécifiques pour certaines éditions si nécessaire",
-      "edit_rights": "Modifier les droits",
-      "updating_rights_success": "Droits mis à jour",
-      "updating_rights_error": "Erreur lors de la mise à jour des droits",
-      "unsaved_warning_title": "Modifications non sauvegardées",
-      "unsaved_warning_message": "Vous avez des modifications en cours. Les abandonner ?"
+      "search_user_placeholder": "Rechercher un utilisateur..."
     },
     "collaborators_rights_panel": {
-      "title": "Droits des collaborateurs (bêta)",
+      "title": "Droits des collaborateurs",
       "no_collaborators": "Aucun collaborateur pour le moment",
       "title_placeholder": "Titre / fonction (optionnel)",
       "saved": "Droits mis à jour",
       "per_edition": "Droits par édition",
-      "no_editions": "Aucune édition",
-      "edit_short": "Édit.",
-      "delete_short": "Suppr.",
+      "per_edition_hint": "Aucun droit spécifique défini pour les éditions",
       "history_title": "Historique des changements",
       "refresh_history": "Rafraîchir",
       "load_history": "Charger l'historique",
       "no_history": "Aucun changement enregistré",
-      "by_user": "Par {user}"
+      "by_user": "Par {user}",
+      "delete_confirm": "Supprimer ce collaborateur ?"
     },
     "country_select": {
       "no_countries_found": "Aucun pays trouvé",
@@ -842,12 +829,6 @@
     "addEdition": "Ajouter des éditions",
     "editAllEditions": "Modifier toutes les éditions",
     "deleteAllEditions": "Supprimer toutes les éditions",
-    "edit_convention": "Modifier la convention",
-    "delete_convention": "Supprimer la convention",
-    "manage_collaborators": "Gérer les collaborateurs",
-    "add_edition": "Ajouter des éditions",
-    "edit_all_editions": "Modifier toutes les éditions",
-    "delete_all_editions": "Supprimer toutes les éditions",
     "admin": "Administrateur",
     "manager": "Gestion avancée",
     "editor": "Éditeur",
@@ -860,14 +841,6 @@
       "UNARCHIVED": "Désarchivé"
     }
   },
-  "newRights": {
-    "editConvention": "Modifier la convention",
-    "deleteConvention": "Supprimer la convention",
-    "manageCollaborators": "Gérer les collaborateurs",
-    "addEdition": "Ajouter des éditions",
-    "editAllEditions": "Modifier toutes les éditions",
-    "deleteAllEditions": "Supprimer toutes les éditions"
-  },
   "c": {
     "user": {
       "pseudo": "Pseudo"
@@ -876,10 +849,7 @@
     "title": "Titre"
   },
   "p": {
-    "key": "Clé",
-    "editionId": "ID de l'édition",
-    "canEdit": "Peut modifier",
-    "canDelete": "Peut supprimer"
+    "key": "Clé"
   },
   "ed": {
     "id": "ID"
