@@ -267,6 +267,7 @@ async function main() {
               addedById: conv.authorId,
               title: role === 'ADMINISTRATOR' ? 'Co-organisateur' : undefined,
               // Mapping rôle -> nouveaux droits
+              // NOTE: legacy mapping basé sur role (ADMINISTRATOR/MODERATOR) conservé uniquement pour seed local.
               canEditConvention: role === 'ADMINISTRATOR',
               canDeleteConvention: role === 'ADMINISTRATOR',
               canManageCollaborators: role === 'ADMINISTRATOR',

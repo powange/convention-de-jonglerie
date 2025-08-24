@@ -35,13 +35,4 @@ export function summarizeRights(
 }
 
 // Fonction pratique utilisée quand on garde encore l'ancien champ role côté backend pour compat.
-export function summarizeFromLegacy(
-  role: string | undefined | null,
-  rights: Record<string, any> | undefined | null
-): CollaboratorRightsSummary {
-  if (role === 'ADMINISTRATOR')
-    return { level: 'admin', labelKey: 'permissions.admin', color: 'warning' }
-  if (role === 'MODERATOR')
-    return { level: 'moderator', labelKey: 'permissions.moderator', color: 'info' }
-  return summarizeRights(rights)
-}
+// Ancienne fonction summarizeFromLegacy supprimée (plus de champ role nécessaire côté front)
