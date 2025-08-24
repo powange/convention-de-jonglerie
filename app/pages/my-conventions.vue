@@ -98,6 +98,7 @@
                 {{ $t('conventions.collaborators') }} ({{ convention.collaborators?.length || 0 }})
               </h4>
               <UButton
+                v-if="canManageCollaborators(convention)"
                 size="xs"
                 variant="outline"
                 icon="i-heroicons-user-plus"
@@ -139,6 +140,7 @@
                 {{ $t('conventions.editions') }} ({{ convention.editions?.length || 0 }})
               </h4>
               <UButton
+                v-if="canAddEdition(convention)"
                 size="xs"
                 variant="outline"
                 icon="i-heroicons-plus"
@@ -306,14 +308,20 @@ const getEditionsColumns = () => [
     header: t('editions.online_status'),
     cell: ({ row }: TableCellParams) => {
       const edition = row.original
-      return h('div', { class: 'flex justify-center' }, [
-        h(USwitch, {
-          modelValue: edition.isOnline,
-          color: 'primary',
-          size: 'sm',
-          'onUpdate:modelValue': (value: boolean) => toggleEditionOnlineStatus(edition.id, value),
-        }),
-      ])
+          const convention = myConventions.value.find((conv) =>
+            conv.editions?.some((ed) => ed.id === edition.id)
+          )
+          const allowed = convention && canEditEdition(convention, edition.id)
+          return h('div', { class: 'flex justify-center' }, [
+            h(USwitch, {
+              modelValue: edition.isOnline,
+              color: 'primary',
+              size: 'sm',
+              disabled: !allowed,
+              'onUpdate:modelValue': (value: boolean) =>
+                allowed && toggleEditionOnlineStatus(edition.id, value),
+            }),
+          ])
     },
   },
   {
@@ -334,22 +342,33 @@ const getEditionsColumns = () => [
                 onClick: () => navigateTo(`/editions/${edition.id}`),
               })
             ),
-            h(UTooltip, { text: t('common.edit') }, () =>
-              h(UButton, {
-                icon: 'i-heroicons-pencil',
-                color: 'warning',
-                variant: 'ghost',
-                onClick: () => navigateTo(`/editions/${edition.id}/edit`),
-              })
-            ),
-            h(UTooltip, { text: t('common.delete') }, () =>
-              h(UButton, {
-                icon: 'i-heroicons-trash',
-                color: 'error',
-                variant: 'ghost',
-                onClick: () => deleteEdition(edition.id),
-              })
-            ),
+            (() => {
+              const convention = myConventions.value.find((conv) =>
+                conv.editions?.some((ed) => ed.id === edition.id)
+              )
+              const canEdit = convention && canEditEdition(convention, edition.id)
+              const canDelete = convention && canDeleteEdition(convention, edition.id)
+              return [
+                h(UTooltip, { text: t('common.edit') }, () =>
+                  h(UButton, {
+                    icon: 'i-heroicons-pencil',
+                    color: 'warning',
+                    variant: 'ghost',
+                    disabled: !canEdit,
+                    onClick: () => canEdit && navigateTo(`/editions/${edition.id}/edit`),
+                  })
+                ),
+                h(UTooltip, { text: t('common.delete') }, () =>
+                  h(UButton, {
+                    icon: 'i-heroicons-trash',
+                    color: 'error',
+                    variant: 'ghost',
+                    disabled: !canDelete,
+                    onClick: () => canDelete && deleteEdition(edition.id),
+                  })
+                ),
+              ]
+            })(),
           ],
         }
       )
@@ -451,24 +470,49 @@ const deleteConvention = async (id: number) => {
   }
 }
 
-// Vérifier si l'utilisateur peut modifier / supprimer via nouveaux droits
-const canEditConvention = (convention: Convention) => {
-  if (!authStore.user) return false
-  if (convention.authorId === authStore.user.id) return true
-  return (
-    convention.collaborators?.some(
-      (c: any) => authStore.user && c.user.id === authStore.user.id && c.rights?.editConvention
-    ) || false
-  )
+// Helpers de droits (auteur = super droit implicite)
+function currentUserId() {
+  return authStore.user?.id
 }
-const canDeleteConvention = (convention: Convention) => {
-  if (!authStore.user) return false
-  if (convention.authorId === authStore.user.id) return true
-  return (
-    convention.collaborators?.some(
-      (c: any) => authStore.user && c.user.id === authStore.user.id && c.rights?.deleteConvention
-    ) || false
+function findCurrentCollab(convention: Convention) {
+  const uid = currentUserId()
+  if (!uid) return undefined
+  return convention.collaborators?.find((c: any) => c.user.id === uid)
+}
+const isAuthor = (convention: Convention) => currentUserId() && convention.authorId === currentUserId()
+const canManageCollaborators = (convention: Convention) =>
+  !!(
+    isAuthor(convention) ||
+    findCurrentCollab(convention)?.rights?.manageCollaborators
   )
+const canAddEdition = (convention: Convention) =>
+  !!(
+    isAuthor(convention) ||
+    findCurrentCollab(convention)?.rights?.addEdition
+  )
+const canEditConvention = (convention: Convention) =>
+  !!(
+    isAuthor(convention) ||
+    findCurrentCollab(convention)?.rights?.editConvention
+  )
+const canDeleteConvention = (convention: Convention) =>
+  !!(
+    isAuthor(convention) ||
+    findCurrentCollab(convention)?.rights?.deleteConvention
+  )
+const canEditEdition = (convention: Convention, editionId: number) => {
+  if (isAuthor(convention)) return true
+  const collab = findCurrentCollab(convention)
+  if (!collab) return false
+  if (collab.rights?.editAllEditions) return true
+  return collab.perEdition?.some((p: any) => p.editionId === editionId && p.canEdit)
+}
+const canDeleteEdition = (convention: Convention, editionId: number) => {
+  if (isAuthor(convention)) return true
+  const collab = findCurrentCollab(convention)
+  if (!collab) return false
+  if (collab.rights?.deleteAllEditions) return true
+  return collab.perEdition?.some((p: any) => p.editionId === editionId && p.canDelete)
 }
 
 function rightsSummary(collaborator: any) {
