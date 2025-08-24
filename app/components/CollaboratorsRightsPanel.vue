@@ -80,13 +80,14 @@
           <!-- Global rights form -->
           <form class="space-y-2" @submit.prevent="save(c)">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div v-for="p in permissionList" :key="p.key" class="flex items-start gap-2">
-                <UCheckbox
+              <div v-for="p in permissionList" :key="p.key" class="flex items-center justify-between gap-2 py-1 px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                <span class="text-xs font-medium">{{ $t(p.label) }}</span>
+                <USwitch
                   v-if="draft[c.id]"
                   :model-value="draft[c.id]?.rights[p.key]"
-                  :label="$t(p.label)"
-                  :ui="{ label: 'text-xs' }"
-                  @change="(val) => updateRight(c.id, p.key, val)"
+                  size="xs"
+                  color="primary"
+                  @update:model-value="(val) => updateRight(c.id, p.key, val)"
                 />
               </div>
             </div>
@@ -119,25 +120,25 @@
                     :title="ed.name || '#' + ed.id"
                     >{{ ed.name || '#' + ed.id }}</span
                   >
-                  <div class="flex gap-3 items-center">
-                    <UCheckbox
-                      size="xs"
-                      :model-value="
-                        draft[c.id]?.perEdition.some((p) => p.editionId === ed.id && p.canEdit)
-                      "
-                      :label="$t('common.edit')"
-                      :ui="{ label: 'text-[10px]' }"
-                      @change="(val) => togglePerEdition(c.id, ed.id, 'canEdit', val)"
-                    />
-                    <UCheckbox
-                      size="xs"
-                      :model-value="
-                        draft[c.id]?.perEdition.some((p) => p.editionId === ed.id && p.canDelete)
-                      "
-                      :label="$t('common.delete')"
-                      :ui="{ label: 'text-[10px]' }"
-                      @change="(val) => togglePerEdition(c.id, ed.id, 'canDelete', val)"
-                    />
+                  <div class="flex gap-4 items-center">
+                    <div class="flex items-center gap-1">
+                      <span class="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ $t('common.edit') }}</span>
+                      <USwitch
+                        size="xs"
+                        color="primary"
+                        :model-value="draft[c.id]?.perEdition.some((p) => p.editionId === ed.id && p.canEdit)"
+                        @update:model-value="(val) => togglePerEdition(c.id, ed.id, 'canEdit', val)"
+                      />
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <span class="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ $t('common.delete') }}</span>
+                      <USwitch
+                        size="xs"
+                        color="primary"
+                        :model-value="draft[c.id]?.perEdition.some((p) => p.editionId === ed.id && p.canDelete)"
+                        @update:model-value="(val) => togglePerEdition(c.id, ed.id, 'canDelete', val)"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
