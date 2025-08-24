@@ -66,7 +66,7 @@ Champs de droits stockés sur `ConventionCollaborator` :
 
 Une permission par édition (table `EditionCollaboratorPermission`) permet d'accorder `canEdit` / `canDelete` sur une édition précise lorsqu'un collaborateur ne possède pas les droits globaux.
 
-Format d'un collaborateur retourné par l'API :
+Format d'un collaborateur retourné par l'API (détails étendus dans `docs/COLLABORATOR_PERMISSIONS.md`) :
 
 ```jsonc
 {
