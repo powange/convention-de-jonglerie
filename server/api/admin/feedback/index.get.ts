@@ -96,8 +96,22 @@ export default defineEventHandler(async (event) => {
       },
       stats: statsFormatted,
     }
-  } catch (error) {
-    console.error('Erreur lors de la récupération des feedbacks:', error)
+  } catch (error: any) {
+    console.error('Erreur lors de la récupération des feedbacks:', error?.message, error)
+    // Mode debug optionnel pour admin: ?debug=1 retourne détails (sans données sensibles majeures)
+    const query = getQuery(event)
+    const isDebug = query.debug === '1'
+    if (isDebug) {
+      return {
+        error: true,
+        message: 'Erreur lors de la récupération des feedbacks',
+        prismaError: {
+          message: error?.message,
+          code: error?.code,
+          meta: error?.meta,
+        },
+      }
+    }
     throw createError({
       statusCode: 500,
       statusMessage: 'Erreur lors de la récupération des feedbacks',
