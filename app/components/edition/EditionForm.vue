@@ -287,10 +287,7 @@
                           color="neutral"
                           variant="link"
                           size="xs"
-                          @click="
-                            showCustomCountry = false
-                            state.country = 'France'
-                          "
+                          @click="(() => { showCustomCountry = false; state.country = 'France' })()"
                         />
                       </template>
                     </UInput>
