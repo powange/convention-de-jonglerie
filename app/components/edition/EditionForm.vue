@@ -72,9 +72,9 @@
                     />
                     <template #content>
                       <UCalendar
-                        v-model="calendarStartDate as any"
+                        v-model="calendarStartDate"
                         class="p-2"
-                        @update:model-value="(d: any) => updateStartDate(d as CalendarDate)"
+                        @update:model-value="updateStartDate"
                       />
                     </template>
                   </UPopover>
@@ -115,12 +115,10 @@
                     />
                     <template #content>
                       <UCalendar
-                        v-model="calendarEndDate as any"
+                        v-model="calendarEndDate"
                         class="p-2"
-                        :is-date-disabled="
-                          (date: any) => !!calendarStartDate && date < (calendarStartDate as any)
-                        "
-                        @update:model-value="(d: any) => updateEndDate(d as CalendarDate)"
+                        :is-date-disabled="date => !!calendarStartDate && date < calendarStartDate"
+                        @update:model-value="updateEndDate"
                       />
                     </template>
                   </UPopover>
@@ -359,9 +357,10 @@
               <UCheckbox
                 v-for="service in category.services"
                 :key="service.key"
-                v-model="(state as any)[service.key]"
+                :model-value="state[service.key]"
                 indicator="end"
                 variant="card"
+                @update:model-value="val => (state as any)[service.key] = val"
               >
                 <template #label>
                   <div class="flex items-center gap-2">
