@@ -191,7 +191,10 @@
     "or": "Або",
     "create": "Створити",
     "refresh": "Оновити",
-    "save": "Зберегти"
+    "save": "Зберегти",
+    "reset": "Скинути",
+    "no_results": "Немає результатів",
+    "start_typing": "Почніть вводити..."
   },
   "dates": {
     "same_day_with_time": "{date} з {startTime} до {endTime}",
@@ -339,7 +342,8 @@
     "edition_creator": "Створювач видання",
     "of_convention": "конвенції",
     "enlarged_image": "Збільшене зображення",
-    "poster_of": "Постер {name}"
+    "poster_of": "Постер {name}",
+    "length": "Довжина"
   },
   "conventions": {
     "my_conventions": "Мої Конвенції",
@@ -537,7 +541,7 @@
     "buttons": {
       "cancel": "Скасувати",
       "publishing": "Публікація...",
-      "submitting": "Submitting..."
+  "submitting": "Надсилання..."
     }
   },
   "components": {
@@ -549,10 +553,16 @@
       "current_collaborators": "Поточні співробітники",
       "add_collaborator": "Додати співробітника",
       "search_user_placeholder": "Пошук користувача...",
-      "moderator": "Модератор",
-      "administrator": "Адміністратор",
       "refresh": "Оновити",
-      "no_collaborators": "Поки немає співавторів"
+      "no_collaborators": "Поки немає співавторів",
+  "optional_title_placeholder": "Титул / функція (необов'язково)",
+  "description": "Керувати співробітниками цієї конвенції",
+  "per_edition_hint": "Права на рівні видання перевизначають глобальні права, якщо вказано.",
+  "edit_rights": "Редагувати права",
+  "updating_rights_success": "Права оновлено",
+  "updating_rights_error": "Помилка оновлення прав",
+  "unsaved_warning_title": "Незбережені зміни",
+  "unsaved_warning_message": "У вас є незбережені зміни прав. Відхилити їх?"
     },
     "country_select": {
       "no_countries_found": "Країни не знайдено",
@@ -576,6 +586,21 @@
       "past": "Минулі",
       "editions_with_location": "{count} видання з розташуванням | {count} видань з розташуванням",
       "all_favorites": "Всі улюблені"
+    },
+    "collaborators_rights_panel": {
+      "title": "Права співавторів (бета)",
+      "no_collaborators": "Немає співавторів",
+      "title_placeholder": "Заголовок або роль (необов'язково)",
+      "saved": "Права оновлено",
+      "per_edition": "Права за виданнями",
+      "no_editions": "Немає видань",
+      "history_title": "Історія змін",
+      "refresh_history": "Оновити",
+      "load_history": "Завантажити історію",
+      "no_history": "Немає записаних змін",
+      "by_user": "Від {user}",
+      "edit_short": "Ред",
+      "delete_short": "Видл"
     },
     "edition_form": {
       "previous": "Попередній",
@@ -693,7 +718,9 @@
       "refresh_history": "Оновити",
       "load_history": "Завантажити історію",
       "no_history": "Немає записаних змін",
-      "by_user": "Від {user}"
+      "by_user": "Від {user}",
+      "edit_short": "Ред",
+      "delete_short": "Видл"
     }
   },
   "services": {
@@ -978,7 +1005,13 @@
       "PER_EDITIONS_UPDATED": "Права за виданнями оновлено",
       "ARCHIVED": "Архівовано",
       "UNARCHIVED": "Відновлено"
-    }
+    },
+    "edit_convention": "Редагувати конвенцію",
+    "delete_convention": "Видалити конвенцію",
+    "manage_collaborators": "Керувати співробітниками",
+    "add_edition": "Додати видання",
+    "edit_all_editions": "Редагувати всі видання",
+    "delete_all_editions": "Видалити всі видання"
   },
   "c": {
     "user": {
@@ -988,9 +1021,23 @@
     "title": "Назва"
   },
   "p": {
-    "key": "Ключ"
+    "key": "Ключ",
+    "editionId": "ID видання",
+    "canEdit": "Може редагувати",
+    "canDelete": "Може видаляти"
   },
   "ed": {
     "id": "ID"
+  },
+  "currentValue": {
+    "avatar": "Аватар вибраного користувача"
+  },
+  "newRights": {
+    "editConvention": "Редагувати конвенцію",
+    "deleteConvention": "Видалити конвенцію",
+    "manageCollaborators": "Керувати співробітниками",
+    "addEdition": "Додати видання",
+    "editAllEditions": "Редагувати всі видання",
+    "deleteAllEditions": "Видалити всі видання"
   }
 }

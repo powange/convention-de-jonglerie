@@ -128,7 +128,6 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId].rights PATCH', ()
       Promise.resolve({ ...data })
     )
     prismaMock.collaboratorPermissionHistory.create.mockResolvedValue({ id: 3 })
-
     ;(global.readBody as any).mockResolvedValue({
       rights: { deleteConvention: true },
       perEdition: [{ editionId: 150, canEdit: true }],

@@ -139,7 +139,6 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
       .fn()
       .mockReturnValueOnce('2') // editionId différent
       .mockReturnValueOnce('1') // itemId
-
     ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
     prismaMock.lostFoundItem.findFirst.mockResolvedValue(null) // Pas trouvé car mauvaise édition
 
@@ -251,7 +250,6 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
 
   it('devrait traiter correctement les IDs numériques', async () => {
     global.getRouterParam = vi.fn().mockReturnValueOnce('123').mockReturnValueOnce('456')
-
     ;(mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } })
     prismaMock.lostFoundItem.findFirst.mockResolvedValue({
       ...mockLostFoundItem,

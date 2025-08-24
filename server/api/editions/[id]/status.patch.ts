@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { getEmailHash } from '../../../utils/email-hash'
 import { prisma } from '../../../utils/prisma'
 
 const statusSchema = z.object({
@@ -32,9 +33,7 @@ export default defineEventHandler(async (event) => {
         include: {
           collaborators: {
             include: {
-              user: {
-                select: { id: true, pseudo: true, emailHash: true },
-              },
+              user: { select: { id: true, pseudo: true, email: true } },
             },
           },
         },
@@ -72,14 +71,12 @@ export default defineEventHandler(async (event) => {
     where: { id: editionId },
     data: { isOnline: validatedData.isOnline },
     include: {
-      creator: { select: { id: true, pseudo: true } },
+      creator: { select: { id: true, pseudo: true, email: true } },
       convention: {
         include: {
           collaborators: {
             include: {
-              user: {
-                select: { id: true, pseudo: true, emailHash: true }, // email supprimé
-              },
+              user: { select: { id: true, pseudo: true, email: true } },
             },
           },
         },
@@ -88,5 +85,32 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  return updatedEdition
+  // Transformer la réponse pour ajouter emailHash et retirer les emails
+  const sanitized = {
+    ...updatedEdition,
+    creator: {
+      id: updatedEdition.creator.id,
+      pseudo: updatedEdition.creator.pseudo,
+      emailHash: getEmailHash(updatedEdition.creator.email),
+    },
+    convention: {
+      ...updatedEdition.convention,
+      collaborators: updatedEdition.convention.collaborators.map((c) => ({
+        ...c,
+        user: {
+          id: c.user.id,
+          pseudo: c.user.pseudo,
+          emailHash: getEmailHash(c.user.email),
+        },
+      })),
+    },
+  }
+
+  // Supprimer les champs email internes
+  // @ts-expect-error suppression email propriété intermédiaire
+  delete sanitized.creator.email
+  // @ts-expect-error suppression email propriété intermédiaire
+  sanitized.convention.collaborators.forEach((c) => delete c.user.email)
+
+  return sanitized
 })

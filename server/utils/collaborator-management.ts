@@ -131,10 +131,11 @@ interface AddConventionCollaboratorInput {
     deleteAllEditions: boolean
   }>
   title?: string
+  perEdition?: Array<{ editionId: number; canEdit?: boolean; canDelete?: boolean }>
 }
 
 export async function addConventionCollaborator(input: AddConventionCollaboratorInput) {
-  const { conventionId, userId: userToAddId, addedById, rights, title } = input
+  const { conventionId, userId: userToAddId, addedById, rights, title, perEdition } = input
   // Vérifier les permissions
   const canManage = await canManageCollaborators(conventionId, addedById)
 
@@ -159,24 +160,43 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
   }
 
   // Créer le collaborateur
-  return await prisma.conventionCollaborator.create({
-    data: {
-      conventionId,
-      userId: userToAddId,
-      addedById,
-      title: title || null,
-      canEditConvention: rights?.editConvention ?? false,
-      canDeleteConvention: rights?.deleteConvention ?? false,
-      canManageCollaborators: rights?.manageCollaborators ?? false,
-      canAddEdition: rights?.addEdition ?? false,
-      canEditAllEditions: rights?.editAllEditions ?? false,
-      canDeleteAllEditions: rights?.deleteAllEditions ?? false,
-    },
-    include: {
-      user: {
-        select: { id: true, pseudo: true },
+  return await prisma.$transaction(async (tx) => {
+    const collaborator = await tx.conventionCollaborator.create({
+      data: {
+        conventionId,
+        userId: userToAddId,
+        addedById,
+        title: title || null,
+        canEditConvention: rights?.editConvention ?? false,
+        canDeleteConvention: rights?.deleteConvention ?? false,
+        canManageCollaborators: rights?.manageCollaborators ?? false,
+        canAddEdition: rights?.addEdition ?? false,
+        canEditAllEditions: rights?.editAllEditions ?? false,
+        canDeleteAllEditions: rights?.deleteAllEditions ?? false,
       },
-    },
+      include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
+    })
+
+    if (perEdition && perEdition.length) {
+      const filtered = perEdition.filter((p) => p && (p.canEdit || p.canDelete))
+      if (filtered.length) {
+        await tx.editionCollaboratorPermission.createMany({
+          data: filtered.map((p) => ({
+            collaboratorId: collaborator.id,
+            editionId: p.editionId,
+            canEdit: !!p.canEdit,
+            canDelete: !!p.canDelete,
+          })),
+          skipDuplicates: true,
+        })
+      }
+    }
+
+    const withPerEdition = await tx.conventionCollaborator.findUnique({
+      where: { id: collaborator.id },
+      include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
+    })
+    return withPerEdition
   })
 }
 

@@ -75,19 +75,19 @@
         "total": "Feedback insgesamt",
         "pending": "Ausstehend",
         "resolved": "Gelöst",
-        "bugs": "Gemeldete Fehler"
+  "bugs": "Gemeldete Fehler"
       },
       "filter": {
         "type": "Nach Typ filtern",
         "status": "Nach Status filtern",
         "all_types": "Alle Typen",
-        "all_status": "Alle Status"
+  "all_status": "Alle Status"
       },
       "types": {
         "bug": "Fehler",
         "suggestion": "Vorschlag",
         "general": "Allgemein",
-        "complaint": "Beschwerde"
+  "complaint": "Beschwerde"
       },
       "pending": "Ausstehend",
       "resolved": "Gelöst",
@@ -100,13 +100,13 @@
       "view": "Details anzeigen",
       "details": "Feedback-Details",
       "type": {
-        "label": "Typ"
+  "label": "Typ"
       },
       "subject": {
-        "label": "Betreff"
+  "label": "Betreff"
       },
       "message": {
-        "label": "Nachricht"
+  "label": "Nachricht"
       },
       "user": "Benutzer",
       "status": "Status",
@@ -115,11 +115,11 @@
       "user_agent": "Browser/OS",
       "success": {
         "resolve": "Feedback als gelöst markiert",
-        "unresolve": "Feedback als ungelöst markiert"
+  "unresolve": "Feedback als ungelöst markiert"
       },
       "error": {
         "load": "Fehler beim Laden des Feedbacks",
-        "resolve": "Fehler beim Aktualisieren des Feedbacks"
+  "resolve": "Fehler beim Aktualisieren des Feedbacks"
       }
     }
   },
@@ -136,7 +136,7 @@
     "tabs": "Navigationsregisterkarten",
     "breadcrumb": "Brotkrümelnavigation",
     "dark_mode": "Dunkler Modus",
-    "light_mode": "Heller Modus"
+  "light_mode": "Heller Modus"
   },
   "homepage": {
     "filters": "Filter",
@@ -149,10 +149,12 @@
     "grid": "Raster",
     "map": "Karte",
     "no_conventions_match_criteria": "Keine Convention entspricht deinen Suchkriterien",
-    "no_conventions_found": "Keine Convention gefunden. Sei der erste, der eine hinzufügt!"
+  "no_conventions_found": "Keine Convention gefunden. Sei der erste, der eine hinzufügt!"
   },
   "common": {
     "loading": "Laden...",
+    "no_results": "Keine Ergebnisse",
+    "start_typing": "Eingabe beginnen...",
     "error": "Fehler",
     "success": "Erfolg",
     "cancelled": "Cancelled",
@@ -191,12 +193,13 @@
     "or": "Oder",
     "create": "Erstellen",
     "refresh": "Aktualisieren",
-    "save": "Speichern"
+    "save": "Speichern",
+  "reset": "Zurücksetzen"
   },
   "dates": {
     "same_day_with_time": "Am {date} von {startTime} bis {endTime}",
     "date_range_with_time": "Vom {startDate} bis {endDate}",
-    "date_range": "Vom {startDate} bis {endDate}"
+  "date_range": "Vom {startDate} bis {endDate}"
   },
   "auth": {
     "login_title": "Anmeldung",
@@ -286,7 +289,7 @@
     "reset_link_used": "Dieser Link wurde bereits zum Zurücksetzen des Passworts verwendet",
     "invalid_code": "Ungültiger Code",
     "continue_with_google": "Mit Google fortfahren",
-    "continue_with_facebook": "Mit Facebook fortfahren"
+  "continue_with_facebook": "Mit Facebook fortfahren"
   },
   "editions": {
     "edit": "Auflage bearbeiten",
@@ -339,7 +342,8 @@
     "edition_creator": "Ersteller der Auflage",
     "of_convention": "der Convention",
     "enlarged_image": "Vergrößertes Bild",
-    "poster_of": "Poster von {name}"
+    "poster_of": "Poster von {name}",
+  "length": "Länge"
   },
   "conventions": {
     "my_conventions": "Meine Conventions",
@@ -361,7 +365,7 @@
     "convention_deleted_success": "Die Convention wurde erfolgreich gelöscht",
     "cannot_load_conventions": "Deine Conventions können nicht geladen werden",
     "convention_not_found": "Convention nicht gefunden",
-    "convention_not_found_description": "Die Convention, die du suchst, existiert nicht"
+  "convention_not_found_description": "Die Convention, die du suchst, existiert nicht"
   },
   "carpool": {
     "offer": {
@@ -370,13 +374,13 @@
       "seats_placeholder": "z. B. 3",
       "price_per_seat": "Preis pro Platz (€)",
       "price_placeholder": "z. B. 10",
-      "created": "Mitfahrangebot erstellt"
+  "created": "Mitfahrangebot erstellt"
     },
     "request": {
       "create": "Mitfahrgesuch erstellen",
       "required_seats": "Benötigte Plätze",
       "seats_placeholder": "z. B. 2",
-      "created": "Mitfahrgesuch erstellt"
+  "created": "Mitfahrgesuch erstellt"
     },
     "route": "Route",
     "from": "Von",
@@ -396,7 +400,7 @@
       "date_required": "Abfahrtsdatum ist erforderlich",
       "date_invalid": "Ungültiges Datum",
       "seats_min": "Mindestens 1 Platz",
-      "seats_max": "Maximal 8 Plätze"
+  "seats_max": "Maximal 8 Plätze"
     }
   },
   "profile": {
@@ -471,12 +475,12 @@
     "admin_mode_enabled": "Administrator-Modus aktiviert",
     "admin_mode_enabled_desc": "Du hast jetzt Zugang zu allen Administrator-Privilegien",
     "admin_mode_disabled": "Administrator-Modus deaktiviert",
-    "admin_mode_disabled_desc": "Du verwendest jetzt die normale Benutzeroberfläche"
+  "admin_mode_disabled_desc": "Du verwendest jetzt die normale Benutzeroberfläche"
   },
   "footer": {
     "language_selector": "Sprache wechseln",
     "copyright": "© {year} Jonglier-Convention. Alle Rechte vorbehalten.",
-    "feedback": "Feedback geben"
+  "feedback": "Feedback geben"
   },
   "messages": {
     "login_success": "Anmeldung erfolgreich!",
@@ -488,7 +492,7 @@
     "favorite_status_updated": "Favoriten-Status aktualisiert!",
     "account_created": "Konto erstellt! Überprüfe deine E-Mail.",
     "verification_code_sent": "Ein Bestätigungscode wurde dir gesendet.",
-    "convention_created_desc": "Die Convention \"{name}\" wurde erfolgreich erstellt",
+  "convention_created_desc": "Die Convention \"{name}\" wurde erfolgreich erstellt",
     "removed_from_favorites": "Aus Favoriten entfernt",
     "comment_added": "Kommentar hinzugefügt",
     "booking_requested": "Buchung angefragt",
@@ -511,7 +515,7 @@
     "reply_deleted": "Antwort gelöscht",
     "reply_deleted_successfully": "Die Antwort wurde erfolgreich gelöscht",
     "edition_created_successfully": "Die Auflage wurde erfolgreich erstellt",
-    "convention_updated_desc": "Die Convention \"{name}\" wurde erfolgreich aktualisiert"
+  "convention_updated_desc": "Die Convention \"{name}\" wurde erfolgreich aktualisiert"
   },
   "upload": {
     "upload_error": "Upload-Fehler",
@@ -544,7 +548,7 @@
       "delete_failed": "Löschen fehlgeschlagen",
       "file_too_large": "Datei zu groß",
       "invalid_file_type": "Ungültiger Dateityp",
-      "invalid_file_extension": "Ungültige Dateierweiterung"
+  "invalid_file_extension": "Ungültige Dateierweiterung"
     }
   },
   "errors": {
@@ -655,7 +659,7 @@
       "edition_name_example": "Name der Auflage (z.B. EJC 2024)",
       "address_complement": "Gebäude A, Festsaal...",
       "search_by_name": "Nach Name suchen",
-      "city_example": "Berlin"
+  "city_example": "Berlin"
     },
     "labels": {
       "full_address": "Vollständige Adresse",
@@ -664,31 +668,37 @@
       "edition_name_optional": "Name der Auflage (optional)",
       "address_complement": "Adresszusatz",
       "convention_name": "Name der Convention",
-      "until_date": "Bis zum"
+  "until_date": "Bis zum"
     },
     "buttons": {
       "cancel": "Abbrechen",
       "publishing": "Veröffentlichung...",
-      "submitting": "Submitting..."
+  "submitting": "Übermittlung..."
     }
   },
   "components": {
     "collaborators_modal": {
       "title": "Mitarbeiter verwalten",
+      "description": "Mitarbeiter dieser Convention verwalten",
       "confirm_remove": "Bist du sicher, dass du diesen Mitarbeiter entfernen möchtest?",
       "permissions": "Berechtigungen",
       "allow_modification": "Änderung erlauben",
       "current_collaborators": "Aktuelle Mitarbeiter",
       "add_collaborator": "Mitarbeiter hinzufügen",
       "search_user_placeholder": "Benutzer suchen...",
-      "moderator": "Moderator",
-      "administrator": "Administrator",
       "refresh": "Aktualisieren",
-      "no_collaborators": "Noch keine Mitarbeiter"
+      "no_collaborators": "Noch keine Mitarbeiter",
+  "optional_title_placeholder": "Titel / Funktion (optional)",
+  "per_edition_hint": "Bei Bedarf spezifische Rechte für einzelne Ausgaben auswählen",
+  "edit_rights": "Rechte bearbeiten",
+  "updating_rights_success": "Rechte aktualisiert",
+  "updating_rights_error": "Rechte konnten nicht aktualisiert werden",
+  "unsaved_warning_title": "Nicht gespeicherte Änderungen",
+  "unsaved_warning_message": "Sie haben ungespeicherte Änderungen. Verwerfen?"
     },
     "country_select": {
       "no_countries_found": "Keine Länder gefunden",
-      "search_country_placeholder": "Land suchen..."
+  "search_country_placeholder": "Land suchen..."
     },
     "convention_form": {
       "click_to_select_image": "Klicken, um ein Bild auszuwählen",
@@ -700,14 +710,14 @@
       "convention_logo_alt": "Convention-Logo",
       "loading_error_title": "Ladefehler",
       "loading_error_description": "Bild kann nicht von dieser URL geladen werden",
-      "logo_url_description": "URL zum Convention-Logo-Bild"
+  "logo_url_description": "URL zum Convention-Logo-Bild"
     },
     "favorites_map": {
       "no_upcoming_favorites": "Keine kommenden Favoriten-Auflagen mit verfügbarem Standort",
       "upcoming": "Kommende",
       "past": "Vergangene",
       "editions_with_location": "{count} Auflage mit Standort | {count} Auflagen mit Standort",
-      "all_favorites": "Alle sind Favoriten"
+  "all_favorites": "Alle sind Favoriten"
     },
     "edition_form": {
       "previous": "Zurück",
@@ -715,7 +725,7 @@
       "convention_poster_optional": "Convention-Poster (Optional)",
       "ticketing_link": "Ticketing-Link",
       "facebook_page": "Facebook-Seite",
-      "instagram_account": "Instagram-Account"
+  "instagram_account": "Instagram-Account"
     },
     "carpool": {
       "offer_vehicle_places": "Biete Plätze in deinem Fahrzeug an",
@@ -792,7 +802,7 @@
       "accept": "Akzeptieren",
       "reject": "Ablehnen",
       "delete_offer": "Angebot löschen",
-      "delete_request": "Anfrage löschen"
+  "delete_request": "Anfrage löschen"
     },
     "posts": {
       "your_reply": "Deine Antwort",
@@ -800,7 +810,7 @@
       "reply": "Antworten",
       "replies_count": "{count} Antwort | {count} Antworten",
       "reply_to_comment": "Auf diesen Kommentar antworten",
-      "publish": "Veröffentlichen"
+  "publish": "Veröffentlichen"
     },
     "map": {
       "editions_on_map": "{count} Auflage auf der Karte | {count} Auflagen auf der Karte",
@@ -812,7 +822,7 @@
       "ongoing": "Laufend",
       "upcoming": "Kommende",
       "past": "Vergangene",
-      "yellow_border_favorite": "Gelber Rand = Favorit"
+  "yellow_border_favorite": "Gelber Rand = Favorit"
     },
     "collaborators_rights_panel": {
       "title": "Mitarbeiterrechte (Beta)",
@@ -825,27 +835,29 @@
       "refresh_history": "Aktualisieren",
       "load_history": "Verlauf laden",
       "no_history": "Keine Änderungen aufgezeichnet",
-      "by_user": "Von {user}"
+      "by_user": "Von {user}",
+      "edit_short": "Bearb.",
+      "delete_short": "Löschen"
     }
   },
   "pages": {
     "favorites": {
       "no_favorites_added": "Du hast noch keine Auflage zu deinen Favoriten hinzugefügt.",
-      "editions_in_favorites": "{count} Auflage in Favoriten | {count} Auflagen in Favoriten"
+  "editions_in_favorites": "{count} Auflage in Favoriten | {count} Auflagen in Favoriten"
     },
     "add_convention": {
       "submit_button": "Convention erstellen",
       "title": "Neue Convention erstellen",
-      "description": "Eine Convention gruppiert mehrere Auflagen derselben Jonglier-Veranstaltung."
+  "description": "Eine Convention gruppiert mehrere Auflagen derselben Jonglier-Veranstaltung."
     },
     "add_edition": {
       "submit_button": "Auflage hinzufügen",
-      "title": "Neue Auflage hinzufügen"
+  "title": "Neue Auflage hinzufügen"
     },
     "access_denied": {
       "title": "Zugang verweigert",
       "description": "Du hast keine Berechtigung, auf diese Seite zuzugreifen.",
-      "confirm_delete_edition": "Bist du sicher, dass du diese Auflage löschen möchtest?"
+  "confirm_delete_edition": "Bist du sicher, dass du diese Auflage löschen möchtest?"
     },
     "comments": {
       "write_comment": "Kommentar schreiben",
@@ -854,7 +866,7 @@
       "share_experience": "Teile deine Erfahrung oder stelle deine Fragen",
       "login_to_participate": "Melde dich an, um an der Diskussion teilzunehmen",
       "no_comments": "Noch keine Kommentare.",
-      "be_first_to_comment": "Sei der erste, der seine Erfahrung teilt!"
+  "be_first_to_comment": "Sei der erste, der seine Erfahrung teilt!"
     },
     "management": {
       "actions": "Aktionen",
@@ -868,10 +880,10 @@
       "available_after_event": "Verfügbar nach der Veranstaltung",
       "lost_found_after_description": "Die Verwaltung der Fundsachen wird automatisch nach Ende der Auflage aktiviert.",
       "manage_lost_found": "Fundsachen verwalten",
-      "lost_found_active_description": "Du kannst jetzt die Fundsachen für diese beendete Auflage verwalten."
+  "lost_found_active_description": "Du kannst jetzt die Fundsachen für diese beendete Auflage verwalten."
     },
     "edit_edition": {
-      "submit_button": "Auflage aktualisieren"
+  "submit_button": "Auflage aktualisieren"
     },
     "add_edition_for_convention": {
       "for_convention": "Für die Convention \"{name}\"",
@@ -891,42 +903,42 @@
     "description": "Helfen Sie uns, die Plattform zu verbessern, indem Sie uns Ihre Kommentare, Vorschläge oder Fehlerberichte mitteilen.",
     "type": {
       "label": "Feedback-Typ",
-      "placeholder": "Einen Typ auswählen"
+  "placeholder": "Einen Typ auswählen"
     },
     "types": {
       "bug": "Fehler melden",
       "suggestion": "Verbesserungsvorschlag",
       "general": "Allgemeiner Kommentar",
-      "complaint": "Problem melden"
+  "complaint": "Problem melden"
     },
     "subject": {
       "label": "Betreff",
-      "placeholder": "Beschreiben Sie kurz Ihr Feedback"
+  "placeholder": "Beschreiben Sie kurz Ihr Feedback"
     },
     "message": {
       "label": "Detaillierte Nachricht",
-      "placeholder": "Beschreiben Sie detailliert Ihr Feedback, Ihren Vorschlag oder das aufgetretene Problem..."
+  "placeholder": "Beschreiben Sie detailliert Ihr Feedback, Ihren Vorschlag oder das aufgetretene Problem..."
     },
     "name": {
       "label": "Ihr Name",
-      "placeholder": "Ihr Vor- und Nachname"
+  "placeholder": "Ihr Vor- und Nachname"
     },
     "email": {
       "label": "Ihre E-Mail",
-      "placeholder": "ihre{'@'}email.com"
+  "placeholder": "ihre{'@'}email.com"
     },
     "url": {
       "label": "Verwandte Seite (automatisch)",
-      "placeholder": "Seiten-URL"
+  "placeholder": "Seiten-URL"
     },
     "guest": {
-      "info": "Als Besucher geben Sie bitte Ihre Kontaktdaten für eine mögliche Nachverfolgung an."
+  "info": "Als Besucher geben Sie bitte Ihre Kontaktdaten für eine mögliche Nachverfolgung an."
     },
     "submit": "Feedback senden",
     "success": {
       "title": "Vielen Dank für Ihr Feedback!",
       "message": "Ihre Nachricht wurde an unser Team gesendet. Wir werden sie so schnell wie möglich prüfen.",
-      "toast": "Ihr Feedback wurde erfolgreich gesendet"
+  "toast": "Ihr Feedback wurde erfolgreich gesendet"
     },
     "error": {
       "title": "Fehler beim Senden des Feedbacks",
@@ -934,23 +946,23 @@
       "captcha_required": "Bitte vervollständigen Sie das Captcha",
       "captcha_not_loaded": "Das Captcha ist noch nicht geladen, bitte warten Sie",
       "name_required": "Name ist erforderlich",
-      "name_required_desc": "Bitte geben Sie Ihren Namen ein"
+  "name_required_desc": "Bitte geben Sie Ihren Namen ein"
     },
     "validation": {
       "subject": {
         "min": "Der Betreff muss mindestens 5 Zeichen haben",
-        "max": "Der Betreff darf 200 Zeichen nicht überschreiten"
+  "max": "Der Betreff darf 200 Zeichen nicht überschreiten"
       },
       "message": {
         "min": "Die Nachricht muss mindestens 20 Zeichen haben",
-        "max": "Die Nachricht darf 5000 Zeichen nicht überschreiten"
+  "max": "Die Nachricht darf 5000 Zeichen nicht überschreiten"
       },
       "name": {
         "min": "Der Name muss mindestens 2 Zeichen haben",
-        "max": "Der Name darf 100 Zeichen nicht überschreiten"
+  "max": "Der Name darf 100 Zeichen nicht überschreiten"
       },
       "email": {
-        "invalid": "Ungültige E-Mail"
+  "invalid": "Ungültige E-Mail"
       }
     },
     "recaptcha": {
@@ -958,7 +970,7 @@
       "privacy_policy": "Datenschutzerklärung",
       "and": "und die",
       "terms_of_service": "Nutzungsbedingungen",
-      "apply": "von Google"
+  "apply": "von Google"
     }
   },
   "permissions": {
@@ -977,20 +989,40 @@
       "RIGHTS_UPDATED": "Rechte aktualisiert",
       "PER_EDITIONS_UPDATED": "Rechte pro Ausgabe aktualisiert",
       "ARCHIVED": "Archiviert",
-      "UNARCHIVED": "Wiederhergestellt"
-    }
+  "UNARCHIVED": "Wiederhergestellt"
+    },
+    "edit_convention": "Convention bearbeiten",
+    "delete_convention": "Convention löschen",
+    "manage_collaborators": "Mitarbeiter verwalten",
+    "add_edition": "Editionen hinzufügen",
+    "edit_all_editions": "Alle Editionen bearbeiten",
+  "delete_all_editions": "Alle Editionen löschen"
   },
   "c": {
     "user": {
-      "pseudo": "Benutzername"
+  "pseudo": "Benutzername"
     },
     "rights": "Rechte",
-    "title": "Titel"
+  "title": "Titel"
   },
   "p": {
-    "key": "Schlüssel"
+    "key": "Schlüssel",
+    "editionId": "Ausgabe-ID",
+    "canEdit": "Kann bearbeiten",
+  "canDelete": "Kann löschen"
   },
   "ed": {
-    "id": "ID"
+  "id": "ID"
+  },
+  "currentValue": {
+  "avatar": "Avatar des ausgewählten Benutzers"
+  },
+  "newRights": {
+    "editConvention": "Convention bearbeiten",
+    "deleteConvention": "Convention löschen",
+    "manageCollaborators": "Mitarbeiter verwalten",
+    "addEdition": "Editionen hinzufügen",
+    "editAllEditions": "Alle Editionen bearbeiten",
+  "deleteAllEditions": "Alle Editionen löschen"
   }
 }

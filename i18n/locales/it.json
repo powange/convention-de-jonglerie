@@ -191,7 +191,10 @@
     "or": "Oppure",
     "create": "Crea",
     "refresh": "Aggiorna",
-    "save": "Salva"
+    "save": "Salva",
+    "reset": "Reimpostare",
+    "no_results": "Nessun risultato",
+    "start_typing": "Inizia a digitare..."
   },
   "dates": {
     "same_day_with_time": "Il {date} dalle {startTime} alle {endTime}",
@@ -339,7 +342,8 @@
     "edition_creator": "Creatore dell'edizione",
     "of_convention": "del convegno",
     "enlarged_image": "Immagine ingrandita",
-    "poster_of": "Poster di {name}"
+    "poster_of": "Poster di {name}",
+    "length": "Lunghezza"
   },
   "conventions": {
     "my_conventions": "I miei Convegni",
@@ -635,7 +639,7 @@
     "buttons": {
       "cancel": "Annulla",
       "publishing": "Pubblicazione...",
-      "submitting": "Submitting..."
+  "submitting": "Invio..."
     }
   },
   "components": {
@@ -647,10 +651,16 @@
       "current_collaborators": "Collaboratori attuali",
       "add_collaborator": "Aggiungi collaboratore",
       "search_user_placeholder": "Cerca un utente...",
-      "moderator": "Moderatore",
-      "administrator": "Amministratore",
       "refresh": "Aggiorna",
-      "no_collaborators": "Ancora nessun collaboratore"
+      "no_collaborators": "Ancora nessun collaboratore",
+      "optional_title_placeholder": "Titolo / ruolo (opzionale)",
+  "description": "Gestisci i collaboratori di questa convention",
+  "per_edition_hint": "I permessi per-edizione sovrascrivono i diritti globali dove specificato.",
+  "edit_rights": "Modifica permessi",
+  "updating_rights_success": "Permessi aggiornati con successo",
+  "updating_rights_error": "Errore durante l'aggiornamento dei permessi",
+  "unsaved_warning_title": "Modifiche non salvate",
+  "unsaved_warning_message": "Hai modifiche non salvate ai permessi. Scartarle?"
     },
     "country_select": {
       "no_countries_found": "Nessun paese trovato",
@@ -791,7 +801,9 @@
       "refresh_history": "Aggiorna",
       "load_history": "Carica cronologia",
       "no_history": "Nessuna modifica registrata",
-      "by_user": "Da {user}"
+      "by_user": "Da {user}",
+      "edit_short": "Mod",
+      "delete_short": "Elim"
     }
   },
   "pages": {
@@ -978,7 +990,13 @@
       "PER_EDITIONS_UPDATED": "Diritti per edizione aggiornati",
       "ARCHIVED": "Archiviato",
       "UNARCHIVED": "Ripristinato"
-    }
+    },
+    "edit_convention": "Modifica convention",
+    "delete_convention": "Elimina convention",
+    "manage_collaborators": "Gestisci collaboratori",
+    "add_edition": "Aggiungi edizioni",
+    "edit_all_editions": "Modifica tutte le edizioni",
+    "delete_all_editions": "Elimina tutte le edizioni"
   },
   "c": {
     "user": {
@@ -988,9 +1006,23 @@
     "title": "Titolo"
   },
   "p": {
-    "key": "Chiave"
+    "key": "Chiave",
+    "editionId": "ID edizione",
+    "canEdit": "Può modificare",
+    "canDelete": "Può eliminare"
   },
   "ed": {
     "id": "ID"
+  },
+  "currentValue": {
+    "avatar": "Avatar dell'utente selezionato"
+  },
+  "newRights": {
+    "editConvention": "Modifica convention",
+    "deleteConvention": "Elimina convention",
+    "manageCollaborators": "Gestisci collaboratori",
+    "addEdition": "Aggiungi edizioni",
+    "editAllEditions": "Modifica tutte le edizioni",
+    "deleteAllEditions": "Elimina tutte le edizioni"
   }
 }

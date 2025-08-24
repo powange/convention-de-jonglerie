@@ -84,7 +84,7 @@ async function main() {
       .filter((p) => Object.keys(p.changes).length)
       .slice(0, 10)
       .forEach((p) => {
-  console.log(`   - #${p.id} -> ${Object.keys(p.changes).join(', ')}`)
+        console.log(`   - #${p.id} -> ${Object.keys(p.changes).join(', ')}`)
       })
     if (willUpdate > 10) console.log(`   ... (+${willUpdate - 10} autres)`)
   }
@@ -111,9 +111,7 @@ async function main() {
         await prisma.conventionCollaborator.update({ where: { id }, data: changes })
       }
       updated++
-      console.log(
-        `✅ Collaborateur ${id} droits appliqués: ${Object.keys(changes).join(', ')}`
-      )
+      console.log(`✅ Collaborateur ${id} droits appliqués: ${Object.keys(changes).join(', ')}`)
     }
     if (needsHistory) {
       if (!dry) {

@@ -98,16 +98,10 @@
       "admin_notes": "Admin notes",
       "admin_notes_placeholder": "Add your notes about resolving this feedback...",
       "view": "View details",
-      "details": "Feedback details",
-      "type": {
-        "label": "Type"
-      },
-      "subject": {
-        "label": "Subject"
-      },
-      "message": {
-        "label": "Message"
-      },
+  "details": "Feedback details",
+  "type": { "label": "Type" },
+  "subject": { "label": "Subject" },
+  "message": { "label": "Message" },
       "user": "User",
       "status": "Status",
       "created_at": "Created at",
@@ -134,9 +128,9 @@
     "login": "Login",
     "logout": "Logout",
     "tabs": "Navigation tabs",
-    "breadcrumb": "Breadcrumb",
-    "dark_mode": "Dark mode",
-    "light_mode": "Light mode"
+  "breadcrumb": "Breadcrumb",
+  "dark_mode": "Dark mode",
+  "light_mode": "Light mode"
   },
   "homepage": {
     "filters": "Filters",
@@ -147,12 +141,14 @@
     "current_editions": "Current editions",
     "searched_services": "Searched services",
     "grid": "Grid",
-    "map": "Map",
-    "no_conventions_match_criteria": "No conventions match your search criteria",
-    "no_conventions_found": "No conventions found. Be the first to add one!"
+  "map": "Map",
+  "no_conventions_match_criteria": "No conventions match your search criteria",
+  "no_conventions_found": "No conventions found. Be the first to add one!"
   },
   "common": {
     "loading": "Loading...",
+    "no_results": "No results",
+    "start_typing": "Start typing...",
     "error": "Error",
     "success": "Success",
     "cancel": "Cancel",
@@ -191,12 +187,13 @@
     "cancelled": "Cancelled",
     "create": "Create",
     "refresh": "Refresh",
-    "save": "Save"
+  "save": "Save",
+  "reset": "Reset"
   },
   "dates": {
     "same_day_with_time": "On {date} from {startTime} to {endTime}",
-    "date_range_with_time": "From {startDate} to {endDate}",
-    "date_range": "From {startDate} to {endDate}"
+  "date_range_with_time": "From {startDate} to {endDate}",
+  "date_range": "From {startDate} to {endDate}"
   },
   "auth": {
     "login_title": "Login",
@@ -339,7 +336,8 @@
     "edition_creator": "Edition creator",
     "of_convention": "of the convention",
     "enlarged_image": "Enlarged image",
-    "poster_of": "Poster of {name}"
+    "poster_of": "Poster of {name}",
+    "length": "Length"
   },
   "conventions": {
     "my_conventions": "My Conventions",
@@ -370,13 +368,13 @@
       "seats_placeholder": "e.g., 3",
       "price_per_seat": "Price per seat (€)",
       "price_placeholder": "e.g., 10",
-      "created": "Carpool offer created"
+  "created": "Carpool offer created"
     },
     "request": {
       "create": "Create carpool request",
       "required_seats": "Required seats",
       "seats_placeholder": "e.g., 2",
-      "created": "Carpool request created"
+  "created": "Carpool request created"
     },
     "route": "Route",
     "from": "From",
@@ -396,7 +394,7 @@
       "date_required": "Departure date is required",
       "date_invalid": "Invalid date",
       "seats_min": "At least 1 seat",
-      "seats_max": "Maximum 8 seats"
+  "seats_max": "Maximum 8 seats"
     }
   },
   "profile": {
@@ -488,8 +486,8 @@
     "favorite_status_updated": "Favorite status updated!",
     "account_created": "Account created! Check your email.",
     "verification_code_sent": "A verification code has been sent to you.",
-    "convention_created_desc": "The convention \"{name}\" has been created successfully",
-    "removed_from_favorites": "Removed from favorites",
+  "convention_created_desc": "The convention \"{name}\" has been created successfully",
+  "removed_from_favorites": "Removed from favorites",
     "comment_added": "Comment added",
     "booking_requested": "Booking requested",
     "booking_requested_successfully": "Your booking request has been sent to the driver",
@@ -511,7 +509,7 @@
     "reply_deleted": "Reply deleted",
     "reply_deleted_successfully": "The reply has been successfully deleted",
     "edition_created_successfully": "The edition has been successfully created",
-    "convention_updated_desc": "The convention \"{name}\" has been successfully updated"
+  "convention_updated_desc": "The convention \"{name}\" has been successfully updated"
   },
   "forms": {
     "placeholders": {
@@ -523,7 +521,7 @@
       "edition_name_example": "Edition name (e.g.: EJC 2024)",
       "address_complement": "Building A, Function room...",
       "search_by_name": "Search by name",
-      "city_example": "Paris"
+  "city_example": "Paris"
     },
     "labels": {
       "full_address": "Full Address",
@@ -532,46 +530,54 @@
       "edition_name_optional": "Edition name (optional)",
       "address_complement": "Address complement",
       "convention_name": "Convention name",
-      "until_date": "Until"
+  "until_date": "Until"
     },
     "buttons": {
       "cancel": "Cancel",
       "publishing": "Publishing...",
-      "submitting": "Submitting..."
+  "submitting": "Submitting..."
     }
   },
   "components": {
-    "collaborators_modal": {
+  "collaborators_modal": {
       "title": "Manage collaborators",
+      "description": "Manage collaborators for this convention",
       "confirm_remove": "Are you sure you want to remove this collaborator?",
       "permissions": "Permissions",
       "allow_modification": "Allow modification",
       "current_collaborators": "Current collaborators",
       "add_collaborator": "Add collaborator",
       "search_user_placeholder": "Search for a user...",
-      "moderator": "Moderator",
-      "administrator": "Administrator",
       "refresh": "Refresh",
-      "no_collaborators": "No collaborators yet"
+      "no_collaborators": "No collaborators yet",
+  "optional_title_placeholder": "Title / role (optional)",
+  "per_edition_hint": "Select specific rights for some editions if needed",
+  "edit_rights": "Edit rights",
+  "updating_rights_success": "Rights updated",
+  "updating_rights_error": "Error updating rights",
+  "unsaved_warning_title": "Unsaved changes",
+  "unsaved_warning_message": "You have unsaved changes. Discard them?"
     },
-    "collaborators_rights_panel": {
+  "collaborators_rights_panel": {
       "title": "Collaborator rights (beta)",
       "no_collaborators": "No collaborators",
       "title_placeholder": "Title or role (optional)",
       "saved": "Rights updated",
       "per_edition": "Per-edition rights",
       "no_editions": "No editions",
+  "edit_short": "Edit",
+  "delete_short": "Del",
       "history_title": "Change history",
       "refresh_history": "Refresh",
       "load_history": "Load history",
       "no_history": "No changes recorded",
-      "by_user": "By {user}"
+  "by_user": "By {user}"
     },
-    "country_select": {
+  "country_select": {
       "no_countries_found": "No countries found",
-      "search_country_placeholder": "Search for a country..."
+  "search_country_placeholder": "Search for a country..."
     },
-    "convention_form": {
+  "convention_form": {
       "click_to_select_image": "Click to select an image",
       "logo_preview": "Logo preview:",
       "convention_name": "Convention name",
@@ -581,24 +587,24 @@
       "convention_logo_alt": "Convention logo",
       "loading_error_title": "Loading error",
       "loading_error_description": "Unable to load image from this URL",
-      "logo_url_description": "URL to the convention logo image"
+  "logo_url_description": "URL to the convention logo image"
     },
-    "favorites_map": {
+  "favorites_map": {
       "no_upcoming_favorites": "No upcoming favorite editions with available location",
       "upcoming": "Upcoming",
       "past": "Past",
       "editions_with_location": "{count} edition with location | {count} editions with location",
-      "all_favorites": "All are favorites"
+  "all_favorites": "All are favorites"
     },
-    "edition_form": {
+  "edition_form": {
       "previous": "Previous",
       "next": "Next",
       "convention_poster_optional": "Convention poster (Optional)",
       "ticketing_link": "Ticketing link",
       "facebook_page": "Facebook page",
-      "instagram_account": "Instagram account"
+  "instagram_account": "Instagram account"
     },
-    "carpool": {
+  "carpool": {
       "offer_vehicle_places": "Offer seats in your vehicle",
       "share_journey": "Share your journey with other jugglers and reduce your transport costs.",
       "search_journey": "Search for a journey to the convention",
@@ -673,17 +679,17 @@
       "accept": "Accept",
       "reject": "Reject",
       "delete_offer": "Delete offer",
-      "delete_request": "Delete request"
+  "delete_request": "Delete request"
     },
-    "posts": {
+  "posts": {
       "your_reply": "Your reply",
       "your_reply_placeholder": "Your reply...",
       "reply": "Reply",
       "replies_count": "{count} reply | {count} replies",
       "reply_to_comment": "Reply to this comment",
-      "publish": "Publish"
+  "publish": "Publish"
     },
-    "map": {
+  "map": {
       "editions_on_map": "{count} edition on map | {count} editions on map",
       "without_coordinates": "({count} without coordinates)",
       "no_editions_with_location": "No editions with location",
@@ -693,7 +699,7 @@
       "ongoing": "Ongoing",
       "upcoming": "Upcoming",
       "past": "Past",
-      "yellow_border_favorite": "Yellow border = Favorite"
+  "yellow_border_favorite": "Yellow border = Favorite"
     }
   },
   "permissions": {
@@ -712,8 +718,14 @@
       "RIGHTS_UPDATED": "Rights updated",
       "PER_EDITIONS_UPDATED": "Per-edition rights updated",
       "ARCHIVED": "Archived",
-      "UNARCHIVED": "Unarchived"
-    }
+  "UNARCHIVED": "Unarchived"
+    },
+    "edit_convention": "Edit convention",
+    "delete_convention": "Delete convention",
+    "manage_collaborators": "Manage collaborators",
+    "add_edition": "Add editions",
+    "edit_all_editions": "Edit all editions",
+  "delete_all_editions": "Delete all editions"
   },
   "services": {
     "food_trucks": "Food trucks",
@@ -743,38 +755,38 @@
       "food": "Food & Drink",
       "activities": "Activities",
       "amenities": "Amenities",
-      "payment": "Payment"
+  "payment": "Payment"
     }
   },
   "pages": {
-    "favorites": {
+  "favorites": {
       "no_favorites_added": "You haven't added any edition to your favorites yet.",
-      "editions_in_favorites": "{count} edition | {count} editions in favorites"
+  "editions_in_favorites": "{count} edition | {count} editions in favorites"
     },
-    "add_convention": {
+  "add_convention": {
       "submit_button": "Create convention",
       "title": "Create a new convention",
-      "description": "A convention brings together several editions of the same juggling event."
+  "description": "A convention brings together several editions of the same juggling event."
     },
-    "add_edition": {
+  "add_edition": {
       "submit_button": "Add edition",
-      "title": "Add a new edition"
+  "title": "Add a new edition"
     },
-    "access_denied": {
+  "access_denied": {
       "title": "Access denied",
       "description": "You don't have the rights to access this page.",
-      "confirm_delete_edition": "Are you sure you want to delete this edition?"
+  "confirm_delete_edition": "Are you sure you want to delete this edition?"
     },
-    "comments": {
+  "comments": {
       "write_comment": "Write a comment",
       "your_comment": "Your comment",
       "comment_placeholder": "Share your experience, ask your questions...",
       "share_experience": "Share your experience or ask your questions",
       "login_to_participate": "Log in to participate in the discussion",
       "no_comments": "No comments yet.",
-      "be_first_to_comment": "Be the first to share your experience!"
+  "be_first_to_comment": "Be the first to share your experience!"
     },
-    "management": {
+  "management": {
       "actions": "Actions",
       "edit_edition": "Edit edition",
       "delete_edition": "Delete edition",
@@ -786,10 +798,10 @@
       "available_after_event": "Available after event",
       "lost_found_after_description": "Lost & found management will be automatically activated after the end of the edition.",
       "manage_lost_found": "Manage lost & found",
-      "lost_found_active_description": "You can now manage lost items for this completed edition."
+  "lost_found_active_description": "You can now manage lost items for this completed edition."
     },
-    "edit_edition": {
-      "submit_button": "Update edition"
+  "edit_edition": {
+  "submit_button": "Update edition"
     },
     "add_edition_for_convention": {
       "for_convention": "For the convention \"{name}\"",
@@ -807,76 +819,76 @@
   "feedback": {
     "title": "We value your feedback",
     "description": "Help us improve the platform by sharing your comments, suggestions or bug reports.",
-    "type": {
+  "type": {
       "label": "Feedback type",
-      "placeholder": "Select a type"
+  "placeholder": "Select a type"
     },
-    "types": {
+  "types": {
       "bug": "Report a bug",
       "suggestion": "Improvement suggestion",
       "general": "General comment",
-      "complaint": "Report a problem"
+  "complaint": "Report a problem"
     },
-    "subject": {
+  "subject": {
       "label": "Subject",
-      "placeholder": "Briefly describe your feedback"
+  "placeholder": "Briefly describe your feedback"
     },
-    "message": {
+  "message": {
       "label": "Detailed message",
-      "placeholder": "Describe in detail your feedback, suggestion or the problem encountered..."
+  "placeholder": "Describe in detail your feedback, suggestion or the problem encountered..."
     },
-    "name": {
+  "name": {
       "label": "Your name",
-      "placeholder": "Your first and last name"
+  "placeholder": "Your first and last name"
     },
-    "email": {
+  "email": {
       "label": "Your email",
-      "placeholder": "your{'@'}email.com"
+  "placeholder": "your{'@'}email.com"
     },
-    "url": {
+  "url": {
       "label": "Related page (automatic)",
-      "placeholder": "Page URL"
+  "placeholder": "Page URL"
     },
-    "guest": {
-      "info": "As a visitor, please provide your contact details for potential follow-up."
+  "guest": {
+  "info": "As a visitor, please provide your contact details for potential follow-up."
     },
     "submit": "Send feedback",
-    "success": {
+  "success": {
       "title": "Thank you for your feedback!",
       "message": "Your message has been sent to our team. We will review it as soon as possible.",
-      "toast": "Your feedback has been sent successfully"
+  "toast": "Your feedback has been sent successfully"
     },
-    "error": {
+  "error": {
       "title": "Error sending feedback",
       "submit": "An error occurred while sending your feedback",
       "name_required": "Name is required",
       "name_required_desc": "Please provide your name so we can identify your feedback",
       "captcha_required": "Please complete the captcha",
-      "captcha_not_loaded": "The captcha is not loaded yet, please wait"
+  "captcha_not_loaded": "The captcha is not loaded yet, please wait"
     },
-    "validation": {
+  "validation": {
       "subject": {
         "min": "Subject must be at least 5 characters",
-        "max": "Subject cannot exceed 200 characters"
+  "max": "Subject cannot exceed 200 characters"
       },
       "message": {
         "min": "Message must be at least 20 characters",
-        "max": "Message cannot exceed 5000 characters"
+  "max": "Message cannot exceed 5000 characters"
       },
       "name": {
         "min": "Name must be at least 2 characters",
-        "max": "Name cannot exceed 100 characters"
+  "max": "Name cannot exceed 100 characters"
       },
-      "email": {
-        "invalid": "Invalid email"
+  "email": {
+  "invalid": "Invalid email"
       }
     },
-    "recaptcha": {
+  "recaptcha": {
       "protected_by": "This site is protected by reCAPTCHA and the",
       "privacy_policy": "Privacy Policy",
       "and": "and",
       "terms_of_service": "Terms of Service",
-      "apply": "apply"
+  "apply": "apply"
     }
   },
   "upload": {
@@ -910,7 +922,7 @@
       "delete_failed": "Delete failed",
       "file_too_large": "File too large",
       "invalid_file_type": "Invalid file type",
-      "invalid_file_extension": "Invalid file extension"
+    "invalid_file_extension": "Invalid file extension"
     }
   },
   "errors": {
@@ -978,19 +990,33 @@
     "convention_update_error": "An error occurred while updating the convention",
     "update_error": "Update error",
     "publish_edition_failed": "Failed to publish edition",
-    "status_update_failed": "Failed to update status"
+  "status_update_failed": "Failed to update status"
   },
   "c": {
     "user": {
-      "pseudo": "Username"
+  "pseudo": "Username"
     },
     "rights": "Rights",
-    "title": "Title"
+  "title": "Title"
   },
   "p": {
-    "key": "Key"
+    "key": "Key",
+    "editionId": "Edition ID",
+    "canEdit": "Can edit",
+  "canDelete": "Can delete"
   },
   "ed": {
-    "id": "ID"
+  "id": "ID"
+  },
+  "currentValue": {
+  "avatar": "Selected user avatar"
+  },
+  "newRights": {
+    "editConvention": "Edit convention",
+    "deleteConvention": "Delete convention",
+    "manageCollaborators": "Manage collaborators",
+    "addEdition": "Add editions",
+    "editAllEditions": "Edit all editions",
+  "deleteAllEditions": "Delete all editions"
   }
 }

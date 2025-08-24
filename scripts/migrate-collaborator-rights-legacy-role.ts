@@ -16,7 +16,10 @@ import { PrismaClient } from '@prisma/client'
     6. Lancer ensuite la migration Prisma qui supprime la colonne `role`
 */
 
-interface Args { dry: boolean; yes: boolean }
+interface Args {
+  dry: boolean
+  yes: boolean
+}
 function parseArgs(): Args {
   const dry = process.argv.includes('--dry')
   const yes = process.argv.includes('--yes') || process.argv.includes('-y')
@@ -34,7 +37,9 @@ async function main() {
     "SHOW COLUMNS FROM `ConventionCollaborator` LIKE 'role'"
   )
   if (!roleColumn.length) {
-    console.log('ℹ️ Colonne `role` absente: aucune migration legacy nécessaire. \nUtilisez éventuellement le script standard (npm run migrate:collaborators:dry) si vous souhaitez vérifier les droits.')
+    console.log(
+      'ℹ️ Colonne `role` absente: aucune migration legacy nécessaire. \nUtilisez éventuellement le script standard (npm run migrate:collaborators:dry) si vous souhaitez vérifier les droits.'
+    )
     return
   }
 
@@ -90,9 +95,7 @@ async function main() {
         .map(([k]) => `${k}=1`)
         .join(', ')
       if (sets) {
-        await tx.$executeRawUnsafe(
-          `UPDATE ConventionCollaborator SET ${sets} WHERE id=${u.id}`
-        )
+        await tx.$executeRawUnsafe(`UPDATE ConventionCollaborator SET ${sets} WHERE id=${u.id}`)
       }
     }
 

@@ -188,7 +188,6 @@ describe('/api/editions/[id]/lost-found/upload-image POST', () => {
 
   it("devrait traiter correctement l'ID numérique", async () => {
     global.getRouterParam.mockReturnValue('456')
-
     ;(mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } })
     mockHasPermission.mockResolvedValue(true)
     mockHandleImageUpload.mockResolvedValue({

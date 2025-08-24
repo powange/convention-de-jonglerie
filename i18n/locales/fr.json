@@ -153,6 +153,8 @@
   },
   "common": {
     "loading": "Chargement...",
+    "no_results": "Aucun résultat",
+    "start_typing": "Commencez à taper...",
     "error": "Erreur",
     "success": "Succès",
     "cancelled": "Annulé",
@@ -191,7 +193,8 @@
     "or": "Ou",
     "create": "Créer",
     "refresh": "Rafraîchir",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "reset": "Réinitialiser"
   },
   "dates": {
     "same_day_with_time": "Le {date} de {startTime} à {endTime}",
@@ -339,7 +342,8 @@
     "edition_creator": "Créateur de l'édition",
     "of_convention": "de la convention",
     "enlarged_image": "Image agrandie",
-    "poster_of": "Affiche de {name}"
+    "poster_of": "Affiche de {name}",
+    "length": "Longueur"
   },
   "conventions": {
     "my_conventions": "Mes Conventions",
@@ -670,16 +674,22 @@
   "components": {
     "collaborators_modal": {
       "title": "Gérer les collaborateurs",
+      "description": "Gérer les collaborateurs de cette convention",
       "confirm_remove": "Êtes-vous sûr de vouloir retirer ce collaborateur ?",
       "permissions": "Permissions",
       "allow_modification": "Autoriser la modification",
       "current_collaborators": "Collaborateurs actuels",
       "add_collaborator": "Ajouter un collaborateur",
       "search_user_placeholder": "Rechercher un utilisateur...",
-      "moderator": "Modérateur",
-      "administrator": "Administrateur",
       "refresh": "Rafraîchir",
-      "no_collaborators": "Aucun collaborateur pour le moment"
+      "no_collaborators": "Aucun collaborateur pour le moment",
+      "optional_title_placeholder": "Titre / fonction (optionnel)",
+      "per_edition_hint": "Cochez des droits spécifiques pour certaines éditions si nécessaire",
+      "edit_rights": "Modifier les droits",
+      "updating_rights_success": "Droits mis à jour",
+      "updating_rights_error": "Erreur lors de la mise à jour des droits",
+      "unsaved_warning_title": "Modifications non sauvegardées",
+      "unsaved_warning_message": "Vous avez des modifications en cours. Les abandonner ?"
     },
     "collaborators_rights_panel": {
       "title": "Droits des collaborateurs (bêta)",
@@ -688,6 +698,8 @@
       "saved": "Droits mis à jour",
       "per_edition": "Droits par édition",
       "no_editions": "Aucune édition",
+      "edit_short": "Édit.",
+      "delete_short": "Suppr.",
       "history_title": "Historique des changements",
       "refresh_history": "Rafraîchir",
       "load_history": "Charger l'historique",
@@ -830,6 +842,12 @@
     "addEdition": "Ajouter des éditions",
     "editAllEditions": "Modifier toutes les éditions",
     "deleteAllEditions": "Supprimer toutes les éditions",
+    "edit_convention": "Modifier la convention",
+    "delete_convention": "Supprimer la convention",
+    "manage_collaborators": "Gérer les collaborateurs",
+    "add_edition": "Ajouter des éditions",
+    "edit_all_editions": "Modifier toutes les éditions",
+    "delete_all_editions": "Supprimer toutes les éditions",
     "admin": "Administrateur",
     "manager": "Gestion avancée",
     "editor": "Éditeur",
@@ -842,6 +860,14 @@
       "UNARCHIVED": "Désarchivé"
     }
   },
+  "newRights": {
+    "editConvention": "Modifier la convention",
+    "deleteConvention": "Supprimer la convention",
+    "manageCollaborators": "Gérer les collaborateurs",
+    "addEdition": "Ajouter des éditions",
+    "editAllEditions": "Modifier toutes les éditions",
+    "deleteAllEditions": "Supprimer toutes les éditions"
+  },
   "c": {
     "user": {
       "pseudo": "Pseudo"
@@ -850,7 +876,10 @@
     "title": "Titre"
   },
   "p": {
-    "key": "Clé"
+    "key": "Clé",
+    "editionId": "ID de l'édition",
+    "canEdit": "Peut modifier",
+    "canDelete": "Peut supprimer"
   },
   "ed": {
     "id": "ID"
@@ -992,5 +1021,8 @@
     "copyright": "© {year} Convention de Jonglerie. Tous droits réservés.",
     "feedback": "Nous faire un retour",
     "language_selector": "Changer de langue"
+  },
+  "currentValue": {
+    "avatar": "Avatar de l'utilisateur sélectionné"
   }
 }

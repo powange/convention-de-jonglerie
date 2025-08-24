@@ -191,7 +191,10 @@
     "or": "Или",
     "create": "Создать",
     "refresh": "Обновить",
-    "save": "Сохранить"
+    "save": "Сохранить",
+    "reset": "Сброс",
+    "no_results": "Нет результатов",
+    "start_typing": "Начните вводить..."
   },
   "dates": {
     "same_day_with_time": "{date} с {startTime} до {endTime}",
@@ -339,7 +342,8 @@
     "edition_creator": "Создатель издания",
     "of_convention": "конвенции",
     "enlarged_image": "Увеличенное изображение",
-    "poster_of": "Постер {name}"
+    "poster_of": "Постер {name}",
+    "length": "Длина"
   },
   "conventions": {
     "my_conventions": "Мои Конвенции",
@@ -537,22 +541,28 @@
     "buttons": {
       "cancel": "Отмена",
       "publishing": "Публикация...",
-      "submitting": "Submitting..."
+  "submitting": "Отправка..."
     }
   },
   "components": {
     "collaborators_modal": {
-      "title": "Управлять сотрудниками",
-      "confirm_remove": "Вы уверены, что хотите удалить этого сотрудника?",
-      "permissions": "Разрешения",
-      "allow_modification": "Разрешить модификацию",
-      "current_collaborators": "Текущие сотрудники",
-      "add_collaborator": "Добавить сотрудника",
-      "search_user_placeholder": "Искать пользователя...",
-      "moderator": "Модератор",
-      "administrator": "Администратор",
-      "refresh": "Обновить",
-      "no_collaborators": "Пока нет соавторов"
+  "title": "Управление соавторами",
+  "confirm_remove": "Вы уверены, что хотите удалить этого соавтора?",
+  "permissions": "Права",
+  "allow_modification": "Разрешить изменение",
+  "current_collaborators": "Текущие соавторы",
+  "add_collaborator": "Добавить соавтора",
+  "search_user_placeholder": "Поиск пользователя...",
+  "refresh": "Обновить",
+  "no_collaborators": "Пока нет соавторов",
+  "optional_title_placeholder": "Заголовок / роль (необязательно)",
+  "description": "Управляйте соавторами этой конвенции",
+  "per_edition_hint": "Права на уровне отдельного издания переопределяют глобальные права, если указано.",
+  "edit_rights": "Изменить права",
+  "updating_rights_success": "Права обновлены",
+  "updating_rights_error": "Ошибка обновления прав",
+  "unsaved_warning_title": "Несохранённые изменения",
+  "unsaved_warning_message": "У вас есть несохранённые изменения прав. Отменить их?"
     },
     "country_select": {
       "no_countries_found": "Страны не найдены",
@@ -576,6 +586,21 @@
       "past": "Прошедшие",
       "editions_with_location": "{count} издание с местоположением | {count} изданий с местоположением",
       "all_favorites": "Все избранные"
+    },
+    "collaborators_rights_panel": {
+      "title": "Права соавторов (бета)",
+      "no_collaborators": "Нет соавторов",
+      "title_placeholder": "Заголовок или роль (необязательно)",
+      "saved": "Права обновлены",
+      "per_edition": "Права по изданиям",
+      "no_editions": "Нет изданий",
+      "history_title": "История изменений",
+      "refresh_history": "Обновить",
+      "load_history": "Загрузить историю",
+      "no_history": "Нет записанных изменений",
+      "by_user": "От {user}",
+      "edit_short": "Изм",
+      "delete_short": "Удл"
     },
     "edition_form": {
       "previous": "Предыдущий",
@@ -670,7 +695,7 @@
       "reply_to_comment": "Ответить на этот комментарий",
       "publish": "Опубликовать"
     },
-    "map": {
+  "map": {
       "editions_on_map": "{count} издание на карте | {count} изданий на карте",
       "without_coordinates": "({count} без координат)",
       "no_editions_with_location": "Нет изданий с местоположением",
@@ -681,19 +706,6 @@
       "upcoming": "Предстоящие",
       "past": "Прошедшие",
       "yellow_border_favorite": "Желтая граница = Избранное"
-    },
-    "collaborators_rights_panel": {
-      "title": "Права соавторов (бета)",
-      "no_collaborators": "Нет соавторов",
-      "title_placeholder": "Название или роль (необязательно)",
-      "saved": "Права обновлены",
-      "per_edition": "Права по изданиям",
-      "no_editions": "Нет изданий",
-      "history_title": "История изменений",
-      "refresh_history": "Обновить",
-      "load_history": "Загрузить историю",
-      "no_history": "Нет записанных изменений",
-      "by_user": "От {user}"
     }
   },
   "services": {
@@ -978,7 +990,13 @@
       "PER_EDITIONS_UPDATED": "Права по изданиям обновлены",
       "ARCHIVED": "Архивировано",
       "UNARCHIVED": "Восстановлено"
-    }
+    },
+    "edit_convention": "Редактировать конвенцию",
+    "delete_convention": "Удалить конвенцию",
+    "manage_collaborators": "Управлять сотрудниками",
+    "add_edition": "Добавить издания",
+    "edit_all_editions": "Редактировать все издания",
+    "delete_all_editions": "Удалить все издания"
   },
   "c": {
     "user": {
@@ -988,9 +1006,23 @@
     "title": "Название"
   },
   "p": {
-    "key": "Ключ"
+    "key": "Ключ",
+    "editionId": "ID издания",
+    "canEdit": "Может редактировать",
+    "canDelete": "Может удалять"
   },
   "ed": {
     "id": "ID"
+  },
+  "currentValue": {
+    "avatar": "Аватар выбранного пользователя"
+  },
+  "newRights": {
+    "editConvention": "Редактировать конвенцию",
+    "deleteConvention": "Удалить конвенцию",
+    "manageCollaborators": "Управлять сотрудниками",
+    "addEdition": "Добавить издания",
+    "editAllEditions": "Редактировать все издания",
+    "deleteAllEditions": "Удалить все издания"
   }
 }

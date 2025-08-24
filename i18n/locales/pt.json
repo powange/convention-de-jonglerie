@@ -191,7 +191,10 @@
     "or": "Ou",
     "create": "Criar",
     "refresh": "Atualizar",
-    "save": "Salvar"
+    "save": "Salvar",
+    "reset": "Redefinir",
+    "no_results": "Sem resultados",
+    "start_typing": "Comece a escrever..."
   },
   "dates": {
     "same_day_with_time": "No dia {date} das {startTime} às {endTime}",
@@ -339,7 +342,8 @@
     "edition_creator": "Criador da edição",
     "of_convention": "da convenção",
     "enlarged_image": "Imagem ampliada",
-    "poster_of": "Cartaz de {name}"
+    "poster_of": "Cartaz de {name}",
+    "length": "Comprimento"
   },
   "conventions": {
     "my_conventions": "As Minhas Convenções",
@@ -635,7 +639,7 @@
     "buttons": {
       "cancel": "Cancelar",
       "publishing": "A publicar...",
-      "submitting": "Submitting..."
+  "submitting": "A enviar..."
     }
   },
   "components": {
@@ -647,10 +651,16 @@
       "current_collaborators": "Colaboradores actuais",
       "add_collaborator": "Adicionar um colaborador",
       "search_user_placeholder": "Procurar um utilizador...",
-      "moderator": "Moderador",
-      "administrator": "Administrador",
       "refresh": "Atualizar",
-      "no_collaborators": "Ainda sem colaboradores"
+      "no_collaborators": "Ainda sem colaboradores",
+      "optional_title_placeholder": "Título / função (opcional)",
+  "description": "Gerir os colaboradores desta convenção",
+  "per_edition_hint": "Permissões por edição sobrescrevem direitos globais onde especificado.",
+  "edit_rights": "Editar permissões",
+  "updating_rights_success": "Permissões atualizadas",
+  "updating_rights_error": "Erro ao atualizar permissões",
+  "unsaved_warning_title": "Alterações não guardadas",
+  "unsaved_warning_message": "Tem alterações de permissões não guardadas. Descartá-las?"
     },
     "country_select": {
       "no_countries_found": "Nenhum país encontrado",
@@ -674,6 +684,21 @@
       "past": "Passadas",
       "editions_with_location": "{count} edição com localização | {count} edições com localização",
       "all_favorites": "Todas são favoritas"
+    },
+    "collaborators_rights_panel": {
+      "title": "Direitos de colaboradores (beta)",
+      "no_collaborators": "Sem colaboradores",
+      "title_placeholder": "Título ou função (opcional)",
+      "saved": "Direitos atualizados",
+      "per_edition": "Direitos por edição",
+      "no_editions": "Sem edições",
+      "history_title": "Histórico de alterações",
+      "refresh_history": "Atualizar",
+      "load_history": "Carregar histórico",
+      "no_history": "Sem alterações registadas",
+      "by_user": "Por {user}",
+      "edit_short": "Editar",
+      "delete_short": "Rem"
     },
     "edition_form": {
       "previous": "Anterior",
@@ -768,7 +793,7 @@
       "reply_to_comment": "Responda a este comentário",
       "publish": "Publicar"
     },
-    "map": {
+  "map": {
       "editions_on_map": "{count} edição no mapa | {count} edições no mapa",
       "without_coordinates": "({count} sem coordenadas)",
       "no_editions_with_location": "Nenhuma edição com localização",
@@ -779,19 +804,6 @@
       "upcoming": "Próximas",
       "past": "Passadas",
       "yellow_border_favorite": "Contorno amarelo = Favorito"
-    },
-    "collaborators_rights_panel": {
-      "title": "Direitos de colaboradores (beta)",
-      "no_collaborators": "Sem colaboradores",
-      "title_placeholder": "Título ou função (opcional)",
-      "saved": "Direitos atualizados",
-      "per_edition": "Direitos por edição",
-      "no_editions": "Sem edições",
-      "history_title": "Histórico de alterações",
-      "refresh_history": "Atualizar",
-      "load_history": "Carregar histórico",
-      "no_history": "Sem alterações registradas",
-      "by_user": "Por {user}"
     }
   },
   "pages": {
@@ -978,7 +990,13 @@
       "PER_EDITIONS_UPDATED": "Direitos por edição atualizados",
       "ARCHIVED": "Arquivado",
       "UNARCHIVED": "Restaurado"
-    }
+    },
+    "edit_convention": "Editar convenção",
+    "delete_convention": "Eliminar convenção",
+    "manage_collaborators": "Gerir colaboradores",
+    "add_edition": "Adicionar edições",
+    "edit_all_editions": "Editar todas as edições",
+    "delete_all_editions": "Eliminar todas as edições"
   },
   "c": {
     "user": {
@@ -988,9 +1006,23 @@
     "title": "Título"
   },
   "p": {
-    "key": "Chave"
+    "key": "Chave",
+    "editionId": "ID da edição",
+    "canEdit": "Pode editar",
+    "canDelete": "Pode excluir"
   },
   "ed": {
     "id": "ID"
+  },
+  "currentValue": {
+    "avatar": "Avatar do usuário selecionado"
+  },
+  "newRights": {
+    "editConvention": "Editar convenção",
+    "deleteConvention": "Eliminar convenção",
+    "manageCollaborators": "Gerir colaboradores",
+    "addEdition": "Adicionar edições",
+    "editAllEditions": "Editar todas as edições",
+    "deleteAllEditions": "Eliminar todas as edições"
   }
 }

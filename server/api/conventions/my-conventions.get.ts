@@ -75,17 +75,7 @@ export default defineEventHandler(async (event) => {
         email: undefined,
       } as any,
       collaborators: convention.collaborators.map((collab) => ({
-        id: collab.id,
-        addedAt: collab.addedAt,
-        title: (collab as any).title ?? null,
-        rights: {
-          editConvention: (collab as any).canEditConvention,
-          deleteConvention: (collab as any).canDeleteConvention,
-          manageCollaborators: (collab as any).canManageCollaborators,
-          addEdition: (collab as any).canAddEdition,
-          editAllEditions: (collab as any).canEditAllEditions,
-          deleteAllEditions: (collab as any).canDeleteAllEditions,
-        },
+        ...collab,
         user: {
           ...collab.user,
           emailHash: getEmailHash(collab.user.email),

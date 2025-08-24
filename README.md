@@ -120,6 +120,7 @@ Assurez-vous d'avoir Node.js, npm (ou pnpm, yarn, bun) et MySQL installés.
 
 3.  **Configuration de l'environnement :**
     - Créez un fichier `.env` à la racine du projet et configurez les variables suivantes :
+
       ```env
       # Base de données
       DATABASE_URL="mysql://user:password@host:port/database_name"

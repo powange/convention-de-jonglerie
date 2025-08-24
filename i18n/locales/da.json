@@ -87,7 +87,7 @@
         "bug": "Fejl",
         "suggestion": "Forslag",
         "general": "Generel",
-        "complaint": "Klage"
+      "complaint": "Klage"
       },
       "pending": "Afventer",
       "resolved": "Løst",
@@ -100,13 +100,13 @@
       "view": "Se detaljer",
       "details": "Feedback-detaljer",
       "type": {
-        "label": "Type"
+  "label": "Type"
       },
       "subject": {
-        "label": "Emne"
+  "label": "Emne"
       },
       "message": {
-        "label": "Besked"
+  "label": "Besked"
       },
       "user": "Bruger",
       "status": "Status",
@@ -136,7 +136,7 @@
     "tabs": "Navigationsfaner",
     "dark_mode": "Mørk tilstand",
     "light_mode": "Lys tilstand",
-    "breadcrumb": "Brødkrumme"
+  "breadcrumb": "Brødkrumme"
   },
   "homepage": {
     "filters": "Filtre",
@@ -149,7 +149,7 @@
     "grid": "Gitter",
     "map": "Kort",
     "no_conventions_match_criteria": "Ingen konventioner matcher dine søgekriterier",
-    "no_conventions_found": "Ingen konventioner fundet. Vær den første til at tilføje en!"
+  "no_conventions_found": "Ingen konventioner fundet. Vær den første til at tilføje en!"
   },
   "common": {
     "loading": "Indlæser...",
@@ -191,12 +191,15 @@
     "or": "Eller",
     "create": "Opret",
     "refresh": "Opdater",
-    "save": "Gem"
+    "save": "Gem",
+    "reset": "Nulstil",
+    "no_results": "Ingen resultater",
+  "start_typing": "Begynd at skrive..."
   },
   "dates": {
     "same_day_with_time": "Den {date} fra {startTime} til {endTime}",
     "date_range_with_time": "Fra {startDate} til {endDate}",
-    "date_range": "Fra {startDate} til {endDate}"
+  "date_range": "Fra {startDate} til {endDate}"
   },
   "auth": {
     "login_title": "Log ind",
@@ -286,7 +289,7 @@
     "reset_link_used": "Dette link er allerede brugt til at nulstille adgangskoden",
     "invalid_code": "Ugyldig kode",
     "continue_with_google": "Fortsæt med Google",
-    "continue_with_facebook": "Fortsæt med Facebook"
+  "continue_with_facebook": "Fortsæt med Facebook"
   },
   "editions": {
     "edit": "Rediger udgaven",
@@ -339,7 +342,8 @@
     "edition_creator": "Udgavens skaber",
     "of_convention": "af konventionen",
     "enlarged_image": "Forstørret billede",
-    "poster_of": "Plakat for {name}"
+    "poster_of": "Plakat for {name}",
+  "length": "Længde"
   },
   "conventions": {
     "my_conventions": "Mine konventioner",
@@ -361,7 +365,7 @@
     "convention_deleted_success": "Konventionen blev slettet med succes",
     "cannot_load_conventions": "Kan ikke indlæse dine konventioner",
     "convention_not_found": "Konvention ikke fundet",
-    "convention_not_found_description": "Den konvention, du leder efter, eksisterer ikke"
+  "convention_not_found_description": "Den konvention, du leder efter, eksisterer ikke"
   },
   "carpool": {
     "offer": {
@@ -370,13 +374,13 @@
       "seats_placeholder": "fx 3",
       "price_per_seat": "Pris pr. sæde (€)",
       "price_placeholder": "fx 10",
-      "created": "Samkørselstilbud oprettet"
+  "created": "Samkørselstilbud oprettet"
     },
     "request": {
       "create": "Opret samkørselsanmodning",
       "required_seats": "Ønskede pladser",
       "seats_placeholder": "fx 2",
-      "created": "Samkørselsanmodning oprettet"
+  "created": "Samkørselsanmodning oprettet"
     },
     "route": "Rute",
     "from": "Fra",
@@ -396,7 +400,7 @@
       "date_required": "Afrejsedato er påkrævet",
       "date_invalid": "Ugyldig dato",
       "seats_min": "Mindst 1 plads",
-      "seats_max": "Maksimalt 8 pladser"
+  "seats_max": "Maksimalt 8 pladser"
     }
   },
   "profile": {
@@ -471,12 +475,12 @@
     "admin_mode_enabled": "Administratortilstand aktiveret",
     "admin_mode_enabled_desc": "Du har nu adgang til alle administratorprivilegier",
     "admin_mode_disabled": "Administratortilstand deaktiveret",
-    "admin_mode_disabled_desc": "Du bruger nu den normale brugerinterface"
+  "admin_mode_disabled_desc": "Du bruger nu den normale brugerinterface"
   },
   "footer": {
     "language_selector": "Skift sprog",
     "copyright": "© {year} Jonglørkonvention. Alle rettigheder forbeholdes.",
-    "feedback": "Giv os feedback"
+  "feedback": "Giv os feedback"
   },
   "messages": {
     "login_success": "Login vellykket!",
@@ -488,7 +492,7 @@
     "favorite_status_updated": "Favoritstatus opdateret!",
     "account_created": "Konto oprettet! Tjek din email.",
     "verification_code_sent": "En bekræftelseskode er sendt til dig.",
-    "convention_created_desc": "Konventionen \"{name}\" blev oprettet med succes",
+  "convention_created_desc": "Konventionen \"{name}\" blev oprettet med succes",
     "removed_from_favorites": "Fjernet fra favoritter",
     "comment_added": "Kommentar tilføjet",
     "booking_requested": "Booking requested",
@@ -578,7 +582,7 @@
     "convention_required": "Konvention påkrævet",
     "address_required": "Adresse påkrævet",
     "publish_edition_failed": "Kunne ikke publicere udgave",
-    "status_update_failed": "Kunne ikke opdatere status"
+  "status_update_failed": "Kunne ikke opdatere status"
   },
   "services": {
     "food_trucks": "Food trucks",
@@ -608,7 +612,7 @@
       "food": "Forplejning",
       "activities": "Aktiviteter",
       "amenities": "Faciliteter",
-      "payment": "Betalinger"
+  "payment": "Betalinger"
     }
   },
   "forms": {
@@ -621,7 +625,7 @@
       "edition_name_example": "Udgavenavn (f.eks: EJC 2024)",
       "address_complement": "Bygning A, Festsal...",
       "search_by_name": "Søg efter navn",
-      "city_example": "København"
+  "city_example": "København"
     },
     "labels": {
       "full_address": "Fuldstændig adresse",
@@ -630,12 +634,12 @@
       "edition_name_optional": "Udgavenavn (valgfrit)",
       "address_complement": "Adressetillæg",
       "convention_name": "Konventionsnavn",
-      "until_date": "Til"
+  "until_date": "Til"
     },
     "buttons": {
       "cancel": "Annuller",
       "publishing": "Offentliggør...",
-      "submitting": "Submitting..."
+  "submitting": "Indsender..."
     }
   },
   "components": {
@@ -647,14 +651,20 @@
       "current_collaborators": "Nuværende medarbejdere",
       "add_collaborator": "Tilføj medarbejder",
       "search_user_placeholder": "Søg efter en bruger...",
-      "moderator": "Moderator",
-      "administrator": "Administrator",
       "refresh": "Opdater",
-      "no_collaborators": "Ingen samarbejdspartnere endnu"
+      "no_collaborators": "Ingen samarbejdspartnere endnu",
+      "optional_title_placeholder": "Titel / funktion (valgfrit)",
+  "description": "Administrer medarbejdere for denne konvention",
+  "per_edition_hint": "Marker specifikke rettigheder for visse udgaver om nødvendigt",
+  "edit_rights": "Rediger rettigheder",
+  "updating_rights_success": "Rettigheder opdateret",
+  "updating_rights_error": "Kunne ikke opdatere rettigheder",
+  "unsaved_warning_title": "Ikke-gemte ændringer",
+  "unsaved_warning_message": "Du har ændringer ikke gemt. Kassere dem?"
     },
     "country_select": {
       "no_countries_found": "Ingen lande fundet",
-      "search_country_placeholder": "Søg efter et land..."
+  "search_country_placeholder": "Søg efter et land..."
     },
     "convention_form": {
       "click_to_select_image": "Klik for at vælge et billede",
@@ -666,14 +676,14 @@
       "convention_logo_alt": "Konventionslogo",
       "loading_error_title": "Indlæsningsfejl",
       "loading_error_description": "Kan ikke indlæse billede fra denne URL",
-      "logo_url_description": "URL til konventionslogoets billede"
+  "logo_url_description": "URL til konventionslogoets billede"
     },
     "favorites_map": {
       "no_upcoming_favorites": "Ingen kommende favoritudgaver med tilgængelig placering",
       "upcoming": "Kommende",
       "past": "Tidligere",
       "editions_with_location": "{count} udgave med placering | {count} udgaver med placering",
-      "all_favorites": "Alle er favoritter"
+  "all_favorites": "Alle er favoritter"
     },
     "edition_form": {
       "previous": "Forrige",
@@ -681,7 +691,7 @@
       "convention_poster_optional": "Konventionsplakat (valgfrit)",
       "ticketing_link": "Billetsalgslink",
       "facebook_page": "Facebook-side",
-      "instagram_account": "Instagram-konto"
+  "instagram_account": "Instagram-konto"
     },
     "carpool": {
       "offer_vehicle_places": "Tilbyd pladser i dit køretøj",
@@ -757,16 +767,16 @@
       "requested_seats": "{count} anmodet plads | {count} anmodede pladser",
       "accept": "Accepter",
       "reject": "Afvis",
-      "delete_offer": "Slet tilbud",
-      "delete_request": "Slet anmodning"
+  "delete_offer": "Slet tilbud",
+  "delete_request": "Slet anmodning"
     },
     "posts": {
       "your_reply": "Dit svar",
       "your_reply_placeholder": "Dit svar...",
-      "reply": "Svar",
-      "replies_count": "{count} svar | {count} svar",
-      "reply_to_comment": "Svar på denne kommentar",
-      "publish": "Offentliggør"
+  "reply": "Svar",
+  "replies_count": "{count} svar | {count} svar",
+  "reply_to_comment": "Svar på denne kommentar",
+  "publish": "Offentliggør"
     },
     "map": {
       "editions_on_map": "{count} udgave på kortet | {count} udgaver på kortet",
@@ -778,7 +788,7 @@
       "ongoing": "Igangværende",
       "upcoming": "Kommende",
       "past": "Tidligere",
-      "yellow_border_favorite": "Gul kant = Favorit"
+  "yellow_border_favorite": "Gul kant = Favorit"
     },
     "collaborators_rights_panel": {
       "title": "Samarbejdspartnerrettigheder (beta)",
@@ -791,27 +801,29 @@
       "refresh_history": "Opdater",
       "load_history": "Indlæs historik",
       "no_history": "Ingen ændringer registreret",
-      "by_user": "Af {user}"
+  "by_user": "Af {user}",
+  "edit_short": "Redig.",
+  "delete_short": "Slet"
     }
   },
   "pages": {
     "favorites": {
       "no_favorites_added": "Du har endnu ikke tilføjet nogen udgaver til dine favoritter.",
-      "editions_in_favorites": "{count} udgave i favoritter | {count} udgaver i favoritter"
+  "editions_in_favorites": "{count} udgave i favoritter | {count} udgaver i favoritter"
     },
     "add_convention": {
       "submit_button": "Opret konventionen",
       "title": "Opret en ny konvention",
-      "description": "En konvention grupperer flere udgaver af samme jonglørbegivenhed."
+  "description": "En konvention grupperer flere udgaver af samme jonglørbegivenhed."
     },
     "add_edition": {
       "submit_button": "Tilføj udgaven",
-      "title": "Tilføj en ny udgave"
+  "title": "Tilføj en ny udgave"
     },
     "access_denied": {
       "title": "Adgang nægtet",
       "description": "Du har ikke rettigheder til at få adgang til denne side.",
-      "confirm_delete_edition": "Er du sikker på, at du vil slette denne udgave?"
+  "confirm_delete_edition": "Er du sikker på, at du vil slette denne udgave?"
     },
     "comments": {
       "write_comment": "Skriv en kommentar",
@@ -820,7 +832,7 @@
       "share_experience": "Del din oplevelse eller stil dine spørgsmål",
       "login_to_participate": "Log ind for at deltage i diskussionen",
       "no_comments": "Ingen kommentarer endnu.",
-      "be_first_to_comment": "Vær den første til at dele din oplevelse!"
+  "be_first_to_comment": "Vær den første til at dele din oplevelse!"
     },
     "management": {
       "actions": "Handlinger",
@@ -834,10 +846,10 @@
       "available_after_event": "Tilgængelig efter begivenheden",
       "lost_found_after_description": "Administration af hittegods vil blive aktiveret automatisk efter udgavens afslutning.",
       "manage_lost_found": "Administrer hittegods",
-      "lost_found_active_description": "Du kan nu administrere hittegods for denne afsluttede udgave."
+  "lost_found_active_description": "Du kan nu administrere hittegods for denne afsluttede udgave."
     },
     "edit_edition": {
-      "submit_button": "Opdater udgaven"
+  "submit_button": "Opdater udgaven"
     },
     "add_edition_for_convention": {
       "for_convention": "For konventionen \"{name}\"",
@@ -857,42 +869,42 @@
     "description": "Hjælp os med at forbedre platformen ved at dele dine kommentarer, forslag eller fejlrapporter.",
     "type": {
       "label": "Feedback-type",
-      "placeholder": "Vælg en type"
+  "placeholder": "Vælg en type"
     },
     "types": {
       "bug": "Rapporter en fejl",
       "suggestion": "Forbedringsforslag",
       "general": "Generel kommentar",
-      "complaint": "Rapporter et problem"
+  "complaint": "Rapporter et problem"
     },
     "subject": {
       "label": "Emne",
-      "placeholder": "Beskriv kort din feedback"
+  "placeholder": "Beskriv kort din feedback"
     },
     "message": {
       "label": "Detaljeret besked",
-      "placeholder": "Beskriv detaljeret din feedback, forslag eller problemet du stødte på..."
+  "placeholder": "Beskriv detaljeret din feedback, forslag eller problemet du stødte på..."
     },
     "name": {
       "label": "Dit navn",
-      "placeholder": "Dit for- og efternavn"
+  "placeholder": "Dit for- og efternavn"
     },
     "email": {
       "label": "Din email",
-      "placeholder": "din{'@'}email.com"
+  "placeholder": "din{'@'}email.com"
     },
     "url": {
       "label": "Relateret side (automatisk)",
-      "placeholder": "Side-URL"
+  "placeholder": "Side-URL"
     },
     "guest": {
-      "info": "Som gæst bedes du oplyse dine kontaktoplysninger for mulig opfølgning."
+  "info": "Som gæst bedes du oplyse dine kontaktoplysninger for mulig opfølgning."
     },
     "submit": "Send feedback",
     "success": {
       "title": "Tak for din feedback!",
       "message": "Din besked er sendt til vores team. Vi vil gennemgå den hurtigst muligt.",
-      "toast": "Din feedback er sendt succesfuldt"
+  "toast": "Din feedback er sendt succesfuldt"
     },
     "error": {
       "title": "Fejl ved afsendelse af feedback",
@@ -900,23 +912,23 @@
       "name_required": "Navn er påkrævet",
       "name_required_desc": "Angiv venligst dit navn",
       "captcha_required": "Udfyld venligst captcha'en",
-      "captcha_not_loaded": "Captcha'en er ikke indlæst endnu, vent venligst"
+  "captcha_not_loaded": "Captcha'en er ikke indlæst endnu, vent venligst"
     },
     "validation": {
       "subject": {
         "min": "Emnet skal være mindst 5 tegn",
-        "max": "Emnet kan ikke overstige 200 tegn"
+  "max": "Emnet kan ikke overstige 200 tegn"
       },
       "message": {
         "min": "Beskeden skal være mindst 20 tegn",
-        "max": "Beskeden kan ikke overstige 5000 tegn"
+  "max": "Beskeden kan ikke overstige 5000 tegn"
       },
       "name": {
         "min": "Navnet skal være mindst 2 tegn",
-        "max": "Navnet kan ikke overstige 100 tegn"
+  "max": "Navnet kan ikke overstige 100 tegn"
       },
       "email": {
-        "invalid": "Ugyldig email"
+  "invalid": "Ugyldig email"
       }
     },
     "recaptcha": {
@@ -924,7 +936,7 @@
       "privacy_policy": "Privatlivspolitik",
       "and": "og",
       "terms_of_service": "Servicevilkår",
-      "apply": "gælder"
+  "apply": "gælder"
     }
   },
   "upload": {
@@ -958,7 +970,7 @@
       "delete_failed": "Sletning mislykkedes",
       "edition_id_required": "Edition ID påkrævet",
       "convention_id_required": "Convention ID påkrævet",
-      "unsupported_delete_endpoint": "Ikke-understøttet sletnings-endpoint"
+  "unsupported_delete_endpoint": "Ikke-understøttet sletnings-endpoint"
     }
   },
   "permissions": {
@@ -977,20 +989,40 @@
       "RIGHTS_UPDATED": "Rettigheder opdateret",
       "PER_EDITIONS_UPDATED": "Rettigheder pr. udgave opdateret",
       "ARCHIVED": "Arkiveret",
-      "UNARCHIVED": "Genaktiveret"
-    }
+  "UNARCHIVED": "Genaktiveret"
+    },
+    "edit_convention": "Rediger konvention",
+    "delete_convention": "Slet konvention",
+    "manage_collaborators": "Administrer medarbejdere",
+    "add_edition": "Tilføj udgaver",
+    "edit_all_editions": "Rediger alle udgaver",
+  "delete_all_editions": "Slet alle udgaver"
   },
   "c": {
     "user": {
-      "pseudo": "Brugernavn"
+  "pseudo": "Brugernavn"
     },
     "rights": "Rettigheder",
-    "title": "Titel"
+  "title": "Titel"
   },
   "p": {
-    "key": "Nøgle"
+    "key": "Nøgle",
+    "editionId": "Udgave ID",
+    "canEdit": "Kan redigere",
+  "canDelete": "Kan slette"
   },
   "ed": {
-    "id": "ID"
+  "id": "ID"
+  },
+  "currentValue": {
+  "avatar": "Valgt brugers avatar"
+  },
+  "newRights": {
+    "editConvention": "Rediger konvention",
+    "deleteConvention": "Slet konvention",
+    "manageCollaborators": "Administrer medarbejdere",
+    "addEdition": "Tilføj udgaver",
+    "editAllEditions": "Rediger alle udgaver",
+  "deleteAllEditions": "Slet alle udgaver"
   }
 }

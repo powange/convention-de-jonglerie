@@ -191,7 +191,10 @@
     "or": "Lub",
     "create": "Utwórz",
     "refresh": "Odśwież",
-    "save": "Zapisz"
+    "save": "Zapisz",
+    "reset": "Resetuj",
+    "no_results": "Brak wyników",
+    "start_typing": "Zacznij pisać..."
   },
   "dates": {
     "same_day_with_time": "{date} od {startTime} do {endTime}",
@@ -339,7 +342,8 @@
     "edition_creator": "Twórca edycji",
     "of_convention": "konwencji",
     "enlarged_image": "Powiększone zdjęcie",
-    "poster_of": "Plakat {name}"
+    "poster_of": "Plakat {name}",
+    "length": "Długość"
   },
   "conventions": {
     "my_conventions": "Moje Konwencje",
@@ -635,7 +639,7 @@
     "buttons": {
       "cancel": "Anuluj",
       "publishing": "Publikowanie...",
-      "submitting": "Submitting..."
+  "submitting": "Wysyłanie..."
     }
   },
   "components": {
@@ -647,10 +651,16 @@
       "current_collaborators": "Obecni współpracownicy",
       "add_collaborator": "Dodaj współpracownika",
       "search_user_placeholder": "Szukaj użytkownika...",
-      "moderator": "Moderator",
-      "administrator": "Administrator",
       "refresh": "Odśwież",
-      "no_collaborators": "Brak współpracowników"
+      "no_collaborators": "Brak współpracowników",
+      "optional_title_placeholder": "Tytuł / funkcja (opcjonalnie)",
+  "description": "Zarządzaj współpracownikami tej konwencji",
+  "per_edition_hint": "Uprawnienia per‑edycja nadpisują globalne uprawnienia edycji gdzie podano.",
+  "edit_rights": "Edytuj uprawnienia",
+  "updating_rights_success": "Uprawnienia zaktualizowane",
+  "updating_rights_error": "Błąd aktualizacji uprawnień",
+  "unsaved_warning_title": "Niezapisane zmiany",
+  "unsaved_warning_message": "Masz niezapisane zmiany uprawnień. Odrzucić je?"
     },
     "country_select": {
       "no_countries_found": "Nie znaleziono krajów",
@@ -791,7 +801,9 @@
       "refresh_history": "Odśwież",
       "load_history": "Załaduj historię",
       "no_history": "Brak zarejestrowanych zmian",
-      "by_user": "Przez {user}"
+      "by_user": "Przez {user}",
+      "edit_short": "Edyt",
+      "delete_short": "Usuń"
     }
   },
   "pages": {
@@ -978,7 +990,13 @@
       "PER_EDITIONS_UPDATED": "Prawa na edycję zaktualizowane",
       "ARCHIVED": "Zarchiwizowane",
       "UNARCHIVED": "Przywrócone"
-    }
+    },
+    "edit_convention": "Edytuj konwencję",
+    "delete_convention": "Usuń konwencję",
+    "manage_collaborators": "Zarządzaj współpracownikami",
+    "add_edition": "Dodaj edycje",
+    "edit_all_editions": "Edytuj wszystkie edycje",
+    "delete_all_editions": "Usuń wszystkie edycje"
   },
   "c": {
     "user": {
@@ -988,9 +1006,23 @@
     "title": "Tytuł"
   },
   "p": {
-    "key": "Klucz"
+    "key": "Klucz",
+    "editionId": "ID edycji",
+    "canEdit": "Może edytować",
+    "canDelete": "Może usunąć"
   },
   "ed": {
     "id": "ID"
+  },
+  "currentValue": {
+    "avatar": "Awatar wybranego użytkownika"
+  },
+  "newRights": {
+    "editConvention": "Edytuj konwencję",
+    "deleteConvention": "Usuń konwencję",
+    "manageCollaborators": "Zarządzaj współpracownikami",
+    "addEdition": "Dodaj edycje",
+    "editAllEditions": "Edytuj wszystkie edycje",
+    "deleteAllEditions": "Usuń wszystkie edycje"
   }
 }

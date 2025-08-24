@@ -153,6 +153,8 @@
   },
   "common": {
     "loading": "Cargando...",
+    "no_results": "Sin resultados",
+    "start_typing": "Empieza a escribir...",
     "error": "Error",
     "success": "Éxito",
     "cancelled": "Cancelled",
@@ -191,7 +193,8 @@
     "or": "O",
     "create": "Crear",
     "refresh": "Actualizar",
-    "save": "Guardar"
+    "save": "Guardar",
+    "reset": "Restablecer"
   },
   "dates": {
     "same_day_with_time": "El {date} de {startTime} a {endTime}",
@@ -339,7 +342,8 @@
     "edition_creator": "Creador de la edición",
     "of_convention": "de la convención",
     "enlarged_image": "Imagen ampliada",
-    "poster_of": "Cartel de {name}"
+    "poster_of": "Cartel de {name}",
+    "length": "Longitud"
   },
   "conventions": {
     "my_conventions": "Mis Convenciones",
@@ -669,22 +673,28 @@
     "buttons": {
       "cancel": "Cancelar",
       "publishing": "Publicando...",
-      "submitting": "Submitting..."
+    "submitting": "Enviando..."
     }
   },
   "components": {
     "collaborators_modal": {
       "title": "Gestionar colaboradores",
+      "description": "Gestionar los colaboradores de esta convención",
       "confirm_remove": "¿Estás seguro de que quieres eliminar este colaborador?",
       "permissions": "Permisos",
       "allow_modification": "Permitir modificación",
       "current_collaborators": "Colaboradores actuales",
       "add_collaborator": "Agregar colaborador",
       "search_user_placeholder": "Buscar usuario...",
-      "moderator": "Moderador",
-      "administrator": "Administrador",
       "refresh": "Actualizar",
-      "no_collaborators": "Sin colaboradores aún"
+  "no_collaborators": "Sin colaboradores aún",
+  "optional_title_placeholder": "Título / función (opcional)",
+  "per_edition_hint": "Los permisos por edición sustituyen los permisos globales donde se especifiquen.",
+  "edit_rights": "Editar permisos",
+  "updating_rights_success": "Permisos actualizados",
+  "updating_rights_error": "Error al actualizar los permisos",
+  "unsaved_warning_title": "Cambios no guardados",
+  "unsaved_warning_message": "Tienes cambios de permisos sin guardar. ¿Descartarlos?"
     },
     "country_select": {
       "no_countries_found": "No se encontraron países",
@@ -825,7 +835,9 @@
       "refresh_history": "Actualizar",
       "load_history": "Cargar historial",
       "no_history": "Sin cambios registrados",
-      "by_user": "Por {user}"
+      "by_user": "Por {user}",
+      "edit_short": "Edit",
+      "delete_short": "Del"
     }
   },
   "pages": {
@@ -978,7 +990,13 @@
       "PER_EDITIONS_UPDATED": "Derechos por edición actualizados",
       "ARCHIVED": "Archivado",
       "UNARCHIVED": "Desarchivado"
-    }
+    },
+    "edit_convention": "Editar convención",
+    "delete_convention": "Eliminar convención",
+    "manage_collaborators": "Gestionar colaboradores",
+    "add_edition": "Añadir ediciones",
+    "edit_all_editions": "Editar todas las ediciones",
+    "delete_all_editions": "Eliminar todas las ediciones"
   },
   "c": {
     "user": {
@@ -988,9 +1006,23 @@
     "title": "Título"
   },
   "p": {
-    "key": "Clave"
+    "key": "Clave",
+    "editionId": "ID de edición",
+    "canEdit": "Puede editar",
+    "canDelete": "Puede eliminar"
   },
   "ed": {
     "id": "ID"
+  },
+  "currentValue": {
+    "avatar": "Avatar del usuario seleccionado"
+  },
+  "newRights": {
+    "editConvention": "Editar convención",
+    "deleteConvention": "Eliminar convención",
+    "manageCollaborators": "Gestionar colaboradores",
+    "addEdition": "Añadir ediciones",
+    "editAllEditions": "Editar todas las ediciones",
+    "deleteAllEditions": "Eliminar todas las ediciones"
   }
 }

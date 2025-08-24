@@ -47,7 +47,15 @@
       "Bash(./scripts/fix-remaining-utils-imports.sh:*)",
       "Bash(echo:*)",
       "Bash(/home/pcomble/projets/convention-de-jonglerie/scripts/add-color-mode-translations.sh)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(for lang in it nl pl pt ru uk da)",
+      "Bash(do tail -10 i18n/locales/$lang.json)",
+      "Bash(done)",
+      "Bash(for lang in en de es it nl pl pt ru uk da)",
+      "Bash(do echo \"=== $lang ===\")",
+      "Bash(do)",
+      "Bash(__NEW_LINE__ grep -n \"optional_title_placeholder\" i18n/locales/$lang.json)",
+      "Bash(__NEW_LINE__ done)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

@@ -39,10 +39,14 @@ async function main() {
   if (doReset) {
     console.log('⚠️  Option --reset: exécution de prisma migrate reset (DEV uniquement).')
     await new Promise<void>((resolve, reject) => {
-      const proc = spawn('npx', ['prisma', 'migrate', 'reset', '--force', '--skip-generate', '--skip-seed'], {
-        stdio: 'inherit',
-        env: process.env,
-      })
+      const proc = spawn(
+        'npx',
+        ['prisma', 'migrate', 'reset', '--force', '--skip-generate', '--skip-seed'],
+        {
+          stdio: 'inherit',
+          env: process.env,
+        }
+      )
       proc.on('exit', (code) => {
         if (code === 0) resolve()
         else reject(new Error(`prisma migrate reset exited with code ${code}`))

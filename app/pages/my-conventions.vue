@@ -320,32 +320,39 @@ const getEditionsColumns = () => [
     id: 'actions',
     cell: ({ row }: TableCellParams) => {
       const edition = row.original
-      return h(UButtonGroup, { size: 'xs' }, [
-        h(UTooltip, { text: t('common.view') }, () =>
-          h(UButton, {
-            icon: 'i-heroicons-eye',
-            color: 'info',
-            variant: 'ghost',
-            onClick: () => navigateTo(`/editions/${edition.id}`),
-          })
-        ),
-        h(UTooltip, { text: t('common.edit') }, () =>
-          h(UButton, {
-            icon: 'i-heroicons-pencil',
-            color: 'warning',
-            variant: 'ghost',
-            onClick: () => navigateTo(`/editions/${edition.id}/edit`),
-          })
-        ),
-        h(UTooltip, { text: t('common.delete') }, () =>
-          h(UButton, {
-            icon: 'i-heroicons-trash',
-            color: 'error',
-            variant: 'ghost',
-            onClick: () => deleteEdition(edition.id),
-          })
-        ),
-      ])
+      // Fournir explicitement une fonction pour le slot par défaut afin d'éviter l'avertissement
+      return h(
+        UButtonGroup,
+        { size: 'xs' },
+        {
+          default: () => [
+            h(UTooltip, { text: t('common.view') }, () =>
+              h(UButton, {
+                icon: 'i-heroicons-eye',
+                color: 'info',
+                variant: 'ghost',
+                onClick: () => navigateTo(`/editions/${edition.id}`),
+              })
+            ),
+            h(UTooltip, { text: t('common.edit') }, () =>
+              h(UButton, {
+                icon: 'i-heroicons-pencil',
+                color: 'warning',
+                variant: 'ghost',
+                onClick: () => navigateTo(`/editions/${edition.id}/edit`),
+              })
+            ),
+            h(UTooltip, { text: t('common.delete') }, () =>
+              h(UButton, {
+                icon: 'i-heroicons-trash',
+                color: 'error',
+                variant: 'ghost',
+                onClick: () => deleteEdition(edition.id),
+              })
+            ),
+          ],
+        }
+      )
     },
   },
 ]

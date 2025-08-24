@@ -191,7 +191,10 @@
     "or": "Of",
     "create": "Aanmaken",
     "refresh": "Vernieuwen",
-    "save": "Opslaan"
+    "save": "Opslaan",
+    "reset": "Opnieuw instellen",
+    "no_results": "Geen resultaten",
+    "start_typing": "Begin met typen..."
   },
   "dates": {
     "same_day_with_time": "Op {date} van {startTime} tot {endTime}",
@@ -339,7 +342,8 @@
     "edition_creator": "Editiemaker",
     "of_convention": "van de conventie",
     "enlarged_image": "Vergroot beeld",
-    "poster_of": "Poster van {name}"
+    "poster_of": "Poster van {name}",
+    "length": "Lengte"
   },
   "conventions": {
     "my_conventions": "Mijn Conventies",
@@ -537,7 +541,7 @@
     "buttons": {
       "cancel": "Annuleren",
       "publishing": "Publiceren...",
-      "submitting": "Submitting..."
+  "submitting": "Verzenden..."
     }
   },
   "components": {
@@ -549,10 +553,16 @@
       "current_collaborators": "Huidige medewerkers",
       "add_collaborator": "Medewerker toevoegen",
       "search_user_placeholder": "Zoek een gebruiker...",
-      "moderator": "Moderator",
-      "administrator": "Administrator",
       "refresh": "Vernieuwen",
-      "no_collaborators": "Nog geen medewerkers"
+      "no_collaborators": "Nog geen medewerkers",
+  "optional_title_placeholder": "Titel / functie (optioneel)",
+  "description": "Beheer medewerkers voor deze conventie",
+  "per_edition_hint": "Per-editie rechten overschrijven globale rechten waar gespecificeerd.",
+  "edit_rights": "Rechten wijzigen",
+  "updating_rights_success": "Rechten succesvol bijgewerkt",
+  "updating_rights_error": "Fout bij bijwerken van rechten",
+  "unsaved_warning_title": "Niet-opgeslagen wijzigingen",
+  "unsaved_warning_message": "Je hebt niet-opgeslagen wijzigingen in rechten. Negeren?"
     },
     "country_select": {
       "no_countries_found": "Geen landen gevonden",
@@ -693,7 +703,9 @@
       "refresh_history": "Vernieuwen",
       "load_history": "Geschiedenis laden",
       "no_history": "Geen wijzigingen geregistreerd",
-      "by_user": "Door {user}"
+      "by_user": "Door {user}",
+      "edit_short": "Wijz",
+      "delete_short": "Verw"
     }
   },
   "services": {
@@ -978,7 +990,13 @@
       "PER_EDITIONS_UPDATED": "Rechten per editie bijgewerkt",
       "ARCHIVED": "Gearchiveerd",
       "UNARCHIVED": "Hersteld"
-    }
+    },
+    "edit_convention": "Conventie bewerken",
+    "delete_convention": "Conventie verwijderen",
+    "manage_collaborators": "Medewerkers beheren",
+    "add_edition": "Edities toevoegen",
+    "edit_all_editions": "Alle edities bewerken",
+    "delete_all_editions": "Alle edities verwijderen"
   },
   "c": {
     "user": {
@@ -988,9 +1006,23 @@
     "title": "Titel"
   },
   "p": {
-    "key": "Sleutel"
+    "key": "Sleutel",
+    "editionId": "Editie ID",
+    "canEdit": "Kan bewerken",
+    "canDelete": "Kan verwijderen"
   },
   "ed": {
     "id": "ID"
+  },
+  "currentValue": {
+    "avatar": "Avatar van geselecteerde gebruiker"
+  },
+  "newRights": {
+    "editConvention": "Conventie bewerken",
+    "deleteConvention": "Conventie verwijderen",
+    "manageCollaborators": "Medewerkers beheren",
+    "addEdition": "Edities toevoegen",
+    "editAllEditions": "Alle edities bewerken",
+    "deleteAllEditions": "Alle edities verwijderen"
   }
 }
