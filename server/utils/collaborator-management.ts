@@ -289,6 +289,9 @@ export async function deleteConventionCollaborator(
 
   // Snapshot avant suppression
   const before = {
+    collaboratorId: collaborator.id,
+    userId: collaborator.userId,
+    userPseudo: collaborator.user.pseudo,
     title: collaborator.title,
     rights: {
       canEditConvention: collaborator.canEditConvention,
@@ -305,10 +308,19 @@ export async function deleteConventionCollaborator(
     await tx.collaboratorPermissionHistory.create({
       data: {
         conventionId,
-        collaboratorId: null, // permettra de garder la trace même après suppression
+        collaboratorId: null, // on conserve les données dans before
         actorId: userId,
         changeType: 'REMOVED',
         before: before as any,
+        after: {
+          removed: true,
+          removedAt: new Date().toISOString(),
+          removedCollaborator: {
+            collaboratorId: collaborator.id,
+            userId: collaborator.userId,
+            userPseudo: collaborator.user.pseudo,
+          },
+        } as any,
       },
     })
     await tx.conventionCollaborator.delete({ where: { id: collaboratorId } })
