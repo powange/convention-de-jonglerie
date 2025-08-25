@@ -824,12 +824,10 @@
     },
     "management": {
       "actions": "Aktionen",
-      "available_after_event": "Verfügbar nach der Veranstaltung",
       "delete_edition": "Auflage löschen",
       "edit_edition": "Auflage bearbeiten",
       "in_development": "In Entwicklung",
-      "lost_found_active_description": "Du kannst jetzt die Fundsachen für diese beendete Auflage verwalten.",
-      "lost_found_after_description": "Die Verwaltung der Fundsachen wird automatisch nach Ende der Auflage aktiviert.",
+      "lost_found_active_description": "Du kannst Fundsachen während der laufenden Auflage verwalten.",
       "manage": "Verwalten",
       "manage_lost_found": "Fundsachen verwalten",
       "upcoming_feature": "Kommende Funktion",

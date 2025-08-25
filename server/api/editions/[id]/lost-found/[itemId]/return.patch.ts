@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import { hasEditionEditPermission } from '../../../../../utils/permissions'
 import { prisma } from '../../../../../utils/prisma'
 // Import dynamique pour compat tests/mocks (#imports)
@@ -51,7 +53,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Mettre à jour le statut
-    const updatedItem = await prisma.lostFoundItem.update({
+    const rawItem = await prisma.lostFoundItem.update({
       where: { id: itemId },
       data: {
         status: lostFoundItem.status === 'RETURNED' ? 'LOST' : 'RETURNED',
@@ -65,6 +67,8 @@ export default defineEventHandler(async (event) => {
             prenom: true,
             nom: true,
             profilePicture: true,
+            updatedAt: true,
+            email: true,
           },
         },
         comments: {
@@ -76,6 +80,8 @@ export default defineEventHandler(async (event) => {
                 prenom: true,
                 nom: true,
                 profilePicture: true,
+                updatedAt: true,
+                email: true,
               },
             },
           },
@@ -83,8 +89,22 @@ export default defineEventHandler(async (event) => {
         },
       },
     })
-
-    return updatedItem
+    const email = (rawItem.user as any).email as string | undefined
+    const emailHash = email
+      ? createHash('md5').update(email.trim().toLowerCase()).digest('hex')
+      : undefined
+    const itemUser = { ...rawItem.user, emailHash }
+    delete (itemUser as any).email
+    const comments = rawItem.comments.map((c) => {
+      const cEmail = (c.user as any).email as string | undefined
+      const cHash = cEmail
+        ? createHash('md5').update(cEmail.trim().toLowerCase()).digest('hex')
+        : undefined
+      const cUser = { ...c.user, emailHash: cHash }
+      delete (cUser as any).email
+      return { ...c, user: cUser }
+    })
+    return { ...rawItem, user: itemUser, comments }
   } catch (error) {
     console.error('Erreur lors de la mise à jour du statut:', error)
 

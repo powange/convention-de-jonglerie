@@ -824,12 +824,10 @@
     },
     "management": {
       "actions": "Handlinger",
-      "available_after_event": "Tilgængelig efter begivenheden",
       "delete_edition": "Slet udgaven",
       "edit_edition": "Rediger udgaven",
       "in_development": "Under udvikling",
-      "lost_found_active_description": "Du kan nu administrere hittegods for denne afsluttede udgave.",
-      "lost_found_after_description": "Administration af hittegods vil blive aktiveret automatisk efter udgavens afslutning.",
+      "lost_found_active_description": "Du kan administrere hittegods mens udgaven er i gang.",
       "manage": "Administrer",
       "manage_lost_found": "Administrer hittegods",
       "upcoming_feature": "Kommende funktion",

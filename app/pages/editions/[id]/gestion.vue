@@ -68,6 +68,69 @@
             </div>
           </div>
         </UCard>
+        <!-- Objets trouvés -->
+        <UCard>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-magnifying-glass" class="text-amber-500" />
+                <h3 class="text-lg font-semibold">{{ $t('editions.lost_found') }}</h3>
+              </div>
+              <UButton
+                v-if="hasEditionStarted"
+                size="sm"
+                color="amber"
+                variant="soft"
+                icon="i-heroicons-arrow-right"
+                :to="`/editions/${edition.id}/objets-trouves`"
+              >
+                {{ $t('pages.management.manage') }}
+              </UButton>
+            </div>
+
+            <div
+              v-if="!hasEditionStarted"
+              class="bg-gray-50 dark:bg-gray-900/20 p-4 rounded-lg border border-gray-200 dark:border-gray-800"
+            >
+              <div class="flex items-start gap-3">
+                <UIcon
+                  name="i-heroicons-clock"
+                  class="text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5"
+                  size="20"
+                />
+                <div class="space-y-2">
+                  <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {{ $t('editions.lost_found_before_start') }}
+                  </h4>
+                  <p class="text-sm text-gray-700 dark:text-gray-300">
+                    {{ $t('editions.items_appear_when_started') }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div
+              v-else
+              class="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800"
+            >
+              <div class="flex items-start gap-3">
+                <UIcon
+                  name="i-heroicons-magnifying-glass"
+                  class="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5"
+                  size="20"
+                />
+                <div class="space-y-2">
+                  <h4 class="text-sm font-medium text-amber-900 dark:text-amber-100">
+                    {{ $t('pages.management.manage_lost_found') }}
+                  </h4>
+                  <p class="text-sm text-amber-800 dark:text-amber-200">
+                    {{ $t('pages.management.lost_found_active_description') }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </UCard>
 
         <!-- Gestion des bénévoles -->
         <UCard>
@@ -100,70 +163,6 @@
                       $t('pages.management.in_development')
                     }}</UBadge>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </UCard>
-
-        <!-- Objets trouvés -->
-        <UCard>
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-magnifying-glass" class="text-amber-500" />
-                <h3 class="text-lg font-semibold">{{ $t('editions.lost_found') }}</h3>
-              </div>
-              <UButton
-                v-if="isEditionFinished"
-                size="sm"
-                color="amber"
-                variant="soft"
-                icon="i-heroicons-arrow-right"
-                :to="`/editions/${edition.id}/objets-trouves`"
-              >
-                {{ $t('pages.management.manage') }}
-              </UButton>
-            </div>
-
-            <div
-              v-if="!isEditionFinished"
-              class="bg-gray-50 dark:bg-gray-900/20 p-4 rounded-lg border border-gray-200 dark:border-gray-800"
-            >
-              <div class="flex items-start gap-3">
-                <UIcon
-                  name="i-heroicons-clock"
-                  class="text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5"
-                  size="20"
-                />
-                <div class="space-y-2">
-                  <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {{ $t('pages.management.available_after_event') }}
-                  </h4>
-                  <p class="text-sm text-gray-700 dark:text-gray-300">
-                    {{ $t('pages.management.lost_found_after_description') }}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div
-              v-else
-              class="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800"
-            >
-              <div class="flex items-start gap-3">
-                <UIcon
-                  name="i-heroicons-magnifying-glass"
-                  class="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5"
-                  size="20"
-                />
-                <div class="space-y-2">
-                  <h4 class="text-sm font-medium text-amber-900 dark:text-amber-100">
-                    {{ $t('pages.management.manage_lost_found') }}
-                  </h4>
-                  <p class="text-sm text-amber-800 dark:text-amber-200">
-                    {{ $t('pages.management.lost_found_active_description') }}
-                  </p>
                 </div>
               </div>
             </div>
@@ -223,10 +222,10 @@ const canDelete = computed(() => {
   return editionStore.canDeleteEdition(edition.value, authStore.user.id)
 })
 
-// Vérifier si l'édition est terminée
-const isEditionFinished = computed(() => {
+// Début d'édition
+const hasEditionStarted = computed(() => {
   if (!edition.value) return false
-  return new Date() > new Date(edition.value.endDate)
+  return new Date() >= new Date(edition.value.startDate)
 })
 
 const isFavorited = computed(() => (_editionId: number) => {

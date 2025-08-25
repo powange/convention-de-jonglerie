@@ -824,12 +824,10 @@
     },
     "management": {
       "actions": "Acties",
-      "available_after_event": "Beschikbaar na evenement",
       "delete_edition": "Editie verwijderen",
       "edit_edition": "Editie bewerken",
       "in_development": "In ontwikkeling",
-      "lost_found_active_description": "Je kunt nu verloren voorwerpen beheren voor deze voltooide editie.",
-      "lost_found_after_description": "Beheer van gevonden voorwerpen wordt automatisch geactiveerd na het einde van de editie.",
+      "lost_found_active_description": "Je kunt gevonden voorwerpen beheren terwijl de editie bezig is.",
       "manage": "Beheren",
       "manage_lost_found": "Gevonden voorwerpen beheren",
       "upcoming_feature": "Aankomende functie",

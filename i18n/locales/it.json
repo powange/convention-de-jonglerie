@@ -824,12 +824,10 @@
     },
     "management": {
       "actions": "Azioni",
-      "available_after_event": "Disponibile dopo l'evento",
       "delete_edition": "Elimina edizione",
       "edit_edition": "Modifica edizione",
       "in_development": "In sviluppo",
-      "lost_found_active_description": "Ora puoi gestire gli oggetti smarriti per questa edizione terminata.",
-      "lost_found_after_description": "La gestione degli oggetti smarriti sarà attivata automaticamente dopo la fine dell'edizione.",
+      "lost_found_active_description": "Puoi gestire gli oggetti smarriti mentre l'edizione è in corso.",
       "manage": "Gestisci",
       "manage_lost_found": "Gestisci oggetti smarriti",
       "upcoming_feature": "Funzionalità futura",

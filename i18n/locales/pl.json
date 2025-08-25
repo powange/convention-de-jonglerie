@@ -824,12 +824,10 @@
     },
     "management": {
       "actions": "Akcje",
-      "available_after_event": "Dostępne po wydarzeniu",
       "delete_edition": "Usuń edycję",
       "edit_edition": "Edytuj edycję",
       "in_development": "W rozwoju",
-      "lost_found_active_description": "Możesz teraz zarządzać rzeczami znalezionymi dla tej zakończonej edycji.",
-      "lost_found_after_description": "Zarządzanie rzeczami znalezionymi zostanie automatycznie aktywowane po zakończeniu edycji.",
+      "lost_found_active_description": "Możesz zarządzać rzeczami znalezionymi w trakcie trwania edycji.",
       "manage": "Zarządzaj",
       "manage_lost_found": "Zarządzaj rzeczami znalezionymi",
       "upcoming_feature": "Nadchodząca funkcja",

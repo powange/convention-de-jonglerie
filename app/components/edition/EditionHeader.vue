@@ -118,7 +118,7 @@
         </NuxtLink>
 
         <NuxtLink
-          v-if="isEditionFinished"
+          v-if="hasEditionStarted"
           :to="`/editions/${edition.id}/objets-trouves`"
           :class="[
             'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
@@ -199,10 +199,10 @@ const canAccess = computed(() => {
   return canEdit || authStore.user?.id === props.edition?.creatorId
 })
 
-// Vérifier si l'édition est terminée
-const isEditionFinished = computed(() => {
+// Vérifier si l'édition a commencé (affichage onglet objets trouvés dès le début)
+const hasEditionStarted = computed(() => {
   if (!props.edition) return false
-  return new Date() > new Date(props.edition.endDate)
+  return new Date() >= new Date(props.edition.startDate)
 })
 
 // Formatter la plage de dates

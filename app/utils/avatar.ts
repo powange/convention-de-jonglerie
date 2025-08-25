@@ -14,8 +14,8 @@ export const useAvatar = () => {
     size: number = 80
   ) => {
     // Vérification de sécurité
-    if (!user || (!user.email && !user.emailHash)) {
-      return 'https://www.gravatar.com/avatar/default?s=80&d=mp' // URL de fallback
+    if (!user) {
+      return `https://www.gravatar.com/avatar/default?s=${size}&d=mp`
     }
 
     // Si l'utilisateur a une photo de profil, l'utiliser avec cache-busting
@@ -46,7 +46,7 @@ export const useAvatar = () => {
       return getGravatarAvatar(user.email, size)
     }
 
-    return 'https://www.gravatar.com/avatar/default?s=80&d=mp'
+    return `https://www.gravatar.com/avatar/default?s=${size}&d=mp`
   }
 
   return {

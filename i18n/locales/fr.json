@@ -318,6 +318,8 @@
     "lost": "🔍 Perdu",
     "mark_as_lost": "Marquer comme perdu",
     "mark_as_returned": "Marquer comme restitué",
+    "show_returned_items": "Afficher les objets restitués",
+    "hide_returned_items": "Masquer les objets restitués",
     "add_comment_placeholder": "Ajouter un commentaire...",
     "no_lost_items": "Aucun objet trouvé",
     "no_items_reported": "Aucun objet n'a été signalé pour cette édition.",
@@ -891,10 +893,8 @@
       "volunteer_description": "Cette section permettra de gérer les équipes de bénévoles pour l'édition, attribuer des rôles et coordonner les activités.",
       "in_development": "En développement",
       "manage": "Gérer",
-      "available_after_event": "Disponible après l'événement",
-      "lost_found_after_description": "La gestion des objets trouvés sera activée automatiquement après la fin de l'édition.",
       "manage_lost_found": "Gérer les objets trouvés",
-      "lost_found_active_description": "Vous pouvez maintenant gérer les objets trouvés pour cette édition terminée."
+      "lost_found_active_description": "Vous pouvez gérer les objets trouvés pendant le déroulement de l'édition."
     },
     "edit_edition": {
       "submit_button": "Mettre à jour l'édition"

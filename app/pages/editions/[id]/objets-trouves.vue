@@ -24,6 +24,21 @@
           </UButton>
         </div>
 
+        <!-- Bouton filtre objets restitués sous le titre -->
+        <div v-if="hasReturnedItems" class="mb-4">
+          <UButton
+            size="xs"
+            color="gray"
+            variant="soft"
+            :icon="showReturned ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
+            @click="toggleShowReturned"
+          >
+            {{
+              showReturned ? t('editions.hide_returned_items') : t('editions.show_returned_items')
+            }}
+          </UButton>
+        </div>
+
         <!-- Message d'information -->
         <UAlert v-if="!hasEditionStarted" icon="i-heroicons-information-circle" color="info">
           {{ $t('editions.lost_found_before_start') }}
@@ -35,10 +50,10 @@
         <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-gray-500" />
       </div>
 
-      <!-- Liste des objets trouvés -->
-      <div v-else-if="lostFoundItems.length > 0" class="space-y-6">
+      <!-- Liste des objets trouvés (filtrés) -->
+      <div v-else-if="filteredItems.length > 0" class="space-y-6">
         <UCard
-          v-for="item in lostFoundItems"
+          v-for="item in filteredItems"
           :key="item.id"
           :class="{ 'opacity-75': item.status === 'RETURNED' }"
         >
@@ -60,16 +75,28 @@
                 </UBadge>
                 <UButton
                   v-if="canEditLostFound"
-                  icon="i-heroicons-arrow-path"
                   size="xs"
-                  variant="ghost"
-                  :title="
+                  :color="item.status === 'RETURNED' ? 'warning' : 'success'"
+                  variant="soft"
+                  :icon="
+                    item.status === 'RETURNED'
+                      ? 'i-heroicons-arrow-uturn-left'
+                      : 'i-heroicons-check-badge'
+                  "
+                  :aria-label="
                     item.status === 'RETURNED'
                       ? t('editions.mark_as_lost')
                       : t('editions.mark_as_returned')
                   "
+                  class="flex items-center gap-1"
                   @click="toggleStatus(item.id)"
-                />
+                >
+                  {{
+                    item.status === 'RETURNED'
+                      ? t('editions.mark_as_lost')
+                      : t('editions.mark_as_returned')
+                  }}
+                </UButton>
               </div>
             </div>
           </template>
@@ -131,19 +158,33 @@
       <!-- État vide -->
       <div
         v-else
-        class="py-24 min-h-[320px] flex flex-col items-center justify-center text-center gap-2"
+        class="py-24 min-h-[320px] flex flex-col items-center justify-center text-center gap-4"
       >
-        <UIcon name="i-heroicons-magnifying-glass" class="w-14 h-14 text-gray-400 mb-2" />
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          {{ $t('editions.no_lost_items') }}
-        </h3>
-        <p class="text-gray-500 max-w-prose">
-          {{
-            !hasEditionStarted
-              ? t('editions.items_appear_when_started')
-              : t('editions.no_items_reported')
-          }}
-        </p>
+        <UIcon name="i-heroicons-magnifying-glass" class="w-14 h-14 text-gray-400" />
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            {{ $t('editions.no_lost_items') }}
+          </h3>
+          <p class="text-gray-500 max-w-prose">
+            {{
+              !hasEditionStarted
+                ? t('editions.items_appear_when_started')
+                : lostFoundItems.length > 0
+                  ? t('editions.no_items_reported')
+                  : t('editions.no_items_reported')
+            }}
+          </p>
+        </div>
+        <UButton
+          v-if="hasReturnedItems && !showReturned && hasEditionStarted"
+          size="xs"
+          color="gray"
+          variant="soft"
+          icon="i-heroicons-eye"
+          @click="toggleShowReturned"
+        >
+          {{ t('editions.show_returned_items') }}
+        </UButton>
       </div>
 
       <!-- Modal d'ajout d'objet trouvé -->
@@ -251,6 +292,7 @@ type LostFoundItem = {
   comments: LostFoundComment[]
 }
 const lostFoundItems = ref<LostFoundItem[]>([])
+const showReturned = ref(false)
 const commentContents = ref<Record<number, string>>({})
 const showAddModal = ref(false)
 const showImageModalState = ref(false)
@@ -331,6 +373,16 @@ const fetchLostFoundItems = async () => {
   } finally {
     loading.value = false
   }
+}
+
+// Filtrage des items (masquer les RETURNED par défaut)
+const hasReturnedItems = computed(() => lostFoundItems.value.some((i) => i.status === 'RETURNED'))
+const filteredItems = computed(() => {
+  if (showReturned.value) return lostFoundItems.value
+  return lostFoundItems.value.filter((i) => i.status !== 'RETURNED')
+})
+const toggleShowReturned = () => {
+  showReturned.value = !showReturned.value
 }
 
 const postComment = async (itemId: number) => {

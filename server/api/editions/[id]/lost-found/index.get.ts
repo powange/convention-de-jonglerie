@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import { prisma } from '../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
@@ -25,7 +27,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Récupérer tous les objets trouvés de l'édition
-    const lostFoundItems = await prisma.lostFoundItem.findMany({
+    const rawItems = await prisma.lostFoundItem.findMany({
       where: { editionId },
       include: {
         user: {
@@ -35,6 +37,8 @@ export default defineEventHandler(async (event) => {
             prenom: true,
             nom: true,
             profilePicture: true,
+            email: true,
+            updatedAt: true,
           },
         },
         comments: {
@@ -46,6 +50,8 @@ export default defineEventHandler(async (event) => {
                 prenom: true,
                 nom: true,
                 profilePicture: true,
+                email: true,
+                updatedAt: true,
               },
             },
           },
@@ -54,8 +60,25 @@ export default defineEventHandler(async (event) => {
       },
       orderBy: { createdAt: 'desc' },
     })
-
-    return lostFoundItems
+    const items = rawItems.map((item) => {
+      const userEmail = (item.user as any).email as string | undefined
+      const emailHash = userEmail
+        ? createHash('md5').update(userEmail.trim().toLowerCase()).digest('hex')
+        : undefined
+      const user = { ...item.user, emailHash }
+      delete (user as any).email
+      const comments = item.comments.map((c) => {
+        const cEmail = (c.user as any).email as string | undefined
+        const cHash = cEmail
+          ? createHash('md5').update(cEmail.trim().toLowerCase()).digest('hex')
+          : undefined
+        const cUser = { ...c.user, emailHash: cHash }
+        delete (cUser as any).email
+        return { ...c, user: cUser }
+      })
+      return { ...item, user, comments }
+    })
+    return items
   } catch (error) {
     console.error('Erreur lors de la récupération des objets trouvés:', error)
 

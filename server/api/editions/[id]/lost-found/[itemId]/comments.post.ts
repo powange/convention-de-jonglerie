@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import { requireUserSession } from '#imports'
 
 import { prisma } from '../../../../../utils/prisma'
@@ -52,7 +54,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Créer le commentaire
-    const comment = await prisma.lostFoundComment.create({
+    const rawComment = await prisma.lostFoundComment.create({
       data: {
         lostFoundItemId: itemId,
         userId,
@@ -66,12 +68,19 @@ export default defineEventHandler(async (event) => {
             prenom: true,
             nom: true,
             profilePicture: true,
+            updatedAt: true,
+            email: true,
           },
         },
       },
     })
-
-    return comment
+    const email = (rawComment.user as any).email as string | undefined
+    const emailHash = email
+      ? createHash('md5').update(email.trim().toLowerCase()).digest('hex')
+      : undefined
+    const commentUser = { ...rawComment.user, emailHash }
+    delete (commentUser as any).email
+    return { ...rawComment, user: commentUser }
   } catch (error: unknown) {
     console.error('Erreur lors de la création du commentaire:', error)
 

@@ -318,6 +318,8 @@
     "lost": "🔍 Lost",
     "mark_as_lost": "Mark as lost",
     "mark_as_returned": "Mark as returned",
+    "show_returned_items": "Show returned items",
+    "hide_returned_items": "Hide returned items",
     "add_comment_placeholder": "Add a comment...",
     "no_lost_items": "No lost items",
     "no_items_reported": "No items have been reported for this edition.",
@@ -782,10 +784,8 @@
       "volunteer_description": "This section will allow you to manage volunteer teams for the edition, assign roles and coordinate activities.",
       "in_development": "In development",
       "manage": "Manage",
-      "available_after_event": "Available after event",
-      "lost_found_after_description": "Lost & found management will be automatically activated after the end of the edition.",
       "manage_lost_found": "Manage lost & found",
-      "lost_found_active_description": "You can now manage lost items for this completed edition."
+      "lost_found_active_description": "You can manage lost & found items while the edition is running."
     },
     "edit_edition": {
       "submit_button": "Update edition"

@@ -824,12 +824,10 @@
     },
     "management": {
       "actions": "Acções",
-      "available_after_event": "Disponível após o evento",
       "delete_edition": "Eliminar a edição",
       "edit_edition": "Editar a edição",
       "in_development": "Em desenvolvimento",
-      "lost_found_active_description": "Pode agora gerir os objectos perdidos para esta edição terminada.",
-      "lost_found_after_description": "A gestão de objectos perdidos será activada automaticamente após o fim da edição.",
+      "lost_found_active_description": "Pode gerir os objectos perdidos enquanto a edição decorre.",
       "manage": "Gerir",
       "manage_lost_found": "Gerir objectos perdidos",
       "upcoming_feature": "Funcionalidade a chegar",

@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import { hasEditionEditPermission } from '../../../../utils/permissions'
 import { prisma } from '../../../../utils/prisma'
 // Import dynamique pour compat tests/mocks (#imports)
@@ -70,7 +72,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Créer l'objet trouvé
-    const lostFoundItem = await prisma.lostFoundItem.create({
+    const rawItem = await prisma.lostFoundItem.create({
       data: {
         editionId,
         userId,
@@ -86,6 +88,8 @@ export default defineEventHandler(async (event) => {
             prenom: true,
             nom: true,
             profilePicture: true,
+            updatedAt: true,
+            email: true,
           },
         },
         comments: {
@@ -103,8 +107,13 @@ export default defineEventHandler(async (event) => {
         },
       },
     })
-
-    return lostFoundItem
+    const email = (rawItem.user as any).email as string | undefined
+    const emailHash = email
+      ? createHash('md5').update(email.trim().toLowerCase()).digest('hex')
+      : undefined
+    const itemUser = { ...rawItem.user, emailHash }
+    delete (itemUser as any).email
+    return { ...rawItem, user: itemUser }
   } catch (error: unknown) {
     console.error("Erreur lors de la création de l'objet trouvé:", error)
     const httpError = error as { statusCode?: number }
