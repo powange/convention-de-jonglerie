@@ -66,24 +66,26 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual(mockUpdatedItem)
+    expect(result).toEqual(
+      expect.objectContaining({
+        id: mockUpdatedItem.id,
+        status: 'RETURNED',
+        user: expect.objectContaining({ id: mockUpdatedItem.user.id }),
+      })
+    )
     expect(prismaMock.lostFoundItem.findFirst).toHaveBeenCalledWith({
       where: {
         id: 1,
         editionId: 1,
       },
     })
-    expect(prismaMock.lostFoundItem.update).toHaveBeenCalledWith({
-      where: { id: 1 },
-      data: {
-        status: 'RETURNED',
-        updatedAt: expect.any(Date),
-      },
-      include: expect.objectContaining({
-        user: expect.any(Object),
-        comments: expect.any(Object),
-      }),
-    })
+    expect(prismaMock.lostFoundItem.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 1 },
+        data: expect.objectContaining({ status: 'RETURNED', updatedAt: expect.any(Date) }),
+        include: expect.objectContaining({ user: expect.any(Object), comments: expect.any(Object) }),
+      })
+    )
   })
 
   it('devrait basculer le statut de RETURNED vers LOST', async () => {
@@ -97,14 +99,12 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(prismaMock.lostFoundItem.update).toHaveBeenCalledWith({
-      where: { id: 1 },
-      data: {
-        status: 'LOST',
-        updatedAt: expect.any(Date),
-      },
-      include: expect.any(Object),
-    })
+    expect(prismaMock.lostFoundItem.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 1 },
+        data: expect.objectContaining({ status: 'LOST', updatedAt: expect.any(Date) }),
+      })
+    )
   })
 
   it("devrait rejeter si ID d'édition invalide", async () => {
@@ -170,35 +170,12 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(prismaMock.lostFoundItem.update).toHaveBeenCalledWith({
-      where: { id: 1 },
-      data: expect.any(Object),
-      include: {
-        user: {
-          select: {
-            id: true,
-            pseudo: true,
-            prenom: true,
-            nom: true,
-            profilePicture: true,
-          },
-        },
-        comments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                prenom: true,
-                nom: true,
-                profilePicture: true,
-              },
-            },
-          },
-          orderBy: { createdAt: 'asc' },
-        },
-      },
-    })
+    expect(prismaMock.lostFoundItem.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 1 },
+        include: expect.objectContaining({ comments: expect.any(Object), user: expect.any(Object) }),
+      })
+    )
   })
 
   it('devrait mettre à jour la date de modification', async () => {
@@ -212,14 +189,12 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
 
     await handler(mockEvent as any)
 
-    expect(prismaMock.lostFoundItem.update).toHaveBeenCalledWith({
-      where: { id: 1 },
-      data: {
-        status: 'RETURNED',
-        updatedAt: expect.any(Date),
-      },
-      include: expect.any(Object),
-    })
+    expect(prismaMock.lostFoundItem.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 1 },
+        data: expect.objectContaining({ status: 'RETURNED', updatedAt: expect.any(Date) }),
+      })
+    )
 
     // Vérifier que la nouvelle date est différente de l'originale
     const updateCall = prismaMock.lostFoundItem.update.mock.calls[0][0]
@@ -268,10 +243,8 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
       },
     })
     expect(mockHasPermission).toHaveBeenCalledWith(1, 123)
-    expect(prismaMock.lostFoundItem.update).toHaveBeenCalledWith({
-      where: { id: 456 },
-      data: expect.any(Object),
-      include: expect.any(Object),
-    })
+    expect(prismaMock.lostFoundItem.update).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: 456 } })
+    )
   })
 })

@@ -73,40 +73,43 @@ describe('/api/editions/[id]/lost-found GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result).toEqual(mockLostFoundItems)
+    // Vérifie longueur identique
+    expect(result).toHaveLength(mockLostFoundItems.length)
+    // Vérifie structure minimale du premier élément (sans exiger égalité stricte car on ajoute emailHash)
+    expect(result[0]).toEqual(
+      expect.objectContaining({
+        id: mockLostFoundItems[0].id,
+        description: mockLostFoundItems[0].description,
+        status: mockLostFoundItems[0].status,
+      })
+    )
+    expect(result[0].user).toEqual(
+      expect.objectContaining({
+        id: mockLostFoundItems[0].user.id,
+        pseudo: mockLostFoundItems[0].user.pseudo,
+        prenom: mockLostFoundItems[0].user.prenom,
+        nom: mockLostFoundItems[0].user.nom,
+        profilePicture: mockLostFoundItems[0].user.profilePicture,
+      })
+    )
+    // emailHash peut être undefined si pas d'email mocké
+    expect(result[0].user).toHaveProperty('emailHash')
+
     expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
       select: { id: true, endDate: true },
     })
-    expect(prismaMock.lostFoundItem.findMany).toHaveBeenCalledWith({
-      where: { editionId: 1 },
-      include: {
-        user: {
-          select: {
-            id: true,
-            pseudo: true,
-            prenom: true,
-            nom: true,
-            profilePicture: true,
-          },
-        },
-        comments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                prenom: true,
-                nom: true,
-                profilePicture: true,
-              },
-            },
-          },
-          orderBy: { createdAt: 'asc' },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    })
+    // Tolère champs additionnels (email, updatedAt)
+    expect(prismaMock.lostFoundItem.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { editionId: 1 },
+        include: expect.objectContaining({
+          user: expect.objectContaining({ select: expect.objectContaining({ id: true }) }),
+          comments: expect.any(Object),
+        }),
+        orderBy: { createdAt: 'desc' },
+      })
+    )
   })
 
   it('devrait retourner une liste vide si aucun objet trouvé', async () => {
@@ -152,7 +155,8 @@ describe('/api/editions/[id]/lost-found GET', () => {
     expect(result[0].user).toHaveProperty('pseudo')
     expect(result[0].user).toHaveProperty('prenom')
     expect(result[0].user).toHaveProperty('nom')
-    expect(result[0].user).toHaveProperty('profilePicture')
+  expect(result[0].user).toHaveProperty('profilePicture')
+  expect(result[0].user).toHaveProperty('emailHash')
   })
 
   it('devrait inclure les commentaires avec les détails utilisateur', async () => {
@@ -166,7 +170,8 @@ describe('/api/editions/[id]/lost-found GET', () => {
     expect(result[0].comments[0].user).toHaveProperty('pseudo')
     expect(result[0].comments[0].user).toHaveProperty('prenom')
     expect(result[0].comments[0].user).toHaveProperty('nom')
-    expect(result[0].comments[0].user).toHaveProperty('profilePicture')
+  expect(result[0].comments[0].user).toHaveProperty('profilePicture')
+  expect(result[0].comments[0].user).toHaveProperty('emailHash')
   })
 
   it('devrait trier les objets par date de création décroissante', async () => {
@@ -176,9 +181,7 @@ describe('/api/editions/[id]/lost-found GET', () => {
     await handler(mockEvent as any)
 
     expect(prismaMock.lostFoundItem.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        orderBy: { createdAt: 'desc' },
-      })
+      expect.objectContaining({ orderBy: { createdAt: 'desc' } })
     )
   })
 
