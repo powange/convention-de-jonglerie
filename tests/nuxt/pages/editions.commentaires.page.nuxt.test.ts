@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest'
-// TODO: route dynamique /editions/[id]/commentaires avec mock commentaires
+import { renderRawPage } from '../utils/renderPage'
 
 describe('Page /editions/[id]/commentaires', () => {
-  it('smoke: devrait charger la page commentaires', () => {
-    expect(true).toBe(true)
+  it('smoke: devrait charger la page commentaires', async () => {
+    const page = await renderRawPage('/editions/1/commentaires')
+    expect(page.html()).toMatch(/commentaire|comment|auteur|author/i)
+    page.unmount?.()
   })
 })

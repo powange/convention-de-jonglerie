@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest'
-// TODO: route dynamique /editions/[id]/edit avec mock des données d'édition
+import { renderRawPage } from '../utils/renderPage'
 
 describe('Page /editions/[id]/edit', () => {
-  it('smoke: devrait charger la page édition (edit)', () => {
-    expect(true).toBe(true)
+  it('smoke: devrait charger la page édition (edit)', async () => {
+    const page = await renderRawPage('/editions/1/edit')
+    expect(page.html()).toMatch(/edition|édit|edit|description|services?/i)
+    page.unmount?.()
   })
 })

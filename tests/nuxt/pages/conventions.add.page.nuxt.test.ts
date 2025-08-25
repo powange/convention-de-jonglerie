@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest'
-// TODO: mocker /api/conventions POST + géocode éventuel
+import { renderRawPage } from '../utils/renderPage'
 
 describe('Page /conventions/add', () => {
-  it('smoke: devrait charger le formulaire ajout convention', () => {
-    expect(true).toBe(true)
+  it('smoke: devrait charger le formulaire ajout convention', async () => {
+    const page = await renderRawPage('/conventions/add')
+    expect(page.html()).toMatch(/convention|ajout|adresse|address|nom|name/i)
+    page.unmount?.()
   })
 })

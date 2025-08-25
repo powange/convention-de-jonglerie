@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest'
-// TODO: plus tard: mocker l'API /api/admin/feedback avec résultats et stats
+import { renderRawPage } from '../utils/renderPage'
 
 describe('Page /admin/feedback', () => {
-  it('smoke: devrait charger la page admin feedback', () => {
-    expect(true).toBe(true)
+  it('smoke: devrait charger la page admin feedback', async () => {
+    const page = await renderRawPage('/admin/feedback')
+    expect(page.html()).toMatch(/feedback|stat|filtre|filter/i)
+    page.unmount?.()
   })
 })

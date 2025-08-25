@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest'
-// TODO: route dynamique /editions/[id]/objets-trouves avec mock lost & found
+import { renderRawPage } from '../utils/renderPage'
 
 describe('Page /editions/[id]/objets-trouves', () => {
-  it('smoke: devrait charger la page objets-trouves', () => {
-    expect(true).toBe(true)
+  it('smoke: devrait charger la page objets-trouves', async () => {
+    const page = await renderRawPage('/editions/1/objets-trouves')
+    expect(page.html()).toMatch(/objets|trouvés|lost|found|item/i)
+    page.unmount?.()
   })
 })

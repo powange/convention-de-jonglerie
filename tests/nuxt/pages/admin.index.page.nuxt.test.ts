@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest'
-// TODO: rendre et vérifier présence des liens de navigation admin
+import { renderRawPage } from '../utils/renderPage'
 
 describe('Page /admin', () => {
-  it('smoke: devrait charger la page dashboard admin', () => {
-    expect(true).toBe(true)
+  it('smoke: devrait charger la page dashboard admin', async () => {
+    const page = await renderRawPage('/admin')
+    expect(page.html()).toMatch(/admin|dashboard|utilisateur|user|feedback/i)
+    page.unmount?.()
   })
 })

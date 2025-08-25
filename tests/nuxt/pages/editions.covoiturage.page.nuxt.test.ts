@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest'
-// TODO: route dynamique /editions/[id]/covoiturage avec mock demandes/offres
+import { renderRawPage } from '../utils/renderPage'
 
 describe('Page /editions/[id]/covoiturage', () => {
-  it('smoke: devrait charger la page covoiturage', () => {
-    expect(true).toBe(true)
+  it('smoke: devrait charger la page covoiturage', async () => {
+    const page = await renderRawPage('/editions/1/covoiturage')
+    expect(page.html()).toMatch(/covoiturage|carpool|offre|demande|offer|request/i)
+    page.unmount?.()
   })
 })

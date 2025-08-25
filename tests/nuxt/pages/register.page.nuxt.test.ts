@@ -1,10 +1,12 @@
 import { describe, it, expect } from 'vitest'
-// TODO: Helper de rendu quand disponible
+import { renderRawPage } from '../utils/renderPage'
 
 // Smoke test page register
 
 describe('Page /register', () => {
   it('devrait se rendre et contenir indices de formulaire', async () => {
-  expect(true).toBe(true)
+  const page = await renderRawPage('/register')
+  expect(page.html()).toMatch(/register|email|pseudo|auth/i)
+  page.unmount?.()
   })
 })

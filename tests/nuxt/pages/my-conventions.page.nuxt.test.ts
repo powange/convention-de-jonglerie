@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest'
-// TODO: ajout rendu + mock API /api/conventions/my-conventions
+import { renderRawPage } from '../utils/renderPage'
 
 describe('Page /my-conventions', () => {
-  it('smoke: devrait charger la page mes conventions', () => {
-    expect(true).toBe(true)
+  it('smoke: devrait charger la page mes conventions', async () => {
+    const page = await renderRawPage('/my-conventions')
+    expect(page.html()).toMatch(/mes|my|conventions|favori|favorite/i)
+    page.unmount?.()
   })
 })
