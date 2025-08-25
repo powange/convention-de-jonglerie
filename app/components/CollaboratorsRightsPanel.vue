@@ -11,8 +11,7 @@
         icon="i-heroicons-arrow-path"
         :loading="loading"
         @click="refresh"
-        >{{ $t('common.refresh') }}</UButton
-      >
+        >{{ $t('common.refresh') }}</UButton>
     </div>
 
     <div v-if="loading" class="text-sm text-gray-500">{{ $t('common.loading') }}</div>
@@ -147,9 +146,17 @@
           >
           <span class="text-[10px] text-gray-400">{{ timeAgo(h.createdAt) }}</span>
         </div>
-        <div class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 flex flex-wrap gap-2">
-          <span v-if="h.targetUser">{{ $t('components.collaborators_rights_panel.target_user', { user: h.targetUser.pseudo }) }}</span>
-          <span v-if="h.actor" class="opacity-70">{{ $t('components.collaborators_rights_panel.by_user', { user: h.actor.pseudo }) }}</span>
+        <div class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 flex flex-wrap gap-3 items-center">
+          <span v-if="h.targetUser" class="flex items-center gap-1">
+            <span>{{ $t('components.collaborators_rights_panel.target_user_label') }}</span>
+            <UAvatar v-if="(h as any).targetUserAvatarSrc" :src="(h as any).targetUserAvatarSrc" size="2xs" :alt="h.targetUser.pseudo" />
+            <span>{{ h.targetUser.pseudo }}</span>
+          </span>
+          <span v-if="h.actor" class="opacity-70 flex items-center gap-1">
+            <span>{{ $t('components.collaborators_rights_panel.by_user_label') }}</span>
+            <UAvatar v-if="(h as any).actorAvatarSrc" :src="(h as any).actorAvatarSrc" size="2xs" :alt="h.actor.pseudo" />
+            <span>{{ h.actor.pseudo }}</span>
+          </span>
         </div>
       </div>
     </div>
@@ -239,7 +246,30 @@ async function fetchHistory() {
   if (!props.conventionId) return
   historyLoading.value = true
   try {
-    history.value = await $fetch(`/api/conventions/${props.conventionId}/collaborators/history`)
+    const raw: any[] = await $fetch(`/api/conventions/${props.conventionId}/collaborators/history`)
+    history.value = raw.map((h) => {
+      const actorAvatarSrc = h.actor?.avatar?.src
+        ? h.actor.avatar.src
+        : h.actor?.avatar?.hash
+          ? `/api/avatar/${h.actor.avatar.hash}`
+          : undefined
+      const targetUserAvatarSrc = h.targetUser?.avatar?.src
+        ? h.targetUser.avatar.src
+        : h.targetUser?.avatar?.hash
+          ? `/api/avatar/${h.targetUser.avatar.hash}`
+          : undefined
+      return {
+        id: h.id,
+        changeType: h.changeType,
+        createdAt: h.createdAt,
+        actor: h.actor ? { id: h.actor.id, pseudo: h.actor.pseudo } : undefined,
+        targetUser: h.targetUser ? { id: h.targetUser.id, pseudo: h.targetUser.pseudo } : undefined,
+        before: h.before,
+        after: h.after,
+        actorAvatarSrc,
+        targetUserAvatarSrc,
+      } as any
+    })
     historyLoaded.value = true
   } catch (e) {
     console.error(e)
