@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import handler from '../../../../../server/api/conventions/[id]/collaborators/[collaboratorId].rights.patch'
+import handler from '../../../../../server/api/conventions/[id]/collaborators/[collaboratorId]/rights.patch'
 import { canManageCollaborators } from '../../../../../server/utils/collaborator-management'
 import { prismaMock } from '../../../../__mocks__/prisma'
 
