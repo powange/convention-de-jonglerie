@@ -196,6 +196,35 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
       where: { id: collaborator.id },
       include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
     })
+
+    // Historique CREATED
+    if (withPerEdition) {
+      await tx.collaboratorPermissionHistory.create({
+        data: {
+          conventionId,
+          collaboratorId: withPerEdition.id,
+          actorId: addedById,
+          changeType: 'CREATED',
+          // before laissé undefined (aucune valeur précédente)
+          after: {
+            title: withPerEdition.title,
+            rights: {
+              canEditConvention: withPerEdition.canEditConvention,
+              canDeleteConvention: withPerEdition.canDeleteConvention,
+              canManageCollaborators: withPerEdition.canManageCollaborators,
+              canAddEdition: withPerEdition.canAddEdition,
+              canEditAllEditions: withPerEdition.canEditAllEditions,
+              canDeleteAllEditions: withPerEdition.canDeleteAllEditions,
+            },
+            perEdition: (withPerEdition.perEditionPermissions || []).map((p) => ({
+              editionId: p.editionId,
+              canEdit: p.canEdit,
+              canDelete: p.canDelete,
+            })),
+          } as any,
+        },
+      })
+    }
     return withPerEdition
   })
 }
@@ -258,9 +287,31 @@ export async function deleteConventionCollaborator(
     })
   }
 
-  // Supprimer le collaborateur
-  await prisma.conventionCollaborator.delete({
-    where: { id: collaboratorId },
+  // Snapshot avant suppression
+  const before = {
+    title: collaborator.title,
+    rights: {
+      canEditConvention: collaborator.canEditConvention,
+      canDeleteConvention: collaborator.canDeleteConvention,
+      canManageCollaborators: collaborator.canManageCollaborators,
+      canAddEdition: collaborator.canAddEdition,
+      canEditAllEditions: collaborator.canEditAllEditions,
+      canDeleteAllEditions: collaborator.canDeleteAllEditions,
+    },
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.conventionCollaborator.delete({ where: { id: collaboratorId } })
+    await tx.collaboratorPermissionHistory.create({
+      data: {
+        conventionId,
+        collaboratorId: collaborator.id,
+        actorId: userId,
+        changeType: 'REMOVED',
+        before: before as any,
+        // after undefined (supprimé)
+      },
+    })
   })
 
   return {

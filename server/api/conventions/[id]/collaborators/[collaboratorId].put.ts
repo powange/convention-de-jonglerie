@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { updateCollaboratorRights } from '../../../../utils/collaborator-management'
+import { prisma } from '../../../../utils/prisma'
 
 const updateRightsSchema = z.object({
   rights: z
@@ -42,7 +43,22 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Mettre à jour le rôle (la fonction gère les permissions)
+    // Charger l'état avant pour snapshot si on va changer
+    const before = await prisma.conventionCollaborator.findUnique({
+      where: { id: collaboratorId },
+      select: {
+        id: true,
+        conventionId: true,
+        title: true,
+        canEditConvention: true,
+        canDeleteConvention: true,
+        canManageCollaborators: true,
+        canAddEdition: true,
+        canEditAllEditions: true,
+        canDeleteAllEditions: true,
+      },
+    })
+
     const updatedCollaborator = await updateCollaboratorRights({
       conventionId,
       collaboratorId,
@@ -50,6 +66,43 @@ export default defineEventHandler(async (event) => {
       rights,
       title: title ?? undefined,
     })
+
+    if (before) {
+      const afterSnapshot = {
+        title: updatedCollaborator.title,
+        rights: {
+          canEditConvention: (updatedCollaborator as any).canEditConvention,
+          canDeleteConvention: (updatedCollaborator as any).canDeleteConvention,
+          canManageCollaborators: (updatedCollaborator as any).canManageCollaborators,
+          canAddEdition: (updatedCollaborator as any).canAddEdition,
+          canEditAllEditions: (updatedCollaborator as any).canEditAllEditions,
+          canDeleteAllEditions: (updatedCollaborator as any).canDeleteAllEditions,
+        },
+      }
+      const beforeSnapshot = {
+        title: before.title,
+        rights: {
+          canEditConvention: before.canEditConvention,
+          canDeleteConvention: before.canDeleteConvention,
+          canManageCollaborators: before.canManageCollaborators,
+          canAddEdition: before.canAddEdition,
+          canEditAllEditions: before.canEditAllEditions,
+          canDeleteAllEditions: before.canDeleteAllEditions,
+        },
+      }
+      if (JSON.stringify(beforeSnapshot) !== JSON.stringify(afterSnapshot)) {
+        await prisma.collaboratorPermissionHistory.create({
+          data: {
+            conventionId,
+            collaboratorId,
+            actorId: event.context.user.id,
+            changeType: 'RIGHTS_UPDATED',
+            before: beforeSnapshot as any,
+            after: afterSnapshot as any,
+          },
+        })
+      }
+    }
 
     const anyCollab: any = updatedCollaborator as any
     return {
