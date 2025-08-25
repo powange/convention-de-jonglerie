@@ -1,5 +1,4 @@
 import { createApp, defineComponent, h } from 'vue'
-import { fileURLToPath } from 'url'
 import { resolve } from 'path'
 
 // Tentative simplifiée: importer dynamiquement le composant page depuis app/pages
@@ -8,7 +7,8 @@ import { resolve } from 'path'
 export async function renderRawPage(routePath: string) {
   // Convertit /login -> login.vue, / -> index.vue, /editions/add -> editions/add.vue
   const pageRelative = routePath === '/' ? 'index.vue' : `${routePath.replace(/^\//, '')}.vue`
-  const rootDir = fileURLToPath(new URL('../../..', import.meta.url)) // remonte vers racine projet
+  // Utilise process.cwd() (racine projet lors de test:nuxt) pour éviter l'erreur "The URL must be of scheme file"
+  const rootDir = process.cwd()
   const pageFile = resolve(rootDir, 'app/pages', pageRelative)
   let mod: any
   try {
