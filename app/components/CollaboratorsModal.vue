@@ -14,10 +14,24 @@
           />
         </section>
         <section v-if="props.convention" class="pt-2 border-t border-gray-100 dark:border-gray-800">
-          <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
-            {{ $t('components.collaborators_modal.add_collaborator') }}
-          </h4>
-          <div class="space-y-4">
+          <div
+            class="flex items-center justify-between mb-2 cursor-pointer select-none group"
+            role="button"
+            :aria-expanded="showAddSection ? 'true' : 'false'"
+            tabindex="0"
+            @click="toggleAddSection"
+            @keydown.enter.prevent="toggleAddSection"
+            @keydown.space.prevent="toggleAddSection"
+          >
+            <h4 class="text-sm font-medium text-gray-900 dark:text-white">
+              {{ $t('components.collaborators_modal.add_collaborator') }}
+            </h4>
+            <UIcon
+              :name="showAddSection ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+              class="h-5 w-5 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200 transition-colors"
+            />
+          </div>
+          <div v-if="showAddSection" class="space-y-4">
             <UInputMenu
               v-model="selectedUser"
               v-model:search-term="searchTerm"
@@ -128,6 +142,12 @@ const userItems = ref<UserItem[]>([])
 const collaborators = ref<CollaboratorItem[]>([])
 const collaboratorsLoading = ref(false)
 const editions = ref<Array<{ id: number; name: string | null }>>([])
+// État repli/affichage de la section d'ajout
+const showAddSection = ref(false)
+
+function toggleAddSection() {
+  showAddSection.value = !showAddSection.value
+}
 
 function updateCreationDraft(v: {
   title: string | null
@@ -185,6 +205,7 @@ watch(
       creationDraft.perEdition = []
       creationDraft.title = null
       userItems.value = []
+  showAddSection.value = false
     }
   }
 )
