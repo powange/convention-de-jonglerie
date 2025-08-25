@@ -60,7 +60,8 @@
     "docker:release:up": "docker compose -f docker-compose.release.yml up -d --build",
     "docker:release:down": "docker compose -f docker-compose.release.yml down",
     "format": "prettier -w \"**/*.{js,ts,vue,json,md,yml,yaml}\"",
-    "format:check": "prettier -c \"**/*.{js,ts,vue,json,md,yml,yaml}\""
+    "format:check": "prettier -c \"**/*.{js,ts,vue,json,md,yml,yaml}\"",
+    "favicons": "tsx scripts/generate-favicons.ts"
   },
   "prettier": {
     "singleQuote": true,
@@ -90,10 +91,11 @@
     "nuxt": "^4.0.1",
     "nuxt-auth-utils": "^0.5.23",
     "pinia": "^3.0.3",
+    "sharp": "0.33.5",
+    "tsx": "^4.19.1",
     "typescript": "^5.8.3",
     "vue": "^3.5.17",
-    "vue-router": "^4.5.1",
-    "tsx": "^4.19.1"
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@iconify-json/bx": "^1.2.2",
@@ -110,8 +112,8 @@
     "@vue/test-utils": "^2.4.6",
     "cross-env": "^10.0.0",
     "happy-dom": "^18.0.1",
-    "vite-tsconfig-paths": "^5.1.4",
     "prettier": "^3.3.3",
+    "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
     "wait-on": "^8.0.4"
   },

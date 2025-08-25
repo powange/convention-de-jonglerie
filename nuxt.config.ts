@@ -3,6 +3,18 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
+  app: {
+    head: {
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/logos/logo-jc.svg' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicons/favicon-32x32.png' },
+        { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/favicons/favicon-192x192.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicons/favicon-180x180.png' },
+        { rel: 'manifest', href: '/favicons/site.webmanifest' },
+        { rel: 'alternate icon', href: '/favicon.ico' },
+      ],
+    },
+  },
   // Active en dev uniquement
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
   // Enregistre explicitement les helpers de session pour l'alias #imports (utile en environnement de test)

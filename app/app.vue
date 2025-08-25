@@ -5,7 +5,7 @@
         <template #header>
           <div class="flex justify-between items-center">
             <NuxtLink to="/" class="flex items-center">
-              <img src="/logos/logo.svg" :alt="$t('app.title')" class="h-16 sm:h-30 w-auto" />
+              <LogoJc class="h-16 sm:h-30 w-auto text-black dark:text-white" />
               <span class="ml-2 text-sm sm:text-xl font-bold">{{ $t('app.title') }}</span>
             </NuxtLink>
             <div class="flex items-center gap-2 sm:gap-4">
@@ -117,6 +117,7 @@
 import { computed, onMounted, onUnmounted } from 'vue'
 
 import AppFooter from '~/components/ui/AppFooter.vue'
+import LogoJc from '~/components/ui/LogoJc.vue'
 import UserAvatar from '~/components/ui/UserAvatar.vue'
 
 import { useAuthStore } from './stores/auth'
@@ -245,7 +246,5 @@ onMounted(() => {
 })
 
 // Calculer le nom d'affichage
-const displayName = computed(() => {
-  return authStore.user?.pseudo || `${authStore.user?.prenom} ${authStore.user?.nom}`
-})
+const displayName = computed(() => authStore.user?.pseudo || authStore.user?.prenom || '')
 </script>

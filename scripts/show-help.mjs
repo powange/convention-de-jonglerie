@@ -99,6 +99,9 @@ const sections = [
   ] },
   { title: '🗺️ Domaine métier', color: colors.magenta, scripts: [
     { name: 'geocode', desc: 'Ajoute les coordonnées GPS aux conventions' }
+  ] },
+  { title: '🖼️ Assets & PWA', color: colors.yellow, scripts: [
+    { name: 'favicons', desc: 'Génère les variantes PNG + manifest PWA (à relancer après modif du SVG)' }
   ] }
 ]
 
