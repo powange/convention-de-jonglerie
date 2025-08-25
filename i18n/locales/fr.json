@@ -693,6 +693,7 @@
       "load_history": "Charger l'historique",
       "no_history": "Aucun changement enregistré",
       "by_user": "Par {user}",
+  "target_user": "Ciblant {user}",
       "delete_confirm": "Supprimer ce collaborateur ?"
     },
     "country_select": {
@@ -840,7 +841,9 @@
       "RIGHTS_UPDATED": "Droits mis à jour",
       "PER_EDITIONS_UPDATED": "Droits par édition mis à jour",
       "ARCHIVED": "Archivé",
-      "UNARCHIVED": "Désarchivé"
+  "UNARCHIVED": "Désarchivé",
+  "CREATED": "Collaborateur ajouté",
+  "REMOVED": "Collaborateur retiré"
     }
   },
   "c": {
