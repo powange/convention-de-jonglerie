@@ -3,15 +3,15 @@ import { z } from 'zod'
 import { canManageCollaborators } from '../../../../utils/collaborator-management'
 import { prisma } from '../../../../utils/prisma'
 
-// Schema d'entrée
+// Schéma combiné (droits globaux + perEdition + title)
 const perEditionSchema = z.object({
   editionId: z.number().int().positive(),
-  canEdit: z.boolean().optional().default(false),
-  canDelete: z.boolean().optional().default(false),
+  canEdit: z.boolean().optional(),
+  canDelete: z.boolean().optional(),
 })
 
-const rightsSchema = z.object({
-  title: z.string().min(1).max(120).optional().nullable(),
+const payloadSchema = z.object({
+  title: z.string().max(120).optional().nullable(),
   rights: z
     .object({
       editConvention: z.boolean().optional(),
@@ -29,28 +29,23 @@ const rightsSchema = z.object({
 export default defineEventHandler(async (event) => {
   const conventionId = parseInt(getRouterParam(event, 'id') || '0')
   const collaboratorId = parseInt(getRouterParam(event, 'collaboratorId') || '0')
-
-  if (!event.context.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
-  }
-
+  if (!event.context.user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
   const body = await readBody(event).catch(() => ({}))
-  const parsed = rightsSchema.parse(body || {})
+  const parsed = payloadSchema.parse(body || {})
 
-  // Vérifier permission gestion
+  // Pas de payload => rien à faire
+  if (!parsed.rights && parsed.title === undefined && !parsed.perEdition)
+    return { success: true, unchanged: true }
+
   const canManage = await canManageCollaborators(conventionId, event.context.user.id)
-  if (!canManage) {
-    throw createError({ statusCode: 403, statusMessage: 'Permission insuffisante' })
-  }
+  if (!canManage) throw createError({ statusCode: 403, statusMessage: 'Permission insuffisante' })
 
-  // Charger collaborateur + état précédent
   const collaborator = await prisma.conventionCollaborator.findUnique({
     where: { id: collaboratorId },
     include: { perEditionPermissions: true },
   })
-  if (!collaborator || collaborator.conventionId !== conventionId) {
+  if (!collaborator || collaborator.conventionId !== conventionId)
     throw createError({ statusCode: 404, statusMessage: 'Collaborateur introuvable' })
-  }
 
   const beforeSnapshot = {
     title: collaborator.title,
@@ -69,7 +64,6 @@ export default defineEventHandler(async (event) => {
     })),
   }
 
-  // Construire data update
   const updateData: any = {}
   if (parsed.title !== undefined) updateData.title = parsed.title || null
   if (parsed.rights) {
@@ -85,18 +79,15 @@ export default defineEventHandler(async (event) => {
     if (parsed.rights.deleteAllEditions !== undefined)
       updateData.canDeleteAllEditions = parsed.rights.deleteAllEditions
   }
-
-  const perEditionInput = parsed.perEdition || []
+  const perEditionInput = parsed.perEdition || null
 
   const result = await prisma.$transaction(async (tx) => {
-    // Update principal
     const updated = Object.keys(updateData).length
       ? await tx.conventionCollaborator.update({ where: { id: collaboratorId }, data: updateData })
       : collaborator
 
-    // Gérer per-edition: simpliste => effacer puis recréer (dataset restreint)
     let newPerEdition = collaborator.perEditionPermissions
-    if (parsed.perEdition) {
+    if (perEditionInput) {
       await tx.editionCollaboratorPermission.deleteMany({ where: { collaboratorId } })
       if (perEditionInput.length) {
         newPerEdition = await Promise.all(
@@ -111,9 +102,7 @@ export default defineEventHandler(async (event) => {
             })
           )
         )
-      } else {
-        newPerEdition = []
-      }
+      } else newPerEdition = []
     }
 
     const afterSnapshot = {
@@ -133,20 +122,18 @@ export default defineEventHandler(async (event) => {
       })),
     }
 
-    const rightsChanged = JSON.stringify(beforeSnapshot) !== JSON.stringify(afterSnapshot)
-    if (rightsChanged) {
+    if (JSON.stringify(beforeSnapshot) !== JSON.stringify(afterSnapshot)) {
       await tx.collaboratorPermissionHistory.create({
         data: {
           conventionId,
           collaboratorId,
-          actorId: event.context.user!.id,
-          changeType: parsed.perEdition ? 'PER_EDITIONS_UPDATED' : 'RIGHTS_UPDATED',
+          actorId: event.context.user.id,
+          changeType: perEditionInput ? 'PER_EDITIONS_UPDATED' : 'RIGHTS_UPDATED',
           before: beforeSnapshot as any,
           after: afterSnapshot as any,
         },
       })
     }
-
     return { updated, perEdition: afterSnapshot.perEdition }
   })
 

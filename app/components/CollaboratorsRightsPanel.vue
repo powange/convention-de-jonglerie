@@ -301,7 +301,7 @@ async function save(c: CollaboratorItem) {
   if (!d) return
   savingId.value = c.id
   try {
-    await $fetch(`/api/conventions/${props.conventionId}/collaborators/${c.id}/rights`, {
+    await $fetch(`/api/conventions/${props.conventionId}/collaborators/${c.id}`, {
       method: 'PATCH' as any,
       body: { title: d.title, rights: d.rights, perEdition: d.perEdition },
     })
