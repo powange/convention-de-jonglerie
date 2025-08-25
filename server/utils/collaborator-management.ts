@@ -301,17 +301,17 @@ export async function deleteConventionCollaborator(
   }
 
   await prisma.$transaction(async (tx) => {
-    await tx.conventionCollaborator.delete({ where: { id: collaboratorId } })
+    // Historiser AVANT suppression en mettant collaboratorId à null pour conserver la ligne après delete
     await tx.collaboratorPermissionHistory.create({
       data: {
         conventionId,
-        collaboratorId: collaborator.id,
+        collaboratorId: null, // permettra de garder la trace même après suppression
         actorId: userId,
         changeType: 'REMOVED',
         before: before as any,
-        // after undefined (supprimé)
       },
     })
+    await tx.conventionCollaborator.delete({ where: { id: collaboratorId } })
   })
 
   return {
