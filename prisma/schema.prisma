@@ -50,7 +50,8 @@ model User {
   lostFoundComments      LostFoundComment[]
   feedbacks              Feedback[]
   carpoolBookings        CarpoolBooking[]
-  permissionHistoryActions CollaboratorPermissionHistory[] @relation("CollaboratorPermissionHistory_actorId")
+  permissionHistoryActions CollaboratorPermissionHistory[] @relation("CollaboratorPermissionHistory_actor")
+  targetUserHistories      CollaboratorPermissionHistory[] @relation("CollaboratorPermissionHistory_target")
 }
 
 model Edition {
@@ -128,7 +129,7 @@ model ConventionCollaborator {
   convention           Convention @relation(fields: [conventionId], references: [id], onDelete: Cascade)
   user                 User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   perEditionPermissions EditionCollaboratorPermission[]
-  permissionHistory     CollaboratorPermissionHistory[]
+  // historique supprimé: désormais l'historique référence uniquement targetUserId
 
   @@unique([conventionId, userId])
   @@index([addedById], map: "ConventionCollaborator_addedById_fkey")
@@ -281,22 +282,22 @@ model EditionCollaboratorPermission {
 
 // Historique des modifications de permissions et d'archivage
 model CollaboratorPermissionHistory {
-  id             Int                               @id @default(autoincrement())
-  conventionId   Int
-  collaboratorId Int?
-  actorId        Int
-  changeType     CollaboratorPermissionChangeType
-  before         Json?
-  after          Json?
-  createdAt      DateTime                          @default(now())
-  convention     Convention                        @relation(fields: [conventionId], references: [id], onDelete: Cascade)
-  collaborator   ConventionCollaborator?           @relation(fields: [collaboratorId], references: [id], onDelete: SetNull)
-  actor          User                              @relation("CollaboratorPermissionHistory_actorId", fields: [actorId], references: [id], onDelete: Cascade)
+  id           Int                               @id @default(autoincrement())
+  conventionId Int
+  targetUserId Int? // utilisateur directement concerné (collaborateur visé). Null pour ARCHIVED/UNARCHIVED
+  actorId      Int
+  changeType   CollaboratorPermissionChangeType
+  before       Json?
+  after        Json?
+  createdAt    DateTime                          @default(now())
+  convention   Convention                        @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  actor        User                              @relation("CollaboratorPermissionHistory_actor", fields: [actorId], references: [id], onDelete: Cascade)
+  targetUser   User?                             @relation("CollaboratorPermissionHistory_target", fields: [targetUserId], references: [id], onDelete: SetNull)
 
   @@index([conventionId])
   @@index([actorId])
-  @@index([collaboratorId])
   @@index([changeType])
+  @@index([targetUserId])
 }
 
 model EditionPost {

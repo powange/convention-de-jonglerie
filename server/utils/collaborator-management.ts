@@ -202,10 +202,9 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
       await tx.collaboratorPermissionHistory.create({
         data: {
           conventionId,
-          collaboratorId: withPerEdition.id,
+          targetUserId: withPerEdition.userId,
           actorId: addedById,
           changeType: 'CREATED',
-          // before laissé undefined (aucune valeur précédente)
           after: {
             title: withPerEdition.title,
             rights: {
@@ -222,7 +221,7 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
               canDelete: p.canDelete,
             })),
           } as any,
-        },
+        } as any,
       })
     }
     return withPerEdition
@@ -289,9 +288,7 @@ export async function deleteConventionCollaborator(
 
   // Snapshot avant suppression
   const before = {
-    collaboratorId: collaborator.id,
-    userId: collaborator.userId,
-    userPseudo: collaborator.user.pseudo,
+    // On n'enregistre plus les infos user redondantes (pseudo / id) car targetUserId suffit
     title: collaborator.title,
     rights: {
       canEditConvention: collaborator.canEditConvention,
@@ -308,20 +305,17 @@ export async function deleteConventionCollaborator(
     await tx.collaboratorPermissionHistory.create({
       data: {
         conventionId,
-        collaboratorId: null, // on conserve les données dans before
+        targetUserId: collaborator.userId,
         actorId: userId,
         changeType: 'REMOVED',
         before: before as any,
         after: {
           removed: true,
           removedAt: new Date().toISOString(),
-          removedCollaborator: {
-            collaboratorId: collaborator.id,
-            userId: collaborator.userId,
-            userPseudo: collaborator.user.pseudo,
-          },
+          removedCollaboratorId: collaborator.id,
+          removedUserId: collaborator.userId,
         } as any,
-      },
+      } as any,
     })
     await tx.conventionCollaborator.delete({ where: { id: collaboratorId } })
   })

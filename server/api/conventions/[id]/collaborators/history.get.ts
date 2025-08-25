@@ -9,22 +9,18 @@ export default defineEventHandler(async (event) => {
   if (!permission.hasPermission)
     throw createError({ statusCode: 403, statusMessage: 'Accès refusé' })
 
-  const history = await prisma.collaboratorPermissionHistory.findMany({
+  const history: any[] = await prisma.collaboratorPermissionHistory.findMany({
     where: { conventionId },
     orderBy: { createdAt: 'desc' },
     take: 200,
-    include: {
-      collaborator: { select: { id: true, userId: true, title: true } },
-      actor: { select: { id: true, pseudo: true } },
-    },
   })
 
   return history.map((h) => ({
     id: h.id,
     changeType: h.changeType,
     createdAt: h.createdAt,
-    actor: h.actor,
-    collaborator: h.collaborator,
+    actorId: h.actorId,
+    targetUserId: h.targetUserId,
     before: h.before,
     after: h.after,
   }))

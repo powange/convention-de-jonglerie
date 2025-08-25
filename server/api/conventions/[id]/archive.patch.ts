@@ -41,9 +41,10 @@ export default defineEventHandler(async (event) => {
       conventionId,
       actorId: event.context.user.id,
       changeType: archived ? 'ARCHIVED' : 'UNARCHIVED',
+      targetUserId: null,
       before: before as any,
       after: { isArchived: updated.isArchived, archivedAt: updated.archivedAt } as any,
-    },
+    } as any,
   })
 
   return { success: true, archived: updated.isArchived, archivedAt: updated.archivedAt }

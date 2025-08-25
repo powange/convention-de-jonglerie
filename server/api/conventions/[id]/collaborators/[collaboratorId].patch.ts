@@ -126,12 +126,12 @@ export default defineEventHandler(async (event) => {
       await tx.collaboratorPermissionHistory.create({
         data: {
           conventionId,
-          collaboratorId,
+          targetUserId: collaborator.userId,
           actorId: event.context.user.id,
           changeType: perEditionInput ? 'PER_EDITIONS_UPDATED' : 'RIGHTS_UPDATED',
           before: beforeSnapshot as any,
           after: afterSnapshot as any,
-        },
+        } as any,
       })
     }
     return { updated, perEdition: afterSnapshot.perEdition }

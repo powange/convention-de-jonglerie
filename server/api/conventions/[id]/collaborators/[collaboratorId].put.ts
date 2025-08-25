@@ -91,15 +91,19 @@ export default defineEventHandler(async (event) => {
         },
       }
       if (JSON.stringify(beforeSnapshot) !== JSON.stringify(afterSnapshot)) {
+        const target = await prisma.conventionCollaborator.findUnique({
+          where: { id: collaboratorId },
+          select: { userId: true },
+        })
         await prisma.collaboratorPermissionHistory.create({
           data: {
             conventionId,
-            collaboratorId,
+            targetUserId: target?.userId,
             actorId: event.context.user.id,
             changeType: 'RIGHTS_UPDATED',
             before: beforeSnapshot as any,
             after: afterSnapshot as any,
-          },
+          } as any,
         })
       }
     }

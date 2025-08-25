@@ -147,8 +147,9 @@
           >
           <span class="text-[10px] text-gray-400">{{ timeAgo(h.createdAt) }}</span>
         </div>
-        <div v-if="h.actor?.pseudo" class="text-[11px] text-gray-600 dark:text-gray-300 mt-1">
-          {{ $t('components.collaborators_rights_panel.by_user', { user: h.actor.pseudo }) }}
+        <div class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 flex flex-wrap gap-2">
+          <span v-if="h.targetUserId">Target #{{ h.targetUserId }}</span>
+          <span v-if="h.actorId" class="opacity-70">Actor #{{ h.actorId }}</span>
         </div>
       </div>
     </div>
@@ -204,6 +205,9 @@ interface HistoryItem {
   changeType: string
   createdAt: string
   actor?: { pseudo: string }
+  targetUser?: { pseudo: string }
+  before?: any
+  after?: any
 }
 const history = ref<HistoryItem[]>([])
 const historyLoading = ref(false)
@@ -215,6 +219,8 @@ function formatChangeType(type: string) {
     PER_EDITIONS_UPDATED: t('permissions.history.PER_EDITIONS_UPDATED'),
     ARCHIVED: t('permissions.history.ARCHIVED'),
     UNARCHIVED: t('permissions.history.UNARCHIVED'),
+    CREATED: t('permissions.history.CREATED') || 'Créé',
+    REMOVED: t('permissions.history.REMOVED') || 'Retiré',
   }
   return map[type] || type
 }
