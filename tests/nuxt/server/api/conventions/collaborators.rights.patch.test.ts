@@ -17,7 +17,7 @@ const baseEvent = {
   },
 }
 
-describe('/api/conventions/[id]/collaborators/[collaboratorId].rights PATCH', () => {
+describe('/api/conventions/[id]/collaborators/[collaboratorId]/rights PATCH', () => {
   beforeEach(() => {
     mockCanManage.mockReset()
     prismaMock.conventionCollaborator.findUnique.mockReset()
