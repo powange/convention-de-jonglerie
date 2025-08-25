@@ -129,12 +129,15 @@
       </div>
 
       <!-- État vide -->
-      <div v-else class="text-center py-12">
-        <UIcon name="i-heroicons-magnifying-glass" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+      <div
+        v-else
+        class="py-24 min-h-[320px] flex flex-col items-center justify-center text-center gap-2"
+      >
+        <UIcon name="i-heroicons-magnifying-glass" class="w-14 h-14 text-gray-400 mb-2" />
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
           {{ $t('editions.no_lost_items') }}
         </h3>
-        <p class="text-gray-500">
+        <p class="text-gray-500 max-w-prose">
           {{
             !hasEditionStarted
               ? t('editions.items_appear_when_started')
@@ -151,11 +154,13 @@
 
         <template #body>
           <div class="space-y-4">
-            <UFormField :label="t('common.description')" required>
+            <UFormField :label="t('common.description')" required class="w-full">
               <UTextarea
                 v-model="newItem.description"
                 :placeholder="t('editions.describe_lost_item')"
-                :rows="3"
+                :rows="4"
+                class="w-full"
+                autoresize
               />
             </UFormField>
 
@@ -265,10 +270,6 @@ const hasEditionStarted = computed(() => {
   if (!edition.value) return false
   return new Date() >= new Date(edition.value.startDate)
 })
-const isEditionFinished = computed(() => {
-  if (!edition.value) return false
-  return new Date() > new Date(edition.value.endDate)
-})
 
 // Vérifier les permissions
 const canAddLostFound = computed(() => {
@@ -318,7 +319,8 @@ const fetchLostFoundItems = async () => {
   loading.value = true
   try {
     const data = await $fetch(`/api/editions/${editionId.value}/lost-found`)
-    lostFoundItems.value = data
+    // Sécurise: toujours un tableau
+    lostFoundItems.value = Array.isArray(data) ? data : []
   } catch (error: unknown) {
     console.error('Error loading lost items:', error)
     toast.add({
@@ -457,10 +459,24 @@ const showImageModal = (imageUrl: string) => {
 // Charger les données au montage
 onMounted(async () => {
   await editionStore.fetchEditionById(editionId.value)
-  if (isEditionFinished.value) {
+  if (hasEditionStarted.value) {
     await fetchLostFoundItems()
   } else {
+    // Edition pas encore démarrée: on arrête le loading mais on ne fetch pas encore
     loading.value = false
+    // Planification d'un fetch au démarrage si la date de début est connue
+    if (edition.value?.startDate) {
+      const startTime = new Date(edition.value.startDate).getTime()
+      const delay = startTime - Date.now()
+      if (delay > 0 && delay < 1000 * 60 * 60 * 24) {
+        setTimeout(async () => {
+          if (!lostFoundItems.value.length) {
+            loading.value = true
+            await fetchLostFoundItems()
+          }
+        }, delay + 500) // léger buffer
+      }
+    }
   }
 })
 </script>
