@@ -1,4 +1,6 @@
 import { createApp, defineComponent, h } from 'vue'
+import { createI18n } from 'vue-i18n'
+import { createPinia } from 'pinia'
 import { resolve } from 'path'
 
 // Tentative simplifiée: importer dynamiquement le composant page depuis app/pages
@@ -20,6 +22,19 @@ export async function renderRawPage(routePath: string) {
   const Comp = mod.default || defineComponent({ render: () => h('div', 'Empty') })
   const el = document.createElement('div')
   const app = createApp(Comp, {})
+  // i18n minimal pour supporter $t sans crash
+  const i18n = createI18n({
+    legacy: false,
+    locale: 'fr',
+    fallbackLocale: 'fr',
+    messages: { fr: {}, en: {} },
+    missingWarn: false,
+    fallbackWarn: false,
+  })
+  app.use(i18n)
+  // Pinia pour pages accédant aux stores
+  const pinia = createPinia()
+  app.use(pinia)
   app.mount(el)
   return {
     html: () => el.innerHTML,
