@@ -119,6 +119,7 @@ async function main() {
           data: {
             conventionId: item.conventionId,
             collaboratorId: id,
+            targetUserId: current.userId,
             actorId: item.addedById,
             changeType: CollaboratorPermissionChangeType.CREATED,
             before: undefined,

@@ -389,7 +389,6 @@
       "title": "Zarządzaj współpracownikami"
     },
     "collaborators_rights_panel": {
-      "by_user": "Przez {user}",
       "delete_confirm": "Usunąć tego współpracownika?",
       "history_title": "Historia zmian",
       "load_history": "Załaduj historię",
@@ -400,7 +399,9 @@
       "refresh_history": "Odśwież",
       "saved": "Prawa zaktualizowane",
       "title": "Prawa współpracowników (beta)",
-      "title_placeholder": "Tytuł lub rola (opcjonalnie)"
+      "title_placeholder": "Tytuł lub rola (opcjonalnie)",
+      "by_user_label": "Przez",
+      "target_user_label": "Celujący"
     },
     "convention_form": {
       "click_to_select_image": "Kliknij, aby wybrać obraz",
@@ -539,7 +540,9 @@
     "set_offline": "Ustaw offline",
     "set_online": "Ustaw online",
     "ticketing": "Bilety",
-    "useful_links": "Przydatne linki"
+    "useful_links": "Przydatne linki",
+    "show_returned_items": "Pokaż zwrócone przedmioty",
+    "hide_returned_items": "Ukryj zwrócone przedmioty"
   },
   "errors": {
     "access_denied": "Dostęp odrzucony",
@@ -847,7 +850,9 @@
       "ARCHIVED": "Zarchiwizowane",
       "PER_EDITIONS_UPDATED": "Prawa na edycję zaktualizowane",
       "RIGHTS_UPDATED": "Prawa zaktualizowane",
-      "UNARCHIVED": "Przywrócone"
+      "UNARCHIVED": "Przywrócone",
+      "CREATED": "Współpracownik dodany",
+      "REMOVED": "Współpracownik usunięty"
     },
     "manageCollaborators": "Zarządzaj współpracownikami",
     "manager": "Menedżer",
@@ -992,5 +997,9 @@
     "upload_error": "Błąd przesyłania",
     "uploading": "Przesyłanie...",
     "validation_error": "Błąd walidacji"
+  },
+  "h": {
+    "actor": "Aktor",
+    "targetUser": "Użytkownik docelowy"
   }
 }

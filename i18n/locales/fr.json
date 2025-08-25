@@ -692,9 +692,7 @@
       "refresh_history": "Rafraîchir",
       "load_history": "Charger l'historique",
       "no_history": "Aucun changement enregistré",
-  "by_user": "Par {user}",
   "by_user_label": "Par",
-  "target_user": "Ciblant {user}",
   "target_user_label": "Ciblant",
       "delete_confirm": "Supprimer ce collaborateur ?"
     },
@@ -827,6 +825,10 @@
       "yellow_border_favorite": "Contour jaune = Favori"
     }
   },
+  "h": {
+    "actor": "Acteur",
+    "targetUser": "Utilisateur ciblé"
+  },
   "permissions": {
     "editConvention": "Modifier la convention",
     "deleteConvention": "Supprimer la convention",
@@ -847,10 +849,6 @@
   "CREATED": "Collaborateur ajouté",
   "REMOVED": "Collaborateur retiré"
     }
-  },
-  "h": {
-    "actor": "Acteur",
-    "targetUser": "Utilisateur ciblé"
   },
   "c": {
     "user": {

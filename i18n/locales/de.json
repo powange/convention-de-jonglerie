@@ -389,7 +389,6 @@
       "title": "Mitarbeiter verwalten"
     },
     "collaborators_rights_panel": {
-      "by_user": "Von {user}",
       "delete_confirm": "Diesen Mitarbeiter entfernen?",
       "history_title": "Änderungsverlauf",
       "load_history": "Verlauf laden",
@@ -400,7 +399,9 @@
       "refresh_history": "Aktualisieren",
       "saved": "Rechte aktualisiert",
       "title": "Mitarbeiterrechte (Beta)",
-      "title_placeholder": "Titel oder Rolle (optional)"
+      "title_placeholder": "Titel oder Rolle (optional)",
+      "by_user_label": "Von",
+      "target_user_label": "Zielend"
     },
     "convention_form": {
       "click_to_select_image": "Klicken, um ein Bild auszuwählen",
@@ -539,7 +540,9 @@
     "set_offline": "Offline setzen",
     "set_online": "Online setzen",
     "ticketing": "Ticketing",
-    "useful_links": "Nützliche Links"
+    "useful_links": "Nützliche Links",
+    "show_returned_items": "Zurückgegebene Artikel anzeigen",
+    "hide_returned_items": "Zurückgegebene Artikel ausblenden"
   },
   "errors": {
     "access_denied": "Zugang verweigert",
@@ -847,7 +850,9 @@
       "ARCHIVED": "Archiviert",
       "PER_EDITIONS_UPDATED": "Rechte pro Ausgabe aktualisiert",
       "RIGHTS_UPDATED": "Rechte aktualisiert",
-      "UNARCHIVED": "Wiederhergestellt"
+      "UNARCHIVED": "Wiederhergestellt",
+      "CREATED": "Mitarbeiter hinzugefügt",
+      "REMOVED": "Mitarbeiter entfernt"
     },
     "manageCollaborators": "Mitarbeiter verwalten",
     "manager": "Manager",
@@ -992,5 +997,9 @@
     "upload_error": "Upload-Fehler",
     "uploading": "Wird hochgeladen...",
     "validation_error": "Validierungsfehler"
+  },
+  "h": {
+    "actor": "Akteur",
+    "targetUser": "Zielbenutzer"
   }
 }

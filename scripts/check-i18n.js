@@ -175,6 +175,8 @@ function extractI18nKeysFromFile(filePath) {
       'service',
       'category',
       'localValue',
+      // Ajout 'h' pour ignorer les accès h.actor.pseudo / h.targetUser.pseudo
+      'h',
     ]
 
     // Exceptions - ces patterns sont valides même s'ils commencent par un mot réservé
@@ -237,7 +239,7 @@ function extractI18nKeysFromFile(filePath) {
   // useI18n et const { t } = useI18n()
   const useI18nRegex = /useI18n\(\)/g
   if (useI18nRegex.test(content)) {
-    const localTRegex = /(?:^|\s)t\(['"]([\w.]+)['"]/g
+    const localTRegex = /(?:^|\s)t\(['"]([\w.]+)['"]\s*\)/g
     while ((match = localTRegex.exec(content)) !== null) {
       keys.add(match[1])
     }

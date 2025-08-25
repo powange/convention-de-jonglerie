@@ -565,8 +565,9 @@
       "refresh_history": "Refresh",
       "load_history": "Load history",
       "no_history": "No changes recorded",
-      "by_user": "By {user}",
-      "delete_confirm": "Remove this collaborator?"
+      "delete_confirm": "Remove this collaborator?",
+      "by_user_label": "By",
+      "target_user_label": "Targeting"
     },
     "country_select": {
       "no_countries_found": "No countries found",
@@ -713,7 +714,9 @@
       "RIGHTS_UPDATED": "Rights updated",
       "PER_EDITIONS_UPDATED": "Per-edition rights updated",
       "ARCHIVED": "Archived",
-      "UNARCHIVED": "Unarchived"
+      "UNARCHIVED": "Unarchived",
+      "CREATED": "Collaborator added",
+      "REMOVED": "Collaborator removed"
     }
   },
   "services": {
@@ -994,5 +997,9 @@
   },
   "currentValue": {
     "avatar": "Selected user avatar"
+  },
+  "h": {
+    "actor": "Actor",
+    "targetUser": "Target user"
   }
 }

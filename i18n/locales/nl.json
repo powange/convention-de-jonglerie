@@ -389,7 +389,6 @@
       "title": "Medewerkers beheren"
     },
     "collaborators_rights_panel": {
-      "by_user": "Door {user}",
       "delete_confirm": "Deze medewerker verwijderen?",
       "history_title": "Wijzigingsgeschiedenis",
       "load_history": "Geschiedenis laden",
@@ -400,7 +399,9 @@
       "refresh_history": "Vernieuwen",
       "saved": "Rechten bijgewerkt",
       "title": "Medewerkersrechten (bèta)",
-      "title_placeholder": "Titel of rol (optioneel)"
+      "title_placeholder": "Titel of rol (optioneel)",
+      "by_user_label": "Door",
+      "target_user_label": "Gericht op"
     },
     "convention_form": {
       "click_to_select_image": "Klik om een afbeelding te selecteren",
@@ -539,7 +540,9 @@
     "set_offline": "Offline zetten",
     "set_online": "Online zetten",
     "ticketing": "Ticketverkoop",
-    "useful_links": "Nuttige links"
+    "useful_links": "Nuttige links",
+    "show_returned_items": "Toon geretourneerde items",
+    "hide_returned_items": "Verberg geretourneerde items"
   },
   "errors": {
     "access_denied": "Toegang geweigerd",
@@ -847,7 +850,9 @@
       "ARCHIVED": "Gearchiveerd",
       "PER_EDITIONS_UPDATED": "Rechten per editie bijgewerkt",
       "RIGHTS_UPDATED": "Rechten bijgewerkt",
-      "UNARCHIVED": "Hersteld"
+      "UNARCHIVED": "Hersteld",
+      "CREATED": "Medewerker toegevoegd",
+      "REMOVED": "Medewerker verwijderd"
     },
     "manageCollaborators": "Medewerkers beheren",
     "manager": "Manager",
@@ -992,5 +997,9 @@
     "upload_error": "Upload fout",
     "uploading": "Upload bezig...",
     "validation_error": "Validatiefout"
+  },
+  "h": {
+    "actor": "Acteur",
+    "targetUser": "Doelgebruiker"
   }
 }

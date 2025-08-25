@@ -9,10 +9,14 @@ export default defineEventHandler(async (event) => {
   if (!permission.hasPermission)
     throw createError({ statusCode: 403, statusMessage: 'Accès refusé' })
 
-  const history: any[] = await prisma.collaboratorPermissionHistory.findMany({
+  const history = await prisma.collaboratorPermissionHistory.findMany({
     where: { conventionId },
     orderBy: { createdAt: 'desc' },
     take: 200,
+    include: {
+      actor: { select: { id: true, pseudo: true, profilePicture: true, email: true } },
+      targetUser: { select: { id: true, pseudo: true, profilePicture: true, email: true } },
+    },
   })
 
   return history.map((h) => ({
@@ -23,5 +27,23 @@ export default defineEventHandler(async (event) => {
     targetUserId: h.targetUserId,
     before: h.before,
     after: h.after,
+    actor: h.actor && {
+      id: h.actor.id,
+      pseudo: h.actor.pseudo,
+      avatar: h.actor.profilePicture
+        ? { src: h.actor.profilePicture, alt: h.actor.pseudo }
+        : h.actor.email
+          ? { hash: h.actor.email }
+          : null,
+    },
+    targetUser: h.targetUser && {
+      id: h.targetUser.id,
+      pseudo: h.targetUser.pseudo,
+      avatar: h.targetUser.profilePicture
+        ? { src: h.targetUser.profilePicture, alt: h.targetUser.pseudo }
+        : h.targetUser.email
+          ? { hash: h.targetUser.email }
+          : null,
+    },
   }))
 })

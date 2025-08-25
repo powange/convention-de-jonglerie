@@ -389,7 +389,6 @@
       "title": "Administrer medarbejdere"
     },
     "collaborators_rights_panel": {
-      "by_user": "Af {user}",
       "delete_confirm": "Fjern denne samarbejdspartner?",
       "history_title": "Ændringshistorik",
       "load_history": "Indlæs historik",
@@ -400,7 +399,9 @@
       "refresh_history": "Opdater",
       "saved": "Rettigheder opdateret",
       "title": "Samarbejdspartnerrettigheder (beta)",
-      "title_placeholder": "Titel eller rolle (valgfrit)"
+      "title_placeholder": "Titel eller rolle (valgfrit)",
+      "by_user_label": "Af",
+      "target_user_label": "Målrettet"
     },
     "convention_form": {
       "click_to_select_image": "Klik for at vælge et billede",
@@ -539,7 +540,9 @@
     "set_offline": "Sæt offline",
     "set_online": "Sæt online",
     "ticketing": "Billetsalg",
-    "useful_links": "Nyttige links"
+    "useful_links": "Nyttige links",
+    "show_returned_items": "Vis returnerede genstande",
+    "hide_returned_items": "Skjul returnerede genstande"
   },
   "errors": {
     "access_denied": "Adgang nægtet",
@@ -847,7 +850,9 @@
       "ARCHIVED": "Arkiveret",
       "PER_EDITIONS_UPDATED": "Rettigheder pr. udgave opdateret",
       "RIGHTS_UPDATED": "Rettigheder opdateret",
-      "UNARCHIVED": "Genaktiveret"
+      "UNARCHIVED": "Genaktiveret",
+      "CREATED": "Samarbejdspartner tilføjet",
+      "REMOVED": "Samarbejdspartner fjernet"
     },
     "manageCollaborators": "Administrer samarbejdspartnere",
     "manager": "Manager",
@@ -992,5 +997,9 @@
     "upload_error": "Upload fejl",
     "uploading": "Uploader...",
     "validation_error": "Valideringsfejl"
+  },
+  "h": {
+    "actor": "Aktør",
+    "targetUser": "Målbruger"
   }
 }

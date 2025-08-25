@@ -389,7 +389,6 @@
       "title": "Gerir colaboradores"
     },
     "collaborators_rights_panel": {
-      "by_user": "Por {user}",
       "delete_confirm": "Remover este colaborador?",
       "history_title": "Histórico de alterações",
       "load_history": "Carregar histórico",
@@ -400,7 +399,9 @@
       "refresh_history": "Atualizar",
       "saved": "Direitos atualizados",
       "title": "Direitos de colaboradores (beta)",
-      "title_placeholder": "Título ou função (opcional)"
+      "title_placeholder": "Título ou função (opcional)",
+      "by_user_label": "Por",
+      "target_user_label": "Direcionado a"
     },
     "convention_form": {
       "click_to_select_image": "Clique para seleccionar uma imagem",
@@ -539,7 +540,9 @@
     "set_offline": "Colocar offline",
     "set_online": "Colocar online",
     "ticketing": "Bilheteira",
-    "useful_links": "Ligações úteis"
+    "useful_links": "Ligações úteis",
+    "show_returned_items": "Mostrar itens devolvidos",
+    "hide_returned_items": "Ocultar itens devolvidos"
   },
   "errors": {
     "access_denied": "Acesso negado",
@@ -847,7 +850,9 @@
       "ARCHIVED": "Arquivado",
       "PER_EDITIONS_UPDATED": "Direitos por edição atualizados",
       "RIGHTS_UPDATED": "Direitos atualizados",
-      "UNARCHIVED": "Restaurado"
+      "UNARCHIVED": "Restaurado",
+      "CREATED": "Colaborador adicionado",
+      "REMOVED": "Colaborador removido"
     },
     "manageCollaborators": "Gerenciar colaboradores",
     "manager": "Gerente",
@@ -992,5 +997,9 @@
     "upload_error": "Erro de upload",
     "uploading": "Enviando...",
     "validation_error": "Erro de validação"
+  },
+  "h": {
+    "actor": "Ator",
+    "targetUser": "Usuário alvo"
   }
 }

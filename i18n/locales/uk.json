@@ -389,7 +389,6 @@
       "title": "Керувати співробітниками"
     },
     "collaborators_rights_panel": {
-      "by_user": "Від {user}",
       "delete_confirm": "Видалити цього співробітника?",
       "history_title": "Історія змін",
       "load_history": "Завантажити історію",
@@ -400,7 +399,9 @@
       "refresh_history": "Оновити",
       "saved": "Права оновлено",
       "title": "Права співавторів (бета)",
-      "title_placeholder": "Назва або роль (необов'язково)"
+      "title_placeholder": "Назва або роль (необов'язково)",
+      "by_user_label": "Від",
+      "target_user_label": "Спрямований на"
     },
     "convention_form": {
       "click_to_select_image": "Натисніть, щоб вибрати зображення",
@@ -539,7 +540,9 @@
     "set_offline": "Встановити офлайн",
     "set_online": "Встановити онлайн",
     "ticketing": "Квитки",
-    "useful_links": "Корисні посилання"
+    "useful_links": "Корисні посилання",
+    "show_returned_items": "Показати повернені предмети",
+    "hide_returned_items": "Приховати повернені предмети"
   },
   "errors": {
     "access_denied": "Доступ заборонено",
@@ -847,7 +850,9 @@
       "ARCHIVED": "Архівовано",
       "PER_EDITIONS_UPDATED": "Права за виданнями оновлено",
       "RIGHTS_UPDATED": "Права оновлено",
-      "UNARCHIVED": "Відновлено"
+      "UNARCHIVED": "Відновлено",
+      "CREATED": "Співавтора додано",
+      "REMOVED": "Співавтора видалено"
     },
     "manageCollaborators": "Керувати співавторами",
     "manager": "Менеджер",
@@ -992,5 +997,9 @@
     "upload_error": "Помилка завантаження",
     "uploading": "Завантаження...",
     "validation_error": "Помилка валідації"
+  },
+  "h": {
+    "actor": "Актор",
+    "targetUser": "Цільовий користувач"
   }
 }
