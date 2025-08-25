@@ -26,9 +26,9 @@
       />
     </div>
 
-    <!-- Per-edition rights -->
+    <!-- Per-edition rights as headerless table -->
     <div v-if="editions.length" class="mt-2">
-      <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center justify-between mb-1">
         <h6
           class="text-[11px] uppercase font-semibold tracking-wide text-gray-500 dark:text-gray-400"
         >
@@ -41,50 +41,58 @@
           color="neutral"
           icon="i-heroicons-x-mark"
           @click="resetPerEdition"
-          >{{ $t('common.reset') }}</UButton
-        >
+        >{{ $t('common.reset') }}</UButton>
       </div>
-      <div
-        class="max-h-48 overflow-y-auto pr-1 space-y-2 border border-gray-100 dark:border-gray-700 rounded p-2"
-      >
-        <div
-          v-for="ed in editions"
-          :key="ed.id"
-          class="border border-gray-100 dark:border-gray-700 rounded px-2 py-1 flex items-center justify-between bg-white/60 dark:bg-gray-900/40"
-        >
-          <span
-            class="text-[11px] font-medium truncate max-w-[140px]"
-            :title="ed.name || '#' + ed.id"
-            >{{ ed.name || '#' + ed.id }}</span
-          >
-          <div class="flex gap-4 items-center">
-            <div class="flex items-center gap-1">
-              <span class="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">{{
-                $t('common.edit')
-              }}</span>
-              <USwitch
-                :size="switchSize"
-                color="primary"
-                :disabled="localValue.rights.editAllEditions"
-                :model-value="hasEditionFlag(ed.id, 'canEdit')"
-                @update:model-value="(val) => toggleEdition(ed.id, 'canEdit', val)"
-              />
-            </div>
-            <div class="flex items-center gap-1">
-              <span class="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">{{
-                $t('common.delete')
-              }}</span>
-              <USwitch
-                :size="switchSize"
-                color="primary"
-                :model-value="hasEditionFlag(ed.id, 'canDelete')"
-                @update:model-value="(val) => toggleEdition(ed.id, 'canDelete', val)"
-              />
-            </div>
-          </div>
-        </div>
-        <div v-if="!localValue.perEdition.length" class="text-[11px] italic text-gray-500">
-          {{ $t('components.collaborators_rights_panel.per_edition_hint') }}
+      <div class="border border-gray-100 dark:border-gray-700 rounded overflow-hidden">
+        <div class="max-h-48 overflow-y-auto">
+          <table class="w-full text-[11px]">
+            <thead>
+              <tr class="bg-gray-50 dark:bg-gray-800/60 border-b border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300">
+                <th class="text-left font-medium px-2 py-1">&nbsp;</th>
+                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">{{ $t('common.edit') }}</th>
+                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">{{ $t('common.delete') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="ed in editions"
+                :key="ed.id"
+                class="border-b last:border-b-0 border-gray-100 dark:border-gray-700 bg-white/60 dark:bg-gray-900/40 hover:bg-gray-50 dark:hover:bg-gray-800/40"
+              >
+                <td class="px-2 py-1 align-middle truncate max-w-[160px]" :title="ed.name || '#' + ed.id">
+                  {{ ed.name || '#' + ed.id }}
+                </td>
+                <td class="px-2 py-1 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('common.edit')"
+                      :size="switchSize"
+                      color="primary"
+                      :disabled="localValue.rights.editAllEditions"
+                      :model-value="hasEditionFlag(ed.id, 'canEdit')"
+                      @update:model-value="(val) => toggleEdition(ed.id, 'canEdit', val)"
+                    />
+                  </div>
+                </td>
+                <td class="px-2 py-1 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('common.delete')"
+                      :size="switchSize"
+                      color="primary"
+                      :model-value="hasEditionFlag(ed.id, 'canDelete')"
+                      @update:model-value="(val) => toggleEdition(ed.id, 'canDelete', val)"
+                    />
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="!localValue.perEdition.length">
+                <td colspan="3" class="px-2 py-2 italic text-gray-500">
+                  {{ $t('components.collaborators_rights_panel.per_edition_hint') }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
