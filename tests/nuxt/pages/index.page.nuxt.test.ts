@@ -5,8 +5,8 @@ import { renderRawPage } from '../utils/renderPage'
 
 describe('Page / (Accueil)', () => {
   it('devrait se rendre et afficher le titre des filtres', async () => {
-  const page = await renderRawPage('/')
-  expect(page.html()).toMatch(/filters|homepage|convention/i)
-  page.unmount?.()
+    const page = await renderRawPage('/')
+    expect(page.html()).toMatch(/filters|homepage|convention/i)
+    page.unmount?.()
   })
 })

@@ -9,8 +9,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // 1. Hydratation rapide depuis storage si disponible (synchronement)
   if (!authStore.user) {
     try {
-      const stored =
-        localStorage.getItem('authUser') || sessionStorage.getItem('authUser') || null
+      const stored = localStorage.getItem('authUser') || sessionStorage.getItem('authUser') || null
       if (stored) {
         authStore.user = JSON.parse(stored)
       }

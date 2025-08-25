@@ -5,8 +5,8 @@ import { renderRawPage } from '../utils/renderPage'
 
 describe('Page /login', () => {
   it('devrait afficher le titre de connexion', async () => {
-  const page = await renderRawPage('/login')
-  expect(page.html()).toMatch(/login|email|password|auth/i)
-  page.unmount?.()
+    const page = await renderRawPage('/login')
+    expect(page.html()).toMatch(/login|email|password|auth/i)
+    page.unmount?.()
   })
 })

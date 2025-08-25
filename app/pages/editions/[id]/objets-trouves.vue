@@ -25,8 +25,8 @@
         </div>
 
         <!-- Message d'information -->
-        <UAlert v-if="!isEditionFinished" icon="i-heroicons-information-circle" color="info">
-          {{ $t('editions.lost_found_after_edition') }}
+        <UAlert v-if="!hasEditionStarted" icon="i-heroicons-information-circle" color="info">
+          {{ $t('editions.lost_found_before_start') }}
         </UAlert>
       </div>
 
@@ -136,9 +136,9 @@
         </h3>
         <p class="text-gray-500">
           {{
-            isEditionFinished
-              ? t('editions.no_items_reported')
-              : t('editions.items_appear_after_edition')
+            !hasEditionStarted
+              ? t('editions.items_appear_when_started')
+              : t('editions.no_items_reported')
           }}
         </p>
       </div>
@@ -260,7 +260,11 @@ const newItem = ref({
 // Récupérer l'édition
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 
-// Vérifier si l'édition est terminée
+// Vérifier début / fin de l'édition
+const hasEditionStarted = computed(() => {
+  if (!edition.value) return false
+  return new Date() >= new Date(edition.value.startDate)
+})
 const isEditionFinished = computed(() => {
   if (!edition.value) return false
   return new Date() > new Date(edition.value.endDate)
@@ -268,7 +272,7 @@ const isEditionFinished = computed(() => {
 
 // Vérifier les permissions
 const canAddLostFound = computed(() => {
-  if (!authStore.isAuthenticated || !isEditionFinished.value) return false
+  if (!authStore.isAuthenticated || !hasEditionStarted.value) return false
   if (!edition.value) return false
   return editionStore.canEditEdition(edition.value, authStore.user?.id || 0)
 })
@@ -289,8 +293,9 @@ const toggleFavorite = async (id: number) => {
       color: 'success',
     })
   } catch (e: unknown) {
+    const err: any = e
     toast.add({
-      title: e.statusMessage || t('errors.favorite_update_failed'),
+      title: err?.statusMessage || t('errors.favorite_update_failed'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })

@@ -5,8 +5,8 @@ import { renderRawPage } from '../utils/renderPage'
 
 describe('Page /register', () => {
   it('devrait se rendre et contenir indices de formulaire', async () => {
-  const page = await renderRawPage('/register')
-  expect(page.html()).toMatch(/register|email|pseudo|auth/i)
-  page.unmount?.()
+    const page = await renderRawPage('/register')
+    expect(page.html()).toMatch(/register|email|pseudo|auth/i)
+    page.unmount?.()
   })
 })

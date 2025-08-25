@@ -16,10 +16,10 @@ export default defineEventHandler(async (event) => {
     }
 
     // Vérifier l'authentification via la session scellée
-  const { user } = await requireUserSession(event)
-  const userId = (user as any).id
+    const { user } = await requireUserSession(event)
+    const userId = (user as any).id
 
-  // Récupérer l'édition et ses dates
+    // Récupérer l'édition et ses dates
     const edition = await prisma.edition.findUnique({
       where: { id: editionId },
       include: {

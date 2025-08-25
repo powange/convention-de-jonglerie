@@ -29,10 +29,7 @@ async function run() {
   )
 
   // Générer favicon.ico (16,32,48)
-  const icoBuffer = await sharp(Buffer.from(svgContent))
-    .resize(48, 48)
-    .png()
-    .toBuffer()
+  const icoBuffer = await sharp(Buffer.from(svgContent)).resize(48, 48).png().toBuffer()
   await writeFile(path.join(outDir, 'favicon.png'), icoBuffer)
 
   // Manifeste web
@@ -41,7 +38,11 @@ async function run() {
     short_name: 'Juggling',
     icons: sizes
       .filter((s) => s >= 64)
-      .map((s) => ({ src: `/favicons/favicon-${s}x${s}.png`, sizes: `${s}x${s}`, type: 'image/png' })),
+      .map((s) => ({
+        src: `/favicons/favicon-${s}x${s}.png`,
+        sizes: `${s}x${s}`,
+        type: 'image/png',
+      })),
     theme_color: '#dd2e21',
     background_color: '#ffffff',
     display: 'standalone',

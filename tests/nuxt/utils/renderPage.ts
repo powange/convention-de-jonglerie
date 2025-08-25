@@ -22,7 +22,8 @@ export async function renderRawPage(routePath: string) {
     // Fallback dynamique pour /editions/:id/... => /editions/[id]/...
     const editionsDyn = routePath.replace(/^(\/editions)\/[^/]+\//, '$1/[id]/')
     if (editionsDyn !== routePath) {
-      const dynRelative = editionsDyn === '/' ? 'index.vue' : `${editionsDyn.replace(/^\//, '')}.vue`
+      const dynRelative =
+        editionsDyn === '/' ? 'index.vue' : `${editionsDyn.replace(/^\//, '')}.vue`
       const dynFile = resolve(rootDir, 'app/pages', dynRelative)
       try {
         mod = await import(dynFile)
