@@ -16,10 +16,10 @@ export default defineEventHandler(async (event) => {
     }
 
     // Vérifier l'authentification via la session scellée
-    const { user } = await requireUserSession(event)
-    const userId = user.id
+  const { user } = await requireUserSession(event)
+  const userId = (user as any).id
 
-    // Vérifier que l'édition existe et est terminée
+  // Récupérer l'édition et ses dates
     const edition = await prisma.edition.findUnique({
       where: { id: editionId },
       include: {
@@ -40,12 +40,13 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Vérifier que l'édition est terminée
+    // Nouvelle règle : autoriser l'ajout à partir du début de l'édition (inclus) et après.
     const now = new Date()
-    if (now <= new Date(edition.endDate)) {
+    const start = new Date(edition.startDate as any)
+    if (now < start) {
       throw createError({
         statusCode: 403,
-        statusMessage: "Les objets trouvés ne peuvent être ajoutés qu'après la fin de l'édition",
+        statusMessage: "Les objets trouvés ne peuvent pas être ajoutés avant le début de l'édition",
       })
     }
 

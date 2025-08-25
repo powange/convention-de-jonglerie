@@ -150,17 +150,18 @@ describe('/api/editions/[id]/lost-found POST', () => {
     await expect(handler(mockEvent as any)).rejects.toThrow('Édition non trouvée')
   })
 
-  it('devrait rejeter si édition pas encore terminée', async () => {
-    const ongoingEdition = {
+  it("devrait rejeter si l'édition n'a pas encore commencé", async () => {
+    const futureEdition = {
       ...mockEdition,
-      endDate: new Date(Date.now() + 86400000), // Demain
+      startDate: new Date(Date.now() + 86400000), // Demain
+      endDate: new Date(Date.now() + 3 * 86400000),
     }
 
     ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
-    prismaMock.edition.findUnique.mockResolvedValue(ongoingEdition)
+    prismaMock.edition.findUnique.mockResolvedValue(futureEdition)
 
     await expect(handler(mockEvent as any)).rejects.toThrow(
-      "Les objets trouvés ne peuvent être ajoutés qu'après la fin de l'édition"
+      "Les objets trouvés ne peuvent pas être ajoutés avant le début de l'édition"
     )
   })
 
