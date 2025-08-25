@@ -148,8 +148,8 @@
           <span class="text-[10px] text-gray-400">{{ timeAgo(h.createdAt) }}</span>
         </div>
         <div class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 flex flex-wrap gap-2">
-          <span v-if="h.targetUserId">Target #{{ h.targetUserId }}</span>
-          <span v-if="h.actorId" class="opacity-70">Actor #{{ h.actorId }}</span>
+          <span v-if="h.targetUser">{{ $t('components.collaborators_rights_panel.target_user', { user: h.targetUser.pseudo }) }}</span>
+          <span v-if="h.actor" class="opacity-70">{{ $t('components.collaborators_rights_panel.by_user', { user: h.actor.pseudo }) }}</span>
         </div>
       </div>
     </div>
@@ -204,8 +204,8 @@ interface HistoryItem {
   id: number
   changeType: string
   createdAt: string
-  actor?: { pseudo: string }
-  targetUser?: { pseudo: string }
+  actor?: { id: number; pseudo: string }
+  targetUser?: { id: number; pseudo: string } | null
   before?: any
   after?: any
 }
