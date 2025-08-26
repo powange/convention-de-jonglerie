@@ -46,6 +46,9 @@
               {{ $t('common.confirm') }}
             </UButton>
           </UForm>
+                  <UFormField :label="t('auth.phone_optional')" name="phone">
+                    <UInput v-model="registerState.phone" autocomplete="tel" />
+                  </UFormField>
 
           <!-- Séparateur OU -->
           <div class="my-6">
@@ -377,6 +380,11 @@ const registerSchema = z
     prenom: z.string().min(1, t('errors.first_name_required')),
     nom: z.string().min(1, t('errors.last_name_required')),
     pseudo: z.string().min(3, t('errors.username_min_3_chars')),
+    phone: z
+      .string()
+      .regex(/^[+0-9 ().-]{6,30}$/u, t('errors.invalid_phone'))
+      .optional()
+      .or(z.literal('').transform(() => undefined)),
     password: z
       .string()
       .min(8, t('errors.password_too_short'))
@@ -388,7 +396,7 @@ const registerSchema = z
     message: t('errors.passwords_dont_match'),
     path: ['confirm'],
   })
-const registerState = reactive({ prenom: '', nom: '', pseudo: '', password: '', confirm: '' })
+const registerState = reactive({ prenom: '', nom: '', pseudo: '', phone: '', password: '', confirm: '' })
 
 // UI state
 const showPassword = ref(false)
@@ -541,6 +549,7 @@ const handleRegisterSubmit = async () => {
         pseudo: registerState.pseudo,
         nom: registerState.nom,
         prenom: registerState.prenom,
+          phone: registerState.phone || undefined,
       },
     })) as any
     if (response?.requiresVerification) {
