@@ -8,7 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 // Historique des changements de permissions collaborateurs
 enum CollaboratorPermissionChangeType {
   CREATED
@@ -20,115 +19,122 @@ enum CollaboratorPermissionChangeType {
 }
 
 model User {
-  id                     Int                      @id @default(autoincrement())
-  email                  String                   @unique
-  pseudo                 String                   @unique
-  nom                    String
-  prenom                 String
-  password               String
-  isEmailVerified        Boolean                  @default(false)
-  isGlobalAdmin          Boolean                  @default(false)
-  emailVerificationCode  String?
-  verificationCodeExpiry DateTime?
-  createdAt              DateTime                 @default(now())
-  updatedAt              DateTime                 @updatedAt
-  profilePicture         String?
-  carpoolComments        CarpoolComment[]
-  carpoolOffers          CarpoolOffer[]
-  carpoolRequests        CarpoolRequest[]
-  carpoolRequestComments CarpoolRequestComment[]
-  carpoolPassengers      CarpoolPassenger[]
-  editionPosts           EditionPost[]
-  editionPostComments    EditionPostComment[]
-  createdConventions     Convention[]
-  addedCollaborators     ConventionCollaborator[] @relation("AddedCollaborators")
-  collaborations         ConventionCollaborator[]
-  createdEditions        Edition[]                @relation("CreatedEditions")
-  favoriteEditions       Edition[]                @relation("FavoriteEditions")
-  passwordResetTokens    PasswordResetToken[]
-  lostFoundItems         LostFoundItem[]
-  lostFoundComments      LostFoundComment[]
-  feedbacks              Feedback[]
-  carpoolBookings        CarpoolBooking[]
+  id                       Int                             @id @default(autoincrement())
+  email                    String                          @unique
+  pseudo                   String                          @unique
+  nom                      String
+  prenom                   String
+  password                 String
+  phone                    String? // Numéro de téléphone optionnel, requis seulement pour postuler bénévole
+  isEmailVerified          Boolean                         @default(false)
+  isGlobalAdmin            Boolean                         @default(false)
+  emailVerificationCode    String?
+  verificationCodeExpiry   DateTime?
+  createdAt                DateTime                        @default(now())
+  updatedAt                DateTime                        @updatedAt
+  profilePicture           String?
+  carpoolComments          CarpoolComment[]
+  carpoolOffers            CarpoolOffer[]
+  carpoolRequests          CarpoolRequest[]
+  carpoolRequestComments   CarpoolRequestComment[]
+  carpoolPassengers        CarpoolPassenger[]
+  editionPosts             EditionPost[]
+  editionPostComments      EditionPostComment[]
+  createdConventions       Convention[]
+  addedCollaborators       ConventionCollaborator[]        @relation("AddedCollaborators")
+  collaborations           ConventionCollaborator[]
+  createdEditions          Edition[]                       @relation("CreatedEditions")
+  favoriteEditions         Edition[]                       @relation("FavoriteEditions")
+  passwordResetTokens      PasswordResetToken[]
+  lostFoundItems           LostFoundItem[]
+  lostFoundComments        LostFoundComment[]
+  feedbacks                Feedback[]
+  carpoolBookings          CarpoolBooking[]
   permissionHistoryActions CollaboratorPermissionHistory[] @relation("CollaboratorPermissionHistory_actor")
   targetUserHistories      CollaboratorPermissionHistory[] @relation("CollaboratorPermissionHistory_target")
+  volunteerApplications    EditionVolunteerApplication[]
 }
 
 model Edition {
-  id                   Int              @id @default(autoincrement())
-  name                 String?
-  description          String?
-  createdAt            DateTime         @default(now())
-  updatedAt            DateTime         @updatedAt
-  creatorId            Int
-  conventionId         Int
-  endDate              DateTime
-  startDate            DateTime
-  addressLine1         String
-  addressLine2         String?
-  city                 String
-  country              String
-  postalCode           String
-  region               String?
-  latitude             Float?
-  longitude            Float?
-  facebookUrl          String?
-  instagramUrl         String?
-  ticketingUrl         String?
-  acceptsPets          Boolean          @default(false)
-  hasFoodTrucks        Boolean          @default(false)
-  hasGym               Boolean          @default(false)
-  hasKidsZone          Boolean          @default(false)
-  hasTentCamping       Boolean          @default(false)
-  hasTruckCamping      Boolean          @default(false)
-  imageUrl             String?
-  hasAccessibility     Boolean          @default(false)
-  hasAerialSpace       Boolean          @default(false)
-  hasCantine           Boolean          @default(false)
-  hasConcert           Boolean          @default(false)
-  hasFamilyCamping     Boolean          @default(false)
-  hasFireSpace         Boolean          @default(false)
-  hasGala              Boolean          @default(false)
-  hasOpenStage         Boolean          @default(false)
-  hasShowers           Boolean          @default(false)
-  hasSlacklineSpace    Boolean          @default(false)
-  hasToilets           Boolean          @default(false)
-  hasWorkshops         Boolean          @default(false)
-  hasAfjTokenPayment   Boolean          @default(false)
-  hasCreditCardPayment Boolean          @default(false)
-  hasLongShow          Boolean          @default(false)
-  hasATM               Boolean          @default(false)
-  isOnline             Boolean          @default(false)
-  carpoolOffers        CarpoolOffer[]
-  carpoolRequests      CarpoolRequest[]
-  editionPosts         EditionPost[]
-  lostFoundItems       LostFoundItem[]
-  creator              User             @relation("CreatedEditions", fields: [creatorId], references: [id])
-  favoritedBy          User[]           @relation("FavoriteEditions")
-  convention           Convention       @relation(fields: [conventionId], references: [id])
+  id                      Int                             @id @default(autoincrement())
+  name                    String?
+  description             String?
+  createdAt               DateTime                        @default(now())
+  updatedAt               DateTime                        @updatedAt
+  creatorId               Int
+  conventionId            Int
+  endDate                 DateTime
+  startDate               DateTime
+  addressLine1            String
+  addressLine2            String?
+  city                    String
+  country                 String
+  postalCode              String
+  region                  String?
+  latitude                Float?
+  longitude               Float?
+  facebookUrl             String?
+  instagramUrl            String?
+  ticketingUrl            String?
+  acceptsPets             Boolean                         @default(false)
+  hasFoodTrucks           Boolean                         @default(false)
+  hasGym                  Boolean                         @default(false)
+  hasKidsZone             Boolean                         @default(false)
+  hasTentCamping          Boolean                         @default(false)
+  hasTruckCamping         Boolean                         @default(false)
+  imageUrl                String?
+  hasAccessibility        Boolean                         @default(false)
+  hasAerialSpace          Boolean                         @default(false)
+  hasCantine              Boolean                         @default(false)
+  hasConcert              Boolean                         @default(false)
+  hasFamilyCamping        Boolean                         @default(false)
+  hasFireSpace            Boolean                         @default(false)
+  hasGala                 Boolean                         @default(false)
+  hasOpenStage            Boolean                         @default(false)
+  hasShowers              Boolean                         @default(false)
+  hasSlacklineSpace       Boolean                         @default(false)
+  hasToilets              Boolean                         @default(false)
+  hasWorkshops            Boolean                         @default(false)
+  hasAfjTokenPayment      Boolean                         @default(false)
+  hasCreditCardPayment    Boolean                         @default(false)
+  hasLongShow             Boolean                         @default(false)
+  hasATM                  Boolean                         @default(false)
+  isOnline                Boolean                         @default(false)
+  carpoolOffers           CarpoolOffer[]
+  carpoolRequests         CarpoolRequest[]
+  editionPosts            EditionPost[]
+  lostFoundItems          LostFoundItem[]
+  creator                 User                            @relation("CreatedEditions", fields: [creatorId], references: [id])
+  favoritedBy             User[]                          @relation("FavoriteEditions")
+  convention              Convention                      @relation(fields: [conventionId], references: [id])
   collaboratorPermissions EditionCollaboratorPermission[]
+  // Bénévolat
+  volunteersOpen          Boolean                         @default(false)
+  volunteersDescription   String?                         @db.Text
+  volunteersUpdatedAt     DateTime?
+  volunteerApplications   EditionVolunteerApplication[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
 }
 
 model ConventionCollaborator {
-  id                   Int       @id @default(autoincrement())
-  conventionId         Int
-  userId               Int
-  title                String?
-  canEditConvention    Boolean   @default(false)
-  canDeleteConvention  Boolean   @default(false)
-  canManageCollaborators Boolean @default(false)
-  canAddEdition        Boolean   @default(false)
-  canEditAllEditions   Boolean   @default(false)
-  canDeleteAllEditions Boolean   @default(false)
-  addedAt              DateTime  @default(now())
-  addedById            Int
-  addedBy              User      @relation("AddedCollaborators", fields: [addedById], references: [id])
-  convention           Convention @relation(fields: [conventionId], references: [id], onDelete: Cascade)
-  user                 User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  perEditionPermissions EditionCollaboratorPermission[]
+  id                     Int                             @id @default(autoincrement())
+  conventionId           Int
+  userId                 Int
+  title                  String?
+  canEditConvention      Boolean                         @default(false)
+  canDeleteConvention    Boolean                         @default(false)
+  canManageCollaborators Boolean                         @default(false)
+  canAddEdition          Boolean                         @default(false)
+  canEditAllEditions     Boolean                         @default(false)
+  canDeleteAllEditions   Boolean                         @default(false)
+  addedAt                DateTime                        @default(now())
+  addedById              Int
+  addedBy                User                            @relation("AddedCollaborators", fields: [addedById], references: [id])
+  convention             Convention                      @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  user                   User                            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  perEditionPermissions  EditionCollaboratorPermission[]
   // historique supprimé: désormais l'historique référence uniquement targetUserId
 
   @@unique([conventionId, userId])
@@ -249,18 +255,18 @@ model CarpoolBooking {
 }
 
 model Convention {
-  id            Int                      @id @default(autoincrement())
-  name          String
-  description   String?                  @db.Text
-  logo          String?
-  createdAt     DateTime                 @default(now())
-  updatedAt     DateTime                 @updatedAt
-  authorId      Int
-  author        User                     @relation(fields: [authorId], references: [id])
-  editions      Edition[]
-  collaborators ConventionCollaborator[]
-  isArchived    Boolean                  @default(false)
-  archivedAt    DateTime?
+  id                Int                             @id @default(autoincrement())
+  name              String
+  description       String?                         @db.Text
+  logo              String?
+  createdAt         DateTime                        @default(now())
+  updatedAt         DateTime                        @updatedAt
+  authorId          Int
+  author            User                            @relation(fields: [authorId], references: [id])
+  editions          Edition[]
+  collaborators     ConventionCollaborator[]
+  isArchived        Boolean                         @default(false)
+  archivedAt        DateTime?
   permissionHistory CollaboratorPermissionHistory[]
 
   @@index([authorId], map: "Convention_authorId_fkey")
@@ -268,13 +274,13 @@ model Convention {
 
 // Permissions spécifiques par édition (complément aux droits globaux)
 model EditionCollaboratorPermission {
-  id             Int                     @id @default(autoincrement())
+  id             Int                    @id @default(autoincrement())
   collaboratorId Int
   editionId      Int
-  canEdit        Boolean                 @default(false)
-  canDelete      Boolean                 @default(false)
-  collaborator   ConventionCollaborator  @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
-  edition        Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  canEdit        Boolean                @default(false)
+  canDelete      Boolean                @default(false)
+  collaborator   ConventionCollaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
+  edition        Edition                @relation(fields: [editionId], references: [id], onDelete: Cascade)
 
   @@unique([collaboratorId, editionId])
   @@index([editionId])
@@ -282,17 +288,17 @@ model EditionCollaboratorPermission {
 
 // Historique des modifications de permissions et d'archivage
 model CollaboratorPermissionHistory {
-  id           Int                               @id @default(autoincrement())
+  id           Int                              @id @default(autoincrement())
   conventionId Int
   targetUserId Int? // utilisateur directement concerné (collaborateur visé). Null pour ARCHIVED/UNARCHIVED
   actorId      Int
   changeType   CollaboratorPermissionChangeType
   before       Json?
   after        Json?
-  createdAt    DateTime                          @default(now())
-  convention   Convention                        @relation(fields: [conventionId], references: [id], onDelete: Cascade)
-  actor        User                              @relation("CollaboratorPermissionHistory_actor", fields: [actorId], references: [id], onDelete: Cascade)
-  targetUser   User?                             @relation("CollaboratorPermissionHistory_target", fields: [targetUserId], references: [id], onDelete: SetNull)
+  createdAt    DateTime                         @default(now())
+  convention   Convention                       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  actor        User                             @relation("CollaboratorPermissionHistory_actor", fields: [actorId], references: [id], onDelete: Cascade)
+  targetUser   User?                            @relation("CollaboratorPermissionHistory_target", fields: [targetUserId], references: [id], onDelete: SetNull)
 
   @@index([conventionId])
   @@index([actorId])
@@ -383,6 +389,32 @@ enum FeedbackType {
   SUGGESTION // Suggestion d'amélioration
   GENERAL // Commentaire général
   COMPLAINT // Plainte ou problème
+}
+
+// Statut candidature bénévole
+enum VolunteerStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+// Candidatures bénévoles par édition
+model EditionVolunteerApplication {
+  id                Int             @id @default(autoincrement())
+  editionId         Int
+  userId            Int
+  status            VolunteerStatus @default(PENDING)
+  motivation        String?         @db.Text
+  createdAt         DateTime        @default(now())
+  decidedAt         DateTime?
+  // Snapshot téléphone au moment de la candidature pour conserver une trace même si l'utilisateur le change
+  userSnapshotPhone String?
+  edition           Edition         @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, userId])
+  @@index([editionId])
+  @@index([status])
 }
 
 model Feedback {
