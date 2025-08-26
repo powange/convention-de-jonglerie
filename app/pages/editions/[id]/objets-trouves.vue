@@ -175,16 +175,7 @@
             }}
           </p>
         </div>
-        <UButton
-          v-if="hasReturnedItems && !showReturned && hasEditionStarted"
-          size="xs"
-          color="gray"
-          variant="soft"
-          icon="i-heroicons-eye"
-          @click="toggleShowReturned"
-        >
-          {{ t('editions.show_returned_items') }}
-        </UButton>
+  <!-- Bouton 'Afficher les objets restitués' supprimé selon demande -->
       </div>
 
       <!-- Modal d'ajout d'objet trouvé -->
