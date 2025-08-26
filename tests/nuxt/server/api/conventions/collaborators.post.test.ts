@@ -271,4 +271,34 @@ describe('/api/conventions/[id]/collaborators POST', () => {
       })
     )
   })
+
+  it("crée une entrée d'historique CREATED via addConventionCollaborator (vérification indirecte)", async () => {
+    const requestBody = { userIdentifier: 'newuser@test.com' }
+    const mockUser = { id: 2, pseudo: 'newuser', email: 'newuser@test.com' }
+    const mockCollaborator = {
+      id: 77,
+      conventionId: 1,
+      userId: 2,
+      canEditConvention: false,
+      canDeleteConvention: false,
+      canManageCollaborators: false,
+      canAddEdition: false,
+      canEditAllEditions: false,
+      canDeleteAllEditions: false,
+      perEditionPermissions: [],
+      addedById: 1,
+      title: null,
+      user: mockUser,
+    }
+    global.readBody.mockResolvedValue(requestBody)
+    mockFindUser.mockResolvedValue(mockUser)
+    mockAddCollaborator.mockResolvedValue(mockCollaborator)
+
+    const res = await handler(mockEvent as any)
+    expect(res.success).toBe(true)
+    // Vérifie que addConventionCollaborator a reçu les champs nécessaires (l'historique est géré là-bas)
+    const callArgs = mockAddCollaborator.mock.calls[0][0]
+    expect(callArgs.conventionId).toBe(1)
+    expect(callArgs.userId).toBe(2)
+  })
 })

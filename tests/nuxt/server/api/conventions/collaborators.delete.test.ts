@@ -166,4 +166,13 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] DELETE', () => {
     expect(result.success).toBe(false)
     expect(result.message).toContain('vous supprimer vous-même')
   })
+
+  it("déclenche une entrée d'historique REMOVED (appel utilitaire simulé)", async () => {
+    // On simule simplement le retour puisque la création d'historique est interne à deleteConventionCollaborator
+    mockDeleteCollaborator.mockResolvedValue({ success: true, message: 'ok' })
+    const res = await handler(mockEvent as any)
+    expect(res.success).toBe(true)
+    // Vérifie paramétrage pour que l'utilitaire puisse créer l'historique avec targetUserId = user du collaborateur supprimé
+    expect(mockDeleteCollaborator).toHaveBeenCalledWith(1, 2, 1)
+  })
 })
