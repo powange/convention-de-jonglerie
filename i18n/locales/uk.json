@@ -306,7 +306,8 @@
     "updated_at": "Оновлено {date}",
     "saving": "Збереження...",
     "saved": "Збережено",
-    "required": "Обов'язково"
+    "required": "Обов'язково",
+    "manage": "Керувати"
   },
   "components": {
     "carpool": {
@@ -532,10 +533,8 @@
     "carpool": "Сумісні поїздки",
     "choose_photo": "Вибрати фото",
     "comment_added": "Коментар додано",
-    "creator": "Створювач",
     "describe_lost_item": "Опишіть загублений предмет...",
     "edit": "Редагувати видання",
-    "edition_creator": "Створювач видання",
     "edition_published": "Видання успішно опубліковано",
     "edition_set_offline": "Видання переведено в офлайн",
     "enlarged_image": "Збільшене зображення",
@@ -556,7 +555,6 @@
     "no_lost_items": "Немає загублених предметів",
     "no_services": "Не надаються специфічні послуги",
     "not_found": "Видання не знайдено.",
-    "of_convention": "конвенції",
     "offline_edition": "Офлайн видання",
     "offline_edition_message": "Це видання ще не видно публічно",
     "online_status": "Онлайн",
@@ -577,7 +575,6 @@
     "hide_returned_items": "Приховати повернені предмети",
     "volunteers_title": "Волонтери",
     "volunteers_open": "Відкрити",
-    "volunteers_close": "Закрити",
     "volunteers_description_label": "Опис для волонтерів",
     "volunteers_description_placeholder": "Опишіть потреби, ролі, розклади, переваги...",
     "volunteers_no_description": "Немає конкретного опису для волонтерів.",
@@ -914,12 +911,10 @@
       "manage": "Керувати",
       "manage_lost_found": "Керувати загубленими та знайденими",
       "volunteer_description": "Цей розділ дозволить вам керувати командами волонтерів для видання, призначати ролі та координувати активності.",
-  "volunteer_management": "Запит волонтерів",
+      "volunteer_management": "Запит волонтерів",
       "volunteer_description_active": "Налаштуйте тут заявки волонтерів: відкрити/закрити, опис, внутрішній режим або зовнішнє посилання."
     },
     "benevoles": {
-      "external_mode_active": "Mode externe actif : les candidatures sont gérées via un outil tiers.",
-      "url_label": "URL:",
       "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
     },
     "objets_trouves": {

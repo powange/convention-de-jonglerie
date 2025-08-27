@@ -979,7 +979,7 @@
       "actions": "Actions",
       "edit_edition": "Modifier l'édition",
       "delete_edition": "Supprimer l'édition",
-  "volunteer_management": "Demande de bénévoles",
+      "volunteer_management": "Demande de bénévoles",
       "volunteer_description": "Cette section permettra de gérer les équipes de bénévoles pour l'édition, attribuer des rôles et coordonner les activités.",
       "volunteer_description_active": "Configurez ici les candidatures bénévoles : ouverture/fermeture, description, mode interne ou lien externe.",
       "manage": "Gérer",

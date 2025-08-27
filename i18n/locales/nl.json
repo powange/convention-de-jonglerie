@@ -306,7 +306,8 @@
     "updated_at": "Bijgewerkt op {date}",
     "saving": "Opslaan...",
     "saved": "Opgeslagen",
-    "required": "Vereist"
+    "required": "Vereist",
+    "manage": "Beheren"
   },
   "components": {
     "carpool": {
@@ -532,10 +533,8 @@
     "carpool": "Meerijden",
     "choose_photo": "Foto kiezen",
     "comment_added": "Opmerking toegevoegd",
-    "creator": "Maker",
     "describe_lost_item": "Beschrijf het verloren voorwerp...",
     "edit": "Editie bewerken",
-    "edition_creator": "Editiemaker",
     "edition_published": "Editie succesvol gepubliceerd",
     "edition_set_offline": "Editie offline gezet",
     "enlarged_image": "Vergroot beeld",
@@ -556,7 +555,6 @@
     "no_lost_items": "Geen verloren voorwerpen",
     "no_services": "Geen specifieke diensten verstrekt",
     "not_found": "Editie niet gevonden.",
-    "of_convention": "van de conventie",
     "offline_edition": "Offline editie",
     "offline_edition_message": "Deze editie is nog niet publiekelijk zichtbaar",
     "online_status": "Online",
@@ -577,7 +575,6 @@
     "hide_returned_items": "Verberg geretourneerde items",
     "volunteers_title": "Vrijwilligers",
     "volunteers_open": "Open",
-    "volunteers_close": "Sluiten",
     "volunteers_description_label": "Beschrijving voor vrijwilligers",
     "volunteers_description_placeholder": "Beschrijf behoeften, rollen, schema's, voordelen...",
     "volunteers_no_description": "Geen specifieke beschrijving voor vrijwilligers.",
@@ -914,12 +911,10 @@
       "manage": "Beheren",
       "manage_lost_found": "Gevonden voorwerpen beheren",
       "volunteer_description": "Deze sectie stelt je in staat om vrijwilligersteams voor de editie te beheren, rollen toe te wijzen en activiteiten te coördineren.",
-  "volunteer_management": "Vrijwilligersaanvraag",
+      "volunteer_management": "Vrijwilligersaanvraag",
       "volunteer_description_active": "Configureer hier de vrijwilligersaanmeldingen: open/sluit, beschrijving, interne modus of externe link."
     },
     "benevoles": {
-      "external_mode_active": "Mode externe actif : les candidatures sont gérées via un outil tiers.",
-      "url_label": "URL:",
       "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
     },
     "objets_trouves": {

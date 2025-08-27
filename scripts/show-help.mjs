@@ -47,9 +47,7 @@ const sections = [
     { name: 'check-i18n -- -h', desc: 'Aide détaillée' },
     { name: 'check-translations', desc: 'Compare les traductions entre locales' },
     { name: 'check-translations -- -l es', desc: 'Limité à une locale' },
-    { name: 'check-translations -- -s', desc: 'Résumé uniquement' },
-    { name: 'normalize-locales', desc: 'Normalise ordre & structure' },
-    { name: 'prune-i18n', desc: 'Supprime les clés inutilisées' }
+    { name: 'check-translations -- -s', desc: 'Résumé uniquement' }
   ] },
   { title: '🧹 Qualité & formatage', color: colors.yellow, scripts: [
     { name: 'lint', desc: 'Analyse lint complète' },

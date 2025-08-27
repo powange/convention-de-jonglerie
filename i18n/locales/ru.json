@@ -306,7 +306,8 @@
     "updated_at": "Обновлено {date}",
     "saving": "Сохранение...",
     "saved": "Сохранено",
-    "required": "Обязательно"
+    "required": "Обязательно",
+    "manage": "Управлять"
   },
   "components": {
     "carpool": {
@@ -532,10 +533,8 @@
     "carpool": "Совместные поездки",
     "choose_photo": "Выбрать фото",
     "comment_added": "Комментарий добавлен",
-    "creator": "Создатель",
     "describe_lost_item": "Опишите потерянную вещь...",
     "edit": "Редактировать издание",
-    "edition_creator": "Создатель издания",
     "edition_published": "Издание успешно опубликовано",
     "edition_set_offline": "Издание переведено в офлайн",
     "enlarged_image": "Увеличенное изображение",
@@ -556,7 +555,6 @@
     "no_lost_items": "Нет потерянных вещей",
     "no_services": "Нет конкретных услуг",
     "not_found": "Издание не найдено.",
-    "of_convention": "конвенции",
     "offline_edition": "Офлайн издание",
     "offline_edition_message": "Это издание еще не видно публично",
     "online_status": "В сети",
@@ -577,7 +575,6 @@
     "hide_returned_items": "Скрыть возвращенные предметы",
     "volunteers_title": "Волонтёры",
     "volunteers_open": "Открыть",
-    "volunteers_close": "Закрыть",
     "volunteers_description_label": "Описание для волонтёров",
     "volunteers_description_placeholder": "Опишите потребности, роли, расписания, преимущества...",
     "volunteers_no_description": "Нет конкретного описания для волонтёров.",
@@ -914,12 +911,10 @@
       "manage": "Управлять",
       "manage_lost_found": "Управлять потерянными вещами",
       "volunteer_description": "Этот раздел позволит вам управлять командами волонтеров для издания, назначать роли и координировать активности.",
-  "volunteer_management": "Запрос волонтеров",
+      "volunteer_management": "Запрос волонтеров",
       "volunteer_description_active": "Настройте здесь заявки волонтёров: открыть/закрыть, описание, внутренний режим или внешняя ссылка."
     },
     "benevoles": {
-      "external_mode_active": "Mode externe actif : les candidatures sont gérées via un outil tiers.",
-      "url_label": "URL:",
       "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
     },
     "objets_trouves": {

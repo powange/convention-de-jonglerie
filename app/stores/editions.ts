@@ -63,8 +63,8 @@ export const useEditionStore = defineStore('editions', {
       limit: 12,
       totalPages: 0,
     },
-  // Promesses en cours pour éviter les requêtes doublons simultanées
-  _pendingEditionFetches: {} as Record<number, Promise<Edition> | undefined>,
+    // Promesses en cours pour éviter les requêtes doublons simultanées
+    _pendingEditionFetches: {} as Record<number, Promise<Edition> | undefined>,
   }),
   getters: {
     getEditionById: (state) => (id: number) => {
@@ -132,7 +132,7 @@ export const useEditionStore = defineStore('editions', {
           Object.keys(filters).forEach((key) => {
             if (key.startsWith('has') || key === 'acceptsPets') {
               if ((filters as Record<string, any>)[key] === true) {
-                (queryParams as Record<string, any>)[key] = 'true'
+                ;(queryParams as Record<string, any>)[key] = 'true'
               }
             }
           })
@@ -267,12 +267,12 @@ export const useEditionStore = defineStore('editions', {
 
       try {
         // Appel API en arrière-plan
-  await $fetch(`/api/editions/${id}/favorite`, {
+        await $fetch(`/api/editions/${id}/favorite`, {
           method: 'POST',
         })
 
         // Mettre à jour avec la réponse du serveur si nécessaire
-  // Réponse minimaliste attendue { message, isFavorited }; on laisse l'état optimiste
+        // Réponse minimaliste attendue { message, isFavorited }; on laisse l'état optimiste
       } catch (e: unknown) {
         // En cas d'erreur, annuler l'optimistic update
         if (editionIndex !== -1 && currentUser) {
@@ -323,8 +323,8 @@ export const useEditionStore = defineStore('editions', {
         const editionIndex = this.editions.findIndex((c) => c.id === editionId)
         if (editionIndex !== -1) {
           const ed = this.editions[editionIndex]
-            ;(ed as any).collaborators = (ed as any).collaborators || []
-            ;(ed as any).collaborators.push(collaborator as any)
+          ;(ed as any).collaborators = (ed as any).collaborators || []
+          ;(ed as any).collaborators.push(collaborator as any)
         }
 
         return collaborator

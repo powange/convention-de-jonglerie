@@ -43,7 +43,9 @@
 
         <!-- Mode EXTERNAL: bouton accessible à tous -->
         <div
-          v-if="volunteersMode === 'EXTERNAL' && volunteersInfo?.open && volunteersInfo?.externalUrl"
+          v-if="
+            volunteersMode === 'EXTERNAL' && volunteersInfo?.open && volunteersInfo?.externalUrl
+          "
           class="flex items-center gap-3"
         >
           <UButton
@@ -55,7 +57,9 @@
           >
             {{ t('editions.volunteers_apply') }}
           </UButton>
-          <span class="text-xs text-gray-500 truncate max-w-full">{{ volunteersInfo.externalUrl }}</span>
+          <span class="text-xs text-gray-500 truncate max-w-full">{{
+            volunteersInfo.externalUrl
+          }}</span>
         </div>
 
         <!-- Candidature utilisateur (déplacé juste après description) -->
@@ -65,61 +69,61 @@
           </div>
           <div v-else>
             <template v-if="volunteersInfo?.myApplication">
-                <div class="space-y-2">
-                  <h4 class="text-sm font-semibold flex items-center gap-1">
-                    <UIcon name="i-heroicons-user" class="text-primary-500" />
-                    {{ t('editions.volunteers_my_application_title') }}
-                  </h4>
-                  <div class="flex flex-wrap items-center gap-3 text-sm">
-                    <UBadge
-                      :color="volunteerStatusColor(volunteersInfo.myApplication.status)"
-                      variant="soft"
-                    >
-                      {{ volunteerStatusLabel(volunteersInfo.myApplication.status) }}
-                    </UBadge>
-                    <span
-                      v-if="volunteersInfo.myApplication.status === 'PENDING'"
-                      class="text-xs text-gray-600 dark:text-gray-400"
-                    >
-                      {{ t('editions.volunteers_my_application_pending') }}
-                    </span>
-                    <span
-                      v-else-if="volunteersInfo.myApplication.status === 'ACCEPTED'"
-                      class="text-xs text-gray-600 dark:text-gray-400"
-                    >
-                      {{ t('editions.volunteers_my_application_accepted') }}
-                    </span>
-                    <span
-                      v-else-if="volunteersInfo.myApplication.status === 'REJECTED'"
-                      class="text-xs text-gray-600 dark:text-gray-400"
-                    >
-                      {{ t('editions.volunteers_my_application_rejected') }}
-                    </span>
-                    <UButton
-                      v-if="volunteersInfo.myApplication.status === 'PENDING'"
-                      size="xs"
-                      color="error"
-                      variant="soft"
-                      :loading="volunteersWithdrawing"
-                      @click="withdrawApplication"
-                    >
-                      {{ t('editions.volunteers_withdraw') }}
-                    </UButton>
-                  </div>
-                </div>
-              </template>
-              <template v-else>
-                <div>
-                  <UButton
-                    size="sm"
-                    color="primary"
-                    icon="i-heroicons-hand-raised"
-                    @click="openApplyModal"
+              <div class="space-y-2">
+                <h4 class="text-sm font-semibold flex items-center gap-1">
+                  <UIcon name="i-heroicons-user" class="text-primary-500" />
+                  {{ t('editions.volunteers_my_application_title') }}
+                </h4>
+                <div class="flex flex-wrap items-center gap-3 text-sm">
+                  <UBadge
+                    :color="volunteerStatusColor(volunteersInfo.myApplication.status)"
+                    variant="soft"
                   >
-                    {{ t('editions.volunteers_apply') }}
+                    {{ volunteerStatusLabel(volunteersInfo.myApplication.status) }}
+                  </UBadge>
+                  <span
+                    v-if="volunteersInfo.myApplication.status === 'PENDING'"
+                    class="text-xs text-gray-600 dark:text-gray-400"
+                  >
+                    {{ t('editions.volunteers_my_application_pending') }}
+                  </span>
+                  <span
+                    v-else-if="volunteersInfo.myApplication.status === 'ACCEPTED'"
+                    class="text-xs text-gray-600 dark:text-gray-400"
+                  >
+                    {{ t('editions.volunteers_my_application_accepted') }}
+                  </span>
+                  <span
+                    v-else-if="volunteersInfo.myApplication.status === 'REJECTED'"
+                    class="text-xs text-gray-600 dark:text-gray-400"
+                  >
+                    {{ t('editions.volunteers_my_application_rejected') }}
+                  </span>
+                  <UButton
+                    v-if="volunteersInfo.myApplication.status === 'PENDING'"
+                    size="xs"
+                    color="error"
+                    variant="soft"
+                    :loading="volunteersWithdrawing"
+                    @click="withdrawApplication"
+                  >
+                    {{ t('editions.volunteers_withdraw') }}
                   </UButton>
                 </div>
-              </template>
+              </div>
+            </template>
+            <template v-else>
+              <div>
+                <UButton
+                  size="sm"
+                  color="primary"
+                  icon="i-heroicons-hand-raised"
+                  @click="openApplyModal"
+                >
+                  {{ t('editions.volunteers_apply') }}
+                </UButton>
+              </div>
+            </template>
           </div>
         </div>
         <div

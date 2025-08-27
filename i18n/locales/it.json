@@ -306,7 +306,8 @@
     "updated_at": "Aggiornato il {date}",
     "saving": "Salvataggio...",
     "saved": "Salvato",
-    "required": "Richiesto"
+    "required": "Richiesto",
+    "manage": "Gestire"
   },
   "components": {
     "carpool": {
@@ -532,10 +533,8 @@
     "carpool": "Condivisione auto",
     "choose_photo": "Scegli una foto",
     "comment_added": "Commento aggiunto",
-    "creator": "Creatore",
     "describe_lost_item": "Descrivi l'oggetto smarrito...",
     "edit": "Modifica l'edizione",
-    "edition_creator": "Creatore dell'edizione",
     "edition_published": "Edizione pubblicata con successo",
     "edition_set_offline": "Edizione messa offline",
     "enlarged_image": "Immagine ingrandita",
@@ -556,7 +555,6 @@
     "no_lost_items": "Nessun oggetto smarrito",
     "no_services": "Nessun servizio specifico indicato",
     "not_found": "Edizione non trovata.",
-    "of_convention": "del convegno",
     "offline_edition": "Edizione offline",
     "offline_edition_message": "Questa edizione non è ancora visibile pubblicamente",
     "online_status": "Online",
@@ -577,7 +575,6 @@
     "hide_returned_items": "Nascondi oggetti restituiti",
     "volunteers_title": "Volontari",
     "volunteers_open": "Apri",
-    "volunteers_close": "Chiudi",
     "volunteers_description_label": "Descrizione per volontari",
     "volunteers_description_placeholder": "Descrivi bisogni, ruoli, orari, benefici...",
     "volunteers_no_description": "Nessuna descrizione specifica per volontari.",
@@ -914,12 +911,10 @@
       "manage": "Gestisci",
       "manage_lost_found": "Gestisci oggetti smarriti",
       "volunteer_description": "Questa sezione permetterà di gestire i team di volontari per l'edizione, assegnare ruoli e coordinare le attività.",
-  "volunteer_management": "Richiesta volontari",
+      "volunteer_management": "Richiesta volontari",
       "volunteer_description_active": "Configura qui le candidature dei volontari: apri/chiudi, descrizione, modalità interna o link esterno."
     },
     "benevoles": {
-      "external_mode_active": "Mode externe actif : les candidatures sont gérées via un outil tiers.",
-      "url_label": "URL:",
       "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
     },
     "objets_trouves": {

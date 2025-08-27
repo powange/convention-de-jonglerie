@@ -306,7 +306,8 @@
     "updated_at": "Aktualisiert am {date}",
     "saving": "Speichern...",
     "saved": "Gespeichert",
-    "required": "Erforderlich"
+    "required": "Erforderlich",
+    "manage": "Verwalten"
   },
   "components": {
     "carpool": {
@@ -532,10 +533,8 @@
     "carpool": "Fahrgemeinschaft",
     "choose_photo": "Foto auswählen",
     "comment_added": "Kommentar hinzugefügt",
-    "creator": "Ersteller",
     "describe_lost_item": "Beschreibe die gefundene Sache...",
     "edit": "Auflage bearbeiten",
-    "edition_creator": "Ersteller der Auflage",
     "edition_published": "Edition erfolgreich veröffentlicht",
     "edition_set_offline": "Edition offline gesetzt",
     "enlarged_image": "Vergrößertes Bild",
@@ -556,7 +555,6 @@
     "no_lost_items": "Keine Fundsachen",
     "no_services": "Keine spezifischen Services angegeben",
     "not_found": "Auflage nicht gefunden.",
-    "of_convention": "der Convention",
     "offline_edition": "Offline-Edition",
     "offline_edition_message": "Diese Edition ist noch nicht öffentlich sichtbar",
     "online_status": "Online",
@@ -577,7 +575,6 @@
     "hide_returned_items": "Zurückgegebene Artikel ausblenden",
     "volunteers_title": "Freiwillige",
     "volunteers_open": "Öffnen",
-    "volunteers_close": "Schließen",
     "volunteers_description_label": "Beschreibung für Freiwillige",
     "volunteers_description_placeholder": "Beschreiben Sie Bedürfnisse, Rollen, Zeitpläne, Vorteile...",
     "volunteers_no_description": "Keine spezifische Beschreibung für Freiwillige.",
@@ -914,12 +911,10 @@
       "manage": "Verwalten",
       "manage_lost_found": "Fundsachen verwalten",
       "volunteer_description": "Dieser Bereich ermöglicht es, die Freiwilligen-Teams für die Auflage zu verwalten, Rollen zuzuweisen und Aktivitäten zu koordinieren.",
-  "volunteer_management": "Freiwilligenanfrage",
+      "volunteer_management": "Freiwilligenanfrage",
       "volunteer_description_active": "Konfigurieren Sie hier die Freiwilligenbewerbungen: öffnen/schließen, Beschreibung, interner Modus oder externer Link."
     },
     "benevoles": {
-      "external_mode_active": "Mode externe actif : les candidatures sont gérées via un outil tiers.",
-      "url_label": "URL:",
       "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
     },
     "objets_trouves": {

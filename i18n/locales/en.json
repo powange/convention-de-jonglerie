@@ -201,7 +201,8 @@
     "updated_at": "Updated on {date}",
     "saving": "Saving...",
     "saved": "Saved",
-    "required": "Required"
+    "required": "Required",
+    "manage": "Manage"
   },
   "volunteersInfo": {
     "externalUrl": "External URL"
@@ -350,15 +351,11 @@
     "no_description_available": "No description available",
     "practical_info": "Practical information",
     "organizing_team": "Organizing team",
-    "creator": "Creator",
-    "edition_creator": "Edition creator",
-    "of_convention": "of the convention",
     "enlarged_image": "Enlarged image",
     "poster_of": "Poster of {name}",
     "length": "Length",
     "volunteers_title": "Volunteers",
     "volunteers_open": "Open",
-    "volunteers_close": "Close",
     "volunteers_description_label": "Description for volunteers",
     "volunteers_description_placeholder": "Describe needs, roles, schedules, benefits...",
     "volunteers_no_description": "No specific description for volunteers.",
@@ -869,7 +866,7 @@
       "edit_edition": "Edit edition",
       "volunteer_description_active": "Configure volunteer applications here: open/close, description, internal mode or external link.",
       "delete_edition": "Delete edition",
-  "volunteer_management": "Volunteer call",
+      "volunteer_management": "Volunteer call",
       "volunteer_description": "This section will allow you to manage volunteer teams for the edition, assign roles and coordinate activities.",
       "manage": "Manage",
       "manage_lost_found": "Manage lost & found",
@@ -891,8 +888,6 @@
       "submit_button": "Update convention"
     },
     "benevoles": {
-      "external_mode_active": "External mode active: applications are managed via a third-party tool.",
-      "url_label": "URL:",
       "sort_tip": "Sort: click on headers (Shift+click for multi)"
     },
     "objets_trouves": {

@@ -329,7 +329,7 @@ const remainingVolunteerDescriptionChars = computed(
 onMounted(async () => {
   if (!edition.value) {
     try {
-  await editionStore.fetchEditionById(editionId, { force: true })
+      await editionStore.fetchEditionById(editionId, { force: true })
     } catch (error) {
       console.error('Failed to fetch edition:', error)
     }
@@ -410,7 +410,7 @@ const persistVolunteerSettings = async () => {
     if (res?.settings) {
       volunteersUpdatedAt.value = new Date()
       volunteersDescriptionOriginal.value = volunteersDescriptionLocal.value
-  await editionStore.fetchEditionById(editionId, { force: true })
+      await editionStore.fetchEditionById(editionId, { force: true })
       toast.add({
         title: t('common.saved') || 'Sauvegardé',
         color: 'success',

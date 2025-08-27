@@ -37,16 +37,9 @@
       "Bash(npm ls:*)",
       "Bash(npx prisma generate:*)",
       "Bash(chmod:*)",
-      "Bash(./scripts/fix-prisma-mock-imports.sh:*)",
-      "Bash(./scripts/fix-all-mock-paths.sh:*)",
-      "Bash(./scripts/final-mock-check.sh:*)",
-      "Bash(./scripts/fix-dynamic-route-imports.sh:*)",
-      "Bash(./scripts/cleanup-alias-paths.sh:*)",
-      "Bash(./scripts/fix-utils-imports.sh:*)",
-      "Bash(./scripts/fix-remaining-invalid-aliases.sh:*)",
-      "Bash(./scripts/fix-remaining-utils-imports.sh:*)",
+      
       "Bash(echo:*)",
-      "Bash(/home/pcomble/projets/convention-de-jonglerie/scripts/add-color-mode-translations.sh)",
+      
       "Bash(cat:*)",
       "Bash(for lang in it nl pl pt ru uk da)",
       "Bash(do tail -10 i18n/locales/$lang.json)",

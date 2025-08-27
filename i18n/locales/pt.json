@@ -306,7 +306,8 @@
     "updated_at": "Atualizado em {date}",
     "saving": "Salvando...",
     "saved": "Salvo",
-    "required": "Obrigatório"
+    "required": "Obrigatório",
+    "manage": "Gerir"
   },
   "components": {
     "carpool": {
@@ -532,10 +533,8 @@
     "carpool": "Boleia",
     "choose_photo": "Escolher uma foto",
     "comment_added": "Comentário adicionado",
-    "creator": "Criador",
     "describe_lost_item": "Descreva o objecto encontrado...",
     "edit": "Editar a edição",
-    "edition_creator": "Criador da edição",
     "edition_published": "Edição publicada com sucesso",
     "edition_set_offline": "Edição colocada offline",
     "enlarged_image": "Imagem ampliada",
@@ -556,7 +555,6 @@
     "no_lost_items": "Nenhum objecto encontrado",
     "no_services": "Nenhum serviço específico indicado",
     "not_found": "Edição não encontrada.",
-    "of_convention": "da convenção",
     "offline_edition": "Edição offline",
     "offline_edition_message": "Esta edição ainda não está visível publicamente",
     "online_status": "Online",
@@ -577,7 +575,6 @@
     "hide_returned_items": "Ocultar itens devolvidos",
     "volunteers_title": "Voluntários",
     "volunteers_open": "Abrir",
-    "volunteers_close": "Fechar",
     "volunteers_description_label": "Descrição para voluntários",
     "volunteers_description_placeholder": "Descreva necessidades, funções, horários, benefícios...",
     "volunteers_no_description": "Sem descrição específica para voluntários.",
@@ -914,12 +911,10 @@
       "manage": "Gerir",
       "manage_lost_found": "Gerir objectos perdidos",
       "volunteer_description": "Esta secção permitirá gerir as equipas de voluntários para a edição, atribuir funções e coordenar actividades.",
-  "volunteer_management": "Pedido de voluntários",
+      "volunteer_management": "Pedido de voluntários",
       "volunteer_description_active": "Configure aqui as inscrições de voluntários: abrir/fechar, descrição, modo interno ou link externo."
     },
     "benevoles": {
-      "external_mode_active": "Mode externe actif : les candidatures sont gérées via un outil tiers.",
-      "url_label": "URL:",
       "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
     },
     "objets_trouves": {

@@ -306,7 +306,8 @@
     "updated_at": "Opdateret den {date}",
     "saving": "Gemmer...",
     "saved": "Gemt",
-    "required": "Påkrævet"
+    "required": "Påkrævet",
+    "manage": "Administrer"
   },
   "components": {
     "carpool": {
@@ -532,10 +533,8 @@
     "carpool": "Samkørsel",
     "choose_photo": "Vælg et foto",
     "comment_added": "Kommentar tilføjet",
-    "creator": "Skaber",
     "describe_lost_item": "Beskriv den fundne genstand...",
     "edit": "Rediger udgaven",
-    "edition_creator": "Udgavens skaber",
     "edition_published": "Udgave publiceret med succes",
     "edition_set_offline": "Udgave sat offline",
     "enlarged_image": "Forstørret billede",
@@ -556,7 +555,6 @@
     "no_lost_items": "Intet hittegods",
     "no_services": "Ingen specifikke tjenester angivet",
     "not_found": "Udgave ikke fundet.",
-    "of_convention": "af konventionen",
     "offline_edition": "Offline udgave",
     "offline_edition_message": "Denne udgave er endnu ikke offentligt synlig",
     "online_status": "Online",
@@ -577,7 +575,6 @@
     "hide_returned_items": "Skjul returnerede genstande",
     "volunteers_title": "Frivillige",
     "volunteers_open": "Åben",
-    "volunteers_close": "Luk",
     "volunteers_description_label": "Beskrivelse for frivillige",
     "volunteers_description_placeholder": "Beskriv behov, roller, tidsplaner, fordele...",
     "volunteers_no_description": "Ingen specifik beskrivelse for frivillige.",
@@ -914,12 +911,10 @@
       "manage": "Administrer",
       "manage_lost_found": "Administrer hittegods",
       "volunteer_description": "Dette afsnit vil gøre det muligt at administrere frivilligteams for udgaven, tildele roller og koordinere aktiviteter.",
-  "volunteer_management": "Frivilligansøgning",
+      "volunteer_management": "Frivilligansøgning",
       "volunteer_description_active": "Konfigurer frivillige ansøgninger her: åbn/luk, beskrivelse, intern tilstand eller eksternt link."
     },
     "benevoles": {
-      "external_mode_active": "Mode externe actif : les candidatures sont gérées via un outil tiers.",
-      "url_label": "URL:",
       "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
     },
     "objets_trouves": {
