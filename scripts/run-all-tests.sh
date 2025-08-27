@@ -33,7 +33,7 @@ echo ""
 echo "==================================="
 echo "    3. Tests avec base de données  "
 echo "==================================="
-# Exécuter les tests DB (script unifié)
+# Script d'intégration unique (gère la présence/absence de Docker)
 TEST_WITH_DB=true npm run test:db:run
 echo ""
 
