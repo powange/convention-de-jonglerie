@@ -201,8 +201,7 @@
     "updated_at": "Updated on {date}",
     "saving": "Saving...",
     "saved": "Saved",
-    "required": "Required",
-    "manage": "Manage"
+    "required": "Required"
   },
   "volunteersInfo": {
     "externalUrl": "External URL"

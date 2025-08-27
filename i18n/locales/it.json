@@ -306,8 +306,7 @@
     "updated_at": "Aggiornato il {date}",
     "saving": "Salvataggio...",
     "saved": "Salvato",
-    "required": "Richiesto",
-    "manage": "Gestire"
+    "required": "Richiesto"
   },
   "components": {
     "carpool": {

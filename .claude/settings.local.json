@@ -37,9 +37,9 @@
       "Bash(npm ls:*)",
       "Bash(npx prisma generate:*)",
       "Bash(chmod:*)",
-      
+
       "Bash(echo:*)",
-      
+
       "Bash(cat:*)",
       "Bash(for lang in it nl pl pt ru uk da)",
       "Bash(do tail -10 i18n/locales/$lang.json)",

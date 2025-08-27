@@ -306,8 +306,7 @@
     "updated_at": "Bijgewerkt op {date}",
     "saving": "Opslaan...",
     "saved": "Opgeslagen",
-    "required": "Vereist",
-    "manage": "Beheren"
+    "required": "Vereist"
   },
   "components": {
     "carpool": {

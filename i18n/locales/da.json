@@ -306,8 +306,7 @@
     "updated_at": "Opdateret den {date}",
     "saving": "Gemmer...",
     "saved": "Gemt",
-    "required": "Påkrævet",
-    "manage": "Administrer"
+    "required": "Påkrævet"
   },
   "components": {
     "carpool": {

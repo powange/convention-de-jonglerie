@@ -306,8 +306,7 @@
     "updated_at": "Zaktualizowano {date}",
     "saving": "Zapisywanie...",
     "saved": "Zapisano",
-    "required": "Wymagane",
-    "manage": "Zarządzaj"
+    "required": "Wymagane"
   },
   "components": {
     "carpool": {

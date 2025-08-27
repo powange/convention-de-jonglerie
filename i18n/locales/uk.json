@@ -306,8 +306,7 @@
     "updated_at": "Оновлено {date}",
     "saving": "Збереження...",
     "saved": "Збережено",
-    "required": "Обов'язково",
-    "manage": "Керувати"
+    "required": "Обов'язково"
   },
   "components": {
     "carpool": {
