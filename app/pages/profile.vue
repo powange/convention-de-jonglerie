@@ -76,53 +76,81 @@
           </div>
         </template>
 
-        <UForm :state="state" :schema="schema" class="space-y-6" @submit="updateProfile">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <UFormField :label="t('auth.first_name')" name="prenom" class="md:col-span-1">
+        <UForm :state="state" :schema="schema" class="space-y-10" @submit="updateProfile">
+          <div class="space-y-6">
+            <UFormField
+              :label="t('auth.username')"
+              name="pseudo"
+              :hint="t('profile.username_hint')"
+            >
               <UInput
-                v-model="state.prenom"
-                icon="i-heroicons-user"
+                v-model="state.pseudo"
+                icon="i-heroicons-at-symbol"
                 required
-                :placeholder="t('profile.first_name_placeholder')"
+                :placeholder="t('profile.username_placeholder')"
                 size="lg"
                 class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
               />
             </UFormField>
 
-            <UFormField :label="t('auth.last_name')" name="nom" class="md:col-span-1">
+            <UFormField :label="t('common.email')" name="email">
               <UInput
-                v-model="state.nom"
-                icon="i-heroicons-user"
+                v-model="state.email"
+                type="email"
+                icon="i-heroicons-envelope"
                 required
-                :placeholder="t('profile.last_name_placeholder')"
+                placeholder="votre.email@example.com"
                 size="lg"
                 class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
               />
             </UFormField>
           </div>
 
-          <UFormField :label="t('auth.username')" name="pseudo" :hint="t('profile.username_hint')">
-            <UInput
-              v-model="state.pseudo"
-              icon="i-heroicons-at-symbol"
-              required
-              :placeholder="t('profile.username_placeholder')"
-              size="lg"
-              class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
-            />
-          </UFormField>
+          <!-- Section champs facultatifs -->
+          <div
+            class="border border-gray-100 dark:border-gray-700 rounded-xl p-5 space-y-6 bg-gray-50/50 dark:bg-gray-800/30"
+          >
+            <div class="flex items-center gap-2 mb-2">
+              <UIcon name="i-heroicons-adjustments-horizontal" class="w-5 h-5 text-gray-500" />
+              <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {{ t('profile.optional_section_title') }}
+              </h3>
+              <UBadge variant="soft" color="neutral" size="xs">{{ t('profile.optional') }}</UBadge>
+            </div>
 
-          <UFormField :label="t('common.email')" name="email">
-            <UInput
-              v-model="state.email"
-              type="email"
-              icon="i-heroicons-envelope"
-              required
-              placeholder="votre.email@example.com"
-              size="lg"
-              class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
-            />
-          </UFormField>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <UFormField :label="t('auth.first_name')" name="prenom">
+                <UInput
+                  v-model="state.prenom"
+                  icon="i-heroicons-user"
+                  :placeholder="t('profile.first_name_placeholder')"
+                  size="lg"
+                  class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+                />
+              </UFormField>
+
+              <UFormField :label="t('auth.last_name')" name="nom">
+                <UInput
+                  v-model="state.nom"
+                  icon="i-heroicons-user"
+                  :placeholder="t('profile.last_name_placeholder')"
+                  size="lg"
+                  class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+                />
+              </UFormField>
+            </div>
+
+            <UFormField :label="t('profile.phone')" name="telephone">
+              <UInput
+                v-model="state.telephone"
+                icon="i-heroicons-phone"
+                type="tel"
+                :placeholder="t('profile.phone_placeholder')"
+                size="lg"
+                class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+              />
+            </UFormField>
+          </div>
 
           <!-- Actions avec indicateur de modifications -->
           <div class="border-t border-gray-100 dark:border-gray-700 pt-6">
@@ -411,7 +439,7 @@
                 </div>
               </div>
               <UBadge
-                :color="authStore.isAdminModeActive ? 'warning' : 'gray'"
+                :color="authStore.isAdminModeActive ? 'warning' : 'neutral'"
                 variant="soft"
                 size="lg"
               >
@@ -605,11 +633,10 @@
                   allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
                   allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
                 },
-                autoUpload: true,
                 resetAfterUpload: false,
               }"
-              alt="Photo de profil"
-              placeholder="Cliquez pour changer votre photo de profil"
+              :alt="$t('pages.profile.photo_alt')"
+              :placeholder="$t('pages.profile.photo_placeholder')"
               :allow-delete="!!authStore.user?.profilePicture"
               @uploaded="onProfilePictureUploaded"
               @deleted="onProfilePictureDeleted"
@@ -684,8 +711,12 @@ const adminModeToggle = ref(authStore.isAdminModeActive)
 const schema = z.object({
   email: z.string().email(t('errors.invalid_email')),
   pseudo: z.string().min(3, t('profile.username_min_3')),
-  nom: z.string().min(1, t('profile.last_name_required')),
-  prenom: z.string().min(1, t('profile.first_name_required')),
+  nom: z.string().optional(),
+  prenom: z.string().optional(),
+  telephone: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^\+?[0-9\s\-()]+$/.test(val), t('errors.invalid_phone_number')),
 })
 
 // Schéma pour le changement de mot de passe
@@ -708,8 +739,9 @@ const passwordSchema = z
 const state = reactive({
   email: authStore.user?.email || '',
   pseudo: authStore.user?.pseudo || '',
-  nom: authStore.user?.nom || '',
-  prenom: authStore.user?.prenom || '',
+  nom: (authStore.user as any)?.nom || '',
+  prenom: (authStore.user as any)?.prenom || '',
+  telephone: (authStore.user as any)?.telephone || (authStore.user as any)?.phone || '',
 })
 
 // État du formulaire de mot de passe
@@ -724,8 +756,9 @@ const hasChanges = computed(() => {
   return (
     state.email !== (authStore.user?.email || '') ||
     state.pseudo !== (authStore.user?.pseudo || '') ||
-    state.nom !== (authStore.user?.nom || '') ||
-    state.prenom !== (authStore.user?.prenom || '')
+    state.nom !== ((authStore.user as any)?.nom || '') ||
+    state.prenom !== ((authStore.user as any)?.prenom || '') ||
+    state.telephone !== ((authStore.user as any)?.telephone || (authStore.user as any)?.phone || '')
   )
 })
 
@@ -749,8 +782,9 @@ const totalFavoritesReceived = computed(() => {
 const resetForm = () => {
   state.email = authStore.user?.email || ''
   state.pseudo = authStore.user?.pseudo || ''
-  state.nom = authStore.user?.nom || ''
-  state.prenom = authStore.user?.prenom || ''
+  state.nom = (authStore.user as any)?.nom || ''
+  state.prenom = (authStore.user as any)?.prenom || ''
+  state.telephone = (authStore.user as any)?.telephone || (authStore.user as any)?.phone || ''
 }
 
 const updateProfile = async () => {
@@ -763,13 +797,14 @@ const updateProfile = async () => {
       body: {
         email: state.email,
         pseudo: state.pseudo,
-        nom: state.nom,
-        prenom: state.prenom,
+        nom: state.nom || undefined,
+        prenom: state.prenom || undefined,
+        telephone: state.telephone || undefined,
       },
     })
 
     // Mettre à jour les données utilisateur dans le store
-    authStore.updateUser(updatedUser)
+    authStore.updateUser({ ...authStore.user!, ...updatedUser })
 
     toast.add({
       title: t('profile.profile_updated'),
@@ -846,7 +881,7 @@ const onProfilePictureUploaded = (result: { success: boolean; imageUrl?: string;
       title: t('profile.photo_updated'),
       description: t('profile.profile_picture_changed'),
       icon: 'i-heroicons-check-circle',
-      color: 'green',
+      color: 'success',
     })
   }
 }
@@ -869,7 +904,7 @@ const onProfilePictureDeleted = () => {
     title: t('profile.photo_deleted'),
     description: t('profile.profile_picture_deleted'),
     icon: 'i-heroicons-check-circle',
-    color: 'green',
+    color: 'success',
   })
 }
 

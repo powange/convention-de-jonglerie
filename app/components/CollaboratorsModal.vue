@@ -205,7 +205,7 @@ watch(
       creationDraft.perEdition = []
       creationDraft.title = null
       userItems.value = []
-  showAddSection.value = false
+      showAddSection.value = false
     }
   }
 )

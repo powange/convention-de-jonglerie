@@ -57,10 +57,10 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId]/rights PATCH', ()
     const res = await handler(baseEvent as any)
     expect(res.success).toBe(true)
     expect(prismaMock.conventionCollaborator.update).toHaveBeenCalled()
-  expect(prismaMock.collaboratorPermissionHistory.create).toHaveBeenCalled()
-  const args = prismaMock.collaboratorPermissionHistory.create.mock.calls[0][0]
-  expect(args.data.actorId).toBe(42)
-  expect(args.data.targetUserId).toBe(existingCollaborator.userId)
+    expect(prismaMock.collaboratorPermissionHistory.create).toHaveBeenCalled()
+    const args = prismaMock.collaboratorPermissionHistory.create.mock.calls[0][0]
+    expect(args.data.actorId).toBe(42)
+    expect(args.data.targetUserId).toBe(existingCollaborator.userId)
     expect(res.collaborator.rights.editConvention).toBe(true)
   })
 
@@ -86,9 +86,9 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId]/rights PATCH', ()
     expect(prismaMock.collaboratorPermissionHistory.create.mock.calls[0][0].data.changeType).toBe(
       'PER_EDITIONS_UPDATED'
     )
-  const args = prismaMock.collaboratorPermissionHistory.create.mock.calls[0][0]
-  expect(args.data.actorId).toBe(42)
-  expect(args.data.targetUserId).toBe(existingCollaborator.userId)
+    const args = prismaMock.collaboratorPermissionHistory.create.mock.calls[0][0]
+    expect(args.data.actorId).toBe(42)
+    expect(args.data.targetUserId).toBe(existingCollaborator.userId)
     expect(res.collaborator.perEdition[0].editionId).toBe(101)
   })
 
@@ -144,8 +144,8 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId]/rights PATCH', ()
     const historyArgs = prismaMock.collaboratorPermissionHistory.create.mock.calls[0][0]
     expect(historyArgs.data.changeType).toBe('PER_EDITIONS_UPDATED') // priorité perEdition
     expect(historyArgs.data.after.rights.canDeleteConvention).toBe(true)
-  expect(historyArgs.data.actorId).toBe(42)
-  expect(historyArgs.data.targetUserId).toBe(existingCollaborator.userId)
+    expect(historyArgs.data.actorId).toBe(42)
+    expect(historyArgs.data.targetUserId).toBe(existingCollaborator.userId)
     expect(res.collaborator.rights.deleteConvention).toBe(true)
     expect(res.collaborator.perEdition[0].editionId).toBe(150)
   })

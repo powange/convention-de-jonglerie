@@ -34,7 +34,12 @@ describe('/api/conventions/[id]/collaborators/history GET', () => {
         after: {},
         actorId: 99,
         targetUserId: 50,
-        actor: { id: 99, pseudo: 'Acteur', profilePicture: '/img/a1.png', email: 'actor@example.tld' },
+        actor: {
+          id: 99,
+          pseudo: 'Acteur',
+          profilePicture: '/img/a1.png',
+          email: 'actor@example.tld',
+        },
         targetUser: { id: 50, pseudo: 'Cible', profilePicture: null, email: 'target@example.tld' },
       },
       {
@@ -46,7 +51,12 @@ describe('/api/conventions/[id]/collaborators/history GET', () => {
         actorId: 99,
         targetUserId: 51,
         actor: { id: 99, pseudo: 'Acteur', profilePicture: null, email: 'actor@example.tld' },
-        targetUser: { id: 51, pseudo: 'Autre', profilePicture: '/img/u2.png', email: 'other@example.tld' },
+        targetUser: {
+          id: 51,
+          pseudo: 'Autre',
+          profilePicture: '/img/u2.png',
+          email: 'other@example.tld',
+        },
       },
     ] as any
     prismaMock.collaboratorPermissionHistory.findMany.mockResolvedValue(history)

@@ -300,7 +300,13 @@
     "time_minutes_ago": "{count} хв тому",
     "tip": "Порада",
     "view": "Переглянути",
-    "view_details": "Переглянути деталі"
+    "view_details": "Переглянути деталі",
+    "active": "Активний",
+    "inactive": "Неактивний",
+    "updated_at": "Оновлено {date}",
+    "saving": "Збереження...",
+    "saved": "Збережено",
+    "required": "Обов'язково"
   },
   "components": {
     "carpool": {
@@ -413,7 +419,9 @@
       "loading_error_title": "Помилка завантаження",
       "logo_preview": "Попередній перегляд логотипу:",
       "logo_url_description": "URL зображення логотипу конвенції",
-      "upload_file": "Завантажити файл"
+      "upload_file": "Завантажити файл",
+      "image_uploaded": "Image uploadée",
+      "image_deleted": "Image supprimée"
     },
     "country_select": {
       "no_countries_found": "Країни не знайдено",
@@ -425,7 +433,18 @@
       "instagram_account": "Обліковий запис Instagram",
       "next": "Наступний",
       "previous": "Попередній",
-      "ticketing_link": "Посилання на квитки"
+      "ticketing_link": "Посилання на квитки",
+      "poster_placeholder": "Cliquez pour sélectionner le poster de l'édition",
+      "poster_alt": "Poster de l'édition",
+      "address_tip": "Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte.",
+      "country_placeholder": "Nom du pays",
+      "convention_description_placeholder": "Description de la convention",
+      "social_networks_title": "Réseaux sociaux",
+      "step_general_title": "Informations Générales",
+      "step_general_description": "Informations Générales",
+      "step_services_title": "Services Proposés",
+      "step_visibility_title": "Visibilité (Réseaux Sociaux)",
+      "step_visibility_description": "Réseaux Sociaux"
     },
     "favorites_map": {
       "all_favorites": "Всі улюблені",
@@ -453,6 +472,19 @@
       "reply_to_comment": "Відповісти на цей коментар",
       "your_reply": "Ваша відповідь",
       "your_reply_placeholder": "Ваша відповідь..."
+    },
+    "date_time_picker": {
+      "placeholder": "Sélectionner une date"
+    },
+    "country_multi_select": {
+      "placeholder": "Sélectionner des pays..."
+    },
+    "collaborators": {
+      "added": "Collaborateur ajouté",
+      "add_error": "Impossible d'ajouter le collaborateur",
+      "removed": "Collaborateur retiré",
+      "load_error": "Impossible de charger les collaborateurs",
+      "remove_error": "Impossible de retirer le collaborateur"
     }
   },
   "conventions": {
@@ -542,7 +574,56 @@
     "ticketing": "Квитки",
     "useful_links": "Корисні посилання",
     "show_returned_items": "Показати повернені предмети",
-    "hide_returned_items": "Приховати повернені предмети"
+    "hide_returned_items": "Приховати повернені предмети",
+    "volunteers_title": "Волонтери",
+    "volunteers_open": "Відкрити",
+    "volunteers_close": "Закрити",
+    "volunteers_description_label": "Опис для волонтерів",
+    "volunteers_description_placeholder": "Опишіть потреби, ролі, розклади, переваги...",
+    "volunteers_no_description": "Немає конкретного опису для волонтерів.",
+    "volunteers_total": "Всього",
+    "volunteers_status_pending": "В очікуванні",
+    "volunteers_status_accepted": "Прийнято",
+    "volunteers_status_rejected": "Відхилено",
+    "volunteers_closed_message": "Заявки волонтерів наразі не приймаються.",
+    "volunteers_motivation_label": "Мотивація (необов'язково)",
+    "volunteers_motivation_placeholder": "Коротко поясніть, чому ви хочете допомогти...",
+    "volunteers_phone_required": "Телефон (необхідний для зв'язку)",
+    "volunteers_mode_label": "Режим обробки заявок",
+    "volunteers_mode_internal": "Внутрішній (форма на сайті)",
+    "volunteers_mode_external": "Зовнішній (посилання на сторонній інструмент)",
+    "volunteers_external_url_label": "Зовнішній URL",
+    "volunteers_external_url_hint": "Посилання на зовнішню форму або платформу управління волонтерами.",
+    "volunteers_personal_info_notice": "Передана особиста інформація",
+    "volunteers_personal_info_disclaimer": "Вказана вище інформація (ім'я, прізвище, телефон) буде надана організаторам для управління командами волонтерів. За потреби заповніть відсутні поля нижче.",
+    "volunteers_first_name": "Ім'я",
+    "volunteers_last_name": "Прізвище",
+    "volunteers_phone": "Телефон",
+    "volunteers_first_name_required": "Ім'я (обов'язково – відсутнє в профілі)",
+    "volunteers_last_name_required": "Прізвище (обов'язково – відсутнє в профілі)",
+    "volunteers_apply": "Подати заявку волонтера",
+    "volunteers_apply_description": "Надішліть заявку на допомогу під час заходу.",
+    "volunteers_motivation_hint": "Ваше (необов'язкове) повідомлення допоможе організаторам призначити вам відповідне завдання. Макс {max} символів.",
+    "volunteers_withdraw": "Відкликати мою заявку",
+    "volunteers_login_prompt": "Увійдіть, щоб подати заявку волонтера.",
+    "volunteers_filter_status": "Фільтр за статусом",
+    "volunteers_status_all": "Всі",
+    "volunteers_table_user": "Заявник",
+    "volunteers_table_motivation": "Мотивація",
+    "volunteers_action_accept": "Прийняти",
+    "volunteers_action_reject": "Відхилити",
+    "volunteers_action_back_pending": "Повернути в очікування",
+    "volunteers_my_application_title": "Моя заявка",
+    "volunteers_my_application_pending": "Моя заявка знаходиться в очікуванні.",
+    "volunteers_my_application_accepted": "Мою заявку прийнято.",
+    "volunteers_my_application_rejected": "Мою заявку відхилено.",
+    "volunteers_no_applications": "Немає заявок",
+    "volunteers_search": "Пошук",
+    "volunteers_search_placeholder": "Ім'я користувача, email, мотивація...",
+    "volunteers_table_first_name": "Ім'я",
+    "volunteers_table_last_name": "Прізвище",
+    "volunteers_filtered_count": "{filtered} з {total} заявок",
+    "volunteers_admin_only_note": "Наступна інформація (заявки, фільтри та детальна статистика) видима лише уповноваженим організаторам та співробітникам."
   },
   "errors": {
     "access_denied": "Доступ заборонено",
@@ -829,13 +910,24 @@
       "actions": "Дії",
       "delete_edition": "Видалити видання",
       "edit_edition": "Редагувати видання",
-      "in_development": "В розробці",
       "lost_found_active_description": "Ви можете керувати загубленими речами під час проведення видання.",
       "manage": "Керувати",
       "manage_lost_found": "Керувати загубленими та знайденими",
-      "upcoming_feature": "Майбутня функція",
       "volunteer_description": "Цей розділ дозволить вам керувати командами волонтерів для видання, призначати ролі та координувати активності.",
-      "volunteer_management": "Управління волонтерами"
+  "volunteer_management": "Запит волонтерів",
+      "volunteer_description_active": "Налаштуйте тут заявки волонтерів: відкрити/закрити, опис, внутрішній режим або зовнішнє посилання."
+    },
+    "benevoles": {
+      "external_mode_active": "Mode externe actif : les candidatures sont gérées via un outil tiers.",
+      "url_label": "URL:",
+      "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
+    },
+    "objets_trouves": {
+      "photo_alt": "Photo de l'objet trouvé"
+    },
+    "profile": {
+      "photo_alt": "Photo de profil",
+      "photo_placeholder": "Cliquez pour changer votre photo de profil"
     }
   },
   "permissions": {
@@ -890,7 +982,6 @@
     "favorites": "Улюблені",
     "favorites_received": "Отримано в улюблені",
     "first_name_placeholder": "Ваше ім'я",
-    "first_name_required": "Ім'я обов'язкове",
     "formats_accepted": "• Прийняті формати: JPG, PNG, GIF, WebP",
     "global_admin": "Глобальний адміністратор",
     "gravatar_avatar": "Аватар, наданий Gravatar",
@@ -898,7 +989,6 @@
     "important_info": "Важлива інформація",
     "info_saved": "Вашу інформацію збережено",
     "last_name_placeholder": "Ваше прізвище",
-    "last_name_required": "Прізвище обов'язкове",
     "manage_password": "Керувати вашим паролем",
     "manage_profile_info": "Керувати інформацією профілю",
     "max_size": "• Максимальний розмір: 5 МБ",
@@ -931,7 +1021,11 @@
     "unsaved_changes": "У вас є незбережені зміни",
     "username_hint": "Публічно видимий іншим користувачам",
     "username_min_3": "Ім'я користувача повинно містити принаймні 3 символи",
-    "username_placeholder": "Ваше унікальне ім'я користувача"
+    "username_placeholder": "Ваше унікальне ім'я користувача",
+    "optional_section_title": "Додатковий розділ",
+    "optional": "Необов'язково",
+    "phone": "Телефон",
+    "phone_placeholder": "Ваш номер телефону"
   },
   "services": {
     "accessibility": "Доступність для людей з інвалідністю",
@@ -996,10 +1090,27 @@
     "upload": "Завантажити",
     "upload_error": "Помилка завантаження",
     "uploading": "Завантаження...",
-    "validation_error": "Помилка валідації"
+    "validation_error": "Помилка валідації",
+    "success_message": "Image uploadée avec succès !",
+    "delete_message": "Image supprimée",
+    "error_message": "Erreur d'upload"
   },
   "h": {
     "actor": "Актор",
     "targetUser": "Цільовий користувач"
+  },
+  "volunteersInfo": {
+    "externalUrl": "Зовнішній URL"
+  },
+  "validation": {
+    "name_min_3": "Le nom doit contenir au moins 3 caractères",
+    "name_max_100": "Le nom ne peut pas dépasser 100 caractères",
+    "name_max_200": "Le nom ne peut pas dépasser 200 caractères",
+    "description_max_1000": "La description ne peut pas dépasser 1000 caractères",
+    "date_end_after_start": "La date de fin doit être strictement supérieure à la date de début",
+    "date_start_required": "La date de début est requise"
+  },
+  "countries": {
+    "czech_republic": "République Tchèque"
   }
 }

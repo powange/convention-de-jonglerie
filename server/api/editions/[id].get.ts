@@ -32,6 +32,13 @@ export default defineEventHandler(async (event) => {
         favoritedBy: {
           select: { id: true },
         },
+        // Champs bénévolat nécessaires pour la page de gestion
+        _count: {
+          select: { volunteerApplications: true },
+        },
+        // Champs bénévolat simples sur le modèle Edition (inclus automatiquement, rien à faire)
+        // Champs bénévolat (valeurs)
+        volunteerApplications: false,
         convention: {
           include: {
             collaborators: {
@@ -158,7 +165,16 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    return edition
+    // Ajouter explicitement les champs bénévolat (déjà présents sur edition)
+    // Juste pour clarté, on renvoie l'objet tel quel; pas de transformation supplémentaire nécessaire ici.
+    return {
+      ...edition,
+      volunteersOpen: (edition as any).volunteersOpen,
+      volunteersDescription: (edition as any).volunteersDescription,
+      volunteersMode: (edition as any).volunteersMode,
+      volunteersExternalUrl: (edition as any).volunteersExternalUrl,
+      volunteersUpdatedAt: (edition as any).volunteersUpdatedAt,
+    }
   } catch (error: any) {
     // If the handler already threw an HTTP error (createError), rethrow it to preserve status
     if (error && (error.statusCode || error.status)) {

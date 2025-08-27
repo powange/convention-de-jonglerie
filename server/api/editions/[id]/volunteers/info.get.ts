@@ -10,6 +10,8 @@ export default defineEventHandler(async (event) => {
       id: true,
       volunteersOpen: true,
       volunteersDescription: true,
+      volunteersMode: true,
+      volunteersExternalUrl: true,
       volunteerApplications: { select: { id: true, status: true, userId: true } },
     },
   })
@@ -33,6 +35,8 @@ export default defineEventHandler(async (event) => {
   return {
     open: edition.volunteersOpen,
     description: edition.volunteersDescription || null,
+    mode: (edition as any).volunteersMode || 'INTERNAL',
+    externalUrl: (edition as any).volunteersExternalUrl || null,
     myApplication,
     counts,
   }

@@ -195,7 +195,16 @@
     "refresh": "Refresh",
     "save": "Save",
     "reset": "Reset",
-    "deleted": "Deleted"
+    "deleted": "Deleted",
+    "active": "Active",
+    "inactive": "Inactive",
+    "updated_at": "Updated on {date}",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "required": "Required"
+  },
+  "volunteersInfo": {
+    "externalUrl": "External URL"
   },
   "dates": {
     "same_day_with_time": "On {date} from {startTime} to {endTime}",
@@ -346,7 +355,56 @@
     "of_convention": "of the convention",
     "enlarged_image": "Enlarged image",
     "poster_of": "Poster of {name}",
-    "length": "Length"
+    "length": "Length",
+    "volunteers_title": "Volunteers",
+    "volunteers_open": "Open",
+    "volunteers_close": "Close",
+    "volunteers_description_label": "Description for volunteers",
+    "volunteers_description_placeholder": "Describe needs, roles, schedules, benefits...",
+    "volunteers_no_description": "No specific description for volunteers.",
+    "volunteers_total": "Total",
+    "volunteers_status_pending": "Pending",
+    "volunteers_status_accepted": "Accepted",
+    "volunteers_status_rejected": "Rejected",
+    "volunteers_closed_message": "Volunteer applications are not open currently.",
+    "volunteers_motivation_label": "Motivation (optional)",
+    "volunteers_motivation_placeholder": "Explain briefly why you wish to help...",
+    "volunteers_phone_required": "Phone (required to contact you)",
+    "volunteers_mode_label": "Application handling mode",
+    "volunteers_mode_internal": "Internal (on-site form)",
+    "volunteers_mode_external": "External (link to third-party tool)",
+    "volunteers_external_url_label": "External URL",
+    "volunteers_external_url_hint": "Link to the external volunteer management form or platform.",
+    "volunteers_personal_info_notice": "Shared personal information",
+    "volunteers_personal_info_disclaimer": "The above information (first name, last name, phone) will be provided to organizers to manage volunteer teams. Complete missing fields below if needed.",
+    "volunteers_first_name": "First name",
+    "volunteers_last_name": "Last name",
+    "volunteers_phone": "Phone",
+    "volunteers_first_name_required": "First name (required – missing in your profile)",
+    "volunteers_last_name_required": "Last name (required – missing in your profile)",
+    "volunteers_apply": "Apply as volunteer",
+    "volunteers_apply_description": "Submit your application to help during the edition.",
+    "volunteers_motivation_hint": "Your (optional) message helps organizers assign you to the right task. Max {max} characters.",
+    "volunteers_withdraw": "Withdraw my application",
+    "volunteers_login_prompt": "Log in to apply as a volunteer.",
+    "volunteers_filter_status": "Filter by status",
+    "volunteers_status_all": "All",
+    "volunteers_table_user": "Applicant",
+    "volunteers_table_motivation": "Motivation",
+    "volunteers_action_accept": "Accept",
+    "volunteers_action_reject": "Reject",
+    "volunteers_action_back_pending": "Back to pending",
+    "volunteers_my_application_title": "My application",
+    "volunteers_my_application_pending": "My application is currently pending.",
+    "volunteers_my_application_accepted": "My application has been accepted.",
+    "volunteers_my_application_rejected": "My application has been rejected.",
+    "volunteers_no_applications": "No applications",
+    "volunteers_search": "Search",
+    "volunteers_search_placeholder": "Username, email, motivation...",
+    "volunteers_table_first_name": "First name",
+    "volunteers_table_last_name": "Last name",
+    "volunteers_filtered_count": "{filtered} of {total} applications",
+    "volunteers_admin_only_note": "The following information (applications, filters and detailed statistics) is visible only to authorized organizers and collaborators."
   },
   "conventions": {
     "my_conventions": "My Conventions",
@@ -458,8 +516,6 @@
     "max_size": "• Maximum size: 5MB",
     "recommended_resolution": "• Recommended resolution: 400x400px minimum",
     "username_min_3": "Username must contain at least 3 characters",
-    "last_name_required": "Last name is required",
-    "first_name_required": "First name is required",
     "current_password_required": "Current password required",
     "password_uppercase_required": "Password must contain at least one uppercase letter",
     "password_digit_required": "Password must contain at least one digit",
@@ -478,7 +534,11 @@
     "admin_mode_enabled": "Administrator mode enabled",
     "admin_mode_enabled_desc": "You now have access to all administrator privileges",
     "admin_mode_disabled": "Administrator mode disabled",
-    "admin_mode_disabled_desc": "You are now using the normal user interface"
+    "admin_mode_disabled_desc": "You are now using the normal user interface",
+    "optional_section_title": "Optional Information",
+    "optional": "Optional",
+    "phone": "Phone",
+    "phone_placeholder": "Your phone number"
   },
   "footer": {
     "language_selector": "Change language",
@@ -583,7 +643,9 @@
       "convention_logo_alt": "Convention logo",
       "loading_error_title": "Loading error",
       "loading_error_description": "Unable to load image from this URL",
-      "logo_url_description": "URL to the convention logo image"
+      "logo_url_description": "URL to the convention logo image",
+      "image_uploaded": "Image uploaded",
+      "image_deleted": "Image deleted"
     },
     "favorites_map": {
       "no_upcoming_favorites": "No upcoming favorite editions with available location",
@@ -598,7 +660,18 @@
       "convention_poster_optional": "Convention poster (Optional)",
       "ticketing_link": "Ticketing link",
       "facebook_page": "Facebook page",
-      "instagram_account": "Instagram account"
+      "instagram_account": "Instagram account",
+      "poster_placeholder": "Click to select the edition poster",
+      "poster_alt": "Edition poster",
+      "address_tip": "Enter a complete address in the search field to automatically prefill all fields below. A precise address will also allow your edition to be geolocated on the map.",
+      "country_placeholder": "Country name",
+      "convention_description_placeholder": "Convention description",
+      "social_networks_title": "Social Networks",
+      "step_general_title": "General Information",
+      "step_general_description": "General Information",
+      "step_services_title": "Offered Services",
+      "step_visibility_title": "Visibility (Social Networks)",
+      "step_visibility_description": "Social Networks"
     },
     "carpool": {
       "offer_vehicle_places": "Offer seats in your vehicle",
@@ -696,6 +769,19 @@
       "upcoming": "Upcoming",
       "past": "Past",
       "yellow_border_favorite": "Yellow border = Favorite"
+    },
+    "date_time_picker": {
+      "placeholder": "Select a date"
+    },
+    "country_multi_select": {
+      "placeholder": "Select countries..."
+    },
+    "collaborators": {
+      "added": "Collaborator added",
+      "add_error": "Unable to add collaborator",
+      "removed": "Collaborator removed",
+      "load_error": "Unable to load collaborators",
+      "remove_error": "Unable to remove collaborator"
     }
   },
   "permissions": {
@@ -781,11 +867,10 @@
     "management": {
       "actions": "Actions",
       "edit_edition": "Edit edition",
+      "volunteer_description_active": "Configure volunteer applications here: open/close, description, internal mode or external link.",
       "delete_edition": "Delete edition",
-      "volunteer_management": "Volunteer management",
-      "upcoming_feature": "Upcoming feature",
+  "volunteer_management": "Volunteer call",
       "volunteer_description": "This section will allow you to manage volunteer teams for the edition, assign roles and coordinate activities.",
-      "in_development": "In development",
       "manage": "Manage",
       "manage_lost_found": "Manage lost & found",
       "lost_found_active_description": "You can manage lost & found items while the edition is running."
@@ -804,6 +889,18 @@
       "loading_convention_data": "Loading convention data...",
       "convention_not_found_or_no_rights": "The convention you are looking for does not exist or you don't have the rights to edit it.",
       "submit_button": "Update convention"
+    },
+    "benevoles": {
+      "external_mode_active": "External mode active: applications are managed via a third-party tool.",
+      "url_label": "URL:",
+      "sort_tip": "Sort: click on headers (Shift+click for multi)"
+    },
+    "objets_trouves": {
+      "photo_alt": "Photo of found item"
+    },
+    "profile": {
+      "photo_alt": "Profile photo",
+      "photo_placeholder": "Click to change your profile photo"
     }
   },
   "feedback": {
@@ -913,7 +1010,10 @@
       "file_too_large": "File too large",
       "invalid_file_type": "Invalid file type",
       "invalid_file_extension": "Invalid file extension"
-    }
+    },
+    "success_message": "Image uploaded successfully!",
+    "delete_message": "Image deleted",
+    "error_message": "Upload error"
   },
   "errors": {
     "delete_error": "Error deleting",
@@ -1001,5 +1101,16 @@
   "h": {
     "actor": "Actor",
     "targetUser": "Target user"
+  },
+  "validation": {
+    "name_min_3": "Name must contain at least 3 characters",
+    "name_max_100": "Name cannot exceed 100 characters",
+    "name_max_200": "Name cannot exceed 200 characters",
+    "description_max_1000": "Description cannot exceed 1000 characters",
+    "date_end_after_start": "End date must be strictly after start date",
+    "date_start_required": "Start date is required"
+  },
+  "countries": {
+    "czech_republic": "Czech Republic"
   }
 }

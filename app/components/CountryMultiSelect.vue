@@ -35,18 +35,17 @@ interface Props {
   placeholder?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  placeholder: 'Sélectionner des pays...',
-})
-
 const { t } = useI18n()
+// define props puis appliquer défaut dynamiquement après (pas de computed inline qui capture $t avant useI18n)
+const props = defineProps<Props>()
+const propsWithDefaults = computed(() => ({
+  placeholder: t('components.country_multi_select.placeholder'),
+  ...props,
+  // si l'utilisateur a fourni une valeur, elle est déjà dans props
+}))
 
 // Utiliser la traduction dynamiquement pour le placeholder
-const dynamicPlaceholder = computed(() => {
-  return props.placeholder === 'Sélectionner des pays...'
-    ? t('forms.placeholders.select_countries')
-    : props.placeholder
-})
+const dynamicPlaceholder = computed(() => propsWithDefaults.value.placeholder)
 
 const emit = defineEmits<{
   'update:modelValue': [value: string[]]

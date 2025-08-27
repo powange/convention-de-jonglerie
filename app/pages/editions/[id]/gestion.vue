@@ -42,7 +42,7 @@
               <UButton
                 v-if="edition.isOnline"
                 :icon="'i-heroicons-eye-slash'"
-                color="gray"
+                color="secondary"
                 variant="soft"
                 @click="toggleOnlineStatus(false)"
               >
@@ -79,7 +79,7 @@
               <UButton
                 v-if="hasEditionStarted"
                 size="sm"
-                color="amber"
+                color="warning"
                 variant="soft"
                 icon="i-heroicons-arrow-right"
                 :to="`/editions/${edition.id}/objets-trouves`"
@@ -135,35 +135,144 @@
         <!-- Gestion des bénévoles -->
         <UCard>
           <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-users" class="text-primary-500" />
-              <h3 class="text-lg font-semibold">
-                {{ $t('pages.management.volunteer_management') }}
-              </h3>
-            </div>
-
-            <div
-              class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800"
-            >
-              <div class="flex items-start gap-3">
-                <UIcon
-                  name="i-heroicons-information-circle"
-                  class="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
-                  size="20"
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-users" class="text-primary-500" />
+                <h3 class="text-lg font-semibold">
+                  {{ $t('pages.management.volunteer_management') }}
+                </h3>
+              </div>
+              <div v-if="canEdit" class="flex items-center gap-3">
+                <USwitch
+                  v-model="volunteersOpenLocal"
+                  :disabled="savingVolunteers"
+                  color="primary"
+                  @update:model-value="handleToggleOpen"
                 />
-                <div class="space-y-2">
-                  <h4 class="text-sm font-medium text-blue-900 dark:text-blue-100">
-                    {{ $t('pages.management.upcoming_feature') }}
-                  </h4>
-                  <p class="text-sm text-blue-800 dark:text-blue-200">
-                    {{ $t('pages.management.volunteer_description') }}
-                  </p>
-                  <div class="mt-3">
-                    <UBadge color="info" variant="soft">{{
-                      $t('pages.management.in_development')
-                    }}</UBadge>
+                <span
+                  class="text-sm"
+                  :class="
+                    volunteersOpenLocal
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-gray-600 dark:text-gray-400'
+                  "
+                >
+                  {{
+                    volunteersOpenLocal
+                      ? $t('editions.volunteers_open') || 'Ouvert'
+                      : $t('editions.volunteers_closed_message') || 'Fermé'
+                  }}
+                </span>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <p class="text-sm text-gray-700 dark:text-gray-300">
+                {{
+                  $t('pages.management.volunteer_description_active') ||
+                  $t('pages.management.volunteer_description')
+                }}
+              </p>
+              <!-- Description des bénévoles -->
+              <div class="space-y-2">
+                <UFormField :label="t('editions.volunteers_description_label')" class="w-full">
+                  <UTextarea
+                    v-model="volunteersDescriptionLocal"
+                    :rows="4"
+                    :placeholder="t('editions.volunteers_description_placeholder')"
+                    class="w-full"
+                    :disabled="!canEdit"
+                  />
+                </UFormField>
+                <div
+                  v-if="canEdit"
+                  class="flex items-center justify-between text-[11px] text-gray-500"
+                >
+                  <span>{{ remainingVolunteerDescriptionChars }} / 5000</span>
+                  <div v-if="volunteersDescriptionDirty" class="flex gap-2">
+                    <UButton
+                      size="xs"
+                      variant="ghost"
+                      :disabled="savingVolunteers"
+                      @click="resetVolunteerDescription"
+                    >
+                      {{ t('common.cancel') }}
+                    </UButton>
+                    <UButton
+                      size="xs"
+                      color="primary"
+                      :loading="savingVolunteers"
+                      :disabled="volunteersDescriptionLocal.length > 5000"
+                      @click="saveVolunteerDescription"
+                    >
+                      {{ t('common.save') }}
+                    </UButton>
                   </div>
                 </div>
+                <div v-else class="prose dark:prose-invert max-w-none text-sm whitespace-pre-wrap">
+                  <template v-if="volunteersDescriptionLocal">
+                    {{ volunteersDescriptionLocal }}
+                  </template>
+                  <template v-else>
+                    <p class="text-gray-500">{{ t('editions.volunteers_no_description') }}</p>
+                  </template>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <UFormField :label="t('editions.volunteers_mode_label') || 'Mode de gestion'">
+                  <URadioGroup
+                    v-model="volunteersModeLocal"
+                    :items="volunteerModeItems"
+                    size="sm"
+                    class="flex flex-col gap-1"
+                    :disabled="!canEdit"
+                    @update:model-value="handleChangeMode"
+                  />
+                </UFormField>
+                <div v-if="volunteersModeLocal === 'EXTERNAL'" class="pl-1">
+                  <UFormField :label="t('editions.volunteers_external_url_label') || 'URL externe'">
+                    <UInput
+                      v-model="volunteersExternalUrlLocal"
+                      :placeholder="'https://...'"
+                      :disabled="!canEdit"
+                      class="w-full"
+                      @blur="canEdit && persistVolunteerSettings()"
+                      @keydown.enter.prevent="canEdit && persistVolunteerSettings()"
+                    />
+                  </UFormField>
+                  <p class="text-[11px] text-gray-500">
+                    {{
+                      t('editions.volunteers_external_url_hint') ||
+                      'Lien vers votre formulaire ou outil externe.'
+                    }}
+                  </p>
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 text-xs">
+                <UBadge :color="volunteersOpenLocal ? 'success' : 'neutral'" variant="soft">
+                  {{
+                    volunteersOpenLocal
+                      ? $t('common.active') || 'Actif'
+                      : $t('common.inactive') || 'Inactif'
+                  }}
+                  ·
+                  {{
+                    volunteersModeLocal === 'EXTERNAL'
+                      ? t('editions.volunteers_mode_external') || 'Externe'
+                      : t('editions.volunteers_mode_internal') || 'Interne'
+                  }}
+                </UBadge>
+                <span v-if="volunteersUpdatedAt" class="text-gray-500 dark:text-gray-400">
+                  {{
+                    $t('common.updated_at', { date: formatRelative(volunteersUpdatedAt) }) ||
+                    formatRelative(volunteersUpdatedAt)
+                  }}
+                </span>
+              </div>
+              <div v-if="canEdit" class="flex gap-2">
+                <span v-if="savingVolunteers" class="text-xs text-gray-500 flex items-center gap-1">
+                  <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
+                  {{ $t('common.saving') || 'Enregistrement...' }}
+                </span>
               </div>
             </div>
           </div>
@@ -174,8 +283,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { onMounted, computed, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import EditionHeader from '~/components/edition/EditionHeader.vue'
 import { useAuthStore } from '~/stores/auth'
@@ -188,22 +297,154 @@ import { useEditionStore } from '~/stores/editions'
 
 const route = useRoute()
 const editionStore = useEditionStore()
+const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToast()
 const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
+const volunteersOpenLocal = ref(false)
+const volunteersModeLocal = ref<'INTERNAL' | 'EXTERNAL'>('INTERNAL')
+const volunteersExternalUrlLocal = ref('')
+const volunteersDescriptionLocal = ref('')
+const volunteersDescriptionOriginal = ref('')
+const volunteersUpdatedAt = ref<Date | null>(null)
+const savingVolunteers = ref(false)
+// Éviter d'envoyer des PATCH à l'initialisation quand on applique les valeurs serveur
+const volunteersInitialized = ref(false)
+// Nuxt UI URadioGroup utilise la prop `items` (pas `options`)
+const volunteerModeItems = computed(() => [
+  { value: 'INTERNAL', label: t('editions.volunteers_mode_internal') || 'Interne' },
+  { value: 'EXTERNAL', label: t('editions.volunteers_mode_external') || 'Externe' },
+])
+
+const volunteersDescriptionDirty = computed(
+  () => volunteersDescriptionLocal.value !== volunteersDescriptionOriginal.value
+)
+const remainingVolunteerDescriptionChars = computed(
+  () => `${volunteersDescriptionLocal.value.length}`
+)
 
 onMounted(async () => {
   if (!edition.value) {
     try {
-      await editionStore.fetchEditionById(editionId)
+  await editionStore.fetchEditionById(editionId, { force: true })
     } catch (error) {
       console.error('Failed to fetch edition:', error)
     }
   }
+  if (edition.value) applyEditionVolunteerFields(edition.value as any)
 })
+
+watch(edition, (val) => {
+  if (val) {
+    applyEditionVolunteerFields(val as any)
+  }
+})
+
+function applyEditionVolunteerFields(src: any) {
+  volunteersOpenLocal.value = !!src.volunteersOpen
+  volunteersModeLocal.value = src.volunteersMode || 'INTERNAL'
+  volunteersExternalUrlLocal.value = src.volunteersExternalUrl || ''
+  volunteersDescriptionLocal.value = src.volunteersDescription || ''
+  volunteersDescriptionOriginal.value = volunteersDescriptionLocal.value
+  const vu = src.volunteersUpdatedAt
+  volunteersUpdatedAt.value = vu ? new Date(vu) : null
+  // marquer initialisation terminée (prochain changement utilisateur déclenchera watchers)
+  volunteersInitialized.value = true
+}
+
+// Handlers explicites pour éviter double PATCH au chargement
+const handleToggleOpen = async (val: boolean) => {
+  if (!edition.value || !volunteersInitialized.value) return
+  savingVolunteers.value = true
+  const previous = !val
+  try {
+    const res: any = await $fetch(`/api/editions/${edition.value.id}/volunteers/settings`, {
+      method: 'PATCH' as any,
+      body: { open: val },
+    })
+    if (res?.settings) {
+      volunteersUpdatedAt.value = new Date()
+      await editionStore.fetchEditionById(editionId, { force: true })
+      toast.add({
+        title: t('common.saved') || 'Sauvegardé',
+        color: 'success',
+        icon: 'i-heroicons-check-circle',
+      })
+    }
+  } catch (e: any) {
+    volunteersOpenLocal.value = previous
+    toast.add({
+      title: e?.statusMessage || t('common.error'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
+  } finally {
+    savingVolunteers.value = false
+  }
+}
+
+const handleChangeMode = async (_raw: any) => {
+  if (!edition.value || !volunteersInitialized.value) return
+  // éviter PATCH si pas de changement réel (comparaison avec valeur locale précédente déjà mise à jour par v-model)
+  // volunteersModeLocal contient déjà la nouvelle valeur; si description/URL pas modifiée inutile ? On laisse sauvegarde car le mode change effectivement côté serveur.
+  await persistVolunteerSettings()
+}
+
+const persistVolunteerSettings = async () => {
+  if (!edition.value) return
+  savingVolunteers.value = true
+  try {
+    const body: any = {
+      mode: volunteersModeLocal.value,
+      description: volunteersDescriptionLocal.value.trim() || null,
+    }
+    if (volunteersModeLocal.value === 'EXTERNAL')
+      body.externalUrl = volunteersExternalUrlLocal.value.trim() || null
+    const res: any = await $fetch(`/api/editions/${edition.value.id}/volunteers/settings`, {
+      method: 'PATCH' as any,
+      body,
+    })
+    if (res?.settings) {
+      volunteersUpdatedAt.value = new Date()
+      volunteersDescriptionOriginal.value = volunteersDescriptionLocal.value
+  await editionStore.fetchEditionById(editionId, { force: true })
+      toast.add({
+        title: t('common.saved') || 'Sauvegardé',
+        color: 'success',
+        icon: 'i-heroicons-check-circle',
+      })
+    }
+  } catch (e: any) {
+    toast.add({
+      title: e?.statusMessage || t('common.error'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
+  } finally {
+    savingVolunteers.value = false
+  }
+}
+
+const saveVolunteerDescription = async () => {
+  // validation simple longueur côté client
+  if (volunteersDescriptionLocal.value.length > 5000) return
+  await persistVolunteerSettings()
+}
+
+const resetVolunteerDescription = () => {
+  volunteersDescriptionLocal.value = volunteersDescriptionOriginal.value
+}
+
+const formatRelative = (date: Date) => {
+  try {
+    return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short' }).format(date)
+  } catch {
+    return date.toLocaleString()
+  }
+}
 
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
@@ -240,9 +481,9 @@ const toggleFavorite = async (id: number) => {
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
-  } catch (e: unknown) {
+  } catch (e: any) {
     toast.add({
-      title: e.statusMessage || t('errors.favorite_update_failed'),
+      title: e?.statusMessage || t('errors.favorite_update_failed'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })
@@ -259,9 +500,9 @@ const deleteEdition = async (id: number) => {
         color: 'success',
       })
       router.push('/')
-    } catch (e: unknown) {
+    } catch (e: any) {
       toast.add({
-        title: e.statusMessage || t('errors.edition_deletion_failed'),
+        title: e?.statusMessage || t('errors.edition_deletion_failed'),
         icon: 'i-heroicons-x-circle',
         color: 'error',
       })

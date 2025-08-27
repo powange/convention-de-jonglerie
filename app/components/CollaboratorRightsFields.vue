@@ -23,6 +23,7 @@
         v-model="localValue.title"
         :size="inputSize"
         :placeholder="$t('components.collaborators_rights_panel.title_placeholder')"
+        @update:model-value="emitModel"
       />
     </div>
 
@@ -41,16 +42,23 @@
           color="neutral"
           icon="i-heroicons-x-mark"
           @click="resetPerEdition"
-        >{{ $t('common.reset') }}</UButton>
+          >{{ $t('common.reset') }}</UButton
+        >
       </div>
       <div class="border border-gray-100 dark:border-gray-700 rounded overflow-hidden">
         <div class="max-h-48 overflow-y-auto">
           <table class="w-full text-[11px]">
             <thead>
-              <tr class="bg-gray-50 dark:bg-gray-800/60 border-b border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300">
+              <tr
+                class="bg-gray-50 dark:bg-gray-800/60 border-b border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300"
+              >
                 <th class="text-left font-medium px-2 py-1">&nbsp;</th>
-                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">{{ $t('common.edit') }}</th>
-                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">{{ $t('common.delete') }}</th>
+                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
+                  {{ $t('common.edit') }}
+                </th>
+                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
+                  {{ $t('common.delete') }}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -59,7 +67,10 @@
                 :key="ed.id"
                 class="border-b last:border-b-0 border-gray-100 dark:border-gray-700 bg-white/60 dark:bg-gray-900/40 hover:bg-gray-50 dark:hover:bg-gray-800/40"
               >
-                <td class="px-2 py-1 align-middle truncate max-w-[160px]" :title="ed.name || '#' + ed.id">
+                <td
+                  class="px-2 py-1 align-middle truncate max-w-[160px]"
+                  :title="ed.name || '#' + ed.id"
+                >
                   {{ ed.name || '#' + ed.id }}
                 </td>
                 <td class="px-2 py-1 align-middle">
@@ -168,6 +179,14 @@ watch(
   { deep: true }
 )
 
+// Propager les modifications du champ titre (v-model interne ne déclenche pas autrement d'émission)
+watch(
+  () => localValue.title,
+  () => {
+    if (!syncingFromParent) emitModel()
+  }
+)
+
 const switchSize = computed(() => props.size)
 const inputSize = computed(() => (props.size === 'xs' ? 'xs' : 'sm'))
 const effectivePermissionList = computed(() => props.permissionList)
@@ -205,5 +224,9 @@ function toggleEdition(editionId: number, field: 'canEdit' | 'canDelete', value:
 function resetPerEdition() {
   localValue.perEdition = []
   if (!syncingFromParent) emit('update:modelValue', JSON.parse(JSON.stringify(localValue)))
+}
+
+function emitModel() {
+  emit('update:modelValue', JSON.parse(JSON.stringify(localValue)))
 }
 </script>

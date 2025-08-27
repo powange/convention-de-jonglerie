@@ -50,9 +50,11 @@ export const changePasswordSchema = z
 // Schémas de profil
 export const updateProfileSchema = z.object({
   pseudo: pseudoSchema,
-  prenom: nameSchema,
-  nom: nameSchema,
+  // Champs rendus optionnels (peuvent être vides ou non fournis)
+  prenom: nameSchema.optional(),
+  nom: nameSchema.optional(),
   email: emailSchema,
+  telephone: phoneSchema.optional(),
 })
 
 // Schémas de convention

@@ -155,8 +155,8 @@
                 },
                 resetAfterUpload: false,
               }"
-              alt="Poster de l'édition"
-              placeholder="Cliquez pour sélectionner le poster de l'édition"
+              :alt="$t('components.edition_form.poster_alt')"
+              :placeholder="$t('components.edition_form.poster_placeholder')"
               @uploaded="onImageUploaded"
               @deleted="onImageDeleted"
               @error="onImageError"
@@ -174,7 +174,7 @@
               color="info"
               variant="soft"
               :title="$t('common.tip')"
-              description="Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte."
+              :description="$t('components.edition_form.address_tip')"
             />
 
             <UCard>
@@ -294,7 +294,7 @@
                       v-if="showCustomCountry"
                       v-model="state.country"
                       required
-                      placeholder="Nom du pays"
+                      :placeholder="$t('components.edition_form.country_placeholder')"
                       size="lg"
                       @blur="
                         (() => {
@@ -346,7 +346,7 @@
           >
             <UTextarea
               v-model="state.description"
-              placeholder="Description de la convention"
+              :placeholder="$t('components.edition_form.convention_description_placeholder')"
               :rows="5"
               class="w-full"
               maxlength="1000"
@@ -420,7 +420,9 @@
         <div class="space-y-6">
           <div class="space-y-4">
             <div class="border-b border-gray-200 pb-2">
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Réseaux sociaux</h3>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                {{ $t('components.edition_form.social_networks_title') }}
+              </h3>
               <p class="text-sm text-gray-600 dark:text-gray-400">
                 Partagez vos pages pour augmenter la visibilité
               </p>
@@ -514,13 +516,13 @@ const emit = defineEmits(['submit'])
 const currentStep = ref(0)
 const steps = ref<StepperItem[]>([
   {
-    title: 'Informations Générales',
-    description: 'Informations Générales',
+    title: computed(() => t('components.edition_form.step_general_title')),
+    description: computed(() => t('components.edition_form.step_general_description')),
     icon: 'i-heroicons-information-circle',
     slot: 'general',
   },
   {
-    title: 'Services Proposés',
+    title: computed(() => t('components.edition_form.step_services_title')),
     description: 'Services Disponibles',
     icon: 'i-heroicons-cog',
     slot: 'services',
@@ -532,8 +534,8 @@ const steps = ref<StepperItem[]>([
     slot: 'ticketing',
   },
   {
-    title: 'Visibilité (Réseaux Sociaux)',
-    description: 'Réseaux Sociaux',
+    title: computed(() => t('components.edition_form.step_visibility_title')),
+    description: computed(() => t('components.edition_form.step_visibility_description')),
     icon: 'i-heroicons-globe-alt',
     slot: 'visibility',
   },
@@ -601,7 +603,7 @@ const servicesByCategory = getTranslatedServicesByCategory
 const showCustomCountry = ref(false)
 
 // Date formatter pour l'affichage
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 const df = computed(() => {
   const localeCode = locale.value === 'fr' ? 'fr-FR' : 'en-US'
   return new DateFormatter(localeCode, { dateStyle: 'medium' })
@@ -629,7 +631,7 @@ const countryOptions = [
   { label: 'Autriche', value: 'Autriche' },
   { label: 'Portugal', value: 'Portugal' },
   { label: 'Pologne', value: 'Pologne' },
-  { label: 'République Tchèque', value: 'République Tchèque' },
+  { label: t('countries.czech_republic'), value: 'République Tchèque' },
   { label: 'Canada', value: 'Canada' },
   { label: 'États-Unis', value: 'États-Unis' },
   { label: 'Autre', value: 'Autre' },
@@ -704,7 +706,7 @@ const validateDates = () => {
   if (endDate <= startDate) {
     return {
       isValid: false,
-      error: 'La date de fin doit être strictement supérieure à la date de début',
+      error: t('validation.date_end_after_start'),
     }
   }
 
@@ -741,7 +743,7 @@ const trimAllTextFields = () => {
 // Fonctions pour obtenir les erreurs de validation des champs de date
 const getStartDateError = () => {
   if (touchedFields.startDate && !state.startDate) {
-    return 'La date de début est requise'
+    return t('validation.date_start_required')
   }
   return undefined
 }
@@ -759,10 +761,10 @@ const getEndDateError = () => {
 const getNameError = () => {
   if (touchedFields.name && state.name) {
     if (state.name.length < 3) {
-      return 'Le nom doit contenir au moins 3 caractères'
+      return t('validation.name_min_3')
     }
     if (state.name.length > 200) {
-      return 'Le nom ne peut pas dépasser 200 caractères'
+      return t('validation.name_max_200')
     }
   }
   return undefined
@@ -770,7 +772,7 @@ const getNameError = () => {
 
 const getDescriptionError = () => {
   if (touchedFields.description && state.description && state.description.length > 1000) {
-    return 'La description ne peut pas dépasser 1000 caractères'
+    return t('validation.description_max_1000')
   }
   return undefined
 }
@@ -788,7 +790,7 @@ const onImageUploaded = (result: {
       state.imageUrl = newImageUrl
     }
     toast.add({
-      title: 'Image uploadée avec succès !',
+      title: t('upload.success_message'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
@@ -798,7 +800,7 @@ const onImageUploaded = (result: {
 const onImageDeleted = () => {
   state.imageUrl = ''
   toast.add({
-    title: 'Image supprimée',
+    title: t('upload.delete_message'),
     icon: 'i-heroicons-check-circle',
     color: 'success',
   })
@@ -806,7 +808,7 @@ const onImageDeleted = () => {
 
 const onImageError = (error: string) => {
   toast.add({
-    title: "Erreur d'upload",
+    title: t('upload.error_message'),
     description: error,
     icon: 'i-heroicons-exclamation-triangle',
     color: 'error',

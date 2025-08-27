@@ -104,12 +104,17 @@ export default defineEventHandler(async (event) => {
   const isPublicEditionPosts =
     path.match(/^\/api\/editions\/\d+\/posts$/) && requestMethod === 'GET'
 
+  // Public GET route pour les informations bénévoles (description, mode, counts)
+  const isPublicVolunteersInfo =
+    path.match(/^\/api\/editions\/\d+\/volunteers\/info$/) && requestMethod === 'GET'
+
   if (
     isPublicCarpoolOffers ||
     isPublicCarpoolRequests ||
     isPublicCarpoolOfferComments ||
     isPublicCarpoolRequestComments ||
-    isPublicEditionPosts
+    isPublicEditionPosts ||
+    isPublicVolunteersInfo
   ) {
     // Ces routes sont publiques, mais on hydrate tout de même la session si présente
     // pour permettre un rendu conditionnel côté API (ex: téléphone visible si réservation ACCEPTED)

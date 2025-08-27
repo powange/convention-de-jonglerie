@@ -66,16 +66,20 @@ interface Props {
   timeInterval?: number
 }
 
-const props = withDefaults(defineProps<Props>(), {
+const { t } = useI18n()
+const baseProps = defineProps<Props>()
+// Appliquer valeurs par défaut (sans computed inline qui référence $t avant useI18n)
+const props = computed(() => ({
   dateLabel: 'Date',
   timeLabel: 'Heure',
   dateFieldName: 'date',
   timeFieldName: 'time',
-  placeholder: 'Sélectionner une date',
+  placeholder: t('components.date_time_picker.placeholder'),
   timePlaceholder: '00:00',
   required: false,
   timeInterval: 30,
-})
+  ...baseProps,
+}))
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
@@ -91,9 +95,9 @@ const {
   updateDateTime,
   setValue,
 } = useDateTimePicker({
-  initialValue: props.modelValue,
-  minDate: props.minDate,
-  timeInterval: props.timeInterval,
+  initialValue: props.value.modelValue,
+  minDate: props.value.minDate,
+  timeInterval: props.value.timeInterval,
   onChange: (isoString) => {
     emit('update:modelValue', isoString)
   },
@@ -125,11 +129,11 @@ watch(
 
 // Fonction pour vérifier si une date CalendarDate est désactivée
 const isCalendarDateDisabled = (calendarDate: CalendarDate) => {
-  if (!props.minDate) return false
+  if (!props.value.minDate) return false
 
   try {
     const jsDate = calendarDate.toDate(getLocalTimeZone())
-    return jsDate < props.minDate
+    return jsDate < props.value.minDate
   } catch {
     return false
   }
@@ -155,7 +159,7 @@ const handleDateUpdate = (newCalendarDate: CalendarDate | null) => {
 
 // Watcher pour les changements du v-model parent
 watch(
-  () => props.modelValue,
+  () => props.value.modelValue,
   (newValue) => {
     if (newValue !== combinedDateTime.value) {
       setValue(newValue || '')

@@ -1,12 +1,13 @@
 import { z } from 'zod'
+
 import { canEditEdition } from '../../../../../utils/collaborator-management'
 import { prisma } from '../../../../../utils/prisma'
 
-const bodySchema = z.object({ status: z.enum(['ACCEPTED', 'REJECTED']) })
+// Autorise aussi le retour à PENDING
+const bodySchema = z.object({ status: z.enum(['ACCEPTED', 'REJECTED', 'PENDING']) })
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user)
-    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+  if (!event.context.user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   const applicationId = parseInt(getRouterParam(event, 'applicationId') || '0')
   if (!editionId || !applicationId)
@@ -14,8 +15,7 @@ export default defineEventHandler(async (event) => {
   const parsed = bodySchema.parse(await readBody(event))
 
   const allowed = await canEditEdition(editionId, event.context.user.id)
-  if (!allowed)
-    throw createError({ statusCode: 403, statusMessage: 'Droits insuffisants' })
+  if (!allowed) throw createError({ statusCode: 403, statusMessage: 'Droits insuffisants' })
 
   const application = await prisma.editionVolunteerApplication.findUnique({
     where: { id: applicationId },
@@ -23,12 +23,30 @@ export default defineEventHandler(async (event) => {
   })
   if (!application || application.editionId !== editionId)
     throw createError({ statusCode: 404, statusMessage: 'Candidature introuvable' })
-  if (application.status !== 'PENDING')
-    throw createError({ statusCode: 400, statusMessage: 'Déjà traitée' })
+  const target = parsed.status
+  if (target === application.status)
+    throw createError({ statusCode: 400, statusMessage: 'Statut identique' })
+
+  // Règles de transition :
+  // PENDING -> ACCEPTED/REJECTED (décision)
+  // ACCEPTED/REJECTED -> PENDING (annulation)
+  // Pas de passage direct ACCEPTED <-> REJECTED sans repasser par PENDING
+  if (
+    (application.status === 'PENDING' && (target === 'ACCEPTED' || target === 'REJECTED')) ||
+    ((application.status === 'ACCEPTED' || application.status === 'REJECTED') &&
+      target === 'PENDING')
+  ) {
+    // ok
+  } else {
+    throw createError({ statusCode: 400, statusMessage: 'Transition interdite' })
+  }
 
   const updated = await prisma.editionVolunteerApplication.update({
     where: { id: applicationId },
-    data: { status: parsed.status, decidedAt: new Date() },
+    data: {
+      status: target,
+      decidedAt: target === 'ACCEPTED' || target === 'REJECTED' ? new Date() : null,
+    },
     select: { id: true, status: true, decidedAt: true },
   })
   return { success: true, application: updated }

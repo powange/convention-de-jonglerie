@@ -1,6 +1,25 @@
 import { requireUserSession } from '#imports'
 
+import { prisma } from '../../utils/prisma'
+
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)
-  return { user }
+  // Recharger les champs éventuellement manquants (telephone, profilePicture...)
+  const full = await prisma.user.findUnique({
+    // user peut être typé sans id dans le wrapper nuxt-auth-utils, on caste
+    where: { id: (user as any).id },
+    select: {
+      id: true,
+      email: true,
+      pseudo: true,
+      nom: true,
+      prenom: true,
+      phone: true,
+      profilePicture: true,
+      isGlobalAdmin: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  })
+  return { user: full || user }
 })

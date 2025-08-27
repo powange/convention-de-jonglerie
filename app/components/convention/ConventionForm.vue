@@ -1,6 +1,6 @@
 <template>
   <UForm :state="form" :validate="validate" class="space-y-6" @submit="onSubmit">
-    <!-- Nom de la convention -->
+    <!-- Convention name -->
     <UFormField :label="$t('components.convention_form.convention_name')" name="name" required>
       <UInput
         v-model="form.name"
@@ -124,6 +124,8 @@ import { reactive, ref, onMounted } from 'vue'
 import ImageUpload from '~/components/ui/ImageUpload.vue'
 import type { Convention } from '~/types'
 
+const { t } = useI18n()
+
 interface Props {
   initialData?: Convention
   submitButtonText?: string
@@ -190,7 +192,7 @@ const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
   if (result.success && result.imageUrl) {
     form.logo = result.imageUrl
     toast.add({
-      title: 'Image uploadée',
+      title: t('components.convention_form.image_uploaded'),
       description: "L'image a été uploadée avec succès",
       color: 'success',
     })
@@ -200,7 +202,7 @@ const onImageUploaded = (result: { success: boolean; imageUrl?: string }) => {
 const onImageDeleted = () => {
   form.logo = ''
   toast.add({
-    title: 'Image supprimée',
+    title: t('components.convention_form.image_deleted'),
     description: "L'image a été supprimée avec succès",
     color: 'success',
   })
@@ -219,17 +221,17 @@ const validate = (state: typeof form) => {
   const errors = []
 
   if (!state.name || state.name.trim().length === 0) {
-    errors.push({ path: 'name', message: 'Le nom de la convention est requis' })
+    errors.push({ path: 'name', message: t('errors.required_field') })
   } else if (state.name.trim().length < 3) {
-    errors.push({ path: 'name', message: 'Le nom doit contenir au moins 3 caractères' })
+    errors.push({ path: 'name', message: t('validation.name_min_3') })
   } else if (state.name.trim().length > 100) {
-    errors.push({ path: 'name', message: 'Le nom ne peut pas dépasser 100 caractères' })
+    errors.push({ path: 'name', message: t('validation.name_max_100') })
   }
 
   if (state.description && state.description.length > 1000) {
     errors.push({
       path: 'description',
-      message: 'La description ne peut pas dépasser 1000 caractères',
+      message: t('validation.description_max_1000'),
     })
   }
 

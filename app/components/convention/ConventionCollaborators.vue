@@ -155,7 +155,7 @@ const loadCollaborators = async () => {
   } catch {
     toast.add({
       title: 'Erreur',
-      description: 'Impossible de charger les collaborateurs',
+      description: t('components.collaborators.load_error'),
       icon: 'i-heroicons-exclamation-triangle',
       color: 'error',
     })
@@ -178,7 +178,7 @@ const addCollaborator = async () => {
     resetForm()
 
     toast.add({
-      title: 'Collaborateur ajouté',
+      title: t('components.collaborators.added'),
       description: `${newCollaborator.user.pseudo} peut maintenant modifier cette convention`,
       icon: 'i-heroicons-check-circle',
       color: 'success',
@@ -190,7 +190,7 @@ const addCollaborator = async () => {
       'statusMessage' in error &&
       typeof error.statusMessage === 'string'
         ? error.statusMessage
-        : "Impossible d'ajouter le collaborateur"
+        : t('components.collaborators.add_error')
     toast.add({
       title: 'Erreur',
       description: errorMessage,
@@ -212,7 +212,7 @@ const removeCollaborator = async (collaborator: ConventionCollaborator) => {
     collaborators.value = collaborators.value.filter((c) => c.id !== collaborator.id)
 
     toast.add({
-      title: 'Collaborateur retiré',
+      title: t('components.collaborators.removed'),
       description: `${collaborator.user.pseudo} ne peut plus modifier cette convention`,
       icon: 'i-heroicons-check-circle',
       color: 'green',
@@ -224,7 +224,7 @@ const removeCollaborator = async (collaborator: ConventionCollaborator) => {
       'statusMessage' in error &&
       typeof error.statusMessage === 'string'
         ? error.statusMessage
-        : 'Impossible de retirer le collaborateur'
+        : t('components.collaborators.remove_error')
     toast.add({
       title: 'Erreur',
       description: errorMessage,

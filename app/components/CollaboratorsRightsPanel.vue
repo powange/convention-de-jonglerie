@@ -11,7 +11,8 @@
         icon="i-heroicons-arrow-path"
         :loading="loading"
         @click="refresh"
-        >{{ $t('common.refresh') }}</UButton>
+        >{{ $t('common.refresh') }}</UButton
+      >
     </div>
 
     <div v-if="loading" class="text-sm text-gray-500">{{ $t('common.loading') }}</div>
@@ -146,17 +147,29 @@
           >
           <span class="text-[10px] text-gray-400">{{ timeAgo(h.createdAt) }}</span>
         </div>
-        <div class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 flex flex-wrap gap-3 items-center">
+        <div
+          class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 flex flex-wrap gap-3 items-center"
+        >
           <span v-if="h.targetUser" class="flex items-center gap-1">
             <span class="sr-only">{{ $t('h.targetUser') }}</span>
             <span>{{ $t('components.collaborators_rights_panel.target_user_label') }}</span>
-            <UAvatar v-if="(h as any).targetUserAvatarSrc" :src="(h as any).targetUserAvatarSrc" size="2xs" :alt="h.targetUser.pseudo" />
+            <UAvatar
+              v-if="(h as any).targetUserAvatarSrc"
+              :src="(h as any).targetUserAvatarSrc"
+              size="2xs"
+              :alt="h.targetUser.pseudo"
+            />
             <span>{{ h.targetUser.pseudo }}</span>
           </span>
           <span v-if="h.actor" class="opacity-70 flex items-center gap-1">
             <span class="sr-only">{{ $t('h.actor') }}</span>
             <span>{{ $t('components.collaborators_rights_panel.by_user_label') }}</span>
-            <UAvatar v-if="(h as any).actorAvatarSrc" :src="(h as any).actorAvatarSrc" size="2xs" :alt="h.actor.pseudo" />
+            <UAvatar
+              v-if="(h as any).actorAvatarSrc"
+              :src="(h as any).actorAvatarSrc"
+              size="2xs"
+              :alt="h.actor.pseudo"
+            />
             <span>{{ h.actor.pseudo }}</span>
           </span>
         </div>
@@ -339,9 +352,16 @@ async function save(c: CollaboratorItem) {
   if (!d) return
   savingId.value = c.id
   try {
+    // Normaliser le titre : trim et convertir chaîne vide en null pour éviter d'envoyer null involontairement
+    const normalizedTitle = (d.title ?? '').trim()
+    const body = {
+      title: normalizedTitle.length ? normalizedTitle : null,
+      rights: d.rights,
+      perEdition: d.perEdition,
+    }
     await $fetch(`/api/conventions/${props.conventionId}/collaborators/${c.id}`, {
       method: 'PATCH' as any,
-      body: { title: d.title, rights: d.rights, perEdition: d.perEdition },
+      body,
     })
     toast.add({
       title: t('components.collaborators_rights_panel.saved'),

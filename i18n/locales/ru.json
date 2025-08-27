@@ -300,7 +300,13 @@
     "time_minutes_ago": "{count} мин назад",
     "tip": "Совет",
     "view": "Просмотреть",
-    "view_details": "Просмотреть детали"
+    "view_details": "Просмотреть детали",
+    "active": "Активный",
+    "inactive": "Неактивный",
+    "updated_at": "Обновлено {date}",
+    "saving": "Сохранение...",
+    "saved": "Сохранено",
+    "required": "Обязательно"
   },
   "components": {
     "carpool": {
@@ -413,7 +419,9 @@
       "loading_error_title": "Ошибка загрузки",
       "logo_preview": "Предварительный просмотр логотипа:",
       "logo_url_description": "URL изображения логотипа конвенции",
-      "upload_file": "Загрузить файл"
+      "upload_file": "Загрузить файл",
+      "image_uploaded": "Image uploadée",
+      "image_deleted": "Image supprimée"
     },
     "country_select": {
       "no_countries_found": "Страны не найдены",
@@ -425,7 +433,18 @@
       "instagram_account": "Аккаунт Instagram",
       "next": "Следующий",
       "previous": "Предыдущий",
-      "ticketing_link": "Ссылка на билеты"
+      "ticketing_link": "Ссылка на билеты",
+      "poster_placeholder": "Cliquez pour sélectionner le poster de l'édition",
+      "poster_alt": "Poster de l'édition",
+      "address_tip": "Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte.",
+      "country_placeholder": "Nom du pays",
+      "convention_description_placeholder": "Description de la convention",
+      "social_networks_title": "Réseaux sociaux",
+      "step_general_title": "Informations Générales",
+      "step_general_description": "Informations Générales",
+      "step_services_title": "Services Proposés",
+      "step_visibility_title": "Visibilité (Réseaux Sociaux)",
+      "step_visibility_description": "Réseaux Sociaux"
     },
     "favorites_map": {
       "all_favorites": "Все избранные",
@@ -453,6 +472,19 @@
       "reply_to_comment": "Ответить на этот комментарий",
       "your_reply": "Ваш ответ",
       "your_reply_placeholder": "Ваш ответ..."
+    },
+    "date_time_picker": {
+      "placeholder": "Sélectionner une date"
+    },
+    "country_multi_select": {
+      "placeholder": "Sélectionner des pays..."
+    },
+    "collaborators": {
+      "added": "Collaborateur ajouté",
+      "add_error": "Impossible d'ajouter le collaborateur",
+      "removed": "Collaborateur retiré",
+      "load_error": "Impossible de charger les collaborateurs",
+      "remove_error": "Impossible de retirer le collaborateur"
     }
   },
   "conventions": {
@@ -542,7 +574,56 @@
     "ticketing": "Билеты",
     "useful_links": "Полезные ссылки",
     "show_returned_items": "Показать возвращенные предметы",
-    "hide_returned_items": "Скрыть возвращенные предметы"
+    "hide_returned_items": "Скрыть возвращенные предметы",
+    "volunteers_title": "Волонтёры",
+    "volunteers_open": "Открыть",
+    "volunteers_close": "Закрыть",
+    "volunteers_description_label": "Описание для волонтёров",
+    "volunteers_description_placeholder": "Опишите потребности, роли, расписания, преимущества...",
+    "volunteers_no_description": "Нет конкретного описания для волонтёров.",
+    "volunteers_total": "Всего",
+    "volunteers_status_pending": "В ожидании",
+    "volunteers_status_accepted": "Принято",
+    "volunteers_status_rejected": "Отклонено",
+    "volunteers_closed_message": "Заявки волонтёров в настоящее время не принимаются.",
+    "volunteers_motivation_label": "Мотивация (необязательно)",
+    "volunteers_motivation_placeholder": "Кратко объясните, почему вы хотите помочь...",
+    "volunteers_phone_required": "Телефон (необходим для связи)",
+    "volunteers_mode_label": "Режим обработки заявок",
+    "volunteers_mode_internal": "Внутренний (форма на сайте)",
+    "volunteers_mode_external": "Внешний (ссылка на сторонний инструмент)",
+    "volunteers_external_url_label": "Внешний URL",
+    "volunteers_external_url_hint": "Ссылка на внешнюю форму или платформу управления волонтёрами.",
+    "volunteers_personal_info_notice": "Передаваемая личная информация",
+    "volunteers_personal_info_disclaimer": "Указанная выше информация (имя, фамилия, телефон) будет предоставлена организаторам для управления командами волонтёров. При необходимости заполните недостающие поля ниже.",
+    "volunteers_first_name": "Имя",
+    "volunteers_last_name": "Фамилия",
+    "volunteers_phone": "Телефон",
+    "volunteers_first_name_required": "Имя (обязательно – отсутствует в профиле)",
+    "volunteers_last_name_required": "Фамилия (обязательно – отсутствует в профиле)",
+    "volunteers_apply": "Подать заявку волонтёра",
+    "volunteers_apply_description": "Отправьте заявку на помощь во время мероприятия.",
+    "volunteers_motivation_hint": "Ваше (необязательное) сообщение поможет организаторам назначить вам подходящую задачу. Макс {max} символов.",
+    "volunteers_withdraw": "Отозвать мою заявку",
+    "volunteers_login_prompt": "Войдите, чтобы подать заявку волонтёра.",
+    "volunteers_filter_status": "Фильтр по статусу",
+    "volunteers_status_all": "Все",
+    "volunteers_table_user": "Заявитель",
+    "volunteers_table_motivation": "Мотивация",
+    "volunteers_action_accept": "Принять",
+    "volunteers_action_reject": "Отклонить",
+    "volunteers_action_back_pending": "Вернуть в ожидание",
+    "volunteers_my_application_title": "Моя заявка",
+    "volunteers_my_application_pending": "Моя заявка находится в ожидании.",
+    "volunteers_my_application_accepted": "Моя заявка принята.",
+    "volunteers_my_application_rejected": "Моя заявка отклонена.",
+    "volunteers_no_applications": "Нет заявок",
+    "volunteers_search": "Поиск",
+    "volunteers_search_placeholder": "Имя пользователя, email, мотивация...",
+    "volunteers_table_first_name": "Имя",
+    "volunteers_table_last_name": "Фамилия",
+    "volunteers_filtered_count": "{filtered} из {total} заявок",
+    "volunteers_admin_only_note": "Следующая информация (заявки, фильтры и подробная статистика) видна только уполномоченным организаторам и сотрудникам."
   },
   "errors": {
     "access_denied": "Доступ запрещен",
@@ -829,13 +910,24 @@
       "actions": "Действия",
       "delete_edition": "Удалить издание",
       "edit_edition": "Редактировать издание",
-      "in_development": "В разработке",
       "lost_found_active_description": "Вы можете управлять найденными вещами во время проведения издания.",
       "manage": "Управлять",
       "manage_lost_found": "Управлять потерянными вещами",
-      "upcoming_feature": "Предстоящая функция",
       "volunteer_description": "Этот раздел позволит вам управлять командами волонтеров для издания, назначать роли и координировать активности.",
-      "volunteer_management": "Управление волонтерами"
+  "volunteer_management": "Запрос волонтеров",
+      "volunteer_description_active": "Настройте здесь заявки волонтёров: открыть/закрыть, описание, внутренний режим или внешняя ссылка."
+    },
+    "benevoles": {
+      "external_mode_active": "Mode externe actif : les candidatures sont gérées via un outil tiers.",
+      "url_label": "URL:",
+      "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
+    },
+    "objets_trouves": {
+      "photo_alt": "Photo de l'objet trouvé"
+    },
+    "profile": {
+      "photo_alt": "Photo de profil",
+      "photo_placeholder": "Cliquez pour changer votre photo de profil"
     }
   },
   "permissions": {
@@ -890,7 +982,6 @@
     "favorites": "Избранные",
     "favorites_received": "Полученные избранные",
     "first_name_placeholder": "Ваше имя",
-    "first_name_required": "Имя обязательно",
     "formats_accepted": "• Принятые форматы: JPG, PNG, GIF, WebP",
     "global_admin": "Глобальный администратор",
     "gravatar_avatar": "Аватар от Gravatar",
@@ -898,7 +989,6 @@
     "important_info": "Важная информация",
     "info_saved": "Ваша информация сохранена",
     "last_name_placeholder": "Ваша фамилия",
-    "last_name_required": "Фамилия обязательна",
     "manage_password": "Управляйте вашим паролем",
     "manage_profile_info": "Управляйте информацией вашего профиля",
     "max_size": "• Максимальный размер: 5МБ",
@@ -931,7 +1021,11 @@
     "unsaved_changes": "У вас есть несохраненные изменения",
     "username_hint": "Публично видимый для других пользователей",
     "username_min_3": "Имя пользователя должно содержать минимум 3 символа",
-    "username_placeholder": "Ваше уникальное имя пользователя"
+    "username_placeholder": "Ваше уникальное имя пользователя",
+    "optional_section_title": "Дополнительный раздел",
+    "optional": "Необязательно",
+    "phone": "Телефон",
+    "phone_placeholder": "Ваш номер телефона"
   },
   "services": {
     "accessibility": "Доступность для людей с инвалидностью",
@@ -996,10 +1090,27 @@
     "upload": "Загрузить",
     "upload_error": "Ошибка загрузки",
     "uploading": "Загрузка...",
-    "validation_error": "Ошибка валидации"
+    "validation_error": "Ошибка валидации",
+    "success_message": "Image uploadée avec succès !",
+    "delete_message": "Image supprimée",
+    "error_message": "Erreur d'upload"
   },
   "h": {
     "actor": "Актер",
     "targetUser": "Целевой пользователь"
+  },
+  "volunteersInfo": {
+    "externalUrl": "Внешний URL"
+  },
+  "validation": {
+    "name_min_3": "Le nom doit contenir au moins 3 caractères",
+    "name_max_100": "Le nom ne peut pas dépasser 100 caractères",
+    "name_max_200": "Le nom ne peut pas dépasser 200 caractères",
+    "description_max_1000": "La description ne peut pas dépasser 1000 caractères",
+    "date_end_after_start": "La date de fin doit être strictement supérieure à la date de début",
+    "date_start_required": "La date de début est requise"
+  },
+  "countries": {
+    "czech_republic": "République Tchèque"
   }
 }

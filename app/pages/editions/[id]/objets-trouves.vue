@@ -175,7 +175,7 @@
             }}
           </p>
         </div>
-  <!-- Bouton 'Afficher les objets restitués' supprimé selon demande -->
+        <!-- Bouton 'Afficher les objets restitués' supprimé selon demande -->
       </div>
 
       <!-- Modal d'ajout d'objet trouvé -->
@@ -208,7 +208,7 @@
                   },
                   resetAfterUpload: false,
                 }"
-                alt="Photo de l'objet trouvé"
+                :alt="$t('pages.objets_trouves.photo_alt')"
                 :placeholder="t('editions.choose_photo')"
                 :allow-delete="false"
                 @uploaded="onImageUploaded"

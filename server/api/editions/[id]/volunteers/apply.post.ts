@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { prisma } from '../../../../utils/prisma'
 
 const bodySchema = z.object({
@@ -8,11 +9,12 @@ const bodySchema = z.object({
     .max(30)
     .regex(/^[+0-9 ().-]{6,30}$/)
     .optional(),
+  nom: z.string().min(1).max(100).optional(),
+  prenom: z.string().min(1).max(100).optional(),
 })
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user)
-    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+  if (!event.context.user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   if (!editionId) throw createError({ statusCode: 400, statusMessage: 'Edition invalide' })
   const body = await readBody(event).catch(() => ({}))
@@ -36,18 +38,31 @@ export default defineEventHandler(async (event) => {
   // Téléphone requis : si pas déjà défini dans user et pas fourni -> erreur
   const user = await prisma.user.findUnique({
     where: { id: event.context.user.id },
-    select: { phone: true },
+    select: { phone: true, nom: true, prenom: true },
   })
   if (!user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
 
-  let finalPhone = user.phone
-  if (!finalPhone) {
-    if (!parsed.phone) {
-      throw createError({ statusCode: 400, statusMessage: 'Téléphone requis' })
-    }
-    finalPhone = parsed.phone
-    // Mise à jour user
-    await prisma.user.update({ where: { id: event.context.user.id }, data: { phone: finalPhone } })
+  // Validations cumulées
+  const missing: string[] = []
+  if (!user.phone && !parsed.phone) missing.push('Téléphone')
+  if (!user.nom && !parsed.nom) missing.push('Nom')
+  if (!user.prenom && !parsed.prenom) missing.push('Prénom')
+  if (missing.length) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `${missing.join(', ')} requis${missing.length > 1 ? ' sont' : ' est'}`,
+    })
+  }
+
+  const finalPhone = user.phone || parsed.phone!
+
+  // Mettre à jour user si des données manquent
+  const updateData: Record<string, any> = {}
+  if (!user.phone && parsed.phone) updateData.phone = parsed.phone
+  if (!user.nom && parsed.nom) updateData.nom = parsed.nom
+  if (!user.prenom && parsed.prenom) updateData.prenom = parsed.prenom
+  if (Object.keys(updateData).length) {
+    await prisma.user.update({ where: { id: event.context.user.id }, data: updateData })
   }
 
   const application = await prisma.editionVolunteerApplication.create({

@@ -83,7 +83,10 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
       expect.objectContaining({
         where: { id: 1 },
         data: expect.objectContaining({ status: 'RETURNED', updatedAt: expect.any(Date) }),
-        include: expect.objectContaining({ user: expect.any(Object), comments: expect.any(Object) }),
+        include: expect.objectContaining({
+          user: expect.any(Object),
+          comments: expect.any(Object),
+        }),
       })
     )
   })
@@ -173,7 +176,10 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
     expect(prismaMock.lostFoundItem.update).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: 1 },
-        include: expect.objectContaining({ comments: expect.any(Object), user: expect.any(Object) }),
+        include: expect.objectContaining({
+          comments: expect.any(Object),
+          user: expect.any(Object),
+        }),
       })
     )
   })

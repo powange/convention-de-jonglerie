@@ -6,7 +6,7 @@
         <div class="flex items-start gap-4">
           <div v-if="edition.convention?.logo" class="flex-shrink-0">
             <img
-              :src="normalizeImageUrl(edition.convention.logo)"
+              :src="normalizeImageUrl(edition.convention.logo || '') || ''"
               :alt="edition.convention.name"
               class="w-16 h-16 object-cover rounded-lg shadow-md"
             />
@@ -118,6 +118,26 @@
         </NuxtLink>
 
         <NuxtLink
+          v-if="volunteersTabVisible"
+          :to="`/editions/${edition.id}/benevoles`"
+          :class="[
+            'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
+            currentPage === 'benevoles'
+              ? 'border-primary-500 text-primary-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+          ]"
+          :title="t('editions.volunteers_title')"
+        >
+          <UIcon
+            name="i-heroicons-hand-raised"
+            :class="['sm:mr-1']"
+            size="24"
+            class="sm:!w-4 sm:!h-4"
+          />
+          <span class="hidden sm:inline">{{ t('editions.volunteers_title') }}</span>
+        </NuxtLink>
+
+        <NuxtLink
           v-if="hasEditionStarted"
           :to="`/editions/${edition.id}/objets-trouves`"
           :class="[
@@ -175,7 +195,13 @@ const { normalizeImageUrl } = useImageUrl()
 
 interface Props {
   edition: Edition
-  currentPage: 'details' | 'commentaires' | 'covoiturage' | 'gestion' | 'objets-trouves'
+  currentPage:
+    | 'details'
+    | 'commentaires'
+    | 'covoiturage'
+    | 'gestion'
+    | 'objets-trouves'
+    | 'benevoles'
   isFavorited?: boolean
 }
 
@@ -199,6 +225,17 @@ const canAccess = computed(() => {
   return canEdit || authStore.user?.id === props.edition?.creatorId
 })
 
+// Visibilité onglet bénévoles: ouvert OU utilisateur peut éditer
+const volunteersTabVisible = computed<boolean>(() => {
+  if (!props.edition) return false
+  // Toujours visible pour les éditeurs (gestion interne même fermé au public)
+  if (authStore.user?.id && editionStore.canEditEdition(props.edition, authStore.user.id))
+    return true
+  // Visible publiquement uniquement si ouvert
+  // edition.volunteersOpen peut ne pas encore être dans le type Edition (ajout récent), cast temporaire
+  return (props.edition as any).volunteersOpen === true
+})
+
 // Vérifier si l'édition a commencé (affichage onglet objets trouvés dès le début)
 const hasEditionStarted = computed(() => {
   if (!props.edition) return false
@@ -210,7 +247,7 @@ const formatDateRange = (start: string, end: string) => {
   const { locale } = useI18n()
   const startDate = new Date(start)
   const endDate = new Date(end)
-  const options = { day: 'numeric', month: 'long', year: 'numeric' }
+  const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' }
 
   if (startDate.toDateString() === endDate.toDateString()) {
     return startDate.toLocaleDateString(locale.value, options)
@@ -221,11 +258,12 @@ const formatDateRange = (start: string, end: string) => {
 
 // Obtenir le titre de la page selon la page courante
 const getPageTitle = (page: string) => {
-  const titles = {
+  const titles: Record<string, string> = {
     details: t('editions.about_this_edition'),
     commentaires: t('editions.posts'),
     covoiturage: t('editions.carpool'),
     'objets-trouves': t('editions.lost_found'),
+    benevoles: t('editions.volunteers_title'),
     gestion: t('editions.management'),
   }
   return titles[page] || t('editions.about_this_edition')

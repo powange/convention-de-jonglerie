@@ -4,6 +4,9 @@ export interface User {
   pseudo: string
   imageUrl?: string | null
   prenom: string
+  nom?: string
+  telephone?: string | null
+  phone?: string | null // compat ancien champ
   profilePicture?: string | null
   isGlobalAdmin?: boolean
   createdAt: string
@@ -179,7 +182,16 @@ export interface EditionFormData {
   hasAccessibility?: boolean
   hasWorkshops?: boolean
   hasCreditCardPayment?: boolean
-  hasAfjTokenPayment?: boolean
+  hasAfjTokenPayment: boolean
+}
+
+// Paramètres bénévolat associés à une édition (pas forcément tous modifiables via le formulaire principal)
+export interface EditionVolunteerSettings {
+  volunteersOpen?: boolean
+  volunteersDescription?: string | null
+  volunteersMode?: 'INTERNAL' | 'EXTERNAL'
+  volunteersExternalUrl?: string | null
+  volunteersUpdatedAt?: string | null
 }
 
 // Types pour les formulaires de convention

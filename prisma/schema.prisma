@@ -18,6 +18,12 @@ enum CollaboratorPermissionChangeType {
   REMOVED
 }
 
+// Mode de gestion des bénévoles
+enum VolunteerMode {
+  INTERNAL
+  EXTERNAL
+}
+
 model User {
   id                       Int                             @id @default(autoincrement())
   email                    String                          @unique
@@ -112,6 +118,8 @@ model Edition {
   volunteersOpen          Boolean                         @default(false)
   volunteersDescription   String?                         @db.Text
   volunteersUpdatedAt     DateTime?
+  volunteersMode          VolunteerMode                   @default(INTERNAL)
+  volunteersExternalUrl   String?
   volunteerApplications   EditionVolunteerApplication[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")

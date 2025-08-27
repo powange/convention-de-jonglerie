@@ -300,7 +300,13 @@
     "time_minutes_ago": "hace {count} min",
     "tip": "Consejo",
     "view": "Ver",
-    "view_details": "Ver detalles"
+    "view_details": "Ver detalles",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "updated_at": "Actualizado el {date}",
+    "saving": "Guardando...",
+    "saved": "Guardado",
+    "required": "Requerido"
   },
   "components": {
     "carpool": {
@@ -413,7 +419,9 @@
       "loading_error_title": "Error de carga",
       "logo_preview": "Vista previa del logo:",
       "logo_url_description": "URL de la imagen del logo de la convención",
-      "upload_file": "Subir archivo"
+      "upload_file": "Subir archivo",
+      "image_uploaded": "Image uploadée",
+      "image_deleted": "Image supprimée"
     },
     "country_select": {
       "no_countries_found": "No se encontraron países",
@@ -425,7 +433,18 @@
       "instagram_account": "Cuenta de Instagram",
       "next": "Siguiente",
       "previous": "Anterior",
-      "ticketing_link": "Enlace de venta de entradas"
+      "ticketing_link": "Enlace de venta de entradas",
+      "poster_placeholder": "Cliquez pour sélectionner le poster de l'édition",
+      "poster_alt": "Poster de l'édition",
+      "address_tip": "Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte.",
+      "country_placeholder": "Nom du pays",
+      "convention_description_placeholder": "Description de la convention",
+      "social_networks_title": "Réseaux sociaux",
+      "step_general_title": "Informations Générales",
+      "step_general_description": "Informations Générales",
+      "step_services_title": "Services Proposés",
+      "step_visibility_title": "Visibilité (Réseaux Sociaux)",
+      "step_visibility_description": "Réseaux Sociaux"
     },
     "favorites_map": {
       "all_favorites": "Todas son favoritas",
@@ -453,6 +472,19 @@
       "reply_to_comment": "Responder a este comentario",
       "your_reply": "Tu respuesta",
       "your_reply_placeholder": "Tu respuesta..."
+    },
+    "date_time_picker": {
+      "placeholder": "Sélectionner une date"
+    },
+    "country_multi_select": {
+      "placeholder": "Sélectionner des pays..."
+    },
+    "collaborators": {
+      "added": "Collaborateur ajouté",
+      "add_error": "Impossible d'ajouter le collaborateur",
+      "removed": "Collaborateur retiré",
+      "load_error": "Impossible de charger les collaborateurs",
+      "remove_error": "Impossible de retirer le collaborateur"
     }
   },
   "conventions": {
@@ -542,7 +574,56 @@
     "ticketing": "Venta de entradas",
     "useful_links": "Enlaces útiles",
     "show_returned_items": "Mostrar artículos devueltos",
-    "hide_returned_items": "Ocultar artículos devueltos"
+    "hide_returned_items": "Ocultar artículos devueltos",
+    "volunteers_title": "Voluntarios",
+    "volunteers_open": "Abrir",
+    "volunteers_close": "Cerrar",
+    "volunteers_description_label": "Descripción para voluntarios",
+    "volunteers_description_placeholder": "Describe necesidades, roles, horarios, beneficios...",
+    "volunteers_no_description": "Sin descripción específica para voluntarios.",
+    "volunteers_total": "Total",
+    "volunteers_status_pending": "Pendiente",
+    "volunteers_status_accepted": "Aceptado",
+    "volunteers_status_rejected": "Rechazado",
+    "volunteers_closed_message": "Las solicitudes de voluntarios no están abiertas actualmente.",
+    "volunteers_motivation_label": "Motivación (opcional)",
+    "volunteers_motivation_placeholder": "Explica brevemente por qué deseas ayudar...",
+    "volunteers_phone_required": "Teléfono (requerido para contactarte)",
+    "volunteers_mode_label": "Modo de gestión de solicitudes",
+    "volunteers_mode_internal": "Interno (formulario en el sitio)",
+    "volunteers_mode_external": "Externo (enlace a herramienta de terceros)",
+    "volunteers_external_url_label": "URL externa",
+    "volunteers_external_url_hint": "Enlace al formulario o plataforma externa de gestión de voluntarios.",
+    "volunteers_personal_info_notice": "Información personal compartida",
+    "volunteers_personal_info_disclaimer": "La información anterior (nombre, apellido, teléfono) se proporcionará a los organizadores para gestionar los equipos de voluntarios. Complete los campos faltantes a continuación si es necesario.",
+    "volunteers_first_name": "Nombre",
+    "volunteers_last_name": "Apellido",
+    "volunteers_phone": "Teléfono",
+    "volunteers_first_name_required": "Nombre (requerido – falta en tu perfil)",
+    "volunteers_last_name_required": "Apellido (requerido – falta en tu perfil)",
+    "volunteers_apply": "Postularse como voluntario",
+    "volunteers_apply_description": "Envía tu solicitud para ayudar durante la edición.",
+    "volunteers_motivation_hint": "Tu mensaje (opcional) ayuda a los organizadores a asignarte la tarea correcta. Máx {max} caracteres.",
+    "volunteers_withdraw": "Retirar mi solicitud",
+    "volunteers_login_prompt": "Inicia sesión para postularte como voluntario.",
+    "volunteers_filter_status": "Filtrar por estado",
+    "volunteers_status_all": "Todos",
+    "volunteers_table_user": "Solicitante",
+    "volunteers_table_motivation": "Motivación",
+    "volunteers_action_accept": "Aceptar",
+    "volunteers_action_reject": "Rechazar",
+    "volunteers_action_back_pending": "Volver a pendiente",
+    "volunteers_my_application_title": "Mi solicitud",
+    "volunteers_my_application_pending": "Mi solicitud está actualmente pendiente.",
+    "volunteers_my_application_accepted": "Mi solicitud ha sido aceptada.",
+    "volunteers_my_application_rejected": "Mi solicitud ha sido rechazada.",
+    "volunteers_no_applications": "Sin solicitudes",
+    "volunteers_search": "Buscar",
+    "volunteers_search_placeholder": "Nombre de usuario, correo, motivación...",
+    "volunteers_table_first_name": "Nombre",
+    "volunteers_table_last_name": "Apellido",
+    "volunteers_filtered_count": "{filtered} de {total} solicitudes",
+    "volunteers_admin_only_note": "La siguiente información (solicitudes, filtros y estadísticas detalladas) solo es visible para organizadores y colaboradores autorizados."
   },
   "errors": {
     "access_denied": "Acceso denegado",
@@ -829,13 +910,24 @@
       "actions": "Acciones",
       "delete_edition": "Eliminar edición",
       "edit_edition": "Editar edición",
-      "in_development": "En desarrollo",
       "lost_found_active_description": "Puedes gestionar los objetos perdidos durante el transcurso de la edición.",
       "manage": "Gestionar",
       "manage_lost_found": "Gestionar objetos perdidos",
-      "upcoming_feature": "Funcionalidad próxima",
       "volunteer_description": "Esta sección permitirá gestionar los equipos de voluntarios para la edición, asignar roles y coordinar actividades.",
-      "volunteer_management": "Gestión de voluntarios"
+  "volunteer_management": "Solicitud de voluntarios",
+      "volunteer_description_active": "Configura aquí las solicitudes de voluntarios: abrir/cerrar, descripción, modo interno o enlace externo."
+    },
+    "benevoles": {
+      "external_mode_active": "Mode externe actif : les candidatures sont gérées via un outil tiers.",
+      "url_label": "URL:",
+      "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
+    },
+    "objets_trouves": {
+      "photo_alt": "Photo de l'objet trouvé"
+    },
+    "profile": {
+      "photo_alt": "Photo de profil",
+      "photo_placeholder": "Cliquez pour changer votre photo de profil"
     }
   },
   "permissions": {
@@ -890,7 +982,6 @@
     "favorites": "Favoritos",
     "favorites_received": "Favoritos recibidos",
     "first_name_placeholder": "Tu nombre",
-    "first_name_required": "El nombre es requerido",
     "formats_accepted": "• Formatos aceptados: JPG, PNG, GIF, WebP",
     "global_admin": "Administrador global",
     "gravatar_avatar": "Avatar proporcionado por Gravatar",
@@ -898,7 +989,6 @@
     "important_info": "Información importante",
     "info_saved": "Tu información ha sido guardada",
     "last_name_placeholder": "Tu apellido",
-    "last_name_required": "El apellido es requerido",
     "manage_password": "Gestiona tu contraseña",
     "manage_profile_info": "Gestiona tu información de perfil",
     "max_size": "• Tamaño máximo: 5MB",
@@ -931,7 +1021,11 @@
     "unsaved_changes": "Tienes cambios sin guardar",
     "username_hint": "Visible públicamente por otros usuarios",
     "username_min_3": "El nombre de usuario debe contener al menos 3 caracteres",
-    "username_placeholder": "Tu nombre de usuario único"
+    "username_placeholder": "Tu nombre de usuario único",
+    "optional_section_title": "Sección opcional",
+    "optional": "Opcional",
+    "phone": "Teléfono",
+    "phone_placeholder": "Tu número de teléfono"
   },
   "services": {
     "accessibility": "Accesibilidad para discapacitados",
@@ -996,10 +1090,27 @@
     "upload": "Subir",
     "upload_error": "Error de subida",
     "uploading": "Subiendo...",
-    "validation_error": "Error de validación"
+    "validation_error": "Error de validación",
+    "success_message": "Image uploadée avec succès !",
+    "delete_message": "Image supprimée",
+    "error_message": "Erreur d'upload"
   },
   "h": {
     "actor": "Actor",
     "targetUser": "Usuario objetivo"
+  },
+  "volunteersInfo": {
+    "externalUrl": "URL externa"
+  },
+  "validation": {
+    "name_min_3": "Le nom doit contenir au moins 3 caractères",
+    "name_max_100": "Le nom ne peut pas dépasser 100 caractères",
+    "name_max_200": "Le nom ne peut pas dépasser 200 caractères",
+    "description_max_1000": "La description ne peut pas dépasser 1000 caractères",
+    "date_end_after_start": "La date de fin doit être strictement supérieure à la date de début",
+    "date_start_required": "La date de début est requise"
+  },
+  "countries": {
+    "czech_republic": "République Tchèque"
   }
 }

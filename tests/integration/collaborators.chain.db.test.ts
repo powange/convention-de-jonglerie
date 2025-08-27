@@ -101,15 +101,15 @@ describe('Intégration collaborateurs: add -> patch -> delete -> history', () =>
         } as any,
         after: {
           title: beforeSnapshot.title,
-            rights: {
-              canEditConvention: true,
-              canDeleteConvention: false,
-              canManageCollaborators: false,
-              canAddEdition: false,
-              canEditAllEditions: false,
-              canDeleteAllEditions: false,
-            },
-            perEdition: [],
+          rights: {
+            canEditConvention: true,
+            canDeleteConvention: false,
+            canManageCollaborators: false,
+            canAddEdition: false,
+            canEditAllEditions: false,
+            canDeleteAllEditions: false,
+          },
+          perEdition: [],
         } as any,
       } as any,
     })

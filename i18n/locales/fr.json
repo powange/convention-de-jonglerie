@@ -164,6 +164,7 @@
     "add": "Ajouter",
     "view": "Voir",
     "close": "Fermer",
+    "manage": "Gérer",
     "confirm": "Confirmer",
     "optional": "Optionnel",
     "name": "Nom",
@@ -195,7 +196,13 @@
     "refresh": "Rafraîchir",
     "save": "Enregistrer",
     "reset": "Réinitialiser",
-    "deleted": "Supprimé"
+    "deleted": "Supprimé",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "updated_at": "Mis à jour le {date}",
+    "saving": "Enregistrement...",
+    "saved": "Sauvegardé",
+    "required": "Requis"
   },
   "dates": {
     "same_day_with_time": "Le {date} de {startTime} à {endTime}",
@@ -216,7 +223,6 @@
     "email_or_username_placeholder": "votre email ou votre pseudo",
     "password_placeholder": "Votre mot de passe",
     "show_password": "Afficher le mot de passe",
-  "phone_optional": "Téléphone (optionnel)",
     "hide_password": "Masquer le mot de passe",
     "forgot_password_link": "Mot de passe oublié ?",
     "login_button": "Se connecter",
@@ -349,6 +355,59 @@
     "poster_of": "Affiche de {name}",
     "length": "Longueur"
   },
+  "editions.volunteers_title": "Bénévolat",
+  "editions.volunteers_open": "Ouvrir",
+  "editions.volunteers_description_label": "Description pour les bénévoles",
+  "editions.volunteers_description_placeholder": "Décrivez les besoins, rôles, horaires, avantages...",
+  "editions.volunteers_no_description": "Aucune description spécifique pour les bénévoles.",
+  "editions.volunteers_total": "Total",
+  "editions.volunteers_status_pending": "En attente",
+  "editions.volunteers_status_accepted": "Accepté",
+  "editions.volunteers_status_rejected": "Refusé",
+  "editions.volunteers_closed_message": "Les candidatures bénévoles ne sont pas ouvertes actuellement.",
+  "editions.volunteers_motivation_label": "Motivation (optionnel)",
+  "editions.volunteers_motivation_placeholder": "Expliquez en quelques mots pourquoi vous souhaitez aider...",
+  "editions.volunteers_phone_required": "Téléphone (requis pour être contacté)",
+  "editions.volunteers_mode_label": "Mode de gestion des candidatures",
+  "editions.volunteers_mode_internal": "Interne (formulaire sur le site)",
+  "editions.volunteers_mode_external": "Externe (lien vers un outil tiers)",
+  "editions.volunteers_external_url_label": "URL externe",
+  "editions.volunteers_external_url_hint": "Lien vers le formulaire ou la plateforme externe de gestion des bénévoles.",
+  "editions.volunteers_personal_info_notice": "Informations personnelles partagées",
+  "editions.volunteers_personal_info_disclaimer": "Les informations ci-dessus (prénom, nom, téléphone) seront communiquées aux responsables de l'organisation pour gérer les équipes de bénévoles. Complétez ce qui manque ci-dessous si nécessaire.",
+  "editions.volunteers_first_name": "Prénom",
+  "editions.volunteers_last_name": "Nom",
+  "editions.volunteers_phone": "Téléphone",
+  "editions.volunteers_first_name_required": "Prénom (obligatoire – manquant dans votre profil)",
+  "editions.volunteers_last_name_required": "Nom (obligatoire – manquant dans votre profil)",
+  "editions.volunteers_apply": "Postuler comme bénévole",
+  "editions.volunteers_apply_description": "Soumettez votre candidature pour aider pendant l'édition.",
+  "editions.volunteers_motivation_hint": "Votre message (optionnel) aide les organisateurs à vous affecter à la bonne tâche. Max {max} caractères.",
+  "editions.volunteers_withdraw": "Retirer ma candidature",
+  "editions.volunteers_login_prompt": "Connectez-vous pour postuler comme bénévole.",
+  "editions.volunteers_filter_status": "Filtrer par statut",
+  "editions.volunteers_status_all": "Tous",
+  "editions.volunteers_table_user": "Candidat",
+  "editions.volunteers_table_motivation": "Motivation",
+  "editions.volunteers_action_accept": "Accepter",
+  "editions.volunteers_action_reject": "Refuser",
+  "editions.volunteers_action_back_pending": "Remettre en attente",
+  "editions.volunteers_my_application_title": "Ma candidature",
+  "editions.volunteers_my_application_pending": "Ma candidature est actuellement en attente.",
+  "editions.volunteers_my_application_accepted": "Ma candidature a été acceptée.",
+  "editions.volunteers_my_application_rejected": "Ma candidature a été refusée.",
+  "profile.optional_section_title": "Informations facultatives",
+  "profile.optional": "Optionnel",
+  "profile.phone": "Téléphone",
+  "profile.phone_placeholder": "+33 6 12 34 56 78",
+  "editions.volunteers_no_applications": "Aucune candidature",
+  "editions.volunteers_search": "Recherche",
+  "editions.volunteers_search_placeholder": "Pseudo, email, motivation...",
+  "editions.volunteers_table_first_name": "Prénom",
+  "editions.volunteers_table_last_name": "Nom",
+  "editions.volunteers_filtered_count": "{filtered} sur {total} candidatures",
+  "editions.volunteers_admin_only_note": "Les informations suivantes (candidatures, filtres et statistiques détaillées) sont visibles uniquement par les organisateurs et collaborateurs autorisés.",
+  "volunteersInfo.externalUrl": "URL externe",
   "conventions": {
     "my_conventions": "Mes Conventions",
     "create": "Créer une convention",
@@ -459,8 +518,6 @@
     "max_size": "• Taille maximale : 5MB",
     "recommended_resolution": "• Résolution recommandée : 400x400px minimum",
     "username_min_3": "Le pseudo doit contenir au moins 3 caractères",
-    "last_name_required": "Le nom est requis",
-    "first_name_required": "Le prénom est requis",
     "current_password_required": "Mot de passe actuel requis",
     "password_uppercase_required": "Le mot de passe doit contenir au moins une majuscule",
     "password_digit_required": "Le mot de passe doit contenir au moins un chiffre",
@@ -577,7 +634,10 @@
       "file_too_large": "Fichier trop volumineux",
       "invalid_file_type": "Type de fichier invalide",
       "invalid_file_extension": "Extension de fichier invalide"
-    }
+    },
+    "success_message": "Image uploadée avec succès !",
+    "delete_message": "Image supprimée",
+    "error_message": "Erreur d'upload"
   },
   "errors": {
     "delete_error": "Erreur lors de la suppression",
@@ -595,7 +655,6 @@
     "password_too_short": "Le mot de passe doit contenir au moins 8 caractères",
     "password_uppercase_required": "Le mot de passe doit contenir au moins une majuscule",
     "password_digit_required": "Le mot de passe doit contenir au moins un chiffre",
-  "invalid_phone": "Numéro de téléphone invalide",
     "passwords_dont_match": "Les mots de passe ne correspondent pas",
     "invalid_email": "Email invalide",
     "required_field": "Ce champ est requis",
@@ -694,8 +753,8 @@
       "refresh_history": "Rafraîchir",
       "load_history": "Charger l'historique",
       "no_history": "Aucun changement enregistré",
-  "by_user_label": "Par",
-  "target_user_label": "Ciblant",
+      "by_user_label": "Par",
+      "target_user_label": "Ciblant",
       "delete_confirm": "Supprimer ce collaborateur ?"
     },
     "country_select": {
@@ -712,7 +771,9 @@
       "convention_logo_alt": "Logo de la convention",
       "loading_error_title": "Erreur de chargement",
       "loading_error_description": "Impossible de charger l'image depuis cette URL",
-      "logo_url_description": "URL vers l'image du logo de la convention"
+      "logo_url_description": "URL vers l'image du logo de la convention",
+      "image_uploaded": "Image uploadée",
+      "image_deleted": "Image supprimée"
     },
     "favorites_map": {
       "no_upcoming_favorites": "Aucune édition favorite à venir avec localisation disponible",
@@ -727,7 +788,18 @@
       "convention_poster_optional": "Affiche de la convention (Optionnel)",
       "ticketing_link": "Lien de la billetterie",
       "facebook_page": "Page Facebook",
-      "instagram_account": "Compte Instagram"
+      "instagram_account": "Compte Instagram",
+      "poster_placeholder": "Cliquez pour sélectionner le poster de l'édition",
+      "poster_alt": "Poster de l'édition",
+      "address_tip": "Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte.",
+      "country_placeholder": "Nom du pays",
+      "convention_description_placeholder": "Description de la convention",
+      "social_networks_title": "Réseaux sociaux",
+      "step_general_title": "Informations Générales",
+      "step_general_description": "Informations Générales",
+      "step_services_title": "Services Proposés",
+      "step_visibility_title": "Visibilité (Réseaux Sociaux)",
+      "step_visibility_description": "Réseaux Sociaux"
     },
     "carpool": {
       "offer_vehicle_places": "Proposez des places dans votre véhicule",
@@ -825,6 +897,19 @@
       "upcoming": "À venir",
       "past": "Passées",
       "yellow_border_favorite": "Contour jaune = Favori"
+    },
+    "date_time_picker": {
+      "placeholder": "Sélectionner une date"
+    },
+    "country_multi_select": {
+      "placeholder": "Sélectionner des pays..."
+    },
+    "collaborators": {
+      "added": "Collaborateur ajouté",
+      "add_error": "Impossible d'ajouter le collaborateur",
+      "removed": "Collaborateur retiré",
+      "load_error": "Impossible de charger les collaborateurs",
+      "remove_error": "Impossible de retirer le collaborateur"
     }
   },
   "h": {
@@ -847,9 +932,9 @@
       "RIGHTS_UPDATED": "Droits mis à jour",
       "PER_EDITIONS_UPDATED": "Droits par édition mis à jour",
       "ARCHIVED": "Archivé",
-  "UNARCHIVED": "Désarchivé",
-  "CREATED": "Collaborateur ajouté",
-  "REMOVED": "Collaborateur retiré"
+      "UNARCHIVED": "Désarchivé",
+      "CREATED": "Collaborateur ajouté",
+      "REMOVED": "Collaborateur retiré"
     }
   },
   "c": {
@@ -897,10 +982,9 @@
       "actions": "Actions",
       "edit_edition": "Modifier l'édition",
       "delete_edition": "Supprimer l'édition",
-      "volunteer_management": "Gestion des bénévoles",
-      "upcoming_feature": "Fonctionnalité à venir",
+  "volunteer_management": "Demande de bénévoles",
       "volunteer_description": "Cette section permettra de gérer les équipes de bénévoles pour l'édition, attribuer des rôles et coordonner les activités.",
-      "in_development": "En développement",
+      "volunteer_description_active": "Configurez ici les candidatures bénévoles : ouverture/fermeture, description, mode interne ou lien externe.",
       "manage": "Gérer",
       "manage_lost_found": "Gérer les objets trouvés",
       "lost_found_active_description": "Vous pouvez gérer les objets trouvés pendant le déroulement de l'édition."
@@ -919,6 +1003,18 @@
       "loading_convention_data": "Chargement des données de la convention...",
       "convention_not_found_or_no_rights": "La convention que vous cherchez n'existe pas ou vous n'avez pas les droits pour la modifier.",
       "submit_button": "Mettre à jour la convention"
+    },
+    "benevoles": {
+      "external_mode_active": "Mode externe actif : les candidatures sont gérées via un outil tiers.",
+      "url_label": "URL:",
+      "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
+    },
+    "objets_trouves": {
+      "photo_alt": "Photo de l'objet trouvé"
+    },
+    "profile": {
+      "photo_alt": "Photo de profil",
+      "photo_placeholder": "Cliquez pour changer votre photo de profil"
     }
   },
   "feedback": {
@@ -1003,5 +1099,16 @@
   },
   "currentValue": {
     "avatar": "Avatar de l'utilisateur sélectionné"
+  },
+  "validation": {
+    "name_min_3": "Le nom doit contenir au moins 3 caractères",
+    "name_max_100": "Le nom ne peut pas dépasser 100 caractères",
+    "name_max_200": "Le nom ne peut pas dépasser 200 caractères",
+    "description_max_1000": "La description ne peut pas dépasser 1000 caractères",
+    "date_end_after_start": "La date de fin doit être strictement supérieure à la date de début",
+    "date_start_required": "La date de début est requise"
+  },
+  "countries": {
+    "czech_republic": "République Tchèque"
   }
 }

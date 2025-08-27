@@ -155,8 +155,8 @@ describe('/api/editions/[id]/lost-found GET', () => {
     expect(result[0].user).toHaveProperty('pseudo')
     expect(result[0].user).toHaveProperty('prenom')
     expect(result[0].user).toHaveProperty('nom')
-  expect(result[0].user).toHaveProperty('profilePicture')
-  expect(result[0].user).toHaveProperty('emailHash')
+    expect(result[0].user).toHaveProperty('profilePicture')
+    expect(result[0].user).toHaveProperty('emailHash')
   })
 
   it('devrait inclure les commentaires avec les détails utilisateur', async () => {
@@ -170,8 +170,8 @@ describe('/api/editions/[id]/lost-found GET', () => {
     expect(result[0].comments[0].user).toHaveProperty('pseudo')
     expect(result[0].comments[0].user).toHaveProperty('prenom')
     expect(result[0].comments[0].user).toHaveProperty('nom')
-  expect(result[0].comments[0].user).toHaveProperty('profilePicture')
-  expect(result[0].comments[0].user).toHaveProperty('emailHash')
+    expect(result[0].comments[0].user).toHaveProperty('profilePicture')
+    expect(result[0].comments[0].user).toHaveProperty('emailHash')
   })
 
   it('devrait trier les objets par date de création décroissante', async () => {

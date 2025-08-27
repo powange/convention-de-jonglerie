@@ -63,6 +63,8 @@ export const useEditionStore = defineStore('editions', {
       limit: 12,
       totalPages: 0,
     },
+  // Promesses en cours pour éviter les requêtes doublons simultanées
+  _pendingEditionFetches: {} as Record<number, Promise<Edition> | undefined>,
   }),
   getters: {
     getEditionById: (state) => (id: number) => {
@@ -129,8 +131,8 @@ export const useEditionStore = defineStore('editions', {
         if (filters) {
           Object.keys(filters).forEach((key) => {
             if (key.startsWith('has') || key === 'acceptsPets') {
-              if (filters[key] === true) {
-                queryParams[key] = 'true'
+              if ((filters as Record<string, any>)[key] === true) {
+                (queryParams as Record<string, any>)[key] = 'true'
               }
             }
           })
@@ -150,28 +152,37 @@ export const useEditionStore = defineStore('editions', {
       }
     },
 
-    async fetchEditionById(id: number) {
+    async fetchEditionById(id: number, opts?: { force?: boolean }) {
+      // Retourner immédiatement depuis le cache si disponible et pas de force
+      const existing = this.editions.find((e) => e.id === id)
+      if (existing && !opts?.force) return existing
+
+      // Re-utiliser une requête déjà en cours
+      if (this._pendingEditionFetches[id]) {
+        return this._pendingEditionFetches[id]!
+      }
+
       this.loading = true
       this.error = null
-      try {
-        const edition = await $fetch<Edition>(`/api/editions/${id}`)
+      const p = $fetch<Edition>(`/api/editions/${id}`)
+        .then((edition) => {
+          const existingIndex = this.editions.findIndex((e) => e.id === id)
+          if (existingIndex !== -1) this.editions[existingIndex] = edition
+          else this.editions.push(edition)
+          return edition
+        })
+        .catch((e: unknown) => {
+          const error = e as HttpError
+          this.error = error.message || error.data?.message || 'Failed to fetch edition'
+          throw e
+        })
+        .finally(() => {
+          this.loading = false
+          this._pendingEditionFetches[id] = undefined
+        })
 
-        // Ajouter l'édition au store si elle n'y est pas déjà
-        const existingIndex = this.editions.findIndex((e) => e.id === id)
-        if (existingIndex !== -1) {
-          this.editions[existingIndex] = edition
-        } else {
-          this.editions.push(edition)
-        }
-
-        return edition
-      } catch (e: unknown) {
-        const error = e as HttpError
-        this.error = error.message || error.data?.message || 'Failed to fetch edition'
-        throw e
-      } finally {
-        this.loading = false
-      }
+      this._pendingEditionFetches[id] = p
+      return p
     },
 
     async addEdition(editionData: Omit<Edition, 'id' | 'creator' | 'creatorId' | 'favoritedBy'>) {
@@ -243,50 +254,36 @@ export const useEditionStore = defineStore('editions', {
       const editionIndex = this.editions.findIndex((e) => e.id === id)
       if (editionIndex !== -1 && currentUser) {
         const edition = this.editions[editionIndex]
-        const isFavorited = edition.favoritedBy.some((u) => u.id === currentUser.id)
-
-        if (isFavorited) {
-          // Retirer des favoris
-          edition.favoritedBy = edition.favoritedBy.filter((u) => u.id !== currentUser.id)
-        } else {
-          // Ajouter aux favoris
-          edition.favoritedBy.push({
-            id: currentUser.id,
-            email: currentUser.email,
-            pseudo: currentUser.pseudo,
-          })
+        if (edition) {
+          const isFavorited = edition.favoritedBy.some((u) => u.id === currentUser.id)
+          if (isFavorited) {
+            edition.favoritedBy = edition.favoritedBy.filter((u) => u.id !== currentUser.id)
+          } else {
+            // Type minimal compatible
+            edition.favoritedBy.push({ id: currentUser.id } as any)
+          }
         }
       }
 
       try {
         // Appel API en arrière-plan
-        const response = await $fetch(`/api/editions/${id}/favorite`, {
+  await $fetch(`/api/editions/${id}/favorite`, {
           method: 'POST',
         })
 
         // Mettre à jour avec la réponse du serveur si nécessaire
-        if (response && editionIndex !== -1) {
-          // Si le serveur renvoie l'édition mise à jour, l'utiliser
-          if (response.edition) {
-            this.editions[editionIndex] = response.edition
-          }
-        }
+  // Réponse minimaliste attendue { message, isFavorited }; on laisse l'état optimiste
       } catch (e: unknown) {
         // En cas d'erreur, annuler l'optimistic update
         if (editionIndex !== -1 && currentUser) {
           const edition = this.editions[editionIndex]
-          const isFavorited = edition.favoritedBy.some((u) => u.id === currentUser.id)
-
-          if (isFavorited) {
-            // Si on avait ajouté, on retire
-            edition.favoritedBy = edition.favoritedBy.filter((u) => u.id !== currentUser.id)
-          } else {
-            // Si on avait retiré, on remet
-            edition.favoritedBy.push({
-              id: currentUser.id,
-              email: currentUser.email,
-              pseudo: currentUser.pseudo,
-            })
+          if (edition) {
+            const isFavorited = edition.favoritedBy.some((u) => u.id === currentUser.id)
+            if (isFavorited) {
+              edition.favoritedBy = edition.favoritedBy.filter((u) => u.id !== currentUser.id)
+            } else {
+              edition.favoritedBy.push({ id: currentUser.id } as any)
+            }
           }
         }
 
@@ -325,10 +322,9 @@ export const useEditionStore = defineStore('editions', {
         // Mettre à jour l'édition locale avec le nouveau collaborateur
         const editionIndex = this.editions.findIndex((c) => c.id === editionId)
         if (editionIndex !== -1) {
-          if (!this.editions[editionIndex].collaborators) {
-            this.editions[editionIndex].collaborators = []
-          }
-          this.editions[editionIndex].collaborators!.push(collaborator)
+          const ed = this.editions[editionIndex]
+            ;(ed as any).collaborators = (ed as any).collaborators || []
+            ;(ed as any).collaborators.push(collaborator as any)
         }
 
         return collaborator
@@ -348,10 +344,11 @@ export const useEditionStore = defineStore('editions', {
 
         // Mettre à jour l'édition locale
         const editionIndex = this.editions.findIndex((c) => c.id === editionId)
-        if (editionIndex !== -1 && this.editions[editionIndex].collaborators) {
-          this.editions[editionIndex].collaborators = this.editions[
-            editionIndex
-          ].collaborators!.filter((c) => c.id !== collaboratorId)
+        if (editionIndex !== -1) {
+          const ed = this.editions[editionIndex] as any
+          if (ed?.collaborators) {
+            ed.collaborators = ed.collaborators.filter((c: any) => c.id !== collaboratorId)
+          }
         }
       } catch (e: unknown) {
         const error = e as HttpError

@@ -240,8 +240,11 @@
             <div class="space-y-6">
               <!-- Filtres de recherche -->
               <div class="space-y-4">
-                <UFormField label="Nom de la convention" name="name">
-                  <UInput v-model="filters.name" placeholder="Rechercher par nom" />
+                <UFormField :label="$t('forms.labels.convention_name')" name="name">
+                  <UInput
+                    v-model="filters.name"
+                    :placeholder="$t('forms.placeholders.search_by_name')"
+                  />
                 </UFormField>
                 <UFormField :label="$t('common.country')" name="countries">
                   <CountryMultiSelect

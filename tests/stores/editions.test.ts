@@ -215,9 +215,23 @@ describe('useEditionStore', () => {
       editionStore.editions = [mockEdition]
       vi.mocked($fetch).mockResolvedValue(updatedEdition)
 
-      await editionStore.fetchEditionById(1)
+      await editionStore.fetchEditionById(1, { force: true })
 
+      expect($fetch).toHaveBeenCalledWith('/api/editions/1')
       expect(editionStore.editions[0]).toEqual(updatedEdition)
+    })
+
+    it("ne devrait pas refetcher si l'édition est déjà en cache sans force", async () => {
+      editionStore.editions = [mockEdition]
+      // Même si on configure un retour différent, il ne doit pas être utilisé
+      const updatedEdition = { ...mockEdition, name: 'Updated Edition' }
+      vi.mocked($fetch).mockResolvedValue(updatedEdition)
+
+      const result = await editionStore.fetchEditionById(1)
+
+      expect(result).toEqual(mockEdition)
+      expect(editionStore.editions[0]).toEqual(mockEdition)
+      expect($fetch).not.toHaveBeenCalled()
     })
 
     it('devrait propager les erreurs', async () => {

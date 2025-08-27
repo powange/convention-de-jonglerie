@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
         pseudo,
         nom,
         prenom,
-        telephone,
+        phone: telephone,
       },
       select: {
         id: true,
@@ -77,7 +77,7 @@ export default defineEventHandler(async (event) => {
         pseudo: true,
         nom: true,
         prenom: true,
-        telephone: true,
+        phone: true,
         profilePicture: true,
         createdAt: true,
         updatedAt: true,
@@ -87,9 +87,9 @@ export default defineEventHandler(async (event) => {
     return updatedUser
   } catch (error) {
     console.error('Erreur lors de la mise à jour du profil:', error)
-
-    if (error.statusCode) {
-      throw error
+    const e: any = error
+    if (e?.statusCode) {
+      throw e
     }
 
     throw createError({

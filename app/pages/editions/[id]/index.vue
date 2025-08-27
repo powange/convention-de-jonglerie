@@ -95,20 +95,17 @@
                   v-for="collaborator in getAllCollaborators(edition)"
                   :key="collaborator.id"
                   class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-full text-sm"
-                  :title="getCollaboratorTitle(collaborator)"
+                  :title="collaboratorTitleTooltip(collaborator)"
                 >
                   <UserAvatar :user="collaborator.user" size="xs" />
                   <span class="text-gray-700 dark:text-gray-300">{{ collaborator.pseudo }}</span>
-                  <UBadge v-if="collaborator.isCreator" size="xs" color="primary" variant="soft">
-                    {{ $t('editions.creator') }}
-                  </UBadge>
                   <UBadge
-                    v-else
+                    v-if="displayCollaboratorBadge(collaborator)"
                     size="xs"
-                    :color="mapSummary(getRightsSummary(collaborator)).color"
+                    color="neutral"
                     variant="soft"
                   >
-                    {{ $t(mapSummary(getRightsSummary(collaborator)).labelKey) }}
+                    {{ displayCollaboratorBadge(collaborator) }}
                   </UBadge>
                 </div>
               </div>
@@ -238,7 +235,6 @@ import { useTranslatedConventionServices } from '~/composables/useConventionServ
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition } from '~/types'
-import { summarizeRights } from '~/utils/collaboratorRights'
 import { getEditionDisplayName } from '~/utils/editionName'
 
 const { formatDateTimeRange } = useDateFormat()
@@ -253,6 +249,8 @@ const { getTranslatedServicesByCategory } = useTranslatedConventionServices()
 const editionId = parseInt(route.params.id as string)
 const showImageOverlay = ref(false)
 const { normalizeImageUrl } = useImageUrl()
+
+// (Bloc bénévolat déplacé dans la page benevoles.vue)
 
 // Charger l'édition côté serveur ET client
 try {
@@ -356,23 +354,11 @@ const getActiveServicesByCategory = (edition: Edition) => {
     .filter((category) => category.services.length > 0)
 }
 
-// Obtenir tous les collaborateurs (créateur + collaborateurs de la convention)
+// Obtenir tous les collaborateurs en préservant éventuel titre custom
 const getAllCollaborators = (edition: Edition) => {
   if (!edition) return []
 
   const collaborators: any[] = []
-
-  // Ajouter le créateur
-  if (edition.creator) {
-    const creator = {
-      id: edition.creator.id,
-      user: edition.creator, // Garder la référence complète
-      pseudo: edition.creator.pseudo,
-      isCreator: true,
-      role: null,
-    }
-    collaborators.push(creator)
-  }
 
   // Ajouter les collaborateurs de la convention
   if (edition.convention?.collaborators) {
@@ -384,6 +370,7 @@ const getAllCollaborators = (edition: Edition) => {
           pseudo: collab.user.pseudo,
           isCreator: false,
           rights: collab.rights || {},
+          title: (collab as any).title || null,
         } as any)
       }
     })
@@ -392,28 +379,15 @@ const getAllCollaborators = (edition: Edition) => {
   return collaborators
 }
 
-// Obtenir le titre du collaborateur pour le tooltip
-const getCollaboratorTitle = (collaborator: any) => {
-  if (collaborator.isCreator) {
-    return `${collaborator.pseudo} - ${t('editions.edition_creator')}`
-  }
-
-  const summary = getRightsSummary(collaborator)
-  return `${collaborator.pseudo} - ${t(summary.labelKey)} ${t('editions.of_convention')}`
+// Tooltip: afficher titre custom si présent sinon rien de spécial
+const collaboratorTitleTooltip = (collaborator: any) => {
+  if (collaborator.title) return `${collaborator.pseudo} - ${collaborator.title}`
+  if (collaborator.isCreator) return `${collaborator.pseudo}`
+  return collaborator.pseudo
 }
 
-function getRightsSummary(collaborator: any) {
-  return summarizeRights(collaborator.rights || {})
-}
-function mapSummary(summary: any) {
-  // adapter le mapping couleur aux badges existants
-  return {
-    labelKey: summary.labelKey.replace('permissions.', 'editions.'),
-    color: (summary.level === 'admin'
-      ? 'warning'
-      : summary.level === 'moderator'
-        ? 'info'
-        : 'neutral') as any,
-  }
+// Texte du badge: titre custom uniquement
+const displayCollaboratorBadge = (collaborator: any): string | null => {
+  return collaborator.title ? collaborator.title : null
 }
 </script>
