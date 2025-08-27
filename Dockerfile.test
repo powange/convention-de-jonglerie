@@ -1,5 +1,8 @@
 # Dockerfile pour l'environnement de test
-FROM node:22-alpine
+# Image de base paramétrable pour contourner d'éventuels soucis de registry / credentials.
+# Utilisation: docker build --build-arg BASE_NODE_IMAGE=node:22 -f Dockerfile.test .
+ARG BASE_NODE_IMAGE=node:22-alpine
+FROM ${BASE_NODE_IMAGE}
 
 # Installer les dépendances système nécessaires
 RUN apk add --no-cache libc6-compat curl python3 make g++
