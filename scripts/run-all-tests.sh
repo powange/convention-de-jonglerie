@@ -33,12 +33,8 @@ echo ""
 echo "==================================="
 echo "    3. Tests avec base de données  "
 echo "==================================="
-# Dans Docker, utiliser le script adapté
-if [ -f scripts/test-db-run-docker.js ]; then
-  node scripts/test-db-run-docker.js
-else
-  TEST_WITH_DB=true npm run test:db:run
-fi
+# Exécuter les tests DB (script unifié)
+TEST_WITH_DB=true npm run test:db:run
 echo ""
 
 echo "==================================="
