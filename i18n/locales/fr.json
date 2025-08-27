@@ -348,9 +348,6 @@
     "no_description_available": "Aucune description disponible",
     "practical_info": "Informations pratiques",
     "organizing_team": "Équipe organisatrice",
-    "creator": "Créateur",
-    "edition_creator": "Créateur de l'édition",
-    "of_convention": "de la convention",
     "enlarged_image": "Image agrandie",
     "poster_of": "Affiche de {name}",
     "length": "Longueur"
@@ -1005,8 +1002,6 @@
       "submit_button": "Mettre à jour la convention"
     },
     "benevoles": {
-      "external_mode_active": "Mode externe actif : les candidatures sont gérées via un outil tiers.",
-      "url_label": "URL:",
       "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
     },
     "objets_trouves": {
