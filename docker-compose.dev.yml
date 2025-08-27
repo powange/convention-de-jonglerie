@@ -24,6 +24,8 @@ services:
     build:
       context: .
       target: dev
+      args:
+        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:22-alpine}
     container_name: convention-app-dev
     working_dir: /app
     # Exécuter les migrations Prisma (idempotent) puis démarrer Nuxt en mode dev.

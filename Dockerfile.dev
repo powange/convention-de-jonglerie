@@ -1,5 +1,6 @@
 # Dockerfile.dev pour l'environnement de développement uniquement
-FROM node:22-alpine
+ARG BASE_NODE_IMAGE=node:22-alpine
+FROM ${BASE_NODE_IMAGE}
 RUN apk add --no-cache libc6-compat curl openssl
 WORKDIR /app
 

@@ -2,7 +2,7 @@
 # Utilisation : docker compose -f docker-compose.dev-install.yml run --rm npm-install
 services:
   npm-install:
-    image: node:22-alpine
+    image: ${BASE_NODE_IMAGE-node:22-alpine}
     container_name: convention-npm-install
     working_dir: /app
     command: npm install

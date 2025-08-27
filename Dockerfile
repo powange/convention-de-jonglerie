@@ -1,7 +1,8 @@
 # Dockerfile multi-stage pour Convention de Jonglerie
 
-# Stage de base commun
-FROM node:22-alpine AS base
+# Stage de base commun (image paramétrable)
+ARG BASE_NODE_IMAGE=node:22-alpine
+FROM ${BASE_NODE_IMAGE} AS base
 RUN apk add --no-cache libc6-compat curl openssl
 WORKDIR /app
 
@@ -27,7 +28,7 @@ RUN npm prune --omit=dev && npx prisma generate
 # -------------------------
 # Stage runtime (production)
 # -------------------------
-FROM node:22-alpine AS runtime
+FROM ${BASE_NODE_IMAGE} AS runtime
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 

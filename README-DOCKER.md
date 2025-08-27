@@ -53,3 +53,32 @@ Si erreur JWT :
 
 - Configurez `NUXT_SESSION_PASSWORD` (en prod) pour sécuriser les sessions côté serveur dans les fichiers Compose
 - Reconstruisez : `docker compose up -d --build`
+
+## Image Node paramétrable
+
+Tous les Dockerfile / docker-compose acceptent un argument ou variable `BASE_NODE_IMAGE` (par défaut `node:22-alpine`).
+
+Changer d'image sans modifier les fichiers :
+
+```bash
+# Exemple: utiliser l'image Debian slim si souci avec alpine / credentials helper
+BASE_NODE_IMAGE=node:22-slim docker compose -f docker-compose.test-all.yml build
+
+# Lancer les tests avec override
+BASE_NODE_IMAGE=node:22-slim npm run docker:test
+
+# En développement
+BASE_NODE_IMAGE=node:22-slim docker compose -f docker-compose.dev.yml up -d --build
+```
+
+Avantages :
+- Contournement rapide de problèmes de registry / credentials helpers
+- Comparaison de comportements entre variantes (alpine vs slim)
+
+Astuce : exportez dans votre shell pour rendre l'override persistant durant la session :
+
+```bash
+export BASE_NODE_IMAGE=node:22-slim
+```
+
+Puis reconstruisez vos services.
