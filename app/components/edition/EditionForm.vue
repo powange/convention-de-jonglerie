@@ -140,29 +140,6 @@
             </div>
           </div>
 
-          <UFormField
-            :label="$t('components.edition_form.convention_poster_optional')"
-            name="image"
-          >
-            <ImageUpload
-              v-model="state.imageUrl"
-              :endpoint="{ type: 'edition', id: props.initialData?.id }"
-              :options="{
-                validation: {
-                  maxSize: 5 * 1024 * 1024, // 5MB
-                  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
-                  allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
-                },
-                resetAfterUpload: false,
-              }"
-              :alt="$t('components.edition_form.poster_alt')"
-              :placeholder="$t('components.edition_form.poster_placeholder')"
-              @uploaded="onImageUploaded"
-              @deleted="onImageDeleted"
-              @error="onImageError"
-            />
-          </UFormField>
-
           <div class="space-y-4">
             <div class="flex items-center gap-2 mb-2">
               <UIcon name="i-heroicons-map-pin" class="text-primary-500" />
@@ -387,16 +364,36 @@
       <template #about>
         <div class="space-y-6">
           <UFormField
+            :label="$t('components.edition_form.convention_poster_optional')"
+            name="image"
+          >
+            <ImageUpload
+              v-model="state.imageUrl"
+              :endpoint="{ type: 'edition', id: props.initialData?.id }"
+              :options="{
+                validation: {
+                  maxSize: 5 * 1024 * 1024, // 5MB
+                  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+                  allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
+                },
+                resetAfterUpload: false,
+              }"
+              :alt="$t('components.edition_form.poster_alt')"
+              :placeholder="$t('components.edition_form.poster_placeholder')"
+              @uploaded="onImageUploaded"
+              @deleted="onImageDeleted"
+              @error="onImageError"
+            />
+          </UFormField>
+
+          <UFormField
             :label="$t('common.description')"
             name="description"
             :error="getDescriptionError()"
           >
-            <UTextarea
+            <MinimalMarkdownEditor
               v-model="state.description"
-              :placeholder="$t('components.edition_form.convention_description_placeholder')"
-              :rows="5"
-              class="w-full"
-              maxlength="1000"
+              :empty-placeholder="$t('components.edition_form.convention_description_placeholder')"
               @blur="
                 (() => {
                   touchedFields.description = true

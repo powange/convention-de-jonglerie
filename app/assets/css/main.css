@@ -66,3 +66,8 @@ html.dark .bg-gray-950 {
     transform: scale(1);
   }
 }
+
+/* Espacement pour le contenu Markdown */
+.prose p {
+  margin: 1em 0;
+}

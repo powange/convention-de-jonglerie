@@ -51,8 +51,16 @@
             </div>
             <div class="flex-1">
               <h3 class="text-lg font-semibold mb-2">{{ $t('editions.about_this_edition') }}</h3>
-              <p class="text-gray-700 dark:text-gray-300">
-                {{ edition.description || t('editions.no_description_available') }}
+              <div
+                v-if="edition.description && descriptionHtml"
+                class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
+              >
+                <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <div v-html="descriptionHtml" />
+              </div>
+              <p v-else class="text-gray-700 dark:text-gray-300">
+                {{ t('editions.no_description_available') }}
               </p>
             </div>
           </div>
@@ -236,6 +244,7 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
+import { markdownToHtml } from '~/utils/markdown'
 
 const { formatDateTimeRange } = useDateFormat()
 
@@ -261,6 +270,14 @@ try {
 
 // Maintenant utiliser directement le store qui est réactif
 const edition = computed(() => editionStore.getEditionById(editionId))
+
+// Description en HTML (rendu Markdown)
+const descriptionHtml = computedAsync(async () => {
+  if (!edition.value?.description) {
+    return ''
+  }
+  return await markdownToHtml(edition.value.description)
+}, '')
 
 const isFavorited = computed(() => (_editionId: number) => {
   return edition.value?.favoritedBy.some((u) => u.id === authStore.user?.id)
