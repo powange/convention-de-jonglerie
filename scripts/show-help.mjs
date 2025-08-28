@@ -47,7 +47,17 @@ const sections = [
     { name: 'check-i18n -- -h', desc: 'Aide détaillée' },
     { name: 'check-translations', desc: 'Compare les traductions entre locales' },
     { name: 'check-translations -- -l es', desc: 'Limité à une locale' },
-    { name: 'check-translations -- -s', desc: 'Résumé uniquement' }
+  { name: 'check-translations -- -s', desc: 'Résumé uniquement' },
+  { name: 'check-translations -- -p', desc: 'Prune: supprime les clés en trop (diff vs référence)' },
+  { name: 'check-translations -- -p -r fr', desc: 'Prune avec référence explicite (ex: fr)' },
+  { name: 'check-translations -- -f', desc: 'Fill: ajoute les clés manquantes (copie valeurs de la référence)' },
+  { name: 'check-translations -- -f -p', desc: 'Fill puis prune (synchronisation complète)' },
+  { name: 'check-translations -- -f --fill-mode todo', desc: 'Marque les clés à traduire: préfixe [TODO]' },
+  { name: 'check-translations -- -f --fill-mode empty', desc: 'Ajoute les clés manquantes avec valeur vide' },
+  { name: 'check-translations -- -f --fill-mode todo --refill', desc: 'Re-marque aussi les clés déjà identiques à la référence' },
+  { name: 'i18n:nest', desc: 'Normalize: transforme toutes les locales (clés pointées -> objets imbriqués)' },
+  { name: 'i18n:nest -- en fr', desc: 'Même transformation mais limité aux locales listées' },
+  { name: 'i18n:nest -- --allow-collisions', desc: 'Ignore les collisions de fusion (conserve existant)' }
   ] },
   { title: '🧹 Qualité & formatage', color: colors.yellow, scripts: [
     { name: 'lint', desc: 'Analyse lint complète' },

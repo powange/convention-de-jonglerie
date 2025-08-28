@@ -257,6 +257,7 @@
     }
   },
   "common": {
+    "active": "Actief",
     "add": "Toevoegen",
     "address": "Adres",
     "back": "Terug",
@@ -274,11 +275,33 @@
     "deleted": "Verwijderd",
     "description": "Beschrijving",
     "edit": "Bewerken",
+    "editor": {
+      "back_to_edit": "Terug naar bewerken",
+      "block_tooltip": "Codeblok",
+      "bold_tooltip": "Vetgedrukte tekst (Ctrl+B)",
+      "bullet_list_tooltip": "Opsommingslijst",
+      "code_tooltip": "Inline code (Ctrl+`)",
+      "edit_mode": "Bewerken",
+      "exit_fullscreen": "Volledig scherm verlaten",
+      "fullscreen_tooltip": "Volledig scherm (Esc om te verlaten)",
+      "heading1_tooltip": "Kop niveau 1",
+      "heading2_tooltip": "Kop niveau 2",
+      "italic_tooltip": "Cursieve tekst (Ctrl+I)",
+      "link_tooltip": "Link invoegen (Ctrl+K)",
+      "numbered_list_tooltip": "Genummerde lijst",
+      "preview_mode": "Voorbeeld",
+      "quote_tooltip": "Citaat",
+      "split_mode": "Gesplitste modus",
+      "split_tooltip": "Bewerken en voorbeeld naast elkaar",
+      "toggle_preview": "Voorbeeld wisselen"
+    },
     "email": "E-mail",
     "error": "Fout",
     "favorite": "Favoriet",
+    "inactive": "Inactief",
     "loading": "Laden...",
     "location": "Locatie",
+    "manage": "Beheren",
     "name": "Naam",
     "no_results": "Geen resultaten",
     "optional": "Optioneel",
@@ -287,8 +310,11 @@
     "postal_code": "Postcode",
     "private": "Privé",
     "refresh": "Vernieuwen",
+    "required": "Vereist",
     "reset": "Opnieuw instellen",
     "save": "Opslaan",
+    "saved": "Opgeslagen",
+    "saving": "Opslaan...",
     "select": "Selecteer",
     "start_typing": "Begin met typen...",
     "status": "Status",
@@ -299,14 +325,9 @@
     "time_just_now": "zojuist",
     "time_minutes_ago": "{count} min geleden",
     "tip": "Tip",
-    "view": "Bekijken",
-    "view_details": "Details bekijken",
-    "active": "Actief",
-    "inactive": "Inactief",
     "updated_at": "Bijgewerkt op {date}",
-    "saving": "Opslaan...",
-    "saved": "Opgeslagen",
-    "required": "Vereist"
+    "view": "Bekijken",
+    "view_details": "Details bekijken"
   },
   "components": {
     "carpool": {
@@ -386,6 +407,13 @@
       "view_comments": "Bekijk opmerkingen ({count})",
       "when_depart": "Wanneer wil je vertrekken?"
     },
+    "collaborators": {
+      "add_error": "Kan medewerker niet toevoegen",
+      "added": "Medewerker toegevoegd",
+      "load_error": "Kan medewerkers niet laden",
+      "remove_error": "Kan medewerker niet verwijderen",
+      "removed": "Medewerker verwijderd"
+    },
     "collaborators_modal": {
       "add_collaborator": "Medewerker toevoegen",
       "allow_modification": "Wijziging toestaan",
@@ -395,6 +423,7 @@
       "title": "Medewerkers beheren"
     },
     "collaborators_rights_panel": {
+      "by_user_label": "Door",
       "delete_confirm": "Deze medewerker verwijderen?",
       "history_title": "Wijzigingsgeschiedenis",
       "load_history": "Geschiedenis laden",
@@ -404,10 +433,9 @@
       "per_edition_hint": "Geen specifieke rechten gedefinieerd voor edities",
       "refresh_history": "Vernieuwen",
       "saved": "Rechten bijgewerkt",
+      "target_user_label": "Gericht op",
       "title": "Medewerkersrechten (bèta)",
-      "title_placeholder": "Titel of rol (optioneel)",
-      "by_user_label": "Door",
-      "target_user_label": "Gericht op"
+      "title_placeholder": "Titel of rol (optioneel)"
     },
     "convention_form": {
       "click_to_select_image": "Klik om een afbeelding te selecteren",
@@ -415,34 +443,47 @@
       "convention_logo_alt": "Conventielogo",
       "convention_name": "Conventienaam",
       "external_url": "Externe URL",
+      "image_deleted": "Afbeelding verwijderd",
+      "image_uploaded": "Afbeelding geüpload",
       "loading_error_description": "Kan afbeelding niet laden vanaf deze URL",
       "loading_error_title": "Laadfout",
       "logo_preview": "Logo voorbeeld:",
       "logo_url_description": "URL van het conventielogo-afbeelding",
-      "upload_file": "Bestand uploaden",
-      "image_uploaded": "Afbeelding geüpload",
-      "image_deleted": "Afbeelding verwijderd"
+      "upload_file": "Bestand uploaden"
+    },
+    "country_multi_select": {
+      "placeholder": "Landen selecteren..."
     },
     "country_select": {
       "no_countries_found": "Geen landen gevonden",
       "search_country_placeholder": "Zoek een land..."
     },
+    "date_time_picker": {
+      "placeholder": "Selecteer een datum"
+    },
     "edition_form": {
+      "address_tip": "Voer een volledig adres in het zoekveld in om automatisch alle onderstaande velden in te vullen. Een nauwkeurig adres maakt het ook mogelijk om uw evenement op de kaart te lokaliseren.",
+      "convention_description_placeholder": "Beschrijving van de conventie",
       "convention_poster_optional": "Conventieposter (Optioneel)",
+      "country_placeholder": "Naam van het land",
       "facebook_page": "Facebookpagina",
       "instagram_account": "Instagram-account",
       "next": "Volgende",
-      "previous": "Vorige",
-      "ticketing_link": "Ticketverkooplink",
-      "poster_placeholder": "Klik om editieposter te selecteren",
       "poster_alt": "Editieposter",
-      "address_tip": "Voer een volledig adres in het zoekveld in om automatisch alle onderstaande velden in te vullen. Een nauwkeurig adres maakt het ook mogelijk om uw evenement op de kaart te lokaliseren.",
-      "country_placeholder": "Naam van het land",
-      "convention_description_placeholder": "Beschrijving van de conventie",
+      "poster_placeholder": "Klik om editieposter te selecteren",
+      "previous": "Vorige",
+      "social_networks_description": "Deel uw pagina's om de zichtbaarheid te vergroten",
       "social_networks_title": "Sociale netwerken",
-      "step_general_title": "Algemene Informatie",
+      "step_about_description": "Editiebeschrijving",
+      "step_about_title": "Over",
+      "step_external_links_description": "Ticketing en sociale netwerken",
+      "step_external_links_title": "Externe links",
       "step_general_description": "Algemene Informatie",
-      "step_services_title": "Aangeboden Diensten"
+      "step_general_title": "Algemene Informatie",
+      "step_services_title": "Aangeboden Diensten",
+      "ticketing_link": "Ticketverkooplink",
+      "ticketing_section_description": "Informatie voor het kopen van tickets",
+      "ticketing_section_title": "Ticketverkoop"
     },
     "favorites_map": {
       "all_favorites": "Alle zijn favorieten",
@@ -470,19 +511,6 @@
       "reply_to_comment": "Antwoord op deze opmerking",
       "your_reply": "Je antwoord",
       "your_reply_placeholder": "Je antwoord..."
-    },
-    "date_time_picker": {
-      "placeholder": "Selecteer een datum"
-    },
-    "country_multi_select": {
-      "placeholder": "Landen selecteren..."
-    },
-    "collaborators": {
-      "added": "Medewerker toegevoegd",
-      "add_error": "Kan medewerker niet toevoegen",
-      "removed": "Medewerker verwijderd",
-      "load_error": "Kan medewerkers niet laden",
-      "remove_error": "Kan medewerker niet verwijderen"
     }
   },
   "conventions": {
@@ -507,6 +535,9 @@
     "no_description": "Geen beschrijving",
     "no_editions": "Geen edities voor deze conventie"
   },
+  "countries": {
+    "czech_republic": "Tsjechische Republiek"
+  },
   "currentValue": {
     "avatar": "Avatar van geselecteerde gebruiker"
   },
@@ -514,6 +545,11 @@
     "date_range": "Van {startDate} tot {endDate}",
     "date_range_with_time": "Van {startDate} tot {endDate}",
     "same_day_with_time": "Op {date} van {startTime} tot {endTime}"
+  },
+  "diet": {
+    "none": "Geen",
+    "vegan": "Vegan",
+    "vegetarian": "Vegetarisch"
   },
   "ed": {
     "id": "ID"
@@ -535,6 +571,7 @@
     "edition_published": "Editie succesvol gepubliceerd",
     "edition_set_offline": "Editie offline gezet",
     "enlarged_image": "Vergroot beeld",
+    "hide_returned_items": "Verberg geretourneerde items",
     "item_marked_lost": "Voorwerp gemarkeerd als verloren",
     "item_marked_returned": "Voorwerp gemarkeerd als teruggegeven",
     "items_appear_when_started": "Verloren voorwerpen verschijnen zodra de editie is begonnen.",
@@ -566,63 +603,59 @@
     "services_offered": "Aangeboden diensten",
     "set_offline": "Offline zetten",
     "set_online": "Online zetten",
+    "show_returned_items": "Toon geretourneerde items",
     "ticketing": "Ticketverkoop",
     "useful_links": "Nuttige links",
-    "show_returned_items": "Toon geretourneerde items",
-    "hide_returned_items": "Verberg geretourneerde items",
-    "volunteers_title": "Vrijwilligers",
-    "volunteers_open": "Open",
-    "volunteers_description_label": "Beschrijving voor vrijwilligers",
-    "volunteers_no_description": "Geen specifieke beschrijving voor vrijwilligers.",
-    "volunteers_total": "Totaal",
-    "volunteers_status_pending": "In afwachting",
-    "volunteers_status_accepted": "Geaccepteerd",
-    "volunteers_status_rejected": "Afgewezen",
-    "volunteers_closed_message": "Vrijwilligersaanmeldingen zijn momenteel niet open.",
-    "volunteers_motivation_label": "Motivatie (optioneel)",
-    "volunteers_motivation_placeholder": "Leg kort uit waarom je wilt helpen...",
-    "volunteers_phone_required": "Telefoon (vereist om contact op te nemen)",
-    "volunteers_mode_label": "Verwerkingsmodus voor aanmeldingen",
-    "volunteers_mode_internal": "Intern (formulier ter plaatse)",
-    "volunteers_mode_external": "Extern (link naar tool van derden)",
-    "volunteers_external_url_label": "Externe URL",
-    "volunteers_external_url_hint": "Link naar het externe formulier of platform voor vrijwilligersbeheer.",
-    "volunteers_personal_info_notice": "Gedeelde persoonlijke informatie",
-    "volunteers_personal_info_disclaimer": "De bovenstaande informatie (voornaam, achternaam, telefoon) wordt aan organisatoren verstrekt om vrijwilligersteams te beheren. Vul indien nodig de ontbrekende velden hieronder in.",
-    "volunteers_first_name": "Voornaam",
-    "volunteers_last_name": "Achternaam",
-    "volunteers_phone": "Telefoon",
-    "volunteers_first_name_required": "Voornaam (vereist – ontbreekt in je profiel)",
-    "volunteers_last_name_required": "Achternaam (vereist – ontbreekt in je profiel)",
+    "volunteers_action_accept": "Accepteren",
+    "volunteers_action_back_pending": "Terug naar in afwachting",
+    "volunteers_action_reject": "Afwijzen",
+    "volunteers_admin_only_note": "De volgende informatie (aanmeldingen, filters en gedetailleerde statistieken) is alleen zichtbaar voor geautoriseerde organisatoren en medewerkers.",
     "volunteers_apply": "Meld je aan als vrijwilliger",
     "volunteers_apply_description": "Dien je aanmelding in om te helpen tijdens de editie.",
-    "volunteers_table_diet": "Dieet",
-    "editions.volunteers_ask_diet_label": "Dieetvoorkeur vragen",
-    "editions.volunteers_diet_label": "Dieetvoorkeur",
-    "diet.none": "Geen",
-    "diet.vegetarian": "Vegetarisch",
-    "diet.vegan": "Veganistisch",
-    "volunteers_motivation_hint": "Je (optionele) bericht helpt organisatoren je aan de juiste taak toe te wijzen. Max {max} tekens.",
-    "volunteers_withdraw": "Trek mijn aanmelding in",
-    "volunteers_login_prompt": "Log in om je als vrijwilliger aan te melden.",
+    "volunteers_ask_diet_label": "Dieetvoorkeur vragen",
+    "volunteers_closed_message": "Vrijwilligersaanmeldingen zijn momenteel niet open.",
+    "volunteers_description_label": "Beschrijving voor vrijwilligers",
+    "volunteers_diet_label": "Dieetvoorkeur",
+    "volunteers_external_url_hint": "Link naar het externe formulier of platform voor vrijwilligersbeheer.",
+    "volunteers_external_url_label": "Externe URL",
     "volunteers_filter_status": "Filter op status",
-    "volunteers_status_all": "Alle",
-    "volunteers_table_user": "Aanvrager",
-    "volunteers_table_motivation": "Motivatie",
-    "volunteers_action_accept": "Accepteren",
-    "volunteers_action_reject": "Afwijzen",
-    "volunteers_action_back_pending": "Terug naar in afwachting",
-    "volunteers_my_application_title": "Mijn aanmelding",
-    "volunteers_my_application_pending": "Mijn aanmelding is momenteel in afwachting.",
+    "volunteers_filtered_count": "{filtered} van {total} aanmeldingen",
+    "volunteers_first_name": "Voornaam",
+    "volunteers_first_name_required": "Voornaam (vereist – ontbreekt in je profiel)",
+    "volunteers_last_name": "Achternaam",
+    "volunteers_last_name_required": "Achternaam (vereist – ontbreekt in je profiel)",
+    "volunteers_login_prompt": "Log in om je als vrijwilliger aan te melden.",
+    "volunteers_mode_external": "Extern (link naar tool van derden)",
+    "volunteers_mode_internal": "Intern (formulier ter plaatse)",
+    "volunteers_mode_label": "Verwerkingsmodus voor aanmeldingen",
+    "volunteers_motivation_hint": "Je (optionele) bericht helpt organisatoren je aan de juiste taak toe te wijzen. Max {max} tekens.",
+    "volunteers_motivation_label": "Motivatie (optioneel)",
+    "volunteers_motivation_placeholder": "Leg kort uit waarom je wilt helpen...",
     "volunteers_my_application_accepted": "Mijn aanmelding is geaccepteerd.",
+    "volunteers_my_application_pending": "Mijn aanmelding is momenteel in afwachting.",
     "volunteers_my_application_rejected": "Mijn aanmelding is afgewezen.",
+    "volunteers_my_application_title": "Mijn aanmelding",
     "volunteers_no_applications": "Geen aanmeldingen",
+    "volunteers_no_description": "Geen specifieke beschrijving voor vrijwilligers.",
+    "volunteers_open": "Open",
+    "volunteers_personal_info_disclaimer": "De bovenstaande informatie (voornaam, achternaam, telefoon) wordt aan organisatoren verstrekt om vrijwilligersteams te beheren. Vul indien nodig de ontbrekende velden hieronder in.",
+    "volunteers_personal_info_notice": "Gedeelde persoonlijke informatie",
+    "volunteers_phone": "Telefoon",
+    "volunteers_phone_required": "Telefoon (vereist om contact op te nemen)",
     "volunteers_search": "Zoeken",
     "volunteers_search_placeholder": "Gebruikersnaam, e-mail, motivatie...",
+    "volunteers_status_accepted": "Geaccepteerd",
+    "volunteers_status_all": "Alle",
+    "volunteers_status_pending": "In afwachting",
+    "volunteers_status_rejected": "Afgewezen",
+    "volunteers_table_diet": "Dieet",
     "volunteers_table_first_name": "Voornaam",
     "volunteers_table_last_name": "Achternaam",
-    "volunteers_filtered_count": "{filtered} van {total} aanmeldingen",
-    "volunteers_admin_only_note": "De volgende informatie (aanmeldingen, filters en gedetailleerde statistieken) is alleen zichtbaar voor geautoriseerde organisatoren en medewerkers."
+    "volunteers_table_motivation": "Motivatie",
+    "volunteers_table_user": "Aanvrager",
+    "volunteers_title": "Vrijwilligers",
+    "volunteers_total": "Totaal",
+    "volunteers_withdraw": "Trek mijn aanmelding in"
   },
   "errors": {
     "access_denied": "Toegang geweigerd",
@@ -798,6 +831,10 @@
       "start_typing_address": "Begin met het typen van een adres..."
     }
   },
+  "h": {
+    "actor": "Acteur",
+    "targetUser": "Doelgebruiker"
+  },
   "homepage": {
     "current_editions": "Huidige edities",
     "filters": "Filters",
@@ -883,6 +920,9 @@
       "loading_convention": "Conventiegegevens laden...",
       "submit_button": "Editie aanmaken"
     },
+    "benevoles": {
+      "sort_tip": "Sorteren: klik op headers (Shift+klik voor meerdere)"
+    },
     "comments": {
       "be_first_to_comment": "Wees de eerste om je ervaring te delen!",
       "comment_placeholder": "Deel je ervaring, stel je vragen...",
@@ -913,11 +953,8 @@
       "manage": "Beheren",
       "manage_lost_found": "Gevonden voorwerpen beheren",
       "volunteer_description": "Deze sectie stelt je in staat om vrijwilligersteams voor de editie te beheren, rollen toe te wijzen en activiteiten te coördineren.",
-      "volunteer_management": "Vrijwilligersaanvraag",
-      "volunteer_description_active": "Configureer hier de vrijwilligersaanmeldingen: open/sluit, beschrijving, interne modus of externe link."
-    },
-    "benevoles": {
-      "sort_tip": "Sorteren: klik op headers (Shift+klik voor meerdere)"
+      "volunteer_description_active": "Configureer hier de vrijwilligersaanmeldingen: open/sluit, beschrijving, interne modus of externe link.",
+      "volunteer_management": "Vrijwilligersaanvraag"
     },
     "objets_trouves": {
       "photo_alt": "Foto van het gevonden voorwerp"
@@ -937,11 +974,11 @@
     "editor": "Redacteur",
     "history": {
       "ARCHIVED": "Gearchiveerd",
-      "PER_EDITIONS_UPDATED": "Rechten per editie bijgewerkt",
-      "RIGHTS_UPDATED": "Rechten bijgewerkt",
-      "UNARCHIVED": "Hersteld",
       "CREATED": "Medewerker toegevoegd",
-      "REMOVED": "Medewerker verwijderd"
+      "PER_EDITIONS_UPDATED": "Rechten per editie bijgewerkt",
+      "REMOVED": "Medewerker verwijderd",
+      "RIGHTS_UPDATED": "Rechten bijgewerkt",
+      "UNARCHIVED": "Hersteld"
     },
     "manageCollaborators": "Medewerkers beheren",
     "manager": "Manager",
@@ -996,12 +1033,16 @@
     "new_password_placeholder": "Je nieuwe wachtwoord",
     "normal_active": "👤 Normale modus",
     "normal_mode": "Normale gebruiker",
+    "optional": "Optioneel",
+    "optional_section_title": "Optionele sectie",
     "password_changed": "Wachtwoord gewijzigd",
     "password_digit_required": "Wachtwoord moet minimaal één cijfer bevatten",
     "password_updated": "Je wachtwoord is bijgewerkt",
     "password_uppercase_required": "Wachtwoord moet minimaal één hoofdletter bevatten",
     "passwords_dont_match": "Wachtwoorden komen niet overeen",
     "personal_info": "Persoonlijke informatie",
+    "phone": "Telefoon",
+    "phone_placeholder": "Je telefoonnummer",
     "photo_deleted": "Foto verwijderd",
     "photo_updated": "Foto bijgewerkt",
     "picture": "Profielfoto",
@@ -1018,11 +1059,7 @@
     "unsaved_changes": "Je hebt niet-opgeslagen wijzigingen",
     "username_hint": "Publiekelijk zichtbaar voor andere gebruikers",
     "username_min_3": "Gebruikersnaam moet minimaal 3 tekens bevatten",
-    "username_placeholder": "Je unieke gebruikersnaam",
-    "optional_section_title": "Optionele sectie",
-    "optional": "Optioneel",
-    "phone": "Telefoon",
-    "phone_placeholder": "Je telefoonnummer"
+    "username_placeholder": "Je unieke gebruikersnaam"
   },
   "services": {
     "accessibility": "Toegankelijkheid voor gehandicapten",
@@ -1059,7 +1096,9 @@
     "click_select_convention_logo": "Klik om een conventie logo te selecteren",
     "convention_logo_alt": "Conventie logo",
     "delete_error": "Verwijderingsfout",
+    "delete_message": "Afbeelding verwijderd",
     "demo_title": "Afbeelding upload demo",
+    "error_message": "Upload fout",
     "errors": {
       "convention_id_required": "Conventie ID vereist",
       "delete_failed": "Verwijdering mislukt",
@@ -1084,56 +1123,21 @@
     "max_size": "Maximale grootte",
     "select_file": "Bestand selecteren",
     "success": "Succes",
+    "success_message": "Afbeelding succesvol geüpload!",
     "upload": "Uploaden",
     "upload_error": "Upload fout",
     "uploading": "Upload bezig...",
-    "validation_error": "Validatiefout",
-    "success_message": "Afbeelding succesvol geüpload!",
-    "delete_message": "Afbeelding verwijderd",
-    "error_message": "Upload fout"
+    "validation_error": "Validatiefout"
   },
-  "h": {
-    "actor": "Acteur",
-    "targetUser": "Doelgebruiker"
+  "validation": {
+    "date_end_after_start": "Einddatum moet na de startdatum liggen",
+    "date_start_required": "Startdatum is vereist",
+    "description_max_1000": "Beschrijving mag niet meer dan 1000 tekens bevatten",
+    "name_max_100": "Naam mag niet meer dan 100 tekens bevatten",
+    "name_max_200": "Naam mag niet meer dan 200 tekens bevatten",
+    "name_min_3": "Naam moet minstens 3 tekens bevatten"
   },
   "volunteersInfo": {
     "externalUrl": "Externe URL"
-  },
-  "validation": {
-    "name_min_3": "Naam moet minstens 3 tekens bevatten",
-    "name_max_100": "Naam mag niet meer dan 100 tekens bevatten",
-    "name_max_200": "Naam mag niet meer dan 200 tekens bevatten",
-    "description_max_1000": "Beschrijving mag niet meer dan 1000 tekens bevatten",
-    "date_end_after_start": "Einddatum moet na de startdatum liggen",
-    "date_start_required": "Startdatum is vereist"
-  },
-  "countries": {
-    "czech_republic": "Tsjechische Republiek"
-  },
-  "common.manage": "Beheren",
-  "components.edition_form.social_networks_description": "Deel uw pagina's om de zichtbaarheid te vergroten",
-  "components.edition_form.ticketing_section_title": "Ticketverkoop",
-  "components.edition_form.ticketing_section_description": "Informatie voor het kopen van tickets",
-  "components.edition_form.step_about_title": "Over",
-  "components.edition_form.step_about_description": "Editiebeschrijving",
-  "components.edition_form.step_external_links_title": "Externe links",
-  "components.edition_form.step_external_links_description": "Ticketing en sociale netwerken",
-  "common.editor.bold_tooltip": "Vetgedrukte tekst (Ctrl+B)",
-  "common.editor.italic_tooltip": "Cursieve tekst (Ctrl+I)",
-  "common.editor.heading1_tooltip": "Kop niveau 1",
-  "common.editor.heading2_tooltip": "Kop niveau 2",
-  "common.editor.bullet_list_tooltip": "Opsommingslijst",
-  "common.editor.numbered_list_tooltip": "Genummerde lijst",
-  "common.editor.code_tooltip": "Inline code (Ctrl+`)",
-  "common.editor.block_tooltip": "Codeblok",
-  "common.editor.quote_tooltip": "Citaat",
-  "common.editor.link_tooltip": "Link invoegen (Ctrl+K)",
-  "common.editor.preview_mode": "Voorbeeld",
-  "common.editor.edit_mode": "Bewerken",
-  "common.editor.toggle_preview": "Voorbeeld wisselen",
-  "common.editor.back_to_edit": "Terug naar bewerken",
-  "common.editor.fullscreen_tooltip": "Volledig scherm (Esc om te verlaten)",
-  "common.editor.exit_fullscreen": "Volledig scherm verlaten",
-  "common.editor.split_mode": "Gesplitste modus",
-  "common.editor.split_tooltip": "Bewerken en voorbeeld naast elkaar"
+  }
 }

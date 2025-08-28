@@ -257,6 +257,7 @@
     }
   },
   "common": {
+    "active": "Aktiv",
     "add": "Tilføj",
     "address": "Adresse",
     "back": "Tilbage",
@@ -274,11 +275,33 @@
     "deleted": "Slettet",
     "description": "Beskrivelse",
     "edit": "Rediger",
+    "editor": {
+      "back_to_edit": "Tilbage til redigering",
+      "block_tooltip": "Kodeblok",
+      "bold_tooltip": "Fed tekst (Ctrl+B)",
+      "bullet_list_tooltip": "Punktliste",
+      "code_tooltip": "Inline kode (Ctrl+`)",
+      "edit_mode": "Redigering",
+      "exit_fullscreen": "Afslut fuldskærm",
+      "fullscreen_tooltip": "Fuldskærmstilstand (Esc for at afslutte)",
+      "heading1_tooltip": "Overskrift niveau 1",
+      "heading2_tooltip": "Overskrift niveau 2",
+      "italic_tooltip": "Kursiv tekst (Ctrl+I)",
+      "link_tooltip": "Indsæt link (Ctrl+K)",
+      "numbered_list_tooltip": "Nummereret liste",
+      "preview_mode": "Forhåndsvisning",
+      "quote_tooltip": "Citat",
+      "split_mode": "Delt tilstand",
+      "split_tooltip": "Redigering og forhåndsvisning side om side",
+      "toggle_preview": "Skift forhåndsvisning"
+    },
     "email": "Email",
     "error": "Fejl",
     "favorite": "Favorit",
+    "inactive": "Inaktiv",
     "loading": "Indlæser...",
     "location": "Sted",
+    "manage": "Administrer",
     "name": "Navn",
     "no_results": "Ingen resultater",
     "optional": "Valgfrit",
@@ -287,8 +310,11 @@
     "postal_code": "Postnummer",
     "private": "Privat",
     "refresh": "Opdater",
+    "required": "Påkrævet",
     "reset": "Nulstil",
     "save": "Gem",
+    "saved": "Gemt",
+    "saving": "Gemmer...",
     "select": "Vælg",
     "start_typing": "Begynd at skrive...",
     "status": "Status",
@@ -299,14 +325,9 @@
     "time_just_now": "lige nu",
     "time_minutes_ago": "{count} min siden",
     "tip": "Tip",
-    "view": "Se",
-    "view_details": "Se detaljer",
-    "active": "Aktiv",
-    "inactive": "Inaktiv",
     "updated_at": "Opdateret den {date}",
-    "saving": "Gemmer...",
-    "saved": "Gemt",
-    "required": "Påkrævet"
+    "view": "Se",
+    "view_details": "Se detaljer"
   },
   "components": {
     "carpool": {
@@ -386,6 +407,13 @@
       "view_comments": "Se kommentarer ({count})",
       "when_depart": "Hvornår ønsker du at køre?"
     },
+    "collaborators": {
+      "add_error": "Kan ikke tilføje medarbejder",
+      "added": "Medarbejder tilføjet",
+      "load_error": "Kan ikke indlæse medarbejdere",
+      "remove_error": "Kan ikke fjerne medarbejder",
+      "removed": "Medarbejder fjernet"
+    },
     "collaborators_modal": {
       "add_collaborator": "Tilføj medarbejder",
       "allow_modification": "Tillad ændringer",
@@ -395,6 +423,7 @@
       "title": "Administrer medarbejdere"
     },
     "collaborators_rights_panel": {
+      "by_user_label": "Af",
       "delete_confirm": "Fjern denne samarbejdspartner?",
       "history_title": "Ændringshistorik",
       "load_history": "Indlæs historik",
@@ -404,10 +433,9 @@
       "per_edition_hint": "Ingen specifikke rettigheder defineret for udgaver",
       "refresh_history": "Opdater",
       "saved": "Rettigheder opdateret",
+      "target_user_label": "Målrettet",
       "title": "Samarbejdspartnerrettigheder (beta)",
-      "title_placeholder": "Titel eller rolle (valgfrit)",
-      "by_user_label": "Af",
-      "target_user_label": "Målrettet"
+      "title_placeholder": "Titel eller rolle (valgfrit)"
     },
     "convention_form": {
       "click_to_select_image": "Klik for at vælge et billede",
@@ -415,34 +443,47 @@
       "convention_logo_alt": "Konventionslogo",
       "convention_name": "Konventionsnavn",
       "external_url": "Ekstern URL",
+      "image_deleted": "Billede slettet",
+      "image_uploaded": "Billede uploadet",
       "loading_error_description": "Kan ikke indlæse billede fra denne URL",
       "loading_error_title": "Indlæsningsfejl",
       "logo_preview": "Logo forhåndsvisning:",
       "logo_url_description": "URL til konventionslogoets billede",
-      "upload_file": "Upload fil",
-      "image_uploaded": "Billede uploadet",
-      "image_deleted": "Billede slettet"
+      "upload_file": "Upload fil"
+    },
+    "country_multi_select": {
+      "placeholder": "Vælg lande..."
     },
     "country_select": {
       "no_countries_found": "Ingen lande fundet",
       "search_country_placeholder": "Søg efter et land..."
     },
+    "date_time_picker": {
+      "placeholder": "Vælg en dato"
+    },
     "edition_form": {
+      "address_tip": "Indtast en komplet adresse i søgefeltet for automatisk at udfylde alle felterne nedenfor. En præcis adresse vil også muliggøre geolokalisering af dit arrangement på kortet.",
+      "convention_description_placeholder": "Beskrivelse af konventionen",
       "convention_poster_optional": "Konventionsplakat (valgfrit)",
+      "country_placeholder": "Landets navn",
       "facebook_page": "Facebook-side",
       "instagram_account": "Instagram-konto",
       "next": "Næste",
-      "previous": "Forrige",
-      "ticketing_link": "Billetsalgslink",
-      "poster_placeholder": "Klik for at vælge udgaveplakat",
       "poster_alt": "Udgaveplakat",
-      "address_tip": "Indtast en komplet adresse i søgefeltet for automatisk at udfylde alle felterne nedenfor. En præcis adresse vil også muliggøre geolokalisering af dit arrangement på kortet.",
-      "country_placeholder": "Landets navn",
-      "convention_description_placeholder": "Beskrivelse af konventionen",
+      "poster_placeholder": "Klik for at vælge udgaveplakat",
+      "previous": "Forrige",
+      "social_networks_description": "Del dine sider for at øge synligheden",
       "social_networks_title": "Sociale netværk",
-      "step_general_title": "Generelle Oplysninger",
+      "step_about_description": "Udgavebeskrivelse",
+      "step_about_title": "Om",
+      "step_external_links_description": "Billetsalg og sociale netværk",
+      "step_external_links_title": "Eksterne links",
       "step_general_description": "Generelle Oplysninger",
-      "step_services_title": "Tilbudte Tjenester"
+      "step_general_title": "Generelle Oplysninger",
+      "step_services_title": "Tilbudte Tjenester",
+      "ticketing_link": "Billetsalgslink",
+      "ticketing_section_description": "Information om køb af billetter",
+      "ticketing_section_title": "Billetsalg"
     },
     "favorites_map": {
       "all_favorites": "Alle er favoritter",
@@ -470,19 +511,6 @@
       "reply_to_comment": "Svar på denne kommentar",
       "your_reply": "Dit svar",
       "your_reply_placeholder": "Dit svar..."
-    },
-    "date_time_picker": {
-      "placeholder": "Vælg en dato"
-    },
-    "country_multi_select": {
-      "placeholder": "Vælg lande..."
-    },
-    "collaborators": {
-      "added": "Medarbejder tilføjet",
-      "add_error": "Kan ikke tilføje medarbejder",
-      "removed": "Medarbejder fjernet",
-      "load_error": "Kan ikke indlæse medarbejdere",
-      "remove_error": "Kan ikke fjerne medarbejder"
     }
   },
   "conventions": {
@@ -507,6 +535,9 @@
     "no_description": "Ingen beskrivelse",
     "no_editions": "Ingen udgaver for denne konvention"
   },
+  "countries": {
+    "czech_republic": "Tjekkiet"
+  },
   "currentValue": {
     "avatar": "Valgt brugers avatar"
   },
@@ -514,6 +545,11 @@
     "date_range": "Fra {startDate} til {endDate}",
     "date_range_with_time": "Fra {startDate} til {endDate}",
     "same_day_with_time": "Den {date} fra {startTime} til {endTime}"
+  },
+  "diet": {
+    "none": "Ingen",
+    "vegan": "Vegansk",
+    "vegetarian": "Vegetarisk"
   },
   "ed": {
     "id": "ID"
@@ -535,6 +571,7 @@
     "edition_published": "Udgave publiceret med succes",
     "edition_set_offline": "Udgave sat offline",
     "enlarged_image": "Forstørret billede",
+    "hide_returned_items": "Skjul returnerede genstande",
     "item_marked_lost": "Genstand markeret som tabt",
     "item_marked_returned": "Genstand markeret som returneret",
     "items_appear_when_started": "Hittegods vil vises når udgaven er startet.",
@@ -566,63 +603,59 @@
     "services_offered": "Tilbudte tjenester",
     "set_offline": "Sæt offline",
     "set_online": "Sæt online",
+    "show_returned_items": "Vis returnerede genstande",
     "ticketing": "Billetsalg",
     "useful_links": "Nyttige links",
-    "show_returned_items": "Vis returnerede genstande",
-    "hide_returned_items": "Skjul returnerede genstande",
-    "volunteers_title": "Frivillige",
-    "volunteers_open": "Åben",
-    "volunteers_description_label": "Beskrivelse for frivillige",
-    "volunteers_no_description": "Ingen specifik beskrivelse for frivillige.",
-    "volunteers_total": "Total",
-    "volunteers_status_pending": "Afventer",
-    "volunteers_status_accepted": "Accepteret",
-    "volunteers_status_rejected": "Afvist",
-    "volunteers_closed_message": "Ansøgninger for frivillige er ikke åbne i øjeblikket.",
-    "volunteers_motivation_label": "Motivation (valgfri)",
-    "volunteers_motivation_placeholder": "Forklar kort hvorfor du ønsker at hjælpe...",
-    "volunteers_phone_required": "Telefon (påkrævet for at kontakte dig)",
-    "volunteers_mode_label": "Håndteringstilstand for ansøgninger",
-    "volunteers_mode_internal": "Intern (formular på stedet)",
-    "volunteers_mode_external": "Ekstern (link til tredjepartsværktøj)",
-    "volunteers_external_url_label": "Ekstern URL",
-    "volunteers_external_url_hint": "Link til den eksterne formular eller platform for frivillige.",
-    "volunteers_personal_info_notice": "Delte personlige oplysninger",
-    "volunteers_personal_info_disclaimer": "Ovenstående oplysninger (fornavn, efternavn, telefon) vil blive givet til arrangører for at administrere frivillige teams. Udfyld manglende felter nedenfor hvis nødvendigt.",
-    "volunteers_first_name": "Fornavn",
-    "volunteers_last_name": "Efternavn",
-    "volunteers_phone": "Telefon",
-    "volunteers_first_name_required": "Fornavn (påkrævet – mangler i din profil)",
-    "volunteers_last_name_required": "Efternavn (påkrævet – mangler i din profil)",
+    "volunteers_action_accept": "Accepter",
+    "volunteers_action_back_pending": "Tilbage til afventende",
+    "volunteers_action_reject": "Afvis",
+    "volunteers_admin_only_note": "Følgende oplysninger (ansøgninger, filtre og detaljeret statistik) er kun synlige for autoriserede arrangører og samarbejdspartnere.",
     "volunteers_apply": "Ansøg som frivillig",
     "volunteers_apply_description": "Indsend din ansøgning for at hjælpe under udgaven.",
-    "volunteers_table_diet": "Kost",
-    "editions.volunteers_ask_diet_label": "Spørg om kostpræference",
-    "editions.volunteers_diet_label": "Kostpræference",
-    "diet.none": "Ingen",
-    "diet.vegetarian": "Vegetarisk",
-    "diet.vegan": "Vegansk",
-    "volunteers_motivation_hint": "Din (valgfri) besked hjælper arrangører med at tildele dig den rigtige opgave. Max {max} tegn.",
-    "volunteers_withdraw": "Træk min ansøgning tilbage",
-    "volunteers_login_prompt": "Log ind for at ansøge som frivillig.",
+    "volunteers_ask_diet_label": "Spørge om kostpræference",
+    "volunteers_closed_message": "Ansøgninger for frivillige er ikke åbne i øjeblikket.",
+    "volunteers_description_label": "Beskrivelse for frivillige",
+    "volunteers_diet_label": "Kostpræference",
+    "volunteers_external_url_hint": "Link til den eksterne formular eller platform for frivillige.",
+    "volunteers_external_url_label": "Ekstern URL",
     "volunteers_filter_status": "Filtrer efter status",
-    "volunteers_status_all": "Alle",
-    "volunteers_table_user": "Ansøger",
-    "volunteers_table_motivation": "Motivation",
-    "volunteers_action_accept": "Accepter",
-    "volunteers_action_reject": "Afvis",
-    "volunteers_action_back_pending": "Tilbage til afventende",
-    "volunteers_my_application_title": "Min ansøgning",
-    "volunteers_my_application_pending": "Min ansøgning afventer i øjeblikket.",
+    "volunteers_filtered_count": "{filtered} af {total} ansøgninger",
+    "volunteers_first_name": "Fornavn",
+    "volunteers_first_name_required": "Fornavn (påkrævet – mangler i din profil)",
+    "volunteers_last_name": "Efternavn",
+    "volunteers_last_name_required": "Efternavn (påkrævet – mangler i din profil)",
+    "volunteers_login_prompt": "Log ind for at ansøge som frivillig.",
+    "volunteers_mode_external": "Ekstern (link til tredjepartsværktøj)",
+    "volunteers_mode_internal": "Intern (formular på stedet)",
+    "volunteers_mode_label": "Håndteringstilstand for ansøgninger",
+    "volunteers_motivation_hint": "Din (valgfri) besked hjælper arrangører med at tildele dig den rigtige opgave. Max {max} tegn.",
+    "volunteers_motivation_label": "Motivation (valgfri)",
+    "volunteers_motivation_placeholder": "Forklar kort hvorfor du ønsker at hjælpe...",
     "volunteers_my_application_accepted": "Min ansøgning er blevet accepteret.",
+    "volunteers_my_application_pending": "Min ansøgning afventer i øjeblikket.",
     "volunteers_my_application_rejected": "Min ansøgning er blevet afvist.",
+    "volunteers_my_application_title": "Min ansøgning",
     "volunteers_no_applications": "Ingen ansøgninger",
+    "volunteers_no_description": "Ingen specifik beskrivelse for frivillige.",
+    "volunteers_open": "Åben",
+    "volunteers_personal_info_disclaimer": "Ovenstående oplysninger (fornavn, efternavn, telefon) vil blive givet til arrangører for at administrere frivillige teams. Udfyld manglende felter nedenfor hvis nødvendigt.",
+    "volunteers_personal_info_notice": "Delte personlige oplysninger",
+    "volunteers_phone": "Telefon",
+    "volunteers_phone_required": "Telefon (påkrævet for at kontakte dig)",
     "volunteers_search": "Søg",
     "volunteers_search_placeholder": "Brugernavn, e-mail, motivation...",
+    "volunteers_status_accepted": "Accepteret",
+    "volunteers_status_all": "Alle",
+    "volunteers_status_pending": "Afventer",
+    "volunteers_status_rejected": "Afvist",
+    "volunteers_table_diet": "Kost",
     "volunteers_table_first_name": "Fornavn",
     "volunteers_table_last_name": "Efternavn",
-    "volunteers_filtered_count": "{filtered} af {total} ansøgninger",
-    "volunteers_admin_only_note": "Følgende oplysninger (ansøgninger, filtre og detaljeret statistik) er kun synlige for autoriserede arrangører og samarbejdspartnere."
+    "volunteers_table_motivation": "Motivation",
+    "volunteers_table_user": "Ansøger",
+    "volunteers_title": "Frivillige",
+    "volunteers_total": "I alt",
+    "volunteers_withdraw": "Træk min ansøgning tilbage"
   },
   "errors": {
     "access_denied": "Adgang nægtet",
@@ -798,6 +831,10 @@
       "start_typing_address": "Begynd at skrive en adresse..."
     }
   },
+  "h": {
+    "actor": "Aktør",
+    "targetUser": "Målbruger"
+  },
   "homepage": {
     "current_editions": "Aktuelle udgaver",
     "filters": "Filtre",
@@ -883,6 +920,9 @@
       "loading_convention": "Indlæser konventionsdata...",
       "submit_button": "Opret udgaven"
     },
+    "benevoles": {
+      "sort_tip": "Sorter: klik på overskrifter (Shift+klik for flere)"
+    },
     "comments": {
       "be_first_to_comment": "Vær den første til at dele din oplevelse!",
       "comment_placeholder": "Del din oplevelse, stil dine spørgsmål...",
@@ -913,11 +953,8 @@
       "manage": "Administrer",
       "manage_lost_found": "Administrer hittegods",
       "volunteer_description": "Dette afsnit vil gøre det muligt at administrere frivilligteams for udgaven, tildele roller og koordinere aktiviteter.",
-      "volunteer_management": "Frivilligansøgning",
-      "volunteer_description_active": "Konfigurer frivillige ansøgninger her: åbn/luk, beskrivelse, intern tilstand eller eksternt link."
-    },
-    "benevoles": {
-      "sort_tip": "Sorter: klik på overskrifter (Shift+klik for flere)"
+      "volunteer_description_active": "Konfigurer frivillige ansøgninger her: åbn/luk, beskrivelse, intern tilstand eller eksternt link.",
+      "volunteer_management": "Frivilligansøgning"
     },
     "objets_trouves": {
       "photo_alt": "Foto af den fundne genstand"
@@ -937,11 +974,11 @@
     "editor": "Redaktør",
     "history": {
       "ARCHIVED": "Arkiveret",
-      "PER_EDITIONS_UPDATED": "Rettigheder pr. udgave opdateret",
-      "RIGHTS_UPDATED": "Rettigheder opdateret",
-      "UNARCHIVED": "Genaktiveret",
       "CREATED": "Samarbejdspartner tilføjet",
-      "REMOVED": "Samarbejdspartner fjernet"
+      "PER_EDITIONS_UPDATED": "Rettigheder pr. udgave opdateret",
+      "REMOVED": "Samarbejdspartner fjernet",
+      "RIGHTS_UPDATED": "Rettigheder opdateret",
+      "UNARCHIVED": "Genaktiveret"
     },
     "manageCollaborators": "Administrer samarbejdspartnere",
     "manager": "Manager",
@@ -996,12 +1033,16 @@
     "new_password_placeholder": "Din nye adgangskode",
     "normal_active": "👤 Normal tilstand",
     "normal_mode": "Normal bruger",
+    "optional": "Valgfri",
+    "optional_section_title": "Valgfri sektion",
     "password_changed": "Adgangskode ændret",
     "password_digit_required": "Adgangskoden skal indeholde mindst ét tal",
     "password_updated": "Din adgangskode er blevet opdateret",
     "password_uppercase_required": "Adgangskoden skal indeholde mindst ét stort bogstav",
     "passwords_dont_match": "Adgangskoderne matcher ikke",
     "personal_info": "Personlige oplysninger",
+    "phone": "Telefon",
+    "phone_placeholder": "Dit telefonnummer",
     "photo_deleted": "Foto slettet",
     "photo_updated": "Foto opdateret",
     "picture": "Profilbillede",
@@ -1018,11 +1059,7 @@
     "unsaved_changes": "Du har ikke-gemte ændringer",
     "username_hint": "Synlig offentligt for andre brugere",
     "username_min_3": "Brugernavnet skal indeholde mindst 3 tegn",
-    "username_placeholder": "Dit unikke brugernavn",
-    "optional_section_title": "Valgfri sektion",
-    "optional": "Valgfri",
-    "phone": "Telefon",
-    "phone_placeholder": "Dit telefonnummer"
+    "username_placeholder": "Dit unikke brugernavn"
   },
   "services": {
     "accessibility": "Handicaptilgængelighed",
@@ -1041,8 +1078,8 @@
     "credit_card_payment": "Kreditkortbetaling",
     "family_camping": "Familiecamping",
     "fire_space": "Ildplads",
-    "food_trucks": "Food trucks",
-    "gala": "Gala",
+    "food_trucks": "Foodtrucks",
+    "gala": "Galla",
     "gym": "Gymnasium",
     "kids_zone": "Børnezone",
     "long_show": "Langt show",
@@ -1059,7 +1096,9 @@
     "click_select_convention_logo": "Klik for at vælge convention logo",
     "convention_logo_alt": "Convention logo",
     "delete_error": "Sletningsfejl",
+    "delete_message": "Billede slettet",
     "demo_title": "Billede upload demo",
+    "error_message": "Upload fejl",
     "errors": {
       "convention_id_required": "Convention ID påkrævet",
       "delete_failed": "Sletning mislykkedes",
@@ -1084,56 +1123,21 @@
     "max_size": "Maksimal størrelse",
     "select_file": "Vælg fil",
     "success": "Succes",
+    "success_message": "Billede uploadet med succes!",
     "upload": "Upload",
     "upload_error": "Upload fejl",
     "uploading": "Uploader...",
-    "validation_error": "Valideringsfejl",
-    "success_message": "Billede uploadet med succes!",
-    "delete_message": "Billede slettet",
-    "error_message": "Upload fejl"
+    "validation_error": "Valideringsfejl"
   },
-  "h": {
-    "actor": "Aktør",
-    "targetUser": "Målbruger"
+  "validation": {
+    "date_end_after_start": "Slutdatoen skal være efter startdatoen",
+    "date_start_required": "Startdato er påkrævet",
+    "description_max_1000": "Beskrivelsen må ikke overskride 1000 tegn",
+    "name_max_100": "Navnet må ikke overskride 100 tegn",
+    "name_max_200": "Navnet må ikke overskride 200 tegn",
+    "name_min_3": "Navnet skal indeholde mindst 3 tegn"
   },
   "volunteersInfo": {
     "externalUrl": "Ekstern URL"
-  },
-  "validation": {
-    "name_min_3": "Navnet skal indeholde mindst 3 tegn",
-    "name_max_100": "Navnet må ikke overskride 100 tegn",
-    "name_max_200": "Navnet må ikke overskride 200 tegn",
-    "description_max_1000": "Beskrivelsen må ikke overskride 1000 tegn",
-    "date_end_after_start": "Slutdatoen skal være efter startdatoen",
-    "date_start_required": "Startdato er påkrævet"
-  },
-  "countries": {
-    "czech_republic": "Tjekkiet"
-  },
-  "common.manage": "Administrer",
-  "components.edition_form.social_networks_description": "Del dine sider for at øge synligheden",
-  "components.edition_form.ticketing_section_title": "Billetsalg",
-  "components.edition_form.ticketing_section_description": "Information om køb af billetter",
-  "components.edition_form.step_about_title": "Om",
-  "components.edition_form.step_about_description": "Udgavebeskrivelse",
-  "components.edition_form.step_external_links_title": "Eksterne links",
-  "components.edition_form.step_external_links_description": "Billetsalg og sociale netværk",
-  "common.editor.bold_tooltip": "Fed tekst (Ctrl+B)",
-  "common.editor.italic_tooltip": "Kursiv tekst (Ctrl+I)",
-  "common.editor.heading1_tooltip": "Overskrift niveau 1",
-  "common.editor.heading2_tooltip": "Overskrift niveau 2",
-  "common.editor.bullet_list_tooltip": "Punktliste",
-  "common.editor.numbered_list_tooltip": "Nummereret liste",
-  "common.editor.code_tooltip": "Inline kode (Ctrl+`)",
-  "common.editor.block_tooltip": "Kodeblok",
-  "common.editor.quote_tooltip": "Citat",
-  "common.editor.link_tooltip": "Indsæt link (Ctrl+K)",
-  "common.editor.preview_mode": "Forhåndsvisning",
-  "common.editor.edit_mode": "Redigering",
-  "common.editor.toggle_preview": "Skift forhåndsvisning",
-  "common.editor.back_to_edit": "Tilbage til redigering",
-  "common.editor.fullscreen_tooltip": "Fuldskærmstilstand (Esc for at afslutte)",
-  "common.editor.exit_fullscreen": "Afslut fuldskærm",
-  "common.editor.split_mode": "Delt tilstand",
-  "common.editor.split_tooltip": "Redigering og forhåndsvisning side om side"
+  }
 }

@@ -98,6 +98,10 @@ ${BOLD}Options:${RESET}
   -r, --reference <locale>  Langue de référence (défaut: fr)
   -l, --lang <locale>       Affiche uniquement les résultats pour cette langue
   -s, --summary            Affiche uniquement le résumé
+  -p, --prune              Supprime les clés en trop dans les locales (par rapport à la référence)
+  -f, --fill               Ajoute automatiquement les clés manquantes (copie valeur de la référence)
+  --fill-mode <mode>   Mode de remplissage: copy (défaut), empty, todo
+  --refill             Force le remplacement des valeurs identiques à la référence selon fill-mode
   -h, --help               Affiche cette aide
 
 ${BOLD}Exemples:${RESET}
@@ -127,6 +131,24 @@ async function main() {
       short: 's',
       description: 'Affiche uniquement le résumé',
     },
+    prune: {
+      type: 'boolean',
+      short: 'p',
+      description: 'Supprime les clés en trop (prune) dans les locales analysées',
+    },
+    fill: {
+      type: 'boolean',
+      short: 'f',
+      description: 'Ajoute les clés manquantes en copiant la valeur de la locale de référence',
+    },
+    'fill-mode': {
+      type: 'string',
+      description: 'Mode de remplissage: copy | empty | todo',
+    },
+    refill: {
+      type: 'boolean',
+      description: 'Force le traitement aussi des clés dont la valeur est identique à la référence',
+    },
     help: {
       type: 'boolean',
       short: 'h',
@@ -151,6 +173,14 @@ async function main() {
   const referenceLocale = args.values.reference || 'fr'
   const targetLang = args.values.lang
   const summaryOnly = args.values.summary
+  const pruneExtra = args.values.prune
+  const fillMissing = args.values.fill
+  const fillMode = (args.values['fill-mode'] || 'copy').toLowerCase()
+  const refill = args.values.refill || false
+  if (fillMissing && !['copy', 'empty', 'todo'].includes(fillMode)) {
+    console.error(`${RED}Mode fill invalide: ${fillMode} (attendu: copy | empty | todo)${RESET}`)
+    process.exit(1)
+  }
 
   console.log(`\n${BOLD}${BLUE}=== Comparaison des traductions ===${RESET}\n`)
 
@@ -180,6 +210,131 @@ async function main() {
 
   // Filtrer par langue si spécifié
   const languagesToShow = targetLang ? { [targetLang]: results[targetLang] } : results
+
+  // Option prune: supprimer les clés en trop avant l'affichage détaillé
+  if (pruneExtra) {
+    for (const [locale, data] of Object.entries(languagesToShow)) {
+      if (data.extraKeys.length > 0) {
+        const localePath = path.join(localesDir, `${locale}.json`)
+        // Recharger contenu brut pour reconstruire proprement
+        const original = locales[locale]
+        // Aplatir
+        const flat = flattenObject(original)
+        // Retirer les extra
+        for (const k of data.extraKeys) delete flat[k]
+        // Reconstruire imbriqué
+        const rebuilt = {}
+        for (const [k, v] of Object.entries(flat)) {
+          const parts = k.split('.').filter(Boolean)
+          let cursor = rebuilt
+          for (let i = 0; i < parts.length; i++) {
+            const p = parts[i]
+            const last = i === parts.length - 1
+            if (last) {
+              cursor[p] = v
+            } else {
+              if (typeof cursor[p] !== 'object' || cursor[p] === null || Array.isArray(cursor[p])) {
+                cursor[p] = {}
+              }
+              cursor = cursor[p]
+            }
+          }
+        }
+        // Tri récursif des clés
+        const sortKeys = (obj) => {
+          if (Array.isArray(obj) || obj === null || typeof obj !== 'object') return obj
+          const out = {}
+          for (const key of Object.keys(obj).sort()) out[key] = sortKeys(obj[key])
+          return out
+        }
+        const sorted = sortKeys(rebuilt)
+        fs.writeFileSync(localePath, JSON.stringify(sorted, null, 2) + '\n', 'utf8')
+        console.log(
+          `${YELLOW}Pruned ${data.extraKeys.length} clé(s) en trop dans ${locale}.json${RESET}`
+        )
+        // Mettre à jour les données en mémoire pour le reporting
+        locales[locale] = sorted
+      }
+    }
+    // Recalculer les résultats après prune
+    const updated = compareTranslations(locales, referenceLocale)
+    for (const [loc, d] of Object.entries(updated)) {
+      if (languagesToShow[loc]) languagesToShow[loc] = d
+    }
+  }
+
+  // Option fill: ajouter les clés manquantes depuis la locale de référence
+  if (fillMissing) {
+    const referenceFlat = flattenObject(locales[referenceLocale])
+    for (const [locale, data] of Object.entries(languagesToShow)) {
+      // Déterminer clés à remplir: manquantes + (optionnel) celles égales à la ref si --refill
+      let keysToFill = [...data.missingKeys]
+      if (refill) {
+        const currentFlat = flattenObject(locales[locale])
+        for (const [k, v] of Object.entries(referenceFlat)) {
+          if (currentFlat[k] === v && !keysToFill.includes(k)) keysToFill.push(k)
+        }
+      }
+      if (keysToFill.length > 0) {
+        const localePath = path.join(localesDir, `${locale}.json`)
+        const original = locales[locale]
+        const flat = flattenObject(original)
+        let added = 0
+        for (const k of keysToFill) {
+          if (referenceFlat[k] === undefined) continue
+          let newVal
+          switch (fillMode) {
+            case 'empty':
+              newVal = ''
+              break
+            case 'todo':
+              newVal = `[TODO] ${referenceFlat[k]}`
+              break
+            case 'copy':
+            default:
+              newVal = referenceFlat[k]
+          }
+          if (flat[k] !== newVal) {
+            flat[k] = newVal
+            added++
+          }
+        }
+        if (added > 0) {
+          // reconstruire imbriqué
+          const rebuilt = {}
+          for (const [k, v] of Object.entries(flat)) {
+            const parts = k.split('.')
+            let cursor = rebuilt
+            for (let i = 0; i < parts.length; i++) {
+              const p = parts[i]
+              const last = i === parts.length - 1
+              if (last) cursor[p] = v
+              else {
+                if (typeof cursor[p] !== 'object' || cursor[p] === null || Array.isArray(cursor[p])) cursor[p] = {}
+                cursor = cursor[p]
+              }
+            }
+          }
+          const sortKeys = (obj) => {
+            if (Array.isArray(obj) || obj === null || typeof obj !== 'object') return obj
+            const out = {}
+            for (const key of Object.keys(obj).sort()) out[key] = sortKeys(obj[key])
+            return out
+          }
+          const sorted = sortKeys(rebuilt)
+          fs.writeFileSync(localePath, JSON.stringify(sorted, null, 2) + '\n', 'utf8')
+          locales[locale] = sorted
+          const modeNote = fillMode === 'copy' ? '' : ` (mode ${fillMode})`
+          console.log(`${GREEN}Filled ${added} clé(s) dans ${locale}.json${modeNote}${RESET}`)
+        }
+      }
+    }
+    // Recalculer après fill
+    const updated = compareTranslations(locales, referenceLocale)
+    for (const [loc, d] of Object.entries(updated)) {
+      if (languagesToShow[loc]) languagesToShow[loc] = d
+    }
+  }
 
   for (const [locale, data] of Object.entries(languagesToShow)) {
     totalMissing += data.missingKeys.length
