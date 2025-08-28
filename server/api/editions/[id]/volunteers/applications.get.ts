@@ -74,6 +74,7 @@ export default defineEventHandler(async (event) => {
       createdAt: true,
       motivation: true,
       userId: true,
+      dietaryPreference: true,
       user: {
         select: { id: true, pseudo: true, email: true, phone: true, prenom: true, nom: true },
       },

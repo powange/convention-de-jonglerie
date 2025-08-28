@@ -8,6 +8,7 @@ const bodySchema = z.object({
   description: z.string().max(5000).optional().nullable(),
   mode: z.enum(['INTERNAL', 'EXTERNAL']).optional(),
   externalUrl: z.string().url('URL externe invalide').max(1000).optional().nullable(),
+  askDiet: z.boolean().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -43,6 +44,7 @@ export default defineEventHandler(async (event) => {
     }
     data.volunteersExternalUrl = parsed.externalUrl || null
   }
+  if (parsed.askDiet !== undefined) data.volunteersAskDiet = parsed.askDiet
   if (Object.keys(data).length === 0) return { success: true, unchanged: true }
   data.volunteersUpdatedAt = new Date()
 
@@ -54,6 +56,7 @@ export default defineEventHandler(async (event) => {
       volunteersDescription: true,
       volunteersMode: true,
       volunteersExternalUrl: true,
+      volunteersAskDiet: true,
       volunteersUpdatedAt: true,
     } as any,
   })) as any

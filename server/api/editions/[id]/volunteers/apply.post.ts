@@ -11,6 +11,7 @@ const bodySchema = z.object({
     .optional(),
   nom: z.string().min(1).max(100).optional(),
   prenom: z.string().min(1).max(100).optional(),
+  dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -22,7 +23,7 @@ export default defineEventHandler(async (event) => {
 
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },
-    select: { volunteersOpen: true },
+    select: { volunteersOpen: true, volunteersAskDiet: true },
   })
   if (!edition) throw createError({ statusCode: 404, statusMessage: 'Edition introuvable' })
   if (!edition.volunteersOpen)
@@ -71,8 +72,10 @@ export default defineEventHandler(async (event) => {
       userId: event.context.user.id,
       motivation: parsed.motivation || null,
       userSnapshotPhone: finalPhone,
+      dietaryPreference:
+        edition.volunteersAskDiet && parsed.dietaryPreference ? parsed.dietaryPreference : 'NONE',
     },
-    select: { id: true, status: true },
+    select: { id: true, status: true, dietaryPreference: true },
   })
   return { success: true, application }
 })

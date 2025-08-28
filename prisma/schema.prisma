@@ -24,6 +24,13 @@ enum VolunteerMode {
   EXTERNAL
 }
 
+// Préférences alimentaires pour les candidatures bénévoles
+enum DietaryPreference {
+  NONE
+  VEGETARIAN
+  VEGAN
+}
+
 model User {
   id                       Int                             @id @default(autoincrement())
   email                    String                          @unique
@@ -120,6 +127,8 @@ model Edition {
   volunteersUpdatedAt     DateTime?
   volunteersMode          VolunteerMode                   @default(INTERNAL)
   volunteersExternalUrl   String?
+  // Demander la préférence alimentaire dans le formulaire interne ?
+  volunteersAskDiet       Boolean                         @default(false)
   volunteerApplications   EditionVolunteerApplication[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
@@ -417,6 +426,8 @@ model EditionVolunteerApplication {
   decidedAt         DateTime?
   // Snapshot téléphone au moment de la candidature pour conserver une trace même si l'utilisateur le change
   userSnapshotPhone String?
+  // Préférence alimentaire déclarée au moment de la candidature
+  dietaryPreference DietaryPreference @default(NONE)
   edition           Edition         @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 

@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
       volunteersDescription: true,
       volunteersMode: true,
       volunteersExternalUrl: true,
+      volunteersAskDiet: true,
       volunteerApplications: { select: { id: true, status: true, userId: true } },
     },
   })
@@ -37,6 +38,7 @@ export default defineEventHandler(async (event) => {
     description: edition.volunteersDescription || null,
     mode: (edition as any).volunteersMode || 'INTERNAL',
     externalUrl: (edition as any).volunteersExternalUrl || null,
+    askDiet: (edition as any).volunteersAskDiet || false,
     myApplication,
     counts,
   }

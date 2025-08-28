@@ -7,7 +7,7 @@
       @toggle-favorite="toggleFavorite(edition.id)"
     />
 
-    <UCard variant="soft">
+    <UCard variant="soft" class="mb-6">
       <template #header>
         <div class="flex items-center justify-between">
           <h3 class="text-lg font-semibold flex items-center gap-2">
@@ -69,62 +69,72 @@
             <UIcon name="i-heroicons-lock-closed" /> {{ t('editions.volunteers_closed_message') }}
           </div>
           <div v-else>
-            <template v-if="volunteersInfo?.myApplication">
-              <div class="space-y-2">
-                <h4 class="text-sm font-semibold flex items-center gap-1">
-                  <UIcon name="i-heroicons-user" class="text-primary-500" />
-                  {{ t('editions.volunteers_my_application_title') }}
-                </h4>
-                <div class="flex flex-wrap items-center gap-3 text-sm">
-                  <UBadge
-                    :color="volunteerStatusColor(volunteersInfo.myApplication.status)"
-                    variant="soft"
-                  >
-                    {{ volunteerStatusLabel(volunteersInfo.myApplication.status) }}
-                  </UBadge>
-                  <span
-                    v-if="volunteersInfo.myApplication.status === 'PENDING'"
-                    class="text-xs text-gray-600 dark:text-gray-400"
-                  >
-                    {{ t('editions.volunteers_my_application_pending') }}
-                  </span>
-                  <span
-                    v-else-if="volunteersInfo.myApplication.status === 'ACCEPTED'"
-                    class="text-xs text-gray-600 dark:text-gray-400"
-                  >
-                    {{ t('editions.volunteers_my_application_accepted') }}
-                  </span>
-                  <span
-                    v-else-if="volunteersInfo.myApplication.status === 'REJECTED'"
-                    class="text-xs text-gray-600 dark:text-gray-400"
-                  >
-                    {{ t('editions.volunteers_my_application_rejected') }}
-                  </span>
+            <UCard
+              variant="subtle"
+              class="border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-gray-800/40"
+            >
+              <template v-if="volunteersInfo?.myApplication">
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <h4 class="text-sm font-semibold flex items-center gap-1">
+                      <UIcon name="i-heroicons-user" class="text-primary-500" />
+                      {{ t('editions.volunteers_my_application_title') }}
+                    </h4>
+                    <UBadge
+                      :color="volunteerStatusColor(volunteersInfo.myApplication.status)"
+                      variant="soft"
+                      class="uppercase"
+                    >
+                      {{ volunteerStatusLabel(volunteersInfo.myApplication.status) }}
+                    </UBadge>
+                  </div>
+                  <div class="text-xs space-y-1">
+                    <span
+                      v-if="volunteersInfo.myApplication.status === 'PENDING'"
+                      class="block text-gray-600 dark:text-gray-400"
+                      >{{ t('editions.volunteers_my_application_pending') }}</span
+                    >
+                    <span
+                      v-else-if="volunteersInfo.myApplication.status === 'ACCEPTED'"
+                      class="block text-gray-600 dark:text-gray-400"
+                      >{{ t('editions.volunteers_my_application_accepted') }}</span
+                    >
+                    <span
+                      v-else-if="volunteersInfo.myApplication.status === 'REJECTED'"
+                      class="block text-gray-600 dark:text-gray-400"
+                      >{{ t('editions.volunteers_my_application_rejected') }}</span
+                    >
+                  </div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <UButton
+                      v-if="volunteersInfo.myApplication.status === 'PENDING'"
+                      size="xs"
+                      color="error"
+                      variant="soft"
+                      :loading="volunteersWithdrawing"
+                      @click="withdrawApplication"
+                    >
+                      {{ t('editions.volunteers_withdraw') }}
+                    </UButton>
+                  </div>
+                </div>
+              </template>
+              <template v-else>
+                <div class="flex items-center justify-between gap-4">
+                  <div class="text-xs text-gray-600 dark:text-gray-400">
+                    {{ t('editions.volunteers_apply_description') }}
+                  </div>
                   <UButton
-                    v-if="volunteersInfo.myApplication.status === 'PENDING'"
-                    size="xs"
-                    color="error"
-                    variant="soft"
-                    :loading="volunteersWithdrawing"
-                    @click="withdrawApplication"
+                    size="sm"
+                    color="primary"
+                    icon="i-heroicons-hand-raised"
+                    @click="openApplyModal"
                   >
-                    {{ t('editions.volunteers_withdraw') }}
+                    {{ t('editions.volunteers_apply') }}
                   </UButton>
                 </div>
-              </div>
-            </template>
-            <template v-else>
-              <div>
-                <UButton
-                  size="sm"
-                  color="primary"
-                  icon="i-heroicons-hand-raised"
-                  @click="openApplyModal"
-                >
-                  {{ t('editions.volunteers_apply') }}
-                </UButton>
-              </div>
-            </template>
+              </template>
+            </UCard>
           </div>
         </div>
         <div
@@ -132,125 +142,6 @@
           class="text-sm text-gray-500"
         >
           {{ t('editions.volunteers_login_prompt') }}
-        </div>
-
-        <!-- Note visibilité + séparation avant statistiques & tableau organisateur -->
-        <div
-          v-if="canManageEdition && volunteersMode === 'INTERNAL'"
-          class="border-t border-gray-200 dark:border-gray-700 pt-4 -mt-2 space-y-3"
-        >
-          <div class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
-            <UIcon name="i-heroicons-shield-check" class="text-primary-500 mt-0.5" />
-            <span>{{ t('editions.volunteers_admin_only_note') }}</span>
-          </div>
-
-          <!-- Statistiques -->
-          <div v-if="volunteersInfo" class="flex flex-wrap gap-3 text-xs">
-            <UBadge color="neutral" variant="soft"
-              >{{ t('editions.volunteers_total') }}: {{ volunteersInfo.counts.total || 0 }}</UBadge
-            >
-            <UBadge color="warning" variant="soft"
-              >{{ t('editions.volunteers_status_pending') }}:
-              {{ volunteersInfo.counts.PENDING || 0 }}</UBadge
-            >
-            <UBadge color="success" variant="soft"
-              >{{ t('editions.volunteers_status_accepted') }}:
-              {{ volunteersInfo.counts.ACCEPTED || 0 }}</UBadge
-            >
-            <UBadge color="error" variant="soft"
-              >{{ t('editions.volunteers_status_rejected') }}:
-              {{ volunteersInfo.counts.REJECTED || 0 }}</UBadge
-            >
-          </div>
-        </div>
-
-        <div v-if="canManageEdition" class="space-y-3">
-          <template v-if="canManageEdition && volunteersMode === 'INTERNAL'">
-            <!-- Liste (organisateur) -->
-            <div class="space-y-4">
-              <div class="flex flex-wrap gap-3 items-end">
-                <UFormField :label="t('editions.volunteers_filter_status')">
-                  <USelect
-                    v-model="applicationsFilterStatus"
-                    :items="volunteerStatusItems"
-                    placeholder="{{ t('editions.volunteers_status_all') }}"
-                    icon="i-heroicons-funnel"
-                    size="xs"
-                    variant="soft"
-                    class="w-48"
-                    @change="onStatusFilterChange"
-                  />
-                </UFormField>
-                <UFormField :label="t('editions.volunteers_search')">
-                  <UInput
-                    v-model="globalFilter"
-                    :placeholder="t('editions.volunteers_search_placeholder')"
-                    class="w-64"
-                    @keydown.enter.prevent="applySearch"
-                  />
-                </UFormField>
-                <UButton
-                  size="xs"
-                  variant="soft"
-                  icon="i-heroicons-arrow-path"
-                  :loading="applicationsLoading"
-                  @click="refreshApplications"
-                >
-                  {{ t('common.refresh') }}
-                </UButton>
-                <UButton
-                  size="xs"
-                  variant="outline"
-                  icon="i-heroicons-arrow-uturn-left"
-                  @click="resetApplicationsFilters"
-                >
-                  {{ t('common.reset') }}
-                </UButton>
-                <span class="text-xs text-gray-500 italic">{{
-                  $t('pages.benevoles.sort_tip')
-                }}</span>
-              </div>
-              <div class="border-t border-gray-200 dark:border-gray-700 pt-2">
-                <UTable
-                  ref="tableRef"
-                  v-model:sorting="sorting"
-                  :data="tableData"
-                  :columns="columns"
-                  :loading="applicationsLoading"
-                  class="flex-1"
-                  sticky
-                />
-                <div
-                  v-if="tableData.length === 0 && !applicationsLoading"
-                  class="text-xs text-gray-500 py-2"
-                >
-                  {{ t('editions.volunteers_no_applications') }}
-                </div>
-              </div>
-              <div class="flex flex-wrap items-center gap-3 text-xs">
-                <span>{{ filteredCountLabel }}</span>
-                <span v-if="serverPagination.totalPages > 1" class="flex items-center gap-2">
-                  <UButton
-                    size="xs"
-                    variant="ghost"
-                    :disabled="serverPagination.page === 1 || applicationsLoading"
-                    icon="i-heroicons-chevron-left"
-                    @click="goToPage(serverPagination.page - 1)"
-                  />
-                  <span>{{ serverPagination.page }} / {{ serverPagination.totalPages }}</span>
-                  <UButton
-                    size="xs"
-                    variant="ghost"
-                    :disabled="
-                      serverPagination.page === serverPagination.totalPages || applicationsLoading
-                    "
-                    icon="i-heroicons-chevron-right"
-                    @click="goToPage(serverPagination.page + 1)"
-                  />
-                </span>
-              </div>
-            </div>
-          </template>
         </div>
       </div>
     </UCard>
@@ -339,6 +230,20 @@
           <p class="text-xs text-gray-500 whitespace-pre-line w-full">
             {{ t('editions.volunteers_motivation_hint', { max: MOTIVATION_MAX }) }}
           </p>
+          <div
+            v-if="volunteersInfo?.askDiet && volunteersMode === 'INTERNAL'"
+            class="space-y-2 w-full"
+          >
+            <UFormField :label="t('editions.volunteers_diet_label')">
+              <USelect
+                v-model="selectedDietPreference"
+                :items="dietPreferenceItems"
+                size="lg"
+                class="w-full text-sm"
+                :placeholder="t('diet.none')"
+              />
+            </UFormField>
+          </div>
         </div>
       </template>
       <template #footer="{ close }">
@@ -368,6 +273,124 @@
         </div>
       </template>
     </UModal>
+
+    <UCard v-if="canManageEdition" variant="soft" class="mb-6">
+      <!-- Note visibilité + séparation avant statistiques & tableau organisateur -->
+      <div v-if="volunteersMode === 'INTERNAL'">
+        <UAlert
+          icon="i-heroicons-shield-check"
+          :title="t('editions.volunteers_admin_only_note')"
+          color="primary"
+          variant="subtle"
+        />
+
+        <!-- Statistiques -->
+        <div v-if="volunteersInfo" class="mt-3 mb-3 flex flex-wrap gap-3">
+          <UBadge color="neutral" variant="soft"
+            >{{ t('editions.volunteers_total') }}: {{ volunteersInfo.counts.total || 0 }}</UBadge
+          >
+          <UBadge color="warning" variant="soft"
+            >{{ t('editions.volunteers_status_pending') }}:
+            {{ volunteersInfo.counts.PENDING || 0 }}</UBadge
+          >
+          <UBadge color="success" variant="soft"
+            >{{ t('editions.volunteers_status_accepted') }}:
+            {{ volunteersInfo.counts.ACCEPTED || 0 }}</UBadge
+          >
+          <UBadge color="error" variant="soft"
+            >{{ t('editions.volunteers_status_rejected') }}:
+            {{ volunteersInfo.counts.REJECTED || 0 }}</UBadge
+          >
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <template v-if="volunteersMode === 'INTERNAL'">
+          <!-- Liste (organisateur) -->
+          <div class="space-y-4">
+            <div class="flex flex-wrap gap-3 items-end">
+              <UFormField :label="t('editions.volunteers_filter_status')">
+                <USelect
+                  v-model="applicationsFilterStatus"
+                  :items="volunteerStatusItems"
+                  :placeholder="t('editions.volunteers_status_all')"
+                  icon="i-heroicons-funnel"
+                  size="xs"
+                  variant="soft"
+                  class="w-48"
+                  @change="onStatusFilterChange"
+                />
+              </UFormField>
+              <UFormField :label="t('editions.volunteers_search')">
+                <UInput
+                  v-model="globalFilter"
+                  :placeholder="t('editions.volunteers_search_placeholder')"
+                  class="w-64"
+                  @keydown.enter.prevent="applySearch"
+                />
+              </UFormField>
+              <UButton
+                size="xs"
+                variant="soft"
+                icon="i-heroicons-arrow-path"
+                :loading="applicationsLoading"
+                @click="refreshApplications"
+              >
+                {{ t('common.refresh') }}
+              </UButton>
+              <UButton
+                size="xs"
+                variant="outline"
+                icon="i-heroicons-arrow-uturn-left"
+                @click="resetApplicationsFilters"
+              >
+                {{ t('common.reset') }}
+              </UButton>
+              <span class="text-xs text-gray-500 italic">{{ $t('pages.benevoles.sort_tip') }}</span>
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-2">
+              <UTable
+                ref="tableRef"
+                v-model:sorting="sorting"
+                :data="tableData"
+                :columns="columns"
+                :loading="applicationsLoading"
+                class="flex-1"
+                sticky
+              />
+              <div
+                v-if="tableData.length === 0 && !applicationsLoading"
+                class="text-xs text-gray-500 py-2"
+              >
+                {{ t('editions.volunteers_no_applications') }}
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 text-xs">
+              <span>{{ filteredCountLabel }}</span>
+              <span v-if="serverPagination.totalPages > 1" class="flex items-center gap-2">
+                <UButton
+                  size="xs"
+                  variant="ghost"
+                  :disabled="serverPagination.page === 1 || applicationsLoading"
+                  icon="i-heroicons-chevron-left"
+                  @click="goToPage(serverPagination.page - 1)"
+                />
+                <span>{{ serverPagination.page }} / {{ serverPagination.totalPages }}</span>
+                <UButton
+                  size="xs"
+                  variant="ghost"
+                  :disabled="
+                    serverPagination.page === serverPagination.totalPages || applicationsLoading
+                  "
+                  icon="i-heroicons-chevron-right"
+                  @click="goToPage(serverPagination.page + 1)"
+                />
+              </span>
+            </div>
+          </div>
+        </template>
+      </div>
+    </UCard>
   </div>
   <div v-else>
     <p>{{ t('editions.loading_details') }}</p>
@@ -440,6 +463,7 @@ interface VolunteerInfo {
   externalUrl: string | null
   counts: Record<string, number>
   myApplication: VolunteerApplication | null
+  askDiet?: boolean
 }
 const volunteersInfo = ref<VolunteerInfo | null>(null)
 const volunteersDescriptionHtml = ref('')
@@ -462,6 +486,15 @@ const volunteerMotivation = ref('')
 const volunteerPhone = ref('')
 const volunteerFirstName = ref('')
 const volunteerLastName = ref('')
+const selectedDietPreference = ref<'NONE' | 'VEGETARIAN' | 'VEGAN'>('NONE')
+// Items du select régime : labels doivent être des chaînes (pas des fonctions) pour USelect
+const dietPreferenceItems = computed<{ value: 'NONE' | 'VEGETARIAN' | 'VEGAN'; label: string }[]>(
+  () => [
+    { value: 'NONE', label: t('diet.none') },
+    { value: 'VEGETARIAN', label: t('diet.vegetarian') },
+    { value: 'VEGAN', label: t('diet.vegan') },
+  ]
+)
 const needsPhone = computed(() => authStore.isAuthenticated && !(authStore.user as any)?.phone)
 const volunteerStatusColor = (s: string) =>
   s === 'PENDING' ? 'warning' : s === 'ACCEPTED' ? 'success' : 'error'
@@ -498,6 +531,10 @@ const applyAsVolunteer = async () => {
           ? undefined
           : volunteerFirstName.value.trim() || undefined,
         nom: (authStore.user as any)?.nom ? undefined : volunteerLastName.value.trim() || undefined,
+        dietaryPreference:
+          volunteersInfo.value?.askDiet && selectedDietPreference.value !== 'NONE'
+            ? selectedDietPreference.value
+            : undefined,
       },
     } as any)
     if (res?.application && volunteersInfo.value)
@@ -661,11 +698,30 @@ const tableData = computed(() =>
     phone: app.user.phone,
     prenom: app.user.prenom,
     nom: app.user.nom,
+    dietaryPreference: (app as any).dietaryPreference,
   }))
 )
 
 // Colonnes UTable
 const columns: TableColumn<any>[] = [
+  // Etat en premier
+  {
+    accessorKey: 'status',
+    header: ({ column }) => getSortableHeader(column, t('common.status')),
+    cell: ({ row }) =>
+      h(
+        resolveComponent('UBadge'),
+        {
+          color: volunteerStatusColor(row.original.status),
+          variant: 'soft',
+          class: 'uppercase text-[10px] px-1.5 py-0.5',
+          title: volunteerStatusLabel(row.original.status),
+        },
+        () => volunteerStatusLabel(row.original.status).slice(0, 1)
+      ),
+    size: 40,
+  },
+  // Infos utilisateur
   {
     accessorKey: 'pseudo',
     header: ({ column }) => getSortableHeader(column, t('editions.volunteers_table_user')),
@@ -678,6 +734,25 @@ const columns: TableColumn<any>[] = [
           : null,
       ]),
   },
+  // Colonne régime si activée
+  ...(volunteersInfo.value?.askDiet
+    ? [
+        {
+          accessorKey: 'dietaryPreference',
+          header: t('editions.volunteers_table_diet'),
+          cell: ({ row }: any) => {
+            const val = row.original.dietaryPreference || 'NONE'
+            const key =
+              val === 'VEGETARIAN'
+                ? t('diet.vegetarian')
+                : val === 'VEGAN'
+                  ? t('diet.vegan')
+                  : t('diet.none')
+            return h('span', { class: 'text-xs' }, key)
+          },
+        } as TableColumn<any>,
+      ]
+    : []),
   {
     accessorKey: 'prenom',
     header: t('editions.volunteers_table_first_name'),
@@ -687,22 +762,6 @@ const columns: TableColumn<any>[] = [
     accessorKey: 'nom',
     header: t('editions.volunteers_table_last_name'),
     cell: ({ row }) => row.original.user.nom || '—',
-  },
-  {
-    accessorKey: 'status',
-    header: ({ column }) => getSortableHeader(column, t('common.status')),
-    cell: ({ row }) =>
-      h('span', {}, [
-        h(
-          resolveComponent('UBadge'),
-          {
-            color: volunteerStatusColor(row.original.status),
-            variant: 'soft',
-            class: 'uppercase text-xs',
-          },
-          () => volunteerStatusLabel(row.original.status)
-        ),
-      ]),
   },
   {
     accessorKey: 'createdAt',
@@ -715,7 +774,6 @@ const columns: TableColumn<any>[] = [
     cell: ({ row }) => {
       const mot = row.original.motivation
       if (!mot) return h('span', '—')
-      // Tooltip complet sur la motivation
       return h(
         resolveComponent('UTooltip'),
         { text: mot, openDelay: 200 },
@@ -757,7 +815,6 @@ const columns: TableColumn<any>[] = [
           ),
         ])
       }
-      // Actions pour revenir à PENDING
       if (status === 'ACCEPTED' || status === 'REJECTED') {
         return h('div', { class: 'flex gap-2' }, [
           h(

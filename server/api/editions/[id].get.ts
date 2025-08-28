@@ -173,6 +173,7 @@ export default defineEventHandler(async (event) => {
       volunteersDescription: (edition as any).volunteersDescription,
       volunteersMode: (edition as any).volunteersMode,
       volunteersExternalUrl: (edition as any).volunteersExternalUrl,
+      volunteersAskDiet: (edition as any).volunteersAskDiet,
       volunteersUpdatedAt: (edition as any).volunteersUpdatedAt,
     }
   } catch (error: any) {

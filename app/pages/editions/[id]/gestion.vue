@@ -79,7 +79,7 @@
               <UButton
                 v-if="hasEditionStarted"
                 size="sm"
-                color="warning"
+                color="primary"
                 variant="soft"
                 icon="i-heroicons-arrow-right"
                 :to="`/editions/${edition.id}/objets-trouves`"
@@ -88,46 +88,24 @@
               </UButton>
             </div>
 
-            <div
-              v-if="!hasEditionStarted"
-              class="bg-gray-50 dark:bg-gray-900/20 p-4 rounded-lg border border-gray-200 dark:border-gray-800"
-            >
-              <div class="flex items-start gap-3">
-                <UIcon
-                  name="i-heroicons-clock"
-                  class="text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5"
-                  size="20"
-                />
-                <div class="space-y-2">
-                  <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {{ $t('editions.lost_found_before_start') }}
-                  </h4>
-                  <p class="text-sm text-gray-700 dark:text-gray-300">
-                    {{ $t('editions.items_appear_when_started') }}
-                  </p>
-                </div>
-              </div>
+            <div v-if="!hasEditionStarted">
+              <UAlert
+                :title="t('editions.lost_found_before_start')"
+                :description="t('editions.items_appear_when_started')"
+                icon="i-heroicons-clock"
+                color="warning"
+                variant="subtle"
+              />
             </div>
 
-            <div
-              v-else
-              class="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800"
-            >
-              <div class="flex items-start gap-3">
-                <UIcon
-                  name="i-heroicons-magnifying-glass"
-                  class="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5"
-                  size="20"
-                />
-                <div class="space-y-2">
-                  <h4 class="text-sm font-medium text-amber-900 dark:text-amber-100">
-                    {{ $t('pages.management.manage_lost_found') }}
-                  </h4>
-                  <p class="text-sm text-amber-800 dark:text-amber-200">
-                    {{ $t('pages.management.lost_found_active_description') }}
-                  </p>
-                </div>
-              </div>
+            <div v-else>
+              <UAlert
+                :title="t('pages.management.manage_lost_found')"
+                :description="t('pages.management.lost_found_active_description')"
+                icon="i-heroicons-magnifying-glass"
+                color="info"
+                variant="subtle"
+              />
             </div>
           </div>
         </UCard>
@@ -251,6 +229,19 @@
                     }}
                   </p>
                 </div>
+                <!-- Switch demander régime alimentaire (mode interne uniquement) -->
+                <div
+                  v-if="canEdit && volunteersModeLocal === 'INTERNAL'"
+                  class="flex items-center gap-3 pt-1"
+                >
+                  <USwitch
+                    v-model="volunteersAskDietLocal"
+                    :disabled="savingVolunteers"
+                    color="primary"
+                    @update:model-value="persistVolunteerSettings"
+                  />
+                  <span class="text-sm">{{ t('editions.volunteers_ask_diet_label') }}</span>
+                </div>
               </div>
               <div class="flex flex-wrap items-center gap-2 text-xs">
                 <UBadge :color="volunteersOpenLocal ? 'success' : 'neutral'" variant="soft">
@@ -317,6 +308,7 @@ const volunteersExternalUrlLocal = ref('')
 const volunteersDescriptionLocal = ref('')
 const volunteersDescriptionOriginal = ref('')
 const volunteersDescriptionHtml = ref('')
+const volunteersAskDietLocal = ref(false)
 const volunteersUpdatedAt = ref<Date | null>(null)
 const savingVolunteers = ref(false)
 // Éviter d'envoyer des PATCH à l'initialisation quand on applique les valeurs serveur
@@ -356,6 +348,7 @@ function applyEditionVolunteerFields(src: any) {
   volunteersModeLocal.value = src.volunteersMode || 'INTERNAL'
   volunteersExternalUrlLocal.value = src.volunteersExternalUrl || ''
   volunteersDescriptionLocal.value = src.volunteersDescription || ''
+  volunteersAskDietLocal.value = !!src.volunteersAskDiet
   volunteersDescriptionOriginal.value = volunteersDescriptionLocal.value
   renderVolunteerDescriptionHtml()
   const vu = src.volunteersUpdatedAt
@@ -409,6 +402,7 @@ const persistVolunteerSettings = async () => {
     const body: any = {
       mode: volunteersModeLocal.value,
       description: volunteersDescriptionLocal.value.trim() || null,
+      askDiet: volunteersAskDietLocal.value,
     }
     if (volunteersModeLocal.value === 'EXTERNAL')
       body.externalUrl = volunteersExternalUrlLocal.value.trim() || null
