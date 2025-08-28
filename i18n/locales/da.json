@@ -420,8 +420,8 @@
       "logo_preview": "Logo forhåndsvisning:",
       "logo_url_description": "URL til konventionslogoets billede",
       "upload_file": "Upload fil",
-      "image_uploaded": "Image uploadée",
-      "image_deleted": "Image supprimée"
+      "image_uploaded": "Billede uploadet",
+      "image_deleted": "Billede slettet"
     },
     "country_select": {
       "no_countries_found": "Ingen lande fundet",
@@ -434,15 +434,15 @@
       "next": "Næste",
       "previous": "Forrige",
       "ticketing_link": "Billetsalgslink",
-      "poster_placeholder": "Cliquez pour sélectionner le poster de l'édition",
-      "poster_alt": "Poster de l'édition",
-      "address_tip": "Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte.",
-      "country_placeholder": "Nom du pays",
-      "convention_description_placeholder": "Description de la convention",
-      "social_networks_title": "Réseaux sociaux",
-      "step_general_title": "Informations Générales",
-      "step_general_description": "Informations Générales",
-      "step_services_title": "Services Proposés"
+      "poster_placeholder": "Klik for at vælge udgaveplakat",
+      "poster_alt": "Udgaveplakat",
+      "address_tip": "Indtast en komplet adresse i søgefeltet for automatisk at udfylde alle felterne nedenfor. En præcis adresse vil også muliggøre geolokalisering af dit arrangement på kortet.",
+      "country_placeholder": "Landets navn",
+      "convention_description_placeholder": "Beskrivelse af konventionen",
+      "social_networks_title": "Sociale netværk",
+      "step_general_title": "Generelle Oplysninger",
+      "step_general_description": "Generelle Oplysninger",
+      "step_services_title": "Tilbudte Tjenester"
     },
     "favorites_map": {
       "all_favorites": "Alle er favoritter",
@@ -472,17 +472,17 @@
       "your_reply_placeholder": "Dit svar..."
     },
     "date_time_picker": {
-      "placeholder": "Sélectionner une date"
+      "placeholder": "Vælg en dato"
     },
     "country_multi_select": {
-      "placeholder": "Sélectionner des pays..."
+      "placeholder": "Vælg lande..."
     },
     "collaborators": {
-      "added": "Collaborateur ajouté",
-      "add_error": "Impossible d'ajouter le collaborateur",
-      "removed": "Collaborateur retiré",
-      "load_error": "Impossible de charger les collaborateurs",
-      "remove_error": "Impossible de retirer le collaborateur"
+      "added": "Medarbejder tilføjet",
+      "add_error": "Kan ikke tilføje medarbejder",
+      "removed": "Medarbejder fjernet",
+      "load_error": "Kan ikke indlæse medarbejdere",
+      "remove_error": "Kan ikke fjerne medarbejder"
     }
   },
   "conventions": {
@@ -911,14 +911,14 @@
       "volunteer_description_active": "Konfigurer frivillige ansøgninger her: åbn/luk, beskrivelse, intern tilstand eller eksternt link."
     },
     "benevoles": {
-      "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
+      "sort_tip": "Sorter: klik på overskrifter (Shift+klik for flere)"
     },
     "objets_trouves": {
-      "photo_alt": "Photo de l'objet trouvé"
+      "photo_alt": "Foto af den fundne genstand"
     },
     "profile": {
-      "photo_alt": "Photo de profil",
-      "photo_placeholder": "Cliquez pour changer votre photo de profil"
+      "photo_alt": "Profilbillede",
+      "photo_placeholder": "Klik for at ændre dit profilbillede"
     }
   },
   "permissions": {
@@ -1082,9 +1082,9 @@
     "upload_error": "Upload fejl",
     "uploading": "Uploader...",
     "validation_error": "Valideringsfejl",
-    "success_message": "Image uploadée avec succès !",
-    "delete_message": "Image supprimée",
-    "error_message": "Erreur d'upload"
+    "success_message": "Billede uploadet med succes!",
+    "delete_message": "Billede slettet",
+    "error_message": "Upload fejl"
   },
   "h": {
     "actor": "Aktør",
@@ -1094,15 +1094,15 @@
     "externalUrl": "Ekstern URL"
   },
   "validation": {
-    "name_min_3": "Le nom doit contenir au moins 3 caractères",
-    "name_max_100": "Le nom ne peut pas dépasser 100 caractères",
-    "name_max_200": "Le nom ne peut pas dépasser 200 caractères",
-    "description_max_1000": "La description ne peut pas dépasser 1000 caractères",
-    "date_end_after_start": "La date de fin doit être strictement supérieure à la date de début",
-    "date_start_required": "La date de début est requise"
+    "name_min_3": "Navnet skal indeholde mindst 3 tegn",
+    "name_max_100": "Navnet må ikke overskride 100 tegn",
+    "name_max_200": "Navnet må ikke overskride 200 tegn",
+    "description_max_1000": "Beskrivelsen må ikke overskride 1000 tegn",
+    "date_end_after_start": "Slutdatoen skal være efter startdatoen",
+    "date_start_required": "Startdato er påkrævet"
   },
   "countries": {
-    "czech_republic": "République Tchèque"
+    "czech_republic": "Tjekkiet"
   },
   "common.manage": "Administrer",
   "components.edition_form.social_networks_description": "Del dine sider for at øge synligheden",

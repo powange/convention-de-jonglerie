@@ -420,8 +420,8 @@
       "logo_preview": "Vista previa del logo:",
       "logo_url_description": "URL de la imagen del logo de la convención",
       "upload_file": "Subir archivo",
-      "image_uploaded": "Image uploadée",
-      "image_deleted": "Image supprimée"
+      "image_uploaded": "Imagen subida",
+      "image_deleted": "Imagen eliminada"
     },
     "country_select": {
       "no_countries_found": "No se encontraron países",
@@ -434,15 +434,15 @@
       "next": "Siguiente",
       "previous": "Anterior",
       "ticketing_link": "Enlace de venta de entradas",
-      "poster_placeholder": "Cliquez pour sélectionner le poster de l'édition",
-      "poster_alt": "Poster de l'édition",
-      "address_tip": "Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte.",
-      "country_placeholder": "Nom du pays",
-      "convention_description_placeholder": "Description de la convention",
-      "social_networks_title": "Réseaux sociaux",
-      "step_general_title": "Informations Générales",
-      "step_general_description": "Informations Générales",
-      "step_services_title": "Services Proposés"
+      "poster_placeholder": "Haga clic para seleccionar el cartel de la edición",
+      "poster_alt": "Cartel de la edición",
+      "address_tip": "Ingrese una dirección completa en el campo de búsqueda para completar automáticamente todos los campos a continuación. Una dirección precisa también permitirá geolocalizar su evento en el mapa.",
+      "country_placeholder": "Nombre del país",
+      "convention_description_placeholder": "Descripción de la convención",
+      "social_networks_title": "Redes sociales",
+      "step_general_title": "Información General",
+      "step_general_description": "Información General",
+      "step_services_title": "Servicios Ofrecidos"
     },
     "favorites_map": {
       "all_favorites": "Todas son favoritas",
@@ -472,17 +472,17 @@
       "your_reply_placeholder": "Tu respuesta..."
     },
     "date_time_picker": {
-      "placeholder": "Sélectionner une date"
+      "placeholder": "Seleccionar una fecha"
     },
     "country_multi_select": {
-      "placeholder": "Sélectionner des pays..."
+      "placeholder": "Seleccionar países..."
     },
     "collaborators": {
-      "added": "Collaborateur ajouté",
-      "add_error": "Impossible d'ajouter le collaborateur",
-      "removed": "Collaborateur retiré",
-      "load_error": "Impossible de charger les collaborateurs",
-      "remove_error": "Impossible de retirer le collaborateur"
+      "added": "Colaborador añadido",
+      "add_error": "No se puede añadir el colaborador",
+      "removed": "Colaborador eliminado",
+      "load_error": "No se pueden cargar los colaboradores",
+      "remove_error": "No se puede eliminar el colaborador"
     }
   },
   "conventions": {
@@ -911,14 +911,14 @@
       "volunteer_description_active": "Configura aquí las solicitudes de voluntarios: abrir/cerrar, descripción, modo interno o enlace externo."
     },
     "benevoles": {
-      "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
+      "sort_tip": "Ordenar: haga clic en los encabezados (Shift+clic para múltiples)"
     },
     "objets_trouves": {
-      "photo_alt": "Photo de l'objet trouvé"
+      "photo_alt": "Foto del objeto encontrado"
     },
     "profile": {
-      "photo_alt": "Photo de profil",
-      "photo_placeholder": "Cliquez pour changer votre photo de profil"
+      "photo_alt": "Foto de perfil",
+      "photo_placeholder": "Haga clic para cambiar su foto de perfil"
     }
   },
   "permissions": {
@@ -1082,9 +1082,9 @@
     "upload_error": "Error de subida",
     "uploading": "Subiendo...",
     "validation_error": "Error de validación",
-    "success_message": "Image uploadée avec succès !",
-    "delete_message": "Image supprimée",
-    "error_message": "Erreur d'upload"
+    "success_message": "¡Imagen subida con éxito!",
+    "delete_message": "Imagen eliminada",
+    "error_message": "Error de subida"
   },
   "h": {
     "actor": "Actor",
@@ -1094,15 +1094,15 @@
     "externalUrl": "URL externa"
   },
   "validation": {
-    "name_min_3": "Le nom doit contenir au moins 3 caractères",
-    "name_max_100": "Le nom ne peut pas dépasser 100 caractères",
-    "name_max_200": "Le nom ne peut pas dépasser 200 caractères",
-    "description_max_1000": "La description ne peut pas dépasser 1000 caractères",
-    "date_end_after_start": "La date de fin doit être strictement supérieure à la date de début",
-    "date_start_required": "La date de début est requise"
+    "name_min_3": "El nombre debe contener al menos 3 caracteres",
+    "name_max_100": "El nombre no puede exceder los 100 caracteres",
+    "name_max_200": "El nombre no puede exceder los 200 caracteres",
+    "description_max_1000": "La descripción no puede exceder los 1000 caracteres",
+    "date_end_after_start": "La fecha de fin debe ser posterior a la fecha de inicio",
+    "date_start_required": "La fecha de inicio es requerida"
   },
   "countries": {
-    "czech_republic": "République Tchèque"
+    "czech_republic": "República Checa"
   },
   "common.manage": "Gestionar",
   "components.edition_form.social_networks_description": "Comparte tus páginas para aumentar la visibilidad",

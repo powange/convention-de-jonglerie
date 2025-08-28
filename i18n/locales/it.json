@@ -420,8 +420,8 @@
       "logo_preview": "Anteprima logo:",
       "logo_url_description": "URL dell'immagine del logo del convegno",
       "upload_file": "Carica file",
-      "image_uploaded": "Image uploadée",
-      "image_deleted": "Image supprimée"
+      "image_uploaded": "Immagine caricata",
+      "image_deleted": "Immagine eliminata"
     },
     "country_select": {
       "no_countries_found": "Nessun paese trovato",
@@ -434,15 +434,15 @@
       "next": "Successivo",
       "previous": "Precedente",
       "ticketing_link": "Link biglietteria",
-      "poster_placeholder": "Cliquez pour sélectionner le poster de l'édition",
-      "poster_alt": "Poster de l'édition",
-      "address_tip": "Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte.",
-      "country_placeholder": "Nom du pays",
-      "convention_description_placeholder": "Description de la convention",
-      "social_networks_title": "Réseaux sociaux",
-      "step_general_title": "Informations Générales",
-      "step_general_description": "Informations Générales",
-      "step_services_title": "Services Proposés"
+      "poster_placeholder": "Clicca per selezionare il poster dell'edizione",
+      "poster_alt": "Poster dell'edizione",
+      "address_tip": "Inserisci un indirizzo completo nel campo di ricerca per compilare automaticamente tutti i campi sottostanti. Un indirizzo preciso permetterà anche di geolocalizzare il tuo evento sulla mappa.",
+      "country_placeholder": "Nome del paese",
+      "convention_description_placeholder": "Descrizione della convention",
+      "social_networks_title": "Reti sociali",
+      "step_general_title": "Informazioni Generali",
+      "step_general_description": "Informazioni Generali",
+      "step_services_title": "Servizi Offerti"
     },
     "favorites_map": {
       "all_favorites": "Tutte sono preferite",
@@ -472,17 +472,17 @@
       "your_reply_placeholder": "La tua risposta..."
     },
     "date_time_picker": {
-      "placeholder": "Sélectionner une date"
+      "placeholder": "Seleziona una data"
     },
     "country_multi_select": {
-      "placeholder": "Sélectionner des pays..."
+      "placeholder": "Seleziona paesi..."
     },
     "collaborators": {
-      "added": "Collaborateur ajouté",
-      "add_error": "Impossible d'ajouter le collaborateur",
-      "removed": "Collaborateur retiré",
-      "load_error": "Impossible de charger les collaborateurs",
-      "remove_error": "Impossible de retirer le collaborateur"
+      "added": "Collaboratore aggiunto",
+      "add_error": "Impossibile aggiungere il collaboratore",
+      "removed": "Collaboratore rimosso",
+      "load_error": "Impossibile caricare i collaboratori",
+      "remove_error": "Impossibile rimuovere il collaboratore"
     }
   },
   "conventions": {
@@ -911,14 +911,14 @@
       "volunteer_description_active": "Configura qui le candidature dei volontari: apri/chiudi, descrizione, modalità interna o link esterno."
     },
     "benevoles": {
-      "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
+      "sort_tip": "Ordina: clicca sulle intestazioni (Shift+clic per multi)"
     },
     "objets_trouves": {
-      "photo_alt": "Photo de l'objet trouvé"
+      "photo_alt": "Foto dell'oggetto trovato"
     },
     "profile": {
-      "photo_alt": "Photo de profil",
-      "photo_placeholder": "Cliquez pour changer votre photo de profil"
+      "photo_alt": "Foto profilo",
+      "photo_placeholder": "Clicca per cambiare la tua foto profilo"
     }
   },
   "permissions": {
@@ -1082,9 +1082,9 @@
     "upload_error": "Errore di caricamento",
     "uploading": "Caricamento...",
     "validation_error": "Errore di validazione",
-    "success_message": "Image uploadée avec succès !",
-    "delete_message": "Image supprimée",
-    "error_message": "Erreur d'upload"
+    "success_message": "Immagine caricata con successo!",
+    "delete_message": "Immagine eliminata",
+    "error_message": "Errore di caricamento"
   },
   "h": {
     "actor": "Attore",
@@ -1094,15 +1094,15 @@
     "externalUrl": "URL esterno"
   },
   "validation": {
-    "name_min_3": "Le nom doit contenir au moins 3 caractères",
-    "name_max_100": "Le nom ne peut pas dépasser 100 caractères",
-    "name_max_200": "Le nom ne peut pas dépasser 200 caractères",
-    "description_max_1000": "La description ne peut pas dépasser 1000 caractères",
-    "date_end_after_start": "La date de fin doit être strictement supérieure à la date de début",
-    "date_start_required": "La date de début est requise"
+    "name_min_3": "Il nome deve contenere almeno 3 caratteri",
+    "name_max_100": "Il nome non può superare i 100 caratteri",
+    "name_max_200": "Il nome non può superare i 200 caratteri",
+    "description_max_1000": "La descrizione non può superare i 1000 caratteri",
+    "date_end_after_start": "La data di fine deve essere successiva alla data di inizio",
+    "date_start_required": "La data di inizio è richiesta"
   },
   "countries": {
-    "czech_republic": "République Tchèque"
+    "czech_republic": "Repubblica Ceca"
   },
   "common.manage": "Gestisci",
   "components.edition_form.social_networks_description": "Condividi le tue pagine per aumentare la visibilità",

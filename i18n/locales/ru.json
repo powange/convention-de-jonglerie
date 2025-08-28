@@ -420,8 +420,8 @@
       "logo_preview": "Предварительный просмотр логотипа:",
       "logo_url_description": "URL изображения логотипа конвенции",
       "upload_file": "Загрузить файл",
-      "image_uploaded": "Image uploadée",
-      "image_deleted": "Image supprimée"
+      "image_uploaded": "Изображение загружено",
+      "image_deleted": "Изображение удалено"
     },
     "country_select": {
       "no_countries_found": "Страны не найдены",
@@ -434,15 +434,15 @@
       "next": "Следующий",
       "previous": "Предыдущий",
       "ticketing_link": "Ссылка на билеты",
-      "poster_placeholder": "Cliquez pour sélectionner le poster de l'édition",
-      "poster_alt": "Poster de l'édition",
-      "address_tip": "Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte.",
-      "country_placeholder": "Nom du pays",
-      "convention_description_placeholder": "Description de la convention",
-      "social_networks_title": "Réseaux sociaux",
-      "step_general_title": "Informations Générales",
-      "step_general_description": "Informations Générales",
-      "step_services_title": "Services Proposés"
+      "poster_placeholder": "Нажмите, чтобы выбрать постер издания",
+      "poster_alt": "Постер издания",
+      "address_tip": "Введите полный адрес в поле поиска, чтобы автоматически заполнить все поля ниже. Точный адрес также позволит геолокализовать ваше мероприятие на карте.",
+      "country_placeholder": "Название страны",
+      "convention_description_placeholder": "Описание конвенции",
+      "social_networks_title": "Социальные сети",
+      "step_general_title": "Общая информация",
+      "step_general_description": "Общая информация",
+      "step_services_title": "Предлагаемые услуги"
     },
     "favorites_map": {
       "all_favorites": "Все избранные",
@@ -472,17 +472,17 @@
       "your_reply_placeholder": "Ваш ответ..."
     },
     "date_time_picker": {
-      "placeholder": "Sélectionner une date"
+      "placeholder": "Выбрать дату"
     },
     "country_multi_select": {
-      "placeholder": "Sélectionner des pays..."
+      "placeholder": "Выбрать страны..."
     },
     "collaborators": {
-      "added": "Collaborateur ajouté",
-      "add_error": "Impossible d'ajouter le collaborateur",
-      "removed": "Collaborateur retiré",
-      "load_error": "Impossible de charger les collaborateurs",
-      "remove_error": "Impossible de retirer le collaborateur"
+      "added": "Сотрудник добавлен",
+      "add_error": "Невозможно добавить сотрудника",
+      "removed": "Сотрудник удален",
+      "load_error": "Невозможно загрузить сотрудников",
+      "remove_error": "Невозможно удалить сотрудника"
     }
   },
   "conventions": {
@@ -911,14 +911,14 @@
       "volunteer_description_active": "Настройте здесь заявки волонтёров: открыть/закрыть, описание, внутренний режим или внешняя ссылка."
     },
     "benevoles": {
-      "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
+      "sort_tip": "Сортировка: нажмите на заголовки (Shift+клик для нескольких)"
     },
     "objets_trouves": {
-      "photo_alt": "Photo de l'objet trouvé"
+      "photo_alt": "Фото найденного предмета"
     },
     "profile": {
-      "photo_alt": "Photo de profil",
-      "photo_placeholder": "Cliquez pour changer votre photo de profil"
+      "photo_alt": "Фото профиля",
+      "photo_placeholder": "Нажмите, чтобы изменить фото профиля"
     }
   },
   "permissions": {
@@ -1082,9 +1082,9 @@
     "upload_error": "Ошибка загрузки",
     "uploading": "Загрузка...",
     "validation_error": "Ошибка валидации",
-    "success_message": "Image uploadée avec succès !",
-    "delete_message": "Image supprimée",
-    "error_message": "Erreur d'upload"
+    "success_message": "Изображение успешно загружено!",
+    "delete_message": "Изображение удалено",
+    "error_message": "Ошибка загрузки"
   },
   "h": {
     "actor": "Актер",
@@ -1094,15 +1094,15 @@
     "externalUrl": "Внешний URL"
   },
   "validation": {
-    "name_min_3": "Le nom doit contenir au moins 3 caractères",
-    "name_max_100": "Le nom ne peut pas dépasser 100 caractères",
-    "name_max_200": "Le nom ne peut pas dépasser 200 caractères",
-    "description_max_1000": "La description ne peut pas dépasser 1000 caractères",
-    "date_end_after_start": "La date de fin doit être strictement supérieure à la date de début",
-    "date_start_required": "La date de début est requise"
+    "name_min_3": "Имя должно содержать не менее 3 символов",
+    "name_max_100": "Имя не может превышать 100 символов",
+    "name_max_200": "Имя не может превышать 200 символов",
+    "description_max_1000": "Описание не может превышать 1000 символов",
+    "date_end_after_start": "Дата окончания должна быть позже даты начала",
+    "date_start_required": "Дата начала обязательна"
   },
   "countries": {
-    "czech_republic": "République Tchèque"
+    "czech_republic": "Чешская Республика"
   },
   "common.manage": "Управлять",
   "components.edition_form.social_networks_description": "Поделитесь своими страницами для повышения видимости",

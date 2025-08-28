@@ -420,8 +420,8 @@
       "logo_preview": "Попередній перегляд логотипу:",
       "logo_url_description": "URL зображення логотипу конвенції",
       "upload_file": "Завантажити файл",
-      "image_uploaded": "Image uploadée",
-      "image_deleted": "Image supprimée"
+      "image_uploaded": "Зображення завантажено",
+      "image_deleted": "Зображення видалено"
     },
     "country_select": {
       "no_countries_found": "Країни не знайдено",
@@ -434,15 +434,15 @@
       "next": "Наступний",
       "previous": "Попередній",
       "ticketing_link": "Посилання на квитки",
-      "poster_placeholder": "Cliquez pour sélectionner le poster de l'édition",
-      "poster_alt": "Poster de l'édition",
-      "address_tip": "Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte.",
-      "country_placeholder": "Nom du pays",
-      "convention_description_placeholder": "Description de la convention",
-      "social_networks_title": "Réseaux sociaux",
-      "step_general_title": "Informations Générales",
-      "step_general_description": "Informations Générales",
-      "step_services_title": "Services Proposés"
+      "poster_placeholder": "Натисніть, щоб вибрати постер видання",
+      "poster_alt": "Постер видання",
+      "address_tip": "Введіть повну адресу в поле пошуку, щоб автоматично заповнити всі поля нижче. Точна адреса також дозволить геолокалізувати вашу подію на карті.",
+      "country_placeholder": "Назва країни",
+      "convention_description_placeholder": "Опис конвенції",
+      "social_networks_title": "Соціальні мережі",
+      "step_general_title": "Загальна інформація",
+      "step_general_description": "Загальна інформація",
+      "step_services_title": "Пропоновані послуги"
     },
     "favorites_map": {
       "all_favorites": "Всі улюблені",
@@ -472,17 +472,17 @@
       "your_reply_placeholder": "Ваша відповідь..."
     },
     "date_time_picker": {
-      "placeholder": "Sélectionner une date"
+      "placeholder": "Вибрати дату"
     },
     "country_multi_select": {
-      "placeholder": "Sélectionner des pays..."
+      "placeholder": "Вибрати країни..."
     },
     "collaborators": {
-      "added": "Collaborateur ajouté",
-      "add_error": "Impossible d'ajouter le collaborateur",
-      "removed": "Collaborateur retiré",
-      "load_error": "Impossible de charger les collaborateurs",
-      "remove_error": "Impossible de retirer le collaborateur"
+      "added": "Співробітника додано",
+      "add_error": "Неможливо додати співробітника",
+      "removed": "Співробітника видалено",
+      "load_error": "Неможливо завантажити співробітників",
+      "remove_error": "Неможливо видалити співробітника"
     }
   },
   "conventions": {
@@ -911,14 +911,14 @@
       "volunteer_description_active": "Налаштуйте тут заявки волонтерів: відкрити/закрити, опис, внутрішній режим або зовнішнє посилання."
     },
     "benevoles": {
-      "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)"
+      "sort_tip": "Сортування: натисніть на заголовки (Shift+клік для кількох)"
     },
     "objets_trouves": {
-      "photo_alt": "Photo de l'objet trouvé"
+      "photo_alt": "Фото знайденого предмета"
     },
     "profile": {
-      "photo_alt": "Photo de profil",
-      "photo_placeholder": "Cliquez pour changer votre photo de profil"
+      "photo_alt": "Фото профілю",
+      "photo_placeholder": "Натисніть, щоб змінити фото профілю"
     }
   },
   "permissions": {
@@ -1082,9 +1082,9 @@
     "upload_error": "Помилка завантаження",
     "uploading": "Завантаження...",
     "validation_error": "Помилка валідації",
-    "success_message": "Image uploadée avec succès !",
-    "delete_message": "Image supprimée",
-    "error_message": "Erreur d'upload"
+    "success_message": "Зображення успішно завантажено!",
+    "delete_message": "Зображення видалено",
+    "error_message": "Помилка завантаження"
   },
   "h": {
     "actor": "Актор",
@@ -1094,15 +1094,15 @@
     "externalUrl": "Зовнішній URL"
   },
   "validation": {
-    "name_min_3": "Le nom doit contenir au moins 3 caractères",
-    "name_max_100": "Le nom ne peut pas dépasser 100 caractères",
-    "name_max_200": "Le nom ne peut pas dépasser 200 caractères",
-    "description_max_1000": "La description ne peut pas dépasser 1000 caractères",
-    "date_end_after_start": "La date de fin doit être strictement supérieure à la date de début",
-    "date_start_required": "La date de début est requise"
+    "name_min_3": "Ім'я повинно містити не менше 3 символів",
+    "name_max_100": "Ім'я не може перевищувати 100 символів",
+    "name_max_200": "Ім'я не може перевищувати 200 символів",
+    "description_max_1000": "Опис не може перевищувати 1000 символів",
+    "date_end_after_start": "Дата закінчення повинна бути пізніше дати початку",
+    "date_start_required": "Дата початку обов'язкова"
   },
   "countries": {
-    "czech_republic": "République Tchèque"
+    "czech_republic": "Чеська Республіка"
   },
   "common.manage": "Керувати",
   "components.edition_form.social_networks_description": "Поділіться своїми сторінками для підвищення видимості",
