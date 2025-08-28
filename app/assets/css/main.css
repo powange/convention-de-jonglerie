@@ -71,3 +71,319 @@ html.dark .bg-gray-950 {
 .prose p {
   margin: 1em 0;
 }
+
+/* Styles pour les listes dans les zones prose (contournement du reset Tailwind) */
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.625em;
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+.prose ul ul {
+  list-style-type: circle;
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.prose ul ul ul {
+  list-style-type: square;
+}
+
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.625em;
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+.prose ol ol {
+  list-style-type: lower-alpha;
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.prose li {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose li:first-child {
+  margin-top: 0;
+}
+
+.prose li:last-child {
+  margin-bottom: 0;
+}
+
+.prose li > p {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.prose li > p:first-child {
+  margin-top: 0;
+}
+
+.prose li > p:last-child {
+  margin-bottom: 0;
+}
+
+.prose li > ul,
+.prose li > ol {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+/* Styles pour les liens dans les zones prose */
+.prose a {
+  color: rgb(59, 130, 246);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.prose a:hover {
+  color: rgb(37, 99, 235);
+  text-decoration-color: rgb(37, 99, 235);
+}
+
+.prose a:visited {
+  color: rgb(109, 40, 217);
+}
+
+/* Styles pour les liens en mode sombre */
+.dark .prose a {
+  color: rgb(96, 165, 250);
+  text-decoration-color: rgba(96, 165, 250, 0.4);
+}
+
+.dark .prose a:hover {
+  color: rgb(147, 197, 253);
+  text-decoration-color: rgb(147, 197, 253);
+}
+
+.dark .prose a:visited {
+  color: rgb(167, 139, 250);
+}
+
+/* Styles pour les titres dans les zones prose */
+.prose h1 {
+  font-size: 2.25em;
+  font-weight: 800;
+  line-height: 1.1111111;
+  margin-top: 0;
+  margin-bottom: 0.8888889em;
+}
+
+.prose h2 {
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1.3333333;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+.prose h3 {
+  font-size: 1.25em;
+  font-weight: 600;
+  line-height: 1.6;
+  margin-top: 1.6em;
+  margin-bottom: 0.6em;
+}
+
+.prose h4 {
+  font-size: 1em;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose h5 {
+  font-size: 0.875em;
+  font-weight: 600;
+  line-height: 1.4285714;
+  margin-top: 1.4285714em;
+  margin-bottom: 0.5714286em;
+}
+
+.prose h6 {
+  font-size: 0.875em;
+  font-weight: 600;
+  line-height: 1.4285714;
+  margin-top: 1.4285714em;
+  margin-bottom: 0.5714286em;
+  color: rgb(107, 114, 128);
+}
+
+/* Ajustements pour le mode sombre */
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose h4,
+.dark .prose h5 {
+  color: rgb(243, 244, 246);
+}
+
+.dark .prose h6 {
+  color: rgb(156, 163, 175);
+}
+
+/* Premier titre sans marge supérieure */
+.prose h1:first-child,
+.prose h2:first-child,
+.prose h3:first-child,
+.prose h4:first-child,
+.prose h5:first-child,
+.prose h6:first-child {
+  margin-top: 0;
+}
+
+/* Styles pour les lignes horizontales dans les zones prose */
+.prose hr {
+  border-color: rgb(229, 231, 235);
+  border-top-width: 1px;
+  margin-top: 3em;
+  margin-bottom: 3em;
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+}
+
+.dark .prose hr {
+  border-color: rgb(55, 65, 81);
+}
+
+/* Ajustement pour hr en début ou fin de contenu */
+.prose hr:first-child {
+  margin-top: 0;
+}
+
+.prose hr:last-child {
+  margin-bottom: 0;
+}
+
+/* Styles pour les blockquotes dans les zones prose */
+.prose blockquote {
+  font-style: italic;
+  font-weight: 500;
+  border-left-width: 4px;
+  border-left-color: rgb(229, 231, 235);
+  padding-left: 1em;
+  margin-top: 1.6em;
+  margin-bottom: 1.6em;
+  quotes: "\201C""\201D""\2018""\2019";
+  color: rgb(107, 114, 128);
+}
+
+.prose blockquote p:first-of-type::before {
+  content: open-quote;
+}
+
+.prose blockquote p:last-of-type::after {
+  content: close-quote;
+}
+
+.dark .prose blockquote {
+  border-left-color: rgb(75, 85, 99);
+  color: rgb(156, 163, 175);
+}
+
+/* Marges des paragraphes dans les blockquotes */
+.prose blockquote p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose blockquote p:first-child {
+  margin-top: 0;
+}
+
+.prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Styles pour les blocs de code dans les zones prose */
+.prose pre {
+  background-color: rgb(249, 250, 251);
+  border-radius: 0.375rem;
+  padding: 0.8571429em 1.1428571em;
+  margin-top: 1.7142857em;
+  margin-bottom: 1.7142857em;
+  overflow-x: auto;
+  font-size: 0.875em;
+  line-height: 1.7142857;
+  border: 1px solid rgb(229, 231, 235);
+}
+
+.prose pre code {
+  background-color: transparent;
+  border-width: 0;
+  border-radius: 0;
+  padding: 0;
+  font-weight: 400;
+  color: inherit;
+  font-size: inherit;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  line-height: inherit;
+}
+
+/* Code inline */
+.prose code {
+  background-color: rgb(243, 244, 246);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-weight: 600;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  color: rgb(17, 24, 39);
+}
+
+.prose code::before,
+.prose code::after {
+  content: none;
+}
+
+/* Styles pour le mode sombre */
+.dark .prose pre {
+  background-color: rgb(31, 41, 55);
+  border-color: rgb(55, 65, 81);
+}
+
+.dark .prose pre code {
+  color: rgb(243, 244, 246);
+}
+
+.dark .prose code {
+  background-color: rgb(55, 65, 81);
+  color: rgb(243, 244, 246);
+}
+
+/* Scrollbar personnalisée pour les blocs de code */
+.prose pre::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.prose pre::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.prose pre::-webkit-scrollbar-thumb {
+  background-color: rgb(209, 213, 219);
+  border-radius: 4px;
+}
+
+.prose pre::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(156, 163, 175);
+}
+
+.dark .prose pre::-webkit-scrollbar-thumb {
+  background-color: rgb(75, 85, 99);
+}
+
+.dark .prose pre::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(107, 114, 128);
+}

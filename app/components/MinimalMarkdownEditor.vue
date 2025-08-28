@@ -56,7 +56,7 @@
               </UButton>
             </UTooltip>
             <UTooltip :text="t('common.editor.block_tooltip')">
-              <UButton :disabled="!canEdit" @click="insertBlock('```\ncode\n```')">
+              <UButton :disabled="!canEdit" @click="insertCodeBlock">
                 <UIcon name="i-heroicons-code-bracket-square" class="w-4 h-4" />
               </UButton>
             </UTooltip>
@@ -127,7 +127,7 @@
         <textarea
           ref="ta"
           v-model="localValue"
-          class="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 p-2 font-mono text-sm resize-none min-h-[300px] focus:outline-none focus:ring-1 focus:ring-primary-500 overflow-hidden"
+          class="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 p-2 font-mono text-sm resize-none min-h-[300px] max-h-[60vh] overflow-y-auto focus:outline-none focus:ring-1 focus:ring-primary-500"
           :disabled="!canEdit"
           @input="onInput"
           @focus="adjustHeight"
@@ -138,7 +138,7 @@
 
       <!-- Zone de prévisualisation -->
       <div
-        class="prose prose-sm max-w-none border rounded-md p-3 bg-white dark:bg-gray-900 min-h-[300px] overflow-y-auto"
+        class="prose prose-sm max-w-none border rounded-md p-3 bg-white dark:bg-gray-900 min-h-[300px] max-h-[60vh] overflow-y-auto"
       >
         <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
         <!-- eslint-disable-next-line vue/no-v-html -->
@@ -269,8 +269,34 @@ function surround(left: string, right: string) {
   replaceSelection(left, right)
 }
 
-function insertBlock(block: string) {
-  replaceSelection('', '', block)
+function insertCodeBlock() {
+  const el = ta.value
+  if (!el || !canEdit.value) return
+
+  const { start, end } = getSelection()
+  const text = localValue.value
+  const selected = text.slice(start, end)
+
+  if (selected) {
+    // Si du texte est sélectionné, l'entourer avec un bloc de code
+    const before = text.slice(0, start)
+    const after = text.slice(end)
+    const newText = before + '```\n' + selected + '\n```' + after
+    localValue.value = newText
+    emitChange()
+
+    // Placer le curseur après le bloc de code
+    const cursorPos = start + 4 + selected.length + 4
+    nextTick(() => {
+      el.focus()
+      el.selectionStart = cursorPos
+      el.selectionEnd = cursorPos
+      adjustHeight()
+    })
+  } else {
+    // Si aucun texte n'est sélectionné, insérer un modèle de bloc
+    replaceSelection('```\n', '\n```', 'code')
+  }
 }
 
 function insertHeading(level: number) {
@@ -509,15 +535,9 @@ scheduleRender()
   }
 }
 
-/* Synchronisation du scroll en mode split */
-.minimal-md-editor .split-textarea,
-.minimal-md-editor .split-preview {
-  height: auto;
-  max-height: 60vh;
-}
-
-.minimal-md-editor.fullscreen .split-textarea,
-.minimal-md-editor.fullscreen .split-preview {
+/* Mode split en plein écran */
+.minimal-md-editor.fullscreen textarea,
+.minimal-md-editor.fullscreen .prose {
   max-height: calc(100vh - 150px);
 }
 </style>
