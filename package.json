@@ -58,7 +58,8 @@
     "docker:release:down": "docker compose -f docker-compose.release.yml down",
     "format": "prettier -w \"**/*.{js,ts,vue,json,md,yml,yaml}\"",
     "format:check": "prettier -c \"**/*.{js,ts,vue,json,md,yml,yaml}\"",
-    "favicons": "tsx scripts/generate-favicons.ts"
+    "favicons": "tsx scripts/generate-favicons.ts",
+    "deps:reset": "bash scripts/reset-deps.sh"
   },
   "prettier": {
     "singleQuote": true,
@@ -85,12 +86,18 @@
     "flag-icons": "^7.5.0",
     "md5": "^2.3.0",
     "nodemailer": "^7.0.5",
-    "nuxt": "^4.0.1",
+    "nuxt": "^4.0.3",
     "nuxt-auth-utils": "^0.5.23",
     "pinia": "^3.0.3",
+    "rehype-sanitize": "^6.0.0",
+    "rehype-stringify": "^10.0.0",
+    "remark-gfm": "^4.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.0",
     "sharp": "0.33.5",
     "tsx": "^4.19.1",
     "typescript": "^5.8.3",
+    "unified": "^11.0.4",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1"
   },

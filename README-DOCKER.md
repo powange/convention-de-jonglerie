@@ -72,6 +72,7 @@ BASE_NODE_IMAGE=node:22-slim docker compose -f docker-compose.dev.yml up -d --bu
 ```
 
 Avantages :
+
 - Contournement rapide de problèmes de registry / credentials helpers
 - Comparaison de comportements entre variantes (alpine vs slim)
 

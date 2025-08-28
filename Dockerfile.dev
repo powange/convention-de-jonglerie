@@ -4,9 +4,16 @@ FROM ${BASE_NODE_IMAGE}
 RUN apk add --no-cache libc6-compat curl openssl
 WORKDIR /app
 
-# Installer les dépendances (si package-lock présent)
+# Installer les dépendances
+# - Si package-lock.json présent: npm ci (reproductible)
+# - Sinon: npm install (fallback)
+# L'ancien `npm ci || true` masquait les erreurs et pouvait laisser node_modules vide
 COPY package*.json ./
-RUN npm ci || true
+RUN if [ -f package-lock.json ]; then \
+            echo "Using npm ci" && npm ci; \
+        else \
+            echo "package-lock.json absent -> npm install" && npm install; \
+        fi
 
 # Variables d'env et ports de dev
 ENV NODE_ENV=development \

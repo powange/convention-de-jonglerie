@@ -166,22 +166,35 @@
               </div>
             </div>
             <div class="space-y-3">
-              <p class="text-sm text-gray-700 dark:text-gray-300">
-                {{
+              <UAlert
+                icon="i-heroicons-information-circle"
+                color="info"
+                variant="soft"
+                :description="
                   $t('pages.management.volunteer_description_active') ||
                   $t('pages.management.volunteer_description')
-                }}
-              </p>
-              <!-- Description des bénévoles -->
+                "
+              />
+              <!-- Description des bénévoles (Markdown) -->
               <div class="space-y-2">
                 <UFormField :label="t('editions.volunteers_description_label')" class="w-full">
-                  <UTextarea
-                    v-model="volunteersDescriptionLocal"
-                    :rows="4"
-                    :placeholder="t('editions.volunteers_description_placeholder')"
-                    class="w-full"
-                    :disabled="!canEdit"
-                  />
+                  <div v-if="canEdit" class="space-y-2">
+                    <MinimalMarkdownEditor
+                      v-model="volunteersDescriptionLocal"
+                      :preview="true"
+                      :disabled="savingVolunteers || !canEdit"
+                    />
+                  </div>
+                  <div v-else class="prose dark:prose-invert max-w-none text-sm">
+                    <template v-if="volunteersDescriptionHtml">
+                      <!-- HTML déjà sanitizé via utils/markdown (rehype-sanitize) -->
+                      <!-- eslint-disable-next-line vue/no-v-html -->
+                      <div v-html="volunteersDescriptionHtml" />
+                    </template>
+                    <template v-else>
+                      <p class="text-gray-500">{{ t('editions.volunteers_no_description') }}</p>
+                    </template>
+                  </div>
                 </UFormField>
                 <div
                   v-if="canEdit"
@@ -207,14 +220,6 @@
                       {{ t('common.save') }}
                     </UButton>
                   </div>
-                </div>
-                <div v-else class="prose dark:prose-invert max-w-none text-sm whitespace-pre-wrap">
-                  <template v-if="volunteersDescriptionLocal">
-                    {{ volunteersDescriptionLocal }}
-                  </template>
-                  <template v-else>
-                    <p class="text-gray-500">{{ t('editions.volunteers_no_description') }}</p>
-                  </template>
                 </div>
               </div>
               <div class="space-y-2">
@@ -287,8 +292,10 @@ import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import EditionHeader from '~/components/edition/EditionHeader.vue'
+import MinimalMarkdownEditor from '~/components/MinimalMarkdownEditor.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { markdownToHtml } from '~/utils/markdown'
 
 // TODO: Ajouter le middleware d'authentification plus tard
 // definePageMeta({
@@ -309,6 +316,7 @@ const volunteersModeLocal = ref<'INTERNAL' | 'EXTERNAL'>('INTERNAL')
 const volunteersExternalUrlLocal = ref('')
 const volunteersDescriptionLocal = ref('')
 const volunteersDescriptionOriginal = ref('')
+const volunteersDescriptionHtml = ref('')
 const volunteersUpdatedAt = ref<Date | null>(null)
 const savingVolunteers = ref(false)
 // Éviter d'envoyer des PATCH à l'initialisation quand on applique les valeurs serveur
@@ -349,6 +357,7 @@ function applyEditionVolunteerFields(src: any) {
   volunteersExternalUrlLocal.value = src.volunteersExternalUrl || ''
   volunteersDescriptionLocal.value = src.volunteersDescription || ''
   volunteersDescriptionOriginal.value = volunteersDescriptionLocal.value
+  renderVolunteerDescriptionHtml()
   const vu = src.volunteersUpdatedAt
   volunteersUpdatedAt.value = vu ? new Date(vu) : null
   // marquer initialisation terminée (prochain changement utilisateur déclenchera watchers)
@@ -436,6 +445,7 @@ const saveVolunteerDescription = async () => {
 
 const resetVolunteerDescription = () => {
   volunteersDescriptionLocal.value = volunteersDescriptionOriginal.value
+  renderVolunteerDescriptionHtml()
 }
 
 const formatRelative = (date: Date) => {
@@ -445,6 +455,22 @@ const formatRelative = (date: Date) => {
     return date.toLocaleString()
   }
 }
+
+async function renderVolunteerDescriptionHtml() {
+  if (!volunteersDescriptionLocal.value) {
+    volunteersDescriptionHtml.value = ''
+    return
+  }
+  try {
+    volunteersDescriptionHtml.value = await markdownToHtml(volunteersDescriptionLocal.value)
+  } catch {
+    volunteersDescriptionHtml.value = ''
+  }
+}
+
+watch(volunteersDescriptionLocal, () => {
+  renderVolunteerDescriptionHtml()
+})
 
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {

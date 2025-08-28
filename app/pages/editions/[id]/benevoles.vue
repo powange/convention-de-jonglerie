@@ -31,9 +31,10 @@
       <div class="space-y-6">
         <!-- Description -->
         <div>
-          <div class="prose dark:prose-invert max-w-none text-sm whitespace-pre-wrap">
+          <div class="prose dark:prose-invert max-w-none text-sm">
             <template v-if="volunteersInfo?.description">
-              {{ volunteersInfo?.description }}
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div v-html="volunteersDescriptionHtml" />
             </template>
             <template v-else>
               <p class="text-gray-500">{{ t('editions.volunteers_no_description') }}</p>
@@ -382,6 +383,7 @@ import { useRoute } from 'vue-router'
 import EditionHeader from '~/components/edition/EditionHeader.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { markdownToHtml } from '~/utils/markdown'
 
 // Types (externes) en dernier
 import type { TableColumn } from '@nuxt/ui'
@@ -440,6 +442,7 @@ interface VolunteerInfo {
   myApplication: VolunteerApplication | null
 }
 const volunteersInfo = ref<VolunteerInfo | null>(null)
+const volunteersDescriptionHtml = ref('')
 // Computed simple pour le mode afin d'éviter des cascades de types lourdes
 const volunteersMode = computed<'INTERNAL' | 'EXTERNAL' | null>(
   () => volunteersInfo.value?.mode || null
@@ -473,6 +476,9 @@ const volunteerStatusLabel = (s: string) =>
 const fetchVolunteersInfo = async () => {
   try {
     volunteersInfo.value = await $fetch(`/api/editions/${editionId}/volunteers/info`)
+    if (volunteersInfo.value?.description) {
+      volunteersDescriptionHtml.value = await markdownToHtml(volunteersInfo.value.description)
+    }
   } catch {
     /* silent */
   }

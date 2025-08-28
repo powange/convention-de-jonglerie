@@ -15,8 +15,12 @@ FROM base AS builder
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Installer dépendances complètes puis générer Prisma
-RUN npm ci
+# Installer dépendances complètes puis générer Prisma (ci si lock, sinon install)
+RUN if [ -f package-lock.json ]; then \
+			echo "Using npm ci (builder stage)" && npm ci; \
+		else \
+			echo "No package-lock.json -> npm install (builder stage)" && npm install; \
+		fi
 
 # Copier le reste du code et construire
 COPY . .
@@ -58,7 +62,11 @@ FROM base AS dev
 # Ce stage sert d’image de dev si souhaité. En pratique, on monte le code en volume
 # et on utilise npm run dev dans docker compose (docker-compose.dev.yml)
 COPY package*.json ./
-RUN npm ci || true
+RUN if [ -f package-lock.json ]; then \
+			echo "Using npm ci (dev stage)" && npm ci; \
+		else \
+			echo "No package-lock.json -> npm install (dev stage)" && npm install; \
+		fi
 ENV NODE_ENV=development NUXT_HOST=0.0.0.0 NUXT_PORT=3000
 EXPOSE 3000 24678
 CMD ["npm", "run", "dev"]

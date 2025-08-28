@@ -14,7 +14,11 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Installer toutes les dépendances (dev + prod)
-RUN npm ci
+RUN if [ -f package-lock.json ]; then \
+			echo "Using npm ci (test stage)" && npm ci; \
+		else \
+			echo "No package-lock.json -> npm install (test stage)" && npm install; \
+		fi
 
 # Copier le reste du code
 COPY . .

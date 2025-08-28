@@ -981,7 +981,7 @@
       "delete_edition": "Supprimer l'édition",
       "volunteer_management": "Demande de bénévoles",
       "volunteer_description": "Cette section permettra de gérer les équipes de bénévoles pour l'édition, attribuer des rôles et coordonner les activités.",
-      "volunteer_description_active": "Configurez ici les candidatures bénévoles : ouverture/fermeture, description, mode interne ou lien externe.",
+      "volunteer_description_active": "Configurez ici l'appel à bénévoles : ouverture/fermeture, description, mode interne ou lien externe.",
       "manage": "Gérer",
       "manage_lost_found": "Gérer les objets trouvés",
       "lost_found_active_description": "Vous pouvez gérer les objets trouvés pendant le déroulement de l'édition."
