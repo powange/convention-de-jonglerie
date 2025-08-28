@@ -187,10 +187,6 @@
     "postal_code": "Code postal",
     "select": "Sélectionner",
     "tip": "Conseil",
-    "code": "Code",
-    "block": "Bloc",
-    "quote": "Citation",
-    "link": "Lien",
     "editor": {
       "bold_tooltip": "Texte en gras (Ctrl+B)",
       "italic_tooltip": "Texte en italique (Ctrl+I)",

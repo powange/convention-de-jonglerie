@@ -185,10 +185,6 @@
     "postal_code": "Postal code",
     "select": "Select",
     "tip": "Tip",
-    "code": "Code",
-    "block": "Block",
-    "quote": "Quote",
-    "link": "Link",
     "editor": {
       "bold_tooltip": "Bold text (Ctrl+B)",
       "italic_tooltip": "Italic text (Ctrl+I)",
@@ -1137,10 +1133,6 @@
     "czech_republic": "Czech Republic"
   },
   "common.manage": "Manage",
-  "common.code": "Code",
-  "common.block": "Block",
-  "common.quote": "Quote",
-  "common.link": "Link",
   "components.edition_form.social_networks_description": "Share your pages to increase visibility",
   "components.edition_form.ticketing_section_title": "Ticketing",
   "components.edition_form.ticketing_section_description": "Information for purchasing tickets",
