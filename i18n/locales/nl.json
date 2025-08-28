@@ -442,9 +442,7 @@
       "social_networks_title": "Réseaux sociaux",
       "step_general_title": "Informations Générales",
       "step_general_description": "Informations Générales",
-      "step_services_title": "Services Proposés",
-      "step_visibility_title": "Visibilité (Réseaux Sociaux)",
-      "step_visibility_description": "Réseaux Sociaux"
+      "step_services_title": "Services Proposés"
     },
     "favorites_map": {
       "all_favorites": "Alle zijn favorieten",
@@ -575,7 +573,6 @@
     "volunteers_title": "Vrijwilligers",
     "volunteers_open": "Open",
     "volunteers_description_label": "Beschrijving voor vrijwilligers",
-    "volunteers_description_placeholder": "Beschrijf behoeften, rollen, schema's, voordelen...",
     "volunteers_no_description": "Geen specifieke beschrijving voor vrijwilligers.",
     "volunteers_total": "Totaal",
     "volunteers_status_pending": "In afwachting",
@@ -1106,5 +1103,17 @@
   },
   "countries": {
     "czech_republic": "République Tchèque"
-  }
+  },
+  "common.manage": "Beheren",
+  "common.code": "Code",
+  "common.block": "Blok",
+  "common.quote": "Citaat",
+  "common.link": "Link",
+  "components.edition_form.social_networks_description": "Deel uw pagina's om de zichtbaarheid te vergroten",
+  "components.edition_form.ticketing_section_title": "Ticketverkoop",
+  "components.edition_form.ticketing_section_description": "Informatie voor het kopen van tickets",
+  "components.edition_form.step_about_title": "Over",
+  "components.edition_form.step_about_description": "Editiebeschrijving",
+  "components.edition_form.step_external_links_title": "Externe links",
+  "components.edition_form.step_external_links_description": "Ticketing en sociale netwerken"
 }

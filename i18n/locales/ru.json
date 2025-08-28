@@ -442,9 +442,7 @@
       "social_networks_title": "Réseaux sociaux",
       "step_general_title": "Informations Générales",
       "step_general_description": "Informations Générales",
-      "step_services_title": "Services Proposés",
-      "step_visibility_title": "Visibilité (Réseaux Sociaux)",
-      "step_visibility_description": "Réseaux Sociaux"
+      "step_services_title": "Services Proposés"
     },
     "favorites_map": {
       "all_favorites": "Все избранные",
@@ -575,7 +573,6 @@
     "volunteers_title": "Волонтёры",
     "volunteers_open": "Открыть",
     "volunteers_description_label": "Описание для волонтёров",
-    "volunteers_description_placeholder": "Опишите потребности, роли, расписания, преимущества...",
     "volunteers_no_description": "Нет конкретного описания для волонтёров.",
     "volunteers_total": "Всего",
     "volunteers_status_pending": "В ожидании",
@@ -1106,5 +1103,17 @@
   },
   "countries": {
     "czech_republic": "République Tchèque"
-  }
+  },
+  "common.manage": "Управлять",
+  "common.code": "Код",
+  "common.block": "Блок",
+  "common.quote": "Цитата",
+  "common.link": "Ссылка",
+  "components.edition_form.social_networks_description": "Поделитесь своими страницами для повышения видимости",
+  "components.edition_form.ticketing_section_title": "Билеты",
+  "components.edition_form.ticketing_section_description": "Информация для покупки билетов",
+  "components.edition_form.step_about_title": "О",
+  "components.edition_form.step_about_description": "Описание издания",
+  "components.edition_form.step_external_links_title": "Внешние ссылки",
+  "components.edition_form.step_external_links_description": "Билеты и социальные сети"
 }

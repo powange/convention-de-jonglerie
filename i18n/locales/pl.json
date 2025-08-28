@@ -442,9 +442,7 @@
       "social_networks_title": "Réseaux sociaux",
       "step_general_title": "Informations Générales",
       "step_general_description": "Informations Générales",
-      "step_services_title": "Services Proposés",
-      "step_visibility_title": "Visibilité (Réseaux Sociaux)",
-      "step_visibility_description": "Réseaux Sociaux"
+      "step_services_title": "Services Proposés"
     },
     "favorites_map": {
       "all_favorites": "Wszystkie są ulubione",
@@ -575,7 +573,6 @@
     "volunteers_title": "Wolontariusze",
     "volunteers_open": "Otwórz",
     "volunteers_description_label": "Opis dla wolontariuszy",
-    "volunteers_description_placeholder": "Opisz potrzeby, role, harmonogramy, korzyści...",
     "volunteers_no_description": "Brak szczegółowego opisu dla wolontariuszy.",
     "volunteers_total": "Razem",
     "volunteers_status_pending": "Oczekujące",
@@ -1106,5 +1103,17 @@
   },
   "countries": {
     "czech_republic": "République Tchèque"
-  }
+  },
+  "common.manage": "Zarządzaj",
+  "common.code": "Kod",
+  "common.block": "Blok",
+  "common.quote": "Cytat",
+  "common.link": "Link",
+  "components.edition_form.social_networks_description": "Udostępnij swoje strony, aby zwiększyć widoczność",
+  "components.edition_form.ticketing_section_title": "Bilety",
+  "components.edition_form.ticketing_section_description": "Informacje o zakupie biletów",
+  "components.edition_form.step_about_title": "O",
+  "components.edition_form.step_about_description": "Opis edycji",
+  "components.edition_form.step_external_links_title": "Linki zewnętrzne",
+  "components.edition_form.step_external_links_description": "Bilety i sieci społecznościowe"
 }

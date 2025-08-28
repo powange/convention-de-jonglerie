@@ -35,19 +35,25 @@
 
         <UButtonGroup size="xs" variant="ghost">
           <UTooltip text="Code en ligne">
-            <UButton :disabled="!canEdit" @click="surround('`', '`')">Code</UButton>
+            <UButton :disabled="!canEdit" @click="surround('`', '`')">{{
+              $t('common.code')
+            }}</UButton>
           </UTooltip>
           <UTooltip text="Bloc de code">
-            <UButton :disabled="!canEdit" @click="insertBlock('```\ncode\n```')">Bloc</UButton>
+            <UButton :disabled="!canEdit" @click="insertBlock('```\ncode\n```')">{{
+              $t('common.block')
+            }}</UButton>
           </UTooltip>
         </UButtonGroup>
 
         <UButtonGroup size="xs" variant="ghost">
           <UTooltip text="Citation">
-            <UButton :disabled="!canEdit" @click="prependLines('> ')">Quote</UButton>
+            <UButton :disabled="!canEdit" @click="prependLines('> ')">{{
+              $t('common.quote')
+            }}</UButton>
           </UTooltip>
           <UTooltip text="Insérer un lien">
-            <UButton :disabled="!canEdit" @click="insertLink">Lien</UButton>
+            <UButton :disabled="!canEdit" @click="insertLink">{{ $t('common.link') }}</UButton>
           </UTooltip>
         </UButtonGroup>
 
@@ -81,6 +87,8 @@
 import { ref, watch, computed, nextTick } from 'vue'
 
 import { markdownToHtml } from '~/utils/markdown'
+
+const { $t } = useI18n()
 
 const props = defineProps<{
   modelValue: string

@@ -442,9 +442,7 @@
       "social_networks_title": "Réseaux sociaux",
       "step_general_title": "Informations Générales",
       "step_general_description": "Informations Générales",
-      "step_services_title": "Services Proposés",
-      "step_visibility_title": "Visibilité (Réseaux Sociaux)",
-      "step_visibility_description": "Réseaux Sociaux"
+      "step_services_title": "Services Proposés"
     },
     "favorites_map": {
       "all_favorites": "Todas são favoritas",
@@ -575,7 +573,6 @@
     "volunteers_title": "Voluntários",
     "volunteers_open": "Abrir",
     "volunteers_description_label": "Descrição para voluntários",
-    "volunteers_description_placeholder": "Descreva necessidades, funções, horários, benefícios...",
     "volunteers_no_description": "Sem descrição específica para voluntários.",
     "volunteers_total": "Total",
     "volunteers_status_pending": "Pendente",
@@ -1106,5 +1103,17 @@
   },
   "countries": {
     "czech_republic": "République Tchèque"
-  }
+  },
+  "common.manage": "Gerir",
+  "common.code": "Código",
+  "common.block": "Bloco",
+  "common.quote": "Citação",
+  "common.link": "Link",
+  "components.edition_form.social_networks_description": "Partilhe as suas páginas para aumentar a visibilidade",
+  "components.edition_form.ticketing_section_title": "Bilheteira",
+  "components.edition_form.ticketing_section_description": "Informações para compra de bilhetes",
+  "components.edition_form.step_about_title": "Sobre",
+  "components.edition_form.step_about_description": "Descrição da edição",
+  "components.edition_form.step_external_links_title": "Links externos",
+  "components.edition_form.step_external_links_description": "Bilheteira e redes sociais"
 }

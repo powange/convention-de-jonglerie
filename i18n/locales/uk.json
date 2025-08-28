@@ -442,9 +442,7 @@
       "social_networks_title": "Réseaux sociaux",
       "step_general_title": "Informations Générales",
       "step_general_description": "Informations Générales",
-      "step_services_title": "Services Proposés",
-      "step_visibility_title": "Visibilité (Réseaux Sociaux)",
-      "step_visibility_description": "Réseaux Sociaux"
+      "step_services_title": "Services Proposés"
     },
     "favorites_map": {
       "all_favorites": "Всі улюблені",
@@ -575,7 +573,6 @@
     "volunteers_title": "Волонтери",
     "volunteers_open": "Відкрити",
     "volunteers_description_label": "Опис для волонтерів",
-    "volunteers_description_placeholder": "Опишіть потреби, ролі, розклади, переваги...",
     "volunteers_no_description": "Немає конкретного опису для волонтерів.",
     "volunteers_total": "Всього",
     "volunteers_status_pending": "В очікуванні",
@@ -1106,5 +1103,17 @@
   },
   "countries": {
     "czech_republic": "République Tchèque"
-  }
+  },
+  "common.manage": "Керувати",
+  "common.code": "Код",
+  "common.block": "Блок",
+  "common.quote": "Цитата",
+  "common.link": "Посилання",
+  "components.edition_form.social_networks_description": "Поділіться своїми сторінками для підвищення видимості",
+  "components.edition_form.ticketing_section_title": "Квитки",
+  "components.edition_form.ticketing_section_description": "Інформація для придбання квитків",
+  "components.edition_form.step_about_title": "Про",
+  "components.edition_form.step_about_description": "Опис видання",
+  "components.edition_form.step_external_links_title": "Зовнішні посилання",
+  "components.edition_form.step_external_links_description": "Квитки та соціальні мережі"
 }

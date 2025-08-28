@@ -296,6 +296,7 @@
                       required
                       :placeholder="$t('components.edition_form.country_placeholder')"
                       size="lg"
+                      class="w-full"
                       @blur="
                         (() => {
                           touchedFields.addressCountry = true
@@ -321,43 +322,36 @@
                         />
                       </template>
                     </UInput>
-                    <USelect
+                    <USelectMenu
                       v-else
-                      v-model="state.country"
+                      v-model="selectedCountry"
                       :items="countryOptions"
                       :placeholder="$t('common.select')"
                       size="lg"
+                      class="w-full"
+                      value-attribute="value"
+                      option-attribute="label"
                       @change="handleCountryChange"
                     >
-                      <template #leading>
-                        <UIcon name="i-heroicons-globe-europe-africa" />
+                      <template #label>
+                        <div v-if="selectedCountry" class="flex items-center gap-2">
+                          <UIcon :name="selectedCountry.icon" class="w-4 h-4" />
+                          <span>{{ selectedCountry.label }}</span>
+                        </div>
+                        <span v-else class="text-gray-400">{{ $t('common.select') }}</span>
                       </template>
-                    </USelect>
+                      <template #option="{ option }">
+                        <div class="flex items-center gap-2">
+                          <UIcon :name="option.icon" class="w-4 h-4" />
+                          <span>{{ option.label }}</span>
+                        </div>
+                      </template>
+                    </USelectMenu>
                   </UFormField>
                 </div>
               </div>
             </UCard>
           </div>
-
-          <UFormField
-            :label="$t('common.description')"
-            name="description"
-            :error="getDescriptionError()"
-          >
-            <UTextarea
-              v-model="state.description"
-              :placeholder="$t('components.edition_form.convention_description_placeholder')"
-              :rows="5"
-              class="w-full"
-              maxlength="1000"
-              @blur="
-                (() => {
-                  touchedFields.description = true
-                  trimField('description')
-                })()
-              "
-            />
-          </UFormField>
         </div>
       </template>
 
@@ -390,13 +384,40 @@
         </div>
       </template>
 
-      <template #ticketing>
+      <template #about>
         <div class="space-y-6">
+          <UFormField
+            :label="$t('common.description')"
+            name="description"
+            :error="getDescriptionError()"
+          >
+            <UTextarea
+              v-model="state.description"
+              :placeholder="$t('components.edition_form.convention_description_placeholder')"
+              :rows="5"
+              class="w-full"
+              maxlength="1000"
+              @blur="
+                (() => {
+                  touchedFields.description = true
+                  trimField('description')
+                })()
+              "
+            />
+          </UFormField>
+        </div>
+      </template>
+
+      <template #external-links>
+        <div class="space-y-6">
+          <!-- Section Billetterie -->
           <div class="space-y-4">
             <div class="border-b border-gray-200 pb-2">
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Billetterie</h3>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                {{ $t('components.edition_form.ticketing_section_title') }}
+              </h3>
               <p class="text-sm text-gray-600 dark:text-gray-400">
-                Informations pour l'achat de billets
+                {{ $t('components.edition_form.ticketing_section_description') }}
               </p>
             </div>
             <UFormField :label="$t('components.edition_form.ticketing_link')" name="ticketingUrl">
@@ -413,18 +434,15 @@
               </UInput>
             </UFormField>
           </div>
-        </div>
-      </template>
 
-      <template #visibility>
-        <div class="space-y-6">
+          <!-- Section Réseaux sociaux -->
           <div class="space-y-4">
             <div class="border-b border-gray-200 pb-2">
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ $t('components.edition_form.social_networks_title') }}
               </h3>
               <p class="text-sm text-gray-600 dark:text-gray-400">
-                Partagez vos pages pour augmenter la visibilité
+                {{ $t('components.edition_form.social_networks_description') }}
               </p>
             </div>
             <div class="space-y-4">
@@ -528,16 +546,16 @@ const steps = ref<StepperItem[]>([
     slot: 'services',
   },
   {
-    title: 'Billetterie',
-    description: 'Billetterie',
-    icon: 'i-heroicons-ticket',
-    slot: 'ticketing',
+    title: computed(() => t('components.edition_form.step_about_title')),
+    description: computed(() => t('components.edition_form.step_about_description')),
+    icon: 'i-heroicons-document-text',
+    slot: 'about',
   },
   {
-    title: computed(() => t('components.edition_form.step_visibility_title')),
-    description: computed(() => t('components.edition_form.step_visibility_description')),
-    icon: 'i-heroicons-globe-alt',
-    slot: 'visibility',
+    title: computed(() => t('components.edition_form.step_external_links_title')),
+    description: computed(() => t('components.edition_form.step_external_links_description')),
+    icon: 'i-heroicons-link',
+    slot: 'external-links',
   },
 ])
 
@@ -619,22 +637,22 @@ const endTime = ref('18:00')
 
 // Options de pays les plus courants pour les conventions de jonglerie
 const countryOptions = [
-  { label: 'France', value: 'France' },
-  { label: 'Belgique', value: 'Belgique' },
-  { label: 'Suisse', value: 'Suisse' },
-  { label: 'Allemagne', value: 'Allemagne' },
-  { label: 'Pays-Bas', value: 'Pays-Bas' },
-  { label: 'Italie', value: 'Italie' },
-  { label: 'Espagne', value: 'Espagne' },
-  { label: 'Royaume-Uni', value: 'Royaume-Uni' },
-  { label: 'Luxembourg', value: 'Luxembourg' },
-  { label: 'Autriche', value: 'Autriche' },
-  { label: 'Portugal', value: 'Portugal' },
-  { label: 'Pologne', value: 'Pologne' },
-  { label: t('countries.czech_republic'), value: 'République Tchèque' },
-  { label: 'Canada', value: 'Canada' },
-  { label: 'États-Unis', value: 'États-Unis' },
-  { label: 'Autre', value: 'Autre' },
+  { label: 'France', value: 'France', icon: 'flag:fr-4x3' },
+  { label: 'Belgique', value: 'Belgique', icon: 'flag:be-4x3' },
+  { label: 'Suisse', value: 'Suisse', icon: 'flag:ch-4x3' },
+  { label: 'Allemagne', value: 'Allemagne', icon: 'flag:de-4x3' },
+  { label: 'Pays-Bas', value: 'Pays-Bas', icon: 'flag:nl-4x3' },
+  { label: 'Italie', value: 'Italie', icon: 'flag:it-4x3' },
+  { label: 'Espagne', value: 'Espagne', icon: 'flag:es-4x3' },
+  { label: 'Royaume-Uni', value: 'Royaume-Uni', icon: 'flag:gb-4x3' },
+  { label: 'Luxembourg', value: 'Luxembourg', icon: 'flag:lu-4x3' },
+  { label: 'Autriche', value: 'Autriche', icon: 'flag:at-4x3' },
+  { label: 'Portugal', value: 'Portugal', icon: 'flag:pt-4x3' },
+  { label: 'Pologne', value: 'Pologne', icon: 'flag:pl-4x3' },
+  { label: t('countries.czech_republic'), value: 'République Tchèque', icon: 'flag:cz-4x3' },
+  { label: 'Canada', value: 'Canada', icon: 'flag:ca-4x3' },
+  { label: 'États-Unis', value: 'États-Unis', icon: 'flag:us-4x3' },
+  { label: 'Autre', value: 'Autre', icon: 'i-heroicons-globe-europe-africa' },
 ]
 
 // Options d'heures (de 00:00 à 23:30 par intervalles de 30 min)
@@ -643,7 +661,15 @@ const timeOptions = computed(() => {
   for (let hour = 0; hour < 24; hour++) {
     for (const minute of [0, 30]) {
       const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
-      options.push({ label: time, value: time })
+      const icon =
+        hour < 6
+          ? 'i-heroicons-moon'
+          : hour < 12
+            ? 'i-heroicons-sun'
+            : hour < 18
+              ? 'i-heroicons-sun'
+              : 'i-heroicons-moon'
+      options.push({ label: time, value: time, icon })
     }
   }
   return options
@@ -670,7 +696,16 @@ const conventionOptions = computed(() => {
     value: convention.id,
     label: convention.name,
     logo: convention.logo,
+    icon: convention.logo ? undefined : 'i-heroicons-building-office',
   }))
+})
+
+// Pays sélectionné pour l'affichage avec drapeau
+const selectedCountry = computed({
+  get: () => countryOptions.find((option) => option.value === state.country) || null,
+  set: (value) => {
+    state.country = value?.value || ''
+  },
 })
 
 // Fonction pour charger les conventions de l'utilisateur

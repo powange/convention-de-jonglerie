@@ -442,9 +442,7 @@
       "social_networks_title": "Réseaux sociaux",
       "step_general_title": "Informations Générales",
       "step_general_description": "Informations Générales",
-      "step_services_title": "Services Proposés",
-      "step_visibility_title": "Visibilité (Réseaux Sociaux)",
-      "step_visibility_description": "Réseaux Sociaux"
+      "step_services_title": "Services Proposés"
     },
     "favorites_map": {
       "all_favorites": "Alle er favoritter",
@@ -575,7 +573,6 @@
     "volunteers_title": "Frivillige",
     "volunteers_open": "Åben",
     "volunteers_description_label": "Beskrivelse for frivillige",
-    "volunteers_description_placeholder": "Beskriv behov, roller, tidsplaner, fordele...",
     "volunteers_no_description": "Ingen specifik beskrivelse for frivillige.",
     "volunteers_total": "Total",
     "volunteers_status_pending": "Afventer",
@@ -1106,5 +1103,17 @@
   },
   "countries": {
     "czech_republic": "République Tchèque"
-  }
+  },
+  "common.manage": "Administrer",
+  "common.code": "Kode",
+  "common.block": "Blok",
+  "common.quote": "Citat",
+  "common.link": "Link",
+  "components.edition_form.social_networks_description": "Del dine sider for at øge synligheden",
+  "components.edition_form.ticketing_section_title": "Billetsalg",
+  "components.edition_form.ticketing_section_description": "Information om køb af billetter",
+  "components.edition_form.step_about_title": "Om",
+  "components.edition_form.step_about_description": "Udgavebeskrivelse",
+  "components.edition_form.step_external_links_title": "Eksterne links",
+  "components.edition_form.step_external_links_description": "Billetsalg og sociale netværk"
 }

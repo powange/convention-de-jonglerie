@@ -185,6 +185,10 @@
     "postal_code": "Postal code",
     "select": "Select",
     "tip": "Tip",
+    "code": "Code",
+    "block": "Block",
+    "quote": "Quote",
+    "link": "Link",
     "favorite": "Favorite",
     "view_details": "View details",
     "back": "Back",
@@ -195,6 +199,7 @@
     "refresh": "Refresh",
     "save": "Save",
     "reset": "Reset",
+    "manage": "Manage",
     "deleted": "Deleted",
     "active": "Active",
     "inactive": "Inactive",
@@ -356,7 +361,6 @@
     "volunteers_title": "Volunteers",
     "volunteers_open": "Open",
     "volunteers_description_label": "Description for volunteers",
-    "volunteers_description_placeholder": "Describe needs, roles, schedules, benefits...",
     "volunteers_no_description": "No specific description for volunteers.",
     "volunteers_total": "Total",
     "volunteers_status_pending": "Pending",
@@ -663,11 +667,16 @@
       "country_placeholder": "Country name",
       "convention_description_placeholder": "Convention description",
       "social_networks_title": "Social Networks",
+      "social_networks_description": "Share your pages to increase visibility",
+      "ticketing_section_title": "Ticketing",
+      "ticketing_section_description": "Information for purchasing tickets",
       "step_general_title": "General Information",
       "step_general_description": "General Information",
+      "step_about_title": "About",
+      "step_about_description": "Edition description",
       "step_services_title": "Offered Services",
-      "step_visibility_title": "Visibility (Social Networks)",
-      "step_visibility_description": "Social Networks"
+      "step_external_links_title": "External Links",
+      "step_external_links_description": "Ticketing and social networks"
     },
     "carpool": {
       "offer_vehicle_places": "Offer seats in your vehicle",
@@ -1106,5 +1115,17 @@
   },
   "countries": {
     "czech_republic": "Czech Republic"
-  }
+  },
+  "common.manage": "Manage",
+  "common.code": "Code",
+  "common.block": "Block",
+  "common.quote": "Quote",
+  "common.link": "Link",
+  "components.edition_form.social_networks_description": "Share your pages to increase visibility",
+  "components.edition_form.ticketing_section_title": "Ticketing",
+  "components.edition_form.ticketing_section_description": "Information for purchasing tickets",
+  "components.edition_form.step_about_title": "About",
+  "components.edition_form.step_about_description": "Edition description",
+  "components.edition_form.step_external_links_title": "External Links",
+  "components.edition_form.step_external_links_description": "Ticketing and social networks"
 }
