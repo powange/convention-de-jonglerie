@@ -469,7 +469,7 @@
       "facebook_page": "Страница Facebook",
       "instagram_account": "Аккаунт Instagram",
       "next": "Следующий",
-  "official_website_link": "Официальный сайт",
+      "official_website_link": "Официальный сайт",
       "poster_alt": "Постер издания",
       "poster_placeholder": "Нажмите, чтобы выбрать постер издания",
       "previous": "Предыдущий",
@@ -553,7 +553,7 @@
     "vegetarian": "Вегетарианский"
   },
   "ed": {
-  "id": "ID"
+    "id": "ID"
   },
   "editions": {
     "about_this_edition": "Об этом издании",
@@ -590,7 +590,7 @@
     "no_lost_items": "Нет потерянных вещей",
     "no_services": "Нет конкретных услуг",
     "not_found": "Издание не найдено.",
-  "official_website": "Официальный сайт",
+    "official_website": "Официальный сайт",
     "offline_edition": "Офлайн издание",
     "offline_edition_message": "Это издание еще не видно публично",
     "online_status": "В сети",
@@ -615,6 +615,11 @@
     "volunteers_apply": "Подать заявку волонтёра",
     "volunteers_apply_description": "Отправьте заявку на помощь во время мероприятия.",
     "volunteers_ask_diet_label": "Запрашивать пищевые предпочтения",
+    "volunteers_ask_allergies_label": "Запрашивать аллергии",
+    "volunteers_allergies_label": "Аллергии",
+    "volunteers_allergies_placeholder": "Напр.: арахис, глютен...",
+    "volunteers_allergies_hint": "Указывайте только значимые медицинские аллергии",
+    "volunteers_table_allergies": "Аллергии",
     "volunteers_closed_message": "Заявки волонтёров в настоящее время не принимаются.",
     "volunteers_description_label": "Описание для волонтёров",
     "volunteers_diet_label": "Пищевые предпочтения",
@@ -1121,7 +1126,7 @@
     "logo_preview_alt": "Предварительный просмотр логотипа",
     "logo_url_label": "URL логотипа",
     "logo_url_optional_placeholder": "URL логотипа конвенции (необязательно)",
-  "logo_url_placeholder": "https://example.com/logo.png",
+    "logo_url_placeholder": "https://example.com/logo.png",
     "max_size": "Максимальный размер",
     "select_file": "Выбрать файл",
     "success": "Успешно",

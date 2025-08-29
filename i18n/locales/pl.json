@@ -295,7 +295,7 @@
       "split_tooltip": "Edycja i podgląd obok siebie",
       "toggle_preview": "Przełącz podgląd"
     },
-  "email": "E-mail",
+    "email": "E-mail",
     "error": "Błąd",
     "favorite": "Ulubione",
     "inactive": "Nieaktywny",
@@ -469,7 +469,7 @@
       "facebook_page": "Strona Facebook",
       "instagram_account": "Konto Instagram",
       "next": "Następny",
-  "official_website_link": "Strona oficjalna",
+      "official_website_link": "Strona oficjalna",
       "poster_alt": "Plakat edycji",
       "poster_placeholder": "Kliknij, aby wybrać plakat edycji",
       "previous": "Poprzedni",
@@ -553,7 +553,7 @@
     "vegetarian": "Wegetariański"
   },
   "ed": {
-  "id": "ID"
+    "id": "ID"
   },
   "editions": {
     "about_this_edition": "O tej edycji",
@@ -590,7 +590,7 @@
     "no_lost_items": "Brak znalezionych rzeczy",
     "no_services": "Brak określonych usług",
     "not_found": "Edycja nie została znaleziona.",
-  "official_website": "Strona oficjalna",
+    "official_website": "Strona oficjalna",
     "offline_edition": "Edycja offline",
     "offline_edition_message": "Ta edycja nie jest jeszcze publicznie widoczna",
     "online_status": "Online",
@@ -615,6 +615,11 @@
     "volunteers_apply": "Zgłoś się jako wolontariusz",
     "volunteers_apply_description": "Złóż zgłoszenie, aby pomóc podczas edycji.",
     "volunteers_ask_diet_label": "Pytaj o preferencje żywieniowe",
+    "volunteers_ask_allergies_label": "Pytaj o alergie",
+    "volunteers_allergies_label": "Alergie",
+    "volunteers_allergies_placeholder": "Np.: orzeszki ziemne, gluten...",
+    "volunteers_allergies_hint": "Podaj tylko istotne medycznie alergie",
+    "volunteers_table_allergies": "Alergie",
     "volunteers_closed_message": "Zgłoszenia wolontariuszy nie są obecnie otwarte.",
     "volunteers_description_label": "Opis dla wolontariuszy",
     "volunteers_diet_label": "Preferencje żywieniowe",
@@ -895,7 +900,7 @@
     "my_conventions": "Moje Konwencje",
     "my_favorites": "Moje ulubione",
     "no_favorites": "Brak ulubionych",
-  "profile": "Profil",
+    "profile": "Profil",
     "tabs": "Zakładki nawigacyjne"
   },
   "p": {
@@ -1081,7 +1086,7 @@
     "family_camping": "Camping rodzinny",
     "fire_space": "Przestrzeń do fire show",
     "food_trucks": "Food trucki",
-  "gala": "Gala",
+    "gala": "Gala",
     "gym": "Siłownia",
     "kids_zone": "Strefa dziecięca",
     "long_show": "Długi spektakl",
@@ -1090,7 +1095,7 @@
     "showers": "Prysznice",
     "slackline_space": "Przestrzeń do slackline",
     "tent_camping": "Camping namiotowy",
-  "toilets": "Toalety",
+    "toilets": "Toalety",
     "truck_camping": "Camping dla kamperów",
     "workshops": "Warsztaty"
   },

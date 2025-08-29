@@ -242,6 +242,18 @@
                   />
                   <span class="text-sm">{{ t('editions.volunteers_ask_diet_label') }}</span>
                 </div>
+                <div
+                  v-if="canEdit && volunteersModeLocal === 'INTERNAL'"
+                  class="flex items-center gap-3 pt-1"
+                >
+                  <USwitch
+                    v-model="volunteersAskAllergiesLocal"
+                    :disabled="savingVolunteers"
+                    color="primary"
+                    @update:model-value="persistVolunteerSettings"
+                  />
+                  <span class="text-sm">{{ t('editions.volunteers_ask_allergies_label') }}</span>
+                </div>
               </div>
               <div class="flex flex-wrap items-center gap-2 text-xs">
                 <UBadge :color="volunteersOpenLocal ? 'success' : 'neutral'" variant="soft">
@@ -309,6 +321,7 @@ const volunteersDescriptionLocal = ref('')
 const volunteersDescriptionOriginal = ref('')
 const volunteersDescriptionHtml = ref('')
 const volunteersAskDietLocal = ref(false)
+const volunteersAskAllergiesLocal = ref(false)
 const volunteersUpdatedAt = ref<Date | null>(null)
 const savingVolunteers = ref(false)
 // Éviter d'envoyer des PATCH à l'initialisation quand on applique les valeurs serveur
@@ -349,6 +362,7 @@ function applyEditionVolunteerFields(src: any) {
   volunteersExternalUrlLocal.value = src.volunteersExternalUrl || ''
   volunteersDescriptionLocal.value = src.volunteersDescription || ''
   volunteersAskDietLocal.value = !!src.volunteersAskDiet
+  volunteersAskAllergiesLocal.value = !!src.volunteersAskAllergies
   volunteersDescriptionOriginal.value = volunteersDescriptionLocal.value
   renderVolunteerDescriptionHtml()
   const vu = src.volunteersUpdatedAt
@@ -403,6 +417,7 @@ const persistVolunteerSettings = async () => {
       mode: volunteersModeLocal.value,
       description: volunteersDescriptionLocal.value.trim() || null,
       askDiet: volunteersAskDietLocal.value,
+      askAllergies: volunteersAskAllergiesLocal.value,
     }
     if (volunteersModeLocal.value === 'EXTERNAL')
       body.externalUrl = volunteersExternalUrlLocal.value.trim() || null

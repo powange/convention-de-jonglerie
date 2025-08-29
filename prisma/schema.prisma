@@ -130,6 +130,8 @@ model Edition {
   volunteersExternalUrl   String?
   // Demander la préférence alimentaire dans le formulaire interne ?
   volunteersAskDiet       Boolean                         @default(false)
+  // Demander les allergies dans le formulaire interne ? (champ texte libre)
+  volunteersAskAllergies  Boolean                         @default(false)
   volunteerApplications   EditionVolunteerApplication[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
@@ -423,6 +425,8 @@ model EditionVolunteerApplication {
   userId            Int
   status            VolunteerStatus @default(PENDING)
   motivation        String?         @db.Text
+  // Allergies (texte libre) si demandé pour l'édition
+  allergies         String?         @db.Text
   createdAt         DateTime        @default(now())
   decidedAt         DateTime?
   // Snapshot téléphone au moment de la candidature pour conserver une trace même si l'utilisateur le change

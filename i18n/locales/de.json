@@ -13,7 +13,7 @@
     "cannot_load_users": "Benutzer können nicht geladen werden",
     "coming_soon": "Demnächst verfügbar",
     "content_creators": "Haben Inhalte erstellt",
-  "conventions": "Conventions",
+    "conventions": "Conventions",
     "conventions_count": "Convention(s)",
     "dashboard": "Administrator-Dashboard",
     "dashboard_subtitle": "Dashboard und Verwaltungstools der Plattform",
@@ -259,14 +259,14 @@
   "common": {
     "active": "Aktiv",
     "add": "Hinzufügen",
-  "address": "Adresse",
+    "address": "Adresse",
     "back": "Zurück",
     "cancel": "Abbrechen",
     "cancelled": "Cancelled",
     "city": "Stadt",
     "close": "Schließen",
     "confirm": "Bestätigen",
-  "convention": "Convention",
+    "convention": "Convention",
     "country": "Land",
     "create": "Erstellen",
     "date": "Datum",
@@ -334,7 +334,7 @@
       "accept": "Akzeptieren",
       "add_comment_placeholder": "Kommentar hinzufügen...",
       "added_on": "Hinzugefügt am {date}",
-  "address": "Adresse",
+      "address": "Adresse",
       "available_seats": "Anzahl verfügbarer Plätze",
       "be_first_to_comment": "Sei der erste, der dieses {type} kommentiert!",
       "be_first_to_offer": "Sei der erste, der eine Fahrgemeinschaft für diese Auflage anbietet!",
@@ -469,7 +469,7 @@
       "facebook_page": "Facebook-Seite",
       "instagram_account": "Instagram-Account",
       "next": "Weiter",
-  "official_website_link": "Offizielle Website",
+      "official_website_link": "Offizielle Website",
       "poster_alt": "Ausgabe-Poster",
       "poster_placeholder": "Klicken Sie, um das Ausgabe-Poster auszuwählen",
       "previous": "Zurück",
@@ -553,7 +553,7 @@
     "vegetarian": "Vegetarisch"
   },
   "ed": {
-  "id": "ID"
+    "id": "ID"
   },
   "editions": {
     "about_this_edition": "Über diese Auflage",
@@ -590,7 +590,7 @@
     "no_lost_items": "Keine Fundsachen",
     "no_services": "Keine spezifischen Services angegeben",
     "not_found": "Auflage nicht gefunden.",
-  "official_website": "Offizielle Website",
+    "official_website": "Offizielle Website",
     "offline_edition": "Offline-Edition",
     "offline_edition_message": "Diese Edition ist noch nicht öffentlich sichtbar",
     "online_status": "Online",
@@ -615,6 +615,11 @@
     "volunteers_apply": "Als Freiwilliger bewerben",
     "volunteers_apply_description": "Reichen Sie Ihre Bewerbung ein, um während der Ausgabe zu helfen.",
     "volunteers_ask_diet_label": "Ernährungspräferenz abfragen",
+    "volunteers_ask_allergies_label": "Allergien abfragen",
+    "volunteers_allergies_label": "Allergien",
+    "volunteers_allergies_placeholder": "Z.B.: Erdnüsse, Gluten...",
+    "volunteers_allergies_hint": "Nur medizinisch relevante Allergien angeben",
+    "volunteers_table_allergies": "Allergien",
     "volunteers_closed_message": "Bewerbungen für Freiwillige sind derzeit nicht geöffnet.",
     "volunteers_description_label": "Beschreibung für Freiwillige",
     "volunteers_diet_label": "Ernährungspräferenz",
@@ -653,7 +658,7 @@
     "volunteers_table_diet": "Ernährung",
     "volunteers_table_first_name": "Vorname",
     "volunteers_table_last_name": "Nachname",
-  "volunteers_table_motivation": "Motivation",
+    "volunteers_table_motivation": "Motivation",
     "volunteers_table_user": "Bewerber",
     "volunteers_title": "Freiwillige",
     "volunteers_total": "Gesamt",
@@ -895,7 +900,7 @@
     "my_conventions": "Meine Conventions",
     "my_favorites": "Meine Favoriten",
     "no_favorites": "Keine Favoriten",
-  "profile": "Profil",
+    "profile": "Profil",
     "tabs": "Navigationsregisterkarten"
   },
   "p": {
@@ -1081,7 +1086,7 @@
     "family_camping": "Familien-Camping",
     "fire_space": "Feuer-Bereich",
     "food_trucks": "Food Trucks",
-  "gala": "Gala",
+    "gala": "Gala",
     "gym": "Turnhalle",
     "kids_zone": "Kinderbereich",
     "long_show": "Lange Show",
@@ -1092,7 +1097,7 @@
     "tent_camping": "Zelt-Camping",
     "toilets": "Toiletten",
     "truck_camping": "Wohnwagen-Camping",
-  "workshops": "Workshops"
+    "workshops": "Workshops"
   },
   "upload": {
     "click_select_convention_logo": "Klicken Sie, um ein Convention-Logo auszuwählen",

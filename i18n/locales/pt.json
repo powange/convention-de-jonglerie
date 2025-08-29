@@ -70,7 +70,7 @@
         "label": "Tipo"
       },
       "types": {
-  "bug": "Bug",
+        "bug": "Bug",
         "complaint": "Reclamação",
         "general": "Geral",
         "suggestion": "Sugestão"
@@ -225,7 +225,7 @@
     "departure_placeholder": "Cidade ou endereço de partida",
     "details": "Detalhes",
     "details_placeholder": "Informações úteis sobre a viagem (bagagem, ponto de encontro, etc.)",
-  "from": "De",
+    "from": "De",
     "music_allowed": "Música permitida",
     "offer": {
       "available_seats": "Lugares disponíveis",
@@ -295,7 +295,7 @@
       "split_tooltip": "Edição e visualização lado a lado",
       "toggle_preview": "Alternar visualização"
     },
-  "email": "E-mail",
+    "email": "E-mail",
     "error": "Erro",
     "favorite": "Favorito",
     "inactive": "Inativo",
@@ -305,7 +305,7 @@
     "name": "Nome",
     "no_results": "Sem resultados",
     "optional": "Opcional",
-  "or": "Ou",
+    "or": "Ou",
     "password": "Palavra-passe",
     "postal_code": "Código postal",
     "private": "Privado",
@@ -469,7 +469,7 @@
       "facebook_page": "Página do Facebook",
       "instagram_account": "Conta do Instagram",
       "next": "Seguinte",
-  "official_website_link": "Site oficial",
+      "official_website_link": "Site oficial",
       "poster_alt": "Cartaz da edição",
       "poster_placeholder": "Clique para selecionar o cartaz da edição",
       "previous": "Anterior",
@@ -553,7 +553,7 @@
     "vegetarian": "Vegetariano"
   },
   "ed": {
-  "id": "ID"
+    "id": "ID"
   },
   "editions": {
     "about_this_edition": "Sobre esta edição",
@@ -590,7 +590,7 @@
     "no_lost_items": "Nenhum objecto encontrado",
     "no_services": "Nenhum serviço específico indicado",
     "not_found": "Edição não encontrada.",
-  "official_website": "Site oficial",
+    "official_website": "Site oficial",
     "offline_edition": "Edição offline",
     "offline_edition_message": "Esta edição ainda não está visível publicamente",
     "online_status": "Online",
@@ -614,7 +614,12 @@
     "volunteers_admin_only_note": "As seguintes informações (inscrições, filtros e estatísticas detalhadas) são visíveis apenas para organizadores e colaboradores autorizados.",
     "volunteers_apply": "Candidatar-se como voluntário",
     "volunteers_apply_description": "Envie sua inscrição para ajudar durante a edição.",
-    "volunteers_ask_diet_label": "Solicitar preferência alimentar",
+    "volunteers_ask_diet_label": "Perguntar preferência alimentar",
+    "volunteers_ask_allergies_label": "Perguntar alergias",
+    "volunteers_allergies_label": "Alergias",
+    "volunteers_allergies_placeholder": "Ex: amendoim, glúten...",
+    "volunteers_allergies_hint": "Indique apenas alergias médicas significativas",
+    "volunteers_table_allergies": "Alergias",
     "volunteers_closed_message": "As inscrições de voluntários não estão abertas no momento.",
     "volunteers_description_label": "Descrição para voluntários",
     "volunteers_diet_label": "Preferência alimentar",
@@ -656,7 +661,7 @@
     "volunteers_table_motivation": "Motivação",
     "volunteers_table_user": "Candidato",
     "volunteers_title": "Voluntários",
-  "volunteers_total": "Total de voluntários",
+    "volunteers_total": "Total de voluntários",
     "volunteers_withdraw": "Retirar minha inscrição"
   },
   "errors": {
@@ -1080,8 +1085,8 @@
     "credit_card_payment": "Pagamento com cartão",
     "family_camping": "Campismo familiar",
     "fire_space": "Espaço de fogo",
-  "food_trucks": "Food trucks",
-  "gala": "Gala",
+    "food_trucks": "Food trucks",
+    "gala": "Gala",
     "gym": "Ginásio",
     "kids_zone": "Zona para crianças",
     "long_show": "Espectáculo longo",
@@ -1090,9 +1095,9 @@
     "showers": "Chuveiros",
     "slackline_space": "Espaço slackline",
     "tent_camping": "Campismo com tenda",
-  "toilets": "WC",
+    "toilets": "WC",
     "truck_camping": "Campismo com camião",
-  "workshops": "Workshops"
+    "workshops": "Workshops"
   },
   "upload": {
     "click_select_convention_logo": "Clique para selecionar logo da convenção",

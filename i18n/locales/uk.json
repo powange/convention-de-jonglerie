@@ -469,7 +469,7 @@
       "facebook_page": "Сторінка Facebook",
       "instagram_account": "Обліковий запис Instagram",
       "next": "Наступний",
-  "official_website_link": "Офіційний сайт",
+      "official_website_link": "Офіційний сайт",
       "poster_alt": "Постер видання",
       "poster_placeholder": "Натисніть, щоб вибрати постер видання",
       "previous": "Попередній",
@@ -553,7 +553,7 @@
     "vegetarian": "Вегетаріанський"
   },
   "ed": {
-  "id": "ID"
+    "id": "ID"
   },
   "editions": {
     "about_this_edition": "Про це видання",
@@ -590,7 +590,7 @@
     "no_lost_items": "Немає загублених предметів",
     "no_services": "Не надаються специфічні послуги",
     "not_found": "Видання не знайдено.",
-  "official_website": "Офіційний сайт",
+    "official_website": "Офіційний сайт",
     "offline_edition": "Офлайн видання",
     "offline_edition_message": "Це видання ще не видно публічно",
     "online_status": "Онлайн",
@@ -615,6 +615,11 @@
     "volunteers_apply": "Подати заявку волонтера",
     "volunteers_apply_description": "Надішліть заявку на допомогу під час заходу.",
     "volunteers_ask_diet_label": "Запитувати харчові вподобання",
+    "volunteers_ask_allergies_label": "Запитувати алергії",
+    "volunteers_allergies_label": "Алергії",
+    "volunteers_allergies_placeholder": "Напр.: арахіс, глютен...",
+    "volunteers_allergies_hint": "Вказуйте лише важливі медичні алергії",
+    "volunteers_table_allergies": "Алергії",
     "volunteers_closed_message": "Заявки волонтерів наразі не приймаються.",
     "volunteers_description_label": "Опис для волонтерів",
     "volunteers_diet_label": "Харчові вподобання",
@@ -1121,7 +1126,7 @@
     "logo_preview_alt": "Попередній перегляд логотипу",
     "logo_url_label": "URL логотипу",
     "logo_url_optional_placeholder": "URL логотипу конвенції (необов'язково)",
-  "logo_url_placeholder": "https://example.com/logo.png",
+    "logo_url_placeholder": "https://example.com/logo.png",
     "max_size": "Максимальний розмір",
     "select_file": "Вибрати файл",
     "success": "Успішно",

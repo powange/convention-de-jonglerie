@@ -244,6 +244,20 @@
               />
             </UFormField>
           </div>
+          <div
+            v-if="volunteersInfo?.askAllergies && volunteersMode === 'INTERNAL'"
+            class="space-y-2 w-full"
+          >
+            <UFormField :label="t('editions.volunteers_allergies_label')">
+              <UInput
+                v-model="volunteerAllergies"
+                :placeholder="t('editions.volunteers_allergies_placeholder')"
+                class="w-full"
+                :maxlength="300"
+              />
+            </UFormField>
+            <p class="text-[11px] text-gray-500">{{ t('editions.volunteers_allergies_hint') }}</p>
+          </div>
         </div>
       </template>
       <template #footer="{ close }">
@@ -464,6 +478,7 @@ interface VolunteerInfo {
   counts: Record<string, number>
   myApplication: VolunteerApplication | null
   askDiet?: boolean
+  askAllergies?: boolean
 }
 const volunteersInfo = ref<VolunteerInfo | null>(null)
 const volunteersDescriptionHtml = ref('')
@@ -487,6 +502,7 @@ const volunteerPhone = ref('')
 const volunteerFirstName = ref('')
 const volunteerLastName = ref('')
 const selectedDietPreference = ref<'NONE' | 'VEGETARIAN' | 'VEGAN'>('NONE')
+const volunteerAllergies = ref('')
 // Items du select régime : labels doivent être des chaînes (pas des fonctions) pour USelect
 const dietPreferenceItems = computed<{ value: 'NONE' | 'VEGETARIAN' | 'VEGAN'; label: string }[]>(
   () => [
@@ -535,6 +551,10 @@ const applyAsVolunteer = async () => {
           volunteersInfo.value?.askDiet && selectedDietPreference.value !== 'NONE'
             ? selectedDietPreference.value
             : undefined,
+        allergies:
+          volunteersInfo.value?.askAllergies && volunteerAllergies.value.trim()
+            ? volunteerAllergies.value.trim()
+            : undefined,
       },
     } as any)
     if (res?.application && volunteersInfo.value)
@@ -549,6 +569,7 @@ const applyAsVolunteer = async () => {
     volunteerPhone.value = ''
     volunteerFirstName.value = ''
     volunteerLastName.value = ''
+    volunteerAllergies.value = ''
     showApplyModal.value = false
   } catch (e: any) {
     toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
@@ -699,6 +720,7 @@ const tableData = computed(() =>
     prenom: app.user.prenom,
     nom: app.user.nom,
     dietaryPreference: (app as any).dietaryPreference,
+    allergies: (app as any).allergies,
   }))
 )
 
@@ -750,6 +772,19 @@ const columns: TableColumn<any>[] = [
                   : t('diet.none')
             return h('span', { class: 'text-xs' }, key)
           },
+        } as TableColumn<any>,
+      ]
+    : []),
+  // Colonne allergies si activée
+  ...(volunteersInfo.value?.askAllergies
+    ? [
+        {
+          accessorKey: 'allergies',
+          header: t('editions.volunteers_table_allergies'),
+          cell: ({ row }: any) =>
+            row.original.allergies
+              ? h('span', { class: 'text-xs truncate block max-w-[160px]' }, row.original.allergies)
+              : '—',
         } as TableColumn<any>,
       ]
     : []),

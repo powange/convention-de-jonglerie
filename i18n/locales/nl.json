@@ -67,10 +67,10 @@
       },
       "title": "Beheer gebruikersfeedback",
       "type": {
-  "label": "Type"
+        "label": "Type"
       },
       "types": {
-  "bug": "Bug",
+        "bug": "Bug",
         "complaint": "Klacht",
         "general": "Algemeen",
         "suggestion": "Suggestie"
@@ -295,7 +295,7 @@
       "split_tooltip": "Bewerken en voorbeeld naast elkaar",
       "toggle_preview": "Voorbeeld wisselen"
     },
-  "email": "E-mail",
+    "email": "E-mail",
     "error": "Fout",
     "favorite": "Favoriet",
     "inactive": "Inactief",
@@ -308,7 +308,7 @@
     "or": "Of",
     "password": "Wachtwoord",
     "postal_code": "Postcode",
-  "private": "Privé",
+    "private": "Privé",
     "refresh": "Vernieuwen",
     "required": "Vereist",
     "reset": "Opnieuw instellen",
@@ -345,7 +345,7 @@
       "confirm_delete_request": "Weet je zeker dat je dit meerijdverzoek wilt verwijderen?",
       "confirm_remove_passenger": "Weet je zeker dat je deze meerijder wilt verwijderen?",
       "confirmed_passengers": "Bevestigde passagiers",
-  "contact": "Contact",
+      "contact": "Contact",
       "contact_user": "Contact {name}",
       "cost_sharing": "Kostendeling",
       "delete_offer": "Aanbieding verwijderen",
@@ -469,7 +469,7 @@
       "facebook_page": "Facebookpagina",
       "instagram_account": "Instagram-account",
       "next": "Volgende",
-  "official_website_link": "Officiële website",
+      "official_website_link": "Officiële website",
       "poster_alt": "Editieposter",
       "poster_placeholder": "Klik om editieposter te selecteren",
       "previous": "Vorige",
@@ -553,7 +553,7 @@
     "vegetarian": "Vegetarisch"
   },
   "ed": {
-  "id": "ID"
+    "id": "ID"
   },
   "editions": {
     "about_this_edition": "Over deze editie",
@@ -590,7 +590,7 @@
     "no_lost_items": "Geen verloren voorwerpen",
     "no_services": "Geen specifieke diensten verstrekt",
     "not_found": "Editie niet gevonden.",
-  "official_website": "Officiële website",
+    "official_website": "Officiële website",
     "offline_edition": "Offline editie",
     "offline_edition_message": "Deze editie is nog niet publiekelijk zichtbaar",
     "online_status": "Online",
@@ -615,6 +615,11 @@
     "volunteers_apply": "Meld je aan als vrijwilliger",
     "volunteers_apply_description": "Dien je aanmelding in om te helpen tijdens de editie.",
     "volunteers_ask_diet_label": "Dieetvoorkeur vragen",
+    "volunteers_ask_allergies_label": "Allergieën vragen",
+    "volunteers_allergies_label": "Allergieën",
+    "volunteers_allergies_placeholder": "Bv: pinda's, gluten...",
+    "volunteers_allergies_hint": "Vermeld enkel belangrijke medische allergieën",
+    "volunteers_table_allergies": "Allergieën",
     "volunteers_closed_message": "Vrijwilligersaanmeldingen zijn momenteel niet open.",
     "volunteers_description_label": "Beschrijving voor vrijwilligers",
     "volunteers_diet_label": "Dieetvoorkeur",
@@ -834,7 +839,7 @@
     }
   },
   "h": {
-  "actor": "Acteur",
+    "actor": "Acteur",
     "targetUser": "Doelgebruiker"
   },
   "homepage": {
@@ -1076,23 +1081,23 @@
       "food": "Eten & Drinken",
       "payment": "Betaling"
     },
-  "concert": "Concert",
+    "concert": "Concert",
     "credit_card_payment": "Creditcardbetaling",
     "family_camping": "Familiekamperen",
     "fire_space": "Vuurruimte",
     "food_trucks": "Foodtrucks",
-  "gala": "Gala",
+    "gala": "Gala",
     "gym": "Sporthal",
     "kids_zone": "Kinderzone",
     "long_show": "Lange show",
     "open_stage": "Open podium",
     "pets_accepted": "Huisdieren toegestaan",
-  "showers": "Douches",
+    "showers": "Douches",
     "slackline_space": "Slackline ruimte",
     "tent_camping": "Tentenkamp",
     "toilets": "Toiletten",
     "truck_camping": "Camperkamperen",
-  "workshops": "Workshops"
+    "workshops": "Workshops"
   },
   "upload": {
     "click_select_convention_logo": "Klik om een conventie logo te selecteren",
