@@ -100,7 +100,7 @@
     "registration": "Registro",
     "role": "Rol",
     "search_users_placeholder": "Buscar por email, usuario, nombre o apellido...",
-    "super_admin": "Super Admin",
+  "super_admin": "Super administrador",
     "super_administrators": "Super administradores",
     "super_admins": "Super administradores",
     "system_settings": "Configuración del Sistema",
@@ -469,6 +469,7 @@
       "facebook_page": "Página de Facebook",
       "instagram_account": "Cuenta de Instagram",
       "next": "Siguiente",
+  "official_website_link": "Sitio oficial",
       "poster_alt": "Cartel de la edición",
       "poster_placeholder": "Haga clic para seleccionar el cartel de la edición",
       "previous": "Anterior",
@@ -552,7 +553,7 @@
     "vegetarian": "Vegetariano"
   },
   "ed": {
-    "id": "ID"
+  "id": "ID"
   },
   "editions": {
     "about_this_edition": "Acerca de esta edición",
@@ -589,6 +590,7 @@
     "no_lost_items": "Sin objetos perdidos",
     "no_services": "Ningún servicio específico proporcionado",
     "not_found": "Edición no encontrada.",
+  "official_website": "Sitio oficial",
     "offline_edition": "Edición fuera de línea",
     "offline_edition_message": "Esta edición aún no es visible públicamente",
     "online_status": "En línea",
@@ -654,7 +656,7 @@
     "volunteers_table_motivation": "Motivación",
     "volunteers_table_user": "Solicitante",
     "volunteers_title": "Voluntarios",
-    "volunteers_total": "Total",
+  "volunteers_total": "Total de voluntarios",
     "volunteers_withdraw": "Retirar mi solicitud"
   },
   "errors": {
@@ -1078,8 +1080,8 @@
     "credit_card_payment": "Pago con tarjeta",
     "family_camping": "Camping familiar",
     "fire_space": "Espacio de fuego",
-    "food_trucks": "Food trucks",
-    "gala": "Gala",
+  "food_trucks": "Food trucks",
+  "gala": "Gala",
     "gym": "Gimnasio",
     "kids_zone": "Zona infantil",
     "long_show": "Espectáculo largo",

@@ -67,7 +67,7 @@
       },
       "title": "Brugerfeedback Administration",
       "type": {
-        "label": "Type"
+  "label": "Type"
       },
       "types": {
         "bug": "Fejl",
@@ -259,7 +259,7 @@
   "common": {
     "active": "Aktiv",
     "add": "Tilføj",
-    "address": "Adresse",
+  "address": "Adresse",
     "back": "Tilbage",
     "cancel": "Annuller",
     "cancelled": "Cancelled",
@@ -331,10 +331,10 @@
   },
   "components": {
     "carpool": {
-      "accept": "Accepter",
+  "accept": "Accepter",
       "add_comment_placeholder": "Tilføj en kommentar...",
       "added_on": "Tilføjet den {date}",
-      "address": "Adresse",
+  "address": "Adresse",
       "available_seats": "Antal ledige pladser",
       "be_first_to_comment": "Vær den første til at kommentere dette {type}!",
       "be_first_to_offer": "Vær den første til at tilbyde samkørsel for denne udgave!",
@@ -469,6 +469,7 @@
       "facebook_page": "Facebook-side",
       "instagram_account": "Instagram-konto",
       "next": "Næste",
+  "official_website_link": "Officiel hjemmeside",
       "poster_alt": "Udgaveplakat",
       "poster_placeholder": "Klik for at vælge udgaveplakat",
       "previous": "Forrige",
@@ -552,7 +553,7 @@
     "vegetarian": "Vegetarisk"
   },
   "ed": {
-    "id": "ID"
+  "id": "ID"
   },
   "editions": {
     "about_this_edition": "Om denne udgave",
@@ -589,6 +590,7 @@
     "no_lost_items": "Intet hittegods",
     "no_services": "Ingen specifikke tjenester angivet",
     "not_found": "Udgave ikke fundet.",
+  "official_website": "Officiel hjemmeside",
     "offline_edition": "Offline udgave",
     "offline_edition_message": "Denne udgave er endnu ikke offentligt synlig",
     "online_status": "Online",
@@ -606,7 +608,7 @@
     "show_returned_items": "Vis returnerede genstande",
     "ticketing": "Billetsalg",
     "useful_links": "Nyttige links",
-    "volunteers_action_accept": "Accepter",
+  "volunteers_action_accept": "Accepter",
     "volunteers_action_back_pending": "Tilbage til afventende",
     "volunteers_action_reject": "Afvis",
     "volunteers_admin_only_note": "Følgende oplysninger (ansøgninger, filtre og detaljeret statistik) er kun synlige for autoriserede arrangører og samarbejdspartnere.",
@@ -651,7 +653,7 @@
     "volunteers_table_diet": "Kost",
     "volunteers_table_first_name": "Fornavn",
     "volunteers_table_last_name": "Efternavn",
-    "volunteers_table_motivation": "Motivation",
+  "volunteers_table_motivation": "Motivation",
     "volunteers_table_user": "Ansøger",
     "volunteers_title": "Frivillige",
     "volunteers_total": "I alt",
@@ -882,7 +884,7 @@
     "verification_code_sent": "En bekræftelseskode er sendt til dig."
   },
   "navigation": {
-    "admin": "Administration",
+  "admin": "Administration",
     "breadcrumb": "Brødkrumme",
     "dark_mode": "Mørk tilstand",
     "discover_editions": "Opdag udgaver",
@@ -893,7 +895,7 @@
     "my_conventions": "Mine konventioner",
     "my_favorites": "Mine favoritter",
     "no_favorites": "Ingen favoritter",
-    "profile": "Profil",
+  "profile": "Profil",
     "tabs": "Navigationsfaner"
   },
   "p": {
@@ -998,7 +1000,7 @@
     "admin_warning_1": "• I admin-tilstand kan du ændre alle konventioner",
     "admin_warning_2": "• Brug disse privilegier med forsigtighed",
     "admin_warning_3": "• Skift til normal tilstand for at teste brugeroplevelsen",
-    "administration": "Administration",
+  "administration": "Administration",
     "cannot_change_password": "Kan ikke ændre adgangskode",
     "cannot_change_photo": "Kan ikke ændre foto",
     "cannot_save_profile": "Kan ikke gemme profil",
@@ -1090,7 +1092,7 @@
     "tent_camping": "Teltcamping",
     "toilets": "Toiletter",
     "truck_camping": "Autocamping",
-    "workshops": "Workshops"
+  "workshops": "Workshops"
   },
   "upload": {
     "click_select_convention_logo": "Klik for at vælge convention logo",
@@ -1124,7 +1126,7 @@
     "select_file": "Vælg fil",
     "success": "Succes",
     "success_message": "Billede uploadet med succes!",
-    "upload": "Upload",
+  "upload": "Upload",
     "upload_error": "Upload fejl",
     "uploading": "Uploader...",
     "validation_error": "Valideringsfejl"

@@ -70,7 +70,7 @@
         "label": "Tipo"
       },
       "types": {
-        "bug": "Bug",
+  "bug": "Bug",
         "complaint": "Reclamo",
         "general": "Generale",
         "suggestion": "Suggerimento"
@@ -100,7 +100,7 @@
     "registration": "Registrazione",
     "role": "Ruolo",
     "search_users_placeholder": "Cerca per email, nome utente, nome o cognome...",
-    "super_admin": "Super Admin",
+  "super_admin": "Super amministratore",
     "super_administrators": "Super amministratori",
     "super_admins": "Super admin",
     "system_settings": "Impostazioni Sistema",
@@ -295,7 +295,7 @@
       "split_tooltip": "Modifica e anteprima affiancate",
       "toggle_preview": "Attiva anteprima"
     },
-    "email": "E-mail",
+  "email": "E-mail",
     "error": "Errore",
     "favorite": "Preferito",
     "inactive": "Inattivo",
@@ -469,6 +469,7 @@
       "facebook_page": "Pagina Facebook",
       "instagram_account": "Account Instagram",
       "next": "Successivo",
+  "official_website_link": "Sito ufficiale",
       "poster_alt": "Poster dell'edizione",
       "poster_placeholder": "Clicca per selezionare il poster dell'edizione",
       "previous": "Precedente",
@@ -552,7 +553,7 @@
     "vegetarian": "Vegetariano"
   },
   "ed": {
-    "id": "ID"
+  "id": "ID"
   },
   "editions": {
     "about_this_edition": "A proposito di questa edizione",
@@ -589,6 +590,7 @@
     "no_lost_items": "Nessun oggetto smarrito",
     "no_services": "Nessun servizio specifico indicato",
     "not_found": "Edizione non trovata.",
+  "official_website": "Sito ufficiale",
     "offline_edition": "Edizione offline",
     "offline_edition_message": "Questa edizione non è ancora visibile pubblicamente",
     "online_status": "Online",
@@ -1079,7 +1081,7 @@
     "family_camping": "Campeggio famiglia",
     "fire_space": "Spazio fuoco",
     "food_trucks": "Food truck",
-    "gala": "Gala",
+  "gala": "Gala",
     "gym": "Palestra",
     "kids_zone": "Zona bambini",
     "long_show": "Spettacolo lungo",

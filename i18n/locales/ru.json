@@ -469,6 +469,7 @@
       "facebook_page": "Страница Facebook",
       "instagram_account": "Аккаунт Instagram",
       "next": "Следующий",
+  "official_website_link": "Официальный сайт",
       "poster_alt": "Постер издания",
       "poster_placeholder": "Нажмите, чтобы выбрать постер издания",
       "previous": "Предыдущий",
@@ -552,7 +553,7 @@
     "vegetarian": "Вегетарианский"
   },
   "ed": {
-    "id": "ID"
+  "id": "ID"
   },
   "editions": {
     "about_this_edition": "Об этом издании",
@@ -589,6 +590,7 @@
     "no_lost_items": "Нет потерянных вещей",
     "no_services": "Нет конкретных услуг",
     "not_found": "Издание не найдено.",
+  "official_website": "Официальный сайт",
     "offline_edition": "Офлайн издание",
     "offline_edition_message": "Это издание еще не видно публично",
     "online_status": "В сети",
@@ -1119,7 +1121,7 @@
     "logo_preview_alt": "Предварительный просмотр логотипа",
     "logo_url_label": "URL логотипа",
     "logo_url_optional_placeholder": "URL логотипа конвенции (необязательно)",
-    "logo_url_placeholder": "https://example.com/logo.jpg",
+  "logo_url_placeholder": "https://example.com/logo.png",
     "max_size": "Максимальный размер",
     "select_file": "Выбрать файл",
     "success": "Успешно",

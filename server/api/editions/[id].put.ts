@@ -53,6 +53,7 @@ export default defineEventHandler(async (event) => {
     region,
     country,
     ticketingUrl,
+    officialWebsiteUrl,
     facebookUrl,
     instagramUrl,
     hasFoodTrucks,
@@ -208,6 +209,7 @@ export default defineEventHandler(async (event) => {
     }
 
     if (ticketingUrl !== undefined) updatedData.ticketingUrl = ticketingUrl
+    if (officialWebsiteUrl !== undefined) updatedData.officialWebsiteUrl = officialWebsiteUrl
     if (facebookUrl !== undefined) updatedData.facebookUrl = facebookUrl
     if (instagramUrl !== undefined) updatedData.instagramUrl = instagramUrl
     if (hasFoodTrucks !== undefined) updatedData.hasFoodTrucks = hasFoodTrucks

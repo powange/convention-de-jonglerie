@@ -482,6 +482,7 @@
       "step_general_title": "Informations Générales",
       "step_services_title": "Services Proposés",
       "ticketing_link": "Lien de la billetterie",
+      "official_website_link": "Site officiel",
       "ticketing_section_description": "Informations pour l'achat de billets",
       "ticketing_section_title": "Billetterie"
     },
@@ -605,6 +606,7 @@
     "set_online": "Mettre en ligne",
     "show_returned_items": "Afficher les objets restitués",
     "ticketing": "Billetterie",
+    "official_website": "Site officiel",
     "useful_links": "Liens utiles",
     "volunteers_action_accept": "Accepter",
     "volunteers_action_back_pending": "Remettre en attente",

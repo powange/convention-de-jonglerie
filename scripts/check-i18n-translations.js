@@ -310,7 +310,8 @@ async function main() {
               const last = i === parts.length - 1
               if (last) cursor[p] = v
               else {
-                if (typeof cursor[p] !== 'object' || cursor[p] === null || Array.isArray(cursor[p])) cursor[p] = {}
+                if (typeof cursor[p] !== 'object' || cursor[p] === null || Array.isArray(cursor[p]))
+                  cursor[p] = {}
                 cursor = cursor[p]
               }
             }

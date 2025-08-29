@@ -469,6 +469,7 @@
       "facebook_page": "Сторінка Facebook",
       "instagram_account": "Обліковий запис Instagram",
       "next": "Наступний",
+  "official_website_link": "Офіційний сайт",
       "poster_alt": "Постер видання",
       "poster_placeholder": "Натисніть, щоб вибрати постер видання",
       "previous": "Попередній",
@@ -552,7 +553,7 @@
     "vegetarian": "Вегетаріанський"
   },
   "ed": {
-    "id": "ID"
+  "id": "ID"
   },
   "editions": {
     "about_this_edition": "Про це видання",
@@ -589,6 +590,7 @@
     "no_lost_items": "Немає загублених предметів",
     "no_services": "Не надаються специфічні послуги",
     "not_found": "Видання не знайдено.",
+  "official_website": "Офіційний сайт",
     "offline_edition": "Офлайн видання",
     "offline_edition_message": "Це видання ще не видно публічно",
     "online_status": "Онлайн",
@@ -1119,7 +1121,7 @@
     "logo_preview_alt": "Попередній перегляд логотипу",
     "logo_url_label": "URL логотипу",
     "logo_url_optional_placeholder": "URL логотипу конвенції (необов'язково)",
-    "logo_url_placeholder": "https://example.com/logo.jpg",
+  "logo_url_placeholder": "https://example.com/logo.png",
     "max_size": "Максимальний розмір",
     "select_file": "Вибрати файл",
     "success": "Успішно",

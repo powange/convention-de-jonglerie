@@ -49,6 +49,7 @@ export interface Edition {
   ticketingUrl?: string | null
   facebookUrl?: string | null
   instagramUrl?: string | null
+  officialWebsiteUrl?: string | null
   hasFoodTrucks: boolean
   hasKidsZone: boolean
   acceptsPets: boolean
@@ -163,6 +164,7 @@ export interface EditionFormData {
   ticketingUrl?: string
   facebookUrl?: string
   instagramUrl?: string
+  officialWebsiteUrl?: string
   hasFoodTrucks?: boolean
   hasKidsZone?: boolean
   acceptsPets?: boolean

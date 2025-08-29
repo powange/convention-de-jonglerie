@@ -122,11 +122,25 @@
 
           <!-- Liens externes -->
           <div
-            v-if="edition.ticketingUrl || edition.facebookUrl || edition.instagramUrl"
+            v-if="
+              edition.officialWebsiteUrl ||
+              edition.ticketingUrl ||
+              edition.facebookUrl ||
+              edition.instagramUrl
+            "
             class="space-y-2"
           >
             <h3 class="text-lg font-semibold">{{ $t('editions.useful_links') }}</h3>
             <div class="flex gap-2">
+              <UButton
+                v-if="edition.officialWebsiteUrl"
+                icon="i-heroicons-globe-alt"
+                :to="edition.officialWebsiteUrl"
+                target="_blank"
+                size="sm"
+                color="primary"
+                >{{ $t('editions.official_website') }}</UButton
+              >
               <UButton
                 v-if="edition.ticketingUrl"
                 icon="i-heroicons-ticket"

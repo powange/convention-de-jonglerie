@@ -417,6 +417,22 @@
                 {{ $t('components.edition_form.ticketing_section_description') }}
               </p>
             </div>
+            <UFormField
+              :label="$t('components.edition_form.official_website_link')"
+              name="officialWebsiteUrl"
+            >
+              <UInput
+                v-model="state.officialWebsiteUrl"
+                type="url"
+                placeholder="https://www.mon-site-officiel.org"
+                class="w-full"
+                @blur="trimField('officialWebsiteUrl')"
+              >
+                <template #leading>
+                  <UIcon name="i-heroicons-globe-alt" />
+                </template>
+              </UInput>
+            </UFormField>
             <UFormField :label="$t('components.edition_form.ticketing_link')" name="ticketingUrl">
               <UInput
                 v-model="state.ticketingUrl"
@@ -587,6 +603,7 @@ const state = reactive({
   region: props.initialData?.region || '',
   country: props.initialData?.country || '',
   ticketingUrl: props.initialData?.ticketingUrl || '',
+  officialWebsiteUrl: props.initialData?.officialWebsiteUrl || '',
   facebookUrl: props.initialData?.facebookUrl || '',
   instagramUrl: props.initialData?.instagramUrl || '',
   hasFoodTrucks: props.initialData?.hasFoodTrucks || false,
@@ -768,6 +785,7 @@ const trimAllTextFields = () => {
   trimField('region')
   trimField('country')
   trimField('ticketingUrl')
+  trimField('officialWebsiteUrl')
   trimField('facebookUrl')
   trimField('instagramUrl')
 }
@@ -1102,6 +1120,7 @@ watch(
       state.region = newVal.region || ''
       state.country = newVal.country || ''
       state.ticketingUrl = newVal.ticketingUrl || ''
+      state.officialWebsiteUrl = newVal.officialWebsiteUrl || ''
       state.facebookUrl = newVal.facebookUrl || ''
       state.instagramUrl = newVal.instagramUrl || ''
       state.hasFoodTrucks = newVal.hasFoodTrucks || false

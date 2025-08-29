@@ -108,6 +108,7 @@ export const editionSchema = z
       .min(1, 'Pays requis')
       .max(100, 'Le pays ne peut pas dépasser 100 caractères'),
     ticketingUrl: urlSchema,
+    officialWebsiteUrl: urlSchema,
     facebookUrl: urlSchema,
     instagramUrl: urlSchema,
     // Services booléens
@@ -184,6 +185,7 @@ export const updateEditionSchema = z
       .max(100, 'Le pays ne peut pas dépasser 100 caractères')
       .optional(),
     ticketingUrl: urlSchema,
+    officialWebsiteUrl: urlSchema,
     facebookUrl: urlSchema,
     instagramUrl: urlSchema,
     // Services booléens

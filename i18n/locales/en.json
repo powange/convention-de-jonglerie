@@ -1,6 +1,6 @@
 {
   "admin": {
-    "actions": "Actions",
+    "actions": "[TODO] Actions",
     "active_administrators": "Active administrators",
     "activity": "Activity",
     "administration_tools": "Administration Tools",
@@ -13,8 +13,8 @@
     "cannot_load_users": "Cannot load users",
     "coming_soon": "Coming soon",
     "content_creators": "Have created content",
-    "conventions": "Conventions",
-    "conventions_count": "convention(s)",
+    "conventions": "[TODO] Conventions",
+    "conventions_count": "[TODO] convention(s)",
     "dashboard": "Administrator Dashboard",
     "dashboard_subtitle": "Dashboard and platform administration tools",
     "days_ago": "{count} days ago",
@@ -45,7 +45,7 @@
       "mark_resolved": "Mark as resolved",
       "mark_unresolved": "Mark as unresolved",
       "message": {
-        "label": "Message"
+        "label": "[TODO] Message"
       },
       "pending": "Pending",
       "resolve": "Resolve",
@@ -67,13 +67,13 @@
       },
       "title": "User Feedback Management",
       "type": {
-        "label": "Type"
+        "label": "[TODO] Type"
       },
       "types": {
-        "bug": "Bug",
+        "bug": "[TODO] Bug",
         "complaint": "Complaint",
         "general": "General",
-        "suggestion": "Suggestion"
+        "suggestion": "[TODO] Suggestion"
       },
       "unresolve": "Reopen",
       "url": "Related page",
@@ -100,9 +100,9 @@
     "registration": "Registration",
     "role": "Role",
     "search_users_placeholder": "Search by email, username, first name or last name...",
-    "super_admin": "Super Admin",
+    "super_admin": "[TODO] Super Admin",
     "super_administrators": "Super administrators",
-    "super_admins": "Super admins",
+    "super_admins": "[TODO] Super admins",
     "system_settings": "System Settings",
     "system_settings_description": "General platform configuration",
     "today": "Today",
@@ -199,7 +199,7 @@
     "send_link": "Send Link",
     "sending": "Sending...",
     "show_password": "Show password",
-    "strength_excellent": "Excellent",
+    "strength_excellent": "[TODO] Excellent",
     "strength_good": "Good",
     "strength_medium": "Medium",
     "strength_very_weak": "Very weak",
@@ -235,7 +235,7 @@
       "price_placeholder": "e.g., 10",
       "seats_placeholder": "e.g., 3"
     },
-    "options": "Options",
+    "options": "[TODO] Options",
     "pets_allowed": "Pets allowed",
     "request": {
       "create": "Create carpool request",
@@ -266,14 +266,14 @@
     "city": "City",
     "close": "Close",
     "confirm": "Confirm",
-    "convention": "Convention",
+    "convention": "[TODO] Convention",
     "country": "Country",
     "create": "Create",
-    "date": "Date",
-    "dates": "Dates",
+    "date": "[TODO] Date",
+    "dates": "[TODO] Dates",
     "delete": "Delete",
     "deleted": "Deleted",
-    "description": "Description",
+    "description": "[TODO] Description",
     "edit": "Edit",
     "editor": {
       "back_to_edit": "Back to edit",
@@ -345,7 +345,7 @@
       "confirm_delete_request": "Are you sure you want to delete this carpool request?",
       "confirm_remove_passenger": "Are you sure you want to remove this carpooler?",
       "confirmed_passengers": "Confirmed passengers",
-      "contact": "Contact",
+      "contact": "[TODO] Contact",
       "contact_user": "Contact {name}",
       "cost_sharing": "Cost sharing",
       "delete_offer": "Delete offer",
@@ -402,7 +402,7 @@
       "space_for_equipment": "Space for equipment",
       "specify_departure_city": "Specify the desired departure city",
       "specify_exact_location": "Specify the exact location to facilitate the meeting",
-      "suggestions": "Suggestions",
+      "suggestions": "[TODO] Suggestions",
       "to_add_comment": "to add a comment",
       "view_comments": "View comments ({count})",
       "when_depart": "When do you want to leave?"
@@ -418,7 +418,7 @@
       "add_collaborator": "Add collaborator",
       "allow_modification": "Allow modification",
       "description": "Manage collaborators for this convention",
-      "permissions": "Permissions",
+      "permissions": "[TODO] Permissions",
       "search_user_placeholder": "Search for a user...",
       "title": "Manage collaborators"
     },
@@ -469,6 +469,7 @@
       "facebook_page": "Facebook page",
       "instagram_account": "Instagram account",
       "next": "Next",
+      "official_website_link": "Official website",
       "poster_alt": "Edition poster",
       "poster_placeholder": "Click to select the edition poster",
       "previous": "Previous",
@@ -552,7 +553,7 @@
     "vegetarian": "Vegetarian"
   },
   "ed": {
-    "id": "ID"
+    "id": "[TODO] ID"
   },
   "editions": {
     "about_this_edition": "About this edition",
@@ -589,6 +590,7 @@
     "no_lost_items": "No lost items",
     "no_services": "No specific services provided",
     "not_found": "Edition not found.",
+    "official_website": "Official website",
     "offline_edition": "Offline edition",
     "offline_edition_message": "This edition is not yet publicly visible",
     "online_status": "Online",
@@ -651,10 +653,10 @@
     "volunteers_table_diet": "Diet",
     "volunteers_table_first_name": "First name",
     "volunteers_table_last_name": "Last name",
-    "volunteers_table_motivation": "Motivation",
+    "volunteers_table_motivation": "[TODO] Motivation",
     "volunteers_table_user": "Applicant",
     "volunteers_title": "Volunteers",
-    "volunteers_total": "Total",
+    "volunteers_total": "[TODO] Total",
     "volunteers_withdraw": "Withdraw my application"
   },
   "errors": {
@@ -821,7 +823,7 @@
     },
     "placeholders": {
       "address_complement": "Building A, Function room...",
-      "city_example": "Paris",
+      "city_example": "[TODO] Paris",
       "convention_description": "Describe the convention, its history, its specificities...",
       "convention_name_example": "e.g.: European Juggling Convention",
       "edition_name_example": "Edition name (e.g.: EJC 2024)",
@@ -882,7 +884,7 @@
     "verification_code_sent": "A verification code has been sent to you."
   },
   "navigation": {
-    "admin": "Administration",
+    "admin": "[TODO] Administration",
     "breadcrumb": "Breadcrumb",
     "dark_mode": "Dark mode",
     "discover_editions": "Discover editions",
@@ -946,7 +948,7 @@
       "no_favorites_added": "You haven't added any edition to your favorites yet."
     },
     "management": {
-      "actions": "Actions",
+      "actions": "[TODO] Actions",
       "delete_edition": "Delete edition",
       "edit_edition": "Edit edition",
       "lost_found_active_description": "You can manage lost & found items while the edition is running.",
@@ -998,7 +1000,7 @@
     "admin_warning_1": "• In admin mode, you can modify all conventions",
     "admin_warning_2": "• Use these privileges with caution",
     "admin_warning_3": "• Switch to normal mode to test user experience",
-    "administration": "Administration",
+    "administration": "[TODO] Administration",
     "cannot_change_password": "Cannot change password",
     "cannot_change_photo": "Cannot change photo",
     "cannot_save_profile": "Cannot save profile",
@@ -1027,7 +1029,7 @@
     "manage_profile_info": "Manage your profile information",
     "max_size": "• Maximum size: 5MB",
     "member_since": "Member since {date}",
-    "mode": "Mode",
+    "mode": "[TODO] Mode",
     "my_statistics": "My statistics",
     "new_password": "New password",
     "new_password_placeholder": "Your new password",
@@ -1074,12 +1076,12 @@
       "food": "Food & Drink",
       "payment": "Payment"
     },
-    "concert": "Concert",
+    "concert": "[TODO] Concert",
     "credit_card_payment": "Credit card payment",
     "family_camping": "Family camping",
-    "fire_space": "Fire space",
-    "food_trucks": "Food trucks",
-    "gala": "Gala",
+    "fire_space": "[TODO] Fire space",
+    "food_trucks": "[TODO] Food trucks",
+    "gala": "[TODO] Gala",
     "gym": "Gymnasium",
     "kids_zone": "Kids zone",
     "long_show": "Long show",
@@ -1090,7 +1092,7 @@
     "tent_camping": "Tent camping",
     "toilets": "Toilets",
     "truck_camping": "RV camping",
-    "workshops": "Workshops"
+    "workshops": "[TODO] Workshops"
   },
   "upload": {
     "click_select_convention_logo": "Click to select convention logo",
@@ -1119,12 +1121,12 @@
     "logo_preview_alt": "Logo preview",
     "logo_url_label": "Logo URL",
     "logo_url_optional_placeholder": "Logo URL (optional)",
-    "logo_url_placeholder": "https://example.com/logo.jpg",
+    "logo_url_placeholder": "[TODO] https://example.com/logo.jpg",
     "max_size": "Max size",
     "select_file": "Select file",
     "success": "Success",
     "success_message": "Image uploaded successfully!",
-    "upload": "Upload",
+    "upload": "[TODO] Upload",
     "upload_error": "Upload error",
     "uploading": "Uploading...",
     "validation_error": "Validation error"
