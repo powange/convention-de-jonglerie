@@ -1,5 +1,4 @@
 <template>
-  
   <UCard variant="outline">
     <div v-if="!ready" class="flex items-center gap-2 text-sm text-gray-500 p-4">
       <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
@@ -58,7 +57,12 @@
         <div v-else class="text-sm text-gray-500">{{ t('common.error') || '—' }}</div>
       </template>
       <template #footer>
-        <UButton :label="t('common.close')" color="neutral" variant="ghost" @click="modalOpen = false" />
+        <UButton
+          :label="t('common.close')"
+          color="neutral"
+          variant="ghost"
+          @click="modalOpen = false"
+        />
         <UButton
           :label="t('common.view_details')"
           color="primary"
@@ -103,8 +107,8 @@ const tooltipFormatter = (event: any) => {
 const modalOpen = ref(false)
 const selectedEditionId = ref<number | null>(null)
 
-const selectedEdition = computed(() =>
-  props.editions.find((e) => e.id === selectedEditionId.value) || null
+const selectedEdition = computed(
+  () => props.editions.find((e) => e.id === selectedEditionId.value) || null
 )
 
 const activeServices = computed<ConventionService[]>(() => {
@@ -117,7 +121,6 @@ function openEdition(id: number) {
   selectedEditionId.value = id
   modalOpen.value = true
 }
-
 
 // Formatage des dates (locale courante)
 function formatEditionDates(e: EditionLike) {

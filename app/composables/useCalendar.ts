@@ -79,7 +79,7 @@ export function useCalendar(options: UseCalendarOptions) {
     headerToolbar,
     buttonText: getCalendarButtonText(t),
     dayMaxEvents,
-    
+
     // Événements passés directement (vide au départ, mis à jour par watcher)
     events: [],
 
@@ -92,7 +92,7 @@ export function useCalendar(options: UseCalendarOptions) {
       const middleDate = new Date(middleTime)
       saveCurrentDate(middleDate)
     },
-    
+
     // Gestion des clics sur événements
     eventClick: (info: EventClickArg) => {
       const id = parseInt(info.event.id)
@@ -101,20 +101,24 @@ export function useCalendar(options: UseCalendarOptions) {
         else router.push(`/editions/${id}`)
       }
     },
-    
+
     // Gestion des tooltips
     eventDidMount: (arg: EventMountArg) => {
       if (eventTooltipFormatter) {
         const lines = eventTooltipFormatter(arg.event.extendedProps as CalendarEvent)
         if (lines.length) arg.el.title = lines.join(' • ')
       }
-    }
+    },
   })
 
   // Watcher pour mettre à jour les événements
-  watch(events, (newEvents) => {
-    calendarOptions.events = newEvents
-  }, { deep: true, immediate: true })
+  watch(
+    events,
+    (newEvents) => {
+      calendarOptions.events = newEvents
+    },
+    { deep: true, immediate: true }
+  )
 
   // Initialisation
   onMounted(() => {

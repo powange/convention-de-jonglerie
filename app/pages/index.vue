@@ -564,15 +564,12 @@ watch(
 )
 
 // Watcher pour charger toutes les éditions quand on passe en mode agenda
-watch(
-  viewMode,
-  (newViewMode) => {
-    if (newViewMode === 'agenda') {
-      // Charger toutes les éditions avec les filtres actuels
-      editionStore.fetchAllEditions(filters)
-    }
+watch(viewMode, (newViewMode) => {
+  if (newViewMode === 'agenda') {
+    // Charger toutes les éditions avec les filtres actuels
+    editionStore.fetchAllEditions(filters)
   }
-)
+})
 
 // Fonctions pour gérer les dates
 const formatDateForDisplay = (dateString: string): string => {

@@ -39,8 +39,8 @@
           </span>
         </p>
 
-        <!-- Boutons de vue -->
-        <div class="flex gap-2">
+        <!-- Sélecteur de vue -->
+        <div class="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
           <UButton
             :color="viewMode === 'grid' ? 'primary' : 'neutral'"
             :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
@@ -48,7 +48,16 @@
             size="sm"
             @click="viewMode = 'grid'"
           >
-            Grille
+            {{ $t('homepage.grid') }}
+          </UButton>
+          <UButton
+            :color="viewMode === 'agenda' ? 'primary' : 'neutral'"
+            :variant="viewMode === 'agenda' ? 'solid' : 'ghost'"
+            icon="i-heroicons-calendar"
+            size="sm"
+            @click="viewMode = 'agenda'"
+          >
+            {{ $t('homepage.agenda') || 'Agenda' }}
           </UButton>
           <UButton
             :color="viewMode === 'map' ? 'primary' : 'neutral'"
@@ -57,7 +66,7 @@
             size="sm"
             @click="viewMode = 'map'"
           >
-            Carte
+            {{ $t('homepage.map') }}
           </UButton>
         </div>
       </div>
@@ -97,6 +106,13 @@
         </div>
       </div>
 
+      <!-- Vue Agenda -->
+      <div v-else-if="viewMode === 'agenda'">
+        <ClientOnly>
+          <HomeAgenda :editions="favoriteEditions" />
+        </ClientOnly>
+      </div>
+
       <!-- Vue en carte -->
       <div v-else-if="viewMode === 'map'">
         <FavoritesMap :editions="favoriteEditions" />
@@ -111,8 +127,9 @@ import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
-// Lazy loading du composant FavoritesMap
+// Lazy loading des composants
 const FavoritesMap = defineAsyncComponent(() => import('~/components/FavoritesMap.vue'))
+const HomeAgenda = defineAsyncComponent(() => import('~/components/HomeAgenda.vue'))
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -125,7 +142,7 @@ const toast = useToast()
 const { t } = useI18n()
 
 const loading = ref(true)
-const viewMode = ref<'grid' | 'map'>('grid')
+const viewMode = ref<'grid' | 'map' | 'agenda'>('grid')
 
 // Pagination
 const currentPage = ref(1)
