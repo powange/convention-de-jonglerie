@@ -29,7 +29,7 @@
         <!-- Actions de gestion -->
         <UCard>
           <div class="space-y-4">
-            <h3 class="text-lg font-semibold">{{ $t('pages.management.actions') }}</h3>
+            <h2 class="text-lg font-semibold">{{ $t('pages.management.actions') }}</h2>
             <div class="flex flex-wrap gap-2">
               <UButton
                 v-if="canEdit"
@@ -74,7 +74,7 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-magnifying-glass" class="text-amber-500" />
-                <h3 class="text-lg font-semibold">{{ $t('editions.lost_found') }}</h3>
+                <h2 class="text-lg font-semibold">{{ $t('editions.lost_found') }}</h2>
               </div>
               <UButton
                 v-if="hasEditionStarted"
@@ -116,9 +116,9 @@
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-users" class="text-primary-500" />
-                <h3 class="text-lg font-semibold">
+                <h2 class="text-lg font-semibold">
                   {{ $t('pages.management.volunteer_management') }}
-                </h3>
+                </h2>
               </div>
               <div v-if="canEdit" class="flex items-center gap-3">
                 <USwitch
@@ -128,7 +128,6 @@
                   @update:model-value="handleToggleOpen"
                 />
                 <span
-                  class="text-sm"
                   :class="
                     volunteersOpenLocal
                       ? 'text-green-600 dark:text-green-400'
@@ -137,8 +136,8 @@
                 >
                   {{
                     volunteersOpenLocal
-                      ? $t('editions.volunteers_open') || 'Ouvert'
-                      : $t('editions.volunteers_closed_message') || 'Fermé'
+                      ? $t('editions.volunteers_open')
+                      : $t('editions.volunteers_closed_message')
                   }}
                 </span>
               </div>
@@ -200,19 +199,36 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Mode de gestion -->
               <div class="space-y-2">
-                <UFormField :label="t('editions.volunteers_mode_label') || 'Mode de gestion'">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300">
+                  {{ t('editions.volunteers_mode_label') }}
+                </h3>
+
+                <UFormField>
                   <URadioGroup
                     v-model="volunteersModeLocal"
                     :items="volunteerModeItems"
-                    size="sm"
+                    size="lg"
                     class="flex flex-col gap-1"
                     :disabled="!canEdit"
                     @update:model-value="handleChangeMode"
                   />
                 </UFormField>
-                <div v-if="volunteersModeLocal === 'EXTERNAL'" class="pl-1">
-                  <UFormField :label="t('editions.volunteers_external_url_label') || 'URL externe'">
+              </div>
+
+              <!-- Options spécifiques au mode externe -->
+              <div v-if="canEdit && volunteersModeLocal === 'EXTERNAL'">
+                <div v-if="canEdit" class="mt-4 mb-2">
+                  <h3 class="font-semibold text-gray-700 dark:text-gray-300">
+                    {{ t('editions.external_mode_options') }}
+                  </h3>
+                </div>
+
+                <!-- Lien externe -->
+                <div class="pl-1">
+                  <UFormField :label="t('editions.volunteers_external_url_label')">
                     <UInput
                       v-model="volunteersExternalUrlLocal"
                       :placeholder="'https://...'"
@@ -229,32 +245,50 @@
                     }}
                   </p>
                 </div>
-                <!-- Switch demander régime alimentaire (mode interne uniquement) -->
-                <div
-                  v-if="canEdit && volunteersModeLocal === 'INTERNAL'"
-                  class="flex items-center gap-3 pt-1"
-                >
-                  <USwitch
-                    v-model="volunteersAskDietLocal"
-                    :disabled="savingVolunteers"
-                    color="primary"
-                    @update:model-value="persistVolunteerSettings"
-                  />
-                  <span class="text-sm">{{ t('editions.volunteers_ask_diet_label') }}</span>
-                </div>
-                <div
-                  v-if="canEdit && volunteersModeLocal === 'INTERNAL'"
-                  class="flex items-center gap-3 pt-1"
-                >
-                  <USwitch
-                    v-model="volunteersAskAllergiesLocal"
-                    :disabled="savingVolunteers"
-                    color="primary"
-                    @update:model-value="persistVolunteerSettings"
-                  />
-                  <span class="text-sm">{{ t('editions.volunteers_ask_allergies_label') }}</span>
-                </div>
               </div>
+
+              <!-- Options spécifiques au mode interne -->
+              <div v-if="canEdit && volunteersModeLocal === 'INTERNAL'">
+                <div v-if="canEdit" class="mt-4 mb-2">
+                  <h3 class="font-semibold text-gray-700 dark:text-gray-300">
+                    {{ t('editions.internal_mode_options') }}
+                  </h3>
+                </div>
+
+                <!-- Switch demander régime alimentaire (mode interne uniquement) -->
+                <USwitch
+                  v-model="volunteersAskDietLocal"
+                  :disabled="savingVolunteers"
+                  color="primary"
+                  class="mb-2"
+                  :label="t('editions.volunteers_ask_diet_label')"
+                  size="lg"
+                  @update:model-value="persistVolunteerSettings"
+                />
+
+                <!-- Switch demander allergies (mode interne uniquement) -->
+                <USwitch
+                  v-model="volunteersAskAllergiesLocal"
+                  :disabled="savingVolunteers"
+                  color="primary"
+                  class="mb-2"
+                  :label="t('editions.volunteers_ask_allergies_label')"
+                  size="lg"
+                  @update:model-value="persistVolunteerSettings"
+                />
+
+                <!-- Switch demander préférences horaires (mode interne uniquement) -->
+                <USwitch
+                  v-model="volunteersAskTimePreferencesLocal"
+                  :disabled="savingVolunteers"
+                  color="primary"
+                  class="mb-2"
+                  :label="t('editions.volunteers_ask_time_preferences_label')"
+                  size="lg"
+                  @update:model-value="persistVolunteerSettings"
+                />
+              </div>
+
               <div class="flex flex-wrap items-center gap-2 text-xs">
                 <UBadge :color="volunteersOpenLocal ? 'success' : 'neutral'" variant="soft">
                   {{
@@ -322,6 +356,7 @@ const volunteersDescriptionOriginal = ref('')
 const volunteersDescriptionHtml = ref('')
 const volunteersAskDietLocal = ref(false)
 const volunteersAskAllergiesLocal = ref(false)
+const volunteersAskTimePreferencesLocal = ref(false)
 const volunteersUpdatedAt = ref<Date | null>(null)
 const savingVolunteers = ref(false)
 // Éviter d'envoyer des PATCH à l'initialisation quand on applique les valeurs serveur
@@ -363,6 +398,7 @@ function applyEditionVolunteerFields(src: any) {
   volunteersDescriptionLocal.value = src.volunteersDescription || ''
   volunteersAskDietLocal.value = !!src.volunteersAskDiet
   volunteersAskAllergiesLocal.value = !!src.volunteersAskAllergies
+  volunteersAskTimePreferencesLocal.value = !!src.volunteersAskTimePreferences
   volunteersDescriptionOriginal.value = volunteersDescriptionLocal.value
   renderVolunteerDescriptionHtml()
   const vu = src.volunteersUpdatedAt
@@ -418,6 +454,7 @@ const persistVolunteerSettings = async () => {
       description: volunteersDescriptionLocal.value.trim() || null,
       askDiet: volunteersAskDietLocal.value,
       askAllergies: volunteersAskAllergiesLocal.value,
+      askTimePreferences: volunteersAskTimePreferencesLocal.value,
     }
     if (volunteersModeLocal.value === 'EXTERNAL')
       body.externalUrl = volunteersExternalUrlLocal.value.trim() || null

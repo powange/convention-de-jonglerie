@@ -158,7 +158,7 @@
         <div class="space-y-4 w-full">
           <!-- Infos personnelles transmises -->
           <div
-            class="space-y-2 text-xs text-gray-600 dark:text-gray-400 border rounded-md p-3 bg-gray-50 dark:bg-gray-800/40"
+            class="space-y-2 text-gray-600 dark:text-gray-400 border rounded-md p-3 bg-gray-50 dark:bg-gray-800/40"
           >
             <div class="flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300">
               <UIcon name="i-heroicons-information-circle" class="text-primary-500" />
@@ -257,6 +257,21 @@
               />
             </UFormField>
             <p class="text-[11px] text-gray-500">{{ t('editions.volunteers_allergies_hint') }}</p>
+          </div>
+          <div
+            v-if="volunteersInfo?.askTimePreferences && volunteersMode === 'INTERNAL'"
+            class="space-y-2 w-full"
+          >
+            <UFormField :label="t('editions.volunteers_time_preferences_label')">
+              <UCheckboxGroup
+                v-model="selectedTimePreferences"
+                :items="timeSlotItems"
+                class="grid grid-cols-1 sm:grid-cols-2 gap-2"
+              />
+            </UFormField>
+            <p class="text-[11px] text-gray-500">
+              {{ t('editions.volunteers_time_preferences_hint') }}
+            </p>
           </div>
         </div>
       </template>
@@ -479,6 +494,7 @@ interface VolunteerInfo {
   myApplication: VolunteerApplication | null
   askDiet?: boolean
   askAllergies?: boolean
+  askTimePreferences?: boolean
 }
 const volunteersInfo = ref<VolunteerInfo | null>(null)
 const volunteersDescriptionHtml = ref('')
@@ -495,7 +511,7 @@ const volunteersWithdrawing = ref(false)
 const showApplyModal = ref(false)
 // Modal candidature helpers
 const MOTIVATION_MAX = 500
-const motivationTextareaRef = ref<HTMLTextAreaElement | null>(null)
+const motivationTextareaRef = ref(null)
 const motivationTooLong = computed<boolean>(() => volunteerMotivation.value.length > MOTIVATION_MAX)
 const volunteerMotivation = ref('')
 const volunteerPhone = ref('')
@@ -503,6 +519,20 @@ const volunteerFirstName = ref('')
 const volunteerLastName = ref('')
 const selectedDietPreference = ref<'NONE' | 'VEGETARIAN' | 'VEGAN'>('NONE')
 const volunteerAllergies = ref('')
+const selectedTimePreferences = ref<string[]>([])
+
+// Items de créneaux horaires pour UCheckboxGroup
+const timeSlotItems = computed(() => [
+  { label: t('editions.volunteers_time_slots.early_morning'), value: 'early_morning' },
+  { label: t('editions.volunteers_time_slots.morning'), value: 'morning' },
+  { label: t('editions.volunteers_time_slots.lunch'), value: 'lunch' },
+  { label: t('editions.volunteers_time_slots.early_afternoon'), value: 'early_afternoon' },
+  { label: t('editions.volunteers_time_slots.late_afternoon'), value: 'late_afternoon' },
+  { label: t('editions.volunteers_time_slots.evening'), value: 'evening' },
+  { label: t('editions.volunteers_time_slots.late_evening'), value: 'late_evening' },
+  { label: t('editions.volunteers_time_slots.night'), value: 'night' },
+])
+
 // Items du select régime : labels doivent être des chaînes (pas des fonctions) pour USelect
 const dietPreferenceItems = computed<{ value: 'NONE' | 'VEGETARIAN' | 'VEGAN'; label: string }[]>(
   () => [
@@ -555,6 +585,10 @@ const applyAsVolunteer = async () => {
           volunteersInfo.value?.askAllergies && volunteerAllergies.value.trim()
             ? volunteerAllergies.value.trim()
             : undefined,
+        timePreferences:
+          volunteersInfo.value?.askTimePreferences && selectedTimePreferences.value.length > 0
+            ? selectedTimePreferences.value
+            : undefined,
       },
     } as any)
     if (res?.application && volunteersInfo.value)
@@ -570,6 +604,7 @@ const applyAsVolunteer = async () => {
     volunteerFirstName.value = ''
     volunteerLastName.value = ''
     volunteerAllergies.value = ''
+    selectedTimePreferences.value = []
     showApplyModal.value = false
   } catch (e: any) {
     toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
@@ -788,6 +823,53 @@ const columns: TableColumn<any>[] = [
         } as TableColumn<any>,
       ]
     : []),
+  // Colonne préférences horaires si activée
+  ...(volunteersInfo.value?.askTimePreferences
+    ? [
+        {
+          accessorKey: 'timePreferences',
+          header: t('editions.volunteers_table_time_preferences'),
+          cell: ({ row }: any) => {
+            const preferences = row.original.timePreferences || []
+            const allSlots = [
+              'early_morning',
+              'morning',
+              'lunch',
+              'early_afternoon',
+              'late_afternoon',
+              'evening',
+              'late_evening',
+              'night',
+            ]
+
+            return h(
+              'div',
+              { class: 'grid grid-cols-4 gap-1' },
+              allSlots.map((slot) => {
+                const isSelected = preferences.includes(slot)
+                const label = t(`editions.volunteers_time_slots.${slot}`)
+
+                return h(
+                  resolveComponent('UTooltip'),
+                  { text: label, openDelay: 200 },
+                  {
+                    default: () =>
+                      h('div', {
+                        class: `w-3 h-3 rounded border ${
+                          isSelected
+                            ? 'bg-green-500 border-green-600'
+                            : 'bg-gray-200 border-gray-300 dark:bg-gray-600 dark:border-gray-500'
+                        }`,
+                        title: label,
+                      }),
+                  }
+                )
+              })
+            )
+          },
+        } as TableColumn<any>,
+      ]
+    : []),
   {
     accessorKey: 'prenom',
     header: t('editions.volunteers_table_first_name'),
@@ -923,9 +1005,11 @@ const filteredCountLabel = computed(() => {
 const openApplyModal = () => {
   volunteerMotivation.value = ''
   volunteerPhone.value = ''
+  selectedTimePreferences.value = []
   showApplyModal.value = true
   nextTick(() => {
-    motivationTextareaRef.value?.focus()
+    const textarea = motivationTextareaRef.value as any
+    textarea?.$el?.focus()
   })
 }
 const closeApplyModal = () => {

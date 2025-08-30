@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
       volunteersExternalUrl: true,
       volunteersAskDiet: true,
       volunteersAskAllergies: true,
+      volunteersAskTimePreferences: true,
       volunteerApplications: { select: { id: true, status: true, userId: true } },
     },
   })
@@ -41,6 +42,7 @@ export default defineEventHandler(async (event) => {
     externalUrl: (edition as any).volunteersExternalUrl || null,
     askDiet: (edition as any).volunteersAskDiet || false,
     askAllergies: (edition as any).volunteersAskAllergies || false,
+    askTimePreferences: (edition as any).volunteersAskTimePreferences || false,
     myApplication,
     counts,
   }

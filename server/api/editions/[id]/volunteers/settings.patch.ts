@@ -10,6 +10,7 @@ const bodySchema = z.object({
   externalUrl: z.string().url('URL externe invalide').max(1000).optional().nullable(),
   askDiet: z.boolean().optional(),
   askAllergies: z.boolean().optional(),
+  askTimePreferences: z.boolean().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -47,6 +48,8 @@ export default defineEventHandler(async (event) => {
   }
   if (parsed.askDiet !== undefined) data.volunteersAskDiet = parsed.askDiet
   if (parsed.askAllergies !== undefined) data.volunteersAskAllergies = parsed.askAllergies
+  if (parsed.askTimePreferences !== undefined)
+    data.volunteersAskTimePreferences = parsed.askTimePreferences
   if (Object.keys(data).length === 0) return { success: true, unchanged: true }
   data.volunteersUpdatedAt = new Date()
 
@@ -60,6 +63,7 @@ export default defineEventHandler(async (event) => {
       volunteersExternalUrl: true,
       volunteersAskDiet: true,
       volunteersAskAllergies: true,
+      volunteersAskTimePreferences: true,
       volunteersUpdatedAt: true,
     } as any,
   })) as any

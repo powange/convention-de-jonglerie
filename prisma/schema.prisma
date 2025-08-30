@@ -132,6 +132,8 @@ model Edition {
   volunteersAskDiet       Boolean                         @default(false)
   // Demander les allergies dans le formulaire interne ? (champ texte libre)
   volunteersAskAllergies  Boolean                         @default(false)
+  // Demander les préférences horaires dans le formulaire interne ?
+  volunteersAskTimePreferences Boolean                    @default(false)
   volunteerApplications   EditionVolunteerApplication[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
@@ -433,6 +435,8 @@ model EditionVolunteerApplication {
   userSnapshotPhone String?
   // Préférence alimentaire déclarée au moment de la candidature
   dietaryPreference DietaryPreference @default(NONE)
+  // Préférences horaires choisies (JSON array de créneaux)
+  timePreferences   Json?
   edition           Edition         @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 

@@ -13,6 +13,7 @@ const bodySchema = z.object({
   prenom: z.string().min(1).max(100).optional(),
   dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).optional(),
   allergies: z.string().max(500).optional().nullable(),
+  timePreferences: z.array(z.string()).max(8).optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -24,7 +25,12 @@ export default defineEventHandler(async (event) => {
 
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },
-    select: { volunteersOpen: true, volunteersAskDiet: true, volunteersAskAllergies: true },
+    select: {
+      volunteersOpen: true,
+      volunteersAskDiet: true,
+      volunteersAskAllergies: true,
+      volunteersAskTimePreferences: true,
+    },
   })
   if (!edition) throw createError({ statusCode: 404, statusMessage: 'Edition introuvable' })
   if (!edition.volunteersOpen)
@@ -77,8 +83,18 @@ export default defineEventHandler(async (event) => {
         edition.volunteersAskDiet && parsed.dietaryPreference ? parsed.dietaryPreference : 'NONE',
       allergies:
         edition.volunteersAskAllergies && parsed.allergies?.trim() ? parsed.allergies.trim() : null,
+      timePreferences:
+        edition.volunteersAskTimePreferences && parsed.timePreferences?.length
+          ? parsed.timePreferences
+          : null,
     },
-    select: { id: true, status: true, dietaryPreference: true, allergies: true },
+    select: {
+      id: true,
+      status: true,
+      dietaryPreference: true,
+      allergies: true,
+      timePreferences: true,
+    },
   })
   return { success: true, application }
 })
