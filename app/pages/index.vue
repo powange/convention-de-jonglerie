@@ -172,6 +172,15 @@
             {{ $t('homepage.grid') }}
           </UButton>
           <UButton
+            :color="viewMode === 'agenda' ? 'primary' : 'neutral'"
+            :variant="viewMode === 'agenda' ? 'solid' : 'ghost'"
+            icon="i-heroicons-calendar"
+            size="sm"
+            @click="viewMode = 'agenda'"
+          >
+            {{ $t('homepage.agenda') || 'Agenda' }}
+          </UButton>
+          <UButton
             :color="viewMode === 'map' ? 'primary' : 'neutral'"
             :variant="viewMode === 'map' ? 'solid' : 'ghost'"
             icon="i-heroicons-map"
@@ -434,6 +443,13 @@
           </div>
         </div>
 
+        <!-- Vue Agenda -->
+        <div v-else-if="viewMode === 'agenda'">
+          <ClientOnly>
+            <HomeAgenda :editions="editionStore.allEditions" />
+          </ClientOnly>
+        </div>
+
         <!-- Vue carte -->
         <div v-else-if="viewMode === 'map'">
           <HomeMap :editions="editionsWithCoordinates" />
@@ -465,7 +481,9 @@ const showMobileFilters = ref(false)
 const { getTranslatedServices, getTranslatedServicesByCategory } = useTranslatedConventionServices()
 const services = getTranslatedServices
 const servicesByCategory = getTranslatedServicesByCategory
-const viewMode = ref<'grid' | 'map'>('grid')
+const viewMode = ref<'grid' | 'map' | 'agenda'>('grid')
+// Lazy load agenda component (FullCalendar wrapper)
+const HomeAgenda = defineAsyncComponent(() => import('~/components/HomeAgenda.vue'))
 
 // Pagination
 const currentPage = ref(1)
@@ -536,8 +554,24 @@ watch(
       // Application immédiate pour les autres filtres (checkbox, dates, pays)
       editionStore.fetchEditions(filtersWithPage)
     }
+
+    // Si on est en mode agenda, charger aussi toutes les éditions
+    if (viewMode.value === 'agenda') {
+      editionStore.fetchAllEditions(newFilters)
+    }
   },
   { deep: true, immediate: false }
+)
+
+// Watcher pour charger toutes les éditions quand on passe en mode agenda
+watch(
+  viewMode,
+  (newViewMode) => {
+    if (newViewMode === 'agenda') {
+      // Charger toutes les éditions avec les filtres actuels
+      editionStore.fetchAllEditions(filters)
+    }
+  }
 )
 
 // Fonctions pour gérer les dates
@@ -610,6 +644,10 @@ const resetFilters = () => {
 
 onMounted(() => {
   editionStore.fetchEditions({ ...filters, page: currentPage.value, limit: itemsPerPage.value })
+  // Si on démarre en mode agenda, charger toutes les éditions aussi
+  if (viewMode.value === 'agenda') {
+    editionStore.fetchAllEditions(filters)
+  }
 })
 
 const isFavorited = computed(() => (editionId: number) => {
@@ -640,13 +678,14 @@ const toggleFavorite = async (id: number) => {
     toast.add({
       title: t('messages.favorite_status_updated'),
       icon: 'i-heroicons-check-circle',
-      color: 'green',
+      color: 'success',
     })
   } catch (e: unknown) {
+    const error = e as { statusMessage?: string }
     toast.add({
-      title: e.statusMessage || t('errors.favorite_update_failed'),
+      title: error.statusMessage || t('errors.favorite_update_failed'),
       icon: 'i-heroicons-x-circle',
-      color: 'red',
+      color: 'error',
     })
   }
 }

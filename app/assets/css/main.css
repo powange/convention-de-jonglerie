@@ -387,3 +387,104 @@ html.dark .bg-gray-950 {
 .dark .prose pre::-webkit-scrollbar-thumb:hover {
   background-color: rgb(107, 114, 128);
 }
+
+/* ===== STYLES FULLCALENDAR avec variables Nuxt UI ===== */
+
+/* Variables CSS de base pour FullCalendar utilisant les couleurs Nuxt UI */
+.fc {
+  --fc-border-color: rgb(var(--ui-color-gray-200));
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: rgb(var(--ui-color-gray-50));
+}
+
+.dark .fc {
+  --fc-border-color: rgb(var(--ui-color-gray-700));
+  --fc-neutral-bg-color: rgb(var(--ui-color-gray-900));
+}
+
+/* Titre du calendrier avec variables Nuxt UI */
+.fc-toolbar-title {
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  color: rgb(var(--ui-color-gray-900)) !important;
+}
+
+.dark .fc-toolbar-title {
+  color: rgb(var(--ui-color-gray-50)) !important;
+}
+
+/* Personnalisation des boutons FullCalendar avec variables Nuxt UI */
+.fc-button {
+  background: transparent !important;
+  border: 1px solid rgb(var(--ui-color-gray-300)) !important;
+  color: rgb(var(--ui-color-gray-700)) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: calc(var(--ui-border-radius) * 1px) !important;
+  transition: all 0.15s ease-in-out !important;
+  box-shadow: 0 1px 2px 0 rgb(var(--ui-color-gray-950) / 0.05) !important;
+}
+
+/* Hover state avec variables Nuxt UI */
+.fc-button:hover {
+  background-color: rgb(var(--ui-color-gray-50)) !important;
+  border-color: rgb(var(--ui-color-gray-400)) !important;
+  color: rgb(var(--ui-color-gray-900)) !important;
+}
+
+/* Active state avec couleur primaire Nuxt UI */
+.fc-button:active,
+.fc-button.fc-button-active {
+  background-color: var(--ui-primary) !important;
+  border-color: var(--ui-primary) !important;
+  color: white !important;
+  box-shadow: 0 1px 2px 0 rgb(var(--ui-color-gray-950) / 0.1) !important;
+}
+
+/* Focus state avec couleur primaire */
+.fc-button:focus {
+  outline: 2px solid transparent !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px rgb(var(--ui-color-primary-500) / 0.1) !important;
+}
+
+/* Mode sombre pour les boutons avec variables Nuxt UI */
+.dark .fc-button {
+  background-color: transparent !important;
+  border-color: rgb(var(--ui-color-gray-700)) !important;
+  color: rgb(var(--ui-color-gray-300)) !important;
+}
+
+.dark .fc-button:hover {
+  background-color: rgb(var(--ui-color-gray-800)) !important;
+  border-color: rgb(var(--ui-color-gray-600)) !important;
+  color: rgb(var(--ui-color-gray-100)) !important;
+}
+
+.dark .fc-button:active,
+.dark .fc-button.fc-button-active {
+  background-color: var(--ui-primary) !important;
+  border-color: var(--ui-primary) !important;
+  color: white !important;
+}
+
+/* Espacement des boutons */
+.fc-toolbar-chunk {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Style spécial pour le bouton Today avec variables Nuxt UI */
+.fc-today-button {
+  background-color: rgb(var(--ui-color-gray-100)) !important;
+  border-color: rgb(var(--ui-color-gray-300)) !important;
+  color: rgb(var(--ui-color-gray-700)) !important;
+  font-weight: 600 !important;
+}
+
+.dark .fc-today-button {
+  background-color: rgb(var(--ui-color-gray-800)) !important;
+  border-color: rgb(var(--ui-color-gray-700)) !important;
+  color: rgb(var(--ui-color-gray-200)) !important;
+}

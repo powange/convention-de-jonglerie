@@ -65,6 +65,8 @@ export const useEditionStore = defineStore('editions', {
     },
     // Promesses en cours pour éviter les requêtes doublons simultanées
     _pendingEditionFetches: {} as Record<number, Promise<Edition> | undefined>,
+    // Toutes les éditions pour l'agenda (sans pagination)
+    allEditions: [] as Edition[],
   }),
   getters: {
     getEditionById: (state) => (id: number) => {
@@ -428,6 +430,74 @@ export const useEditionStore = defineStore('editions', {
           if (per?.canDelete) return true
         }
         return false
+      })
+    },
+
+    // Récupérer toutes les éditions sans pagination (pour l'agenda)
+    async fetchAllEditions(filters?: Omit<EditionFilters, 'page' | 'limit'>) {
+      this.loading = true
+      this.error = null
+      try {
+        const queryParams: { [key: string]: string } = {}
+
+        // Récupérer un grand nombre d'éditions (pas de pagination réelle)
+        queryParams.limit = '10000' // Limite très élevée pour récupérer toutes les éditions
+
+        // Filtres de base
+        if (filters?.name) {
+          queryParams.name = filters.name
+        }
+        if (filters?.startDate) {
+          queryParams.startDate = filters.startDate
+        }
+        if (filters?.endDate) {
+          queryParams.endDate = filters.endDate
+        }
+        if (filters?.countries && filters.countries.length > 0) {
+          queryParams.countries = JSON.stringify(filters.countries)
+        }
+
+        // Filtres temporels
+        if (filters?.showPast !== undefined) {
+          queryParams.showPast = filters.showPast.toString()
+        }
+        if (filters?.showCurrent !== undefined) {
+          queryParams.showCurrent = filters.showCurrent.toString()
+        }
+        if (filters?.showFuture !== undefined) {
+          queryParams.showFuture = filters.showFuture.toString()
+        }
+
+        // Filtres de services - passer tous les services actifs
+        if (filters) {
+          Object.keys(filters).forEach((key) => {
+            if (key.startsWith('has') || key === 'acceptsPets') {
+              if ((filters as Record<string, any>)[key] === true) {
+                ;(queryParams as Record<string, any>)[key] = 'true'
+              }
+            }
+          })
+        }
+
+        const response = await $fetch<PaginatedResponse>('/api/editions', {
+          params: queryParams,
+        })
+        this.allEditions = response.data
+        this.processAllEditions()
+      } catch (e: unknown) {
+        const error = e as HttpError
+        this.error = error.message || error.data?.message || 'Failed to fetch all editions'
+      } finally {
+        this.loading = false
+      }
+    },
+
+    // Traiter toutes les éditions (tri seulement)
+    processAllEditions() {
+      this.allEditions.sort((a, b) => {
+        const dateA = new Date(a.startDate)
+        const dateB = new Date(b.startDate)
+        return dateA.getTime() - dateB.getTime() // Tri croissant (plus ancien en premier)
       })
     },
   },
