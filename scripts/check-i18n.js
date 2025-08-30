@@ -180,7 +180,7 @@ function extractI18nKeysFromFile(filePath) {
       's',
       'selectedCountry',
       'selectedEdition',
-      'activeServices'
+      'activeServices',
     ]
 
     // Exceptions - ces patterns sont valides même s'ils commencent par un mot réservé
