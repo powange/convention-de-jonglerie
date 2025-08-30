@@ -167,7 +167,7 @@
             :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
             icon="i-heroicons-squares-2x2"
             size="sm"
-            @click="viewMode = 'grid'"
+            @click="changeViewMode('grid')"
           >
             {{ $t('homepage.grid') }}
           </UButton>
@@ -176,7 +176,7 @@
             :variant="viewMode === 'agenda' ? 'solid' : 'ghost'"
             icon="i-heroicons-calendar"
             size="sm"
-            @click="viewMode = 'agenda'"
+            @click="changeViewMode('agenda')"
           >
             {{ $t('homepage.agenda') || 'Agenda' }}
           </UButton>
@@ -185,7 +185,7 @@
             :variant="viewMode === 'map' ? 'solid' : 'ghost'"
             icon="i-heroicons-map"
             size="sm"
-            @click="viewMode = 'map'"
+            @click="changeViewMode('map')"
           >
             {{ $t('homepage.map') }}
           </UButton>
@@ -462,7 +462,7 @@
 <script setup lang="ts">
 import { CalendarDate, DateFormatter } from '@internationalized/date'
 import { useDebounceFn } from '@vueuse/core'
-import { onMounted, computed, reactive, watch, ref, defineAsyncComponent } from 'vue'
+import { onMounted, computed, reactive, watch, ref, defineAsyncComponent, toRaw } from 'vue'
 
 import CountryMultiSelect from '~/components/CountryMultiSelect.vue'
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
@@ -476,12 +476,84 @@ const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
 const { t, locale } = useI18n()
+const route = useRoute()
+const router = useRouter()
 
 const showMobileFilters = ref(false)
 const { getTranslatedServices, getTranslatedServicesByCategory } = useTranslatedConventionServices()
 const services = getTranslatedServices
 const servicesByCategory = getTranslatedServicesByCategory
-const viewMode = ref<'grid' | 'map' | 'agenda'>('grid')
+// Initialiser le mode de vue depuis l'URL ou par défaut 'grid'
+const getInitialViewMode = (): 'grid' | 'map' | 'agenda' => {
+  const urlView = route.query.view as string
+  if (urlView === 'agenda' || urlView === 'map' || urlView === 'grid') {
+    return urlView
+  }
+  return 'grid'
+}
+
+const viewMode = ref<'grid' | 'map' | 'agenda'>(getInitialViewMode())
+
+// Fonction pour initialiser les filtres depuis l'URL
+const initFiltersFromUrl = () => {
+  const query = route.query
+
+  // Parser les pays avec gestion d'erreur
+  let countries: string[] = []
+  if (query.countries) {
+    try {
+      countries = JSON.parse(query.countries as string)
+    } catch {
+      countries = []
+    }
+  }
+
+  return {
+    name: (query.name as string) || '',
+    startDate: (query.startDate as string) || '',
+    endDate: (query.endDate as string) || '',
+    countries,
+    showPast: query.showPast ? query.showPast === 'true' : false,
+    showCurrent: query.showCurrent ? query.showCurrent === 'true' : true,
+    showFuture: query.showFuture ? query.showFuture === 'true' : true,
+    // Initialiser les services depuis l'URL ou false par défaut
+    ...Object.fromEntries(
+      services.value.map((service) => [service.key, query[service.key] === 'true'])
+    ),
+  }
+}
+
+// Fonction pour changer le mode de vue et mettre à jour l'URL
+const changeViewMode = (newMode: 'grid' | 'map' | 'agenda') => {
+  viewMode.value = newMode
+  updateUrlFromFilters({ view: newMode === 'grid' ? undefined : newMode })
+}
+
+// Fonction pour mettre à jour l'URL avec les filtres
+const updateUrlFromFilters = (extraParams: Record<string, any> = {}) => {
+  const query: Record<string, any> = { ...extraParams }
+
+  // Ajouter les filtres non-par défaut à l'URL
+  if (filters.name) query.name = filters.name
+  if (filters.startDate) query.startDate = filters.startDate
+  if (filters.endDate) query.endDate = filters.endDate
+  if (filters.countries.length > 0) query.countries = JSON.stringify(filters.countries)
+
+  // Filtres temporels (seulement si différents des valeurs par défaut)
+  if (filters.showPast !== false) query.showPast = filters.showPast.toString()
+  if (filters.showCurrent !== true) query.showCurrent = filters.showCurrent.toString()
+  if (filters.showFuture !== true) query.showFuture = filters.showFuture.toString()
+
+  // Services actifs
+  services.value.forEach((service) => {
+    if (filters[service.key]) {
+      query[service.key] = 'true'
+    }
+  })
+
+  router.push({ query })
+}
+
 // Lazy load agenda component (FullCalendar wrapper)
 const HomeAgenda = defineAsyncComponent(() => import('~/components/HomeAgenda.vue'))
 
@@ -514,18 +586,7 @@ const activeFiltersCount = computed(() => {
   return count
 })
 
-const filters = reactive({
-  name: '',
-  startDate: '',
-  endDate: '',
-  countries: [] as string[],
-  // Filtre temporel - par défaut : en cours et à venir cochés
-  showPast: false,
-  showCurrent: true,
-  showFuture: true,
-  // Initialiser tous les services à false
-  ...Object.fromEntries(services.value.map((service) => [service.key, false])),
-})
+const filters = reactive(initFiltersFromUrl())
 
 // Créer une fonction debounced pour éviter les appels API trop fréquents
 // Délai de 300ms pour tous les changements de filtres pour éviter la surcharge
@@ -559,6 +620,9 @@ watch(
     if (viewMode.value === 'agenda') {
       editionStore.fetchAllEditions(newFilters)
     }
+
+    // Mettre à jour l'URL avec les nouveaux filtres
+    updateUrlFromFilters()
   },
   { deep: true, immediate: false }
 )
@@ -570,6 +634,35 @@ watch(viewMode, (newViewMode) => {
     editionStore.fetchAllEditions(filters)
   }
 })
+
+// Watcher pour synchroniser viewMode avec les changements d'URL (boutons navigateur)
+watch(
+  () => route.query.view,
+  (newView) => {
+    const validViews = ['grid', 'agenda', 'map']
+    const targetView =
+      newView && validViews.includes(newView as string)
+        ? (newView as 'grid' | 'agenda' | 'map')
+        : 'grid'
+    if (viewMode.value !== targetView) {
+      viewMode.value = targetView
+    }
+  }
+)
+
+// Watcher pour synchroniser les filtres avec les changements d'URL (boutons navigateur)
+watch(
+  () => route.query,
+  (_newQuery) => {
+    const newFilters = initFiltersFromUrl()
+    // Mettre à jour seulement si les filtres ont vraiment changé pour éviter une boucle
+    const filtersChanged = JSON.stringify(newFilters) !== JSON.stringify(toRaw(filters))
+    if (filtersChanged) {
+      Object.assign(filters, newFilters)
+    }
+  },
+  { deep: true }
+)
 
 // Fonctions pour gérer les dates
 const formatDateForDisplay = (dateString: string): string => {
@@ -636,6 +729,12 @@ const resetFilters = () => {
   services.value.forEach((service) => {
     filters[service.key] = false
   })
+  // Vider l'URL (garder seulement la vue si elle n'est pas 'grid')
+  const query: Record<string, any> = {}
+  if (viewMode.value !== 'grid') {
+    query.view = viewMode.value
+  }
+  router.push({ query })
   editionStore.fetchEditions({ ...filters, page: currentPage.value, limit: itemsPerPage.value }) // Fetch all conventions again
 }
 

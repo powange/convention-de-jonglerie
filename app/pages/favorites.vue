@@ -32,7 +32,6 @@
     <div v-else>
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
         <p class="text-gray-600 mb-4 lg:mb-0">
-          {{ favoriteEditions.length }}
           {{ $t('pages.favorites.editions_in_favorites', { count: favoriteEditions.length }) }}
           <span v-if="favoriteEditions.length > itemsPerPage" class="ml-2">
             (Page {{ currentPage }} sur {{ Math.ceil(favoriteEditions.length / itemsPerPage) }})
@@ -46,7 +45,7 @@
             :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
             icon="i-heroicons-squares-2x2"
             size="sm"
-            @click="viewMode = 'grid'"
+            @click="changeViewMode('grid')"
           >
             {{ $t('homepage.grid') }}
           </UButton>
@@ -55,7 +54,7 @@
             :variant="viewMode === 'agenda' ? 'solid' : 'ghost'"
             icon="i-heroicons-calendar"
             size="sm"
-            @click="viewMode = 'agenda'"
+            @click="changeViewMode('agenda')"
           >
             {{ $t('homepage.agenda') || 'Agenda' }}
           </UButton>
@@ -64,7 +63,7 @@
             :variant="viewMode === 'map' ? 'solid' : 'ghost'"
             icon="i-heroicons-map"
             size="sm"
-            @click="viewMode = 'map'"
+            @click="changeViewMode('map')"
           >
             {{ $t('homepage.map') }}
           </UButton>
@@ -140,9 +139,33 @@ const authStore = useAuthStore()
 const editionStore = useEditionStore()
 const toast = useToast()
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 
 const loading = ref(true)
-const viewMode = ref<'grid' | 'map' | 'agenda'>('grid')
+
+// Initialiser le mode de vue depuis l'URL ou par défaut 'grid'
+const getInitialViewMode = (): 'grid' | 'map' | 'agenda' => {
+  const urlView = route.query.view as string
+  if (urlView === 'agenda' || urlView === 'map' || urlView === 'grid') {
+    return urlView
+  }
+  return 'grid'
+}
+
+const viewMode = ref<'grid' | 'map' | 'agenda'>(getInitialViewMode())
+
+// Fonction pour changer le mode de vue et mettre à jour l'URL
+const changeViewMode = (newMode: 'grid' | 'map' | 'agenda') => {
+  viewMode.value = newMode
+  // Mettre à jour l'URL sans rechargement de page
+  router.push({
+    query: {
+      ...route.query,
+      view: newMode === 'grid' ? undefined : newMode, // Ne pas ajouter 'grid' car c'est le défaut
+    },
+  })
+}
 
 // Pagination
 const currentPage = ref(1)
@@ -183,6 +206,21 @@ const removeFavorite = async (id: number) => {
     })
   }
 }
+
+// Watcher pour synchroniser viewMode avec les changements d'URL (boutons navigateur)
+watch(
+  () => route.query.view,
+  (newView) => {
+    const validViews = ['grid', 'agenda', 'map']
+    const targetView =
+      newView && validViews.includes(newView as string)
+        ? (newView as 'grid' | 'agenda' | 'map')
+        : 'grid'
+    if (viewMode.value !== targetView) {
+      viewMode.value = targetView
+    }
+  }
+)
 
 onMounted(async () => {
   try {
