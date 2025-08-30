@@ -177,7 +177,10 @@ function extractI18nKeysFromFile(filePath) {
       'localValue',
       // Ajout 'h' pour ignorer les accès h.actor.pseudo / h.targetUser.pseudo
       'h',
+      's',
       'selectedCountry',
+      'selectedEdition',
+      'activeServices'
     ]
 
     // Exceptions - ces patterns sont valides même s'ils commencent par un mot réservé
