@@ -121,8 +121,8 @@ const upcomingFavorites = computed(() => {
   })
 })
 
-// Préparer les marqueurs pour le composable
-const markers = computed<MapMarker[]>(() => {
+// Fonction pour créer les marqueurs (appelée quand Leaflet est disponible)
+const createMarkers = (): MapMarker[] => {
   if (!import.meta.client || !(window as any).L) return []
 
   return upcomingFavorites.value.map((edition) => {
@@ -162,14 +162,14 @@ const markers = computed<MapMarker[]>(() => {
       icon,
     }
   })
-})
+}
 
-// Utiliser le composable uniquement côté client
+// Utiliser le composable uniquement côté client (sans marqueurs initiaux)
 const mapUtils = import.meta.client
   ? useLeafletMap(mapContainer, {
       center: [46.603354, 1.888334],
       zoom: 6,
-      markers: markers.value,
+      markers: [], // Pas de marqueurs initiaux
     })
   : {
       isLoading: ref(false),
@@ -184,19 +184,46 @@ const mapUtils = import.meta.client
 
 const { isLoading } = mapUtils
 
-// Watcher pour mettre à jour les marqueurs
-if (import.meta.client) {
-  watch(markers, (newMarkers) => {
-    if (mapUtils.updateMarkers) {
-      mapUtils.updateMarkers(newMarkers)
+// Fonction pour vérifier et ajouter les marqueurs
+const tryAddMarkers = () => {
+  if ((window as any).L && upcomingFavorites.value.length > 0) {
+    const markers = createMarkers()
+    if (markers.length > 0 && mapUtils.updateMarkers) {
+      mapUtils.updateMarkers(markers)
+      
+      // Ajuster la vue pour montrer tous les marqueurs
+      if (mapUtils.fitBounds) {
+        const Lany = (window as any).L as any
+        const bounds = markers.map((m) => m.position)
+        const leafletBounds = Lany.latLngBounds(bounds)
+        mapUtils.fitBounds(leafletBounds.pad(0.1))
+      }
+      return true
     }
+  }
+  return false
+}
 
-    // Ajuster la vue si nécessaire
-    if (newMarkers.length > 0 && mapUtils.fitBounds && (window as any).L) {
-      const Lany = (window as any).L as any
-      const bounds = newMarkers.map((m) => m.position)
-      const leafletBounds = Lany.latLngBounds(bounds)
-      mapUtils.fitBounds(leafletBounds.pad(0.1))
+// Polling pour détecter quand Leaflet est disponible
+if (import.meta.client) {
+  const checkLeafletInterval = setInterval(() => {
+    if ((window as any).L) {
+      if (tryAddMarkers()) {
+        clearInterval(checkLeafletInterval)
+      }
+    }
+  }, 100) // Vérifier toutes les 100ms
+  
+  // Nettoyer l'interval après 10 secondes pour éviter les fuites mémoire
+  setTimeout(() => {
+    clearInterval(checkLeafletInterval)
+  }, 10000)
+
+  // Watcher pour les changements de favoris
+  watch(upcomingFavorites, () => {
+    // Seulement si Leaflet est disponible
+    if ((window as any).L) {
+      tryAddMarkers()
     }
   })
 }

@@ -134,8 +134,8 @@ const isFavorited = (edition: Edition): boolean => {
   return edition.favoritedBy.some((user) => user.id === authStore.user?.id)
 }
 
-// Préparer les marqueurs pour le composable
-const markers = computed<MapMarker[]>(() => {
+// Fonction pour créer les marqueurs (appelée quand Leaflet est disponible)
+const createMarkers = (): MapMarker[] => {
   if (!import.meta.client || !(window as any).L) return []
 
   return editionsWithCoordinates.value.map((edition) => {
@@ -163,7 +163,7 @@ const markers = computed<MapMarker[]>(() => {
         ${edition.description ? `<p class="text-xs text-gray-600 mb-3 line-clamp-2">${edition.description}</p>` : ''}
         <a href="/editions/${edition.id}" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002 2v-4M14 4h6m0 0v6m0-6L10 14" />
           </svg>
           ${t('common.view_details')}
         </a>
@@ -177,14 +177,14 @@ const markers = computed<MapMarker[]>(() => {
       icon,
     }
   })
-})
+}
 
-// Utiliser le composable uniquement côté client
+// Utiliser le composable uniquement côté client (sans marqueurs initiaux)
 const mapUtils = import.meta.client
   ? useLeafletMap(mapContainer, {
       center: [46.603354, 1.888334],
       zoom: 6,
-      markers: markers.value,
+      markers: [], // Pas de marqueurs initiaux
     })
   : {
       isLoading: ref(false),
@@ -199,19 +199,46 @@ const mapUtils = import.meta.client
 
 const { isLoading } = mapUtils
 
-// Watcher pour mettre à jour les marqueurs
-if (import.meta.client) {
-  watch(markers, (newMarkers) => {
-    if (mapUtils.updateMarkers) {
-      mapUtils.updateMarkers(newMarkers)
+// Fonction pour vérifier et ajouter les marqueurs
+const tryAddMarkers = () => {
+  if ((window as any).L && editionsWithCoordinates.value.length > 0) {
+    const markers = createMarkers()
+    if (markers.length > 0 && mapUtils.updateMarkers) {
+      mapUtils.updateMarkers(markers)
+      
+      // Ajuster la vue pour montrer tous les marqueurs
+      if (mapUtils.fitBounds) {
+        const Lany = (window as any).L as any
+        const bounds = markers.map((m) => m.position)
+        const leafletBounds = Lany.latLngBounds(bounds)
+        mapUtils.fitBounds(leafletBounds.pad(0.1))
+      }
+      return true
     }
+  }
+  return false
+}
 
-    // Ajuster la vue si nécessaire
-    if (newMarkers.length > 0 && mapUtils.fitBounds && (window as any).L) {
-      const Lany = (window as any).L as any
-      const bounds = newMarkers.map((m) => m.position)
-      const leafletBounds = Lany.latLngBounds(bounds)
-      mapUtils.fitBounds(leafletBounds.pad(0.1))
+// Polling pour détecter quand Leaflet est disponible
+if (import.meta.client) {
+  const checkLeafletInterval = setInterval(() => {
+    if ((window as any).L) {
+      if (tryAddMarkers()) {
+        clearInterval(checkLeafletInterval)
+      }
+    }
+  }, 100) // Vérifier toutes les 100ms
+  
+  // Nettoyer l'interval après 10 secondes pour éviter les fuites mémoire
+  setTimeout(() => {
+    clearInterval(checkLeafletInterval)
+  }, 10000)
+
+  // Watcher pour les changements d'éditions (filtres, etc.)
+  watch(editionsWithCoordinates, () => {
+    // Seulement si Leaflet est disponible
+    if ((window as any).L) {
+      tryAddMarkers()
     }
   })
 }

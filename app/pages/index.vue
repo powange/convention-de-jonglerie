@@ -452,7 +452,7 @@
 
         <!-- Vue carte -->
         <div v-else-if="viewMode === 'map'">
-          <HomeMap :editions="editionsWithCoordinates" />
+          <HomeMap :editions="editionStore.allEditions" />
         </div>
       </div>
     </div>
@@ -532,6 +532,13 @@ const changeViewMode = (newMode: 'grid' | 'map' | 'agenda') => {
 // Fonction pour mettre à jour l'URL avec les filtres
 const updateUrlFromFilters = (extraParams: Record<string, any> = {}) => {
   const query: Record<string, any> = { ...extraParams }
+
+  // Préserver le viewMode actuel si pas explicitement fourni dans extraParams
+  if (!('view' in extraParams)) {
+    if (viewMode.value !== 'grid') {
+      query.view = viewMode.value
+    }
+  }
 
   // Ajouter les filtres non-par défaut à l'URL
   if (filters.name) query.name = filters.name
@@ -616,8 +623,8 @@ watch(
       editionStore.fetchEditions(filtersWithPage)
     }
 
-    // Si on est en mode agenda, charger aussi toutes les éditions
-    if (viewMode.value === 'agenda') {
+    // Si on est en mode agenda ou carte, charger aussi toutes les éditions
+    if (viewMode.value === 'agenda' || viewMode.value === 'map') {
       editionStore.fetchAllEditions(newFilters)
     }
 
@@ -627,28 +634,14 @@ watch(
   { deep: true, immediate: false }
 )
 
-// Watcher pour charger toutes les éditions quand on passe en mode agenda
+// Watcher pour charger toutes les éditions quand on passe en mode agenda ou carte
 watch(viewMode, (newViewMode) => {
-  if (newViewMode === 'agenda') {
+  if (newViewMode === 'agenda' || newViewMode === 'map') {
     // Charger toutes les éditions avec les filtres actuels
     editionStore.fetchAllEditions(filters)
   }
 })
 
-// Watcher pour synchroniser viewMode avec les changements d'URL (boutons navigateur)
-watch(
-  () => route.query.view,
-  (newView) => {
-    const validViews = ['grid', 'agenda', 'map']
-    const targetView =
-      newView && validViews.includes(newView as string)
-        ? (newView as 'grid' | 'agenda' | 'map')
-        : 'grid'
-    if (viewMode.value !== targetView) {
-      viewMode.value = targetView
-    }
-  }
-)
 
 // Watcher pour synchroniser les filtres avec les changements d'URL (boutons navigateur)
 watch(
@@ -659,6 +652,14 @@ watch(
     const filtersChanged = JSON.stringify(newFilters) !== JSON.stringify(toRaw(filters))
     if (filtersChanged) {
       Object.assign(filters, newFilters)
+    }
+    
+    // Synchroniser le viewMode avec l'URL (séparément des filtres)
+    const newView = route.query.view as string
+    const validViews = ['grid', 'agenda', 'map']
+    const targetView = newView && validViews.includes(newView) ? (newView as 'grid' | 'agenda' | 'map') : 'grid'
+    if (viewMode.value !== targetView) {
+      viewMode.value = targetView
     }
   },
   { deep: true }
@@ -740,8 +741,8 @@ const resetFilters = () => {
 
 onMounted(() => {
   editionStore.fetchEditions({ ...filters, page: currentPage.value, limit: itemsPerPage.value })
-  // Si on démarre en mode agenda, charger toutes les éditions aussi
-  if (viewMode.value === 'agenda') {
+  // Si on démarre en mode agenda ou carte, charger toutes les éditions aussi
+  if (viewMode.value === 'agenda' || viewMode.value === 'map') {
     editionStore.fetchAllEditions(filters)
   }
 })
@@ -752,12 +753,6 @@ const isFavorited = computed(() => (editionId: number) => {
     ?.favoritedBy.some((u) => u.id === authStore.user?.id)
 })
 
-// Éditions avec coordonnées pour la carte
-const editionsWithCoordinates = computed(() => {
-  return editionStore.editions.filter(
-    (edition) => edition.latitude !== null && edition.longitude !== null
-  )
-})
 
 // Réinitialiser la page courante quand les filtres changent
 watch(
