@@ -32,7 +32,9 @@
 
     <!-- Légende au-dessus de la carte -->
     <div v-else>
-      <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg mb-3 border border-gray-200 dark:border-gray-700">
+      <div
+        class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg mb-3 border border-gray-200 dark:border-gray-700"
+      >
         <div class="flex flex-wrap items-center gap-4">
           <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
             {{ $t('components.map.temporal_status') }} :
@@ -40,15 +42,21 @@
           <div class="flex flex-wrap items-center gap-4">
             <div class="flex items-center gap-2">
               <div class="w-3 h-3 bg-emerald-500 rounded-full" />
-              <span class="text-sm text-gray-600 dark:text-gray-400">{{ $t('components.map.ongoing') }}</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                $t('components.map.ongoing')
+              }}</span>
             </div>
             <div class="flex items-center gap-2">
               <div class="w-3 h-3 bg-blue-500 rounded-full" />
-              <span class="text-sm text-gray-600 dark:text-gray-400">{{ $t('components.map.upcoming') }}</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                $t('components.map.upcoming')
+              }}</span>
             </div>
             <div class="flex items-center gap-2">
               <div class="w-3 h-3 bg-gray-500 rounded-full" />
-              <span class="text-sm text-gray-600 dark:text-gray-400">{{ $t('components.map.past') }}</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                $t('components.map.past')
+              }}</span>
             </div>
             <div v-if="authStore.isAuthenticated" class="flex items-center gap-2">
               <div class="w-3 h-3 rounded-full border-2 border-yellow-500 bg-transparent" />
@@ -204,7 +212,7 @@ const tryAddMarkers = () => {
     const markers = createMarkers()
     if (markers.length > 0 && mapUtils.updateMarkers) {
       mapUtils.updateMarkers(markers)
-      
+
       // Ajuster la vue pour montrer tous les marqueurs
       if (mapUtils.fitBounds) {
         const Lany = (window as any).L as any
@@ -227,7 +235,7 @@ if (import.meta.client) {
       }
     }
   }, 100) // Vérifier toutes les 100ms
-  
+
   // Nettoyer l'interval après 10 secondes pour éviter les fuites mémoire
   setTimeout(() => {
     clearInterval(checkLeafletInterval)

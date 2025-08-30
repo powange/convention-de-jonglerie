@@ -642,7 +642,6 @@ watch(viewMode, (newViewMode) => {
   }
 })
 
-
 // Watcher pour synchroniser les filtres avec les changements d'URL (boutons navigateur)
 watch(
   () => route.query,
@@ -653,11 +652,12 @@ watch(
     if (filtersChanged) {
       Object.assign(filters, newFilters)
     }
-    
+
     // Synchroniser le viewMode avec l'URL (séparément des filtres)
     const newView = route.query.view as string
     const validViews = ['grid', 'agenda', 'map']
-    const targetView = newView && validViews.includes(newView) ? (newView as 'grid' | 'agenda' | 'map') : 'grid'
+    const targetView =
+      newView && validViews.includes(newView) ? (newView as 'grid' | 'agenda' | 'map') : 'grid'
     if (viewMode.value !== targetView) {
       viewMode.value = targetView
     }
@@ -752,7 +752,6 @@ const isFavorited = computed(() => (editionId: number) => {
     .find((c) => c.id === editionId)
     ?.favoritedBy.some((u) => u.id === authStore.user?.id)
 })
-
 
 // Réinitialiser la page courante quand les filtres changent
 watch(
