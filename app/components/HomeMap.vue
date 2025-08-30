@@ -30,58 +30,57 @@
       </p>
     </div>
 
-    <!-- Conteneur de la carte -->
-    <div v-else class="relative">
-      <div
-        ref="mapContainer"
-        class="h-[600px] rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
-      >
-        <!-- Message de chargement -->
-        <div
-          v-if="isLoading"
-          class="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800"
-        >
-          <div class="text-center">
-            <UIcon
-              name="i-heroicons-arrow-path"
-              class="animate-spin text-primary-500 mx-auto mb-2"
-              size="24"
-            />
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ $t('components.map.loading') }}
-            </p>
+    <!-- Légende au-dessus de la carte -->
+    <div v-else>
+      <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg mb-3 border border-gray-200 dark:border-gray-700">
+        <div class="flex flex-wrap items-center gap-4">
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {{ $t('components.map.temporal_status') }} :
+          </span>
+          <div class="flex flex-wrap items-center gap-4">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-emerald-500 rounded-full" />
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{ $t('components.map.ongoing') }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-blue-500 rounded-full" />
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{ $t('components.map.upcoming') }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-gray-500 rounded-full" />
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{ $t('components.map.past') }}</span>
+            </div>
+            <div v-if="authStore.isAuthenticated" class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full border-2 border-yellow-500 bg-transparent" />
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                $t('components.map.yellow_border_favorite')
+              }}</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Légende et contrôles -->
-      <div
-        class="absolute top-4 right-4 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-[1000] space-y-2"
-      >
-        <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
-          {{ $t('components.map.temporal_status') }} :
-        </div>
-        <div class="flex items-center gap-2 text-sm">
-          <div class="w-3 h-3 bg-green-500 rounded-full" />
-          <span class="text-gray-700 dark:text-gray-300">{{ $t('components.map.ongoing') }}</span>
-        </div>
-        <div class="flex items-center gap-2 text-sm">
-          <div class="w-3 h-3 bg-blue-500 rounded-full" />
-          <span class="text-gray-700 dark:text-gray-300">{{ $t('components.map.upcoming') }}</span>
-        </div>
-        <div class="flex items-center gap-2 text-sm">
-          <div class="w-3 h-3 bg-gray-500 rounded-full" />
-          <span class="text-gray-700 dark:text-gray-300">{{ $t('components.map.past') }}</span>
-        </div>
+      <!-- Conteneur de la carte -->
+      <div class="relative">
         <div
-          v-if="authStore.isAuthenticated"
-          class="pt-2 border-t border-gray-200 dark:border-gray-600"
+          ref="mapContainer"
+          class="h-[600px] rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
         >
-          <div class="flex items-center gap-2 text-sm">
-            <div class="w-3 h-3 rounded-full border-2 border-yellow-500 bg-transparent" />
-            <span class="text-gray-700 dark:text-gray-300">{{
-              $t('components.map.yellow_border_favorite')
-            }}</span>
+          <!-- Message de chargement -->
+          <div
+            v-if="isLoading"
+            class="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800"
+          >
+            <div class="text-center">
+              <UIcon
+                name="i-heroicons-arrow-path"
+                class="animate-spin text-primary-500 mx-auto mb-2"
+                size="24"
+              />
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                {{ $t('components.map.loading') }}
+              </p>
+            </div>
           </div>
         </div>
       </div>
