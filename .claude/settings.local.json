@@ -53,7 +53,8 @@
       "Read(/tmp/**)",
       "Read(/tmp/**)",
       "WebFetch(domain:fullcalendar.io)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(npx prisma migrate dev:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"
