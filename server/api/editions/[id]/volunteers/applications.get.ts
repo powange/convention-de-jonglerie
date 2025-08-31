@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
 
   const query = getQuery(event)
   const statusFilter = query.status as string | undefined
+  const teamsFilter = query.teams as string | undefined
   const page = Math.max(1, parseInt((query.page as string) || '1'))
   const pageSize = Math.min(
     100,
@@ -22,26 +23,54 @@ export default defineEventHandler(async (event) => {
   const sortDirRaw = (query.sortDir as string) === 'asc' ? 'asc' : 'desc'
   const sortSecondary = (query.sortSecondary as string) || '' // format "field:dir,field2:dir"
   const search = (query.search as string)?.trim()
-  const where: any = { editionId }
-  if (statusFilter) where.status = statusFilter
+  // Construction de la clause WHERE
+  const conditions: any[] = [{ editionId }]
+
+  // Filtre par statut
+  if (statusFilter) {
+    conditions.push({ status: statusFilter })
+  }
+
+  // Filtre par équipes
+  if (teamsFilter) {
+    const teamNames = teamsFilter
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean)
+    if (teamNames.length > 0) {
+      // Pour les champs JSON array, on cherche les candidatures qui contiennent au moins une des équipes
+      const teamConditions = teamNames.map((teamName) => ({
+        teamPreferences: {
+          array_contains: [teamName],
+        },
+      }))
+      conditions.push({ OR: teamConditions })
+    }
+  }
+
+  // Filtre de recherche textuelle
   if (search) {
     const s = search.slice(0, 100)
-    where.OR = [
-      { motivation: { contains: s } },
-      {
-        user: {
-          is: {
-            OR: [
-              { pseudo: { contains: s } },
-              { email: { contains: s } },
-              { prenom: { contains: s } },
-              { nom: { contains: s } },
-            ],
+    conditions.push({
+      OR: [
+        { motivation: { contains: s } },
+        {
+          user: {
+            is: {
+              OR: [
+                { pseudo: { contains: s } },
+                { email: { contains: s } },
+                { prenom: { contains: s } },
+                { nom: { contains: s } },
+              ],
+            },
           },
         },
-      },
-    ]
+      ],
+    })
   }
+
+  const where = conditions.length === 1 ? conditions[0] : { AND: conditions }
   const total = await prisma.editionVolunteerApplication.count({ where })
   const primary: any = (() => {
     if (sortFieldRaw === 'pseudo') return { user: { pseudo: sortDirRaw } }
@@ -77,6 +106,7 @@ export default defineEventHandler(async (event) => {
       dietaryPreference: true,
       allergies: true,
       timePreferences: true,
+      teamPreferences: true,
       user: {
         select: { id: true, pseudo: true, email: true, phone: true, prenom: true, nom: true },
       },

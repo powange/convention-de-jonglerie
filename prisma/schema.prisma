@@ -35,8 +35,8 @@ model User {
   id                       Int                             @id @default(autoincrement())
   email                    String                          @unique
   pseudo                   String                          @unique
-  nom                      String
-  prenom                   String
+  nom                      String?
+  prenom                   String?
   password                 String
   phone                    String? // Numéro de téléphone optionnel, requis seulement pour postuler bénévole
   isEmailVerified          Boolean                         @default(false)
@@ -134,6 +134,10 @@ model Edition {
   volunteersAskAllergies  Boolean                         @default(false)
   // Demander les préférences horaires dans le formulaire interne ?
   volunteersAskTimePreferences Boolean                    @default(false)
+  // Demander les préférences d'équipes dans le formulaire interne ?
+  volunteersAskTeamPreferences Boolean                    @default(false)
+  // Équipes de bénévoles avec optionnellement le nombre de places (JSON array)
+  volunteersTeams         Json?
   volunteerApplications   EditionVolunteerApplication[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
@@ -437,6 +441,8 @@ model EditionVolunteerApplication {
   dietaryPreference DietaryPreference @default(NONE)
   // Préférences horaires choisies (JSON array de créneaux)
   timePreferences   Json?
+  // Préférences d'équipes choisies (JSON array de noms d'équipes)
+  teamPreferences   Json?
   edition           Edition         @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 

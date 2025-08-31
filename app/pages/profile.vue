@@ -797,9 +797,9 @@ const updateProfile = async () => {
       body: {
         email: state.email,
         pseudo: state.pseudo,
-        nom: state.nom || undefined,
-        prenom: state.prenom || undefined,
-        telephone: state.telephone || undefined,
+        nom: state.nom || '',
+        prenom: state.prenom || '',
+        telephone: state.telephone || '',
       },
     })
 

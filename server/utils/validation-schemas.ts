@@ -51,8 +51,8 @@ export const changePasswordSchema = z
 export const updateProfileSchema = z.object({
   pseudo: pseudoSchema,
   // Champs rendus optionnels (peuvent être vides ou non fournis)
-  prenom: nameSchema.optional(),
-  nom: nameSchema.optional(),
+  prenom: z.string().max(100, 'Ce champ ne peut pas dépasser 100 caractères').optional(),
+  nom: z.string().max(100, 'Ce champ ne peut pas dépasser 100 caractères').optional(),
   email: emailSchema,
   telephone: phoneSchema.optional(),
 })

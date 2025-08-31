@@ -15,6 +15,8 @@ export default defineEventHandler(async (event) => {
       volunteersAskDiet: true,
       volunteersAskAllergies: true,
       volunteersAskTimePreferences: true,
+      volunteersAskTeamPreferences: true,
+      volunteersTeams: true,
       volunteerApplications: { select: { id: true, status: true, userId: true } },
     },
   })
@@ -43,6 +45,8 @@ export default defineEventHandler(async (event) => {
     askDiet: (edition as any).volunteersAskDiet || false,
     askAllergies: (edition as any).volunteersAskAllergies || false,
     askTimePreferences: (edition as any).volunteersAskTimePreferences || false,
+    askTeamPreferences: (edition as any).volunteersAskTeamPreferences || false,
+    teams: (edition as any).volunteersTeams || [],
     myApplication,
     counts,
   }

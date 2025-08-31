@@ -14,6 +14,7 @@ const bodySchema = z.object({
   dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).optional(),
   allergies: z.string().max(500).optional().nullable(),
   timePreferences: z.array(z.string()).max(8).optional(),
+  teamPreferences: z.array(z.string()).max(20).optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -30,6 +31,8 @@ export default defineEventHandler(async (event) => {
       volunteersAskDiet: true,
       volunteersAskAllergies: true,
       volunteersAskTimePreferences: true,
+      volunteersAskTeamPreferences: true,
+      volunteersTeams: true,
     },
   })
   if (!edition) throw createError({ statusCode: 404, statusMessage: 'Edition introuvable' })
@@ -87,6 +90,10 @@ export default defineEventHandler(async (event) => {
         edition.volunteersAskTimePreferences && parsed.timePreferences?.length
           ? parsed.timePreferences
           : null,
+      teamPreferences:
+        (edition as any).volunteersAskTeamPreferences && parsed.teamPreferences?.length
+          ? parsed.teamPreferences
+          : null,
     },
     select: {
       id: true,
@@ -94,6 +101,7 @@ export default defineEventHandler(async (event) => {
       dietaryPreference: true,
       allergies: true,
       timePreferences: true,
+      teamPreferences: true,
     },
   })
   return { success: true, application }

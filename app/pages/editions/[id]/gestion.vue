@@ -114,11 +114,34 @@
         <UCard>
           <div class="space-y-4">
             <div class="flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-users" class="text-primary-500" />
-                <h2 class="text-lg font-semibold">
-                  {{ $t('pages.management.volunteer_management') }}
-                </h2>
+              <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                  <UIcon name="i-heroicons-users" class="text-primary-500" />
+                  <h2 class="text-lg font-semibold">
+                    {{ $t('pages.management.volunteer_management') }}
+                  </h2>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 text-xs ml-7">
+                  <UBadge :color="volunteersOpenLocal ? 'success' : 'neutral'" variant="soft">
+                    {{
+                      volunteersOpenLocal
+                        ? $t('common.active') || 'Actif'
+                        : $t('common.inactive') || 'Inactif'
+                    }}
+                    ·
+                    {{
+                      volunteersModeLocal === 'EXTERNAL'
+                        ? t('editions.volunteers_mode_external') || 'Externe'
+                        : t('editions.volunteers_mode_internal') || 'Interne'
+                    }}
+                  </UBadge>
+                  <span v-if="volunteersUpdatedAt" class="text-gray-500 dark:text-gray-400">
+                    {{
+                      $t('common.updated_at', { date: formatRelative(volunteersUpdatedAt) }) ||
+                      formatRelative(volunteersUpdatedAt)
+                    }}
+                  </span>
+                </div>
               </div>
               <div v-if="canEdit" class="flex items-center gap-3">
                 <USwitch
@@ -287,28 +310,87 @@
                   size="lg"
                   @update:model-value="persistVolunteerSettings"
                 />
-              </div>
 
-              <div class="flex flex-wrap items-center gap-2 text-xs">
-                <UBadge :color="volunteersOpenLocal ? 'success' : 'neutral'" variant="soft">
-                  {{
-                    volunteersOpenLocal
-                      ? $t('common.active') || 'Actif'
-                      : $t('common.inactive') || 'Inactif'
-                  }}
-                  ·
-                  {{
-                    volunteersModeLocal === 'EXTERNAL'
-                      ? t('editions.volunteers_mode_external') || 'Externe'
-                      : t('editions.volunteers_mode_internal') || 'Interne'
-                  }}
-                </UBadge>
-                <span v-if="volunteersUpdatedAt" class="text-gray-500 dark:text-gray-400">
-                  {{
-                    $t('common.updated_at', { date: formatRelative(volunteersUpdatedAt) }) ||
-                    formatRelative(volunteersUpdatedAt)
-                  }}
-                </span>
+                <!-- Switch demander préférences d'équipes (mode interne uniquement) -->
+                <USwitch
+                  v-model="volunteersAskTeamPreferencesLocal"
+                  :disabled="savingVolunteers || volunteersTeamsLocal.length === 0"
+                  color="primary"
+                  class="mb-2"
+                  :label="
+                    volunteersTeamsLocal.length === 0
+                      ? t('editions.volunteers_ask_team_preferences_label') +
+                        ' (définissez d\'abord des équipes)'
+                      : t('editions.volunteers_ask_team_preferences_label')
+                  "
+                  size="lg"
+                  @update:model-value="persistVolunteerSettings"
+                />
+
+                <!-- Gestion des équipes (mode interne uniquement) -->
+                <div class="mt-6 space-y-4">
+                  <div class="space-y-2">
+                    <h4 class="font-medium text-gray-700 dark:text-gray-300">
+                      {{ t('editions.volunteers_teams_label') }}
+                    </h4>
+                    <p class="text-xs text-gray-500">
+                      {{ t('editions.volunteers_teams_hint') }}
+                    </p>
+                  </div>
+
+                  <div class="space-y-3">
+                    <div
+                      v-if="volunteersTeamsLocal.length === 0"
+                      class="text-sm text-gray-500 italic"
+                    >
+                      {{ t('editions.volunteers_teams_empty') }}
+                    </div>
+
+                    <div
+                      v-for="(team, index) in volunteersTeamsLocal"
+                      :key="index"
+                      class="flex gap-2 items-start"
+                    >
+                      <UInput
+                        v-model="team.name"
+                        :placeholder="t('editions.volunteers_team_name_placeholder')"
+                        class="flex-1"
+                        :disabled="savingVolunteers"
+                        @blur="() => persistVolunteerSettings({ skipRefetch: true })"
+                      />
+                      <UInput
+                        v-model.number="team.slots"
+                        type="number"
+                        min="1"
+                        max="99"
+                        :placeholder="t('editions.volunteers_team_slots_placeholder')"
+                        class="w-20"
+                        :disabled="savingVolunteers"
+                        @blur="() => persistVolunteerSettings({ skipRefetch: true })"
+                      />
+                      <UButton
+                        icon="i-heroicons-trash"
+                        color="error"
+                        variant="ghost"
+                        size="sm"
+                        :disabled="savingVolunteers"
+                        @click="removeTeam(index)"
+                      >
+                        {{ t('editions.volunteers_team_remove') }}
+                      </UButton>
+                    </div>
+
+                    <UButton
+                      icon="i-heroicons-plus"
+                      variant="outline"
+                      size="sm"
+                      :disabled="savingVolunteers"
+                      @click="addTeam"
+                    >
+                      {{ t('editions.volunteers_team_add') }}
+                    </UButton>
+                  </div>
+                </div>
               </div>
               <div v-if="canEdit" class="flex gap-2">
                 <span v-if="savingVolunteers" class="text-xs text-gray-500 flex items-center gap-1">
@@ -357,6 +439,8 @@ const volunteersDescriptionHtml = ref('')
 const volunteersAskDietLocal = ref(false)
 const volunteersAskAllergiesLocal = ref(false)
 const volunteersAskTimePreferencesLocal = ref(false)
+const volunteersAskTeamPreferencesLocal = ref(false)
+const volunteersTeamsLocal = ref<{ name: string; slots?: number }[]>([])
 const volunteersUpdatedAt = ref<Date | null>(null)
 const savingVolunteers = ref(false)
 // Éviter d'envoyer des PATCH à l'initialisation quand on applique les valeurs serveur
@@ -399,6 +483,10 @@ function applyEditionVolunteerFields(src: any) {
   volunteersAskDietLocal.value = !!src.volunteersAskDiet
   volunteersAskAllergiesLocal.value = !!src.volunteersAskAllergies
   volunteersAskTimePreferencesLocal.value = !!src.volunteersAskTimePreferences
+  volunteersAskTeamPreferencesLocal.value = !!src.volunteersAskTeamPreferences
+  volunteersTeamsLocal.value = src.volunteersTeams
+    ? JSON.parse(JSON.stringify(src.volunteersTeams))
+    : []
   volunteersDescriptionOriginal.value = volunteersDescriptionLocal.value
   renderVolunteerDescriptionHtml()
   const vu = src.volunteersUpdatedAt
@@ -445,7 +533,7 @@ const handleChangeMode = async (_raw: any) => {
   await persistVolunteerSettings()
 }
 
-const persistVolunteerSettings = async () => {
+const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {}) => {
   if (!edition.value) return
   savingVolunteers.value = true
   try {
@@ -455,6 +543,8 @@ const persistVolunteerSettings = async () => {
       askDiet: volunteersAskDietLocal.value,
       askAllergies: volunteersAskAllergiesLocal.value,
       askTimePreferences: volunteersAskTimePreferencesLocal.value,
+      askTeamPreferences: volunteersAskTeamPreferencesLocal.value,
+      teams: volunteersTeamsLocal.value.filter((team) => team.name.trim()),
     }
     if (volunteersModeLocal.value === 'EXTERNAL')
       body.externalUrl = volunteersExternalUrlLocal.value.trim() || null
@@ -465,7 +555,9 @@ const persistVolunteerSettings = async () => {
     if (res?.settings) {
       volunteersUpdatedAt.value = new Date()
       volunteersDescriptionOriginal.value = volunteersDescriptionLocal.value
-      await editionStore.fetchEditionById(editionId, { force: true })
+      if (!options.skipRefetch) {
+        await editionStore.fetchEditionById(editionId, { force: true })
+      }
       toast.add({
         title: t('common.saved') || 'Sauvegardé',
         color: 'success',
@@ -492,6 +584,19 @@ const saveVolunteerDescription = async () => {
 const resetVolunteerDescription = () => {
   volunteersDescriptionLocal.value = volunteersDescriptionOriginal.value
   renderVolunteerDescriptionHtml()
+}
+
+const addTeam = () => {
+  volunteersTeamsLocal.value.push({ name: '', slots: undefined })
+}
+
+const removeTeam = (index: number) => {
+  volunteersTeamsLocal.value.splice(index, 1)
+  // Si plus d'équipes, désactiver automatiquement l'option
+  if (volunteersTeamsLocal.value.length === 0) {
+    volunteersAskTeamPreferencesLocal.value = false
+  }
+  persistVolunteerSettings({ skipRefetch: true })
 }
 
 const formatRelative = (date: Date) => {

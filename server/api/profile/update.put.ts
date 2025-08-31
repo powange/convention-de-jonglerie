@@ -67,9 +67,9 @@ export default defineEventHandler(async (event) => {
       data: {
         email,
         pseudo,
-        nom,
-        prenom,
-        phone: telephone,
+        nom: nom && nom.trim() !== '' ? nom.trim() : null,
+        prenom: prenom && prenom.trim() !== '' ? prenom.trim() : null,
+        phone: telephone && telephone.trim() !== '' ? telephone.trim() : null,
       },
       select: {
         id: true,

@@ -11,6 +11,16 @@ const bodySchema = z.object({
   askDiet: z.boolean().optional(),
   askAllergies: z.boolean().optional(),
   askTimePreferences: z.boolean().optional(),
+  askTeamPreferences: z.boolean().optional(),
+  teams: z
+    .array(
+      z.object({
+        name: z.string().min(1).max(100),
+        slots: z.number().int().min(1).max(99).optional(),
+      })
+    )
+    .max(20)
+    .optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -50,6 +60,9 @@ export default defineEventHandler(async (event) => {
   if (parsed.askAllergies !== undefined) data.volunteersAskAllergies = parsed.askAllergies
   if (parsed.askTimePreferences !== undefined)
     data.volunteersAskTimePreferences = parsed.askTimePreferences
+  if (parsed.askTeamPreferences !== undefined)
+    data.volunteersAskTeamPreferences = parsed.askTeamPreferences
+  if (parsed.teams !== undefined) data.volunteersTeams = parsed.teams
   if (Object.keys(data).length === 0) return { success: true, unchanged: true }
   data.volunteersUpdatedAt = new Date()
 
@@ -64,6 +77,8 @@ export default defineEventHandler(async (event) => {
       volunteersAskDiet: true,
       volunteersAskAllergies: true,
       volunteersAskTimePreferences: true,
+      volunteersAskTeamPreferences: true,
+      volunteersTeams: true,
       volunteersUpdatedAt: true,
     } as any,
   })) as any

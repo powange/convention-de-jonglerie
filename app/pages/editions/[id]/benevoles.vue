@@ -164,54 +164,55 @@
               <UIcon name="i-heroicons-information-circle" class="text-primary-500" />
               <span>{{ t('editions.volunteers_personal_info_notice') }}</span>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] sm:text-xs">
-              <div>
-                <span class="font-semibold">{{ t('editions.volunteers_first_name') }}:</span>
-                <span v-if="(authStore.user as any)?.prenom" class="ml-1">{{
-                  (authStore.user as any).prenom
-                }}</span>
-                <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
+            <div class="space-y-2 text-[11px] sm:text-xs">
+              <!-- Première ligne: Nom et Prénom -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <span class="font-semibold">{{ t('editions.volunteers_first_name') }}:</span>
+                  <span v-if="(authStore.user as any)?.prenom" class="ml-1">{{
+                    (authStore.user as any).prenom
+                  }}</span>
+                  <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
+                </div>
+                <div>
+                  <span class="font-semibold">{{ t('editions.volunteers_last_name') }}:</span>
+                  <span v-if="(authStore.user as any)?.nom" class="ml-1">{{
+                    (authStore.user as any).nom
+                  }}</span>
+                  <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
+                </div>
               </div>
-              <div>
-                <span class="font-semibold">{{ t('editions.volunteers_last_name') }}:</span>
-                <span v-if="(authStore.user as any)?.nom" class="ml-1">{{
-                  (authStore.user as any).nom
-                }}</span>
-                <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
-              </div>
-              <div>
-                <span class="font-semibold">{{ t('editions.volunteers_phone') }}:</span>
-                <span v-if="(authStore.user as any)?.phone" class="ml-1">{{
-                  (authStore.user as any).phone
-                }}</span>
-                <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
+              <!-- Deuxième ligne: Email et Téléphone -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <span class="font-semibold">{{ t('common.email') }}:</span>
+                  <span class="ml-1">{{ authStore.user?.email }}</span>
+                </div>
+                <div>
+                  <span class="font-semibold">{{ t('editions.volunteers_phone') }}:</span>
+                  <span v-if="(authStore.user as any)?.phone" class="ml-1">{{
+                    (authStore.user as any).phone
+                  }}</span>
+                  <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
+                </div>
               </div>
             </div>
             <p class="mt-1 text-[11px] leading-snug">
               {{ t('editions.volunteers_personal_info_disclaimer') }}
             </p>
           </div>
-          <UFormField :label="t('editions.volunteers_motivation_label')" class="w-full">
-            <div class="space-y-1 w-full">
-              <UTextarea
-                ref="motivationTextareaRef"
-                v-model="volunteerMotivation"
-                :rows="5"
-                :placeholder="t('editions.volunteers_motivation_placeholder')"
-                :maxlength="MOTIVATION_MAX"
-                class="w-full"
-              />
-              <div class="flex justify-end text-xs" :class="{ 'text-red-500': motivationTooLong }">
-                {{ volunteerMotivation.length }} / {{ MOTIVATION_MAX }}
-              </div>
-            </div>
-          </UFormField>
+          <!-- Champ téléphone si manquant -->
           <div v-if="needsPhone" class="space-y-2 w-full">
             <UFormField :label="t('editions.volunteers_phone_required')" class="w-full">
               <UInput v-model="volunteerPhone" autocomplete="tel" class="w-full" />
             </UFormField>
           </div>
-          <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+
+          <!-- Champs nom/prénom si manquants -->
+          <div
+            v-if="!(authStore.user as any)?.prenom || !(authStore.user as any)?.nom"
+            class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full"
+          >
             <UFormField
               v-if="!(authStore.user as any)?.prenom"
               :label="t('editions.volunteers_first_name_required')"
@@ -227,9 +228,6 @@
               <UInput v-model="volunteerLastName" class="w-full" />
             </UFormField>
           </div>
-          <p class="text-xs text-gray-500 whitespace-pre-line w-full">
-            {{ t('editions.volunteers_motivation_hint', { max: MOTIVATION_MAX }) }}
-          </p>
           <div
             v-if="volunteersInfo?.askDiet && volunteersMode === 'INTERNAL'"
             class="space-y-2 w-full"
@@ -273,12 +271,52 @@
               {{ t('editions.volunteers_time_preferences_hint') }}
             </p>
           </div>
+          <div
+            v-if="
+              volunteersInfo?.askTeamPreferences &&
+              volunteersInfo?.teams &&
+              volunteersInfo.teams.length > 0 &&
+              volunteersMode === 'INTERNAL'
+            "
+            class="space-y-2 w-full"
+          >
+            <UFormField :label="t('editions.volunteers_team_preferences_label')">
+              <UCheckboxGroup
+                v-model="selectedTeamPreferences"
+                :items="teamItems"
+                class="grid grid-cols-1 gap-2"
+              />
+            </UFormField>
+            <p class="text-[11px] text-gray-500">
+              {{ t('editions.volunteers_team_preferences_hint') }}
+            </p>
+          </div>
+
+          <!-- Motivation (déplacé en bas) -->
+          <UFormField :label="t('editions.volunteers_motivation_label')" class="w-full">
+            <div class="space-y-1 w-full">
+              <UTextarea
+                ref="motivationTextareaRef"
+                v-model="volunteerMotivation"
+                :rows="5"
+                :placeholder="t('editions.volunteers_motivation_placeholder')"
+                :maxlength="MOTIVATION_MAX"
+                class="w-full"
+              />
+              <div class="flex justify-end text-xs" :class="{ 'text-red-500': motivationTooLong }">
+                {{ volunteerMotivation.length }} / {{ MOTIVATION_MAX }}
+              </div>
+            </div>
+          </UFormField>
+          <p class="text-xs text-gray-500 whitespace-pre-line w-full">
+            {{ t('editions.volunteers_motivation_hint', { max: MOTIVATION_MAX }) }}
+          </p>
         </div>
       </template>
       <template #footer="{ close }">
         <div class="flex justify-end gap-2 w-full">
           <UButton
-            size="xs"
+            size="lg"
             variant="ghost"
             :disabled="volunteersApplying"
             @click="
@@ -290,7 +328,7 @@
             >{{ t('common.cancel') }}</UButton
           >
           <UButton
-            size="xs"
+            size="lg"
             color="primary"
             :loading="volunteersApplying"
             :disabled="volunteersApplying || motivationTooLong"
@@ -304,6 +342,13 @@
     </UModal>
 
     <UCard v-if="canManageEdition" variant="soft" class="mb-6">
+      <template #header>
+        <h3 class="text-lg font-semibold flex items-center gap-2">
+          <UIcon name="i-heroicons-clipboard-document-list" class="text-primary-500" />
+          {{ t('editions.volunteers_management_title') }}
+        </h3>
+      </template>
+
       <!-- Note visibilité + séparation avant statistiques & tableau organisateur -->
       <div v-if="volunteersMode === 'INTERNAL'">
         <UAlert
@@ -335,48 +380,69 @@
 
       <div class="space-y-3">
         <template v-if="volunteersMode === 'INTERNAL'">
-          <!-- Liste (organisateur) -->
           <div class="space-y-4">
-            <div class="flex flex-wrap gap-3 items-end">
-              <UFormField :label="t('editions.volunteers_filter_status')">
-                <USelect
-                  v-model="applicationsFilterStatus"
-                  :items="volunteerStatusItems"
-                  :placeholder="t('editions.volunteers_status_all')"
-                  icon="i-heroicons-funnel"
+            <!-- Filtres -->
+            <UCard variant="subtle">
+              <div class="flex flex-wrap gap-3 items-end">
+                <UFormField :label="t('editions.volunteers_filter_status')">
+                  <USelect
+                    v-model="applicationsFilterStatus"
+                    :items="volunteerStatusItems"
+                    :placeholder="t('editions.volunteers_status_all')"
+                    icon="i-heroicons-funnel"
+                    size="xs"
+                    variant="soft"
+                    class="w-48"
+                    @change="onStatusFilterChange"
+                  />
+                </UFormField>
+                <UFormField
+                  v-if="volunteersInfo?.askTeamPreferences && volunteerTeamItems.length > 0"
+                  :label="t('editions.volunteers_table_team_preferences')"
+                >
+                  <USelect
+                    v-model="applicationsFilterTeams"
+                    :items="volunteerTeamItems"
+                    :placeholder="t('editions.volunteers_teams_empty')"
+                    icon="i-heroicons-user-group"
+                    size="xs"
+                    variant="soft"
+                    class="w-48"
+                    multiple
+                    @change="onTeamsFilterChange"
+                  />
+                </UFormField>
+                <UFormField :label="t('editions.volunteers_search')">
+                  <UInput
+                    v-model="globalFilter"
+                    :placeholder="t('editions.volunteers_search_placeholder')"
+                    class="w-64"
+                    @keydown.enter.prevent="applySearch"
+                  />
+                </UFormField>
+                <UButton
                   size="xs"
                   variant="soft"
-                  class="w-48"
-                  @change="onStatusFilterChange"
-                />
-              </UFormField>
-              <UFormField :label="t('editions.volunteers_search')">
-                <UInput
-                  v-model="globalFilter"
-                  :placeholder="t('editions.volunteers_search_placeholder')"
-                  class="w-64"
-                  @keydown.enter.prevent="applySearch"
-                />
-              </UFormField>
-              <UButton
-                size="xs"
-                variant="soft"
-                icon="i-heroicons-arrow-path"
-                :loading="applicationsLoading"
-                @click="refreshApplications"
-              >
-                {{ t('common.refresh') }}
-              </UButton>
-              <UButton
-                size="xs"
-                variant="outline"
-                icon="i-heroicons-arrow-uturn-left"
-                @click="resetApplicationsFilters"
-              >
-                {{ t('common.reset') }}
-              </UButton>
-              <span class="text-xs text-gray-500 italic">{{ $t('pages.benevoles.sort_tip') }}</span>
-            </div>
+                  icon="i-heroicons-arrow-path"
+                  :loading="applicationsLoading"
+                  @click="refreshApplications"
+                >
+                  {{ t('common.refresh') }}
+                </UButton>
+                <UButton
+                  size="xs"
+                  variant="outline"
+                  icon="i-heroicons-arrow-uturn-left"
+                  @click="resetApplicationsFilters"
+                >
+                  {{ t('common.reset') }}
+                </UButton>
+                <span class="text-xs text-gray-500 italic">{{
+                  $t('pages.benevoles.sort_tip')
+                }}</span>
+              </div>
+            </UCard>
+
             <div class="border-t border-gray-200 dark:border-gray-700 pt-2">
               <UTable
                 ref="tableRef"
@@ -495,6 +561,8 @@ interface VolunteerInfo {
   askDiet?: boolean
   askAllergies?: boolean
   askTimePreferences?: boolean
+  askTeamPreferences?: boolean
+  teams?: { name: string; slots?: number }[]
 }
 const volunteersInfo = ref<VolunteerInfo | null>(null)
 const volunteersDescriptionHtml = ref('')
@@ -520,6 +588,7 @@ const volunteerLastName = ref('')
 const selectedDietPreference = ref<'NONE' | 'VEGETARIAN' | 'VEGAN'>('NONE')
 const volunteerAllergies = ref('')
 const selectedTimePreferences = ref<string[]>([])
+const selectedTeamPreferences = ref<string[]>([])
 
 // Items de créneaux horaires pour UCheckboxGroup
 const timeSlotItems = computed(() => [
@@ -532,6 +601,15 @@ const timeSlotItems = computed(() => [
   { label: t('editions.volunteers_time_slots.late_evening'), value: 'late_evening' },
   { label: t('editions.volunteers_time_slots.night'), value: 'night' },
 ])
+
+// Items d'équipes pour UCheckboxGroup
+const teamItems = computed(() => {
+  if (!volunteersInfo.value?.teams) return []
+  return volunteersInfo.value.teams.map((team) => ({
+    label: team.name,
+    value: team.name,
+  }))
+})
 
 // Items du select régime : labels doivent être des chaînes (pas des fonctions) pour USelect
 const dietPreferenceItems = computed<{ value: 'NONE' | 'VEGETARIAN' | 'VEGAN'; label: string }[]>(
@@ -589,6 +667,10 @@ const applyAsVolunteer = async () => {
           volunteersInfo.value?.askTimePreferences && selectedTimePreferences.value.length > 0
             ? selectedTimePreferences.value
             : undefined,
+        teamPreferences:
+          volunteersInfo.value?.askTeamPreferences && selectedTeamPreferences.value.length > 0
+            ? selectedTeamPreferences.value
+            : undefined,
       },
     } as any)
     if (res?.application && volunteersInfo.value)
@@ -644,6 +726,7 @@ const serverPagination = ref({ page: 1, pageSize: 20, total: 0, totalPages: 1 })
 // Filtres
 // Filtre statut: utiliser 'ALL' plutôt que null pour que USelect affiche une option
 const applicationsFilterStatus = ref<string>('ALL')
+const applicationsFilterTeams = ref<string[]>([])
 const globalFilter = ref('')
 // Tri multi-colonnes (TanStack sorting state)
 const sorting = ref<{ id: string; desc: boolean }[]>([{ id: 'createdAt', desc: true }])
@@ -657,6 +740,16 @@ const volunteerStatusItems = computed(() => [
   { label: t('editions.volunteers_status_accepted'), value: 'ACCEPTED' },
   { label: t('editions.volunteers_status_rejected'), value: 'REJECTED' },
 ])
+
+const volunteerTeamItems = computed(() => {
+  if (!volunteersInfo.value?.askTeamPreferences || !volunteersInfo.value?.teams?.length) {
+    return []
+  }
+  return volunteersInfo.value.teams.map((team) => ({
+    label: team.name,
+    value: team.name,
+  }))
+})
 const applySearch = () => {
   serverPagination.value.page = 1
   refreshApplications()
@@ -665,8 +758,13 @@ const onStatusFilterChange = () => {
   serverPagination.value.page = 1
   refreshApplications()
 }
+const onTeamsFilterChange = () => {
+  serverPagination.value.page = 1
+  refreshApplications()
+}
 const resetApplicationsFilters = () => {
   applicationsFilterStatus.value = 'ALL'
+  applicationsFilterTeams.value = []
   globalFilter.value = ''
   sorting.value = [{ id: 'createdAt', desc: true }]
   serverPagination.value.page = 1
@@ -696,6 +794,10 @@ const refreshApplications = async () => {
         status:
           applicationsFilterStatus.value && applicationsFilterStatus.value !== 'ALL'
             ? applicationsFilterStatus.value
+            : undefined,
+        teams:
+          applicationsFilterTeams.value.length > 0
+            ? applicationsFilterTeams.value.join(',')
             : undefined,
         sortField,
         sortDir,
@@ -771,12 +873,11 @@ const columns: TableColumn<any>[] = [
         {
           color: volunteerStatusColor(row.original.status),
           variant: 'soft',
-          class: 'uppercase text-[10px] px-1.5 py-0.5',
-          title: volunteerStatusLabel(row.original.status),
+          class: 'uppercase text-xs px-2 py-1',
         },
-        () => volunteerStatusLabel(row.original.status).slice(0, 1)
+        () => volunteerStatusLabel(row.original.status)
       ),
-    size: 40,
+    size: 120,
   },
   // Infos utilisateur
   {
@@ -790,6 +891,17 @@ const columns: TableColumn<any>[] = [
           ? h('span', { class: 'text-xs text-gray-500' }, row.original.user.phone)
           : null,
       ]),
+  },
+  // Colonnes Prénom et Nom
+  {
+    accessorKey: 'prenom',
+    header: t('editions.volunteers_table_first_name'),
+    cell: ({ row }) => row.original.user.prenom || '—',
+  },
+  {
+    accessorKey: 'nom',
+    header: t('editions.volunteers_table_last_name'),
+    cell: ({ row }) => row.original.user.nom || '—',
   },
   // Colonne régime si activée
   ...(volunteersInfo.value?.askDiet
@@ -870,16 +982,43 @@ const columns: TableColumn<any>[] = [
         } as TableColumn<any>,
       ]
     : []),
-  {
-    accessorKey: 'prenom',
-    header: t('editions.volunteers_table_first_name'),
-    cell: ({ row }) => row.original.user.prenom || '—',
-  },
-  {
-    accessorKey: 'nom',
-    header: t('editions.volunteers_table_last_name'),
-    cell: ({ row }) => row.original.user.nom || '—',
-  },
+  // Colonne équipes préférées si activée
+  ...(volunteersInfo.value?.askTeamPreferences
+    ? [
+        {
+          accessorKey: 'teamPreferences',
+          header: t('editions.volunteers_table_team_preferences'),
+          cell: ({ row }: any) => {
+            const preferences = row.original.teamPreferences || []
+            if (preferences.length === 0) return h('span', '—')
+
+            const teams = volunteersInfo.value?.teams || []
+            const teamNames = preferences
+              .map((teamId: string) => {
+                const team = teams.find((t: any) => t.id === teamId)
+                return team?.name || teamId
+              })
+              .join(', ')
+
+            return h(
+              resolveComponent('UTooltip'),
+              { text: teamNames, openDelay: 200 },
+              {
+                default: () =>
+                  h(
+                    'div',
+                    {
+                      class: 'max-w-xs truncate cursor-help text-xs',
+                      title: teamNames,
+                    },
+                    teamNames
+                  ),
+              }
+            )
+          },
+        } as TableColumn<any>,
+      ]
+    : []),
   {
     accessorKey: 'createdAt',
     header: ({ column }) => getSortableHeader(column, t('common.date')),
@@ -1006,6 +1145,7 @@ const openApplyModal = () => {
   volunteerMotivation.value = ''
   volunteerPhone.value = ''
   selectedTimePreferences.value = []
+  selectedTeamPreferences.value = []
   showApplyModal.value = true
   nextTick(() => {
     const textarea = motivationTextareaRef.value as any
