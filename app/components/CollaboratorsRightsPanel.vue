@@ -93,6 +93,7 @@
               v-if="draft[c.id]"
               v-model="draft[c.id]"
               :editions="editions"
+              :convention-name="props.conventionName"
               size="xs"
             />
             <div class="flex justify-end gap-2">
@@ -186,6 +187,7 @@
 <script setup lang="ts">
 interface Props {
   conventionId: number | null
+  conventionName?: string
 }
 const props = defineProps<Props>()
 

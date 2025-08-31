@@ -282,6 +282,7 @@
     "deleted": "Gelöscht",
     "description": "Beschreibung",
     "edit": "Bearbeiten",
+    "volunteers_short": "Freiwillige",
     "editor": {
       "back_to_edit": "Zurück zur Bearbeitung",
       "block_tooltip": "Codeblock",
@@ -996,6 +997,7 @@
       "UNARCHIVED": "Wiederhergestellt"
     },
     "manageCollaborators": "Mitarbeiter verwalten",
+    "manageVolunteers": "Freiwillige verwalten",
     "manager": "Manager",
     "moderator": "Moderator",
     "viewer": "Betrachter"

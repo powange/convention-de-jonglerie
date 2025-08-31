@@ -282,6 +282,7 @@
     "deleted": "Slettet",
     "description": "Beskrivelse",
     "edit": "Rediger",
+    "volunteers_short": "Frivillige",
     "editor": {
       "back_to_edit": "Tilbage til redigering",
       "block_tooltip": "Kodeblok",
@@ -996,6 +997,7 @@
       "UNARCHIVED": "Genaktiveret"
     },
     "manageCollaborators": "Administrer samarbejdspartnere",
+    "manageVolunteers": "Administrer frivillige",
     "manager": "Manager",
     "moderator": "Moderator",
     "viewer": "Læser"

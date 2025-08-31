@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { canEditEdition } from '../../../../utils/collaborator-management'
+import { canManageEditionVolunteers } from '../../../../utils/collaborator-management'
 import { prisma } from '../../../../utils/prisma'
 
 const bodySchema = z.object({
@@ -30,14 +30,18 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event).catch(() => ({}))
   const parsed = bodySchema.parse(body || {})
 
-  // Permission: auteur convention ou collaborateur avec droit édition (reuse canEditEdition)
+  // Permission: auteur convention ou collaborateur avec droit gestion bénévoles
   const edition = (await prisma.edition.findUnique({
     where: { id: editionId },
     select: { conventionId: true, volunteersMode: true } as any,
   })) as any
   if (!edition) throw createError({ statusCode: 404, statusMessage: 'Edition introuvable' })
-  const allowed = await canEditEdition(editionId, event.context.user.id)
-  if (!allowed) throw createError({ statusCode: 403, statusMessage: 'Droits insuffisants' })
+  const allowed = await canManageEditionVolunteers(editionId, event.context.user.id)
+  if (!allowed)
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Droits insuffisants pour gérer les bénévoles',
+    })
 
   const data: any = {}
   if (parsed.open !== undefined) data.volunteersOpen = parsed.open

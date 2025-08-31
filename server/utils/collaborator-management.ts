@@ -68,6 +68,61 @@ export async function canManageCollaborators(
 }
 
 /**
+ * Vérifie si un utilisateur peut gérer les bénévoles d'une convention
+ */
+export async function canManageVolunteers(conventionId: number, userId: number): Promise<boolean> {
+  const convention = await prisma.convention.findUnique({
+    where: { id: conventionId },
+    select: {
+      authorId: true,
+      collaborators: { where: { userId }, select: { canManageVolunteers: true } },
+    },
+  })
+  if (!convention) return false
+  if (convention.authorId === userId) return true
+  const collab = convention.collaborators[0]
+  return !!(collab && collab.canManageVolunteers)
+}
+
+/**
+ * Vérifie si un utilisateur peut gérer les bénévoles d'une édition spécifique
+ */
+export async function canManageEditionVolunteers(
+  editionId: number,
+  userId: number
+): Promise<boolean> {
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    select: { creatorId: true, conventionId: true, id: true },
+  })
+  if (!edition) return false
+  if (edition.creatorId === userId) return true
+
+  const convention = await prisma.convention.findUnique({
+    where: { id: edition.conventionId },
+    select: {
+      authorId: true,
+      collaborators: { where: { userId }, select: { canManageVolunteers: true, id: true } },
+    },
+  })
+  if (!convention) return false
+  if (convention.authorId === userId) return true
+
+  const collab = convention.collaborators[0]
+  if (!collab) return false
+
+  // Si le collaborateur a le droit global de gérer les bénévoles
+  if (collab.canManageVolunteers) return true
+
+  // Vérifier les permissions spécifiques à cette édition
+  const perEdition = await prisma.editionCollaboratorPermission.findUnique({
+    where: { collaboratorId_editionId: { collaboratorId: collab.id, editionId } },
+    select: { canManageVolunteers: true },
+  })
+  return !!perEdition?.canManageVolunteers
+}
+
+/**
  * Vérifie si un utilisateur peut éditer une convention
  */
 export async function canEditConvention(conventionId: number, userId: number): Promise<boolean> {
@@ -129,9 +184,15 @@ interface AddConventionCollaboratorInput {
     addEdition: boolean
     editAllEditions: boolean
     deleteAllEditions: boolean
+    manageVolunteers: boolean
   }>
   title?: string
-  perEdition?: Array<{ editionId: number; canEdit?: boolean; canDelete?: boolean }>
+  perEdition?: Array<{
+    editionId: number
+    canEdit?: boolean
+    canDelete?: boolean
+    canManageVolunteers?: boolean
+  }>
 }
 
 export async function addConventionCollaborator(input: AddConventionCollaboratorInput) {
@@ -173,12 +234,15 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
         canAddEdition: rights?.addEdition ?? false,
         canEditAllEditions: rights?.editAllEditions ?? false,
         canDeleteAllEditions: rights?.deleteAllEditions ?? false,
+        canManageVolunteers: rights?.manageVolunteers ?? false,
       },
       include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
     })
 
     if (perEdition && perEdition.length) {
-      const filtered = perEdition.filter((p) => p && (p.canEdit || p.canDelete))
+      const filtered = perEdition.filter(
+        (p) => p && (p.canEdit || p.canDelete || p.canManageVolunteers)
+      )
       if (filtered.length) {
         await tx.editionCollaboratorPermission.createMany({
           data: filtered.map((p) => ({
@@ -186,6 +250,7 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
             editionId: p.editionId,
             canEdit: !!p.canEdit,
             canDelete: !!p.canDelete,
+            canManageVolunteers: !!p.canManageVolunteers,
           })),
           skipDuplicates: true,
         })
@@ -214,11 +279,13 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
               canAddEdition: withPerEdition.canAddEdition,
               canEditAllEditions: withPerEdition.canEditAllEditions,
               canDeleteAllEditions: withPerEdition.canDeleteAllEditions,
+              canManageVolunteers: withPerEdition.canManageVolunteers,
             },
             perEdition: (withPerEdition.perEditionPermissions || []).map((p) => ({
               editionId: p.editionId,
               canEdit: p.canEdit,
               canDelete: p.canDelete,
+              canManageVolunteers: p.canManageVolunteers,
             })),
           } as any,
         } as any,
@@ -297,6 +364,7 @@ export async function deleteConventionCollaborator(
       canAddEdition: collaborator.canAddEdition,
       canEditAllEditions: collaborator.canEditAllEditions,
       canDeleteAllEditions: collaborator.canDeleteAllEditions,
+      canManageVolunteers: collaborator.canManageVolunteers,
     },
   }
 
@@ -365,6 +433,7 @@ export async function updateCollaboratorRights(params: {
     addEdition: boolean
     editAllEditions: boolean
     deleteAllEditions: boolean
+    manageVolunteers: boolean
   }>
   title?: string
 }) {
@@ -386,6 +455,7 @@ export async function updateCollaboratorRights(params: {
       canAddEdition: rights?.addEdition ?? collaborator.canAddEdition,
       canEditAllEditions: rights?.editAllEditions ?? collaborator.canEditAllEditions,
       canDeleteAllEditions: rights?.deleteAllEditions ?? collaborator.canDeleteAllEditions,
+      canManageVolunteers: rights?.manageVolunteers ?? collaborator.canManageVolunteers,
     },
     include: { user: { select: { id: true, pseudo: true } } },
   })

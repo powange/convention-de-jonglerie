@@ -282,6 +282,7 @@
     "deleted": "Видалено",
     "description": "Опис",
     "edit": "Редагувати",
+    "volunteers_short": "Волонтери",
     "editor": {
       "back_to_edit": "Повернутися до редагування",
       "block_tooltip": "Блок коду",
@@ -996,6 +997,7 @@
       "UNARCHIVED": "Відновлено"
     },
     "manageCollaborators": "Керувати співавторами",
+    "manageVolunteers": "Керувати волонтерами",
     "manager": "Менеджер",
     "moderator": "Модератор",
     "viewer": "Глядач"

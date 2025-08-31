@@ -282,6 +282,7 @@
     "deleted": "Удалено",
     "description": "Описание",
     "edit": "Редактировать",
+    "volunteers_short": "Волонтёры",
     "editor": {
       "back_to_edit": "Вернуться к редактированию",
       "block_tooltip": "Блок кода",
@@ -996,6 +997,7 @@
       "UNARCHIVED": "Восстановлено"
     },
     "manageCollaborators": "Управлять соавторами",
+    "manageVolunteers": "Управлять волонтёрами",
     "manager": "Менеджер",
     "moderator": "Модератор",
     "viewer": "Зритель"

@@ -1,4 +1,4 @@
-import { canEditEdition } from '../../../../utils/collaborator-management'
+import { canManageEditionVolunteers } from '../../../../utils/collaborator-management'
 import { prisma } from '../../../../utils/prisma'
 
 const DEFAULT_PAGE_SIZE = 20
@@ -8,8 +8,12 @@ export default defineEventHandler(async (event) => {
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   if (!editionId) throw createError({ statusCode: 400, statusMessage: 'Edition invalide' })
 
-  const allowed = await canEditEdition(editionId, event.context.user.id)
-  if (!allowed) throw createError({ statusCode: 403, statusMessage: 'Droits insuffisants' })
+  const allowed = await canManageEditionVolunteers(editionId, event.context.user.id)
+  if (!allowed)
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Droits insuffisants pour gérer les bénévoles',
+    })
 
   const query = getQuery(event)
   const statusFilter = query.status as string | undefined

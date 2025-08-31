@@ -12,7 +12,7 @@
         <div class="flex items-center gap-2">
           <UIcon name="i-heroicons-calendar" class="text-primary-500" />
           <h3 class="font-semibold text-lg truncate max-w-[28rem]">
-            {{ selectedEdition?.name }}
+            {{ selectedEdition ? getEditionDisplayName(selectedEdition) : '' }}
           </h3>
         </div>
       </template>
@@ -81,6 +81,7 @@ import FullCalendar from '@fullcalendar/vue3'
 import { DateTime } from 'luxon'
 
 import { getActiveServices, type ConventionService } from '~/utils/convention-services'
+import { getEditionDisplayName } from '~/utils/editionName'
 
 interface EditionLike {
   id: number
@@ -89,6 +90,7 @@ interface EditionLike {
   endDate: string
   country?: string | null
   city?: string | null
+  convention?: { name: string }
 }
 
 const props = defineProps<{ editions: EditionLike[] }>()

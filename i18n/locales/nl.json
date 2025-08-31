@@ -282,6 +282,7 @@
     "deleted": "Verwijderd",
     "description": "Beschrijving",
     "edit": "Bewerken",
+    "volunteers_short": "Vrijwilligers",
     "editor": {
       "back_to_edit": "Terug naar bewerken",
       "block_tooltip": "Codeblok",
@@ -996,6 +997,7 @@
       "UNARCHIVED": "Hersteld"
     },
     "manageCollaborators": "Medewerkers beheren",
+    "manageVolunteers": "Vrijwilligers beheren",
     "manager": "Manager",
     "moderator": "Moderator",
     "viewer": "Kijker"

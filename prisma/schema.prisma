@@ -155,6 +155,7 @@ model ConventionCollaborator {
   canAddEdition          Boolean                         @default(false)
   canEditAllEditions     Boolean                         @default(false)
   canDeleteAllEditions   Boolean                         @default(false)
+  canManageVolunteers    Boolean                         @default(false)
   addedAt                DateTime                        @default(now())
   addedById              Int
   addedBy                User                            @relation("AddedCollaborators", fields: [addedById], references: [id])
@@ -300,11 +301,12 @@ model Convention {
 
 // Permissions spécifiques par édition (complément aux droits globaux)
 model EditionCollaboratorPermission {
-  id             Int                    @id @default(autoincrement())
-  collaboratorId Int
-  editionId      Int
-  canEdit        Boolean                @default(false)
-  canDelete      Boolean                @default(false)
+  id                  Int                    @id @default(autoincrement())
+  collaboratorId      Int
+  editionId           Int
+  canEdit             Boolean                @default(false)
+  canDelete           Boolean                @default(false)
+  canManageVolunteers Boolean                @default(false)
   collaborator   ConventionCollaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
   edition        Edition                @relation(fields: [editionId], references: [id], onDelete: Cascade)
 

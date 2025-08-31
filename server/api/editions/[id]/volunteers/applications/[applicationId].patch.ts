@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { canEditEdition } from '../../../../../utils/collaborator-management'
+import { canManageEditionVolunteers } from '../../../../../utils/collaborator-management'
 import { prisma } from '../../../../../utils/prisma'
 
 // Autorise aussi le retour à PENDING
@@ -14,8 +14,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Paramètres invalides' })
   const parsed = bodySchema.parse(await readBody(event))
 
-  const allowed = await canEditEdition(editionId, event.context.user.id)
-  if (!allowed) throw createError({ statusCode: 403, statusMessage: 'Droits insuffisants' })
+  const allowed = await canManageEditionVolunteers(editionId, event.context.user.id)
+  if (!allowed)
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Droits insuffisants pour gérer les bénévoles',
+    })
 
   const application = await prisma.editionVolunteerApplication.findUnique({
     where: { id: applicationId },

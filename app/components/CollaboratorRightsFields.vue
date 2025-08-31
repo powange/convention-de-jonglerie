@@ -59,6 +59,9 @@
                 <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
                   {{ $t('common.delete') }}
                 </th>
+                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
+                  {{ $t('common.volunteers_short') }}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -69,9 +72,9 @@
               >
                 <td
                   class="px-2 py-1 align-middle truncate max-w-[160px]"
-                  :title="ed.name || '#' + ed.id"
+                  :title="getEditionDisplayNameWithFallback(ed)"
                 >
-                  {{ ed.name || '#' + ed.id }}
+                  {{ getEditionDisplayNameWithFallback(ed) }}
                 </td>
                 <td class="px-2 py-1 align-middle">
                   <div class="flex justify-center">
@@ -96,9 +99,23 @@
                     />
                   </div>
                 </td>
+                <td class="px-2 py-1 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('common.volunteers_short')"
+                      :size="switchSize"
+                      color="primary"
+                      :disabled="localValue.rights.manageVolunteers"
+                      :model-value="hasEditionFlag(ed.id, 'canManageVolunteers')"
+                      @update:model-value="
+                        (val) => toggleEdition(ed.id, 'canManageVolunteers', val)
+                      "
+                    />
+                  </div>
+                </td>
               </tr>
               <tr v-if="!localValue.perEdition.length">
-                <td colspan="3" class="px-2 py-2 italic text-gray-500">
+                <td colspan="4" class="px-2 py-2 italic text-gray-500">
                   {{ $t('components.collaborators_rights_panel.per_edition_hint') }}
                 </td>
               </tr>
@@ -114,11 +131,13 @@
 interface EditionLite {
   id: number
   name: string | null
+  convention?: { name: string }
 }
 interface PerEditionRight {
   editionId: number
   canEdit?: boolean
   canDelete?: boolean
+  canManageVolunteers?: boolean
 }
 interface ModelValue {
   title: string | null
@@ -134,6 +153,7 @@ const props = withDefaults(
   defineProps<{
     modelValue: ModelValue
     editions: EditionLite[]
+    conventionName?: string
     permissionList?: PermissionMeta[]
     hideTitle?: boolean
     size?: 'xs' | 'sm'
@@ -146,6 +166,7 @@ const props = withDefaults(
       { key: 'addEdition', label: 'permissions.addEdition' },
       { key: 'editAllEditions', label: 'permissions.editAllEditions' },
       { key: 'deleteAllEditions', label: 'permissions.deleteAllEditions' },
+      { key: 'manageVolunteers', label: 'permissions.manageVolunteers' },
     ],
     hideTitle: false,
     size: 'xs',
@@ -191,32 +212,52 @@ const switchSize = computed(() => props.size)
 const inputSize = computed(() => (props.size === 'xs' ? 'xs' : 'sm'))
 const effectivePermissionList = computed(() => props.permissionList)
 
+// Helper pour afficher le nom d'édition avec fallback sur le nom de convention
+function getEditionDisplayNameWithFallback(edition: EditionLite): string {
+  if (edition.name) return edition.name
+  if (props.conventionName) return props.conventionName
+  if (edition.convention?.name) return edition.convention.name
+  return `#${edition.id}`
+}
+
 function updateRight(key: string, value: any) {
   localValue.rights[key] = !!value
   // If enabling editAllEditions we clean perEdition edit flags
   if (key === 'editAllEditions' && localValue.rights.editAllEditions) {
-    localValue.perEdition = localValue.perEdition.filter((p) => p.canDelete) // drop entries that only had canEdit
     localValue.perEdition.forEach((p) => {
       if (p.canEdit) p.canEdit = false
     })
-    localValue.perEdition = localValue.perEdition.filter((p) => p.canDelete) // remove empty after clearing
   }
+  // If enabling manageVolunteers we clean perEdition volunteer flags
+  if (key === 'manageVolunteers' && localValue.rights.manageVolunteers) {
+    localValue.perEdition.forEach((p) => {
+      if (p.canManageVolunteers) p.canManageVolunteers = false
+    })
+  }
+  // Clean up empty entries
+  localValue.perEdition = localValue.perEdition.filter(
+    (p) => p.canEdit || p.canDelete || p.canManageVolunteers
+  )
   if (!syncingFromParent) emit('update:modelValue', JSON.parse(JSON.stringify(localValue)))
 }
-function hasEditionFlag(editionId: number, field: 'canEdit' | 'canDelete') {
+function hasEditionFlag(editionId: number, field: 'canEdit' | 'canDelete' | 'canManageVolunteers') {
   return !!localValue.perEdition.find((p) => p.editionId === editionId && (p as any)[field])
 }
-function toggleEdition(editionId: number, field: 'canEdit' | 'canDelete', value: any) {
+function toggleEdition(
+  editionId: number,
+  field: 'canEdit' | 'canDelete' | 'canManageVolunteers',
+  value: any
+) {
   const boolVal = !!value
   let entry = localValue.perEdition.find((p) => p.editionId === editionId)
   if (!entry && boolVal) {
-    entry = { editionId, canEdit: false, canDelete: false }
+    entry = { editionId, canEdit: false, canDelete: false, canManageVolunteers: false }
     localValue.perEdition.push(entry)
   }
   if (!entry) return
   ;(entry as any)[field] = boolVal
   // cleaning
-  if (!entry.canEdit && !entry.canDelete) {
+  if (!entry.canEdit && !entry.canDelete && !entry.canManageVolunteers) {
     localValue.perEdition = localValue.perEdition.filter((p) => p !== entry)
   }
   if (!syncingFromParent) emit('update:modelValue', JSON.parse(JSON.stringify(localValue)))

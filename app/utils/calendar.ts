@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon'
 
+import { getEditionDisplayName } from './editionName'
+
 import type { EventInput } from '@fullcalendar/core'
 
 export interface CalendarEvent {
@@ -7,6 +9,7 @@ export interface CalendarEvent {
   name?: string
   startDate: string
   endDate: string
+  convention?: { name: string }
   [key: string]: any
 }
 
@@ -19,7 +22,7 @@ export function formatEventForCalendar(event: CalendarEvent): EventInput {
 
   return {
     id: String(event.id),
-    title: event.name,
+    title: getEditionDisplayName(event),
     start,
     end: endExclusive,
     allDay: true,

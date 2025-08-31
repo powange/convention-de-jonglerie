@@ -282,6 +282,7 @@
     "deleted": "Supprimé",
     "description": "Description",
     "edit": "Modifier",
+    "volunteers_short": "Bénévoles",
     "editor": {
       "back_to_edit": "Revenir à l'édition",
       "block_tooltip": "Bloc de code",
@@ -996,6 +997,7 @@
       "UNARCHIVED": "Désarchivé"
     },
     "manageCollaborators": "Gérer les collaborateurs",
+    "manageVolunteers": "Gérer les bénévoles",
     "manager": "Gestion avancée",
     "moderator": "Modérateur",
     "viewer": "Lecteur"

@@ -282,6 +282,7 @@
     "deleted": "Eliminato",
     "description": "Descrizione",
     "edit": "Modifica",
+    "volunteers_short": "Volontari",
     "editor": {
       "back_to_edit": "Torna alla modifica",
       "block_tooltip": "Blocco di codice",
@@ -996,6 +997,7 @@
       "UNARCHIVED": "Ripristinato"
     },
     "manageCollaborators": "Gestisci collaboratori",
+    "manageVolunteers": "Gestisci volontari",
     "manager": "Manager",
     "moderator": "Moderatore",
     "viewer": "Visualizzatore"

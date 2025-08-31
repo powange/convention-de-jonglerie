@@ -11,6 +11,7 @@
           <CollaboratorsRightsPanel
             ref="rightsPanel"
             :convention-id="props.convention?.id || null"
+            :convention-name="props.convention?.name"
           />
         </section>
         <section v-if="props.convention" class="pt-2 border-t border-gray-100 dark:border-gray-800">
@@ -61,6 +62,7 @@
             <CollaboratorRightsFields
               :model-value="creationDraft"
               :editions="editions"
+              :convention-name="props.convention?.name"
               size="xs"
               @update:model-value="updateCreationDraft"
             />
