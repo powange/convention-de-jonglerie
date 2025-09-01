@@ -98,9 +98,11 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
-      - name: Setup database (DB tests only)
+      - name: Setup database schema (DB tests only)
         if: matrix.test-group.db
-        run: npx prisma db push
+        run: |
+          # Reset la base complètement pour éviter les conflits de migration
+          npx prisma migrate reset --force --skip-seed
 
       - name: Run tests - ${{ matrix.test-group.name }}
         run: ${{ matrix.test-group.cmd }}
