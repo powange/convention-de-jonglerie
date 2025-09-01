@@ -328,9 +328,9 @@ describe("Système d'éditions", () => {
       const result = await getEditionHandler(mockEvent as any)
 
       // Les emails doivent être transformés en emailHash
-      expect(result.creator.email).toBeUndefined()
+      expect(result.creator).not.toHaveProperty('email')
       expect(result.creator.emailHash).toBeDefined()
-      expect(result.convention.collaborators[0].user.email).toBeUndefined()
+      expect(result.convention.collaborators[0].user).not.toHaveProperty('email')
       expect(result.convention.collaborators[0].user.emailHash).toBeDefined()
     })
   })
