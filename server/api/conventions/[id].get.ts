@@ -52,13 +52,15 @@ export default defineEventHandler(async (event) => {
     const transformed = {
       ...convention,
       author: convention.author
-        ? {
-            ...convention.author,
-            emailHash: convention.author.email
-              ? (await import('../../utils/email-hash')).getEmailHash(convention.author.email)
-              : undefined,
-            email: undefined,
-          }
+        ? (() => {
+            const { email, ...authorWithoutEmail } = convention.author
+            return {
+              ...authorWithoutEmail,
+              emailHash: email
+                ? (await import('../../utils/email-hash')).getEmailHash(email)
+                : undefined,
+            }
+          })()
         : null,
       collaborators: convention.collaborators.map((c: any) => ({
         id: c.id,

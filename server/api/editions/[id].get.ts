@@ -95,13 +95,13 @@ export default defineEventHandler(async (event) => {
 
     // Transformer les emails en emailHash
     if (edition) {
-      // Transformer creator
+      // Transformer creator - ajouter emailHash et supprimer email
       if (edition.creator && edition.creator.email) {
         edition.creator = {
           ...edition.creator,
           emailHash: getEmailHash(edition.creator.email),
-          email: undefined,
-        }
+        } as any
+        delete (edition.creator as any).email
       }
 
       // Transformer les collaborateurs de la convention
@@ -120,7 +120,7 @@ export default defineEventHandler(async (event) => {
           user: {
             ...collab.user,
             emailHash: getEmailHash(collab.user.email),
-            email: undefined,
+            email: '', // Vide au lieu d'undefined pour éviter l'erreur TypeScript
           },
         }))
       }

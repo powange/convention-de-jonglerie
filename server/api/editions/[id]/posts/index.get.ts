@@ -57,22 +57,26 @@ export default defineEventHandler(async (event) => {
     })
 
     // Transformer les emails en emailHash
-    const transformedPosts = posts.map((post) => ({
-      ...post,
-      user: {
-        ...post.user,
-        emailHash: getEmailHash(post.user.email),
-        email: undefined,
-      } as any,
-      comments: post.comments.map((comment) => ({
-        ...comment,
+    const transformedPosts = posts.map((post) => {
+      const { email: postUserEmail, ...postUserWithoutEmail } = post.user
+      return {
+        ...post,
         user: {
-          ...comment.user,
-          emailHash: getEmailHash(comment.user.email),
-          email: undefined,
-        } as any,
-      })),
-    }))
+          ...postUserWithoutEmail,
+          emailHash: getEmailHash(postUserEmail),
+        },
+        comments: post.comments.map((comment) => {
+          const { email: commentUserEmail, ...commentUserWithoutEmail } = comment.user
+          return {
+            ...comment,
+            user: {
+              ...commentUserWithoutEmail,
+              emailHash: getEmailHash(commentUserEmail),
+            },
+          }
+        }),
+      }
+    })
 
     return transformedPosts
   } catch (error: any) {
