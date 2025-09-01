@@ -12,15 +12,6 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Essayer d'inclure les collaborateurs, fallback sans si la table n'existe pas
-    let includeCollaborators = false
-    try {
-      await prisma.editionCollaborator.findFirst()
-      includeCollaborators = true
-    } catch {
-      console.log('Table EditionCollaborator pas encore créée, ignorer les collaborateurs')
-    }
-
     const edition = await prisma.edition.findUnique({
       where: {
         id: editionId,
@@ -56,24 +47,6 @@ export default defineEventHandler(async (event) => {
             },
           },
         },
-        ...(includeCollaborators && {
-          collaborators: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  pseudo: true,
-                  profilePicture: true,
-                  updatedAt: true,
-                  email: true,
-                },
-              },
-              addedBy: {
-                select: { id: true, pseudo: true },
-              },
-            },
-          },
-        }),
       },
     })
 
@@ -128,7 +101,7 @@ export default defineEventHandler(async (event) => {
           ...edition.creator,
           emailHash: getEmailHash(edition.creator.email),
           email: undefined,
-        } as unknown
+        }
       }
 
       // Transformer les collaborateurs de la convention
@@ -148,19 +121,7 @@ export default defineEventHandler(async (event) => {
             ...collab.user,
             emailHash: getEmailHash(collab.user.email),
             email: undefined,
-          } as unknown,
-        }))
-      }
-
-      // Transformer les collaborateurs de l'édition
-      if (includeCollaborators && edition.collaborators) {
-        edition.collaborators = edition.collaborators.map((collab) => ({
-          ...collab,
-          user: {
-            ...collab.user,
-            emailHash: getEmailHash(collab.user.email),
-            email: undefined,
-          } as unknown,
+          },
         }))
       }
     }

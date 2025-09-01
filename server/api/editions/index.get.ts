@@ -235,16 +235,6 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Essayer d'inclure les collaborateurs, fallback sans si la table n'existe pas
-    let includeCollaborators = false
-    try {
-      // Test si la table EditionCollaborator existe
-      await prisma.editionCollaborator.findFirst()
-      includeCollaborators = true
-    } catch {
-      console.log('Table EditionCollaborator pas encore créée, ignorer les collaborateurs')
-    }
-
     // Calculer le skip et take pour la pagination
     const skip = (pageNumber - 1) * limitNumber
 
@@ -265,24 +255,6 @@ export default defineEventHandler(async (event) => {
         convention: {
           select: { id: true, name: true, description: true, logo: true },
         },
-        ...(includeCollaborators && {
-          collaborators: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  pseudo: true,
-                  profilePicture: true,
-                  updatedAt: true,
-                  email: true,
-                },
-              },
-              addedBy: {
-                select: { id: true, pseudo: true },
-              },
-            },
-          },
-        }),
       },
       orderBy: {
         startDate: 'asc', // Tri croissant par date de début (plus proche en premier)
