@@ -119,6 +119,7 @@ export default defineEventHandler(async (event) => {
       vehicleDetails: true,
       companionName: true,
       avoidList: true,
+      skills: true,
       user: {
         select: { id: true, pseudo: true, email: true, phone: true, prenom: true, nom: true },
       },

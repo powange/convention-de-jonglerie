@@ -23,6 +23,7 @@ const bodySchema = z.object({
   vehicleDetails: z.string().max(200).optional().nullable(),
   companionName: z.string().max(300).optional().nullable(),
   avoidList: z.string().max(500).optional().nullable(),
+  skills: z.string().max(1000).optional().nullable(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -129,6 +130,8 @@ export default defineEventHandler(async (event) => {
         (edition as any).volunteersAskAvoidList && parsed.avoidList?.trim()
           ? parsed.avoidList.trim()
           : null,
+      skills:
+        (edition as any).volunteersAskSkills && parsed.skills?.trim() ? parsed.skills.trim() : null,
     },
     select: {
       id: true,
@@ -143,6 +146,9 @@ export default defineEventHandler(async (event) => {
       minorsDetails: true,
       hasVehicle: true,
       vehicleDetails: true,
+      companionName: true,
+      avoidList: true,
+      skills: true,
     },
   })
   return { success: true, application }

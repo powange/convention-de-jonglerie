@@ -355,6 +355,17 @@
                   @update:model-value="persistVolunteerSettings"
                 />
 
+                <!-- Switch demander compétences/certifications -->
+                <USwitch
+                  v-model="volunteersAskSkillsLocal"
+                  :disabled="savingVolunteers"
+                  color="primary"
+                  class="mb-2"
+                  :label="t('editions.volunteers_ask_skills_label')"
+                  size="lg"
+                  @update:model-value="persistVolunteerSettings"
+                />
+
                 <!-- Switch demander préférences horaires (mode interne uniquement) -->
                 <USwitch
                   v-model="volunteersAskTimePreferencesLocal"
@@ -500,6 +511,7 @@ const volunteersAskMinorsLocal = ref(false)
 const volunteersAskVehicleLocal = ref(false)
 const volunteersAskCompanionLocal = ref(false)
 const volunteersAskAvoidListLocal = ref(false)
+const volunteersAskSkillsLocal = ref(false)
 const volunteersTeamsLocal = ref<{ name: string; slots?: number }[]>([])
 const volunteersUpdatedAt = ref<Date | null>(null)
 const savingVolunteers = ref(false)
@@ -549,6 +561,7 @@ function applyEditionVolunteerFields(src: any) {
   volunteersAskVehicleLocal.value = !!src.volunteersAskVehicle
   volunteersAskCompanionLocal.value = !!src.volunteersAskCompanion
   volunteersAskAvoidListLocal.value = !!src.volunteersAskAvoidList
+  volunteersAskSkillsLocal.value = !!src.volunteersAskSkills
   volunteersTeamsLocal.value = src.volunteersTeams
     ? JSON.parse(JSON.stringify(src.volunteersTeams))
     : []
@@ -615,6 +628,7 @@ const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {})
       askVehicle: volunteersAskVehicleLocal.value,
       askCompanion: volunteersAskCompanionLocal.value,
       askAvoidList: volunteersAskAvoidListLocal.value,
+      askSkills: volunteersAskSkillsLocal.value,
       teams: volunteersTeamsLocal.value.filter((team) => team.name.trim()),
     }
     if (volunteersModeLocal.value === 'EXTERNAL')
@@ -642,6 +656,7 @@ const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {})
           volunteersAskVehicle: res.settings.volunteersAskVehicle,
           volunteersAskCompanion: res.settings.volunteersAskCompanion,
           volunteersAskAvoidList: res.settings.volunteersAskAvoidList,
+          volunteersAskSkills: res.settings.volunteersAskSkills,
           volunteersTeams: res.settings.volunteersTeams,
           volunteersUpdatedAt: res.settings.volunteersUpdatedAt,
         })

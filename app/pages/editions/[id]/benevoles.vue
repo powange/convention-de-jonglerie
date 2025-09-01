@@ -425,7 +425,10 @@
 
           <!-- Section: Ce que vous pouvez nous apporter -->
           <div
-            v-if="volunteersInfo?.askVehicle && volunteersMode === 'INTERNAL'"
+            v-if="
+              (volunteersInfo?.askVehicle && volunteersMode === 'INTERNAL') ||
+              volunteersInfo?.askSkills
+            "
             class="space-y-4 w-full"
           >
             <h3
@@ -459,6 +462,26 @@
                 <p class="text-[11px] text-gray-500">
                   {{ t('editions.volunteers_vehicle_details_hint') }}
                 </p>
+              </div>
+            </div>
+
+            <!-- Compétences et certifications -->
+            <div v-if="volunteersInfo?.askSkills" class="space-y-2 w-full">
+              <UFormField>
+                <UTextarea
+                  v-model="skills"
+                  :label="t('editions.volunteers_skills_label')"
+                  :placeholder="t('editions.volunteers_skills_placeholder')"
+                  class="w-full"
+                  :rows="4"
+                  :maxlength="1000"
+                />
+              </UFormField>
+              <div class="flex justify-between items-center">
+                <p class="text-[11px] text-gray-500">
+                  {{ t('editions.volunteers_skills_hint') }}
+                </p>
+                <p class="text-[11px] text-gray-500">{{ skills.length }} / 1000</p>
               </div>
             </div>
           </div>
@@ -820,6 +843,7 @@ const hasVehicle = ref(false)
 const vehicleDetails = ref('')
 const companionName = ref('')
 const avoidList = ref('')
+const skills = ref('')
 
 // Items de créneaux horaires pour UCheckboxGroup
 const timeSlotItems = computed(() => [
@@ -925,6 +949,8 @@ const applyAsVolunteer = async () => {
           volunteersInfo.value?.askAvoidList && avoidList.value.trim()
             ? avoidList.value.trim()
             : undefined,
+        skills:
+          volunteersInfo.value?.askSkills && skills.value.trim() ? skills.value.trim() : undefined,
       },
     } as any)
     if (res?.application && volunteersInfo.value)
@@ -950,6 +976,7 @@ const applyAsVolunteer = async () => {
     vehicleDetails.value = ''
     companionName.value = ''
     avoidList.value = ''
+    skills.value = ''
     showApplyModal.value = false
   } catch (e: any) {
     toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
@@ -1346,6 +1373,40 @@ const columns: TableColumn<any>[] = [
                     },
                     [
                       h('span', { class: 'text-xs max-w-[100px] truncate' }, avoidList),
+                      h(resolveComponent('UIcon'), {
+                        name: 'i-heroicons-information-circle',
+                        class: 'text-gray-400',
+                        size: '14',
+                      }),
+                    ]
+                  ),
+              }
+            )
+          },
+        } as TableColumn<any>,
+      ]
+    : []),
+  // Colonne compétences si activée
+  ...(volunteersInfo.value?.askSkills
+    ? [
+        {
+          accessorKey: 'skills',
+          header: t('editions.volunteers_table_skills'),
+          cell: ({ row }: any) => {
+            const skills = row.original.skills
+            if (!skills) return h('span', '—')
+            return h(
+              resolveComponent('UTooltip'),
+              { text: skills, openDelay: 200 },
+              {
+                default: () =>
+                  h(
+                    'div',
+                    {
+                      class: 'flex items-center gap-1 cursor-help',
+                    },
+                    [
+                      h('span', { class: 'text-xs max-w-[150px] truncate' }, skills),
                       h(resolveComponent('UIcon'), {
                         name: 'i-heroicons-information-circle',
                         class: 'text-gray-400',
