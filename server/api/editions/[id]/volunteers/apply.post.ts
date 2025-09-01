@@ -15,6 +15,10 @@ const bodySchema = z.object({
   allergies: z.string().max(500).optional().nullable(),
   timePreferences: z.array(z.string()).max(8).optional(),
   teamPreferences: z.array(z.string()).max(20).optional(),
+  hasPets: z.boolean().optional(),
+  petsDetails: z.string().max(200).optional().nullable(),
+  hasMinors: z.boolean().optional(),
+  minorsDetails: z.string().max(200).optional().nullable(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -32,6 +36,8 @@ export default defineEventHandler(async (event) => {
       volunteersAskAllergies: true,
       volunteersAskTimePreferences: true,
       volunteersAskTeamPreferences: true,
+      volunteersAskPets: true,
+      volunteersAskMinors: true,
       volunteersTeams: true,
     },
   })
@@ -94,6 +100,16 @@ export default defineEventHandler(async (event) => {
         (edition as any).volunteersAskTeamPreferences && parsed.teamPreferences?.length
           ? parsed.teamPreferences
           : null,
+      hasPets: (edition as any).volunteersAskPets && parsed.hasPets ? parsed.hasPets : null,
+      petsDetails:
+        (edition as any).volunteersAskPets && parsed.hasPets && parsed.petsDetails?.trim()
+          ? parsed.petsDetails.trim()
+          : null,
+      hasMinors: (edition as any).volunteersAskMinors && parsed.hasMinors ? parsed.hasMinors : null,
+      minorsDetails:
+        (edition as any).volunteersAskMinors && parsed.hasMinors && parsed.minorsDetails?.trim()
+          ? parsed.minorsDetails.trim()
+          : null,
     },
     select: {
       id: true,
@@ -102,6 +118,10 @@ export default defineEventHandler(async (event) => {
       allergies: true,
       timePreferences: true,
       teamPreferences: true,
+      hasPets: true,
+      petsDetails: true,
+      hasMinors: true,
+      minorsDetails: true,
     },
   })
   return { success: true, application }

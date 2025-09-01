@@ -136,6 +136,10 @@ model Edition {
   volunteersAskTimePreferences Boolean                    @default(false)
   // Demander les préférences d'équipes dans le formulaire interne ?
   volunteersAskTeamPreferences Boolean                    @default(false)
+  // Demander si accompagné d'un animal de compagnie dans le formulaire interne ?
+  volunteersAskPets       Boolean                         @default(false)
+  // Demander si accompagné d'une personne mineure dans le formulaire interne ?
+  volunteersAskMinors     Boolean                         @default(false)
   // Équipes de bénévoles avec optionnellement le nombre de places (JSON array)
   volunteersTeams         Json?
   volunteerApplications   EditionVolunteerApplication[]
@@ -445,6 +449,14 @@ model EditionVolunteerApplication {
   timePreferences   Json?
   // Préférences d'équipes choisies (JSON array de noms d'équipes)
   teamPreferences   Json?
+  // Si accompagné d'un animal de compagnie
+  hasPets           Boolean?
+  // Détails sur les animaux de compagnie
+  petsDetails       String?         @db.Text
+  // Si accompagné d'une personne mineure
+  hasMinors         Boolean?
+  // Détails sur les personnes mineures
+  minorsDetails     String?         @db.Text
   edition           Edition         @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 

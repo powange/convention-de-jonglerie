@@ -282,7 +282,6 @@
     "deleted": "Slettet",
     "description": "Beskrivelse",
     "edit": "Rediger",
-    "volunteers_short": "Frivillige",
     "editor": {
       "back_to_edit": "Tilbage til redigering",
       "block_tooltip": "Kodeblok",
@@ -311,6 +310,7 @@
     "location": "Sted",
     "manage": "Administrer",
     "name": "Navn",
+    "no_permission": "Ingen tilladelse",
     "no_results": "Ingen resultater",
     "optional": "Valgfrit",
     "or": "Eller",
@@ -335,7 +335,9 @@
     "tip": "Tip",
     "updated_at": "Opdateret den {date}",
     "view": "Se",
-    "view_details": "Se detaljer"
+    "view_details": "Se detaljer",
+    "volunteers_short": "Frivillige",
+    "yes": "Ja"
   },
   "components": {
     "carpool": {
@@ -623,6 +625,8 @@
     "volunteers_apply_description": "Indsend din ansøgning for at hjælpe under udgaven.",
     "volunteers_ask_allergies_label": "Spørg allergier",
     "volunteers_ask_diet_label": "Spørg kostpræference",
+    "volunteers_ask_minors_label": "Spørg om ledsaget af mindreårige",
+    "volunteers_ask_pets_label": "Spørg om ledsaget af kæledyr",
     "volunteers_ask_team_preferences_label": "Spørg om holdpræferencer",
     "volunteers_ask_time_preferences_label": "Spørg om tidspræferencer",
     "volunteers_closed_message": "Ansøgninger for frivillige er ikke åbne i øjeblikket.",
@@ -637,6 +641,11 @@
     "volunteers_last_name": "Efternavn",
     "volunteers_last_name_required": "Efternavn (påkrævet – mangler i din profil)",
     "volunteers_login_prompt": "Log ind for at ansøge som frivillig.",
+    "volunteers_management_title": "Ansøgningsstyring",
+    "volunteers_minors_details_hint": "Disse oplysninger vil hjælpe arrangørerne med at modtage dig bedre",
+    "volunteers_minors_details_label": "Detaljer om den mindreårige",
+    "volunteers_minors_details_placeholder": "Alder, navn, særlige behov...",
+    "volunteers_minors_label": "Jeg vil blive ledsaget af en mindreårig",
     "volunteers_mode_external": "Ekstern (link til tredjepartsværktøj)",
     "volunteers_mode_internal": "Intern (formular på stedet)",
     "volunteers_mode_label": "Håndteringstilstand for ansøgninger",
@@ -652,6 +661,10 @@
     "volunteers_open": "Åben",
     "volunteers_personal_info_disclaimer": "Ovenstående oplysninger (fornavn, efternavn, email, telefon) vil blive givet til arrangører for at administrere frivillige teams. Udfyld manglende felter nedenfor hvis nødvendigt.",
     "volunteers_personal_info_notice": "Delte personlige oplysninger",
+    "volunteers_pets_details_hint": "Disse oplysninger vil hjælpe arrangørerne med at modtage dig bedre",
+    "volunteers_pets_details_label": "Detaljer om dit kæledyr",
+    "volunteers_pets_details_placeholder": "Type, race, navn, særlige forholdsregler...",
+    "volunteers_pets_label": "Jeg vil blive ledsaget af et kæledyr",
     "volunteers_phone": "Telefon",
     "volunteers_phone_required": "Telefon (påkrævet for at kontakte dig)",
     "volunteers_search": "Søg",
@@ -664,7 +677,9 @@
     "volunteers_table_diet": "Kost",
     "volunteers_table_first_name": "Fornavn",
     "volunteers_table_last_name": "Efternavn",
+    "volunteers_table_minors": "Mindreårig",
     "volunteers_table_motivation": "Kommentarer",
+    "volunteers_table_pets": "Kæledyr",
     "volunteers_table_team_preferences": "Foretrukne hold",
     "volunteers_table_time_preferences": "Tidsrammer",
     "volunteers_table_user": "Ansøger",
@@ -690,8 +705,9 @@
       "night": "Nat (2-6)"
     },
     "volunteers_title": "Frivillige",
-    "volunteers_management_title": "Ansøgningsstyring",
     "volunteers_total": "I alt",
+    "volunteers_view_only_description": "Du kan se ansøgningerne, men kun frivilligledere kan acceptere eller afvise ansøgninger.",
+    "volunteers_view_only_note": "Kun visning tilstand",
     "volunteers_withdraw": "Træk min ansøgning tilbage"
   },
   "errors": {

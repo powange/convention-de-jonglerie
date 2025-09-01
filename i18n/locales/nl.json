@@ -282,7 +282,6 @@
     "deleted": "Verwijderd",
     "description": "Beschrijving",
     "edit": "Bewerken",
-    "volunteers_short": "Vrijwilligers",
     "editor": {
       "back_to_edit": "Terug naar bewerken",
       "block_tooltip": "Codeblok",
@@ -311,6 +310,7 @@
     "location": "Locatie",
     "manage": "Beheren",
     "name": "Naam",
+    "no_permission": "Geen toestemming",
     "no_results": "Geen resultaten",
     "optional": "Optioneel",
     "or": "Of",
@@ -335,7 +335,9 @@
     "tip": "Tip",
     "updated_at": "Bijgewerkt op {date}",
     "view": "Bekijken",
-    "view_details": "Details bekijken"
+    "view_details": "Details bekijken",
+    "volunteers_short": "Vrijwilligers",
+    "yes": "Ja"
   },
   "components": {
     "carpool": {
@@ -623,6 +625,8 @@
     "volunteers_apply_description": "Dien je aanmelding in om te helpen tijdens de editie.",
     "volunteers_ask_allergies_label": "Allergieën vragen",
     "volunteers_ask_diet_label": "Dieetvoorkeur vragen",
+    "volunteers_ask_minors_label": "Vragen of vergezeld door een minderjarige",
+    "volunteers_ask_pets_label": "Vragen of vergezeld door een huisdier",
     "volunteers_ask_team_preferences_label": "Teamvoorkeuren vragen",
     "volunteers_ask_time_preferences_label": "Tijdvoorkeuren vragen",
     "volunteers_closed_message": "Vrijwilligersaanmeldingen zijn momenteel niet open.",
@@ -637,6 +641,11 @@
     "volunteers_last_name": "Achternaam",
     "volunteers_last_name_required": "Achternaam (vereist – ontbreekt in je profiel)",
     "volunteers_login_prompt": "Log in om je als vrijwilliger aan te melden.",
+    "volunteers_management_title": "Aanmelding beheer",
+    "volunteers_minors_details_hint": "Deze informatie helpt organisatoren u beter te ontvangen",
+    "volunteers_minors_details_label": "Details over de minderjarige",
+    "volunteers_minors_details_placeholder": "Leeftijd, naam, bijzondere behoeften...",
+    "volunteers_minors_label": "Ik word vergezeld door een minderjarige",
     "volunteers_mode_external": "Extern (link naar tool van derden)",
     "volunteers_mode_internal": "Intern (formulier ter plaatse)",
     "volunteers_mode_label": "Verwerkingsmodus voor aanmeldingen",
@@ -652,6 +661,10 @@
     "volunteers_open": "Open",
     "volunteers_personal_info_disclaimer": "De bovenstaande informatie (voornaam, achternaam, email, telefoon) wordt aan organisatoren verstrekt om vrijwilligersteams te beheren. Vul indien nodig de ontbrekende velden hieronder in.",
     "volunteers_personal_info_notice": "Gedeelde persoonlijke informatie",
+    "volunteers_pets_details_hint": "Deze informatie helpt organisatoren u beter te ontvangen",
+    "volunteers_pets_details_label": "Details over uw dier",
+    "volunteers_pets_details_placeholder": "Type, ras, naam, speciale voorzorgsmaatregelen...",
+    "volunteers_pets_label": "Ik word vergezeld door een huisdier",
     "volunteers_phone": "Telefoon",
     "volunteers_phone_required": "Telefoon (vereist om contact op te nemen)",
     "volunteers_search": "Zoeken",
@@ -664,7 +677,9 @@
     "volunteers_table_diet": "Dieet",
     "volunteers_table_first_name": "Voornaam",
     "volunteers_table_last_name": "Achternaam",
+    "volunteers_table_minors": "Minderjarige",
     "volunteers_table_motivation": "Opmerkingen",
+    "volunteers_table_pets": "Huisdier",
     "volunteers_table_team_preferences": "Gewenste teams",
     "volunteers_table_time_preferences": "Tijdsloten",
     "volunteers_table_user": "Aanvrager",
@@ -690,8 +705,9 @@
       "night": "Nacht (2-6 uur)"
     },
     "volunteers_title": "Vrijwilligers",
-    "volunteers_management_title": "Aanmelding beheer",
     "volunteers_total": "Totaal",
+    "volunteers_view_only_description": "U kunt de aanmeldingen bekijken, maar alleen vrijwilligersbeheerders kunnen aanmeldingen accepteren of afwijzen.",
+    "volunteers_view_only_note": "Alleen bekijkmodus",
     "volunteers_withdraw": "Trek mijn aanmelding in"
   },
   "errors": {

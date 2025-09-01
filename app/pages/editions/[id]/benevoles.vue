@@ -292,6 +292,58 @@
             </p>
           </div>
 
+          <!-- Animaux de compagnie -->
+          <div
+            v-if="volunteersInfo?.askPets && volunteersMode === 'INTERNAL'"
+            class="space-y-2 w-full"
+          >
+            <UFormField>
+              <USwitch v-model="hasPets" :label="t('editions.volunteers_pets_label')" size="lg" />
+            </UFormField>
+            <div v-if="hasPets" class="ml-8">
+              <UFormField :label="t('editions.volunteers_pets_details_label')">
+                <UTextarea
+                  v-model="petsDetails"
+                  :placeholder="t('editions.volunteers_pets_details_placeholder')"
+                  :rows="2"
+                  class="w-full"
+                  :maxlength="200"
+                />
+              </UFormField>
+              <p class="text-[11px] text-gray-500">
+                {{ t('editions.volunteers_pets_details_hint') }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Personnes mineures -->
+          <div
+            v-if="volunteersInfo?.askMinors && volunteersMode === 'INTERNAL'"
+            class="space-y-2 w-full"
+          >
+            <UFormField>
+              <USwitch
+                v-model="hasMinors"
+                :label="t('editions.volunteers_minors_label')"
+                size="lg"
+              />
+            </UFormField>
+            <div v-if="hasMinors" class="ml-8">
+              <UFormField :label="t('editions.volunteers_minors_details_label')">
+                <UTextarea
+                  v-model="minorsDetails"
+                  :placeholder="t('editions.volunteers_minors_details_placeholder')"
+                  :rows="2"
+                  class="w-full"
+                  :maxlength="200"
+                />
+              </UFormField>
+              <p class="text-[11px] text-gray-500">
+                {{ t('editions.volunteers_minors_details_hint') }}
+              </p>
+            </div>
+          </div>
+
           <!-- Motivation (déplacé en bas) -->
           <UFormField :label="t('editions.volunteers_motivation_label')" class="w-full">
             <div class="space-y-1 w-full">
@@ -602,6 +654,8 @@ interface VolunteerInfo {
   askAllergies?: boolean
   askTimePreferences?: boolean
   askTeamPreferences?: boolean
+  askPets?: boolean
+  askMinors?: boolean
   teams?: { name: string; slots?: number }[]
 }
 const volunteersInfo = ref<VolunteerInfo | null>(null)
@@ -629,6 +683,10 @@ const selectedDietPreference = ref<'NONE' | 'VEGETARIAN' | 'VEGAN'>('NONE')
 const volunteerAllergies = ref('')
 const selectedTimePreferences = ref<string[]>([])
 const selectedTeamPreferences = ref<string[]>([])
+const hasPets = ref(false)
+const petsDetails = ref('')
+const hasMinors = ref(false)
+const minorsDetails = ref('')
 
 // Items de créneaux horaires pour UCheckboxGroup
 const timeSlotItems = computed(() => [
@@ -711,6 +769,16 @@ const applyAsVolunteer = async () => {
           volunteersInfo.value?.askTeamPreferences && selectedTeamPreferences.value.length > 0
             ? selectedTeamPreferences.value
             : undefined,
+        hasPets: volunteersInfo.value?.askPets ? hasPets.value || undefined : undefined,
+        petsDetails:
+          volunteersInfo.value?.askPets && hasPets.value && petsDetails.value.trim()
+            ? petsDetails.value.trim()
+            : undefined,
+        hasMinors: volunteersInfo.value?.askMinors ? hasMinors.value || undefined : undefined,
+        minorsDetails:
+          volunteersInfo.value?.askMinors && hasMinors.value && minorsDetails.value.trim()
+            ? minorsDetails.value.trim()
+            : undefined,
       },
     } as any)
     if (res?.application && volunteersInfo.value)
@@ -727,6 +795,11 @@ const applyAsVolunteer = async () => {
     volunteerLastName.value = ''
     volunteerAllergies.value = ''
     selectedTimePreferences.value = []
+    selectedTeamPreferences.value = []
+    hasPets.value = false
+    petsDetails.value = ''
+    hasMinors.value = false
+    minorsDetails.value = ''
     showApplyModal.value = false
   } catch (e: any) {
     toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
@@ -898,6 +971,10 @@ const tableData = computed(() =>
     nom: app.user.nom,
     dietaryPreference: (app as any).dietaryPreference,
     allergies: (app as any).allergies,
+    hasPets: (app as any).hasPets,
+    petsDetails: (app as any).petsDetails,
+    hasMinors: (app as any).hasMinors,
+    minorsDetails: (app as any).minorsDetails,
   }))
 )
 
@@ -972,6 +1049,76 @@ const columns: TableColumn<any>[] = [
             row.original.allergies
               ? h('span', { class: 'text-xs truncate block max-w-[160px]' }, row.original.allergies)
               : '—',
+        } as TableColumn<any>,
+      ]
+    : []),
+  // Colonne animaux de compagnie si activée
+  ...(volunteersInfo.value?.askPets
+    ? [
+        {
+          accessorKey: 'hasPets',
+          header: t('editions.volunteers_table_pets'),
+          cell: ({ row }: any) => {
+            if (!row.original.hasPets) return h('span', '—')
+            const petsDetails = row.original.petsDetails
+            if (!petsDetails) return h('span', { class: 'text-xs' }, t('common.yes'))
+            return h(
+              resolveComponent('UTooltip'),
+              { text: petsDetails, openDelay: 200 },
+              {
+                default: () =>
+                  h(
+                    'div',
+                    {
+                      class: 'flex items-center gap-1 cursor-help',
+                    },
+                    [
+                      h('span', { class: 'text-xs' }, t('common.yes')),
+                      h(resolveComponent('UIcon'), {
+                        name: 'i-heroicons-information-circle',
+                        class: 'text-gray-400',
+                        size: '14',
+                      }),
+                    ]
+                  ),
+              }
+            )
+          },
+        } as TableColumn<any>,
+      ]
+    : []),
+  // Colonne personnes mineures si activée
+  ...(volunteersInfo.value?.askMinors
+    ? [
+        {
+          accessorKey: 'hasMinors',
+          header: t('editions.volunteers_table_minors'),
+          cell: ({ row }: any) => {
+            if (!row.original.hasMinors) return h('span', '—')
+            const minorsDetails = row.original.minorsDetails
+            if (!minorsDetails) return h('span', { class: 'text-xs' }, t('common.yes'))
+            return h(
+              resolveComponent('UTooltip'),
+              { text: minorsDetails, openDelay: 200 },
+              {
+                default: () =>
+                  h(
+                    'div',
+                    {
+                      class: 'flex items-center gap-1 cursor-help',
+                    },
+                    [
+                      h('span', { class: 'text-xs' }, t('common.yes')),
+                      h(resolveComponent('UIcon'), {
+                        name: 'i-heroicons-information-circle',
+                        class: 'text-gray-400',
+                        size: '14',
+                      }),
+                    ]
+                  ),
+              }
+            )
+          },
         } as TableColumn<any>,
       ]
     : []),
@@ -1189,8 +1336,16 @@ const filteredCountLabel = computed(() => {
 const openApplyModal = () => {
   volunteerMotivation.value = ''
   volunteerPhone.value = ''
+  volunteerFirstName.value = ''
+  volunteerLastName.value = ''
+  volunteerAllergies.value = ''
+  selectedDietPreference.value = 'NONE'
   selectedTimePreferences.value = []
   selectedTeamPreferences.value = []
+  hasPets.value = false
+  petsDetails.value = ''
+  hasMinors.value = false
+  minorsDetails.value = ''
   showApplyModal.value = true
   nextTick(() => {
     const textarea = motivationTextareaRef.value as any

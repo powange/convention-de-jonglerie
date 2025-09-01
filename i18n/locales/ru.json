@@ -282,7 +282,6 @@
     "deleted": "Удалено",
     "description": "Описание",
     "edit": "Редактировать",
-    "volunteers_short": "Волонтёры",
     "editor": {
       "back_to_edit": "Вернуться к редактированию",
       "block_tooltip": "Блок кода",
@@ -311,6 +310,7 @@
     "location": "Местоположение",
     "manage": "Управлять",
     "name": "Имя",
+    "no_permission": "Нет разрешения",
     "no_results": "Нет результатов",
     "optional": "Необязательно",
     "or": "Или",
@@ -335,7 +335,9 @@
     "tip": "Совет",
     "updated_at": "Обновлено {date}",
     "view": "Просмотреть",
-    "view_details": "Просмотреть детали"
+    "view_details": "Просмотреть детали",
+    "volunteers_short": "Волонтёры",
+    "yes": "Да"
   },
   "components": {
     "carpool": {
@@ -623,6 +625,8 @@
     "volunteers_apply_description": "Отправьте заявку на помощь во время мероприятия.",
     "volunteers_ask_allergies_label": "Запрашивать аллергии",
     "volunteers_ask_diet_label": "Запрашивать пищевые предпочтения",
+    "volunteers_ask_minors_label": "Спросить о сопровождении несовершеннолетних",
+    "volunteers_ask_pets_label": "Спросить о домашних животных",
     "volunteers_ask_team_preferences_label": "Запрашивать предпочтения команд",
     "volunteers_ask_time_preferences_label": "Запрашивать временные предпочтения",
     "volunteers_closed_message": "Заявки волонтёров в настоящее время не принимаются.",
@@ -637,6 +641,11 @@
     "volunteers_last_name": "Фамилия",
     "volunteers_last_name_required": "Фамилия (обязательно – отсутствует в профиле)",
     "volunteers_login_prompt": "Войдите, чтобы подать заявку волонтёра.",
+    "volunteers_management_title": "Управление заявками",
+    "volunteers_minors_details_hint": "Эта информация поможет организаторам лучше вас принять",
+    "volunteers_minors_details_label": "Подробности о несовершеннолетнем",
+    "volunteers_minors_details_placeholder": "Возраст, имя, особые потребности...",
+    "volunteers_minors_label": "Я буду сопровождаться несовершеннолетним",
     "volunteers_mode_external": "Внешний (ссылка на сторонний инструмент)",
     "volunteers_mode_internal": "Внутренний (форма на сайте)",
     "volunteers_mode_label": "Режим обработки заявок",
@@ -652,6 +661,10 @@
     "volunteers_open": "Открыть",
     "volunteers_personal_info_disclaimer": "Указанная выше информация (имя, фамилия, email, телефон) будет предоставлена организаторам для управления командами волонтёров. При необходимости заполните недостающие поля ниже.",
     "volunteers_personal_info_notice": "Передаваемая личная информация",
+    "volunteers_pets_details_hint": "Эта информация поможет организаторам лучше вас принять",
+    "volunteers_pets_details_label": "Подробности о вашем животном",
+    "volunteers_pets_details_placeholder": "Тип, порода, имя, особые меры предосторожности...",
+    "volunteers_pets_label": "Я буду с домашним животным",
     "volunteers_phone": "Телефон",
     "volunteers_phone_required": "Телефон (необходим для связи)",
     "volunteers_search": "Поиск",
@@ -664,7 +677,9 @@
     "volunteers_table_diet": "Диета",
     "volunteers_table_first_name": "Имя",
     "volunteers_table_last_name": "Фамилия",
+    "volunteers_table_minors": "Несовершеннолетний",
     "volunteers_table_motivation": "Комментарии",
+    "volunteers_table_pets": "Домашнее животное",
     "volunteers_table_team_preferences": "Предпочитаемые команды",
     "volunteers_table_time_preferences": "Временные промежутки",
     "volunteers_table_user": "Заявитель",
@@ -690,8 +705,9 @@
       "night": "Ночь (2-6 ч)"
     },
     "volunteers_title": "Волонтёры",
-    "volunteers_management_title": "Управление заявками",
     "volunteers_total": "Всего",
+    "volunteers_view_only_description": "Вы можете просматривать заявки, но только менеджеры волонтёров могут принимать или отклонять заявки.",
+    "volunteers_view_only_note": "Режим только просмотра",
     "volunteers_withdraw": "Отозвать мою заявку"
   },
   "errors": {

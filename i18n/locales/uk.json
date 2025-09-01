@@ -282,7 +282,6 @@
     "deleted": "Видалено",
     "description": "Опис",
     "edit": "Редагувати",
-    "volunteers_short": "Волонтери",
     "editor": {
       "back_to_edit": "Повернутися до редагування",
       "block_tooltip": "Блок коду",
@@ -311,6 +310,7 @@
     "location": "Місце",
     "manage": "Керувати",
     "name": "Ім'я",
+    "no_permission": "Немає дозволу",
     "no_results": "Немає результатів",
     "optional": "Необов'язково",
     "or": "Або",
@@ -335,7 +335,9 @@
     "tip": "Порада",
     "updated_at": "Оновлено {date}",
     "view": "Переглянути",
-    "view_details": "Переглянути деталі"
+    "view_details": "Переглянути деталі",
+    "volunteers_short": "Волонтери",
+    "yes": "Так"
   },
   "components": {
     "carpool": {
@@ -623,6 +625,8 @@
     "volunteers_apply_description": "Надішліть заявку на допомогу під час заходу.",
     "volunteers_ask_allergies_label": "Запитувати алергії",
     "volunteers_ask_diet_label": "Запитувати харчові вподобання",
+    "volunteers_ask_minors_label": "Запитати про супровід неповнолітніх",
+    "volunteers_ask_pets_label": "Запитати про домашніх тварин",
     "volunteers_ask_team_preferences_label": "Запитувати переваги команд",
     "volunteers_ask_time_preferences_label": "Запитувати часові переваги",
     "volunteers_closed_message": "Заявки волонтерів наразі не приймаються.",
@@ -637,6 +641,11 @@
     "volunteers_last_name": "Прізвище",
     "volunteers_last_name_required": "Прізвище (обов'язково – відсутнє в профілі)",
     "volunteers_login_prompt": "Увійдіть, щоб подати заявку волонтера.",
+    "volunteers_management_title": "Управління заявками",
+    "volunteers_minors_details_hint": "Ця інформація допоможе організаторам краще вас прийняти",
+    "volunteers_minors_details_label": "Подробиці про неповнолітнього",
+    "volunteers_minors_details_placeholder": "Вік, ім'я, особливі потреби...",
+    "volunteers_minors_label": "Мене супроводжуватиме неповнолітній",
     "volunteers_mode_external": "Зовнішній (посилання на сторонній інструмент)",
     "volunteers_mode_internal": "Внутрішній (форма на сайті)",
     "volunteers_mode_label": "Режим обробки заявок",
@@ -652,6 +661,10 @@
     "volunteers_open": "Відкрити",
     "volunteers_personal_info_disclaimer": "Вказана вище інформація (ім'я, прізвище, email, телефон) буде надана організаторам для управління командами волонтерів. За потреби заповніть відсутні поля нижче.",
     "volunteers_personal_info_notice": "Передана особиста інформація",
+    "volunteers_pets_details_hint": "Ця інформація допоможе організаторам краще вас прийняти",
+    "volunteers_pets_details_label": "Подробиці про вашу тварину",
+    "volunteers_pets_details_placeholder": "Тип, порода, ім'я, особливі заходи безпеки...",
+    "volunteers_pets_label": "Мене супроводжуватиме домашня тварина",
     "volunteers_phone": "Телефон",
     "volunteers_phone_required": "Телефон (необхідний для зв'язку)",
     "volunteers_search": "Пошук",
@@ -664,7 +677,9 @@
     "volunteers_table_diet": "Дієта",
     "volunteers_table_first_name": "Ім'я",
     "volunteers_table_last_name": "Прізвище",
+    "volunteers_table_minors": "Неповнолітній",
     "volunteers_table_motivation": "Коментарі",
+    "volunteers_table_pets": "Домашня тварина",
     "volunteers_table_team_preferences": "Бажані команди",
     "volunteers_table_time_preferences": "Проміжки часу",
     "volunteers_table_user": "Заявник",
@@ -690,8 +705,9 @@
       "night": "Ніч (2-6 год)"
     },
     "volunteers_title": "Волонтери",
-    "volunteers_management_title": "Управління заявками",
     "volunteers_total": "Всього",
+    "volunteers_view_only_description": "Ви можете переглядати заявки, але лише менеджери волонтерів можуть приймати або відхиляти заявки.",
+    "volunteers_view_only_note": "Режим лише перегляду",
     "volunteers_withdraw": "Відкликати мою заявку"
   },
   "errors": {

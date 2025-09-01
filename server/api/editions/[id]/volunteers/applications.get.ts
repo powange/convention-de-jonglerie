@@ -111,6 +111,10 @@ export default defineEventHandler(async (event) => {
       allergies: true,
       timePreferences: true,
       teamPreferences: true,
+      hasPets: true,
+      petsDetails: true,
+      hasMinors: true,
+      minorsDetails: true,
       user: {
         select: { id: true, pseudo: true, email: true, phone: true, prenom: true, nom: true },
       },

@@ -282,7 +282,6 @@
     "deleted": "Eliminato",
     "description": "Descrizione",
     "edit": "Modifica",
-    "volunteers_short": "Volontari",
     "editor": {
       "back_to_edit": "Torna alla modifica",
       "block_tooltip": "Blocco di codice",
@@ -311,6 +310,7 @@
     "location": "Luogo",
     "manage": "Gestisci",
     "name": "Nome",
+    "no_permission": "Nessun permesso",
     "no_results": "Nessun risultato",
     "optional": "Opzionale",
     "or": "Oppure",
@@ -335,7 +335,9 @@
     "tip": "Consiglio",
     "updated_at": "Aggiornato il {date}",
     "view": "Visualizza",
-    "view_details": "Visualizza dettagli"
+    "view_details": "Visualizza dettagli",
+    "volunteers_short": "Volontari",
+    "yes": "Sì"
   },
   "components": {
     "carpool": {
@@ -623,6 +625,8 @@
     "volunteers_apply_description": "Invia la tua candidatura per aiutare durante l'edizione.",
     "volunteers_ask_allergies_label": "Richiedere le allergie",
     "volunteers_ask_diet_label": "Richiedere la preferenza alimentare",
+    "volunteers_ask_minors_label": "Chiedere se accompagnato da un minore",
+    "volunteers_ask_pets_label": "Chiedere se accompagnato da un animale domestico",
     "volunteers_ask_team_preferences_label": "Richiedere preferenze team",
     "volunteers_ask_time_preferences_label": "Richiedere preferenze orarie",
     "volunteers_closed_message": "Le candidature per volontari non sono aperte al momento.",
@@ -637,6 +641,11 @@
     "volunteers_last_name": "Cognome",
     "volunteers_last_name_required": "Cognome (richiesto – mancante nel tuo profilo)",
     "volunteers_login_prompt": "Accedi per candidarti come volontario.",
+    "volunteers_management_title": "Gestione candidature",
+    "volunteers_minors_details_hint": "Queste informazioni aiuteranno gli organizzatori ad accogliervi meglio",
+    "volunteers_minors_details_label": "Dettagli sulla persona minorenne",
+    "volunteers_minors_details_placeholder": "Età, nome, esigenze particolari...",
+    "volunteers_minors_label": "Sarò accompagnato/a da una persona minorenne",
     "volunteers_mode_external": "Esterno (link a strumento di terze parti)",
     "volunteers_mode_internal": "Interno (modulo sul sito)",
     "volunteers_mode_label": "Modalità di gestione candidature",
@@ -652,6 +661,10 @@
     "volunteers_open": "Apri",
     "volunteers_personal_info_disclaimer": "Le informazioni sopra (nome, cognome, email, telefono) saranno fornite agli organizzatori per gestire i team di volontari. Completa i campi mancanti di seguito se necessario.",
     "volunteers_personal_info_notice": "Informazioni personali condivise",
+    "volunteers_pets_details_hint": "Queste informazioni aiuteranno gli organizzatori ad accogliervi meglio",
+    "volunteers_pets_details_label": "Dettagli sul vostro animale",
+    "volunteers_pets_details_placeholder": "Tipo, razza, nome, precauzioni particolari...",
+    "volunteers_pets_label": "Sarò accompagnato/a da un animale domestico",
     "volunteers_phone": "Telefono",
     "volunteers_phone_required": "Telefono (richiesto per contattarti)",
     "volunteers_search": "Cerca",
@@ -664,7 +677,9 @@
     "volunteers_table_diet": "Dieta",
     "volunteers_table_first_name": "Nome",
     "volunteers_table_last_name": "Cognome",
+    "volunteers_table_minors": "Persona minorenne",
     "volunteers_table_motivation": "Commenti",
+    "volunteers_table_pets": "Animale domestico",
     "volunteers_table_team_preferences": "Team preferiti",
     "volunteers_table_time_preferences": "Fasce orarie",
     "volunteers_table_user": "Candidato",
@@ -690,8 +705,9 @@
       "night": "Notte (2-6)"
     },
     "volunteers_title": "Volontari",
-    "volunteers_management_title": "Gestione candidature",
     "volunteers_total": "Totale",
+    "volunteers_view_only_description": "Potete consultare le candidature ma solo i gestori dei volontari possono accettare o rifiutare le candidature.",
+    "volunteers_view_only_note": "Solo modalità consultazione",
     "volunteers_withdraw": "Ritira la mia candidatura"
   },
   "errors": {

@@ -282,7 +282,6 @@
     "deleted": "Eliminado",
     "description": "Descripción",
     "edit": "Editar",
-    "volunteers_short": "Voluntarios",
     "editor": {
       "back_to_edit": "Volver a edición",
       "block_tooltip": "Bloque de código",
@@ -311,6 +310,7 @@
     "location": "Ubicación",
     "manage": "Gestionar",
     "name": "Nombre",
+    "no_permission": "Sin permisos",
     "no_results": "Sin resultados",
     "optional": "Opcional",
     "or": "O",
@@ -335,7 +335,9 @@
     "tip": "Consejo",
     "updated_at": "Actualizado el {date}",
     "view": "Ver",
-    "view_details": "Ver detalles"
+    "view_details": "Ver detalles",
+    "volunteers_short": "Voluntarios",
+    "yes": "Sí"
   },
   "components": {
     "carpool": {
@@ -623,6 +625,8 @@
     "volunteers_apply_description": "Envía tu solicitud para ayudar durante la edición.",
     "volunteers_ask_allergies_label": "Preguntar alergias",
     "volunteers_ask_diet_label": "Preguntar preferencia alimentaria",
+    "volunteers_ask_minors_label": "Preguntar si va acompañado de un menor",
+    "volunteers_ask_pets_label": "Preguntar si va acompañado de una mascota",
     "volunteers_ask_team_preferences_label": "Solicitar preferencias de equipo",
     "volunteers_ask_time_preferences_label": "Solicitar preferencias horarias",
     "volunteers_closed_message": "Las solicitudes de voluntarios no están abiertas actualmente.",
@@ -637,6 +641,11 @@
     "volunteers_last_name": "Apellido",
     "volunteers_last_name_required": "Apellido (requerido – falta en tu perfil)",
     "volunteers_login_prompt": "Inicia sesión para postularte como voluntario.",
+    "volunteers_management_title": "Gestión de solicitudes",
+    "volunteers_minors_details_hint": "Esta información ayudará a los organizadores a recibirle mejor",
+    "volunteers_minors_details_label": "Detalles sobre el menor",
+    "volunteers_minors_details_placeholder": "Edad, nombre, necesidades especiales...",
+    "volunteers_minors_label": "Iré acompañado/a de un menor",
     "volunteers_mode_external": "Externo (enlace a herramienta de terceros)",
     "volunteers_mode_internal": "Interno (formulario en el sitio)",
     "volunteers_mode_label": "Modo de gestión de solicitudes",
@@ -652,6 +661,10 @@
     "volunteers_open": "Abrir",
     "volunteers_personal_info_disclaimer": "La información anterior (nombre, apellido, email, teléfono) se proporcionará a los organizadores para gestionar los equipos de voluntarios. Complete los campos faltantes a continuación si es necesario.",
     "volunteers_personal_info_notice": "Información personal compartida",
+    "volunteers_pets_details_hint": "Esta información ayudará a los organizadores a recibirle mejor",
+    "volunteers_pets_details_label": "Detalles sobre su mascota",
+    "volunteers_pets_details_placeholder": "Tipo, raza, nombre, precauciones especiales...",
+    "volunteers_pets_label": "Iré acompañado/a de una mascota",
     "volunteers_phone": "Teléfono",
     "volunteers_phone_required": "Teléfono (requerido para contactarte)",
     "volunteers_search": "Buscar",
@@ -664,7 +677,9 @@
     "volunteers_table_diet": "Dieta",
     "volunteers_table_first_name": "Nombre",
     "volunteers_table_last_name": "Apellido",
+    "volunteers_table_minors": "Menor",
     "volunteers_table_motivation": "Comentarios",
+    "volunteers_table_pets": "Mascota",
     "volunteers_table_team_preferences": "Equipos preferidos",
     "volunteers_table_time_preferences": "Franjas horarias",
     "volunteers_table_user": "Solicitante",
@@ -690,8 +705,9 @@
       "night": "Madrugada (2h-6h)"
     },
     "volunteers_title": "Voluntarios",
-    "volunteers_management_title": "Gestión de solicitudes",
     "volunteers_total": "Total de voluntarios",
+    "volunteers_view_only_description": "Puede consultar las solicitudes pero solo los administradores de voluntarios pueden aceptar o rechazar solicitudes.",
+    "volunteers_view_only_note": "Solo modo consulta",
     "volunteers_withdraw": "Retirar mi solicitud"
   },
   "errors": {

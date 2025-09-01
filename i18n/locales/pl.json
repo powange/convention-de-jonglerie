@@ -282,7 +282,6 @@
     "deleted": "Usunięto",
     "description": "Opis",
     "edit": "Edytuj",
-    "volunteers_short": "Wolontariusze",
     "editor": {
       "back_to_edit": "Powrót do edycji",
       "block_tooltip": "Blok kodu",
@@ -311,6 +310,7 @@
     "location": "Lokalizacja",
     "manage": "Zarządzaj",
     "name": "Nazwa",
+    "no_permission": "Brak uprawnień",
     "no_results": "Brak wyników",
     "optional": "Opcjonalne",
     "or": "Lub",
@@ -335,7 +335,9 @@
     "tip": "Porada",
     "updated_at": "Zaktualizowano {date}",
     "view": "Zobacz",
-    "view_details": "Zobacz szczegóły"
+    "view_details": "Zobacz szczegóły",
+    "volunteers_short": "Wolontariusze",
+    "yes": "Tak"
   },
   "components": {
     "carpool": {
@@ -623,6 +625,8 @@
     "volunteers_apply_description": "Złóż zgłoszenie, aby pomóc podczas edycji.",
     "volunteers_ask_allergies_label": "Pytaj o alergie",
     "volunteers_ask_diet_label": "Pytaj o preferencje żywieniowe",
+    "volunteers_ask_minors_label": "Zapytaj, czy towarzyszy niepełnoletni",
+    "volunteers_ask_pets_label": "Zapytaj, czy towarzyszy zwierzę domowe",
     "volunteers_ask_team_preferences_label": "Pytaj o preferencje zespołów",
     "volunteers_ask_time_preferences_label": "Pytaj o preferencje czasowe",
     "volunteers_closed_message": "Zgłoszenia wolontariuszy nie są obecnie otwarte.",
@@ -637,6 +641,11 @@
     "volunteers_last_name": "Nazwisko",
     "volunteers_last_name_required": "Nazwisko (wymagane – brak w profilu)",
     "volunteers_login_prompt": "Zaloguj się, aby zgłosić się jako wolontariusz.",
+    "volunteers_management_title": "Zarządzanie zgłoszeniami",
+    "volunteers_minors_details_hint": "Te informacje pomogą organizatorom lepiej Państwa przyjąć",
+    "volunteers_minors_details_label": "Szczegóły o niepełnoletnim",
+    "volunteers_minors_details_placeholder": "Wiek, imię, szczególne potrzeby...",
+    "volunteers_minors_label": "Będę towarzyszyć niepełnoletniemu",
     "volunteers_mode_external": "Zewnętrzny (link do narzędzia zewnętrznego)",
     "volunteers_mode_internal": "Wewnętrzny (formularz na stronie)",
     "volunteers_mode_label": "Tryb obsługi zgłoszeń",
@@ -652,6 +661,10 @@
     "volunteers_open": "Otwórz",
     "volunteers_personal_info_disclaimer": "Powyższe informacje (imię, nazwisko, email, telefon) zostaną przekazane organizatorom w celu zarządzania zespołami wolontariuszy. W razie potrzeby uzupełnij brakujące pola poniżej.",
     "volunteers_personal_info_notice": "Udostępnione dane osobowe",
+    "volunteers_pets_details_hint": "Te informacje pomogą organizatorom lepiej Państwa przyjąć",
+    "volunteers_pets_details_label": "Szczegóły o Państwa zwierzęciu",
+    "volunteers_pets_details_placeholder": "Typ, rasa, imię, szczególne środki ostrożności...",
+    "volunteers_pets_label": "Będę towarzyszyć zwierzę domowe",
     "volunteers_phone": "Telefon",
     "volunteers_phone_required": "Telefon (wymagany do kontaktu)",
     "volunteers_search": "Szukaj",
@@ -664,7 +677,9 @@
     "volunteers_table_diet": "Dieta",
     "volunteers_table_first_name": "Imię",
     "volunteers_table_last_name": "Nazwisko",
+    "volunteers_table_minors": "Niepełnoletni",
     "volunteers_table_motivation": "Komentarze",
+    "volunteers_table_pets": "Zwierzę domowe",
     "volunteers_table_team_preferences": "Preferowane zespoły",
     "volunteers_table_time_preferences": "Przedziały czasowe",
     "volunteers_table_user": "Kandydat",
@@ -690,8 +705,9 @@
       "night": "Noc (2-6)"
     },
     "volunteers_title": "Wolontariusze",
-    "volunteers_management_title": "Zarządzanie zgłoszeniami",
     "volunteers_total": "Razem",
+    "volunteers_view_only_description": "Możecie Państwo przeglądać aplikacje, ale tylko menedżerowie wolontariuszy mogą akceptować lub odrzucać aplikacje.",
+    "volunteers_view_only_note": "Tryb tylko do przeglądania",
     "volunteers_withdraw": "Wycofaj moje zgłoszenie"
   },
   "errors": {

@@ -300,6 +300,28 @@
                   @update:model-value="persistVolunteerSettings"
                 />
 
+                <!-- Switch demander animaux de compagnie (mode interne uniquement) -->
+                <USwitch
+                  v-model="volunteersAskPetsLocal"
+                  :disabled="savingVolunteers"
+                  color="primary"
+                  class="mb-2"
+                  :label="t('editions.volunteers_ask_pets_label')"
+                  size="lg"
+                  @update:model-value="persistVolunteerSettings"
+                />
+
+                <!-- Switch demander personnes mineures (mode interne uniquement) -->
+                <USwitch
+                  v-model="volunteersAskMinorsLocal"
+                  :disabled="savingVolunteers"
+                  color="primary"
+                  class="mb-2"
+                  :label="t('editions.volunteers_ask_minors_label')"
+                  size="lg"
+                  @update:model-value="persistVolunteerSettings"
+                />
+
                 <!-- Switch demander préférences horaires (mode interne uniquement) -->
                 <USwitch
                   v-model="volunteersAskTimePreferencesLocal"
@@ -440,6 +462,8 @@ const volunteersAskDietLocal = ref(false)
 const volunteersAskAllergiesLocal = ref(false)
 const volunteersAskTimePreferencesLocal = ref(false)
 const volunteersAskTeamPreferencesLocal = ref(false)
+const volunteersAskPetsLocal = ref(false)
+const volunteersAskMinorsLocal = ref(false)
 const volunteersTeamsLocal = ref<{ name: string; slots?: number }[]>([])
 const volunteersUpdatedAt = ref<Date | null>(null)
 const savingVolunteers = ref(false)
@@ -484,6 +508,8 @@ function applyEditionVolunteerFields(src: any) {
   volunteersAskAllergiesLocal.value = !!src.volunteersAskAllergies
   volunteersAskTimePreferencesLocal.value = !!src.volunteersAskTimePreferences
   volunteersAskTeamPreferencesLocal.value = !!src.volunteersAskTeamPreferences
+  volunteersAskPetsLocal.value = !!src.volunteersAskPets
+  volunteersAskMinorsLocal.value = !!src.volunteersAskMinors
   volunteersTeamsLocal.value = src.volunteersTeams
     ? JSON.parse(JSON.stringify(src.volunteersTeams))
     : []
@@ -544,6 +570,8 @@ const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {})
       askAllergies: volunteersAskAllergiesLocal.value,
       askTimePreferences: volunteersAskTimePreferencesLocal.value,
       askTeamPreferences: volunteersAskTeamPreferencesLocal.value,
+      askPets: volunteersAskPetsLocal.value,
+      askMinors: volunteersAskMinorsLocal.value,
       teams: volunteersTeamsLocal.value.filter((team) => team.name.trim()),
     }
     if (volunteersModeLocal.value === 'EXTERNAL')
