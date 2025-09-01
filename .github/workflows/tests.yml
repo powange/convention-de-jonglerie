@@ -6,14 +6,26 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  NODE_ENV: test
+  DATABASE_URL: mysql://root:rootpassword@localhost:3306/convention_db_test
+  NUXT_SESSION_PASSWORD: test_session_password_32_chars_min
+  # Désactiver les emails en test
+  SEND_EMAILS: false
+  # Bypass reCAPTCHA en test
+  NUXT_RECAPTCHA_DEV_BYPASS: true
+
 jobs:
-  test:
+  # Job pour le linting (rapide, pas besoin de DB)
+  lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -22,15 +34,92 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run unit + nuxt + e2e
-        run: npm run test:all
+      - name: Run linting
+        run: npm run lint
 
-      - name: Start test database
-        run: npm run test:setup
+  # Tests en parallèle avec matrice
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: lint # Attendre le lint avant de lancer les tests
+    
+    strategy:
+      fail-fast: false # Continue même si un test échoue
+      matrix:
+        test-group: 
+          - { name: 'unit-e2e', cmd: 'npm run test:all', db: false }
+          - { name: 'database', cmd: 'npm run test:db:run', db: true }
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: convention_db_test
+          MYSQL_USER: convention_user
+          MYSQL_PASSWORD: convention_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
-      - name: Run DB integration tests
-        run: npm run test:db:run
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Stop test database
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Cache Prisma client
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.prisma
+          key: ${{ runner.os }}-prisma-${{ hashFiles('prisma/schema.prisma') }}
+          restore-keys: |
+            ${{ runner.os }}-prisma-
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Setup database (DB tests only)
+        if: matrix.test-group.db
+        run: npx prisma db push
+
+      - name: Run tests - ${{ matrix.test-group.name }}
+        run: ${{ matrix.test-group.cmd }}
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.test-group.name }}-${{ github.run_id }}
+          path: |
+            test-results/
+            coverage/
+            .nuxt/
+          retention-days: 7
+
+      - name: Upload coverage reports
         if: always()
-        run: npm run test:teardown
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports-${{ matrix.test-group.name }}-${{ github.run_id }}
+          path: coverage/
+          retention-days: 30
