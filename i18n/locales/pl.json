@@ -708,7 +708,13 @@
     "volunteers_total": "Razem",
     "volunteers_view_only_description": "Możecie Państwo przeglądać aplikacje, ale tylko menedżerowie wolontariuszy mogą akceptować lub odrzucać aplikacje.",
     "volunteers_view_only_note": "Tryb tylko do przeglądania",
-    "volunteers_withdraw": "Wycofaj moje zgłoszenie"
+    "volunteers_withdraw": "Wycofaj moje zgłoszenie",
+    "volunteers_ask_vehicle_label": "Zapytaj, czy pojazd dostępny",
+    "volunteers_vehicle_label": "Mam dostępny pojazd",
+    "volunteers_vehicle_details_label": "Szczegóły o Państwa pojeździe",
+    "volunteers_vehicle_details_placeholder": "Typ pojazdu, liczba miejsc, pojemność ładunkowa...",
+    "volunteers_vehicle_details_hint": "Te informacje pomogą organizatorom w logistyce",
+    "volunteers_table_vehicle": "Pojazd"
   },
   "errors": {
     "access_denied": "Dostęp odrzucony",

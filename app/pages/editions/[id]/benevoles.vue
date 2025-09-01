@@ -344,6 +344,34 @@
             </div>
           </div>
 
+          <!-- Véhicule à disposition -->
+          <div
+            v-if="volunteersInfo?.askVehicle && volunteersMode === 'INTERNAL'"
+            class="space-y-2 w-full"
+          >
+            <UFormField>
+              <USwitch
+                v-model="hasVehicle"
+                :label="t('editions.volunteers_vehicle_label')"
+                size="lg"
+              />
+            </UFormField>
+            <div v-if="hasVehicle" class="ml-8">
+              <UFormField :label="t('editions.volunteers_vehicle_details_label')">
+                <UTextarea
+                  v-model="vehicleDetails"
+                  :placeholder="t('editions.volunteers_vehicle_details_placeholder')"
+                  :rows="2"
+                  class="w-full"
+                  :maxlength="200"
+                />
+              </UFormField>
+              <p class="text-[11px] text-gray-500">
+                {{ t('editions.volunteers_vehicle_details_hint') }}
+              </p>
+            </div>
+          </div>
+
           <!-- Motivation (déplacé en bas) -->
           <UFormField :label="t('editions.volunteers_motivation_label')" class="w-full">
             <div class="space-y-1 w-full">
@@ -656,6 +684,7 @@ interface VolunteerInfo {
   askTeamPreferences?: boolean
   askPets?: boolean
   askMinors?: boolean
+  askVehicle?: boolean
   teams?: { name: string; slots?: number }[]
 }
 const volunteersInfo = ref<VolunteerInfo | null>(null)
@@ -687,6 +716,8 @@ const hasPets = ref(false)
 const petsDetails = ref('')
 const hasMinors = ref(false)
 const minorsDetails = ref('')
+const hasVehicle = ref(false)
+const vehicleDetails = ref('')
 
 // Items de créneaux horaires pour UCheckboxGroup
 const timeSlotItems = computed(() => [
@@ -779,6 +810,11 @@ const applyAsVolunteer = async () => {
           volunteersInfo.value?.askMinors && hasMinors.value && minorsDetails.value.trim()
             ? minorsDetails.value.trim()
             : undefined,
+        hasVehicle: volunteersInfo.value?.askVehicle ? hasVehicle.value || undefined : undefined,
+        vehicleDetails:
+          volunteersInfo.value?.askVehicle && hasVehicle.value && vehicleDetails.value.trim()
+            ? vehicleDetails.value.trim()
+            : undefined,
       },
     } as any)
     if (res?.application && volunteersInfo.value)
@@ -800,6 +836,8 @@ const applyAsVolunteer = async () => {
     petsDetails.value = ''
     hasMinors.value = false
     minorsDetails.value = ''
+    hasVehicle.value = false
+    vehicleDetails.value = ''
     showApplyModal.value = false
   } catch (e: any) {
     toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
@@ -975,6 +1013,8 @@ const tableData = computed(() =>
     petsDetails: (app as any).petsDetails,
     hasMinors: (app as any).hasMinors,
     minorsDetails: (app as any).minorsDetails,
+    hasVehicle: (app as any).hasVehicle,
+    vehicleDetails: (app as any).vehicleDetails,
   }))
 )
 
@@ -1100,6 +1140,41 @@ const columns: TableColumn<any>[] = [
             return h(
               resolveComponent('UTooltip'),
               { text: minorsDetails, openDelay: 200 },
+              {
+                default: () =>
+                  h(
+                    'div',
+                    {
+                      class: 'flex items-center gap-1 cursor-help',
+                    },
+                    [
+                      h('span', { class: 'text-xs' }, t('common.yes')),
+                      h(resolveComponent('UIcon'), {
+                        name: 'i-heroicons-information-circle',
+                        class: 'text-gray-400',
+                        size: '14',
+                      }),
+                    ]
+                  ),
+              }
+            )
+          },
+        } as TableColumn<any>,
+      ]
+    : []),
+  // Colonne véhicule si activée
+  ...(volunteersInfo.value?.askVehicle
+    ? [
+        {
+          accessorKey: 'hasVehicle',
+          header: t('editions.volunteers_table_vehicle'),
+          cell: ({ row }: any) => {
+            if (!row.original.hasVehicle) return h('span', '—')
+            const vehicleDetails = row.original.vehicleDetails
+            if (!vehicleDetails) return h('span', { class: 'text-xs' }, t('common.yes'))
+            return h(
+              resolveComponent('UTooltip'),
+              { text: vehicleDetails, openDelay: 200 },
               {
                 default: () =>
                   h(
@@ -1346,6 +1421,8 @@ const openApplyModal = () => {
   petsDetails.value = ''
   hasMinors.value = false
   minorsDetails.value = ''
+  hasVehicle.value = false
+  vehicleDetails.value = ''
   showApplyModal.value = true
   nextTick(() => {
     const textarea = motivationTextareaRef.value as any

@@ -322,6 +322,17 @@
                   @update:model-value="persistVolunteerSettings"
                 />
 
+                <!-- Switch demander véhicule (mode interne uniquement) -->
+                <USwitch
+                  v-model="volunteersAskVehicleLocal"
+                  :disabled="savingVolunteers"
+                  color="primary"
+                  class="mb-2"
+                  :label="t('editions.volunteers_ask_vehicle_label')"
+                  size="lg"
+                  @update:model-value="persistVolunteerSettings"
+                />
+
                 <!-- Switch demander préférences horaires (mode interne uniquement) -->
                 <USwitch
                   v-model="volunteersAskTimePreferencesLocal"
@@ -464,6 +475,7 @@ const volunteersAskTimePreferencesLocal = ref(false)
 const volunteersAskTeamPreferencesLocal = ref(false)
 const volunteersAskPetsLocal = ref(false)
 const volunteersAskMinorsLocal = ref(false)
+const volunteersAskVehicleLocal = ref(false)
 const volunteersTeamsLocal = ref<{ name: string; slots?: number }[]>([])
 const volunteersUpdatedAt = ref<Date | null>(null)
 const savingVolunteers = ref(false)
@@ -510,6 +522,7 @@ function applyEditionVolunteerFields(src: any) {
   volunteersAskTeamPreferencesLocal.value = !!src.volunteersAskTeamPreferences
   volunteersAskPetsLocal.value = !!src.volunteersAskPets
   volunteersAskMinorsLocal.value = !!src.volunteersAskMinors
+  volunteersAskVehicleLocal.value = !!src.volunteersAskVehicle
   volunteersTeamsLocal.value = src.volunteersTeams
     ? JSON.parse(JSON.stringify(src.volunteersTeams))
     : []
@@ -572,6 +585,7 @@ const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {})
       askTeamPreferences: volunteersAskTeamPreferencesLocal.value,
       askPets: volunteersAskPetsLocal.value,
       askMinors: volunteersAskMinorsLocal.value,
+      askVehicle: volunteersAskVehicleLocal.value,
       teams: volunteersTeamsLocal.value.filter((team) => team.name.trim()),
     }
     if (volunteersModeLocal.value === 'EXTERNAL')

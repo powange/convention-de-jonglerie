@@ -19,6 +19,8 @@ const bodySchema = z.object({
   petsDetails: z.string().max(200).optional().nullable(),
   hasMinors: z.boolean().optional(),
   minorsDetails: z.string().max(200).optional().nullable(),
+  hasVehicle: z.boolean().optional(),
+  vehicleDetails: z.string().max(200).optional().nullable(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -38,6 +40,7 @@ export default defineEventHandler(async (event) => {
       volunteersAskTeamPreferences: true,
       volunteersAskPets: true,
       volunteersAskMinors: true,
+      volunteersAskVehicle: true,
       volunteersTeams: true,
     },
   })
@@ -110,6 +113,12 @@ export default defineEventHandler(async (event) => {
         (edition as any).volunteersAskMinors && parsed.hasMinors && parsed.minorsDetails?.trim()
           ? parsed.minorsDetails.trim()
           : null,
+      hasVehicle:
+        (edition as any).volunteersAskVehicle && parsed.hasVehicle ? parsed.hasVehicle : null,
+      vehicleDetails:
+        (edition as any).volunteersAskVehicle && parsed.hasVehicle && parsed.vehicleDetails?.trim()
+          ? parsed.vehicleDetails.trim()
+          : null,
     },
     select: {
       id: true,
@@ -122,6 +131,8 @@ export default defineEventHandler(async (event) => {
       petsDetails: true,
       hasMinors: true,
       minorsDetails: true,
+      hasVehicle: true,
+      vehicleDetails: true,
     },
   })
   return { success: true, application }

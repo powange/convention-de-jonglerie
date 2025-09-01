@@ -708,7 +708,13 @@
     "volunteers_total": "I alt",
     "volunteers_view_only_description": "Du kan se ansøgningerne, men kun frivilligledere kan acceptere eller afvise ansøgninger.",
     "volunteers_view_only_note": "Kun visning tilstand",
-    "volunteers_withdraw": "Træk min ansøgning tilbage"
+    "volunteers_withdraw": "Træk min ansøgning tilbage",
+    "volunteers_ask_vehicle_label": "Spørg om køretøj tilgængeligt",
+    "volunteers_vehicle_label": "Jeg har et køretøj til rådighed",
+    "volunteers_vehicle_details_label": "Detaljer om dit køretøj",
+    "volunteers_vehicle_details_placeholder": "Type køretøj, antal sæder, lastekapacitet...",
+    "volunteers_vehicle_details_hint": "Disse oplysninger vil hjælpe arrangørerne med logistik",
+    "volunteers_table_vehicle": "Køretøj"
   },
   "errors": {
     "access_denied": "Adgang nægtet",

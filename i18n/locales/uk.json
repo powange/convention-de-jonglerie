@@ -708,7 +708,13 @@
     "volunteers_total": "Всього",
     "volunteers_view_only_description": "Ви можете переглядати заявки, але лише менеджери волонтерів можуть приймати або відхиляти заявки.",
     "volunteers_view_only_note": "Режим лише перегляду",
-    "volunteers_withdraw": "Відкликати мою заявку"
+    "volunteers_withdraw": "Відкликати мою заявку",
+    "volunteers_ask_vehicle_label": "Запитати про наявність транспорту",
+    "volunteers_vehicle_label": "У мене є доступний транспорт",
+    "volunteers_vehicle_details_label": "Подробиці про ваш транспорт",
+    "volunteers_vehicle_details_placeholder": "Тип транспорту, кількість місць, вантажопідйомність...",
+    "volunteers_vehicle_details_hint": "Ця інформація допоможе організаторам з логістикою",
+    "volunteers_table_vehicle": "Транспорт"
   },
   "errors": {
     "access_denied": "Доступ заборонено",

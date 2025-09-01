@@ -708,7 +708,13 @@
     "volunteers_total": "Totaal",
     "volunteers_view_only_description": "U kunt de aanmeldingen bekijken, maar alleen vrijwilligersbeheerders kunnen aanmeldingen accepteren of afwijzen.",
     "volunteers_view_only_note": "Alleen bekijkmodus",
-    "volunteers_withdraw": "Trek mijn aanmelding in"
+    "volunteers_withdraw": "Trek mijn aanmelding in",
+    "volunteers_ask_vehicle_label": "Vragen of voertuig beschikbaar",
+    "volunteers_vehicle_label": "Ik heb een voertuig beschikbaar",
+    "volunteers_vehicle_details_label": "Details over uw voertuig",
+    "volunteers_vehicle_details_placeholder": "Type voertuig, aantal stoelen, laadcapaciteit...",
+    "volunteers_vehicle_details_hint": "Deze informatie helpt organisatoren bij de logistiek",
+    "volunteers_table_vehicle": "Voertuig"
   },
   "errors": {
     "access_denied": "Toegang geweigerd",

@@ -708,7 +708,13 @@
     "volunteers_total": "Total de voluntários",
     "volunteers_view_only_description": "Pode consultar as candidaturas, mas apenas os gestores de voluntários podem aceitar ou rejeitar candidaturas.",
     "volunteers_view_only_note": "Modo somente consulta",
-    "volunteers_withdraw": "Retirar minha inscrição"
+    "volunteers_withdraw": "Retirar minha inscrição",
+    "volunteers_ask_vehicle_label": "Perguntar se veículo disponível",
+    "volunteers_vehicle_label": "Tenho um veículo disponível",
+    "volunteers_vehicle_details_label": "Detalhes sobre seu veículo",
+    "volunteers_vehicle_details_placeholder": "Tipo de veículo, número de lugares, capacidade de carga...",
+    "volunteers_vehicle_details_hint": "Essas informações ajudarão os organizadores com a logística",
+    "volunteers_table_vehicle": "Veículo"
   },
   "errors": {
     "access_denied": "Acesso negado",

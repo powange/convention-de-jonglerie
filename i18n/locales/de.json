@@ -708,7 +708,13 @@
     "volunteers_total": "Gesamt",
     "volunteers_view_only_description": "Sie können die Bewerbungen einsehen, aber nur Freiwilligenverwalter können Bewerbungen annehmen oder ablehnen.",
     "volunteers_view_only_note": "Nur-Ansicht-Modus",
-    "volunteers_withdraw": "Meine Bewerbung zurückziehen"
+    "volunteers_withdraw": "Meine Bewerbung zurückziehen",
+    "volunteers_ask_vehicle_label": "Fragen, ob Fahrzeug verfügbar",
+    "volunteers_vehicle_label": "Ich habe ein Fahrzeug zur Verfügung",
+    "volunteers_vehicle_details_label": "Details zu Ihrem Fahrzeug",
+    "volunteers_vehicle_details_placeholder": "Fahrzeugtyp, Anzahl Sitze, Ladekapazität...",
+    "volunteers_vehicle_details_hint": "Diese Informationen helfen den Organisatoren bei der Logistik",
+    "volunteers_table_vehicle": "Fahrzeug"
   },
   "errors": {
     "access_denied": "Zugang verweigert",
