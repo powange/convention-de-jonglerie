@@ -3,7 +3,20 @@
     <!-- Section Conventions -->
     <div class="mb-12">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">{{ $t('conventions.my_conventions') }}</h2>
+        <div class="flex items-center gap-3">
+          <h2 class="text-2xl font-bold">{{ $t('conventions.my_conventions') }}</h2>
+          <!-- Debug: afficher toujours l'icône pour tester -->
+          <UButton
+            icon="i-heroicons-question-mark-circle"
+            size="xs"
+            color="gray"
+            variant="ghost"
+            :ui="{ rounded: 'rounded-full' }"
+            @click="openFeaturesModal"
+          />
+          <!-- Debug: afficher le nombre de conventions -->
+          <span class="text-xs text-gray-500">({{ myConventions.length }} conventions)</span>
+        </div>
         <UButton
           icon="i-heroicons-plus"
           size="sm"
@@ -18,13 +31,15 @@
         <p>{{ $t('common.loading') }}</p>
       </div>
 
-      <div
-        v-else-if="myConventions.length === 0"
-        class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg"
-      >
-        <UIcon name="i-heroicons-building-library" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-        <p class="text-gray-500 mb-2">{{ $t('conventions.no_conventions') }}</p>
-        <p class="text-sm text-gray-400">{{ $t('conventions.no_conventions_description') }}</p>
+      <div v-else-if="myConventions.length === 0" class="space-y-6">
+        <div class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <UIcon name="i-heroicons-building-library" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
+          <p class="text-gray-500 mb-2">{{ $t('conventions.no_conventions') }}</p>
+          <p class="text-sm text-gray-400">{{ $t('conventions.no_conventions_description') }}</p>
+        </div>
+
+        <!-- Card explicative des fonctionnalités -->
+        <ConventionsFeaturesCard />
       </div>
 
       <div v-else class="space-y-4 mb-8">
@@ -179,6 +194,9 @@
       @collaborator-added="fetchMyConventions"
       @collaborator-removed="fetchMyConventions"
     />
+
+    <!-- Modal des fonctionnalités -->
+    <ConventionsFeaturesModal v-model:model-value="showFeaturesModal" />
   </div>
 </template>
 
@@ -220,6 +238,15 @@ const myConventions = ref<Convention[]>([])
 // Modal collaborateurs
 const collaboratorsModalOpen = ref(false)
 const selectedConvention = ref<Convention | null>(null)
+
+// Modal fonctionnalités
+const showFeaturesModal = ref(false)
+
+function openFeaturesModal() {
+  console.log('Opening features modal', showFeaturesModal.value)
+  showFeaturesModal.value = true
+  console.log('Modal state after:', showFeaturesModal.value)
+}
 
 // Utiliser le composable pour formater les dates
 const { formatDateTime } = useDateFormat()
@@ -494,14 +521,14 @@ const canEditEdition = (convention: Convention, editionId: number) => {
   const collab = findCurrentCollab(convention)
   if (!collab) return false
   if (collab.rights?.editAllEditions) return true
-  return collab.perEdition?.some((p: any) => p.editionId === editionId && p.canEdit)
+  return (collab as any).perEdition?.some((p: any) => p.editionId === editionId && p.canEdit)
 }
 const canDeleteEdition = (convention: Convention, editionId: number) => {
   if (isAuthor(convention)) return true
   const collab = findCurrentCollab(convention)
   if (!collab) return false
   if (collab.rights?.deleteAllEditions) return true
-  return collab.perEdition?.some((p: any) => p.editionId === editionId && p.canDelete)
+  return (collab as any).perEdition?.some((p: any) => p.editionId === editionId && p.canDelete)
 }
 
 function rightsSummary(collaborator: any) {
