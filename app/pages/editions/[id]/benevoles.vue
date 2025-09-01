@@ -341,7 +341,7 @@
       </template>
     </UModal>
 
-    <UCard v-if="canManageEdition" variant="soft" class="mb-6">
+    <UCard v-if="canViewVolunteersTable" variant="soft" class="mb-6">
       <template #header>
         <h3 class="text-lg font-semibold flex items-center gap-2">
           <UIcon name="i-heroicons-clipboard-document-list" class="text-primary-500" />
@@ -353,7 +353,12 @@
       <div v-if="volunteersMode === 'INTERNAL'">
         <UAlert
           icon="i-heroicons-shield-check"
-          :title="t('editions.volunteers_admin_only_note')"
+          :title="
+            canManageVolunteers
+              ? t('editions.volunteers_admin_only_note')
+              : t('editions.volunteers_view_only_note')
+          "
+          :description="canManageVolunteers ? null : t('editions.volunteers_view_only_description')"
           color="primary"
           variant="subtle"
         />
@@ -530,6 +535,41 @@ const toggleFavorite = async (id: number) => {
   }
 }
 
+// Condition pour voir le tableau des bénévoles (tous les collaborateurs)
+const canViewVolunteersTable = computed(() => {
+  if (!authStore.user || !edition.value) return false
+  // Créateur de l'édition
+  if (edition.value.creatorId === authStore.user.id) return true
+  // Auteur de la convention
+  if (edition.value.convention?.authorId === authStore.user.id) return true
+  // Collaborateur de la convention
+  const collab = edition.value.convention?.collaborators?.find(
+    (c: any) => c.user.id === authStore.user!.id
+  )
+  return !!collab
+})
+
+// Condition pour gérer les bénévoles (accepter/refuser candidatures)
+const canManageVolunteers = computed(() => {
+  if (!authStore.user || !edition.value) return false
+  // Créateur de l'édition
+  if (edition.value.creatorId === authStore.user.id) return true
+  // Auteur de la convention
+  if (edition.value.convention?.authorId === authStore.user.id) return true
+  // Collaborateur avec droit global de gérer les bénévoles
+  const collab = edition.value.convention?.collaborators?.find(
+    (c: any) => c.user.id === authStore.user!.id
+  )
+  if (!collab) return false
+  const rights = collab.rights || {}
+  if (rights.manageVolunteers) return true
+  // Collaborateur avec droit spécifique à cette édition
+  const perEdition = (collab as any).perEdition || []
+  const editionPerm = perEdition.find((p: any) => p.editionId === edition.value!.id)
+  return editionPerm?.canManageVolunteers || false
+})
+
+// Ancien canManageEdition gardé pour compatibilité avec le bouton "Gérer"
 const canManageEdition = computed(() => {
   if (!authStore.user || !edition.value) return false
   if (edition.value.creatorId === authStore.user.id) return true
@@ -776,7 +816,7 @@ const goToPage = (p: number) => {
   refreshApplications()
 }
 const refreshApplications = async () => {
-  if (!canManageEdition.value) return
+  if (!canViewVolunteersTable.value) return
   if (volunteersMode.value === 'EXTERNAL') return // Pas de tableau en mode externe
   applicationsLoading.value = true
   try {
@@ -1042,6 +1082,11 @@ const columns: TableColumn<any>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
+      // N'afficher les actions que si l'utilisateur peut gérer les bénévoles
+      if (!canManageVolunteers.value) {
+        return h('span', { class: 'text-xs text-gray-500 italic' }, t('common.no_permission'))
+      }
+
       const status = row.original.status
       if (status === 'PENDING') {
         return h('div', { class: 'flex gap-2' }, [
