@@ -1,5 +1,10 @@
 <template>
   <UApp>
+    <!-- Loading Screen -->
+    <div v-if="isLoading" class="loading-screen">
+      <img src="/logos/logo-jc-anim-orbit.svg" alt="Chargement..." class="loading-logo" />
+    </div>
+
     <ClientOnly>
       <UCard>
         <template #header>
@@ -126,6 +131,9 @@ const authStore = useAuthStore()
 const { locale, locales, setLocale, t } = useI18n()
 const colorMode = useColorMode()
 
+// État de chargement
+const isLoading = ref(true)
+
 // État réactif pour la taille d'écran
 const isMobile = ref(false)
 
@@ -239,12 +247,69 @@ onMounted(() => {
   checkMobile()
   window.addEventListener('resize', checkMobile)
 
+  // Attendre que tout soit chargé
+  const hideLoading = () => {
+    // Petit délai pour s'assurer que l'hydration est complète
+    setTimeout(() => {
+      isLoading.value = false
+    }, 500)
+  }
+
+  // Si tout est déjà chargé
+  if (document.readyState === 'complete') {
+    hideLoading()
+  } else {
+    // Attendre que tout soit chargé (images, CSS, etc.)
+    window.addEventListener('load', hideLoading)
+  }
+
   // Cleanup
   onUnmounted(() => {
     window.removeEventListener('resize', checkMobile)
+    window.removeEventListener('load', hideLoading)
   })
 })
 
 // Calculer le nom d'affichage
 const displayName = computed(() => authStore.user?.pseudo || authStore.user?.prenom || '')
 </script>
+
+<style>
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+
+  /* Transition fluide à la sortie */
+  transition: opacity 0.8s ease-out;
+}
+
+.loading-logo {
+  width: 200px;
+  height: 200px;
+  max-width: 50vw;
+  max-height: 50vh;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+  }
+}
+
+/* Support du dark mode */
+@media (prefers-color-scheme: dark) {
+  .loading-screen {
+    background: #0f172a; /* bg-slate-900 */
+  }
+}
+</style>
