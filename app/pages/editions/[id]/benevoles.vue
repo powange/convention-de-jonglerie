@@ -228,148 +228,248 @@
               <UInput v-model="volunteerLastName" class="w-full" />
             </UFormField>
           </div>
-          <div
-            v-if="volunteersInfo?.askDiet && volunteersMode === 'INTERNAL'"
-            class="space-y-2 w-full"
-          >
-            <UFormField :label="t('editions.volunteers_diet_label')">
-              <USelect
-                v-model="selectedDietPreference"
-                :items="dietPreferenceItems"
-                size="lg"
-                class="w-full text-sm"
-                :placeholder="t('diet.none')"
-              />
-            </UFormField>
-          </div>
-          <div
-            v-if="volunteersInfo?.askAllergies && volunteersMode === 'INTERNAL'"
-            class="space-y-2 w-full"
-          >
-            <UFormField :label="t('editions.volunteers_allergies_label')">
-              <UInput
-                v-model="volunteerAllergies"
-                :placeholder="t('editions.volunteers_allergies_placeholder')"
-                class="w-full"
-                :maxlength="300"
-              />
-            </UFormField>
-            <p class="text-[11px] text-gray-500">{{ t('editions.volunteers_allergies_hint') }}</p>
-          </div>
-          <div
-            v-if="volunteersInfo?.askTimePreferences && volunteersMode === 'INTERNAL'"
-            class="space-y-2 w-full"
-          >
-            <UFormField :label="t('editions.volunteers_time_preferences_label')">
-              <UCheckboxGroup
-                v-model="selectedTimePreferences"
-                :items="timeSlotItems"
-                class="grid grid-cols-1 sm:grid-cols-2 gap-2"
-              />
-            </UFormField>
-            <p class="text-[11px] text-gray-500">
-              {{ t('editions.volunteers_time_preferences_hint') }}
-            </p>
-          </div>
+
+          <!-- Section: Comment vous voyez vos créneaux -->
           <div
             v-if="
-              volunteersInfo?.askTeamPreferences &&
-              volunteersInfo?.teams &&
-              volunteersInfo.teams.length > 0 &&
-              volunteersMode === 'INTERNAL'
+              (volunteersInfo?.askTimePreferences && volunteersMode === 'INTERNAL') ||
+              (volunteersInfo?.askTeamPreferences &&
+                volunteersInfo?.teams &&
+                volunteersInfo.teams.length > 0 &&
+                volunteersMode === 'INTERNAL') ||
+              volunteersInfo?.askCompanion ||
+              volunteersInfo?.askAvoidList
             "
-            class="space-y-2 w-full"
+            class="space-y-4 w-full"
           >
-            <UFormField :label="t('editions.volunteers_team_preferences_label')">
-              <UCheckboxGroup
-                v-model="selectedTeamPreferences"
-                :items="teamItems"
-                class="grid grid-cols-1 gap-2"
-              />
-            </UFormField>
-            <p class="text-[11px] text-gray-500">
-              {{ t('editions.volunteers_team_preferences_hint') }}
-            </p>
-          </div>
+            <h3
+              class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+            >
+              {{ t('editions.volunteers_shifts_preferences_title') }}
+            </h3>
 
-          <!-- Animaux de compagnie -->
-          <div
-            v-if="volunteersInfo?.askPets && volunteersMode === 'INTERNAL'"
-            class="space-y-2 w-full"
-          >
-            <UFormField>
-              <USwitch v-model="hasPets" :label="t('editions.volunteers_pets_label')" size="lg" />
-            </UFormField>
-            <div v-if="hasPets" class="ml-8">
-              <UFormField :label="t('editions.volunteers_pets_details_label')">
-                <UTextarea
-                  v-model="petsDetails"
-                  :placeholder="t('editions.volunteers_pets_details_placeholder')"
-                  :rows="2"
-                  class="w-full"
-                  :maxlength="200"
+            <!-- Équipes préférées -->
+            <div
+              v-if="
+                volunteersInfo?.askTeamPreferences &&
+                volunteersInfo?.teams &&
+                volunteersInfo.teams.length > 0 &&
+                volunteersMode === 'INTERNAL'
+              "
+              class="space-y-2 w-full"
+            >
+              <UFormField :label="t('editions.volunteers_team_preferences_label')">
+                <UCheckboxGroup
+                  v-model="selectedTeamPreferences"
+                  :items="teamItems"
+                  class="grid grid-cols-1 gap-2"
                 />
               </UFormField>
               <p class="text-[11px] text-gray-500">
-                {{ t('editions.volunteers_pets_details_hint') }}
+                {{ t('editions.volunteers_team_preferences_hint') }}
+              </p>
+            </div>
+
+            <!-- Créneaux horaires préférés -->
+            <div
+              v-if="volunteersInfo?.askTimePreferences && volunteersMode === 'INTERNAL'"
+              class="space-y-2 w-full"
+            >
+              <UFormField :label="t('editions.volunteers_time_preferences_label')">
+                <UCheckboxGroup
+                  v-model="selectedTimePreferences"
+                  :items="timeSlotItems"
+                  class="grid grid-cols-1 sm:grid-cols-2 gap-2"
+                />
+              </UFormField>
+              <p class="text-[11px] text-gray-500">
+                {{ t('editions.volunteers_time_preferences_hint') }}
+              </p>
+            </div>
+
+            <!-- Bénévoles préférés pour créneaux -->
+            <div v-if="volunteersInfo?.askCompanion" class="space-y-2 w-full">
+              <UFormField>
+                <UTextarea
+                  v-model="companionName"
+                  :label="t('editions.volunteers_companion_label')"
+                  :placeholder="t('editions.volunteers_companion_placeholder')"
+                  class="w-full"
+                  :rows="2"
+                  :maxlength="300"
+                />
+              </UFormField>
+              <p class="text-[11px] text-gray-500">
+                {{ t('editions.volunteers_companion_hint') }}
+              </p>
+            </div>
+
+            <!-- Bénévoles à éviter pour créneaux -->
+            <div v-if="volunteersInfo?.askAvoidList" class="space-y-2 w-full">
+              <UFormField>
+                <UTextarea
+                  v-model="avoidList"
+                  :label="t('editions.volunteers_avoid_list_label')"
+                  :placeholder="t('editions.volunteers_avoid_list_placeholder')"
+                  class="w-full"
+                  :rows="3"
+                  :maxlength="500"
+                />
+              </UFormField>
+              <p class="text-[11px] text-gray-500">
+                {{ t('editions.volunteers_avoid_list_hint') }}
               </p>
             </div>
           </div>
 
-          <!-- Personnes mineures -->
+          <!-- Section: Les choses à savoir sur vous -->
           <div
-            v-if="volunteersInfo?.askMinors && volunteersMode === 'INTERNAL'"
-            class="space-y-2 w-full"
+            v-if="
+              (volunteersInfo?.askDiet && volunteersMode === 'INTERNAL') ||
+              (volunteersInfo?.askAllergies && volunteersMode === 'INTERNAL') ||
+              (volunteersInfo?.askPets && volunteersMode === 'INTERNAL') ||
+              (volunteersInfo?.askMinors && volunteersMode === 'INTERNAL')
+            "
+            class="space-y-4 w-full"
           >
-            <UFormField>
-              <USwitch
-                v-model="hasMinors"
-                :label="t('editions.volunteers_minors_label')"
-                size="lg"
-              />
-            </UFormField>
-            <div v-if="hasMinors" class="ml-8">
-              <UFormField :label="t('editions.volunteers_minors_details_label')">
-                <UTextarea
-                  v-model="minorsDetails"
-                  :placeholder="t('editions.volunteers_minors_details_placeholder')"
-                  :rows="2"
-                  class="w-full"
-                  :maxlength="200"
+            <h3
+              class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+            >
+              {{ t('editions.volunteers_about_you_title') }}
+            </h3>
+
+            <!-- Régime alimentaire -->
+            <div
+              v-if="volunteersInfo?.askDiet && volunteersMode === 'INTERNAL'"
+              class="space-y-2 w-full"
+            >
+              <UFormField :label="t('editions.volunteers_diet_label')">
+                <USelect
+                  v-model="selectedDietPreference"
+                  :items="dietPreferenceItems"
+                  size="lg"
+                  class="w-full text-sm"
+                  :placeholder="t('diet.none')"
                 />
               </UFormField>
-              <p class="text-[11px] text-gray-500">
-                {{ t('editions.volunteers_minors_details_hint') }}
-              </p>
+            </div>
+
+            <!-- Allergies -->
+            <div
+              v-if="volunteersInfo?.askAllergies && volunteersMode === 'INTERNAL'"
+              class="space-y-2 w-full"
+            >
+              <UFormField :label="t('editions.volunteers_allergies_label')">
+                <UInput
+                  v-model="volunteerAllergies"
+                  :placeholder="t('editions.volunteers_allergies_placeholder')"
+                  class="w-full"
+                  :maxlength="300"
+                />
+              </UFormField>
+              <p class="text-[11px] text-gray-500">{{ t('editions.volunteers_allergies_hint') }}</p>
+            </div>
+
+            <!-- Animaux de compagnie -->
+            <div
+              v-if="volunteersInfo?.askPets && volunteersMode === 'INTERNAL'"
+              class="space-y-2 w-full"
+            >
+              <UFormField>
+                <USwitch v-model="hasPets" :label="t('editions.volunteers_pets_label')" size="lg" />
+              </UFormField>
+              <div v-if="hasPets" class="ml-8">
+                <UFormField :label="t('editions.volunteers_pets_details_label')">
+                  <UTextarea
+                    v-model="petsDetails"
+                    :placeholder="t('editions.volunteers_pets_details_placeholder')"
+                    :rows="2"
+                    class="w-full"
+                    :maxlength="200"
+                  />
+                </UFormField>
+                <p class="text-[11px] text-gray-500">
+                  {{ t('editions.volunteers_pets_details_hint') }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Personnes mineures -->
+            <div
+              v-if="volunteersInfo?.askMinors && volunteersMode === 'INTERNAL'"
+              class="space-y-2 w-full"
+            >
+              <UFormField>
+                <USwitch
+                  v-model="hasMinors"
+                  :label="t('editions.volunteers_minors_label')"
+                  size="lg"
+                />
+              </UFormField>
+              <div v-if="hasMinors" class="ml-8">
+                <UFormField :label="t('editions.volunteers_minors_details_label')">
+                  <UTextarea
+                    v-model="minorsDetails"
+                    :placeholder="t('editions.volunteers_minors_details_placeholder')"
+                    :rows="2"
+                    class="w-full"
+                    :maxlength="200"
+                  />
+                </UFormField>
+                <p class="text-[11px] text-gray-500">
+                  {{ t('editions.volunteers_minors_details_hint') }}
+                </p>
+              </div>
             </div>
           </div>
 
-          <!-- Véhicule à disposition -->
+          <!-- Section: Ce que vous pouvez nous apporter -->
           <div
             v-if="volunteersInfo?.askVehicle && volunteersMode === 'INTERNAL'"
-            class="space-y-2 w-full"
+            class="space-y-4 w-full"
           >
-            <UFormField>
-              <USwitch
-                v-model="hasVehicle"
-                :label="t('editions.volunteers_vehicle_label')"
-                size="lg"
-              />
-            </UFormField>
-            <div v-if="hasVehicle" class="ml-8">
-              <UFormField :label="t('editions.volunteers_vehicle_details_label')">
-                <UTextarea
-                  v-model="vehicleDetails"
-                  :placeholder="t('editions.volunteers_vehicle_details_placeholder')"
-                  :rows="2"
-                  class="w-full"
-                  :maxlength="200"
+            <h3
+              class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+            >
+              {{ t('editions.volunteers_what_you_can_bring_title') }}
+            </h3>
+
+            <!-- Véhicule à disposition -->
+            <div
+              v-if="volunteersInfo?.askVehicle && volunteersMode === 'INTERNAL'"
+              class="space-y-2 w-full"
+            >
+              <UFormField>
+                <USwitch
+                  v-model="hasVehicle"
+                  :label="t('editions.volunteers_vehicle_label')"
+                  size="lg"
                 />
               </UFormField>
-              <p class="text-[11px] text-gray-500">
-                {{ t('editions.volunteers_vehicle_details_hint') }}
-              </p>
+              <div v-if="hasVehicle" class="ml-8">
+                <UFormField :label="t('editions.volunteers_vehicle_details_label')">
+                  <UTextarea
+                    v-model="vehicleDetails"
+                    :placeholder="t('editions.volunteers_vehicle_details_placeholder')"
+                    :rows="2"
+                    class="w-full"
+                    :maxlength="200"
+                  />
+                </UFormField>
+                <p class="text-[11px] text-gray-500">
+                  {{ t('editions.volunteers_vehicle_details_hint') }}
+                </p>
+              </div>
             </div>
+          </div>
+
+          <!-- Section: A rajouter -->
+          <div class="space-y-4 w-full">
+            <h3
+              class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+            >
+              {{ t('editions.volunteers_additional_info_title') }}
+            </h3>
           </div>
 
           <!-- Motivation (déplacé en bas) -->
@@ -718,6 +818,8 @@ const hasMinors = ref(false)
 const minorsDetails = ref('')
 const hasVehicle = ref(false)
 const vehicleDetails = ref('')
+const companionName = ref('')
+const avoidList = ref('')
 
 // Items de créneaux horaires pour UCheckboxGroup
 const timeSlotItems = computed(() => [
@@ -815,6 +917,14 @@ const applyAsVolunteer = async () => {
           volunteersInfo.value?.askVehicle && hasVehicle.value && vehicleDetails.value.trim()
             ? vehicleDetails.value.trim()
             : undefined,
+        companionName:
+          volunteersInfo.value?.askCompanion && companionName.value.trim()
+            ? companionName.value.trim()
+            : undefined,
+        avoidList:
+          volunteersInfo.value?.askAvoidList && avoidList.value.trim()
+            ? avoidList.value.trim()
+            : undefined,
       },
     } as any)
     if (res?.application && volunteersInfo.value)
@@ -838,6 +948,8 @@ const applyAsVolunteer = async () => {
     minorsDetails.value = ''
     hasVehicle.value = false
     vehicleDetails.value = ''
+    companionName.value = ''
+    avoidList.value = ''
     showApplyModal.value = false
   } catch (e: any) {
     toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
@@ -1015,6 +1127,8 @@ const tableData = computed(() =>
     minorsDetails: (app as any).minorsDetails,
     hasVehicle: (app as any).hasVehicle,
     vehicleDetails: (app as any).vehicleDetails,
+    companionName: (app as any).companionName,
+    avoidList: (app as any).avoidList,
   }))
 )
 
@@ -1184,6 +1298,54 @@ const columns: TableColumn<any>[] = [
                     },
                     [
                       h('span', { class: 'text-xs' }, t('common.yes')),
+                      h(resolveComponent('UIcon'), {
+                        name: 'i-heroicons-information-circle',
+                        class: 'text-gray-400',
+                        size: '14',
+                      }),
+                    ]
+                  ),
+              }
+            )
+          },
+        } as TableColumn<any>,
+      ]
+    : []),
+  // Colonne compagnon si activée
+  ...(volunteersInfo.value?.askCompanion
+    ? [
+        {
+          accessorKey: 'companionName',
+          header: t('editions.volunteers_table_companion'),
+          cell: ({ row }: any) => {
+            const companionName = row.original.companionName
+            if (!companionName) return h('span', '—')
+            return h('span', { class: 'text-xs' }, companionName)
+          },
+        } as TableColumn<any>,
+      ]
+    : []),
+  // Colonne liste à éviter si activée
+  ...(volunteersInfo.value?.askAvoidList
+    ? [
+        {
+          accessorKey: 'avoidList',
+          header: t('editions.volunteers_table_avoid_list'),
+          cell: ({ row }: any) => {
+            const avoidList = row.original.avoidList
+            if (!avoidList) return h('span', '—')
+            return h(
+              resolveComponent('UTooltip'),
+              { text: avoidList, openDelay: 200 },
+              {
+                default: () =>
+                  h(
+                    'div',
+                    {
+                      class: 'flex items-center gap-1 cursor-help',
+                    },
+                    [
+                      h('span', { class: 'text-xs max-w-[100px] truncate' }, avoidList),
                       h(resolveComponent('UIcon'), {
                         name: 'i-heroicons-information-circle',
                         class: 'text-gray-400',
@@ -1423,6 +1585,8 @@ const openApplyModal = () => {
   minorsDetails.value = ''
   hasVehicle.value = false
   vehicleDetails.value = ''
+  companionName.value = ''
+  avoidList.value = ''
   showApplyModal.value = true
   nextTick(() => {
     const textarea = motivationTextareaRef.value as any

@@ -333,6 +333,28 @@
                   @update:model-value="persistVolunteerSettings"
                 />
 
+                <!-- Switch demander compagnon (mode interne uniquement) -->
+                <USwitch
+                  v-model="volunteersAskCompanionLocal"
+                  :disabled="savingVolunteers"
+                  color="primary"
+                  class="mb-2"
+                  :label="t('editions.volunteers_ask_companion_label')"
+                  size="lg"
+                  @update:model-value="persistVolunteerSettings"
+                />
+
+                <!-- Switch demander liste à éviter (mode interne uniquement) -->
+                <USwitch
+                  v-model="volunteersAskAvoidListLocal"
+                  :disabled="savingVolunteers"
+                  color="primary"
+                  class="mb-2"
+                  :label="t('editions.volunteers_ask_avoid_list_label')"
+                  size="lg"
+                  @update:model-value="persistVolunteerSettings"
+                />
+
                 <!-- Switch demander préférences horaires (mode interne uniquement) -->
                 <USwitch
                   v-model="volunteersAskTimePreferencesLocal"
@@ -476,6 +498,8 @@ const volunteersAskTeamPreferencesLocal = ref(false)
 const volunteersAskPetsLocal = ref(false)
 const volunteersAskMinorsLocal = ref(false)
 const volunteersAskVehicleLocal = ref(false)
+const volunteersAskCompanionLocal = ref(false)
+const volunteersAskAvoidListLocal = ref(false)
 const volunteersTeamsLocal = ref<{ name: string; slots?: number }[]>([])
 const volunteersUpdatedAt = ref<Date | null>(null)
 const savingVolunteers = ref(false)
@@ -523,6 +547,8 @@ function applyEditionVolunteerFields(src: any) {
   volunteersAskPetsLocal.value = !!src.volunteersAskPets
   volunteersAskMinorsLocal.value = !!src.volunteersAskMinors
   volunteersAskVehicleLocal.value = !!src.volunteersAskVehicle
+  volunteersAskCompanionLocal.value = !!src.volunteersAskCompanion
+  volunteersAskAvoidListLocal.value = !!src.volunteersAskAvoidList
   volunteersTeamsLocal.value = src.volunteersTeams
     ? JSON.parse(JSON.stringify(src.volunteersTeams))
     : []
@@ -575,6 +601,7 @@ const handleChangeMode = async (_raw: any) => {
 const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {}) => {
   if (!edition.value) return
   savingVolunteers.value = true
+
   try {
     const body: any = {
       mode: volunteersModeLocal.value,
@@ -586,6 +613,8 @@ const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {})
       askPets: volunteersAskPetsLocal.value,
       askMinors: volunteersAskMinorsLocal.value,
       askVehicle: volunteersAskVehicleLocal.value,
+      askCompanion: volunteersAskCompanionLocal.value,
+      askAvoidList: volunteersAskAvoidListLocal.value,
       teams: volunteersTeamsLocal.value.filter((team) => team.name.trim()),
     }
     if (volunteersModeLocal.value === 'EXTERNAL')
@@ -597,8 +626,25 @@ const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {})
     if (res?.settings) {
       volunteersUpdatedAt.value = new Date()
       volunteersDescriptionOriginal.value = volunteersDescriptionLocal.value
-      if (!options.skipRefetch) {
-        await editionStore.fetchEditionById(editionId, { force: true })
+
+      // Mettre à jour directement les données locales au lieu de re-fetch complet
+      if (!options.skipRefetch && edition.value) {
+        // Mettre à jour seulement les champs bénévoles dans le store local
+        Object.assign(edition.value, {
+          volunteersMode: res.settings.volunteersMode,
+          volunteersDescription: res.settings.volunteersDescription,
+          volunteersAskDiet: res.settings.volunteersAskDiet,
+          volunteersAskAllergies: res.settings.volunteersAskAllergies,
+          volunteersAskTimePreferences: res.settings.volunteersAskTimePreferences,
+          volunteersAskTeamPreferences: res.settings.volunteersAskTeamPreferences,
+          volunteersAskPets: res.settings.volunteersAskPets,
+          volunteersAskMinors: res.settings.volunteersAskMinors,
+          volunteersAskVehicle: res.settings.volunteersAskVehicle,
+          volunteersAskCompanion: res.settings.volunteersAskCompanion,
+          volunteersAskAvoidList: res.settings.volunteersAskAvoidList,
+          volunteersTeams: res.settings.volunteersTeams,
+          volunteersUpdatedAt: res.settings.volunteersUpdatedAt,
+        })
       }
       toast.add({
         title: t('common.saved') || 'Sauvegardé',

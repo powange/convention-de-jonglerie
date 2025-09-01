@@ -117,6 +117,8 @@ export default defineEventHandler(async (event) => {
       minorsDetails: true,
       hasVehicle: true,
       vehicleDetails: true,
+      companionName: true,
+      avoidList: true,
       user: {
         select: { id: true, pseudo: true, email: true, phone: true, prenom: true, nom: true },
       },

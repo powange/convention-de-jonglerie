@@ -21,6 +21,8 @@ const bodySchema = z.object({
   minorsDetails: z.string().max(200).optional().nullable(),
   hasVehicle: z.boolean().optional(),
   vehicleDetails: z.string().max(200).optional().nullable(),
+  companionName: z.string().max(300).optional().nullable(),
+  avoidList: z.string().max(500).optional().nullable(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -118,6 +120,14 @@ export default defineEventHandler(async (event) => {
       vehicleDetails:
         (edition as any).volunteersAskVehicle && parsed.hasVehicle && parsed.vehicleDetails?.trim()
           ? parsed.vehicleDetails.trim()
+          : null,
+      companionName:
+        (edition as any).volunteersAskCompanion && parsed.companionName?.trim()
+          ? parsed.companionName.trim()
+          : null,
+      avoidList:
+        (edition as any).volunteersAskAvoidList && parsed.avoidList?.trim()
+          ? parsed.avoidList.trim()
           : null,
     },
     select: {

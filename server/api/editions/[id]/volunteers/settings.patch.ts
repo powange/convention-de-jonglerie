@@ -15,6 +15,8 @@ const bodySchema = z.object({
   askPets: z.boolean().optional(),
   askMinors: z.boolean().optional(),
   askVehicle: z.boolean().optional(),
+  askCompanion: z.boolean().optional(),
+  askAvoidList: z.boolean().optional(),
   teams: z
     .array(
       z.object({
@@ -72,6 +74,8 @@ export default defineEventHandler(async (event) => {
   if (parsed.askPets !== undefined) data.volunteersAskPets = parsed.askPets
   if (parsed.askMinors !== undefined) data.volunteersAskMinors = parsed.askMinors
   if (parsed.askVehicle !== undefined) data.volunteersAskVehicle = parsed.askVehicle
+  if (parsed.askCompanion !== undefined) data.volunteersAskCompanion = parsed.askCompanion
+  if (parsed.askAvoidList !== undefined) data.volunteersAskAvoidList = parsed.askAvoidList
   if (parsed.teams !== undefined) data.volunteersTeams = parsed.teams
   if (Object.keys(data).length === 0) return { success: true, unchanged: true }
   data.volunteersUpdatedAt = new Date()
@@ -91,6 +95,8 @@ export default defineEventHandler(async (event) => {
       volunteersAskPets: true,
       volunteersAskMinors: true,
       volunteersAskVehicle: true,
+      volunteersAskCompanion: true,
+      volunteersAskAvoidList: true,
       volunteersTeams: true,
       volunteersUpdatedAt: true,
     } as any,
