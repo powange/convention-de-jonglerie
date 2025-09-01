@@ -32,23 +32,10 @@ async function run() {
   const icoBuffer = await sharp(Buffer.from(svgContent)).resize(48, 48).png().toBuffer()
   await writeFile(path.join(outDir, 'favicon.png'), icoBuffer)
 
-  // Manifeste web
-  const manifest = {
-    name: 'Juggling Convention',
-    short_name: 'Juggling',
-    icons: sizes
-      .filter((s) => s >= 64)
-      .map((s) => ({
-        src: `/favicons/favicon-${s}x${s}.png`,
-        sizes: `${s}x${s}`,
-        type: 'image/png',
-      })),
-    theme_color: '#dd2e21',
-    background_color: '#ffffff',
-    display: 'standalone',
-  }
-  await writeFile(path.join(outDir, 'site.webmanifest'), JSON.stringify(manifest, null, 2))
+  // Note: Le manifest web est maintenant généré dynamiquement via /api/site.webmanifest
+  // selon l'environnement (DEV/TEST/PROD). Voir server/api/site.webmanifest.get.ts
   console.log('Favicons générés dans public/favicons')
+  console.log('Le manifest est généré dynamiquement via /api/site.webmanifest')
 }
 
 run().catch((e) => {

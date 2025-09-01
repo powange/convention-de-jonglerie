@@ -13,6 +13,11 @@ export default defineEventHandler(async (event) => {
     return
   }
 
+  // Web App Manifest should be public
+  if (path === '/api/site.webmanifest') {
+    return
+  }
+
   // Auth API routes (register, login, verify-email, resend-verification, password reset) are public for POST requests
   if (
     [

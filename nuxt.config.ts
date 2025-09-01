@@ -10,7 +10,7 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicons/favicon-32x32.png' },
         { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/favicons/favicon-192x192.png' },
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicons/favicon-180x180.png' },
-        { rel: 'manifest', href: '/favicons/site.webmanifest' },
+        { rel: 'manifest', href: '/api/site.webmanifest' },
         { rel: 'alternate icon', href: '/favicon.ico' },
       ],
     },
