@@ -70,20 +70,24 @@ export default defineEventHandler(async (event) => {
     // Transformer les emails en emailHash pour les auteurs et collaborateurs
     const transformedConventions = conventions.map((convention) => ({
       ...convention,
-      author: {
-        ...convention.author,
-        emailHash: getEmailHash(convention.author.email),
-        email: undefined,
-      } as any,
+      author: (() => {
+        const { email, ...authorWithoutEmail } = convention.author
+        return {
+          ...authorWithoutEmail,
+          emailHash: getEmailHash(email),
+        }
+      })(),
       collaborators: convention.collaborators.map((collab: any) => ({
         id: collab.id,
         title: collab.title,
         addedAt: collab.addedAt,
-        user: {
-          ...collab.user,
-          emailHash: getEmailHash(collab.user.email),
-          email: undefined,
-        } as any,
+        user: (() => {
+          const { email, ...userWithoutEmail } = collab.user
+          return {
+            ...userWithoutEmail,
+            emailHash: getEmailHash(email),
+          }
+        })(),
         rights: {
           editConvention: collab.canEditConvention,
           deleteConvention: collab.canDeleteConvention,

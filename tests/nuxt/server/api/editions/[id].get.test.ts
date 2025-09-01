@@ -123,12 +123,12 @@ describe('/api/editions/[id] GET', () => {
     const result = await handler(mockEvent as any)
 
     // Vérifier que les emails sont masqués
-    expect(result.creator.email).toBeUndefined()
+    expect(result.creator).not.toHaveProperty('email')
     expect(result.creator.emailHash).toBe('hash_creator@example.com')
 
     // Vérifier qu'il y a au moins un collaborateur
     expect(result.convention.collaborators).toHaveLength(1)
-    expect(result.convention.collaborators[0].user.email).toBeUndefined()
+    expect(result.convention.collaborators[0].user).not.toHaveProperty('email')
     // Dans certains cas, l'email du collaborateur peut être undefined, donc emailHash sera vide
     expect(result.convention.collaborators[0].user.emailHash).toBeDefined()
   })
@@ -136,22 +136,25 @@ describe('/api/editions/[id] GET', () => {
   it("devrait inclure les collaborateurs d'édition si disponible", async () => {
     const editionWithCollaborators = {
       ...mockEdition,
-      collaborators: [
-        {
-          id: 1,
-          user: {
-            id: 4,
-            pseudo: 'edition_collab',
-            email: 'ed_collab@example.com',
-            profilePicture: null,
-            updatedAt: new Date(),
-          },
-          addedBy: {
+      convention: {
+        ...mockEdition.convention,
+        collaborators: [
+          {
             id: 1,
-            pseudo: 'creator',
+            user: {
+              id: 4,
+              pseudo: 'edition_collab',
+              email: 'ed_collab@example.com',
+              profilePicture: null,
+              updatedAt: new Date(),
+            },
+            addedBy: {
+              id: 1,
+              pseudo: 'creator',
+            },
           },
-        },
-      ],
+        ],
+      },
     }
 
     global.getRouterParam.mockReturnValue('1')
@@ -164,11 +167,11 @@ describe('/api/editions/[id] GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result.collaborators).toBeDefined()
-    expect(result.collaborators).toHaveLength(1)
-    expect(result.collaborators[0].user.pseudo).toBe('edition_collab')
-    expect(result.collaborators[0].user.emailHash).toBe('hash_ed_collab@example.com')
-    expect(result.collaborators[0].user.email).toBeUndefined()
+    expect(result.convention.collaborators).toBeDefined()
+    expect(result.convention.collaborators).toHaveLength(1)
+    expect(result.convention.collaborators[0].user.pseudo).toBe('edition_collab')
+    expect(result.convention.collaborators[0].user.emailHash).toBe('hash_ed_collab@example.com')
+    expect(result.convention.collaborators[0].user).not.toHaveProperty('email')
   })
 
   it('devrait rejeter pour un ID invalide', async () => {

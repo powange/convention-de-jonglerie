@@ -236,9 +236,9 @@ describe('/api/conventions/my-conventions GET', () => {
     expect(result[0].collaborators[1].user.emailHash).toBe('collab2-hash')
 
     // Vérifier que les emails originaux ne sont pas exposés
-    expect(result[0].author.email).toBeUndefined()
-    expect(result[0].collaborators[0].user.email).toBeUndefined()
-    expect(result[0].collaborators[1].user.email).toBeUndefined()
+    expect(result[0].author).not.toHaveProperty('email')
+    expect(result[0].collaborators[0].user).not.toHaveProperty('email')
+    expect(result[0].collaborators[1].user).not.toHaveProperty('email')
   })
 
   it('devrait rejeter si utilisateur non authentifié', async () => {

@@ -122,7 +122,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
 
     expect(result).toHaveLength(1)
     expect(result[0].user.emailHash).toBe('test-hash')
-    expect(result[0].user.email).toBeUndefined() // Email doit être masqué
+    expect(result[0].user).not.toHaveProperty('email') // Email doit être masqué
     expect(result[0].passengers[0].user.emailHash).toBe('test-hash')
     expect(result[0].comments[0].user.emailHash).toBe('test-hash')
   })
@@ -244,13 +244,13 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     const result = await handler(mockEvent)
 
     // Vérifier que les emails sont masqués et remplacés par des hash
-    expect(result[0].user.email).toBeUndefined()
+    expect(result[0].user).not.toHaveProperty('email')
     expect(result[0].user.emailHash).toBe('test-hash')
 
-    expect(result[0].passengers[0].user.email).toBeUndefined()
+    expect(result[0].passengers[0].user).not.toHaveProperty('email')
     expect(result[0].passengers[0].user.emailHash).toBe('test-hash')
 
-    expect(result[0].comments[0].user.email).toBeUndefined()
+    expect(result[0].comments[0].user).not.toHaveProperty('email')
     expect(result[0].comments[0].user.emailHash).toBe('test-hash')
 
     // Vérifier que getEmailHash est appelé pour chaque utilisateur

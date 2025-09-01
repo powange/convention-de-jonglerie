@@ -73,7 +73,7 @@
 
               <!-- Dropdown utilisateur ou boutons connexion -->
               <UDropdownMenu
-                v-if="authStore.isAuthenticated && authStore.user?.email"
+                v-if="authStore.isAuthenticated && authStore.user"
                 :items="userMenuItems"
               >
                 <UButton variant="ghost" color="neutral" class="rounded-full">

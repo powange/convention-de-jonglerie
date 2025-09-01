@@ -268,11 +268,13 @@ export default defineEventHandler(async (event) => {
       if (edition.collaborators) {
         edition.collaborators = edition.collaborators.map((collab) => ({
           ...collab,
-          user: {
-            ...collab.user,
-            emailHash: getEmailHash(collab.user.email),
-            email: undefined,
-          } as unknown,
+          user: (() => {
+            const { email, ...userWithoutEmail } = collab.user
+            return {
+              ...userWithoutEmail,
+              emailHash: getEmailHash(email),
+            }
+          })(),
         }))
       }
       return edition

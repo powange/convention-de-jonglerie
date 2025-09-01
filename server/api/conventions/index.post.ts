@@ -92,13 +92,13 @@ export default defineEventHandler(async (event) => {
     const transformed = {
       ...conventionWithCollaborators,
       author: conventionWithCollaborators?.author
-        ? {
-            ...conventionWithCollaborators.author,
-            emailHash: conventionWithCollaborators.author.email
-              ? getEmailHash(conventionWithCollaborators.author.email)
-              : undefined,
-            email: undefined,
-          }
+        ? (() => {
+            const { email, ...authorWithoutEmail } = conventionWithCollaborators.author
+            return {
+              ...authorWithoutEmail,
+              emailHash: email ? getEmailHash(email) : undefined,
+            }
+          })()
         : null,
       collaborators: (conventionWithCollaborators?.collaborators || []).map((c: any) => ({
         id: c.id,
@@ -113,12 +113,13 @@ export default defineEventHandler(async (event) => {
           deleteAllEditions: c.canDeleteAllEditions,
         },
         user: c.user
-          ? {
-              id: c.user.id,
-              pseudo: c.user.pseudo,
-              emailHash: c.user.email ? getEmailHash(c.user.email) : undefined,
-              email: undefined,
-            }
+          ? (() => {
+              const { email, ...userWithoutEmail } = c.user
+              return {
+                ...userWithoutEmail,
+                emailHash: email ? getEmailHash(email) : undefined,
+              }
+            })()
           : null,
         addedBy: c.addedBy,
       })),

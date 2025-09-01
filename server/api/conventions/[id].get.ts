@@ -1,3 +1,4 @@
+import { getEmailHash } from '../../utils/email-hash'
 import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
@@ -56,9 +57,7 @@ export default defineEventHandler(async (event) => {
             const { email, ...authorWithoutEmail } = convention.author
             return {
               ...authorWithoutEmail,
-              emailHash: email
-                ? (await import('../../utils/email-hash')).getEmailHash(email)
-                : undefined,
+              emailHash: email ? getEmailHash(email) : undefined,
             }
           })()
         : null,

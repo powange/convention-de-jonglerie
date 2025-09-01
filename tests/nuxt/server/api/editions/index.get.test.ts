@@ -235,7 +235,7 @@ describe('/api/editions GET', () => {
 
     expect(result.data[0].collaborators).toBeDefined()
     expect(result.data[0].collaborators[0].user.emailHash).toBe('hash_collab@example.com')
-    expect(result.data[0].collaborators[0].user.email).toBeUndefined()
+    expect(result.data[0].collaborators[0].user).not.toHaveProperty('email')
   })
 
   it('devrait gérer les erreurs', async () => {

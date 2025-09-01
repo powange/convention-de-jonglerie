@@ -201,7 +201,7 @@ describe('Système de conventions', () => {
       // Adapté: le handler retire email et ajoute emailHash
       expect(result.id).toBe(conventionWithDetails.id)
       expect(result.author.id).toBe(mockUser.id)
-      expect(result.author.email).toBeUndefined()
+      expect(result.author).not.toHaveProperty('email')
       expect(result.author.emailHash).toBeDefined()
       expect(prismaMock.convention.findUnique).toHaveBeenCalledWith({
         where: { id: 1 },

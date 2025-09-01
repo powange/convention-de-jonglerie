@@ -30,6 +30,8 @@ export default defineEventHandler(async (event) => {
         // Champs bénévolat simples sur le modèle Edition (inclus automatiquement, rien à faire)
         // Champs bénévolat (valeurs)
         volunteerApplications: false,
+        // collaboratorPermissions: permet de gérer les droits spécifiques par édition
+        // Pour l'instant on n'inclut pas, on utilise juste convention.collaborators
         convention: {
           include: {
             collaborators: {
@@ -117,12 +119,14 @@ export default defineEventHandler(async (event) => {
             editAllEditions: (collab as any).canEditAllEditions ?? false,
             deleteAllEditions: (collab as any).canDeleteAllEditions ?? false,
           },
-          user: {
-            ...collab.user,
-            emailHash: getEmailHash(collab.user.email),
-            email: '', // Vide au lieu d'undefined pour éviter l'erreur TypeScript
-          },
-        }))
+          user: (() => {
+            const { email, ...userWithoutEmail } = collab.user
+            return {
+              ...userWithoutEmail,
+              emailHash: getEmailHash(email),
+            }
+          })(),
+        })) as any
       }
     }
 

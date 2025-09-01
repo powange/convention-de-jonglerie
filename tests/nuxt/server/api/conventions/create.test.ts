@@ -33,7 +33,6 @@ describe('API Convention - Création', () => {
     author: {
       id: rawConvention.author.id,
       pseudo: rawConvention.author.pseudo,
-      email: undefined,
       emailHash: getEmailHash(rawConvention.author.email),
     },
     collaborators: [
@@ -52,7 +51,6 @@ describe('API Convention - Création', () => {
         user: {
           id: mockUser.id,
           pseudo: mockUser.pseudo,
-          email: undefined,
           emailHash: getEmailHash(mockUser.email),
         },
         addedBy: { id: mockUser.id, pseudo: mockUser.pseudo },
@@ -86,7 +84,7 @@ describe('API Convention - Création', () => {
           canAddEdition: true,
           canEditAllEditions: true,
           canDeleteAllEditions: true,
-          user: { ...mockUser },
+          user: { id: mockUser.id, pseudo: mockUser.pseudo, email: mockUser.email },
           addedBy: { id: 1, pseudo: 'creator' },
         },
       ],
