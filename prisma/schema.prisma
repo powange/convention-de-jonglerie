@@ -104,6 +104,8 @@ model Edition {
   volunteersAskPets            Boolean                         @default(false)
   volunteersAskMinors          Boolean                         @default(false)
   volunteersAskVehicle         Boolean                         @default(false)
+  volunteersAskCompanion       Boolean                         @default(false)
+  volunteersAskAvoidList       Boolean                         @default(false)
   carpoolOffers                CarpoolOffer[]
   carpoolRequests              CarpoolRequest[]
   convention                   Convention                      @relation(fields: [conventionId], references: [id])
@@ -388,6 +390,8 @@ model EditionVolunteerApplication {
   minorsDetails     String?           @db.Text
   hasVehicle        Boolean?
   vehicleDetails    String?           @db.Text
+  companionName     String?           @db.Text
+  avoidList         String?           @db.Text
   edition           Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
