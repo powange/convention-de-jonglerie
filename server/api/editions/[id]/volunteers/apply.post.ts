@@ -24,6 +24,8 @@ const bodySchema = z.object({
   companionName: z.string().max(300).optional().nullable(),
   avoidList: z.string().max(500).optional().nullable(),
   skills: z.string().max(1000).optional().nullable(),
+  hasExperience: z.boolean().optional(),
+  experienceDetails: z.string().max(500).optional().nullable(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -132,6 +134,16 @@ export default defineEventHandler(async (event) => {
           : null,
       skills:
         (edition as any).volunteersAskSkills && parsed.skills?.trim() ? parsed.skills.trim() : null,
+      hasExperience:
+        (edition as any).volunteersAskExperience && parsed.hasExperience
+          ? parsed.hasExperience
+          : null,
+      experienceDetails:
+        (edition as any).volunteersAskExperience &&
+        parsed.hasExperience &&
+        parsed.experienceDetails?.trim()
+          ? parsed.experienceDetails.trim()
+          : null,
     },
     select: {
       id: true,
@@ -149,6 +161,8 @@ export default defineEventHandler(async (event) => {
       companionName: true,
       avoidList: true,
       skills: true,
+      hasExperience: true,
+      experienceDetails: true,
     },
   })
   return { success: true, application }

@@ -18,6 +18,7 @@ const bodySchema = z.object({
   askCompanion: z.boolean().optional(),
   askAvoidList: z.boolean().optional(),
   askSkills: z.boolean().optional(),
+  askExperience: z.boolean().optional(),
   teams: z
     .array(
       z.object({
@@ -78,6 +79,7 @@ export default defineEventHandler(async (event) => {
   if (parsed.askCompanion !== undefined) data.volunteersAskCompanion = parsed.askCompanion
   if (parsed.askAvoidList !== undefined) data.volunteersAskAvoidList = parsed.askAvoidList
   if (parsed.askSkills !== undefined) data.volunteersAskSkills = parsed.askSkills
+  if (parsed.askExperience !== undefined) data.volunteersAskExperience = parsed.askExperience
   if (parsed.teams !== undefined) data.volunteersTeams = parsed.teams
   if (Object.keys(data).length === 0) return { success: true, unchanged: true }
   data.volunteersUpdatedAt = new Date()
@@ -100,6 +102,7 @@ export default defineEventHandler(async (event) => {
       volunteersAskCompanion: true,
       volunteersAskAvoidList: true,
       volunteersAskSkills: true,
+      volunteersAskExperience: true,
       volunteersTeams: true,
       volunteersUpdatedAt: true,
     } as any,

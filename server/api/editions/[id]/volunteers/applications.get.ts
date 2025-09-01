@@ -120,6 +120,8 @@ export default defineEventHandler(async (event) => {
       companionName: true,
       avoidList: true,
       skills: true,
+      hasExperience: true,
+      experienceDetails: true,
       user: {
         select: { id: true, pseudo: true, email: true, phone: true, prenom: true, nom: true },
       },

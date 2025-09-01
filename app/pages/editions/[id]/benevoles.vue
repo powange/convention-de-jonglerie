@@ -427,7 +427,8 @@
           <div
             v-if="
               (volunteersInfo?.askVehicle && volunteersMode === 'INTERNAL') ||
-              volunteersInfo?.askSkills
+              volunteersInfo?.askSkills ||
+              volunteersInfo?.askExperience
             "
             class="space-y-4 w-full"
           >
@@ -482,6 +483,34 @@
                   {{ t('editions.volunteers_skills_hint') }}
                 </p>
                 <p class="text-[11px] text-gray-500">{{ skills.length }} / 1000</p>
+              </div>
+            </div>
+
+            <!-- Expérience bénévolat -->
+            <div v-if="volunteersInfo?.askExperience" class="space-y-2 w-full">
+              <UFormField>
+                <USwitch
+                  v-model="hasExperience"
+                  :label="t('editions.volunteers_experience_label')"
+                  size="lg"
+                />
+              </UFormField>
+              <div v-if="hasExperience" class="ml-8">
+                <UFormField :label="t('editions.volunteers_experience_details_label')">
+                  <UTextarea
+                    v-model="experienceDetails"
+                    :placeholder="t('editions.volunteers_experience_details_placeholder')"
+                    :rows="3"
+                    class="w-full"
+                    :maxlength="500"
+                  />
+                </UFormField>
+                <div class="flex justify-between items-center">
+                  <p class="text-[11px] text-gray-500">
+                    {{ t('editions.volunteers_experience_details_hint') }}
+                  </p>
+                  <p class="text-[11px] text-gray-500">{{ experienceDetails.length }} / 500</p>
+                </div>
               </div>
             </div>
           </div>
@@ -844,6 +873,8 @@ const vehicleDetails = ref('')
 const companionName = ref('')
 const avoidList = ref('')
 const skills = ref('')
+const hasExperience = ref(false)
+const experienceDetails = ref('')
 
 // Items de créneaux horaires pour UCheckboxGroup
 const timeSlotItems = computed(() => [
@@ -951,6 +982,13 @@ const applyAsVolunteer = async () => {
             : undefined,
         skills:
           volunteersInfo.value?.askSkills && skills.value.trim() ? skills.value.trim() : undefined,
+        hasExperience: volunteersInfo.value?.askExperience ? hasExperience.value : undefined,
+        experienceDetails:
+          volunteersInfo.value?.askExperience &&
+          hasExperience.value &&
+          experienceDetails.value.trim()
+            ? experienceDetails.value.trim()
+            : undefined,
       },
     } as any)
     if (res?.application && volunteersInfo.value)
@@ -977,6 +1015,8 @@ const applyAsVolunteer = async () => {
     companionName.value = ''
     avoidList.value = ''
     skills.value = ''
+    hasExperience.value = false
+    experienceDetails.value = ''
     showApplyModal.value = false
   } catch (e: any) {
     toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
@@ -1648,6 +1688,9 @@ const openApplyModal = () => {
   vehicleDetails.value = ''
   companionName.value = ''
   avoidList.value = ''
+  skills.value = ''
+  hasExperience.value = false
+  experienceDetails.value = ''
   showApplyModal.value = true
   nextTick(() => {
     const textarea = motivationTextareaRef.value as any
