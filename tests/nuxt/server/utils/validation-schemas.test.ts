@@ -485,11 +485,11 @@ describe('Validation Schemas', () => {
         })
       ).toThrow()
 
-      // Description: max 1000 caractères
+      // Description: max 5000 caractères
       expect(() =>
         schemas.conventionSchema.parse({
           name: 'Valid Name',
-          description: 'a'.repeat(1001),
+          description: 'a'.repeat(5001),
         })
       ).toThrow()
 

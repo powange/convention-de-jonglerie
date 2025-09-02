@@ -724,7 +724,7 @@
     "volunteers_select_departure_placeholder": "Sélectionnez votre départ",
     "volunteers_time_granularity": {
       "morning": "Matin",
-      "noon": "Midi", 
+      "noon": "Midi",
       "afternoon": "Après-midi",
       "evening": "Soir"
     },
