@@ -697,6 +697,10 @@
     "volunteers_table_skills": "Habilidades",
     "volunteers_ask_experience_label": "Perguntar sobre experiência de voluntário",
     "volunteers_experience_label": "Já fui voluntário em eventos similares",
+    "volunteers_setup_start_date_label": "Data de início da montagem",
+    "volunteers_setup_end_date_label": "Data de fim da desmontagem",
+    "volunteers_ask_setup_label": "Perguntar disponibilidade para montagem",
+    "volunteers_ask_teardown_label": "Perguntar disponibilidade para desmontagem",
     "volunteers_experience_details_label": "Detalhes da sua experiência (opcional)",
     "volunteers_experience_details_placeholder": "Descreva brevemente sua experiência como voluntário (eventos, funções, etc.)",
     "volunteers_experience_details_hint": "Descreva sua experiência anterior como voluntário para nos ajudar a conhecê-lo melhor",
@@ -1222,6 +1226,7 @@
     "date_end_after_start": "A data de fim deve ser posterior à data de início",
     "date_start_required": "A data de início é obrigatória",
     "description_max_1000": "A descrição não pode exceder 1000 caracteres",
+    "description_max_5000": "A descrição não pode exceder 5000 caracteres",
     "name_max_100": "O nome não pode exceder 100 caracteres",
     "name_max_200": "O nome não pode exceder 200 caracteres",
     "name_min_3": "O nome deve conter pelo menos 3 caracteres"

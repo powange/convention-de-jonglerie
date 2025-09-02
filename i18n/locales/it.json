@@ -697,6 +697,10 @@
     "volunteers_table_skills": "Competenze",
     "volunteers_ask_experience_label": "Chiedere l'esperienza di volontariato",
     "volunteers_experience_label": "Ho già fatto volontariato in eventi simili",
+    "volunteers_setup_start_date_label": "Data di inizio allestimento",
+    "volunteers_setup_end_date_label": "Data di fine smontaggio",
+    "volunteers_ask_setup_label": "Chiedere disponibilità per l'allestimento",
+    "volunteers_ask_teardown_label": "Chiedere disponibilità per lo smontaggio",
     "volunteers_experience_details_label": "Dettagli della tua esperienza (opzionale)",
     "volunteers_experience_details_placeholder": "Descrivi brevemente la tua esperienza come volontario (eventi, ruoli, ecc.)",
     "volunteers_experience_details_hint": "Descrivi la tua precedente esperienza di volontariato per aiutarci a conoscerti meglio",
@@ -1222,6 +1226,7 @@
     "date_end_after_start": "La data di fine deve essere successiva alla data di inizio",
     "date_start_required": "La data di inizio è richiesta",
     "description_max_1000": "La descrizione non può superare i 1000 caratteri",
+    "description_max_5000": "La descrizione non può superare i 5000 caratteri",
     "name_max_100": "Il nome non può superare i 100 caratteri",
     "name_max_200": "Il nome non può superare i 200 caratteri",
     "name_min_3": "Il nome deve contenere almeno 3 caratteri"

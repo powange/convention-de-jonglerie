@@ -697,6 +697,10 @@
     "volunteers_table_skills": "Навыки",
     "volunteers_ask_experience_label": "Спросить о опыте волонтёрства",
     "volunteers_experience_label": "Я уже работал волонтёром на подобных мероприятиях",
+    "volunteers_setup_start_date_label": "Дата начала монтажа",
+    "volunteers_setup_end_date_label": "Дата окончания демонтажа",
+    "volunteers_ask_setup_label": "Спросить о доступности для монтажа",
+    "volunteers_ask_teardown_label": "Спросить о доступности для демонтажа",
     "volunteers_experience_details_label": "Подробности вашего опыта (опционально)",
     "volunteers_experience_details_placeholder": "Коротко опишите ваш опыт волонтёрства (мероприятия, роли и т.д.)",
     "volunteers_experience_details_hint": "Опишите ваш предыдущий опыт волонтёрства, чтобы помочь нам лучше вас узнать",
@@ -1222,6 +1226,7 @@
     "date_end_after_start": "Дата окончания должна быть позже даты начала",
     "date_start_required": "Дата начала обязательна",
     "description_max_1000": "Описание не может превышать 1000 символов",
+    "description_max_5000": "Описание не может превышать 5000 символов",
     "name_max_100": "Имя не может превышать 100 символов",
     "name_max_200": "Имя не может превышать 200 символов",
     "name_min_3": "Имя должно содержать не менее 3 символов"

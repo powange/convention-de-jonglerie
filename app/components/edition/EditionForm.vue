@@ -821,8 +821,8 @@ const getNameError = () => {
 }
 
 const getDescriptionError = () => {
-  if (touchedFields.description && state.description && state.description.length > 1000) {
-    return t('validation.description_max_1000')
+  if (touchedFields.description && state.description && state.description.length > 5000) {
+    return t('validation.description_max_5000')
   }
   return undefined
 }

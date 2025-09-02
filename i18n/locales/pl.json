@@ -697,6 +697,10 @@
     "volunteers_table_skills": "Umiejętności",
     "volunteers_ask_experience_label": "Zapytaj o doświadczenie wolontariuszy",
     "volunteers_experience_label": "Już wcześniej byłem wolontariuszem na podobnych wydarzeniach",
+    "volunteers_setup_start_date_label": "Data rozpoczęcia montażu",
+    "volunteers_setup_end_date_label": "Data zakończenia demontażu",
+    "volunteers_ask_setup_label": "Zapytaj o dostępność do montażu",
+    "volunteers_ask_teardown_label": "Zapytaj o dostępność do demontażu",
     "volunteers_experience_details_label": "Szczegóły Twojego doświadczenia (opcjonalnie)",
     "volunteers_experience_details_placeholder": "Krótko opisz swoje doświadczenie jako wolontariusz (wydarzenia, role, itp.)",
     "volunteers_experience_details_hint": "Opisz swoje wcześniejsze doświadczenie wolontariusza, aby pomóc nam lepiej Cię poznać",
@@ -1222,6 +1226,7 @@
     "date_end_after_start": "Data końcowa musi być późniejsza niż data początkowa",
     "date_start_required": "Data początkowa jest wymagana",
     "description_max_1000": "Opis nie może przekroczyć 1000 znaków",
+    "description_max_5000": "Opis nie może przekroczyć 5000 znaków",
     "name_max_100": "Nazwa nie może przekroczyć 100 znaków",
     "name_max_200": "Nazwa nie może przekroczyć 200 znaków",
     "name_min_3": "Nazwa musi zawierać co najmniej 3 znaki"

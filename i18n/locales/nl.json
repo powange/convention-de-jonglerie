@@ -697,6 +697,10 @@
     "volunteers_table_skills": "Vaardigheden",
     "volunteers_ask_experience_label": "Vragen naar vrijwilligerservaring",
     "volunteers_experience_label": "Ik heb al vrijwilligerswerk gedaan bij vergelijkbare evenementen",
+    "volunteers_setup_start_date_label": "Startdatum opbouw",
+    "volunteers_setup_end_date_label": "Einddatum afbouw",
+    "volunteers_ask_setup_label": "Vraag naar beschikbaarheid voor opbouw",
+    "volunteers_ask_teardown_label": "Vraag naar beschikbaarheid voor afbraak",
     "volunteers_experience_details_label": "Details van uw ervaring (optioneel)",
     "volunteers_experience_details_placeholder": "Beschrijf kort uw ervaring als vrijwilliger (evenementen, rollen, enz.)",
     "volunteers_experience_details_hint": "Beschrijf uw eerdere vrijwilligerservaring om ons te helpen u beter te leren kennen",
@@ -1222,6 +1226,7 @@
     "date_end_after_start": "Einddatum moet na de startdatum liggen",
     "date_start_required": "Startdatum is vereist",
     "description_max_1000": "Beschrijving mag niet meer dan 1000 tekens bevatten",
+    "description_max_5000": "Beschrijving mag niet meer dan 5000 tekens bevatten",
     "name_max_100": "Naam mag niet meer dan 100 tekens bevatten",
     "name_max_200": "Naam mag niet meer dan 200 tekens bevatten",
     "name_min_3": "Naam moet minstens 3 tekens bevatten"

@@ -697,6 +697,10 @@
     "volunteers_table_skills": "Færdigheder",
     "volunteers_ask_experience_label": "Spørg om frivillig erfaring",
     "volunteers_experience_label": "Jeg har allerede været frivillig ved lignende begivenheder",
+    "volunteers_setup_start_date_label": "Opstartsdato for opsætning",
+    "volunteers_setup_end_date_label": "Slutdato for nedtagning",
+    "volunteers_ask_setup_label": "Spørg om tilgængelighed til opsætning",
+    "volunteers_ask_teardown_label": "Spørg om tilgængelighed til nedtagning",
     "volunteers_experience_details_label": "Detaljer om din erfaring (valgfrit)",
     "volunteers_experience_details_placeholder": "Beskriv kort din erfaring som frivillig (begivenheder, roller, osv.)",
     "volunteers_experience_details_hint": "Beskriv din tidligere frivillige erfaring for at hjælpe os med at lære dig bedre at kende",
@@ -1222,6 +1226,7 @@
     "date_end_after_start": "Slutdatoen skal være efter startdatoen",
     "date_start_required": "Startdato er påkrævet",
     "description_max_1000": "Beskrivelsen må ikke overskride 1000 tegn",
+    "description_max_5000": "Beskrivelsen må ikke overskride 5000 tegn",
     "name_max_100": "Navnet må ikke overskride 100 tegn",
     "name_max_200": "Navnet må ikke overskride 200 tegn",
     "name_min_3": "Navnet skal indeholde mindst 3 tegn"

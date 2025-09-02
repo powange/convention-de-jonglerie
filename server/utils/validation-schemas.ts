@@ -65,7 +65,7 @@ export const conventionSchema = z.object({
     .max(100, 'Le nom ne peut pas dépasser 100 caractères'),
   description: z
     .string()
-    .max(1000, 'La description ne peut pas dépasser 1000 caractères')
+    .max(5000, 'La description ne peut pas dépasser 5000 caractères')
     .nullable()
     .optional(),
   logo: z.string().nullable().optional(),
@@ -84,7 +84,7 @@ export const editionSchema = z
       .refine((val) => !val || val.length >= 3, 'Le nom doit contenir au moins 3 caractères'),
     description: z
       .string()
-      .max(1000, 'La description ne peut pas dépasser 1000 caractères')
+      .max(5000, 'La description ne peut pas dépasser 5000 caractères')
       .optional(),
     imageUrl: z.string().optional(),
     startDate: dateSchema,
@@ -157,7 +157,7 @@ export const updateEditionSchema = z
       .refine((val) => !val || val.length >= 3, 'Le nom doit contenir au moins 3 caractères'),
     description: z
       .string()
-      .max(1000, 'La description ne peut pas dépasser 1000 caractères')
+      .max(5000, 'La description ne peut pas dépasser 5000 caractères')
       .optional(),
     imageUrl: z.string().optional(),
     startDate: dateSchema.optional(),
