@@ -229,6 +229,61 @@
             </UFormField>
           </div>
 
+          <!-- Section: Votre présence -->
+          <div v-if="volunteersMode === 'INTERNAL'" class="space-y-4 w-full">
+            <h3
+              class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+            >
+              {{ t('editions.volunteers_presence_title') }}
+            </h3>
+
+            <!-- Disponibilité montage -->
+            <div
+              v-if="volunteersInfo?.askSetup && volunteersMode === 'INTERNAL'"
+              class="space-y-2 w-full"
+            >
+              <USwitch
+                v-model="setupAvailability"
+                :label="t('editions.volunteers_setup_availability_label')"
+              />
+            </div>
+
+            <!-- Disponibilité démontage -->
+            <div
+              v-if="volunteersInfo?.askTeardown && volunteersMode === 'INTERNAL'"
+              class="space-y-2 w-full"
+            >
+              <USwitch
+                v-model="teardownAvailability"
+                :label="t('editions.volunteers_teardown_availability_label')"
+              />
+            </div>
+
+            <!-- Sélection arrivée -->
+            <div class="space-y-2 w-full">
+              <UFormField :label="t('editions.volunteers_arrival_time_label')">
+                <USelect
+                  v-model="arrivalDateTime"
+                  :options="arrivalDateOptions"
+                  :placeholder="t('editions.volunteers_select_arrival_placeholder')"
+                  class="w-full"
+                />
+              </UFormField>
+            </div>
+
+            <!-- Sélection départ -->
+            <div class="space-y-2 w-full">
+              <UFormField :label="t('editions.volunteers_departure_time_label')">
+                <USelect
+                  v-model="departureDateTime"
+                  :options="departureDateOptions"
+                  :placeholder="t('editions.volunteers_select_departure_placeholder')"
+                  class="w-full"
+                />
+              </UFormField>
+            </div>
+          </div>
+
           <!-- Section: Comment vous voyez vos créneaux -->
           <div
             v-if="
@@ -875,6 +930,80 @@ const avoidList = ref('')
 const skills = ref('')
 const hasExperience = ref(false)
 const experienceDetails = ref('')
+const setupAvailability = ref(false)
+const teardownAvailability = ref(false)
+const arrivalDateTime = ref('')
+const departureDateTime = ref('')
+
+// Options pour les selects d'arrivée et départ
+const arrivalDateOptions = computed(() => {
+  if (!edition.value) return []
+
+  const startDate =
+    setupAvailability.value && volunteersInfo.value?.setupStartDate
+      ? new Date(volunteersInfo.value.setupStartDate)
+      : new Date(edition.value.startDate)
+
+  const endDate = new Date(edition.value.startDate)
+
+  // S'assurer qu'il y a au moins un jour d'options
+  if (startDate >= endDate) {
+    // Si les dates sont identiques, proposer au moins le jour de début
+    return generateDateTimeOptions(startDate, startDate)
+  }
+
+  return generateDateTimeOptions(startDate, endDate)
+})
+
+const departureDateOptions = computed(() => {
+  if (!edition.value) return []
+
+  const startDate = new Date(edition.value.endDate)
+  const endDate =
+    teardownAvailability.value && volunteersInfo.value?.setupEndDate
+      ? new Date(volunteersInfo.value.setupEndDate)
+      : new Date(edition.value.endDate)
+
+  // S'assurer qu'il y a au moins un jour d'options
+  if (startDate >= endDate) {
+    // Si les dates sont identiques, proposer au moins le jour de fin
+    return generateDateTimeOptions(startDate, startDate)
+  }
+
+  return generateDateTimeOptions(startDate, endDate)
+})
+
+const generateDateTimeOptions = (startDate: Date, endDate: Date) => {
+  const options = []
+  const currentDate = new Date(startDate)
+
+  const granularities = [
+    { key: 'morning', label: t('editions.volunteers_time_granularity.morning') },
+    { key: 'noon', label: t('editions.volunteers_time_granularity.noon') },
+    { key: 'afternoon', label: t('editions.volunteers_time_granularity.afternoon') },
+    { key: 'evening', label: t('editions.volunteers_time_granularity.evening') },
+  ]
+
+  while (currentDate <= endDate) {
+    const dateStr = currentDate.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+    })
+    const formattedDate = dateStr.charAt(0).toUpperCase() + dateStr.slice(1)
+
+    granularities.forEach((granularity) => {
+      options.push({
+        value: `${currentDate.toISOString().split('T')[0]}_${granularity.key}`,
+        label: `${formattedDate} - ${granularity.label}`,
+      })
+    })
+
+    currentDate.setDate(currentDate.getDate() + 1)
+  }
+
+  return options
+}
 
 // Items de créneaux horaires pour UCheckboxGroup
 const timeSlotItems = computed(() => [
@@ -989,6 +1118,12 @@ const applyAsVolunteer = async () => {
           experienceDetails.value.trim()
             ? experienceDetails.value.trim()
             : undefined,
+        setupAvailability: volunteersInfo.value?.askSetup ? setupAvailability.value : undefined,
+        teardownAvailability: volunteersInfo.value?.askTeardown
+          ? teardownAvailability.value
+          : undefined,
+        arrivalDateTime: arrivalDateTime.value || undefined,
+        departureDateTime: departureDateTime.value || undefined,
       },
     } as any)
     if (res?.application && volunteersInfo.value)
@@ -1544,6 +1679,58 @@ const columns: TableColumn<any>[] = [
         } as TableColumn<any>,
       ]
     : []),
+  // Colonne présence
+  {
+    accessorKey: 'presence',
+    header: t('editions.volunteers_table_presence'),
+    cell: ({ row }: any) => {
+      const hasSetupAvailability = row.original.setupAvailability
+      const hasTeardownAvailability = row.original.teardownAvailability
+      const arrivalDateTime = row.original.arrivalDateTime
+      const departureDateTime = row.original.departureDateTime
+
+      if (
+        !hasSetupAvailability &&
+        !hasTeardownAvailability &&
+        !arrivalDateTime &&
+        !departureDateTime
+      ) {
+        return h('span', '—')
+      }
+
+      const details = []
+      if (hasSetupAvailability) details.push('Montage')
+      if (hasTeardownAvailability) details.push('Démontage')
+      if (arrivalDateTime) details.push(`Arrivée: ${arrivalDateTime.split('_').join(' ')}`)
+      if (departureDateTime) details.push(`Départ: ${departureDateTime.split('_').join(' ')}`)
+
+      const text = details.slice(0, 2).join(', ')
+      const fullText = details.join('\n')
+
+      return h(
+        resolveComponent('UTooltip'),
+        { text: fullText, openDelay: 200 },
+        {
+          default: () =>
+            h(
+              'div',
+              {
+                class: 'flex items-center gap-1 cursor-help',
+              },
+              [
+                h('span', { class: 'text-xs max-w-[120px] truncate' }, text),
+                h(resolveComponent('UIcon'), {
+                  name: 'i-heroicons-information-circle',
+                  class: 'text-gray-400',
+                  size: '14',
+                }),
+              ]
+            ),
+        }
+      )
+    },
+    size: 140,
+  } as TableColumn<any>,
   {
     accessorKey: 'createdAt',
     header: ({ column }) => getSortableHeader(column, t('common.date')),

@@ -19,6 +19,10 @@ const bodySchema = z.object({
   askAvoidList: z.boolean().optional(),
   askSkills: z.boolean().optional(),
   askExperience: z.boolean().optional(),
+  setupStartDate: z.string().datetime().nullable().optional(),
+  setupEndDate: z.string().datetime().nullable().optional(),
+  askSetup: z.boolean().optional(),
+  askTeardown: z.boolean().optional(),
   teams: z
     .array(
       z.object({
@@ -80,6 +84,12 @@ export default defineEventHandler(async (event) => {
   if (parsed.askAvoidList !== undefined) data.volunteersAskAvoidList = parsed.askAvoidList
   if (parsed.askSkills !== undefined) data.volunteersAskSkills = parsed.askSkills
   if (parsed.askExperience !== undefined) data.volunteersAskExperience = parsed.askExperience
+  if (parsed.setupStartDate !== undefined)
+    data.volunteersSetupStartDate = parsed.setupStartDate ? new Date(parsed.setupStartDate) : null
+  if (parsed.setupEndDate !== undefined)
+    data.volunteersTeardownEndDate = parsed.setupEndDate ? new Date(parsed.setupEndDate) : null
+  if (parsed.askSetup !== undefined) data.volunteersAskSetup = parsed.askSetup
+  if (parsed.askTeardown !== undefined) data.volunteersAskTeardown = parsed.askTeardown
   if (parsed.teams !== undefined) data.volunteersTeams = parsed.teams
   if (Object.keys(data).length === 0) return { success: true, unchanged: true }
   data.volunteersUpdatedAt = new Date()
@@ -103,6 +113,10 @@ export default defineEventHandler(async (event) => {
       volunteersAskAvoidList: true,
       volunteersAskSkills: true,
       volunteersAskExperience: true,
+      volunteersSetupStartDate: true,
+      volunteersTeardownEndDate: true,
+      volunteersAskSetup: true,
+      volunteersAskTeardown: true,
       volunteersTeams: true,
       volunteersUpdatedAt: true,
     } as any,

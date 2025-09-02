@@ -122,6 +122,10 @@ export default defineEventHandler(async (event) => {
       skills: true,
       hasExperience: true,
       experienceDetails: true,
+      setupAvailability: true,
+      teardownAvailability: true,
+      arrivalDateTime: true,
+      departureDateTime: true,
       user: {
         select: { id: true, pseudo: true, email: true, phone: true, prenom: true, nom: true },
       },

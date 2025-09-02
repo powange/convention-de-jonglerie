@@ -278,6 +278,121 @@
                   </h3>
                 </div>
 
+                <!-- Dates de montage -->
+                <div class="space-y-4 mb-4">
+                  <UFormField :label="t('editions.volunteers_setup_start_date_label')">
+                    <UPopover>
+                      <UButtonGroup>
+                        <UButton
+                          :disabled="savingVolunteers"
+                          variant="outline"
+                          color="neutral"
+                          icon="i-heroicons-calendar-days"
+                        >
+                          {{
+                            volunteersSetupStartDateLocal
+                              ? toCalendarDate(volunteersSetupStartDateLocal).toString()
+                              : t('forms.labels.select_date')
+                          }}
+                        </UButton>
+                        <UButton
+                          v-if="volunteersSetupStartDateLocal"
+                          icon="i-heroicons-x-mark"
+                          color="neutral"
+                          variant="outline"
+                          :disabled="savingVolunteers"
+                          @click="
+                            () => {
+                              volunteersSetupStartDateLocal = null
+                              volunteersAskSetupLocal = false
+                              persistVolunteerSettings()
+                            }
+                          "
+                        />
+                      </UButtonGroup>
+                      <template #content>
+                        <UCalendar
+                          v-model="volunteersSetupStartDateLocal"
+                          :max-value="setupStartDateMaxValue"
+                          @update:model-value="() => persistVolunteerSettings()"
+                        />
+                      </template>
+                    </UPopover>
+                  </UFormField>
+
+                  <UFormField :label="t('editions.volunteers_setup_end_date_label')">
+                    <UPopover>
+                      <UButtonGroup>
+                        <UButton
+                          :disabled="savingVolunteers"
+                          variant="outline"
+                          color="neutral"
+                          icon="i-heroicons-calendar-days"
+                        >
+                          {{
+                            volunteersTeardownEndDateLocal
+                              ? toCalendarDate(volunteersTeardownEndDateLocal).toString()
+                              : t('forms.labels.select_date')
+                          }}
+                        </UButton>
+                        <UButton
+                          v-if="volunteersTeardownEndDateLocal"
+                          icon="i-heroicons-x-mark"
+                          color="neutral"
+                          variant="outline"
+                          :disabled="savingVolunteers"
+                          @click="
+                            () => {
+                              volunteersTeardownEndDateLocal = null
+                              volunteersAskTeardownLocal = false
+                              persistVolunteerSettings()
+                            }
+                          "
+                        />
+                      </UButtonGroup>
+                      <template #content>
+                        <UCalendar
+                          v-model="volunteersTeardownEndDateLocal"
+                          :min-value="setupEndDateMinValue"
+                          @update:model-value="() => persistVolunteerSettings()"
+                        />
+                      </template>
+                    </UPopover>
+                  </UFormField>
+                </div>
+
+                <!-- Switch demander participation au montage -->
+                <USwitch
+                  v-model="volunteersAskSetupLocal"
+                  :disabled="savingVolunteers || !volunteersSetupStartDateLocal"
+                  color="primary"
+                  class="mb-2"
+                  :label="
+                    !volunteersSetupStartDateLocal
+                      ? t('editions.volunteers_ask_setup_label') +
+                        ' (définissez d\'abord la date de début du montage)'
+                      : t('editions.volunteers_ask_setup_label')
+                  "
+                  size="lg"
+                  @update:model-value="persistVolunteerSettings"
+                />
+
+                <!-- Switch demander participation au démontage -->
+                <USwitch
+                  v-model="volunteersAskTeardownLocal"
+                  :disabled="savingVolunteers || !volunteersTeardownEndDateLocal"
+                  color="primary"
+                  class="mb-2"
+                  :label="
+                    !volunteersTeardownEndDateLocal
+                      ? t('editions.volunteers_ask_teardown_label') +
+                        ' (définissez d\'abord la date de fin du démontage)'
+                      : t('editions.volunteers_ask_teardown_label')
+                  "
+                  size="lg"
+                  @update:model-value="persistVolunteerSettings"
+                />
+
                 <!-- Switch demander régime alimentaire (mode interne uniquement) -->
                 <USwitch
                   v-model="volunteersAskDietLocal"
@@ -484,6 +599,7 @@
 </template>
 
 <script setup lang="ts">
+import { type DateValue, fromDate, toCalendarDate } from '@internationalized/date'
 import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -507,6 +623,17 @@ const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
+
+// Contraintes de dates pour le montage
+const setupStartDateMaxValue = computed(() => {
+  if (!edition.value?.startDate) return null
+  return fromDate(new Date(edition.value.startDate), 'UTC')
+})
+const setupEndDateMinValue = computed(() => {
+  if (!edition.value?.endDate) return null
+  return fromDate(new Date(edition.value.endDate), 'UTC')
+})
+
 const volunteersOpenLocal = ref(false)
 const volunteersModeLocal = ref<'INTERNAL' | 'EXTERNAL'>('INTERNAL')
 const volunteersExternalUrlLocal = ref('')
@@ -524,6 +651,10 @@ const volunteersAskCompanionLocal = ref(false)
 const volunteersAskAvoidListLocal = ref(false)
 const volunteersAskSkillsLocal = ref(false)
 const volunteersAskExperienceLocal = ref(false)
+const volunteersSetupStartDateLocal = ref<DateValue | null>(null)
+const volunteersTeardownEndDateLocal = ref<DateValue | null>(null)
+const volunteersAskSetupLocal = ref(false)
+const volunteersAskTeardownLocal = ref(false)
 const volunteersTeamsLocal = ref<{ name: string; slots?: number }[]>([])
 const volunteersUpdatedAt = ref<Date | null>(null)
 const savingVolunteers = ref(false)
@@ -575,6 +706,14 @@ function applyEditionVolunteerFields(src: any) {
   volunteersAskAvoidListLocal.value = !!src.volunteersAskAvoidList
   volunteersAskSkillsLocal.value = !!src.volunteersAskSkills
   volunteersAskExperienceLocal.value = !!src.volunteersAskExperience
+  volunteersSetupStartDateLocal.value = src.volunteersSetupStartDate
+    ? fromDate(new Date(src.volunteersSetupStartDate), 'UTC')
+    : null
+  volunteersTeardownEndDateLocal.value = src.volunteersTeardownEndDate
+    ? fromDate(new Date(src.volunteersTeardownEndDate), 'UTC')
+    : null
+  volunteersAskSetupLocal.value = !!src.volunteersAskSetup
+  volunteersAskTeardownLocal.value = !!src.volunteersAskTeardown
   volunteersTeamsLocal.value = src.volunteersTeams
     ? JSON.parse(JSON.stringify(src.volunteersTeams))
     : []
@@ -643,6 +782,14 @@ const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {})
       askAvoidList: volunteersAskAvoidListLocal.value,
       askSkills: volunteersAskSkillsLocal.value,
       askExperience: volunteersAskExperienceLocal.value,
+      setupStartDate: volunteersSetupStartDateLocal.value
+        ? new Date(toCalendarDate(volunteersSetupStartDateLocal.value).toString()).toISOString()
+        : null,
+      setupEndDate: volunteersTeardownEndDateLocal.value
+        ? new Date(toCalendarDate(volunteersTeardownEndDateLocal.value).toString()).toISOString()
+        : null,
+      askSetup: volunteersAskSetupLocal.value,
+      askTeardown: volunteersAskTeardownLocal.value,
       teams: volunteersTeamsLocal.value.filter((team) => team.name.trim()),
     }
     if (volunteersModeLocal.value === 'EXTERNAL')

@@ -26,6 +26,10 @@ const bodySchema = z.object({
   skills: z.string().max(1000).optional().nullable(),
   hasExperience: z.boolean().optional(),
   experienceDetails: z.string().max(500).optional().nullable(),
+  setupAvailability: z.boolean().optional(),
+  teardownAvailability: z.boolean().optional(),
+  arrivalDateTime: z.string().optional().nullable(),
+  departureDateTime: z.string().optional().nullable(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -144,6 +148,10 @@ export default defineEventHandler(async (event) => {
         parsed.experienceDetails?.trim()
           ? parsed.experienceDetails.trim()
           : null,
+      setupAvailability: parsed.setupAvailability || null,
+      teardownAvailability: parsed.teardownAvailability || null,
+      arrivalDateTime: parsed.arrivalDateTime?.trim() ? parsed.arrivalDateTime.trim() : null,
+      departureDateTime: parsed.departureDateTime?.trim() ? parsed.departureDateTime.trim() : null,
     },
     select: {
       id: true,
@@ -163,6 +171,10 @@ export default defineEventHandler(async (event) => {
       skills: true,
       hasExperience: true,
       experienceDetails: true,
+      setupAvailability: true,
+      teardownAvailability: true,
+      arrivalDateTime: true,
+      departureDateTime: true,
     },
   })
   return { success: true, application }
