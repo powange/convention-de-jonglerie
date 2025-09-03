@@ -676,6 +676,8 @@
     "volunteers_departure_time_label": "Wanneer bent u van plan te vertrekken?",
     "volunteers_description_label": "Beschrijving voor vrijwilligers",
     "volunteers_diet_label": "Dieetvoorkeur",
+    "volunteers_event_availability_hint": "Naast de op- en afbouw kunt u ook helpen tijdens het hoofdevenement",
+    "volunteers_event_availability_label": "Ik ben ook beschikbaar tijdens het evenement",
     "volunteers_experience_details_hint": "Beschrijf uw eerdere vrijwilligerservaring om ons te helpen u beter te leren kennen",
     "volunteers_experience_details_label": "Details van uw ervaring (optioneel)",
     "volunteers_experience_details_placeholder": "Beschrijf kort uw ervaring als vrijwilliger (evenementen, rollen, enz.)",
@@ -1264,13 +1266,20 @@
     "validation_error": "Validatiefout"
   },
   "validation": {
+    "arrival_date_required": "Aankomstdatum is vereist",
+    "at_least_one_availability_required": "Ten minste één beschikbaarheid moet worden geselecteerd",
     "date_end_after_start": "Einddatum moet na de startdatum liggen",
     "date_start_required": "Startdatum is vereist",
+    "departure_date_required": "Vertrekdatum is vereist",
     "description_max_1000": "Beschrijving mag niet meer dan 1000 tekens bevatten",
     "description_max_5000": "Beschrijving mag niet meer dan 5000 tekens bevatten",
+    "first_name_required": "Voornaam is vereist",
+    "last_name_required": "Achternaam is vereist",
+    "motivation_too_long": "Motivatie mag niet meer dan {max} tekens bevatten",
     "name_max_100": "Naam mag niet meer dan 100 tekens bevatten",
     "name_max_200": "Naam mag niet meer dan 200 tekens bevatten",
-    "name_min_3": "Naam moet minstens 3 tekens bevatten"
+    "name_min_3": "Naam moet minstens 3 tekens bevatten",
+    "phone_required": "Telefoonnummer is vereist"
   },
   "volunteersInfo": {
     "externalUrl": "Externe URL"

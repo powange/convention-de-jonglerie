@@ -676,6 +676,8 @@
     "volunteers_departure_time_label": "¿Cuándo planea marcharse?",
     "volunteers_description_label": "Descripción para voluntarios",
     "volunteers_diet_label": "Preferencia alimentaria",
+    "volunteers_event_availability_hint": "Además del montaje/desmontaje, también puedes ayudar durante el evento principal",
+    "volunteers_event_availability_label": "También estoy disponible durante el evento",
     "volunteers_experience_details_hint": "Describe tu experiencia previa como voluntario para ayudarnos a conocerte mejor",
     "volunteers_experience_details_label": "Detalles de tu experiencia (opcional)",
     "volunteers_experience_details_placeholder": "Describe brevemente tu experiencia como voluntario (eventos, funciones, etc.)",
@@ -1264,13 +1266,20 @@
     "validation_error": "Error de validación"
   },
   "validation": {
+    "arrival_date_required": "La fecha de llegada es requerida",
+    "at_least_one_availability_required": "Debe seleccionarse al menos una disponibilidad",
     "date_end_after_start": "La fecha de fin debe ser posterior a la fecha de inicio",
     "date_start_required": "La fecha de inicio es requerida",
+    "departure_date_required": "La fecha de salida es requerida",
     "description_max_1000": "La descripción no puede exceder los 1000 caracteres",
     "description_max_5000": "La descripción no puede exceder los 5000 caracteres",
+    "first_name_required": "El nombre es requerido",
+    "last_name_required": "El apellido es requerido",
+    "motivation_too_long": "La motivación no puede exceder {max} caracteres",
     "name_max_100": "El nombre no puede exceder los 100 caracteres",
     "name_max_200": "El nombre no puede exceder los 200 caracteres",
-    "name_min_3": "El nombre debe contener al menos 3 caracteres"
+    "name_min_3": "El nombre debe contener al menos 3 caracteres",
+    "phone_required": "El número de teléfono es requerido"
   },
   "volunteersInfo": {
     "externalUrl": "URL externa"

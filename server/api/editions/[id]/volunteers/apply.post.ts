@@ -28,6 +28,7 @@ const bodySchema = z.object({
   experienceDetails: z.string().max(500).optional().nullable(),
   setupAvailability: z.boolean().optional(),
   teardownAvailability: z.boolean().optional(),
+  eventAvailability: z.boolean().optional(),
   arrivalDateTime: z.string().optional().nullable(),
   departureDateTime: z.string().optional().nullable(),
 })
@@ -150,6 +151,7 @@ export default defineEventHandler(async (event) => {
           : null,
       setupAvailability: parsed.setupAvailability || null,
       teardownAvailability: parsed.teardownAvailability || null,
+      eventAvailability: parsed.eventAvailability || null,
       arrivalDateTime: parsed.arrivalDateTime?.trim() ? parsed.arrivalDateTime.trim() : null,
       departureDateTime: parsed.departureDateTime?.trim() ? parsed.departureDateTime.trim() : null,
     },

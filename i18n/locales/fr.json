@@ -746,6 +746,8 @@
     "volunteers_presence_title": "Votre présence",
     "volunteers_setup_availability_label": "Je suis disponible pour le montage",
     "volunteers_teardown_availability_label": "Je suis disponible pour le démontage",
+    "volunteers_event_availability_label": "Je suis aussi disponible pendant l'événement",
+    "volunteers_event_availability_hint": "En plus du montage/démontage, vous pouvez aussi aider pendant l'événement principal",
     "volunteers_arrival_time_label": "Quand comptez-vous arriver ?",
     "volunteers_departure_time_label": "Quand comptez-vous repartir ?",
     "volunteers_select_arrival_placeholder": "Sélectionnez votre arrivée",
@@ -1267,7 +1269,14 @@
     "description_max_5000": "La description ne peut pas dépasser 5000 caractères",
     "name_max_100": "Le nom ne peut pas dépasser 100 caractères",
     "name_max_200": "Le nom ne peut pas dépasser 200 caractères",
-    "name_min_3": "Le nom doit contenir au moins 3 caractères"
+    "name_min_3": "Le nom doit contenir au moins 3 caractères",
+    "phone_required": "Le numéro de téléphone est requis",
+    "first_name_required": "Le prénom est requis",
+    "last_name_required": "Le nom est requis",
+    "motivation_too_long": "La motivation ne peut pas dépasser {max} caractères",
+    "at_least_one_availability_required": "Au moins une disponibilité doit être sélectionnée",
+    "arrival_date_required": "La date d'arrivée est requise",
+    "departure_date_required": "La date de départ est requise"
   },
   "team": {
     "name": "Nom de l'équipe",

@@ -676,6 +676,8 @@
     "volunteers_departure_time_label": "Когда вы планируете уехать?",
     "volunteers_description_label": "Описание для волонтёров",
     "volunteers_diet_label": "Пищевые предпочтения",
+    "volunteers_event_availability_hint": "Кроме сборки/разборки, вы также можете помочь во время основного мероприятия",
+    "volunteers_event_availability_label": "Я также доступен во время мероприятия",
     "volunteers_experience_details_hint": "Опишите ваш предыдущий опыт волонтёрства, чтобы помочь нам лучше вас узнать",
     "volunteers_experience_details_label": "Подробности вашего опыта (опционально)",
     "volunteers_experience_details_placeholder": "Коротко опишите ваш опыт волонтёрства (мероприятия, роли и т.д.)",
@@ -1264,13 +1266,20 @@
     "validation_error": "Ошибка валидации"
   },
   "validation": {
+    "arrival_date_required": "Дата прибытия обязательна",
+    "at_least_one_availability_required": "Должна быть выбрана хотя бы одна доступность",
     "date_end_after_start": "Дата окончания должна быть позже даты начала",
     "date_start_required": "Дата начала обязательна",
+    "departure_date_required": "Дата отъезда обязательна",
     "description_max_1000": "Описание не может превышать 1000 символов",
     "description_max_5000": "Описание не может превышать 5000 символов",
+    "first_name_required": "Имя обязательно",
+    "last_name_required": "Фамилия обязательна",
+    "motivation_too_long": "Мотивация не может превышать {max} символов",
     "name_max_100": "Имя не может превышать 100 символов",
     "name_max_200": "Имя не может превышать 200 символов",
-    "name_min_3": "Имя должно содержать не менее 3 символов"
+    "name_min_3": "Имя должно содержать не менее 3 символов",
+    "phone_required": "Номер телефона обязателен"
   },
   "volunteersInfo": {
     "externalUrl": "Внешний URL"

@@ -147,486 +147,15 @@
     </UCard>
 
     <!-- Modal candidature bénévole -->
-    <UModal
-      v-model:open="showApplyModal"
-      :title="t('editions.volunteers_apply')"
-      :description="t('editions.volunteers_apply_description')"
-      :dismissible="!volunteersApplying"
-      :ui="{ content: 'max-w-xl rounded-none' }"
-    >
-      <template #body>
-        <div class="space-y-4 w-full">
-          <!-- Infos personnelles transmises -->
-          <div
-            class="space-y-2 text-gray-600 dark:text-gray-400 border rounded-md p-3 bg-gray-50 dark:bg-gray-800/40"
-          >
-            <div class="flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300">
-              <UIcon name="i-heroicons-information-circle" class="text-primary-500" />
-              <span>{{ t('editions.volunteers_personal_info_notice') }}</span>
-            </div>
-            <div class="space-y-2 text-[11px] sm:text-xs">
-              <!-- Première ligne: Nom et Prénom -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <span class="font-semibold">{{ t('editions.volunteers_first_name') }}:</span>
-                  <span v-if="(authStore.user as any)?.prenom" class="ml-1">{{
-                    (authStore.user as any).prenom
-                  }}</span>
-                  <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
-                </div>
-                <div>
-                  <span class="font-semibold">{{ t('editions.volunteers_last_name') }}:</span>
-                  <span v-if="(authStore.user as any)?.nom" class="ml-1">{{
-                    (authStore.user as any).nom
-                  }}</span>
-                  <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
-                </div>
-              </div>
-              <!-- Deuxième ligne: Email et Téléphone -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <span class="font-semibold">{{ t('common.email') }}:</span>
-                  <span class="ml-1">{{ authStore.user?.email }}</span>
-                </div>
-                <div>
-                  <span class="font-semibold">{{ t('editions.volunteers_phone') }}:</span>
-                  <span v-if="(authStore.user as any)?.phone" class="ml-1">{{
-                    (authStore.user as any).phone
-                  }}</span>
-                  <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
-                </div>
-              </div>
-            </div>
-            <p class="mt-1 text-[11px] leading-snug">
-              {{ t('editions.volunteers_personal_info_disclaimer') }}
-            </p>
-          </div>
-          <!-- Champ téléphone si manquant -->
-          <div v-if="needsPhone" class="space-y-2 w-full">
-            <UFormField :label="t('editions.volunteers_phone_required')" class="w-full">
-              <UInput v-model="volunteerPhone" autocomplete="tel" class="w-full" />
-            </UFormField>
-          </div>
-
-          <!-- Champs nom/prénom si manquants -->
-          <div
-            v-if="!(authStore.user as any)?.prenom || !(authStore.user as any)?.nom"
-            class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full"
-          >
-            <UFormField
-              v-if="!(authStore.user as any)?.prenom"
-              :label="t('editions.volunteers_first_name_required')"
-              class="w-full"
-            >
-              <UInput v-model="volunteerFirstName" class="w-full" />
-            </UFormField>
-            <UFormField
-              v-if="!(authStore.user as any)?.nom"
-              :label="t('editions.volunteers_last_name_required')"
-              class="w-full"
-            >
-              <UInput v-model="volunteerLastName" class="w-full" />
-            </UFormField>
-          </div>
-
-          <!-- Section: Votre présence -->
-          <div v-if="volunteersMode === 'INTERNAL'" class="space-y-4 w-full">
-            <h3
-              class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
-            >
-              {{ t('editions.volunteers_presence_title') }}
-            </h3>
-
-            <!-- Disponibilité montage -->
-            <div
-              v-if="volunteersInfo?.askSetup && volunteersMode === 'INTERNAL'"
-              class="space-y-2 w-full"
-            >
-              <USwitch
-                v-model="setupAvailability"
-                :label="t('editions.volunteers_setup_availability_label')"
-              />
-            </div>
-
-            <!-- Disponibilité démontage -->
-            <div
-              v-if="volunteersInfo?.askTeardown && volunteersMode === 'INTERNAL'"
-              class="space-y-2 w-full"
-            >
-              <USwitch
-                v-model="teardownAvailability"
-                :label="t('editions.volunteers_teardown_availability_label')"
-              />
-            </div>
-
-            <!-- Sélection arrivée -->
-            <div class="space-y-2 w-full">
-              <UFormField :label="t('editions.volunteers_arrival_time_label')">
-                <USelect
-                  v-model="arrivalDateTime"
-                  :options="arrivalDateOptions"
-                  :placeholder="t('editions.volunteers_select_arrival_placeholder')"
-                  class="w-full"
-                />
-              </UFormField>
-            </div>
-
-            <!-- Sélection départ -->
-            <div class="space-y-2 w-full">
-              <UFormField :label="t('editions.volunteers_departure_time_label')">
-                <USelect
-                  v-model="departureDateTime"
-                  :options="departureDateOptions"
-                  :placeholder="t('editions.volunteers_select_departure_placeholder')"
-                  class="w-full"
-                />
-              </UFormField>
-            </div>
-          </div>
-
-          <!-- Section: Comment vous voyez vos créneaux -->
-          <div
-            v-if="
-              (volunteersInfo?.askTimePreferences && volunteersMode === 'INTERNAL') ||
-              (volunteersInfo?.askTeamPreferences &&
-                volunteersInfo?.teams &&
-                volunteersInfo.teams.length > 0 &&
-                volunteersMode === 'INTERNAL') ||
-              volunteersInfo?.askCompanion ||
-              volunteersInfo?.askAvoidList
-            "
-            class="space-y-4 w-full"
-          >
-            <h3
-              class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
-            >
-              {{ t('editions.volunteers_shifts_preferences_title') }}
-            </h3>
-
-            <!-- Équipes préférées -->
-            <div
-              v-if="
-                volunteersInfo?.askTeamPreferences &&
-                volunteersInfo?.teams &&
-                volunteersInfo.teams.length > 0 &&
-                volunteersMode === 'INTERNAL'
-              "
-              class="space-y-2 w-full"
-            >
-              <UFormField :label="t('editions.volunteers_team_preferences_label')">
-                <UCheckboxGroup
-                  v-model="selectedTeamPreferences"
-                  :items="teamItems"
-                  class="grid grid-cols-1 gap-2"
-                />
-              </UFormField>
-              <p class="text-[11px] text-gray-500">
-                {{ t('editions.volunteers_team_preferences_hint') }}
-              </p>
-            </div>
-
-            <!-- Créneaux horaires préférés -->
-            <div
-              v-if="volunteersInfo?.askTimePreferences && volunteersMode === 'INTERNAL'"
-              class="space-y-2 w-full"
-            >
-              <UFormField :label="t('editions.volunteers_time_preferences_label')">
-                <UCheckboxGroup
-                  v-model="selectedTimePreferences"
-                  :items="timeSlotItems"
-                  class="grid grid-cols-1 sm:grid-cols-2 gap-2"
-                />
-              </UFormField>
-              <p class="text-[11px] text-gray-500">
-                {{ t('editions.volunteers_time_preferences_hint') }}
-              </p>
-            </div>
-
-            <!-- Bénévoles préférés pour créneaux -->
-            <div v-if="volunteersInfo?.askCompanion" class="space-y-2 w-full">
-              <UFormField>
-                <UTextarea
-                  v-model="companionName"
-                  :label="t('editions.volunteers_companion_label')"
-                  :placeholder="t('editions.volunteers_companion_placeholder')"
-                  class="w-full"
-                  :rows="2"
-                  :maxlength="300"
-                />
-              </UFormField>
-              <p class="text-[11px] text-gray-500">
-                {{ t('editions.volunteers_companion_hint') }}
-              </p>
-            </div>
-
-            <!-- Bénévoles à éviter pour créneaux -->
-            <div v-if="volunteersInfo?.askAvoidList" class="space-y-2 w-full">
-              <UFormField>
-                <UTextarea
-                  v-model="avoidList"
-                  :label="t('editions.volunteers_avoid_list_label')"
-                  :placeholder="t('editions.volunteers_avoid_list_placeholder')"
-                  class="w-full"
-                  :rows="3"
-                  :maxlength="500"
-                />
-              </UFormField>
-              <p class="text-[11px] text-gray-500">
-                {{ t('editions.volunteers_avoid_list_hint') }}
-              </p>
-            </div>
-          </div>
-
-          <!-- Section: Les choses à savoir sur vous -->
-          <div
-            v-if="
-              (volunteersInfo?.askDiet && volunteersMode === 'INTERNAL') ||
-              (volunteersInfo?.askAllergies && volunteersMode === 'INTERNAL') ||
-              (volunteersInfo?.askPets && volunteersMode === 'INTERNAL') ||
-              (volunteersInfo?.askMinors && volunteersMode === 'INTERNAL')
-            "
-            class="space-y-4 w-full"
-          >
-            <h3
-              class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
-            >
-              {{ t('editions.volunteers_about_you_title') }}
-            </h3>
-
-            <!-- Régime alimentaire -->
-            <div
-              v-if="volunteersInfo?.askDiet && volunteersMode === 'INTERNAL'"
-              class="space-y-2 w-full"
-            >
-              <UFormField :label="t('editions.volunteers_diet_label')">
-                <USelect
-                  v-model="selectedDietPreference"
-                  :items="dietPreferenceItems"
-                  size="lg"
-                  class="w-full text-sm"
-                  :placeholder="t('diet.none')"
-                />
-              </UFormField>
-            </div>
-
-            <!-- Allergies -->
-            <div
-              v-if="volunteersInfo?.askAllergies && volunteersMode === 'INTERNAL'"
-              class="space-y-2 w-full"
-            >
-              <UFormField :label="t('editions.volunteers_allergies_label')">
-                <UInput
-                  v-model="volunteerAllergies"
-                  :placeholder="t('editions.volunteers_allergies_placeholder')"
-                  class="w-full"
-                  :maxlength="300"
-                />
-              </UFormField>
-              <p class="text-[11px] text-gray-500">{{ t('editions.volunteers_allergies_hint') }}</p>
-            </div>
-
-            <!-- Animaux de compagnie -->
-            <div
-              v-if="volunteersInfo?.askPets && volunteersMode === 'INTERNAL'"
-              class="space-y-2 w-full"
-            >
-              <UFormField>
-                <USwitch v-model="hasPets" :label="t('editions.volunteers_pets_label')" size="lg" />
-              </UFormField>
-              <div v-if="hasPets" class="ml-8">
-                <UFormField :label="t('editions.volunteers_pets_details_label')">
-                  <UTextarea
-                    v-model="petsDetails"
-                    :placeholder="t('editions.volunteers_pets_details_placeholder')"
-                    :rows="2"
-                    class="w-full"
-                    :maxlength="200"
-                  />
-                </UFormField>
-                <p class="text-[11px] text-gray-500">
-                  {{ t('editions.volunteers_pets_details_hint') }}
-                </p>
-              </div>
-            </div>
-
-            <!-- Personnes mineures -->
-            <div
-              v-if="volunteersInfo?.askMinors && volunteersMode === 'INTERNAL'"
-              class="space-y-2 w-full"
-            >
-              <UFormField>
-                <USwitch
-                  v-model="hasMinors"
-                  :label="t('editions.volunteers_minors_label')"
-                  size="lg"
-                />
-              </UFormField>
-              <div v-if="hasMinors" class="ml-8">
-                <UFormField :label="t('editions.volunteers_minors_details_label')">
-                  <UTextarea
-                    v-model="minorsDetails"
-                    :placeholder="t('editions.volunteers_minors_details_placeholder')"
-                    :rows="2"
-                    class="w-full"
-                    :maxlength="200"
-                  />
-                </UFormField>
-                <p class="text-[11px] text-gray-500">
-                  {{ t('editions.volunteers_minors_details_hint') }}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section: Ce que vous pouvez nous apporter -->
-          <div
-            v-if="
-              (volunteersInfo?.askVehicle && volunteersMode === 'INTERNAL') ||
-              volunteersInfo?.askSkills ||
-              volunteersInfo?.askExperience
-            "
-            class="space-y-4 w-full"
-          >
-            <h3
-              class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
-            >
-              {{ t('editions.volunteers_what_you_can_bring_title') }}
-            </h3>
-
-            <!-- Véhicule à disposition -->
-            <div
-              v-if="volunteersInfo?.askVehicle && volunteersMode === 'INTERNAL'"
-              class="space-y-2 w-full"
-            >
-              <UFormField>
-                <USwitch
-                  v-model="hasVehicle"
-                  :label="t('editions.volunteers_vehicle_label')"
-                  size="lg"
-                />
-              </UFormField>
-              <div v-if="hasVehicle" class="ml-8">
-                <UFormField :label="t('editions.volunteers_vehicle_details_label')">
-                  <UTextarea
-                    v-model="vehicleDetails"
-                    :placeholder="t('editions.volunteers_vehicle_details_placeholder')"
-                    :rows="2"
-                    class="w-full"
-                    :maxlength="200"
-                  />
-                </UFormField>
-                <p class="text-[11px] text-gray-500">
-                  {{ t('editions.volunteers_vehicle_details_hint') }}
-                </p>
-              </div>
-            </div>
-
-            <!-- Compétences et certifications -->
-            <div v-if="volunteersInfo?.askSkills" class="space-y-2 w-full">
-              <UFormField>
-                <UTextarea
-                  v-model="skills"
-                  :label="t('editions.volunteers_skills_label')"
-                  :placeholder="t('editions.volunteers_skills_placeholder')"
-                  class="w-full"
-                  :rows="4"
-                  :maxlength="1000"
-                />
-              </UFormField>
-              <div class="flex justify-between items-center">
-                <p class="text-[11px] text-gray-500">
-                  {{ t('editions.volunteers_skills_hint') }}
-                </p>
-                <p class="text-[11px] text-gray-500">{{ skills.length }} / 1000</p>
-              </div>
-            </div>
-
-            <!-- Expérience bénévolat -->
-            <div v-if="volunteersInfo?.askExperience" class="space-y-2 w-full">
-              <UFormField>
-                <USwitch
-                  v-model="hasExperience"
-                  :label="t('editions.volunteers_experience_label')"
-                  size="lg"
-                />
-              </UFormField>
-              <div v-if="hasExperience" class="ml-8">
-                <UFormField :label="t('editions.volunteers_experience_details_label')">
-                  <UTextarea
-                    v-model="experienceDetails"
-                    :placeholder="t('editions.volunteers_experience_details_placeholder')"
-                    :rows="3"
-                    class="w-full"
-                    :maxlength="500"
-                  />
-                </UFormField>
-                <div class="flex justify-between items-center">
-                  <p class="text-[11px] text-gray-500">
-                    {{ t('editions.volunteers_experience_details_hint') }}
-                  </p>
-                  <p class="text-[11px] text-gray-500">{{ experienceDetails.length }} / 500</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section: A rajouter -->
-          <div class="space-y-4 w-full">
-            <h3
-              class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
-            >
-              {{ t('editions.volunteers_additional_info_title') }}
-            </h3>
-          </div>
-
-          <!-- Motivation (déplacé en bas) -->
-          <UFormField :label="t('editions.volunteers_motivation_label')" class="w-full">
-            <div class="space-y-1 w-full">
-              <UTextarea
-                ref="motivationTextareaRef"
-                v-model="volunteerMotivation"
-                :rows="5"
-                :placeholder="t('editions.volunteers_motivation_placeholder')"
-                :maxlength="MOTIVATION_MAX"
-                class="w-full"
-              />
-              <div class="flex justify-end text-xs" :class="{ 'text-red-500': motivationTooLong }">
-                {{ volunteerMotivation.length }} / {{ MOTIVATION_MAX }}
-              </div>
-            </div>
-          </UFormField>
-          <p class="text-xs text-gray-500 whitespace-pre-line w-full">
-            {{ t('editions.volunteers_motivation_hint', { max: MOTIVATION_MAX }) }}
-          </p>
-        </div>
-      </template>
-      <template #footer="{ close }">
-        <div class="flex justify-end gap-2 w-full">
-          <UButton
-            size="lg"
-            variant="ghost"
-            :disabled="volunteersApplying"
-            @click="
-              () => {
-                close()
-                closeApplyModal()
-              }
-            "
-            >{{ t('common.cancel') }}</UButton
-          >
-          <UButton
-            size="lg"
-            color="primary"
-            :loading="volunteersApplying"
-            :disabled="volunteersApplying || motivationTooLong"
-            icon="i-heroicons-paper-airplane"
-            @click="applyAsVolunteer"
-          >
-            {{ t('editions.volunteers_apply') }}
-          </UButton>
-        </div>
-      </template>
-    </UModal>
+    <VolunteerApplicationModal
+      v-model="showApplyModal"
+      :volunteers-info="volunteersInfo"
+      :edition="edition"
+      :user="authStore.user as any"
+      :applying="volunteersApplying"
+      @close="closeApplyModal"
+      @submit="applyAsVolunteer"
+    />
 
     <UCard v-if="canViewVolunteersTable" variant="soft" class="mb-6">
       <template #header>
@@ -786,7 +315,7 @@
 
 <script setup lang="ts">
 // Vue & libs
-import { ref, computed, watch, h, nextTick } from 'vue'
+import { ref, computed, watch, h } from 'vue'
 import { useRoute } from 'vue-router'
 
 // App components & stores
@@ -908,133 +437,7 @@ const volunteersWithdrawing = ref(false)
 // Suppression édition publique : editingVolunteers retiré
 const showApplyModal = ref(false)
 // Modal candidature helpers
-const MOTIVATION_MAX = 500
-const motivationTextareaRef = ref(null)
-const motivationTooLong = computed<boolean>(() => volunteerMotivation.value.length > MOTIVATION_MAX)
-const volunteerMotivation = ref('')
-const volunteerPhone = ref('')
-const volunteerFirstName = ref('')
-const volunteerLastName = ref('')
-const selectedDietPreference = ref<'NONE' | 'VEGETARIAN' | 'VEGAN'>('NONE')
-const volunteerAllergies = ref('')
-const selectedTimePreferences = ref<string[]>([])
-const selectedTeamPreferences = ref<string[]>([])
-const hasPets = ref(false)
-const petsDetails = ref('')
-const hasMinors = ref(false)
-const minorsDetails = ref('')
-const hasVehicle = ref(false)
-const vehicleDetails = ref('')
-const companionName = ref('')
-const avoidList = ref('')
-const skills = ref('')
-const hasExperience = ref(false)
-const experienceDetails = ref('')
-const setupAvailability = ref(false)
-const teardownAvailability = ref(false)
-const arrivalDateTime = ref('')
-const departureDateTime = ref('')
-
-// Options pour les selects d'arrivée et départ
-const arrivalDateOptions = computed(() => {
-  if (!edition.value) return []
-
-  const startDate =
-    setupAvailability.value && volunteersInfo.value?.setupStartDate
-      ? new Date(volunteersInfo.value.setupStartDate)
-      : new Date(edition.value.startDate)
-
-  const endDate = new Date(edition.value.startDate)
-
-  // S'assurer qu'il y a au moins un jour d'options
-  if (startDate >= endDate) {
-    // Si les dates sont identiques, proposer au moins le jour de début
-    return generateDateTimeOptions(startDate, startDate)
-  }
-
-  return generateDateTimeOptions(startDate, endDate)
-})
-
-const departureDateOptions = computed(() => {
-  if (!edition.value) return []
-
-  const startDate = new Date(edition.value.endDate)
-  const endDate =
-    teardownAvailability.value && volunteersInfo.value?.setupEndDate
-      ? new Date(volunteersInfo.value.setupEndDate)
-      : new Date(edition.value.endDate)
-
-  // S'assurer qu'il y a au moins un jour d'options
-  if (startDate >= endDate) {
-    // Si les dates sont identiques, proposer au moins le jour de fin
-    return generateDateTimeOptions(startDate, startDate)
-  }
-
-  return generateDateTimeOptions(startDate, endDate)
-})
-
-const generateDateTimeOptions = (startDate: Date, endDate: Date) => {
-  const options = []
-  const currentDate = new Date(startDate)
-
-  const granularities = [
-    { key: 'morning', label: t('editions.volunteers_time_granularity.morning') },
-    { key: 'noon', label: t('editions.volunteers_time_granularity.noon') },
-    { key: 'afternoon', label: t('editions.volunteers_time_granularity.afternoon') },
-    { key: 'evening', label: t('editions.volunteers_time_granularity.evening') },
-  ]
-
-  while (currentDate <= endDate) {
-    const dateStr = currentDate.toLocaleDateString('fr-FR', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-    })
-    const formattedDate = dateStr.charAt(0).toUpperCase() + dateStr.slice(1)
-
-    granularities.forEach((granularity) => {
-      options.push({
-        value: `${currentDate.toISOString().split('T')[0]}_${granularity.key}`,
-        label: `${formattedDate} - ${granularity.label}`,
-      })
-    })
-
-    currentDate.setDate(currentDate.getDate() + 1)
-  }
-
-  return options
-}
-
-// Items de créneaux horaires pour UCheckboxGroup
-const timeSlotItems = computed(() => [
-  { label: t('editions.volunteers_time_slots.early_morning'), value: 'early_morning' },
-  { label: t('editions.volunteers_time_slots.morning'), value: 'morning' },
-  { label: t('editions.volunteers_time_slots.lunch'), value: 'lunch' },
-  { label: t('editions.volunteers_time_slots.early_afternoon'), value: 'early_afternoon' },
-  { label: t('editions.volunteers_time_slots.late_afternoon'), value: 'late_afternoon' },
-  { label: t('editions.volunteers_time_slots.evening'), value: 'evening' },
-  { label: t('editions.volunteers_time_slots.late_evening'), value: 'late_evening' },
-  { label: t('editions.volunteers_time_slots.night'), value: 'night' },
-])
-
-// Items d'équipes pour UCheckboxGroup
-const teamItems = computed(() => {
-  if (!volunteersInfo.value?.teams) return []
-  return volunteersInfo.value.teams.map((team) => ({
-    label: team.name,
-    value: team.name,
-  }))
-})
-
-// Items du select régime : labels doivent être des chaînes (pas des fonctions) pour USelect
-const dietPreferenceItems = computed<{ value: 'NONE' | 'VEGETARIAN' | 'VEGAN'; label: string }[]>(
-  () => [
-    { value: 'NONE', label: t('diet.none') },
-    { value: 'VEGETARIAN', label: t('diet.vegetarian') },
-    { value: 'VEGAN', label: t('diet.vegan') },
-  ]
-)
-const needsPhone = computed(() => authStore.isAuthenticated && !(authStore.user as any)?.phone)
+// Variables du formulaire déplacées dans VolunteerApplicationModal
 const volunteerStatusColor = (s: string) =>
   s === 'PENDING' ? 'warning' : s === 'ACCEPTED' ? 'success' : 'error'
 const volunteerStatusLabel = (s: string) =>
@@ -1058,100 +461,93 @@ const fetchVolunteersInfo = async () => {
 await fetchVolunteersInfo()
 
 // Fonctions d'édition/gestion supprimées de la page publique
-const applyAsVolunteer = async () => {
+const applyAsVolunteer = async (formData?: any) => {
   volunteersApplying.value = true
   try {
     const res: any = await $fetch(`/api/editions/${editionId}/volunteers/apply`, {
       method: 'POST',
       body: {
-        motivation: volunteerMotivation.value.trim() || undefined,
-        phone: needsPhone.value ? volunteerPhone.value.trim() || undefined : undefined,
+        motivation: formData?.motivation?.trim() || undefined,
+        phone: formData?.phone?.trim() || undefined,
         prenom: (authStore.user as any)?.prenom
           ? undefined
-          : volunteerFirstName.value.trim() || undefined,
-        nom: (authStore.user as any)?.nom ? undefined : volunteerLastName.value.trim() || undefined,
+          : formData?.firstName?.trim() || undefined,
+        nom: (authStore.user as any)?.nom ? undefined : formData?.lastName?.trim() || undefined,
         dietaryPreference:
-          volunteersInfo.value?.askDiet && selectedDietPreference.value !== 'NONE'
-            ? selectedDietPreference.value
+          volunteersInfo.value?.askDiet &&
+          formData?.dietPreference !== 'NONE' &&
+          formData?.dietPreference
+            ? formData.dietPreference
             : undefined,
         allergies:
-          volunteersInfo.value?.askAllergies && volunteerAllergies.value.trim()
-            ? volunteerAllergies.value.trim()
+          volunteersInfo.value?.askAllergies && formData?.allergies?.trim()
+            ? formData.allergies.trim()
             : undefined,
         timePreferences:
-          volunteersInfo.value?.askTimePreferences && selectedTimePreferences.value.length > 0
-            ? selectedTimePreferences.value
+          volunteersInfo.value?.askTimePreferences && formData?.timePreferences?.length > 0
+            ? formData.timePreferences
             : undefined,
         teamPreferences:
-          volunteersInfo.value?.askTeamPreferences && selectedTeamPreferences.value.length > 0
-            ? selectedTeamPreferences.value
+          volunteersInfo.value?.askTeamPreferences && formData?.teamPreferences?.length > 0
+            ? formData.teamPreferences
             : undefined,
-        hasPets: volunteersInfo.value?.askPets ? hasPets.value || undefined : undefined,
+        hasPets: volunteersInfo.value?.askPets ? formData?.hasPets || undefined : undefined,
         petsDetails:
-          volunteersInfo.value?.askPets && hasPets.value && petsDetails.value.trim()
-            ? petsDetails.value.trim()
+          volunteersInfo.value?.askPets && formData?.hasPets && formData?.petsDetails?.trim()
+            ? formData.petsDetails.trim()
             : undefined,
-        hasMinors: volunteersInfo.value?.askMinors ? hasMinors.value || undefined : undefined,
+        hasMinors: volunteersInfo.value?.askMinors ? formData?.hasMinors || undefined : undefined,
         minorsDetails:
-          volunteersInfo.value?.askMinors && hasMinors.value && minorsDetails.value.trim()
-            ? minorsDetails.value.trim()
+          volunteersInfo.value?.askMinors && formData?.hasMinors && formData?.minorsDetails?.trim()
+            ? formData.minorsDetails.trim()
             : undefined,
-        hasVehicle: volunteersInfo.value?.askVehicle ? hasVehicle.value || undefined : undefined,
+        hasVehicle: volunteersInfo.value?.askVehicle
+          ? formData?.hasVehicle || undefined
+          : undefined,
         vehicleDetails:
-          volunteersInfo.value?.askVehicle && hasVehicle.value && vehicleDetails.value.trim()
-            ? vehicleDetails.value.trim()
+          volunteersInfo.value?.askVehicle &&
+          formData?.hasVehicle &&
+          formData?.vehicleDetails?.trim()
+            ? formData.vehicleDetails.trim()
             : undefined,
         companionName:
-          volunteersInfo.value?.askCompanion && companionName.value.trim()
-            ? companionName.value.trim()
+          volunteersInfo.value?.askCompanion && formData?.companionName?.trim()
+            ? formData.companionName.trim()
             : undefined,
         avoidList:
-          volunteersInfo.value?.askAvoidList && avoidList.value.trim()
-            ? avoidList.value.trim()
+          volunteersInfo.value?.askAvoidList && formData?.avoidList?.trim()
+            ? formData.avoidList.trim()
             : undefined,
         skills:
-          volunteersInfo.value?.askSkills && skills.value.trim() ? skills.value.trim() : undefined,
-        hasExperience: volunteersInfo.value?.askExperience ? hasExperience.value : undefined,
+          volunteersInfo.value?.askSkills && formData?.skills?.trim()
+            ? formData.skills.trim()
+            : undefined,
+        hasExperience: volunteersInfo.value?.askExperience ? formData?.hasExperience : undefined,
         experienceDetails:
           volunteersInfo.value?.askExperience &&
-          hasExperience.value &&
-          experienceDetails.value.trim()
-            ? experienceDetails.value.trim()
+          formData?.hasExperience &&
+          formData?.experienceDetails?.trim()
+            ? formData.experienceDetails.trim()
             : undefined,
-        setupAvailability: volunteersInfo.value?.askSetup ? setupAvailability.value : undefined,
+        setupAvailability: volunteersInfo.value?.askSetup ? formData?.setupAvailability : undefined,
         teardownAvailability: volunteersInfo.value?.askTeardown
-          ? teardownAvailability.value
+          ? formData?.teardownAvailability
           : undefined,
-        arrivalDateTime: arrivalDateTime.value || undefined,
-        departureDateTime: departureDateTime.value || undefined,
+        eventAvailability: formData?.eventAvailability || undefined,
+        arrivalDateTime: formData?.arrivalDateTime || undefined,
+        departureDateTime: formData?.departureDateTime || undefined,
       },
     } as any)
     if (res?.application && volunteersInfo.value)
       volunteersInfo.value.myApplication = res.application
-    if (needsPhone.value && volunteerPhone.value.trim())
-      (authStore.user as any).phone = volunteerPhone.value.trim()
-    if (!(authStore.user as any)?.prenom && volunteerFirstName.value.trim())
-      (authStore.user as any).prenom = volunteerFirstName.value.trim()
-    if (!(authStore.user as any)?.nom && volunteerLastName.value.trim())
-      (authStore.user as any).nom = volunteerLastName.value.trim()
-    volunteerMotivation.value = ''
-    volunteerPhone.value = ''
-    volunteerFirstName.value = ''
-    volunteerLastName.value = ''
-    volunteerAllergies.value = ''
-    selectedTimePreferences.value = []
-    selectedTeamPreferences.value = []
-    hasPets.value = false
-    petsDetails.value = ''
-    hasMinors.value = false
-    minorsDetails.value = ''
-    hasVehicle.value = false
-    vehicleDetails.value = ''
-    companionName.value = ''
-    avoidList.value = ''
-    skills.value = ''
-    hasExperience.value = false
-    experienceDetails.value = ''
+
+    // Mettre à jour les infos utilisateur si nécessaire
+    if (formData?.phone?.trim()) (authStore.user as any).phone = formData.phone.trim()
+    if (!(authStore.user as any)?.prenom && formData?.firstName?.trim())
+      (authStore.user as any).prenom = formData.firstName.trim()
+    if (!(authStore.user as any)?.nom && formData?.lastName?.trim())
+      (authStore.user as any).nom = formData.lastName.trim()
+
     showApplyModal.value = false
   } catch (e: any) {
     toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
@@ -1310,6 +706,36 @@ const formatDate = (iso: string) => {
     })
   } catch {
     return iso
+  }
+}
+
+const formatDateTimeWithGranularity = (dateTimeString: string) => {
+  if (!dateTimeString || !dateTimeString.includes('_')) {
+    return dateTimeString
+  }
+
+  const [datePart, timePart] = dateTimeString.split('_')
+
+  try {
+    const date = new Date(datePart)
+    const dateFormatted = date.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+    })
+
+    // Traduction des granularités
+    const timeTranslations: Record<string, string> = {
+      morning: t('editions.volunteers_time_granularity.morning'),
+      noon: t('editions.volunteers_time_granularity.noon'),
+      afternoon: t('editions.volunteers_time_granularity.afternoon'),
+      evening: t('editions.volunteers_time_granularity.evening'),
+    }
+
+    const timeFormatted = timeTranslations[timePart] || timePart
+
+    return `${dateFormatted} ${timeFormatted.toLowerCase()}`
+  } catch {
+    return dateTimeString.split('_').join(' ')
   }
 }
 // Données aplaties pour le tableau
@@ -1686,12 +1112,14 @@ const columns: TableColumn<any>[] = [
     cell: ({ row }: any) => {
       const hasSetupAvailability = row.original.setupAvailability
       const hasTeardownAvailability = row.original.teardownAvailability
+      const hasEventAvailability = row.original.eventAvailability
       const arrivalDateTime = row.original.arrivalDateTime
       const departureDateTime = row.original.departureDateTime
 
       if (
         !hasSetupAvailability &&
         !hasTeardownAvailability &&
+        !hasEventAvailability &&
         !arrivalDateTime &&
         !departureDateTime
       ) {
@@ -1701,8 +1129,11 @@ const columns: TableColumn<any>[] = [
       const details = []
       if (hasSetupAvailability) details.push('Montage')
       if (hasTeardownAvailability) details.push('Démontage')
-      if (arrivalDateTime) details.push(`Arrivée: ${arrivalDateTime.split('_').join(' ')}`)
-      if (departureDateTime) details.push(`Départ: ${departureDateTime.split('_').join(' ')}`)
+      if (hasEventAvailability) details.push('Événement')
+      if (arrivalDateTime)
+        details.push(`Arrivée: ${formatDateTimeWithGranularity(arrivalDateTime)}`)
+      if (departureDateTime)
+        details.push(`Départ: ${formatDateTimeWithGranularity(departureDateTime)}`)
 
       const text = details.slice(0, 2).join(', ')
       const fullText = details.join('\n')
@@ -1859,30 +1290,7 @@ const filteredCountLabel = computed(() => {
 
 // Gestion ouverture / fermeture modal candidature
 const openApplyModal = () => {
-  volunteerMotivation.value = ''
-  volunteerPhone.value = ''
-  volunteerFirstName.value = ''
-  volunteerLastName.value = ''
-  volunteerAllergies.value = ''
-  selectedDietPreference.value = 'NONE'
-  selectedTimePreferences.value = []
-  selectedTeamPreferences.value = []
-  hasPets.value = false
-  petsDetails.value = ''
-  hasMinors.value = false
-  minorsDetails.value = ''
-  hasVehicle.value = false
-  vehicleDetails.value = ''
-  companionName.value = ''
-  avoidList.value = ''
-  skills.value = ''
-  hasExperience.value = false
-  experienceDetails.value = ''
   showApplyModal.value = true
-  nextTick(() => {
-    const textarea = motivationTextareaRef.value as any
-    textarea?.$el?.focus()
-  })
 }
 const closeApplyModal = () => {
   showApplyModal.value = false

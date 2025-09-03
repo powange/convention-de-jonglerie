@@ -65,7 +65,7 @@ export default defineEventHandler(async (event) => {
     askSkills: (edition as any).volunteersAskSkills || false,
     askExperience: (edition as any).volunteersAskExperience || false,
     setupStartDate: (edition as any).volunteersSetupStartDate || null,
-    setupEndDate: (edition as any).volunteersTeardownEndDate || null,
+    teardownEndDate: (edition as any).volunteersTeardownEndDate || null,
     askSetup: (edition as any).volunteersAskSetup || false,
     askTeardown: (edition as any).volunteersAskTeardown || false,
     teams: (edition as any).volunteersTeams || [],

@@ -676,6 +676,8 @@
     "volunteers_departure_time_label": "Коли ви плануєте відійти?",
     "volunteers_description_label": "Опис для волонтерів",
     "volunteers_diet_label": "Харчові вподобання",
+    "volunteers_event_availability_hint": "Окрім монтажу/демонтажу, ви також можете допомогти під час основної події",
+    "volunteers_event_availability_label": "Я також доступний під час події",
     "volunteers_experience_details_hint": "Опишіть ваш попередній досвід волонтерства, щоб допомогти нам краще вас пізнати",
     "volunteers_experience_details_label": "Подробиці вашого досвіду (опціонально)",
     "volunteers_experience_details_placeholder": "Коротко опишіть ваш досвід волонтерства (заходи, ролі, тощо)",
@@ -1264,13 +1266,20 @@
     "validation_error": "Помилка валідації"
   },
   "validation": {
+    "arrival_date_required": "Дата прибуття обов'язкова",
+    "at_least_one_availability_required": "Має бути обрана принаймні одна доступність",
     "date_end_after_start": "Дата закінчення повинна бути пізніше дати початку",
     "date_start_required": "Дата початку обов'язкова",
+    "departure_date_required": "Дата від'їзду обов'язкова",
     "description_max_1000": "Опис не може перевищувати 1000 символів",
     "description_max_5000": "Опис не може перевищувати 5000 символів",
+    "first_name_required": "Ім'я обов'язкове",
+    "last_name_required": "Прізвище обов'язкове",
+    "motivation_too_long": "Мотивація не може перевищувати {max} символів",
     "name_max_100": "Ім'я не може перевищувати 100 символів",
     "name_max_200": "Ім'я не може перевищувати 200 символів",
-    "name_min_3": "Ім'я повинно містити не менше 3 символів"
+    "name_min_3": "Ім'я повинно містити не менше 3 символів",
+    "phone_required": "Номер телефону обов'язковий"
   },
   "volunteersInfo": {
     "externalUrl": "Зовнішній URL"

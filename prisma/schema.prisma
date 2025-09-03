@@ -403,6 +403,7 @@ model EditionVolunteerApplication {
   experienceDetails    String?           @db.Text
   setupAvailability    Boolean?
   teardownAvailability Boolean?
+  eventAvailability    Boolean?
   arrivalDateTime      String?
   departureDateTime    String?
   edition              Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)

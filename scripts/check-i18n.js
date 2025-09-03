@@ -181,6 +181,7 @@ function extractI18nKeysFromFile(filePath) {
       'selectedCountry',
       'selectedEdition',
       'activeServices',
+      'formData',
     ]
 
     // Exceptions - ces patterns sont valides même s'ils commencent par un mot réservé

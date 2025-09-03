@@ -676,6 +676,8 @@
     "volunteers_departure_time_label": "Wann planen Sie abzureisen?",
     "volunteers_description_label": "Beschreibung für Freiwillige",
     "volunteers_diet_label": "Ernährungspräferenz",
+    "volunteers_event_availability_hint": "Zusätzlich zum Auf-/Abbau können Sie auch während der Hauptveranstaltung helfen",
+    "volunteers_event_availability_label": "Ich bin auch während der Veranstaltung verfügbar",
     "volunteers_experience_details_hint": "Beschreiben Sie Ihre bisherige Erfahrung als Freiwilliger, damit wir Sie besser kennenlernen können",
     "volunteers_experience_details_label": "Details zu Ihrer Erfahrung (optional)",
     "volunteers_experience_details_placeholder": "Beschreiben Sie kurz Ihre Erfahrung als Freiwilliger (Veranstaltungen, Aufgaben, etc.)",
@@ -1264,13 +1266,20 @@
     "validation_error": "Validierungsfehler"
   },
   "validation": {
+    "arrival_date_required": "Ankunftsdatum ist erforderlich",
+    "at_least_one_availability_required": "Mindestens eine Verfügbarkeit muss ausgewählt werden",
     "date_end_after_start": "Enddatum muss nach dem Startdatum liegen",
     "date_start_required": "Startdatum ist erforderlich",
+    "departure_date_required": "Abreisedatum ist erforderlich",
     "description_max_1000": "Beschreibung darf nicht länger als 1000 Zeichen sein",
     "description_max_5000": "Beschreibung darf nicht länger als 5000 Zeichen sein",
+    "first_name_required": "Vorname ist erforderlich",
+    "last_name_required": "Nachname ist erforderlich",
+    "motivation_too_long": "Motivation darf nicht mehr als {max} Zeichen enthalten",
     "name_max_100": "Name darf nicht länger als 100 Zeichen sein",
     "name_max_200": "Name darf nicht länger als 200 Zeichen sein",
-    "name_min_3": "Name muss mindestens 3 Zeichen enthalten"
+    "name_min_3": "Name muss mindestens 3 Zeichen enthalten",
+    "phone_required": "Telefonnummer ist erforderlich"
   },
   "volunteersInfo": {
     "externalUrl": "Externe URL"
