@@ -113,6 +113,39 @@
           </UCard>
         </NuxtLink>
 
+        <!-- Gestion des conventions -->
+        <NuxtLink to="/admin/conventions" class="block">
+          <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                    <UIcon
+                      name="i-heroicons-building-library"
+                      class="h-6 w-6 text-purple-600 dark:text-purple-400"
+                    />
+                  </div>
+                  <h3 class="font-semibold text-lg">{{ $t('admin.conventions_management') }}</h3>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                  {{ $t('admin.conventions_management_description') }}
+                </p>
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-eye" class="h-4 w-4" />
+                    {{ $t('admin.view_all_conventions') }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-calendar-days" class="h-4 w-4" />
+                    {{ $t('admin.manage_editions') }}
+                  </span>
+                </div>
+              </div>
+              <UIcon name="i-heroicons-arrow-right" class="h-5 w-5 text-gray-400" />
+            </div>
+          </UCard>
+        </NuxtLink>
+
         <!-- Gestion des feedbacks -->
         <NuxtLink to="/admin/feedback" class="block">
           <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
