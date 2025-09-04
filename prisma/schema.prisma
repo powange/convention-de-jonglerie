@@ -39,6 +39,7 @@ model User {
   editionPostComments      EditionPostComment[]
   volunteerApplications    EditionVolunteerApplication[]
   feedbacks                Feedback[]
+  apiErrorLogs             ApiErrorLog[]
   lostFoundComments        LostFoundComment[]
   lostFoundItems           LostFoundItem[]
   passwordResetTokens      PasswordResetToken[]
@@ -480,3 +481,48 @@ enum VolunteerStatus {
   ACCEPTED
   REJECTED
 }
+
+// ========== LOGS D'ERREURS ==========
+
+model ApiErrorLog {
+  id              String   @id @default(cuid())
+  
+  // Informations sur l'erreur
+  message         String   @db.Text
+  statusCode      Int
+  stack           String?  @db.LongText
+  errorType       String?  // Type d'erreur (ValidationError, DatabaseError, etc.)
+  
+  // Contexte de la requête
+  method          String   // GET, POST, PUT, DELETE, etc.
+  url             String   @db.Text
+  path            String   // URL path sans query params
+  userAgent       String?  @db.Text
+  ip              String?
+  
+  // Données de la requête
+  headers         Json?    // Headers de la requête (sans données sensibles)
+  body            Json?    // Corps de la requête (sans données sensibles)
+  queryParams     Json?    // Paramètres de requête
+  
+  // Informations utilisateur
+  userId          Int?
+  user            User?    @relation(fields: [userId], references: [id])
+  
+  // Métadonnées
+  resolved        Boolean  @default(false)  // Marqué comme résolu par un admin
+  resolvedBy      Int?
+  resolvedAt      DateTime?
+  adminNotes      String?  @db.Text
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([createdAt])
+  @@index([statusCode])
+  @@index([path])
+  @@index([userId])
+  @@index([resolved])
+}
+

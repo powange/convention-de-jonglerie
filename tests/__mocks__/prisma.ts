@@ -30,6 +30,7 @@ export const prismaMock = {
   collaboratorPermissionHistory: createModelMock(),
   editionVolunteerApplication: createModelMock(),
   editionVolunteerTeam: createModelMock(),
+  apiErrorLog: createModelMock(),
 
   // Modèles objets trouvés
   lostFoundItem: createModelMock(),
