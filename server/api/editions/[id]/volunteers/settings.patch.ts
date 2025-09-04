@@ -3,36 +3,107 @@ import { z } from 'zod'
 import { canManageEditionVolunteers } from '../../../../utils/collaborator-management'
 import { prisma } from '../../../../utils/prisma'
 
-const bodySchema = z.object({
-  open: z.boolean().optional(),
-  description: z.string().max(5000).optional().nullable(),
-  mode: z.enum(['INTERNAL', 'EXTERNAL']).optional(),
-  externalUrl: z.string().url('URL externe invalide').max(1000).optional().nullable(),
-  askDiet: z.boolean().optional(),
-  askAllergies: z.boolean().optional(),
-  askTimePreferences: z.boolean().optional(),
-  askTeamPreferences: z.boolean().optional(),
-  askPets: z.boolean().optional(),
-  askMinors: z.boolean().optional(),
-  askVehicle: z.boolean().optional(),
-  askCompanion: z.boolean().optional(),
-  askAvoidList: z.boolean().optional(),
-  askSkills: z.boolean().optional(),
-  askExperience: z.boolean().optional(),
-  setupStartDate: z.string().datetime().nullable().optional(),
-  setupEndDate: z.string().datetime().nullable().optional(),
-  askSetup: z.boolean().optional(),
-  askTeardown: z.boolean().optional(),
-  teams: z
-    .array(
-      z.object({
-        name: z.string().min(1).max(100),
-        slots: z.number().int().min(1).max(99).optional(),
-      })
-    )
-    .max(20)
-    .optional(),
-})
+const bodySchema = z
+  .object({
+    open: z.boolean().optional(),
+    description: z
+      .string()
+      .max(5000, 'La description ne peut pas dépasser 5000 caractères')
+      .optional()
+      .nullable(),
+    mode: z.enum(['INTERNAL', 'EXTERNAL']).optional(),
+    externalUrl: z
+      .string()
+      .url('URL externe invalide')
+      .max(1000, 'URL trop longue (max 1000 caractères)')
+      .refine((url) => {
+        // Rejeter les URLs vides ou incomplètes
+        if (!url || url.trim().length === 0) return false
+
+        // Rejeter les protocoles dangereux
+        const dangerousProtocols = ['javascript:', 'data:', 'vbscript:', 'file:']
+        const lowerUrl = url.toLowerCase()
+        if (dangerousProtocols.some((protocol) => lowerUrl.startsWith(protocol))) {
+          return false
+        }
+
+        // Accepter seulement HTTP et HTTPS
+        if (!lowerUrl.startsWith('http://') && !lowerUrl.startsWith('https://')) {
+          return false
+        }
+
+        // Vérifier que l'URL n'est pas juste le protocole
+        if (lowerUrl === 'http://' || lowerUrl === 'https://') {
+          return false
+        }
+
+        return true
+      }, 'URL externe invalide - seuls les liens HTTP/HTTPS sont autorisés')
+      .optional()
+      .nullable(),
+    askDiet: z.boolean().optional(),
+    askAllergies: z.boolean().optional(),
+    askTimePreferences: z.boolean().optional(),
+    askTeamPreferences: z.boolean().optional(),
+    askPets: z.boolean().optional(),
+    askMinors: z.boolean().optional(),
+    askVehicle: z.boolean().optional(),
+    askCompanion: z.boolean().optional(),
+    askAvoidList: z.boolean().optional(),
+    askSkills: z.boolean().optional(),
+    askExperience: z.boolean().optional(),
+    setupStartDate: z
+      .string()
+      .datetime('Format de date invalide - utilisez le format ISO 8601')
+      .refine((date) => {
+        if (!date) return true // null/undefined acceptés
+        const parsedDate = new Date(date)
+        const now = new Date()
+        // Permettre les dates à partir d'hier (pour la flexibilité)
+        const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+        return parsedDate >= yesterday
+      }, 'La date de début de montage ne peut pas être dans le passé')
+      .nullable()
+      .optional(),
+    setupEndDate: z
+      .string()
+      .datetime('Format de date invalide - utilisez le format ISO 8601')
+      .refine((date) => {
+        if (!date) return true // null/undefined acceptés
+        const parsedDate = new Date(date)
+        const now = new Date()
+        const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+        return parsedDate >= yesterday
+      }, 'La date de fin de montage ne peut pas être dans le passé')
+      .nullable()
+      .optional(),
+    askSetup: z.boolean().optional(),
+    askTeardown: z.boolean().optional(),
+    teams: z
+      .array(
+        z.object({
+          name: z.string().min(1).max(100),
+          slots: z.number().int().min(1).max(99).optional(),
+        })
+      )
+      .max(20)
+      .optional(),
+  })
+  .refine(
+    (data) => {
+      // Validation croisée : date de fin après date de début
+      if (data.setupStartDate && data.setupEndDate) {
+        const startDate = new Date(data.setupStartDate)
+        const endDate = new Date(data.setupEndDate)
+        return endDate >= startDate
+      }
+      return true
+    },
+    {
+      message: 'La date de fin de montage doit être après la date de début',
+      path: ['setupEndDate'], // L'erreur sera attachée au champ setupEndDate
+    }
+  )
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })

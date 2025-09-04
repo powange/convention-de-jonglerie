@@ -28,6 +28,8 @@ export const prismaMock = {
   editionPost: createModelMock(),
   editionPostComment: createModelMock(),
   collaboratorPermissionHistory: createModelMock(),
+  editionVolunteerApplication: createModelMock(),
+  editionVolunteerTeam: createModelMock(),
 
   // Modèles objets trouvés
   lostFoundItem: createModelMock(),

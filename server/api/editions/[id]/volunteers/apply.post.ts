@@ -2,18 +2,45 @@ import { z } from 'zod'
 
 import { prisma } from '../../../../utils/prisma'
 
+// Créneaux horaires valides pour les préférences
+const VALID_TIME_SLOTS = [
+  'early_morning',
+  'morning',
+  'early_afternoon',
+  'late_afternoon',
+  'evening',
+  'late_evening',
+  'night',
+] as const
+
 const bodySchema = z.object({
-  motivation: z.string().max(1000).optional().nullable(),
+  motivation: z.string().max(2000).optional().nullable(),
   phone: z
     .string()
-    .max(30)
-    .regex(/^[+0-9 ().-]{6,30}$/)
+    .min(6, 'Téléphone trop court')
+    .max(30, 'Téléphone trop long')
+    .regex(/^[+0-9 ().-]{6,30}$/, 'Format de téléphone invalide')
     .optional(),
-  nom: z.string().min(1).max(100).optional(),
-  prenom: z.string().min(1).max(100).optional(),
+  nom: z.string().min(1, 'Nom requis').max(100, 'Nom trop long').optional(),
+  prenom: z.string().min(1, 'Prénom requis').max(100, 'Prénom trop long').optional(),
   dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).optional(),
   allergies: z.string().max(500).optional().nullable(),
-  timePreferences: z.array(z.string()).max(8).optional(),
+  timePreferences: z
+    .array(
+      z.enum(VALID_TIME_SLOTS, {
+        errorMap: () => ({ message: 'Créneau horaire invalide' }),
+      })
+    )
+    .max(8, 'Maximum 8 créneaux horaires')
+    .refine(
+      (arr) => {
+        // Vérifier qu'il n'y a pas de doublons
+        const uniqueValues = new Set(arr)
+        return uniqueValues.size === arr.length
+      },
+      { message: 'Les créneaux horaires ne doivent pas contenir de doublons' }
+    )
+    .optional(),
   teamPreferences: z.array(z.string()).max(20).optional(),
   hasPets: z.boolean().optional(),
   petsDetails: z.string().max(200).optional().nullable(),
@@ -85,6 +112,52 @@ export default defineEventHandler(async (event) => {
   }
 
   const finalPhone = user.phone || parsed.phone!
+
+  // Validation des disponibilités (au moins une requise)
+  const hasAvailability =
+    parsed.setupAvailability || parsed.teardownAvailability || parsed.eventAvailability
+  if (!hasAvailability) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Au moins une disponibilité est requise',
+    })
+  }
+
+  // Validation des dates d'arrivée/départ si disponibilité sélectionnée
+  if (
+    (parsed.setupAvailability || parsed.eventAvailability || parsed.teardownAvailability) &&
+    !parsed.arrivalDateTime
+  ) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Date d'arrivée requise",
+    })
+  }
+
+  if ((parsed.eventAvailability || parsed.teardownAvailability) && !parsed.departureDateTime) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Date de départ requise',
+    })
+  }
+
+  // Validation des préférences d'équipe (seulement si les équipes sont demandées)
+  if (
+    edition.volunteersAskTeamPreferences &&
+    parsed.teamPreferences &&
+    parsed.teamPreferences.length > 0
+  ) {
+    const validTeamNames = ((edition.volunteersTeams as Array<{ name: string }>) || []).map(
+      (team) => team.name
+    )
+    const invalidTeams = parsed.teamPreferences.filter((team) => !validTeamNames.includes(team))
+    if (invalidTeams.length > 0) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: `Équipes invalides : ${invalidTeams.join(', ')}. Équipes valides : ${validTeamNames.join(', ')}`,
+      })
+    }
+  }
 
   // Mettre à jour user si des données manquent
   const updateData: Record<string, any> = {}
