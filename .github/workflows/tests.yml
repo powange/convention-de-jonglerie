@@ -21,9 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
-      deps-cache-key: ${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}
-      prisma-cache-key: ${{ runner.os }}-prisma-${{ hashFiles('prisma/schema.prisma') }}-${{ hashFiles('package-lock.json') }}
-      nuxt-cache-key: ${{ runner.os }}-nuxt-${{ hashFiles('**/*.vue', '**/*.ts', '**/*.js', 'nuxt.config.ts', 'tsconfig.json') }}
+      deps-cache-key: ${{ steps.cache-keys.outputs.deps }}
+      prisma-cache-key: ${{ steps.cache-keys.outputs.prisma }}
+      nuxt-cache-key: ${{ steps.cache-keys.outputs.nuxt }}
 
     steps:
       - name: Checkout code
@@ -33,6 +33,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Generate cache keys
+        id: cache-keys
+        run: |
+          echo "deps=${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
+          echo "prisma=${{ runner.os }}-prisma-${{ hashFiles('prisma/schema.prisma') }}-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
+          echo "nuxt=${{ runner.os }}-nuxt-${{ hashFiles('**/*.vue', '**/*.ts', '**/*.js', 'nuxt.config.ts', 'tsconfig.json') }}" >> $GITHUB_OUTPUT
           cache: 'npm'
 
       - name: Cache Node dependencies
@@ -42,7 +49,7 @@ jobs:
           path: |
             node_modules
             ~/.npm
-          key: ${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}
+          key: ${{ steps.cache-keys.outputs.deps }}
           restore-keys: |
             ${{ runner.os }}-deps-
 
@@ -51,9 +58,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules/.prisma
-          key: ${{ runner.os }}-prisma-${{ hashFiles('prisma/schema.prisma') }}-${{ hashFiles('package-lock.json') }}
+          key: ${{ steps.cache-keys.outputs.prisma }}
           restore-keys: |
-            ${{ runner.os }}-prisma-${{ hashFiles('prisma/schema.prisma') }}-
             ${{ runner.os }}-prisma-
 
       - name: Cache Nuxt build
@@ -61,7 +67,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .nuxt
-          key: ${{ runner.os }}-nuxt-${{ hashFiles('**/*.vue', '**/*.ts', '**/*.js', 'nuxt.config.ts', 'tsconfig.json') }}
+          key: ${{ steps.cache-keys.outputs.nuxt }}
           restore-keys: |
             ${{ runner.os }}-nuxt-
 
