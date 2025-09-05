@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 10
     outputs:
       cache-key: ${{ steps.cache-key.outputs.key }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

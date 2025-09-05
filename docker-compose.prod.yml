@@ -91,7 +91,7 @@ services:
       # Volumes en lecture seule pour la sécurité
       - mysql_data:/mysql-data:ro
       - uploads_data:/data/uploads:ro
-      
+
       # Volumes de travail
       - backup_logs:/backup/logs
       - backup_archives:/backup/archives
@@ -99,10 +99,10 @@ services:
       database-prod:
         condition: service_healthy
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: '10m'
+        max-file: '3'
 
 volumes:
   mysql_data:
