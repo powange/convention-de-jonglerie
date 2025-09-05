@@ -32,9 +32,5 @@ lib/prisma.ts
 public/uploads/
 !public/uploads/.gitkeep
 
-# Backup service
-.env.backup
-backup/logs/
-backup/archives/
-backup/temp/
-backup/ssh/
+# Backup folder (local development)
+backup/
