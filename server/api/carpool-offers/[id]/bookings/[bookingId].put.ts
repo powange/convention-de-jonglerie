@@ -1,3 +1,4 @@
+import { NotificationHelpers } from '../../../../utils/notification-service'
 import { prisma } from '../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
@@ -65,7 +66,41 @@ export default defineEventHandler(async (event) => {
   const updated = await prisma.carpoolBooking.update({
     where: { id: bookingId },
     data: { status: newStatus },
+    include: {
+      requester: {
+        select: { id: true, pseudo: true, profilePicture: true },
+      },
+    },
   })
+
+  // Envoyer notifications au demandeur selon l'action
+  if (action === 'ACCEPT' || action === 'REJECT') {
+    try {
+      const ownerName = offer.user.pseudo || `Utilisateur ${offer.user.id}`
+
+      if (action === 'ACCEPT') {
+        await NotificationHelpers.carpoolBookingAccepted(
+          booking.requesterId,
+          ownerName,
+          offerId,
+          booking.seats,
+          offer.departureCity,
+          offer.departureDate
+        )
+      } else if (action === 'REJECT') {
+        await NotificationHelpers.carpoolBookingRejected(
+          booking.requesterId,
+          ownerName,
+          offerId,
+          booking.seats,
+          offer.departureCity
+        )
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'envoi de la notification de covoiturage:", error)
+      // On ne fait pas échouer la mise à jour si la notification échoue
+    }
+  }
 
   return updated
 })

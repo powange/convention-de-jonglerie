@@ -296,4 +296,79 @@ export const NotificationHelpers = {
       category: 'system',
     })
   },
+
+  /**
+   * Notification de demande de covoiturage reçue
+   */
+  async carpoolBookingReceived(
+    userId: number,
+    requesterName: string,
+    offerId: number,
+    seats: number,
+    message?: string
+  ) {
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      title: 'Nouvelle demande de covoiturage 🚗',
+      message: `${requesterName} souhaite réserver ${seats} place${seats > 1 ? 's' : ''} dans votre covoiturage${message ? ` : "${message}"` : '.'}`,
+      category: 'carpool',
+      entityType: 'CarpoolOffer',
+      entityId: offerId.toString(),
+      actionUrl: `/carpool-offers/${offerId}`,
+      actionText: 'Voir la demande',
+    })
+  },
+
+  /**
+   * Notification de demande de covoiturage acceptée
+   */
+  async carpoolBookingAccepted(
+    userId: number,
+    ownerName: string,
+    offerId: number,
+    seats: number,
+    departureCity: string,
+    departureDate: Date
+  ) {
+    const dateStr = departureDate.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+    return await NotificationService.create({
+      userId,
+      type: 'SUCCESS',
+      title: 'Demande de covoiturage acceptée ! ✅',
+      message: `${ownerName} a accepté votre demande de ${seats} place${seats > 1 ? 's' : ''} pour le trajet au départ de ${departureCity} le ${dateStr}.`,
+      category: 'carpool',
+      entityType: 'CarpoolOffer',
+      entityId: offerId.toString(),
+      actionUrl: `/carpool-offers/${offerId}`,
+      actionText: 'Voir les détails',
+    })
+  },
+
+  /**
+   * Notification de demande de covoiturage refusée
+   */
+  async carpoolBookingRejected(
+    userId: number,
+    ownerName: string,
+    offerId: number,
+    seats: number,
+    departureCity: string
+  ) {
+    return await NotificationService.create({
+      userId,
+      type: 'WARNING',
+      title: 'Demande de covoiturage refusée',
+      message: `${ownerName} a refusé votre demande de ${seats} place${seats > 1 ? 's' : ''} pour le trajet au départ de ${departureCity}.`,
+      category: 'carpool',
+      entityType: 'CarpoolOffer',
+      entityId: offerId.toString(),
+      actionUrl: `/carpool-offers/${offerId}`,
+      actionText: "Voir d'autres offres",
+    })
+  },
 }

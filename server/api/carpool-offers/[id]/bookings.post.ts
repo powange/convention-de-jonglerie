@@ -1,3 +1,4 @@
+import { NotificationHelpers } from '../../../utils/notification-service'
 import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
@@ -78,6 +79,21 @@ export default defineEventHandler(async (event) => {
       requester: { select: { id: true, pseudo: true, profilePicture: true } },
     },
   })
+
+  // Envoyer une notification au propriétaire de l'offre
+  try {
+    const requesterName = booking.requester.pseudo || `Utilisateur ${booking.requester.id}`
+    await NotificationHelpers.carpoolBookingReceived(
+      offer.userId,
+      requesterName,
+      offerId,
+      seats,
+      message
+    )
+  } catch (error) {
+    console.error("Erreur lors de l'envoi de la notification de covoiturage:", error)
+    // On ne fait pas échouer la création du booking si la notification échoue
+  }
 
   return booking
 })
