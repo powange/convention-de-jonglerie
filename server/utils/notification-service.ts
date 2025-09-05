@@ -1,0 +1,299 @@
+import { prisma } from './prisma'
+
+import type { NotificationType } from '@prisma/client'
+
+export interface CreateNotificationData {
+  userId: number
+  type: NotificationType
+  title: string
+  message: string
+  category?: string
+  entityType?: string
+  entityId?: string
+  actionUrl?: string
+  actionText?: string
+}
+
+export interface NotificationFilters {
+  userId: number
+  isRead?: boolean
+  category?: string
+  limit?: number
+  offset?: number
+}
+
+/**
+ * Service de gestion des notifications utilisateur
+ */
+export const NotificationService = {
+  /**
+   * Crée une nouvelle notification
+   */
+  async create(data: CreateNotificationData) {
+    return await prisma.notification.create({
+      data: {
+        userId: data.userId,
+        type: data.type,
+        title: data.title,
+        message: data.message,
+        category: data.category,
+        entityType: data.entityType,
+        entityId: data.entityId,
+        actionUrl: data.actionUrl,
+        actionText: data.actionText,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            email: true,
+          },
+        },
+      },
+    })
+  },
+
+  /**
+   * Récupère les notifications d'un utilisateur
+   */
+  async getForUser(filters: NotificationFilters) {
+    const where: any = {
+      userId: filters.userId,
+    }
+
+    if (filters.isRead !== undefined) {
+      where.isRead = filters.isRead
+    }
+
+    if (filters.category) {
+      where.category = filters.category
+    }
+
+    return await prisma.notification.findMany({
+      where,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: filters.limit || 50,
+      skip: filters.offset || 0,
+      include: {
+        user: {
+          select: {
+            id: true,
+            pseudo: true,
+            email: true,
+          },
+        },
+      },
+    })
+  },
+
+  /**
+   * Marque une notification comme lue
+   */
+  async markAsRead(notificationId: string, userId: number) {
+    return await prisma.notification.update({
+      where: {
+        id: notificationId,
+        userId, // S'assurer que l'utilisateur est propriétaire
+      },
+      data: {
+        isRead: true,
+        readAt: new Date(),
+      },
+    })
+  },
+
+  /**
+   * Marque toutes les notifications d'un utilisateur comme lues
+   */
+  async markAllAsRead(userId: number, category?: string) {
+    const where: any = { userId, isRead: false }
+
+    if (category) {
+      where.category = category
+    }
+
+    return await prisma.notification.updateMany({
+      where,
+      data: {
+        isRead: true,
+        readAt: new Date(),
+      },
+    })
+  },
+
+  /**
+   * Supprime une notification
+   */
+  async delete(notificationId: string, userId: number) {
+    return await prisma.notification.delete({
+      where: {
+        id: notificationId,
+        userId, // S'assurer que l'utilisateur est propriétaire
+      },
+    })
+  },
+
+  /**
+   * Supprime les anciennes notifications (plus de X jours)
+   */
+  async cleanup(daysOld: number = 30) {
+    const cutoffDate = new Date()
+    cutoffDate.setDate(cutoffDate.getDate() - daysOld)
+
+    return await prisma.notification.deleteMany({
+      where: {
+        createdAt: {
+          lt: cutoffDate,
+        },
+        isRead: true, // Supprimer uniquement les notifications lues
+      },
+    })
+  },
+
+  /**
+   * Compte les notifications non lues d'un utilisateur
+   */
+  async getUnreadCount(userId: number, category?: string) {
+    const where: any = {
+      userId,
+      isRead: false,
+    }
+
+    if (category) {
+      where.category = category
+    }
+
+    return await prisma.notification.count({ where })
+  },
+
+  /**
+   * Obtient les statistiques des notifications d'un utilisateur
+   */
+  async getStats(userId: number) {
+    const [total, unread, byType] = await Promise.all([
+      prisma.notification.count({
+        where: { userId },
+      }),
+      prisma.notification.count({
+        where: { userId, isRead: false },
+      }),
+      prisma.notification.groupBy({
+        by: ['type'],
+        where: { userId },
+        _count: true,
+      }),
+    ])
+
+    return {
+      total,
+      unread,
+      byType: byType.map((item) => ({
+        type: item.type,
+        count: item._count,
+      })),
+    }
+  },
+}
+
+// Helpers pour créer des notifications courantes
+export const NotificationHelpers = {
+  /**
+   * Notification de bienvenue pour nouveaux utilisateurs
+   */
+  async welcome(userId: number) {
+    return await NotificationService.create({
+      userId,
+      type: 'SUCCESS',
+      title: 'Bienvenue ! 🎉',
+      message:
+        'Votre compte a été créé avec succès. Découvrez les conventions de jonglerie près de chez vous !',
+      category: 'system',
+      actionUrl: '/conventions',
+      actionText: 'Voir les conventions',
+    })
+  },
+
+  /**
+   * Notification de nouvelle convention ajoutée
+   */
+  async newConvention(userId: number, conventionName: string, conventionId: number) {
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      title: 'Nouvelle convention ajoutée',
+      message: `La convention "${conventionName}" vient d'être ajoutée à la plateforme.`,
+      category: 'edition',
+      entityType: 'Convention',
+      entityId: conventionId.toString(),
+      actionUrl: `/conventions/${conventionId}`,
+      actionText: 'Voir les détails',
+    })
+  },
+
+  /**
+   * Notification de candidature de bénévolat acceptée
+   */
+  async volunteerAccepted(userId: number, editionName: string, editionId: number) {
+    return await NotificationService.create({
+      userId,
+      type: 'SUCCESS',
+      title: 'Candidature acceptée ! ✅',
+      message: `Votre candidature de bénévolat pour "${editionName}" a été acceptée.`,
+      category: 'volunteer',
+      entityType: 'Edition',
+      entityId: editionId.toString(),
+      actionUrl: `/editions/${editionId}/volunteers`,
+      actionText: 'Voir les détails',
+    })
+  },
+
+  /**
+   * Notification de candidature de bénévolat refusée
+   */
+  async volunteerRejected(userId: number, editionName: string, editionId: number) {
+    return await NotificationService.create({
+      userId,
+      type: 'WARNING',
+      title: 'Candidature non retenue',
+      message: `Votre candidature de bénévolat pour "${editionName}" n'a pas été retenue cette fois.`,
+      category: 'volunteer',
+      entityType: 'Edition',
+      entityId: editionId.toString(),
+      actionUrl: `/editions/${editionId}`,
+      actionText: "Voir l'édition",
+    })
+  },
+
+  /**
+   * Notification de rappel d'événement
+   */
+  async eventReminder(userId: number, editionName: string, editionId: number, daysUntil: number) {
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      title: "Rappel d'événement 📅",
+      message: `L'édition "${editionName}" commence dans ${daysUntil} jour${daysUntil > 1 ? 's' : ''} !`,
+      category: 'edition',
+      entityType: 'Edition',
+      entityId: editionId.toString(),
+      actionUrl: `/editions/${editionId}`,
+      actionText: 'Voir les détails',
+    })
+  },
+
+  /**
+   * Notification d'erreur système
+   */
+  async systemError(userId: number, errorMessage: string) {
+    return await NotificationService.create({
+      userId,
+      type: 'ERROR',
+      title: 'Erreur système',
+      message: `Une erreur s'est produite : ${errorMessage}`,
+      category: 'system',
+    })
+  },
+}

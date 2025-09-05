@@ -250,7 +250,40 @@ export default defineEventHandler(async (event) => {
       teardownAvailability: true,
       arrivalDateTime: true,
       departureDateTime: true,
+      edition: {
+        select: {
+          id: true,
+          title: true,
+          conventionId: true,
+          convention: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
     },
   })
+
+  // Envoyer une notification de confirmation de candidature
+  try {
+    await prisma.notification.create({
+      data: {
+        userId: event.context.user.id,
+        type: 'SUCCESS',
+        title: 'Candidature de bénévolat envoyée ! 🎉',
+        message: `Votre candidature pour "${application.edition.convention.name} - ${application.edition.title}" a été envoyée avec succès. Les organisateurs vont l'examiner.`,
+        category: 'volunteer',
+        entityType: 'Edition',
+        entityId: editionId.toString(),
+        actionUrl: `/editions/${editionId}/volunteers`,
+        actionText: 'Voir mes candidatures',
+      },
+    })
+  } catch (notificationError) {
+    // Ne pas faire échouer l'application si la notification échoue
+    console.error("Erreur lors de l'envoi de la notification:", notificationError)
+  }
+
   return { success: true, application }
 })

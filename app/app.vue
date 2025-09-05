@@ -71,6 +71,9 @@
                 </UButton>
               </div>
 
+              <!-- Centre de notifications (si connecté) -->
+              <NotificationCenter v-if="authStore.isAuthenticated" />
+
               <!-- Dropdown utilisateur ou boutons connexion -->
               <UDropdownMenu
                 v-if="authStore.isAuthenticated && authStore.user"
@@ -121,6 +124,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted } from 'vue'
 
+import NotificationCenter from '~/components/notifications/NotificationCenter.vue'
 import AppFooter from '~/components/ui/AppFooter.vue'
 import LogoJc from '~/components/ui/LogoJc.vue'
 import UserAvatar from '~/components/ui/UserAvatar.vue'
@@ -190,6 +194,11 @@ const userMenuItems = computed(() => {
       label: t('navigation.profile'),
       icon: 'i-heroicons-user',
       to: '/profile',
+    },
+    {
+      label: t('navigation.notifications'),
+      icon: 'i-heroicons-bell',
+      to: '/notifications',
     },
     {
       label: t('navigation.my_conventions'),

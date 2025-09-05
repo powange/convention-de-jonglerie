@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { NotificationHelpers } from '../../utils/notification-service'
 import { prisma } from '../../utils/prisma'
 import { handleValidationError } from '../../utils/validation-schemas'
 
@@ -69,6 +70,14 @@ export default defineEventHandler(async (event) => {
         verificationCodeExpiry: null,
       },
     })
+
+    // Envoyer une notification de bienvenue
+    try {
+      await NotificationHelpers.welcome(updatedUser.id)
+    } catch (notificationError) {
+      // Ne pas faire échouer la vérification si la notification échoue
+      console.error("Erreur lors de l'envoi de la notification de bienvenue:", notificationError)
+    }
 
     return {
       message: 'Email vérifié avec succès ! Votre compte est maintenant actif.',

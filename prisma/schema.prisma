@@ -40,6 +40,7 @@ model User {
   volunteerApplications    EditionVolunteerApplication[]
   feedbacks                Feedback[]
   apiErrorLogs             ApiErrorLog[]
+  notifications            Notification[]
   lostFoundComments        LostFoundComment[]
   lostFoundItems           LostFoundItem[]
   passwordResetTokens      PasswordResetToken[]
@@ -524,5 +525,48 @@ model ApiErrorLog {
   @@index([path])
   @@index([userId])
   @@index([resolved])
+}
+
+// ========== NOTIFICATIONS ==========
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      Int
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Contenu de la notification
+  type        NotificationType
+  title       String
+  message     String           @db.Text
+  
+  // Métadonnées pour le contexte
+  category    String?          // 'edition', 'volunteer', 'system', etc.
+  entityType  String?          // Type d'entité liée (Edition, User, etc.)
+  entityId    String?          // ID de l'entité liée
+  
+  // États de lecture
+  isRead      Boolean          @default(false)
+  readAt      DateTime?
+  
+  // Actions optionnelles
+  actionUrl   String?          @db.Text // URL vers laquelle rediriger
+  actionText  String?          // Texte du bouton d'action
+  
+  // Timestamps
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  // Index pour optimiser les requêtes
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@index([category])
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
 }
 
