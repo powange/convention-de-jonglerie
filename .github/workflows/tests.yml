@@ -21,7 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
-      cache-key: ${{ steps.cache-key.outputs.key }}
+      deps-cache-key: ${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}-${{ hashFiles('prisma/schema.prisma') }}
+      nuxt-cache-key: ${{ runner.os }}-nuxt-${{ hashFiles('**/*.vue', '**/*.ts', '**/*.js', 'nuxt.config.ts', 'tsconfig.json') }}
 
     steps:
       - name: Checkout code
@@ -33,11 +34,7 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: Generate cache key
-        id: cache-key
-        run: echo "key=${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}-${{ hashFiles('prisma/schema.prisma') }}" >> $GITHUB_OUTPUT
-
-      - name: Cache dependencies and Prisma
+      - name: Cache Node dependencies
         id: cache-deps
         uses: actions/cache@v4
         with:
@@ -45,11 +42,19 @@ jobs:
             node_modules
             ~/.npm
             node_modules/.prisma
-            .nuxt
-          key: ${{ steps.cache-key.outputs.key }}
+          key: ${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}-${{ hashFiles('prisma/schema.prisma') }}
           restore-keys: |
-            ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}-
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}-
+            ${{ runner.os }}-deps-
+
+      - name: Cache Nuxt build
+        id: cache-nuxt
+        uses: actions/cache@v4
+        with:
+          path: .nuxt
+          key: ${{ runner.os }}-nuxt-${{ hashFiles('**/*.vue', '**/*.ts', '**/*.js', 'nuxt.config.ts', 'tsconfig.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuxt-
 
       - name: Install dependencies (if not cached)
         if: steps.cache-deps.outputs.cache-hit != 'true'
@@ -59,8 +64,9 @@ jobs:
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: npx prisma generate
 
-      # Générer les fichiers Nuxt nécessaires pour les tests
+      # Générer les fichiers Nuxt nécessaires pour les tests (si pas en cache)
       - name: Prepare Nuxt
+        if: steps.cache-nuxt.outputs.cache-hit != 'true'
         run: npx nuxi prepare
 
       # Sauvegarder les dépendances comme artifact pour les autres jobs
@@ -90,15 +96,21 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Restore dependencies from cache
+      - name: Restore Node dependencies
         uses: actions/cache@v4
         with:
           path: |
             node_modules
             ~/.npm
             node_modules/.prisma
-            .nuxt
-          key: ${{ needs.setup.outputs.cache-key }}
+          key: ${{ needs.setup.outputs.deps-cache-key }}
+          fail-on-cache-miss: true
+
+      - name: Restore Nuxt build
+        uses: actions/cache@v4
+        with:
+          path: .nuxt
+          key: ${{ needs.setup.outputs.nuxt-cache-key }}
           fail-on-cache-miss: true
 
       - name: Run linting
@@ -144,15 +156,21 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Restore dependencies from cache
+      - name: Restore Node dependencies
         uses: actions/cache@v4
         with:
           path: |
             node_modules
             ~/.npm
             node_modules/.prisma
-            .nuxt
-          key: ${{ needs.setup.outputs.cache-key }}
+          key: ${{ needs.setup.outputs.deps-cache-key }}
+          fail-on-cache-miss: true
+
+      - name: Restore Nuxt build
+        uses: actions/cache@v4
+        with:
+          path: .nuxt
+          key: ${{ needs.setup.outputs.nuxt-cache-key }}
           fail-on-cache-miss: true
 
       - name: Setup database schema (DB tests only)
