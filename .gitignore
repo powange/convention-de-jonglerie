@@ -31,3 +31,10 @@ lib/prisma.ts
 # Uploaded files
 public/uploads/
 !public/uploads/.gitkeep
+
+# Backup service
+.env.backup
+backup/logs/
+backup/archives/
+backup/temp/
+backup/ssh/
