@@ -570,6 +570,15 @@
   "countries": {
     "czech_republic": "Чеська Республіка"
   },
+  "createForm": {
+    "actionText": "Texte du bouton",
+    "actionUrl": "URL d'action",
+    "category": "Catégorie",
+    "message": "Message",
+    "title": "Titre",
+    "type": "Type",
+    "userId": "ID utilisateur"
+  },
   "currentValue": {
     "avatar": "Аватар вибраного користувача"
   },
@@ -787,6 +796,13 @@
     "volunteers_what_you_can_bring_title": "Що ви можете нам принести",
     "volunteers_withdraw": "Відкликати мою заявку"
   },
+  "erreur": {
+    "": {
+      "": {
+        "": "Ajouter des notes sur cette erreur..."
+      }
+    }
+  },
   "errors": {
     "access_denied": "Доступ заборонено",
     "addition_error": "Помилка додавання",
@@ -979,6 +995,13 @@
     "searched_services": "Шукані послуги",
     "upcoming_editions": "Майбутні видання"
   },
+  "log": {
+    "adminNotes": "Notes administrateur",
+    "errorType": "Type d'erreur",
+    "id": "ID",
+    "ip": "Adresse IP",
+    "user": "Utilisateur"
+  },
   "messages": {
     "account_created": "Обліковий запис створено! Перевірте свою пошту.",
     "booking_cancelled": "Booking cancelled",
@@ -1024,8 +1047,18 @@
     "my_conventions": "Мої Конвенції",
     "my_favorites": "Мої Улюблені",
     "no_favorites": "Немає улюблених",
+    "notifications": "Notifications",
     "profile": "Профіль",
     "tabs": "Вкладки навігації"
+  },
+  "notification": {
+    "actionUrl": "URL d'action",
+    "category": "Catégorie",
+    "id": "Identifiant",
+    "user": "Utilisateur"
+  },
+  "notificationsStore": {
+    "loading": "Chargement des notifications..."
   },
   "p": {
     "key": "Ключ"
@@ -1193,6 +1226,13 @@
     "username_min_3": "Ім'я користувача повинно містити принаймні 3 символи",
     "username_placeholder": "Ваше унікальне ім'я користувача"
   },
+  "selectedLog": {
+    "adminNotes": "Notes administrateur",
+    "ip": "Adresse IP",
+    "message": "Message d'erreur",
+    "stack": "Trace de la pile",
+    "user": "Utilisateur"
+  },
   "services": {
     "accessibility": "Доступність для людей з інвалідністю",
     "aerial_space": "Повітряний простір",
@@ -1227,6 +1267,10 @@
   "team": {
     "name": "Назва команди",
     "slots": "Кількість місць"
+  },
+  "testType": {
+    "icon": "Icône",
+    "value": "Valeur"
   },
   "upload": {
     "click_select_convention_logo": "Натисніть, щоб вибрати логотип конвенції",

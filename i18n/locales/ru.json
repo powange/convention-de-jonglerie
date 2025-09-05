@@ -570,6 +570,15 @@
   "countries": {
     "czech_republic": "Чешская Республика"
   },
+  "createForm": {
+    "actionText": "Texte du bouton",
+    "actionUrl": "URL d'action",
+    "category": "Catégorie",
+    "message": "Message",
+    "title": "Titre",
+    "type": "Type",
+    "userId": "ID utilisateur"
+  },
   "currentValue": {
     "avatar": "Аватар выбранного пользователя"
   },
@@ -787,6 +796,13 @@
     "volunteers_what_you_can_bring_title": "Что вы можете нам принести",
     "volunteers_withdraw": "Отозвать мою заявку"
   },
+  "erreur": {
+    "": {
+      "": {
+        "": "Ajouter des notes sur cette erreur..."
+      }
+    }
+  },
   "errors": {
     "access_denied": "Доступ запрещен",
     "addition_error": "Ошибка добавления",
@@ -979,6 +995,13 @@
     "searched_services": "Поисковые сервисы",
     "upcoming_editions": "Предстоящие издания"
   },
+  "log": {
+    "adminNotes": "Notes administrateur",
+    "errorType": "Type d'erreur",
+    "id": "ID",
+    "ip": "Adresse IP",
+    "user": "Utilisateur"
+  },
   "messages": {
     "account_created": "Аккаунт создан! Проверьте ваш email.",
     "booking_cancelled": "Booking cancelled",
@@ -1024,8 +1047,18 @@
     "my_conventions": "Мои Конвенции",
     "my_favorites": "Мои Избранные",
     "no_favorites": "Нет избранных",
+    "notifications": "Notifications",
     "profile": "Профиль",
     "tabs": "Вкладки навигации"
+  },
+  "notification": {
+    "actionUrl": "URL d'action",
+    "category": "Catégorie",
+    "id": "Identifiant",
+    "user": "Utilisateur"
+  },
+  "notificationsStore": {
+    "loading": "Chargement des notifications..."
   },
   "p": {
     "key": "Ключ"
@@ -1193,6 +1226,13 @@
     "username_min_3": "Имя пользователя должно содержать минимум 3 символа",
     "username_placeholder": "Ваше уникальное имя пользователя"
   },
+  "selectedLog": {
+    "adminNotes": "Notes administrateur",
+    "ip": "Adresse IP",
+    "message": "Message d'erreur",
+    "stack": "Trace de la pile",
+    "user": "Utilisateur"
+  },
   "services": {
     "accessibility": "Доступность для людей с инвалидностью",
     "aerial_space": "Воздушное пространство",
@@ -1227,6 +1267,10 @@
   "team": {
     "name": "Название команды",
     "slots": "Количество мест"
+  },
+  "testType": {
+    "icon": "Icône",
+    "value": "Valeur"
   },
   "upload": {
     "click_select_convention_logo": "Нажмите, чтобы выбрать логотип конвенции",

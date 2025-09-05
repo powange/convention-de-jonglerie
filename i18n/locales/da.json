@@ -570,6 +570,15 @@
   "countries": {
     "czech_republic": "Tjekkiet"
   },
+  "createForm": {
+    "actionText": "Texte du bouton",
+    "actionUrl": "URL d'action",
+    "category": "Catégorie",
+    "message": "Message",
+    "title": "Titre",
+    "type": "Type",
+    "userId": "ID utilisateur"
+  },
   "currentValue": {
     "avatar": "Valgt brugers avatar"
   },
@@ -787,6 +796,13 @@
     "volunteers_what_you_can_bring_title": "Hvad du kan bringe os",
     "volunteers_withdraw": "Træk min ansøgning tilbage"
   },
+  "erreur": {
+    "": {
+      "": {
+        "": "Ajouter des notes sur cette erreur..."
+      }
+    }
+  },
   "errors": {
     "access_denied": "Adgang nægtet",
     "addition_error": "Fejl under tilføjelse",
@@ -979,6 +995,13 @@
     "searched_services": "Søgte tjenester",
     "upcoming_editions": "Kommende udgaver"
   },
+  "log": {
+    "adminNotes": "Notes administrateur",
+    "errorType": "Type d'erreur",
+    "id": "ID",
+    "ip": "Adresse IP",
+    "user": "Utilisateur"
+  },
   "messages": {
     "account_created": "Konto oprettet! Tjek din email.",
     "booking_cancelled": "Booking cancelled",
@@ -1024,8 +1047,18 @@
     "my_conventions": "Mine konventioner",
     "my_favorites": "Mine favoritter",
     "no_favorites": "Ingen favoritter",
+    "notifications": "Notifications",
     "profile": "Profil",
     "tabs": "Navigationsfaner"
+  },
+  "notification": {
+    "actionUrl": "URL d'action",
+    "category": "Catégorie",
+    "id": "Identifiant",
+    "user": "Utilisateur"
+  },
+  "notificationsStore": {
+    "loading": "Chargement des notifications..."
   },
   "p": {
     "key": "Nøgle"
@@ -1193,6 +1226,13 @@
     "username_min_3": "Brugernavnet skal indeholde mindst 3 tegn",
     "username_placeholder": "Dit unikke brugernavn"
   },
+  "selectedLog": {
+    "adminNotes": "Notes administrateur",
+    "ip": "Adresse IP",
+    "message": "Message d'erreur",
+    "stack": "Trace de la pile",
+    "user": "Utilisateur"
+  },
   "services": {
     "accessibility": "Handicaptilgængelighed",
     "aerial_space": "Luftakrobatik område",
@@ -1227,6 +1267,10 @@
   "team": {
     "name": "Holdnavn",
     "slots": "Antal pladser"
+  },
+  "testType": {
+    "icon": "Icône",
+    "value": "Valeur"
   },
   "upload": {
     "click_select_convention_logo": "Klik for at vælge convention logo",

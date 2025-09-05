@@ -570,6 +570,15 @@
   "countries": {
     "czech_republic": "República Checa"
   },
+  "createForm": {
+    "actionText": "Texte du bouton",
+    "actionUrl": "URL d'action",
+    "category": "Catégorie",
+    "message": "Message",
+    "title": "Titre",
+    "type": "Type",
+    "userId": "ID utilisateur"
+  },
   "currentValue": {
     "avatar": "Avatar do usuário selecionado"
   },
@@ -787,6 +796,13 @@
     "volunteers_what_you_can_bring_title": "O que você pode nos trazer",
     "volunteers_withdraw": "Retirar minha inscrição"
   },
+  "erreur": {
+    "": {
+      "": {
+        "": "Ajouter des notes sur cette erreur..."
+      }
+    }
+  },
   "errors": {
     "access_denied": "Acesso negado",
     "addition_error": "Erro na adição",
@@ -979,6 +995,13 @@
     "searched_services": "Serviços procurados",
     "upcoming_editions": "Próximas edições"
   },
+  "log": {
+    "adminNotes": "Notes administrateur",
+    "errorType": "Type d'erreur",
+    "id": "ID",
+    "ip": "Adresse IP",
+    "user": "Utilisateur"
+  },
   "messages": {
     "account_created": "Conta criada! Verifique o seu email.",
     "booking_cancelled": "Booking cancelled",
@@ -1024,8 +1047,18 @@
     "my_conventions": "As Minhas Convenções",
     "my_favorites": "Os meus favoritos",
     "no_favorites": "Nenhum favorito",
+    "notifications": "Notifications",
     "profile": "Perfil",
     "tabs": "Separadores de navegação"
+  },
+  "notification": {
+    "actionUrl": "URL d'action",
+    "category": "Catégorie",
+    "id": "Identifiant",
+    "user": "Utilisateur"
+  },
+  "notificationsStore": {
+    "loading": "Chargement des notifications..."
   },
   "p": {
     "key": "Chave"
@@ -1193,6 +1226,13 @@
     "username_min_3": "A alcunha deve conter pelo menos 3 caracteres",
     "username_placeholder": "A sua alcunha única"
   },
+  "selectedLog": {
+    "adminNotes": "Notes administrateur",
+    "ip": "Adresse IP",
+    "message": "Message d'erreur",
+    "stack": "Trace de la pile",
+    "user": "Utilisateur"
+  },
   "services": {
     "accessibility": "Acessibilidade para deficientes",
     "aerial_space": "Espaço aéreo",
@@ -1227,6 +1267,10 @@
   "team": {
     "name": "Nome da equipe",
     "slots": "Número de vagas"
+  },
+  "testType": {
+    "icon": "Icône",
+    "value": "Valeur"
   },
   "upload": {
     "click_select_convention_logo": "Clique para selecionar logo da convenção",

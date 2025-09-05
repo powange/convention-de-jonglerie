@@ -1013,6 +1013,43 @@
     "request_deleted_successfully": "Votre demande de covoiturage a été supprimée avec succès",
     "verification_code_sent": "Un code de vérification vous a été envoyé."
   },
+  "notificationsStore": {
+    "loading": "Chargement des notifications..."
+  },
+  "notification": {
+    "id": "Identifiant",
+    "category": "Catégorie",
+    "actionUrl": "URL d'action",
+    "user": "Utilisateur"
+  },
+  "createForm": {
+    "userId": "ID utilisateur",
+    "type": "Type",
+    "title": "Titre",
+    "message": "Message",
+    "category": "Catégorie",
+    "actionUrl": "URL d'action",
+    "actionText": "Texte du bouton"
+  },
+  "testType": {
+    "value": "Valeur",
+    "icon": "Icône"
+  },
+  "erreur...": "Ajouter des notes sur cette erreur...",
+  "log": {
+    "id": "ID",
+    "user": "Utilisateur",
+    "ip": "Adresse IP",
+    "errorType": "Type d'erreur",
+    "adminNotes": "Notes administrateur"
+  },
+  "selectedLog": {
+    "message": "Message d'erreur",
+    "ip": "Adresse IP",
+    "user": "Utilisateur",
+    "stack": "Trace de la pile",
+    "adminNotes": "Notes administrateur"
+  },
   "navigation": {
     "admin": "Administration",
     "breadcrumb": "Fil d'Ariane",
@@ -1025,6 +1062,7 @@
     "my_conventions": "Mes Conventions",
     "my_favorites": "Mes favoris",
     "no_favorites": "Aucun favori",
+    "notifications": "Notifications",
     "profile": "Profil",
     "tabs": "Onglets de navigation"
   },

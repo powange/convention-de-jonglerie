@@ -570,6 +570,15 @@
   "countries": {
     "czech_republic": "Tschechische Republik"
   },
+  "createForm": {
+    "actionText": "Texte du bouton",
+    "actionUrl": "URL d'action",
+    "category": "Catégorie",
+    "message": "Message",
+    "title": "Titre",
+    "type": "Type",
+    "userId": "ID utilisateur"
+  },
   "currentValue": {
     "avatar": "Avatar des ausgewählten Benutzers"
   },
@@ -787,6 +796,13 @@
     "volunteers_what_you_can_bring_title": "Was Sie uns bringen können",
     "volunteers_withdraw": "Meine Bewerbung zurückziehen"
   },
+  "erreur": {
+    "": {
+      "": {
+        "": "Ajouter des notes sur cette erreur..."
+      }
+    }
+  },
   "errors": {
     "access_denied": "Zugang verweigert",
     "addition_error": "Fehler beim Hinzufügen",
@@ -979,6 +995,13 @@
     "searched_services": "Gesuchte Services",
     "upcoming_editions": "Kommende Auflagen"
   },
+  "log": {
+    "adminNotes": "Notes administrateur",
+    "errorType": "Type d'erreur",
+    "id": "ID",
+    "ip": "Adresse IP",
+    "user": "Utilisateur"
+  },
   "messages": {
     "account_created": "Konto erstellt! Überprüfe deine E-Mail.",
     "booking_cancelled": "Buchung storniert",
@@ -1024,8 +1047,18 @@
     "my_conventions": "Meine Conventions",
     "my_favorites": "Meine Favoriten",
     "no_favorites": "Keine Favoriten",
+    "notifications": "Notifications",
     "profile": "Profil",
     "tabs": "Navigationsregisterkarten"
+  },
+  "notification": {
+    "actionUrl": "URL d'action",
+    "category": "Catégorie",
+    "id": "Identifiant",
+    "user": "Utilisateur"
+  },
+  "notificationsStore": {
+    "loading": "Chargement des notifications..."
   },
   "p": {
     "key": "Schlüssel"
@@ -1193,6 +1226,13 @@
     "username_min_3": "Der Benutzername muss mindestens 3 Zeichen enthalten",
     "username_placeholder": "Dein eindeutiger Benutzername"
   },
+  "selectedLog": {
+    "adminNotes": "Notes administrateur",
+    "ip": "Adresse IP",
+    "message": "Message d'erreur",
+    "stack": "Trace de la pile",
+    "user": "Utilisateur"
+  },
   "services": {
     "accessibility": "Barrierefreiheit",
     "aerial_space": "Luftakrobatik-Bereich",
@@ -1227,6 +1267,10 @@
   "team": {
     "name": "Teamname",
     "slots": "Anzahl der Plätze"
+  },
+  "testType": {
+    "icon": "Icône",
+    "value": "Valeur"
   },
   "upload": {
     "click_select_convention_logo": "Klicken Sie, um ein Convention-Logo auszuwählen",

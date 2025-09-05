@@ -570,6 +570,15 @@
   "countries": {
     "czech_republic": "Republika Czeska"
   },
+  "createForm": {
+    "actionText": "Texte du bouton",
+    "actionUrl": "URL d'action",
+    "category": "Catégorie",
+    "message": "Message",
+    "title": "Titre",
+    "type": "Type",
+    "userId": "ID utilisateur"
+  },
   "currentValue": {
     "avatar": "Awatar wybranego użytkownika"
   },
@@ -787,6 +796,13 @@
     "volunteers_what_you_can_bring_title": "Co możesz nam przynieść",
     "volunteers_withdraw": "Wycofaj moje zgłoszenie"
   },
+  "erreur": {
+    "": {
+      "": {
+        "": "Ajouter des notes sur cette erreur..."
+      }
+    }
+  },
   "errors": {
     "access_denied": "Dostęp odrzucony",
     "addition_error": "Błąd podczas dodawania",
@@ -979,6 +995,13 @@
     "searched_services": "Szukane usługi",
     "upcoming_editions": "Nadchodzące edycje"
   },
+  "log": {
+    "adminNotes": "Notes administrateur",
+    "errorType": "Type d'erreur",
+    "id": "ID",
+    "ip": "Adresse IP",
+    "user": "Utilisateur"
+  },
   "messages": {
     "account_created": "Konto utworzone! Sprawdź swój email.",
     "booking_cancelled": "Booking cancelled",
@@ -1024,8 +1047,18 @@
     "my_conventions": "Moje Konwencje",
     "my_favorites": "Moje ulubione",
     "no_favorites": "Brak ulubionych",
+    "notifications": "Notifications",
     "profile": "Profil",
     "tabs": "Zakładki nawigacyjne"
+  },
+  "notification": {
+    "actionUrl": "URL d'action",
+    "category": "Catégorie",
+    "id": "Identifiant",
+    "user": "Utilisateur"
+  },
+  "notificationsStore": {
+    "loading": "Chargement des notifications..."
   },
   "p": {
     "key": "Klucz"
@@ -1193,6 +1226,13 @@
     "username_min_3": "Pseudonim musi zawierać co najmniej 3 znaki",
     "username_placeholder": "Twój unikalny pseudonim"
   },
+  "selectedLog": {
+    "adminNotes": "Notes administrateur",
+    "ip": "Adresse IP",
+    "message": "Message d'erreur",
+    "stack": "Trace de la pile",
+    "user": "Utilisateur"
+  },
   "services": {
     "accessibility": "Dostępność dla niepełnosprawnych",
     "aerial_space": "Przestrzeń powietrzna",
@@ -1227,6 +1267,10 @@
   "team": {
     "name": "Nazwa zespołu",
     "slots": "Liczba miejsc"
+  },
+  "testType": {
+    "icon": "Icône",
+    "value": "Valeur"
   },
   "upload": {
     "click_select_convention_logo": "Kliknij, aby wybrać logo konwencji",

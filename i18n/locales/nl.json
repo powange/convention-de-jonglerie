@@ -570,6 +570,15 @@
   "countries": {
     "czech_republic": "Tsjechische Republiek"
   },
+  "createForm": {
+    "actionText": "Texte du bouton",
+    "actionUrl": "URL d'action",
+    "category": "Catégorie",
+    "message": "Message",
+    "title": "Titre",
+    "type": "Type",
+    "userId": "ID utilisateur"
+  },
   "currentValue": {
     "avatar": "Avatar van geselecteerde gebruiker"
   },
@@ -787,6 +796,13 @@
     "volunteers_what_you_can_bring_title": "Wat u ons kunt brengen",
     "volunteers_withdraw": "Trek mijn aanmelding in"
   },
+  "erreur": {
+    "": {
+      "": {
+        "": "Ajouter des notes sur cette erreur..."
+      }
+    }
+  },
   "errors": {
     "access_denied": "Toegang geweigerd",
     "addition_error": "Toevoegfout",
@@ -979,6 +995,13 @@
     "searched_services": "Gezochte diensten",
     "upcoming_editions": "Aankomende edities"
   },
+  "log": {
+    "adminNotes": "Notes administrateur",
+    "errorType": "Type d'erreur",
+    "id": "ID",
+    "ip": "Adresse IP",
+    "user": "Utilisateur"
+  },
   "messages": {
     "account_created": "Account aangemaakt! Controleer je e-mail.",
     "booking_cancelled": "Booking cancelled",
@@ -1024,8 +1047,18 @@
     "my_conventions": "Mijn Conventies",
     "my_favorites": "Mijn Favorieten",
     "no_favorites": "Geen favorieten",
+    "notifications": "Notifications",
     "profile": "Profiel",
     "tabs": "Navigatietabs"
+  },
+  "notification": {
+    "actionUrl": "URL d'action",
+    "category": "Catégorie",
+    "id": "Identifiant",
+    "user": "Utilisateur"
+  },
+  "notificationsStore": {
+    "loading": "Chargement des notifications..."
   },
   "p": {
     "key": "Sleutel"
@@ -1193,6 +1226,13 @@
     "username_min_3": "Gebruikersnaam moet minimaal 3 tekens bevatten",
     "username_placeholder": "Je unieke gebruikersnaam"
   },
+  "selectedLog": {
+    "adminNotes": "Notes administrateur",
+    "ip": "Adresse IP",
+    "message": "Message d'erreur",
+    "stack": "Trace de la pile",
+    "user": "Utilisateur"
+  },
   "services": {
     "accessibility": "Toegankelijkheid voor gehandicapten",
     "aerial_space": "Luchtruimte",
@@ -1227,6 +1267,10 @@
   "team": {
     "name": "Teamnaam",
     "slots": "Aantal plaatsen"
+  },
+  "testType": {
+    "icon": "Icône",
+    "value": "Valeur"
   },
   "upload": {
     "click_select_convention_logo": "Klik om een conventie logo te selecteren",

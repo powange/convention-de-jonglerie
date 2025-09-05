@@ -570,6 +570,15 @@
   "countries": {
     "czech_republic": "Czech Republic"
   },
+  "createForm": {
+    "actionText": "Button Text",
+    "actionUrl": "Action URL",
+    "category": "Category",
+    "message": "Message",
+    "title": "Title",
+    "type": "Type",
+    "userId": "User ID"
+  },
   "currentValue": {
     "avatar": "Selected user avatar"
   },
@@ -787,6 +796,13 @@
     "volunteers_what_you_can_bring_title": "What you can bring to us",
     "volunteers_withdraw": "Withdraw my application"
   },
+  "erreur": {
+    "": {
+      "": {
+        "": "Add notes about this error..."
+      }
+    }
+  },
   "errors": {
     "access_denied": "Access denied",
     "addition_error": "Addition error",
@@ -979,6 +995,13 @@
     "searched_services": "Searched services",
     "upcoming_editions": "Upcoming editions"
   },
+  "log": {
+    "adminNotes": "Admin Notes",
+    "errorType": "Error Type",
+    "id": "ID",
+    "ip": "IP Address",
+    "user": "User"
+  },
   "messages": {
     "account_created": "Account created! Check your email.",
     "booking_cancelled": "Booking cancelled",
@@ -1024,8 +1047,18 @@
     "my_conventions": "My Conventions",
     "my_favorites": "My Favorites",
     "no_favorites": "No favorites",
+    "notifications": "Notifications",
     "profile": "Profile",
     "tabs": "Navigation tabs"
+  },
+  "notification": {
+    "actionUrl": "Action URL",
+    "category": "Category",
+    "id": "Identifier",
+    "user": "User"
+  },
+  "notificationsStore": {
+    "loading": "Loading notifications..."
   },
   "p": {
     "key": "Key"
@@ -1193,6 +1226,13 @@
     "username_min_3": "Username must contain at least 3 characters",
     "username_placeholder": "Your unique username"
   },
+  "selectedLog": {
+    "adminNotes": "Admin Notes",
+    "ip": "IP Address",
+    "message": "Error Message",
+    "stack": "Stack Trace",
+    "user": "User"
+  },
   "services": {
     "accessibility": "Disability accessibility",
     "aerial_space": "Aerial space",
@@ -1227,6 +1267,10 @@
   "team": {
     "name": "Team name",
     "slots": "Number of spots"
+  },
+  "testType": {
+    "icon": "Icon",
+    "value": "Value"
   },
   "upload": {
     "click_select_convention_logo": "Click to select convention logo",
