@@ -21,7 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
-      deps-cache-key: ${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}-${{ hashFiles('prisma/schema.prisma') }}
+      deps-cache-key: ${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}
+      prisma-cache-key: ${{ runner.os }}-prisma-${{ hashFiles('prisma/schema.prisma') }}-${{ hashFiles('package-lock.json') }}
       nuxt-cache-key: ${{ runner.os }}-nuxt-${{ hashFiles('**/*.vue', '**/*.ts', '**/*.js', 'nuxt.config.ts', 'tsconfig.json') }}
 
     steps:
@@ -41,11 +42,19 @@ jobs:
           path: |
             node_modules
             ~/.npm
-            node_modules/.prisma
-          key: ${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}-${{ hashFiles('prisma/schema.prisma') }}
+          key: ${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}-
             ${{ runner.os }}-deps-
+
+      - name: Cache Prisma client
+        id: cache-prisma
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.prisma
+          key: ${{ runner.os }}-prisma-${{ hashFiles('prisma/schema.prisma') }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-prisma-${{ hashFiles('prisma/schema.prisma') }}-
+            ${{ runner.os }}-prisma-
 
       - name: Cache Nuxt build
         id: cache-nuxt
@@ -61,7 +70,7 @@ jobs:
         run: npm ci --prefer-offline --no-audit
 
       - name: Generate Prisma client
-        if: steps.cache-deps.outputs.cache-hit != 'true'
+        if: steps.cache-prisma.outputs.cache-hit != 'true'
         run: npx prisma generate
 
       # Générer les fichiers Nuxt nécessaires pour les tests (si pas en cache)
@@ -102,8 +111,14 @@ jobs:
           path: |
             node_modules
             ~/.npm
-            node_modules/.prisma
           key: ${{ needs.setup.outputs.deps-cache-key }}
+          fail-on-cache-miss: true
+
+      - name: Restore Prisma client
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.prisma
+          key: ${{ needs.setup.outputs.prisma-cache-key }}
           fail-on-cache-miss: true
 
       - name: Restore Nuxt build
@@ -162,8 +177,14 @@ jobs:
           path: |
             node_modules
             ~/.npm
-            node_modules/.prisma
           key: ${{ needs.setup.outputs.deps-cache-key }}
+          fail-on-cache-miss: true
+
+      - name: Restore Prisma client
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.prisma
+          key: ${{ needs.setup.outputs.prisma-cache-key }}
           fail-on-cache-miss: true
 
       - name: Restore Nuxt build
