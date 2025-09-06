@@ -78,16 +78,6 @@ export default defineEventHandler(async (event) => {
       const isConventionAuthor = edition.convention.authorId === userId
       const isCollaborator = edition.convention.collaborators?.some((c) => c.userId === userId)
 
-      console.log('[DEBUG] Permission check for offline edition:', {
-        userId,
-        editionCreatorId: edition.creatorId,
-        conventionAuthorId: edition.convention.authorId,
-        isCreator,
-        isConventionAuthor,
-        isCollaborator,
-        collaborators: edition.convention.collaborators?.map((c) => ({ userId: c.userId })),
-      })
-
       if (!isCreator && !isConventionAuthor && !isCollaborator) {
         throw createError({
           statusCode: 404,
