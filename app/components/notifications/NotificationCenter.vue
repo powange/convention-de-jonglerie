@@ -4,14 +4,14 @@
     <UButton
       icon="i-heroicons-bell"
       variant="ghost"
-      color="gray"
-      class="relative"
+      :color="notificationsStore.unreadCount > 0 ? 'primary' : 'gray'"
+      :class="['relative', notificationsStore.unreadCount > 0 ? 'animate-pulse' : '']"
       @click="isOpen = !isOpen"
     >
       <!-- Badge de notifications non lues -->
       <UBadge
         v-if="notificationsStore.unreadCount > 0"
-        color="red"
+        color="error"
         variant="solid"
         :label="
           notificationsStore.unreadCount > 99 ? '99+' : notificationsStore.unreadCount.toString()
@@ -21,10 +21,10 @@
     </UButton>
 
     <!-- Panel de notifications -->
-    <UModal v-model:open="isOpen" :ui="{ width: 'w-full max-w-md' }">
+    <UModal v-model:open="isOpen" :ui="{ width: 'w-full max-w-md' }" title="Notifications">
       <template #content>
         <UCard>
-          <template #header>
+          <template #body>
             <div class="flex justify-between items-center">
               <div>
                 <h3 class="text-lg font-semibold">Notifications</h3>
@@ -125,7 +125,7 @@
                           icon="i-heroicons-x-mark"
                           variant="ghost"
                           size="2xs"
-                          color="gray"
+                          color="neutral"
                           @click.stop="deleteNotification(notification.id)"
                         />
                       </div>
@@ -322,10 +322,58 @@ const loadMore = async () => {
 // Charger les notifications au montage si authentifié
 const authStore = useAuthStore()
 
+// Polling automatique pour les notifications
+let pollingInterval: NodeJS.Timeout | null = null
+
+const startPolling = () => {
+  if (pollingInterval) return
+
+  console.log('🔄 Démarrage du polling notifications (5s)')
+
+  // Rafraîchir toutes les 5 secondes
+  pollingInterval = setInterval(async () => {
+    console.log(
+      '⏰ Tentative de rafraîchissement - Utilisateur:',
+      !!authStore.user,
+      'Visible:',
+      document.visibilityState === 'visible'
+    )
+    if (authStore.user && document.visibilityState === 'visible') {
+      console.log('✅ Rafraîchissement des notifications')
+      await notificationsStore.refresh()
+    }
+  }, 5000)
+}
+
+const stopPolling = () => {
+  if (pollingInterval) {
+    console.log('⏹️ Arrêt du polling notifications')
+    clearInterval(pollingInterval)
+    pollingInterval = null
+  }
+}
+
 onMounted(() => {
   if (authStore.user) {
     notificationsStore.refresh()
+    startPolling()
   }
+
+  // Gérer la visibilité de la page
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      if (authStore.user) {
+        notificationsStore.refresh()
+      }
+      startPolling()
+    } else {
+      stopPolling()
+    }
+  })
+})
+
+onUnmounted(() => {
+  stopPolling()
 })
 
 // Watcher pour charger les notifications quand l'utilisateur se connecte
@@ -334,8 +382,10 @@ watch(
   (user) => {
     if (user) {
       notificationsStore.refresh()
+      startPolling()
     } else {
       notificationsStore.reset()
+      stopPolling()
     }
   }
 )

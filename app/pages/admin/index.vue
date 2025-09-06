@@ -260,7 +260,9 @@
               <p class="text-gray-400 text-sm mb-4">
                 {{ $t('admin.system_settings_description') }}
               </p>
-              <UBadge color="gray" variant="soft" size="xs">{{ $t('admin.coming_soon') }}</UBadge>
+              <UBadge color="neutral" variant="soft" size="xs">{{
+                $t('admin.coming_soon')
+              }}</UBadge>
             </div>
           </div>
         </UCard>
@@ -279,7 +281,9 @@
               <p class="text-gray-400 text-sm mb-4">
                 {{ $t('admin.advanced_statistics_description') }}
               </p>
-              <UBadge color="gray" variant="soft" size="xs">{{ $t('admin.coming_soon') }}</UBadge>
+              <UBadge color="neutral" variant="soft" size="xs">{{
+                $t('admin.coming_soon')
+              }}</UBadge>
             </div>
           </div>
         </UCard>

@@ -1,4 +1,4 @@
-import { NotificationHelpers } from '../../../../utils/notification-service'
+import { NotificationService } from '../../../../utils/notification-service'
 import { prisma } from '../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
@@ -73,13 +73,14 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  // Envoyer notifications au demandeur selon l'action
-  if (action === 'ACCEPT' || action === 'REJECT') {
-    try {
+  // Envoyer notifications selon l'action
+  try {
+    if (action === 'ACCEPT' || action === 'REJECT') {
+      // Notifications au demandeur (passager)
       const ownerName = offer.user.pseudo || `Utilisateur ${offer.user.id}`
 
       if (action === 'ACCEPT') {
-        await NotificationHelpers.carpoolBookingAccepted(
+        await NotificationService.carpoolBookingAccepted(
           booking.requesterId,
           ownerName,
           offerId,
@@ -88,7 +89,7 @@ export default defineEventHandler(async (event) => {
           offer.tripDate
         )
       } else if (action === 'REJECT') {
-        await NotificationHelpers.carpoolBookingRejected(
+        await NotificationService.carpoolBookingRejected(
           booking.requesterId,
           ownerName,
           offerId,
@@ -96,10 +97,22 @@ export default defineEventHandler(async (event) => {
           offer.locationCity
         )
       }
-    } catch (error) {
-      console.error("Erreur lors de l'envoi de la notification de covoiturage:", error)
-      // On ne fait pas échouer la mise à jour si la notification échoue
+    } else if (action === 'CANCEL' && booking.status === 'ACCEPTED') {
+      // Notification au conducteur quand un passager annule une réservation acceptée
+      const passengerName = updated.requester.pseudo || `Utilisateur ${updated.requester.id}`
+
+      await NotificationService.carpoolBookingCancelled(
+        offer.userId,
+        passengerName,
+        offerId,
+        booking.seats,
+        offer.locationCity,
+        offer.tripDate
+      )
     }
+  } catch (error) {
+    console.error("Erreur lors de l'envoi de la notification de covoiturage:", error)
+    // On ne fait pas échouer la mise à jour si la notification échoue
   }
 
   return updated

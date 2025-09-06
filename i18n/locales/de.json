@@ -269,8 +269,6 @@
       "available_seats": "Verfügbare Plätze",
       "create": "Mitfahrangebot erstellen",
       "created": "Mitfahrangebot erstellt",
-      "price_per_seat": "Preis pro Platz (€)",
-      "price_placeholder": "z. B. 10",
       "seats_placeholder": "z. B. 3"
     },
     "options": "Optionen",

@@ -135,7 +135,7 @@
             <!-- Boutons d'action -->
             <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4">
               <UButton
-                color="gray"
+                color="neutral"
                 variant="outline"
                 class="order-2 sm:order-1"
                 icon="i-heroicons-x-mark"

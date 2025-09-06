@@ -269,8 +269,6 @@
       "available_seats": "Dostępne miejsca",
       "create": "Utwórz ofertę wspólnego przejazdu",
       "created": "Oferta wspólnego przejazdu utworzona",
-      "price_per_seat": "Cena za miejsce (€)",
-      "price_placeholder": "np. 10",
       "seats_placeholder": "np. 3"
     },
     "options": "Opcje",

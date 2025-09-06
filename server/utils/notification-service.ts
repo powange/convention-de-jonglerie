@@ -307,6 +307,16 @@ export const NotificationHelpers = {
     seats: number,
     message?: string
   ) {
+    // Récupérer l'ID de l'édition pour construire la bonne URL
+    const offer = await prisma.carpoolOffer.findUnique({
+      where: { id: offerId },
+      select: { editionId: true },
+    })
+
+    const actionUrl = offer
+      ? `/editions/${offer.editionId}/covoiturage?offerId=${offerId}`
+      : `/carpool-offers/${offerId}`
+
     return await NotificationService.create({
       userId,
       type: 'INFO',
@@ -315,7 +325,7 @@ export const NotificationHelpers = {
       category: 'carpool',
       entityType: 'CarpoolOffer',
       entityId: offerId.toString(),
-      actionUrl: `/carpool-offers/${offerId}`,
+      actionUrl,
       actionText: 'Voir la demande',
     })
   },
@@ -331,6 +341,16 @@ export const NotificationHelpers = {
     locationCity: string,
     tripDate: Date
   ) {
+    // Récupérer l'ID de l'édition pour construire la bonne URL
+    const offer = await prisma.carpoolOffer.findUnique({
+      where: { id: offerId },
+      select: { editionId: true },
+    })
+
+    const actionUrl = offer
+      ? `/editions/${offer.editionId}/covoiturage?offerId=${offerId}`
+      : `/carpool-offers/${offerId}`
+
     const dateStr = tripDate.toLocaleDateString('fr-FR', {
       day: 'numeric',
       month: 'long',
@@ -344,7 +364,7 @@ export const NotificationHelpers = {
       category: 'carpool',
       entityType: 'CarpoolOffer',
       entityId: offerId.toString(),
-      actionUrl: `/carpool-offers/${offerId}`,
+      actionUrl,
       actionText: 'Voir les détails',
     })
   },
@@ -359,6 +379,16 @@ export const NotificationHelpers = {
     seats: number,
     locationCity: string
   ) {
+    // Récupérer l'ID de l'édition pour construire la bonne URL
+    const offer = await prisma.carpoolOffer.findUnique({
+      where: { id: offerId },
+      select: { editionId: true },
+    })
+
+    const actionUrl = offer
+      ? `/editions/${offer.editionId}/covoiturage?offerId=${offerId}`
+      : `/carpool-offers/${offerId}`
+
     return await NotificationService.create({
       userId,
       type: 'WARNING',
@@ -367,8 +397,48 @@ export const NotificationHelpers = {
       category: 'carpool',
       entityType: 'CarpoolOffer',
       entityId: offerId.toString(),
-      actionUrl: `/carpool-offers/${offerId}`,
+      actionUrl,
       actionText: "Voir d'autres offres",
+    })
+  },
+
+  /**
+   * Notification d'annulation d'une réservation acceptée
+   */
+  async carpoolBookingCancelled(
+    userId: number,
+    passengerName: string,
+    offerId: number,
+    seats: number,
+    locationCity: string,
+    tripDate: Date
+  ) {
+    // Récupérer l'ID de l'édition pour construire la bonne URL
+    const offer = await prisma.carpoolOffer.findUnique({
+      where: { id: offerId },
+      select: { editionId: true },
+    })
+
+    const actionUrl = offer
+      ? `/editions/${offer.editionId}/covoiturage?offerId=${offerId}`
+      : `/carpool-offers/${offerId}`
+
+    const dateStr = tripDate.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      title: 'Réservation annulée 📅',
+      message: `${passengerName} a annulé sa réservation de ${seats} place${seats > 1 ? 's' : ''} pour le trajet au départ de ${locationCity} le ${dateStr}.`,
+      category: 'carpool',
+      entityType: 'CarpoolOffer',
+      entityId: offerId.toString(),
+      actionUrl,
+      actionText: 'Voir le covoiturage',
     })
   },
 }

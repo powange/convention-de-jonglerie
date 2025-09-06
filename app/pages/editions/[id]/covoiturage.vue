@@ -16,7 +16,7 @@
       />
 
       <!-- Contenu du covoiturage -->
-      <CarpoolSection :edition-id="edition.id" />
+      <CarpoolSection :edition-id="edition.id" :highlight-offer-id="highlightOfferId" />
     </div>
   </div>
 </template>
@@ -43,6 +43,12 @@ const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
+
+// Paramètre pour mettre en évidence une offre spécifique
+const highlightOfferId = computed(() => {
+  const offerId = route.query.offerId
+  return offerId ? parseInt(offerId as string) : null
+})
 
 const isFavorited = computed(() => (_editionId: number) => {
   return edition.value?.favoritedBy?.some((u) => u.id === authStore.user?.id) || false

@@ -103,6 +103,7 @@
               v-for="offer in offers"
               :key="offer.id"
               :offer="offer"
+              :highlighted="props.highlightOfferId === offer.id"
               @comment-added="refreshOffers"
               @passenger-added="refreshOffers"
               @edit="editOffer(offer)"
@@ -154,6 +155,7 @@ import CarpoolRequestForm from './CarpoolRequestForm.vue'
 
 interface Props {
   editionId: number
+  highlightOfferId?: number | null
 }
 
 const props = defineProps<Props>()

@@ -269,8 +269,6 @@
       "available_seats": "Plazas disponibles",
       "create": "Crear oferta de viaje compartido",
       "created": "Oferta de viaje creada",
-      "price_per_seat": "Precio por plaza (€)",
-      "price_placeholder": "p. ej., 10",
       "seats_placeholder": "p. ej., 3"
     },
     "options": "Opciones",

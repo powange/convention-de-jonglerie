@@ -206,7 +206,7 @@
               <h3 class="text-lg font-semibold">Créer une notification</h3>
               <UButton
                 icon="i-heroicons-x-mark"
-                color="gray"
+                color="neutral"
                 variant="ghost"
                 @click="showCreateModal = false"
               />
@@ -294,7 +294,7 @@
               <h3 class="text-lg font-semibold">Tester les notifications</h3>
               <UButton
                 icon="i-heroicons-x-mark"
-                color="gray"
+                color="neutral"
                 variant="ghost"
                 @click="showTestModal = false"
               />

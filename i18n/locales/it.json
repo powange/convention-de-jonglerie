@@ -269,8 +269,6 @@
       "available_seats": "Posti disponibili",
       "create": "Crea offerta di car pooling",
       "created": "Offerta di car pooling creata",
-      "price_per_seat": "Prezzo per posto (€)",
-      "price_placeholder": "es. 10",
       "seats_placeholder": "es. 3"
     },
     "options": "Opzioni",

@@ -274,7 +274,7 @@
     "departure_date_description": "Choose departure date and time",
     "departure_placeholder": "Departure city or address",
     "trip_details": "Trip details",
-    "pricing_contact": "Pricing and contact",
+    "contact": "Contact",
     "preferences": "Preferences",
     "form_help_text": "Your information will remain private",
     "phone_number": "Phone number",
@@ -300,9 +300,6 @@
       "create_description": "Offer seats in your vehicle for the event",
       "edit_description": "Edit your carpool offer details",
       "created": "Carpool offer created",
-      "price_per_seat": "Price per seat (€)",
-      "price_placeholder": "e.g., 10",
-      "price_description": "Leave empty if it's free",
       "seats_placeholder": "e.g., 3",
       "seats_description": "Number of available seats in your vehicle"
     },

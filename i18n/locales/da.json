@@ -269,8 +269,6 @@
       "available_seats": "Ledige pladser",
       "create": "Opret samkørselstilbud",
       "created": "Samkørselstilbud oprettet",
-      "price_per_seat": "Pris pr. sæde (€)",
-      "price_placeholder": "fx 10",
       "seats_placeholder": "fx 3"
     },
     "options": "Valgmuligheder",

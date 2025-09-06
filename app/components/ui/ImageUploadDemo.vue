@@ -64,7 +64,7 @@
         />
         <UAlert
           v-if="logoError"
-          color="red"
+          color="error"
           variant="subtle"
           :title="t('upload.loading_error_title')"
           description="Impossible de charger l'image depuis cette URL"

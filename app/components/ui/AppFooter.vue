@@ -9,7 +9,7 @@
 
         <!-- Liens footer -->
         <div class="flex items-center gap-4 text-sm">
-          <UButton variant="ghost" color="gray" size="sm" @click="openFeedbackModal">
+          <UButton variant="ghost" color="neutral" size="sm" @click="openFeedbackModal">
             {{ t('footer.feedback') }}
           </UButton>
         </div>

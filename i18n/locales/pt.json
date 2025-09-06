@@ -269,8 +269,6 @@
       "available_seats": "Lugares disponíveis",
       "create": "Criar oferta de carona",
       "created": "Oferta de carona criada",
-      "price_per_seat": "Preço por lugar (€)",
-      "price_placeholder": "ex.: 10",
       "seats_placeholder": "ex.: 3"
     },
     "options": "Opções",

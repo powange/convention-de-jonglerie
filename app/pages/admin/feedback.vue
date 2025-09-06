@@ -205,14 +205,19 @@
                 </UButton>
                 <UButton
                   v-else
-                  color="gray"
+                  color="neutral"
                   variant="soft"
                   size="sm"
                   @click="openResolveModal(feedback)"
                 >
                   {{ t('admin.feedback.unresolve') }}
                 </UButton>
-                <UButton color="blue" variant="soft" size="sm" @click="openDetailsModal(feedback)">
+                <UButton
+                  color="secondary"
+                  variant="soft"
+                  size="sm"
+                  @click="openDetailsModal(feedback)"
+                >
                   {{ t('admin.feedback.view') }}
                 </UButton>
               </div>
@@ -260,7 +265,7 @@
             </UFormField>
 
             <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <UButton color="gray" variant="outline" @click="resolveModal.isOpen = false">
+              <UButton color="neutral" variant="outline" @click="resolveModal.isOpen = false">
                 {{ t('common.cancel') }}
               </UButton>
               <UButton :loading="resolveModal.loading" @click="resolveFeedback">
@@ -382,7 +387,7 @@
             </div>
 
             <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
-              <UButton color="gray" variant="outline" @click="detailsModal.isOpen = false">
+              <UButton color="neutral" variant="outline" @click="detailsModal.isOpen = false">
                 {{ t('common.close') }}
               </UButton>
             </div>

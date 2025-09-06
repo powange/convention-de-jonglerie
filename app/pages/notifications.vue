@@ -53,25 +53,28 @@
       <div class="flex flex-wrap gap-4 items-center justify-between">
         <div class="flex flex-wrap gap-4 items-center">
           <!-- Filtre par statut -->
-          <USelectMenu
+          <USelect
             v-model="selectedStatus"
-            :options="statusOptions"
+            :items="statusOptions"
             placeholder="Statut"
             class="w-40"
-            @update:model-value="applyFilters"
           />
 
           <!-- Filtre par catégorie -->
-          <USelectMenu
+          <USelect
             v-model="selectedCategory"
-            :options="categoryOptions"
+            :items="categoryOptions"
             placeholder="Catégorie"
             class="w-48"
-            @update:model-value="applyFilters"
           />
 
           <!-- Bouton effacer filtres -->
-          <UButton icon="i-heroicons-x-mark" variant="outline" color="gray" @click="clearFilters">
+          <UButton
+            icon="i-heroicons-x-mark"
+            variant="outline"
+            color="neutral"
+            @click="clearFilters"
+          >
             Effacer
           </UButton>
         </div>
@@ -149,7 +152,12 @@
                 <div class="flex-1">
                   <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
                     {{ notification.title }}
-                    <UBadge v-if="!notification.isRead" color="blue" variant="soft" class="ml-2">
+                    <UBadge
+                      v-if="!notification.isRead"
+                      color="secondary"
+                      variant="soft"
+                      class="ml-2"
+                    >
                       Nouveau
                     </UBadge>
                   </h3>
@@ -174,7 +182,7 @@
                     icon="i-heroicons-trash"
                     variant="ghost"
                     size="sm"
-                    color="red"
+                    color="error"
                     @click="deleteNotification(notification.id)"
                   />
                 </div>
@@ -243,22 +251,26 @@ const authStore = useAuthStore()
 const toast = useToast()
 
 // État réactif
-const selectedStatus = ref('')
-const selectedCategory = ref('')
+const selectedStatus = ref('all')
+const selectedCategory = ref('all')
 const stats = ref(null)
 
-// Options pour les filtres
+// Options statiques pour les filtres
 const statusOptions = [
-  { label: 'Toutes', value: '' },
+  { label: 'Toutes', value: 'all' },
   { label: 'Non lues', value: 'false' },
   { label: 'Lues', value: 'true' },
 ]
 
 const categoryOptions = [
-  { label: 'Toutes les catégories', value: '' },
+  { label: 'Toutes les catégories', value: 'all' },
   { label: 'Système', value: 'system' },
   { label: 'Éditions', value: 'edition' },
+  { label: 'Covoiturage', value: 'carpool' },
   { label: 'Bénévolat', value: 'volunteer' },
+  { label: 'Commentaires', value: 'comment' },
+  { label: 'Favoris', value: 'favorite' },
+  { label: 'Réservations', value: 'booking' },
   { label: 'Autres', value: 'other' },
 ]
 
@@ -344,11 +356,11 @@ const applyFilters = async () => {
     offset: 0,
   }
 
-  if (selectedStatus.value) {
+  if (selectedStatus.value && selectedStatus.value !== 'all') {
     filters.isRead = selectedStatus.value === 'true'
   }
 
-  if (selectedCategory.value) {
+  if (selectedCategory.value && selectedCategory.value !== 'all') {
     filters.category = selectedCategory.value
   }
 
@@ -356,8 +368,8 @@ const applyFilters = async () => {
 }
 
 const clearFilters = async () => {
-  selectedStatus.value = ''
-  selectedCategory.value = ''
+  selectedStatus.value = 'all'
+  selectedCategory.value = 'all'
   await notificationsStore.clearFilters()
 }
 
@@ -455,10 +467,58 @@ const loadStats = async () => {
   }
 }
 
+// Polling automatique des notifications
+let pollingInterval: NodeJS.Timeout | null = null
+
+const startPolling = () => {
+  if (pollingInterval) return
+
+  // Rafraîchir toutes les 10 secondes
+  pollingInterval = setInterval(async () => {
+    if (authStore.user && document.visibilityState === 'visible') {
+      await notificationsStore.refresh()
+    }
+  }, 10000)
+}
+
+const stopPolling = () => {
+  if (pollingInterval) {
+    clearInterval(pollingInterval)
+    pollingInterval = null
+  }
+}
+
+// Watchers pour appliquer les filtres automatiquement
+watch([selectedStatus, selectedCategory], () => {
+  applyFilters()
+})
+
+// Gérer la visibilité de la page
+onMounted(() => {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      // Rafraîchir quand l'utilisateur revient sur l'onglet
+      if (authStore.user) {
+        notificationsStore.refresh()
+      }
+      startPolling()
+    } else {
+      // Arrêter le polling quand l'onglet n'est pas visible
+      stopPolling()
+    }
+  })
+})
+
 // Initialisation
 onMounted(async () => {
   if (authStore.user) {
     await Promise.all([notificationsStore.refresh(), loadStats()])
+    startPolling()
   }
+})
+
+// Nettoyage
+onUnmounted(() => {
+  stopPolling()
 })
 </script>

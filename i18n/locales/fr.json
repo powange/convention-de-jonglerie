@@ -278,7 +278,7 @@
     "phone_placeholder": "Votre numéro de téléphone",
     "phone_description": "Pour être contacté par les autres utilisateurs",
     "trip_details": "Détails du voyage",
-    "pricing_contact": "Prix et contact",
+    "contact": "Contact",
     "preferences": "Préférences",
     "form_help_text": "Vos informations resteront privées",
     "details": "Détails",
@@ -301,9 +301,6 @@
       "create_description": "Proposez des places dans votre véhicule pour l'événement",
       "edit_description": "Modifiez les détails de votre offre de covoiturage",
       "created": "Offre de covoiturage créée",
-      "price_per_seat": "Prix par place (€)",
-      "price_placeholder": "Ex: 10",
-      "price_description": "Laissez vide si c'est gratuit",
       "seats_placeholder": "Ex: 3",
       "seats_description": "Nombre de places libres dans votre véhicule"
     },

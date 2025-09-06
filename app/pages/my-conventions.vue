@@ -9,7 +9,7 @@
           <UButton
             icon="i-heroicons-question-mark-circle"
             size="xs"
-            color="gray"
+            color="neutral"
             variant="ghost"
             :ui="{ rounded: 'rounded-full' }"
             @click="openFeaturesModal"

@@ -116,7 +116,7 @@
           @input="debouncedSearch"
         />
 
-        <UButton icon="i-heroicons-x-mark" variant="outline" color="gray" @click="clearFilters">
+        <UButton icon="i-heroicons-x-mark" variant="outline" color="neutral" @click="clearFilters">
           Effacer
         </UButton>
       </div>
@@ -130,7 +130,7 @@
           <div class="flex justify-between items-center">
             <h3 class="text-lg font-medium">
               Logs d'erreurs
-              <UBadge color="gray" variant="soft">{{ pagination.total }}</UBadge>
+              <UBadge color="neutral" variant="soft">{{ pagination.total }}</UBadge>
             </h3>
             <div class="flex items-center gap-4">
               <!-- Sélecteur de taille de page -->
@@ -201,7 +201,7 @@
                       {{ log.statusCode }}
                     </UBadge>
 
-                    <UBadge v-if="log.errorType" color="gray" variant="outline">
+                    <UBadge v-if="log.errorType" color="neutral" variant="outline">
                       {{ log.errorType }}
                     </UBadge>
 
@@ -254,7 +254,7 @@
             </div>
             <UButton
               icon="i-heroicons-x-mark"
-              color="gray"
+              color="neutral"
               variant="ghost"
               @click="showLogDetails = false"
             />
@@ -276,7 +276,7 @@
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Type d'erreur
               </label>
-              <UBadge color="gray" variant="outline">
+              <UBadge color="neutral" variant="outline">
                 {{ selectedLog.errorType || 'Non défini' }}
               </UBadge>
             </div>
@@ -384,7 +384,7 @@
                 </UButton>
                 <UButton
                   v-else
-                  color="red"
+                  color="error"
                   variant="outline"
                   :loading="resolving"
                   @click="resolveLog(false)"

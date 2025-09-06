@@ -165,31 +165,12 @@
           </UFormField>
         </div>
 
-        <!-- Section Prix et Contact -->
+        <!-- Section Contact -->
         <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg space-y-4">
           <h4 class="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
-            <UIcon name="i-heroicons-currency-euro" class="text-primary-500" />
-            {{ $t('carpool.pricing_contact') }}
+            <UIcon name="i-heroicons-phone" class="text-primary-500" />
+            {{ $t('carpool.contact') }}
           </h4>
-
-          <!-- Prix (pour les offres) -->
-          <UFormField
-            v-if="formType === 'offer'"
-            :label="$t('carpool.offer.price_per_seat')"
-            name="pricePerSeat"
-            :description="$t('carpool.offer.price_description')"
-          >
-            <UInput
-              v-model.number="form.pricePerSeat"
-              type="number"
-              min="0"
-              step="0.01"
-              :placeholder="$t('carpool.offer.price_placeholder')"
-              icon="i-heroicons-currency-euro"
-              size="lg"
-              class="max-w-xs"
-            />
-          </UFormField>
 
           <!-- Numéro de téléphone (pleine largeur) -->
           <UFormField
@@ -322,7 +303,6 @@ const form = reactive({
   direction: props.initialData?.direction || 'TO_EVENT',
   availableSeats: props.initialData?.availableSeats || (props.formType === 'offer' ? 1 : undefined),
   seatsNeeded: props.initialData?.seatsNeeded || (props.formType === 'request' ? 1 : undefined),
-  pricePerSeat: props.initialData?.pricePerSeat || null,
   description: props.initialData?.description || '',
   phoneNumber: props.initialData?.phoneNumber || '',
   smokingAllowed: props.initialData?.smokingAllowed || false,
@@ -398,7 +378,6 @@ const schema = computed(() => {
         .number()
         .min(1, t('carpool.validation.seats_min'))
         .max(8, t('carpool.validation.seats_max')),
-      pricePerSeat: z.number().min(0).optional().nullable(),
       musicAllowed: z.boolean().optional(),
     })
   } else {
@@ -435,11 +414,16 @@ const fetchSuggestions = useDebounceFn(async (_field: 'locationCity', query: str
     // Privilégier les résultats en Europe (vous pouvez ajuster selon vos besoins)
     const countryCodes = 'fr,be,ch,de,es,it,nl,gb,lu'
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=${currentLocale}&countrycodes=${countryCodes}`
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=${currentLocale}&countrycodes=${countryCodes}&addressdetails=1&featuretype=settlement&class=place&type=city,town,village`
     )
     const data = await response.json()
 
-    const suggestions = data.map((item: any) => ({
+    // Filtrer uniquement les résultats avec addresstype = "city", "town" ou "village"
+    const filteredData = data.filter((item: any) =>
+      ['city', 'town', 'village'].includes(item.addresstype)
+    )
+
+    const suggestions = filteredData.map((item: any) => ({
       id: item.place_id,
       name: item.display_name.split(',')[0],
       city: item.display_name.split(',')[1]?.trim() || '',
@@ -483,7 +467,6 @@ const onSubmit = async () => {
       delete payload.seatsNeeded
     } else {
       delete payload.availableSeats
-      delete payload.pricePerSeat
       delete payload.musicAllowed
     }
 

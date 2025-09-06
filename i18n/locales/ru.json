@@ -269,8 +269,6 @@
       "available_seats": "Доступные места",
       "create": "Создать предложение попутки",
       "created": "Предложение попутки создано",
-      "price_per_seat": "Цена за место (€)",
-      "price_placeholder": "напр., 10",
       "seats_placeholder": "напр., 3"
     },
     "options": "Параметры",

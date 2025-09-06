@@ -28,7 +28,7 @@
         <div v-if="hasReturnedItems" class="mb-4">
           <UButton
             size="xs"
-            color="gray"
+            color="neutral"
             variant="soft"
             :icon="showReturned ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
             @click="toggleShowReturned"
