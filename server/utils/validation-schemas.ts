@@ -300,6 +300,7 @@ export const collaboratorRightsSchema = z
     editConvention: z.boolean().optional(),
     deleteConvention: z.boolean().optional(),
     manageCollaborators: z.boolean().optional(),
+    manageVolunteers: z.boolean().optional(),
     addEdition: z.boolean().optional(),
     editAllEditions: z.boolean().optional(),
     deleteAllEditions: z.boolean().optional(),

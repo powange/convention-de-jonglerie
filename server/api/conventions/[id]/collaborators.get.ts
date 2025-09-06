@@ -44,6 +44,7 @@ export default defineEventHandler(async (event) => {
         editConvention: c.canEditConvention,
         deleteConvention: c.canDeleteConvention,
         manageCollaborators: c.canManageCollaborators,
+        manageVolunteers: c.canManageVolunteers,
         addEdition: c.canAddEdition,
         editAllEditions: c.canEditAllEditions,
         deleteAllEditions: c.canDeleteAllEditions,
@@ -52,6 +53,7 @@ export default defineEventHandler(async (event) => {
         editionId: p.editionId,
         canEdit: p.canEdit,
         canDelete: p.canDelete,
+        canManageVolunteers: p.canManageVolunteers,
       })),
     }))
   } catch (error: unknown) {

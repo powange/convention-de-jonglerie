@@ -8,6 +8,7 @@ const perEditionSchema = z.object({
   editionId: z.number().int().positive(),
   canEdit: z.boolean().optional(),
   canDelete: z.boolean().optional(),
+  canManageVolunteers: z.boolean().optional(),
 })
 
 const payloadSchema = z.object({
@@ -17,6 +18,7 @@ const payloadSchema = z.object({
       editConvention: z.boolean().optional(),
       deleteConvention: z.boolean().optional(),
       manageCollaborators: z.boolean().optional(),
+      manageVolunteers: z.boolean().optional(),
       addEdition: z.boolean().optional(),
       editAllEditions: z.boolean().optional(),
       deleteAllEditions: z.boolean().optional(),
@@ -53,6 +55,7 @@ export default defineEventHandler(async (event) => {
       canEditConvention: collaborator.canEditConvention,
       canDeleteConvention: collaborator.canDeleteConvention,
       canManageCollaborators: collaborator.canManageCollaborators,
+      canManageVolunteers: collaborator.canManageVolunteers,
       canAddEdition: collaborator.canAddEdition,
       canEditAllEditions: collaborator.canEditAllEditions,
       canDeleteAllEditions: collaborator.canDeleteAllEditions,
@@ -61,6 +64,7 @@ export default defineEventHandler(async (event) => {
       editionId: p.editionId,
       canEdit: p.canEdit,
       canDelete: p.canDelete,
+      canManageVolunteers: p.canManageVolunteers,
     })),
   }
 
@@ -73,6 +77,8 @@ export default defineEventHandler(async (event) => {
       updateData.canDeleteConvention = parsed.rights.deleteConvention
     if (parsed.rights.manageCollaborators !== undefined)
       updateData.canManageCollaborators = parsed.rights.manageCollaborators
+    if (parsed.rights.manageVolunteers !== undefined)
+      updateData.canManageVolunteers = parsed.rights.manageVolunteers
     if (parsed.rights.addEdition !== undefined) updateData.canAddEdition = parsed.rights.addEdition
     if (parsed.rights.editAllEditions !== undefined)
       updateData.canEditAllEditions = parsed.rights.editAllEditions
@@ -98,6 +104,7 @@ export default defineEventHandler(async (event) => {
                 editionId: p.editionId,
                 canEdit: !!p.canEdit,
                 canDelete: !!p.canDelete,
+                canManageVolunteers: !!p.canManageVolunteers,
               },
             })
           )
@@ -111,6 +118,7 @@ export default defineEventHandler(async (event) => {
         canEditConvention: updated.canEditConvention,
         canDeleteConvention: updated.canDeleteConvention,
         canManageCollaborators: updated.canManageCollaborators,
+        canManageVolunteers: updated.canManageVolunteers,
         canAddEdition: updated.canAddEdition,
         canEditAllEditions: updated.canEditAllEditions,
         canDeleteAllEditions: updated.canDeleteAllEditions,
@@ -119,6 +127,7 @@ export default defineEventHandler(async (event) => {
         editionId: p.editionId,
         canEdit: p.canEdit,
         canDelete: p.canDelete,
+        canManageVolunteers: p.canManageVolunteers,
       })),
     }
 
@@ -146,6 +155,7 @@ export default defineEventHandler(async (event) => {
         editConvention: result.updated.canEditConvention,
         deleteConvention: result.updated.canDeleteConvention,
         manageCollaborators: result.updated.canManageCollaborators,
+        manageVolunteers: result.updated.canManageVolunteers,
         addEdition: result.updated.canAddEdition,
         editAllEditions: result.updated.canEditAllEditions,
         deleteAllEditions: result.updated.canDeleteAllEditions,

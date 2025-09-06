@@ -15,6 +15,7 @@ const addCollaboratorSchema = z
         editConvention: z.boolean().optional(),
         deleteConvention: z.boolean().optional(),
         manageCollaborators: z.boolean().optional(),
+        manageVolunteers: z.boolean().optional(),
         addEdition: z.boolean().optional(),
         editAllEditions: z.boolean().optional(),
         deleteAllEditions: z.boolean().optional(),
@@ -28,6 +29,7 @@ const addCollaboratorSchema = z
           editionId: z.number().int().positive(),
           canEdit: z.boolean().optional(),
           canDelete: z.boolean().optional(),
+          canManageVolunteers: z.boolean().optional(),
         })
       )
       .optional(),
@@ -115,6 +117,7 @@ export default defineEventHandler(async (event) => {
           editConvention: collaborator.canEditConvention,
           deleteConvention: collaborator.canDeleteConvention,
           manageCollaborators: collaborator.canManageCollaborators,
+          manageVolunteers: collaborator.canManageVolunteers,
           addEdition: collaborator.canAddEdition,
           editAllEditions: collaborator.canEditAllEditions,
           deleteAllEditions: collaborator.canDeleteAllEditions,
@@ -123,6 +126,7 @@ export default defineEventHandler(async (event) => {
           editionId: p.editionId,
           canEdit: p.canEdit,
           canDelete: p.canDelete,
+          canManageVolunteers: p.canManageVolunteers,
         })),
         user: collaborator.user,
       },
