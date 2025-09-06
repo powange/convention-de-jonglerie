@@ -248,26 +248,14 @@
     </UCard>
 
     <!-- Modal de détails -->
-    <UModal v-model="showLogDetails" class="z-50">
-      <UCard v-if="selectedLog">
-        <template #header>
-          <div class="flex justify-between items-start">
-            <div>
-              <h3 class="text-lg font-semibold">{{ $t('admin.error_details') }}</h3>
-              <p class="text-sm text-gray-500 mt-1">
-                {{ formatDateTime(selectedLog.createdAt) }}
-              </p>
-            </div>
-            <UButton
-              icon="i-heroicons-x-mark"
-              color="neutral"
-              variant="ghost"
-              @click="showLogDetails = false"
-            />
-          </div>
-        </template>
+    <UModal v-model:open="showLogDetails" :title="$t('admin.error_details')">
+      <template #body>
+        <div v-if="selectedLog" class="space-y-6">
+          <!-- Date et heure -->
+          <p class="text-sm text-gray-500 mb-4">
+            {{ formatDateTime(selectedLog.createdAt) }}
+          </p>
 
-        <div class="space-y-6">
           <!-- Informations principales -->
           <div class="grid grid-cols-2 gap-4">
             <div>
@@ -405,7 +393,7 @@
             </div>
           </div>
         </div>
-      </UCard>
+      </template>
     </UModal>
   </div>
 </template>

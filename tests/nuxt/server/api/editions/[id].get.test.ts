@@ -250,6 +250,12 @@ describe('/api/editions/[id] GET', () => {
             id: true,
           },
         },
+        // Champs bénévolat nécessaires pour la page de gestion
+        _count: {
+          select: { volunteerApplications: true },
+        },
+        // Champs bénévolat (valeurs)
+        volunteerApplications: false,
         convention: {
           include: {
             collaborators: {
@@ -263,6 +269,7 @@ describe('/api/editions/[id] GET', () => {
                     updatedAt: true,
                   },
                 },
+                perEditionPermissions: true,
               },
             },
           },
