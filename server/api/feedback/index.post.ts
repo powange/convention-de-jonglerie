@@ -4,8 +4,10 @@ import { z } from 'zod'
 import { prisma } from '../../utils/prisma'
 import { validateAndSanitize, handleValidationError } from '../../utils/validation-schemas'
 
+import type { FeedbackType } from '@prisma/client'
+
 const feedbackSchema = z.object({
-  type: z.enum(['BUG', 'SUGGESTION', 'GENERAL', 'COMPLAINT']),
+  type: z.enum(['bug', 'feature', 'general', 'other']),
   subject: z
     .string()
     .min(5, 'Le sujet doit faire au moins 5 caractères')
@@ -138,9 +140,17 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
+    // Mapper les types du frontend vers les types de la DB
+    const typeMapping: Record<string, FeedbackType> = {
+      bug: 'BUG',
+      feature: 'SUGGESTION',
+      general: 'GENERAL',
+      other: 'COMPLAINT',
+    }
+    
     const feedback = await prisma.feedback.create({
       data: {
-        type,
+        type: (typeMapping[type] || 'GENERAL') as FeedbackType,
         subject,
         message,
         email: isAuthenticated ? null : email,

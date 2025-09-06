@@ -217,7 +217,7 @@ const feedbackSchema = computed(() => {
   // Pour les visiteurs, seul le nom est requis (pas l'email)
   if (!authStore.user) {
     return z.object({
-      type: z.enum(['BUG', 'SUGGESTION', 'GENERAL', 'COMPLAINT']),
+      type: z.enum(['bug', 'feature', 'general', 'other']),
       subject: z
         .string()
         .min(5, t('feedback.validation.subject.min'))
@@ -237,7 +237,7 @@ const feedbackSchema = computed(() => {
 
   // Pour les utilisateurs connectés
   return z.object({
-    type: z.enum(['BUG', 'SUGGESTION', 'GENERAL', 'COMPLAINT']),
+    type: z.enum(['bug', 'feature', 'general', 'other']),
     subject: z
       .string()
       .min(5, t('feedback.validation.subject.min'))
@@ -252,7 +252,7 @@ const feedbackSchema = computed(() => {
 
 // Formulaire
 const form = reactive({
-  type: 'GENERAL' as const,
+  type: 'general' as const,
   subject: '',
   message: '',
   name: '',
@@ -266,10 +266,10 @@ const user = computed(() => authStore.user)
 
 // Types de feedback
 const feedbackTypes = [
-  { value: 'BUG', label: 'feedback.types.bug' },
-  { value: 'SUGGESTION', label: 'feedback.types.suggestion' },
-  { value: 'GENERAL', label: 'feedback.types.general' },
-  { value: 'COMPLAINT', label: 'feedback.types.complaint' },
+  { value: 'bug', label: 'feedback.types.bug' },
+  { value: 'feature', label: 'feedback.types.suggestion' },
+  { value: 'general', label: 'feedback.types.general' },
+  { value: 'other', label: 'feedback.types.complaint' },
 ]
 
 // Options de feedback traduites
@@ -436,7 +436,7 @@ function closeModal() {
   setTimeout(() => {
     submitted.value = false
     Object.assign(form, {
-      type: 'GENERAL',
+      type: 'general',
       subject: '',
       message: '',
       name: '',
