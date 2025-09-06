@@ -127,6 +127,13 @@
         />
       </div>
     </UCard>
+
+    <!-- Modal de suppression d'utilisateur -->
+    <AdminUserDeletionModal
+      v-model:open="showDeletionModal"
+      :user="userToDelete"
+      @deleted="onUserDeleted"
+    />
   </div>
 </template>
 
@@ -135,31 +142,15 @@
 // Import du store d'authentification
 import { h, resolveComponent } from 'vue'
 
+import type { AdminUser } from '~/composables/useUserDeletion'
+
 definePageMeta({
   middleware: ['auth-protected', 'super-admin'],
 })
 
 const { t } = useI18n()
 
-// Types pour les utilisateurs
-interface UserCount {
-  createdConventions: number
-  createdEditions: number
-  favoriteEditions: number
-}
-
-interface AdminUser {
-  id: number
-  email: string
-  pseudo: string
-  nom: string
-  prenom: string
-  profilePicture: string | null
-  isEmailVerified: boolean
-  isGlobalAdmin: boolean
-  createdAt: string
-  _count: UserCount
-}
+// Types pour les utilisateurs (utilisé dans la page mais défini dans le composable)
 
 interface PaginationData {
   page: number
@@ -205,6 +196,10 @@ const adminFilter = ref('all')
 const emailFilter = ref('all')
 const sortOption = ref('createdAt:desc')
 const currentPage = ref(1)
+
+// État pour le modal de suppression
+const userToDelete = ref<AdminUser | null>(null)
+const showDeletionModal = ref(false)
 
 // Statistiques rapides
 const stats = computed(() => {
@@ -425,6 +420,16 @@ const getUserActions = (user: AdminUser): DropdownMenuItem[] => {
     })
   }
 
+  // Action de suppression (seulement pour les utilisateurs normaux)
+  if (!user.isGlobalAdmin) {
+    actions.push({
+      label: t('admin.delete_account'),
+      icon: 'i-heroicons-trash',
+      color: 'error' as const,
+      onSelect: () => openDeletionModal(user),
+    })
+  }
+
   return actions
 }
 
@@ -437,6 +442,20 @@ const promoteToAdmin = async (user: AdminUser) => {
 const demoteFromAdmin = async (user: AdminUser) => {
   // TODO: Implémenter la rétrogradation
   console.log('Demote:', user)
+}
+
+// Fonction pour ouvrir le modal de suppression
+const openDeletionModal = (user: AdminUser) => {
+  userToDelete.value = user
+  showDeletionModal.value = true
+}
+
+// Fonction appelée après suppression réussie
+const onUserDeleted = (deletedUser: AdminUser) => {
+  // Retirer l'utilisateur de la liste
+  users.value = users.value.filter((u) => u.id !== deletedUser.id)
+  // Recharger les stats
+  fetchUsers()
 }
 
 // Recherche avec debounce

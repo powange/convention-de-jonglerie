@@ -163,7 +163,8 @@
               >{{ $t('common.edit') || 'Modifier' }}</UButton
             >
           </div>
-          <!-- Encarts d'informations comme sur register.vue -->
+
+          <!-- Encarts d'informations avec switches de confirmation -->
           <div class="mt-2 space-y-3 mb-6">
             <div
               class="p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg"
@@ -174,13 +175,19 @@
                   class="text-blue-600 dark:text-blue-400 mt-0.5"
                   size="20"
                 />
-                <div>
+                <div class="flex-1">
                   <p class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
                     {{ $t('auth.email_access_required') }}
                   </p>
-                  <p class="text-xs text-blue-700 dark:text-blue-300">
+                  <p class="text-xs text-blue-700 dark:text-blue-300 mb-3">
                     {{ $t('auth.verification_email_notice') }}
                   </p>
+                  <div class="flex items-center gap-2">
+                    <USwitch v-model="emailAccessConfirmed" />
+                    <span class="text-sm text-blue-800 dark:text-blue-200">
+                      {{ $t('auth.email_access_confirmation') }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -194,18 +201,38 @@
                   class="text-amber-600 dark:text-amber-400 mt-0.5"
                   size="20"
                 />
-                <div>
+                <div class="flex-1">
                   <p class="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">
                     {{ $t('auth.personal_account_only') }}
                   </p>
-                  <p class="text-xs text-amber-700 dark:text-amber-300">
+                  <p class="text-xs text-amber-700 dark:text-amber-300 mb-3">
                     {{ $t('auth.personal_account_description') }}
                   </p>
+                  <div class="flex items-center gap-2">
+                    <USwitch v-model="personalAccountConfirmed" />
+                    <span class="text-sm text-amber-800 dark:text-amber-200">
+                      {{ $t('auth.personal_account_confirmation') }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
+          <!-- Affichage conditionnel du formulaire -->
+          <div
+            v-if="!canShowRegistrationForm"
+            class="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+          >
+            <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              <UIcon name="i-heroicons-lock-closed" class="w-5 h-5" />
+              <p class="text-sm">
+                {{ $t('auth.confirmation_required_message') }}
+              </p>
+            </div>
+          </div>
           <UForm
+            v-if="canShowRegistrationForm"
             :state="registerState"
             :schema="registerSchema"
             class="space-y-6"
@@ -335,7 +362,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { z } from 'zod'
 
 import type { HttpError } from '~/types'
@@ -395,6 +422,15 @@ const showPassword = ref(false)
 const showRegisterPassword = ref(false)
 const showRegisterConfirm = ref(false)
 const loading = ref(false)
+
+// States pour les switches de confirmation d'inscription
+const emailAccessConfirmed = ref(false)
+const personalAccountConfirmed = ref(false)
+
+// Computed pour afficher le formulaire d'inscription
+const canShowRegistrationForm = computed(() => {
+  return emailAccessConfirmed.value && personalAccountConfirmed.value
+})
 
 // Indicateur de force du mot de passe (repris de register.vue)
 const getPasswordStrength = () => {

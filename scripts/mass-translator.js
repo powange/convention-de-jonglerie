@@ -15,6 +15,12 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
+import {
+  TRANSLATION_DICTIONARY,
+  CONTEXT_PATTERNS as EXTERNAL_CONTEXT_PATTERNS,
+  getFlatTranslations,
+} from './translation-dictionary.js'
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -284,16 +290,35 @@ class MassTranslator {
   findCommonTranslation(text, targetLang) {
     const cleanText = text.replace(/^\[TODO\]\s*/, '').trim()
 
+    // Utiliser le dictionnaire externe centralisé
+    const flatTranslations = getFlatTranslations()
+
     // Recherche exacte
-    if (COMMON_TRANSLATIONS[cleanText] && COMMON_TRANSLATIONS[cleanText][targetLang]) {
-      return COMMON_TRANSLATIONS[cleanText][targetLang]
+    if (flatTranslations[cleanText] && flatTranslations[cleanText][targetLang]) {
+      return flatTranslations[cleanText][targetLang]
     }
 
-    // Recherche par pattern
+    // Recherche par pattern (dictionnaire externe)
+    for (const pattern of EXTERNAL_CONTEXT_PATTERNS) {
+      const match = cleanText.match(pattern.pattern)
+      if (match && pattern.getTranslations) {
+        const translations = pattern.getTranslations(match)
+        if (translations && translations[targetLang]) {
+          return translations[targetLang]
+        }
+      }
+    }
+
+    // Fallback vers les anciens patterns internes
     for (const pattern of CONTEXT_PATTERNS) {
       if (pattern.pattern.test(cleanText) && pattern.translations[targetLang]) {
         return pattern.translations[targetLang]
       }
+    }
+
+    // Fallback vers l'ancien dictionnaire interne
+    if (COMMON_TRANSLATIONS[cleanText] && COMMON_TRANSLATIONS[cleanText][targetLang]) {
+      return COMMON_TRANSLATIONS[cleanText][targetLang]
     }
 
     return null
