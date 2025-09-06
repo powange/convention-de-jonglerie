@@ -32,6 +32,23 @@ async function run() {
   const icoBuffer = await sharp(Buffer.from(svgContent)).resize(48, 48).png().toBuffer()
   await writeFile(path.join(outDir, 'favicon.png'), icoBuffer)
 
+  // Générer les noms spéciaux attendus par les PWA et navigateurs
+  const specialFiles = [
+    { size: 192, name: 'android-chrome-192x192.png' },
+    { size: 512, name: 'android-chrome-512x512.png' },
+    { size: 180, name: 'apple-touch-icon.png' },
+  ]
+
+  await Promise.all(
+    specialFiles.map(async ({ size, name }) => {
+      const file = path.join(outDir, name)
+      await sharp(Buffer.from(svgContent))
+        .resize(size, size)
+        .png({ compressionLevel: 9 })
+        .toFile(file)
+    })
+  )
+
   // Note: Le manifest web est maintenant généré dynamiquement via /api/site.webmanifest
   // selon l'environnement (DEV/TEST/PROD). Voir server/api/site.webmanifest.get.ts
   console.log('Favicons générés dans public/favicons')

@@ -143,7 +143,7 @@
                   </span>
                 </div>
               </div>
-              <div v-if="canEdit" class="flex items-center gap-3">
+              <div v-if="canEdit || canManageVolunteers" class="flex items-center gap-3">
                 <USwitch
                   v-model="volunteersOpenLocal"
                   :disabled="savingVolunteers"
@@ -178,11 +178,11 @@
               <!-- Description des bénévoles (Markdown) -->
               <div class="space-y-2">
                 <UFormField :label="t('editions.volunteers_description_label')" class="w-full">
-                  <div v-if="canEdit" class="space-y-2">
+                  <div v-if="canEdit || canManageVolunteers" class="space-y-2">
                     <MinimalMarkdownEditor
                       v-model="volunteersDescriptionLocal"
                       :preview="true"
-                      :disabled="savingVolunteers || !canEdit"
+                      :disabled="savingVolunteers || !(canEdit || canManageVolunteers)"
                     />
                   </div>
                   <div v-else class="prose dark:prose-invert max-w-none text-sm">
@@ -197,7 +197,7 @@
                   </div>
                 </UFormField>
                 <div
-                  v-if="canEdit"
+                  v-if="canEdit || canManageVolunteers"
                   class="flex items-center justify-between text-[11px] text-gray-500"
                 >
                   <span>{{ remainingVolunteerDescriptionChars }} / 5000</span>
@@ -235,14 +235,14 @@
                     :items="volunteerModeItems"
                     size="lg"
                     class="flex flex-col gap-1"
-                    :disabled="!canEdit"
+                    :disabled="!(canEdit || canManageVolunteers)"
                     @update:model-value="handleChangeMode"
                   />
                 </UFormField>
               </div>
 
               <!-- Options spécifiques au mode externe -->
-              <div v-if="canEdit && volunteersModeLocal === 'EXTERNAL'">
+              <div v-if="(canEdit || canManageVolunteers) && volunteersModeLocal === 'EXTERNAL'">
                 <div v-if="canEdit" class="mt-4 mb-2">
                   <h3 class="font-semibold text-gray-700 dark:text-gray-300">
                     {{ t('editions.external_mode_options') }}
@@ -255,10 +255,10 @@
                     <UInput
                       v-model="volunteersExternalUrlLocal"
                       :placeholder="'https://...'"
-                      :disabled="!canEdit"
+                      :disabled="!(canEdit || canManageVolunteers)"
                       class="w-full"
-                      @blur="canEdit && persistVolunteerSettings()"
-                      @keydown.enter.prevent="canEdit && persistVolunteerSettings()"
+                      @blur="(canEdit || canManageVolunteers) && persistVolunteerSettings()"
+                      @keydown.enter.prevent="(canEdit || canManageVolunteers) && persistVolunteerSettings()"
                     />
                   </UFormField>
                   <p class="text-[11px] text-gray-500">
@@ -271,7 +271,7 @@
               </div>
 
               <!-- Options spécifiques au mode interne -->
-              <div v-if="canEdit && volunteersModeLocal === 'INTERNAL'">
+              <div v-if="(canEdit || canManageVolunteers) && volunteersModeLocal === 'INTERNAL'">
                 <div v-if="canEdit" class="mt-4 mb-2">
                   <h3 class="font-semibold text-gray-700 dark:text-gray-300">
                     {{ t('editions.internal_mode_options') }}
@@ -891,7 +891,7 @@ watch(volunteersDescriptionLocal, () => {
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return canEdit.value || authStore.user?.id === edition.value?.creatorId
+  return canEdit.value || canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
 })
 
 // Permissions calculées
@@ -903,6 +903,11 @@ const canEdit = computed(() => {
 const canDelete = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canDeleteEdition(edition.value, authStore.user.id)
+})
+
+const canManageVolunteers = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageVolunteers(edition.value, authStore.user.id)
 })
 
 // Début d'édition

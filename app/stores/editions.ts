@@ -433,6 +433,46 @@ export const useEditionStore = defineStore('editions', {
       })
     },
 
+    // Vérifier si l'utilisateur peut gérer les bénévoles d'une édition
+    canManageVolunteers(edition: Edition, userId: number): boolean {
+      const authStore = useAuthStore()
+
+      // Les admins globaux en mode admin peuvent tout gérer
+      if (authStore.isAdminModeActive) {
+        return true
+      }
+
+      // Le créateur de l'édition peut gérer les bénévoles
+      if (edition.creatorId === userId) {
+        return true
+      }
+
+      // Vérifier si la convention a des collaborateurs
+      if (!edition.convention || !edition.convention.collaborators) {
+        return false
+      }
+
+      // L'auteur de la convention peut gérer tous les bénévoles
+      if (edition.convention.authorId === userId) {
+        return true
+      }
+
+      // Collaborateur avec droits explicites
+      return edition.convention.collaborators.some((collab) => {
+        if (collab.user.id !== userId) return false
+        // Droit global de gérer les bénévoles
+        if (collab.rights?.manageVolunteers) return true
+        // Droit global d'éditer la convention implique gestion des bénévoles
+        if (collab.rights?.editConvention || collab.rights?.editAllEditions) return true
+        // Droit spécifique sur cette édition
+        if (collab.perEditionRights) {
+          const per = collab.perEditionRights.find((r) => r.editionId === edition.id)
+          if (per?.canManageVolunteers || per?.canEdit) return true
+        }
+        return false
+      })
+    },
+
     // Récupérer toutes les éditions sans pagination (pour l'agenda)
     async fetchAllEditions(filters?: Omit<EditionFilters, 'page' | 'limit'>) {
       this.loading = true
