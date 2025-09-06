@@ -2,7 +2,7 @@
   <UApp>
     <!-- Loading Screen -->
     <div v-if="isLoading" class="loading-screen">
-      <img src="/logos/logo-jc-anim-orbit.svg" alt="Chargement..." class="loading-logo" />
+      <img src="/logos/logo-jc-anim-orbit.svg" :alt="$t('common.loading')" class="loading-logo" />
     </div>
 
     <ClientOnly>

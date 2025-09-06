@@ -3,12 +3,15 @@
     "actions": "Aktionen",
     "active_administrators": "Aktive Administratoren",
     "active_conventions": "Aktive Conventions",
+    "active_types": "Aktive Typen",
     "activity": "Aktivität",
     "administration_tools": "Verwaltungstools",
     "advanced_statistics": "Erweiterte Statistiken",
     "advanced_statistics_description": "Detaillierte Berichte und Analysen",
     "all_emails": "Alle E-Mails",
     "all_users": "Alle Benutzer",
+    "api_error_logs": "API-Fehler-Protokolle",
+    "api_path": "API-Pfad...",
     "archive_convention": "Konvention archivieren",
     "cannot_load_activity": "Aktuelle Aktivität kann nicht geladen werden",
     "cannot_load_stats": "Statistiken können nicht geladen werden",
@@ -36,6 +39,10 @@
     "email_a_z": "Nach E-Mail (A-Z)",
     "email_verified": "E-Mail verifiziert",
     "email_z_a": "Nach E-Mail (Z-A)",
+    "error_details": "Fehlerdetails",
+    "error_type": "Fehlertyp",
+    "errors_24h": "Fehler (24h)",
+    "event_reminders": "Veranstaltungserinnerungen",
     "favorites_count": "Favorit(en)",
     "feedback": {
       "admin_notes": "Admin-Notizen",
@@ -97,13 +104,17 @@
     "filter_all_conventions": "Alle Conventions",
     "filter_archived_conventions": "Archivierte Conventions",
     "filter_sort": "Filtern und sortieren",
+    "good_news": "Das sind gute Nachrichten!",
     "loading_activity": "Lade aktuelle Aktivität...",
+    "loading_logs": "Protokolle laden...",
+    "main_type": "Haupttyp",
     "manage_editions": "Ausgaben verwalten",
     "months_ago": "Vor {count} Monaten",
     "name_a_z": "Nach Name (A-Z)",
     "name_z_a": "Nach Name (Z-A)",
     "new_conventions_this_month": "+{count} diesen Monat",
     "new_editions_this_month": "+{count} diesen Monat",
+    "new_notification": "Neue Benachrichtigung",
     "new_users_this_month": "+{count} diesen Monat",
     "newest_first": "Neueste zuerst",
     "no_activity": "Keine Aktivität",
@@ -111,26 +122,35 @@
     "no_conventions_search": "Keine Conventions entsprechen Ihrer Suche",
     "no_conventions_yet": "Es wurden noch keine Conventions erstellt",
     "no_editions": "Keine Ausgaben",
+    "no_errors_found": "Keine Fehler gefunden",
     "no_recent_activity": "Keine aktuelle Aktivität",
     "normal_users": "Normale Benutzer",
     "not_verified": "Nicht verifiziert",
+    "notification_management": "Benachrichtigungsverwaltung",
     "oldest_first": "Älteste zuerst",
+    "per_page": "pro Seite",
     "promote_to_admin": "Zum Super-Admin befördern",
     "recent_activity": "Aktuelle Aktivität",
+    "recent_notifications": "Neueste Benachrichtigungen",
     "registration": "Registrierung",
     "role": "Rolle",
     "search_conventions_placeholder": "Nach Name, Beschreibung, Ersteller suchen...",
+    "search_error_messages": "In Fehlermeldungen suchen...",
     "search_users_placeholder": "Nach E-Mail, Benutzername, Vorname oder Nachname suchen...",
     "super_admin": "Super-Admin",
     "super_administrators": "Super-Administratoren",
     "super_admins": "Super-Admins",
     "system_settings": "Systemeinstellungen",
     "system_settings_description": "Allgemeine Plattformkonfiguration",
+    "test": "Testen",
+    "test_debug": "Tests und Debug",
     "today": "Heute",
     "total_conventions": "Conventions insgesamt",
     "total_editions": "Ausgaben insgesamt",
+    "total_sent": "Gesamt gesendet",
     "total_users": "Benutzer gesamt",
     "unarchive_convention": "Konvention dearchivieren",
+    "unresolved": "Ungelöst",
     "unverified_emails": "Unverifizierte E-Mails",
     "user": "Benutzer",
     "user_column": "Benutzer",
@@ -254,41 +274,71 @@
     "week": "Woche"
   },
   "carpool": {
-    "arrival_placeholder": "Ankunftsstadt oder -adresse",
-    "departure_placeholder": "Abfahrtsstadt oder -adresse",
+    "arrival_address": "Genaue Ankunftsadresse",
+    "arrival_address_description": "Genauer Absetzpunkt für Passagiere",
+    "arrival_address_placeholder": "Absetzadresse",
+    "arrival_city": "Ankunftsstadt",
+    "arrival_city_hint": "Geben Sie mindestens 3 Zeichen ein, um Vorschläge zu sehen",
+    "arrival_city_placeholder": "Z.B.: Berlin, München, Hamburg",
+    "contact": "Kontakt",
+    "departure_address": "Genaue Abfahrtsadresse",
+    "departure_address_description": "Genauer Treffpunkt zum Abholen der Passagiere",
+    "departure_address_placeholder": "Treffpunktadresse",
+    "departure_city": "Abfahrtsstadt",
+    "departure_city_hint": "Geben Sie mindestens 3 Zeichen ein, um Vorschläge zu sehen",
+    "departure_city_placeholder": "Abfahrtsstadt",
+    "departure_date_description": "Wählen Sie Abfahrtsdatum und -zeit",
+    "departure_location": "Abfahrtsort",
     "details": "Details",
+    "details_description": "Zusätzliche Informationen für andere Reisende",
     "details_placeholder": "Nützliche Infos zur Fahrt (Gepäck, Treffpunkt usw.)",
     "direction": {
+      "description": "Geben Sie an, ob Sie zur Convention fahren oder davon zurückkehren",
       "from_event": "Rückfahrt von der Convention",
       "label": "Fahrtrichtung",
       "to_event": "Hinfahrt zur Convention"
     },
-    "from": "Von",
+    "dropoff_location": "Absetzort",
+    "form_help_text": "Ihre Informationen bleiben privat",
+    "meeting_location": "Treffpunkt",
     "music_allowed": "Musik erlaubt",
+    "music_description": "Sie sind einverstanden, während der Fahrt Musik zu hören",
     "offer": {
       "available_seats": "Verfügbare Plätze",
       "create": "Mitfahrangebot erstellen",
+      "create_description": "Bieten Sie Plätze in Ihrem Fahrzeug für die Veranstaltung an",
       "created": "Mitfahrangebot erstellt",
+      "edit_description": "Bearbeiten Sie die Details Ihres Mitfahrangebots",
+      "seats_description": "Anzahl freier Plätze in Ihrem Fahrzeug",
       "seats_placeholder": "z. B. 3"
     },
-    "options": "Optionen",
     "pets_allowed": "Haustiere erlaubt",
+    "pets_description": "Sie akzeptieren Haustiere oder reisen mit Haustieren",
+    "phone_description": "Um von anderen Benutzern kontaktiert zu werden",
+    "phone_number": "Telefonnummer",
+    "phone_placeholder": "Ihre Telefonnummer",
+    "pickup_location": "Abholort",
+    "preferences": "Präferenzen",
     "request": {
       "create": "Mitfahrgesuch erstellen",
+      "create_description": "Suchen Sie eine Mitfahrgelegenheit zur Veranstaltung",
       "created": "Mitfahrgesuch erstellt",
+      "edit_description": "Bearbeiten Sie die Details Ihrer Mitfahranfrage",
       "required_seats": "Benötigte Plätze",
+      "seats_description": "Anzahl der Plätze, die Sie für Ihre Gruppe benötigen",
       "seats_placeholder": "z. B. 2"
     },
     "route": "Route",
     "select_date_time": "Datum und Uhrzeit wählen",
     "select_direction": "Richtung auswählen",
     "smoking_allowed": "Rauchen erlaubt",
-    "to": "Nach",
+    "smoking_description": "Sie erlauben Raucher in Ihrem Fahrzeug oder sind Raucher",
+    "trip_details": "Reisedetails",
     "validation": {
-      "arrival_required": "Ankunftsstadt ist erforderlich",
       "date_invalid": "Ungültiges Datum",
       "date_required": "Abfahrtsdatum ist erforderlich",
-      "departure_required": "Abfahrtsstadt ist erforderlich",
+      "departure_address_required": "Die Abfahrtsadresse ist erforderlich",
+      "departure_city_required": "Die Abfahrtsstadt ist erforderlich",
       "direction_invalid": "Ungültige Fahrtrichtung",
       "direction_required": "Fahrtrichtung ist erforderlich",
       "seats_max": "Maximal 8 Plätze",
@@ -303,12 +353,14 @@
     "back": "Zurück",
     "cancel": "Abbrechen",
     "cancelled": "Cancelled",
+    "category": "Kategorie",
     "city": "Stadt",
     "close": "Schließen",
     "confirm": "Bestätigen",
     "convention": "Convention",
     "country": "Land",
     "create": "Erstellen",
+    "creating": "Wird erstellt...",
     "date": "Datum",
     "dates": "Termine",
     "delete": "Löschen",
@@ -341,6 +393,7 @@
     "inactive": "Inaktiv",
     "loading": "Laden...",
     "location": "Ort",
+    "logo": "Logo",
     "manage": "Verwalten",
     "name": "Name",
     "no_permission": "Keine Berechtigung",
@@ -366,6 +419,7 @@
     "time_just_now": "gerade eben",
     "time_minutes_ago": "vor {count} Min",
     "tip": "Tipp",
+    "total": "Gesamt",
     "updated_at": "Aktualisiert am {date}",
     "view": "Anzeigen",
     "view_details": "Details anzeigen",
@@ -577,13 +631,13 @@
     "czech_republic": "Tschechische Republik"
   },
   "createForm": {
-    "actionText": "Texte du bouton",
-    "actionUrl": "URL d'action",
-    "category": "Catégorie",
-    "message": "Message",
-    "title": "Titre",
-    "type": "Type",
-    "userId": "ID utilisateur"
+    "actionText": "Schaltflächentext",
+    "actionUrl": "Aktions-URL",
+    "category": "Kategorie",
+    "message": "Nachricht",
+    "title": "Titel",
+    "type": "Typ",
+    "userId": "Benutzer-ID"
   },
   "currentValue": {
     "avatar": "Avatar des ausgewählten Benutzers"
@@ -805,7 +859,7 @@
   "erreur": {
     "": {
       "": {
-        "": "Ajouter des notes sur cette erreur..."
+        "": "Notizen zu diesem Fehler hinzufügen..."
       }
     }
   },
@@ -988,7 +1042,7 @@
     "targetUser": "Zielbenutzer"
   },
   "homepage": {
-    "agenda": "Agenda",
+    "agenda": "Programm",
     "current_editions": "Laufende Auflagen",
     "filters": "Filter",
     "finished_editions": "Beendete Auflagen",
@@ -1001,12 +1055,20 @@
     "searched_services": "Gesuchte Services",
     "upcoming_editions": "Kommende Auflagen"
   },
+  "locationLabels": {
+    "addressDescription": "Genauer Absetzpunkt für Passagiere",
+    "addressLabel": "Genaue Abfahrtsadresse",
+    "addressPlaceholder": "Vollständige Adresse",
+    "cityHint": "Geben Sie mindestens 3 Zeichen ein, um Vorschläge zu sehen",
+    "cityLabel": "Stadt",
+    "cityPlaceholder": "Z.B.: Berlin, München, Hamburg"
+  },
   "log": {
-    "adminNotes": "Notes administrateur",
-    "errorType": "Type d'erreur",
+    "adminNotes": "Admin-Notizen",
+    "errorType": "Fehlertyp",
     "id": "ID",
-    "ip": "Adresse IP",
-    "user": "Utilisateur"
+    "ip": "IP-Adresse",
+    "user": "Benutzer"
   },
   "messages": {
     "account_created": "Konto erstellt! Überprüfe deine E-Mail.",
@@ -1053,18 +1115,25 @@
     "my_conventions": "Meine Conventions",
     "my_favorites": "Meine Favoriten",
     "no_favorites": "Keine Favoriten",
-    "notifications": "Notifications",
+    "notifications": "Benachrichtigungen",
     "profile": "Profil",
     "tabs": "Navigationsregisterkarten"
   },
   "notification": {
-    "actionUrl": "URL d'action",
-    "category": "Catégorie",
-    "id": "Identifiant",
-    "user": "Utilisateur"
+    "actionUrl": "Aktions-URL",
+    "category": "Kategorie",
+    "id": "Kennung",
+    "user": "Benutzer"
+  },
+  "notifications": {
+    "loading": "Laden des notifications...",
+    "manage_description": "Verwalten Sie Ihre Benachrichtigungen und Einstellungen",
+    "none_found": "Keine Benachrichtigungen gefunden",
+    "this_week": "Diese Woche",
+    "unread": "Ungelesen"
   },
   "notificationsStore": {
-    "loading": "Chargement des notifications..."
+    "loading": "Laden des notifications..."
   },
   "p": {
     "key": "Schlüssel"
@@ -1233,11 +1302,11 @@
     "username_placeholder": "Dein eindeutiger Benutzername"
   },
   "selectedLog": {
-    "adminNotes": "Notes administrateur",
-    "ip": "Adresse IP",
-    "message": "Message d'erreur",
-    "stack": "Trace de la pile",
-    "user": "Utilisateur"
+    "adminNotes": "Admin-Notizen",
+    "ip": "IP-Adresse",
+    "message": "Fehlermeldung",
+    "stack": "Stack-Trace",
+    "user": "Benutzer"
   },
   "services": {
     "accessibility": "Barrierefreiheit",
@@ -1275,8 +1344,8 @@
     "slots": "Anzahl der Plätze"
   },
   "testType": {
-    "icon": "Icône",
-    "value": "Valeur"
+    "icon": "Symbol",
+    "value": "Wert"
   },
   "upload": {
     "click_select_convention_logo": "Klicken Sie, um ein Convention-Logo auszuwählen",

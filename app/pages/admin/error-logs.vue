@@ -6,7 +6,7 @@
         <div>
           <h1 class="text-3xl font-bold flex items-center gap-3">
             <UIcon name="i-heroicons-exclamation-triangle" class="text-red-600" />
-            Logs d'erreurs API
+            {{ $t('admin.api_error_logs') }}
           </h1>
           <p class="text-gray-600 dark:text-gray-400 mt-2">
             Surveillance et résolution des erreurs de l'API
@@ -30,7 +30,7 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Erreurs (24h)</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('admin.errors_24h') }}</p>
             <p class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ stats.totalLast24h }}
             </p>
@@ -42,7 +42,7 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Non résolues</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('admin.unresolved') }}</p>
             <p class="text-2xl font-bold text-red-600">
               {{ stats.unresolvedCount }}
             </p>
@@ -54,7 +54,7 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Type principal</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('admin.main_type') }}</p>
             <p class="text-lg font-bold text-gray-900 dark:text-white">
               {{ stats.errorTypes[0]?.type || 'N/A' }}
             </p>
@@ -87,7 +87,7 @@
           <UInput
             v-model="filters.search"
             icon="i-heroicons-magnifying-glass"
-            placeholder="Rechercher dans les messages d'erreur..."
+:placeholder="$t('admin.search_error_messages')"
             @input="debouncedSearch"
           />
         </div>
@@ -95,7 +95,7 @@
         <USelectMenu
           v-model="filters.status"
           :options="statusOptions"
-          placeholder="Statut"
+:placeholder="$t('common.status')"
           class="w-40"
           @update:model-value="applyFilters"
         />
@@ -103,7 +103,7 @@
         <USelectMenu
           v-model="filters.errorType"
           :options="errorTypeOptions"
-          placeholder="Type d'erreur"
+:placeholder="$t('admin.error_type')"
           class="w-48"
           @update:model-value="applyFilters"
         />
@@ -111,7 +111,7 @@
         <UInput
           v-model="filters.path"
           icon="i-heroicons-link"
-          placeholder="Chemin API..."
+:placeholder="$t('admin.api_path')"
           class="w-48"
           @input="debouncedSearch"
         />
@@ -140,7 +140,7 @@
                 class="w-20"
                 @update:model-value="changePageSize"
               />
-              <span class="text-sm text-gray-500">par page</span>
+              <span class="text-sm text-gray-500">{{ $t('admin.per_page') }}</span>
             </div>
           </div>
         </div>
@@ -151,13 +151,13 @@
             name="i-heroicons-arrow-path"
             class="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400"
           />
-          <p class="text-gray-500">Chargement des logs...</p>
+          <p class="text-gray-500">{{ $t('admin.loading_logs') }}</p>
         </div>
 
         <div v-else-if="logs.length === 0" class="p-8 text-center">
           <UIcon name="i-heroicons-check-circle" class="h-12 w-12 text-green-400 mx-auto mb-4" />
-          <p class="text-gray-500 mb-2">Aucune erreur trouvée</p>
-          <p class="text-sm text-gray-400">C'est une bonne nouvelle !</p>
+          <p class="text-gray-500 mb-2">{{ $t('admin.no_errors_found') }}</p>
+          <p class="text-sm text-gray-400">{{ $t('admin.good_news') }}</p>
         </div>
 
         <div v-else class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -247,7 +247,7 @@
         <template #header>
           <div class="flex justify-between items-start">
             <div>
-              <h3 class="text-lg font-semibold">Détails de l'erreur</h3>
+              <h3 class="text-lg font-semibold">{{ $t('admin.error_details') }}</h3>
               <p class="text-sm text-gray-500 mt-1">
                 {{ formatDateTime(selectedLog.createdAt) }}
               </p>
@@ -366,7 +366,7 @@
                 </label>
                 <UTextarea
                   v-model="selectedLog.adminNotes"
-                  placeholder="Ajouter des notes sur cette erreur..."
+:placeholder="$t('erreur...')"
                   :rows="3"
                   class="w-full"
                 />

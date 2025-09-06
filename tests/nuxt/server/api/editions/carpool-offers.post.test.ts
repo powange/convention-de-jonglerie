@@ -29,6 +29,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
       locationCity: 'Paris',
       locationAddress: '123 Rue de la Paix',
       availableSeats: 3,
+      direction: 'TO_EVENT',
       description: 'Voyage sympa vers la convention',
       phoneNumber: '0123456789',
     }
@@ -48,6 +49,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
       locationCity: requestBody.locationCity,
       locationAddress: requestBody.locationAddress,
       availableSeats: requestBody.availableSeats,
+      direction: requestBody.direction,
       description: requestBody.description,
       phoneNumber: requestBody.phoneNumber,
       createdAt: new Date(),
@@ -77,6 +79,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
         locationCity: requestBody.locationCity,
         locationAddress: requestBody.locationAddress,
         availableSeats: requestBody.availableSeats,
+        direction: requestBody.direction,
         description: requestBody.description,
         phoneNumber: requestBody.phoneNumber,
       },
@@ -122,7 +125,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
     global.readBody.mockResolvedValue(incompleteBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Données manquantes')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
   })
 
   it('devrait valider les données obligatoires - locationCity manquante', async () => {
@@ -134,7 +137,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
     global.readBody.mockResolvedValue(incompleteBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Données manquantes')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
   })
 
   it('devrait valider les données obligatoires - locationAddress manquante', async () => {
@@ -146,7 +149,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
     global.readBody.mockResolvedValue(incompleteBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Données manquantes')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
   })
 
   it('devrait valider les données obligatoires - availableSeats manquant', async () => {
@@ -158,7 +161,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
     global.readBody.mockResolvedValue(incompleteBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Données manquantes')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
   })
 
   it('devrait rejeter si édition non trouvée', async () => {
@@ -167,6 +170,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
       locationCity: 'Paris',
       locationAddress: '123 Rue de la Paix',
       availableSeats: 3,
+      direction: 'TO_EVENT',
     }
 
     global.readBody.mockResolvedValue(requestBody)
@@ -181,6 +185,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
       locationCity: 'Paris',
       locationAddress: '123 Rue de la Paix',
       availableSeats: 3,
+      direction: 'FROM_EVENT',
     }
 
     global.readBody.mockResolvedValue(requestBody)
@@ -195,6 +200,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
       locationCity: 'Paris',
       locationAddress: '123 Rue de la Paix',
       availableSeats: 2,
+      direction: 'TO_EVENT',
       // description et phoneNumber omis
     }
 
@@ -233,6 +239,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
       locationCity: 'Paris',
       locationAddress: '123 Rue de la Paix',
       availableSeats: '4', // String au lieu d'entier
+      direction: 'FROM_EVENT',
     }
 
     const mockEdition = { id: 1, name: 'EJC 2024' }

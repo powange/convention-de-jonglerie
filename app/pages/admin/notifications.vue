@@ -4,7 +4,7 @@
     <div class="mb-8">
       <h1 class="text-3xl font-bold flex items-center gap-3">
         <UIcon name="i-heroicons-bell" class="text-yellow-600" />
-        Gestion des Notifications
+        {{ $t('admin.notification_management') }}
       </h1>
       <p class="text-gray-600 dark:text-gray-400 mt-2">
         Envoyer et gérer les notifications système
@@ -21,7 +21,7 @@
           >
             <UIcon name="i-heroicons-clock" class="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
-          <h3 class="text-lg font-semibold mb-2">Rappels d'événements</h3>
+          <h3 class="text-lg font-semibold mb-2">{{ $t('admin.event_reminders') }}</h3>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Envoyer des rappels pour les événements à venir
           </p>
@@ -42,7 +42,7 @@
               class="h-6 w-6 text-green-600 dark:text-green-400"
             />
           </div>
-          <h3 class="text-lg font-semibold mb-2">Nouvelle notification</h3>
+          <h3 class="text-lg font-semibold mb-2">{{ $t('admin.new_notification') }}</h3>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Envoyer une notification personnalisée
           </p>
@@ -60,11 +60,11 @@
           >
             <UIcon name="i-heroicons-beaker" class="h-6 w-6 text-purple-600 dark:text-purple-400" />
           </div>
-          <h3 class="text-lg font-semibold mb-2">Tests et debug</h3>
+          <h3 class="text-lg font-semibold mb-2">{{ $t('admin.test_debug') }}</h3>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Tester les différents types de notifications
           </p>
-          <UButton variant="outline" color="purple" @click="showTestModal = true"> Tester </UButton>
+          <UButton variant="outline" color="purple" @click="showTestModal = true"> {{ $t('admin.test') }} </UButton>
         </div>
       </UCard>
     </div>
@@ -74,7 +74,7 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total envoyées</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('admin.total_sent') }}</p>
             <p class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ stats?.totalSent || 0 }}
             </p>
@@ -86,7 +86,7 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Non lues</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('notifications.unread') }}</p>
             <p class="text-2xl font-bold text-red-600">
               {{ stats?.totalUnread || 0 }}
             </p>
@@ -98,7 +98,7 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Aujourd'hui</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('admin.today') }}</p>
             <p class="text-2xl font-bold text-green-600">
               {{ stats?.sentToday || 0 }}
             </p>
@@ -110,7 +110,7 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Types actifs</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('admin.active_types') }}</p>
             <p class="text-2xl font-bold text-purple-600">
               {{ stats?.activeTypes || 0 }}
             </p>
@@ -124,7 +124,7 @@
     <UCard>
       <template #header>
         <div class="flex justify-between items-center">
-          <h3 class="text-lg font-semibold">Notifications récentes</h3>
+          <h3 class="text-lg font-semibold">{{ $t('admin.recent_notifications') }}</h3>
           <UButton
             icon="i-heroicons-arrow-path"
             variant="ghost"

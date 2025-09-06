@@ -300,6 +300,7 @@ describe('Validation Schemas', () => {
           locationAddress: '123 rue de la Gare',
           tripDate: '2024-06-01T10:00:00Z',
           availableSeats: 3,
+          direction: 'TO_EVENT',
         }
 
         expect(() => schemas.carpoolOfferSchema.parse(validOffer)).not.toThrow()
@@ -311,6 +312,7 @@ describe('Validation Schemas', () => {
           locationAddress: '123 rue de la Gare',
           tripDate: '2024-06-01T10:00:00Z',
           availableSeats: 3,
+          direction: 'FROM_EVENT',
           description: 'Départ depuis la gare',
           phoneNumber: '0612345678',
         }
@@ -324,6 +326,7 @@ describe('Validation Schemas', () => {
           locationAddress: '123 rue de la Gare',
           tripDate: '2024-06-01T10:00:00Z',
           availableSeats: 0, // Minimum 1
+          direction: 'TO_EVENT',
         }
 
         expect(() => schemas.carpoolOfferSchema.parse(invalidSeats)).toThrow()
@@ -338,6 +341,7 @@ describe('Validation Schemas', () => {
         const validRequest = {
           locationCity: 'Lyon',
           tripDate: '2024-06-01',
+          direction: 'TO_EVENT',
         }
 
         const parsed = schemas.carpoolRequestSchema.parse(validRequest)
@@ -348,6 +352,7 @@ describe('Validation Schemas', () => {
         const fullRequest = {
           locationCity: 'Lyon',
           tripDate: '2024-06-01',
+          direction: 'FROM_EVENT',
           seatsNeeded: 2,
           description: 'Recherche covoiturage',
           phoneNumber: '+33612345678',

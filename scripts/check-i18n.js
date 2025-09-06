@@ -47,6 +47,52 @@ function flattenObject(obj, prefix = '') {
   return result
 }
 
+function removeKeysFromObject(obj, keysToRemove) {
+  const newObj = { ...obj }
+
+  for (const keyToRemove of keysToRemove) {
+    const keyParts = keyToRemove.split('.')
+    let current = newObj
+
+    // Naviguer jusqu'au parent de la clé à supprimer
+    for (let i = 0; i < keyParts.length - 1; i++) {
+      if (current[keyParts[i]]) {
+        current = current[keyParts[i]]
+      } else {
+        break
+      }
+    }
+
+    // Supprimer la clé
+    const lastKey = keyParts[keyParts.length - 1]
+    if (current && Object.prototype.hasOwnProperty.call(current, lastKey)) {
+      delete current[lastKey]
+
+      // Nettoyer les objets vides remontant dans la hiérarchie
+      let parent = newObj
+      for (let i = 0; i < keyParts.length - 2; i++) {
+        parent = parent[keyParts[i]]
+      }
+
+      // Si l'objet parent est vide après suppression, on le supprime aussi
+      if (keyParts.length > 1) {
+        const parentKey = keyParts[keyParts.length - 2]
+        if (current && typeof current === 'object' && Object.keys(current).length === 0) {
+          let grandParent = newObj
+          for (let i = 0; i < keyParts.length - 2; i++) {
+            grandParent = grandParent[keyParts[i]]
+          }
+          if (grandParent) {
+            delete grandParent[parentKey]
+          }
+        }
+      }
+    }
+  }
+
+  return newObj
+}
+
 function findDuplicateValues(obj) {
   const flatObj = flattenObject(obj)
   const valueToKeys = {}
@@ -357,6 +403,11 @@ async function main() {
       short: 'h',
       description: "Affiche l'aide",
     },
+    'delete-unused': {
+      type: 'boolean',
+      short: 'd',
+      description: 'Supprime automatiquement les clés inutilisées (nécessite confirmation)',
+    },
   }
 
   let args
@@ -453,6 +504,55 @@ async function main() {
     if (unusedKeys.length > 0) {
       console.log(`${YELLOW}⚠ ${unusedKeys.length} clé(s) inutilisée(s):${RESET}`)
       unusedKeys.forEach((key) => console.log(`  ${YELLOW}- ${key}${RESET}`))
+
+      // Option de suppression automatique
+      if (args.values['delete-unused']) {
+        console.log(
+          `\n${BOLD}${RED}⚠ ATTENTION: Vous vous apprêtez à supprimer ${unusedKeys.length} clé(s) inutilisée(s) !${RESET}`
+        )
+        console.log(`${YELLOW}Une sauvegarde sera créée avant la suppression.${RESET}`)
+
+        // Demander confirmation
+        const readline = await import('readline')
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout,
+        })
+
+        const answer = await new Promise((resolve) => {
+          rl.question(`${BOLD}Confirmez-vous la suppression ? (oui/non): ${RESET}`, (answer) => {
+            rl.close()
+            resolve(answer.toLowerCase())
+          })
+        })
+
+        if (answer === 'oui' || answer === 'o' || answer === 'y' || answer === 'yes') {
+          try {
+            // Créer une sauvegarde
+            const backupPath = localeFile.replace('.json', `.backup.${Date.now()}.json`)
+            fs.copyFileSync(localeFile, backupPath)
+            console.log(`${GREEN}✓ Sauvegarde créée: ${path.basename(backupPath)}${RESET}`)
+
+            // Supprimer les clés inutilisées
+            const updatedLocaleData = removeKeysFromObject(localeData, unusedKeys)
+
+            // Réécrire le fichier
+            fs.writeFileSync(localeFile, JSON.stringify(updatedLocaleData, null, 2) + '\n', 'utf8')
+
+            console.log(`${GREEN}✓ ${unusedKeys.length} clé(s) supprimée(s) avec succès !${RESET}`)
+            console.log(`${CYAN}Fichier mis à jour: ${path.basename(localeFile)}${RESET}`)
+          } catch (error) {
+            console.error(`${RED}❌ Erreur lors de la suppression: ${error.message}${RESET}`)
+            process.exit(1)
+          }
+        } else {
+          console.log(`${YELLOW}Suppression annulée.${RESET}`)
+        }
+      } else {
+        console.log(
+          `\n${CYAN}💡 Tip: Utilisez --delete-unused pour supprimer automatiquement ces clés${RESET}`
+        )
+      }
     } else {
       console.log(`${GREEN}✓ Toutes les clés sont utilisées${RESET}`)
     }
@@ -537,8 +637,9 @@ ${BOLD}Usage:${RESET}
   npm run check-i18n [options]
 
 ${BOLD}Options:${RESET}
-  -s, --step <num>  Exécute uniquement l'étape spécifiée (1-4)
-  -h, --help        Affiche cette aide
+  -s, --step <num>     Exécute uniquement l'étape spécifiée (1-4)
+  -d, --delete-unused  Supprime automatiquement les clés inutilisées (avec confirmation)
+  -h, --help           Affiche cette aide
 
 ${BOLD}Étapes disponibles:${RESET}
   1 - Clés manquantes dans fr.json (utilisées dans le code mais absentes)
@@ -547,10 +648,17 @@ ${BOLD}Étapes disponibles:${RESET}
   4 - Textes hardcodés dans les fichiers Vue (non traduits)
 
 ${BOLD}Exemples:${RESET}
-  npm run check-i18n              # Exécute toutes les vérifications
-  npm run check-i18n -- -s 1      # Vérifie uniquement les clés manquantes
-  npm run check-i18n -- --step=2  # Vérifie uniquement les clés inutilisées
-  npm run check-i18n -- -h        # Affiche cette aide
+  npm run check-i18n                     # Exécute toutes les vérifications
+  npm run check-i18n -- -s 1             # Vérifie uniquement les clés manquantes
+  npm run check-i18n -- --step=2         # Vérifie uniquement les clés inutilisées
+  npm run check-i18n -- --delete-unused  # Supprime les clés inutilisées (avec confirmation)
+  npm run check-i18n -- -s 2 -d          # Vérifie les clés inutilisées et les supprime
+  npm run check-i18n -- -h               # Affiche cette aide
+
+${BOLD}${YELLOW}Note sur --delete-unused:${RESET}
+  • Une sauvegarde automatique est créée avant toute suppression
+  • Une confirmation est demandée avant la suppression
+  • Fonctionne avec toutes les étapes ou avec --step=2 uniquement
 `)
 }
 

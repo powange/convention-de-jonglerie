@@ -21,13 +21,13 @@
     </UButton>
 
     <!-- Panel de notifications -->
-    <UModal v-model:open="isOpen" :ui="{ width: 'w-full max-w-md' }" title="Notifications">
+    <UModal v-model:open="isOpen" :ui="{ width: 'w-full max-w-md' }" :title="$t('navigation.notifications')">
       <template #content>
         <UCard>
           <template #body>
             <div class="flex justify-between items-center">
               <div>
-                <h3 class="text-lg font-semibold">Notifications</h3>
+                <h3 class="text-lg font-semibold">{{ $t('navigation.notifications') }}</h3>
                 <p v-if="notificationsStore.unreadCount > 0" class="text-sm text-gray-500">
                   {{ notificationsStore.unreadCount }} non lue{{
                     notificationsStore.unreadCount > 1 ? 's' : ''

@@ -27,6 +27,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
     const requestBody = {
       tripDate: '2024-07-15T08:00:00.000Z',
       locationCity: 'Lyon',
+      direction: 'TO_EVENT',
       seatsNeeded: 2,
       description: 'Cherche covoiturage sympa',
       phoneNumber: '0987654321',
@@ -45,6 +46,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
       userId: 1,
       tripDate: new Date(requestBody.tripDate),
       locationCity: requestBody.locationCity,
+      direction: requestBody.direction,
       seatsNeeded: requestBody.seatsNeeded,
       description: requestBody.description,
       phoneNumber: requestBody.phoneNumber,
@@ -73,6 +75,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
         userId: 1,
         tripDate: new Date(requestBody.tripDate),
         locationCity: requestBody.locationCity,
+        direction: requestBody.direction,
         seatsNeeded: requestBody.seatsNeeded,
         description: requestBody.description,
         phoneNumber: requestBody.phoneNumber,
@@ -118,7 +121,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
     global.readBody.mockResolvedValue(incompleteBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Données manquantes')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
   })
 
   it('devrait valider les données obligatoires - locationCity manquante', async () => {
@@ -129,13 +132,14 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
     global.readBody.mockResolvedValue(incompleteBody)
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Données manquantes')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
   })
 
   it('devrait rejeter si édition non trouvée', async () => {
     const requestBody = {
       tripDate: '2024-07-15T08:00:00.000Z',
       locationCity: 'Lyon',
+      direction: 'FROM_EVENT',
     }
 
     global.readBody.mockResolvedValue(requestBody)
@@ -148,6 +152,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
     const requestBody = {
       tripDate: '2024-07-15T08:00:00.000Z',
       locationCity: 'Lyon',
+      direction: 'TO_EVENT',
     }
 
     global.readBody.mockResolvedValue(requestBody)
@@ -160,6 +165,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
     const requestBodyMinimal = {
       tripDate: '2024-07-15T08:00:00.000Z',
       locationCity: 'Lyon',
+      direction: 'TO_EVENT',
       // seatsNeeded omis
     }
 
@@ -194,6 +200,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
     const requestBodyMinimal = {
       tripDate: '2024-07-15T08:00:00.000Z',
       locationCity: 'Lyon',
+      direction: 'FROM_EVENT',
       // description et phoneNumber omis
     }
 
@@ -231,6 +238,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
     const requestBody = {
       tripDate: '2024-07-15T08:00:00.000Z',
       locationCity: 'Lyon',
+      direction: 'FROM_EVENT',
       seatsNeeded: 3, // Valeur personnalisée
     }
 

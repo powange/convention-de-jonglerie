@@ -3,12 +3,15 @@
     "actions": "Дії",
     "active_administrators": "Активні адміністратори",
     "active_conventions": "Активні конвенції",
+    "active_types": "Активні типи",
     "activity": "Активність",
     "administration_tools": "Інструменти адміністрування",
     "advanced_statistics": "Розширена статистика",
     "advanced_statistics_description": "Детальні звіти та аналітика",
     "all_emails": "Всі електронні пошти",
     "all_users": "Всі користувачі",
+    "api_error_logs": "Журнали помилок API",
+    "api_path": "Шлях API...",
     "archive_convention": "Архівувати конвенцію",
     "cannot_load_activity": "Неможливо завантажити нещодавню активність",
     "cannot_load_stats": "Неможливо завантажити статистику",
@@ -36,6 +39,10 @@
     "email_a_z": "За поштою (А-Я)",
     "email_verified": "Електронна пошта підтверджена",
     "email_z_a": "За поштою (Я-А)",
+    "error_details": "Деталі помилки",
+    "error_type": "Тип помилки",
+    "errors_24h": "Помилки (24г)",
+    "event_reminders": "Нагадування про події",
     "favorites_count": "вибране",
     "feedback": {
       "admin_notes": "Нотатки адміністратора",
@@ -97,13 +104,17 @@
     "filter_all_conventions": "Всі конвенції",
     "filter_archived_conventions": "Архівовані конвенції",
     "filter_sort": "Фільтрувати та сортувати",
+    "good_news": "Це хороші новини!",
     "loading_activity": "Завантаження нещодавньої активності...",
+    "loading_logs": "Завантаження журналів...",
+    "main_type": "Основний тип",
     "manage_editions": "Управляти виданнями",
     "months_ago": "{count} місяців тому",
     "name_a_z": "За іменем (А-Я)",
     "name_z_a": "За іменем (Я-А)",
     "new_conventions_this_month": "+{count} цього місяця",
     "new_editions_this_month": "+{count} цього місяця",
+    "new_notification": "Нове сповіщення",
     "new_users_this_month": "+{count} цього місяця",
     "newest_first": "Спочатку нові",
     "no_activity": "Немає активності",
@@ -111,26 +122,35 @@
     "no_conventions_search": "Жодна конвенція не відповідає вашому пошуку",
     "no_conventions_yet": "Поки не створено жодної конвенції",
     "no_editions": "Немає видань",
+    "no_errors_found": "Помилок не знайдено",
     "no_recent_activity": "Немає нещодавньої активності",
     "normal_users": "Звичайні користувачі",
     "not_verified": "Не підтверджено",
+    "notification_management": "Керування сповіщеннями",
     "oldest_first": "Спочатку старі",
+    "per_page": "на сторінку",
     "promote_to_admin": "Підвищити до супер адміністратора",
     "recent_activity": "Нещодавня активність",
+    "recent_notifications": "Недавні сповіщення",
     "registration": "Реєстрація",
     "role": "Роль",
     "search_conventions_placeholder": "Пошук за назвою, описом, творцем...",
+    "search_error_messages": "Пошук в повідомленнях про помилки...",
     "search_users_placeholder": "Пошук за електронною поштою, ім'ям користувача, ім'ям або прізвищем...",
     "super_admin": "Супер Адмін",
     "super_administrators": "Супер адміністратори",
     "super_admins": "Супер адміністратори",
     "system_settings": "Налаштування системи",
     "system_settings_description": "Загальна конфігурація платформи",
+    "test": "Тест",
+    "test_debug": "Тести та налагодження",
     "today": "Сьогодні",
     "total_conventions": "Загальна кількість конвенцій",
     "total_editions": "Загальна кількість видань",
+    "total_sent": "Всього надіслано",
     "total_users": "Всього користувачів",
     "unarchive_convention": "Розархівувати конвенцію",
+    "unresolved": "Невирішені",
     "unverified_emails": "Непідтверджені електронні пошти",
     "user": "Користувач",
     "user_column": "Користувач",
@@ -254,41 +274,71 @@
     "week": "Тиждень"
   },
   "carpool": {
-    "arrival_placeholder": "Місто або адреса прибуття",
-    "departure_placeholder": "Місто або адреса відправлення",
+    "arrival_address": "Точна адреса прибуття",
+    "arrival_address_description": "Точне місце висадки пасажирів",
+    "arrival_address_placeholder": "Адреса висадки",
+    "arrival_city": "Місто прибуття",
+    "arrival_city_hint": "Введіть принаймні 3 символи для перегляду пропозицій",
+    "arrival_city_placeholder": "Напр.: Київ, Львів, Одеса",
+    "contact": "Контакт",
+    "departure_address": "Точна адреса відправлення",
+    "departure_address_description": "Точне місце зустрічі для посадки пасажирів",
+    "departure_address_placeholder": "Адреса зустрічі",
+    "departure_city": "Місто відправлення",
+    "departure_city_hint": "Введіть принаймні 3 символи для перегляду пропозицій",
+    "departure_city_placeholder": "Місто відправлення",
+    "departure_date_description": "Виберіть дату та час відправлення",
+    "departure_location": "Місце відправлення",
     "details": "Деталі",
+    "details_description": "Додаткова корисна інформація для інших мандрівників",
     "details_placeholder": "Корисна інформація про поїздку (багаж, місце зустрічі тощо)",
     "direction": {
+      "description": "Вкажіть, чи їдете ви на конвенцію, чи повертаєтесь з неї",
       "from_event": "Повертатися з конвенту",
       "label": "Напрямок подорожі",
       "to_event": "Їхати на конвент"
     },
-    "from": "З",
+    "dropoff_location": "Місце висадки",
+    "form_help_text": "Ваша інформація залишиться приватною",
+    "meeting_location": "Місце зустрічі",
     "music_allowed": "Музика дозволена",
+    "music_description": "Ви згодні слухати музику під час поїздки",
     "offer": {
       "available_seats": "Доступні місця",
       "create": "Створити пропозицію спільної поїздки",
+      "create_description": "Запропонуйте місця у вашому автомобілі для заходу",
       "created": "Пропозицію спільної поїздки створено",
+      "edit_description": "Редагуйте деталі вашої пропозиції спільної поїздки",
+      "seats_description": "Кількість вільних місць у вашому автомобілі",
       "seats_placeholder": "напр., 3"
     },
-    "options": "Параметри",
     "pets_allowed": "Домашні тварини дозволені",
+    "pets_description": "Ви приймаєте домашніх тварин або подорожуєте з ними",
+    "phone_description": "Для зв'язку з іншими користувачами",
+    "phone_number": "Номер телефону",
+    "phone_placeholder": "Ваш номер телефону",
+    "pickup_location": "Місце зустрічі",
+    "preferences": "Налаштування",
     "request": {
       "create": "Створити запит на спільну поїздку",
+      "create_description": "Знайдіть поїздку, щоб дістатися до заходу",
       "created": "Запит на спільну поїздку створено",
+      "edit_description": "Редагуйте деталі вашого запиту на спільну поїздку",
       "required_seats": "Потрібні місця",
+      "seats_description": "Кількість місць, необхідних для вашої групи",
       "seats_placeholder": "напр., 2"
     },
     "route": "Маршрут",
     "select_date_time": "Виберіть дату і час",
     "select_direction": "Виберіть напрямок",
     "smoking_allowed": "Куріння дозволено",
-    "to": "До",
+    "smoking_description": "Ви дозволяєте курців у вашому автомобілі або палите самі",
+    "trip_details": "Деталі подорожі",
     "validation": {
-      "arrival_required": "Потрібне місто прибуття",
       "date_invalid": "Недійсна дата",
       "date_required": "Потрібна дата відправлення",
-      "departure_required": "Потрібне місто відправлення",
+      "departure_address_required": "Адреса відправлення обов'язкова",
+      "departure_city_required": "Місто відправлення обов'язкове",
       "direction_invalid": "Напрямок подорожі invalide",
       "direction_required": "Напрямок подорожі обов'язковий",
       "seats_max": "Максимум 8 місць",
@@ -303,12 +353,14 @@
     "back": "Назад",
     "cancel": "Скасувати",
     "cancelled": "Cancelled",
+    "category": "Категорія",
     "city": "Місто",
     "close": "Закрити",
     "confirm": "Підтвердити",
     "convention": "Конвенція",
     "country": "Країна",
     "create": "Створити",
+    "creating": "Створення...",
     "date": "Дата",
     "dates": "Дати",
     "delete": "Видалити",
@@ -341,6 +393,7 @@
     "inactive": "Неактивний",
     "loading": "Завантаження...",
     "location": "Місце",
+    "logo": "Логотип",
     "manage": "Керувати",
     "name": "Ім'я",
     "no_permission": "Немає дозволу",
@@ -366,6 +419,7 @@
     "time_just_now": "щойно",
     "time_minutes_ago": "{count} хв тому",
     "tip": "Порада",
+    "total": "Всього",
     "updated_at": "Оновлено {date}",
     "view": "Переглянути",
     "view_details": "Переглянути деталі",
@@ -577,13 +631,13 @@
     "czech_republic": "Чеська Республіка"
   },
   "createForm": {
-    "actionText": "Texte du bouton",
-    "actionUrl": "URL d'action",
-    "category": "Catégorie",
-    "message": "Message",
-    "title": "Titre",
-    "type": "Type",
-    "userId": "ID utilisateur"
+    "actionText": "Текст кнопки",
+    "actionUrl": "URL дії",
+    "category": "Категорія",
+    "message": "Повідомлення",
+    "title": "Заголовок",
+    "type": "Тип",
+    "userId": "ID користувача"
   },
   "currentValue": {
     "avatar": "Аватар вибраного користувача"
@@ -805,7 +859,7 @@
   "erreur": {
     "": {
       "": {
-        "": "Ajouter des notes sur cette erreur..."
+        "": "Додати нотатки про цю помилку..."
       }
     }
   },
@@ -1001,12 +1055,20 @@
     "searched_services": "Шукані послуги",
     "upcoming_editions": "Майбутні видання"
   },
+  "locationLabels": {
+    "addressDescription": "Точне місце висадки пасажирів",
+    "addressLabel": "Точна адреса відправлення",
+    "addressPlaceholder": "Повна адреса",
+    "cityHint": "Введіть принаймні 3 символи для перегляду пропозицій",
+    "cityLabel": "Місто",
+    "cityPlaceholder": "Напр.: Київ, Львів, Одеса"
+  },
   "log": {
-    "adminNotes": "Notes administrateur",
-    "errorType": "Type d'erreur",
+    "adminNotes": "Нотатки адміністратора",
+    "errorType": "Тип помилки",
     "id": "ID",
-    "ip": "Adresse IP",
-    "user": "Utilisateur"
+    "ip": "IP-адреса",
+    "user": "Користувач"
   },
   "messages": {
     "account_created": "Обліковий запис створено! Перевірте свою пошту.",
@@ -1053,18 +1115,25 @@
     "my_conventions": "Мої Конвенції",
     "my_favorites": "Мої Улюблені",
     "no_favorites": "Немає улюблених",
-    "notifications": "Notifications",
+    "notifications": "Сповіщення",
     "profile": "Профіль",
     "tabs": "Вкладки навігації"
   },
   "notification": {
-    "actionUrl": "URL d'action",
-    "category": "Catégorie",
-    "id": "Identifiant",
-    "user": "Utilisateur"
+    "actionUrl": "URL дії",
+    "category": "Категорія",
+    "id": "Ідентифікатор",
+    "user": "Користувач"
+  },
+  "notifications": {
+    "loading": "Завантаження сповіщень...",
+    "manage_description": "Керуйте своїми сповіщеннями та налаштуваннями",
+    "none_found": "Сповіщень не знайдено",
+    "this_week": "Цього тижня",
+    "unread": "Непрочитані"
   },
   "notificationsStore": {
-    "loading": "Chargement des notifications..."
+    "loading": "Завантаження des notifications..."
   },
   "p": {
     "key": "Ключ"
@@ -1233,11 +1302,11 @@
     "username_placeholder": "Ваше унікальне ім'я користувача"
   },
   "selectedLog": {
-    "adminNotes": "Notes administrateur",
-    "ip": "Adresse IP",
-    "message": "Message d'erreur",
-    "stack": "Trace de la pile",
-    "user": "Utilisateur"
+    "adminNotes": "Нотатки адміністратора",
+    "ip": "IP-адреса",
+    "message": "Повідомлення про помилку",
+    "stack": "Трасування стеку",
+    "user": "Користувач"
   },
   "services": {
     "accessibility": "Доступність для людей з інвалідністю",
@@ -1275,8 +1344,8 @@
     "slots": "Кількість місць"
   },
   "testType": {
-    "icon": "Icône",
-    "value": "Valeur"
+    "icon": "Іконка",
+    "value": "Значення"
   },
   "upload": {
     "click_select_convention_logo": "Натисніть, щоб вибрати логотип конвенції",

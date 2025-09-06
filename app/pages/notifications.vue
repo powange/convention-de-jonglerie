@@ -4,9 +4,9 @@
     <div class="mb-8">
       <h1 class="text-3xl font-bold flex items-center gap-3">
         <UIcon name="i-heroicons-bell" class="text-blue-600" />
-        Mes Notifications
+        {{ $t('navigation.notifications') }}
       </h1>
-      <p class="text-gray-600 dark:text-gray-400 mt-2">Gérez vos notifications et préférences</p>
+      <p class="text-gray-600 dark:text-gray-400 mt-2">{{ $t('notifications.manage_description') }}</p>
     </div>
 
     <!-- Statistiques rapides -->
@@ -14,7 +14,7 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('common.total') }}</p>
             <p class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ stats?.total || 0 }}
             </p>
@@ -26,7 +26,7 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Non lues</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('notifications.unread') }}</p>
             <p class="text-2xl font-bold text-red-600">
               {{ notificationsStore.unreadCount }}
             </p>
@@ -38,7 +38,7 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Cette semaine</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('notifications.this_week') }}</p>
             <p class="text-2xl font-bold text-green-600">
               {{ weeklyCount }}
             </p>
@@ -56,7 +56,7 @@
           <USelect
             v-model="selectedStatus"
             :items="statusOptions"
-            placeholder="Statut"
+            :placeholder="$t('common.status')"
             class="w-40"
           />
 
@@ -64,7 +64,7 @@
           <USelect
             v-model="selectedCategory"
             :items="categoryOptions"
-            placeholder="Catégorie"
+            :placeholder="$t('common.category')"
             class="w-48"
           />
 
@@ -110,13 +110,13 @@
           name="i-heroicons-arrow-path"
           class="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400"
         />
-        <p class="text-gray-500">Chargement des notifications...</p>
+        <p class="text-gray-500">{{ $t('notifications.loading') }}</p>
       </div>
 
       <!-- Aucune notification -->
       <div v-else-if="notifications.length === 0" class="p-8 text-center">
         <UIcon name="i-heroicons-bell-slash" class="h-12 w-12 mx-auto mb-4 text-gray-400" />
-        <p class="text-gray-500 mb-2">Aucune notification trouvée</p>
+        <p class="text-gray-500 mb-2">{{ $t('notifications.none_found') }}</p>
         <p class="text-sm text-gray-400">
           {{
             selectedStatus || selectedCategory

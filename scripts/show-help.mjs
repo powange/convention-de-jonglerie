@@ -44,6 +44,8 @@ const sections = [
     { name: 'check-i18n -- -s 2', desc: 'Clés inutilisées seulement' },
     { name: 'check-i18n -- -s 3', desc: 'Valeurs dupliquées seulement' },
     { name: 'check-i18n -- -s 4', desc: 'Textes hardcodés seulement' },
+    { name: 'check-i18n -- --delete-unused', desc: 'Supprime automatiquement les clés inutilisées (avec confirmation)' },
+    { name: 'check-i18n -- -s 2 -d', desc: 'Clés inutilisées + suppression automatique' },
     { name: 'check-i18n -- -h', desc: 'Aide détaillée' },
     { name: 'check-translations', desc: 'Compare les traductions entre locales' },
     { name: 'check-translations -- -l es', desc: 'Limité à une locale' },
@@ -57,7 +59,11 @@ const sections = [
   { name: 'check-translations -- -f --fill-mode todo --refill', desc: 'Re-marque aussi les clés déjà identiques à la référence' },
   { name: 'i18n:nest', desc: 'Normalize: transforme toutes les locales (clés pointées -> objets imbriqués)' },
   { name: 'i18n:nest -- en fr', desc: 'Même transformation mais limité aux locales listées' },
-  { name: 'i18n:nest -- --allow-collisions', desc: 'Ignore les collisions de fusion (conserve existant)' }
+  { name: 'i18n:nest -- --allow-collisions', desc: 'Ignore les collisions de fusion (conserve existant)' },
+  { name: 'i18n:status', desc: '📊 Rapport état des traductions (% completion, clés manquantes)' },
+  { name: 'i18n:translate:dry', desc: '🔍 Simulation traduction automatique des clés [TODO]' },
+  { name: 'i18n:translate', desc: '🚀 Traduction automatique en masse des clés [TODO]' },
+  { name: 'i18n:add "terme"', desc: '✏️ Ajouter interactivement un terme au dictionnaire de traduction' }
   ] },
   { title: '🧹 Qualité & formatage', color: colors.yellow, scripts: [
     { name: 'lint', desc: 'Analyse lint complète' },

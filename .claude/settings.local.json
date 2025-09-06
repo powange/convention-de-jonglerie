@@ -59,7 +59,8 @@
       "Bash(for lang in fr en de es it nl pl pt ru uk da)",
       "Bash(npx prisma migrate:*)",
       "Bash(npx prisma:*)",
-      "Bash(mysql:*)"
+      "Bash(mysql:*)",
+      "Bash(for lang in en de es it nl pt ru pl uk da)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

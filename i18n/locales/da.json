@@ -3,12 +3,15 @@
     "actions": "Handlinger",
     "active_administrators": "Aktive administratorer",
     "active_conventions": "Aktive konventioner",
+    "active_types": "Aktive typer",
     "activity": "Aktivitet",
     "administration_tools": "Administrationsværktøjer",
     "advanced_statistics": "Avancerede statistikker",
     "advanced_statistics_description": "Detaljerede rapporter og analyser",
     "all_emails": "Alle emails",
     "all_users": "Alle brugere",
+    "api_error_logs": "API-fejllogger",
+    "api_path": "API-sti...",
     "archive_convention": "Arkiver konvention",
     "cannot_load_activity": "Kan ikke indlæse seneste aktivitet",
     "cannot_load_stats": "Kan ikke indlæse statistikker",
@@ -36,6 +39,10 @@
     "email_a_z": "Efter email (A-Z)",
     "email_verified": "Email bekræftet",
     "email_z_a": "Efter email (Z-A)",
+    "error_details": "Fejldetaljer",
+    "error_type": "Fejltype",
+    "errors_24h": "Fejl (24t)",
+    "event_reminders": "Begivenhedspåmindelser",
     "favorites_count": "favorit(ter)",
     "feedback": {
       "admin_notes": "Admin-noter",
@@ -97,13 +104,17 @@
     "filter_all_conventions": "Alle konventioner",
     "filter_archived_conventions": "Arkiverede konventioner",
     "filter_sort": "Filtrer og sorter",
+    "good_news": "Det er gode nyheder!",
     "loading_activity": "Indlæser seneste aktivitet...",
+    "loading_logs": "Indlæser logfiler...",
+    "main_type": "Hovedtype",
     "manage_editions": "Administrer udgaver",
     "months_ago": "{count} måneder siden",
     "name_a_z": "Efter navn (A-Z)",
     "name_z_a": "Efter navn (Z-A)",
     "new_conventions_this_month": "+{count} denne måned",
     "new_editions_this_month": "+{count} denne måned",
+    "new_notification": "Ny besked",
     "new_users_this_month": "+{count} denne måned",
     "newest_first": "Nyeste først",
     "no_activity": "Ingen aktivitet",
@@ -111,26 +122,35 @@
     "no_conventions_search": "Ingen konventioner matcher din søgning",
     "no_conventions_yet": "Der er ikke oprettet nogle konventioner endnu",
     "no_editions": "Ingen udgaver",
+    "no_errors_found": "Ingen fejl fundet",
     "no_recent_activity": "Ingen seneste aktivitet",
     "normal_users": "Normale brugere",
     "not_verified": "Ikke bekræftet",
+    "notification_management": "Meddelelseshåndtering",
     "oldest_first": "Ældste først",
+    "per_page": "per side",
     "promote_to_admin": "Forfrem til superadmin",
     "recent_activity": "Seneste aktivitet",
+    "recent_notifications": "Seneste beskeder",
     "registration": "Registrering",
     "role": "Rolle",
     "search_conventions_placeholder": "Søg efter navn, beskrivelse, skaber...",
+    "search_error_messages": "Søg i fejlmeddelelser...",
     "search_users_placeholder": "Søg via email, brugernavn, fornavn eller efternavn...",
     "super_admin": "Superadministrator",
     "super_administrators": "Superadministratorer",
     "super_admins": "Superadministratorer",
     "system_settings": "Systemindstillinger",
     "system_settings_description": "Generel platformskonfiguration",
+    "test": "Test",
+    "test_debug": "Tests og fejlfinding",
     "today": "I dag",
     "total_conventions": "Total konventioner",
     "total_editions": "Total udgaver",
+    "total_sent": "Total sendt",
     "total_users": "Samlede brugere",
     "unarchive_convention": "Gendan konvention fra arkiv",
+    "unresolved": "Uløste",
     "unverified_emails": "Ikke bekræftede emails",
     "user": "Bruger",
     "user_column": "Bruger",
@@ -254,41 +274,71 @@
     "week": "Uge"
   },
   "carpool": {
-    "arrival_placeholder": "Ankomstby eller -adresse",
-    "departure_placeholder": "Afrejseby eller -adresse",
+    "arrival_address": "Præcis ankomstadresse",
+    "arrival_address_description": "Præcist afsætningspunkt for passagerer",
+    "arrival_address_placeholder": "Afsætningsadresse",
+    "arrival_city": "Ankomstby",
+    "arrival_city_hint": "Indtast mindst 3 tegn for at se forslag",
+    "arrival_city_placeholder": "F.eks.: København, Aarhus, Odense",
+    "contact": "Kontakt",
+    "departure_address": "Præcis afgangsadresse",
+    "departure_address_description": "Præcist mødested for at hente passagerer",
+    "departure_address_placeholder": "Mødeadresse",
+    "departure_city": "Afgangssted",
+    "departure_city_hint": "Indtast mindst 3 tegn for at se forslag",
+    "departure_city_placeholder": "Afgangssted",
+    "departure_date_description": "Vælg afgangsdato og -tid",
+    "departure_location": "Afgangssted",
     "details": "Detaljer",
+    "details_description": "Yderligere nyttig information for andre rejsende",
     "details_placeholder": "Nyttig info om turen (bagage, mødested mv.)",
     "direction": {
+      "description": "Angiv om du skal til konventionen eller vender tilbage fra den",
       "from_event": "Tilbage fra konventet",
       "label": "Rejsens retning",
       "to_event": "Til konventet"
     },
-    "from": "Fra",
+    "dropoff_location": "Aflevering sted",
+    "form_help_text": "Dine oplysninger forbliver private",
+    "meeting_location": "Mødested",
     "music_allowed": "Musik tilladt",
+    "music_description": "Du er enig i at lytte til musik under turen",
     "offer": {
       "available_seats": "Ledige pladser",
       "create": "Opret samkørselstilbud",
+      "create_description": "Tilbyd pladser i dit køretøj til begivenheden",
       "created": "Samkørselstilbud oprettet",
+      "edit_description": "Rediger detaljerne i dit samkørselstilbud",
+      "seats_description": "Antal ledige pladser i dit køretøj",
       "seats_placeholder": "fx 3"
     },
-    "options": "Valgmuligheder",
     "pets_allowed": "Kæledyr tilladt",
+    "pets_description": "Du accepterer kæledyr eller rejser med kæledyr",
+    "phone_description": "For at blive kontaktet af andre brugere",
+    "phone_number": "Telefonnummer",
+    "phone_placeholder": "Dit telefonnummer",
+    "pickup_location": "Afhentningssted",
+    "preferences": "Præferencer",
     "request": {
       "create": "Opret samkørselsanmodning",
+      "create_description": "Søg efter et lift til begivenheden",
       "created": "Samkørselsanmodning oprettet",
+      "edit_description": "Rediger detaljerne i din samkørselsanmodning",
       "required_seats": "Ønskede pladser",
+      "seats_description": "Antal pladser du har brug for til din gruppe",
       "seats_placeholder": "fx 2"
     },
     "route": "Rute",
     "select_date_time": "Vælg dato og tidspunkt",
     "select_direction": "Vælg en retning",
     "smoking_allowed": "Rygning tilladt",
-    "to": "Til",
+    "smoking_description": "Du tillader rygere i dit køretøj eller er ryger",
+    "trip_details": "Rejsedetaljer",
     "validation": {
-      "arrival_required": "Ankomstby er påkrævet",
       "date_invalid": "Ugyldig dato",
       "date_required": "Afrejsedato er påkrævet",
-      "departure_required": "Afrejseby er påkrævet",
+      "departure_address_required": "Afgangsadressen er påkrævet",
+      "departure_city_required": "Afgangsbyen er påkrævet",
       "direction_invalid": "Rejsens retning invalide",
       "direction_required": "Rejsens retning er påkrævet",
       "seats_max": "Maksimalt 8 pladser",
@@ -303,12 +353,14 @@
     "back": "Tilbage",
     "cancel": "Annuller",
     "cancelled": "Cancelled",
+    "category": "Kategori",
     "city": "By",
     "close": "Luk",
     "confirm": "Bekræft",
     "convention": "Konvention",
     "country": "Land",
     "create": "Opret",
+    "creating": "Opretter...",
     "date": "Dato",
     "dates": "Datoer",
     "delete": "Slet",
@@ -341,6 +393,7 @@
     "inactive": "Inaktiv",
     "loading": "Indlæser...",
     "location": "Sted",
+    "logo": "Logo",
     "manage": "Administrer",
     "name": "Navn",
     "no_permission": "Ingen tilladelse",
@@ -366,6 +419,7 @@
     "time_just_now": "lige nu",
     "time_minutes_ago": "{count} min siden",
     "tip": "Tip",
+    "total": "Total",
     "updated_at": "Opdateret den {date}",
     "view": "Se",
     "view_details": "Se detaljer",
@@ -577,13 +631,13 @@
     "czech_republic": "Tjekkiet"
   },
   "createForm": {
-    "actionText": "Texte du bouton",
-    "actionUrl": "URL d'action",
-    "category": "Catégorie",
-    "message": "Message",
-    "title": "Titre",
+    "actionText": "Knaptekst",
+    "actionUrl": "Handlings-URL",
+    "category": "Kategori",
+    "message": "Besked",
+    "title": "Titel",
     "type": "Type",
-    "userId": "ID utilisateur"
+    "userId": "Bruger-ID"
   },
   "currentValue": {
     "avatar": "Valgt brugers avatar"
@@ -805,7 +859,7 @@
   "erreur": {
     "": {
       "": {
-        "": "Ajouter des notes sur cette erreur..."
+        "": "Tilføj noter om denne fejl..."
       }
     }
   },
@@ -1001,12 +1055,20 @@
     "searched_services": "Søgte tjenester",
     "upcoming_editions": "Kommende udgaver"
   },
+  "locationLabels": {
+    "addressDescription": "Præcist afsætningspunkt for passagerer",
+    "addressLabel": "Præcis afgangsadresse",
+    "addressPlaceholder": "Fuld adresse",
+    "cityHint": "Indtast mindst 3 tegn for at se forslag",
+    "cityLabel": "By",
+    "cityPlaceholder": "F.eks.: København, Aarhus, Odense"
+  },
   "log": {
-    "adminNotes": "Notes administrateur",
-    "errorType": "Type d'erreur",
+    "adminNotes": "Admin-noter",
+    "errorType": "Fejltype",
     "id": "ID",
-    "ip": "Adresse IP",
-    "user": "Utilisateur"
+    "ip": "IP-adresse",
+    "user": "Bruger"
   },
   "messages": {
     "account_created": "Konto oprettet! Tjek din email.",
@@ -1053,18 +1115,25 @@
     "my_conventions": "Mine konventioner",
     "my_favorites": "Mine favoritter",
     "no_favorites": "Ingen favoritter",
-    "notifications": "Notifications",
+    "notifications": "Beskeder",
     "profile": "Profil",
     "tabs": "Navigationsfaner"
   },
   "notification": {
-    "actionUrl": "URL d'action",
-    "category": "Catégorie",
-    "id": "Identifiant",
-    "user": "Utilisateur"
+    "actionUrl": "Handlings-URL",
+    "category": "Kategori",
+    "id": "Identifikator",
+    "user": "Bruger"
+  },
+  "notifications": {
+    "loading": "Indlæser des notifications...",
+    "manage_description": "Administrer dine beskeder og præferencer",
+    "none_found": "Ingen beskeder fundet",
+    "this_week": "Denne uge",
+    "unread": "Ulæste"
   },
   "notificationsStore": {
-    "loading": "Chargement des notifications..."
+    "loading": "Indlæser des notifications..."
   },
   "p": {
     "key": "Nøgle"
@@ -1233,11 +1302,11 @@
     "username_placeholder": "Dit unikke brugernavn"
   },
   "selectedLog": {
-    "adminNotes": "Notes administrateur",
-    "ip": "Adresse IP",
-    "message": "Message d'erreur",
-    "stack": "Trace de la pile",
-    "user": "Utilisateur"
+    "adminNotes": "Admin-noter",
+    "ip": "IP-adresse",
+    "message": "Fejlmeddelelse",
+    "stack": "Stack trace",
+    "user": "Bruger"
   },
   "services": {
     "accessibility": "Handicaptilgængelighed",
@@ -1275,8 +1344,8 @@
     "slots": "Antal pladser"
   },
   "testType": {
-    "icon": "Icône",
-    "value": "Valeur"
+    "icon": "Ikon",
+    "value": "Værdi"
   },
   "upload": {
     "click_select_convention_logo": "Klik for at vælge convention logo",

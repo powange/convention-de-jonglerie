@@ -191,7 +191,7 @@
                       class="h-6 w-6 text-red-600 dark:text-red-400"
                     />
                   </div>
-                  <h3 class="font-semibold text-lg">Logs d'erreurs API</h3>
+                  <h3 class="font-semibold text-lg">{{ $t('admin.api_error_logs') }}</h3>
                 </div>
                 <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
                   Surveiller et résoudre les erreurs de l'API
@@ -224,7 +224,7 @@
                       class="h-6 w-6 text-yellow-600 dark:text-yellow-400"
                     />
                   </div>
-                  <h3 class="font-semibold text-lg">Gestion des notifications</h3>
+                  <h3 class="font-semibold text-lg">{{ $t('admin.notification_management') }}</h3>
                 </div>
                 <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
                   Envoyer et gérer les notifications système

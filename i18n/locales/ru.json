@@ -3,12 +3,15 @@
     "actions": "Действия",
     "active_administrators": "Активные администраторы",
     "active_conventions": "Активные конвенции",
+    "active_types": "Активные типы",
     "activity": "Активность",
     "administration_tools": "Инструменты Администрирования",
     "advanced_statistics": "Расширенная Статистика",
     "advanced_statistics_description": "Подробные отчеты и аналитика",
     "all_emails": "Все email",
     "all_users": "Все пользователи",
+    "api_error_logs": "Журналы ошибок API",
+    "api_path": "Путь API...",
     "archive_convention": "Архивировать конвенцию",
     "cannot_load_activity": "Невозможно загрузить недавнюю активность",
     "cannot_load_stats": "Невозможно загрузить статистику",
@@ -36,6 +39,10 @@
     "email_a_z": "По email (А-Я)",
     "email_verified": "Email подтвержден",
     "email_z_a": "По email (Я-А)",
+    "error_details": "Детали ошибки",
+    "error_type": "Тип ошибки",
+    "errors_24h": "Ошибки (24ч)",
+    "event_reminders": "Напоминания о событиях",
     "favorites_count": "избранных",
     "feedback": {
       "admin_notes": "Заметки администратора",
@@ -97,13 +104,17 @@
     "filter_all_conventions": "Все конвенции",
     "filter_archived_conventions": "Архивированные конвенции",
     "filter_sort": "Фильтровать и сортировать",
+    "good_news": "Это хорошие новости!",
     "loading_activity": "Загрузка недавней активности...",
+    "loading_logs": "Загрузка журналов...",
+    "main_type": "Основной тип",
     "manage_editions": "Управлять изданиями",
     "months_ago": "{count} месяцев назад",
     "name_a_z": "По имени (А-Я)",
     "name_z_a": "По имени (Я-А)",
     "new_conventions_this_month": "+{count} в этом месяце",
     "new_editions_this_month": "+{count} в этом месяце",
+    "new_notification": "Новое уведомление",
     "new_users_this_month": "+{count} в этом месяце",
     "newest_first": "Новейшие сначала",
     "no_activity": "Нет активности",
@@ -111,26 +122,35 @@
     "no_conventions_search": "Ни одна конвенция не соответствует вашему поиску",
     "no_conventions_yet": "Пока не создано ни одной конвенции",
     "no_editions": "Нет изданий",
+    "no_errors_found": "Ошибок не найдено",
     "no_recent_activity": "Нет недавней активности",
     "normal_users": "Обычные пользователи",
     "not_verified": "Не подтвержден",
+    "notification_management": "Управление уведомлениями",
     "oldest_first": "Старейшие сначала",
+    "per_page": "на страницу",
     "promote_to_admin": "Повысить до супер администратора",
     "recent_activity": "Недавняя активность",
+    "recent_notifications": "Недавние уведомления",
     "registration": "Регистрация",
     "role": "Роль",
     "search_conventions_placeholder": "Поиск по названию, описанию, создателю...",
+    "search_error_messages": "Поиск в сообщениях об ошибках...",
     "search_users_placeholder": "Поиск по email, имени пользователя, имени или фамилии...",
     "super_admin": "Супер Администратор",
     "super_administrators": "Супер администраторы",
     "super_admins": "Супер администраторы",
     "system_settings": "Настройки Системы",
     "system_settings_description": "Общая конфигурация платформы",
+    "test": "Тест",
+    "test_debug": "Тесты и отладка",
     "today": "Сегодня",
     "total_conventions": "Общее количество конвенций",
     "total_editions": "Общее количество изданий",
+    "total_sent": "Всего отправлено",
     "total_users": "Всего Пользователей",
     "unarchive_convention": "Разархивировать конвенцию",
+    "unresolved": "Нерешённые",
     "unverified_emails": "Неподтвержденные email",
     "user": "Пользователь",
     "user_column": "Пользователь",
@@ -254,41 +274,71 @@
     "week": "Неделя"
   },
   "carpool": {
-    "arrival_placeholder": "Город или адрес прибытия",
-    "departure_placeholder": "Город или адрес отправления",
+    "arrival_address": "Точный адрес прибытия",
+    "arrival_address_description": "Точное место высадки пассажиров",
+    "arrival_address_placeholder": "Адрес высадки",
+    "arrival_city": "Город прибытия",
+    "arrival_city_hint": "Введите не менее 3 символов для просмотра предложений",
+    "arrival_city_placeholder": "Напр.: Москва, Санкт-Петербург, Новосибирск",
+    "contact": "Контакт",
+    "departure_address": "Точный адрес отправления",
+    "departure_address_description": "Точное место встречи для посадки пассажиров",
+    "departure_address_placeholder": "Адрес встречи",
+    "departure_city": "Город отправления",
+    "departure_city_hint": "Введите не менее 3 символов для просмотра предложений",
+    "departure_city_placeholder": "Город отправления",
+    "departure_date_description": "Выберите дату и время отправления",
+    "departure_location": "Место отправления",
     "details": "Детали",
+    "details_description": "Дополнительная полезная информация для других путешественников",
     "details_placeholder": "Полезная информация о поездке (багаж, место встречи и т. д.)",
     "direction": {
+      "description": "Укажите, едете ли вы на конвенцию или возвращаетесь с неё",
       "from_event": "Возвращаться с конвента",
       "label": "Направление поездки",
       "to_event": "Ехать на конвент"
     },
-    "from": "Из",
+    "dropoff_location": "Место высадки",
+    "form_help_text": "Ваша информация останется конфиденциальной",
+    "meeting_location": "Место встречи",
     "music_allowed": "Музыка разрешена",
+    "music_description": "Вы согласны слушать музыку во время поездки",
     "offer": {
       "available_seats": "Доступные места",
       "create": "Создать предложение попутки",
+      "create_description": "Предложите места в вашем автомобиле для мероприятия",
       "created": "Предложение попутки создано",
+      "edit_description": "Измените детали вашего предложения попутки",
+      "seats_description": "Количество свободных мест в вашем автомобиле",
       "seats_placeholder": "напр., 3"
     },
-    "options": "Параметры",
     "pets_allowed": "Разрешены животные",
+    "pets_description": "Вы принимаете домашних животных или путешествуете с ними",
+    "phone_description": "Для связи с другими пользователями",
+    "phone_number": "Номер телефона",
+    "phone_placeholder": "Ваш номер телефона",
+    "pickup_location": "Место встречи",
+    "preferences": "Предпочтения",
     "request": {
       "create": "Создать запрос на попутку",
+      "create_description": "Найдите поездку, чтобы добраться до мероприятия",
       "created": "Запрос на попутку создан",
+      "edit_description": "Измените детали вашего запроса попутки",
       "required_seats": "Требуемые места",
+      "seats_description": "Количество мест, необходимых для вашей группы",
       "seats_placeholder": "напр., 2"
     },
     "route": "Маршрут",
     "select_date_time": "Выберите дату и время",
     "select_direction": "Выберите направление",
     "smoking_allowed": "Разрешено курение",
-    "to": "В",
+    "smoking_description": "Вы разрешаете курильщиков в вашем автомобиле или курите сами",
+    "trip_details": "Детали поездки",
     "validation": {
-      "arrival_required": "Требуется город прибытия",
       "date_invalid": "Недействительная дата",
       "date_required": "Требуется дата отправления",
-      "departure_required": "Требуется город отправления",
+      "departure_address_required": "Адрес отправления обязателен",
+      "departure_city_required": "Город отправления обязателен",
       "direction_invalid": "Направление поездки invalide",
       "direction_required": "Направление поездки обязательно",
       "seats_max": "Максимум 8 мест",
@@ -303,12 +353,14 @@
     "back": "Назад",
     "cancel": "Отмена",
     "cancelled": "Cancelled",
+    "category": "Категория",
     "city": "Город",
     "close": "Закрыть",
     "confirm": "Подтвердить",
     "convention": "Конвенция",
     "country": "Страна",
     "create": "Создать",
+    "creating": "Создание...",
     "date": "Дата",
     "dates": "Даты",
     "delete": "Удалить",
@@ -341,6 +393,7 @@
     "inactive": "Неактивный",
     "loading": "Загрузка...",
     "location": "Местоположение",
+    "logo": "Логотип",
     "manage": "Управлять",
     "name": "Имя",
     "no_permission": "Нет разрешения",
@@ -366,6 +419,7 @@
     "time_just_now": "только что",
     "time_minutes_ago": "{count} мин назад",
     "tip": "Совет",
+    "total": "Всего",
     "updated_at": "Обновлено {date}",
     "view": "Просмотреть",
     "view_details": "Просмотреть детали",
@@ -577,13 +631,13 @@
     "czech_republic": "Чешская Республика"
   },
   "createForm": {
-    "actionText": "Texte du bouton",
-    "actionUrl": "URL d'action",
-    "category": "Catégorie",
-    "message": "Message",
-    "title": "Titre",
-    "type": "Type",
-    "userId": "ID utilisateur"
+    "actionText": "Текст кнопки",
+    "actionUrl": "URL действия",
+    "category": "Категория",
+    "message": "Сообщение",
+    "title": "Заголовок",
+    "type": "Тип",
+    "userId": "ID пользователя"
   },
   "currentValue": {
     "avatar": "Аватар выбранного пользователя"
@@ -805,7 +859,7 @@
   "erreur": {
     "": {
       "": {
-        "": "Ajouter des notes sur cette erreur..."
+        "": "Добавить заметки об этой ошибке..."
       }
     }
   },
@@ -1001,12 +1055,20 @@
     "searched_services": "Поисковые сервисы",
     "upcoming_editions": "Предстоящие издания"
   },
+  "locationLabels": {
+    "addressDescription": "Точное место высадки пассажиров",
+    "addressLabel": "Точный адрес отправления",
+    "addressPlaceholder": "Полный адрес",
+    "cityHint": "Введите не менее 3 символов для просмотра предложений",
+    "cityLabel": "Город",
+    "cityPlaceholder": "Напр.: Москва, Санкт-Петербург, Новосибирск"
+  },
   "log": {
-    "adminNotes": "Notes administrateur",
-    "errorType": "Type d'erreur",
+    "adminNotes": "Заметки администратора",
+    "errorType": "Тип ошибки",
     "id": "ID",
-    "ip": "Adresse IP",
-    "user": "Utilisateur"
+    "ip": "IP-адрес",
+    "user": "Пользователь"
   },
   "messages": {
     "account_created": "Аккаунт создан! Проверьте ваш email.",
@@ -1053,18 +1115,25 @@
     "my_conventions": "Мои Конвенции",
     "my_favorites": "Мои Избранные",
     "no_favorites": "Нет избранных",
-    "notifications": "Notifications",
+    "notifications": "Уведомления",
     "profile": "Профиль",
     "tabs": "Вкладки навигации"
   },
   "notification": {
-    "actionUrl": "URL d'action",
-    "category": "Catégorie",
-    "id": "Identifiant",
-    "user": "Utilisateur"
+    "actionUrl": "URL действия",
+    "category": "Категория",
+    "id": "Идентификатор",
+    "user": "Пользователь"
+  },
+  "notifications": {
+    "loading": "Загрузка des notifications...",
+    "manage_description": "Управляйте своими уведомлениями и настройками",
+    "none_found": "Уведомления не найдены",
+    "this_week": "На этой неделе",
+    "unread": "Непрочитанные"
   },
   "notificationsStore": {
-    "loading": "Chargement des notifications..."
+    "loading": "Загрузка des notifications..."
   },
   "p": {
     "key": "Ключ"
@@ -1233,11 +1302,11 @@
     "username_placeholder": "Ваше уникальное имя пользователя"
   },
   "selectedLog": {
-    "adminNotes": "Notes administrateur",
-    "ip": "Adresse IP",
-    "message": "Message d'erreur",
-    "stack": "Trace de la pile",
-    "user": "Utilisateur"
+    "adminNotes": "Заметки администратора",
+    "ip": "IP-адрес",
+    "message": "Сообщение об ошибке",
+    "stack": "Трассировка стека",
+    "user": "Пользователь"
   },
   "services": {
     "accessibility": "Доступность для людей с инвалидностью",
@@ -1275,8 +1344,8 @@
     "slots": "Количество мест"
   },
   "testType": {
-    "icon": "Icône",
-    "value": "Valeur"
+    "icon": "Иконка",
+    "value": "Значение"
   },
   "upload": {
     "click_select_convention_logo": "Нажмите, чтобы выбрать логотип конвенции",

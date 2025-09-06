@@ -5,7 +5,7 @@
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 7270 7270"
     role="img"
-    aria-label="Logo"
+    :aria-label="$t('common.logo')"
     fill="none"
   >
     <!-- Partie rouge conservée -->

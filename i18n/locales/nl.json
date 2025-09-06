@@ -3,12 +3,15 @@
     "actions": "Acties",
     "active_administrators": "Actieve beheerders",
     "active_conventions": "Actieve conventies",
+    "active_types": "Actieve types",
     "activity": "Activiteit",
     "administration_tools": "Beheertools",
     "advanced_statistics": "Geavanceerde statistieken",
     "advanced_statistics_description": "Gedetailleerde rapporten en analyses",
     "all_emails": "Alle e-mails",
     "all_users": "Alle gebruikers",
+    "api_error_logs": "API-foutenlogboeken",
+    "api_path": "API-pad...",
     "archive_convention": "Conventie archiveren",
     "cannot_load_activity": "Kan recente activiteit niet laden",
     "cannot_load_stats": "Kan statistieken niet laden",
@@ -36,6 +39,10 @@
     "email_a_z": "Op e-mail (A-Z)",
     "email_verified": "E-mail geverifieerd",
     "email_z_a": "Op e-mail (Z-A)",
+    "error_details": "Foutdetails",
+    "error_type": "Fouttype",
+    "errors_24h": "Fouten (24u)",
+    "event_reminders": "Evenementherinneringen",
     "favorites_count": "favoriet(en)",
     "feedback": {
       "admin_notes": "Beheerder notities",
@@ -97,13 +104,17 @@
     "filter_all_conventions": "Alle conventies",
     "filter_archived_conventions": "Gearchiveerde conventies",
     "filter_sort": "Filteren en sorteren",
+    "good_news": "Dat is goed nieuws!",
     "loading_activity": "Recente activiteit laden...",
+    "loading_logs": "Logboeken laden...",
+    "main_type": "Hoofdtype",
     "manage_editions": "Edities beheren",
     "months_ago": "{count} maanden geleden",
     "name_a_z": "Op naam (A-Z)",
     "name_z_a": "Op naam (Z-A)",
     "new_conventions_this_month": "+{count} deze maand",
     "new_editions_this_month": "+{count} deze maand",
+    "new_notification": "Nieuwe melding",
     "new_users_this_month": "+{count} deze maand",
     "newest_first": "Nieuwste eerst",
     "no_activity": "Geen activiteit",
@@ -111,26 +122,35 @@
     "no_conventions_search": "Geen conventies komen overeen met uw zoekopdracht",
     "no_conventions_yet": "Er zijn nog geen conventies gemaakt",
     "no_editions": "Geen edities",
+    "no_errors_found": "Geen fouten gevonden",
     "no_recent_activity": "Geen recente activiteit",
     "normal_users": "Normale gebruikers",
     "not_verified": "Niet geverifieerd",
+    "notification_management": "Meldingenbeheer",
     "oldest_first": "Oudste eerst",
+    "per_page": "per pagina",
     "promote_to_admin": "Promoveren tot super beheerder",
     "recent_activity": "Recente activiteit",
+    "recent_notifications": "Recente meldingen",
     "registration": "Registratie",
     "role": "Rol",
     "search_conventions_placeholder": "Zoek op naam, beschrijving, maker...",
+    "search_error_messages": "Zoeken in foutmeldingen...",
     "search_users_placeholder": "Zoeken op e-mail, gebruikersnaam, voornaam of achternaam...",
     "super_admin": "Super Beheerder",
     "super_administrators": "Super beheerders",
     "super_admins": "Super beheerders",
     "system_settings": "Systeeminstellingen",
     "system_settings_description": "Algemene platformconfiguratie",
+    "test": "Testen",
+    "test_debug": "Tests en debug",
     "today": "Vandaag",
     "total_conventions": "Totaal conventies",
     "total_editions": "Totaal edities",
+    "total_sent": "Totaal verzonden",
     "total_users": "Totaal gebruikers",
     "unarchive_convention": "Conventie dearchiveren",
+    "unresolved": "Onopgelost",
     "unverified_emails": "Niet-geverifieerde e-mails",
     "user": "Gebruiker",
     "user_column": "Gebruiker",
@@ -254,41 +274,71 @@
     "week": "Week"
   },
   "carpool": {
-    "arrival_placeholder": "Aankomstplaats of adres",
-    "departure_placeholder": "Vertrekplaats of adres",
+    "arrival_address": "Precieze aankomstadres",
+    "arrival_address_description": "Exact afzetpunt voor passagiers",
+    "arrival_address_placeholder": "Afzetadres",
+    "arrival_city": "Aankomststad",
+    "arrival_city_hint": "Typ minstens 3 tekens om suggesties te zien",
+    "arrival_city_placeholder": "Bijv: Amsterdam, Rotterdam, Utrecht",
+    "contact": "Contact",
+    "departure_address": "Precieze vertrekadres",
+    "departure_address_description": "Exact ontmoetingspunt om passagiers op te halen",
+    "departure_address_placeholder": "Ontmoetingsadres",
+    "departure_city": "Vertrekstad",
+    "departure_city_hint": "Typ minstens 3 tekens om suggesties te zien",
+    "departure_city_placeholder": "Vertrekstad",
+    "departure_date_description": "Kies vertrekdatum en -tijd",
+    "departure_location": "Vertreklocatie",
     "details": "Details",
+    "details_description": "Extra nuttige informatie voor andere reizigers",
     "details_placeholder": "Nuttige info over de rit (bagage, ontmoetingspunt, etc.)",
     "direction": {
+      "description": "Geef aan of je naar de conventie gaat of ervan terugkeert",
       "from_event": "Terug van de conventie",
       "label": "Richting van de reis",
       "to_event": "Naar de conventie gaan"
     },
-    "from": "Van",
+    "dropoff_location": "Afzetlocatie",
+    "form_help_text": "Uw gegevens blijven privé",
+    "meeting_location": "Ontmoetingsplaats",
     "music_allowed": "Muziek toegestaan",
+    "music_description": "Je gaat akkoord met muziek luisteren tijdens de rit",
     "offer": {
       "available_seats": "Beschikbare plaatsen",
       "create": "Carpoolaanbod maken",
+      "create_description": "Bied plaatsen aan in je voertuig voor het evenement",
       "created": "Carpoolaanbod aangemaakt",
+      "edit_description": "Bewerk de details van je carpool aanbod",
+      "seats_description": "Aantal vrije plaatsen in je voertuig",
       "seats_placeholder": "bijv. 3"
     },
-    "options": "Opties",
     "pets_allowed": "Huisdieren toegestaan",
+    "pets_description": "Je accepteert huisdieren of reist met huisdieren",
+    "phone_description": "Om door andere gebruikers gecontacteerd te worden",
+    "phone_number": "Telefoonnummer",
+    "phone_placeholder": "Je telefoonnummer",
+    "pickup_location": "Ophaallocatie",
+    "preferences": "Voorkeuren",
     "request": {
       "create": "Carpoolaanvraag maken",
+      "create_description": "Zoek een rit om bij het evenement te komen",
       "created": "Carpoolaanvraag aangemaakt",
+      "edit_description": "Bewerk de details van je carpool verzoek",
       "required_seats": "Benodigde plaatsen",
+      "seats_description": "Aantal plaatsen dat je nodig hebt voor je groep",
       "seats_placeholder": "bijv. 2"
     },
     "route": "Route",
     "select_date_time": "Selecteer datum en tijd",
     "select_direction": "Selecteer een richting",
     "smoking_allowed": "Roken toegestaan",
-    "to": "Naar",
+    "smoking_description": "Je staat rokers toe in je voertuig of bent roker",
+    "trip_details": "Reisdetails",
     "validation": {
-      "arrival_required": "Aankomstplaats is vereist",
       "date_invalid": "Ongeldige datum",
       "date_required": "Vertrekdatum is vereist",
-      "departure_required": "Vertrekplaats is vereist",
+      "departure_address_required": "Het vertrekadres is verplicht",
+      "departure_city_required": "De vertrekstad is verplicht",
       "direction_invalid": "Richting van de reis invalide",
       "direction_required": "De reisrichting is verplicht",
       "seats_max": "Maximaal 8 plaatsen",
@@ -303,12 +353,14 @@
     "back": "Terug",
     "cancel": "Annuleren",
     "cancelled": "Cancelled",
+    "category": "Categorie",
     "city": "Stad",
     "close": "Sluiten",
     "confirm": "Bevestigen",
     "convention": "Conventie",
     "country": "Land",
     "create": "Aanmaken",
+    "creating": "Bezig met maken...",
     "date": "Datum",
     "dates": "Datums",
     "delete": "Verwijderen",
@@ -341,6 +393,7 @@
     "inactive": "Inactief",
     "loading": "Laden...",
     "location": "Locatie",
+    "logo": "Logo",
     "manage": "Beheren",
     "name": "Naam",
     "no_permission": "Geen toestemming",
@@ -366,6 +419,7 @@
     "time_just_now": "zojuist",
     "time_minutes_ago": "{count} min geleden",
     "tip": "Tip",
+    "total": "Totaal",
     "updated_at": "Bijgewerkt op {date}",
     "view": "Bekijken",
     "view_details": "Details bekijken",
@@ -577,13 +631,13 @@
     "czech_republic": "Tsjechische Republiek"
   },
   "createForm": {
-    "actionText": "Texte du bouton",
-    "actionUrl": "URL d'action",
-    "category": "Catégorie",
-    "message": "Message",
-    "title": "Titre",
+    "actionText": "Knoptekst",
+    "actionUrl": "Actie-URL",
+    "category": "Categorie",
+    "message": "Bericht",
+    "title": "Titel",
     "type": "Type",
-    "userId": "ID utilisateur"
+    "userId": "Gebruikers-ID"
   },
   "currentValue": {
     "avatar": "Avatar van geselecteerde gebruiker"
@@ -805,7 +859,7 @@
   "erreur": {
     "": {
       "": {
-        "": "Ajouter des notes sur cette erreur..."
+        "": "Voeg notities toe over deze fout..."
       }
     }
   },
@@ -984,7 +1038,7 @@
     }
   },
   "h": {
-    "actor": "Acteur",
+    "actor": "Actor",
     "targetUser": "Doelgebruiker"
   },
   "homepage": {
@@ -1001,12 +1055,20 @@
     "searched_services": "Gezochte diensten",
     "upcoming_editions": "Aankomende edities"
   },
+  "locationLabels": {
+    "addressDescription": "Exact afzetpunt voor passagiers",
+    "addressLabel": "Precieze vertrekadres",
+    "addressPlaceholder": "Volledig adres",
+    "cityHint": "Typ minstens 3 tekens om suggesties te zien",
+    "cityLabel": "Stad",
+    "cityPlaceholder": "Bijv: Amsterdam, Rotterdam, Utrecht"
+  },
   "log": {
-    "adminNotes": "Notes administrateur",
-    "errorType": "Type d'erreur",
+    "adminNotes": "Beheernotities",
+    "errorType": "Fouttype",
     "id": "ID",
-    "ip": "Adresse IP",
-    "user": "Utilisateur"
+    "ip": "IP-adres",
+    "user": "Gebruiker"
   },
   "messages": {
     "account_created": "Account aangemaakt! Controleer je e-mail.",
@@ -1053,18 +1115,25 @@
     "my_conventions": "Mijn Conventies",
     "my_favorites": "Mijn Favorieten",
     "no_favorites": "Geen favorieten",
-    "notifications": "Notifications",
+    "notifications": "Meldingen",
     "profile": "Profiel",
     "tabs": "Navigatietabs"
   },
   "notification": {
-    "actionUrl": "URL d'action",
-    "category": "Catégorie",
-    "id": "Identifiant",
-    "user": "Utilisateur"
+    "actionUrl": "Actie-URL",
+    "category": "Categorie",
+    "id": "Identificatie",
+    "user": "Gebruiker"
+  },
+  "notifications": {
+    "loading": "Laden des notifications...",
+    "manage_description": "Beheer je meldingen en voorkeuren",
+    "none_found": "Geen meldingen gevonden",
+    "this_week": "Deze week",
+    "unread": "Ongelezen"
   },
   "notificationsStore": {
-    "loading": "Chargement des notifications..."
+    "loading": "Laden des notifications..."
   },
   "p": {
     "key": "Sleutel"
@@ -1233,11 +1302,11 @@
     "username_placeholder": "Je unieke gebruikersnaam"
   },
   "selectedLog": {
-    "adminNotes": "Notes administrateur",
-    "ip": "Adresse IP",
-    "message": "Message d'erreur",
-    "stack": "Trace de la pile",
-    "user": "Utilisateur"
+    "adminNotes": "Beheernotities",
+    "ip": "IP-adres",
+    "message": "Foutmelding",
+    "stack": "Stack trace",
+    "user": "Gebruiker"
   },
   "services": {
     "accessibility": "Toegankelijkheid voor gehandicapten",
@@ -1275,8 +1344,8 @@
     "slots": "Aantal plaatsen"
   },
   "testType": {
-    "icon": "Icône",
-    "value": "Valeur"
+    "icon": "Pictogram",
+    "value": "Waarde"
   },
   "upload": {
     "click_select_convention_logo": "Klik om een conventie logo te selecteren",

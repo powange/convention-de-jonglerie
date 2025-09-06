@@ -238,7 +238,7 @@ export const carpoolOfferSchema = z.object({
     .min(1, 'Adresse requise')
     .max(200, "L'adresse ne peut pas dépasser 200 caractères"),
   tripDate: dateSchema,
-  availableSeats: z.number().int().min(1, 'Au moins 1 place disponible').max(8, 'Maximum 8 places'),
+  availableSeats: z.coerce.number().int().min(1, 'Au moins 1 place disponible').max(8, 'Maximum 8 places'),
   direction: z.enum(['TO_EVENT', 'FROM_EVENT'], {
     required_error: 'Direction requise',
     invalid_type_error: 'Direction invalide',
@@ -253,7 +253,7 @@ export const carpoolRequestSchema = z.object({
     .min(1, 'Ville requise')
     .max(100, 'La ville ne peut pas dépasser 100 caractères'),
   tripDate: dateSchema,
-  seatsNeeded: z
+  seatsNeeded: z.coerce
     .number()
     .int()
     .min(1, 'Au moins 1 personne')
