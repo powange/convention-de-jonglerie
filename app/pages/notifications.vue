@@ -48,6 +48,11 @@
       </UCard>
     </div>
 
+    <!-- Configuration des notifications push -->
+    <UCard class="mb-6">
+      <NotificationsPushNotificationSettings />
+    </UCard>
+
     <!-- Filtres et actions -->
     <UCard class="mb-6">
       <div class="flex flex-wrap gap-4 items-center justify-between">

@@ -65,6 +65,9 @@ const sections = [
   { name: 'i18n:translate', desc: '🚀 Traduction automatique en masse des clés [TODO]' },
   { name: 'i18n:add "terme"', desc: '✏️ Ajouter interactivement un terme au dictionnaire de traduction' }
   ] },
+  { title: '📱 Push Notifications', color: colors.magenta, scripts: [
+    { name: 'generate:vapid', desc: '🔑 Générer les clés VAPID pour notifications push' }
+  ] },
   { title: '🧹 Qualité & formatage', color: colors.yellow, scripts: [
     { name: 'lint', desc: 'Analyse lint complète' },
     { name: 'lint:fix', desc: 'Corrige automatiquement' },

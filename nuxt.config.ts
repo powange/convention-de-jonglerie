@@ -39,6 +39,7 @@ export default defineNuxtConfig({
     'nuxt-auth-utils',
     '@nuxtjs/i18n',
     '@vueuse/nuxt',
+    '@vite-pwa/nuxt',
   ].filter(Boolean),
 
   // Restreindre les collections d'icônes empaquetées côté serveur
@@ -103,10 +104,14 @@ export default defineNuxtConfig({
     recaptchaExpectedHostname: process.env.NUXT_RECAPTCHA_EXPECTED_HOSTNAME || '', // optionnel: valider le hostname retourné par Google
     recaptchaDevBypass:
       process.env.NUXT_RECAPTCHA_DEV_BYPASS === 'true' || process.env.NODE_ENV !== 'production', // bypass en dev par défaut
+    // Configuration VAPID pour Web Push
+    vapidPrivateKey: process.env.VAPID_PRIVATE_KEY || '',
+    vapidSubject: process.env.VAPID_SUBJECT || 'mailto:admin@convention-jonglerie.fr',
     public: {
       // Public keys that are available on both client and server
       // Supporte aussi la convention Nuxt NUXT_PUBLIC_*
       recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '', // reCAPTCHA site key for client-side widget
+      vapidPublicKey: process.env.NUXT_PUBLIC_VAPID_PUBLIC_KEY || '',
     },
   },
   vite: {
@@ -146,5 +151,51 @@ export default defineNuxtConfig({
     lazyHydration: true,
     // Optimiser la gestion d'erreur des chunks
     emitRouteChunkError: 'automatic',
+  },
+  
+  // Configuration PWA
+  pwa: {
+    registerType: 'autoUpdate',
+    workbox: {
+      navigateFallback: null,
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+    },
+    manifest: {
+      name: 'Convention de Jonglerie',
+      short_name: 'ConvJong',
+      description: 'Découvrez et gérez les conventions de jonglerie',
+      theme_color: '#3b82f6',
+      background_color: '#ffffff',
+      display: 'standalone',
+      orientation: 'portrait',
+      icons: [
+        {
+          src: '/favicons/favicon-192x192.png',
+          sizes: '192x192',
+          type: 'image/png',
+        },
+        {
+          src: '/favicons/favicon-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+        },
+        {
+          src: '/favicons/favicon-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'maskable',
+        },
+      ],
+      start_url: '/',
+      categories: ['entertainment', 'social'],
+    },
+    client: {
+      installPrompt: true,
+      periodicSyncForUpdates: 20,
+    },
+    devOptions: {
+      enabled: process.env.NODE_ENV !== 'production',
+      type: 'module',
+    },
   },
 })

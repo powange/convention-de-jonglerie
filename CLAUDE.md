@@ -67,6 +67,7 @@
 - `npm run preview` : Prévisualiser la version de production
 - `npm run lint` : Vérifier le code avec ESLint
 - `npm run db:seed:dev` : Peupler la base de données avec des données de développement
+- `npm run kill-servers` : Arrêter tous les serveurs en cours d'exécution
 
 **Scripts de traduction i18n :**
 

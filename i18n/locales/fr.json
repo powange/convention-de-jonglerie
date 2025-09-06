@@ -1086,7 +1086,40 @@
     "unread": "Non lues",
     "this_week": "Cette semaine",
     "loading": "Chargement des notifications...",
-    "none_found": "Aucune notification trouvée"
+    "none_found": "Aucune notification trouvée",
+    "push": {
+      "title": "Notifications Push",
+      "description": "Recevez des notifications directement sur vos appareils",
+      "status": "Statut des notifications",
+      "enabled": "Notifications activées",
+      "disabled": "Notifications désactivées",
+      "enable": "Activer",
+      "disable": "Désactiver",
+      "enabled_success": "Notifications push activées !",
+      "disabled_success": "Notifications push désactivées",
+      "enable_error": "Erreur lors de l'activation des notifications",
+      "disable_error": "Erreur lors de la désactivation des notifications",
+      "unsupported": {
+        "title": "Non supporté",
+        "description": "Votre navigateur ne supporte pas les notifications push"
+      },
+      "permission_denied": {
+        "title": "Permission refusée",
+        "description": "Vous avez refusé les notifications. Réactivez-les dans les paramètres de votre navigateur."
+      },
+      "test": {
+        "title": "Test de notification",
+        "description": "Envoyez-vous une notification de test",
+        "button": "Envoyer un test",
+        "success": "Test envoyé !",
+        "success_message": "Vérifiez que vous avez reçu la notification",
+        "error": "Erreur lors de l'envoi du test"
+      },
+      "devices": {
+        "title": "Appareils connectés",
+        "registered_on": "Enregistré le"
+      }
+    }
   },
   "createForm": {
     "userId": "ID utilisateur",

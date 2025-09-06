@@ -1,4 +1,5 @@
 import { prisma } from './prisma'
+import { WebPushService } from './web-push-service'
 
 import type { NotificationType } from '@prisma/client'
 
@@ -30,7 +31,7 @@ export const NotificationService = {
    * Crée une nouvelle notification
    */
   async create(data: CreateNotificationData) {
-    return await prisma.notification.create({
+    const notification = await prisma.notification.create({
       data: {
         userId: data.userId,
         type: data.type,
@@ -52,6 +53,43 @@ export const NotificationService = {
         },
       },
     })
+
+    // Envoyer la notification push en parallèle (ne pas bloquer la création)
+    this.sendPushNotification(notification).catch(error => {
+      console.error('Erreur lors de l\'envoi de la notification push:', error)
+    })
+
+    return notification
+  },
+
+  /**
+   * Envoie une notification push
+   */
+  async sendPushNotification(notification: any) {
+    try {
+      // Déterminer l'icône selon le type
+      let icon = '/favicons/favicon-192x192.png'
+      if (notification.type === 'SUCCESS') icon = '/favicons/favicon-192x192.png'
+      else if (notification.type === 'WARNING') icon = '/favicons/favicon-192x192.png'
+      else if (notification.type === 'ERROR') icon = '/favicons/favicon-192x192.png'
+
+      const pushPayload = {
+        title: notification.title,
+        body: notification.message,
+        icon,
+        url: notification.actionUrl || '/notifications',
+        tag: `notification-${notification.id}`,
+        requireInteraction: notification.type === 'ERROR',
+      }
+
+      const result = await WebPushService.sendToUser(notification.userId, pushPayload)
+      
+      if (result.success && result.summary) {
+        console.log(`Push envoyé à l'utilisateur ${notification.userId}: ${result.summary.success}/${result.summary.total} succès`)
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi push:', error)
+    }
   },
 
   /**

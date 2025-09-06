@@ -41,6 +41,7 @@ model User {
   feedbacks                Feedback[]
   apiErrorLogs             ApiErrorLog[]
   notifications            Notification[]
+  pushSubscriptions        PushSubscription[]
   lostFoundComments        LostFoundComment[]
   lostFoundItems           LostFoundItem[]
   passwordResetTokens      PasswordResetToken[]
@@ -575,5 +576,28 @@ enum NotificationType {
   SUCCESS
   WARNING
   ERROR
+}
+
+// ========== PUSH NOTIFICATIONS ==========
+
+model PushSubscription {
+  id           String   @id @default(cuid())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Subscription data (JSON string)
+  subscription String   @db.Text // JSON de la PushSubscription
+  
+  // Métadonnées
+  userAgent    String?  @db.Text
+  active       Boolean  @default(true)
+  
+  // Timestamps
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Index pour optimiser les requêtes
+  @@index([userId])
+  @@index([active])
 }
 
