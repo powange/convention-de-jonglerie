@@ -199,6 +199,7 @@ interface PerEditionRight {
   editionId: number
   canEdit?: boolean
   canDelete?: boolean
+  canManageVolunteers?: boolean
 }
 interface CollaboratorItem {
   id: number
@@ -300,6 +301,7 @@ const permissionList = [
   { key: 'editConvention', label: 'permissions.editConvention' },
   { key: 'deleteConvention', label: 'permissions.deleteConvention' },
   { key: 'manageCollaborators', label: 'permissions.manageCollaborators' },
+  { key: 'manageVolunteers', label: 'permissions.manageVolunteers' },
   { key: 'addEdition', label: 'permissions.addEdition' },
   { key: 'editAllEditions', label: 'permissions.editAllEditions' },
   { key: 'deleteAllEditions', label: 'permissions.deleteAllEditions' },

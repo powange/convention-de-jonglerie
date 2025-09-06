@@ -125,13 +125,19 @@ const searchTerm = ref('')
 const creationDraft = reactive<{
   title: string | null
   rights: Record<string, boolean>
-  perEdition: Array<{ editionId: number; canEdit?: boolean; canDelete?: boolean }>
+  perEdition: Array<{
+    editionId: number
+    canEdit?: boolean
+    canDelete?: boolean
+    canManageVolunteers?: boolean
+  }>
 }>({
   title: null,
   rights: {
     editConvention: false,
     deleteConvention: false,
     manageCollaborators: false,
+    manageVolunteers: false,
     addEdition: false,
     editAllEditions: false,
     deleteAllEditions: false,
@@ -217,11 +223,29 @@ watch(
   () => creationDraft.rights.editAllEditions,
   (val) => {
     if (val) {
-      creationDraft.perEdition = creationDraft.perEdition.filter((p) => p.canDelete)
+      creationDraft.perEdition = creationDraft.perEdition.filter(
+        (p) => p.canDelete || p.canManageVolunteers
+      )
       creationDraft.perEdition.forEach((p) => {
         if (p.canEdit) p.canEdit = false
       })
-      creationDraft.perEdition = creationDraft.perEdition.filter((p) => p.canDelete)
+      creationDraft.perEdition = creationDraft.perEdition.filter(
+        (p) => p.canDelete || p.canManageVolunteers
+      )
+    }
+  }
+)
+
+// Si "gérer les bénévoles" global est activé, on supprime les flags canManageVolunteers par édition
+watch(
+  () => creationDraft.rights.manageVolunteers,
+  (val) => {
+    if (val) {
+      creationDraft.perEdition = creationDraft.perEdition.filter((p) => p.canEdit || p.canDelete)
+      creationDraft.perEdition.forEach((p) => {
+        if (p.canManageVolunteers) p.canManageVolunteers = false
+      })
+      creationDraft.perEdition = creationDraft.perEdition.filter((p) => p.canEdit || p.canDelete)
     }
   }
 )

@@ -147,7 +147,7 @@ export default defineEventHandler(async (event) => {
       general: 'GENERAL',
       other: 'COMPLAINT',
     }
-    
+
     const feedback = await prisma.feedback.create({
       data: {
         type: (typeMapping[type] || 'GENERAL') as FeedbackType,

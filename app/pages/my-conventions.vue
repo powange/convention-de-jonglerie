@@ -375,26 +375,37 @@ const getEditionsColumns = () => [
               )
               const canEdit = convention && canEditEdition(convention, edition.id)
               const canDelete = convention && canDeleteEdition(convention, edition.id)
-              return [
-                h(UTooltip, { text: t('common.edit') }, () =>
-                  h(UButton, {
-                    icon: 'i-heroicons-pencil',
-                    color: 'warning',
-                    variant: 'ghost',
-                    disabled: !canEdit,
-                    onClick: () => canEdit && navigateTo(`/editions/${edition.id}/edit`),
-                  })
-                ),
-                h(UTooltip, { text: t('common.delete') }, () =>
-                  h(UButton, {
-                    icon: 'i-heroicons-trash',
-                    color: 'error',
-                    variant: 'ghost',
-                    disabled: !canDelete,
-                    onClick: () => canDelete && deleteEdition(edition.id),
-                  })
-                ),
-              ]
+              const buttons = []
+
+              // Bouton d'édition seulement si l'utilisateur a les droits
+              if (canEdit) {
+                buttons.push(
+                  h(UTooltip, { text: t('common.edit') }, () =>
+                    h(UButton, {
+                      icon: 'i-heroicons-pencil',
+                      color: 'warning',
+                      variant: 'ghost',
+                      onClick: () => navigateTo(`/editions/${edition.id}/edit`),
+                    })
+                  )
+                )
+              }
+
+              // Bouton de suppression seulement si l'utilisateur a les droits
+              if (canDelete) {
+                buttons.push(
+                  h(UTooltip, { text: t('common.delete') }, () =>
+                    h(UButton, {
+                      icon: 'i-heroicons-trash',
+                      color: 'error',
+                      variant: 'ghost',
+                      onClick: () => deleteEdition(edition.id),
+                    })
+                  )
+                )
+              }
+
+              return buttons
             })(),
           ],
         }

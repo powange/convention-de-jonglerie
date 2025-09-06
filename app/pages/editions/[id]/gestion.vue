@@ -27,7 +27,7 @@
       <!-- Contenu de gestion -->
       <div class="space-y-6">
         <!-- Actions de gestion -->
-        <UCard>
+        <UCard v-if="hasManagementActions">
           <div class="space-y-4">
             <h2 class="text-lg font-semibold">{{ $t('pages.management.actions') }}</h2>
             <div class="flex flex-wrap gap-2">
@@ -40,7 +40,7 @@
                 {{ $t('pages.management.edit_edition') }}
               </UButton>
               <UButton
-                v-if="edition.isOnline"
+                v-if="canEdit && edition.isOnline"
                 :icon="'i-heroicons-eye-slash'"
                 color="secondary"
                 variant="soft"
@@ -49,7 +49,7 @@
                 {{ $t('editions.set_offline') }}
               </UButton>
               <UButton
-                v-else
+                v-else-if="canEdit && !edition.isOnline"
                 :icon="'i-heroicons-globe-alt'"
                 color="primary"
                 @click="toggleOnlineStatus(true)"
@@ -258,7 +258,9 @@
                       :disabled="!(canEdit || canManageVolunteers)"
                       class="w-full"
                       @blur="(canEdit || canManageVolunteers) && persistVolunteerSettings()"
-                      @keydown.enter.prevent="(canEdit || canManageVolunteers) && persistVolunteerSettings()"
+                      @keydown.enter.prevent="
+                        (canEdit || canManageVolunteers) && persistVolunteerSettings()
+                      "
                     />
                   </UFormField>
                   <p class="text-[11px] text-gray-500">
@@ -891,7 +893,9 @@ watch(volunteersDescriptionLocal, () => {
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return canEdit.value || canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
+  return (
+    canEdit.value || canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
+  )
 })
 
 // Permissions calculées
@@ -908,6 +912,11 @@ const canDelete = computed(() => {
 const canManageVolunteers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageVolunteers(edition.value, authStore.user.id)
+})
+
+// Vérifier s'il y a des actions de gestion disponibles
+const hasManagementActions = computed(() => {
+  return canEdit.value || canDelete.value
 })
 
 // Début d'édition

@@ -14,6 +14,7 @@ export function useCollaboratorTitle() {
       'editConvention',
       'deleteConvention',
       'manageCollaborators',
+      'manageVolunteers',
       'addEdition',
       'editAllEditions',
       'deleteAllEditions',
@@ -22,7 +23,8 @@ export function useCollaboratorTitle() {
     if (allTrue) return t('permissions.admin')
     if (r.manageCollaborators || (r.editConvention && r.deleteConvention))
       return t('permissions.manager')
-    if (r.addEdition || r.editAllEditions || r.deleteAllEditions) return t('permissions.editor')
+    if (r.addEdition || r.editAllEditions || r.deleteAllEditions || r.manageVolunteers)
+      return t('permissions.editor')
     return t('permissions.viewer')
   }
 

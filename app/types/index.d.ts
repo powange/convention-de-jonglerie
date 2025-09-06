@@ -108,7 +108,12 @@ export interface ConventionCollaboratorWithRights {
   id: number
   user: PublicUser
   rights?: Record<string, boolean> // ex: editConvention, deleteConvention...
-  perEditionRights?: { editionId: number; canEdit?: boolean; canDelete?: boolean }[]
+  perEditionRights?: {
+    editionId: number
+    canEdit?: boolean
+    canDelete?: boolean
+    canManageVolunteers?: boolean
+  }[]
   title?: string | null // résumé (ex: Administrateur, Éditeur...)
 }
 
@@ -116,7 +121,12 @@ export interface EditionCollaborator {
   id: number
   user: PublicUser
   rights?: Record<string, boolean>
-  perEditionRights?: { editionId: number; canEdit?: boolean; canDelete?: boolean }[]
+  perEditionRights?: {
+    editionId: number
+    canEdit?: boolean
+    canDelete?: boolean
+    canManageVolunteers?: boolean
+  }[]
   title?: string | null
 }
 

@@ -45,6 +45,7 @@ export default defineEventHandler(async (event) => {
                     updatedAt: true,
                   },
                 },
+                perEditionPermissions: true,
               },
             },
           },
@@ -115,10 +116,18 @@ export default defineEventHandler(async (event) => {
             editConvention: (collab as any).canEditConvention ?? false,
             deleteConvention: (collab as any).canDeleteConvention ?? false,
             manageCollaborators: (collab as any).canManageCollaborators ?? false,
+            manageVolunteers: (collab as any).canManageVolunteers ?? false,
             addEdition: (collab as any).canAddEdition ?? false,
             editAllEditions: (collab as any).canEditAllEditions ?? false,
             deleteAllEditions: (collab as any).canDeleteAllEditions ?? false,
           },
+          // Transformer les droits par édition
+          perEditionRights: ((collab as any).perEditionPermissions || []).map((per: any) => ({
+            editionId: per.editionId,
+            canEdit: per.canEdit ?? false,
+            canDelete: per.canDelete ?? false,
+            canManageVolunteers: per.canManageVolunteers ?? false,
+          })),
           user: (() => {
             const { email, ...userWithoutEmail } = collab.user
             return {

@@ -222,15 +222,19 @@ const canAccess = computed(() => {
   }
 
   const canEdit = editionStore.canEditEdition(props.edition, authStore.user.id)
-  return canEdit || authStore.user?.id === props.edition?.creatorId
+  const canManageVolunteers = editionStore.canManageVolunteers(props.edition, authStore.user.id)
+  return canEdit || canManageVolunteers || authStore.user?.id === props.edition?.creatorId
 })
 
-// Visibilité onglet bénévoles: ouvert OU utilisateur peut éditer
+// Visibilité onglet bénévoles: ouvert OU utilisateur peut éditer/gérer bénévoles
 const volunteersTabVisible = computed<boolean>(() => {
   if (!props.edition) return false
-  // Toujours visible pour les éditeurs (gestion interne même fermé au public)
-  if (authStore.user?.id && editionStore.canEditEdition(props.edition, authStore.user.id))
-    return true
+  // Toujours visible pour les éditeurs et gestionnaires de bénévoles (gestion interne même fermé au public)
+  if (authStore.user?.id) {
+    const canEdit = editionStore.canEditEdition(props.edition, authStore.user.id)
+    const canManageVolunteers = editionStore.canManageVolunteers(props.edition, authStore.user.id)
+    if (canEdit || canManageVolunteers) return true
+  }
   // Visible publiquement uniquement si ouvert
   // edition.volunteersOpen peut ne pas encore être dans le type Edition (ajout récent), cast temporaire
   return (props.edition as any).volunteersOpen === true
