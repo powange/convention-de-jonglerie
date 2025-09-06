@@ -336,14 +336,7 @@ const startPolling = () => {
 
   // Rafraîchir toutes les 5 secondes
   pollingInterval = setInterval(async () => {
-    console.log(
-      '⏰ Tentative de rafraîchissement - Utilisateur:',
-      !!authStore.user,
-      'Visible:',
-      document.visibilityState === 'visible'
-    )
     if (authStore.user && document.visibilityState === 'visible') {
-      console.log('✅ Rafraîchissement des notifications')
       await notificationsStore.refresh()
     }
   }, 5000)

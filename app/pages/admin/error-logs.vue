@@ -212,7 +212,7 @@
                     </UBadge>
 
                     <UBadge
-                      :color="log.resolved ? 'green' : 'red'"
+                      :color="log.resolved ? 'success' : 'error'"
                       :variant="log.resolved ? 'subtle' : 'solid'"
                     >
                       {{ log.resolved ? 'Résolu' : 'Non résolu' }}
@@ -247,8 +247,8 @@
       </div>
     </UCard>
 
-    <!-- Modal de détails -->
-    <UModal v-model:open="showLogDetails" :title="$t('admin.error_details')">
+    <!-- Slideover de détails -->
+    <USlideover v-model:open="showLogDetails" :title="$t('admin.error_details')">
       <template #body>
         <div v-if="selectedLog" class="space-y-6">
           <!-- Date et heure -->
@@ -345,7 +345,7 @@
             <div class="flex items-center justify-between mb-4">
               <h4 class="text-md font-medium">Résolution</h4>
               <UBadge
-                :color="selectedLog.resolved ? 'green' : 'red'"
+                :color="selectedLog.resolved ? 'success' : 'error'"
                 :variant="selectedLog.resolved ? 'subtle' : 'solid'"
               >
                 {{ selectedLog.resolved ? 'Résolu' : 'Non résolu' }}
@@ -370,7 +370,7 @@
               <div class="flex gap-3">
                 <UButton
                   v-if="!selectedLog.resolved"
-                  color="green"
+                  color="success"
                   :loading="resolving"
                   @click="resolveLog(true)"
                 >
@@ -394,7 +394,7 @@
           </div>
         </div>
       </template>
-    </UModal>
+    </USlideover>
   </div>
 </template>
 
@@ -480,10 +480,10 @@ const formatDateTime = (dateString: string) => {
 }
 
 const getStatusCodeColor = (statusCode: number) => {
-  if (statusCode >= 500) return 'red'
-  if (statusCode >= 400) return 'orange'
-  if (statusCode >= 300) return 'yellow'
-  return 'green'
+  if (statusCode >= 500) return 'error'
+  if (statusCode >= 400) return 'warning'
+  if (statusCode >= 300) return 'warning'
+  return 'success'
 }
 
 // Chargement des logs
@@ -507,7 +507,7 @@ const loadLogs = async () => {
   } catch {
     console.error('Error loading logs:', error)
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
       description: "Impossible de charger les logs d'erreurs",
     })
@@ -562,7 +562,7 @@ const openLogDetails = async (log: any) => {
     showLogDetails.value = true
   } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
       description: 'Impossible de charger les détails du log',
     })
@@ -586,7 +586,7 @@ const resolveLog = async (resolved: boolean) => {
     selectedLog.value.resolvedAt = resolved ? new Date().toISOString() : null
 
     toast.add({
-      color: 'green',
+      color: 'success',
       title: 'Succès',
       description: response.message,
     })
@@ -595,7 +595,7 @@ const resolveLog = async (resolved: boolean) => {
     loadLogs()
   } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
       description: 'Impossible de mettre à jour le statut',
     })
@@ -618,13 +618,13 @@ const updateAdminNotes = async () => {
     })
 
     toast.add({
-      color: 'green',
+      color: 'success',
       title: 'Succès',
       description: 'Notes sauvegardées avec succès',
     })
   } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
       description: 'Impossible de sauvegarder les notes',
     })
