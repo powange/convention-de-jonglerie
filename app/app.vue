@@ -321,4 +321,13 @@ const displayName = computed(() => authStore.user?.pseudo || authStore.user?.pre
     background: #0f172a; /* bg-slate-900 */
   }
 }
+
+/* Force le thème selon la classe dark sur html/body (priorité sur le thème système) */
+.dark .loading-screen {
+  background: #0f172a !important; /* bg-slate-900 en mode sombre */
+}
+
+.light .loading-screen {
+  background: white !important; /* fond blanc en mode clair */
+}
 </style>
