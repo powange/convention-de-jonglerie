@@ -11,21 +11,25 @@ Ce dossier contient les scripts pour automatiser les traductions en masse des fi
 ## 🚀 Usage Rapide
 
 ### Traduction complète
+
 ```bash
 node scripts/mass-translator.js
 ```
 
 ### Simulation (sans modification)
+
 ```bash
 node scripts/mass-translator.js --dry-run
 ```
 
 ### Langues spécifiques
+
 ```bash
 node scripts/mass-translator.js --lang "en,es,de"
 ```
 
 ### Pattern personnalisé
+
 ```bash
 node scripts/mass-translator.js --pattern "[NEW]"
 ```
@@ -53,16 +57,32 @@ Options:
 export const TRANSLATION_DICTIONARY = {
   // Nouvelle catégorie
   monnaie: {
-    "Euro": {
-      en: "Euro", es: "Euro", de: "Euro", it: "Euro", nl: "Euro",
-      pl: "Euro", pt: "Euro", ru: "Евро", uk: "Євро", da: "Euro"
+    Euro: {
+      en: 'Euro',
+      es: 'Euro',
+      de: 'Euro',
+      it: 'Euro',
+      nl: 'Euro',
+      pl: 'Euro',
+      pt: 'Euro',
+      ru: 'Евро',
+      uk: 'Євро',
+      da: 'Euro',
     },
-    "Devise": {
-      en: "Currency", es: "Moneda", de: "Währung", it: "Valuta", nl: "Valuta",
-      pl: "Waluta", pt: "Moeda", ru: "Валюта", uk: "Валюта", da: "Valuta"
-    }
-  }
-};
+    Devise: {
+      en: 'Currency',
+      es: 'Moneda',
+      de: 'Währung',
+      it: 'Valuta',
+      nl: 'Valuta',
+      pl: 'Waluta',
+      pt: 'Moeda',
+      ru: 'Валюта',
+      uk: 'Валюта',
+      da: 'Valuta',
+    },
+  },
+}
 ```
 
 ### 2. Patterns contextuels
@@ -78,16 +98,17 @@ export const CONTEXT_PATTERNS = [
       es: `El ${match[1]} es inválido`,
       de: `${match[1]} ist ungültig`,
       // ... autres langues
-    })
-  }
-];
+    }),
+  },
+]
 ```
 
 ## 🌍 Langues Supportées
 
 Le script supporte ces codes de langue :
+
 - `en` - Anglais
-- `es` - Espagnol  
+- `es` - Espagnol
 - `de` - Allemand
 - `it` - Italien
 - `nl` - Néerlandais
@@ -100,12 +121,14 @@ Le script supporte ces codes de langue :
 ## 📊 Exemples d'Usage
 
 ### Vérifier ce qui sera traduit
+
 ```bash
 # Simulation pour voir les traductions possibles
 node scripts/mass-translator.js --dry-run --verbose
 ```
 
 ### Traduction par étapes
+
 ```bash
 # D'abord les langues principales
 node scripts/mass-translator.js --lang "en,es,de,it"
@@ -115,6 +138,7 @@ node scripts/mass-translator.js --lang "nl,pl,pt,ru,uk,da"
 ```
 
 ### Traduction de patterns spécifiques
+
 ```bash
 # Traduire seulement les clés avec [NOUVEAU]
 node scripts/mass-translator.js --pattern "[NOUVEAU]"
@@ -145,14 +169,17 @@ Pour maintenir le dictionnaire à jour :
 ## 🐛 Dépannage
 
 ### Aucune traduction trouvée
+
 - Vérifiez que le pattern correspond (défaut: `[TODO]`)
 - Vérifiez que les termes sont dans le dictionnaire
 - Utilisez `--verbose` pour voir les détails
 
 ### Erreur de fichier
+
 - Vérifiez que les fichiers JSON sont valides
 - Vérifiez les permissions d'écriture
 
 ### Traductions incorrectes
+
 - Modifiez le dictionnaire
 - Relancez le script sur les fichiers concernés

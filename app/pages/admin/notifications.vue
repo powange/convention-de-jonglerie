@@ -64,7 +64,9 @@
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Tester les différents types de notifications
           </p>
-          <UButton variant="outline" color="purple" @click="showTestModal = true"> {{ $t('admin.test') }} </UButton>
+          <UButton variant="outline" color="purple" @click="showTestModal = true">
+            {{ $t('admin.test') }}
+          </UButton>
         </div>
       </UCard>
     </div>
@@ -74,7 +76,9 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('admin.total_sent') }}</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {{ $t('admin.total_sent') }}
+            </p>
             <p class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ stats?.totalSent || 0 }}
             </p>
@@ -86,7 +90,9 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('notifications.unread') }}</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {{ $t('notifications.unread') }}
+            </p>
             <p class="text-2xl font-bold text-red-600">
               {{ stats?.totalUnread || 0 }}
             </p>
@@ -98,7 +104,9 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('admin.today') }}</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {{ $t('admin.today') }}
+            </p>
             <p class="text-2xl font-bold text-green-600">
               {{ stats?.sentToday || 0 }}
             </p>
@@ -110,7 +118,9 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('admin.active_types') }}</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {{ $t('admin.active_types') }}
+            </p>
             <p class="text-2xl font-bold text-purple-600">
               {{ stats?.activeTypes || 0 }}
             </p>

@@ -6,7 +6,9 @@
         <UIcon name="i-heroicons-bell" class="text-blue-600" />
         {{ $t('navigation.notifications') }}
       </h1>
-      <p class="text-gray-600 dark:text-gray-400 mt-2">{{ $t('notifications.manage_description') }}</p>
+      <p class="text-gray-600 dark:text-gray-400 mt-2">
+        {{ $t('notifications.manage_description') }}
+      </p>
     </div>
 
     <!-- Statistiques rapides -->
@@ -14,7 +16,9 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('common.total') }}</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {{ $t('common.total') }}
+            </p>
             <p class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ stats?.total || 0 }}
             </p>
@@ -26,7 +30,9 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('notifications.unread') }}</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {{ $t('notifications.unread') }}
+            </p>
             <p class="text-2xl font-bold text-red-600">
               {{ notificationsStore.unreadCount }}
             </p>
@@ -38,7 +44,9 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('notifications.this_week') }}</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {{ $t('notifications.this_week') }}
+            </p>
             <p class="text-2xl font-bold text-green-600">
               {{ weeklyCount }}
             </p>

@@ -1,6 +1,6 @@
 /**
  * Dictionnaire de traductions extensible pour le mass-translator
- * 
+ *
  * Pour ajouter de nouvelles traductions :
  * 1. Ajouter les termes dans les catégories appropriées
  * 2. Ou créer de nouvelles catégories selon vos besoins
@@ -10,163 +10,435 @@
 export const TRANSLATION_DICTIONARY = {
   // === INTERFACE UTILISATEUR ===
   navigation: {
-    "Accueil": {
-      en: "Home", es: "Inicio", de: "Startseite", it: "Home", nl: "Startpagina",
-      pl: "Strona główna", pt: "Início", ru: "Главная", uk: "Головна", da: "Hjem"
+    Accueil: {
+      en: 'Home',
+      es: 'Inicio',
+      de: 'Startseite',
+      it: 'Home',
+      nl: 'Startpagina',
+      pl: 'Strona główna',
+      pt: 'Início',
+      ru: 'Главная',
+      uk: 'Головна',
+      da: 'Hjem',
     },
-    "Menu": {
-      en: "Menu", es: "Menú", de: "Menü", it: "Menu", nl: "Menu",
-      pl: "Menu", pt: "Menu", ru: "Меню", uk: "Меню", da: "Menu"
+    Menu: {
+      en: 'Menu',
+      es: 'Menú',
+      de: 'Menü',
+      it: 'Menu',
+      nl: 'Menu',
+      pl: 'Menu',
+      pt: 'Menu',
+      ru: 'Меню',
+      uk: 'Меню',
+      da: 'Menu',
     },
-    "Navigation": {
-      en: "Navigation", es: "Navegación", de: "Navigation", it: "Navigazione", nl: "Navigatie",
-      pl: "Nawigacja", pt: "Navegação", ru: "Навигация", uk: "Навігація", da: "Navigation"
+    Navigation: {
+      en: 'Navigation',
+      es: 'Navegación',
+      de: 'Navigation',
+      it: 'Navigazione',
+      nl: 'Navigatie',
+      pl: 'Nawigacja',
+      pt: 'Navegação',
+      ru: 'Навигация',
+      uk: 'Навігація',
+      da: 'Navigation',
     },
-    "Retour": {
-      en: "Back", es: "Volver", de: "Zurück", it: "Indietro", nl: "Terug",
-      pl: "Wstecz", pt: "Voltar", ru: "Назад", uk: "Назад", da: "Tilbage"
-    }
+    Retour: {
+      en: 'Back',
+      es: 'Volver',
+      de: 'Zurück',
+      it: 'Indietro',
+      nl: 'Terug',
+      pl: 'Wstecz',
+      pt: 'Voltar',
+      ru: 'Назад',
+      uk: 'Назад',
+      da: 'Tilbage',
+    },
   },
 
   actions: {
-    "Ajouter": {
-      en: "Add", es: "Agregar", de: "Hinzufügen", it: "Aggiungi", nl: "Toevoegen",
-      pl: "Dodaj", pt: "Adicionar", ru: "Добавить", uk: "Додати", da: "Tilføj"
+    Ajouter: {
+      en: 'Add',
+      es: 'Agregar',
+      de: 'Hinzufügen',
+      it: 'Aggiungi',
+      nl: 'Toevoegen',
+      pl: 'Dodaj',
+      pt: 'Adicionar',
+      ru: 'Добавить',
+      uk: 'Додати',
+      da: 'Tilføj',
     },
-    "Modifier": {
-      en: "Edit", es: "Editar", de: "Bearbeiten", it: "Modifica", nl: "Bewerken",
-      pl: "Edytuj", pt: "Editar", ru: "Редактировать", uk: "Редагувати", da: "Rediger"
+    Modifier: {
+      en: 'Edit',
+      es: 'Editar',
+      de: 'Bearbeiten',
+      it: 'Modifica',
+      nl: 'Bewerken',
+      pl: 'Edytuj',
+      pt: 'Editar',
+      ru: 'Редактировать',
+      uk: 'Редагувати',
+      da: 'Rediger',
     },
-    "Supprimer": {
-      en: "Delete", es: "Eliminar", de: "Löschen", it: "Elimina", nl: "Verwijderen",
-      pl: "Usuń", pt: "Excluir", ru: "Удалить", uk: "Видалити", da: "Slet"
+    Supprimer: {
+      en: 'Delete',
+      es: 'Eliminar',
+      de: 'Löschen',
+      it: 'Elimina',
+      nl: 'Verwijderen',
+      pl: 'Usuń',
+      pt: 'Excluir',
+      ru: 'Удалить',
+      uk: 'Видалити',
+      da: 'Slet',
     },
-    "Rechercher": {
-      en: "Search", es: "Buscar", de: "Suchen", it: "Cerca", nl: "Zoeken",
-      pl: "Szukaj", pt: "Pesquisar", ru: "Поиск", uk: "Пошук", da: "Søg"
+    Rechercher: {
+      en: 'Search',
+      es: 'Buscar',
+      de: 'Suchen',
+      it: 'Cerca',
+      nl: 'Zoeken',
+      pl: 'Szukaj',
+      pt: 'Pesquisar',
+      ru: 'Поиск',
+      uk: 'Пошук',
+      da: 'Søg',
     },
-    "Filtrer": {
-      en: "Filter", es: "Filtrar", de: "Filtern", it: "Filtra", nl: "Filteren",
-      pl: "Filtruj", pt: "Filtrar", ru: "Фильтровать", uk: "Фільтрувати", da: "Filtrer"
+    Filtrer: {
+      en: 'Filter',
+      es: 'Filtrar',
+      de: 'Filtern',
+      it: 'Filtra',
+      nl: 'Filteren',
+      pl: 'Filtruj',
+      pt: 'Filtrar',
+      ru: 'Фильтровать',
+      uk: 'Фільтрувати',
+      da: 'Filtrer',
     },
-    "Enregistrer": {
-      en: "Save", es: "Guardar", de: "Speichern", it: "Salva", nl: "Opslaan",
-      pl: "Zapisz", pt: "Salvar", ru: "Сохранить", uk: "Зберегти", da: "Gem"
+    Enregistrer: {
+      en: 'Save',
+      es: 'Guardar',
+      de: 'Speichern',
+      it: 'Salva',
+      nl: 'Opslaan',
+      pl: 'Zapisz',
+      pt: 'Salvar',
+      ru: 'Сохранить',
+      uk: 'Зберегти',
+      da: 'Gem',
     },
-    "Annuler": {
-      en: "Cancel", es: "Cancelar", de: "Abbrechen", it: "Annulla", nl: "Annuleren",
-      pl: "Anuluj", pt: "Cancelar", ru: "Отменить", uk: "Скасувати", da: "Annuller"
+    Annuler: {
+      en: 'Cancel',
+      es: 'Cancelar',
+      de: 'Abbrechen',
+      it: 'Annulla',
+      nl: 'Annuleren',
+      pl: 'Anuluj',
+      pt: 'Cancelar',
+      ru: 'Отменить',
+      uk: 'Скасувати',
+      da: 'Annuller',
     },
-    "Confirmer": {
-      en: "Confirm", es: "Confirmar", de: "Bestätigen", it: "Conferma", nl: "Bevestigen",
-      pl: "Potwierdź", pt: "Confirmar", ru: "Подтвердить", uk: "Підтвердити", da: "Bekræft"
+    Confirmer: {
+      en: 'Confirm',
+      es: 'Confirmar',
+      de: 'Bestätigen',
+      it: 'Conferma',
+      nl: 'Bevestigen',
+      pl: 'Potwierdź',
+      pt: 'Confirmar',
+      ru: 'Подтвердить',
+      uk: 'Підтвердити',
+      da: 'Bekræft',
     },
-    "Importer": {
-      en: "Import", es: "Importar", de: "Importieren", it: "Importa", nl: "Importeren",
-      pl: "Importuj", pt: "Importar", ru: "Импортировать", uk: "Імпортувати", da: "Importer"
+    Importer: {
+      en: 'Import',
+      es: 'Importar',
+      de: 'Importieren',
+      it: 'Importa',
+      nl: 'Importeren',
+      pl: 'Importuj',
+      pt: 'Importar',
+      ru: 'Импортировать',
+      uk: 'Імпортувати',
+      da: 'Importer',
     },
-    "Exporter": {
-      en: "Export", es: "Exportar", de: "Exportieren", it: "Esporta", nl: "Exporteren",
-      pl: "Eksportuj", pt: "Exportar", ru: "Экспортировать", uk: "Експортувати", da: "Eksporter"
-    }
+    Exporter: {
+      en: 'Export',
+      es: 'Exportar',
+      de: 'Exportieren',
+      it: 'Esporta',
+      nl: 'Exporteren',
+      pl: 'Eksportuj',
+      pt: 'Exportar',
+      ru: 'Экспортировать',
+      uk: 'Експортувати',
+      da: 'Eksporter',
+    },
   },
 
   // === ÉTATS ET STATUTS ===
   status: {
-    "Actif": {
-      en: "Active", es: "Activo", de: "Aktiv", it: "Attivo", nl: "Actief",
-      pl: "Aktywny", pt: "Ativo", ru: "Активный", uk: "Активний", da: "Aktiv"
+    Actif: {
+      en: 'Active',
+      es: 'Activo',
+      de: 'Aktiv',
+      it: 'Attivo',
+      nl: 'Actief',
+      pl: 'Aktywny',
+      pt: 'Ativo',
+      ru: 'Активный',
+      uk: 'Активний',
+      da: 'Aktiv',
     },
-    "Inactif": {
-      en: "Inactive", es: "Inactivo", de: "Inaktiv", it: "Inattivo", nl: "Inactief",
-      pl: "Nieaktywny", pt: "Inativo", ru: "Неактивный", uk: "Неактивний", da: "Inaktiv"
+    Inactif: {
+      en: 'Inactive',
+      es: 'Inactivo',
+      de: 'Inaktiv',
+      it: 'Inattivo',
+      nl: 'Inactief',
+      pl: 'Nieaktywny',
+      pt: 'Inativo',
+      ru: 'Неактивный',
+      uk: 'Неактивний',
+      da: 'Inaktiv',
     },
-    "En cours": {
-      en: "In progress", es: "En progreso", de: "In Bearbeitung", it: "In corso", nl: "In uitvoering",
-      pl: "W toku", pt: "Em andamento", ru: "В процессе", uk: "В процесі", da: "I gang"
+    'En cours': {
+      en: 'In progress',
+      es: 'En progreso',
+      de: 'In Bearbeitung',
+      it: 'In corso',
+      nl: 'In uitvoering',
+      pl: 'W toku',
+      pt: 'Em andamento',
+      ru: 'В процессе',
+      uk: 'В процесі',
+      da: 'I gang',
     },
-    "Terminé": {
-      en: "Completed", es: "Terminado", de: "Abgeschlossen", it: "Completato", nl: "Voltooid",
-      pl: "Zakończony", pt: "Concluído", ru: "Завершено", uk: "Завершено", da: "Færdig"
+    Terminé: {
+      en: 'Completed',
+      es: 'Terminado',
+      de: 'Abgeschlossen',
+      it: 'Completato',
+      nl: 'Voltooid',
+      pl: 'Zakończony',
+      pt: 'Concluído',
+      ru: 'Завершено',
+      uk: 'Завершено',
+      da: 'Færdig',
     },
-    "En attente": {
-      en: "Pending", es: "Pendiente", de: "Wartend", it: "In attesa", nl: "In afwachting",
-      pl: "Oczekujący", pt: "Pendente", ru: "Ожидание", uk: "Очікування", da: "Afventer"
+    'En attente': {
+      en: 'Pending',
+      es: 'Pendiente',
+      de: 'Wartend',
+      it: 'In attesa',
+      nl: 'In afwachting',
+      pl: 'Oczekujący',
+      pt: 'Pendente',
+      ru: 'Ожидание',
+      uk: 'Очікування',
+      da: 'Afventer',
     },
-    "Disponible": {
-      en: "Available", es: "Disponible", de: "Verfügbar", it: "Disponibile", nl: "Beschikbaar",
-      pl: "Dostępny", pt: "Disponível", ru: "Доступно", uk: "Доступно", da: "Tilgængelig"
-    }
+    Disponible: {
+      en: 'Available',
+      es: 'Disponible',
+      de: 'Verfügbar',
+      it: 'Disponibile',
+      nl: 'Beschikbaar',
+      pl: 'Dostępny',
+      pt: 'Disponível',
+      ru: 'Доступно',
+      uk: 'Доступно',
+      da: 'Tilgængelig',
+    },
   },
 
   // === TEMPS ET DATES ===
   time: {
     "Aujourd'hui": {
-      en: "Today", es: "Hoy", de: "Heute", it: "Oggi", nl: "Vandaag",
-      pl: "Dzisiaj", pt: "Hoje", ru: "Сегодня", uk: "Сьогодні", da: "I dag"
+      en: 'Today',
+      es: 'Hoy',
+      de: 'Heute',
+      it: 'Oggi',
+      nl: 'Vandaag',
+      pl: 'Dzisiaj',
+      pt: 'Hoje',
+      ru: 'Сегодня',
+      uk: 'Сьогодні',
+      da: 'I dag',
     },
-    "Hier": {
-      en: "Yesterday", es: "Ayer", de: "Gestern", it: "Ieri", nl: "Gisteren",
-      pl: "Wczoraj", pt: "Ontem", ru: "Вчера", uk: "Вчора", da: "I går"
+    Hier: {
+      en: 'Yesterday',
+      es: 'Ayer',
+      de: 'Gestern',
+      it: 'Ieri',
+      nl: 'Gisteren',
+      pl: 'Wczoraj',
+      pt: 'Ontem',
+      ru: 'Вчера',
+      uk: 'Вчора',
+      da: 'I går',
     },
-    "Demain": {
-      en: "Tomorrow", es: "Mañana", de: "Morgen", it: "Domani", nl: "Morgen",
-      pl: "Jutro", pt: "Amanhã", ru: "Завтра", uk: "Завтра", da: "I morgen"
+    Demain: {
+      en: 'Tomorrow',
+      es: 'Mañana',
+      de: 'Morgen',
+      it: 'Domani',
+      nl: 'Morgen',
+      pl: 'Jutro',
+      pt: 'Amanhã',
+      ru: 'Завтра',
+      uk: 'Завтра',
+      da: 'I morgen',
     },
-    "Date": {
-      en: "Date", es: "Fecha", de: "Datum", it: "Data", nl: "Datum",
-      pl: "Data", pt: "Data", ru: "Дата", uk: "Дата", da: "Dato"
+    Date: {
+      en: 'Date',
+      es: 'Fecha',
+      de: 'Datum',
+      it: 'Data',
+      nl: 'Datum',
+      pl: 'Data',
+      pt: 'Data',
+      ru: 'Дата',
+      uk: 'Дата',
+      da: 'Dato',
     },
-    "Heure": {
-      en: "Time", es: "Hora", de: "Zeit", it: "Ora", nl: "Tijd",
-      pl: "Czas", pt: "Hora", ru: "Время", uk: "Час", da: "Tid"
-    }
+    Heure: {
+      en: 'Time',
+      es: 'Hora',
+      de: 'Zeit',
+      it: 'Ora',
+      nl: 'Tijd',
+      pl: 'Czas',
+      pt: 'Hora',
+      ru: 'Время',
+      uk: 'Час',
+      da: 'Tid',
+    },
   },
 
   // === FORMULAIRES ===
   forms: {
-    "Obligatoire": {
-      en: "Required", es: "Obligatorio", de: "Erforderlich", it: "Obbligatorio", nl: "Verplicht",
-      pl: "Wymagane", pt: "Obrigatório", ru: "Обязательно", uk: "Обов'язково", da: "Påkrævet"
+    Obligatoire: {
+      en: 'Required',
+      es: 'Obligatorio',
+      de: 'Erforderlich',
+      it: 'Obbligatorio',
+      nl: 'Verplicht',
+      pl: 'Wymagane',
+      pt: 'Obrigatório',
+      ru: 'Обязательно',
+      uk: "Обов'язково",
+      da: 'Påkrævet',
     },
-    "Optionnel": {
-      en: "Optional", es: "Opcional", de: "Optional", it: "Opzionale", nl: "Optioneel",
-      pl: "Opcjonalny", pt: "Opcional", ru: "Необязательно", uk: "Необов'язково", da: "Valgfri"
+    Optionnel: {
+      en: 'Optional',
+      es: 'Opcional',
+      de: 'Optional',
+      it: 'Opzionale',
+      nl: 'Optioneel',
+      pl: 'Opcjonalny',
+      pt: 'Opcional',
+      ru: 'Необязательно',
+      uk: "Необов'язково",
+      da: 'Valgfri',
     },
-    "Nom": {
-      en: "Name", es: "Nombre", de: "Name", it: "Nome", nl: "Naam",
-      pl: "Nazwa", pt: "Nome", ru: "Имя", uk: "Ім'я", da: "Navn"
+    Nom: {
+      en: 'Name',
+      es: 'Nombre',
+      de: 'Name',
+      it: 'Nome',
+      nl: 'Naam',
+      pl: 'Nazwa',
+      pt: 'Nome',
+      ru: 'Имя',
+      uk: "Ім'я",
+      da: 'Navn',
     },
-    "Email": {
-      en: "Email", es: "Correo electrónico", de: "E-Mail", it: "Email", nl: "E-mail",
-      pl: "E-mail", pt: "E-mail", ru: "Эл. почта", uk: "Електронна пошта", da: "E-mail"
+    Email: {
+      en: 'Email',
+      es: 'Correo electrónico',
+      de: 'E-Mail',
+      it: 'Email',
+      nl: 'E-mail',
+      pl: 'E-mail',
+      pt: 'E-mail',
+      ru: 'Эл. почта',
+      uk: 'Електронна пошта',
+      da: 'E-mail',
     },
-    "Description": {
-      en: "Description", es: "Descripción", de: "Beschreibung", it: "Descrizione", nl: "Beschrijving",
-      pl: "Opis", pt: "Descrição", ru: "Описание", uk: "Опис", da: "Beskrivelse"
-    }
+    Description: {
+      en: 'Description',
+      es: 'Descripción',
+      de: 'Beschreibung',
+      it: 'Descrizione',
+      nl: 'Beschrijving',
+      pl: 'Opis',
+      pt: 'Descrição',
+      ru: 'Описание',
+      uk: 'Опис',
+      da: 'Beskrivelse',
+    },
   },
 
   // === MESSAGES ===
   messages: {
-    "Chargement": {
-      en: "Loading", es: "Cargando", de: "Laden", it: "Caricamento", nl: "Laden",
-      pl: "Ładowanie", pt: "Carregando", ru: "Загрузка", uk: "Завантаження", da: "Indlæser"
+    Chargement: {
+      en: 'Loading',
+      es: 'Cargando',
+      de: 'Laden',
+      it: 'Caricamento',
+      nl: 'Laden',
+      pl: 'Ładowanie',
+      pt: 'Carregando',
+      ru: 'Загрузка',
+      uk: 'Завантаження',
+      da: 'Indlæser',
     },
-    "Erreur": {
-      en: "Error", es: "Error", de: "Fehler", it: "Errore", nl: "Fout",
-      pl: "Błąd", pt: "Erro", ru: "Ошибка", uk: "Помилка", da: "Fejl"
+    Erreur: {
+      en: 'Error',
+      es: 'Error',
+      de: 'Fehler',
+      it: 'Errore',
+      nl: 'Fout',
+      pl: 'Błąd',
+      pt: 'Erro',
+      ru: 'Ошибка',
+      uk: 'Помилка',
+      da: 'Fejl',
     },
-    "Succès": {
-      en: "Success", es: "Éxito", de: "Erfolg", it: "Successo", nl: "Succes",
-      pl: "Sukces", pt: "Sucesso", ru: "Успех", uk: "Успіх", da: "Succes"
+    Succès: {
+      en: 'Success',
+      es: 'Éxito',
+      de: 'Erfolg',
+      it: 'Successo',
+      nl: 'Succes',
+      pl: 'Sukces',
+      pt: 'Sucesso',
+      ru: 'Успех',
+      uk: 'Успіх',
+      da: 'Succes',
     },
-    "Aucun résultat": {
-      en: "No results", es: "Sin resultados", de: "Keine Ergebnisse", it: "Nessun risultato", nl: "Geen resultaten",
-      pl: "Brak wyników", pt: "Sem resultados", ru: "Нет результатов", uk: "Немає результатів", da: "Ingen resultater"
-    }
-  }
-};
+    'Aucun résultat': {
+      en: 'No results',
+      es: 'Sin resultados',
+      de: 'Keine Ergebnisse',
+      it: 'Nessun risultato',
+      nl: 'Geen resultaten',
+      pl: 'Brak wyników',
+      pt: 'Sem resultados',
+      ru: 'Нет результатов',
+      uk: 'Немає результатів',
+      da: 'Ingen resultater',
+    },
+  },
+}
 
 // Patterns pour reconnaître des contextes spécifiques
 export const CONTEXT_PATTERNS = [
@@ -182,33 +454,33 @@ export const CONTEXT_PATTERNS = [
       pt: `${match[1]} é obrigatório`,
       ru: `${match[1]} обязателен`,
       uk: `${match[1]} обов'язковий`,
-      da: `${match[1]} er påkrævet`
-    })
+      da: `${match[1]} er påkrævet`,
+    }),
   },
   {
     pattern: /^chargement.*$/i,
     getTranslations: () => ({
-      en: "Loading...",
-      es: "Cargando...",
-      de: "Laden...",
-      it: "Caricamento...",
-      nl: "Laden...",
-      pl: "Ładowanie...",
-      pt: "Carregando...",
-      ru: "Загрузка...",
-      uk: "Завантаження...",
-      da: "Indlæser..."
-    })
-  }
-];
+      en: 'Loading...',
+      es: 'Cargando...',
+      de: 'Laden...',
+      it: 'Caricamento...',
+      nl: 'Laden...',
+      pl: 'Ładowanie...',
+      pt: 'Carregando...',
+      ru: 'Загрузка...',
+      uk: 'Завантаження...',
+      da: 'Indlæser...',
+    }),
+  },
+]
 
 // Fonction helper pour obtenir toutes les traductions dans un objet plat
 export function getFlatTranslations() {
-  const flat = {};
-  
+  const flat = {}
+
   for (const category of Object.values(TRANSLATION_DICTIONARY)) {
-    Object.assign(flat, category);
+    Object.assign(flat, category)
   }
-  
-  return flat;
+
+  return flat
 }

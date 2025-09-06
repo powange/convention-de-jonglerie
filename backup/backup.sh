@@ -21,9 +21,16 @@ check_env() {
     local required_vars=""
     
     if [ -z "$DB_HOST" ]; then required_vars="$required_vars DB_HOST"; fi
+    if [ -z "$DB_PORT" ]; then DB_PORT=3306; fi  # Valeur par défaut
     if [ -z "$DB_NAME" ]; then required_vars="$required_vars DB_NAME"; fi
     if [ -z "$DB_USER" ]; then required_vars="$required_vars DB_USER"; fi
     if [ -z "$DB_PASSWORD" ]; then required_vars="$required_vars DB_PASSWORD"; fi
+    
+    # Vérification que DB_PORT est un nombre valide
+    if ! [[ "$DB_PORT" =~ ^[0-9]+$ ]] || [ "$DB_PORT" -lt 1 ] || [ "$DB_PORT" -gt 65535 ]; then
+        log "ERREUR: DB_PORT doit être un nombre entre 1 et 65535 (valeur actuelle: $DB_PORT)"
+        exit 1
+    fi
     
     if [ "$BACKUP_DESTINATION" = "synology" ]; then
         if [ -z "$SYNOLOGY_HOST" ]; then required_vars="$required_vars SYNOLOGY_HOST"; fi
@@ -34,6 +41,14 @@ check_env() {
     if [ -n "$required_vars" ]; then
         log "ERREUR: Variables manquantes: $required_vars"
         exit 1
+    fi
+    
+    # Affichage des variables pour débogage (sans mot de passe)
+    log "Configuration détectée:"
+    log "  Base de données: $DB_HOST:$DB_PORT/$DB_NAME (utilisateur: $DB_USER)"
+    log "  Destination: $BACKUP_DESTINATION"
+    if [ "$BACKUP_DESTINATION" = "synology" ]; then
+        log "  Synology: $SYNOLOGY_USER@$SYNOLOGY_HOST:$SYNOLOGY_PATH"
     fi
 }
 
@@ -48,8 +63,18 @@ prepare_backup() {
 backup_database() {
     log "Backup de la base de données MySQL..."
     
+    # Test de connexion d'abord
+    if ! mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -e "SELECT 1;" "$DB_NAME" >/dev/null 2>&1; then
+        log "ERREUR: Impossible de se connecter à la base de données $DB_NAME sur $DB_HOST:$DB_PORT"
+        log "Vérifiez les paramètres: Host=$DB_HOST, Port=$DB_PORT, User=$DB_USER, Database=$DB_NAME"
+        return 1
+    fi
+    
+    log "Connexion à la base de données réussie ($DB_HOST:$DB_PORT)"
+    
     mysqldump \
         -h "$DB_HOST" \
+        -P "$DB_PORT" \
         -u "$DB_USER" \
         -p"$DB_PASSWORD" \
         --single-transaction \

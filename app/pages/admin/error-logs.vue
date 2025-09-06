@@ -30,7 +30,9 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('admin.errors_24h') }}</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {{ $t('admin.errors_24h') }}
+            </p>
             <p class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ stats.totalLast24h }}
             </p>
@@ -42,7 +44,9 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('admin.unresolved') }}</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {{ $t('admin.unresolved') }}
+            </p>
             <p class="text-2xl font-bold text-red-600">
               {{ stats.unresolvedCount }}
             </p>
@@ -54,7 +58,9 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $t('admin.main_type') }}</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {{ $t('admin.main_type') }}
+            </p>
             <p class="text-lg font-bold text-gray-900 dark:text-white">
               {{ stats.errorTypes[0]?.type || 'N/A' }}
             </p>
@@ -87,7 +93,7 @@
           <UInput
             v-model="filters.search"
             icon="i-heroicons-magnifying-glass"
-:placeholder="$t('admin.search_error_messages')"
+            :placeholder="$t('admin.search_error_messages')"
             @input="debouncedSearch"
           />
         </div>
@@ -95,7 +101,7 @@
         <USelectMenu
           v-model="filters.status"
           :options="statusOptions"
-:placeholder="$t('common.status')"
+          :placeholder="$t('common.status')"
           class="w-40"
           @update:model-value="applyFilters"
         />
@@ -103,7 +109,7 @@
         <USelectMenu
           v-model="filters.errorType"
           :options="errorTypeOptions"
-:placeholder="$t('admin.error_type')"
+          :placeholder="$t('admin.error_type')"
           class="w-48"
           @update:model-value="applyFilters"
         />
@@ -111,7 +117,7 @@
         <UInput
           v-model="filters.path"
           icon="i-heroicons-link"
-:placeholder="$t('admin.api_path')"
+          :placeholder="$t('admin.api_path')"
           class="w-48"
           @input="debouncedSearch"
         />
@@ -366,7 +372,7 @@
                 </label>
                 <UTextarea
                   v-model="selectedLog.adminNotes"
-:placeholder="$t('erreur...')"
+                  :placeholder="$t('erreur...')"
                   :rows="3"
                   class="w-full"
                 />

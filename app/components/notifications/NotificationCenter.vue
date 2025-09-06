@@ -21,7 +21,11 @@
     </UButton>
 
     <!-- Panel de notifications -->
-    <UModal v-model:open="isOpen" :ui="{ width: 'w-full max-w-md' }" :title="$t('navigation.notifications')">
+    <UModal
+      v-model:open="isOpen"
+      :ui="{ width: 'w-full max-w-md' }"
+      :title="$t('navigation.notifications')"
+    >
       <template #content>
         <UCard>
           <template #body>

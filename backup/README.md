@@ -71,6 +71,7 @@ docker-compose -f docker-compose.prod.yml up -d
 | Variable | Description | Exemple |
 |----------|-------------|---------|
 | `DB_HOST` | Host MySQL | `mysql_db` |
+| `DB_PORT` | Port MySQL | `3306` |
 | `DB_NAME` | Nom de la base | `convention_db` |
 | `DB_USER` | Utilisateur MySQL | `root` |
 | `DB_PASSWORD` | Mot de passe MySQL | `secret123` |
@@ -159,7 +160,7 @@ ssh backup-user@192.168.1.100 "ls -lh /volume1/backups/convention/daily/"
 docker logs convention-backup-prod
 
 # Tester la connexion DB
-docker exec convention-backup-prod mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD -e "SELECT 1"
+docker exec convention-backup-prod mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASSWORD -e "SELECT 1"
 ```
 
 ### Erreur de connexion Synology

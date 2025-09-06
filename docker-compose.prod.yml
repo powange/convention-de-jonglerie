@@ -78,6 +78,7 @@ services:
       - BACKUP_PREFIX=convention-prod
       - BACKUP_DESTINATION=synology
       - DB_HOST=database-prod
+      - DB_PORT=${MYSQL_PORT:-3306}
       - DB_NAME=${MYSQL_DATABASE:-convention_db}
       - DB_USER=${MYSQL_USER:-convention_user}
       - DB_PASSWORD=${MYSQL_PASSWORD:-convention_password}

@@ -27,8 +27,12 @@ EOF
 test_db_connection() {
     echo "Test de connexion à la base de données..."
     
+    # Port par défaut si non défini
+    DB_PORT="${DB_PORT:-3306}"
+    echo "Connexion à $DB_HOST:$DB_PORT avec l'utilisateur $DB_USER"
+    
     for i in {1..30}; do
-        if mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" -e "SELECT 1" &>/dev/null; then
+        if mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -e "SELECT 1" &>/dev/null; then
             echo "Connexion à la base de données réussie!"
             return 0
         fi
@@ -36,7 +40,7 @@ test_db_connection() {
         sleep 2
     done
     
-    echo "ERREUR: Impossible de se connecter à la base de données"
+    echo "ERREUR: Impossible de se connecter à la base de données $DB_HOST:$DB_PORT"
     return 1
 }
 
