@@ -258,6 +258,11 @@
     "departure_placeholder": "Afrejseby eller -adresse",
     "details": "Detaljer",
     "details_placeholder": "Nyttig info om turen (bagage, mødested mv.)",
+    "direction": {
+      "from_event": "Tilbage fra konventet",
+      "label": "Rejsens retning",
+      "to_event": "Til konventet"
+    },
     "from": "Fra",
     "music_allowed": "Musik tilladt",
     "offer": {
@@ -278,6 +283,7 @@
     },
     "route": "Rute",
     "select_date_time": "Vælg dato og tidspunkt",
+    "select_direction": "Vælg en retning",
     "smoking_allowed": "Rygning tilladt",
     "to": "Til",
     "validation": {
@@ -285,6 +291,8 @@
       "date_invalid": "Ugyldig dato",
       "date_required": "Afrejsedato er påkrævet",
       "departure_required": "Afrejseby er påkrævet",
+      "direction_invalid": "Rejsens retning invalide",
+      "direction_required": "Rejsens retning er påkrævet",
       "seats_max": "Maksimalt 8 pladser",
       "seats_min": "Mindst 1 plads"
     }

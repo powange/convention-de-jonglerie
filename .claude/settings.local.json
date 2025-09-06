@@ -59,13 +59,7 @@
       "Bash(for lang in fr en de es it nl pl pt ru uk da)",
       "Bash(npx prisma migrate:*)",
       "Bash(npx prisma:*)",
-      "Bash(mysql:*)",
-      "Bash(__NEW_LINE__ echo \"Fichiers vides :\")",
-      "Bash(for file in scripts/nest-locale-da.ts scripts/normalize-locales.cjs scripts/prune-i18n.cjs)",
-      "Bash(if [ -f \"$file\" ])",
-      "Bash(then)",
-      "Bash(fi)",
-      "Bash(__NEW_LINE__ echo -e \"\\nFichiers README/documentation :\")"
+      "Bash(mysql:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

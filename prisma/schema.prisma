@@ -152,13 +152,19 @@ model ConventionCollaborator {
   @@index([userId], map: "ConventionCollaborator_userId_fkey")
 }
 
+enum CarpoolDirection {
+  TO_EVENT     // Aller vers la convention
+  FROM_EVENT   // Retour depuis la convention
+}
+
 model CarpoolOffer {
   id               Int                @id @default(autoincrement())
   userId           Int
-  departureDate    DateTime
-  departureCity    String
-  departureAddress String
+  tripDate         DateTime
+  locationCity     String
+  locationAddress  String
   availableSeats   Int
+  direction        CarpoolDirection   @default(TO_EVENT)
   description      String?            @db.Text
   phoneNumber      String?
   createdAt        DateTime           @default(now())
@@ -177,9 +183,10 @@ model CarpoolOffer {
 model CarpoolRequest {
   id            Int                     @id @default(autoincrement())
   userId        Int
-  departureDate DateTime
-  departureCity String
+  tripDate      DateTime
+  locationCity  String
   seatsNeeded   Int                     @default(1)
+  direction     CarpoolDirection        @default(TO_EVENT)
   description   String?                 @db.Text
   phoneNumber   String?
   createdAt     DateTime                @default(now())

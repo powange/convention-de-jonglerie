@@ -229,32 +229,40 @@ export const updateEditionSchema = z
 
 // Schémas de covoiturage
 export const carpoolOfferSchema = z.object({
-  departureCity: z
+  locationCity: z
     .string()
-    .min(1, 'Ville de départ requise')
+    .min(1, 'Ville requise')
     .max(100, 'La ville ne peut pas dépasser 100 caractères'),
-  departureAddress: z
+  locationAddress: z
     .string()
-    .min(1, 'Adresse de départ requise')
+    .min(1, 'Adresse requise')
     .max(200, "L'adresse ne peut pas dépasser 200 caractères"),
-  departureDate: dateSchema,
+  tripDate: dateSchema,
   availableSeats: z.number().int().min(1, 'Au moins 1 place disponible').max(8, 'Maximum 8 places'),
+  direction: z.enum(['TO_EVENT', 'FROM_EVENT'], {
+    required_error: 'Direction requise',
+    invalid_type_error: 'Direction invalide',
+  }),
   description: z.string().max(500, 'La description ne peut pas dépasser 500 caractères').optional(),
   phoneNumber: phoneSchema,
 })
 
 export const carpoolRequestSchema = z.object({
-  departureCity: z
+  locationCity: z
     .string()
-    .min(1, 'Ville de départ requise')
+    .min(1, 'Ville requise')
     .max(100, 'La ville ne peut pas dépasser 100 caractères'),
-  departureDate: dateSchema,
+  tripDate: dateSchema,
   seatsNeeded: z
     .number()
     .int()
     .min(1, 'Au moins 1 personne')
     .max(8, 'Maximum 8 personnes')
     .default(1),
+  direction: z.enum(['TO_EVENT', 'FROM_EVENT'], {
+    required_error: 'Direction requise',
+    invalid_type_error: 'Direction invalide',
+  }),
   description: z.string().max(500, 'La description ne peut pas dépasser 500 caractères').optional(),
   phoneNumber: phoneSchema,
 })

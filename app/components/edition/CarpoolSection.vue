@@ -28,10 +28,14 @@
     </div>
 
     <!-- Modal pour proposer un covoiturage -->
-    <UModal v-model:open="showOfferModal" :title="$t('components.carpool.propose_carpool')">
+    <UModal
+      v-model:open="showOfferModal"
+      :title="$t('carpool.offer.create')"
+      :description="$t('carpool.offer.create_description')"
+    >
       <template #body>
         <CarpoolOfferForm
-          :edition-id="editionId"
+          :edition-id="String(editionId)"
           @success="onOfferCreated"
           @cancel="showOfferModal = false"
         />
@@ -39,10 +43,14 @@
     </UModal>
 
     <!-- Modal pour demander un covoiturage -->
-    <UModal v-model:open="showRequestModal" :title="$t('components.carpool.request_carpool')">
+    <UModal
+      v-model:open="showRequestModal"
+      :title="$t('carpool.request.create')"
+      :description="$t('carpool.request.create_description')"
+    >
       <template #body>
         <CarpoolRequestForm
-          :edition-id="editionId"
+          :edition-id="String(editionId)"
           @success="onRequestCreated"
           @cancel="showRequestModal = false"
         />
@@ -50,11 +58,15 @@
     </UModal>
 
     <!-- Modal pour éditer une offre de covoiturage -->
-    <UModal v-model:open="showEditOfferModal" :title="$t('components.carpool.edit_offer')">
+    <UModal
+      v-model:open="showEditOfferModal"
+      :title="$t('components.carpool.edit_offer')"
+      :description="$t('carpool.offer.edit_description')"
+    >
       <template #body>
         <CarpoolOfferForm
           v-if="editingOffer"
-          :edition-id="editionId"
+          :edition-id="String(editionId)"
           :initial-data="editingOffer"
           :is-editing="true"
           @success="onOfferUpdated"
@@ -64,11 +76,15 @@
     </UModal>
 
     <!-- Modal pour éditer une demande de covoiturage -->
-    <UModal v-model:open="showEditRequestModal" :title="$t('components.carpool.edit_request')">
+    <UModal
+      v-model:open="showEditRequestModal"
+      :title="$t('components.carpool.edit_request')"
+      :description="$t('carpool.request.edit_description')"
+    >
       <template #body>
         <CarpoolRequestForm
           v-if="editingRequest"
-          :edition-id="editionId"
+          :edition-id="String(editionId)"
           :initial-data="editingRequest"
           :is-editing="true"
           @success="onRequestUpdated"

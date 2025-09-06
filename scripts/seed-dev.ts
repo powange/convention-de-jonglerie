@@ -112,8 +112,8 @@ async function main() {
       data: {
         email: powangeUserEmail,
         pseudo: 'Powange',
-        nom: 'Powange',
-        prenom: 'User',
+        nom: 'Comble',
+        prenom: 'Pierre',
         password: await bcrypt.hash(powangeUserPassword, 10),
         isEmailVerified: true,
         isGlobalAdmin: false,
@@ -433,21 +433,21 @@ async function main() {
       // S'assurer que le superadmin crée au moins une offre par édition (la première)
       const randomUser =
         i === 0 ? superAdmin : createdUsers[Math.floor(Math.random() * createdUsers.length)]
-      const departureCity = departureCities[Math.floor(Math.random() * departureCities.length)]
+      const locationCity = departureCities[Math.floor(Math.random() * departureCities.length)]
 
       // Date de départ 1-2 jours avant le début de l'édition
-      const departureDate = new Date(edition.startDate)
-      departureDate.setDate(departureDate.getDate() - Math.floor(Math.random() * 2) - 1)
+      const tripDate = new Date(edition.startDate)
+      tripDate.setDate(tripDate.getDate() - Math.floor(Math.random() * 2) - 1)
 
       const offer = await prisma.carpoolOffer.create({
         data: {
           userId: randomUser.id,
           editionId: edition.id,
-          departureDate,
-          departureCity,
-          departureAddress: `${Math.floor(Math.random() * 100) + 1} Avenue de la Gare, ${departureCity}`,
+          tripDate,
+          locationCity,
+          locationAddress: `${Math.floor(Math.random() * 100) + 1} Avenue de la Gare, ${locationCity}`,
           availableSeats: Math.floor(Math.random() * 4) + 1, // 1-4 places
-          description: `Covoiturage au départ de ${departureCity}. Ambiance conviviale garantie ! Place pour matériel de jonglerie.`,
+          description: `Covoiturage au départ de ${locationCity}. Ambiance conviviale garantie ! Place pour matériel de jonglerie.`,
           phoneNumber: `06${Math.floor(Math.random() * 90000000) + 10000000}`,
         },
       })
@@ -488,19 +488,19 @@ async function main() {
         Math.random() < 0.3
           ? superAdmin
           : createdUsers[Math.floor(Math.random() * createdUsers.length)]
-      const departureCity = departureCities[Math.floor(Math.random() * departureCities.length)]
+      const locationCity = departureCities[Math.floor(Math.random() * departureCities.length)]
 
-      const departureDate = new Date(edition.startDate)
-      departureDate.setDate(departureDate.getDate() - Math.floor(Math.random() * 2) - 1)
+      const tripDate = new Date(edition.startDate)
+      tripDate.setDate(tripDate.getDate() - Math.floor(Math.random() * 2) - 1)
 
       const request = await prisma.carpoolRequest.create({
         data: {
           userId: randomUser.id,
           editionId: edition.id,
-          departureDate,
-          departureCity,
+          tripDate,
+          locationCity,
           seatsNeeded: Math.floor(Math.random() * 2) + 1, // 1-2 places
-          description: `Recherche covoiturage depuis ${departureCity}. Flexible sur l'horaire !`,
+          description: `Recherche covoiturage depuis ${locationCity}. Flexible sur l'horaire !`,
           phoneNumber:
             Math.random() > 0.5 ? `06${Math.floor(Math.random() * 90000000) + 10000000}` : null,
         },

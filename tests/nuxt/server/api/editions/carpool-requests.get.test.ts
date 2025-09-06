@@ -30,8 +30,8 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
         id: 1,
         editionId: 1,
         userId: 1,
-        departureDate: new Date('2024-07-15T08:00:00Z'),
-        departureCity: 'Lyon',
+        tripDate: new Date('2024-07-15T08:00:00Z'),
+        locationCity: 'Lyon',
         seatsNeeded: 2,
         description: 'Cherche covoiturage',
         phoneNumber: '0123456789',
@@ -73,8 +73,8 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
       id: 1,
       editionId: 1,
       userId: 1,
-      departureDate: new Date('2024-07-15T08:00:00Z'),
-      departureCity: 'Lyon',
+      tripDate: new Date('2024-07-15T08:00:00Z'),
+      locationCity: 'Lyon',
       seatsNeeded: 2,
       description: 'Cherche covoiturage',
       phoneNumber: '0123456789',
@@ -113,7 +113,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
           orderBy: { createdAt: 'desc' },
         },
       },
-      orderBy: { departureDate: 'asc' },
+      orderBy: { tripDate: 'asc' },
     })
   })
 
@@ -145,8 +145,8 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
     const mockRequests = [
       {
         id: 2,
-        departureDate: new Date('2024-07-16T10:00:00Z'),
-        departureCity: 'Marseille',
+        tripDate: new Date('2024-07-16T10:00:00Z'),
+        locationCity: 'Marseille',
         user: {
           id: 2,
           pseudo: 'user2',
@@ -158,8 +158,8 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
       },
       {
         id: 1,
-        departureDate: new Date('2024-07-15T08:00:00Z'),
-        departureCity: 'Lyon',
+        tripDate: new Date('2024-07-15T08:00:00Z'),
+        locationCity: 'Lyon',
         user: {
           id: 1,
           pseudo: 'user1',
@@ -185,7 +185,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
           orderBy: { createdAt: 'desc' },
         },
       },
-      orderBy: { departureDate: 'asc' }, // Vérification du tri
+      orderBy: { tripDate: 'asc' }, // Vérification du tri
     })
   })
 
@@ -195,8 +195,8 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
         id: 1,
         editionId: 1,
         userId: 1,
-        departureDate: new Date('2024-07-15T08:00:00Z'),
-        departureCity: 'Lyon',
+        tripDate: new Date('2024-07-15T08:00:00Z'),
+        locationCity: 'Lyon',
         seatsNeeded: 1,
         user: {
           id: 1,
@@ -269,7 +269,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
           orderBy: { createdAt: 'desc' }, // Les commentaires triés par date décroissante
         },
       },
-      orderBy: { departureDate: 'asc' },
+      orderBy: { tripDate: 'asc' },
     })
   })
 
@@ -353,7 +353,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
           orderBy: { createdAt: 'desc' },
         },
       },
-      orderBy: { departureDate: 'asc' },
+      orderBy: { tripDate: 'asc' },
     })
   })
 })

@@ -258,6 +258,11 @@
     "departure_placeholder": "Місто або адреса відправлення",
     "details": "Деталі",
     "details_placeholder": "Корисна інформація про поїздку (багаж, місце зустрічі тощо)",
+    "direction": {
+      "from_event": "Повертатися з конвенту",
+      "label": "Напрямок подорожі",
+      "to_event": "Їхати на конвент"
+    },
     "from": "З",
     "music_allowed": "Музика дозволена",
     "offer": {
@@ -278,6 +283,7 @@
     },
     "route": "Маршрут",
     "select_date_time": "Виберіть дату і час",
+    "select_direction": "Виберіть напрямок",
     "smoking_allowed": "Куріння дозволено",
     "to": "До",
     "validation": {
@@ -285,6 +291,8 @@
       "date_invalid": "Недійсна дата",
       "date_required": "Потрібна дата відправлення",
       "departure_required": "Потрібне місто відправлення",
+      "direction_invalid": "Напрямок подорожі invalide",
+      "direction_required": "Напрямок подорожі обов'язковий",
       "seats_max": "Максимум 8 місць",
       "seats_min": "Щонайменше 1 місце"
     }

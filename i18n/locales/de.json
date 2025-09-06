@@ -258,6 +258,11 @@
     "departure_placeholder": "Abfahrtsstadt oder -adresse",
     "details": "Details",
     "details_placeholder": "Nützliche Infos zur Fahrt (Gepäck, Treffpunkt usw.)",
+    "direction": {
+      "from_event": "Rückfahrt von der Convention",
+      "label": "Fahrtrichtung",
+      "to_event": "Hinfahrt zur Convention"
+    },
     "from": "Von",
     "music_allowed": "Musik erlaubt",
     "offer": {
@@ -278,6 +283,7 @@
     },
     "route": "Route",
     "select_date_time": "Datum und Uhrzeit wählen",
+    "select_direction": "Richtung auswählen",
     "smoking_allowed": "Rauchen erlaubt",
     "to": "Nach",
     "validation": {
@@ -285,6 +291,8 @@
       "date_invalid": "Ungültiges Datum",
       "date_required": "Abfahrtsdatum ist erforderlich",
       "departure_required": "Abfahrtsstadt ist erforderlich",
+      "direction_invalid": "Ungültige Fahrtrichtung",
+      "direction_required": "Fahrtrichtung ist erforderlich",
       "seats_max": "Maximal 8 Plätze",
       "seats_min": "Mindestens 1 Platz"
     }

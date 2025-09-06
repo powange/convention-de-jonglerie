@@ -328,10 +328,10 @@ export const NotificationHelpers = {
     ownerName: string,
     offerId: number,
     seats: number,
-    departureCity: string,
-    departureDate: Date
+    locationCity: string,
+    tripDate: Date
   ) {
-    const dateStr = departureDate.toLocaleDateString('fr-FR', {
+    const dateStr = tripDate.toLocaleDateString('fr-FR', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -340,7 +340,7 @@ export const NotificationHelpers = {
       userId,
       type: 'SUCCESS',
       title: 'Demande de covoiturage acceptée ! ✅',
-      message: `${ownerName} a accepté votre demande de ${seats} place${seats > 1 ? 's' : ''} pour le trajet au départ de ${departureCity} le ${dateStr}.`,
+      message: `${ownerName} a accepté votre demande de ${seats} place${seats > 1 ? 's' : ''} pour le trajet au départ de ${locationCity} le ${dateStr}.`,
       category: 'carpool',
       entityType: 'CarpoolOffer',
       entityId: offerId.toString(),
@@ -357,13 +357,13 @@ export const NotificationHelpers = {
     ownerName: string,
     offerId: number,
     seats: number,
-    departureCity: string
+    locationCity: string
   ) {
     return await NotificationService.create({
       userId,
       type: 'WARNING',
       title: 'Demande de covoiturage refusée',
-      message: `${ownerName} a refusé votre demande de ${seats} place${seats > 1 ? 's' : ''} pour le trajet au départ de ${departureCity}.`,
+      message: `${ownerName} a refusé votre demande de ${seats} place${seats > 1 ? 's' : ''} pour le trajet au départ de ${locationCity}.`,
       category: 'carpool',
       entityType: 'CarpoolOffer',
       entityId: offerId.toString(),

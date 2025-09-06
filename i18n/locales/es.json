@@ -258,6 +258,11 @@
     "departure_placeholder": "Ciudad o dirección de salida",
     "details": "Detalles",
     "details_placeholder": "Información útil del viaje (equipaje, punto de encuentro, etc.)",
+    "direction": {
+      "from_event": "Volver de la convención",
+      "label": "Dirección del viaje",
+      "to_event": "Ir a la convención"
+    },
     "from": "Desde",
     "music_allowed": "Música permitida",
     "offer": {
@@ -278,6 +283,7 @@
     },
     "route": "Ruta",
     "select_date_time": "Seleccionar fecha y hora",
+    "select_direction": "Seleccionar una dirección",
     "smoking_allowed": "Se permite fumar",
     "to": "Hasta",
     "validation": {
@@ -285,6 +291,8 @@
       "date_invalid": "Fecha inválida",
       "date_required": "La fecha de salida es obligatoria",
       "departure_required": "La ciudad de salida es obligatoria",
+      "direction_invalid": "Dirección del viaje inválida",
+      "direction_required": "La dirección del viaje es obligatoria",
       "seats_max": "Máximo 8 plazas",
       "seats_min": "Al menos 1 plaza"
     }

@@ -258,6 +258,11 @@
     "departure_placeholder": "Город или адрес отправления",
     "details": "Детали",
     "details_placeholder": "Полезная информация о поездке (багаж, место встречи и т. д.)",
+    "direction": {
+      "from_event": "Возвращаться с конвента",
+      "label": "Направление поездки",
+      "to_event": "Ехать на конвент"
+    },
     "from": "Из",
     "music_allowed": "Музыка разрешена",
     "offer": {
@@ -278,6 +283,7 @@
     },
     "route": "Маршрут",
     "select_date_time": "Выберите дату и время",
+    "select_direction": "Выберите направление",
     "smoking_allowed": "Разрешено курение",
     "to": "В",
     "validation": {
@@ -285,6 +291,8 @@
       "date_invalid": "Недействительная дата",
       "date_required": "Требуется дата отправления",
       "departure_required": "Требуется город отправления",
+      "direction_invalid": "Направление поездки invalide",
+      "direction_required": "Направление поездки обязательно",
       "seats_max": "Максимум 8 мест",
       "seats_min": "Как минимум 1 место"
     }

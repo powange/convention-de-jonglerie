@@ -25,9 +25,9 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
   it('devrait créer une offre de covoiturage avec succès', async () => {
     const requestBody = {
-      departureDate: '2024-07-15T08:00:00.000Z',
-      departureCity: 'Paris',
-      departureAddress: '123 Rue de la Paix',
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Paris',
+      locationAddress: '123 Rue de la Paix',
       availableSeats: 3,
       description: 'Voyage sympa vers la convention',
       phoneNumber: '0123456789',
@@ -44,9 +44,9 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
       id: 1,
       editionId: 1,
       userId: 1,
-      departureDate: new Date(requestBody.departureDate),
-      departureCity: requestBody.departureCity,
-      departureAddress: requestBody.departureAddress,
+      tripDate: new Date(requestBody.tripDate),
+      locationCity: requestBody.locationCity,
+      locationAddress: requestBody.locationAddress,
       availableSeats: requestBody.availableSeats,
       description: requestBody.description,
       phoneNumber: requestBody.phoneNumber,
@@ -73,9 +73,9 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
       data: {
         editionId: 1,
         userId: 1,
-        departureDate: new Date(requestBody.departureDate),
-        departureCity: requestBody.departureCity,
-        departureAddress: requestBody.departureAddress,
+        tripDate: new Date(requestBody.tripDate),
+        locationCity: requestBody.locationCity,
+        locationAddress: requestBody.locationAddress,
         availableSeats: requestBody.availableSeats,
         description: requestBody.description,
         phoneNumber: requestBody.phoneNumber,
@@ -113,10 +113,10 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
     await expect(handler(eventWithBadId as any)).rejects.toThrow('Edition ID invalide')
   })
 
-  it('devrait valider les données obligatoires - departureDate manquante', async () => {
+  it('devrait valider les données obligatoires - tripDate manquante', async () => {
     const incompleteBody = {
-      departureCity: 'Paris',
-      departureAddress: '123 Rue de la Paix',
+      locationCity: 'Paris',
+      locationAddress: '123 Rue de la Paix',
       availableSeats: 3,
     }
 
@@ -125,10 +125,10 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
     await expect(handler(mockEvent as any)).rejects.toThrow('Données manquantes')
   })
 
-  it('devrait valider les données obligatoires - departureCity manquante', async () => {
+  it('devrait valider les données obligatoires - locationCity manquante', async () => {
     const incompleteBody = {
-      departureDate: '2024-07-15T08:00:00.000Z',
-      departureAddress: '123 Rue de la Paix',
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationAddress: '123 Rue de la Paix',
       availableSeats: 3,
     }
 
@@ -137,10 +137,10 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
     await expect(handler(mockEvent as any)).rejects.toThrow('Données manquantes')
   })
 
-  it('devrait valider les données obligatoires - departureAddress manquante', async () => {
+  it('devrait valider les données obligatoires - locationAddress manquante', async () => {
     const incompleteBody = {
-      departureDate: '2024-07-15T08:00:00.000Z',
-      departureCity: 'Paris',
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Paris',
       availableSeats: 3,
     }
 
@@ -151,9 +151,9 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
   it('devrait valider les données obligatoires - availableSeats manquant', async () => {
     const incompleteBody = {
-      departureDate: '2024-07-15T08:00:00.000Z',
-      departureCity: 'Paris',
-      departureAddress: '123 Rue de la Paix',
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Paris',
+      locationAddress: '123 Rue de la Paix',
     }
 
     global.readBody.mockResolvedValue(incompleteBody)
@@ -163,9 +163,9 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
   it('devrait rejeter si édition non trouvée', async () => {
     const requestBody = {
-      departureDate: '2024-07-15T08:00:00.000Z',
-      departureCity: 'Paris',
-      departureAddress: '123 Rue de la Paix',
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Paris',
+      locationAddress: '123 Rue de la Paix',
       availableSeats: 3,
     }
 
@@ -177,9 +177,9 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
   it('devrait gérer les erreurs de base de données', async () => {
     const requestBody = {
-      departureDate: '2024-07-15T08:00:00.000Z',
-      departureCity: 'Paris',
-      departureAddress: '123 Rue de la Paix',
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Paris',
+      locationAddress: '123 Rue de la Paix',
       availableSeats: 3,
     }
 
@@ -191,9 +191,9 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
   it('devrait créer une offre avec données optionnelles null', async () => {
     const requestBodyMinimal = {
-      departureDate: '2024-07-15T08:00:00.000Z',
-      departureCity: 'Paris',
-      departureAddress: '123 Rue de la Paix',
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Paris',
+      locationAddress: '123 Rue de la Paix',
       availableSeats: 2,
       // description et phoneNumber omis
     }
@@ -204,7 +204,7 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
       editionId: 1,
       userId: 1,
       ...requestBodyMinimal,
-      departureDate: new Date(requestBodyMinimal.departureDate),
+      tripDate: new Date(requestBodyMinimal.tripDate),
       description: undefined,
       phoneNumber: undefined,
       user: { id: 1, pseudo: 'testuser', prenom: 'Test', nom: 'User' },
@@ -229,9 +229,9 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
 
   it('devrait convertir availableSeats en entier', async () => {
     const requestBody = {
-      departureDate: '2024-07-15T08:00:00.000Z',
-      departureCity: 'Paris',
-      departureAddress: '123 Rue de la Paix',
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Paris',
+      locationAddress: '123 Rue de la Paix',
       availableSeats: '4', // String au lieu d'entier
     }
 

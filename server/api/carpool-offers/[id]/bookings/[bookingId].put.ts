@@ -84,8 +84,8 @@ export default defineEventHandler(async (event) => {
           ownerName,
           offerId,
           booking.seats,
-          offer.departureCity,
-          offer.departureDate
+          offer.locationCity,
+          offer.tripDate
         )
       } else if (action === 'REJECT') {
         await NotificationHelpers.carpoolBookingRejected(
@@ -93,7 +93,7 @@ export default defineEventHandler(async (event) => {
           ownerName,
           offerId,
           booking.seats,
-          offer.departureCity
+          offer.locationCity
         )
       }
     } catch (error) {

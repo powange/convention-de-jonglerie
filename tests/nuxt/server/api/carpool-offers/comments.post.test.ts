@@ -32,8 +32,8 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
       id: 1,
       editionId: 1,
       userId: 2,
-      departureDate: new Date('2024-07-15'),
-      departureCity: 'Paris',
+      tripDate: new Date('2024-07-15'),
+      locationCity: 'Paris',
     }
 
     const mockComment = {

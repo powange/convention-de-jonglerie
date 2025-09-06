@@ -3,8 +3,8 @@ import { z } from 'zod'
 import { prisma } from '../../utils/prisma'
 
 const updateCarpoolRequestSchema = z.object({
-  departureDate: z.string().optional(),
-  departureCity: z.string().min(1, 'La ville de départ est requise').optional(),
+  tripDate: z.string().optional(),
+  locationCity: z.string().min(1, 'La ville de départ est requise').optional(),
   seatsNeeded: z
     .number()
     .int()
@@ -67,11 +67,11 @@ export default defineEventHandler(async (event) => {
     // Préparer les données à mettre à jour
     const updateData: any = {}
 
-    if (validatedData.departureDate) {
-      updateData.departureDate = new Date(validatedData.departureDate)
+    if (validatedData.tripDate) {
+      updateData.tripDate = new Date(validatedData.tripDate)
     }
-    if (validatedData.departureCity) {
-      updateData.departureCity = validatedData.departureCity.trim()
+    if (validatedData.locationCity) {
+      updateData.locationCity = validatedData.locationCity.trim()
     }
     if (validatedData.seatsNeeded !== undefined) {
       updateData.seatsNeeded = validatedData.seatsNeeded

@@ -43,11 +43,26 @@
           <div class="text-sm">
             <div class="flex items-center gap-1 justify-end mb-1">
               <UIcon name="i-heroicons-calendar" class="text-gray-400 w-4 h-4" />
-              <span class="font-medium">{{ formatDate(request.departureDate) }}</span>
+              <span class="font-medium">{{ formatDate(request.tripDate) }}</span>
+            </div>
+            <div class="flex items-center gap-1 justify-end mb-1">
+              <UIcon name="i-heroicons-map-pin" class="text-gray-400 w-4 h-4" />
+              <span class="font-medium">{{ request.locationCity }}</span>
             </div>
             <div class="flex items-center gap-1 justify-end">
-              <UIcon name="i-heroicons-map-pin" class="text-gray-400 w-4 h-4" />
-              <span class="font-medium">{{ request.departureCity }}</span>
+              <UIcon
+                :name="
+                  request.direction === 'TO_EVENT'
+                    ? 'i-heroicons-arrow-right'
+                    : 'i-heroicons-arrow-left'
+                "
+                class="text-gray-400 w-4 h-4"
+              />
+              <span class="text-sm font-medium">{{
+                request.direction === 'TO_EVENT'
+                  ? $t('carpool.direction.to_event')
+                  : $t('carpool.direction.from_event')
+              }}</span>
             </div>
           </div>
         </div>
@@ -103,9 +118,10 @@ import CarpoolCommentsModal from './CarpoolCommentsModal.vue'
 
 interface CarpoolRequest {
   id: number
-  departureDate: string
-  departureCity: string
+  tripDate: string
+  locationCity: string
   seatsNeeded: number
+  direction: 'TO_EVENT' | 'FROM_EVENT'
   description?: string
   phoneNumber?: string
   createdAt: string

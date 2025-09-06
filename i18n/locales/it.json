@@ -258,6 +258,11 @@
     "departure_placeholder": "Città o indirizzo di partenza",
     "details": "Dettagli",
     "details_placeholder": "Informazioni utili sul viaggio (bagagli, punto d'incontro, ecc.)",
+    "direction": {
+      "from_event": "Tornare dalla convention",
+      "label": "Direzione del viaggio",
+      "to_event": "Andare alla convention"
+    },
     "from": "Da",
     "music_allowed": "Musica consentita",
     "offer": {
@@ -278,6 +283,7 @@
     },
     "route": "Percorso",
     "select_date_time": "Seleziona data e ora",
+    "select_direction": "Seleziona una direzione",
     "smoking_allowed": "Fumo consentito",
     "to": "A",
     "validation": {
@@ -285,6 +291,8 @@
       "date_invalid": "Data non valida",
       "date_required": "La data di partenza è obbligatoria",
       "departure_required": "La città di partenza è obbligatoria",
+      "direction_invalid": "Direzione del viaggio non valida",
+      "direction_required": "La direzione del viaggio è richiesta",
       "seats_max": "Massimo 8 posti",
       "seats_min": "Almeno 1 posto"
     }

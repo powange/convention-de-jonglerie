@@ -1,11 +1,14 @@
 export type CarpoolType = 'offer' | 'request'
 
+export type CarpoolDirection = 'TO_EVENT' | 'FROM_EVENT'
+
 export interface CarpoolFormData {
-  departureDate: string
-  departureCity: string
-  departureAddress?: string // Uniquement pour les offres
+  tripDate: string
+  locationCity: string
+  locationAddress?: string // Uniquement pour les offres
   availableSeats?: number // Uniquement pour les offres
   seatsNeeded?: number // Uniquement pour les demandes
+  direction: CarpoolDirection
   phoneNumber: string
   description: string
 }
@@ -35,17 +38,19 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
     const baseData =
       config.type === 'offer'
         ? {
-            departureDate: '',
-            departureCity: '',
-            departureAddress: '',
+            tripDate: '',
+            locationCity: '',
+            locationAddress: '',
             availableSeats: 1,
+            direction: 'TO_EVENT' as CarpoolDirection,
             phoneNumber: '',
             description: '',
           }
         : {
-            departureDate: '',
-            departureCity: '',
+            tripDate: '',
+            locationCity: '',
             seatsNeeded: 1,
+            direction: 'TO_EVENT' as CarpoolDirection,
             phoneNumber: '',
             description: '',
           }
@@ -59,8 +64,8 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
         }
       })
       // Formater la date pour l'input datetime-local
-      if (config.initialData.departureDate) {
-        data.departureDate = new Date(config.initialData.departureDate).toISOString().slice(0, 16)
+      if (config.initialData.tripDate) {
+        data.tripDate = new Date(config.initialData.tripDate).toISOString().slice(0, 16)
       }
       return data
     }
@@ -79,9 +84,9 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
   }
 
   const trimAllTextFields = () => {
-    trimField('departureCity')
+    trimField('locationCity')
     if (config.type === 'offer') {
-      trimField('departureAddress')
+      trimField('locationAddress')
     }
     trimField('phoneNumber')
     trimField('description')
@@ -91,18 +96,18 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
   const validate = (state: CarpoolFormData) => {
     const errors = []
 
-    if (!state.departureDate) {
+    if (!state.tripDate) {
       const message =
         config.type === 'offer'
           ? t('errors.departure_date_required')
           : t('errors.desired_date_required')
-      errors.push({ path: 'departureDate', message })
+      errors.push({ path: 'tripDate', message })
     }
 
-    if (!state.departureCity) {
-      errors.push({ path: 'departureCity', message: t('errors.departure_city_required') })
-    } else if (state.departureCity.length > 100) {
-      errors.push({ path: 'departureCity', message: t('errors.city_too_long', { max: 100 }) })
+    if (!state.locationCity) {
+      errors.push({ path: 'locationCity', message: t('errors.departure_city_required') })
+    } else if (state.locationCity.length > 100) {
+      errors.push({ path: 'locationCity', message: t('errors.city_too_long', { max: 100 }) })
     }
 
     // Validation du numéro de téléphone
@@ -117,11 +122,11 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
 
     // Validation spécifique aux offres
     if (config.type === 'offer') {
-      if (!state.departureAddress) {
-        errors.push({ path: 'departureAddress', message: t('errors.departure_address_required') })
-      } else if (state.departureAddress.length > 200) {
+      if (!state.locationAddress) {
+        errors.push({ path: 'locationAddress', message: t('errors.departure_address_required') })
+      } else if (state.locationAddress.length > 200) {
         errors.push({
-          path: 'departureAddress',
+          path: 'locationAddress',
           message: t('errors.address_too_long', { max: 200 }),
         })
       }
@@ -149,18 +154,20 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
   const resetForm = () => {
     if (config.type === 'offer') {
       Object.assign(form, {
-        departureDate: '',
-        departureCity: '',
-        departureAddress: '',
+        tripDate: '',
+        locationCity: '',
+        locationAddress: '',
         availableSeats: 1,
+        direction: 'TO_EVENT' as CarpoolDirection,
         phoneNumber: '',
         description: '',
       })
     } else {
       Object.assign(form, {
-        departureDate: '',
-        departureCity: '',
+        tripDate: '',
+        locationCity: '',
         seatsNeeded: 1,
+        direction: 'TO_EVENT' as CarpoolDirection,
         phoneNumber: '',
         description: '',
       })

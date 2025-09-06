@@ -296,9 +296,9 @@ describe('Validation Schemas', () => {
     describe('carpoolOfferSchema', () => {
       it('devrait valider une offre de covoiturage valide', () => {
         const validOffer = {
-          departureCity: 'Paris',
-          departureAddress: '123 rue de la Gare',
-          departureDate: '2024-06-01T10:00:00Z',
+          locationCity: 'Paris',
+          locationAddress: '123 rue de la Gare',
+          tripDate: '2024-06-01T10:00:00Z',
           availableSeats: 3,
         }
 
@@ -307,9 +307,9 @@ describe('Validation Schemas', () => {
 
       it('devrait valider avec champs optionnels', () => {
         const fullOffer = {
-          departureCity: 'Paris',
-          departureAddress: '123 rue de la Gare',
-          departureDate: '2024-06-01T10:00:00Z',
+          locationCity: 'Paris',
+          locationAddress: '123 rue de la Gare',
+          tripDate: '2024-06-01T10:00:00Z',
           availableSeats: 3,
           description: 'Départ depuis la gare',
           phoneNumber: '0612345678',
@@ -320,9 +320,9 @@ describe('Validation Schemas', () => {
 
       it('devrait rejeter avec des sièges invalides', () => {
         const invalidSeats = {
-          departureCity: 'Paris',
-          departureAddress: '123 rue de la Gare',
-          departureDate: '2024-06-01T10:00:00Z',
+          locationCity: 'Paris',
+          locationAddress: '123 rue de la Gare',
+          tripDate: '2024-06-01T10:00:00Z',
           availableSeats: 0, // Minimum 1
         }
 
@@ -336,8 +336,8 @@ describe('Validation Schemas', () => {
     describe('carpoolRequestSchema', () => {
       it('devrait valider une demande de covoiturage valide', () => {
         const validRequest = {
-          departureCity: 'Lyon',
-          departureDate: '2024-06-01',
+          locationCity: 'Lyon',
+          tripDate: '2024-06-01',
         }
 
         const parsed = schemas.carpoolRequestSchema.parse(validRequest)
@@ -346,8 +346,8 @@ describe('Validation Schemas', () => {
 
       it('devrait valider avec tous les champs', () => {
         const fullRequest = {
-          departureCity: 'Lyon',
-          departureDate: '2024-06-01',
+          locationCity: 'Lyon',
+          tripDate: '2024-06-01',
           seatsNeeded: 2,
           description: 'Recherche covoiturage',
           phoneNumber: '+33612345678',

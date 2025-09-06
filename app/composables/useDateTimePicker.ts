@@ -17,7 +17,7 @@ export const useDateTimePicker = (options: UseDateTimePickerOptions = {}) => {
 
   // Variables réactives avec watcher pour protection
   const calendarDate = ref<Date | null>(null)
-  const selectedTime = ref('')
+  const selectedTime = ref<string | undefined>(undefined)
   const combinedDateTime = ref(initialValue || '')
 
   // Watcher défensif pour calendarDate
@@ -72,24 +72,38 @@ export const useDateTimePicker = (options: UseDateTimePickerOptions = {}) => {
     if (
       calendarDate.value &&
       calendarDate.value instanceof Date &&
-      !isNaN(calendarDate.value.getTime()) &&
-      selectedTime.value
+      !isNaN(calendarDate.value.getTime())
     ) {
-      const [hours, minutes] = selectedTime.value.split(':')
+      if (selectedTime.value) {
+        const [hours, minutes] = selectedTime.value.split(':')
 
-      // Créer un format datetime-local en évitant les conversions UTC
-      const year = calendarDate.value.getFullYear().toString().padStart(4, '0')
-      const month = (calendarDate.value.getMonth() + 1).toString().padStart(2, '0')
-      const day = calendarDate.value.getDate().toString().padStart(2, '0')
-      const hoursStr = hours.padStart(2, '0')
-      const minutesStr = minutes.padStart(2, '0')
-      const isoString = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`
+        // Créer un format datetime-local en évitant les conversions UTC
+        const year = calendarDate.value.getFullYear().toString().padStart(4, '0')
+        const month = (calendarDate.value.getMonth() + 1).toString().padStart(2, '0')
+        const day = calendarDate.value.getDate().toString().padStart(2, '0')
+        const hoursStr = hours.padStart(2, '0')
+        const minutesStr = minutes.padStart(2, '0')
+        const isoString = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`
 
-      combinedDateTime.value = isoString
+        combinedDateTime.value = isoString
 
-      // Appeler le callback si fourni
-      if (onChange) {
-        onChange(isoString)
+        // Appeler le callback si fourni
+        if (onChange) {
+          onChange(isoString)
+        }
+      } else {
+        // Si pas d'heure sélectionnée, créer une date sans heure (00:00)
+        const year = calendarDate.value.getFullYear().toString().padStart(4, '0')
+        const month = (calendarDate.value.getMonth() + 1).toString().padStart(2, '0')
+        const day = calendarDate.value.getDate().toString().padStart(2, '0')
+        const isoString = `${year}-${month}-${day}T00:00`
+
+        combinedDateTime.value = isoString
+
+        // Appeler le callback si fourni
+        if (onChange) {
+          onChange(isoString)
+        }
       }
     }
   }
@@ -98,7 +112,7 @@ export const useDateTimePicker = (options: UseDateTimePickerOptions = {}) => {
   const setValue = (isoString: string) => {
     if (!isoString) {
       calendarDate.value = null
-      selectedTime.value = ''
+      selectedTime.value = undefined
       combinedDateTime.value = ''
       return
     }

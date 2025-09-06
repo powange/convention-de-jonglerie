@@ -1,4 +1,5 @@
 import { prisma } from '../../../utils/prisma'
+import { carpoolRequestSchema } from '../../../utils/validation-schemas'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
@@ -19,13 +20,17 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Validation des données
-  if (!body.departureDate || !body.departureCity) {
+  // Validation des données avec Zod
+  const validationResult = carpoolRequestSchema.safeParse(body)
+  if (!validationResult.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Données manquantes',
+      statusMessage: 'Données invalides',
+      data: validationResult.error.flatten(),
     })
   }
+
+  const validatedData = validationResult.data
 
   try {
     // Vérifier que l'édition existe
@@ -45,11 +50,12 @@ export default defineEventHandler(async (event) => {
       data: {
         editionId,
         userId: event.context.user.id,
-        departureDate: new Date(body.departureDate),
-        departureCity: body.departureCity,
-        seatsNeeded: body.seatsNeeded || 1,
-        description: body.description,
-        phoneNumber: body.phoneNumber,
+        tripDate: new Date(validatedData.tripDate),
+        locationCity: validatedData.locationCity,
+        seatsNeeded: validatedData.seatsNeeded,
+        direction: validatedData.direction,
+        description: validatedData.description,
+        phoneNumber: validatedData.phoneNumber,
       },
       include: {
         user: {

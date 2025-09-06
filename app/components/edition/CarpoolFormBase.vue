@@ -1,91 +1,135 @@
 <template>
   <div class="space-y-6">
-    <h2 class="text-xl font-semibold">
-      {{ formType === 'offer' ? $t('carpool.offer.create') : $t('carpool.request.create') }}
-    </h2>
-
     <UForm :state="form" :schema="schema" @submit="onSubmit">
       <!-- Section Trajet -->
-      <div class="space-y-4">
-        <h3 class="text-lg font-medium">{{ $t('carpool.route') }}</h3>
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-lg font-medium flex items-center gap-2 mb-4">
+            <UIcon name="i-heroicons-map" class="text-primary-500" />
+            {{ $t('carpool.route') }}
+          </h3>
 
-        <div class="grid gap-4 md:grid-cols-2">
-          <UFormGroup :label="$t('carpool.from')" name="departure" :required="true">
+          <!-- Direction du trajet avec description -->
+          <UFormField
+            :label="$t('carpool.direction.label')"
+            name="direction"
+            :required="true"
+            :description="$t('carpool.direction.description')"
+          >
+            <USelect
+              v-model="form.direction"
+              :items="directionOptions"
+              :placeholder="$t('carpool.select_direction')"
+              color="primary"
+              size="lg"
+              class="w-full"
+            >
+              <template #leading>
+                <UIcon
+                  :name="
+                    form.direction === 'TO_EVENT'
+                      ? 'i-heroicons-arrow-right'
+                      : 'i-heroicons-arrow-left'
+                  "
+                  class="text-primary-500"
+                />
+              </template>
+            </USelect>
+          </UFormField>
+        </div>
+
+        <!-- Section Localisation -->
+        <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg space-y-4">
+          <h4 class="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <UIcon name="i-heroicons-map-pin" class="text-primary-500" />
+            {{ locationLabels.sectionTitle }}
+          </h4>
+
+          <!-- Ville de départ/arrivée -->
+          <UFormField
+            :label="locationLabels.cityLabel"
+            name="locationCity"
+            :required="true"
+            :description="locationLabels.cityHint"
+          >
             <div class="relative">
               <UInput
-                v-model="form.departure"
-                :placeholder="$t('carpool.departure_placeholder')"
+                v-model="form.locationCity"
+                :placeholder="locationLabels.cityPlaceholder"
                 icon="i-heroicons-map-pin"
-                @input="fetchSuggestions('departure', $event)"
+                size="lg"
+                class="w-full"
               />
               <div
                 v-if="showDepartureSuggestions && departureSuggestions.length > 0"
-                class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto"
               >
                 <button
                   v-for="suggestion in departureSuggestions"
                   :key="suggestion.id"
                   type="button"
-                  class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  @click="selectSuggestion('departure', suggestion)"
+                  class="w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                  @click="selectSuggestion('locationCity', suggestion)"
                 >
-                  <div class="font-medium">{{ suggestion.name }}</div>
-                  <div class="text-sm text-gray-500">
+                  <div class="font-medium text-gray-900 dark:text-gray-100">
+                    {{ suggestion.name }}
+                  </div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">
                     {{ suggestion.city }}, {{ suggestion.country }}
                   </div>
                 </button>
               </div>
             </div>
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup :label="$t('carpool.to')" name="arrival" :required="true">
-            <div class="relative">
-              <UInput
-                v-model="form.arrival"
-                :placeholder="$t('carpool.arrival_placeholder')"
-                icon="i-heroicons-flag"
-                @input="fetchSuggestions('arrival', $event)"
-              />
-              <div
-                v-if="showArrivalSuggestions && arrivalSuggestions.length > 0"
-                class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto"
-              >
-                <button
-                  v-for="suggestion in arrivalSuggestions"
-                  :key="suggestion.id"
-                  type="button"
-                  class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  @click="selectSuggestion('arrival', suggestion)"
-                >
-                  <div class="font-medium">{{ suggestion.name }}</div>
-                  <div class="text-sm text-gray-500">
-                    {{ suggestion.city }}, {{ suggestion.country }}
-                  </div>
-                </button>
-              </div>
-            </div>
-          </UFormGroup>
+          <!-- Adresse précise (pour les offres seulement) -->
+          <UFormField
+            v-if="formType === 'offer'"
+            :label="locationLabels.addressLabel"
+            name="locationAddress"
+            :required="true"
+            :description="locationLabels.addressDescription"
+          >
+            <UInput
+              v-model="form.locationAddress"
+              :placeholder="locationLabels.addressPlaceholder"
+              icon="i-heroicons-home"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
         </div>
 
-        <!-- Date et Heure -->
-        <div class="grid gap-4 md:grid-cols-2">
-          <UFormGroup
+        <!-- Section Détails du voyage -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg space-y-4">
+          <h4 class="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <UIcon name="i-heroicons-clock" class="text-primary-500" />
+            {{ $t('carpool.trip_details') }}
+          </h4>
+
+          <!-- Date et heure de départ -->
+          <UFormField
             :label="$t('components.carpool.departure_date_time')"
-            name="departureDate"
+            name="tripDate"
             :required="true"
+            :description="$t('carpool.departure_date_description')"
           >
             <DateTimePicker
-              v-model="form.departureDate"
+              v-model="form.tripDate"
               :min-date="new Date()"
               :placeholder="$t('carpool.select_date_time')"
+              size="lg"
             />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup
+          <!-- Nombre de places pour les offres (sur ligne séparée) -->
+          <UFormField
             v-if="formType === 'offer'"
             :label="$t('carpool.offer.available_seats')"
             name="availableSeats"
             :required="true"
+            :description="$t('carpool.offer.seats_description')"
+            class="mt-4"
           >
             <UInput
               v-model.number="form.availableSeats"
@@ -94,77 +138,155 @@
               max="8"
               :placeholder="$t('carpool.offer.seats_placeholder')"
               icon="i-heroicons-user-group"
+              size="lg"
+              class="max-w-xs"
             />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup
-            v-else
+          <!-- Nombre de places pour les demandes (sur ligne séparée) -->
+          <UFormField
+            v-if="formType === 'request'"
             :label="$t('carpool.request.required_seats')"
-            name="requiredSeats"
+            name="seatsNeeded"
             :required="true"
+            :description="$t('carpool.request.seats_description')"
+            class="mt-4"
           >
             <UInput
-              v-model.number="form.requiredSeats"
+              v-model.number="form.seatsNeeded"
               type="number"
               min="1"
               max="8"
               :placeholder="$t('carpool.request.seats_placeholder')"
               icon="i-heroicons-user-group"
+              size="lg"
+              class="max-w-xs"
             />
-          </UFormGroup>
+          </UFormField>
         </div>
 
-        <!-- Prix (pour les offres) -->
-        <UFormGroup
-          v-if="formType === 'offer'"
-          :label="$t('carpool.offer.price_per_seat')"
-          name="pricePerSeat"
-        >
-          <UInput
-            v-model.number="form.pricePerSeat"
-            type="number"
-            min="0"
-            step="0.01"
-            :placeholder="$t('carpool.offer.price_placeholder')"
-            icon="i-heroicons-currency-euro"
-          />
-        </UFormGroup>
-
-        <!-- Description -->
-        <UFormGroup :label="$t('carpool.details')" name="description">
-          <UTextarea
-            v-model="form.description"
-            :placeholder="$t('carpool.details_placeholder')"
-            :rows="4"
-          />
-        </UFormGroup>
-
-        <!-- Options supplémentaires -->
-        <div class="space-y-3">
-          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {{ $t('carpool.options') }}
+        <!-- Section Prix et Contact -->
+        <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg space-y-4">
+          <h4 class="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <UIcon name="i-heroicons-currency-euro" class="text-primary-500" />
+            {{ $t('carpool.pricing_contact') }}
           </h4>
 
-          <UCheckbox v-model="form.smokingAllowed" :label="$t('carpool.smoking_allowed')" />
-
-          <UCheckbox v-model="form.petsAllowed" :label="$t('carpool.pets_allowed')" />
-
-          <UCheckbox
+          <!-- Prix (pour les offres) -->
+          <UFormField
             v-if="formType === 'offer'"
-            v-model="form.musicAllowed"
-            :label="$t('carpool.music_allowed')"
-          />
+            :label="$t('carpool.offer.price_per_seat')"
+            name="pricePerSeat"
+            :description="$t('carpool.offer.price_description')"
+          >
+            <UInput
+              v-model.number="form.pricePerSeat"
+              type="number"
+              min="0"
+              step="0.01"
+              :placeholder="$t('carpool.offer.price_placeholder')"
+              icon="i-heroicons-currency-euro"
+              size="lg"
+              class="max-w-xs"
+            />
+          </UFormField>
+
+          <!-- Numéro de téléphone (pleine largeur) -->
+          <UFormField
+            :label="$t('carpool.phone_number')"
+            name="phoneNumber"
+            :description="$t('carpool.phone_description')"
+          >
+            <UInput
+              v-model="form.phoneNumber"
+              :placeholder="$t('carpool.phone_placeholder')"
+              icon="i-heroicons-phone"
+              type="tel"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+        </div>
+
+        <!-- Options supplémentaires -->
+        <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+          <h4 class="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-4">
+            <UIcon name="i-heroicons-adjustments-horizontal" class="text-primary-500" />
+            {{ $t('carpool.preferences') }}
+          </h4>
+
+          <div class="space-y-3">
+            <USwitch
+              v-model="form.smokingAllowed"
+              :label="$t('carpool.smoking_allowed')"
+              :description="$t('carpool.smoking_description')"
+              size="lg"
+            />
+
+            <USwitch
+              v-model="form.petsAllowed"
+              :label="$t('carpool.pets_allowed')"
+              :description="$t('carpool.pets_description')"
+              size="lg"
+            />
+
+            <USwitch
+              v-if="formType === 'offer'"
+              v-model="form.musicAllowed"
+              :label="$t('carpool.music_allowed')"
+              :description="$t('carpool.music_description')"
+              size="lg"
+            />
+          </div>
+        </div>
+
+        <!-- Description / Détails (en pleine largeur à la fin) -->
+        <div class="space-y-2">
+          <UFormField
+            :label="$t('carpool.details')"
+            name="description"
+            :description="$t('carpool.details_description')"
+          >
+            <UTextarea
+              v-model="form.description"
+              :placeholder="$t('carpool.details_placeholder')"
+              :rows="4"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
         </div>
 
         <!-- Boutons -->
-        <div class="flex justify-end gap-4 pt-4">
-          <UButton type="button" color="gray" variant="ghost" @click="$emit('cancel')">
-            {{ $t('common.cancel') }}
-          </UButton>
+        <div
+          class="flex justify-between items-center gap-4 pt-6 border-t border-gray-200 dark:border-gray-700"
+        >
+          <div class="text-sm text-gray-500 dark:text-gray-400">
+            <UIcon name="i-heroicons-information-circle" class="inline mr-1" />
+            {{ $t('carpool.form_help_text') }}
+          </div>
 
-          <UButton type="submit" :loading="loading" :disabled="!isFormValid">
-            {{ $t('common.create') }}
-          </UButton>
+          <div class="flex gap-3">
+            <UButton
+              type="button"
+              color="neutral"
+              variant="ghost"
+              size="lg"
+              @click="$emit('cancel')"
+            >
+              {{ $t('common.cancel') }}
+            </UButton>
+
+            <UButton
+              type="submit"
+              :loading="loading"
+              :disabled="!isFormValid"
+              size="lg"
+              icon="i-heroicons-paper-airplane"
+            >
+              {{ loading ? $t('common.creating') : $t('common.create') }}
+            </UButton>
+          </div>
         </div>
       </div>
     </UForm>
@@ -172,6 +294,7 @@
 </template>
 
 <script setup lang="ts">
+import { watch } from 'vue'
 import { z } from 'zod'
 
 import DateTimePicker from '~/components/ui/DateTimePicker.vue'
@@ -187,40 +310,82 @@ const emit = defineEmits(['submit', 'cancel'])
 
 const { $api } = useNuxtApp()
 const toast = useToast()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 // État du formulaire
 const loading = ref(false)
 const form = reactive({
-  departure: props.initialData?.departure || '',
+  locationCity: props.initialData?.locationCity || '',
+  locationAddress: props.initialData?.locationAddress || '',
   departureCoordinates: props.initialData?.departureCoordinates || null,
-  arrival: props.initialData?.arrival || '',
-  arrivalCoordinates: props.initialData?.arrivalCoordinates || null,
-  departureDate: props.initialData?.departureDate || null,
+  tripDate: props.initialData?.tripDate || null,
+  direction: props.initialData?.direction || 'TO_EVENT',
   availableSeats: props.initialData?.availableSeats || (props.formType === 'offer' ? 1 : undefined),
-  requiredSeats: props.initialData?.requiredSeats || (props.formType === 'request' ? 1 : undefined),
+  seatsNeeded: props.initialData?.seatsNeeded || (props.formType === 'request' ? 1 : undefined),
   pricePerSeat: props.initialData?.pricePerSeat || null,
   description: props.initialData?.description || '',
+  phoneNumber: props.initialData?.phoneNumber || '',
   smokingAllowed: props.initialData?.smokingAllowed || false,
   petsAllowed: props.initialData?.petsAllowed || false,
   musicAllowed: props.initialData?.musicAllowed || false,
 })
 
+// Options pour la direction du trajet
+const directionOptions = computed(() => [
+  {
+    value: 'TO_EVENT',
+    label: t('carpool.direction.to_event'),
+  },
+  {
+    value: 'FROM_EVENT',
+    label: t('carpool.direction.from_event'),
+  },
+])
+
+// Labels dynamiques selon la direction
+const locationLabels = computed(() => {
+  const isToEvent = form.direction === 'TO_EVENT'
+  return {
+    sectionTitle:
+      props.formType === 'offer'
+        ? isToEvent
+          ? t('carpool.pickup_location')
+          : t('carpool.meeting_location')
+        : isToEvent
+          ? t('carpool.departure_location')
+          : t('carpool.dropoff_location'),
+    cityLabel: isToEvent ? t('carpool.departure_city') : t('carpool.arrival_city'),
+    cityHint: isToEvent ? t('carpool.departure_city_hint') : t('carpool.arrival_city_hint'),
+    cityPlaceholder: isToEvent
+      ? t('carpool.departure_city_placeholder')
+      : t('carpool.arrival_city_placeholder'),
+    addressLabel: isToEvent ? t('carpool.departure_address') : t('carpool.arrival_address'),
+    addressDescription: isToEvent
+      ? t('carpool.departure_address_description')
+      : t('carpool.arrival_address_description'),
+    addressPlaceholder: isToEvent
+      ? t('carpool.departure_address_placeholder')
+      : t('carpool.arrival_address_placeholder'),
+  }
+})
+
 // Suggestions d'adresses
 const departureSuggestions = ref<any[]>([])
-const arrivalSuggestions = ref<any[]>([])
 const showDepartureSuggestions = ref(false)
-const showArrivalSuggestions = ref(false)
 
 // Schéma de validation
 const baseSchema = z.object({
-  departure: z.string().min(1, t('carpool.validation.departure_required')),
-  arrival: z.string().min(1, t('carpool.validation.arrival_required')),
-  departureDate: z.date({
+  locationCity: z.string().min(1, t('carpool.validation.departure_city_required')),
+  tripDate: z.date({
     required_error: t('carpool.validation.date_required'),
     invalid_type_error: t('carpool.validation.date_invalid'),
   }),
+  direction: z.enum(['TO_EVENT', 'FROM_EVENT'], {
+    required_error: t('carpool.validation.direction_required'),
+    invalid_type_error: t('carpool.validation.direction_invalid'),
+  }),
   description: z.string().optional(),
+  phoneNumber: z.string().optional(),
   smokingAllowed: z.boolean().optional(),
   petsAllowed: z.boolean().optional(),
 })
@@ -228,6 +393,7 @@ const baseSchema = z.object({
 const schema = computed(() => {
   if (props.formType === 'offer') {
     return baseSchema.extend({
+      locationAddress: z.string().min(1, t('carpool.validation.departure_address_required')),
       availableSeats: z
         .number()
         .min(1, t('carpool.validation.seats_min'))
@@ -237,7 +403,7 @@ const schema = computed(() => {
     })
   } else {
     return baseSchema.extend({
-      requiredSeats: z
+      seatsNeeded: z
         .number()
         .min(1, t('carpool.validation.seats_min'))
         .max(8, t('carpool.validation.seats_max')),
@@ -256,21 +422,20 @@ const isFormValid = computed(() => {
 })
 
 // Recherche de suggestions d'adresses
-const fetchSuggestions = useDebounceFn(async (field: 'departure' | 'arrival', query: string) => {
+const fetchSuggestions = useDebounceFn(async (_field: 'locationCity', query: string) => {
   if (!query || query.length < 3) {
-    if (field === 'departure') {
-      departureSuggestions.value = []
-      showDepartureSuggestions.value = false
-    } else {
-      arrivalSuggestions.value = []
-      showArrivalSuggestions.value = false
-    }
+    departureSuggestions.value = []
+    showDepartureSuggestions.value = false
     return
   }
 
   try {
+    // Utiliser la locale actuelle pour l'API Nominatim
+    const currentLocale = locale.value || 'fr'
+    // Privilégier les résultats en Europe (vous pouvez ajuster selon vos besoins)
+    const countryCodes = 'fr,be,ch,de,es,it,nl,gb,lu'
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=${currentLocale}&countrycodes=${countryCodes}`
     )
     const data = await response.json()
 
@@ -284,29 +449,18 @@ const fetchSuggestions = useDebounceFn(async (field: 'departure' | 'arrival', qu
       fullAddress: item.display_name,
     }))
 
-    if (field === 'departure') {
-      departureSuggestions.value = suggestions
-      showDepartureSuggestions.value = true
-    } else {
-      arrivalSuggestions.value = suggestions
-      showArrivalSuggestions.value = true
-    }
+    departureSuggestions.value = suggestions
+    showDepartureSuggestions.value = true
   } catch (error) {
     console.error("Erreur lors de la recherche d'adresses:", error)
   }
 }, 300)
 
 // Sélection d'une suggestion
-const selectSuggestion = (field: 'departure' | 'arrival', suggestion: any) => {
-  if (field === 'departure') {
-    form.departure = suggestion.fullAddress
-    form.departureCoordinates = { lat: suggestion.lat, lon: suggestion.lon }
-    showDepartureSuggestions.value = false
-  } else {
-    form.arrival = suggestion.fullAddress
-    form.arrivalCoordinates = { lat: suggestion.lat, lon: suggestion.lon }
-    showArrivalSuggestions.value = false
-  }
+const selectSuggestion = (_field: 'locationCity', suggestion: any) => {
+  form.locationCity = suggestion.name
+  form.departureCoordinates = { lat: suggestion.lat, lon: suggestion.lon }
+  showDepartureSuggestions.value = false
 }
 
 // Soumission du formulaire
@@ -326,7 +480,7 @@ const onSubmit = async () => {
 
     // Nettoyer les champs non pertinents
     if (props.formType === 'offer') {
-      delete payload.requiredSeats
+      delete payload.seatsNeeded
     } else {
       delete payload.availableSeats
       delete payload.pricePerSeat
@@ -342,7 +496,7 @@ const onSubmit = async () => {
       title: t('common.success'),
       description:
         props.formType === 'offer' ? t('carpool.offer.created') : t('carpool.request.created'),
-      color: 'green',
+      color: 'success',
     })
 
     emit('submit', response)
@@ -351,22 +505,27 @@ const onSubmit = async () => {
     toast.add({
       title: t('common.error'),
       description: error.data?.message || t('errors.generic'),
-      color: 'red',
+      color: 'error',
     })
   } finally {
     loading.value = false
   }
 }
 
+// Watcher pour l'autocomplete de la ville
+watch(
+  () => form.locationCity,
+  (newValue) => {
+    fetchSuggestions('locationCity', newValue)
+  }
+)
+
 // Fermer les suggestions lors d'un clic en dehors
 onMounted(() => {
   document.addEventListener('click', (e) => {
     const target = e.target as HTMLElement
-    if (!target.closest('[name="departure"]')) {
+    if (!target.closest('[name="locationCity"]')) {
       showDepartureSuggestions.value = false
-    }
-    if (!target.closest('[name="arrival"]')) {
-      showArrivalSuggestions.value = false
     }
   })
 })

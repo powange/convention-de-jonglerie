@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
         },
       },
       orderBy: {
-        departureDate: 'asc',
+        tripDate: 'asc',
       },
     })
 

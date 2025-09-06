@@ -29,6 +29,7 @@
             :label="$t('forms.labels.edition_name_optional')"
             name="name"
             :error="getNameError()"
+            description="Si aucun nom n'est spécifié, le nom de la convention sera utilisé"
           >
             <UInput
               v-model="state.name"
@@ -43,11 +44,6 @@
                 })()
               "
             />
-            <template #help>
-              <p class="text-xs text-gray-500">
-                Si aucun nom n'est spécifié, le nom de la convention sera utilisé
-              </p>
-            </template>
           </UFormField>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

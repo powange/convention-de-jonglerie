@@ -258,6 +258,11 @@
     "departure_placeholder": "Cidade ou endereço de partida",
     "details": "Detalhes",
     "details_placeholder": "Informações úteis sobre a viagem (bagagem, ponto de encontro, etc.)",
+    "direction": {
+      "from_event": "Voltar da convenção",
+      "label": "Direção da viagem",
+      "to_event": "Ir para a convenção"
+    },
     "from": "De",
     "music_allowed": "Música permitida",
     "offer": {
@@ -278,6 +283,7 @@
     },
     "route": "Rota",
     "select_date_time": "Selecionar data e hora",
+    "select_direction": "Selecionar uma direção",
     "smoking_allowed": "Fumar permitido",
     "to": "Para",
     "validation": {
@@ -285,6 +291,8 @@
       "date_invalid": "Data inválida",
       "date_required": "Data de partida é obrigatória",
       "departure_required": "Cidade de partida é obrigatória",
+      "direction_invalid": "Direção da viagem invalide",
+      "direction_required": "A direção da viagem é obrigatória",
       "seats_max": "Máximo de 8 lugares",
       "seats_min": "Pelo menos 1 lugar"
     }

@@ -219,56 +219,59 @@
             @submit="createNotification"
           >
             <div class="space-y-4">
-              <UFormGroup label="Utilisateur cible" name="userId">
+              <UFormField
+                label="Utilisateur cible"
+                name="userId"
+                description="Laisser vide pour envoyer à votre propre compte (test)"
+              >
                 <UInput
                   v-model="createForm.userId"
                   type="number"
                   placeholder="ID de l'utilisateur (optionnel)"
                 />
-                <template #help> Laisser vide pour envoyer à votre propre compte (test) </template>
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Type" name="type" required>
+              <UFormField label="Type" name="type" required>
                 <USelectMenu
                   v-model="createForm.type"
                   :options="notificationTypes"
                   placeholder="Sélectionnez un type"
                 />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Titre" name="title" required>
+              <UFormField label="Titre" name="title" required>
                 <UInput v-model="createForm.title" placeholder="Titre de la notification" />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Message" name="message" required>
+              <UFormField label="Message" name="message" required>
                 <UTextarea
                   v-model="createForm.message"
                   placeholder="Contenu de la notification"
                   :rows="4"
                 />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Catégorie" name="category">
+              <UFormField label="Catégorie" name="category">
                 <USelectMenu
                   v-model="createForm.category"
                   :options="categoryOptions"
                   placeholder="Sélectionnez une catégorie"
                 />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="URL d'action" name="actionUrl">
+              <UFormField label="URL d'action" name="actionUrl">
                 <UInput
                   v-model="createForm.actionUrl"
                   placeholder="URL de redirection (optionnel)"
                 />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Texte du bouton" name="actionText">
+              <UFormField label="Texte du bouton" name="actionText">
                 <UInput
                   v-model="createForm.actionText"
                   placeholder="Texte du bouton d'action (optionnel)"
                 />
-              </UFormGroup>
+              </UFormField>
             </div>
 
             <template #footer>

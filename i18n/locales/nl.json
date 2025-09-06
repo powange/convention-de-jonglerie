@@ -258,6 +258,11 @@
     "departure_placeholder": "Vertrekplaats of adres",
     "details": "Details",
     "details_placeholder": "Nuttige info over de rit (bagage, ontmoetingspunt, etc.)",
+    "direction": {
+      "from_event": "Terug van de conventie",
+      "label": "Richting van de reis",
+      "to_event": "Naar de conventie gaan"
+    },
     "from": "Van",
     "music_allowed": "Muziek toegestaan",
     "offer": {
@@ -278,6 +283,7 @@
     },
     "route": "Route",
     "select_date_time": "Selecteer datum en tijd",
+    "select_direction": "Selecteer een richting",
     "smoking_allowed": "Roken toegestaan",
     "to": "Naar",
     "validation": {
@@ -285,6 +291,8 @@
       "date_invalid": "Ongeldige datum",
       "date_required": "Vertrekdatum is vereist",
       "departure_required": "Vertrekplaats is vereist",
+      "direction_invalid": "Richting van de reis invalide",
+      "direction_required": "De reisrichting is verplicht",
       "seats_max": "Maximaal 8 plaatsen",
       "seats_min": "Minimaal 1 plaats"
     }

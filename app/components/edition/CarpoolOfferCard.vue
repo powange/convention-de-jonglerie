@@ -43,11 +43,26 @@
           <div class="text-sm">
             <div class="flex items-center gap-1 justify-end mb-1">
               <UIcon name="i-heroicons-calendar" class="text-gray-400 w-4 h-4" />
-              <span class="font-medium">{{ formatDate(offer.departureDate) }}</span>
+              <span class="font-medium">{{ formatDate(offer.tripDate) }}</span>
+            </div>
+            <div class="flex items-center gap-1 justify-end mb-1">
+              <UIcon name="i-heroicons-map-pin" class="text-gray-400 w-4 h-4" />
+              <span class="font-medium">{{ offer.locationCity }}</span>
             </div>
             <div class="flex items-center gap-1 justify-end">
-              <UIcon name="i-heroicons-map-pin" class="text-gray-400 w-4 h-4" />
-              <span class="font-medium">{{ offer.departureCity }}</span>
+              <UIcon
+                :name="
+                  offer.direction === 'TO_EVENT'
+                    ? 'i-heroicons-arrow-right'
+                    : 'i-heroicons-arrow-left'
+                "
+                class="text-gray-400 w-4 h-4"
+              />
+              <span class="text-sm font-medium">{{
+                offer.direction === 'TO_EVENT'
+                  ? $t('carpool.direction.to_event')
+                  : $t('carpool.direction.from_event')
+              }}</span>
             </div>
           </div>
         </div>
@@ -58,7 +73,7 @@
         <div class="flex items-center gap-2">
           <UIcon name="i-heroicons-map" class="text-gray-400" />
           <span class="font-medium">{{ $t('components.carpool.address') }} :</span>
-          <span>{{ offer.departureAddress }}</span>
+          <span>{{ offer.locationAddress }}</span>
         </div>
 
         <div v-if="authStore.isAuthenticated && offer.phoneNumber" class="flex items-center gap-2">
@@ -214,10 +229,11 @@ import CarpoolCommentsModal from './CarpoolCommentsModal.vue'
 
 interface CarpoolOffer {
   id: number
-  departureDate: string
-  departureCity: string
-  departureAddress: string
+  tripDate: string
+  locationCity: string
+  locationAddress: string
   availableSeats: number
+  direction: 'TO_EVENT' | 'FROM_EVENT'
   remainingSeats?: number
   description?: string
   phoneNumber?: string

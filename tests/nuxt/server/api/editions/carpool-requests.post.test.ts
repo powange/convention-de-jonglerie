@@ -25,8 +25,8 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
   it('devrait créer une demande de covoiturage avec succès', async () => {
     const requestBody = {
-      departureDate: '2024-07-15T08:00:00.000Z',
-      departureCity: 'Lyon',
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Lyon',
       seatsNeeded: 2,
       description: 'Cherche covoiturage sympa',
       phoneNumber: '0987654321',
@@ -43,8 +43,8 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
       id: 1,
       editionId: 1,
       userId: 1,
-      departureDate: new Date(requestBody.departureDate),
-      departureCity: requestBody.departureCity,
+      tripDate: new Date(requestBody.tripDate),
+      locationCity: requestBody.locationCity,
       seatsNeeded: requestBody.seatsNeeded,
       description: requestBody.description,
       phoneNumber: requestBody.phoneNumber,
@@ -71,8 +71,8 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
       data: {
         editionId: 1,
         userId: 1,
-        departureDate: new Date(requestBody.departureDate),
-        departureCity: requestBody.departureCity,
+        tripDate: new Date(requestBody.tripDate),
+        locationCity: requestBody.locationCity,
         seatsNeeded: requestBody.seatsNeeded,
         description: requestBody.description,
         phoneNumber: requestBody.phoneNumber,
@@ -110,9 +110,9 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
     await expect(handler(eventWithBadId as any)).rejects.toThrow('Edition ID invalide')
   })
 
-  it('devrait valider les données obligatoires - departureDate manquante', async () => {
+  it('devrait valider les données obligatoires - tripDate manquante', async () => {
     const incompleteBody = {
-      departureCity: 'Lyon',
+      locationCity: 'Lyon',
       seatsNeeded: 2,
     }
 
@@ -121,9 +121,9 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
     await expect(handler(mockEvent as any)).rejects.toThrow('Données manquantes')
   })
 
-  it('devrait valider les données obligatoires - departureCity manquante', async () => {
+  it('devrait valider les données obligatoires - locationCity manquante', async () => {
     const incompleteBody = {
-      departureDate: '2024-07-15T08:00:00.000Z',
+      tripDate: '2024-07-15T08:00:00.000Z',
       seatsNeeded: 2,
     }
 
@@ -134,8 +134,8 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
   it('devrait rejeter si édition non trouvée', async () => {
     const requestBody = {
-      departureDate: '2024-07-15T08:00:00.000Z',
-      departureCity: 'Lyon',
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Lyon',
     }
 
     global.readBody.mockResolvedValue(requestBody)
@@ -146,8 +146,8 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
   it('devrait gérer les erreurs de base de données', async () => {
     const requestBody = {
-      departureDate: '2024-07-15T08:00:00.000Z',
-      departureCity: 'Lyon',
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Lyon',
     }
 
     global.readBody.mockResolvedValue(requestBody)
@@ -158,8 +158,8 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
   it('devrait créer une demande avec seatsNeeded par défaut à 1', async () => {
     const requestBodyMinimal = {
-      departureDate: '2024-07-15T08:00:00.000Z',
-      departureCity: 'Lyon',
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Lyon',
       // seatsNeeded omis
     }
 
@@ -168,8 +168,8 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
       id: 1,
       editionId: 1,
       userId: 1,
-      departureDate: new Date(requestBodyMinimal.departureDate),
-      departureCity: requestBodyMinimal.departureCity,
+      tripDate: new Date(requestBodyMinimal.tripDate),
+      locationCity: requestBodyMinimal.locationCity,
       seatsNeeded: 1, // Valeur par défaut
       user: { id: 1, pseudo: 'testuser', prenom: 'Test', nom: 'User' },
     }
@@ -192,8 +192,8 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
   it('devrait créer une demande avec données optionnelles null', async () => {
     const requestBodyMinimal = {
-      departureDate: '2024-07-15T08:00:00.000Z',
-      departureCity: 'Lyon',
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Lyon',
       // description et phoneNumber omis
     }
 
@@ -203,7 +203,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
       editionId: 1,
       userId: 1,
       ...requestBodyMinimal,
-      departureDate: new Date(requestBodyMinimal.departureDate),
+      tripDate: new Date(requestBodyMinimal.tripDate),
       seatsNeeded: 1,
       description: undefined,
       phoneNumber: undefined,
@@ -229,8 +229,8 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
 
   it('devrait accepter seatsNeeded personnalisé', async () => {
     const requestBody = {
-      departureDate: '2024-07-15T08:00:00.000Z',
-      departureCity: 'Lyon',
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Lyon',
       seatsNeeded: 3, // Valeur personnalisée
     }
 

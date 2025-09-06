@@ -31,6 +31,7 @@
         :placeholder="timePlaceholder"
         size="lg"
         class="w-full"
+        clearable
         @change="updateDateTime"
       />
     </UFormField>
@@ -67,19 +68,19 @@ interface Props {
 }
 
 const { t } = useI18n()
-const baseProps = defineProps<Props>()
-// Appliquer valeurs par défaut (sans computed inline qui référence $t avant useI18n)
-const props = computed(() => ({
-  dateLabel: 'Date',
-  timeLabel: 'Heure',
-  dateFieldName: 'date',
-  timeFieldName: 'time',
-  placeholder: t('components.date_time_picker.placeholder'),
-  timePlaceholder: '00:00',
-  required: false,
-  timeInterval: 30,
-  ...baseProps,
-}))
+const props = defineProps<Props>()
+
+// Computed pour les valeurs par défaut
+const dateLabel = computed(() => props.dateLabel || 'Date')
+const timeLabel = computed(() => props.timeLabel || 'Heure')
+const dateFieldName = computed(() => props.dateFieldName || 'date')
+const timeFieldName = computed(() => props.timeFieldName || 'time')
+const placeholder = computed(
+  () => props.placeholder || t('components.date_time_picker.placeholder')
+)
+const timePlaceholder = computed(() => props.timePlaceholder || 'Sélectionner une heure')
+const required = computed(() => props.required || false)
+const timeInterval = computed(() => props.timeInterval || 30)
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
@@ -95,9 +96,9 @@ const {
   updateDateTime,
   setValue,
 } = useDateTimePicker({
-  initialValue: props.value.modelValue,
-  minDate: props.value.minDate,
-  timeInterval: props.value.timeInterval,
+  initialValue: props.modelValue,
+  minDate: props.minDate,
+  timeInterval: timeInterval.value,
   onChange: (isoString) => {
     emit('update:modelValue', isoString)
   },
@@ -129,11 +130,11 @@ watch(
 
 // Fonction pour vérifier si une date CalendarDate est désactivée
 const isCalendarDateDisabled = (calendarDate: CalendarDate) => {
-  if (!props.value.minDate) return false
+  if (!props.minDate) return false
 
   try {
     const jsDate = calendarDate.toDate(getLocalTimeZone())
-    return jsDate < props.value.minDate
+    return jsDate < props.minDate
   } catch {
     return false
   }
@@ -159,7 +160,7 @@ const handleDateUpdate = (newCalendarDate: CalendarDate | null) => {
 
 // Watcher pour les changements du v-model parent
 watch(
-  () => props.value.modelValue,
+  () => props.modelValue,
   (newValue) => {
     if (newValue !== combinedDateTime.value) {
       setValue(newValue || '')

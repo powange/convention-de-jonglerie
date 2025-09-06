@@ -58,9 +58,9 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       {
         id: 1,
         editionId: 1,
-        departureDate: new Date('2024-06-15T10:00:00Z'),
-        departureCity: 'Paris',
-        departureAddress: '123 rue de la Paix',
+        tripDate: new Date('2024-06-15T10:00:00Z'),
+        locationCity: 'Paris',
+        locationAddress: '123 rue de la Paix',
         availableSeats: 3,
         description: 'Covoiturage vers convention',
         user: {
@@ -117,7 +117,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
           orderBy: { createdAt: 'desc' },
         },
       },
-      orderBy: { departureDate: 'asc' },
+      orderBy: { tripDate: 'asc' },
     })
 
     expect(result).toHaveLength(1)
@@ -173,14 +173,14 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     const mockOffers = [
       {
         id: 1,
-        departureDate: new Date('2024-06-20T10:00:00Z'),
+        tripDate: new Date('2024-06-20T10:00:00Z'),
         user: { id: 1, email: 'user1@test.com', pseudo: 'user1' },
         passengers: [],
         comments: [],
       },
       {
         id: 2,
-        departureDate: new Date('2024-06-15T10:00:00Z'),
+        tripDate: new Date('2024-06-15T10:00:00Z'),
         user: { id: 2, email: 'user2@test.com', pseudo: 'user2' },
         passengers: [],
         comments: [],
@@ -193,7 +193,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
 
     expect(mockPrisma.carpoolOffer.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        orderBy: { departureDate: 'asc' },
+        orderBy: { tripDate: 'asc' },
       })
     )
   })

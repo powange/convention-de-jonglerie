@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-      orderBy: { departureDate: 'asc' },
+      orderBy: { tripDate: 'asc' },
     })
 
     // Transformer les données pour masquer les emails et ajouter les hash
@@ -57,9 +57,9 @@ export default defineEventHandler(async (event) => {
         id: offer.id,
         editionId: offer.editionId,
         userId: offer.userId,
-        departureDate: offer.departureDate,
-        departureCity: offer.departureCity,
-        departureAddress: offer.departureAddress,
+        tripDate: offer.tripDate,
+        locationCity: offer.locationCity,
+        locationAddress: offer.locationAddress,
         availableSeats,
         description: offer.description,
         // n'exposer le contact que pour le propriétaire ou un réservant ACCEPTED

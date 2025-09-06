@@ -399,8 +399,8 @@ describe('Fonctionnalités des éditions', () => {
       id: 1,
       editionId: 1,
       driverId: 1,
-      departureCity: 'Paris',
-      departureDate: new Date('2024-06-01T08:00:00'),
+      locationCity: 'Paris',
+      tripDate: new Date('2024-06-01T08:00:00'),
       availableSeats: 3,
       price: 15,
       contact: 'driver@example.com',
@@ -411,7 +411,7 @@ describe('Fonctionnalités des éditions', () => {
       id: 1,
       editionId: 1,
       passengerId: 1,
-      departureCity: 'Lyon',
+      locationCity: 'Lyon',
       desiredDate: new Date('2024-06-01'),
       seatsNeeded: 2,
       contact: 'passenger@example.com',
@@ -420,8 +420,8 @@ describe('Fonctionnalités des éditions', () => {
 
     it('devrait créer une offre de covoiturage', async () => {
       const offerData = {
-        departureCity: 'Marseille',
-        departureDate: '2024-06-01T10:00:00',
+        locationCity: 'Marseille',
+        tripDate: '2024-06-01T10:00:00',
         availableSeats: 4,
         price: 20,
         contact: 'mycontact@example.com',
@@ -431,7 +431,7 @@ describe('Fonctionnalités des éditions', () => {
       prismaMock.carpoolOffer.create.mockResolvedValue({
         ...mockCarpoolOffer,
         ...offerData,
-        departureDate: new Date(offerData.departureDate),
+        tripDate: new Date(offerData.tripDate),
       })
 
       const createOffer = async (editionId: number, data: typeof offerData, userId: number) => {
@@ -447,8 +447,8 @@ describe('Fonctionnalités des éditions', () => {
           data: {
             editionId,
             driverId: userId,
-            departureCity: data.departureCity,
-            departureDate: new Date(data.departureDate),
+            locationCity: data.locationCity,
+            tripDate: new Date(data.tripDate),
             availableSeats: data.availableSeats,
             price: data.price,
             contact: data.contact,
@@ -459,7 +459,7 @@ describe('Fonctionnalités des éditions', () => {
 
       const result = await createOffer(1, offerData, mockUser.id)
 
-      expect(result.departureCity).toBe(offerData.departureCity)
+      expect(result.locationCity).toBe(offerData.locationCity)
       expect(result.availableSeats).toBe(offerData.availableSeats)
       expect(result.price).toBe(offerData.price)
       expect(prismaMock.carpoolOffer.create).toHaveBeenCalled()
@@ -467,7 +467,7 @@ describe('Fonctionnalités des éditions', () => {
 
     it('devrait créer une demande de covoiturage', async () => {
       const requestData = {
-        departureCity: 'Toulouse',
+        locationCity: 'Toulouse',
         desiredDate: '2024-06-01',
         seatsNeeded: 1,
         contact: 'need-ride@example.com',
@@ -493,7 +493,7 @@ describe('Fonctionnalités des éditions', () => {
           data: {
             editionId,
             passengerId: userId,
-            departureCity: data.departureCity,
+            locationCity: data.locationCity,
             desiredDate: new Date(data.desiredDate),
             seatsNeeded: data.seatsNeeded,
             contact: data.contact,
@@ -504,7 +504,7 @@ describe('Fonctionnalités des éditions', () => {
 
       const result = await createRequest(1, requestData, mockUser.id)
 
-      expect(result.departureCity).toBe(requestData.departureCity)
+      expect(result.locationCity).toBe(requestData.locationCity)
       expect(result.seatsNeeded).toBe(requestData.seatsNeeded)
       expect(prismaMock.carpoolRequest.create).toHaveBeenCalled()
     })
@@ -513,36 +513,35 @@ describe('Fonctionnalités des éditions', () => {
       const offers = [
         {
           id: 1,
-          departureCity: 'Paris',
+          locationCity: 'Paris',
           availableSeats: 3,
-          departureDate: new Date('2024-06-01T08:00'),
+          tripDate: new Date('2024-06-01T08:00'),
         },
         {
           id: 2,
-          departureCity: 'Lyon',
+          locationCity: 'Lyon',
           availableSeats: 2,
-          departureDate: new Date('2024-06-01T10:00'),
+          tripDate: new Date('2024-06-01T10:00'),
         },
         {
           id: 3,
-          departureCity: 'Paris',
+          locationCity: 'Paris',
           availableSeats: 1,
-          departureDate: new Date('2024-06-02T08:00'),
+          tripDate: new Date('2024-06-02T08:00'),
         },
       ]
 
       const requests = [
-        { id: 1, departureCity: 'Paris', seatsNeeded: 2, desiredDate: new Date('2024-06-01') },
-        { id: 2, departureCity: 'Lyon', seatsNeeded: 1, desiredDate: new Date('2024-06-01') },
+        { id: 1, locationCity: 'Paris', seatsNeeded: 2, desiredDate: new Date('2024-06-01') },
+        { id: 2, locationCity: 'Lyon', seatsNeeded: 1, desiredDate: new Date('2024-06-01') },
       ]
 
       const matchCarpools = (offers: any[], requests: any[]) => {
         return requests.map((request) => {
           const matches = offers.filter((offer) => {
-            const sameCity = offer.departureCity === request.departureCity
+            const sameCity = offer.locationCity === request.locationCity
             const enoughSeats = offer.availableSeats >= request.seatsNeeded
-            const sameDay =
-              offer.departureDate.toDateString() === request.desiredDate.toDateString()
+            const sameDay = offer.tripDate.toDateString() === request.desiredDate.toDateString()
             return sameCity && enoughSeats && sameDay
           })
 
@@ -563,21 +562,21 @@ describe('Fonctionnalités des éditions', () => {
 
     it('devrait permettre de filtrer les covoiturages par ville', () => {
       const offers = [
-        { id: 1, departureCity: 'Paris' },
-        { id: 2, departureCity: 'Lyon' },
-        { id: 3, departureCity: 'Paris' },
-        { id: 4, departureCity: 'Marseille' },
+        { id: 1, locationCity: 'Paris' },
+        { id: 2, locationCity: 'Lyon' },
+        { id: 3, locationCity: 'Paris' },
+        { id: 4, locationCity: 'Marseille' },
       ]
 
       const filterByCity = (items: any[], city: string) => {
-        return items.filter((item) => item.departureCity === city)
+        return items.filter((item) => item.locationCity === city)
       }
 
       const parisOffers = filterByCity(offers, 'Paris')
 
       expect(parisOffers).toHaveLength(2)
-      expect(parisOffers[0].departureCity).toBe('Paris')
-      expect(parisOffers[1].departureCity).toBe('Paris')
+      expect(parisOffers[0].locationCity).toBe('Paris')
+      expect(parisOffers[1].locationCity).toBe('Paris')
     })
   })
 
