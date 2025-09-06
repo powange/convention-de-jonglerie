@@ -227,7 +227,7 @@ L'application dispose d'un script pour géocoder automatiquement les adresses de
 
 ```bash
 # Géocoder toutes les éditions sans coordonnées
-node scripts/geocode-existing-editions.js
+npm run geocode
 ```
 
 Ce script utilise l'API Nominatim (OpenStreetMap) avec une stratégie de fallback pour maximiser le taux de succès.
