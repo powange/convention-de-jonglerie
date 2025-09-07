@@ -13,6 +13,10 @@
     "api_error_logs": "API Error Logs",
     "api_path": "API Path...",
     "archive_convention": "Archive convention",
+    "error_logs": {
+      "unresolved": "Unresolved errors",
+      "need_investigation": "Need investigation"
+    },
     "cannot_load_activity": "Cannot load recent activity",
     "cannot_load_stats": "Cannot load statistics",
     "cannot_load_users": "Cannot load users",
@@ -103,6 +107,8 @@
         "suggestion": "Suggestion"
       },
       "unresolve": "Reopen",
+      "unresolved": "Unresolved feedback",
+      "require_attention": "Require attention",
       "url": "Related page",
       "user": "User",
       "user_agent": "Browser/OS",

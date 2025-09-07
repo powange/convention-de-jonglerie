@@ -11,8 +11,56 @@
       </p>
     </div>
 
+    <!-- Switch d'administration -->
+    <div
+      v-if="authStore.isGlobalAdmin"
+      class="mb-6 p-4 bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-lg border border-orange-200 dark:border-orange-800"
+    >
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-8 h-8 bg-orange-100 dark:bg-orange-800 rounded-lg flex items-center justify-center"
+          >
+            <UIcon
+              name="i-heroicons-shield-exclamation"
+              class="w-4 h-4 text-orange-600 dark:text-orange-400"
+            />
+          </div>
+          <div>
+            <h4 class="font-medium text-gray-900 dark:text-white">
+              {{ $t('profile.admin_mode') }}
+            </h4>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              {{
+                authStore.isAdminModeActive
+                  ? $t('profile.admin_access_all')
+                  : $t('profile.activate_admin_privileges')
+              }}
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <UBadge
+            :color="authStore.isAdminModeActive ? 'warning' : 'neutral'"
+            variant="soft"
+            size="sm"
+          >
+            {{
+              authStore.isAdminModeActive ? $t('profile.admin_active') : $t('profile.normal_active')
+            }}
+          </UBadge>
+          <USwitch
+            v-model="adminModeToggle"
+            color="warning"
+            size="lg"
+            @update:model-value="toggleAdminMode"
+          />
+        </div>
+      </div>
+    </div>
+
     <!-- Statistiques rapides -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
       <UCard>
         <div class="flex items-center justify-between">
           <div>
@@ -72,6 +120,40 @@
             <p class="text-xs text-gray-500">{{ $t('admin.active_administrators') }}</p>
           </div>
           <UIcon name="i-heroicons-shield-check" class="h-8 w-8 text-red-500" />
+        </div>
+      </UCard>
+
+      <UCard>
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {{ $t('admin.feedback.unresolved') }}
+            </p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">
+              {{ stats.unresolvedFeedbacks }}
+            </p>
+            <p class="text-xs text-orange-600">
+              {{ $t('admin.feedback.require_attention') }}
+            </p>
+          </div>
+          <UIcon name="i-heroicons-chat-bubble-left-ellipsis" class="h-8 w-8 text-green-500" />
+        </div>
+      </UCard>
+
+      <UCard>
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {{ $t('admin.error_logs.unresolved') }}
+            </p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">
+              {{ stats.unresolvedErrorLogs }}
+            </p>
+            <p class="text-xs text-red-600">
+              {{ $t('admin.error_logs.need_investigation') }}
+            </p>
+          </div>
+          <UIcon name="i-heroicons-exclamation-triangle" class="h-8 w-8 text-red-500" />
         </div>
       </UCard>
     </div>
@@ -333,7 +415,7 @@ definePageMeta({
   middleware: ['auth-protected', 'super-admin'],
 })
 
-// const authStore = useAuthStore()
+const authStore = useAuthStore()
 const toast = useToast()
 
 // Métadonnées de la page
@@ -353,9 +435,14 @@ const stats = ref({
   totalEditions: 0,
   newEditionsThisMonth: 0,
   totalAdmins: 0,
+  unresolvedFeedbacks: 0,
+  unresolvedErrorLogs: 0,
 })
 
 const recentActivity = ref([])
+
+// Gestion du mode administrateur
+const adminModeToggle = ref(authStore.isAdminModeActive)
 
 // Fonctions utilitaires
 const formatRelativeTime = (date: string) => {
@@ -458,6 +545,27 @@ const refreshData = async () => {
   loading.value = true
   await Promise.all([loadStats(), loadRecentActivity()])
   loading.value = false
+}
+
+// Fonction pour basculer le mode administrateur
+const toggleAdminMode = (enabled: boolean) => {
+  if (enabled) {
+    authStore.enableAdminMode()
+    toast.add({
+      title: t('profile.admin_mode_enabled'),
+      description: t('profile.admin_mode_enabled_desc'),
+      icon: 'i-heroicons-shield-check',
+      color: 'warning',
+    })
+  } else {
+    authStore.disableAdminMode()
+    toast.add({
+      title: t('profile.admin_mode_disabled'),
+      description: t('profile.admin_mode_disabled_desc'),
+      icon: 'i-heroicons-shield-exclamation',
+      color: 'neutral',
+    })
+  }
 }
 
 // Charger les données au montage

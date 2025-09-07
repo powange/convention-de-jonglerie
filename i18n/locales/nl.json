@@ -48,6 +48,10 @@
     "email_verified": "E-mail geverifieerd",
     "email_z_a": "Op e-mail (Z-A)",
     "error_details": "Foutdetails",
+    "error_logs": {
+      "need_investigation": "Vereisen onderzoek",
+      "unresolved": "Onopgeloste fouten"
+    },
     "error_type": "Fouttype",
     "errors_24h": "Fouten (24u)",
     "event_reminders": "Evenementherinneringen",
@@ -75,6 +79,7 @@
         "label": "Bericht"
       },
       "pending": "In afwachting",
+      "require_attention": "Vereisen aandacht",
       "resolve": "Oplossen",
       "resolved": "Opgelost",
       "search": "Zoeken in feedback...",
@@ -103,6 +108,7 @@
         "suggestion": "Suggestie"
       },
       "unresolve": "Heropenen",
+      "unresolved": "Onopgeloste feedback",
       "url": "Gerelateerde pagina",
       "user": "Gebruiker",
       "user_agent": "Browser/OS",

@@ -61,11 +61,12 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Vérifier que l'utilisateur est soit l'auteur, soit un collaborateur avec droits d'édition
+    // Vérifier que l'utilisateur est soit l'auteur, soit un collaborateur avec droits d'édition, soit un admin global
     const isAuthor = existingConvention.authorId === event.context.user.id
-    const isAdmin = existingConvention.collaborators.length > 0
+    const isCollaborator = existingConvention.collaborators.length > 0
+    const isGlobalAdmin = event.context.user.isGlobalAdmin || false
 
-    if (!isAuthor && !isAdmin) {
+    if (!isAuthor && !isCollaborator && !isGlobalAdmin) {
       throw createError({
         statusCode: 403,
         message: "Vous n'avez pas les droits pour modifier cette convention",

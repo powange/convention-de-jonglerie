@@ -22,7 +22,8 @@ export default defineEventHandler(async (event) => {
     select: { canDeleteConvention: true },
   })
   const isAuthor = convention.authorId === event.context.user.id
-  const allowed = isAuthor || manager?.canDeleteConvention
+  const isGlobalAdmin = event.context.user.isGlobalAdmin || false
+  const allowed = isAuthor || manager?.canDeleteConvention || isGlobalAdmin
   if (!allowed) throw createError({ statusCode: 403, statusMessage: 'Droit insuffisant' })
 
   if (convention.isArchived === archived) {

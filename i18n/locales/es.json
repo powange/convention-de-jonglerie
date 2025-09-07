@@ -48,6 +48,10 @@
     "email_verified": "Email verificado",
     "email_z_a": "Por email (Z-A)",
     "error_details": "Detalles del error",
+    "error_logs": {
+      "need_investigation": "Requieren investigación",
+      "unresolved": "Errores sin resolver"
+    },
     "error_type": "Tipo de error",
     "errors_24h": "Errores (24h)",
     "event_reminders": "Recordatorios de eventos",
@@ -75,6 +79,7 @@
         "label": "Mensaje"
       },
       "pending": "Pendiente",
+      "require_attention": "Requieren atención",
       "resolve": "Resolver",
       "resolved": "Resuelto",
       "search": "Buscar comentarios...",
@@ -103,6 +108,7 @@
         "suggestion": "Sugerencia"
       },
       "unresolve": "Reabrir",
+      "unresolved": "Comentarios sin resolver",
       "url": "Página relacionada",
       "user": "Usuario",
       "user_agent": "Navegador/SO",

@@ -82,6 +82,8 @@
         "suggestion": "Suggestion"
       },
       "unresolve": "Rouvrir",
+      "unresolved": "Retours non résolus",
+      "require_attention": "Nécessitent une attention",
       "url": "Page concernée",
       "user": "Utilisateur",
       "user_agent": "Navigateur/OS",
@@ -124,7 +126,10 @@
     "api_error_logs": "Logs d'erreurs API",
     "api_path": "Chemin API...",
     "error_details": "Détails de l'erreur",
-    "error_type": "Type d'erreur",
+    "error_logs": {
+      "unresolved": "Erreurs non résolues",
+      "need_investigation": "Nécessitent une enquête"
+    },
     "errors_24h": "Erreurs (24h)",
     "good_news": "C'est une bonne nouvelle !",
     "loading_logs": "Chargement des logs...",

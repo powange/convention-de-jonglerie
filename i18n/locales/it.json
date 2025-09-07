@@ -48,6 +48,10 @@
     "email_verified": "Email verificata",
     "email_z_a": "Per email (Z-A)",
     "error_details": "Dettagli errore",
+    "error_logs": {
+      "need_investigation": "Richiedono investigazione",
+      "unresolved": "Errori non risolti"
+    },
     "error_type": "Tipo di errore",
     "errors_24h": "Errori (24h)",
     "event_reminders": "Promemoria eventi",
@@ -75,6 +79,7 @@
         "label": "Messaggio"
       },
       "pending": "In attesa",
+      "require_attention": "Richiedono attenzione",
       "resolve": "Risolvi",
       "resolved": "Risolto",
       "search": "Cerca nei feedback...",
@@ -103,6 +108,7 @@
         "suggestion": "Suggerimento"
       },
       "unresolve": "Riapri",
+      "unresolved": "Feedback non risolti",
       "url": "Pagina correlata",
       "user": "Utente",
       "user_agent": "Browser/OS",

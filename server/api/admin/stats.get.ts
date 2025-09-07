@@ -43,6 +43,8 @@ export default defineEventHandler(async (event) => {
       totalEditions,
       newEditionsThisMonth,
       totalAdmins,
+      unresolvedFeedbacks,
+      unresolvedErrorLogs,
     ] = await Promise.all([
       // Total utilisateurs
       prisma.user.count(),
@@ -86,6 +88,20 @@ export default defineEventHandler(async (event) => {
           isGlobalAdmin: true,
         },
       }),
+
+      // Feedbacks non résolus
+      prisma.feedback.count({
+        where: {
+          resolved: false,
+        },
+      }),
+
+      // Logs d'erreur non résolus
+      prisma.apiErrorLog.count({
+        where: {
+          resolved: false,
+        },
+      }),
     ])
 
     return {
@@ -96,6 +112,8 @@ export default defineEventHandler(async (event) => {
       totalEditions,
       newEditionsThisMonth,
       totalAdmins,
+      unresolvedFeedbacks,
+      unresolvedErrorLogs,
     }
   } catch (error) {
     console.error('Erreur lors de la récupération des statistiques:', error)

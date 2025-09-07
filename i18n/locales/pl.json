@@ -48,6 +48,10 @@
     "email_verified": "Email zweryfikowany",
     "email_z_a": "Wg emaila (Z-A)",
     "error_details": "Szczegóły błędu",
+    "error_logs": {
+      "need_investigation": "Wymagają badań",
+      "unresolved": "Nierozwiązane błędy"
+    },
     "error_type": "Typ błędu",
     "errors_24h": "Błędy (24h)",
     "event_reminders": "Przypomnienia o wydarzeniach",
@@ -75,6 +79,7 @@
         "label": "Wiadomość"
       },
       "pending": "Oczekujące",
+      "require_attention": "Wymagają uwagi",
       "resolve": "Rozwiąż",
       "resolved": "Rozwiązane",
       "search": "Szukaj w opiniach...",
@@ -103,6 +108,7 @@
         "suggestion": "Sugestia"
       },
       "unresolve": "Otwórz ponownie",
+      "unresolved": "Nierozwiązane opinie",
       "url": "Powiązana strona",
       "user": "Użytkownik",
       "user_agent": "Przeglądarka/System",

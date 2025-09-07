@@ -24,7 +24,10 @@
     </nav>
 
     <div class="mb-6">
-      <h1 class="text-3xl font-bold">{{ $t('admin.user_management') }}</h1>
+      <h1 class="text-3xl font-bold flex items-center gap-3">
+        <UIcon name="i-heroicons-users" class="text-blue-600" />
+        {{ $t('admin.user_management') }}
+      </h1>
       <p class="text-gray-600 dark:text-gray-400 mt-2">
         {{ $t('admin.user_management_description') }}
       </p>

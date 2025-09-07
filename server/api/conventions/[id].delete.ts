@@ -37,7 +37,8 @@ export default defineEventHandler(async (event) => {
 
     const isAuthor = existingConvention.authorId === event.context.user.id
     const collab = existingConvention.collaborators[0]
-    const canDelete = isAuthor || (collab && collab.canDeleteConvention)
+    const isGlobalAdmin = event.context.user.isGlobalAdmin || false
+    const canDelete = isAuthor || (collab && collab.canDeleteConvention) || isGlobalAdmin
     if (!canDelete) {
       throw createError({
         statusCode: 403,
