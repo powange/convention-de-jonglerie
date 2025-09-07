@@ -98,20 +98,18 @@
           />
         </div>
 
-        <USelectMenu
+        <USelect
           v-model="filters.status"
-          :options="statusOptions"
-          :placeholder="$t('common.status')"
+          :items="statusOptions"
           class="w-40"
-          @update:model-value="applyFilters"
+          @change="applyFilters"
         />
 
-        <USelectMenu
+        <USelect
           v-model="filters.errorType"
-          :options="errorTypeOptions"
-          :placeholder="$t('admin.error_type')"
+          :items="errorTypeOptions"
           class="w-48"
-          @update:model-value="applyFilters"
+          @change="applyFilters"
         />
 
         <UInput
@@ -140,11 +138,11 @@
             </h3>
             <div class="flex items-center gap-4">
               <!-- Sélecteur de taille de page -->
-              <USelectMenu
+              <USelect
                 v-model="pagination.pageSize"
-                :options="pageSizeOptions"
+                :items="pageSizeOptions"
                 class="w-20"
-                @update:model-value="changePageSize"
+                @change="changePageSize"
               />
               <span class="text-sm text-gray-500">{{ $t('admin.per_page') }}</span>
             </div>
@@ -408,12 +406,12 @@ const toast = useToast()
 
 // État réactif
 const loading = ref(false)
-const logs = ref([])
+const logs = ref<any[]>([])
 const stats = ref({
   totalLast24h: 0,
   unresolvedCount: 0,
-  errorTypes: [],
-  statusCodes: [],
+  errorTypes: [] as any[],
+  statusCodes: [] as any[],
 })
 
 const pagination = ref({
@@ -425,26 +423,26 @@ const pagination = ref({
 
 const filters = ref({
   search: '',
-  status: '',
-  errorType: '',
+  status: 'unresolved', // Par défaut, on cache les logs résolus
+  errorType: 'all',
   path: '',
 })
 
 // Modal de détails
 const showLogDetails = ref(false)
-const selectedLog = ref(null)
+const selectedLog = ref<any>(null)
 const resolving = ref(false)
 const updatingNotes = ref(false)
 
-// Options pour les filtres
+// Options pour les filtres (statiques)
 const statusOptions = [
-  { label: 'Tous', value: '' },
   { label: 'Non résolues', value: 'unresolved' },
   { label: 'Résolues', value: 'resolved' },
+  { label: 'Toutes', value: 'all' },
 ]
 
-const errorTypeOptions = ref([
-  { label: 'Tous les types', value: '' },
+const errorTypeOptions = [
+  { label: 'Tous les types', value: 'all' },
   { label: 'Validation', value: 'ValidationError' },
   { label: 'Base de données', value: 'DatabaseError' },
   { label: 'Authentification', value: 'AuthenticationError' },
@@ -453,7 +451,7 @@ const errorTypeOptions = ref([
   { label: 'Réseau', value: 'NetworkError' },
   { label: 'Fichier', value: 'FileError' },
   { label: 'Inconnue', value: 'UnknownError' },
-])
+]
 
 const pageSizeOptions = [
   { label: '10', value: 10 },
@@ -495,8 +493,10 @@ const loadLogs = async () => {
     params.append('pageSize', pagination.value.pageSize.toString())
 
     if (filters.value.search) params.append('search', filters.value.search)
-    if (filters.value.status) params.append('status', filters.value.status)
-    if (filters.value.errorType) params.append('errorType', filters.value.errorType)
+    if (filters.value.status && filters.value.status !== 'all')
+      params.append('status', filters.value.status)
+    if (filters.value.errorType && filters.value.errorType !== 'all')
+      params.append('errorType', filters.value.errorType)
     if (filters.value.path) params.append('path', filters.value.path)
 
     const response = await $fetch(`/api/admin/error-logs?${params}`)
@@ -504,7 +504,7 @@ const loadLogs = async () => {
     logs.value = response.logs
     stats.value = response.stats
     pagination.value = response.pagination
-  } catch {
+  } catch (error) {
     console.error('Error loading logs:', error)
     toast.add({
       color: 'error',
@@ -535,8 +535,8 @@ const applyFilters = () => {
 const clearFilters = () => {
   filters.value = {
     search: '',
-    status: '',
-    errorType: '',
+    status: 'unresolved', // Par défaut on affiche les non résolues
+    errorType: 'all',
     path: '',
   }
   pagination.value.page = 1
@@ -548,8 +548,7 @@ const changePage = (page: number) => {
   loadLogs()
 }
 
-const changePageSize = (pageSize: number) => {
-  pagination.value.pageSize = pageSize
+const changePageSize = () => {
   pagination.value.page = 1
   loadLogs()
 }
