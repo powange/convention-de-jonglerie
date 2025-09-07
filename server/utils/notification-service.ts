@@ -211,7 +211,7 @@ export const NotificationHelpers = {
       message:
         'Votre compte a été créé avec succès. Découvrez les conventions de jonglerie près de chez vous !',
       category: 'system',
-      actionUrl: '/conventions',
+      actionUrl: '/',
       actionText: 'Voir les conventions',
     })
   },
