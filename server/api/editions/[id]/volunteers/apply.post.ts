@@ -6,6 +6,7 @@ import { prisma } from '../../../../utils/prisma'
 const VALID_TIME_SLOTS = [
   'early_morning',
   'morning',
+  'lunch',
   'early_afternoon',
   'late_afternoon',
   'evening',
