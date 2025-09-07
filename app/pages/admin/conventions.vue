@@ -147,6 +147,15 @@
                 {{ $t('admin.collaborators_count', { count: convention._count.collaborators }) }}
               </UBadge>
               <UButton
+                :to="`/conventions/${convention.id}/edit`"
+                size="xs"
+                color="primary"
+                variant="soft"
+                icon="i-heroicons-pencil-square"
+              >
+                {{ $t('common.edit') }}
+              </UButton>
+              <UButton
                 v-if="convention.isArchived"
                 size="xs"
                 color="success"
@@ -248,14 +257,25 @@
                         size="xs"
                         color="primary"
                         variant="soft"
+                        icon="i-heroicons-eye"
                       >
                         {{ $t('common.view') }}
+                      </UButton>
+                      <UButton
+                        :to="`/editions/${edition.id}/edit`"
+                        size="xs"
+                        color="primary"
+                        variant="soft"
+                        icon="i-heroicons-pencil-square"
+                      >
+                        {{ $t('common.edit') }}
                       </UButton>
                       <UButton
                         :to="`/editions/${edition.id}/gestion`"
                         size="xs"
                         color="warning"
                         variant="soft"
+                        icon="i-heroicons-cog-6-tooth"
                       >
                         {{ $t('common.manage') }}
                       </UButton>

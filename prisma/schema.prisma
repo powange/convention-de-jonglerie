@@ -432,8 +432,8 @@ model Feedback {
   email      String?
   name       String?
   userId     Int?
-  userAgent  String?
-  url        String?
+  userAgent  String?      @db.Text
+  url        String?      @db.Text
   resolved   Boolean      @default(false)
   adminNotes String?      @db.Text
   createdAt  DateTime     @default(now())

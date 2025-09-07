@@ -332,8 +332,6 @@ let pollingInterval: NodeJS.Timeout | null = null
 const startPolling = () => {
   if (pollingInterval) return
 
-  console.log('🔄 Démarrage du polling notifications (5s)')
-
   // Rafraîchir toutes les 5 secondes
   pollingInterval = setInterval(async () => {
     if (authStore.user && document.visibilityState === 'visible') {
@@ -344,7 +342,6 @@ const startPolling = () => {
 
 const stopPolling = () => {
   if (pollingInterval) {
-    console.log('⏹️ Arrêt du polling notifications')
     clearInterval(pollingInterval)
     pollingInterval = null
   }
