@@ -108,8 +108,6 @@ services:
 volumes:
   mysql_data:
     driver: local
-  uploads_data:
-    driver: local
   backup_logs:
     driver: local
   backup_archives:
