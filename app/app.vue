@@ -248,6 +248,9 @@ const changeLanguage = async (newLocale: string) => {
 onMounted(() => {
   // Le plugin auth.client.ts s'occupe maintenant de l'initialisation de l'authentification
 
+  // S'assurer que nous sommes côté client
+  if (typeof window === 'undefined') return
+
   // Gérer le responsive
   const checkMobile = () => {
     isMobile.value = window.innerWidth < 768
@@ -274,8 +277,10 @@ onMounted(() => {
 
   // Cleanup
   onUnmounted(() => {
-    window.removeEventListener('resize', checkMobile)
-    window.removeEventListener('load', hideLoading)
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', checkMobile)
+      window.removeEventListener('load', hideLoading)
+    }
   })
 })
 
