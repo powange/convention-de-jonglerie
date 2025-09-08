@@ -122,7 +122,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted } from 'vue'
 
 import NotificationCenter from '~/components/notifications/NotificationCenter.vue'
 import AppFooter from '~/components/ui/AppFooter.vue'
@@ -245,22 +245,23 @@ const changeLanguage = async (newLocale: string) => {
   refreshNuxtData()
 }
 
-// Utiliser les composables Nuxt appropriés pour éviter les problèmes de tree-shaking
-const { $router } = useNuxtApp()
-
-// Utiliser nextTick pour s'assurer que nous sommes côté client après hydration  
+// Utiliser nextTick pour s'assurer que nous sommes côté client après hydration
 onMounted(async () => {
   // Le plugin auth.client.ts s'occupe maintenant de l'initialisation de l'authentification
-  
+
   await nextTick()
-  
+
   // Gérer le responsive avec les composables VueUse
   const { width } = useWindowSize()
-  
+
   // Watcher réactif pour la taille d'écran
-  watch(width, (newWidth) => {
-    isMobile.value = newWidth < 768
-  }, { immediate: true })
+  watch(
+    width,
+    (newWidth) => {
+      isMobile.value = newWidth < 768
+    },
+    { immediate: true }
+  )
 
   // Attendre que tout soit chargé
   const hideLoading = () => {
