@@ -47,8 +47,11 @@ services:
       # Exposition Nuxt (public/secret) basée sur les mêmes valeurs
       NUXT_PUBLIC_RECAPTCHA_SITE_KEY: '${NUXT_PUBLIC_RECAPTCHA_SITE_KEY}'
       NUXT_RECAPTCHA_SECRET_KEY: '${NUXT_RECAPTCHA_SECRET_KEY}'
+      # Configuration nuxt-file-storage
+      NUXT_FILE_STORAGE_MOUNT: '${NUXT_FILE_STORAGE_MOUNT:-/uploads}'
     volumes:
       - /home/powange/docker_workspaces/convention-de-jonglerie-prod/uploads_data:/app/public/uploads
+      - /home/powange/docker_workspaces/convention-de-jonglerie-prod/uploads:/uploads
     depends_on:
       database-prod:
         condition: service_healthy
@@ -92,6 +95,7 @@ services:
       # Volumes en lecture seule pour la sécurité
       - mysql_data:/mysql-data:ro
       - /home/powange/docker_workspaces/convention-de-jonglerie-prod/uploads_data:/data/uploads:ro
+      - /home/powange/docker_workspaces/convention-de-jonglerie-prod/uploads:/uploads:ro
 
       # Volumes de travail
       - backup_logs:/backup/logs

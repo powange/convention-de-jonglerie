@@ -46,34 +46,31 @@ async function run() {
     specialFiles.map(async ({ size, name, needsBackground }) => {
       const file = path.join(outDir, name)
       let sharpInstance = sharp(Buffer.from(svgContent)).resize(size, size)
-      
+
       if (needsBackground) {
         // Créer une image avec fond coloré puis composer le logo par-dessus
-        const logoBuffer = await sharp(Buffer.from(svgContent))
-          .resize(size, size)
-          .png()
-          .toBuffer()
-        
+        const logoBuffer = await sharp(Buffer.from(svgContent)).resize(size, size).png().toBuffer()
+
         sharpInstance = sharp({
           create: {
             width: size,
             height: size,
             channels: 4,
-            background: backgroundColorRgb
-          }
+            background: backgroundColorRgb,
+          },
         })
-        .composite([
-          {
-            input: logoBuffer,
-            top: 0,
-            left: 0
-          }
-        ])
-        .png({ compressionLevel: 9 })
+          .composite([
+            {
+              input: logoBuffer,
+              top: 0,
+              left: 0,
+            },
+          ])
+          .png({ compressionLevel: 9 })
       } else {
         sharpInstance = sharpInstance.png({ compressionLevel: 9 })
       }
-      
+
       await sharpInstance.toFile(file)
     })
   )

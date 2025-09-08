@@ -50,8 +50,11 @@ services:
       # Exposition Nuxt (public/secret) basée sur les mêmes valeurs
       NUXT_PUBLIC_RECAPTCHA_SITE_KEY: '${NUXT_PUBLIC_RECAPTCHA_SITE_KEY}'
       NUXT_RECAPTCHA_SECRET_KEY: '${NUXT_RECAPTCHA_SECRET_KEY}'
+      # Configuration nuxt-file-storage
+      NUXT_FILE_STORAGE_MOUNT: '${NUXT_FILE_STORAGE_MOUNT:-/uploads}'
     volumes:
       - /home/powange/docker_workspaces/convention-de-jonglerie-release/uploads_data:/app/public/uploads
+      - /home/powange/docker_workspaces/convention-de-jonglerie-release/uploads:/uploads
     depends_on:
       database:
         condition: service_healthy

@@ -15,19 +15,14 @@ export const useImageUrl = () => {
       return url
     }
 
-    // Si l'URL commence déjà par /api/uploads/, elle est déjà correcte
-    if (url.startsWith('/api/uploads/')) {
+    // Si l'URL commence par /uploads/, elle est déjà correcte (servie directement)
+    if (url.startsWith('/uploads/')) {
       return url
     }
 
-    // Convertir toutes les URLs d'uploads vers l'API
-    if (url.startsWith('/uploads/')) {
-      return `/api${url}`
-    }
-
-    // Si l'URL ne commence pas par /, l'ajouter et passer par l'API
+    // Si l'URL ne commence pas par /, l'ajouter comme upload direct
     if (!url.startsWith('/')) {
-      return `/api/uploads/${url}`
+      return `/uploads/${url}`
     }
 
     // Pour toute autre URL relative, la retourner telle quelle

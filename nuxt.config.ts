@@ -39,6 +39,7 @@ export default defineNuxtConfig({
     'nuxt-auth-utils',
     '@nuxtjs/i18n',
     '@vueuse/nuxt',
+    'nuxt-file-storage',
   ].filter(Boolean),
 
   // Restreindre les collections d'icônes empaquetées côté serveur
@@ -92,6 +93,11 @@ export default defineNuxtConfig({
     vueI18n: './i18n/i18n.config.ts',
   },
   css: ['~/assets/css/main.css', 'flag-icons/css/flag-icons.min.css'],
+  // Configuration pour nuxt-file-storage
+  fileStorage: {
+    mount: process.env.NUXT_FILE_STORAGE_MOUNT || '/uploads',
+  },
+
   runtimeConfig: {
     sessionPassword: process.env.NUXT_SESSION_PASSWORD || '',
     emailEnabled: process.env.SEND_EMAILS || 'false', // Enable/disable real email sending

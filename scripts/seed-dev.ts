@@ -2,8 +2,11 @@
 import { spawn } from 'node:child_process'
 
 import bcrypt from 'bcryptjs'
+import { config } from 'dotenv'
 
 import { prisma } from '../server/utils/prisma'
+
+config()
 
 // Fonction utilitaire pour générer des dates aléatoires
 function getRandomDate(daysFromNow: number, variationDays: number): Date {
@@ -106,12 +109,16 @@ async function main() {
   const powangeUserEmail = 'powange@hotmail.com'
   const powangeUserPassword = process.env.POWANGE_PASSWORD || 'powange123'
 
-  let powangeUser = await prisma.user.findUnique({ where: { email: powangeUserEmail } })
+  let powangeUser = await prisma.user.findFirst({
+    where: {
+      OR: [{ email: powangeUserEmail }, { pseudo: 'PowangeUser' }],
+    },
+  })
   if (!powangeUser) {
     powangeUser = await prisma.user.create({
       data: {
         email: powangeUserEmail,
-        pseudo: 'Powange',
+        pseudo: 'PowangeUser',
         nom: 'Comble',
         prenom: 'Pierre',
         password: await bcrypt.hash(powangeUserPassword, 10),

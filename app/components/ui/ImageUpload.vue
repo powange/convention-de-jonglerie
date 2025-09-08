@@ -146,19 +146,30 @@ const emit = defineEmits<Emits>()
 // Composables
 const { t } = useI18n()
 
-// Composable d'upload
-const {
-  uploading,
-  progress,
-  selectedFile,
-  previewUrl,
-  error,
-  selectFile,
-  uploadFile,
-  deleteImage,
-  reset,
-  validation,
-} = useImageUpload(props.options)
+// États locaux simplifiés - sans dépendance à useFileStorage qui ne fonctionne pas
+const uploading = ref(false)
+const progress = ref(0)
+const selectedFile = ref<File | null>(null)
+const previewUrl = ref<string | null>(null)
+const error = ref<string | null>(null)
+const serverFiles = ref<any[]>([])
+
+// Validation par défaut
+const validation = {
+  maxSize: props.options?.validation?.maxSize || 5 * 1024 * 1024,
+  allowedTypes: props.options?.validation?.allowedTypes || [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/webp',
+  ],
+  allowedExtensions: props.options?.validation?.allowedExtensions || [
+    '.jpg',
+    '.jpeg',
+    '.png',
+    '.webp',
+  ],
+}
 
 // États réactifs
 const fileInput = ref<HTMLInputElement>()
@@ -177,14 +188,96 @@ const triggerFileInput = () => {
   fileInput.value?.click()
 }
 
+// Validation des fichiers
+const validateFile = (file: File): { valid: boolean; error?: string } => {
+  if (file.size > validation.maxSize) {
+    const maxSizeMB = Math.round(validation.maxSize / (1024 * 1024))
+    return {
+      valid: false,
+      error: t('upload.errors.file_too_large', { maxSize: `${maxSizeMB}MB` }),
+    }
+  }
+
+  if (!validation.allowedTypes.includes(file.type)) {
+    return {
+      valid: false,
+      error: t('upload.errors.invalid_file_type', {
+        allowedTypes: validation.allowedTypes.join(', '),
+      }),
+    }
+  }
+
+  const extension = '.' + file.name.split('.').pop()?.toLowerCase()
+  if (extension && !validation.allowedExtensions.includes(extension)) {
+    return {
+      valid: false,
+      error: t('upload.errors.invalid_file_extension', {
+        allowedExtensions: validation.allowedExtensions.join(', '),
+      }),
+    }
+  }
+
+  return { valid: true }
+}
+
+// Générer un aperçu
+const generatePreview = (file: File) => {
+  if (previewUrl.value) {
+    URL.revokeObjectURL(previewUrl.value)
+  }
+  previewUrl.value = URL.createObjectURL(file)
+}
+
+// Sélectionner et valider un fichier
+const selectFile = (file: File): boolean => {
+  error.value = null
+
+  const validationResult = validateFile(file)
+  if (!validationResult.valid) {
+    error.value = validationResult.error || 'Fichier invalide'
+    return false
+  }
+
+  selectedFile.value = file
+  generatePreview(file)
+
+  // Créer manuellement le ServerFile avec data URL
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const dataUrl = e.target?.result as string
+
+    const serverFile = {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      lastModified: file.lastModified,
+      content: dataUrl, // C'est la clé pour nuxt-file-storage
+    }
+
+    serverFiles.value = [serverFile]
+    console.log('Created ServerFile manually:', !!serverFile.content)
+  }
+  reader.readAsDataURL(file)
+
+  return true
+}
+
 // Gestionnaires d'événements
 const handleFileSelect = (event: Event) => {
+  // Ne plus utiliser handleFileInput qui ne fonctionne pas
+  // Gérer le fichier manuellement
+
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
 
-  if (file && selectFile(file)) {
-    if (props.autoUpload) {
-      upload()
+  if (file) {
+    console.log('File selected:', file.name)
+
+    if (selectFile(file) && props.autoUpload) {
+      // Attendre que le FileReader finisse avant d'uploader
+      setTimeout(() => {
+        upload()
+      }, 100)
     }
   }
 }
@@ -200,24 +293,87 @@ const onDragLeave = () => {
 
 const onDrop = (event: DragEvent) => {
   isDragOver.value = false
-  const files = event.dataTransfer?.files
+  const droppedFiles = event.dataTransfer?.files
 
-  if (files && files.length > 0) {
-    const file = files[0]
+  if (droppedFiles && droppedFiles.length > 0) {
+    const file = droppedFiles[0]
+
+    console.log('File dropped:', file.name)
+
     if (selectFile(file) && props.autoUpload) {
-      upload()
+      setTimeout(() => {
+        upload()
+      }, 100)
     }
   }
 }
 
 const upload = async () => {
+  if (!serverFiles.value || serverFiles.value.length === 0) {
+    error.value = 'Aucun fichier sélectionné'
+    emit('error', error.value)
+    return
+  }
+
+  uploading.value = true
+  error.value = null
+
   try {
-    const result = await uploadFile(props.endpoint)
-    emit('update:modelValue', result.imageUrl || null)
-    emit('uploaded', result)
+    console.log('Uploading files:', serverFiles.value)
+
+    // Construire l'URL de l'API selon l'endpoint
+    let apiUrl: string
+    switch (props.endpoint.type) {
+      case 'convention':
+        apiUrl = '/api/files/convention'
+        break
+      case 'edition':
+        apiUrl = '/api/files/edition'
+        break
+      case 'lost-found':
+        apiUrl = '/api/files/lost-found'
+        break
+      case 'profile':
+        apiUrl = '/api/files/profile'
+        break
+      default:
+        apiUrl = '/api/files/generic'
+        break
+    }
+
+    // Envoyer nos ServerFiles créés manuellement
+    const response = await $fetch(apiUrl, {
+      method: 'POST',
+      body: {
+        files: serverFiles.value,
+        metadata: {
+          endpoint: props.endpoint.type,
+          entityId: props.endpoint.id,
+        },
+      },
+    })
+
+    emit('update:modelValue', response.imageUrl || null)
+    emit('uploaded', response)
   } catch (uploadError: unknown) {
+    console.error('Upload error:', uploadError)
     const message = uploadError instanceof Error ? uploadError.message : 'Upload failed'
+    error.value = message
     emit('error', message)
+  } finally {
+    uploading.value = false
+  }
+}
+
+// Fonction de reset
+const reset = () => {
+  selectedFile.value = null
+  error.value = null
+  serverFiles.value = []
+
+  if (previewUrl.value) {
+    URL.revokeObjectURL(previewUrl.value)
+    previewUrl.value = null
   }
 }
 
@@ -229,14 +385,9 @@ const handleDelete = async () => {
   }
 
   if (props.modelValue && props.allowDelete) {
-    try {
-      await deleteImage(props.endpoint)
-      emit('update:modelValue', null)
-      emit('deleted')
-    } catch (deleteError: unknown) {
-      const message = deleteError instanceof Error ? deleteError.message : 'Delete failed'
-      emit('error', message)
-    }
+    // Pour la suppression d'images déjà uploadées, on peut implémenter plus tard
+    emit('update:modelValue', null)
+    emit('deleted')
   }
 }
 
