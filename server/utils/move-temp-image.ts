@@ -30,7 +30,14 @@ export async function moveTempImageToConvention(
     if (!filename) return null
 
     const tempPath = join(process.cwd(), 'public', 'uploads', 'temp', filename)
-    const editionDir = join(process.cwd(), 'public', 'uploads', 'editions', conventionId.toString())
+    // Utiliser 'conventions' au lieu de 'editions' pour être cohérent
+    const editionDir = join(
+      process.cwd(),
+      'public',
+      'uploads',
+      'conventions',
+      conventionId.toString()
+    )
 
     // Créer le dossier de destination
     await fs.mkdir(editionDir, { recursive: true })
@@ -44,10 +51,10 @@ export async function moveTempImageToConvention(
     await fs.rename(tempPath, newPath)
 
     // Copier vers .output/public en production
-    await copyToOutputPublic(`uploads/editions/${conventionId}/${newFilename}`)
+    await copyToOutputPublic(`uploads/conventions/${conventionId}/${newFilename}`)
 
-    // Retourner la nouvelle URL
-    return `/uploads/editions/${conventionId}/${newFilename}`
+    // Retourner la nouvelle URL cohérente
+    return `/uploads/conventions/${conventionId}/${newFilename}`
   } catch (error) {
     console.error("Erreur lors du déplacement de l'image temporaire:", error)
     return null

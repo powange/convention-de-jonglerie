@@ -254,7 +254,7 @@ export default defineEventHandler(async (event) => {
       edition: {
         select: {
           id: true,
-          title: true,
+          name: true,
           conventionId: true,
           convention: {
             select: {
@@ -273,7 +273,7 @@ export default defineEventHandler(async (event) => {
         userId: event.context.user.id,
         type: 'SUCCESS',
         title: 'Candidature de bénévolat envoyée ! 🎉',
-        message: `Votre candidature pour "${application.edition.convention.name} - ${application.edition.title}" a été envoyée avec succès. Les organisateurs vont l'examiner.`,
+        message: `Votre candidature pour "${application.edition.convention.name}${application.edition.name ? ' - ' + application.edition.name : ''}" a été envoyée avec succès. Les organisateurs vont l'examiner.`,
         category: 'volunteer',
         entityType: 'Edition',
         entityId: editionId.toString(),
