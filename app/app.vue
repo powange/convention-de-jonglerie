@@ -245,19 +245,22 @@ const changeLanguage = async (newLocale: string) => {
   refreshNuxtData()
 }
 
-onMounted(() => {
+// Utiliser les composables Nuxt appropriés pour éviter les problèmes de tree-shaking
+const { $router } = useNuxtApp()
+
+// Utiliser nextTick pour s'assurer que nous sommes côté client après hydration  
+onMounted(async () => {
   // Le plugin auth.client.ts s'occupe maintenant de l'initialisation de l'authentification
-
-  // S'assurer que nous sommes côté client (méthode recommandée par Nuxt)
-  if (!process.client) return
-
-  // Gérer le responsive
-  const checkMobile = () => {
-    isMobile.value = window.innerWidth < 768
-  }
-
-  checkMobile()
-  window.addEventListener('resize', checkMobile)
+  
+  await nextTick()
+  
+  // Gérer le responsive avec les composables VueUse
+  const { width } = useWindowSize()
+  
+  // Watcher réactif pour la taille d'écran
+  watch(width, (newWidth) => {
+    isMobile.value = newWidth < 768
+  }, { immediate: true })
 
   // Attendre que tout soit chargé
   const hideLoading = () => {
@@ -267,21 +270,20 @@ onMounted(() => {
     }, 500)
   }
 
+  // Utiliser useEventListener de VueUse pour gérer automatiquement le cleanup
+  useEventListener(document, 'readystatechange', () => {
+    if (document.readyState === 'complete') {
+      hideLoading()
+    }
+  })
+
   // Si tout est déjà chargé
   if (document.readyState === 'complete') {
     hideLoading()
   } else {
     // Attendre que tout soit chargé (images, CSS, etc.)
-    window.addEventListener('load', hideLoading)
+    useEventListener(window, 'load', hideLoading)
   }
-
-  // Cleanup
-  onUnmounted(() => {
-    if (process.client) {
-      window.removeEventListener('resize', checkMobile)
-      window.removeEventListener('load', hideLoading)
-    }
-  })
 })
 
 // Calculer le nom d'affichage
