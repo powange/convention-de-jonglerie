@@ -13,10 +13,6 @@
     "api_error_logs": "API Error Logs",
     "api_path": "API Path...",
     "archive_convention": "Archive convention",
-    "error_logs": {
-      "unresolved": "Unresolved errors",
-      "need_investigation": "Need investigation"
-    },
     "cannot_load_activity": "Cannot load recent activity",
     "cannot_load_stats": "Cannot load statistics",
     "cannot_load_users": "Cannot load users",
@@ -52,7 +48,10 @@
     "email_verified": "Email verified",
     "email_z_a": "By email (Z-A)",
     "error_details": "Error Details",
-    "error_type": "Error Type",
+    "error_logs": {
+      "need_investigation": "Need investigation",
+      "unresolved": "Unresolved errors"
+    },
     "errors_24h": "Errors (24h)",
     "event_reminders": "Event Reminders",
     "favorites_count": "favorite(s)",
@@ -79,6 +78,7 @@
         "label": "Message"
       },
       "pending": "Pending",
+      "require_attention": "Require attention",
       "resolve": "Resolve",
       "resolved": "Resolved",
       "search": "Search feedback...",
@@ -108,7 +108,6 @@
       },
       "unresolve": "Reopen",
       "unresolved": "Unresolved feedback",
-      "require_attention": "Require attention",
       "url": "Related page",
       "user": "User",
       "user_agent": "Browser/OS",
@@ -632,6 +631,7 @@
     "granular_rights": "Granular rights",
     "granular_rights_desc": "Specific permissions per edition or global according to your needs",
     "learn_more": "Learn more",
+    "logo_alt": "Logo of {name}",
     "manage": "Manage",
     "manage_collaborators": "Manage collaborators",
     "manage_collaborators_desc": "Invite and manage your organizing team members",
@@ -643,6 +643,7 @@
     "no_conventions": "No conventions created",
     "no_conventions_description": "Conventions will allow you to group multiple editions.",
     "no_description": "No description",
+    "no_description_available": "No description available",
     "no_editions": "No editions for this convention",
     "status_control": "Visibility control",
     "status_control_desc": "Publish or unpublish your editions according to their progress"
@@ -676,6 +677,7 @@
     "id": "ID"
   },
   "editions": {
+    "about_convention": "About the convention",
     "about_this_edition": "About this edition",
     "add_comment_placeholder": "Add a comment...",
     "add_lost_item": "Add lost item",
@@ -698,6 +700,7 @@
     "item_marked_lost": "Item marked as lost",
     "item_marked_returned": "Item marked as returned",
     "items_appear_when_started": "Lost items will appear once the edition has started.",
+    "learn_more_about_convention": "Learn more about the convention",
     "length": "Length",
     "loading_details": "Loading edition details...",
     "lost": "🔍 Lost",
@@ -1086,8 +1089,12 @@
   "log": {
     "adminNotes": "Admin Notes",
     "errorType": "Error Type",
+    "full_url": "Full URL",
     "id": "ID",
     "ip": "IP Address",
+    "method": "Method",
+    "path": "Path",
+    "resolution": "Resolution",
     "user": "User"
   },
   "messages": {

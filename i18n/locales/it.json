@@ -52,7 +52,6 @@
       "need_investigation": "Richiedono investigazione",
       "unresolved": "Errori non risolti"
     },
-    "error_type": "Tipo di errore",
     "errors_24h": "Errori (24h)",
     "event_reminders": "Promemoria eventi",
     "favorites_count": "preferito(i)",
@@ -632,6 +631,7 @@
     "granular_rights": "Diritti granulari",
     "granular_rights_desc": "Permessi specifici per edizione o globali secondo le tue esigenze",
     "learn_more": "Saperne di più",
+    "logo_alt": "Logo di {name}",
     "manage": "Gestisci",
     "manage_collaborators": "Gestire collaboratori",
     "manage_collaborators_desc": "Invita e gestisci i membri del tuo team organizzativo",
@@ -643,6 +643,7 @@
     "no_conventions": "Nessun convegno creato",
     "no_conventions_description": "I convegni ti permetteranno di raggruppare più edizioni.",
     "no_description": "Nessuna descrizione",
+    "no_description_available": "Nessuna descrizione disponibile",
     "no_editions": "Nessuna edizione per questo convegno",
     "status_control": "Controllo della visibilità",
     "status_control_desc": "Pubblica o nascondi le tue edizioni secondo il loro progresso"
@@ -676,6 +677,7 @@
     "id": "ID"
   },
   "editions": {
+    "about_convention": "Informazioni sulla convention",
     "about_this_edition": "A proposito di questa edizione",
     "add_comment_placeholder": "Aggiungi un commento...",
     "add_lost_item": "Aggiungi oggetto smarrito",
@@ -698,6 +700,7 @@
     "item_marked_lost": "Oggetto segnato come smarrito",
     "item_marked_returned": "Oggetto segnato come restituito",
     "items_appear_when_started": "Gli oggetti smarriti appariranno una volta iniziata l'edizione.",
+    "learn_more_about_convention": "Maggiori informazioni sulla convention",
     "length": "Lunghezza",
     "loading_details": "Caricamento dettagli edizione...",
     "lost": "🔍 Smarrito",
@@ -1086,8 +1089,12 @@
   "log": {
     "adminNotes": "Note amministratore",
     "errorType": "Tipo di errore",
+    "full_url": "URL completo",
     "id": "ID",
     "ip": "Indirizzo IP",
+    "method": "Metodo",
+    "path": "Percorso",
+    "resolution": "Risoluzione",
     "user": "Utente"
   },
   "messages": {

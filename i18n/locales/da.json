@@ -52,7 +52,6 @@
       "need_investigation": "Kræver undersøgelse",
       "unresolved": "Uløste fejl"
     },
-    "error_type": "Fejltype",
     "errors_24h": "Fejl (24t)",
     "event_reminders": "Begivenhedspåmindelser",
     "favorites_count": "favorit(ter)",
@@ -632,6 +631,7 @@
     "granular_rights": "Granulære rettigheder",
     "granular_rights_desc": "Specifikke tilladelser per udgave eller globale efter dine behov",
     "learn_more": "Lær mere",
+    "logo_alt": "Logo for {name}",
     "manage": "Administrer",
     "manage_collaborators": "Administrer samarbejdspartnere",
     "manage_collaborators_desc": "Inviter og administrer medlemmer af dit organisationsteam",
@@ -643,6 +643,7 @@
     "no_conventions": "Ingen konventioner oprettet",
     "no_conventions_description": "Konventioner giver dig mulighed for at gruppere flere udgaver.",
     "no_description": "Ingen beskrivelse",
+    "no_description_available": "Ingen beskrivelse tilgængelig",
     "no_editions": "Ingen udgaver for denne konvention",
     "status_control": "Synlighedskontrol",
     "status_control_desc": "Publicer eller afpublicér dine udgaver efter deres fremskridtstilstand"
@@ -676,6 +677,7 @@
     "id": "ID"
   },
   "editions": {
+    "about_convention": "Om konventionen",
     "about_this_edition": "Om denne udgave",
     "add_comment_placeholder": "Tilføj en kommentar...",
     "add_lost_item": "Tilføj hittegods",
@@ -698,6 +700,7 @@
     "item_marked_lost": "Genstand markeret som tabt",
     "item_marked_returned": "Genstand markeret som returneret",
     "items_appear_when_started": "Hittegods vil vises når udgaven er startet.",
+    "learn_more_about_convention": "Læs mere om konventionen",
     "length": "Længde",
     "loading_details": "Indlæser udgavens detaljer...",
     "lost": "🔍 Tabt",
@@ -1086,8 +1089,12 @@
   "log": {
     "adminNotes": "Admin-noter",
     "errorType": "Fejltype",
+    "full_url": "Fuld URL",
     "id": "ID",
     "ip": "IP-adresse",
+    "method": "Metode",
+    "path": "Sti",
+    "resolution": "Løsning",
     "user": "Bruger"
   },
   "messages": {

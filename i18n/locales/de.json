@@ -52,7 +52,6 @@
       "need_investigation": "Untersuchung erforderlich",
       "unresolved": "Ungelöste Fehler"
     },
-    "error_type": "Fehlertyp",
     "errors_24h": "Fehler (24h)",
     "event_reminders": "Veranstaltungserinnerungen",
     "favorites_count": "Favorit(en)",
@@ -632,6 +631,7 @@
     "granular_rights": "Detaillierte Rechte",
     "granular_rights_desc": "Spezifische Berechtigungen pro Auflage oder global nach Ihren Bedürfnissen",
     "learn_more": "Mehr erfahren",
+    "logo_alt": "Logo von {name}",
     "manage": "Verwalten",
     "manage_collaborators": "Mitarbeiter verwalten",
     "manage_collaborators_desc": "Laden Sie Ihre Organisationsteam-Mitglieder ein und verwalten Sie sie",
@@ -643,6 +643,7 @@
     "no_conventions": "Keine Convention erstellt",
     "no_conventions_description": "Conventions ermöglichen es dir, mehrere Auflagen zu gruppieren.",
     "no_description": "Keine Beschreibung",
+    "no_description_available": "Keine Beschreibung verfügbar",
     "no_editions": "Keine Auflage für diese Convention",
     "status_control": "Sichtbarkeitskontrolle",
     "status_control_desc": "Veröffentlichen oder verstecken Sie Ihre Auflagen je nach Fortschritt"
@@ -676,6 +677,7 @@
     "id": "ID"
   },
   "editions": {
+    "about_convention": "Über die Convention",
     "about_this_edition": "Über diese Auflage",
     "add_comment_placeholder": "Kommentar hinzufügen...",
     "add_lost_item": "Fundsache hinzufügen",
@@ -698,6 +700,7 @@
     "item_marked_lost": "Gegenstand als verloren markiert",
     "item_marked_returned": "Gegenstand als zurückgegeben markiert",
     "items_appear_when_started": "Fundsachen erscheinen sobald die Auflage begonnen hat.",
+    "learn_more_about_convention": "Mehr über die Convention erfahren",
     "length": "Länge",
     "loading_details": "Lade Details der Auflage...",
     "lost": "🔍 Verloren",
@@ -1086,8 +1089,12 @@
   "log": {
     "adminNotes": "Admin-Notizen",
     "errorType": "Fehlertyp",
+    "full_url": "Vollständige URL",
     "id": "ID",
     "ip": "IP-Adresse",
+    "method": "Methode",
+    "path": "Pfad",
+    "resolution": "Auflösung",
     "user": "Benutzer"
   },
   "messages": {

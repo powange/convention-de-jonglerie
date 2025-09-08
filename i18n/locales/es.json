@@ -52,7 +52,6 @@
       "need_investigation": "Requieren investigación",
       "unresolved": "Errores sin resolver"
     },
-    "error_type": "Tipo de error",
     "errors_24h": "Errores (24h)",
     "event_reminders": "Recordatorios de eventos",
     "favorites_count": "favorito(s)",
@@ -632,6 +631,7 @@
     "granular_rights": "Derechos granulares",
     "granular_rights_desc": "Permisos específicos por edición o globales según tus necesidades",
     "learn_more": "Saber más",
+    "logo_alt": "Logo de {name}",
     "manage": "Gestionar",
     "manage_collaborators": "Gestionar colaboradores",
     "manage_collaborators_desc": "Invita y gestiona a los miembros de tu equipo organizador",
@@ -643,6 +643,7 @@
     "no_conventions": "Sin convenciones creadas",
     "no_conventions_description": "Las convenciones te permitirán agrupar múltiples ediciones.",
     "no_description": "Sin descripción",
+    "no_description_available": "No hay descripción disponible",
     "no_editions": "Sin ediciones para esta convención",
     "status_control": "Control de visibilidad",
     "status_control_desc": "Publica o despublica tus ediciones según su progreso"
@@ -676,6 +677,7 @@
     "id": "ID"
   },
   "editions": {
+    "about_convention": "Acerca de la convención",
     "about_this_edition": "Acerca de esta edición",
     "add_comment_placeholder": "Agregar un comentario...",
     "add_lost_item": "Agregar objeto perdido",
@@ -698,6 +700,7 @@
     "item_marked_lost": "Objeto marcado como perdido",
     "item_marked_returned": "Objeto marcado como devuelto",
     "items_appear_when_started": "Los objetos perdidos aparecerán una vez que la edición haya comenzado.",
+    "learn_more_about_convention": "Más información sobre la convención",
     "length": "Longitud",
     "loading_details": "Cargando detalles de la edición...",
     "lost": "🔍 Perdido",
@@ -1086,8 +1089,12 @@
   "log": {
     "adminNotes": "Notas de administrador",
     "errorType": "Tipo de error",
+    "full_url": "URL completa",
     "id": "ID",
     "ip": "Dirección IP",
+    "method": "Método",
+    "path": "Ruta",
+    "resolution": "Resolución",
     "user": "Usuario"
   },
   "messages": {

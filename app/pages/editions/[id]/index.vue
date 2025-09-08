@@ -62,6 +62,18 @@
               <p v-else class="text-gray-700 dark:text-gray-300">
                 {{ t('editions.no_description_available') }}
               </p>
+
+              <!-- Lien vers la modale de la convention -->
+              <div class="mt-4">
+                <UButton
+                  variant="ghost"
+                  size="sm"
+                  icon="i-heroicons-information-circle"
+                  @click="showConventionModal = true"
+                >
+                  {{ $t('editions.learn_more_about_convention') }}
+                </UButton>
+              </div>
             </div>
           </div>
         </template>
@@ -244,6 +256,47 @@
         </div>
       </Transition>
     </Teleport>
+
+    <!-- Modale d'informations sur la convention -->
+    <UModal v-model:open="showConventionModal" :title="$t('editions.about_convention')" size="md">
+      <template #body>
+        <div class="space-y-4">
+          <!-- Logo de la convention -->
+          <div v-if="edition?.convention?.logoUrl" class="flex justify-center">
+            <img
+              :src="normalizeImageUrl(edition.convention.logoUrl)"
+              :alt="$t('conventions.logo_alt', { name: edition.convention.name })"
+              class="max-w-32 max-h-32 object-contain"
+            />
+          </div>
+
+          <!-- Nom de la convention -->
+          <h3 class="text-lg font-semibold text-center">
+            {{ edition?.convention?.name }}
+          </h3>
+
+          <!-- Description de la convention -->
+          <div
+            v-if="edition?.convention?.description && conventionDescriptionHtml"
+            class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
+          >
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <div v-html="conventionDescriptionHtml" />
+          </div>
+          <p v-else class="text-gray-700 dark:text-gray-300 text-center">
+            {{ $t('conventions.no_description_available') }}
+          </p>
+        </div>
+      </template>
+
+      <template #footer="{ close }">
+        <div class="flex justify-end">
+          <UButton variant="outline" @click="close">
+            {{ $t('common.close') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -271,6 +324,7 @@ const { getTranslatedServicesByCategory } = useTranslatedConventionServices()
 
 const editionId = parseInt(route.params.id as string)
 const showImageOverlay = ref(false)
+const showConventionModal = ref(false)
 const { normalizeImageUrl } = useImageUrl()
 
 // (Bloc bénévolat déplacé dans la page benevoles.vue)
@@ -291,6 +345,14 @@ const descriptionHtml = computedAsync(async () => {
     return ''
   }
   return await markdownToHtml(edition.value.description)
+}, '')
+
+// Description de la convention en HTML (rendu Markdown)
+const conventionDescriptionHtml = computedAsync(async () => {
+  if (!edition.value?.convention?.description) {
+    return ''
+  }
+  return await markdownToHtml(edition.value.convention.description)
 }, '')
 
 const isFavorited = computed(() => (_editionId: number) => {

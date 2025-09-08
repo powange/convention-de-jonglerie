@@ -52,7 +52,6 @@
       "need_investigation": "Wymagają badań",
       "unresolved": "Nierozwiązane błędy"
     },
-    "error_type": "Typ błędu",
     "errors_24h": "Błędy (24h)",
     "event_reminders": "Przypomnienia o wydarzeniach",
     "favorites_count": "ulubione",
@@ -632,6 +631,7 @@
     "granular_rights": "Szczegółowe uprawnienia",
     "granular_rights_desc": "Konkretne uprawnienia dla każdej edycji lub globalne według twoich potrzeb",
     "learn_more": "Dowiedz się więcej",
+    "logo_alt": "Logo {name}",
     "manage": "Zarządzaj",
     "manage_collaborators": "Zarządzanie współpracownikami",
     "manage_collaborators_desc": "Zapraszaj i zarządzaj członkami swojego zespołu organizacyjnego",
@@ -643,6 +643,7 @@
     "no_conventions": "Brak utworzonych konwencji",
     "no_conventions_description": "Konwencje pozwolą ci zgrupować kilka edycji.",
     "no_description": "Brak opisu",
+    "no_description_available": "Brak opisu",
     "no_editions": "Brak edycji dla tej konwencji",
     "status_control": "Kontrola widoczności",
     "status_control_desc": "Publikuj lub cofaj publikację swoich edycji zgodnie z ich stanem przygotowania"
@@ -676,6 +677,7 @@
     "id": "ID"
   },
   "editions": {
+    "about_convention": "O konwencji",
     "about_this_edition": "O tej edycji",
     "add_comment_placeholder": "Dodaj komentarz...",
     "add_lost_item": "Dodaj znalezioną rzecz",
@@ -698,6 +700,7 @@
     "item_marked_lost": "Rzecz oznaczona jako zgubiona",
     "item_marked_returned": "Rzecz oznaczona jako zwrócona",
     "items_appear_when_started": "Znalezione rzeczy pojawią się po rozpoczęciu edycji.",
+    "learn_more_about_convention": "Dowiedz się więcej o konwencji",
     "length": "Długość",
     "loading_details": "Ładowanie szczegółów edycji...",
     "lost": "🔍 Zgubione",
@@ -1086,8 +1089,12 @@
   "log": {
     "adminNotes": "Notatki administratora",
     "errorType": "Typ błędu",
+    "full_url": "Pełny URL",
     "id": "ID",
     "ip": "Adres IP",
+    "method": "Metoda",
+    "path": "Ścieżka",
+    "resolution": "Rozwiązanie",
     "user": "Użytkownik"
   },
   "messages": {

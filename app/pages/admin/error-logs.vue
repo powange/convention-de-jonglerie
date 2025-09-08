@@ -318,19 +318,19 @@
             </label>
             <div class="grid grid-cols-2 gap-4 text-sm">
               <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded">
-                <strong>Méthode :</strong> {{ selectedLog.method }}
+                <strong>{{ $t('log.method') }}:</strong> {{ selectedLog.method }}
               </div>
               <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded">
-                <strong>Chemin :</strong> {{ selectedLog.path }}
+                <strong>{{ $t('log.path') }}:</strong> {{ selectedLog.path }}
               </div>
               <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded col-span-2">
-                <strong>URL complète :</strong> {{ selectedLog.url }}
+                <strong>{{ $t('log.full_url') }}:</strong> {{ selectedLog.url }}
               </div>
               <div v-if="selectedLog.ip" class="p-3 bg-gray-50 dark:bg-gray-800 rounded">
-                <strong>Adresse IP :</strong> {{ selectedLog.ip }}
+                <strong>{{ $t('log.ip') }}:</strong> {{ selectedLog.ip }}
               </div>
               <div v-if="selectedLog.user" class="p-3 bg-gray-50 dark:bg-gray-800 rounded">
-                <strong>Utilisateur :</strong> {{ selectedLog.user.pseudo }} ({{
+                <strong>{{ $t('log.user') }}:</strong> {{ selectedLog.user.pseudo }} ({{
                   selectedLog.user.email
                 }})
               </div>
@@ -364,7 +364,7 @@
           <!-- Section de résolution -->
           <div class="border-t pt-6">
             <div class="flex items-center justify-between mb-4">
-              <h4 class="text-md font-medium">Résolution</h4>
+              <h4 class="text-md font-medium">{{ $t('log.resolution') }}</h4>
               <UBadge
                 :color="selectedLog.resolved ? 'success' : 'error'"
                 :variant="selectedLog.resolved ? 'subtle' : 'solid'"

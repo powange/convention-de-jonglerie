@@ -52,7 +52,6 @@
       "need_investigation": "Vereisen onderzoek",
       "unresolved": "Onopgeloste fouten"
     },
-    "error_type": "Fouttype",
     "errors_24h": "Fouten (24u)",
     "event_reminders": "Evenementherinneringen",
     "favorites_count": "favoriet(en)",
@@ -632,6 +631,7 @@
     "granular_rights": "Gedetailleerde rechten",
     "granular_rights_desc": "Specifieke rechten per editie of globaal volgens je behoeften",
     "learn_more": "Meer weten",
+    "logo_alt": "Logo van {name}",
     "manage": "Beheren",
     "manage_collaborators": "Medewerkers beheren",
     "manage_collaborators_desc": "Nodig teamleden uit en beheer ze",
@@ -643,6 +643,7 @@
     "no_conventions": "Geen conventies aangemaakt",
     "no_conventions_description": "Conventies stellen je in staat om meerdere edities te groeperen.",
     "no_description": "Geen beschrijving",
+    "no_description_available": "Geen beschrijving beschikbaar",
     "no_editions": "Geen edities voor deze conventie",
     "status_control": "Zichtbaarheidscontrole",
     "status_control_desc": "Publiceer of verberg je edities volgens hun voortgang"
@@ -676,6 +677,7 @@
     "id": "ID"
   },
   "editions": {
+    "about_convention": "Over de conventie",
     "about_this_edition": "Over deze editie",
     "add_comment_placeholder": "Voeg een opmerking toe...",
     "add_lost_item": "Verloren voorwerp toevoegen",
@@ -698,6 +700,7 @@
     "item_marked_lost": "Voorwerp gemarkeerd als verloren",
     "item_marked_returned": "Voorwerp gemarkeerd als teruggegeven",
     "items_appear_when_started": "Verloren voorwerpen verschijnen zodra de editie is begonnen.",
+    "learn_more_about_convention": "Meer over de conventie",
     "length": "Lengte",
     "loading_details": "Editiedetails laden...",
     "lost": "🔍 Verloren",
@@ -879,7 +882,7 @@
   "erreur": {
     "": {
       "": {
-        "": "Voeg notities toe over deze fout..."
+        "": "Notities over deze fout toevoegen..."
       }
     }
   },
@@ -1086,8 +1089,12 @@
   "log": {
     "adminNotes": "Beheernotities",
     "errorType": "Fouttype",
+    "full_url": "Volledige URL",
     "id": "ID",
     "ip": "IP-adres",
+    "method": "Methode",
+    "path": "Pad",
+    "resolution": "Resolutie",
     "user": "Gebruiker"
   },
   "messages": {
