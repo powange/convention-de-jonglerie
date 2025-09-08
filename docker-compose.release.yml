@@ -51,7 +51,7 @@ services:
       NUXT_PUBLIC_RECAPTCHA_SITE_KEY: '${NUXT_PUBLIC_RECAPTCHA_SITE_KEY}'
       NUXT_RECAPTCHA_SECRET_KEY: '${NUXT_RECAPTCHA_SECRET_KEY}'
     volumes:
-      - uploads_data:/app/public/uploads
+      - /home/powange/docker_workspaces/convention-de-jonglerie-release/uploads_data:/app/public/uploads
     depends_on:
       database:
         condition: service_healthy
