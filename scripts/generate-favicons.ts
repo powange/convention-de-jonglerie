@@ -34,18 +34,47 @@ async function run() {
 
   // Générer les noms spéciaux attendus par les PWA et navigateurs
   const specialFiles = [
-    { size: 192, name: 'android-chrome-192x192.png' },
-    { size: 512, name: 'android-chrome-512x512.png' },
-    { size: 180, name: 'apple-touch-icon.png' },
+    { size: 192, name: 'android-chrome-192x192.png', needsBackground: true },
+    { size: 512, name: 'android-chrome-512x512.png', needsBackground: true },
+    { size: 180, name: 'apple-touch-icon.png', needsBackground: true },
   ]
 
+  // Couleur de fond oklch(20.8% 0.042 265.755) convertie en RGB
+  const backgroundColorRgb = { r: 44, g: 50, b: 68 } // Approximation RGB de la couleur oklch
+
   await Promise.all(
-    specialFiles.map(async ({ size, name }) => {
+    specialFiles.map(async ({ size, name, needsBackground }) => {
       const file = path.join(outDir, name)
-      await sharp(Buffer.from(svgContent))
-        .resize(size, size)
+      let sharpInstance = sharp(Buffer.from(svgContent)).resize(size, size)
+      
+      if (needsBackground) {
+        // Créer une image avec fond coloré puis composer le logo par-dessus
+        const logoBuffer = await sharp(Buffer.from(svgContent))
+          .resize(size, size)
+          .png()
+          .toBuffer()
+        
+        sharpInstance = sharp({
+          create: {
+            width: size,
+            height: size,
+            channels: 4,
+            background: backgroundColorRgb
+          }
+        })
+        .composite([
+          {
+            input: logoBuffer,
+            top: 0,
+            left: 0
+          }
+        ])
         .png({ compressionLevel: 9 })
-        .toFile(file)
+      } else {
+        sharpInstance = sharpInstance.png({ compressionLevel: 9 })
+      }
+      
+      await sharpInstance.toFile(file)
     })
   )
 
