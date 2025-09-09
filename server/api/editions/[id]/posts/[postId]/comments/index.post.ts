@@ -6,6 +6,7 @@ import {
   validateAndSanitize,
   handleValidationError,
 } from '../../../../../../../server/utils/validation-schemas'
+import { hasEditionEditPermission } from '../../../../../../utils/permissions'
 
 const prisma = new PrismaClient()
 
@@ -42,6 +43,15 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 404,
         statusMessage: 'Post non trouvé',
+      })
+    }
+
+    // Vérifier les permissions pour commenter sur cette édition
+    const hasPermission = await hasEditionEditPermission(user.id, editionId)
+    if (!hasPermission) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Vous devez être collaborateur pour commenter sur cette édition',
       })
     }
 

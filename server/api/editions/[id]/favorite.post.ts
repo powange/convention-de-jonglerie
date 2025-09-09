@@ -18,6 +18,18 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
+    // Vérifier que l'édition existe
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
+    })
+
+    if (!edition) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Edition introuvable',
+      })
+    }
+
     const user = await prisma.user.findUnique({
       where: { id: event.context.user.id },
       include: { favoriteEditions: true },

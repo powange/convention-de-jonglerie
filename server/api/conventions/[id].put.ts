@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
         collaborators: {
           where: {
             userId: event.context.user.id,
-            OR: [{ canEditConvention: true }, { canManageCollaborators: true }],
+            canEditConvention: true,
           },
         },
       },

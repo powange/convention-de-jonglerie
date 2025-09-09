@@ -17,6 +17,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Restreindre aux administrateurs globaux pour la sécurité
+  if (!event.context.user.isGlobalAdmin) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Accès réservé aux administrateurs',
+    })
+  }
+
   try {
     const { files, metadata } = await readBody<RequestBody>(event)
 
