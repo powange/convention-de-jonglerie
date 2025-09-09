@@ -10,6 +10,15 @@ node -e "require.resolve('nuxt-auth-utils')" >/dev/null 2>&1 || {
   npm ci
 }
 
+# Préparer Nuxt pour les tests
+echo "🔧 Préparation de Nuxt..."
+rm -rf /app/.nuxt
+npx nuxt prepare || {
+  echo "⚠️  Nuxt prepare a échoué, tentative de récupération..."
+  mkdir -p /app/.nuxt
+  touch /app/.nuxt/ui.css
+}
+
 echo "==================================="
 echo "     Lancement de tous les tests    "
 echo "==================================="
