@@ -679,6 +679,7 @@
   },
   "editions": {
     "about_convention": "Acerca de la convención",
+    "about_convention_description": "Información detallada sobre la convención",
     "about_this_edition": "Acerca de esta edición",
     "add_comment_placeholder": "Agregar un comentario...",
     "add_lost_item": "Agregar objeto perdido",
@@ -879,6 +880,13 @@
     "volunteers_view_only_note": "Solo modo consulta",
     "volunteers_what_you_can_bring_title": "Lo que puede aportarnos",
     "volunteers_withdraw": "Retirar mi solicitud"
+  },
+  "erreur": {
+    "": {
+      "": {
+        "": "[TODO] Ajouter des notes sur cette erreur..."
+      }
+    }
   },
   "errors": {
     "access_denied": "Acceso denegado",

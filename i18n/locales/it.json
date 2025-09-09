@@ -679,6 +679,7 @@
   },
   "editions": {
     "about_convention": "Informazioni sulla convention",
+    "about_convention_description": "Informazioni dettagliate sulla convention",
     "about_this_edition": "A proposito di questa edizione",
     "add_comment_placeholder": "Aggiungi un commento...",
     "add_lost_item": "Aggiungi oggetto smarrito",
@@ -879,6 +880,13 @@
     "volunteers_view_only_note": "Solo modalità consultazione",
     "volunteers_what_you_can_bring_title": "Cosa può portarci",
     "volunteers_withdraw": "Ritira la mia candidatura"
+  },
+  "erreur": {
+    "": {
+      "": {
+        "": "[TODO] Ajouter des notes sur cette erreur..."
+      }
+    }
   },
   "errors": {
     "access_denied": "Accesso non autorizzato",

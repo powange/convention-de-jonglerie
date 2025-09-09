@@ -196,7 +196,12 @@
     </div>
 
     <!-- Modale d'informations sur la convention -->
-    <UModal v-model:open="showConventionModal" :title="$t('editions.about_convention')" size="md">
+    <UModal
+      v-model:open="showConventionModal"
+      :title="$t('editions.about_convention')"
+      :description="$t('editions.about_convention_description')"
+      size="md"
+    >
       <template #body>
         <div class="space-y-4">
           <!-- Logo de la convention -->

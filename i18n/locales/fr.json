@@ -671,6 +671,7 @@
   "editions": {
     "about_this_edition": "À propos de cette édition",
     "about_convention": "À propos de la convention",
+    "about_convention_description": "Informations détaillées sur la convention",
     "learn_more_about_convention": "En savoir plus sur la convention",
     "add_comment_placeholder": "Ajouter un commentaire...",
     "add_lost_item": "Ajouter un objet trouvé",

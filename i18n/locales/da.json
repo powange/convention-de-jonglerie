@@ -679,6 +679,7 @@
   },
   "editions": {
     "about_convention": "Om konventionen",
+    "about_convention_description": "Detaljerede oplysninger om konventionen",
     "about_this_edition": "Om denne udgave",
     "add_comment_placeholder": "Tilføj en kommentar...",
     "add_lost_item": "Tilføj hittegods",
@@ -879,6 +880,13 @@
     "volunteers_view_only_note": "Kun visning tilstand",
     "volunteers_what_you_can_bring_title": "Hvad du kan bringe os",
     "volunteers_withdraw": "Træk min ansøgning tilbage"
+  },
+  "erreur": {
+    "": {
+      "": {
+        "": "[TODO] Ajouter des notes sur cette erreur..."
+      }
+    }
   },
   "errors": {
     "access_denied": "Adgang nægtet",

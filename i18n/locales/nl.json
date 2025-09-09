@@ -679,6 +679,7 @@
   },
   "editions": {
     "about_convention": "Over de conventie",
+    "about_convention_description": "Gedetailleerde informatie over de conventie",
     "about_this_edition": "Over deze editie",
     "add_comment_placeholder": "Voeg een opmerking toe...",
     "add_lost_item": "Verloren voorwerp toevoegen",
@@ -879,6 +880,13 @@
     "volunteers_view_only_note": "Alleen bekijkmodus",
     "volunteers_what_you_can_bring_title": "Wat u ons kunt brengen",
     "volunteers_withdraw": "Trek mijn aanmelding in"
+  },
+  "erreur": {
+    "": {
+      "": {
+        "": "[TODO] Ajouter des notes sur cette erreur..."
+      }
+    }
   },
   "errors": {
     "access_denied": "Toegang geweigerd",

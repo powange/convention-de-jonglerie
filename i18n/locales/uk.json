@@ -679,6 +679,7 @@
   },
   "editions": {
     "about_convention": "Про конвенцію",
+    "about_convention_description": "Детальна інформація про конвенцію",
     "about_this_edition": "Про це видання",
     "add_comment_placeholder": "Додати коментар...",
     "add_lost_item": "Додати загублений предмет",
