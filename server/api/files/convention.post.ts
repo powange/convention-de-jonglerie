@@ -40,6 +40,14 @@ export default defineEventHandler(async (event) => {
       const targetId = entityId || conventionId
       const convention = await prisma.convention.findUnique({
         where: { id: targetId },
+        include: {
+          collaborators: {
+            where: {
+              userId: event.context.user.id,
+              canEditConvention: true,
+            },
+          },
+        },
       })
 
       if (!convention) {
@@ -49,7 +57,11 @@ export default defineEventHandler(async (event) => {
         })
       }
 
-      if (convention.authorId !== event.context.user.id) {
+      const isAuthor = convention.authorId === event.context.user.id
+      const isCollaborator = convention.collaborators.length > 0
+      const isGlobalAdmin = event.context.user.isGlobalAdmin || false
+
+      if (!isAuthor && !isCollaborator && !isGlobalAdmin) {
         throw createError({
           statusCode: 403,
           statusMessage: "Vous n'avez pas les droits pour modifier cette convention",

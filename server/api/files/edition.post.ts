@@ -1,3 +1,5 @@
+import { prisma } from '../../utils/prisma'
+
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
   if (!event.context.user) {
@@ -30,6 +32,42 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 400,
         message: "ID d'édition invalide",
+      })
+    }
+
+    // Vérifier les permissions pour modifier cette édition
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
+      include: {
+        convention: {
+          include: {
+            collaborators: {
+              where: {
+                userId: event.context.user.id,
+                OR: [{ canEditAllEditions: true }, { canEditConvention: true }],
+              },
+            },
+          },
+        },
+      },
+    })
+
+    if (!edition) {
+      throw createError({
+        statusCode: 404,
+        message: 'Édition introuvable',
+      })
+    }
+
+    const isCreator = edition.createdBy === event.context.user.id
+    const isConventionAuthor = edition.convention.authorId === event.context.user.id
+    const isCollaborator = edition.convention.collaborators.length > 0
+    const isGlobalAdmin = event.context.user.isGlobalAdmin || false
+
+    if (!isCreator && !isConventionAuthor && !isCollaborator && !isGlobalAdmin) {
+      throw createError({
+        statusCode: 403,
+        message: "Vous n'avez pas les droits pour modifier cette édition",
       })
     }
 

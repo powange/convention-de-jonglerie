@@ -41,11 +41,20 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Vérifier que l'édition existe et récupérer sa convention
+    // Vérifier que l'édition existe et récupérer sa convention avec permissions
     const edition = await prisma.edition.findUnique({
       where: { id: targetEditionId },
       include: {
-        convention: true,
+        convention: {
+          include: {
+            collaborators: {
+              where: {
+                userId: event.context.user.id,
+                OR: [{ canEditAllEditions: true }, { canEditConvention: true }],
+              },
+            },
+          },
+        },
       },
     })
 
@@ -53,6 +62,19 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 404,
         statusMessage: 'Édition introuvable',
+      })
+    }
+
+    // Vérifier les permissions pour modifier cette édition
+    const isCreator = edition.createdBy === event.context.user.id
+    const isConventionAuthor = edition.convention.authorId === event.context.user.id
+    const isCollaborator = edition.convention.collaborators.length > 0
+    const isGlobalAdmin = event.context.user.isGlobalAdmin || false
+
+    if (!isCreator && !isConventionAuthor && !isCollaborator && !isGlobalAdmin) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Vous n'avez pas les droits pour ajouter des objets trouvés à cette édition",
       })
     }
 
