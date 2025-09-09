@@ -55,6 +55,7 @@ describe('Système de favoris', () => {
         favoriteEditions: [],
       }
 
+      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
       prismaMock.user.findUnique.mockResolvedValue(userWithoutFavorites)
       prismaMock.user.update.mockResolvedValue({
         ...userWithoutFavorites,
@@ -91,6 +92,7 @@ describe('Système de favoris', () => {
         favoriteEditions: [mockEdition],
       }
 
+      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
       prismaMock.user.findUnique.mockResolvedValue(userWithFavorites)
       prismaMock.user.update.mockResolvedValue({
         ...userWithFavorites,
