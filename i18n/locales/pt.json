@@ -440,6 +440,7 @@
     "tip": "Dica",
     "total": "Total",
     "updated_at": "Atualizado em {date}",
+    "validate": "Validar",
     "view": "Ver",
     "view_details": "Ver detalhes",
     "volunteers_short": "Voluntários",
@@ -879,13 +880,6 @@
     "volunteers_what_you_can_bring_title": "O que você pode nos trazer",
     "volunteers_withdraw": "Retirar minha inscrição"
   },
-  "erreur": {
-    "": {
-      "": {
-        "": "Adicionar notas sobre este erro..."
-      }
-    }
-  },
   "errors": {
     "access_denied": "Acesso negado",
     "addition_error": "Erro na adição",
@@ -1324,7 +1318,7 @@
     "saving": "A guardar...",
     "security": "Segurança",
     "unsaved_changes": "Tem alterações por guardar",
-    "username_hint": "Visível publicamente pelos outros utilizadores",
+    "username_help": "Visível publicamente pelos outros utilizadores",
     "username_min_3": "A alcunha deve conter pelo menos 3 caracteres",
     "username_placeholder": "A sua alcunha única"
   },
@@ -1377,26 +1371,16 @@
   "upload": {
     "click_select_convention_logo": "Clique para selecionar logo da convenção",
     "convention_logo_alt": "Logo da convenção",
-    "delete_error": "Erro de exclusão",
     "delete_message": "Imagem excluída",
     "demo_title": "Demo de upload de imagem",
     "error_message": "Erro de upload",
     "errors": {
-      "convention_id_required": "ID da convenção obrigatório",
-      "delete_failed": "Falha na exclusão",
-      "edition_id_required": "ID da edição obrigatório",
       "file_too_large": "Arquivo muito grande. Tamanho máximo: {maxSize}",
       "invalid_file_extension": "Extensão de arquivo inválida. Extensões aceitas: {allowedExtensions}",
-      "invalid_file_type": "Tipo de arquivo inválido. Formatos aceitos: {allowedTypes}",
-      "no_file_selected": "Nenhum arquivo selecionado",
-      "unsupported_delete_endpoint": "Endpoint de exclusão não suportado",
-      "upload_failed": "Falha no upload",
-      "validation_failed": "Falha na validação"
+      "invalid_file_type": "Tipo de arquivo inválido. Formatos aceitos: {allowedTypes}"
     },
     "formats_accepted": "Formatos aceitos",
     "image_configured": "Imagem configurada",
-    "image_deleted_successfully": "Imagem excluída com sucesso",
-    "image_uploaded_successfully": "Imagem enviada com sucesso",
     "loading_error_title": "Erro ao carregar imagem",
     "logo_preview_alt": "Pré-visualização do logo",
     "logo_url_label": "URL do logo",
@@ -1404,12 +1388,10 @@
     "logo_url_placeholder": "https://exemplo.com/logo.jpg",
     "max_size": "Tamanho máximo",
     "select_file": "Selecionar arquivo",
-    "success": "Sucesso",
     "success_message": "Imagem enviada com sucesso!",
     "upload": "Enviar",
     "upload_error": "Erro de upload",
-    "uploading": "Enviando...",
-    "validation_error": "Erro de validação"
+    "uploading": "Enviando..."
   },
   "validation": {
     "arrival_date_required": "Data de chegada é obrigatória",

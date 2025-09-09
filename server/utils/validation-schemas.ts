@@ -17,9 +17,10 @@ export const nameSchema = z
   .max(100, 'Ce champ ne peut pas dépasser 100 caractères')
 export const phoneSchema = z
   .string()
+  .nullable()
   .optional()
   .refine((val) => !val || /^\+?[0-9\s\-()]+$/.test(val), 'Numéro de téléphone invalide')
-export const urlSchema = z.string().url('URL invalide').optional().or(z.literal(''))
+export const urlSchema = z.string().url('URL invalide').nullable().optional().or(z.literal(''))
 export const dateSchema = z.string().refine((val) => !isNaN(Date.parse(val)), 'Date invalide')
 
 // Schémas d'authentification
@@ -55,6 +56,7 @@ export const updateProfileSchema = z.object({
   nom: z.string().max(100, 'Ce champ ne peut pas dépasser 100 caractères').optional(),
   email: emailSchema,
   telephone: phoneSchema.optional(),
+  profilePicture: z.string().nullable().optional(),
 })
 
 // Schémas de convention
@@ -86,7 +88,7 @@ export const editionSchema = z
       .string()
       .max(5000, 'La description ne peut pas dépasser 5000 caractères')
       .optional(),
-    imageUrl: z.string().optional(),
+    imageUrl: z.string().nullable().optional(),
     startDate: dateSchema,
     endDate: dateSchema,
     addressLine1: z
@@ -153,13 +155,15 @@ export const updateEditionSchema = z
     name: z
       .string()
       .max(200, 'Le nom ne peut pas dépasser 200 caractères')
+      .nullable()
       .optional()
       .refine((val) => !val || val.length >= 3, 'Le nom doit contenir au moins 3 caractères'),
     description: z
       .string()
       .max(5000, 'La description ne peut pas dépasser 5000 caractères')
+      .nullable()
       .optional(),
-    imageUrl: z.string().optional(),
+    imageUrl: z.string().nullable().optional(),
     startDate: dateSchema.optional(),
     endDate: dateSchema.optional(),
     addressLine1: z
@@ -167,7 +171,7 @@ export const updateEditionSchema = z
       .min(1, 'Adresse ligne 1 requise')
       .max(200, "L'adresse ne peut pas dépasser 200 caractères")
       .optional(),
-    addressLine2: z.string().optional(),
+    addressLine2: z.string().nullable().optional(),
     postalCode: z
       .string()
       .min(1, 'Code postal requis')
@@ -178,7 +182,7 @@ export const updateEditionSchema = z
       .min(1, 'Ville requise')
       .max(100, 'La ville ne peut pas dépasser 100 caractères')
       .optional(),
-    region: z.string().optional(),
+    region: z.string().nullable().optional(),
     country: z
       .string()
       .min(1, 'Pays requis')

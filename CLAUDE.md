@@ -4,6 +4,10 @@
 
 - Les conversations avec Claude se déroulent en français
 
+## Règles importantes
+
+- **NE JAMAIS lancer `npm run dev`** - Le serveur de développement est déjà en cours d'exécution
+
 ## Détails du projet
 
 ### Convention de Jonglerie - Application Web Full-Stack
@@ -67,6 +71,14 @@
 - `npm run preview` : Prévisualiser la version de production
 - `npm run lint` : Vérifier le code avec ESLint
 - `npm run db:seed:dev` : Peupler la base de données avec des données de développement
+
+**Scripts Docker pour le développement :**
+
+- `npm run docker:dev` : Environnement de développement (build + up)
+- `npm run docker:dev:detached` : Environnement de développement en mode détaché
+- `npm run docker:dev:down` : Arrêter les services de développement
+- `npm run docker:dev:logs` : Afficher les logs de l'application
+- `npm run docker:dev:exec` : Ouvrir un shell dans le conteneur de l'application
 
 **Scripts de traduction i18n :**
 

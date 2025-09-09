@@ -88,6 +88,7 @@ describe('Validation Schemas', () => {
           '06 12 34 56 78',
           '(06) 12-34-56-78',
           undefined, // Optionnel
+          null, // Nullable
           '',
         ]
 

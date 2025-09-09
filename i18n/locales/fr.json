@@ -329,8 +329,7 @@
     "no_editions": "Aucune édition pour cette convention",
     "status_control": "Contrôle de visibilité",
     "status_control_desc": "Publier ou dépublier vos éditions selon leur avancement",
-    "no_description_available": "Aucune description disponible",
-    "logo_alt": "Logo de {name}"
+    "no_description_available": "Aucune description disponible"
   },
   "calendar": {
     "list": "Liste",
@@ -486,6 +485,7 @@
     "time_minutes_ago": "il y a {count} min",
     "tip": "Conseil",
     "updated_at": "Mis à jour le {date}",
+    "validate": "Valider",
     "view": "Voir",
     "view_details": "Voir les détails",
     "yes": "Oui",
@@ -1330,7 +1330,7 @@
     "saving": "Sauvegarde...",
     "security": "Sécurité",
     "unsaved_changes": "Vous avez des modifications non sauvegardées",
-    "username_hint": "Visible publiquement par les autres utilisateurs",
+    "username_help": "Visible publiquement par les autres utilisateurs",
     "username_min_3": "Le pseudo doit contenir au moins 3 caractères",
     "username_placeholder": "Votre pseudo unique"
   },
@@ -1368,26 +1368,16 @@
   "upload": {
     "click_select_convention_logo": "Cliquez pour sélectionner le logo de la convention",
     "convention_logo_alt": "Logo de la convention",
-    "delete_error": "Erreur de suppression",
     "delete_message": "Image supprimée",
     "demo_title": "Démonstration ImageUpload",
     "error_message": "Erreur d'upload",
     "errors": {
-      "convention_id_required": "ID de convention requis",
-      "delete_failed": "Échec de la suppression",
-      "edition_id_required": "ID d'édition requis",
       "file_too_large": "Fichier trop volumineux",
       "invalid_file_extension": "Extension de fichier invalide",
-      "invalid_file_type": "Type de fichier invalide",
-      "no_file_selected": "Aucun fichier sélectionné",
-      "unsupported_delete_endpoint": "Endpoint de suppression non supporté",
-      "upload_failed": "Échec de l'upload",
-      "validation_failed": "Validation échouée"
+      "invalid_file_type": "Type de fichier invalide"
     },
     "formats_accepted": "Formats acceptés",
     "image_configured": "Image configurée",
-    "image_deleted_successfully": "Image supprimée avec succès",
-    "image_uploaded_successfully": "Image uploadée avec succès",
     "loading_error_title": "Erreur de chargement",
     "logo_preview_alt": "Aperçu du logo",
     "logo_url_label": "URL du logo",
@@ -1395,12 +1385,10 @@
     "logo_url_placeholder": "https://example.com/logo.jpg",
     "max_size": "Taille maximale",
     "select_file": "Sélectionner un fichier",
-    "success": "Succès",
     "success_message": "Image uploadée avec succès !",
     "upload": "Upload",
     "upload_error": "Erreur d'upload",
-    "uploading": "Upload en cours...",
-    "validation_error": "Erreur de validation"
+    "uploading": "Upload en cours..."
   },
   "validation": {
     "date_end_after_start": "La date de fin doit être strictement supérieure à la date de début",

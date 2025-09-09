@@ -3,10 +3,10 @@
     <template #header>
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div v-if="edition.convention?.logo" class="flex-shrink-0">
+          <div v-if="displayImageUrl" class="flex-shrink-0">
             <img
-              :src="normalizeImageUrl(edition.convention.logo)"
-              :alt="edition.convention.name"
+              :src="displayImageUrl"
+              :alt="displayImageAlt"
               class="w-16 h-16 object-cover rounded-lg"
             />
           </div>
@@ -87,16 +87,45 @@ interface Props {
   showStatus?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   showStatus: false,
 })
 
 const { formatDateTimeRange } = useDateFormat()
 const { getStatusColor, getStatusText } = useEditionStatus()
 const { getTranslatedServices } = useTranslatedConventionServices()
-const { normalizeImageUrl } = useImageUrl()
+const { getImageUrl } = useImageUrl()
 const { t } = useI18n()
 // const localePath = useLocalePath(); // Pas nécessaire avec strategy: 'no_prefix'
+
+// Computed pour l'URL de l'image à afficher (édition en priorité, sinon convention)
+const displayImageUrl = computed(() => {
+  // Priorité 1: Image de l'édition
+  if (props.edition.imageUrl) {
+    return getImageUrl(props.edition.imageUrl, 'edition', props.edition.id)
+  }
+
+  // Priorité 2: Logo de la convention
+  if (props.edition.convention?.logo) {
+    return getImageUrl(props.edition.convention.logo, 'convention', props.edition.convention.id)
+  }
+
+  // Aucune image disponible
+  return null
+})
+
+// Computed pour le texte alternatif de l'image
+const displayImageAlt = computed(() => {
+  if (props.edition.imageUrl) {
+    return `Affiche de ${getEditionDisplayName(props.edition)}`
+  }
+
+  if (props.edition.convention?.logo) {
+    return `Logo de ${props.edition.convention.name}`
+  }
+
+  return ''
+})
 
 // Fonction pour obtenir les services actifs traduits
 const getActiveServices = (edition: Edition) => {

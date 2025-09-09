@@ -440,6 +440,7 @@
     "tip": "Porada",
     "total": "Suma",
     "updated_at": "Zaktualizowano {date}",
+    "validate": "Walidować",
     "view": "Zobacz",
     "view_details": "Zobacz szczegóły",
     "volunteers_short": "Wolontariusze",
@@ -879,13 +880,6 @@
     "volunteers_what_you_can_bring_title": "Co możesz nam przynieść",
     "volunteers_withdraw": "Wycofaj moje zgłoszenie"
   },
-  "erreur": {
-    "": {
-      "": {
-        "": "Dodaj notatki o tym błędzie..."
-      }
-    }
-  },
   "errors": {
     "access_denied": "Dostęp odrzucony",
     "addition_error": "Błąd podczas dodawania",
@@ -1324,7 +1318,7 @@
     "saving": "Zapisywanie...",
     "security": "Bezpieczeństwo",
     "unsaved_changes": "Masz niezapisane zmiany",
-    "username_hint": "Widoczne publicznie przez innych użytkowników",
+    "username_help": "Widoczne publicznie przez innych użytkowników",
     "username_min_3": "Pseudonim musi zawierać co najmniej 3 znaki",
     "username_placeholder": "Twój unikalny pseudonim"
   },
@@ -1377,26 +1371,16 @@
   "upload": {
     "click_select_convention_logo": "Kliknij, aby wybrać logo konwencji",
     "convention_logo_alt": "Logo konwencji",
-    "delete_error": "Błąd usuwania",
     "delete_message": "Obraz usunięty",
     "demo_title": "Demo przesyłania obrazów",
     "error_message": "Błąd przesyłania",
     "errors": {
-      "convention_id_required": "Wymagane ID konwencji",
-      "delete_failed": "Błąd usuwania",
-      "edition_id_required": "Wymagane ID edycji",
       "file_too_large": "Plik za duży. Maksymalny rozmiar: {maxSize}",
       "invalid_file_extension": "Nieprawidłowe rozszerzenie pliku. Akceptowane rozszerzenia: {allowedExtensions}",
-      "invalid_file_type": "Nieprawidłowy typ pliku. Akceptowane formaty: {allowedTypes}",
-      "no_file_selected": "Nie wybrano pliku",
-      "unsupported_delete_endpoint": "Nieobsługiwany endpoint usuwania",
-      "upload_failed": "Błąd przesyłania",
-      "validation_failed": "Walidacja nie powiodła się"
+      "invalid_file_type": "Nieprawidłowy typ pliku. Akceptowane formaty: {allowedTypes}"
     },
     "formats_accepted": "Akceptowane formaty",
     "image_configured": "Obraz skonfigurowany",
-    "image_deleted_successfully": "Obraz usunięty pomyślnie",
-    "image_uploaded_successfully": "Obraz przesłany pomyślnie",
     "loading_error_title": "Błąd ładowania obrazu",
     "logo_preview_alt": "Podgląd logo",
     "logo_url_label": "URL logo",
@@ -1404,12 +1388,10 @@
     "logo_url_placeholder": "https://przykład.com/logo.jpg",
     "max_size": "Maksymalny rozmiar",
     "select_file": "Wybierz plik",
-    "success": "Sukces",
     "success_message": "Obraz przesłany pomyślnie!",
     "upload": "Prześlij",
     "upload_error": "Błąd przesyłania",
-    "uploading": "Przesyłanie...",
-    "validation_error": "Błąd walidacji"
+    "uploading": "Przesyłanie..."
   },
   "validation": {
     "arrival_date_required": "Data przyjazdu jest wymagana",

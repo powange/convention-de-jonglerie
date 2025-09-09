@@ -98,6 +98,7 @@ interface Props {
 
 const props = defineProps<Props>()
 const { t } = useI18n()
+const { getImageUrl } = useImageUrl()
 
 // Références
 const mapContainer = ref<HTMLElement | null>(null)
@@ -127,6 +128,11 @@ const upcomingFavorites = computed(() => {
   })
 })
 
+// Fonction helper pour obtenir l'URL complète de l'image d'édition
+const getEditionImageUrl = (edition: Edition): string => {
+  return getImageUrl(edition.imageUrl, 'edition', edition.id) || ''
+}
+
 // Fonction pour créer les marqueurs (appelée quand Leaflet est disponible)
 const createMarkers = (): MapMarker[] => {
   if (!import.meta.client || !(window as any).L) return []
@@ -143,9 +149,10 @@ const createMarkers = (): MapMarker[] => {
     })
 
     // Créer le contenu du popup
+    const imageUrl = getEditionImageUrl(edition)
     const popupContent = `
       <div class="p-3 min-w-[200px]">
-        ${edition.imageUrl ? `<img src="${edition.imageUrl}" alt="${getEditionDisplayName(edition)}" class="w-full h-24 object-cover rounded mb-2">` : ''}
+        ${imageUrl ? `<img src="${imageUrl}" alt="${getEditionDisplayName(edition)}" class="w-full h-24 object-cover rounded mb-2">` : ''}
         <div class="flex items-start justify-between gap-2 mb-1">
           <h4 class="font-semibold text-gray-900 text-sm">${getEditionDisplayName(edition)}</h4>
           <span class="text-yellow-500 text-sm" title="${t('common.favorite')}">★</span>

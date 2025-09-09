@@ -43,7 +43,7 @@
           <div class="flex flex-col sm:flex-row gap-6">
             <div v-if="edition.imageUrl" class="flex-shrink-0 self-center sm:self-start">
               <img
-                :src="normalizeImageUrl(edition.imageUrl || '') || ''"
+                :src="getImageUrl(edition.imageUrl, 'edition', edition.id) || ''"
                 :alt="t('editions.poster_of', { name: getEditionDisplayName(edition) })"
                 class="w-full sm:w-48 h-auto sm:h-48 max-w-xs object-cover rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
                 @click="showImageOverlay = true"
@@ -239,7 +239,7 @@
         >
           <div class="relative max-w-6xl max-h-[90vh]">
             <img
-              :src="normalizeImageUrl(edition.imageUrl || '') || ''"
+              :src="getImageUrl(edition.imageUrl, 'edition', edition.id) || ''"
               :alt="t('editions.poster_of', { name: getEditionDisplayName(edition) })"
               class="max-w-full max-h-[90vh] object-contain rounded-lg"
               @click.stop
@@ -325,7 +325,7 @@ const { getTranslatedServicesByCategory } = useTranslatedConventionServices()
 const editionId = parseInt(route.params.id as string)
 const showImageOverlay = ref(false)
 const showConventionModal = ref(false)
-const { normalizeImageUrl } = useImageUrl()
+const { getImageUrl } = useImageUrl()
 
 // (Bloc bénévolat déplacé dans la page benevoles.vue)
 

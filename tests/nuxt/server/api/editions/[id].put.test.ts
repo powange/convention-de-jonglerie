@@ -11,8 +11,16 @@ vi.mock('../../../../../server/utils/geocoding', () => ({
   }),
 }))
 
-vi.mock('../../../../../server/utils/move-temp-image', () => ({
-  moveTempImageToEdition: vi.fn().mockResolvedValue('/uploads/editions/1/image.jpg'),
+// Mock nuxt-file-storage
+vi.mock('nuxt-file-storage', () => ({
+  getFileLocally: vi.fn().mockReturnValue('/tmp/mock/file/path'),
+  storeFileLocally: vi.fn().mockResolvedValue('mock-filename.jpg'),
+  deleteFile: vi.fn().mockResolvedValue(true),
+}))
+
+// Mock fs/promises
+vi.mock('fs/promises', () => ({
+  readFile: vi.fn().mockResolvedValue(Buffer.from('fake-image-data')),
 }))
 
 describe('/api/editions/[id] PUT', () => {
@@ -338,19 +346,17 @@ describe('/api/editions/[id] PUT', () => {
   })
 
   it("devrait gérer l'upload d'image", async () => {
-    const { moveTempImageToEdition } = await import('../../../../../server/utils/move-temp-image')
-
     const updateData = {
       name: 'Edition Modifiée',
-      imageUrl: '/temp/789012.jpg',
+      imageUrl: 'simple-filename.jpg', // Test avec un nom de fichier simple
     }
 
     global.getRouterParam.mockReturnValue('1')
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     prismaMock.edition.update.mockResolvedValue({
       ...mockEdition,
-      ...updateData,
-      imageUrl: '/uploads/editions/1/image.jpg', // L'API utilise finalImageUrl dans updatedData
+      name: updateData.name,
+      imageUrl: updateData.imageUrl,
     })
 
     global.readBody.mockResolvedValue(updateData)
@@ -364,8 +370,16 @@ describe('/api/editions/[id] PUT', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(moveTempImageToEdition).toHaveBeenCalledWith('/temp/789012.jpg', 1)
-    expect(result.imageUrl).toBe('/uploads/editions/1/image.jpg')
+    expect(result.imageUrl).toBe('simple-filename.jpg')
+    expect(prismaMock.edition.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 1 },
+        data: expect.objectContaining({
+          name: updateData.name,
+          imageUrl: updateData.imageUrl,
+        }),
+      })
+    )
   })
 
   it('devrait valider que la date de fin est après la date de début', async () => {

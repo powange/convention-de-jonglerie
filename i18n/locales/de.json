@@ -440,6 +440,7 @@
     "tip": "Tipp",
     "total": "Gesamt",
     "updated_at": "Aktualisiert am {date}",
+    "validate": "Validieren",
     "view": "Anzeigen",
     "view_details": "Details anzeigen",
     "volunteers_short": "Freiwillige",
@@ -879,13 +880,6 @@
     "volunteers_what_you_can_bring_title": "Was Sie uns bringen können",
     "volunteers_withdraw": "Meine Bewerbung zurückziehen"
   },
-  "erreur": {
-    "": {
-      "": {
-        "": "Notizen zu diesem Fehler hinzufügen..."
-      }
-    }
-  },
   "errors": {
     "access_denied": "Zugang verweigert",
     "addition_error": "Fehler beim Hinzufügen",
@@ -1324,7 +1318,7 @@
     "saving": "Speichern...",
     "security": "Sicherheit",
     "unsaved_changes": "Du hast nicht gespeicherte Änderungen",
-    "username_hint": "Öffentlich für andere Benutzer sichtbar",
+    "username_help": "Öffentlich für andere Benutzer sichtbar",
     "username_min_3": "Der Benutzername muss mindestens 3 Zeichen enthalten",
     "username_placeholder": "Dein eindeutiger Benutzername"
   },
@@ -1377,26 +1371,16 @@
   "upload": {
     "click_select_convention_logo": "Klicken Sie, um ein Convention-Logo auszuwählen",
     "convention_logo_alt": "Convention-Logo",
-    "delete_error": "Löschen fehlgeschlagen",
     "delete_message": "Bild gelöscht",
     "demo_title": "Bild-Upload Demo",
     "error_message": "Upload-Fehler",
     "errors": {
-      "convention_id_required": "Convention-ID erforderlich",
-      "delete_failed": "Löschen fehlgeschlagen",
-      "edition_id_required": "Auflagen-ID erforderlich",
       "file_too_large": "Datei zu groß",
       "invalid_file_extension": "Ungültige Dateierweiterung",
-      "invalid_file_type": "Ungültiger Dateityp",
-      "no_file_selected": "Keine Datei ausgewählt",
-      "unsupported_delete_endpoint": "Nicht unterstützter Lösch-Endpunkt",
-      "upload_failed": "Upload fehlgeschlagen",
-      "validation_failed": "Validierung fehlgeschlagen"
+      "invalid_file_type": "Ungültiger Dateityp"
     },
     "formats_accepted": "Akzeptierte Formate",
     "image_configured": "Bild konfiguriert",
-    "image_deleted_successfully": "Bild erfolgreich gelöscht",
-    "image_uploaded_successfully": "Bild erfolgreich hochgeladen",
     "loading_error_title": "Fehler beim Laden des Bildes",
     "logo_preview_alt": "Logo-Vorschau",
     "logo_url_label": "Logo-URL",
@@ -1404,12 +1388,10 @@
     "logo_url_placeholder": "https://beispiel.com/logo.jpg",
     "max_size": "Maximale Größe",
     "select_file": "Datei auswählen",
-    "success": "Erfolg",
     "success_message": "Bild erfolgreich hochgeladen!",
     "upload": "Hochladen",
     "upload_error": "Upload-Fehler",
-    "uploading": "Wird hochgeladen...",
-    "validation_error": "Validierungsfehler"
+    "uploading": "Wird hochgeladen..."
   },
   "validation": {
     "arrival_date_required": "Ankunftsdatum ist erforderlich",

@@ -440,6 +440,7 @@
     "tip": "Tip",
     "total": "Totaal",
     "updated_at": "Bijgewerkt op {date}",
+    "validate": "Valideren",
     "view": "Bekijken",
     "view_details": "Details bekijken",
     "volunteers_short": "Vrijwilligers",
@@ -879,13 +880,6 @@
     "volunteers_what_you_can_bring_title": "Wat u ons kunt brengen",
     "volunteers_withdraw": "Trek mijn aanmelding in"
   },
-  "erreur": {
-    "": {
-      "": {
-        "": "Notities over deze fout toevoegen..."
-      }
-    }
-  },
   "errors": {
     "access_denied": "Toegang geweigerd",
     "addition_error": "Toevoegfout",
@@ -1324,7 +1318,7 @@
     "saving": "Opslaan...",
     "security": "Beveiliging",
     "unsaved_changes": "Je hebt niet-opgeslagen wijzigingen",
-    "username_hint": "Publiekelijk zichtbaar voor andere gebruikers",
+    "username_help": "Publiekelijk zichtbaar voor andere gebruikers",
     "username_min_3": "Gebruikersnaam moet minimaal 3 tekens bevatten",
     "username_placeholder": "Je unieke gebruikersnaam"
   },
@@ -1377,26 +1371,16 @@
   "upload": {
     "click_select_convention_logo": "Klik om een conventie logo te selecteren",
     "convention_logo_alt": "Conventie logo",
-    "delete_error": "Verwijderingsfout",
     "delete_message": "Afbeelding verwijderd",
     "demo_title": "Afbeelding upload demo",
     "error_message": "Upload fout",
     "errors": {
-      "convention_id_required": "Conventie ID vereist",
-      "delete_failed": "Verwijdering mislukt",
-      "edition_id_required": "Editie ID vereist",
       "file_too_large": "Bestand te groot. Maximale grootte: {maxSize}",
       "invalid_file_extension": "Ongeldige bestandsextensie. Geaccepteerde extensies: {allowedExtensions}",
-      "invalid_file_type": "Ongeldig bestandstype. Geaccepteerde formaten: {allowedTypes}",
-      "no_file_selected": "Geen bestand geselecteerd",
-      "unsupported_delete_endpoint": "Niet-ondersteund verwijder endpoint",
-      "upload_failed": "Upload mislukt",
-      "validation_failed": "Validatie mislukt"
+      "invalid_file_type": "Ongeldig bestandstype. Geaccepteerde formaten: {allowedTypes}"
     },
     "formats_accepted": "Geaccepteerde formaten",
     "image_configured": "Afbeelding geconfigureerd",
-    "image_deleted_successfully": "Afbeelding succesvol verwijderd",
-    "image_uploaded_successfully": "Afbeelding succesvol geüpload",
     "loading_error_title": "Fout bij laden van afbeelding",
     "logo_preview_alt": "Logo voorvertoning",
     "logo_url_label": "Logo URL",
@@ -1404,12 +1388,10 @@
     "logo_url_placeholder": "https://voorbeeld.com/logo.jpg",
     "max_size": "Maximale grootte",
     "select_file": "Bestand selecteren",
-    "success": "Succes",
     "success_message": "Afbeelding succesvol geüpload!",
     "upload": "Uploaden",
     "upload_error": "Upload fout",
-    "uploading": "Upload bezig...",
-    "validation_error": "Validatiefout"
+    "uploading": "Upload bezig..."
   },
   "validation": {
     "arrival_date_required": "Aankomstdatum is vereist",

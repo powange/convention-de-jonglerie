@@ -1,120 +1,108 @@
-import { prisma } from '../../utils/prisma'
-
-import type { ServerFile } from 'nuxt-file-storage'
-
-interface RequestBody {
-  files: ServerFile[]
-  metadata: {
-    endpoint: string
-    entityId?: number
-    editionId?: number
-  }
-}
-
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
   try {
-    const { files, metadata } = await readBody<RequestBody>(event)
+    const body = await readBody(event)
 
-    if (!files || files.length === 0) {
+    // Validation basique
+    if (!body.files || !Array.isArray(body.files) || body.files.length === 0) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Aucun fichier fourni',
+        message: 'Aucun fichier fourni',
       })
     }
 
-    const file = files[0] // Prendre le premier fichier
-    const { entityId, editionId } = metadata
-
-    // Si c'est pour une édition existante, vérifier les permissions
-    if (entityId || editionId) {
-      const targetId = entityId || editionId
-      const edition = await prisma.edition.findUnique({
-        where: { id: targetId },
-        include: {
-          convention: true,
-        },
+    if (!body.metadata?.entityId) {
+      throw createError({
+        statusCode: 400,
+        message: "ID d'édition requis",
       })
+    }
 
-      if (!edition) {
-        throw createError({
-          statusCode: 404,
-          statusMessage: 'Édition introuvable',
+    const editionId = parseInt(body.metadata.entityId)
+    if (isNaN(editionId)) {
+      throw createError({
+        statusCode: 400,
+        message: "ID d'édition invalide",
+      })
+    }
+
+    console.log('=== UPLOAD EDITION FILES ===')
+    console.log('Edition ID:', editionId)
+    console.log('Files count:', body.files.length)
+
+    // Stocker les fichiers dans le dossier temporaire pour les éditions
+    const results = []
+
+    for (const file of body.files) {
+      console.log(`Stockage fichier: ${file.name}`)
+
+      try {
+        // Utiliser nuxt-file-storage pour stocker le fichier dans temp/editions/[id]
+        const storedFilename = await storeFileLocally(
+          file,
+          8, // Longueur du suffixe aléatoire
+          `temp/editions/${editionId}` // Dossier temporaire pour cette édition
+        )
+
+        console.log(`Fichier stocké: ${storedFilename}`)
+
+        // Construire l'URL temporaire
+        const temporaryUrl = `/uploads/temp/editions/${editionId}/${storedFilename}`
+
+        results.push({
+          success: true,
+          filename: storedFilename,
+          temporaryUrl,
+          originalName: file.name,
+        })
+      } catch (error) {
+        console.error(`Erreur lors du stockage de ${file.name}:`, error)
+        results.push({
+          success: false,
+          error: error instanceof Error ? error.message : 'Erreur inconnue',
+          filename: file.name,
         })
       }
+    }
 
-      // Vérifier les droits (créateur de l'édition ou auteur de la convention)
-      const hasPermission =
-        edition.creatorId === event.context.user.id ||
-        edition.convention.authorId === event.context.user.id
+    // Si au moins un fichier a été uploadé avec succès
+    const successfulUploads = results.filter((r) => r.success)
+    if (successfulUploads.length > 0) {
+      // Pour l'instant, retourner l'URL du premier fichier (éditions ont une seule image)
+      const firstUpload = successfulUploads[0]
 
-      if (!hasPermission) {
-        throw createError({
-          statusCode: 403,
-          statusMessage: "Vous n'avez pas les droits pour modifier cette édition",
-        })
-      }
-
-      // Stocker le fichier dans le dossier de l'édition (sous conventions)
-      const filename = await storeFileLocally(
-        file,
-        8, // longueur ID unique
-        `conventions/${edition.conventionId}/editions/${targetId}` // dossier de destination dans le mount
-      )
-
-      // Mettre à jour l'édition avec la nouvelle URL
-      const imageUrl = `/uploads/conventions/${edition.conventionId}/editions/${targetId}/${filename}`
-
-      const updatedEdition = await prisma.edition.update({
-        where: { id: targetId },
-        data: { imageUrl },
-        include: {
-          creator: { select: { id: true, email: true, pseudo: true } },
-          convention: true,
-          favoritedBy: { select: { id: true } },
-        },
-      })
+      console.log('=== UPLOAD EDITION SUCCESS ===')
+      console.log('Temporary URL:', firstUpload.temporaryUrl)
 
       return {
         success: true,
-        imageUrl,
-        filename,
-        edition: updatedEdition,
+        imageUrl: firstUpload.temporaryUrl,
+        results,
       }
     } else {
-      // Nouvelle édition - stocker temporairement
-      const filename = await storeFileLocally(
-        file,
-        8, // longueur ID unique
-        'temp' // dossier temporaire dans le mount
-      )
-
-      const imageUrl = `/uploads/temp/${filename}`
-
-      return {
-        success: true,
-        imageUrl,
-        filename,
-        temporary: true,
-      }
+      throw createError({
+        statusCode: 500,
+        message: "Échec de l'upload de tous les fichiers",
+      })
     }
-  } catch (error: unknown) {
-    console.error("Erreur lors de l'upload d'édition:", error)
+  } catch (error) {
+    console.error("Erreur dans l'upload d'édition:", error)
 
-    if (error && typeof error === 'object' && 'statusCode' in error) {
+    // Si c'est déjà une erreur HTTP, la relancer
+    if ((error as any)?.statusCode) {
       throw error
     }
 
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur lors de l'upload de l'image",
+      message: "Erreur serveur lors de l'upload",
     })
   }
 })

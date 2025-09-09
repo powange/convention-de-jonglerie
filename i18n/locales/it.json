@@ -440,6 +440,7 @@
     "tip": "Consiglio",
     "total": "Totale",
     "updated_at": "Aggiornato il {date}",
+    "validate": "Convalida",
     "view": "Visualizza",
     "view_details": "Visualizza dettagli",
     "volunteers_short": "Volontari",
@@ -879,13 +880,6 @@
     "volunteers_what_you_can_bring_title": "Cosa può portarci",
     "volunteers_withdraw": "Ritira la mia candidatura"
   },
-  "erreur": {
-    "": {
-      "": {
-        "": "Aggiungi note su questo errore..."
-      }
-    }
-  },
   "errors": {
     "access_denied": "Accesso non autorizzato",
     "addition_error": "Errore durante l'aggiunta",
@@ -1324,7 +1318,7 @@
     "saving": "Salvataggio...",
     "security": "Sicurezza",
     "unsaved_changes": "Hai modifiche non salvate",
-    "username_hint": "Visibile pubblicamente dagli altri utenti",
+    "username_help": "Visibile pubblicamente dagli altri utenti",
     "username_min_3": "Il nome utente deve contenere almeno 3 caratteri",
     "username_placeholder": "Il tuo nome utente unico"
   },
@@ -1377,26 +1371,16 @@
   "upload": {
     "click_select_convention_logo": "Clicca per selezionare un logo della convention",
     "convention_logo_alt": "Logo della convention",
-    "delete_error": "Errore nella cancellazione",
     "delete_message": "Immagine eliminata",
     "demo_title": "Demo caricamento immagine",
     "error_message": "Errore di caricamento",
     "errors": {
-      "convention_id_required": "ID convention richiesto",
-      "delete_failed": "Cancellazione fallita",
-      "edition_id_required": "ID edizione richiesto",
       "file_too_large": "File troppo grande",
       "invalid_file_extension": "Estensione file non valida",
-      "invalid_file_type": "Tipo di file non valido",
-      "no_file_selected": "Nessun file selezionato",
-      "unsupported_delete_endpoint": "Endpoint di cancellazione non supportato",
-      "upload_failed": "Caricamento fallito",
-      "validation_failed": "Validazione fallita"
+      "invalid_file_type": "Tipo di file non valido"
     },
     "formats_accepted": "Formati accettati",
     "image_configured": "Immagine configurata",
-    "image_deleted_successfully": "Immagine cancellata con successo",
-    "image_uploaded_successfully": "Immagine caricata con successo",
     "loading_error_title": "Errore nel caricamento dell'immagine",
     "logo_preview_alt": "Anteprima del logo",
     "logo_url_label": "URL del logo",
@@ -1404,12 +1388,10 @@
     "logo_url_placeholder": "https://esempio.com/logo.jpg",
     "max_size": "Dimensione massima",
     "select_file": "Seleziona file",
-    "success": "Successo",
     "success_message": "Immagine caricata con successo!",
     "upload": "Carica",
     "upload_error": "Errore di caricamento",
-    "uploading": "Caricamento...",
-    "validation_error": "Errore di validazione"
+    "uploading": "Caricamento..."
   },
   "validation": {
     "arrival_date_required": "La data di arrivo è obbligatoria",

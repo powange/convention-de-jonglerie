@@ -19,7 +19,7 @@
             color="primary"
             variant="solid"
             class="absolute -bottom-2 -right-2 rounded-full shadow-lg transition-all hover:scale-110"
-            @click="showProfilePictureModal = true"
+            @click="openProfilePictureModal"
           />
         </div>
         <div class="text-center sm:text-left flex-1">
@@ -81,7 +81,7 @@
             <UFormField
               :label="t('auth.username')"
               name="pseudo"
-              :hint="t('profile.username_hint')"
+              :help="t('profile.username_help')"
             >
               <UInput
                 v-model="state.pseudo"
@@ -598,35 +598,26 @@
       size="md"
       :title="$t('profile.picture')"
       :description="$t('profile.customize_avatar')"
+      :prevent-close="profilePictureUrl !== (authStore.user?.profilePicture || '')"
     >
       <template #body>
         <div class="space-y-8">
           <!-- Aperçu actuel -->
           <div class="flex justify-center">
-            <div class="relative group">
-              <UserAvatar
-                v-if="authStore.user"
-                :user="authStore.user"
-                :size="128"
-                border
-                class="border-primary-200 dark:border-primary-700 shadow-xl transition-transform group-hover:scale-105"
-              />
-              <div
-                class="absolute inset-0 rounded-full bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center"
-              >
-                <UIcon
-                  name="i-heroicons-camera"
-                  class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                />
-              </div>
-            </div>
+            <UserAvatar
+              v-if="authStore.user"
+              :user="getPreviewUser()"
+              :size="128"
+              border
+              class="border-primary-200 dark:border-primary-700 shadow-xl"
+            />
           </div>
 
           <!-- Upload de photo -->
           <div>
             <ImageUpload
               v-model="profilePictureUrl"
-              :endpoint="{ type: 'profile' }"
+              :endpoint="{ type: 'profile', id: authStore.user?.id }"
               :options="{
                 validation: {
                   maxSize: 5 * 1024 * 1024,
@@ -638,7 +629,7 @@
               :alt="$t('pages.profile.photo_alt')"
               :placeholder="$t('pages.profile.photo_placeholder')"
               :allow-delete="!!authStore.user?.profilePicture"
-              @uploaded="onProfilePictureUploaded"
+              @uploaded="onProfilePictureTemporarilyUploaded"
               @deleted="onProfilePictureDeleted"
               @error="onProfilePictureError"
             />
@@ -663,6 +654,21 @@
               </div>
             </div>
           </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton variant="outline" @click="cancelProfilePictureChanges">
+            {{ $t('common.cancel') }}
+          </UButton>
+          <UButton
+            :disabled="profilePictureUrl === (authStore.user?.profilePicture || '')"
+            :loading="pictureValidationLoading"
+            @click="validateProfilePictureChanges"
+          >
+            {{ $t('common.validate') }}
+          </UButton>
         </div>
       </template>
     </UModal>
@@ -703,6 +709,7 @@ const showPasswordModal = ref(false)
 const showProfilePictureModal = ref(false)
 const profilePictureUrl = ref(authStore.user?.profilePicture || '')
 const avatarKey = ref(Date.now()) // Pour forcer le rechargement de l'avatar
+const pictureValidationLoading = ref(false) // Loading lors de la validation
 
 // Gestion du mode administrateur
 const adminModeToggle = ref(authStore.isAdminModeActive)
@@ -862,50 +869,102 @@ const changePassword = async () => {
 }
 
 // Gestionnaires d'événements pour ImageUpload
-const onProfilePictureUploaded = (result: { success: boolean; imageUrl?: string; user?: User }) => {
-  if (result.success) {
-    // Mettre à jour l'URL locale
-    profilePictureUrl.value = result.imageUrl || result.user?.profilePicture || ''
-
-    // Mettre à jour les données utilisateur si fournies
-    if (result.user) {
-      authStore.updateUser(result.user)
-    }
-
-    // Forcer le rechargement de l'avatar
-    avatarKey.value++
-
-    showProfilePictureModal.value = false
-
-    toast.add({
-      title: t('profile.photo_updated'),
-      description: t('profile.profile_picture_changed'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
+const onProfilePictureTemporarilyUploaded = async (result: {
+  success: boolean
+  imageUrl?: string
+  user?: User
+}) => {
+  if (result.success && result.imageUrl) {
+    profilePictureUrl.value = result.imageUrl
   }
 }
 
 const onProfilePictureDeleted = () => {
+  // Simple suppression comme dans ConventionForm
   profilePictureUrl.value = ''
+}
 
-  // Mettre à jour les données utilisateur (supprimer la photo)
-  if (authStore.user) {
-    const updatedUser = { ...authStore.user, profilePicture: null }
-    authStore.updateUser(updatedUser)
+// Validation des changements de photo de profil
+const validateProfilePictureChanges = async () => {
+  // Vérifier s'il y a des changements
+  if (profilePictureUrl.value === (authStore.user?.profilePicture || '')) return
+
+  pictureValidationLoading.value = true
+
+  try {
+    // Déterminer la valeur à envoyer
+    const profilePictureValue = profilePictureUrl.value || null
+
+    // Sauvegarder les changements (nouvelle photo ou suppression)
+    const updatedUser = await $fetch('/api/profile/update', {
+      method: 'PUT',
+      body: {
+        email: authStore.user?.email,
+        pseudo: authStore.user?.pseudo,
+        nom: authStore.user?.nom,
+        prenom: authStore.user?.prenom,
+        telephone: authStore.user?.phone,
+        profilePicture: profilePictureValue,
+      },
+    })
+
+    // Mettre à jour les données utilisateur avec le résultat de l'API
+    if (updatedUser) {
+      authStore.updateUser(updatedUser)
+      profilePictureUrl.value = updatedUser.profilePicture || ''
+    }
+
+    const isDelete = !profilePictureValue
+    toast.add({
+      title: isDelete ? t('profile.photo_deleted') : t('profile.photo_updated'),
+      description: isDelete
+        ? t('profile.profile_picture_deleted')
+        : t('profile.profile_picture_changed'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    // Forcer le rechargement de l'avatar et fermer la modal
+    avatarKey.value++
+    resetProfilePictureModal()
+    showProfilePictureModal.value = false
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde de la photo de profil:', error)
+    toast.add({
+      title: t('common.error'),
+      description: t('profile.cannot_change_photo'),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  } finally {
+    pictureValidationLoading.value = false
   }
+}
 
-  // Forcer le rechargement de l'avatar
-  avatarKey.value++
-
+// Annuler les changements de photo de profil
+const cancelProfilePictureChanges = () => {
+  resetProfilePictureModal()
   showProfilePictureModal.value = false
+}
 
-  toast.add({
-    title: t('profile.photo_deleted'),
-    description: t('profile.profile_picture_deleted'),
-    icon: 'i-heroicons-check-circle',
-    color: 'success',
-  })
+// Ouvrir la modal de photo de profil
+const openProfilePictureModal = () => {
+  resetProfilePictureModal()
+  showProfilePictureModal.value = true
+}
+
+// Reset de l'état de la modal de photo de profil
+const resetProfilePictureModal = () => {
+  pictureValidationLoading.value = false
+  profilePictureUrl.value = authStore.user?.profilePicture || ''
+}
+
+// Obtenir l'utilisateur pour l'aperçu (avec image du formulaire)
+const getPreviewUser = () => {
+  if (!authStore.user) return authStore.user
+
+  // Utiliser l'image du formulaire pour l'aperçu
+  return { ...authStore.user, profilePicture: profilePictureUrl.value || null }
 }
 
 const onProfilePictureError = (error: string) => {

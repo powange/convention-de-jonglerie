@@ -11,9 +11,9 @@ vi.mock('../../app/utils/gravatar', () => ({
 }))
 
 // Mock useImageUrl (Nuxt function)
-const mockNormalizeImageUrl = vi.fn()
+const mockGetImageUrl = vi.fn()
 global.useImageUrl = vi.fn(() => ({
-  normalizeImageUrl: mockNormalizeImageUrl,
+  getImageUrl: mockGetImageUrl,
 }))
 
 // Mock Date.now pour des tests prévisibles
@@ -80,47 +80,50 @@ describe('avatar utils', () => {
       expect(url).toBe('https://example.com/avatar.jpg')
     })
 
-    it('devrait normaliser profilePicture relative avec updatedAt', () => {
+    it('devrait construire URL profilePicture avec getImageUrl et updatedAt', () => {
       const { getUserAvatar } = useAvatar()
 
-      mockNormalizeImageUrl.mockReturnValue('https://cdn.example.com/avatar.jpg')
+      mockGetImageUrl.mockReturnValue('/uploads/profiles/1/avatar.jpg')
 
       const user = {
+        id: 1,
         email: 'test@example.com',
-        profilePicture: '/uploads/avatar.jpg',
+        profilePicture: 'avatar.jpg',
         updatedAt: '2022-01-01T10:00:00Z',
       }
 
       const url = getUserAvatar(user)
 
-      expect(mockNormalizeImageUrl).toHaveBeenCalledWith('/uploads/avatar.jpg')
-      expect(url).toBe('https://cdn.example.com/avatar.jpg?v=1641031200000')
+      expect(mockGetImageUrl).toHaveBeenCalledWith('avatar.jpg', 'profile', 1)
+      expect(url).toBe('/uploads/profiles/1/avatar.jpg?v=1641031200000')
     })
 
     it("devrait utiliser Date.now() si pas d'updatedAt", () => {
       const { getUserAvatar } = useAvatar()
 
-      mockNormalizeImageUrl.mockReturnValue('https://cdn.example.com/avatar.jpg')
+      mockGetImageUrl.mockReturnValue('/uploads/profiles/2/avatar.jpg')
 
       const user = {
+        id: 2,
         email: 'test@example.com',
-        profilePicture: '/uploads/avatar.jpg',
+        profilePicture: 'avatar.jpg',
       }
 
       const url = getUserAvatar(user)
 
-      expect(url).toBe('https://cdn.example.com/avatar.jpg?v=1640995200000')
+      expect(url).toBe('/uploads/profiles/2/avatar.jpg?v=1640995200000')
       expect(mockDateNow).toHaveBeenCalled()
     })
 
-    it('devrait retourner fallback si normalizeImageUrl échoue', () => {
+    it('devrait retourner fallback si getImageUrl échoue', () => {
       const { getUserAvatar } = useAvatar()
 
-      mockNormalizeImageUrl.mockReturnValue(null)
+      mockGetImageUrl.mockReturnValue(null)
 
       const user = {
+        id: 3,
         email: 'test@example.com',
-        profilePicture: '/uploads/invalid.jpg',
+        profilePicture: 'invalid.jpg',
       }
 
       const url = getUserAvatar(user)

@@ -1,67 +1,95 @@
-import { prisma } from '../../utils/prisma'
-
-import type { ServerFile } from 'nuxt-file-storage'
-
-interface RequestBody {
-  files: ServerFile[]
-  metadata: {
-    endpoint: string
-  }
-}
-
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
   try {
-    const { files } = await readBody<RequestBody>(event)
+    const body = await readBody(event)
 
-    if (!files || files.length === 0) {
+    // Validation basique
+    if (!body.files || !Array.isArray(body.files) || body.files.length === 0) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Aucun fichier fourni',
+        message: 'Aucun fichier fourni',
       })
     }
 
-    const file = files[0] // Prendre le premier fichier
     const userId = event.context.user.id
 
-    // Stocker le fichier dans le dossier utilisateur
-    const filename = await storeFileLocally(
-      file,
-      8, // longueur ID unique
-      `users/${userId}` // dossier de destination dans le mount
-    )
+    console.log('=== UPLOAD PROFILE FILES ===')
+    console.log('User ID:', userId)
+    console.log('Files count:', body.files.length)
 
-    // Mettre à jour l'utilisateur avec la nouvelle URL
-    const imageUrl = `/uploads/users/${userId}/${filename}`
+    // Stocker les fichiers dans le dossier temporaire pour le profil
+    const results = []
 
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: { profilePicture: imageUrl },
-    })
+    for (const file of body.files) {
+      console.log(`Stockage fichier: ${file.name}`)
 
-    return {
-      success: true,
-      imageUrl,
-      filename,
-      user: updatedUser,
+      try {
+        // Utiliser nuxt-file-storage pour stocker le fichier dans temp/profiles/[userId]
+        const storedFilename = await storeFileLocally(
+          file,
+          8, // Longueur du suffixe aléatoire
+          `temp/profiles/${userId}` // Dossier temporaire pour ce profil
+        )
+
+        console.log(`Fichier stocké: ${storedFilename}`)
+
+        // Construire l'URL temporaire
+        const temporaryUrl = `/uploads/temp/profiles/${userId}/${storedFilename}`
+
+        results.push({
+          success: true,
+          filename: storedFilename,
+          temporaryUrl,
+          originalName: file.name,
+        })
+      } catch (error) {
+        console.error(`Erreur lors du stockage de ${file.name}:`, error)
+        results.push({
+          success: false,
+          error: error instanceof Error ? error.message : 'Erreur inconnue',
+          filename: file.name,
+        })
+      }
     }
-  } catch (error: unknown) {
-    console.error("Erreur lors de l'upload de profil:", error)
 
-    if (error && typeof error === 'object' && 'statusCode' in error) {
+    // Si au moins un fichier a été uploadé avec succès
+    const successfulUploads = results.filter((r) => r.success)
+    if (successfulUploads.length > 0) {
+      // Pour l'instant, retourner l'URL du premier fichier (profils ont une seule image)
+      const firstUpload = successfulUploads[0]
+
+      console.log('=== UPLOAD PROFILE SUCCESS ===')
+      console.log('Temporary URL:', firstUpload.temporaryUrl)
+
+      return {
+        success: true,
+        imageUrl: firstUpload.temporaryUrl,
+        results,
+      }
+    } else {
+      throw createError({
+        statusCode: 500,
+        message: "Échec de l'upload de tous les fichiers",
+      })
+    }
+  } catch (error) {
+    console.error("Erreur dans l'upload de profil:", error)
+
+    // Si c'est déjà une erreur HTTP, la relancer
+    if ((error as any)?.statusCode) {
       throw error
     }
 
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur lors de l'upload de l'image",
+      message: "Erreur serveur lors de l'upload",
     })
   }
 })

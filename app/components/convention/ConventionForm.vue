@@ -86,7 +86,7 @@
               {{ $t('components.convention_form.logo_preview') }}
             </p>
             <img
-              :src="form.logo"
+              :src="getImageUrl(form.logo, 'convention', initialData?.id) || form.logo"
               :alt="form.name || $t('components.convention_form.convention_logo_alt')"
               class="w-24 h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
               @error="logoError = true"
@@ -125,6 +125,7 @@ import ImageUpload from '~/components/ui/ImageUpload.vue'
 import type { Convention } from '~/types'
 
 const { t } = useI18n()
+const { getImageUrl } = useImageUrl()
 
 interface Props {
   initialData?: Convention

@@ -585,7 +585,7 @@ const state = reactive({
   conventionId: props.initialData?.conventionId,
   name: props.initialData?.name || '',
   description: props.initialData?.description || '',
-  imageUrl: props.initialData?.imageUrl || '',
+  imageUrl: props.initialData?.imageUrl || null,
   startDate: props.initialData?.startDate
     ? new Date(props.initialData.startDate).toISOString().slice(0, 16)
     : '',
@@ -844,7 +844,7 @@ const onImageUploaded = (result: {
 }
 
 const onImageDeleted = () => {
-  state.imageUrl = ''
+  state.imageUrl = null
   toast.add({
     title: t('upload.delete_message'),
     icon: 'i-heroicons-check-circle',
@@ -958,7 +958,21 @@ const handleSubmit = () => {
     return
   }
 
-  emit('submit', state)
+  // Nettoyer les données avant envoi (convertir chaînes vides en null)
+  const cleanedData = {
+    ...state,
+    imageUrl: state.imageUrl?.trim() || null,
+    description: state.description?.trim() || null,
+    name: state.name?.trim() || null,
+    addressLine2: state.addressLine2?.trim() || null,
+    region: state.region?.trim() || null,
+    ticketingUrl: state.ticketingUrl?.trim() || null,
+    officialWebsiteUrl: state.officialWebsiteUrl?.trim() || null,
+    facebookUrl: state.facebookUrl?.trim() || null,
+    instagramUrl: state.instagramUrl?.trim() || null,
+  }
+
+  emit('submit', cleanedData)
 }
 
 // Watchers pour marquer les champs de date comme touchés lors des changements

@@ -440,6 +440,7 @@
     "tip": "Порада",
     "total": "Всього",
     "updated_at": "Оновлено {date}",
+    "validate": "Підтвердити",
     "view": "Переглянути",
     "view_details": "Переглянути деталі",
     "volunteers_short": "Волонтери",
@@ -879,13 +880,6 @@
     "volunteers_what_you_can_bring_title": "Що ви можете нам принести",
     "volunteers_withdraw": "Відкликати мою заявку"
   },
-  "erreur": {
-    "": {
-      "": {
-        "": "Додати нотатки про цю помилку..."
-      }
-    }
-  },
   "errors": {
     "access_denied": "Доступ заборонено",
     "addition_error": "Помилка додавання",
@@ -1324,7 +1318,7 @@
     "saving": "Збереження...",
     "security": "Безпека",
     "unsaved_changes": "У вас є незбережені зміни",
-    "username_hint": "Публічно видимий іншим користувачам",
+    "username_help": "Публічно видимий іншим користувачам",
     "username_min_3": "Ім'я користувача повинно містити принаймні 3 символи",
     "username_placeholder": "Ваше унікальне ім'я користувача"
   },
@@ -1377,26 +1371,16 @@
   "upload": {
     "click_select_convention_logo": "Натисніть, щоб вибрати логотип конвенції",
     "convention_logo_alt": "Логотип конвенції",
-    "delete_error": "Помилка видалення",
     "delete_message": "Зображення видалено",
     "demo_title": "Демо завантаження зображення",
     "error_message": "Помилка завантаження",
     "errors": {
-      "convention_id_required": "Потрібен ID конвенції",
-      "delete_failed": "Помилка видалення",
-      "edition_id_required": "Потрібен ID видання",
       "file_too_large": "Файл занадто великий. Максимальний розмір: {maxSize}",
       "invalid_file_extension": "Недопустиме розширення файлу. Прийнятні розширення: {allowedExtensions}",
-      "invalid_file_type": "Недопустимий тип файлу. Прийнятні формати: {allowedTypes}",
-      "no_file_selected": "Файл не вибрано",
-      "unsupported_delete_endpoint": "Непідтримуваний endpoint видалення",
-      "upload_failed": "Помилка завантаження",
-      "validation_failed": "Помилка валідації"
+      "invalid_file_type": "Недопустимий тип файлу. Прийнятні формати: {allowedTypes}"
     },
     "formats_accepted": "Прийнятні формати",
     "image_configured": "Зображення налаштовано",
-    "image_deleted_successfully": "Зображення успішно видалено",
-    "image_uploaded_successfully": "Зображення успішно завантажено",
     "loading_error_title": "Помилка завантаження зображення",
     "logo_preview_alt": "Попередній перегляд логотипу",
     "logo_url_label": "URL логотипу",
@@ -1404,12 +1388,10 @@
     "logo_url_placeholder": "https://example.com/logo.png",
     "max_size": "Максимальний розмір",
     "select_file": "Вибрати файл",
-    "success": "Успішно",
     "success_message": "Зображення успішно завантажено!",
     "upload": "Завантажити",
     "upload_error": "Помилка завантаження",
-    "uploading": "Завантаження...",
-    "validation_error": "Помилка валідації"
+    "uploading": "Завантаження..."
   },
   "validation": {
     "arrival_date_required": "Дата прибуття обов'язкова",

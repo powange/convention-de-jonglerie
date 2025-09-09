@@ -3,16 +3,16 @@
     <!-- Zone d'upload -->
     <div class="flex flex-col space-y-3">
       <!-- Preview actuelle ou placeholder -->
-      <div v-if="modelValue || previewUrl" class="relative">
+      <div v-if="displayImageUrl" class="relative">
         <img
-          :src="previewUrl || modelValue"
+          :src="displayImageUrl"
           :alt="alt"
           class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-700"
         />
         <div class="absolute top-2 right-2 flex space-x-2">
           <!-- Bouton de suppression -->
           <UButton
-            v-if="!uploading && (previewUrl || (modelValue && allowDelete))"
+            v-if="!uploading && displayImageUrl && (previewUrl || (modelValue && allowDelete))"
             icon="i-heroicons-trash"
             color="error"
             variant="solid"
@@ -145,6 +145,28 @@ const emit = defineEmits<Emits>()
 
 // Composables
 const { t } = useI18n()
+const { getImageUrl } = useImageUrl()
+
+// Computed pour l'URL de l'image affichée
+const displayImageUrl = computed(() => {
+  // Si on a une preview (nouveau fichier), l'utiliser
+  if (previewUrl.value) {
+    return previewUrl.value
+  }
+
+  // Si on a une valeur model (image existante), construire l'URL
+  if (props.modelValue) {
+    // Si c'est déjà une URL complète, la retourner telle quelle
+    if (props.modelValue.startsWith('http') || props.modelValue.startsWith('/uploads/')) {
+      return props.modelValue
+    }
+
+    // Sinon, construire l'URL avec getImageUrl
+    return getImageUrl(props.modelValue, props.endpoint.type, props.endpoint.id)
+  }
+
+  return null
+})
 
 // États locaux simplifiés - sans dépendance à useFileStorage qui ne fonctionne pas
 const uploading = ref(false)
@@ -375,12 +397,18 @@ const reset = () => {
     URL.revokeObjectURL(previewUrl.value)
     previewUrl.value = null
   }
+
+  // Réinitialiser l'input file pour permettre de sélectionner à nouveau le même fichier
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
 }
 
 const handleDelete = async () => {
   if (previewUrl.value) {
     // Suppression locale (fichier sélectionné mais pas encore uploadé)
     reset()
+    emit('deleted') // Émettre l'événement même pour les suppressions locales
     return
   }
 

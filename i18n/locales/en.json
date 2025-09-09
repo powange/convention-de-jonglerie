@@ -440,6 +440,7 @@
     "tip": "Tip",
     "total": "Total",
     "updated_at": "Updated on {date}",
+    "validate": "Validate",
     "view": "View",
     "view_details": "View details",
     "volunteers_short": "Volunteers",
@@ -879,13 +880,6 @@
     "volunteers_what_you_can_bring_title": "What you can bring to us",
     "volunteers_withdraw": "Withdraw my application"
   },
-  "erreur": {
-    "": {
-      "": {
-        "": "Add notes about this error..."
-      }
-    }
-  },
   "errors": {
     "access_denied": "Access denied",
     "addition_error": "Addition error",
@@ -1324,7 +1318,7 @@
     "saving": "Saving...",
     "security": "Security",
     "unsaved_changes": "You have unsaved changes",
-    "username_hint": "Publicly visible to other users",
+    "username_help": "Publicly visible to other users",
     "username_min_3": "Username must contain at least 3 characters",
     "username_placeholder": "Your unique username"
   },
@@ -1377,26 +1371,16 @@
   "upload": {
     "click_select_convention_logo": "Click to select convention logo",
     "convention_logo_alt": "Convention logo",
-    "delete_error": "Delete error",
     "delete_message": "Image deleted",
     "demo_title": "ImageUpload Demo",
     "error_message": "Upload error",
     "errors": {
-      "convention_id_required": "Convention ID required",
-      "delete_failed": "Delete failed",
-      "edition_id_required": "Edition ID required",
       "file_too_large": "File too large",
       "invalid_file_extension": "Invalid file extension",
-      "invalid_file_type": "Invalid file type",
-      "no_file_selected": "No file selected",
-      "unsupported_delete_endpoint": "Delete endpoint not supported",
-      "upload_failed": "Upload failed",
-      "validation_failed": "Validation failed"
+      "invalid_file_type": "Invalid file type"
     },
     "formats_accepted": "Accepted formats",
     "image_configured": "Image configured",
-    "image_deleted_successfully": "Image deleted successfully",
-    "image_uploaded_successfully": "Image uploaded successfully",
     "loading_error_title": "Loading Error",
     "logo_preview_alt": "Logo preview",
     "logo_url_label": "Logo URL",
@@ -1404,12 +1388,10 @@
     "logo_url_placeholder": "https://example.com/logo.jpg",
     "max_size": "Max size",
     "select_file": "Select file",
-    "success": "Success",
     "success_message": "Image uploaded successfully!",
     "upload": "Upload",
     "upload_error": "Upload error",
-    "uploading": "Uploading...",
-    "validation_error": "Validation error"
+    "uploading": "Uploading..."
   },
   "validation": {
     "arrival_date_required": "Arrival date is required",

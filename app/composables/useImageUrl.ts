@@ -1,11 +1,58 @@
 /**
  * Composable pour gérer les URLs d'images
- * Utilise l'API pour servir les images en production
+ * Gère la construction des URLs depuis les noms de fichiers stockés en DB
  */
 export const useImageUrl = () => {
   /**
-   * Normalise une URL d'image pour l'affichage
-   * Utilise toujours l'API pour servir les images uploadées
+   * Génère l'URL complète pour une image depuis un nom de fichier
+   * @param filename - Nom de fichier stocké en DB
+   * @param type - Type d'entité (convention, edition, profile, etc.)
+   * @param entityId - ID de l'entité
+   * @returns URL complète pour l'image
+   */
+  const getImageUrl = (
+    filename: string | null | undefined,
+    type: 'convention' | 'edition' | 'profile' | 'lost-found' = 'convention',
+    entityId?: number
+  ): string | null => {
+    if (!filename) {
+      return null
+    }
+
+    // Si c'est déjà une URL complète (rétrocompatibilité)
+    if (filename.startsWith('http://') || filename.startsWith('https://')) {
+      return filename
+    }
+
+    // Si c'est déjà un path /uploads/ (rétrocompatibilité)
+    if (filename.startsWith('/uploads/')) {
+      return filename
+    }
+
+    // Construire l'URL selon le type d'entité
+    switch (type) {
+      case 'convention':
+        return entityId
+          ? `/uploads/conventions/${entityId}/${filename}`
+          : `/uploads/temp/${filename}`
+      case 'edition':
+        return entityId ? `/uploads/editions/${entityId}/${filename}` : `/uploads/temp/${filename}`
+      case 'profile':
+        return entityId ? `/uploads/profiles/${entityId}/${filename}` : `/uploads/temp/${filename}`
+      case 'lost-found':
+        return entityId
+          ? `/uploads/lost-found/${entityId}/${filename}`
+          : `/uploads/temp/${filename}`
+      default:
+        // Fallback générique
+        return `/uploads/${filename}`
+    }
+  }
+
+  /**
+   * Version legacy pour compatibilité ascendante
+   * @param url - URL ou nom de fichier
+   * @returns URL complète
    */
   const normalizeImageUrl = (url: string | null | undefined): string | null => {
     if (!url) return null
@@ -30,6 +77,7 @@ export const useImageUrl = () => {
   }
 
   return {
-    normalizeImageUrl,
+    getImageUrl,
+    normalizeImageUrl, // Garder pour compatibilité
   }
 }

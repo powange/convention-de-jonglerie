@@ -6,7 +6,9 @@
         <div class="flex items-start gap-4">
           <div v-if="edition.convention?.logo" class="flex-shrink-0">
             <img
-              :src="normalizeImageUrl(edition.convention.logo || '') || ''"
+              :src="
+                getImageUrl(edition.convention.logo, 'convention', edition.convention?.id) || ''
+              "
               :alt="edition.convention.name"
               class="w-16 h-16 object-cover rounded-lg shadow-md"
             />
@@ -191,7 +193,7 @@ import { getEditionDisplayName } from '~/utils/editionName'
 
 const { t } = useI18n()
 
-const { normalizeImageUrl } = useImageUrl()
+const { getImageUrl } = useImageUrl()
 
 interface Props {
   edition: Edition

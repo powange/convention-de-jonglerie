@@ -440,6 +440,7 @@
     "tip": "Tip",
     "total": "Total",
     "updated_at": "Opdateret den {date}",
+    "validate": "Valider",
     "view": "Se",
     "view_details": "Se detaljer",
     "volunteers_short": "Frivillige",
@@ -879,13 +880,6 @@
     "volunteers_what_you_can_bring_title": "Hvad du kan bringe os",
     "volunteers_withdraw": "Træk min ansøgning tilbage"
   },
-  "erreur": {
-    "": {
-      "": {
-        "": "Tilføj noter om denne fejl..."
-      }
-    }
-  },
   "errors": {
     "access_denied": "Adgang nægtet",
     "addition_error": "Fejl under tilføjelse",
@@ -1324,7 +1318,7 @@
     "saving": "Gemmer...",
     "security": "Sikkerhed",
     "unsaved_changes": "Du har ikke-gemte ændringer",
-    "username_hint": "Synlig offentligt for andre brugere",
+    "username_help": "Synlig offentligt for andre brugere",
     "username_min_3": "Brugernavnet skal indeholde mindst 3 tegn",
     "username_placeholder": "Dit unikke brugernavn"
   },
@@ -1377,26 +1371,16 @@
   "upload": {
     "click_select_convention_logo": "Klik for at vælge convention logo",
     "convention_logo_alt": "Convention logo",
-    "delete_error": "Sletningsfejl",
     "delete_message": "Billede slettet",
     "demo_title": "Billede upload demo",
     "error_message": "Upload fejl",
     "errors": {
-      "convention_id_required": "Convention ID påkrævet",
-      "delete_failed": "Sletning mislykkedes",
-      "edition_id_required": "Edition ID påkrævet",
       "file_too_large": "Fil for stor. Maksimal størrelse: {maxSize}",
       "invalid_file_extension": "Ugyldig filendelse. Accepterede endelser: {allowedExtensions}",
-      "invalid_file_type": "Ugyldig filtype. Accepterede formater: {allowedTypes}",
-      "no_file_selected": "Ingen fil valgt",
-      "unsupported_delete_endpoint": "Ikke-understøttet sletnings-endpoint",
-      "upload_failed": "Upload mislykkedes",
-      "validation_failed": "Validering mislykkedes"
+      "invalid_file_type": "Ugyldig filtype. Accepterede formater: {allowedTypes}"
     },
     "formats_accepted": "Accepterede formater",
     "image_configured": "Billede konfigureret",
-    "image_deleted_successfully": "Billede slettet med succes",
-    "image_uploaded_successfully": "Billede uploadet med succes",
     "loading_error_title": "Fejl ved indlæsning af billede",
     "logo_preview_alt": "Logo forhåndsvisning",
     "logo_url_label": "Logo URL",
@@ -1404,12 +1388,10 @@
     "logo_url_placeholder": "https://eksempel.com/logo.jpg",
     "max_size": "Maksimal størrelse",
     "select_file": "Vælg fil",
-    "success": "Succes",
     "success_message": "Billede uploadet med succes!",
     "upload": "Upload",
     "upload_error": "Upload fejl",
-    "uploading": "Uploader...",
-    "validation_error": "Valideringsfejl"
+    "uploading": "Uploader..."
   },
   "validation": {
     "arrival_date_required": "Ankomstdato er påkrævet",

@@ -110,6 +110,7 @@ interface Props {
 const props = defineProps<Props>()
 const authStore = useAuthStore()
 const { t } = useI18n()
+const { getImageUrl } = useImageUrl()
 
 // Utilitaire local pour éviter une dépendance circulaire avec mapUtils
 const formatDateRangeLocal = (startDate: string, endDate: string) => {
@@ -141,6 +142,11 @@ const isFavorited = (edition: Edition): boolean => {
   return edition.favoritedBy.some((user) => user.id === authStore.user?.id)
 }
 
+// Fonction helper pour obtenir l'URL complète de l'image d'édition
+const getEditionImageUrl = (edition: Edition): string => {
+  return getImageUrl(edition.imageUrl, 'edition', edition.id) || ''
+}
+
 // Fonction pour créer les marqueurs (appelée quand Leaflet est disponible)
 const createMarkers = (): MapMarker[] => {
   if (!import.meta.client || !(window as any).L) return []
@@ -158,9 +164,10 @@ const createMarkers = (): MapMarker[] => {
     })
 
     // Créer le contenu du popup
+    const imageUrl = getEditionImageUrl(edition)
     const popupContent = `
       <div class="p-3 min-w-[250px]">
-        ${edition.imageUrl ? `<img src="${edition.imageUrl}" alt="${getEditionDisplayName(edition)}" class="w-full h-32 object-cover rounded mb-3">` : ''}
+        ${imageUrl ? `<img src="${imageUrl}" alt="${getEditionDisplayName(edition)}" class="w-full h-32 object-cover rounded mb-3">` : ''}
         <div class="flex items-start justify-between gap-2 mb-2">
           <h4 class="font-semibold text-gray-900">${getEditionDisplayName(edition)}</h4>
           ${isFav ? `<span class="text-yellow-500" title="${t('common.favorite')}">★</span>` : ''}

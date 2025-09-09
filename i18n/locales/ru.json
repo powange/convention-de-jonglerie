@@ -440,6 +440,7 @@
     "tip": "Совет",
     "total": "Всего",
     "updated_at": "Обновлено {date}",
+    "validate": "Подтвердить",
     "view": "Просмотреть",
     "view_details": "Просмотреть детали",
     "volunteers_short": "Волонтёры",
@@ -879,13 +880,6 @@
     "volunteers_what_you_can_bring_title": "Что вы можете нам принести",
     "volunteers_withdraw": "Отозвать мою заявку"
   },
-  "erreur": {
-    "": {
-      "": {
-        "": "Добавить заметки об этой ошибке..."
-      }
-    }
-  },
   "errors": {
     "access_denied": "Доступ запрещен",
     "addition_error": "Ошибка добавления",
@@ -1324,7 +1318,7 @@
     "saving": "Сохранение...",
     "security": "Безопасность",
     "unsaved_changes": "У вас есть несохраненные изменения",
-    "username_hint": "Публично видимый для других пользователей",
+    "username_help": "Публично видимый для других пользователей",
     "username_min_3": "Имя пользователя должно содержать минимум 3 символа",
     "username_placeholder": "Ваше уникальное имя пользователя"
   },
@@ -1377,26 +1371,16 @@
   "upload": {
     "click_select_convention_logo": "Нажмите, чтобы выбрать логотип конвенции",
     "convention_logo_alt": "Логотип конвенции",
-    "delete_error": "Ошибка удаления",
     "delete_message": "Изображение удалено",
     "demo_title": "Демо загрузки изображения",
     "error_message": "Ошибка загрузки",
     "errors": {
-      "convention_id_required": "Требуется ID конвенции",
-      "delete_failed": "Ошибка удаления",
-      "edition_id_required": "Требуется ID издания",
       "file_too_large": "Файл слишком большой. Максимальный размер: {maxSize}",
       "invalid_file_extension": "Недопустимое расширение файла. Принимаемые расширения: {allowedExtensions}",
-      "invalid_file_type": "Недопустимый тип файла. Принимаемые форматы: {allowedTypes}",
-      "no_file_selected": "Файл не выбран",
-      "unsupported_delete_endpoint": "Неподдерживаемый endpoint удаления",
-      "upload_failed": "Ошибка загрузки",
-      "validation_failed": "Ошибка валидации"
+      "invalid_file_type": "Недопустимый тип файла. Принимаемые форматы: {allowedTypes}"
     },
     "formats_accepted": "Принимаемые форматы",
     "image_configured": "Изображение настроено",
-    "image_deleted_successfully": "Изображение успешно удалено",
-    "image_uploaded_successfully": "Изображение успешно загружено",
     "loading_error_title": "Ошибка загрузки изображения",
     "logo_preview_alt": "Предварительный просмотр логотипа",
     "logo_url_label": "URL логотипа",
@@ -1404,12 +1388,10 @@
     "logo_url_placeholder": "https://example.com/logo.png",
     "max_size": "Максимальный размер",
     "select_file": "Выбрать файл",
-    "success": "Успешно",
     "success_message": "Изображение успешно загружено!",
     "upload": "Загрузить",
     "upload_error": "Ошибка загрузки",
-    "uploading": "Загрузка...",
-    "validation_error": "Ошибка валидации"
+    "uploading": "Загрузка..."
   },
   "validation": {
     "arrival_date_required": "Дата прибытия обязательна",

@@ -111,7 +111,7 @@ const emit = defineEmits<{
   (e: 'collaborator-added' | 'collaborator-removed'): void
 }>()
 
-const { normalizeImageUrl } = useImageUrl()
+const { getImageUrl } = useImageUrl()
 const toast = useToast()
 const { t } = useI18n()
 
@@ -267,7 +267,7 @@ const searchUsers = async (query: string) => {
       value: u.id,
       label: u.pseudo,
       avatar: u.profilePicture
-        ? { src: normalizeImageUrl(u.profilePicture) || '', alt: u.pseudo }
+        ? { src: getImageUrl(u.profilePicture, 'profile', u.id) || '', alt: u.pseudo }
         : undefined,
       user: u,
     }))

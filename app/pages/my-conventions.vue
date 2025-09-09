@@ -54,7 +54,7 @@
               <div class="flex items-center gap-3">
                 <div v-if="convention.logo" class="flex-shrink-0">
                   <img
-                    :src="normalizeImageUrl(convention.logo || '') || ''"
+                    :src="getImageUrl(convention.logo, 'convention', convention.id) || ''"
                     :alt="convention.name"
                     class="w-12 h-12 object-cover rounded-lg"
                   />
@@ -229,7 +229,7 @@ definePageMeta({
 
 const authStore = useAuthStore()
 const toast = useToast()
-const { normalizeImageUrl } = useImageUrl()
+const { getImageUrl } = useImageUrl()
 const { t } = useI18n()
 
 const conventionsLoading = ref(true)
@@ -270,7 +270,7 @@ const getEditionsColumns = () => [
       return h('div', { class: 'flex items-center gap-2' }, [
         edition.imageUrl
           ? h('img', {
-              src: normalizeImageUrl(edition.imageUrl),
+              src: getImageUrl(edition.imageUrl, 'edition', edition.id),
               alt: displayName,
               class: 'w-10 h-10 object-cover rounded flex-shrink-0',
             })

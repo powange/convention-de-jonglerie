@@ -2,10 +2,11 @@ import { useGravatar } from './gravatar'
 
 export const useAvatar = () => {
   const { getUserAvatar: getGravatarAvatar } = useGravatar()
-  const { normalizeImageUrl } = useImageUrl()
+  const { getImageUrl } = useImageUrl()
 
   const getUserAvatar = (
     user: {
+      id?: number
       email?: string
       emailHash?: string
       profilePicture?: string | null
@@ -28,13 +29,13 @@ export const useAvatar = () => {
       // Utiliser updatedAt comme version pour éviter le cache, sinon timestamp actuel
       const version = user.updatedAt ? new Date(user.updatedAt).getTime() : Date.now()
 
-      // Sinon, normaliser l'URL via l'API
-      const normalizedUrl = normalizeImageUrl(user.profilePicture)
-      if (!normalizedUrl) {
+      // Utiliser getImageUrl pour construire l'URL
+      const imageUrl = getImageUrl(user.profilePicture, 'profile', user.id)
+      if (!imageUrl) {
         return 'https://www.gravatar.com/avatar/default?s=80&d=mp'
       }
 
-      return `${normalizedUrl}?v=${version}`
+      return `${imageUrl}?v=${version}`
     }
 
     // Sinon, utiliser Gravatar

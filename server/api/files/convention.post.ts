@@ -56,29 +56,27 @@ export default defineEventHandler(async (event) => {
         })
       }
 
-      // Stocker le fichier dans le dossier conventions
+      // Stocker le fichier dans le dossier temporaire pour conventions existantes
       const filename = await storeFileLocally(
         file,
         8, // longueur ID unique
-        `conventions/${targetId}` // dossier de destination dans le mount
+        `temp/conventions/${targetId}` // dossier temporaire spécifique à la convention
       )
 
-      // Mettre à jour la convention avec la nouvelle URL
-      const imageUrl = `/uploads/conventions/${targetId}/${filename}`
+      // Retourner l'URL temporaire - la DB ne sera mise à jour qu'au PUT
+      const imageUrl = `/uploads/temp/conventions/${targetId}/${filename}`
 
-      const updatedConvention = await prisma.convention.update({
-        where: { id: targetId },
-        data: { logo: imageUrl },
-        include: {
-          author: { select: { id: true, pseudo: true, email: true } },
-        },
-      })
+      console.log('=== UPLOAD CONVENTION ===')
+      console.log('Fichier stocké:', filename)
+      console.log('URL retournée:', imageUrl)
+      console.log('Convention ID:', targetId)
 
       return {
         success: true,
         imageUrl,
-        filename,
-        convention: updatedConvention,
+        filename, // Le nom de fichier sera stocké en DB lors du PUT
+        temporary: true,
+        conventionId: targetId,
       }
     } else {
       // Nouvelle convention - stocker temporairement
