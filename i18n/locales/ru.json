@@ -881,13 +881,6 @@
     "volunteers_what_you_can_bring_title": "Что вы можете нам принести",
     "volunteers_withdraw": "Отозвать мою заявку"
   },
-  "erreur": {
-    "": {
-      "": {
-        "": "[TODO] Ajouter des notes sur cette erreur..."
-      }
-    }
-  },
   "errors": {
     "access_denied": "Доступ запрещен",
     "addition_error": "Ошибка добавления",

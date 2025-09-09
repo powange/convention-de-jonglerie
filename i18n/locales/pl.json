@@ -881,13 +881,6 @@
     "volunteers_what_you_can_bring_title": "Co możesz nam przynieść",
     "volunteers_withdraw": "Wycofaj moje zgłoszenie"
   },
-  "erreur": {
-    "": {
-      "": {
-        "": "[TODO] Ajouter des notes sur cette erreur..."
-      }
-    }
-  },
   "errors": {
     "access_denied": "Dostęp odrzucony",
     "addition_error": "Błąd podczas dodawania",

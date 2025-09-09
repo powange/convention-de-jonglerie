@@ -881,13 +881,6 @@
     "volunteers_what_you_can_bring_title": "Wat u ons kunt brengen",
     "volunteers_withdraw": "Trek mijn aanmelding in"
   },
-  "erreur": {
-    "": {
-      "": {
-        "": "[TODO] Ajouter des notes sur cette erreur..."
-      }
-    }
-  },
   "errors": {
     "access_denied": "Toegang geweigerd",
     "addition_error": "Toevoegfout",

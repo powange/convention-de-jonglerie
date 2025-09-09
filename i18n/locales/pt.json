@@ -881,13 +881,6 @@
     "volunteers_what_you_can_bring_title": "O que você pode nos trazer",
     "volunteers_withdraw": "Retirar minha inscrição"
   },
-  "erreur": {
-    "": {
-      "": {
-        "": "[TODO] Ajouter des notes sur cette erreur..."
-      }
-    }
-  },
   "errors": {
     "access_denied": "Acesso negado",
     "addition_error": "Erro na adição",
