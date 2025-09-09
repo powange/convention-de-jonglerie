@@ -61,6 +61,20 @@
       </div>
     </div>
 
+    <div>
+      <!-- Bouton En savoir plus -->
+      <div class="mt-3">
+        <UButton
+          variant="ghost"
+          size="sm"
+          icon="i-heroicons-information-circle"
+          @click="showConventionModal = true"
+        >
+          {{ $t('editions.learn_more_about_convention') }}
+        </UButton>
+      </div>
+    </div>
+
     <!-- Navigation par onglets -->
     <div class="border-b border-gray-200">
       <nav
@@ -180,16 +194,60 @@
         {{ getPageTitle(currentPage) }}
       </div>
     </div>
+
+    <!-- Modale d'informations sur la convention -->
+    <UModal v-model:open="showConventionModal" :title="$t('editions.about_convention')" size="md">
+      <template #body>
+        <div class="space-y-4">
+          <!-- Logo de la convention -->
+          <div v-if="edition.convention?.logo" class="flex justify-center">
+            <img
+              :src="
+                getImageUrl(edition.convention.logo, 'convention', edition.convention?.id) || ''
+              "
+              :alt="$t('conventions.logo_alt', { name: edition.convention.name })"
+              class="max-w-32 max-h-32 object-contain"
+            />
+          </div>
+
+          <!-- Nom de la convention -->
+          <h3 class="text-lg font-semibold text-center">
+            {{ edition.convention?.name }}
+          </h3>
+
+          <!-- Description de la convention -->
+          <div
+            v-if="edition.convention?.description && conventionDescriptionHtml"
+            class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
+          >
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <div v-html="conventionDescriptionHtml" />
+          </div>
+          <p v-else class="text-gray-700 dark:text-gray-300 text-center">
+            {{ $t('conventions.no_description_available') }}
+          </p>
+        </div>
+      </template>
+
+      <template #footer="{ close }">
+        <div class="flex justify-end">
+          <UButton variant="outline" @click="close">
+            {{ $t('common.close') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
+import { markdownToHtml } from '~/utils/markdown'
 
 const { t } = useI18n()
 
@@ -213,6 +271,17 @@ defineEmits<{
 }>()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
+
+// État de la modal
+const showConventionModal = ref(false)
+
+// Description de la convention en HTML (rendu Markdown)
+const conventionDescriptionHtml = computedAsync(async () => {
+  if (!props.edition?.convention?.description) {
+    return ''
+  }
+  return await markdownToHtml(props.edition.convention.description)
+}, '')
 
 // Vérifier l'accès à la page gestion
 const canAccess = computed(() => {

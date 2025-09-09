@@ -121,7 +121,7 @@
             <div class="flex items-center gap-4">
               <div v-if="convention.logo" class="w-12 h-12">
                 <img
-                  :src="convention.logo"
+                  :src="getImageUrl(convention.logo, 'convention', convention.id) || ''"
                   :alt="convention.name"
                   class="w-12 h-12 object-cover rounded-lg"
                 />
@@ -203,35 +203,44 @@
                 class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 <div class="flex items-start justify-between">
-                  <div class="flex-1">
-                    <div class="flex items-center gap-2">
-                      <h5 class="font-medium">
-                        {{ edition.name || convention.name }}
-                      </h5>
-                      <UBadge v-if="edition.isOnline" color="success" variant="soft" size="xs">
-                        {{ $t('editions.online_status') }}
-                      </UBadge>
-                      <UBadge v-else color="neutral" variant="soft" size="xs">
-                        {{ $t('editions.offline_edition') }}
-                      </UBadge>
+                  <div class="flex items-start gap-3 flex-1">
+                    <div v-if="edition.imageUrl" class="w-16 h-16 flex-shrink-0">
+                      <img
+                        :src="getImageUrl(edition.imageUrl, 'edition', edition.id) || ''"
+                        :alt="edition.name || convention.name"
+                        class="w-16 h-16 object-cover rounded-lg"
+                      />
                     </div>
-
-                    <div class="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                      <div class="flex items-center gap-4">
-                        <span class="flex items-center gap-1">
-                          <UIcon name="i-heroicons-calendar-days" class="w-4 h-4" />
-                          {{ formatDateRange(edition.startDate, edition.endDate) }}
-                        </span>
-                        <span class="flex items-center gap-1">
-                          <UIcon name="i-heroicons-map-pin" class="w-4 h-4" />
-                          {{ edition.city }}, {{ edition.country }}
-                        </span>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2">
+                        <h5 class="font-medium">
+                          {{ edition.name || convention.name }}
+                        </h5>
+                        <UBadge v-if="edition.isOnline" color="success" variant="soft" size="xs">
+                          {{ $t('editions.online_status') }}
+                        </UBadge>
+                        <UBadge v-else color="neutral" variant="soft" size="xs">
+                          {{ $t('editions.offline_edition') }}
+                        </UBadge>
                       </div>
 
-                      <p class="flex items-center gap-1">
-                        <UIcon name="i-heroicons-user" class="w-4 h-4" />
-                        {{ $t('admin.created_by') }} {{ formatAuthorName(edition.creator) }}
-                      </p>
+                      <div class="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                        <div class="flex items-center gap-4">
+                          <span class="flex items-center gap-1">
+                            <UIcon name="i-heroicons-calendar-days" class="w-4 h-4" />
+                            {{ formatDateRange(edition.startDate, edition.endDate) }}
+                          </span>
+                          <span class="flex items-center gap-1">
+                            <UIcon name="i-heroicons-map-pin" class="w-4 h-4" />
+                            {{ edition.city }}, {{ edition.country }}
+                          </span>
+                        </div>
+
+                        <p class="flex items-center gap-1">
+                          <UIcon name="i-heroicons-user" class="w-4 h-4" />
+                          {{ $t('admin.created_by') }} {{ formatAuthorName(edition.creator) }}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
@@ -304,6 +313,7 @@
 
 <script setup>
 const { t } = useI18n()
+const { getImageUrl } = useImageUrl()
 
 // Métadonnées de la page
 definePageMeta({
