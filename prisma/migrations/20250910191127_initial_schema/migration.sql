@@ -42,14 +42,31 @@ CREATE TABLE `ConventionCollaborator` (
     `userId` INTEGER NOT NULL,
     `addedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `addedById` INTEGER NOT NULL,
+    `canAddEdition` BOOLEAN NOT NULL DEFAULT false,
+    `canDeleteAllEditions` BOOLEAN NOT NULL DEFAULT false,
     `canDeleteConvention` BOOLEAN NOT NULL DEFAULT false,
+    `canEditAllEditions` BOOLEAN NOT NULL DEFAULT false,
     `canEditConvention` BOOLEAN NOT NULL DEFAULT false,
     `canManageCollaborators` BOOLEAN NOT NULL DEFAULT false,
-    `canArchiveConvention` BOOLEAN NOT NULL DEFAULT false,
-    `canManageEditions` BOOLEAN NOT NULL DEFAULT false,
+    `title` VARCHAR(191) NULL,
     `canManageVolunteers` BOOLEAN NOT NULL DEFAULT false,
 
     UNIQUE INDEX `ConventionCollaborator_conventionId_userId_key`(`conventionId`, `userId`),
+    INDEX `ConventionCollaborator_addedById_fkey`(`addedById`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `EditionCollaboratorPermission` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `collaboratorId` INTEGER NOT NULL,
+    `editionId` INTEGER NOT NULL,
+    `canEdit` BOOLEAN NOT NULL DEFAULT false,
+    `canDelete` BOOLEAN NOT NULL DEFAULT false,
+    `canManageVolunteers` BOOLEAN NOT NULL DEFAULT false,
+
+    UNIQUE INDEX `EditionCollaboratorPermission_collaboratorId_editionId_key`(`collaboratorId`, `editionId`),
+    INDEX `EditionCollaboratorPermission_editionId_fkey`(`editionId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -57,13 +74,17 @@ CREATE TABLE `ConventionCollaborator` (
 CREATE TABLE `CollaboratorPermissionHistory` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `conventionId` INTEGER NOT NULL,
-    `targetUserId` INTEGER NOT NULL,
     `actorId` INTEGER NOT NULL,
-    `action` ENUM('CREATED', 'REMOVED', 'RIGHTS_UPDATED', 'ARCHIVED') NOT NULL,
-    `previousRights` JSON NULL,
-    `newRights` JSON NULL,
-    `timestamp` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `changeType` ENUM('CREATED', 'RIGHTS_UPDATED', 'PER_EDITIONS_UPDATED', 'ARCHIVED', 'UNARCHIVED', 'REMOVED') NOT NULL,
+    `before` JSON NULL,
+    `after` JSON NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `targetUserId` INTEGER NULL,
 
+    INDEX `CollaboratorPermissionHistory_conventionId_fkey`(`conventionId`),
+    INDEX `CollaboratorPermissionHistory_actorId_fkey`(`actorId`),
+    INDEX `CollaboratorPermissionHistory_changeType_idx`(`changeType`),
+    INDEX `CollaboratorPermissionHistory_targetUserId_fkey`(`targetUserId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -414,6 +435,12 @@ ALTER TABLE `ConventionCollaborator` ADD CONSTRAINT `ConventionCollaborator_user
 
 -- AddForeignKey
 ALTER TABLE `ConventionCollaborator` ADD CONSTRAINT `ConventionCollaborator_addedById_fkey` FOREIGN KEY (`addedById`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `EditionCollaboratorPermission` ADD CONSTRAINT `EditionCollaboratorPermission_collaboratorId_fkey` FOREIGN KEY (`collaboratorId`) REFERENCES `ConventionCollaborator`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `EditionCollaboratorPermission` ADD CONSTRAINT `EditionCollaboratorPermission_editionId_fkey` FOREIGN KEY (`editionId`) REFERENCES `Edition`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `CollaboratorPermissionHistory` ADD CONSTRAINT `CollaboratorPermissionHistory_conventionId_fkey` FOREIGN KEY (`conventionId`) REFERENCES `Convention`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
