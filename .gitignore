@@ -34,3 +34,7 @@ public/uploads/
 
 # Backup folder (local development)
 backup/
+
+# Translation config files (generated)
+scripts/translation/translations-config.json
+scripts/translation/translations-config.template.json
