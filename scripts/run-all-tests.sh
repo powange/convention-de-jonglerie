@@ -2,7 +2,13 @@
 
 sleep 5
 mkdir -p /app/public/uploads
-npx prisma migrate deploy >/dev/null 2>&1 || true
+
+# Application des migrations avec gestion d'erreur visible
+echo "🔄 Application des migrations..."
+if ! npx prisma migrate deploy; then
+  echo "❌ Échec des migrations - abandon des tests"
+  exit 1
+fi
 
 # Vérifier la présence des dépendances critiques et installer si nécessaire
 node -e "require.resolve('nuxt-auth-utils')" >/dev/null 2>&1 || {
@@ -12,16 +18,16 @@ node -e "require.resolve('nuxt-auth-utils')" >/dev/null 2>&1 || {
 
 # Préparer Nuxt pour les tests
 echo "🔧 Préparation de Nuxt..."
-rm -rf /app/.nuxt
+rm -rf /app/.nuxt || echo "Nettoyage .nuxt ignoré (volume monté)"
 npx nuxt prepare || {
   echo "⚠️  Nuxt prepare a échoué, tentative de récupération..."
   mkdir -p /app/.nuxt
   touch /app/.nuxt/ui.css
 }
 
-echo "==================================="
-echo "     Lancement de tous les tests    "
-echo "==================================="
+echo "============================================="
+echo "    Lancement de tous les tests"
+echo "============================================="
 echo ""
 
 # Tests unitaires simples
