@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "fix:locales": "node scripts/fix-locales-syntax.mjs",
-    "build": "nuxt build",
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
