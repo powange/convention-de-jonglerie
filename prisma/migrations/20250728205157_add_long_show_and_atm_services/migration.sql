@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE `Edition` ADD COLUMN `hasATM` BOOLEAN NOT NULL DEFAULT false,
-    ADD COLUMN `hasLongShow` BOOLEAN NOT NULL DEFAULT false;

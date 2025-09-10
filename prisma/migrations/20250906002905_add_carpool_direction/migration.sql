@@ -1,5 +1,0 @@
--- AlterTable
-ALTER TABLE `CarpoolOffer` ADD COLUMN `direction` ENUM('TO_EVENT', 'FROM_EVENT') NOT NULL DEFAULT 'TO_EVENT';
-
--- AlterTable
-ALTER TABLE `CarpoolRequest` ADD COLUMN `direction` ENUM('TO_EVENT', 'FROM_EVENT') NOT NULL DEFAULT 'TO_EVENT';
