@@ -169,14 +169,6 @@ interface UsersApiResponse {
   pagination: PaginationData
 }
 
-interface DropdownMenuItem {
-  label: string
-  icon: string
-  color?: 'error' | 'warning' | 'success' | 'primary'
-  onSelect?: () => void
-  to?: string
-}
-
 // Métadonnées de la page
 useSeoMeta({
   title: t('admin.user_management') + ' - Admin',
@@ -184,7 +176,7 @@ useSeoMeta({
 })
 
 // Composables
-const router = useRouter()
+// const router = useRouter() // Supprimé car non utilisé
 
 // État réactif
 const loading = ref(false)
@@ -419,22 +411,15 @@ const formatRelativeTime = (date: string) => {
   return t('admin.years_ago', { count: Math.floor(diffInDays / 365) })
 }
 
-const getUserActions = (user: AdminUser): DropdownMenuItem[] => {
-  const actions: DropdownMenuItem[] = [
+const getUserActions = (user: AdminUser) => {
+  console.log('Creating actions for user:', user.pseudo)
+
+  const actions = [
     // Action pour voir le profil
     {
       label: t('admin.view_profile'),
       icon: 'i-heroicons-user',
-      onSelect: () => {
-        console.log('Click detected! Navigating to:', `/admin/users/${user.id}`)
-        try {
-          router.push(`/admin/users/${user.id}`)
-        } catch (error) {
-          console.error('Navigation error:', error)
-          // Fallback avec window.location
-          window.location.href = `/admin/users/${user.id}`
-        }
-      },
+      to: `/admin/users/${user.id}`,
     },
   ]
 
@@ -443,14 +428,20 @@ const getUserActions = (user: AdminUser): DropdownMenuItem[] => {
     actions.push({
       label: t('admin.promote_to_admin'),
       icon: 'i-heroicons-shield-check',
-      onSelect: () => promoteToAdmin(user),
+      onSelect: () => {
+        console.log('Promote clicked for:', user.pseudo)
+        promoteToAdmin(user)
+      },
     })
   } else {
     actions.push({
       label: t('admin.demote'),
       icon: 'i-heroicons-shield-exclamation',
       color: 'error' as const,
-      onSelect: () => demoteFromAdmin(user),
+      onSelect: () => {
+        console.log('Demote clicked for:', user.pseudo)
+        demoteFromAdmin(user)
+      },
     })
   }
 
@@ -460,22 +451,85 @@ const getUserActions = (user: AdminUser): DropdownMenuItem[] => {
       label: t('admin.delete_account'),
       icon: 'i-heroicons-trash',
       color: 'error' as const,
-      onSelect: () => openDeletionModal(user),
+      onSelect: () => {
+        console.log('Delete clicked for:', user.pseudo)
+        openDeletionModal(user)
+      },
     })
   }
 
-  return actions
+  return [actions]
 }
 
 // Fonctions d'action
 const promoteToAdmin = async (user: AdminUser) => {
-  // TODO: Implémenter la promotion
-  console.log('Promote:', user)
+  try {
+    const confirmMessage = t('admin.confirm_promote_to_admin', {
+      name: `${user.prenom} ${user.nom}`,
+    })
+
+    if (confirm(confirmMessage)) {
+      const updatedUser = await $fetch<AdminUser>(`/api/admin/users/${user.id}/promote`, {
+        method: 'PUT',
+        body: { isGlobalAdmin: true },
+      })
+
+      // Mettre à jour l'utilisateur dans la liste locale
+      const userIndex = users.value.findIndex((u) => u.id === user.id)
+      if (userIndex !== -1) {
+        users.value[userIndex] = updatedUser
+      }
+
+      useToast().add({
+        title: t('common.success'),
+        description: t('admin.user_promoted_successfully'),
+        color: 'success',
+      })
+    }
+  } catch (error: any) {
+    console.error('Erreur lors de la promotion:', error)
+
+    useToast().add({
+      title: t('common.error'),
+      description: error.data?.message || t('admin.promotion_error'),
+      color: 'error',
+    })
+  }
 }
 
 const demoteFromAdmin = async (user: AdminUser) => {
-  // TODO: Implémenter la rétrogradation
-  console.log('Demote:', user)
+  try {
+    const confirmMessage = t('admin.confirm_demote_from_admin', {
+      name: `${user.prenom} ${user.nom}`,
+    })
+
+    if (confirm(confirmMessage)) {
+      const updatedUser = await $fetch<AdminUser>(`/api/admin/users/${user.id}/promote`, {
+        method: 'PUT',
+        body: { isGlobalAdmin: false },
+      })
+
+      // Mettre à jour l'utilisateur dans la liste locale
+      const userIndex = users.value.findIndex((u) => u.id === user.id)
+      if (userIndex !== -1) {
+        users.value[userIndex] = updatedUser
+      }
+
+      useToast().add({
+        title: t('common.success'),
+        description: t('admin.user_demoted_successfully'),
+        color: 'success',
+      })
+    }
+  } catch (error: any) {
+    console.error('Erreur lors de la rétrogradation:', error)
+
+    useToast().add({
+      title: t('common.error'),
+      description: error.data?.message || t('admin.demotion_error'),
+      color: 'error',
+    })
+  }
 }
 
 // Fonction pour ouvrir le modal de suppression

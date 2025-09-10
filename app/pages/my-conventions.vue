@@ -73,26 +73,14 @@
                   </p>
                 </div>
               </div>
-              <div class="flex gap-2 ml-4">
+              <UDropdownMenu :items="getConventionActions(convention)">
                 <UButton
-                  v-if="canEditConvention(convention)"
-                  icon="i-heroicons-pencil"
-                  size="xs"
-                  color="warning"
+                  color="neutral"
                   variant="ghost"
-                  :title="t('conventions.edit')"
-                  :to="`/conventions/${convention.id}/edit`"
-                />
-                <UButton
-                  v-if="canDeleteConvention(convention)"
-                  icon="i-heroicons-trash"
+                  icon="i-heroicons-ellipsis-horizontal"
                   size="xs"
-                  color="error"
-                  variant="ghost"
-                  :title="t('conventions.delete')"
-                  @click="deleteConvention(convention.id)"
                 />
-              </div>
+              </UDropdownMenu>
             </div>
           </template>
 
@@ -212,8 +200,6 @@ import { getEditionDisplayNameWithConvention } from '~/utils/editionName'
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
 const USwitch = resolveComponent('USwitch')
-const UButtonGroup = resolveComponent('UButtonGroup')
-const UTooltip = resolveComponent('UTooltip')
 
 // Type pour les paramètres des cellules du tableau
 interface TableCellParams {
@@ -253,6 +239,30 @@ const { formatDateTime } = useDateFormat()
 
 // Utiliser le composable pour le statut des éditions
 const { getStatusColor, getStatusText } = useEditionStatus()
+
+// Actions pour les conventions
+const getConventionActions = (convention: Convention) => {
+  const actions = []
+
+  if (canEditConvention(convention)) {
+    actions.push({
+      label: t('conventions.edit'),
+      icon: 'i-heroicons-pencil',
+      to: `/conventions/${convention.id}/edit`,
+    })
+  }
+
+  if (canDeleteConvention(convention)) {
+    actions.push({
+      label: t('conventions.delete'),
+      icon: 'i-heroicons-trash',
+      color: 'error' as const,
+      onSelect: () => deleteConvention(convention.id),
+    })
+  }
+
+  return [actions]
+}
 
 // Colonnes pour le tableau des éditions
 const getEditionsColumns = () => [
@@ -355,59 +365,50 @@ const getEditionsColumns = () => [
     id: 'actions',
     cell: ({ row }: TableCellParams) => {
       const edition = row.original
-      // Fournir explicitement une fonction pour le slot par défaut afin d'éviter l'avertissement
-      return h(
-        UButtonGroup,
-        { size: 'xs' },
+      const convention = myConventions.value.find((conv) =>
+        conv.editions?.some((ed) => ed.id === edition.id)
+      )
+      const canEdit = convention && canEditEdition(convention, edition.id)
+      const canDelete = convention && canDeleteEdition(convention, edition.id)
+
+      const actions = [
         {
-          default: () => [
-            h(UTooltip, { text: t('common.view') }, () =>
-              h(UButton, {
-                icon: 'i-heroicons-eye',
-                color: 'info',
-                variant: 'ghost',
-                onClick: () => navigateTo(`/editions/${edition.id}`),
-              })
-            ),
-            (() => {
-              const convention = myConventions.value.find((conv) =>
-                conv.editions?.some((ed) => ed.id === edition.id)
-              )
-              const canEdit = convention && canEditEdition(convention, edition.id)
-              const canDelete = convention && canDeleteEdition(convention, edition.id)
-              const buttons = []
+          label: t('common.view'),
+          icon: 'i-heroicons-eye',
+          to: `/editions/${edition.id}`,
+        },
+      ]
 
-              // Bouton d'édition seulement si l'utilisateur a les droits
-              if (canEdit) {
-                buttons.push(
-                  h(UTooltip, { text: t('common.edit') }, () =>
-                    h(UButton, {
-                      icon: 'i-heroicons-pencil',
-                      color: 'warning',
-                      variant: 'ghost',
-                      onClick: () => navigateTo(`/editions/${edition.id}/edit`),
-                    })
-                  )
-                )
-              }
+      if (canEdit) {
+        actions.push({
+          label: t('common.edit'),
+          icon: 'i-heroicons-pencil',
+          to: `/editions/${edition.id}/edit`,
+        })
+      }
 
-              // Bouton de suppression seulement si l'utilisateur a les droits
-              if (canDelete) {
-                buttons.push(
-                  h(UTooltip, { text: t('common.delete') }, () =>
-                    h(UButton, {
-                      icon: 'i-heroicons-trash',
-                      color: 'error',
-                      variant: 'ghost',
-                      onClick: () => deleteEdition(edition.id),
-                    })
-                  )
-                )
-              }
+      if (canDelete) {
+        actions.push({
+          label: t('common.delete'),
+          icon: 'i-heroicons-trash',
+          color: 'error' as const,
+          onSelect: () => deleteEdition(edition.id),
+        })
+      }
 
-              return buttons
-            })(),
-          ],
+      return h(
+        resolveComponent('UDropdownMenu'),
+        {
+          items: [actions],
+        },
+        {
+          default: () =>
+            h(resolveComponent('UButton'), {
+              color: 'neutral',
+              variant: 'ghost',
+              icon: 'i-heroicons-ellipsis-horizontal',
+              size: 'xs',
+            }),
         }
       )
     },

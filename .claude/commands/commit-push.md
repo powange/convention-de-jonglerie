@@ -1,5 +1,5 @@
 ---
-description: "Commit tous les fichiers modifiés et push vers le repository"
+description: 'Commit tous les fichiers modifiés et push vers le repository'
 thinking: true
 ---
 

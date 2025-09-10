@@ -134,6 +134,66 @@ export function generateVerificationEmailHtml(code: string, prenom: string, emai
   `
 }
 
+export function generateAccountDeletionEmailHtml(
+  prenom: string,
+  reason: { title: string; message: string }
+): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Suppression de votre compte</title>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #dc2626; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #f8fafc; padding: 30px; border-radius: 0 0 8px 8px; }
+            .reason-box { background: #fef2f2; border-left: 4px solid #dc2626; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+            .reason-title { font-weight: bold; color: #dc2626; margin-bottom: 10px; }
+            .button { display: inline-block; background: #3b82f6; color: white !important; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+            .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>⚠️ Suppression de votre compte</h1>
+            </div>
+            <div class="content">
+                <p>Bonjour ${prenom},</p>
+                
+                <p>Nous vous informons que votre compte sur la plateforme Conventions de Jonglerie a été supprimé par nos administrateurs.</p>
+                
+                <div class="reason-box">
+                    <div class="reason-title">Motif de la suppression :</div>
+                    <div><strong>${reason.title}</strong></div>
+                    <p style="margin-top: 10px;">${reason.message}</p>
+                </div>
+                
+                <p><strong>Cette action est définitive.</strong> Toutes vos données personnelles ont été supprimées de nos serveurs conformément à notre politique de confidentialité.</p>
+                
+                <p>Si vous pensez que cette suppression est une erreur ou si vous avez des questions, vous pouvez nous contacter :</p>
+                
+                <div style="text-align: center;">
+                    <a href="mailto:contact@conventionsdejonglerie.fr" class="button">Nous contacter</a>
+                </div>
+                
+                <p>Nous vous remercions pour votre participation à la communauté des conventions de jonglerie.</p>
+                
+                <p>Cordialement,<br>
+                L'équipe des Conventions de Jonglerie</p>
+            </div>
+            <div class="footer">
+                <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre directement.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+  `
+}
+
 export function generatePasswordResetEmailHtml(resetLink: string, prenom: string): string {
   return `
     <!DOCTYPE html>

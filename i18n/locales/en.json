@@ -895,13 +895,6 @@
     "volunteers_what_you_can_bring_title": "What you can bring to us",
     "volunteers_withdraw": "Withdraw my application"
   },
-  "erreur": {
-    "": {
-      "": {
-        "": "Add notes about this error..."
-      }
-    }
-  },
   "errors": {
     "access_denied": "Access denied",
     "addition_error": "Addition error",

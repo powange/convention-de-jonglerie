@@ -1,5 +1,5 @@
 ---
-description: "Traduit automatiquement les clés [TODO] dans les fichiers de langue"
+description: 'Traduit automatiquement les clés [TODO] dans les fichiers de langue'
 thinking: false
 ---
 

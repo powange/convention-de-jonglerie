@@ -14,9 +14,6 @@
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
           {{ $t('admin.view_profile') }}
         </h1>
-        <p class="text-gray-600 dark:text-gray-400">
-          {{ $t('admin.user_management_description') }}
-        </p>
       </div>
     </div>
 
@@ -291,7 +288,7 @@ interface UserProfile {
 
 // Protection de la page - seulement pour les super admins
 definePageMeta({
-  middleware: 'super-admin',
+  middleware: ['auth-protected', 'super-admin'],
 })
 
 const route = useRoute()
@@ -345,23 +342,67 @@ const formatDate = (date: string) => {
 
 // Actions administrateur
 const promoteToAdmin = async (user: UserProfile) => {
-  // TODO: Implémenter la promotion
-  console.log('Promote:', user)
-  toast.add({
-    title: 'TODO',
-    description: 'Fonctionnalité de promotion à implémenter',
-    color: 'warning',
-  })
+  try {
+    const confirmMessage = t('admin.confirm_promote_to_admin', {
+      name: `${user.prenom} ${user.nom}`,
+    })
+
+    if (confirm(confirmMessage)) {
+      await $fetch<UserProfile>(`/api/admin/users/${user.id}/promote`, {
+        method: 'PUT',
+        body: { isGlobalAdmin: true },
+      })
+
+      // Rafraîchir les données depuis le serveur
+      await refresh()
+
+      toast.add({
+        title: t('common.success'),
+        description: t('admin.user_promoted_successfully'),
+        color: 'success',
+      })
+    }
+  } catch (error: any) {
+    console.error('Erreur lors de la promotion:', error)
+
+    toast.add({
+      title: t('common.error'),
+      description: error.data?.message || t('admin.promotion_error'),
+      color: 'error',
+    })
+  }
 }
 
 const demoteFromAdmin = async (user: UserProfile) => {
-  // TODO: Implémenter la rétrogradation
-  console.log('Demote:', user)
-  toast.add({
-    title: 'TODO',
-    description: 'Fonctionnalité de rétrogradation à implémenter',
-    color: 'warning',
-  })
+  try {
+    const confirmMessage = t('admin.confirm_demote_from_admin', {
+      name: `${user.prenom} ${user.nom}`,
+    })
+
+    if (confirm(confirmMessage)) {
+      await $fetch<UserProfile>(`/api/admin/users/${user.id}/promote`, {
+        method: 'PUT',
+        body: { isGlobalAdmin: false },
+      })
+
+      // Rafraîchir les données depuis le serveur
+      await refresh()
+
+      toast.add({
+        title: t('common.success'),
+        description: t('admin.user_demoted_successfully'),
+        color: 'success',
+      })
+    }
+  } catch (error: any) {
+    console.error('Erreur lors de la rétrogradation:', error)
+
+    toast.add({
+      title: t('common.error'),
+      description: error.data?.message || t('admin.demotion_error'),
+      color: 'error',
+    })
+  }
 }
 
 const openDeletionModal = (user: UserProfile) => {

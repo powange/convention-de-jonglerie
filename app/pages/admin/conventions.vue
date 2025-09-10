@@ -146,35 +146,43 @@
               <UBadge color="neutral" variant="soft">
                 {{ $t('admin.collaborators_count', { count: convention._count.collaborators }) }}
               </UBadge>
-              <UButton
-                :to="`/conventions/${convention.id}/edit`"
-                size="xs"
-                color="primary"
-                variant="soft"
-                icon="i-heroicons-pencil-square"
+              <UDropdownMenu
+                :items="[
+                  [
+                    {
+                      label: $t('common.edit'),
+                      icon: 'i-heroicons-pencil-square',
+                      to: `/conventions/${convention.id}/edit`,
+                    },
+                    ...(convention.isArchived
+                      ? [
+                          {
+                            label: $t('admin.unarchive_convention'),
+                            icon: 'i-heroicons-arrow-up-tray',
+                            color: 'success',
+                            click: () =>
+                              toggleArchiveConvention(convention.id, convention.isArchived),
+                          },
+                        ]
+                      : [
+                          {
+                            label: $t('admin.archive_convention'),
+                            icon: 'i-heroicons-archive-box',
+                            color: 'error',
+                            click: () =>
+                              toggleArchiveConvention(convention.id, convention.isArchived),
+                          },
+                        ]),
+                  ],
+                ]"
               >
-                {{ $t('common.edit') }}
-              </UButton>
-              <UButton
-                v-if="convention.isArchived"
-                size="xs"
-                color="success"
-                variant="soft"
-                icon="i-heroicons-arrow-up-tray"
-                @click="toggleArchiveConvention(convention.id, convention.isArchived)"
-              >
-                {{ $t('admin.unarchive_convention') }}
-              </UButton>
-              <UButton
-                v-else
-                size="xs"
-                color="error"
-                variant="soft"
-                icon="i-heroicons-archive-box"
-                @click="toggleArchiveConvention(convention.id, convention.isArchived)"
-              >
-                {{ $t('admin.archive_convention') }}
-              </UButton>
+                <UButton
+                  color="neutral"
+                  variant="ghost"
+                  icon="i-heroicons-ellipsis-horizontal"
+                  size="xs"
+                />
+              </UDropdownMenu>
             </div>
           </div>
 
@@ -245,50 +253,69 @@
                   </div>
 
                   <div class="flex flex-col items-end gap-2 ml-4">
-                    <div class="flex items-center gap-2">
-                      <UBadge color="primary" variant="soft" size="xs">
-                        {{
-                          $t('admin.volunteers_count', {
-                            count: edition._count.volunteerApplications,
-                          })
-                        }}
-                      </UBadge>
-                      <UBadge color="green" variant="soft" size="xs">
-                        {{
-                          $t('admin.carpool_offers_count', { count: edition._count.carpoolOffers })
-                        }}
-                      </UBadge>
+                    <div class="flex items-center gap-3">
+                      <div class="flex items-center gap-1.5">
+                        <UIcon name="i-heroicons-hand-raised" class="w-4 h-4 text-primary-500" />
+                        <span class="text-lg font-semibold text-primary-600 dark:text-primary-400">
+                          {{ edition._count.volunteerApplications }}
+                        </span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">
+                          {{
+                            $t('admin.volunteers_count', {
+                              count: edition._count.volunteerApplications,
+                            })
+                              .split(' ')
+                              .slice(1)
+                              .join(' ')
+                          }}
+                        </span>
+                      </div>
+                      <div class="flex items-center gap-1.5">
+                        <UIcon name="i-heroicons-truck" class="w-4 h-4 text-green-500" />
+                        <span class="text-lg font-semibold text-green-600 dark:text-green-400">
+                          {{ edition._count.carpoolOffers }}
+                        </span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">
+                          {{
+                            $t('admin.carpool_offers_count', {
+                              count: edition._count.carpoolOffers,
+                            })
+                              .split(' ')
+                              .slice(1)
+                              .join(' ')
+                          }}
+                        </span>
+                      </div>
                     </div>
 
-                    <div class="flex gap-1">
+                    <UDropdownMenu
+                      :items="[
+                        [
+                          {
+                            label: $t('common.view'),
+                            icon: 'i-heroicons-eye',
+                            to: `/editions/${edition.id}`,
+                          },
+                          {
+                            label: $t('common.edit'),
+                            icon: 'i-heroicons-pencil-square',
+                            to: `/editions/${edition.id}/edit`,
+                          },
+                          {
+                            label: $t('common.manage'),
+                            icon: 'i-heroicons-cog-6-tooth',
+                            to: `/editions/${edition.id}/gestion`,
+                          },
+                        ],
+                      ]"
+                    >
                       <UButton
-                        :to="`/editions/${edition.id}`"
+                        color="neutral"
+                        variant="ghost"
+                        icon="i-heroicons-ellipsis-horizontal"
                         size="xs"
-                        color="primary"
-                        variant="soft"
-                        icon="i-heroicons-eye"
-                      >
-                        {{ $t('common.view') }}
-                      </UButton>
-                      <UButton
-                        :to="`/editions/${edition.id}/edit`"
-                        size="xs"
-                        color="primary"
-                        variant="soft"
-                        icon="i-heroicons-pencil-square"
-                      >
-                        {{ $t('common.edit') }}
-                      </UButton>
-                      <UButton
-                        :to="`/editions/${edition.id}/gestion`"
-                        size="xs"
-                        color="warning"
-                        variant="soft"
-                        icon="i-heroicons-cog-6-tooth"
-                      >
-                        {{ $t('common.manage') }}
-                      </UButton>
-                    </div>
+                      />
+                    </UDropdownMenu>
                   </div>
                 </div>
               </div>

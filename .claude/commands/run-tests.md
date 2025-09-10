@@ -1,5 +1,5 @@
 ---
-description: "Exécute tous les tests du projet"
+description: 'Exécute tous les tests du projet'
 thinking: false
 ---
 

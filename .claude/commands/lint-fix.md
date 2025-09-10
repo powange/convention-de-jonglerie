@@ -1,5 +1,5 @@
 ---
-description: "Exécute le linter et corrige automatiquement les erreurs"
+description: 'Exécute le linter et corrige automatiquement les erreurs'
 thinking: false
 ---
 

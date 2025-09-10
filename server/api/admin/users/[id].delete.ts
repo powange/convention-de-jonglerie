@@ -4,6 +4,7 @@ import { readBody } from 'h3'
 import { requireUserSession } from '#imports'
 
 import { getEmailHash } from '../../../utils/email-hash'
+import { sendEmail, generateAccountDeletionEmailHtml } from '../../../utils/emailService'
 
 const prisma = new PrismaClient()
 
@@ -120,8 +121,26 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // TODO: Envoyer un email de notification à l'utilisateur supprimé
-    // Cette partie sera implémentée quand le système d'email sera configuré
+    // Envoyer un email de notification à l'utilisateur avant suppression
+    try {
+      const emailHtml = generateAccountDeletionEmailHtml(userToDelete.prenom || '', deletionReason)
+      const emailSent = await sendEmail({
+        to: userToDelete.email,
+        subject: `⚠️  Suppression de votre compte - ${deletionReason.title}`,
+        html: emailHtml,
+        text: `Bonjour ${userToDelete.prenom}, votre compte a été supprimé. Motif: ${deletionReason.title} - ${deletionReason.message}`,
+      })
+
+      if (emailSent) {
+        console.log(`✅ Email de suppression envoyé à ${userToDelete.email}`)
+      } else {
+        console.error(`❌ Échec envoi email de suppression à ${userToDelete.email}`)
+      }
+    } catch (emailError) {
+      console.error('❌ Erreur envoi email de suppression:', emailError)
+      // On continue la suppression même si l'email échoue
+    }
+
     console.log(
       `[DELETION] Compte supprimé - Email: ${userToDelete.email}, Raison: ${deletionReason.title}`
     )
