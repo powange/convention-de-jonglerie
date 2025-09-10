@@ -1,6 +1,5 @@
 {
   "admin": {
-    "actions": "Действия",
     "active_administrators": "Активные администраторы",
     "active_conventions": "Активные конвенции",
     "active_types": "Активные типы",
@@ -378,6 +377,7 @@
     }
   },
   "common": {
+    "actions": "Действия",
     "active": "Активный",
     "add": "Добавить",
     "address": "Адрес",
@@ -1230,7 +1230,6 @@
       "no_favorites_added": "Вы еще не добавили ни одного издания в избранные."
     },
     "management": {
-      "actions": "Действия",
       "delete_edition": "Удалить издание",
       "edit_edition": "Редактировать издание",
       "lost_found_active_description": "Вы можете управлять найденными вещами во время проведения издания.",

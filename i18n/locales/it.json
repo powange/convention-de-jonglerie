@@ -1,6 +1,5 @@
 {
   "admin": {
-    "actions": "Azioni",
     "active_administrators": "Amministratori attivi",
     "active_conventions": "Convegni attivi",
     "active_types": "Tipi attivi",
@@ -378,6 +377,7 @@
     }
   },
   "common": {
+    "actions": "Azioni",
     "active": "Attivo",
     "add": "Aggiungi",
     "address": "Indirizzo",
@@ -1230,7 +1230,6 @@
       "no_favorites_added": "Non hai ancora aggiunto edizioni ai tuoi preferiti."
     },
     "management": {
-      "actions": "Azioni",
       "delete_edition": "Elimina edizione",
       "edit_edition": "Modifica edizione",
       "lost_found_active_description": "Puoi gestire gli oggetti smarriti mentre l'edizione è in corso.",

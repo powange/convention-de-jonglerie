@@ -218,7 +218,7 @@
       <UCard>
         <template #header>
           <h3 class="font-medium text-gray-900 dark:text-white">
-            {{ $t('admin.actions') }}
+            {{ $t('common.actions') }}
           </h3>
         </template>
 

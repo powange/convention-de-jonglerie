@@ -1,4 +1,3 @@
-import bcrypt from 'bcryptjs'
 import { sendRedirect, getQuery, setCookie, getCookie, getRequestURL, createError } from 'h3'
 import { $fetch } from 'ofetch'
 
@@ -117,17 +116,13 @@ export default defineEventHandler(async (event) => {
     const basePseudo = email.split('@')[0]
     const pseudo = await uniquePseudo(basePseudo)
 
-    // Générer un mot de passe aléatoire (non utilisé pour Google), stocké hashé via bcrypt
-    const randomPassword = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
-    const hashed = await bcrypt.hash(randomPassword, 10)
-
     dbUser = await prisma.user.create({
       data: {
         email,
         pseudo,
         nom,
         prenom,
-        password: hashed,
+        password: null, // Pas de mot de passe pour les utilisateurs OAuth
         isEmailVerified: true,
         ...(picture ? { profilePicture: picture } : {}),
       },

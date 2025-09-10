@@ -29,7 +29,7 @@
         <!-- Actions de gestion -->
         <UCard v-if="hasManagementActions">
           <div class="space-y-4">
-            <h2 class="text-lg font-semibold">{{ $t('pages.management.actions') }}</h2>
+            <h2 class="text-lg font-semibold">{{ $t('common.actions') }}</h2>
             <div class="flex flex-wrap gap-2">
               <UButton
                 v-if="canEdit"

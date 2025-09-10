@@ -1,6 +1,5 @@
 {
   "admin": {
-    "actions": "Acties",
     "active_administrators": "Actieve beheerders",
     "active_conventions": "Actieve conventies",
     "active_types": "Actieve types",
@@ -378,6 +377,7 @@
     }
   },
   "common": {
+    "actions": "Acties",
     "active": "Actief",
     "add": "Toevoegen",
     "address": "Adres",
@@ -1230,7 +1230,6 @@
       "no_favorites_added": "Je hebt nog geen editie aan je favorieten toegevoegd."
     },
     "management": {
-      "actions": "Acties",
       "delete_edition": "Editie verwijderen",
       "edit_edition": "Editie bewerken",
       "lost_found_active_description": "Je kunt gevonden voorwerpen beheren terwijl de editie bezig is.",

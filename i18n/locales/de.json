@@ -1,6 +1,5 @@
 {
   "admin": {
-    "actions": "Aktionen",
     "active_administrators": "Aktive Administratoren",
     "active_conventions": "Aktive Conventions",
     "active_types": "Aktive Typen",
@@ -378,6 +377,7 @@
     }
   },
   "common": {
+    "actions": "Aktionen",
     "active": "Aktiv",
     "add": "Hinzufügen",
     "address": "Adresse",
@@ -1230,7 +1230,6 @@
       "no_favorites_added": "Du hast noch keine Auflage zu deinen Favoriten hinzugefügt."
     },
     "management": {
-      "actions": "Aktionen",
       "delete_edition": "Auflage löschen",
       "edit_edition": "Auflage bearbeiten",
       "lost_found_active_description": "Du kannst Fundsachen während der laufenden Auflage verwalten.",

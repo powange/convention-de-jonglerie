@@ -196,11 +196,6 @@ const userMenuItems = computed(() => {
       to: '/profile',
     },
     {
-      label: t('navigation.notifications'),
-      icon: 'i-heroicons-bell',
-      to: '/notifications',
-    },
-    {
       label: t('navigation.my_conventions'),
       icon: 'i-heroicons-calendar-days',
       to: '/my-conventions',

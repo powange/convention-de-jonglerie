@@ -39,7 +39,7 @@ export const registerSchema = z.object({
 
 export const changePasswordSchema = z
   .object({
-    currentPassword: z.string().min(1, 'Mot de passe actuel requis'),
+    currentPassword: z.string().optional(), // Optionnel pour les utilisateurs OAuth
     newPassword: passwordSchema,
     confirmPassword: z.string(),
   })

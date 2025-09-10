@@ -1,6 +1,5 @@
 {
   "admin": {
-    "actions": "Handlinger",
     "active_administrators": "Aktive administratorer",
     "active_conventions": "Aktive konventioner",
     "active_types": "Aktive typer",
@@ -378,6 +377,7 @@
     }
   },
   "common": {
+    "actions": "Handlinger",
     "active": "Aktiv",
     "add": "Tilføj",
     "address": "Adresse",
@@ -1230,7 +1230,6 @@
       "no_favorites_added": "Du har endnu ikke tilføjet nogen udgaver til dine favoritter."
     },
     "management": {
-      "actions": "Handlinger",
       "delete_edition": "Slet udgaven",
       "edit_edition": "Rediger udgaven",
       "lost_found_active_description": "Du kan administrere hittegods mens udgaven er i gang.",

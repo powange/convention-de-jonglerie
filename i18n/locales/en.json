@@ -1,6 +1,5 @@
 {
   "admin": {
-    "actions": "Actions",
     "active_administrators": "Active administrators",
     "active_conventions": "Active conventions",
     "active_types": "Active types",
@@ -378,6 +377,7 @@
     }
   },
   "common": {
+    "actions": "Actions",
     "active": "Active",
     "add": "Add",
     "address": "Address",
@@ -1230,7 +1230,6 @@
       "no_favorites_added": "You haven't added any edition to your favorites yet."
     },
     "management": {
-      "actions": "Actions",
       "delete_edition": "Delete edition",
       "edit_edition": "Edit edition",
       "lost_found_active_description": "You can manage lost & found items while the edition is running.",

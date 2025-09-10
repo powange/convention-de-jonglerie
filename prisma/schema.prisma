@@ -15,7 +15,7 @@ model User {
   pseudo                   String                          @unique
   nom                      String?
   prenom                   String?
-  password                 String
+  password                 String?
   createdAt                DateTime                        @default(now())
   updatedAt                DateTime                        @updatedAt
   profilePicture           String?

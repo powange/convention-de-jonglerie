@@ -1,6 +1,5 @@
 {
   "admin": {
-    "actions": "Acções",
     "active_administrators": "Administradores activos",
     "active_conventions": "Convenções ativas",
     "active_types": "Tipos ativos",
@@ -378,6 +377,7 @@
     }
   },
   "common": {
+    "actions": "Acções",
     "active": "Ativo",
     "add": "Adicionar",
     "address": "Morada",
@@ -1230,7 +1230,6 @@
       "no_favorites_added": "Ainda não adicionou nenhuma edição aos seus favoritos."
     },
     "management": {
-      "actions": "Acções",
       "delete_edition": "Eliminar a edição",
       "edit_edition": "Editar a edição",
       "lost_found_active_description": "Pode gerir os objectos perdidos enquanto a edição decorre.",

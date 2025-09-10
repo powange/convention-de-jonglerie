@@ -1,6 +1,5 @@
 {
   "admin": {
-    "actions": "Actions",
     "active_administrators": "Administrateurs actifs",
     "activity": "Activité",
     "administration_tools": "Outils d'Administration",
@@ -424,6 +423,7 @@
     }
   },
   "common": {
+    "actions": "Actions",
     "active": "Actif",
     "add": "Ajouter",
     "address": "Adresse",
@@ -1305,7 +1305,6 @@
       "no_favorites_added": "Vous n'avez pas encore ajouté d'édition à vos favoris."
     },
     "management": {
-      "actions": "Actions",
       "delete_edition": "Supprimer l'édition",
       "edit_edition": "Modifier l'édition",
       "lost_found_active_description": "Vous pouvez gérer les objets trouvés pendant le déroulement de l'édition.",

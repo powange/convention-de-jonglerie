@@ -334,7 +334,7 @@ const columns = [
   },
   {
     accessorKey: 'actions',
-    header: t('admin.actions'),
+    header: t('common.actions'),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUser
       return h(

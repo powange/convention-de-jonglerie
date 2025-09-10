@@ -50,14 +50,27 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Vérifier le mot de passe actuel
-    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, userWithPassword.password)
+    // Vérifier le mot de passe actuel (sauf si l'utilisateur n'a pas de mot de passe - OAuth)
+    if (userWithPassword.password) {
+      // L'utilisateur a déjà un mot de passe, il faut le vérifier
+      if (!currentPassword) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Mot de passe actuel requis',
+        })
+      }
+      
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, userWithPassword.password)
 
-    if (!isCurrentPasswordValid) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Mot de passe actuel incorrect',
-      })
+      if (!isCurrentPasswordValid) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Mot de passe actuel incorrect',
+        })
+      }
+    } else {
+      // Utilisateur OAuth sans mot de passe - il peut directement définir un nouveau mot de passe
+      // Le champ currentPassword est ignoré
     }
 
     // Hasher le nouveau mot de passe

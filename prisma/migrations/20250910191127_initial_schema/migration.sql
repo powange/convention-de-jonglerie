@@ -52,6 +52,7 @@ CREATE TABLE `ConventionCollaborator` (
     `canManageVolunteers` BOOLEAN NOT NULL DEFAULT false,
 
     UNIQUE INDEX `ConventionCollaborator_conventionId_userId_key`(`conventionId`, `userId`),
+    INDEX `ConventionCollaborator_userId_fkey`(`userId`),
     INDEX `ConventionCollaborator_addedById_fkey`(`addedById`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -107,7 +108,7 @@ CREATE TABLE `Edition` (
     `facebookUrl` VARCHAR(191) NULL,
     `instagramUrl` VARCHAR(191) NULL,
     `ticketingUrl` VARCHAR(191) NULL,
-    `websiteUrl` VARCHAR(191) NULL,
+    `officialWebsiteUrl` VARCHAR(191) NULL,
     `acceptsPets` BOOLEAN NOT NULL DEFAULT false,
     `hasFoodTrucks` BOOLEAN NOT NULL DEFAULT false,
     `hasGym` BOOLEAN NOT NULL DEFAULT false,
@@ -135,21 +136,30 @@ CREATE TABLE `Edition` (
     `creatorId` INTEGER NOT NULL,
     `conventionId` INTEGER NOT NULL,
     `isOnline` BOOLEAN NOT NULL DEFAULT false,
-    `askForDiet` BOOLEAN NOT NULL DEFAULT false,
-    `askForAllergies` BOOLEAN NOT NULL DEFAULT false,
-    `askForTimePreferences` BOOLEAN NOT NULL DEFAULT false,
-    `askForTeamPreferences` BOOLEAN NOT NULL DEFAULT false,
-    `teams` JSON NULL,
-    `askForVehicle` BOOLEAN NOT NULL DEFAULT false,
-    `askForCompanions` BOOLEAN NOT NULL DEFAULT false,
-    `askForAvoidList` BOOLEAN NOT NULL DEFAULT false,
-    `askForSkills` BOOLEAN NOT NULL DEFAULT false,
-    `askForExperience` BOOLEAN NOT NULL DEFAULT false,
-    `askForMinors` BOOLEAN NOT NULL DEFAULT false,
-    `askForPets` BOOLEAN NOT NULL DEFAULT false,
-    `volunteerExternalUrl` VARCHAR(191) NULL,
-    `askForPresence` BOOLEAN NOT NULL DEFAULT false,
+    `volunteersDescription` TEXT NULL,
+    `volunteersOpen` BOOLEAN NOT NULL DEFAULT false,
+    `volunteersUpdatedAt` DATETIME(3) NULL,
+    `volunteersExternalUrl` VARCHAR(191) NULL,
+    `volunteersMode` ENUM('INTERNAL', 'EXTERNAL') NOT NULL DEFAULT 'INTERNAL',
+    `volunteersAskDiet` BOOLEAN NOT NULL DEFAULT false,
+    `volunteersAskAllergies` BOOLEAN NOT NULL DEFAULT false,
+    `volunteersAskTimePreferences` BOOLEAN NOT NULL DEFAULT false,
+    `volunteersTeams` JSON NULL,
+    `volunteersAskTeamPreferences` BOOLEAN NOT NULL DEFAULT false,
+    `volunteersAskPets` BOOLEAN NOT NULL DEFAULT false,
+    `volunteersAskMinors` BOOLEAN NOT NULL DEFAULT false,
+    `volunteersAskVehicle` BOOLEAN NOT NULL DEFAULT false,
+    `volunteersAskCompanion` BOOLEAN NOT NULL DEFAULT false,
+    `volunteersAskAvoidList` BOOLEAN NOT NULL DEFAULT false,
+    `volunteersAskSkills` BOOLEAN NOT NULL DEFAULT false,
+    `volunteersAskExperience` BOOLEAN NOT NULL DEFAULT false,
+    `volunteersTeardownEndDate` DATETIME(3) NULL,
+    `volunteersSetupStartDate` DATETIME(3) NULL,
+    `volunteersAskSetup` BOOLEAN NOT NULL DEFAULT false,
+    `volunteersAskTeardown` BOOLEAN NOT NULL DEFAULT false,
 
+    INDEX `Edition_creatorId_fkey`(`creatorId`),
+    INDEX `Edition_conventionId_fkey`(`conventionId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -186,26 +196,37 @@ CREATE TABLE `EditionVolunteerApplication` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `editionId` INTEGER NOT NULL,
     `userId` INTEGER NOT NULL,
-    `motivation` TEXT NOT NULL,
-    `diet` ENUM('NONE', 'VEGETARIAN', 'VEGAN', 'GLUTEN_FREE', 'OTHER') NOT NULL DEFAULT 'NONE',
+    `motivation` TEXT NULL,
+    `userSnapshotPhone` VARCHAR(191) NULL,
+    `dietaryPreference` ENUM('NONE', 'VEGETARIAN', 'VEGAN') NOT NULL DEFAULT 'NONE',
     `allergies` TEXT NULL,
     `timePreferences` JSON NULL,
-    `teamPreferences` TEXT NULL,
-    `vehicle` ENUM('NONE', 'CAR', 'MOTORCYCLE', 'BICYCLE', 'OTHER') NOT NULL DEFAULT 'NONE',
-    `companions` TEXT NULL,
+    `teamPreferences` JSON NULL,
+    `hasPets` BOOLEAN NULL,
+    `petsDetails` TEXT NULL,
+    `hasMinors` BOOLEAN NULL,
+    `minorsDetails` TEXT NULL,
+    `hasVehicle` BOOLEAN NULL,
+    `vehicleDetails` TEXT NULL,
+    `companionName` TEXT NULL,
     `avoidList` TEXT NULL,
     `skills` TEXT NULL,
-    `experience` TEXT NULL,
-    `minors` TEXT NULL,
-    `pets` TEXT NULL,
-    `presence` JSON NULL,
-    `eventAvailability` JSON NULL,
+    `hasExperience` BOOLEAN NULL,
+    `experienceDetails` TEXT NULL,
+    `setupAvailability` BOOLEAN NULL,
+    `teardownAvailability` BOOLEAN NULL,
+    `eventAvailability` BOOLEAN NULL,
+    `arrivalDateTime` VARCHAR(191) NULL,
+    `departureDateTime` VARCHAR(191) NULL,
     `status` ENUM('PENDING', 'ACCEPTED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
-    `adminNotes` TEXT NULL,
-    `appliedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `decidedAt` DATETIME(3) NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `EditionVolunteerApplication_editionId_userId_key`(`editionId`, `userId`),
+    INDEX `EditionVolunteerApplication_editionId_fkey`(`editionId`),
+    INDEX `EditionVolunteerApplication_userId_fkey`(`userId`),
+    INDEX `EditionVolunteerApplication_status_idx`(`status`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -214,19 +235,18 @@ CREATE TABLE `CarpoolOffer` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `editionId` INTEGER NOT NULL,
     `userId` INTEGER NOT NULL,
-    `departureDate` DATETIME(3) NOT NULL,
-    `returnDate` DATETIME(3) NULL,
-    `departureCity` VARCHAR(191) NOT NULL,
-    `departureAddress` VARCHAR(191) NOT NULL,
+    `tripDate` DATETIME(3) NOT NULL,
+    `locationCity` VARCHAR(191) NOT NULL,
+    `locationAddress` VARCHAR(191) NOT NULL,
     `availableSeats` INTEGER NOT NULL,
+    `direction` ENUM('TO_EVENT', 'FROM_EVENT') NOT NULL DEFAULT 'TO_EVENT',
     `description` TEXT NULL,
     `phoneNumber` VARCHAR(191) NULL,
-    `petsAllowed` BOOLEAN NOT NULL DEFAULT false,
-    `smokingAllowed` BOOLEAN NOT NULL DEFAULT false,
-    `pricePerSeat` DECIMAL(10, 2) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `CarpoolOffer_editionId_fkey`(`editionId`),
+    INDEX `CarpoolOffer_userId_fkey`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -235,18 +255,17 @@ CREATE TABLE `CarpoolRequest` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `editionId` INTEGER NOT NULL,
     `userId` INTEGER NOT NULL,
-    `departureDate` DATETIME(3) NOT NULL,
-    `returnDate` DATETIME(3) NULL,
-    `departureCity` VARCHAR(191) NOT NULL,
+    `tripDate` DATETIME(3) NOT NULL,
+    `locationCity` VARCHAR(191) NOT NULL,
     `seatsNeeded` INTEGER NOT NULL DEFAULT 1,
+    `direction` ENUM('TO_EVENT', 'FROM_EVENT') NOT NULL DEFAULT 'TO_EVENT',
     `description` TEXT NULL,
     `phoneNumber` VARCHAR(191) NULL,
-    `hasPets` BOOLEAN NOT NULL DEFAULT false,
-    `canSmoke` BOOLEAN NOT NULL DEFAULT false,
-    `maxBudget` DECIMAL(10, 2) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `CarpoolRequest_editionId_fkey`(`editionId`),
+    INDEX `CarpoolRequest_userId_fkey`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -259,6 +278,8 @@ CREATE TABLE `CarpoolComment` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `CarpoolComment_carpoolOfferId_fkey`(`carpoolOfferId`),
+    INDEX `CarpoolComment_userId_fkey`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -271,6 +292,8 @@ CREATE TABLE `CarpoolRequestComment` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `CarpoolRequestComment_carpoolRequestId_fkey`(`carpoolRequestId`),
+    INDEX `CarpoolRequestComment_userId_fkey`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -296,7 +319,7 @@ CREATE TABLE `CarpoolBooking` (
     `requesterId` INTEGER NOT NULL,
     `seats` INTEGER NOT NULL,
     `message` TEXT NULL,
-    `status` ENUM('PENDING', 'ACCEPTED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
+    `status` ENUM('PENDING', 'ACCEPTED', 'REJECTED', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -316,6 +339,8 @@ CREATE TABLE `PasswordResetToken` (
     `used` BOOLEAN NOT NULL DEFAULT false,
 
     UNIQUE INDEX `PasswordResetToken_token_key`(`token`),
+    INDEX `PasswordResetToken_userId_fkey`(`userId`),
+    INDEX `PasswordResetToken_token_idx`(`token`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -324,17 +349,14 @@ CREATE TABLE `LostFoundItem` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `editionId` INTEGER NOT NULL,
     `userId` INTEGER NOT NULL,
-    `title` VARCHAR(191) NOT NULL,
     `description` TEXT NOT NULL,
-    `category` ENUM('CLOTHING', 'ELECTRONICS', 'JUGGLING_PROP', 'PERSONAL_ITEM', 'DOCUMENTS', 'OTHER') NOT NULL,
-    `location` VARCHAR(191) NULL,
     `imageUrl` VARCHAR(191) NULL,
-    `isReturned` BOOLEAN NOT NULL DEFAULT false,
-    `returnedAt` DATETIME(3) NULL,
-    `returnedToUserId` INTEGER NULL,
+    `status` ENUM('LOST', 'RETURNED') NOT NULL DEFAULT 'LOST',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `LostFoundItem_editionId_fkey`(`editionId`),
+    INDEX `LostFoundItem_userId_fkey`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -345,73 +367,88 @@ CREATE TABLE `LostFoundComment` (
     `userId` INTEGER NOT NULL,
     `content` TEXT NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `LostFoundComment_lostFoundItemId_fkey`(`lostFoundItemId`),
+    INDEX `LostFoundComment_userId_fkey`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Feedback` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `email` VARCHAR(191) NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NULL,
+    `name` VARCHAR(191) NULL,
     `subject` VARCHAR(191) NOT NULL,
     `message` TEXT NOT NULL,
-    `type` ENUM('BUG_REPORT', 'FEATURE_REQUEST', 'GENERAL_FEEDBACK') NOT NULL DEFAULT 'GENERAL_FEEDBACK',
+    `type` ENUM('BUG', 'SUGGESTION', 'GENERAL', 'COMPLAINT') NOT NULL,
     `userId` INTEGER NULL,
-    `url` VARCHAR(191) NULL,
-    `userAgent` VARCHAR(2000) NULL,
-    `ip` VARCHAR(45) NULL,
-    `status` ENUM('NEW', 'IN_PROGRESS', 'RESOLVED', 'CLOSED') NOT NULL DEFAULT 'NEW',
+    `url` TEXT NULL,
+    `userAgent` TEXT NULL,
+    `resolved` BOOLEAN NOT NULL DEFAULT false,
     `adminNotes` TEXT NULL,
-    `resolvedAt` DATETIME(3) NULL,
-    `resolvedById` INTEGER NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `Feedback_type_idx`(`type`),
+    INDEX `Feedback_resolved_idx`(`resolved`),
+    INDEX `Feedback_userId_fkey`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `ApiErrorLog` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `method` VARCHAR(10) NOT NULL,
-    `url` VARCHAR(500) NOT NULL,
+    `id` VARCHAR(191) NOT NULL,
+    `message` TEXT NOT NULL,
     `statusCode` INTEGER NOT NULL,
-    `errorMessage` TEXT NOT NULL,
-    `stack` TEXT NULL,
-    `userId` INTEGER NULL,
-    `ip` VARCHAR(45) NULL,
+    `stack` LONGTEXT NULL,
+    `errorType` VARCHAR(191) NULL,
+    `method` VARCHAR(191) NOT NULL,
+    `url` TEXT NOT NULL,
+    `path` VARCHAR(191) NOT NULL,
     `userAgent` TEXT NULL,
-    `body` TEXT NULL,
-    `query` JSON NULL,
-    `params` JSON NULL,
+    `ip` VARCHAR(191) NULL,
     `headers` JSON NULL,
+    `body` JSON NULL,
+    `queryParams` JSON NULL,
+    `userId` INTEGER NULL,
     `resolved` BOOLEAN NOT NULL DEFAULT false,
+    `resolvedBy` INTEGER NULL,
+    `resolvedAt` DATETIME(3) NULL,
     `adminNotes` TEXT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
     INDEX `ApiErrorLog_statusCode_idx`(`statusCode`),
     INDEX `ApiErrorLog_createdAt_idx`(`createdAt`),
     INDEX `ApiErrorLog_resolved_idx`(`resolved`),
+    INDEX `ApiErrorLog_path_idx`(`path`),
+    INDEX `ApiErrorLog_userId_fkey`(`userId`),
+    INDEX `ApiErrorLog_resolvedBy_fkey`(`resolvedBy`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Notification` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id` VARCHAR(191) NOT NULL,
     `userId` INTEGER NOT NULL,
     `title` VARCHAR(191) NOT NULL,
     `message` TEXT NOT NULL,
-    `type` VARCHAR(50) NOT NULL DEFAULT 'info',
-    `category` VARCHAR(100) NULL,
+    `type` ENUM('INFO', 'SUCCESS', 'WARNING', 'ERROR') NOT NULL,
+    `category` VARCHAR(191) NULL,
+    `entityType` VARCHAR(191) NULL,
+    `entityId` VARCHAR(191) NULL,
     `isRead` BOOLEAN NOT NULL DEFAULT false,
-    `actionUrl` VARCHAR(500) NULL,
+    `readAt` DATETIME(3) NULL,
+    `actionText` VARCHAR(191) NULL,
+    `actionUrl` TEXT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
     INDEX `Notification_userId_idx`(`userId`),
     INDEX `Notification_isRead_idx`(`isRead`),
     INDEX `Notification_createdAt_idx`(`createdAt`),
+    INDEX `Notification_category_idx`(`category`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -527,9 +564,6 @@ ALTER TABLE `LostFoundItem` ADD CONSTRAINT `LostFoundItem_editionId_fkey` FOREIG
 ALTER TABLE `LostFoundItem` ADD CONSTRAINT `LostFoundItem_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `LostFoundItem` ADD CONSTRAINT `LostFoundItem_returnedToUserId_fkey` FOREIGN KEY (`returnedToUserId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `LostFoundComment` ADD CONSTRAINT `LostFoundComment_lostFoundItemId_fkey` FOREIGN KEY (`lostFoundItemId`) REFERENCES `LostFoundItem`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -539,10 +573,16 @@ ALTER TABLE `LostFoundComment` ADD CONSTRAINT `LostFoundComment_userId_fkey` FOR
 ALTER TABLE `Feedback` ADD CONSTRAINT `Feedback_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Feedback` ADD CONSTRAINT `Feedback_resolvedById_fkey` FOREIGN KEY (`resolvedById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `ApiErrorLog` ADD CONSTRAINT `ApiErrorLog_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ApiErrorLog` ADD CONSTRAINT `ApiErrorLog_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `ApiErrorLog` ADD CONSTRAINT `ApiErrorLog_resolvedBy_fkey` FOREIGN KEY (`resolvedBy`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Feedback` ADD CONSTRAINT `Feedback_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `CarpoolPassenger` ADD CONSTRAINT `CarpoolPassenger_addedById_fkey` FOREIGN KEY (`addedById`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Notification` ADD CONSTRAINT `Notification_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

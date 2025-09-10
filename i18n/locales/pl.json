@@ -1,6 +1,5 @@
 {
   "admin": {
-    "actions": "Akcje",
     "active_administrators": "Aktywni administratorzy",
     "active_conventions": "Aktywne konwencje",
     "active_types": "Aktywne typy",
@@ -378,6 +377,7 @@
     }
   },
   "common": {
+    "actions": "Akcje",
     "active": "Aktywny",
     "add": "Dodaj",
     "address": "Adres",
@@ -1230,7 +1230,6 @@
       "no_favorites_added": "Nie dodałeś jeszcze żadnej edycji do ulubionych."
     },
     "management": {
-      "actions": "Akcje",
       "delete_edition": "Usuń edycję",
       "edit_edition": "Edytuj edycję",
       "lost_found_active_description": "Możesz zarządzać rzeczami znalezionymi w trakcie trwania edycji.",

@@ -62,7 +62,8 @@
       "Bash(mysql:*)",
       "Bash(for lang in en de es it nl pt ru pl uk da)",
       "Bash(npm ci:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(for:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"
