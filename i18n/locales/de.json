@@ -17,6 +17,8 @@
     "cannot_load_stats": "Statistiken können nicht geladen werden",
     "cannot_load_users": "Benutzer können nicht geladen werden",
     "carpool_offers_count": "{count} Fahrgemeinschaften",
+    "change_profile_picture": "Profilbild ändern",
+    "change_profile_picture_description": "Profilbild dieses Benutzers hochladen oder ändern",
     "collaborators_count": "{count} Mitarbeiter",
     "coming_soon": "Demnächst verfügbar",
     "confirm_archive_convention": "Sind Sie sicher, dass Sie diese Konvention archivieren möchten?",
@@ -142,6 +144,11 @@
     "notification_management": "Benachrichtigungsverwaltung",
     "oldest_first": "Älteste zuerst",
     "per_page": "pro Seite",
+    "profile_picture_alt": "Profilbild des Benutzers",
+    "profile_picture_info": "Profilbild-Informationen",
+    "profile_picture_placeholder": "Klicken Sie hier, um ein Profilbild hinzuzufügen",
+    "profile_picture_update_error": "Fehler beim Aktualisieren des Profilbilds",
+    "profile_picture_updated": "Profilbild erfolgreich aktualisiert",
     "promote_to_admin": "Zum Super-Admin befördern",
     "recent_activity": "Aktuelle Aktivität",
     "recent_notifications": "Neueste Benachrichtigungen",
@@ -677,6 +684,13 @@
   "ed": {
     "id": "ID"
   },
+  "editForm": {
+    "email": "E-Mail",
+    "nom": "Nachname",
+    "phone": "Telefon",
+    "prenom": "Vorname",
+    "pseudo": "Benutzername"
+  },
   "editions": {
     "about_convention": "Über die Convention",
     "about_convention_description": "Detaillierte Informationen zur Convention",
@@ -1082,6 +1096,7 @@
     "cityPlaceholder": "Z.B.: Berlin, München, Hamburg"
   },
   "log": {
+    "add_admin_notes": "Notizen zu diesem Fehler hinzufügen...",
     "adminNotes": "Admin-Notizen",
     "errorType": "Fehlertyp",
     "full_url": "Vollständige URL",
@@ -1374,6 +1389,7 @@
     "convention_logo_alt": "Convention-Logo",
     "delete_message": "Bild gelöscht",
     "demo_title": "Bild-Upload Demo",
+    "error": "Fehler beim Hochladen",
     "error_message": "Upload-Fehler",
     "errors": {
       "file_too_large": "Datei zu groß",

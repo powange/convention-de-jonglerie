@@ -17,6 +17,8 @@
     "cannot_load_stats": "Cannot load statistics",
     "cannot_load_users": "Cannot load users",
     "carpool_offers_count": "{count} carpools",
+    "change_profile_picture": "Change profile picture",
+    "change_profile_picture_description": "Upload or modify this user's profile picture",
     "collaborators_count": "{count} collaborators",
     "coming_soon": "Coming soon",
     "confirm_archive_convention": "Are you sure you want to archive this convention?",
@@ -142,6 +144,11 @@
     "notification_management": "Notification Management",
     "oldest_first": "Oldest first",
     "per_page": "per page",
+    "profile_picture_alt": "User's profile picture",
+    "profile_picture_info": "Profile picture information",
+    "profile_picture_placeholder": "Click to add a profile picture",
+    "profile_picture_update_error": "Error updating profile picture",
+    "profile_picture_updated": "Profile picture updated successfully",
     "promote_to_admin": "Promote to super admin",
     "recent_activity": "Recent activity",
     "recent_notifications": "Recent Notifications",
@@ -150,7 +157,7 @@
     "search_conventions_placeholder": "Search by name, description, creator...",
     "search_error_messages": "Search in error messages...",
     "search_users_placeholder": "Search by email, username, first name or last name...",
-    "select_deletion_reason": "Select a reason for deletion",
+    "select_deletion_reason": "Choose a reason",
     "super_admin": "Super Admin",
     "super_administrators": "Super administrators",
     "super_admins": "Super admins",
@@ -677,6 +684,13 @@
   "ed": {
     "id": "ID"
   },
+  "editForm": {
+    "email": "Email",
+    "nom": "Last name",
+    "phone": "Phone",
+    "prenom": "First name",
+    "pseudo": "Username"
+  },
   "editions": {
     "about_convention": "About the convention",
     "about_convention_description": "Detailed information about the convention",
@@ -881,6 +895,13 @@
     "volunteers_what_you_can_bring_title": "What you can bring to us",
     "volunteers_withdraw": "Withdraw my application"
   },
+  "erreur": {
+    "": {
+      "": {
+        "": "Add notes about this error..."
+      }
+    }
+  },
   "errors": {
     "access_denied": "Access denied",
     "addition_error": "Addition error",
@@ -1082,6 +1103,7 @@
     "cityPlaceholder": "e.g., London, Manchester, Edinburgh"
   },
   "log": {
+    "add_admin_notes": "Add notes about this error...",
     "adminNotes": "Admin Notes",
     "errorType": "Error Type",
     "full_url": "Full URL",
@@ -1374,6 +1396,7 @@
     "convention_logo_alt": "Convention logo",
     "delete_message": "Image deleted",
     "demo_title": "ImageUpload Demo",
+    "error": "Error during upload",
     "error_message": "Upload error",
     "errors": {
       "file_too_large": "File too large",

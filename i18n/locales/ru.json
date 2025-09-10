@@ -17,6 +17,8 @@
     "cannot_load_stats": "Невозможно загрузить статистику",
     "cannot_load_users": "Невозможно загрузить пользователей",
     "carpool_offers_count": "{count} поездок",
+    "change_profile_picture": "Изменить фото профиля",
+    "change_profile_picture_description": "Загрузить или изменить фото профиля этого пользователя",
     "collaborators_count": "{count} сотрудников",
     "coming_soon": "Скоро",
     "confirm_archive_convention": "Вы уверены, что хотите архивировать эту конвенцию?",
@@ -142,6 +144,11 @@
     "notification_management": "Управление уведомлениями",
     "oldest_first": "Старейшие сначала",
     "per_page": "на страницу",
+    "profile_picture_alt": "Фото профиля пользователя",
+    "profile_picture_info": "Информация о фото профиля",
+    "profile_picture_placeholder": "Нажмите, чтобы добавить фото профиля",
+    "profile_picture_update_error": "Ошибка при обновлении фото профиля",
+    "profile_picture_updated": "Фото профиля успешно обновлено",
     "promote_to_admin": "Повысить до супер администратора",
     "recent_activity": "Недавняя активность",
     "recent_notifications": "Недавние уведомления",
@@ -677,6 +684,13 @@
   "ed": {
     "id": "ID"
   },
+  "editForm": {
+    "email": "Эл. почта",
+    "nom": "Фамилия",
+    "phone": "Телефон",
+    "prenom": "Имя",
+    "pseudo": "Имя пользователя"
+  },
   "editions": {
     "about_convention": "О конвенции",
     "about_convention_description": "Подробная информация о конвенции",
@@ -1082,6 +1096,7 @@
     "cityPlaceholder": "Напр.: Москва, Санкт-Петербург, Новосибирск"
   },
   "log": {
+    "add_admin_notes": "Добавить заметки об этой ошибке...",
     "adminNotes": "Заметки администратора",
     "errorType": "Тип ошибки",
     "full_url": "Полный URL",
@@ -1374,6 +1389,7 @@
     "convention_logo_alt": "Логотип конвенции",
     "delete_message": "Изображение удалено",
     "demo_title": "Демо загрузки изображения",
+    "error": "Ошибка при загрузке",
     "error_message": "Ошибка загрузки",
     "errors": {
       "file_too_large": "Файл слишком большой. Максимальный размер: {maxSize}",

@@ -17,6 +17,8 @@
     "cannot_load_stats": "Kan ikke indlæse statistikker",
     "cannot_load_users": "Kan ikke indlæse brugere",
     "carpool_offers_count": "{count} samkørsler",
+    "change_profile_picture": "Skift profilbillede",
+    "change_profile_picture_description": "Upload eller ændr denne brugers profilbillede",
     "collaborators_count": "{count} samarbejdspartnere",
     "coming_soon": "Kommer snart",
     "confirm_archive_convention": "Er du sikker på, at du vil arkivere denne konvention?",
@@ -142,6 +144,11 @@
     "notification_management": "Meddelelseshåndtering",
     "oldest_first": "Ældste først",
     "per_page": "per side",
+    "profile_picture_alt": "Brugerens profilbillede",
+    "profile_picture_info": "Profilbillede information",
+    "profile_picture_placeholder": "Klik for at tilføje et profilbillede",
+    "profile_picture_update_error": "Fejl ved opdatering af profilbillede",
+    "profile_picture_updated": "Profilbillede opdateret succesfuldt",
     "promote_to_admin": "Forfrem til superadmin",
     "recent_activity": "Seneste aktivitet",
     "recent_notifications": "Seneste beskeder",
@@ -677,6 +684,13 @@
   "ed": {
     "id": "ID"
   },
+  "editForm": {
+    "email": "E-mail",
+    "nom": "Efternavn",
+    "phone": "Telefon",
+    "prenom": "Fornavn",
+    "pseudo": "Brugernavn"
+  },
   "editions": {
     "about_convention": "Om konventionen",
     "about_convention_description": "Detaljerede oplysninger om konventionen",
@@ -1082,6 +1096,7 @@
     "cityPlaceholder": "F.eks.: København, Aarhus, Odense"
   },
   "log": {
+    "add_admin_notes": "Tilføj noter om denne fejl...",
     "adminNotes": "Admin-noter",
     "errorType": "Fejltype",
     "full_url": "Fuld URL",
@@ -1374,6 +1389,7 @@
     "convention_logo_alt": "Convention logo",
     "delete_message": "Billede slettet",
     "demo_title": "Billede upload demo",
+    "error": "Fejl under upload",
     "error_message": "Upload fejl",
     "errors": {
       "file_too_large": "Fil for stor. Maksimal størrelse: {maxSize}",

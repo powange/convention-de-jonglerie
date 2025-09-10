@@ -381,7 +381,7 @@
                 </label>
                 <UTextarea
                   v-model="selectedLog.adminNotes"
-                  :placeholder="$t('erreur...')"
+                  :placeholder="$t('log.add_admin_notes')"
                   :rows="3"
                   class="w-full"
                 />

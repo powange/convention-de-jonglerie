@@ -17,6 +17,8 @@
     "cannot_load_stats": "Kan statistieken niet laden",
     "cannot_load_users": "Kan gebruikers niet laden",
     "carpool_offers_count": "{count} carpools",
+    "change_profile_picture": "Profielfoto wijzigen",
+    "change_profile_picture_description": "Upload of wijzig de profielfoto van deze gebruiker",
     "collaborators_count": "{count} medewerkers",
     "coming_soon": "Binnenkort beschikbaar",
     "confirm_archive_convention": "Weet u zeker dat u deze conventie wilt archiveren?",
@@ -142,6 +144,11 @@
     "notification_management": "Meldingenbeheer",
     "oldest_first": "Oudste eerst",
     "per_page": "per pagina",
+    "profile_picture_alt": "Profielfoto van de gebruiker",
+    "profile_picture_info": "Profielfoto informatie",
+    "profile_picture_placeholder": "Klik om een profielfoto toe te voegen",
+    "profile_picture_update_error": "Fout bij het bijwerken van profielfoto",
+    "profile_picture_updated": "Profielfoto succesvol bijgewerkt",
     "promote_to_admin": "Promoveren tot super beheerder",
     "recent_activity": "Recente activiteit",
     "recent_notifications": "Recente meldingen",
@@ -677,6 +684,13 @@
   "ed": {
     "id": "ID"
   },
+  "editForm": {
+    "email": "E-mail",
+    "nom": "Achternaam",
+    "phone": "Telefoon",
+    "prenom": "Voornaam",
+    "pseudo": "Gebruikersnaam"
+  },
   "editions": {
     "about_convention": "Over de conventie",
     "about_convention_description": "Gedetailleerde informatie over de conventie",
@@ -1082,6 +1096,7 @@
     "cityPlaceholder": "Bijv: Amsterdam, Rotterdam, Utrecht"
   },
   "log": {
+    "add_admin_notes": "Voeg notities toe over deze fout...",
     "adminNotes": "Beheernotities",
     "errorType": "Fouttype",
     "full_url": "Volledige URL",
@@ -1374,6 +1389,7 @@
     "convention_logo_alt": "Conventie logo",
     "delete_message": "Afbeelding verwijderd",
     "demo_title": "Afbeelding upload demo",
+    "error": "Fout tijdens uploaden",
     "error_message": "Upload fout",
     "errors": {
       "file_too_large": "Bestand te groot. Maximale grootte: {maxSize}",

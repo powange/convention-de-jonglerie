@@ -152,10 +152,17 @@
     "yesterday": "Hier",
     "delete_account": "Supprimer le compte",
     "delete_user_account": "Supprimer le compte utilisateur",
+    "change_profile_picture": "Modifier la photo de profil",
+    "change_profile_picture_description": "Téléchargez ou modifiez la photo de profil de cet utilisateur",
+    "profile_picture_alt": "Photo de profil de l'utilisateur",
+    "profile_picture_placeholder": "Cliquez pour ajouter une photo de profil",
+    "profile_picture_info": "Informations sur la photo de profil",
+    "profile_picture_updated": "Photo de profil mise à jour avec succès",
+    "profile_picture_update_error": "Erreur lors de la mise à jour de la photo de profil",
     "deletion_warning_title": "Action irréversible",
     "deletion_warning_description": "Cette action supprimera définitivement le compte utilisateur et toutes ses données. Cette action ne peut pas être annulée.",
     "deletion_reason": "Raison de la suppression",
-    "select_deletion_reason": "Sélectionnez une raison de suppression",
+    "select_deletion_reason": "Choisissez une raison",
     "email_notification": "Notification par email",
     "email_notification_description": "L'utilisateur recevra un email l'informant de la suppression de son compte et la raison.",
     "type_pseudo_to_confirm": "Tapez le pseudo de l'utilisateur pour confirmer",
@@ -668,6 +675,13 @@
   "ed": {
     "id": "ID"
   },
+  "editForm": {
+    "email": "Email",
+    "pseudo": "Pseudo",
+    "prenom": "Prénom",
+    "nom": "Nom",
+    "phone": "Téléphone"
+  },
   "editions": {
     "about_this_edition": "À propos de cette édition",
     "about_convention": "À propos de la convention",
@@ -1126,7 +1140,6 @@
     "value": "Valeur",
     "icon": "Icône"
   },
-  "erreur...": "Ajouter des notes sur cette erreur...",
   "locationLabels": {
     "cityLabel": "Ville",
     "cityHint": "Tapez au moins 3 caractères pour voir les suggestions",
@@ -1144,7 +1157,8 @@
     "method": "Méthode",
     "path": "Chemin",
     "full_url": "URL complète",
-    "resolution": "Résolution"
+    "resolution": "Résolution",
+    "add_admin_notes": "Ajouter des notes sur cette erreur..."
   },
   "selectedLog": {
     "message": "Message d'erreur",
@@ -1389,7 +1403,8 @@
     "success_message": "Image uploadée avec succès !",
     "upload": "Upload",
     "upload_error": "Erreur d'upload",
-    "uploading": "Upload en cours..."
+    "uploading": "Upload en cours...",
+    "error": "Erreur lors de l'upload"
   },
   "validation": {
     "date_end_after_start": "La date de fin doit être strictement supérieure à la date de début",

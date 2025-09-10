@@ -173,7 +173,8 @@ interface DropdownMenuItem {
   label: string
   icon: string
   color?: 'error' | 'warning' | 'success' | 'primary'
-  onSelect: () => void
+  onSelect?: () => void
+  to?: string
 }
 
 // Métadonnées de la page
@@ -181,6 +182,9 @@ useSeoMeta({
   title: t('admin.user_management') + ' - Admin',
   description: t('admin.user_management_description'),
 })
+
+// Composables
+const router = useRouter()
 
 // État réactif
 const loading = ref(false)
@@ -421,7 +425,16 @@ const getUserActions = (user: AdminUser): DropdownMenuItem[] => {
     {
       label: t('admin.view_profile'),
       icon: 'i-heroicons-user',
-      to: `/admin/users/${user.id}`,
+      onSelect: () => {
+        console.log('Click detected! Navigating to:', `/admin/users/${user.id}`)
+        try {
+          router.push(`/admin/users/${user.id}`)
+        } catch (error) {
+          console.error('Navigation error:', error)
+          // Fallback avec window.location
+          window.location.href = `/admin/users/${user.id}`
+        }
+      },
     },
   ]
 

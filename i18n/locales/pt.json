@@ -17,6 +17,8 @@
     "cannot_load_stats": "Impossível carregar as estatísticas",
     "cannot_load_users": "Impossível carregar os utilizadores",
     "carpool_offers_count": "{count} caronas",
+    "change_profile_picture": "Alterar foto de perfil",
+    "change_profile_picture_description": "Carregar ou modificar a foto de perfil deste utilizador",
     "collaborators_count": "{count} colaboradores",
     "coming_soon": "Brevemente disponível",
     "confirm_archive_convention": "Tem certeza de que deseja arquivar esta convenção?",
@@ -142,6 +144,11 @@
     "notification_management": "Gerenciamento de Notificações",
     "oldest_first": "Mais antigos primeiro",
     "per_page": "por página",
+    "profile_picture_alt": "Foto de perfil do utilizador",
+    "profile_picture_info": "Informações da foto de perfil",
+    "profile_picture_placeholder": "Clique para adicionar uma foto de perfil",
+    "profile_picture_update_error": "Erro ao atualizar a foto de perfil",
+    "profile_picture_updated": "Foto de perfil atualizada com sucesso",
     "promote_to_admin": "Promover a super administrador",
     "recent_activity": "Actividade recente",
     "recent_notifications": "Notificações recentes",
@@ -677,6 +684,13 @@
   "ed": {
     "id": "ID"
   },
+  "editForm": {
+    "email": "E-mail",
+    "nom": "Apelido",
+    "phone": "Telefone",
+    "prenom": "Nome",
+    "pseudo": "Nome de utilizador"
+  },
   "editions": {
     "about_convention": "Sobre a convenção",
     "about_convention_description": "Informações detalhadas sobre a convenção",
@@ -1082,6 +1096,7 @@
     "cityPlaceholder": "Ex: Lisboa, Porto, Braga"
   },
   "log": {
+    "add_admin_notes": "Adicionar notas sobre este erro...",
     "adminNotes": "Notas do administrador",
     "errorType": "Tipo de erro",
     "full_url": "URL completo",
@@ -1374,6 +1389,7 @@
     "convention_logo_alt": "Logo da convenção",
     "delete_message": "Imagem excluída",
     "demo_title": "Demo de upload de imagem",
+    "error": "Erro durante o carregamento",
     "error_message": "Erro de upload",
     "errors": {
       "file_too_large": "Arquivo muito grande. Tamanho máximo: {maxSize}",

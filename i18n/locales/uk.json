@@ -17,6 +17,8 @@
     "cannot_load_stats": "Неможливо завантажити статистику",
     "cannot_load_users": "Неможливо завантажити користувачів",
     "carpool_offers_count": "{count} поїздок",
+    "change_profile_picture": "Змінити фото профілю",
+    "change_profile_picture_description": "Завантажити або змінити фото профілю цього користувача",
     "collaborators_count": "{count} співробітників",
     "coming_soon": "Скоро",
     "confirm_archive_convention": "Ви впевнені, що хочете архівувати цю конвенцію?",
@@ -142,6 +144,11 @@
     "notification_management": "Керування сповіщеннями",
     "oldest_first": "Спочатку старі",
     "per_page": "на сторінку",
+    "profile_picture_alt": "Фото профілю користувача",
+    "profile_picture_info": "Інформація про фото профілю",
+    "profile_picture_placeholder": "Натисніть, щоб додати фото профілю",
+    "profile_picture_update_error": "Помилка при оновленні фото профілю",
+    "profile_picture_updated": "Фото профілю успішно оновлено",
     "promote_to_admin": "Підвищити до супер адміністратора",
     "recent_activity": "Нещодавня активність",
     "recent_notifications": "Недавні сповіщення",
@@ -677,6 +684,13 @@
   "ed": {
     "id": "ID"
   },
+  "editForm": {
+    "email": "Ел. пошта",
+    "nom": "Прізвище",
+    "phone": "Телефон",
+    "prenom": "Ім'я",
+    "pseudo": "Ім'я користувача"
+  },
   "editions": {
     "about_convention": "Про конвенцію",
     "about_convention_description": "Детальна інформація про конвенцію",
@@ -1082,6 +1096,7 @@
     "cityPlaceholder": "Напр.: Київ, Львів, Одеса"
   },
   "log": {
+    "add_admin_notes": "Додати нотатки про цю помилку...",
     "adminNotes": "Нотатки адміністратора",
     "errorType": "Тип помилки",
     "full_url": "Повний URL",
@@ -1374,6 +1389,7 @@
     "convention_logo_alt": "Логотип конвенції",
     "delete_message": "Зображення видалено",
     "demo_title": "Демо завантаження зображення",
+    "error": "Помилка при завантаженні",
     "error_message": "Помилка завантаження",
     "errors": {
       "file_too_large": "Файл занадто великий. Максимальний розмір: {maxSize}",

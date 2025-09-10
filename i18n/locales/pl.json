@@ -17,6 +17,8 @@
     "cannot_load_stats": "Nie można załadować statystyk",
     "cannot_load_users": "Nie można załadować użytkowników",
     "carpool_offers_count": "{count} współjazdów",
+    "change_profile_picture": "Zmień zdjęcie profilowe",
+    "change_profile_picture_description": "Prześlij lub zmień zdjęcie profilowe tego użytkownika",
     "collaborators_count": "{count} współpracowników",
     "coming_soon": "Wkrótce dostępne",
     "confirm_archive_convention": "Czy na pewno chcesz zarchiwizować tę konwencję?",
@@ -142,6 +144,11 @@
     "notification_management": "Zarządzanie powiadomieniami",
     "oldest_first": "Najstarsi jako pierwsi",
     "per_page": "na stronę",
+    "profile_picture_alt": "Zdjęcie profilowe użytkownika",
+    "profile_picture_info": "Informacje o zdjęciu profilowym",
+    "profile_picture_placeholder": "Kliknij, aby dodać zdjęcie profilowe",
+    "profile_picture_update_error": "Błąd podczas aktualizacji zdjęcia profilowego",
+    "profile_picture_updated": "Zdjęcie profilowe zaktualizowane pomyślnie",
     "promote_to_admin": "Nadaj uprawnienia super administratora",
     "recent_activity": "Ostatnia aktywność",
     "recent_notifications": "Ostatnie powiadomienia",
@@ -677,6 +684,13 @@
   "ed": {
     "id": "ID"
   },
+  "editForm": {
+    "email": "E-mail",
+    "nom": "Nazwisko",
+    "phone": "Telefon",
+    "prenom": "Imię",
+    "pseudo": "Nazwa użytkownika"
+  },
   "editions": {
     "about_convention": "O konwencji",
     "about_convention_description": "Szczegółowe informacje o konwencji",
@@ -1082,6 +1096,7 @@
     "cityPlaceholder": "Np: Warszawa, Kraków, Wrocław"
   },
   "log": {
+    "add_admin_notes": "Dodaj uwagi o tym błędzie...",
     "adminNotes": "Notatki administratora",
     "errorType": "Typ błędu",
     "full_url": "Pełny URL",
@@ -1374,6 +1389,7 @@
     "convention_logo_alt": "Logo konwencji",
     "delete_message": "Obraz usunięty",
     "demo_title": "Demo przesyłania obrazów",
+    "error": "Błąd podczas przesyłania",
     "error_message": "Błąd przesyłania",
     "errors": {
       "file_too_large": "Plik za duży. Maksymalny rozmiar: {maxSize}",

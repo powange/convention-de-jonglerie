@@ -17,6 +17,8 @@
     "cannot_load_stats": "No se pueden cargar las estadísticas",
     "cannot_load_users": "No se pueden cargar los usuarios",
     "carpool_offers_count": "{count} coches compartidos",
+    "change_profile_picture": "Cambiar foto de perfil",
+    "change_profile_picture_description": "Subir o modificar la foto de perfil de este usuario",
     "collaborators_count": "{count} colaboradores",
     "coming_soon": "Próximamente disponible",
     "confirm_archive_convention": "¿Está seguro de que desea archivar esta convención?",
@@ -142,6 +144,11 @@
     "notification_management": "Gestión de Notificaciones",
     "oldest_first": "Más antiguos primero",
     "per_page": "por página",
+    "profile_picture_alt": "Foto de perfil del usuario",
+    "profile_picture_info": "Información de la foto de perfil",
+    "profile_picture_placeholder": "Haz clic para añadir una foto de perfil",
+    "profile_picture_update_error": "Error al actualizar la foto de perfil",
+    "profile_picture_updated": "Foto de perfil actualizada con éxito",
     "promote_to_admin": "Promover a super admin",
     "recent_activity": "Actividad reciente",
     "recent_notifications": "Notificaciones recientes",
@@ -677,6 +684,13 @@
   "ed": {
     "id": "ID"
   },
+  "editForm": {
+    "email": "Correo electrónico",
+    "nom": "Apellido",
+    "phone": "Teléfono",
+    "prenom": "Nombre",
+    "pseudo": "Nombre de usuario"
+  },
   "editions": {
     "about_convention": "Acerca de la convención",
     "about_convention_description": "Información detallada sobre la convención",
@@ -1082,6 +1096,7 @@
     "cityPlaceholder": "Ej: Madrid, Barcelona, Valencia"
   },
   "log": {
+    "add_admin_notes": "Añadir notas sobre este error...",
     "adminNotes": "Notas de administrador",
     "errorType": "Tipo de error",
     "full_url": "URL completa",
@@ -1374,6 +1389,7 @@
     "convention_logo_alt": "Logo de la convención",
     "delete_message": "Imagen eliminada",
     "demo_title": "Demo de subida de imagen",
+    "error": "Error durante la carga",
     "error_message": "Error de subida",
     "errors": {
       "file_too_large": "Archivo demasiado grande",

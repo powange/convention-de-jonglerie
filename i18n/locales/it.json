@@ -17,6 +17,8 @@
     "cannot_load_stats": "Impossibile caricare le statistiche",
     "cannot_load_users": "Impossibile caricare gli utenti",
     "carpool_offers_count": "{count} passaggi auto",
+    "change_profile_picture": "Cambia foto profilo",
+    "change_profile_picture_description": "Carica o modifica la foto profilo di questo utente",
     "collaborators_count": "{count} collaboratori",
     "coming_soon": "Presto disponibile",
     "confirm_archive_convention": "Sei sicuro di voler archiviare questo convegno?",
@@ -142,6 +144,11 @@
     "notification_management": "Gestione Notifiche",
     "oldest_first": "Più vecchi prima",
     "per_page": "per pagina",
+    "profile_picture_alt": "Foto profilo dell'utente",
+    "profile_picture_info": "Informazioni foto profilo",
+    "profile_picture_placeholder": "Clicca per aggiungere una foto profilo",
+    "profile_picture_update_error": "Errore nell'aggiornamento della foto profilo",
+    "profile_picture_updated": "Foto profilo aggiornata con successo",
     "promote_to_admin": "Promuovi super admin",
     "recent_activity": "Attività recente",
     "recent_notifications": "Notifiche recenti",
@@ -677,6 +684,13 @@
   "ed": {
     "id": "ID"
   },
+  "editForm": {
+    "email": "Email",
+    "nom": "Cognome",
+    "phone": "Telefono",
+    "prenom": "Nome",
+    "pseudo": "Nome utente"
+  },
   "editions": {
     "about_convention": "Informazioni sulla convention",
     "about_convention_description": "Informazioni dettagliate sulla convention",
@@ -1082,6 +1096,7 @@
     "cityPlaceholder": "Es: Roma, Milano, Napoli"
   },
   "log": {
+    "add_admin_notes": "Aggiungi note su questo errore...",
     "adminNotes": "Note amministratore",
     "errorType": "Tipo di errore",
     "full_url": "URL completo",
@@ -1374,6 +1389,7 @@
     "convention_logo_alt": "Logo della convention",
     "delete_message": "Immagine eliminata",
     "demo_title": "Demo caricamento immagine",
+    "error": "Errore durante il caricamento",
     "error_message": "Errore di caricamento",
     "errors": {
       "file_too_large": "File troppo grande",

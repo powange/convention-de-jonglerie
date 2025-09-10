@@ -1,15 +1,6 @@
 <template>
-  <UModal v-model:open="isOpen">
-    <UCard>
-      <template #header>
-        <div class="flex justify-between items-center">
-          <h3 class="text-lg font-semibold text-red-600">
-            {{ $t('admin.delete_user_account') }}
-          </h3>
-          <UButton icon="i-heroicons-x-mark" variant="ghost" color="neutral" @click="close" />
-        </div>
-      </template>
-
+  <UModal v-model:open="isOpen" :title="$t('admin.delete_user_account')" size="md">
+    <template #body>
       <div v-if="user" class="space-y-4">
         <!-- Information utilisateur -->
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -57,9 +48,10 @@
           <USelect
             v-model="selectedReason"
             :items="deletionReasons"
-            value-key="value"
             :placeholder="$t('admin.select_deletion_reason')"
-            size="md"
+            size="lg"
+            class="w-full"
+            required
           />
 
           <!-- Description de la raison sélectionnée -->
@@ -97,37 +89,47 @@
         </div>
       </div>
 
-      <template #footer>
-        <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="close">
-            {{ $t('common.cancel') }}
-          </UButton>
-          <UButton
-            color="error"
-            :loading="loading"
-            :disabled="!canConfirm"
-            @click="confirmDeletion"
-          >
-            {{ $t('admin.delete_account') }}
-          </UButton>
-        </div>
-      </template>
-    </UCard>
+      <!-- Boutons d'action -->
+      <div class="mt-6 flex justify-end gap-3">
+        <UButton variant="ghost" @click="close">
+          {{ $t('common.cancel') }}
+        </UButton>
+        <UButton color="error" :loading="loading" :disabled="!canConfirm" @click="confirmDeletion">
+          {{ $t('admin.delete_account') }}
+        </UButton>
+      </div>
+    </template>
   </UModal>
 </template>
 
 <script setup lang="ts">
-import type { AdminUser } from '~/composables/useUserDeletion'
 import { useUserDeletion } from '~/composables/useUserDeletion'
 
+interface ModalUser {
+  id: number
+  email: string
+  pseudo: string
+  nom: string
+  prenom: string
+  profilePicture?: string | null
+  isEmailVerified: boolean
+  isGlobalAdmin: boolean
+  createdAt: string
+  _count: {
+    createdConventions: number
+    createdEditions: number
+    favoriteEditions: number
+  }
+}
+
 interface Props {
-  user: AdminUser | null
+  user: ModalUser | null
   open: boolean
 }
 
 interface Emits {
   (e: 'update:open', value: boolean): void
-  (e: 'deleted', user: AdminUser): void
+  (e: 'deleted', user: ModalUser): void
 }
 
 const props = defineProps<Props>()
@@ -139,7 +141,9 @@ const { t } = useI18n()
 
 // État réactif
 const loading = ref(false)
-const selectedReason = ref('')
+const selectedReason = ref<
+  'NOT_PHYSICAL_PERSON' | 'SPAM_ACTIVITY' | 'INACTIVE_ACCOUNT' | 'POLICY_VIOLATION' | undefined
+>(undefined)
 const confirmationText = ref('')
 
 // Computed
@@ -166,7 +170,7 @@ const close = () => {
 }
 
 const resetForm = () => {
-  selectedReason.value = ''
+  selectedReason.value = undefined
   confirmationText.value = ''
   loading.value = false
 }
@@ -180,7 +184,7 @@ const confirmDeletion = async () => {
     const result = await deleteUser(props.user.id, selectedReason.value as any)
 
     toast.add({
-      color: 'green',
+      color: 'success',
       title: t('admin.user_deleted_successfully'),
       description: result.message,
     })
@@ -190,7 +194,7 @@ const confirmDeletion = async () => {
   } catch (error: any) {
     console.error('Erreur suppression:', error)
     toast.add({
-      color: 'red',
+      color: 'error',
       title: t('common.error'),
       description: error.data?.message || t('admin.deletion_error'),
     })
