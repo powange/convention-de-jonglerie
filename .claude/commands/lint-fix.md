@@ -5,33 +5,27 @@ thinking: false
 
 # Lint et correction automatique complète
 
-Je vais effectuer un processus de correction complet en plusieurs étapes :
+Je vais effectuer un processus de correction optimisé :
 
-1. **Correction automatique initiale**
+1. **Correction automatique**
 
 ```bash
 npm run lint:fix
 ```
 
-2. **Analyse des erreurs restantes**
+2. **Analyse des erreurs restantes** (seulement si nécessaire)
 
 ```bash
 npm run lint
 ```
 
-3. **Correction manuelle des erreurs** (si nécessaire)
-   Je vais analyser les erreurs retournées et les corriger manuellement une par une.
+3. **Correction manuelle** (si des erreurs persistent)
+   Je corrige manuellement les erreurs qui ne peuvent pas être auto-corrigées.
 
-4. **Correction automatique finale**
-
-```bash
-npm run lint:fix
-```
-
-5. **Formatage du code**
+4. **Formatage du code**
 
 ```bash
 npm run format
 ```
 
-Ce processus garantit que tout le code respecte les standards de qualité et de formatage du projet.
+Le processus s'arrête automatiquement si aucune erreur n'est détectée lors de la première correction.

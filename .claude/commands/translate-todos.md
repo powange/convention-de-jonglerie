@@ -23,6 +23,7 @@ Si des clés [TODO] sont trouvées :
    - Renommer en `translations-config.json`
 
 2. **Valider la configuration** :
+
    ```bash
    node scripts/translation/apply-translations.js --validate
    ```

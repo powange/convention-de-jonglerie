@@ -23,14 +23,10 @@ const sections = [
     { name: 'generate', desc: 'Génère le site statique (SSG)' },
     { name: 'kill-servers', desc: 'Stoppe les serveurs de dev en cours' }
   ] },
-  { title: '🗄️ Base de données & migrations', color: colors.magenta, scripts: [
+  { title: '🗄️ Base de données', color: colors.magenta, scripts: [
     { name: 'db:seed:dev', desc: 'Seed données de dev (faker)' },
     { name: 'db:reset:dev', desc: 'Reset complet (DROP + migrations) DEV UNIQUEMENT' },
     { name: 'db:seed:dev -- --reset', desc: 'Reset + seed (préférer reset puis seed séparés)' },
-    { name: 'migrate:collaborators:dry', desc: 'Simulation migration rôles -> droits' },
-    { name: 'migrate:collaborators', desc: 'Migration rôles -> droits (confirmation)' },
-    { name: 'migrate:collaborators:legacy:dry', desc: 'Dry-run legacy (colonne role présente)' },
-    { name: 'migrate:collaborators:legacy', desc: 'Migration legacy (après backup)' },
     { name: 'db:clean-tokens', desc: 'Nettoie les tokens expirés' }
   ] },
   { title: '👤 Administration', color: colors.yellow, scripts: [
@@ -57,13 +53,13 @@ const sections = [
   { name: 'check-translations -- -f --fill-mode todo', desc: 'Marque les clés à traduire: préfixe [TODO]' },
   { name: 'check-translations -- -f --fill-mode empty', desc: 'Ajoute les clés manquantes avec valeur vide' },
   { name: 'check-translations -- -f --fill-mode todo --refill', desc: 'Re-marque aussi les clés déjà identiques à la référence' },
-  { name: 'i18n:nest', desc: 'Normalize: transforme toutes les locales (clés pointées -> objets imbriqués)' },
-  { name: 'i18n:nest -- en fr', desc: 'Même transformation mais limité aux locales listées' },
-  { name: 'i18n:nest -- --allow-collisions', desc: 'Ignore les collisions de fusion (conserve existant)' },
-  { name: 'i18n:status', desc: '📊 Rapport état des traductions (% completion, clés manquantes)' },
-  { name: 'i18n:translate:dry', desc: '🔍 Simulation traduction automatique des clés [TODO]' },
-  { name: 'i18n:translate', desc: '🚀 Traduction automatique en masse des clés [TODO]' },
   { name: 'i18n:add "terme"', desc: '✏️ Ajouter interactivement un terme au dictionnaire de traduction' }
+  ] },
+  { title: '🔄 Système de traduction avancé (scripts/translation/)', color: colors.cyan, scripts: [
+    { name: 'scripts/translation/list-todo-keys.js', desc: '🔍 Diagnostic des clés [TODO] + génération template' },
+    { name: 'scripts/translation/apply-translations.js --validate', desc: '✅ Validation du fichier de configuration' },
+    { name: 'scripts/translation/apply-translations.js', desc: '🚀 Application des traductions depuis la config JSON' },
+    { name: 'scripts/translation/apply-translations.js --help', desc: '📖 Aide détaillée du système de traduction' }
   ] },
   { title: '🧹 Qualité & formatage', color: colors.yellow, scripts: [
     { name: 'lint', desc: 'Analyse lint complète' },
@@ -88,7 +84,7 @@ const sections = [
     { name: 'test:all', desc: 'Unit + Nuxt + E2E enchaînés' }
   ] },
   { title: '🧪 Tests (environnement docker)', color: colors.blue, scripts: [
-    { name: 'test:setup', desc: 'Démarre MySQL + migrations (tests)' },
+    { name: 'test:setup', desc: 'Démarre MySQL pour les tests' },
     { name: 'test:teardown', desc: 'Arrête & nettoie environnement test' }
   ] },
   { title: '🐳 Docker - développement & release', color: colors.blue, scripts: [

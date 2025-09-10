@@ -55,7 +55,7 @@
     "format": "prettier -w \"**/*.{js,ts,vue,json,md,yml,yaml}\"",
     "format:check": "prettier -c \"**/*.{js,ts,vue,json,md,yml,yaml}\"",
     "favicons": "tsx scripts/generate-favicons.ts",
-    "deps:reset": "bash scripts/reset-deps.sh",
+    "deps:reset": "bash scripts/reset-deps.sh"
   },
   "prettier": {
     "singleQuote": true,

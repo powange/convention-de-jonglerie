@@ -18,7 +18,7 @@ const colors = {
   yellow: '\x1b[33m',
   blue: '\x1b[34m',
   cyan: '\x1b[36m',
-  bold: '\x1b[1m'
+  bold: '\x1b[1m',
 }
 
 /**
@@ -27,14 +27,14 @@ const colors = {
 function setNestedValue(obj, keyPath, value) {
   const keys = keyPath.split('.')
   let current = obj
-  
+
   for (let i = 0; i < keys.length - 1; i++) {
     if (!current[keys[i]]) {
       current[keys[i]] = {}
     }
     current = current[keys[i]]
   }
-  
+
   current[keys[keys.length - 1]] = value
 }
 
@@ -52,23 +52,31 @@ function getNestedValue(obj, keyPath) {
  */
 function loadTranslationsConfig() {
   if (!fs.existsSync(CONFIG_FILE)) {
-    console.error(`${colors.red}❌ Fichier de configuration non trouvé: ${CONFIG_FILE}${colors.reset}`)
-    console.log(`${colors.yellow}💡 Lancez d'abord: node scripts/translation/list-todo-keys.js${colors.reset}`)
+    console.error(
+      `${colors.red}❌ Fichier de configuration non trouvé: ${CONFIG_FILE}${colors.reset}`
+    )
+    console.log(
+      `${colors.yellow}💡 Lancez d'abord: node scripts/translation/list-todo-keys.js${colors.reset}`
+    )
     process.exit(1)
   }
 
   try {
     const content = fs.readFileSync(CONFIG_FILE, 'utf-8')
     const config = JSON.parse(content)
-    
+
     if (!config.translations) {
-      console.error(`${colors.red}❌ Structure invalide: 'translations' manquant dans le fichier de config${colors.reset}`)
+      console.error(
+        `${colors.red}❌ Structure invalide: 'translations' manquant dans le fichier de config${colors.reset}`
+      )
       process.exit(1)
     }
 
     return config.translations
   } catch (error) {
-    console.error(`${colors.red}❌ Erreur lors du chargement de la configuration: ${error.message}${colors.reset}`)
+    console.error(
+      `${colors.red}❌ Erreur lors du chargement de la configuration: ${error.message}${colors.reset}`
+    )
     process.exit(1)
   }
 }
@@ -78,12 +86,14 @@ function loadTranslationsConfig() {
  */
 function applyTranslations() {
   console.log(`${colors.blue}${colors.bold}=== APPLICATION DES TRADUCTIONS ===${colors.reset}\n`)
-  
+
   const translations = loadTranslationsConfig()
   const keyPaths = Object.keys(translations)
-  
+
   if (keyPaths.length === 0) {
-    console.log(`${colors.yellow}⚠️  Aucune traduction trouvée dans le fichier de configuration${colors.reset}`)
+    console.log(
+      `${colors.yellow}⚠️  Aucune traduction trouvée dans le fichier de configuration${colors.reset}`
+    )
     return
   }
 
@@ -91,9 +101,10 @@ function applyTranslations() {
   console.log(`${colors.cyan}Fichier de configuration: ${CONFIG_FILE}${colors.reset}\n`)
 
   // Obtenir la liste des fichiers de langue
-  const languageFiles = fs.readdirSync(LOCALES_DIR)
-    .filter(file => file.endsWith('.json'))
-    .map(file => file.replace('.json', ''))
+  const languageFiles = fs
+    .readdirSync(LOCALES_DIR)
+    .filter((file) => file.endsWith('.json'))
+    .map((file) => file.replace('.json', ''))
     .sort()
 
   let totalUpdates = 0
@@ -102,7 +113,7 @@ function applyTranslations() {
   // Traiter chaque fichier de langue
   for (const lang of languageFiles) {
     console.log(`${colors.bold}Traitement de ${lang}.json:${colors.reset}`)
-    
+
     const filePath = path.join(LOCALES_DIR, `${lang}.json`)
     let data
     let fileModified = false
@@ -118,20 +129,24 @@ function applyTranslations() {
     // Appliquer chaque traduction pour cette langue
     for (const keyPath of keyPaths) {
       const translation = translations[keyPath][lang]
-      
+
       if (!translation) {
-        console.log(`  ${colors.yellow}⚠ ${keyPath}: Pas de traduction pour ${lang}${colors.reset}`)
+        console.log(
+          `  ${colors.yellow}⚠ ${keyPath}: Pas de traduction pour ${lang}${colors.reset}`
+        )
         continue
       }
 
       // Vérifier si la traduction est encore un placeholder
       if (translation.startsWith('TODO:')) {
-        console.log(`  ${colors.yellow}⚠ ${keyPath}: Traduction non complétée (${translation})${colors.reset}`)
+        console.log(
+          `  ${colors.yellow}⚠ ${keyPath}: Traduction non complétée (${translation})${colors.reset}`
+        )
         continue
       }
 
       const currentValue = getNestedValue(data, keyPath)
-      
+
       // Vérifier si la clé existe et commence par [TODO]
       if (!currentValue) {
         console.log(`  ${colors.yellow}⚠ ${keyPath}: Clé non trouvée${colors.reset}`)
@@ -139,13 +154,17 @@ function applyTranslations() {
       }
 
       if (!currentValue.toString().startsWith('[TODO]')) {
-        console.log(`  ${colors.blue}ℹ ${keyPath}: Déjà traduit ("${currentValue}")${colors.reset}`)
+        console.log(
+          `  ${colors.blue}ℹ ${keyPath}: Déjà traduit ("${currentValue}")${colors.reset}`
+        )
         continue
       }
 
       // Appliquer la traduction
       setNestedValue(data, keyPath, translation)
-      console.log(`  ${colors.green}✓ ${keyPath}: "${currentValue}" → "${translation}"${colors.reset}`)
+      console.log(
+        `  ${colors.green}✓ ${keyPath}: "${currentValue}" → "${translation}"${colors.reset}`
+      )
       fileModified = true
       totalUpdates++
     }
@@ -162,7 +181,7 @@ function applyTranslations() {
     } else {
       console.log(`  ${colors.blue}ℹ Aucune modification nécessaire${colors.reset}`)
     }
-    
+
     console.log() // Ligne vide entre les fichiers
   }
 
@@ -173,7 +192,9 @@ function applyTranslations() {
   console.log(`${colors.cyan}📁 Fichiers traités: ${languageFiles.join(', ')}${colors.reset}`)
 
   if (totalUpdates > 0) {
-    console.log(`\n${colors.yellow}💡 N'oubliez pas de vérifier les changements avec git diff${colors.reset}`)
+    console.log(
+      `\n${colors.yellow}💡 N'oubliez pas de vérifier les changements avec git diff${colors.reset}`
+    )
     console.log(`${colors.yellow}💡 Lancez les tests pour valider les traductions${colors.reset}`)
   }
 }
@@ -183,12 +204,14 @@ function applyTranslations() {
  */
 function validateConfig() {
   console.log(`${colors.blue}${colors.bold}=== VALIDATION DE LA CONFIGURATION ===${colors.reset}\n`)
-  
+
   const translations = loadTranslationsConfig()
   const keyPaths = Object.keys(translations)
-  
+
   if (keyPaths.length === 0) {
-    console.log(`${colors.yellow}⚠️  Aucune traduction trouvée dans le fichier de configuration${colors.reset}`)
+    console.log(
+      `${colors.yellow}⚠️  Aucune traduction trouvée dans le fichier de configuration${colors.reset}`
+    )
     return false
   }
 
@@ -198,10 +221,10 @@ function validateConfig() {
   for (const keyPath of keyPaths) {
     const langs = Object.keys(translations[keyPath])
     console.log(`${colors.bold}${keyPath}:${colors.reset}`)
-    
+
     for (const lang of langs) {
       const translation = translations[keyPath][lang]
-      
+
       if (!translation) {
         console.log(`  ${colors.red}✗ ${lang}: Traduction manquante${colors.reset}`)
         hasErrors = true
@@ -217,9 +240,11 @@ function validateConfig() {
 
   console.log(`${colors.blue}${colors.bold}=== RÉSUMÉ VALIDATION ===${colors.reset}`)
   console.log(`${colors.green}✓ ${readyTranslations} traduction(s) prête(s)${colors.reset}`)
-  
+
   if (hasErrors) {
-    console.log(`${colors.red}❌ Des erreurs ont été détectées dans la configuration${colors.reset}`)
+    console.log(
+      `${colors.red}❌ Des erreurs ont été détectées dans la configuration${colors.reset}`
+    )
   } else {
     console.log(`${colors.green}✅ Configuration valide${colors.reset}`)
   }
@@ -233,7 +258,9 @@ const args = process.argv.slice(2)
 if (args.includes('--validate') || args.includes('-v')) {
   validateConfig()
 } else if (args.includes('--help') || args.includes('-h')) {
-  console.log(`${colors.blue}${colors.bold}=== AIDE - SCRIPT D'APPLICATION DES TRADUCTIONS ===${colors.reset}\n`)
+  console.log(
+    `${colors.blue}${colors.bold}=== AIDE - SCRIPT D'APPLICATION DES TRADUCTIONS ===${colors.reset}\n`
+  )
   console.log(`${colors.bold}Usage:${colors.reset}`)
   console.log(`  node scripts/translation/apply-translations.js [options]\n`)
   console.log(`${colors.bold}Options:${colors.reset}`)
@@ -246,14 +273,20 @@ if (args.includes('--validate') || args.includes('-v')) {
   console.log(`  1. ${colors.cyan}node scripts/translation/list-todo-keys.js${colors.reset}`)
   console.log(`  2. ${colors.cyan}Éditer translations-config.template.json${colors.reset}`)
   console.log(`  3. ${colors.cyan}Renommer en translations-config.json${colors.reset}`)
-  console.log(`  4. ${colors.cyan}node scripts/translation/apply-translations.js --validate${colors.reset}`)
+  console.log(
+    `  4. ${colors.cyan}node scripts/translation/apply-translations.js --validate${colors.reset}`
+  )
   console.log(`  5. ${colors.cyan}node scripts/translation/apply-translations.js${colors.reset}`)
 } else {
   if (validateConfig()) {
-    console.log(`\n${colors.green}✅ Configuration validée, application des traductions...\n${colors.reset}`)
+    console.log(
+      `\n${colors.green}✅ Configuration validée, application des traductions...\n${colors.reset}`
+    )
     applyTranslations()
   } else {
-    console.log(`\n${colors.red}❌ Veuillez corriger la configuration avant d'appliquer les traductions${colors.reset}`)
+    console.log(
+      `\n${colors.red}❌ Veuillez corriger la configuration avant d'appliquer les traductions${colors.reset}`
+    )
     process.exit(1)
   }
 }
