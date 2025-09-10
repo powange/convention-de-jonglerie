@@ -131,8 +131,8 @@
                     ·
                     {{
                       volunteersModeLocal === 'EXTERNAL'
-                        ? t('editions.volunteers_mode_external') || 'Externe'
-                        : t('editions.volunteers_mode_internal') || 'Interne'
+                        ? t('editions.volunteers.mode_external') || 'Externe'
+                        : t('editions.volunteers.mode_internal') || 'Interne'
                     }}
                   </UBadge>
                   <span v-if="volunteersUpdatedAt" class="text-gray-500 dark:text-gray-400">
@@ -159,8 +159,8 @@
                 >
                   {{
                     volunteersOpenLocal
-                      ? $t('editions.volunteers_open')
-                      : $t('editions.volunteers_closed_message')
+                      ? $t('editions.volunteers.open')
+                      : $t('editions.volunteers.closed_message')
                   }}
                 </span>
               </div>
@@ -177,7 +177,7 @@
               />
               <!-- Description des bénévoles (Markdown) -->
               <div class="space-y-2">
-                <UFormField :label="t('editions.volunteers_description_label')" class="w-full">
+                <UFormField :label="t('editions.volunteers.description_label')" class="w-full">
                   <div v-if="canEdit || canManageVolunteers" class="space-y-2">
                     <MinimalMarkdownEditor
                       v-model="volunteersDescriptionLocal"
@@ -192,7 +192,7 @@
                       <div v-html="volunteersDescriptionHtml" />
                     </template>
                     <template v-else>
-                      <p class="text-gray-500">{{ t('editions.volunteers_no_description') }}</p>
+                      <p class="text-gray-500">{{ t('editions.volunteers.no_description') }}</p>
                     </template>
                   </div>
                 </UFormField>
@@ -226,7 +226,7 @@
               <!-- Mode de gestion -->
               <div class="space-y-2">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300">
-                  {{ t('editions.volunteers_mode_label') }}
+                  {{ t('editions.volunteers.mode_label') }}
                 </h3>
 
                 <UFormField>
@@ -251,7 +251,7 @@
 
                 <!-- Lien externe -->
                 <div class="pl-1">
-                  <UFormField :label="t('editions.volunteers_external_url_label')">
+                  <UFormField :label="t('editions.volunteers.external_url_label')">
                     <UInput
                       v-model="volunteersExternalUrlLocal"
                       :placeholder="'https://...'"
@@ -265,7 +265,7 @@
                   </UFormField>
                   <p class="text-[11px] text-gray-500">
                     {{
-                      t('editions.volunteers_external_url_hint') ||
+                      t('editions.volunteers.external_url_hint') ||
                       'Lien vers votre formulaire ou outil externe.'
                     }}
                   </p>
@@ -282,7 +282,7 @@
 
                 <!-- Dates de montage -->
                 <div class="space-y-4 mb-4">
-                  <UFormField :label="t('editions.volunteers_setup_start_date_label')">
+                  <UFormField :label="t('editions.volunteers.setup_start_date_label')">
                     <UPopover>
                       <UButtonGroup>
                         <UButton
@@ -322,7 +322,7 @@
                     </UPopover>
                   </UFormField>
 
-                  <UFormField :label="t('editions.volunteers_setup_end_date_label')">
+                  <UFormField :label="t('editions.volunteers.setup_end_date_label')">
                     <UPopover>
                       <UButtonGroup>
                         <UButton
@@ -371,9 +371,9 @@
                   class="mb-2"
                   :label="
                     !volunteersSetupStartDateLocal
-                      ? t('editions.volunteers_ask_setup_label') +
+                      ? t('editions.volunteers.ask_setup_label') +
                         ' (définissez d\'abord la date de début du montage)'
-                      : t('editions.volunteers_ask_setup_label')
+                      : t('editions.volunteers.ask_setup_label')
                   "
                   size="lg"
                   @update:model-value="persistVolunteerSettings"
@@ -387,9 +387,9 @@
                   class="mb-2"
                   :label="
                     !volunteersTeardownEndDateLocal
-                      ? t('editions.volunteers_ask_teardown_label') +
+                      ? t('editions.volunteers.ask_teardown_label') +
                         ' (définissez d\'abord la date de fin du démontage)'
-                      : t('editions.volunteers_ask_teardown_label')
+                      : t('editions.volunteers.ask_teardown_label')
                   "
                   size="lg"
                   @update:model-value="persistVolunteerSettings"
@@ -401,7 +401,7 @@
                   :disabled="savingVolunteers"
                   color="primary"
                   class="mb-2"
-                  :label="t('editions.volunteers_ask_diet_label')"
+                  :label="t('editions.volunteers.ask_diet_label')"
                   size="lg"
                   @update:model-value="persistVolunteerSettings"
                 />
@@ -412,7 +412,7 @@
                   :disabled="savingVolunteers"
                   color="primary"
                   class="mb-2"
-                  :label="t('editions.volunteers_ask_allergies_label')"
+                  :label="t('editions.volunteers.ask_allergies_label')"
                   size="lg"
                   @update:model-value="persistVolunteerSettings"
                 />
@@ -423,7 +423,7 @@
                   :disabled="savingVolunteers"
                   color="primary"
                   class="mb-2"
-                  :label="t('editions.volunteers_ask_pets_label')"
+                  :label="t('editions.volunteers.ask_pets_label')"
                   size="lg"
                   @update:model-value="persistVolunteerSettings"
                 />
@@ -434,7 +434,7 @@
                   :disabled="savingVolunteers"
                   color="primary"
                   class="mb-2"
-                  :label="t('editions.volunteers_ask_minors_label')"
+                  :label="t('editions.volunteers.ask_minors_label')"
                   size="lg"
                   @update:model-value="persistVolunteerSettings"
                 />
@@ -445,7 +445,7 @@
                   :disabled="savingVolunteers"
                   color="primary"
                   class="mb-2"
-                  :label="t('editions.volunteers_ask_vehicle_label')"
+                  :label="t('editions.volunteers.ask_vehicle_label')"
                   size="lg"
                   @update:model-value="persistVolunteerSettings"
                 />
@@ -456,7 +456,7 @@
                   :disabled="savingVolunteers"
                   color="primary"
                   class="mb-2"
-                  :label="t('editions.volunteers_ask_companion_label')"
+                  :label="t('editions.volunteers.ask_companion_label')"
                   size="lg"
                   @update:model-value="persistVolunteerSettings"
                 />
@@ -467,7 +467,7 @@
                   :disabled="savingVolunteers"
                   color="primary"
                   class="mb-2"
-                  :label="t('editions.volunteers_ask_avoid_list_label')"
+                  :label="t('editions.volunteers.ask_avoid_list_label')"
                   size="lg"
                   @update:model-value="persistVolunteerSettings"
                 />
@@ -478,7 +478,7 @@
                   :disabled="savingVolunteers"
                   color="primary"
                   class="mb-2"
-                  :label="t('editions.volunteers_ask_skills_label')"
+                  :label="t('editions.volunteers.ask_skills_label')"
                   size="lg"
                   @update:model-value="persistVolunteerSettings"
                 />
@@ -489,7 +489,7 @@
                   :disabled="savingVolunteers"
                   color="primary"
                   class="mb-2"
-                  :label="t('editions.volunteers_ask_experience_label')"
+                  :label="t('editions.volunteers.ask_experience_label')"
                   size="lg"
                   @update:model-value="persistVolunteerSettings"
                 />
@@ -500,7 +500,7 @@
                   :disabled="savingVolunteers"
                   color="primary"
                   class="mb-2"
-                  :label="t('editions.volunteers_ask_time_preferences_label')"
+                  :label="t('editions.volunteers.ask_time_preferences_label')"
                   size="lg"
                   @update:model-value="persistVolunteerSettings"
                 />
@@ -513,9 +513,9 @@
                   class="mb-2"
                   :label="
                     volunteersTeamsLocal.length === 0
-                      ? t('editions.volunteers_ask_team_preferences_label') +
+                      ? t('editions.volunteers.ask_team_preferences_label') +
                         ' (définissez d\'abord des équipes)'
-                      : t('editions.volunteers_ask_team_preferences_label')
+                      : t('editions.volunteers.ask_team_preferences_label')
                   "
                   size="lg"
                   @update:model-value="persistVolunteerSettings"
@@ -525,10 +525,10 @@
                 <div class="mt-6 space-y-4">
                   <div class="space-y-2">
                     <h4 class="font-medium text-gray-700 dark:text-gray-300">
-                      {{ t('editions.volunteers_teams_label') }}
+                      {{ t('editions.volunteers.teams_label') }}
                     </h4>
                     <p class="text-xs text-gray-500">
-                      {{ t('editions.volunteers_teams_hint') }}
+                      {{ t('editions.volunteers.teams_hint') }}
                     </p>
                   </div>
 
@@ -537,7 +537,7 @@
                       v-if="volunteersTeamsLocal.length === 0"
                       class="text-sm text-gray-500 italic"
                     >
-                      {{ t('editions.volunteers_teams_empty') }}
+                      {{ t('editions.volunteers.teams_empty') }}
                     </div>
 
                     <div
@@ -547,7 +547,7 @@
                     >
                       <UInput
                         v-model="team.name"
-                        :placeholder="t('editions.volunteers_team_name_placeholder')"
+                        :placeholder="t('editions.volunteers.team_name_placeholder')"
                         class="flex-1"
                         :disabled="savingVolunteers"
                         @blur="() => persistVolunteerSettings({ skipRefetch: true })"
@@ -557,7 +557,7 @@
                         type="number"
                         min="1"
                         max="99"
-                        :placeholder="t('editions.volunteers_team_slots_placeholder')"
+                        :placeholder="t('editions.volunteers.team_slots_placeholder')"
                         class="w-20"
                         :disabled="savingVolunteers"
                         @blur="() => persistVolunteerSettings({ skipRefetch: true })"
@@ -570,7 +570,7 @@
                         :disabled="savingVolunteers"
                         @click="removeTeam(index)"
                       >
-                        {{ t('editions.volunteers_team_remove') }}
+                        {{ t('editions.volunteers.team_remove') }}
                       </UButton>
                     </div>
 
@@ -581,7 +581,7 @@
                       :disabled="savingVolunteers"
                       @click="addTeam"
                     >
-                      {{ t('editions.volunteers_team_add') }}
+                      {{ t('editions.volunteers.team_add') }}
                     </UButton>
                   </div>
                 </div>
@@ -664,8 +664,8 @@ const savingVolunteers = ref(false)
 const volunteersInitialized = ref(false)
 // Nuxt UI URadioGroup utilise la prop `items` (pas `options`)
 const volunteerModeItems = computed(() => [
-  { value: 'INTERNAL', label: t('editions.volunteers_mode_internal') || 'Interne' },
-  { value: 'EXTERNAL', label: t('editions.volunteers_mode_external') || 'Externe' },
+  { value: 'INTERNAL', label: t('editions.volunteers.mode_internal') || 'Interne' },
+  { value: 'EXTERNAL', label: t('editions.volunteers.mode_external') || 'Externe' },
 ])
 
 const volunteersDescriptionDirty = computed(

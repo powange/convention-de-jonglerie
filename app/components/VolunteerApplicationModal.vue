@@ -1,8 +1,8 @@
 <template>
   <UModal
     v-model:open="showModal"
-    :title="t('editions.volunteers_apply')"
-    :description="t('editions.volunteers_apply_description')"
+    :title="t('editions.volunteers.apply')"
+    :description="t('editions.volunteers.apply_description')"
     :dismissible="!applying"
     :ui="{ content: 'max-w-xl rounded-none' }"
   >
@@ -14,18 +14,18 @@
         >
           <div class="flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300">
             <UIcon name="i-heroicons-information-circle" class="text-primary-500" />
-            <span>{{ t('editions.volunteers_personal_info_notice') }}</span>
+            <span>{{ t('editions.volunteers.personal_info_notice') }}</span>
           </div>
           <div class="space-y-2 text-[11px] sm:text-xs">
             <!-- Première ligne: Nom et Prénom -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <span class="font-semibold">{{ t('editions.volunteers_first_name') }}:</span>
+                <span class="font-semibold">{{ t('editions.volunteers.first_name') }}:</span>
                 <span v-if="user?.prenom" class="ml-1">{{ user.prenom }}</span>
                 <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
               </div>
               <div>
-                <span class="font-semibold">{{ t('editions.volunteers_last_name') }}:</span>
+                <span class="font-semibold">{{ t('editions.volunteers.last_name') }}:</span>
                 <span v-if="user?.nom" class="ml-1">{{ user.nom }}</span>
                 <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
               </div>
@@ -37,21 +37,21 @@
                 <span class="ml-1">{{ user?.email }}</span>
               </div>
               <div>
-                <span class="font-semibold">{{ t('editions.volunteers_phone') }}:</span>
+                <span class="font-semibold">{{ t('editions.volunteers.phone') }}:</span>
                 <span v-if="user?.phone" class="ml-1">{{ user.phone }}</span>
                 <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
               </div>
             </div>
           </div>
           <p class="mt-1 text-[11px] leading-snug">
-            {{ t('editions.volunteers_personal_info_disclaimer') }}
+            {{ t('editions.volunteers.personal_info_disclaimer') }}
           </p>
         </div>
 
         <!-- Champ téléphone si manquant -->
         <div v-if="needsPhone" class="space-y-2 w-full">
           <UFormField
-            :label="t('editions.volunteers_phone_required')"
+            :label="t('editions.volunteers.phone_required')"
             :error="phoneError"
             class="w-full"
           >
@@ -66,7 +66,7 @@
         >
           <UFormField
             v-if="!user?.prenom"
-            :label="t('editions.volunteers_first_name_required')"
+            :label="t('editions.volunteers.first_name_required')"
             :error="firstNameError"
             class="w-full"
           >
@@ -74,7 +74,7 @@
           </UFormField>
           <UFormField
             v-if="!user?.nom"
-            :label="t('editions.volunteers_last_name_required')"
+            :label="t('editions.volunteers.last_name_required')"
             :error="lastNameError"
             class="w-full"
           >
@@ -87,14 +87,14 @@
           <h3
             class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
           >
-            {{ t('editions.volunteers_presence_title') }}
+            {{ t('editions.volunteers.presence_title') }}
           </h3>
 
           <!-- Disponibilité montage -->
           <div v-if="volunteersInfo?.askSetup" class="space-y-2 w-full">
             <USwitch
               v-model="formData.setupAvailability"
-              :label="t('editions.volunteers_setup_availability_label')"
+              :label="t('editions.volunteers.setup_availability_label')"
             />
           </div>
 
@@ -102,7 +102,7 @@
           <div v-if="volunteersInfo?.askTeardown" class="space-y-2 w-full">
             <USwitch
               v-model="formData.teardownAvailability"
-              :label="t('editions.volunteers_teardown_availability_label')"
+              :label="t('editions.volunteers.teardown_availability_label')"
             />
           </div>
 
@@ -110,10 +110,10 @@
           <div class="space-y-2 w-full">
             <USwitch
               v-model="formData.eventAvailability"
-              :label="t('editions.volunteers_event_availability_label')"
+              :label="t('editions.volunteers.event_availability_label')"
             />
             <p class="text-[11px] text-gray-500">
-              {{ t('editions.volunteers_event_availability_hint') }}
+              {{ t('editions.volunteers.event_availability_hint') }}
             </p>
           </div>
 
@@ -125,13 +125,13 @@
           <!-- Sélection arrivée -->
           <div class="space-y-2 w-full">
             <UFormField
-              :label="t('editions.volunteers_arrival_time_label')"
+              :label="t('editions.volunteers.arrival_time_label')"
               :error="arrivalDateError"
             >
               <USelect
                 v-model="formData.arrivalDateTime"
                 :items="arrivalDateOptions"
-                :placeholder="t('editions.volunteers_select_arrival_placeholder')"
+                :placeholder="t('editions.volunteers.select_arrival_placeholder')"
                 class="w-full"
               />
             </UFormField>
@@ -140,13 +140,13 @@
           <!-- Sélection départ -->
           <div class="space-y-2 w-full">
             <UFormField
-              :label="t('editions.volunteers_departure_time_label')"
+              :label="t('editions.volunteers.departure_time_label')"
               :error="departureDateError"
             >
               <USelect
                 v-model="formData.departureDateTime"
                 :items="departureDateOptions"
-                :placeholder="t('editions.volunteers_select_departure_placeholder')"
+                :placeholder="t('editions.volunteers.select_departure_placeholder')"
                 class="w-full"
               />
             </UFormField>
@@ -158,7 +158,7 @@
           <h3
             class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
           >
-            {{ t('editions.volunteers_shifts_preferences_title') }}
+            {{ t('editions.volunteers.shifts_preferences_title') }}
           </h3>
 
           <!-- Équipes préférées -->
@@ -166,7 +166,7 @@
             v-if="volunteersInfo?.askTeamPreferences && volunteersInfo?.teams?.length"
             class="space-y-2 w-full"
           >
-            <UFormField :label="t('editions.volunteers_team_preferences_label')">
+            <UFormField :label="t('editions.volunteers.team_preferences_label')">
               <UCheckboxGroup
                 v-model="formData.teamPreferences"
                 :items="teamItems"
@@ -174,13 +174,13 @@
               />
             </UFormField>
             <p class="text-[11px] text-gray-500">
-              {{ t('editions.volunteers_team_preferences_hint') }}
+              {{ t('editions.volunteers.team_preferences_hint') }}
             </p>
           </div>
 
           <!-- Créneaux horaires préférés -->
           <div v-if="volunteersInfo?.askTimePreferences" class="space-y-2 w-full">
-            <UFormField :label="t('editions.volunteers_time_preferences_label')">
+            <UFormField :label="t('editions.volunteers.time_preferences_label')">
               <UCheckboxGroup
                 v-model="formData.timePreferences"
                 :items="timeSlotItems"
@@ -188,7 +188,7 @@
               />
             </UFormField>
             <p class="text-[11px] text-gray-500">
-              {{ t('editions.volunteers_time_preferences_hint') }}
+              {{ t('editions.volunteers.time_preferences_hint') }}
             </p>
           </div>
 
@@ -197,15 +197,15 @@
             <UFormField>
               <UTextarea
                 v-model="formData.companionName"
-                :label="t('editions.volunteers_companion_label')"
-                :placeholder="t('editions.volunteers_companion_placeholder')"
+                :label="t('editions.volunteers.companion_label')"
+                :placeholder="t('editions.volunteers.companion_placeholder')"
                 class="w-full"
                 :rows="2"
                 :maxlength="300"
               />
             </UFormField>
             <p class="text-[11px] text-gray-500">
-              {{ t('editions.volunteers_companion_hint') }}
+              {{ t('editions.volunteers.companion_hint') }}
             </p>
           </div>
 
@@ -214,15 +214,15 @@
             <UFormField>
               <UTextarea
                 v-model="formData.avoidList"
-                :label="t('editions.volunteers_avoid_list_label')"
-                :placeholder="t('editions.volunteers_avoid_list_placeholder')"
+                :label="t('editions.volunteers.avoid_list_label')"
+                :placeholder="t('editions.volunteers.avoid_list_placeholder')"
                 class="w-full"
                 :rows="3"
                 :maxlength="500"
               />
             </UFormField>
             <p class="text-[11px] text-gray-500">
-              {{ t('editions.volunteers_avoid_list_hint') }}
+              {{ t('editions.volunteers.avoid_list_hint') }}
             </p>
           </div>
         </div>
@@ -232,12 +232,12 @@
           <h3
             class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
           >
-            {{ t('editions.volunteers_about_you_title') }}
+            {{ t('editions.volunteers.about_you_title') }}
           </h3>
 
           <!-- Régime alimentaire -->
           <div v-if="volunteersInfo?.askDiet" class="space-y-2 w-full">
-            <UFormField :label="t('editions.volunteers_diet_label')">
+            <UFormField :label="t('editions.volunteers.diet_label')">
               <USelect
                 v-model="formData.dietPreference"
                 :items="dietPreferenceItems"
@@ -250,15 +250,15 @@
 
           <!-- Allergies -->
           <div v-if="volunteersInfo?.askAllergies" class="space-y-2 w-full">
-            <UFormField :label="t('editions.volunteers_allergies_label')">
+            <UFormField :label="t('editions.volunteers.allergies_label')">
               <UInput
                 v-model="formData.allergies"
-                :placeholder="t('editions.volunteers_allergies_placeholder')"
+                :placeholder="t('editions.volunteers.allergies_placeholder')"
                 class="w-full"
                 :maxlength="300"
               />
             </UFormField>
-            <p class="text-[11px] text-gray-500">{{ t('editions.volunteers_allergies_hint') }}</p>
+            <p class="text-[11px] text-gray-500">{{ t('editions.volunteers.allergies_hint') }}</p>
           </div>
 
           <!-- Animaux de compagnie -->
@@ -266,22 +266,22 @@
             <UFormField>
               <USwitch
                 v-model="formData.hasPets"
-                :label="t('editions.volunteers_pets_label')"
+                :label="t('editions.volunteers.pets_label')"
                 size="lg"
               />
             </UFormField>
             <div v-if="formData.hasPets" class="ml-8">
-              <UFormField :label="t('editions.volunteers_pets_details_label')">
+              <UFormField :label="t('editions.volunteers.pets_details_label')">
                 <UTextarea
                   v-model="formData.petsDetails"
-                  :placeholder="t('editions.volunteers_pets_details_placeholder')"
+                  :placeholder="t('editions.volunteers.pets_details_placeholder')"
                   :rows="2"
                   class="w-full"
                   :maxlength="200"
                 />
               </UFormField>
               <p class="text-[11px] text-gray-500">
-                {{ t('editions.volunteers_pets_details_hint') }}
+                {{ t('editions.volunteers.pets_details_hint') }}
               </p>
             </div>
           </div>
@@ -291,22 +291,22 @@
             <UFormField>
               <USwitch
                 v-model="formData.hasMinors"
-                :label="t('editions.volunteers_minors_label')"
+                :label="t('editions.volunteers.minors_label')"
                 size="lg"
               />
             </UFormField>
             <div v-if="formData.hasMinors" class="ml-8">
-              <UFormField :label="t('editions.volunteers_minors_details_label')">
+              <UFormField :label="t('editions.volunteers.minors_details_label')">
                 <UTextarea
                   v-model="formData.minorsDetails"
-                  :placeholder="t('editions.volunteers_minors_details_placeholder')"
+                  :placeholder="t('editions.volunteers.minors_details_placeholder')"
                   :rows="2"
                   class="w-full"
                   :maxlength="200"
                 />
               </UFormField>
               <p class="text-[11px] text-gray-500">
-                {{ t('editions.volunteers_minors_details_hint') }}
+                {{ t('editions.volunteers.minors_details_hint') }}
               </p>
             </div>
           </div>
@@ -317,7 +317,7 @@
           <h3
             class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
           >
-            {{ t('editions.volunteers_what_you_can_bring_title') }}
+            {{ t('editions.volunteers.what_you_can_bring_title') }}
           </h3>
 
           <!-- Véhicule à disposition -->
@@ -325,22 +325,22 @@
             <UFormField>
               <USwitch
                 v-model="formData.hasVehicle"
-                :label="t('editions.volunteers_vehicle_label')"
+                :label="t('editions.volunteers.vehicle_label')"
                 size="lg"
               />
             </UFormField>
             <div v-if="formData.hasVehicle" class="ml-8">
-              <UFormField :label="t('editions.volunteers_vehicle_details_label')">
+              <UFormField :label="t('editions.volunteers.vehicle_details_label')">
                 <UTextarea
                   v-model="formData.vehicleDetails"
-                  :placeholder="t('editions.volunteers_vehicle_details_placeholder')"
+                  :placeholder="t('editions.volunteers.vehicle_details_placeholder')"
                   :rows="2"
                   class="w-full"
                   :maxlength="200"
                 />
               </UFormField>
               <p class="text-[11px] text-gray-500">
-                {{ t('editions.volunteers_vehicle_details_hint') }}
+                {{ t('editions.volunteers.vehicle_details_hint') }}
               </p>
             </div>
           </div>
@@ -350,8 +350,8 @@
             <UFormField>
               <UTextarea
                 v-model="formData.skills"
-                :label="t('editions.volunteers_skills_label')"
-                :placeholder="t('editions.volunteers_skills_placeholder')"
+                :label="t('editions.volunteers.skills_label')"
+                :placeholder="t('editions.volunteers.skills_placeholder')"
                 class="w-full"
                 :rows="4"
                 :maxlength="1000"
@@ -359,7 +359,7 @@
             </UFormField>
             <div class="flex justify-between items-center">
               <p class="text-[11px] text-gray-500">
-                {{ t('editions.volunteers_skills_hint') }}
+                {{ t('editions.volunteers.skills_hint') }}
               </p>
               <p class="text-[11px] text-gray-500">{{ formData.skills.length }} / 1000</p>
             </div>
@@ -370,15 +370,15 @@
             <UFormField>
               <USwitch
                 v-model="formData.hasExperience"
-                :label="t('editions.volunteers_experience_label')"
+                :label="t('editions.volunteers.experience_label')"
                 size="lg"
               />
             </UFormField>
             <div v-if="formData.hasExperience" class="ml-8">
-              <UFormField :label="t('editions.volunteers_experience_details_label')">
+              <UFormField :label="t('editions.volunteers.experience_details_label')">
                 <UTextarea
                   v-model="formData.experienceDetails"
-                  :placeholder="t('editions.volunteers_experience_details_placeholder')"
+                  :placeholder="t('editions.volunteers.experience_details_placeholder')"
                   :rows="3"
                   class="w-full"
                   :maxlength="500"
@@ -386,7 +386,7 @@
               </UFormField>
               <div class="flex justify-between items-center">
                 <p class="text-[11px] text-gray-500">
-                  {{ t('editions.volunteers_experience_details_hint') }}
+                  {{ t('editions.volunteers.experience_details_hint') }}
                 </p>
                 <p class="text-[11px] text-gray-500">
                   {{ formData.experienceDetails.length }} / 500
@@ -401,13 +401,13 @@
           <h3
             class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
           >
-            {{ t('editions.volunteers_additional_info_title') }}
+            {{ t('editions.volunteers.additional_info_title') }}
           </h3>
         </div>
 
         <!-- Motivation (déplacé en bas) -->
         <UFormField
-          :label="t('editions.volunteers_motivation_label')"
+          :label="t('editions.volunteers.motivation_label')"
           :error="motivationError"
           class="w-full"
         >
@@ -415,7 +415,7 @@
             <UTextarea
               v-model="formData.motivation"
               :rows="5"
-              :placeholder="t('editions.volunteers_motivation_placeholder')"
+              :placeholder="t('editions.volunteers.motivation_placeholder')"
               :maxlength="MOTIVATION_MAX"
               class="w-full"
             />
@@ -425,7 +425,7 @@
           </div>
         </UFormField>
         <p class="text-xs text-gray-500 whitespace-pre-line w-full">
-          {{ t('editions.volunteers_motivation_hint', { max: MOTIVATION_MAX }) }}
+          {{ t('editions.volunteers.motivation_hint', { max: MOTIVATION_MAX }) }}
         </p>
       </div>
     </template>
@@ -452,7 +452,7 @@
           icon="i-heroicons-paper-airplane"
           @click="handleSubmit"
         >
-          {{ t('editions.volunteers_apply') }}
+          {{ t('editions.volunteers.apply') }}
         </UButton>
       </div>
     </template>
@@ -671,10 +671,10 @@ const generateDateTimeOptions = (
   const currentDate = new Date(startDate)
 
   const granularities = [
-    { key: 'morning', label: t('editions.volunteers_time_granularity.morning') },
-    { key: 'noon', label: t('editions.volunteers_time_granularity.noon') },
-    { key: 'afternoon', label: t('editions.volunteers_time_granularity.afternoon') },
-    { key: 'evening', label: t('editions.volunteers_time_granularity.evening') },
+    { key: 'morning', label: t('editions.volunteers.time_granularity.morning') },
+    { key: 'noon', label: t('editions.volunteers.time_granularity.noon') },
+    { key: 'afternoon', label: t('editions.volunteers.time_granularity.afternoon') },
+    { key: 'evening', label: t('editions.volunteers.time_granularity.evening') },
   ]
 
   while (currentDate <= endDate) {
@@ -756,14 +756,14 @@ const teamItems = computed(() => {
 
 // Items de créneaux horaires pour UCheckboxGroup
 const timeSlotItems = computed(() => [
-  { label: t('editions.volunteers_time_slots.early_morning'), value: 'early_morning' },
-  { label: t('editions.volunteers_time_slots.morning'), value: 'morning' },
-  { label: t('editions.volunteers_time_slots.lunch'), value: 'lunch' },
-  { label: t('editions.volunteers_time_slots.early_afternoon'), value: 'early_afternoon' },
-  { label: t('editions.volunteers_time_slots.late_afternoon'), value: 'late_afternoon' },
-  { label: t('editions.volunteers_time_slots.evening'), value: 'evening' },
-  { label: t('editions.volunteers_time_slots.late_evening'), value: 'late_evening' },
-  { label: t('editions.volunteers_time_slots.night'), value: 'night' },
+  { label: t('editions.volunteers.time_slots.early_morning'), value: 'early_morning' },
+  { label: t('editions.volunteers.time_slots.morning'), value: 'morning' },
+  { label: t('editions.volunteers.time_slots.lunch'), value: 'lunch' },
+  { label: t('editions.volunteers.time_slots.early_afternoon'), value: 'early_afternoon' },
+  { label: t('editions.volunteers.time_slots.late_afternoon'), value: 'late_afternoon' },
+  { label: t('editions.volunteers.time_slots.evening'), value: 'evening' },
+  { label: t('editions.volunteers.time_slots.late_evening'), value: 'late_evening' },
+  { label: t('editions.volunteers.time_slots.night'), value: 'night' },
 ])
 
 const dietPreferenceItems = computed<{ value: 'NONE' | 'VEGETARIAN' | 'VEGAN'; label: string }[]>(

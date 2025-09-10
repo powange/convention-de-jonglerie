@@ -229,6 +229,7 @@ function extractI18nKeysFromFile(filePath) {
       'activeServices',
       'formData',
       'abc123',
+      'application',
     ]
 
     // Exceptions - ces patterns sont valides même s'ils commencent par un mot réservé

@@ -2,7 +2,7 @@
   <div v-if="edition">
     <EditionHeader
       :edition="edition"
-      current-page="benevoles"
+      current-page="volunteers"
       :is-favorited="isFavorited(edition.id)"
       @toggle-favorite="toggleFavorite(edition.id)"
     />
@@ -12,7 +12,7 @@
         <div class="flex items-center justify-between">
           <h3 class="text-lg font-semibold flex items-center gap-2">
             <UIcon name="i-heroicons-hand-raised" class="text-primary-500" />
-            {{ t('editions.volunteers_title') }}
+            {{ t('editions.volunteers.title') }}
           </h3>
           <div v-if="canManageEdition" class="flex items-center gap-2">
             <UButton
@@ -37,7 +37,7 @@
               <div v-html="volunteersDescriptionHtml" />
             </template>
             <template v-else>
-              <p class="text-gray-500">{{ t('editions.volunteers_no_description') }}</p>
+              <p class="text-gray-500">{{ t('editions.volunteers.no_description') }}</p>
             </template>
           </div>
         </div>
@@ -56,7 +56,7 @@
             :to="volunteersInfo.externalUrl"
             target="_blank"
           >
-            {{ t('editions.volunteers_apply') }}
+            {{ t('editions.volunteers.apply') }}
           </UButton>
           <span class="text-xs text-gray-500 truncate max-w-full">{{
             volunteersInfo.externalUrl
@@ -66,7 +66,7 @@
         <!-- Candidature utilisateur (déplacé juste après description) -->
         <div v-if="authStore.isAuthenticated && volunteersMode === 'INTERNAL'">
           <div v-if="!volunteersInfo?.open" class="text-sm text-gray-500 flex items-center gap-2">
-            <UIcon name="i-heroicons-lock-closed" /> {{ t('editions.volunteers_closed_message') }}
+            <UIcon name="i-heroicons-lock-closed" /> {{ t('editions.volunteers.closed_message') }}
           </div>
           <div v-else>
             <UCard
@@ -78,7 +78,7 @@
                   <div class="flex items-center justify-between">
                     <h4 class="text-sm font-semibold flex items-center gap-1">
                       <UIcon name="i-heroicons-user" class="text-primary-500" />
-                      {{ t('editions.volunteers_my_application_title') }}
+                      {{ t('editions.volunteers.my_application_title') }}
                     </h4>
                     <UBadge
                       :color="volunteerStatusColor(volunteersInfo.myApplication.status)"
@@ -92,17 +92,17 @@
                     <span
                       v-if="volunteersInfo.myApplication.status === 'PENDING'"
                       class="block text-gray-600 dark:text-gray-400"
-                      >{{ t('editions.volunteers_my_application_pending') }}</span
+                      >{{ t('editions.volunteers.my_application_pending') }}</span
                     >
                     <span
                       v-else-if="volunteersInfo.myApplication.status === 'ACCEPTED'"
                       class="block text-gray-600 dark:text-gray-400"
-                      >{{ t('editions.volunteers_my_application_accepted') }}</span
+                      >{{ t('editions.volunteers.my_application_accepted') }}</span
                     >
                     <span
                       v-else-if="volunteersInfo.myApplication.status === 'REJECTED'"
                       class="block text-gray-600 dark:text-gray-400"
-                      >{{ t('editions.volunteers_my_application_rejected') }}</span
+                      >{{ t('editions.volunteers.my_application_rejected') }}</span
                     >
                   </div>
                   <div class="flex flex-wrap items-center gap-2">
@@ -114,7 +114,7 @@
                       :loading="volunteersWithdrawing"
                       @click="withdrawApplication"
                     >
-                      {{ t('editions.volunteers_withdraw') }}
+                      {{ t('editions.volunteers.withdraw') }}
                     </UButton>
                   </div>
                 </div>
@@ -122,7 +122,7 @@
               <template v-else>
                 <div class="flex items-center justify-between gap-4">
                   <div class="text-xs text-gray-600 dark:text-gray-400">
-                    {{ t('editions.volunteers_apply_description') }}
+                    {{ t('editions.volunteers.apply_description') }}
                   </div>
                   <UButton
                     size="sm"
@@ -130,7 +130,7 @@
                     icon="i-heroicons-hand-raised"
                     @click="openApplyModal"
                   >
-                    {{ t('editions.volunteers_apply') }}
+                    {{ t('editions.volunteers.apply') }}
                   </UButton>
                 </div>
               </template>
@@ -141,7 +141,7 @@
           v-else-if="!authStore.isAuthenticated && volunteersMode === 'INTERNAL'"
           class="text-sm text-gray-500"
         >
-          {{ t('editions.volunteers_login_prompt') }}
+          {{ t('editions.volunteers.login_prompt') }}
         </div>
       </div>
     </UCard>
@@ -161,7 +161,7 @@
       <template #header>
         <h3 class="text-lg font-semibold flex items-center gap-2">
           <UIcon name="i-heroicons-clipboard-document-list" class="text-primary-500" />
-          {{ t('editions.volunteers_management_title') }}
+          {{ t('editions.volunteers.management_title') }}
         </h3>
       </template>
 
@@ -171,10 +171,10 @@
           icon="i-heroicons-shield-check"
           :title="
             canManageVolunteers
-              ? t('editions.volunteers_admin_only_note')
-              : t('editions.volunteers_view_only_note')
+              ? t('editions.volunteers.admin_only_note')
+              : t('editions.volunteers.view_only_note')
           "
-          :description="canManageVolunteers ? null : t('editions.volunteers_view_only_description')"
+          :description="canManageVolunteers ? null : t('editions.volunteers.view_only_description')"
           color="primary"
           variant="subtle"
         />
@@ -182,18 +182,18 @@
         <!-- Statistiques -->
         <div v-if="volunteersInfo" class="mt-3 mb-3 flex flex-wrap gap-3">
           <UBadge color="neutral" variant="soft"
-            >{{ t('editions.volunteers_total') }}: {{ volunteersInfo.counts.total || 0 }}</UBadge
+            >{{ t('editions.volunteers.total') }}: {{ volunteersInfo.counts.total || 0 }}</UBadge
           >
           <UBadge color="warning" variant="soft"
-            >{{ t('editions.volunteers_status_pending') }}:
+            >{{ t('editions.volunteers.status_pending') }}:
             {{ volunteersInfo.counts.PENDING || 0 }}</UBadge
           >
           <UBadge color="success" variant="soft"
-            >{{ t('editions.volunteers_status_accepted') }}:
+            >{{ t('editions.volunteers.status_accepted') }}:
             {{ volunteersInfo.counts.ACCEPTED || 0 }}</UBadge
           >
           <UBadge color="error" variant="soft"
-            >{{ t('editions.volunteers_status_rejected') }}:
+            >{{ t('editions.volunteers.status_rejected') }}:
             {{ volunteersInfo.counts.REJECTED || 0 }}</UBadge
           >
         </div>
@@ -205,11 +205,11 @@
             <!-- Filtres -->
             <UCard variant="subtle">
               <div class="flex flex-wrap gap-3 items-end">
-                <UFormField :label="t('editions.volunteers_filter_status')">
+                <UFormField :label="t('editions.volunteers.filter_status')">
                   <USelect
                     v-model="applicationsFilterStatus"
                     :items="volunteerStatusItems"
-                    :placeholder="t('editions.volunteers_status_all')"
+                    :placeholder="t('editions.volunteers.status_all')"
                     icon="i-heroicons-funnel"
                     size="xs"
                     variant="soft"
@@ -219,12 +219,12 @@
                 </UFormField>
                 <UFormField
                   v-if="volunteersInfo?.askTeamPreferences && volunteerTeamItems.length > 0"
-                  :label="t('editions.volunteers_table_team_preferences')"
+                  :label="t('editions.volunteers.table_team_preferences')"
                 >
                   <USelect
                     v-model="applicationsFilterTeams"
                     :items="volunteerTeamItems"
-                    :placeholder="t('editions.volunteers_teams_empty')"
+                    :placeholder="t('editions.volunteers.teams_empty')"
                     icon="i-heroicons-user-group"
                     size="xs"
                     variant="soft"
@@ -233,10 +233,10 @@
                     @change="onTeamsFilterChange"
                   />
                 </UFormField>
-                <UFormField :label="t('editions.volunteers_search')">
+                <UFormField :label="t('editions.volunteers.search')">
                   <UInput
                     v-model="globalFilter"
-                    :placeholder="t('editions.volunteers_search_placeholder')"
+                    :placeholder="t('editions.volunteers.search_placeholder')"
                     class="w-64"
                     @keydown.enter.prevent="applySearch"
                   />
@@ -258,9 +258,7 @@
                 >
                   {{ t('common.reset') }}
                 </UButton>
-                <span class="text-xs text-gray-500 italic">{{
-                  $t('pages.benevoles.sort_tip')
-                }}</span>
+                <span class="text-xs text-gray-500 italic">{{ $t('common.sort_tip') }}</span>
               </div>
             </UCard>
 
@@ -278,7 +276,7 @@
                 v-if="tableData.length === 0 && !applicationsLoading"
                 class="text-xs text-gray-500 py-2"
               >
-                {{ t('editions.volunteers_no_applications') }}
+                {{ t('editions.volunteers.no_applications') }}
               </div>
             </div>
             <div class="flex flex-wrap items-center gap-3 text-xs">
@@ -329,6 +327,7 @@ import type { TableColumn } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
 
 const { t } = useI18n()
+const { formatDateTimeWithGranularity } = useDateFormat()
 const toast = useToast()
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -442,11 +441,11 @@ const volunteerStatusColor = (s: string) =>
   s === 'PENDING' ? 'warning' : s === 'ACCEPTED' ? 'success' : 'error'
 const volunteerStatusLabel = (s: string) =>
   s === 'PENDING'
-    ? t('editions.volunteers_status_pending')
+    ? t('editions.volunteers.status_pending')
     : s === 'ACCEPTED'
-      ? t('editions.volunteers_status_accepted')
+      ? t('editions.volunteers.status_accepted')
       : s === 'REJECTED'
-        ? t('editions.volunteers_status_rejected')
+        ? t('editions.volunteers.status_rejected')
         : s
 const fetchVolunteersInfo = async () => {
   try {
@@ -596,10 +595,10 @@ const actingAction = ref<'ACCEPTED' | 'REJECTED' | 'PENDING' | null>(null)
 // (Anciennes options de tri supprimées, tri via entêtes de colonnes)
 // Items pour USelect (API Nuxt UI v3)
 const volunteerStatusItems = computed(() => [
-  { label: t('editions.volunteers_status_all'), value: 'ALL' },
-  { label: t('editions.volunteers_status_pending'), value: 'PENDING' },
-  { label: t('editions.volunteers_status_accepted'), value: 'ACCEPTED' },
-  { label: t('editions.volunteers_status_rejected'), value: 'REJECTED' },
+  { label: t('editions.volunteers.status_all'), value: 'ALL' },
+  { label: t('editions.volunteers.status_pending'), value: 'PENDING' },
+  { label: t('editions.volunteers.status_accepted'), value: 'ACCEPTED' },
+  { label: t('editions.volunteers.status_rejected'), value: 'REJECTED' },
 ])
 
 const volunteerTeamItems = computed(() => {
@@ -709,35 +708,6 @@ const formatDate = (iso: string) => {
   }
 }
 
-const formatDateTimeWithGranularity = (dateTimeString: string) => {
-  if (!dateTimeString || !dateTimeString.includes('_')) {
-    return dateTimeString
-  }
-
-  const [datePart, timePart] = dateTimeString.split('_')
-
-  try {
-    const date = new Date(datePart)
-    const dateFormatted = date.toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'short',
-    })
-
-    // Traduction des granularités
-    const timeTranslations: Record<string, string> = {
-      morning: t('editions.volunteers_time_granularity.morning'),
-      noon: t('editions.volunteers_time_granularity.noon'),
-      afternoon: t('editions.volunteers_time_granularity.afternoon'),
-      evening: t('editions.volunteers_time_granularity.evening'),
-    }
-
-    const timeFormatted = timeTranslations[timePart] || timePart
-
-    return `${dateFormatted} ${timeFormatted.toLowerCase()}`
-  } catch {
-    return dateTimeString.split('_').join(' ')
-  }
-}
 // Données aplaties pour le tableau
 const tableData = computed(() =>
   applications.value.map((app) => ({
@@ -781,7 +751,7 @@ const columns: TableColumn<any>[] = [
   // Infos utilisateur
   {
     accessorKey: 'pseudo',
-    header: ({ column }) => getSortableHeader(column, t('editions.volunteers_table_user')),
+    header: ({ column }) => getSortableHeader(column, t('editions.volunteers.table_user')),
     cell: ({ row }) =>
       h('div', { class: 'flex flex-col' }, [
         h('span', { class: 'font-medium' }, row.original.user.pseudo),
@@ -794,12 +764,12 @@ const columns: TableColumn<any>[] = [
   // Colonnes Prénom et Nom
   {
     accessorKey: 'prenom',
-    header: t('editions.volunteers_table_first_name'),
+    header: t('editions.volunteers.table_first_name'),
     cell: ({ row }) => row.original.user.prenom || '—',
   },
   {
     accessorKey: 'nom',
-    header: t('editions.volunteers_table_last_name'),
+    header: t('editions.volunteers.table_last_name'),
     cell: ({ row }) => row.original.user.nom || '—',
   },
   // Colonne régime si activée
@@ -807,7 +777,7 @@ const columns: TableColumn<any>[] = [
     ? [
         {
           accessorKey: 'dietaryPreference',
-          header: t('editions.volunteers_table_diet'),
+          header: t('editions.volunteers.table_diet'),
           cell: ({ row }: any) => {
             const val = row.original.dietaryPreference || 'NONE'
             const key =
@@ -826,7 +796,7 @@ const columns: TableColumn<any>[] = [
     ? [
         {
           accessorKey: 'allergies',
-          header: t('editions.volunteers_table_allergies'),
+          header: t('editions.volunteers.table_allergies'),
           cell: ({ row }: any) =>
             row.original.allergies
               ? h('span', { class: 'text-xs truncate block max-w-[160px]' }, row.original.allergies)
@@ -839,7 +809,7 @@ const columns: TableColumn<any>[] = [
     ? [
         {
           accessorKey: 'hasPets',
-          header: t('editions.volunteers_table_pets'),
+          header: t('editions.volunteers.table_pets'),
           cell: ({ row }: any) => {
             if (!row.original.hasPets) return h('span', '—')
             const petsDetails = row.original.petsDetails
@@ -874,7 +844,7 @@ const columns: TableColumn<any>[] = [
     ? [
         {
           accessorKey: 'hasMinors',
-          header: t('editions.volunteers_table_minors'),
+          header: t('editions.volunteers.table_minors'),
           cell: ({ row }: any) => {
             if (!row.original.hasMinors) return h('span', '—')
             const minorsDetails = row.original.minorsDetails
@@ -909,7 +879,7 @@ const columns: TableColumn<any>[] = [
     ? [
         {
           accessorKey: 'hasVehicle',
-          header: t('editions.volunteers_table_vehicle'),
+          header: t('editions.volunteers.table_vehicle'),
           cell: ({ row }: any) => {
             if (!row.original.hasVehicle) return h('span', '—')
             const vehicleDetails = row.original.vehicleDetails
@@ -944,7 +914,7 @@ const columns: TableColumn<any>[] = [
     ? [
         {
           accessorKey: 'companionName',
-          header: t('editions.volunteers_table_companion'),
+          header: t('editions.volunteers.table_companion'),
           cell: ({ row }: any) => {
             const companionName = row.original.companionName
             if (!companionName) return h('span', '—')
@@ -958,7 +928,7 @@ const columns: TableColumn<any>[] = [
     ? [
         {
           accessorKey: 'avoidList',
-          header: t('editions.volunteers_table_avoid_list'),
+          header: t('editions.volunteers.table_avoid_list'),
           cell: ({ row }: any) => {
             const avoidList = row.original.avoidList
             if (!avoidList) return h('span', '—')
@@ -992,7 +962,7 @@ const columns: TableColumn<any>[] = [
     ? [
         {
           accessorKey: 'skills',
-          header: t('editions.volunteers_table_skills'),
+          header: t('editions.volunteers.table_skills'),
           cell: ({ row }: any) => {
             const skills = row.original.skills
             if (!skills) return h('span', '—')
@@ -1026,7 +996,7 @@ const columns: TableColumn<any>[] = [
     ? [
         {
           accessorKey: 'timePreferences',
-          header: t('editions.volunteers_table_time_preferences'),
+          header: t('editions.volunteers.table_time_preferences'),
           cell: ({ row }: any) => {
             const preferences = row.original.timePreferences || []
             const allSlots = [
@@ -1045,7 +1015,7 @@ const columns: TableColumn<any>[] = [
               { class: 'grid grid-cols-4 gap-1' },
               allSlots.map((slot) => {
                 const isSelected = preferences.includes(slot)
-                const label = t(`editions.volunteers_time_slots.${slot}`)
+                const label = t(`editions.volunteers.time_slots.${slot}`)
 
                 return h(
                   resolveComponent('UTooltip'),
@@ -1073,7 +1043,7 @@ const columns: TableColumn<any>[] = [
     ? [
         {
           accessorKey: 'teamPreferences',
-          header: t('editions.volunteers_table_team_preferences'),
+          header: t('editions.volunteers.table_team_preferences'),
           cell: ({ row }: any) => {
             const preferences = row.original.teamPreferences || []
             if (preferences.length === 0) return h('span', '—')
@@ -1108,7 +1078,7 @@ const columns: TableColumn<any>[] = [
   // Colonne présence
   {
     accessorKey: 'presence',
-    header: t('editions.volunteers_table_presence'),
+    header: t('editions.volunteers.table_presence'),
     cell: ({ row }: any) => {
       const hasSetupAvailability = row.original.setupAvailability
       const hasTeardownAvailability = row.original.teardownAvailability
@@ -1169,7 +1139,7 @@ const columns: TableColumn<any>[] = [
   },
   {
     id: 'motivation',
-    header: t('editions.volunteers_table_motivation'),
+    header: t('editions.volunteers.table_motivation'),
     cell: ({ row }) => {
       const mot = row.original.motivation
       if (!mot) return h('span', '—')
@@ -1203,7 +1173,7 @@ const columns: TableColumn<any>[] = [
                 applicationsActingId.value === row.original.id && actingAction.value === 'ACCEPTED',
               onClick: () => decideApplication(row.original, 'ACCEPTED'),
             },
-            () => t('editions.volunteers_action_accept')
+            () => t('editions.volunteers.action_accept')
           ),
           h(
             resolveComponent('UButton'),
@@ -1215,7 +1185,7 @@ const columns: TableColumn<any>[] = [
                 applicationsActingId.value === row.original.id && actingAction.value === 'REJECTED',
               onClick: () => decideApplication(row.original, 'REJECTED'),
             },
-            () => t('editions.volunteers_action_reject')
+            () => t('editions.volunteers.action_reject')
           ),
         ])
       }
@@ -1231,7 +1201,7 @@ const columns: TableColumn<any>[] = [
                 applicationsActingId.value === row.original.id && actingAction.value === 'PENDING',
               onClick: () => decideApplication(row.original, 'PENDING' as any),
             },
-            () => t('editions.volunteers_action_back_pending')
+            () => t('editions.volunteers.action_back_pending')
           ),
         ])
       }
@@ -1285,7 +1255,7 @@ const filteredCountLabel = computed(() => {
   const end = (page - 1) * pageSize + applications.value.length
   const boundedEnd = Math.min(end, filtered)
   const boundedStart = Math.min(start, filtered === 0 ? 0 : filtered)
-  return `${t('editions.volunteers_filtered_count', { filtered, total })} (${boundedStart}–${boundedEnd})`
+  return `${t('editions.volunteers.filtered_count', { filtered, total })} (${boundedStart}–${boundedEnd})`
 })
 
 // Gestion ouverture / fermeture modal candidature

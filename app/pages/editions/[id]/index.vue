@@ -273,7 +273,7 @@ const editionId = parseInt(route.params.id as string)
 const showImageOverlay = ref(false)
 const { getImageUrl } = useImageUrl()
 
-// (Bloc bénévolat déplacé dans la page benevoles.vue)
+// (Bloc bénévolat déplacé dans la page volunteers.vue)
 
 // Charger l'édition côté serveur ET client
 try {

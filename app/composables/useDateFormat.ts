@@ -80,10 +80,45 @@ export const useDateFormat = () => {
     })
   }
 
+  /**
+   * Formate une date avec granularité temporelle (format: date_granularity)
+   * Exemple: "2024-01-15_morning" -> "15 janv. matin"
+   */
+  const formatDateTimeWithGranularity = (dateTimeString: string) => {
+    if (!dateTimeString || !dateTimeString.includes('_')) {
+      return dateTimeString
+    }
+
+    const [datePart, timePart] = dateTimeString.split('_')
+
+    try {
+      const date = new Date(datePart)
+      const dateFormatted = date.toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'short',
+      })
+
+      // Traduction des granularités
+      const timeTranslations: Record<string, string> = {
+        morning: t('editions.volunteers.time_granularity.morning'),
+        noon: t('editions.volunteers.time_granularity.noon'),
+        afternoon: t('editions.volunteers.time_granularity.afternoon'),
+        evening: t('editions.volunteers.time_granularity.evening'),
+      }
+
+      const timeFormatted = timeTranslations[timePart] || timePart
+
+      return `${dateFormatted} ${timeFormatted.toLowerCase()}`
+    } catch {
+      return dateTimeString.split('_').join(' ')
+    }
+  }
+
   return {
     formatDateTime,
     formatDate,
     formatDateTimeRange,
     formatDateRange,
+    formatDateTimeWithGranularity,
   }
 }

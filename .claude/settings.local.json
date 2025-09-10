@@ -61,7 +61,8 @@
       "Bash(npx prisma:*)",
       "Bash(mysql:*)",
       "Bash(for lang in en de es it nl pt ru pl uk da)",
-      "Bash(npm ci:*)"
+      "Bash(npm ci:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

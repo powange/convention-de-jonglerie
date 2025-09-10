@@ -135,14 +135,14 @@
 
         <NuxtLink
           v-if="volunteersTabVisible"
-          :to="`/editions/${edition.id}/benevoles`"
+          :to="`/editions/${edition.id}/volunteers`"
           :class="[
             'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
-            currentPage === 'benevoles'
+            currentPage === 'volunteers'
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
           ]"
-          :title="t('editions.volunteers_title')"
+          :title="t('editions.volunteers.title')"
         >
           <UIcon
             name="i-heroicons-hand-raised"
@@ -150,7 +150,7 @@
             size="24"
             class="sm:!w-4 sm:!h-4"
           />
-          <span class="hidden sm:inline">{{ t('editions.volunteers_title') }}</span>
+          <span class="hidden sm:inline">{{ t('editions.volunteers.title') }}</span>
         </NuxtLink>
 
         <NuxtLink
@@ -266,7 +266,7 @@ interface Props {
     | 'covoiturage'
     | 'gestion'
     | 'objets-trouves'
-    | 'benevoles'
+    | 'volunteers'
   isFavorited?: boolean
 }
 
@@ -343,7 +343,7 @@ const getPageTitle = (page: string) => {
     commentaires: t('editions.posts'),
     covoiturage: t('editions.carpool'),
     'objets-trouves': t('editions.lost_found'),
-    benevoles: t('editions.volunteers_title'),
+    volunteers: t('editions.volunteers.title'),
     gestion: t('editions.management'),
   }
   return titles[page] || t('editions.about_this_edition')

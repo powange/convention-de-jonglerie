@@ -205,6 +205,11 @@ const userMenuItems = computed(() => {
       icon: 'i-heroicons-calendar-days',
       to: '/my-conventions',
     },
+    {
+      label: t('navigation.my_volunteer_applications'),
+      icon: 'i-heroicons-hand-raised',
+      to: '/my-volunteer-applications',
+    },
   ]
 
   // Ajouter le dashboard admin si super admin

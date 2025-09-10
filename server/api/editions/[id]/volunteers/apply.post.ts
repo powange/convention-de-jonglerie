@@ -277,7 +277,7 @@ export default defineEventHandler(async (event) => {
         category: 'volunteer',
         entityType: 'Edition',
         entityId: editionId.toString(),
-        actionUrl: `/editions/${editionId}/volunteers`,
+        actionUrl: '/my-volunteer-applications',
         actionText: 'Voir mes candidatures',
       },
     })
