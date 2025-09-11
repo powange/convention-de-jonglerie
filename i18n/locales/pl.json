@@ -421,6 +421,7 @@
     },
     "email": "E-mail",
     "error": "Błąd",
+    "export_success": "Eksport udany",
     "favorite": "Ulubione",
     "inactive": "Nieaktywny",
     "loading": "Ładowanie...",
@@ -799,6 +800,7 @@
       "experience_details_label": "Szczegóły Twojego doświadczenia (opcjonalnie)",
       "experience_details_placeholder": "Krótko opisz swoje doświadczenie jako wolontariusz (wydarzenia, role, itp.)",
       "experience_label": "Już wcześniej byłem wolontariuszem na podobnych wydarzeniach",
+      "export": "Eksportuj",
       "external_url_hint": "Link do zewnętrznego formularza lub platformy zarządzania wolontariuszami.",
       "external_url_label": "Zewnętrzny URL",
       "filter_status": "Filtruj według statusu",
@@ -899,7 +901,6 @@
       "vehicle_details_label": "Szczegóły o Państwa pojeździe",
       "vehicle_details_placeholder": "Typ pojazdu, liczba miejsc, pojemność ładunkowa...",
       "vehicle_label": "Mam dostępny pojazd",
-      "view_only_description": "Możecie Państwo przeglądać aplikacje, ale tylko menedżerowie wolontariuszy mogą akceptować lub odrzucać aplikacje.",
       "view_only_note": "Tryb tylko do przeglądania",
       "what_you_can_bring_title": "Co możesz nam przynieść",
       "withdraw": "Wycofaj moje zgłoszenie"
@@ -1046,6 +1047,11 @@
         "min": "Temat musi mieć co najmniej 5 znaków"
       }
     }
+  },
+  "fieldErrors": {
+    "description": "Opis nie może przekraczać 5000 znaków",
+    "externalUrl": "Zewnętrzny adres URL nie jest prawidłowy",
+    "setupStartDate": "Data rozpoczęcia montażu jest wymagana"
   },
   "footer": {
     "copyright": "© {year} Konwencja Żonglerska. Wszelkie prawa zastrzeżone.",

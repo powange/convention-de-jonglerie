@@ -421,6 +421,7 @@
     },
     "email": "Email",
     "error": "Error",
+    "export_success": "Exportación exitosa",
     "favorite": "Favorito",
     "inactive": "Inactivo",
     "loading": "Cargando...",
@@ -799,6 +800,7 @@
       "experience_details_label": "Detalles de tu experiencia (opcional)",
       "experience_details_placeholder": "Describe brevemente tu experiencia como voluntario (eventos, funciones, etc.)",
       "experience_label": "Ya he sido voluntario en eventos similares",
+      "export": "Exportar",
       "external_url_hint": "Enlace al formulario o plataforma externa de gestión de voluntarios.",
       "external_url_label": "URL externa",
       "filter_status": "Filtrar por estado",
@@ -899,7 +901,6 @@
       "vehicle_details_label": "Detalles sobre su vehículo",
       "vehicle_details_placeholder": "Tipo de vehículo, número de asientos, capacidad de carga...",
       "vehicle_label": "Tengo un vehículo disponible",
-      "view_only_description": "Puede consultar las solicitudes pero solo los administradores de voluntarios pueden aceptar o rechazar solicitudes.",
       "view_only_note": "Solo modo consulta",
       "what_you_can_bring_title": "Lo que puede aportarnos",
       "withdraw": "Retirar mi solicitud"
@@ -1046,6 +1047,11 @@
         "min": "El asunto debe tener al menos 5 caracteres"
       }
     }
+  },
+  "fieldErrors": {
+    "description": "La descripción no puede exceder 5000 caracteres",
+    "externalUrl": "La URL externa no es válida",
+    "setupStartDate": "La fecha de inicio del montaje es obligatoria"
   },
   "footer": {
     "copyright": "© {year} Convención de Malabares. Todos los derechos reservados.",

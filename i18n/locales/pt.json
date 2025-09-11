@@ -421,6 +421,7 @@
     },
     "email": "E-mail",
     "error": "Erro",
+    "export_success": "Exportação bem-sucedida",
     "favorite": "Favorito",
     "inactive": "Inativo",
     "loading": "A carregar...",
@@ -799,6 +800,7 @@
       "experience_details_label": "Detalhes da sua experiência (opcional)",
       "experience_details_placeholder": "Descreva brevemente sua experiência como voluntário (eventos, funções, etc.)",
       "experience_label": "Já fui voluntário em eventos similares",
+      "export": "Exportar",
       "external_url_hint": "Link para o formulário ou plataforma externa de gestão de voluntários.",
       "external_url_label": "URL externa",
       "filter_status": "Filtrar por status",
@@ -899,7 +901,6 @@
       "vehicle_details_label": "Detalhes sobre seu veículo",
       "vehicle_details_placeholder": "Tipo de veículo, número de lugares, capacidade de carga...",
       "vehicle_label": "Tenho um veículo disponível",
-      "view_only_description": "Pode consultar as candidaturas, mas apenas os gestores de voluntários podem aceitar ou rejeitar candidaturas.",
       "view_only_note": "Modo somente consulta",
       "what_you_can_bring_title": "O que você pode nos trazer",
       "withdraw": "Retirar minha inscrição"
@@ -1046,6 +1047,11 @@
         "min": "O assunto deve ter pelo menos 5 caracteres"
       }
     }
+  },
+  "fieldErrors": {
+    "description": "A descrição não pode exceder 5000 caracteres",
+    "externalUrl": "A URL externa não é válida",
+    "setupStartDate": "A data de início da montagem é obrigatória"
   },
   "footer": {
     "copyright": "© {year} Convenção de Malabarismo. Todos os direitos reservados.",

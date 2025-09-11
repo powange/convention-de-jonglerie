@@ -421,6 +421,7 @@
     },
     "email": "Email",
     "error": "Error",
+    "export_success": "Export successful",
     "favorite": "Favorite",
     "inactive": "Inactive",
     "loading": "Loading...",
@@ -799,6 +800,7 @@
       "experience_details_label": "Details about your experience (optional)",
       "experience_details_placeholder": "Briefly describe your volunteer experience (events, roles, etc.)",
       "experience_label": "I have volunteered at similar events before",
+      "export": "Export",
       "external_url_hint": "Link to the external volunteer management form or platform.",
       "external_url_label": "External URL",
       "filter_status": "Filter by status",
@@ -899,7 +901,6 @@
       "vehicle_details_label": "Details about your vehicle",
       "vehicle_details_placeholder": "Vehicle type, number of seats, cargo capacity...",
       "vehicle_label": "I have a vehicle available",
-      "view_only_description": "You can view applications but only volunteer managers can accept or reject applications.",
       "view_only_note": "View-only mode",
       "what_you_can_bring_title": "What you can bring to us",
       "withdraw": "Withdraw my application"
@@ -1046,6 +1047,11 @@
         "min": "Subject must be at least 5 characters"
       }
     }
+  },
+  "fieldErrors": {
+    "description": "The description cannot exceed 5000 characters",
+    "externalUrl": "The external URL is not valid",
+    "setupStartDate": "The setup start date is required"
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. All rights reserved.",
@@ -1362,9 +1368,6 @@
     "direct_access": "Direct access to features",
     "enter_current_new_password": "Enter your current password and the new one",
     "enter_new_password": "Set a new password for your account",
-    "set_password": "Set password",
-    "no_password_set": "No password set",
-    "oauth_password_info": "You signed in with Google. You can set a password to sign in with your email.",
     "favorites": "Favorites",
     "favorites_received": "Favorites received",
     "first_name_placeholder": "Your first name",
@@ -1383,8 +1386,10 @@
     "my_statistics": "My statistics",
     "new_password": "New password",
     "new_password_placeholder": "Your new password",
+    "no_password_set": "No password set",
     "normal_active": "👤 Normal mode",
     "normal_mode": "Normal user",
+    "oauth_password_info": "You signed in with Google. You can set a password to sign in with your email.",
     "optional": "Optional",
     "optional_section_title": "Optional Information",
     "password_changed": "Password changed",
@@ -1408,6 +1413,7 @@
     "save_changes": "Save changes",
     "saving": "Saving...",
     "security": "Security",
+    "set_password": "Set password",
     "unsaved_changes": "You have unsaved changes",
     "username_help": "Publicly visible to other users",
     "username_min_3": "Username must contain at least 3 characters",

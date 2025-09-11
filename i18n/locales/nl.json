@@ -421,6 +421,7 @@
     },
     "email": "E-mail",
     "error": "Fout",
+    "export_success": "Export succesvol",
     "favorite": "Favoriet",
     "inactive": "Inactief",
     "loading": "Laden...",
@@ -799,6 +800,7 @@
       "experience_details_label": "Details van uw ervaring (optioneel)",
       "experience_details_placeholder": "Beschrijf kort uw ervaring als vrijwilliger (evenementen, rollen, enz.)",
       "experience_label": "Ik heb al vrijwilligerswerk gedaan bij vergelijkbare evenementen",
+      "export": "Exporteren",
       "external_url_hint": "Link naar het externe formulier of platform voor vrijwilligersbeheer.",
       "external_url_label": "Externe URL",
       "filter_status": "Filter op status",
@@ -899,7 +901,6 @@
       "vehicle_details_label": "Details over uw voertuig",
       "vehicle_details_placeholder": "Type voertuig, aantal stoelen, laadcapaciteit...",
       "vehicle_label": "Ik heb een voertuig beschikbaar",
-      "view_only_description": "U kunt de aanmeldingen bekijken, maar alleen vrijwilligersbeheerders kunnen aanmeldingen accepteren of afwijzen.",
       "view_only_note": "Alleen bekijkmodus",
       "what_you_can_bring_title": "Wat u ons kunt brengen",
       "withdraw": "Trek mijn aanmelding in"
@@ -1046,6 +1047,11 @@
         "min": "Onderwerp moet minimaal 5 tekens bevatten"
       }
     }
+  },
+  "fieldErrors": {
+    "description": "De beschrijving mag niet meer dan 5000 tekens bevatten",
+    "externalUrl": "De externe URL is niet geldig",
+    "setupStartDate": "De startdatum voor de opbouw is vereist"
   },
   "footer": {
     "copyright": "© {year} Jongleerconventie. Alle rechten voorbehouden.",

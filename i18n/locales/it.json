@@ -421,6 +421,7 @@
     },
     "email": "Email",
     "error": "Errore",
+    "export_success": "Esportazione riuscita",
     "favorite": "Preferito",
     "inactive": "Inattivo",
     "loading": "Caricamento...",
@@ -799,6 +800,7 @@
       "experience_details_label": "Dettagli della tua esperienza (opzionale)",
       "experience_details_placeholder": "Descrivi brevemente la tua esperienza come volontario (eventi, ruoli, ecc.)",
       "experience_label": "Ho già fatto volontariato in eventi simili",
+      "export": "Esporta",
       "external_url_hint": "Link al modulo o piattaforma esterna di gestione volontari.",
       "external_url_label": "URL esterno",
       "filter_status": "Filtra per stato",
@@ -899,7 +901,6 @@
       "vehicle_details_label": "Dettagli sul vostro veicolo",
       "vehicle_details_placeholder": "Tipo di veicolo, numero di posti, capacità di carico...",
       "vehicle_label": "Ho un veicolo a disposizione",
-      "view_only_description": "Potete consultare le candidature ma solo i gestori dei volontari possono accettare o rifiutare le candidature.",
       "view_only_note": "Solo modalità consultazione",
       "what_you_can_bring_title": "Cosa può portarci",
       "withdraw": "Ritira la mia candidatura"
@@ -1046,6 +1047,11 @@
         "min": "L'oggetto deve avere almeno 5 caratteri"
       }
     }
+  },
+  "fieldErrors": {
+    "description": "La descrizione non può superare i 5000 caratteri",
+    "externalUrl": "L'URL esterna non è valida",
+    "setupStartDate": "La data di inizio allestimento è obbligatoria"
   },
   "footer": {
     "copyright": "© {year} Convegni di Giocoleria. Tutti i diritti riservati.",

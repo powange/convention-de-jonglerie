@@ -421,6 +421,7 @@
     },
     "email": "Email",
     "error": "Fejl",
+    "export_success": "Eksport lykkedes",
     "favorite": "Favorit",
     "inactive": "Inaktiv",
     "loading": "Indlæser...",
@@ -799,6 +800,7 @@
       "experience_details_label": "Detaljer om din erfaring (valgfrit)",
       "experience_details_placeholder": "Beskriv kort din erfaring som frivillig (begivenheder, roller, osv.)",
       "experience_label": "Jeg har allerede været frivillig ved lignende begivenheder",
+      "export": "Eksporter",
       "external_url_hint": "Link til den eksterne formular eller platform for frivillige.",
       "external_url_label": "Ekstern URL",
       "filter_status": "Filtrer efter status",
@@ -899,7 +901,6 @@
       "vehicle_details_label": "Detaljer om dit køretøj",
       "vehicle_details_placeholder": "Type køretøj, antal sæder, lastekapacitet...",
       "vehicle_label": "Jeg har et køretøj til rådighed",
-      "view_only_description": "Du kan se ansøgningerne, men kun frivilligledere kan acceptere eller afvise ansøgninger.",
       "view_only_note": "Kun visning tilstand",
       "what_you_can_bring_title": "Hvad du kan bringe os",
       "withdraw": "Træk min ansøgning tilbage"
@@ -1046,6 +1047,11 @@
         "min": "Emnet skal være mindst 5 tegn"
       }
     }
+  },
+  "fieldErrors": {
+    "description": "Beskrivelsen må ikke overstige 5000 tegn",
+    "externalUrl": "Den externe URL er ikke gyldig",
+    "setupStartDate": "Startdato for opsætning er påkrævet"
   },
   "footer": {
     "copyright": "© {year} Jonglørkonvention. Alle rettigheder forbeholdes.",

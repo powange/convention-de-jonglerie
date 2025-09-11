@@ -421,6 +421,7 @@
     },
     "email": "E-Mail",
     "error": "Fehler",
+    "export_success": "Export erfolgreich",
     "favorite": "Favorit",
     "inactive": "Inaktiv",
     "loading": "Laden...",
@@ -799,6 +800,7 @@
       "experience_details_label": "Details zu Ihrer Erfahrung (optional)",
       "experience_details_placeholder": "Beschreiben Sie kurz Ihre Erfahrung als Freiwilliger (Veranstaltungen, Aufgaben, etc.)",
       "experience_label": "Ich habe bereits bei ähnlichen Veranstaltungen als Freiwilliger gearbeitet",
+      "export": "Exportieren",
       "external_url_hint": "Link zum externen Formular oder Plattform für Freiwillige.",
       "external_url_label": "Externe URL",
       "filter_status": "Nach Status filtern",
@@ -899,7 +901,6 @@
       "vehicle_details_label": "Details zu Ihrem Fahrzeug",
       "vehicle_details_placeholder": "Fahrzeugtyp, Anzahl Sitze, Ladekapazität...",
       "vehicle_label": "Ich habe ein Fahrzeug zur Verfügung",
-      "view_only_description": "Sie können die Bewerbungen einsehen, aber nur Freiwilligenverwalter können Bewerbungen annehmen oder ablehnen.",
       "view_only_note": "Nur-Ansicht-Modus",
       "what_you_can_bring_title": "Was Sie uns bringen können",
       "withdraw": "Meine Bewerbung zurückziehen"
@@ -1046,6 +1047,11 @@
         "min": "Der Betreff muss mindestens 5 Zeichen haben"
       }
     }
+  },
+  "fieldErrors": {
+    "description": "Die Beschreibung darf nicht mehr als 5000 Zeichen haben",
+    "externalUrl": "Die externe URL ist nicht gültig",
+    "setupStartDate": "Das Startdatum für den Aufbau ist erforderlich"
   },
   "footer": {
     "copyright": "© {year} Jonglier-Convention. Alle Rechte vorbehalten.",
