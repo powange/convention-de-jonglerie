@@ -1,29 +1,26 @@
 import { useAuthStore } from '~/stores/auth'
 
-import type { FetchOptions } from 'ofetch'
-
 export default defineNuxtPlugin(() => {
   if (import.meta.client) {
     const authStore = useAuthStore()
 
-    // Hook global pour intercepter les requêtes $fetch
+    // Intercepter les requêtes avec ofetch hook
     const nuxtApp = useNuxtApp()
 
-    // Remplacer $fetch par notre version qui ajoute le header admin
+    // Créer une instance $fetch personnalisée avec le header admin
     const enhancedFetch = $fetch.create({
-      onRequest({ options }: { options: FetchOptions }) {
-        // Ajouter le header X-Admin-Mode si le mode admin est activé
+      onRequest({ options }) {
         if (authStore.isAdminModeActive) {
-          if (!options.headers) {
-            options.headers = {}
+          options.headers = {
+            ...options.headers,
+            'X-Admin-Mode': 'true',
           }
-          // Ajouter le header pour indiquer que le mode admin est activé
-          ;(options.headers as Record<string, string>)['X-Admin-Mode'] = 'true'
         }
       },
     })
 
-    // Remplacer $fetch global
+    // Remplacer $fetch global et celui de Nuxt
+    globalThis.$fetch = enhancedFetch
     nuxtApp.provide('fetch', enhancedFetch)
   }
 })

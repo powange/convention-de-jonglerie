@@ -115,8 +115,20 @@ export async function canManageEditionVolunteers(
   userId: number,
   event?: any
 ): Promise<boolean> {
-  // Vérifier si l'utilisateur est un super-admin avec mode admin activé
-  if (await checkAdminMode(userId, event)) {
+  // Vérifier d'abord si l'utilisateur est un super-admin
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { isGlobalAdmin: true },
+  })
+
+  // Pour les super-admins : vérifier le mode admin seulement pour les actions sensibles
+  if (user?.isGlobalAdmin) {
+    // Si c'est une action sensible (modification/suppression), vérifier le mode admin
+    const isSensitiveAction = event?.node?.req?.method !== 'GET'
+    if (isSensitiveAction) {
+      return await checkAdminMode(userId, event)
+    }
+    // Pour la lecture, les super-admins ont accès direct
     return true
   }
 

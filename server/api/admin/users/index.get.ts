@@ -1,29 +1,16 @@
 import { PrismaClient } from '@prisma/client'
 
-import { requireUserSession } from '#imports'
-
-import { checkAdminMode } from '../../../utils/collaborator-management'
-
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   try {
-    // Vérifier l'authentification via la session scellée
-    const { user } = await requireUserSession(event)
-    const userId = user.id
+    const user = event.context.user
 
-    if (!userId) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token invalide',
-      })
-    }
-
-    // Vérifier que l'utilisateur est un super administrateur ET que le mode admin est activé
-    if (!(await checkAdminMode(userId, event))) {
+    // Vérifier que l'utilisateur est un super administrateur
+    if (!user || !user.isGlobalAdmin) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Accès refusé - Droits super administrateur requis et mode admin activé',
+        statusMessage: "Accès refusé. Droits d'administrateur requis.",
       })
     }
 
