@@ -380,7 +380,7 @@
             class="transition-all duration-200 hover:transform hover:scale-105 justify-start"
             @click="showPasswordModal = true"
           >
-            {{ $t('profile.change_password') }}
+            {{ userHasPassword ? $t('profile.change_password') : $t('profile.set_password') }}
           </UButton>
         </UCard>
 
@@ -517,7 +517,11 @@
               {{ $t('profile.change_password') }}
             </h3>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-              {{ $t('profile.enter_current_new_password') }}
+              {{
+                userHasPassword
+                  ? $t('profile.enter_current_new_password')
+                  : $t('profile.enter_new_password')
+              }}
             </p>
           </div>
         </div>
@@ -530,7 +534,11 @@
           class="space-y-6"
           @submit="changePassword"
         >
-          <UFormField :label="t('profile.current_password')" name="currentPassword">
+          <UFormField
+            v-if="userHasPassword"
+            :label="t('profile.current_password')"
+            name="currentPassword"
+          >
             <UInput
               v-model="passwordState.currentPassword"
               type="password"
@@ -541,6 +549,21 @@
               class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
             />
           </UFormField>
+
+          <UAlert
+            v-else
+            icon="i-heroicons-information-circle"
+            color="info"
+            variant="soft"
+            class="mb-4"
+          >
+            <template #title>
+              {{ $t('profile.no_password_set') }}
+            </template>
+            <template #description>
+              {{ $t('profile.oauth_password_info') }}
+            </template>
+          </UAlert>
 
           <UFormField :label="t('profile.new_password')" name="newPassword">
             <UInput
@@ -707,6 +730,7 @@ const loading = ref(false)
 const passwordLoading = ref(false)
 const showPasswordModal = ref(false)
 const showProfilePictureModal = ref(false)
+const userHasPassword = ref(true) // Par défaut, on suppose qu'il a un mot de passe
 const profilePictureUrl = ref(authStore.user?.profilePicture || '')
 const avatarKey = ref(Date.now()) // Pour forcer le rechargement de l'avatar
 const pictureValidationLoading = ref(false) // Loading lors de la validation
@@ -727,20 +751,34 @@ const schema = z.object({
 })
 
 // Schéma pour le changement de mot de passe
-const passwordSchema = z
-  .object({
-    currentPassword: z.string().min(1, t('profile.current_password_required')),
+const passwordSchema = computed(() => {
+  const baseSchema = {
     newPassword: z
       .string()
       .min(8, t('errors.password_too_short'))
       .regex(/(?=.*[A-Z])/, t('profile.password_uppercase_required'))
       .regex(/(?=.*\d)/, t('profile.password_digit_required')),
     confirmPassword: z.string(),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
+  }
+
+  // Ajouter currentPassword seulement si l'utilisateur a déjà un mot de passe
+  if (userHasPassword.value) {
+    return z
+      .object({
+        currentPassword: z.string().min(1, t('profile.current_password_required')),
+        ...baseSchema,
+      })
+      .refine((data) => data.newPassword === data.confirmPassword, {
+        message: t('profile.passwords_dont_match'),
+        path: ['confirmPassword'],
+      })
+  }
+
+  return z.object(baseSchema).refine((data) => data.newPassword === data.confirmPassword, {
     message: t('profile.passwords_dont_match'),
     path: ['confirmPassword'],
   })
+})
 
 // État du formulaire principal
 const state = reactive({
@@ -999,5 +1037,15 @@ const toggleAdminMode = (enabled: boolean) => {
 
 onMounted(async () => {
   await editionStore.fetchEditions()
+
+  // Vérifier si l'utilisateur a un mot de passe
+  try {
+    const { hasPassword } = await $fetch('/api/profile/has-password')
+    userHasPassword.value = hasPassword
+  } catch (error) {
+    console.error('Erreur lors de la vérification du mot de passe:', error)
+    // En cas d'erreur, on suppose qu'il a un mot de passe pour la sécurité
+    userHasPassword.value = true
+  }
 })
 </script>

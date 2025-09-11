@@ -59,8 +59,11 @@ export default defineEventHandler(async (event) => {
           statusMessage: 'Mot de passe actuel requis',
         })
       }
-      
-      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, userWithPassword.password)
+
+      const isCurrentPasswordValid = await bcrypt.compare(
+        currentPassword,
+        userWithPassword.password
+      )
 
       if (!isCurrentPasswordValid) {
         throw createError({
