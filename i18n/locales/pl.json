@@ -792,6 +792,7 @@
       "companion_hint": "Opcjonalne - Ta informacja pomaga organizatorom tworzyć zespoły z innymi wolontariuszami, których znasz",
       "companion_label": "Wolontariusze, z którymi chciałbym pracować na zmianach (opcjonalne)",
       "companion_placeholder": "Imiona innych preferowanych wolontariuszy do zmian...",
+      "confirm_back_pending": "Czy na pewno chcesz przywrócić tę aplikację do statusu oczekującej?",
       "departure_time_label": "Kiedy planuje Pan/Pani wyjechalć?",
       "description_label": "Opis dla wolontariuszy",
       "diet_label": "Preferencje żywieniowe",

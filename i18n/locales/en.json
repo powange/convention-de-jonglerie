@@ -763,6 +763,7 @@
       "action_accept": "Accept",
       "action_back_pending": "Back to pending",
       "action_reject": "Reject",
+      "confirm_back_pending": "Are you sure you want to set this application back to pending?",
       "additional_info_title": "Additional information",
       "admin_only_note": "The following information (applications, filters and detailed statistics) is visible only to authorized organizers and collaborators.",
       "allergies_hint": "List only significant medical allergies",

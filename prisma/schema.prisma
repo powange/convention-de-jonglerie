@@ -395,6 +395,7 @@ model EditionVolunteerApplication {
   motivation           String?           @db.Text
   allergies            String?           @db.Text
   createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
   decidedAt            DateTime?
   userSnapshotPhone    String?
   dietaryPreference    DietaryPreference @default(NONE)

@@ -131,6 +131,7 @@ export default defineEventHandler(async (event) => {
       experienceDetails: true,
       setupAvailability: true,
       teardownAvailability: true,
+      eventAvailability: true,
       arrivalDateTime: true,
       departureDateTime: true,
       user: {
@@ -163,6 +164,7 @@ export default defineEventHandler(async (event) => {
       'Expérience',
       'Montage',
       'Démontage',
+      'Événement',
       'Arrivée',
       'Départ',
     ]
@@ -231,6 +233,7 @@ export default defineEventHandler(async (event) => {
           : 'Non',
         formatBoolean(app.setupAvailability),
         formatBoolean(app.teardownAvailability),
+        formatBoolean(app.eventAvailability),
         formatDateTimeWithGranularity(app.arrivalDateTime || ''),
         formatDateTimeWithGranularity(app.departureDateTime || ''),
       ].map((cell) => `"${(cell || '').toString().replace(/"/g, '""')}"`)

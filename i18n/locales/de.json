@@ -792,6 +792,7 @@
       "companion_hint": "Optional - Diese Information hilft Organisatoren, Teams mit anderen Freiwilligen zu bilden, die Sie kennen",
       "companion_label": "Freiwillige, mit denen ich Schichten arbeiten möchte (optional)",
       "companion_placeholder": "Namen anderer bevorzugter Freiwilliger für Schichten...",
+      "confirm_back_pending": "Sind Sie sicher, dass Sie diese Bewerbung auf ausstehend zurücksetzen möchten?",
       "departure_time_label": "Wann planen Sie abzureisen?",
       "description_label": "Beschreibung für Freiwillige",
       "diet_label": "Ernährungspräferenz",

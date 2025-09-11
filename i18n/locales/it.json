@@ -792,6 +792,7 @@
       "companion_hint": "Opzionale - Queste informazioni aiutano gli organizzatori a formare squadre con altri volontari che conosci",
       "companion_label": "Volontari con cui vorrei fare i turni (opzionale)",
       "companion_placeholder": "Nomi di altri volontari preferiti per i turni...",
+      "confirm_back_pending": "Sei sicuro di voler rimettere questa candidatura in attesa?",
       "departure_time_label": "Quando prevede di partire?",
       "description_label": "Descrizione per volontari",
       "diet_label": "Preferenza alimentare",

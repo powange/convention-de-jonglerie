@@ -145,6 +145,28 @@ async function main() {
     { email: 'eve.contact@example.com', pseudo: 'EveContact', nom: 'Moreau', prenom: 'Eve' },
   ]
 
+  // Créer des utilisateurs spécialement pour les candidatures de bénévolat
+  const volunteerUsers = [
+    {
+      email: 'marie.benevole@example.com',
+      pseudo: 'MarieVolunteer',
+      nom: 'Dupont',
+      prenom: 'Marie',
+    },
+    { email: 'paul.aidant@example.com', pseudo: 'PaulHelper', nom: 'Lemoine', prenom: 'Paul' },
+    {
+      email: 'sophie.entraide@example.com',
+      pseudo: 'SophieSupport',
+      nom: 'Bernard',
+      prenom: 'Sophie',
+    },
+    { email: 'lucas.engagement@example.com', pseudo: 'LucasCommit', nom: 'Petit', prenom: 'Lucas' },
+    { email: 'emma.solidaire@example.com', pseudo: 'EmmaSolid', nom: 'Roux', prenom: 'Emma' },
+    { email: 'thomas.devoue@example.com', pseudo: 'ThomasDevoted', nom: 'Blanc', prenom: 'Thomas' },
+    { email: 'chloe.investie@example.com', pseudo: 'ChloeInvested', nom: 'Lopez', prenom: 'Chloé' },
+    { email: 'alex.motive@example.com', pseudo: 'AlexMotiv', nom: 'Garcia', prenom: 'Alex' },
+  ]
+
   const createdUsers = [user, superAdmin, powangeUser] // Inclure l'admin, le superadmin et powange
 
   for (const userData of testUsers) {
@@ -162,6 +184,24 @@ async function main() {
       console.log(`Utilisateur de test existant: ${testUser.email} (id=${testUser.id})`)
     }
     createdUsers.push(testUser)
+  }
+
+  // Créer les utilisateurs bénévoles
+  for (const volunteerData of volunteerUsers) {
+    let volunteerUser = await prisma.user.findUnique({ where: { email: volunteerData.email } })
+    if (!volunteerUser) {
+      volunteerUser = await prisma.user.create({
+        data: {
+          ...volunteerData,
+          password: await bcrypt.hash('volunteer123', 10),
+          isEmailVerified: true,
+        },
+      })
+      console.log(`Utilisateur bénévole créé: ${volunteerUser.email} (id=${volunteerUser.id})`)
+    } else {
+      console.log(`Utilisateur bénévole existant: ${volunteerUser.email} (id=${volunteerUser.id})`)
+    }
+    createdUsers.push(volunteerUser)
   }
 
   // Définitions de conventions à insérer
@@ -534,13 +574,216 @@ async function main() {
     }
   }
 
+  // Configurer les appels à bénévoles sur certaines éditions et créer des candidatures
+  console.log('Configuration des appels à bénévoles...')
+  let volunteerApplicationsCount = 0
+  let volunteerSettingsCount = 0
+
+  for (const edition of createdEditions) {
+    // Configurer un appel à bénévoles sur environ 60% des éditions
+    if (Math.random() > 0.4) {
+      const setupStartDate = new Date(edition.startDate)
+      setupStartDate.setDate(setupStartDate.getDate() - Math.floor(Math.random() * 3) - 1) // 1-3 jours avant
+
+      const teardownEndDate = new Date(edition.endDate)
+      teardownEndDate.setDate(teardownEndDate.getDate() + Math.floor(Math.random() * 2) + 1) // 1-2 jours après
+
+      // Configurer les paramètres de bénévolat de l'édition
+      await prisma.edition.update({
+        where: { id: edition.id },
+        data: {
+          volunteersOpen: true,
+          volunteersDescription: `Rejoins l'équipe bénévole de ${edition.name} ! Nous recherchons des personnes motivées pour nous aider dans l'organisation de cet événement incroyable. Différentes missions sont disponibles : accueil, logistique, technique, restauration...`,
+          volunteersMode: 'INTERNAL',
+          volunteersSetupStartDate: setupStartDate,
+          volunteersTeardownEndDate: teardownEndDate,
+          volunteersAskDiet: true,
+          volunteersAskAllergies: true,
+          volunteersAskTimePreferences: Math.random() > 0.5,
+          volunteersAskTeamPreferences: Math.random() > 0.3,
+          volunteersAskPets: Math.random() > 0.7,
+          volunteersAskMinors: Math.random() > 0.6,
+          volunteersAskVehicle: Math.random() > 0.4,
+          volunteersAskCompanion: Math.random() > 0.5,
+          volunteersAskAvoidList: Math.random() > 0.8,
+          volunteersAskSkills: true,
+          volunteersAskExperience: true,
+          volunteersAskSetup: true,
+          volunteersAskTeardown: true,
+        },
+      })
+      volunteerSettingsCount++
+
+      // Créer des équipes bénévoles si demandées
+      const teams: { name: string; slots: number }[] = []
+      if (Math.random() > 0.5) {
+        const teamNames = [
+          'Accueil',
+          'Logistique',
+          'Technique',
+          'Restauration',
+          'Animation',
+          'Sécurité',
+        ]
+        const numTeams = Math.floor(Math.random() * 4) + 2 // 2-5 équipes
+        for (let i = 0; i < numTeams; i++) {
+          const teamName = teamNames[Math.floor(Math.random() * teamNames.length)]
+          if (!teams.find((t) => t.name === teamName)) {
+            teams.push({
+              name: teamName,
+              slots: Math.floor(Math.random() * 8) + 3, // 3-10 places par équipe
+            })
+          }
+        }
+
+        await prisma.edition.update({
+          where: { id: edition.id },
+          data: {
+            volunteersTeams: teams,
+          },
+        })
+      }
+
+      // Créer des candidatures de bénévoles
+      const numApplications = Math.floor(Math.random() * 6) + 3 // 3-8 candidatures par édition
+      const shuffledVolunteers = [...volunteerUsers, ...testUsers].sort(() => Math.random() - 0.5)
+
+      for (let i = 0; i < Math.min(numApplications, shuffledVolunteers.length); i++) {
+        const volunteer = createdUsers.find((u) => u.email === shuffledVolunteers[i].email)
+        if (!volunteer) continue
+
+        // Vérifier qu'il n'y a pas déjà une candidature
+        const existingApplication = await prisma.editionVolunteerApplication.findFirst({
+          where: {
+            editionId: edition.id,
+            userId: volunteer.id,
+          },
+        })
+
+        if (existingApplication) continue
+
+        // Dates d'arrivée et départ réalistes
+        const arrivalOptions = ['morning', 'noon', 'afternoon', 'evening']
+        const departureOptions = ['morning', 'noon', 'afternoon', 'evening']
+
+        const arrivalDate = new Date(Math.random() > 0.3 ? edition.startDate : setupStartDate)
+        const departureDate = new Date(Math.random() > 0.3 ? edition.endDate : teardownEndDate)
+
+        const arrivalDateTime = `${arrivalDate.toISOString().split('T')[0]}_${arrivalOptions[Math.floor(Math.random() * arrivalOptions.length)]}`
+        const departureDateTime = `${departureDate.toISOString().split('T')[0]}_${departureOptions[Math.floor(Math.random() * departureOptions.length)]}`
+
+        // Préférences alimentaires réalistes
+        const dietaryOptions = ['NONE', 'VEGETARIAN', 'VEGAN']
+        const dietaryWeights = [0.7, 0.2, 0.1] // 70% aucun, 20% végétarien, 10% vegan
+        let dietaryPreference = 'NONE'
+        const rand = Math.random()
+        if (rand < dietaryWeights[2]) dietaryPreference = 'VEGAN'
+        else if (rand < dietaryWeights[1] + dietaryWeights[2]) dietaryPreference = 'VEGETARIAN'
+
+        // Disponibilités setup/teardown
+        const setupAvailability = Math.random() > 0.4 ? true : null
+        const teardownAvailability = Math.random() > 0.5 ? true : null
+
+        const hasExperience = Math.random() > 0.4
+
+        // Générer des préférences horaires aléatoires
+        const timeSlots = [
+          'early_morning',
+          'morning',
+          'lunch',
+          'early_afternoon',
+          'late_afternoon',
+          'evening',
+          'late_evening',
+          'night',
+        ]
+
+        let timePreferencesArray: string[] | undefined = undefined
+        if (Math.random() > 0.4) {
+          // 60% ont des préférences horaires
+          const numPreferences = Math.floor(Math.random() * 4) + 1 // 1-4 créneaux
+          const shuffledSlots = [...timeSlots].sort(() => Math.random() - 0.5)
+          timePreferencesArray = shuffledSlots.slice(0, numPreferences)
+        }
+
+        const application = await prisma.editionVolunteerApplication.create({
+          data: {
+            editionId: edition.id,
+            userId: volunteer.id,
+            status:
+              Math.random() > 0.15 ? 'ACCEPTED' : Math.random() > 0.5 ? 'PENDING' : 'REJECTED', // 85% acceptées
+            arrivalDateTime,
+            departureDateTime,
+            dietaryPreference: dietaryPreference as any,
+            allergies:
+              Math.random() > 0.8
+                ? ['Arachides', 'Gluten', 'Lactose', 'Fruits à coque'][
+                    Math.floor(Math.random() * 4)
+                  ]
+                : null,
+            timePreferences: timePreferencesArray || undefined,
+            teamPreferences:
+              teams.length > 0 && Math.random() > 0.6
+                ? [
+                    teams[Math.floor(Math.random() * teams.length)].name,
+                    ...(Math.random() > 0.5 && teams.length > 1
+                      ? [teams[Math.floor(Math.random() * teams.length)].name]
+                      : []),
+                  ].filter((value, index, self) => self.indexOf(value) === index) // Enlever les doublons
+                : undefined,
+            hasPets: Math.random() > 0.8 ? true : null,
+            petsDetails: Math.random() > 0.8 && Math.random() > 0.5 ? 'Un chat très calme' : null,
+            hasMinors: Math.random() > 0.9 ? true : null,
+            minorsDetails: Math.random() > 0.9 && Math.random() > 0.5 ? 'Un enfant de 8 ans' : null,
+            hasVehicle: Math.random() > 0.6 ? true : null,
+            vehicleDetails: Math.random() > 0.6 && Math.random() > 0.5 ? 'Voiture 5 places' : null,
+            companionName:
+              Math.random() > 0.8
+                ? ['Alex Martin', 'Sarah Durand', 'Tom Berger'][Math.floor(Math.random() * 3)]
+                : null,
+            avoidList: Math.random() > 0.9 ? 'Préfère éviter les tâches en hauteur' : null,
+            skills: [
+              'Expérience en événementiel',
+              'Permis poids lourd',
+              'Connaissance technique son/lumière',
+              'Animation jeunesse',
+              'Premiers secours',
+              'Cuisine collective',
+            ][Math.floor(Math.random() * 6)],
+            hasExperience,
+            experienceDetails: hasExperience ? 'Déjà bénévole sur plusieurs conventions' : null,
+            setupAvailability,
+            teardownAvailability,
+            eventAvailability:
+              !setupAvailability && !teardownAvailability
+                ? true
+                : Math.random() > 0.3
+                  ? true
+                  : null,
+            motivation: [
+              'Envie de contribuer à la réussite de cet événement !',
+              'Passionné de jonglerie et désir de donner de mon temps',
+              'Expérience enrichissante et rencontres garanties',
+              "Plaisir de participer à l'organisation d'une belle convention",
+            ][Math.floor(Math.random() * 4)],
+          },
+        })
+        volunteerApplicationsCount++
+      }
+    }
+  }
+
   console.log('Seed dev terminé avec succès !')
   if (doReset) console.log('(Reset préalable exécuté)')
-  console.log(`- ${createdUsers.length} utilisateurs créés/vérifiés (dont 1 superadmin)`)
+  console.log(
+    `- ${createdUsers.length} utilisateurs créés/vérifiés (dont 1 superadmin et ${volunteerUsers.length} bénévoles)`
+  )
   console.log(`- ${conventions.length} conventions créées/vérifiées`)
   console.log(`- ${createdEditions.length} éditions créées avec dates variées`)
   console.log('- Posts et commentaires ajoutés sur les éditions')
   console.log('- Propositions de covoiturage et commentaires ajoutés')
+  console.log(`- ${volunteerSettingsCount} éditions configurées avec appels à bénévoles`)
+  console.log(`- ${volunteerApplicationsCount} candidatures de bénévolat créées (85% acceptées)`)
 }
 
 main()

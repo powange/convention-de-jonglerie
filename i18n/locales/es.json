@@ -792,6 +792,7 @@
       "companion_hint": "Opcional - Esta información ayuda a los organizadores a formar equipos con otros voluntarios que conoces",
       "companion_label": "Voluntarios con los que me gustaría trabajar turnos (opcional)",
       "companion_placeholder": "Nombres de otros voluntarios preferidos para turnos...",
+      "confirm_back_pending": "¿Está seguro de que desea volver a poner esta solicitud en espera?",
       "departure_time_label": "¿Cuándo planea marcharse?",
       "description_label": "Descripción para voluntarios",
       "diet_label": "Preferencia alimentaria",

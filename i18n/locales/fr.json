@@ -751,6 +751,7 @@
       "action_accept": "Accepter",
       "action_back_pending": "Remettre en attente",
       "action_reject": "Refuser",
+      "confirm_back_pending": "Êtes-vous sûr de vouloir remettre cette candidature en attente ?",
       "admin_only_note": "Les informations suivantes (candidatures, filtres et statistiques détaillées) sont visibles uniquement par les organisateurs et collaborateurs autorisés.",
       "view_only_note": "Mode consultation uniquement",
       "export": "Exporter",

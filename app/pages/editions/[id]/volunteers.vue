@@ -1088,6 +1088,84 @@ const columns: TableColumn<any>[] = [
     header: ({ column }) => getSortableHeader(column, t('editions.volunteers.table_last_name')),
     cell: ({ row }) => row.original.user.nom || '—',
   },
+  // Colonne présence
+  {
+    accessorKey: 'presence',
+    header: t('editions.volunteers.table_presence'),
+    cell: ({ row }: any) => {
+      const hasSetupAvailability = row.original.setupAvailability
+      const hasTeardownAvailability = row.original.teardownAvailability
+      const hasEventAvailability = row.original.eventAvailability
+      const arrivalDateTime = row.original.arrivalDateTime
+      const departureDateTime = row.original.departureDateTime
+
+      if (
+        !hasSetupAvailability &&
+        !hasTeardownAvailability &&
+        !hasEventAvailability &&
+        !arrivalDateTime &&
+        !departureDateTime
+      ) {
+        return h('span', '—')
+      }
+
+      // Construire les lignes d'affichage
+      const lines = []
+
+      // 1. Disponibilités (montage/événement/démontage)
+      const availabilities = []
+      if (hasSetupAvailability) availabilities.push('Montage')
+      if (hasEventAvailability) availabilities.push('Événement')
+      if (hasTeardownAvailability) availabilities.push('Démontage')
+
+      if (availabilities.length > 0) {
+        lines.push(
+          h(
+            'div',
+            { class: 'text-xs font-medium text-gray-900 dark:text-gray-100' },
+            availabilities.join(' • ')
+          )
+        )
+      }
+
+      // 2. Date d'arrivée avec granularité et icône
+      if (arrivalDateTime) {
+        lines.push(
+          h('div', { class: 'flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400' }, [
+            h(resolveComponent('UIcon'), {
+              name: 'i-heroicons-arrow-right-end-on-rectangle',
+              class: 'text-gray-500',
+              size: '12',
+            }),
+            h('span', formatDateTimeWithGranularity(arrivalDateTime)),
+          ])
+        )
+      }
+
+      // 3. Date de départ avec granularité et icône
+      if (departureDateTime) {
+        lines.push(
+          h('div', { class: 'flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400' }, [
+            h(resolveComponent('UIcon'), {
+              name: 'i-heroicons-arrow-left-start-on-rectangle',
+              class: 'text-gray-500',
+              size: '12',
+            }),
+            h('span', formatDateTimeWithGranularity(departureDateTime)),
+          ])
+        )
+      }
+
+      return h(
+        'div',
+        {
+          class: 'flex flex-col gap-1 py-1',
+        },
+        lines
+      )
+    },
+    size: 180,
+  } as TableColumn<any>,
   // Colonne régime si activée
   ...(volunteersInfo.value?.askDiet
     ? [
@@ -1392,63 +1470,6 @@ const columns: TableColumn<any>[] = [
         } as TableColumn<any>,
       ]
     : []),
-  // Colonne présence
-  {
-    accessorKey: 'presence',
-    header: t('editions.volunteers.table_presence'),
-    cell: ({ row }: any) => {
-      const hasSetupAvailability = row.original.setupAvailability
-      const hasTeardownAvailability = row.original.teardownAvailability
-      const hasEventAvailability = row.original.eventAvailability
-      const arrivalDateTime = row.original.arrivalDateTime
-      const departureDateTime = row.original.departureDateTime
-
-      if (
-        !hasSetupAvailability &&
-        !hasTeardownAvailability &&
-        !hasEventAvailability &&
-        !arrivalDateTime &&
-        !departureDateTime
-      ) {
-        return h('span', '—')
-      }
-
-      const details = []
-      if (hasSetupAvailability) details.push('Montage')
-      if (hasTeardownAvailability) details.push('Démontage')
-      if (hasEventAvailability) details.push('Événement')
-      if (arrivalDateTime)
-        details.push(`Arrivée: ${formatDateTimeWithGranularity(arrivalDateTime)}`)
-      if (departureDateTime)
-        details.push(`Départ: ${formatDateTimeWithGranularity(departureDateTime)}`)
-
-      const text = details.slice(0, 2).join(', ')
-      const fullText = details.join('\n')
-
-      return h(
-        resolveComponent('UTooltip'),
-        { text: fullText, openDelay: 200 },
-        {
-          default: () =>
-            h(
-              'div',
-              {
-                class: 'flex items-center gap-1 cursor-help',
-              },
-              [
-                h('span', { class: 'text-xs max-w-[120px] truncate' }, text),
-                h(resolveComponent('UIcon'), {
-                  name: 'i-heroicons-information-circle',
-                  class: 'text-gray-400',
-                  size: '14',
-                }),
-              ]
-            ),
-        }
-      )
-    },
-    size: 140,
-  } as TableColumn<any>,
   {
     accessorKey: 'createdAt',
     header: ({ column }) => getSortableHeader(column, t('common.date')),
@@ -1516,7 +1537,11 @@ const columns: TableColumn<any>[] = [
               variant: 'soft',
               loading:
                 applicationsActingId.value === row.original.id && actingAction.value === 'PENDING',
-              onClick: () => decideApplication(row.original, 'PENDING' as any),
+              onClick: () => {
+                if (confirm(t('editions.volunteers.confirm_back_pending'))) {
+                  decideApplication(row.original, 'PENDING' as any)
+                }
+              },
             },
             () => t('editions.volunteers.action_back_pending')
           ),
