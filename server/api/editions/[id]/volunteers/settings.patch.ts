@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { canManageEditionVolunteers } from '../../../../utils/collaborator-management'
 import { prisma } from '../../../../utils/prisma'
+import { handleValidationError } from '../../../../utils/validation-schemas'
 
 const bodySchema = z
   .object({
@@ -109,8 +110,19 @@ export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   if (!editionId) throw createError({ statusCode: 400, statusMessage: 'Edition invalide' })
+
   const body = await readBody(event).catch(() => ({}))
-  const parsed = bodySchema.parse(body || {})
+
+  // Validation avec gestion d'erreur appropriée
+  let parsed
+  try {
+    parsed = bodySchema.parse(body || {})
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      handleValidationError(error)
+    }
+    throw error
+  }
 
   // Permission: auteur convention ou collaborateur avec droit gestion bénévoles
   const edition = (await prisma.edition.findUnique({

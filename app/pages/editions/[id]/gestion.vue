@@ -177,7 +177,11 @@
               />
               <!-- Description des bénévoles (Markdown) -->
               <div class="space-y-2">
-                <UFormField :label="t('editions.volunteers.description_label')" class="w-full">
+                <UFormField
+                  :label="t('editions.volunteers.description_label')"
+                  class="w-full"
+                  :error="fieldErrors.description"
+                >
                   <div v-if="canEdit || canManageVolunteers" class="space-y-2">
                     <MinimalMarkdownEditor
                       v-model="volunteersDescriptionLocal"
@@ -251,7 +255,10 @@
 
                 <!-- Lien externe -->
                 <div class="pl-1">
-                  <UFormField :label="t('editions.volunteers.external_url_label')">
+                  <UFormField
+                    :label="t('editions.volunteers.external_url_label')"
+                    :error="fieldErrors.externalUrl"
+                  >
                     <UInput
                       v-model="volunteersExternalUrlLocal"
                       :placeholder="'https://...'"
@@ -282,7 +289,10 @@
 
                 <!-- Dates de montage -->
                 <div class="space-y-4 mb-4">
-                  <UFormField :label="t('editions.volunteers.setup_start_date_label')">
+                  <UFormField
+                    :label="t('editions.volunteers.setup_start_date_label')"
+                    :error="fieldErrors.setupStartDate"
+                  >
                     <UPopover>
                       <UButtonGroup>
                         <UButton
@@ -316,7 +326,12 @@
                         <UCalendar
                           v-model="volunteersSetupStartDateLocal"
                           :max-value="setupStartDateMaxValue"
-                          @update:model-value="() => persistVolunteerSettings()"
+                          @update:model-value="
+                            () => {
+                              clearFieldError('setupStartDate')
+                              persistVolunteerSettings()
+                            }
+                          "
                         />
                       </template>
                     </UPopover>
@@ -636,6 +651,19 @@ const setupEndDateMinValue = computed(() => {
   return fromDate(new Date(edition.value.endDate), 'UTC')
 })
 
+// Gestion des erreurs de validation par champ
+const fieldErrors = ref<Record<string, string>>({})
+
+// Fonction pour effacer l'erreur d'un champ spécifique
+const clearFieldError = (fieldName: string) => {
+  if (fieldErrors.value[fieldName]) {
+    const newErrors = { ...fieldErrors.value }
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete newErrors[fieldName]
+    fieldErrors.value = newErrors
+  }
+}
+
 const volunteersOpenLocal = ref(false)
 const volunteersModeLocal = ref<'INTERNAL' | 'EXTERNAL'>('INTERNAL')
 const volunteersExternalUrlLocal = ref('')
@@ -674,6 +702,10 @@ const volunteersDescriptionDirty = computed(
 const remainingVolunteerDescriptionChars = computed(
   () => `${volunteersDescriptionLocal.value.length}`
 )
+
+// Watchers pour effacer les erreurs quand les champs sont modifiés
+watch(volunteersDescriptionLocal, () => clearFieldError('description'))
+watch(volunteersExternalUrlLocal, () => clearFieldError('externalUrl'))
 
 onMounted(async () => {
   if (!edition.value) {
@@ -832,11 +864,24 @@ const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {})
       })
     }
   } catch (e: any) {
-    toast.add({
-      title: e?.statusMessage || t('common.error'),
-      color: 'error',
-      icon: 'i-heroicons-x-circle',
-    })
+    // Gérer les erreurs de validation par champ
+    if (e?.data?.data?.errors) {
+      fieldErrors.value = e.data.data.errors
+      toast.add({
+        title: e.data.data.message || 'Erreurs de validation',
+        description: 'Veuillez corriger les erreurs dans le formulaire',
+        color: 'error',
+        icon: 'i-heroicons-x-circle',
+      })
+    } else {
+      // Erreur générale
+      fieldErrors.value = {}
+      toast.add({
+        title: e?.data?.statusMessage || e?.statusMessage || t('common.error'),
+        color: 'error',
+        icon: 'i-heroicons-x-circle',
+      })
+    }
   } finally {
     savingVolunteers.value = false
   }

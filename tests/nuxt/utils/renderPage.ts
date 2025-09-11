@@ -61,7 +61,7 @@ export async function renderRawPage(routePath: string) {
     { path: '/editions/:id/edit', component: Comp },
     { path: '/editions/:id/objets-trouves', component: Comp },
     { path: '/editions/:id/commentaires', component: Comp },
-    { path: '/editions/:id/covoiturage', component: Comp },
+    { path: '/editions/:id/carpool', component: Comp },
     // Route demandée en dernier (si non couverte par dynamique) afin de ne pas masquer les params
     { path: routePath, component: Comp },
   ]

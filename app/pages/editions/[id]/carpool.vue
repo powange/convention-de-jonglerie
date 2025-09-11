@@ -10,7 +10,7 @@
       <!-- En-tête avec navigation -->
       <EditionHeader
         :edition="edition"
-        current-page="covoiturage"
+        current-page="carpool"
         :is-favorited="isFavorited(edition.id)"
         @toggle-favorite="toggleFavorite(edition.id)"
       />

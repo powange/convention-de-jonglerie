@@ -405,7 +405,7 @@
       <p class="text-gray-600 dark:text-gray-400 mb-4">
         {{ $t('pages.volunteers.no_applications_description') }}
       </p>
-      <UButton to="/conventions" color="primary" icon="i-heroicons-magnifying-glass">
+      <UButton to="/" color="primary" icon="i-heroicons-magnifying-glass">
         {{ $t('pages.volunteers.browse_conventions') }}
       </UButton>
     </div>

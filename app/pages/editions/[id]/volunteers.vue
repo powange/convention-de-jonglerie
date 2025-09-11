@@ -353,6 +353,8 @@ const toggleFavorite = async (id: number) => {
 // Condition pour voir le tableau des bénévoles (tous les collaborateurs)
 const canViewVolunteersTable = computed(() => {
   if (!authStore.user || !edition.value) return false
+  // Super Admin en mode admin
+  if (authStore.isAdminModeActive) return true
   // Créateur de l'édition
   if (edition.value.creatorId === authStore.user.id) return true
   // Auteur de la convention
@@ -367,6 +369,8 @@ const canViewVolunteersTable = computed(() => {
 // Condition pour gérer les bénévoles (accepter/refuser candidatures)
 const canManageVolunteers = computed(() => {
   if (!authStore.user || !edition.value) return false
+  // Super Admin en mode admin
+  if (authStore.isAdminModeActive) return true
   // Créateur de l'édition
   if (edition.value.creatorId === authStore.user.id) return true
   // Auteur de la convention
@@ -387,6 +391,8 @@ const canManageVolunteers = computed(() => {
 // Ancien canManageEdition gardé pour compatibilité avec le bouton "Gérer"
 const canManageEdition = computed(() => {
   if (!authStore.user || !edition.value) return false
+  // Super Admin en mode admin
+  if (authStore.isAdminModeActive) return true
   if (edition.value.creatorId === authStore.user.id) return true
   const collab = edition.value.convention?.collaborators?.find(
     (c: any) => c.user.id === authStore.user!.id
@@ -420,6 +426,12 @@ interface VolunteerInfo {
   askPets?: boolean
   askMinors?: boolean
   askVehicle?: boolean
+  askCompanion?: boolean
+  askAvoidList?: boolean
+  askSkills?: boolean
+  askExperience?: boolean
+  askSetup?: boolean
+  askTeardown?: boolean
   teams?: { name: string; slots?: number }[]
 }
 const volunteersInfo = ref<VolunteerInfo | null>(null)
@@ -449,7 +461,9 @@ const volunteerStatusLabel = (s: string) =>
         : s
 const fetchVolunteersInfo = async () => {
   try {
-    volunteersInfo.value = await $fetch(`/api/editions/${editionId}/volunteers/info`)
+    volunteersInfo.value = (await $fetch(
+      `/api/editions/${editionId}/volunteers/info`
+    )) as VolunteerInfo
     if (volunteersInfo.value?.description) {
       volunteersDescriptionHtml.value = await markdownToHtml(volunteersInfo.value.description)
     }

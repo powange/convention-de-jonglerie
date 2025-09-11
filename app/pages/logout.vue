@@ -30,7 +30,7 @@ onMounted(async () => {
   const protectedPatterns = [
     '/edit', // /conventions/[id]/edit, /editions/[id]/edit
     '/gestion', // /editions/[id]/gestion
-    '/covoiturage', // /editions/[id]/covoiturage
+    '/carpool', // /editions/[id]/carpool
     '/editions/add', // /conventions/[id]/editions/add
   ]
 
