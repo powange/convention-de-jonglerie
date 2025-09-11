@@ -55,7 +55,12 @@
             :error="phoneError"
             class="w-full"
           >
-            <UInput v-model="formData.phone" autocomplete="tel" class="w-full" />
+            <UInput
+              v-model="formData.phone"
+              autocomplete="tel"
+              class="w-full"
+              @blur="markFieldTouched('phone')"
+            />
           </UFormField>
         </div>
 
@@ -70,7 +75,11 @@
             :error="firstNameError"
             class="w-full"
           >
-            <UInput v-model="formData.firstName" class="w-full" />
+            <UInput
+              v-model="formData.firstName"
+              class="w-full"
+              @blur="markFieldTouched('firstName')"
+            />
           </UFormField>
           <UFormField
             v-if="!user?.nom"
@@ -78,7 +87,11 @@
             :error="lastNameError"
             class="w-full"
           >
-            <UInput v-model="formData.lastName" class="w-full" />
+            <UInput
+              v-model="formData.lastName"
+              class="w-full"
+              @blur="markFieldTouched('lastName')"
+            />
           </UFormField>
         </div>
 
@@ -95,6 +108,7 @@
             <USwitch
               v-model="formData.setupAvailability"
               :label="t('editions.volunteers.setup_availability_label')"
+              @change="markFieldTouched('availability')"
             />
           </div>
 
@@ -103,6 +117,7 @@
             <USwitch
               v-model="formData.teardownAvailability"
               :label="t('editions.volunteers.teardown_availability_label')"
+              @change="markFieldTouched('availability')"
             />
           </div>
 
@@ -111,6 +126,7 @@
             <USwitch
               v-model="formData.eventAvailability"
               :label="t('editions.volunteers.event_availability_label')"
+              @change="markFieldTouched('availability')"
             />
             <p class="text-[11px] text-gray-500">
               {{ t('editions.volunteers.event_availability_hint') }}
@@ -133,6 +149,7 @@
                 :items="arrivalDateOptions"
                 :placeholder="t('editions.volunteers.select_arrival_placeholder')"
                 class="w-full"
+                @change="markFieldTouched('arrivalDateTime')"
               />
             </UFormField>
           </div>
@@ -148,6 +165,7 @@
                 :items="departureDateOptions"
                 :placeholder="t('editions.volunteers.select_departure_placeholder')"
                 class="w-full"
+                @change="markFieldTouched('departureDateTime')"
               />
             </UFormField>
           </div>
@@ -194,14 +212,14 @@
 
           <!-- Bénévoles préférés pour créneaux -->
           <div v-if="volunteersInfo?.askCompanion" class="space-y-2 w-full">
-            <UFormField>
+            <UFormField :label="t('editions.volunteers.companion_label')">
               <UTextarea
                 v-model="formData.companionName"
-                :label="t('editions.volunteers.companion_label')"
                 :placeholder="t('editions.volunteers.companion_placeholder')"
                 class="w-full"
                 :rows="2"
                 :maxlength="300"
+                @blur="markFieldTouched('companionName')"
               />
             </UFormField>
             <p class="text-[11px] text-gray-500">
@@ -211,14 +229,14 @@
 
           <!-- Bénévoles à éviter pour créneaux -->
           <div v-if="volunteersInfo?.askAvoidList" class="space-y-2 w-full">
-            <UFormField>
+            <UFormField :label="t('editions.volunteers.avoid_list_label')">
               <UTextarea
                 v-model="formData.avoidList"
-                :label="t('editions.volunteers.avoid_list_label')"
                 :placeholder="t('editions.volunteers.avoid_list_placeholder')"
                 class="w-full"
                 :rows="3"
                 :maxlength="500"
+                @blur="markFieldTouched('avoidList')"
               />
             </UFormField>
             <p class="text-[11px] text-gray-500">
@@ -347,14 +365,14 @@
 
           <!-- Compétences et certifications -->
           <div v-if="volunteersInfo?.askSkills" class="space-y-2 w-full">
-            <UFormField>
+            <UFormField :label="t('editions.volunteers.skills_label')">
               <UTextarea
                 v-model="formData.skills"
-                :label="t('editions.volunteers.skills_label')"
                 :placeholder="t('editions.volunteers.skills_placeholder')"
                 class="w-full"
                 :rows="4"
                 :maxlength="1000"
+                @blur="markFieldTouched('skills')"
               />
             </UFormField>
             <div class="flex justify-between items-center">
@@ -418,6 +436,7 @@
               :placeholder="t('editions.volunteers.motivation_placeholder')"
               :maxlength="MOTIVATION_MAX"
               class="w-full"
+              @blur="markFieldTouched('motivation')"
             />
             <div class="flex justify-end text-xs" :class="{ 'text-red-500': motivationTooLong }">
               {{ formData.motivation.length }} / {{ MOTIVATION_MAX }}
@@ -549,12 +568,22 @@ const formData = ref({
   motivation: '',
 })
 
+// Système de suivi des champs touchés
+const touchedFields = ref(new Set<string>())
+const showAllErrors = ref(false)
+
 // Computed properties
 const needsPhone = computed(() => !props.user?.phone)
 const motivationTooLong = computed(() => formData.value.motivation.length > MOTIVATION_MAX)
 
+// Fonction pour marquer un champ comme touché
+const markFieldTouched = (fieldName: string) => {
+  touchedFields.value.add(fieldName)
+}
+
 // Individual field validation computed properties
 const phoneError = computed(() => {
+  if (!showAllErrors.value && !touchedFields.value.has('phone')) return undefined
   if (needsPhone.value && !formData.value.phone?.trim()) {
     return t('validation.phone_required')
   }
@@ -562,6 +591,7 @@ const phoneError = computed(() => {
 })
 
 const firstNameError = computed(() => {
+  if (!showAllErrors.value && !touchedFields.value.has('firstName')) return undefined
   if (!props.user?.prenom && !formData.value.firstName?.trim()) {
     return t('validation.first_name_required')
   }
@@ -569,6 +599,7 @@ const firstNameError = computed(() => {
 })
 
 const lastNameError = computed(() => {
+  if (!showAllErrors.value && !touchedFields.value.has('lastName')) return undefined
   if (!props.user?.nom && !formData.value.lastName?.trim()) {
     return t('validation.last_name_required')
   }
@@ -576,6 +607,7 @@ const lastNameError = computed(() => {
 })
 
 const motivationError = computed(() => {
+  if (!showAllErrors.value && !touchedFields.value.has('motivation')) return undefined
   if (motivationTooLong.value) {
     return t('validation.motivation_too_long', { max: MOTIVATION_MAX })
   }
@@ -583,6 +615,7 @@ const motivationError = computed(() => {
 })
 
 const availabilityError = computed(() => {
+  if (!showAllErrors.value && !touchedFields.value.has('availability')) return undefined
   if (
     !formData.value.setupAvailability &&
     !formData.value.teardownAvailability &&
@@ -594,6 +627,7 @@ const availabilityError = computed(() => {
 })
 
 const arrivalDateError = computed(() => {
+  if (!showAllErrors.value && !touchedFields.value.has('arrivalDateTime')) return undefined
   if (
     props.volunteersInfo?.mode === 'INTERNAL' &&
     (formData.value.setupAvailability ||
@@ -607,6 +641,7 @@ const arrivalDateError = computed(() => {
 })
 
 const departureDateError = computed(() => {
+  if (!showAllErrors.value && !touchedFields.value.has('departureDateTime')) return undefined
   if (
     props.volunteersInfo?.mode === 'INTERNAL' &&
     (formData.value.eventAvailability || formData.value.teardownAvailability) &&
@@ -776,7 +811,13 @@ const dietPreferenceItems = computed<{ value: 'NONE' | 'VEGETARIAN' | 'VEGAN'; l
 
 // Methods
 const handleSubmit = () => {
-  emit('submit', formData.value)
+  // Activer l'affichage de toutes les erreurs lors de la soumission
+  showAllErrors.value = true
+
+  // Ne soumettre que si le formulaire est valide
+  if (isFormValid.value) {
+    emit('submit', formData.value)
+  }
 }
 
 // Auto-check event availability when neither setup nor teardown is selected
@@ -789,6 +830,18 @@ watch(
     }
   },
   { immediate: true }
+)
+
+// Réinitialiser les erreurs à l'ouverture du modal
+watch(
+  () => props.modelValue,
+  (isOpen) => {
+    if (isOpen) {
+      // Réinitialiser le suivi des erreurs
+      touchedFields.value.clear()
+      showAllErrors.value = false
+    }
+  }
 )
 
 // Reset form when modal opens

@@ -159,26 +159,27 @@
 
     <UCard v-if="canViewVolunteersTable" variant="soft" class="mb-6">
       <template #header>
-        <h3 class="text-lg font-semibold flex items-center gap-2">
-          <UIcon name="i-heroicons-clipboard-document-list" class="text-primary-500" />
-          {{ t('editions.volunteers.management_title') }}
-        </h3>
+        <div class="space-y-2">
+          <h3 class="text-lg font-semibold flex items-center gap-2">
+            <UIcon name="i-heroicons-clipboard-document-list" class="text-primary-500" />
+            {{ t('editions.volunteers.management_title') }}
+          </h3>
+          <p
+            v-if="volunteersMode === 'INTERNAL'"
+            class="text-sm text-blue-600 dark:text-blue-400 flex items-center gap-2"
+          >
+            <UIcon name="i-heroicons-information-circle" class="text-blue-500" size="16" />
+            {{
+              canManageVolunteers
+                ? t('editions.volunteers.admin_only_note')
+                : t('editions.volunteers.view_only_note')
+            }}
+          </p>
+        </div>
       </template>
 
       <!-- Note visibilité + séparation avant statistiques & tableau organisateur -->
       <div v-if="volunteersMode === 'INTERNAL'">
-        <UAlert
-          icon="i-heroicons-shield-check"
-          :title="
-            canManageVolunteers
-              ? t('editions.volunteers.admin_only_note')
-              : t('editions.volunteers.view_only_note')
-          "
-          :description="canManageVolunteers ? null : t('editions.volunteers.view_only_description')"
-          color="primary"
-          variant="subtle"
-        />
-
         <!-- Statistiques -->
         <div v-if="volunteersInfo" class="mt-3 mb-3 flex flex-wrap gap-3">
           <UBadge color="neutral" variant="soft"
@@ -257,6 +258,16 @@
                   @click="resetApplicationsFilters"
                 >
                   {{ t('common.reset') }}
+                </UButton>
+                <UButton
+                  size="xs"
+                  color="blue"
+                  variant="soft"
+                  icon="i-heroicons-arrow-down-tray"
+                  :loading="exportingApplications"
+                  @click="exportApplications"
+                >
+                  {{ t('editions.volunteers.export') }}
                 </UButton>
                 <span class="text-xs text-gray-500 italic">{{ $t('common.sort_tip') }}</span>
               </div>
@@ -595,6 +606,7 @@ interface VolunteerApplicationFull extends VolunteerApplication {
 }
 const applications = ref<VolunteerApplicationFull[]>([])
 const applicationsLoading = ref(false)
+const exportingApplications = ref(false)
 // Pagination serveur
 const serverPagination = ref({ page: 1, pageSize: 20, total: 0, totalPages: 1 })
 // Filtres
@@ -688,6 +700,66 @@ const refreshApplications = async () => {
   }
 }
 await refreshApplications()
+
+const exportApplications = async () => {
+  if (!canViewVolunteersTable.value) return
+  if (volunteersMode.value === 'EXTERNAL') return
+
+  exportingApplications.value = true
+  try {
+    // Convert sorting state en paramètres existants (compat backend)
+    const primary = sorting.value[0]
+    const secondary = sorting.value.slice(1)
+    const sortField = primary?.id || 'createdAt'
+    const sortDir = primary?.desc ? 'desc' : 'asc'
+    const sortSecondary =
+      secondary.map((s) => `${s.id}:${s.desc ? 'desc' : 'asc'}`).join(',') || undefined
+
+    const params = {
+      export: 'true', // Paramètre spécial pour l'export
+      status:
+        applicationsFilterStatus.value && applicationsFilterStatus.value !== 'ALL'
+          ? applicationsFilterStatus.value
+          : undefined,
+      teams:
+        applicationsFilterTeams.value.length > 0
+          ? applicationsFilterTeams.value.join(',')
+          : undefined,
+      sortField,
+      sortDir,
+      sortSecondary,
+      search: globalFilter.value || undefined,
+    }
+
+    // Créer l'URL avec les paramètres
+    const queryString = new URLSearchParams(
+      Object.entries(params).filter(([_, value]) => value !== undefined) as [string, string][]
+    ).toString()
+
+    const url = `/api/editions/${editionId}/volunteers/applications?${queryString}`
+
+    // Télécharger le fichier
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `candidatures-benevoles-edition-${editionId}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    toast.add({
+      title: t('common.export_success'),
+      color: 'success',
+    })
+  } catch (e: any) {
+    toast.add({
+      title: e?.statusMessage || t('common.error'),
+      color: 'error',
+    })
+  } finally {
+    exportingApplications.value = false
+  }
+}
+
 const decideApplication = async (
   app: VolunteerApplicationFull,
   status: 'ACCEPTED' | 'REJECTED' | 'PENDING'
@@ -778,12 +850,12 @@ const columns: TableColumn<any>[] = [
   // Colonnes Prénom et Nom
   {
     accessorKey: 'prenom',
-    header: t('editions.volunteers.table_first_name'),
+    header: ({ column }) => getSortableHeader(column, t('editions.volunteers.table_first_name')),
     cell: ({ row }) => row.original.user.prenom || '—',
   },
   {
     accessorKey: 'nom',
-    header: t('editions.volunteers.table_last_name'),
+    header: ({ column }) => getSortableHeader(column, t('editions.volunteers.table_last_name')),
     cell: ({ row }) => row.original.user.nom || '—',
   },
   // Colonne régime si activée
@@ -810,7 +882,8 @@ const columns: TableColumn<any>[] = [
     ? [
         {
           accessorKey: 'allergies',
-          header: t('editions.volunteers.table_allergies'),
+          header: ({ column }: any) =>
+            getSortableHeader(column, t('editions.volunteers.table_allergies')),
           cell: ({ row }: any) =>
             row.original.allergies
               ? h('span', { class: 'text-xs truncate block max-w-[160px]' }, row.original.allergies)

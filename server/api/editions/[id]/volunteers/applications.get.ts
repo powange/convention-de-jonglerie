@@ -18,6 +18,7 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const statusFilter = query.status as string | undefined
   const teamsFilter = query.teams as string | undefined
+  const isExport = query.export === 'true'
   const page = Math.max(1, parseInt((query.page as string) || '1'))
   const pageSize = Math.min(
     100,
@@ -78,6 +79,9 @@ export default defineEventHandler(async (event) => {
   const total = await prisma.editionVolunteerApplication.count({ where })
   const primary: any = (() => {
     if (sortFieldRaw === 'pseudo') return { user: { pseudo: sortDirRaw } }
+    if (sortFieldRaw === 'prenom') return { user: { prenom: sortDirRaw } }
+    if (sortFieldRaw === 'nom') return { user: { nom: sortDirRaw } }
+    if (sortFieldRaw === 'allergies') return { allergies: sortDirRaw }
     if (sortFieldRaw === 'status') return { status: sortDirRaw }
     return { createdAt: sortDirRaw }
   })()
@@ -91,6 +95,9 @@ export default defineEventHandler(async (event) => {
       const [f, d] = p.split(':')
       const dir = d === 'asc' ? 'asc' : 'desc'
       if (f === 'pseudo') orderBy.push({ user: { pseudo: dir } })
+      else if (f === 'prenom') orderBy.push({ user: { prenom: dir } })
+      else if (f === 'nom') orderBy.push({ user: { nom: dir } })
+      else if (f === 'allergies') orderBy.push({ allergies: dir })
       else if (f === 'status') orderBy.push({ status: dir })
       else if (f === 'createdAt') orderBy.push({ createdAt: dir })
     }
@@ -99,8 +106,8 @@ export default defineEventHandler(async (event) => {
   const applications = await prisma.editionVolunteerApplication.findMany({
     where,
     orderBy,
-    skip: (page - 1) * pageSize,
-    take: pageSize,
+    // En cas d'export, pas de pagination
+    ...(isExport ? {} : { skip: (page - 1) * pageSize, take: pageSize }),
     select: {
       id: true,
       status: true,
@@ -131,6 +138,116 @@ export default defineEventHandler(async (event) => {
       },
     },
   })
+
+  // Si c'est un export, générer le CSV
+  if (isExport) {
+    const csvHeaders = [
+      'Date candidature',
+      'Statut',
+      'Pseudo',
+      'Prénom',
+      'Nom',
+      'Email',
+      'Téléphone',
+      'Motivation',
+      'Régime alimentaire',
+      'Allergies',
+      'Préférences horaires',
+      'Équipes préférées',
+      'Animaux',
+      'Mineurs',
+      'Véhicule',
+      'Compagnons souhaités',
+      'Personnes à éviter',
+      'Compétences',
+      'Expérience',
+      'Montage',
+      'Démontage',
+      'Arrivée',
+      'Départ',
+    ]
+
+    const csvRows = applications.map((app) => {
+      const formatArray = (arr: any) => (Array.isArray(arr) ? arr.join('; ') : arr || '')
+      const formatDate = (date: any) => (date ? new Date(date).toLocaleString('fr-FR') : '')
+      const formatBoolean = (bool: boolean) => (bool ? 'Oui' : 'Non')
+
+      // Format spécial pour les dates avec granularité (format: date_granularity)
+      const formatDateTimeWithGranularity = (dateTimeString: string) => {
+        if (!dateTimeString || !dateTimeString.includes('_')) {
+          return dateTimeString || ''
+        }
+
+        const [datePart, timePart] = dateTimeString.split('_')
+
+        try {
+          const date = new Date(datePart)
+          const dateFormatted = date.toLocaleDateString('fr-FR', {
+            day: 'numeric',
+            month: 'short',
+          })
+
+          // Traduction des granularités en français
+          const timeTranslations: Record<string, string> = {
+            morning: 'matin',
+            noon: 'midi',
+            afternoon: 'après-midi',
+            evening: 'soir',
+          }
+
+          const timeFormatted = timeTranslations[timePart] || timePart
+
+          return `${dateFormatted} ${timeFormatted}`
+        } catch {
+          return dateTimeString.split('_').join(' ')
+        }
+      }
+
+      return [
+        formatDate(app.createdAt),
+        app.status === 'PENDING' ? 'En attente' : app.status === 'ACCEPTED' ? 'Accepté' : 'Refusé',
+        app.user.pseudo || '',
+        app.user.prenom || '',
+        app.user.nom || '',
+        app.user.email || '',
+        app.user.phone || '',
+        app.motivation || '',
+        app.dietaryPreference === 'VEGETARIAN'
+          ? 'Végétarien'
+          : app.dietaryPreference === 'VEGAN'
+            ? 'Végan'
+            : 'Aucun',
+        app.allergies || '',
+        formatArray(app.timePreferences),
+        formatArray(app.teamPreferences),
+        app.hasPets ? `Oui${app.petsDetails ? ` (${app.petsDetails})` : ''}` : 'Non',
+        app.hasMinors ? `Oui${app.minorsDetails ? ` (${app.minorsDetails})` : ''}` : 'Non',
+        app.hasVehicle ? `Oui${app.vehicleDetails ? ` (${app.vehicleDetails})` : ''}` : 'Non',
+        app.companionName || '',
+        app.avoidList || '',
+        app.skills || '',
+        app.hasExperience
+          ? `Oui${app.experienceDetails ? ` (${app.experienceDetails})` : ''}`
+          : 'Non',
+        formatBoolean(app.setupAvailability),
+        formatBoolean(app.teardownAvailability),
+        formatDateTimeWithGranularity(app.arrivalDateTime || ''),
+        formatDateTimeWithGranularity(app.departureDateTime || ''),
+      ].map((cell) => `"${(cell || '').toString().replace(/"/g, '""')}"`)
+    })
+
+    const csvContent = [csvHeaders.join(','), ...csvRows.map((row) => row.join(','))].join('\n')
+
+    setHeader(event, 'Content-Type', 'text/csv; charset=utf-8')
+    setHeader(
+      event,
+      'Content-Disposition',
+      `attachment; filename="candidatures-benevoles-edition-${editionId}.csv"`
+    )
+
+    return csvContent
+  }
+
   return {
     applications,
     pagination: {
