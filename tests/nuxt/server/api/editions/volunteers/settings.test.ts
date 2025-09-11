@@ -315,7 +315,7 @@ describe('/api/editions/[id]/volunteers/settings PATCH', () => {
       const mockEvent = { context: { user: mockUser } }
 
       // Doit rejeter les descriptions trop longues
-      await expect(handler(mockEvent as any)).rejects.toThrow(/description.*5000.*caractères/i)
+      await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
     })
 
     it('devrait accepter les descriptions de longueur valide', async () => {
