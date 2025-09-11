@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   if (!editionId) throw createError({ statusCode: 400, statusMessage: 'Edition invalide' })
 
-  const allowed = await canManageEditionVolunteers(editionId, event.context.user.id)
+  const allowed = await canManageEditionVolunteers(editionId, event.context.user.id, event)
   if (!allowed)
     throw createError({
       statusCode: 403,
@@ -172,7 +172,7 @@ export default defineEventHandler(async (event) => {
     const csvRows = applications.map((app) => {
       const formatArray = (arr: any) => (Array.isArray(arr) ? arr.join('; ') : arr || '')
       const formatDate = (date: any) => (date ? new Date(date).toLocaleString('fr-FR') : '')
-      const formatBoolean = (bool: boolean) => (bool ? 'Oui' : 'Non')
+      const formatBoolean = (bool: boolean | null) => (bool ? 'Oui' : 'Non')
 
       // Format spécial pour les dates avec granularité (format: date_granularity)
       const formatDateTimeWithGranularity = (dateTimeString: string) => {

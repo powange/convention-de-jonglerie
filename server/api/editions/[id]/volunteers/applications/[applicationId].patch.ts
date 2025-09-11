@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Paramètres invalides' })
   const parsed = bodySchema.parse(await readBody(event))
 
-  const allowed = await canManageEditionVolunteers(editionId, event.context.user.id)
+  const allowed = await canManageEditionVolunteers(editionId, event.context.user.id, event)
   if (!allowed)
     throw createError({
       statusCode: 403,

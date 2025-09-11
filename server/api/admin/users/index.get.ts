@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client'
 
 import { requireUserSession } from '#imports'
 
+import { checkAdminMode } from '../../../utils/collaborator-management'
+
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
@@ -17,16 +19,11 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Vérifier que l'utilisateur est un super administrateur
-    const currentUser = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { isGlobalAdmin: true },
-    })
-
-    if (!currentUser?.isGlobalAdmin) {
+    // Vérifier que l'utilisateur est un super administrateur ET que le mode admin est activé
+    if (!(await checkAdminMode(userId, event))) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Accès refusé - Droits super administrateur requis',
+        statusMessage: 'Accès refusé - Droits super administrateur requis et mode admin activé',
       })
     }
 

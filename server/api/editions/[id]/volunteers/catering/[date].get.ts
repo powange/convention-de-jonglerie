@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   if (!editionId) throw createError({ statusCode: 400, statusMessage: 'Edition invalide' })
   if (!targetDate) throw createError({ statusCode: 400, statusMessage: 'Date invalide' })
 
-  const allowed = await canManageEditionVolunteers(editionId, event.context.user.id)
+  const allowed = await canManageEditionVolunteers(editionId, event.context.user.id, event)
   if (!allowed) {
     throw createError({
       statusCode: 403,

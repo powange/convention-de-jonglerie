@@ -130,7 +130,7 @@ export default defineEventHandler(async (event) => {
     select: { conventionId: true, volunteersMode: true } as any,
   })) as any
   if (!edition) throw createError({ statusCode: 404, statusMessage: 'Edition introuvable' })
-  const allowed = await canManageEditionVolunteers(editionId, event.context.user.id)
+  const allowed = await canManageEditionVolunteers(editionId, event.context.user.id, event)
   if (!allowed)
     throw createError({
       statusCode: 403,

@@ -2,6 +2,29 @@
 // Removed unused types import (frontend types not needed server-side)
 import { prisma } from './prisma'
 
+/**
+ * Vérifie si un utilisateur a les droits d'admin ET que le mode admin est activé
+ */
+export async function checkAdminMode(userId: number, event?: any): Promise<boolean> {
+  // Vérifier d'abord si l'utilisateur est globalAdmin
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { isGlobalAdmin: true },
+  })
+  
+  if (!user?.isGlobalAdmin) {
+    return false
+  }
+  
+  // Vérifier que le mode admin est activé côté client
+  if (event) {
+    const adminModeHeader = event.node?.req?.headers?.['x-admin-mode']
+    return adminModeHeader === 'true'
+  }
+  
+  return false
+}
+
 export interface CollaboratorPermissionCheck {
   hasPermission: boolean
   isOwner: boolean
@@ -89,8 +112,14 @@ export async function canManageVolunteers(conventionId: number, userId: number):
  */
 export async function canManageEditionVolunteers(
   editionId: number,
-  userId: number
+  userId: number,
+  event?: any
 ): Promise<boolean> {
+  // Vérifier si l'utilisateur est un super-admin avec mode admin activé
+  if (await checkAdminMode(userId, event)) {
+    return true
+  }
+
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },
     select: { creatorId: true, conventionId: true, id: true },
