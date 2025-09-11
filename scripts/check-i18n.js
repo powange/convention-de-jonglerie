@@ -21,6 +21,13 @@ const BOLD = '\x1b[1m'
 const projectRoot = path.resolve(__dirname, '..')
 const localeFile = path.join(projectRoot, 'i18n', 'locales', 'fr.json')
 
+// Fichiers à exclure de l'analyse (qui génèrent des faux positifs)
+// Ces fichiers contiennent leurs propres traductions intégrées
+const EXCLUDED_FILES = [
+  'app/pages/privacy-policy.vue',
+  // Ajouter d'autres fichiers ici si nécessaire
+]
+
 function loadLocaleFile() {
   try {
     const content = fs.readFileSync(localeFile, 'utf8')
@@ -389,7 +396,23 @@ async function getAllRelevantFiles() {
     files = files.concat(found)
   }
 
-  return files
+  // Filtrer les fichiers exclus
+  const filteredFiles = files.filter(file => {
+    const relativePath = path.relative(projectRoot, file).replace(/\\/g, '/')
+    const isExcluded = EXCLUDED_FILES.some(excludedFile => {
+      const normalizedExcluded = excludedFile.replace(/\\/g, '/')
+      return relativePath === normalizedExcluded
+    })
+    return !isExcluded
+  })
+
+  // Afficher les fichiers exclus si présents
+  const excludedCount = files.length - filteredFiles.length
+  if (excludedCount > 0) {
+    console.log(`${YELLOW}ℹ️  ${excludedCount} fichier(s) exclu(s) de l'analyse (traductions per-component)${RESET}`)
+  }
+
+  return filteredFiles
 }
 
 async function main() {

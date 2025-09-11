@@ -1057,7 +1057,8 @@
   "footer": {
     "copyright": "© {year} Convention de Jonglerie. Tous droits réservés.",
     "feedback": "Nous faire un retour",
-    "language_selector": "Changer de langue"
+    "language_selector": "Changer de langue",
+    "privacy": "Politique de confidentialité"
   },
   "forms": {
     "buttons": {

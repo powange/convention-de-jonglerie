@@ -1066,7 +1066,8 @@
   "footer": {
     "copyright": "© {year} Juggling Convention. All rights reserved.",
     "feedback": "Give us feedback",
-    "language_selector": "Change language"
+    "language_selector": "Change language",
+    "privacy": "Privacy Policy"
   },
   "forms": {
     "buttons": {

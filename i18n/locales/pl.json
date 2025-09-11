@@ -1066,7 +1066,8 @@
   "footer": {
     "copyright": "© {year} Konwencja Żonglerska. Wszelkie prawa zastrzeżone.",
     "feedback": "Podziel się opinią",
-    "language_selector": "Zmień język"
+    "language_selector": "Zmień język",
+    "privacy": "Polityka Prywatności"
   },
   "forms": {
     "buttons": {

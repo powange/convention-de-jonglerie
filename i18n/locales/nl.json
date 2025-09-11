@@ -1066,7 +1066,8 @@
   "footer": {
     "copyright": "© {year} Jongleerconventie. Alle rechten voorbehouden.",
     "feedback": "Geef ons feedback",
-    "language_selector": "Taal wijzigen"
+    "language_selector": "Taal wijzigen",
+    "privacy": "Privacybeleid"
   },
   "forms": {
     "buttons": {

@@ -1066,7 +1066,8 @@
   "footer": {
     "copyright": "© {year} Конвенция Жонглирования. Все права защищены.",
     "feedback": "Оставьте нам отзыв",
-    "language_selector": "Изменить язык"
+    "language_selector": "Изменить язык",
+    "privacy": "Политика конфиденциальности"
   },
   "forms": {
     "buttons": {

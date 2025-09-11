@@ -1066,7 +1066,8 @@
   "footer": {
     "copyright": "© {year} Конвенція Жонглювання. Всі права захищені.",
     "feedback": "Залишити відгук",
-    "language_selector": "Змінити мову"
+    "language_selector": "Змінити мову",
+    "privacy": "Політика конфіденційності"
   },
   "forms": {
     "buttons": {

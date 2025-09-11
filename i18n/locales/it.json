@@ -1066,7 +1066,8 @@
   "footer": {
     "copyright": "© {year} Convegni di Giocoleria. Tutti i diritti riservati.",
     "feedback": "Dacci un feedback",
-    "language_selector": "Cambia lingua"
+    "language_selector": "Cambia lingua",
+    "privacy": "Politica sulla Privacy"
   },
   "forms": {
     "buttons": {

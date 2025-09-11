@@ -1066,7 +1066,8 @@
   "footer": {
     "copyright": "© {year} Convenção de Malabarismo. Todos os direitos reservados.",
     "feedback": "Dar-nos feedback",
-    "language_selector": "Alterar idioma"
+    "language_selector": "Alterar idioma",
+    "privacy": "Política de Privacidade"
   },
   "forms": {
     "buttons": {

@@ -1066,7 +1066,8 @@
   "footer": {
     "copyright": "© {year} Jonglier-Convention. Alle Rechte vorbehalten.",
     "feedback": "Feedback geben",
-    "language_selector": "Sprache wechseln"
+    "language_selector": "Sprache wechseln",
+    "privacy": "Datenschutzrichtlinie"
   },
   "forms": {
     "buttons": {
