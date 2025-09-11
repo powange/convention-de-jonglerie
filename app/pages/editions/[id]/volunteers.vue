@@ -940,10 +940,14 @@ const generateCateringPdf = async () => {
         doc.text('Régimes alimentaires:', 25, yPosition)
         yPosition += 6
 
-        for (const [diet, count] of Object.entries(slotData.dietaryCounts)) {
-          const label = dietaryLabels[diet as keyof typeof dietaryLabels] || diet
-          doc.text(`  • ${label}: ${count} personne(s)`, 30, yPosition)
-          yPosition += 6
+        // Ordre spécifique : NONE, VEGETARIAN, VEGAN
+        const dietOrder = ['NONE', 'VEGETARIAN', 'VEGAN']
+        for (const diet of dietOrder) {
+          if (slotData.dietaryCounts[diet]) {
+            const label = dietaryLabels[diet as keyof typeof dietaryLabels] || diet
+            doc.text(`  • ${label}: ${slotData.dietaryCounts[diet]} personne(s)`, 30, yPosition)
+            yPosition += 6
+          }
         }
       }
 
