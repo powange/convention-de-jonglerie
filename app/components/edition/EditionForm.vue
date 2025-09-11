@@ -83,6 +83,8 @@
                     :items="timeOptions"
                     placeholder="00:00"
                     size="lg"
+                    value-key="value"
+                    :ui="{ content: 'min-w-fit' }"
                     @change="updateStartDateTime"
                   />
                 </UFormField>
@@ -129,6 +131,8 @@
                     :items="timeOptions"
                     placeholder="00:00"
                     size="lg"
+                    value-key="value"
+                    :ui="{ content: 'min-w-fit' }"
                     @change="updateEndDateTime"
                   />
                 </UFormField>
@@ -261,6 +265,7 @@
                         ? $t('errors.required_field')
                         : undefined
                     "
+                    :ui="{ content: 'min-w-fit' }"
                     class="col-span-2 md:col-span-1"
                   >
                     <UInput
@@ -705,8 +710,7 @@ const conventionOptions = computed(() => {
   return conventions.value.map((convention) => ({
     value: convention.id,
     label: convention.name,
-    logo: convention.logo,
-    icon: convention.logo ? undefined : 'i-heroicons-building-office',
+    icon: 'i-heroicons-building-office',
   }))
 })
 
