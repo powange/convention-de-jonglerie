@@ -873,12 +873,20 @@ const updateProfile = async () => {
 const changePassword = async () => {
   passwordLoading.value = true
   try {
+    // Préparer le body en fonction de si l'utilisateur a un mot de passe ou non
+    const body: any = {
+      newPassword: passwordState.newPassword,
+      confirmPassword: passwordState.confirmPassword,
+    }
+
+    // Ajouter currentPassword seulement si l'utilisateur a déjà un mot de passe
+    if (userHasPassword.value) {
+      body.currentPassword = passwordState.currentPassword
+    }
+
     await $fetch('/api/profile/change-password', {
       method: 'POST',
-      body: {
-        currentPassword: passwordState.currentPassword,
-        newPassword: passwordState.newPassword,
-      },
+      body,
     })
 
     showPasswordModal.value = false

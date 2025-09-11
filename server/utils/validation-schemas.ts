@@ -39,7 +39,7 @@ export const registerSchema = z.object({
 
 export const changePasswordSchema = z
   .object({
-    currentPassword: z.string().optional(), // Optionnel pour les utilisateurs OAuth
+    currentPassword: z.string().optional().or(z.literal('')), // Optionnel ou chaîne vide pour les utilisateurs OAuth
     newPassword: passwordSchema,
     confirmPassword: z.string(),
   })

@@ -31,7 +31,10 @@ export default defineEventHandler(async (event) => {
     throw error
   }
 
-  const { currentPassword, newPassword } = validatedData
+  const { currentPassword: rawCurrentPassword, newPassword } = validatedData
+
+  // Traiter les chaînes vides comme undefined pour les utilisateurs OAuth
+  const currentPassword = rawCurrentPassword === '' ? undefined : rawCurrentPassword
 
   try {
     // Récupérer l'utilisateur avec son mot de passe
