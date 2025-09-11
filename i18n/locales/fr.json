@@ -892,7 +892,10 @@
       "title": "Bénévolat",
       "management_title": "Gestion des candidatures",
       "total": "Total",
-      "withdraw": "Retirer ma candidature"
+      "withdraw": "Retirer ma candidature",
+      "catering_info": "Informations restauration",
+      "select_date": "Sélectionner une date",
+      "generate": "Générer"
     },
     "external_mode_options": "Options du mode externe",
     "internal_mode_options": "Options du mode interne"

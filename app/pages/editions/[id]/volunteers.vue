@@ -261,7 +261,7 @@
                 </UButton>
                 <UButton
                   size="xs"
-                  color="blue"
+                  color="primary"
                   variant="soft"
                   icon="i-heroicons-arrow-down-tray"
                   :loading="exportingApplications"
@@ -311,6 +311,37 @@
                   @click="goToPage(serverPagination.page + 1)"
                 />
               </span>
+            </div>
+
+            <!-- Interface génération informations restauration -->
+            <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div class="flex items-center justify-between mb-4">
+                <h4
+                  class="text-sm font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2"
+                >
+                  <UIcon name="i-heroicons-document-text" class="text-gray-500" />
+                  {{ t('editions.volunteers.catering_info') }}
+                </h4>
+              </div>
+              <UButtonGroup>
+                <USelect
+                  v-model="selectedCateringDate"
+                  :items="cateringDateOptions"
+                  value-attribute="value"
+                  option-attribute="label"
+                  :placeholder="t('editions.volunteers.select_date')"
+                  :ui="{ content: 'min-w-fit' }"
+                  class="min-w-[200px]"
+                />
+                <UButton
+                  color="primary"
+                  :disabled="!selectedCateringDate"
+                  :loading="generatingCateringPdf"
+                  @click="generateCateringPdf"
+                >
+                  {{ t('editions.volunteers.generate') }}
+                </UButton>
+              </UButtonGroup>
             </div>
           </div>
         </template>
@@ -425,9 +456,9 @@ interface VolunteerApplication {
 }
 interface VolunteerInfo {
   open: boolean
-  description: string | null
+  description?: string
   mode: 'INTERNAL' | 'EXTERNAL'
-  externalUrl: string | null
+  externalUrl?: string
   counts: Record<string, number>
   myApplication: VolunteerApplication | null
   askDiet?: boolean
@@ -443,6 +474,8 @@ interface VolunteerInfo {
   askExperience?: boolean
   askSetup?: boolean
   askTeardown?: boolean
+  setupStartDate?: string
+  teardownEndDate?: string
   teams?: { name: string; slots?: number }[]
 }
 const volunteersInfo = ref<VolunteerInfo | null>(null)
@@ -472,9 +505,7 @@ const volunteerStatusLabel = (s: string) =>
         : s
 const fetchVolunteersInfo = async () => {
   try {
-    volunteersInfo.value = (await $fetch(
-      `/api/editions/${editionId}/volunteers/info`
-    )) as VolunteerInfo
+    volunteersInfo.value = (await $fetch(`/api/editions/${editionId}/volunteers/info`)) as any
     if (volunteersInfo.value?.description) {
       volunteersDescriptionHtml.value = await markdownToHtml(volunteersInfo.value.description)
     }
@@ -614,6 +645,10 @@ const serverPagination = ref({ page: 1, pageSize: 20, total: 0, totalPages: 1 })
 const applicationsFilterStatus = ref<string>('ALL')
 const applicationsFilterTeams = ref<string[]>([])
 const globalFilter = ref('')
+
+// Variables pour génération informations restauration
+const selectedCateringDate = ref<string | undefined>(undefined)
+const generatingCateringPdf = ref(false)
 // Tri multi-colonnes (TanStack sorting state)
 const sorting = ref<{ id: string; desc: boolean }[]>([{ id: 'createdAt', desc: true }])
 const applicationsActingId = ref<number | null>(null)
@@ -635,6 +670,67 @@ const volunteerTeamItems = computed(() => {
     label: team.name,
     value: team.name,
   }))
+})
+
+// Options pour le select de génération des informations restauration
+const cateringDateOptions = computed(() => {
+  if (!edition.value || !volunteersInfo.value) return []
+
+  const options = []
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+  }
+
+  const startDate = new Date(edition.value.startDate)
+  const endDate = new Date(edition.value.endDate)
+
+  // Ajouter les jours de montage si définis
+  if (volunteersInfo.value?.setupStartDate) {
+    const setupStart = new Date(volunteersInfo.value.setupStartDate)
+    const currentDate = new Date(setupStart)
+
+    while (currentDate.toISOString().split('T')[0] < startDate.toISOString().split('T')[0]) {
+      const dateValue = currentDate.toISOString().split('T')[0]
+      options.push({
+        label: `${formatDate(currentDate)} (Montage)`,
+        value: dateValue,
+      })
+      currentDate.setDate(currentDate.getDate() + 1)
+    }
+  }
+
+  // Ajouter les jours de l'événement principal
+  const currentEventDate = new Date(startDate)
+  while (currentEventDate <= endDate) {
+    options.push({
+      label: formatDate(currentEventDate),
+      value: currentEventDate.toISOString().split('T')[0],
+    })
+    currentEventDate.setDate(currentEventDate.getDate() + 1)
+  }
+
+  // Ajouter les jours de démontage si définis
+  if (volunteersInfo.value?.teardownEndDate) {
+    const teardownEnd = new Date(volunteersInfo.value.teardownEndDate)
+    const currentDate = new Date(endDate)
+    currentDate.setDate(currentDate.getDate() + 1)
+
+    while (currentDate.toISOString().split('T')[0] <= teardownEnd.toISOString().split('T')[0]) {
+      const dateValue = currentDate.toISOString().split('T')[0]
+      options.push({
+        label: `${formatDate(currentDate)} (Démontage)`,
+        value: dateValue,
+      })
+      currentDate.setDate(currentDate.getDate() + 1)
+    }
+  }
+
+  return options
 })
 const applySearch = () => {
   serverPagination.value.page = 1
@@ -757,6 +853,140 @@ const exportApplications = async () => {
     })
   } finally {
     exportingApplications.value = false
+  }
+}
+
+const generateCateringPdf = async () => {
+  if (!selectedCateringDate.value) return
+
+  generatingCateringPdf.value = true
+  try {
+    // Importer jsPDF dynamiquement
+    const { jsPDF } = await import('jspdf')
+
+    // Récupérer les données depuis l'API
+    const cateringData = (await $fetch(
+      `/api/editions/${editionId}/volunteers/catering/${selectedCateringDate.value}`
+    )) as any
+
+    // Créer le PDF
+    const doc = new jsPDF()
+    let yPosition = 20
+
+    // Titre du document
+    doc.setFontSize(18)
+    doc.text(
+      `Informations Restauration - ${new Date(selectedCateringDate.value).toLocaleDateString(
+        'fr-FR',
+        {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }
+      )}`,
+      20,
+      yPosition
+    )
+    yPosition += 15
+
+    // Type de date
+    doc.setFontSize(12)
+    const dateTypeLabel =
+      (cateringData as any).dateType === 'setup'
+        ? 'Montage'
+        : (cateringData as any).dateType === 'teardown'
+          ? 'Démontage'
+          : 'Événement'
+    doc.text(`Type: ${dateTypeLabel}`, 20, yPosition)
+    yPosition += 20
+
+    // Traiter chaque créneau
+    const timeSlotLabels = {
+      morning: 'MATIN',
+      noon: 'MIDI',
+      evening: 'SOIR',
+    }
+
+    const dietaryLabels = {
+      NONE: 'Aucun régime spécial',
+      VEGETARIAN: 'Végétarien',
+      VEGAN: 'Végétalien',
+    }
+
+    for (const [slotKey, slotLabel] of Object.entries(timeSlotLabels)) {
+      const slotData = (cateringData as any).slots[slotKey]
+
+      if (yPosition > 250) {
+        doc.addPage()
+        yPosition = 20
+      }
+
+      // Titre du créneau
+      doc.setFontSize(14)
+      doc.setFont('helvetica', 'bold')
+      doc.text(`${slotLabel}`, 20, yPosition)
+      yPosition += 10
+
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(11)
+
+      // Nombre total de bénévoles
+      doc.text(`Total bénévoles: ${slotData.totalVolunteers}`, 25, yPosition)
+      yPosition += 8
+
+      // Répartition par régime
+      if (Object.keys(slotData.dietaryCounts).length > 0) {
+        doc.text('Régimes alimentaires:', 25, yPosition)
+        yPosition += 6
+
+        for (const [diet, count] of Object.entries(slotData.dietaryCounts)) {
+          const label = dietaryLabels[diet as keyof typeof dietaryLabels] || diet
+          doc.text(`  • ${label}: ${count} personne(s)`, 30, yPosition)
+          yPosition += 6
+        }
+      }
+
+      // Liste des allergies
+      if (slotData.allergies.length > 0) {
+        yPosition += 3
+        doc.text('Allergies:', 25, yPosition)
+        yPosition += 6
+
+        for (const allergy of slotData.allergies) {
+          const name =
+            allergy.volunteer.prenom && allergy.volunteer.nom
+              ? `${allergy.volunteer.prenom} ${allergy.volunteer.nom}`
+              : allergy.volunteer.pseudo
+
+          doc.text(`  • ${name}: ${allergy.allergies}`, 30, yPosition)
+          yPosition += 6
+
+          if (yPosition > 270) {
+            doc.addPage()
+            yPosition = 20
+          }
+        }
+      }
+
+      yPosition += 10
+    }
+
+    // Télécharger le PDF
+    const fileName = `restauration-${edition.value?.name?.replace(/[^a-zA-Z0-9]/g, '-') || 'edition'}-${selectedCateringDate.value}.pdf`
+    doc.save(fileName)
+
+    toast.add({
+      title: t('common.export_success'),
+      color: 'success',
+    })
+  } catch (e: any) {
+    toast.add({
+      title: e?.statusMessage || t('common.error'),
+      color: 'error',
+    })
+  } finally {
+    generatingCateringPdf.value = false
   }
 }
 

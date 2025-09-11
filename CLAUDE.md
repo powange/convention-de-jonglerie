@@ -55,6 +55,11 @@
 - **Nuxt 4.x** : https://nuxt.com/docs/4.x/getting-started/introduction
 - **Nuxt 4.x Testing** : https://nuxt.com/docs/4.x/getting-started/testing
 - **Nuxt UI** : https://ui.nuxt.com/getting-started
+- **Nuxt UI components** : https://ui.nuxt.com/components
+- **Nuxt UI select** : https://ui.nuxt.com/components/select
+- **Nuxt UI modal** : https://ui.nuxt.com/components/modal
+- **Nuxt UI button group** : https://ui.nuxt.com/components/button-group
+- **Nuxt UI formfield** : https://ui.nuxt.com/components/formfield
 - **Nuxt i18n** : https://i18n.nuxtjs.org/docs/getting-started
 - **Nuxt Icon** : https://nuxt.com/modules/icon
 - **Nuxt Image** : https://image.nuxt.com/get-started/installation
