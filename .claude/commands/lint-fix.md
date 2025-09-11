@@ -27,5 +27,3 @@ npm run lint
 ```bash
 npm run format
 ```
-
-Le processus s'arrête automatiquement si aucune erreur n'est détectée lors de la première correction.

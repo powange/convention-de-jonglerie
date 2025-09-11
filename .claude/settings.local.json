@@ -64,7 +64,8 @@
       "Bash(npm ci:*)",
       "Bash(python3:*)",
       "Bash(for:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Read(///**)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

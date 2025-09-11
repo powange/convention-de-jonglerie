@@ -281,325 +281,15 @@
 
               <!-- Options spécifiques au mode interne -->
               <div v-if="(canEdit || canManageVolunteers) && volunteersModeLocal === 'INTERNAL'">
-                <div v-if="canEdit" class="mt-4 mb-2">
-                  <h3 class="font-semibold text-gray-700 dark:text-gray-300">
-                    {{ t('editions.internal_mode_options') }}
-                  </h3>
-                </div>
-
-                <!-- Dates de montage -->
-                <div class="space-y-4 mb-4">
-                  <UFormField
-                    :label="t('editions.volunteers.setup_start_date_label')"
-                    :error="fieldErrors.setupStartDate"
-                  >
-                    <UPopover>
-                      <UButtonGroup>
-                        <UButton
-                          :disabled="savingVolunteers"
-                          variant="outline"
-                          color="neutral"
-                          icon="i-heroicons-calendar-days"
-                        >
-                          {{
-                            volunteersSetupStartDateLocal
-                              ? toCalendarDate(volunteersSetupStartDateLocal).toString()
-                              : t('forms.labels.select_date')
-                          }}
-                        </UButton>
-                        <UButton
-                          v-if="volunteersSetupStartDateLocal"
-                          icon="i-heroicons-x-mark"
-                          color="neutral"
-                          variant="outline"
-                          :disabled="savingVolunteers"
-                          @click="
-                            () => {
-                              volunteersSetupStartDateLocal = null
-                              volunteersAskSetupLocal = false
-                              persistVolunteerSettings()
-                            }
-                          "
-                        />
-                      </UButtonGroup>
-                      <template #content>
-                        <UCalendar
-                          v-model="volunteersSetupStartDateLocal"
-                          :max-value="setupStartDateMaxValue"
-                          @update:model-value="
-                            () => {
-                              clearFieldError('setupStartDate')
-                              persistVolunteerSettings()
-                            }
-                          "
-                        />
-                      </template>
-                    </UPopover>
-                  </UFormField>
-
-                  <UFormField :label="t('editions.volunteers.setup_end_date_label')">
-                    <UPopover>
-                      <UButtonGroup>
-                        <UButton
-                          :disabled="savingVolunteers"
-                          variant="outline"
-                          color="neutral"
-                          icon="i-heroicons-calendar-days"
-                        >
-                          {{
-                            volunteersTeardownEndDateLocal
-                              ? toCalendarDate(volunteersTeardownEndDateLocal).toString()
-                              : t('forms.labels.select_date')
-                          }}
-                        </UButton>
-                        <UButton
-                          v-if="volunteersTeardownEndDateLocal"
-                          icon="i-heroicons-x-mark"
-                          color="neutral"
-                          variant="outline"
-                          :disabled="savingVolunteers"
-                          @click="
-                            () => {
-                              volunteersTeardownEndDateLocal = null
-                              volunteersAskTeardownLocal = false
-                              persistVolunteerSettings()
-                            }
-                          "
-                        />
-                      </UButtonGroup>
-                      <template #content>
-                        <UCalendar
-                          v-model="volunteersTeardownEndDateLocal"
-                          :min-value="setupEndDateMinValue"
-                          @update:model-value="() => persistVolunteerSettings()"
-                        />
-                      </template>
-                    </UPopover>
-                  </UFormField>
-                </div>
-
-                <!-- Switch demander participation au montage -->
-                <USwitch
-                  v-model="volunteersAskSetupLocal"
-                  :disabled="savingVolunteers || !volunteersSetupStartDateLocal"
-                  color="primary"
-                  class="mb-2"
-                  :label="
-                    !volunteersSetupStartDateLocal
-                      ? t('editions.volunteers.ask_setup_label') +
-                        ' (définissez d\'abord la date de début du montage)'
-                      : t('editions.volunteers.ask_setup_label')
-                  "
-                  size="lg"
-                  @update:model-value="persistVolunteerSettings"
-                />
-
-                <!-- Switch demander participation au démontage -->
-                <USwitch
-                  v-model="volunteersAskTeardownLocal"
-                  :disabled="savingVolunteers || !volunteersTeardownEndDateLocal"
-                  color="primary"
-                  class="mb-2"
-                  :label="
-                    !volunteersTeardownEndDateLocal
-                      ? t('editions.volunteers.ask_teardown_label') +
-                        ' (définissez d\'abord la date de fin du démontage)'
-                      : t('editions.volunteers.ask_teardown_label')
-                  "
-                  size="lg"
-                  @update:model-value="persistVolunteerSettings"
-                />
-
-                <!-- Switch demander régime alimentaire (mode interne uniquement) -->
-                <USwitch
-                  v-model="volunteersAskDietLocal"
-                  :disabled="savingVolunteers"
-                  color="primary"
-                  class="mb-2"
-                  :label="t('editions.volunteers.ask_diet_label')"
-                  size="lg"
-                  @update:model-value="persistVolunteerSettings"
-                />
-
-                <!-- Switch demander allergies (mode interne uniquement) -->
-                <USwitch
-                  v-model="volunteersAskAllergiesLocal"
-                  :disabled="savingVolunteers"
-                  color="primary"
-                  class="mb-2"
-                  :label="t('editions.volunteers.ask_allergies_label')"
-                  size="lg"
-                  @update:model-value="persistVolunteerSettings"
-                />
-
-                <!-- Switch demander animaux de compagnie (mode interne uniquement) -->
-                <USwitch
-                  v-model="volunteersAskPetsLocal"
-                  :disabled="savingVolunteers"
-                  color="primary"
-                  class="mb-2"
-                  :label="t('editions.volunteers.ask_pets_label')"
-                  size="lg"
-                  @update:model-value="persistVolunteerSettings"
-                />
-
-                <!-- Switch demander personnes mineures (mode interne uniquement) -->
-                <USwitch
-                  v-model="volunteersAskMinorsLocal"
-                  :disabled="savingVolunteers"
-                  color="primary"
-                  class="mb-2"
-                  :label="t('editions.volunteers.ask_minors_label')"
-                  size="lg"
-                  @update:model-value="persistVolunteerSettings"
-                />
-
-                <!-- Switch demander véhicule (mode interne uniquement) -->
-                <USwitch
-                  v-model="volunteersAskVehicleLocal"
-                  :disabled="savingVolunteers"
-                  color="primary"
-                  class="mb-2"
-                  :label="t('editions.volunteers.ask_vehicle_label')"
-                  size="lg"
-                  @update:model-value="persistVolunteerSettings"
-                />
-
-                <!-- Switch demander compagnon (mode interne uniquement) -->
-                <USwitch
-                  v-model="volunteersAskCompanionLocal"
-                  :disabled="savingVolunteers"
-                  color="primary"
-                  class="mb-2"
-                  :label="t('editions.volunteers.ask_companion_label')"
-                  size="lg"
-                  @update:model-value="persistVolunteerSettings"
-                />
-
-                <!-- Switch demander liste à éviter (mode interne uniquement) -->
-                <USwitch
-                  v-model="volunteersAskAvoidListLocal"
-                  :disabled="savingVolunteers"
-                  color="primary"
-                  class="mb-2"
-                  :label="t('editions.volunteers.ask_avoid_list_label')"
-                  size="lg"
-                  @update:model-value="persistVolunteerSettings"
-                />
-
-                <!-- Switch demander compétences/certifications -->
-                <USwitch
-                  v-model="volunteersAskSkillsLocal"
-                  :disabled="savingVolunteers"
-                  color="primary"
-                  class="mb-2"
-                  :label="t('editions.volunteers.ask_skills_label')"
-                  size="lg"
-                  @update:model-value="persistVolunteerSettings"
-                />
-
-                <!-- Switch demander expérience bénévolat -->
-                <USwitch
-                  v-model="volunteersAskExperienceLocal"
-                  :disabled="savingVolunteers"
-                  color="primary"
-                  class="mb-2"
-                  :label="t('editions.volunteers.ask_experience_label')"
-                  size="lg"
-                  @update:model-value="persistVolunteerSettings"
-                />
-
-                <!-- Switch demander préférences horaires (mode interne uniquement) -->
-                <USwitch
-                  v-model="volunteersAskTimePreferencesLocal"
-                  :disabled="savingVolunteers"
-                  color="primary"
-                  class="mb-2"
-                  :label="t('editions.volunteers.ask_time_preferences_label')"
-                  size="lg"
-                  @update:model-value="persistVolunteerSettings"
-                />
-
-                <!-- Switch demander préférences d'équipes (mode interne uniquement) -->
-                <USwitch
-                  v-model="volunteersAskTeamPreferencesLocal"
-                  :disabled="savingVolunteers || volunteersTeamsLocal.length === 0"
-                  color="primary"
-                  class="mb-2"
-                  :label="
-                    volunteersTeamsLocal.length === 0
-                      ? t('editions.volunteers.ask_team_preferences_label') +
-                        ' (définissez d\'abord des équipes)'
-                      : t('editions.volunteers.ask_team_preferences_label')
-                  "
-                  size="lg"
-                  @update:model-value="persistVolunteerSettings"
-                />
-
-                <!-- Gestion des équipes (mode interne uniquement) -->
-                <div class="mt-6 space-y-4">
-                  <div class="space-y-2">
-                    <h4 class="font-medium text-gray-700 dark:text-gray-300">
-                      {{ t('editions.volunteers.teams_label') }}
-                    </h4>
-                    <p class="text-xs text-gray-500">
-                      {{ t('editions.volunteers.teams_hint') }}
-                    </p>
-                  </div>
-
-                  <div class="space-y-3">
-                    <div
-                      v-if="volunteersTeamsLocal.length === 0"
-                      class="text-sm text-gray-500 italic"
-                    >
-                      {{ t('editions.volunteers.teams_empty') }}
-                    </div>
-
-                    <div
-                      v-for="(team, index) in volunteersTeamsLocal"
-                      :key="index"
-                      class="flex gap-2 items-start"
-                    >
-                      <UInput
-                        v-model="team.name"
-                        :placeholder="t('editions.volunteers.team_name_placeholder')"
-                        class="flex-1"
-                        :disabled="savingVolunteers"
-                        @blur="() => persistVolunteerSettings({ skipRefetch: true })"
-                      />
-                      <UInput
-                        v-model.number="team.slots"
-                        type="number"
-                        min="1"
-                        max="99"
-                        :placeholder="t('editions.volunteers.team_slots_placeholder')"
-                        class="w-20"
-                        :disabled="savingVolunteers"
-                        @blur="() => persistVolunteerSettings({ skipRefetch: true })"
-                      />
-                      <UButton
-                        icon="i-heroicons-trash"
-                        color="error"
-                        variant="ghost"
-                        size="sm"
-                        :disabled="savingVolunteers"
-                        @click="removeTeam(index)"
-                      >
-                        {{ t('editions.volunteers.team_remove') }}
-                      </UButton>
-                    </div>
-
-                    <UButton
-                      icon="i-heroicons-plus"
-                      variant="outline"
-                      size="sm"
-                      :disabled="savingVolunteers"
-                      @click="addTeam"
-                    >
-                      {{ t('editions.volunteers.team_add') }}
-                    </UButton>
-                  </div>
-                </div>
+                <UCard variant="soft">
+                  <EditionVolunteerInternalModeOptions
+                    :edition-id="editionId"
+                    :initial-data="volunteersInternalData"
+                    :edition-start-date="edition?.startDate"
+                    :edition-end-date="edition?.endDate"
+                    @updated="handleVolunteerInternalOptionsUpdated"
+                  />
+                </UCard>
               </div>
               <div v-if="canEdit" class="flex gap-2">
                 <span v-if="savingVolunteers" class="text-xs text-gray-500 flex items-center gap-1">
@@ -621,6 +311,7 @@ import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import EditionHeader from '~/components/edition/EditionHeader.vue'
+import EditionVolunteerInternalModeOptions from '~/components/edition/VolunteerInternalModeOptions.vue'
 import MinimalMarkdownEditor from '~/components/MinimalMarkdownEditor.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
@@ -641,14 +332,31 @@ const { t } = useI18n()
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
-// Contraintes de dates pour le montage
-const setupStartDateMaxValue = computed(() => {
-  if (!edition.value?.startDate) return null
-  return fromDate(new Date(edition.value.startDate), 'UTC')
-})
-const setupEndDateMinValue = computed(() => {
-  if (!edition.value?.endDate) return null
-  return fromDate(new Date(edition.value.endDate), 'UTC')
+// Données pour le composant des options internes
+const volunteersInternalData = computed(() => {
+  if (!edition.value) return {}
+  return {
+    setupStartDate: edition.value.volunteersSetupStartDate
+      ? fromDate(new Date(edition.value.volunteersSetupStartDate), 'UTC')
+      : null,
+    teardownEndDate: edition.value.volunteersTeardownEndDate
+      ? fromDate(new Date(edition.value.volunteersTeardownEndDate), 'UTC')
+      : null,
+    askSetup: edition.value.volunteersAskSetup,
+    askTeardown: edition.value.volunteersAskTeardown,
+    askDiet: edition.value.volunteersAskDiet,
+    askAllergies: edition.value.volunteersAskAllergies,
+    askPets: edition.value.volunteersAskPets,
+    askMinors: edition.value.volunteersAskMinors,
+    askVehicle: edition.value.volunteersAskVehicle,
+    askCompanion: edition.value.volunteersAskCompanion,
+    askAvoidList: edition.value.volunteersAskAvoidList,
+    askSkills: edition.value.volunteersAskSkills,
+    askExperience: edition.value.volunteersAskExperience,
+    askTimePreferences: edition.value.volunteersAskTimePreferences,
+    askTeamPreferences: edition.value.volunteersAskTeamPreferences,
+    teams: edition.value.volunteersTeams || [],
+  }
 })
 
 // Gestion des erreurs de validation par champ
@@ -898,17 +606,13 @@ const resetVolunteerDescription = () => {
   renderVolunteerDescriptionHtml()
 }
 
-const addTeam = () => {
-  volunteersTeamsLocal.value.push({ name: '', slots: undefined })
-}
-
-const removeTeam = (index: number) => {
-  volunteersTeamsLocal.value.splice(index, 1)
-  // Si plus d'équipes, désactiver automatiquement l'option
-  if (volunteersTeamsLocal.value.length === 0) {
-    volunteersAskTeamPreferencesLocal.value = false
+// Gestionnaire pour les mises à jour du composant des options internes
+const handleVolunteerInternalOptionsUpdated = async (settings: any) => {
+  // Mettre à jour les données locales avec les nouvelles valeurs du serveur
+  if (edition.value) {
+    Object.assign(edition.value, settings)
+    volunteersUpdatedAt.value = new Date()
   }
-  persistVolunteerSettings({ skipRefetch: true })
 }
 
 const formatRelative = (date: Date) => {

@@ -8,7 +8,7 @@ export default defineNuxtPlugin(() => {
 
     // Hook global pour intercepter les requêtes $fetch
     const nuxtApp = useNuxtApp()
-    
+
     // Remplacer $fetch par notre version qui ajoute le header admin
     const enhancedFetch = $fetch.create({
       onRequest({ options }: { options: FetchOptions }) {
@@ -20,7 +20,7 @@ export default defineNuxtPlugin(() => {
           // Ajouter le header pour indiquer que le mode admin est activé
           ;(options.headers as Record<string, string>)['X-Admin-Mode'] = 'true'
         }
-      }
+      },
     })
 
     // Remplacer $fetch global

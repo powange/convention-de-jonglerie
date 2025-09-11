@@ -18,6 +18,7 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const statusFilter = query.status as string | undefined
   const teamsFilter = query.teams as string | undefined
+  const presenceFilter = query.presence as string | undefined
   const isExport = query.export === 'true'
   const page = Math.max(1, parseInt((query.page as string) || '1'))
   const pageSize = Math.min(
@@ -50,6 +51,34 @@ export default defineEventHandler(async (event) => {
         },
       }))
       conditions.push({ OR: teamConditions })
+    }
+  }
+
+  // Filtre par présence
+  if (presenceFilter) {
+    const presenceTypes = presenceFilter
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean)
+    if (presenceTypes.length > 0) {
+      const presenceConditions = presenceTypes
+        .map((presenceType) => {
+          switch (presenceType) {
+            case 'setup':
+              return { setupAvailability: true }
+            case 'event':
+              return { eventAvailability: true }
+            case 'teardown':
+              return { teardownAvailability: true }
+            default:
+              return null
+          }
+        })
+        .filter(Boolean)
+
+      if (presenceConditions.length > 0) {
+        conditions.push({ OR: presenceConditions })
+      }
     }
   }
 

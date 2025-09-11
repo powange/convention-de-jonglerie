@@ -11,17 +11,17 @@ export async function checkAdminMode(userId: number, event?: any): Promise<boole
     where: { id: userId },
     select: { isGlobalAdmin: true },
   })
-  
+
   if (!user?.isGlobalAdmin) {
     return false
   }
-  
+
   // Vérifier que le mode admin est activé côté client
   if (event) {
     const adminModeHeader = event.node?.req?.headers?.['x-admin-mode']
     return adminModeHeader === 'true'
   }
-  
+
   return false
 }
 
