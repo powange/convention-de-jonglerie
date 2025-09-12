@@ -64,11 +64,17 @@ export const usePushNotifications = () => {
 
   // Vérifier si l'utilisateur est déjà abonné
   const checkSubscription = async () => {
-    if (!state.isSupported) return
+    if (!state.isSupported) {
+      console.log('[Push] Service non supporté, arrêt de checkSubscription')
+      return
+    }
 
     try {
+      console.log('[Push] Attente du Service Worker...')
       const registration = await navigator.serviceWorker.ready
+      console.log('[Push] Service Worker prêt, vérification subscription...')
       const subscription = await registration.pushManager.getSubscription()
+      console.log('[Push] Subscription actuelle:', !!subscription)
 
       // Si on a une subscription ET la permission est accordée
       if (subscription && Notification.permission === 'granted') {
@@ -92,6 +98,8 @@ export const usePushNotifications = () => {
       }
     } catch (error) {
       console.error("[Push] Erreur lors de la vérification de l'abonnement:", error)
+      state.isSubscribed = false
+      state.subscription = null
     }
   }
 
@@ -342,7 +350,13 @@ export const usePushNotifications = () => {
     console.log('[Push] Force check demandé')
     checkSupport()
     if (state.isSupported) {
+      console.log('[Push] Vérification des subscriptions...')
       await checkSubscription()
+      console.log('[Push] État après vérification:', {
+        isSubscribed: state.isSubscribed,
+        permission: state.permission,
+        hasSubscription: !!state.subscription,
+      })
     }
   }
 
