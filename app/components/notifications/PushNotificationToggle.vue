@@ -56,15 +56,27 @@
       v-if="isSubscribed && authStore.user?.isGlobalAdmin"
       class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
     >
-      <UButton
-        size="sm"
-        variant="outline"
-        icon="i-heroicons-paper-airplane"
-        :loading="isTesting"
-        @click="testNotification"
-      >
-        {{ $t('notifications.push.test_button') }}
-      </UButton>
+      <div class="flex gap-2">
+        <UButton
+          size="sm"
+          variant="outline"
+          icon="i-heroicons-paper-airplane"
+          :loading="isTesting"
+          @click="testNotification"
+        >
+          {{ $t('notifications.push.test_button') }}
+        </UButton>
+        
+        <!-- Bouton de debug temporaire -->
+        <UButton
+          size="sm"
+          variant="ghost"
+          icon="i-heroicons-arrow-path"
+          @click="forceCheck"
+        >
+          Debug
+        </UButton>
+      </div>
     </div>
 
     <!-- Message d'erreur -->
@@ -95,6 +107,7 @@ const {
   subscribe,
   unsubscribe,
   testNotification: testPushNotification,
+  forceCheck,
 } = usePushNotifications()
 
 const isTesting = ref(false)

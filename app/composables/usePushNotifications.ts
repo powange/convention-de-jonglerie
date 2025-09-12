@@ -70,13 +70,25 @@ export const usePushNotifications = () => {
       const registration = await navigator.serviceWorker.ready
       const subscription = await registration.pushManager.getSubscription()
 
-      if (subscription) {
+      // Si on a une subscription ET la permission est accordée
+      if (subscription && Notification.permission === 'granted') {
         state.isSubscribed = true
         state.subscription = subscription
-        console.log('[Push] Abonnement existant trouvé')
+        console.log('[Push] Abonnement valide existant trouvé')
       } else {
+        // Si pas de subscription OU permission non accordée, pas d'abonnement valide
         state.isSubscribed = false
         state.subscription = null
+        console.log('[Push] Pas d\'abonnement valide:', {
+          hasSubscription: !!subscription,
+          permission: Notification.permission,
+        })
+        
+        // Si on avait une subscription mais plus la permission, la désabonner
+        if (subscription && Notification.permission !== 'granted') {
+          console.log('[Push] Nettoyage de subscription obsolète')
+          await subscription.unsubscribe().catch(console.error)
+        }
       }
     } catch (error) {
       console.error("[Push] Erreur lors de la vérification de l'abonnement:", error)
@@ -325,6 +337,15 @@ export const usePushNotifications = () => {
     })
   }
 
+  // Forcer une nouvelle vérification (utile pour debugging)
+  const forceCheck = async () => {
+    console.log('[Push] Force check demandé')
+    checkSupport()
+    if (state.isSupported) {
+      await checkSubscription()
+    }
+  }
+
   // Initialisation
   onMounted(() => {
     checkSupport()
@@ -340,5 +361,6 @@ export const usePushNotifications = () => {
     testNotification,
     checkSupport,
     checkSubscription,
+    forceCheck,
   }
 }
