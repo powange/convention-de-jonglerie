@@ -15,9 +15,11 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
-      timeout: 5s
-      retries: 30
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '--silent']
+      timeout: 2s
+      interval: 3s
+      retries: 15
+      start_period: 5s
 
   # Application Nuxt.js (mode développement)
   app:
@@ -29,8 +31,8 @@ services:
     container_name: convention-app-dev
     working_dir: /app
     # Exécuter les migrations Prisma (idempotent) puis démarrer Nuxt en mode dev.
-    # Utilise migrate deploy pour appliquer les migrations existantes sans interaction.
-    command: sh -lc "npx prisma generate >/dev/null 2>&1 || true && npx prisma migrate deploy || true && npm run dev"
+    # Optimisé pour réduire les temps de démarrage
+    command: sh -lc "echo 'Starting app initialization...' && npx prisma generate && npx prisma migrate deploy && echo 'Ready! Starting Nuxt...' && npm run dev"
     environment:
       DATABASE_URL: 'mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}'
       NUXT_HOST: '0.0.0.0'
@@ -56,6 +58,10 @@ services:
       NUXT_RECAPTCHA_SECRET_KEY: '${NUXT_RECAPTCHA_SECRET_KEY}'
       # Configuration nuxt-file-storage
       NUXT_FILE_STORAGE_MOUNT: '${NUXT_FILE_STORAGE_MOUNT:-/uploads}'
+      # Configuration VAPID pour notifications push
+      NUXT_PUBLIC_VAPID_PUBLIC_KEY: '${NUXT_PUBLIC_VAPID_PUBLIC_KEY:-}'
+      VAPID_PRIVATE_KEY: '${VAPID_PRIVATE_KEY:-}'
+      VAPID_SUBJECT: '${VAPID_SUBJECT:-}'
       # Force le polling pour Windows
       CHOKIDAR_USEPOLLING: 'true'
       CHOKIDAR_INTERVAL: '1000'

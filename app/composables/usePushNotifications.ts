@@ -29,8 +29,12 @@ export const usePushNotifications = () => {
       state.isSupported =
         'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
 
-      if (state.isSupported && Notification.permission) {
+      if (state.isSupported) {
         state.permission = Notification.permission
+        console.log('[Push] Support vérifié:', {
+          isSupported: state.isSupported,
+          permission: state.permission,
+        })
       }
     }
   }
@@ -183,6 +187,8 @@ export const usePushNotifications = () => {
 
       state.isSubscribed = true
       state.subscription = subscription
+      // Mettre à jour la permission après l'abonnement réussi
+      state.permission = Notification.permission
 
       toast.add({
         color: 'green',
@@ -274,17 +280,35 @@ export const usePushNotifications = () => {
 
   // Tester l'envoi d'une notification locale
   const testNotification = () => {
-    if (!state.isSupported || state.permission !== 'granted') {
+    console.log('[Push Test] État actuel:', {
+      isSupported: state.isSupported,
+      permission: state.permission,
+      isSubscribed: state.isSubscribed,
+      currentPermission: Notification.permission,
+    })
+
+    if (!state.isSupported) {
       toast.add({
         color: 'yellow',
-        title: 'Non disponible',
-        description: 'Les notifications ne sont pas activées',
+        title: 'Non supporté',
+        description: 'Les notifications push ne sont pas supportées',
       })
       return
     }
 
-    const notification = new Notification('Test de notification', {
-      body: 'Ceci est une notification de test',
+    const currentPermission = Notification.permission
+    if (currentPermission !== 'granted') {
+      toast.add({
+        color: 'yellow',
+        title: 'Non disponible',
+        description: `Permission: ${currentPermission}. Les notifications ne sont pas activées`,
+      })
+      return
+    }
+
+    console.log('[Push Test] Envoi de notification de test')
+    const notification = new Notification('🎯 Test de notification', {
+      body: 'Ceci est une notification de test locale',
       icon: '/favicons/android-chrome-192x192.png',
       badge: '/favicons/favicon-32x32.png',
     })
@@ -293,6 +317,12 @@ export const usePushNotifications = () => {
       window.focus()
       notification.close()
     }
+
+    toast.add({
+      color: 'green',
+      title: 'Test envoyé',
+      description: 'Notification de test envoyée',
+    })
   }
 
   // Initialisation
