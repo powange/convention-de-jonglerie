@@ -87,7 +87,7 @@
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Tester les différents types de notifications
           </p>
-          <UButton variant="outline" color="purple" @click="showTestModal = true">
+          <UButton variant="outline" color="primary" @click="showTestModal = true">
             {{ $t('admin.test') }}
           </UButton>
         </div>
@@ -210,12 +210,12 @@
                   <UBadge
                     :color="
                       notification.type === 'ERROR'
-                        ? 'red'
+                        ? 'error'
                         : notification.type === 'SUCCESS'
-                          ? 'green'
+                          ? 'success'
                           : notification.type === 'WARNING'
-                            ? 'yellow'
-                            : 'blue'
+                            ? 'warning'
+                            : 'primary'
                     "
                     variant="soft"
                     size="xs"
@@ -231,16 +231,31 @@
     </UCard>
 
     <!-- Modal de création de notification -->
-    <UModal v-model:open="showCreateModal" class="z-50">
+    <UModal v-model:open="showCreateModal">
       <template #content>
         <UCard>
           <template #header>
-            <div class="flex justify-between items-center">
-              <h3 class="text-lg font-semibold">Créer une notification</h3>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div
+                  class="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/20"
+                >
+                  <UIcon name="i-heroicons-plus-circle" class="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Nouvelle notification
+                  </h3>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Créez et envoyez une notification personnalisée
+                  </p>
+                </div>
+              </div>
               <UButton
                 icon="i-heroicons-x-mark"
                 color="neutral"
                 variant="ghost"
+                size="sm"
                 @click="showCreateModal = false"
               />
             </div>
@@ -249,110 +264,260 @@
           <UForm
             :schema="createNotificationSchema"
             :state="createForm"
+            class="space-y-5"
             @submit="createNotification"
           >
-            <div class="space-y-4">
-              <UFormField
-                label="Utilisateur cible"
-                name="userId"
-                description="Laisser vide pour envoyer à votre propre compte (test)"
-              >
-                <UInput
-                  v-model="createForm.userId"
-                  type="number"
-                  placeholder="ID de l'utilisateur (optionnel)"
-                />
-              </UFormField>
-
-              <UFormField label="Type" name="type" required>
-                <USelectMenu
+            <!-- Type et Catégorie -->
+            <div class="grid grid-cols-2 gap-4">
+              <UFormField label="Type de notification" name="type" required>
+                <USelect
                   v-model="createForm.type"
-                  :options="notificationTypes"
-                  placeholder="Sélectionnez un type"
-                />
-              </UFormField>
-
-              <UFormField label="Titre" name="title" required>
-                <UInput v-model="createForm.title" placeholder="Titre de la notification" />
-              </UFormField>
-
-              <UFormField label="Message" name="message" required>
-                <UTextarea
-                  v-model="createForm.message"
-                  placeholder="Contenu de la notification"
-                  :rows="4"
+                  :items="notificationTypes"
+                  placeholder="Choisir le type..."
+                  icon="i-heroicons-tag"
+                  class="w-full"
                 />
               </UFormField>
 
               <UFormField label="Catégorie" name="category">
-                <USelectMenu
+                <USelect
                   v-model="createForm.category"
-                  :options="categoryOptions"
-                  placeholder="Sélectionnez une catégorie"
-                />
-              </UFormField>
-
-              <UFormField label="URL d'action" name="actionUrl">
-                <UInput
-                  v-model="createForm.actionUrl"
-                  placeholder="URL de redirection (optionnel)"
-                />
-              </UFormField>
-
-              <UFormField label="Texte du bouton" name="actionText">
-                <UInput
-                  v-model="createForm.actionText"
-                  placeholder="Texte du bouton d'action (optionnel)"
+                  :items="categoryOptions"
+                  placeholder="Choisir une catégorie..."
+                  icon="i-heroicons-folder"
+                  class="w-full"
                 />
               </UFormField>
             </div>
 
-            <template #footer>
-              <div class="flex justify-end gap-3">
-                <UButton variant="ghost" @click="showCreateModal = false"> Annuler </UButton>
-                <UButton type="submit" :loading="creatingNotification"> Envoyer </UButton>
+            <!-- Destinataire -->
+            <UFormField
+              label="ID Utilisateur (optionnel)"
+              name="userId"
+              description="Laissez vide pour vous l'envoyer (test)"
+            >
+              <UInput
+                v-model="createForm.userId"
+                type="number"
+                placeholder="Ex: 123"
+                icon="i-heroicons-user"
+              />
+            </UFormField>
+
+            <UDivider />
+
+            <!-- Contenu -->
+            <UFormField label="Titre" name="title" required>
+              <UInput
+                v-model="createForm.title"
+                placeholder="Ex: Nouvelle convention disponible"
+                icon="i-heroicons-megaphone"
+                class="w-full"
+              />
+            </UFormField>
+
+            <UFormField label="Message" name="message" required>
+              <UTextarea
+                v-model="createForm.message"
+                placeholder="Décrivez le contenu de votre notification..."
+                :rows="4"
+                class="w-full"
+              />
+            </UFormField>
+
+            <!-- Action optionnelle -->
+            <div class="space-y-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <p
+                class="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1"
+              >
+                <UIcon name="i-heroicons-cursor-arrow-rays" class="h-3 w-3" />
+                Action optionnelle
+              </p>
+
+              <div class="grid grid-cols-2 gap-3">
+                <UFormField label="URL de redirection" name="actionUrl">
+                  <UInput
+                    v-model="createForm.actionUrl"
+                    placeholder="https://..."
+                    icon="i-heroicons-link"
+                    size="sm"
+                  />
+                </UFormField>
+
+                <UFormField label="Texte du bouton" name="actionText">
+                  <UInput
+                    v-model="createForm.actionText"
+                    placeholder="Ex: Voir détails"
+                    icon="i-heroicons-arrow-right"
+                    size="sm"
+                  />
+                </UFormField>
               </div>
-            </template>
+            </div>
+
+            <!-- Preview de la notification -->
+            <div
+              v-if="createForm.title || createForm.message"
+              class="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800"
+            >
+              <p class="text-xs font-medium text-blue-700 dark:text-blue-300 mb-2">Aperçu :</p>
+              <div class="space-y-1">
+                <p
+                  v-if="createForm.title"
+                  class="font-medium text-sm text-gray-900 dark:text-white"
+                >
+                  {{ createForm.title }}
+                </p>
+                <p v-if="createForm.message" class="text-xs text-gray-600 dark:text-gray-400">
+                  {{ createForm.message.substring(0, 100)
+                  }}{{ createForm.message.length > 100 ? '...' : '' }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <UButton
+                variant="ghost"
+                :disabled="creatingNotification"
+                @click="showCreateModal = false"
+              >
+                Annuler
+              </UButton>
+              <UButton
+                type="submit"
+                :loading="creatingNotification"
+                color="primary"
+                :disabled="!createForm.type || !createForm.title || !createForm.message"
+              >
+                <UIcon name="i-heroicons-paper-airplane" class="mr-2" />
+                {{ creatingNotification ? 'Envoi...' : 'Créer et envoyer' }}
+              </UButton>
+            </div>
           </UForm>
         </UCard>
       </template>
     </UModal>
 
     <!-- Modal de test -->
-    <UModal v-model:open="showTestModal" class="z-50">
+    <UModal v-model:open="showTestModal">
       <template #content>
         <UCard>
           <template #header>
-            <div class="flex justify-between items-center">
-              <h3 class="text-lg font-semibold">Tester les notifications</h3>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div
+                  class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/20"
+                >
+                  <UIcon name="i-heroicons-bell" class="h-5 w-5 text-primary-600" />
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Test de notification
+                  </h3>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Envoyez une notification de test personnalisée
+                  </p>
+                </div>
+              </div>
               <UButton
                 icon="i-heroicons-x-mark"
                 color="neutral"
                 variant="ghost"
+                size="sm"
                 @click="showTestModal = false"
               />
             </div>
           </template>
 
-          <div class="space-y-4">
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              Choisissez un type de notification à tester :
-            </p>
+          <UForm
+            id="test-form"
+            :schema="testNotificationSchema"
+            :state="testForm"
+            class="space-y-6"
+            @submit="testNotificationAdvanced"
+          >
+            <!-- Email de l'utilisateur cible -->
+            <UFormField
+              label="Destinataire"
+              name="targetUserEmail"
+              description="Email de l'utilisateur qui recevra la notification"
+              required
+            >
+              <UInput
+                v-model="testForm.targetUserEmail"
+                type="email"
+                placeholder="exemple@email.com"
+                class="w-full"
+                icon="i-heroicons-envelope"
+              />
 
-            <div class="grid grid-cols-2 gap-3">
+              <!-- Suggestions rapides avec meilleure présentation -->
+              <div class="mt-3">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  Utilisateurs de test disponibles :
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  <UButton
+                    v-for="user in testUserEmails"
+                    :key="user.value"
+                    variant="soft"
+                    size="xs"
+                    :color="testForm.targetUserEmail === user.value ? 'primary' : 'neutral'"
+                    class="transition-colors"
+                    @click="testForm.targetUserEmail = user.value"
+                  >
+                    <UIcon name="i-heroicons-user" class="mr-1 h-3 w-3" />
+                    {{ user.label.split(' ')[0] }}
+                  </UButton>
+                </div>
+              </div>
+            </UFormField>
+
+            <!-- Type de notification -->
+            <UFormField label="Type de notification" name="type" required>
+              <USelect
+                v-model="testForm.type"
+                :items="testTypesWithLabels"
+                placeholder="Sélectionnez le type de notification..."
+                class="w-full"
+                icon="i-heroicons-tag"
+              />
+            </UFormField>
+
+            <!-- Message personnalisé (conditionnel) -->
+            <UFormField
+              v-if="testForm.type === 'custom'"
+              label="Message personnalisé"
+              name="message"
+              description="Rédigez votre message de test personnalisé"
+              class="w-full"
+            >
+              <UTextarea
+                v-model="testForm.message"
+                placeholder="Votre message de test personnalisé..."
+                :rows="4"
+                class="w-full"
+              />
+            </UFormField>
+
+            <!-- Actions du formulaire -->
+            <div class="flex justify-end gap-3 pt-4">
+              <UButton variant="ghost" :disabled="testingAdvanced" @click="showTestModal = false">
+                Annuler
+              </UButton>
               <UButton
-                v-for="testType in testTypes"
-                :key="testType.value"
-                variant="outline"
-                class="justify-start"
-                :loading="testingType === testType.value"
-                @click="testNotification(testType.value)"
+                type="submit"
+                :loading="testingAdvanced"
+                color="primary"
+                form="test-form"
+                :disabled="!testForm.targetUserEmail || !testForm.type"
               >
-                <UIcon :name="testType.icon" class="mr-2" />
-                {{ testType.label }}
+                <UIcon name="i-heroicons-paper-airplane" class="mr-2" />
+                {{ testingAdvanced ? 'Envoi en cours...' : 'Envoyer le test' }}
               </UButton>
             </div>
-          </div>
+          </UForm>
         </UCard>
       </template>
     </UModal>
@@ -379,11 +544,29 @@ const sendingReminders = ref(false)
 const showCreateModal = ref(false)
 const showTestModal = ref(false)
 const creatingNotification = ref(false)
-const testingType = ref('')
+const testingAdvanced = ref(false)
 const loadingRecent = ref(false)
 
-const stats = ref(null)
-const recentNotifications = ref([])
+interface NotificationStats {
+  totalSent: number
+  totalUnread: number
+  sentToday: number
+  activeTypes: number
+}
+
+interface RecentNotification {
+  id: string
+  type: string
+  title: string
+  message: string
+  createdAt: string
+  user?: {
+    pseudo: string
+  }
+}
+
+const stats = ref<NotificationStats | null>(null)
+const recentNotifications = ref<RecentNotification[]>([])
 
 // Formulaire de création
 const createNotificationSchema = z.object({
@@ -397,13 +580,39 @@ const createNotificationSchema = z.object({
 })
 
 const createForm = reactive({
-  userId: null,
-  type: '',
+  userId: undefined as number | undefined,
+  type: 'INFO' as 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR',
   title: '',
   message: '',
   category: '',
   actionUrl: '',
   actionText: '',
+})
+
+// Formulaire de test avancé
+const testNotificationSchema = z.object({
+  targetUserEmail: z.string().email(),
+  type: z.enum([
+    'welcome',
+    'volunteer-accepted',
+    'volunteer-rejected',
+    'event-reminder',
+    'system-error',
+    'custom',
+  ]),
+  message: z.string().optional(),
+})
+
+const testForm = reactive({
+  targetUserEmail: 'alice.jongleuse@example.com',
+  type: 'welcome' as
+    | 'welcome'
+    | 'volunteer-accepted'
+    | 'volunteer-rejected'
+    | 'event-reminder'
+    | 'system-error'
+    | 'custom',
+  message: '',
 })
 
 // Options
@@ -415,20 +624,50 @@ const notificationTypes = [
 ]
 
 const categoryOptions = [
+  { label: 'Aucune catégorie', value: '' },
   { label: 'Système', value: 'system' },
   { label: 'Édition', value: 'edition' },
   { label: 'Bénévolat', value: 'volunteer' },
   { label: 'Autre', value: 'other' },
 ]
 
-const testTypes = [
-  { label: 'Bienvenue', value: 'welcome', icon: 'i-heroicons-hand-raised' },
-  { label: 'Bénévole accepté', value: 'volunteer-accepted', icon: 'i-heroicons-check-circle' },
-  { label: 'Bénévole refusé', value: 'volunteer-rejected', icon: 'i-heroicons-x-circle' },
-  { label: "Rappel d'événement", value: 'event-reminder', icon: 'i-heroicons-clock' },
-  { label: 'Erreur système', value: 'system-error', icon: 'i-heroicons-exclamation-triangle' },
-  { label: 'Personnalisée', value: 'custom', icon: 'i-heroicons-cog-6-tooth' },
+const testUserEmails = [
+  { label: 'Alice Jongleuse (utilisateur test)', value: 'alice.jongleuse@example.com' },
+  { label: 'Bob Cirque (utilisateur test)', value: 'bob.cirque@example.com' },
+  { label: 'Charlie Diabolo (utilisateur test)', value: 'charlie.diabolo@example.com' },
+  { label: 'Diana Massues (utilisateur test)', value: 'diana.massues@example.com' },
+  { label: 'Marie Bénévole (bénévole)', value: 'marie.benevole@example.com' },
+  { label: 'Paul Aidant (bénévole)', value: 'paul.aidant@example.com' },
+  { label: 'Powange User (utilisateur)', value: 'powange@hotmail.com' },
 ]
+
+// Options avec labels pour USelect (format correct avec value)
+const testTypesWithLabels = ref([
+  {
+    label: 'Bienvenue',
+    value: 'welcome',
+  },
+  {
+    label: 'Bénévole accepté',
+    value: 'volunteer-accepted',
+  },
+  {
+    label: 'Bénévole refusé',
+    value: 'volunteer-rejected',
+  },
+  {
+    label: "Rappel d'événement",
+    value: 'event-reminder',
+  },
+  {
+    label: 'Erreur système',
+    value: 'system-error',
+  },
+  {
+    label: 'Personnalisée',
+    value: 'custom',
+  },
+])
 
 // Méthodes utilitaires
 const getNotificationIcon = (type: string) => {
@@ -476,7 +715,7 @@ const sendReminders = async () => {
     })
 
     toast.add({
-      color: 'green',
+      color: 'success',
       title: 'Rappels envoyés',
       description: response.message,
     })
@@ -485,7 +724,7 @@ const sendReminders = async () => {
     await loadRecentNotifications()
   } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
       description: "Impossible d'envoyer les rappels",
     })
@@ -500,7 +739,7 @@ const createNotification = async () => {
     const response = await $fetch('/api/admin/notifications/create', {
       method: 'POST',
       body: {
-        userId: createForm.userId || undefined,
+        userId: createForm.userId,
         type: createForm.type,
         title: createForm.title,
         message: createForm.message,
@@ -511,7 +750,7 @@ const createNotification = async () => {
     })
 
     toast.add({
-      color: 'green',
+      color: 'success',
       title: 'Notification envoyée',
       description: response.message,
     })
@@ -522,51 +761,66 @@ const createNotification = async () => {
     await loadRecentNotifications()
   } catch (error) {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
-      description: error.data?.message || "Impossible d'envoyer la notification",
+      description: (error as any).data?.message || "Impossible d'envoyer la notification",
     })
   } finally {
     creatingNotification.value = false
   }
 }
 
-const testNotification = async (type: string) => {
-  testingType.value = type
+// Test avancé avec email et message personnalisé
+const testNotificationAdvanced = async () => {
+  testingAdvanced.value = true
   try {
-    const response = await $fetch('/api/admin/notifications/test', {
+    await $fetch('/api/admin/notifications/test', {
       method: 'POST',
-      body: { type },
+      body: {
+        type: testForm.type,
+        targetUserEmail: testForm.targetUserEmail,
+        message: testForm.message || undefined,
+      },
     })
 
     toast.add({
-      color: 'green',
-      title: 'Test envoyé',
-      description: response.message,
+      color: 'success',
+      title: 'Test personnalisé envoyé',
+      description: `Notification ${testForm.type} envoyée à ${testForm.targetUserEmail}`,
     })
 
+    showTestModal.value = false
+    resetTestForm()
     await loadStats()
     await loadRecentNotifications()
-  } catch {
+  } catch (error) {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
-      description: "Impossible d'envoyer le test",
+      description: (error as any).data?.message || "Impossible d'envoyer le test",
     })
   } finally {
-    testingType.value = ''
+    testingAdvanced.value = false
   }
 }
 
 const resetCreateForm = () => {
   Object.assign(createForm, {
-    userId: null,
-    type: '',
+    userId: undefined,
+    type: 'INFO' as const,
     title: '',
     message: '',
     category: '',
     actionUrl: '',
     actionText: '',
+  })
+}
+
+const resetTestForm = () => {
+  Object.assign(testForm, {
+    targetUserEmail: 'alice.jongleuse@example.com',
+    type: 'welcome' as const,
+    message: '',
   })
 }
 

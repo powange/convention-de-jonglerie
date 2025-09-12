@@ -39,6 +39,25 @@
                 </p>
               </div>
               <div class="flex items-center gap-2">
+                <!-- Indicateur SSE -->
+                <div
+                  v-if="notificationsStore.realTimeEnabled"
+                  class="flex items-center gap-1"
+                  :title="isConnected ? 'Temps réel actif' : 'Reconnexion en cours...'"
+                >
+                  <div
+                    class="w-2 h-2 rounded-full"
+                    :class="{
+                      'bg-green-500 animate-pulse': isConnected,
+                      'bg-yellow-500 animate-pulse': isConnecting,
+                      'bg-red-500': !isConnected && !isConnecting,
+                    }"
+                  />
+                  <span class="text-xs text-gray-500">
+                    {{ isConnected ? 'Temps réel' : isConnecting ? 'Connexion...' : 'Hors ligne' }}
+                  </span>
+                </div>
+
                 <!-- Bouton actualiser -->
                 <UButton
                   icon="i-heroicons-arrow-path"
@@ -187,12 +206,18 @@
 </template>
 
 <script setup lang="ts">
+import { useNotificationStream } from '~/composables/useNotificationStream'
 import { useAuthStore } from '~/stores/auth'
 import { useNotificationsStore } from '~/stores/notifications'
 import type { Notification } from '~/stores/notifications'
 
 const notificationsStore = useNotificationsStore()
+const authStore = useAuthStore()
 const toast = useToast()
+
+// SSE Stream management
+const { isConnected, isConnecting, connect, disconnect, cleanup, handleVisibilityChange } =
+  useNotificationStream()
 
 // État local
 const isOpen = ref(false)
@@ -323,21 +348,20 @@ const loadMore = async () => {
   }
 }
 
-// Charger les notifications au montage si authentifié
-const authStore = useAuthStore()
-
-// Polling automatique pour les notifications
+// Gestion hybride : SSE + Polling fallback
 let pollingInterval: NodeJS.Timeout | null = null
 
 const startPolling = () => {
   if (pollingInterval) return
 
-  // Rafraîchir toutes les 5 secondes
+  // Polling de fallback moins fréquent quand SSE est connecté
+  const interval = isConnected.value ? 60000 : 5000 // 1 minute si SSE, 5 secondes sinon
+
   pollingInterval = setInterval(async () => {
     if (authStore.user && document.visibilityState === 'visible') {
       await notificationsStore.refresh()
     }
-  }, 5000)
+  }, interval)
 }
 
 const stopPolling = () => {
@@ -347,40 +371,70 @@ const stopPolling = () => {
   }
 }
 
-onMounted(() => {
-  if (authStore.user) {
-    notificationsStore.refresh()
-    startPolling()
+const initializeNotifications = async () => {
+  console.log('[NotificationCenter] Début initialisation, user:', authStore.user?.email)
+
+  if (!authStore.user) {
+    console.log("[NotificationCenter] Pas d'utilisateur authentifié, arrêt")
+    return
   }
 
+  // 1. Charger les notifications initiales
+  console.log('[NotificationCenter] Chargement notifications initiales...')
+  await notificationsStore.refresh()
+  console.log(
+    '[NotificationCenter] Notifications initiales chargées:',
+    notificationsStore.notifications.length
+  )
+
+  // 2. Essayer de connecter SSE
+  try {
+    console.log('[NotificationCenter] Tentative connexion SSE...')
+    await connect()
+    notificationsStore.setRealTimeEnabled(true)
+    console.log('[NotificationCenter] ✅ SSE initialisé avec succès')
+
+    // Polling de fallback moins fréquent
+    startPolling()
+  } catch (error) {
+    console.log('[NotificationCenter] ❌ SSE non disponible:', error)
+    notificationsStore.setRealTimeEnabled(false)
+
+    // Polling classique
+    startPolling()
+  }
+}
+
+onMounted(() => {
+  initializeNotifications()
+
   // Gérer la visibilité de la page
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      if (authStore.user) {
-        notificationsStore.refresh()
-      }
-      startPolling()
-    } else {
-      stopPolling()
-    }
-  })
+  document.addEventListener('visibilitychange', handleVisibilityChange)
 })
 
 onUnmounted(() => {
   stopPolling()
+  cleanup()
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 
-// Watcher pour charger les notifications quand l'utilisateur se connecte
+// Watcher pour gérer la connexion/déconnexion utilisateur
 watch(
   () => authStore.user,
-  (user) => {
+  async (user) => {
     if (user) {
-      notificationsStore.refresh()
-      startPolling()
+      await initializeNotifications()
     } else {
       notificationsStore.reset()
       stopPolling()
+      disconnect()
     }
   }
 )
+
+// Ajuster le polling selon l'état SSE
+watch(isConnected, () => {
+  stopPolling()
+  startPolling() // Redémarre avec le bon intervalle
+})
 </script>

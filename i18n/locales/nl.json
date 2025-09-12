@@ -1198,7 +1198,8 @@
     "unread": "Ongelezen"
   },
   "notificationsStore": {
-    "loading": "Laden des notifications..."
+    "loading": "Laden des notifications...",
+    "realTimeEnabled": "Realtime ingeschakeld"
   },
   "p": {
     "key": "Sleutel"
@@ -1472,9 +1473,10 @@
     "name": "Teamnaam",
     "slots": "Aantal plaatsen"
   },
-  "testType": {
-    "icon": "Pictogram",
-    "value": "Waarde"
+  "testForm": {
+    "message": "Testbericht",
+    "targetUserEmail": "E-mail van doelgebruiker",
+    "type": "Meldingstype"
   },
   "upload": {
     "click_select_convention_logo": "Klik om een conventie logo te selecteren",

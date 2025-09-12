@@ -89,7 +89,3 @@
 
 - `npm run check-i18n` : Analyse clés manquantes/inutilisées/dupliquées/hardcodées
 - `npm run check-translations` : Compare les traductions entre locales
-- `npm run i18n:status` : Rapport état des traductions (% completion, clés manquantes)
-- `npm run i18n:translate:dry` : Simulation traduction automatique des clés [TODO]
-- `npm run i18n:translate` : Traduction automatique en masse des clés [TODO]
-- `npm run i18n:add "terme"` : Ajouter interactivement un terme au dictionnaire de traduction

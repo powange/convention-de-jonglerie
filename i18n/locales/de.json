@@ -1198,7 +1198,8 @@
     "unread": "Ungelesen"
   },
   "notificationsStore": {
-    "loading": "Laden des notifications..."
+    "loading": "Laden des notifications...",
+    "realTimeEnabled": "Echtzeit aktiviert"
   },
   "p": {
     "key": "Schlüssel"
@@ -1472,9 +1473,10 @@
     "name": "Teamname",
     "slots": "Anzahl der Plätze"
   },
-  "testType": {
-    "icon": "Symbol",
-    "value": "Wert"
+  "testForm": {
+    "message": "Testnachricht",
+    "targetUserEmail": "E-Mail des Zielbenutzers",
+    "type": "Benachrichtigungstyp"
   },
   "upload": {
     "click_select_convention_logo": "Klicken Sie, um ein Convention-Logo auszuwählen",

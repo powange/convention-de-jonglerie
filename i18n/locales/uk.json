@@ -1198,7 +1198,8 @@
     "unread": "Непрочитані"
   },
   "notificationsStore": {
-    "loading": "Завантаження des notifications..."
+    "loading": "Завантаження des notifications...",
+    "realTimeEnabled": "Режим реального часу увімкнений"
   },
   "p": {
     "key": "Ключ"
@@ -1472,9 +1473,10 @@
     "name": "Назва команди",
     "slots": "Кількість місць"
   },
-  "testType": {
-    "icon": "Іконка",
-    "value": "Значення"
+  "testForm": {
+    "message": "Тестове повідомлення",
+    "targetUserEmail": "Email цільового користувача",
+    "type": "Тип сповіщення"
   },
   "upload": {
     "click_select_convention_logo": "Натисніть, щоб вибрати логотип конвенції",

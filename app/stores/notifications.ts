@@ -39,6 +39,9 @@ export const useNotificationsStore = defineStore('notifications', {
     } as NotificationFilters,
     // Pagination
     hasMore: true,
+    // Support SSE
+    realTimeEnabled: false,
+    lastRealTimeUpdate: null as Date | null,
   }),
 
   getters: {
@@ -265,6 +268,60 @@ export const useNotificationsStore = defineStore('notifications', {
     },
 
     /**
+     * Ajoute une notification reçue en temps réel via SSE
+     */
+    addRealTimeNotification(notification: Notification) {
+      // Vérifier si la notification n'existe pas déjà
+      const exists = this.notifications.some((n) => n.id === notification.id)
+      if (exists) {
+        return
+      }
+
+      // Ajouter la notification en tête de liste
+      this.notifications.unshift(notification)
+
+      // Mettre à jour le compteur de non lues
+      if (!notification.isRead) {
+        this.unreadCount++
+      }
+
+      // Marquer le timestamp de la dernière mise à jour
+      this.lastRealTimeUpdate = new Date()
+
+      console.log('[Store] Notification temps réel ajoutée:', notification.title)
+    },
+
+    /**
+     * Active/désactive le mode temps réel
+     */
+    setRealTimeEnabled(enabled: boolean) {
+      this.realTimeEnabled = enabled
+      console.log('[Store] Mode temps réel:', enabled ? 'activé' : 'désactivé')
+    },
+
+    /**
+     * Actualise les notifications (mode intelligent avec SSE)
+     */
+    async refresh(force: boolean = false) {
+      // Si le temps réel est activé et qu'il y a eu une mise à jour récente,
+      // ne pas refaire un fetch complet sauf si forcé
+      const hasRecentRealTimeUpdate =
+        this.lastRealTimeUpdate && Date.now() - this.lastRealTimeUpdate.getTime() < 30000 // 30 secondes
+
+      if (this.realTimeEnabled && hasRecentRealTimeUpdate && !force) {
+        console.log('[Store] Skip refresh - données temps réel récentes')
+        return
+      }
+
+      // Actualiser si pas de dernière récupération ou si > 5 secondes
+      const shouldRefresh = force || !this.lastFetch || Date.now() - this.lastFetch.getTime() > 5000
+
+      if (shouldRefresh) {
+        await this.fetchNotifications(this.currentFilters)
+      }
+    },
+
+    /**
      * Réinitialise le store
      */
     reset() {
@@ -279,6 +336,8 @@ export const useNotificationsStore = defineStore('notifications', {
         offset: 0,
       }
       this.hasMore = true
+      this.realTimeEnabled = false
+      this.lastRealTimeUpdate = null
     },
   },
 })

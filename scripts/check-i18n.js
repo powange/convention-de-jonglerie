@@ -397,9 +397,9 @@ async function getAllRelevantFiles() {
   }
 
   // Filtrer les fichiers exclus
-  const filteredFiles = files.filter(file => {
+  const filteredFiles = files.filter((file) => {
     const relativePath = path.relative(projectRoot, file).replace(/\\/g, '/')
-    const isExcluded = EXCLUDED_FILES.some(excludedFile => {
+    const isExcluded = EXCLUDED_FILES.some((excludedFile) => {
       const normalizedExcluded = excludedFile.replace(/\\/g, '/')
       return relativePath === normalizedExcluded
     })
@@ -409,7 +409,9 @@ async function getAllRelevantFiles() {
   // Afficher les fichiers exclus si présents
   const excludedCount = files.length - filteredFiles.length
   if (excludedCount > 0) {
-    console.log(`${YELLOW}ℹ️  ${excludedCount} fichier(s) exclu(s) de l'analyse (traductions per-component)${RESET}`)
+    console.log(
+      `${YELLOW}ℹ️  ${excludedCount} fichier(s) exclu(s) de l'analyse (traductions per-component)${RESET}`
+    )
   }
 
   return filteredFiles

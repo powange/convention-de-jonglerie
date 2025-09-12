@@ -1198,7 +1198,8 @@
     "unread": "No leídas"
   },
   "notificationsStore": {
-    "loading": "Cargando des notifications..."
+    "loading": "Cargando des notifications...",
+    "realTimeEnabled": "Tiempo real activado"
   },
   "p": {
     "key": "Clave"
@@ -1472,9 +1473,10 @@
     "name": "Nombre del equipo",
     "slots": "Número de plazas"
   },
-  "testType": {
-    "icon": "Icono",
-    "value": "Valor"
+  "testForm": {
+    "message": "Mensaje de prueba",
+    "targetUserEmail": "Email del usuario objetivo",
+    "type": "Tipo de notificación"
   },
   "upload": {
     "click_select_convention_logo": "Haz clic para seleccionar un logo de convención",

@@ -1198,7 +1198,8 @@
     "unread": "Nieprzeczytane"
   },
   "notificationsStore": {
-    "loading": "Ładowanie des notifications..."
+    "loading": "Ładowanie des notifications...",
+    "realTimeEnabled": "Czas rzeczywisty włączony"
   },
   "p": {
     "key": "Klucz"
@@ -1472,9 +1473,10 @@
     "name": "Nazwa zespołu",
     "slots": "Liczba miejsc"
   },
-  "testType": {
-    "icon": "Ikona",
-    "value": "Wartość"
+  "testForm": {
+    "message": "Wiadomość testowa",
+    "targetUserEmail": "Email użytkownika docelowego",
+    "type": "Typ powiadomienia"
   },
   "upload": {
     "click_select_convention_logo": "Kliknij, aby wybrać logo konwencji",

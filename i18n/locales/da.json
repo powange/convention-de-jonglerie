@@ -1198,7 +1198,8 @@
     "unread": "Ulæste"
   },
   "notificationsStore": {
-    "loading": "Indlæser des notifications..."
+    "loading": "Indlæser des notifications...",
+    "realTimeEnabled": "Realtid aktiveret"
   },
   "p": {
     "key": "Nøgle"
@@ -1472,9 +1473,10 @@
     "name": "Holdnavn",
     "slots": "Antal pladser"
   },
-  "testType": {
-    "icon": "Ikon",
-    "value": "Værdi"
+  "testForm": {
+    "message": "Testbesked",
+    "targetUserEmail": "Måluserens email",
+    "type": "Notifikationstype"
   },
   "upload": {
     "click_select_convention_logo": "Klik for at vælge convention logo",

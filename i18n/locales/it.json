@@ -1198,7 +1198,8 @@
     "unread": "Non lette"
   },
   "notificationsStore": {
-    "loading": "Caricamento des notifications..."
+    "loading": "Caricamento des notifications...",
+    "realTimeEnabled": "Tempo reale attivato"
   },
   "p": {
     "key": "Chiave"
@@ -1472,9 +1473,10 @@
     "name": "Nome del team",
     "slots": "Numero di posti"
   },
-  "testType": {
-    "icon": "Icona",
-    "value": "Valore"
+  "testForm": {
+    "message": "Messaggio di test",
+    "targetUserEmail": "Email utente di destinazione",
+    "type": "Tipo di notifica"
   },
   "upload": {
     "click_select_convention_logo": "Clicca per selezionare un logo della convention",

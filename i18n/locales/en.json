@@ -1198,7 +1198,8 @@
     "unread": "Unread"
   },
   "notificationsStore": {
-    "loading": "Loading notifications..."
+    "loading": "Loading notifications...",
+    "realTimeEnabled": "Real-time enabled"
   },
   "p": {
     "key": "Key"
@@ -1472,9 +1473,10 @@
     "name": "Team name",
     "slots": "Number of spots"
   },
-  "testType": {
-    "icon": "Icon",
-    "value": "Value"
+  "testForm": {
+    "message": "Test message",
+    "targetUserEmail": "Target user email",
+    "type": "Notification type"
   },
   "upload": {
     "click_select_convention_logo": "Click to select convention logo",

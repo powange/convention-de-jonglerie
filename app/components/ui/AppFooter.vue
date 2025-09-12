@@ -9,7 +9,10 @@
 
         <!-- Liens footer -->
         <div class="flex items-center gap-4 text-sm">
-          <NuxtLink to="/privacy-policy" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+          <NuxtLink
+            to="/privacy-policy"
+            class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+          >
             {{ t('footer.privacy') }}
           </NuxtLink>
           <UButton variant="ghost" color="neutral" size="sm" @click="openFeedbackModal">

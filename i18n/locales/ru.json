@@ -1198,7 +1198,8 @@
     "unread": "Непрочитанные"
   },
   "notificationsStore": {
-    "loading": "Загрузка des notifications..."
+    "loading": "Загрузка des notifications...",
+    "realTimeEnabled": "Режим реального времени включен"
   },
   "p": {
     "key": "Ключ"
@@ -1472,9 +1473,10 @@
     "name": "Название команды",
     "slots": "Количество мест"
   },
-  "testType": {
-    "icon": "Иконка",
-    "value": "Значение"
+  "testForm": {
+    "message": "Тестовое сообщение",
+    "targetUserEmail": "Email целевого пользователя",
+    "type": "Тип уведомления"
   },
   "upload": {
     "click_select_convention_logo": "Нажмите, чтобы выбрать логотип конвенции",

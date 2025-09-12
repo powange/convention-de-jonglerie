@@ -1,3 +1,4 @@
+import { notificationStreamManager } from './notification-stream-manager'
 import { prisma } from './prisma'
 
 import type { NotificationType } from '@prisma/client'
@@ -30,7 +31,7 @@ export const NotificationService = {
    * Crée une nouvelle notification
    */
   async create(data: CreateNotificationData) {
-    return await prisma.notification.create({
+    const notification = await prisma.notification.create({
       data: {
         userId: data.userId,
         type: data.type,
@@ -52,6 +53,19 @@ export const NotificationService = {
         },
       },
     })
+
+    // Envoyer la notification en temps réel via SSE
+    try {
+      const sent = await notificationStreamManager.notifyUser(data.userId, notification)
+      console.log(
+        `[NotificationService] Notification ${notification.id} ${sent ? 'envoyée' : 'non envoyée'} via SSE`
+      )
+    } catch (error) {
+      console.error('[NotificationService] Erreur envoi SSE:', error)
+      // Ne pas faire échouer la création de notification si SSE échoue
+    }
+
+    return notification
   },
 
   /**

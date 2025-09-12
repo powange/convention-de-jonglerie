@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { requireUserSession } from '#imports'
 
 import { NotificationService, NotificationHelpers } from '../../../utils/notification-service'
+import { notificationStreamManager } from '../../../utils/notification-stream-manager'
 import { prisma } from '../../../utils/prisma'
 
 const bodySchema = z.object({
@@ -16,6 +17,7 @@ const bodySchema = z.object({
   ]),
   message: z.string().optional(),
   targetUserId: z.number().int().positive().optional(),
+  targetUserEmail: z.string().email().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -45,7 +47,25 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event).catch(() => ({}))
   const parsed = bodySchema.parse(body)
 
-  const targetUserId = parsed.targetUserId || user.id
+  // Déterminer l'utilisateur cible
+  let targetUserId = parsed.targetUserId || user.id
+
+  // Si un email est fourni, chercher l'utilisateur correspondant
+  if (parsed.targetUserEmail) {
+    const targetUser = await prisma.user.findUnique({
+      where: { email: parsed.targetUserEmail },
+      select: { id: true },
+    })
+
+    if (!targetUser) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: `Utilisateur avec l'email ${parsed.targetUserEmail} introuvable`,
+      })
+    }
+
+    targetUserId = targetUser.id
+  }
 
   try {
     let notification
@@ -108,10 +128,23 @@ export default defineEventHandler(async (event) => {
         })
     }
 
+    // Obtenir les statistiques des connexions SSE
+    const streamStats = notificationStreamManager.getStats()
+
     return {
       success: true,
       message: 'Notification de test envoyée avec succès',
       notification,
+      streamStats: {
+        totalConnections: streamStats.totalConnections,
+        activeUsers: streamStats.activeUsers,
+        connectionsByUser: streamStats.connectionsByUser,
+      },
+      testInfo: {
+        type: parsed.type,
+        targetUserId,
+        timestamp: new Date().toISOString(),
+      },
     }
   } catch (error) {
     console.error("Erreur lors de l'envoi de la notification de test:", error)
