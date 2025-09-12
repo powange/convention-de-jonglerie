@@ -130,7 +130,10 @@ export const usePushNotifications = () => {
 
   // Demander la permission
   const requestPermission = async (): Promise<boolean> => {
+    console.log('[Push Permission] Début demande de permission...')
+    
     if (!state.isSupported) {
+      console.log('[Push Permission] Navigateur non supporté')
       toast.add({
         color: 'red',
         title: 'Non supporté',
@@ -140,15 +143,16 @@ export const usePushNotifications = () => {
     }
 
     try {
-      console.log('[Push] Demande de permission...')
+      console.log('[Push Permission] Appel Notification.requestPermission()...')
       const permission = await Notification.requestPermission()
+      console.log('[Push Permission] Réponse reçue:', permission)
       state.permission = permission
 
       if (permission === 'granted') {
-        console.log('[Push] Permission accordée')
+        console.log('[Push Permission] ✅ Permission accordée')
         return true
       } else if (permission === 'denied') {
-        console.log('[Push] Permission refusée')
+        console.log('[Push Permission] ❌ Permission refusée')
         toast.add({
           color: 'red',
           title: 'Permission refusée',
@@ -157,11 +161,11 @@ export const usePushNotifications = () => {
         })
         return false
       } else {
-        console.log('[Push] Permission en attente')
+        console.log('[Push Permission] ⏳ Permission en attente ou default')
         return false
       }
     } catch (error) {
-      console.error('[Push] Erreur lors de la demande de permission:', error)
+      console.error('[Push Permission] ❌ Erreur lors de la demande de permission:', error)
       state.error = 'Erreur lors de la demande de permission'
       return false
     }
@@ -169,7 +173,10 @@ export const usePushNotifications = () => {
 
   // S'abonner aux notifications push
   const subscribe = async () => {
+    console.log('[Push Subscribe] Démarrage de l\'abonnement...')
+    
     if (!authStore.user) {
+      console.log('[Push Subscribe] Utilisateur non connecté')
       toast.add({
         color: 'yellow',
         title: 'Connexion requise',
@@ -178,19 +185,44 @@ export const usePushNotifications = () => {
       return false
     }
 
-    if (state.isSubscribed) {
-      console.log('[Push] Déjà abonné')
-      return true
+    // Ne pas vérifier state.isSubscribed car il a déjà été changé par le v-model
+    // Vérifier plutôt s'il y a déjà une subscription active
+    console.log('[Push Subscribe] Vérification subscription existante:', {
+      hasSubscription: !!state.subscription,
+      permission: state.permission
+    })
+    
+    if (state.subscription && state.permission === 'granted') {
+      console.log('[Push Subscribe] Subscription valide existante, vérification sauvegarde serveur...')
+      // Même si la subscription existe, tentons de la sauvegarder au cas où elle ne serait pas en BDD
+      try {
+        const result = await $fetch('/api/notifications/push/subscribe', {
+          method: 'POST',
+          body: {
+            subscription: state.subscription.toJSON(),
+          },
+        })
+        console.log('[Push Subscribe] Résultat sauvegarde serveur (existante):', result)
+        return true
+      } catch (error) {
+        console.error('[Push Subscribe] Erreur sauvegarde serveur (existante):', error)
+        // Continuer le processus normal si la sauvegarde échoue
+      }
     }
 
+    console.log('[Push Subscribe] Début du processus d\'abonnement...')
     state.isLoading = true
     state.error = null
 
     try {
       // 1. Demander la permission si nécessaire
+      console.log('[Push Subscribe] Vérification permission actuelle:', state.permission)
       if (state.permission !== 'granted') {
+        console.log('[Push Subscribe] Permission requise, demande en cours...')
         const granted = await requestPermission()
+        console.log('[Push Subscribe] Résultat de la demande:', granted)
         if (!granted) {
+          console.log('[Push Subscribe] Permission refusée, arrêt')
           state.isLoading = false
           return false
         }
@@ -219,14 +251,17 @@ export const usePushNotifications = () => {
       console.log('[Push] Abonnement créé:', subscription)
 
       // 4. Envoyer l'abonnement au serveur
-      const { error } = await $fetch('/api/notifications/push/subscribe', {
-        method: 'POST',
-        body: {
-          subscription: subscription.toJSON(),
-        },
-      }).catch((err) => ({ data: null, error: err }))
-
-      if (error) {
+      console.log('[Push Subscribe] Envoi subscription au serveur...')
+      try {
+        const result = await $fetch('/api/notifications/push/subscribe', {
+          method: 'POST',
+          body: {
+            subscription: subscription.toJSON(),
+          },
+        })
+        console.log('[Push Subscribe] Résultat sauvegarde serveur:', result)
+      } catch (error) {
+        console.error('[Push Subscribe] Erreur sauvegarde serveur:', error)
         throw error
       }
 

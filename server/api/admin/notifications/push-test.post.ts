@@ -70,7 +70,9 @@ export default defineEventHandler(async (event) => {
       }
     } else {
       // Envoyer à l'admin lui-même pour test
+      console.log('[Push Test API] Test pour userId:', session.user.id)
       const sent = await pushNotificationService.testPush(session.user.id)
+      console.log('[Push Test API] Résultat:', sent)
       result = {
         success: sent,
         message: sent ? 'Notification de test envoyée' : 'Aucune subscription trouvée',

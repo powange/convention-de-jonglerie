@@ -49,7 +49,11 @@ class PushNotificationService {
       webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey)
 
       this.initialized = true
-      console.log('[Push Service] Service initialisé avec succès')
+      console.log('[Push Service] Service initialisé avec succès', {
+        subject: vapidSubject,
+        publicKeyLength: vapidPublicKey?.length,
+        privateKeyLength: vapidPrivateKey?.length
+      })
     } catch (error) {
       console.error("[Push Service] Erreur lors de l'initialisation:", error)
     }
@@ -202,7 +206,13 @@ class PushNotificationService {
       )
       return true
     } catch (error: any) {
-      console.error(`[Push Service] ✗ Erreur d'envoi:`, error.message)
+      console.error(`[Push Service] ✗ Erreur d'envoi:`, {
+        message: error.message,
+        statusCode: error.statusCode,
+        body: error.body,
+        headers: error.headers,
+        stack: error.stack?.split('\n').slice(0, 3).join('\n')
+      })
 
       // Si l'erreur est 410 (Gone), la subscription n'est plus valide
       if (error.statusCode === 410) {
