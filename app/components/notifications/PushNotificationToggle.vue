@@ -15,18 +15,18 @@
             v-if="isSubscribed"
             class="flex items-center gap-2 text-sm text-green-600 dark:text-green-400"
           >
-            <Icon name="i-heroicons-check-circle" class="w-4 h-4" />
+            <UIcon name="i-heroicons-check-circle" class="w-4 h-4" />
             <span>{{ $t('notifications.push.enabled') }}</span>
           </div>
           <div
             v-else-if="permission === 'denied'"
             class="flex items-center gap-2 text-sm text-red-600 dark:text-red-400"
           >
-            <Icon name="i-heroicons-x-circle" class="w-4 h-4" />
+            <UIcon name="i-heroicons-x-circle" class="w-4 h-4" />
             <span>{{ $t('notifications.push.blocked') }}</span>
           </div>
           <div v-else class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <Icon name="i-heroicons-bell-slash" class="w-4 h-4" />
+            <UIcon name="i-heroicons-bell-slash" class="w-4 h-4" />
             <span>{{ $t('notifications.push.disabled') }}</span>
           </div>
         </div>
@@ -36,7 +36,7 @@
           v-else
           class="mt-2 flex items-center gap-2 text-sm text-yellow-600 dark:text-yellow-400"
         >
-          <Icon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
+          <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
           <span>{{ $t('notifications.push.not_supported') }}</span>
         </div>
       </div>
