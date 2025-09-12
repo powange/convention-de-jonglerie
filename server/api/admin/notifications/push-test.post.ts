@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { pushNotificationService } from '~/server/utils/push-notification-service'
+import { pushNotificationService } from '../../../utils/push-notification-service'
 
 const testPushSchema = z.object({
   userId: z.number().optional(),
