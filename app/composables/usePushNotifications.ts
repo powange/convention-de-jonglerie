@@ -70,8 +70,33 @@ export const usePushNotifications = () => {
     }
 
     try {
+      console.log('[Push] Vérification du Service Worker...')
+      
+      // Vérifier d'abord s'il y a des registrations
+      const registrations = await navigator.serviceWorker.getRegistrations()
+      console.log('[Push] Registrations trouvées:', registrations.length)
+      
+      if (registrations.length === 0) {
+        console.log('[Push] Aucun Service Worker enregistré, tentative d\'enregistrement...')
+        const registration = await registerServiceWorker()
+        if (!registration) {
+          console.error('[Push] Impossible d\'enregistrer le Service Worker')
+          state.isSubscribed = false
+          state.subscription = null
+          return
+        }
+      }
+      
       console.log('[Push] Attente du Service Worker...')
-      const registration = await navigator.serviceWorker.ready
+      
+      // Utiliser un timeout pour éviter de bloquer indéfiniment
+      const registration = await Promise.race([
+        navigator.serviceWorker.ready,
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Service Worker timeout après 10s')), 10000)
+        )
+      ]) as ServiceWorkerRegistration
+      
       console.log('[Push] Service Worker prêt, vérification subscription...')
       const subscription = await registration.pushManager.getSubscription()
       console.log('[Push] Subscription actuelle:', !!subscription)
