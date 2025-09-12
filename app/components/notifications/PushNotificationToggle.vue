@@ -71,7 +71,7 @@
     <!-- Message d'erreur -->
     <UAlert
       v-if="error"
-      color="red"
+      color="error"
       variant="subtle"
       class="mt-3"
       :title="error"
