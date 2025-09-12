@@ -1,28 +1,12 @@
-import { PrismaClient } from '@prisma/client'
-
-import { requireUserSession } from '#imports'
+import { requireGlobalAdmin } from '../../utils/admin-auth'
+import { prisma } from '../../utils/prisma'
 
 import type { H3Error } from 'h3'
 
-const prisma = new PrismaClient()
-
 export default defineEventHandler(async (event) => {
   try {
-    // Vérifier l'authentification via la session scellée
-    const { user } = await requireUserSession(event)
-
-    // Vérifier que l'utilisateur est un super administrateur
-    const currentUser = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { isGlobalAdmin: true },
-    })
-
-    if (!currentUser?.isGlobalAdmin) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Accès refusé - Droits super administrateur requis',
-      })
-    }
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    await requireGlobalAdmin(event)
 
     const limit = parseInt(getQuery(event).limit as string) || 10
 

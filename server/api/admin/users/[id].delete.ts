@@ -1,12 +1,9 @@
-import { PrismaClient } from '@prisma/client'
 import { readBody } from 'h3'
 
-import { requireUserSession } from '#imports'
-
+import { requireGlobalAdmin } from '../../../utils/admin-auth'
 import { getEmailHash } from '../../../utils/email-hash'
 import { sendEmail, generateAccountDeletionEmailHtml } from '../../../utils/emailService'
-
-const prisma = new PrismaClient()
+import { prisma } from '../../../utils/prisma'
 
 // Raisons prédéfinies pour la suppression de comptes
 const DELETION_REASONS = {
@@ -38,29 +35,8 @@ const DELETION_REASONS = {
 
 export default defineEventHandler(async (event) => {
   try {
-    // Vérifier l'authentification
-    const { user } = await requireUserSession(event)
-    const adminUserId = user.id
-
-    if (!adminUserId) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token invalide',
-      })
-    }
-
-    // Vérifier que l'utilisateur est un super administrateur
-    const currentUser = await prisma.user.findUnique({
-      where: { id: adminUserId },
-      select: { isGlobalAdmin: true, email: true, pseudo: true },
-    })
-
-    if (!currentUser?.isGlobalAdmin) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Accès refusé - Droits super administrateur requis',
-      })
-    }
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    const adminUser = await requireGlobalAdmin(event)
 
     // Récupérer l'ID de l'utilisateur à supprimer
     const userIdToDelete = parseInt(event.context.params?.id as string)
@@ -160,7 +136,7 @@ export default defineEventHandler(async (event) => {
 
     // Log de l'action admin pour audit
     console.log(
-      `[ADMIN] Utilisateur supprimé par ${currentUser.pseudo} (${currentUser.email}): ${deletedUser.pseudo} (${deletedUser.email}) - Raison: ${deletionReason.title}`
+      `[ADMIN] Utilisateur supprimé par ${adminUser.pseudo} (${adminUser.email}): ${deletedUser.pseudo} (${deletedUser.email}) - Raison: ${deletionReason.title}`
     )
 
     return {

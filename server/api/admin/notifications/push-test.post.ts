@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { requireGlobalAdmin } from '../../../utils/admin-auth'
 import { pushNotificationService } from '../../../utils/push-notification-service'
 
 const testPushSchema = z.object({
@@ -12,14 +13,8 @@ const testPushSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   try {
-    // Vérifier que c'est un admin
-    const session = await requireUserSession(event)
-    if (!session.user.isGlobalAdmin) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Accès interdit',
-      })
-    }
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    const adminUser = await requireGlobalAdmin(event)
 
     // Valider les données
     const body = await readBody(event)
@@ -70,8 +65,8 @@ export default defineEventHandler(async (event) => {
       }
     } else {
       // Envoyer à l'admin lui-même pour test
-      console.log('[Push Test API] Test pour userId:', session.user.id)
-      const sent = await pushNotificationService.testPush(session.user.id)
+      console.log('[Push Test API] Test pour userId:', adminUser.id)
+      const sent = await pushNotificationService.testPush(adminUser.id)
       console.log('[Push Test API] Résultat:', sent)
       result = {
         success: sent,

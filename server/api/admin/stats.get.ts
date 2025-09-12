@@ -1,34 +1,10 @@
-import { PrismaClient } from '@prisma/client'
-
-import { requireUserSession } from '#imports'
-
-const prisma = new PrismaClient()
+import { requireGlobalAdmin } from '../../utils/admin-auth'
+import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   try {
-    // Vérifier l'authentification via la session scellée
-    const { user } = await requireUserSession(event)
-    const userId = user.id
-
-    if (!userId) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Token invalide',
-      })
-    }
-
-    // Vérifier que l'utilisateur est un super administrateur
-    const currentUser = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { isGlobalAdmin: true },
-    })
-
-    if (!currentUser?.isGlobalAdmin) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Accès refusé - Droits super administrateur requis',
-      })
-    }
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    await requireGlobalAdmin(event)
 
     // Calculer les dates pour les statistiques mensuelles
     const now = new Date()

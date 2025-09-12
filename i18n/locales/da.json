@@ -1187,8 +1187,7 @@
   "notification": {
     "actionUrl": "Handlings-URL",
     "category": "Kategori",
-    "id": "Identifikator",
-    "user": "Bruger"
+    "id": "Identifikator"
   },
   "notifications": {
     "loading": "Indlæser des notifications...",

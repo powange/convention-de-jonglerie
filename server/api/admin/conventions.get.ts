@@ -1,28 +1,10 @@
+import { requireGlobalAdmin } from '../../utils/admin-auth'
+import { prisma } from '../../utils/prisma'
+
 export default defineEventHandler(async (event) => {
   try {
-    // Vérifier que l'utilisateur est connecté
-    const session = await requireUserSession(event)
-    if (!session?.user) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Non authentifié',
-      })
-    }
-
-    const userId = session.user.id
-
-    // Récupérer l'utilisateur depuis la base de données pour vérifier les droits
-    const currentUser = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { isGlobalAdmin: true },
-    })
-
-    if (!currentUser?.isGlobalAdmin) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Accès refusé - droits administrateur requis',
-      })
-    }
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    await requireGlobalAdmin(event)
 
     // Récupérer toutes les conventions avec leurs éditions
     const conventions = await prisma.convention.findMany({

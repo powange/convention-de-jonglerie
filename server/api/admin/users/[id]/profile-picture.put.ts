@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { requireGlobalAdmin } from '../../../../utils/admin-auth'
 import { prisma } from '../../../../utils/prisma'
 
 const updateProfilePictureSchema = z.object({
@@ -7,26 +8,8 @@ const updateProfilePictureSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Non authentifié',
-    })
-  }
-
-  // Récupérer l'utilisateur actuel pour vérifier ses permissions
-  const currentUser = await prisma.user.findUnique({
-    where: { id: event.context.user.id },
-    select: { isGlobalAdmin: true },
-  })
-
-  if (!currentUser?.isGlobalAdmin) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Accès refusé - Droits administrateur requis',
-    })
-  }
+  // Vérifier l'authentification et les droits admin (mutualisé)
+  await requireGlobalAdmin(event)
 
   const userId = parseInt(getRouterParam(event, 'id') as string)
 

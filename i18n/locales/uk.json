@@ -1187,8 +1187,7 @@
   "notification": {
     "actionUrl": "URL дії",
     "category": "Категорія",
-    "id": "Ідентифікатор",
-    "user": "Користувач"
+    "id": "Ідентифікатор"
   },
   "notifications": {
     "loading": "Завантаження сповіщень...",

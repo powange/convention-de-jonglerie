@@ -1,9 +1,7 @@
 import { z } from 'zod'
 
-import { requireUserSession } from '#imports'
-
+import { requireGlobalAdmin } from '../../utils/admin-auth'
 import { logApiError } from '../../utils/error-logger'
-import { prisma } from '../../utils/prisma'
 
 const bodySchema = z.object({
   type: z.enum([
@@ -19,29 +17,8 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification via la session scellée
-  const { user } = await requireUserSession(event)
-  const userId = user.id
-
-  if (!userId) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Token invalide',
-    })
-  }
-
-  // Vérifier que l'utilisateur est un super administrateur
-  const currentUser = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { isGlobalAdmin: true },
-  })
-
-  if (!currentUser?.isGlobalAdmin) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Accès refusé - Droits super administrateur requis',
-    })
-  }
+  // Vérifier l'authentification et les droits admin (mutualisé)
+  await requireGlobalAdmin(event)
 
   const body = await readBody(event).catch(() => ({}))
   const parsed = bodySchema.parse(body)

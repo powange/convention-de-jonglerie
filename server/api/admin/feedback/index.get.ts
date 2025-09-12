@@ -1,15 +1,9 @@
+import { requireGlobalAdmin } from '../../../utils/admin-auth'
 import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
-
-  // Vérifier que l'utilisateur est admin global
-  if (!user || !user.isGlobalAdmin) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Accès refusé. Droits d'administrateur requis.",
-    })
-  }
+  // Vérifier l'authentification et les droits admin (mutualisé)
+  await requireGlobalAdmin(event)
 
   try {
     const query = getQuery(event)

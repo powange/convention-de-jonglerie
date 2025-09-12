@@ -1,16 +1,11 @@
+import { requireGlobalAdmin } from '../../../utils/admin-auth'
 import { prisma } from '../../../utils/prisma'
 import { pushNotificationService } from '../../../utils/push-notification-service'
 
 export default defineEventHandler(async (event) => {
   try {
-    // Vérifier que c'est un admin
-    const session = await requireUserSession(event)
-    if (!session.user.isGlobalAdmin) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Accès interdit',
-      })
-    }
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    await requireGlobalAdmin(event)
 
     // Obtenir les stats du service
     const serviceStats = await pushNotificationService.getStats()

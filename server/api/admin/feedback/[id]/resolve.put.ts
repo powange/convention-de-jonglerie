@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { requireGlobalAdmin } from '../../../../utils/admin-auth'
 import { prisma } from '../../../../utils/prisma'
 import { validateAndSanitize, handleValidationError } from '../../../../utils/validation-schemas'
 
@@ -12,15 +13,8 @@ const resolveSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
-
-  // Vérifier que l'utilisateur est admin global
-  if (!user || !user.isGlobalAdmin) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Accès refusé. Droits d'administrateur requis.",
-    })
-  }
+  // Vérifier l'authentification et les droits admin (mutualisé)
+  await requireGlobalAdmin(event)
 
   const feedbackId = parseInt(event.context.params?.id as string)
 

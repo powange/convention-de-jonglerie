@@ -1187,8 +1187,7 @@
   "notification": {
     "actionUrl": "URL de acción",
     "category": "Categoría",
-    "id": "Identificador",
-    "user": "Usuario"
+    "id": "Identificador"
   },
   "notifications": {
     "loading": "Cargando notificaciones...",

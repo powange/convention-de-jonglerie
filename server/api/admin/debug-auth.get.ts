@@ -1,46 +1,20 @@
-import { requireUserSession } from '#imports'
-
-import { prisma } from '../../utils/prisma'
+import { requireGlobalAdmin } from '../../utils/admin-auth'
 
 export default defineEventHandler(async (event) => {
   try {
     console.log('=== DEBUG AUTH ===')
 
-    // Essayer de récupérer la session
-    const { user } = await requireUserSession(event)
-    console.log('Session user:', user)
-
-    const userId = user.id
-    console.log('User ID from session:', userId)
-
-    if (!userId) {
-      return {
-        error: 'No userId in session',
-        sessionData: user,
-      }
-    }
-
-    // Vérifier l'utilisateur en base
-    const currentUser = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        pseudo: true,
-        isGlobalAdmin: true,
-      },
-    })
-
-    console.log('User from database:', currentUser)
+    // Vérifier l'authentification et les droits admin (mutualisé)
+    const adminUser = await requireGlobalAdmin(event)
+    console.log('Admin user:', adminUser)
 
     return {
-      sessionUser: user,
-      dbUser: currentUser,
-      hasAdminRights: currentUser?.isGlobalAdmin || false,
+      adminUser,
+      hasAdminRights: adminUser.isGlobalAdmin,
       debug: {
-        userId,
-        userExists: !!currentUser,
-        isAdmin: currentUser?.isGlobalAdmin,
+        userId: adminUser.id,
+        userExists: true,
+        isAdmin: adminUser.isGlobalAdmin,
       },
     }
   } catch (error) {

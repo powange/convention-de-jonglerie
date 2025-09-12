@@ -1145,8 +1145,7 @@
   "notification": {
     "id": "Identifiant",
     "category": "Catégorie",
-    "actionUrl": "URL d'action",
-    "user": "Utilisateur"
+    "actionUrl": "URL d'action"
   },
   "notifications": {
     "manage_description": "Gérez vos notifications et préférences",

@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
-import { requireUserSession } from '#imports'
-
+import { requireGlobalAdmin } from '../../../utils/admin-auth'
 import { NotificationService, NotificationHelpers } from '../../../utils/notification-service'
 import { notificationStreamManager } from '../../../utils/notification-stream-manager'
 import { prisma } from '../../../utils/prisma'
@@ -21,34 +20,14 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin
-  const { user } = await requireUserSession(event)
-
-  if (!user?.id) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Non authentifié',
-    })
-  }
-
-  // Vérifier que l'utilisateur est un super administrateur
-  const currentUser = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: { isGlobalAdmin: true },
-  })
-
-  if (!currentUser?.isGlobalAdmin) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Accès refusé - Droits super administrateur requis',
-    })
-  }
+  // Vérifier l'authentification et les droits admin (mutualisé)
+  const adminUser = await requireGlobalAdmin(event)
 
   const body = await readBody(event).catch(() => ({}))
   const parsed = bodySchema.parse(body)
 
   // Déterminer l'utilisateur cible
-  let targetUserId = parsed.targetUserId || user.id
+  let targetUserId = parsed.targetUserId || adminUser.id
 
   // Si un email est fourni, chercher l'utilisateur correspondant
   if (parsed.targetUserEmail) {

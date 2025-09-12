@@ -1,31 +1,10 @@
-import { requireUserSession } from '#imports'
-
+import { requireGlobalAdmin } from '../../../utils/admin-auth'
 import { NotificationHelpers } from '../../../utils/notification-service'
 import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin
-  const { user } = await requireUserSession(event)
-
-  if (!user?.id) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Non authentifié',
-    })
-  }
-
-  // Vérifier que l'utilisateur est un super administrateur
-  const currentUser = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: { isGlobalAdmin: true },
-  })
-
-  if (!currentUser?.isGlobalAdmin) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Accès refusé - Droits super administrateur requis',
-    })
-  }
+  // Vérifier l'authentification et les droits admin (mutualisé)
+  await requireGlobalAdmin(event)
 
   try {
     const now = new Date()

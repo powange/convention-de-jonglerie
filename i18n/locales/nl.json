@@ -1187,8 +1187,7 @@
   "notification": {
     "actionUrl": "Actie-URL",
     "category": "Categorie",
-    "id": "Identificatie",
-    "user": "Gebruiker"
+    "id": "Identificatie"
   },
   "notifications": {
     "loading": "Laden des notifications...",

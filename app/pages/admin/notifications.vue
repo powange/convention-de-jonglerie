@@ -170,62 +170,305 @@
         </div>
       </template>
 
-      <div v-if="loadingRecent" class="py-8 text-center">
-        <UIcon
-          name="i-heroicons-arrow-path"
-          class="h-6 w-6 animate-spin mx-auto mb-2 text-gray-400"
-        />
-        <p class="text-sm text-gray-500">Chargement...</p>
-      </div>
-
-      <div v-else-if="recentNotifications.length === 0" class="py-8 text-center">
-        <UIcon name="i-heroicons-bell-slash" class="h-8 w-8 mx-auto mb-2 text-gray-400" />
-        <p class="text-sm text-gray-500">Aucune notification récente</p>
-      </div>
-
-      <div v-else class="space-y-4">
-        <div
-          v-for="notification in recentNotifications"
-          :key="notification.id"
-          class="flex items-start gap-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700"
-        >
-          <UIcon
-            :name="getNotificationIcon(notification.type)"
-            :class="getNotificationIconColor(notification.type)"
-            class="h-5 w-5 mt-0.5 flex-shrink-0"
-          />
-
-          <div class="flex-1 min-w-0">
-            <div class="flex items-start justify-between">
-              <div class="flex-1">
-                <h4 class="text-sm font-medium text-gray-900 dark:text-white">
-                  {{ notification.title }}
-                </h4>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {{ notification.message }}
-                </p>
-                <div class="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                  <span>{{ formatDateTime(notification.createdAt) }}</span>
-                  <span v-if="notification.user"> Pour: {{ notification.user.pseudo }} </span>
-                  <UBadge
-                    :color="
-                      notification.type === 'ERROR'
-                        ? 'error'
-                        : notification.type === 'SUCCESS'
-                          ? 'success'
-                          : notification.type === 'WARNING'
-                            ? 'warning'
-                            : 'primary'
-                    "
-                    variant="soft"
-                    size="xs"
-                  >
-                    {{ notification.type }}
-                  </UBadge>
-                </div>
-              </div>
+      <!-- Filtres améliorés -->
+      <div
+        class="mb-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm"
+      >
+        <!-- En-tête des filtres -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <div
+              class="flex items-center justify-center w-8 h-8 bg-primary-100 dark:bg-primary-900/20 rounded-lg"
+            >
+              <UIcon
+                name="i-heroicons-funnel"
+                class="h-4 w-4 text-primary-600 dark:text-primary-400"
+              />
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Filtres</h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Affiner les résultats</p>
             </div>
           </div>
+
+          <!-- Compteur de résultats -->
+          <div v-if="!loadingRecent" class="text-right">
+            <p class="text-sm font-medium text-gray-900 dark:text-white">
+              {{ pagination.total }} notification{{ pagination.total > 1 ? 's' : '' }}
+            </p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              {{ hasActiveFilters ? 'Filtrées' : 'Total' }}
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <!-- Filtre par type avec icônes -->
+          <div class="space-y-2">
+            <label
+              class="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300"
+            >
+              <UIcon name="i-heroicons-tag" class="h-3 w-3 text-gray-500" />
+              Type de notification
+            </label>
+            <USelect
+              v-model="filters.type"
+              :items="typeFilterItems"
+              size="sm"
+              color="primary"
+              variant="outline"
+              placeholder="Sélectionner un type"
+              class="w-full"
+            />
+          </div>
+
+          <!-- Filtre par catégorie avec icônes -->
+          <div class="space-y-2">
+            <label
+              class="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300"
+            >
+              <UIcon name="i-heroicons-folder" class="h-3 w-3 text-gray-500" />
+              Catégorie
+            </label>
+            <USelect
+              v-model="filters.category"
+              :items="categoryFilterItems"
+              size="sm"
+              color="primary"
+              variant="outline"
+              placeholder="Sélectionner une catégorie"
+              class="w-full"
+            />
+          </div>
+
+          <!-- Filtre par période avec icônes -->
+          <div class="space-y-2">
+            <label
+              class="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300"
+            >
+              <UIcon name="i-heroicons-calendar-days" class="h-3 w-3 text-gray-500" />
+              Période
+            </label>
+            <USelect
+              v-model="filters.days"
+              :items="daysFilterItems"
+              size="sm"
+              color="primary"
+              variant="outline"
+              class="w-full"
+            />
+          </div>
+
+          <!-- Actions des filtres -->
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-medium text-gray-700 dark:text-gray-300"> Actions </label>
+            <div class="flex gap-2">
+              <UButton
+                icon="i-heroicons-arrow-path"
+                size="sm"
+                variant="solid"
+                color="primary"
+                :loading="loadingRecent"
+                class="flex-1"
+                @click="applyFilters"
+              >
+                Appliquer
+              </UButton>
+
+              <UButton
+                icon="i-heroicons-x-mark"
+                size="sm"
+                variant="outline"
+                color="neutral"
+                :disabled="!hasActiveFilters"
+                @click="resetFilters"
+              >
+                Reset
+              </UButton>
+            </div>
+          </div>
+        </div>
+
+        <!-- Résumé des filtres actifs amélioré -->
+        <div
+          v-if="hasActiveFilters"
+          class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700"
+        >
+          <div class="flex items-center gap-2 mb-2">
+            <UIcon name="i-heroicons-check-circle" class="h-4 w-4 text-green-600" />
+            <span class="text-xs font-medium text-green-700 dark:text-green-400"
+              >Filtres actifs</span
+            >
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <UBadge
+              v-if="filters.type !== 'all'"
+              variant="soft"
+              color="primary"
+              size="sm"
+              class="flex items-center gap-1"
+            >
+              <UIcon name="i-heroicons-tag" class="h-3 w-3" />
+              {{ typeFilterItems.find((t) => t.value === filters.type)?.label }}
+              <UButton
+                icon="i-heroicons-x-mark"
+                size="sm"
+                variant="ghost"
+                color="primary"
+                class="ml-1 -mr-1"
+                @click="
+                  filters.type = 'all'
+                  applyFilters()
+                "
+              />
+            </UBadge>
+
+            <UBadge
+              v-if="filters.category !== 'all'"
+              variant="soft"
+              color="success"
+              size="sm"
+              class="flex items-center gap-1"
+            >
+              <UIcon name="i-heroicons-folder" class="h-3 w-3" />
+              {{ categoryFilterItems.find((c) => c.value === filters.category)?.label }}
+              <UButton
+                icon="i-heroicons-x-mark"
+                size="sm"
+                variant="ghost"
+                color="success"
+                class="ml-1 -mr-1"
+                @click="
+                  filters.category = 'all'
+                  applyFilters()
+                "
+              />
+            </UBadge>
+
+            <UBadge
+              v-if="filters.days !== 30"
+              variant="soft"
+              color="secondary"
+              size="sm"
+              class="flex items-center gap-1"
+            >
+              <UIcon name="i-heroicons-calendar-days" class="h-3 w-3" />
+              {{ daysFilterItems.find((d) => d.value === filters.days)?.label }}
+              <UButton
+                icon="i-heroicons-x-mark"
+                size="sm"
+                variant="ghost"
+                color="secondary"
+                class="ml-1 -mr-1"
+                @click="
+                  filters.days = 30
+                  applyFilters()
+                "
+              />
+            </UBadge>
+          </div>
+        </div>
+      </div>
+
+      <!-- État vide personnalisé -->
+      <div v-if="!loadingRecent && recentNotifications.length === 0" class="text-center py-12">
+        <div
+          class="mx-auto h-16 w-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4"
+        >
+          <UIcon name="i-heroicons-bell-slash" class="h-8 w-8 text-gray-400" />
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          Aucune notification
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">
+          {{
+            hasActiveFilters
+              ? 'Aucune notification trouvée avec les filtres appliqués.'
+              : 'Aucune notification récente à afficher.'
+          }}
+        </p>
+        <UButton v-if="hasActiveFilters" variant="outline" @click="resetFilters">
+          <UIcon name="i-heroicons-funnel" class="mr-2" />
+          Réinitialiser les filtres
+        </UButton>
+      </div>
+
+      <!-- Tableau avec syntaxe Nuxt UI v3 correcte -->
+      <UTable
+        v-else
+        :data="recentNotifications"
+        :columns="notificationColumns"
+        :loading="loadingRecent"
+        class="w-full"
+      />
+
+      <!-- Pagination améliorée -->
+      <div
+        v-if="pagination.total > pagination.limit"
+        class="flex items-center justify-between px-4 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700 rounded-b-lg"
+      >
+        <div class="flex items-center gap-4">
+          <!-- Informations de pagination -->
+          <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <UIcon name="i-heroicons-bars-3-bottom-left" class="h-4 w-4" />
+            <span class="font-medium">
+              {{ (pagination.page - 1) * pagination.limit + 1 }}-{{
+                Math.min(pagination.page * pagination.limit, pagination.total)
+              }}
+            </span>
+            <span>sur</span>
+            <span class="font-semibold text-gray-900 dark:text-white">{{ pagination.total }}</span>
+            <span>notification{{ pagination.total > 1 ? 's' : '' }}</span>
+          </div>
+
+          <!-- Sélecteur de nombre d'éléments par page -->
+          <div class="flex items-center gap-2">
+            <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Par page :</label>
+            <USelect
+              v-model="pagination.limit"
+              :items="[
+                { label: '5', value: 5 },
+                { label: '10', value: 10 },
+                { label: '20', value: 20 },
+                { label: '50', value: 50 },
+              ]"
+              size="sm"
+              class="w-20"
+              variant="outline"
+            />
+          </div>
+        </div>
+
+        <!-- Navigation de pagination -->
+        <div class="flex items-center gap-3">
+          <!-- Boutons de navigation rapide -->
+          <UButton
+            :disabled="pagination.page === 1"
+            variant="ghost"
+            size="sm"
+            class="hidden sm:flex"
+            @click="pagination.page = 1"
+          >
+            <UIcon name="i-heroicons-chevron-double-left" class="h-4 w-4" />
+          </UButton>
+
+          <UPagination
+            v-model="pagination.page"
+            :page-count="pagination.limit"
+            :total="pagination.total"
+            size="sm"
+            class="flex-shrink-0"
+          />
+
+          <UButton
+            :disabled="pagination.page === pagination.totalPages"
+            variant="ghost"
+            size="sm"
+            class="hidden sm:flex"
+            @click="pagination.page = pagination.totalPages"
+          >
+            <UIcon name="i-heroicons-chevron-double-right" class="h-4 w-4" />
+          </UButton>
         </div>
       </div>
     </UCard>
@@ -460,7 +703,7 @@
                     v-for="user in testUserEmails"
                     :key="user.value"
                     variant="soft"
-                    size="xs"
+                    size="sm"
                     :color="testForm.targetUserEmail === user.value ? 'primary' : 'neutral'"
                     class="transition-colors"
                     @click="testForm.targetUserEmail = user.value"
@@ -523,6 +766,7 @@
 </template>
 
 <script setup lang="ts">
+import { h } from 'vue'
 import { z } from 'zod'
 
 // Protection admin
@@ -555,16 +799,44 @@ interface NotificationStats {
 interface RecentNotification {
   id: string
   type: string
+  category: string | null
   title: string
   message: string
+  isRead: boolean
+  readAt: string | null
   createdAt: string
-  user?: {
-    pseudo: string
+  actionUrl: string | null
+  actionText: string | null
+  user: {
+    id: number
+    email: string
+    name: string
+    profilePictureUrl: string | null
   }
+}
+
+interface NotificationPagination {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
 }
 
 const stats = ref<NotificationStats | null>(null)
 const recentNotifications = ref<RecentNotification[]>([])
+const pagination = ref<NotificationPagination>({
+  page: 1,
+  limit: 10,
+  total: 0,
+  totalPages: 0,
+})
+
+// Filtres pour les notifications
+const filters = ref({
+  category: 'all',
+  type: 'all',
+  days: 30,
+})
 
 // Formulaire de création
 const createNotificationSchema = z.object({
@@ -639,6 +911,30 @@ const testUserEmails = [
   { label: 'Powange User (utilisateur)', value: 'powange@hotmail.com' },
 ]
 
+// Options pour les filtres (format Nuxt UI v3 avec icônes)
+const typeFilterItems = [
+  { label: 'Tous les types', value: 'all', icon: 'i-heroicons-squares-2x2' },
+  { label: 'Information', value: 'INFO', icon: 'i-heroicons-information-circle' },
+  { label: 'Succès', value: 'SUCCESS', icon: 'i-heroicons-check-circle' },
+  { label: 'Avertissement', value: 'WARNING', icon: 'i-heroicons-exclamation-triangle' },
+  { label: 'Erreur', value: 'ERROR', icon: 'i-heroicons-x-circle' },
+]
+
+const categoryFilterItems = [
+  { label: 'Toutes les catégories', value: 'all', icon: 'i-heroicons-squares-2x2' },
+  { label: 'Système', value: 'system', icon: 'i-heroicons-cog-6-tooth' },
+  { label: 'Édition', value: 'edition', icon: 'i-heroicons-calendar-days' },
+  { label: 'Bénévolat', value: 'volunteer', icon: 'i-heroicons-heart' },
+  { label: 'Autre', value: 'other', icon: 'i-heroicons-ellipsis-horizontal-circle' },
+]
+
+const daysFilterItems = [
+  { label: 'Derniers 7 jours', value: 7 },
+  { label: 'Derniers 30 jours', value: 30 },
+  { label: 'Derniers 90 jours', value: 90 },
+  { label: 'Toutes', value: 365 },
+]
+
 // Options avec labels pour USelect (format correct avec value)
 const testTypesWithLabels = ref([
   {
@@ -667,32 +963,354 @@ const testTypesWithLabels = ref([
   },
 ])
 
-// Méthodes utilitaires
-const getNotificationIcon = (type: string) => {
-  switch (type) {
-    case 'SUCCESS':
-      return 'i-heroicons-check-circle'
-    case 'WARNING':
-      return 'i-heroicons-exclamation-triangle'
-    case 'ERROR':
-      return 'i-heroicons-x-circle'
-    default:
-      return 'i-heroicons-information-circle'
-  }
-}
+// Type pour les lignes du tableau (utilisé pour les colonnes)
+// type NotificationRow = RecentNotification
 
-const getNotificationIconColor = (type: string) => {
-  switch (type) {
-    case 'SUCCESS':
-      return 'text-green-500'
-    case 'WARNING':
-      return 'text-yellow-500'
-    case 'ERROR':
-      return 'text-red-500'
-    default:
-      return 'text-blue-500'
-  }
-}
+// Colonnes du tableau des notifications
+const notificationColumns = [
+  {
+    accessorKey: 'user.name',
+    header: 'Utilisateur',
+    cell: ({ row }: { row: any }) => {
+      const user = row.original.user
+      return h('div', { class: 'flex items-center gap-3 py-1' }, [
+        user.profilePictureUrl
+          ? h('img', {
+              src: user.profilePictureUrl,
+              alt: user.name,
+              class: 'h-9 w-9 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-700',
+            })
+          : h(
+              'div',
+              {
+                class:
+                  'h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold ring-2 ring-gray-200 dark:ring-gray-700',
+              },
+              user.name.charAt(0).toUpperCase()
+            ),
+        h('div', { class: 'min-w-0 flex-1' }, [
+          h('p', { class: 'font-semibold text-gray-900 dark:text-white truncate' }, user.name),
+          h('p', { class: 'text-sm text-gray-500 dark:text-gray-400 truncate' }, user.email),
+        ]),
+      ])
+    },
+  },
+  {
+    accessorKey: 'type',
+    header: 'Type',
+    cell: ({ row }: { row: any }) => {
+      const type = row.getValue('type')
+      const getTypeConfig = (type: string) => {
+        switch (type) {
+          case 'ERROR':
+            return { color: 'error', icon: 'i-heroicons-x-circle', label: 'Erreur' }
+          case 'SUCCESS':
+            return { color: 'success', icon: 'i-heroicons-check-circle', label: 'Succès' }
+          case 'WARNING':
+            return {
+              color: 'warning',
+              icon: 'i-heroicons-exclamation-triangle',
+              label: 'Attention',
+            }
+          default:
+            return { color: 'info', icon: 'i-heroicons-information-circle', label: 'Info' }
+        }
+      }
+      const config = getTypeConfig(type)
+      return h('div', { class: 'flex items-center gap-2' }, [
+        h(resolveComponent('UIcon'), {
+          name: config.icon,
+          class: `h-4 w-4 text-${config.color}-600`,
+        }),
+        h(
+          resolveComponent('UBadge'),
+          {
+            color: config.color,
+            variant: 'soft',
+          },
+          () => config.label
+        ),
+      ])
+    },
+  },
+  {
+    accessorKey: 'title',
+    header: 'Titre & Message',
+    cell: ({ row }: { row: any }) => {
+      const title = row.getValue('title')
+      const message = row.original.message
+      return h('div', { class: 'min-w-0 max-w-md space-y-2 py-1' }, [
+        h(
+          'p',
+          {
+            class: 'font-semibold text-gray-900 dark:text-white leading-tight',
+          },
+          title
+        ),
+        h(
+          'p',
+          {
+            class: 'text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap',
+          },
+          message
+        ),
+        row.original.actionUrl &&
+          h('div', { class: 'mt-1' }, [
+            h(
+              resolveComponent('UBadge'),
+              {
+                variant: 'outline',
+                color: 'primary',
+              },
+              () => [
+                h(resolveComponent('UIcon'), { name: 'i-heroicons-link', class: 'h-3 w-3 mr-1' }),
+                'Action disponible',
+              ]
+            ),
+          ]),
+      ])
+    },
+  },
+  {
+    accessorKey: 'category',
+    header: 'Catégorie',
+    cell: ({ row }: { row: any }) => {
+      const category = row.getValue('category')
+      if (!category) {
+        return h('div', { class: 'flex items-center gap-2 text-gray-400' }, [
+          h(resolveComponent('UIcon'), {
+            name: 'i-heroicons-minus',
+            class: 'h-4 w-4',
+          }),
+          h('span', { class: 'text-xs italic' }, 'Aucune'),
+        ])
+      }
+
+      const getCategoryConfig = (cat: string) => {
+        switch (cat) {
+          case 'system':
+            return { color: 'gray', icon: 'i-heroicons-cog-6-tooth', label: 'Système' }
+          case 'edition':
+            return { color: 'blue', icon: 'i-heroicons-calendar-days', label: 'Édition' }
+          case 'volunteer':
+            return { color: 'green', icon: 'i-heroicons-heart', label: 'Bénévolat' }
+          case 'other':
+            return {
+              color: 'purple',
+              icon: 'i-heroicons-ellipsis-horizontal-circle',
+              label: 'Autre',
+            }
+          default:
+            return { color: 'gray', icon: 'i-heroicons-folder', label: cat }
+        }
+      }
+
+      const config = getCategoryConfig(category)
+      return h('div', { class: 'flex items-center gap-2' }, [
+        h(resolveComponent('UIcon'), {
+          name: config.icon,
+          class: `h-4 w-4 text-${config.color}-600 dark:text-${config.color}-400`,
+        }),
+        h(
+          resolveComponent('UBadge'),
+          {
+            color: config.color,
+            variant: 'soft',
+          },
+          () => config.label
+        ),
+      ])
+    },
+  },
+  {
+    accessorKey: 'isRead',
+    header: 'Statut',
+    cell: ({ row }: { row: any }) => {
+      const isRead = row.getValue('isRead')
+      const readAt = row.original.readAt
+
+      if (isRead) {
+        return h('div', { class: 'flex items-center gap-2' }, [
+          h(resolveComponent('UIcon'), {
+            name: 'i-heroicons-eye',
+            class: 'h-4 w-4 text-green-600 dark:text-green-400',
+          }),
+          h('div', { class: 'space-y-1' }, [
+            h(
+              resolveComponent('UBadge'),
+              {
+                color: 'success',
+                variant: 'soft',
+                size: 'sm',
+              },
+              () => 'Lue'
+            ),
+            readAt &&
+              h(
+                'p',
+                {
+                  class: 'text-xs text-gray-500 dark:text-gray-400',
+                  title: `Lue le ${formatDateTime(readAt)}`,
+                },
+                formatDateTime(readAt).split(' ')[0]
+              ),
+          ]),
+        ])
+      } else {
+        return h('div', { class: 'flex items-center gap-2' }, [
+          h('div', {
+            class: 'h-2 w-2 rounded-full bg-orange-500 animate-pulse',
+          }),
+          h(
+            resolveComponent('UBadge'),
+            {
+              color: 'warning',
+              variant: 'soft',
+              size: 'sm',
+            },
+            () => 'Non lue'
+          ),
+        ])
+      }
+    },
+  },
+  {
+    accessorKey: 'createdAt',
+    header: 'Date',
+    cell: ({ row }: { row: any }) => {
+      const createdAt = row.getValue('createdAt')
+      const date = new Date(createdAt)
+      const now = new Date()
+      const diffMs = now.getTime() - date.getTime()
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+      const diffDays = Math.floor(diffHours / 24)
+
+      let timeAgo = ''
+      let icon = 'i-heroicons-clock'
+      let color = 'gray'
+
+      if (diffHours < 1) {
+        timeAgo = "À l'instant"
+        icon = 'i-heroicons-bolt'
+        color = 'green'
+      } else if (diffHours < 24) {
+        timeAgo = `Il y a ${diffHours}h`
+        color = 'blue'
+      } else if (diffDays === 1) {
+        timeAgo = 'Hier'
+        color = 'yellow'
+      } else if (diffDays < 7) {
+        timeAgo = `Il y a ${diffDays}j`
+        color = 'orange'
+      } else {
+        timeAgo = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
+        color = 'gray'
+      }
+
+      return h('div', { class: 'flex items-center gap-2' }, [
+        h(resolveComponent('UIcon'), {
+          name: icon,
+          class: `h-4 w-4 text-${color}-600 dark:text-${color}-400`,
+        }),
+        h('div', { class: 'space-y-1' }, [
+          h(
+            'p',
+            {
+              class: `text-sm font-medium text-${color}-700 dark:text-${color}-300`,
+            },
+            timeAgo
+          ),
+          h(
+            'p',
+            {
+              class: 'text-xs text-gray-500 dark:text-gray-400',
+              title: formatDateTime(createdAt),
+            },
+            date.toLocaleDateString('fr-FR')
+          ),
+        ]),
+      ])
+    },
+  },
+  {
+    accessorKey: 'actionUrl',
+    header: 'Actions',
+    cell: ({ row }: { row: any }) => {
+      const actionUrl = row.getValue('actionUrl')
+      const actionText = row.original.actionText
+      const notification = row.original
+
+      return h('div', { class: 'flex items-center gap-2' }, [
+        // Bouton d'action principal si disponible
+        actionUrl
+          ? h(
+              resolveComponent('UButton'),
+              {
+                to: actionUrl,
+                variant: 'soft',
+                color: 'primary',
+                target: '_blank',
+                class: 'flex items-center gap-1',
+              },
+              () => [
+                h(resolveComponent('UIcon'), {
+                  name: 'i-heroicons-arrow-top-right-on-square',
+                  class: 'h-3 w-3',
+                }),
+                actionText || 'Voir',
+              ]
+            )
+          : null,
+
+        // Menu d'actions secondaires
+        h(
+          resolveComponent('UDropdown'),
+          {
+            items: [
+              [
+                {
+                  label: 'Copier ID',
+                  icon: 'i-heroicons-clipboard-document',
+                  click: () => {
+                    navigator.clipboard.writeText(notification.id)
+                    toast.add({ title: 'ID copié', color: 'success' })
+                  },
+                },
+                {
+                  label: notification.isRead ? 'Marquer non lue' : 'Marquer comme lue',
+                  icon: notification.isRead ? 'i-heroicons-eye-slash' : 'i-heroicons-eye',
+                  click: () => {
+                    toast.add({
+                      title: 'Fonctionnalité à venir',
+                      description: 'Modification du statut de lecture en cours de développement',
+                      color: 'info',
+                    })
+                  },
+                },
+              ],
+            ],
+          },
+          () =>
+            h(
+              resolveComponent('UButton'),
+              {
+                variant: 'ghost',
+                color: 'gray',
+                square: true,
+              },
+              () =>
+                h(resolveComponent('UIcon'), {
+                  name: 'i-heroicons-ellipsis-horizontal',
+                  class: 'h-4 w-4',
+                })
+            )
+        ),
+      ])
+    },
+  },
+]
+
+// Méthodes utilitaires
 
 const formatDateTime = (dateString: string) => {
   return new Date(dateString).toLocaleString('fr-FR', {
@@ -824,30 +1442,121 @@ const resetTestForm = () => {
 
 const loadStats = async () => {
   try {
-    // Simuler des statistiques pour l'instant
+    const response = await $fetch('/api/admin/notifications/stats')
     stats.value = {
-      totalSent: 127,
-      totalUnread: 23,
-      sentToday: 8,
-      activeTypes: 4,
+      totalSent: response.totalSent || 0,
+      totalUnread: response.unreadCount || 0,
+      sentToday: response.thisWeekCount || 0,
+      activeTypes: response.pushSubscriptionsActive || 0,
     }
   } catch (error) {
     console.error('Erreur lors du chargement des statistiques:', error)
+    toast.add({
+      color: 'error',
+      title: 'Erreur',
+      description: 'Impossible de charger les statistiques',
+    })
   }
 }
 
 const loadRecentNotifications = async () => {
   loadingRecent.value = true
   try {
-    // Pour l'instant, simuler des notifications récentes
-    // Plus tard, on pourra créer une API dédiée
-    recentNotifications.value = []
+    const query: any = {
+      page: pagination.value.page,
+      limit: pagination.value.limit,
+      days: filters.value.days,
+    }
+
+    // Ajouter les filtres seulement s'ils ne sont pas 'all'
+    if (filters.value.type !== 'all') {
+      query.type = filters.value.type
+    }
+
+    if (filters.value.category !== 'all') {
+      query.category = filters.value.category
+    }
+
+    const response = await $fetch('/api/admin/notifications/recent', {
+      query,
+    })
+
+    recentNotifications.value = response.notifications || []
+
+    // Mettre à jour la pagination depuis la réponse serveur
+    if (response.pagination) {
+      pagination.value = {
+        ...pagination.value,
+        total: response.pagination.total,
+        totalPages: response.pagination.totalPages,
+      }
+    }
   } catch (error) {
     console.error('Erreur lors du chargement des notifications récentes:', error)
+    toast.add({
+      color: 'error',
+      title: 'Erreur',
+      description: 'Impossible de charger les notifications récentes',
+    })
+    recentNotifications.value = []
+    pagination.value.total = 0
+    pagination.value.totalPages = 0
   } finally {
     loadingRecent.value = false
   }
 }
+
+// Computed pour les filtres
+const hasActiveFilters = computed(() => {
+  return (
+    filters.value.type !== 'all' || filters.value.category !== 'all' || filters.value.days !== 30
+  )
+})
+
+// Méthodes pour les filtres
+const applyFilters = () => {
+  // Réinitialiser à la page 1 et recharger
+  pagination.value.page = 1
+  loadRecentNotifications()
+}
+
+const resetFilters = () => {
+  filters.value = {
+    category: 'all',
+    type: 'all',
+    days: 30,
+  }
+  pagination.value.page = 1
+  loadRecentNotifications()
+}
+
+// Watchers pour la pagination
+watch(
+  () => pagination.value.page,
+  () => {
+    // Recharger les données quand on change de page
+    loadRecentNotifications()
+  }
+)
+
+watch(
+  () => pagination.value.limit,
+  () => {
+    // Réinitialiser à la page 1 et recharger quand on change la limite
+    pagination.value.page = 1
+    loadRecentNotifications()
+  }
+)
+
+// Watcher pour appliquer automatiquement les filtres
+watch(
+  () => filters.value.days,
+  () => {
+    // Recharger automatiquement quand on change la période
+    pagination.value.page = 1
+    loadRecentNotifications()
+  }
+)
 
 // Initialisation
 onMounted(async () => {
