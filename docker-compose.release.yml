@@ -52,6 +52,10 @@ services:
       NUXT_RECAPTCHA_SECRET_KEY: '${NUXT_RECAPTCHA_SECRET_KEY}'
       # Configuration nuxt-file-storage
       NUXT_FILE_STORAGE_MOUNT: '${NUXT_FILE_STORAGE_MOUNT:-/uploads}'
+      # Configuration VAPID pour notifications push
+      NUXT_PUBLIC_VAPID_PUBLIC_KEY: '${NUXT_PUBLIC_VAPID_PUBLIC_KEY}'
+      VAPID_PRIVATE_KEY: '${VAPID_PRIVATE_KEY}'
+      VAPID_SUBJECT: '${VAPID_SUBJECT}'
     volumes:
       - /home/powange/docker_workspaces/convention-de-jonglerie-release/uploads_data:/app/public/uploads
       - /home/powange/docker_workspaces/convention-de-jonglerie-release/uploads:/uploads
