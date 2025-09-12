@@ -24,13 +24,13 @@ export default defineEventHandler(async (event) => {
   const stream = new ReadableStream({
     start(controller) {
       let isControllerClosed = false
-      
+
       const safeClose = () => {
         if (!isControllerClosed) {
           try {
             controller.close()
             isControllerClosed = true
-          } catch (error) {
+          } catch {
             // Controller déjà fermé, ignorer l'erreur
             console.log(`[SSE] Controller déjà fermé pour user ${user.id}`)
           }

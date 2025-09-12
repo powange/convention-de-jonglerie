@@ -243,10 +243,10 @@
 </template>
 
 <script setup lang="ts">
+import PushNotificationToggle from '~/components/notifications/PushNotificationToggle.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useNotificationsStore } from '~/stores/notifications'
 import type { Notification } from '~/stores/notifications'
-import PushNotificationToggle from '~/components/notifications/PushNotificationToggle.vue'
 
 // Métadonnées de la page
 definePageMeta({

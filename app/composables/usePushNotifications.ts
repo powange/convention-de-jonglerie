@@ -85,11 +85,11 @@ export const usePushNotifications = () => {
         // Si pas de subscription OU permission non accordée, pas d'abonnement valide
         state.isSubscribed = false
         state.subscription = null
-        console.log('[Push] Pas d\'abonnement valide:', {
+        console.log("[Push] Pas d'abonnement valide:", {
           hasSubscription: !!subscription,
           permission: Notification.permission,
         })
-        
+
         // Si on avait une subscription mais plus la permission, la désabonner
         if (subscription && Notification.permission !== 'granted') {
           console.log('[Push] Nettoyage de subscription obsolète')

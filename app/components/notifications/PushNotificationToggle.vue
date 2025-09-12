@@ -66,14 +66,9 @@
         >
           {{ $t('notifications.push.test_button') }}
         </UButton>
-        
+
         <!-- Bouton de debug temporaire -->
-        <UButton
-          size="sm"
-          variant="ghost"
-          icon="i-heroicons-arrow-path"
-          @click="forceCheck"
-        >
+        <UButton size="sm" variant="ghost" icon="i-heroicons-arrow-path" @click="forceCheck">
           Debug
         </UButton>
       </div>
