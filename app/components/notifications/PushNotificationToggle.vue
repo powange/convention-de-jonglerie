@@ -47,7 +47,6 @@
           v-model="isSubscribed"
           :disabled="!isSupported || isLoading || permission === 'denied'"
           :loading="isLoading"
-          @change="handleToggle"
         />
       </div>
     </div>
@@ -100,14 +99,17 @@ const {
 
 const isTesting = ref(false)
 
-// Gérer le changement du toggle
-const handleToggle = async (value: boolean) => {
-  if (value) {
-    await subscribe()
-  } else {
-    await unsubscribe()
+// Watcher pour gérer les changements du switch
+watch(isSubscribed, async (newValue, oldValue) => {
+  // Éviter les appels lors de l'initialisation
+  if (oldValue !== undefined && newValue !== oldValue) {
+    if (newValue) {
+      await subscribe()
+    } else {
+      await unsubscribe()
+    }
   }
-}
+})
 
 // Tester une notification
 const testNotification = async () => {
