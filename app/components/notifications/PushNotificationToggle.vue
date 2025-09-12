@@ -43,7 +43,7 @@
 
       <!-- Toggle switch -->
       <div class="ml-4">
-        <UToggle
+        <USwitch
           v-model="isSubscribed"
           :disabled="!isSupported || isLoading || permission === 'denied'"
           :loading="isLoading"
