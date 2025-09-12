@@ -1,6 +1,6 @@
 import webpush from 'web-push'
 
-import prisma from './prisma'
+import { prisma } from './prisma'
 
 import type { Notification } from '@prisma/client'
 

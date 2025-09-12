@@ -1,4 +1,4 @@
-import prisma from '~/server/utils/prisma'
+import { prisma } from '~/server/utils/prisma'
 import { pushNotificationService } from '~/server/utils/push-notification-service'
 
 export default defineEventHandler(async (event) => {

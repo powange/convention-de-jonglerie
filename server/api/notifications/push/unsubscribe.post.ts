@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import prisma from '~/server/utils/prisma'
+import { prisma } from '~/server/utils/prisma'
 
 const unsubscribeSchema = z.object({
   endpoint: z.string(),
