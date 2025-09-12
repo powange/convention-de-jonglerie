@@ -1194,6 +1194,15 @@
     "loading": "Ładowanie des notifications...",
     "manage_description": "Zarządzaj powiadomieniami i preferencjami",
     "none_found": "Nie znaleziono powiadomień",
+    "push": {
+      "blocked": "Powiadomienia zablokowane w ustawieniach przeglądarki",
+      "description": "Otrzymuj powiadomienia nawet gdy aplikacja jest zamknięta",
+      "disabled": "Powiadomienia wyłączone",
+      "enabled": "Powiadomienia włączone na tym urządzeniu",
+      "not_supported": "Powiadomienia push nie są obsługiwane w tej przeglądarce",
+      "test_button": "Przetestuj powiadomienie",
+      "title": "Powiadomienia push"
+    },
     "this_week": "W tym tygodniu",
     "unread": "Nieprzeczytane"
   },

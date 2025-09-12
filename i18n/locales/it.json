@@ -1194,6 +1194,15 @@
     "loading": "Caricamento notifiche...",
     "manage_description": "Gestisci le tue notifiche e preferenze",
     "none_found": "Nessuna notifica trovata",
+    "push": {
+      "blocked": "Notifiche bloccate nelle impostazioni del browser",
+      "description": "Ricevi notifiche anche quando l'applicazione è chiusa",
+      "disabled": "Notifiche disattivate",
+      "enabled": "Notifiche attivate su questo dispositivo",
+      "not_supported": "Notifiche push non supportate su questo browser",
+      "test_button": "Testa una notifica",
+      "title": "Notifiche push"
+    },
     "this_week": "Questa settimana",
     "unread": "Non lette"
   },

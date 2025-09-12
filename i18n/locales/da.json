@@ -1194,6 +1194,15 @@
     "loading": "Indlæser des notifications...",
     "manage_description": "Administrer dine beskeder og præferencer",
     "none_found": "Ingen beskeder fundet",
+    "push": {
+      "blocked": "Notifikationer blokeret i browserindstillinger",
+      "description": "Modtag notifikationer selv når applikationen er lukket",
+      "disabled": "Notifikationer deaktiveret",
+      "enabled": "Notifikationer aktiveret på denne enhed",
+      "not_supported": "Push-notifikationer understøttes ikke på denne browser",
+      "test_button": "Test en notifikation",
+      "title": "Push-notifikationer"
+    },
     "this_week": "Denne uge",
     "unread": "Ulæste"
   },

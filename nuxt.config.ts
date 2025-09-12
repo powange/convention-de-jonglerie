@@ -113,6 +113,7 @@ export default defineNuxtConfig({
       // Public keys that are available on both client and server
       // Supporte aussi la convention Nuxt NUXT_PUBLIC_*
       recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '', // reCAPTCHA site key for client-side widget
+      vapidPublicKey: process.env.NUXT_PUBLIC_VAPID_PUBLIC_KEY || '', // VAPID public key for push notifications
     },
   },
   vite: {

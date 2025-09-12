@@ -1194,6 +1194,15 @@
     "loading": "Carregando des notifications...",
     "manage_description": "Gerencie suas notificações e preferências",
     "none_found": "Nenhuma notificação encontrada",
+    "push": {
+      "blocked": "Notificações bloqueadas nas configurações do navegador",
+      "description": "Receba notificações mesmo quando a aplicação estiver fechada",
+      "disabled": "Notificações desativadas",
+      "enabled": "Notificações ativadas neste dispositivo",
+      "not_supported": "Notificações push não suportadas neste navegador",
+      "test_button": "Testar uma notificação",
+      "title": "Notificações push"
+    },
     "this_week": "Esta semana",
     "unread": "Não lidas"
   },

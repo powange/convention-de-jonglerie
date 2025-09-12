@@ -1194,6 +1194,15 @@
     "loading": "Loading notifications...",
     "manage_description": "Manage your notifications and preferences",
     "none_found": "No notifications found",
+    "push": {
+      "blocked": "Notifications blocked in browser settings",
+      "description": "Receive notifications even when the application is closed",
+      "disabled": "Notifications disabled",
+      "enabled": "Notifications enabled on this device",
+      "not_supported": "Push notifications not supported on this browser",
+      "test_button": "Test a notification",
+      "title": "Push notifications"
+    },
     "this_week": "This week",
     "unread": "Unread"
   },

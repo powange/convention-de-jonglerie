@@ -1194,6 +1194,15 @@
     "loading": "Laden des notifications...",
     "manage_description": "Beheer je meldingen en voorkeuren",
     "none_found": "Geen meldingen gevonden",
+    "push": {
+      "blocked": "Meldingen geblokkeerd in browserinstellingen",
+      "description": "Ontvang meldingen zelfs wanneer de applicatie gesloten is",
+      "disabled": "Meldingen uitgeschakeld",
+      "enabled": "Meldingen ingeschakeld op dit apparaat",
+      "not_supported": "Push-meldingen niet ondersteund op deze browser",
+      "test_button": "Test een melding",
+      "title": "Push-meldingen"
+    },
     "this_week": "Deze week",
     "unread": "Ongelezen"
   },

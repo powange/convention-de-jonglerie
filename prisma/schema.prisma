@@ -46,6 +46,7 @@ model User {
   lostFoundItems           LostFoundItem[]
   passwordResetTokens      PasswordResetToken[]
   favoriteEditions         Edition[]                       @relation("FavoriteEditions")
+  pushSubscriptions        PushSubscription[]
 }
 
 model Edition {
@@ -577,5 +578,19 @@ enum NotificationType {
   SUCCESS
   WARNING
   ERROR
+}
+
+model PushSubscription {
+  id         String   @id @default(cuid())
+  userId     Int
+  endpoint   String   @db.VarChar(500)
+  p256dh     String   @db.VarChar(255)
+  auth       String   @db.VarChar(255)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, endpoint])
+  @@index([userId])
 }
 

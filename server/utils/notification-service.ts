@@ -1,5 +1,6 @@
 import { notificationStreamManager } from './notification-stream-manager'
 import { prisma } from './prisma'
+import { pushNotificationService } from './push-notification-service'
 
 import type { NotificationType } from '@prisma/client'
 
@@ -63,6 +64,17 @@ export const NotificationService = {
     } catch (error) {
       console.error('[NotificationService] Erreur envoi SSE:', error)
       // Ne pas faire échouer la création de notification si SSE échoue
+    }
+
+    // Envoyer aussi en push notification si disponible
+    try {
+      const pushSent = await pushNotificationService.sendNotification(notification)
+      console.log(
+        `[NotificationService] Notification ${notification.id} ${pushSent ? 'envoyée' : 'non envoyée'} via Push`
+      )
+    } catch (error) {
+      console.error('[NotificationService] Erreur envoi Push:', error)
+      // Ne pas faire échouer la création de notification si Push échoue
     }
 
     return notification
