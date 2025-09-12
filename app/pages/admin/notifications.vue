@@ -304,8 +304,6 @@
               />
             </UFormField>
 
-            <UDivider />
-
             <!-- Contenu -->
             <UFormField label="Titre" name="title" required>
               <UInput

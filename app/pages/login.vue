@@ -385,11 +385,11 @@ const router = useRouter()
 const { t } = useI18n()
 
 // Flow state
-const step = ref<'email' | 'password' | 'register'>('password') // ✨ Direct en mode password pour les tests
+const step = ref<'email' | 'password' | 'register'>('email')
 
 // Étape email
 const emailSchema = z.object({ email: z.string().email(t('errors.invalid_email')) })
-const emailState = reactive({ email: 'powange@gmail.com' }) // ✨ Email pré-rempli pour les tests
+const emailState = reactive({ email: '' })
 
 // Étape password
 const passwordSchema = z.object({

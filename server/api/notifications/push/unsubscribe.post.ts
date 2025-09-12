@@ -16,28 +16,34 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const { endpoint } = unsubscribeSchema.parse(body)
 
-    console.log("[Push Unsubscribe] Suppression de la souscription pour l'utilisateur:", userId)
+    console.log("[Push Unsubscribe] Désactivation de la souscription pour l'utilisateur:", userId)
+    console.log('[Push Unsubscribe] Endpoint:', endpoint)
 
-    // Supprimer la subscription
-    const deleted = await prisma.pushSubscription.deleteMany({
+    // Marquer la subscription comme inactive au lieu de la supprimer
+    const updated = await prisma.pushSubscription.updateMany({
       where: {
         userId,
         endpoint,
       },
+      data: {
+        isActive: false,
+      },
     })
 
-    if (deleted.count === 0) {
-      console.log('[Push Unsubscribe] Aucune subscription trouvée')
+    console.log('[Push Unsubscribe] Résultat update:', { count: updated.count })
+
+    if (updated.count === 0) {
+      console.log('[Push Unsubscribe] ⚠️ Aucune subscription trouvée pour cet endpoint')
       return {
         success: false,
         message: 'Subscription non trouvée',
       }
     }
 
-    console.log('[Push Unsubscribe] Subscription supprimée avec succès')
+    console.log('[Push Unsubscribe] ✅ Subscription désactivée avec succès en BDD')
     return {
       success: true,
-      message: 'Subscription supprimée',
+      message: 'Subscription désactivée',
     }
   } catch (error: any) {
     console.error('[Push Unsubscribe] Erreur:', error)

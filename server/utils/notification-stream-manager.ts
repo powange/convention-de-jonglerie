@@ -44,10 +44,6 @@ class NotificationStreamManager {
     }
     this.userConnections.get(userId)!.add(connectionId)
 
-    console.log(
-      `[SSE] Nouvelle connexion pour user ${userId}. Total connexions: ${this.connections.size}`
-    )
-
     return connectionId
   }
 
@@ -71,10 +67,6 @@ class NotificationStreamManager {
         this.userConnections.delete(userId)
       }
     }
-
-    console.log(
-      `[SSE] Connexion supprimée pour user ${userId}. Total connexions: ${this.connections.size}`
-    )
   }
 
   /**
@@ -111,7 +103,6 @@ class NotificationStreamManager {
     // Nettoyer les connexions mortes
     toRemove.forEach((id) => this.removeConnection(id))
 
-    console.log(`[SSE] Notification envoyée à ${sentCount} connexion(s) pour user ${userId}`)
     return sentCount > 0
   }
 
@@ -120,7 +111,6 @@ class NotificationStreamManager {
    */
   async pingConnections() {
     const toRemove: string[] = []
-    let pingCount = 0
 
     for (const [connectionId, connection] of this.connections) {
       try {
@@ -129,7 +119,6 @@ class NotificationStreamManager {
           data: JSON.stringify({ timestamp: Date.now() }),
         })
         connection.lastPing = new Date()
-        pingCount++
       } catch (error) {
         console.error(`[SSE] Erreur ping connexion ${connectionId}:`, error)
         toRemove.push(connectionId)
@@ -138,10 +127,6 @@ class NotificationStreamManager {
 
     // Nettoyer les connexions mortes
     toRemove.forEach((id) => this.removeConnection(id))
-
-    if (pingCount > 0) {
-      console.log(`[SSE] Ping envoyé à ${pingCount} connexion(s)`)
-    }
   }
 
   /**
@@ -165,7 +150,6 @@ class NotificationStreamManager {
 
     for (const [connectionId, connection] of this.connections) {
       if (now - connection.lastPing.getTime() > staleThreshold) {
-        console.log(`[SSE] Connexion stale détectée: ${connectionId}`)
         toRemove.push(connectionId)
       }
     }
@@ -199,9 +183,7 @@ class NotificationStreamManager {
     }
 
     // Nettoyer toutes les connexions (pas de close() sur notre wrapper)
-    for (const [connectionId] of this.connections) {
-      console.log(`[SSE] Nettoyage connexion ${connectionId}`)
-    }
+    // Nettoyer toutes les connexions
 
     this.connections.clear()
     this.userConnections.clear()
@@ -214,12 +196,10 @@ export const notificationStreamManager = new NotificationStreamManager()
 // Nettoyage gracieux lors de l'arrêt du serveur
 if (process.env.NODE_ENV !== 'development') {
   process.on('SIGINT', () => {
-    console.log('[SSE] Arrêt du gestionnaire de stream...')
     notificationStreamManager.destroy()
   })
 
   process.on('SIGTERM', () => {
-    console.log('[SSE] Arrêt du gestionnaire de stream...')
     notificationStreamManager.destroy()
   })
 }

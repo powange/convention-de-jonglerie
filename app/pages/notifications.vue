@@ -482,17 +482,6 @@ const loadStats = async () => {
 // Polling automatique des notifications
 let pollingInterval: NodeJS.Timeout | null = null
 
-const startPolling = () => {
-  if (pollingInterval) return
-
-  // Rafraîchir toutes les 10 secondes
-  pollingInterval = setInterval(async () => {
-    if (authStore.user && document.visibilityState === 'visible') {
-      await notificationsStore.refresh()
-    }
-  }, 10000)
-}
-
 const stopPolling = () => {
   if (pollingInterval) {
     clearInterval(pollingInterval)
@@ -505,32 +494,36 @@ watch([selectedStatus, selectedCategory], () => {
   applyFilters()
 })
 
+// Plus besoin de ce watcher car le polling est géré par NotificationCenter
+
+// Plus besoin de ces gestionnaires car le polling est géré par NotificationCenter
+
 // Gérer la visibilité de la page
 onMounted(() => {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
-      // Rafraîchir quand l'utilisateur revient sur l'onglet
+      // Rafraîchir une fois quand l'utilisateur revient sur l'onglet
+      // Le SSE ou le polling fallback dans NotificationCenter gérera les mises à jour continues
       if (authStore.user) {
         notificationsStore.refresh()
       }
-      startPolling()
-    } else {
-      // Arrêter le polling quand l'onglet n'est pas visible
-      stopPolling()
     }
   })
+
+  // Plus besoin d'écouter les événements push car le polling est géré centralement
 })
 
 // Initialisation
 onMounted(async () => {
   if (authStore.user) {
     await Promise.all([notificationsStore.refresh(), loadStats()])
-    startPolling()
+    // Plus de startPolling() car géré par NotificationCenter
   }
 })
 
 // Nettoyage
 onUnmounted(() => {
-  stopPolling()
+  stopPolling() // Au cas où il y aurait encore un intervalle actif
+  // Plus besoin de nettoyer les listeners d'événements push
 })
 </script>

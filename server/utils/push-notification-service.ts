@@ -49,11 +49,6 @@ class PushNotificationService {
       webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey)
 
       this.initialized = true
-      console.log('[Push Service] Service initialisé avec succès', {
-        subject: vapidSubject,
-        publicKeyLength: vapidPublicKey?.length,
-        privateKeyLength: vapidPrivateKey?.length
-      })
     } catch (error) {
       console.error("[Push Service] Erreur lors de l'initialisation:", error)
     }
@@ -69,19 +64,17 @@ class PushNotificationService {
     }
 
     try {
-      // Récupérer toutes les subscriptions de l'utilisateur
+      // Récupérer toutes les subscriptions ACTIVES de l'utilisateur
       const subscriptions = await prisma.pushSubscription.findMany({
-        where: { userId },
+        where: {
+          userId,
+          isActive: true, // Ne récupérer que les subscriptions actives
+        },
       })
 
       if (subscriptions.length === 0) {
-        console.log(`[Push Service] Aucune subscription pour l'utilisateur ${userId}`)
         return false
       }
-
-      console.log(
-        `[Push Service] Envoi à ${subscriptions.length} appareil(s) pour l'utilisateur ${userId}`
-      )
 
       // Envoyer à toutes les subscriptions
       const results = await Promise.allSettled(
@@ -90,9 +83,6 @@ class PushNotificationService {
 
       // Compter les succès
       const successCount = results.filter((r) => r.status === 'fulfilled' && r.value).length
-      console.log(
-        `[Push Service] ${successCount}/${subscriptions.length} notifications envoyées avec succès`
-      )
 
       return successCount > 0
     } catch (error) {
@@ -129,11 +119,8 @@ class PushNotificationService {
       const subscriptions = await prisma.pushSubscription.findMany()
 
       if (subscriptions.length === 0) {
-        console.log('[Push Service] Aucune subscription trouvée')
         return 0
       }
-
-      console.log(`[Push Service] Envoi à ${subscriptions.length} subscription(s)`)
 
       // Envoyer à toutes les subscriptions
       const results = await Promise.allSettled(
@@ -142,9 +129,6 @@ class PushNotificationService {
 
       // Compter les succès
       const successCount = results.filter((r) => r.status === 'fulfilled' && r.value).length
-      console.log(
-        `[Push Service] ${successCount}/${subscriptions.length} notifications envoyées avec succès`
-      )
 
       return successCount
     } catch (error) {
@@ -199,11 +183,7 @@ class PushNotificationService {
         timestamp: new Date().toISOString(),
       })
 
-      // Envoyer la notification
       await webpush.sendNotification(pushSubscription, payload)
-      console.log(
-        `[Push Service] ✓ Notification envoyée à ${subscription.endpoint.substring(0, 50)}...`
-      )
       return true
     } catch (error: any) {
       console.error(`[Push Service] ✗ Erreur d'envoi:`, {
@@ -211,12 +191,10 @@ class PushNotificationService {
         statusCode: error.statusCode,
         body: error.body,
         headers: error.headers,
-        stack: error.stack?.split('\n').slice(0, 3).join('\n')
+        stack: error.stack?.split('\n').slice(0, 3).join('\n'),
       })
 
-      // Si l'erreur est 410 (Gone), la subscription n'est plus valide
       if (error.statusCode === 410) {
-        console.log('[Push Service] Subscription expirée, suppression...')
         try {
           await prisma.pushSubscription.delete({
             where: { id: subscription.id },

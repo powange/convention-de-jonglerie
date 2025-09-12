@@ -742,9 +742,12 @@ const arrivalDateOptions = computed(() => {
       ? new Date(props.volunteersInfo.setupStartDate)
       : new Date(props.edition.startDate)
 
+  const endSetupDate = new Date(props.edition.startDate)
+  endSetupDate.setDate(endSetupDate.getDate() - 1)
+
   const endDate =
     formData.value.setupAvailability && props.volunteersInfo?.setupStartDate
-      ? new Date(props.edition.startDate)
+      ? endSetupDate
       : new Date(props.edition.endDate)
 
   // S'assurer qu'il y a au moins un jour d'options
@@ -759,9 +762,12 @@ const arrivalDateOptions = computed(() => {
 const departureDateOptions = computed(() => {
   if (!props.edition) return []
 
+  const startTeardownDate = new Date(props.edition.endDate)
+  startTeardownDate.setDate(startTeardownDate.getDate() + 1)
+
   const startDate =
     formData.value.teardownAvailability && props.volunteersInfo?.teardownEndDate
-      ? new Date(props.edition.endDate)
+      ? startTeardownDate
       : new Date(props.edition.startDate)
 
   const endDate =

@@ -50,8 +50,6 @@ export const useNotificationStream = () => {
     connectionStats.value.error = null
 
     try {
-      console.log('[SSE Client] Connexion au stream de notifications...')
-
       eventSource = new EventSource('/api/notifications/stream')
 
       // Événement de connexion établie
@@ -65,26 +63,16 @@ export const useNotificationStream = () => {
         connectionStats.value.error = null
         reconnectDelay = 1000 // Reset delay
 
-        console.log('[SSE Client] Connexion établie:', data)
-
-        toast.add({
-          color: 'green',
-          title: 'Notifications temps réel',
-          description: 'Connexion établie',
-          timeout: 3000,
-        })
+        // Pas de toast ni de log pour éviter le spam
       })
 
       // Réception de nouvelles notifications
       eventSource.addEventListener('notification', (event) => {
         try {
           const notification: Notification = JSON.parse(event.data)
-          console.log('[SSE Client] 🔔 Nouvelle notification reçue:', notification.title)
-          console.log('[SSE Client] 📝 Détails notification:', notification)
 
           // Ajouter la notification au store
           notificationStore.addRealTimeNotification(notification)
-          console.log('[SSE Client] ✅ Notification ajoutée au store')
 
           // Toast de notification si l'utilisateur n'est pas sur la page notifications
           if (!window.location.pathname.includes('/notifications')) {
@@ -115,9 +103,7 @@ export const useNotificationStream = () => {
       })
 
       // Gestion des erreurs
-      eventSource.onerror = (error) => {
-        console.error('[SSE Client] Erreur SSE:', error)
-
+      eventSource.onerror = () => {
         connectionStats.value.isConnected = false
         connectionStats.value.isConnecting = false
         connectionStats.value.error = 'Connection error'
@@ -128,8 +114,6 @@ export const useNotificationStream = () => {
 
       // Gestion de la fermeture
       eventSource.onclose = () => {
-        console.log('[SSE Client] Connexion SSE fermée')
-
         connectionStats.value.isConnected = false
         connectionStats.value.isConnecting = false
       }
@@ -148,25 +132,13 @@ export const useNotificationStream = () => {
    */
   const scheduleReconnect = () => {
     if (connectionStats.value.reconnectAttempts >= maxReconnectAttempts) {
-      console.log('[SSE Client] Nombre maximum de tentatives de reconnexion atteint')
       connectionStats.value.error = 'Max reconnect attempts reached'
-
-      toast.add({
-        color: 'red',
-        title: 'Connexion perdue',
-        description: 'Impossible de rétablir la connexion temps réel',
-        timeout: 8000,
-      })
       return
     }
 
     if (reconnectTimer) {
       clearTimeout(reconnectTimer)
     }
-
-    console.log(
-      `[SSE Client] Reconnexion programmée dans ${reconnectDelay}ms (tentative ${connectionStats.value.reconnectAttempts + 1}/${maxReconnectAttempts})`
-    )
 
     reconnectTimer = setTimeout(() => {
       connectionStats.value.reconnectAttempts++

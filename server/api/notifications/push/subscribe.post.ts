@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
 
     if (existingSubscription) {
       console.log('[Push Subscribe] Mise à jour de la souscription existante')
-      // Mettre à jour la subscription existante
+      // Mettre à jour la subscription existante et la réactiver
       const updated = await prisma.pushSubscription.update({
         where: {
           id: existingSubscription.id,
@@ -44,6 +44,7 @@ export default defineEventHandler(async (event) => {
         data: {
           p256dh: subscription.keys.p256dh,
           auth: subscription.keys.auth,
+          isActive: true, // Réactiver la subscription
           updatedAt: new Date(),
         },
       })

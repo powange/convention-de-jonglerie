@@ -47,7 +47,14 @@
           v-model="isSubscribed"
           :disabled="!isSupported || isLoading || permission === 'denied'"
           :loading="isLoading"
-          @click="console.log('[Push Toggle] Click detected! Current state:', { isSubscribed, permission, isSupported, isLoading })"
+          @click="
+            console.log('[Push Toggle] Click detected! Current state:', {
+              isSubscribed,
+              permission,
+              isSupported,
+              isLoading,
+            })
+          "
         />
       </div>
     </div>
@@ -110,8 +117,12 @@ const isTesting = ref(false)
 
 // Watcher pour gérer les changements du switch
 watch(isSubscribed, async (newValue, oldValue) => {
-  console.log('[Push Toggle] Watch triggered:', { newValue, oldValue, wasUndefined: oldValue === undefined })
-  
+  console.log('[Push Toggle] Watch triggered:', {
+    newValue,
+    oldValue,
+    wasUndefined: oldValue === undefined,
+  })
+
   // Éviter les appels lors de l'initialisation
   if (oldValue !== undefined && newValue !== oldValue) {
     console.log('[Push Toggle] Changement détecté:', newValue ? 'Subscribe' : 'Unsubscribe')
