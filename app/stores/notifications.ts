@@ -235,18 +235,6 @@ export const useNotificationsStore = defineStore('notifications', {
     },
 
     /**
-     * Actualise les notifications (si pas de fetch récent)
-     */
-    async refresh(force: boolean = false) {
-      // Actualiser si pas de dernière récupération ou si > 5 secondes
-      const shouldRefresh = force || !this.lastFetch || Date.now() - this.lastFetch.getTime() > 5000
-
-      if (shouldRefresh) {
-        await this.fetchNotifications(this.currentFilters)
-      }
-    },
-
-    /**
      * Obtient les statistiques des notifications
      */
     async getStats() {
