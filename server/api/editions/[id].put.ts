@@ -63,6 +63,7 @@ export default defineEventHandler(async (event) => {
     hasShowers,
     hasAccessibility,
     hasWorkshops,
+    hasCashPayment,
     hasCreditCardPayment,
     hasAfjTokenPayment,
   } = validatedData
@@ -268,6 +269,7 @@ export default defineEventHandler(async (event) => {
     if (hasShowers !== undefined) updatedData.hasShowers = hasShowers
     if (hasAccessibility !== undefined) updatedData.hasAccessibility = hasAccessibility
     if (hasWorkshops !== undefined) updatedData.hasWorkshops = hasWorkshops
+    if (hasCashPayment !== undefined) updatedData.hasCashPayment = hasCashPayment
     if (hasCreditCardPayment !== undefined) updatedData.hasCreditCardPayment = hasCreditCardPayment
     if (hasAfjTokenPayment !== undefined) updatedData.hasAfjTokenPayment = hasAfjTokenPayment
 

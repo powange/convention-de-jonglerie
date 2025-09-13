@@ -65,6 +65,7 @@ export default defineEventHandler(async (event) => {
     hasShowers,
     hasAccessibility,
     hasWorkshops,
+    hasCashPayment,
     hasCreditCardPayment,
     hasAfjTokenPayment,
   } = validatedData
@@ -122,6 +123,7 @@ export default defineEventHandler(async (event) => {
         hasShowers: hasShowers || false,
         hasAccessibility: hasAccessibility || false,
         hasWorkshops: hasWorkshops || false,
+        hasCashPayment: hasCashPayment || false,
         hasCreditCardPayment: hasCreditCardPayment || false,
         hasAfjTokenPayment: hasAfjTokenPayment || false,
         creatorId: user.id,
