@@ -621,6 +621,7 @@
     }
   },
   "conventions": {
+    "add_collaborator": "Add collaborator",
     "add_edition": "Add edition",
     "analytics_access": "Analytics access",
     "analytics_access_desc": "Track performance and engagement of your editions",
@@ -649,7 +650,6 @@
     "granular_rights": "Granular rights",
     "granular_rights_desc": "Specific permissions per edition or global according to your needs",
     "logo_alt": "Logo of {name}",
-    "manage": "Manage",
     "manage_collaborators": "Manage collaborators",
     "manage_collaborators_desc": "Invite and manage your organizing team members",
     "manage_editions": "Manage editions",
@@ -667,15 +667,6 @@
   },
   "countries": {
     "czech_republic": "Czech Republic"
-  },
-  "createForm": {
-    "actionText": "Button Text",
-    "actionUrl": "Action URL",
-    "category": "Category",
-    "message": "Message",
-    "title": "Title",
-    "type": "Type",
-    "userId": "User ID"
   },
   "currentValue": {
     "avatar": "Selected user avatar"
@@ -701,8 +692,6 @@
     "pseudo": "Username"
   },
   "editions": {
-    "about_convention": "About the convention",
-    "about_convention_description": "Detailed information about the convention",
     "about_this_edition": "About this edition",
     "add_comment_placeholder": "Add a comment...",
     "add_lost_item": "Add lost item",
@@ -739,6 +728,7 @@
     "no_description_available": "No description available",
     "no_items_reported": "No items have been reported for this edition.",
     "no_lost_items": "No lost items",
+    "no_participants_yet": "No participants yet",
     "no_services": "No specific services provided",
     "not_found": "Edition not found.",
     "official_website": "Official website",
@@ -747,8 +737,6 @@
     "online_status": "Online",
     "organizing_team": "Organizing team",
     "participants": "Participants",
-    "no_participants_yet": "No participants yet",
-    "i_attend": "I attend",
     "photo_optional": "Photo (optional)",
     "photo_uploaded": "Photo uploaded",
     "poster_of": "Poster of {name}",
@@ -1448,20 +1436,20 @@
   },
   "push_notifications": {
     "promo_modal": {
-      "title": "Stay informed in real time",
-      "description": "Enable push notifications to never miss the latest news and events from the juggling community.",
       "benefits": {
+        "community": "Don't miss any community news",
         "new_events": "Be alerted about new events near you",
         "reminders": "Receive reminders for your favorite conventions",
-        "updates": "Stay updated on important announcements",
-        "community": "Don't miss any community news"
+        "updates": "Stay updated on important announcements"
       },
-      "privacy": {
-        "title": "Privacy friendly",
-        "description": "You can disable notifications anytime in your settings."
-      },
+      "description": "Enable push notifications to never miss the latest news and events from the juggling community.",
       "enable": "Enable notifications",
-      "not_now": "Not now"
+      "not_now": "Not now",
+      "privacy": {
+        "description": "You can disable notifications anytime in your settings.",
+        "title": "Privacy friendly"
+      },
+      "title": "Stay informed in real time"
     }
   },
   "pwa": {
@@ -1526,11 +1514,6 @@
   "team": {
     "name": "Team name",
     "slots": "Number of spots"
-  },
-  "testForm": {
-    "message": "Test message",
-    "targetUserEmail": "Target user email",
-    "type": "Notification type"
   },
   "upload": {
     "click_select_convention_logo": "Click to select convention logo",

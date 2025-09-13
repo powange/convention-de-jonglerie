@@ -100,15 +100,16 @@
               <h4 class="text-sm font-medium text-gray-900 dark:text-white">
                 {{ $t('conventions.collaborators') }} ({{ convention.collaborators?.length || 0 }})
               </h4>
-              <UButton
-                v-if="canManageCollaborators(convention)"
-                size="xs"
-                variant="outline"
-                icon="i-heroicons-user-plus"
-                @click="openCollaboratorsModal(convention)"
-              >
-                {{ $t('conventions.manage') }}
-              </UButton>
+              <div v-if="canManageCollaborators(convention)" class="flex gap-2">
+                <UButton
+                  size="xs"
+                  variant="outline"
+                  icon="i-heroicons-plus"
+                  @click="openAddCollaboratorModal(convention)"
+                >
+                  {{ $t('common.add') }}
+                </UButton>
+              </div>
             </div>
             <div v-if="convention.collaborators && convention.collaborators.length > 0">
               <div class="flex flex-wrap gap-2">
@@ -121,14 +122,16 @@
                       : rightsSummary(collaborator).color
                   "
                   variant="subtle"
-                  size="sm"
                   class="flex items-center gap-2"
                 >
                   <div class="flex items-center gap-1.5">
-                    <UserAvatar :user="collaborator.user" size="xs" />
-                    <span>{{ collaborator.user.pseudo }}</span>
-                    <span class="text-xs opacity-75">
-                      ({{ $t(rightsSummary(collaborator).labelKey) }})
+                    <UserAvatar :user="collaborator.user" size="sm" />
+                    <span>{{ collaborator.user?.pseudo || '' }}</span>
+                    <span
+                      v-if="collaborator.title && collaborator.title.trim()"
+                      class="text-xs opacity-75"
+                    >
+                      ({{ collaborator.title.trim() }})
                     </span>
                   </div>
                 </UBadge>
@@ -144,7 +147,7 @@
               </h4>
               <UButton
                 v-if="canAddEdition(convention)"
-                size="xs"
+                size="sm"
                 variant="outline"
                 icon="i-heroicons-plus"
                 :to="`/conventions/${convention.id}/editions/add`"
@@ -183,15 +186,63 @@
       @collaborator-removed="fetchMyConventions"
     />
 
+    <!-- Modal d'ajout de collaborateur -->
+    <UModal
+      v-model:open="addCollaboratorModalOpen"
+      :title="$t('conventions.add_collaborator')"
+      size="lg"
+    >
+      <template #body>
+        <div v-if="selectedConventionForAdd" class="space-y-4">
+          <div class="space-y-3">
+            <!-- Recherche utilisateur -->
+            <div>
+              <label class="block text-sm font-medium mb-2"> Sélectionner un utilisateur </label>
+              <UserSelector
+                v-model="newCollaboratorUser"
+                v-model:search-term="newCollaboratorSearchTerm"
+                :searched-users="searchedUsers"
+                :searching-users="searchingUsers"
+                placeholder="Rechercher un utilisateur..."
+              />
+            </div>
+
+            <!-- Configuration des droits -->
+            <div v-if="newCollaboratorUser">
+              <label class="block text-sm font-medium mb-2"> Droits du collaborateur </label>
+              <CollaboratorRightsFields
+                v-model="newCollaboratorRights"
+                :editions="(selectedConventionForAdd.editions || []) as any[]"
+                :convention-name="selectedConventionForAdd.name"
+                size="sm"
+              />
+            </div>
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton variant="ghost" @click="closeAddCollaboratorModal">
+            {{ $t('common.cancel') }}
+          </UButton>
+          <UButton color="primary" :disabled="!newCollaboratorUser" @click="addCollaborator">
+            {{ $t('common.add') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
+
     <!-- Modal des fonctionnalités -->
     <ConventionsFeaturesModal v-model:model-value="showFeaturesModal" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, h } from 'vue'
+import { ref, onMounted, h, watch } from 'vue'
 
+import CollaboratorRightsFields from '~/components/CollaboratorRightsFields.vue'
 import UserAvatar from '~/components/ui/UserAvatar.vue'
+import UserSelector from '~/components/UserSelector.vue'
 import { useAuthStore } from '~/stores/auth'
 import type { Convention, HttpError, Edition } from '~/types'
 import { summarizeRights } from '~/utils/collaboratorRights'
@@ -224,6 +275,80 @@ const myConventions = ref<Convention[]>([])
 // Modal collaborateurs
 const collaboratorsModalOpen = ref(false)
 const selectedConvention = ref<Convention | null>(null)
+
+// Modal d'ajout de collaborateur
+const addCollaboratorModalOpen = ref(false)
+const selectedConventionForAdd = ref<Convention | null>(null)
+const newCollaboratorUser = ref<any>(null)
+const newCollaboratorSearchTerm = ref('')
+const newCollaboratorRights = ref<any>({
+  title: null,
+  rights: {
+    editConvention: false,
+    deleteConvention: false,
+    manageCollaborators: false,
+    manageVolunteers: false,
+    addEdition: false,
+    editAllEditions: false,
+    deleteAllEditions: false,
+  },
+  perEdition: [],
+})
+
+// Variables pour la recherche d'utilisateurs (réutilisées du UserSelector)
+const searchedUsers = ref<any[]>([])
+const searchingUsers = ref(false)
+
+// Watcher pour la recherche d'utilisateurs
+let searchTimeout: NodeJS.Timeout | null = null
+
+watch(newCollaboratorSearchTerm, (newValue) => {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout)
+  }
+
+  if (!newValue || newValue.length < 2) {
+    searchedUsers.value = []
+    return
+  }
+
+  searchTimeout = setTimeout(async () => {
+    await searchUsers(newValue)
+  }, 300)
+})
+
+const searchUsers = async (query: string) => {
+  if (!query || query.length < 2) {
+    searchedUsers.value = []
+    return
+  }
+
+  try {
+    searchingUsers.value = true
+    const response = await $fetch<any[]>('/api/users/search', {
+      query: { q: query, limit: 10 },
+    })
+
+    searchedUsers.value = response.map((user) => ({
+      id: user.id,
+      label: user.pseudo,
+      email: user.emailHash,
+      avatar: user.profilePicture
+        ? {
+            src: user.profilePicture,
+            alt: user.pseudo,
+          }
+        : undefined,
+      isRealUser: true,
+    }))
+    console.log('Résultats de recherche:', response.length, searchedUsers.value)
+  } catch (error) {
+    console.error('Error searching users:', error)
+    searchedUsers.value = []
+  } finally {
+    searchingUsers.value = false
+  }
+}
 
 // Modal fonctionnalités
 const showFeaturesModal = ref(false)
@@ -334,7 +459,7 @@ const getEditionsColumns = () => [
         {
           color: getStatusColor(edition),
           variant: 'subtle',
-          size: 'sm',
+          size: 'md',
         },
         () => getStatusText(edition)
       )
@@ -371,7 +496,7 @@ const getEditionsColumns = () => [
       const canEdit = convention && canEditEdition(convention, edition.id)
       const canDelete = convention && canDeleteEdition(convention, edition.id)
 
-      const actions = [
+      const actions: any[] = [
         {
           label: t('common.view'),
           icon: 'i-heroicons-eye',
@@ -392,7 +517,7 @@ const getEditionsColumns = () => [
           label: t('common.delete'),
           icon: 'i-heroicons-trash',
           color: 'error' as const,
-          onSelect: () => deleteEdition(edition.id),
+          onClick: () => deleteEdition(edition.id),
         })
       }
 
@@ -421,9 +546,71 @@ const onEditionAction = (_action: unknown) => {
 }
 
 // Fonctions pour gérer les collaborateurs
-const openCollaboratorsModal = (convention: Convention) => {
-  selectedConvention.value = convention
-  collaboratorsModalOpen.value = true
+const openAddCollaboratorModal = (convention: Convention) => {
+  selectedConventionForAdd.value = convention
+  // Réinitialiser les valeurs
+  newCollaboratorUser.value = null
+  newCollaboratorSearchTerm.value = ''
+  newCollaboratorRights.value = {
+    title: null,
+    rights: {
+      editConvention: false,
+      deleteConvention: false,
+      manageCollaborators: false,
+      manageVolunteers: false,
+      addEdition: false,
+      editAllEditions: false,
+      deleteAllEditions: false,
+    },
+    perEdition: [],
+  }
+  searchedUsers.value = []
+  addCollaboratorModalOpen.value = true
+}
+
+const closeAddCollaboratorModal = () => {
+  addCollaboratorModalOpen.value = false
+  selectedConventionForAdd.value = null
+  newCollaboratorUser.value = null
+  newCollaboratorSearchTerm.value = ''
+  searchedUsers.value = []
+}
+
+const addCollaborator = async () => {
+  if (!newCollaboratorUser.value || !selectedConventionForAdd.value) {
+    return
+  }
+
+  try {
+    await $fetch(`/api/conventions/${selectedConventionForAdd.value.id}/collaborators`, {
+      method: 'POST',
+      body: {
+        userId: newCollaboratorUser.value.id,
+        rights: newCollaboratorRights.value.rights,
+        title: newCollaboratorRights.value.title,
+        perEdition: newCollaboratorRights.value.perEdition || [],
+      },
+    })
+
+    toast.add({
+      title: 'Collaborateur ajouté',
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    // Fermer la modal et recharger les conventions
+    closeAddCollaboratorModal()
+    await fetchMyConventions()
+  } catch (error: unknown) {
+    const httpError = error as HttpError
+    console.error('Error adding collaborator:', error)
+    toast.add({
+      title: "Erreur lors de l'ajout",
+      description: httpError.data?.message || httpError.message || t('errors.server_error'),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  }
 }
 
 const deleteEdition = async (_id: number) => {

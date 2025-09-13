@@ -298,6 +298,7 @@
     }
   },
   "conventions": {
+    "add_collaborator": "Ajouter un collaborateur",
     "add_edition": "Ajouter une édition",
     "analytics_access": "Accès aux analyses",
     "analytics_access_desc": "Suivez les performances et l'engagement de vos éditions",
@@ -326,7 +327,6 @@
     "granular_rights": "Droits granulaires",
     "granular_rights_desc": "Permissions spécifiques par édition ou globales selon vos besoins",
     "logo_alt": "Logo de {name}",
-    "manage": "Gérer",
     "manage_collaborators": "Gérer les collaborateurs",
     "manage_collaborators_desc": "Inviter et gérer les membres de votre équipe organisatrice",
     "manage_editions": "Gérer les éditions",

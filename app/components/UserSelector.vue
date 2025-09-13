@@ -1,24 +1,23 @@
 <template>
   <div class="flex gap-2">
     <USelectMenu
-      :model-value="modelValue"
+      v-model="internalValue"
       :search-term="searchTerm"
-      :items="searchedUsers"
+      :items="displayedItems"
       :loading="searchingUsers"
-      searchable
-      clearable
+      ignore-filter
+      option-attribute="label"
       :placeholder="placeholder"
       icon="i-heroicons-user"
-      by="id"
+      :ui="{ content: 'min-w-fit' }"
       class="flex-1"
-      @update:model-value="$emit('update:modelValue', $event)"
-      @update:search-term="$emit('update:searchTerm', $event)"
+      @update:search-term="(v) => emit('update:searchTerm', v)"
     >
       <template #leading>
         <UAvatar
-          v-if="modelValue?.avatar"
-          :src="modelValue.avatar.src"
-          :alt="modelValue.avatar.alt"
+          v-if="internalValue?.avatar"
+          :src="internalValue.avatar.src"
+          :alt="internalValue.avatar.alt"
           size="xs"
         />
         <UIcon v-else name="i-heroicons-user-circle" class="text-gray-400 h-4 w-4" />
@@ -39,13 +38,13 @@
     </USelectMenu>
 
     <UButton
-      v-if="modelValue && showClearButton"
+      v-if="internalValue && showClearButton"
       variant="outline"
       color="neutral"
       size="sm"
       icon="i-heroicons-x-mark"
       class="shrink-0"
-      @click="$emit('update:modelValue', null)"
+      @click="internalValue = undefined"
     />
   </div>
 
@@ -60,9 +59,9 @@
         :key="user.id"
         variant="soft"
         size="sm"
-        :color="modelValue?.id === user.id ? 'primary' : 'neutral'"
+        :color="internalValue?.id === user.id ? 'primary' : 'neutral'"
         class="transition-colors"
-        @click="$emit('update:modelValue', user)"
+        @click="internalValue = user"
       >
         <UAvatar
           v-if="user.avatar"
@@ -79,6 +78,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref, toRefs, watch, computed } from 'vue'
+
 export interface UserSelectItem {
   id: number
   label: string
@@ -98,15 +99,84 @@ interface Props {
   testUsersLabel?: string
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   placeholder: 'Rechercher un utilisateur...',
   showClearButton: true,
   testUsers: undefined,
   testUsersLabel: undefined,
 })
 
-defineEmits<{
+const emit = defineEmits<{
   'update:modelValue': [value: UserSelectItem | null]
   'update:searchTerm': [value: string]
 }>()
+
+// expose prop refs for template convenience
+const {
+  searchTerm,
+  searchedUsers,
+  searchingUsers,
+  placeholder,
+  showClearButton,
+  testUsers,
+  testUsersLabel,
+} = toRefs(props)
+
+// Prevent mutating the incoming prop directly: use an internal ref bound to the select
+const internalValue = ref<UserSelectItem | undefined>(props.modelValue ?? undefined)
+
+// Ensure items passed to USelectMenu include the email in the label so
+// built-in filtering (which usually matches on label) also matches emails.
+const itemsForSelect = computed(() => {
+  const src = searchedUsers.value || []
+  return src.map((u) => {
+    // normalize possible fields returned by different endpoints
+    const pseudo = (u as any).pseudo ?? (u as any).label ?? ''
+    const email = (u as any).email ?? (u as any).emailAddress ?? ''
+    const profilePicture = (u as any).profilePicture ?? (u as any).avatar?.src ?? undefined
+    const avatar = profilePicture ? { src: profilePicture, alt: pseudo || '' } : undefined
+
+    // Build a friendly label without introducing 'undefined' strings
+    const baseLabel = pseudo || String((u as any).id || '')
+    const fullLabel = email ? `${baseLabel} — ${email}` : baseLabel
+
+    return {
+      // preserve original properties (id, etc.) and expose expected fields
+      id: (u as any).id,
+      label: fullLabel,
+      email,
+      avatar,
+      // keep other original data accessible if needed
+      ...u,
+    } as UserSelectItem & Record<string, any>
+  })
+})
+
+// Ensure that an email search matches results: filter items by label or email
+const displayedItems = computed(() => {
+  const term = (searchTerm.value || '').trim().toLowerCase()
+  // If the parent/API already returned results, trust them and show them as-is.
+  if (searchedUsers.value && searchedUsers.value.length > 0) return itemsForSelect.value
+
+  // Fallback to local filtering when we don't have server-side results
+  if (!term || term.length < 2) return itemsForSelect.value
+  return itemsForSelect.value.filter((u) => {
+    const label = (u.label || '').toLowerCase()
+    const email = (u.email || '').toLowerCase()
+    return label.includes(term) || email.includes(term)
+  })
+})
+
+watch(
+  () => props.modelValue,
+  (v) => {
+    internalValue.value = v ?? undefined
+  },
+  { immediate: true }
+)
+
+watch(internalValue, (val) => {
+  emit('update:modelValue', val ?? null)
+})
 </script>
+<!-- thomas.devoue@example.com -->

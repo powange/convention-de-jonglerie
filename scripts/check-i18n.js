@@ -241,6 +241,9 @@ function extractI18nKeysFromFile(filePath) {
       'modelValue',
       'createForm',
       'testForm',
+      'selectedCollaboratorConvention',
+      'selectedConventionForAdd',
+      'internalValue',
     ]
 
     // Exceptions - ces patterns sont valides même s'ils commencent par un mot réservé

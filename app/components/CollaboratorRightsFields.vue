@@ -52,7 +52,7 @@
               <tr
                 class="bg-gray-50 dark:bg-gray-800/60 border-b border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300"
               >
-                <th class="text-left font-medium px-2 py-1">&nbsp;</th>
+                <th class="text-left font-medium px-2 py-1"></th>
                 <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
                   {{ $t('common.edit') }}
                 </th>

@@ -621,6 +621,7 @@
     }
   },
   "conventions": {
+    "add_collaborator": "Adicionar colaborador",
     "add_edition": "Adicionar uma edição",
     "analytics_access": "Acesso às estatísticas",
     "analytics_access_desc": "Acompanhe o desempenho e envolvimento das suas edições",
@@ -649,7 +650,6 @@
     "granular_rights": "Direitos granulares",
     "granular_rights_desc": "Permissões específicas por edição ou globais segundo as suas necessidades",
     "logo_alt": "Logotipo de {name}",
-    "manage": "Gerir",
     "manage_collaborators": "Gerir colaboradores",
     "manage_collaborators_desc": "Convide e gira os membros da sua equipa organizadora",
     "manage_editions": "Gerir edições",
@@ -667,15 +667,6 @@
   },
   "countries": {
     "czech_republic": "República Checa"
-  },
-  "createForm": {
-    "actionText": "Texto do botão",
-    "actionUrl": "URL de ação",
-    "category": "Categoria",
-    "message": "Mensagem",
-    "title": "Título",
-    "type": "Tipo",
-    "userId": "ID do utilizador"
   },
   "currentValue": {
     "avatar": "Avatar do usuário selecionado"
@@ -701,8 +692,6 @@
     "pseudo": "Nome de utilizador"
   },
   "editions": {
-    "about_convention": "Sobre a convenção",
-    "about_convention_description": "Informações detalhadas sobre a convenção",
     "about_this_edition": "Sobre esta edição",
     "add_comment_placeholder": "Adicionar um comentário...",
     "add_lost_item": "Adicionar objecto encontrado",
@@ -1525,11 +1514,6 @@
   "team": {
     "name": "Nome da equipe",
     "slots": "Número de vagas"
-  },
-  "testForm": {
-    "message": "Mensagem de teste",
-    "targetUserEmail": "Email do usuário alvo",
-    "type": "Tipo de notificação"
   },
   "upload": {
     "click_select_convention_logo": "Clique para selecionar logo da convenção",

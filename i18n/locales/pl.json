@@ -621,6 +621,7 @@
     }
   },
   "conventions": {
+    "add_collaborator": "Dodaj współpracownika",
     "add_edition": "Dodaj edycję",
     "analytics_access": "Dostęp do analiz",
     "analytics_access_desc": "Śledź wydajność i zaangażowanie swoich edycji",
@@ -649,7 +650,6 @@
     "granular_rights": "Szczegółowe uprawnienia",
     "granular_rights_desc": "Konkretne uprawnienia dla każdej edycji lub globalne według twoich potrzeb",
     "logo_alt": "Logo {name}",
-    "manage": "Zarządzaj",
     "manage_collaborators": "Zarządzanie współpracownikami",
     "manage_collaborators_desc": "Zapraszaj i zarządzaj członkami swojego zespołu organizacyjnego",
     "manage_editions": "Zarządzanie edycjami",
@@ -667,15 +667,6 @@
   },
   "countries": {
     "czech_republic": "Republika Czeska"
-  },
-  "createForm": {
-    "actionText": "Tekst przycisku",
-    "actionUrl": "URL akcji",
-    "category": "Kategoria",
-    "message": "Wiadomość",
-    "title": "Tytuł",
-    "type": "Typ",
-    "userId": "ID użytkownika"
   },
   "currentValue": {
     "avatar": "Awatar wybranego użytkownika"
@@ -701,8 +692,6 @@
     "pseudo": "Nazwa użytkownika"
   },
   "editions": {
-    "about_convention": "O konwencji",
-    "about_convention_description": "Szczegółowe informacje o konwencji",
     "about_this_edition": "O tej edycji",
     "add_comment_placeholder": "Dodaj komentarz...",
     "add_lost_item": "Dodaj znalezioną rzecz",
@@ -1525,11 +1514,6 @@
   "team": {
     "name": "Nazwa zespołu",
     "slots": "Liczba miejsc"
-  },
-  "testForm": {
-    "message": "Wiadomość testowa",
-    "targetUserEmail": "Email użytkownika docelowego",
-    "type": "Typ powiadomienia"
   },
   "upload": {
     "click_select_convention_logo": "Kliknij, aby wybrać logo konwencji",

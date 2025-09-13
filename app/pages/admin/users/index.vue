@@ -42,7 +42,6 @@
             v-model="searchQuery"
             :placeholder="t('admin.search_users_placeholder')"
             icon="i-heroicons-magnifying-glass"
-            size="sm"
             @input="debouncedSearch"
           />
         </div>
@@ -52,7 +51,6 @@
           v-model="adminFilter"
           :items="adminFilterOptions"
           value-key="value"
-          size="sm"
           class="w-full sm:w-48"
           @change="fetchUsers"
         />
@@ -62,7 +60,6 @@
           v-model="emailFilter"
           :items="emailFilterOptions"
           value-key="value"
-          size="sm"
           class="w-full sm:w-48"
           @change="fetchUsers"
         />
@@ -72,7 +69,6 @@
           v-model="sortOption"
           :items="sortOptions"
           value-key="value"
-          size="sm"
           class="w-full sm:w-48"
           @change="fetchUsers"
         />
@@ -122,11 +118,10 @@
       <!-- Pagination -->
       <div v-if="pagination.totalPages > 1" class="flex justify-center mt-6">
         <UPagination
-          v-model="currentPage"
+          :default-page="currentPage"
+          :items-per-page="pagination.limit"
           :total="pagination.totalCount"
-          :page-count="pagination.limit"
-          :max="5"
-          @update:model-value="fetchUsers"
+          @update:page="onPageChange"
         />
       </div>
     </UCard>
@@ -414,7 +409,7 @@ const formatRelativeTime = (date: string) => {
 const getUserActions = (user: AdminUser) => {
   console.log('Creating actions for user:', user.pseudo)
 
-  const actions = [
+  const actions: any[] = [
     // Action pour voir le profil
     {
       label: t('admin.view_profile'),
@@ -428,7 +423,7 @@ const getUserActions = (user: AdminUser) => {
     actions.push({
       label: t('admin.promote_to_admin'),
       icon: 'i-heroicons-shield-check',
-      onSelect: () => {
+      onClick: () => {
         console.log('Promote clicked for:', user.pseudo)
         promoteToAdmin(user)
       },
@@ -437,8 +432,7 @@ const getUserActions = (user: AdminUser) => {
     actions.push({
       label: t('admin.demote'),
       icon: 'i-heroicons-shield-exclamation',
-      color: 'error' as const,
-      onSelect: () => {
+      onClick: () => {
         console.log('Demote clicked for:', user.pseudo)
         demoteFromAdmin(user)
       },
@@ -450,8 +444,7 @@ const getUserActions = (user: AdminUser) => {
     actions.push({
       label: t('admin.delete_account'),
       icon: 'i-heroicons-trash',
-      color: 'error' as const,
-      onSelect: () => {
+      onClick: () => {
         console.log('Delete clicked for:', user.pseudo)
         openDeletionModal(user)
       },
@@ -539,7 +532,7 @@ const openDeletionModal = (user: AdminUser) => {
 }
 
 // Fonction appelée après suppression réussie
-const onUserDeleted = (deletedUser: AdminUser) => {
+const onUserDeleted = (deletedUser: any) => {
   // Retirer l'utilisateur de la liste
   users.value = users.value.filter((u) => u.id !== deletedUser.id)
   // Fermer le modal
@@ -560,6 +553,12 @@ const debouncedSearch = () => {
     currentPage.value = 1
     fetchUsers()
   }, 300)
+}
+
+// Fonction pour gérer le changement de page
+const onPageChange = (page: number) => {
+  currentPage.value = page
+  fetchUsers()
 }
 
 // Fonction pour récupérer les utilisateurs

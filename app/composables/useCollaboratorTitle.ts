@@ -8,7 +8,13 @@ export function useCollaboratorTitle() {
   const { t } = useI18n()
 
   function formatRightsTitle(collab: { rights?: Record<string, boolean>; title?: string | null }) {
-    if (!collab.rights) return collab.title || t('permissions.viewer')
+    // Prioriser le titre personnalisé s'il existe
+    if (collab.title && collab.title.trim()) {
+      return collab.title.trim()
+    }
+
+    // Sinon, utiliser les permissions automatiques
+    if (!collab.rights) return t('permissions.viewer')
     const r = collab.rights
     const allKeys = [
       'editConvention',

@@ -621,6 +621,7 @@
     }
   },
   "conventions": {
+    "add_collaborator": "Aggiungi collaboratore",
     "add_edition": "Aggiungi edizione",
     "analytics_access": "Accesso alle statistiche",
     "analytics_access_desc": "Monitora le prestazioni e il coinvolgimento delle tue edizioni",
@@ -649,7 +650,6 @@
     "granular_rights": "Diritti granulari",
     "granular_rights_desc": "Permessi specifici per edizione o globali secondo le tue esigenze",
     "logo_alt": "Logo di {name}",
-    "manage": "Gestisci",
     "manage_collaborators": "Gestire collaboratori",
     "manage_collaborators_desc": "Invita e gestisci i membri del tuo team organizzativo",
     "manage_editions": "Gestire edizioni",
@@ -667,15 +667,6 @@
   },
   "countries": {
     "czech_republic": "Repubblica Ceca"
-  },
-  "createForm": {
-    "actionText": "Testo del pulsante",
-    "actionUrl": "URL azione",
-    "category": "Categoria",
-    "message": "Messaggio",
-    "title": "Titolo",
-    "type": "Tipo",
-    "userId": "ID utente"
   },
   "currentValue": {
     "avatar": "Avatar dell'utente selezionato"
@@ -701,8 +692,6 @@
     "pseudo": "Nome utente"
   },
   "editions": {
-    "about_convention": "Informazioni sulla convention",
-    "about_convention_description": "Informazioni dettagliate sulla convention",
     "about_this_edition": "A proposito di questa edizione",
     "add_comment_placeholder": "Aggiungi un commento...",
     "add_lost_item": "Aggiungi oggetto smarrito",
@@ -1525,11 +1514,6 @@
   "team": {
     "name": "Nome del team",
     "slots": "Numero di posti"
-  },
-  "testForm": {
-    "message": "Messaggio di test",
-    "targetUserEmail": "Email utente di destinazione",
-    "type": "Tipo di notifica"
   },
   "upload": {
     "click_select_convention_logo": "Clicca per selezionare un logo della convention",

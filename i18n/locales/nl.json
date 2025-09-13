@@ -621,6 +621,7 @@
     }
   },
   "conventions": {
+    "add_collaborator": "Medewerker toevoegen",
     "add_edition": "Editie toevoegen",
     "analytics_access": "Toegang tot statistieken",
     "analytics_access_desc": "Volg de prestaties en betrokkenheid van je edities",
@@ -649,7 +650,6 @@
     "granular_rights": "Gedetailleerde rechten",
     "granular_rights_desc": "Specifieke rechten per editie of globaal volgens je behoeften",
     "logo_alt": "Logo van {name}",
-    "manage": "Beheren",
     "manage_collaborators": "Medewerkers beheren",
     "manage_collaborators_desc": "Nodig teamleden uit en beheer ze",
     "manage_editions": "Edities beheren",
@@ -667,15 +667,6 @@
   },
   "countries": {
     "czech_republic": "Tsjechische Republiek"
-  },
-  "createForm": {
-    "actionText": "Knoptekst",
-    "actionUrl": "Actie-URL",
-    "category": "Categorie",
-    "message": "Bericht",
-    "title": "Titel",
-    "type": "Type",
-    "userId": "Gebruikers-ID"
   },
   "currentValue": {
     "avatar": "Avatar van geselecteerde gebruiker"
@@ -701,8 +692,6 @@
     "pseudo": "Gebruikersnaam"
   },
   "editions": {
-    "about_convention": "Over de conventie",
-    "about_convention_description": "Gedetailleerde informatie over de conventie",
     "about_this_edition": "Over deze editie",
     "add_comment_placeholder": "Voeg een opmerking toe...",
     "add_lost_item": "Verloren voorwerp toevoegen",
@@ -1525,11 +1514,6 @@
   "team": {
     "name": "Teamnaam",
     "slots": "Aantal plaatsen"
-  },
-  "testForm": {
-    "message": "Testbericht",
-    "targetUserEmail": "E-mail van doelgebruiker",
-    "type": "Meldingstype"
   },
   "upload": {
     "click_select_convention_logo": "Klik om een conventie logo te selecteren",

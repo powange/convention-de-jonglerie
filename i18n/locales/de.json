@@ -621,6 +621,7 @@
     }
   },
   "conventions": {
+    "add_collaborator": "Mitarbeiter hinzufügen",
     "add_edition": "Eine Auflage hinzufügen",
     "analytics_access": "Zugang zu Statistiken",
     "analytics_access_desc": "Verfolgen Sie die Leistung und das Engagement Ihrer Auflagen",
@@ -649,7 +650,6 @@
     "granular_rights": "Detaillierte Rechte",
     "granular_rights_desc": "Spezifische Berechtigungen pro Auflage oder global nach Ihren Bedürfnissen",
     "logo_alt": "Logo von {name}",
-    "manage": "Verwalten",
     "manage_collaborators": "Mitarbeiter verwalten",
     "manage_collaborators_desc": "Laden Sie Ihre Organisationsteam-Mitglieder ein und verwalten Sie sie",
     "manage_editions": "Auflagen verwalten",
@@ -667,15 +667,6 @@
   },
   "countries": {
     "czech_republic": "Tschechische Republik"
-  },
-  "createForm": {
-    "actionText": "Schaltflächentext",
-    "actionUrl": "Aktions-URL",
-    "category": "Kategorie",
-    "message": "Nachricht",
-    "title": "Titel",
-    "type": "Typ",
-    "userId": "Benutzer-ID"
   },
   "currentValue": {
     "avatar": "Avatar des ausgewählten Benutzers"
@@ -701,8 +692,6 @@
     "pseudo": "Benutzername"
   },
   "editions": {
-    "about_convention": "Über die Convention",
-    "about_convention_description": "Detaillierte Informationen zur Convention",
     "about_this_edition": "Über diese Auflage",
     "add_comment_placeholder": "Kommentar hinzufügen...",
     "add_lost_item": "Fundsache hinzufügen",
@@ -1525,11 +1514,6 @@
   "team": {
     "name": "Teamname",
     "slots": "Anzahl der Plätze"
-  },
-  "testForm": {
-    "message": "Testnachricht",
-    "targetUserEmail": "E-Mail des Zielbenutzers",
-    "type": "Benachrichtigungstyp"
   },
   "upload": {
     "click_select_convention_logo": "Klicken Sie, um ein Convention-Logo auszuwählen",

@@ -621,6 +621,7 @@
     }
   },
   "conventions": {
+    "add_collaborator": "Добавить сотрудника",
     "add_edition": "Добавить издание",
     "analytics_access": "Доступ к аналитике",
     "analytics_access_desc": "Отслеживайте эффективность и вовлеченность ваших изданий",
@@ -649,7 +650,6 @@
     "granular_rights": "Детальные права",
     "granular_rights_desc": "Специфические разрешения для каждого издания или глобальные согласно вашим потребностям",
     "logo_alt": "Логотип {name}",
-    "manage": "Управлять",
     "manage_collaborators": "Управление сотрудниками",
     "manage_collaborators_desc": "Приглашайте и управляйте членами вашей организационной команды",
     "manage_editions": "Управление изданиями",
@@ -667,15 +667,6 @@
   },
   "countries": {
     "czech_republic": "Чешская Республика"
-  },
-  "createForm": {
-    "actionText": "Текст кнопки",
-    "actionUrl": "URL действия",
-    "category": "Категория",
-    "message": "Сообщение",
-    "title": "Заголовок",
-    "type": "Тип",
-    "userId": "ID пользователя"
   },
   "currentValue": {
     "avatar": "Аватар выбранного пользователя"
@@ -701,8 +692,6 @@
     "pseudo": "Имя пользователя"
   },
   "editions": {
-    "about_convention": "О конвенции",
-    "about_convention_description": "Подробная информация о конвенции",
     "about_this_edition": "Об этом издании",
     "add_comment_placeholder": "Добавить комментарий...",
     "add_lost_item": "Добавить потерянную вещь",
@@ -1525,11 +1514,6 @@
   "team": {
     "name": "Название команды",
     "slots": "Количество мест"
-  },
-  "testForm": {
-    "message": "Тестовое сообщение",
-    "targetUserEmail": "Email целевого пользователя",
-    "type": "Тип уведомления"
   },
   "upload": {
     "click_select_convention_logo": "Нажмите, чтобы выбрать логотип конвенции",

@@ -621,6 +621,7 @@
     }
   },
   "conventions": {
+    "add_collaborator": "Tilføj en samarbejdspartner",
     "add_edition": "Tilføj en udgave",
     "analytics_access": "Adgang til statistikker",
     "analytics_access_desc": "Følg ydeevne og engagement for dine udgaver",
@@ -649,7 +650,6 @@
     "granular_rights": "Granulære rettigheder",
     "granular_rights_desc": "Specifikke tilladelser per udgave eller globale efter dine behov",
     "logo_alt": "Logo for {name}",
-    "manage": "Administrer",
     "manage_collaborators": "Administrer samarbejdspartnere",
     "manage_collaborators_desc": "Inviter og administrer medlemmer af dit organisationsteam",
     "manage_editions": "Administrer udgaver",
@@ -667,15 +667,6 @@
   },
   "countries": {
     "czech_republic": "Tjekkiet"
-  },
-  "createForm": {
-    "actionText": "Knaptekst",
-    "actionUrl": "Handlings-URL",
-    "category": "Kategori",
-    "message": "Besked",
-    "title": "Titel",
-    "type": "Type",
-    "userId": "Bruger-ID"
   },
   "currentValue": {
     "avatar": "Valgt brugers avatar"
@@ -701,8 +692,6 @@
     "pseudo": "Brugernavn"
   },
   "editions": {
-    "about_convention": "Om konventionen",
-    "about_convention_description": "Detaljerede oplysninger om konventionen",
     "about_this_edition": "Om denne udgave",
     "add_comment_placeholder": "Tilføj en kommentar...",
     "add_lost_item": "Tilføj hittegods",
@@ -1525,11 +1514,6 @@
   "team": {
     "name": "Holdnavn",
     "slots": "Antal pladser"
-  },
-  "testForm": {
-    "message": "Testbesked",
-    "targetUserEmail": "Måluserens email",
-    "type": "Notifikationstype"
   },
   "upload": {
     "click_select_convention_logo": "Klik for at vælge convention logo",
