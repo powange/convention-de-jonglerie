@@ -32,32 +32,50 @@
                 </div>
               </div>
 
-              <!-- Bouton favori mobile -->
-              <UButton
-                v-if="authStore.isAuthenticated"
-                :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-                :color="isFavorited ? 'warning' : 'neutral'"
-                variant="ghost"
-                size="sm"
-                class="sm:hidden flex-shrink-0"
-                @click="$emit('toggle-favorite')"
-              />
+              <!-- Actions mobile -->
+              <div v-if="authStore.isAuthenticated" class="sm:hidden flex items-center gap-2">
+                <!-- Checkbox Participation mobile -->
+                <UCheckbox
+                  :model-value="isAttending"
+                  @update:model-value="$emit('toggle-attendance')"
+                />
+
+                <!-- Bouton favori mobile -->
+                <UButton
+                  :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+                  :color="isFavorited ? 'warning' : 'neutral'"
+                  variant="ghost"
+                  size="sm"
+                  class="flex-shrink-0"
+                  @click="$emit('toggle-favorite')"
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Bouton favori desktop -->
-        <UButton
-          v-if="authStore.isAuthenticated"
-          :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-          :color="isFavorited ? 'warning' : 'neutral'"
-          variant="ghost"
-          size="lg"
-          class="hidden sm:flex"
-          @click="$emit('toggle-favorite')"
-        >
-          {{ isFavorited ? t('profile.favorites') : t('common.add') }}
-        </UButton>
+        <!-- Actions desktop -->
+        <div v-if="authStore.isAuthenticated" class="hidden sm:flex gap-3">
+          <!-- Checkbox Participation -->
+          <div class="flex items-center gap-2">
+            <UCheckbox
+              :model-value="isAttending"
+              :label="$t('editions.i_attend')"
+              @update:model-value="$emit('toggle-attendance')"
+            />
+          </div>
+
+          <!-- Bouton favori -->
+          <UButton
+            :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+            :color="isFavorited ? 'warning' : 'neutral'"
+            variant="ghost"
+            size="lg"
+            @click="$emit('toggle-favorite')"
+          >
+            {{ isFavorited ? t('profile.favorites') : t('common.add') }}
+          </UButton>
+        </div>
       </div>
     </div>
 
@@ -262,12 +280,15 @@ interface Props {
   edition: Edition
   currentPage: 'details' | 'commentaires' | 'carpool' | 'gestion' | 'objets-trouves' | 'volunteers'
   isFavorited?: boolean
+  isAttending?: boolean
 }
 
 const props = defineProps<Props>()
 defineEmits<{
   'toggle-favorite': []
+  'toggle-attendance': []
 }>()
+
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
 

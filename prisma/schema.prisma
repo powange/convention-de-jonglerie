@@ -46,6 +46,7 @@ model User {
   lostFoundItems           LostFoundItem[]
   passwordResetTokens      PasswordResetToken[]
   favoriteEditions         Edition[]                       @relation("FavoriteEditions")
+  attendingEditions        Edition[]                       @relation("AttendingEditions")
   pushSubscriptions        PushSubscription[]
 }
 
@@ -125,6 +126,7 @@ model Edition {
   volunteerApplications        EditionVolunteerApplication[]
   lostFoundItems               LostFoundItem[]
   favoritedBy                  User[]                          @relation("FavoriteEditions")
+  attendingUsers               User[]                          @relation("AttendingEditions")
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")

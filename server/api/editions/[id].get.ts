@@ -23,6 +23,15 @@ export default defineEventHandler(async (event) => {
         favoritedBy: {
           select: { id: true },
         },
+        attendingUsers: {
+          select: {
+            id: true,
+            pseudo: true,
+            profilePicture: true,
+            updatedAt: true,
+            email: true,
+          },
+        },
         // Champs bénévolat nécessaires pour la page de gestion
         _count: {
           select: { volunteerApplications: true },
@@ -126,6 +135,17 @@ export default defineEventHandler(async (event) => {
             }
           })(),
         })) as any
+      }
+
+      // Transformer les participants (attendingUsers)
+      if (edition.attendingUsers) {
+        edition.attendingUsers = edition.attendingUsers.map((user) => {
+          const { email, ...userWithoutEmail } = user as any
+          return {
+            ...userWithoutEmail,
+            emailHash: getEmailHash(email),
+          }
+        }) as any
       }
     }
 

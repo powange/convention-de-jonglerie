@@ -33,7 +33,9 @@
         :edition="edition"
         current-page="details"
         :is-favorited="isFavorited(edition.id)"
+        :is-attending="isAttending(edition.id)"
         @toggle-favorite="toggleFavorite(edition.id)"
+        @toggle-attendance="toggleAttendance(edition.id)"
       />
 
       <!-- Contenu des détails -->
@@ -208,6 +210,36 @@
           </div>
         </div>
       </UCard>
+
+      <!-- Liste des participants -->
+      <UCard
+        v-if="edition.attendingUsers && edition.attendingUsers.length > 0"
+        variant="subtle"
+        class="mt-6"
+      >
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-users" class="text-primary-500" />
+            <h3 class="text-lg font-semibold">{{ $t('editions.participants') }}</h3>
+            <UBadge size="sm" color="neutral" variant="soft">
+              {{ edition.attendingUsers.length }}
+            </UBadge>
+          </div>
+        </template>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div
+            v-for="participant in edition.attendingUsers"
+            :key="participant.id"
+            class="flex flex-col items-center text-center"
+          >
+            <UserAvatar :user="participant" size="md" class="mb-2" />
+            <span class="text-sm font-medium text-gray-900 dark:text-white truncate w-full">
+              {{ participant.pseudo }}
+            </span>
+          </div>
+        </div>
+      </UCard>
     </div>
 
     <!-- Overlay pour l'affiche en grand -->
@@ -294,7 +326,11 @@ const descriptionHtml = computedAsync(async () => {
 }, '')
 
 const isFavorited = computed(() => (_editionId: number) => {
-  return edition.value?.favoritedBy.some((u) => u.id === authStore.user?.id)
+  return edition.value?.favoritedBy?.some((u) => u.id === authStore.user?.id) || false
+})
+
+const isAttending = computed(() => (_editionId: number) => {
+  return edition.value?.attendingUsers?.some((u) => u.id === authStore.user?.id) || false
 })
 
 // Check if user can manage edition
@@ -355,6 +391,34 @@ const toggleFavorite = async (id: number) => {
       e && typeof e === 'object' && 'statusMessage' in e && typeof e.statusMessage === 'string'
         ? e.statusMessage
         : t('errors.favorite_update_failed')
+    toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' })
+  }
+}
+
+const toggleAttendance = async (id: number) => {
+  try {
+    const response = await $fetch(`/api/editions/${id}/attendance`, {
+      method: 'POST',
+    })
+
+    // Recharger l'édition pour mettre à jour les données (forcer le rafraîchissement)
+    await editionStore.fetchEditionById(editionId, { force: true })
+
+    // Afficher le message traduit selon l'état
+    const message = response.isAttending
+      ? t('messages.attendance_added')
+      : t('messages.attendance_removed')
+
+    toast.add({
+      title: message,
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (e: unknown) {
+    const errorMessage =
+      e && typeof e === 'object' && 'statusMessage' in e && typeof e.statusMessage === 'string'
+        ? e.statusMessage
+        : t('errors.attendance_update_failed')
     toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' })
   }
 }

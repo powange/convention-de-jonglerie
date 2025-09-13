@@ -106,6 +106,7 @@
     "web-push": "^3.6.7"
   },
   "devDependencies": {
+    "prisma": "^6.15.0",
     "@iconify-json/bx": "^1.2.2",
     "@iconify-json/guidance": "^1.2.2",
     "@iconify-json/heroicons": "^1.2.2",

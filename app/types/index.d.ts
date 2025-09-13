@@ -45,6 +45,7 @@ export interface Edition {
   conventionId: number
   convention?: ConventionWithCollaborators
   favoritedBy: { id: number }[]
+  attendingUsers?: PublicUser[]
   collaborators?: EditionCollaborator[]
   ticketingUrl?: string | null
   facebookUrl?: string | null
