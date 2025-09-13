@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     // Trouver les éditions qui commencent dans 3 ou 7 jours
     const upcomingEditions = await prisma.edition.findMany({
       where: {
-        dateStart: {
+        startDate: {
           gte: now,
           lte: sevenDaysFromNow,
         },
@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
 
     for (const edition of upcomingEditions) {
       const daysUntil = Math.ceil(
-        (edition.dateStart.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+        (edition.startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
       )
 
       // Envoyer des rappels seulement pour 3 ou 7 jours

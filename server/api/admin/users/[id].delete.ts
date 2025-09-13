@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
     const deletionReason = DELETION_REASONS[reason as keyof typeof DELETION_REASONS]
 
     // Empêcher l'auto-suppression
-    if (userIdToDelete === adminUserId) {
+    if (userIdToDelete === adminUser.id) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Impossible de supprimer son propre compte',

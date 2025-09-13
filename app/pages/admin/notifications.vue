@@ -541,15 +541,17 @@
 
             <!-- Destinataire -->
             <UFormField
-              label="ID Utilisateur (optionnel)"
-              name="userId"
+              label="Destinataire (optionnel)"
+              name="targetUser"
               description="Laissez vide pour vous l'envoyer (test)"
             >
-              <UInput
-                v-model="createForm.userId"
-                type="number"
-                placeholder="Ex: 123"
-                icon="i-heroicons-user"
+              <UserSelector
+                v-model="createForm.targetUser"
+                v-model:search-term="createSearchQuery"
+                :searched-users="createSearchedUsers"
+                :searching-users="createSearchingUsers"
+                placeholder="Rechercher un utilisateur..."
+                :show-clear-button="true"
               />
             </UFormField>
 
@@ -587,7 +589,6 @@
                     v-model="createForm.actionUrl"
                     placeholder="https://..."
                     icon="i-heroicons-link"
-                    size="sm"
                   />
                 </UFormField>
 
@@ -596,7 +597,6 @@
                     v-model="createForm.actionText"
                     placeholder="Ex: Voir détails"
                     icon="i-heroicons-arrow-right"
-                    size="sm"
                   />
                 </UFormField>
               </div>
@@ -684,41 +684,21 @@
             class="space-y-6"
             @submit="testNotificationAdvanced"
           >
-            <!-- Email de l'utilisateur cible -->
+            <!-- Recherche et sélection d'utilisateur -->
             <UFormField
               label="Destinataire"
-              name="targetUserEmail"
-              description="Email de l'utilisateur qui recevra la notification"
+              name="targetUser"
+              description="Recherchez et sélectionnez l'utilisateur qui recevra la notification"
               required
             >
-              <UInput
-                v-model="testForm.targetUserEmail"
-                type="email"
-                placeholder="exemple@email.com"
-                class="w-full"
-                icon="i-heroicons-envelope"
+              <UserSelector
+                v-model="testForm.targetUser"
+                v-model:search-term="searchQuery"
+                :searched-users="searchedUsers"
+                :searching-users="searchingUsers"
+                placeholder="Rechercher un utilisateur..."
+                :test-users="testUserItems"
               />
-
-              <!-- Suggestions rapides avec meilleure présentation -->
-              <div class="mt-3">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                  Utilisateurs de test disponibles :
-                </p>
-                <div class="flex flex-wrap gap-2">
-                  <UButton
-                    v-for="user in testUserEmails"
-                    :key="user.value"
-                    variant="soft"
-                    size="sm"
-                    :color="testForm.targetUserEmail === user.value ? 'primary' : 'neutral'"
-                    class="transition-colors"
-                    @click="testForm.targetUserEmail = user.value"
-                  >
-                    <UIcon name="i-heroicons-user" class="mr-1 h-3 w-3" />
-                    {{ user.label.split(' ')[0] }}
-                  </UButton>
-                </div>
-              </div>
             </UFormField>
 
             <!-- Type de notification -->
@@ -758,7 +738,7 @@
                 :loading="testingAdvanced"
                 color="primary"
                 form="test-form"
-                :disabled="!testForm.targetUserEmail || !testForm.type"
+                :disabled="!testForm.targetUser || !testForm.type"
               >
                 <UIcon name="i-heroicons-paper-airplane" class="mr-2" />
                 {{ testingAdvanced ? 'Envoi en cours...' : 'Envoyer le test' }}
@@ -786,6 +766,7 @@ useSeoMeta({
 })
 
 const toast = useToast()
+const { getImageUrl } = useImageUrl()
 
 // État réactif
 const sendingReminders = ref(false)
@@ -846,7 +827,15 @@ const filters = ref({
 
 // Formulaire de création
 const createNotificationSchema = z.object({
-  userId: z.number().int().positive().optional(),
+  targetUser: z
+    .object({
+      id: z.number(),
+      label: z.string(),
+      email: z.string().optional(),
+      isRealUser: z.boolean().optional(),
+    })
+    .optional()
+    .nullable(),
   type: z.enum(['INFO', 'SUCCESS', 'WARNING', 'ERROR']),
   title: z.string().min(1).max(255),
   message: z.string().min(1).max(2000),
@@ -856,18 +845,23 @@ const createNotificationSchema = z.object({
 })
 
 const createForm = reactive({
-  userId: undefined as number | undefined,
+  targetUser: null as UserSelectItem | null,
   type: 'INFO' as 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR',
   title: '',
   message: '',
-  category: '',
+  category: 'none',
   actionUrl: '',
   actionText: '',
 })
 
 // Formulaire de test avancé
 const testNotificationSchema = z.object({
-  targetUserEmail: z.string().email(),
+  targetUser: z.object({
+    id: z.number(),
+    label: z.string(),
+    email: z.string().optional(), // Email optionnel pour les vrais utilisateurs
+    isRealUser: z.boolean().optional(),
+  }),
   type: z.enum([
     'welcome',
     'volunteer-accepted',
@@ -879,8 +873,16 @@ const testNotificationSchema = z.object({
   message: z.string().optional(),
 })
 
+interface UserSelectItem {
+  id: number
+  label: string
+  email: string
+  avatar?: { src: string; alt: string }
+  isRealUser?: boolean // true pour les vrais utilisateurs, false/undefined pour les utilisateurs de test
+}
+
 const testForm = reactive({
-  targetUserEmail: 'alice.jongleuse@example.com',
+  targetUser: null as UserSelectItem | null,
   type: 'welcome' as
     | 'welcome'
     | 'volunteer-accepted'
@@ -900,21 +902,34 @@ const notificationTypes = [
 ]
 
 const categoryOptions = [
-  { label: 'Aucune catégorie', value: '' },
+  { label: 'Aucune catégorie', value: 'none' },
   { label: 'Système', value: 'system' },
   { label: 'Édition', value: 'edition' },
   { label: 'Bénévolat', value: 'volunteer' },
   { label: 'Autre', value: 'other' },
 ]
 
-const testUserEmails = [
-  { label: 'Alice Jongleuse (utilisateur test)', value: 'alice.jongleuse@example.com' },
-  { label: 'Bob Cirque (utilisateur test)', value: 'bob.cirque@example.com' },
-  { label: 'Charlie Diabolo (utilisateur test)', value: 'charlie.diabolo@example.com' },
-  { label: 'Diana Massues (utilisateur test)', value: 'diana.massues@example.com' },
-  { label: 'Marie Bénévole (bénévole)', value: 'marie.benevole@example.com' },
-  { label: 'Paul Aidant (bénévole)', value: 'paul.aidant@example.com' },
-  { label: 'Powange User (utilisateur)', value: 'powange@hotmail.com' },
+// Variables pour la recherche d'utilisateurs (modal de test)
+const searchedUsers = ref<UserSelectItem[]>([])
+const searchingUsers = ref(false)
+const searchQuery = ref('')
+let searchTimeout: NodeJS.Timeout
+
+// Variables pour la recherche d'utilisateurs (modal de création)
+const createSearchedUsers = ref<UserSelectItem[]>([])
+const createSearchingUsers = ref(false)
+const createSearchQuery = ref('')
+let createSearchTimeout: NodeJS.Timeout
+
+// Utilisateurs de test disponibles (format compatible avec le nouveau système)
+const testUserItems: UserSelectItem[] = [
+  { id: -1, label: 'Alice Jongleuse (utilisateur test)', email: 'alice.jongleuse@example.com' },
+  { id: -2, label: 'Bob Cirque (utilisateur test)', email: 'bob.cirque@example.com' },
+  { id: -3, label: 'Charlie Diabolo (utilisateur test)', email: 'charlie.diabolo@example.com' },
+  { id: -4, label: 'Diana Massues (utilisateur test)', email: 'diana.massues@example.com' },
+  { id: -5, label: 'Marie Bénévole (bénévole)', email: 'marie.benevole@example.com' },
+  { id: -6, label: 'Paul Aidant (bénévole)', email: 'paul.aidant@example.com' },
+  { id: -7, label: 'Powange User (utilisateur)', email: 'powange@hotmail.com' },
 ]
 
 // Options pour les filtres (format Nuxt UI v3 avec icônes)
@@ -1361,11 +1376,11 @@ const createNotification = async () => {
     const response = await $fetch('/api/admin/notifications/create', {
       method: 'POST',
       body: {
-        userId: createForm.userId,
+        userId: createForm.targetUser?.id,
         type: createForm.type,
         title: createForm.title,
         message: createForm.message,
-        category: createForm.category || undefined,
+        category: createForm.category === 'none' ? undefined : createForm.category || undefined,
         actionUrl: createForm.actionUrl || undefined,
         actionText: createForm.actionText || undefined,
       },
@@ -1392,23 +1407,126 @@ const createNotification = async () => {
   }
 }
 
-// Test avancé avec email et message personnalisé
+// Fonction pour rechercher des utilisateurs
+const searchUsers = async (query: string) => {
+  if (!query || query.length < 2) {
+    searchedUsers.value = []
+    return
+  }
+
+  try {
+    searchingUsers.value = true
+    const response = await $fetch<any>('/api/admin/users', {
+      query: {
+        search: query,
+        limit: 10, // Limiter à 10 résultats pour la recherche
+      },
+    })
+
+    searchedUsers.value = response.users.map((u: any) => ({
+      id: u.id,
+      label: `${u.pseudo} (${u.email})`, // Afficher pseudo et email
+      email: u.email, // Email complet disponible via l'API admin
+      isRealUser: true, // Marquer comme vrai utilisateur
+      avatar: u.profilePicture
+        ? {
+            src: getImageUrl(u.profilePicture, 'profile', u.id) || '',
+            alt: u.pseudo,
+          }
+        : undefined,
+    }))
+  } catch (error) {
+    console.error('Erreur lors de la recherche:', error)
+    searchedUsers.value = []
+  } finally {
+    searchingUsers.value = false
+  }
+}
+
+// Fonction pour rechercher des utilisateurs (modal de création)
+const searchUsersForCreate = async (query: string) => {
+  if (!query || query.length < 2) {
+    createSearchedUsers.value = []
+    return
+  }
+
+  try {
+    createSearchingUsers.value = true
+    const response = await $fetch<any>('/api/admin/users', {
+      query: {
+        search: query,
+        limit: 10,
+      },
+    })
+
+    createSearchedUsers.value = response.users.map((u: any) => ({
+      id: u.id,
+      label: `${u.pseudo} (${u.email})`,
+      email: u.email,
+      isRealUser: true,
+      avatar: u.profilePicture
+        ? {
+            src: getImageUrl(u.profilePicture, 'profile', u.id) || '',
+            alt: u.pseudo,
+          }
+        : undefined,
+    }))
+  } catch (error) {
+    console.error('Erreur lors de la recherche:', error)
+    createSearchedUsers.value = []
+  } finally {
+    createSearchingUsers.value = false
+  }
+}
+
+// Watcher sur searchQuery pour déclencher la recherche (modal de test)
+watch(searchQuery, (query) => {
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => searchUsers(query), 300)
+})
+
+// Watcher sur createSearchQuery pour déclencher la recherche (modal de création)
+watch(createSearchQuery, (query) => {
+  if (createSearchTimeout) clearTimeout(createSearchTimeout)
+  createSearchTimeout = setTimeout(() => searchUsersForCreate(query), 300)
+})
+
+// Test avancé avec utilisateur sélectionné et message personnalisé
 const testNotificationAdvanced = async () => {
+  if (!testForm.targetUser) {
+    toast.add({
+      color: 'error',
+      title: 'Erreur',
+      description: 'Veuillez sélectionner un utilisateur destinataire',
+    })
+    return
+  }
+
   testingAdvanced.value = true
   try {
+    // Déterminer si on utilise targetUserId ou targetUserEmail
+    const requestBody: any = {
+      type: testForm.type,
+      message: testForm.message || undefined,
+    }
+
+    if (testForm.targetUser.isRealUser) {
+      // Pour les vrais utilisateurs, utiliser l'ID
+      requestBody.targetUserId = testForm.targetUser.id
+    } else {
+      // Pour les utilisateurs de test, utiliser l'email
+      requestBody.targetUserEmail = testForm.targetUser.email
+    }
+
     await $fetch('/api/admin/notifications/test', {
       method: 'POST',
-      body: {
-        type: testForm.type,
-        targetUserEmail: testForm.targetUserEmail,
-        message: testForm.message || undefined,
-      },
+      body: requestBody,
     })
 
     toast.add({
       color: 'success',
       title: 'Test personnalisé envoyé',
-      description: `Notification ${testForm.type} envoyée à ${testForm.targetUserEmail}`,
+      description: `Notification ${testForm.type} envoyée à ${testForm.targetUser.label}`,
     })
 
     showTestModal.value = false
@@ -1428,22 +1546,28 @@ const testNotificationAdvanced = async () => {
 
 const resetCreateForm = () => {
   Object.assign(createForm, {
-    userId: undefined,
+    targetUser: null,
     type: 'INFO' as const,
     title: '',
     message: '',
-    category: '',
+    category: 'none',
     actionUrl: '',
     actionText: '',
   })
+  // Reset des variables de recherche
+  createSearchedUsers.value = []
+  createSearchQuery.value = ''
 }
 
 const resetTestForm = () => {
   Object.assign(testForm, {
-    targetUserEmail: 'alice.jongleuse@example.com',
+    targetUser: testUserItems[0], // Sélectionner Alice par défaut
     type: 'welcome' as const,
     message: '',
   })
+  // Reset des variables de recherche
+  searchedUsers.value = []
+  searchQuery.value = ''
 }
 
 const loadStats = async () => {
