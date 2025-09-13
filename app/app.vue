@@ -112,22 +112,17 @@
               </div>
             </div>
           </div>
+
+          <!-- Bannière d'installation PWA -->
+          <PWAInstallBanner />
+
+          <!-- Modale de promotion des notifications push -->
+          <PushNotificationPromoModal />
         </template>
         <NuxtPage />
       </UCard>
     </ClientOnly>
     <AppFooter />
-
-    <!-- Bannière d'installation PWA -->
-    <ClientOnly>
-      <PWAInstallBanner />
-    </ClientOnly>
-
-    <!-- Modale de promotion des notifications push -->
-    <ClientOnly>
-      <PushNotificationPromoModal />
-    </ClientOnly>
-
     <UToast />
   </UApp>
 </template>

@@ -1437,12 +1437,12 @@
   "push_notifications": {
     "promo_modal": {
       "benefits": {
-        "community": "Nie przegap żadnych wiadomości ze społeczności",
-        "new_events": "Otrzymuj powiadomienia o nowych wydarzeniach w pobliżu",
-        "reminders": "Otrzymuj przypomnienia o swoich ulubionych konwencjach",
-        "updates": "Bądź na bieżąco z ważnymi aktualizacjami"
+        "carpool": "Otrzymuj powiadomienia o rezerwacjach i wiadomościach dotyczących wspólnych przejazdów",
+        "volunteer": "Otrzymuj aktualizacje dotyczące swoich aplikacji wolontariuszy",
+        "reminders": "Otrzymuj przypomnienia o swoich ulubionych konwentach",
+        "important": "Nie przegap ważnych informacji dotyczących Ciebie"
       },
-      "description": "Włącz powiadomienia push, aby nigdy nie przegapić najnowszych wiadomości i wydarzeń ze społeczności żonglerskiej.",
+      "description": "Włącz powiadomienia push, aby być na bieżąco z wspólnymi przejazdami, aplikacjami wolontariuszy i ulubionymi konwentami.",
       "enable": "Włącz powiadomienia",
       "not_now": "Nie teraz",
       "privacy": {

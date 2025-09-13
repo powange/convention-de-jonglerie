@@ -1,9 +1,10 @@
 <template>
   <UModal
-    v-model="isOpen"
+    v-model:open="isOpen"
     :title="$t('push_notifications.promo_modal.title')"
     size="md"
-    :prevent-close="false"
+    :close="false"
+    :dismissible="false"
   >
     <template #body>
       <div class="space-y-6">
@@ -91,7 +92,7 @@ const isOpen = computed({
 const loading = ref(false)
 
 // Liste des avantages des notifications push
-const benefits = ['new_events', 'reminders', 'updates', 'community']
+const benefits = ['carpool', 'volunteer', 'reminders', 'important']
 
 const onEnable = async () => {
   loading.value = true

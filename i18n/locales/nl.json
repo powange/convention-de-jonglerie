@@ -1437,12 +1437,12 @@
   "push_notifications": {
     "promo_modal": {
       "benefits": {
-        "community": "Mis geen enkel community nieuws",
-        "new_events": "Ontvang meldingen over nieuwe evenementen bij jou in de buurt",
+        "carpool": "Ontvang meldingen van carpool-boekingen en berichten",
+        "volunteer": "Ontvang updates over je vrijwilligersaanmeldingen",
         "reminders": "Ontvang herinneringen voor je favoriete conventies",
-        "updates": "Blijf op de hoogte van belangrijke updates"
+        "important": "Mis geen belangrijke informatie die jou betreft"
       },
-      "description": "Schakel push-notificaties in om nooit de laatste nieuws en evenementen van de jongleer-community te missen.",
+      "description": "Schakel push-notificaties in om op de hoogte te blijven van je carpools, vrijwilligersaanmeldingen en favoriete conventies.",
       "enable": "Notificaties inschakelen",
       "not_now": "Niet nu",
       "privacy": {

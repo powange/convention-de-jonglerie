@@ -1525,12 +1525,12 @@
   "push_notifications": {
     "promo_modal": {
       "title": "Restez informé en temps réel",
-      "description": "Activez les notifications push pour ne jamais manquer les dernières actualités et événements de la communauté de jonglerie.",
+      "description": "Activez les notifications push pour être tenu au courant de vos covoiturages, candidatures de bénévolat et conventions favorites.",
       "benefits": {
-        "new_events": "Soyez alerté des nouveaux événements près de chez vous",
+        "carpool": "Soyez notifié des réservations et messages de covoiturage",
+        "volunteer": "Recevez les mises à jour sur vos candidatures de bénévolat",
         "reminders": "Recevez des rappels pour vos conventions favorites",
-        "updates": "Restez au courant des mises à jour importantes",
-        "community": "Ne manquez aucune actualité de la communauté"
+        "important": "Ne manquez pas les informations importantes vous concernant"
       },
       "privacy": {
         "title": "Respectueux de votre vie privée",

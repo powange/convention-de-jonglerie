@@ -11,7 +11,7 @@ interface PromoState {
 const STORAGE_KEY = 'push-notification-promo'
 const SESSION_KEY = 'push-promo-session'
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000 // 7 jours en millisecondes
-const MIN_SESSION_TIME = 10 * 1000 // 10 secondes minimum avant de montrer la modale
+const MIN_SESSION_TIME = 30 * 1000 // 10 secondes minimum avant de montrer la modale
 
 export const usePushNotificationPromo = () => {
   const authStore = useAuthStore()
@@ -113,6 +113,9 @@ export const usePushNotificationPromo = () => {
       if (timeSinceSessionStart < MIN_SESSION_TIME) {
         return false
       }
+    } else {
+      // Pas encore de sessionStartTime, ne pas afficher
+      return false
     }
 
     return true

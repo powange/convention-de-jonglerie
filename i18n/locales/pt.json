@@ -1437,12 +1437,12 @@
   "push_notifications": {
     "promo_modal": {
       "benefits": {
-        "community": "Não perca nenhuma notícia da comunidade",
-        "new_events": "Seja alertado sobre novos eventos perto de você",
+        "carpool": "Seja notificado sobre reservas e mensagens de caronas",
+        "volunteer": "Receba atualizações sobre suas candidaturas de voluntário",
         "reminders": "Receba lembretes das suas convenções favoritas",
-        "updates": "Mantenha-se atualizado sobre anúncios importantes"
+        "important": "Não perca informações importantes que lhe dizem respeito"
       },
-      "description": "Ative as notificações push para nunca perder as últimas notícias e eventos da comunidade de malabarismo.",
+      "description": "Ative as notificações push para se manter informado sobre suas caronas, candidaturas de voluntário e convenções favoritas.",
       "enable": "Ativar notificações",
       "not_now": "Agora não",
       "privacy": {

@@ -1437,12 +1437,12 @@
   "push_notifications": {
     "promo_modal": {
       "benefits": {
-        "community": "Don't miss any community news",
-        "new_events": "Be alerted about new events near you",
+        "carpool": "Get notified of carpool bookings and messages",
+        "volunteer": "Receive updates on your volunteer applications",
         "reminders": "Receive reminders for your favorite conventions",
-        "updates": "Stay updated on important announcements"
+        "important": "Don't miss important information concerning you"
       },
-      "description": "Enable push notifications to never miss the latest news and events from the juggling community.",
+      "description": "Enable push notifications to stay informed about your carpools, volunteer applications, and favorite conventions.",
       "enable": "Enable notifications",
       "not_now": "Not now",
       "privacy": {

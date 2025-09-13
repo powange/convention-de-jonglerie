@@ -1437,12 +1437,12 @@
   "push_notifications": {
     "promo_modal": {
       "benefits": {
-        "community": "Verpassen Sie keine Community-Neuigkeiten",
-        "new_events": "Werden Sie über neue Veranstaltungen in Ihrer Nähe benachrichtigt",
+        "carpool": "Erhalten Sie Benachrichtigungen über Mitfahrgelegenheit-Buchungen und Nachrichten",
+        "volunteer": "Erhalten Sie Updates zu Ihren Freiwilligen-Bewerbungen",
         "reminders": "Erhalten Sie Erinnerungen für Ihre Lieblings-Conventions",
-        "updates": "Bleiben Sie über wichtige Updates informiert"
+        "important": "Verpassen Sie keine wichtigen Informationen, die Sie betreffen"
       },
-      "description": "Aktivieren Sie Push-Benachrichtigungen, um nie die neuesten Nachrichten und Veranstaltungen der Jonglier-Community zu verpassen.",
+      "description": "Aktivieren Sie Push-Benachrichtigungen, um über Ihre Fahrgemeinschaften, Freiwilligen-Bewerbungen und Lieblings-Conventions informiert zu bleiben.",
       "enable": "Benachrichtigungen aktivieren",
       "not_now": "Nicht jetzt",
       "privacy": {

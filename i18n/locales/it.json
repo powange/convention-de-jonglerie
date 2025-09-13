@@ -1437,12 +1437,12 @@
   "push_notifications": {
     "promo_modal": {
       "benefits": {
-        "community": "Non perdere nessuna notizia della comunità",
-        "new_events": "Ricevi avvisi sui nuovi eventi vicino a te",
+        "carpool": "Ricevi notifiche per prenotazioni e messaggi di carpooling",
+        "volunteer": "Ricevi aggiornamenti sulle tue candidature come volontario",
         "reminders": "Ricevi promemoria per le tue convention preferite",
-        "updates": "Rimani aggiornato sugli annunci importanti"
+        "important": "Non perdere informazioni importanti che ti riguardano"
       },
-      "description": "Abilita le notifiche push per non perdere mai le ultime notizie ed eventi dalla comunità di giocoleria.",
+      "description": "Abilita le notifiche push per rimanere informato sui tuoi carpooling, candidature come volontario e convention preferite.",
       "enable": "Abilita notifiche",
       "not_now": "Non ora",
       "privacy": {

@@ -1437,12 +1437,12 @@
   "push_notifications": {
     "promo_modal": {
       "benefits": {
-        "community": "Gå ikke glip af nogen community nyheder",
-        "new_events": "Bliv advaret om nye begivenheder tæt på dig",
-        "reminders": "Modtag påmindelser om dine favoritkonventioner",
-        "updates": "Hold dig opdateret om vigtige opdateringer"
+        "carpool": "Få besked om samkørsel-bookinger og beskeder",
+        "volunteer": "Modtag opdateringer om dine frivillig-ansøgninger",
+        "reminders": "Modtag påmindelser om dine yndlings-konventioner",
+        "important": "Gå ikke glip af vigtig information der vedrører dig"
       },
-      "description": "Aktiver push-notifikationer for aldrig at gå glip af de seneste nyheder og begivenheder fra jonglørfællesskabet.",
+      "description": "Aktivér push-notifikationer for at holde dig opdateret om dine samkørsler, frivillig-ansøgninger og yndlings-konventioner.",
       "enable": "Aktivér notifikationer",
       "not_now": "Ikke nu",
       "privacy": {

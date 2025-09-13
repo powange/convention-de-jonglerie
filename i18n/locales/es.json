@@ -1437,12 +1437,12 @@
   "push_notifications": {
     "promo_modal": {
       "benefits": {
-        "community": "No te pierdas ninguna noticia de la comunidad",
-        "new_events": "Recibe alertas sobre nuevos eventos cerca de ti",
-        "reminders": "Recibe recordatorios para tus convenciones favoritas",
-        "updates": "Mantente al día con actualizaciones importantes"
+        "carpool": "Recibe notificaciones de reservas y mensajes de viajes compartidos",
+        "volunteer": "Recibe actualizaciones sobre tus solicitudes de voluntariado",
+        "reminders": "Recibe recordatorios de tus convenciones favoritas",
+        "important": "No te pierdas información importante que te concierne"
       },
-      "description": "Activa las notificaciones push para nunca perderte las últimas noticias y eventos de la comunidad de malabares.",
+      "description": "Activa las notificaciones push para mantenerte informado sobre tus viajes compartidos, solicitudes de voluntariado y convenciones favoritas.",
       "enable": "Activar notificaciones",
       "not_now": "Ahora no",
       "privacy": {
