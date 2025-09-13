@@ -1445,6 +1445,24 @@
     "username_min_3": "A alcunha deve conter pelo menos 3 caracteres",
     "username_placeholder": "A sua alcunha única"
   },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "community": "Não perca nenhuma notícia da comunidade",
+        "new_events": "Seja alertado sobre novos eventos perto de você",
+        "reminders": "Receba lembretes das suas convenções favoritas",
+        "updates": "Mantenha-se atualizado sobre anúncios importantes"
+      },
+      "description": "Ative as notificações push para nunca perder as últimas notícias e eventos da comunidade de malabarismo.",
+      "enable": "Ativar notificações",
+      "not_now": "Agora não",
+      "privacy": {
+        "description": "Pode desativar as notificações a qualquer momento nas suas definições.",
+        "title": "Respeitoso da privacidade"
+      },
+      "title": "Mantenha-se informado em tempo real"
+    }
+  },
   "pwa": {
     "install": {
       "button": "Instalar agora",

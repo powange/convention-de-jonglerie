@@ -1445,6 +1445,24 @@
     "username_min_3": "Brugernavnet skal indeholde mindst 3 tegn",
     "username_placeholder": "Dit unikke brugernavn"
   },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "community": "Gå ikke glip af nogen community nyheder",
+        "new_events": "Bliv advaret om nye begivenheder tæt på dig",
+        "reminders": "Modtag påmindelser om dine favoritkonventioner",
+        "updates": "Hold dig opdateret om vigtige opdateringer"
+      },
+      "description": "Aktiver push-notifikationer for aldrig at gå glip af de seneste nyheder og begivenheder fra jonglørfællesskabet.",
+      "enable": "Aktivér notifikationer",
+      "not_now": "Ikke nu",
+      "privacy": {
+        "description": "Du kan deaktivere notifikationer når som helst i dine indstillinger.",
+        "title": "Respekterer dit privatliv"
+      },
+      "title": "Hold dig informeret i realtid"
+    }
+  },
   "pwa": {
     "install": {
       "button": "Installer nu",

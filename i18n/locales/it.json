@@ -1445,6 +1445,24 @@
     "username_min_3": "Il nome utente deve contenere almeno 3 caratteri",
     "username_placeholder": "Il tuo nome utente unico"
   },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "community": "Non perdere nessuna notizia della comunità",
+        "new_events": "Ricevi avvisi sui nuovi eventi vicino a te",
+        "reminders": "Ricevi promemoria per le tue convention preferite",
+        "updates": "Rimani aggiornato sugli annunci importanti"
+      },
+      "description": "Abilita le notifiche push per non perdere mai le ultime notizie ed eventi dalla comunità di giocoleria.",
+      "enable": "Abilita notifiche",
+      "not_now": "Non ora",
+      "privacy": {
+        "description": "Puoi disabilitare le notifiche in qualsiasi momento nelle tue impostazioni.",
+        "title": "Rispettoso della privacy"
+      },
+      "title": "Rimani informato in tempo reale"
+    }
+  },
   "pwa": {
     "install": {
       "button": "Installa ora",

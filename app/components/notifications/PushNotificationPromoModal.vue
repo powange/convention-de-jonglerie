@@ -1,0 +1,121 @@
+<template>
+  <UModal
+    v-model="isOpen"
+    :title="$t('push_notifications.promo_modal.title')"
+    size="md"
+    :prevent-close="false"
+  >
+    <template #body>
+      <div class="space-y-6">
+        <!-- Icône principale -->
+        <div class="flex justify-center">
+          <div
+            class="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center"
+          >
+            <UIcon name="i-heroicons-bell" class="w-8 h-8 text-blue-600 dark:text-blue-400" />
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="text-center space-y-3">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            {{ $t('push_notifications.promo_modal.title') }}
+          </h3>
+          <p class="text-gray-600 dark:text-gray-300">
+            {{ $t('push_notifications.promo_modal.description') }}
+          </p>
+        </div>
+
+        <!-- Liste des avantages -->
+        <div class="space-y-3">
+          <div v-for="benefit in benefits" :key="benefit" class="flex items-start gap-3">
+            <div
+              class="flex-shrink-0 w-5 h-5 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mt-0.5"
+            >
+              <UIcon name="i-heroicons-check" class="w-3 h-3 text-green-600 dark:text-green-400" />
+            </div>
+            <p class="text-sm text-gray-700 dark:text-gray-300">
+              {{ $t(`push_notifications.promo_modal.benefits.${benefit}`) }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Note sur la confidentialité -->
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+          <div class="flex items-start gap-3">
+            <UIcon
+              name="i-heroicons-shield-check"
+              class="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5"
+            />
+            <div>
+              <p class="text-sm font-medium text-gray-900 dark:text-white">
+                {{ $t('push_notifications.promo_modal.privacy.title') }}
+              </p>
+              <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                {{ $t('push_notifications.promo_modal.privacy.description') }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template #footer>
+      <div class="flex gap-3 justify-end">
+        <UButton variant="ghost" color="gray" @click="onNotNow">
+          {{ $t('push_notifications.promo_modal.not_now') }}
+        </UButton>
+        <UButton :loading="loading" @click="onEnable">
+          {{ $t('push_notifications.promo_modal.enable') }}
+        </UButton>
+      </div>
+    </template>
+  </UModal>
+</template>
+
+<script setup lang="ts">
+import { usePushNotifications } from '~/composables/usePushNotifications'
+
+interface Props {
+  modelValue: boolean
+}
+
+interface Emits {
+  'update:modelValue': [value: boolean]
+  enabled: []
+  dismissed: []
+}
+
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
+
+const { subscribe } = usePushNotifications()
+
+const isOpen = computed({
+  get: () => props.modelValue,
+  set: (value: boolean) => emit('update:modelValue', value),
+})
+
+const loading = ref(false)
+
+// Liste des avantages des notifications push
+const benefits = ['new_events', 'reminders', 'updates', 'community']
+
+const onEnable = async () => {
+  loading.value = true
+  try {
+    const success = await subscribe()
+    if (success) {
+      emit('enabled')
+      isOpen.value = false
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+const onNotNow = () => {
+  emit('dismissed')
+  isOpen.value = false
+}
+</script>

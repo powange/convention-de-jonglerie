@@ -1445,6 +1445,24 @@
     "username_min_3": "Pseudonim musi zawierać co najmniej 3 znaki",
     "username_placeholder": "Twój unikalny pseudonim"
   },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "community": "Nie przegap żadnych wiadomości ze społeczności",
+        "new_events": "Otrzymuj powiadomienia o nowych wydarzeniach w pobliżu",
+        "reminders": "Otrzymuj przypomnienia o swoich ulubionych konwencjach",
+        "updates": "Bądź na bieżąco z ważnymi aktualizacjami"
+      },
+      "description": "Włącz powiadomienia push, aby nigdy nie przegapić najnowszych wiadomości i wydarzeń ze społeczności żonglerskiej.",
+      "enable": "Włącz powiadomienia",
+      "not_now": "Nie teraz",
+      "privacy": {
+        "description": "Możesz wyłączyć powiadomienia w każdej chwili w swoich ustawieniach.",
+        "title": "Szanuje prywatność"
+      },
+      "title": "Bądź informowany w czasie rzeczywistym"
+    }
+  },
   "pwa": {
     "install": {
       "button": "Zainstaluj teraz",

@@ -1445,6 +1445,24 @@
     "username_min_3": "El nombre de usuario debe contener al menos 3 caracteres",
     "username_placeholder": "Tu nombre de usuario único"
   },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "community": "No te pierdas ninguna noticia de la comunidad",
+        "new_events": "Recibe alertas sobre nuevos eventos cerca de ti",
+        "reminders": "Recibe recordatorios para tus convenciones favoritas",
+        "updates": "Mantente al día con actualizaciones importantes"
+      },
+      "description": "Activa las notificaciones push para nunca perderte las últimas noticias y eventos de la comunidad de malabares.",
+      "enable": "Activar notificaciones",
+      "not_now": "Ahora no",
+      "privacy": {
+        "description": "Puedes desactivar las notificaciones en cualquier momento en tu configuración.",
+        "title": "Respetuoso con la privacidad"
+      },
+      "title": "Mantente informado en tiempo real"
+    }
+  },
   "pwa": {
     "install": {
       "button": "Instalar ahora",

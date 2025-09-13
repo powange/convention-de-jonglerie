@@ -1446,6 +1446,24 @@
     "username_min_3": "Username must contain at least 3 characters",
     "username_placeholder": "Your unique username"
   },
+  "push_notifications": {
+    "promo_modal": {
+      "title": "Stay informed in real time",
+      "description": "Enable push notifications to never miss the latest news and events from the juggling community.",
+      "benefits": {
+        "new_events": "Be alerted about new events near you",
+        "reminders": "Receive reminders for your favorite conventions",
+        "updates": "Stay updated on important announcements",
+        "community": "Don't miss any community news"
+      },
+      "privacy": {
+        "title": "Privacy friendly",
+        "description": "You can disable notifications anytime in your settings."
+      },
+      "enable": "Enable notifications",
+      "not_now": "Not now"
+    }
+  },
   "pwa": {
     "install": {
       "button": "Install now",

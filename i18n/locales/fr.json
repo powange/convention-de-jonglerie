@@ -693,8 +693,6 @@
   },
   "editions": {
     "about_this_edition": "À propos de cette édition",
-    "about_convention": "À propos de la convention",
-    "about_convention_description": "Informations détaillées sur la convention",
     "learn_more_about_convention": "En savoir plus sur la convention",
     "add_comment_placeholder": "Ajouter un commentaire...",
     "add_lost_item": "Ajouter un objet trouvé",
@@ -1537,6 +1535,24 @@
   },
   "volunteersInfo": {
     "externalUrl": "URL externe"
+  },
+  "push_notifications": {
+    "promo_modal": {
+      "title": "Restez informé en temps réel",
+      "description": "Activez les notifications push pour ne jamais manquer les dernières actualités et événements de la communauté de jonglerie.",
+      "benefits": {
+        "new_events": "Soyez alerté des nouveaux événements près de chez vous",
+        "reminders": "Recevez des rappels pour vos conventions favorites",
+        "updates": "Restez au courant des mises à jour importantes",
+        "community": "Ne manquez aucune actualité de la communauté"
+      },
+      "privacy": {
+        "title": "Respectueux de votre vie privée",
+        "description": "Vous pouvez désactiver les notifications à tout moment dans vos paramètres."
+      },
+      "enable": "Activer les notifications",
+      "not_now": "Pas maintenant"
+    }
   },
   "pwa": {
     "install": {
