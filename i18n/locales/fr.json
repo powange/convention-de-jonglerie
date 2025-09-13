@@ -735,6 +735,7 @@
     "online_status": "En ligne",
     "organizing_team": "Équipe organisatrice",
     "participants": "Participants",
+    "no_participants_yet": "Aucun participant pour le moment",
     "photo_optional": "Photo (optionnel)",
     "photo_uploaded": "Photo uploadée",
     "poster_of": "Affiche de {name}",

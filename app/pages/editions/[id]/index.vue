@@ -33,9 +33,7 @@
         :edition="edition"
         current-page="details"
         :is-favorited="isFavorited(edition.id)"
-        :is-attending="isAttending(edition.id)"
         @toggle-favorite="toggleFavorite(edition.id)"
-        @toggle-attendance="toggleAttendance(edition.id)"
       />
 
       <!-- Contenu des détails -->
@@ -213,21 +211,31 @@
 
       <!-- Liste des participants -->
       <UCard
-        v-if="edition.attendingUsers && edition.attendingUsers.length > 0"
         variant="subtle"
         class="mt-6"
       >
         <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-users" class="text-primary-500" />
-            <h3 class="text-lg font-semibold">{{ $t('editions.participants') }}</h3>
-            <UBadge size="sm" color="neutral" variant="soft">
-              {{ edition.attendingUsers.length }}
-            </UBadge>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-users" class="text-primary-500" />
+              <h3 class="text-lg font-semibold">{{ $t('editions.participants') }}</h3>
+              <UBadge size="sm" color="neutral" variant="soft">
+                {{ edition.attendingUsers?.length || 0 }}
+              </UBadge>
+            </div>
+            
+            <!-- Checkbox "Je participe" -->
+            <div v-if="authStore.isAuthenticated" class="flex items-center gap-2">
+              <UCheckbox
+                :model-value="isAttending(edition.id)"
+                :label="$t('editions.i_attend')"
+                @update:model-value="toggleAttendance(edition.id)"
+              />
+            </div>
           </div>
         </template>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div v-if="edition.attendingUsers && edition.attendingUsers.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <div
             v-for="participant in edition.attendingUsers"
             :key="participant.id"
@@ -238,6 +246,10 @@
               {{ participant.pseudo }}
             </span>
           </div>
+        </div>
+        <div v-else class="text-center py-8 text-gray-500">
+          <UIcon name="i-heroicons-user-plus" class="text-4xl mb-2 text-gray-400" />
+          <p>{{ $t('editions.no_participants_yet') }}</p>
         </div>
       </UCard>
     </div>

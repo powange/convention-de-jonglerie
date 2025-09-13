@@ -747,6 +747,8 @@
     "online_status": "Online",
     "organizing_team": "Organizing team",
     "participants": "Participants",
+    "no_participants_yet": "No participants yet",
+    "i_attend": "I attend",
     "photo_optional": "Photo (optional)",
     "photo_uploaded": "Photo uploaded",
     "poster_of": "Poster of {name}",

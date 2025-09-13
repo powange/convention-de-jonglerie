@@ -34,12 +34,6 @@
 
               <!-- Actions mobile -->
               <div v-if="authStore.isAuthenticated" class="sm:hidden flex items-center gap-2">
-                <!-- Checkbox Participation mobile -->
-                <UCheckbox
-                  :model-value="isAttending"
-                  @update:model-value="$emit('toggle-attendance')"
-                />
-
                 <!-- Bouton favori mobile -->
                 <UButton
                   :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
@@ -56,15 +50,6 @@
 
         <!-- Actions desktop -->
         <div v-if="authStore.isAuthenticated" class="hidden sm:flex gap-3">
-          <!-- Checkbox Participation -->
-          <div class="flex items-center gap-2">
-            <UCheckbox
-              :model-value="isAttending"
-              :label="$t('editions.i_attend')"
-              @update:model-value="$emit('toggle-attendance')"
-            />
-          </div>
-
           <!-- Bouton favori -->
           <UButton
             :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
@@ -280,13 +265,11 @@ interface Props {
   edition: Edition
   currentPage: 'details' | 'commentaires' | 'carpool' | 'gestion' | 'objets-trouves' | 'volunteers'
   isFavorited?: boolean
-  isAttending?: boolean
 }
 
 const props = defineProps<Props>()
 defineEmits<{
   'toggle-favorite': []
-  'toggle-attendance': []
 }>()
 
 const authStore = useAuthStore()
