@@ -1167,15 +1167,6 @@
     "loading": "Chargement des notifications...",
     "none_found": "Aucune notification trouvée"
   },
-  "createForm": {
-    "userId": "ID utilisateur",
-    "type": "Type",
-    "title": "Titre",
-    "message": "Message",
-    "category": "Catégorie",
-    "actionUrl": "URL d'action",
-    "actionText": "Texte du bouton"
-  },
   "locationLabels": {
     "cityLabel": "Ville",
     "cityHint": "Tapez au moins 3 caractères pour voir les suggestions",
@@ -1523,11 +1514,6 @@
     "at_least_one_availability_required": "Au moins une disponibilité doit être sélectionnée",
     "arrival_date_required": "La date d'arrivée est requise",
     "departure_date_required": "La date de départ est requise"
-  },
-  "testForm": {
-    "targetUserEmail": "Email de l'utilisateur cible",
-    "type": "Type de notification",
-    "message": "Message de test"
   },
   "team": {
     "name": "Nom de l'équipe",
