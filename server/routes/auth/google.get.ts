@@ -49,6 +49,18 @@ export default defineEventHandler(async (event) => {
       maxAge: 600,
     })
 
+    // Conserver le paramètre returnTo dans un cookie séparé
+    const returnTo = query.returnTo as string
+    if (returnTo) {
+      setCookie(event, 'oauth_returnTo', returnTo, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 600,
+      })
+    }
+
     const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth')
     authUrl.searchParams.set('client_id', clientId)
     authUrl.searchParams.set('redirect_uri', redirectUri)
@@ -158,5 +170,14 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  return sendRedirect(event, '/')
+  // Récupérer le returnTo depuis le cookie et nettoyer le cookie
+  const returnTo = getCookie(event, 'oauth_returnTo')
+  if (returnTo) {
+    setCookie(event, 'oauth_returnTo', '', { maxAge: 0 }) // Supprimer le cookie
+  }
+
+  // Valider et utiliser returnTo ou rediriger vers la page d'accueil
+  const finalRedirect =
+    returnTo && !returnTo.includes('/login') && !returnTo.includes('/auth/') ? returnTo : '/'
+  return sendRedirect(event, finalRedirect)
 })

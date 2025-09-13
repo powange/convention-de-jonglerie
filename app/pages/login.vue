@@ -371,12 +371,20 @@ import { useAuthStore } from '../stores/auth'
 
 const onGoogleLogin = async () => {
   // Navigation externe pour forcer l'appel de la route serveur (/server/routes/auth/google.get.ts)
-  await navigateTo('/auth/google', { external: true })
+  const returnTo = useRoute().query.returnTo as string
+  const googleUrl = returnTo
+    ? `/auth/google?returnTo=${encodeURIComponent(returnTo)}`
+    : '/auth/google'
+  await navigateTo(googleUrl, { external: true })
 }
 
 const onFacebookLogin = async () => {
   // Navigation externe pour forcer l'appel de la route serveur (/server/routes/auth/facebook.get.ts)
-  await navigateTo('/auth/facebook', { external: true })
+  const returnTo = useRoute().query.returnTo as string
+  const facebookUrl = returnTo
+    ? `/auth/facebook?returnTo=${encodeURIComponent(returnTo)}`
+    : '/auth/facebook'
+  await navigateTo(facebookUrl, { external: true })
 }
 
 const authStore = useAuthStore()
