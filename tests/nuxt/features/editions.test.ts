@@ -672,7 +672,7 @@ describe("Système d'éditions", () => {
       expect(activeServices).toContain('hasFoodTrucks')
       expect(activeServices).toContain('hasToilets')
       expect(activeServices).not.toContain('acceptsPets')
-      expect(activeServices.length).toBe(14)
+      expect(activeServices.length).toBe(15)
     })
 
     it('devrait grouper les services par catégorie', () => {
