@@ -30,6 +30,19 @@
                   <span class="hidden sm:inline">•</span>
                   <span>{{ formatDateRange(edition.startDate, edition.endDate) }}</span>
                 </div>
+
+                <!-- Bouton En savoir plus -->
+                <div class="mt-3">
+                  <UButton
+                    variant="ghost"
+                    size="sm"
+                    icon="i-heroicons-information-circle"
+                    color="info"
+                    @click="showConventionModal = true"
+                  >
+                    {{ $t('editions.learn_more_about_convention') }}
+                  </UButton>
+                </div>
               </div>
 
               <!-- Actions mobile -->
@@ -64,19 +77,7 @@
       </div>
     </div>
 
-    <div>
-      <!-- Bouton En savoir plus -->
-      <div class="mt-3">
-        <UButton
-          variant="ghost"
-          size="sm"
-          icon="i-heroicons-information-circle"
-          @click="showConventionModal = true"
-        >
-          {{ $t('editions.learn_more_about_convention') }}
-        </UButton>
-      </div>
-    </div>
+    <div></div>
 
     <!-- Navigation par onglets -->
     <div class="border-b border-gray-200">
@@ -199,12 +200,7 @@
     </div>
 
     <!-- Modale d'informations sur la convention -->
-    <UModal
-      v-model:open="showConventionModal"
-      :title="$t('editions.about_convention')"
-      :description="$t('editions.about_convention_description')"
-      size="md"
-    >
+    <UModal v-model:open="showConventionModal" :title="edition.convention?.name" size="md">
       <template #body>
         <div class="space-y-4">
           <!-- Logo de la convention -->
@@ -217,11 +213,6 @@
               class="max-w-32 max-h-32 object-contain"
             />
           </div>
-
-          <!-- Nom de la convention -->
-          <h3 class="text-lg font-semibold text-center">
-            {{ edition.convention?.name }}
-          </h3>
 
           <!-- Description de la convention -->
           <div
