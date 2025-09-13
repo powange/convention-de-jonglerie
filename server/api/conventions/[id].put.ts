@@ -2,6 +2,8 @@ import { readFile } from 'fs/promises'
 
 import { z } from 'zod'
 
+import { requireAuth } from '../../utils/auth-utils'
+import { getConventionForEdit, validateConventionId } from '../../utils/convention-permissions'
 import { prisma } from '../../utils/prisma'
 import {
   updateConventionSchema,
@@ -11,22 +13,10 @@ import {
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   try {
-    const conventionId = parseInt(getRouterParam(event, 'id') as string)
-
-    if (isNaN(conventionId)) {
-      throw createError({
-        statusCode: 400,
-        message: 'ID de convention invalide',
-      })
-    }
+    const conventionId = validateConventionId(getRouterParam(event, 'id'))
 
     const body = await readBody(event)
 
@@ -41,39 +31,8 @@ export default defineEventHandler(async (event) => {
       throw error
     }
 
-    // Vérifier que la convention existe et que l'utilisateur a les droits
-    const existingConvention = await prisma.convention.findUnique({
-      where: {
-        id: conventionId,
-      },
-      include: {
-        collaborators: {
-          where: {
-            userId: event.context.user.id,
-            canEditConvention: true,
-          },
-        },
-      },
-    })
-
-    if (!existingConvention) {
-      throw createError({
-        statusCode: 404,
-        message: 'Convention introuvable',
-      })
-    }
-
-    // Vérifier que l'utilisateur est soit l'auteur, soit un collaborateur avec droits d'édition, soit un admin global
-    const isAuthor = existingConvention.authorId === event.context.user.id
-    const isCollaborator = existingConvention.collaborators.length > 0
-    const isGlobalAdmin = event.context.user.isGlobalAdmin || false
-
-    if (!isAuthor && !isCollaborator && !isGlobalAdmin) {
-      throw createError({
-        statusCode: 403,
-        message: "Vous n'avez pas les droits pour modifier cette convention",
-      })
-    }
+    // Récupère la convention et vérifie les permissions d'édition
+    const existingConvention = await getConventionForEdit(conventionId, user)
 
     // Gérer le logo - nouvelle approche : stocker seulement le nom de fichier
     console.log('=== GESTION DU LOGO ===')

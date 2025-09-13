@@ -1,10 +1,10 @@
-import { requireGlobalAdmin } from '../../../utils/admin-auth'
+import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
 import { NotificationHelpers } from '../../../utils/notification-service'
 import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification et les droits admin (mutualisé)
-  await requireGlobalAdmin(event)
+  await requireGlobalAdminWithDbCheck(event)
 
   try {
     const now = new Date()

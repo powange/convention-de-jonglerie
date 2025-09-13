@@ -78,7 +78,8 @@ describe('/api/editions/[id] DELETE', () => {
         collaborators: [
           {
             userId: 1,
-            role: 'MODERATOR',
+            canDeleteAllEditions: true,
+            canEditAllEditions: true,
           },
         ],
       },

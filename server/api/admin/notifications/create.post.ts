@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { requireGlobalAdmin } from '../../../utils/admin-auth'
+import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
 import { NotificationService } from '../../../utils/notification-service'
 import { prisma } from '../../../utils/prisma'
 
@@ -18,7 +18,7 @@ const bodySchema = z.object({
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification et les droits admin (mutualisé)
-  await requireGlobalAdmin(event)
+  await requireGlobalAdminWithDbCheck(event)
 
   const body = await readBody(event)
   const parsed = bodySchema.parse(body)

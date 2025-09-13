@@ -317,8 +317,10 @@
                 color="primary"
                 class="ml-1 -mr-1"
                 @click="
-                  filters.type = 'all'
-                  applyFilters()
+                  (() => {
+                    filters.type = 'all'
+                    applyFilters()
+                  })()
                 "
               />
             </UBadge>
@@ -339,8 +341,10 @@
                 color="success"
                 class="ml-1 -mr-1"
                 @click="
-                  filters.category = 'all'
-                  applyFilters()
+                  (() => {
+                    filters.category = 'all'
+                    applyFilters()
+                  })()
                 "
               />
             </UBadge>
@@ -361,8 +365,10 @@
                 color="secondary"
                 class="ml-1 -mr-1"
                 @click="
-                  filters.days = 30
-                  applyFilters()
+                  (() => {
+                    filters.days = 30
+                    applyFilters()
+                  })()
                 "
               />
             </UBadge>

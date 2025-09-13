@@ -1,16 +1,12 @@
 import { z } from 'zod'
 
+import { requireAuth } from '../../utils/auth-utils'
 import { prisma } from '../../utils/prisma'
 import { conventionSchema, handleValidationError } from '../../utils/validation-schemas'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   try {
     const body = await readBody(event)
@@ -29,7 +25,7 @@ export default defineEventHandler(async (event) => {
         name: cleanName,
         description: cleanDescription,
         logo: cleanLogo,
-        authorId: event.context.user.id,
+        authorId: user.id,
       },
       include: {
         author: {
@@ -46,8 +42,8 @@ export default defineEventHandler(async (event) => {
     await prisma.conventionCollaborator.create({
       data: {
         conventionId: convention.id,
-        userId: event.context.user.id,
-        addedById: event.context.user.id,
+        userId: user.id,
+        addedById: user.id,
         title: 'Créateur',
         canEditConvention: true,
         canDeleteConvention: true,

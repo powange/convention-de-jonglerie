@@ -123,7 +123,7 @@ describe('/api/editions POST', () => {
       context: { user: null },
     }
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Non authentifié')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Unauthorized')
   })
 
   it("devrait rejeter si la convention n'existe pas", async () => {

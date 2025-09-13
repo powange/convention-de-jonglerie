@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { requireGlobalAdmin } from '../../utils/admin-auth'
+import { requireGlobalAdminWithDbCheck } from '../../utils/admin-auth'
 import { logApiError } from '../../utils/error-logger'
 
 const bodySchema = z.object({
@@ -18,7 +18,7 @@ const bodySchema = z.object({
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification et les droits admin (mutualisé)
-  await requireGlobalAdmin(event)
+  await requireGlobalAdminWithDbCheck(event)
 
   const body = await readBody(event).catch(() => ({}))
   const parsed = bodySchema.parse(body)

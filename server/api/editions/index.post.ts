@@ -1,5 +1,10 @@
 import { z } from 'zod'
 
+import { requireAuth } from '../../utils/auth-utils'
+import {
+  getConventionForEditionCreation,
+  validateConventionId,
+} from '../../utils/convention-permissions'
 import { geocodeEdition } from '../../utils/geocoding'
 import { moveTempImageToEdition } from '../../utils/move-temp-image'
 import { prisma } from '../../utils/prisma'
@@ -10,12 +15,7 @@ import {
 } from '../../utils/validation-schemas'
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   const body = await readBody(event)
 
@@ -69,37 +69,9 @@ export default defineEventHandler(async (event) => {
     hasAfjTokenPayment,
   } = validatedData
 
-  // Vérifier que la convention existe
-  const convention = await prisma.convention.findUnique({
-    where: { id: conventionId },
-    include: { collaborators: { where: { userId: event.context.user.id } } },
-  })
-
-  if (!convention) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Convention introuvable',
-    })
-  }
-
-  // Bloquer si archivée
-  if (convention.isArchived) {
-    throw createError({
-      statusCode: 409,
-      statusMessage: "Convention archivée: création d'édition impossible",
-    })
-  }
-
-  // Vérifier droit: auteur ou collaborateur avec canAddEdition (ajusté pour tolérer absence de tableau dans anciens tests)
-  const collab = (convention as any).collaborators?.[0]
-  const canAdd =
-    convention.authorId === event.context.user.id || (!!collab && !!collab.canAddEdition)
-  if (!canAdd) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Droit insuffisant pour créer une édition',
-    })
-  }
+  // Valider l'ID de convention et vérifier les permissions
+  const validConventionId = validateConventionId(conventionId)
+  await getConventionForEditionCreation(validConventionId, user)
 
   try {
     // Géocoder l'adresse pour obtenir les coordonnées
@@ -114,7 +86,7 @@ export default defineEventHandler(async (event) => {
     // Créer l'édition sans l'image d'abord
     const edition = await prisma.edition.create({
       data: {
-        conventionId,
+        conventionId: validConventionId,
         name: name?.trim() || null,
         description,
         imageUrl: null, // On met null d'abord
@@ -152,7 +124,7 @@ export default defineEventHandler(async (event) => {
         hasWorkshops: hasWorkshops || false,
         hasCreditCardPayment: hasCreditCardPayment || false,
         hasAfjTokenPayment: hasAfjTokenPayment || false,
-        creatorId: event.context.user.id,
+        creatorId: user.id,
         isOnline: false, // Nouvelle édition créée hors ligne par défaut
       },
       include: {

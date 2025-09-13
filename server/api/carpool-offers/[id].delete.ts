@@ -1,13 +1,9 @@
+import { requireAuth } from '../../utils/auth-utils'
 import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   const offerId = parseInt(getRouterParam(event, 'id') as string)
 
@@ -32,7 +28,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Seul le créateur peut supprimer son offre
-    if (existingOffer.userId !== event.context.user.id) {
+    if (existingOffer.userId !== user.id) {
       throw createError({
         statusCode: 403,
         statusMessage: "Vous n'avez pas les droits pour supprimer cette offre",

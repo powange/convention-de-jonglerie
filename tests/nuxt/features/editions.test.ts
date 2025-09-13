@@ -414,7 +414,8 @@ describe("Système d'éditions", () => {
           collaborators: [
             {
               userId: 1,
-              role: 'ADMINISTRATOR',
+              canEditAllEditions: true,
+              canEditConvention: true,
             },
           ],
         },

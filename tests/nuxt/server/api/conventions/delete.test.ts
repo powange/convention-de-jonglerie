@@ -75,7 +75,7 @@ describe('/api/conventions/[id] DELETE', () => {
       context: { ...mockEvent.context, user: null },
     }
 
-    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Non authentifié')
+    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Unauthorized')
   })
 
   it('devrait rejeter un ID de convention invalide', async () => {

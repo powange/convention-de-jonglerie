@@ -1,70 +1,21 @@
+import { requireAuth } from '../../utils/auth-utils'
+import { getEditionForDelete, validateEditionId } from '../../utils/edition-permissions'
 import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-    })
-  }
+  const user = requireAuth(event)
 
-  const editionId = parseInt(event.context.params?.id as string)
-
-  if (isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid Edition ID',
-    })
-  }
+  const editionId = validateEditionId(event.context.params?.id)
 
   try {
-    const edition = await prisma.edition.findUnique({
-      where: {
-        id: editionId,
-      },
-      include: {
-        convention: {
-          include: {
-            collaborators: {
-              where: {
-                userId: event.context.user.id,
-                OR: [
-                  { canDeleteAllEditions: true },
-                  { canDeleteConvention: true },
-                  { canEditAllEditions: true },
-                ],
-              },
-            },
-          },
-        },
-      },
-    })
+    // Récupère l'édition et vérifie les permissions de suppression
+    await getEditionForDelete(editionId, user)
 
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Edition not found',
-      })
-    }
-
-    // Vérifier les permissions : créateur de l'édition, auteur de la convention, collaborateur, ou admin global
-    const isCreator = edition.creatorId === event.context.user.id
-    const isConventionAuthor = edition.convention.authorId === event.context.user.id
-    const isCollaborator = edition.convention.collaborators.length > 0 // déjà filtré sur droits suffisants
-    const isGlobalAdmin = event.context.user.isGlobalAdmin || false
-
-    if (!isCreator && !isConventionAuthor && !isCollaborator && !isGlobalAdmin) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: "Vous n'avez pas les droits pour supprimer cette édition",
-      })
-    }
-
+    // Si on arrive ici, l'utilisateur a les droits
     await prisma.edition.delete({
-      where: {
-        id: editionId,
-      },
+      where: { id: editionId },
     })
+
     return { message: 'Edition deleted successfully' }
   } catch (error: any) {
     // Si c'est déjà une erreur HTTP (createError), on la relance

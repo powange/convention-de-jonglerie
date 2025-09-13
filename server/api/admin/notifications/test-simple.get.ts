@@ -1,4 +1,4 @@
-import { requireGlobalAdmin } from '../../../utils/admin-auth'
+import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
 
 /**
  * API de test simple pour vérifier la connectivité admin
@@ -6,7 +6,7 @@ import { requireGlobalAdmin } from '../../../utils/admin-auth'
 export default defineEventHandler(async (event) => {
   try {
     // Vérifier l'authentification et les droits admin (mutualisé)
-    const adminUser = await requireGlobalAdmin(event)
+    const adminUser = await requireGlobalAdminWithDbCheck(event)
 
     return {
       message: 'API admin fonctionnelle',

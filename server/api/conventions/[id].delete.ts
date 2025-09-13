@@ -1,54 +1,24 @@
+import { requireAuth } from '../../utils/auth-utils'
+import {
+  getConventionForDelete,
+  shouldArchiveInsteadOfDelete,
+  validateConventionId,
+} from '../../utils/convention-permissions'
 import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   try {
-    const conventionId = parseInt(getRouterParam(event, 'id') as string)
+    const conventionId = validateConventionId(getRouterParam(event, 'id'))
 
-    if (isNaN(conventionId)) {
-      throw createError({
-        statusCode: 400,
-        message: 'ID de convention invalide',
-      })
-    }
+    // Récupère la convention et vérifie les permissions de suppression
+    const convention = await getConventionForDelete(conventionId, user)
 
-    // Charger convention + droits granularisés
-    const existingConvention = await prisma.convention.findUnique({
-      where: { id: conventionId },
-      include: {
-        editions: { select: { id: true } },
-        collaborators: { where: { userId: event.context.user.id } },
-      },
-    })
-
-    if (!existingConvention) {
-      throw createError({
-        statusCode: 404,
-        message: 'Convention introuvable',
-      })
-    }
-
-    const isAuthor = existingConvention.authorId === event.context.user.id
-    const collab = existingConvention.collaborators[0]
-    const isGlobalAdmin = event.context.user.isGlobalAdmin || false
-    const canDelete = isAuthor || (collab && collab.canDeleteConvention) || isGlobalAdmin
-    if (!canDelete) {
-      throw createError({
-        statusCode: 403,
-        message: 'Droit insuffisant pour supprimer cette convention',
-      })
-    }
-
-    if (existingConvention.editions.length > 0) {
+    if (shouldArchiveInsteadOfDelete(convention)) {
       // Archiver à la place
-      if (!existingConvention.isArchived) {
+      if (!convention.isArchived) {
         const archived = await prisma.convention.update({
           where: { id: conventionId },
           data: { isArchived: true, archivedAt: new Date() },
@@ -56,7 +26,7 @@ export default defineEventHandler(async (event) => {
         await prisma.collaboratorPermissionHistory.create({
           data: {
             conventionId,
-            actorId: event.context.user.id,
+            actorId: user.id,
             changeType: 'ARCHIVED',
             targetUserId: null,
             before: { isArchived: false } as any,

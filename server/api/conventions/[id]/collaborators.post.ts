@@ -1,9 +1,11 @@
 import { z } from 'zod'
 
+import { requireAuth } from '../../../utils/auth-utils'
 import {
   addConventionCollaborator,
   findUserByPseudoOrEmail,
 } from '../../../utils/collaborator-management'
+import { validateConventionId } from '../../../utils/convention-permissions'
 
 const addCollaboratorSchema = z
   .object({
@@ -40,19 +42,13 @@ const addCollaboratorSchema = z
 
 export default defineEventHandler(async (event) => {
   try {
-    const conventionId = parseInt(getRouterParam(event, 'id') as string)
+    const conventionId = validateConventionId(getRouterParam(event, 'id'))
+    const user = requireAuth(event)
+
     const body = await readBody(event)
 
     // Valider les données
     const { userIdentifier, userId, rights, title, perEdition } = addCollaboratorSchema.parse(body)
-
-    // Vérifier l'authentification (le middleware s'en charge déjà)
-    if (!event.context.user) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Non authentifié',
-      })
-    }
 
     let userToAdd
 
@@ -89,7 +85,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Empêcher l'utilisateur de s'ajouter lui-même
-    if (userToAdd.id === event.context.user.id) {
+    if (userToAdd.id === user.id) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Vous ne pouvez pas vous ajouter comme collaborateur',
@@ -100,7 +96,7 @@ export default defineEventHandler(async (event) => {
     const collaborator = await addConventionCollaborator({
       conventionId,
       userId: userToAdd.id,
-      addedById: event.context.user.id,
+      addedById: user.id,
       rights,
       title: title ?? undefined,
       perEdition,

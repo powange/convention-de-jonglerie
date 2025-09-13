@@ -1,6 +1,6 @@
 import { readBody } from 'h3'
 
-import { requireGlobalAdmin } from '../../../utils/admin-auth'
+import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
 import { getEmailHash } from '../../../utils/email-hash'
 import { sendEmail, generateAccountDeletionEmailHtml } from '../../../utils/emailService'
 import { prisma } from '../../../utils/prisma'
@@ -36,7 +36,7 @@ const DELETION_REASONS = {
 export default defineEventHandler(async (event) => {
   try {
     // Vérifier l'authentification et les droits admin (mutualisé)
-    const adminUser = await requireGlobalAdmin(event)
+    const adminUser = await requireGlobalAdminWithDbCheck(event)
 
     // Récupérer l'ID de l'utilisateur à supprimer
     const userIdToDelete = parseInt(event.context.params?.id as string)

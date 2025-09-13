@@ -45,7 +45,7 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
     it('devrait rejeter si utilisateur non authentifié', async () => {
       global.getRouterParam.mockReturnValue('1')
 
-      await expect(handler(mockEventWithoutUser as any)).rejects.toThrow('Non authentifié')
+      await expect(handler(mockEventWithoutUser as any)).rejects.toThrow('Unauthorized')
     })
 
     it('devrait accepter si utilisateur authentifié', async () => {
@@ -89,7 +89,10 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteConventionImage).toHaveBeenCalledWith(123, 1)
+      expect(mockDeleteConventionImage).toHaveBeenCalledWith(123, {
+        email: 'test@example.com',
+        id: 1,
+      })
     })
 
     it('devrait accepter les IDs négatifs (parseInt les convertit)', async () => {
@@ -97,7 +100,10 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteConventionImage).toHaveBeenCalledWith(-1, 1)
+      expect(mockDeleteConventionImage).toHaveBeenCalledWith(-1, {
+        email: 'test@example.com',
+        id: 1,
+      })
     })
 
     it('devrait accepter l\'ID 0 (parseInt("0") = 0, pas NaN)', async () => {
@@ -105,7 +111,10 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteConventionImage).toHaveBeenCalledWith(0, 1)
+      expect(mockDeleteConventionImage).toHaveBeenCalledWith(0, {
+        email: 'test@example.com',
+        id: 1,
+      })
     })
 
     it('devrait gérer les grands nombres', async () => {
@@ -113,7 +122,10 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteConventionImage).toHaveBeenCalledWith(999999999, 1)
+      expect(mockDeleteConventionImage).toHaveBeenCalledWith(999999999, {
+        email: 'test@example.com',
+        id: 1,
+      })
     })
   })
 
@@ -123,7 +135,10 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteConventionImage).toHaveBeenCalledWith(1, 1)
+      expect(mockDeleteConventionImage).toHaveBeenCalledWith(1, {
+        email: 'test@example.com',
+        id: 1,
+      })
     })
 
     it('devrait rejeter si convention non trouvée', async () => {
@@ -271,7 +286,10 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteConventionImage).toHaveBeenCalledWith(1, 1)
+      expect(mockDeleteConventionImage).toHaveBeenCalledWith(1, {
+        email: 'test@example.com',
+        id: 1,
+      })
     })
 
     it('devrait gérer les IDs avec des zéros en début', async () => {
@@ -279,7 +297,10 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteConventionImage).toHaveBeenCalledWith(123, 1)
+      expect(mockDeleteConventionImage).toHaveBeenCalledWith(123, {
+        email: 'test@example.com',
+        id: 1,
+      })
     })
 
     it('devrait gérer les IDs décimaux (truncation)', async () => {
@@ -287,7 +308,10 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteConventionImage).toHaveBeenCalledWith(123, 1)
+      expect(mockDeleteConventionImage).toHaveBeenCalledWith(123, {
+        email: 'test@example.com',
+        id: 1,
+      })
     })
 
     it("devrait gérer les espaces dans l'ID", async () => {
@@ -295,7 +319,10 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteConventionImage).toHaveBeenCalledWith(123, 1)
+      expect(mockDeleteConventionImage).toHaveBeenCalledWith(123, {
+        email: 'test@example.com',
+        id: 1,
+      })
     })
 
     it('devrait accepter les chaînes vides (parseInt donne NaN puis rejeté)', async () => {
@@ -320,7 +347,7 @@ describe('/api/conventions/[id]/delete-image DELETE', () => {
 
       await handler(customEvent as any)
 
-      expect(mockDeleteConventionImage).toHaveBeenCalledWith(456, 789)
+      expect(mockDeleteConventionImage).toHaveBeenCalledWith(456, customUser)
       expect(mockDeleteConventionImage).toHaveBeenCalledTimes(1)
     })
 

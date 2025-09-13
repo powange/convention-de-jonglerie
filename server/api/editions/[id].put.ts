@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { requireAuth } from '../../utils/auth-utils'
+import { getEditionForEdit, validateEditionId } from '../../utils/edition-permissions'
 import { geocodeEdition } from '../../utils/geocoding'
 import { prisma } from '../../utils/prisma'
 import {
@@ -9,21 +11,9 @@ import {
 } from '../../utils/validation-schemas'
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
-  const editionId = parseInt(event.context.params?.id as string)
-
-  if (isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "ID d'édition invalide",
-    })
-  }
+  const editionId = validateEditionId(event.context.params?.id)
 
   const body = await readBody(event)
 
@@ -78,43 +68,8 @@ export default defineEventHandler(async (event) => {
   } = validatedData
 
   try {
-    const edition = await prisma.edition.findUnique({
-      where: {
-        id: editionId,
-      },
-      include: {
-        convention: {
-          include: {
-            collaborators: {
-              where: {
-                userId: event.context.user.id,
-                OR: [{ canEditAllEditions: true }, { canEditConvention: true }],
-              },
-            },
-          },
-        },
-      },
-    })
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Édition introuvable',
-      })
-    }
-
-    // Vérifier les permissions : créateur de l'édition, auteur de la convention, collaborateur, ou admin global
-    const isCreator = edition.creatorId === event.context.user.id
-    const isConventionAuthor = edition.convention.authorId === event.context.user.id
-    const isCollaborator = edition.convention.collaborators.length > 0 // collaborateur avec droits suffisants déjà filtré
-    const isGlobalAdmin = event.context.user.isGlobalAdmin || false
-
-    if (!isCreator && !isConventionAuthor && !isCollaborator && !isGlobalAdmin) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: "Vous n'avez pas les droits pour modifier cette édition",
-      })
-    }
+    // Récupère l'édition et vérifie les permissions d'édition
+    const edition = await getEditionForEdit(editionId, user)
 
     // Si une convention est spécifiée, vérifier qu'elle existe et que l'utilisateur a les droits
     if (conventionId && conventionId !== edition.conventionId) {
@@ -123,7 +78,7 @@ export default defineEventHandler(async (event) => {
         include: {
           collaborators: {
             where: {
-              userId: event.context.user.id,
+              userId: user.id,
               canManageCollaborators: true,
             },
           },
@@ -139,9 +94,7 @@ export default defineEventHandler(async (event) => {
 
       // Seuls l'auteur, les administrateurs, ou les admins globaux peuvent changer la convention d'une édition
       const canChangeConvention =
-        convention.authorId === event.context.user.id ||
-        convention.collaborators.length > 0 ||
-        event.context.user.isGlobalAdmin
+        convention.authorId === user.id || convention.collaborators.length > 0 || user.isGlobalAdmin
 
       if (!canChangeConvention) {
         throw createError({

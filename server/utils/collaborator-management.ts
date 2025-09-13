@@ -163,53 +163,9 @@ export async function canManageEditionVolunteers(
   return !!perEdition?.canManageVolunteers
 }
 
-/**
- * Vérifie si un utilisateur peut éditer une convention
- */
-export async function canEditConvention(conventionId: number, userId: number): Promise<boolean> {
-  const convention = await prisma.convention.findUnique({
-    where: { id: conventionId },
-    select: {
-      authorId: true,
-      collaborators: { where: { userId }, select: { canEditConvention: true } },
-    },
-  })
-  if (!convention) return false
-  if (convention.authorId === userId) return true
-  const collab = convention.collaborators[0]
-  return !!(collab && collab.canEditConvention)
-}
+// canEditConvention déplacé vers convention-permissions.ts
 
-/**
- * Vérifie si un utilisateur peut éditer une édition
- */
-export async function canEditEdition(editionId: number, userId: number): Promise<boolean> {
-  const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
-    select: { creatorId: true, conventionId: true, id: true },
-  })
-  if (!edition) throw createError({ statusCode: 404, statusMessage: 'Édition introuvable' })
-  if (edition.creatorId === userId) return true
-  const convention = await prisma.convention.findUnique({
-    where: { id: edition.conventionId },
-    select: {
-      authorId: true,
-      collaborators: { where: { userId }, select: { canEditAllEditions: true, id: true } },
-      editions: { where: { id: editionId }, select: { id: true } },
-    },
-  })
-  if (!convention) return false
-  if (convention.authorId === userId) return true
-  const collab = convention.collaborators[0]
-  if (!collab) return false
-  if (collab.canEditAllEditions) return true
-  // Vérifier per-edition permission
-  const per = await prisma.editionCollaboratorPermission.findUnique({
-    where: { collaboratorId_editionId: { collaboratorId: collab.id, editionId } },
-    select: { canEdit: true },
-  })
-  return !!per?.canEdit
-}
+// canEditEdition déplacé vers edition-permissions.ts
 
 /**
  * Ajoute un collaborateur à une convention

@@ -1,11 +1,11 @@
-import { requireGlobalAdmin } from '../../utils/admin-auth'
+import { requireGlobalAdminWithDbCheck } from '../../utils/admin-auth'
 
 export default defineEventHandler(async (event) => {
   try {
     console.log('=== DEBUG AUTH ===')
 
     // Vérifier l'authentification et les droits admin (mutualisé)
-    const adminUser = await requireGlobalAdmin(event)
+    const adminUser = await requireGlobalAdminWithDbCheck(event)
     console.log('Admin user:', adminUser)
 
     return {

@@ -117,7 +117,7 @@ describe('/api/conventions/[id]/collaborators GET', () => {
       context: { ...mockEvent.context, user: null },
     }
 
-    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Non authentifié')
+    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Unauthorized')
   })
 
   it('devrait rejeter si utilisateur sans permissions', async () => {
@@ -142,7 +142,7 @@ describe('/api/conventions/[id]/collaborators GET', () => {
     // checkUserConventionPermission va lever une erreur pour un ID invalide
     mockCheckPermission.mockRejectedValue(new Error('Convention ID invalide'))
 
-    await expect(handler(eventWithBadId as any)).rejects.toThrow('Erreur serveur')
+    await expect(handler(eventWithBadId as any)).rejects.toThrow('ID de convention invalide')
   })
 
   it('devrait gérer les erreurs de base de données', async () => {

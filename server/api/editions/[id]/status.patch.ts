@@ -1,5 +1,10 @@
 import { z } from 'zod'
 
+import { requireAuth } from '../../../utils/auth-utils'
+import {
+  getEditionForStatusManagement,
+  validateEditionId,
+} from '../../../utils/edition-permissions'
 import { getEmailHash } from '../../../utils/email-hash'
 import { prisma } from '../../../utils/prisma'
 
@@ -8,64 +13,15 @@ const statusSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
-  const editionId = parseInt(event.context.params?.id as string)
-  if (isNaN(editionId)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "ID d'édition invalide",
-    })
-  }
+  const editionId = validateEditionId(event.context.params?.id)
 
   const body = await readBody(event)
   const validatedData = statusSchema.parse(body)
 
-  const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
-    include: {
-      convention: {
-        include: {
-          collaborators: {
-            include: {
-              user: { select: { id: true, pseudo: true, email: true } },
-            },
-          },
-        },
-      },
-    },
-  })
-
-  if (!edition) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Édition introuvable',
-    })
-  }
-
-  const userId = event.context.user.id
-  const isCreator = edition.creatorId === userId
-  const isConventionAuthor = edition.convention.authorId === userId
-  const collaboration = edition.convention.collaborators.find((c) => c.userId === userId)
-  const canManage =
-    isCreator ||
-    isConventionAuthor ||
-    (collaboration &&
-      (collaboration.canEditAllEditions ||
-        collaboration.canEditConvention ||
-        collaboration.canManageCollaborators))
-
-  if (!canManage) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Vous n'avez pas la permission de modifier le statut de cette édition",
-    })
-  }
+  // Récupère l'édition et vérifie les permissions de gestion de statut
+  await getEditionForStatusManagement(editionId, user)
 
   const updatedEdition = await prisma.edition.update({
     where: { id: editionId },

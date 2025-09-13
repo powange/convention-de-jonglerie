@@ -1,4 +1,4 @@
-import { requireGlobalAdmin } from '../../utils/admin-auth'
+import { requireGlobalAdminWithDbCheck } from '../../utils/admin-auth'
 import { prisma } from '../../utils/prisma'
 
 import type { H3Error } from 'h3'
@@ -6,7 +6,7 @@ import type { H3Error } from 'h3'
 export default defineEventHandler(async (event) => {
   try {
     // Vérifier l'authentification et les droits admin (mutualisé)
-    await requireGlobalAdmin(event)
+    await requireGlobalAdminWithDbCheck(event)
 
     const limit = parseInt(getQuery(event).limit as string) || 10
 

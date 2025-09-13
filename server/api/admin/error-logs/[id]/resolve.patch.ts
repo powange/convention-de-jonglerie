@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { requireGlobalAdmin } from '../../../../utils/admin-auth'
+import { requireGlobalAdminWithDbCheck } from '../../../../utils/admin-auth'
 import { prisma } from '../../../../utils/prisma'
 
 const bodySchema = z.object({
@@ -10,7 +10,7 @@ const bodySchema = z.object({
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification et les droits admin (mutualisé)
-  const adminUser = await requireGlobalAdmin(event)
+  const adminUser = await requireGlobalAdminWithDbCheck(event)
 
   const logId = getRouterParam(event, 'id')
   if (!logId) {

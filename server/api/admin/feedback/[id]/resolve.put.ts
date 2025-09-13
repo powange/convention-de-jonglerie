@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { requireGlobalAdmin } from '../../../../utils/admin-auth'
+import { requireGlobalAdminWithDbCheck } from '../../../../utils/admin-auth'
 import { prisma } from '../../../../utils/prisma'
 import { validateAndSanitize, handleValidationError } from '../../../../utils/validation-schemas'
 
@@ -14,7 +14,7 @@ const resolveSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification et les droits admin (mutualisé)
-  await requireGlobalAdmin(event)
+  await requireGlobalAdminWithDbCheck(event)
 
   const feedbackId = parseInt(event.context.params?.id as string)
 

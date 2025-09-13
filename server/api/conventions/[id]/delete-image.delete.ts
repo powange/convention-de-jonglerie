@@ -1,26 +1,16 @@
+import { requireAuth } from '../../../utils/auth-utils'
+import { validateConventionId } from '../../../utils/convention-permissions'
 import { deleteConventionImage } from '../../../utils/image-deletion'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   try {
-    const conventionId = parseInt(getRouterParam(event, 'id') as string)
+    const conventionId = validateConventionId(getRouterParam(event, 'id'))
 
-    if (isNaN(conventionId)) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'ID de convention invalide',
-      })
-    }
-
-    // Utiliser l'utilitaire de suppression
-    const result = await deleteConventionImage(conventionId, event.context.user.id)
+    // Utiliser l'utilitaire de suppression avec l'objet user complet
+    const result = await deleteConventionImage(conventionId, user)
 
     return {
       success: result.success,

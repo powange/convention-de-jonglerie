@@ -316,7 +316,7 @@ describe('Système de conventions', () => {
         collaborators: [
           {
             userId: mockUser.id,
-            role: 'ADMINISTRATOR',
+            canEditConvention: true,
           },
         ],
       }

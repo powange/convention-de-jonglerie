@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { requireGlobalAdmin } from '../../../utils/admin-auth'
+import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
 import { pushNotificationService } from '../../../utils/push-notification-service'
 
 const testPushSchema = z.object({
@@ -14,7 +14,7 @@ const testPushSchema = z.object({
 export default defineEventHandler(async (event) => {
   try {
     // Vérifier l'authentification et les droits admin (mutualisé)
-    const adminUser = await requireGlobalAdmin(event)
+    const adminUser = await requireGlobalAdminWithDbCheck(event)
 
     // Valider les données
     const body = await readBody(event)

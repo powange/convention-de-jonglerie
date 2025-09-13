@@ -1,14 +1,10 @@
+import { requireAuth } from '../../utils/auth-utils'
 import { getEmailHash } from '../../utils/email-hash'
 import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   try {
     // Editions must include isOnline (non-nullable boolean with default false)
@@ -26,10 +22,7 @@ export default defineEventHandler(async (event) => {
     const conventions = await prisma.convention.findMany({
       where: {
         isArchived: false,
-        OR: [
-          { authorId: event.context.user.id },
-          { collaborators: { some: { userId: event.context.user.id } } },
-        ],
+        OR: [{ authorId: user.id }, { collaborators: { some: { userId: user.id } } }],
       },
       include: {
         author: {

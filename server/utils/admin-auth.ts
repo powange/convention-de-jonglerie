@@ -4,11 +4,12 @@ import type { EventHandlerRequest, H3Event } from 'h3'
 
 /**
  * Vérifie que l'utilisateur est authentifié et possède les droits d'administrateur global
+ * Version avec vérification en base de données pour les APIs admin
  * @param event - L'événement H3
  * @returns L'utilisateur admin avec ses informations
  * @throws Une erreur HTTP 401 ou 403 si l'accès est refusé
  */
-export async function requireGlobalAdmin(event: H3Event<EventHandlerRequest>) {
+export async function requireGlobalAdminWithDbCheck(event: H3Event<EventHandlerRequest>) {
   // Vérifier l'authentification
   const { user } = await requireUserSession(event)
 
@@ -53,7 +54,7 @@ export async function requireGlobalAdmin(event: H3Event<EventHandlerRequest>) {
  * Version légère qui utilise directement les données de session
  * (plus rapide mais moins sûre, à utiliser uniquement si les données de session sont fiables)
  */
-export async function requireGlobalAdminFast(event: H3Event<EventHandlerRequest>) {
+export async function requireGlobalAdminFromSession(event: H3Event<EventHandlerRequest>) {
   const { user } = await requireUserSession(event)
 
   if (!user?.id) {

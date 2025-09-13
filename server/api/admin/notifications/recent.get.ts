@@ -1,4 +1,4 @@
-import { requireGlobalAdmin } from '../../../utils/admin-auth'
+import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
 import { prisma } from '../../../utils/prisma'
 
 /**
@@ -16,7 +16,7 @@ import { prisma } from '../../../utils/prisma'
  */
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification et les droits admin (mutualisé)
-  await requireGlobalAdmin(event)
+  await requireGlobalAdminWithDbCheck(event)
 
   try {
     // Récupérer les paramètres depuis la query string

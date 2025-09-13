@@ -246,7 +246,7 @@ describe('/api/conventions/my-conventions GET', () => {
       context: { user: null },
     }
 
-    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Non authentifié')
+    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Unauthorized')
   })
 
   it('devrait retourner un tableau vide si aucune convention', async () => {

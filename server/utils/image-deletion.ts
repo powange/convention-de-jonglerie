@@ -3,6 +3,7 @@ import { join, dirname } from 'path'
 
 import type { Convention, Edition, User } from '~/app/types'
 
+import { getConventionForEdit } from './convention-permissions'
 import { deleteFromBothLocations } from './copy-to-output'
 import { prisma } from './prisma'
 
@@ -25,27 +26,11 @@ export interface ImageDeletionResult {
  */
 export async function checkConventionDeletionPermission(
   conventionId: number,
-  userId: number
+  user: { id: number; isGlobalAdmin?: boolean }
 ): Promise<Convention> {
-  const convention = await prisma.convention.findUnique({
-    where: { id: conventionId },
-  })
-
-  if (!convention) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Convention introuvable',
-    })
-  }
-
-  if (convention.authorId !== userId) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Vous n'avez pas les droits pour modifier cette convention",
-    })
-  }
-
-  return convention
+  // Utiliser les mêmes permissions que pour éditer une convention
+  const convention = await getConventionForEdit(conventionId, user as any)
+  return convention as any
 }
 
 /**
@@ -263,7 +248,10 @@ export async function handleImageDeletion(
 /**
  * Fonctions spécialisées pour chaque type d'entité
  */
-export async function deleteConventionImage(conventionId: number, userId: number) {
+export async function deleteConventionImage(
+  conventionId: number,
+  user: { id: number; isGlobalAdmin?: boolean }
+) {
   return handleImageDeletion(
     {
       entityType: 'convention',
@@ -272,7 +260,7 @@ export async function deleteConventionImage(conventionId: number, userId: number
       useOutputDeletion: true,
       pathExtraction: 'convention',
     },
-    userId
+    user
   )
 }
 

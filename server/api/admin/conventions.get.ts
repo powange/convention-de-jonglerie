@@ -1,10 +1,10 @@
-import { requireGlobalAdmin } from '../../utils/admin-auth'
+import { requireGlobalAdminWithDbCheck } from '../../utils/admin-auth'
 import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   try {
     // Vérifier l'authentification et les droits admin (mutualisé)
-    await requireGlobalAdmin(event)
+    await requireGlobalAdminWithDbCheck(event)
 
     // Récupérer toutes les conventions avec leurs éditions
     const conventions = await prisma.convention.findMany({

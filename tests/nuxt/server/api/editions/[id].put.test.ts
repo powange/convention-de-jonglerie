@@ -118,7 +118,7 @@ describe('/api/editions/[id] PUT', () => {
       },
     }
 
-    await expect(handler(mockEvent as any)).rejects.toThrow('Non authentifié')
+    await expect(handler(mockEvent as any)).rejects.toThrow('Unauthorized')
   })
 
   it('devrait rejeter pour un ID invalide', async () => {
@@ -131,7 +131,7 @@ describe('/api/editions/[id] PUT', () => {
       },
     }
 
-    await expect(handler(mockEvent as any)).rejects.toThrow("ID d'édition invalide")
+    await expect(handler(mockEvent as any)).rejects.toThrow('Invalid Edition ID')
   })
 
   it('devrait rejeter si édition non trouvée', async () => {
