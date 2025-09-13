@@ -91,6 +91,7 @@ model Edition {
   hasWorkshops                 Boolean                         @default(false)
   hasAfjTokenPayment           Boolean                         @default(false)
   hasCreditCardPayment         Boolean                         @default(false)
+  hasCashPayment               Boolean                         @default(false)
   conventionId                 Int
   hasATM                       Boolean                         @default(false)
   hasLongShow                  Boolean                         @default(false)

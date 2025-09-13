@@ -1457,6 +1457,7 @@
     "afj_token_payment": "Pagamento gettoni AFJ",
     "atm": "Bancomat",
     "canteen": "Mensa",
+    "cash_payment": "Pagamento in contanti",
     "categories": {
       "accommodation": "Alloggio",
       "activities": "Attività",

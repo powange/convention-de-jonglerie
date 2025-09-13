@@ -1457,6 +1457,7 @@
     "afj_token_payment": "Оплата токенами AFJ",
     "atm": "Банкомат",
     "canteen": "Їдальня",
+    "cash_payment": "Готівкова оплата",
     "categories": {
       "accommodation": "Розміщення",
       "activities": "Активності",

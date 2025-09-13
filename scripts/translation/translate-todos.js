@@ -22,6 +22,7 @@ const translations = {
     'editForm.pseudo': 'Benutzername',
     erreur: 'Notizen zu diesem Fehler hinzufügen...',
     'upload.error': 'Fehler beim Hochladen',
+    'services.cash_payment': 'Barzahlung',
   },
   es: {
     change_profile_picture: 'Cambiar foto de perfil',

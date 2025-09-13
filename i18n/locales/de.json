@@ -1457,6 +1457,7 @@
     "afj_token_payment": "AFJ-Token-Zahlung",
     "atm": "Geldautomat",
     "canteen": "Kantine",
+    "cash_payment": "Barzahlung",
     "categories": {
       "accommodation": "Unterkunft",
       "activities": "Aktivitäten",

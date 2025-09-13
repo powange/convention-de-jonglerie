@@ -1457,6 +1457,7 @@
     "afj_token_payment": "Paiement jetons AFJ",
     "atm": "Distributeur automatique de billets",
     "canteen": "Cantine",
+    "cash_payment": "Paiement liquide",
     "categories": {
       "accommodation": "Hébergement",
       "activities": "Activités",

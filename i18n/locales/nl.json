@@ -1457,6 +1457,7 @@
     "afj_token_payment": "AFJ-tokenbetaling",
     "atm": "Geldautomaat",
     "canteen": "Kantine",
+    "cash_payment": "Contante betaling",
     "categories": {
       "accommodation": "Accommodatie",
       "activities": "Activiteiten",

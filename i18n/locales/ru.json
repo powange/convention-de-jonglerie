@@ -1457,6 +1457,7 @@
     "afj_token_payment": "Оплата токенами AFJ",
     "atm": "Банкомат",
     "canteen": "Столовая",
+    "cash_payment": "Оплата наличными",
     "categories": {
       "accommodation": "Проживание",
       "activities": "Активности",

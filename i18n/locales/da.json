@@ -1457,6 +1457,7 @@
     "afj_token_payment": "AFJ token betaling",
     "atm": "Hæveautomat",
     "canteen": "Kantine",
+    "cash_payment": "Kontant betaling",
     "categories": {
       "accommodation": "Indkvartering",
       "activities": "Aktiviteter",

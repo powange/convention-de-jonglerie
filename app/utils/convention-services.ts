@@ -26,6 +26,7 @@ export interface ConventionServiceKeys {
   hasWorkshops: boolean
   hasCreditCardPayment: boolean
   hasAfjTokenPayment: boolean
+  hasCashPayment: boolean
   hasLongShow: boolean
   hasATM: boolean
 }
@@ -121,6 +122,12 @@ export const conventionServices: ConventionService[] = [
     color: 'text-slate-600',
   },
   {
+    key: 'hasCashPayment',
+    label: 'Paiement liquide',
+    icon: 'i-heroicons-banknotes',
+    color: 'text-green-700',
+  },
+  {
     key: 'hasCreditCardPayment',
     label: 'Paiement CB',
     icon: 'i-heroicons-credit-card',
@@ -189,7 +196,7 @@ export const getServicesGrouped = () => {
     },
     payment: {
       label: 'Paiements',
-      services: ['hasCreditCardPayment', 'hasAfjTokenPayment'],
+      services: ['hasCashPayment', 'hasCreditCardPayment', 'hasAfjTokenPayment'],
     },
   }
 }

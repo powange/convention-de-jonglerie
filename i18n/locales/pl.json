@@ -1457,6 +1457,7 @@
     "afj_token_payment": "Płatność żetonami AFJ",
     "atm": "Bankomat",
     "canteen": "Kantyna",
+    "cash_payment": "Płatność gotówką",
     "categories": {
       "accommodation": "Zakwaterowanie",
       "activities": "Aktywności",

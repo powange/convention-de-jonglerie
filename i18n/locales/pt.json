@@ -1457,6 +1457,7 @@
     "afj_token_payment": "Pagamento com fichas AFJ",
     "atm": "Multibanco",
     "canteen": "Cantina",
+    "cash_payment": "Pagamento em dinheiro",
     "categories": {
       "accommodation": "Alojamento",
       "activities": "Actividades",
