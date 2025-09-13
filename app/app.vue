@@ -117,6 +117,12 @@
       </UCard>
     </ClientOnly>
     <AppFooter />
+    
+    <!-- Bannière d'installation PWA -->
+    <ClientOnly>
+      <PWAInstallBanner />
+    </ClientOnly>
+    
     <UToast />
   </UApp>
 </template>
@@ -125,6 +131,7 @@
 import { computed, onMounted } from 'vue'
 
 import NotificationCenter from '~/components/notifications/NotificationCenter.vue'
+import PWAInstallBanner from '~/components/PWAInstallBanner.vue'
 import AppFooter from '~/components/ui/AppFooter.vue'
 import LogoJc from '~/components/ui/LogoJc.vue'
 import UserAvatar from '~/components/ui/UserAvatar.vue'
