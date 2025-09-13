@@ -5,11 +5,13 @@ interface PromoState {
   shouldShow: boolean
   isDismissedForSession: boolean
   lastDismissed: number | null
+  sessionStartTime: number | null
 }
 
 const STORAGE_KEY = 'push-notification-promo'
+const SESSION_KEY = 'push-promo-session'
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000 // 7 jours en millisecondes
-const MIN_SESSION_TIME = 30 * 1000 // 30 secondes minimum avant de montrer la modale
+const MIN_SESSION_TIME = 10 * 1000 // 10 secondes minimum avant de montrer la modale
 
 export const usePushNotificationPromo = () => {
   const authStore = useAuthStore()
@@ -19,32 +21,50 @@ export const usePushNotificationPromo = () => {
     shouldShow: false,
     isDismissedForSession: false,
     lastDismissed: null,
+    sessionStartTime: null,
   })
 
-  // Charger l'état depuis le localStorage
+  // Charger l'état depuis le localStorage et sessionStorage
   const loadState = () => {
     if (!import.meta.client) return
 
     try {
+      // Charger depuis localStorage (persistant entre sessions)
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) {
         const parsed = JSON.parse(saved)
         state.lastDismissed = parsed.lastDismissed || null
+      }
+
+      // Charger depuis sessionStorage (timer global de session)
+      const sessionData = sessionStorage.getItem(SESSION_KEY)
+      if (sessionData) {
+        const parsed = JSON.parse(sessionData)
+        state.sessionStartTime = parsed.sessionStartTime || null
+        state.isDismissedForSession = parsed.isDismissedForSession || false
       }
     } catch (error) {
       console.warn("Erreur lors du chargement de l'état de la promo push:", error)
     }
   }
 
-  // Sauvegarder l'état dans le localStorage
+  // Sauvegarder l'état dans localStorage et sessionStorage
   const saveState = () => {
     if (!import.meta.client) return
 
     try {
+      // Sauvegarder dans localStorage (persistant)
       const toSave = {
         lastDismissed: state.lastDismissed,
       }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave))
+
+      // Sauvegarder dans sessionStorage (timer global)
+      const sessionData = {
+        sessionStartTime: state.sessionStartTime,
+        isDismissedForSession: state.isDismissedForSession,
+      }
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData))
     } catch (error) {
       console.warn("Erreur lors de la sauvegarde de l'état de la promo push:", error)
     }
@@ -87,18 +107,42 @@ export const usePushNotificationPromo = () => {
       }
     }
 
+    // Vérifier si le délai minimum de session est écoulé
+    if (state.sessionStartTime) {
+      const timeSinceSessionStart = Date.now() - state.sessionStartTime
+      if (timeSinceSessionStart < MIN_SESSION_TIME) {
+        return false
+      }
+    }
+
     return true
   }
 
-  // Montrer la modale après un délai minimum
-  const showWithDelay = (delay: number = MIN_SESSION_TIME) => {
+  // Initialiser le timer de session si nécessaire
+  const initSessionTimer = () => {
+    if (!import.meta.client) return
+    if (!authStore.isAuthenticated) return
+
+    // Si pas encore de timer de session, en créer un
+    if (!state.sessionStartTime) {
+      state.sessionStartTime = Date.now()
+      saveState()
+    }
+  }
+
+  // Vérifier périodiquement si on peut montrer la modale
+  const checkPeriodically = () => {
     if (!import.meta.client) return
 
-    setTimeout(() => {
+    const interval = setInterval(() => {
       if (checkShouldShow()) {
         state.shouldShow = true
+        clearInterval(interval)
       }
-    }, delay)
+    }, 1000) // Vérifier toutes les secondes
+
+    // Nettoyer l'interval après 1 minute maximum
+    setTimeout(() => clearInterval(interval), 60000)
   }
 
   // Marquer comme rejetée
@@ -113,6 +157,7 @@ export const usePushNotificationPromo = () => {
   const markAsEnabled = () => {
     state.shouldShow = false
     state.isDismissedForSession = true
+    saveState()
     // Ne pas sauvegarder lastDismissed car l'utilisateur a activé
   }
 
@@ -123,7 +168,9 @@ export const usePushNotificationPromo = () => {
     state.shouldShow = false
     state.isDismissedForSession = false
     state.lastDismissed = null
+    state.sessionStartTime = null
     localStorage.removeItem(STORAGE_KEY)
+    sessionStorage.removeItem(SESSION_KEY)
   }
 
   // Initialisation
@@ -132,9 +179,10 @@ export const usePushNotificationPromo = () => {
 
     // Attendre que l'auth store soit initialisé
     watchEffect(() => {
-      if (authStore.isAuthenticated !== null) {
+      if (authStore.isAuthenticated === true) {
         nextTick(() => {
-          showWithDelay()
+          initSessionTimer()
+          checkPeriodically()
         })
       }
     })
@@ -146,6 +194,7 @@ export const usePushNotificationPromo = () => {
     markAsEnabled,
     reset,
     checkShouldShow,
-    showWithDelay,
+    initSessionTimer,
+    checkPeriodically,
   }
 }

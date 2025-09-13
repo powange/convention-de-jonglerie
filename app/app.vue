@@ -125,11 +125,7 @@
 
     <!-- Modale de promotion des notifications push -->
     <ClientOnly>
-      <PushNotificationPromoModal
-        v-model="showPushPromo"
-        @enabled="handlePushEnabled"
-        @dismissed="handlePushDismissed"
-      />
+      <PushNotificationPromoModal />
     </ClientOnly>
 
     <UToast />
@@ -146,19 +142,11 @@ import AppFooter from '~/components/ui/AppFooter.vue'
 import LogoJc from '~/components/ui/LogoJc.vue'
 import UserAvatar from '~/components/ui/UserAvatar.vue'
 
-import { usePushNotificationPromo } from './composables/usePushNotificationPromo'
 import { useAuthStore } from './stores/auth'
 
 const authStore = useAuthStore()
 const { locale, locales, setLocale, t } = useI18n()
 const colorMode = useColorMode()
-
-// Push notification promo
-const {
-  shouldShow: showPushPromo,
-  markAsEnabled,
-  dismiss: dismissPushPromo,
-} = usePushNotificationPromo()
 
 // État de chargement
 const isLoading = ref(true)
@@ -314,15 +302,6 @@ onMounted(async () => {
 
 // Calculer le nom d'affichage
 const displayName = computed(() => authStore.user?.pseudo || authStore.user?.prenom || '')
-
-// Gestionnaires pour la modale de promotion des notifications push
-const handlePushEnabled = () => {
-  markAsEnabled()
-}
-
-const handlePushDismissed = () => {
-  dismissPushPromo()
-}
 </script>
 
 <style>

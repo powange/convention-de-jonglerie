@@ -62,7 +62,7 @@
 
     <template #footer>
       <div class="flex gap-3 justify-end">
-        <UButton variant="ghost" color="gray" @click="onNotNow">
+        <UButton variant="ghost" color="neutral" @click="onNotNow">
           {{ $t('push_notifications.promo_modal.not_now') }}
         </UButton>
         <UButton :loading="loading" @click="onEnable">
@@ -74,26 +74,18 @@
 </template>
 
 <script setup lang="ts">
+import { usePushNotificationPromo } from '~/composables/usePushNotificationPromo'
 import { usePushNotifications } from '~/composables/usePushNotifications'
 
-interface Props {
-  modelValue: boolean
-}
-
-interface Emits {
-  'update:modelValue': [value: boolean]
-  enabled: []
-  dismissed: []
-}
-
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
-
 const { subscribe } = usePushNotifications()
+const { shouldShow, markAsEnabled, dismiss: dismissPromo } = usePushNotificationPromo()
 
+// Créer une référence locale qui suit shouldShow
 const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value: boolean) => emit('update:modelValue', value),
+  get: () => shouldShow.value,
+  set: () => {
+    // Ne rien faire lors de la fermeture, les handlers s'en occupent
+  },
 })
 
 const loading = ref(false)
@@ -106,8 +98,7 @@ const onEnable = async () => {
   try {
     const success = await subscribe()
     if (success) {
-      emit('enabled')
-      isOpen.value = false
+      markAsEnabled()
     }
   } finally {
     loading.value = false
@@ -115,7 +106,6 @@ const onEnable = async () => {
 }
 
 const onNotNow = () => {
-  emit('dismissed')
-  isOpen.value = false
+  dismissPromo()
 }
 </script>

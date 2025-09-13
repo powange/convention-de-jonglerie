@@ -220,7 +220,7 @@
               <div class="flex items-center gap-2 ml-4">
                 <UButton
                   v-if="!feedback.resolved"
-                  color="green"
+                  color="success"
                   variant="soft"
                   size="sm"
                   @click="openResolveModal(feedback)"
