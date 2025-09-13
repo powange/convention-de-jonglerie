@@ -32,6 +32,9 @@ export default defineEventHandler(async (event) => {
       hasShowers,
       hasAccessibility,
       hasWorkshops,
+      hasCreditCardPayment,
+      hasAfjTokenPayment,
+      hasCashPayment,
       hasLongShow,
       hasATM,
       page = '1',
@@ -65,6 +68,9 @@ export default defineEventHandler(async (event) => {
       hasShowers?: boolean
       hasAccessibility?: boolean
       hasWorkshops?: boolean
+      hasCreditCardPayment?: boolean
+      hasAfjTokenPayment?: boolean
+      hasCashPayment?: boolean
       hasLongShow?: boolean
       hasATM?: boolean
     } = {}
@@ -181,6 +187,15 @@ export default defineEventHandler(async (event) => {
     }
     if (hasWorkshops === 'true') {
       where.hasWorkshops = true
+    }
+    if (hasCreditCardPayment === 'true') {
+      where.hasCreditCardPayment = true
+    }
+    if (hasAfjTokenPayment === 'true') {
+      where.hasAfjTokenPayment = true
+    }
+    if (hasCashPayment === 'true') {
+      where.hasCashPayment = true
     }
     if (hasLongShow === 'true') {
       where.hasLongShow = true

@@ -22,7 +22,7 @@ npm run lint
 3. **Correction manuelle** (si des erreurs persistent)
    Je corrige manuellement les erreurs qui ne peuvent pas être auto-corrigées.
 
-4. **Formatage du code**
+4. **Formatage du code** (TOUJOURS exécuté à la fin)
 
 ```bash
 npm run format

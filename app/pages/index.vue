@@ -12,147 +12,16 @@
           </div>
         </template>
 
-        <div class="space-y-6">
-          <div class="space-y-6">
-            <!-- Bouton réinitialiser les filtres -->
-            <UButton
-              icon="i-heroicons-arrow-path"
-              type="button"
-              color="neutral"
-              variant="ghost"
-              block
-              @click="resetFilters"
-            >
-              {{ $t('homepage.reset_filters') }}
-            </UButton>
-
-            <!-- Filtres de recherche -->
-            <div class="space-y-4">
-              <UFormField :label="$t('forms.labels.convention_name')" name="name">
-                <UInput
-                  v-model="filters.name"
-                  :placeholder="$t('forms.placeholders.search_by_name')"
-                />
-              </UFormField>
-              <UFormField :label="$t('common.country')" name="countries">
-                <CountryMultiSelect
-                  v-model="filters.countries"
-                  :placeholder="$t('forms.placeholders.select_countries')"
-                />
-              </UFormField>
-            </div>
-
-            <!-- Filtres de dates -->
-            <div class="space-y-4">
-              <h4 class="font-medium text-gray-700">{{ $t('common.dates') }} :</h4>
-              <UFormField :label="$t('forms.labels.from_date')" name="startDate">
-                <UPopover :popper="{ placement: 'bottom-start' }">
-                  <UButton
-                    color="neutral"
-                    variant="outline"
-                    icon="i-heroicons-calendar-days"
-                    :label="
-                      filters.startDate
-                        ? formatDateForDisplay(filters.startDate)
-                        : $t('forms.labels.select_date')
-                    "
-                    block
-                  />
-                  <template #content>
-                    <UCalendar
-                      v-model="calendarStartDate"
-                      class="p-2"
-                      @update:model-value="updateStartDate"
-                    />
-                  </template>
-                </UPopover>
-              </UFormField>
-              <UFormField :label="$t('forms.labels.until_date')" name="endDate">
-                <UPopover :popper="{ placement: 'bottom-start' }">
-                  <UButton
-                    color="neutral"
-                    variant="outline"
-                    icon="i-heroicons-calendar-days"
-                    :label="
-                      filters.endDate
-                        ? formatDateForDisplay(filters.endDate)
-                        : $t('forms.labels.select_date')
-                    "
-                    block
-                  />
-                  <template #content>
-                    <UCalendar
-                      v-model="calendarEndDate"
-                      class="p-2"
-                      :is-date-disabled="(date) => calendarStartDate && date < calendarStartDate"
-                      @update:model-value="updateEndDate"
-                    />
-                  </template>
-                </UPopover>
-              </UFormField>
-            </div>
-
-            <!-- Filtre temporel -->
-            <div class="space-y-4">
-              <h4 class="font-medium text-gray-700">{{ $t('homepage.period') }} :</h4>
-              <div class="space-y-3">
-                <UCheckbox v-model="filters.showPast" name="showPast">
-                  <template #label>
-                    <div class="flex items-center gap-2">
-                      <span class="text-base">✅</span>
-                      <span>{{ $t('homepage.finished_editions') }}</span>
-                    </div>
-                  </template>
-                </UCheckbox>
-                <UCheckbox v-model="filters.showCurrent" name="showCurrent">
-                  <template #label>
-                    <div class="flex items-center gap-2">
-                      <span class="text-base">🔥</span>
-                      <span>{{ $t('homepage.current_editions') }}</span>
-                    </div>
-                  </template>
-                </UCheckbox>
-                <UCheckbox v-model="filters.showFuture" name="showFuture">
-                  <template #label>
-                    <div class="flex items-center gap-2">
-                      <span class="text-base">🔄</span>
-                      <span>{{ $t('homepage.upcoming_editions') }}</span>
-                    </div>
-                  </template>
-                </UCheckbox>
-              </div>
-            </div>
-
-            <!-- Filtres services -->
-            <div class="space-y-4">
-              <h4 class="font-medium text-gray-700">{{ $t('homepage.searched_services') }} :</h4>
-              <div class="space-y-6">
-                <div
-                  v-for="category in servicesByCategory"
-                  :key="category.category"
-                  class="space-y-3"
-                >
-                  <h5 class="text-sm font-medium text-gray-600">{{ category.label }}</h5>
-                  <div class="space-y-2">
-                    <UCheckbox
-                      v-for="service in category.services"
-                      :key="service.key"
-                      v-model="filters[service.key]"
-                      :name="service.key"
-                    >
-                      <template #label>
-                        <div class="flex items-center gap-2">
-                          <UIcon :name="service.icon" :class="service.color" size="16" />
-                          <span>{{ service.label }}</span>
-                        </div>
-                      </template>
-                    </UCheckbox>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <FiltersPanel
+          :filters="filters"
+          :services-by-category="servicesByCategory"
+          :calendar-start-date="calendarStartDate"
+          :calendar-end-date="calendarEndDate"
+          @reset-filters="resetFilters"
+          @update-filter="handleFilterUpdate"
+          @update-start-date="updateStartDate"
+          @update-end-date="updateEndDate"
+        />
       </UCard>
     </div>
 
@@ -208,172 +77,43 @@
         v-model:open="showMobileFilters"
         variant="subtle"
         size="lg"
+        close-icon="i-heroicons-x-mark"
         @close="closeMobileFilters"
       >
         <template #header>
-          <div class="flex items-center gap-2">
-            <h2 class="text-xl font-semibold">{{ $t('homepage.filters') }}</h2>
-            <UBadge v-if="activeFiltersCount > 0" :color="'primary'" variant="solid" size="xs">
-              {{ activeFiltersCount }}
-            </UBadge>
-          </div>
-        </template>
-
-        <template #body>
-          <!-- Boutons de réinitialisation et fermeture -->
-          <div class="flex items-center gap-2 mb-4">
-            <UButton
-              icon="i-heroicons-arrow-path"
-              type="button"
-              color="neutral"
-              variant="ghost"
-              block
-              @click="resetFilters"
-            >
-              {{ $t('homepage.reset_filters') }}
-            </UButton>
+          <div class="flex items-center justify-between w-full">
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-semibold">{{ $t('homepage.filters') }}</h2>
+              <UBadge v-if="activeFiltersCount > 0" :color="'primary'" variant="solid" size="xs">
+                {{ activeFiltersCount }}
+              </UBadge>
+            </div>
+            <!-- Bouton de fermeture pour mobile -->
             <UButton
               icon="i-heroicons-x-mark"
               type="button"
               color="neutral"
               variant="ghost"
-              block
-              class="ml-auto"
+              size="sm"
               @click="closeMobileFilters"
             >
               {{ $t('common.close') }}
             </UButton>
           </div>
+        </template>
 
-          <div class="space-y-6">
-            <div class="space-y-6">
-              <!-- Filtres de recherche -->
-              <div class="space-y-4">
-                <UFormField :label="$t('forms.labels.convention_name')" name="name">
-                  <UInput
-                    v-model="filters.name"
-                    :placeholder="$t('forms.placeholders.search_by_name')"
-                  />
-                </UFormField>
-                <UFormField :label="$t('common.country')" name="countries">
-                  <CountryMultiSelect
-                    v-model="filters.countries"
-                    :placeholder="$t('forms.placeholders.select_countries')"
-                  />
-                </UFormField>
-              </div>
-
-              <!-- Filtres de dates -->
-              <div class="space-y-4">
-                <h4 class="font-medium text-gray-700">{{ $t('common.dates') }} :</h4>
-                <UFormField :label="$t('forms.labels.from_date')" name="startDate">
-                  <UPopover :popper="{ placement: 'bottom-start' }">
-                    <UButton
-                      color="neutral"
-                      variant="outline"
-                      icon="i-heroicons-calendar-days"
-                      :label="
-                        filters.startDate
-                          ? formatDateForDisplay(filters.startDate)
-                          : $t('forms.labels.select_date')
-                      "
-                      block
-                    />
-                    <template #content>
-                      <UCalendar
-                        v-model="calendarStartDate"
-                        class="p-2"
-                        @update:model-value="updateStartDate"
-                      />
-                    </template>
-                  </UPopover>
-                </UFormField>
-                <UFormField :label="$t('forms.labels.until_date')" name="endDate">
-                  <UPopover :popper="{ placement: 'bottom-start' }">
-                    <UButton
-                      color="neutral"
-                      variant="outline"
-                      icon="i-heroicons-calendar-days"
-                      :label="
-                        filters.endDate
-                          ? formatDateForDisplay(filters.endDate)
-                          : $t('forms.labels.select_date')
-                      "
-                      block
-                    />
-                    <template #content>
-                      <UCalendar
-                        v-model="calendarEndDate"
-                        class="p-2"
-                        :is-date-disabled="(date) => calendarStartDate && date < calendarStartDate"
-                        @update:model-value="updateEndDate"
-                      />
-                    </template>
-                  </UPopover>
-                </UFormField>
-              </div>
-
-              <!-- Filtre temporel -->
-              <div class="space-y-4">
-                <h4 class="font-medium text-gray-700">{{ $t('homepage.period') }} :</h4>
-                <div class="space-y-3">
-                  <UCheckbox v-model="filters.showPast" name="showPast">
-                    <template #label>
-                      <div class="flex items-center gap-2">
-                        <span class="text-base">✅</span>
-                        <span>{{ $t('homepage.finished_editions') }}</span>
-                      </div>
-                    </template>
-                  </UCheckbox>
-                  <UCheckbox v-model="filters.showCurrent" name="showCurrent">
-                    <template #label>
-                      <div class="flex items-center gap-2">
-                        <span class="text-base">🔥</span>
-                        <span>{{ $t('homepage.current_editions') }}</span>
-                      </div>
-                    </template>
-                  </UCheckbox>
-                  <UCheckbox v-model="filters.showFuture" name="showFuture">
-                    <template #label>
-                      <div class="flex items-center gap-2">
-                        <span class="text-base">🔄</span>
-                        <span>{{ $t('homepage.upcoming_editions') }}</span>
-                      </div>
-                    </template>
-                  </UCheckbox>
-                </div>
-              </div>
-
-              <!-- Filtres services -->
-              <div class="space-y-4">
-                <h4 class="font-medium text-gray-700">{{ $t('homepage.searched_services') }} :</h4>
-                <div class="space-y-4">
-                  <div
-                    v-for="category in servicesByCategory"
-                    :key="category.category"
-                    class="space-y-2"
-                  >
-                    <h5 class="text-sm font-medium text-gray-600">{{ category.label }}</h5>
-                    <div class="grid grid-cols-2 gap-2">
-                      <UCheckbox
-                        v-for="service in category.services"
-                        :key="service.key"
-                        v-model="filters[service.key]"
-                        :name="service.key"
-                      >
-                        <template #label>
-                          <div class="flex items-center gap-2">
-                            <UIcon :name="service.icon" :class="service.color" size="16" />
-                            <span class="text-sm">{{ service.label }}</span>
-                          </div>
-                        </template>
-                      </UCheckbox>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <template #body>
+          <FiltersPanel
+            :filters="filters"
+            :services-by-category="servicesByCategory"
+            :calendar-start-date="calendarStartDate"
+            :calendar-end-date="calendarEndDate"
+            :is-mobile="true"
+            @reset-filters="resetFilters"
+            @update-filter="handleFilterUpdate"
+            @update-start-date="updateStartDate"
+            @update-end-date="updateEndDate"
+          />
         </template>
       </UModal>
 
@@ -460,11 +200,11 @@
 </template>
 
 <script setup lang="ts">
-import { CalendarDate, DateFormatter } from '@internationalized/date'
+import { CalendarDate } from '@internationalized/date'
 import { useDebounceFn } from '@vueuse/core'
 import { onMounted, computed, reactive, watch, ref, defineAsyncComponent, toRaw } from 'vue'
 
-import CountryMultiSelect from '~/components/CountryMultiSelect.vue'
+import FiltersPanel from '~/components/FiltersPanel.vue'
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
@@ -475,7 +215,7 @@ const HomeMap = defineAsyncComponent(() => import('~/components/HomeMap.vue'))
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 
@@ -518,7 +258,7 @@ const initFiltersFromUrl = () => {
     showFuture: query.showFuture ? query.showFuture === 'true' : true,
     // Initialiser les services depuis l'URL ou false par défaut
     ...Object.fromEntries(
-      services.value.map((service) => [service.key, query[service.key] === 'true'])
+      services.value.map((service: any) => [service.key, query[service.key] === 'true'])
     ),
   }
 }
@@ -552,8 +292,8 @@ const updateUrlFromFilters = (extraParams: Record<string, any> = {}) => {
   if (filters.showFuture !== true) query.showFuture = filters.showFuture.toString()
 
   // Services actifs
-  services.value.forEach((service) => {
-    if (filters[service.key]) {
+  services.value.forEach((service: any) => {
+    if ((filters as any)[service.key]) {
       query[service.key] = 'true'
     }
   })
@@ -567,12 +307,6 @@ const HomeAgenda = defineAsyncComponent(() => import('~/components/HomeAgenda.vu
 // Pagination
 const currentPage = ref(1)
 const itemsPerPage = ref(12)
-
-// Date formatter pour l'affichage
-const df = computed(() => {
-  const localeCode = locale.value === 'fr' ? 'fr-FR' : 'en-US'
-  return new DateFormatter(localeCode, { dateStyle: 'medium' })
-})
 
 // CalendarDate objects pour les sélecteurs de date
 const calendarStartDate = ref<CalendarDate | null>(null)
@@ -589,7 +323,7 @@ const activeFiltersCount = computed(() => {
   if (!(filters.showPast === false && filters.showCurrent === true && filters.showFuture === true))
     count++
   // Compter les services actifs
-  count += services.value.filter((service) => filters[service.key]).length
+  count += services.value.filter((service: any) => (filters as any)[service.key]).length
   return count
 })
 
@@ -597,7 +331,7 @@ const filters = reactive(initFiltersFromUrl())
 
 // Créer une fonction debounced pour éviter les appels API trop fréquents
 // Délai de 300ms pour tous les changements de filtres pour éviter la surcharge
-const debouncedFetchEditions = useDebounceFn((newFilters) => {
+const debouncedFetchEditions = useDebounceFn((newFilters: any) => {
   editionStore.fetchEditions(newFilters)
 }, 300)
 
@@ -665,13 +399,6 @@ watch(
   { deep: true }
 )
 
-// Fonctions pour gérer les dates
-const formatDateForDisplay = (dateString: string): string => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return df.value.format(date)
-}
-
 const updateStartDate = (date: CalendarDate | null) => {
   if (date) {
     // Convertir CalendarDate en string ISO
@@ -695,8 +422,13 @@ watch(
   () => filters.startDate,
   (newValue) => {
     if (newValue) {
-      const [year, month, day] = newValue.split('-').map(Number)
-      calendarStartDate.value = new CalendarDate(year, month, day)
+      const parts = newValue.split('-').map(Number)
+      if (parts.length === 3 && parts.every((part) => !isNaN(part))) {
+        const [year, month, day] = parts
+        if (year && month && day) {
+          calendarStartDate.value = new CalendarDate(year, month, day)
+        }
+      }
     } else {
       calendarStartDate.value = null
     }
@@ -707,8 +439,13 @@ watch(
   () => filters.endDate,
   (newValue) => {
     if (newValue) {
-      const [year, month, day] = newValue.split('-').map(Number)
-      calendarEndDate.value = new CalendarDate(year, month, day)
+      const parts = newValue.split('-').map(Number)
+      if (parts.length === 3 && parts.every((part) => !isNaN(part))) {
+        const [year, month, day] = parts
+        if (year && month && day) {
+          calendarEndDate.value = new CalendarDate(year, month, day)
+        }
+      }
     } else {
       calendarEndDate.value = null
     }
@@ -727,8 +464,8 @@ const resetFilters = () => {
   filters.showCurrent = true
   filters.showFuture = true
   // Réinitialiser tous les services
-  services.value.forEach((service) => {
-    filters[service.key] = false
+  services.value.forEach((service: any) => {
+    ;(filters as any)[service.key] = false
   })
   // Vider l'URL (garder seulement la vue si elle n'est pas 'grid')
   const query: Record<string, any> = {}
@@ -737,6 +474,11 @@ const resetFilters = () => {
   }
   router.push({ query })
   editionStore.fetchEditions({ ...filters, page: currentPage.value, limit: itemsPerPage.value }) // Fetch all conventions again
+}
+
+// Fonction pour gérer les mises à jour de filtres depuis le composant FiltersPanel
+const handleFilterUpdate = ({ key, value }: { key: string; value: any }) => {
+  Object.assign(filters, { [key]: value })
 }
 
 onMounted(() => {
@@ -749,8 +491,8 @@ onMounted(() => {
 
 const isFavorited = computed(() => (editionId: number) => {
   return editionStore.editions
-    .find((c) => c.id === editionId)
-    ?.favoritedBy.some((u) => u.id === authStore.user?.id)
+    .find((c: any) => c.id === editionId)
+    ?.favoritedBy.some((u: any) => u.id === authStore.user?.id)
 })
 
 // Réinitialiser la page courante quand les filtres changent

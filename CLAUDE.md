@@ -89,3 +89,29 @@
 
 - `npm run check-i18n` : Analyse clés manquantes/inutilisées/dupliquées/hardcodées
 - `npm run check-translations` : Compare les traductions entre locales
+
+## Commandes Claude personnalisées
+
+**Commande `/lint-fix` :**
+
+Processus de correction automatique complet qui :
+
+1. **Correction automatique**
+
+   ```bash
+   npm run lint -- --fix
+   ```
+
+2. **Analyse des erreurs restantes** (seulement si nécessaire)
+
+   ```bash
+   npm run lint
+   ```
+
+3. **Correction manuelle** (si des erreurs persistent)
+   Correction manuelle des erreurs qui ne peuvent pas être auto-corrigées.
+
+4. **Formatage du code** (TOUJOURS exécuté à la fin)
+   ```bash
+   npm run format
+   ```

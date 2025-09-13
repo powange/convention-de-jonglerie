@@ -13,7 +13,7 @@ import {
 describe('convention-services utils', () => {
   describe('conventionServices array', () => {
     it('devrait contenir tous les services définis', () => {
-      expect(conventionServices).toHaveLength(22)
+      expect(conventionServices).toHaveLength(23)
     })
 
     it('chaque service devrait avoir la structure correcte', () => {
@@ -45,6 +45,7 @@ describe('convention-services utils', () => {
         'hasGym',
         'hasToilets',
         'hasAccessibility',
+        'hasCashPayment',
       ]
 
       essentialServices.forEach((serviceKey) => {
@@ -76,6 +77,16 @@ describe('convention-services utils', () => {
       expect(service!.label).toBe('Food trucks')
       expect(service!.icon).toBe('i-mdi:food-outline')
       expect(service!.color).toBe('text-orange-500')
+    })
+
+    it('devrait retourner le service de paiement liquide', () => {
+      const service = getServiceByKey('hasCashPayment')
+
+      expect(service).toBeDefined()
+      expect(service!.key).toBe('hasCashPayment')
+      expect(service!.label).toBe('Paiement liquide')
+      expect(service!.icon).toBe('i-heroicons-banknotes')
+      expect(service!.color).toBe('text-green-700')
     })
 
     it('devrait retourner undefined pour une clé inexistante', () => {

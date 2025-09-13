@@ -10,6 +10,8 @@
       :searchable-placeholder="$t('components.country_select.search_country_placeholder')"
       value-attribute="value"
       option-attribute="label"
+      class="w-full"
+      :ui="{ content: 'min-w-fit' }"
     >
       <template #option="{ option }">
         <div class="flex items-center gap-2">
@@ -62,7 +64,7 @@ const data = computed(() => {
   return rawCountries.value.map((country) => ({
     label: country,
     value: country,
-    icon: `fi fi-${getCountryCode(country)}`,
+    icon: `flag:${getCountryCode(country)}-4x3`,
   }))
 })
 
