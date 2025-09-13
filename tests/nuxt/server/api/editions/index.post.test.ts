@@ -321,6 +321,7 @@ describe('/api/editions POST', () => {
     expect(createCall.data.hasShowers).toBe(false)
     expect(createCall.data.hasAccessibility).toBe(false)
     expect(createCall.data.hasWorkshops).toBe(false)
+    expect(createCall.data.hasCashPayment).toBe(false)
     expect(createCall.data.hasCreditCardPayment).toBe(false)
     expect(createCall.data.hasAfjTokenPayment).toBe(false)
   })

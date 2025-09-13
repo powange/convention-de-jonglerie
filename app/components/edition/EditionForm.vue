@@ -625,6 +625,7 @@ const state = reactive({
   hasShowers: props.initialData?.hasShowers || false,
   hasAccessibility: props.initialData?.hasAccessibility || false,
   hasWorkshops: props.initialData?.hasWorkshops || false,
+  hasCashPayment: props.initialData?.hasCashPayment || false,
   hasCreditCardPayment: props.initialData?.hasCreditCardPayment || false,
   hasAfjTokenPayment: props.initialData?.hasAfjTokenPayment || false,
 })
@@ -1155,6 +1156,7 @@ watch(
       state.hasShowers = newVal.hasShowers || false
       state.hasAccessibility = newVal.hasAccessibility || false
       state.hasWorkshops = newVal.hasWorkshops || false
+      state.hasCashPayment = newVal.hasCashPayment || false
       state.hasCreditCardPayment = newVal.hasCreditCardPayment || false
       state.hasAfjTokenPayment = newVal.hasAfjTokenPayment || false
     }

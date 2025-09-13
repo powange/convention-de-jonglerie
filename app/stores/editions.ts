@@ -35,6 +35,7 @@ interface EditionFilters {
   hasShowers?: boolean
   hasAccessibility?: boolean
   hasWorkshops?: boolean
+  hasCashPayment?: boolean
   hasCreditCardPayment?: boolean
   hasAfjTokenPayment?: boolean
   hasLongShow?: boolean

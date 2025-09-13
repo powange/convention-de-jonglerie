@@ -660,6 +660,7 @@ describe("Système d'éditions", () => {
         hasShowers: true,
         hasAccessibility: true,
         hasWorkshops: true,
+        hasCashPayment: true,
         hasCreditCardPayment: false,
         hasAfjTokenPayment: true,
       }
@@ -691,7 +692,9 @@ describe("Système d'éditions", () => {
             'hasFireSpace',
           ].filter((key) => services[key]),
           food: ['hasFoodTrucks', 'hasCantine'].filter((key) => services[key]),
-          payment: ['hasCreditCardPayment', 'hasAfjTokenPayment'].filter((key) => services[key]),
+          payment: ['hasCashPayment', 'hasCreditCardPayment', 'hasAfjTokenPayment'].filter(
+            (key) => services[key]
+          ),
         }
       }
 
@@ -701,6 +704,7 @@ describe("Système d'éditions", () => {
         hasShowers: true,
         hasGala: true,
         hasFoodTrucks: true,
+        hasCashPayment: true,
         hasCreditCardPayment: true,
       }
 
@@ -711,6 +715,7 @@ describe("Système d'éditions", () => {
       expect(categorized.facilities).toContain('hasShowers')
       expect(categorized.activities).toContain('hasGala')
       expect(categorized.food).toContain('hasFoodTrucks')
+      expect(categorized.payment).toContain('hasCashPayment')
       expect(categorized.payment).toContain('hasCreditCardPayment')
     })
   })

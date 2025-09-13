@@ -140,6 +140,12 @@ export const useTranslatedConventionServices = () => {
       color: 'text-slate-600',
     },
     {
+      key: 'hasCashPayment',
+      label: t('services.cash_payment'),
+      icon: 'i-heroicons-banknotes',
+      color: 'text-green-700',
+    },
+    {
       key: 'hasCreditCardPayment',
       label: t('services.credit_card_payment'),
       icon: 'i-heroicons-credit-card',
@@ -150,12 +156,6 @@ export const useTranslatedConventionServices = () => {
       label: t('services.afj_token_payment'),
       icon: 'i-heroicons-currency-dollar',
       color: 'text-orange-600',
-    },
-    {
-      key: 'hasCashPayment',
-      label: t('services.cash_payment'),
-      icon: 'i-heroicons-banknotes',
-      color: 'text-green-700',
     },
     {
       key: 'hasATM',

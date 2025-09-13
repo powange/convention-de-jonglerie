@@ -210,10 +210,7 @@
       </UCard>
 
       <!-- Liste des participants -->
-      <UCard
-        variant="subtle"
-        class="mt-6"
-      >
+      <UCard variant="subtle" class="mt-6">
         <template #header>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -223,7 +220,7 @@
                 {{ edition.attendingUsers?.length || 0 }}
               </UBadge>
             </div>
-            
+
             <!-- Checkbox "Je participe" -->
             <div v-if="authStore.isAuthenticated" class="flex items-center gap-2">
               <UCheckbox
@@ -235,7 +232,10 @@
           </div>
         </template>
 
-        <div v-if="edition.attendingUsers && edition.attendingUsers.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div
+          v-if="edition.attendingUsers && edition.attendingUsers.length > 0"
+          class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
+        >
           <div
             v-for="participant in edition.attendingUsers"
             :key="participant.id"

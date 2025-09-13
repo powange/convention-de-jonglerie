@@ -188,6 +188,7 @@ describe('/api/editions POST - Tests complets', () => {
         hasAccessibility: true,
         acceptsPets: false,
         // Paiements
+        hasCashPayment: true,
         hasCreditCardPayment: true,
         hasAfjTokenPayment: false,
       }
@@ -219,6 +220,7 @@ describe('/api/editions POST - Tests complets', () => {
       expect(result.hasShowers).toBe(false)
       expect(result.hasAccessibility).toBe(true)
       expect(result.acceptsPets).toBe(false)
+      expect(result.hasCashPayment).toBe(true)
       expect(result.hasCreditCardPayment).toBe(true)
       expect(result.hasAfjTokenPayment).toBe(false)
       // hasAtm n'existe pas dans le schéma
@@ -266,6 +268,7 @@ describe('/api/editions POST - Tests complets', () => {
       expect(data.hasShowers).toBe(false)
       expect(data.hasAccessibility).toBe(false)
       expect(data.hasWorkshops).toBe(false)
+      expect(data.hasCashPayment).toBe(false)
       expect(data.hasCreditCardPayment).toBe(false)
       expect(data.hasAfjTokenPayment).toBe(false)
       // hasAtm n'existe pas dans le schéma

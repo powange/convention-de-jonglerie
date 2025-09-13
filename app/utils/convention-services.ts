@@ -24,9 +24,9 @@ export interface ConventionServiceKeys {
   hasShowers: boolean
   hasAccessibility: boolean
   hasWorkshops: boolean
+  hasCashPayment: boolean
   hasCreditCardPayment: boolean
   hasAfjTokenPayment: boolean
-  hasCashPayment: boolean
   hasLongShow: boolean
   hasATM: boolean
 }
