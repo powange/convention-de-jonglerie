@@ -1536,5 +1536,25 @@
   },
   "volunteersInfo": {
     "externalUrl": "URL externe"
+  },
+  "pwa": {
+    "install": {
+      "title": "Installer l'application",
+      "description": "Ajoutez l'application Juggling Convention à votre écran d'accueil pour un accès rapide et une expérience optimale.",
+      "button": "Installer maintenant",
+      "later": "Plus tard",
+      "success": {
+        "title": "Installation réussie !",
+        "description": "L'application a été ajoutée à votre écran d'accueil."
+      },
+      "cancelled": {
+        "title": "Installation annulée",
+        "description": "Vous pourrez installer l'application plus tard depuis les paramètres de votre navigateur."
+      },
+      "error": {
+        "title": "Erreur d'installation",
+        "description": "Une erreur s'est produite lors de l'installation. Veuillez réessayer."
+      }
+    }
   }
 }

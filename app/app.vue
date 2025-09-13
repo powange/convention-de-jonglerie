@@ -117,12 +117,12 @@
       </UCard>
     </ClientOnly>
     <AppFooter />
-    
+
     <!-- Bannière d'installation PWA -->
     <ClientOnly>
       <PWAInstallBanner />
     </ClientOnly>
-    
+
     <UToast />
   </UApp>
 </template>

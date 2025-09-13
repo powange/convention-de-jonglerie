@@ -1444,6 +1444,26 @@
     "username_min_3": "Brugernavnet skal indeholde mindst 3 tegn",
     "username_placeholder": "Dit unikke brugernavn"
   },
+  "pwa": {
+    "install": {
+      "button": "Installer nu",
+      "cancelled": {
+        "description": "Du kan installere appen senere fra dine browserindstillinger.",
+        "title": "Installation annulleret"
+      },
+      "description": "Tilføj Juggling Convention-appen til din startskærm for hurtig adgang og en optimal oplevelse.",
+      "error": {
+        "description": "Der opstod en fejl under installationen. Prøv igen.",
+        "title": "Installationsfejl"
+      },
+      "later": "Senere",
+      "success": {
+        "description": "Appen er blevet tilføjet til din startskærm.",
+        "title": "Installation lykkedes!"
+      },
+      "title": "Installer app"
+    }
+  },
   "selectedLog": {
     "adminNotes": "Admin-noter",
     "ip": "IP-adresse",

@@ -1444,6 +1444,26 @@
     "username_min_3": "Der Benutzername muss mindestens 3 Zeichen enthalten",
     "username_placeholder": "Dein eindeutiger Benutzername"
   },
+  "pwa": {
+    "install": {
+      "button": "Jetzt installieren",
+      "cancelled": {
+        "description": "Sie können die App später über Ihre Browser-Einstellungen installieren.",
+        "title": "Installation abgebrochen"
+      },
+      "description": "Fügen Sie die Juggling Convention App zu Ihrem Startbildschirm hinzu für schnellen Zugriff und optimale Erfahrung.",
+      "error": {
+        "description": "Ein Fehler ist bei der Installation aufgetreten. Bitte versuchen Sie es erneut.",
+        "title": "Installationsfehler"
+      },
+      "later": "Später",
+      "success": {
+        "description": "Die App wurde zu Ihrem Startbildschirm hinzugefügt.",
+        "title": "Installation erfolgreich!"
+      },
+      "title": "App installieren"
+    }
+  },
   "selectedLog": {
     "adminNotes": "Admin-Notizen",
     "ip": "IP-Adresse",

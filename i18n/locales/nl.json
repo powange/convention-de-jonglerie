@@ -1444,6 +1444,26 @@
     "username_min_3": "Gebruikersnaam moet minimaal 3 tekens bevatten",
     "username_placeholder": "Je unieke gebruikersnaam"
   },
+  "pwa": {
+    "install": {
+      "button": "Nu installeren",
+      "cancelled": {
+        "description": "Je kunt de app later installeren via je browserinstellingen.",
+        "title": "Installatie geannuleerd"
+      },
+      "description": "Voeg de Juggling Convention app toe aan je startscherm voor snelle toegang en een optimale ervaring.",
+      "error": {
+        "description": "Er is een fout opgetreden tijdens de installatie. Probeer opnieuw.",
+        "title": "Installatiefout"
+      },
+      "later": "Later",
+      "success": {
+        "description": "De app is toegevoegd aan je startscherm.",
+        "title": "Installatie succesvol!"
+      },
+      "title": "App installeren"
+    }
+  },
   "selectedLog": {
     "adminNotes": "Beheernotities",
     "ip": "IP-adres",

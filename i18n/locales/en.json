@@ -1444,6 +1444,26 @@
     "username_min_3": "Username must contain at least 3 characters",
     "username_placeholder": "Your unique username"
   },
+  "pwa": {
+    "install": {
+      "button": "Install now",
+      "cancelled": {
+        "description": "You can install the app later from your browser settings.",
+        "title": "Installation cancelled"
+      },
+      "description": "Add the Juggling Convention app to your home screen for quick access and an optimal experience.",
+      "error": {
+        "description": "An error occurred during installation. Please try again.",
+        "title": "Installation error"
+      },
+      "later": "Later",
+      "success": {
+        "description": "The app has been added to your home screen.",
+        "title": "Installation successful!"
+      },
+      "title": "Install app"
+    }
+  },
   "selectedLog": {
     "adminNotes": "Admin Notes",
     "ip": "IP Address",

@@ -1444,6 +1444,26 @@
     "username_min_3": "Pseudonim musi zawierać co najmniej 3 znaki",
     "username_placeholder": "Twój unikalny pseudonim"
   },
+  "pwa": {
+    "install": {
+      "button": "Zainstaluj teraz",
+      "cancelled": {
+        "description": "Możesz zainstalować aplikację później z ustawień przeglądarki.",
+        "title": "Instalacja anulowana"
+      },
+      "description": "Dodaj aplikację Juggling Convention do ekranu głównego dla szybkiego dostępu i optymalnego doświadczenia.",
+      "error": {
+        "description": "Wystąpił błąd podczas instalacji. Spróbuj ponownie.",
+        "title": "Błąd instalacji"
+      },
+      "later": "Później",
+      "success": {
+        "description": "Aplikacja została dodana do ekranu głównego.",
+        "title": "Instalacja udana!"
+      },
+      "title": "Zainstaluj aplikację"
+    }
+  },
   "selectedLog": {
     "adminNotes": "Notatki administratora",
     "ip": "Adres IP",
