@@ -432,7 +432,6 @@
     "name": "Navn",
     "no": "Nej",
     "no_permission": "Ingen tilladelse",
-    "no_results": "Ingen resultater",
     "optional": "Valgfrit",
     "or": "Eller",
     "password": "Adgangskode",
@@ -446,7 +445,6 @@
     "saving": "Gemmer...",
     "select": "Vælg",
     "sort_tip": "Sorter: klik på overskrifter (Shift+klik for flere)",
-    "start_typing": "Begynd at skrive...",
     "status": "Status",
     "success": "Succes",
     "time": "Tid",
@@ -521,12 +519,8 @@
       "removed": "Medarbejder fjernet"
     },
     "collaborators_modal": {
-      "add_collaborator": "Tilføj medarbejder",
       "allow_modification": "Tillad ændringer",
-      "description": "Administrer medarbejdere for denne konvention",
-      "permissions": "Tilladelser",
-      "search_user_placeholder": "Søg efter en bruger...",
-      "title": "Administrer medarbejdere"
+      "permissions": "Tilladelser"
     },
     "collaborators_rights_panel": {
       "by_user_label": "Af",
@@ -642,6 +636,7 @@
     "created_at": "Oprettet den",
     "delete": "Slet konventionen",
     "edit": "Rediger konventionen",
+    "edit_collaborator_rights": "Rediger medarbejderrettigheder",
     "edit_permissions": "Redigeringsrettigheder",
     "edit_permissions_desc": "Modificer konventioner i henhold til dine tilladelser",
     "editions": "Udgaver",
@@ -668,9 +663,6 @@
   "countries": {
     "czech_republic": "Tjekkiet"
   },
-  "currentValue": {
-    "avatar": "Valgt brugers avatar"
-  },
   "dates": {
     "date_range": "Fra {startDate} til {endDate}",
     "date_range_with_time": "Fra {startDate} til {endDate}",
@@ -680,9 +672,6 @@
     "none": "Ingen",
     "vegan": "Vegansk",
     "vegetarian": "Vegetarisk"
-  },
-  "ed": {
-    "id": "ID"
   },
   "editForm": {
     "email": "E-mail",
@@ -752,8 +741,12 @@
     "useful_links": "Nyttige links",
     "volunteers": {
       "about_you_title": "Ting at vide om dig",
+      "accept_modal_title": "Accepter frivillig",
+      "accept_note_label": "Acceptnotat (valgfrit)",
+      "accept_note_placeholder": "Tilføj en note eller instruktioner til denne frivillige...",
       "action_accept": "Accepter",
       "action_back_pending": "Tilbage til afventende",
+      "action_edit_teams": "Edit teams",
       "action_reject": "Afvis",
       "additional_info_title": "At tilføje",
       "admin_only_note": "Følgende oplysninger (ansøgninger, filtre og detaljeret statistik) er kun synlige for autoriserede arrangører og samarbejdspartnere.",
@@ -776,6 +769,8 @@
       "ask_teardown_label": "Spørg om tilgængelighed til nedtagning",
       "ask_time_preferences_label": "Spørg om tidspræferencer",
       "ask_vehicle_label": "Spørg om køretøj tilgængeligt",
+      "assign_to_teams": "Tildel til hold",
+      "assigned_to_teams": "Tildelt til {count} hold | Tildelt til {count} hold",
       "avoid_list_hint": "Denne information forbliver fortrolig og hjælper arrangørerne med at skabe harmoniske hold",
       "avoid_list_label": "Frivillige jeg helst ikke vil arbejde vagter med (valgfrit)",
       "avoid_list_placeholder": "Navne på andre frivillige at undgå til vagter...",
@@ -785,10 +780,12 @@
       "companion_hint": "Valgfrit - Denne information hjælper arrangørerne med at danne hold med andre frivillige, du kender",
       "companion_label": "Frivillige jeg gerne vil arbejde vagter med (valgfrit)",
       "companion_placeholder": "Navne på andre foretrukne frivillige til vagter...",
+      "confirm_accept": "Accepter frivillig",
       "confirm_back_pending": "Er du sikker på, at du vil sætte denne ansøgning tilbage til afventende?",
       "departure_time_label": "Hvornår planlægger du at forlade?",
       "description_label": "Beskrivelse for frivillige",
       "diet_label": "Kostpræference",
+      "edit_teams_title": "Edit assigned teams",
       "event_availability_hint": "Udover opsætning/nedtagning kan du også hjælpe under hovedarrangementet",
       "event_availability_label": "Jeg er også tilgængelig under arrangementet",
       "experience_details_hint": "Beskriv din tidligere frivillige erfaring for at hjælpe os med at lære dig bedre at kende",
@@ -824,6 +821,7 @@
       "my_application_title": "Min ansøgning",
       "no_applications": "Ingen ansøgninger",
       "no_description": "Ingen specifik beskrivelse for frivillige.",
+      "no_volunteers_assigned": "No volunteers assigned",
       "open": "Åben",
       "personal_info_disclaimer": "Ovenstående oplysninger (fornavn, efternavn, email, telefon) vil blive givet til arrangører for at administrere frivillige teams. Udfyld manglende felter nedenfor hvis nødvendigt.",
       "personal_info_notice": "Delte personlige oplysninger",
@@ -838,6 +836,8 @@
       "presence_setup": "Opsætning",
       "presence_teardown": "Nedtagning",
       "presence_title": "Din tilstedeværelse",
+      "removed_from_teams": "Removed from all teams",
+      "save_teams": "Save teams",
       "search": "Søg",
       "search_placeholder": "Brugernavn, e-mail, kommentarer...",
       "select_arrival_placeholder": "Vælg din ankomst",
@@ -875,9 +875,12 @@
       "team_preferences_label": "Foretrukne hold",
       "team_remove": "Fjern dette hold",
       "team_slots_placeholder": "Valgfrit",
+      "teams_assignments": "Team assignments",
       "teams_empty": "Ingen hold defineret",
       "teams_hint": "Definer de forskellige hold og eventuelt antallet af pladser",
       "teams_label": "Frivillige hold",
+      "teams_selection_hint": "Vælg hold til at tildele denne frivillige til (valgfrit)",
+      "teams_updated": "Teams updated",
       "teardown_availability_label": "Jeg er tilgængelig for nedtagning",
       "time_granularity": {
         "afternoon": "Eftermiddag",
@@ -904,13 +907,13 @@
       "vehicle_details_placeholder": "Type køretøj, antal sæder, lastekapacitet...",
       "vehicle_label": "Jeg har et køretøj til rådighed",
       "view_only_note": "Kun visning tilstand",
+      "volunteer_accepted": "Frivillig accepteret",
       "what_you_can_bring_title": "Hvad du kan bringe os",
       "withdraw": "Træk min ansøgning tilbage"
     }
   },
   "errors": {
     "access_denied": "Adgang nægtet",
-    "addition_error": "Fejl under tilføjelse",
     "address_required": "Adresse påkrævet",
     "address_too_long": "Adressen må ikke overstige {max} tegn",
     "attendance_update_failed": "Kunne ikke opdatere deltagerstatus",
@@ -1117,10 +1120,7 @@
   },
   "log": {
     "add_admin_notes": "Tilføj noter om denne fejl...",
-    "adminNotes": "Admin-noter",
-    "errorType": "Fejltype",
     "full_url": "Fuld URL",
-    "id": "ID",
     "ip": "IP-adresse",
     "method": "Metode",
     "path": "Sti",
@@ -1134,8 +1134,6 @@
     "booking_cancelled": "Booking cancelled",
     "booking_requested": "Booking requested",
     "booking_requested_successfully": "Your booking request has been sent to the driver",
-    "collaborator_added": "Medarbejder tilføjet",
-    "collaborator_added_successfully": "Medarbejderen blev tilføjet med succes",
     "comment_added": "Kommentar tilføjet",
     "comment_deleted": "Kommentar slettet",
     "comment_deleted_successfully": "Kommentaren blev slettet med succes",
@@ -1179,11 +1177,6 @@
     "profile": "Profil",
     "tabs": "Navigationsfaner"
   },
-  "notification": {
-    "actionUrl": "Handlings-URL",
-    "category": "Kategori",
-    "id": "Identifikator"
-  },
   "notifications": {
     "loading": "Indlæser des notifications...",
     "manage_description": "Administrer dine beskeder og præferencer",
@@ -1203,9 +1196,6 @@
   "notificationsStore": {
     "loading": "Indlæser des notifications...",
     "realTimeEnabled": "Realtid aktiveret"
-  },
-  "p": {
-    "key": "Nøgle"
   },
   "pages": {
     "access_denied": {
@@ -1438,9 +1428,9 @@
     "promo_modal": {
       "benefits": {
         "carpool": "Få besked om samkørsel-bookinger og beskeder",
-        "volunteer": "Modtag opdateringer om dine frivillig-ansøgninger",
+        "important": "Gå ikke glip af vigtig information der vedrører dig",
         "reminders": "Modtag påmindelser om dine yndlings-konventioner",
-        "important": "Gå ikke glip af vigtig information der vedrører dig"
+        "volunteer": "Modtag opdateringer om dine frivillig-ansøgninger"
       },
       "description": "Aktivér push-notifikationer for at holde dig opdateret om dine samkørsler, frivillig-ansøgninger og yndlings-konventioner.",
       "enable": "Aktivér notifikationer",
@@ -1472,8 +1462,15 @@
       "title": "Installer app"
     }
   },
+  "selectedCollaboratorForEdit": {
+    "title": "Titel/Funktion",
+    "user": "Bruger"
+  },
+  "selectedConventionForEdit": {
+    "name": "Konventionsnavn"
+  },
   "selectedLog": {
-    "adminNotes": "Admin-noter",
+    "adminNotes": "Administratornotater",
     "ip": "IP-adresse",
     "message": "Fejlmeddelelse",
     "stack": "Stack trace",
@@ -1512,6 +1509,7 @@
     "workshops": "Workshops"
   },
   "team": {
+    "description": "Holdbeskrivelse",
     "name": "Holdnavn",
     "slots": "Antal pladser"
   },

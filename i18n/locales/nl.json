@@ -432,7 +432,6 @@
     "name": "Naam",
     "no": "Nee",
     "no_permission": "Geen toestemming",
-    "no_results": "Geen resultaten",
     "optional": "Optioneel",
     "or": "Of",
     "password": "Wachtwoord",
@@ -446,7 +445,6 @@
     "saving": "Opslaan...",
     "select": "Selecteer",
     "sort_tip": "Sorteren: klik op headers (Shift+klik voor meerdere)",
-    "start_typing": "Begin met typen...",
     "status": "Status",
     "success": "Succes",
     "time": "Tijd",
@@ -521,12 +519,8 @@
       "removed": "Medewerker verwijderd"
     },
     "collaborators_modal": {
-      "add_collaborator": "Medewerker toevoegen",
       "allow_modification": "Wijziging toestaan",
-      "description": "Beheer medewerkers voor deze conventie",
-      "permissions": "Rechten",
-      "search_user_placeholder": "Zoek een gebruiker...",
-      "title": "Medewerkers beheren"
+      "permissions": "Rechten"
     },
     "collaborators_rights_panel": {
       "by_user_label": "Door",
@@ -642,6 +636,7 @@
     "created_at": "Aangemaakt op",
     "delete": "Conventie verwijderen",
     "edit": "Conventie bewerken",
+    "edit_collaborator_rights": "Medewerkerrechten bewerken",
     "edit_permissions": "Bewerkingsrechten",
     "edit_permissions_desc": "Bewerk conventies volgens je rechten",
     "editions": "Edities",
@@ -668,9 +663,7 @@
   "countries": {
     "czech_republic": "Tsjechische Republiek"
   },
-  "currentValue": {
-    "avatar": "Avatar van geselecteerde gebruiker"
-  },
+  "currentValue": {},
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",
     "date_range_with_time": "Van {startDate} tot {endDate}",
@@ -680,9 +673,6 @@
     "none": "Geen",
     "vegan": "Vegan",
     "vegetarian": "Vegetarisch"
-  },
-  "ed": {
-    "id": "ID"
   },
   "editForm": {
     "email": "E-mail",
@@ -752,6 +742,9 @@
     "useful_links": "Nuttige links",
     "volunteers": {
       "about_you_title": "Dingen om te weten over u",
+      "accept_modal_title": "Vrijwilliger accepteren",
+      "accept_note_label": "Acceptatienotitie (optioneel)",
+      "accept_note_placeholder": "Voeg een notitie of instructies toe voor deze vrijwilliger...",
       "action_accept": "Accepteren",
       "action_back_pending": "Terug naar in afwachting",
       "action_reject": "Afwijzen",
@@ -776,6 +769,8 @@
       "ask_teardown_label": "Vraag naar beschikbaarheid voor afbraak",
       "ask_time_preferences_label": "Tijdvoorkeuren vragen",
       "ask_vehicle_label": "Vragen of voertuig beschikbaar",
+      "assign_to_teams": "Toewijzen aan teams",
+      "assigned_to_teams": "Toegewezen aan {count} team | Toegewezen aan {count} teams",
       "avoid_list_hint": "Deze informatie blijft vertrouwelijk en helpt organisatoren harmonieuze teams te creëren",
       "avoid_list_label": "Vrijwilligers waarmee ik liever geen diensten zou willen draaien (optioneel)",
       "avoid_list_placeholder": "Namen van andere vrijwilligers te vermijden voor diensten...",
@@ -785,6 +780,7 @@
       "companion_hint": "Optioneel - Deze informatie helpt organisatoren teams te vormen met andere vrijwilligers die je kent",
       "companion_label": "Vrijwilligers waarmee ik graag diensten zou willen draaien (optioneel)",
       "companion_placeholder": "Namen van andere voorkeursvolunteers voor diensten...",
+      "confirm_accept": "Vrijwilliger accepteren",
       "confirm_back_pending": "Weet u zeker dat u deze aanvraag weer op wachtend wilt zetten?",
       "departure_time_label": "Wanneer bent u van plan te vertrekken?",
       "description_label": "Beschrijving voor vrijwilligers",
@@ -878,6 +874,7 @@
       "teams_empty": "Geen teams gedefinieerd",
       "teams_hint": "Definieer de verschillende teams en optioneel het aantal plaatsen",
       "teams_label": "Vrijwilligersteams",
+      "teams_selection_hint": "Selecteer teams om deze vrijwilliger toe te wijzen (optioneel)",
       "teardown_availability_label": "Ik ben beschikbaar voor de afbraak",
       "time_granularity": {
         "afternoon": "Middag",
@@ -904,13 +901,20 @@
       "vehicle_details_placeholder": "Type voertuig, aantal stoelen, laadcapaciteit...",
       "vehicle_label": "Ik heb een voertuig beschikbaar",
       "view_only_note": "Alleen bekijkmodus",
+      "volunteer_accepted": "Vrijwilliger geaccepteerd",
       "what_you_can_bring_title": "Wat u ons kunt brengen",
-      "withdraw": "Trek mijn aanmelding in"
+      "withdraw": "Trek mijn aanmelding in",
+      "action_edit_teams": "Edit teams",
+      "edit_teams_title": "Edit assigned teams",
+      "save_teams": "Save teams",
+      "teams_updated": "Teams updated",
+      "removed_from_teams": "Removed from all teams",
+      "teams_assignments": "Team assignments",
+      "no_volunteers_assigned": "No volunteers assigned"
     }
   },
   "errors": {
     "access_denied": "Toegang geweigerd",
-    "addition_error": "Toevoegfout",
     "address_required": "Adres is vereist",
     "address_too_long": "Adres mag niet meer dan {max} tekens bevatten",
     "attendance_update_failed": "Fout bij het bijwerken van de deelnamestatus",
@@ -1117,10 +1121,7 @@
   },
   "log": {
     "add_admin_notes": "Voeg notities toe over deze fout...",
-    "adminNotes": "Beheernotities",
-    "errorType": "Fouttype",
     "full_url": "Volledige URL",
-    "id": "ID",
     "ip": "IP-adres",
     "method": "Methode",
     "path": "Pad",
@@ -1134,8 +1135,6 @@
     "booking_cancelled": "Booking cancelled",
     "booking_requested": "Booking requested",
     "booking_requested_successfully": "Your booking request has been sent to the driver",
-    "collaborator_added": "Medewerker toegevoegd",
-    "collaborator_added_successfully": "De medewerker is succesvol toegevoegd",
     "comment_added": "Opmerking toegevoegd",
     "comment_deleted": "Opmerking verwijderd",
     "comment_deleted_successfully": "De opmerking is succesvol verwijderd",
@@ -1179,11 +1178,6 @@
     "profile": "Profiel",
     "tabs": "Navigatietabs"
   },
-  "notification": {
-    "actionUrl": "Actie-URL",
-    "category": "Categorie",
-    "id": "Identificatie"
-  },
   "notifications": {
     "loading": "Laden des notifications...",
     "manage_description": "Beheer je meldingen en voorkeuren",
@@ -1203,9 +1197,6 @@
   "notificationsStore": {
     "loading": "Laden des notifications...",
     "realTimeEnabled": "Realtime ingeschakeld"
-  },
-  "p": {
-    "key": "Sleutel"
   },
   "pages": {
     "access_denied": {
@@ -1438,9 +1429,9 @@
     "promo_modal": {
       "benefits": {
         "carpool": "Ontvang meldingen van carpool-boekingen en berichten",
-        "volunteer": "Ontvang updates over je vrijwilligersaanmeldingen",
+        "important": "Mis geen belangrijke informatie die jou betreft",
         "reminders": "Ontvang herinneringen voor je favoriete conventies",
-        "important": "Mis geen belangrijke informatie die jou betreft"
+        "volunteer": "Ontvang updates over je vrijwilligersaanmeldingen"
       },
       "description": "Schakel push-notificaties in om op de hoogte te blijven van je carpools, vrijwilligersaanmeldingen en favoriete conventies.",
       "enable": "Notificaties inschakelen",
@@ -1471,6 +1462,13 @@
       },
       "title": "App installeren"
     }
+  },
+  "selectedCollaboratorForEdit": {
+    "title": "Titel/Functie",
+    "user": "Gebruiker"
+  },
+  "selectedConventionForEdit": {
+    "name": "Conventienaam"
   },
   "selectedLog": {
     "adminNotes": "Beheernotities",
@@ -1512,6 +1510,7 @@
     "workshops": "Workshops"
   },
   "team": {
+    "description": "Teamomschrijving",
     "name": "Teamnaam",
     "slots": "Aantal plaatsen"
   },

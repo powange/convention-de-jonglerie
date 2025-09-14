@@ -432,7 +432,6 @@
     "name": "Nome",
     "no": "No",
     "no_permission": "Nessun permesso",
-    "no_results": "Nessun risultato",
     "optional": "Opzionale",
     "or": "Oppure",
     "password": "Password",
@@ -446,7 +445,6 @@
     "saving": "Salvataggio...",
     "select": "Seleziona",
     "sort_tip": "Ordina: clicca sulle intestazioni (Shift+clic per multi)",
-    "start_typing": "Inizia a digitare...",
     "status": "Stato",
     "success": "Successo",
     "time": "Ora",
@@ -521,12 +519,8 @@
       "removed": "Collaboratore rimosso"
     },
     "collaborators_modal": {
-      "add_collaborator": "Aggiungi collaboratore",
       "allow_modification": "Consenti modifica",
-      "description": "Gestisci i collaboratori di questa convention",
-      "permissions": "Permessi",
-      "search_user_placeholder": "Cerca un utente...",
-      "title": "Gestisci collaboratori"
+      "permissions": "Permessi"
     },
     "collaborators_rights_panel": {
       "by_user_label": "Da",
@@ -642,6 +636,7 @@
     "created_at": "Creato il",
     "delete": "Elimina il convegno",
     "edit": "Modifica il convegno",
+    "edit_collaborator_rights": "Modifica diritti del collaboratore",
     "edit_permissions": "Permessi di modifica",
     "edit_permissions_desc": "Modifica i convegni secondo i tuoi permessi",
     "editions": "Edizioni",
@@ -668,9 +663,7 @@
   "countries": {
     "czech_republic": "Repubblica Ceca"
   },
-  "currentValue": {
-    "avatar": "Avatar dell'utente selezionato"
-  },
+  "currentValue": {},
   "dates": {
     "date_range": "Dal {startDate} al {endDate}",
     "date_range_with_time": "Dal {startDate} al {endDate}",
@@ -680,9 +673,6 @@
     "none": "Nessuno",
     "vegan": "Vegano",
     "vegetarian": "Vegetariano"
-  },
-  "ed": {
-    "id": "ID"
   },
   "editForm": {
     "email": "Email",
@@ -752,6 +742,9 @@
     "useful_links": "Link utili",
     "volunteers": {
       "about_you_title": "Cose da sapere su di lei",
+      "accept_modal_title": "Accetta volontario",
+      "accept_note_label": "Nota di accettazione (opzionale)",
+      "accept_note_placeholder": "Aggiungi una nota o istruzioni per questo volontario...",
       "action_accept": "Accetta",
       "action_back_pending": "Torna in attesa",
       "action_reject": "Rifiuta",
@@ -776,6 +769,8 @@
       "ask_teardown_label": "Chiedere disponibilità per lo smontaggio",
       "ask_time_preferences_label": "Richiedere preferenze orarie",
       "ask_vehicle_label": "Chiedere se veicolo disponibile",
+      "assign_to_teams": "Assegna ai team",
+      "assigned_to_teams": "Assegnato a {count} team | Assegnato a {count} team",
       "avoid_list_hint": "Queste informazioni rimangono riservate e aiutano gli organizzatori a creare squadre armoniose",
       "avoid_list_label": "Volontari con cui preferisco non fare turni (opzionale)",
       "avoid_list_placeholder": "Nomi di altri volontari da evitare per i turni...",
@@ -785,6 +780,7 @@
       "companion_hint": "Opzionale - Queste informazioni aiutano gli organizzatori a formare squadre con altri volontari che conosci",
       "companion_label": "Volontari con cui vorrei fare i turni (opzionale)",
       "companion_placeholder": "Nomi di altri volontari preferiti per i turni...",
+      "confirm_accept": "Accetta volontario",
       "confirm_back_pending": "Sei sicuro di voler rimettere questa candidatura in attesa?",
       "departure_time_label": "Quando prevede di partire?",
       "description_label": "Descrizione per volontari",
@@ -878,6 +874,7 @@
       "teams_empty": "Nessun team definito",
       "teams_hint": "Definisci i diversi team e opzionalmente il numero di posti",
       "teams_label": "Team di volontari",
+      "teams_selection_hint": "Seleziona i team a cui assegnare questo volontario (opzionale)",
       "teardown_availability_label": "Sono disponibile per lo smontaggio",
       "time_granularity": {
         "afternoon": "Pomeriggio",
@@ -904,13 +901,20 @@
       "vehicle_details_placeholder": "Tipo di veicolo, numero di posti, capacità di carico...",
       "vehicle_label": "Ho un veicolo a disposizione",
       "view_only_note": "Solo modalità consultazione",
+      "volunteer_accepted": "Volontario accettato",
       "what_you_can_bring_title": "Cosa può portarci",
-      "withdraw": "Ritira la mia candidatura"
+      "withdraw": "Ritira la mia candidatura",
+      "action_edit_teams": "Edit teams",
+      "edit_teams_title": "Edit assigned teams",
+      "save_teams": "Save teams",
+      "teams_updated": "Teams updated",
+      "removed_from_teams": "Removed from all teams",
+      "teams_assignments": "Team assignments",
+      "no_volunteers_assigned": "No volunteers assigned"
     }
   },
   "errors": {
     "access_denied": "Accesso non autorizzato",
-    "addition_error": "Errore durante l'aggiunta",
     "address_required": "L'indirizzo è richiesto",
     "address_too_long": "L'indirizzo non può superare {max} caratteri",
     "attendance_update_failed": "Errore nell'aggiornamento dello stato di partecipazione",
@@ -1117,10 +1121,7 @@
   },
   "log": {
     "add_admin_notes": "Aggiungi note su questo errore...",
-    "adminNotes": "Note amministratore",
-    "errorType": "Tipo di errore",
     "full_url": "URL completo",
-    "id": "ID",
     "ip": "Indirizzo IP",
     "method": "Metodo",
     "path": "Percorso",
@@ -1134,8 +1135,6 @@
     "booking_cancelled": "Booking cancelled",
     "booking_requested": "Booking requested",
     "booking_requested_successfully": "Your booking request has been sent to the driver",
-    "collaborator_added": "Collaboratore aggiunto",
-    "collaborator_added_successfully": "Il collaboratore è stato aggiunto con successo",
     "comment_added": "Commento aggiunto",
     "comment_deleted": "Commento eliminato",
     "comment_deleted_successfully": "Il commento è stato eliminato con successo",
@@ -1179,11 +1178,6 @@
     "profile": "Profilo",
     "tabs": "Schede di navigazione"
   },
-  "notification": {
-    "actionUrl": "URL azione",
-    "category": "Categoria",
-    "id": "Identificatore"
-  },
   "notifications": {
     "loading": "Caricamento notifiche...",
     "manage_description": "Gestisci le tue notifiche e preferenze",
@@ -1203,9 +1197,6 @@
   "notificationsStore": {
     "loading": "Caricamento des notifications...",
     "realTimeEnabled": "Tempo reale attivato"
-  },
-  "p": {
-    "key": "Chiave"
   },
   "pages": {
     "access_denied": {
@@ -1438,9 +1429,9 @@
     "promo_modal": {
       "benefits": {
         "carpool": "Ricevi notifiche per prenotazioni e messaggi di carpooling",
-        "volunteer": "Ricevi aggiornamenti sulle tue candidature come volontario",
+        "important": "Non perdere informazioni importanti che ti riguardano",
         "reminders": "Ricevi promemoria per le tue convention preferite",
-        "important": "Non perdere informazioni importanti che ti riguardano"
+        "volunteer": "Ricevi aggiornamenti sulle tue candidature come volontario"
       },
       "description": "Abilita le notifiche push per rimanere informato sui tuoi carpooling, candidature come volontario e convention preferite.",
       "enable": "Abilita notifiche",
@@ -1471,6 +1462,13 @@
       },
       "title": "Installa app"
     }
+  },
+  "selectedCollaboratorForEdit": {
+    "title": "Titolo/Ruolo",
+    "user": "Utente"
+  },
+  "selectedConventionForEdit": {
+    "name": "Nome della convention"
   },
   "selectedLog": {
     "adminNotes": "Note amministratore",
@@ -1512,6 +1510,7 @@
     "workshops": "Workshop"
   },
   "team": {
+    "description": "Descrizione del team",
     "name": "Nome del team",
     "slots": "Numero di posti"
   },

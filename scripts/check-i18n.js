@@ -186,6 +186,15 @@ function extractI18nKeysFromFile(filePath) {
     const potentialKey = match[1]
     const parts = potentialKey.split('.')
 
+    // Vérifier si on est dans un attribut :key= (faux positif fréquent)
+    const matchStart = match.index
+    const beforeMatch = content.substring(Math.max(0, matchStart - 20), matchStart)
+    const isInKeyAttribute = /:key\s*=\s*$/.test(beforeMatch)
+
+    if (isInKeyAttribute) {
+      continue // Ignorer les propriétés d'objets dans :key=
+    }
+
     // Filtrer les faux positifs
     // - Exclure les propriétés d'objets JavaScript communes
     const jsObjectPatterns = [
@@ -244,6 +253,11 @@ function extractI18nKeysFromFile(filePath) {
       'selectedCollaboratorConvention',
       'selectedConventionForAdd',
       'internalValue',
+      'teamAssignment',
+      'notification',
+      'ed',
+      'log',
+      'p',
     ]
 
     // Exceptions - ces patterns sont valides même s'ils commencent par un mot réservé

@@ -432,7 +432,6 @@
     "name": "Ім'я",
     "no": "Ні",
     "no_permission": "Немає дозволу",
-    "no_results": "Немає результатів",
     "optional": "Необов'язково",
     "or": "Або",
     "password": "Пароль",
@@ -446,7 +445,6 @@
     "saving": "Збереження...",
     "select": "Вибрати",
     "sort_tip": "Сортування: натисніть на заголовки (Shift+клік для кількох)",
-    "start_typing": "Почніть вводити...",
     "status": "Статус",
     "success": "Успіх",
     "time": "Час",
@@ -521,12 +519,8 @@
       "removed": "Співробітника видалено"
     },
     "collaborators_modal": {
-      "add_collaborator": "Додати співробітника",
       "allow_modification": "Дозволити модифікацію",
-      "description": "Керувати співробітниками цієї конвенції",
-      "permissions": "Дозволи",
-      "search_user_placeholder": "Пошук користувача...",
-      "title": "Керувати співробітниками"
+      "permissions": "Дозволи"
     },
     "collaborators_rights_panel": {
       "by_user_label": "Від",
@@ -642,6 +636,7 @@
     "created_at": "Створено",
     "delete": "Видалити конвенцію",
     "edit": "Редагувати конвенцію",
+    "edit_collaborator_rights": "Редагувати права співробітника",
     "edit_permissions": "Права редагування",
     "edit_permissions_desc": "Змінюйте конвенції відповідно до ваших дозволів",
     "editions": "Видання",
@@ -668,9 +663,7 @@
   "countries": {
     "czech_republic": "Чеська Республіка"
   },
-  "currentValue": {
-    "avatar": "Аватар вибраного користувача"
-  },
+  "currentValue": {},
   "dates": {
     "date_range": "З {startDate} до {endDate}",
     "date_range_with_time": "З {startDate} до {endDate}",
@@ -680,9 +673,6 @@
     "none": "Немає",
     "vegan": "Веганський",
     "vegetarian": "Вегетаріанський"
-  },
-  "ed": {
-    "id": "ID"
   },
   "editForm": {
     "email": "Ел. пошта",
@@ -752,6 +742,9 @@
     "useful_links": "Корисні посилання",
     "volunteers": {
       "about_you_title": "Що потрібно знати про вас",
+      "accept_modal_title": "Прийняти волонтера",
+      "accept_note_label": "Нотатка прийняття (необов'язково)",
+      "accept_note_placeholder": "Додайте нотатку або інструкції для цього волонтера...",
       "action_accept": "Прийняти",
       "action_back_pending": "Повернути в очікування",
       "action_reject": "Відхилити",
@@ -776,6 +769,8 @@
       "ask_teardown_label": "Запитати про доступність для демонтажу",
       "ask_time_preferences_label": "Запитувати часові переваги",
       "ask_vehicle_label": "Запитати про наявність транспорту",
+      "assign_to_teams": "Призначити до команд",
+      "assigned_to_teams": "Призначено до {count} команди | Призначено до {count} команд",
       "avoid_list_hint": "Ця інформація залишається конфіденційною і допомагає організаторам створювати гармонійні команди",
       "avoid_list_label": "Волонтери, з якими я волів би не працювати на змінах (необов'язково)",
       "avoid_list_placeholder": "Імена інших волонтерів, яких слід уникати на змінах...",
@@ -785,6 +780,7 @@
       "companion_hint": "Необов'язково - Ця інформація допомагає організаторам формувати команди з іншими волонтерами, яких ви знаєте",
       "companion_label": "Волонтери, з якими я хотів би працювати на змінах (необов'язково)",
       "companion_placeholder": "Імена інших бажаних волонтерів для змін...",
+      "confirm_accept": "Прийняти волонтера",
       "confirm_back_pending": "Ви впевнені, що хочете повернути цю заявку в статус очікування?",
       "departure_time_label": "Коли ви плануєте відійти?",
       "description_label": "Опис для волонтерів",
@@ -878,6 +874,7 @@
       "teams_empty": "Команди не визначені",
       "teams_hint": "Визначте різні команди та, за бажанням, кількість місць",
       "teams_label": "Команди волонтерів",
+      "teams_selection_hint": "Оберіть команди для призначення цього волонтера (необов'язково)",
       "teardown_availability_label": "Я доступний для демонтажу",
       "time_granularity": {
         "afternoon": "Пополудні",
@@ -904,13 +901,20 @@
       "vehicle_details_placeholder": "Тип транспорту, кількість місць, вантажопідйомність...",
       "vehicle_label": "У мене є доступний транспорт",
       "view_only_note": "Режим лише перегляду",
+      "volunteer_accepted": "Волонтера прийнято",
       "what_you_can_bring_title": "Що ви можете нам принести",
-      "withdraw": "Відкликати мою заявку"
+      "withdraw": "Відкликати мою заявку",
+      "action_edit_teams": "Edit teams",
+      "edit_teams_title": "Edit assigned teams",
+      "save_teams": "Save teams",
+      "teams_updated": "Teams updated",
+      "removed_from_teams": "Removed from all teams",
+      "teams_assignments": "Team assignments",
+      "no_volunteers_assigned": "No volunteers assigned"
     }
   },
   "errors": {
     "access_denied": "Доступ заборонено",
-    "addition_error": "Помилка додавання",
     "address_required": "Адреса обов'язкова",
     "address_too_long": "Адреса не може перевищувати {max} символів",
     "attendance_update_failed": "Не вдалося оновити статус участі",
@@ -1117,10 +1121,7 @@
   },
   "log": {
     "add_admin_notes": "Додати нотатки про цю помилку...",
-    "adminNotes": "Нотатки адміністратора",
-    "errorType": "Тип помилки",
     "full_url": "Повний URL",
-    "id": "ID",
     "ip": "IP-адреса",
     "method": "Метод",
     "path": "Шлях",
@@ -1134,8 +1135,6 @@
     "booking_cancelled": "Booking cancelled",
     "booking_requested": "Booking requested",
     "booking_requested_successfully": "Your booking request has been sent to the driver",
-    "collaborator_added": "Співробітника додано",
-    "collaborator_added_successfully": "Співробітника успішно додано",
     "comment_added": "Коментар додано",
     "comment_deleted": "Коментар видалено",
     "comment_deleted_successfully": "Коментар успішно видалено",
@@ -1179,11 +1178,6 @@
     "profile": "Профіль",
     "tabs": "Вкладки навігації"
   },
-  "notification": {
-    "actionUrl": "URL дії",
-    "category": "Категорія",
-    "id": "Ідентифікатор"
-  },
   "notifications": {
     "loading": "Завантаження сповіщень...",
     "manage_description": "Керуйте своїми сповіщеннями та налаштуваннями",
@@ -1203,9 +1197,6 @@
   "notificationsStore": {
     "loading": "Завантаження des notifications...",
     "realTimeEnabled": "Режим реального часу увімкнений"
-  },
-  "p": {
-    "key": "Ключ"
   },
   "pages": {
     "access_denied": {
@@ -1438,9 +1429,9 @@
     "promo_modal": {
       "benefits": {
         "carpool": "Отримуйте сповіщення про бронювання та повідомлення спільних поїздок",
-        "volunteer": "Отримуйте оновлення щодо ваших заявок волонтера",
+        "important": "Не пропустіть важливу інформацію, що стосується вас",
         "reminders": "Отримуйте нагадування про ваші улюблені конвенції",
-        "important": "Не пропустіть важливу інформацію, що стосується вас"
+        "volunteer": "Отримуйте оновлення щодо ваших заявок волонтера"
       },
       "description": "Увімкніть push-сповіщення, щоб бути в курсі ваших спільних поїздок, заявок волонтера та улюблених конвенцій.",
       "enable": "Увімкнути сповіщення",
@@ -1471,6 +1462,13 @@
       },
       "title": "Встановити додаток"
     }
+  },
+  "selectedCollaboratorForEdit": {
+    "title": "Посада/Роль",
+    "user": "Користувач"
+  },
+  "selectedConventionForEdit": {
+    "name": "Назва конвенції"
   },
   "selectedLog": {
     "adminNotes": "Нотатки адміністратора",
@@ -1512,6 +1510,7 @@
     "workshops": "Майстер-класи"
   },
   "team": {
+    "description": "Опис команди",
     "name": "Назва команди",
     "slots": "Кількість місць"
   },

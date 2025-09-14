@@ -122,7 +122,8 @@
                       : rightsSummary(collaborator).color
                   "
                   variant="subtle"
-                  class="flex items-center gap-2"
+                  class="flex items-center gap-2 cursor-pointer hover:bg-opacity-80 transition-colors"
+                  @click="openEditCollaboratorModal(convention, collaborator)"
                 >
                   <div class="flex items-center gap-1.5">
                     <UserAvatar :user="collaborator.user" size="sm" />
@@ -177,14 +178,48 @@
       </div>
     </div>
 
-    <!-- Modal de gestion des collaborateurs -->
-    <CollaboratorsModal
-      v-model="collaboratorsModalOpen"
-      :convention="selectedConvention"
-      :current-user-id="authStore.user?.id"
-      @collaborator-added="fetchMyConventions"
-      @collaborator-removed="fetchMyConventions"
-    />
+    <!-- Modal d'édition de collaborateur -->
+    <UModal
+      v-model:open="editCollaboratorModalOpen"
+      :title="selectedCollaboratorForEdit ? $t('conventions.edit_collaborator_rights') : ''"
+      size="lg"
+    >
+      <template #body>
+        <div v-if="selectedCollaboratorForEdit && selectedConventionForEdit" class="space-y-4">
+          <!-- Informations du collaborateur -->
+          <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <UserAvatar :user="selectedCollaboratorForEdit.user" size="md" />
+            <div>
+              <h4 class="font-medium">{{ selectedCollaboratorForEdit.user?.pseudo || '' }}</h4>
+              <p v-if="selectedCollaboratorForEdit.title" class="text-sm text-gray-500">
+                {{ selectedCollaboratorForEdit.title }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Configuration des droits -->
+          <div>
+            <label class="block text-sm font-medium mb-2"> Droits du collaborateur </label>
+            <CollaboratorRightsFields
+              v-model="editCollaboratorRights"
+              :editions="(selectedConventionForEdit.editions || []) as any[]"
+              :convention-name="selectedConventionForEdit.name"
+              size="sm"
+            />
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton variant="ghost" @click="closeEditCollaboratorModal">
+            {{ $t('common.cancel') }}
+          </UButton>
+          <UButton color="primary" :loading="savingCollaborator" @click="saveCollaboratorChanges">
+            {{ $t('common.save') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
 
     <!-- Modal d'ajout de collaborateur -->
     <UModal
@@ -272,9 +307,24 @@ const { t } = useI18n()
 const conventionsLoading = ref(true)
 const myConventions = ref<Convention[]>([])
 
-// Modal collaborateurs
-const collaboratorsModalOpen = ref(false)
-const selectedConvention = ref<Convention | null>(null)
+// Modal d'édition de collaborateur
+const editCollaboratorModalOpen = ref(false)
+const selectedConventionForEdit = ref<Convention | null>(null)
+const selectedCollaboratorForEdit = ref<any>(null)
+const editCollaboratorRights = ref<any>({
+  title: null,
+  rights: {
+    editConvention: false,
+    deleteConvention: false,
+    manageCollaborators: false,
+    manageVolunteers: false,
+    addEdition: false,
+    editAllEditions: false,
+    deleteAllEditions: false,
+  },
+  perEdition: [],
+})
+const savingCollaborator = ref(false)
 
 // Modal d'ajout de collaborateur
 const addCollaboratorModalOpen = ref(false)
@@ -546,6 +596,93 @@ const onEditionAction = (_action: unknown) => {
 }
 
 // Fonctions pour gérer les collaborateurs
+const openEditCollaboratorModal = (convention: Convention, collaborator: any) => {
+  if (!canManageCollaborators(convention)) {
+    toast.add({
+      title: 'Action non autorisée',
+      description: "Vous n'avez pas les droits pour modifier ce collaborateur",
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+    return
+  }
+
+  selectedConventionForEdit.value = convention
+  selectedCollaboratorForEdit.value = collaborator
+
+  // Charger les droits actuels du collaborateur
+  editCollaboratorRights.value = {
+    title: collaborator.title || '',
+    rights: { ...collaborator.rights },
+    perEdition: [...(collaborator.perEdition || [])],
+  }
+
+  editCollaboratorModalOpen.value = true
+}
+
+const closeEditCollaboratorModal = () => {
+  editCollaboratorModalOpen.value = false
+  selectedConventionForEdit.value = null
+  selectedCollaboratorForEdit.value = null
+  editCollaboratorRights.value = {
+    title: null,
+    rights: {
+      editConvention: false,
+      deleteConvention: false,
+      manageCollaborators: false,
+      manageVolunteers: false,
+      addEdition: false,
+      editAllEditions: false,
+      deleteAllEditions: false,
+    },
+    perEdition: [],
+  }
+}
+
+const saveCollaboratorChanges = async () => {
+  if (!selectedCollaboratorForEdit.value || !selectedConventionForEdit.value) {
+    return
+  }
+
+  try {
+    savingCollaborator.value = true
+
+    await $fetch(
+      `/api/conventions/${selectedConventionForEdit.value.id}/collaborators/${selectedCollaboratorForEdit.value.id}`,
+      {
+        method: 'PUT',
+        body: {
+          rights: editCollaboratorRights.value.rights,
+          title: editCollaboratorRights.value.title,
+          perEdition: editCollaboratorRights.value.perEdition || [],
+        },
+      }
+    )
+
+    toast.add({
+      title: 'Droits mis à jour',
+      description: 'Les droits du collaborateur ont été modifiés avec succès',
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    // Fermer la modal et recharger les conventions
+    closeEditCollaboratorModal()
+    await fetchMyConventions()
+  } catch (error: unknown) {
+    const httpError = error as HttpError
+    console.error('Error updating collaborator rights:', error)
+    toast.add({
+      title: 'Erreur lors de la mise à jour',
+      description: httpError.data?.message || httpError.message || t('errors.server_error'),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  } finally {
+    savingCollaborator.value = false
+  }
+}
+
 const openAddCollaboratorModal = (convention: Convention) => {
   selectedConventionForAdd.value = convention
   // Réinitialiser les valeurs
@@ -645,9 +782,9 @@ const fetchMyConventions = async () => {
     myConventions.value = data || []
 
     // Mettre à jour la convention sélectionnée si la modal est ouverte
-    if (selectedConvention.value && collaboratorsModalOpen.value) {
+    if (selectedConventionForEdit.value && editCollaboratorModalOpen.value) {
       const updatedConvention = myConventions.value.find(
-        (c) => c.id === selectedConvention.value!.id
+        (c) => c.id === selectedConventionForEdit.value!.id
       )
       if (updatedConvention) {
         selectedConvention.value = updatedConvention

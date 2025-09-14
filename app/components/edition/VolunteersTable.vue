@@ -104,8 +104,8 @@
         :items="
           tableRef?.tableApi
             ?.getAllColumns()
-            .filter((column) => column.getCanHide())
-            .map((column) => ({
+            .filter((column: any) => column.getCanHide())
+            .map((column: any) => ({
               label: getColumnLabel(column.id),
               type: 'checkbox' as const,
               checked: column.getIsVisible(),
@@ -152,7 +152,71 @@
       :loading="applicationsLoading"
       class="border border-accented"
       sticky
-    />
+    >
+      <template #actions-cell="{ row }">
+        <div v-if="props.canManageVolunteers">
+          <!-- Actions selon le statut -->
+          <div v-if="row.original.status === 'PENDING'" class="flex flex-col items-start gap-1">
+            <UButton
+              :label="t('editions.volunteers.action_accept')"
+              size="xs"
+              color="success"
+              variant="solid"
+              :loading="applicationsActingId === row.original.id && actingAction === 'ACCEPTED'"
+              @click="decideApplication(row.original, 'ACCEPTED')"
+            />
+            <UButton
+              :label="t('editions.volunteers.action_reject')"
+              size="xs"
+              color="error"
+              variant="solid"
+              :loading="applicationsActingId === row.original.id && actingAction === 'REJECTED'"
+              @click="decideApplication(row.original, 'REJECTED')"
+            />
+          </div>
+
+          <div
+            v-else-if="row.original.status === 'ACCEPTED'"
+            class="flex flex-col items-start gap-1"
+          >
+            <UButton
+              :label="t('editions.volunteers.action_edit_teams')"
+              size="xs"
+              color="primary"
+              variant="solid"
+              icon="i-heroicons-user-group"
+              @click="openEditTeamsModal(row.original)"
+            />
+            <UButton
+              :label="t('editions.volunteers.action_back_pending')"
+              size="xs"
+              color="warning"
+              variant="soft"
+              :loading="applicationsActingId === row.original.id && actingAction === 'PENDING'"
+              @click="confirmBackToPending(row.original)"
+            />
+          </div>
+
+          <div
+            v-else-if="row.original.status === 'REJECTED'"
+            class="flex flex-col items-start gap-1"
+          >
+            <UButton
+              :label="t('editions.volunteers.action_back_pending')"
+              size="xs"
+              color="warning"
+              variant="soft"
+              :loading="applicationsActingId === row.original.id && actingAction === 'PENDING'"
+              @click="confirmBackToPending(row.original)"
+            />
+          </div>
+        </div>
+
+        <span v-else class="text-xs text-gray-500 italic">
+          {{ t('common.no_permission') }}
+        </span>
+      </template>
+    </UTable>
     <div v-if="tableData.length === 0 && !applicationsLoading" class="text-xs text-gray-500 py-2">
       {{ t('editions.volunteers.no_applications') }}
     </div>
@@ -178,10 +242,153 @@
       />
     </span>
   </div>
+
+  <!-- Section équipes avec leurs bénévoles -->
+  <div v-if="volunteersInfo?.teams?.length > 0" class="mt-8">
+    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+      <UIcon name="i-heroicons-user-group" class="text-blue-600" />
+      {{ t('editions.volunteers.teams_assignments') }}
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <UCard
+        v-for="teamAssignment in teamAssignments"
+        :key="teamAssignment.teamName"
+        variant="subtle"
+      >
+        <template #header>
+          <h4
+            class="font-medium text-gray-900 dark:text-white mb-2 flex items-center justify-between"
+          >
+            <span>{{ teamAssignment.teamName }}</span>
+            <UBadge
+              :color="getBadgeColor(teamAssignment.volunteers.length, teamAssignment.teamSlots)"
+              variant="soft"
+            >
+              {{ teamAssignment.volunteers.length
+              }}{{ teamAssignment.teamSlots ? `/${teamAssignment.teamSlots}` : '' }}
+            </UBadge>
+          </h4>
+        </template>
+
+        <div v-if="teamAssignment.teamDescription" class="text-sm text-gray-500 mb-3">
+          {{ teamAssignment.teamDescription }}
+        </div>
+
+        <div class="space-y-2">
+          <div
+            v-for="volunteer in teamAssignment.volunteers"
+            :key="volunteer.id"
+            class="flex items-center gap-2 text-sm"
+          >
+            <UIcon name="i-heroicons-user" class="text-gray-400 flex-shrink-0" />
+            <span class="font-medium">{{ volunteer.user.pseudo }}</span>
+            <span class="text-gray-500">
+              ({{ volunteer.user.prenom }} {{ volunteer.user.nom }})
+            </span>
+          </div>
+        </div>
+
+        <div v-if="teamAssignment.volunteers.length === 0" class="text-sm text-gray-400 italic">
+          {{ t('editions.volunteers.no_volunteers_assigned') }}
+        </div>
+      </UCard>
+    </div>
+  </div>
+
+  <!-- Modal unifiée pour acceptation et modification des équipes -->
+  <UModal v-model:open="teamsModalOpen">
+    <template #header>
+      <div class="flex items-center gap-2">
+        <UIcon
+          :name="modalMode === 'accept' ? 'i-heroicons-user-plus' : 'i-heroicons-user-group'"
+          :class="modalMode === 'accept' ? 'text-green-600' : 'text-blue-600'"
+        />
+        <h3 class="font-semibold">
+          {{
+            modalMode === 'accept'
+              ? t('editions.volunteers.accept_modal_title')
+              : t('editions.volunteers.edit_teams_title')
+          }}
+        </h3>
+      </div>
+    </template>
+    <template #body>
+      <div v-if="currentApplication" class="space-y-4">
+        <!-- Info du bénévole -->
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+          <div class="flex items-center gap-3">
+            <UIcon name="i-heroicons-user-circle" class="text-2xl text-gray-600" />
+            <div>
+              <div class="font-medium">{{ currentApplication.user.pseudo }}</div>
+              <div class="text-sm text-gray-500">{{ currentApplication.user.email }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sélection des équipes -->
+        <div v-if="availableTeamsForModal.length > 0">
+          <label class="block text-sm font-medium mb-2">
+            {{ t('editions.volunteers.assign_to_teams') }}
+          </label>
+          <div class="space-y-2 max-h-60 overflow-y-auto">
+            <div
+              v-for="team in availableTeamsForModal"
+              :key="team.name"
+              class="flex items-center gap-3 p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
+              <UCheckbox
+                :model-value="selectedTeams.includes(team.name)"
+                :label="team.name"
+                @update:model-value="toggleTeamSelection(team.name)"
+              />
+              <span v-if="team.description" class="text-xs text-gray-500">
+                ({{ team.description }})
+              </span>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">
+            {{ t('editions.volunteers.teams_selection_hint') }}
+          </p>
+        </div>
+
+        <!-- Note optionnelle (seulement pour l'acceptation) -->
+        <div v-if="modalMode === 'accept'">
+          <label class="block text-sm font-medium mb-2">
+            {{ t('editions.volunteers.accept_note_label') }}
+          </label>
+          <UTextarea
+            v-model="acceptNote"
+            :placeholder="t('editions.volunteers.accept_note_placeholder')"
+            :rows="3"
+            class="w-full"
+          />
+        </div>
+      </div>
+    </template>
+    <template #footer>
+      <div class="flex justify-end gap-3">
+        <UButton variant="ghost" @click="closeTeamsModal">
+          {{ t('common.cancel') }}
+        </UButton>
+        <UButton
+          :color="modalMode === 'accept' ? 'success' : 'primary'"
+          :loading="teamsModalLoading"
+          @click="confirmTeamsModal"
+        >
+          {{
+            modalMode === 'accept'
+              ? t('editions.volunteers.confirm_accept')
+              : t('editions.volunteers.save_teams')
+          }}
+        </UButton>
+      </div>
+    </template>
+  </UModal>
 </template>
 
 <script setup lang="ts">
-import { h, resolveComponent, watch, onMounted } from 'vue'
+import { h, resolveComponent, watch, onMounted, nextTick } from 'vue'
 
 import type { TableColumn } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
@@ -218,6 +425,14 @@ const columnVisibility = ref<Record<string, boolean>>({
 const applicationsActingId = ref<number | null>(null)
 const actingAction = ref<'ACCEPTED' | 'REJECTED' | 'PENDING' | null>(null)
 
+// Variables pour la modal unifiée
+const teamsModalOpen = ref(false)
+const currentApplication = ref<any>(null)
+const selectedTeams = ref<string[]>([])
+const acceptNote = ref('')
+const teamsModalLoading = ref(false)
+const modalMode = ref<'accept' | 'edit'>('accept')
+
 // Référence pour le tableau
 const tableRef = ref()
 
@@ -244,6 +459,61 @@ const volunteerPresenceItems = computed(() => [
   { label: t('editions.volunteers.presence_event'), value: 'event' },
   { label: t('editions.volunteers.presence_teardown'), value: 'teardown' },
 ])
+
+// Équipes disponibles pour la modal (préférences du bénévole ou toutes les équipes)
+const availableTeamsForModal = computed(() => {
+  if (!props.volunteersInfo?.teams?.length || !currentApplication.value) {
+    return []
+  }
+
+  const allTeams = props.volunteersInfo.teams
+  const preferredTeams = currentApplication.value.teamPreferences || []
+
+  // Si le bénévole a des préférences d'équipes, on ne montre que celles-ci
+  if (preferredTeams.length > 0) {
+    return allTeams.filter((team: any) => preferredTeams.includes(team.name))
+  }
+
+  // Sinon on montre toutes les équipes
+  return allTeams
+})
+
+// Computed pour les assignations d'équipes
+const teamAssignments = computed(() => {
+  if (!props.volunteersInfo?.teams?.length) {
+    return []
+  }
+
+  const assignments: Array<{
+    teamName: string
+    teamDescription?: string
+    teamSlots?: number
+    volunteers: Array<any>
+  }> = []
+
+  // Pour chaque équipe configurée
+  for (const team of props.volunteersInfo.teams) {
+    const teamAssignment = {
+      teamName: team.name,
+      teamDescription: team.description,
+      teamSlots: team.slots,
+      volunteers: [] as Array<any>,
+    }
+
+    // Trouver tous les bénévoles acceptés assignés à cette équipe (même si aucun)
+    if (applications.value.length > 0) {
+      for (const app of applications.value) {
+        if (app.status === 'ACCEPTED' && app.assignedTeams?.includes(team.name)) {
+          teamAssignment.volunteers.push(app)
+        }
+      }
+    }
+
+    assignments.push(teamAssignment)
+  }
+
+  return assignments
+})
 
 // Computed pour les données du tableau
 const tableData = computed(() =>
@@ -398,6 +668,13 @@ const volunteerStatusLabel = (s: string) =>
         : s
 
 const decideApplication = async (app: any, status: 'ACCEPTED' | 'REJECTED' | 'PENDING') => {
+  // Si c'est une acceptation et qu'il y a des équipes configurées, ouvrir la modal
+  if (status === 'ACCEPTED' && props.volunteersInfo?.teams?.length > 0) {
+    openAcceptModal(app)
+    return
+  }
+
+  // Sinon, procéder directement
   applicationsActingId.value = app.id
   actingAction.value = status
   try {
@@ -409,14 +686,176 @@ const decideApplication = async (app: any, status: 'ACCEPTED' | 'REJECTED' | 'PE
       } as any
     )
     if (res?.application) {
-      app.status = res.application.status
       emit('refreshVolunteersInfo')
+
+      // Rafraîchir les données du tableau
+      refreshApplications()
     }
   } catch (e: any) {
     toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
   } finally {
     applicationsActingId.value = null
     actingAction.value = null
+  }
+}
+
+// Fonction pour confirmer une action
+const confirmAction = (message: string): boolean => {
+  return (globalThis as any).confirm(message)
+}
+
+// Fonction pour remettre en attente avec confirmation
+const confirmBackToPending = (app: any) => {
+  if (confirmAction(t('editions.volunteers.confirm_back_pending'))) {
+    decideApplication(app, 'PENDING')
+  }
+}
+
+// Fonction pour déterminer la couleur du badge selon le remplissage
+const getBadgeColor = (current: number, max?: number): 'success' | 'warning' | 'error' | 'info' => {
+  // Équipe vide = toujours rouge (avec ou sans limite)
+  if (current === 0) return 'error'
+
+  // Équipe sans limite définie
+  if (!max) {
+    return current > 0 ? 'success' : 'error' // Au moins 1 personne = vert, sinon rouge
+  }
+
+  // Équipe avec limite définie
+  if (current === max) return 'success' // Complète => vert
+  if (current > max) return 'warning' // Pleine (dépassement) => orange
+  return 'info' // Pas remplie => bleu
+}
+
+// Fonctions pour la modal d'acceptation
+const toggleTeamSelection = (teamId: string) => {
+  const index = selectedTeams.value.indexOf(teamId)
+  if (index === -1) {
+    selectedTeams.value.push(teamId)
+  } else {
+    selectedTeams.value.splice(index, 1)
+  }
+}
+
+// Ouvrir la modal en mode acceptation
+const openAcceptModal = (app: any) => {
+  modalMode.value = 'accept'
+  currentApplication.value = app
+  selectedTeams.value = []
+  acceptNote.value = ''
+  teamsModalOpen.value = true
+
+  // Si une seule équipe disponible, la cocher par défaut
+  nextTick(() => {
+    if (availableTeamsForModal.value.length === 1) {
+      selectedTeams.value = [availableTeamsForModal.value[0].name]
+    }
+  })
+}
+
+// Ouvrir la modal en mode édition
+const openEditTeamsModal = (app: any) => {
+  modalMode.value = 'edit'
+  currentApplication.value = app
+  selectedTeams.value = app.assignedTeams || []
+  acceptNote.value = ''
+  teamsModalOpen.value = true
+
+  // Si une seule équipe disponible et aucune sélectionnée, la cocher par défaut
+  nextTick(() => {
+    if (availableTeamsForModal.value.length === 1 && selectedTeams.value.length === 0) {
+      selectedTeams.value = [availableTeamsForModal.value[0].name]
+    }
+  })
+}
+
+// Fermer la modal
+const closeTeamsModal = () => {
+  teamsModalOpen.value = false
+  currentApplication.value = null
+  selectedTeams.value = []
+  acceptNote.value = ''
+  modalMode.value = 'accept'
+}
+
+// Fonction de confirmation unifiée
+const confirmTeamsModal = async () => {
+  if (!currentApplication.value) return
+
+  teamsModalLoading.value = true
+  try {
+    if (modalMode.value === 'accept') {
+      // Mode acceptation : d'abord assigner les équipes, puis accepter
+      if (selectedTeams.value.length > 0) {
+        // D'abord assigner les équipes
+        await $fetch(
+          `/api/editions/${props.editionId}/volunteers/applications/${currentApplication.value.id}/teams`,
+          {
+            method: 'PATCH',
+            body: {
+              teams: selectedTeams.value,
+            },
+          } as any
+        )
+      }
+
+      // Ensuite accepter le bénévole
+      await $fetch(
+        `/api/editions/${props.editionId}/volunteers/applications/${currentApplication.value.id}`,
+        {
+          method: 'PATCH',
+          body: {
+            status: 'ACCEPTED',
+            note: acceptNote.value || undefined,
+          },
+        } as any
+      )
+
+      emit('refreshVolunteersInfo')
+
+      // Rafraîchir les données du tableau
+      refreshApplications()
+
+      toast.add({
+        title: t('editions.volunteers.volunteer_accepted'),
+        description:
+          selectedTeams.value.length > 0
+            ? t('editions.volunteers.assigned_to_teams', { count: selectedTeams.value.length })
+            : undefined,
+        color: 'success',
+      })
+    } else {
+      // Mode édition : seulement assigner les équipes
+      await $fetch(
+        `/api/editions/${props.editionId}/volunteers/applications/${currentApplication.value.id}/teams`,
+        {
+          method: 'PATCH',
+          body: {
+            teams: selectedTeams.value,
+          },
+        } as any
+      )
+
+      emit('refreshVolunteersInfo')
+
+      // Rafraîchir les données du tableau
+      refreshApplications()
+
+      toast.add({
+        title: t('editions.volunteers.teams_updated'),
+        description:
+          selectedTeams.value.length > 0
+            ? t('editions.volunteers.assigned_to_teams', { count: selectedTeams.value.length })
+            : t('editions.volunteers.removed_from_teams'),
+        color: 'success',
+      })
+    }
+
+    closeTeamsModal()
+  } catch (e: any) {
+    toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
+  } finally {
+    teamsModalLoading.value = false
   }
 }
 
@@ -520,16 +959,50 @@ const columns: TableColumn<any>[] = [
   {
     accessorKey: 'status',
     header: ({ column }) => getSortableHeader(column, t('common.status')),
-    cell: ({ row }) =>
-      h(
+    cell: ({ row }) => {
+      const status = row.original.status
+      const acceptanceNote = row.original.acceptanceNote
+
+      // Si accepté avec une note, afficher avec tooltip
+      if (status === 'ACCEPTED' && acceptanceNote) {
+        return h('div', { class: 'flex items-center gap-1' }, [
+          h(
+            resolveComponent('UBadge'),
+            {
+              color: volunteerStatusColor(status),
+              variant: 'soft',
+              class: 'uppercase text-xs px-2 py-1',
+            },
+            () => volunteerStatusLabel(status)
+          ),
+          h(
+            resolveComponent('UTooltip'),
+            {
+              text: acceptanceNote,
+              openDelay: 200,
+            },
+            {
+              default: () =>
+                h(resolveComponent('UIcon'), {
+                  name: 'i-heroicons-information-circle',
+                  class: 'text-blue-500 cursor-help text-sm',
+                }),
+            }
+          ),
+        ])
+      }
+
+      // Sinon, affichage normal sans tooltip
+      return h(
         resolveComponent('UBadge'),
         {
-          color: volunteerStatusColor(row.original.status),
+          color: volunteerStatusColor(status),
           variant: 'soft',
           class: 'uppercase text-xs px-2 py-1',
         },
-        () => volunteerStatusLabel(row.original.status)
-      ),
+        () => volunteerStatusLabel(status)
+      )
+    },
     size: 120,
   },
   // Date juste après l'état
@@ -992,63 +1465,6 @@ const columns: TableColumn<any>[] = [
   {
     id: 'actions',
     header: t('common.actions'),
-    cell: ({ row }) => {
-      // N'afficher les actions que si l'utilisateur peut gérer les bénévoles
-      if (!props.canManageVolunteers) {
-        return h('span', { class: 'text-xs text-gray-500 italic' }, t('common.no_permission'))
-      }
-
-      const status = row.original.status
-      if (status === 'PENDING') {
-        return h('div', { class: 'flex gap-2' }, [
-          h(
-            resolveComponent('UButton'),
-            {
-              size: 'xs',
-              color: 'success',
-              variant: 'soft',
-              loading:
-                applicationsActingId.value === row.original.id && actingAction.value === 'ACCEPTED',
-              onClick: () => decideApplication(row.original, 'ACCEPTED'),
-            },
-            () => t('editions.volunteers.action_accept')
-          ),
-          h(
-            resolveComponent('UButton'),
-            {
-              size: 'xs',
-              color: 'error',
-              variant: 'soft',
-              loading:
-                applicationsActingId.value === row.original.id && actingAction.value === 'REJECTED',
-              onClick: () => decideApplication(row.original, 'REJECTED'),
-            },
-            () => t('editions.volunteers.action_reject')
-          ),
-        ])
-      }
-      if (status === 'ACCEPTED' || status === 'REJECTED') {
-        return h('div', { class: 'flex gap-2' }, [
-          h(
-            resolveComponent('UButton'),
-            {
-              size: 'xs',
-              color: 'warning',
-              variant: 'soft',
-              loading:
-                applicationsActingId.value === row.original.id && actingAction.value === 'PENDING',
-              onClick: () => {
-                if (confirm(t('editions.volunteers.confirm_back_pending'))) {
-                  decideApplication(row.original, 'PENDING' as any)
-                }
-              },
-            },
-            () => t('editions.volunteers.action_back_pending')
-          ),
-        ])
-      }
-      return null
-    },
   },
 ]
 

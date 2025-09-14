@@ -85,6 +85,7 @@ export default defineEventHandler(async (event) => {
           editConvention: collab.canEditConvention,
           deleteConvention: collab.canDeleteConvention,
           manageCollaborators: collab.canManageCollaborators,
+          manageVolunteers: collab.canManageVolunteers,
           addEdition: collab.canAddEdition,
           editAllEditions: collab.canEditAllEditions,
           deleteAllEditions: collab.canDeleteAllEditions,
@@ -93,6 +94,7 @@ export default defineEventHandler(async (event) => {
           editionId: p.editionId,
           canEdit: p.canEdit,
           canDelete: p.canDelete,
+          canManageVolunteers: p.canManageVolunteers,
         })),
       })),
     }))

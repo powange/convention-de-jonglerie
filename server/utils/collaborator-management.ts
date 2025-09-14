@@ -113,24 +113,10 @@ export async function canManageVolunteers(conventionId: number, userId: number):
 export async function canManageEditionVolunteers(
   editionId: number,
   userId: number,
-  event?: any
+  _event?: any
 ): Promise<boolean> {
-  // Vérifier d'abord si l'utilisateur est un super-admin
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { isGlobalAdmin: true },
-  })
-
-  // Pour les super-admins : vérifier le mode admin seulement pour les actions sensibles
-  if (user?.isGlobalAdmin) {
-    // Si c'est une action sensible (modification/suppression), vérifier le mode admin
-    const isSensitiveAction = event?.node?.req?.method !== 'GET'
-    if (isSensitiveAction) {
-      return await checkAdminMode(userId, event)
-    }
-    // Pour la lecture, les super-admins ont accès direct
-    return true
-  }
+  // Note: On ne vérifie plus le statut super-admin ici car la gestion des bénévoles
+  // doit se faire selon les droits de collaborateur normaux, pas les droits admin système
 
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },
@@ -149,7 +135,7 @@ export async function canManageEditionVolunteers(
   if (!convention) return false
   if (convention.authorId === userId) return true
 
-  const collab = convention.collaborators[0]
+  const collab = convention.collaborators?.[0]
   if (!collab) return false
 
   // Si le collaborateur a le droit global de gérer les bénévoles
@@ -433,8 +419,14 @@ export async function updateCollaboratorRights(params: {
     manageVolunteers: boolean
   }>
   title?: string
+  perEdition?: Array<{
+    editionId: number
+    canEdit?: boolean
+    canDelete?: boolean
+    canManageVolunteers?: boolean
+  }>
 }) {
-  const { conventionId, collaboratorId, userId, rights, title } = params
+  const { conventionId, collaboratorId, userId, rights, title, perEdition } = params
   const canManage = await canManageCollaborators(conventionId, userId)
   if (!canManage) throw createError({ statusCode: 403, statusMessage: 'Droits insuffisants' })
   const collaborator = await prisma.conventionCollaborator.findUnique({
@@ -442,18 +434,51 @@ export async function updateCollaboratorRights(params: {
   })
   if (!collaborator || collaborator.conventionId !== conventionId)
     throw createError({ statusCode: 404, statusMessage: 'Collaborateur introuvable' })
-  return prisma.conventionCollaborator.update({
-    where: { id: collaboratorId },
-    data: {
-      title: title ?? collaborator.title,
-      canEditConvention: rights?.editConvention ?? collaborator.canEditConvention,
-      canDeleteConvention: rights?.deleteConvention ?? collaborator.canDeleteConvention,
-      canManageCollaborators: rights?.manageCollaborators ?? collaborator.canManageCollaborators,
-      canAddEdition: rights?.addEdition ?? collaborator.canAddEdition,
-      canEditAllEditions: rights?.editAllEditions ?? collaborator.canEditAllEditions,
-      canDeleteAllEditions: rights?.deleteAllEditions ?? collaborator.canDeleteAllEditions,
-      canManageVolunteers: rights?.manageVolunteers ?? collaborator.canManageVolunteers,
-    },
-    include: { user: { select: { id: true, pseudo: true } } },
+  return prisma.$transaction(async (tx) => {
+    await tx.conventionCollaborator.update({
+      where: { id: collaboratorId },
+      data: {
+        title: title ?? collaborator.title,
+        canEditConvention: rights?.editConvention ?? collaborator.canEditConvention,
+        canDeleteConvention: rights?.deleteConvention ?? collaborator.canDeleteConvention,
+        canManageCollaborators: rights?.manageCollaborators ?? collaborator.canManageCollaborators,
+        canAddEdition: rights?.addEdition ?? collaborator.canAddEdition,
+        canEditAllEditions: rights?.editAllEditions ?? collaborator.canEditAllEditions,
+        canDeleteAllEditions: rights?.deleteAllEditions ?? collaborator.canDeleteAllEditions,
+        canManageVolunteers: rights?.manageVolunteers ?? collaborator.canManageVolunteers,
+      },
+      include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
+    })
+
+    // Gérer les permissions per-edition si fournies
+    if (perEdition) {
+      // Supprimer toutes les permissions existantes pour ce collaborateur
+      await tx.editionCollaboratorPermission.deleteMany({
+        where: { collaboratorId },
+      })
+
+      // Ajouter les nouvelles permissions (filtrer les vides)
+      const filtered = perEdition.filter(
+        (p) => p && (p.canEdit || p.canDelete || p.canManageVolunteers)
+      )
+      if (filtered.length > 0) {
+        await tx.editionCollaboratorPermission.createMany({
+          data: filtered.map((p) => ({
+            collaboratorId,
+            editionId: p.editionId,
+            canEdit: !!p.canEdit,
+            canDelete: !!p.canDelete,
+            canManageVolunteers: !!p.canManageVolunteers,
+          })),
+          skipDuplicates: true,
+        })
+      }
+    }
+
+    // Récupérer le collaborateur avec les permissions mises à jour
+    return tx.conventionCollaborator.findUnique({
+      where: { id: collaboratorId },
+      include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
+    })
   })
 }

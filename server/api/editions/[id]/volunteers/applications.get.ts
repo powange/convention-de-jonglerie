@@ -147,6 +147,8 @@ export default defineEventHandler(async (event) => {
       allergies: true,
       timePreferences: true,
       teamPreferences: true,
+      assignedTeams: true,
+      acceptanceNote: true,
       hasPets: true,
       petsDetails: true,
       hasMinors: true,

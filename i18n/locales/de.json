@@ -432,7 +432,6 @@
     "name": "Name",
     "no": "Nein",
     "no_permission": "Keine Berechtigung",
-    "no_results": "Keine Ergebnisse",
     "optional": "Optional",
     "or": "Oder",
     "password": "Passwort",
@@ -446,7 +445,6 @@
     "saving": "Speichern...",
     "select": "Auswählen",
     "sort_tip": "Sortieren: Klicken Sie auf die Kopfzeilen (Shift+Klick für mehrere)",
-    "start_typing": "Eingabe beginnen...",
     "status": "Status",
     "success": "Erfolg",
     "time": "Zeit",
@@ -521,12 +519,8 @@
       "removed": "Mitarbeiter entfernt"
     },
     "collaborators_modal": {
-      "add_collaborator": "Mitarbeiter hinzufügen",
       "allow_modification": "Änderung erlauben",
-      "description": "Mitarbeiter dieser Convention verwalten",
-      "permissions": "Berechtigungen",
-      "search_user_placeholder": "Benutzer suchen...",
-      "title": "Mitarbeiter verwalten"
+      "permissions": "Berechtigungen"
     },
     "collaborators_rights_panel": {
       "by_user_label": "Von",
@@ -642,6 +636,7 @@
     "created_at": "Erstellt am",
     "delete": "Convention löschen",
     "edit": "Convention bearbeiten",
+    "edit_collaborator_rights": "Mitarbeiterrechte bearbeiten",
     "edit_permissions": "Bearbeitungsrechte",
     "edit_permissions_desc": "Bearbeiten Sie Conventions gemäß Ihren Berechtigungen",
     "editions": "Auflagen",
@@ -668,9 +663,6 @@
   "countries": {
     "czech_republic": "Tschechische Republik"
   },
-  "currentValue": {
-    "avatar": "Avatar des ausgewählten Benutzers"
-  },
   "dates": {
     "date_range": "Vom {startDate} bis {endDate}",
     "date_range_with_time": "Vom {startDate} bis {endDate}",
@@ -680,9 +672,6 @@
     "none": "Keine",
     "vegan": "Vegan",
     "vegetarian": "Vegetarisch"
-  },
-  "ed": {
-    "id": "ID"
   },
   "editForm": {
     "email": "E-Mail",
@@ -752,8 +741,12 @@
     "useful_links": "Nützliche Links",
     "volunteers": {
       "about_you_title": "Was man über Sie wissen sollte",
+      "accept_modal_title": "Freiwilligen akzeptieren",
+      "accept_note_label": "Akzeptanznotiz (optional)",
+      "accept_note_placeholder": "Fügen Sie eine Notiz oder Anweisungen für diesen Freiwilligen hinzu...",
       "action_accept": "Akzeptieren",
       "action_back_pending": "Zurück zu ausstehend",
+      "action_edit_teams": "Edit teams",
       "action_reject": "Ablehnen",
       "additional_info_title": "Hinzuzufügen",
       "admin_only_note": "Die folgenden Informationen (Bewerbungen, Filter und detaillierte Statistiken) sind nur für autorisierte Organisatoren und Mitarbeiter sichtbar.",
@@ -776,6 +769,8 @@
       "ask_teardown_label": "Nach Verfügbarkeit für den Abbau fragen",
       "ask_time_preferences_label": "Zeitpräferenzen abfragen",
       "ask_vehicle_label": "Fragen, ob Fahrzeug verfügbar",
+      "assign_to_teams": "Zu Teams zuweisen",
+      "assigned_to_teams": "Zu {count} Team zugewiesen | Zu {count} Teams zugewiesen",
       "avoid_list_hint": "Diese Informationen bleiben vertraulich und helfen den Organisatoren, harmonische Teams zu bilden",
       "avoid_list_label": "Freiwillige, mit denen ich nicht arbeiten möchte (optional)",
       "avoid_list_placeholder": "Namen anderer Freiwilliger, die für Schichten zu vermeiden sind...",
@@ -785,10 +780,12 @@
       "companion_hint": "Optional - Diese Information hilft Organisatoren, Teams mit anderen Freiwilligen zu bilden, die Sie kennen",
       "companion_label": "Freiwillige, mit denen ich Schichten arbeiten möchte (optional)",
       "companion_placeholder": "Namen anderer bevorzugter Freiwilliger für Schichten...",
+      "confirm_accept": "Freiwilligen akzeptieren",
       "confirm_back_pending": "Sind Sie sicher, dass Sie diese Bewerbung auf ausstehend zurücksetzen möchten?",
       "departure_time_label": "Wann planen Sie abzureisen?",
       "description_label": "Beschreibung für Freiwillige",
       "diet_label": "Ernährungspräferenz",
+      "edit_teams_title": "Edit assigned teams",
       "event_availability_hint": "Zusätzlich zum Auf-/Abbau können Sie auch während der Hauptveranstaltung helfen",
       "event_availability_label": "Ich bin auch während der Veranstaltung verfügbar",
       "experience_details_hint": "Beschreiben Sie Ihre bisherige Erfahrung als Freiwilliger, damit wir Sie besser kennenlernen können",
@@ -824,6 +821,7 @@
       "my_application_title": "Meine Bewerbung",
       "no_applications": "Keine Bewerbungen",
       "no_description": "Keine spezifische Beschreibung für Freiwillige.",
+      "no_volunteers_assigned": "No volunteers assigned",
       "open": "Öffnen",
       "personal_info_disclaimer": "Die oben genannten Informationen (Vorname, Nachname, E-Mail, Telefon) werden den Organisatoren zur Verwaltung der Freiwilligenteams zur Verfügung gestellt. Füllen Sie bei Bedarf die fehlenden Felder unten aus.",
       "personal_info_notice": "Geteilte persönliche Informationen",
@@ -838,6 +836,8 @@
       "presence_setup": "Aufbau",
       "presence_teardown": "Abbau",
       "presence_title": "Ihre Anwesenheit",
+      "removed_from_teams": "Removed from all teams",
+      "save_teams": "Save teams",
       "search": "Suchen",
       "search_placeholder": "Benutzername, E-Mail, Motivation...",
       "select_arrival_placeholder": "Ankunft auswählen",
@@ -875,9 +875,12 @@
       "team_preferences_label": "Bevorzugte Teams",
       "team_remove": "Dieses Team entfernen",
       "team_slots_placeholder": "Optional",
+      "teams_assignments": "Team assignments",
       "teams_empty": "Keine Teams definiert",
       "teams_hint": "Definieren Sie die verschiedenen Teams und optional die Anzahl der Plätze",
       "teams_label": "Freiwilligenteams",
+      "teams_selection_hint": "Wählen Sie Teams aus, denen Sie diesen Freiwilligen zuweisen möchten (optional)",
+      "teams_updated": "Teams updated",
       "teardown_availability_label": "Ich bin für den Abbau verfügbar",
       "time_granularity": {
         "afternoon": "Nachmittag",
@@ -904,13 +907,13 @@
       "vehicle_details_placeholder": "Fahrzeugtyp, Anzahl Sitze, Ladekapazität...",
       "vehicle_label": "Ich habe ein Fahrzeug zur Verfügung",
       "view_only_note": "Nur-Ansicht-Modus",
+      "volunteer_accepted": "Freiwilliger akzeptiert",
       "what_you_can_bring_title": "Was Sie uns bringen können",
       "withdraw": "Meine Bewerbung zurückziehen"
     }
   },
   "errors": {
     "access_denied": "Zugang verweigert",
-    "addition_error": "Fehler beim Hinzufügen",
     "address_required": "Die Adresse ist erforderlich",
     "address_too_long": "Die Adresse darf nicht länger als {max} Zeichen sein",
     "attendance_update_failed": "Fehler beim Aktualisieren des Teilnahmestatus",
@@ -1117,10 +1120,7 @@
   },
   "log": {
     "add_admin_notes": "Notizen zu diesem Fehler hinzufügen...",
-    "adminNotes": "Admin-Notizen",
-    "errorType": "Fehlertyp",
     "full_url": "Vollständige URL",
-    "id": "ID",
     "ip": "IP-Adresse",
     "method": "Methode",
     "path": "Pfad",
@@ -1134,8 +1134,6 @@
     "booking_cancelled": "Buchung storniert",
     "booking_requested": "Buchung angefragt",
     "booking_requested_successfully": "Deine Buchungsanfrage wurde an den Fahrer gesendet",
-    "collaborator_added": "Mitarbeiter hinzugefügt",
-    "collaborator_added_successfully": "Der Mitarbeiter wurde erfolgreich hinzugefügt",
     "comment_added": "Kommentar hinzugefügt",
     "comment_deleted": "Kommentar gelöscht",
     "comment_deleted_successfully": "Der Kommentar wurde erfolgreich gelöscht",
@@ -1179,11 +1177,6 @@
     "profile": "Profil",
     "tabs": "Navigationsregisterkarten"
   },
-  "notification": {
-    "actionUrl": "Aktions-URL",
-    "category": "Kategorie",
-    "id": "Kennung"
-  },
   "notifications": {
     "loading": "Laden des notifications...",
     "manage_description": "Verwalten Sie Ihre Benachrichtigungen und Einstellungen",
@@ -1203,9 +1196,6 @@
   "notificationsStore": {
     "loading": "Laden des notifications...",
     "realTimeEnabled": "Echtzeit aktiviert"
-  },
-  "p": {
-    "key": "Schlüssel"
   },
   "pages": {
     "access_denied": {
@@ -1438,9 +1428,9 @@
     "promo_modal": {
       "benefits": {
         "carpool": "Erhalten Sie Benachrichtigungen über Mitfahrgelegenheit-Buchungen und Nachrichten",
-        "volunteer": "Erhalten Sie Updates zu Ihren Freiwilligen-Bewerbungen",
+        "important": "Verpassen Sie keine wichtigen Informationen, die Sie betreffen",
         "reminders": "Erhalten Sie Erinnerungen für Ihre Lieblings-Conventions",
-        "important": "Verpassen Sie keine wichtigen Informationen, die Sie betreffen"
+        "volunteer": "Erhalten Sie Updates zu Ihren Freiwilligen-Bewerbungen"
       },
       "description": "Aktivieren Sie Push-Benachrichtigungen, um über Ihre Fahrgemeinschaften, Freiwilligen-Bewerbungen und Lieblings-Conventions informiert zu bleiben.",
       "enable": "Benachrichtigungen aktivieren",
@@ -1472,8 +1462,15 @@
       "title": "App installieren"
     }
   },
+  "selectedCollaboratorForEdit": {
+    "title": "Titel/Funktion",
+    "user": "Benutzer"
+  },
+  "selectedConventionForEdit": {
+    "name": "Name der Tagung"
+  },
   "selectedLog": {
-    "adminNotes": "Admin-Notizen",
+    "adminNotes": "Administrator-Notizen",
     "ip": "IP-Adresse",
     "message": "Fehlermeldung",
     "stack": "Stack-Trace",
@@ -1512,6 +1509,7 @@
     "workshops": "Workshops"
   },
   "team": {
+    "description": "Team-Beschreibung",
     "name": "Teamname",
     "slots": "Anzahl der Plätze"
   },

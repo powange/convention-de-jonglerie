@@ -9,6 +9,7 @@ const updateRightsSchema = z.object({
       editConvention: z.boolean().optional(),
       deleteConvention: z.boolean().optional(),
       manageCollaborators: z.boolean().optional(),
+      manageVolunteers: z.boolean().optional(),
       addEdition: z.boolean().optional(),
       editAllEditions: z.boolean().optional(),
       deleteAllEditions: z.boolean().optional(),
@@ -16,6 +17,16 @@ const updateRightsSchema = z.object({
     .partial()
     .optional(),
   title: z.string().max(100).optional().nullable(),
+  perEdition: z
+    .array(
+      z.object({
+        editionId: z.number(),
+        canEdit: z.boolean().optional(),
+        canDelete: z.boolean().optional(),
+        canManageVolunteers: z.boolean().optional(),
+      })
+    )
+    .optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -25,10 +36,10 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
     // Valider les données
-    const { rights, title } = updateRightsSchema.parse(body)
+    const { rights, title, perEdition } = updateRightsSchema.parse(body)
 
     // Empêcher une mise à jour vide (aucun champ fourni)
-    if (!rights && (title === undefined || title === null)) {
+    if (!rights && (title === undefined || title === null) && !perEdition) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Aucune donnée à mettre à jour',
@@ -53,6 +64,7 @@ export default defineEventHandler(async (event) => {
         canEditConvention: true,
         canDeleteConvention: true,
         canManageCollaborators: true,
+        canManageVolunteers: true,
         canAddEdition: true,
         canEditAllEditions: true,
         canDeleteAllEditions: true,
@@ -65,6 +77,7 @@ export default defineEventHandler(async (event) => {
       userId: event.context.user.id,
       rights,
       title: title ?? undefined,
+      perEdition,
     })
 
     if (before) {
@@ -74,6 +87,7 @@ export default defineEventHandler(async (event) => {
           canEditConvention: (updatedCollaborator as any).canEditConvention,
           canDeleteConvention: (updatedCollaborator as any).canDeleteConvention,
           canManageCollaborators: (updatedCollaborator as any).canManageCollaborators,
+          canManageVolunteers: (updatedCollaborator as any).canManageVolunteers,
           canAddEdition: (updatedCollaborator as any).canAddEdition,
           canEditAllEditions: (updatedCollaborator as any).canEditAllEditions,
           canDeleteAllEditions: (updatedCollaborator as any).canDeleteAllEditions,
@@ -85,6 +99,7 @@ export default defineEventHandler(async (event) => {
           canEditConvention: before.canEditConvention,
           canDeleteConvention: before.canDeleteConvention,
           canManageCollaborators: before.canManageCollaborators,
+          canManageVolunteers: before.canManageVolunteers,
           canAddEdition: before.canAddEdition,
           canEditAllEditions: before.canEditAllEditions,
           canDeleteAllEditions: before.canDeleteAllEditions,
@@ -118,6 +133,7 @@ export default defineEventHandler(async (event) => {
           editConvention: anyCollab.canEditConvention,
           deleteConvention: anyCollab.canDeleteConvention,
           manageCollaborators: anyCollab.canManageCollaborators,
+          manageVolunteers: anyCollab.canManageVolunteers,
           addEdition: anyCollab.canAddEdition,
           editAllEditions: anyCollab.canEditAllEditions,
           deleteAllEditions: anyCollab.canDeleteAllEditions,
@@ -126,6 +142,7 @@ export default defineEventHandler(async (event) => {
           editionId: p.editionId,
           canEdit: p.canEdit,
           canDelete: p.canDelete,
+          canManageVolunteers: p.canManageVolunteers,
         })),
         user: anyCollab.user,
       },

@@ -4,7 +4,11 @@ import { canManageEditionVolunteers } from '../../../../../utils/collaborator-ma
 import { prisma } from '../../../../../utils/prisma'
 
 // Autorise aussi le retour à PENDING
-const bodySchema = z.object({ status: z.enum(['ACCEPTED', 'REJECTED', 'PENDING']) })
+const bodySchema = z.object({
+  status: z.enum(['ACCEPTED', 'REJECTED', 'PENDING']),
+  teams: z.array(z.string()).optional(), // IDs des équipes pour l'assignation
+  note: z.string().optional(), // Note optionnelle pour l'acceptation
+})
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
@@ -45,13 +49,22 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Transition interdite' })
   }
 
+  // Mettre à jour le statut et la note d'acceptation
+  const updateData: any = {
+    status: target,
+    decidedAt: target === 'ACCEPTED' || target === 'REJECTED' ? new Date() : null,
+  }
+
+  // Ajouter la note d'acceptation si fournie et si on accepte
+  if (target === 'ACCEPTED' && parsed.note) {
+    updateData.acceptanceNote = parsed.note
+  }
+
   const updated = await prisma.editionVolunteerApplication.update({
     where: { id: applicationId },
-    data: {
-      status: target,
-      decidedAt: target === 'ACCEPTED' || target === 'REJECTED' ? new Date() : null,
-    },
-    select: { id: true, status: true, decidedAt: true },
+    data: updateData,
+    select: { id: true, status: true, decidedAt: true, acceptanceNote: true },
   })
+
   return { success: true, application: updated }
 })

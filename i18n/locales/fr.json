@@ -319,6 +319,7 @@
     "created_at": "Créé le",
     "delete": "Supprimer la convention",
     "edit": "Modifier la convention",
+    "edit_collaborator_rights": "Modifier les droits du collaborateur",
     "edit_permissions": "Modifier les permissions",
     "edit_permissions_desc": "Modifier les conventions selon vos permissions",
     "editions": "Éditions",
@@ -475,7 +476,6 @@
     "logo": "Logo",
     "manage": "Gérer",
     "name": "Nom",
-    "no_results": "Aucun résultat",
     "optional": "Optionnel",
     "or": "Ou",
     "password": "Mot de passe",
@@ -488,7 +488,6 @@
     "saved": "Sauvegardé",
     "saving": "Enregistrement...",
     "select": "Sélectionner",
-    "start_typing": "Commencez à taper...",
     "status": "État",
     "success": "Succès",
     "time": "Heure",
@@ -566,12 +565,8 @@
       "removed": "Collaborateur retiré"
     },
     "collaborators_modal": {
-      "add_collaborator": "Ajouter un collaborateur",
       "allow_modification": "Autoriser la modification",
-      "description": "Gérer les collaborateurs de cette convention",
-      "permissions": "Permissions",
-      "search_user_placeholder": "Rechercher un utilisateur...",
-      "title": "Gérer les collaborateurs"
+      "permissions": "Permissions"
     },
     "collaborators_rights_panel": {
       "by_user_label": "Par",
@@ -668,9 +663,6 @@
   "countries": {
     "czech_republic": "République Tchèque"
   },
-  "currentValue": {
-    "avatar": "Avatar de l'utilisateur sélectionné"
-  },
   "dates": {
     "date_range": "Du {startDate} au {endDate}",
     "date_range_with_time": "Du {startDate} au {endDate}",
@@ -680,9 +672,6 @@
     "none": "Aucun",
     "vegan": "Végan",
     "vegetarian": "Végétarien"
-  },
-  "ed": {
-    "id": "ID"
   },
   "editForm": {
     "email": "Email",
@@ -752,6 +741,21 @@
       "action_accept": "Accepter",
       "action_back_pending": "Remettre en attente",
       "action_reject": "Refuser",
+      "action_edit_teams": "Modifier les équipes",
+      "accept_modal_title": "Accepter le bénévole",
+      "assign_to_teams": "Assigner aux équipes",
+      "teams_selection_hint": "Sélectionnez les équipes auxquelles assigner ce bénévole (optionnel)",
+      "accept_note_label": "Note d'acceptation (optionnel)",
+      "accept_note_placeholder": "Ajoutez une note ou des instructions pour ce bénévole...",
+      "confirm_accept": "Accepter le bénévole",
+      "volunteer_accepted": "Bénévole accepté",
+      "assigned_to_teams": "Assigné à {count} équipe | Assigné à {count} équipes",
+      "edit_teams_title": "Modifier les équipes assignées",
+      "save_teams": "Enregistrer les équipes",
+      "teams_updated": "Équipes mises à jour",
+      "removed_from_teams": "Retiré de toutes les équipes",
+      "teams_assignments": "Répartition par équipes",
+      "no_volunteers_assigned": "Aucun bénévole assigné",
       "confirm_back_pending": "Êtes-vous sûr de vouloir remettre cette candidature en attente ?",
       "admin_only_note": "Les informations suivantes (candidatures, filtres et statistiques détaillées) sont visibles uniquement par les organisateurs et collaborateurs autorisés.",
       "view_only_note": "Mode consultation uniquement",
@@ -910,7 +914,6 @@
   },
   "errors": {
     "access_denied": "Accès non autorisé",
-    "addition_error": "Erreur lors de l'ajout",
     "address_required": "L'adresse est requise",
     "address_too_long": "L'adresse ne peut pas dépasser {max} caractères",
     "authentication_error": "Erreur d'authentification",
@@ -1112,8 +1115,6 @@
     "booking_cancelled": "Réservation annulée",
     "booking_requested": "Réservation envoyée",
     "booking_requested_successfully": "Votre demande de réservation a été transmise au conducteur",
-    "collaborator_added": "Collaborateur ajouté",
-    "collaborator_added_successfully": "Le collaborateur a été ajouté avec succès",
     "comment_added": "Commentaire ajouté",
     "comment_deleted": "Commentaire supprimé",
     "comment_deleted_successfully": "Le commentaire a été supprimé avec succès",
@@ -1146,11 +1147,6 @@
     "loading": "Chargement des notifications...",
     "realTimeEnabled": "Temps réel activé"
   },
-  "notification": {
-    "id": "Identifiant",
-    "category": "Catégorie",
-    "actionUrl": "URL d'action"
-  },
   "notifications": {
     "manage_description": "Gérez vos notifications et préférences",
     "unread": "Non lues",
@@ -1176,11 +1172,8 @@
     "addressPlaceholder": "Adresse complète"
   },
   "log": {
-    "id": "ID",
     "user": "Utilisateur",
     "ip": "Adresse IP",
-    "errorType": "Type d'erreur",
-    "adminNotes": "Notes administrateur",
     "method": "Méthode",
     "path": "Chemin",
     "full_url": "URL complète",
@@ -1210,9 +1203,6 @@
     "notifications": "Notifications",
     "profile": "Profil",
     "tabs": "Onglets de navigation"
-  },
-  "p": {
-    "key": "Clé"
   },
   "pages": {
     "access_denied": {
@@ -1517,7 +1507,15 @@
   },
   "team": {
     "name": "Nom de l'équipe",
+    "description": "TODO: team.description",
     "slots": "Nombre de places"
+  },
+  "selectedCollaboratorForEdit": {
+    "user": "TODO: selectedCollaboratorForEdit.user",
+    "title": "TODO: selectedCollaboratorForEdit.title"
+  },
+  "selectedConventionForEdit": {
+    "name": "TODO: selectedConventionForEdit.name"
   },
   "volunteersInfo": {
     "externalUrl": "URL externe"
