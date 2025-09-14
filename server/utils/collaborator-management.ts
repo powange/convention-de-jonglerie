@@ -75,8 +75,13 @@ export async function checkUserConventionPermission(
  */
 export async function canManageCollaborators(
   conventionId: number,
-  userId: number
+  userId: number,
+  event?: any
 ): Promise<boolean> {
+  // Vérifier le mode admin en premier
+  const isAdminMode = await checkAdminMode(userId, event)
+  if (isAdminMode) return true
+
   const convention = await prisma.convention.findUnique({
     where: { id: conventionId },
     select: {
@@ -93,7 +98,15 @@ export async function canManageCollaborators(
 /**
  * Vérifie si un utilisateur peut gérer les bénévoles d'une convention
  */
-export async function canManageVolunteers(conventionId: number, userId: number): Promise<boolean> {
+export async function canManageVolunteers(
+  conventionId: number,
+  userId: number,
+  event?: any
+): Promise<boolean> {
+  // Vérifier le mode admin en premier
+  const isAdminMode = await checkAdminMode(userId, event)
+  if (isAdminMode) return true
+
   const convention = await prisma.convention.findUnique({
     where: { id: conventionId },
     select: {
@@ -113,10 +126,11 @@ export async function canManageVolunteers(conventionId: number, userId: number):
 export async function canManageEditionVolunteers(
   editionId: number,
   userId: number,
-  _event?: any
+  event?: any
 ): Promise<boolean> {
-  // Note: On ne vérifie plus le statut super-admin ici car la gestion des bénévoles
-  // doit se faire selon les droits de collaborateur normaux, pas les droits admin système
+  // Vérifier le mode admin en premier
+  const isAdminMode = await checkAdminMode(userId, event)
+  if (isAdminMode) return true
 
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },

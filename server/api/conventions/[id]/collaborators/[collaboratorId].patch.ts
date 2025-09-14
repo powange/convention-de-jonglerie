@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
   if (!parsed.rights && parsed.title === undefined && !parsed.perEdition)
     return { success: true, unchanged: true }
 
-  const canManage = await canManageCollaborators(conventionId, event.context.user.id)
+  const canManage = await canManageCollaborators(conventionId, event.context.user.id, event)
   if (!canManage) throw createError({ statusCode: 403, statusMessage: 'Permission insuffisante' })
 
   const collaborator = await prisma.conventionCollaborator.findUnique({

@@ -8,91 +8,70 @@
   >
     <template #body>
       <div class="space-y-4 w-full">
-        <!-- Infos personnelles transmises -->
-        <div
-          class="space-y-2 text-gray-600 dark:text-gray-400 border rounded-md p-3 bg-gray-50 dark:bg-gray-800/40"
-        >
-          <div class="flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300">
-            <UIcon name="i-heroicons-information-circle" class="text-primary-500" />
-            <span>{{ t('editions.volunteers.personal_info_notice') }}</span>
+        <!-- Section: Vos informations personnelles -->
+        <div class="space-y-4 w-full">
+          <h3
+            class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+          >
+            {{ t('editions.volunteers.personal_info_title') }}
+          </h3>
+
+          <!-- Champs nom/prénom (toujours affichés) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+            <UFormField
+              :label="t('editions.volunteers.first_name')"
+              :error="firstNameError"
+              class="w-full"
+            >
+              <UInput
+                v-model="formData.firstName"
+                :placeholder="user?.prenom || t('editions.volunteers.first_name_placeholder')"
+                class="w-full"
+                @blur="markFieldTouched('firstName')"
+              />
+            </UFormField>
+            <UFormField
+              :label="t('editions.volunteers.last_name')"
+              :error="lastNameError"
+              class="w-full"
+            >
+              <UInput
+                v-model="formData.lastName"
+                :placeholder="user?.nom || t('editions.volunteers.last_name_placeholder')"
+                class="w-full"
+                @blur="markFieldTouched('lastName')"
+              />
+            </UFormField>
           </div>
-          <div class="space-y-2 text-[11px] sm:text-xs">
-            <!-- Première ligne: Nom et Prénom -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <span class="font-semibold">{{ t('editions.volunteers.first_name') }}:</span>
-                <span v-if="user?.prenom" class="ml-1">{{ user.prenom }}</span>
-                <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
-              </div>
-              <div>
-                <span class="font-semibold">{{ t('editions.volunteers.last_name') }}:</span>
-                <span v-if="user?.nom" class="ml-1">{{ user.nom }}</span>
-                <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
-              </div>
-            </div>
-            <!-- Deuxième ligne: Email et Téléphone -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <span class="font-semibold">{{ t('common.email') }}:</span>
-                <span class="ml-1">{{ user?.email }}</span>
-              </div>
-              <div>
-                <span class="font-semibold">{{ t('editions.volunteers.phone') }}:</span>
-                <span v-if="user?.phone" class="ml-1">{{ user.phone }}</span>
-                <span v-else class="ml-1 text-red-500">{{ t('common.required') }}</span>
-              </div>
-            </div>
+
+          <!-- Champ email (lecture seule) -->
+          <div class="w-full">
+            <UFormField :label="t('common.email')" class="w-full">
+              <UInput
+                :value="user?.email"
+                readonly
+                disabled
+                class="w-full bg-gray-50 dark:bg-gray-800"
+              />
+            </UFormField>
           </div>
-          <p class="mt-1 text-[11px] leading-snug">
+
+          <!-- Champ téléphone (toujours affiché) -->
+          <div class="w-full">
+            <UFormField :label="t('editions.volunteers.phone')" :error="phoneError" class="w-full">
+              <UInput
+                v-model="formData.phone"
+                :placeholder="user?.phone || t('editions.volunteers.phone_placeholder')"
+                autocomplete="tel"
+                class="w-full"
+                @blur="markFieldTouched('phone')"
+              />
+            </UFormField>
+          </div>
+
+          <p class="text-xs text-gray-500">
             {{ t('editions.volunteers.personal_info_disclaimer') }}
           </p>
-        </div>
-
-        <!-- Champ téléphone si manquant -->
-        <div v-if="needsPhone" class="space-y-2 w-full">
-          <UFormField
-            :label="t('editions.volunteers.phone_required')"
-            :error="phoneError"
-            class="w-full"
-          >
-            <UInput
-              v-model="formData.phone"
-              autocomplete="tel"
-              class="w-full"
-              @blur="markFieldTouched('phone')"
-            />
-          </UFormField>
-        </div>
-
-        <!-- Champs nom/prénom si manquants -->
-        <div
-          v-if="!user?.prenom || !user?.nom"
-          class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full"
-        >
-          <UFormField
-            v-if="!user?.prenom"
-            :label="t('editions.volunteers.first_name_required')"
-            :error="firstNameError"
-            class="w-full"
-          >
-            <UInput
-              v-model="formData.firstName"
-              class="w-full"
-              @blur="markFieldTouched('firstName')"
-            />
-          </UFormField>
-          <UFormField
-            v-if="!user?.nom"
-            :label="t('editions.volunteers.last_name_required')"
-            :error="lastNameError"
-            class="w-full"
-          >
-            <UInput
-              v-model="formData.lastName"
-              class="w-full"
-              @blur="markFieldTouched('lastName')"
-            />
-          </UFormField>
         </div>
 
         <!-- Section: Votre présence -->
@@ -573,7 +552,6 @@ const touchedFields = ref(new Set<string>())
 const showAllErrors = ref(false)
 
 // Computed properties
-const needsPhone = computed(() => !props.user?.phone)
 const motivationTooLong = computed(() => formData.value.motivation.length > MOTIVATION_MAX)
 
 // Fonction pour marquer un champ comme touché
@@ -584,7 +562,7 @@ const markFieldTouched = (fieldName: string) => {
 // Individual field validation computed properties
 const phoneError = computed(() => {
   if (!showAllErrors.value && !touchedFields.value.has('phone')) return undefined
-  if (needsPhone.value && !formData.value.phone?.trim()) {
+  if (!formData.value.phone?.trim()) {
     return t('validation.phone_required')
   }
   return undefined
@@ -592,7 +570,7 @@ const phoneError = computed(() => {
 
 const firstNameError = computed(() => {
   if (!showAllErrors.value && !touchedFields.value.has('firstName')) return undefined
-  if (!props.user?.prenom && !formData.value.firstName?.trim()) {
+  if (!formData.value.firstName?.trim()) {
     return t('validation.first_name_required')
   }
   return undefined
@@ -600,7 +578,7 @@ const firstNameError = computed(() => {
 
 const lastNameError = computed(() => {
   if (!showAllErrors.value && !touchedFields.value.has('lastName')) return undefined
-  if (!props.user?.nom && !formData.value.lastName?.trim()) {
+  if (!formData.value.lastName?.trim()) {
     return t('validation.last_name_required')
   }
   return undefined
@@ -855,11 +833,11 @@ watch(
   () => props.modelValue,
   (newValue) => {
     if (newValue) {
-      // Reset form data
+      // Reset form data avec pré-remplissage des infos utilisateur
       Object.assign(formData.value, {
-        phone: '',
-        firstName: '',
-        lastName: '',
+        phone: props.user?.phone || '',
+        firstName: props.user?.prenom || '',
+        lastName: props.user?.nom || '',
         setupAvailability: false,
         teardownAvailability: false,
         eventAvailability: true,
