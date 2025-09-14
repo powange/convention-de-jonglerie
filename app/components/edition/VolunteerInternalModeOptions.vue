@@ -268,7 +268,7 @@
             min="1"
             max="99"
             :placeholder="t('editions.volunteers.team_slots_placeholder')"
-            class="w-20"
+            class="w-16"
             :disabled="saving"
             @blur="handleTeamChange"
           />
@@ -280,7 +280,7 @@
             :disabled="saving"
             @click="removeTeam(index)"
           >
-            {{ t('editions.volunteers.team_remove') }}
+            <span class="hidden sm:inline">{{ t('editions.volunteers.team_remove') }}</span>
           </UButton>
         </div>
 
