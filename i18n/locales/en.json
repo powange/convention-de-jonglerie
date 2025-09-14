@@ -443,6 +443,8 @@
     "saved": "Saved",
     "saving": "Saving...",
     "select": "Select",
+    "show_less": "Show less",
+    "show_more": "Show more",
     "sort_tip": "Sort: click on headers (Shift+click for multi)",
     "status": "Status",
     "success": "Success",

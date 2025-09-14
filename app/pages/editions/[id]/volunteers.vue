@@ -34,7 +34,33 @@
           <div class="prose dark:prose-invert max-w-none text-sm">
             <template v-if="volunteersInfo?.description">
               <!-- eslint-disable-next-line vue/no-v-html -->
-              <div v-html="volunteersDescriptionHtml" />
+              <div
+                :class="[shouldReduceDescription && !showFullDescription ? 'overflow-hidden' : '']"
+                :style="
+                  shouldReduceDescription && !showFullDescription
+                    ? {
+                        display: '-webkit-box',
+                        WebkitLineClamp: '3',
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }
+                    : {}
+                "
+                v-html="volunteersDescriptionHtml"
+              />
+              <div v-if="shouldReduceDescription && volunteersInfo?.description" class="mt-2">
+                <UButton
+                  size="xs"
+                  variant="ghost"
+                  color="primary"
+                  :icon="
+                    showFullDescription ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+                  "
+                  @click="showFullDescription = !showFullDescription"
+                >
+                  {{ showFullDescription ? t('common.show_less') : t('common.show_more') }}
+                </UButton>
+              </div>
             </template>
             <template v-else>
               <p class="text-gray-500">{{ t('editions.volunteers.no_description') }}</p>
@@ -301,6 +327,15 @@ const canViewVolunteersTable = computed(() => {
   return !!collab
 })
 
+// Condition pour réduire la description (collaborateurs ou utilisateurs ayant postulé)
+const shouldReduceDescription = computed(() => {
+  // Si c'est un collaborateur
+  if (canViewVolunteersTable.value) return true
+  // Si l'utilisateur a déjà postulé
+  if (volunteersInfo.value?.myApplication) return true
+  return false
+})
+
 // Condition pour gérer les bénévoles (accepter/refuser candidatures)
 const canManageVolunteers = computed(() => {
   if (!authStore.user || !edition.value) return false
@@ -373,6 +408,7 @@ interface VolunteerInfo {
 }
 const volunteersInfo = ref<VolunteerInfo | null>(null)
 const volunteersDescriptionHtml = ref('')
+const showFullDescription = ref(false)
 // Computed simple pour le mode afin d'éviter des cascades de types lourdes
 const volunteersMode = computed<'INTERNAL' | 'EXTERNAL' | null>(
   () => volunteersInfo.value?.mode || null
