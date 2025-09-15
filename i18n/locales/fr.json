@@ -931,7 +931,12 @@
       "schedule_management": "Gérer le planning",
       "go_to_schedule": "Aller au planning",
       "planning_coming_soon": "Planning des bénévoles",
-      "planning_description": "Ici vous pourrez gérer et visualiser le planning des bénévoles pour cette édition."
+      "planning_description": "Ici vous pourrez gérer et visualiser le planning des bénévoles pour cette édition.",
+      "create_time_slot": "Créer un créneau",
+      "planning_tip": "Sélectionnez une zone pour créer un créneau, glissez pour déplacer",
+      "unassigned_slots": "Non assigné",
+      "day_view": "Jour",
+      "week_view": "Semaine"
     },
     "external_mode_options": "Options du mode externe",
     "internal_mode_options": "Options du mode interne"

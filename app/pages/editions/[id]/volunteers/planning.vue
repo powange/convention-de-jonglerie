@@ -29,18 +29,44 @@
       </template>
 
       <div class="space-y-6">
-        <!-- Placeholder pour le futur contenu du planning -->
-        <div class="text-center py-12">
-          <UIcon name="i-heroicons-calendar-days" class="mx-auto text-gray-400 mb-4" size="48" />
-          <h4 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-            {{ t('editions.volunteers.planning_coming_soon') || 'Planning des bénévoles' }}
-          </h4>
-          <p class="text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-            {{
-              t('editions.volunteers.planning_description') ||
-              'Ici vous pourrez gérer et visualiser le planning des bénévoles pour cette édition.'
-            }}
-          </p>
+        <!-- Barre d'outils -->
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-2">
+            <UButton size="sm" color="primary" icon="i-heroicons-plus" @click="openCreateSlotModal">
+              {{ t('editions.volunteers.create_time_slot') }}
+            </UButton>
+            <UButton
+              size="sm"
+              color="neutral"
+              variant="soft"
+              icon="i-heroicons-arrow-path"
+              :loading="refreshing"
+              @click="refreshData"
+            >
+              {{ t('common.refresh') }}
+            </UButton>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-500">
+              {{ t('editions.volunteers.planning_tip') }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Calendrier de planning -->
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+        >
+          <div v-if="!ready" class="flex items-center justify-center py-8">
+            <UIcon name="i-heroicons-arrow-path" class="animate-spin text-gray-400" size="20" />
+            <span class="ml-2 text-base text-gray-500">{{ t('common.loading') }}</span>
+          </div>
+          <FullCalendar
+            v-else
+            ref="calendarRef"
+            :options="calendarOptions"
+            class="volunteer-planning-calendar"
+          />
         </div>
       </div>
     </UCard>
@@ -52,11 +78,13 @@
 
 <script setup lang="ts">
 // Vue & libs
-import { computed } from 'vue'
+import FullCalendar from '@fullcalendar/vue3'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 // App components & stores
 import EditionHeader from '~/components/edition/EditionHeader.vue'
+import type { VolunteerTimeSlot, VolunteerTeam } from '~/composables/useVolunteerSchedule'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
@@ -69,6 +97,82 @@ const editionId = parseInt(route.params.id as string)
 // Charger l'édition
 await editionStore.fetchEditionById(editionId)
 const edition = computed(() => editionStore.getEditionById(editionId))
+
+// État du composant
+const refreshing = ref(false)
+
+// Données mock pour l'instant (à remplacer par des vraies APIs)
+const teams = ref<VolunteerTeam[]>([
+  { id: 'team-1', name: 'Accueil', color: '#3b82f6' },
+  { id: 'team-2', name: 'Technique', color: '#ef4444' },
+  { id: 'team-3', name: 'Bar', color: '#10b981' },
+  { id: 'team-4', name: 'Sécurité', color: '#f59e0b' },
+])
+
+const timeSlots = ref<VolunteerTimeSlot[]>([
+  {
+    id: 'slot-1',
+    title: 'Accueil des visiteurs',
+    start: edition.value?.startDate + 'T09:00:00',
+    end: edition.value?.startDate + 'T12:00:00',
+    teamId: 'team-1',
+    maxVolunteers: 3,
+    assignedVolunteers: 1,
+    color: '#3b82f6',
+    description: 'Accueil et orientation des visiteurs',
+  },
+  {
+    id: 'slot-2',
+    title: 'Garde de nuit',
+    start: edition.value?.startDate + 'T22:00:00',
+    end: edition.value
+      ? new Date(new Date(edition.value.startDate).getTime() + 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split('T')[0] + 'T08:00:00'
+      : '',
+    teamId: 'team-4',
+    maxVolunteers: 2,
+    assignedVolunteers: 0,
+    color: '#f59e0b',
+    description: 'Surveillance nocturne des équipements',
+  },
+])
+
+// Configuration du calendrier de planning
+const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
+  editionStartDate: edition.value?.startDate || '',
+  editionEndDate: edition.value?.endDate || '',
+  teams,
+  timeSlots,
+  onTimeSlotCreate: (start, end, resourceId) => {
+    console.log('Créer créneau:', { start, end, resourceId })
+    // TODO: Ouvrir modal de création
+  },
+  onTimeSlotUpdate: (timeSlot) => {
+    console.log('Mettre à jour créneau:', timeSlot)
+    // TODO: API de mise à jour
+  },
+  onTimeSlotDelete: (timeSlotId) => {
+    console.log('Supprimer créneau:', timeSlotId)
+    // TODO: API de suppression
+  },
+})
+
+// Actions
+const openCreateSlotModal = () => {
+  console.log('Ouvrir modal de création de créneau')
+  // TODO: Implémenter modal
+}
+
+const refreshData = async () => {
+  refreshing.value = true
+  try {
+    // TODO: Recharger les données depuis l'API
+    await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulation
+  } finally {
+    refreshing.value = false
+  }
+}
 
 // Gestion des favoris
 const isFavorited = computed(() => (_id: number) => {
@@ -114,3 +218,82 @@ useHead({
   ),
 })
 </script>
+
+<style>
+/* Styles pour le planning des bénévoles */
+.volunteer-planning-calendar {
+  /* Timeline resource view styling */
+  --fc-border-color: rgb(229 231 235); /* gray-200 */
+  --fc-neutral-bg-color: rgb(249 250 251); /* gray-50 */
+}
+
+.volunteer-planning-calendar .fc-theme-standard .fc-resource-timeline-divider {
+  border-color: rgb(229 231 235);
+}
+
+.volunteer-planning-calendar .fc-theme-standard .fc-scrollgrid {
+  border-color: rgb(229 231 235);
+}
+
+.volunteer-planning-calendar .fc-theme-standard td,
+.volunteer-planning-calendar .fc-theme-standard th {
+  border-color: rgb(229 231 235);
+}
+
+.volunteer-planning-calendar .fc-resource {
+  background-color: rgb(249 250 251);
+  color: rgb(17 24 39);
+}
+
+.volunteer-planning-calendar .fc-event {
+  border: 1px solid;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  font-size: 0.875rem;
+}
+
+.volunteer-planning-calendar .fc-event:hover {
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .volunteer-planning-calendar {
+    --fc-border-color: rgb(55 65 81); /* gray-700 */
+    --fc-neutral-bg-color: rgb(31 41 55); /* gray-800 */
+  }
+
+  .volunteer-planning-calendar .fc-theme-standard .fc-resource-timeline-divider {
+    border-color: rgb(55 65 81);
+  }
+
+  .volunteer-planning-calendar .fc-theme-standard .fc-scrollgrid {
+    border-color: rgb(55 65 81);
+  }
+
+  .volunteer-planning-calendar .fc-theme-standard td,
+  .volunteer-planning-calendar .fc-theme-standard th {
+    border-color: rgb(55 65 81);
+  }
+
+  .volunteer-planning-calendar .fc-resource {
+    background-color: rgb(31 41 55);
+    color: rgb(243 244 246);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .volunteer-planning-calendar .fc-toolbar {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .volunteer-planning-calendar .fc-toolbar-chunk {
+    display: flex;
+    justify-content: center;
+  }
+}
+</style>
