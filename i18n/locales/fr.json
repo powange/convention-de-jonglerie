@@ -927,7 +927,11 @@
       "sms_app_opened_desc": "Modifiez le message si nécessaire puis envoyez",
       "phone_numbers_copied": "Numéros copiés !",
       "phone_numbers_copied_desc": "{count} numéro(s) copié(s) dans le presse-papier",
-      "copy_error": "Impossible de copier les numéros"
+      "copy_error": "Impossible de copier les numéros",
+      "schedule_management": "Gérer le planning",
+      "go_to_schedule": "Aller au planning",
+      "planning_coming_soon": "Planning des bénévoles",
+      "planning_description": "Ici vous pourrez gérer et visualiser le planning des bénévoles pour cette édition."
     },
     "external_mode_options": "Options du mode externe",
     "internal_mode_options": "Options du mode interne"

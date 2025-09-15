@@ -267,6 +267,26 @@
                 </UButton>
               </UButtonGroup>
             </div>
+
+            <!-- Interface gestion du planning -->
+            <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div class="flex items-center justify-between mb-4">
+                <h4
+                  class="text-sm font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2"
+                >
+                  <UIcon name="i-heroicons-calendar-days" class="text-gray-500" />
+                  {{ t('editions.volunteers.schedule_management') }}
+                </h4>
+              </div>
+              <UButton
+                color="primary"
+                variant="solid"
+                icon="i-heroicons-calendar-days"
+                :to="`/editions/${edition?.id}/volunteers/planning`"
+              >
+                {{ t('editions.volunteers.go_to_schedule') }}
+              </UButton>
+            </div>
           </div>
         </template>
       </div>
