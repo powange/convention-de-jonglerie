@@ -157,8 +157,6 @@
 </template>
 
 <script setup lang="ts">
-import CountryMultiSelect from '~/components/CountryMultiSelect.vue'
-
 import type { CalendarDate } from '@internationalized/date'
 
 interface Props {

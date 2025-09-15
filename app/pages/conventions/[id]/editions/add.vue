@@ -33,7 +33,7 @@
         </UButton>
       </div>
 
-      <EditionForm
+      <EditionEditionForm
         v-else
         :initial-data="{ conventionId: convention.id }"
         :submit-button-text="$t('pages.add_edition_for_convention.submit_button')"
@@ -48,7 +48,6 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import EditionForm from '~/components/edition/EditionForm.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Convention, EditionFormData, HttpError } from '~/types'

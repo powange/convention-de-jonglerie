@@ -1,6 +1,6 @@
 <template>
   <div v-if="edition">
-    <EditionHeader
+    <EditionEditionHeader
       :edition="edition"
       current-page="volunteers"
       :is-favorited="isFavorited(edition.id)"
@@ -83,7 +83,6 @@ import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 // App components & stores
-import EditionHeader from '~/components/edition/EditionHeader.vue'
 import type { VolunteerTimeSlot, VolunteerTeam } from '~/composables/useVolunteerSchedule'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'

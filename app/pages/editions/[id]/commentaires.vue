@@ -8,7 +8,7 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionHeader
+      <EditionEditionHeader
         :edition="edition"
         current-page="commentaires"
         :is-favorited="isFavorited(edition.id)"
@@ -89,7 +89,7 @@
         </div>
 
         <div v-else class="space-y-6">
-          <EditionPost
+          <EditionEditionPost
             v-for="post in posts"
             :key="post.id"
             :post="post"

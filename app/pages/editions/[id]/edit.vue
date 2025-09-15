@@ -10,7 +10,7 @@
       <div v-else-if="!edition">
         <p>{{ $t('editions.not_found') }}</p>
       </div>
-      <EditionForm
+      <EditionEditionForm
         v-else
         :initial-data="edition"
         :submit-button-text="$t('pages.edit_edition.submit_button')"
@@ -25,7 +25,6 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-import EditionForm from '~/components/edition/EditionForm.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition } from '~/types'

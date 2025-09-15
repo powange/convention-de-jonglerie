@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- En-tête avec navigation -->
-    <EditionHeader
+    <EditionEditionHeader
       v-if="edition"
       :edition="edition"
       current-page="objets-trouves"
@@ -197,7 +197,7 @@
             </UFormField>
 
             <UFormField :label="t('editions.photo_optional')">
-              <ImageUpload
+              <UiImageUpload
                 v-model="newItem.imageUrl"
                 :endpoint="{ type: 'lost-found', id: editionId }"
                 :options="{
@@ -248,8 +248,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 
-import EditionHeader from '~/components/edition/EditionHeader.vue'
-import ImageUpload from '~/components/ui/ImageUpload.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 

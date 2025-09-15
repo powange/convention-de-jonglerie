@@ -368,7 +368,7 @@
             :label="$t('components.edition_form.convention_poster_optional')"
             name="image"
           >
-            <ImageUpload
+            <UiImageUpload
               v-model="state.imageUrl"
               :endpoint="{ type: 'edition', id: props.initialData?.id }"
               :options="{
@@ -528,8 +528,6 @@
 import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date'
 import { reactive, ref, watch, computed, onMounted, nextTick } from 'vue'
 
-import AddressAutocomplete from '~/components/AddressAutocomplete.vue'
-import ImageUpload from '~/components/ui/ImageUpload.vue'
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
 import type { Edition, Convention } from '~/types'
 

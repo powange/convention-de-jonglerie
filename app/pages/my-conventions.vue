@@ -275,8 +275,6 @@
 <script setup lang="ts">
 import { ref, onMounted, h, watch } from 'vue'
 
-import CollaboratorRightsFields from '~/components/CollaboratorRightsFields.vue'
-import UserSelector from '~/components/UserSelector.vue'
 import { useAuthStore } from '~/stores/auth'
 import type { Convention, HttpError, Edition } from '~/types'
 import { summarizeRights } from '~/utils/collaboratorRights'
@@ -786,7 +784,7 @@ const fetchMyConventions = async () => {
         (c) => c.id === selectedConventionForEdit.value!.id
       )
       if (updatedConvention) {
-        selectedConvention.value = updatedConvention
+        selectedConventionForEdit.value = updatedConvention
       }
     }
   } catch (error) {

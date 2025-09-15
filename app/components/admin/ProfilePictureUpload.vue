@@ -42,7 +42,7 @@
 
           <!-- Upload de photo -->
           <div>
-            <ImageUpload
+            <UiImageUpload
               v-model="tempProfilePictureUrl"
               :endpoint="{ type: 'profile', id: user.id }"
               :options="{
@@ -99,8 +99,6 @@
 </template>
 
 <script setup lang="ts">
-import ImageUpload from '~/components/ui/ImageUpload.vue'
-
 interface User {
   id: number
   email: string

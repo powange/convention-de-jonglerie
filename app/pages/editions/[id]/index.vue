@@ -29,7 +29,7 @@
       </UAlert>
 
       <!-- En-tête avec navigation -->
-      <EditionHeader
+      <EditionEditionHeader
         :edition="edition"
         current-page="details"
         :is-favorited="isFavorited(edition.id)"
@@ -295,7 +295,6 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
-import EditionHeader from '~/components/edition/EditionHeader.vue'
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'

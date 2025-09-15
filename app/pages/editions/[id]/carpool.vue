@@ -8,7 +8,7 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionHeader
+      <EditionEditionHeader
         :edition="edition"
         current-page="carpool"
         :is-favorited="isFavorited(edition.id)"
@@ -26,7 +26,6 @@ import { onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 // Auto-imported: EditionCarpoolSection
-import EditionHeader from '~/components/edition/EditionHeader.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 

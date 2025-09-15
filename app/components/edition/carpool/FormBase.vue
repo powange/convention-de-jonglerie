@@ -114,7 +114,7 @@
             :required="true"
             :description="$t('carpool.departure_date_description')"
           >
-            <DateTimePicker
+            <UiDateTimePicker
               v-model="form.tripDate"
               :min-date="new Date()"
               :placeholder="$t('carpool.select_date_time')"
@@ -277,8 +277,6 @@
 <script setup lang="ts">
 import { watch } from 'vue'
 import { z } from 'zod'
-
-import DateTimePicker from '~/components/ui/DateTimePicker.vue'
 
 interface Props {
   formType: 'offer' | 'request'

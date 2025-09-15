@@ -33,7 +33,7 @@
         </UButton>
       </div>
 
-      <ConventionForm
+      <ConventionConventionForm
         v-else
         :initial-data="convention"
         :submit-button-text="$t('pages.edit_convention.submit_button')"
@@ -49,7 +49,6 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import ConventionForm from '~/components/convention/ConventionForm.vue'
 import { useAuthStore } from '~/stores/auth'
 import type { Convention } from '~/types'
 

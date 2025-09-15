@@ -204,7 +204,6 @@ import { CalendarDate } from '@internationalized/date'
 import { useDebounceFn } from '@vueuse/core'
 import { onMounted, computed, reactive, watch, ref, defineAsyncComponent, toRaw } from 'vue'
 
-import FiltersPanel from '~/components/FiltersPanel.vue'
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'

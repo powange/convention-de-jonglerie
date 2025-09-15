@@ -4,7 +4,7 @@
       <template #header>
         <h1 class="text-2xl font-bold">{{ $t('pages.add_edition.title') }}</h1>
       </template>
-      <EditionForm
+      <EditionEditionForm
         :submit-button-text="$t('pages.add_edition.submit_button')"
         :loading="editionStore.loading"
         :initial-data="initialData"
@@ -18,7 +18,6 @@
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
-import EditionForm from '~/components/edition/EditionForm.vue'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition } from '~/types'
 

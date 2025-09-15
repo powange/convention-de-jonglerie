@@ -17,7 +17,7 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionHeader
+      <EditionEditionHeader
         :edition="edition"
         current-page="gestion"
         :is-favorited="isFavorited(edition.id)"
@@ -310,9 +310,7 @@ import { type DateValue, fromDate, toCalendarDate } from '@internationalized/dat
 import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import EditionHeader from '~/components/edition/EditionHeader.vue'
 // Auto-imported: EditionVolunteerInternalModeOptions
-import MinimalMarkdownEditor from '~/components/MinimalMarkdownEditor.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { markdownToHtml } from '~/utils/markdown'

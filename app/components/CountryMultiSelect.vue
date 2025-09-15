@@ -29,7 +29,6 @@
 </template>
 
 <script setup lang="ts">
-import FlagIcon from '~/components/FlagIcon.vue'
 import { getCountryCode } from '~/utils/countries'
 
 interface Props {

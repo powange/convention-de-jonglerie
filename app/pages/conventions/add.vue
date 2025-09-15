@@ -11,7 +11,7 @@
         </p>
       </template>
 
-      <ConventionForm
+      <ConventionConventionForm
         :submit-button-text="$t('pages.add_convention.submit_button')"
         :loading="loading"
         @submit="handleAddConvention"
@@ -25,7 +25,6 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import ConventionForm from '~/components/convention/ConventionForm.vue'
 import { useAuthStore } from '~/stores/auth'
 import type { ConventionFormData, HttpError } from '~/types'
 

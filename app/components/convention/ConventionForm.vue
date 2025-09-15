@@ -48,7 +48,7 @@
 
         <!-- Upload de fichier -->
         <div v-if="uploadMode === 'file'">
-          <ImageUpload
+          <UiImageUpload
             v-model="form.logo"
             :endpoint="{ type: 'convention', id: initialData?.id }"
             :options="{
@@ -121,7 +121,6 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted } from 'vue'
 
-import ImageUpload from '~/components/ui/ImageUpload.vue'
 import type { Convention } from '~/types'
 
 const { t } = useI18n()

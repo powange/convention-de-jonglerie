@@ -10,7 +10,7 @@
         <template #header>
           <div class="flex justify-between items-center">
             <NuxtLink to="/" class="flex items-center">
-              <LogoJc class="h-16 sm:h-30 w-auto text-black dark:text-white" />
+              <UiLogoJc class="h-16 sm:h-30 w-auto text-black dark:text-white" />
               <span class="ml-2 text-sm sm:text-xl font-bold">{{ $t('app.title') }}</span>
             </NuxtLink>
             <div class="flex items-center gap-2 sm:gap-4">
@@ -72,7 +72,7 @@
               </div>
 
               <!-- Centre de notifications (si connecté) -->
-              <NotificationCenter v-if="authStore.isAuthenticated" />
+              <NotificationsNotificationCenter v-if="authStore.isAuthenticated" />
 
               <!-- Dropdown utilisateur ou boutons connexion -->
               <UDropdownMenu
@@ -117,24 +117,18 @@
           <PWAInstallBanner />
 
           <!-- Modale de promotion des notifications push -->
-          <PushNotificationPromoModal />
+          <NotificationsPushNotificationPromoModal />
         </template>
         <NuxtPage />
       </UCard>
     </ClientOnly>
-    <AppFooter />
+    <UiAppFooter />
     <UToast />
   </UApp>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-
-import NotificationCenter from '~/components/notifications/NotificationCenter.vue'
-import PushNotificationPromoModal from '~/components/notifications/PushNotificationPromoModal.vue'
-import PWAInstallBanner from '~/components/PWAInstallBanner.vue'
-import AppFooter from '~/components/ui/AppFooter.vue'
-import LogoJc from '~/components/ui/LogoJc.vue'
 
 import { useAuthStore } from './stores/auth'
 

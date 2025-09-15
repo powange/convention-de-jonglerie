@@ -638,7 +638,7 @@
 
           <!-- Upload de photo -->
           <div>
-            <ImageUpload
+            <UiImageUpload
               v-model="profilePictureUrl"
               :endpoint="{ type: 'profile', id: authStore.user?.id }"
               :options="{
@@ -702,7 +702,6 @@
 import { reactive, ref, computed, onMounted } from 'vue'
 import { z } from 'zod'
 
-import ImageUpload from '~/components/ui/ImageUpload.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { HttpError, User } from '~/types'
