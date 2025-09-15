@@ -274,27 +274,36 @@ const isOpen = computed({
 // État du composant
 const selectedTab = ref(0)
 
-// Utiliser directement les données passées en props
-const data = computed(() => {
-  if (!props.notificationData) return null
-
-  return {
-    notification: {
-      id: props.notificationData.id,
-      title: props.notificationData.title,
-      message: props.notificationData.message,
-      targetType: props.notificationData.targetType,
-      selectedTeams: props.notificationData.selectedTeams,
-      recipientCount: props.notificationData.recipientCount,
-      sentAt: props.notificationData.sentAt,
-      senderName: props.notificationData.senderName,
-      editionName: '', // TODO: Peut être ajouté si nécessaire
-    },
-    confirmed: props.notificationData.volunteers.confirmed,
-    pending: props.notificationData.volunteers.pending,
-    stats: props.notificationData.stats,
+// Récupérer les données détaillées depuis l'API
+const { data, pending: loading } = await useLazyAsyncData(
+  `notification-confirmations-${props.notificationData?.id}`,
+  () =>
+    $fetch(
+      `/api/editions/${props.editionId}/volunteers/notification/${props.notificationData?.id}/confirmations`
+    ),
+  {
+    default: () =>
+      props.notificationData
+        ? {
+            notification: {
+              id: props.notificationData.id,
+              title: props.notificationData.title,
+              message: props.notificationData.message,
+              targetType: props.notificationData.targetType,
+              selectedTeams: props.notificationData.selectedTeams,
+              recipientCount: props.notificationData.recipientCount,
+              sentAt: props.notificationData.sentAt,
+              senderName: props.notificationData.senderName,
+              editionName: '',
+              conventionName: '',
+            },
+            confirmed: props.notificationData.volunteers.confirmed,
+            pending: props.notificationData.volunteers.pending,
+            stats: props.notificationData.stats,
+          }
+        : null,
   }
-})
+)
 
 // Détection mobile
 const isMobile = computed(() => {
@@ -341,9 +350,15 @@ const sendGroupSMS = () => {
   // Récupérer les numéros de téléphone
   const phoneNumbers = pendingWithPhone.value.map((v: any) => v.user.phone).filter(Boolean)
 
-  // Créer le message pré-rempli
+  // Créer le message pré-rempli avec fallback sur le nom de la convention
+  const displayName =
+    data.value?.notification.editionName ||
+    data.value?.notification.conventionName ||
+    'la convention'
+  const messageContent = data.value?.notification.message || ''
+  const confirmationLink = `${window.location.origin}/editions/${props.editionId}/volunteers/notification/${data.value?.notification.id}/confirm`
   const message = encodeURIComponent(
-    `Rappel: Merci de confirmer la lecture de la notification bénévole pour ${data.value?.notification.editionName || 'la convention'}.`
+    `Rappel: Merci de confirmer la lecture de la notification bénévole pour ${displayName}.\nMESSAGE : ${messageContent}\n\nConfirmer : ${confirmationLink}`
   )
 
   // Créer le lien SMS (format peut varier selon l'OS)

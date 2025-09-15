@@ -28,7 +28,12 @@ export default defineEventHandler(async (event) => {
     },
     include: {
       edition: {
-        select: { name: true },
+        select: {
+          name: true,
+          convention: {
+            select: { name: true },
+          },
+        },
       },
       sender: {
         select: { pseudo: true },
@@ -131,6 +136,7 @@ export default defineEventHandler(async (event) => {
       sentAt: notificationGroup.sentAt,
       senderName: notificationGroup.sender.pseudo,
       editionName: notificationGroup.edition.name,
+      conventionName: notificationGroup.edition.convention.name,
     },
     confirmed: confirmedVolunteers.map((volunteer) => {
       const confirmation = notificationGroup.confirmations.find(
