@@ -61,7 +61,7 @@
           <UFormField :label="t('common.message')" :error="messageError" class="w-full">
             <UTextarea
               v-model="formData.message"
-              rows="4"
+              :rows="4"
               :placeholder="t('editions.volunteers.notification_message_placeholder')"
               :maxlength="messageMaxLength"
               class="w-full"
@@ -137,6 +137,29 @@
       </form>
     </template>
   </UModal>
+
+  <!-- Modal de confirmation avec teleport -->
+  <Teleport to="body">
+    <UiConfirmModal
+      v-model="showConfirmation"
+      :title="t('editions.volunteers.confirm_send_notification_title')"
+      :description="
+        t('editions.volunteers.confirm_send_notification_description', {
+          count: recipientCount,
+          targetType:
+            formData.targetType === 'all'
+              ? t('editions.volunteers.all_accepted_volunteers').toLowerCase()
+              : t('editions.volunteers.selected_teams').toLowerCase(),
+        })
+      "
+      :confirm-label="t('editions.volunteers.send_notification')"
+      :cancel-label="t('common.cancel')"
+      confirm-icon="i-heroicons-paper-airplane"
+      :loading="sending"
+      @confirm="confirmSend"
+      @cancel="showConfirmation = false"
+    />
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -299,6 +322,8 @@ const resetForm = () => {
   sending.value = false
 }
 
+const showConfirmation = ref(false)
+
 const handleSubmit = async () => {
   // Valider tous les champs
   touchedFields.value.add('message')
@@ -306,6 +331,13 @@ const handleSubmit = async () => {
   if (!canSend.value) {
     return
   }
+
+  // Afficher la modal de confirmation
+  showConfirmation.value = true
+}
+
+const confirmSend = async () => {
+  showConfirmation.value = false
 
   sending.value = true
 

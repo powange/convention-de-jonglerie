@@ -68,6 +68,31 @@ export default defineEventHandler(async (event) => {
     },
   })
 
+  // Marquer la notification correspondante comme lue
+  // Chercher la notification qui correspond à ce groupe et cet utilisateur
+  const userNotification = await prisma.notification.findFirst({
+    where: {
+      userId: event.context.user.id,
+      category: 'volunteer',
+      entityType: 'Edition',
+      entityId: editionId.toString(),
+      actionUrl: `/editions/${editionId}/volunteers/notification/${groupId}/confirm`,
+      isRead: false,
+    },
+  })
+
+  if (userNotification) {
+    await prisma.notification.update({
+      where: {
+        id: userNotification.id,
+      },
+      data: {
+        isRead: true,
+        readAt: new Date(),
+      },
+    })
+  }
+
   return {
     success: true,
     alreadyConfirmed: false,
