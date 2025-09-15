@@ -30,15 +30,23 @@
         class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
       >
         <!-- Header -->
-        <div class="flex items-start justify-between mb-3">
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
           <div class="flex-1">
             <h6 class="font-medium text-gray-900 dark:text-gray-100 text-base">
               {{ notification.title }}
             </h6>
-            <div class="flex items-center gap-4 mt-1 text-sm text-gray-500">
-              <span class="flex items-center gap-1">
-                <UIcon name="i-heroicons-user" size="14" />
+            <div class="flex flex-wrap items-center gap-2 sm:gap-4 mt-1 text-sm text-gray-500">
+              <span class="flex items-center gap-2">
+                <UiUserAvatar :user="notification.sender" size="xs" />
                 {{ notification.senderName }}
+                <span
+                  v-if="notification.sender.prenom || notification.sender.nom"
+                  class="text-gray-400"
+                >
+                  ({{
+                    [notification.sender.prenom, notification.sender.nom].filter(Boolean).join(' ')
+                  }})
+                </span>
               </span>
               <span class="flex items-center gap-1">
                 <UIcon name="i-heroicons-calendar" size="14" />
@@ -48,11 +56,7 @@
           </div>
 
           <!-- Badge du type de destinataires -->
-          <UBadge
-            :color="notification.targetType === 'all' ? 'info' : 'purple'"
-            variant="soft"
-            size="sm"
-          >
+          <UBadge color="info" variant="soft" size="sm" class="self-start">
             {{
               notification.targetType === 'all'
                 ? t('editions.volunteers.all_accepted_volunteers')
@@ -87,22 +91,36 @@
         </div>
 
         <!-- Statistiques -->
-        <div class="flex items-center justify-between text-sm">
-          <div class="flex items-center gap-4 text-gray-500">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm">
+          <div class="flex flex-wrap items-center gap-3 sm:gap-4 text-gray-500">
             <span class="flex items-center gap-1">
               <UIcon name="i-heroicons-users" size="14" />
-              {{
-                t('editions.volunteers.recipients_count', { count: notification.recipientCount })
-              }}
+              <span class="hidden sm:inline">
+                {{
+                  t('editions.volunteers.recipients_count', { count: notification.recipientCount })
+                }}
+              </span>
+              <span class="sm:hidden">{{ notification.recipientCount }}</span>
             </span>
             <span class="flex items-center gap-1">
               <UIcon name="i-heroicons-check-circle" size="14" />
-              {{
-                t('editions.volunteers.confirmations_count', {
-                  count: notification.confirmationsCount,
-                })
-              }}
+              <span class="hidden sm:inline">
+                {{
+                  t('editions.volunteers.confirmations_count', {
+                    count: notification.confirmationsCount,
+                  })
+                }}
+              </span>
+              <span class="sm:hidden">{{ notification.confirmationsCount }}</span>
             </span>
+            <UBadge
+              :color="getConfirmationRateColor(notification.confirmationRate)"
+              variant="soft"
+              size="sm"
+              class="sm:hidden"
+            >
+              {{ notification.confirmationRate }}%
+            </UBadge>
           </div>
 
           <!-- Taux de confirmation et bouton détails -->
@@ -111,14 +129,16 @@
               :color="getConfirmationRateColor(notification.confirmationRate)"
               variant="soft"
               size="sm"
+              class="hidden sm:inline-flex"
             >
               {{ notification.confirmationRate }}% {{ t('editions.volunteers.confirmed') }}
             </UBadge>
             <UButton
-              size="xs"
+              size="md"
               color="primary"
               variant="soft"
               icon="i-heroicons-eye"
+              class="sm:!text-xs sm:!py-1 sm:!px-2.5 sm:!gap-1.5"
               @click="openConfirmationsModal(notification)"
             >
               {{ t('editions.volunteers.view_details') }}
@@ -166,6 +186,16 @@ interface Notification {
   recipientCount: number
   sentAt: string | Date
   senderName: string
+  sender: {
+    id: number
+    pseudo: string
+    email: string
+    prenom?: string
+    nom?: string
+    profilePicture?: string | null
+    emailHash?: string
+    updatedAt?: string
+  }
   confirmationsCount: number
   confirmationRate: number
   volunteers: {

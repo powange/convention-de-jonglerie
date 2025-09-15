@@ -23,7 +23,13 @@ export default defineEventHandler(async (event) => {
     include: {
       sender: {
         select: {
+          id: true,
           pseudo: true,
+          email: true, // Gardé pour emailHash seulement
+          prenom: true,
+          nom: true,
+          profilePicture: true,
+          updatedAt: true,
         },
       },
       confirmations: {
@@ -145,6 +151,15 @@ export default defineEventHandler(async (event) => {
         recipientCount: notification.recipientCount,
         sentAt: notification.sentAt,
         senderName: notification.sender.pseudo,
+        sender: {
+          id: notification.sender.id,
+          pseudo: notification.sender.pseudo,
+          prenom: notification.sender.prenom,
+          nom: notification.sender.nom,
+          profilePicture: notification.sender.profilePicture,
+          emailHash: getEmailHash(notification.sender.email),
+          updatedAt: notification.sender.updatedAt,
+        },
         confirmationsCount: actualConfirmationsCount,
         confirmationRate,
         volunteers: {

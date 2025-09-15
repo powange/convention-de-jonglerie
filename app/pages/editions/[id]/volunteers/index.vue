@@ -267,24 +267,21 @@
                 </UButton>
               </UButtonGroup>
             </div>
-
-            <!-- Section notification des bénévoles -->
-            <div
-              v-if="canManageVolunteers"
-              class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700"
-            >
-              <EditionVolunteerNotifications
-                ref="notificationsListRef"
-                :edition-id="editionId"
-                :edition="edition"
-                :volunteers-info="volunteersInfo"
-                :can-manage-volunteers="canManageVolunteers"
-                :accepted-volunteers-count="volunteersInfo?.counts?.ACCEPTED ?? 0"
-              />
-            </div>
           </div>
         </template>
       </div>
+    </UCard>
+
+    <!-- Section notification des bénévoles -->
+    <UCard v-if="canManageVolunteers" variant="soft" class="mb-6">
+      <EditionVolunteerNotifications
+        ref="notificationsListRef"
+        :edition-id="editionId"
+        :edition="edition"
+        :volunteers-info="volunteersInfo"
+        :can-manage-volunteers="canManageVolunteers"
+        :accepted-volunteers-count="volunteersInfo?.counts?.ACCEPTED ?? 0"
+      />
     </UCard>
   </div>
   <div v-else>

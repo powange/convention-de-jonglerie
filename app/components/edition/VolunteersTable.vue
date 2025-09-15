@@ -281,13 +281,15 @@
           <div
             v-for="volunteer in teamAssignment.volunteers"
             :key="volunteer.id"
-            class="flex items-center gap-2 text-sm"
+            class="flex items-center gap-3 text-sm"
           >
-            <UIcon name="i-heroicons-user" class="text-gray-400 flex-shrink-0" />
-            <span class="font-medium">{{ volunteer.user.pseudo }}</span>
-            <span class="text-gray-500">
-              ({{ volunteer.user.prenom }} {{ volunteer.user.nom }})
-            </span>
+            <UiUserAvatar :user="volunteer.user" size="xs" class="flex-shrink-0" />
+            <div class="flex-1 min-w-0">
+              <span class="font-medium">{{ volunteer.user.pseudo }}</span>
+              <span class="text-gray-500 ml-1">
+                ({{ volunteer.user.prenom }} {{ volunteer.user.nom }})
+              </span>
+            </div>
           </div>
         </div>
 
