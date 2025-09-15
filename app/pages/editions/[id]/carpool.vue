@@ -16,7 +16,7 @@
       />
 
       <!-- Contenu du covoiturage -->
-      <CarpoolSection :edition-id="edition.id" :highlight-offer-id="highlightOfferId" />
+      <EditionCarpoolSection :edition-id="edition.id" :highlight-offer-id="highlightOfferId" />
     </div>
   </div>
 </template>
@@ -25,7 +25,7 @@
 import { onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
-import CarpoolSection from '~/components/edition/CarpoolSection.vue'
+// Auto-imported: EditionCarpoolSection
 import EditionHeader from '~/components/edition/EditionHeader.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'

@@ -99,7 +99,7 @@
       <div class="pt-4">
         <div class="flex items-center justify-between">
           <!-- Modal des commentaires -->
-          <CarpoolCommentsModal
+          <EditionCarpoolCommentsModal
             :id="request.id"
             type="request"
             @comment-added="emit('comment-added')"
@@ -113,7 +113,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 
-import CarpoolCommentsModal from './CarpoolCommentsModal.vue'
+// Auto-imported: EditionCarpoolCommentsModal
 
 interface CarpoolRequest {
   id: number

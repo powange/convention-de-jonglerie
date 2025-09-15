@@ -230,7 +230,7 @@
         <template v-if="volunteersMode === 'INTERNAL'">
           <div class="space-y-4">
             <!-- Tableau des bénévoles avec filtres -->
-            <EditionVolunteersTable
+            <EditionVolunteerTable
               :volunteers-info="volunteersInfo"
               :edition-id="editionId"
               :can-manage-volunteers="canManageVolunteers"

@@ -34,7 +34,7 @@
       :description="$t('carpool.offer.create_description')"
     >
       <template #body>
-        <CarpoolOfferForm
+        <EditionCarpoolOfferForm
           :edition-id="String(editionId)"
           @success="onOfferCreated"
           @cancel="showOfferModal = false"
@@ -49,7 +49,7 @@
       :description="$t('carpool.request.create_description')"
     >
       <template #body>
-        <CarpoolRequestForm
+        <EditionCarpoolRequestForm
           :edition-id="String(editionId)"
           @success="onRequestCreated"
           @cancel="showRequestModal = false"
@@ -64,7 +64,7 @@
       :description="$t('carpool.offer.edit_description')"
     >
       <template #body>
-        <CarpoolOfferForm
+        <EditionCarpoolOfferForm
           v-if="editingOffer"
           :edition-id="String(editionId)"
           :initial-data="editingOffer"
@@ -82,7 +82,7 @@
       :description="$t('carpool.request.edit_description')"
     >
       <template #body>
-        <CarpoolRequestForm
+        <EditionCarpoolRequestForm
           v-if="editingRequest"
           :edition-id="String(editionId)"
           :initial-data="editingRequest"
@@ -99,7 +99,7 @@
         <div class="space-y-4">
           <!-- Liste des offres -->
           <div v-if="offers.length > 0" class="space-y-4">
-            <CarpoolOfferCard
+            <EditionCarpoolOfferCard
               v-for="offer in offers"
               :key="offer.id"
               :offer="offer"
@@ -122,7 +122,7 @@
         <div class="space-y-4">
           <!-- Liste des demandes -->
           <div v-if="requests.length > 0" class="space-y-4">
-            <CarpoolRequestCard
+            <EditionCarpoolRequestCard
               v-for="request in requests"
               :key="request.id"
               :request="request"
@@ -148,10 +148,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 
-import CarpoolOfferCard from './CarpoolOfferCard.vue'
-import CarpoolOfferForm from './CarpoolOfferForm.vue'
-import CarpoolRequestCard from './CarpoolRequestCard.vue'
-import CarpoolRequestForm from './CarpoolRequestForm.vue'
+// Auto-imported: EditionCarpoolOfferCard, EditionCarpoolOfferForm, EditionCarpoolRequestCard, EditionCarpoolRequestForm
 
 interface Props {
   editionId: number

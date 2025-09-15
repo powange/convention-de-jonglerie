@@ -1,6 +1,6 @@
 <template>
-  <CarpoolFormBase
-    :form-type="'request'"
+  <EditionCarpoolFormBase
+    :form-type="'offer'"
     :edition-id="editionId"
     :initial-data="initialData"
     @submit="handleSubmit"
@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import CarpoolFormBase from './CarpoolFormBase.vue'
+// Auto-imported: EditionCarpoolFormBase
 
 interface Props {
   editionId: string

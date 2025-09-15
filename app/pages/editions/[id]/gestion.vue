@@ -311,7 +311,7 @@ import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import EditionHeader from '~/components/edition/EditionHeader.vue'
-import EditionVolunteerInternalModeOptions from '~/components/edition/VolunteerInternalModeOptions.vue'
+// Auto-imported: EditionVolunteerInternalModeOptions
 import MinimalMarkdownEditor from '~/components/MinimalMarkdownEditor.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'

@@ -169,7 +169,7 @@
             </UButton>
           </div>
           <!-- Modal des commentaires -->
-          <CarpoolCommentsModal
+          <EditionCarpoolCommentsModal
             :id="offer.id"
             type="offer"
             @comment-added="emit('comment-added')"
@@ -179,7 +179,7 @@
 
       <!-- Réservations en attente (visible au propriétaire) -->
       <div v-if="canEdit" class="pt-2">
-        <CarpoolBookingsList :offer-id="offer.id" @updated="emit('passenger-added')" />
+        <EditionCarpoolBookingsList :offer-id="offer.id" @updated="emit('passenger-added')" />
       </div>
 
       <!-- Modal de réservation -->
@@ -226,8 +226,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 
-import CarpoolBookingsList from './CarpoolBookingsList.vue'
-import CarpoolCommentsModal from './CarpoolCommentsModal.vue'
+// Auto-imported: EditionCarpoolBookingsList, EditionCarpoolCommentsModal
 
 interface CarpoolOffer {
   id: number
