@@ -26,11 +26,7 @@
               </div>
             </div>
           </div>
-          <UBadge
-            :color="getStatusColor(application.status)"
-            variant="soft"
-            size="sm"
-          >
+          <UBadge :color="getStatusColor(application.status)" variant="soft" size="sm">
             {{ t(`editions.volunteers.status.${application.status.toLowerCase()}`) }}
           </UBadge>
         </div>
@@ -44,11 +40,7 @@
               :help="t('editions.volunteers.team_preferences_hint')"
             >
               <div class="space-y-2 max-h-48 overflow-y-auto">
-                <div
-                  v-for="team in teamOptions"
-                  :key="team.value"
-                  class="flex items-center"
-                >
+                <div v-for="team in teamOptions" :key="team.value" class="flex items-center">
                   <UCheckbox
                     :id="`team-${team.value}`"
                     :model-value="formData.teamPreferences.includes(team.value)"
@@ -71,6 +63,7 @@
               :rows="3"
               :placeholder="t('editions.volunteers.modification_note_placeholder')"
               :maxlength="500"
+              class="w-full"
             />
             <div class="text-xs text-gray-500 mt-1 text-right">
               {{ formData.modificationNote.length }}/500
@@ -82,19 +75,10 @@
 
     <template #footer>
       <div class="flex justify-end gap-3">
-        <UButton
-          color="neutral"
-          variant="ghost"
-          @click="isOpen = false"
-        >
+        <UButton color="neutral" variant="ghost" @click="isOpen = false">
           {{ t('common.cancel') }}
         </UButton>
-        <UButton
-          color="primary"
-          :loading="saving"
-          :disabled="!hasChanges"
-          @click="handleSubmit"
-        >
+        <UButton color="primary" :loading="saving" :disabled="!hasChanges" @click="handleSubmit">
           {{ t('common.save') }}
         </UButton>
       </div>
@@ -145,7 +129,10 @@ const initialData = ref({
 
 // Calculer s'il y a des changements
 const hasChanges = computed(() => {
-  return JSON.stringify(formData.value.teamPreferences) !== JSON.stringify(initialData.value.teamPreferences)
+  return (
+    JSON.stringify(formData.value.teamPreferences) !==
+    JSON.stringify(initialData.value.teamPreferences)
+  )
 })
 
 // Initialiser le formulaire quand l'application change
@@ -187,10 +174,14 @@ const handleTeamToggle = (teamValue: string, checked: boolean) => {
 // Couleur du statut
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'PENDING': return 'orange'
-    case 'ACCEPTED': return 'green'
-    case 'REJECTED': return 'red'
-    default: return 'gray'
+    case 'PENDING':
+      return 'orange'
+    case 'ACCEPTED':
+      return 'green'
+    case 'REJECTED':
+      return 'red'
+    default:
+      return 'gray'
   }
 }
 
@@ -211,12 +202,6 @@ const handleSubmit = async () => {
     emit('save', {
       application: props.application,
       changes,
-    })
-
-    toast.add({
-      title: t('editions.volunteers.application_updated'),
-      description: t('editions.volunteers.notification_sent_to_volunteer'),
-      color: 'success',
     })
 
     isOpen.value = false
