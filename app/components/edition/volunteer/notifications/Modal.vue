@@ -210,7 +210,9 @@ const touchedFields = ref(new Set<string>())
 
 // Computed properties
 const notificationTitle = computed(() => {
-  return `${t('editions.volunteers.notification_title_prefix')} - ${props.edition?.name || ''}`
+  // Utiliser le nom de l'édition si disponible, sinon le nom de la convention
+  const displayName = props.edition?.name || props.edition?.convention?.name || ''
+  return `${t('editions.volunteers.notification_title_prefix')} - ${displayName}`
 })
 
 const recipientOptions = computed(() => [
