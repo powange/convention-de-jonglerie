@@ -162,6 +162,18 @@
     >
       <template #actions-cell="{ row }">
         <div v-if="props.canManageVolunteers">
+          <!-- Bouton Éditer disponible pour tous les statuts -->
+          <div class="flex flex-col items-start gap-1 mb-2">
+            <UButton
+              :label="t('common.edit')"
+              size="xs"
+              color="neutral"
+              variant="soft"
+              icon="i-heroicons-pencil"
+              @click="openEditApplicationModal(row.original)"
+            />
+          </div>
+
           <!-- Actions selon le statut -->
           <div v-if="row.original.status === 'PENDING'" class="flex flex-col items-start gap-1">
             <UButton
@@ -396,10 +408,20 @@
       </div>
     </template>
   </UModal>
+
+  <!-- Modal d'édition des candidatures -->
+  <EditVolunteerApplicationModal
+    v-model="editModalOpen"
+    :application="currentEditApplication"
+    :team-options="teamOptionsForEdit"
+    @save="handleEditApplicationSave"
+  />
 </template>
 
 <script setup lang="ts">
 import { h, resolveComponent, watch, onMounted, nextTick } from 'vue'
+
+import EditVolunteerApplicationModal from '~/components/edition/EditVolunteerApplicationModal.vue'
 
 import type { TableColumn } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
@@ -444,6 +466,10 @@ const acceptNote = ref('')
 const teamsModalLoading = ref(false)
 const modalMode = ref<'accept' | 'edit'>('accept')
 
+// Variables pour la modal d'édition des candidatures
+const editModalOpen = ref(false)
+const currentEditApplication = ref<any>(null)
+
 // Référence pour le tableau
 const tableRef = ref()
 
@@ -487,6 +513,18 @@ const availableTeamsForModal = computed(() => {
 
   // Sinon on montre toutes les équipes
   return allTeams
+})
+
+// Options d'équipes pour le modal d'édition (toutes les équipes disponibles)
+const teamOptionsForEdit = computed(() => {
+  if (!props.volunteersInfo?.teams?.length) {
+    return []
+  }
+
+  return props.volunteersInfo.teams.map((team: any) => ({
+    value: team.name,
+    label: team.name,
+  }))
 })
 
 // Computed pour les assignations d'équipes
@@ -1503,6 +1541,49 @@ watch(globalFilter, () => {
     refreshApplications()
   }, 350)
 })
+
+// Fonction pour ouvrir le modal d'édition d'une candidature
+const openEditApplicationModal = (application: any) => {
+  currentEditApplication.value = application
+  editModalOpen.value = true
+}
+
+// Fonction pour sauvegarder les modifications d'une candidature
+const handleEditApplicationSave = async (data: { application: any; changes: any }) => {
+  try {
+    // Appeler l'API pour sauvegarder les changements
+    await $fetch(
+      `/api/editions/${props.editionId}/volunteers/applications/${data.application.id}`,
+      {
+        method: 'PATCH',
+        body: {
+          teamPreferences: data.changes.teamPreferences,
+          modificationNote: data.changes.modificationNote,
+        },
+      } as any
+    )
+
+    // Rafraîchir les données
+    emit('refreshVolunteersInfo')
+    refreshApplications()
+
+    // Fermer le modal
+    editModalOpen.value = false
+    currentEditApplication.value = null
+
+    toast.add({
+      title: t('editions.volunteers.application_updated'),
+      description: t('editions.volunteers.notification_sent_to_volunteer'),
+      color: 'success',
+    })
+  } catch (error: any) {
+    toast.add({
+      title: t('common.error'),
+      description: error?.statusMessage || t('editions.volunteers.update_error'),
+      color: 'error',
+    })
+  }
+}
 
 // Exposer les méthodes utiles
 defineExpose({

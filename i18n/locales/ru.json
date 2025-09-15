@@ -932,7 +932,15 @@
       "view_only_note": "Режим только просмотра",
       "volunteer_accepted": "Волонтёр принят",
       "what_you_can_bring_title": "Что вы можете нам принести",
-      "withdraw": "Отозвать мою заявку"
+      "withdraw": "Отозвать мою заявку",
+      "edit_application": "Edit application",
+      "applicant_info": "Applicant information",
+      "modification_note": "Modification note (optional)",
+      "modification_note_help": "This note will be sent to the volunteer to explain the changes",
+      "modification_note_placeholder": "Explain why you are modifying team preferences...",
+      "application_updated": "Application updated",
+      "notification_sent_to_volunteer": "Volunteer has been notified of the changes",
+      "update_error": "Error updating application"
     }
   },
   "errors": {
