@@ -123,9 +123,47 @@ function findDuplicateValues(obj) {
   return duplicates
 }
 
+function preprocessVueContent(content) {
+  // Créer une copie du contenu pour le traitement
+  let processedContent = content
+
+  // 1. Supprimer le contenu des interpolations {{ }} SEULEMENT si elles ne contiennent pas d'appels de traduction
+  processedContent = processedContent.replace(/\{\{([^}]*)\}\}/g, (match, inner) => {
+    // Garder les interpolations qui contiennent $t( ou t(
+    if (inner.includes('$t(') || inner.includes('t(')) {
+      return match
+    }
+    // Supprimer les autres (accès aux propriétés d'objets comme volunteer.user.phone)
+    return ''
+  })
+
+  // 2. Supprimer le contenu des directives Vue SEULEMENT si elles ne contiennent pas d'appels de traduction
+  processedContent = processedContent.replace(
+    /(\s+(?:v-(?:if|show|for|model|bind|on|else-if)|[@:][\w-]*)\s*=\s*)(["'])([^"']*)\2/g,
+    (match, directive, quote, value) => {
+      // Garder les directives qui contiennent $t( ou t(
+      if (value.includes('$t(') || value.includes('t(')) {
+        return match
+      }
+      // Supprimer les autres (conditions comme volunteer.user.phone)
+      return directive + quote + quote
+    }
+  )
+
+  // 3. Supprimer les directives sans valeur (v-else)
+  processedContent = processedContent.replace(/\s+v-else\b/g, '')
+
+  return processedContent
+}
+
 function extractI18nKeysFromFile(filePath) {
-  const content = fs.readFileSync(filePath, 'utf8')
+  let content = fs.readFileSync(filePath, 'utf8')
   const keys = new Set()
+
+  // Pour les fichiers Vue, prétraiter le contenu pour exclure les directives et interpolations
+  if (filePath.endsWith('.vue')) {
+    content = preprocessVueContent(content)
+  }
 
   // $t('key') ou $t("key")
   const tFunctionRegex = /\$t\(['"]([\w.]+)['"]/g

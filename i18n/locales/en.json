@@ -290,13 +290,6 @@
     "verify_email_title": "Verify your email",
     "verifying": "Verifying..."
   },
-  "c": {
-    "rights": "Rights",
-    "title": "Title",
-    "user": {
-      "pseudo": "Username"
-    }
-  },
   "calendar": {
     "day": "Day",
     "list": "List",
@@ -396,7 +389,6 @@
     "date": "Date",
     "dates": "Dates",
     "delete": "Delete",
-    "deleted": "Deleted",
     "description": "Description",
     "edit": "Edit",
     "editor": {
@@ -429,6 +421,7 @@
     "location": "Location",
     "logo": "Logo",
     "manage": "Manage",
+    "message": "Message",
     "name": "Name",
     "no": "No",
     "no_permission": "No permission",
@@ -454,6 +447,7 @@
     "time_just_now": "just now",
     "time_minutes_ago": "{count} min ago",
     "tip": "Tip",
+    "title": "Title",
     "total": "Total",
     "updated_at": "Updated on {date}",
     "validate": "Validate",
@@ -512,30 +506,9 @@
       "to_add_comment": "to add a comment",
       "view_comments": "View comments ({count})"
     },
-    "collaborators": {
-      "add_error": "Unable to add collaborator",
-      "added": "Collaborator added",
-      "load_error": "Unable to load collaborators",
-      "remove_error": "Unable to remove collaborator",
-      "removed": "Collaborator removed"
-    },
-    "collaborators_modal": {
-      "allow_modification": "Allow modification",
-      "permissions": "Permissions"
-    },
     "collaborators_rights_panel": {
-      "by_user_label": "By",
-      "delete_confirm": "Remove this collaborator?",
-      "history_title": "Change history",
-      "load_history": "Load history",
-      "no_collaborators": "No collaborators",
-      "no_history": "No changes recorded",
       "per_edition": "Per-edition rights",
       "per_edition_hint": "No specific rights defined for editions",
-      "refresh_history": "Refresh",
-      "saved": "Rights updated",
-      "target_user_label": "Targeting",
-      "title": "Collaborator rights",
       "title_placeholder": "Title or role (optional)"
     },
     "convention_form": {
@@ -674,13 +647,6 @@
     "vegan": "Vegan",
     "vegetarian": "Vegetarian"
   },
-  "editForm": {
-    "email": "Email",
-    "nom": "Last name",
-    "phone": "Phone",
-    "prenom": "First name",
-    "pseudo": "Username"
-  },
   "editions": {
     "about_this_edition": "About this edition",
     "add_comment_placeholder": "Add a comment...",
@@ -706,7 +672,6 @@
     "item_marked_returned": "Item marked as returned",
     "items_appear_when_started": "Lost items will appear once the edition has started.",
     "learn_more_about_convention": "Learn more about the convention",
-    "length": "Length",
     "loading_details": "Loading edition details...",
     "lost": "🔍 Lost",
     "lost_found": "Lost & Found",
@@ -751,6 +716,8 @@
       "action_reject": "Reject",
       "additional_info_title": "Additional information",
       "admin_only_note": "The following information (applications, filters and detailed statistics) is visible only to authorized organizers and collaborators.",
+      "all_accepted_volunteers": "All accepted volunteers",
+      "all_confirmed": "All confirmed!",
       "allergies_hint": "List only significant medical allergies",
       "allergies_label": "Allergies",
       "allergies_placeholder": "Eg: peanuts, gluten...",
@@ -775,6 +742,7 @@
       "avoid_list_hint": "This information remains confidential and helps organizers create harmonious teams",
       "avoid_list_label": "Volunteers I prefer not to work shifts with (optional)",
       "avoid_list_placeholder": "Names of other volunteers to avoid for shifts...",
+      "back_to_volunteers": "Back to volunteers",
       "catering_info": "Catering information",
       "closed_message": "Volunteer applications are not open currently.",
       "columns": "Columns",
@@ -783,6 +751,17 @@
       "companion_placeholder": "Names of other preferred volunteers for shifts...",
       "confirm_accept": "Accept volunteer",
       "confirm_back_pending": "Are you sure you want to set this application back to pending?",
+      "confirm_notification_desc": "Confirm that you have read this notification",
+      "confirm_notification_title": "Read confirmation",
+      "confirm_reading": "Confirm reading",
+      "confirmation_error": "Confirmation error",
+      "confirmation_success": "Reading confirmed!",
+      "confirmation_success_desc": "Thank you for confirming reading this message.",
+      "confirmations_count": "{count} confirmation(s)",
+      "confirmed": "confirmed",
+      "confirmed_at": "Confirmed on {date}",
+      "copy_error": "Unable to copy numbers",
+      "copy_phone_numbers": "Copy phone numbers",
       "departure_time_label": "When do you plan to leave?",
       "description_label": "Description for volunteers",
       "diet_label": "Dietary preference",
@@ -821,9 +800,29 @@
       "my_application_rejected": "My application has been rejected.",
       "my_application_title": "My application",
       "no_applications": "No applications",
+      "no_confirmations_yet": "No confirmations yet",
       "no_description": "No specific description for volunteers.",
+      "no_notifications_sent": "No notifications sent",
+      "no_phone": "No phone",
       "no_volunteers_assigned": "No volunteers assigned",
+      "notification_already_confirmed": "Reading already confirmed",
+      "notification_confirmations": "Notification confirmations",
+      "notification_load_error": "Error loading notification",
+      "notification_message_help": "Message that will be sent to selected volunteers",
+      "notification_message_placeholder": "Type your message here...",
+      "notification_recipients": "Recipients",
+      "notification_recipients_count": "{count} recipient | {count} recipients",
+      "notification_send_error": "Sending error",
+      "notification_sent_by": "Sent by {sender}",
+      "notification_sent_count": "Sent to {count} volunteer | Sent to {count} volunteers",
+      "notification_sent_success": "Notification sent!",
+      "notification_title_info": "The title will automatically be \"Volunteers - {'edition name'}\"",
+      "notification_title_prefix": "Volunteers",
+      "notifications": "Volunteer notifications",
+      "notifications_history": "Notification history",
       "open": "Open",
+      "pending": "Pending",
+      "pending_with_phone_count": "{count} unconfirmed volunteer(s) with phone",
       "personal_info_disclaimer": "This information will be communicated to the organization's responsible parties to manage volunteer teams.",
       "personal_info_title": "Your personal information",
       "pets_details_hint": "This information will help organizers better accommodate you",
@@ -831,12 +830,15 @@
       "pets_details_placeholder": "Type, breed, name, special precautions...",
       "pets_label": "I will be accompanied by a pet",
       "phone": "Phone",
+      "phone_numbers_copied": "Numbers copied!",
+      "phone_numbers_copied_desc": "{count} number(s) copied to clipboard",
       "phone_placeholder": "Your phone number",
       "presence_all": "All presences",
       "presence_event": "Event",
       "presence_setup": "Setup",
       "presence_teardown": "Teardown",
       "presence_title": "Your presence",
+      "recipients_count": "{count} recipient(s)",
       "removed_from_teams": "Removed from all teams",
       "save_teams": "Save teams",
       "search": "Search",
@@ -844,6 +846,10 @@
       "select_arrival_placeholder": "Select your arrival",
       "select_date": "Select a date",
       "select_departure_placeholder": "Select your departure",
+      "select_teams": "Select teams",
+      "send_group_sms": "Send group SMS",
+      "send_notification": "Send notification",
+      "sent_by": "Sent by",
       "setup_availability_label": "I am available for setup",
       "setup_end_date_label": "Setup end date",
       "setup_start_date_label": "Setup start date",
@@ -851,6 +857,9 @@
       "skills_hint": "Describe your skills, certifications or training that could be useful during the event (medical, security, technical, etc.)",
       "skills_label": "Skills and certifications (optional)",
       "skills_placeholder": "First aid (CPR, AED...), technical (electrical, sound, lighting...), security (security guard, crowd control...), medical (nurse, doctor...), other useful certifications...",
+      "sms_app_opened": "SMS app opened",
+      "sms_app_opened_desc": "Edit the message if needed then send",
+      "specific_teams": "Specific teams",
       "status_accepted": "Accepted",
       "status_all": "All",
       "status_pending": "Pending",
@@ -870,6 +879,7 @@
       "table_time_preferences": "Time slots",
       "table_user": "Applicant",
       "table_vehicle": "Vehicle",
+      "targeted_teams": "Targeted teams",
       "team_add": "Add team",
       "team_name_placeholder": "Ex: Welcome, Technical, Bar...",
       "team_preferences_hint": "Check the teams you would like to volunteer for (optional)",
@@ -903,10 +913,12 @@
       },
       "title": "Volunteers",
       "total": "Total",
+      "total_recipients": "Total recipients",
       "vehicle_details_hint": "This information will help organizers with logistics",
       "vehicle_details_label": "Details about your vehicle",
       "vehicle_details_placeholder": "Vehicle type, number of seats, cargo capacity...",
       "vehicle_label": "I have a vehicle available",
+      "view_details": "View details",
       "view_only_note": "View-only mode",
       "volunteer_accepted": "Volunteer accepted",
       "what_you_can_bring_title": "What you can bring to us",
@@ -936,7 +948,6 @@
     "convention_required": "Convention is required",
     "convention_update_error": "An error occurred while updating the convention",
     "creation_error": "Creation error",
-    "delete_error": "Error deleting",
     "deletion_error": "Deletion error",
     "departure_address_required": "Departure address is required",
     "departure_city_required": "Departure city is required",
@@ -1055,11 +1066,6 @@
       }
     }
   },
-  "fieldErrors": {
-    "description": "The description cannot exceed 5000 characters",
-    "externalUrl": "The external URL is not valid",
-    "setupStartDate": "The setup start date is required"
-  },
   "footer": {
     "copyright": "© {year} Juggling Convention. All rights reserved.",
     "feedback": "Give us feedback",
@@ -1093,10 +1099,6 @@
       "start_typing_address": "Start typing an address..."
     }
   },
-  "h": {
-    "actor": "Actor",
-    "targetUser": "Target user"
-  },
   "homepage": {
     "agenda": "Agenda",
     "current_editions": "Current editions",
@@ -1110,14 +1112,6 @@
     "reset_filters": "Reset",
     "searched_services": "Searched services",
     "upcoming_editions": "Upcoming editions"
-  },
-  "locationLabels": {
-    "addressDescription": "Exact pickup or drop-off point",
-    "addressLabel": "Precise address",
-    "addressPlaceholder": "Full address",
-    "cityHint": "Type at least 3 characters to see suggestions",
-    "cityLabel": "City",
-    "cityPlaceholder": "e.g., London, Manchester, Edinburgh"
   },
   "log": {
     "add_admin_notes": "Add notes about this error...",
@@ -1193,10 +1187,6 @@
     },
     "this_week": "This week",
     "unread": "Unread"
-  },
-  "notificationsStore": {
-    "loading": "Loading notifications...",
-    "realTimeEnabled": "Real-time enabled"
   },
   "pages": {
     "access_denied": {
@@ -1331,14 +1321,6 @@
     "editAllEditions": "Edit all editions",
     "editConvention": "Edit convention",
     "editor": "Editor",
-    "history": {
-      "ARCHIVED": "Archived",
-      "CREATED": "Collaborator added",
-      "PER_EDITIONS_UPDATED": "Per-edition rights updated",
-      "REMOVED": "Collaborator removed",
-      "RIGHTS_UPDATED": "Rights updated",
-      "UNARCHIVED": "Unarchived"
-    },
     "manageCollaborators": "Manage collaborators",
     "manageVolunteers": "Manage volunteers",
     "manager": "Manager",
@@ -1463,20 +1445,6 @@
       "title": "Install app"
     }
   },
-  "selectedCollaboratorForEdit": {
-    "title": "Title/Role",
-    "user": "User"
-  },
-  "selectedConventionForEdit": {
-    "name": "Convention name"
-  },
-  "selectedLog": {
-    "adminNotes": "Admin Notes",
-    "ip": "IP Address",
-    "message": "Error Message",
-    "stack": "Stack Trace",
-    "user": "User"
-  },
   "services": {
     "accessibility": "Disability accessibility",
     "aerial_space": "Aerial space",
@@ -1510,15 +1478,10 @@
     "workshops": "Workshops"
   },
   "team": {
-    "description": "Team description",
-    "name": "Team name",
     "slots": "Number of spots"
   },
   "upload": {
-    "click_select_convention_logo": "Click to select convention logo",
-    "convention_logo_alt": "Convention logo",
     "delete_message": "Image deleted",
-    "demo_title": "ImageUpload Demo",
     "error": "Error during upload",
     "error_message": "Upload error",
     "errors": {
@@ -1527,12 +1490,7 @@
       "invalid_file_type": "Invalid file type"
     },
     "formats_accepted": "Accepted formats",
-    "image_configured": "Image configured",
-    "loading_error_title": "Loading Error",
-    "logo_preview_alt": "Logo preview",
-    "logo_url_label": "Logo URL",
     "logo_url_optional_placeholder": "Logo URL (optional)",
-    "logo_url_placeholder": "https://example.com/logo.jpg",
     "max_size": "Max size",
     "select_file": "Select file",
     "success_message": "Image uploaded successfully!",
@@ -1550,13 +1508,12 @@
     "description_max_5000": "Description cannot exceed 5000 characters",
     "first_name_required": "First name is required",
     "last_name_required": "Last name is required",
+    "message_required": "Message is required",
+    "message_too_long": "Message cannot exceed {max} characters",
     "motivation_too_long": "Motivation cannot exceed {max} characters",
     "name_max_100": "Name cannot exceed 100 characters",
     "name_max_200": "Name cannot exceed 200 characters",
     "name_min_3": "Name must contain at least 3 characters",
     "phone_required": "Phone number is required"
-  },
-  "volunteersInfo": {
-    "externalUrl": "External URL"
   }
 }

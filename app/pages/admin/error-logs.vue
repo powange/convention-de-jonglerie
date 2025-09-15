@@ -269,7 +269,7 @@
     </UCard>
 
     <!-- Slideover de détails -->
-    <USlideover v-model:open="showLogDetails" :title="$t('admin.error_details')">
+    <USlideover v-model:open="showLogDetails" :title="$t('admin.error_details')" side="left">
       <template #body>
         <div v-if="selectedLog" class="space-y-6">
           <!-- Date et heure -->
@@ -388,7 +388,7 @@
               </div>
 
               <!-- Actions -->
-              <div class="flex gap-3">
+              <div class="flex flex-wrap gap-3">
                 <UButton
                   v-if="!selectedLog.resolved"
                   color="success"
@@ -405,6 +405,17 @@
                   @click="resolveLog(false)"
                 >
                   Marquer comme non résolu
+                </UButton>
+
+                <UButton
+                  v-if="!selectedLog.resolved"
+                  color="warning"
+                  variant="outline"
+                  icon="i-heroicons-squares-plus"
+                  :loading="resolvingSimilar"
+                  @click="resolveSimilarLogs"
+                >
+                  Résoudre tous les logs identiques
                 </UButton>
 
                 <UButton variant="outline" :loading="updatingNotes" @click="updateAdminNotes">
@@ -455,6 +466,7 @@ const filters = ref({
 const showLogDetails = ref(false)
 const selectedLog = ref<any>(null)
 const resolving = ref(false)
+const resolvingSimilar = ref(false)
 const updatingNotes = ref(false)
 
 // Options pour les filtres (statiques)
@@ -623,6 +635,49 @@ const resolveLog = async (resolved: boolean) => {
     })
   } finally {
     resolving.value = false
+  }
+}
+
+const resolveSimilarLogs = async () => {
+  if (!selectedLog.value) return
+
+  // Demander confirmation à l'utilisateur
+  const confirmed = confirm(
+    `Êtes-vous sûr de vouloir marquer comme résolus TOUS les logs avec le message d'erreur suivant ?\n\n"${selectedLog.value.message}"\n\nCette action ne peut pas être annulée.`
+  )
+
+  if (!confirmed) return
+
+  resolvingSimilar.value = true
+  try {
+    const response = await $fetch('/api/admin/error-logs/resolve-similar', {
+      method: 'POST',
+      body: {
+        message: selectedLog.value.message,
+        adminNotes: selectedLog.value.adminNotes || 'Résolu en masse - logs identiques',
+      },
+    })
+
+    toast.add({
+      color: 'success',
+      title: 'Succès',
+      description: response.message,
+    })
+
+    // Marquer le log actuel comme résolu dans l'interface
+    selectedLog.value.resolved = true
+    selectedLog.value.resolvedAt = new Date().toISOString()
+
+    // Recharger les logs pour mettre à jour les stats et la liste
+    loadLogs()
+  } catch (error: any) {
+    toast.add({
+      color: 'error',
+      title: 'Erreur',
+      description: error.data?.statusMessage || 'Impossible de résoudre les logs identiques',
+    })
+  } finally {
+    resolvingSimilar.value = false
   }
 }
 

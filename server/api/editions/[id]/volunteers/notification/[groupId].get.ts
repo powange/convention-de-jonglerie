@@ -1,0 +1,71 @@
+import { prisma } from '../../../../../utils/prisma'
+
+export default defineEventHandler(async (event) => {
+  const editionId = parseInt(getRouterParam(event, 'id') || '0')
+  const groupId = getRouterParam(event, 'groupId')
+
+  if (!event.context.user) {
+    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+  }
+
+  if (!groupId) {
+    throw createError({ statusCode: 400, statusMessage: 'ID de groupe requis' })
+  }
+
+  // Récupérer le groupe de notifications
+  const notificationGroup = await prisma.volunteerNotificationGroup.findFirst({
+    where: {
+      id: groupId,
+      editionId,
+    },
+    include: {
+      edition: {
+        select: { name: true },
+      },
+      sender: {
+        select: { pseudo: true },
+      },
+      confirmations: {
+        where: {
+          userId: event.context.user.id,
+        },
+        select: {
+          confirmedAt: true,
+        },
+      },
+    },
+  })
+
+  if (!notificationGroup) {
+    throw createError({ statusCode: 404, statusMessage: 'Notification introuvable' })
+  }
+
+  // Vérifier que l'utilisateur est un bénévole accepté de cette édition
+  const volunteerApplication = await prisma.editionVolunteerApplication.findFirst({
+    where: {
+      editionId,
+      userId: event.context.user.id,
+      status: 'ACCEPTED',
+    },
+  })
+
+  if (!volunteerApplication) {
+    throw createError({ statusCode: 403, statusMessage: 'Accès non autorisé' })
+  }
+
+  const isConfirmed = notificationGroup.confirmations.length > 0
+  const confirmedAt = isConfirmed ? notificationGroup.confirmations[0].confirmedAt : null
+
+  return {
+    notification: {
+      id: notificationGroup.id,
+      title: notificationGroup.title,
+      message: notificationGroup.message,
+      sentAt: notificationGroup.sentAt,
+      senderName: notificationGroup.sender.pseudo,
+      editionName: notificationGroup.edition.name,
+    },
+    isConfirmed,
+    confirmedAt,
+  }
+})

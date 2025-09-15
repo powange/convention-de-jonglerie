@@ -159,7 +159,7 @@
                     :label="t(`admin.feedback.types.${feedback.type.toLowerCase()}`)"
                   />
                   <UBadge
-                    :color="feedback.resolved ? 'green' : 'yellow'"
+                    :color="feedback.resolved ? 'success' : 'warning'"
                     :label="
                       feedback.resolved ? t('admin.feedback.resolved') : t('admin.feedback.pending')
                     "
@@ -325,7 +325,7 @@
                   {{ t('admin.feedback.status') }}
                 </label>
                 <UBadge
-                  :color="detailsModal.feedback.resolved ? 'green' : 'yellow'"
+                  :color="detailsModal.feedback.resolved ? 'success' : 'warning'"
                   :label="
                     detailsModal.feedback.resolved
                       ? t('admin.feedback.resolved')
@@ -498,7 +498,7 @@ async function fetchFeedbacks() {
     console.error('Erreur lors du chargement des feedbacks:', error)
     toast.add({
       title: t('admin.feedback.error.load'),
-      color: 'red',
+      color: 'error',
     })
   } finally {
     loading.value = false
@@ -543,7 +543,7 @@ async function resolveFeedback() {
       title: resolveModal.feedback.resolved
         ? t('admin.feedback.success.unresolve')
         : t('admin.feedback.success.resolve'),
-      color: 'green',
+      color: 'success',
     })
 
     resolveModal.isOpen = false
@@ -552,7 +552,7 @@ async function resolveFeedback() {
     console.error('Erreur lors de la mise à jour:', error)
     toast.add({
       title: t('admin.feedback.error.resolve'),
-      color: 'red',
+      color: 'error',
     })
   } finally {
     resolveModal.loading = false
@@ -561,12 +561,12 @@ async function resolveFeedback() {
 
 function getTypeColor(type: string) {
   const colors = {
-    BUG: 'red',
-    SUGGESTION: 'blue',
-    GENERAL: 'gray',
-    COMPLAINT: 'orange',
+    BUG: 'error',
+    SUGGESTION: 'info',
+    GENERAL: 'neutral',
+    COMPLAINT: 'warning',
   }
-  return colors[type] || 'gray'
+  return colors[type] || 'neutral'
 }
 
 function formatDate(dateString: string) {

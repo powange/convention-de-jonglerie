@@ -48,6 +48,8 @@ model User {
   favoriteEditions         Edition[]                       @relation("FavoriteEditions")
   attendingEditions        Edition[]                       @relation("AttendingEditions")
   pushSubscriptions        PushSubscription[]
+  volunteerNotificationGroups VolunteerNotificationGroup[]
+  volunteerNotificationConfirmations VolunteerNotificationConfirmation[]
 }
 
 model Edition {
@@ -128,6 +130,7 @@ model Edition {
   lostFoundItems               LostFoundItem[]
   favoritedBy                  User[]                          @relation("FavoriteEditions")
   attendingUsers               User[]                          @relation("AttendingEditions")
+  volunteerNotificationGroups  VolunteerNotificationGroup[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -597,6 +600,40 @@ model PushSubscription {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, endpoint])
+  @@index([userId])
+}
+
+// ========== NOTIFICATIONS BÉNÉVOLES ==========
+
+model VolunteerNotificationGroup {
+  id             String                          @id @default(cuid())
+  editionId      Int
+  senderId       Int
+  title          String
+  message        String                          @db.Text
+  targetType     String                          // 'all' ou 'teams'
+  selectedTeams  Json?                           // Array des équipes sélectionnées si targetType = 'teams'
+  recipientCount Int
+  sentAt         DateTime                        @default(now())
+
+  edition        Edition                         @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  sender         User                            @relation(fields: [senderId], references: [id])
+  confirmations  VolunteerNotificationConfirmation[]
+
+  @@index([editionId])
+  @@index([senderId])
+}
+
+model VolunteerNotificationConfirmation {
+  id                           String                     @id @default(cuid())
+  volunteerNotificationGroupId String
+  userId                       Int
+  confirmedAt                  DateTime                   @default(now())
+
+  notificationGroup            VolunteerNotificationGroup @relation(fields: [volunteerNotificationGroupId], references: [id], onDelete: Cascade)
+  user                         User                       @relation(fields: [userId], references: [id])
+
+  @@unique([volunteerNotificationGroupId, userId])
   @@index([userId])
 }
 

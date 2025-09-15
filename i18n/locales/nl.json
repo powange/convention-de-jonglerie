@@ -290,13 +290,6 @@
     "verify_email_title": "Verifieer je e-mail",
     "verifying": "Verifiëren..."
   },
-  "c": {
-    "rights": "Rechten",
-    "title": "Titel",
-    "user": {
-      "pseudo": "Gebruikersnaam"
-    }
-  },
   "calendar": {
     "day": "Dag",
     "list": "Lijst",
@@ -396,7 +389,6 @@
     "date": "Datum",
     "dates": "Datums",
     "delete": "Verwijderen",
-    "deleted": "Verwijderd",
     "description": "Beschrijving",
     "edit": "Bewerken",
     "editor": {
@@ -429,6 +421,7 @@
     "location": "Locatie",
     "logo": "Logo",
     "manage": "Beheren",
+    "message": "Bericht",
     "name": "Naam",
     "no": "Nee",
     "no_permission": "Geen toestemming",
@@ -454,6 +447,7 @@
     "time_just_now": "zojuist",
     "time_minutes_ago": "{count} min geleden",
     "tip": "Tip",
+    "title": "Titel",
     "total": "Totaal",
     "updated_at": "Bijgewerkt op {date}",
     "validate": "Valideren",
@@ -512,30 +506,9 @@
       "to_add_comment": "om een opmerking toe te voegen",
       "view_comments": "Bekijk opmerkingen ({count})"
     },
-    "collaborators": {
-      "add_error": "Kan medewerker niet toevoegen",
-      "added": "Medewerker toegevoegd",
-      "load_error": "Kan medewerkers niet laden",
-      "remove_error": "Kan medewerker niet verwijderen",
-      "removed": "Medewerker verwijderd"
-    },
-    "collaborators_modal": {
-      "allow_modification": "Wijziging toestaan",
-      "permissions": "Rechten"
-    },
     "collaborators_rights_panel": {
-      "by_user_label": "Door",
-      "delete_confirm": "Deze medewerker verwijderen?",
-      "history_title": "Wijzigingsgeschiedenis",
-      "load_history": "Geschiedenis laden",
-      "no_collaborators": "Geen medewerkers",
-      "no_history": "Geen wijzigingen geregistreerd",
       "per_edition": "Rechten per editie",
       "per_edition_hint": "Geen specifieke rechten gedefinieerd voor edities",
-      "refresh_history": "Vernieuwen",
-      "saved": "Rechten bijgewerkt",
-      "target_user_label": "Gericht op",
-      "title": "Medewerkersrechten (bèta)",
       "title_placeholder": "Titel of rol (optioneel)"
     },
     "convention_form": {
@@ -674,13 +647,6 @@
     "vegan": "Vegan",
     "vegetarian": "Vegetarisch"
   },
-  "editForm": {
-    "email": "E-mail",
-    "nom": "Achternaam",
-    "phone": "Telefoon",
-    "prenom": "Voornaam",
-    "pseudo": "Gebruikersnaam"
-  },
   "editions": {
     "about_this_edition": "Over deze editie",
     "add_comment_placeholder": "Voeg een opmerking toe...",
@@ -706,7 +672,6 @@
     "item_marked_returned": "Voorwerp gemarkeerd als teruggegeven",
     "items_appear_when_started": "Verloren voorwerpen verschijnen zodra de editie is begonnen.",
     "learn_more_about_convention": "Meer over de conventie",
-    "length": "Lengte",
     "loading_details": "Editiedetails laden...",
     "lost": "🔍 Verloren",
     "lost_found": "Gevonden Voorwerpen",
@@ -751,6 +716,8 @@
       "action_reject": "Afwijzen",
       "additional_info_title": "Toe te voegen",
       "admin_only_note": "De volgende informatie (aanmeldingen, filters en gedetailleerde statistieken) is alleen zichtbaar voor geautoriseerde organisatoren en medewerkers.",
+      "all_accepted_volunteers": "Alle geaccepteerde vrijwilligers",
+      "all_confirmed": "Allemaal bevestigd!",
       "allergies_hint": "Vermeld enkel belangrijke medische allergieën",
       "allergies_label": "Allergieën",
       "allergies_placeholder": "Bv: pinda's, gluten...",
@@ -775,6 +742,7 @@
       "avoid_list_hint": "Deze informatie blijft vertrouwelijk en helpt organisatoren harmonieuze teams te creëren",
       "avoid_list_label": "Vrijwilligers waarmee ik liever geen diensten zou willen draaien (optioneel)",
       "avoid_list_placeholder": "Namen van andere vrijwilligers te vermijden voor diensten...",
+      "back_to_volunteers": "Terug naar vrijwilligers",
       "catering_info": "Cateringinformatie",
       "closed_message": "Vrijwilligersaanmeldingen zijn momenteel niet open.",
       "columns": "Kolommen",
@@ -783,6 +751,17 @@
       "companion_placeholder": "Namen van andere voorkeursvolunteers voor diensten...",
       "confirm_accept": "Vrijwilliger accepteren",
       "confirm_back_pending": "Weet u zeker dat u deze aanvraag weer op wachtend wilt zetten?",
+      "confirm_notification_desc": "Bevestig dat je deze melding hebt gelezen",
+      "confirm_notification_title": "Leesbevestiging",
+      "confirm_reading": "Lezen bevestigen",
+      "confirmation_error": "Bevestigingsfout",
+      "confirmation_success": "Lezen bevestigd!",
+      "confirmation_success_desc": "Bedankt voor het bevestigen van het lezen van dit bericht.",
+      "confirmations_count": "{count} bevestiging(en)",
+      "confirmed": "bevestigd",
+      "confirmed_at": "Bevestigd op {date}",
+      "copy_error": "Kan nummers niet kopiëren",
+      "copy_phone_numbers": "Nummers kopiëren",
       "departure_time_label": "Wanneer bent u van plan te vertrekken?",
       "description_label": "Beschrijving voor vrijwilligers",
       "diet_label": "Dieetvoorkeur",
@@ -821,9 +800,29 @@
       "my_application_rejected": "Mijn aanmelding is afgewezen.",
       "my_application_title": "Mijn aanmelding",
       "no_applications": "Geen aanmeldingen",
+      "no_confirmations_yet": "Nog geen bevestigingen",
       "no_description": "Geen specifieke beschrijving voor vrijwilligers.",
+      "no_notifications_sent": "Geen meldingen verzonden",
+      "no_phone": "Geen telefoon",
       "no_volunteers_assigned": "No volunteers assigned",
+      "notification_already_confirmed": "Lezen al bevestigd",
+      "notification_confirmations": "Notificatiebevestigingen",
+      "notification_load_error": "Fout bij laden van melding",
+      "notification_message_help": "Bericht dat naar geselecteerde vrijwilligers wordt gestuurd",
+      "notification_message_placeholder": "Typ je bericht hier...",
+      "notification_recipients": "Ontvangers",
+      "notification_recipients_count": "{count} ontvanger | {count} ontvangers",
+      "notification_send_error": "Verzendingsfout",
+      "notification_sent_by": "Verzonden door {sender}",
+      "notification_sent_count": "Verzonden naar {count} vrijwilliger | Verzonden naar {count} vrijwilligers",
+      "notification_sent_success": "Melding verzonden!",
+      "notification_title_info": "De titel zal automatisch \"Vrijwilligers - {'editienaam'}\" zijn",
+      "notification_title_prefix": "Vrijwilligers",
+      "notifications": "Vrijwilligersmeldingen",
+      "notifications_history": "Meldingsgeschiedenis",
       "open": "Open",
+      "pending": "In afwachting",
+      "pending_with_phone_count": "{count} onbevestigde vrijwilliger(s) met telefoon",
       "personal_info_disclaimer": "Deze informatie wordt meegedeeld aan de verantwoordelijken van de organisatie om vrijwilligersteams te beheren.",
       "personal_info_title": "Uw persoonlijke informatie",
       "pets_details_hint": "Deze informatie helpt organisatoren u beter te ontvangen",
@@ -831,12 +830,15 @@
       "pets_details_placeholder": "Type, ras, naam, speciale voorzorgsmaatregelen...",
       "pets_label": "Ik word vergezeld door een huisdier",
       "phone": "Telefoon",
+      "phone_numbers_copied": "Nummers gekopieerd!",
+      "phone_numbers_copied_desc": "{count} nummer(s) gekopieerd naar klembord",
       "phone_placeholder": "Uw telefoonnummer",
       "presence_all": "Alle aanwezigheden",
       "presence_event": "Evenement",
       "presence_setup": "Opbouw",
       "presence_teardown": "Afbraak",
       "presence_title": "Uw aanwezigheid",
+      "recipients_count": "{count} ontvanger(s)",
       "removed_from_teams": "Removed from all teams",
       "save_teams": "Save teams",
       "search": "Zoeken",
@@ -844,6 +846,10 @@
       "select_arrival_placeholder": "Selecteer uw aankomst",
       "select_date": "Datum selecteren",
       "select_departure_placeholder": "Selecteer uw vertrek",
+      "select_teams": "Selecteer teams",
+      "send_group_sms": "Groeps-SMS versturen",
+      "send_notification": "Melding verzenden",
+      "sent_by": "Verzonden door",
       "setup_availability_label": "Ik ben beschikbaar voor de opbouw",
       "setup_end_date_label": "Einddatum afbouw",
       "setup_start_date_label": "Startdatum opbouw",
@@ -851,6 +857,9 @@
       "skills_hint": "Beschrijf je vaardigheden, certificaten of trainingen die nuttig kunnen zijn tijdens het evenement (medisch, beveiliging, technisch, etc.)",
       "skills_label": "Vaardigheden en certificaten (optioneel)",
       "skills_placeholder": "Eerste hulp (EHBO, BHV...), technisch (elektriciteit, geluid, verlichting...), beveiliging (beveiliger, crowd control...), medisch (verpleegster, arts...), andere nuttige certificaten...",
+      "sms_app_opened": "SMS-app geopend",
+      "sms_app_opened_desc": "Bewerk het bericht indien nodig en verstuur",
+      "specific_teams": "Specifieke teams",
       "status_accepted": "Geaccepteerd",
       "status_all": "Alle",
       "status_pending": "In afwachting",
@@ -870,6 +879,7 @@
       "table_time_preferences": "Tijdsloten",
       "table_user": "Aanvrager",
       "table_vehicle": "Voertuig",
+      "targeted_teams": "Doelteams",
       "team_add": "Team toevoegen",
       "team_name_placeholder": "Bijv: Ontvangst, Techniek, Bar...",
       "team_preferences_hint": "Vink de teams aan waarin je graag vrijwilliger zou zijn (optioneel)",
@@ -903,10 +913,12 @@
       },
       "title": "Vrijwilligers",
       "total": "Totaal",
+      "total_recipients": "Totaal ontvangers",
       "vehicle_details_hint": "Deze informatie helpt organisatoren bij de logistiek",
       "vehicle_details_label": "Details over uw voertuig",
       "vehicle_details_placeholder": "Type voertuig, aantal stoelen, laadcapaciteit...",
       "vehicle_label": "Ik heb een voertuig beschikbaar",
+      "view_details": "Details bekijken",
       "view_only_note": "Alleen bekijkmodus",
       "volunteer_accepted": "Vrijwilliger geaccepteerd",
       "what_you_can_bring_title": "Wat u ons kunt brengen",
@@ -936,7 +948,6 @@
     "convention_required": "Conventie is vereist",
     "convention_update_error": "Er is een fout opgetreden bij het bijwerken van de conventie",
     "creation_error": "Aanmaakfout",
-    "delete_error": "Verwijderingsfout",
     "deletion_error": "Verwijderfout",
     "departure_address_required": "Vertrekadres is vereist",
     "departure_city_required": "Vertrekstad is vereist",
@@ -1055,11 +1066,6 @@
       }
     }
   },
-  "fieldErrors": {
-    "description": "De beschrijving mag niet meer dan 5000 tekens bevatten",
-    "externalUrl": "De externe URL is niet geldig",
-    "setupStartDate": "De startdatum voor de opbouw is vereist"
-  },
   "footer": {
     "copyright": "© {year} Jongleerconventie. Alle rechten voorbehouden.",
     "feedback": "Geef ons feedback",
@@ -1093,10 +1099,6 @@
       "start_typing_address": "Begin met het typen van een adres..."
     }
   },
-  "h": {
-    "actor": "Actor",
-    "targetUser": "Doelgebruiker"
-  },
   "homepage": {
     "agenda": "Agenda",
     "current_editions": "Huidige edities",
@@ -1110,14 +1112,6 @@
     "reset_filters": "Resetten",
     "searched_services": "Gezochte diensten",
     "upcoming_editions": "Aankomende edities"
-  },
-  "locationLabels": {
-    "addressDescription": "Exact afzetpunt voor passagiers",
-    "addressLabel": "Precieze vertrekadres",
-    "addressPlaceholder": "Volledig adres",
-    "cityHint": "Typ minstens 3 tekens om suggesties te zien",
-    "cityLabel": "Stad",
-    "cityPlaceholder": "Bijv: Amsterdam, Rotterdam, Utrecht"
   },
   "log": {
     "add_admin_notes": "Voeg notities toe over deze fout...",
@@ -1193,10 +1187,6 @@
     },
     "this_week": "Deze week",
     "unread": "Ongelezen"
-  },
-  "notificationsStore": {
-    "loading": "Laden des notifications...",
-    "realTimeEnabled": "Realtime ingeschakeld"
   },
   "pages": {
     "access_denied": {
@@ -1331,14 +1321,6 @@
     "editAllEditions": "Alle edities bewerken",
     "editConvention": "Conventie bewerken",
     "editor": "Redacteur",
-    "history": {
-      "ARCHIVED": "Gearchiveerd",
-      "CREATED": "Medewerker toegevoegd",
-      "PER_EDITIONS_UPDATED": "Rechten per editie bijgewerkt",
-      "REMOVED": "Medewerker verwijderd",
-      "RIGHTS_UPDATED": "Rechten bijgewerkt",
-      "UNARCHIVED": "Hersteld"
-    },
     "manageCollaborators": "Medewerkers beheren",
     "manageVolunteers": "Vrijwilligers beheren",
     "manager": "Manager",
@@ -1463,20 +1445,6 @@
       "title": "App installeren"
     }
   },
-  "selectedCollaboratorForEdit": {
-    "title": "Titel/Functie",
-    "user": "Gebruiker"
-  },
-  "selectedConventionForEdit": {
-    "name": "Conventienaam"
-  },
-  "selectedLog": {
-    "adminNotes": "Beheernotities",
-    "ip": "IP-adres",
-    "message": "Foutmelding",
-    "stack": "Stack trace",
-    "user": "Gebruiker"
-  },
   "services": {
     "accessibility": "Toegankelijkheid voor gehandicapten",
     "aerial_space": "Luchtruimte",
@@ -1510,15 +1478,10 @@
     "workshops": "Workshops"
   },
   "team": {
-    "description": "Teamomschrijving",
-    "name": "Teamnaam",
     "slots": "Aantal plaatsen"
   },
   "upload": {
-    "click_select_convention_logo": "Klik om een conventie logo te selecteren",
-    "convention_logo_alt": "Conventie logo",
     "delete_message": "Afbeelding verwijderd",
-    "demo_title": "Afbeelding upload demo",
     "error": "Fout tijdens uploaden",
     "error_message": "Upload fout",
     "errors": {
@@ -1527,12 +1490,7 @@
       "invalid_file_type": "Ongeldig bestandstype. Geaccepteerde formaten: {allowedTypes}"
     },
     "formats_accepted": "Geaccepteerde formaten",
-    "image_configured": "Afbeelding geconfigureerd",
-    "loading_error_title": "Fout bij laden van afbeelding",
-    "logo_preview_alt": "Logo voorvertoning",
-    "logo_url_label": "Logo URL",
     "logo_url_optional_placeholder": "URL van het conventie logo (optioneel)",
-    "logo_url_placeholder": "https://voorbeeld.com/logo.jpg",
     "max_size": "Maximale grootte",
     "select_file": "Bestand selecteren",
     "success_message": "Afbeelding succesvol geüpload!",
@@ -1550,13 +1508,12 @@
     "description_max_5000": "Beschrijving mag niet meer dan 5000 tekens bevatten",
     "first_name_required": "Voornaam is vereist",
     "last_name_required": "Achternaam is vereist",
+    "message_required": "Bericht is verplicht",
+    "message_too_long": "Bericht kan niet meer dan {max} tekens bevatten",
     "motivation_too_long": "Motivatie mag niet meer dan {max} tekens bevatten",
     "name_max_100": "Naam mag niet meer dan 100 tekens bevatten",
     "name_max_200": "Naam mag niet meer dan 200 tekens bevatten",
     "name_min_3": "Naam moet minstens 3 tekens bevatten",
     "phone_required": "Telefoonnummer is vereist"
-  },
-  "volunteersInfo": {
-    "externalUrl": "Externe URL"
   }
 }

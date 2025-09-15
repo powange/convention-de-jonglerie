@@ -354,7 +354,7 @@ async function submitFeedback() {
         toast.add({
           title: t('feedback.error.name_required'),
           description: t('feedback.error.name_required_desc'),
-          color: 'red',
+          color: 'error',
         })
         loading.value = false
         return
@@ -365,7 +365,7 @@ async function submitFeedback() {
         ensureRecaptchaScript()
         const siteKey = useRuntimeConfig().public.recaptchaSiteKey
         if (!window.grecaptcha || !siteKey) {
-          toast.add({ title: t('feedback.error.captcha_not_loaded'), color: 'red' })
+          toast.add({ title: t('feedback.error.captcha_not_loaded'), color: 'error' })
           loading.value = false
           return
         }
@@ -375,14 +375,14 @@ async function submitFeedback() {
           })
         })
         if (!token) {
-          toast.add({ title: t('feedback.error.captcha_required'), color: 'red' })
+          toast.add({ title: t('feedback.error.captcha_required'), color: 'error' })
           loading.value = false
           return
         }
         form.captchaToken = token
       } catch (error) {
         console.error('Erreur avec reCAPTCHA v3:', error)
-        toast.add({ title: t('feedback.error.captcha_not_loaded'), color: 'red' })
+        toast.add({ title: t('feedback.error.captcha_not_loaded'), color: 'error' })
         loading.value = false
         return
       }
@@ -407,7 +407,7 @@ async function submitFeedback() {
     toast.add({
       title: t('feedback.success.title'),
       description: t('feedback.success.toast'),
-      color: 'green',
+      color: 'success',
     })
   } catch (error: unknown) {
     console.error("Erreur lors de l'envoi du feedback:", error)
@@ -420,7 +420,7 @@ async function submitFeedback() {
     toast.add({
       title: t('feedback.error.title'),
       description: errorMessage,
-      color: 'red',
+      color: 'error',
     })
 
     // Pas de reset nécessaire pour v3

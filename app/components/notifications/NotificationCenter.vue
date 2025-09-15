@@ -278,7 +278,7 @@ const refreshNotifications = async () => {
     await notificationsStore.refresh(true)
   } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
       description: 'Impossible de charger les notifications',
     })
@@ -289,13 +289,13 @@ const markAllAsRead = async () => {
   try {
     await notificationsStore.markAllAsRead()
     toast.add({
-      color: 'green',
+      color: 'success',
       title: 'Succès',
       description: 'Toutes les notifications ont été marquées comme lues',
     })
   } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
       description: 'Impossible de marquer les notifications comme lues',
     })
@@ -323,13 +323,13 @@ const deleteNotification = async (notificationId: string) => {
   try {
     await notificationsStore.deleteNotification(notificationId)
     toast.add({
-      color: 'green',
+      color: 'success',
       title: 'Supprimé',
       description: 'Notification supprimée',
     })
   } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
       description: 'Impossible de supprimer la notification',
     })
@@ -341,7 +341,7 @@ const loadMore = async () => {
     await notificationsStore.loadMore()
   } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
       description: 'Impossible de charger plus de notifications',
     })

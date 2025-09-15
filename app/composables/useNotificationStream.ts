@@ -187,13 +187,13 @@ export const useNotificationStream = () => {
   const getNotificationColor = (type: string) => {
     switch (type) {
       case 'SUCCESS':
-        return 'green'
+        return 'success'
       case 'WARNING':
-        return 'yellow'
+        return 'warning'
       case 'ERROR':
-        return 'red'
+        return 'error'
       default:
-        return 'blue'
+        return 'info'
     }
   }
 

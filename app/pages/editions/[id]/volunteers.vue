@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
   <div v-if="edition">
     <EditionHeader
@@ -33,7 +34,6 @@
         <div>
           <div class="prose dark:prose-invert max-w-none text-sm">
             <template v-if="volunteersInfo?.description">
-              <!-- eslint-disable-next-line vue/no-v-html -->
               <div
                 :class="[shouldReduceDescription && !showFullDescription ? 'overflow-hidden' : '']"
                 :style="
@@ -175,7 +175,7 @@
     <!-- Modal candidature bénévole -->
     <EditionVolunteerApplicationModal
       v-model="showApplyModal"
-      :volunteers-info="volunteersInfo"
+      :volunteers-info="volunteersInfo as any"
       :edition="edition"
       :user="authStore.user as any"
       :applying="volunteersApplying"
@@ -266,6 +266,21 @@
                   {{ t('editions.volunteers.generate') }}
                 </UButton>
               </UButtonGroup>
+            </div>
+
+            <!-- Section notification des bénévoles -->
+            <div
+              v-if="canManageVolunteers"
+              class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700"
+            >
+              <EditionVolunteerNotifications
+                ref="notificationsListRef"
+                :edition-id="editionId"
+                :edition="edition"
+                :volunteers-info="volunteersInfo"
+                :can-manage-volunteers="canManageVolunteers"
+                :accepted-volunteers-count="volunteersInfo?.counts?.ACCEPTED ?? 0"
+              />
             </div>
           </div>
         </template>
@@ -420,6 +435,7 @@ const volunteersApplying = ref(false)
 const volunteersWithdrawing = ref(false)
 // Suppression édition publique : editingVolunteers retiré
 const showApplyModal = ref(false)
+
 // Modal candidature helpers
 // Variables du formulaire déplacées dans EditionVolunteerApplicationModal
 const volunteerStatusColor = (s: string) =>
@@ -569,8 +585,8 @@ const cateringDateOptions = computed(() => {
     })
   }
 
-  const startDate = new Date(edition.value.startDate)
-  const endDate = new Date(edition.value.endDate)
+  const startDate = new Date(edition.value!.startDate)
+  const endDate = new Date(edition.value!.endDate)
 
   // Ajouter les jours de montage si définis
   if (volunteersInfo.value?.setupStartDate) {
@@ -761,4 +777,7 @@ const openApplyModal = () => {
 const closeApplyModal = () => {
   showApplyModal.value = false
 }
+
+// Référence au composant de notifications
+const notificationsListRef = ref()
 </script>

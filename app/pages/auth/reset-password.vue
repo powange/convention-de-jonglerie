@@ -288,7 +288,7 @@ onMounted(async () => {
         title: t('auth.invalid_link'),
         description: message,
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'red',
+        color: 'error',
       })
     }
   } catch (error) {
@@ -315,7 +315,7 @@ const handleSubmit = async () => {
       title: t('common.success'),
       description: t('auth.password_reset_description'),
       icon: 'i-heroicons-check-circle',
-      color: 'green',
+      color: 'success',
     })
   } catch (error: any) {
     if (
@@ -330,7 +330,7 @@ const handleSubmit = async () => {
         title: t('common.error'),
         description: error.data?.statusMessage || t('errors.server_error'),
         icon: 'i-heroicons-x-circle',
-        color: 'red',
+        color: 'error',
       })
     }
   } finally {

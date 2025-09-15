@@ -390,13 +390,13 @@ const refreshNotifications = async () => {
     await notificationsStore.refresh(true)
     await loadStats()
     toast.add({
-      color: 'green',
+      color: 'success',
       title: 'Actualisé',
       description: 'Notifications mises à jour',
     })
   } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
       description: 'Impossible de charger les notifications',
     })
@@ -408,13 +408,13 @@ const markAllAsRead = async () => {
     await notificationsStore.markAllAsRead()
     await loadStats()
     toast.add({
-      color: 'green',
+      color: 'success',
       title: 'Succès',
       description: 'Toutes les notifications ont été marquées comme lues',
     })
   } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
       description: 'Impossible de marquer les notifications comme lues',
     })
@@ -426,7 +426,7 @@ const toggleReadStatus = async (notification: Notification) => {
     if (!notification.isRead) {
       await notificationsStore.markAsRead(notification.id)
       toast.add({
-        color: 'green',
+        color: 'success',
         title: 'Marquée comme lue',
         description: 'Notification mise à jour',
       })
@@ -434,7 +434,7 @@ const toggleReadStatus = async (notification: Notification) => {
     // Note: on pourrait ajouter une fonction markAsUnread si nécessaire
   } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
       description: 'Impossible de mettre à jour la notification',
     })
@@ -446,13 +446,13 @@ const deleteNotification = async (notificationId: string) => {
     await notificationsStore.deleteNotification(notificationId)
     await loadStats()
     toast.add({
-      color: 'green',
+      color: 'success',
       title: 'Supprimée',
       description: 'Notification supprimée',
     })
   } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
       description: 'Impossible de supprimer la notification',
     })
@@ -464,7 +464,7 @@ const loadMore = async () => {
     await notificationsStore.loadMore()
   } catch {
     toast.add({
-      color: 'red',
+      color: 'error',
       title: 'Erreur',
       description: 'Impossible de charger plus de notifications',
     })

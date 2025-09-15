@@ -127,14 +127,14 @@ const handleSubmit = async () => {
       title: t('auth.email_sent_success'),
       description: response.message,
       icon: 'i-heroicons-check-circle',
-      color: 'green',
+      color: 'success',
     })
   } catch (error: any) {
     toast.add({
       title: t('common.error'),
       description: error.data?.statusMessage || t('errors.server_error'),
       icon: 'i-heroicons-x-circle',
-      color: 'red',
+      color: 'error',
     })
   } finally {
     loading.value = false

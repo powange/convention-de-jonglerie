@@ -99,21 +99,21 @@ onMounted(async () => {
         title: t('conventions.convention_not_found'),
         description: t('conventions.convention_not_found_description'),
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'red',
+        color: 'error',
       })
     } else if (errorStatus === 403) {
       toast.add({
         title: t('pages.access_denied.title'),
         description: t('errors.convention_edit_denied'),
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'red',
+        color: 'error',
       })
     } else {
       toast.add({
         title: t('errors.loading_error'),
         description: t('errors.cannot_load_convention'),
         icon: 'i-heroicons-exclamation-triangle',
-        color: 'red',
+        color: 'error',
       })
     }
   } finally {

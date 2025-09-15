@@ -1,0 +1,361 @@
+<template>
+  <UModal v-model:open="isOpen" :ui="{ width: 'sm:max-w-lg' }">
+    <template #header>
+      <div class="flex items-center gap-2">
+        <UIcon name="i-heroicons-bell" class="text-primary-500" />
+        <span class="font-semibold">{{ t('editions.volunteers.send_notification') }}</span>
+      </div>
+    </template>
+
+    <template #body>
+      <form class="space-y-4" @submit.prevent="handleSubmit">
+        <!-- Titre (non modifiable) -->
+        <div>
+          <UFormField :label="t('common.title')" class="w-full">
+            <UInput
+              :value="notificationTitle"
+              readonly
+              disabled
+              class="w-full bg-gray-50 dark:bg-gray-800 text-gray-600"
+            />
+          </UFormField>
+          <p class="text-xs text-gray-500 mt-1">
+            {{ t('editions.volunteers.notification_title_info') }}
+          </p>
+        </div>
+
+        <!-- Destinataires -->
+        <div>
+          <UFormField :label="t('editions.volunteers.notification_recipients')" class="w-full">
+            <URadioGroup
+              v-model="formData.targetType"
+              :items="recipientOptions"
+              :ui="{ fieldset: 'flex flex-col gap-2' }"
+            />
+          </UFormField>
+        </div>
+
+        <!-- Sélection d'équipes (si applicable) -->
+        <div v-if="formData.targetType === 'teams' && teamsOptions.length > 0">
+          <UFormField :label="t('editions.volunteers.select_teams')" class="w-full">
+            <div class="space-y-2 max-h-32 overflow-y-auto">
+              <div
+                v-for="(team, index) in teamsOptions"
+                :key="`team-${index}-${team.value}`"
+                class="flex items-center"
+              >
+                <UCheckbox
+                  :id="`team-checkbox-${index}`"
+                  :model-value="formData.selectedTeams.includes(team.value)"
+                  :label="team.label"
+                  class="text-sm"
+                  @update:model-value="(checked) => handleTeamChange(team.value, checked)"
+                />
+              </div>
+            </div>
+          </UFormField>
+        </div>
+
+        <!-- Message -->
+        <div>
+          <UFormField :label="t('common.message')" :error="messageError" class="w-full">
+            <UTextarea
+              v-model="formData.message"
+              rows="4"
+              :placeholder="t('editions.volunteers.notification_message_placeholder')"
+              :maxlength="messageMaxLength"
+              class="w-full"
+              @blur="markFieldTouched('message')"
+            />
+            <div class="text-xs text-gray-500 mt-1 flex justify-between">
+              <span>{{ t('editions.volunteers.notification_message_help') }}</span>
+              <span>{{ formData.message.length }}/{{ messageMaxLength }}</span>
+            </div>
+          </UFormField>
+        </div>
+
+        <!-- Aperçu du nombre de destinataires -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg space-y-2">
+          <div class="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+            <UIcon name="i-heroicons-users" size="16" />
+            <span class="text-sm font-medium">
+              {{
+                t('editions.volunteers.notification_recipients_count', { count: recipientCount })
+              }}
+            </span>
+          </div>
+
+          <!-- Liste des destinataires -->
+          <div
+            v-if="selectedRecipients.length > 0"
+            class="text-sm text-blue-600 dark:text-blue-300"
+          >
+            <div class="max-h-32 overflow-y-auto space-y-1">
+              <div
+                v-for="recipient in selectedRecipients"
+                :key="recipient.id"
+                class="flex items-center justify-between bg-white dark:bg-blue-800/30 px-2 py-1 rounded text-xs"
+              >
+                <span class="font-medium">
+                  {{ recipient.user.pseudo }}
+                  <span
+                    v-if="recipient.user.prenom || recipient.user.nom"
+                    class="font-normal text-gray-600 dark:text-gray-400"
+                  >
+                    ({{ [recipient.user.prenom, recipient.user.nom].filter(Boolean).join(' ') }})
+                  </span>
+                </span>
+                <span
+                  v-if="formData.targetType === 'teams' && recipient.assignedTeams?.length"
+                  class="text-blue-500 dark:text-blue-400"
+                >
+                  {{
+                    recipient.assignedTeams
+                      .filter((team) => formData.selectedTeams.includes(team))
+                      .join(', ')
+                  }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-end gap-3 pt-4">
+          <UButton type="button" color="neutral" variant="ghost" @click="isOpen = false">
+            {{ t('common.cancel') }}
+          </UButton>
+          <UButton
+            type="submit"
+            :loading="sending"
+            :disabled="!canSend"
+            icon="i-heroicons-paper-airplane"
+          >
+            {{ t('editions.volunteers.send_notification') }}
+          </UButton>
+        </div>
+      </form>
+    </template>
+  </UModal>
+</template>
+
+<script setup lang="ts">
+interface Props {
+  modelValue: boolean
+  edition: any
+  volunteersInfo: any
+  volunteerApplications?: any[]
+}
+
+interface Emits {
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'close'): void
+  (
+    e: 'sent',
+    data: { targetType: string; selectedTeams?: string[]; message: string; recipientCount: number }
+  ): void
+}
+
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
+
+const { t } = useI18n()
+const toast = useToast()
+
+const messageMaxLength = 500
+
+// Gestion de l'état open/close de la modal
+const isOpen = computed({
+  get: () => props.modelValue,
+  set: (value) => {
+    emit('update:modelValue', value)
+    if (!value) {
+      emit('close')
+    }
+  },
+})
+
+// Form data
+const formData = ref({
+  targetType: 'all' as 'all' | 'teams',
+  selectedTeams: [] as string[],
+  message: '',
+})
+
+const sending = ref(false)
+const touchedFields = ref(new Set<string>())
+
+// Computed properties
+const notificationTitle = computed(() => {
+  return `${t('editions.volunteers.notification_title_prefix')} - ${props.edition?.name || ''}`
+})
+
+const recipientOptions = computed(() => [
+  {
+    value: 'all',
+    label: t('editions.volunteers.all_accepted_volunteers'),
+  },
+  {
+    value: 'teams',
+    label: t('editions.volunteers.specific_teams'),
+    disabled: !teamsOptions.value.length,
+  },
+])
+
+const teamsOptions = computed(() => {
+  if (!props.volunteersInfo?.teams) return []
+
+  return props.volunteersInfo.teams.map((team: any) => ({
+    value: team.name,
+    label: `${team.name} ${team.assignedVolunteersCount ? `(${team.assignedVolunteersCount})` : ''}`,
+  }))
+})
+
+const selectedRecipients = computed(() => {
+  const applications = props.volunteerApplications
+
+  if (!applications || applications.length === 0) {
+    return []
+  }
+
+  if (formData.value.targetType === 'all') {
+    return applications.filter((app: any) => app.status === 'ACCEPTED')
+  } else if (formData.value.targetType === 'teams' && formData.value.selectedTeams.length > 0) {
+    return applications.filter(
+      (app: any) =>
+        app.status === 'ACCEPTED' &&
+        app.assignedTeams?.some((team: string) => formData.value.selectedTeams.includes(team))
+    )
+  }
+
+  return []
+})
+
+const recipientCount = computed(() => {
+  // Si on a les applications détaillées, utiliser la liste filtrée
+  if (props.volunteerApplications && props.volunteerApplications.length > 0) {
+    return selectedRecipients.value.length
+  }
+
+  // Fallback: utiliser les counts de volunteersInfo
+  if (formData.value.targetType === 'all') {
+    return props.volunteersInfo?.counts?.ACCEPTED || 0
+  }
+
+  // Pour les équipes spécifiques sans données détaillées, on ne peut pas calculer
+  return 0
+})
+
+const messageError = computed(() => {
+  if (!touchedFields.value.has('message')) return undefined
+  if (!formData.value.message.trim()) {
+    return t('validation.message_required')
+  }
+  if (formData.value.message.length > messageMaxLength) {
+    return t('validation.message_too_long', { max: messageMaxLength })
+  }
+  return undefined
+})
+
+const canSend = computed(() => {
+  return (
+    formData.value.message.trim() &&
+    formData.value.message.length <= messageMaxLength &&
+    recipientCount.value > 0 &&
+    (formData.value.targetType === 'all' || formData.value.selectedTeams.length > 0) &&
+    !sending.value
+  )
+})
+
+// Methods
+const markFieldTouched = (field: string) => {
+  touchedFields.value.add(field)
+}
+
+const handleTeamChange = (teamName: string, checked: boolean) => {
+  console.log('handleTeamChange called with:', teamName, checked)
+  const index = formData.value.selectedTeams.indexOf(teamName)
+  console.log('Current selectedTeams:', formData.value.selectedTeams)
+  console.log('Team index:', index)
+
+  if (checked && index === -1) {
+    formData.value.selectedTeams.push(teamName)
+    console.log('Added team:', teamName)
+  } else if (!checked && index > -1) {
+    formData.value.selectedTeams.splice(index, 1)
+    console.log('Removed team:', teamName)
+  }
+
+  console.log('New selectedTeams:', formData.value.selectedTeams)
+}
+
+const resetForm = () => {
+  formData.value = {
+    targetType: 'all',
+    selectedTeams: [],
+    message: '',
+  }
+  touchedFields.value.clear()
+  sending.value = false
+}
+
+const handleSubmit = async () => {
+  // Valider tous les champs
+  touchedFields.value.add('message')
+
+  if (!canSend.value) {
+    return
+  }
+
+  sending.value = true
+
+  try {
+    await $fetch(`/api/editions/${props.edition.id}/volunteers/notifications`, {
+      method: 'POST',
+      body: {
+        targetType: formData.value.targetType,
+        selectedTeams:
+          formData.value.targetType === 'teams' ? formData.value.selectedTeams : undefined,
+        message: formData.value.message.trim(),
+      },
+    })
+
+    emit('sent', {
+      targetType: formData.value.targetType,
+      selectedTeams:
+        formData.value.targetType === 'teams' ? formData.value.selectedTeams : undefined,
+      message: formData.value.message.trim(),
+      recipientCount: recipientCount.value,
+    })
+
+    toast.add({
+      title: t('editions.volunteers.notification_sent_success'),
+      description: t('editions.volunteers.notification_sent_count', {
+        count: recipientCount.value,
+      }),
+      color: 'success',
+    })
+
+    resetForm()
+    isOpen.value = false
+  } catch (error: any) {
+    toast.add({
+      title: t('editions.volunteers.notification_send_error'),
+      description: error?.data?.message || t('common.error'),
+      color: 'error',
+    })
+  } finally {
+    sending.value = false
+  }
+}
+
+// Watch for modal changes to reset form
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue) {
+      resetForm()
+    }
+  }
+)
+</script>

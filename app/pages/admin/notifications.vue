@@ -1110,11 +1110,11 @@ const notificationColumns = [
       const getCategoryConfig = (cat: string) => {
         switch (cat) {
           case 'system':
-            return { color: 'gray', icon: 'i-heroicons-cog-6-tooth', label: 'Système' }
+            return { color: 'neutral', icon: 'i-heroicons-cog-6-tooth', label: 'Système' }
           case 'edition':
-            return { color: 'blue', icon: 'i-heroicons-calendar-days', label: 'Édition' }
+            return { color: 'info', icon: 'i-heroicons-calendar-days', label: 'Édition' }
           case 'volunteer':
-            return { color: 'green', icon: 'i-heroicons-heart', label: 'Bénévolat' }
+            return { color: 'success', icon: 'i-heroicons-heart', label: 'Bénévolat' }
           case 'other':
             return {
               color: 'purple',
@@ -1122,7 +1122,7 @@ const notificationColumns = [
               label: 'Autre',
             }
           default:
-            return { color: 'gray', icon: 'i-heroicons-folder', label: cat }
+            return { color: 'neutral', icon: 'i-heroicons-folder', label: cat }
         }
       }
 
@@ -1208,24 +1208,24 @@ const notificationColumns = [
 
       let timeAgo = ''
       let icon = 'i-heroicons-clock'
-      let color = 'gray'
+      let color = 'neutral'
 
       if (diffHours < 1) {
         timeAgo = "À l'instant"
         icon = 'i-heroicons-bolt'
-        color = 'green'
+        color = 'success'
       } else if (diffHours < 24) {
         timeAgo = `Il y a ${diffHours}h`
-        color = 'blue'
+        color = 'info'
       } else if (diffDays === 1) {
         timeAgo = 'Hier'
-        color = 'yellow'
+        color = 'warning'
       } else if (diffDays < 7) {
         timeAgo = `Il y a ${diffDays}j`
-        color = 'orange'
+        color = 'warning'
       } else {
         timeAgo = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
-        color = 'gray'
+        color = 'neutral'
       }
 
       return h('div', { class: 'flex items-center gap-2' }, [

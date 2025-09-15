@@ -65,7 +65,9 @@
       "Bash(python3:*)",
       "Bash(for:*)",
       "Bash(awk:*)",
-      "Read(///**)"
+      "Read(///**)",
+      "Bash(/tmp/check_components_correct.sh:*)",
+      "Bash(/tmp/final_analysis.sh:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

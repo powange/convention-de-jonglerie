@@ -290,13 +290,6 @@
     "verify_email_title": "Bekræft din email",
     "verifying": "Bekræfter..."
   },
-  "c": {
-    "rights": "Rettigheder",
-    "title": "Titel",
-    "user": {
-      "pseudo": "Brugernavn"
-    }
-  },
   "calendar": {
     "day": "Dag",
     "list": "Liste",
@@ -396,7 +389,6 @@
     "date": "Dato",
     "dates": "Datoer",
     "delete": "Slet",
-    "deleted": "Slettet",
     "description": "Beskrivelse",
     "edit": "Rediger",
     "editor": {
@@ -429,6 +421,7 @@
     "location": "Sted",
     "logo": "Logo",
     "manage": "Administrer",
+    "message": "Besked",
     "name": "Navn",
     "no": "Nej",
     "no_permission": "Ingen tilladelse",
@@ -454,6 +447,7 @@
     "time_just_now": "lige nu",
     "time_minutes_ago": "{count} min siden",
     "tip": "Tip",
+    "title": "Titel",
     "total": "Total",
     "updated_at": "Opdateret den {date}",
     "validate": "Valider",
@@ -512,30 +506,9 @@
       "to_add_comment": "for at tilføje en kommentar",
       "view_comments": "Se kommentarer ({count})"
     },
-    "collaborators": {
-      "add_error": "Kan ikke tilføje medarbejder",
-      "added": "Medarbejder tilføjet",
-      "load_error": "Kan ikke indlæse medarbejdere",
-      "remove_error": "Kan ikke fjerne medarbejder",
-      "removed": "Medarbejder fjernet"
-    },
-    "collaborators_modal": {
-      "allow_modification": "Tillad ændringer",
-      "permissions": "Tilladelser"
-    },
     "collaborators_rights_panel": {
-      "by_user_label": "Af",
-      "delete_confirm": "Fjern denne samarbejdspartner?",
-      "history_title": "Ændringshistorik",
-      "load_history": "Indlæs historik",
-      "no_collaborators": "Ingen samarbejdspartnere",
-      "no_history": "Ingen ændringer registreret",
       "per_edition": "Rettigheder pr. udgave",
       "per_edition_hint": "Ingen specifikke rettigheder defineret for udgaver",
-      "refresh_history": "Opdater",
-      "saved": "Rettigheder opdateret",
-      "target_user_label": "Målrettet",
-      "title": "Samarbejdspartnerrettigheder (beta)",
       "title_placeholder": "Titel eller rolle (valgfrit)"
     },
     "convention_form": {
@@ -674,13 +647,6 @@
     "vegan": "Vegansk",
     "vegetarian": "Vegetarisk"
   },
-  "editForm": {
-    "email": "E-mail",
-    "nom": "Efternavn",
-    "phone": "Telefon",
-    "prenom": "Fornavn",
-    "pseudo": "Brugernavn"
-  },
   "editions": {
     "about_this_edition": "Om denne udgave",
     "add_comment_placeholder": "Tilføj en kommentar...",
@@ -706,7 +672,6 @@
     "item_marked_returned": "Genstand markeret som returneret",
     "items_appear_when_started": "Hittegods vil vises når udgaven er startet.",
     "learn_more_about_convention": "Læs mere om konventionen",
-    "length": "Længde",
     "loading_details": "Indlæser udgavens detaljer...",
     "lost": "🔍 Tabt",
     "lost_found": "Hittegods",
@@ -751,6 +716,8 @@
       "action_reject": "Afvis",
       "additional_info_title": "At tilføje",
       "admin_only_note": "Følgende oplysninger (ansøgninger, filtre og detaljeret statistik) er kun synlige for autoriserede arrangører og samarbejdspartnere.",
+      "all_accepted_volunteers": "Alle accepterede frivillige",
+      "all_confirmed": "Alle har bekræftet!",
       "allergies_hint": "Angiv kun vigtige medicinske allergier",
       "allergies_label": "Allergier",
       "allergies_placeholder": "Fx: peanuts, gluten...",
@@ -775,6 +742,7 @@
       "avoid_list_hint": "Denne information forbliver fortrolig og hjælper arrangørerne med at skabe harmoniske hold",
       "avoid_list_label": "Frivillige jeg helst ikke vil arbejde vagter med (valgfrit)",
       "avoid_list_placeholder": "Navne på andre frivillige at undgå til vagter...",
+      "back_to_volunteers": "Tilbage til frivillige",
       "catering_info": "Forplejningsoplysninger",
       "closed_message": "Ansøgninger for frivillige er ikke åbne i øjeblikket.",
       "columns": "Kolonner",
@@ -783,6 +751,17 @@
       "companion_placeholder": "Navne på andre foretrukne frivillige til vagter...",
       "confirm_accept": "Accepter frivillig",
       "confirm_back_pending": "Er du sikker på, at du vil sætte denne ansøgning tilbage til afventende?",
+      "confirm_notification_desc": "Bekræft at du har læst denne notifikation",
+      "confirm_notification_title": "Læsebekræftelse",
+      "confirm_reading": "Bekræft læsning",
+      "confirmation_error": "Fejl under bekræftelse",
+      "confirmation_success": "Læsning bekræftet!",
+      "confirmation_success_desc": "Tak for at bekræfte læsningen af denne besked.",
+      "confirmations_count": "{count} bekræftelse(r)",
+      "confirmed": "bekræftet",
+      "confirmed_at": "Bekræftet den {date}",
+      "copy_error": "Kan ikke kopiere numrene",
+      "copy_phone_numbers": "Kopier numrene",
       "departure_time_label": "Hvornår planlægger du at forlade?",
       "description_label": "Beskrivelse for frivillige",
       "diet_label": "Kostpræference",
@@ -821,9 +800,29 @@
       "my_application_rejected": "Min ansøgning er blevet afvist.",
       "my_application_title": "Min ansøgning",
       "no_applications": "Ingen ansøgninger",
+      "no_confirmations_yet": "Ingen bekræftelser endnu",
       "no_description": "Ingen specifik beskrivelse for frivillige.",
+      "no_notifications_sent": "Ingen notifikationer sendt",
+      "no_phone": "Ingen telefon",
       "no_volunteers_assigned": "No volunteers assigned",
+      "notification_already_confirmed": "Læsning allerede bekræftet",
+      "notification_confirmations": "Notifikationsbekræftelser",
+      "notification_load_error": "Fejl ved indlæsning af notifikation",
+      "notification_message_help": "Besked der sendes til de valgte frivillige",
+      "notification_message_placeholder": "Indtast din besked her...",
+      "notification_recipients": "Modtagere",
+      "notification_recipients_count": "{count} modtager | {count} modtagere",
+      "notification_send_error": "Fejl ved afsendelse",
+      "notification_sent_by": "Sendt af {sender}",
+      "notification_sent_count": "Sendt til {count} frivillig | Sendt til {count} frivillige",
+      "notification_sent_success": "Notifikation sendt!",
+      "notification_title_info": "Titlen vil automatisk være \"Frivillige - {'udgavenavn'}\"",
+      "notification_title_prefix": "Frivillige",
+      "notifications": "Frivillige notifikationer",
+      "notifications_history": "Notifikationshistorik",
       "open": "Åben",
+      "pending": "Afventer",
+      "pending_with_phone_count": "{count} ubekræftet(e) frivillig(e) med telefon",
       "personal_info_disclaimer": "Disse oplysninger vil blive kommunikeret til organisationens ansvarlige for at administrere frivillige teams.",
       "personal_info_title": "Dine personlige oplysninger",
       "pets_details_hint": "Disse oplysninger vil hjælpe arrangørerne med at modtage dig bedre",
@@ -831,12 +830,15 @@
       "pets_details_placeholder": "Type, race, navn, særlige forholdsregler...",
       "pets_label": "Jeg vil blive ledsaget af et kæledyr",
       "phone": "Telefon",
+      "phone_numbers_copied": "Numre kopieret!",
+      "phone_numbers_copied_desc": "{count} nummer/numre kopieret til udklipsholder",
       "phone_placeholder": "Dit telefonnummer",
       "presence_all": "Alle tilstedeværelser",
       "presence_event": "Begivenhed",
       "presence_setup": "Opsætning",
       "presence_teardown": "Nedtagning",
       "presence_title": "Din tilstedeværelse",
+      "recipients_count": "{count} modtager(e)",
       "removed_from_teams": "Removed from all teams",
       "save_teams": "Save teams",
       "search": "Søg",
@@ -844,6 +846,10 @@
       "select_arrival_placeholder": "Vælg din ankomst",
       "select_date": "Vælg en dato",
       "select_departure_placeholder": "Vælg din afrejse",
+      "select_teams": "Vælg hold",
+      "send_group_sms": "Send gruppe-SMS",
+      "send_notification": "Send notifikation",
+      "sent_by": "Sendt af",
       "setup_availability_label": "Jeg er tilgængelig for opsætning",
       "setup_end_date_label": "Slutdato for nedtagning",
       "setup_start_date_label": "Opstartsdato for opsætning",
@@ -851,6 +857,9 @@
       "skills_hint": "Beskriv dine færdigheder, certificeringer eller uddannelser, der kunne være nyttige under arrangementet (medicinsk, sikkerhed, teknisk, etc.)",
       "skills_label": "Færdigheder og certificeringer (valgfrit)",
       "skills_placeholder": "Førstehjælp (HLR, hjertestarter...), teknisk (elektricitet, lyd, belysning...), sikkerhed (vagt, crowd control...), medicinsk (sygeplejerske, læge...), andre nyttige certificeringer...",
+      "sms_app_opened": "SMS-app åbnet",
+      "sms_app_opened_desc": "Rediger beskeden hvis nødvendigt og send derefter",
+      "specific_teams": "Specifikke hold",
       "status_accepted": "Accepteret",
       "status_all": "Alle",
       "status_pending": "Afventer",
@@ -870,6 +879,7 @@
       "table_time_preferences": "Tidsrammer",
       "table_user": "Ansøger",
       "table_vehicle": "Køretøj",
+      "targeted_teams": "Målrettede hold",
       "team_add": "Tilføj hold",
       "team_name_placeholder": "F.eks.: Modtagelse, Teknik, Bar...",
       "team_preferences_hint": "Marker de hold, du gerne vil være frivillig i (valgfrit)",
@@ -903,10 +913,12 @@
       },
       "title": "Frivillige",
       "total": "I alt",
+      "total_recipients": "Modtagere i alt",
       "vehicle_details_hint": "Disse oplysninger vil hjælpe arrangørerne med logistik",
       "vehicle_details_label": "Detaljer om dit køretøj",
       "vehicle_details_placeholder": "Type køretøj, antal sæder, lastekapacitet...",
       "vehicle_label": "Jeg har et køretøj til rådighed",
+      "view_details": "Se detaljer",
       "view_only_note": "Kun visning tilstand",
       "volunteer_accepted": "Frivillig accepteret",
       "what_you_can_bring_title": "Hvad du kan bringe os",
@@ -936,7 +948,6 @@
     "convention_required": "Konvention påkrævet",
     "convention_update_error": "Der opstod en fejl under opdateringen af konventionen",
     "creation_error": "Fejl under oprettelse",
-    "delete_error": "Sletningsfejl",
     "deletion_error": "Fejl under sletning",
     "departure_address_required": "Afrejseadresse er påkrævet",
     "departure_city_required": "Afrejseby er påkrævet",
@@ -1055,11 +1066,6 @@
       }
     }
   },
-  "fieldErrors": {
-    "description": "Beskrivelsen må ikke overstige 5000 tegn",
-    "externalUrl": "Den externe URL er ikke gyldig",
-    "setupStartDate": "Startdato for opsætning er påkrævet"
-  },
   "footer": {
     "copyright": "© {year} Jonglørkonvention. Alle rettigheder forbeholdes.",
     "feedback": "Giv os feedback",
@@ -1093,10 +1099,6 @@
       "start_typing_address": "Begynd at skrive en adresse..."
     }
   },
-  "h": {
-    "actor": "Aktør",
-    "targetUser": "Målbruger"
-  },
   "homepage": {
     "agenda": "Dagsorden",
     "current_editions": "Aktuelle udgaver",
@@ -1110,14 +1112,6 @@
     "reset_filters": "Nulstil",
     "searched_services": "Søgte tjenester",
     "upcoming_editions": "Kommende udgaver"
-  },
-  "locationLabels": {
-    "addressDescription": "Præcist afsætningspunkt for passagerer",
-    "addressLabel": "Præcis afgangsadresse",
-    "addressPlaceholder": "Fuld adresse",
-    "cityHint": "Indtast mindst 3 tegn for at se forslag",
-    "cityLabel": "By",
-    "cityPlaceholder": "F.eks.: København, Aarhus, Odense"
   },
   "log": {
     "add_admin_notes": "Tilføj noter om denne fejl...",
@@ -1193,10 +1187,6 @@
     },
     "this_week": "Denne uge",
     "unread": "Ulæste"
-  },
-  "notificationsStore": {
-    "loading": "Indlæser des notifications...",
-    "realTimeEnabled": "Realtid aktiveret"
   },
   "pages": {
     "access_denied": {
@@ -1331,14 +1321,6 @@
     "editAllEditions": "Rediger alle udgaver",
     "editConvention": "Rediger konvention",
     "editor": "Redaktør",
-    "history": {
-      "ARCHIVED": "Arkiveret",
-      "CREATED": "Samarbejdspartner tilføjet",
-      "PER_EDITIONS_UPDATED": "Rettigheder pr. udgave opdateret",
-      "REMOVED": "Samarbejdspartner fjernet",
-      "RIGHTS_UPDATED": "Rettigheder opdateret",
-      "UNARCHIVED": "Genaktiveret"
-    },
     "manageCollaborators": "Administrer samarbejdspartnere",
     "manageVolunteers": "Administrer frivillige",
     "manager": "Manager",
@@ -1463,20 +1445,6 @@
       "title": "Installer app"
     }
   },
-  "selectedCollaboratorForEdit": {
-    "title": "Titel/Funktion",
-    "user": "Bruger"
-  },
-  "selectedConventionForEdit": {
-    "name": "Konventionsnavn"
-  },
-  "selectedLog": {
-    "adminNotes": "Administratornotater",
-    "ip": "IP-adresse",
-    "message": "Fejlmeddelelse",
-    "stack": "Stack trace",
-    "user": "Bruger"
-  },
   "services": {
     "accessibility": "Handicaptilgængelighed",
     "aerial_space": "Luftakrobatik område",
@@ -1510,15 +1478,10 @@
     "workshops": "Workshops"
   },
   "team": {
-    "description": "Holdbeskrivelse",
-    "name": "Holdnavn",
     "slots": "Antal pladser"
   },
   "upload": {
-    "click_select_convention_logo": "Klik for at vælge convention logo",
-    "convention_logo_alt": "Convention logo",
     "delete_message": "Billede slettet",
-    "demo_title": "Billede upload demo",
     "error": "Fejl under upload",
     "error_message": "Upload fejl",
     "errors": {
@@ -1527,12 +1490,7 @@
       "invalid_file_type": "Ugyldig filtype. Accepterede formater: {allowedTypes}"
     },
     "formats_accepted": "Accepterede formater",
-    "image_configured": "Billede konfigureret",
-    "loading_error_title": "Fejl ved indlæsning af billede",
-    "logo_preview_alt": "Logo forhåndsvisning",
-    "logo_url_label": "Logo URL",
     "logo_url_optional_placeholder": "URL til convention logo (valgfrit)",
-    "logo_url_placeholder": "https://eksempel.com/logo.jpg",
     "max_size": "Maksimal størrelse",
     "select_file": "Vælg fil",
     "success_message": "Billede uploadet med succes!",
@@ -1550,13 +1508,12 @@
     "description_max_5000": "Beskrivelsen må ikke overskride 5000 tegn",
     "first_name_required": "Fornavn er påkrævet",
     "last_name_required": "Efternavn er påkrævet",
+    "message_required": "Besked er påkrævet",
+    "message_too_long": "Besked må ikke overstige {max} tegn",
     "motivation_too_long": "Motivation må ikke overstige {max} tegn",
     "name_max_100": "Navnet må ikke overskride 100 tegn",
     "name_max_200": "Navnet må ikke overskride 200 tegn",
     "name_min_3": "Navnet skal indeholde mindst 3 tegn",
     "phone_required": "Telefonnummer er påkrævet"
-  },
-  "volunteersInfo": {
-    "externalUrl": "Ekstern URL"
   }
 }

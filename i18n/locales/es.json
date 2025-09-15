@@ -290,13 +290,6 @@
     "verify_email_title": "Verifica tu email",
     "verifying": "Verificando..."
   },
-  "c": {
-    "rights": "Derechos",
-    "title": "Título",
-    "user": {
-      "pseudo": "Nombre de usuario"
-    }
-  },
   "calendar": {
     "day": "Día",
     "list": "Lista",
@@ -396,7 +389,6 @@
     "date": "Fecha",
     "dates": "Fechas",
     "delete": "Eliminar",
-    "deleted": "Eliminado",
     "description": "Descripción",
     "edit": "Editar",
     "editor": {
@@ -429,6 +421,7 @@
     "location": "Ubicación",
     "logo": "Logo",
     "manage": "Gestionar",
+    "message": "Mensaje",
     "name": "Nombre",
     "no": "No",
     "no_permission": "Sin permisos",
@@ -454,6 +447,7 @@
     "time_just_now": "ahora mismo",
     "time_minutes_ago": "hace {count} min",
     "tip": "Consejo",
+    "title": "Título",
     "total": "Total",
     "updated_at": "Actualizado el {date}",
     "validate": "Validar",
@@ -512,30 +506,9 @@
       "to_add_comment": "para agregar un comentario",
       "view_comments": "Ver comentarios ({count})"
     },
-    "collaborators": {
-      "add_error": "No se puede añadir el colaborador",
-      "added": "Colaborador añadido",
-      "load_error": "No se pueden cargar los colaboradores",
-      "remove_error": "No se puede eliminar el colaborador",
-      "removed": "Colaborador eliminado"
-    },
-    "collaborators_modal": {
-      "allow_modification": "Permitir modificación",
-      "permissions": "Permisos"
-    },
     "collaborators_rights_panel": {
-      "by_user_label": "Por",
-      "delete_confirm": "¿Eliminar este colaborador?",
-      "history_title": "Historial de cambios",
-      "load_history": "Cargar historial",
-      "no_collaborators": "Sin colaboradores",
-      "no_history": "Sin cambios registrados",
       "per_edition": "Derechos por edición",
       "per_edition_hint": "No se han definido derechos específicos para las ediciones",
-      "refresh_history": "Actualizar",
-      "saved": "Derechos actualizados",
-      "target_user_label": "Dirigido a",
-      "title": "Derechos de colaboradores (beta)",
       "title_placeholder": "Título o rol (opcional)"
     },
     "convention_form": {
@@ -674,13 +647,6 @@
     "vegan": "Vegano",
     "vegetarian": "Vegetariano"
   },
-  "editForm": {
-    "email": "Correo electrónico",
-    "nom": "Apellido",
-    "phone": "Teléfono",
-    "prenom": "Nombre",
-    "pseudo": "Nombre de usuario"
-  },
   "editions": {
     "about_this_edition": "Acerca de esta edición",
     "add_comment_placeholder": "Agregar un comentario...",
@@ -706,7 +672,6 @@
     "item_marked_returned": "Objeto marcado como devuelto",
     "items_appear_when_started": "Los objetos perdidos aparecerán una vez que la edición haya comenzado.",
     "learn_more_about_convention": "Más información sobre la convención",
-    "length": "Longitud",
     "loading_details": "Cargando detalles de la edición...",
     "lost": "🔍 Perdido",
     "lost_found": "Objetos perdidos",
@@ -751,6 +716,8 @@
       "action_reject": "Rechazar",
       "additional_info_title": "A agregar",
       "admin_only_note": "La siguiente información (solicitudes, filtros y estadísticas detalladas) solo es visible para organizadores y colaboradores autorizados.",
+      "all_accepted_volunteers": "Todos los voluntarios aceptados",
+      "all_confirmed": "¡Todos confirmados!",
       "allergies_hint": "Indica solo alergias médicas significativas",
       "allergies_label": "Alergias",
       "allergies_placeholder": "Ej: cacahuetes, gluten...",
@@ -775,6 +742,7 @@
       "avoid_list_hint": "Esta información permanece confidencial y ayuda a los organizadores a crear equipos armoniosos",
       "avoid_list_label": "Voluntarios con los que prefiero no trabajar turnos (opcional)",
       "avoid_list_placeholder": "Nombres de otros voluntarios a evitar para turnos...",
+      "back_to_volunteers": "Volver a voluntarios",
       "catering_info": "Información de catering",
       "closed_message": "Las solicitudes de voluntarios no están abiertas actualmente.",
       "columns": "Columnas",
@@ -783,6 +751,17 @@
       "companion_placeholder": "Nombres de otros voluntarios preferidos para turnos...",
       "confirm_accept": "Aceptar voluntario",
       "confirm_back_pending": "¿Está seguro de que desea volver a poner esta solicitud en espera?",
+      "confirm_notification_desc": "Confirma que has leído esta notificación",
+      "confirm_notification_title": "Confirmación de lectura",
+      "confirm_reading": "Confirmar lectura",
+      "confirmation_error": "Error de confirmación",
+      "confirmation_success": "¡Lectura confirmada!",
+      "confirmation_success_desc": "Gracias por confirmar la lectura de este mensaje.",
+      "confirmations_count": "{count} confirmación(es)",
+      "confirmed": "confirmado",
+      "confirmed_at": "Confirmado el {date}",
+      "copy_error": "No se pueden copiar los números",
+      "copy_phone_numbers": "Copiar números",
       "departure_time_label": "¿Cuándo planea marcharse?",
       "description_label": "Descripción para voluntarios",
       "diet_label": "Preferencia alimentaria",
@@ -821,9 +800,29 @@
       "my_application_rejected": "Mi solicitud ha sido rechazada.",
       "my_application_title": "Mi solicitud",
       "no_applications": "Sin solicitudes",
+      "no_confirmations_yet": "Aún no hay confirmaciones",
       "no_description": "Sin descripción específica para voluntarios.",
+      "no_notifications_sent": "Ninguna notificación enviada",
+      "no_phone": "Sin teléfono",
       "no_volunteers_assigned": "No volunteers assigned",
+      "notification_already_confirmed": "Lectura ya confirmada",
+      "notification_confirmations": "Confirmaciones de notificación",
+      "notification_load_error": "Error al cargar la notificación",
+      "notification_message_help": "Mensaje que se enviará a los voluntarios seleccionados",
+      "notification_message_placeholder": "Escribe tu mensaje aquí...",
+      "notification_recipients": "Destinatarios",
+      "notification_recipients_count": "{count} destinatario | {count} destinatarios",
+      "notification_send_error": "Error de envío",
+      "notification_sent_by": "Enviado por {sender}",
+      "notification_sent_count": "Enviado a {count} voluntario | Enviado a {count} voluntarios",
+      "notification_sent_success": "¡Notificación enviada!",
+      "notification_title_info": "El título será automáticamente \"Voluntarios - {'nombre de la edición'}\"",
+      "notification_title_prefix": "Voluntarios",
+      "notifications": "Notificaciones a voluntarios",
+      "notifications_history": "Historial de notificaciones",
       "open": "Abrir",
+      "pending": "Pendiente",
+      "pending_with_phone_count": "{count} voluntario(s) sin confirmar con teléfono",
       "personal_info_disclaimer": "Esta información será comunicada a los responsables de la organización para gestionar los equipos de voluntarios.",
       "personal_info_title": "Su información personal",
       "pets_details_hint": "Esta información ayudará a los organizadores a recibirle mejor",
@@ -831,12 +830,15 @@
       "pets_details_placeholder": "Tipo, raza, nombre, precauciones especiales...",
       "pets_label": "Iré acompañado/a de una mascota",
       "phone": "Teléfono",
+      "phone_numbers_copied": "¡Números copiados!",
+      "phone_numbers_copied_desc": "{count} número(s) copiado(s) al portapapeles",
       "phone_placeholder": "Su número de teléfono",
       "presence_all": "Todas las presencias",
       "presence_event": "Evento",
       "presence_setup": "Montaje",
       "presence_teardown": "Desmontaje",
       "presence_title": "Su presencia",
+      "recipients_count": "{count} destinatario(s)",
       "removed_from_teams": "Removed from all teams",
       "save_teams": "Save teams",
       "search": "Buscar",
@@ -844,6 +846,10 @@
       "select_arrival_placeholder": "Seleccione su llegada",
       "select_date": "Seleccionar una fecha",
       "select_departure_placeholder": "Seleccione su salida",
+      "select_teams": "Seleccionar equipos",
+      "send_group_sms": "Enviar SMS grupal",
+      "send_notification": "Enviar notificación",
+      "sent_by": "Enviado por",
       "setup_availability_label": "Estoy disponible para el montaje",
       "setup_end_date_label": "Fecha de fin del desmontaje",
       "setup_start_date_label": "Fecha de inicio del montaje",
@@ -851,6 +857,9 @@
       "skills_hint": "Describa sus habilidades, certificaciones o formación que podrían ser útiles durante el evento (médico, seguridad, técnico, etc.)",
       "skills_label": "Habilidades y certificaciones (opcional)",
       "skills_placeholder": "Primeros auxilios (RCP, DEA...), técnico (electricidad, sonido, iluminación...), seguridad (guardia de seguridad, control de multitudes...), médico (enfermero, doctor...), otras certificaciones útiles...",
+      "sms_app_opened": "App de SMS abierta",
+      "sms_app_opened_desc": "Edita el mensaje si es necesario y luego envía",
+      "specific_teams": "Equipos específicos",
       "status_accepted": "Aceptado",
       "status_all": "Todos",
       "status_pending": "Pendiente",
@@ -870,6 +879,7 @@
       "table_time_preferences": "Franjas horarias",
       "table_user": "Solicitante",
       "table_vehicle": "Vehículo",
+      "targeted_teams": "Equipos objetivo",
       "team_add": "Añadir equipo",
       "team_name_placeholder": "Ej: Recepción, Técnica, Bar...",
       "team_preferences_hint": "Marque los equipos en los que le gustaría ser voluntario (opcional)",
@@ -903,10 +913,12 @@
       },
       "title": "Voluntarios",
       "total": "Total de voluntarios",
+      "total_recipients": "Total destinatarios",
       "vehicle_details_hint": "Esta información ayudará a los organizadores con la logística",
       "vehicle_details_label": "Detalles sobre su vehículo",
       "vehicle_details_placeholder": "Tipo de vehículo, número de asientos, capacidad de carga...",
       "vehicle_label": "Tengo un vehículo disponible",
+      "view_details": "Ver detalles",
       "view_only_note": "Solo modo consulta",
       "volunteer_accepted": "Voluntario aceptado",
       "what_you_can_bring_title": "Lo que puede aportarnos",
@@ -936,7 +948,6 @@
     "convention_required": "La convención es requerida",
     "convention_update_error": "Ha ocurrido un error al actualizar la convención",
     "creation_error": "Error durante la creación",
-    "delete_error": "Error al eliminar",
     "deletion_error": "Error durante la eliminación",
     "departure_address_required": "La dirección de salida es requerida",
     "departure_city_required": "La ciudad de salida es requerida",
@@ -1055,11 +1066,6 @@
       }
     }
   },
-  "fieldErrors": {
-    "description": "La descripción no puede exceder 5000 caracteres",
-    "externalUrl": "La URL externa no es válida",
-    "setupStartDate": "La fecha de inicio del montaje es obligatoria"
-  },
   "footer": {
     "copyright": "© {year} Convención de Malabares. Todos los derechos reservados.",
     "feedback": "Danos tu opinión",
@@ -1093,10 +1099,6 @@
       "start_typing_address": "Comienza a escribir una dirección..."
     }
   },
-  "h": {
-    "actor": "Actor",
-    "targetUser": "Usuario objetivo"
-  },
   "homepage": {
     "agenda": "Agenda",
     "current_editions": "Ediciones actuales",
@@ -1110,14 +1112,6 @@
     "reset_filters": "Reiniciar",
     "searched_services": "Servicios buscados",
     "upcoming_editions": "Próximas ediciones"
-  },
-  "locationLabels": {
-    "addressDescription": "Punto exacto de descenso para los pasajeros",
-    "addressLabel": "Dirección precisa de salida",
-    "addressPlaceholder": "Dirección completa",
-    "cityHint": "Escriba al menos 3 caracteres para ver sugerencias",
-    "cityLabel": "Ciudad",
-    "cityPlaceholder": "Ej: Madrid, Barcelona, Valencia"
   },
   "log": {
     "add_admin_notes": "Añadir notas sobre este error...",
@@ -1193,10 +1187,6 @@
     },
     "this_week": "Esta semana",
     "unread": "No leídas"
-  },
-  "notificationsStore": {
-    "loading": "Cargando des notifications...",
-    "realTimeEnabled": "Tiempo real activado"
   },
   "pages": {
     "access_denied": {
@@ -1331,14 +1321,6 @@
     "editAllEditions": "Editar todas las ediciones",
     "editConvention": "Editar convención",
     "editor": "Editor",
-    "history": {
-      "ARCHIVED": "Archivado",
-      "CREATED": "Colaborador añadido",
-      "PER_EDITIONS_UPDATED": "Derechos por edición actualizados",
-      "REMOVED": "Colaborador eliminado",
-      "RIGHTS_UPDATED": "Derechos actualizados",
-      "UNARCHIVED": "Desarchivado"
-    },
     "manageCollaborators": "Gestionar colaboradores",
     "manageVolunteers": "Gestionar voluntarios",
     "manager": "Gerente",
@@ -1463,20 +1445,6 @@
       "title": "Instalar aplicación"
     }
   },
-  "selectedCollaboratorForEdit": {
-    "title": "Título/Rol",
-    "user": "Usuario"
-  },
-  "selectedConventionForEdit": {
-    "name": "Nombre de la convención"
-  },
-  "selectedLog": {
-    "adminNotes": "Notas de administrador",
-    "ip": "Dirección IP",
-    "message": "Mensaje de error",
-    "stack": "Traza de pila",
-    "user": "Usuario"
-  },
   "services": {
     "accessibility": "Accesibilidad para discapacitados",
     "aerial_space": "Espacio aéreo",
@@ -1510,15 +1478,10 @@
     "workshops": "Talleres"
   },
   "team": {
-    "description": "Descripción del equipo",
-    "name": "Nombre del equipo",
     "slots": "Número de plazas"
   },
   "upload": {
-    "click_select_convention_logo": "Haz clic para seleccionar un logo de convención",
-    "convention_logo_alt": "Logo de la convención",
     "delete_message": "Imagen eliminada",
-    "demo_title": "Demo de subida de imagen",
     "error": "Error durante la carga",
     "error_message": "Error de subida",
     "errors": {
@@ -1527,12 +1490,7 @@
       "invalid_file_type": "Tipo de archivo inválido"
     },
     "formats_accepted": "Formatos aceptados",
-    "image_configured": "Imagen configurada",
-    "loading_error_title": "Error al cargar la imagen",
-    "logo_preview_alt": "Vista previa del logo",
-    "logo_url_label": "URL del logo",
     "logo_url_optional_placeholder": "URL del logo de la convención (opcional)",
-    "logo_url_placeholder": "https://ejemplo.com/logo.jpg",
     "max_size": "Tamaño máximo",
     "select_file": "Seleccionar archivo",
     "success_message": "¡Imagen subida con éxito!",
@@ -1550,13 +1508,12 @@
     "description_max_5000": "La descripción no puede exceder los 5000 caracteres",
     "first_name_required": "El nombre es requerido",
     "last_name_required": "El apellido es requerido",
+    "message_required": "El mensaje es obligatorio",
+    "message_too_long": "El mensaje no puede exceder {max} caracteres",
     "motivation_too_long": "La motivación no puede exceder {max} caracteres",
     "name_max_100": "El nombre no puede exceder los 100 caracteres",
     "name_max_200": "El nombre no puede exceder los 200 caracteres",
     "name_min_3": "El nombre debe contener al menos 3 caracteres",
     "phone_required": "El número de teléfono es requerido"
-  },
-  "volunteersInfo": {
-    "externalUrl": "URL externa"
   }
 }
