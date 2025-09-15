@@ -1,28 +1,32 @@
 <template>
   <div class="flex flex-col flex-1 w-full">
     <div
-      class="flex justify-between px-4 py-3.5 border border-accented border-b-0 bg-elevated rounded-t-lg"
+      class="flex justify-between items-center gap-3 px-4 py-3.5 border border-accented border-b-0 bg-elevated rounded-t-lg"
     >
-      <div class="flex gap-2">
+      <div class="flex gap-2 overflow-x-auto">
         <UButton
-          size="lg"
+          size="md"
           variant="soft"
           color="neutral"
           icon="i-heroicons-arrow-path"
           :loading="applicationsLoading"
+          class="whitespace-nowrap sm:!text-sm sm:!px-3 sm:!py-2"
           @click="refreshApplications"
         >
-          {{ t('common.refresh') }}
+          <span class="hidden sm:inline">{{ t('common.refresh') }}</span>
         </UButton>
 
         <!-- Filtres -->
         <UModal>
           <UButton
-            :label="t('common.filters')"
             color="neutral"
             variant="subtle"
             icon="i-heroicons-funnel"
-          />
+            size="md"
+            class="whitespace-nowrap sm:!text-sm sm:!px-3 sm:!py-2"
+          >
+            <span class="hidden sm:inline">{{ t('common.filters') }}</span>
+          </UButton>
 
           <template #header>
             <div class="flex items-center justify-between">
@@ -121,26 +125,29 @@
         <UButton
           icon="i-heroicons-view-columns"
           color="neutral"
-          size="lg"
+          size="md"
           variant="soft"
-          :label="t('editions.volunteers.columns')"
           trailing-icon="i-heroicons-chevron-down"
-        />
+          class="whitespace-nowrap sm:!text-sm sm:!px-3 sm:!py-2"
+        >
+          <span class="hidden sm:inline">{{ t('editions.volunteers.columns') }}</span>
+        </UButton>
       </UDropdownMenu>
     </div>
     <div
-      class="flex justify-between items-center border border-accented border-b-0 px-4 py-2 bg-elevated"
+      class="flex justify-between items-center gap-2 border border-accented border-b-0 px-4 py-2 bg-elevated"
     >
       <span class="text-xs text-gray-500 italic">{{ $t('common.sort_tip') }}</span>
       <UButton
-        size="lg"
+        size="md"
         color="neutral"
         variant="soft"
         icon="i-heroicons-arrow-down-tray"
         :loading="exportingApplications"
+        class="whitespace-nowrap sm:!text-sm sm:!px-3 sm:!py-2"
         @click="exportApplications"
       >
-        {{ t('editions.volunteers.export') }}
+        <span class="hidden sm:inline">{{ t('editions.volunteers.export') }}</span>
       </UButton>
     </div>
     <UTable
