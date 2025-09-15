@@ -20,7 +20,12 @@ export default defineEventHandler(async (event) => {
     },
     include: {
       edition: {
-        select: { name: true },
+        select: {
+          name: true,
+          convention: {
+            select: { name: true },
+          },
+        },
       },
       sender: {
         select: { pseudo: true },
@@ -53,8 +58,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: 'Accès non autorisé' })
   }
 
-  const isConfirmed = notificationGroup.confirmations.length > 0
-  const confirmedAt = isConfirmed ? notificationGroup.confirmations[0].confirmedAt : null
+  const confirmation =
+    notificationGroup.confirmations.length > 0 ? notificationGroup.confirmations[0] : null
+  const isConfirmed = confirmation && confirmation.confirmedAt !== null
+  const confirmedAt = isConfirmed ? confirmation.confirmedAt : null
+
+  const displayName = notificationGroup.edition.name || notificationGroup.edition.convention.name
 
   return {
     notification: {
@@ -63,7 +72,7 @@ export default defineEventHandler(async (event) => {
       message: notificationGroup.message,
       sentAt: notificationGroup.sentAt,
       senderName: notificationGroup.sender.pseudo,
-      editionName: notificationGroup.edition.name,
+      editionName: displayName,
     },
     isConfirmed,
     confirmedAt,

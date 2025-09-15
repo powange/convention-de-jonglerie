@@ -45,7 +45,12 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  if (existingConfirmation) {
+  if (!existingConfirmation) {
+    throw createError({ statusCode: 404, statusMessage: 'Aucune notification à confirmer' })
+  }
+
+  // Si déjà confirmé (confirmedAt n'est pas null)
+  if (existingConfirmation.confirmedAt) {
     return {
       success: true,
       alreadyConfirmed: true,
@@ -53,11 +58,13 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Créer la confirmation
-  const confirmation = await prisma.volunteerNotificationConfirmation.create({
+  // Mettre à jour la confirmation avec la date actuelle
+  const confirmation = await prisma.volunteerNotificationConfirmation.update({
+    where: {
+      id: existingConfirmation.id,
+    },
     data: {
-      volunteerNotificationGroupId: groupId,
-      userId: event.context.user.id,
+      confirmedAt: new Date(),
     },
   })
 

@@ -23,6 +23,8 @@ export default defineEventHandler(async (event) => {
         allergies: true,
         timePreferences: true,
         teamPreferences: true,
+        assignedTeams: true,
+        acceptanceNote: true,
         setupAvailability: true,
         teardownAvailability: true,
         eventAvailability: true,

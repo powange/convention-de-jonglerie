@@ -92,10 +92,30 @@
               <UBadge
                 :color="getStatusColor(application.status)"
                 :variant="getStatusVariant(application.status)"
-                size="sm"
               >
                 {{ $t(`pages.volunteers.status.${application.status.toLowerCase()}`) }}
               </UBadge>
+
+              <!-- Équipes assignées dans le header -->
+              <div
+                v-if="
+                  application.status === 'ACCEPTED' &&
+                  application.assignedTeams &&
+                  Array.isArray(application.assignedTeams) &&
+                  application.assignedTeams.length > 0
+                "
+                class="flex flex-wrap gap-1 justify-end"
+              >
+                <UBadge
+                  v-for="team in application.assignedTeams as string[]"
+                  :key="team"
+                  color="info"
+                  variant="solid"
+                >
+                  {{ team }}
+                </UBadge>
+              </div>
+
               <span class="text-sm text-gray-500">
                 {{ $t('pages.volunteers.applied_on') }} {{ formatDate(application.createdAt) }}
               </span>
@@ -144,23 +164,19 @@
             <h4 class="font-medium text-gray-900 dark:text-white mb-2">
               {{ $t('pages.volunteers.dates') }}
             </h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div v-if="application.arrivalDateTime">
-                <span class="text-gray-600 dark:text-gray-400"
-                  >{{ $t('pages.volunteers.arrival') }}:</span
-                >
-                <span class="ml-2">{{
-                  formatDateTimeWithGranularity(application.arrivalDateTime)
-                }}</span>
-              </div>
-              <div v-if="application.departureDateTime">
-                <span class="text-gray-600 dark:text-gray-400"
-                  >{{ $t('pages.volunteers.departure') }}:</span
-                >
-                <span class="ml-2">{{
-                  formatDateTimeWithGranularity(application.departureDateTime)
-                }}</span>
-              </div>
+            <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+              <span v-if="application.arrivalDateTime">
+                {{ formatDateTimeWithGranularity(application.arrivalDateTime) }}
+              </span>
+              <UIcon
+                v-if="application.arrivalDateTime && application.departureDateTime"
+                name="i-heroicons-arrow-right"
+                class="text-gray-400"
+                size="16"
+              />
+              <span v-if="application.departureDateTime">
+                {{ formatDateTimeWithGranularity(application.departureDateTime) }}
+              </span>
             </div>
           </div>
 
@@ -362,6 +378,20 @@
                 <span class="ml-2">{{ application.experienceDetails }}</span>
               </div>
             </div>
+          </div>
+
+          <!-- Note d'acceptation -->
+          <div
+            v-if="application.status === 'ACCEPTED' && application.acceptanceNote"
+            class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800"
+          >
+            <h4 class="font-medium text-green-800 dark:text-green-200 mb-2 flex items-center gap-2">
+              <UIcon name="i-heroicons-check-circle" class="text-green-600 dark:text-green-400" />
+              {{ $t('editions.volunteers.acceptance_note_title') }}
+            </h4>
+            <p class="text-sm text-green-700 dark:text-green-300">
+              {{ application.acceptanceNote }}
+            </p>
           </div>
         </div>
 

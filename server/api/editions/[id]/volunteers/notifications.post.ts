@@ -30,10 +30,15 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { targetType, selectedTeams, message } = notificationSchema.parse(body)
 
-  // Récupérer l'édition
+  // Récupérer l'édition avec les informations de la convention
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },
-    select: { name: true },
+    select: {
+      name: true,
+      convention: {
+        select: { name: true },
+      },
+    },
   })
 
   if (!edition) {
@@ -74,7 +79,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Aucun bénévole trouvé avec ces critères' })
   }
 
-  const title = `Bénévoles - ${edition.name}`
+  // Utiliser le nom de l'édition si disponible, sinon le nom de la convention
+  const displayName = edition.name || edition.convention.name
+  const title = `Bénévoles - ${displayName}`
 
   // Enregistrer les métadonnées du groupe de notifications pour le suivi
   const notificationGroup = await prisma.volunteerNotificationGroup.create({
@@ -92,6 +99,15 @@ export default defineEventHandler(async (event) => {
 
   // URL de confirmation de lecture avec l'ID généré automatiquement
   const confirmationUrl = `/editions/${editionId}/volunteers/notification/${notificationGroup.id}/confirm`
+
+  // Créer les enregistrements de confirmation pour chaque bénévole (avec confirmedAt = null)
+  await prisma.volunteerNotificationConfirmation.createMany({
+    data: volunteers.map((volunteer) => ({
+      volunteerNotificationGroupId: notificationGroup.id,
+      userId: volunteer.user.id,
+      confirmedAt: null,
+    })),
+  })
 
   // Créer les notifications pour chaque bénévole
   const _notifications = await Promise.all(

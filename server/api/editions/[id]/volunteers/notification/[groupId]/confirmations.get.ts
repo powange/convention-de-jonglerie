@@ -1,4 +1,5 @@
 import { canManageEditionVolunteers } from '../../../../../../utils/collaborator-management'
+import { getEmailHash } from '../../../../../../utils/email-hash'
 import { prisma } from '../../../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
@@ -42,6 +43,8 @@ export default defineEventHandler(async (event) => {
               prenom: true,
               nom: true,
               phone: true,
+              profilePicture: true,
+              updatedAt: true,
             },
           },
         },
@@ -66,10 +69,11 @@ export default defineEventHandler(async (event) => {
   if (
     notificationGroup.targetType === 'teams' &&
     notificationGroup.selectedTeams &&
+    Array.isArray(notificationGroup.selectedTeams) &&
     notificationGroup.selectedTeams.length > 0
   ) {
     // Pour les champs JSON avec arrays, utiliser OR avec array_contains pour chaque équipe
-    whereClause.OR = notificationGroup.selectedTeams.map((team) => ({
+    whereClause.OR = (notificationGroup.selectedTeams as string[]).map((team: string) => ({
       assignedTeams: {
         array_contains: team,
       },
@@ -87,13 +91,17 @@ export default defineEventHandler(async (event) => {
           prenom: true,
           nom: true,
           phone: true,
+          profilePicture: true,
+          updatedAt: true,
         },
       },
     },
   })
 
-  // Créer un set des IDs qui ont confirmé
-  const confirmedUserIds = new Set(notificationGroup.confirmations.map((c) => c.user.id))
+  // Créer un set des IDs qui ont vraiment confirmé (confirmedAt non null)
+  const confirmedUserIds = new Set(
+    notificationGroup.confirmations.filter((c) => c.confirmedAt !== null).map((c) => c.user.id)
+  )
 
   // Séparer les bénévoles confirmés et non confirmés
   const confirmedVolunteers = allRecipients.filter((volunteer) =>
@@ -104,9 +112,12 @@ export default defineEventHandler(async (event) => {
   )
 
   // Calculer les statistiques
+  const actualConfirmationsCount = notificationGroup.confirmations.filter(
+    (c) => c.confirmedAt !== null
+  ).length
   const confirmationRate =
     notificationGroup.recipientCount > 0
-      ? (notificationGroup.confirmations.length / notificationGroup.recipientCount) * 100
+      ? (actualConfirmationsCount / notificationGroup.recipientCount) * 100
       : 0
 
   return {
@@ -133,6 +144,9 @@ export default defineEventHandler(async (event) => {
           nom: volunteer.user.nom,
           email: volunteer.user.email,
           phone: volunteer.user.phone,
+          profilePicture: volunteer.user.profilePicture,
+          emailHash: getEmailHash(volunteer.user.email),
+          updatedAt: volunteer.user.updatedAt,
         },
         confirmedAt: confirmation?.confirmedAt,
       }
@@ -145,11 +159,14 @@ export default defineEventHandler(async (event) => {
         nom: volunteer.user.nom,
         email: volunteer.user.email,
         phone: volunteer.user.phone,
+        profilePicture: volunteer.user.profilePicture,
+        emailHash: getEmailHash(volunteer.user.email),
+        updatedAt: volunteer.user.updatedAt,
       },
     })),
     stats: {
       totalRecipients: allRecipients.length,
-      confirmationsCount: confirmedVolunteers.length,
+      confirmationsCount: actualConfirmationsCount,
       confirmationRate: Math.round(confirmationRate * 100) / 100, // 2 décimales
       pendingCount: pendingVolunteers.length,
     },

@@ -47,7 +47,7 @@
                 {{ t('editions.volunteers.notification_already_confirmed') }}
               </span>
             </div>
-            <p class="text-xs text-green-600 dark:text-green-500 mt-1">
+            <p v-if="confirmationDate" class="text-xs text-green-600 dark:text-green-500 mt-1">
               {{ t('editions.volunteers.confirmed_at', { date: formatDate(confirmationDate) }) }}
             </p>
           </div>
@@ -89,10 +89,10 @@
           <div class="flex justify-between items-center text-xs text-gray-500">
             <span>{{ notification.editionName }}</span>
             <NuxtLink
-              :to="`/editions/${$route.params.id}/volunteers`"
+              to="/my-volunteer-applications"
               class="text-primary-600 hover:text-primary-700"
             >
-              {{ t('editions.volunteers.back_to_volunteers') }}
+              {{ t('editions.volunteers.back_to_my_applications') }}
             </NuxtLink>
           </div>
         </template>
@@ -134,7 +134,7 @@ const loadNotification = async () => {
 
     notification.value = response.notification
     confirmationStatus.value = response.isConfirmed ? 'confirmed' : 'pending'
-    if (response.isConfirmed) {
+    if (response.isConfirmed && response.confirmedAt) {
       confirmationDate.value = response.confirmedAt
     }
   } catch (err: any) {
@@ -151,7 +151,7 @@ const confirmReading = async () => {
   confirming.value = true
 
   try {
-    const _response = await $fetch(
+    const response = await $fetch(
       `/api/editions/${editionId}/volunteers/notification/${groupId}/confirm`,
       {
         method: 'POST',
@@ -159,7 +159,9 @@ const confirmReading = async () => {
     )
 
     confirmationStatus.value = 'confirmed'
-    confirmationDate.value = new Date().toISOString()
+    if (response.confirmedAt) {
+      confirmationDate.value = response.confirmedAt
+    }
 
     toast.add({
       title: t('editions.volunteers.confirmation_success'),
@@ -179,6 +181,7 @@ const confirmReading = async () => {
 
 // Formatage de date
 const formatDate = (dateString: string) => {
+  if (!dateString) return ''
   return new Date(dateString).toLocaleDateString('fr-FR', {
     day: 'numeric',
     month: 'long',

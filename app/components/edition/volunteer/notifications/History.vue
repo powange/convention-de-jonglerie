@@ -119,7 +119,7 @@
               color="primary"
               variant="soft"
               icon="i-heroicons-eye"
-              @click="openConfirmationsModal(notification.id)"
+              @click="openConfirmationsModal(notification)"
             >
               {{ t('editions.volunteers.view_details') }}
             </UButton>
@@ -131,7 +131,7 @@
     <!-- Modal des détails de confirmations -->
     <EditionVolunteerNotificationsConfirmationsModal
       v-model="showConfirmationsModal"
-      :notification-id="selectedNotificationId"
+      :notification-data="selectedNotificationData"
       :edition-id="editionId"
     />
   </div>
@@ -142,17 +142,42 @@ interface Props {
   editionId: number
 }
 
+interface Volunteer {
+  user: {
+    id: number
+    pseudo: string
+    prenom?: string
+    nom?: string
+    email: string
+    phone?: string
+    profilePicture?: string | null
+    emailHash?: string
+    updatedAt?: string
+  }
+  confirmedAt?: string
+}
+
 interface Notification {
   id: string
   title: string
   message: string
-  targetType: 'all' | 'teams'
-  selectedTeams?: string[]
+  targetType: string // Peut être 'all' | 'teams' mais vient de l'API comme string
+  selectedTeams?: any // JsonValue from Prisma
   recipientCount: number
-  sentAt: string
+  sentAt: string | Date
   senderName: string
   confirmationsCount: number
   confirmationRate: number
+  volunteers: {
+    confirmed: Volunteer[]
+    pending: Volunteer[]
+  }
+  stats: {
+    totalRecipients: number
+    confirmationsCount: number
+    confirmationRate: number
+    pendingCount: number
+  }
 }
 
 const props = defineProps<Props>()
@@ -162,11 +187,11 @@ const { t } = useI18n()
 const notifications = ref<Notification[]>([])
 const loading = ref(true)
 const showConfirmationsModal = ref(false)
-const selectedNotificationId = ref<string | null>(null)
+const selectedNotificationData = ref<Notification | null>(null)
 
 // Fonctions utilitaires
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
+const formatDate = (dateInput: string | Date) => {
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput
   return date.toLocaleDateString('fr-FR', {
     day: 'numeric',
     month: 'short',
@@ -181,8 +206,8 @@ const getConfirmationRateColor = (rate: number) => {
   return 'error'
 }
 
-const openConfirmationsModal = (notificationId: string) => {
-  selectedNotificationId.value = notificationId
+const openConfirmationsModal = (notification: Notification) => {
+  selectedNotificationData.value = notification
   showConfirmationsModal.value = true
 }
 

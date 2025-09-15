@@ -628,7 +628,7 @@ model VolunteerNotificationConfirmation {
   id                           String                     @id @default(cuid())
   volunteerNotificationGroupId String
   userId                       Int
-  confirmedAt                  DateTime                   @default(now())
+  confirmedAt                  DateTime?
 
   notificationGroup            VolunteerNotificationGroup @relation(fields: [volunteerNotificationGroupId], references: [id], onDelete: Cascade)
   user                         User                       @relation(fields: [userId], references: [id])

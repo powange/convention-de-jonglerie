@@ -717,6 +717,7 @@
       "confirm_accept": "Accepter le bénévole",
       "volunteer_accepted": "Bénévole accepté",
       "assigned_to_teams": "Assigné à {count} équipe | Assigné à {count} équipes",
+      "acceptance_note_title": "Note d'acceptation",
       "edit_teams_title": "Modifier les équipes assignées",
       "save_teams": "Enregistrer les équipes",
       "teams_updated": "Équipes mises à jour",
@@ -884,7 +885,7 @@
       "confirmations_count": "{count} confirmation(s)",
       "confirmed": "confirmé",
       "notification_title_prefix": "Bénévoles",
-      "notification_title_info": "Le titre sera automatiquement \"Bénévoles - {'nom de l`édition'}\"",
+      "notification_title_info": "Le titre sera automatiquement \"Bénévoles - {'nom de l`édition ou de la convention'}\"",
       "notification_recipients": "Destinataires",
       "all_accepted_volunteers": "Tous les bénévoles acceptés",
       "specific_teams": "Équipes spécifiques",
@@ -899,7 +900,7 @@
       "confirm_notification_desc": "Confirmez que vous avez lu cette notification",
       "notification_sent_by": "Envoyé par {sender}",
       "notification_already_confirmed": "Lecture déjà confirmée",
-      "confirmed_at": "Confirmé le",
+      "confirmed_at": "Confirmé le {date}",
       "confirm_reading": "Confirmer la lecture",
       "confirmation_success": "Lecture confirmée !",
       "confirmation_success_desc": "Merci d'avoir confirmé la lecture de ce message.",
@@ -907,6 +908,7 @@
       "notification_load_error": "Erreur lors du chargement de la notification",
       "notification_confirmations": "Confirmations de notification",
       "view_details": "Voir détails",
+      "back_to_my_applications": "Mes candidatures bénévoles",
       "sent_by": "Envoyé par",
       "total_recipients": "Total destinataires",
       "pending": "En attente",
@@ -920,8 +922,7 @@
       "sms_app_opened_desc": "Modifiez le message si nécessaire puis envoyez",
       "phone_numbers_copied": "Numéros copiés !",
       "phone_numbers_copied_desc": "{count} numéro(s) copié(s) dans le presse-papier",
-      "copy_error": "Impossible de copier les numéros",
-      "back_to_volunteers": "Retour aux bénévoles"
+      "copy_error": "Impossible de copier les numéros"
     },
     "external_mode_options": "Options du mode externe",
     "internal_mode_options": "Options du mode interne"
@@ -1226,8 +1227,6 @@
       "event": "Événement",
       "teardown": "Démontage",
       "dates": "Dates",
-      "arrival": "Arrivée",
-      "departure": "Départ",
       "dietary_preferences": "Préférences alimentaires",
       "diet": "Régime",
       "dietary": {

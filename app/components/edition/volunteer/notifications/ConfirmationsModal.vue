@@ -69,21 +69,24 @@
                   :key="volunteer.user.id"
                   class="flex items-start justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800"
                 >
-                  <div class="flex-1 min-w-0">
-                    <div class="font-medium text-green-800 dark:text-green-200 mb-1">
-                      {{ volunteer.user.pseudo }}
-                      <span
-                        v-if="volunteer.user.prenom || volunteer.user.nom"
-                        class="font-normal text-green-600 dark:text-green-400"
-                      >
-                        ({{
-                          [volunteer.user.prenom, volunteer.user.nom].filter(Boolean).join(' ')
-                        }})
-                      </span>
-                    </div>
-                    <div class="text-sm text-green-600 dark:text-green-400">
-                      {{ t('editions.volunteers.confirmed_at') }}:
-                      {{ formatDate(volunteer.confirmedAt) }}
+                  <div class="flex items-start gap-3 flex-1 min-w-0">
+                    <UserAvatar :user="volunteer.user" size="sm" />
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-green-800 dark:text-green-200 mb-1">
+                        {{ volunteer.user.pseudo }}
+                        <span
+                          v-if="volunteer.user.prenom || volunteer.user.nom"
+                          class="font-normal text-green-600 dark:text-green-400"
+                        >
+                          ({{
+                            [volunteer.user.prenom, volunteer.user.nom].filter(Boolean).join(' ')
+                          }})
+                        </span>
+                      </div>
+                      <div class="text-sm text-green-600 dark:text-green-400">
+                        {{ t('editions.volunteers.confirmed_at') }}:
+                        {{ volunteer.confirmedAt ? formatDate(volunteer.confirmedAt) : '' }}
+                      </div>
                     </div>
                   </div>
                   <div
@@ -146,23 +149,26 @@
                     :key="volunteer.user.id"
                     class="flex items-start justify-between p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800"
                   >
-                    <div class="flex-1 min-w-0">
-                      <div class="font-medium text-orange-800 dark:text-orange-200 mb-1">
-                        {{ volunteer.user.pseudo }}
-                        <span
-                          v-if="volunteer.user.prenom || volunteer.user.nom"
-                          class="font-normal text-orange-600 dark:text-orange-400"
-                        >
-                          ({{
-                            [volunteer.user.prenom, volunteer.user.nom].filter(Boolean).join(' ')
-                          }})
-                        </span>
+                    <div class="flex items-start gap-3 flex-1 min-w-0">
+                      <UserAvatar :user="volunteer.user" size="sm" />
+                      <div class="flex-1 min-w-0">
+                        <div class="font-medium text-orange-800 dark:text-orange-200 mb-1">
+                          {{ volunteer.user.pseudo }}
+                          <span
+                            v-if="volunteer.user.prenom || volunteer.user.nom"
+                            class="font-normal text-orange-600 dark:text-orange-400"
+                          >
+                            ({{
+                              [volunteer.user.prenom, volunteer.user.nom].filter(Boolean).join(' ')
+                            }})
+                          </span>
+                        </div>
+                        <div class="text-sm text-orange-600 dark:text-orange-400">
+                          {{ volunteer.user.email }}
+                        </div>
                       </div>
                     </div>
                     <div class="text-right text-sm ml-4 flex-shrink-0">
-                      <div class="text-orange-600 dark:text-orange-400 mb-1">
-                        {{ volunteer.user.email }}
-                      </div>
                       <div
                         v-if="volunteer.user.phone"
                         class="font-medium text-orange-800 dark:text-orange-200"
@@ -193,9 +199,59 @@
 </template>
 
 <script setup lang="ts">
+import UserAvatar from '~/components/ui/UserAvatar.vue'
+
+interface NotificationData {
+  id: string
+  title: string
+  message: string
+  targetType: string
+  selectedTeams?: any
+  recipientCount: number
+  sentAt: string | Date
+  senderName: string
+  confirmationsCount: number
+  confirmationRate: number
+  volunteers: {
+    confirmed: Array<{
+      user: {
+        id: number
+        pseudo: string
+        prenom?: string
+        nom?: string
+        email: string
+        phone?: string
+        profilePicture?: string | null
+        emailHash?: string
+        updatedAt?: string
+      }
+      confirmedAt?: string
+    }>
+    pending: Array<{
+      user: {
+        id: number
+        pseudo: string
+        prenom?: string
+        nom?: string
+        email: string
+        phone?: string
+        profilePicture?: string | null
+        emailHash?: string
+        updatedAt?: string
+      }
+    }>
+  }
+  stats: {
+    totalRecipients: number
+    confirmationsCount: number
+    confirmationRate: number
+    pendingCount: number
+  }
+}
+
 interface Props {
   modelValue: boolean
-  notificationId: string | null
+  notificationData: NotificationData | null
   editionId: number
 }
 
@@ -216,9 +272,29 @@ const isOpen = computed({
 })
 
 // État du composant
-const loading = ref(false)
-const data = ref<any>(null)
 const selectedTab = ref(0)
+
+// Utiliser directement les données passées en props
+const data = computed(() => {
+  if (!props.notificationData) return null
+
+  return {
+    notification: {
+      id: props.notificationData.id,
+      title: props.notificationData.title,
+      message: props.notificationData.message,
+      targetType: props.notificationData.targetType,
+      selectedTeams: props.notificationData.selectedTeams,
+      recipientCount: props.notificationData.recipientCount,
+      sentAt: props.notificationData.sentAt,
+      senderName: props.notificationData.senderName,
+      editionName: '', // TODO: Peut être ajouté si nécessaire
+    },
+    confirmed: props.notificationData.volunteers.confirmed,
+    pending: props.notificationData.volunteers.pending,
+    stats: props.notificationData.stats,
+  }
+})
 
 // Détection mobile
 const isMobile = computed(() => {
@@ -314,29 +390,12 @@ const copyPhoneNumbers = async () => {
   }
 }
 
-// Charger les données quand la modal s'ouvre
-const loadConfirmations = async () => {
-  if (!props.notificationId) return
-
-  try {
-    loading.value = true
-    data.value = await $fetch(
-      `/api/editions/${props.editionId}/volunteers/notification/${props.notificationId}/confirmations`
-    )
-  } catch (error) {
-    console.error('Erreur lors du chargement des confirmations:', error)
-  } finally {
-    loading.value = false
-  }
-}
-
-// Watcher pour charger les données quand la modal s'ouvre
+// Réinitialiser l'onglet quand la modal s'ouvre
 watch(
   () => props.modelValue,
   (newValue) => {
-    if (newValue && props.notificationId) {
+    if (newValue) {
       selectedTab.value = 0 // Premier onglet (confirmés)
-      loadConfirmations()
     }
   }
 )
