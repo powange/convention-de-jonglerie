@@ -775,14 +775,14 @@ const teamItems = computed(() => {
 
 // Items de créneaux horaires pour UCheckboxGroup
 const timeSlotItems = computed(() => [
-  { label: t('editions.volunteers.time_slots.early_morning'), value: 'early_morning' },
-  { label: t('editions.volunteers.time_slots.morning'), value: 'morning' },
-  { label: t('editions.volunteers.time_slots.lunch'), value: 'lunch' },
-  { label: t('editions.volunteers.time_slots.early_afternoon'), value: 'early_afternoon' },
-  { label: t('editions.volunteers.time_slots.late_afternoon'), value: 'late_afternoon' },
-  { label: t('editions.volunteers.time_slots.evening'), value: 'evening' },
-  { label: t('editions.volunteers.time_slots.late_evening'), value: 'late_evening' },
-  { label: t('editions.volunteers.time_slots.night'), value: 'night' },
+  { label: t('editions.volunteers.time_slots_options.early_morning'), value: 'early_morning' },
+  { label: t('editions.volunteers.time_slots_options.morning'), value: 'morning' },
+  { label: t('editions.volunteers.time_slots_options.lunch'), value: 'lunch' },
+  { label: t('editions.volunteers.time_slots_options.early_afternoon'), value: 'early_afternoon' },
+  { label: t('editions.volunteers.time_slots_options.late_afternoon'), value: 'late_afternoon' },
+  { label: t('editions.volunteers.time_slots_options.evening'), value: 'evening' },
+  { label: t('editions.volunteers.time_slots_options.late_evening'), value: 'late_evening' },
+  { label: t('editions.volunteers.time_slots_options.night'), value: 'night' },
 ])
 
 const dietPreferenceItems = computed<{ value: 'NONE' | 'VEGETARIAN' | 'VEGAN'; label: string }[]>(

@@ -1214,7 +1214,7 @@ const columns: TableColumn<any>[] = [
               allSlots.map((slot) => {
                 // Si aucun créneau préféré n'est renseigné, considérer tous les créneaux comme cochés
                 const isSelected = preferences.length === 0 || preferences.includes(slot)
-                const label = t(`editions.volunteers.time_slots.${slot}`)
+                const label = t(`editions.volunteers.time_slots_options.${slot}`)
 
                 return h(
                   resolveComponent('UTooltip'),

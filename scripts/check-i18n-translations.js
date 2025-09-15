@@ -54,6 +54,47 @@ function flattenObject(obj, prefix = '') {
   return result
 }
 
+/**
+ * Fonction récursive pour parcourir un objet JSON et trouver les clés avec [TODO]
+ * Réutilise la logique de scripts/translation/list-todo-keys.js
+ */
+function findTodoKeys(obj, prefix = '') {
+  const todoKeys = {}
+
+  for (const [key, value] of Object.entries(obj)) {
+    const currentPath = prefix ? `${prefix}.${key}` : key
+
+    if (typeof value === 'string' && value.startsWith('[TODO]')) {
+      todoKeys[currentPath] = value
+    } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      const nestedTodos = findTodoKeys(value, currentPath)
+      Object.assign(todoKeys, nestedTodos)
+    }
+  }
+
+  return todoKeys
+}
+
+/**
+ * Compte les clés TODO dans toutes les langues
+ */
+function countTodoKeys(locales) {
+  const todoStats = {}
+  let totalTodoKeys = 0
+
+  for (const [locale, data] of Object.entries(locales)) {
+    const todoKeys = findTodoKeys(data)
+    const todoCount = Object.keys(todoKeys).length
+    todoStats[locale] = {
+      count: todoCount,
+      keys: todoKeys,
+    }
+    totalTodoKeys += todoCount
+  }
+
+  return { todoStats, totalTodoKeys }
+}
+
 function compareTranslations(locales, referenceLocale = 'fr') {
   if (!locales[referenceLocale]) {
     console.error(
@@ -204,6 +245,9 @@ async function main() {
   // Comparer les traductions
   const results = compareTranslations(locales, referenceLocale)
 
+  // Compter les clés TODO
+  const { todoStats, totalTodoKeys } = countTodoKeys(locales)
+
   let hasErrors = false
   let totalMissing = 0
   let totalExtra = 0
@@ -348,7 +392,9 @@ async function main() {
 
       // Statistiques
       const coverage = ((data.totalKeys / data.referenceTotal) * 100).toFixed(1)
+      const todoCount = todoStats[locale]?.count || 0
       console.log(`Couverture: ${data.totalKeys}/${data.referenceTotal} clés (${coverage}%)`)
+      console.log(`Clés [TODO]: ${todoCount}`)
 
       // Clés manquantes
       if (data.missingKeys.length > 0) {
@@ -380,14 +426,17 @@ async function main() {
   for (const [locale, data] of Object.entries(languagesToShow)) {
     const coverage = ((data.totalKeys / data.referenceTotal) * 100).toFixed(1)
     const status = data.missingKeys.length === 0 ? GREEN + '✓' : RED + '✗'
+    const todoCount = todoStats[locale]?.count || 0
+    const todoText = todoCount > 0 ? `, ${todoCount} TODO` : ''
     console.log(
-      `${locale}: ${data.totalKeys} clés (${coverage}%) ${status}${RESET} ${data.missingKeys.length > 0 ? `${data.missingKeys.length} manquantes` : ''}`
+      `${locale}: ${data.totalKeys} clés (${coverage}%) ${status}${RESET} ${data.missingKeys.length > 0 ? `${data.missingKeys.length} manquantes` : ''}${todoText}`
     )
   }
 
   if (!targetLang && !summaryOnly) {
     console.log(`\nTotal clés manquantes: ${totalMissing}`)
     console.log(`Total clés en trop: ${totalExtra}`)
+    console.log(`Total clés [TODO]: ${totalTodoKeys}`)
   }
 
   // Code de sortie

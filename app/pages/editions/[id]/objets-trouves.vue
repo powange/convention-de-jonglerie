@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- En-tête avec navigation -->
-    <EditionEditionHeader
+    <EditionHeader
       v-if="edition"
       :edition="edition"
       current-page="objets-trouves"

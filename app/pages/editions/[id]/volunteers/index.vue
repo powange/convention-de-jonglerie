@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
   <div v-if="edition">
-    <EditionEditionHeader
+    <EditionHeader
       :edition="edition"
       current-page="volunteers"
       :is-favorited="isFavorited(edition.id)"

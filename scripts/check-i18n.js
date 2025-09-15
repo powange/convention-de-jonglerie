@@ -145,7 +145,7 @@ function preprocessVueContent(content) {
       if (value.includes('$t(') || value.includes('t(')) {
         return match
       }
-      // Supprimer les autres (conditions comme volunteer.user.phone)
+      // Supprimer les autres (conditions comme volunteer.user.phone, formState.maxVolunteers, etc.)
       return directive + quote + quote
     }
   )
@@ -237,6 +237,8 @@ function extractI18nKeysFromFile(filePath) {
     // - Exclure les propriétés d'objets JavaScript communes
     const jsObjectPatterns = [
       'form',
+      'formState',
+      'teamFormState',
       'pagination',
       'user',
       'resolveModal',

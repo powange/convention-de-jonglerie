@@ -50,6 +50,8 @@ model User {
   pushSubscriptions        PushSubscription[]
   volunteerNotificationGroups VolunteerNotificationGroup[]
   volunteerNotificationConfirmations VolunteerNotificationConfirmation[]
+  volunteerAssignments         VolunteerAssignment[]        @relation("VolunteerAssignment_user")
+  assignedVolunteerSlots       VolunteerAssignment[]        @relation("VolunteerAssignment_assignedBy")
 }
 
 model Edition {
@@ -131,6 +133,8 @@ model Edition {
   favoritedBy                  User[]                          @relation("FavoriteEditions")
   attendingUsers               User[]                          @relation("AttendingEditions")
   volunteerNotificationGroups  VolunteerNotificationGroup[]
+  volunteerTeams               VolunteerTeam[]
+  volunteerTimeSlots           VolunteerTimeSlot[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -635,5 +639,61 @@ model VolunteerNotificationConfirmation {
 
   @@unique([volunteerNotificationGroupId, userId])
   @@index([userId])
+}
+
+// ========== PLANNING BÉNÉVOLES ==========
+
+model VolunteerTeam {
+  id           String              @id @default(cuid())
+  editionId    Int
+  name         String
+  description  String?             @db.Text
+  color        String              @default("#6b7280") @db.VarChar(7)
+  maxVolunteers Int?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  edition      Edition             @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  timeSlots    VolunteerTimeSlot[]
+
+  @@index([editionId])
+}
+
+model VolunteerTimeSlot {
+  id                 String                @id @default(cuid())
+  editionId          Int
+  teamId             String?
+  title              String
+  description        String?               @db.Text
+  startDateTime      DateTime
+  endDateTime        DateTime
+  maxVolunteers      Int                   @default(1)
+  assignedVolunteers Int                   @default(0)
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  edition            Edition               @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  team               VolunteerTeam?        @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  assignments        VolunteerAssignment[]
+
+  @@index([editionId])
+  @@index([teamId])
+}
+
+model VolunteerAssignment {
+  id           String            @id @default(cuid())
+  timeSlotId   String
+  userId       Int
+  assignedAt   DateTime          @default(now())
+  assignedById Int
+
+  timeSlot     VolunteerTimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
+  user         User              @relation("VolunteerAssignment_user", fields: [userId], references: [id], onDelete: Cascade)
+  assignedBy   User              @relation("VolunteerAssignment_assignedBy", fields: [assignedById], references: [id], onDelete: Cascade)
+
+  @@unique([timeSlotId, userId])
+  @@index([timeSlotId])
+  @@index([userId])
+  @@index([assignedById])
 }
 

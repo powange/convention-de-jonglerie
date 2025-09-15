@@ -29,7 +29,7 @@
       </UAlert>
 
       <!-- En-tête avec navigation -->
-      <EditionEditionHeader
+      <EditionHeader
         :edition="edition"
         current-page="details"
         :is-favorited="isFavorited(edition.id)"

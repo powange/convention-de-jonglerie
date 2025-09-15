@@ -2,7 +2,6 @@ import { createHash } from 'node:crypto'
 
 import { hasEditionEditPermission } from '../../../../utils/permissions'
 import { prisma } from '../../../../utils/prisma'
-// Import dynamique pour compat tests/mocks (#imports)
 
 export default defineEventHandler(async (event) => {
   try {

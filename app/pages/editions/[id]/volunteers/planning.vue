@@ -1,6 +1,6 @@
 <template>
   <div v-if="edition">
-    <EditionEditionHeader
+    <EditionHeader
       :edition="edition"
       current-page="volunteers"
       :is-favorited="isFavorited(edition.id)"
@@ -29,47 +29,84 @@
       </template>
 
       <div class="space-y-6">
-        <!-- Barre d'outils -->
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <div class="flex items-center gap-2">
-            <UButton size="sm" color="primary" icon="i-heroicons-plus" @click="openCreateSlotModal">
-              {{ t('editions.volunteers.create_time_slot') }}
-            </UButton>
-            <UButton
-              size="sm"
-              color="neutral"
-              variant="soft"
-              icon="i-heroicons-arrow-path"
-              :loading="refreshing"
-              @click="refreshData"
-            >
-              {{ t('common.refresh') }}
-            </UButton>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-500">
-              {{ t('editions.volunteers.planning_tip') }}
-            </span>
-          </div>
-        </div>
-
-        <!-- Calendrier de planning -->
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+        <!-- Onglets -->
+        <UTabs
+          v-model="activeTab"
+          :items="[
+            { key: 'planning', label: t('editions.volunteers.planning'), slot: 'planning' },
+            { key: 'teams', label: t('editions.volunteers.teams'), slot: 'teams' },
+          ]"
         >
-          <div v-if="!ready" class="flex items-center justify-center py-8">
-            <UIcon name="i-heroicons-arrow-path" class="animate-spin text-gray-400" size="20" />
-            <span class="ml-2 text-base text-gray-500">{{ t('common.loading') }}</span>
-          </div>
-          <FullCalendar
-            v-else
-            ref="calendarRef"
-            :options="calendarOptions"
-            class="volunteer-planning-calendar"
-          />
-        </div>
+          <template #planning>
+            <!-- Contenu de l'onglet planning -->
+            <div class="space-y-6">
+              <!-- Barre d'outils -->
+              <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                  <UButton
+                    size="sm"
+                    color="primary"
+                    icon="i-heroicons-plus"
+                    @click="openCreateSlotModal"
+                  >
+                    {{ t('editions.volunteers.create_time_slot') }}
+                  </UButton>
+                  <UButton
+                    size="sm"
+                    color="neutral"
+                    variant="soft"
+                    icon="i-heroicons-arrow-path"
+                    :loading="refreshing"
+                    @click="refreshData"
+                  >
+                    {{ t('common.refresh') }}
+                  </UButton>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-gray-500">
+                    {{ t('editions.volunteers.planning_tip') }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Calendrier de planning -->
+              <div
+                class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+              >
+                <div v-if="!ready" class="flex items-center justify-center py-8">
+                  <UIcon
+                    name="i-heroicons-arrow-path"
+                    class="animate-spin text-gray-400"
+                    size="20"
+                  />
+                  <span class="ml-2 text-base text-gray-500">{{ t('common.loading') }}</span>
+                </div>
+                <FullCalendar
+                  v-else-if="calendarOptions"
+                  ref="calendarRef"
+                  :options="calendarOptions"
+                  class="volunteer-planning-calendar"
+                />
+              </div>
+            </div>
+          </template>
+
+          <template #teams>
+            <!-- Contenu de l'onglet équipes -->
+            <TeamManagement :edition-id="editionId" />
+          </template>
+        </UTabs>
       </div>
     </UCard>
+
+    <!-- Modal de création/édition de créneau -->
+    <SlotModal
+      v-model="slotModalOpen"
+      :teams="teams"
+      :initial-slot="slotModalData"
+      @save="handleSlotSave"
+      @delete="handleSlotDelete"
+    />
   </div>
   <div v-else>
     <p>{{ t('editions.loading_details') }}</p>
@@ -83,7 +120,9 @@ import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 // App components & stores
-import type { VolunteerTimeSlot, VolunteerTeam } from '~/composables/useVolunteerSchedule'
+import SlotModal from '~/components/edition/volunteer/planning/SlotModal.vue'
+import TeamManagement from '~/components/edition/volunteer/planning/TeamManagement.vue'
+import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '~/composables/useVolunteerSchedule'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
@@ -91,6 +130,7 @@ const { t } = useI18n()
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
+const toast = useToast()
 const editionId = parseInt(route.params.id as string)
 
 // Charger l'édition
@@ -99,75 +139,236 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 
 // État du composant
 const refreshing = ref(false)
+const activeTab = ref('planning')
 
-// Données mock pour l'instant (à remplacer par des vraies APIs)
-const teams = ref<VolunteerTeam[]>([
-  { id: 'team-1', name: 'Accueil', color: '#3b82f6' },
-  { id: 'team-2', name: 'Technique', color: '#ef4444' },
-  { id: 'team-3', name: 'Bar', color: '#10b981' },
-  { id: 'team-4', name: 'Sécurité', color: '#f59e0b' },
-])
+// État de la modal
+const slotModalOpen = ref(false)
+const slotModalData = ref<any>(null)
 
-const timeSlots = ref<VolunteerTimeSlot[]>([
-  {
-    id: 'slot-1',
-    title: 'Accueil des visiteurs',
-    start: edition.value?.startDate + 'T09:00:00',
-    end: edition.value?.startDate + 'T12:00:00',
-    teamId: 'team-1',
-    maxVolunteers: 3,
-    assignedVolunteers: 1,
-    color: '#3b82f6',
-    description: 'Accueil et orientation des visiteurs',
-  },
-  {
-    id: 'slot-2',
-    title: 'Garde de nuit',
-    start: edition.value?.startDate + 'T22:00:00',
-    end: edition.value
-      ? new Date(new Date(edition.value.startDate).getTime() + 24 * 60 * 60 * 1000)
-          .toISOString()
-          .split('T')[0] + 'T08:00:00'
-      : '',
-    teamId: 'team-4',
-    maxVolunteers: 2,
-    assignedVolunteers: 0,
-    color: '#f59e0b',
-    description: 'Surveillance nocturne des équipements',
-  },
-])
+// Utilisation des vraies APIs
+const { teams } = useVolunteerTeams(editionId)
+const { timeSlots, createTimeSlot, updateTimeSlot, deleteTimeSlot } =
+  useVolunteerTimeSlots(editionId)
+
+// Conversion des données API pour compatibilité avec FullCalendar
+const convertedTimeSlots = computed(() => {
+  return timeSlots.value.map(
+    (slot): VolunteerTimeSlot => ({
+      id: slot.id,
+      title: slot.title,
+      start: slot.start,
+      end: slot.end,
+      teamId: slot.teamId,
+      maxVolunteers: slot.maxVolunteers,
+      assignedVolunteers: slot.assignedVolunteers,
+      color: slot.color,
+      description: slot.description,
+    })
+  )
+})
+
+const convertedTeams = computed(() => {
+  return teams.value.map(
+    (team): VolunteerTeamCalendar => ({
+      id: team.id,
+      name: team.name,
+      color: team.color,
+    })
+  )
+})
 
 // Configuration du calendrier de planning
 const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
   editionStartDate: edition.value?.startDate || '',
   editionEndDate: edition.value?.endDate || '',
-  teams,
-  timeSlots,
+  teams: convertedTeams,
+  timeSlots: convertedTimeSlots,
   onTimeSlotCreate: (start, end, resourceId) => {
-    console.log('Créer créneau:', { start, end, resourceId })
-    // TODO: Ouvrir modal de création
+    // Ouvrir la modal avec les dates pré-remplies
+    openSlotModal({
+      start,
+      end,
+      teamId: resourceId === 'unassigned' ? '' : resourceId,
+    })
   },
-  onTimeSlotUpdate: (timeSlot) => {
-    console.log('Mettre à jour créneau:', timeSlot)
-    // TODO: API de mise à jour
+  onTimeSlotClick: (timeSlot: VolunteerTimeSlot) => {
+    // Ouvrir la modal en mode édition lors d'un clic
+    const existingSlot = timeSlots.value.find((s) => s.id === timeSlot.id)
+    if (existingSlot) {
+      // Convertir les dates au format attendu par datetime-local
+      const formatDateTimeLocal = (dateStr: string) => {
+        if (!dateStr) return ''
+        return dateStr.replace(/:\d{2}Z?$/, '').substring(0, 16)
+      }
+
+      slotModalData.value = {
+        id: existingSlot.id,
+        title: existingSlot.title,
+        description: existingSlot.description || '',
+        teamId: existingSlot.teamId || '',
+        startDateTime: formatDateTimeLocal(existingSlot.start),
+        endDateTime: formatDateTimeLocal(existingSlot.end),
+        maxVolunteers: existingSlot.maxVolunteers,
+      }
+      slotModalOpen.value = true
+    }
   },
-  onTimeSlotDelete: (timeSlotId) => {
-    console.log('Supprimer créneau:', timeSlotId)
-    // TODO: API de suppression
+  onTimeSlotUpdate: async (timeSlot) => {
+    // Mise à jour directe lors du drag & drop ou resize
+    try {
+      await updateTimeSlot(timeSlot.id, {
+        title: timeSlot.title,
+        description: timeSlot.description,
+        teamId: timeSlot.teamId || undefined,
+        startDateTime: timeSlot.start,
+        endDateTime: timeSlot.end,
+        maxVolunteers: timeSlot.maxVolunteers,
+      })
+      toast.add({
+        title: t('editions.volunteers.slot_updated'),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+    } catch (error) {
+      toast.add({
+        title: t('errors.error_occurred'),
+        description: error.message || 'Erreur lors de la mise à jour',
+        icon: 'i-heroicons-x-circle',
+        color: 'error',
+      })
+    }
+  },
+  onTimeSlotDelete: async (timeSlotId) => {
+    if (confirm(t('editions.volunteers.confirm_delete_slot'))) {
+      try {
+        await deleteTimeSlot(timeSlotId)
+        toast.add({
+          title: t('editions.volunteers.slot_deleted'),
+          icon: 'i-heroicons-check-circle',
+          color: 'success',
+        })
+      } catch (error) {
+        toast.add({
+          title: t('errors.error_occurred'),
+          description: error.message || 'Erreur lors de la suppression',
+          icon: 'i-heroicons-x-circle',
+          color: 'error',
+        })
+      }
+    }
   },
 })
 
-// Actions
+// Actions de la modal
+const openSlotModal = (initialData?: { start?: string; end?: string; teamId?: string }) => {
+  // Convertir les dates au format attendu par datetime-local
+  const formatDateTimeLocal = (dateStr: string) => {
+    if (!dateStr) return ''
+    // Enlever les secondes et la timezone si présentes
+    return dateStr.replace(/:\d{2}Z?$/, '').substring(0, 16)
+  }
+
+  // Définir les données initiales
+  slotModalData.value = {
+    title: '',
+    description: '',
+    teamId: initialData?.teamId || '',
+    startDateTime: formatDateTimeLocal(initialData?.start || ''),
+    endDateTime: formatDateTimeLocal(initialData?.end || ''),
+    maxVolunteers: 3,
+  }
+  slotModalOpen.value = true
+}
+
 const openCreateSlotModal = () => {
-  console.log('Ouvrir modal de création de créneau')
-  // TODO: Implémenter modal
+  // Utiliser les dates de l'édition par défaut
+  const defaultStart = edition.value?.startDate ? `${edition.value.startDate}T09:00` : ''
+  const defaultEnd = edition.value?.startDate ? `${edition.value.startDate}T10:00` : ''
+  openSlotModal({
+    start: defaultStart,
+    end: defaultEnd,
+  })
+}
+
+// Handlers pour la modal
+const handleSlotSave = async (slotData: any) => {
+  try {
+    if (slotData.id) {
+      // Mise à jour d'un créneau existant
+      await updateTimeSlot(slotData.id, {
+        title: slotData.title,
+        description: slotData.description,
+        teamId: slotData.teamId || undefined,
+        startDateTime: slotData.start,
+        endDateTime: slotData.end,
+        maxVolunteers: slotData.maxVolunteers,
+      })
+      toast.add({
+        title: t('editions.volunteers.slot_updated'),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+    } else {
+      // Création d'un nouveau créneau
+      await createTimeSlot({
+        title: slotData.title,
+        description: slotData.description,
+        teamId: slotData.teamId || undefined,
+        startDateTime: slotData.start,
+        endDateTime: slotData.end,
+        maxVolunteers: slotData.maxVolunteers,
+      })
+      toast.add({
+        title: t('editions.volunteers.slot_created'),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+    }
+  } catch (error) {
+    toast.add({
+      title: t('errors.error_occurred'),
+      description: error.message || 'Erreur lors de la sauvegarde',
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  }
+  slotModalData.value = null
+}
+
+const handleSlotDelete = async (slotId: string) => {
+  try {
+    await deleteTimeSlot(slotId)
+    toast.add({
+      title: t('editions.volunteers.slot_deleted'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (error) {
+    toast.add({
+      title: t('errors.error_occurred'),
+      description: error.message || 'Erreur lors de la suppression',
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  }
+  slotModalData.value = null
 }
 
 const refreshData = async () => {
   refreshing.value = true
   try {
-    // TODO: Recharger les données depuis l'API
-    await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulation
+    // Recharger les données depuis l'API
+    const { fetchTeams } = useVolunteerTeams(editionId)
+    const { fetchTimeSlots } = useVolunteerTimeSlots(editionId)
+
+    await Promise.all([fetchTeams(), fetchTimeSlots()])
+  } catch {
+    toast.add({
+      title: t('errors.error_occurred'),
+      description: 'Erreur lors du rechargement des données',
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
   } finally {
     refreshing.value = false
   }

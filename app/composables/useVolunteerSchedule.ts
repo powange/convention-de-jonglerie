@@ -3,8 +3,16 @@ import interactionPlugin from '@fullcalendar/interaction'
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline'
 import timelinePlugin from '@fullcalendar/timeline'
 
+// Import supprimé car non utilisé directement dans ce fichier
 import type { CalendarOptions, EventInput, ResourceInput } from '@fullcalendar/core'
 import type { ComputedRef, Ref } from 'vue'
+
+// Type simplifié pour FullCalendar (compatible avec VolunteerTeam)
+export interface VolunteerTeamCalendar {
+  id: string
+  name: string
+  color: string
+}
 
 export interface VolunteerTimeSlot {
   id: string
@@ -18,19 +26,16 @@ export interface VolunteerTimeSlot {
   description?: string
 }
 
-export interface VolunteerTeam {
-  id: string
-  name: string
-  color?: string
-}
+// VolunteerTeam est importé depuis useVolunteerTeams.ts
 
 export interface UseVolunteerScheduleOptions {
   editionStartDate: string
   editionEndDate: string
-  teams: Ref<VolunteerTeam[]> | ComputedRef<VolunteerTeam[]>
+  teams: Ref<VolunteerTeamCalendar[]> | ComputedRef<VolunteerTeamCalendar[]>
   timeSlots: Ref<VolunteerTimeSlot[]> | ComputedRef<VolunteerTimeSlot[]>
   onTimeSlotCreate?: (start: string, end: string, resourceId?: string) => void
   onTimeSlotUpdate?: (timeSlot: VolunteerTimeSlot) => void
+  onTimeSlotClick?: (timeSlot: VolunteerTimeSlot) => void
   onTimeSlotDelete?: (timeSlotId: string) => void
 }
 
@@ -44,6 +49,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     timeSlots,
     onTimeSlotCreate,
     onTimeSlotUpdate,
+    onTimeSlotClick,
     onTimeSlotDelete: _onTimeSlotDelete,
   } = options
 
@@ -141,13 +147,32 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         onTimeSlotCreate(selectInfo.startStr, selectInfo.endStr, selectInfo.resource?.id)
       }
       // Désélectionner après la création
-      calendarRef.value?.getApi()?.unselect()
+      nextTick(() => {
+        if (calendarRef.value && calendarRef.value.getApi) {
+          calendarRef.value.getApi().unselect()
+        }
+      })
     },
 
     // Gestion des événements
     eventClick: (info) => {
-      // TODO: Ouvrir modal d'édition du créneau
-      console.log('Événement cliqué:', info.event)
+      // Appeler le callback pour le clic si fourni, sinon utiliser onTimeSlotUpdate
+      const callback = onTimeSlotClick || onTimeSlotUpdate
+      if (callback) {
+        const event = info.event
+        const slot: VolunteerTimeSlot = {
+          id: event.id,
+          title: event.title.split(' (')[0], // Enlever le compteur
+          start: event.startStr,
+          end: event.endStr,
+          teamId: event.extendedProps.teamId,
+          maxVolunteers: event.extendedProps.maxVolunteers,
+          assignedVolunteers: event.extendedProps.assignedVolunteers,
+          color: event.backgroundColor || event.color,
+          description: event.extendedProps.description,
+        }
+        callback(slot)
+      }
     },
 
     // Drag & drop des événements

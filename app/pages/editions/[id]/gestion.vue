@@ -17,7 +17,7 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionEditionHeader
+      <EditionHeader
         :edition="edition"
         current-page="gestion"
         :is-favorited="isFavorited(edition.id)"
