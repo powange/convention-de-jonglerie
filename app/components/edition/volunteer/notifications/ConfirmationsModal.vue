@@ -275,12 +275,20 @@ const isOpen = computed({
 const selectedTab = ref(0)
 
 // Récupérer les données détaillées depuis l'API
-const { data, pending: loading } = await useLazyAsyncData(
+const {
+  data,
+  pending: loading,
+  refresh,
+} = await useLazyAsyncData(
   `notification-confirmations-${props.notificationData?.id}`,
-  () =>
-    $fetch(
-      `/api/editions/${props.editionId}/volunteers/notification/${props.notificationData?.id}/confirmations`
-    ),
+  () => {
+    if (!props.notificationData?.id || !props.modelValue) {
+      return Promise.resolve(null)
+    }
+    return $fetch(
+      `/api/editions/${props.editionId}/volunteers/notification/${props.notificationData.id}/confirmations`
+    )
+  },
   {
     default: () =>
       props.notificationData
@@ -405,12 +413,23 @@ const copyPhoneNumbers = async () => {
   }
 }
 
+// Fonction pour rafraîchir les données
+const refreshData = async () => {
+  if (props.notificationData?.id) {
+    await refresh()
+  }
+}
+
 // Réinitialiser l'onglet quand la modal s'ouvre
 watch(
   () => props.modelValue,
   (newValue) => {
     if (newValue) {
       selectedTab.value = 0 // Premier onglet (confirmés)
+      // Déclencher le rechargement des données si on a un ID de notification
+      if (props.notificationData?.id) {
+        refreshData()
+      }
     }
   }
 )
