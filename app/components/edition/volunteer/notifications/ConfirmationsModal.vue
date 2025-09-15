@@ -70,7 +70,7 @@
                   class="flex items-start justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800"
                 >
                   <div class="flex items-start gap-3 flex-1 min-w-0">
-                    <UserAvatar :user="volunteer.user" size="sm" />
+                    <UiUserAvatar :user="volunteer.user" size="sm" />
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-green-800 dark:text-green-200 mb-1">
                         {{ volunteer.user.pseudo }}
@@ -150,7 +150,7 @@
                     class="flex items-start justify-between p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800"
                   >
                     <div class="flex items-start gap-3 flex-1 min-w-0">
-                      <UserAvatar :user="volunteer.user" size="sm" />
+                      <UiUserAvatar :user="volunteer.user" size="sm" />
                       <div class="flex-1 min-w-0">
                         <div class="font-medium text-orange-800 dark:text-orange-200 mb-1">
                           {{ volunteer.user.pseudo }}
@@ -199,8 +199,6 @@
 </template>
 
 <script setup lang="ts">
-import UserAvatar from '~/components/ui/UserAvatar.vue'
-
 interface NotificationData {
   id: string
   title: string

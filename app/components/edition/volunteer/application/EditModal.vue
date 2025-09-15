@@ -89,8 +89,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import UiUserAvatar from '~/components/ui/UserAvatar.vue'
-
 interface Props {
   modelValue: boolean
   application: any | null
@@ -175,13 +173,13 @@ const handleTeamToggle = (teamValue: string, checked: boolean) => {
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'PENDING':
-      return 'orange'
+      return 'warning'
     case 'ACCEPTED':
-      return 'green'
+      return 'success'
     case 'REJECTED':
-      return 'red'
+      return 'error'
     default:
-      return 'gray'
+      return 'neutral'
   }
 }
 

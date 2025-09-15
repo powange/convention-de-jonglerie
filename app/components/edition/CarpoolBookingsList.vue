@@ -14,7 +14,7 @@
         class="flex items-center justify-between border rounded p-2"
       >
         <div class="flex items-center gap-2">
-          <UserAvatar :user="b.requester" size="xs" />
+          <UiUserAvatar :user="b.requester" size="xs" />
           <div>
             <div class="font-medium">{{ b.requester.pseudo }}</div>
             <div class="text-xs text-gray-500">
@@ -45,8 +45,6 @@
 </template>
 
 <script setup lang="ts">
-import UserAvatar from '~/components/ui/UserAvatar.vue'
-
 interface Props {
   offerId: number
 }

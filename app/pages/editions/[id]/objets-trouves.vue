@@ -60,7 +60,7 @@
           <template #header>
             <div class="flex items-start justify-between">
               <div class="flex items-center gap-3">
-                <UserAvatar :user="item.user" size="lg" />
+                <UiUserAvatar :user="item.user" size="lg" />
                 <div>
                   <p class="font-medium">{{ item.user.prenom }} {{ item.user.nom }}</p>
                   <p class="text-sm text-gray-500">{{ formatDate(item.createdAt) }}</p>
@@ -120,7 +120,7 @@
               <!-- Liste des commentaires -->
               <div v-if="item.comments.length > 0" class="space-y-3">
                 <div v-for="comment in item.comments" :key="comment.id" class="flex gap-3">
-                  <UserAvatar :user="comment.user" size="md" shrink />
+                  <UiUserAvatar :user="comment.user" size="md" shrink />
                   <div class="flex-1">
                     <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
                       <p class="text-sm font-medium">
@@ -250,7 +250,6 @@ import { ref, computed, onMounted } from 'vue'
 
 import EditionHeader from '~/components/edition/EditionHeader.vue'
 import ImageUpload from '~/components/ui/ImageUpload.vue'
-import UserAvatar from '~/components/ui/UserAvatar.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 

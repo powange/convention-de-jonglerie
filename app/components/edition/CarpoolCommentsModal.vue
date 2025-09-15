@@ -23,7 +23,7 @@
         <UCard v-for="comment in comments" :key="comment.id" variant="subtle">
           <div class="flex items-start justify-between mb-2">
             <div class="flex items-center gap-2">
-              <UserAvatar :user="comment.user" size="sm" />
+              <UiUserAvatar :user="comment.user" size="sm" />
               <span class="font-medium text-sm">{{ comment.user.pseudo }}</span>
               <span class="text-xs text-gray-500">{{ formatRelativeTime(comment.createdAt) }}</span>
             </div>
@@ -81,7 +81,6 @@
 </template>
 
 <script setup lang="ts">
-import UserAvatar from '~/components/ui/UserAvatar.vue'
 import { useAuthStore } from '~/stores/auth'
 
 interface Comment {

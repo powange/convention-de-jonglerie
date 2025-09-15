@@ -6,7 +6,7 @@
     >
       <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
         <div class="relative group">
-          <UserAvatar
+          <UiUserAvatar
             v-if="authStore.user"
             :user="authStore.user"
             :size="120"
@@ -627,7 +627,7 @@
         <div class="space-y-8">
           <!-- Aperçu actuel -->
           <div class="flex justify-center">
-            <UserAvatar
+            <UiUserAvatar
               v-if="authStore.user"
               :user="getPreviewUser()"
               :size="128"
@@ -703,7 +703,6 @@ import { reactive, ref, computed, onMounted } from 'vue'
 import { z } from 'zod'
 
 import ImageUpload from '~/components/ui/ImageUpload.vue'
-import UserAvatar from '~/components/ui/UserAvatar.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { HttpError, User } from '~/types'

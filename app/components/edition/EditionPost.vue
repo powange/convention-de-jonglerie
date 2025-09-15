@@ -4,7 +4,7 @@
     <template #header>
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-3">
-          <UserAvatar :user="post.user" size="lg" />
+          <UiUserAvatar :user="post.user" size="lg" />
           <div>
             <p class="font-medium text-gray-900 dark:text-gray-100">
               {{ post.user.pseudo }}
@@ -104,7 +104,7 @@
         :key="comment.id"
         class="flex gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
       >
-        <UserAvatar :user="comment.user" size="md" shrink />
+        <UiUserAvatar :user="comment.user" size="md" shrink />
         <div class="flex-1 min-w-0">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -137,7 +137,6 @@
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue'
 
-import UserAvatar from '~/components/ui/UserAvatar.vue'
 import { useAuthStore } from '~/stores/auth'
 
 const { t } = useI18n()

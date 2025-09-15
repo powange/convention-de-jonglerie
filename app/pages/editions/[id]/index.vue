@@ -105,7 +105,7 @@
                   class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-full text-sm"
                   :title="collaboratorTitleTooltip(collaborator)"
                 >
-                  <UserAvatar :user="collaborator.user" size="xs" />
+                  <UiUserAvatar :user="collaborator.user" size="xs" />
                   <span class="text-gray-700 dark:text-gray-300">{{ collaborator.pseudo }}</span>
                   <UBadge
                     v-if="displayCollaboratorBadge(collaborator)"
@@ -241,7 +241,7 @@
             :key="participant.id"
             class="flex flex-col items-center text-center"
           >
-            <UserAvatar :user="participant" size="md" class="mb-2" />
+            <UiUserAvatar :user="participant" size="md" class="mb-2" />
             <span class="text-sm font-medium text-gray-900 dark:text-white truncate w-full">
               {{ participant.pseudo }}
             </span>
@@ -296,7 +296,6 @@ import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 import EditionHeader from '~/components/edition/EditionHeader.vue'
-import UserAvatar from '~/components/ui/UserAvatar.vue'
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'

@@ -410,7 +410,7 @@
   </UModal>
 
   <!-- Modal d'édition des candidatures -->
-  <EditVolunteerApplicationModal
+  <EditionVolunteerApplicationEditModal
     v-model="editModalOpen"
     :application="currentEditApplication"
     :team-options="teamOptionsForEdit"
@@ -420,8 +420,6 @@
 
 <script setup lang="ts">
 import { h, resolveComponent, watch, onMounted, nextTick } from 'vue'
-
-import EditVolunteerApplicationModal from '~/components/edition/EditVolunteerApplicationModal.vue'
 
 import type { TableColumn } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'

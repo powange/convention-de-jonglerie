@@ -81,7 +81,7 @@
               >
                 <UButton variant="ghost" color="neutral" class="rounded-full">
                   <div class="flex items-center gap-2">
-                    <UserAvatar :user="authStore.user" size="md" border />
+                    <UiUserAvatar :user="authStore.user" size="md" border />
                     <div class="hidden sm:flex flex-col items-start">
                       <span class="text-sm font-medium">{{ displayName }}</span>
                       <UBadge
@@ -135,7 +135,6 @@ import PushNotificationPromoModal from '~/components/notifications/PushNotificat
 import PWAInstallBanner from '~/components/PWAInstallBanner.vue'
 import AppFooter from '~/components/ui/AppFooter.vue'
 import LogoJc from '~/components/ui/LogoJc.vue'
-import UserAvatar from '~/components/ui/UserAvatar.vue'
 
 import { useAuthStore } from './stores/auth'
 

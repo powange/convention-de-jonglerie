@@ -126,7 +126,7 @@
                   @click="openEditCollaboratorModal(convention, collaborator)"
                 >
                   <div class="flex items-center gap-1.5">
-                    <UserAvatar :user="collaborator.user" size="sm" />
+                    <UiUserAvatar :user="collaborator.user" size="sm" />
                     <span>{{ collaborator.user?.pseudo || '' }}</span>
                     <span
                       v-if="collaborator.title && collaborator.title.trim()"
@@ -188,7 +188,7 @@
         <div v-if="selectedCollaboratorForEdit && selectedConventionForEdit" class="space-y-4">
           <!-- Informations du collaborateur -->
           <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <UserAvatar :user="selectedCollaboratorForEdit.user" size="md" />
+            <UiUserAvatar :user="selectedCollaboratorForEdit.user" size="md" />
             <div>
               <h4 class="font-medium">{{ selectedCollaboratorForEdit.user?.pseudo || '' }}</h4>
               <p v-if="selectedCollaboratorForEdit.title" class="text-sm text-gray-500">
@@ -276,7 +276,6 @@
 import { ref, onMounted, h, watch } from 'vue'
 
 import CollaboratorRightsFields from '~/components/CollaboratorRightsFields.vue'
-import UserAvatar from '~/components/ui/UserAvatar.vue'
 import UserSelector from '~/components/UserSelector.vue'
 import { useAuthStore } from '~/stores/auth'
 import type { Convention, HttpError, Edition } from '~/types'

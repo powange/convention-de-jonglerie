@@ -7,7 +7,7 @@
       <!-- En-tête avec les infos utilisateur -->
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-3 flex-1">
-          <UserAvatar :user="offer.user" size="lg" />
+          <UiUserAvatar :user="offer.user" size="lg" />
           <div>
             <p class="font-semibold">{{ offer.user.pseudo }}</p>
             <p class="text-sm text-gray-500">
@@ -147,7 +147,7 @@
               })
             "
           >
-            <UserAvatar :user="b.requester" size="xs" />
+            <UiUserAvatar :user="b.requester" size="xs" />
             <span class="text-green-700 dark:text-green-300">{{ b.requester.pseudo }}</span>
             <UBadge color="success" variant="soft">+{{ b.seats }}</UBadge>
           </div>
@@ -224,7 +224,6 @@
 </template>
 
 <script setup lang="ts">
-import UserAvatar from '~/components/ui/UserAvatar.vue'
 import { useAuthStore } from '~/stores/auth'
 
 import CarpoolBookingsList from './CarpoolBookingsList.vue'
