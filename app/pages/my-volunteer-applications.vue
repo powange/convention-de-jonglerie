@@ -93,7 +93,7 @@
                 :color="getStatusColor(application.status)"
                 :variant="getStatusVariant(application.status)"
               >
-                {{ $t(`pages.volunteers.status.${application.status.toLowerCase()}`) }}
+                {{ $t(`editions.volunteers.status.${application.status.toLowerCase()}`) }}
               </UBadge>
 
               <!-- Équipes assignées dans le header -->
@@ -232,7 +232,7 @@
                 variant="soft"
                 size="sm"
               >
-                {{ $t(`pages.volunteers.time_slots.${timeSlot}`) }}
+                {{ $t(`editions.volunteers.time_slots_options.${timeSlot}`) }}
               </UBadge>
             </div>
           </div>

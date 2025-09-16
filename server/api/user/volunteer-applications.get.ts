@@ -70,6 +70,12 @@ export default defineEventHandler(async (event) => {
                 logo: true,
               },
             },
+            volunteerTeams: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
       },
@@ -78,7 +84,34 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    return applications
+    // Traitement pour remplacer les IDs des équipes par leurs noms
+    const applicationsWithTeamNames = applications.map((app) => {
+      const teamPreferencesWithNames = app.teamPreferences
+        ? app.teamPreferences.map((teamId: any) => {
+            const team = app.edition.volunteerTeams.find((t: any) => t.id === teamId)
+            return team ? team.name : teamId
+          })
+        : []
+
+      const assignedTeamsWithNames = app.assignedTeams
+        ? app.assignedTeams.map((teamId: any) => {
+            const team = app.edition.volunteerTeams.find((t: any) => t.id === teamId)
+            return team ? team.name : teamId
+          })
+        : []
+
+      return {
+        ...app,
+        teamPreferences: teamPreferencesWithNames,
+        assignedTeams: assignedTeamsWithNames,
+        edition: {
+          ...app.edition,
+          volunteerTeams: undefined, // On supprime cette propriété du retour
+        },
+      }
+    })
+
+    return applicationsWithTeamNames
   } catch (error) {
     console.error('Erreur lors de la récupération des candidatures:', error)
 
