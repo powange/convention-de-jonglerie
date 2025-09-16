@@ -6,12 +6,36 @@
         <div
           class="mx-auto w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mb-4 shadow-lg"
         >
-          <UIcon name="i-heroicons-key" class="text-white" size="32" />
+          <UIcon
+            :name="
+              step === 'email'
+                ? 'i-heroicons-envelope'
+                : step === 'register'
+                  ? 'i-heroicons-user-plus'
+                  : 'i-heroicons-key'
+            "
+            class="text-white"
+            size="32"
+          />
         </div>
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          {{ $t('auth.login_title') }}
+          {{
+            step === 'email'
+              ? $t('auth.login_title')
+              : step === 'register'
+                ? $t('auth.register_title')
+                : $t('auth.connection_title')
+          }}
         </h1>
-        <p class="text-gray-600 dark:text-gray-400">{{ $t('auth.login_subtitle') }}</p>
+        <p class="text-gray-600 dark:text-gray-400">
+          {{
+            step === 'email'
+              ? $t('auth.login_subtitle')
+              : step === 'register'
+                ? $t('auth.register_subtitle')
+                : $t('auth.connection_subtitle')
+          }}
+        </p>
       </div>
 
       <!-- Card principale -->
@@ -243,7 +267,6 @@
                 <UInput
                   v-model="registerState.prenom"
                   :placeholder="t('auth.first_name_placeholder')"
-                  required
                   icon="i-heroicons-user"
                   class="w-full"
                 />
@@ -252,7 +275,6 @@
                 <UInput
                   v-model="registerState.nom"
                   :placeholder="t('auth.last_name_placeholder')"
-                  required
                   icon="i-heroicons-user"
                   class="w-full"
                 />
@@ -362,7 +384,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, watchEffect } from 'vue'
 import { z } from 'zod'
 
 import type { HttpError } from '~/types'
@@ -409,8 +431,8 @@ const passwordState = reactive({ password: '', rememberMe: false })
 // Étape register
 const registerSchema = z
   .object({
-    prenom: z.string().min(1, t('errors.first_name_required')),
-    nom: z.string().min(1, t('errors.last_name_required')),
+    prenom: z.string().optional(),
+    nom: z.string().optional(),
     pseudo: z.string().min(3, t('errors.username_min_3_chars')),
     password: z
       .string()
@@ -573,6 +595,25 @@ const handlePasswordSubmit = async () => {
     loading.value = false
   }
 }
+
+// Métadonnées dynamiques de la page
+watchEffect(() => {
+  const currentStep = step.value
+  let title, description
+
+  if (currentStep === 'email') {
+    title = t('auth.login_title')
+    description = 'Connectez-vous à votre compte ou créez-en un nouveau'
+  } else if (currentStep === 'register') {
+    title = t('auth.register_title')
+    description = 'Créez votre compte pour rejoindre la communauté des jongleurs'
+  } else {
+    title = t('auth.connection_title')
+    description = 'Connectez-vous à votre compte'
+  }
+
+  useSeoMeta({ title, description })
+})
 
 const handleRegisterSubmit = async () => {
   loading.value = true

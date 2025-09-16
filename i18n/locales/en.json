@@ -242,6 +242,8 @@
     "login_button_loading": "Signing in...",
     "login_subtitle": "Sign in or create your account",
     "login_title": "Login or Registration",
+    "connection_title": "Login",
+    "connection_subtitle": "Access your account",
     "logout_success_message": "Logout successful!",
     "min_characters": "Minimum 8 characters",
     "new_code_sent": "A new code has been sent to your email.",

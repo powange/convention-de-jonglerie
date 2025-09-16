@@ -240,6 +240,8 @@
     "login_button_loading": "Connexion en cours...",
     "login_subtitle": "Connectez-vous ou créez votre compte",
     "login_title": "Connexion ou inscription",
+    "connection_title": "Connexion",
+    "connection_subtitle": "Accédez à votre compte",
     "logout_success_message": "Déconnexion réussie !",
     "min_characters": "Minimum 8 caractères",
     "new_code_sent": "Un nouveau code a été envoyé à votre email.",
