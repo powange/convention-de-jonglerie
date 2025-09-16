@@ -19,6 +19,7 @@ export interface VolunteerTimeSlotAPI {
       pseudo: string
       nom?: string
       prenom?: string
+      email: string
     }
   }>
   color: string

@@ -451,7 +451,7 @@ const availableTeamsForModal = computed(() => {
 
   // Si le bénévole a des préférences d'équipes, on ne montre que celles-ci
   if (preferredTeams.length > 0) {
-    return allTeams.filter((team: any) => preferredTeams.includes(team.name))
+    return allTeams.filter((team: any) => preferredTeams.includes(team.id))
   }
 
   // Sinon on montre toutes les équipes

@@ -81,12 +81,12 @@
           <div
             class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
           >
-            <div v-if="!ready" class="flex items-center justify-center py-8">
+            <div v-if="!ready || !edition" class="flex items-center justify-center py-8">
               <UIcon name="i-heroicons-arrow-path" class="animate-spin text-gray-400" size="20" />
               <span class="ml-2 text-base text-gray-500">{{ t('common.loading') }}</span>
             </div>
             <FullCalendar
-              v-else-if="calendarOptions"
+              v-else-if="calendarOptions && edition"
               ref="calendarRef"
               :options="calendarOptions"
               class="volunteer-planning-calendar"
@@ -95,10 +95,111 @@
         </div>
       </UCard>
 
+      <!-- Résumé des bénévoles par jour -->
+      <UCard v-if="volunteersStats.totalVolunteers > 0" variant="soft" class="mt-6">
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold flex items-center gap-2">
+              <UIcon name="i-heroicons-user-group" class="text-primary-500" />
+              {{ t('editions.volunteers.volunteers_summary') }}
+            </h3>
+            <UBadge color="primary" variant="soft">
+              {{ volunteersStats.totalVolunteers }} {{ t('editions.volunteers.volunteers') }}
+            </UBadge>
+          </div>
+        </template>
+
+        <div class="space-y-4">
+          <!-- Résumé global -->
+          <div
+            class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+          >
+            <div class="text-center">
+              <div class="text-2xl font-bold text-primary-600">
+                {{ volunteersStats.totalHours.toFixed(1) }}h
+              </div>
+              <div class="text-sm text-gray-500">{{ t('editions.volunteers.total_hours') }}</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-green-600">
+                {{ volunteersStats.averageHours.toFixed(1) }}h
+              </div>
+              <div class="text-sm text-gray-500">
+                {{ t('editions.volunteers.average_per_volunteer') }}
+              </div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-blue-600">{{ volunteersStats.totalSlots }}</div>
+              <div class="text-sm text-gray-500">
+                {{ t('editions.volunteers.total_assignments') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Détail par jour -->
+          <div class="space-y-3">
+            <h4 class="font-medium text-gray-900 dark:text-white">
+              {{ t('editions.volunteers.hours_per_day') }}
+            </h4>
+            <div class="space-y-2">
+              <div
+                v-for="dayStats in volunteersStatsByDay"
+                :key="dayStats.date"
+                class="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h5 class="font-medium text-gray-900 dark:text-white">
+                    {{ formatDate(dayStats.date) }}
+                  </h5>
+                  <div class="flex items-center gap-2">
+                    <UBadge color="gray" variant="soft" size="sm">
+                      {{ dayStats.totalVolunteers }} {{ t('editions.volunteers.volunteers_short') }}
+                    </UBadge>
+                    <UBadge color="primary" variant="soft" size="sm">
+                      {{ dayStats.totalHours.toFixed(1) }}h
+                    </UBadge>
+                  </div>
+                </div>
+
+                <div class="space-y-1">
+                  <div
+                    v-for="volunteerStat in dayStats.volunteers"
+                    :key="`${dayStats.date}-${volunteerStat.user.id}`"
+                    class="flex items-center justify-between text-sm"
+                  >
+                    <div class="flex items-center gap-2">
+                      <UiUserAvatar :user="volunteerStat.user" size="xs" />
+                      <span class="text-gray-700 dark:text-gray-300">{{
+                        volunteerStat.user.pseudo
+                      }}</span>
+                      <span
+                        v-if="volunteerStat.user.prenom || volunteerStat.user.nom"
+                        class="text-gray-500 text-xs"
+                      >
+                        ({{ volunteerStat.user.prenom }} {{ volunteerStat.user.nom }})
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-gray-600 dark:text-gray-400"
+                        >{{ volunteerStat.hours.toFixed(1) }}h</span
+                      >
+                      <UBadge color="gray" variant="soft" size="xs">
+                        {{ volunteerStat.slots }} {{ t('editions.volunteers.slots_short') }}
+                      </UBadge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </UCard>
+
       <!-- Modal de création/édition de créneau -->
       <SlotModal
         v-model="slotModalOpen"
         :teams="teams"
+        :edition-id="editionId"
         :initial-slot="slotModalData"
         @save="handleSlotSave"
         @delete="handleSlotDelete"
@@ -153,6 +254,7 @@ const convertedTimeSlots = computed(() => {
       assignedVolunteers: slot.assignedVolunteers,
       color: slot.color,
       description: slot.description,
+      assignedVolunteersList: slot.assignments || [], // Mapping des assignments vers assignedVolunteersList
     })
   )
 })
@@ -167,10 +269,18 @@ const convertedTeams = computed(() => {
   )
 })
 
+// Computed pour les dates avec fallbacks
+const editionStartDate = computed(
+  () => edition.value?.startDate || new Date().toISOString().split('T')[0]
+)
+const editionEndDate = computed(
+  () => edition.value?.endDate || new Date().toISOString().split('T')[0]
+)
+
 // Configuration du calendrier de planning
 const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
-  editionStartDate: edition.value?.startDate || '',
-  editionEndDate: edition.value?.endDate || '',
+  editionStartDate: editionStartDate,
+  editionEndDate: editionEndDate,
   teams: convertedTeams,
   timeSlots: convertedTimeSlots,
   onTimeSlotCreate: (start, end, resourceId) => {
@@ -185,10 +295,17 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
     // Ouvrir la modal en mode édition lors d'un clic
     const existingSlot = timeSlots.value.find((s) => s.id === timeSlot.id)
     if (existingSlot) {
-      // Convertir les dates au format attendu par datetime-local
+      // Convertir les dates au format attendu par datetime-local (heure locale)
       const formatDateTimeLocal = (dateStr: string) => {
         if (!dateStr) return ''
-        return dateStr.replace(/:\d{2}Z?$/, '').substring(0, 16)
+        const date = new Date(dateStr)
+        // Convertir en heure locale pour datetime-local
+        const year = date.getFullYear()
+        const month = (date.getMonth() + 1).toString().padStart(2, '0')
+        const day = date.getDate().toString().padStart(2, '0')
+        const hours = date.getHours().toString().padStart(2, '0')
+        const minutes = date.getMinutes().toString().padStart(2, '0')
+        return `${year}-${month}-${day}T${hours}:${minutes}`
       }
 
       slotModalData.value = {
@@ -251,11 +368,17 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
 
 // Actions de la modal
 const openSlotModal = (initialData?: { start?: string; end?: string; teamId?: string }) => {
-  // Convertir les dates au format attendu par datetime-local
+  // Convertir les dates au format attendu par datetime-local (heure locale)
   const formatDateTimeLocal = (dateStr: string) => {
     if (!dateStr) return ''
-    // Enlever les secondes et la timezone si présentes
-    return dateStr.replace(/:\d{2}Z?$/, '').substring(0, 16)
+    const date = new Date(dateStr)
+    // Convertir en heure locale pour datetime-local
+    const year = date.getFullYear()
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
+    const day = date.getDate().toString().padStart(2, '0')
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    return `${year}-${month}-${day}T${hours}:${minutes}`
   }
 
   // Définir les données initiales
@@ -372,6 +495,114 @@ const canAccess = computed(() => {
   )
 })
 
+// Fonction utilitaire pour formater les dates
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr)
+  return new Intl.DateTimeFormat('fr-FR', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(date)
+}
+
+// Calcul des statistiques des bénévoles
+const volunteersStats = computed(() => {
+  const slotsWithAssignments = convertedTimeSlots.value.filter(
+    (slot) => slot.assignedVolunteersList && slot.assignedVolunteersList.length > 0
+  )
+
+  if (slotsWithAssignments.length === 0) {
+    return {
+      totalVolunteers: 0,
+      totalHours: 0,
+      averageHours: 0,
+      totalSlots: 0,
+    }
+  }
+
+  const volunteerHours = new Map<number, number>()
+  const volunteerSlots = new Map<number, number>()
+  let totalHours = 0
+  let totalSlots = 0
+
+  slotsWithAssignments.forEach((slot) => {
+    const startTime = new Date(slot.start)
+    const endTime = new Date(slot.end)
+    const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
+
+    slot.assignedVolunteersList?.forEach((assignment) => {
+      const userId = assignment.user.id
+      volunteerHours.set(userId, (volunteerHours.get(userId) || 0) + hours)
+      volunteerSlots.set(userId, (volunteerSlots.get(userId) || 0) + 1)
+      totalHours += hours
+      totalSlots += 1
+    })
+  })
+
+  const totalVolunteers = volunteerHours.size
+  const averageHours = totalVolunteers > 0 ? totalHours / totalVolunteers : 0
+
+  return {
+    totalVolunteers,
+    totalHours,
+    averageHours,
+    totalSlots,
+  }
+})
+
+// Statistiques par jour
+const volunteersStatsByDay = computed(() => {
+  const dayStats = new Map<string, any>()
+
+  convertedTimeSlots.value.forEach((slot) => {
+    if (!slot.assignedVolunteersList || slot.assignedVolunteersList.length === 0) return
+
+    const startTime = new Date(slot.start)
+    const endTime = new Date(slot.end)
+    const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
+    const dayKey = startTime.toISOString().split('T')[0] // YYYY-MM-DD
+
+    if (!dayStats.has(dayKey)) {
+      dayStats.set(dayKey, {
+        date: dayKey,
+        volunteers: new Map<number, any>(),
+        totalHours: 0,
+        totalVolunteers: 0,
+      })
+    }
+
+    const day = dayStats.get(dayKey)
+
+    slot.assignedVolunteersList.forEach((assignment) => {
+      const userId = assignment.user.id
+
+      if (!day.volunteers.has(userId)) {
+        day.volunteers.set(userId, {
+          user: assignment.user,
+          hours: 0,
+          slots: 0,
+        })
+      }
+
+      const volunteerStat = day.volunteers.get(userId)
+      volunteerStat.hours += hours
+      volunteerStat.slots += 1
+      day.totalHours += hours
+    })
+
+    day.totalVolunteers = day.volunteers.size
+  })
+
+  // Convertir en array et trier par date
+  return Array.from(dayStats.values())
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map((day) => ({
+      ...day,
+      volunteers: Array.from(day.volunteers.values()).sort((a, b) => b.hours - a.hours), // Trier par heures décroissantes
+    }))
+})
+
 // Permissions calculées
 const canEdit = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
@@ -454,6 +685,88 @@ useSeoMeta({
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   font-size: 0.875rem;
   cursor: pointer;
+}
+
+.volunteer-planning-calendar .fc-event-title {
+  white-space: pre-line;
+  line-height: 1.3;
+  padding: 2px 4px;
+  font-size: 0.75rem;
+}
+
+.volunteer-planning-calendar .fc-event-main {
+  padding: 1px 2px;
+}
+
+/* Styles pour le contenu personnalisé des événements */
+.volunteer-planning-calendar .volunteer-slot-content {
+  padding: 2px 4px;
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.volunteer-planning-calendar .slot-title {
+  font-weight: 500;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.volunteer-planning-calendar .slot-avatars {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 2px;
+}
+
+.volunteer-planning-calendar .volunteer-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  line-height: 1.2;
+}
+
+.volunteer-planning-calendar .user-avatar {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: rgb(99 102 241); /* indigo-500 */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.45rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.volunteer-planning-calendar .volunteer-text {
+  color: inherit;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.volunteer-planning-calendar .user-avatar-1 {
+  background-color: rgb(34 197 94); /* green-500 */
+}
+
+.volunteer-planning-calendar .user-avatar-2 {
+  background-color: rgb(251 146 60); /* orange-400 */
+}
+
+.volunteer-planning-calendar .user-avatar-3 {
+  background-color: rgb(168 85 247); /* purple-500 */
+}
+
+.volunteer-planning-calendar .user-avatar-4 {
+  background-color: rgb(236 72 153); /* pink-500 */
 }
 
 .volunteer-planning-calendar .fc-event:hover {

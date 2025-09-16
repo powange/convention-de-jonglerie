@@ -41,6 +41,7 @@ export default defineEventHandler(async (event) => {
                 pseudo: true,
                 nom: true,
                 prenom: true,
+                email: true,
               },
             },
           },

@@ -665,7 +665,7 @@ model VolunteerTimeSlot {
   id                 String                @id @default(cuid())
   editionId          Int
   teamId             String?
-  title              String
+  title              String?
   description        String?               @db.Text
   startDateTime      DateTime
   endDateTime        DateTime

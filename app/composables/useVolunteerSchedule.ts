@@ -16,7 +16,7 @@ export interface VolunteerTeamCalendar {
 
 export interface VolunteerTimeSlot {
   id: string
-  title: string
+  title: string | null
   start: string
   end: string
   teamId?: string
@@ -24,13 +24,23 @@ export interface VolunteerTimeSlot {
   assignedVolunteers: number
   color?: string
   description?: string
+  assignedVolunteersList?: Array<{
+    id: string
+    user: {
+      id: number
+      pseudo: string
+      nom: string | null
+      prenom: string | null
+      email: string
+    }
+  }>
 }
 
 // VolunteerTeam est importé depuis useVolunteerTeams.ts
 
 export interface UseVolunteerScheduleOptions {
-  editionStartDate: string
-  editionEndDate: string
+  editionStartDate: string | Ref<string> | ComputedRef<string>
+  editionEndDate: string | Ref<string> | ComputedRef<string>
   teams: Ref<VolunteerTeamCalendar[]> | ComputedRef<VolunteerTeamCalendar[]>
   timeSlots: Ref<VolunteerTimeSlot[]> | ComputedRef<VolunteerTimeSlot[]>
   onTimeSlotCreate?: (start: string, end: string, resourceId?: string) => void
@@ -43,8 +53,6 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
   const { t, locale } = useI18n()
 
   const {
-    editionStartDate,
-    editionEndDate,
     teams,
     timeSlots,
     onTimeSlotCreate,
@@ -52,6 +60,10 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     onTimeSlotClick,
     onTimeSlotDelete: _onTimeSlotDelete,
   } = options
+
+  // Computed pour les dates réactives
+  const startDate = computed(() => unref(options.editionStartDate))
+  const endDate = computed(() => unref(options.editionEndDate))
 
   const calendarRef = ref<any>(null)
   const ready = ref(false)
@@ -77,20 +89,40 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
   // Conversion des créneaux en événements FullCalendar
   const events = computed((): EventInput[] => {
-    return unref(timeSlots).map((slot) => ({
-      id: slot.id,
-      title: `${slot.title} (${slot.assignedVolunteers}/${slot.maxVolunteers})`,
-      start: slot.start,
-      end: slot.end,
-      resourceId: slot.teamId || 'unassigned',
-      color: slot.color,
-      extendedProps: {
-        description: slot.description,
-        maxVolunteers: slot.maxVolunteers,
-        assignedVolunteers: slot.assignedVolunteers,
-        teamId: slot.teamId,
-      },
-    }))
+    return unref(timeSlots).map((slot) => {
+      const slotTitle = slot.title || t('editions.volunteers.untitled_slot')
+      const counterInfo = `(${slot.assignedVolunteers}/${slot.maxVolunteers})`
+
+      return {
+        id: slot.id,
+        title: `${slotTitle} ${counterInfo}`, // Titre simple pour les cas où eventContent n'est pas utilisé
+        start: slot.start,
+        end: slot.end,
+        resourceId: slot.teamId || 'unassigned',
+        color: slot.color,
+        extendedProps: {
+          description: slot.description,
+          maxVolunteers: slot.maxVolunteers,
+          assignedVolunteers: slot.assignedVolunteers,
+          teamId: slot.teamId,
+          assignedVolunteersList: slot.assignedVolunteersList,
+          slotTitle, // Titre original pour eventContent
+        },
+      }
+    })
+  })
+
+  // Calcul de l'heure de début pour l'affichage initial
+  const initialScrollTime = computed(() => {
+    const startDateValue = startDate.value
+    if (startDateValue) {
+      const date = new Date(startDateValue)
+      // Extraire l'heure et retourner au format HH:MM:SS
+      const hours = date.getHours().toString().padStart(2, '0')
+      const minutes = date.getMinutes().toString().padStart(2, '0')
+      return `${hours}:${minutes}:00`
+    }
+    return '08:00:00' // Fallback par défaut
   })
 
   // Configuration du calendrier
@@ -102,10 +134,13 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     // Vue timeline par ressource
     initialView: 'resourceTimelineWeek',
 
-    // Période visible
+    // Date initiale (premier jour de l'événement)
+    initialDate: startDate.value,
+
+    // Période visible (limite la navigation)
     validRange: {
-      start: editionStartDate,
-      end: editionEndDate,
+      start: startDate.value,
+      end: endDate.value,
     },
 
     // Configuration temporelle
@@ -114,6 +149,9 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     slotDuration: '00:15:00', // Granularité 15 minutes
     slotLabelInterval: '01:00:00', // Libellés toutes les heures
 
+    // Heure de défilement initial basée sur l'heure de début de l'édition
+    scrollTime: initialScrollTime.value,
+
     // Configuration des ressources
     resources: [],
 
@@ -121,6 +159,13 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     events: [],
     editable: true,
     selectable: true,
+
+    // Gestion des chevauchements
+    eventOverlap: true, // Permet les chevauchements (par défaut: true)
+    selectOverlap: true, // Permet la sélection sur des événements existants
+
+    // Hauteur des ressources
+    resourceAreaWidth: '15%', // Largeur de la colonne des équipes
 
     // Hauteur du calendrier
     height: 'auto',
@@ -139,6 +184,76 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       week: t('common.week'),
       resourceTimelineDay: t('editions.volunteers.day_view'),
       resourceTimelineWeek: t('editions.volunteers.week_view'),
+    },
+
+    // Rendu HTML personnalisé pour les événements
+    eventContent: (arg) => {
+      const event = arg.event
+      const slotTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
+      const counterInfo = `(${event.extendedProps.assignedVolunteers}/${event.extendedProps.maxVolunteers})`
+      const assignedVolunteersList = event.extendedProps.assignedVolunteersList || []
+
+      // Créer le conteneur principal
+      const container = document.createElement('div')
+      container.className = 'volunteer-slot-content'
+
+      // Titre du créneau avec compteur
+      const titleDiv = document.createElement('div')
+      titleDiv.className = 'slot-title'
+      titleDiv.textContent = `${slotTitle} ${counterInfo}`
+      container.appendChild(titleDiv)
+
+      // Section des avatars si il y a des bénévoles assignés
+      if (assignedVolunteersList.length > 0) {
+        const avatarsDiv = document.createElement('div')
+        avatarsDiv.className = 'slot-avatars'
+
+        assignedVolunteersList.forEach((assignment: any, index: number) => {
+          const user = assignment.user
+          const volunteerContainer = document.createElement('div')
+          volunteerContainer.className = 'volunteer-item'
+
+          // Créer l'avatar
+          const avatar = document.createElement('div')
+          avatar.className = `user-avatar user-avatar-${index % 5}`
+
+          // Initiales pour l'avatar
+          let initials = ''
+          if (user.pseudo) {
+            initials = user.pseudo.substring(0, 2).toUpperCase()
+          } else if (user.prenom || user.nom) {
+            const firstName = user.prenom || ''
+            const lastName = user.nom || ''
+            initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase()
+          } else {
+            initials = 'U'
+          }
+
+          avatar.textContent = initials
+
+          // Créer le texte d'affichage
+          const textSpan = document.createElement('span')
+          textSpan.className = 'volunteer-text'
+
+          const fullName = `${user.prenom || ''} ${user.nom || ''}`.trim()
+          let displayText = user.pseudo || fullName || `Utilisateur ${user.id}`
+
+          // Ajouter nom et prénom entre parenthèses si ils existent et si on a déjà un pseudo
+          if (user.pseudo && fullName) {
+            displayText = `${user.pseudo} (${fullName})`
+          }
+
+          textSpan.textContent = displayText
+
+          volunteerContainer.appendChild(avatar)
+          volunteerContainer.appendChild(textSpan)
+          avatarsDiv.appendChild(volunteerContainer)
+        })
+
+        container.appendChild(avatarsDiv)
+      }
+
+      return { domNodes: [container] }
     },
 
     // Gestion des clics et sélections
@@ -160,9 +275,11 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       const callback = onTimeSlotClick || onTimeSlotUpdate
       if (callback) {
         const event = info.event
+        // Utiliser le titre original depuis extendedProps
+        const rawTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
         const slot: VolunteerTimeSlot = {
           id: event.id,
-          title: event.title.split(' (')[0], // Enlever le compteur
+          title: rawTitle === t('editions.volunteers.untitled_slot') ? null : rawTitle,
           start: event.startStr,
           end: event.endStr,
           teamId: event.extendedProps.teamId,
@@ -170,6 +287,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
           assignedVolunteers: event.extendedProps.assignedVolunteers,
           color: event.backgroundColor || event.color,
           description: event.extendedProps.description,
+          assignedVolunteersList: event.extendedProps.assignedVolunteersList,
         }
         callback(slot)
       }
@@ -178,9 +296,11 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     // Drag & drop des événements
     eventDrop: (info) => {
       const event = info.event
+      // Utiliser le titre original depuis extendedProps
+      const rawTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
       const updatedSlot: VolunteerTimeSlot = {
         id: event.id,
-        title: event.title.split(' (')[0], // Enlever le compteur
+        title: rawTitle === t('editions.volunteers.untitled_slot') ? null : rawTitle,
         start: event.startStr,
         end: event.endStr,
         teamId:
@@ -189,6 +309,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         assignedVolunteers: event.extendedProps.assignedVolunteers,
         color: event.color,
         description: event.extendedProps.description,
+        assignedVolunteersList: event.extendedProps.assignedVolunteersList,
       }
 
       if (onTimeSlotUpdate) {
@@ -199,9 +320,11 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     // Redimensionnement des événements
     eventResize: (info) => {
       const event = info.event
+      // Utiliser le titre original depuis extendedProps
+      const rawTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
       const updatedSlot: VolunteerTimeSlot = {
         id: event.id,
-        title: event.title.split(' (')[0],
+        title: rawTitle === t('editions.volunteers.untitled_slot') ? null : rawTitle,
         start: event.startStr,
         end: event.endStr,
         teamId:
@@ -210,6 +333,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         assignedVolunteers: event.extendedProps.assignedVolunteers,
         color: event.color,
         description: event.extendedProps.description,
+        assignedVolunteersList: event.extendedProps.assignedVolunteersList,
       }
 
       if (onTimeSlotUpdate) {
@@ -233,6 +357,36 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       calendarOptions.events = newEvents
     },
     { deep: true, immediate: true }
+  )
+
+  // Watcher pour les dates d'édition
+  watch(
+    [startDate, endDate],
+    ([newStartDate, newEndDate]) => {
+      if (newStartDate && newEndDate) {
+        calendarOptions.initialDate = newStartDate
+        calendarOptions.validRange = {
+          start: newStartDate,
+          end: newEndDate,
+        }
+
+        // Mettre à jour l'heure de défilement
+        calendarOptions.scrollTime = initialScrollTime.value
+
+        // Forcer la mise à jour du calendrier si il est déjà initialisé
+        nextTick(() => {
+          if (calendarRef.value && ready.value) {
+            const calendarApi = calendarRef.value.getApi()
+            if (calendarApi) {
+              calendarApi.gotoDate(newStartDate)
+              // Forcer le scroll à la bonne heure
+              calendarApi.scrollToTime(initialScrollTime.value)
+            }
+          }
+        })
+      }
+    },
+    { immediate: true }
   )
 
   // Initialisation

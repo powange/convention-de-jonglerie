@@ -6,7 +6,7 @@ import { requireVolunteerManagementAccess } from '../../../../utils/volunteer-pe
 
 const updateTimeSlotSchema = z
   .object({
-    title: z.string().min(1, 'Le titre est requis').max(200).optional(),
+    title: z.string().max(200).nullable().optional(),
     description: z.string().optional(),
     teamId: z.string().nullable().optional(),
     startDateTime: z
