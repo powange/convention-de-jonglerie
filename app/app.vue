@@ -72,7 +72,7 @@
               </div>
 
               <!-- Centre de notifications (si connecté) -->
-              <NotificationCenter v-if="authStore.isAuthenticated" />
+              <NotificationsCenter v-if="authStore.isAuthenticated" />
 
               <!-- Dropdown utilisateur ou boutons connexion -->
               <UDropdownMenu
@@ -117,7 +117,7 @@
           <PWAInstallBanner />
 
           <!-- Modale de promotion des notifications push -->
-          <PushNotificationPromoModal />
+          <NotificationsPushPromoModal />
         </template>
         <NuxtPage />
       </UCard>
