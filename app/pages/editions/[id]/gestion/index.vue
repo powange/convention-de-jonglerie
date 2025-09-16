@@ -84,7 +84,7 @@
                 icon="i-heroicons-arrow-right"
                 :to="`/editions/${edition.id}/objets-trouves`"
               >
-                {{ $t('pages.management.manage') }}
+                {{ $t('common.manage') }}
               </UButton>
             </div>
 

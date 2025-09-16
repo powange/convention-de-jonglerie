@@ -125,7 +125,6 @@
     "recent_notifications": "Notifications récentes",
     "test": "Tester",
     "test_debug": "Tests et debug",
-    "today": "Aujourd'hui",
     "total_sent": "Total envoyées",
     "total_users": "Utilisateurs totaux",
     "api_error_logs": "Logs d'erreurs API",
@@ -330,7 +329,6 @@
     "manage_editions_desc": "Créer, modifier et publier différentes éditions de vos conventions",
     "manage_volunteers": "Gérer les bénévoles",
     "manage_volunteers_desc": "Coordonner les équipes de bénévoles et leurs candidatures",
-    "my_conventions": "Mes Conventions",
     "no_conventions": "Aucune convention créée",
     "no_conventions_description": "Les conventions vous permettront de regrouper plusieurs éditions.",
     "no_description": "Aucune description",
@@ -858,7 +856,6 @@
       "table_user": "Candidat",
       "title": "Bénévolat",
       "management_title": "Gestion des candidatures",
-      "total": "Total",
       "withdraw": "Retirer ma candidature",
       "catering_info": "Informations restauration",
       "select_date": "Sélectionner une date",
@@ -1155,7 +1152,6 @@
   },
   "forms": {
     "buttons": {
-      "cancel": "Annuler",
       "publishing": "Publication...",
       "submitting": "Envoi..."
     },
@@ -1190,7 +1186,6 @@
     "no_conventions_found": "Aucune convention trouvée. Soyez le premier à en ajouter une !",
     "no_conventions_match_criteria": "Aucune convention ne correspond à vos critères de recherche",
     "period": "Période",
-    "reset_filters": "Réinitialiser",
     "searched_services": "Services recherchés",
     "upcoming_editions": "Éditions à venir"
   },
@@ -1362,7 +1357,6 @@
       "delete_edition": "Supprimer l'édition",
       "edit_edition": "Modifier l'édition",
       "lost_found_active_description": "Vous pouvez gérer les objets trouvés pendant le déroulement de l'édition.",
-      "manage": "Gérer",
       "manage_lost_found": "Gérer les objets trouvés"
     },
     "objets_trouves": {
@@ -1439,7 +1433,6 @@
     "new_password_placeholder": "Votre nouveau mot de passe",
     "normal_active": "👤 Mode normal",
     "normal_mode": "Utilisateur normal",
-    "optional": "Optionnel",
     "optional_section_title": "Informations facultatives",
     "password_changed": "Mot de passe changé",
     "password_digit_required": "Le mot de passe doit contenir au moins un chiffre",

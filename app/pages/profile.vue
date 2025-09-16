@@ -115,7 +115,7 @@
               <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {{ t('profile.optional_section_title') }}
               </h3>
-              <UBadge variant="soft" color="neutral" size="xs">{{ t('profile.optional') }}</UBadge>
+              <UBadge variant="soft" color="neutral" size="xs">{{ t('common.optional') }}</UBadge>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -329,7 +329,7 @@
               to="/my-conventions"
               class="transition-all duration-200 hover:transform hover:scale-105 justify-start"
             >
-              {{ $t('conventions.my_conventions') }}
+              {{ $t('navigation.my_conventions') }}
             </UButton>
 
             <UButton

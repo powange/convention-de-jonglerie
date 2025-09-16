@@ -203,7 +203,7 @@
             </UFormField>
             <div class="flex justify-end gap-2">
               <UButton variant="ghost" @click="showBookingModal = false">{{
-                $t('forms.buttons.cancel')
+                $t('common.cancel')
               }}</UButton>
               <UButton
                 color="primary"

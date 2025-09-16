@@ -168,7 +168,6 @@
     "system_settings_description": "Configuración general de la plataforma",
     "test": "Probar",
     "test_debug": "Pruebas y depuración",
-    "today": "Hoy",
     "total_conventions": "Total de convenciones",
     "total_editions": "Total de ediciones",
     "total_sent": "Total enviadas",
@@ -633,7 +632,6 @@
     "manage_editions_desc": "Crea, edita y publica diferentes ediciones de tus convenciones",
     "manage_volunteers": "Gestionar voluntarios",
     "manage_volunteers_desc": "Coordina los equipos de voluntarios y sus solicitudes",
-    "my_conventions": "Mis Convenciones",
     "no_conventions": "Sin convenciones creadas",
     "no_conventions_description": "Las convenciones te permitirán agrupar múltiples ediciones.",
     "no_description": "Sin descripción",
@@ -980,7 +978,6 @@
         "night": "Noche (2h-6h)"
       },
       "title": "Voluntarios",
-      "total": "Total de voluntarios",
       "total_recipients": "Total destinatarios",
       "unassigned_slots": "Sin asignar",
       "update_error": "Error updating application",
@@ -1154,7 +1151,6 @@
   },
   "forms": {
     "buttons": {
-      "cancel": "Cancelar",
       "publishing": "Publicando...",
       "submitting": "Enviando..."
     },
@@ -1189,7 +1185,6 @@
     "no_conventions_found": "No se encontraron convenciones. ¡Sé el primero en agregar una!",
     "no_conventions_match_criteria": "Ninguna convención coincide con tus criterios de búsqueda",
     "period": "Período",
-    "reset_filters": "Reiniciar",
     "searched_services": "Servicios buscados",
     "upcoming_editions": "Próximas ediciones"
   },
@@ -1315,7 +1310,6 @@
       "delete_edition": "Eliminar edición",
       "edit_edition": "Editar edición",
       "lost_found_active_description": "Puedes gestionar los objetos perdidos durante el transcurso de la edición.",
-      "manage": "Gestionar",
       "manage_lost_found": "Gestionar objetos perdidos"
     },
     "objets_trouves": {
@@ -1437,7 +1431,6 @@
     "normal_active": "👤 Modo normal",
     "normal_mode": "Usuario normal",
     "oauth_password_info": "Has iniciado sesión con Google. Puedes establecer una contraseña para iniciar sesión con tu correo electrónico.",
-    "optional": "Opcional",
     "optional_section_title": "Sección opcional",
     "password_changed": "Contraseña cambiada",
     "password_digit_required": "La contraseña debe contener al menos un dígito",

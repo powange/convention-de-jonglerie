@@ -168,7 +168,6 @@
     "system_settings_description": "Configuração geral da plataforma",
     "test": "Testar",
     "test_debug": "Testes e depuração",
-    "today": "Hoje",
     "total_conventions": "Total de convenções",
     "total_editions": "Total de edições",
     "total_sent": "Total enviadas",
@@ -633,7 +632,6 @@
     "manage_editions_desc": "Crie, edite e publique as diferentes edições das suas convenções",
     "manage_volunteers": "Gerir voluntários",
     "manage_volunteers_desc": "Coordene as equipas voluntárias e as suas candidaturas",
-    "my_conventions": "As Minhas Convenções",
     "no_conventions": "Nenhuma convenção criada",
     "no_conventions_description": "As convenções permitir-lhe-ão agrupar várias edições.",
     "no_description": "Nenhuma descrição",
@@ -980,7 +978,6 @@
         "night": "Noite (2h-6h)"
       },
       "title": "Voluntários",
-      "total": "Total de voluntários",
       "total_recipients": "Total de destinatários",
       "unassigned_slots": "Não atribuído",
       "update_error": "Erro ao atualizar candidatura",
@@ -1154,7 +1151,6 @@
   },
   "forms": {
     "buttons": {
-      "cancel": "Cancelar",
       "publishing": "A publicar...",
       "submitting": "A enviar..."
     },
@@ -1189,7 +1185,6 @@
     "no_conventions_found": "Nenhuma convenção encontrada. Seja o primeiro a adicionar uma!",
     "no_conventions_match_criteria": "Nenhuma convenção corresponde aos seus critérios de pesquisa",
     "period": "Período",
-    "reset_filters": "Reinicializar",
     "searched_services": "Serviços procurados",
     "upcoming_editions": "Próximas edições"
   },
@@ -1315,7 +1310,6 @@
       "delete_edition": "Eliminar a edição",
       "edit_edition": "Editar a edição",
       "lost_found_active_description": "Pode gerir os objectos perdidos enquanto a edição decorre.",
-      "manage": "Gerir",
       "manage_lost_found": "Gerir objectos perdidos"
     },
     "objets_trouves": {
@@ -1437,7 +1431,6 @@
     "normal_active": "👤 Modo normal",
     "normal_mode": "Utilizador normal",
     "oauth_password_info": "Iniciou sessão com o Google. Pode definir uma palavra-passe para iniciar sessão com o seu email.",
-    "optional": "Opcional",
     "optional_section_title": "Seção opcional",
     "password_changed": "Palavra-passe alterada",
     "password_digit_required": "A palavra-passe deve conter pelo menos um dígito",

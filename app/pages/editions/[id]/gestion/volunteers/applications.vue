@@ -64,8 +64,7 @@
             <!-- Statistiques -->
             <div v-if="volunteersInfo" class="mt-3 mb-3 flex flex-wrap gap-3">
               <UBadge color="neutral" variant="soft"
-                >{{ t('editions.volunteers.total') }}:
-                {{ volunteersInfo.counts.total || 0 }}</UBadge
+                >{{ t('common.total') }}: {{ volunteersInfo.counts.total || 0 }}</UBadge
               >
               <UBadge color="warning" variant="soft"
                 >{{ t('editions.volunteers.status_pending') }}:

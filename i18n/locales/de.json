@@ -168,7 +168,6 @@
     "system_settings_description": "Allgemeine Plattformkonfiguration",
     "test": "Testen",
     "test_debug": "Tests und Debug",
-    "today": "Heute",
     "total_conventions": "Conventions insgesamt",
     "total_editions": "Ausgaben insgesamt",
     "total_sent": "Gesamt gesendet",
@@ -633,7 +632,6 @@
     "manage_editions_desc": "Erstellen, bearbeiten und veröffentlichen Sie verschiedene Auflagen Ihrer Conventions",
     "manage_volunteers": "Freiwillige verwalten",
     "manage_volunteers_desc": "Koordinieren Sie Freiwilligenteams und ihre Bewerbungen",
-    "my_conventions": "Meine Conventions",
     "no_conventions": "Keine Convention erstellt",
     "no_conventions_description": "Conventions ermöglichen es dir, mehrere Auflagen zu gruppieren.",
     "no_description": "Keine Beschreibung",
@@ -980,7 +978,6 @@
         "night": "Nacht (2-6 Uhr)"
       },
       "title": "Freiwillige",
-      "total": "Gesamt",
       "total_recipients": "Empfänger insgesamt",
       "unassigned_slots": "Nicht zugewiesen",
       "update_error": "Fehler beim Aktualisieren der Bewerbung",
@@ -1154,7 +1151,6 @@
   },
   "forms": {
     "buttons": {
-      "cancel": "Abbrechen",
       "publishing": "Veröffentlichung...",
       "submitting": "Übermittlung..."
     },
@@ -1189,7 +1185,6 @@
     "no_conventions_found": "Keine Convention gefunden. Sei der erste, der eine hinzufügt!",
     "no_conventions_match_criteria": "Keine Convention entspricht deinen Suchkriterien",
     "period": "Zeitraum",
-    "reset_filters": "Zurücksetzen",
     "searched_services": "Gesuchte Services",
     "upcoming_editions": "Kommende Auflagen"
   },
@@ -1315,7 +1310,6 @@
       "delete_edition": "Auflage löschen",
       "edit_edition": "Auflage bearbeiten",
       "lost_found_active_description": "Du kannst Fundsachen während der laufenden Auflage verwalten.",
-      "manage": "Verwalten",
       "manage_lost_found": "Fundsachen verwalten"
     },
     "objets_trouves": {
@@ -1437,7 +1431,6 @@
     "normal_active": "👤 Normaler Modus",
     "normal_mode": "Normaler Benutzer",
     "oauth_password_info": "Du hast dich mit Google angemeldet. Du kannst ein Passwort festlegen, um dich mit deiner E-Mail anzumelden.",
-    "optional": "Optional",
     "optional_section_title": "Optionaler Bereich",
     "password_changed": "Passwort geändert",
     "password_digit_required": "Das Passwort muss mindestens eine Ziffer enthalten",

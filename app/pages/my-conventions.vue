@@ -4,7 +4,7 @@
     <div class="mb-12">
       <div class="flex justify-between items-center mb-6">
         <div class="flex items-center gap-3">
-          <h2 class="text-2xl font-bold">{{ $t('conventions.my_conventions') }}</h2>
+          <h2 class="text-2xl font-bold">{{ $t('navigation.my_conventions') }}</h2>
           <!-- Debug: afficher toujours l'icône pour tester -->
           <UButton
             icon="i-heroicons-question-mark-circle"

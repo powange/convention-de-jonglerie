@@ -168,7 +168,6 @@
     "system_settings_description": "General platform configuration",
     "test": "Test",
     "test_debug": "Testing & Debug",
-    "today": "Today",
     "total_conventions": "Total conventions",
     "total_editions": "Total editions",
     "total_sent": "Total sent",
@@ -633,7 +632,6 @@
     "manage_editions_desc": "Create, edit and publish different editions of your conventions",
     "manage_volunteers": "Manage volunteers",
     "manage_volunteers_desc": "Coordinate volunteer teams and their applications",
-    "my_conventions": "My Conventions",
     "no_conventions": "No conventions created",
     "no_conventions_description": "Conventions will allow you to group multiple editions.",
     "no_description": "No description",
@@ -980,7 +978,6 @@
         "night": "Night (2am-6am)"
       },
       "title": "Volunteers",
-      "total": "Total",
       "total_recipients": "Total recipients",
       "unassigned_slots": "Unassigned",
       "update_error": "Error updating application",
@@ -1154,7 +1151,6 @@
   },
   "forms": {
     "buttons": {
-      "cancel": "Cancel",
       "publishing": "Publishing...",
       "submitting": "Submitting..."
     },
@@ -1189,7 +1185,6 @@
     "no_conventions_found": "No conventions found. Be the first to add one!",
     "no_conventions_match_criteria": "No conventions match your search criteria",
     "period": "Period",
-    "reset_filters": "Reset",
     "searched_services": "Searched services",
     "upcoming_editions": "Upcoming editions"
   },
@@ -1315,7 +1310,6 @@
       "delete_edition": "Delete edition",
       "edit_edition": "Edit edition",
       "lost_found_active_description": "You can manage lost & found items while the edition is running.",
-      "manage": "Manage",
       "manage_lost_found": "Manage lost & found"
     },
     "objets_trouves": {
@@ -1437,7 +1431,6 @@
     "normal_active": "👤 Normal mode",
     "normal_mode": "Normal user",
     "oauth_password_info": "You signed in with Google. You can set a password to sign in with your email.",
-    "optional": "Optional",
     "optional_section_title": "Optional Information",
     "password_changed": "Password changed",
     "password_digit_required": "Password must contain at least one digit",

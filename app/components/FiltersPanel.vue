@@ -9,7 +9,7 @@
       block
       @click="emit('reset-filters')"
     >
-      {{ $t('homepage.reset_filters') }}
+      {{ $t('common.reset') }}
     </UButton>
 
     <!-- Filtres de recherche -->

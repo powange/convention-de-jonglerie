@@ -134,7 +134,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
     // Textes des boutons
     buttonText: {
-      today: t('common.today'),
+      today: t('calendar.today'),
       day: t('common.day'),
       week: t('common.week'),
       resourceTimelineDay: t('editions.volunteers.day_view'),

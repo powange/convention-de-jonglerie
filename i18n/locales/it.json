@@ -168,7 +168,6 @@
     "system_settings_description": "Configurazione generale della piattaforma",
     "test": "Prova",
     "test_debug": "Test e debug",
-    "today": "Oggi",
     "total_conventions": "Totale convegni",
     "total_editions": "Totale edizioni",
     "total_sent": "Totale inviate",
@@ -633,7 +632,6 @@
     "manage_editions_desc": "Crea, modifica e pubblica diverse edizioni dei tuoi convegni",
     "manage_volunteers": "Gestire volontari",
     "manage_volunteers_desc": "Coordina i team di volontari e le loro candidature",
-    "my_conventions": "I miei Convegni",
     "no_conventions": "Nessun convegno creato",
     "no_conventions_description": "I convegni ti permetteranno di raggruppare più edizioni.",
     "no_description": "Nessuna descrizione",
@@ -980,7 +978,6 @@
         "night": "Notte (2-6)"
       },
       "title": "Volontari",
-      "total": "Totale",
       "total_recipients": "Destinatari totali",
       "unassigned_slots": "Non assegnato",
       "update_error": "Errore nell'aggiornamento della candidatura",
@@ -1154,7 +1151,6 @@
   },
   "forms": {
     "buttons": {
-      "cancel": "Annulla",
       "publishing": "Pubblicazione...",
       "submitting": "Invio..."
     },
@@ -1189,7 +1185,6 @@
     "no_conventions_found": "Nessun convegno trovato. Sii il primo ad aggiungerne uno!",
     "no_conventions_match_criteria": "Nessun convegno corrisponde ai tuoi criteri di ricerca",
     "period": "Periodo",
-    "reset_filters": "Reimposta",
     "searched_services": "Servizi ricercati",
     "upcoming_editions": "Edizioni future"
   },
@@ -1315,7 +1310,6 @@
       "delete_edition": "Elimina edizione",
       "edit_edition": "Modifica edizione",
       "lost_found_active_description": "Puoi gestire gli oggetti smarriti mentre l'edizione è in corso.",
-      "manage": "Gestisci",
       "manage_lost_found": "Gestisci oggetti smarriti"
     },
     "objets_trouves": {
@@ -1437,7 +1431,6 @@
     "normal_active": "👤 Modalità normale",
     "normal_mode": "Utente normale",
     "oauth_password_info": "Hai effettuato l'accesso con Google. Puoi impostare una password per accedere con la tua email.",
-    "optional": "Opzionale",
     "optional_section_title": "Sezione opzionale",
     "password_changed": "Password cambiata",
     "password_digit_required": "La password deve contenere almeno una cifra",

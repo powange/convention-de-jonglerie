@@ -168,7 +168,6 @@
     "system_settings_description": "Algemene platformconfiguratie",
     "test": "Testen",
     "test_debug": "Tests en debug",
-    "today": "Vandaag",
     "total_conventions": "Totaal conventies",
     "total_editions": "Totaal edities",
     "total_sent": "Totaal verzonden",
@@ -633,7 +632,6 @@
     "manage_editions_desc": "Maak, bewerk en publiceer verschillende edities van je conventies",
     "manage_volunteers": "Vrijwilligers beheren",
     "manage_volunteers_desc": "Coördineer vrijwilligersteams en hun aanmeldingen",
-    "my_conventions": "Mijn Conventies",
     "no_conventions": "Geen conventies aangemaakt",
     "no_conventions_description": "Conventies stellen je in staat om meerdere edities te groeperen.",
     "no_description": "Geen beschrijving",
@@ -980,7 +978,6 @@
         "night": "Nacht (2u-6u)"
       },
       "title": "Vrijwilligers",
-      "total": "Totaal",
       "total_recipients": "Totaal ontvangers",
       "unassigned_slots": "Niet toegewezen",
       "update_error": "Fout bij bijwerken aanmelding",
@@ -1154,7 +1151,6 @@
   },
   "forms": {
     "buttons": {
-      "cancel": "Annuleren",
       "publishing": "Publiceren...",
       "submitting": "Verzenden..."
     },
@@ -1189,7 +1185,6 @@
     "no_conventions_found": "Geen conventies gevonden. Wees de eerste om er een toe te voegen!",
     "no_conventions_match_criteria": "Geen conventies voldoen aan je zoekcriteria",
     "period": "Periode",
-    "reset_filters": "Resetten",
     "searched_services": "Gezochte diensten",
     "upcoming_editions": "Aankomende edities"
   },
@@ -1315,7 +1310,6 @@
       "delete_edition": "Editie verwijderen",
       "edit_edition": "Editie bewerken",
       "lost_found_active_description": "Je kunt gevonden voorwerpen beheren terwijl de editie bezig is.",
-      "manage": "Beheren",
       "manage_lost_found": "Gevonden voorwerpen beheren"
     },
     "objets_trouves": {
@@ -1437,7 +1431,6 @@
     "normal_active": "👤 Normale modus",
     "normal_mode": "Normale gebruiker",
     "oauth_password_info": "Je bent ingelogd met Google. Je kunt een wachtwoord instellen om in te loggen met je e-mail.",
-    "optional": "Optioneel",
     "optional_section_title": "Optionele sectie",
     "password_changed": "Wachtwoord gewijzigd",
     "password_digit_required": "Wachtwoord moet minimaal één cijfer bevatten",

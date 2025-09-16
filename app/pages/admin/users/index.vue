@@ -398,7 +398,7 @@ const formatRelativeTime = (date: string) => {
   const target = new Date(date)
   const diffInDays = Math.floor((now.getTime() - target.getTime()) / (1000 * 60 * 60 * 24))
 
-  if (diffInDays === 0) return t('admin.today')
+  if (diffInDays === 0) return t('common.today')
   if (diffInDays === 1) return t('admin.yesterday')
   if (diffInDays < 7) return t('admin.days_ago', { count: diffInDays })
   if (diffInDays < 30) return t('admin.weeks_ago', { count: Math.floor(diffInDays / 7) })

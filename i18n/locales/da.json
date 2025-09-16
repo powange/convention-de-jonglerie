@@ -168,7 +168,6 @@
     "system_settings_description": "Generel platformskonfiguration",
     "test": "Test",
     "test_debug": "Tests og fejlfinding",
-    "today": "I dag",
     "total_conventions": "Total konventioner",
     "total_editions": "Total udgaver",
     "total_sent": "Total sendt",
@@ -633,7 +632,6 @@
     "manage_editions_desc": "Opret, rediger og publicer forskellige udgaver af dine konventioner",
     "manage_volunteers": "Administrer frivillige",
     "manage_volunteers_desc": "Koordiner frivillige teams og deres ansøgninger",
-    "my_conventions": "Mine konventioner",
     "no_conventions": "Ingen konventioner oprettet",
     "no_conventions_description": "Konventioner giver dig mulighed for at gruppere flere udgaver.",
     "no_description": "Ingen beskrivelse",
@@ -980,7 +978,6 @@
         "night": "Nat (2-6)"
       },
       "title": "Frivillige",
-      "total": "I alt",
       "total_recipients": "Modtagere i alt",
       "unassigned_slots": "Ikke tildelt",
       "update_error": "Error updating application",
@@ -1154,7 +1151,6 @@
   },
   "forms": {
     "buttons": {
-      "cancel": "Annuller",
       "publishing": "Offentliggør...",
       "submitting": "Indsender..."
     },
@@ -1189,7 +1185,6 @@
     "no_conventions_found": "Ingen konventioner fundet. Vær den første til at tilføje en!",
     "no_conventions_match_criteria": "Ingen konventioner matcher dine søgekriterier",
     "period": "Periode",
-    "reset_filters": "Nulstil",
     "searched_services": "Søgte tjenester",
     "upcoming_editions": "Kommende udgaver"
   },
@@ -1315,7 +1310,6 @@
       "delete_edition": "Slet udgaven",
       "edit_edition": "Rediger udgaven",
       "lost_found_active_description": "Du kan administrere hittegods mens udgaven er i gang.",
-      "manage": "Administrer",
       "manage_lost_found": "Administrer hittegods"
     },
     "objets_trouves": {
@@ -1437,7 +1431,6 @@
     "normal_active": "👤 Normal tilstand",
     "normal_mode": "Normal bruger",
     "oauth_password_info": "Du loggede ind med Google. Du kan indstille en adgangskode for at logge ind med din email.",
-    "optional": "Valgfri",
     "optional_section_title": "Valgfri sektion",
     "password_changed": "Adgangskode ændret",
     "password_digit_required": "Adgangskoden skal indeholde mindst ét tal",

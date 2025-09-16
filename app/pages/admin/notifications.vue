@@ -128,7 +128,7 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-              {{ $t('admin.today') }}
+              {{ $t('calendar.today') }}
             </p>
             <p class="text-2xl font-bold text-green-600">
               {{ stats?.sentToday || 0 }}

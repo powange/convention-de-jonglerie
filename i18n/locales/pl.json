@@ -168,7 +168,6 @@
     "system_settings_description": "Konfiguracja ogólna platformy",
     "test": "Testuj",
     "test_debug": "Testy i debugowanie",
-    "today": "Dzisiaj",
     "total_conventions": "Łączna liczba konwencji",
     "total_editions": "Łączna liczba edycji",
     "total_sent": "Całkowicie wysłane",
@@ -633,7 +632,6 @@
     "manage_editions_desc": "Twórz, edytuj i publikuj różne edycje swoich konwencji",
     "manage_volunteers": "Zarządzanie wolontariuszami",
     "manage_volunteers_desc": "Koordynuj zespoły wolontariuszy i ich zgłoszenia",
-    "my_conventions": "Moje Konwencje",
     "no_conventions": "Brak utworzonych konwencji",
     "no_conventions_description": "Konwencje pozwolą ci zgrupować kilka edycji.",
     "no_description": "Brak opisu",
@@ -980,7 +978,6 @@
         "night": "Noc (2-6)"
       },
       "title": "Wolontariusze",
-      "total": "Razem",
       "total_recipients": "Łączna liczba odbiorców",
       "unassigned_slots": "Nieprzypisane",
       "update_error": "Błąd podczas aktualizacji zgłoszenia",
@@ -1154,7 +1151,6 @@
   },
   "forms": {
     "buttons": {
-      "cancel": "Anuluj",
       "publishing": "Publikowanie...",
       "submitting": "Wysyłanie..."
     },
@@ -1189,7 +1185,6 @@
     "no_conventions_found": "Nie znaleziono konwencji. Bądź pierwszy, który ją doda!",
     "no_conventions_match_criteria": "Żadna konwencja nie spełnia twoich kryteriów wyszukiwania",
     "period": "Okres",
-    "reset_filters": "Resetuj",
     "searched_services": "Szukane usługi",
     "upcoming_editions": "Nadchodzące edycje"
   },
@@ -1315,7 +1310,6 @@
       "delete_edition": "Usuń edycję",
       "edit_edition": "Edytuj edycję",
       "lost_found_active_description": "Możesz zarządzać rzeczami znalezionymi w trakcie trwania edycji.",
-      "manage": "Zarządzaj",
       "manage_lost_found": "Zarządzaj rzeczami znalezionymi"
     },
     "objets_trouves": {
@@ -1437,7 +1431,6 @@
     "normal_active": "👤 Tryb normalny",
     "normal_mode": "Zwykły użytkownik",
     "oauth_password_info": "Zalogowałeś się przez Google. Możesz ustawić hasło, aby logować się za pomocą swojego adresu e-mail.",
-    "optional": "Opcjonalne",
     "optional_section_title": "Sekcja opcjonalna",
     "password_changed": "Hasło zmienione",
     "password_digit_required": "Hasło musi zawierać co najmniej jedną cyfrę",

@@ -142,7 +142,7 @@
             class="mt-4"
             @click="resetFilters"
           >
-            {{ $t('homepage.reset_filters') }}
+            {{ $t('common.reset') }}
           </UButton>
         </div>
       </div>
