@@ -10,7 +10,7 @@
       <div v-else-if="!edition">
         <p>{{ $t('editions.not_found') }}</p>
       </div>
-      <EditionEditionForm
+      <EditionForm
         v-else
         :initial-data="edition"
         :submit-button-text="$t('pages.edit_edition.submit_button')"
