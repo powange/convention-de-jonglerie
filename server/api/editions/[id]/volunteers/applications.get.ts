@@ -39,15 +39,15 @@ export default defineEventHandler(async (event) => {
 
   // Filtre par équipes
   if (teamsFilter) {
-    const teamNames = teamsFilter
+    const teamIds = teamsFilter
       .split(',')
       .map((t) => t.trim())
       .filter(Boolean)
-    if (teamNames.length > 0) {
-      // Pour les champs JSON array, on cherche les candidatures qui contiennent au moins une des équipes
-      const teamConditions = teamNames.map((teamName) => ({
+    if (teamIds.length > 0) {
+      // Pour les champs JSON array, on cherche les candidatures qui contiennent au moins un des IDs d'équipes
+      const teamConditions = teamIds.map((teamId) => ({
         teamPreferences: {
-          array_contains: [teamName],
+          array_contains: [teamId],
         },
       }))
       conditions.push({ OR: teamConditions })

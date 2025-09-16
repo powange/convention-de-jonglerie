@@ -430,7 +430,7 @@ const volunteerTeamItems = computed(() => {
   }
   return volunteerTeams.value.map((team: any) => ({
     label: team.name,
-    value: team.name,
+    value: team.id,
   }))
 })
 
@@ -465,7 +465,7 @@ const teamOptionsForEdit = computed(() => {
   }
 
   return volunteerTeams.value.map((team: any) => ({
-    value: team.name,
+    value: team.id,
     label: team.name,
   }))
 })
