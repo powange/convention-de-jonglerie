@@ -84,7 +84,51 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    // Traitement pour remplacer les IDs des équipes par leurs noms
+    // Récupérer les éditions des candidatures acceptées pour chercher les créneaux assignés
+    const acceptedApplications = applications.filter((app) => app.status === 'ACCEPTED')
+    const editionIds = acceptedApplications.map((app) => app.edition.id)
+
+    // Récupérer tous les créneaux assignés pour cet utilisateur dans ces éditions
+    let volunteerAssignments = []
+    if (editionIds.length > 0) {
+      volunteerAssignments = await prisma.volunteerAssignment.findMany({
+        where: {
+          userId: event.context.user.id,
+          timeSlot: {
+            editionId: {
+              in: editionIds,
+            },
+          },
+        },
+        select: {
+          id: true,
+          assignedAt: true,
+          timeSlot: {
+            select: {
+              id: true,
+              title: true,
+              startDateTime: true,
+              endDateTime: true,
+              editionId: true,
+              team: {
+                select: {
+                  id: true,
+                  name: true,
+                  color: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          timeSlot: {
+            startDateTime: 'asc',
+          },
+        },
+      })
+    }
+
+    // Traitement pour remplacer les IDs des équipes par leurs noms et ajouter les créneaux assignés
     const applicationsWithTeamNames = applications.map((app) => {
       const teamPreferencesWithNames = app.teamPreferences
         ? app.teamPreferences.map((teamId: any) => {
@@ -100,10 +144,16 @@ export default defineEventHandler(async (event) => {
           })
         : []
 
+      // Filtrer les créneaux assignés pour cette édition
+      const editionAssignments = volunteerAssignments.filter(
+        (assignment) => assignment.timeSlot.editionId === app.edition.id
+      )
+
       return {
         ...app,
         teamPreferences: teamPreferencesWithNames,
         assignedTeams: assignedTeamsWithNames,
+        assignedTimeSlots: editionAssignments,
         edition: {
           ...app.edition,
           volunteerTeams: undefined, // On supprime cette propriété du retour

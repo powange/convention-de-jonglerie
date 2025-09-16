@@ -1388,7 +1388,10 @@
       "view_edition": "View edition",
       "withdraw": "Withdraw",
       "withdrawal_error": "Error withdrawing application",
-      "withdrawal_success": "Application withdrawn successfully"
+      "withdrawal_success": "Application withdrawn successfully",
+      "assigned_time_slots": "Assigned Time Slots",
+      "unnamed_slot": "Unnamed slot",
+      "total_hours": "Total hours"
     }
   },
   "permissions": {

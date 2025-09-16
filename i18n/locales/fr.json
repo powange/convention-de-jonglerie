@@ -1354,7 +1354,10 @@
       "browse_conventions": "Parcourir les conventions",
       "confirm_withdraw": "Êtes-vous sûr de vouloir retirer votre candidature ?",
       "withdrawal_success": "Candidature retirée avec succès",
-      "withdrawal_error": "Erreur lors du retrait de la candidature"
+      "withdrawal_error": "Erreur lors du retrait de la candidature",
+      "assigned_time_slots": "Créneaux assignés",
+      "unnamed_slot": "Créneau sans titre",
+      "total_hours": "Total d'heures"
     },
     "comments": {
       "be_first_to_comment": "Soyez le premier à partager votre expérience !",

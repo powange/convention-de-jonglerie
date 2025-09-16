@@ -380,6 +380,59 @@
             </div>
           </div>
 
+          <!-- Créneaux assignés -->
+          <div
+            v-if="
+              application.status === 'ACCEPTED' &&
+              application.assignedTimeSlots &&
+              application.assignedTimeSlots.length > 0
+            "
+          >
+            <h4 class="font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+              <UIcon name="i-heroicons-clock" class="text-blue-600 dark:text-blue-400" />
+              {{ $t('pages.volunteers.assigned_time_slots') }}
+              <UBadge color="blue" variant="soft" size="sm">
+                {{ application.assignedTimeSlots.length }}
+              </UBadge>
+            </h4>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <div
+                v-for="assignment in application.assignedTimeSlots"
+                :key="assignment.id"
+                class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
+              >
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium text-blue-900 dark:text-blue-100 text-sm mb-1">
+                      {{ assignment.timeSlot.title || $t('pages.volunteers.unnamed_slot') }}
+                    </p>
+                    <div class="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300 mb-2">
+                      <UIcon name="i-heroicons-calendar-days" class="w-3 h-3" />
+                      <span>
+                        {{ formatSlotDateTime(assignment.timeSlot.startDateTime, assignment.timeSlot.endDateTime) }}
+                      </span>
+                    </div>
+                    <div
+                      v-if="assignment.timeSlot.team"
+                      class="flex items-center gap-2"
+                    >
+                      <div
+                        class="w-2 h-2 rounded-full flex-shrink-0"
+                        :style="{ backgroundColor: assignment.timeSlot.team.color || '#6b7280' }"
+                      ></div>
+                      <span class="text-xs text-gray-600 dark:text-gray-400 truncate">
+                        {{ assignment.timeSlot.team.name }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-2 text-xs text-blue-600 dark:text-blue-400">
+              {{ $t('pages.volunteers.total_hours') }}: {{ calculateTotalHours(application.assignedTimeSlots) }}h
+            </div>
+          </div>
+
           <!-- Note d'acceptation -->
           <div
             v-if="application.status === 'ACCEPTED' && application.acceptanceNote"
@@ -515,6 +568,43 @@ const getStatusVariant = (status: string) => {
     default:
       return 'soft'
   }
+}
+
+// Fonction pour formater les dates et heures des créneaux
+const formatSlotDateTime = (startDateTime: string, endDateTime: string) => {
+  const start = new Date(startDateTime)
+  const end = new Date(endDateTime)
+
+  const dateStr = start.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+  })
+
+  const startTimeStr = start.toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
+  const endTimeStr = end.toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
+  return `${dateStr} • ${startTimeStr} - ${endTimeStr}`
+}
+
+// Fonction pour calculer le total d'heures
+const calculateTotalHours = (assignments: any[]) => {
+  let totalMs = 0
+
+  assignments.forEach((assignment) => {
+    const start = new Date(assignment.timeSlot.startDateTime)
+    const end = new Date(assignment.timeSlot.endDateTime)
+    totalMs += end.getTime() - start.getTime()
+  })
+
+  const totalHours = totalMs / (1000 * 60 * 60)
+  return totalHours.toFixed(1)
 }
 
 // Fonction pour retirer une candidature
