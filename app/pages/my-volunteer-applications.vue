@@ -395,7 +395,7 @@
                 {{ application.assignedTimeSlots.length }}
               </UBadge>
             </h4>
-            <div class="grid gap-3 sm:grid-cols-2">
+            <div class="space-y-3">
               <div
                 v-for="assignment in application.assignedTimeSlots"
                 :key="assignment.id"
