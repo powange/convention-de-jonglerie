@@ -36,26 +36,6 @@ export default defineEventHandler(async (event) => {
             nom: true,
             prenom: true,
             email: true,
-          },
-        },
-        teamPreferences: true,
-        teams: {
-          select: {
-            id: true,
-            name: true,
-            color: true,
-          },
-        },
-        timePreferences: true,
-        skills: true,
-        // Compter les assignations existantes
-        user: {
-          select: {
-            id: true,
-            pseudo: true,
-            nom: true,
-            prenom: true,
-            email: true,
             volunteerAssignments: {
               where: {
                 timeSlot: {
@@ -78,6 +58,16 @@ export default defineEventHandler(async (event) => {
             },
           },
         },
+        teamPreferences: true,
+        teams: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
+        timePreferences: true,
+        skills: true,
       },
       orderBy: {
         user: {
