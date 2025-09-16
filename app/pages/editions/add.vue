@@ -4,7 +4,7 @@
       <template #header>
         <h1 class="text-2xl font-bold">{{ $t('pages.add_edition.title') }}</h1>
       </template>
-      <EditionEditionForm
+      <EditionForm
         :submit-button-text="$t('pages.add_edition.submit_button')"
         :loading="editionStore.loading"
         :initial-data="initialData"
