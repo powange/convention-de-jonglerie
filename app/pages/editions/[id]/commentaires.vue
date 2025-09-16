@@ -89,7 +89,7 @@
         </div>
 
         <div v-else class="space-y-6">
-          <EditionEditionPost
+          <EditionPost
             v-for="post in posts"
             :key="post.id"
             :post="post"
