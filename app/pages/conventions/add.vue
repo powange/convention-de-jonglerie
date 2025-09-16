@@ -11,7 +11,7 @@
         </p>
       </template>
 
-      <ConventionConventionForm
+      <ConventionForm
         :submit-button-text="$t('pages.add_convention.submit_button')"
         :loading="loading"
         @submit="handleAddConvention"

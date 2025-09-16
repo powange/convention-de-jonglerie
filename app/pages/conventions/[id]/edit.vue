@@ -33,7 +33,7 @@
         </UButton>
       </div>
 
-      <ConventionConventionForm
+      <ConventionForm
         v-else
         :initial-data="convention"
         :submit-button-text="$t('pages.edit_convention.submit_button')"
