@@ -2,11 +2,6 @@
   <div>
     <!-- Section notification des bénévoles -->
     <div class="mb-6">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
-        <UIcon name="i-heroicons-bell" class="text-blue-600" />
-        {{ t('editions.volunteers.notifications') }}
-      </h3>
-
       <!-- Bouton envoyer notification -->
       <div v-if="canManageVolunteers && acceptedVolunteersCount > 0" class="flex justify-center">
         <UButton

@@ -33,17 +33,34 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
     volunteersTeardownEndDate: new Date('2024-06-05'),
     volunteersAskSetup: true,
     volunteersAskTeardown: true,
-    volunteersTeams: [
-      { id: 1, name: 'Accueil', slots: 5 },
-      { id: 2, name: 'Technique', slots: 3 },
-      { id: 3, name: 'Bar', slots: null },
-    ],
+    // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
     volunteerApplications: [],
   }
+
+  // Mock des équipes VolunteerTeam
+  const mockVolunteerTeams = [
+    {
+      id: 'team1',
+      name: 'Accueil',
+      description: 'Équipe accueil',
+      color: '#ef4444',
+      maxVolunteers: 5,
+    },
+    {
+      id: 'team2',
+      name: 'Technique',
+      description: 'Équipe technique',
+      color: '#3b82f6',
+      maxVolunteers: 3,
+    },
+    { id: 'team3', name: 'Bar', description: 'Équipe bar', color: '#10b981', maxVolunteers: null },
+  ]
 
   beforeEach(() => {
     vi.clearAllMocks()
     global.getRouterParam = vi.fn().mockReturnValue('1')
+    // Mock des équipes VolunteerTeam par défaut
+    prismaMock.volunteerTeam.findMany.mockResolvedValue(mockVolunteerTeams)
   })
 
   describe('Mode INTERNAL', () => {
@@ -74,11 +91,7 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
         teardownEndDate: mockEdition.volunteersTeardownEndDate,
         askSetup: true,
         askTeardown: true,
-        teams: [
-          { id: 1, name: 'Accueil', slots: 5 },
-          { id: 2, name: 'Technique', slots: 3 },
-          { id: 3, name: 'Bar', slots: null },
-        ],
+        teams: mockVolunteerTeams,
         myApplication: null,
         counts: { total: 0 },
       })
@@ -98,10 +111,12 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
         volunteersAskAvoidList: false,
         volunteersAskSkills: false,
         volunteersAskExperience: false,
-        volunteersTeams: [],
+        // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
       }
 
       prismaMock.edition.findUnique.mockResolvedValue(editionWithMinimalOptions)
+      // Pas d'équipes pour ce test
+      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
 
       const mockEvent = { context: { user: null } }
       const result = await handler(mockEvent as any)
@@ -171,11 +186,7 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
         teardownEndDate: mockEdition.volunteersTeardownEndDate,
         askSetup: true,
         askTeardown: true,
-        teams: [
-          { id: 1, name: 'Accueil', slots: 5 },
-          { id: 2, name: 'Technique', slots: 3 },
-          { id: 3, name: 'Bar', slots: null },
-        ],
+        teams: mockVolunteerTeams,
         myApplication: null,
         counts: { total: 0 },
       })
@@ -236,11 +247,7 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
         teardownEndDate: mockEdition.volunteersTeardownEndDate,
         askSetup: true,
         askTeardown: true,
-        teams: [
-          { id: 1, name: 'Accueil', slots: 5 },
-          { id: 2, name: 'Technique', slots: 3 },
-          { id: 3, name: 'Bar', slots: null },
-        ],
+        teams: mockVolunteerTeams,
         myApplication: null,
         counts: { total: 0 },
       })
@@ -268,36 +275,54 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
   })
 
   describe('Gestion des équipes', () => {
-    it('devrait retourner les équipes avec leurs slots', async () => {
-      const editionWithTeams = {
-        ...mockEdition,
-        volunteersTeams: [
-          { id: 1, name: 'Accueil', slots: 10 },
-          { id: 2, name: 'Technique', slots: 5 },
-          { id: 3, name: 'Bar', slots: null }, // Pas de limite
-          { id: 4, name: 'Sécurité', slots: 2 },
-        ],
-      }
+    it('devrait retourner les équipes avec leurs maxVolunteers', async () => {
+      const customVolunteerTeams = [
+        {
+          id: 'team1',
+          name: 'Accueil',
+          description: 'Équipe accueil',
+          color: '#ef4444',
+          maxVolunteers: 10,
+        },
+        {
+          id: 'team2',
+          name: 'Technique',
+          description: 'Équipe technique',
+          color: '#3b82f6',
+          maxVolunteers: 5,
+        },
+        {
+          id: 'team3',
+          name: 'Bar',
+          description: 'Équipe bar',
+          color: '#10b981',
+          maxVolunteers: null,
+        },
+        {
+          id: 'team4',
+          name: 'Sécurité',
+          description: 'Équipe sécurité',
+          color: '#f59e0b',
+          maxVolunteers: 2,
+        },
+      ]
 
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithTeams)
+      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.volunteerTeam.findMany.mockResolvedValue(customVolunteerTeams)
 
       const mockEvent = { context: { user: null } }
       const result = await handler(mockEvent as any)
 
       expect(result.teams).toHaveLength(4)
-      expect(result.teams[0]).toEqual({ id: 1, name: 'Accueil', slots: 10 })
-      expect(result.teams[1]).toEqual({ id: 2, name: 'Technique', slots: 5 })
-      expect(result.teams[2]).toEqual({ id: 3, name: 'Bar', slots: null })
-      expect(result.teams[3]).toEqual({ id: 4, name: 'Sécurité', slots: 2 })
+      expect(result.teams[0]).toEqual(customVolunteerTeams[0])
+      expect(result.teams[1]).toEqual(customVolunteerTeams[1])
+      expect(result.teams[2]).toEqual(customVolunteerTeams[2])
+      expect(result.teams[3]).toEqual(customVolunteerTeams[3])
     })
 
     it('devrait gérer les éditions sans équipes', async () => {
-      const editionWithoutTeams = {
-        ...mockEdition,
-        volunteersTeams: [],
-      }
-
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithoutTeams)
+      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
 
       const mockEvent = { context: { user: null } }
       const result = await handler(mockEvent as any)
@@ -305,18 +330,40 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
       expect(result.teams).toEqual([])
     })
 
-    it("devrait retourner les équipes dans l'ordre fourni", async () => {
-      const editionWithUnsortedTeams = {
-        ...mockEdition,
-        volunteersTeams: [
-          { id: 3, name: 'Zzz Dernier', slots: 1 },
-          { id: 1, name: 'Accueil', slots: 10 },
-          { id: 2, name: 'Bar', slots: 5 },
-          { id: 4, name: 'Aaa Premier', slots: 2 },
-        ],
-      }
+    it("devrait retourner les équipes dans l'ordre de la base", async () => {
+      const unsortedVolunteerTeams = [
+        {
+          id: 'team3',
+          name: 'Zzz Dernier',
+          description: 'Last team',
+          color: '#ef4444',
+          maxVolunteers: 1,
+        },
+        {
+          id: 'team1',
+          name: 'Accueil',
+          description: 'First team',
+          color: '#3b82f6',
+          maxVolunteers: 10,
+        },
+        {
+          id: 'team2',
+          name: 'Bar',
+          description: 'Middle team',
+          color: '#10b981',
+          maxVolunteers: 5,
+        },
+        {
+          id: 'team4',
+          name: 'Aaa Premier',
+          description: 'Early team',
+          color: '#f59e0b',
+          maxVolunteers: 2,
+        },
+      ]
 
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithUnsortedTeams)
+      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.volunteerTeam.findMany.mockResolvedValue(unsortedVolunteerTeams)
 
       const mockEvent = { context: { user: null } }
       const result = await handler(mockEvent as any)
@@ -497,21 +544,31 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
           volunteersTeardownEndDate: true,
           volunteersAskSetup: true,
           volunteersAskTeardown: true,
-          volunteersTeams: true,
+          // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
           volunteerApplications: { select: { id: true, status: true, userId: true } },
         },
       })
     })
 
-    it("devrait ne faire qu'une seule requête base de données", async () => {
+    it('devrait faire les requêtes nécessaires (edition + volunteerTeam)', async () => {
       prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
 
       const mockEvent = { context: { user: null } }
       await handler(mockEvent as any)
 
       expect(prismaMock.edition.findUnique).toHaveBeenCalledTimes(1)
-      // Vérifier qu'il n'y a pas d'autres appels Prisma
-      expect(prismaMock.editionVolunteerTeam.findMany).not.toHaveBeenCalled()
+      expect(prismaMock.volunteerTeam.findMany).toHaveBeenCalledTimes(1)
+      expect(prismaMock.volunteerTeam.findMany).toHaveBeenCalledWith({
+        where: { editionId: 1 },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          color: true,
+          maxVolunteers: true,
+        },
+        orderBy: { name: 'asc' },
+      })
     })
   })
 

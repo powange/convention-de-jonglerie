@@ -4,7 +4,10 @@
       <UForm :schema="slotSchema" :state="formState" class="space-y-4" @submit="onSubmit">
         <!-- Titre du créneau -->
         <UFormField name="title" :label="t('editions.volunteers.slot_title')">
-          <UInput v-model="formState.title" placeholder="Ex: Accueil des visiteurs" />
+          <UInput
+            v-model="formState.title"
+            :placeholder="$t('editions.volunteers.slot_title_placeholder')"
+          />
         </UFormField>
 
         <!-- Description -->
@@ -55,7 +58,7 @@
             type="number"
             min="1"
             max="50"
-            placeholder="3"
+            :placeholder="$t('editions.volunteers.max_volunteers_placeholder')"
           />
         </UFormField>
       </UForm>

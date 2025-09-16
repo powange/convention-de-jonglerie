@@ -4,7 +4,7 @@ import { canManageEditionVolunteers } from '../../../../../../utils/collaborator
 import { prisma } from '../../../../../../utils/prisma'
 
 const bodySchema = z.object({
-  teams: z.array(z.string()), // Noms des équipes pour l'assignation
+  teams: z.array(z.string()), // Noms ou IDs des équipes pour l'assignation
 })
 
 export default defineEventHandler(async (event) => {
@@ -41,13 +41,56 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Les équipes ne peuvent être assignées aux bénévoles rejetés',
     })
 
-  // Mettre à jour la candidature avec les équipes assignées
+  // Récupérer les équipes de cette édition pour faire le mapping noms -> IDs
+  const availableTeams = await prisma.volunteerTeam.findMany({
+    where: { editionId },
+    select: { id: true, name: true },
+  })
+
+  // Mapper les noms/IDs d'équipes vers les IDs des VolunteerTeam
+  const teamIds: string[] = []
+  for (const teamIdentifier of parsed.teams) {
+    // Chercher d'abord par ID, puis par nom (pour compatibilité)
+    let team = availableTeams.find((t) => t.id === teamIdentifier)
+    if (!team) {
+      team = availableTeams.find(
+        (t) => t.name.toLowerCase().trim() === teamIdentifier.toLowerCase().trim()
+      )
+    }
+
+    if (team) {
+      teamIds.push(team.id)
+    } else {
+      throw createError({
+        statusCode: 400,
+        statusMessage: `Équipe "${teamIdentifier}" introuvable dans cette édition`,
+      })
+    }
+  }
+
+  // Mettre à jour les relations avec les nouvelles équipes
   const updated = await prisma.editionVolunteerApplication.update({
     where: { id: applicationId },
     data: {
+      // Conserver l'ancien système pour compatibilité
       assignedTeams: parsed.teams,
+      // Utiliser le nouveau système de relations
+      teams: {
+        set: teamIds.map((id) => ({ id })),
+      },
     },
-    select: { id: true, assignedTeams: true },
+    select: {
+      id: true,
+      assignedTeams: true,
+      teams: {
+        select: {
+          id: true,
+          name: true,
+          color: true,
+          description: true,
+        },
+      },
+    },
   })
 
   return {

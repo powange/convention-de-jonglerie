@@ -185,6 +185,9 @@ const emit = defineEmits<Emits>()
 const { t } = useI18n()
 const toast = useToast()
 
+// Utiliser le nouveau système VolunteerTeam
+const { teams: volunteerTeams } = useVolunteerTeams(props.edition.id)
+
 const messageMaxLength = 500
 
 // Gestion de l'état open/close de la modal
@@ -228,10 +231,10 @@ const recipientOptions = computed(() => [
 ])
 
 const teamsOptions = computed(() => {
-  if (!props.volunteersInfo?.teams) return []
+  if (!volunteerTeams.value || volunteerTeams.value.length === 0) return []
 
-  return props.volunteersInfo.teams.map((team: any) => ({
-    value: team.name,
+  return volunteerTeams.value.map((team: any) => ({
+    value: team.name, // Garder le nom comme valeur pour la compatibilité avec les assignedTeams
     label: `${team.name} ${team.assignedVolunteersCount ? `(${team.assignedVolunteersCount})` : ''}`,
   }))
 })

@@ -27,7 +27,12 @@ const sections = [
     { name: 'db:seed:dev', desc: 'Seed données de dev (faker)' },
     { name: 'db:reset:dev', desc: 'Reset complet (DROP + migrations) DEV UNIQUEMENT' },
     { name: 'db:seed:dev -- --reset', desc: 'Reset + seed (préférer reset puis seed séparés)' },
-    { name: 'db:clean-tokens', desc: 'Nettoie les tokens expirés' }
+    { name: 'db:clean-tokens', desc: 'Nettoie les tokens expirés' },
+    { name: 'db:check-teams', desc: 'Vérifie les équipes de bénévoles (JSON vs table)' },
+    { name: 'db:migrate-teams', desc: 'Migre les équipes de bénévoles vers la nouvelle table' },
+    { name: 'db:check-team-assignments', desc: 'Vérifie les assignations d\'équipes (JSON vs relations)' },
+    { name: 'db:migrate-team-assignments', desc: 'Migre les assignations d\'équipes vers les nouvelles relations' },
+    { name: 'db:migrate-team-preferences', desc: 'Migre les préférences d\'équipes des candidatures (noms → IDs)' }
   ] },
   { title: '👤 Administration', color: colors.yellow, scripts: [
     { name: 'admin:list', desc: 'Liste les super administrateurs' },

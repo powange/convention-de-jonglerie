@@ -23,37 +23,40 @@
         <div
           v-for="team in teams"
           :key="team.id"
-          class="border rounded-lg p-4 hover:shadow-md transition-shadow"
+          class="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
           :style="{ borderColor: team.color }"
+          @click="openEditTeamModal(team)"
         >
           <div class="flex items-start justify-between mb-2">
             <div class="flex items-center gap-2">
               <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: team.color }" />
               <h4 class="font-medium">{{ team.name }}</h4>
             </div>
-            <UDropdown
-              :items="[
-                [
-                  {
-                    label: t('common.edit'),
-                    icon: 'i-heroicons-pencil',
-                    click: () => openEditTeamModal(team),
-                  },
-                  {
-                    label: t('common.delete'),
-                    icon: 'i-heroicons-trash',
-                    click: () => confirmDeleteTeam(team),
-                  },
-                ],
-              ]"
-            >
-              <UButton
-                variant="ghost"
-                color="gray"
-                icon="i-heroicons-ellipsis-vertical"
-                size="xs"
-              />
-            </UDropdown>
+            <div @click.stop>
+              <UDropdown
+                :items="[
+                  [
+                    {
+                      label: t('common.edit'),
+                      icon: 'i-heroicons-pencil',
+                      click: () => openEditTeamModal(team),
+                    },
+                    {
+                      label: t('common.delete'),
+                      icon: 'i-heroicons-trash',
+                      click: () => confirmDeleteTeam(team),
+                    },
+                  ],
+                ]"
+              >
+                <UButton
+                  variant="ghost"
+                  color="gray"
+                  icon="i-heroicons-ellipsis-vertical"
+                  size="xs"
+                />
+              </UDropdown>
+            </div>
           </div>
 
           <p v-if="team.description" class="text-sm text-gray-600 mb-2">
@@ -75,47 +78,133 @@
     <!-- Modal de création/édition d'équipe -->
     <UModal v-model:open="teamModalOpen" :title="teamModalTitle">
       <template #body>
-        <UForm :schema="teamSchema" :state="teamFormState" class="space-y-4" @submit="onTeamSubmit">
-          <!-- Nom de l'équipe -->
-          <UFormField name="name" :label="t('editions.volunteers.team_name')">
-            <UInput v-model="teamFormState.name" placeholder="Ex: Accueil" />
-          </UFormField>
-
-          <!-- Description -->
-          <UFormField name="description" :label="t('common.description')">
-            <UTextarea
-              v-model="teamFormState.description"
-              :placeholder="t('editions.volunteers.team_description_placeholder')"
-              :rows="3"
-            />
-          </UFormField>
-
-          <!-- Couleur -->
-          <UFormField name="color" :label="t('editions.volunteers.team_color')">
-            <div class="flex items-center gap-3">
-              <input
-                v-model="teamFormState.color"
-                type="color"
-                class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+        <div class="space-y-6">
+          <!-- Aperçu de l'équipe -->
+          <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border">
+            <div class="flex items-center gap-3 mb-2">
+              <div
+                class="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+                :style="{ backgroundColor: teamFormState.color }"
               />
-              <UInput v-model="teamFormState.color" placeholder="#3b82f6" class="flex-1" />
+              <h3 class="font-medium text-lg">
+                {{ teamFormState.name || t('editions.volunteers.team_preview') }}
+              </h3>
             </div>
-          </UFormField>
+            <p v-if="teamFormState.description" class="text-sm text-gray-600 dark:text-gray-400">
+              {{ teamFormState.description }}
+            </p>
+            <p v-else class="text-sm text-gray-500 italic">
+              {{ t('editions.volunteers.no_description_preview') }}
+            </p>
+            <div v-if="teamFormState.maxVolunteers" class="mt-2 text-xs text-gray-500">
+              <UIcon name="i-heroicons-users" class="w-3 h-3 inline mr-1" />
+              {{ t('editions.volunteers.max_volunteers') }}: {{ teamFormState.maxVolunteers }}
+            </div>
+          </div>
 
-          <!-- Nombre max de bénévoles -->
-          <UFormField
-            name="maxVolunteers"
-            :label="t('editions.volunteers.max_volunteers_optional')"
+          <UForm
+            :schema="teamSchema"
+            :state="teamFormState"
+            class="space-y-5"
+            @submit="onTeamSubmit"
           >
-            <UInput
-              v-model.number="teamFormState.maxVolunteers"
-              type="number"
-              min="1"
-              max="100"
-              placeholder="Pas de limite"
-            />
-          </UFormField>
-        </UForm>
+            <!-- Nom de l'équipe -->
+            <UFormField name="name" :label="t('editions.volunteers.team_name')" required>
+              <UInput
+                v-model="teamFormState.name"
+                placeholder="Ex: Accueil, Sécurité, Logistique..."
+                icon="i-heroicons-user-group"
+                class="w-full"
+              />
+              <template #hint>
+                <span class="text-xs text-gray-500">{{
+                  t('editions.volunteers.team_name_hint')
+                }}</span>
+              </template>
+            </UFormField>
+
+            <!-- Description -->
+            <UFormField name="description" :label="t('common.description')">
+              <UTextarea
+                v-model="teamFormState.description"
+                :placeholder="t('editions.volunteers.team_description_placeholder')"
+                :rows="3"
+                class="w-full"
+              />
+              <template #hint>
+                <span class="text-xs text-gray-500">{{
+                  t('editions.volunteers.team_description_hint')
+                }}</span>
+              </template>
+            </UFormField>
+
+            <!-- Couleur avec palette -->
+            <UFormField name="color" :label="t('editions.volunteers.team_color')" required>
+              <!-- Palette de couleurs prédéfinies -->
+              <div class="space-y-3">
+                <div class="grid grid-cols-8 gap-2 mb-3">
+                  <button
+                    v-for="color in predefinedColors"
+                    :key="color"
+                    type="button"
+                    class="w-8 h-8 rounded-full border-2 shadow-sm hover:scale-110 transition-transform"
+                    :class="
+                      teamFormState.color === color
+                        ? 'border-gray-900 dark:border-white ring-2 ring-offset-2 ring-gray-500'
+                        : 'border-gray-300'
+                    "
+                    :style="{ backgroundColor: color }"
+                    @click="teamFormState.color = color"
+                  />
+                </div>
+
+                <!-- Sélecteur de couleur personnalisé -->
+                <div class="flex items-center gap-3">
+                  <label class="block">
+                    <span class="sr-only">{{ t('editions.volunteers.custom_color') }}</span>
+                    <input
+                      v-model="teamFormState.color"
+                      type="color"
+                      class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+                    />
+                  </label>
+                  <UInput
+                    v-model="teamFormState.color"
+                    placeholder="#3b82f6"
+                    class="flex-1"
+                    pattern="^#[0-9A-Fa-f]{6}$"
+                  />
+                </div>
+              </div>
+              <template #hint>
+                <span class="text-xs text-gray-500">{{
+                  t('editions.volunteers.team_color_hint')
+                }}</span>
+              </template>
+            </UFormField>
+
+            <!-- Nombre max de bénévoles -->
+            <UFormField
+              name="maxVolunteers"
+              :label="t('editions.volunteers.max_volunteers_optional')"
+            >
+              <UInput
+                v-model.number="teamFormState.maxVolunteers"
+                type="number"
+                min="1"
+                max="100"
+                placeholder="Pas de limite"
+                icon="i-heroicons-users"
+                class="w-full"
+              />
+              <template #hint>
+                <span class="text-xs text-gray-500">{{
+                  t('editions.volunteers.max_volunteers_hint')
+                }}</span>
+              </template>
+            </UFormField>
+          </UForm>
+        </div>
       </template>
       <template #footer>
         <div class="flex justify-between">
@@ -184,6 +273,26 @@ const teamFormState = ref({
   maxVolunteers: undefined as number | undefined,
 })
 
+// Couleurs prédéfinies pour la palette
+const predefinedColors = [
+  '#ef4444', // red-500
+  '#f97316', // orange-500
+  '#eab308', // yellow-500
+  '#22c55e', // green-500
+  '#06b6d4', // cyan-500
+  '#3b82f6', // blue-500
+  '#8b5cf6', // violet-500
+  '#ec4899', // pink-500
+  '#f59e0b', // amber-500
+  '#10b981', // emerald-500
+  '#0ea5e9', // sky-500
+  '#6366f1', // indigo-500
+  '#a855f7', // purple-500
+  '#f43f5e', // rose-500
+  '#84cc16', // lime-500
+  '#64748b', // slate-500
+]
+
 // Computed
 const teamModalTitle = computed(() =>
   editingTeam.value ? t('editions.volunteers.edit_team') : t('editions.volunteers.create_team')
@@ -192,10 +301,18 @@ const teamModalTitle = computed(() =>
 // Actions
 const openCreateTeamModal = () => {
   editingTeam.value = null
+  // Choisir une couleur aléatoire parmi celles qui ne sont pas déjà utilisées
+  const usedColors = teams.value.map((team) => team.color)
+  const availableColors = predefinedColors.filter((color) => !usedColors.includes(color))
+  const randomColor =
+    availableColors.length > 0
+      ? availableColors[Math.floor(Math.random() * availableColors.length)]
+      : predefinedColors[Math.floor(Math.random() * predefinedColors.length)]
+
   teamFormState.value = {
     name: '',
     description: '',
-    color: '#3b82f6',
+    color: randomColor,
     maxVolunteers: undefined,
   }
   teamModalOpen.value = true

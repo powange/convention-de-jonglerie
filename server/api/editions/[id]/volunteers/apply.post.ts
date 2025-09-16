@@ -79,7 +79,7 @@ export default defineEventHandler(async (event) => {
       volunteersAskPets: true,
       volunteersAskMinors: true,
       volunteersAskVehicle: true,
-      volunteersTeams: true,
+      // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
     },
   })
   if (!edition) throw createError({ statusCode: 404, statusMessage: 'Edition introuvable' })
@@ -142,16 +142,23 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Validation des préférences d'équipe (seulement si les équipes sont demandées)
+  // Validation des préférences d'équipe (nouveau système VolunteerTeam)
   if (
     edition.volunteersAskTeamPreferences &&
     parsed.teamPreferences &&
     parsed.teamPreferences.length > 0
   ) {
-    const validTeamNames = ((edition.volunteersTeams as Array<{ name: string }>) || []).map(
-      (team) => team.name
-    )
-    const invalidTeams = parsed.teamPreferences.filter((team) => !validTeamNames.includes(team))
+    // Récupérer les équipes du nouveau système
+    const validTeams = await prisma.volunteerTeam.findMany({
+      where: { editionId },
+      select: { id: true, name: true },
+    })
+
+    const validTeamIds = validTeams.map((team) => team.id)
+    const validTeamNames = validTeams.map((team) => team.name)
+
+    // Vérifier si les IDs fournis sont valides
+    const invalidTeams = parsed.teamPreferences.filter((teamId) => !validTeamIds.includes(teamId))
     if (invalidTeams.length > 0) {
       throw createError({
         statusCode: 400,

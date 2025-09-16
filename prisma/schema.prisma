@@ -432,6 +432,7 @@ model EditionVolunteerApplication {
   departureDateTime    String?
   edition              Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user                 User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teams                VolunteerTeam[]
 
   @@unique([editionId, userId])
   @@index([editionId])
@@ -655,6 +656,7 @@ model VolunteerTeam {
 
   edition      Edition             @relation(fields: [editionId], references: [id], onDelete: Cascade)
   timeSlots    VolunteerTimeSlot[]
+  applications EditionVolunteerApplication[]
 
   @@index([editionId])
 }

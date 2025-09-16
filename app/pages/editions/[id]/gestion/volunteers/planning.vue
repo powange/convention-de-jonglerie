@@ -1,115 +1,109 @@
 <template>
-  <div v-if="edition">
-    <EditionHeader
-      :edition="edition"
-      current-page="volunteers"
-      :is-favorited="isFavorited(edition.id)"
-      @toggle-favorite="toggleFavorite(edition.id)"
-    />
+  <div>
+    <div v-if="editionStore.loading">
+      <p>{{ $t('editions.loading_details') }}</p>
+    </div>
+    <div v-else-if="!edition">
+      <p>{{ $t('editions.not_found') }}</p>
+    </div>
+    <div v-else-if="!canAccess">
+      <UAlert
+        icon="i-heroicons-exclamation-triangle"
+        color="error"
+        variant="soft"
+        :title="$t('pages.access_denied.title')"
+        :description="$t('pages.access_denied.description')"
+      />
+    </div>
+    <div v-else>
+      <!-- En-tête avec navigation -->
+      <EditionHeader
+        :edition="edition"
+        current-page="gestion"
+        :is-favorited="isFavorited(edition.id)"
+        @toggle-favorite="toggleFavorite(edition.id)"
+      />
 
-    <UCard variant="soft" class="mb-6">
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold flex items-center gap-2">
-            <UIcon name="i-heroicons-calendar-days" class="text-primary-500" />
-            {{ t('editions.volunteers.schedule_management') }}
-          </h3>
-          <div v-if="canManageVolunteers" class="flex items-center gap-2">
-            <UButton
-              size="xs"
-              color="primary"
-              variant="soft"
-              icon="i-heroicons-arrow-left"
-              :to="`/editions/${edition?.id}/volunteers`"
-            >
-              {{ t('common.back') || 'Retour' }}
-            </UButton>
+      <!-- Titre de la page -->
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <UIcon name="i-heroicons-calendar-days" class="text-orange-600 dark:text-orange-400" />
+          Planning des bénévoles
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">
+          Planifier les créneaux et missions des bénévoles
+        </p>
+      </div>
+
+      <!-- Contenu du planning -->
+      <UCard variant="soft">
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold flex items-center gap-2">
+              <UIcon name="i-heroicons-calendar-days" class="text-primary-500" />
+              {{ t('editions.volunteers.schedule_management') }}
+            </h3>
+          </div>
+        </template>
+
+        <div class="space-y-6">
+          <!-- Barre d'outils -->
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+              <UButton
+                v-if="canManageVolunteers"
+                size="sm"
+                color="primary"
+                icon="i-heroicons-plus"
+                @click="openCreateSlotModal"
+              >
+                {{ t('editions.volunteers.create_time_slot') }}
+              </UButton>
+              <UButton
+                size="sm"
+                color="neutral"
+                variant="soft"
+                icon="i-heroicons-arrow-path"
+                :loading="refreshing"
+                @click="refreshData"
+              >
+                {{ t('common.refresh') }}
+              </UButton>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-gray-500">
+                {{ t('editions.volunteers.planning_tip') }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Calendrier de planning -->
+          <div
+            class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+          >
+            <div v-if="!ready" class="flex items-center justify-center py-8">
+              <UIcon name="i-heroicons-arrow-path" class="animate-spin text-gray-400" size="20" />
+              <span class="ml-2 text-base text-gray-500">{{ t('common.loading') }}</span>
+            </div>
+            <FullCalendar
+              v-else-if="calendarOptions"
+              ref="calendarRef"
+              :options="calendarOptions"
+              class="volunteer-planning-calendar"
+            />
           </div>
         </div>
-      </template>
+      </UCard>
 
-      <div class="space-y-6">
-        <!-- Onglets -->
-        <UTabs
-          v-model="activeTab"
-          :items="[
-            { key: 'planning', label: t('editions.volunteers.planning'), slot: 'planning' },
-            { key: 'teams', label: t('editions.volunteers.teams'), slot: 'teams' },
-          ]"
-        >
-          <template #planning>
-            <!-- Contenu de l'onglet planning -->
-            <div class="space-y-6">
-              <!-- Barre d'outils -->
-              <div class="flex flex-wrap items-center justify-between gap-4">
-                <div class="flex items-center gap-2">
-                  <UButton
-                    size="sm"
-                    color="primary"
-                    icon="i-heroicons-plus"
-                    @click="openCreateSlotModal"
-                  >
-                    {{ t('editions.volunteers.create_time_slot') }}
-                  </UButton>
-                  <UButton
-                    size="sm"
-                    color="neutral"
-                    variant="soft"
-                    icon="i-heroicons-arrow-path"
-                    :loading="refreshing"
-                    @click="refreshData"
-                  >
-                    {{ t('common.refresh') }}
-                  </UButton>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="text-xs text-gray-500">
-                    {{ t('editions.volunteers.planning_tip') }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Calendrier de planning -->
-              <div
-                class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
-              >
-                <div v-if="!ready" class="flex items-center justify-center py-8">
-                  <UIcon
-                    name="i-heroicons-arrow-path"
-                    class="animate-spin text-gray-400"
-                    size="20"
-                  />
-                  <span class="ml-2 text-base text-gray-500">{{ t('common.loading') }}</span>
-                </div>
-                <FullCalendar
-                  v-else-if="calendarOptions"
-                  ref="calendarRef"
-                  :options="calendarOptions"
-                  class="volunteer-planning-calendar"
-                />
-              </div>
-            </div>
-          </template>
-
-          <template #teams>
-            <!-- Contenu de l'onglet équipes -->
-            <TeamManagement :edition-id="editionId" />
-          </template>
-        </UTabs>
-      </div>
-    </UCard>
-
-    <!-- Modal de création/édition de créneau -->
-    <SlotModal
-      v-model="slotModalOpen"
-      :teams="teams"
-      :initial-slot="slotModalData"
-      @save="handleSlotSave"
-      @delete="handleSlotDelete"
-    />
-  </div>
-  <div v-else>
-    <p>{{ t('editions.loading_details') }}</p>
+      <!-- Modal de création/édition de créneau -->
+      <SlotModal
+        v-model="slotModalOpen"
+        :teams="teams"
+        :initial-slot="slotModalData"
+        @save="handleSlotSave"
+        @delete="handleSlotDelete"
+      />
+    </div>
   </div>
 </template>
 
@@ -121,7 +115,6 @@ import { useRoute } from 'vue-router'
 
 // App components & stores
 import SlotModal from '~/components/edition/volunteer/planning/SlotModal.vue'
-import TeamManagement from '~/components/edition/volunteer/planning/TeamManagement.vue'
 import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '~/composables/useVolunteerSchedule'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
@@ -131,15 +124,12 @@ const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
-const editionId = parseInt(route.params.id as string)
 
-// Charger l'édition
-await editionStore.fetchEditionById(editionId)
+const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 // État du composant
 const refreshing = ref(false)
-const activeTab = ref('planning')
 
 // État de la modal
 const slotModalOpen = ref(false)
@@ -229,7 +219,7 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
-    } catch (error) {
+    } catch (error: any) {
       toast.add({
         title: t('errors.error_occurred'),
         description: error.message || 'Erreur lors de la mise à jour',
@@ -247,7 +237,7 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
           icon: 'i-heroicons-check-circle',
           color: 'success',
         })
-      } catch (error) {
+      } catch (error: any) {
         toast.add({
           title: t('errors.error_occurred'),
           description: error.message || 'Erreur lors de la suppression',
@@ -324,7 +314,7 @@ const handleSlotSave = async (slotData: any) => {
         color: 'success',
       })
     }
-  } catch (error) {
+  } catch (error: any) {
     toast.add({
       title: t('errors.error_occurred'),
       description: error.message || 'Erreur lors de la sauvegarde',
@@ -343,7 +333,7 @@ const handleSlotDelete = async (slotId: string) => {
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
-  } catch (error) {
+  } catch (error: any) {
     toast.add({
       title: t('errors.error_occurred'),
       description: error.message || 'Erreur lors de la suppression',
@@ -374,48 +364,61 @@ const refreshData = async () => {
   }
 }
 
-// Gestion des favoris
-const isFavorited = computed(() => (_id: number) => {
+// Vérifier l'accès à cette page
+const canAccess = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return (
+    canEdit.value || canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
+  )
+})
+
+// Permissions calculées
+const canEdit = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canEditEdition(edition.value, authStore.user.id)
+})
+
+const canManageVolunteers = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageVolunteers(edition.value, authStore.user.id)
+})
+
+const isFavorited = computed(() => (_editionId: number) => {
   return edition.value?.favoritedBy.some((u) => u.id === authStore.user?.id)
 })
 
 const toggleFavorite = async (id: number) => {
   try {
     await editionStore.toggleFavorite(id)
-  } catch {
-    /* silent */
+    toast.add({
+      title: t('messages.favorite_status_updated'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (e: any) {
+    toast.add({
+      title: e?.statusMessage || t('errors.favorite_update_failed'),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
   }
 }
 
-// Permissions pour gérer les bénévoles (repris de la page index)
-const canManageVolunteers = computed(() => {
-  if (!authStore.user || !edition.value) return false
-  // Super Admin en mode admin
-  if (authStore.isAdminModeActive) return true
-  // Créateur de l'édition
-  if (edition.value.creatorId === authStore.user.id) return true
-  // Auteur de la convention
-  if (edition.value.convention?.authorId === authStore.user.id) return true
-  // Collaborateur avec droit global de gérer les bénévoles
-  const collab = edition.value.convention?.collaborators?.find(
-    (c: any) => c.user.id === authStore.user!.id
-  )
-  if (!collab) return false
-  const rights = collab.rights || {}
-  if (rights.manageVolunteers) return true
-  // Collaborateur avec droit spécifique à cette édition
-  const perEdition = (collab as any).perEdition || []
-  const editionPerm = perEdition.find((p: any) => p.editionId === edition.value!.id)
-  return editionPerm?.canManageVolunteers || false
+// Charger l'édition si nécessaire
+onMounted(async () => {
+  if (!edition.value) {
+    try {
+      await editionStore.fetchEditionById(editionId, { force: true })
+    } catch (error) {
+      console.error('Failed to fetch edition:', error)
+    }
+  }
 })
 
-// Metadata SEO
-useHead({
-  title: computed(() =>
-    edition.value
-      ? `Planning - ${edition.value.name || edition.value.convention?.name}`
-      : 'Planning'
-  ),
+// Métadonnées de la page
+useSeoMeta({
+  title: 'Planning des bénévoles - ' + (edition.value?.name || 'Édition'),
+  description: 'Planification des créneaux et missions des bénévoles',
 })
 </script>
 
@@ -450,6 +453,7 @@ useHead({
   border-radius: 0.375rem;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   font-size: 0.875rem;
+  cursor: pointer;
 }
 
 .volunteer-planning-calendar .fc-event:hover {

@@ -225,11 +225,11 @@
     <!-- Switch demander préférences d'équipes (mode interne uniquement) -->
     <USwitch
       v-model="askTeamPreferences"
-      :disabled="saving || teams.length === 0"
+      :disabled="saving || volunteerTeams.length === 0"
       color="primary"
       class="mb-2"
       :label="
-        teams.length === 0
+        volunteerTeams.length === 0
           ? t('editions.volunteers.ask_team_preferences_label') +
             ' (définissez d\'abord des équipes)'
           : t('editions.volunteers.ask_team_preferences_label')
@@ -238,61 +238,59 @@
       @update:model-value="handleChange('askTeamPreferences', $event)"
     />
 
-    <!-- Gestion des équipes (mode interne uniquement) -->
+    <!-- Équipes de bénévoles (affichage lecture seule) -->
     <div class="mt-6 space-y-4">
-      <div class="space-y-2">
-        <h4 class="font-medium text-gray-700 dark:text-gray-300">
-          {{ t('editions.volunteers.teams_label') }}
-        </h4>
-        <p class="text-xs text-gray-500">
-          {{ t('editions.volunteers.teams_hint') }}
-        </p>
+      <div class="flex items-center justify-between">
+        <div class="space-y-2">
+          <h4 class="font-medium text-gray-700 dark:text-gray-300">
+            {{ t('editions.volunteers.teams_label') }}
+          </h4>
+          <p class="text-xs text-gray-500">Liste des équipes de bénévoles configurées</p>
+        </div>
+        <UButton
+          :to="`/editions/${editionId}/gestion/volunteers/teams`"
+          color="primary"
+          variant="soft"
+          size="sm"
+          icon="i-heroicons-pencil"
+        >
+          Gérer les équipes
+        </UButton>
       </div>
 
-      <div class="space-y-3">
-        <div v-if="teams.length === 0" class="text-sm text-gray-500 italic">
-          {{ t('editions.volunteers.teams_empty') }}
-        </div>
-
-        <div v-for="(team, index) in teams" :key="index" class="flex gap-2 items-start">
-          <UInput
-            v-model="team.name"
-            :placeholder="t('editions.volunteers.team_name_placeholder')"
-            class="flex-1"
-            :disabled="saving"
-            @blur="handleTeamChange"
-          />
-          <UInput
-            v-model.number="team.slots"
-            type="number"
-            min="1"
-            max="99"
-            :placeholder="t('editions.volunteers.team_slots_placeholder')"
-            class="w-16"
-            :disabled="saving"
-            @blur="handleTeamChange"
-          />
+      <div class="space-y-2">
+        <div
+          v-if="volunteerTeams.length === 0"
+          class="text-sm text-gray-500 italic p-4 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center"
+        >
+          Aucune équipe configurée.
           <UButton
-            icon="i-heroicons-trash"
-            color="error"
+            :to="`/editions/${editionId}/gestion/volunteers/teams`"
             variant="ghost"
-            size="sm"
-            :disabled="saving"
-            @click="removeTeam(index)"
+            size="xs"
+            class="ml-1"
           >
-            <span class="hidden sm:inline">{{ t('editions.volunteers.team_remove') }}</span>
+            Créer une équipe
           </UButton>
         </div>
 
-        <UButton
-          icon="i-heroicons-plus"
-          variant="outline"
-          size="sm"
-          :disabled="saving"
-          @click="addTeam"
-        >
-          {{ t('editions.volunteers.team_add') }}
-        </UButton>
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div
+            v-for="team in volunteerTeams"
+            :key="team.id"
+            class="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800"
+          >
+            <div class="w-3 h-3 rounded-full" :style="{ backgroundColor: team.color }" />
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-sm text-gray-900 dark:text-white truncate">
+                {{ team.name }}
+              </p>
+              <p v-if="team.maxVolunteers" class="text-xs text-gray-500">
+                Max: {{ team.maxVolunteers }} bénévoles
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -307,6 +305,8 @@
 <script setup lang="ts">
 import { type DateValue, fromDate, toCalendarDate } from '@internationalized/date'
 import { computed, ref, watch } from 'vue'
+
+import { useVolunteerTeams } from '~/composables/useVolunteerTeams'
 
 interface Props {
   editionId: number
@@ -346,6 +346,9 @@ const emit = defineEmits<Emits>()
 const { t } = useI18n()
 const toast = useToast()
 
+// Récupération des équipes depuis la nouvelle table
+const { teams: volunteerTeams } = useVolunteerTeams(props.editionId)
+
 // État local
 const saving = ref(false)
 const fieldErrors = ref<Record<string, string>>({})
@@ -366,9 +369,6 @@ const askSkills = ref(props.initialData?.askSkills || false)
 const askExperience = ref(props.initialData?.askExperience || false)
 const askTimePreferences = ref(props.initialData?.askTimePreferences || false)
 const askTeamPreferences = ref(props.initialData?.askTeamPreferences || false)
-const teams = ref<{ name: string; slots?: number }[]>(
-  props.initialData?.teams ? JSON.parse(JSON.stringify(props.initialData.teams)) : []
-)
 
 // Contraintes de dates
 const setupStartDateMaxValue = computed(() => {
@@ -426,24 +426,6 @@ const handleTeardownEndDateClear = async () => {
     askTeardown: false,
   }
   await persistSettings(data)
-}
-
-const handleTeamChange = async () => {
-  const filteredTeams = teams.value.filter((team) => team.name.trim())
-  await persistSettings({ teams: filteredTeams })
-}
-
-const addTeam = () => {
-  teams.value.push({ name: '', slots: undefined })
-}
-
-const removeTeam = async (index: number) => {
-  teams.value.splice(index, 1)
-  if (teams.value.length === 0) {
-    askTeamPreferences.value = false
-  }
-  const filteredTeams = teams.value.filter((team) => team.name.trim())
-  await persistSettings({ teams: filteredTeams })
 }
 
 // Fonction principale de sauvegarde
@@ -512,7 +494,6 @@ watch(
       askExperience.value = newData.askExperience || false
       askTimePreferences.value = newData.askTimePreferences || false
       askTeamPreferences.value = newData.askTeamPreferences || false
-      teams.value = newData.teams ? JSON.parse(JSON.stringify(newData.teams)) : []
     }
   },
   { deep: true }

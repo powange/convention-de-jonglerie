@@ -105,11 +105,8 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
         askPets: true,
         askTimePreferences: true,
         askTeamPreferences: true,
-        teams: [
-          { name: 'Accueil', slots: 5 },
-          { name: 'Technique', slots: 3 },
-          { name: 'Bar', slots: 10 }, // Mettre un nombre positif
-        ],
+        // Les équipes seront créées via le système VolunteerTeam
+        // Plus besoin de passer teams dans volunteerSettings
       }
 
       // Mock de la session gestionnaire
@@ -119,6 +116,32 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
 
       const { prismaMock } = await import('../__mocks__/prisma')
       prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      // Mock pour les équipes VolunteerTeam
+      const mockVolunteerTeams = [
+        {
+          id: 'team1',
+          name: 'Accueil',
+          description: 'Équipe accueil',
+          color: '#ef4444',
+          maxVolunteers: 5,
+        },
+        {
+          id: 'team2',
+          name: 'Technique',
+          description: 'Équipe technique',
+          color: '#3b82f6',
+          maxVolunteers: 3,
+        },
+        {
+          id: 'team3',
+          name: 'Bar',
+          description: 'Équipe bar',
+          color: '#10b981',
+          maxVolunteers: 10,
+        },
+      ]
+      prismaMock.volunteerTeam.findMany.mockResolvedValue(mockVolunteerTeams)
+
       prismaMock.edition.update.mockResolvedValue({
         ...mockEdition,
         volunteersMode: volunteerSettings.mode,
@@ -130,7 +153,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
         volunteersAskPets: volunteerSettings.askPets,
         volunteersAskTimePreferences: volunteerSettings.askTimePreferences,
         volunteersAskTeamPreferences: volunteerSettings.askTeamPreferences,
-        volunteersTeams: volunteerSettings.teams,
+        // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
         volunteersSetupStartDate: new Date(volunteerSettings.setupStartDate),
         volunteersTeardownEndDate: new Date(volunteerSettings.setupEndDate),
       })
@@ -145,7 +168,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
 
       expect(settingsResult.success).toBe(true)
       expect(settingsResult.settings.volunteersMode).toBe('INTERNAL')
-      expect(settingsResult.settings.volunteersTeams).toHaveLength(3)
+      // Les équipes sont maintenant gérées via VolunteerTeam, pas via volunteersTeams
 
       // ========== ÉTAPE 2: Consultation des infos par un candidat ==========
 
@@ -160,9 +183,11 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
         volunteersAskPets: volunteerSettings.askPets,
         volunteersAskTimePreferences: volunteerSettings.askTimePreferences,
         volunteersAskTeamPreferences: volunteerSettings.askTeamPreferences,
-        volunteersTeams: volunteerSettings.teams,
+        // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
         volunteerApplications: [], // Pas encore de candidatures
       })
+      // Mock des équipes VolunteerTeam pour info.get
+      prismaMock.volunteerTeam.findMany.mockResolvedValue(mockVolunteerTeams)
 
       // Un candidat consulte les informations (API publique)
       const infoHandler = await import('../../server/api/editions/[id]/volunteers/info.get')
@@ -189,9 +214,11 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
         volunteersAskPets: volunteerSettings.askPets,
         volunteersAskTimePreferences: volunteerSettings.askTimePreferences,
         volunteersAskTeamPreferences: volunteerSettings.askTeamPreferences,
-        volunteersTeams: volunteerSettings.teams,
+        // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
         volunteerApplications: [], // Pas encore de candidatures
       })
+      // Mock des équipes VolunteerTeam pour apply.post
+      prismaMock.volunteerTeam.findMany.mockResolvedValue(mockVolunteerTeams)
       prismaMock.editionVolunteerApplication.findFirst.mockResolvedValue(null) // Pas de candidature existante
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
 
@@ -208,7 +235,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
         dietaryPreference: 'VEGETARIAN',
         allergies: 'Aucune',
         timePreferences: ['morning', 'evening'],
-        teamPreferences: ['Accueil', 'Technique'],
+        teamPreferences: ['team1', 'team2'], // IDs des équipes VolunteerTeam mockées
         hasPets: false,
         hasVehicle: true,
         vehicleDetails: 'Voiture 5 places',
@@ -623,8 +650,14 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
         volunteersDescription: 'Description cohérente',
         volunteersAskDiet: true,
         volunteersAskAllergies: false,
-        volunteersTeams: [{ id: 1, name: 'Test Team', slots: 5 }],
+        // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
       }
+
+      // Mock des équipes VolunteerTeam pour les tests de cohérence
+      const mockTeamsForConsistency = [
+        { id: 'test1', name: 'Test Team', description: 'Test', color: '#ef4444', maxVolunteers: 5 },
+      ]
+      prismaMock.volunteerTeam.findMany.mockResolvedValue(mockTeamsForConsistency)
 
       // Configuration
       prismaMock.edition.findUnique.mockResolvedValue(commonEditionData)
@@ -641,7 +674,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       expect(infoResult.description).toBe(commonEditionData.volunteersDescription)
       expect(infoResult.askDiet).toBe(commonEditionData.volunteersAskDiet)
       expect(infoResult.askAllergies).toBe(commonEditionData.volunteersAskAllergies)
-      expect(infoResult.teams).toEqual(commonEditionData.volunteersTeams)
+      expect(infoResult.teams).toEqual(mockTeamsForConsistency)
     })
 
     it('devrait optimiser les requêtes base de données', async () => {
@@ -679,7 +712,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
           volunteersTeardownEndDate: true,
           volunteersAskSetup: true,
           volunteersAskTeardown: true,
-          volunteersTeams: true,
+          // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
           volunteerApplications: { select: { id: true, status: true, userId: true } },
         },
       })

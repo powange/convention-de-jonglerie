@@ -170,10 +170,33 @@ export default defineEventHandler(async (event) => {
     updateData.acceptanceNote = parsed.note
   }
 
+  // Si on remet en attente, supprimer toutes les assignations d'équipes
+  if (target === 'PENDING') {
+    // Supprimer l'ancien système (JSON)
+    updateData.assignedTeams = null
+
+    // Supprimer le nouveau système (relations)
+    updateData.teams = {
+      set: [], // Supprimer toutes les relations avec les équipes
+    }
+  }
+
   const updated = await prisma.editionVolunteerApplication.update({
     where: { id: applicationId },
     data: updateData,
-    select: { id: true, status: true, decidedAt: true, acceptanceNote: true },
+    select: {
+      id: true,
+      status: true,
+      decidedAt: true,
+      acceptanceNote: true,
+      assignedTeams: true,
+      teams: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
   })
 
   return { success: true, application: updated }

@@ -463,93 +463,9 @@ describe('/api/editions/[id]/volunteers/settings PATCH', () => {
     })
   })
 
-  describe('Gestion des équipes', () => {
-    it('devrait créer des équipes avec et sans limite', async () => {
-      const teams = [
-        { name: 'Accueil', slots: 10 },
-        { name: 'Technique', slots: 5 },
-        { name: 'Bar' }, // Pas de limite (slots optionnel)
-        { name: 'Sécurité', slots: 3 },
-      ]
-
-      const updateData = {
-        mode: 'INTERNAL',
-        askTeamPreferences: true,
-        teams,
-      }
-
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-      prismaMock.edition.update.mockResolvedValue({ ...mockEdition, teams })
-
-      global.readBody.mockResolvedValue(updateData)
-      const mockEvent = { context: { user: mockUser } }
-
-      await handler(mockEvent as any)
-
-      expect(prismaMock.edition.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: expect.objectContaining({
-          volunteersAskTeamPreferences: true,
-          volunteersTeams: teams.map((team) => ({
-            name: team.name,
-            slots: team.slots,
-          })),
-        }),
-        select: expect.any(Object),
-      })
-    })
-
-    it('devrait supprimer toutes les équipes existantes', async () => {
-      const updateData = {
-        mode: 'INTERNAL',
-        askTeamPreferences: false,
-        teams: [],
-      }
-
-      prismaMock.edition.findUnique.mockResolvedValue({
-        ...mockEdition,
-        teams: [
-          { name: 'Ancienne équipe 1', slots: 5 },
-          { name: 'Ancienne équipe 2', slots: 3 },
-        ],
-      })
-      prismaMock.edition.update.mockResolvedValue({ ...mockEdition, teams: [] })
-
-      global.readBody.mockResolvedValue(updateData)
-      const mockEvent = { context: { user: mockUser } }
-
-      await handler(mockEvent as any)
-
-      expect(prismaMock.edition.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: expect.objectContaining({
-          volunteersAskTeamPreferences: false,
-          volunteersTeams: [],
-        }),
-        select: expect.any(Object),
-      })
-    })
-
-    it('devrait gérer les équipes avec noms dupliqués', async () => {
-      const teams = [
-        { name: 'Accueil', slots: 5 },
-        { name: 'Accueil', slots: 3 }, // Même nom
-      ]
-
-      const updateData = {
-        mode: 'INTERNAL',
-        teams,
-      }
-
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-      global.readBody.mockResolvedValue(updateData)
-      const mockEvent = { context: { user: mockUser } }
-
-      // Les doublons de noms sont autorisés
-      const result = await handler(mockEvent as any)
-      expect(result.success).toBe(true)
-    })
-  })
+  // Section "Gestion des équipes" supprimée
+  // Les équipes sont maintenant gérées via le système VolunteerTeam
+  // et non plus via l'API settings.patch.ts
 
   describe('Permissions', () => {
     it("devrait permettre au créateur de l'édition", async () => {

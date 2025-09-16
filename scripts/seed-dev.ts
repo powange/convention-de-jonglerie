@@ -614,8 +614,7 @@ async function main() {
       })
       volunteerSettingsCount++
 
-      // Créer des équipes bénévoles si demandées
-      const teams: { name: string; slots: number }[] = []
+      // Créer des équipes bénévoles avec le nouveau système VolunteerTeam
       if (Math.random() > 0.5) {
         const teamNames = [
           'Accueil',
@@ -625,23 +624,32 @@ async function main() {
           'Animation',
           'Sécurité',
         ]
+        const teamColors = [
+          '#ef4444', // red-500
+          '#3b82f6', // blue-500
+          '#10b981', // emerald-500
+          '#f59e0b', // amber-500
+          '#8b5cf6', // violet-500
+          '#06b6d4', // cyan-500
+        ]
         const numTeams = Math.floor(Math.random() * 4) + 2 // 2-5 équipes
+        const createdTeams: string[] = []
+
         for (let i = 0; i < numTeams; i++) {
           const teamName = teamNames[Math.floor(Math.random() * teamNames.length)]
-          if (!teams.find((t) => t.name === teamName)) {
-            teams.push({
-              name: teamName,
-              slots: Math.floor(Math.random() * 8) + 3, // 3-10 places par équipe
+          if (!createdTeams.includes(teamName)) {
+            await prisma.volunteerTeam.create({
+              data: {
+                editionId: edition.id,
+                name: teamName,
+                description: `Équipe ${teamName.toLowerCase()} pour cette édition`,
+                color: teamColors[Math.floor(Math.random() * teamColors.length)],
+                maxVolunteers: Math.floor(Math.random() * 8) + 3, // 3-10 places par équipe
+              },
             })
+            createdTeams.push(teamName)
           }
         }
-
-        await prisma.edition.update({
-          where: { id: edition.id },
-          data: {
-            volunteersTeams: teams,
-          },
-        })
       }
 
       // Créer des candidatures de bénévoles

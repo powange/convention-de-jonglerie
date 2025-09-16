@@ -160,7 +160,7 @@
 
           <!-- Équipes préférées -->
           <div
-            v-if="volunteersInfo?.askTeamPreferences && volunteersInfo?.teams?.length"
+            v-if="volunteersInfo?.askTeamPreferences && volunteerTeams.length"
             class="space-y-2 w-full"
           >
             <UFormField :label="t('editions.volunteers.team_preferences_label')">
@@ -510,6 +510,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const { t } = useI18n()
+const { teams: volunteerTeams } = useVolunteerTeams(props.edition.id)
 
 const MOTIVATION_MAX = 2000
 
@@ -650,8 +651,7 @@ const showPreferencesSection = computed(() => {
   return (
     (props.volunteersInfo?.askTimePreferences && props.volunteersInfo?.mode === 'INTERNAL') ||
     (props.volunteersInfo?.askTeamPreferences &&
-      props.volunteersInfo?.teams &&
-      props.volunteersInfo.teams.length > 0 &&
+      volunteerTeams.value.length > 0 &&
       props.volunteersInfo?.mode === 'INTERNAL') ||
     props.volunteersInfo?.askCompanion ||
     props.volunteersInfo?.askAvoidList
@@ -764,12 +764,12 @@ const departureDateOptions = computed(() => {
 
 // Items for select/checkbox components
 const teamItems = computed(() => {
-  if (!props.volunteersInfo?.askTeamPreferences || !props.volunteersInfo?.teams?.length) {
+  if (!props.volunteersInfo?.askTeamPreferences || !volunteerTeams.value.length) {
     return []
   }
-  return props.volunteersInfo.teams.map((team) => ({
+  return volunteerTeams.value.map((team) => ({
     label: team.name,
-    value: team.name,
+    value: team.id, // Utiliser l'ID au lieu du nom pour le nouveau système
   }))
 })
 

@@ -262,63 +262,6 @@
     </span>
   </div>
 
-  <!-- Section équipes avec leurs bénévoles -->
-  <div v-if="volunteersInfo?.teams?.length > 0" class="mt-8">
-    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-      <UIcon name="i-heroicons-user-group" class="text-blue-600" />
-      {{ t('editions.volunteers.teams_assignments') }}
-    </h3>
-
-    <div
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
-    >
-      <UCard
-        v-for="teamAssignment in teamAssignments"
-        :key="teamAssignment.teamName"
-        variant="subtle"
-      >
-        <template #header>
-          <h4
-            class="font-medium text-gray-900 dark:text-white mb-2 flex items-center justify-between"
-          >
-            <span>{{ teamAssignment.teamName }}</span>
-            <UBadge
-              :color="getBadgeColor(teamAssignment.volunteers.length, teamAssignment.teamSlots)"
-              variant="soft"
-            >
-              {{ teamAssignment.volunteers.length
-              }}{{ teamAssignment.teamSlots ? `/${teamAssignment.teamSlots}` : '' }}
-            </UBadge>
-          </h4>
-        </template>
-
-        <div v-if="teamAssignment.teamDescription" class="text-sm text-gray-500 mb-3">
-          {{ teamAssignment.teamDescription }}
-        </div>
-
-        <div class="space-y-2">
-          <div
-            v-for="volunteer in teamAssignment.volunteers"
-            :key="volunteer.id"
-            class="flex items-center gap-3 text-sm"
-          >
-            <UiUserAvatar :user="volunteer.user" size="xs" class="flex-shrink-0" />
-            <div class="flex-1 min-w-0">
-              <span class="font-medium">{{ volunteer.user.pseudo }}</span>
-              <span class="text-gray-500 ml-1">
-                ({{ volunteer.user.prenom }} {{ volunteer.user.nom }})
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div v-if="teamAssignment.volunteers.length === 0" class="text-sm text-gray-400 italic">
-          {{ t('editions.volunteers.no_volunteers_assigned') }}
-        </div>
-      </UCard>
-    </div>
-  </div>
-
   <!-- Modal unifiée pour acceptation et modification des équipes -->
   <UModal v-model:open="teamsModalOpen">
     <template #header>
@@ -432,6 +375,7 @@ interface Props {
 
 const emit = defineEmits<{
   refreshVolunteersInfo: []
+  refreshTeamAssignments: []
 }>()
 
 const props = defineProps<Props>()
@@ -439,6 +383,7 @@ const props = defineProps<Props>()
 const { t } = useI18n()
 const toast = useToast()
 const { formatDateTimeWithGranularity } = useDateFormat()
+const { teams: volunteerTeams } = useVolunteerTeams(props.editionId)
 
 // Variables d'état internes du tableau
 const applications = ref<any[]>([])
@@ -480,10 +425,10 @@ const volunteerStatusItems = computed(() => [
 ])
 
 const volunteerTeamItems = computed(() => {
-  if (!props.volunteersInfo?.askTeamPreferences || !props.volunteersInfo?.teams?.length) {
+  if (!props.volunteersInfo?.askTeamPreferences || !volunteerTeams.value.length) {
     return []
   }
-  return props.volunteersInfo.teams.map((team: any) => ({
+  return volunteerTeams.value.map((team: any) => ({
     label: team.name,
     value: team.name,
   }))
@@ -495,13 +440,13 @@ const volunteerPresenceItems = computed(() => [
   { label: t('editions.volunteers.presence_teardown'), value: 'teardown' },
 ])
 
-// Équipes disponibles pour la modal (préférences du bénévole ou toutes les équipes)
+// Équipes disponibles pour la modal (utilise le nouveau système VolunteerTeam)
 const availableTeamsForModal = computed(() => {
-  if (!props.volunteersInfo?.teams?.length || !currentApplication.value) {
+  if (!volunteerTeams.value.length || !currentApplication.value) {
     return []
   }
 
-  const allTeams = props.volunteersInfo.teams
+  const allTeams = volunteerTeams.value
   const preferredTeams = currentApplication.value.teamPreferences || []
 
   // Si le bénévole a des préférences d'équipes, on ne montre que celles-ci
@@ -515,51 +460,14 @@ const availableTeamsForModal = computed(() => {
 
 // Options d'équipes pour le modal d'édition (toutes les équipes disponibles)
 const teamOptionsForEdit = computed(() => {
-  if (!props.volunteersInfo?.teams?.length) {
+  if (!volunteerTeams.value.length) {
     return []
   }
 
-  return props.volunteersInfo.teams.map((team: any) => ({
+  return volunteerTeams.value.map((team: any) => ({
     value: team.name,
     label: team.name,
   }))
-})
-
-// Computed pour les assignations d'équipes
-const teamAssignments = computed(() => {
-  if (!props.volunteersInfo?.teams?.length) {
-    return []
-  }
-
-  const assignments: Array<{
-    teamName: string
-    teamDescription?: string
-    teamSlots?: number
-    volunteers: Array<any>
-  }> = []
-
-  // Pour chaque équipe configurée
-  for (const team of props.volunteersInfo.teams) {
-    const teamAssignment = {
-      teamName: team.name,
-      teamDescription: team.description,
-      teamSlots: team.slots,
-      volunteers: [] as Array<any>,
-    }
-
-    // Trouver tous les bénévoles acceptés assignés à cette équipe (même si aucun)
-    if (applications.value.length > 0) {
-      for (const app of applications.value) {
-        if (app.status === 'ACCEPTED' && app.assignedTeams?.includes(team.name)) {
-          teamAssignment.volunteers.push(app)
-        }
-      }
-    }
-
-    assignments.push(teamAssignment)
-  }
-
-  return assignments
 })
 
 // Computed pour les données du tableau
@@ -663,6 +571,7 @@ const refreshApplications = async () => {
         sortDir,
         sortSecondary,
         search: globalFilter.value || undefined,
+        includeTeams: 'true', // Inclure les équipes du nouveau système
       },
     } as any)
     applications.value = res.applications || []
@@ -716,7 +625,7 @@ const volunteerStatusLabel = (s: string) =>
 
 const decideApplication = async (app: any, status: 'ACCEPTED' | 'REJECTED' | 'PENDING') => {
   // Si c'est une acceptation et qu'il y a des équipes configurées, ouvrir la modal
-  if (status === 'ACCEPTED' && props.volunteersInfo?.teams?.length > 0) {
+  if (status === 'ACCEPTED' && volunteerTeams.value.length > 0) {
     openAcceptModal(app)
     return
   }
@@ -734,6 +643,11 @@ const decideApplication = async (app: any, status: 'ACCEPTED' | 'REJECTED' | 'PE
     )
     if (res?.application) {
       emit('refreshVolunteersInfo')
+
+      // Si on remet en attente ou on change vers accepté, rafraîchir les assignations d'équipes
+      if (status === 'PENDING' || status === 'ACCEPTED') {
+        emit('refreshTeamAssignments')
+      }
 
       // Rafraîchir les données du tableau
       refreshApplications()
@@ -758,22 +672,6 @@ const confirmBackToPending = (app: any) => {
   }
 }
 
-// Fonction pour déterminer la couleur du badge selon le remplissage
-const getBadgeColor = (current: number, max?: number): 'success' | 'warning' | 'error' | 'info' => {
-  // Équipe vide = toujours rouge (avec ou sans limite)
-  if (current === 0) return 'error'
-
-  // Équipe sans limite définie
-  if (!max) {
-    return current > 0 ? 'success' : 'error' // Au moins 1 personne = vert, sinon rouge
-  }
-
-  // Équipe avec limite définie
-  if (current === max) return 'success' // Complète => vert
-  if (current > max) return 'warning' // Pleine (dépassement) => orange
-  return 'info' // Pas remplie => bleu
-}
-
 // Fonctions pour la modal d'acceptation
 const toggleTeamSelection = (teamId: string) => {
   const index = selectedTeams.value.indexOf(teamId)
@@ -794,7 +692,7 @@ const openAcceptModal = (app: any) => {
 
   // Si une seule équipe disponible, la cocher par défaut
   nextTick(() => {
-    if (availableTeamsForModal.value.length === 1) {
+    if (availableTeamsForModal.value.length === 1 && availableTeamsForModal.value[0]) {
       selectedTeams.value = [availableTeamsForModal.value[0].name]
     }
   })
@@ -804,13 +702,25 @@ const openAcceptModal = (app: any) => {
 const openEditTeamsModal = (app: any) => {
   modalMode.value = 'edit'
   currentApplication.value = app
-  selectedTeams.value = app.assignedTeams || []
+
+  // Si l'application a des équipes dans le nouveau système, les utiliser
+  if (app.teams && app.teams.length > 0) {
+    selectedTeams.value = app.teams.map((team: any) => team.name)
+  } else {
+    // Sinon, utiliser l'ancien système pour compatibilité
+    selectedTeams.value = app.assignedTeams || []
+  }
+
   acceptNote.value = ''
   teamsModalOpen.value = true
 
   // Si une seule équipe disponible et aucune sélectionnée, la cocher par défaut
   nextTick(() => {
-    if (availableTeamsForModal.value.length === 1 && selectedTeams.value.length === 0) {
+    if (
+      availableTeamsForModal.value.length === 1 &&
+      selectedTeams.value.length === 0 &&
+      availableTeamsForModal.value[0]
+    ) {
       selectedTeams.value = [availableTeamsForModal.value[0].name]
     }
   })
@@ -859,6 +769,7 @@ const confirmTeamsModal = async () => {
       )
 
       emit('refreshVolunteersInfo')
+      emit('refreshTeamAssignments')
 
       // Rafraîchir les données du tableau
       refreshApplications()
@@ -884,6 +795,7 @@ const confirmTeamsModal = async () => {
       )
 
       emit('refreshVolunteersInfo')
+      emit('refreshTeamAssignments')
 
       // Rafraîchir les données du tableau
       refreshApplications()
@@ -983,8 +895,10 @@ const getColumnLabel = (columnId: string): string => {
     companionName: t('editions.volunteers.table_companion'),
     avoidList: t('editions.volunteers.table_avoid_list'),
     skills: t('editions.volunteers.table_skills'),
+    hasExperience: t('pages.volunteers.experience'),
     timePreferences: t('editions.volunteers.table_time_preferences'),
     teamPreferences: t('editions.volunteers.table_team_preferences'),
+    assignedTeams: t('editions.volunteers.assigned_team'),
     createdAt: t('common.date'),
     motivation: t('editions.volunteers.table_motivation'),
     actions: t('common.actions'),
@@ -993,8 +907,8 @@ const getColumnLabel = (columnId: string): string => {
   return labels[columnId] || columnId
 }
 
-// Définition des colonnes
-const columns: TableColumn<any>[] = [
+// Définition des colonnes (reactive)
+const columns = computed((): TableColumn<any>[] => [
   // ID en tout premier
   {
     accessorKey: 'id',
@@ -1467,7 +1381,7 @@ const columns: TableColumn<any>[] = [
             const preferences = row.original.teamPreferences || []
             if (preferences.length === 0) return h('span', '—')
 
-            const teams = props.volunteersInfo?.teams || []
+            const teams = volunteerTeams.value || []
             const teamNames = preferences
               .map((teamId: string) => {
                 const team = teams.find((t: any) => t.id === teamId)
@@ -1494,6 +1408,96 @@ const columns: TableColumn<any>[] = [
         } as TableColumn<any>,
       ]
     : []),
+  // Colonne équipes assignées (nouveau système)
+  {
+    accessorKey: 'assignedTeams',
+    header: t('editions.volunteers.assigned_team'),
+    cell: ({ row }: any) => {
+      // Priorité au nouveau système
+      const teams = row.original.teams
+      if (teams && teams.length > 0) {
+        return h(
+          'div',
+          { class: 'flex flex-wrap gap-1' },
+          teams.map((team: any) =>
+            h(
+              resolveComponent('UBadge'),
+              {
+                key: team.id,
+                color: 'primary',
+                variant: 'soft',
+                size: 'sm',
+                style: {
+                  backgroundColor: team.color + '20',
+                  borderColor: team.color,
+                  color: team.color,
+                },
+              },
+              () => team.name
+            )
+          )
+        )
+      }
+
+      // Fallback vers l'ancien système
+      const assignedTeams = row.original.assignedTeams
+      if (assignedTeams && assignedTeams.length > 0) {
+        return h(
+          'div',
+          { class: 'flex flex-wrap gap-1' },
+          assignedTeams.map((teamName: string) =>
+            h(
+              resolveComponent('UBadge'),
+              {
+                key: teamName,
+                color: 'gray',
+                variant: 'soft',
+                size: 'xs',
+              },
+              () => teamName
+            )
+          )
+        )
+      }
+
+      return h('span', '—')
+    },
+  } as TableColumn<any>,
+  // Colonne expérience si activée
+  ...(props.volunteersInfo?.askExperience
+    ? [
+        {
+          accessorKey: 'hasExperience',
+          header: t('pages.volunteers.experience'),
+          cell: ({ row }: any) => {
+            if (!row.original.hasExperience) return h('span', '—')
+            const experienceDetails = row.original.experienceDetails
+            if (!experienceDetails) return h('span', { class: 'text-xs' }, t('common.yes'))
+            return h(
+              resolveComponent('UTooltip'),
+              { text: experienceDetails, openDelay: 200 },
+              {
+                default: () =>
+                  h(
+                    'div',
+                    {
+                      class: 'flex items-center gap-1 cursor-help',
+                    },
+                    [
+                      h('span', { class: 'text-xs' }, t('common.yes')),
+                      h(resolveComponent('UIcon'), {
+                        name: 'i-heroicons-information-circle',
+                        class: 'text-gray-400',
+                        size: '14',
+                      }),
+                    ]
+                  ),
+              }
+            )
+          },
+        } as TableColumn<any>,
+      ]
+    : []),
   {
     id: 'motivation',
     header: t('editions.volunteers.table_motivation'),
@@ -1513,7 +1517,7 @@ const columns: TableColumn<any>[] = [
     id: 'actions',
     header: t('common.actions'),
   },
-]
+])
 
 // Initialisation
 onMounted(() => {

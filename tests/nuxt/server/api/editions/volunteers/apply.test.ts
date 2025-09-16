@@ -29,10 +29,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
     volunteersAskAvoidList: true,
     volunteersAskSkills: true,
     volunteersAskExperience: true,
-    volunteersTeams: [
-      { id: 1, name: 'Accueil', slots: 5 },
-      { id: 2, name: 'Technique', slots: 3 },
-    ],
+    // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
   }
 
   const mockApplication = {
@@ -48,10 +45,18 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
     updatedAt: new Date(),
   }
 
+  // Mock des équipes VolunteerTeam pour les tests de validation
+  const mockVolunteerTeams = [
+    { id: 'team1', name: 'Accueil' },
+    { id: 'team2', name: 'Technique' },
+  ]
+
   beforeEach(() => {
     vi.clearAllMocks()
     global.readBody = vi.fn()
     global.getRouterParam = vi.fn().mockReturnValue('1')
+    // Mock par défaut des équipes VolunteerTeam
+    prismaMock.volunteerTeam.findMany.mockResolvedValue(mockVolunteerTeams)
   })
 
   describe('Candidature basique', () => {
@@ -186,7 +191,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
         dietaryPreference: 'VEGETARIAN',
         allergies: 'Arachides, gluten',
         timePreferences: ['morning', 'evening'],
-        teamPreferences: ['Accueil', 'Technique'],
+        teamPreferences: ['team1', 'team2'], // IDs des équipes VolunteerTeam
         hasPets: true,
         petsDetails: 'Chien de 5kg, très gentil',
         hasMinors: true,
@@ -266,7 +271,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
         dietaryPreference: 'VEGAN',
         allergies: 'Aucune',
         timePreferences: ['morning'],
-        teamPreferences: ['Accueil'],
+        teamPreferences: ['team1'], // ID équipe VolunteerTeam
         skills: 'Beaucoup de compétences',
       }
 
@@ -447,9 +452,9 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
       await expect(handler(mockEvent1 as any)).rejects.toThrow()
 
       // Cas 2: Équipes inexistantes - erreur métier
-      const invalidTeamNames = [['Équipe Inexistante'], ['Accueil', 'Équipe Bidon']]
+      const invalidTeamIds = [['team_inexistant'], ['team1', 'team_bidon']]
 
-      for (const invalidTeams of invalidTeamNames) {
+      for (const invalidTeams of invalidTeamIds) {
         const applicationData = {
           setupAvailability: true,
           arrivalDateTime: tomorrow.toISOString(),
@@ -470,8 +475,8 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
     it("devrait accepter les préférences d'équipe valides", async () => {
       const validTeamPreferences = [
         [], // Tableau vide
-        ['Accueil'], // Une équipe valide
-        ['Accueil', 'Technique'], // Plusieurs équipes valides
+        ['team1'], // Une équipe valide
+        ['team1', 'team2'], // Plusieurs équipes valides
       ]
 
       for (const validTeams of validTeamPreferences) {

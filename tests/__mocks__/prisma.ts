@@ -30,6 +30,11 @@ export const prismaMock = {
   collaboratorPermissionHistory: createModelMock(),
   editionVolunteerApplication: createModelMock(),
   editionVolunteerTeam: createModelMock(),
+  volunteerTeam: createModelMock(),
+  volunteerTimeSlot: createModelMock(),
+  volunteerNotificationGroup: createModelMock(),
+  volunteerNotificationConfirmation: createModelMock(),
+  volunteerAssignment: createModelMock(),
   apiErrorLog: createModelMock(),
 
   // Modèles objets trouvés

@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
       volunteersTeardownEndDate: true,
       volunteersAskSetup: true,
       volunteersAskTeardown: true,
-      volunteersTeams: true,
+      // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
       volunteerApplications: { select: { id: true, status: true, userId: true } },
     },
   })
@@ -47,6 +47,19 @@ export default defineEventHandler(async (event) => {
     },
     { total: 0 } as any
   )
+
+  // Récupérer les équipes du nouveau système VolunteerTeam
+  const volunteerTeams = await prisma.volunteerTeam.findMany({
+    where: { editionId },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      color: true,
+      maxVolunteers: true,
+    },
+    orderBy: { name: 'asc' },
+  })
 
   return {
     open: edition.volunteersOpen,
@@ -68,7 +81,7 @@ export default defineEventHandler(async (event) => {
     teardownEndDate: (edition as any).volunteersTeardownEndDate || null,
     askSetup: (edition as any).volunteersAskSetup || false,
     askTeardown: (edition as any).volunteersAskTeardown || false,
-    teams: (edition as any).volunteersTeams || [],
+    teams: volunteerTeams, // Nouveau système VolunteerTeam
     myApplication,
     counts,
   }

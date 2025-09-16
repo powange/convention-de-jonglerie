@@ -132,6 +132,8 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  const includeTeams = query.includeTeams === 'true'
+
   const applications = await prisma.editionVolunteerApplication.findMany({
     where,
     orderBy,
@@ -168,6 +170,17 @@ export default defineEventHandler(async (event) => {
       user: {
         select: { id: true, pseudo: true, email: true, phone: true, prenom: true, nom: true },
       },
+      ...(includeTeams && {
+        teams: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            color: true,
+            maxVolunteers: true,
+          },
+        },
+      }),
     },
   })
 
