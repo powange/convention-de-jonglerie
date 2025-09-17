@@ -134,7 +134,7 @@
     "happy-dom": "^18.0.1",
     "nuxt-file-storage": "^0.3.0",
     "prettier": "^3.3.3",
-    "prisma": "^6.15.0",
+    "prisma": "^6.16.2",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
     "wait-on": "^8.0.4"
