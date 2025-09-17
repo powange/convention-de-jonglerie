@@ -12,7 +12,7 @@ const notificationPreferencesSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+    throw createError({ statusCode: 401, message: 'Non authentifié' })
   }
 
   const body = await readBody(event)
@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la sauvegarde des préférences de notifications:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la sauvegarde des préférences',
+      message: 'Erreur lors de la sauvegarde des préférences',
     })
   }
 })

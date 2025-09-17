@@ -5,11 +5,11 @@ export default defineEventHandler(async (event) => {
   const groupId = getRouterParam(event, 'groupId')
 
   if (!event.context.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+    throw createError({ statusCode: 401, message: 'Non authentifié' })
   }
 
   if (!groupId) {
-    throw createError({ statusCode: 400, statusMessage: 'ID de groupe requis' })
+    throw createError({ statusCode: 400, message: 'ID de groupe requis' })
   }
 
   // Récupérer le groupe de notifications
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!notificationGroup) {
-    throw createError({ statusCode: 404, statusMessage: 'Notification introuvable' })
+    throw createError({ statusCode: 404, message: 'Notification introuvable' })
   }
 
   // Vérifier que l'utilisateur est un bénévole accepté de cette édition
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!volunteerApplication) {
-    throw createError({ statusCode: 403, statusMessage: 'Accès non autorisé' })
+    throw createError({ statusCode: 403, message: 'Accès non autorisé' })
   }
 
   const confirmation =

@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
     if (!targetUser) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Utilisateur cible non trouvé',
+        message: 'Utilisateur cible non trouvé',
       })
     }
 
@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la création de la notification',
+      message: 'Erreur lors de la création de la notification',
     })
   }
 })

@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   if (!user?.id) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
   if (!notificationId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID de notification requis',
+      message: 'ID de notification requis',
     })
   }
 
@@ -35,13 +35,13 @@ export default defineEventHandler(async (event) => {
     if (error.code === 'P2025') {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Notification non trouvée ou accès refusé',
+        message: 'Notification non trouvée ou accès refusé',
       })
     }
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la mise à jour de la notification',
+      message: 'Erreur lors de la mise à jour de la notification',
     })
   }
 })

@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
     if (!userWithPassword) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Utilisateur non trouvé',
+        message: 'Utilisateur non trouvé',
       })
     }
 
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la vérification',
+      message: 'Erreur lors de la vérification',
     })
   }
 })

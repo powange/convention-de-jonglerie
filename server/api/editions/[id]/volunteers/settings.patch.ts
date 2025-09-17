@@ -107,9 +107,9 @@ const bodySchema = z
   )
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, statusMessage: 'Edition invalide' })
+  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
 
   const body = await readBody(event).catch(() => ({}))
 
@@ -129,12 +129,12 @@ export default defineEventHandler(async (event) => {
     where: { id: editionId },
     select: { conventionId: true, volunteersMode: true } as any,
   })) as any
-  if (!edition) throw createError({ statusCode: 404, statusMessage: 'Edition introuvable' })
+  if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })
   const allowed = await canManageEditionVolunteers(editionId, event.context.user.id, event)
   if (!allowed)
     throw createError({
       statusCode: 403,
-      statusMessage: 'Droits insuffisants pour gérer les bénévoles',
+      message: 'Droits insuffisants pour gérer les bénévoles',
     })
 
   const data: any = {}
@@ -149,7 +149,7 @@ export default defineEventHandler(async (event) => {
     ) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'URL externe requise pour le mode EXTERNAL',
+        message: 'URL externe requise pour le mode EXTERNAL',
       })
     }
     data.volunteersExternalUrl = parsed.externalUrl || null

@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
     if (!rights && (title === undefined || title === null) && !perEdition) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Aucune donnée à mettre à jour',
+        message: 'Aucune donnée à mettre à jour',
       })
     }
 
@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
     if (!event.context.user) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Non authentifié',
+        message: 'Non authentifié',
       })
     }
 
@@ -155,7 +155,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la mise à jour du rôle:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur',
+      message: 'Erreur serveur',
     })
   }
 })

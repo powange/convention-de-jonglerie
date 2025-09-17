@@ -17,13 +17,13 @@ export default defineEventHandler(async (event) => {
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
 
   if (!event.context.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+    throw createError({ statusCode: 401, message: 'Non authentifié' })
   }
 
   // Vérifier les permissions
   const canManage = await canManageEditionVolunteers(editionId, event.context.user.id, event)
   if (!canManage) {
-    throw createError({ statusCode: 403, statusMessage: 'Droits insuffisants' })
+    throw createError({ statusCode: 403, message: 'Droits insuffisants' })
   }
 
   // Valider les données
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!edition) {
-    throw createError({ statusCode: 404, statusMessage: 'Édition introuvable' })
+    throw createError({ statusCode: 404, message: 'Édition introuvable' })
   }
 
   // Construire la requête pour récupérer les bénévoles
@@ -76,7 +76,7 @@ export default defineEventHandler(async (event) => {
   })
 
   if (volunteers.length === 0) {
-    throw createError({ statusCode: 400, statusMessage: 'Aucun bénévole trouvé avec ces critères' })
+    throw createError({ statusCode: 400, message: 'Aucun bénévole trouvé avec ces critères' })
   }
 
   // Utiliser le nom de l'édition si disponible, sinon le nom de la convention

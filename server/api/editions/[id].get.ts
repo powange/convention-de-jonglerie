@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   if (isNaN(editionId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Invalid Edition ID',
+      message: 'Invalid Edition ID',
     })
   }
 
@@ -65,7 +65,7 @@ export default defineEventHandler(async (event) => {
     if (!edition) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Edition not found',
+        message: 'Edition not found',
       })
     }
 
@@ -77,7 +77,7 @@ export default defineEventHandler(async (event) => {
       if (!event.context.user) {
         throw createError({
           statusCode: 404,
-          statusMessage: 'Edition not found',
+          message: 'Edition not found',
         })
       }
 
@@ -90,7 +90,7 @@ export default defineEventHandler(async (event) => {
       if (!isCreator && !isConventionAuthor && !isCollaborator) {
         throw createError({
           statusCode: 404,
-          statusMessage: 'Edition not found',
+          message: 'Edition not found',
         })
       }
     }
@@ -169,7 +169,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur API edition:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Internal Server Error',
+      message: 'Internal Server Error',
     })
   }
 })

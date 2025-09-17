@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     if (!editionId || isNaN(editionId) || !itemId || isNaN(itemId)) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'ID invalide',
+        message: 'ID invalide',
       })
     }
 
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
     if (!userId) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Token invalide',
+        message: 'Token invalide',
       })
     }
 
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
     if (!lostFoundItem) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Objet trouvé non trouvé',
+        message: 'Objet trouvé non trouvé',
       })
     }
 
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     if (!content || typeof content !== 'string' || content.trim().length === 0) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Le contenu du commentaire est requis',
+        message: 'Le contenu du commentaire est requis',
       })
     }
 
@@ -90,7 +90,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur interne du serveur',
+      message: 'Erreur interne du serveur',
     })
   }
 })

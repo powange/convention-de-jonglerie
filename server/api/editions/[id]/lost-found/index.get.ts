@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     if (!editionId || isNaN(editionId)) {
       throw createError({
         statusCode: 400,
-        statusMessage: "ID d'édition invalide",
+        message: "ID d'édition invalide",
       })
     }
 
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     if (!edition) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Édition non trouvée',
+        message: 'Édition non trouvée',
       })
     }
 
@@ -88,7 +88,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur interne du serveur',
+      message: 'Erreur interne du serveur',
     })
   }
 })

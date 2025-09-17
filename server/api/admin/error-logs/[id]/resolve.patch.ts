@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   const logId = getRouterParam(event, 'id')
   if (!logId) {
-    throw createError({ statusCode: 400, statusMessage: 'ID du log requis' })
+    throw createError({ statusCode: 400, message: 'ID du log requis' })
   }
 
   const body = await readBody(event).catch(() => ({}))
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!existingLog) {
-    throw createError({ statusCode: 404, statusMessage: "Log d'erreur introuvable" })
+    throw createError({ statusCode: 404, message: "Log d'erreur introuvable" })
   }
 
   // Mettre à jour le statut de résolution

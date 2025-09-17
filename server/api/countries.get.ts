@@ -28,7 +28,7 @@ export default defineEventHandler(async (_event) => {
     console.error('Erreur lors de la récupération des pays:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur',
+      message: 'Erreur serveur',
     })
   }
 })

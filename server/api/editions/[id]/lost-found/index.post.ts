@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     if (!editionId || isNaN(editionId)) {
       throw createError({
         statusCode: 400,
-        statusMessage: "ID d'édition invalide",
+        message: "ID d'édition invalide",
       })
     }
 
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
     if (!edition) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Édition non trouvée',
+        message: 'Édition non trouvée',
       })
     }
 
@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
     if (now < start) {
       throw createError({
         statusCode: 403,
-        statusMessage: "Les objets trouvés ne peuvent pas être ajoutés avant le début de l'édition",
+        message: "Les objets trouvés ne peuvent pas être ajoutés avant le début de l'édition",
       })
     }
 
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
     if (!hasPermission) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Vous devez être collaborateur pour ajouter un objet trouvé',
+        message: 'Vous devez être collaborateur pour ajouter un objet trouvé',
       })
     }
 
@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
     if (!description || typeof description !== 'string' || description.trim().length === 0) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'La description est requise',
+        message: 'La description est requise',
       })
     }
 
@@ -121,7 +121,7 @@ export default defineEventHandler(async (event) => {
     }
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur interne du serveur',
+      message: 'Erreur interne du serveur',
     })
   }
 })

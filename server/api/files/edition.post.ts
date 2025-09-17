@@ -12,6 +12,13 @@ export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
 
+    console.log('[EDITION UPLOAD] Body reçu:', {
+      hasFiles: body.files ? 'oui' : 'non',
+      filesLength: body.files?.length,
+      metadata: body.metadata,
+      bodyKeys: Object.keys(body),
+    })
+
     // Validation basique
     if (!body.files || !Array.isArray(body.files) || body.files.length === 0) {
       throw createError({
@@ -21,6 +28,10 @@ export default defineEventHandler(async (event) => {
     }
 
     if (!body.metadata?.entityId) {
+      console.error('[EDITION UPLOAD ERROR] metadata manquant ou entityId manquant:', {
+        hasMetadata: !!body.metadata,
+        metadata: body.metadata,
+      })
       throw createError({
         statusCode: 400,
         message: "ID d'édition requis",

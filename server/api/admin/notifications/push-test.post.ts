@@ -87,13 +87,13 @@ export default defineEventHandler(async (event) => {
     if (error.name === 'ZodError') {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Données invalides',
+        message: 'Données invalides',
       })
     }
 
     throw createError({
       statusCode: 500,
-      statusMessage: error.message || "Erreur lors de l'envoi de la notification push",
+      message: error.message || "Erreur lors de l'envoi de la notification push",
     })
   }
 })

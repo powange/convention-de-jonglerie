@@ -4,12 +4,12 @@ import { prisma } from '../../../utils/prisma'
 export default defineEventHandler(async (event) => {
   const offerId = parseInt(event.context.params?.id as string)
   if (!offerId) {
-    throw createError({ statusCode: 400, statusMessage: "ID de l'offre invalide" })
+    throw createError({ statusCode: 400, message: "ID de l'offre invalide" })
   }
 
   const offer = await prisma.carpoolOffer.findUnique({ where: { id: offerId } })
   if (!offer) {
-    throw createError({ statusCode: 404, statusMessage: 'Offre de covoiturage introuvable' })
+    throw createError({ statusCode: 404, message: 'Offre de covoiturage introuvable' })
   }
 
   const userId = event.context.user?.id as number | undefined

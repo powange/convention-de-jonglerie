@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     console.error('[Test API] Erreur:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur de test API',
+      message: 'Erreur de test API',
     })
   }
 })

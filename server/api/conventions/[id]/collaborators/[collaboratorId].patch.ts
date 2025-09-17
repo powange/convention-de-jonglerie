@@ -31,7 +31,7 @@ const payloadSchema = z.object({
 export default defineEventHandler(async (event) => {
   const conventionId = parseInt(getRouterParam(event, 'id') || '0')
   const collaboratorId = parseInt(getRouterParam(event, 'collaboratorId') || '0')
-  if (!event.context.user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
   const body = await readBody(event).catch(() => ({}))
   const parsed = payloadSchema.parse(body || {})
 
@@ -40,14 +40,14 @@ export default defineEventHandler(async (event) => {
     return { success: true, unchanged: true }
 
   const canManage = await canManageCollaborators(conventionId, event.context.user.id, event)
-  if (!canManage) throw createError({ statusCode: 403, statusMessage: 'Permission insuffisante' })
+  if (!canManage) throw createError({ statusCode: 403, message: 'Permission insuffisante' })
 
   const collaborator = await prisma.conventionCollaborator.findUnique({
     where: { id: collaboratorId },
     include: { perEditionPermissions: true },
   })
   if (!collaborator || collaborator.conventionId !== conventionId)
-    throw createError({ statusCode: 404, statusMessage: 'Collaborateur introuvable' })
+    throw createError({ statusCode: 404, message: 'Collaborateur introuvable' })
 
   const beforeSnapshot = {
     title: collaborator.title,

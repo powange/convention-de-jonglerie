@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   if (!editionId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Edition ID invalide',
+      message: 'Edition ID invalide',
     })
   }
 
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la récupération des demandes:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur',
+      message: 'Erreur serveur',
     })
   }
 })

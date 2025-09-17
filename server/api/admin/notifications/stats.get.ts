@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
     console.error('[Admin] Erreur récupération statistiques notifications:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la récupération des statistiques',
+      message: 'Erreur lors de la récupération des statistiques',
     })
   }
 })

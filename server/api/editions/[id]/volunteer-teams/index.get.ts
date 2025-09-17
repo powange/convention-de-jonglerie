@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   if (!editionId || isNaN(editionId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: "ID d'édition invalide",
+      message: "ID d'édition invalide",
     })
   }
 
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
   } catch {
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la récupération des équipes de bénévoles',
+      message: 'Erreur lors de la récupération des équipes de bénévoles',
     })
   }
 })

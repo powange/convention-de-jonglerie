@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la suppression du collaborateur:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur',
+      message: 'Erreur serveur',
     })
   }
 })

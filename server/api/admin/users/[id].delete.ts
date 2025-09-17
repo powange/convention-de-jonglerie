@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
     if (isNaN(userIdToDelete)) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'ID utilisateur invalide',
+        message: 'ID utilisateur invalide',
       })
     }
 
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
     if (!reason || !DELETION_REASONS[reason as keyof typeof DELETION_REASONS]) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Raison de suppression invalide',
+        message: 'Raison de suppression invalide',
       })
     }
 
@@ -65,7 +65,7 @@ export default defineEventHandler(async (event) => {
     if (userIdToDelete === adminUser.id) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Impossible de supprimer son propre compte',
+        message: 'Impossible de supprimer son propre compte',
       })
     }
 
@@ -85,7 +85,7 @@ export default defineEventHandler(async (event) => {
     if (!userToDelete) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Utilisateur non trouvé',
+        message: 'Utilisateur non trouvé',
       })
     }
 
@@ -93,7 +93,7 @@ export default defineEventHandler(async (event) => {
     if (userToDelete.isGlobalAdmin) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Impossible de supprimer un super administrateur',
+        message: 'Impossible de supprimer un super administrateur',
       })
     }
 
@@ -159,7 +159,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: `Erreur interne du serveur: ${err.message}`,
+      message: `Erreur interne du serveur: ${err.message}`,
     })
   }
 })

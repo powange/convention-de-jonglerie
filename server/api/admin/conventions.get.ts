@@ -67,7 +67,7 @@ export default defineEventHandler(async (event) => {
     // Sinon, erreur serveur générique
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur lors de la récupération des conventions',
+      message: 'Erreur serveur lors de la récupération des conventions',
     })
   }
 })

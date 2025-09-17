@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const schema = z.object({ email: z.string().email() })
   const parse = schema.safeParse(body)
   if (!parse.success) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid email' })
+    throw createError({ statusCode: 400, message: 'Invalid email' })
   }
 
   const { email } = parse.data

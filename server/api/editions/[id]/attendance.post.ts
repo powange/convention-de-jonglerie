@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   if (isNaN(editionId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Invalid Edition ID',
+      message: 'Invalid Edition ID',
     })
   }
 
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     if (!edition) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Edition introuvable',
+        message: 'Edition introuvable',
       })
     }
 
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
     if (!userWithAttendance) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'User not found',
+        message: 'User not found',
       })
     }
 
@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
     console.error('Error toggling attendance:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Internal Server Error',
+      message: 'Internal Server Error',
     })
   }
 })

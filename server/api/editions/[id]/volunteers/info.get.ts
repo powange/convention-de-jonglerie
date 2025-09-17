@@ -2,7 +2,7 @@ import { prisma } from '../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, statusMessage: 'Edition invalide' })
+  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
 
   const edition = await prisma.edition.findUnique({
     where: { id: editionId },
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
       volunteerApplications: { select: { id: true, status: true, userId: true } },
     },
   })
-  if (!edition) throw createError({ statusCode: 404, statusMessage: 'Edition introuvable' })
+  if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })
 
   const user = event.context.user
   let myApplication: any = null

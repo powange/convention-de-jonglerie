@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
     if (!targetUser) {
       throw createError({
         statusCode: 404,
-        statusMessage: `Utilisateur avec l'email ${parsed.targetUserEmail} introuvable`,
+        message: `Utilisateur avec l'email ${parsed.targetUserEmail} introuvable`,
       })
     }
 
@@ -103,7 +103,7 @@ export default defineEventHandler(async (event) => {
       default:
         throw createError({
           statusCode: 400,
-          statusMessage: 'Type de notification de test non reconnu',
+          message: 'Type de notification de test non reconnu',
         })
     }
 
@@ -129,7 +129,7 @@ export default defineEventHandler(async (event) => {
     console.error("Erreur lors de l'envoi de la notification de test:", error)
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur lors de l'envoi de la notification de test",
+      message: "Erreur lors de l'envoi de la notification de test",
     })
   }
 })

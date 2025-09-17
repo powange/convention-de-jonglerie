@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
   if (isNaN(requestId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID de demande invalide',
+      message: 'ID de demande invalide',
     })
   }
 
@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
     if (!existingRequest) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Demande de covoiturage introuvable',
+        message: 'Demande de covoiturage introuvable',
       })
     }
 
@@ -60,7 +60,7 @@ export default defineEventHandler(async (event) => {
     if (existingRequest.userId !== event.context.user.id) {
       throw createError({
         statusCode: 403,
-        statusMessage: "Vous n'avez pas les droits pour modifier cette demande",
+        message: "Vous n'avez pas les droits pour modifier cette demande",
       })
     }
 
@@ -105,7 +105,7 @@ export default defineEventHandler(async (event) => {
     if (error instanceof z.ZodError) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Données invalides',
+        message: 'Données invalides',
         data: error.errors,
       })
     }
@@ -116,7 +116,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la mise à jour de la demande',
+      message: 'Erreur lors de la mise à jour de la demande',
     })
   }
 })

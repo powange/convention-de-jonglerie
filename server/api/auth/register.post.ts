@@ -76,7 +76,7 @@ export default defineEventHandler(async (event) => {
         // Unique constraint failed
         throw createError({
           statusCode: 409,
-          statusMessage: 'Email ou pseudo déjà utilisé',
+          message: 'Email ou pseudo déjà utilisé',
         })
       }
     }
@@ -84,7 +84,7 @@ export default defineEventHandler(async (event) => {
     console.error("Erreur lors de l'inscription:", error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur interne',
+      message: 'Erreur serveur interne',
     })
   }
 })

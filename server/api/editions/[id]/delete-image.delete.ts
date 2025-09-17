@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   if (!editionId) {
     throw createError({
       statusCode: 400,
-      statusMessage: "ID d'édition invalide",
+      message: "ID d'édition invalide",
     })
   }
 
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     console.error("Erreur lors de la suppression de l'image d'édition:", error)
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur lors de la suppression de l'image",
+      message: "Erreur lors de la suppression de l'image",
     })
   }
 })

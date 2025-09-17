@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -167,7 +167,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur lors de la récupération des candidatures',
+      message: 'Erreur serveur lors de la récupération des candidatures',
     })
   }
 })

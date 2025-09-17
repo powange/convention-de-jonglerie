@@ -7,17 +7,17 @@ export default defineEventHandler(async (event) => {
   const groupId = getRouterParam(event, 'groupId')
 
   if (!event.context.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+    throw createError({ statusCode: 401, message: 'Non authentifié' })
   }
 
   // Vérifier les permissions
   const canManage = await canManageEditionVolunteers(editionId, event.context.user.id, event)
   if (!canManage) {
-    throw createError({ statusCode: 403, statusMessage: 'Droits insuffisants' })
+    throw createError({ statusCode: 403, message: 'Droits insuffisants' })
   }
 
   if (!groupId) {
-    throw createError({ statusCode: 400, statusMessage: 'ID de groupe requis' })
+    throw createError({ statusCode: 400, message: 'ID de groupe requis' })
   }
 
   // Récupérer le groupe de notifications avec les confirmations
@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!notificationGroup) {
-    throw createError({ statusCode: 404, statusMessage: 'Notification introuvable' })
+    throw createError({ statusCode: 404, message: 'Notification introuvable' })
   }
 
   // Récupérer tous les destinataires originaux (pour identifier ceux qui n'ont pas confirmé)

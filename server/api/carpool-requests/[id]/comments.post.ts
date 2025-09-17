@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   if (!carpoolRequestId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Carpool Request ID invalide',
+      message: 'Carpool Request ID invalide',
     })
   }
 
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   if (!body.content || body.content.trim() === '') {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Le commentaire ne peut pas être vide',
+      message: 'Le commentaire ne peut pas être vide',
     })
   }
 
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     if (!carpoolRequest) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Demande de covoiturage non trouvée',
+        message: 'Demande de covoiturage non trouvée',
       })
     }
 
@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la création du commentaire:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur',
+      message: 'Erreur serveur',
     })
   }
 })

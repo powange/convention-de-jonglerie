@@ -2,19 +2,19 @@ import { canManageEditionVolunteers } from '../../../../../utils/collaborator-ma
 import { prisma } from '../../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
 
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   const targetDate = getRouterParam(event, 'date') || ''
 
-  if (!editionId) throw createError({ statusCode: 400, statusMessage: 'Edition invalide' })
-  if (!targetDate) throw createError({ statusCode: 400, statusMessage: 'Date invalide' })
+  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+  if (!targetDate) throw createError({ statusCode: 400, message: 'Date invalide' })
 
   const allowed = await canManageEditionVolunteers(editionId, event.context.user.id, event)
   if (!allowed) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Droits insuffisants pour gérer les bénévoles',
+      message: 'Droits insuffisants pour gérer les bénévoles',
     })
   }
 
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  if (!edition) throw createError({ statusCode: 404, statusMessage: 'Edition introuvable' })
+  if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })
 
   // Récupérer toutes les candidatures acceptées avec les infos utilisateur
   const applications = await prisma.editionVolunteerApplication.findMany({

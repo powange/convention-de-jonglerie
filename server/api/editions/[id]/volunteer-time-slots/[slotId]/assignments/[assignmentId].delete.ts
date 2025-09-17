@@ -14,21 +14,21 @@ export default defineEventHandler(async (event) => {
   if (!editionId || isNaN(editionId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: "ID d'édition invalide",
+      message: "ID d'édition invalide",
     })
   }
 
   if (!slotId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID de créneau invalide',
+      message: 'ID de créneau invalide',
     })
   }
 
   if (!assignmentId) {
     throw createError({
       statusCode: 400,
-      statusMessage: "ID d'assignation invalide",
+      message: "ID d'assignation invalide",
     })
   }
 
@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
     if (!assignment) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Assignation non trouvée',
+        message: 'Assignation non trouvée',
       })
     }
 
@@ -80,7 +80,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur lors de la suppression de l'assignation",
+      message: "Erreur lors de la suppression de l'assignation",
     })
   }
 })

@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   if (isNaN(userId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID utilisateur invalide',
+      message: 'ID utilisateur invalide',
     })
   }
 
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   if (userId === adminUser.id) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Vous ne pouvez pas modifier vos propres droits administrateur',
+      message: 'Vous ne pouvez pas modifier vos propres droits administrateur',
     })
   }
 
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
     if (!existingUser) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Utilisateur introuvable',
+        message: 'Utilisateur introuvable',
       })
     }
 
@@ -83,7 +83,7 @@ export default defineEventHandler(async (event) => {
     if (error instanceof z.ZodError) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Données invalides',
+        message: 'Données invalides',
         data: error.errors,
       })
     }
@@ -95,7 +95,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur serveur lors de la promotion/rétrogradation de l'utilisateur",
+      message: "Erreur serveur lors de la promotion/rétrogradation de l'utilisateur",
     })
   }
 })

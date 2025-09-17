@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   if (!taskName || !availableTasks.includes(taskName)) {
     throw createError({
       statusCode: 400,
-      statusMessage: `Tâche invalide. Tâches disponibles: ${availableTasks.join(', ')}`,
+      message: `Tâche invalide. Tâches disponibles: ${availableTasks.join(', ')}`,
     })
   }
 
@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: `Erreur lors de l'exécution de la tâche ${taskName}: ${error.message}`,
+      message: `Erreur lors de l'exécution de la tâche ${taskName}: ${error.message}`,
     })
   }
 })

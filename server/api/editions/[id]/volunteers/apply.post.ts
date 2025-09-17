@@ -62,9 +62,9 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!editionId) throw createError({ statusCode: 400, statusMessage: 'Edition invalide' })
+  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
   const body = await readBody(event).catch(() => ({}))
   const parsed = bodySchema.parse(body || {})
 
@@ -82,23 +82,22 @@ export default defineEventHandler(async (event) => {
       // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
     },
   })
-  if (!edition) throw createError({ statusCode: 404, statusMessage: 'Edition introuvable' })
-  if (!edition.volunteersOpen)
-    throw createError({ statusCode: 400, statusMessage: 'Recrutement fermé' })
+  if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })
+  if (!edition.volunteersOpen) throw createError({ statusCode: 400, message: 'Recrutement fermé' })
 
   // Vérifier candidature existante
   const existing = await prisma.editionVolunteerApplication.findUnique({
     where: { editionId_userId: { editionId, userId: event.context.user.id } },
     select: { id: true },
   })
-  if (existing) throw createError({ statusCode: 409, statusMessage: 'Déjà candidat' })
+  if (existing) throw createError({ statusCode: 409, message: 'Déjà candidat' })
 
   // Téléphone requis : si pas déjà défini dans user et pas fourni -> erreur
   const user = await prisma.user.findUnique({
     where: { id: event.context.user.id },
     select: { phone: true, nom: true, prenom: true },
   })
-  if (!user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+  if (!user) throw createError({ statusCode: 401, message: 'Non authentifié' })
 
   // Validations cumulées
   const missing: string[] = []
@@ -108,7 +107,7 @@ export default defineEventHandler(async (event) => {
   if (missing.length) {
     throw createError({
       statusCode: 400,
-      statusMessage: `${missing.join(', ')} requis${missing.length > 1 ? ' sont' : ' est'}`,
+      message: `${missing.join(', ')} requis${missing.length > 1 ? ' sont' : ' est'}`,
     })
   }
 
@@ -120,7 +119,7 @@ export default defineEventHandler(async (event) => {
   if (!hasAvailability) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Au moins une disponibilité est requise',
+      message: 'Au moins une disponibilité est requise',
     })
   }
 
@@ -131,14 +130,14 @@ export default defineEventHandler(async (event) => {
   ) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Date d'arrivée requise",
+      message: "Date d'arrivée requise",
     })
   }
 
   if ((parsed.eventAvailability || parsed.teardownAvailability) && !parsed.departureDateTime) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Date de départ requise',
+      message: 'Date de départ requise',
     })
   }
 
@@ -162,7 +161,7 @@ export default defineEventHandler(async (event) => {
     if (invalidTeams.length > 0) {
       throw createError({
         statusCode: 400,
-        statusMessage: `Équipes invalides : ${invalidTeams.join(', ')}. Équipes valides : ${validTeamNames.join(', ')}`,
+        message: `Équipes invalides : ${invalidTeams.join(', ')}. Équipes valides : ${validTeamNames.join(', ')}`,
       })
     }
   }

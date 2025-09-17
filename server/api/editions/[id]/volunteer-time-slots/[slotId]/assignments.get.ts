@@ -13,14 +13,14 @@ export default defineEventHandler(async (event) => {
   if (!editionId || isNaN(editionId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: "ID d'édition invalide",
+      message: "ID d'édition invalide",
     })
   }
 
   if (!slotId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID de créneau invalide',
+      message: 'ID de créneau invalide',
     })
   }
 
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
     if (!timeSlot) {
       throw createError({
         statusCode: 404,
-        statusMessage: "Créneau non trouvé ou n'appartient pas à cette édition",
+        message: "Créneau non trouvé ou n'appartient pas à cette édition",
       })
     }
 
@@ -78,7 +78,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la récupération des assignations',
+      message: 'Erreur lors de la récupération des assignations',
     })
   }
 })

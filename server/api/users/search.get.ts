@@ -39,10 +39,10 @@ export default defineEventHandler(async (event) => {
     }))
   } catch (error: unknown) {
     if ((error as any)?.issues) {
-      throw createError({ statusCode: 400, statusMessage: 'Requête invalide' })
+      throw createError({ statusCode: 400, message: 'Requête invalide' })
     }
     if ((error as H3Error)?.statusCode) throw error
     console.error('Erreur recherche utilisateurs:', error)
-    throw createError({ statusCode: 500, statusMessage: 'Erreur serveur' })
+    throw createError({ statusCode: 500, message: 'Erreur serveur' })
   }
 })

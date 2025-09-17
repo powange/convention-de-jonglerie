@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     if (!resetToken) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Token de réinitialisation invalide',
+        message: 'Token de réinitialisation invalide',
       })
     }
 
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
     if (nowUTC.getTime() > expiresAtUTC.getTime()) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Le token de réinitialisation a expiré',
+        message: 'Le token de réinitialisation a expiré',
       })
     }
 
@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
     if (resetToken.used) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Ce token a déjà été utilisé',
+        message: 'Ce token a déjà été utilisé',
       })
     }
 
@@ -80,7 +80,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 400,
-      statusMessage: 'Erreur lors de la réinitialisation du mot de passe',
+      message: 'Erreur lors de la réinitialisation du mot de passe',
     })
   }
 })

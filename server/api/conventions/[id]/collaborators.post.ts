@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
       if (!userToAdd) {
         throw createError({
           statusCode: 404,
-          statusMessage: 'Utilisateur introuvable',
+          message: 'Utilisateur introuvable',
         })
       }
     } else if (userIdentifier) {
@@ -74,13 +74,13 @@ export default defineEventHandler(async (event) => {
       if (!userToAdd) {
         throw createError({
           statusCode: 404,
-          statusMessage: 'Utilisateur introuvable avec ce pseudo ou cet email',
+          message: 'Utilisateur introuvable avec ce pseudo ou cet email',
         })
       }
     } else {
       throw createError({
         statusCode: 400,
-        statusMessage: 'userIdentifier ou userId est requis',
+        message: 'userIdentifier ou userId est requis',
       })
     }
 
@@ -88,7 +88,7 @@ export default defineEventHandler(async (event) => {
     if (userToAdd.id === user.id) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Vous ne pouvez pas vous ajouter comme collaborateur',
+        message: 'Vous ne pouvez pas vous ajouter comme collaborateur',
       })
     }
 
@@ -135,7 +135,7 @@ export default defineEventHandler(async (event) => {
     console.error("Erreur lors de l'ajout du collaborateur:", error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur',
+      message: 'Erreur serveur',
     })
   }
 })

@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     if (!userWithPassword) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Utilisateur non trouvé',
+        message: 'Utilisateur non trouvé',
       })
     }
 
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
       if (!currentPassword) {
         throw createError({
           statusCode: 400,
-          statusMessage: 'Mot de passe actuel requis',
+          message: 'Mot de passe actuel requis',
         })
       }
 
@@ -71,7 +71,7 @@ export default defineEventHandler(async (event) => {
       if (!isCurrentPasswordValid) {
         throw createError({
           statusCode: 400,
-          statusMessage: 'Mot de passe actuel incorrect',
+          message: 'Mot de passe actuel incorrect',
         })
       }
     } else {
@@ -100,7 +100,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors du changement de mot de passe',
+      message: 'Erreur lors du changement de mot de passe',
     })
   }
 })

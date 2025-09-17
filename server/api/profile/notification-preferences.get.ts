@@ -11,7 +11,7 @@ const defaultPreferences = {
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+    throw createError({ statusCode: 401, message: 'Non authentifié' })
   }
 
   try {
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la récupération des préférences de notifications:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la récupération des préférences',
+      message: 'Erreur lors de la récupération des préférences',
     })
   }
 })

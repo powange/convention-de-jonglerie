@@ -136,7 +136,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la création de la convention:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur lors de la création de la convention',
+      message: 'Erreur serveur lors de la création de la convention',
     })
   }
 })

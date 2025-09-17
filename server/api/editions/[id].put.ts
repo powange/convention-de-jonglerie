@@ -90,7 +90,7 @@ export default defineEventHandler(async (event) => {
       if (!convention) {
         throw createError({
           statusCode: 404,
-          statusMessage: 'Convention introuvable',
+          message: 'Convention introuvable',
         })
       }
 
@@ -101,7 +101,7 @@ export default defineEventHandler(async (event) => {
       if (!canChangeConvention) {
         throw createError({
           statusCode: 403,
-          statusMessage: "Vous ne pouvez assigner des éditions qu'aux conventions que vous gérez",
+          message: "Vous ne pouvez assigner des éditions qu'aux conventions que vous gérez",
         })
       }
     }
@@ -319,7 +319,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur lors de la mise à jour de l'édition",
+      message: "Erreur lors de la mise à jour de l'édition",
     })
   }
 })

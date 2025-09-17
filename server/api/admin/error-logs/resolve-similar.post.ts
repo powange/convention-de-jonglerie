@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la résolution des logs',
+      message: 'Erreur lors de la résolution des logs',
     })
   }
 })

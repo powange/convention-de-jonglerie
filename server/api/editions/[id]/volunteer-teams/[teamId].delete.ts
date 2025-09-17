@@ -13,14 +13,14 @@ export default defineEventHandler(async (event) => {
   if (!editionId || isNaN(editionId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: "ID d'édition invalide",
+      message: "ID d'édition invalide",
     })
   }
 
   if (!teamId) {
     throw createError({
       statusCode: 400,
-      statusMessage: "ID d'équipe invalide",
+      message: "ID d'équipe invalide",
     })
   }
 
@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
     if (!existingTeam) {
       throw createError({
         statusCode: 404,
-        statusMessage: "Équipe non trouvée ou n'appartient pas à cette édition",
+        message: "Équipe non trouvée ou n'appartient pas à cette édition",
       })
     }
 
@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
     if (existingTeam._count.timeSlots > 0) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Impossible de supprimer une équipe avec des créneaux assignés',
+        message: 'Impossible de supprimer une équipe avec des créneaux assignés',
       })
     }
 
@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur lors de la suppression de l'équipe",
+      message: "Erreur lors de la suppression de l'équipe",
     })
   }
 })

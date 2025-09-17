@@ -167,6 +167,6 @@ export default defineEventHandler(async (event) => {
     if (typeof error === 'object' && error && 'statusCode' in error) {
       throw error as any
     }
-    throw createError({ statusCode: 500, statusMessage: "Erreur lors de la création de l'édition" })
+    throw createError({ statusCode: 500, message: "Erreur lors de la création de l'édition" })
   }
 })

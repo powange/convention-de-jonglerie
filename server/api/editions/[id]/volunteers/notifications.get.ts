@@ -6,13 +6,13 @@ export default defineEventHandler(async (event) => {
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
 
   if (!event.context.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+    throw createError({ statusCode: 401, message: 'Non authentifié' })
   }
 
   // Vérifier les permissions
   const canManage = await canManageEditionVolunteers(editionId, event.context.user.id, event)
   if (!canManage) {
-    throw createError({ statusCode: 403, statusMessage: 'Droits insuffisants' })
+    throw createError({ statusCode: 403, message: 'Droits insuffisants' })
   }
 
   // Récupérer la liste des notifications envoyées avec toutes les confirmations

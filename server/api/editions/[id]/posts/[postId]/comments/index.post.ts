@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
   const user = event.context.user
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
   if (isNaN(editionId) || isNaN(postId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID invalide',
+      message: 'ID invalide',
     })
   }
 
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
     if (!post) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Post non trouvé',
+        message: 'Post non trouvé',
       })
     }
 
@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
     if (!hasPermission) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Vous devez être collaborateur pour commenter sur cette édition',
+        message: 'Vous devez être collaborateur pour commenter sur cette édition',
       })
     }
 
@@ -90,7 +90,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la création du commentaire:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur interne du serveur',
+      message: 'Erreur interne du serveur',
     })
   }
 })

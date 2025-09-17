@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
   if (!editionId || isNaN(editionId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: "ID d'édition invalide",
+      message: "ID d'édition invalide",
     })
   }
 
@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
     if (!edition) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Édition non trouvée',
+        message: 'Édition non trouvée',
       })
     }
 
@@ -63,7 +63,7 @@ export default defineEventHandler(async (event) => {
       if (!team) {
         throw createError({
           statusCode: 400,
-          statusMessage: "Équipe non trouvée ou n'appartient pas à cette édition",
+          message: "Équipe non trouvée ou n'appartient pas à cette édition",
         })
       }
     }
@@ -75,7 +75,7 @@ export default defineEventHandler(async (event) => {
     if (body.startDateTime < editionStart || body.endDateTime > editionEnd) {
       throw createError({
         statusCode: 400,
-        statusMessage: "Le créneau doit être dans la période de l'édition",
+        message: "Le créneau doit être dans la période de l'édition",
       })
     }
 
@@ -143,7 +143,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la création du créneau',
+      message: 'Erreur lors de la création du créneau',
     })
   }
 })

@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     if (!captchaToken) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Captcha requis pour les utilisateurs non connectés',
+        message: 'Captcha requis pour les utilisateurs non connectés',
       })
     }
 
@@ -67,7 +67,7 @@ export default defineEventHandler(async (event) => {
       if (!recaptchaSecret) {
         throw createError({
           statusCode: 500,
-          statusMessage: 'Configuration du captcha manquante',
+          message: 'Configuration du captcha manquante',
         })
       }
 
@@ -110,22 +110,22 @@ export default defineEventHandler(async (event) => {
           .toString()
           .trim()
         if (!verification?.success) {
-          throw createError({ statusCode: 400, statusMessage: 'Captcha invalide' })
+          throw createError({ statusCode: 400, message: 'Captcha invalide' })
         }
         if (verification?.action && verification.action !== 'feedback') {
-          throw createError({ statusCode: 400, statusMessage: 'Captcha action invalide' })
+          throw createError({ statusCode: 400, message: 'Captcha action invalide' })
         }
         if (typeof verification?.score === 'number' && verification.score < minScore) {
-          throw createError({ statusCode: 400, statusMessage: 'Captcha score insuffisant' })
+          throw createError({ statusCode: 400, message: 'Captcha score insuffisant' })
         }
         if (expectedHost && verification?.hostname && verification.hostname !== expectedHost) {
-          throw createError({ statusCode: 400, statusMessage: 'Captcha hostname invalide' })
+          throw createError({ statusCode: 400, message: 'Captcha hostname invalide' })
         }
       } catch (error) {
         console.error('Erreur lors de la vérification du captcha:', error)
         throw createError({
           statusCode: 400,
-          statusMessage: 'Erreur lors de la vérification du captcha',
+          message: 'Erreur lors de la vérification du captcha',
         })
       }
     }
@@ -134,7 +134,7 @@ export default defineEventHandler(async (event) => {
     if (!name) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Le nom est requis pour les utilisateurs non connectés',
+        message: 'Le nom est requis pour les utilisateurs non connectés',
       })
     }
   }
@@ -178,7 +178,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la création du feedback:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur lors de l'envoi du feedback",
+      message: "Erreur lors de l'envoi du feedback",
     })
   }
 })

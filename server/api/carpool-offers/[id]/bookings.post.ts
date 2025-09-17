@@ -3,12 +3,12 @@ import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+    throw createError({ statusCode: 401, message: 'Non authentifié' })
   }
 
   const offerId = parseInt(event.context.params?.id as string)
   if (!offerId) {
-    throw createError({ statusCode: 400, statusMessage: "ID de l'offre invalide" })
+    throw createError({ statusCode: 400, message: "ID de l'offre invalide" })
   }
 
   const body = await readBody(event)
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   const requestId = body?.requestId ? Number(body.requestId) : undefined
 
   if (!seats || seats < 1 || seats > 8) {
-    throw createError({ statusCode: 400, statusMessage: 'Nombre de places invalide' })
+    throw createError({ statusCode: 400, message: 'Nombre de places invalide' })
   }
 
   // Récupérer l'offre et vérifier droits/capacité
@@ -30,14 +30,14 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!offer) {
-    throw createError({ statusCode: 404, statusMessage: 'Offre de covoiturage introuvable' })
+    throw createError({ statusCode: 404, message: 'Offre de covoiturage introuvable' })
   }
 
   // Le créateur ne peut pas réserver sur sa propre offre
   if (offer.userId === event.context.user.id) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Impossible de réserver votre propre offre',
+      message: 'Impossible de réserver votre propre offre',
     })
   }
 
@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
   if (requestId) {
     const req = await prisma.carpoolRequest.findUnique({ where: { id: requestId } })
     if (!req || req.userId !== event.context.user.id || req.editionId !== offer.editionId) {
-      throw createError({ statusCode: 400, statusMessage: 'Demande invalide' })
+      throw createError({ statusCode: 400, message: 'Demande invalide' })
     }
   }
 
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
     .reduce((sum, b) => sum + (b.seats || 0), 0)
 
   if (acceptedSeats + seats > offer.availableSeats) {
-    throw createError({ statusCode: 400, statusMessage: 'Plus assez de places disponibles' })
+    throw createError({ statusCode: 400, message: 'Plus assez de places disponibles' })
   }
 
   // Option: éviter multi-PENDING du même utilisateur sur la même offre
@@ -63,7 +63,7 @@ export default defineEventHandler(async (event) => {
     where: { carpoolOfferId: offerId, requesterId: event.context.user.id, status: 'PENDING' },
   })
   if (existingPending) {
-    throw createError({ statusCode: 400, statusMessage: 'Une réservation en attente existe déjà' })
+    throw createError({ statusCode: 400, message: 'Une réservation en attente existe déjà' })
   }
 
   const booking = await prisma.carpoolBooking.create({

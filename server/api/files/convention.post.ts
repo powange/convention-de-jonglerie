@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     if (!files || files.length === 0) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Aucun fichier fourni',
+        message: 'Aucun fichier fourni',
       })
     }
 
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
       if (!convention) {
         throw createError({
           statusCode: 404,
-          statusMessage: 'Convention introuvable',
+          message: 'Convention introuvable',
         })
       }
 
@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
       if (!isAuthor && !isCollaborator && !isGlobalAdmin) {
         throw createError({
           statusCode: 403,
-          statusMessage: "Vous n'avez pas les droits pour modifier cette convention",
+          message: "Vous n'avez pas les droits pour modifier cette convention",
         })
       }
 
@@ -116,7 +116,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur lors de l'upload de l'image",
+      message: "Erreur lors de l'upload de l'image",
     })
   }
 })

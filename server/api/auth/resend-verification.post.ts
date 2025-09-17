@@ -35,14 +35,14 @@ export default defineEventHandler(async (event) => {
     if (!user) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Utilisateur non trouvé',
+        message: 'Utilisateur non trouvé',
       })
     }
 
     if (user.isEmailVerified) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Email déjà vérifié',
+        message: 'Email déjà vérifié',
       })
     }
 
@@ -89,7 +89,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors du renvoi du code:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur interne',
+      message: 'Erreur serveur interne',
     })
   }
 })

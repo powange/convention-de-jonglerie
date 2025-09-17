@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
     if (!user) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Identifiants invalides',
+        message: 'Identifiants invalides',
       })
     }
 
@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
     if (!isPasswordValid) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Identifiants invalides',
+        message: 'Identifiants invalides',
       })
     }
 
@@ -65,7 +65,7 @@ export default defineEventHandler(async (event) => {
     if (!user.isEmailVerified) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Email non vérifié. Veuillez vérifier votre email avant de vous connecter.',
+        message: 'Email non vérifié. Veuillez vérifier votre email avant de vous connecter.',
         data: {
           requiresEmailVerification: true,
           email: user.email,

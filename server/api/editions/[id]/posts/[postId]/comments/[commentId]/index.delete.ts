@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
   const user = event.context.user
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   if (isNaN(editionId) || isNaN(postId) || isNaN(commentId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID invalide',
+      message: 'ID invalide',
     })
   }
 
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
     if (!comment || comment.editionPost.editionId !== editionId) {
       throw createError({
         statusCode: 404,
-        statusMessage: "Commentaire non trouvé ou vous n'êtes pas autorisé à le supprimer",
+        message: "Commentaire non trouvé ou vous n'êtes pas autorisé à le supprimer",
       })
     }
 
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la suppression du commentaire:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur interne du serveur',
+      message: 'Erreur interne du serveur',
     })
   }
 })

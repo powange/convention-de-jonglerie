@@ -8,18 +8,18 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   const applicationId = parseInt(getRouterParam(event, 'applicationId') || '0')
   if (!editionId || !applicationId)
-    throw createError({ statusCode: 400, statusMessage: 'Paramètres invalides' })
+    throw createError({ statusCode: 400, message: 'Paramètres invalides' })
   const parsed = bodySchema.parse(await readBody(event))
 
   const allowed = await canManageEditionVolunteers(editionId, event.context.user.id, event)
   if (!allowed)
     throw createError({
       statusCode: 403,
-      statusMessage: 'Droits insuffisants pour gérer les bénévoles',
+      message: 'Droits insuffisants pour gérer les bénévoles',
     })
 
   const application = await prisma.editionVolunteerApplication.findUnique({
@@ -32,13 +32,13 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (!application || application.editionId !== editionId)
-    throw createError({ statusCode: 404, statusMessage: 'Candidature introuvable' })
+    throw createError({ statusCode: 404, message: 'Candidature introuvable' })
 
   // Vérifier que le bénévole est en attente ou accepté (pas rejeté)
   if (application.status === 'REJECTED')
     throw createError({
       statusCode: 400,
-      statusMessage: 'Les équipes ne peuvent être assignées aux bénévoles rejetés',
+      message: 'Les équipes ne peuvent être assignées aux bénévoles rejetés',
     })
 
   // Récupérer les équipes de cette édition pour faire le mapping noms -> IDs
@@ -63,7 +63,7 @@ export default defineEventHandler(async (event) => {
     } else {
       throw createError({
         statusCode: 400,
-        statusMessage: `Équipe "${teamIdentifier}" introuvable dans cette édition`,
+        message: `Équipe "${teamIdentifier}" introuvable dans cette édition`,
       })
     }
   }

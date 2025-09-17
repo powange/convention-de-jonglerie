@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
           statusCode: 400,
           event,
         })
-        throw createError({ statusCode: 400, statusMessage: 'Erreur de validation de test' })
+        throw createError({ statusCode: 400, message: 'Erreur de validation de test' })
       }
       break
     }
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
       dbError.name = 'PrismaClientKnownRequestError'
       throw createError({
         statusCode: 500,
-        statusMessage: 'Erreur de base de données de test',
+        message: 'Erreur de base de données de test',
         cause: dbError,
       })
     }
@@ -56,20 +56,20 @@ export default defineEventHandler(async (event) => {
     case 'authentication':
       throw createError({
         statusCode: 401,
-        statusMessage: "Token d'authentification invalide (test)",
+        message: "Token d'authentification invalide (test)",
       })
 
     case 'authorization':
       throw createError({
         statusCode: 403,
-        statusMessage: 'Permissions insuffisantes pour cette ressource (test)',
+        message: 'Permissions insuffisantes pour cette ressource (test)',
       })
 
     case 'not-found':
-      throw createError({ statusCode: 404, statusMessage: 'Ressource de test introuvable' })
+      throw createError({ statusCode: 404, message: 'Ressource de test introuvable' })
 
     case 'server-error':
-      throw createError({ statusCode: 500, statusMessage: 'Erreur interne du serveur (test)' })
+      throw createError({ statusCode: 500, message: 'Erreur interne du serveur (test)' })
 
     case 'custom': {
       const customError = new Error(parsed.message || 'Erreur personnalisée de test')
@@ -80,12 +80,12 @@ export default defineEventHandler(async (event) => {
 
       throw createError({
         statusCode: 500,
-        statusMessage: customError.message,
+        message: customError.message,
         cause: customError,
       })
     }
 
     default:
-      throw createError({ statusCode: 400, statusMessage: "Type d'erreur de test non reconnu" })
+      throw createError({ statusCode: 400, message: "Type d'erreur de test non reconnu" })
   }
 })

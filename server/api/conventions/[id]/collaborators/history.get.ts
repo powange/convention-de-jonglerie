@@ -3,11 +3,10 @@ import { prisma } from '../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const conventionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!event.context.user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
 
   const permission = await checkUserConventionPermission(conventionId, event.context.user.id)
-  if (!permission.hasPermission)
-    throw createError({ statusCode: 403, statusMessage: 'Accès refusé' })
+  if (!permission.hasPermission) throw createError({ statusCode: 403, message: 'Accès refusé' })
 
   const history = await prisma.collaboratorPermissionHistory.findMany({
     where: { conventionId },

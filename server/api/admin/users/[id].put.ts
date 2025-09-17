@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
   if (isNaN(userId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID utilisateur invalide',
+      message: 'ID utilisateur invalide',
     })
   }
 
@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
     if (!existingUser) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Utilisateur introuvable',
+        message: 'Utilisateur introuvable',
       })
     }
 
@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
       if (emailExists) {
         throw createError({
           statusCode: 409,
-          statusMessage: 'Cette adresse email est déjà utilisée',
+          message: 'Cette adresse email est déjà utilisée',
         })
       }
     }
@@ -70,7 +70,7 @@ export default defineEventHandler(async (event) => {
       if (pseudoExists) {
         throw createError({
           statusCode: 409,
-          statusMessage: 'Ce pseudo est déjà utilisé',
+          message: 'Ce pseudo est déjà utilisé',
         })
       }
     }
@@ -116,7 +116,7 @@ export default defineEventHandler(async (event) => {
     if (error instanceof z.ZodError) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Données invalides',
+        message: 'Données invalides',
         data: error.errors,
       })
     }
@@ -128,7 +128,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur serveur lors de la mise à jour de l'utilisateur",
+      message: "Erreur serveur lors de la mise à jour de l'utilisateur",
     })
   }
 })

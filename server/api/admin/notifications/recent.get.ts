@@ -113,7 +113,7 @@ export default defineEventHandler(async (event) => {
     console.error('[Admin] Erreur récupération notifications récentes:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la récupération des notifications récentes',
+      message: 'Erreur lors de la récupération des notifications récentes',
     })
   }
 })

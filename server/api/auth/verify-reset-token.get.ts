@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     if (!token) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Token manquant',
+        message: 'Token manquant',
       })
     }
 
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 400,
-      statusMessage: 'Erreur lors de la vérification du token',
+      message: 'Erreur lors de la vérification du token',
     })
   }
 })

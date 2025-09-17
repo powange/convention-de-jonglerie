@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   if (!endpoint) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Endpoint requis',
+      message: 'Endpoint requis',
     })
   }
 

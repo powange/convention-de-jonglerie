@@ -3,19 +3,19 @@ import { prisma } from '../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+    throw createError({ statusCode: 401, message: 'Non authentifié' })
   }
 
   const offerId = parseInt(event.context.params?.id as string)
   const bookingId = parseInt(event.context.params?.bookingId as string)
   if (!offerId || !bookingId) {
-    throw createError({ statusCode: 400, statusMessage: 'Paramètres invalides' })
+    throw createError({ statusCode: 400, message: 'Paramètres invalides' })
   }
 
   const body = await readBody(event)
   const action = body?.action as 'ACCEPT' | 'REJECT' | 'CANCEL'
   if (!action) {
-    throw createError({ statusCode: 400, statusMessage: 'Action manquante' })
+    throw createError({ statusCode: 400, message: 'Action manquante' })
   }
 
   // Récupérer l'offre et la réservation
@@ -23,11 +23,11 @@ export default defineEventHandler(async (event) => {
     where: { id: offerId },
     include: { user: true, bookings: true },
   })
-  if (!offer) throw createError({ statusCode: 404, statusMessage: 'Offre introuvable' })
+  if (!offer) throw createError({ statusCode: 404, message: 'Offre introuvable' })
 
   const booking = await prisma.carpoolBooking.findUnique({ where: { id: bookingId } })
   if (!booking || booking.carpoolOfferId !== offerId) {
-    throw createError({ statusCode: 404, statusMessage: 'Réservation introuvable' })
+    throw createError({ statusCode: 404, message: 'Réservation introuvable' })
   }
 
   // Droits:
@@ -35,15 +35,15 @@ export default defineEventHandler(async (event) => {
   // - CANCEL: le demandeur de la réservation
   const userId = event.context.user.id
   if ((action === 'ACCEPT' || action === 'REJECT') && offer.userId !== userId) {
-    throw createError({ statusCode: 403, statusMessage: 'Action non autorisée' })
+    throw createError({ statusCode: 403, message: 'Action non autorisée' })
   }
   if (action === 'CANCEL' && booking.requesterId !== userId) {
-    throw createError({ statusCode: 403, statusMessage: 'Annulation non autorisée' })
+    throw createError({ statusCode: 403, message: 'Annulation non autorisée' })
   }
 
   // Transitions de statut
   if (booking.status !== 'PENDING' && action !== 'CANCEL') {
-    throw createError({ statusCode: 400, statusMessage: 'Réservation déjà traitée' })
+    throw createError({ statusCode: 400, message: 'Réservation déjà traitée' })
   }
 
   let newStatus = booking.status
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
       .filter((b) => b.status === 'ACCEPTED' && b.id !== booking.id)
       .reduce((sum, b) => sum + (b.seats || 0), 0)
     if (acceptedSeats + booking.seats > offer.availableSeats) {
-      throw createError({ statusCode: 400, statusMessage: 'Plus assez de places disponibles' })
+      throw createError({ statusCode: 400, message: 'Plus assez de places disponibles' })
     }
     newStatus = 'ACCEPTED'
   } else if (action === 'REJECT') {

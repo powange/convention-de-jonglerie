@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
       if (existingUser && existingUser.id !== user.id) {
         throw createError({
           statusCode: 400,
-          statusMessage: 'Cette adresse email est déjà utilisée',
+          message: 'Cette adresse email est déjà utilisée',
         })
       }
     }
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
       if (existingUser && existingUser.id !== user.id) {
         throw createError({
           statusCode: 400,
-          statusMessage: 'Ce pseudo est déjà utilisé',
+          message: 'Ce pseudo est déjà utilisé',
         })
       }
     }
@@ -169,7 +169,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la mise à jour du profil',
+      message: 'Erreur lors de la mise à jour du profil',
     })
   }
 })

@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     if (!permission.hasPermission) {
       throw createError({
         statusCode: 403,
-        statusMessage: "Vous n'avez pas accès à cette convention",
+        message: "Vous n'avez pas accès à cette convention",
       })
     }
 
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la récupération des collaborateurs:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur',
+      message: 'Erreur serveur',
     })
   }
 })

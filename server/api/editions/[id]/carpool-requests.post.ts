@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   if (!editionId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Edition ID invalide',
+      message: 'Edition ID invalide',
     })
   }
 
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
   if (!validationResult.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Données invalides',
+      message: 'Données invalides',
       data: validationResult.error.flatten(),
     })
   }
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
     if (!edition) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Edition non trouvée',
+        message: 'Edition non trouvée',
       })
     }
 
@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la création de la demande:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur',
+      message: 'Erreur serveur',
     })
   }
 })

@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la suppression de la photo de profil:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la suppression de la photo de profil',
+      message: 'Erreur lors de la suppression de la photo de profil',
     })
   }
 })

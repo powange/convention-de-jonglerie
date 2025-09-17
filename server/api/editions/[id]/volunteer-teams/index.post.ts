@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   if (!editionId || isNaN(editionId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: "ID d'édition invalide",
+      message: "ID d'édition invalide",
     })
   }
 
@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
     if (!edition) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Édition non trouvée',
+        message: 'Édition non trouvée',
       })
     }
 
@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
     if (existingTeam) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Une équipe avec ce nom existe déjà pour cette édition',
+        message: 'Une équipe avec ce nom existe déjà pour cette édition',
       })
     }
 
@@ -89,7 +89,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur lors de la création de l'équipe",
+      message: "Erreur lors de la création de l'équipe",
     })
   }
 })

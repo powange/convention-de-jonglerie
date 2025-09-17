@@ -14,18 +14,18 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   const applicationId = parseInt(getRouterParam(event, 'applicationId') || '0')
   if (!editionId || !applicationId)
-    throw createError({ statusCode: 400, statusMessage: 'Paramètres invalides' })
+    throw createError({ statusCode: 400, message: 'Paramètres invalides' })
   const parsed = bodySchema.parse(await readBody(event))
 
   const allowed = await canManageEditionVolunteers(editionId, event.context.user.id, event)
   if (!allowed)
     throw createError({
       statusCode: 403,
-      statusMessage: 'Droits insuffisants pour gérer les bénévoles',
+      message: 'Droits insuffisants pour gérer les bénévoles',
     })
 
   const application = await prisma.editionVolunteerApplication.findUnique({
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
     },
   })
   if (!application || application.editionId !== editionId)
-    throw createError({ statusCode: 404, statusMessage: 'Candidature introuvable' })
+    throw createError({ statusCode: 404, message: 'Candidature introuvable' })
 
   // Si on modifie juste les préférences d'équipes (sans changer le statut)
   if (parsed.teamPreferences !== undefined && parsed.status === undefined) {
@@ -157,10 +157,10 @@ export default defineEventHandler(async (event) => {
 
   // Sinon, gestion classique du changement de statut
   const target = parsed.status
-  if (!target) throw createError({ statusCode: 400, statusMessage: 'Statut requis' })
+  if (!target) throw createError({ statusCode: 400, message: 'Statut requis' })
 
   if (target === application.status)
-    throw createError({ statusCode: 400, statusMessage: 'Statut identique' })
+    throw createError({ statusCode: 400, message: 'Statut identique' })
 
   // Règles de transition :
   // PENDING -> ACCEPTED/REJECTED (décision)
@@ -173,7 +173,7 @@ export default defineEventHandler(async (event) => {
   ) {
     // ok
   } else {
-    throw createError({ statusCode: 400, statusMessage: 'Transition interdite' })
+    throw createError({ statusCode: 400, message: 'Transition interdite' })
   }
 
   // Mettre à jour le statut et la note d'acceptation

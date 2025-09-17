@@ -4,14 +4,14 @@ import { prisma } from '../../../utils/prisma'
 export default defineEventHandler(async (event) => {
   const conventionId = parseInt(getRouterParam(event, 'id') || '0')
   if (!event.context.user) {
-    throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+    throw createError({ statusCode: 401, message: 'Non authentifié' })
   }
   if (!conventionId) {
-    throw createError({ statusCode: 400, statusMessage: 'ID invalide' })
+    throw createError({ statusCode: 400, message: 'ID invalide' })
   }
   const perm = await checkUserConventionPermission(conventionId, event.context.user.id)
   if (!perm.hasPermission) {
-    throw createError({ statusCode: 403, statusMessage: 'Accès refusé' })
+    throw createError({ statusCode: 403, message: 'Accès refusé' })
   }
   const editions = await prisma.edition.findMany({
     where: { conventionId },

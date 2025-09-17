@@ -114,7 +114,7 @@ export default defineEventHandler(async (event) => {
     console.error("Erreur lors de l'envoi des rappels:", error)
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur lors de l'envoi des rappels",
+      message: "Erreur lors de l'envoi des rappels",
     })
   }
 })

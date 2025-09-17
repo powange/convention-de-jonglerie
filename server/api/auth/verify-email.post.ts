@@ -27,21 +27,21 @@ export default defineEventHandler(async (event) => {
     if (!user) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Utilisateur non trouvé',
+        message: 'Utilisateur non trouvé',
       })
     }
 
     if (user.isEmailVerified) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Email déjà vérifié',
+        message: 'Email déjà vérifié',
       })
     }
 
     if (!user.emailVerificationCode || !user.verificationCodeExpiry) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Aucun code de vérification actif',
+        message: 'Aucun code de vérification actif',
       })
     }
 
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     if (new Date() > user.verificationCodeExpiry) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Code de vérification expiré',
+        message: 'Code de vérification expiré',
       })
     }
 
@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
     if (user.emailVerificationCode !== validatedData.code) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Code de vérification incorrect',
+        message: 'Code de vérification incorrect',
       })
     }
 
@@ -104,7 +104,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la vérification email:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur interne',
+      message: 'Erreur serveur interne',
     })
   }
 })

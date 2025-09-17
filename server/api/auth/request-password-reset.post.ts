@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erreur lors de la demande de réinitialisation:', error)
     throw createError({
       statusCode: 400,
-      statusMessage: 'Erreur lors de la demande de réinitialisation',
+      message: 'Erreur lors de la demande de réinitialisation',
     })
   }
 })

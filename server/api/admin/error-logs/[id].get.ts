@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   const logId = getRouterParam(event, 'id')
   if (!logId) {
-    throw createError({ statusCode: 400, statusMessage: 'ID du log requis' })
+    throw createError({ statusCode: 400, message: 'ID du log requis' })
   }
 
   // Récupération du log avec tous les détails
@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!errorLog) {
-    throw createError({ statusCode: 404, statusMessage: "Log d'erreur introuvable" })
+    throw createError({ statusCode: 404, message: "Log d'erreur introuvable" })
   }
 
   return errorLog

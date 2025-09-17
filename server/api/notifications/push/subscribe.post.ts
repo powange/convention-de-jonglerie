@@ -89,13 +89,13 @@ export default defineEventHandler(async (event) => {
     if (error.name === 'ZodError') {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Données invalides',
+        message: 'Données invalides',
       })
     }
 
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur lors de l'enregistrement de la subscription",
+      message: "Erreur lors de l'enregistrement de la subscription",
     })
   }
 })

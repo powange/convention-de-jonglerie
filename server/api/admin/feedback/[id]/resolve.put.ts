@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   if (isNaN(feedbackId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID de feedback invalide',
+      message: 'ID de feedback invalide',
     })
   }
 
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     if (!existingFeedback) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Feedback introuvable',
+        message: 'Feedback introuvable',
       })
     }
 
@@ -86,7 +86,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la mise à jour du feedback',
+      message: 'Erreur lors de la mise à jour du feedback',
     })
   }
 })

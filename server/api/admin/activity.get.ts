@@ -163,7 +163,7 @@ export default defineEventHandler(async (event) => {
     if ((error as H3Error)?.statusCode) throw error
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur interne du serveur',
+      message: 'Erreur interne du serveur',
     })
   }
 })

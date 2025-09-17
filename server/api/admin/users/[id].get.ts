@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   if (isNaN(userId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID utilisateur invalide',
+      message: 'ID utilisateur invalide',
     })
   }
 
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
     if (!user) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Utilisateur introuvable',
+        message: 'Utilisateur introuvable',
       })
     }
 
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur serveur lors de la récupération de l'utilisateur",
+      message: "Erreur serveur lors de la récupération de l'utilisateur",
     })
   }
 })

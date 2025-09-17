@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     console.error("Erreur lors de la suppression de l'image:", error)
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur serveur lors de la suppression de l'image",
+      message: "Erreur serveur lors de la suppression de l'image",
     })
   }
 })
