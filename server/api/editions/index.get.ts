@@ -1,4 +1,4 @@
-import { getEmailHash } from '../../utils/email-hash'
+// import { getEmailHash } from '../../utils/email-hash'
 import { prisma } from '../../utils/prisma'
 
 // import type { Edition } from '~/types';
@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
       showPast,
       showCurrent,
       showFuture,
+      includeOffline,
       hasFoodTrucks,
       hasKidsZone,
       acceptsPets,
@@ -77,8 +78,11 @@ export default defineEventHandler(async (event) => {
       hasATM?: boolean
     } = {}
 
-    // No default isOnline filter here; callers/tests expect the handler to
-    // build filters strictly from request query parameters.
+    // Par défaut, filtrer les éditions en ligne uniquement
+    // sauf si includeOffline=true est passé explicitement
+    if (includeOffline !== 'true') {
+      where.isOnline = true
+    }
 
     if (name) {
       where.name = {
@@ -283,22 +287,9 @@ export default defineEventHandler(async (event) => {
       take: limitNumber,
     })
 
-    // Transformer les emails en emailHash pour les collaborateurs
-    const transformedEditions = editions.map((edition) => {
-      if (edition.collaborators) {
-        edition.collaborators = edition.collaborators.map((collab) => ({
-          ...collab,
-          user: (() => {
-            const { email, ...userWithoutEmail } = collab.user
-            return {
-              ...userWithoutEmail,
-              emailHash: getEmailHash(email),
-            }
-          })(),
-        }))
-      }
-      return edition
-    })
+    // Pas de transformation des collaborators ici car ils ne sont pas inclus
+    // dans cette requête (contrairement à l'API individuelle)
+    const transformedEditions = editions
 
     // Retourner les résultats avec les métadonnées de pagination
     return {
@@ -310,12 +301,12 @@ export default defineEventHandler(async (event) => {
         totalPages: Math.ceil(totalCount / limitNumber),
       },
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Erreur API editions:', error)
-    console.error('Query params:', query)
+    console.error('Query params:', getQuery(event))
     throw createError({
       statusCode: 500,
-      message: `Erreur lors de la récupération des éditions: ${error.message}`,
+      message: `Erreur lors de la récupération des éditions: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
     })
   }
 })

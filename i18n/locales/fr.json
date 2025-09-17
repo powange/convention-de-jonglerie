@@ -345,7 +345,6 @@
     "cannot_load_conventions": "Impossible de charger vos conventions",
     "collaborators": "Collaborateurs",
     "confirm_delete_convention": "Êtes-vous sûr de vouloir supprimer cette convention ?",
-    "confirm_delete_edition": "Êtes-vous sûr de vouloir supprimer cette édition ?",
     "convention_deleted": "Convention supprimée",
     "convention_deleted_success": "La convention a été supprimée avec succès",
     "convention_not_found": "Convention introuvable",

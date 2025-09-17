@@ -648,7 +648,6 @@
     "cannot_load_conventions": "Kan ikke indlæse dine konventioner",
     "collaborators": "Medarbejdere",
     "confirm_delete_convention": "Er du sikker på, at du vil slette denne konvention?",
-    "confirm_delete_edition": "Er du sikker på, at du vil slette denne udgave?",
     "convention_deleted": "Konvention slettet",
     "convention_deleted_success": "Konventionen blev slettet med succes",
     "convention_not_found": "Konvention ikke fundet",

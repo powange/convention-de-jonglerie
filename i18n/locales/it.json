@@ -648,7 +648,6 @@
     "cannot_load_conventions": "Impossibile caricare i tuoi convegni",
     "collaborators": "Collaboratori",
     "confirm_delete_convention": "Sei sicuro di voler eliminare questo convegno?",
-    "confirm_delete_edition": "Sei sicuro di voler eliminare questa edizione?",
     "convention_deleted": "Convegno eliminato",
     "convention_deleted_success": "Il convegno è stato eliminato con successo",
     "convention_not_found": "Convegno non trovato",

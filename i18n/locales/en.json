@@ -648,7 +648,6 @@
     "cannot_load_conventions": "Cannot load your conventions",
     "collaborators": "Collaborators",
     "confirm_delete_convention": "Are you sure you want to delete this convention?",
-    "confirm_delete_edition": "Are you sure you want to delete this edition?",
     "convention_deleted": "Convention deleted",
     "convention_deleted_success": "The convention has been successfully deleted",
     "convention_not_found": "Convention not found",

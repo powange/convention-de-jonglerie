@@ -49,6 +49,7 @@ describe('/api/editions GET', () => {
     hasWorkshops: true,
     hasLongShow: false,
     hasATM: true,
+    isOnline: true,
     creator: {
       id: 1,
       pseudo: 'testuser',
@@ -282,6 +283,48 @@ describe('/api/editions GET', () => {
     expect(result.data).toHaveLength(0)
     expect(prismaMock.edition.count).toHaveBeenCalledWith({
       where: { id: -1 }, // Condition impossible
+    })
+  })
+
+  it('devrait filtrer les éditions hors ligne par défaut', async () => {
+    global.getQuery.mockReturnValue({})
+    prismaMock.edition.count.mockResolvedValue(5)
+    prismaMock.edition.findMany.mockResolvedValue([mockEdition])
+    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+
+    const mockEvent = {}
+    await handler(mockEvent as any)
+
+    expect(prismaMock.edition.count).toHaveBeenCalledWith({
+      where: { isOnline: true },
+    })
+    expect(prismaMock.edition.findMany).toHaveBeenCalledWith({
+      where: { isOnline: true },
+      include: expect.any(Object),
+      orderBy: { startDate: 'asc' },
+      skip: 0,
+      take: 12,
+    })
+  })
+
+  it('devrait inclure les éditions hors ligne si includeOffline=true', async () => {
+    global.getQuery.mockReturnValue({ includeOffline: 'true' })
+    prismaMock.edition.count.mockResolvedValue(10)
+    prismaMock.edition.findMany.mockResolvedValue([mockEdition])
+    prismaMock.editionCollaborator.findFirst.mockRejectedValue(new Error('Table not found'))
+
+    const mockEvent = {}
+    await handler(mockEvent as any)
+
+    expect(prismaMock.edition.count).toHaveBeenCalledWith({
+      where: {},
+    })
+    expect(prismaMock.edition.findMany).toHaveBeenCalledWith({
+      where: {},
+      include: expect.any(Object),
+      orderBy: { startDate: 'asc' },
+      skip: 0,
+      take: 12,
     })
   })
 })

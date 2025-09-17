@@ -12,6 +12,7 @@ interface EditionFilters {
   startDate?: string
   endDate?: string
   countries?: string[]
+  includeOffline?: boolean
   // Filtres temporels
   showPast?: boolean
   showCurrent?: boolean
@@ -129,6 +130,11 @@ export const useEditionStore = defineStore('editions', {
         }
         if (filters?.showFuture !== undefined) {
           queryParams.showFuture = filters.showFuture.toString()
+        }
+
+        // Filtre includeOffline pour voir les éditions hors ligne
+        if (filters?.includeOffline !== undefined) {
+          queryParams.includeOffline = filters.includeOffline.toString()
         }
 
         // Filtres de services - passer tous les services actifs
@@ -537,6 +543,11 @@ export const useEditionStore = defineStore('editions', {
         }
         if (filters?.showFuture !== undefined) {
           queryParams.showFuture = filters.showFuture.toString()
+        }
+
+        // Filtre includeOffline pour voir les éditions hors ligne
+        if (filters?.includeOffline !== undefined) {
+          queryParams.includeOffline = filters.includeOffline.toString()
         }
 
         // Filtres de services - passer tous les services actifs

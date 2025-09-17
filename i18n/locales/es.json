@@ -648,7 +648,6 @@
     "cannot_load_conventions": "No se pueden cargar tus convenciones",
     "collaborators": "Colaboradores",
     "confirm_delete_convention": "¿Estás seguro de que quieres eliminar esta convención?",
-    "confirm_delete_edition": "¿Estás seguro de que quieres eliminar esta edición?",
     "convention_deleted": "Convención eliminada",
     "convention_deleted_success": "La convención ha sido eliminada exitosamente",
     "convention_not_found": "Convención no encontrada",

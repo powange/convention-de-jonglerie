@@ -648,7 +648,6 @@
     "cannot_load_conventions": "Невозможно загрузить ваши конвенции",
     "collaborators": "Сотрудники",
     "confirm_delete_convention": "Вы уверены, что хотите удалить эту конвенцию?",
-    "confirm_delete_edition": "Вы уверены, что хотите удалить это издание?",
     "convention_deleted": "Конвенция удалена",
     "convention_deleted_success": "Конвенция успешно удалена",
     "convention_not_found": "Конвенция не найдена",

@@ -648,7 +648,6 @@
     "cannot_load_conventions": "Deine Conventions können nicht geladen werden",
     "collaborators": "Mitarbeiter",
     "confirm_delete_convention": "Bist du sicher, dass du diese Convention löschen möchtest?",
-    "confirm_delete_edition": "Bist du sicher, dass du diese Auflage löschen möchtest?",
     "convention_deleted": "Convention gelöscht",
     "convention_deleted_success": "Die Convention wurde erfolgreich gelöscht",
     "convention_not_found": "Convention nicht gefunden",
