@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { requireAuth } from '../../utils/auth-utils'
+import { normalizeDateToISO } from '../../utils/date-helpers'
 import { getEditionForEdit, validateEditionId } from '../../utils/edition-permissions'
 import { geocodeEdition } from '../../utils/geocoding'
 import { prisma } from '../../utils/prisma'
@@ -238,8 +239,8 @@ export default defineEventHandler(async (event) => {
       name: name !== undefined ? name?.trim() || null : edition.name,
       description: description || edition.description,
       imageUrl: finalImageFilename !== undefined ? finalImageFilename : edition.imageUrl,
-      startDate: startDate ? new Date(startDate) : edition.startDate,
-      endDate: endDate ? new Date(endDate) : edition.endDate,
+      startDate: startDate ? normalizeDateToISO(startDate) || startDate : edition.startDate,
+      endDate: endDate ? normalizeDateToISO(endDate) || endDate : edition.endDate,
       addressLine1: addressLine1 || edition.addressLine1,
       postalCode: postalCode || edition.postalCode,
       city: city || edition.city,

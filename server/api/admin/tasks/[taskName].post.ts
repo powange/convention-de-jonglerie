@@ -1,16 +1,8 @@
-import { requireAuth } from '../../../utils/auth-utils'
+import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
 
 export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin
-  await requireAuth(event)
-
-  const user = event.context.user
-  if (!user?.isAdmin) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Accès refusé - droits administrateur requis',
-    })
-  }
+  // Vérifier l'authentification et les droits admin (mutualisé)
+  const user = await requireGlobalAdminWithDbCheck(event)
 
   const taskName = getRouterParam(event, 'taskName')
 

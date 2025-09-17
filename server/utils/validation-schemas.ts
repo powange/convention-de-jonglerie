@@ -21,7 +21,20 @@ export const phoneSchema = z
   .optional()
   .refine((val) => !val || /^\+?[0-9\s\-()]+$/.test(val), 'Numéro de téléphone invalide')
 export const urlSchema = z.string().url('URL invalide').nullable().optional().or(z.literal(''))
-export const dateSchema = z.string().refine((val) => !isNaN(Date.parse(val)), 'Date invalide')
+// Schéma pour les dates - accepte ISO strict et datetime-local pour la transition
+export const dateSchema = z
+  .string()
+  .min(1, 'Date requise')
+  .refine((val) => {
+    // Accepter les formats ISO stricts et datetime-local pendant la transition
+    return !isNaN(Date.parse(val))
+  }, 'Date invalide')
+
+// Schéma pour les dates optionnelles (mises à jour)
+export const optionalDateSchema = z
+  .string()
+  .optional()
+  .refine((val) => !val || !isNaN(Date.parse(val)), 'Date invalide')
 
 // Schémas d'authentification
 export const loginSchema = z.object({
@@ -165,8 +178,8 @@ export const updateEditionSchema = z
       .nullable()
       .optional(),
     imageUrl: z.string().nullable().optional(),
-    startDate: dateSchema.optional(),
-    endDate: dateSchema.optional(),
+    startDate: optionalDateSchema,
+    endDate: optionalDateSchema,
     addressLine1: z
       .string()
       .min(1, 'Adresse ligne 1 requise')

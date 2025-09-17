@@ -1,16 +1,8 @@
-import { requireAuth } from '../../../utils/auth-utils'
+import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
 
 export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification et les droits admin
-  await requireAuth(event)
-
-  const user = event.context.user
-  if (!user?.isAdmin) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Accès refusé - droits administrateur requis',
-    })
-  }
+  // Vérifier l'authentification et les droits admin (mutualisé)
+  await requireGlobalAdminWithDbCheck(event)
 
   // Liste des tâches disponibles avec leurs descriptions et planifications
   const tasks = [
@@ -37,7 +29,7 @@ export default defineEventHandler(async (event) => {
     },
     {
       name: 'cleanup-resolved-error-logs',
-      description: 'Supprime les logs d\'erreur résolus de plus d\'un mois',
+      description: "Supprime les logs d'erreur résolus de plus d'un mois",
       schedule: 'Mensuel (1er du mois à 3h)',
       cronExpression: '0 3 1 * *',
       category: 'Maintenance',

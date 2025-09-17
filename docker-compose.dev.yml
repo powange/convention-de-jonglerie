@@ -62,6 +62,7 @@ services:
       NUXT_PUBLIC_VAPID_PUBLIC_KEY: '${NUXT_PUBLIC_VAPID_PUBLIC_KEY:-}'
       VAPID_PRIVATE_KEY: '${VAPID_PRIVATE_KEY:-}'
       VAPID_SUBJECT: '${VAPID_SUBJECT:-}'
+      ENABLE_CRON: '${ENABLE_CRON:-true}'
       # Force le polling pour Windows
       CHOKIDAR_USEPOLLING: 'true'
       CHOKIDAR_INTERVAL: '1000'

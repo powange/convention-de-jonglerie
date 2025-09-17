@@ -53,146 +53,194 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Informations utilisateur -->
-      <UCard class="lg:col-span-2 shadow-lg border-0">
-        <template #header>
-          <div class="flex items-center gap-3">
-            <div
-              class="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center"
-            >
-              <UIcon
-                name="i-heroicons-user"
-                class="w-5 h-5 text-primary-600 dark:text-primary-400"
-              />
-            </div>
-            <div>
-              <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-                {{ $t('profile.personal_info') }}
-              </h2>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ $t('profile.manage_profile_info') }}
-              </p>
-            </div>
-          </div>
-        </template>
-
-        <UForm :state="state" :schema="schema" class="space-y-10" @submit="updateProfile">
-          <div class="space-y-6">
-            <UFormField
-              :label="t('auth.username')"
-              name="pseudo"
-              :help="t('profile.username_help')"
-            >
-              <UInput
-                v-model="state.pseudo"
-                icon="i-heroicons-at-symbol"
-                required
-                :placeholder="t('profile.username_placeholder')"
-                size="lg"
-                class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
-              />
-            </UFormField>
-
-            <UFormField :label="t('common.email')" name="email">
-              <UInput
-                v-model="state.email"
-                type="email"
-                icon="i-heroicons-envelope"
-                required
-                placeholder="votre.email@example.com"
-                size="lg"
-                class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
-              />
-            </UFormField>
-          </div>
-
-          <!-- Section champs facultatifs -->
-          <div
-            class="border border-gray-100 dark:border-gray-700 rounded-xl p-5 space-y-6 bg-gray-50/50 dark:bg-gray-800/30"
-          >
-            <div class="flex items-center gap-2 mb-2">
-              <UIcon name="i-heroicons-adjustments-horizontal" class="w-5 h-5 text-gray-500" />
-              <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{ t('profile.optional_section_title') }}
-              </h3>
-              <UBadge variant="soft" color="neutral" size="xs">{{ t('common.optional') }}</UBadge>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <UFormField :label="t('auth.first_name')" name="prenom">
-                <UInput
-                  v-model="state.prenom"
-                  icon="i-heroicons-user"
-                  :placeholder="t('profile.first_name_placeholder')"
-                  size="lg"
-                  class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+      <!-- Colonne de gauche -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- Informations utilisateur -->
+        <UCard class="shadow-lg border-0">
+          <template #header>
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center"
+              >
+                <UIcon
+                  name="i-heroicons-user"
+                  class="w-5 h-5 text-primary-600 dark:text-primary-400"
                 />
-              </UFormField>
-
-              <UFormField :label="t('auth.last_name')" name="nom">
-                <UInput
-                  v-model="state.nom"
-                  icon="i-heroicons-user"
-                  :placeholder="t('profile.last_name_placeholder')"
-                  size="lg"
-                  class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
-                />
-              </UFormField>
-            </div>
-
-            <UFormField :label="t('profile.phone')" name="telephone">
-              <UInput
-                v-model="state.telephone"
-                icon="i-heroicons-phone"
-                type="tel"
-                :placeholder="t('profile.phone_placeholder')"
-                size="lg"
-                class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
-              />
-            </UFormField>
-          </div>
-
-          <!-- Actions avec indicateur de modifications -->
-          <div class="border-t border-gray-100 dark:border-gray-700 pt-6">
-            <div
-              v-if="hasChanges"
-              class="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg"
-            >
-              <div class="flex items-center gap-2 text-amber-800 dark:text-amber-200">
-                <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
-                <span class="text-sm font-medium">{{ $t('profile.unsaved_changes') }}</span>
+              </div>
+              <div>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                  {{ $t('profile.personal_info') }}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  {{ $t('profile.manage_profile_info') }}
+                </p>
               </div>
             </div>
+          </template>
 
-            <div class="flex flex-col sm:flex-row gap-3 justify-between">
-              <UButton
-                type="submit"
-                :loading="loading"
-                :disabled="!hasChanges"
-                icon="i-heroicons-check"
-                color="primary"
-                size="lg"
-                class="transition-all duration-200 hover:transform hover:scale-105"
+          <UForm :state="state" :schema="schema" class="space-y-10" @submit="updateProfile">
+            <div class="space-y-6">
+              <UFormField
+                :label="t('auth.username')"
+                name="pseudo"
+                :help="t('profile.username_help')"
               >
-                {{ loading ? t('profile.saving') : t('profile.save_changes') }}
-              </UButton>
+                <UInput
+                  v-model="state.pseudo"
+                  icon="i-heroicons-at-symbol"
+                  required
+                  :placeholder="t('profile.username_placeholder')"
+                  size="lg"
+                  class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+                />
+              </UFormField>
 
-              <UButton
-                v-if="hasChanges"
-                type="button"
-                variant="outline"
-                color="neutral"
-                size="lg"
-                icon="i-heroicons-arrow-path"
-                class="transition-all duration-200 hover:transform hover:scale-105"
-                @click="resetForm"
-              >
-                {{ $t('common.cancel') }}
-              </UButton>
+              <UFormField :label="t('common.email')" name="email">
+                <UInput
+                  v-model="state.email"
+                  type="email"
+                  icon="i-heroicons-envelope"
+                  required
+                  placeholder="votre.email@example.com"
+                  size="lg"
+                  class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+                />
+              </UFormField>
             </div>
+
+            <!-- Section champs facultatifs -->
+            <div
+              class="border border-gray-100 dark:border-gray-700 rounded-xl p-5 space-y-6 bg-gray-50/50 dark:bg-gray-800/30"
+            >
+              <div class="flex items-center gap-2 mb-2">
+                <UIcon name="i-heroicons-adjustments-horizontal" class="w-5 h-5 text-gray-500" />
+                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {{ t('profile.optional_section_title') }}
+                </h3>
+                <UBadge variant="soft" color="neutral" size="xs">{{ t('common.optional') }}</UBadge>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <UFormField :label="t('auth.first_name')" name="prenom">
+                  <UInput
+                    v-model="state.prenom"
+                    icon="i-heroicons-user"
+                    :placeholder="t('profile.first_name_placeholder')"
+                    size="lg"
+                    class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+                  />
+                </UFormField>
+
+                <UFormField :label="t('auth.last_name')" name="nom">
+                  <UInput
+                    v-model="state.nom"
+                    icon="i-heroicons-user"
+                    :placeholder="t('profile.last_name_placeholder')"
+                    size="lg"
+                    class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+                  />
+                </UFormField>
+              </div>
+
+              <UFormField :label="t('profile.phone')" name="telephone">
+                <UInput
+                  v-model="state.telephone"
+                  icon="i-heroicons-phone"
+                  type="tel"
+                  :placeholder="t('profile.phone_placeholder')"
+                  size="lg"
+                  class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+                />
+              </UFormField>
+            </div>
+
+            <!-- Actions avec indicateur de modifications -->
+            <div class="border-t border-gray-100 dark:border-gray-700 pt-6">
+              <div
+                v-if="hasChanges"
+                class="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg"
+              >
+                <div class="flex items-center gap-2 text-amber-800 dark:text-amber-200">
+                  <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
+                  <span class="text-sm font-medium">{{ $t('profile.unsaved_changes') }}</span>
+                </div>
+              </div>
+
+              <div class="flex flex-col sm:flex-row gap-3 justify-between">
+                <UButton
+                  type="submit"
+                  :loading="loading"
+                  :disabled="!hasChanges"
+                  icon="i-heroicons-check"
+                  color="primary"
+                  size="lg"
+                  class="transition-all duration-200 hover:transform hover:scale-105"
+                >
+                  {{ loading ? t('profile.saving') : t('profile.save_changes') }}
+                </UButton>
+
+                <UButton
+                  v-if="hasChanges"
+                  type="button"
+                  variant="outline"
+                  color="neutral"
+                  size="lg"
+                  icon="i-heroicons-arrow-path"
+                  class="transition-all duration-200 hover:transform hover:scale-105"
+                  @click="resetForm"
+                >
+                  {{ $t('common.cancel') }}
+                </UButton>
+              </div>
+            </div>
+          </UForm>
+        </UCard>
+
+        <!-- Notifications -->
+        <UCard class="shadow-lg border-0">
+          <template #header>
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center"
+              >
+                <UIcon name="i-heroicons-bell" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                  {{ $t('navigation.notifications') }}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Gérer vos préférences de notifications
+                </p>
+              </div>
+            </div>
+          </template>
+
+          <div class="flex items-center justify-between p-6">
+            <div class="flex items-center gap-4">
+              <UIcon name="i-heroicons-cog-6-tooth" class="w-6 h-6 text-gray-400" />
+              <div>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                  Préférences de notifications
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Configurez les types de notifications que vous souhaitez recevoir
+                </p>
+              </div>
+            </div>
+            <UButton
+              icon="i-heroicons-cog-6-tooth"
+              variant="soft"
+              color="blue"
+              size="lg"
+              class="transition-all duration-200 hover:transform hover:scale-105"
+              @click="showNotificationPreferencesModal = true"
+            >
+              Gérer les notifications
+            </UButton>
           </div>
-        </UForm>
-      </UCard>
+        </UCard>
+      </div>
 
       <!-- Statistiques -->
       <div class="space-y-6">
@@ -695,6 +743,169 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Modal de préférences de notifications -->
+    <UModal
+      v-model:open="showNotificationPreferencesModal"
+      size="lg"
+      :title="$t('navigation.notifications')"
+    >
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center"
+          >
+            <UIcon name="i-heroicons-bell" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              Préférences de notifications
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Choisissez les types de notifications que vous souhaitez recevoir
+            </p>
+          </div>
+        </div>
+      </template>
+
+      <template #body>
+        <div class="space-y-6">
+          <!-- Rappels de créneaux bénévoles -->
+          <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center"
+              >
+                <UIcon
+                  name="i-heroicons-clock"
+                  class="w-4 h-4 text-orange-600 dark:text-orange-400"
+                />
+              </div>
+              <div>
+                <h4 class="font-medium text-gray-900 dark:text-white">
+                  Rappels de créneaux bénévoles
+                </h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Notifications 30 minutes avant vos créneaux
+                </p>
+              </div>
+            </div>
+            <USwitch
+              v-model="notificationPreferences.volunteerReminders"
+              color="primary"
+              size="lg"
+            />
+          </div>
+
+          <!-- Mises à jour de candidatures -->
+          <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center"
+              >
+                <UIcon
+                  name="i-heroicons-hand-raised"
+                  class="w-4 h-4 text-green-600 dark:text-green-400"
+                />
+              </div>
+              <div>
+                <h4 class="font-medium text-gray-900 dark:text-white">Candidatures bénévoles</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Acceptation, refus ou modifications de vos candidatures
+                </p>
+              </div>
+            </div>
+            <USwitch
+              v-model="notificationPreferences.applicationUpdates"
+              color="primary"
+              size="lg"
+            />
+          </div>
+
+          <!-- Nouvelles conventions -->
+          <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center"
+              >
+                <UIcon
+                  name="i-heroicons-calendar-days"
+                  class="w-4 h-4 text-blue-600 dark:text-blue-400"
+                />
+              </div>
+              <div>
+                <h4 class="font-medium text-gray-900 dark:text-white">Nouvelles conventions</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Notifications des nouvelles conventions ajoutées
+                </p>
+              </div>
+            </div>
+            <USwitch v-model="notificationPreferences.conventionNews" color="primary" size="lg" />
+          </div>
+
+          <!-- Covoiturage -->
+          <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center"
+              >
+                <UIcon
+                  name="i-heroicons-truck"
+                  class="w-4 h-4 text-purple-600 dark:text-purple-400"
+                />
+              </div>
+              <div>
+                <h4 class="font-medium text-gray-900 dark:text-white">Covoiturage</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Demandes, confirmations et annulations de covoiturage
+                </p>
+              </div>
+            </div>
+            <USwitch v-model="notificationPreferences.carpoolUpdates" color="primary" size="lg" />
+          </div>
+
+          <!-- Notifications système -->
+          <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 bg-gray-100 dark:bg-gray-900/30 rounded-lg flex items-center justify-center"
+              >
+                <UIcon
+                  name="i-heroicons-cog-6-tooth"
+                  class="w-4 h-4 text-gray-600 dark:text-gray-400"
+                />
+              </div>
+              <div>
+                <h4 class="font-medium text-gray-900 dark:text-white">Notifications système</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Mises à jour importantes et maintenance
+                </p>
+              </div>
+            </div>
+            <USwitch
+              v-model="notificationPreferences.systemNotifications"
+              color="primary"
+              size="lg"
+            />
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton variant="outline" @click="showNotificationPreferencesModal = false">
+            Annuler
+          </UButton>
+          <UButton
+            :loading="notificationPreferencesLoading"
+            icon="i-heroicons-check"
+            @click="saveNotificationPreferences"
+          >
+            {{ notificationPreferencesLoading ? 'Sauvegarde...' : 'Sauvegarder' }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -728,6 +939,7 @@ const loading = ref(false)
 const passwordLoading = ref(false)
 const showPasswordModal = ref(false)
 const showProfilePictureModal = ref(false)
+const showNotificationPreferencesModal = ref(false)
 const userHasPassword = ref(true) // Par défaut, on suppose qu'il a un mot de passe
 const profilePictureUrl = ref(authStore.user?.profilePicture || '')
 const avatarKey = ref(Date.now()) // Pour forcer le rechargement de l'avatar
@@ -735,6 +947,17 @@ const pictureValidationLoading = ref(false) // Loading lors de la validation
 
 // Gestion du mode administrateur
 const adminModeToggle = ref(authStore.isAdminModeActive)
+
+// État des préférences de notifications
+const notificationPreferences = reactive({
+  volunteerReminders: true, // Rappels de créneaux bénévoles
+  applicationUpdates: true, // Mises à jour de candidatures
+  conventionNews: true, // Nouvelles conventions
+  systemNotifications: true, // Notifications système
+  carpoolUpdates: true, // Covoiturage
+})
+
+const notificationPreferencesLoading = ref(false)
 
 // Schéma de validation pour le profil
 const schema = z.object({
@@ -1041,8 +1264,51 @@ const toggleAdminMode = (enabled: boolean) => {
   }
 }
 
+// Fonction pour charger les préférences de notifications
+const loadNotificationPreferences = async () => {
+  try {
+    const { preferences } = await $fetch('/api/profile/notification-preferences')
+    Object.assign(notificationPreferences, preferences)
+  } catch (error) {
+    console.error('Erreur lors du chargement des préférences:', error)
+    // En cas d'erreur, garder les valeurs par défaut (tout activé)
+  }
+}
+
+// Fonction pour sauvegarder les préférences de notifications
+const saveNotificationPreferences = async () => {
+  notificationPreferencesLoading.value = true
+  try {
+    await $fetch('/api/profile/notification-preferences', {
+      method: 'PUT',
+      body: notificationPreferences,
+    })
+
+    showNotificationPreferencesModal.value = false
+    toast.add({
+      title: 'Préférences sauvegardées',
+      description: 'Vos préférences de notifications ont été mises à jour',
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde des préférences:', error)
+    toast.add({
+      title: 'Erreur',
+      description: 'Impossible de sauvegarder vos préférences',
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  } finally {
+    notificationPreferencesLoading.value = false
+  }
+}
+
 onMounted(async () => {
   await editionStore.fetchEditions()
+
+  // Charger les préférences de notifications
+  await loadNotificationPreferences()
 
   // Vérifier si l'utilisateur a un mot de passe
   try {

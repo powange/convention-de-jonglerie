@@ -24,6 +24,7 @@ model User {
   verificationCodeExpiry   DateTime?
   isGlobalAdmin            Boolean                         @default(false)
   phone                    String?
+  notificationPreferences  Json?
   carpoolBookings          CarpoolBooking[]
   carpoolComments          CarpoolComment[]
   carpoolOffers            CarpoolOffer[]

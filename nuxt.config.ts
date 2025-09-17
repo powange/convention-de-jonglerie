@@ -50,6 +50,12 @@ export default defineNuxtConfig({
   },
   nitro: {
     ignore: ['**/*.spec.ts', '**/*.test.ts', 'tests/**', '__tests__/**', 'scripts/**'],
+    externals: {
+      external: ['node-cron'],
+    },
+    experimental: {
+      tasks: true,
+    },
   },
   i18n: {
     defaultLocale: 'en',
@@ -141,6 +147,9 @@ export default defineNuxtConfig({
       alias: {
         '.prisma/client/index-browser': './node_modules/.prisma/client/index-browser.js',
       },
+    },
+    optimizeDeps: {
+      exclude: ['node-cron'],
     },
   },
   // Configuration du module Prisma

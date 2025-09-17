@@ -228,6 +228,39 @@
           </UCard>
         </NuxtLink>
 
+        <!-- Gestion des notifications -->
+        <NuxtLink to="/admin/notifications" class="block">
+          <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+                    <UIcon
+                      name="i-heroicons-bell"
+                      class="h-6 w-6 text-yellow-600 dark:text-yellow-400"
+                    />
+                  </div>
+                  <h3 class="font-semibold text-lg">{{ $t('admin.notification_management') }}</h3>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                  Envoyer et gérer les notifications système
+                </p>
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-paper-airplane" class="h-4 w-4" />
+                    Envoyer des notifications
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-heroicons-clock" class="h-4 w-4" />
+                    Rappels automatiques
+                  </span>
+                </div>
+              </div>
+              <UIcon name="i-heroicons-arrow-right" class="h-5 w-5 text-gray-400" />
+            </div>
+          </UCard>
+        </NuxtLink>
+
         <!-- Gestion des feedbacks -->
         <NuxtLink to="/admin/feedback" class="block">
           <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
@@ -294,31 +327,31 @@
           </UCard>
         </NuxtLink>
 
-        <!-- Gestion des notifications -->
-        <NuxtLink to="/admin/notifications" class="block">
+        <!-- Gestion des tâches automatisées -->
+        <NuxtLink to="/admin/crons" class="block">
           <UCard class="hover:shadow-lg transition-shadow cursor-pointer">
             <div class="flex items-start justify-between">
               <div class="flex-1">
                 <div class="flex items-center gap-3 mb-3">
-                  <div class="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+                  <div class="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
                     <UIcon
-                      name="i-heroicons-bell"
-                      class="h-6 w-6 text-yellow-600 dark:text-yellow-400"
+                      name="i-heroicons-clock"
+                      class="h-6 w-6 text-indigo-600 dark:text-indigo-400"
                     />
                   </div>
-                  <h3 class="font-semibold text-lg">{{ $t('admin.notification_management') }}</h3>
+                  <h3 class="font-semibold text-lg">{{ $t('admin.cron_management') }}</h3>
                 </div>
                 <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                  Envoyer et gérer les notifications système
+                  {{ $t('admin.cron_management_description') }}
                 </p>
                 <div class="flex items-center gap-4 text-sm text-gray-500">
                   <span class="flex items-center gap-1">
-                    <UIcon name="i-heroicons-paper-airplane" class="h-4 w-4" />
-                    Envoyer des notifications
+                    <UIcon name="i-heroicons-play" class="h-4 w-4" />
+                    {{ $t('admin.execute_tasks') }}
                   </span>
                   <span class="flex items-center gap-1">
-                    <UIcon name="i-heroicons-clock" class="h-4 w-4" />
-                    Rappels automatiques
+                    <UIcon name="i-heroicons-eye" class="h-4 w-4" />
+                    {{ $t('admin.monitor_tasks') }}
                   </span>
                 </div>
               </div>
@@ -326,28 +359,6 @@
             </div>
           </UCard>
         </NuxtLink>
-
-        <!-- Placeholder pour futures fonctionnalités -->
-        <UCard class="opacity-75 border-dashed border-2 border-gray-300 dark:border-gray-600">
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <div class="flex items-center gap-3 mb-3">
-                <div class="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                  <UIcon name="i-heroicons-cog-6-tooth" class="h-6 w-6 text-gray-400" />
-                </div>
-                <h3 class="font-semibold text-lg text-gray-500">
-                  {{ $t('admin.system_settings') }}
-                </h3>
-              </div>
-              <p class="text-gray-400 text-sm mb-4">
-                {{ $t('admin.system_settings_description') }}
-              </p>
-              <UBadge color="neutral" variant="soft" size="xs">{{
-                $t('admin.coming_soon')
-              }}</UBadge>
-            </div>
-          </div>
-        </UCard>
 
         <UCard class="opacity-75 border-dashed border-2 border-gray-300 dark:border-gray-600">
           <div class="flex items-start justify-between">

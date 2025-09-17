@@ -5,6 +5,7 @@ import {
   getConventionForEditionCreation,
   validateConventionId,
 } from '../../utils/convention-permissions'
+import { normalizeDateToISO } from '../../utils/date-helpers'
 import { geocodeEdition } from '../../utils/geocoding'
 import { moveTempImageToEdition } from '../../utils/move-temp-image'
 import { prisma } from '../../utils/prisma'
@@ -91,8 +92,8 @@ export default defineEventHandler(async (event) => {
         name: name?.trim() || null,
         description,
         imageUrl: null, // On met null d'abord
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
+        startDate: normalizeDateToISO(startDate) || startDate,
+        endDate: normalizeDateToISO(endDate) || endDate,
         addressLine1,
         addressLine2,
         postalCode,

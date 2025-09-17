@@ -216,6 +216,7 @@ import { useRoute } from 'vue-router'
 
 // App components & stores
 import SlotModal from '~/components/edition/volunteer/planning/SlotModal.vue'
+import { useDatetime } from '~/composables/useDatetime'
 import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '~/composables/useVolunteerSchedule'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
@@ -225,6 +226,7 @@ const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
+const { toDatetimeLocal } = useDatetime()
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
@@ -295,26 +297,13 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
     // Ouvrir la modal en mode édition lors d'un clic
     const existingSlot = timeSlots.value.find((s) => s.id === timeSlot.id)
     if (existingSlot) {
-      // Convertir les dates au format attendu par datetime-local (heure locale)
-      const formatDateTimeLocal = (dateStr: string) => {
-        if (!dateStr) return ''
-        const date = new Date(dateStr)
-        // Convertir en heure locale pour datetime-local
-        const year = date.getFullYear()
-        const month = (date.getMonth() + 1).toString().padStart(2, '0')
-        const day = date.getDate().toString().padStart(2, '0')
-        const hours = date.getHours().toString().padStart(2, '0')
-        const minutes = date.getMinutes().toString().padStart(2, '0')
-        return `${year}-${month}-${day}T${hours}:${minutes}`
-      }
-
       slotModalData.value = {
         id: existingSlot.id,
         title: existingSlot.title,
         description: existingSlot.description || '',
         teamId: existingSlot.teamId || '',
-        startDateTime: formatDateTimeLocal(existingSlot.start),
-        endDateTime: formatDateTimeLocal(existingSlot.end),
+        startDateTime: toDatetimeLocal(existingSlot.start),
+        endDateTime: toDatetimeLocal(existingSlot.end),
         maxVolunteers: existingSlot.maxVolunteers,
       }
       slotModalOpen.value = true
@@ -368,26 +357,13 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
 
 // Actions de la modal
 const openSlotModal = (initialData?: { start?: string; end?: string; teamId?: string }) => {
-  // Convertir les dates au format attendu par datetime-local (heure locale)
-  const formatDateTimeLocal = (dateStr: string) => {
-    if (!dateStr) return ''
-    const date = new Date(dateStr)
-    // Convertir en heure locale pour datetime-local
-    const year = date.getFullYear()
-    const month = (date.getMonth() + 1).toString().padStart(2, '0')
-    const day = date.getDate().toString().padStart(2, '0')
-    const hours = date.getHours().toString().padStart(2, '0')
-    const minutes = date.getMinutes().toString().padStart(2, '0')
-    return `${year}-${month}-${day}T${hours}:${minutes}`
-  }
-
   // Définir les données initiales
   slotModalData.value = {
     title: '',
     description: '',
     teamId: initialData?.teamId || '',
-    startDateTime: formatDateTimeLocal(initialData?.start || ''),
-    endDateTime: formatDateTimeLocal(initialData?.end || ''),
+    startDateTime: toDatetimeLocal(initialData?.start || ''),
+    endDateTime: toDatetimeLocal(initialData?.end || ''),
     maxVolunteers: 3,
   }
   slotModalOpen.value = true

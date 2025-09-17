@@ -406,16 +406,20 @@
                     <p class="font-medium text-blue-900 dark:text-blue-100 text-sm mb-1">
                       {{ assignment.timeSlot.title || $t('pages.volunteers.unnamed_slot') }}
                     </p>
-                    <div class="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300 mb-2">
+                    <div
+                      class="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300 mb-2"
+                    >
                       <UIcon name="i-heroicons-calendar-days" class="w-3 h-3" />
                       <span>
-                        {{ formatSlotDateTime(assignment.timeSlot.startDateTime, assignment.timeSlot.endDateTime) }}
+                        {{
+                          formatSlotDateTime(
+                            assignment.timeSlot.startDateTime,
+                            assignment.timeSlot.endDateTime
+                          )
+                        }}
                       </span>
                     </div>
-                    <div
-                      v-if="assignment.timeSlot.team"
-                      class="flex items-center gap-2"
-                    >
+                    <div v-if="assignment.timeSlot.team" class="flex items-center gap-2">
                       <div
                         class="w-2 h-2 rounded-full flex-shrink-0"
                         :style="{ backgroundColor: assignment.timeSlot.team.color || '#6b7280' }"
@@ -429,7 +433,8 @@
               </div>
             </div>
             <div class="mt-2 text-xs text-blue-600 dark:text-blue-400">
-              {{ $t('pages.volunteers.total_hours') }}: {{ calculateTotalHours(application.assignedTimeSlots) }}h
+              {{ $t('pages.volunteers.total_hours') }}:
+              {{ calculateTotalHours(application.assignedTimeSlots) }}h
             </div>
           </div>
 

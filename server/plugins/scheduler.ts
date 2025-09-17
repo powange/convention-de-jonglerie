@@ -1,16 +1,17 @@
-import cron from 'node-cron'
-
-export default defineNitroPlugin(async (nitroApp) => {
+export default defineNitroPlugin(async (_nitroApp) => {
   // Ne lancer les crons qu'en production ou si explicitement demandé
   if (process.env.NODE_ENV === 'production' || process.env.ENABLE_CRON === 'true') {
     console.log('🕒 Initialisation du système de cron...')
+
+    // Import dynamique de node-cron pour éviter les problèmes ESM
+    const cron = await import('node-cron').then((m) => m.default || m)
 
     // Rappels aux bénévoles (toutes les minutes pour vérifier les créneaux dans 30min)
     cron.schedule('* * * * *', async () => {
       try {
         await runTask('volunteer-reminders')
       } catch (error) {
-        console.error('Erreur lors de l\'exécution de volunteer-reminders:', error)
+        console.error("Erreur lors de l'exécution de volunteer-reminders:", error)
       }
     })
 
@@ -19,7 +20,7 @@ export default defineNitroPlugin(async (nitroApp) => {
       try {
         await runTask('convention-favorites-reminders')
       } catch (error) {
-        console.error('Erreur lors de l\'exécution de convention-favorites-reminders:', error)
+        console.error("Erreur lors de l'exécution de convention-favorites-reminders:", error)
       }
     })
 
@@ -28,7 +29,7 @@ export default defineNitroPlugin(async (nitroApp) => {
       try {
         await runTask('cleanup-expired-tokens')
       } catch (error) {
-        console.error('Erreur lors de l\'exécution de cleanup-expired-tokens:', error)
+        console.error("Erreur lors de l'exécution de cleanup-expired-tokens:", error)
       }
     })
 
@@ -37,7 +38,7 @@ export default defineNitroPlugin(async (nitroApp) => {
       try {
         await runTask('cleanup-resolved-error-logs')
       } catch (error) {
-        console.error('Erreur lors de l\'exécution de cleanup-resolved-error-logs:', error)
+        console.error("Erreur lors de l'exécution de cleanup-resolved-error-logs:", error)
       }
     })
 

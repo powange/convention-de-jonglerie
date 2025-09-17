@@ -67,19 +67,35 @@ export default defineEventHandler(async (event) => {
     const newTeamPrefs = parsed.teamPreferences || []
 
     if (JSON.stringify(oldTeamPrefs.sort()) !== JSON.stringify(newTeamPrefs.sort())) {
+      // Récupérer les noms des équipes pour un affichage lisible
+      const allTeamIds = [...new Set([...oldTeamPrefs, ...newTeamPrefs])]
+      const teams = await prisma.volunteerTeam.findMany({
+        where: { id: { in: allTeamIds } },
+        select: { id: true, name: true },
+      })
+
+      // Créer un map ID -> Nom pour faciliter la conversion
+      const teamMap = new Map(teams.map((t) => [t.id, t.name]))
+
+      // Convertir les IDs en noms
+      const oldTeamNames = oldTeamPrefs.map((id) => teamMap.get(id) || 'Équipe inconnue')
+      const newTeamNames = newTeamPrefs.map((id) => teamMap.get(id) || 'Équipe inconnue')
+
       if (oldTeamPrefs.length === 0 && newTeamPrefs.length > 0) {
-        changes.push(`Équipes préférées ajoutées : ${newTeamPrefs.join(', ')}`)
+        changes.push(`Équipes préférées ajoutées : ${newTeamNames.join(', ')}`)
       } else if (oldTeamPrefs.length > 0 && newTeamPrefs.length === 0) {
-        changes.push(`Équipes préférées supprimées : ${oldTeamPrefs.join(', ')}`)
+        changes.push(`Équipes préférées supprimées : ${oldTeamNames.join(', ')}`)
       } else {
         const added = newTeamPrefs.filter((team) => !oldTeamPrefs.includes(team))
         const removed = oldTeamPrefs.filter((team) => !newTeamPrefs.includes(team))
 
         if (added.length > 0) {
-          changes.push(`Équipes ajoutées : ${added.join(', ')}`)
+          const addedNames = added.map((id) => teamMap.get(id) || 'Équipe inconnue')
+          changes.push(`Équipes préférées ajoutées : ${addedNames.join(', ')}`)
         }
         if (removed.length > 0) {
-          changes.push(`Équipes supprimées : ${removed.join(', ')}`)
+          const removedNames = removed.map((id) => teamMap.get(id) || 'Équipe inconnue')
+          changes.push(`Équipes préférées supprimées : ${removedNames.join(', ')}`)
         }
       }
     }
@@ -128,6 +144,7 @@ export default defineEventHandler(async (event) => {
           entityId: editionId.toString(),
           actionUrl: `/my-volunteer-applications`,
           actionText: 'Voir ma candidature',
+          notificationType: 'volunteer_application_modified',
         })
       } catch (error) {
         console.error("Erreur lors de l'envoi de la notification:", error)

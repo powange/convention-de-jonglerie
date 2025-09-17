@@ -529,6 +529,7 @@ import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalize
 import { reactive, ref, watch, computed, onMounted, nextTick } from 'vue'
 
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
+import { useDatetime } from '~/composables/useDatetime'
 import type { Edition, Convention } from '~/types'
 
 import type { StepperItem } from '@nuxt/ui'
@@ -542,6 +543,14 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['submit'])
+
+// Importer les fonctions de date en premier
+const toast = useToast()
+const { getTranslatedServicesByCategory } = useTranslatedConventionServices()
+const servicesByCategory = getTranslatedServicesByCategory
+const { toApiFormat, fromApiFormat } = useDatetime()
+// const authStore = useAuthStore();
+const showCustomCountry = ref(false)
 
 const currentStep = ref(0)
 const steps = ref<StepperItem[]>([
@@ -589,12 +598,9 @@ const state = reactive({
   name: props.initialData?.name || '',
   description: props.initialData?.description || '',
   imageUrl: props.initialData?.imageUrl || null,
-  startDate: props.initialData?.startDate
-    ? new Date(props.initialData.startDate).toISOString().slice(0, 16)
-    : '',
-  endDate: props.initialData?.endDate
-    ? new Date(props.initialData.endDate).toISOString().slice(0, 16)
-    : '',
+  // Les dates sont maintenant des objets Date natifs
+  startDate: props.initialData?.startDate ? fromApiFormat(props.initialData.startDate) : null,
+  endDate: props.initialData?.endDate ? fromApiFormat(props.initialData.endDate) : null,
   addressLine1: props.initialData?.addressLine1 || '',
   addressLine2: props.initialData?.addressLine2 || '',
   postalCode: props.initialData?.postalCode || '',
@@ -628,12 +634,6 @@ const state = reactive({
   hasAfjTokenPayment: props.initialData?.hasAfjTokenPayment || false,
 })
 
-const toast = useToast()
-const { getTranslatedServicesByCategory } = useTranslatedConventionServices()
-const servicesByCategory = getTranslatedServicesByCategory
-// const authStore = useAuthStore();
-const showCustomCountry = ref(false)
-
 // Date formatter pour l'affichage
 const { locale, t } = useI18n()
 const df = computed(() => {
@@ -645,7 +645,7 @@ const df = computed(() => {
 const calendarStartDate = ref<CalendarDate | null>(null)
 const calendarEndDate = ref<CalendarDate | null>(null)
 
-// Heures séparées
+// Heures séparées pour les selects
 const startTime = ref('09:00')
 const endTime = ref('18:00')
 
@@ -742,16 +742,12 @@ const fetchUserConventions = async () => {
   }
 }
 
-// Fonctions de validation des dates
+// Fonctions de validation des dates (utilise le nouveau système)
 const validateDates = () => {
   if (!state.startDate || !state.endDate) return { isValid: true }
 
-  const startDate = new Date(state.startDate)
-  const endDate = new Date(state.endDate)
-  // const now = new Date();
-
-  // Vérifier que la date de fin est supérieure à la date de début
-  if (endDate <= startDate) {
+  // Les dates sont maintenant des objets Date natifs
+  if (state.endDate <= state.startDate) {
     return {
       isValid: false,
       error: t('validation.date_end_after_start'),
@@ -964,6 +960,9 @@ const handleSubmit = () => {
   // Nettoyer les données avant envoi (convertir chaînes vides en null)
   const cleanedData = {
     ...state,
+    // Convertir les dates en format ISO pour l'API
+    startDate: toApiFormat(state.startDate),
+    endDate: toApiFormat(state.endDate),
     imageUrl: state.imageUrl?.trim() || null,
     description: state.description?.trim() || null,
     name: state.name?.trim() || null,
@@ -1001,78 +1000,74 @@ watch(
 onMounted(() => {
   fetchUserConventions()
 
-  // Initialiser les dates et heures si elles existent
+  // Initialiser les dates et heures si elles existent (nouveau système)
   if (state.startDate) {
-    const startDateTime = new Date(state.startDate)
-    const year = startDateTime.getFullYear()
-    const month = startDateTime.getMonth() + 1
-    const day = startDateTime.getDate()
+    const year = state.startDate.getFullYear()
+    const month = state.startDate.getMonth() + 1
+    const day = state.startDate.getDate()
     calendarStartDate.value = new CalendarDate(year, month, day)
-    startTime.value = `${startDateTime.getHours().toString().padStart(2, '0')}:${startDateTime.getMinutes().toString().padStart(2, '0')}`
+    startTime.value = `${state.startDate.getHours().toString().padStart(2, '0')}:${state.startDate.getMinutes().toString().padStart(2, '0')}`
   }
 
   if (state.endDate) {
-    const endDateTime = new Date(state.endDate)
-    const year = endDateTime.getFullYear()
-    const month = endDateTime.getMonth() + 1
-    const day = endDateTime.getDate()
+    const year = state.endDate.getFullYear()
+    const month = state.endDate.getMonth() + 1
+    const day = state.endDate.getDate()
     calendarEndDate.value = new CalendarDate(year, month, day)
-    endTime.value = `${endDateTime.getHours().toString().padStart(2, '0')}:${endDateTime.getMinutes().toString().padStart(2, '0')}`
+    endTime.value = `${state.endDate.getHours().toString().padStart(2, '0')}:${state.endDate.getMinutes().toString().padStart(2, '0')}`
   }
 })
 
-// Fonctions pour mettre à jour les dates
+// Fonctions pour mettre à jour les dates avec le nouveau système
 const updateStartDate = (date: CalendarDate | null) => {
-  if (date && startTime.value) {
-    const [hours, minutes] = (startTime.value || '').split(':').map(Number)
-    // Créer un format datetime-local en évitant les conversions UTC
-    const year = date.year.toString().padStart(4, '0')
-    const month = date.month.toString().padStart(2, '0')
-    const day = date.day.toString().padStart(2, '0')
-    const hoursStr = Number.isFinite(hours) ? hours!.toString().padStart(2, '0') : '00'
-    const minutesStr = Number.isFinite(minutes) ? minutes!.toString().padStart(2, '0') : '00'
-    state.startDate = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`
+  if (date) {
+    const [hours, minutes] = (startTime.value || '09:00').split(':').map(Number)
+    // Créer un nouvel objet Date
+    const newDate = new Date(date.year, date.month - 1, date.day, hours, minutes)
+    state.startDate = newDate
     touchedFields.startDate = true
   }
 }
 
 const updateEndDate = (date: CalendarDate | null) => {
-  if (date && endTime.value) {
-    const [hours, minutes] = (endTime.value || '').split(':').map(Number)
-    // Créer un format datetime-local en évitant les conversions UTC
-    const year = date.year.toString().padStart(4, '0')
-    const month = date.month.toString().padStart(2, '0')
-    const day = date.day.toString().padStart(2, '0')
-    const hoursStr = Number.isFinite(hours) ? hours!.toString().padStart(2, '0') : '00'
-    const minutesStr = Number.isFinite(minutes) ? minutes!.toString().padStart(2, '0') : '00'
-    state.endDate = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`
+  if (date) {
+    const [hours, minutes] = (endTime.value || '18:00').split(':').map(Number)
+    // Créer un nouvel objet Date
+    const newDate = new Date(date.year, date.month - 1, date.day, hours, minutes)
+    state.endDate = newDate
     touchedFields.endDate = true
   }
 }
 
 const updateStartDateTime = () => {
   if (calendarStartDate.value && startTime.value) {
-    const [hours, minutes] = (startTime.value || '').split(':').map(Number)
-    // Créer un format datetime-local en évitant les conversions UTC
-    const year = calendarStartDate.value.year.toString().padStart(4, '0')
-    const month = calendarStartDate.value.month.toString().padStart(2, '0')
-    const day = calendarStartDate.value.day.toString().padStart(2, '0')
-    const hoursStr = Number.isFinite(hours) ? hours!.toString().padStart(2, '0') : '00'
-    const minutesStr = Number.isFinite(minutes) ? minutes!.toString().padStart(2, '0') : '00'
-    state.startDate = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`
+    const [hours, minutes] = startTime.value.split(':').map(Number)
+    // Créer un nouvel objet Date
+    const newDate = new Date(
+      calendarStartDate.value.year,
+      calendarStartDate.value.month - 1,
+      calendarStartDate.value.day,
+      hours,
+      minutes
+    )
+    state.startDate = newDate
+    touchedFields.startDate = true
   }
 }
 
 const updateEndDateTime = () => {
   if (calendarEndDate.value && endTime.value) {
-    const [hours, minutes] = (endTime.value || '').split(':').map(Number)
-    // Créer un format datetime-local en évitant les conversions UTC
-    const year = calendarEndDate.value.year.toString().padStart(4, '0')
-    const month = calendarEndDate.value.month.toString().padStart(2, '0')
-    const day = calendarEndDate.value.day.toString().padStart(2, '0')
-    const hoursStr = Number.isFinite(hours) ? hours!.toString().padStart(2, '0') : '00'
-    const minutesStr = Number.isFinite(minutes) ? minutes!.toString().padStart(2, '0') : '00'
-    state.endDate = `${year}-${month}-${day}T${hoursStr}:${minutesStr}`
+    const [hours, minutes] = endTime.value.split(':').map(Number)
+    // Créer un nouvel objet Date
+    const newDate = new Date(
+      calendarEndDate.value.year,
+      calendarEndDate.value.month - 1,
+      calendarEndDate.value.day,
+      hours,
+      minutes
+    )
+    state.endDate = newDate
+    touchedFields.endDate = true
   }
 }
 
@@ -1122,10 +1117,26 @@ watch(
       state.conventionId = newVal.conventionId
       state.name = newVal.name || ''
       state.description = newVal.description || ''
-      state.startDate = newVal.startDate
-        ? new Date(newVal.startDate).toISOString().slice(0, 16)
-        : ''
-      state.endDate = newVal.endDate ? new Date(newVal.endDate).toISOString().slice(0, 16) : ''
+      // Utiliser le nouveau système de dates
+      state.startDate = newVal.startDate ? fromApiFormat(newVal.startDate) : null
+      state.endDate = newVal.endDate ? fromApiFormat(newVal.endDate) : null
+
+      // Réinitialiser les calendriers pour la compatibilité
+      if (state.startDate) {
+        const year = state.startDate.getFullYear()
+        const month = state.startDate.getMonth() + 1
+        const day = state.startDate.getDate()
+        calendarStartDate.value = new CalendarDate(year, month, day)
+        startTime.value = `${state.startDate.getHours().toString().padStart(2, '0')}:${state.startDate.getMinutes().toString().padStart(2, '0')}`
+      }
+
+      if (state.endDate) {
+        const year = state.endDate.getFullYear()
+        const month = state.endDate.getMonth() + 1
+        const day = state.endDate.getDate()
+        calendarEndDate.value = new CalendarDate(year, month, day)
+        endTime.value = `${state.endDate.getHours().toString().padStart(2, '0')}:${state.endDate.getMinutes().toString().padStart(2, '0')}`
+      }
       state.addressLine1 = newVal.addressLine1 || ''
       state.addressLine2 = newVal.addressLine2 || ''
       state.postalCode = newVal.postalCode || ''

@@ -5,13 +5,13 @@ export default defineTask({
     name: 'convention-favorites-reminders',
     description: 'Notify users about favorite conventions starting in 3 days',
   },
-  async run({ payload }) {
+  async run({ payload: _payload }) {
     console.log('💖 Exécution de la tâche: notifications conventions favorites')
 
     try {
       // Calculer la date dans 3 jours (avec une marge de 1 jour)
       const now = new Date()
-      const targetDate = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000)
+      const _targetDate = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000)
 
       // Fenêtre de notification : entre 2.5 et 3.5 jours pour éviter les doublons
       const notificationStart = new Date(now.getTime() + 2.5 * 24 * 60 * 60 * 1000)
@@ -74,7 +74,9 @@ export default defineTask({
           for (const favorite of edition.favorites) {
             // TODO: Intégrer avec votre système de notifications existant
             // Pour l'instant, on log les notifications qui devraient être envoyées
-            console.log(`🔔 Notification à envoyer à ${favorite.user.pseudo} (${favorite.user.email})`)
+            console.log(
+              `🔔 Notification à envoyer à ${favorite.user.pseudo} (${favorite.user.email})`
+            )
             console.log(`   Édition: ${editionName}`)
             console.log(`   Convention: ${edition.convention.name}`)
             console.log(`   Lieu: ${edition.city}, ${edition.country}`)
@@ -89,7 +91,9 @@ export default defineTask({
         }
       }
 
-      console.log(`✅ Tâche terminée: ${totalNotificationsSent} notifications de conventions favorites envoyées`)
+      console.log(
+        `✅ Tâche terminée: ${totalNotificationsSent} notifications de conventions favorites envoyées`
+      )
 
       return {
         success: true,
@@ -98,7 +102,7 @@ export default defineTask({
         timestamp: new Date().toISOString(),
       }
     } catch (error) {
-      console.error('❌ Erreur lors de l\'envoi des notifications de conventions favorites:', error)
+      console.error("❌ Erreur lors de l'envoi des notifications de conventions favorites:", error)
       throw error
     }
   },

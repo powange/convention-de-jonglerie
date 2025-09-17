@@ -1,3 +1,8 @@
+import {
+  isNotificationAllowed,
+  NotificationTypeMapping,
+  type NotificationType as CustomNotificationType,
+} from './notification-preferences'
 import { notificationStreamManager } from './notification-stream-manager'
 import { prisma } from './prisma'
 import { pushNotificationService } from './push-notification-service'
@@ -14,6 +19,8 @@ export interface CreateNotificationData {
   entityId?: string
   actionUrl?: string
   actionText?: string
+  // Type de notification pour vérifier les préférences
+  notificationType?: CustomNotificationType
 }
 
 export interface NotificationFilters {
@@ -32,6 +39,26 @@ export const NotificationService = {
    * Crée une nouvelle notification
    */
   async create(data: CreateNotificationData) {
+    // Vérifier les préférences utilisateur si un type de notification est spécifié
+    if (data.notificationType) {
+      const preferenceKey = NotificationTypeMapping[data.notificationType]
+      const allowed = await isNotificationAllowed(data.userId, preferenceKey)
+
+      if (!allowed) {
+        console.log(
+          `[NotificationService] Notification ${data.notificationType} bloquée par les préférences utilisateur ${data.userId}`
+        )
+        return null // Ne pas créer la notification
+      }
+      console.log(
+        `[NotificationService] Notification ${data.notificationType} autorisée pour l'utilisateur ${data.userId}`
+      )
+    } else {
+      console.log(
+        `[NotificationService] Notification sans type spécifié envoyée à l'utilisateur ${data.userId} (non filtrée)`
+      )
+    }
+
     const notification = await prisma.notification.create({
       data: {
         userId: data.userId,
@@ -239,6 +266,7 @@ export const NotificationHelpers = {
       category: 'system',
       actionUrl: '/',
       actionText: 'Voir les conventions',
+      notificationType: 'welcome',
     })
   },
 
@@ -256,6 +284,7 @@ export const NotificationHelpers = {
       entityId: conventionId.toString(),
       actionUrl: `/conventions/${conventionId}`,
       actionText: 'Voir les détails',
+      notificationType: 'new_convention',
     })
   },
 
@@ -273,6 +302,7 @@ export const NotificationHelpers = {
       entityId: editionId.toString(),
       actionUrl: `/editions/${editionId}/volunteers`,
       actionText: 'Voir les détails',
+      notificationType: 'volunteer_application_accepted',
     })
   },
 
@@ -290,6 +320,7 @@ export const NotificationHelpers = {
       entityId: editionId.toString(),
       actionUrl: `/editions/${editionId}`,
       actionText: "Voir l'édition",
+      notificationType: 'volunteer_application_rejected',
     })
   },
 
@@ -320,6 +351,7 @@ export const NotificationHelpers = {
       title: 'Erreur système',
       message: `Une erreur s'est produite : ${errorMessage}`,
       category: 'system',
+      notificationType: 'system_error',
     })
   },
 
@@ -353,6 +385,7 @@ export const NotificationHelpers = {
       entityId: offerId.toString(),
       actionUrl,
       actionText: 'Voir la demande',
+      notificationType: 'carpool_booking_received',
     })
   },
 
@@ -392,6 +425,7 @@ export const NotificationHelpers = {
       entityId: offerId.toString(),
       actionUrl,
       actionText: 'Voir les détails',
+      notificationType: 'carpool_booking_accepted',
     })
   },
 
@@ -425,6 +459,7 @@ export const NotificationHelpers = {
       entityId: offerId.toString(),
       actionUrl,
       actionText: "Voir d'autres offres",
+      notificationType: 'carpool_booking_rejected',
     })
   },
 
@@ -465,6 +500,7 @@ export const NotificationHelpers = {
       entityId: offerId.toString(),
       actionUrl,
       actionText: 'Voir le covoiturage',
+      notificationType: 'carpool_booking_cancelled',
     })
   },
 }

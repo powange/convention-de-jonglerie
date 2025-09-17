@@ -381,6 +381,7 @@
 import { computed, ref, watch } from 'vue'
 import { z } from 'zod'
 
+import { useDatetime } from '~/composables/useDatetime'
 import type { VolunteerTimeSlot } from '~/composables/useVolunteerSchedule'
 import type { VolunteerTeam } from '~/composables/useVolunteerTeams'
 
@@ -406,6 +407,9 @@ const emit = defineEmits<{
 
 // i18n
 const { t } = useI18n()
+
+// Composable dates
+const { toDatetimeLocal, fromDatetimeLocal, toApiFormat } = useDatetime()
 
 // État
 const loading = ref(false)
@@ -628,11 +632,15 @@ const close = () => {
 const setDuration = (hours: number) => {
   if (!formState.value.startDateTime) return
 
-  const start = new Date(formState.value.startDateTime)
-  const end = new Date(start.getTime() + hours * 60 * 60 * 1000)
+  // Convertir datetime-local en Date
+  const startDate = fromDatetimeLocal(formState.value.startDateTime)
+  if (!startDate) return
 
-  // Format pour datetime-local
-  formState.value.endDateTime = end.toISOString().slice(0, 16)
+  // Ajouter la durée
+  const endDate = new Date(startDate.getTime() + hours * 60 * 60 * 1000)
+
+  // Reconvertir en datetime-local pour l'input
+  formState.value.endDateTime = toDatetimeLocal(endDate)
 }
 
 // Gestion du changement de date de début
@@ -654,13 +662,17 @@ const onSubmit = async () => {
     const selectedTeam = props.teams.find((t) => t.id === formState.value.teamId)
     const color = selectedTeam?.color || '#6b7280'
 
+    // Convertir les dates en format ISO pour l'API
+    const startDate = fromDatetimeLocal(formState.value.startDateTime)
+    const endDate = fromDatetimeLocal(formState.value.endDateTime)
+
     const slotData = {
       id: formState.value.id || undefined,
       title: formState.value.title?.trim() || null,
       description: formState.value.description || '',
       teamId: formState.value.teamId === 'unassigned' ? undefined : formState.value.teamId,
-      start: formState.value.startDateTime,
-      end: formState.value.endDateTime,
+      start: toApiFormat(startDate),
+      end: toApiFormat(endDate),
       maxVolunteers: formState.value.maxVolunteers,
       assignedVolunteers: 0,
       color,

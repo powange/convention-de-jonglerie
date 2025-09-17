@@ -5,8 +5,8 @@ export default defineTask({
     name: 'cleanup-resolved-error-logs',
     description: 'Remove resolved error logs older than 1 month',
   },
-  async run({ payload }) {
-    console.log('🗑️ Exécution de la tâche: nettoyage des logs d\'erreur résolus')
+  async run({ payload: _payload }) {
+    console.log("🗑️ Exécution de la tâche: nettoyage des logs d'erreur résolus")
 
     try {
       const now = new Date()
@@ -60,7 +60,9 @@ export default defineTask({
             },
           },
         })
-        console.log(`🗑️ Supprimé ${deletedVeryOldLogs.count} très anciens logs d'erreur non résolus`)
+        console.log(
+          `🗑️ Supprimé ${deletedVeryOldLogs.count} très anciens logs d'erreur non résolus`
+        )
       }
 
       // Statistiques finales
@@ -71,7 +73,7 @@ export default defineTask({
         console.log(`   - ${deletedLogs.count} logs résolus (> 1 mois)`)
         console.log(`   - ${deletedVeryOldLogs.count} logs non résolus (> 6 mois)`)
       } else {
-        console.log('✅ Tâche terminée: aucun log d\'erreur à nettoyer')
+        console.log("✅ Tâche terminée: aucun log d'erreur à nettoyer")
       }
 
       // Afficher les statistiques restantes
@@ -96,7 +98,7 @@ export default defineTask({
         timestamp: new Date().toISOString(),
       }
     } catch (error) {
-      console.error('❌ Erreur lors du nettoyage des logs d\'erreur:', error)
+      console.error("❌ Erreur lors du nettoyage des logs d'erreur:", error)
       throw error
     }
   },

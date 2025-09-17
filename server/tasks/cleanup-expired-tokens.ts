@@ -5,7 +5,7 @@ export default defineTask({
     name: 'cleanup-expired-tokens',
     description: 'Clean up expired authentication tokens',
   },
-  async run({ payload }) {
+  async run({ payload: _payload }) {
     console.log('🗑️ Exécution de la tâche: nettoyage des tokens expirés')
 
     try {
@@ -30,7 +30,9 @@ export default defineTask({
         },
       })
 
-      console.log(`🗑️ Supprimé ${expiredPasswordTokens.count} tokens de réinitialisation de mot de passe expirés`)
+      console.log(
+        `🗑️ Supprimé ${expiredPasswordTokens.count} tokens de réinitialisation de mot de passe expirés`
+      )
 
       // Nettoyer les anciennes sessions (si vous en avez dans votre base de données)
       // Note: Nuxt Auth Utils utilise des cookies signés, donc pas forcément stockés en DB

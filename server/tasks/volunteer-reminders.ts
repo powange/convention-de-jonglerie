@@ -1,3 +1,4 @@
+import { NotificationService } from '../utils/notification-service'
 import { prisma } from '../utils/prisma'
 
 export default defineTask({
@@ -5,14 +6,14 @@ export default defineTask({
     name: 'volunteer-reminders',
     description: 'Send reminders to volunteers 30 minutes before their shifts',
   },
-  async run({ payload }) {
+  async run({ payload: _payload }) {
     console.log('🔔 Exécution de la tâche: rappels bénévoles')
 
     try {
       // Calculer la fenêtre de temps (dans 28-32 minutes pour éviter les doublons)
       const now = new Date()
       const reminderStart = new Date(now.getTime() + 28 * 60 * 1000) // Dans 28 minutes
-      const reminderEnd = new Date(now.getTime() + 32 * 60 * 1000)   // Dans 32 minutes
+      const reminderEnd = new Date(now.getTime() + 32 * 60 * 1000) // Dans 32 minutes
 
       // Trouver tous les créneaux qui commencent dans cette fenêtre
       const upcomingSlots = await prisma.volunteerTimeSlot.findMany({
@@ -21,10 +22,10 @@ export default defineTask({
             gte: reminderStart,
             lte: reminderEnd,
           },
-          // Seulement les créneaux des éditions actives
+          // Seulement les créneaux des éditions futures
           edition: {
-            status: {
-              in: ['DRAFT', 'PUBLISHED'],
+            endDate: {
+              gte: now, // L'édition n'est pas encore terminée
             },
           },
         },
@@ -76,21 +77,36 @@ export default defineTask({
           const startTime = slot.startDateTime.toLocaleTimeString('fr-FR', {
             hour: '2-digit',
             minute: '2-digit',
+            timeZone: 'Europe/Paris',
           })
 
           for (const assignment of slot.assignments) {
-            // TODO: Intégrer avec votre système de notifications existant
-            // Pour l'instant, on log les notifications qui devraient être envoyées
-            console.log(`🔔 Notification à envoyer à ${assignment.user.pseudo} (${assignment.user.email})`)
-            console.log(`   Créneau: ${slotTitle} - ${teamName}`)
-            console.log(`   Édition: ${editionName}`)
-            console.log(`   Heure: ${startTime}`)
-            console.log(`   Message: "Rappel: votre créneau bénévole commence dans 30 minutes"`)
+            try {
+              // Créer et envoyer la notification
+              await NotificationService.create({
+                userId: assignment.user.id,
+                type: 'INFO',
+                title: 'Rappel : Créneau bénévole dans 30 minutes',
+                message: `Votre créneau "${slotTitle}" pour l'équipe "${teamName}" de "${editionName}" commence à ${startTime}. Merci de vous présenter à l'heure !`,
+                category: 'volunteer',
+                entityType: 'VolunteerTimeSlot',
+                entityId: slot.id,
+                actionUrl: `/my-volunteer-applications`,
+                actionText: 'Voir mes candidatures',
+                notificationType: 'volunteer_reminder',
+              })
 
-            // Ici vous pouvez intégrer avec votre système de notifications push
-            // ou envoyer un email via votre service d'email existant
-
-            totalNotificationsSent++
+              console.log(
+                `✅ Notification envoyée à ${assignment.user.pseudo} pour le créneau ${slotTitle}`
+              )
+              totalNotificationsSent++
+            } catch (error) {
+              console.error(
+                `❌ Erreur lors de l'envoi de la notification à ${assignment.user.pseudo}:`,
+                error
+              )
+              // On continue avec les autres notifications même si une échoue
+            }
           }
         }
       }
@@ -104,7 +120,7 @@ export default defineTask({
         timestamp: new Date().toISOString(),
       }
     } catch (error) {
-      console.error('❌ Erreur lors de l\'envoi des rappels bénévoles:', error)
+      console.error("❌ Erreur lors de l'envoi des rappels bénévoles:", error)
       throw error
     }
   },
