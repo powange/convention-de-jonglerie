@@ -413,8 +413,8 @@ async function submitFeedback() {
     console.error("Erreur lors de l'envoi du feedback:", error)
 
     let errorMessage = t('feedback.error.submit')
-    if (error.data?.statusMessage) {
-      errorMessage = error.data.statusMessage
+    if (error.data?.message) {
+      errorMessage = error.data.message
     }
 
     toast.add({

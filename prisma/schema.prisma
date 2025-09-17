@@ -87,6 +87,7 @@ model Edition {
   hasCantine                   Boolean                         @default(false)
   hasConcert                   Boolean                         @default(false)
   hasFamilyCamping             Boolean                         @default(false)
+  hasSleepingRoom              Boolean                         @default(false)
   hasFireSpace                 Boolean                         @default(false)
   hasGala                      Boolean                         @default(false)
   hasOpenStage                 Boolean                         @default(false)

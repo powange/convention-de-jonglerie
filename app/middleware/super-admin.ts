@@ -11,7 +11,7 @@ export default defineNuxtRouteMiddleware((_to) => {
     if (!authStore.user?.isGlobalAdmin) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Accès refusé - Droits super administrateur requis',
+        message: 'Accès refusé - Droits super administrateur requis',
       })
     }
   }

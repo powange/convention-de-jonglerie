@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
       hasTentCamping,
       hasTruckCamping,
       hasFamilyCamping,
+      hasSleepingRoom,
       hasGym,
       hasFireSpace,
       hasGala,
@@ -56,6 +57,7 @@ export default defineEventHandler(async (event) => {
       hasTentCamping?: boolean
       hasTruckCamping?: boolean
       hasFamilyCamping?: boolean
+      hasSleepingRoom?: boolean
       hasGym?: boolean
       hasFireSpace?: boolean
       hasGala?: boolean
@@ -151,6 +153,9 @@ export default defineEventHandler(async (event) => {
     }
     if (hasFamilyCamping === 'true') {
       where.hasFamilyCamping = true
+    }
+    if (hasSleepingRoom === 'true') {
+      where.hasSleepingRoom = true
     }
     if (hasGym === 'true') {
       where.hasGym = true

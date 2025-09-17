@@ -24,6 +24,7 @@ interface EditionFilters {
   hasTruckCamping?: boolean
   hasGym?: boolean
   hasFamilyCamping?: boolean
+  hasSleepingRoom?: boolean
   hasFireSpace?: boolean
   hasGala?: boolean
   hasOpenStage?: boolean

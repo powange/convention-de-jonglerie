@@ -648,6 +648,7 @@ describe("Système d'éditions", () => {
         hasTentCamping: true,
         hasTruckCamping: false,
         hasFamilyCamping: true,
+        hasSleepingRoom: true,
         hasGym: true,
         hasFireSpace: false,
         hasGala: true,
@@ -672,15 +673,18 @@ describe("Système d'éditions", () => {
       expect(activeServices).toContain('hasFoodTrucks')
       expect(activeServices).toContain('hasToilets')
       expect(activeServices).not.toContain('acceptsPets')
-      expect(activeServices.length).toBe(15)
+      expect(activeServices.length).toBe(16)
     })
 
     it('devrait grouper les services par catégorie', () => {
       const categorizeServices = (services: Record<string, boolean>) => {
         return {
-          accommodation: ['hasTentCamping', 'hasTruckCamping', 'hasFamilyCamping'].filter(
-            (key) => services[key]
-          ),
+          accommodation: [
+            'hasTentCamping',
+            'hasTruckCamping',
+            'hasFamilyCamping',
+            'hasSleepingRoom',
+          ].filter((key) => services[key]),
           facilities: ['hasToilets', 'hasShowers', 'hasGym', 'hasAccessibility'].filter(
             (key) => services[key]
           ),

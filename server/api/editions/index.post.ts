@@ -7,7 +7,7 @@ import {
 } from '../../utils/convention-permissions'
 import { normalizeDateToISO } from '../../utils/date-helpers'
 import { geocodeEdition } from '../../utils/geocoding'
-import { moveTempImageToEdition } from '../../utils/move-temp-image'
+import { moveTempImageToEdition, moveTempImageFromPlaceholder } from '../../utils/move-temp-image'
 import { prisma } from '../../utils/prisma'
 import {
   editionSchema,
@@ -54,6 +54,7 @@ export default defineEventHandler(async (event) => {
     hasTentCamping,
     hasTruckCamping,
     hasFamilyCamping,
+    hasSleepingRoom,
     hasGym,
     hasFireSpace,
     hasGala,
@@ -112,6 +113,7 @@ export default defineEventHandler(async (event) => {
         hasTentCamping: hasTentCamping || false,
         hasTruckCamping: hasTruckCamping || false,
         hasFamilyCamping: hasFamilyCamping || false,
+        hasSleepingRoom: hasSleepingRoom || false,
         hasGym: hasGym || false,
         hasFireSpace: hasFireSpace || false,
         hasGala: hasGala || false,
@@ -142,7 +144,16 @@ export default defineEventHandler(async (event) => {
 
     // Si une image temporaire a été fournie, la déplacer dans le bon dossier
     if (imageUrl && imageUrl.includes('/temp/')) {
-      const newImageUrl = await moveTempImageToEdition(imageUrl, edition.id)
+      let newImageUrl: string | null = null
+
+      if (imageUrl.includes('/temp/editions/NEW_EDITION/')) {
+        // Gérer les fichiers uploadés avec le placeholder NEW_EDITION
+        newImageUrl = await moveTempImageFromPlaceholder(imageUrl, edition.id)
+      } else {
+        // Gérer les autres images temporaires
+        newImageUrl = await moveTempImageToEdition(imageUrl, edition.id)
+      }
+
       if (newImageUrl) {
         // Mettre à jour l'édition avec la nouvelle URL
         const updatedEdition = await prisma.edition.update({

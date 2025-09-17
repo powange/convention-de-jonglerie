@@ -12,13 +12,6 @@ export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
 
-    console.log('[EDITION UPLOAD] Body reçu:', {
-      hasFiles: body.files ? 'oui' : 'non',
-      filesLength: body.files?.length,
-      metadata: body.metadata,
-      bodyKeys: Object.keys(body),
-    })
-
     // Validation basique
     if (!body.files || !Array.isArray(body.files) || body.files.length === 0) {
       throw createError({
@@ -28,59 +21,68 @@ export default defineEventHandler(async (event) => {
     }
 
     if (!body.metadata?.entityId) {
-      console.error('[EDITION UPLOAD ERROR] metadata manquant ou entityId manquant:', {
-        hasMetadata: !!body.metadata,
-        metadata: body.metadata,
-      })
       throw createError({
         statusCode: 400,
         message: "ID d'édition requis",
       })
     }
 
-    const editionId = parseInt(body.metadata.entityId)
-    if (isNaN(editionId)) {
-      throw createError({
-        statusCode: 400,
-        message: "ID d'édition invalide",
-      })
+    const entityId = body.metadata.entityId
+    let editionId: number | null = null
+    let isNewEdition = false
+
+    if (entityId === 'NEW_EDITION') {
+      // Nouvelle édition - utiliser placeholder
+      isNewEdition = true
+    } else {
+      // Édition existante - valider l'ID
+      editionId = parseInt(entityId)
+      if (isNaN(editionId)) {
+        throw createError({
+          statusCode: 400,
+          message: "ID d'édition invalide",
+        })
+      }
     }
 
-    // Vérifier les permissions pour modifier cette édition
-    const edition = await prisma.edition.findUnique({
-      where: { id: editionId },
-      include: {
-        convention: {
-          include: {
-            collaborators: {
-              where: {
-                userId: event.context.user.id,
-                OR: [{ canEditAllEditions: true }, { canEditConvention: true }],
+    if (!isNewEdition) {
+      // Pour les éditions existantes, vérifier les permissions
+      const edition = await prisma.edition.findUnique({
+        where: { id: editionId! },
+        include: {
+          convention: {
+            include: {
+              collaborators: {
+                where: {
+                  userId: event.context.user.id,
+                  OR: [{ canEditAllEditions: true }, { canEditConvention: true }],
+                },
               },
             },
           },
         },
-      },
-    })
-
-    if (!edition) {
-      throw createError({
-        statusCode: 404,
-        message: 'Édition introuvable',
       })
-    }
 
-    const isCreator = edition.createdBy === event.context.user.id
-    const isConventionAuthor = edition.convention.authorId === event.context.user.id
-    const isCollaborator = edition.convention.collaborators.length > 0
-    const isGlobalAdmin = event.context.user.isGlobalAdmin || false
+      if (!edition) {
+        throw createError({
+          statusCode: 404,
+          message: 'Édition introuvable',
+        })
+      }
 
-    if (!isCreator && !isConventionAuthor && !isCollaborator && !isGlobalAdmin) {
-      throw createError({
-        statusCode: 403,
-        message: "Vous n'avez pas les droits pour modifier cette édition",
-      })
+      const isCreator = edition.createdBy === event.context.user.id
+      const isConventionAuthor = edition.convention.authorId === event.context.user.id
+      const isCollaborator = edition.convention.collaborators.length > 0
+      const isGlobalAdmin = event.context.user.isGlobalAdmin || false
+
+      if (!isCreator && !isConventionAuthor && !isCollaborator && !isGlobalAdmin) {
+        throw createError({
+          statusCode: 403,
+          message: "Vous n'avez pas les droits pour modifier cette édition",
+        })
+      }
     }
+    // Pour les nouvelles éditions (isNewEdition = true), on laisse passer
 
     console.log('=== UPLOAD EDITION FILES ===')
     console.log('Edition ID:', editionId)
@@ -88,6 +90,7 @@ export default defineEventHandler(async (event) => {
 
     // Stocker les fichiers dans le dossier temporaire pour les éditions
     const results = []
+    const storageId = isNewEdition ? 'NEW_EDITION' : editionId
 
     for (const file of body.files) {
       console.log(`Stockage fichier: ${file.name}`)
@@ -97,13 +100,13 @@ export default defineEventHandler(async (event) => {
         const storedFilename = await storeFileLocally(
           file,
           8, // Longueur du suffixe aléatoire
-          `temp/editions/${editionId}` // Dossier temporaire pour cette édition
+          `temp/editions/${storageId}` // Dossier temporaire pour cette édition
         )
 
         console.log(`Fichier stocké: ${storedFilename}`)
 
         // Construire l'URL temporaire
-        const temporaryUrl = `/uploads/temp/editions/${editionId}/${storedFilename}`
+        const temporaryUrl = `/uploads/temp/editions/${storageId}/${storedFilename}`
 
         results.push({
           success: true,

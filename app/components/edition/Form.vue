@@ -370,7 +370,7 @@
           >
             <UiImageUpload
               v-model="state.imageUrl"
-              :endpoint="{ type: 'edition', id: props.initialData?.id }"
+              :endpoint="uploadEndpoint"
               :options="{
                 validation: {
                   maxSize: 5 * 1024 * 1024, // 5MB
@@ -552,29 +552,46 @@ const { toApiFormat, fromApiFormat } = useDatetime()
 // const authStore = useAuthStore();
 const showCustomCountry = ref(false)
 
+// Récupérer l'ID de l'édition uniquement depuis les props (initialData)
+// La route peut contenir l'ID de convention ou d'édition selon le contexte
+const editionId = computed(() => {
+  return props.initialData?.id || undefined
+})
+
+// Configuration pour l'upload d'image
+const uploadEndpoint = computed(() => {
+  if (editionId.value) {
+    // Édition existante - utiliser l'ID réel
+    return { type: 'edition' as const, id: editionId.value }
+  } else {
+    // Nouvelle édition - utiliser un placeholder qui sera remplacé
+    return { type: 'edition' as const, id: 'NEW_EDITION' }
+  }
+})
+
 const currentStep = ref(0)
-const steps = ref<StepperItem[]>([
+const steps = computed<StepperItem[]>(() => [
   {
-    title: computed(() => t('components.edition_form.step_general_title')),
-    description: computed(() => t('components.edition_form.step_general_description')),
+    title: t('components.edition_form.step_general_title'),
+    description: t('components.edition_form.step_general_description'),
     icon: 'i-heroicons-information-circle',
     slot: 'general',
   },
   {
-    title: computed(() => t('components.edition_form.step_services_title')),
+    title: t('components.edition_form.step_services_title'),
     description: 'Services Disponibles',
     icon: 'i-heroicons-cog',
     slot: 'services',
   },
   {
-    title: computed(() => t('components.edition_form.step_about_title')),
-    description: computed(() => t('components.edition_form.step_about_description')),
+    title: t('components.edition_form.step_about_title'),
+    description: t('components.edition_form.step_about_description'),
     icon: 'i-heroicons-document-text',
     slot: 'about',
   },
   {
-    title: computed(() => t('components.edition_form.step_external_links_title')),
-    description: computed(() => t('components.edition_form.step_external_links_description')),
+    title: t('components.edition_form.step_external_links_title'),
+    description: t('components.edition_form.step_external_links_description'),
     icon: 'i-heroicons-link',
     slot: 'external-links',
   },
@@ -617,6 +634,7 @@ const state = reactive({
   hasTentCamping: props.initialData?.hasTentCamping || false,
   hasTruckCamping: props.initialData?.hasTruckCamping || false,
   hasFamilyCamping: props.initialData?.hasFamilyCamping || false,
+  hasSleepingRoom: props.initialData?.hasSleepingRoom || false,
   hasGym: props.initialData?.hasGym || false,
   hasFireSpace: props.initialData?.hasFireSpace || false,
   hasGala: props.initialData?.hasGala || false,
@@ -1153,6 +1171,7 @@ watch(
       state.hasTentCamping = newVal.hasTentCamping || false
       state.hasTruckCamping = newVal.hasTruckCamping || false
       state.hasFamilyCamping = newVal.hasFamilyCamping || false
+      state.hasSleepingRoom = newVal.hasSleepingRoom || false
       state.hasGym = newVal.hasGym || false
       state.hasFireSpace = newVal.hasFireSpace || false
       state.hasGala = newVal.hasGala || false

@@ -326,7 +326,7 @@ const toggleFavorite = async (id: number) => {
   } catch (e: unknown) {
     const err: any = e
     toast.add({
-      title: err?.statusMessage || t('errors.favorite_update_failed'),
+      title: err?.message || t('errors.favorite_update_failed'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })
@@ -480,11 +480,11 @@ const submitNewItem = async () => {
       title: t('editions.lost_item_added'),
     })
   } catch (error: unknown) {
-    const err = error as { data?: { statusMessage?: string } } | undefined
+    const err = error as { data?: { message?: string } } | undefined
     toast.add({
       color: 'error',
       title: t('common.error'),
-      description: err?.data?.statusMessage || t('editions.cannot_add_item'),
+      description: err?.data?.message || t('editions.cannot_add_item'),
     })
   } finally {
     submittingItem.value = false

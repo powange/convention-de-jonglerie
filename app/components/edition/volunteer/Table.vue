@@ -577,7 +577,7 @@ const refreshApplications = async () => {
     applications.value = res.applications || []
     if (res.pagination) serverPagination.value = res.pagination
   } catch (e: any) {
-    toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
+    toast.add({ title: e?.message || t('common.error'), color: 'error' })
   } finally {
     applicationsLoading.value = false
   }
@@ -653,7 +653,7 @@ const decideApplication = async (app: any, status: 'ACCEPTED' | 'REJECTED' | 'PE
       refreshApplications()
     }
   } catch (e: any) {
-    toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
+    toast.add({ title: e?.message || t('common.error'), color: 'error' })
   } finally {
     applicationsActingId.value = null
     actingAction.value = null
@@ -812,7 +812,7 @@ const confirmTeamsModal = async () => {
 
     closeTeamsModal()
   } catch (e: any) {
-    toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
+    toast.add({ title: e?.message || t('common.error'), color: 'error' })
   } finally {
     teamsModalLoading.value = false
   }
@@ -870,7 +870,7 @@ const exportApplications = async () => {
     })
   } catch (e: any) {
     toast.add({
-      title: e?.statusMessage || t('common.error'),
+      title: e?.message || t('common.error'),
       color: 'error',
     })
   } finally {
@@ -1581,7 +1581,7 @@ const handleEditApplicationSave = async (data: { application: any; changes: any 
   } catch (error: any) {
     toast.add({
       title: t('common.error'),
-      description: error?.statusMessage || t('editions.volunteers.update_error'),
+      description: error?.message || t('editions.volunteers.update_error'),
       color: 'error',
     })
   }

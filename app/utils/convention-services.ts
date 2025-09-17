@@ -12,6 +12,7 @@ export interface ConventionServiceKeys {
   hasTentCamping: boolean
   hasTruckCamping: boolean
   hasFamilyCamping: boolean
+  hasSleepingRoom: boolean
   hasGym: boolean
   hasFireSpace: boolean
   hasGala: boolean
@@ -67,6 +68,12 @@ export const conventionServices: ConventionService[] = [
     label: 'Camping famille',
     icon: 'i-heroicons-users',
     color: 'text-indigo-500',
+  },
+  {
+    key: 'hasSleepingRoom',
+    label: 'Salle de couchage',
+    icon: 'i-heroicons-home',
+    color: 'text-slate-600',
   },
   { key: 'hasGym', label: 'Gymnase', icon: 'i-heroicons-trophy', color: 'text-purple-500' },
   { key: 'hasFireSpace', label: 'Fire space', icon: 'i-heroicons-fire', color: 'text-red-600' },
@@ -163,7 +170,7 @@ export const getServicesGrouped = () => {
   return {
     accommodation: {
       label: 'Hébergement',
-      services: ['hasTentCamping', 'hasTruckCamping', 'hasFamilyCamping'],
+      services: ['hasTentCamping', 'hasTruckCamping', 'hasFamilyCamping', 'hasSleepingRoom'],
     },
     food: {
       label: 'Restauration',

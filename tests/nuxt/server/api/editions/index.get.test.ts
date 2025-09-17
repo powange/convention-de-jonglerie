@@ -34,6 +34,7 @@ describe('/api/editions GET', () => {
     hasTentCamping: true,
     hasTruckCamping: false,
     hasFamilyCamping: true,
+    hasSleepingRoom: true,
     hasGym: true,
     hasFireSpace: false,
     hasGala: true,

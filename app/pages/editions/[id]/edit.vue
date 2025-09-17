@@ -83,9 +83,9 @@ const handleUpdateConvention = async (formData: Edition) => {
     })
     router.push(`/editions/${editionId}`)
   } catch (e: unknown) {
-    const err = e as { statusMessage?: string }
+    const err = e as { message?: string }
     toast.add({
-      title: err?.statusMessage || t('errors.edition_update_failed'),
+      title: err?.message || t('errors.edition_update_failed'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })

@@ -431,7 +431,7 @@ const applyAsVolunteer = async (formData?: any) => {
 
     showApplyModal.value = false
   } catch (e: any) {
-    toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
+    toast.add({ title: e?.message || t('common.error'), color: 'error' })
   } finally {
     volunteersApplying.value = false
   }
@@ -442,7 +442,7 @@ const withdrawApplication = async () => {
     await $fetch(`/api/editions/${editionId}/volunteers/apply`, { method: 'DELETE' } as any)
     if (volunteersInfo.value) volunteersInfo.value.myApplication = null
   } catch (e: any) {
-    toast.add({ title: e?.statusMessage || t('common.error'), color: 'error' })
+    toast.add({ title: e?.message || t('common.error'), color: 'error' })
   } finally {
     volunteersWithdrawing.value = false
   }

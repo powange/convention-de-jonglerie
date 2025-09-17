@@ -62,6 +62,12 @@ export const useTranslatedConventionServices = () => {
       color: 'text-indigo-500',
     },
     {
+      key: 'hasSleepingRoom',
+      label: t('services.sleeping_room'),
+      icon: 'i-heroicons-home',
+      color: 'text-slate-600',
+    },
+    {
       key: 'hasGym',
       label: t('services.gym'),
       icon: 'i-heroicons-trophy',
@@ -176,7 +182,7 @@ export const useTranslatedConventionServices = () => {
     const grouped = {
       accommodation: {
         label: t('services.categories.accommodation'),
-        services: ['hasTentCamping', 'hasTruckCamping', 'hasFamilyCamping'],
+        services: ['hasTentCamping', 'hasTruckCamping', 'hasFamilyCamping', 'hasSleepingRoom'],
       },
       food: {
         label: t('services.categories.food'),

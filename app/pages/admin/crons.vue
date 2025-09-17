@@ -75,7 +75,7 @@
         {{ $t('common.error') }}
       </h3>
       <p class="text-gray-600 dark:text-gray-400">
-        {{ error.statusMessage || $t('errors.loading_error') }}
+        {{ error.message || $t('errors.loading_error') }}
       </p>
       <UButton class="mt-4" color="primary" variant="outline" @click="refresh()">
         {{ $t('common.retry') }}
@@ -216,13 +216,13 @@ const executeTask = async (taskName: string) => {
 
     taskResults.value[taskName] = {
       success: false,
-      error: err.data?.statusMessage || err.message,
+      error: err.data?.message || err.message,
       timestamp: new Date().toISOString(),
     }
 
     toast.add({
       title: t('admin.task_execution_failed'),
-      description: err.data?.statusMessage || t('admin.task_execution_error'),
+      description: err.data?.message || t('admin.task_execution_error'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })

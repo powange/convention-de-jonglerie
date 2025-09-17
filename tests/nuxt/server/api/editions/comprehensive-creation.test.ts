@@ -168,6 +168,7 @@ describe('/api/editions POST - Tests complets', () => {
         hasTentCamping: true,
         hasTruckCamping: true,
         hasFamilyCamping: false,
+        hasSleepingRoom: true,
         // Restauration
         hasFoodTrucks: true,
         hasCantine: false,
@@ -205,6 +206,7 @@ describe('/api/editions POST - Tests complets', () => {
       expect(result.hasTentCamping).toBe(true)
       expect(result.hasTruckCamping).toBe(true)
       expect(result.hasFamilyCamping).toBe(false)
+      expect(result.hasSleepingRoom).toBe(true)
       expect(result.hasFoodTrucks).toBe(true)
       expect(result.hasCantine).toBe(false)
       expect(result.hasKidsZone).toBe(true)
@@ -256,6 +258,7 @@ describe('/api/editions POST - Tests complets', () => {
       expect(data.hasTentCamping).toBe(false)
       expect(data.hasTruckCamping).toBe(false)
       expect(data.hasFamilyCamping).toBe(false)
+      expect(data.hasSleepingRoom).toBe(false)
       expect(data.hasGym).toBe(false)
       expect(data.hasFireSpace).toBe(false)
       expect(data.hasGala).toBe(false)

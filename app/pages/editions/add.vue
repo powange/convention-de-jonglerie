@@ -54,7 +54,7 @@ const handleAddEdition = async (formData: Edition) => {
     router.push('/')
   } catch (e: unknown) {
     toast.add({
-      title: e.statusMessage || t('errors.edition_creation_failed'),
+      title: e.message || t('errors.edition_creation_failed'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })

@@ -16,7 +16,7 @@ export async function requireGlobalAdminWithDbCheck(event: H3Event<EventHandlerR
   if (!user?.id) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -36,7 +36,7 @@ export async function requireGlobalAdminWithDbCheck(event: H3Event<EventHandlerR
   if (!currentUser?.isGlobalAdmin) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Accès refusé - Droits super administrateur requis',
+      message: 'Accès refusé - Droits super administrateur requis',
     })
   }
 
@@ -60,7 +60,7 @@ export async function requireGlobalAdminFromSession(event: H3Event<EventHandlerR
   if (!user?.id) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Non authentifié',
+      message: 'Non authentifié',
     })
   }
 
@@ -68,7 +68,7 @@ export async function requireGlobalAdminFromSession(event: H3Event<EventHandlerR
   if (!user.isGlobalAdmin) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Accès refusé - Droits super administrateur requis',
+      message: 'Accès refusé - Droits super administrateur requis',
     })
   }
 

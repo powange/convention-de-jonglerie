@@ -68,7 +68,7 @@ export function createRateLimiter(config: RateLimitConfig) {
 
       throw createError({
         statusCode: 429,
-        statusMessage: message,
+        message: message,
         data: {
           retryAfter, // Temps en secondes avant de pouvoir réessayer
           resetTime: new Date(record.resetTime).toISOString(),

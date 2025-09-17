@@ -17,7 +17,7 @@ export function requireAuth(event: any): AuthenticatedUser {
   if (!event.context.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Unauthorized',
+      message: 'Unauthorized',
     })
   }
 
@@ -36,7 +36,7 @@ export function requireGlobalAdmin(event: any): AuthenticatedUser {
   if (!user.isGlobalAdmin) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Accès réservé aux administrateurs',
+      message: 'Accès réservé aux administrateurs',
     })
   }
 
@@ -81,7 +81,7 @@ export function requireUserOrGlobalAdmin(event: any, userId: number): Authentica
   if (user.id !== userId && !user.isGlobalAdmin) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Accès non autorisé',
+      message: 'Accès non autorisé',
     })
   }
 
@@ -109,6 +109,6 @@ export function createAuthError(type: keyof typeof AUTH_ERRORS, customMessage?: 
 
   throw createError({
     statusCode,
-    statusMessage: customMessage || AUTH_ERRORS[type],
+    message: customMessage || AUTH_ERRORS[type],
   })
 }

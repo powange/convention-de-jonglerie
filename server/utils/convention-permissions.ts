@@ -143,14 +143,14 @@ export async function getConventionForEdit(
   if (!convention) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Convention introuvable',
+      message: 'Convention introuvable',
     })
   }
 
   if (!canEditConvention(convention, user)) {
     throw createError({
       statusCode: 403,
-      statusMessage: "Vous n'avez pas les droits pour modifier cette convention",
+      message: "Vous n'avez pas les droits pour modifier cette convention",
     })
   }
 
@@ -173,14 +173,14 @@ export async function getConventionForDelete(
   if (!convention) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Convention introuvable',
+      message: 'Convention introuvable',
     })
   }
 
   if (!canDeleteConvention(convention, user)) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Droit insuffisant pour supprimer cette convention',
+      message: 'Droit insuffisant pour supprimer cette convention',
     })
   }
 
@@ -203,14 +203,14 @@ export async function getConventionForArchive(
   if (!convention) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Convention introuvable',
+      message: 'Convention introuvable',
     })
   }
 
   if (!canArchiveConvention(convention, user)) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Droit insuffisant',
+      message: 'Droit insuffisant',
     })
   }
 
@@ -232,7 +232,7 @@ export async function getConventionForCollaboratorManagement(
   if (!convention) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Convention introuvable',
+      message: 'Convention introuvable',
     })
   }
 
@@ -240,7 +240,7 @@ export async function getConventionForCollaboratorManagement(
   if (!canManage) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Droits insuffisants pour gérer les collaborateurs',
+      message: 'Droits insuffisants pour gérer les collaborateurs',
     })
   }
 
@@ -256,7 +256,7 @@ export function validateConventionId(id: string | undefined): number {
   if (isNaN(conventionId)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ID de convention invalide',
+      message: 'ID de convention invalide',
     })
   }
 
@@ -300,7 +300,7 @@ export async function getConventionForEditionCreation(
   if (!convention) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Convention introuvable',
+      message: 'Convention introuvable',
     })
   }
 
@@ -308,14 +308,14 @@ export async function getConventionForEditionCreation(
   if (convention.isArchived) {
     throw createError({
       statusCode: 409,
-      statusMessage: "Convention archivée: création d'édition impossible",
+      message: "Convention archivée: création d'édition impossible",
     })
   }
 
   if (!canCreateEdition(convention, user)) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Droit insuffisant pour créer une édition',
+      message: 'Droit insuffisant pour créer une édition',
     })
   }
 

@@ -286,9 +286,9 @@ const toggleFavorite = async (id: number) => {
       color: 'success',
     })
   } catch (e: unknown) {
-    const err = e as { statusMessage?: string } | undefined
+    const err = e as { message?: string } | undefined
     toast.add({
-      title: err?.statusMessage || t('errors.favorite_update_failed'),
+      title: err?.message || t('errors.favorite_update_failed'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })

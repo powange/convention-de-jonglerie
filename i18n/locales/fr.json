@@ -1566,7 +1566,8 @@
     "tent_camping": "Camping tente",
     "toilets": "WC",
     "truck_camping": "Camping camion",
-    "workshops": "Workshops"
+    "workshops": "Workshops",
+    "sleeping_room": "Salle de couchage"
   },
   "upload": {
     "delete_message": "Image supprimée",

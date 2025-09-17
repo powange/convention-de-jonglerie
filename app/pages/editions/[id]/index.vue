@@ -398,8 +398,8 @@ const toggleFavorite = async (id: number) => {
     })
   } catch (e: unknown) {
     const errorMessage =
-      e && typeof e === 'object' && 'statusMessage' in e && typeof e.statusMessage === 'string'
-        ? e.statusMessage
+      e && typeof e === 'object' && 'message' in e && typeof e.message === 'string'
+        ? e.message
         : t('errors.favorite_update_failed')
     toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' })
   }
@@ -426,8 +426,8 @@ const toggleAttendance = async (id: number) => {
     })
   } catch (e: unknown) {
     const errorMessage =
-      e && typeof e === 'object' && 'statusMessage' in e && typeof e.statusMessage === 'string'
-        ? e.statusMessage
+      e && typeof e === 'object' && 'message' in e && typeof e.message === 'string'
+        ? e.message
         : t('errors.attendance_update_failed')
     toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' })
   }

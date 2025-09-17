@@ -63,11 +63,8 @@ const toggleFavorite = async (id: number) => {
     })
   } catch (e: unknown) {
     const title =
-      e &&
-      typeof e === 'object' &&
-      'statusMessage' in e &&
-      typeof (e as any).statusMessage === 'string'
-        ? (e as any).statusMessage
+      e && typeof e === 'object' && 'message' in e && typeof (e as any).message === 'string'
+        ? (e as any).message
         : t('errors.favorite_update_failed')
     toast.add({ title, icon: 'i-heroicons-x-circle', color: 'error' })
   }

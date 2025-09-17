@@ -674,7 +674,7 @@ const resolveSimilarLogs = async () => {
     toast.add({
       color: 'error',
       title: 'Erreur',
-      description: error.data?.statusMessage || 'Impossible de résoudre les logs identiques',
+      description: error.data?.message || 'Impossible de résoudre les logs identiques',
     })
   } finally {
     resolvingSimilar.value = false

@@ -132,7 +132,7 @@ const handleSubmit = async () => {
   } catch (error: any) {
     toast.add({
       title: t('common.error'),
-      description: error.data?.statusMessage || t('errors.server_error'),
+      description: error.data?.message || t('errors.server_error'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })

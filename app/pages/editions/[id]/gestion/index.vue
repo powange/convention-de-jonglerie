@@ -668,7 +668,7 @@ const handleToggleOpen = async (val: boolean) => {
   } catch (e: any) {
     volunteersOpenLocal.value = previous
     toast.add({
-      title: e?.statusMessage || t('common.error'),
+      title: e?.message || t('common.error'),
       color: 'error',
       icon: 'i-heroicons-x-circle',
     })
@@ -730,7 +730,7 @@ const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {})
       // Erreur générale
       fieldErrors.value = {}
       toast.add({
-        title: e?.data?.statusMessage || e?.statusMessage || t('common.error'),
+        title: e?.data?.message || e?.message || t('common.error'),
         color: 'error',
         icon: 'i-heroicons-x-circle',
       })
@@ -1005,7 +1005,7 @@ const toggleFavorite = async (id: number) => {
     })
   } catch (e: any) {
     toast.add({
-      title: e?.statusMessage || t('errors.favorite_update_failed'),
+      title: e?.message || t('errors.favorite_update_failed'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })
@@ -1024,7 +1024,7 @@ const deleteEdition = async (id: number) => {
       router.push('/')
     } catch (e: any) {
       toast.add({
-        title: e?.statusMessage || t('errors.edition_deletion_failed'),
+        title: e?.message || t('errors.edition_deletion_failed'),
         icon: 'i-heroicons-x-circle',
         color: 'error',
       })

@@ -78,7 +78,7 @@ export default defineEventHandler(async (event) => {
   const sentState = query.state
   const cookieState = getCookie(event, 'oauth_state')
   if (!sentState || !cookieState || sentState !== cookieState) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid OAuth state' })
+    throw createError({ statusCode: 400, message: 'Invalid OAuth state' })
   }
 
   // Échanger le code contre des jetons

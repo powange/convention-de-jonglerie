@@ -464,7 +464,7 @@ const persistSettings = async (data: any) => {
       // Erreur générale
       fieldErrors.value = {}
       toast.add({
-        title: error?.data?.statusMessage || error?.statusMessage || t('common.error'),
+        title: error?.data?.message || error?.message || t('common.error'),
         color: 'error',
         icon: 'i-heroicons-x-circle',
       })

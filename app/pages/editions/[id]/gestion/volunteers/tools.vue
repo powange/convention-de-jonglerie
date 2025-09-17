@@ -177,7 +177,7 @@ const toggleFavorite = async (id: number) => {
     })
   } catch (e: any) {
     toast.add({
-      title: e?.statusMessage || t('errors.favorite_update_failed'),
+      title: e?.message || t('errors.favorite_update_failed'),
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })
@@ -375,7 +375,7 @@ const generateCateringPdf = async () => {
     })
   } catch (e: any) {
     toast.add({
-      title: e?.statusMessage || t('common.error'),
+      title: e?.message || t('common.error'),
       color: 'error',
     })
   } finally {

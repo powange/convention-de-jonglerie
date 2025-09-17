@@ -568,9 +568,9 @@ const handlePasswordSubmit = async () => {
     } else if ((error as any).statusCode === 403 || (error as any).status === 403) {
       const errAny = error as any
       const isEmailNotVerified =
-        errAny.statusMessage?.includes('email not verified') ||
         errAny.message?.includes('email not verified') ||
-        errAny.statusMessage?.includes('Email non vérifié') ||
+        errAny.message?.includes('email not verified') ||
+        errAny.message?.includes('Email non vérifié') ||
         errAny.message?.includes('Email non vérifié')
       const errorData = (error as any).data
       const actualData = errorData?.data || errorData
@@ -585,7 +585,7 @@ const handlePasswordSubmit = async () => {
         await router.push(`/verify-email?email=${encodeURIComponent(email)}`)
         return
       } else {
-        errorMessage = (error as any).statusMessage || t('errors.access_denied')
+        errorMessage = (error as any).message || t('errors.access_denied')
       }
     } else if (error.message || (error as any).data?.message) {
       errorMessage = (error.message as string) || (error as any).data?.message || errorMessage

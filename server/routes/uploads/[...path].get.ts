@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   if (!path) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Path is required',
+      message: 'Path is required',
     })
   }
 
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
     if (!stats.isFile()) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'File not found',
+        message: 'File not found',
       })
     }
 
@@ -94,7 +94,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 404,
-      statusMessage: 'File not found',
+      message: 'File not found',
     })
   }
 })

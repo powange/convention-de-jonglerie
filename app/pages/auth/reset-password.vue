@@ -319,16 +319,16 @@ const handleSubmit = async () => {
     })
   } catch (error: any) {
     if (
-      error.data?.statusMessage?.includes('invalide') ||
-      error.data?.statusMessage?.includes('expiré') ||
-      error.data?.statusMessage?.includes('invalid') ||
-      error.data?.statusMessage?.includes('expired')
+      error.data?.message?.includes('invalide') ||
+      error.data?.message?.includes('expiré') ||
+      error.data?.message?.includes('invalid') ||
+      error.data?.message?.includes('expired')
     ) {
       invalidToken.value = true
     } else {
       toast.add({
         title: t('common.error'),
-        description: error.data?.statusMessage || t('errors.server_error'),
+        description: error.data?.message || t('errors.server_error'),
         icon: 'i-heroicons-x-circle',
         color: 'error',
       })

@@ -309,6 +309,7 @@ describe('/api/editions POST', () => {
     expect(createCall.data.hasTentCamping).toBe(false)
     expect(createCall.data.hasTruckCamping).toBe(false)
     expect(createCall.data.hasFamilyCamping).toBe(false)
+    expect(createCall.data.hasSleepingRoom).toBe(false)
     expect(createCall.data.hasGym).toBe(false)
     expect(createCall.data.hasFireSpace).toBe(false)
     expect(createCall.data.hasGala).toBe(false)

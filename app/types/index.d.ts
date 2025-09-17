@@ -58,6 +58,7 @@ export interface Edition {
   hasTruckCamping: boolean
   hasGym: boolean
   hasFamilyCamping: boolean
+  hasSleepingRoom: boolean
   hasFireSpace: boolean
   hasGala: boolean
   hasOpenStage: boolean
@@ -184,6 +185,7 @@ export interface EditionFormData {
   hasTruckCamping?: boolean
   hasGym?: boolean
   hasFamilyCamping?: boolean
+  hasSleepingRoom?: boolean
   hasFireSpace?: boolean
   hasGala?: boolean
   hasOpenStage?: boolean

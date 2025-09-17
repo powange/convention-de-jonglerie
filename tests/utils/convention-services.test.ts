@@ -206,6 +206,7 @@ describe('convention-services utils', () => {
         'hasTentCamping',
         'hasTruckCamping',
         'hasFamilyCamping',
+        'hasSleepingRoom',
       ])
     })
 

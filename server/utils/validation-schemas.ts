@@ -95,11 +95,13 @@ export const editionSchema = z
     name: z
       .string()
       .max(200, 'Le nom ne peut pas dépasser 200 caractères')
+      .nullable()
       .optional()
       .refine((val) => !val || val.length >= 3, 'Le nom doit contenir au moins 3 caractères'),
     description: z
       .string()
       .max(5000, 'La description ne peut pas dépasser 5000 caractères')
+      .nullable()
       .optional(),
     imageUrl: z.string().nullable().optional(),
     startDate: dateSchema,
@@ -133,6 +135,7 @@ export const editionSchema = z
     hasTentCamping: z.boolean().optional(),
     hasTruckCamping: z.boolean().optional(),
     hasFamilyCamping: z.boolean().optional(),
+    hasSleepingRoom: z.boolean().optional(),
     hasGym: z.boolean().optional(),
     hasFireSpace: z.boolean().optional(),
     hasGala: z.boolean().optional(),
@@ -213,6 +216,7 @@ export const updateEditionSchema = z
     hasTentCamping: z.boolean().optional(),
     hasTruckCamping: z.boolean().optional(),
     hasFamilyCamping: z.boolean().optional(),
+    hasSleepingRoom: z.boolean().optional(),
     hasGym: z.boolean().optional(),
     hasFireSpace: z.boolean().optional(),
     hasGala: z.boolean().optional(),
@@ -376,7 +380,7 @@ export function handleValidationError(error: z.ZodError) {
 
   throw createError({
     statusCode: 400,
-    statusMessage: 'Données invalides',
+    message: 'Données invalides',
     data: {
       errors: formattedErrors,
       message: 'Veuillez corriger les erreurs de saisie',

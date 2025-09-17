@@ -52,6 +52,7 @@ export default defineEventHandler(async (event) => {
     hasTentCamping,
     hasTruckCamping,
     hasFamilyCamping,
+    hasSleepingRoom,
     hasGym,
     hasFireSpace,
     hasGala,
@@ -258,6 +259,7 @@ export default defineEventHandler(async (event) => {
     if (hasTentCamping !== undefined) updatedData.hasTentCamping = hasTentCamping
     if (hasTruckCamping !== undefined) updatedData.hasTruckCamping = hasTruckCamping
     if (hasFamilyCamping !== undefined) updatedData.hasFamilyCamping = hasFamilyCamping
+    if (hasSleepingRoom !== undefined) updatedData.hasSleepingRoom = hasSleepingRoom
     if (hasGym !== undefined) updatedData.hasGym = hasGym
     if (hasFireSpace !== undefined) updatedData.hasFireSpace = hasFireSpace
     if (hasGala !== undefined) updatedData.hasGala = hasGala

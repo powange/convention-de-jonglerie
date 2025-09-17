@@ -269,6 +269,41 @@
 
     <!-- Modal des fonctionnalités -->
     <ConventionsFeaturesModal v-model:model-value="showFeaturesModal" />
+
+    <!-- Modal de confirmation de suppression d'édition -->
+    <UModal v-model:open="deleteEditionModalOpen" title="Confirmer la suppression">
+      <template #body>
+        <div class="space-y-4">
+          <div class="flex items-center gap-3 text-orange-600">
+            <UIcon name="i-heroicons-exclamation-triangle" size="20" />
+            <span class="font-medium">Attention : cette action est irréversible</span>
+          </div>
+
+          <p class="text-gray-600 dark:text-gray-300">
+            Êtes-vous sûr de vouloir supprimer cette édition ? Toutes les données associées
+            (bénévoles, commentaires, objets trouvés, etc.) seront définitivement perdues.
+          </p>
+
+          <div v-if="editionToDelete" class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div class="font-medium">{{ getEditionDisplayName(editionToDelete) }}</div>
+            <div class="text-sm text-gray-500">
+              {{ editionToDelete.city }}, {{ editionToDelete.country }}
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton variant="ghost" @click="cancelDeleteEdition">
+            {{ $t('common.cancel') }}
+          </UButton>
+          <UButton color="error" :loading="deletingEdition" @click="confirmDeleteEdition">
+            {{ $t('common.delete') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -399,6 +434,11 @@ const searchUsers = async (query: string) => {
 
 // Modal fonctionnalités
 const showFeaturesModal = ref(false)
+
+// Modal de suppression d'édition
+const deleteEditionModalOpen = ref(false)
+const editionToDelete = ref<Edition | null>(null)
+const deletingEdition = ref(false)
 
 function openFeaturesModal() {
   console.log('Opening features modal', showFeaturesModal.value)
@@ -747,25 +787,52 @@ const addCollaborator = async () => {
   }
 }
 
-const deleteEdition = async (_id: number) => {
-  if (confirm(t('conventions.confirm_delete_edition'))) {
-    try {
-      // Recharger les conventions après suppression pour mettre à jour les tableaux
-      await fetchMyConventions()
-      toast.add({
-        title: t('messages.edition_deleted'),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-    } catch (e: unknown) {
-      const error = e as HttpError
-      toast.add({
-        title: t('errors.deletion_error'),
-        description: error.message || error.data?.message || t('errors.server_error'),
-        icon: 'i-heroicons-x-circle',
-        color: 'error',
-      })
-    }
+const deleteEdition = async (id: number) => {
+  // Trouver l'édition à supprimer pour l'afficher dans le modal
+  const edition = myConventions.value
+    .flatMap((conv) => conv.editions || [])
+    .find((ed) => ed.id === id)
+
+  if (edition) {
+    editionToDelete.value = edition
+    deleteEditionModalOpen.value = true
+  }
+}
+
+const cancelDeleteEdition = () => {
+  deleteEditionModalOpen.value = false
+  editionToDelete.value = null
+  deletingEdition.value = false
+}
+
+const confirmDeleteEdition = async () => {
+  if (!editionToDelete.value) return
+
+  try {
+    deletingEdition.value = true
+
+    await $fetch(`/api/editions/${editionToDelete.value.id}`, {
+      method: 'DELETE',
+    })
+
+    toast.add({
+      title: t('messages.edition_deleted'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    // Fermer le modal et recharger les conventions
+    cancelDeleteEdition()
+    await fetchMyConventions()
+  } catch (e: unknown) {
+    const error = e as HttpError
+    toast.add({
+      title: t('errors.deletion_error'),
+      description: error.message || error.data?.message || t('errors.server_error'),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+    deletingEdition.value = false
   }
 }
 
@@ -866,6 +933,14 @@ const canDeleteEdition = (convention: Convention, editionId: number) => {
 
 function rightsSummary(collaborator: any) {
   return summarizeRights(collaborator.rights || {})
+}
+
+// Fonction pour obtenir le nom d'affichage d'une édition
+const getEditionDisplayName = (edition: Edition) => {
+  const convention = myConventions.value.find((conv) =>
+    conv.editions?.some((ed) => ed.id === edition.id)
+  )
+  return getEditionDisplayNameWithConvention(edition, convention)
 }
 
 // Toggle edition online status

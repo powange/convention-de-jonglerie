@@ -47,7 +47,7 @@ export async function checkEditionDeletionPermission(
   if (!edition || edition.creatorId !== userId) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Non autorisé à modifier cette édition',
+      message: 'Non autorisé à modifier cette édition',
     })
   }
 
@@ -217,7 +217,7 @@ export async function handleImageDeletion(
     if (!imageUrl) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Aucune image à supprimer',
+        message: 'Aucune image à supprimer',
       })
     }
 
@@ -240,7 +240,7 @@ export async function handleImageDeletion(
     console.error("Erreur lors de la suppression de l'image:", error)
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur serveur lors de la suppression de l'image",
+      message: "Erreur serveur lors de la suppression de l'image",
     })
   }
 }

@@ -28,7 +28,7 @@
         {{ $t('common.error') }}
       </h3>
       <p class="text-gray-600 dark:text-gray-400">
-        {{ error.statusMessage || $t('errors.loading_error') }}
+        {{ error.message || $t('errors.loading_error') }}
       </p>
     </div>
 

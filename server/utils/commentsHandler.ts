@@ -18,7 +18,7 @@ export async function getCommentsForEntity(event: H3Event, config: CommentConfig
     // Récupérer l'ID depuis les params et le parser en nombre
     const rawId = (event.context as any)?.params?.id
     if (!rawId) {
-      throw createError({ statusCode: 400, statusMessage: 'ID manquant' })
+      throw createError({ statusCode: 400, message: 'ID manquant' })
     }
 
     const parsedId = parseInt(rawId)
@@ -27,7 +27,7 @@ export async function getCommentsForEntity(event: H3Event, config: CommentConfig
         config.entityType === 'carpoolOffer'
           ? "ID de l'offre invalide"
           : 'ID de la demande invalide'
-      throw createError({ statusCode: 400, statusMessage: msg })
+      throw createError({ statusCode: 400, message: msg })
     }
 
     // Construire la requête where dynamiquement (avec ID numérique)
@@ -73,7 +73,7 @@ export async function getCommentsForEntity(event: H3Event, config: CommentConfig
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur serveur',
+      message: 'Erreur serveur',
     })
   }
 }
@@ -87,18 +87,18 @@ export async function createCommentForEntity(
     if (config.requireAuth && !event.context.user) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Authentification requise',
+        message: 'Authentification requise',
       })
     }
 
     const rawId = getRouterParam(event, 'id')
     if (!rawId) {
-      throw createError({ statusCode: 400, statusMessage: 'ID manquant' })
+      throw createError({ statusCode: 400, message: 'ID manquant' })
     }
 
     const parsedId = parseInt(rawId)
     if (isNaN(parsedId)) {
-      throw createError({ statusCode: 400, statusMessage: 'ID manquant' })
+      throw createError({ statusCode: 400, message: 'ID manquant' })
     }
 
     const body = await readBody(event)
@@ -106,7 +106,7 @@ export async function createCommentForEntity(
     if (!body.content || !body.content.trim()) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Le contenu du commentaire est requis',
+        message: 'Le contenu du commentaire est requis',
       })
     }
 
@@ -162,7 +162,7 @@ export async function createCommentForEntity(
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la création du commentaire',
+      message: 'Erreur lors de la création du commentaire',
     })
   }
 }
@@ -176,18 +176,18 @@ export async function deleteCommentForEntity(
     if (config.requireAuth && !event.context.user) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Authentification requise',
+        message: 'Authentification requise',
       })
     }
 
     const commentIdRaw = getRouterParam(event, 'commentId')
     if (!commentIdRaw) {
-      throw createError({ statusCode: 400, statusMessage: 'ID du commentaire manquant' })
+      throw createError({ statusCode: 400, message: 'ID du commentaire manquant' })
     }
 
     const commentId = parseInt(commentIdRaw)
     if (isNaN(commentId)) {
-      throw createError({ statusCode: 400, statusMessage: 'ID du commentaire manquant' })
+      throw createError({ statusCode: 400, message: 'ID du commentaire manquant' })
     }
 
     // Vérifier que le commentaire existe et appartient à l'utilisateur
@@ -199,14 +199,14 @@ export async function deleteCommentForEntity(
     if (!comment) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Commentaire non trouvé',
+        message: 'Commentaire non trouvé',
       })
     }
 
     if (comment.userId !== event.context.user?.id) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Vous ne pouvez supprimer que vos propres commentaires',
+        message: 'Vous ne pouvez supprimer que vos propres commentaires',
       })
     }
 
@@ -226,7 +226,7 @@ export async function deleteCommentForEntity(
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors de la suppression du commentaire',
+      message: 'Erreur lors de la suppression du commentaire',
     })
   }
 }

@@ -238,12 +238,12 @@ const handleVerification = async () => {
     hasError.value = true
 
     if (error.statusCode === 400) {
-      if (error.statusMessage?.includes('expired') || error.statusMessage?.includes('expiré')) {
+      if (error.message?.includes('expired') || error.message?.includes('expiré')) {
         errorMessage.value = t('auth.code_expired')
-      } else if (error.statusMessage?.includes('incorrect')) {
+      } else if (error.message?.includes('incorrect')) {
         errorMessage.value = t('auth.code_incorrect')
       } else {
-        errorMessage.value = error.statusMessage || t('auth.invalid_code')
+        errorMessage.value = error.message || t('auth.invalid_code')
       }
     } else {
       errorMessage.value = t('errors.server_error')

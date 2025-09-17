@@ -47,7 +47,7 @@ export async function checkUserConventionPermission(
   if (!convention) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Convention introuvable',
+      message: 'Convention introuvable',
     })
   }
 
@@ -200,7 +200,7 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
   if (!canManage) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Seuls les administrateurs peuvent ajouter des collaborateurs',
+      message: 'Seuls les administrateurs peuvent ajouter des collaborateurs',
     })
   }
 
@@ -213,7 +213,7 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
   if (!userToAdd) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Utilisateur introuvable',
+      message: 'Utilisateur introuvable',
     })
   }
 
@@ -321,7 +321,7 @@ export async function deleteConventionCollaborator(
   if (!canManage) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Seuls les administrateurs peuvent retirer des collaborateurs',
+      message: 'Seuls les administrateurs peuvent retirer des collaborateurs',
     })
   }
 
@@ -338,7 +338,7 @@ export async function deleteConventionCollaborator(
   if (!collaborator || collaborator.conventionId !== conventionId) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Collaborateur introuvable',
+      message: 'Collaborateur introuvable',
     })
   }
 
@@ -346,7 +346,7 @@ export async function deleteConventionCollaborator(
   if (collaborator.userId === userId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Vous ne pouvez pas vous retirer vous-même des collaborateurs',
+      message: 'Vous ne pouvez pas vous retirer vous-même des collaborateurs',
     })
   }
 
@@ -442,12 +442,12 @@ export async function updateCollaboratorRights(params: {
 }) {
   const { conventionId, collaboratorId, userId, rights, title, perEdition } = params
   const canManage = await canManageCollaborators(conventionId, userId)
-  if (!canManage) throw createError({ statusCode: 403, statusMessage: 'Droits insuffisants' })
+  if (!canManage) throw createError({ statusCode: 403, message: 'Droits insuffisants' })
   const collaborator = await prisma.conventionCollaborator.findUnique({
     where: { id: collaboratorId },
   })
   if (!collaborator || collaborator.conventionId !== conventionId)
-    throw createError({ statusCode: 404, statusMessage: 'Collaborateur introuvable' })
+    throw createError({ statusCode: 404, message: 'Collaborateur introuvable' })
   return prisma.$transaction(async (tx) => {
     await tx.conventionCollaborator.update({
       where: { id: collaboratorId },
