@@ -191,6 +191,48 @@
               {{ convention.description }}
             </p>
           </div>
+
+          <!-- Liste des collaborateurs -->
+          <div v-if="convention.collaborators.length > 0" class="mt-4">
+            <h5 class="text-sm font-medium text-gray-900 dark:text-white mb-2">
+              {{ $t('admin.collaborators') }} ({{ convention.collaborators.length }})
+            </h5>
+            <div class="flex flex-wrap gap-2">
+              <div
+                v-for="collaborator in convention.collaborators"
+                :key="collaborator.id"
+                class="flex items-center gap-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2"
+              >
+                <UiUserAvatar :user="collaborator.user" size="xs" />
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {{ formatAuthorName(collaborator.user) }}
+                  </div>
+                  <div class="flex items-center gap-1 text-xs text-gray-500">
+                    <UBadge v-if="collaborator.canEdit" color="blue" variant="soft" size="xs">
+                      {{ $t('admin.can_edit') }}
+                    </UBadge>
+                    <UBadge
+                      v-if="collaborator.canManageVolunteers"
+                      color="green"
+                      variant="soft"
+                      size="xs"
+                    >
+                      {{ $t('admin.can_manage_volunteers') }}
+                    </UBadge>
+                    <UBadge
+                      v-if="collaborator.canManageEditions"
+                      color="purple"
+                      variant="soft"
+                      size="xs"
+                    >
+                      {{ $t('admin.can_manage_editions') }}
+                    </UBadge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Éditions de la convention -->

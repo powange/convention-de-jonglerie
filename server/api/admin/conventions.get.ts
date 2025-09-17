@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     // Vérifier l'authentification et les droits admin (mutualisé)
     await requireGlobalAdminWithDbCheck(event)
 
-    // Récupérer toutes les conventions avec leurs éditions
+    // Récupérer toutes les conventions avec leurs éditions et collaborateurs
     const conventions = await prisma.convention.findMany({
       include: {
         author: {
@@ -16,6 +16,19 @@ export default defineEventHandler(async (event) => {
             email: true,
             nom: true,
             prenom: true,
+          },
+        },
+        collaborators: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                email: true,
+                nom: true,
+                prenom: true,
+              },
+            },
           },
         },
         editions: {
