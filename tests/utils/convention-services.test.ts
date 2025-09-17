@@ -13,7 +13,7 @@ import {
 describe('convention-services utils', () => {
   describe('conventionServices array', () => {
     it('devrait contenir tous les services définis', () => {
-      expect(conventionServices).toHaveLength(23)
+      expect(conventionServices).toHaveLength(24)
     })
 
     it('chaque service devrait avoir la structure correcte', () => {
@@ -311,7 +311,7 @@ describe('convention-services utils', () => {
 
       const accommodationCategory = servicesByCategory.find((c) => c.category === 'accommodation')
       expect(accommodationCategory!.label).toBe('Hébergement')
-      expect(accommodationCategory!.services).toHaveLength(3)
+      expect(accommodationCategory!.services).toHaveLength(4)
 
       const tentCampingService = accommodationCategory!.services.find(
         (s) => s.key === 'hasTentCamping'
