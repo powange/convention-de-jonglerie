@@ -644,9 +644,9 @@ const formatDate = (dateStr: string) => {
   const date = new Date(dateStr)
   return new Intl.DateTimeFormat('fr-FR', {
     weekday: 'long',
-    year: 'numeric',
-    month: 'long',
     day: 'numeric',
+    month: 'long',
+    year: 'numeric',
   }).format(date)
 }
 

@@ -177,6 +177,14 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       right: 'resourceTimelineDay,resourceTimelineWeek',
     },
 
+    // Format du titre principal pour afficher le nom du jour
+    titleFormat: {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    },
+
     // Textes des boutons
     buttonText: {
       today: t('calendar.today'),
@@ -184,6 +192,39 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       week: t('common.week'),
       resourceTimelineDay: t('editions.volunteers.day_view'),
       resourceTimelineWeek: t('editions.volunteers.week_view'),
+    },
+
+    // Format des en-têtes de jour avec nom du jour
+    dayHeaderContent: (arg) => {
+      const date = arg.date
+      const formatter = new Intl.DateTimeFormat('fr-FR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+      })
+      return formatter.format(date)
+    },
+
+    // Configuration spécifique des vues
+    views: {
+      resourceTimelineDay: {
+        slotLabelFormat: {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        },
+      },
+      resourceTimelineWeek: {
+        dayHeaderContent: (arg) => {
+          const date = arg.date
+          const formatter = new Intl.DateTimeFormat('fr-FR', {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+          })
+          return formatter.format(date)
+        },
+      },
     },
 
     // Rendu HTML personnalisé pour les événements
