@@ -1,7 +1,7 @@
 # Dockerfile pour l'environnement de test
 # Image de base paramétrable pour contourner d'éventuels soucis de registry / credentials.
 # Utilisation: docker build --build-arg BASE_NODE_IMAGE=node:22 -f Dockerfile.test .
-ARG BASE_NODE_IMAGE=node:22-alpine
+ARG BASE_NODE_IMAGE=node:22-slim
 FROM ${BASE_NODE_IMAGE}
 
 # Installer les dépendances système nécessaires

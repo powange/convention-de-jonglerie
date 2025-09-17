@@ -56,7 +56,7 @@ Si erreur JWT :
 
 ## Image Node paramétrable
 
-Tous les Dockerfile / docker-compose acceptent un argument ou variable `BASE_NODE_IMAGE` (par défaut `node:22-alpine`).
+Tous les Dockerfile / docker-compose acceptent un argument ou variable `BASE_NODE_IMAGE` (par défaut `node:22-slim`).
 
 Changer d'image sans modifier les fichiers :
 
