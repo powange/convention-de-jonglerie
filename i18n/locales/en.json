@@ -945,6 +945,7 @@
       "save_teams": "Save teams",
       "schedule_info": "Schedule planning",
       "schedule_management": "Manage schedule",
+      "scheduling_conflicts": "Scheduling conflicts detected",
       "search": "Search",
       "search_placeholder": "Username, email, comments...",
       "select_arrival_placeholder": "Select your arrival",

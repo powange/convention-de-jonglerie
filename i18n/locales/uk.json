@@ -945,6 +945,7 @@
       "save_teams": "Save teams",
       "schedule_info": "Планування розкладу",
       "schedule_management": "Керувати розкладом",
+      "scheduling_conflicts": "Виявлено конфлікти планування",
       "search": "Пошук",
       "search_placeholder": "Ім'я користувача, email, мотивація...",
       "select_arrival_placeholder": "Оберіть час прибуття",

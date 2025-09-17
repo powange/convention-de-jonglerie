@@ -95,6 +95,53 @@
         </div>
       </UCard>
 
+      <!-- Alerte pour les chevauchements de créneaux -->
+      <UAlert
+        v-if="overlapWarnings.length > 0"
+        color="warning"
+        variant="soft"
+        icon="i-heroicons-exclamation-triangle"
+        class="mt-6"
+      >
+        <template #title>
+          {{ t('editions.volunteers.scheduling_conflicts') || 'Conflits de planning détectés' }}
+        </template>
+        <template #description>
+          <div class="space-y-2">
+            <p class="text-sm">
+              {{ overlapWarnings.length }} bénévole(s) ont des créneaux qui se chevauchent :
+            </p>
+            <div class="space-y-1">
+              <div
+                v-for="warning in overlapWarnings"
+                :key="`${warning.volunteerId}-${warning.slot1.id}-${warning.slot2.id}`"
+                class="text-sm bg-amber-50 dark:bg-amber-900/20 p-2 rounded border-l-2 border-amber-400"
+              >
+                <div class="flex items-center gap-2 font-medium text-amber-800 dark:text-amber-200">
+                  <UiUserAvatar :user="warning.volunteer" size="xs" />
+                  {{ warning.volunteer.pseudo }}
+                </div>
+                <div class="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                  <strong>{{ warning.slot1.title }}</strong>
+                  <span v-if="warning.slot1.teamName" class="text-amber-600 dark:text-amber-400">
+                    - {{ warning.slot1.teamName }}</span
+                  >
+                  <br />
+                  ({{ formatDateTimeRange(warning.slot1.start, warning.slot1.end) }})
+                  <br />
+                  <strong>{{ warning.slot2.title }}</strong>
+                  <span v-if="warning.slot2.teamName" class="text-amber-600 dark:text-amber-400">
+                    - {{ warning.slot2.teamName }}</span
+                  >
+                  <br />
+                  ({{ formatDateTimeRange(warning.slot2.start, warning.slot2.end) }})
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </UAlert>
+
       <!-- Résumé des bénévoles par jour -->
       <UCard v-if="volunteersStats.totalVolunteers > 0" variant="soft" class="mt-6">
         <template #header>
@@ -481,6 +528,134 @@ const formatDate = (dateStr: string) => {
     day: 'numeric',
   }).format(date)
 }
+
+// Fonction utilitaire pour formater une plage horaire avec le jour
+const formatDateTimeRange = (start: string, end: string) => {
+  // Parse les dates en tant que dates locales (sans conversion de timezone)
+  const startTime = new Date(start.includes('T') ? start : start + 'T00:00:00')
+  const endTime = new Date(end.includes('T') ? end : end + 'T00:00:00')
+
+  // Extraire les composants directement pour éviter les conversions de timezone
+  const startYear = startTime.getFullYear()
+  const startMonth = startTime.getMonth()
+  const startDate = startTime.getDate()
+  const startHours = startTime.getHours()
+  const startMinutes = startTime.getMinutes()
+
+  const endYear = endTime.getFullYear()
+  const endMonth = endTime.getMonth()
+  const endDate = endTime.getDate()
+  const endHours = endTime.getHours()
+  const endMinutes = endTime.getMinutes()
+
+  // Créer une date locale pour le formatage du jour
+  const startDateLocal = new Date(startYear, startMonth, startDate)
+  const endDateLocal = new Date(endYear, endMonth, endDate)
+
+  // Format pour le jour
+  const dayFormat = new Intl.DateTimeFormat('fr-FR', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  })
+
+  // Formater les heures manuellement
+  const formatTime = (hours: number, minutes: number) => {
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+  }
+
+  const startDay = dayFormat.format(startDateLocal)
+  const startTimeStr = formatTime(startHours, startMinutes)
+  const endTimeStr = formatTime(endHours, endMinutes)
+
+  // Si c'est le même jour, on affiche le jour une seule fois
+  if (startDateLocal.toDateString() === endDateLocal.toDateString()) {
+    return `${startDay} ${startTimeStr} - ${endTimeStr}`
+  } else {
+    // Si les créneaux sont sur des jours différents
+    const endDay = dayFormat.format(endDateLocal)
+    return `${startDay} ${startTimeStr} - ${endDay} ${endTimeStr}`
+  }
+}
+
+// Détection des chevauchements de créneaux
+const overlapWarnings = computed(() => {
+  const warnings: Array<{
+    volunteerId: number
+    volunteer: any
+    slot1: any
+    slot2: any
+  }> = []
+
+  // Regrouper tous les créneaux par bénévole
+  const volunteerSlots = new Map<number, Array<{ slot: any; assignment: any }>>()
+
+  convertedTimeSlots.value.forEach((slot) => {
+    // Vérifications basiques seulement
+    if (!slot || !slot.id) return
+    if (!slot.assignedVolunteersList || slot.assignedVolunteersList.length === 0) return
+
+    slot.assignedVolunteersList.forEach((assignment) => {
+      if (!assignment || !assignment.user || !assignment.user.id) return
+
+      const userId = assignment.user.id
+      if (!volunteerSlots.has(userId)) {
+        volunteerSlots.set(userId, [])
+      }
+      volunteerSlots.get(userId)!.push({ slot, assignment })
+    })
+  })
+
+  // Vérifier les chevauchements pour chaque bénévole
+  volunteerSlots.forEach((slots, volunteerId) => {
+    if (slots.length < 2) return // Pas de chevauchement possible avec moins de 2 créneaux
+
+    // Comparer tous les couples de créneaux
+    for (let i = 0; i < slots.length; i++) {
+      for (let j = i + 1; j < slots.length; j++) {
+        const slot1 = slots[i].slot
+        const slot2 = slots[j].slot
+
+        // Vérifications minimales
+        if (!slot1 || !slot2 || slot1.id === slot2.id) continue
+
+        // Vérifier si les créneaux se chevauchent
+        const start1 = new Date(slot1.start)
+        const end1 = new Date(slot1.end)
+        const start2 = new Date(slot2.start)
+        const end2 = new Date(slot2.end)
+
+        // Condition de chevauchement : start1 < end2 && start2 < end1
+        if (start1 < end2 && start2 < end1) {
+          // Trouver les noms des équipes
+          const team1 = convertedTeams.value.find((t) => t.id === slot1.teamId)
+          const team2 = convertedTeams.value.find((t) => t.id === slot2.teamId)
+
+          warnings.push({
+            volunteerId,
+            volunteer: slots[i].assignment.user,
+            slot1: {
+              id: slot1.id,
+              title: slot1.title || 'Sans titre',
+              start: slot1.start,
+              end: slot1.end,
+              teamName: team1?.name || null,
+            },
+            slot2: {
+              id: slot2.id,
+              title: slot2.title || 'Sans titre',
+              start: slot2.start,
+              end: slot2.end,
+              teamName: team2?.name || null,
+            },
+          })
+        }
+      }
+    }
+  })
+
+  return warnings
+})
 
 // Calcul des statistiques des bénévoles
 const volunteersStats = computed(() => {

@@ -945,6 +945,7 @@
       "save_teams": "Save teams",
       "schedule_info": "Zeitplanung",
       "schedule_management": "Zeitplan verwalten",
+      "scheduling_conflicts": "Planungskonflikte erkannt",
       "search": "Suchen",
       "search_placeholder": "Benutzername, E-Mail, Motivation...",
       "select_arrival_placeholder": "Ankunft auswählen",

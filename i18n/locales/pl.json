@@ -945,6 +945,7 @@
       "save_teams": "Save teams",
       "schedule_info": "Planowanie harmonogramu",
       "schedule_management": "Zarządzaj harmonogramem",
+      "scheduling_conflicts": "Wykryto konflikty w harmonogramie",
       "search": "Szukaj",
       "search_placeholder": "Nazwa użytkownika, e-mail, motywacja...",
       "select_arrival_placeholder": "Wybierz swój przyjazd",

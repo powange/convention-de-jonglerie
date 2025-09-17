@@ -945,6 +945,7 @@
       "save_teams": "Save teams",
       "schedule_info": "Планирование расписания",
       "schedule_management": "Управлять расписанием",
+      "scheduling_conflicts": "Обнаружены конфликты планирования",
       "search": "Поиск",
       "search_placeholder": "Имя пользователя, email, мотивация...",
       "select_arrival_placeholder": "Выберите время прибытия",

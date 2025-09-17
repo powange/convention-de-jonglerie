@@ -1063,6 +1063,7 @@
       "application_management": "Gestion des candidatures",
       "teams": "Les équipes",
       "planning": "Planning",
+      "scheduling_conflicts": "Conflits de planning détectés",
       "volunteer_notifications": "Notifications bénévoles",
       "external_link": "Lien externe",
       "restricted_access": "Accès restreint",
