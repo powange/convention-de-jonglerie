@@ -401,6 +401,16 @@
       "seats_min": "Mindst 1 plads"
     }
   },
+  "collaborators": {
+    "collaborator_added": "Samarbejdspartner tilføjet",
+    "collaborator_removed": "Samarbejdspartner fjernet",
+    "collaborator_updated": "Samarbejdspartner opdateret",
+    "confirm_remove": "Er du sikker på, at du vil fjerne denne samarbejdspartner?",
+    "edit_collaborator": "Rediger samarbejdspartner",
+    "no_collaborators": "Ingen samarbejdspartnere",
+    "rights": "Rettigheder",
+    "title": "Samarbejdspartnere"
+  },
   "common": {
     "actions": "Handlinger",
     "active": "Aktiv",
@@ -670,6 +680,8 @@
     "no_description": "Ingen beskrivelse",
     "no_description_available": "Ingen beskrivelse tilgængelig",
     "no_editions": "Ingen udgaver for denne konvention",
+    "search_user_placeholder": "Søg efter en bruger...",
+    "select_user": "Vælg en bruger",
     "status_control": "Synlighedskontrol",
     "status_control_desc": "Publicer eller afpublicér dine udgaver efter deres fremskridtstilstand"
   },
@@ -1059,6 +1071,7 @@
   },
   "errors": {
     "access_denied": "Adgang nægtet",
+    "add_collaborator_error": "Fejl ved tilføjelse af samarbejdspartner",
     "address_required": "Adresse påkrævet",
     "address_too_long": "Adressen må ikke overstige {max} tegn",
     "attendance_update_failed": "Kunne ikke opdatere deltagerstatus",
@@ -1117,11 +1130,13 @@
     "people_maximum": "Maksimum {max} personer",
     "publish_edition_failed": "Kunne ikke publicere udgave",
     "registration_failed": "Registrering mislykkedes",
+    "remove_collaborator_error": "Fejl ved fjernelse af samarbejdspartner",
     "required_field": "Dette felt er påkrævet",
     "seats_maximum": "Maksimum {max} pladser",
     "seats_minimum_one": "Antallet af pladser skal være mindst 1",
     "server_error": "Serverfejl",
     "status_update_failed": "Kunne ikke opdatere status",
+    "update_collaborator_error": "Fejl ved opdatering af samarbejdspartner",
     "update_error": "Fejl under opdatering",
     "username_min_3_chars": "Brugernavnet skal have mindst 3 tegn"
   },

@@ -70,13 +70,13 @@
                 :key="ed.id"
                 class="border-b last:border-b-0 border-gray-100 dark:border-gray-700 bg-white/60 dark:bg-gray-900/40 hover:bg-gray-50 dark:hover:bg-gray-800/40"
               >
-                <td
-                  class="px-2 py-1 align-middle truncate max-w-[160px]"
-                  :title="getEditionDisplayNameWithFallback(ed)"
-                >
-                  {{ getEditionDisplayNameWithFallback(ed) }}
+                <td class="px-2 py-1 align-top max-w-[160px] break-words">
+                  <div>{{ getEditionDisplayNameWithFallback(ed) }}</div>
+                  <div class="text-xs text-gray-500 mt-1">
+                    {{ formatDateRange(ed.startDate, ed.endDate) }}
+                  </div>
                 </td>
-                <td class="px-2 py-1 align-middle">
+                <td class="px-2 py-1 align-top">
                   <div class="flex justify-center">
                     <USwitch
                       :aria-label="$t('common.edit')"
@@ -88,7 +88,7 @@
                     />
                   </div>
                 </td>
-                <td class="px-2 py-1 align-middle">
+                <td class="px-2 py-1 align-top">
                   <div class="flex justify-center">
                     <USwitch
                       :aria-label="$t('common.delete')"
@@ -99,7 +99,7 @@
                     />
                   </div>
                 </td>
-                <td class="px-2 py-1 align-middle">
+                <td class="px-2 py-1 align-top">
                   <div class="flex justify-center">
                     <USwitch
                       :aria-label="$t('common.volunteers_short')"
@@ -131,6 +131,8 @@
 interface EditionLite {
   id: number
   name: string | null
+  startDate: string | Date
+  endDate: string | Date
   convention?: { name: string }
 }
 interface PerEditionRight {
@@ -218,6 +220,36 @@ function getEditionDisplayNameWithFallback(edition: EditionLite): string {
   if (props.conventionName) return props.conventionName
   if (edition.convention?.name) return edition.convention.name
   return `#${edition.id}`
+}
+
+// Helper pour formater la plage de dates
+function formatDateRange(startDate: string | Date, endDate: string | Date): string {
+  try {
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return ''
+    }
+
+    const formatOptions: Intl.DateTimeFormatOptions = {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }
+
+    const startFormatted = start.toLocaleDateString('fr-FR', formatOptions)
+    const endFormatted = end.toLocaleDateString('fr-FR', formatOptions)
+
+    // Si même jour, afficher seulement une date
+    if (start.toDateString() === end.toDateString()) {
+      return startFormatted
+    }
+
+    return `${startFormatted} - ${endFormatted}`
+  } catch {
+    return ''
+  }
 }
 
 function updateRight(key: string, value: any) {

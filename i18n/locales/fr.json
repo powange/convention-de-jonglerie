@@ -323,8 +323,20 @@
     "verifying": "Vérification..."
   },
   "c": {},
+  "collaborators": {
+    "title": "Collaborateurs",
+    "no_collaborators": "Aucun collaborateur",
+    "rights": "Droits",
+    "edit_collaborator": "Modifier le collaborateur",
+    "collaborator_added": "Collaborateur ajouté",
+    "collaborator_updated": "Collaborateur mis à jour",
+    "collaborator_removed": "Collaborateur supprimé",
+    "confirm_remove": "Êtes-vous sûr de vouloir supprimer ce collaborateur ?"
+  },
   "conventions": {
     "add_collaborator": "Ajouter un collaborateur",
+    "select_user": "Sélectionner un utilisateur",
+    "search_user_placeholder": "Rechercher un utilisateur...",
     "add_edition": "Ajouter une édition",
     "analytics_access": "Accès aux analyses",
     "analytics_access_desc": "Suivez les performances et l'engagement de vos éditions",
@@ -1060,6 +1072,7 @@
   },
   "errors": {
     "access_denied": "Accès non autorisé",
+    "add_collaborator_error": "Erreur lors de l'ajout du collaborateur",
     "address_required": "L'adresse est requise",
     "address_too_long": "L'adresse ne peut pas dépasser {max} caractères",
     "authentication_error": "Erreur d'authentification",
@@ -1123,6 +1136,8 @@
     "server_error": "Erreur serveur",
     "status_update_failed": "Échec de la mise à jour du statut",
     "update_error": "Erreur lors de la mise à jour",
+    "update_collaborator_error": "Erreur lors de la mise à jour du collaborateur",
+    "remove_collaborator_error": "Erreur lors de la suppression du collaborateur",
     "error_occurred": "Une erreur est survenue",
     "username_min_3_chars": "Le pseudo doit contenir au moins 3 caractères"
   },

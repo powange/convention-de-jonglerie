@@ -401,6 +401,16 @@
       "seats_min": "At least 1 seat"
     }
   },
+  "collaborators": {
+    "collaborator_added": "Collaborator added",
+    "collaborator_removed": "Collaborator removed",
+    "collaborator_updated": "Collaborator updated",
+    "confirm_remove": "Are you sure you want to remove this collaborator?",
+    "edit_collaborator": "Edit collaborator",
+    "no_collaborators": "No collaborators",
+    "rights": "Rights",
+    "title": "Collaborators"
+  },
   "common": {
     "actions": "Actions",
     "active": "Active",
@@ -670,6 +680,8 @@
     "no_description": "No description",
     "no_description_available": "No description available",
     "no_editions": "No editions for this convention",
+    "search_user_placeholder": "Search for a user...",
+    "select_user": "Select a user",
     "status_control": "Visibility control",
     "status_control_desc": "Publish or unpublish your editions according to their progress"
   },
@@ -1059,6 +1071,7 @@
   },
   "errors": {
     "access_denied": "Access denied",
+    "add_collaborator_error": "Error adding collaborator",
     "address_required": "Address is required",
     "address_too_long": "Address cannot exceed {max} characters",
     "attendance_update_failed": "Failed to update attendance status",
@@ -1117,11 +1130,13 @@
     "people_maximum": "Maximum {max} people",
     "publish_edition_failed": "Failed to publish edition",
     "registration_failed": "Registration failed",
+    "remove_collaborator_error": "Error removing collaborator",
     "required_field": "This field is required",
     "seats_maximum": "Maximum {max} seats",
     "seats_minimum_one": "Number of seats must be at least 1",
     "server_error": "Server error",
     "status_update_failed": "Failed to update status",
+    "update_collaborator_error": "Error updating collaborator",
     "update_error": "Update error",
     "username_min_3_chars": "Username must contain at least 3 characters"
   },

@@ -401,6 +401,16 @@
       "seats_min": "Pelo menos 1 lugar"
     }
   },
+  "collaborators": {
+    "collaborator_added": "Colaborador adicionado",
+    "collaborator_removed": "Colaborador removido",
+    "collaborator_updated": "Colaborador atualizado",
+    "confirm_remove": "Tem certeza de que deseja remover este colaborador?",
+    "edit_collaborator": "Editar colaborador",
+    "no_collaborators": "Nenhum colaborador",
+    "rights": "Direitos",
+    "title": "Colaboradores"
+  },
   "common": {
     "actions": "Acções",
     "active": "Ativo",
@@ -670,6 +680,8 @@
     "no_description": "Nenhuma descrição",
     "no_description_available": "Sem descrição disponível",
     "no_editions": "Nenhuma edição para esta convenção",
+    "search_user_placeholder": "Procurar um usuário...",
+    "select_user": "Selecionar um usuário",
     "status_control": "Controlo de visibilidade",
     "status_control_desc": "Publique ou despublique as suas edições conforme o estado de progresso"
   },
@@ -1059,6 +1071,7 @@
   },
   "errors": {
     "access_denied": "Acesso negado",
+    "add_collaborator_error": "Erro ao adicionar colaborador",
     "address_required": "Morada obrigatória",
     "address_too_long": "A morada não pode exceder {max} caracteres",
     "attendance_update_failed": "Falha ao atualizar o status de participação",
@@ -1117,11 +1130,13 @@
     "people_maximum": "Máximo {max} pessoas",
     "publish_edition_failed": "Falha ao publicar edição",
     "registration_failed": "Falha no registo",
+    "remove_collaborator_error": "Erro ao remover colaborador",
     "required_field": "Este campo é obrigatório",
     "seats_maximum": "Máximo {max} lugares",
     "seats_minimum_one": "O número de lugares deve ser pelo menos 1",
     "server_error": "Erro do servidor",
     "status_update_failed": "Falha ao atualizar status",
+    "update_collaborator_error": "Erro ao atualizar colaborador",
     "update_error": "Erro na actualização",
     "username_min_3_chars": "O nome de utilizador deve ter pelo menos 3 caracteres"
   },

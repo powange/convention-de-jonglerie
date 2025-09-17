@@ -401,6 +401,16 @@
       "seats_min": "Al menos 1 plaza"
     }
   },
+  "collaborators": {
+    "collaborator_added": "Colaborador añadido",
+    "collaborator_removed": "Colaborador eliminado",
+    "collaborator_updated": "Colaborador actualizado",
+    "confirm_remove": "¿Estás seguro de que quieres eliminar este colaborador?",
+    "edit_collaborator": "Editar colaborador",
+    "no_collaborators": "Sin colaboradores",
+    "rights": "Derechos",
+    "title": "Colaboradores"
+  },
   "common": {
     "actions": "Acciones",
     "active": "Activo",
@@ -670,6 +680,8 @@
     "no_description": "Sin descripción",
     "no_description_available": "No hay descripción disponible",
     "no_editions": "Sin ediciones para esta convención",
+    "search_user_placeholder": "Buscar un usuario...",
+    "select_user": "Seleccionar un usuario",
     "status_control": "Control de visibilidad",
     "status_control_desc": "Publica o despublica tus ediciones según su progreso"
   },
@@ -1059,6 +1071,7 @@
   },
   "errors": {
     "access_denied": "Acceso denegado",
+    "add_collaborator_error": "Error al añadir colaborador",
     "address_required": "La dirección es requerida",
     "address_too_long": "La dirección no puede exceder {max} caracteres",
     "attendance_update_failed": "Error al actualizar el estado de asistencia",
@@ -1117,11 +1130,13 @@
     "people_maximum": "Máximo {max} personas",
     "publish_edition_failed": "Error al publicar la edición",
     "registration_failed": "Error en el registro",
+    "remove_collaborator_error": "Error al eliminar colaborador",
     "required_field": "Este campo es requerido",
     "seats_maximum": "Máximo {max} asientos",
     "seats_minimum_one": "El número de asientos debe ser al menos 1",
     "server_error": "Error del servidor",
     "status_update_failed": "Error al actualizar el estado",
+    "update_collaborator_error": "Error al actualizar colaborador",
     "update_error": "Error durante la actualización",
     "username_min_3_chars": "El usuario debe contener al menos 3 caracteres"
   },

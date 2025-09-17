@@ -401,6 +401,16 @@
       "seats_min": "Almeno 1 posto"
     }
   },
+  "collaborators": {
+    "collaborator_added": "Collaboratore aggiunto",
+    "collaborator_removed": "Collaboratore rimosso",
+    "collaborator_updated": "Collaboratore aggiornato",
+    "confirm_remove": "Sei sicuro di voler rimuovere questo collaboratore?",
+    "edit_collaborator": "Modifica collaboratore",
+    "no_collaborators": "Nessun collaboratore",
+    "rights": "Diritti",
+    "title": "Collaboratori"
+  },
   "common": {
     "actions": "Azioni",
     "active": "Attivo",
@@ -670,6 +680,8 @@
     "no_description": "Nessuna descrizione",
     "no_description_available": "Nessuna descrizione disponibile",
     "no_editions": "Nessuna edizione per questo convegno",
+    "search_user_placeholder": "Cerca un utente...",
+    "select_user": "Seleziona un utente",
     "status_control": "Controllo della visibilità",
     "status_control_desc": "Pubblica o nascondi le tue edizioni secondo il loro progresso"
   },
@@ -1059,6 +1071,7 @@
   },
   "errors": {
     "access_denied": "Accesso non autorizzato",
+    "add_collaborator_error": "Errore nell'aggiungere collaboratore",
     "address_required": "L'indirizzo è richiesto",
     "address_too_long": "L'indirizzo non può superare {max} caratteri",
     "attendance_update_failed": "Errore nell'aggiornamento dello stato di partecipazione",
@@ -1117,11 +1130,13 @@
     "people_maximum": "Massimo {max} persone",
     "publish_edition_failed": "Impossibile pubblicare l'edizione",
     "registration_failed": "Registrazione fallita",
+    "remove_collaborator_error": "Errore nella rimozione del collaboratore",
     "required_field": "Questo campo è richiesto",
     "seats_maximum": "Massimo {max} posti",
     "seats_minimum_one": "Il numero di posti deve essere almeno 1",
     "server_error": "Errore server",
     "status_update_failed": "Impossibile aggiornare lo stato",
+    "update_collaborator_error": "Errore nell'aggiornamento del collaboratore",
     "update_error": "Errore durante l'aggiornamento",
     "username_min_3_chars": "Il nome utente deve contenere almeno 3 caratteri"
   },

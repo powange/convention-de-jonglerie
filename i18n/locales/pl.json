@@ -401,6 +401,16 @@
       "seats_min": "Co najmniej 1 miejsce"
     }
   },
+  "collaborators": {
+    "collaborator_added": "Współpracownik dodany",
+    "collaborator_removed": "Współpracownik usunięty",
+    "collaborator_updated": "Współpracownik zaktualizowany",
+    "confirm_remove": "Czy na pewno chcesz usunąć tego współpracownika?",
+    "edit_collaborator": "Edytuj współpracownika",
+    "no_collaborators": "Brak współpracowników",
+    "rights": "Prawa",
+    "title": "Współpracownicy"
+  },
   "common": {
     "actions": "Akcje",
     "active": "Aktywny",
@@ -670,6 +680,8 @@
     "no_description": "Brak opisu",
     "no_description_available": "Brak opisu",
     "no_editions": "Brak edycji dla tej konwencji",
+    "search_user_placeholder": "Wyszukaj użytkownika...",
+    "select_user": "Wybierz użytkownika",
     "status_control": "Kontrola widoczności",
     "status_control_desc": "Publikuj lub cofaj publikację swoich edycji zgodnie z ich stanem przygotowania"
   },
@@ -1059,6 +1071,7 @@
   },
   "errors": {
     "access_denied": "Dostęp odrzucony",
+    "add_collaborator_error": "Błąd dodawania współpracownika",
     "address_required": "Adres jest wymagany",
     "address_too_long": "Adres nie może przekroczyć {max} znaków",
     "attendance_update_failed": "Nie udało się zaktualizować statusu uczestnictwa",
@@ -1117,11 +1130,13 @@
     "people_maximum": "Maksimum {max} osób",
     "publish_edition_failed": "Nie udało się opublikować edycji",
     "registration_failed": "Rejestracja nie powiodła się",
+    "remove_collaborator_error": "Błąd usuwania współpracownika",
     "required_field": "To pole jest wymagane",
     "seats_maximum": "Maksimum {max} miejsc",
     "seats_minimum_one": "Liczba miejsc musi wynosić co najmniej 1",
     "server_error": "Błąd serwera",
     "status_update_failed": "Nie udało się zaktualizować statusu",
+    "update_collaborator_error": "Błąd aktualizacji współpracownika",
     "update_error": "Błąd podczas aktualizacji",
     "username_min_3_chars": "Nazwa użytkownika musi mieć co najmniej 3 znaki"
   },

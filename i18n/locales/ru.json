@@ -401,6 +401,16 @@
       "seats_min": "Как минимум 1 место"
     }
   },
+  "collaborators": {
+    "collaborator_added": "Сотрудник добавлен",
+    "collaborator_removed": "Сотрудник удален",
+    "collaborator_updated": "Сотрудник обновлен",
+    "confirm_remove": "Вы уверены, что хотите удалить этого сотрудника?",
+    "edit_collaborator": "Редактировать сотрудника",
+    "no_collaborators": "Нет сотрудников",
+    "rights": "Права",
+    "title": "Сотрудники"
+  },
   "common": {
     "actions": "Действия",
     "active": "Активный",
@@ -670,6 +680,8 @@
     "no_description": "Нет описания",
     "no_description_available": "Описание отсутствует",
     "no_editions": "Нет изданий для этой конвенции",
+    "search_user_placeholder": "Поиск пользователя...",
+    "select_user": "Выбрать пользователя",
     "status_control": "Контроль видимости",
     "status_control_desc": "Публикуйте или снимайте с публикации ваши издания согласно их состоянию готовности"
   },
@@ -1059,6 +1071,7 @@
   },
   "errors": {
     "access_denied": "Доступ запрещен",
+    "add_collaborator_error": "Ошибка добавления сотрудника",
     "address_required": "Адрес обязателен",
     "address_too_long": "Адрес не может превышать {max} символов",
     "attendance_update_failed": "Не удалось обновить статус участия",
@@ -1117,11 +1130,13 @@
     "people_maximum": "Максимум {max} человек",
     "publish_edition_failed": "Не удалось опубликовать издание",
     "registration_failed": "Регистрация не удалась",
+    "remove_collaborator_error": "Ошибка удаления сотрудника",
     "required_field": "Это поле обязательно",
     "seats_maximum": "Максимум {max} мест",
     "seats_minimum_one": "Количество мест должно быть минимум 1",
     "server_error": "Ошибка сервера",
     "status_update_failed": "Не удалось обновить статус",
+    "update_collaborator_error": "Ошибка обновления сотрудника",
     "update_error": "Ошибка обновления",
     "username_min_3_chars": "Имя пользователя должно содержать минимум 3 символа"
   },

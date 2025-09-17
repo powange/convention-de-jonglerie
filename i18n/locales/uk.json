@@ -401,6 +401,16 @@
       "seats_min": "Щонайменше 1 місце"
     }
   },
+  "collaborators": {
+    "collaborator_added": "Співробітника додано",
+    "collaborator_removed": "Співробітника видалено",
+    "collaborator_updated": "Співробітника оновлено",
+    "confirm_remove": "Ви впевнені, що хочете видалити цього співробітника?",
+    "edit_collaborator": "Редагувати співробітника",
+    "no_collaborators": "Немає співробітників",
+    "rights": "Права",
+    "title": "Співробітники"
+  },
   "common": {
     "actions": "Дії",
     "active": "Активний",
@@ -670,6 +680,8 @@
     "no_description": "Немає опису",
     "no_description_available": "Опис відсутній",
     "no_editions": "Немає видань для цієї конвенції",
+    "search_user_placeholder": "Пошук користувача...",
+    "select_user": "Вибрати користувача",
     "status_control": "Контроль видимості",
     "status_control_desc": "Публікуйте або скасовуйте публікацію ваших видань відповідно до їх стану готовності"
   },
@@ -1059,6 +1071,7 @@
   },
   "errors": {
     "access_denied": "Доступ заборонено",
+    "add_collaborator_error": "Помилка додавання співробітника",
     "address_required": "Адреса обов'язкова",
     "address_too_long": "Адреса не може перевищувати {max} символів",
     "attendance_update_failed": "Не вдалося оновити статус участі",
@@ -1117,11 +1130,13 @@
     "people_maximum": "Максимум {max} людей",
     "publish_edition_failed": "Не вдалося опублікувати видання",
     "registration_failed": "Помилка реєстрації",
+    "remove_collaborator_error": "Помилка видалення співробітника",
     "required_field": "Це поле обов'язкове",
     "seats_maximum": "Максимум {max} місць",
     "seats_minimum_one": "Кількість місць повинна бути принаймні 1",
     "server_error": "Помилка сервера",
     "status_update_failed": "Не вдалося оновити статус",
+    "update_collaborator_error": "Помилка оновлення співробітника",
     "update_error": "Помилка оновлення",
     "username_min_3_chars": "Ім'я користувача повинно містити принаймні 3 символи"
   },

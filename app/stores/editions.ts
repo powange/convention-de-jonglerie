@@ -474,6 +474,35 @@ export const useEditionStore = defineStore('editions', {
       })
     },
 
+    // Vérifier si l'utilisateur peut gérer les collaborateurs d'une convention
+    canManageCollaborators(edition: Edition, userId: number): boolean {
+      const authStore = useAuthStore()
+
+      // Les admins globaux en mode admin peuvent tout gérer
+      if (authStore.isAdminModeActive) {
+        return true
+      }
+
+      // Vérifier si la convention a des collaborateurs
+      if (!edition.convention || !edition.convention.collaborators) {
+        // Si pas de collaborateurs et c'est l'auteur de la convention, il peut gérer
+        return edition.convention?.authorId === userId
+      }
+
+      // L'auteur de la convention peut toujours gérer les collaborateurs
+      if (edition.convention.authorId === userId) {
+        return true
+      }
+
+      // Collaborateur avec droit explicite de gestion des collaborateurs
+      return edition.convention.collaborators.some((collab) => {
+        if (collab.user.id !== userId) return false
+        // Droit global de gérer les collaborateurs
+        if (collab.rights?.manageCollaborators) return true
+        return false
+      })
+    },
+
     // Récupérer toutes les éditions sans pagination (pour l'agenda)
     async fetchAllEditions(filters?: Omit<EditionFilters, 'page' | 'limit'>) {
       this.loading = true

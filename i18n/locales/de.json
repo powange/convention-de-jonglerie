@@ -401,6 +401,16 @@
       "seats_min": "Mindestens 1 Platz"
     }
   },
+  "collaborators": {
+    "collaborator_added": "Mitarbeiter hinzugefügt",
+    "collaborator_removed": "Mitarbeiter entfernt",
+    "collaborator_updated": "Mitarbeiter aktualisiert",
+    "confirm_remove": "Sind Sie sicher, dass Sie diesen Mitarbeiter entfernen möchten?",
+    "edit_collaborator": "Mitarbeiter bearbeiten",
+    "no_collaborators": "Keine Mitarbeiter",
+    "rights": "Rechte",
+    "title": "Mitarbeiter"
+  },
   "common": {
     "actions": "Aktionen",
     "active": "Aktiv",
@@ -670,6 +680,8 @@
     "no_description": "Keine Beschreibung",
     "no_description_available": "Keine Beschreibung verfügbar",
     "no_editions": "Keine Auflage für diese Convention",
+    "search_user_placeholder": "Benutzer suchen...",
+    "select_user": "Benutzer auswählen",
     "status_control": "Sichtbarkeitskontrolle",
     "status_control_desc": "Veröffentlichen oder verstecken Sie Ihre Auflagen je nach Fortschritt"
   },
@@ -1059,6 +1071,7 @@
   },
   "errors": {
     "access_denied": "Zugang verweigert",
+    "add_collaborator_error": "Fehler beim Hinzufügen des Mitarbeiters",
     "address_required": "Die Adresse ist erforderlich",
     "address_too_long": "Die Adresse darf nicht länger als {max} Zeichen sein",
     "attendance_update_failed": "Fehler beim Aktualisieren des Teilnahmestatus",
@@ -1117,11 +1130,13 @@
     "people_maximum": "Maximum {max} Personen",
     "publish_edition_failed": "Fehler beim Veröffentlichen der Edition",
     "registration_failed": "Registrierung fehlgeschlagen",
+    "remove_collaborator_error": "Fehler beim Entfernen des Mitarbeiters",
     "required_field": "Dieses Feld ist erforderlich",
     "seats_maximum": "Maximum {max} Plätze",
     "seats_minimum_one": "Die Anzahl der Plätze muss mindestens 1 sein",
     "server_error": "Server-Fehler",
     "status_update_failed": "Fehler beim Aktualisieren des Status",
+    "update_collaborator_error": "Fehler beim Aktualisieren des Mitarbeiters",
     "update_error": "Fehler beim Aktualisieren",
     "username_min_3_chars": "Der Benutzername muss mindestens 3 Zeichen enthalten"
   },
