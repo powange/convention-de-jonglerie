@@ -183,69 +183,153 @@
             </div>
           </div>
 
-          <!-- Détail par jour -->
-          <div class="space-y-3">
-            <h4 class="font-medium text-gray-900 dark:text-white">
-              {{ t('editions.volunteers.hours_per_day') }}
-            </h4>
-            <div class="space-y-2">
-              <div
-                v-for="dayStats in volunteersStatsByDay"
-                :key="dayStats.date"
-                class="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
-              >
-                <div class="flex items-center justify-between mb-3">
-                  <h5 class="font-medium text-gray-900 dark:text-white">
-                    {{ formatDate(dayStats.date) }}
-                  </h5>
-                  <div class="flex items-center gap-2">
-                    <UBadge color="gray" variant="soft" size="sm">
-                      {{ dayStats.totalVolunteers }} {{ t('editions.volunteers.volunteers_short') }}
-                    </UBadge>
-                    <UBadge color="primary" variant="soft" size="sm">
-                      {{ dayStats.totalHours.toFixed(1) }}h
-                    </UBadge>
-                  </div>
-                </div>
-
-                <div class="space-y-1">
+          <!-- Onglets pour les statistiques -->
+          <UTabs
+            :v-model="activeStatsTab"
+            :items="[
+              {
+                key: 'hours-per-volunteer',
+                label: 'Heures par bénévoles',
+                icon: 'i-heroicons-user-group',
+              },
+              {
+                key: 'hours-per-day',
+                label: 'Heures par jour',
+                icon: 'i-heroicons-calendar-days',
+              },
+            ]"
+            class="w-full"
+          >
+            <template #content="{ item }">
+              <div v-if="item.key === 'hours-per-day'" class="space-y-3 mt-4">
+                <!-- Détail par jour -->
+                <div class="space-y-2">
                   <div
-                    v-for="volunteerStat in dayStats.volunteers"
-                    :key="`${dayStats.date}-${volunteerStat.user.id}`"
-                    class="flex items-center justify-between text-sm"
+                    v-for="dayStats in volunteersStatsByDay"
+                    :key="dayStats.date"
+                    class="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
                   >
-                    <div class="flex items-center gap-2">
-                      <UiUserAvatar :user="volunteerStat.user" size="xs" />
-                      <span class="text-gray-700 dark:text-gray-300">{{
-                        volunteerStat.user.pseudo
-                      }}</span>
-                      <span
-                        v-if="volunteerStat.user.prenom || volunteerStat.user.nom"
-                        class="text-gray-500 text-xs"
-                      >
-                        ({{ volunteerStat.user.prenom }} {{ volunteerStat.user.nom }})
-                      </span>
+                    <div class="flex items-center justify-between mb-3">
+                      <h5 class="font-medium text-gray-900 dark:text-white">
+                        {{ formatDate(dayStats.date) }}
+                      </h5>
+                      <div class="flex items-center gap-2">
+                        <UBadge color="neutral" variant="soft" size="sm">
+                          {{ dayStats.totalVolunteers }}
+                          {{ t('editions.volunteers.volunteers_short') }}
+                        </UBadge>
+                        <UBadge color="primary" variant="soft" size="sm">
+                          {{ dayStats.totalHours.toFixed(1) }}h
+                        </UBadge>
+                      </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                      <span class="text-gray-600 dark:text-gray-400"
-                        >{{ volunteerStat.hours.toFixed(1) }}h</span
+
+                    <div class="space-y-1">
+                      <div
+                        v-for="volunteerStat in dayStats.volunteers"
+                        :key="`${dayStats.date}-${volunteerStat.user.id}`"
+                        class="flex items-center justify-between text-sm"
                       >
-                      <UBadge color="gray" variant="soft" size="xs">
-                        {{ volunteerStat.slots }} {{ t('editions.volunteers.slots_short') }}
-                      </UBadge>
+                        <div class="flex items-center gap-2">
+                          <UiUserAvatar :user="volunteerStat.user" size="xs" />
+                          <span class="text-gray-700 dark:text-gray-300">{{
+                            volunteerStat.user.pseudo
+                          }}</span>
+                          <span
+                            v-if="volunteerStat.user.prenom || volunteerStat.user.nom"
+                            class="text-gray-500 text-xs"
+                          >
+                            ({{ volunteerStat.user.prenom }} {{ volunteerStat.user.nom }})
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="text-gray-600 dark:text-gray-400"
+                            >{{ volunteerStat.hours.toFixed(1) }}h</span
+                          >
+                          <UBadge color="neutral" variant="soft" size="xs">
+                            {{ volunteerStat.slots }} {{ t('editions.volunteers.slots_short') }}
+                          </UBadge>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+
+              <div v-else-if="item.key === 'hours-per-volunteer'" class="space-y-3 mt-4">
+                <!-- Statistiques par bénévole -->
+                <div class="space-y-2">
+                  <div
+                    v-for="volunteerStat in volunteersStatsIndividual"
+                    :key="volunteerStat.user.id"
+                    class="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+                  >
+                    <div class="flex items-center justify-between mb-3">
+                      <div class="flex items-center gap-3">
+                        <UiUserAvatar :user="volunteerStat.user" size="sm" />
+                        <div>
+                          <h5 class="font-medium text-gray-900 dark:text-white">
+                            {{ volunteerStat.user.pseudo }}
+                          </h5>
+                          <p
+                            v-if="volunteerStat.user.prenom || volunteerStat.user.nom"
+                            class="text-sm text-gray-500"
+                          >
+                            {{ volunteerStat.user.prenom }} {{ volunteerStat.user.nom }}
+                          </p>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <UBadge color="primary" variant="soft" size="sm">
+                          {{ volunteerStat.totalHours.toFixed(1) }}h
+                        </UBadge>
+                        <UBadge color="neutral" variant="soft" size="sm">
+                          {{ volunteerStat.totalSlots }} {{ t('editions.volunteers.slots_short') }}
+                        </UBadge>
+                      </div>
+                    </div>
+
+                    <!-- Détail par jour pour ce bénévole -->
+                    <div
+                      v-if="volunteerStat.dayDetails && volunteerStat.dayDetails.length > 0"
+                      class="space-y-1"
+                    >
+                      <div
+                        v-for="dayDetail in volunteerStat.dayDetails"
+                        :key="dayDetail.date"
+                        class="flex items-center justify-between text-sm"
+                      >
+                        <div class="flex items-center gap-2">
+                          <UIcon name="i-heroicons-calendar" class="text-gray-400" size="14" />
+                          <span class="text-gray-700 dark:text-gray-300">
+                            {{ formatDate(dayDetail.date) }}
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="text-gray-600 dark:text-gray-400">
+                            {{ dayDetail.hours.toFixed(1) }}h
+                          </span>
+                          <UBadge color="neutral" variant="soft" size="xs">
+                            {{ dayDetail.slots }} {{ t('editions.volunteers.slots_short') }}
+                          </UBadge>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-else class="text-sm text-gray-500 italic">
+                      Aucun créneau assigné pour le moment
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </UTabs>
         </div>
       </UCard>
 
       <!-- Modal de création/édition de créneau -->
       <SlotModal
         v-model="slotModalOpen"
-        :teams="teams"
+        :teams="teams as any"
         :edition-id="editionId"
         :initial-slot="slotModalData"
         @save="handleSlotSave"
@@ -281,6 +365,9 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 // État du composant
 const refreshing = ref(false)
 
+// État des onglets de statistiques
+const activeStatsTab = ref('hours-per-volunteer') // heures par bénévole par défaut
+
 // État de la modal
 const slotModalOpen = ref(false)
 const slotModalData = ref<any>(null)
@@ -303,7 +390,14 @@ const convertedTimeSlots = computed(() => {
       assignedVolunteers: slot.assignedVolunteers,
       color: slot.color,
       description: slot.description,
-      assignedVolunteersList: slot.assignments || [], // Mapping des assignments vers assignedVolunteersList
+      assignedVolunteersList: [...(slot.assignments || [])].map((assignment: any) => ({
+        ...assignment,
+        user: {
+          ...assignment.user,
+          nom: assignment.user.nom ?? null,
+          prenom: assignment.user.prenom ?? null,
+        },
+      })), // Mapping des assignments vers assignedVolunteersList
     })
   )
 })
@@ -320,10 +414,10 @@ const convertedTeams = computed(() => {
 
 // Computed pour les dates avec fallbacks
 const editionStartDate = computed(
-  () => edition.value?.startDate || new Date().toISOString().split('T')[0]
+  () => (edition.value?.startDate || new Date().toISOString().split('T')[0]) as string
 )
 const editionEndDate = computed(
-  () => edition.value?.endDate || new Date().toISOString().split('T')[0]
+  () => (edition.value?.endDate || new Date().toISOString().split('T')[0]) as string
 )
 
 // Configuration du calendrier de planning
@@ -686,11 +780,10 @@ const overlapWarnings = computed(() => {
 
 // Calcul des statistiques des bénévoles
 const volunteersStats = computed(() => {
-  const slotsWithAssignments = convertedTimeSlots.value.filter(
-    (slot) => slot.assignedVolunteersList && slot.assignedVolunteersList.length > 0
-  )
+  // Inclure tous les bénévoles acceptés
+  const totalVolunteers = acceptedVolunteers.value.length
 
-  if (slotsWithAssignments.length === 0) {
+  if (totalVolunteers === 0) {
     return {
       totalVolunteers: 0,
       totalHours: 0,
@@ -703,6 +796,10 @@ const volunteersStats = computed(() => {
   const volunteerSlots = new Map<number, number>()
   let totalHours = 0
   let totalSlots = 0
+
+  const slotsWithAssignments = convertedTimeSlots.value.filter(
+    (slot) => slot.assignedVolunteersList && slot.assignedVolunteersList.length > 0
+  )
 
   slotsWithAssignments.forEach((slot) => {
     const startTime = new Date(slot.start)
@@ -718,7 +815,6 @@ const volunteersStats = computed(() => {
     })
   })
 
-  const totalVolunteers = volunteerHours.size
   const averageHours = totalVolunteers > 0 ? totalHours / totalVolunteers : 0
 
   return {
@@ -774,11 +870,100 @@ const volunteersStatsByDay = computed(() => {
 
   // Convertir en array et trier par date
   return Array.from(dayStats.values())
-    .sort((a, b) => a.date.localeCompare(b.date))
+    .sort((a: any, b: any) => a.date.localeCompare(b.date))
     .map((day) => ({
       ...day,
-      volunteers: Array.from(day.volunteers.values()).sort((a, b) => b.hours - a.hours), // Trier par heures décroissantes
+      volunteers: Array.from(day.volunteers.values()).sort((a: any, b: any) => b.hours - a.hours), // Trier par heures décroissantes
     }))
+})
+
+// Liste des bénévoles acceptés pour les stats
+const acceptedVolunteers = ref<any[]>([])
+
+// Fonction pour récupérer les bénévoles acceptés
+const fetchAcceptedVolunteers = async () => {
+  try {
+    const response: any = await $fetch(`/api/editions/${editionId}/volunteers/applications`, {
+      query: { status: 'ACCEPTED' },
+    })
+    const applications = response.applications || response
+    acceptedVolunteers.value = applications.filter((app: any) => app.status === 'ACCEPTED')
+  } catch (error) {
+    console.error('Failed to fetch accepted volunteers:', error)
+  }
+}
+
+// Statistiques par bénévole individuel (incluant ceux sans créneaux)
+const volunteersStatsIndividual = computed(() => {
+  const volunteerStats = new Map<number, any>()
+
+  // D'abord, ajouter tous les bénévoles acceptés avec 0 heures
+  acceptedVolunteers.value.forEach((application) => {
+    if (application.user && !volunteerStats.has(application.user.id)) {
+      volunteerStats.set(application.user.id, {
+        user: application.user,
+        totalHours: 0,
+        totalSlots: 0,
+        dayDetails: new Map<string, any>(),
+      })
+    }
+  })
+
+  // Ensuite, calculer les heures pour ceux qui ont des créneaux
+  convertedTimeSlots.value.forEach((slot) => {
+    if (!slot.assignedVolunteersList || slot.assignedVolunteersList.length === 0) return
+
+    const startTime = new Date(slot.start)
+    const endTime = new Date(slot.end)
+    const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
+    const dayKey = startTime.toISOString().split('T')[0] // YYYY-MM-DD
+
+    slot.assignedVolunteersList.forEach((assignment) => {
+      const userId = assignment.user.id
+
+      if (!volunteerStats.has(userId)) {
+        volunteerStats.set(userId, {
+          user: assignment.user,
+          totalHours: 0,
+          totalSlots: 0,
+          dayDetails: new Map<string, any>(),
+        })
+      }
+
+      const volunteerStat = volunteerStats.get(userId)
+      volunteerStat.totalHours += hours
+      volunteerStat.totalSlots += 1
+
+      // Ajouter les détails par jour
+      if (!volunteerStat.dayDetails.has(dayKey)) {
+        volunteerStat.dayDetails.set(dayKey, {
+          date: dayKey,
+          hours: 0,
+          slots: 0,
+        })
+      }
+
+      const dayDetail = volunteerStat.dayDetails.get(dayKey)
+      dayDetail.hours += hours
+      dayDetail.slots += 1
+    })
+  })
+
+  // Convertir en array et trier par nombre d'heures total décroissant
+  return Array.from(volunteerStats.values())
+    .map((volunteer) => ({
+      ...volunteer,
+      dayDetails: Array.from(volunteer.dayDetails.values()).sort((a: any, b: any) =>
+        a.date.localeCompare(b.date)
+      ), // Trier par date
+    }))
+    .sort((a, b) => {
+      // Trier par heures décroissantes, puis par nom
+      if (b.totalHours !== a.totalHours) {
+        return b.totalHours - a.totalHours
+      }
+      return (a.user.pseudo || '').localeCompare(b.user.pseudo || '')
+    })
 })
 
 // Permissions calculées
@@ -822,6 +1007,8 @@ onMounted(async () => {
       console.error('Failed to fetch edition:', error)
     }
   }
+  // Charger les bénévoles acceptés pour les statistiques
+  await fetchAcceptedVolunteers()
 })
 
 // Métadonnées de la page

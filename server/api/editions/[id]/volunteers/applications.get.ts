@@ -19,6 +19,7 @@ export default defineEventHandler(async (event) => {
   const statusFilter = query.status as string | undefined
   const teamsFilter = query.teams as string | undefined
   const presenceFilter = query.presence as string | undefined
+  const assignedTeamsFilter = query.assignedTeams as string | undefined
   const isExport = query.export === 'true'
   const page = Math.max(1, parseInt((query.page as string) || '1'))
   const pageSize = Math.min(
@@ -78,6 +79,41 @@ export default defineEventHandler(async (event) => {
 
       if (presenceConditions.length > 0) {
         conditions.push({ OR: presenceConditions })
+      }
+    }
+  }
+
+  // Filtre par équipes assignées
+  if (assignedTeamsFilter) {
+    const assignedTeamIds = assignedTeamsFilter
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean)
+
+    if (assignedTeamIds.length > 0) {
+      const assignedTeamConditions = []
+
+      // Gérer le cas "NO_TEAM" (aucune équipe assignée)
+      if (assignedTeamIds.includes('NO_TEAM')) {
+        assignedTeamConditions.push({
+          teams: { none: {} },
+        })
+      }
+
+      // Filtrer par équipes spécifiques (nouveau système VolunteerTeam)
+      const specificTeamIds = assignedTeamIds.filter((id) => id !== 'NO_TEAM')
+      if (specificTeamIds.length > 0) {
+        assignedTeamConditions.push({
+          teams: {
+            some: {
+              id: { in: specificTeamIds },
+            },
+          },
+        })
+      }
+
+      if (assignedTeamConditions.length > 0) {
+        conditions.push({ OR: assignedTeamConditions })
       }
     }
   }

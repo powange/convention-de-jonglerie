@@ -1,9 +1,9 @@
 # Dockerfile multi-stage pour Convention de Jonglerie
 
 # Stage de base commun (image paramétrable)
-ARG BASE_NODE_IMAGE=node:22-alpine
+ARG BASE_NODE_IMAGE=node:22-slim
 FROM ${BASE_NODE_IMAGE} AS base
-RUN apk add --no-cache libc6-compat curl openssl
+RUN apt-get update && apt-get install -y curl openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 # -------------------------
@@ -33,7 +33,7 @@ RUN npm prune --omit=dev && npx prisma generate
 # Stage runtime (production)
 # -------------------------
 FROM ${BASE_NODE_IMAGE} AS runtime
-RUN apk add --no-cache libc6-compat openssl
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 # Dossiers requis au runtime

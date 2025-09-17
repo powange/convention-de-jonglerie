@@ -859,7 +859,6 @@
       "first_name_placeholder": "Dit fornavn",
       "form_description": "Opret og administrer frivilligopslag",
       "generate": "Generer",
-      "hours_per_day": "Timer per dag",
       "internal_mode_description": "Konfigurer indstillinger specifikke for intern frivilligadministration.",
       "internal_mode_only": "Konfigurationsindstillinger er kun tilgængelige i intern tilstand.",
       "internal_mode_options": "Indstillinger for intern tilstand",

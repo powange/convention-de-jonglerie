@@ -859,7 +859,6 @@
       "first_name_placeholder": "Your first name",
       "form_description": "Create and manage volunteer calls",
       "generate": "Generate",
-      "hours_per_day": "Hours per Day",
       "internal_mode_description": "Configure specific settings for internal volunteer management.",
       "internal_mode_only": "Configuration options are only available in internal mode.",
       "internal_mode_options": "Internal mode options",

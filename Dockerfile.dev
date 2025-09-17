@@ -1,7 +1,7 @@
 # Dockerfile.dev pour l'environnement de développement uniquement
-ARG BASE_NODE_IMAGE=node:22-alpine
+ARG BASE_NODE_IMAGE=node:22-slim
 FROM ${BASE_NODE_IMAGE}
-RUN apk add --no-cache libc6-compat curl openssl
+RUN apt-get update && apt-get install -y curl openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 # Installer les dépendances
