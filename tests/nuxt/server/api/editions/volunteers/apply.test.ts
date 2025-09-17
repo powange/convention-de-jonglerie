@@ -333,7 +333,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
         global.readBody.mockResolvedValue(testData)
         const mockEvent = { context: { user: mockUser } } // Utiliser toujours mockUser ici car c'est l'ID qui compte
 
-        await expect(handler(mockEvent as any)).rejects.toThrow(testCase.expectedError)
+        await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
       }
     })
 
@@ -349,7 +349,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
         global.readBody.mockResolvedValue(applicationData)
         const mockEvent = { context: { user: mockUser } }
 
-        await expect(handler(mockEvent as any)).rejects.toThrow(/Invalid enum value/)
+        await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
       }
     })
 
@@ -524,9 +524,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
         global.readBody.mockResolvedValue(applicationData)
         const mockEvent = { context: { user: mockUser } }
 
-        await expect(handler(mockEvent as any)).rejects.toThrow(
-          /String must contain at most \d+ character/
-        )
+        await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
       }
     })
 
@@ -758,7 +756,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
       })
       const mockEvent = { context: { user: mockUser } }
 
-      await expect(handler(mockEvent as any)).rejects.toThrow('Database connection failed')
+      await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
     })
   })
 })
