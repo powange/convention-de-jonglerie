@@ -373,9 +373,14 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
         color: 'success',
       })
     } catch (error: any) {
+      console.error('Erreur lors de la mise à jour du créneau:', error)
+
+      const errorMessage =
+        error.data?.message || error.message || error.statusText || 'Erreur lors de la mise à jour'
+
       toast.add({
         title: t('errors.error_occurred'),
-        description: error.message || 'Erreur lors de la mise à jour',
+        description: errorMessage,
         icon: 'i-heroicons-x-circle',
         color: 'error',
       })
@@ -391,9 +396,17 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
           color: 'success',
         })
       } catch (error: any) {
+        console.error('Erreur lors de la suppression du créneau:', error)
+
+        const errorMessage =
+          error.data?.message ||
+          error.message ||
+          error.statusText ||
+          'Erreur lors de la suppression'
+
         toast.add({
           title: t('errors.error_occurred'),
-          description: error.message || 'Erreur lors de la suppression',
+          description: errorMessage,
           icon: 'i-heroicons-x-circle',
           color: 'error',
         })
@@ -461,9 +474,18 @@ const handleSlotSave = async (slotData: any) => {
       })
     }
   } catch (error: any) {
+    console.error('Erreur lors de la sauvegarde du créneau:', error)
+
+    // Extraire le message d'erreur approprié
+    const errorMessage =
+      error.data?.message || // Message de l'API
+      error.message || // Message de l'erreur standard
+      error.statusText || // Texte du statut HTTP
+      'Erreur lors de la sauvegarde'
+
     toast.add({
       title: t('errors.error_occurred'),
-      description: error.message || 'Erreur lors de la sauvegarde',
+      description: errorMessage,
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })
@@ -480,9 +502,14 @@ const handleSlotDelete = async (slotId: string) => {
       color: 'success',
     })
   } catch (error: any) {
+    console.error('Erreur lors de la suppression du créneau:', error)
+
+    const errorMessage =
+      error.data?.message || error.message || error.statusText || 'Erreur lors de la suppression'
+
     toast.add({
       title: t('errors.error_occurred'),
-      description: error.message || 'Erreur lors de la suppression',
+      description: errorMessage,
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })

@@ -99,6 +99,23 @@
                   @change="onTeamsFilterChange"
                 />
               </UFormField>
+
+              <UFormField
+                v-if="assignedTeamItems.length > 1"
+                :label="t('editions.volunteers.filter_assigned_teams')"
+              >
+                <USelect
+                  v-model="applicationsFilterAssignedTeams"
+                  :items="assignedTeamItems"
+                  :placeholder="t('editions.volunteers.assigned_teams_all')"
+                  icon="i-heroicons-users"
+                  size="lg"
+                  variant="soft"
+                  class="w-full"
+                  multiple
+                  @change="onAssignedTeamsFilterChange"
+                />
+              </UFormField>
             </div>
           </template>
         </UModal>
@@ -393,6 +410,7 @@ const serverPagination = ref({ page: 1, pageSize: 20, total: 0, totalPages: 1 })
 const applicationsFilterStatus = ref<string>('ALL')
 const applicationsFilterTeams = ref<string[]>([])
 const applicationsFilterPresence = ref<string[]>([])
+const applicationsFilterAssignedTeams = ref<string[]>([])
 const globalFilter = ref('')
 const sorting = ref<{ id: string; desc: boolean }[]>([{ id: 'createdAt', desc: true }])
 const columnVisibility = ref<Record<string, boolean>>({
@@ -439,6 +457,28 @@ const volunteerPresenceItems = computed(() => [
   { label: t('editions.volunteers.presence_event'), value: 'event' },
   { label: t('editions.volunteers.presence_teardown'), value: 'teardown' },
 ])
+
+const assignedTeamItems = computed(() => {
+  const items = []
+
+  // Option pour "Sans équipe"
+  items.push({
+    label: t('editions.volunteers.filter_no_team'),
+    value: 'NO_TEAM',
+  })
+
+  // Ajouter toutes les équipes disponibles
+  if (volunteerTeams.value.length) {
+    items.push(
+      ...volunteerTeams.value.map((team: any) => ({
+        label: team.name,
+        value: team.id.toString(),
+      }))
+    )
+  }
+
+  return items
+})
 
 // Équipes disponibles pour la modal (utilise le nouveau système VolunteerTeam)
 const availableTeamsForModal = computed(() => {
@@ -525,10 +565,16 @@ const onPresenceFilterChange = () => {
   refreshApplications()
 }
 
+const onAssignedTeamsFilterChange = () => {
+  serverPagination.value.page = 1
+  refreshApplications()
+}
+
 const resetApplicationsFilters = () => {
   applicationsFilterStatus.value = 'ALL'
   applicationsFilterTeams.value = []
   applicationsFilterPresence.value = []
+  applicationsFilterAssignedTeams.value = []
   globalFilter.value = ''
   sorting.value = [{ id: 'createdAt', desc: true }]
   serverPagination.value.page = 1
@@ -566,6 +612,10 @@ const refreshApplications = async () => {
         presence:
           applicationsFilterPresence.value.length > 0
             ? applicationsFilterPresence.value.join(',')
+            : undefined,
+        assignedTeams:
+          applicationsFilterAssignedTeams.value.length > 0
+            ? applicationsFilterAssignedTeams.value.join(',')
             : undefined,
         sortField,
         sortDir,
@@ -842,6 +892,10 @@ const exportApplications = async () => {
       presence:
         applicationsFilterPresence.value.length > 0
           ? applicationsFilterPresence.value.join(',')
+          : undefined,
+      assignedTeams:
+        applicationsFilterAssignedTeams.value.length > 0
+          ? applicationsFilterAssignedTeams.value.join(',')
           : undefined,
       sortField,
       sortDir,

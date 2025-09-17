@@ -10,7 +10,7 @@ vi.mock('../utils/auth-session', () => ({
 
 // Mock des fonctions h3
 vi.mock('h3', () => ({
-  createError: vi.fn((err) => new Error(err.statusMessage || 'Error')),
+  createError: vi.fn((err) => new Error(err.message || err.statusMessage || 'Error')),
   getRouterParam: vi.fn((event, param) => event.context.params?.[param]),
   readBody: vi.fn((event) => (event.readBody ? event.readBody() : Promise.resolve({}))),
   getQuery: vi.fn(() => ({})),
@@ -258,9 +258,13 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       global.readBody.mockResolvedValue(applicationData)
 
       // Candidature par l'utilisateur connecté
+      global.getRouterParam.mockReturnValue('1')
       const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
       const applicationResult = await applyHandler.default({
-        context: { user: mockUser },
+        context: {
+          user: mockUser,
+          params: { id: '1' },
+        },
       } as any)
 
       expect(applicationResult.success).toBe(true)
@@ -416,10 +420,14 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
 
       prismaMock.editionVolunteerApplication.create.mockResolvedValue(createdApplication)
       global.readBody.mockResolvedValue(initialApplication)
+      global.getRouterParam.mockReturnValue('1')
 
       const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
       const firstResult = await applyHandler.default({
-        context: { user: mockUser },
+        context: {
+          user: mockUser,
+          params: { id: '1' },
+        },
       } as any)
 
       expect(firstResult.success).toBe(true)
@@ -450,11 +458,15 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       }
 
       global.readBody.mockResolvedValue(newApplication)
+      global.getRouterParam.mockReturnValue('1')
 
       // L'API actuelle empêche la re-candidature même après rejet
       await expect(
         applyHandler.default({
-          context: { user: mockUser },
+          context: {
+            user: mockUser,
+            params: { id: '1' },
+          },
         } as any)
       ).rejects.toThrow(/déjà candidat/i)
 
@@ -489,10 +501,14 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       global.readBody.mockResolvedValue(duplicateApplication)
 
       const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
+      global.getRouterParam.mockReturnValue('1')
 
       await expect(
         applyHandler.default({
-          context: { user: mockUser },
+          context: {
+            user: mockUser,
+            params: { id: '1' },
+          },
         } as any)
       ).rejects.toThrow(/candidat/i)
 
@@ -517,12 +533,16 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       }
 
       global.readBody.mockResolvedValue(applicationData)
+      global.getRouterParam.mockReturnValue('1')
 
       const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
 
       await expect(
         applyHandler.default({
-          context: { user: mockUser },
+          context: {
+            user: mockUser,
+            params: { id: '1' },
+          },
         } as any)
       ).rejects.toThrow(/recrutement.*fermé/i)
     })
@@ -627,6 +647,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
 
       prismaMock.edition.findUnique.mockResolvedValue(editionWithoutPermissions)
       global.readBody.mockResolvedValue({ mode: 'INTERNAL' })
+      global.getRouterParam.mockReturnValue('1')
 
       const settingsHandler = await import(
         '../../server/api/editions/[id]/volunteers/settings.patch'
@@ -634,7 +655,10 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
 
       await expect(
         settingsHandler.default({
-          context: { user: unauthorizedUser },
+          context: {
+            user: unauthorizedUser,
+            params: { id: '1' },
+          },
         } as any)
       ).rejects.toThrow('Droits insuffisants pour gérer les bénévoles')
     })
