@@ -71,6 +71,20 @@
               </UButton>
             </div>
             <div class="flex items-center gap-4">
+              <!-- Filtre par équipes -->
+              <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-600 dark:text-gray-400">Équipes :</span>
+                <USelect
+                  v-model="selectedTeams"
+                  :items="teamFilterOptions"
+                  option-attribute="label"
+                  value-attribute="value"
+                  multiple
+                  size="sm"
+                  class="min-w-[200px]"
+                  :placeholder="t('editions.volunteers.all_teams')"
+                />
+              </div>
               <!-- Sélecteur de granularité -->
               <div class="flex items-center gap-2">
                 <span class="text-sm text-gray-600 dark:text-gray-400">Granularité :</span>
@@ -389,12 +403,25 @@ const slotModalOpen = ref(false)
 const slotModalData = ref<any>(null)
 
 // Configuration de la granularité temporelle
-const selectedGranularity = ref(30) // Granularité par défaut : 15 minutes
+const selectedGranularity = ref(30) // Granularité par défaut : 30 minutes
 const granularityOptions = [
   { label: '15 minutes', value: 15 },
   { label: '30 minutes', value: 30 },
   { label: '60 minutes', value: 60 },
 ]
+
+// Configuration du filtre d'équipes
+const selectedTeams = ref<string[]>([]) // Par défaut, toutes les équipes sont sélectionnées
+
+// Options pour le filtre d'équipes
+const teamFilterOptions = computed(() => {
+  if (!teams.value) return []
+
+  return teams.value.map((team) => ({
+    label: team.name,
+    value: team.id,
+  }))
+})
 
 // Utilisation des vraies APIs
 const { teams } = useVolunteerTeams(editionId)
@@ -436,6 +463,31 @@ const convertedTeams = computed(() => {
   )
 })
 
+// Équipes filtrées selon la sélection
+const filteredTeams = computed(() => {
+  if (selectedTeams.value.length === 0) {
+    // Si aucune équipe sélectionnée, afficher toutes les équipes
+    return convertedTeams.value
+  }
+
+  // Filtrer selon la sélection
+  return convertedTeams.value.filter((team) => selectedTeams.value.includes(team.id))
+})
+
+// Créneaux filtrés selon les équipes sélectionnées
+const filteredTimeSlots = computed(() => {
+  if (selectedTeams.value.length === 0) {
+    // Si aucune équipe sélectionnée, afficher tous les créneaux
+    return convertedTimeSlots.value
+  }
+
+  // Filtrer les créneaux selon les équipes sélectionnées
+  // Inclure aussi les créneaux "non assignés" (teamId null/undefined)
+  return convertedTimeSlots.value.filter(
+    (slot) => !slot.teamId || selectedTeams.value.includes(slot.teamId)
+  )
+})
+
 // Computed pour les dates avec fallbacks
 const editionStartDate = computed(
   () => (edition.value?.startDate || new Date().toISOString().split('T')[0]) as string
@@ -454,8 +506,8 @@ const canManageVolunteers = computed(() => {
 const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
   editionStartDate: editionStartDate,
   editionEndDate: editionEndDate,
-  teams: convertedTeams,
-  timeSlots: convertedTimeSlots,
+  teams: filteredTeams,
+  timeSlots: filteredTimeSlots,
   readOnly: computed(() => !canManageVolunteers.value),
   slotDuration: selectedGranularity,
   onTimeSlotCreate: (start, end, resourceId) => {
