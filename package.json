@@ -54,6 +54,7 @@
     "docker:dev:logs": "docker compose -f docker-compose.dev.yml logs -f app",
     "docker:dev:exec": "docker compose -f docker-compose.dev.yml exec app sh",
     "db:seed:dev": "npx tsx scripts/seed-dev.ts",
+    "db:seed:password": "npx tsx scripts/list-seed-accounts.ts",
     "db:reset:dev": "npx prisma migrate reset --force --skip-seed",
     "docker:release:up": "docker compose -f docker-compose.release.yml up -d --build",
     "docker:release:down": "docker compose -f docker-compose.release.yml down",

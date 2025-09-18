@@ -70,7 +70,19 @@
                 {{ t('common.refresh') }}
               </UButton>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-4">
+              <!-- Sélecteur de granularité -->
+              <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-600 dark:text-gray-400">Granularité :</span>
+                <USelect
+                  v-model="selectedGranularity"
+                  :items="granularityOptions"
+                  option-attribute="label"
+                  value-attribute="value"
+                  size="sm"
+                  class="min-w-[120px]"
+                />
+              </div>
               <span class="text-xs text-gray-500">
                 {{ t('editions.volunteers.planning_tip') }}
               </span>
@@ -97,7 +109,7 @@
 
       <!-- Alerte pour les chevauchements de créneaux -->
       <UAlert
-        v-if="overlapWarnings.length > 0"
+        v-if="canManageVolunteers && overlapWarnings.length > 0"
         color="warning"
         variant="soft"
         icon="i-heroicons-exclamation-triangle"
@@ -143,7 +155,11 @@
       </UAlert>
 
       <!-- Résumé des bénévoles par jour -->
-      <UCard v-if="volunteersStats.totalVolunteers > 0" variant="soft" class="mt-6">
+      <UCard
+        v-if="canManageVolunteers && volunteersStats.totalVolunteers > 0"
+        variant="soft"
+        class="mt-6"
+      >
         <template #header>
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-semibold flex items-center gap-2">
@@ -329,7 +345,7 @@
       <!-- Modal de création/édition de créneau -->
       <SlotModal
         v-model="slotModalOpen"
-        :teams="teams as any"
+        :teams="teams"
         :edition-id="editionId"
         :initial-slot="slotModalData"
         @save="handleSlotSave"
@@ -371,6 +387,14 @@ const activeStatsTab = ref('hours-per-volunteer') // heures par bénévole par d
 // État de la modal
 const slotModalOpen = ref(false)
 const slotModalData = ref<any>(null)
+
+// Configuration de la granularité temporelle
+const selectedGranularity = ref(30) // Granularité par défaut : 15 minutes
+const granularityOptions = [
+  { label: '15 minutes', value: 15 },
+  { label: '30 minutes', value: 30 },
+  { label: '60 minutes', value: 60 },
+]
 
 // Utilisation des vraies APIs
 const { teams } = useVolunteerTeams(editionId)
@@ -420,14 +444,22 @@ const editionEndDate = computed(
   () => (edition.value?.endDate || new Date().toISOString().split('T')[0]) as string
 )
 
+// Permissions calculées (doivent être définies avant useVolunteerSchedule)
+const canManageVolunteers = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageVolunteers(edition.value, authStore.user.id)
+})
+
 // Configuration du calendrier de planning
 const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
   editionStartDate: editionStartDate,
   editionEndDate: editionEndDate,
   teams: convertedTeams,
   timeSlots: convertedTimeSlots,
+  readOnly: computed(() => !canManageVolunteers.value),
+  slotDuration: selectedGranularity,
   onTimeSlotCreate: (start, end, resourceId) => {
-    // Ouvrir la modal avec les dates pré-remplies
+    // Les permissions sont déjà vérifiées par readOnly, ouvrir directement la modal
     openSlotModal({
       start,
       end,
@@ -435,7 +467,7 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
     })
   },
   onTimeSlotClick: (timeSlot: VolunteerTimeSlot) => {
-    // Ouvrir la modal en mode édition lors d'un clic
+    // Les permissions sont déjà vérifiées par readOnly, ouvrir directement la modal
     const existingSlot = timeSlots.value.find((s) => s.id === timeSlot.id)
     if (existingSlot) {
       slotModalData.value = {
@@ -634,9 +666,23 @@ const refreshData = async () => {
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return (
-    canEdit.value || canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
-  )
+
+  // Créateur de l'édition
+  if (authStore.user.id === edition.value.creatorId) {
+    return true
+  }
+
+  // Utilisateurs avec des droits spécifiques
+  if (canEdit.value || canManageVolunteers.value) {
+    return true
+  }
+
+  // Tous les collaborateurs de la convention (même sans droits)
+  if (isCollaborator.value) {
+    return true
+  }
+
+  return false
 })
 
 // Fonction utilitaire pour formater les dates
@@ -972,9 +1018,11 @@ const canEdit = computed(() => {
   return editionStore.canEditEdition(edition.value, authStore.user.id)
 })
 
-const canManageVolunteers = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canManageVolunteers(edition.value, authStore.user.id)
+const isCollaborator = computed(() => {
+  if (!edition.value?.convention?.collaborators || !authStore.user?.id) return false
+  return edition.value.convention.collaborators.some(
+    (collab) => collab.user.id === authStore.user?.id
+  )
 })
 
 const isFavorited = computed(() => (_editionId: number) => {
@@ -1140,30 +1188,28 @@ useSeoMeta({
     0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .volunteer-planning-calendar {
-    --fc-border-color: rgb(55 65 81); /* gray-700 */
-    --fc-neutral-bg-color: rgb(31 41 55); /* gray-800 */
-  }
+/* Dark mode support avec toggle manuel Nuxt UI */
+.dark .volunteer-planning-calendar {
+  --fc-border-color: rgb(55 65 81); /* gray-700 */
+  --fc-neutral-bg-color: rgb(31 41 55); /* gray-800 */
+}
 
-  .volunteer-planning-calendar .fc-theme-standard .fc-resource-timeline-divider {
-    border-color: rgb(55 65 81);
-  }
+.dark .volunteer-planning-calendar .fc-theme-standard .fc-resource-timeline-divider {
+  border-color: rgb(55 65 81);
+}
 
-  .volunteer-planning-calendar .fc-theme-standard .fc-scrollgrid {
-    border-color: rgb(55 65 81);
-  }
+.dark .volunteer-planning-calendar .fc-theme-standard .fc-scrollgrid {
+  border-color: rgb(55 65 81);
+}
 
-  .volunteer-planning-calendar .fc-theme-standard td,
-  .volunteer-planning-calendar .fc-theme-standard th {
-    border-color: rgb(55 65 81);
-  }
+.dark .volunteer-planning-calendar .fc-theme-standard td,
+.dark .volunteer-planning-calendar .fc-theme-standard th {
+  border-color: rgb(55 65 81);
+}
 
-  .volunteer-planning-calendar .fc-resource {
-    background-color: rgb(31 41 55);
-    color: rgb(243 244 246);
-  }
+.dark .volunteer-planning-calendar .fc-resource {
+  background-color: rgb(31 41 55);
+  color: rgb(243 244 246);
 }
 
 /* Responsive adjustments */

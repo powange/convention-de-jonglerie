@@ -286,9 +286,26 @@ const canAccess = computed(() => {
     return true
   }
 
+  // Créateur de l'édition
+  if (authStore.user.id === props.edition.creatorId) {
+    return true
+  }
+
+  // Utilisateurs avec des droits spécifiques
   const canEdit = editionStore.canEditEdition(props.edition, authStore.user.id)
   const canManageVolunteers = editionStore.canManageVolunteers(props.edition, authStore.user.id)
-  return canEdit || canManageVolunteers || authStore.user?.id === props.edition?.creatorId
+  if (canEdit || canManageVolunteers) {
+    return true
+  }
+
+  // Tous les collaborateurs de la convention (même sans droits)
+  if (props.edition.convention?.collaborators) {
+    return props.edition.convention.collaborators.some(
+      (collab) => collab.user.id === authStore.user?.id
+    )
+  }
+
+  return false
 })
 
 // Visibilité onglet bénévoles: ouvert OU utilisateur peut éditer/gérer bénévoles

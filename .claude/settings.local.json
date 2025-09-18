@@ -68,7 +68,8 @@
       "Read(///**)",
       "Bash(/tmp/check_components_correct.sh:*)",
       "Bash(/tmp/final_analysis.sh:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "WebSearch"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

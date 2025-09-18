@@ -1,3 +1,4 @@
+import { checkAdminMode } from './collaborator-management'
 import { prisma } from './prisma'
 
 import type { User, Edition, Convention, ConventionCollaborator } from '@prisma/client'
@@ -218,6 +219,47 @@ export async function getEditionForStatusManagement(
   }
 
   return edition
+}
+
+/**
+ * Vérifie si un utilisateur peut accéder aux données d'une édition (lecture seule)
+ * Autorise les créateurs, auteurs, admins et tous les collaborateurs de la convention
+ */
+export async function canAccessEditionData(
+  editionId: number,
+  userId: number,
+  event?: any
+): Promise<boolean> {
+  // Vérifier le mode admin en premier
+  const isAdminMode = await checkAdminMode(userId, event)
+  if (isAdminMode) return true
+
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    select: {
+      creatorId: true,
+      conventionId: true,
+      convention: {
+        select: {
+          authorId: true,
+          collaborators: { where: { userId }, select: { userId: true } },
+        },
+      },
+    },
+  })
+
+  if (!edition) return false
+
+  // Créateur de l'édition
+  if (edition.creatorId === userId) return true
+
+  // Auteur de la convention
+  if (edition.convention.authorId === userId) return true
+
+  // Collaborateur de la convention (n'importe quel collaborateur)
+  if (edition.convention.collaborators?.length > 0) return true
+
+  return false
 }
 
 /**

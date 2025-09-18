@@ -25,6 +25,7 @@ const sections = [
   ] },
   { title: '🗄️ Base de données', color: colors.magenta, scripts: [
     { name: 'db:seed:dev', desc: 'Seed données de dev (faker)' },
+    { name: 'db:seed:password', desc: '🔑 Liste tous les comptes de test avec leurs mots de passe' },
     { name: 'db:reset:dev', desc: 'Reset complet (DROP + migrations) DEV UNIQUEMENT' },
     { name: 'db:seed:dev -- --reset', desc: 'Reset + seed (préférer reset puis seed séparés)' },
     { name: 'db:clean-tokens', desc: 'Nettoie les tokens expirés' },

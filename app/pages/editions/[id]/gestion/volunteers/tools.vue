@@ -38,7 +38,7 @@
       <!-- Contenu des outils de gestion -->
       <div class="space-y-6">
         <!-- Outils disponibles si on peut gérer les bénévoles -->
-        <div v-if="canManageVolunteers && volunteersMode === 'INTERNAL'" class="space-y-6">
+        <div v-if="volunteersMode === 'INTERNAL'" class="space-y-6">
           <!-- Interface génération informations restauration -->
           <UCard>
             <template #header>
@@ -147,9 +147,25 @@ const generatingCateringPdf = ref(false)
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return (
-    canEdit.value || canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
-  )
+
+  // Créateur de l'édition
+  if (authStore.user.id === edition.value.creatorId) {
+    return true
+  }
+
+  // Utilisateurs avec des droits spécifiques
+  if (canEdit.value || canManageVolunteers.value) {
+    return true
+  }
+
+  // Tous les collaborateurs de la convention (même sans droits)
+  if (edition.value.convention?.collaborators) {
+    return edition.value.convention.collaborators.some(
+      (collab) => collab.user.id === authStore.user?.id
+    )
+  }
+
+  return false
 })
 
 // Permissions calculées

@@ -390,6 +390,11 @@ html.dark .bg-gray-950 {
 
 /* ===== STYLES FULLCALENDAR avec variables Nuxt UI ===== */
 
+/* Suppression du message de licence FullCalendar */
+.fc-license-message {
+  display: none !important;
+}
+
 /* Variables CSS de base pour FullCalendar utilisant les couleurs Nuxt UI */
 .fc {
   --fc-border-color: rgb(var(--ui-color-gray-200));

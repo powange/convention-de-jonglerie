@@ -1,10 +1,8 @@
-import { requireAuth } from '../../../../utils/auth-utils'
+import { canAccessEditionData } from '../../../../utils/edition-permissions'
 import { prisma } from '../../../../utils/prisma'
-import { requireVolunteerManagementAccess } from '../../../../utils/volunteer-permissions'
 
 export default defineEventHandler(async (event) => {
-  // Authentification requise
-  await requireAuth(event)
+  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
 
   // Validation des paramètres
   const editionId = parseInt(getRouterParam(event, 'id') as string)
@@ -16,8 +14,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Vérifier les permissions de gestion des bénévoles
-  await requireVolunteerManagementAccess(event, editionId)
+  // Vérifier l'accès aux données de l'édition (tous les collaborateurs)
+  const allowed = await canAccessEditionData(editionId, event.context.user.id, event)
+  if (!allowed) {
+    throw createError({
+      statusCode: 403,
+      message: 'Droits insuffisants pour accéder à ces données',
+    })
+  }
 
   try {
     // Récupérer les créneaux de bénévoles pour cette édition

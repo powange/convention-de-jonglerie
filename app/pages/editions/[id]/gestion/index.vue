@@ -90,11 +90,13 @@
 
             <!-- Liste des collaborateurs -->
             <div
-              v-if="edition.convention.collaborators && edition.convention.collaborators.length > 0"
+              v-if="
+                edition.convention?.collaborators && edition.convention.collaborators.length > 0
+              "
             >
               <div class="flex flex-wrap gap-2">
                 <UBadge
-                  v-for="collaborator in edition.convention.collaborators"
+                  v-for="collaborator in edition.convention?.collaborators"
                   :key="collaborator.id"
                   :color="getCollaboratorBadgeColor(collaborator)"
                   variant="subtle"
@@ -122,7 +124,7 @@
         </UCard>
 
         <!-- Gestion bénévole -->
-        <UCard>
+        <UCard v-if="isCollaborator">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-user-group" class="text-primary-500" />
@@ -132,7 +134,10 @@
             </div>
 
             <!-- Mode de gestion des bénévoles -->
-            <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+            <div
+              v-if="canEdit || canManageVolunteers"
+              class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+            >
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="font-medium text-gray-900 dark:text-white">
@@ -143,7 +148,7 @@
                   </p>
                 </div>
                 <UBadge
-                  :color="volunteersModeLocal === 'INTERNAL' ? 'primary' : 'orange'"
+                  :color="volunteersModeLocal === 'INTERNAL' ? 'primary' : 'warning'"
                   variant="soft"
                   size="sm"
                 >
@@ -186,7 +191,10 @@
             </div>
 
             <!-- Ouverture des candidatures -->
-            <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+            <div
+              v-if="canEdit || canManageVolunteers"
+              class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+            >
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="font-medium text-gray-900 dark:text-white">
@@ -232,7 +240,11 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               <!-- Page bénévoles -->
-              <NuxtLink :to="`/editions/${edition.id}/gestion/volunteers/page`" class="block">
+              <NuxtLink
+                v-if="canEdit || canManageVolunteers"
+                :to="`/editions/${edition.id}/gestion/volunteers/page`"
+                class="block"
+              >
                 <UCard
                   class="hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700"
                 >
@@ -259,7 +271,11 @@
               <!-- Liens visibles uniquement en mode interne -->
               <template v-if="volunteersModeLocal === 'INTERNAL'">
                 <!-- Formulaire d'appel à bénévole -->
-                <NuxtLink :to="`/editions/${edition.id}/gestion/volunteers/form`" class="block">
+                <NuxtLink
+                  v-if="canEdit || canManageVolunteers"
+                  :to="`/editions/${edition.id}/gestion/volunteers/form`"
+                  class="block"
+                >
                   <UCard
                     class="hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700"
                   >
@@ -287,6 +303,7 @@
 
                 <!-- Gestion des candidatures -->
                 <NuxtLink
+                  v-if="canEdit || canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/applications`"
                   class="block"
                 >
@@ -316,7 +333,11 @@
                 </NuxtLink>
 
                 <!-- Les équipes -->
-                <NuxtLink :to="`/editions/${edition.id}/gestion/volunteers/teams`" class="block">
+                <NuxtLink
+                  v-if="canEdit || canManageVolunteers"
+                  :to="`/editions/${edition.id}/gestion/volunteers/teams`"
+                  class="block"
+                >
                   <UCard
                     class="hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700"
                   >
@@ -367,6 +388,7 @@
 
                 <!-- Notifications bénévoles -->
                 <NuxtLink
+                  v-if="canEdit || canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/notifications`"
                   class="block"
                 >
@@ -743,9 +765,21 @@ const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {})
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return (
-    canEdit.value || canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
-  )
+
+  // Créateur de l'édition
+  if (authStore.user.id === edition.value.creatorId) return true
+
+  // Utilisateurs avec des droits spécifiques
+  if (canEdit.value || canManageVolunteers.value) return true
+
+  // Tous les collaborateurs de la convention (même sans droits)
+  if (edition.value.convention?.collaborators) {
+    return edition.value.convention.collaborators.some(
+      (collab) => collab.user.id === authStore.user?.id
+    )
+  }
+
+  return false
 })
 
 // Permissions calculées
@@ -767,6 +801,14 @@ const canManageVolunteers = computed(() => {
 const canManageCollaborators = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageCollaborators(edition.value, authStore.user.id)
+})
+
+// Vérifier si l'utilisateur est collaborateur de la convention
+const isCollaborator = computed(() => {
+  if (!edition.value?.convention?.collaborators || !authStore.user?.id) return false
+  return edition.value.convention.collaborators.some(
+    (collab) => collab.user.id === authStore.user?.id
+  )
 })
 
 // État pour les modals de collaborateurs

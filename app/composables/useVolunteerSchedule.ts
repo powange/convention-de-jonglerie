@@ -43,6 +43,8 @@ export interface UseVolunteerScheduleOptions {
   editionEndDate: string | Ref<string> | ComputedRef<string>
   teams: Ref<VolunteerTeamCalendar[]> | ComputedRef<VolunteerTeamCalendar[]>
   timeSlots: Ref<VolunteerTimeSlot[]> | ComputedRef<VolunteerTimeSlot[]>
+  readOnly?: boolean | Ref<boolean> | ComputedRef<boolean>
+  slotDuration?: number | Ref<number> | ComputedRef<number> // en minutes (15, 30, 60)
   onTimeSlotCreate?: (start: string, end: string, resourceId?: string) => void
   onTimeSlotUpdate?: (timeSlot: VolunteerTimeSlot) => void
   onTimeSlotClick?: (timeSlot: VolunteerTimeSlot) => void
@@ -64,6 +66,8 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
   // Computed pour les dates réactives
   const startDate = computed(() => unref(options.editionStartDate))
   const endDate = computed(() => unref(options.editionEndDate))
+  const isReadOnly = computed(() => unref(options.readOnly) ?? false)
+  const slotDurationMinutes = computed(() => unref(options.slotDuration) ?? 15)
 
   const calendarRef = ref<any>(null)
   const ready = ref(false)
@@ -146,7 +150,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     // Configuration temporelle
     slotMinTime: '00:00:00',
     slotMaxTime: '24:00:00',
-    slotDuration: '00:15:00', // Granularité 15 minutes
+    slotDuration: `00:${String(slotDurationMinutes.value).padStart(2, '0')}:00`, // Granularité dynamique
     slotLabelInterval: '01:00:00', // Libellés toutes les heures
 
     // Heure de défilement initial basée sur l'heure de début de l'édition
@@ -157,8 +161,8 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
     // Configuration des événements
     events: [],
-    editable: true,
-    selectable: true,
+    editable: !isReadOnly.value,
+    selectable: !isReadOnly.value,
 
     // Gestion des chevauchements
     eventOverlap: true, // Permet les chevauchements (par défaut: true)
@@ -166,6 +170,9 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
     // Hauteur des ressources
     resourceAreaWidth: '15%', // Largeur de la colonne des équipes
+
+    // Personnalisation de l'en-tête de la zone des ressources
+    resourceAreaHeaderContent: t('editions.volunteers.teams'),
 
     // Hauteur du calendrier
     height: 'auto',
@@ -299,7 +306,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
     // Gestion des clics et sélections
     select: (selectInfo) => {
-      if (onTimeSlotCreate) {
+      if (!isReadOnly.value && onTimeSlotCreate) {
         onTimeSlotCreate(selectInfo.startStr, selectInfo.endStr, selectInfo.resource?.id)
       }
       // Désélectionner après la création
@@ -312,6 +319,11 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
     // Gestion des événements
     eventClick: (info) => {
+      // Ne pas déclencher les callbacks si en mode lecture seule
+      if (isReadOnly.value) {
+        return
+      }
+
       // Appeler le callback pour le clic si fourni, sinon utiliser onTimeSlotUpdate
       const callback = onTimeSlotClick || onTimeSlotUpdate
       if (callback) {
@@ -429,6 +441,17 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     },
     { immediate: true }
   )
+
+  // Watcher pour la granularité
+  watch(slotDurationMinutes, (newDuration) => {
+    if (calendarRef.value && calendarRef.value.getApi) {
+      const calendarApi = calendarRef.value.getApi()
+      if (calendarApi) {
+        // Mettre à jour la configuration de slotDuration
+        calendarApi.setOption('slotDuration', `00:${String(newDuration).padStart(2, '0')}:00`)
+      }
+    }
+  })
 
   // Initialisation
   onMounted(() => {
