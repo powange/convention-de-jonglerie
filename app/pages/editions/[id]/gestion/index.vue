@@ -805,10 +805,8 @@ const canManageCollaborators = computed(() => {
 
 // Vérifier si l'utilisateur est collaborateur de la convention
 const isCollaborator = computed(() => {
-  if (!edition.value?.convention?.collaborators || !authStore.user?.id) return false
-  return edition.value.convention.collaborators.some(
-    (collab) => collab.user.id === authStore.user?.id
-  )
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.isCollaborator(edition.value, authStore.user.id)
 })
 
 // État pour les modals de collaborateurs

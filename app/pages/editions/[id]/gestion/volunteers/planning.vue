@@ -1071,10 +1071,8 @@ const canEdit = computed(() => {
 })
 
 const isCollaborator = computed(() => {
-  if (!edition.value?.convention?.collaborators || !authStore.user?.id) return false
-  return edition.value.convention.collaborators.some(
-    (collab) => collab.user.id === authStore.user?.id
-  )
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.isCollaborator(edition.value, authStore.user.id)
 })
 
 const isFavorited = computed(() => (_editionId: number) => {

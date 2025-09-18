@@ -510,6 +510,30 @@ export const useEditionStore = defineStore('editions', {
       })
     },
 
+    // Vérifier si l'utilisateur est collaborateur d'une convention
+    isCollaborator(edition: Edition, userId: number): boolean {
+      const authStore = useAuthStore()
+
+      // Les admins globaux en mode admin sont considérés comme collaborateurs
+      if (authStore.isAdminModeActive) {
+        return true
+      }
+
+      // L'auteur de la convention est toujours collaborateur
+      if (edition.convention?.authorId === userId) {
+        return true
+      }
+
+      // Vérifier si l'utilisateur est dans la liste des collaborateurs
+      if (!edition.convention?.collaborators) {
+        return false
+      }
+
+      return edition.convention.collaborators.some(
+        (collab) => collab.user.id === userId
+      )
+    },
+
     // Récupérer toutes les éditions sans pagination (pour l'agenda)
     async fetchAllEditions(filters?: Omit<EditionFilters, 'page' | 'limit'>) {
       this.loading = true

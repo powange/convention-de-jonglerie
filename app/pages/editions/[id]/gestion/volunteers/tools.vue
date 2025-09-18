@@ -159,13 +159,7 @@ const canAccess = computed(() => {
   }
 
   // Tous les collaborateurs de la convention (même sans droits)
-  if (edition.value.convention?.collaborators) {
-    return edition.value.convention.collaborators.some(
-      (collab) => collab.user.id === authStore.user?.id
-    )
-  }
-
-  return false
+  return editionStore.isCollaborator(edition.value, authStore.user.id)
 })
 
 // Permissions calculées
