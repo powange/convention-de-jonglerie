@@ -325,9 +325,6 @@
                 :label="team.name"
                 @update:model-value="toggleTeamSelection(team.name)"
               />
-              <span v-if="team.description" class="text-xs text-gray-500">
-                ({{ team.description }})
-              </span>
             </div>
           </div>
           <p class="text-xs text-gray-500 mt-2">
@@ -1621,6 +1618,7 @@ const handleEditApplicationSave = async (data: { application: any; changes: any 
 
     // Rafraîchir les données
     emit('refreshVolunteersInfo')
+    emit('refreshTeamAssignments')
     refreshApplications()
 
     // Fermer le modal

@@ -87,6 +87,7 @@
                 <!-- Tableau des bénévoles avec filtres -->
                 <EditionVolunteerTable
                   v-if="isVolunteersDataReady"
+                  ref="volunteerTableRef"
                   :volunteers-info="volunteersInfo"
                   :edition-id="editionId"
                   :can-manage-volunteers="canManageVolunteers"
@@ -139,7 +140,10 @@
             </div>
           </template>
 
-          <div v-if="teamDistribution.length === 0" class="text-center py-8">
+          <div
+            v-if="teamDistribution.length === 0 && unassignedVolunteers.length === 0"
+            class="text-center py-8"
+          >
             <UIcon name="i-heroicons-user-group" class="h-12 w-12 text-gray-400 mx-auto mb-3" />
             <p class="text-gray-600 dark:text-gray-400 text-sm">
               Aucune assignation d'équipe trouvée
@@ -151,7 +155,7 @@
 
           <div v-else class="space-y-4">
             <!-- Statistiques générales -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
                 <div class="flex items-center gap-3">
                   <UIcon name="i-heroicons-user-group" class="text-blue-600" size="24" />
@@ -170,6 +174,21 @@
                   </div>
                 </div>
               </div>
+              <div class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4">
+                <div class="flex items-center gap-3">
+                  <UIcon
+                    name="i-heroicons-exclamation-triangle"
+                    class="text-orange-600"
+                    size="24"
+                  />
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Sans assignation</p>
+                    <p class="text-xl font-semibold text-orange-600">
+                      {{ unassignedVolunteers.length }}
+                    </p>
+                  </div>
+                </div>
+              </div>
               <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
                 <div class="flex items-center gap-3">
                   <UIcon name="i-heroicons-chart-bar" class="text-purple-600" size="24" />
@@ -183,25 +202,97 @@
               </div>
             </div>
 
+            <!-- Liste des bénévoles non assignés -->
+            <div v-if="unassignedVolunteers.length > 0" class="space-y-4">
+              <div
+                class="border border-orange-200 dark:border-orange-700 rounded-lg overflow-hidden"
+              >
+                <div
+                  class="px-4 py-3 border-l-4 border-l-orange-400 flex items-center justify-between bg-orange-50 dark:bg-orange-900/20"
+                >
+                  <div class="flex items-center gap-3">
+                    <UIcon
+                      name="i-heroicons-exclamation-triangle"
+                      class="text-orange-600"
+                      size="20"
+                    />
+                    <div>
+                      <h4 class="font-medium text-gray-900 dark:text-white">
+                        Bénévoles non assignés
+                      </h4>
+                      <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Ces bénévoles acceptés n'ont pas encore été assignés à une équipe. Vous
+                        pouvez les glisser-déposer dans une équipe ci-dessous.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-medium">{{ unassignedVolunteers.length }} bénévole(s)</p>
+                  </div>
+                </div>
+
+                <!-- Liste des bénévoles non assignés -->
+                <div class="px-4 py-3 bg-gray-50 dark:bg-gray-800/50">
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div
+                      v-for="volunteer in unassignedVolunteers"
+                      :key="volunteer.id"
+                      draggable="true"
+                      class="flex items-center gap-3 text-sm cursor-move hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded"
+                      @dragstart="handleDragStart(volunteer)"
+                      @dragend="handleDragEnd"
+                    >
+                      <UIcon name="i-heroicons-bars-3" class="text-gray-400" size="16" />
+                      <UiUserAvatar :user="volunteer.user" size="sm" class="flex-shrink-0" />
+                      <div class="min-w-0 flex-1">
+                        <p class="text-gray-700 dark:text-gray-300 font-medium truncate">
+                          {{ volunteer.user.prenom }} {{ volunteer.user.nom }}
+                        </p>
+                        <p class="text-xs text-gray-500 truncate">{{ volunteer.user.email }}</p>
+                        <div
+                          v-if="volunteer.teamPreferences && volunteer.teamPreferences.length > 0"
+                          class="flex items-center gap-1 mt-1"
+                        >
+                          <UIcon name="i-heroicons-heart" class="text-red-500" size="12" />
+                          <span class="text-xs text-gray-600 dark:text-gray-400">
+                            Préf: {{ getTeamNamesFromPreferences(volunteer.teamPreferences) }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Liste des équipes avec leurs bénévoles -->
             <div class="space-y-4">
               <div
                 v-for="team in teamDistribution"
                 :key="team.id"
-                class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
+                class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all"
+                :class="{
+                  'border-primary-500 bg-primary-50 dark:bg-primary-900/20':
+                    dragOverTeam === team.id,
+                  'opacity-50 cursor-not-allowed':
+                    draggedVolunteer && !isTeamInVolunteerPreferences(draggedVolunteer, team.id),
+                  'border-green-300 dark:border-green-600':
+                    draggedVolunteer && isTeamInVolunteerPreferences(draggedVolunteer, team.id),
+                }"
+                @dragover.prevent="handleDragOver(team.id)"
+                @dragleave="handleDragLeave"
+                @drop="handleDrop(team.id)"
               >
                 <div
-                  class="px-4 py-3 border-l-4 flex items-center justify-between"
+                  class="px-4 py-3 border-l-4 flex items-center justify-between transition-colors"
+                  :class="{
+                    'bg-primary-100 dark:bg-primary-900/30': dragOverTeam === team.id,
+                  }"
                   :style="{ borderLeftColor: team.color }"
                 >
                   <div class="flex items-center gap-3">
                     <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: team.color }" />
-                    <div>
-                      <h4 class="font-medium text-gray-900 dark:text-white">{{ team.name }}</h4>
-                      <p v-if="team.description" class="text-sm text-gray-500">
-                        {{ team.description }}
-                      </p>
-                    </div>
+                    <h4 class="font-medium text-gray-900 dark:text-white">{{ team.name }}</h4>
                   </div>
                   <div class="flex items-center gap-4">
                     <div class="text-right">
@@ -300,6 +391,7 @@ interface VolunteerInfo {
 
 // Variables pour les informations des bénévoles
 const volunteersInfo = ref<VolunteerInfo | null>(null)
+const volunteerTableRef = ref<any>(null)
 
 // Mode des bénévoles
 const volunteersMode = computed(() => edition.value?.volunteersMode || 'INTERNAL')
@@ -312,6 +404,9 @@ const isVolunteersDataReady = computed(() => {
 // Récupération des équipes et des assignations pour la nouvelle répartition
 const { teams: volunteerTeams } = useVolunteerTeams(editionId)
 const teamAssignments = ref<any[]>([])
+const acceptedVolunteers = ref<any[]>([])
+const draggedVolunteer = ref<any>(null)
+const dragOverTeam = ref<string | null>(null)
 
 // Fonction pour récupérer les assignations d'équipes
 const fetchTeamAssignments = async () => {
@@ -320,6 +415,7 @@ const fetchTeamAssignments = async () => {
       query: { includeTeams: 'true', status: 'ACCEPTED' },
     })
     const applications = response.applications || response
+    acceptedVolunteers.value = applications.filter((app: any) => app.status === 'ACCEPTED')
     teamAssignments.value = applications.filter(
       (app: any) => app.status === 'ACCEPTED' && app.teams && app.teams.length > 0
     )
@@ -327,6 +423,56 @@ const fetchTeamAssignments = async () => {
     console.error('Failed to fetch team assignments:', error)
   }
 }
+
+// Vérifier si une équipe est dans les préférences du bénévole
+const isTeamInVolunteerPreferences = (volunteer: any, teamId: string): boolean => {
+  if (!volunteer.teamPreferences) return false
+
+  // teamPreferences est un tableau JSON avec les IDs ou noms des équipes préférées
+  if (Array.isArray(volunteer.teamPreferences)) {
+    // Trouver l'équipe par son ID
+    const team = volunteerTeams.value.find((t) => t.id === teamId)
+    if (!team) return false
+
+    // Vérifier si l'ID ou le nom de l'équipe est dans les préférences
+    return (
+      volunteer.teamPreferences.includes(teamId) || volunteer.teamPreferences.includes(team.name)
+    )
+  }
+
+  return false
+}
+
+// Convertir les IDs/noms d'équipes en noms lisibles
+const getTeamNamesFromPreferences = (teamPreferences: string[]): string => {
+  if (!teamPreferences || !Array.isArray(teamPreferences)) return ''
+
+  const names = teamPreferences.map((pref) => {
+    // Chercher d'abord par ID
+    const teamById = volunteerTeams.value.find((t) => t.id === pref)
+    if (teamById) return teamById.name
+
+    // Si ce n'est pas un ID, c'est peut-être déjà un nom
+    const teamByName = volunteerTeams.value.find((t) => t.name === pref)
+    if (teamByName) return teamByName.name
+
+    // Si on ne trouve pas l'équipe, retourner la préférence telle quelle
+    return pref
+  })
+
+  return names.join(', ')
+}
+
+// Computed pour les bénévoles non assignés
+const unassignedVolunteers = computed(() => {
+  if (!acceptedVolunteers.value.length) {
+    return []
+  }
+
+  return acceptedVolunteers.value.filter(
+    (volunteer: any) => !volunteer.teams || volunteer.teams.length === 0
+  )
+})
 
 // Computed pour la répartition par équipes
 const teamDistribution = computed(() => {
@@ -405,6 +551,94 @@ const toggleFavorite = async (id: number) => {
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })
+  }
+}
+
+// Fonctions de drag and drop
+const handleDragStart = (volunteer: any) => {
+  draggedVolunteer.value = volunteer
+}
+
+const handleDragEnd = () => {
+  draggedVolunteer.value = null
+  dragOverTeam.value = null
+}
+
+const handleDragOver = (teamId: string) => {
+  // Ne permettre le survol que si l'équipe est dans les préférences du bénévole
+  if (draggedVolunteer.value && isTeamInVolunteerPreferences(draggedVolunteer.value, teamId)) {
+    dragOverTeam.value = teamId
+  }
+}
+
+const handleDragLeave = () => {
+  dragOverTeam.value = null
+}
+
+const handleDrop = async (teamId: string) => {
+  if (!draggedVolunteer.value) return
+
+  // Vérifier que l'équipe est dans les préférences du bénévole
+  if (!isTeamInVolunteerPreferences(draggedVolunteer.value, teamId)) {
+    toast.add({
+      title: 'Action non autorisée',
+      description: "Ce bénévole ne peut être assigné qu'aux équipes de sa préférence",
+      icon: 'i-heroicons-exclamation-triangle',
+      color: 'warning',
+    })
+    draggedVolunteer.value = null
+    dragOverTeam.value = null
+    return
+  }
+
+  try {
+    // Sauvegarder les infos du bénévole avant de l'assigner
+    const volunteerName = `${draggedVolunteer.value.user.prenom} ${draggedVolunteer.value.user.nom}`
+    const volunteerId = draggedVolunteer.value.id
+
+    // Assigner le bénévole à l'équipe
+    await $fetch(`/api/editions/${editionId}/volunteers/applications/${volunteerId}/teams`, {
+      method: 'PATCH',
+      body: {
+        teams: [teamId],
+      },
+    })
+
+    // Rafraîchir les données
+    await fetchTeamAssignments()
+    await fetchVolunteersInfo()
+
+    // Rafraîchir le tableau des bénévoles
+    if (volunteerTableRef.value && volunteerTableRef.value.refreshApplications) {
+      await volunteerTableRef.value.refreshApplications()
+    }
+
+    // Trouver le nom de l'équipe
+    const team = volunteerTeams.value.find((t) => t.id === teamId)
+    const teamName = team?.name || "l'équipe"
+
+    toast.add({
+      title: 'Bénévole assigné',
+      description: `${volunteerName} a été assigné à ${teamName}`,
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (error: any) {
+    console.error('Failed to assign volunteer to team:', error)
+
+    // Si l'erreur contient un message spécifique, l'afficher
+    const errorMessage =
+      error?.data?.message || error?.message || "Impossible d'assigner le bénévole à l'équipe"
+
+    toast.add({
+      title: 'Erreur',
+      description: errorMessage,
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  } finally {
+    draggedVolunteer.value = null
+    dragOverTeam.value = null
   }
 }
 

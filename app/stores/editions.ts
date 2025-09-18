@@ -529,9 +529,7 @@ export const useEditionStore = defineStore('editions', {
         return false
       }
 
-      return edition.convention.collaborators.some(
-        (collab) => collab.user.id === userId
-      )
+      return edition.convention.collaborators.some((collab) => collab.user.id === userId)
     },
 
     // Récupérer toutes les éditions sans pagination (pour l'agenda)

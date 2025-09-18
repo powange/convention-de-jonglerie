@@ -23,12 +23,11 @@
         <div
           v-for="team in teams"
           :key="team.id"
-          class="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+          class="border rounded-lg p-4 hover:shadow-md transition-shadow"
           :style="{ borderColor: team.color }"
-          @click="openEditTeamModal(team)"
         >
           <div class="flex items-start justify-between mb-2">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 cursor-pointer" @click="openEditTeamModal(team)">
               <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: team.color }" />
               <h4 class="font-medium">{{ team.name }}</h4>
             </div>
@@ -59,9 +58,31 @@
             </div>
           </div>
 
-          <p v-if="team.description" class="text-sm text-gray-600 mb-2">
-            {{ team.description }}
-          </p>
+          <div v-if="team.description" class="mb-2">
+            <div v-if="!expandedTeams[team.id]" class="relative">
+              <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 whitespace-pre-line">
+                {{ team.description }}
+              </p>
+              <button
+                v-if="team.description.length > 100 || team.description.includes('\n')"
+                class="text-xs text-primary-500 hover:text-primary-600 mt-1"
+                @click.stop="toggleExpand(team.id)"
+              >
+                {{ t('common.show_more') }}
+              </button>
+            </div>
+            <div v-else>
+              <p class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+                {{ team.description }}
+              </p>
+              <button
+                class="text-xs text-primary-500 hover:text-primary-600 mt-1"
+                @click.stop="toggleExpand(team.id)"
+              >
+                {{ t('common.show_less') }}
+              </button>
+            </div>
+          </div>
 
           <div class="flex items-center justify-between text-xs text-gray-500">
             <span v-if="team.maxVolunteers">
@@ -90,7 +111,10 @@
                 {{ teamFormState.name || t('editions.volunteers.team_preview') }}
               </h3>
             </div>
-            <p v-if="teamFormState.description" class="text-sm text-gray-600 dark:text-gray-400">
+            <p
+              v-if="teamFormState.description"
+              class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line"
+            >
               {{ teamFormState.description }}
             </p>
             <p v-else class="text-sm text-gray-500 italic">
@@ -253,6 +277,7 @@ const toast = useToast()
 const teamModalOpen = ref(false)
 const editingTeam = ref<VolunteerTeam | null>(null)
 const loading = ref(false)
+const expandedTeams = ref<Record<number, boolean>>({})
 
 // API
 const { teams, createTeam, updateTeam, deleteTeam } = useVolunteerTeams(props.editionId)
@@ -299,6 +324,10 @@ const teamModalTitle = computed(() =>
 )
 
 // Actions
+const toggleExpand = (teamId: number) => {
+  expandedTeams.value[teamId] = !expandedTeams.value[teamId]
+}
+
 const openCreateTeamModal = () => {
   editingTeam.value = null
   // Choisir une couleur aléatoire parmi celles qui ne sont pas déjà utilisées
