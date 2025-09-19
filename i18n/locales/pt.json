@@ -48,7 +48,6 @@
     "cron_system_status": "Estado do sistema de tarefas",
     "dashboard": "Painel de Controlo Administrador",
     "dashboard_subtitle": "Painel de controlo e ferramentas de administração da plataforma",
-    "days_ago": "Há {count} dias",
     "delete_account": "Excluir conta",
     "delete_user_account": "Excluir conta utilisateur",
     "deletion_error": "Erro ao excluir conta",
@@ -185,7 +184,6 @@
     "main_type": "Tipo principal",
     "manage_editions": "Gerenciar edições",
     "monitor_tasks": "Monitorar execução",
-    "months_ago": "Há {count} meses",
     "name_a_z": "Por nome (A-Z)",
     "name_z_a": "Por nome (Z-A)",
     "new_conventions_this_month": "+{count} este mês",
@@ -259,10 +257,7 @@
     "view_profile": "Ver perfil",
     "view_profiles": "Ver perfis",
     "volunteer_reminders": "Lembretes de voluntários",
-    "volunteers_count": "{count} voluntários",
-    "weeks_ago": "Há {count} semanas",
-    "years_ago": "Há {count} anos",
-    "yesterday": "Ontem"
+    "volunteers_count": "{count} voluntários"
   },
   "app": {
     "title": "Convenção de Malabarismo"
@@ -535,13 +530,8 @@
     "status": "Estado",
     "success": "Sucesso",
     "time": "Hora",
-    "time_days_ago": "há {count} d",
-    "time_hours_ago": "há {count} h",
-    "time_just_now": "agora mesmo",
-    "time_minutes_ago": "há {count} min",
     "tip": "Dica",
     "title": "Título",
-    "today": "Hoje",
     "total": "Total",
     "validate": "Validar",
     "view": "Ver",

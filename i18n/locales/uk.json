@@ -48,7 +48,6 @@
     "cron_system_status": "Статус системи завдань",
     "dashboard": "Панель адміністратора",
     "dashboard_subtitle": "Панель керування та інструменти адміністрування платформи",
-    "days_ago": "{count} днів тому",
     "delete_account": "Видалити акаунт",
     "delete_user_account": "Видалити акаунт utilisateur",
     "deletion_error": "Помилка при видаленні акаунта",
@@ -185,7 +184,6 @@
     "main_type": "Основний тип",
     "manage_editions": "Управляти виданнями",
     "monitor_tasks": "Моніторинг виконання",
-    "months_ago": "{count} місяців тому",
     "name_a_z": "За іменем (А-Я)",
     "name_z_a": "За іменем (Я-А)",
     "new_conventions_this_month": "+{count} цього місяця",
@@ -259,10 +257,7 @@
     "view_profile": "Переглянути профіль",
     "view_profiles": "Переглянути профілі",
     "volunteer_reminders": "Нагадування волонтерам",
-    "volunteers_count": "{count} волонтерів",
-    "weeks_ago": "{count} тижнів тому",
-    "years_ago": "{count} років тому",
-    "yesterday": "Вчора"
+    "volunteers_count": "{count} волонтерів"
   },
   "app": {
     "title": "Конвенція Жонглювання"
@@ -535,13 +530,8 @@
     "status": "Статус",
     "success": "Успіх",
     "time": "Час",
-    "time_days_ago": "{count} д тому",
-    "time_hours_ago": "{count} год тому",
-    "time_just_now": "щойно",
-    "time_minutes_ago": "{count} хв тому",
     "tip": "Порада",
     "title": "Заголовок",
-    "today": "Сьогодні",
     "total": "Всього",
     "validate": "Підтвердити",
     "view": "Переглянути",

@@ -48,7 +48,6 @@
     "cron_system_status": "Stato del sistema di attività",
     "dashboard": "Pannello di controllo Amministratore",
     "dashboard_subtitle": "Pannello di controllo e strumenti di amministrazione della piattaforma",
-    "days_ago": "{count} giorni fa",
     "delete_account": "Elimina account",
     "delete_user_account": "Elimina account utilisateur",
     "deletion_error": "Errore durante l'eliminazione dell'account",
@@ -185,7 +184,6 @@
     "main_type": "Tipo principale",
     "manage_editions": "Gestisci edizioni",
     "monitor_tasks": "Monitora esecuzione",
-    "months_ago": "{count} mesi fa",
     "name_a_z": "Per nome (A-Z)",
     "name_z_a": "Per nome (Z-A)",
     "new_conventions_this_month": "+{count} questo mese",
@@ -259,10 +257,7 @@
     "view_profile": "Visualizza profilo",
     "view_profiles": "Visualizza profili",
     "volunteer_reminders": "Promemoria volontari",
-    "volunteers_count": "{count} volontari",
-    "weeks_ago": "{count} settimane fa",
-    "years_ago": "{count} anni fa",
-    "yesterday": "Ieri"
+    "volunteers_count": "{count} volontari"
   },
   "app": {
     "title": "Convegni di Giocoleria"
@@ -535,13 +530,8 @@
     "status": "Stato",
     "success": "Successo",
     "time": "Ora",
-    "time_days_ago": "{count} g fa",
-    "time_hours_ago": "{count} h fa",
-    "time_just_now": "proprio ora",
-    "time_minutes_ago": "{count} min fa",
     "tip": "Consiglio",
     "title": "Titolo",
-    "today": "Oggi",
     "total": "Totale",
     "validate": "Convalida",
     "view": "Visualizza",

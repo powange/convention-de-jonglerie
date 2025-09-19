@@ -4,7 +4,7 @@
     <UButton
       icon="i-heroicons-bell"
       variant="ghost"
-      :color="notificationsStore.unreadCount > 0 ? 'primary' : 'gray'"
+      :color="notificationsStore.unreadCount > 0 ? 'primary' : 'neutral'"
       :class="['relative', notificationsStore.unreadCount > 0 ? 'animate-pulse' : '']"
       @click="isOpen = !isOpen"
     >
@@ -23,7 +23,7 @@
     <!-- Panel de notifications -->
     <UModal
       v-model:open="isOpen"
-      :ui="{ width: 'w-full max-w-md' }"
+      :ui="{ content: 'w-full max-w-md' }"
       :title="$t('navigation.notifications')"
     >
       <template #content>
@@ -147,7 +147,7 @@
                         <UButton
                           icon="i-heroicons-x-mark"
                           variant="ghost"
-                          size="2xs"
+                          size="xs"
                           color="neutral"
                           @click.stop="deleteNotification(notification.id)"
                         />
@@ -252,24 +252,18 @@ const getNotificationIconColor = (type: string) => {
   }
 }
 
+const { locale } = useI18n()
+
 const formatRelativeTime = (dateString: string) => {
   const date = new Date(dateString)
-  const now = new Date()
-  const diff = now.getTime() - date.getTime()
 
-  const minutes = Math.floor(diff / (1000 * 60))
-  const hours = Math.floor(diff / (1000 * 60 * 60))
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-
-  if (minutes < 1) return "À l'instant"
-  if (minutes < 60) return `${minutes} min`
-  if (hours < 24) return `${hours}h`
-  if (days < 7) return `${days}j`
-
-  return date.toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'short',
-  })
+  return useTimeAgoIntl(date, {
+    locale: locale.value,
+    relativeTimeFormatOptions: {
+      numeric: 'auto',
+      style: 'short',
+    },
+  }).value
 }
 
 // Actions

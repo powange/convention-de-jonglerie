@@ -387,17 +387,18 @@ const formatDateTime = (date: string) => {
   })
 }
 
-const formatRelativeTime = (date: string) => {
-  const now = new Date()
-  const target = new Date(date)
-  const diffInDays = Math.floor((now.getTime() - target.getTime()) / (1000 * 60 * 60 * 24))
+const { locale } = useI18n()
 
-  if (diffInDays === 0) return t('common.today')
-  if (diffInDays === 1) return t('admin.yesterday')
-  if (diffInDays < 7) return t('admin.days_ago', { count: diffInDays })
-  if (diffInDays < 30) return t('admin.weeks_ago', { count: Math.floor(diffInDays / 7) })
-  if (diffInDays < 365) return t('admin.months_ago', { count: Math.floor(diffInDays / 30) })
-  return t('admin.years_ago', { count: Math.floor(diffInDays / 365) })
+const formatRelativeTime = (date: string) => {
+  const target = new Date(date)
+
+  return useTimeAgoIntl(target, {
+    locale: locale.value,
+    relativeTimeFormatOptions: {
+      numeric: 'auto',
+      style: 'short',
+    },
+  }).value
 }
 
 const getUserActions = (user: AdminUser) => {

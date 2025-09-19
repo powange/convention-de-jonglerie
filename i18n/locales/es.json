@@ -48,7 +48,6 @@
     "cron_system_status": "Estado del sistema de tareas",
     "dashboard": "Panel de Administrador",
     "dashboard_subtitle": "Panel de control y herramientas de administración de la plataforma",
-    "days_ago": "Hace {count} días",
     "delete_account": "Eliminar cuenta",
     "delete_user_account": "Eliminar cuenta utilisateur",
     "deletion_error": "Error al eliminar la cuenta",
@@ -185,7 +184,6 @@
     "main_type": "Tipo principal",
     "manage_editions": "Gestionar ediciones",
     "monitor_tasks": "Monitorear ejecución",
-    "months_ago": "Hace {count} meses",
     "name_a_z": "Por nombre (A-Z)",
     "name_z_a": "Por nombre (Z-A)",
     "new_conventions_this_month": "+{count} este mes",
@@ -259,10 +257,7 @@
     "view_profile": "Ver perfil",
     "view_profiles": "Ver perfiles",
     "volunteer_reminders": "Recordatorios de voluntarios",
-    "volunteers_count": "{count} voluntarios",
-    "weeks_ago": "Hace {count} semanas",
-    "years_ago": "Hace {count} años",
-    "yesterday": "Ayer"
+    "volunteers_count": "{count} voluntarios"
   },
   "app": {
     "title": "Convención de Malabares"
@@ -535,13 +530,8 @@
     "status": "Estado",
     "success": "Éxito",
     "time": "Hora",
-    "time_days_ago": "hace {count} d",
-    "time_hours_ago": "hace {count} h",
-    "time_just_now": "ahora mismo",
-    "time_minutes_ago": "hace {count} min",
     "tip": "Consejo",
     "title": "Título",
-    "today": "Hoy",
     "total": "Total",
     "validate": "Validar",
     "view": "Ver",

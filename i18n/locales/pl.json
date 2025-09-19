@@ -48,7 +48,6 @@
     "cron_system_status": "Status systemu zadań",
     "dashboard": "Panel Administratora",
     "dashboard_subtitle": "Panel i narzędzia administracyjne platformy",
-    "days_ago": "{count} dni temu",
     "delete_account": "Usuń konto",
     "delete_user_account": "Usuń konto utilisateur",
     "deletion_error": "Błąd podczas usuwania konta",
@@ -185,7 +184,6 @@
     "main_type": "Typ główny",
     "manage_editions": "Zarządzaj edycjami",
     "monitor_tasks": "Monitoruj wykonanie",
-    "months_ago": "{count} miesięcy temu",
     "name_a_z": "Wg nazwy (A-Z)",
     "name_z_a": "Wg nazwy (Z-A)",
     "new_conventions_this_month": "+{count} w tym miesiącu",
@@ -259,10 +257,7 @@
     "view_profile": "Zobacz profil",
     "view_profiles": "Zobacz profile",
     "volunteer_reminders": "Przypomnienia wolontariuszy",
-    "volunteers_count": "{count} wolontariuszy",
-    "weeks_ago": "{count} tygodni temu",
-    "years_ago": "{count} lat temu",
-    "yesterday": "Wczoraj"
+    "volunteers_count": "{count} wolontariuszy"
   },
   "app": {
     "title": "Konwencja Żonglerska"
@@ -535,13 +530,8 @@
     "status": "Stan",
     "success": "Sukces",
     "time": "Czas",
-    "time_days_ago": "{count} dni temu",
-    "time_hours_ago": "{count} godz temu",
-    "time_just_now": "przed chwilą",
-    "time_minutes_ago": "{count} min temu",
     "tip": "Porada",
     "title": "Tytuł",
-    "today": "Dziś",
     "total": "Suma",
     "validate": "Walidować",
     "view": "Zobacz",

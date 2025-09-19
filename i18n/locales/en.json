@@ -48,7 +48,6 @@
     "cron_system_status": "Task system status",
     "dashboard": "Administrator Dashboard",
     "dashboard_subtitle": "Dashboard and platform administration tools",
-    "days_ago": "{count} days ago",
     "delete_account": "Delete account",
     "delete_user_account": "Delete account utilisateur",
     "deletion_error": "Error deleting account",
@@ -185,7 +184,6 @@
     "main_type": "Main Type",
     "manage_editions": "Manage editions",
     "monitor_tasks": "Monitor execution",
-    "months_ago": "{count} months ago",
     "name_a_z": "By name (A-Z)",
     "name_z_a": "By name (Z-A)",
     "new_conventions_this_month": "+{count} this month",
@@ -259,10 +257,7 @@
     "view_profile": "View profile",
     "view_profiles": "View profiles",
     "volunteer_reminders": "Volunteer reminders",
-    "volunteers_count": "{count} volunteers",
-    "weeks_ago": "{count} weeks ago",
-    "years_ago": "{count} years ago",
-    "yesterday": "Yesterday"
+    "volunteers_count": "{count} volunteers"
   },
   "app": {
     "title": "Juggling Convention"
@@ -535,13 +530,8 @@
     "status": "Status",
     "success": "Success",
     "time": "Time",
-    "time_days_ago": "{count} d ago",
-    "time_hours_ago": "{count} h ago",
-    "time_just_now": "just now",
-    "time_minutes_ago": "{count} min ago",
     "tip": "Tip",
     "title": "Title",
-    "today": "Today",
     "total": "Total",
     "validate": "Validate",
     "view": "View",

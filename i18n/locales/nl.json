@@ -48,7 +48,6 @@
     "cron_system_status": "Status takensysteem",
     "dashboard": "Beheerdersdashboard",
     "dashboard_subtitle": "Dashboard en platformbeheertools",
-    "days_ago": "{count} dagen geleden",
     "delete_account": "Account verwijderen",
     "delete_user_account": "Account verwijderen utilisateur",
     "deletion_error": "Fout bij het verwijderen van account",
@@ -185,7 +184,6 @@
     "main_type": "Hoofdtype",
     "manage_editions": "Edities beheren",
     "monitor_tasks": "Uitvoering bewaken",
-    "months_ago": "{count} maanden geleden",
     "name_a_z": "Op naam (A-Z)",
     "name_z_a": "Op naam (Z-A)",
     "new_conventions_this_month": "+{count} deze maand",
@@ -259,10 +257,7 @@
     "view_profile": "Profiel bekijken",
     "view_profiles": "Profielen bekijken",
     "volunteer_reminders": "Vrijwilligersherinneringen",
-    "volunteers_count": "{count} vrijwilligers",
-    "weeks_ago": "{count} weken geleden",
-    "years_ago": "{count} jaar geleden",
-    "yesterday": "Gisteren"
+    "volunteers_count": "{count} vrijwilligers"
   },
   "app": {
     "title": "Jongleerconventie"
@@ -535,13 +530,8 @@
     "status": "Status",
     "success": "Succes",
     "time": "Tijd",
-    "time_days_ago": "{count} d geleden",
-    "time_hours_ago": "{count} u geleden",
-    "time_just_now": "zojuist",
-    "time_minutes_ago": "{count} min geleden",
     "tip": "Tip",
     "title": "Titel",
-    "today": "Vandaag",
     "total": "Totaal",
     "validate": "Valideren",
     "view": "Bekijken",

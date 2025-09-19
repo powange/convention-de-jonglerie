@@ -48,7 +48,6 @@
     "cron_system_status": "Status des Aufgabensystems",
     "dashboard": "Administrator-Dashboard",
     "dashboard_subtitle": "Dashboard und Verwaltungstools der Plattform",
-    "days_ago": "Vor {count} Tagen",
     "delete_account": "Konto löschen",
     "delete_user_account": "Konto löschen utilisateur",
     "deletion_error": "Fehler beim Löschen des Kontos",
@@ -185,7 +184,6 @@
     "main_type": "Haupttyp",
     "manage_editions": "Ausgaben verwalten",
     "monitor_tasks": "Ausführung überwachen",
-    "months_ago": "Vor {count} Monaten",
     "name_a_z": "Nach Name (A-Z)",
     "name_z_a": "Nach Name (Z-A)",
     "new_conventions_this_month": "+{count} diesen Monat",
@@ -259,10 +257,7 @@
     "view_profile": "Profil anzeigen",
     "view_profiles": "Profile anzeigen",
     "volunteer_reminders": "Freiwilligen-Erinnerungen",
-    "volunteers_count": "{count} Freiwillige",
-    "weeks_ago": "Vor {count} Wochen",
-    "years_ago": "Vor {count} Jahren",
-    "yesterday": "Gestern"
+    "volunteers_count": "{count} Freiwillige"
   },
   "app": {
     "title": "Jonglier-Convention"
@@ -535,13 +530,8 @@
     "status": "Status",
     "success": "Erfolg",
     "time": "Zeit",
-    "time_days_ago": "vor {count} T",
-    "time_hours_ago": "vor {count} Std",
-    "time_just_now": "gerade eben",
-    "time_minutes_ago": "vor {count} Min",
     "tip": "Tipp",
     "title": "Titel",
-    "today": "Heute",
     "total": "Gesamt",
     "validate": "Validieren",
     "view": "Anzeigen",

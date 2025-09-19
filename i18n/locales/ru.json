@@ -48,7 +48,6 @@
     "cron_system_status": "Статус системы задач",
     "dashboard": "Панель Администратора",
     "dashboard_subtitle": "Панель управления и инструменты администрирования платформы",
-    "days_ago": "{count} дней назад",
     "delete_account": "Удалить аккаунт",
     "delete_user_account": "Удалить аккаунт utilisateur",
     "deletion_error": "Ошибка при удалении аккаунта",
@@ -185,7 +184,6 @@
     "main_type": "Основной тип",
     "manage_editions": "Управлять изданиями",
     "monitor_tasks": "Мониторинг выполнения",
-    "months_ago": "{count} месяцев назад",
     "name_a_z": "По имени (А-Я)",
     "name_z_a": "По имени (Я-А)",
     "new_conventions_this_month": "+{count} в этом месяце",
@@ -259,10 +257,7 @@
     "view_profile": "Просмотреть профиль",
     "view_profiles": "Просмотреть профили",
     "volunteer_reminders": "Напоминания волонтерам",
-    "volunteers_count": "{count} волонтеров",
-    "weeks_ago": "{count} недель назад",
-    "years_ago": "{count} лет назад",
-    "yesterday": "Вчера"
+    "volunteers_count": "{count} волонтеров"
   },
   "app": {
     "title": "Конвенция Жонглирования"
@@ -535,13 +530,8 @@
     "status": "Статус",
     "success": "Успех",
     "time": "Время",
-    "time_days_ago": "{count} дн назад",
-    "time_hours_ago": "{count} ч назад",
-    "time_just_now": "только что",
-    "time_minutes_ago": "{count} мин назад",
     "tip": "Совет",
     "title": "Заголовок",
-    "today": "Сегодня",
     "total": "Всего",
     "validate": "Подтвердить",
     "view": "Просмотреть",

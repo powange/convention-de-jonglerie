@@ -483,31 +483,36 @@ const stats = ref({
   unresolvedErrorLogs: 0,
 })
 
-const recentActivity = ref([])
+interface Activity {
+  id: string
+  type: string
+  title: string
+  description: string
+  createdAt: string
+}
+
+const recentActivity = ref<Activity[]>([])
 
 // Gestion du mode administrateur
 const adminModeToggle = ref(authStore.isAdminModeActive)
 
 // Fonctions utilitaires
+const { locale } = useI18n()
+
 const formatRelativeTime = (date: string) => {
-  const now = new Date()
   const target = new Date(date)
-  const diffInMinutes = Math.floor((now.getTime() - target.getTime()) / (1000 * 60))
 
-  if (diffInMinutes < 1) return t('common.time_just_now')
-  if (diffInMinutes < 60) return t('common.time_minutes_ago', { count: diffInMinutes })
-
-  const diffInHours = Math.floor(diffInMinutes / 60)
-  if (diffInHours < 24) return t('common.time_hours_ago', { count: diffInHours })
-
-  const diffInDays = Math.floor(diffInHours / 24)
-  if (diffInDays < 7) return t('common.time_days_ago', { count: diffInDays })
-
-  return target.toLocaleDateString()
+  return useTimeAgoIntl(target, {
+    locale: locale.value,
+    relativeTimeFormatOptions: {
+      numeric: 'auto',
+      style: 'short',
+    },
+  }).value
 }
 
 const getActivityIcon = (type: string) => {
-  const icons = {
+  const icons: Record<string, string> = {
     user_registered: 'i-heroicons-user-plus',
     convention_created: 'i-heroicons-building-library',
     edition_created: 'i-heroicons-calendar-plus',
@@ -517,7 +522,7 @@ const getActivityIcon = (type: string) => {
 }
 
 const getActivityIconClass = (type: string) => {
-  const classes = {
+  const classes: Record<string, string> = {
     user_registered: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
     convention_created: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
     edition_created: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
@@ -535,7 +540,7 @@ const loadStats = async () => {
     console.error('Error loading statistics:', error)
 
     // Si erreur d'authentification, rediriger vers login
-    if (error?.statusCode === 401 || error?.status === 401) {
+    if ((error as any)?.statusCode === 401 || (error as any)?.status === 401) {
       navigateTo('/login')
       return
     }
@@ -549,6 +554,8 @@ const loadStats = async () => {
       totalEditions: 0,
       newEditionsThisMonth: 0,
       totalAdmins: 0,
+      unresolvedFeedbacks: 0,
+      unresolvedErrorLogs: 0,
     }
 
     toast.add({
@@ -568,7 +575,7 @@ const loadRecentActivity = async () => {
     console.error('Error loading activity:', error)
 
     // Si erreur d'authentification, rediriger vers login
-    if (error?.statusCode === 401 || error?.status === 401) {
+    if ((error as any)?.statusCode === 401 || (error as any)?.status === 401) {
       navigateTo('/login')
       return
     }

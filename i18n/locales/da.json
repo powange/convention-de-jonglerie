@@ -48,7 +48,6 @@
     "cron_system_status": "Opgavesystemstatus",
     "dashboard": "Administrator Dashboard",
     "dashboard_subtitle": "Dashboard og administrative værktøjer til platformen",
-    "days_ago": "{count} dage siden",
     "delete_account": "Slet konto",
     "delete_user_account": "Slet konto utilisateur",
     "deletion_error": "Fejl ved sletning af konto",
@@ -185,7 +184,6 @@
     "main_type": "Hovedtype",
     "manage_editions": "Administrer udgaver",
     "monitor_tasks": "Overvåg udførelse",
-    "months_ago": "{count} måneder siden",
     "name_a_z": "Efter navn (A-Z)",
     "name_z_a": "Efter navn (Z-A)",
     "new_conventions_this_month": "+{count} denne måned",
@@ -259,10 +257,7 @@
     "view_profile": "Se profil",
     "view_profiles": "Se profiler",
     "volunteer_reminders": "Frivillig påmindelser",
-    "volunteers_count": "{count} frivillige",
-    "weeks_ago": "{count} uger siden",
-    "years_ago": "{count} år siden",
-    "yesterday": "I går"
+    "volunteers_count": "{count} frivillige"
   },
   "app": {
     "title": "Juggling Convention"
@@ -535,13 +530,8 @@
     "status": "Status",
     "success": "Succes",
     "time": "Tid",
-    "time_days_ago": "{count} d siden",
-    "time_hours_ago": "{count} t siden",
-    "time_just_now": "lige nu",
-    "time_minutes_ago": "{count} min siden",
     "tip": "Tip",
     "title": "Titel",
-    "today": "I dag",
     "total": "Total",
     "validate": "Valider",
     "view": "Se",

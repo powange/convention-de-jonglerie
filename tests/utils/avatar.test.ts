@@ -37,21 +37,23 @@ describe('avatar utils', () => {
       expect(typeof getUserAvatar).toBe('function')
     })
 
-    it("devrait utiliser l'URL de fallback pour un utilisateur null", () => {
+    it('devrait utiliser un avatar avec initiales vides pour un utilisateur null', () => {
       const { getUserAvatar } = useAvatar()
 
       const url = getUserAvatar(null as any)
 
-      expect(url).toBe('https://www.gravatar.com/avatar/default?s=80&d=mp')
+      // Should return an SVG with empty initials
+      expect(url).toContain('data:image/svg+xml;base64,')
     })
 
-    it("devrait utiliser l'URL de fallback pour un utilisateur sans email ni emailHash", () => {
+    it('devrait utiliser un avatar avec initiales vides pour un utilisateur sans email ni emailHash', () => {
       const { getUserAvatar } = useAvatar()
 
       const user = { profilePicture: null }
       const url = getUserAvatar(user as any)
 
-      expect(url).toBe('https://www.gravatar.com/avatar/default?s=80&d=mp')
+      // Should return an SVG with empty initials
+      expect(url).toContain('data:image/svg+xml;base64,')
     })
 
     it("devrait utiliser profilePicture si c'est une URL absolue HTTP", () => {
@@ -145,21 +147,21 @@ describe('avatar utils', () => {
       expect(mockGetGravatarAvatar).not.toHaveBeenCalled()
     })
 
-    it("devrait calculer l'avatar Gravatar depuis l'email", () => {
+    it('devrait générer un avatar avec initiales basées sur le pseudo', () => {
       const { getUserAvatar } = useAvatar()
-
-      mockGetGravatarAvatar.mockReturnValue(
-        'https://www.gravatar.com/avatar/calculatedHash?s=80&d=mp'
-      )
 
       const user = {
         email: 'test@example.com',
+        pseudo: 'John Doe',
       }
 
       const url = getUserAvatar(user)
 
-      expect(mockGetGravatarAvatar).toHaveBeenCalledWith('test@example.com', 80)
-      expect(url).toBe('https://www.gravatar.com/avatar/calculatedHash?s=80&d=mp')
+      // Should return an SVG with initials
+      expect(url).toContain('data:image/svg+xml;base64,')
+      // The SVG should contain "JD" for John Doe
+      const decoded = atob(url.split(',')[1])
+      expect(decoded).toContain('JD')
     })
 
     it('devrait utiliser la taille par défaut de 80px', () => {
@@ -177,15 +179,19 @@ describe('avatar utils', () => {
     it('devrait respecter la taille personnalisée', () => {
       const { getUserAvatar } = useAvatar()
 
-      mockGetGravatarAvatar.mockReturnValue('https://www.gravatar.com/avatar/hash?s=200&d=mp')
-
       const user = {
         email: 'test@example.com',
+        pseudo: 'Test',
       }
 
       const url = getUserAvatar(user, 200)
 
-      expect(mockGetGravatarAvatar).toHaveBeenCalledWith('test@example.com', 200)
+      // Should return an SVG
+      expect(url).toContain('data:image/svg+xml;base64,')
+      // The SVG should include the size
+      const decoded = atob(url.split(',')[1])
+      expect(decoded).toContain('width="200"')
+      expect(decoded).toContain('height="200"')
     })
 
     it('devrait prioriser profilePicture sur email et emailHash', () => {
@@ -229,40 +235,36 @@ describe('avatar utils', () => {
             profilePicture: 'https://example.com/pic.jpg',
             updatedAt: '2022-01-01T00:00:00Z',
           },
-          expected: 'https://example.com/pic.jpg',
+          expected: 'profile-picture',
         },
         // Utilisateur avec emailHash seulement
         {
           user: {
             emailHash: 'hash456',
           },
-          expected: 'https://www.gravatar.com/avatar/hash456?s=80&d=mp',
+          expected: 'gravatar',
         },
-        // Utilisateur avec email seulement
+        // Utilisateur avec email seulement (will generate initials)
         {
           user: {
             email: 'user@test.com',
+            pseudo: 'Test User',
           },
-          expected: 'gravatar-calculated',
+          expected: 'initials',
         },
       ]
 
       testCases.forEach(({ user, expected }, index) => {
         vi.clearAllMocks()
 
-        if (expected === 'gravatar-calculated') {
-          mockGetGravatarAvatar.mockReturnValue(
-            'https://www.gravatar.com/avatar/calculated?s=80&d=mp'
-          )
-        }
-
         const url = getUserAvatar(user as any)
 
-        if (expected === 'gravatar-calculated') {
-          expect(mockGetGravatarAvatar).toHaveBeenCalled()
-          expect(url).toBe('https://www.gravatar.com/avatar/calculated?s=80&d=mp')
-        } else {
-          expect(url).toBe(expected)
+        if (expected === 'profile-picture') {
+          expect(url).toBe('https://example.com/pic.jpg')
+        } else if (expected === 'gravatar') {
+          expect(url).toBe('https://www.gravatar.com/avatar/hash456?s=80&d=mp')
+        } else if (expected === 'initials') {
+          expect(url).toContain('data:image/svg+xml;base64,')
         }
       })
     })
