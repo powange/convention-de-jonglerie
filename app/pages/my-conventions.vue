@@ -907,7 +907,7 @@ function findCurrentCollab(convention: Convention) {
   return convention.collaborators?.find((c: any) => c.user.id === uid)
 }
 const isAuthor = (convention: Convention) =>
-  currentUserId() && convention.authorId === currentUserId()
+  currentUserId() && convention.authorId && convention.authorId === currentUserId()
 const canManageCollaborators = (convention: Convention) =>
   !!(isAuthor(convention) || findCurrentCollab(convention)?.rights?.manageCollaborators)
 const canAddEdition = (convention: Convention) =>

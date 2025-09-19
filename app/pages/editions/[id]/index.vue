@@ -346,7 +346,7 @@ const isAttending = computed(() => (_editionId: number) => {
 // Check if user can manage edition
 const canManageEdition = computed(() => {
   if (!authStore.user || !edition.value) return false
-  if (edition.value.creatorId === authStore.user.id) return true
+  if (edition.value.creatorId && edition.value.creatorId === authStore.user.id) return true
   const collab = edition.value.convention?.collaborators?.find(
     (c: any) => authStore.user && c.user.id === authStore.user.id
   )

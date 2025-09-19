@@ -53,6 +53,7 @@ model User {
   volunteerNotificationConfirmations VolunteerNotificationConfirmation[]
   volunteerAssignments         VolunteerAssignment[]        @relation("VolunteerAssignment_user")
   assignedVolunteerSlots       VolunteerAssignment[]        @relation("VolunteerAssignment_assignedBy")
+  claimRequests                ConventionClaimRequest[]
 }
 
 model Edition {
@@ -61,7 +62,7 @@ model Edition {
   description                  String?                         @db.Text
   createdAt                    DateTime                        @default(now())
   updatedAt                    DateTime                        @updatedAt
-  creatorId                    Int
+  creatorId                    Int?                            // Nullable pour éditions importées
   endDate                      DateTime
   startDate                    DateTime
   addressLine1                 String
@@ -127,7 +128,7 @@ model Edition {
   carpoolOffers                CarpoolOffer[]
   carpoolRequests              CarpoolRequest[]
   convention                   Convention                      @relation(fields: [conventionId], references: [id])
-  creator                      User                            @relation("CreatedEditions", fields: [creatorId], references: [id])
+  creator                      User?                           @relation("CreatedEditions", fields: [creatorId], references: [id])
   collaboratorPermissions      EditionCollaboratorPermission[]
   editionPosts                 EditionPost[]
   volunteerApplications        EditionVolunteerApplication[]
@@ -281,15 +282,17 @@ model Convention {
   name              String
   description       String?                         @db.Text
   logo              String?
+  email             String?                         // Email pour revendication
   createdAt         DateTime                        @default(now())
   updatedAt         DateTime                        @updatedAt
-  authorId          Int
+  authorId          Int?                            // Nullable pour conventions importées
   archivedAt        DateTime?
   isArchived        Boolean                         @default(false)
   permissionHistory CollaboratorPermissionHistory[]
-  author            User                            @relation(fields: [authorId], references: [id])
+  author            User?                           @relation(fields: [authorId], references: [id])
   collaborators     ConventionCollaborator[]
   editions          Edition[]
+  claimRequests     ConventionClaimRequest[]
 
   @@index([authorId], map: "Convention_authorId_fkey")
 }
@@ -699,5 +702,28 @@ model VolunteerAssignment {
   @@index([timeSlotId])
   @@index([userId])
   @@index([assignedById])
+}
+
+// ========== REVENDICATION DE CONVENTIONS ==========
+
+model ConventionClaimRequest {
+  id           String      @id @default(cuid())
+  conventionId Int
+  userId       Int
+  code         String      @unique  // Code de vérification envoyé par email
+  expiresAt    DateTime    // Expiration du code (ex: 1h)
+  isVerified   Boolean     @default(false)
+  verifiedAt   DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  convention   Convention  @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conventionId, userId])  // Un seul claim actif par convention/utilisateur
+  @@index([conventionId])
+  @@index([userId])
+  @@index([code])
+  @@index([expiresAt])
 }
 

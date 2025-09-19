@@ -460,10 +460,13 @@ const filteredConventions = computed(() => {
 
 // Fonctions utilitaires
 const formatAuthorName = (author) => {
+  if (!author) {
+    return 'Auteur inconnu'
+  }
   if (author.prenom && author.nom) {
     return `${author.prenom} ${author.nom} (${author.pseudo})`
   }
-  return author.pseudo
+  return author.pseudo || 'Utilisateur anonyme'
 }
 
 const formatDate = (date) => {

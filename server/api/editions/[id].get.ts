@@ -87,7 +87,10 @@ export default defineEventHandler(async (event) => {
       const isConventionAuthor = edition.convention.authorId === userId
       const isCollaborator = edition.convention.collaborators?.some((c) => c.userId === userId)
 
-      if (!isCreator && !isConventionAuthor && !isCollaborator) {
+      // Les éditions orphelines (sans créateur et sans auteur de convention) sont considérées comme publiques
+      const isOrphanEdition = !edition.creatorId && !edition.convention.authorId
+
+      if (!isCreator && !isConventionAuthor && !isCollaborator && !isOrphanEdition) {
         throw createError({
           statusCode: 404,
           message: 'Edition not found',

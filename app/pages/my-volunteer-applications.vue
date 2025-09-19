@@ -21,8 +21,8 @@
             class="flex-1 sm:flex-none"
             @click="viewMode = 'detailed'"
           >
-            <span class="hidden sm:inline">Détaillée</span>
-            <span class="sm:hidden">Vue détaillée</span>
+            <span class="hidden sm:inline">{{ $t('pages.volunteers.view_detailed_short') }}</span>
+            <span class="sm:hidden">{{ $t('pages.volunteers.view_detailed') }}</span>
           </UButton>
           <UButton
             :variant="viewMode === 'compact' ? 'solid' : 'ghost'"
@@ -30,8 +30,8 @@
             class="flex-1 sm:flex-none"
             @click="viewMode = 'compact'"
           >
-            <span class="hidden sm:inline">Compacte</span>
-            <span class="sm:hidden">Vue liste</span>
+            <span class="hidden sm:inline">{{ $t('pages.volunteers.view_compact_short') }}</span>
+            <span class="sm:hidden">{{ $t('pages.volunteers.view_compact') }}</span>
           </UButton>
         </UButtonGroup>
 
@@ -48,7 +48,7 @@
             size="sm"
             class="w-full sm:w-auto justify-center"
           >
-            Exporter
+            {{ $t('pages.volunteers.export') }}
           </UButton>
         </UDropdown>
       </div>
@@ -854,7 +854,7 @@
               icon="i-heroicons-arrow-down-tray"
               @click="exportPlanning('pdf')"
             >
-              Export PDF
+              {{ $t('pages.volunteers.export_pdf') }}
             </UButton>
             <UButton
               color="green"
@@ -862,7 +862,7 @@
               icon="i-heroicons-calendar"
               @click="exportPlanning('ical')"
             >
-              Export iCal
+              {{ $t('pages.volunteers.export_ical') }}
             </UButton>
           </div>
         </div>
@@ -956,14 +956,14 @@ const tabs = computed(() => [
 const exportMenuItems = [
   [
     {
-      label: 'Export PDF',
+      label: t('pages.volunteers.export_pdf'),
       icon: 'i-heroicons-document-text',
       click: () => exportPlanning('pdf'),
     },
   ],
   [
     {
-      label: 'Export iCal',
+      label: t('pages.volunteers.export_ical'),
       icon: 'i-heroicons-calendar',
       click: () => exportPlanning('ical'),
     },

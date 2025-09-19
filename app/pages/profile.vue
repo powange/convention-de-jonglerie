@@ -1030,7 +1030,9 @@ const hasChanges = computed(() => {
 
 // Statistiques calculées
 const myConventionsCount = computed(() => {
-  return editionStore.editions.filter((edition) => edition.creatorId === authStore.user?.id).length
+  return editionStore.editions.filter(
+    (edition) => edition.creatorId && edition.creatorId === authStore.user?.id
+  ).length
 })
 
 const favoritesCount = computed(() => {
@@ -1041,7 +1043,7 @@ const favoritesCount = computed(() => {
 
 const totalFavoritesReceived = computed(() => {
   return editionStore.editions
-    .filter((edition) => edition.creatorId === authStore.user?.id)
+    .filter((edition) => edition.creatorId && edition.creatorId === authStore.user?.id)
     .reduce((total, edition) => total + edition.favoritedBy.length, 0)
 })
 

@@ -259,7 +259,7 @@ const canManageEdition = computed(() => {
   if (!authStore.user || !edition.value) return false
   // Super Admin en mode admin
   if (authStore.isAdminModeActive) return true
-  if (edition.value.creatorId === authStore.user.id) return true
+  if (edition.value.creatorId && edition.value.creatorId === authStore.user.id) return true
   const collab = edition.value.convention?.collaborators?.find(
     (c: any) => c.user.id === authStore.user!.id
   )

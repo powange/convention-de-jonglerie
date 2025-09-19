@@ -249,14 +249,22 @@
                           {{ volunteer.user.prenom }} {{ volunteer.user.nom }}
                         </p>
                         <p class="text-xs text-gray-500 truncate">{{ volunteer.user.email }}</p>
-                        <div
-                          v-if="volunteer.teamPreferences && volunteer.teamPreferences.length > 0"
-                          class="flex items-center gap-1 mt-1"
-                        >
-                          <UIcon name="i-heroicons-heart" class="text-red-500" size="12" />
-                          <span class="text-xs text-gray-600 dark:text-gray-400">
-                            Préf: {{ getTeamNamesFromPreferences(volunteer.teamPreferences) }}
-                          </span>
+                        <div class="flex items-center gap-1 mt-1">
+                          <div
+                            v-if="volunteer.teamPreferences && volunteer.teamPreferences.length > 0"
+                            class="flex items-center gap-1"
+                          >
+                            <UIcon name="i-heroicons-heart" class="text-red-500" size="12" />
+                            <span class="text-xs text-gray-600 dark:text-gray-400">
+                              Préf: {{ getTeamNamesFromPreferences(volunteer.teamPreferences) }}
+                            </span>
+                          </div>
+                          <div v-else class="flex items-center gap-1">
+                            <UIcon name="i-heroicons-globe-alt" class="text-blue-500" size="12" />
+                            <span class="text-xs text-blue-600 dark:text-blue-400">
+                              Toutes équipes
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -426,21 +434,22 @@ const fetchTeamAssignments = async () => {
 
 // Vérifier si une équipe est dans les préférences du bénévole
 const isTeamInVolunteerPreferences = (volunteer: any, teamId: string): boolean => {
-  if (!volunteer.teamPreferences) return false
-
-  // teamPreferences est un tableau JSON avec les IDs ou noms des équipes préférées
-  if (Array.isArray(volunteer.teamPreferences)) {
-    // Trouver l'équipe par son ID
-    const team = volunteerTeams.value.find((t) => t.id === teamId)
-    if (!team) return false
-
-    // Vérifier si l'ID ou le nom de l'équipe est dans les préférences
-    return (
-      volunteer.teamPreferences.includes(teamId) || volunteer.teamPreferences.includes(team.name)
-    )
+  if (
+    !volunteer.teamPreferences ||
+    !Array.isArray(volunteer.teamPreferences) ||
+    volunteer.teamPreferences.length === 0
+  ) {
+    // Si pas de préférences, le bénévole peut être assigné à n'importe quelle équipe
+    return true
   }
 
-  return false
+  // teamPreferences est un tableau JSON avec les IDs ou noms des équipes préférées
+  // Trouver l'équipe par son ID
+  const team = volunteerTeams.value.find((t) => t.id === teamId)
+  if (!team) return false
+
+  // Vérifier si l'ID ou le nom de l'équipe est dans les préférences
+  return volunteer.teamPreferences.includes(teamId) || volunteer.teamPreferences.includes(team.name)
 }
 
 // Convertir les IDs/noms d'équipes en noms lisibles
@@ -523,9 +532,10 @@ const canViewVolunteersTable = computed(() => {
   // Super Admin en mode admin
   if (authStore.isAdminModeActive) return true
   // Créateur de l'édition
-  if (edition.value.creatorId === authStore.user.id) return true
+  if (edition.value.creatorId && edition.value.creatorId === authStore.user.id) return true
   // Auteur de la convention
-  if (edition.value.convention?.authorId === authStore.user.id) return true
+  if (edition.value.convention?.authorId && edition.value.convention.authorId === authStore.user.id)
+    return true
   // Collaborateur
   const collab = edition.value.convention?.collaborators?.find(
     (c: any) => c.user.id === authStore.user!.id
@@ -578,7 +588,7 @@ const handleDragLeave = () => {
 const handleDrop = async (teamId: string) => {
   if (!draggedVolunteer.value) return
 
-  // Vérifier que l'équipe est dans les préférences du bénévole
+  // Vérifier que l'équipe est valide pour le bénévole (préférences ou pas de préférences)
   if (!isTeamInVolunteerPreferences(draggedVolunteer.value, teamId)) {
     toast.add({
       title: 'Action non autorisée',

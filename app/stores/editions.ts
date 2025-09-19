@@ -377,7 +377,7 @@ export const useEditionStore = defineStore('editions', {
       }
 
       // Le créateur de l'édition peut toujours modifier
-      if (edition.creatorId === userId) {
+      if (edition.creatorId && edition.creatorId === userId) {
         return true
       }
 
@@ -387,7 +387,7 @@ export const useEditionStore = defineStore('editions', {
       }
 
       // L'auteur de la convention peut modifier toutes les éditions
-      if (edition.convention.authorId === userId) {
+      if (edition.convention.authorId && edition.convention.authorId === userId) {
         return true
       }
 
@@ -415,7 +415,7 @@ export const useEditionStore = defineStore('editions', {
       }
 
       // Le créateur de l'édition peut supprimer
-      if (edition.creatorId === userId) {
+      if (edition.creatorId && edition.creatorId === userId) {
         return true
       }
 
@@ -425,7 +425,7 @@ export const useEditionStore = defineStore('editions', {
       }
 
       // L'auteur de la convention peut supprimer toutes les éditions
-      if (edition.convention.authorId === userId) {
+      if (edition.convention.authorId && edition.convention.authorId === userId) {
         return true
       }
 
@@ -451,7 +451,7 @@ export const useEditionStore = defineStore('editions', {
       }
 
       // Le créateur de l'édition peut gérer les bénévoles
-      if (edition.creatorId === userId) {
+      if (edition.creatorId && edition.creatorId === userId) {
         return true
       }
 
@@ -461,7 +461,7 @@ export const useEditionStore = defineStore('editions', {
       }
 
       // L'auteur de la convention peut gérer tous les bénévoles
-      if (edition.convention.authorId === userId) {
+      if (edition.convention.authorId && edition.convention.authorId === userId) {
         return true
       }
 
@@ -493,11 +493,11 @@ export const useEditionStore = defineStore('editions', {
       // Vérifier si la convention a des collaborateurs
       if (!edition.convention || !edition.convention.collaborators) {
         // Si pas de collaborateurs et c'est l'auteur de la convention, il peut gérer
-        return edition.convention?.authorId === userId
+        return edition.convention?.authorId && edition.convention.authorId === userId
       }
 
       // L'auteur de la convention peut toujours gérer les collaborateurs
-      if (edition.convention.authorId === userId) {
+      if (edition.convention.authorId && edition.convention.authorId === userId) {
         return true
       }
 
@@ -520,7 +520,7 @@ export const useEditionStore = defineStore('editions', {
       }
 
       // L'auteur de la convention est toujours collaborateur
-      if (edition.convention?.authorId === userId) {
+      if (edition.convention?.authorId && edition.convention.authorId === userId) {
         return true
       }
 

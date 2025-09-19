@@ -63,15 +63,24 @@
 
         <!-- Actions desktop -->
         <div v-if="authStore.isAuthenticated" class="hidden sm:flex gap-3">
+          <!-- Bouton revendication -->
+
+          <!-- Modale de revendication -->
+          <ConventionClaimModal
+            v-if="canClaimConvention"
+            :convention="edition.convention"
+            @claimed="handleConventionClaimed"
+          />
+
           <!-- Bouton favori -->
           <UButton
             :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
             :color="isFavorited ? 'warning' : 'neutral'"
             variant="ghost"
-            size="lg"
+            size="md"
             @click="$emit('toggle-favorite')"
           >
-            {{ isFavorited ? t('profile.favorites') : t('common.add') }}
+            {{ isFavorited ? t('common.added') : t('common.add') }}
           </UButton>
         </div>
       </div>
@@ -266,7 +275,7 @@ defineEmits<{
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
 
-// État de la modal
+// État des modales
 const showConventionModal = ref(false)
 
 // Description de la convention en HTML (rendu Markdown)
@@ -283,6 +292,11 @@ const canAccess = computed(() => {
 
   // Les admins globaux en mode admin peuvent accéder à la gestion
   if (authStore.isAdminModeActive) {
+    return true
+  }
+
+  // Les admins peuvent accéder aux conventions orphelines (sans auteur)
+  if (authStore.user.isGlobalAdmin && !props.edition.convention?.authorId) {
     return true
   }
 
@@ -306,6 +320,15 @@ const canAccess = computed(() => {
   }
 
   return false
+})
+
+// Vérifier si l'utilisateur peut revendiquer la convention
+const canClaimConvention = computed(() => {
+  if (!authStore.isAuthenticated || !props.edition?.convention) return false
+
+  // La convention doit ne pas avoir de créateur et avoir un email
+  const convention = props.edition.convention
+  return !convention.authorId && !!convention.email
 })
 
 // Visibilité onglet bénévoles: ouvert OU utilisateur peut éditer/gérer bénévoles
@@ -353,5 +376,20 @@ const getPageTitle = (page: string) => {
     gestion: t('editions.management'),
   }
   return titles[page] || t('editions.about_this_edition')
+}
+
+// Gérer la revendication réussie
+const handleConventionClaimed = async () => {
+  // Recharger les données de l'édition pour refléter le nouveau propriétaire
+  try {
+    await editionStore.fetchEditionById(props.edition.id)
+    useToast().add({
+      title: t('conventions.claim.verification_success'),
+      description: t('conventions.claim.verification_success_description'),
+      color: 'success',
+    })
+  } catch (error) {
+    console.error("Erreur lors du rechargement de l'édition:", error)
+  }
 }
 </script>

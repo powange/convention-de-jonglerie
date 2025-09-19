@@ -40,7 +40,7 @@ export interface Edition {
   latitude?: number | null
   longitude?: number | null
   isOnline?: boolean
-  creatorId: number
+  creatorId?: number | null // Nullable pour éditions importées
   creator?: PublicUser
   conventionId: number
   convention?: ConventionWithCollaborators
@@ -80,9 +80,10 @@ export interface Convention {
   name: string
   description?: string | null
   logo?: string | null
+  email?: string | null // Email pour revendication
   createdAt: string
   updatedAt: string
-  authorId: number
+  authorId?: number | null // Nullable pour conventions importées
   author?: User
   editions?: {
     id: number

@@ -73,8 +73,8 @@ onMounted(async () => {
   try {
     convention.value = await $fetch(`/api/conventions/${conventionId}`)
 
-    // Vérifier que l'utilisateur est l'auteur de la convention
-    if (convention.value.authorId !== authStore.user?.id) {
+    // Vérifier que l'utilisateur est l'auteur de la convention (ou qu'elle n'a pas d'auteur)
+    if (convention.value.authorId && convention.value.authorId !== authStore.user?.id) {
       throw {
         status: 403,
         message: t('errors.edition_add_denied'),
