@@ -1513,6 +1513,35 @@
       "pets_details": "Kæledyrsdetaljer",
       "setup": "Opsætning",
       "skills": "Færdigheder",
+      "team_distribution": {
+        "all_teams": "Alle hold",
+        "description": "Fordeling af accepterede frivillige i hold. Træk og slip for at flytte eller tilføje til et hold.",
+        "manage_teams": "Administrer hold",
+        "max_label": "Maks:",
+        "modal": {
+          "add": "Tilføj",
+          "add_description_multiple": "Behold frivillig i deres nuværende hold og tilføj dem også til \"{targetTeam}\"",
+          "add_description_single": "Behold frivillig i \"{sourceTeam}\" og tildel dem også til \"{targetTeam}\"",
+          "cancel": "Annuller",
+          "move": "Flyt",
+          "move_description_multiple": "Fjern frivillig fra alle deres nuværende hold og placer dem i \"{targetTeam}\"",
+          "move_description_single": "Fjern frivillig fra \"{sourceTeam}\" og placer dem i \"{targetTeam}\"",
+          "question": "Hvad vil du gerne gøre?"
+        },
+        "no_assignments": "Ingen holdtildeling fundet",
+        "no_assignments_description": "Accepterede frivillige vil blive vist her, når de er tildelt til hold",
+        "preferences_label": "Præf:",
+        "stats": {
+          "assigned_volunteers": "Tildelte frivillige",
+          "total_assignments": "Samlede tildelinger",
+          "total_teams": "Samlede hold",
+          "unassigned": "Ikke tildelt"
+        },
+        "title": "Fordeling efter hold",
+        "unassigned_description": "Disse accepterede frivillige er endnu ikke blevet tildelt til et hold. Du kan trække og slippe dem til et hold nedenfor.",
+        "unassigned_volunteers": "Ikke-tildelte frivillige",
+        "volunteers_count": "{count} frivillig(e)"
+      },
       "team_preferences": "Holdpræferencer",
       "teardown": "Nedtagning",
       "time_preferences": "Tidspræferencer",

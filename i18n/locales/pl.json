@@ -1513,6 +1513,35 @@
       "pets_details": "Szczegóły zwierząt",
       "setup": "Przygotowanie",
       "skills": "Umiejętności",
+      "team_distribution": {
+        "all_teams": "Wszystkie zespoły",
+        "description": "Rozkład zaakceptowanych wolontariuszy w zespołach. Przeciągnij i upuść, aby przenieść lub dodać do zespołu.",
+        "manage_teams": "Zarządzaj zespołami",
+        "max_label": "Maks:",
+        "modal": {
+          "add": "Dodaj",
+          "add_description_multiple": "Zachowaj wolontariusza w jego obecnych zespołach i dodaj go także do \"{targetTeam}\"",
+          "add_description_single": "Zachowaj wolontariusza w \"{sourceTeam}\" i przypisz go także do \"{targetTeam}\"",
+          "cancel": "Anuluj",
+          "move": "Przenieś",
+          "move_description_multiple": "Usuń wolontariusza ze wszystkich jego obecnych zespołów i umieść go w \"{targetTeam}\"",
+          "move_description_single": "Usuń wolontariusza z \"{sourceTeam}\" i umieść go w \"{targetTeam}\"",
+          "question": "Co chciałbyś zrobić?"
+        },
+        "no_assignments": "Nie znaleziono przypisań zespołów",
+        "no_assignments_description": "Zaakceptowani wolontariusze pojawią się tutaj po przypisaniu do zespołów",
+        "preferences_label": "Pref:",
+        "stats": {
+          "assigned_volunteers": "Przypisani wolontariusze",
+          "total_assignments": "Łączne przypisania",
+          "total_teams": "Łączne zespoły",
+          "unassigned": "Nieprzypisani"
+        },
+        "title": "Podział na zespoły",
+        "unassigned_description": "Ci zaakceptowani wolontariusze nie zostali jeszcze przypisani do zespołu. Możesz przeciągnąć i upuścić ich do zespołu poniżej.",
+        "unassigned_volunteers": "Nieprzypisani wolontariusze",
+        "volunteers_count": "{count} wolontariusz(y)"
+      },
       "team_preferences": "Preferencje zespołów",
       "teardown": "Sprzątanie",
       "time_preferences": "Preferencje czasowe",

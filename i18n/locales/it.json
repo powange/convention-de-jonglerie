@@ -1513,6 +1513,35 @@
       "pets_details": "Dettagli animali domestici",
       "setup": "Allestimento",
       "skills": "Competenze",
+      "team_distribution": {
+        "all_teams": "Tutte le squadre",
+        "description": "Distribuzione dei volontari accettati nei team. Trascina e rilascia per spostare o aggiungere a una squadra.",
+        "manage_teams": "Gestisci squadre",
+        "max_label": "Max:",
+        "modal": {
+          "add": "Aggiungi",
+          "add_description_multiple": "Mantieni il volontario nelle sue squadre attuali e aggiungilo anche a \"{targetTeam}\"",
+          "add_description_single": "Mantieni il volontario in \"{sourceTeam}\" e assegnalo anche a \"{targetTeam}\"",
+          "cancel": "Annulla",
+          "move": "Sposta",
+          "move_description_multiple": "Rimuovi il volontario da tutte le sue squadre attuali e posizionalo in \"{targetTeam}\"",
+          "move_description_single": "Rimuovi il volontario da \"{sourceTeam}\" e posizionalo in \"{targetTeam}\"",
+          "question": "Cosa vorresti fare?"
+        },
+        "no_assignments": "Nessuna assegnazione di squadra trovata",
+        "no_assignments_description": "I volontari accettati appariranno qui una volta assegnati alle squadre",
+        "preferences_label": "Pref:",
+        "stats": {
+          "assigned_volunteers": "Volontari assegnati",
+          "total_assignments": "Assegnazioni totali",
+          "total_teams": "Squadre totali",
+          "unassigned": "Non assegnati"
+        },
+        "title": "Distribuzione per squadre",
+        "unassigned_description": "Questi volontari accettati non sono ancora stati assegnati a una squadra. Puoi trascinarli e rilasciarli in una squadra qui sotto.",
+        "unassigned_volunteers": "Volontari non assegnati",
+        "volunteers_count": "{count} volontario/i"
+      },
       "team_preferences": "Preferenze di squadra",
       "teardown": "Smontaggio",
       "time_preferences": "Preferenze orarie",

@@ -1513,6 +1513,35 @@
       "pets_details": "Деталі про тварин",
       "setup": "Підготовка",
       "skills": "Навички",
+      "team_distribution": {
+        "all_teams": "Всі команди",
+        "description": "Розподіл прийнятих волонтерів по командах. Перетягніть, щоб перемістити або додати до команди.",
+        "manage_teams": "Керувати командами",
+        "max_label": "Макс:",
+        "modal": {
+          "add": "Додати",
+          "add_description_multiple": "Залишити волонтера в поточних командах і також додати до \"{targetTeam}\"",
+          "add_description_single": "Залишити волонтера в \"{sourceTeam}\" і призначити також до \"{targetTeam}\"",
+          "cancel": "Скасувати",
+          "move": "Перемістити",
+          "move_description_multiple": "Видалити волонтера з усіх поточних команд і помістити в \"{targetTeam}\"",
+          "move_description_single": "Видалити волонтера з \"{sourceTeam}\" і помістити в \"{targetTeam}\"",
+          "question": "Що ви хочете зробити?"
+        },
+        "no_assignments": "Призначень команд не знайдено",
+        "no_assignments_description": "Прийняті волонтери з'являться тут після призначення до команд",
+        "preferences_label": "Пер:",
+        "stats": {
+          "assigned_volunteers": "Призначені волонтери",
+          "total_assignments": "Всього призначень",
+          "total_teams": "Всього команд",
+          "unassigned": "Не призначені"
+        },
+        "title": "Розподіл по командах",
+        "unassigned_description": "Ці прийняті волонтери ще не призначені до команди. Ви можете перетягнути їх до команди нижче.",
+        "unassigned_volunteers": "Непризначені волонтери",
+        "volunteers_count": "{count} волонтер(ів)"
+      },
       "team_preferences": "Командні переваги",
       "teardown": "Розбирання",
       "time_preferences": "Часові уподобання",

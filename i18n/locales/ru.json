@@ -1513,6 +1513,35 @@
       "pets_details": "Детали о животных",
       "setup": "Подготовка",
       "skills": "Навыки",
+      "team_distribution": {
+        "all_teams": "Все команды",
+        "description": "Распределение принятых волонтёров по командам. Перетащите, чтобы переместить или добавить в команду.",
+        "manage_teams": "Управлять командами",
+        "max_label": "Макс:",
+        "modal": {
+          "add": "Добавить",
+          "add_description_multiple": "Оставить волонтёра в текущих командах и также добавить в \"{targetTeam}\"",
+          "add_description_single": "Оставить волонтёра в \"{sourceTeam}\" и назначить также в \"{targetTeam}\"",
+          "cancel": "Отменить",
+          "move": "Переместить",
+          "move_description_multiple": "Удалить волонтёра из всех текущих команд и поместить в \"{targetTeam}\"",
+          "move_description_single": "Удалить волонтёра из \"{sourceTeam}\" и поместить в \"{targetTeam}\"",
+          "question": "Что вы хотите сделать?"
+        },
+        "no_assignments": "Назначений команд не найдено",
+        "no_assignments_description": "Принятые волонтёры появятся здесь после назначения в команды",
+        "preferences_label": "Пред:",
+        "stats": {
+          "assigned_volunteers": "Назначенные волонтёры",
+          "total_assignments": "Всего назначений",
+          "total_teams": "Всего команд",
+          "unassigned": "Не назначены"
+        },
+        "title": "Распределение по командам",
+        "unassigned_description": "Эти принятые волонтёры ещё не назначены в команду. Вы можете перетащить их в команду ниже.",
+        "unassigned_volunteers": "Неназначенные волонтёры",
+        "volunteers_count": "{count} волонтёр(ов)"
+      },
       "team_preferences": "Предпочтения команд",
       "teardown": "Разборка",
       "time_preferences": "Временные предпочтения",

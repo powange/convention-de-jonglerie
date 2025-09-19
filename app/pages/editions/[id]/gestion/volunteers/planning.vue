@@ -296,7 +296,7 @@
                   >
                     <div class="flex items-center justify-between mb-3">
                       <div class="flex items-center gap-3">
-                        <UiUserAvatar :user="volunteerStat.user" size="sm" />
+                        <UiUserAvatar :user="volunteerStat.user" />
                         <div>
                           <h5 class="font-medium text-gray-900 dark:text-white">
                             {{ volunteerStat.user.pseudo }}
@@ -310,10 +310,10 @@
                         </div>
                       </div>
                       <div class="flex items-center gap-2">
-                        <UBadge color="primary" variant="soft" size="sm">
+                        <UBadge color="primary" variant="soft">
                           {{ volunteerStat.totalHours.toFixed(1) }}h
                         </UBadge>
-                        <UBadge color="neutral" variant="soft" size="sm">
+                        <UBadge color="neutral" variant="soft">
                           {{ volunteerStat.totalSlots }} {{ t('editions.volunteers.slots_short') }}
                         </UBadge>
                       </div>
@@ -339,7 +339,7 @@
                           <span class="text-gray-600 dark:text-gray-400">
                             {{ dayDetail.hours.toFixed(1) }}h
                           </span>
-                          <UBadge color="neutral" variant="soft" size="xs">
+                          <UBadge color="neutral" variant="soft">
                             {{ dayDetail.slots }} {{ t('editions.volunteers.slots_short') }}
                           </UBadge>
                         </div>

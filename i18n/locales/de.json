@@ -1513,6 +1513,35 @@
       "pets_details": "Haustier-Details",
       "setup": "Aufbau",
       "skills": "Fähigkeiten",
+      "team_distribution": {
+        "all_teams": "Alle Teams",
+        "description": "Verteilung der akzeptierten Freiwilligen in Teams. Ziehen und ablegen, um zu verschieben oder zu einem Team hinzuzufügen.",
+        "manage_teams": "Teams verwalten",
+        "max_label": "Max:",
+        "modal": {
+          "add": "Hinzufügen",
+          "add_description_multiple": "Freiwilligen in ihren aktuellen Teams behalten und auch zu \"{targetTeam}\" hinzufügen",
+          "add_description_single": "Freiwilligen in \"{sourceTeam}\" behalten und auch zu \"{targetTeam}\" zuweisen",
+          "cancel": "Abbrechen",
+          "move": "Verschieben",
+          "move_description_multiple": "Freiwilligen aus allen aktuellen Teams entfernen und in \"{targetTeam}\" platzieren",
+          "move_description_single": "Freiwilligen aus \"{sourceTeam}\" entfernen und in \"{targetTeam}\" platzieren",
+          "question": "Was möchten Sie tun?"
+        },
+        "no_assignments": "Keine Teamzuweisungen gefunden",
+        "no_assignments_description": "Akzeptierte Freiwillige werden hier angezeigt, sobald sie Teams zugewiesen sind",
+        "preferences_label": "Präf:",
+        "stats": {
+          "assigned_volunteers": "Zugewiesene Freiwillige",
+          "total_assignments": "Gesamtzuweisungen",
+          "total_teams": "Teams insgesamt",
+          "unassigned": "Nicht zugewiesen"
+        },
+        "title": "Teamverteilung",
+        "unassigned_description": "Diese akzeptierten Freiwilligen wurden noch keinem Team zugewiesen. Sie können sie per Drag & Drop zu einem Team unten hinzufügen.",
+        "unassigned_volunteers": "Nicht zugewiesene Freiwillige",
+        "volunteers_count": "{count} Freiwillige(r)"
+      },
       "team_preferences": "Team-Präferenzen",
       "teardown": "Abbau",
       "time_preferences": "Zeitpräferenzen",

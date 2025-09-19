@@ -122,10 +122,10 @@
               <div class="space-y-2">
                 <h3 class="text-lg font-semibold flex items-center gap-2">
                   <UIcon name="i-heroicons-user-group" class="text-blue-600" />
-                  Répartition par équipes
+                  {{ $t('pages.volunteers.team_distribution.title') }}
                 </h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                  Répartition des bénévoles acceptés dans les équipes
+                  {{ $t('pages.volunteers.team_distribution.description') }}
                 </p>
               </div>
               <UButton
@@ -135,7 +135,7 @@
                 size="sm"
                 icon="i-heroicons-cog-6-tooth"
               >
-                Gérer les équipes
+                {{ $t('pages.volunteers.team_distribution.manage_teams') }}
               </UButton>
             </div>
           </template>
@@ -146,10 +146,10 @@
           >
             <UIcon name="i-heroicons-user-group" class="h-12 w-12 text-gray-400 mx-auto mb-3" />
             <p class="text-gray-600 dark:text-gray-400 text-sm">
-              Aucune assignation d'équipe trouvée
+              {{ $t('pages.volunteers.team_distribution.no_assignments') }}
             </p>
             <p class="text-xs text-gray-500 mt-1">
-              Les bénévoles acceptés apparaîtront ici une fois assignés à des équipes
+              {{ $t('pages.volunteers.team_distribution.no_assignments_description') }}
             </p>
           </div>
 
@@ -160,7 +160,9 @@
                 <div class="flex items-center gap-3">
                   <UIcon name="i-heroicons-user-group" class="text-blue-600" size="24" />
                   <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Total équipes</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ $t('pages.volunteers.team_distribution.stats.total_teams') }}
+                    </p>
                     <p class="text-xl font-semibold text-blue-600">{{ volunteerTeams.length }}</p>
                   </div>
                 </div>
@@ -169,7 +171,9 @@
                 <div class="flex items-center gap-3">
                   <UIcon name="i-heroicons-users" class="text-green-600" size="24" />
                   <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Bénévoles assignés</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ $t('pages.volunteers.team_distribution.stats.assigned_volunteers') }}
+                    </p>
                     <p class="text-xl font-semibold text-green-600">{{ teamAssignments.length }}</p>
                   </div>
                 </div>
@@ -182,7 +186,9 @@
                     size="24"
                   />
                   <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Sans assignation</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ $t('pages.volunteers.team_distribution.stats.unassigned') }}
+                    </p>
                     <p class="text-xl font-semibold text-orange-600">
                       {{ unassignedVolunteers.length }}
                     </p>
@@ -193,7 +199,9 @@
                 <div class="flex items-center gap-3">
                   <UIcon name="i-heroicons-chart-bar" class="text-purple-600" size="24" />
                   <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Assignations totales</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ $t('pages.volunteers.team_distribution.stats.total_assignments') }}
+                    </p>
                     <p class="text-xl font-semibold text-purple-600">
                       {{ teamAssignments.reduce((total, app) => total + app.teams.length, 0) }}
                     </p>
@@ -218,16 +226,21 @@
                     />
                     <div>
                       <h4 class="font-medium text-gray-900 dark:text-white">
-                        Bénévoles non assignés
+                        {{ $t('pages.volunteers.team_distribution.unassigned_volunteers') }}
                       </h4>
                       <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Ces bénévoles acceptés n'ont pas encore été assignés à une équipe. Vous
-                        pouvez les glisser-déposer dans une équipe ci-dessous.
+                        {{ $t('pages.volunteers.team_distribution.unassigned_description') }}
                       </p>
                     </div>
                   </div>
                   <div class="text-right">
-                    <p class="text-sm font-medium">{{ unassignedVolunteers.length }} bénévole(s)</p>
+                    <p class="text-sm font-medium">
+                      {{
+                        $t('pages.volunteers.team_distribution.volunteers_count', {
+                          count: unassignedVolunteers.length,
+                        })
+                      }}
+                    </p>
                   </div>
                 </div>
 
@@ -256,13 +269,14 @@
                           >
                             <UIcon name="i-heroicons-heart" class="text-red-500" size="12" />
                             <span class="text-xs text-gray-600 dark:text-gray-400">
-                              Préf: {{ getTeamNamesFromPreferences(volunteer.teamPreferences) }}
+                              {{ $t('pages.volunteers.team_distribution.preferences_label') }}
+                              {{ getTeamNamesFromPreferences(volunteer.teamPreferences) }}
                             </span>
                           </div>
                           <div v-else class="flex items-center gap-1">
                             <UIcon name="i-heroicons-globe-alt" class="text-blue-500" size="12" />
                             <span class="text-xs text-blue-600 dark:text-blue-400">
-                              Toutes équipes
+                              {{ $t('pages.volunteers.team_distribution.all_teams') }}
                             </span>
                           </div>
                         </div>
@@ -304,9 +318,16 @@
                   </div>
                   <div class="flex items-center gap-4">
                     <div class="text-right">
-                      <p class="text-sm font-medium">{{ team.count }} bénévole(s)</p>
+                      <p class="text-sm font-medium">
+                        {{
+                          $t('pages.volunteers.team_distribution.volunteers_count', {
+                            count: team.count,
+                          })
+                        }}
+                      </p>
                       <p v-if="team.maxVolunteers" class="text-xs text-gray-500">
-                        Max: {{ team.maxVolunteers }}
+                        {{ $t('pages.volunteers.team_distribution.max_label') }}
+                        {{ team.maxVolunteers }}
                         <span v-if="team.utilizationRate !== null" class="ml-1">
                           ({{ team.utilizationRate }}%)
                         </span>
@@ -338,15 +359,47 @@
                     <div
                       v-for="volunteer in team.volunteers"
                       :key="volunteer.id"
-                      class="flex items-center gap-3 text-sm"
+                      draggable="true"
+                      class="relative flex items-center gap-3 text-sm cursor-move hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded group"
+                      @dragstart="handleDragStart(volunteer, team.id)"
+                      @dragend="handleDragEnd"
                     >
+                      <UIcon name="i-heroicons-bars-3" class="text-gray-400" size="16" />
                       <UiUserAvatar :user="volunteer.user" size="sm" class="flex-shrink-0" />
                       <div class="min-w-0 flex-1">
                         <p class="text-gray-700 dark:text-gray-300 font-medium truncate">
                           {{ volunteer.user.prenom }} {{ volunteer.user.nom }}
                         </p>
                         <p class="text-xs text-gray-500 truncate">{{ volunteer.user.email }}</p>
+                        <div class="flex items-center gap-1 mt-1">
+                          <div
+                            v-if="volunteer.teamPreferences && volunteer.teamPreferences.length > 0"
+                            class="flex items-center gap-1"
+                          >
+                            <UIcon name="i-heroicons-heart" class="text-red-500" size="12" />
+                            <span class="text-xs text-gray-600 dark:text-gray-400">
+                              {{ $t('pages.volunteers.team_distribution.preferences_label') }}
+                              {{ getTeamNamesFromPreferences(volunteer.teamPreferences) }}
+                            </span>
+                          </div>
+                          <div v-else class="flex items-center gap-1">
+                            <UIcon name="i-heroicons-globe-alt" class="text-blue-500" size="12" />
+                            <span class="text-xs text-blue-600 dark:text-blue-400">
+                              {{ $t('pages.volunteers.team_distribution.all_teams') }}
+                            </span>
+                          </div>
+                        </div>
                       </div>
+
+                      <!-- Bouton de désassignation au survol -->
+                      <UButton
+                        icon="material-symbols-light:delete-outline"
+                        size="sm"
+                        color="error"
+                        variant="outline"
+                        class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                        @click.stop="unassignFromTeam(volunteer, team.id)"
+                      />
                     </div>
                   </div>
                 </div>
@@ -365,6 +418,128 @@
             </p>
           </div>
         </UCard>
+
+        <!-- Modal de choix déplacer/ajouter -->
+        <UModal v-model:open="showMoveModal" :title="moveModalTitle" @close="handleModalClose">
+          <template #body>
+            <div class="space-y-4">
+              <div class="text-center">
+                <UiUserAvatar
+                  v-if="draggedVolunteer"
+                  :user="draggedVolunteer.user"
+                  size="lg"
+                  class="mx-auto mb-3"
+                />
+                <h4 class="text-lg font-medium text-gray-900 dark:text-white">
+                  {{ draggedVolunteer?.user?.prenom }} {{ draggedVolunteer?.user?.nom }}
+                </h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  <template v-if="draggedVolunteer?.teams?.length > 1">
+                    {{ draggedVolunteer.teams.map((t) => t.name).join(', ') }} →
+                    {{ targetTeamName }}
+                  </template>
+                  <template v-else> {{ sourceTeamName }} → {{ targetTeamName }} </template>
+                </p>
+              </div>
+
+              <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                  {{ $t('pages.volunteers.team_distribution.modal.question') }}
+                </p>
+
+                <div class="space-y-3">
+                  <!-- Option Déplacer -->
+                  <button
+                    class="w-full flex items-start gap-3 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 text-left group"
+                    :disabled="isProcessingMove"
+                    @click="processMove('move')"
+                  >
+                    <div class="flex-shrink-0 mt-1">
+                      <UIcon
+                        name="i-heroicons-arrow-right"
+                        class="text-blue-500 group-hover:text-blue-600"
+                        size="16"
+                      />
+                    </div>
+                    <div>
+                      <p
+                        class="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                      >
+                        {{ $t('pages.volunteers.team_distribution.modal.move') }}
+                      </p>
+                      <p class="text-sm text-gray-600 dark:text-gray-400">
+                        <template v-if="draggedVolunteer?.teams?.length > 1">
+                          {{
+                            $t(
+                              'pages.volunteers.team_distribution.modal.move_description_multiple',
+                              { targetTeam: targetTeamName }
+                            )
+                          }}
+                        </template>
+                        <template v-else>
+                          {{
+                            $t('pages.volunteers.team_distribution.modal.move_description_single', {
+                              sourceTeam: sourceTeamName,
+                              targetTeam: targetTeamName,
+                            })
+                          }}
+                        </template>
+                      </p>
+                    </div>
+                  </button>
+
+                  <!-- Option Ajouter -->
+                  <button
+                    class="w-full flex items-start gap-3 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-200 text-left group"
+                    :disabled="isProcessingMove"
+                    @click="processMove('add')"
+                  >
+                    <div class="flex-shrink-0 mt-1">
+                      <UIcon
+                        name="i-heroicons-plus"
+                        class="text-green-500 group-hover:text-green-600"
+                        size="16"
+                      />
+                    </div>
+                    <div>
+                      <p
+                        class="font-medium text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400"
+                      >
+                        {{ $t('pages.volunteers.team_distribution.modal.add') }}
+                      </p>
+                      <p class="text-sm text-gray-600 dark:text-gray-400">
+                        <template v-if="draggedVolunteer?.teams?.length > 1">
+                          {{
+                            $t(
+                              'pages.volunteers.team_distribution.modal.add_description_multiple',
+                              { targetTeam: targetTeamName }
+                            )
+                          }}
+                        </template>
+                        <template v-else>
+                          {{
+                            $t('pages.volunteers.team_distribution.modal.add_description_single', {
+                              sourceTeam: sourceTeamName,
+                              targetTeam: targetTeamName,
+                            })
+                          }}
+                        </template>
+                      </p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <template #footer="{ close }">
+            <div class="flex justify-center">
+              <UButton color="neutral" variant="soft" @click="close">
+                {{ $t('pages.volunteers.team_distribution.modal.cancel') }}
+              </UButton>
+            </div>
+          </template>
+        </UModal>
       </div>
     </div>
   </div>
@@ -415,6 +590,10 @@ const teamAssignments = ref<any[]>([])
 const acceptedVolunteers = ref<any[]>([])
 const draggedVolunteer = ref<any>(null)
 const dragOverTeam = ref<string | null>(null)
+const sourceTeamId = ref<string | null>(null)
+const targetTeamId = ref<string | null>(null)
+const showMoveModal = ref(false)
+const isProcessingMove = ref(false)
 
 // Fonction pour récupérer les assignations d'équipes
 const fetchTeamAssignments = async () => {
@@ -507,6 +686,58 @@ const teamDistribution = computed(() => {
     .sort((a, b) => b.count - a.count) // Trier par nombre de bénévoles décroissant
 })
 
+// Computed pour les noms des équipes dans le modal
+const sourceTeamName = computed(() => {
+  // Si on a sourceTeamId (cas normal), utiliser celui-ci
+  if (sourceTeamId.value) {
+    // Chercher d'abord dans teamDistribution (données affichées)
+    let team = teamDistribution.value.find((t) => t.id === sourceTeamId.value)
+    if (team) {
+      return team.name
+    }
+
+    // Sinon chercher dans volunteerTeams (données originales)
+    team = volunteerTeams.value.find((t) => t.id === sourceTeamId.value)
+    if (team) {
+      return team.name
+    }
+
+    return 'Équipe inconnue'
+  }
+
+  // Sinon, vérifier si le bénévole a des équipes
+  if (!draggedVolunteer.value?.teams || draggedVolunteer.value.teams.length === 0) {
+    return 'Non assigné'
+  }
+
+  // Prendre la première équipe du bénévole
+  const firstTeam = draggedVolunteer.value.teams[0]
+  return firstTeam?.name || 'Équipe inconnue'
+})
+
+const targetTeamName = computed(() => {
+  if (!targetTeamId.value) return 'Équipe cible'
+
+  // Chercher d'abord dans teamDistribution (données affichées)
+  let team = teamDistribution.value.find((t) => t.id === targetTeamId.value)
+  if (team) {
+    return team.name
+  }
+
+  // Sinon chercher dans volunteerTeams (données originales)
+  team = volunteerTeams.value.find((t) => t.id === targetTeamId.value)
+  if (team) {
+    return team.name
+  }
+
+  return 'Équipe inconnue'
+})
+
+const moveModalTitle = computed(() => {
+  if (!draggedVolunteer.value) return 'Déplacer un bénévole'
+  return `Déplacer ${draggedVolunteer.value.user.prenom} ${draggedVolunteer.value.user.nom}`
+})
+
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
@@ -565,13 +796,84 @@ const toggleFavorite = async (id: number) => {
 }
 
 // Fonctions de drag and drop
-const handleDragStart = (volunteer: any) => {
+const handleDragStart = (volunteer: any, fromTeamId?: string) => {
   draggedVolunteer.value = volunteer
+  sourceTeamId.value = fromTeamId || null
 }
 
 const handleDragEnd = () => {
+  dragOverTeam.value = null
+
+  // Ne pas reset les variables si la modal est ouverte
+  // car ces valeurs sont nécessaires pour les actions dans la modal
+  if (!showMoveModal.value) {
+    draggedVolunteer.value = null
+    sourceTeamId.value = null
+    targetTeamId.value = null
+  }
+}
+
+// Fonction pour gérer la fermeture de la modal
+const handleModalClose = () => {
+  // Nettoyer toutes les variables quand la modal se ferme
   draggedVolunteer.value = null
   dragOverTeam.value = null
+  sourceTeamId.value = null
+  targetTeamId.value = null
+}
+
+// Fonction pour désassigner un bénévole d'une équipe spécifique
+const unassignFromTeam = async (volunteer: any, teamId: string) => {
+  try {
+    const volunteerName = `${volunteer.user.prenom} ${volunteer.user.nom}`
+    const volunteerId = volunteer.id
+
+    // Récupérer les équipes actuelles du bénévole
+    const currentTeams = volunteer.teams?.map((t: any) => t.id) || []
+
+    // Retirer l'équipe spécifiée
+    const newTeams = currentTeams.filter((id: string) => id !== teamId)
+
+    // Appeler l'API pour mettre à jour les assignations
+    await $fetch(`/api/editions/${editionId}/volunteers/applications/${volunteerId}/teams`, {
+      method: 'PATCH',
+      body: {
+        teams: newTeams,
+      },
+    })
+
+    // Rafraîchir les données
+    await fetchTeamAssignments()
+    await fetchVolunteersInfo()
+
+    // Rafraîchir le tableau des bénévoles
+    if (volunteerTableRef.value && volunteerTableRef.value.refreshApplications) {
+      await volunteerTableRef.value.refreshApplications()
+    }
+
+    // Trouver le nom de l'équipe
+    const team = volunteerTeams.value.find((t) => t.id === teamId)
+    const teamName = team?.name || "l'équipe"
+
+    toast.add({
+      title: 'Bénévole désassigné',
+      description: `${volunteerName} a été retiré de ${teamName}`,
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (error: any) {
+    console.error('Failed to unassign volunteer from team:', error)
+
+    const errorMessage =
+      error?.data?.message || error?.message || 'Impossible de désassigner le bénévole'
+
+    toast.add({
+      title: 'Erreur',
+      description: errorMessage,
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  }
 }
 
 const handleDragOver = (teamId: string) => {
@@ -600,6 +902,42 @@ const handleDrop = async (teamId: string) => {
     dragOverTeam.value = null
     return
   }
+
+  // Vérifier si on glisse dans la même équipe - ne rien faire
+  if (sourceTeamId.value === teamId) {
+    draggedVolunteer.value = null
+    dragOverTeam.value = null
+    sourceTeamId.value = null
+    targetTeamId.value = null
+    return
+  }
+
+  // IMPORTANT: Définir targetTeamId AVANT d'ouvrir la modal
+  targetTeamId.value = teamId
+
+  // Si le bénévole vient d'une équipe (sourceTeamId existe) et ce n'est pas la même équipe,
+  // ouvrir la modal pour choisir déplacer ou ajouter
+  // Aussi vérifier si le bénévole a des équipes dans ses données
+  const hasExistingTeams = draggedVolunteer.value.teams && draggedVolunteer.value.teams.length > 0
+
+  if (
+    (sourceTeamId.value && sourceTeamId.value !== teamId) ||
+    (hasExistingTeams && !sourceTeamId.value)
+  ) {
+    // Utiliser nextTick pour s'assurer que les valeurs sont mises à jour avant d'ouvrir la modal
+    await nextTick()
+    showMoveModal.value = true
+    dragOverTeam.value = null
+    return
+  }
+
+  // Sinon, procéder directement à l'assignation (bénévole non assigné)
+  await directAssign(teamId)
+}
+
+// Fonction d'assignation directe (pour les bénévoles non assignés)
+const directAssign = async (teamId: string) => {
+  if (!draggedVolunteer.value) return
 
   try {
     // Sauvegarder les infos du bénévole avant de l'assigner
@@ -649,6 +987,86 @@ const handleDrop = async (teamId: string) => {
   } finally {
     draggedVolunteer.value = null
     dragOverTeam.value = null
+    sourceTeamId.value = null
+    targetTeamId.value = null
+  }
+}
+
+// Fonction pour traiter les actions de déplacer/ajouter depuis la modal
+const processMove = async (action: 'move' | 'add') => {
+  if (!draggedVolunteer.value || !targetTeamId.value) return
+
+  isProcessingMove.value = true
+
+  try {
+    const volunteerName = `${draggedVolunteer.value.user.prenom} ${draggedVolunteer.value.user.nom}`
+    const volunteerId = draggedVolunteer.value.id
+
+    let newTeams: string[] = []
+
+    if (action === 'move') {
+      // Déplacer : assigner uniquement à la nouvelle équipe
+      newTeams = [targetTeamId.value]
+    } else {
+      // Ajouter : garder les équipes existantes et ajouter la nouvelle
+      const currentTeams = draggedVolunteer.value.teams?.map((t: any) => t.id) || []
+      newTeams = [...currentTeams, targetTeamId.value]
+      // Enlever les doublons au cas où
+      newTeams = [...new Set(newTeams)]
+    }
+
+    // Appeler l'API pour mettre à jour les assignations
+    await $fetch(`/api/editions/${editionId}/volunteers/applications/${volunteerId}/teams`, {
+      method: 'PATCH',
+      body: {
+        teams: newTeams,
+      },
+    })
+
+    // Rafraîchir les données
+    await fetchTeamAssignments()
+    await fetchVolunteersInfo()
+
+    // Rafraîchir le tableau des bénévoles
+    if (volunteerTableRef.value && volunteerTableRef.value.refreshApplications) {
+      await volunteerTableRef.value.refreshApplications()
+    }
+
+    // Message de succès
+    const actionText = action === 'move' ? 'déplacé vers' : 'ajouté à'
+    toast.add({
+      title: 'Opération réussie',
+      description: `${volunteerName} a été ${actionText} ${targetTeamName.value}`,
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    // Fermer la modal et nettoyer les variables
+    showMoveModal.value = false
+    draggedVolunteer.value = null
+    dragOverTeam.value = null
+    sourceTeamId.value = null
+    targetTeamId.value = null
+  } catch (error: any) {
+    console.error('Failed to process move/add:', error)
+
+    const errorMessage =
+      error?.data?.message || error?.message || "Impossible de traiter l'opération"
+
+    toast.add({
+      title: 'Erreur',
+      description: errorMessage,
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+    // En cas d'erreur, fermer quand même la modal et nettoyer
+    showMoveModal.value = false
+    draggedVolunteer.value = null
+    dragOverTeam.value = null
+    sourceTeamId.value = null
+    targetTeamId.value = null
+  } finally {
+    isProcessingMove.value = false
   }
 }
 
@@ -662,6 +1080,18 @@ const fetchVolunteersInfo = async () => {
     console.error('Failed to fetch volunteers info:', error)
   }
 }
+
+// Watcher pour nettoyer les variables quand la modal se ferme
+watch(showMoveModal, (newValue) => {
+  if (!newValue) {
+    // Nettoyer les variables quand la modal se ferme
+    draggedVolunteer.value = null
+    dragOverTeam.value = null
+    sourceTeamId.value = null
+    targetTeamId.value = null
+    isProcessingMove.value = false
+  }
+})
 
 // Charger l'édition si nécessaire
 onMounted(async () => {

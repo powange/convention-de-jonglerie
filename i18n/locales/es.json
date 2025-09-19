@@ -1513,6 +1513,35 @@
       "pets_details": "Detalles de mascotas",
       "setup": "Montaje",
       "skills": "Habilidades",
+      "team_distribution": {
+        "all_teams": "Todos los equipos",
+        "description": "Distribución de voluntarios aceptados en equipos. Arrastra y suelta para mover o agregar a un equipo.",
+        "manage_teams": "Gestionar equipos",
+        "max_label": "Máx:",
+        "modal": {
+          "add": "Agregar",
+          "add_description_multiple": "Mantener el voluntario en sus equipos actuales y agregarlo también a \"{targetTeam}\"",
+          "add_description_single": "Mantener el voluntario en \"{sourceTeam}\" y asignarlo también a \"{targetTeam}\"",
+          "cancel": "Cancelar",
+          "move": "Mover",
+          "move_description_multiple": "Remover el voluntario de todos sus equipos actuales y colocarlo en \"{targetTeam}\"",
+          "move_description_single": "Remover el voluntario de \"{sourceTeam}\" y colocarlo en \"{targetTeam}\"",
+          "question": "¿Qué te gustaría hacer?"
+        },
+        "no_assignments": "No se encontraron asignaciones de equipo",
+        "no_assignments_description": "Los voluntarios aceptados aparecerán aquí una vez asignados a equipos",
+        "preferences_label": "Pref:",
+        "stats": {
+          "assigned_volunteers": "Voluntarios asignados",
+          "total_assignments": "Asignaciones totales",
+          "total_teams": "Total equipos",
+          "unassigned": "Sin asignar"
+        },
+        "title": "Distribución por equipos",
+        "unassigned_description": "Estos voluntarios aceptados aún no han sido asignados a un equipo. Puedes arrastrarlos y soltarlos en un equipo a continuación.",
+        "unassigned_volunteers": "Voluntarios sin asignar",
+        "volunteers_count": "{count} voluntario(s)"
+      },
       "team_preferences": "Preferencias de equipo",
       "teardown": "Desmontaje",
       "time_preferences": "Preferencias horarias",

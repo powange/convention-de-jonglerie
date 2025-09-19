@@ -1513,6 +1513,35 @@
       "pets_details": "Pet details",
       "setup": "Setup",
       "skills": "Skills",
+      "team_distribution": {
+        "all_teams": "All teams",
+        "description": "Distribution of accepted volunteers in teams. Drag and drop to move or add to a team.",
+        "manage_teams": "Manage teams",
+        "max_label": "Max:",
+        "modal": {
+          "add": "Add",
+          "add_description_multiple": "Keep the volunteer in their current teams and also add them to \"{targetTeam}\"",
+          "add_description_single": "Keep the volunteer in \"{sourceTeam}\" and also assign them to \"{targetTeam}\"",
+          "cancel": "Cancel",
+          "move": "Move",
+          "move_description_multiple": "Remove the volunteer from all their current teams and place them in \"{targetTeam}\"",
+          "move_description_single": "Remove the volunteer from \"{sourceTeam}\" and place them in \"{targetTeam}\"",
+          "question": "What would you like to do?"
+        },
+        "no_assignments": "No team assignments found",
+        "no_assignments_description": "Accepted volunteers will appear here once assigned to teams",
+        "preferences_label": "Pref:",
+        "stats": {
+          "assigned_volunteers": "Assigned volunteers",
+          "total_assignments": "Total assignments",
+          "total_teams": "Total teams",
+          "unassigned": "Unassigned"
+        },
+        "title": "Team Distribution",
+        "unassigned_description": "These accepted volunteers have not yet been assigned to a team. You can drag and drop them to a team below.",
+        "unassigned_volunteers": "Unassigned volunteers",
+        "volunteers_count": "{count} volunteer(s)"
+      },
       "team_preferences": "Team preferences",
       "teardown": "Teardown",
       "time_preferences": "Time preferences",

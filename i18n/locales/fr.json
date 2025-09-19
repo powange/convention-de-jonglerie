@@ -1494,7 +1494,36 @@
       "withdrawal_error": "Erreur lors du retrait de la candidature",
       "assigned_time_slots": "Créneaux assignés",
       "unnamed_slot": "Créneau sans titre",
-      "total_hours": "Total d'heures"
+      "total_hours": "Total d'heures",
+      "team_distribution": {
+        "all_teams": "Toutes équipes",
+        "description": "Répartition des bénévoles acceptés dans les équipes. Glissez-déposez pour déplacer ou ajouter à une équipe.",
+        "manage_teams": "Gérer les équipes",
+        "max_label": "Max:",
+        "modal": {
+          "add": "Ajouter",
+          "add_description_multiple": "Garder le bénévole dans ses équipes actuelles et l'ajouter aussi à \"{targetTeam}\"",
+          "add_description_single": "Garder le bénévole dans \"{sourceTeam}\" et l'assigner aussi à \"{targetTeam}\"",
+          "cancel": "Annuler",
+          "move": "Déplacer",
+          "move_description_multiple": "Retirer le bénévole de toutes ses équipes actuelles et le placer dans \"{targetTeam}\"",
+          "move_description_single": "Retirer le bénévole de \"{sourceTeam}\" et le placer dans \"{targetTeam}\"",
+          "question": "Que souhaitez-vous faire ?"
+        },
+        "no_assignments": "Aucune assignation d'équipe trouvée",
+        "no_assignments_description": "Les bénévoles acceptés apparaîtront ici une fois assignés à des équipes",
+        "preferences_label": "Préf:",
+        "stats": {
+          "assigned_volunteers": "Bénévoles assignés",
+          "total_assignments": "Assignations totales",
+          "total_teams": "Total équipes",
+          "unassigned": "Sans assignation"
+        },
+        "title": "Répartition par équipes",
+        "unassigned_description": "Ces bénévoles acceptés n'ont pas encore été assignés à une équipe. Vous pouvez les glisser-déposer dans une équipe ci-dessous.",
+        "unassigned_volunteers": "Bénévoles non assignés",
+        "volunteers_count": "{count} bénévole(s)"
+      }
     },
     "comments": {
       "be_first_to_comment": "Soyez le premier à partager votre expérience !",

@@ -1513,6 +1513,35 @@
       "pets_details": "Detalhes dos animais",
       "setup": "Montagem",
       "skills": "Competências",
+      "team_distribution": {
+        "all_teams": "Todas as equipes",
+        "description": "Distribuição de voluntários aceitos em equipes. Arraste e solte para mover ou adicionar a uma equipe.",
+        "manage_teams": "Gerenciar equipes",
+        "max_label": "Máx:",
+        "modal": {
+          "add": "Adicionar",
+          "add_description_multiple": "Manter o voluntário em suas equipes atuais e adicioná-lo também a \"{targetTeam}\"",
+          "add_description_single": "Manter o voluntário em \"{sourceTeam}\" e atribuí-lo também a \"{targetTeam}\"",
+          "cancel": "Cancelar",
+          "move": "Mover",
+          "move_description_multiple": "Remover o voluntário de todas as suas equipes atuais e colocá-lo em \"{targetTeam}\"",
+          "move_description_single": "Remover o voluntário de \"{sourceTeam}\" e colocá-lo em \"{targetTeam}\"",
+          "question": "O que você gostaria de fazer?"
+        },
+        "no_assignments": "Nenhuma atribuição de equipe encontrada",
+        "no_assignments_description": "Voluntários aceitos aparecerão aqui uma vez atribuídos a equipes",
+        "preferences_label": "Pref:",
+        "stats": {
+          "assigned_volunteers": "Voluntários atribuídos",
+          "total_assignments": "Atribuições totais",
+          "total_teams": "Total de equipes",
+          "unassigned": "Não atribuídos"
+        },
+        "title": "Distribuição por equipes",
+        "unassigned_description": "Estes voluntários aceitos ainda não foram atribuídos a uma equipe. Você pode arrastá-los e soltá-los em uma equipe abaixo.",
+        "unassigned_volunteers": "Voluntários não atribuídos",
+        "volunteers_count": "{count} voluntário(s)"
+      },
       "team_preferences": "Preferências de equipa",
       "teardown": "Desmontagem",
       "time_preferences": "Preferências horárias",

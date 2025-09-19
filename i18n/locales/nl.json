@@ -1513,6 +1513,35 @@
       "pets_details": "Huisdierdetails",
       "setup": "Opbouw",
       "skills": "Vaardigheden",
+      "team_distribution": {
+        "all_teams": "Alle teams",
+        "description": "Verdeling van geaccepteerde vrijwilligers in teams. Sleep en zet neer om te verplaatsen of toe te voegen aan een team.",
+        "manage_teams": "Teams beheren",
+        "max_label": "Max:",
+        "modal": {
+          "add": "Toevoegen",
+          "add_description_multiple": "Houd de vrijwilliger in hun huidige teams en voeg ze ook toe aan \"{targetTeam}\"",
+          "add_description_single": "Houd de vrijwilliger in \"{sourceTeam}\" en wijs ze ook toe aan \"{targetTeam}\"",
+          "cancel": "Annuleren",
+          "move": "Verplaatsen",
+          "move_description_multiple": "Verwijder de vrijwilliger uit al hun huidige teams en plaats ze in \"{targetTeam}\"",
+          "move_description_single": "Verwijder de vrijwilliger uit \"{sourceTeam}\" en plaats ze in \"{targetTeam}\"",
+          "question": "Wat wil je doen?"
+        },
+        "no_assignments": "Geen teamtoewijzingen gevonden",
+        "no_assignments_description": "Geaccepteerde vrijwilligers verschijnen hier zodra ze zijn toegewezen aan teams",
+        "preferences_label": "Voork:",
+        "stats": {
+          "assigned_volunteers": "Toegewezen vrijwilligers",
+          "total_assignments": "Totale toewijzingen",
+          "total_teams": "Totale teams",
+          "unassigned": "Niet toegewezen"
+        },
+        "title": "Teamverdeling",
+        "unassigned_description": "Deze geaccepteerde vrijwilligers zijn nog niet toegewezen aan een team. Je kunt ze slepen en neerzetten bij een team hieronder.",
+        "unassigned_volunteers": "Niet-toegewezen vrijwilligers",
+        "volunteers_count": "{count} vrijwilliger(s)"
+      },
       "team_preferences": "Teamvoorkeuren",
       "teardown": "Afbouw",
       "time_preferences": "Tijdvoorkeuren",
