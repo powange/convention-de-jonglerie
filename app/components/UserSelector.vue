@@ -14,18 +14,27 @@
       @update:search-term="(v) => emit('update:searchTerm', v)"
     >
       <template #leading>
-        <UAvatar
-          v-if="internalValue?.avatar"
-          :src="internalValue.avatar.src"
-          :alt="internalValue.avatar.alt"
+        <UiUserAvatar
+          v-if="internalValue"
+          :user="{
+            pseudo: internalValue.label.split(' — ')[0],
+            profilePicture: internalValue.avatar?.src,
+            emailHash: '',
+          }"
           size="xs"
         />
         <UIcon v-else name="i-heroicons-user-circle" class="text-gray-400 h-4 w-4" />
       </template>
 
       <template #item-leading="{ item }">
-        <UAvatar v-if="item.avatar" :src="item.avatar.src" :alt="item.avatar.alt" size="xs" />
-        <UIcon v-else name="i-heroicons-user-circle" class="text-gray-400 h-4 w-4" />
+        <UiUserAvatar
+          :user="{
+            pseudo: item.label.split(' — ')[0],
+            profilePicture: item.avatar?.src,
+            emailHash: '',
+          }"
+          size="xs"
+        />
       </template>
 
       <template #empty>
@@ -63,14 +72,15 @@
         class="transition-colors"
         @click="internalValue = user"
       >
-        <UAvatar
-          v-if="user.avatar"
-          :src="user.avatar.src"
-          :alt="user.avatar.alt"
+        <UiUserAvatar
+          :user="{
+            pseudo: user.label.split(' — ')[0],
+            profilePicture: user.avatar?.src,
+            emailHash: '',
+          }"
           size="xs"
           class="mr-1"
         />
-        <UIcon v-else name="i-heroicons-user" class="mr-1 h-3 w-3" />
         {{ user.label.split(' ')[0] }}
       </UButton>
     </div>

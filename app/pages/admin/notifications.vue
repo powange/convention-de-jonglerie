@@ -406,7 +406,128 @@
         :columns="notificationColumns"
         :loading="loadingRecent"
         class="w-full"
-      />
+      >
+        <template #name-cell="{ row }">
+          <UiUserDisplayForAdmin :user="row.original.user" />
+        </template>
+        <template #type-cell="{ row }">
+          <div class="flex items-center gap-2">
+            <UIcon
+              :name="getTypeConfig(row.original.type).icon"
+              :class="`h-4 w-4 text-${getTypeConfig(row.original.type).color}-600`"
+            />
+            <UBadge :color="getTypeConfig(row.original.type).color" variant="soft">
+              {{ getTypeConfig(row.original.type).label }}
+            </UBadge>
+          </div>
+        </template>
+        <template #title_message-cell="{ row }">
+          <div class="min-w-0 max-w-md space-y-2 py-1">
+            <p class="font-semibold text-gray-900 dark:text-white leading-tight">
+              {{ row.original.title }}
+            </p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
+              {{ row.original.message }}
+            </p>
+            <div v-if="row.original.actionUrl" class="mt-2 flex items-center gap-2">
+              <UButton
+                :to="row.original.actionUrl"
+                variant="soft"
+                color="primary"
+                size="xs"
+                target="_blank"
+                rel="noopener"
+                class="inline-flex items-center gap-1"
+              >
+                <UIcon name="i-heroicons-arrow-top-right-on-square" class="h-3 w-3" />
+                {{ row.original.actionText || 'Voir détails' }}
+              </UButton>
+            </div>
+          </div>
+        </template>
+        <template #category-cell="{ row }">
+          <div v-if="!row.original.category" class="flex items-center gap-2">
+            <UIcon name="i-heroicons-minus" class="h-4 w-4" />
+            <span class="text-xs italic">Aucune</span>
+          </div>
+          <div v-else class="flex items-center gap-2">
+            <UIcon
+              :name="getCategoryConfig(row.original.category).icon"
+              :class="`h-4 w-4 text-${getCategoryConfig(row.original.category).color}-600 dark:text-${getCategoryConfig(row.original.category).color}-400`"
+            />
+            <UBadge :color="getCategoryConfig(row.original.category).color" variant="soft">
+              {{ getCategoryConfig(row.original.category).label }}
+            </UBadge>
+          </div>
+        </template>
+        <template #isRead-cell="{ row }">
+          <div v-if="row.original.isRead" class="flex items-center gap-2">
+            <UIcon name="i-heroicons-check-circle" class="h-4 w-4 text-green-600" />
+            <span class="text-sm font-medium text-green-700 dark:text-green-400">Lu</span>
+            <span v-if="row.original.readAt" class="text-xs text-gray-500 dark:text-gray-400"
+              >le {{ new Date(row.original.readAt).toLocaleDateString() }}</span
+            >
+          </div>
+          <div v-else class="flex items-center gap-2">
+            <UIcon name="i-heroicons-x-circle" class="h-4 w-4 text-red-600" />
+            <span class="text-sm font-medium text-red-700 dark:text-red-400">Non lu</span>
+          </div>
+        </template>
+        <template #createdAt-cell="{ row }">
+          <div class="space-y-1">
+            <p class="text-sm font-medium text-gray-900 dark:text-white">
+              {{ formatTimeAgoCustom(row.original.createdAt) }}
+            </p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              {{
+                new Date(row.original.createdAt).toLocaleString('fr-FR', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              }}
+            </p>
+          </div>
+        </template>
+        <template #actions-cell="{ row }">
+          <UMenu
+            :items="[
+              [
+                {
+                  label: 'Copier ID',
+                  icon: 'i-heroicons-clipboard-document',
+                  click: () => {
+                    navigator.clipboard.writeText(row.original.id)
+                    toast.add({ title: 'ID copié', color: 'success' })
+                  },
+                },
+                {
+                  label: row.original.isRead ? 'Marquer non lue' : 'Marquer comme lue',
+                  icon: row.original.isRead ? 'i-heroicons-eye-slash' : 'i-heroicons-eye',
+                  disabled: true,
+                  click: () => {
+                    toast.add({
+                      title: 'Fonctionnalité à venir',
+                      description: 'Modification du statut de lecture en cours de développement',
+                      color: 'info',
+                    })
+                  },
+                },
+              ],
+            ]"
+          >
+            <UButton
+              variant="ghost"
+              color="gray"
+              size="sm"
+              square
+              icon="i-heroicons-ellipsis-horizontal"
+            />
+          </UMenu>
+        </template>
+      </UTable>
 
       <!-- Pagination améliorée -->
       <div
@@ -459,11 +580,12 @@
           </UButton>
 
           <UPagination
-            v-model="pagination.page"
+            :model-value="pagination.page"
             :page-count="pagination.limit"
             :total="pagination.total"
             size="sm"
             class="flex-shrink-0"
+            @update:model-value="handlePageChange"
           />
 
           <UButton
@@ -752,7 +874,7 @@
 </template>
 
 <script setup lang="ts">
-import { h } from 'vue'
+import { formatTimeAgoIntl } from '@vueuse/core'
 import { z } from 'zod'
 
 // Protection admin
@@ -766,7 +888,6 @@ useSeoMeta({
 })
 
 const toast = useToast()
-const { getImageUrl } = useImageUrl()
 
 // État réactif
 const sendingReminders = ref(false)
@@ -797,8 +918,11 @@ interface RecentNotification {
   user: {
     id: number
     email: string
-    name: string
-    profilePictureUrl: string | null
+    emailHash: string
+    pseudo: string
+    nom: string | null
+    prenom: string | null
+    profilePicture: string | null
   }
 }
 
@@ -984,363 +1108,103 @@ const testTypesWithLabels = ref([
   },
 ])
 
+const getCategoryConfig = (cat: string): { color: any; icon: string; label: string } => {
+  switch (cat) {
+    case 'system':
+      return { color: 'neutral', icon: 'i-heroicons-cog-6-tooth', label: 'Système' }
+    case 'edition':
+      return { color: 'info', icon: 'i-heroicons-calendar-days', label: 'Édition' }
+    case 'volunteer':
+      return { color: 'success', icon: 'i-heroicons-heart', label: 'Bénévolat' }
+    case 'other':
+      return {
+        color: 'purple',
+        icon: 'i-heroicons-ellipsis-horizontal-circle',
+        label: 'Autre',
+      }
+    default:
+      return { color: 'neutral', icon: 'i-heroicons-folder', label: cat }
+  }
+}
+
+const getTypeConfig = (type: string): { color: any; icon: string; label: string } => {
+  switch (type) {
+    case 'ERROR':
+      return { color: 'error', icon: 'i-heroicons-x-circle', label: 'Erreur' }
+    case 'SUCCESS':
+      return { color: 'success', icon: 'i-heroicons-check-circle', label: 'Succès' }
+    case 'WARNING':
+      return {
+        color: 'warning',
+        icon: 'i-heroicons-exclamation-triangle',
+        label: 'Attention',
+      }
+    default:
+      return { color: 'info', icon: 'i-heroicons-information-circle', label: 'Info' }
+  }
+}
+
 // Type pour les lignes du tableau (utilisé pour les colonnes)
 // type NotificationRow = RecentNotification
 
 // Colonnes du tableau des notifications
 const notificationColumns = [
   {
-    accessorKey: 'user.name',
+    accessorKey: 'user.pseudo',
     header: 'Utilisateur',
-    cell: ({ row }: { row: any }) => {
-      const user = row.original.user
-      return h('div', { class: 'flex items-center gap-3 py-1' }, [
-        user.profilePictureUrl
-          ? h('img', {
-              src: user.profilePictureUrl,
-              alt: user.name,
-              class: 'h-9 w-9 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-700',
-            })
-          : h(
-              'div',
-              {
-                class:
-                  'h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold ring-2 ring-gray-200 dark:ring-gray-700',
-              },
-              user.name.charAt(0).toUpperCase()
-            ),
-        h('div', { class: 'min-w-0 flex-1' }, [
-          h('p', { class: 'font-semibold text-gray-900 dark:text-white truncate' }, user.name),
-          h('p', { class: 'text-sm text-gray-500 dark:text-gray-400 truncate' }, user.email),
-        ]),
-      ])
-    },
+    id: 'name',
   },
   {
     accessorKey: 'type',
     header: 'Type',
-    cell: ({ row }: { row: any }) => {
-      const type = row.getValue('type')
-      const getTypeConfig = (type: string) => {
-        switch (type) {
-          case 'ERROR':
-            return { color: 'error', icon: 'i-heroicons-x-circle', label: 'Erreur' }
-          case 'SUCCESS':
-            return { color: 'success', icon: 'i-heroicons-check-circle', label: 'Succès' }
-          case 'WARNING':
-            return {
-              color: 'warning',
-              icon: 'i-heroicons-exclamation-triangle',
-              label: 'Attention',
-            }
-          default:
-            return { color: 'info', icon: 'i-heroicons-information-circle', label: 'Info' }
-        }
-      }
-      const config = getTypeConfig(type)
-      return h('div', { class: 'flex items-center gap-2' }, [
-        h(resolveComponent('UIcon'), {
-          name: config.icon,
-          class: `h-4 w-4 text-${config.color}-600`,
-        }),
-        h(
-          resolveComponent('UBadge'),
-          {
-            color: config.color,
-            variant: 'soft',
-          },
-          () => config.label
-        ),
-      ])
-    },
+    id: 'type',
   },
   {
     accessorKey: 'title',
     header: 'Titre & Message',
-    cell: ({ row }: { row: any }) => {
-      const title = row.getValue('title')
-      const message = row.original.message
-      return h('div', { class: 'min-w-0 max-w-md space-y-2 py-1' }, [
-        h(
-          'p',
-          {
-            class: 'font-semibold text-gray-900 dark:text-white leading-tight',
-          },
-          title
-        ),
-        h(
-          'p',
-          {
-            class: 'text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap',
-          },
-          message
-        ),
-        row.original.actionUrl &&
-          h('div', { class: 'mt-1' }, [
-            h(
-              resolveComponent('UBadge'),
-              {
-                variant: 'outline',
-                color: 'primary',
-              },
-              () => [
-                h(resolveComponent('UIcon'), { name: 'i-heroicons-link', class: 'h-3 w-3 mr-1' }),
-                'Action disponible',
-              ]
-            ),
-          ]),
-      ])
-    },
+    id: 'title_message',
   },
   {
     accessorKey: 'category',
     header: 'Catégorie',
-    cell: ({ row }: { row: any }) => {
-      const category = row.getValue('category')
-      if (!category) {
-        return h('div', { class: 'flex items-center gap-2 text-gray-400' }, [
-          h(resolveComponent('UIcon'), {
-            name: 'i-heroicons-minus',
-            class: 'h-4 w-4',
-          }),
-          h('span', { class: 'text-xs italic' }, 'Aucune'),
-        ])
-      }
-
-      const getCategoryConfig = (cat: string) => {
-        switch (cat) {
-          case 'system':
-            return { color: 'neutral', icon: 'i-heroicons-cog-6-tooth', label: 'Système' }
-          case 'edition':
-            return { color: 'info', icon: 'i-heroicons-calendar-days', label: 'Édition' }
-          case 'volunteer':
-            return { color: 'success', icon: 'i-heroicons-heart', label: 'Bénévolat' }
-          case 'other':
-            return {
-              color: 'purple',
-              icon: 'i-heroicons-ellipsis-horizontal-circle',
-              label: 'Autre',
-            }
-          default:
-            return { color: 'neutral', icon: 'i-heroicons-folder', label: cat }
-        }
-      }
-
-      const config = getCategoryConfig(category)
-      return h('div', { class: 'flex items-center gap-2' }, [
-        h(resolveComponent('UIcon'), {
-          name: config.icon,
-          class: `h-4 w-4 text-${config.color}-600 dark:text-${config.color}-400`,
-        }),
-        h(
-          resolveComponent('UBadge'),
-          {
-            color: config.color,
-            variant: 'soft',
-          },
-          () => config.label
-        ),
-      ])
-    },
+    id: 'category',
   },
   {
     accessorKey: 'isRead',
     header: 'Statut',
-    cell: ({ row }: { row: any }) => {
-      const isRead = row.getValue('isRead')
-      const readAt = row.original.readAt
-
-      if (isRead) {
-        return h('div', { class: 'flex items-center gap-2' }, [
-          h(resolveComponent('UIcon'), {
-            name: 'i-heroicons-eye',
-            class: 'h-4 w-4 text-green-600 dark:text-green-400',
-          }),
-          h('div', { class: 'space-y-1' }, [
-            h(
-              resolveComponent('UBadge'),
-              {
-                color: 'success',
-                variant: 'soft',
-                size: 'sm',
-              },
-              () => 'Lue'
-            ),
-            readAt &&
-              h(
-                'p',
-                {
-                  class: 'text-xs text-gray-500 dark:text-gray-400',
-                  title: `Lue le ${formatDateTime(readAt)}`,
-                },
-                formatDateTime(readAt).split(' ')[0]
-              ),
-          ]),
-        ])
-      } else {
-        return h('div', { class: 'flex items-center gap-2' }, [
-          h('div', {
-            class: 'h-2 w-2 rounded-full bg-orange-500 animate-pulse',
-          }),
-          h(
-            resolveComponent('UBadge'),
-            {
-              color: 'warning',
-              variant: 'soft',
-              size: 'sm',
-            },
-            () => 'Non lue'
-          ),
-        ])
-      }
-    },
+    id: 'isRead',
   },
   {
     accessorKey: 'createdAt',
     header: 'Date',
-    cell: ({ row }: { row: any }) => {
-      const createdAt = row.getValue('createdAt')
-      const date = new Date(createdAt)
-      const now = new Date()
-      const diffMs = now.getTime() - date.getTime()
-      const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-      const diffDays = Math.floor(diffHours / 24)
-
-      let timeAgo = ''
-      let icon = 'i-heroicons-clock'
-      let color = 'neutral'
-
-      if (diffHours < 1) {
-        timeAgo = "À l'instant"
-        icon = 'i-heroicons-bolt'
-        color = 'success'
-      } else if (diffHours < 24) {
-        timeAgo = `Il y a ${diffHours}h`
-        color = 'info'
-      } else if (diffDays === 1) {
-        timeAgo = 'Hier'
-        color = 'warning'
-      } else if (diffDays < 7) {
-        timeAgo = `Il y a ${diffDays}j`
-        color = 'warning'
-      } else {
-        timeAgo = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
-        color = 'neutral'
-      }
-
-      return h('div', { class: 'flex items-center gap-2' }, [
-        h(resolveComponent('UIcon'), {
-          name: icon,
-          class: `h-4 w-4 text-${color}-600 dark:text-${color}-400`,
-        }),
-        h('div', { class: 'space-y-1' }, [
-          h(
-            'p',
-            {
-              class: `text-sm font-medium text-${color}-700 dark:text-${color}-300`,
-            },
-            timeAgo
-          ),
-          h(
-            'p',
-            {
-              class: 'text-xs text-gray-500 dark:text-gray-400',
-              title: formatDateTime(createdAt),
-            },
-            date.toLocaleDateString('fr-FR')
-          ),
-        ]),
-      ])
-    },
+    id: 'createdAt',
   },
   {
-    accessorKey: 'actionUrl',
-    header: 'Actions',
-    cell: ({ row }: { row: any }) => {
-      const actionUrl = row.getValue('actionUrl')
-      const actionText = row.original.actionText
-      const notification = row.original
-
-      return h('div', { class: 'flex items-center gap-2' }, [
-        // Bouton d'action principal si disponible
-        actionUrl
-          ? h(
-              resolveComponent('UButton'),
-              {
-                to: actionUrl,
-                variant: 'soft',
-                color: 'primary',
-                target: '_blank',
-                class: 'flex items-center gap-1',
-              },
-              () => [
-                h(resolveComponent('UIcon'), {
-                  name: 'i-heroicons-arrow-top-right-on-square',
-                  class: 'h-3 w-3',
-                }),
-                actionText || 'Voir',
-              ]
-            )
-          : null,
-
-        // Menu d'actions secondaires
-        h(
-          resolveComponent('UDropdown'),
-          {
-            items: [
-              [
-                {
-                  label: 'Copier ID',
-                  icon: 'i-heroicons-clipboard-document',
-                  click: () => {
-                    navigator.clipboard.writeText(notification.id)
-                    toast.add({ title: 'ID copié', color: 'success' })
-                  },
-                },
-                {
-                  label: notification.isRead ? 'Marquer non lue' : 'Marquer comme lue',
-                  icon: notification.isRead ? 'i-heroicons-eye-slash' : 'i-heroicons-eye',
-                  click: () => {
-                    toast.add({
-                      title: 'Fonctionnalité à venir',
-                      description: 'Modification du statut de lecture en cours de développement',
-                      color: 'info',
-                    })
-                  },
-                },
-              ],
-            ],
-          },
-          () =>
-            h(
-              resolveComponent('UButton'),
-              {
-                variant: 'ghost',
-                color: 'gray',
-                square: true,
-              },
-              () =>
-                h(resolveComponent('UIcon'), {
-                  name: 'i-heroicons-ellipsis-horizontal',
-                  class: 'h-4 w-4',
-                })
-            )
-        ),
-      ])
-    },
+    accessorKey: 'actions',
+    header: '',
+    id: 'actions',
   },
 ]
 
 // Méthodes utilitaires
 
-const formatDateTime = (dateString: string) => {
-  return new Date(dateString).toLocaleString('fr-FR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+// Fonction pour formater les dates en mode humain avec Intl
+const formatTimeAgoCustom = (dateString: string) => {
+  const { locale } = useI18n()
+  return formatTimeAgoIntl(new Date(dateString), {
+    locale: locale.value, // Utilise la locale actuelle de l'application
+    relativeTimeFormatOptions: {
+      numeric: 'auto', // Affiche "hier" au lieu de "il y a 1 jour"
+      style: 'long', // Style long pour plus de précision
+    },
   })
+}
+
+const handlePageChange = (newPage: number) => {
+  console.log('handlePageChange called with page:', newPage)
+  pagination.value.page = newPage
+  // Force le rechargement immédiatement
+  loadRecentNotifications()
 }
 
 // Actions
@@ -1430,7 +1294,7 @@ const searchUsers = async (query: string) => {
       isRealUser: true, // Marquer comme vrai utilisateur
       avatar: u.profilePicture
         ? {
-            src: getImageUrl(u.profilePicture, 'profile', u.id) || '',
+            src: u.profilePicture,
             alt: u.pseudo,
           }
         : undefined,
@@ -1466,7 +1330,7 @@ const searchUsersForCreate = async (query: string) => {
       isRealUser: true,
       avatar: u.profilePicture
         ? {
-            src: getImageUrl(u.profilePicture, 'profile', u.id) || '',
+            src: u.profilePicture,
             alt: u.pseudo,
           }
         : undefined,
@@ -1561,7 +1425,7 @@ const resetCreateForm = () => {
 
 const resetTestForm = () => {
   Object.assign(testForm, {
-    targetUser: testUserItems[0], // Sélectionner Alice par défaut
+    targetUser: null, // Pas de sélection par défaut
     type: 'welcome' as const,
     message: '',
   })
@@ -1590,6 +1454,12 @@ const loadStats = async () => {
 }
 
 const loadRecentNotifications = async () => {
+  console.log(
+    'loadRecentNotifications called with page:',
+    pagination.value.page,
+    'limit:',
+    pagination.value.limit
+  )
   loadingRecent.value = true
   try {
     const query: any = {
@@ -1660,21 +1530,27 @@ const resetFilters = () => {
   loadRecentNotifications()
 }
 
-// Watchers pour la pagination
-watch(
-  () => pagination.value.page,
-  () => {
-    // Recharger les données quand on change de page
-    loadRecentNotifications()
-  }
-)
+// Watchers pour la pagination - Désactivé car on utilise handlePageChange
+// watch(
+//   () => pagination.value.page,
+//   (newPage, oldPage) => {
+//     console.log('Page changed from', oldPage, 'to', newPage)
+//     // Recharger les données quand on change de page
+//     if (newPage !== undefined && newPage !== oldPage) {
+//       loadRecentNotifications()
+//     }
+//   }
+// )
 
 watch(
   () => pagination.value.limit,
-  () => {
+  (newLimit, oldLimit) => {
+    console.log('Limit changed from', oldLimit, 'to', newLimit)
     // Réinitialiser à la page 1 et recharger quand on change la limite
-    pagination.value.page = 1
-    loadRecentNotifications()
+    if (newLimit !== oldLimit) {
+      pagination.value.page = 1
+      loadRecentNotifications()
+    }
   }
 )
 

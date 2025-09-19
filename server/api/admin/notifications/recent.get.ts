@@ -1,4 +1,5 @@
 import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
+import { getEmailHash } from '../../../utils/email-hash'
 import { prisma } from '../../../utils/prisma'
 
 /**
@@ -90,13 +91,12 @@ export default defineEventHandler(async (event) => {
       actionText: notification.actionText,
       user: {
         id: notification.user.id,
-        email: notification.user.email,
+        emailHash: getEmailHash(notification.user.email),
         pseudo: notification.user.pseudo,
-        name:
-          `${notification.user.prenom || ''} ${notification.user.nom || ''}`.trim() ||
-          notification.user.pseudo ||
-          notification.user.email,
-        profilePictureUrl: notification.user.profilePicture,
+        nom: notification.user.nom,
+        prenom: notification.user.prenom,
+        email: notification.user.email,
+        profilePicture: notification.user.profilePicture,
       },
     }))
 

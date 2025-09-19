@@ -236,16 +236,13 @@
           v-if="edition.attendingUsers && edition.attendingUsers.length > 0"
           class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
         >
-          <div
+          <UiUserDisplay
             v-for="participant in edition.attendingUsers"
             :key="participant.id"
-            class="flex flex-col items-center text-center"
-          >
-            <UiUserAvatar :user="participant" size="md" class="mb-2" />
-            <span class="text-sm font-medium text-gray-900 dark:text-white truncate w-full">
-              {{ participant.pseudo }}
-            </span>
-          </div>
+            :user="participant"
+            layout="vertical"
+            size="md"
+          />
         </div>
         <div v-else class="text-center py-8 text-gray-500">
           <UIcon name="i-heroicons-user-plus" class="text-4xl mb-2 text-gray-400" />
@@ -317,9 +314,9 @@ const { getImageUrl } = useImageUrl()
 
 // (Bloc bénévolat déplacé dans la page volunteers.vue)
 
-// Charger l'édition côté serveur ET client
+// Charger l'édition côté serveur ET client - forcer le rechargement pour avoir les données complètes
 try {
-  await editionStore.fetchEditionById(editionId)
+  await editionStore.fetchEditionById(editionId, { force: true })
 } catch (error) {
   console.error('Failed to fetch edition:', error)
 }

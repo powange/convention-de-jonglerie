@@ -69,7 +69,8 @@
       "Bash(/tmp/check_components_correct.sh:*)",
       "Bash(/tmp/final_analysis.sh:*)",
       "Bash(git mv:*)",
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:vueuse.org)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

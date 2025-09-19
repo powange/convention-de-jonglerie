@@ -3,18 +3,8 @@
     <div class="space-y-4">
       <!-- En-tête avec les infos utilisateur -->
       <div class="flex items-start justify-between">
-        <div class="flex items-center gap-3 flex-1">
-          <UiUserAvatar :user="request.user" size="lg" />
-          <div>
-            <p class="font-semibold">{{ request.user.pseudo }}</p>
-            <p class="text-sm text-gray-500">
-              {{
-                $t('components.carpool.requested_on', {
-                  date: new Date(request.createdAt).toLocaleDateString(),
-                })
-              }}
-            </p>
-          </div>
+        <div class="flex-1">
+          <UiUserDisplay :user="request.user" :datetime="request.createdAt" size="lg" />
         </div>
 
         <!-- Boutons d'action pour le créateur -->

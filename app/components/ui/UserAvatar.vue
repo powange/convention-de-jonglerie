@@ -13,8 +13,6 @@ interface User {
   profilePicture?: string | null
   updatedAt?: string
   pseudo?: string
-  prenom?: string
-  nom?: string
 }
 
 interface Props {
@@ -59,9 +57,6 @@ const avatarUrl = computed(() => {
 const altText = computed(() => {
   if (props.user.pseudo) {
     return `Avatar de ${props.user.pseudo}`
-  }
-  if (props.user.prenom && props.user.nom) {
-    return `Avatar de ${props.user.prenom} ${props.user.nom}`
   }
   return 'Avatar utilisateur'
 })

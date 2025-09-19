@@ -6,18 +6,8 @@
     <div class="space-y-4">
       <!-- En-tête avec les infos utilisateur -->
       <div class="flex items-start justify-between">
-        <div class="flex items-center gap-3 flex-1">
-          <UiUserAvatar :user="offer.user" size="lg" />
-          <div>
-            <p class="font-semibold">{{ offer.user.pseudo }}</p>
-            <p class="text-sm text-gray-500">
-              {{
-                $t('components.carpool.offered_on', {
-                  date: new Date(offer.createdAt).toLocaleDateString(),
-                })
-              }}
-            </p>
-          </div>
+        <div class="flex-1">
+          <UiUserDisplay :user="offer.user" :datetime="offer.createdAt" size="lg" />
         </div>
 
         <!-- Boutons d'action pour le créateur -->
@@ -141,14 +131,8 @@
             v-for="b in acceptedBookings"
             :key="b.id"
             class="flex items-center gap-2 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full text-sm"
-            :title="
-              $t('components.carpool.added_on', {
-                date: new Date(b.createdAt).toLocaleDateString(),
-              })
-            "
           >
-            <UiUserAvatar :user="b.requester" size="xs" />
-            <span class="text-green-700 dark:text-green-300">{{ b.requester.pseudo }}</span>
+            <UiUserDisplay :user="b.requester" :datetime="b.createdAt" size="xs" />
             <UBadge color="success" variant="soft">+{{ b.seats }}</UBadge>
           </div>
         </div>

@@ -21,12 +21,8 @@
       <!-- Liste des commentaires -->
       <div v-else-if="comments.length > 0" class="space-y-3 max-h-96 overflow-y-auto">
         <UCard v-for="comment in comments" :key="comment.id" variant="subtle">
-          <div class="flex items-start justify-between mb-2">
-            <div class="flex items-center gap-2">
-              <UiUserAvatar :user="comment.user" size="sm" />
-              <span class="font-medium text-sm">{{ comment.user.pseudo }}</span>
-              <span class="text-xs text-gray-500">{{ formatRelativeTime(comment.createdAt) }}</span>
-            </div>
+          <div class="mb-2">
+            <UiUserDisplay :user="comment.user" :datetime="comment.createdAt" size="sm" />
           </div>
           <p class="text-sm">{{ comment.content }}</p>
         </UCard>
@@ -147,18 +143,6 @@ const loadComments = async () => {
   } finally {
     loading.value = false
   }
-}
-
-const formatRelativeTime = (date: string) => {
-  const now = new Date()
-  const then = new Date(date)
-  const diffInMinutes = Math.floor((now.getTime() - then.getTime()) / 60000)
-
-  if (diffInMinutes < 1) return t('common.time_just_now')
-  if (diffInMinutes < 60) return t('common.time_minutes_ago', { count: diffInMinutes })
-  if (diffInMinutes < 1440)
-    return t('common.time_hours_ago', { count: Math.floor(diffInMinutes / 60) })
-  return t('common.time_days_ago', { count: Math.floor(diffInMinutes / 1440) })
 }
 
 const addComment = async () => {

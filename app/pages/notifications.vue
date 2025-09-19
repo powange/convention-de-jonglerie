@@ -201,9 +201,12 @@
 
               <!-- Métadonnées -->
               <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
-                <span class="flex items-center gap-1">
+                <span
+                  class="flex items-center gap-1"
+                  :title="formatDateTime(notification.createdAt)"
+                >
                   <UIcon name="i-heroicons-clock" class="h-3 w-3" />
-                  {{ formatDateTime(notification.createdAt) }}
+                  {{ formatRelativeTime(notification.createdAt) }}
                 </span>
                 <span v-if="notification.category" class="flex items-center gap-1">
                   <UIcon name="i-heroicons-tag" class="h-3 w-3" />
@@ -212,6 +215,7 @@
                 <span
                   v-if="notification.isRead && notification.readAt"
                   class="flex items-center gap-1"
+                  :title="formatDateTime(notification.readAt)"
                 >
                   <UIcon name="i-heroicons-check" class="h-3 w-3" />
                   Lu {{ formatRelativeTime(notification.readAt) }}
@@ -334,30 +338,29 @@ const getCategoryLabel = (category: string) => {
 }
 
 const formatDateTime = (dateString: string) => {
-  return new Date(dateString).toLocaleString('fr-FR', {
-    day: '2-digit',
-    month: '2-digit',
+  return new Date(dateString).toLocaleString(locale.value, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    second: '2-digit',
   })
 }
 
+const { locale } = useI18n()
+
 const formatRelativeTime = (dateString: string) => {
   const date = new Date(dateString)
-  const now = new Date()
-  const diff = now.getTime() - date.getTime()
 
-  const minutes = Math.floor(diff / (1000 * 60))
-  const hours = Math.floor(diff / (1000 * 60 * 60))
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-
-  if (minutes < 1) return "à l'instant"
-  if (minutes < 60) return `il y a ${minutes} min`
-  if (hours < 24) return `il y a ${hours}h`
-  if (days < 7) return `il y a ${days}j`
-
-  return `le ${date.toLocaleDateString('fr-FR')}`
+  return useTimeAgoIntl(date, {
+    locale: locale.value,
+    relativeTimeFormatOptions: {
+      numeric: 'auto',
+      style: 'short',
+    },
+  }).value
 }
 
 // Actions

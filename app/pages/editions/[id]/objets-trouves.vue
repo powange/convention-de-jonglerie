@@ -59,13 +59,12 @@
         >
           <template #header>
             <div class="flex items-start justify-between">
-              <div class="flex items-center gap-3">
-                <UiUserAvatar :user="item.user" size="lg" />
-                <div>
-                  <p class="font-medium">{{ item.user.prenom }} {{ item.user.nom }}</p>
-                  <p class="text-sm text-gray-500">{{ formatDate(item.createdAt) }}</p>
-                </div>
-              </div>
+              <UiUserDisplayForAdmin
+                :user="item.user"
+                :datetime="item.createdAt"
+                size="lg"
+                :show-email="false"
+              />
               <div class="flex items-center gap-2">
                 <UBadge
                   :color="item.status === 'RETURNED' ? 'success' : 'warning'"
@@ -120,17 +119,18 @@
               <!-- Liste des commentaires -->
               <div v-if="item.comments.length > 0" class="space-y-3">
                 <div v-for="comment in item.comments" :key="comment.id" class="flex gap-3">
-                  <UiUserAvatar :user="comment.user" size="md" shrink />
                   <div class="flex-1">
                     <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
-                      <p class="text-sm font-medium">
-                        {{ comment.user.prenom }} {{ comment.user.nom }}
-                      </p>
-                      <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">
+                      <UiUserDisplayForAdmin
+                        :user="comment.user"
+                        :datetime="comment.createdAt"
+                        size="sm"
+                        :show-email="false"
+                      />
+                      <p class="text-sm text-gray-700 dark:text-gray-300 mt-2">
                         {{ comment.content }}
                       </p>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">{{ formatDate(comment.createdAt) }}</p>
                   </div>
                 </div>
               </div>
@@ -334,16 +334,6 @@ const toggleFavorite = async (id: number) => {
 }
 
 // Fonctions
-const formatDate = (date: string) => {
-  const { locale } = useI18n()
-  return new Date(date).toLocaleDateString(locale.value, {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 const fetchLostFoundItems = async () => {
   loading.value = true

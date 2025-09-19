@@ -3,17 +3,7 @@
     <!-- En-tête du post -->
     <template #header>
       <div class="flex items-start justify-between">
-        <div class="flex items-center gap-3">
-          <UiUserAvatar :user="post.user" size="lg" />
-          <div>
-            <p class="font-medium text-gray-900 dark:text-gray-100">
-              {{ post.user.pseudo }}
-            </p>
-            <p class="text-sm text-gray-500">
-              {{ formatDate(post.createdAt) }}
-            </p>
-          </div>
-        </div>
+        <UiUserDisplay :user="post.user" :datetime="post.createdAt" size="lg" />
 
         <!-- Menu d'actions -->
         <UButton
@@ -104,16 +94,9 @@
         :key="comment.id"
         class="flex gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
       >
-        <UiUserAvatar :user="comment.user" size="md" shrink />
         <div class="flex-1 min-w-0">
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                {{ comment.user.pseudo }}
-              </p>
-              <span class="text-xs text-gray-500">•</span>
-              <span class="text-xs text-gray-500">{{ formatDate(comment.createdAt) }}</span>
-            </div>
+            <UiUserDisplay :user="comment.user" :datetime="comment.createdAt" size="md" />
 
             <!-- Menu d'actions pour le commentaire -->
             <UButton
@@ -238,32 +221,5 @@ const deletePost = () => {
 // Supprimer un commentaire
 const deleteComment = (commentId: number) => {
   emit('delete-comment', props.post.id, commentId)
-}
-
-// Formater la date
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInMs = now.getTime() - date.getTime()
-  const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
-  const diffInHours = Math.floor(diffInMinutes / 60)
-  const diffInDays = Math.floor(diffInHours / 24)
-
-  if (diffInMinutes < 1) {
-    return t('common.time_just_now')
-  } else if (diffInMinutes < 60) {
-    return t('common.time_minutes_ago', { count: diffInMinutes })
-  } else if (diffInHours < 24) {
-    return t('common.time_hours_ago', { count: diffInHours })
-  } else if (diffInDays < 7) {
-    return t('common.time_days_ago', { count: diffInDays })
-  } else {
-    const { locale } = useI18n()
-    return date.toLocaleDateString(locale.value, {
-      day: 'numeric',
-      month: 'short',
-      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
-    })
-  }
 }
 </script>

@@ -214,17 +214,11 @@ const columns = [
     header: t('admin.user_column'),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUser
-      return h('div', { class: 'flex items-center gap-3' }, [
-        h(resolveComponent('UiUserAvatar'), {
-          user: user,
-          size: 'md',
-          border: true,
-        }),
-        h('div', [
-          h('div', { class: 'font-medium' }, `${user.prenom} ${user.nom}`),
-          h('div', { class: 'text-sm text-gray-500' }, `@${user.pseudo}`),
-        ]),
-      ])
+      return h(resolveComponent('UiUserDisplayForAdmin'), {
+        user: user,
+        size: 'md',
+        showEmail: false,
+      })
     },
   },
   {
