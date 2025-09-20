@@ -177,12 +177,21 @@ export default defineNuxtConfig({
 
   // Configuration des modules SEO
   robots: {
-    // Permettre l'indexation en production seulement
-    disallow: process.env.NODE_ENV !== 'production' ? ['/'] : [],
+    // Permettre l'indexation uniquement sur le domaine principal en production
+    disallow: process.env.NODE_ENV !== 'production' ||
+              process.env.NUXT_ENV === 'staging' ||
+              process.env.NUXT_ENV === 'release' ||
+              !process.env.NUXT_PUBLIC_SITE_URL?.includes('juggling-convention.com')
+              ? ['/'] : [],
     sitemap: '/sitemap.xml',
   },
 
   sitemap: {
+    // Désactiver le sitemap sur les environnements non-production
+    enabled: process.env.NODE_ENV === 'production' &&
+             process.env.NUXT_ENV !== 'staging' &&
+             process.env.NUXT_ENV !== 'release' &&
+             (process.env.NUXT_PUBLIC_SITE_URL?.includes('juggling-convention.com') ?? false),
     // Exclure certaines routes du sitemap
     exclude: [
       '/admin/**',
