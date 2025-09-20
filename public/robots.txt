@@ -17,4 +17,4 @@ Disallow: /notifications
 Disallow: /api/
 
 # Sitemap
-Sitemap: https://convention-de-jonglerie.fr/sitemap.xml
+Sitemap: https://juggling-convention.com/sitemap.xml

@@ -194,7 +194,7 @@ export function generateIcsFile(event: CalendarEventData): string {
     'VERSION:2.0',
     'PRODID:-//Juggling Convention//Event//EN',
     'BEGIN:VEVENT',
-    `UID:${Date.now()}@convention-de-jonglerie.fr`,
+    `UID:${Date.now()}@juggling-convention.com`,
     `DTSTAMP:${now}`,
     `DTSTART:${startDate}`,
     `DTEND:${endDate}`,

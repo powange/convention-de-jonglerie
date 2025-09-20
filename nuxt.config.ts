@@ -6,7 +6,7 @@ export default defineNuxtConfig({
 
   // Configuration SEO du site
   site: {
-    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://convention-de-jonglerie.fr',
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://juggling-convention.com',
     name: 'Juggling Convention',
     description:
       'Find and manage your favorite juggling conventions. Collaborative platform for jugglers and event organizers.',

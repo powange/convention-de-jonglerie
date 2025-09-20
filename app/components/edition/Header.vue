@@ -414,7 +414,7 @@ const calendarEventData = computed<CalendarEventData>(() => {
     endDate: props.edition.endDate,
     url: import.meta.client
       ? `${window.location.origin}/editions/${props.edition.id}`
-      : `https://convention-de-jonglerie.fr/editions/${props.edition.id}`,
+      : `https://juggling-convention.com/editions/${props.edition.id}`,
   }
 })
 

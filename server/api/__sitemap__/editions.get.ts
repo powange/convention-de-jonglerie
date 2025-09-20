@@ -2,14 +2,11 @@ import { prisma } from '../../utils/prisma'
 
 export default defineSitemapEventHandler(async () => {
   try {
-    // Récupérer toutes les éditions publiques
+    // Récupérer toutes les éditions publiques (convention non archivée)
     const editions = await prisma.edition.findMany({
       where: {
         convention: {
-          archived: false,
-        },
-        status: {
-          in: ['published', 'closed'],
+          isArchived: false,
         },
       },
       select: {
