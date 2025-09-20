@@ -13,7 +13,7 @@ Je vais effectuer un processus de correction optimisé :
 npm run lint:fix
 ```
 
-2. **Analyse des erreurs restantes** (seulement si nécessaire)
+2. **Analyse des erreurs restantes** (seulement si erreur à la fin de l'étape 1)
 
 ```bash
 npm run lint

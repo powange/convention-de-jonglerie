@@ -209,5 +209,6 @@ onMounted(async () => {
 useSeoMeta({
   title: "Formulaire d'appel à bénévole - " + (edition.value?.name || 'Édition'),
   description: 'Formulaire pour créer et gérer les appels à bénévoles',
+  ogTitle: () => edition.value?.name || edition.value?.convention?.name || 'Convention',
 })
 </script>

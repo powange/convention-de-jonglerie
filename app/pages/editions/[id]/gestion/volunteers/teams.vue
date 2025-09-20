@@ -113,5 +113,6 @@ onMounted(async () => {
 useSeoMeta({
   title: 'Les équipes - ' + (edition.value?.name || 'Édition'),
   description: 'Organisation et gestion des équipes de bénévoles',
+  ogTitle: () => edition.value?.name || edition.value?.convention?.name || 'Convention',
 })
 </script>

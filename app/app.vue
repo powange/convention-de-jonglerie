@@ -208,21 +208,21 @@ const userMenuItems = computed(() => {
     },
   ]
 
-  // Ajouter le dashboard admin si super admin
-  if (authStore.user?.isGlobalAdmin) {
-    items.push({
-      label: t('navigation.admin'),
-      icon: 'i-heroicons-squares-2x2',
-      to: '/admin',
-    })
-  }
-
   // Ajouter les favoris en mobile
   if (isMobile.value) {
     items.push({
       label: t('navigation.my_favorites'),
       icon: 'i-heroicons-star',
       to: '/favorites',
+    })
+  }
+
+  // Ajouter le dashboard admin si super admin
+  if (authStore.user?.isGlobalAdmin) {
+    items.push({
+      label: t('navigation.admin'),
+      icon: 'i-heroicons-squares-2x2',
+      to: '/admin',
     })
   }
 

@@ -1736,6 +1736,13 @@
     }
   },
   "seo": {
+    "organization": {
+      "description": "Kollaborative Plattform für die Jonglier-Community, die die Entdeckung und Organisation von Jonglier-Veranstaltungen in Frankreich und Europa erleichtert."
+    },
+    "search_action": {
+      "name": "Nach einer Tagung suchen",
+      "description": "Suchen Sie nach Jonglier-Veranstaltungen nach Name, Ort oder Veranstalter"
+    },
     "carpool": {
       "description": "Organisieren Sie Ihre Fahrgemeinschaft für {name} von {convention}. Finden Sie Mitfahrer oder bieten Sie freie Plätze für {date} in {location} an.",
       "keywords": "Fahrgemeinschaft, Transport, {convention}, {location}, Mitfahrgelegenheit, günstig, umweltfreundlich",

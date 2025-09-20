@@ -352,7 +352,7 @@ watch(
             convention: conventionName,
             location: newEdition.location || '',
           }),
-        ogTitle: () => t('seo.edition.og_title', { name: editionName }),
+        ogTitle: () => editionName || conventionName,
         ogDescription: () =>
           t('seo.edition.og_description', {
             name: editionName,

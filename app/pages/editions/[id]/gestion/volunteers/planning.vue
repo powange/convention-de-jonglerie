@@ -1296,6 +1296,7 @@ onMounted(async () => {
 useSeoMeta({
   title: 'Planning des bénévoles - ' + (edition.value?.name || 'Édition'),
   description: 'Planification des créneaux et missions des bénévoles',
+  ogTitle: () => edition.value?.name || edition.value?.convention?.name || 'Convention',
 })
 </script>
 

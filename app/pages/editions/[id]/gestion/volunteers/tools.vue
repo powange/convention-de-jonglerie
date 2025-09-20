@@ -421,5 +421,6 @@ onMounted(async () => {
 useSeoMeta({
   title: 'Outils de gestion - ' + (edition.value?.name || 'Édition'),
   description: 'Outils avancés pour la gestion des bénévoles',
+  ogTitle: () => edition.value?.name || edition.value?.convention?.name || 'Convention',
 })
 </script>

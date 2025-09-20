@@ -1736,6 +1736,13 @@
     }
   },
   "seo": {
+    "organization": {
+      "description": "Plataforma colaborativa dedicada à comunidade de malabarismo, facilitando a descoberta e organização de eventos de malabarismo na França e na Europa."
+    },
+    "search_action": {
+      "name": "Procurar uma convenção",
+      "description": "Procure convenções de malabarismo por nome, local ou organizador"
+    },
     "carpool": {
       "description": "Organize a sua boleia para {name} de {convention}. Encontre companheiros de viagem ou ofereça os seus lugares livres para {date} em {location}.",
       "keywords": "boleia, transporte, {convention}, {location}, partilha, económico, ecológico",

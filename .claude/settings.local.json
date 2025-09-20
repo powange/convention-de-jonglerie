@@ -71,7 +71,10 @@
       "Bash(git mv:*)",
       "WebSearch",
       "WebFetch(domain:vueuse.org)",
-      "WebFetch(domain:nuxtseo.com)"
+      "WebFetch(domain:nuxtseo.com)",
+      "Bash(/tmp/update-other-pages.sh:*)",
+      "Bash(/tmp/fix-ogsitename.sh:*)",
+      "Bash(/tmp/remove-ogsitename.sh:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

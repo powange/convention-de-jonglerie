@@ -235,10 +235,55 @@ useSchemaOrg([
     potentialAction: [
       {
         '@type': 'SearchAction',
-        target: () => `${useRequestURL().origin}/?search={search_term_string}`,
+        target: () => `${useRequestURL().origin}/?name={search_term_string}`,
         'query-input': 'required name=search_term_string',
+        description: () => t('seo.search_action.description'),
+        name: () => t('seo.search_action.name'),
       },
     ],
+  }),
+  defineOrganization({
+    name: 'Juggling Convention',
+    alternateName: 'Convention de Jonglerie',
+    description: () => t('seo.organization.description'),
+    url: () => useRequestURL().origin,
+    logo: () => `${useRequestURL().origin}/logos/logo-jc.svg`,
+    foundingDate: '2024',
+    organizationType: 'Organization',
+    knowsAbout: [
+      'Juggling',
+      'Convention Management',
+      'Event Organization',
+      'Juggling Community',
+      'Circus Arts',
+    ],
+    sameAs: [
+      // TODO: Ajouter les liens vers les réseaux sociaux si disponibles
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'Customer Service',
+      availableLanguage: ['fr', 'en', 'de', 'es', 'it', 'nl', 'pl', 'pt', 'ru', 'uk', 'da'],
+    },
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: 'FR',
+      addressLocality: 'France',
+    },
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'Juggling Conventions',
+      itemListElement: [
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Event',
+            name: 'Convention de Jonglerie',
+            description: 'Événements de jonglerie organisés par la communauté',
+          },
+        },
+      ],
+    },
   }),
 ])
 

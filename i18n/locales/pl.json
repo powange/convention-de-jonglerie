@@ -1736,6 +1736,13 @@
     }
   },
   "seo": {
+    "organization": {
+      "description": "Platforma współpracy dedykowana społeczności żonglerskiej, ułatwiająca odkrywanie i organizację wydarzeń żonglerskich we Francji i Europie."
+    },
+    "search_action": {
+      "name": "Szukaj konwencji",
+      "description": "Szukaj konwencji żonglerskich według nazwy, lokalizacji lub organizatora"
+    },
     "carpool": {
       "description": "Zorganizuj wspólną podróż na {name} od {convention}. Znajdź towarzyszy podróży lub zaoferuj wolne miejsca na {date} w {location}.",
       "keywords": "wspólna podróż, transport, {convention}, {location}, dzielenie się, ekonomiczny, ekologiczny",

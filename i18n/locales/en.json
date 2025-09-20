@@ -1736,6 +1736,13 @@
     }
   },
   "seo": {
+    "organization": {
+      "description": "Collaborative platform dedicated to the juggling community, facilitating the discovery and organization of juggling events in France and Europe."
+    },
+    "search_action": {
+      "name": "Search for a convention",
+      "description": "Search for juggling conventions by name, location or organizer"
+    },
     "carpool": {
       "description": "Organize your carpool for {name} by {convention}. Find travel companions or offer your free seats for {date} in {location}.",
       "keywords": "carpool, transport, {convention}, {location}, sharing, economical, ecological",

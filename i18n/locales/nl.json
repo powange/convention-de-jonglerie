@@ -1736,6 +1736,13 @@
     }
   },
   "seo": {
+    "organization": {
+      "description": "Collaboratief platform gewijd aan de jongleer gemeenschap, dat de ontdekking en organisatie van jongleer evenementen in Frankrijk en Europa vergemakkelijkt."
+    },
+    "search_action": {
+      "name": "Zoek naar een conventie",
+      "description": "Zoek naar jongleer conventies op naam, locatie of organisator"
+    },
     "carpool": {
       "description": "Organiseer uw carpoolrit voor {name} van {convention}. Vind reisgenoten of bied uw vrije plaatsen aan voor {date} in {location}.",
       "keywords": "carpool, vervoer, {convention}, {location}, delen, economisch, milieuvriendelijk",

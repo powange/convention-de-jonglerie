@@ -1608,6 +1608,13 @@
   "seo": {
     "site_name": "Convention de Jonglerie",
     "site_description": "Trouvez et gérez vos conventions de jonglerie préférées. Plateforme collaborative pour les jongleurs et organisateurs d'événements.",
+    "organization": {
+      "description": "Plateforme collaborative dédiée à la communauté de jonglerie, facilitant la découverte et l'organisation d'événements de jonglerie en France et en Europe."
+    },
+    "search_action": {
+      "name": "Rechercher une convention",
+      "description": "Recherchez des conventions de jonglerie par nom, lieu ou organisateur"
+    },
     "homepage": {
       "title": "Conventions de Jonglerie",
       "description": "Découvrez les prochaines conventions de jonglerie en France et en Europe. Organisez vos événements favoris et connectez-vous avec la communauté de jongleurs.",

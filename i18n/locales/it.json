@@ -1736,6 +1736,13 @@
     }
   },
   "seo": {
+    "organization": {
+      "description": "Piattaforma collaborativa dedicata alla comunità del giocoliere, che facilita la scoperta e l'organizzazione di eventi di giocoleria in Francia e in Europa."
+    },
+    "search_action": {
+      "name": "Cerca una convention",
+      "description": "Cerca convention di giocoleria per nome, luogo o organizzatore"
+    },
     "carpool": {
       "description": "Organizza il tuo viaggio condiviso per {name} di {convention}. Trova compagni di viaggio o offri i tuoi posti liberi per {date} a {location}.",
       "keywords": "passaggio, trasporto, {convention}, {location}, condivisione, economico, ecologico",

@@ -1736,6 +1736,13 @@
     }
   },
   "seo": {
+    "organization": {
+      "description": "Kollaborativ platform dedikeret til jonglørfællesskabet, der letter opdagelsen og organisationen af jonglør begivenheder i Frankrig og Europa."
+    },
+    "search_action": {
+      "name": "Søg efter en konvention",
+      "description": "Søg efter jonglør konventioner efter navn, sted eller arrangør"
+    },
     "carpool": {
       "description": "Organiser din samkørsel til {name} fra {convention}. Find rejsefæller eller tilbyd dine ledige pladser til {date} i {location}.",
       "keywords": "samkørsel, transport, {convention}, {location}, deling, økonomisk, økologisk",

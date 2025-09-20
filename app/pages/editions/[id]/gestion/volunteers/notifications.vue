@@ -175,5 +175,6 @@ onMounted(async () => {
 useSeoMeta({
   title: 'Notifications bénévoles - ' + (edition.value?.name || 'Édition'),
   description: 'Envoi et gestion des notifications aux bénévoles',
+  ogTitle: () => edition.value?.name || edition.value?.convention?.name || 'Convention',
 })
 </script>

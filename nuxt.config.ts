@@ -7,10 +7,10 @@ export default defineNuxtConfig({
   // Configuration SEO du site
   site: {
     url: process.env.NUXT_PUBLIC_SITE_URL || 'https://convention-de-jonglerie.fr',
-    name: 'Convention de Jonglerie',
+    name: 'Juggling Convention',
     description:
-      "Trouvez et gérez vos conventions de jonglerie préférées. Plateforme collaborative pour les jongleurs et organisateurs d'événements.",
-    defaultLocale: 'fr',
+      'Find and manage your favorite juggling conventions. Collaborative platform for jugglers and event organizers.',
+    defaultLocale: 'en',
   },
 
   app: {
@@ -97,7 +97,7 @@ export default defineNuxtConfig({
       cookieCrossOrigin: false,
       redirectOn: 'root',
       alwaysRedirect: false,
-      fallbackLocale: 'fr',
+      fallbackLocale: 'en',
     },
     // Optimiser les traductions pour réduire la taille des bundles
     bundle: {

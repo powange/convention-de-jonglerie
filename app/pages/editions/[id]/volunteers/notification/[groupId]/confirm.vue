@@ -195,6 +195,7 @@ const formatDate = (dateString: string) => {
 useSeoMeta({
   title: () => t('editions.volunteers.confirm_notification_title'),
   description: () => t('editions.volunteers.confirm_notification_desc'),
+  ogTitle: () => edition.value?.name || edition.value?.convention?.name || 'Convention',
 })
 
 // Charger les données au montage

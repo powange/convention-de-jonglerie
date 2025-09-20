@@ -272,5 +272,6 @@ onMounted(async () => {
 useSeoMeta({
   title: 'Page bénévolat - ' + (edition.value?.name || 'Édition'),
   description: 'Page de gestion du bénévolat pour cette édition',
+  ogTitle: () => edition.value?.name || edition.value?.convention?.name || 'Convention',
 })
 </script>

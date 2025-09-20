@@ -1129,5 +1129,6 @@ onMounted(async () => {
 useSeoMeta({
   title: 'Gestion des candidatures - ' + (edition.value?.name || 'Édition'),
   description: 'Gestion et traitement des candidatures de bénévoles',
+  ogTitle: () => edition.value?.name || edition.value?.convention?.name || 'Convention',
 })
 </script>
