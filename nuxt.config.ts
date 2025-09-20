@@ -190,8 +190,7 @@ export default defineNuxtConfig({
     // Désactiver le sitemap sur les environnements non-production
     enabled: process.env.NODE_ENV === 'production' &&
              process.env.NUXT_ENV !== 'staging' &&
-             process.env.NUXT_ENV !== 'release' &&
-             (process.env.NUXT_PUBLIC_SITE_URL?.includes('juggling-convention.com') ?? false),
+             process.env.NUXT_ENV !== 'release',
     // Exclure certaines routes du sitemap
     exclude: [
       '/admin/**',
