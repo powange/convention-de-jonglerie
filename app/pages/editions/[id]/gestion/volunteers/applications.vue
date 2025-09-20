@@ -140,10 +140,7 @@
             </div>
           </template>
 
-          <div
-            v-if="teamDistribution.length === 0 && unassignedVolunteers.length === 0"
-            class="text-center py-8"
-          >
+          <div v-if="acceptedVolunteers.length === 0" class="text-center py-8">
             <UIcon name="i-heroicons-user-group" class="h-12 w-12 text-gray-400 mx-auto mb-3" />
             <p class="text-gray-600 dark:text-gray-400 text-sm">
               {{ $t('pages.volunteers.team_distribution.no_assignments') }}
@@ -402,6 +399,26 @@
                       />
                     </div>
                   </div>
+                </div>
+
+                <!-- Message pour équipe vide avec zone de drop -->
+                <div
+                  v-else
+                  class="px-4 py-6 bg-gray-50 dark:bg-gray-800/50 text-center border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-lg mx-4 mb-4"
+                  :class="{
+                    'border-primary-400 bg-primary-50 dark:bg-primary-900/20':
+                      dragOverTeam === team.id,
+                    'border-green-400 bg-green-50 dark:bg-green-900/20':
+                      draggedVolunteer && isTeamInVolunteerPreferences(draggedVolunteer, team.id),
+                  }"
+                >
+                  <UIcon name="i-heroicons-users" class="text-gray-400 mx-auto mb-2" size="24" />
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ $t('pages.volunteers.team_distribution.empty_team') }}
+                  </p>
+                  <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    {{ $t('pages.volunteers.team_distribution.drop_volunteers_here') }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -664,7 +681,7 @@ const unassignedVolunteers = computed(() => {
 
 // Computed pour la répartition par équipes
 const teamDistribution = computed(() => {
-  if (!volunteerTeams.value.length || !teamAssignments.value.length) {
+  if (!volunteerTeams.value.length) {
     return []
   }
 

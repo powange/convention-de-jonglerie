@@ -178,6 +178,17 @@
         </template>
       </UAlert>
 
+      <!-- Panneau d'auto-assignation -->
+      <AutoAssignmentPanel
+        v-if="canManageVolunteers"
+        :edition-id="editionId"
+        :volunteers="acceptedVolunteers"
+        :time-slots="convertedTimeSlots"
+        :teams="teams"
+        class="mt-6"
+        @assignments-applied="refreshData"
+      />
+
       <!-- Résumé des bénévoles par jour -->
       <UCard
         v-if="canManageVolunteers && volunteersStats.totalVolunteers > 0"
@@ -382,10 +393,11 @@
 <script setup lang="ts">
 // Vue & libs
 import FullCalendar from '@fullcalendar/vue3'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 // App components & stores
+import AutoAssignmentPanel from '~/components/edition/volunteer/AutoAssignmentPanel.vue'
 import SlotModal from '~/components/edition/volunteer/planning/SlotModal.vue'
 import { useDatetime } from '~/composables/useDatetime'
 import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '~/composables/useVolunteerSchedule'
@@ -408,6 +420,9 @@ const exportingPdf = ref(false)
 
 // État des onglets de statistiques
 const activeStatsTab = ref('hours-per-volunteer') // heures par bénévole par défaut
+
+// Données des bénévoles
+const volunteers = ref<any[]>([]) // Applications de bénévoles
 
 // État de la modal
 const slotModalOpen = ref(false)
@@ -865,7 +880,7 @@ const refreshData = async () => {
     const { fetchTeams } = useVolunteerTeams(editionId)
     const { fetchTimeSlots } = useVolunteerTimeSlots(editionId)
 
-    await Promise.all([fetchTeams(), fetchTimeSlots()])
+    await Promise.all([fetchTeams(), fetchTimeSlots(), fetchAcceptedVolunteers()])
   } catch {
     toast.add({
       title: t('errors.error_occurred'),
@@ -1042,7 +1057,7 @@ const overlapWarnings = computed(() => {
 // Calcul des statistiques des bénévoles
 const volunteersStats = computed(() => {
   // Inclure tous les bénévoles acceptés
-  const totalVolunteers = acceptedVolunteers.value.length
+  const totalVolunteers = acceptedVolunteers.value?.length || 0
 
   if (totalVolunteers === 0) {
     return {
@@ -1084,6 +1099,11 @@ const volunteersStats = computed(() => {
     averageHours,
     totalSlots,
   }
+})
+
+// Données pour le composant d'auto-assignation
+const acceptedVolunteers = computed(() => {
+  return volunteers.value?.filter((v) => v.status === 'ACCEPTED') || []
 })
 
 // Statistiques par jour
@@ -1139,7 +1159,6 @@ const volunteersStatsByDay = computed(() => {
 })
 
 // Liste des bénévoles acceptés pour les stats
-const acceptedVolunteers = ref<any[]>([])
 
 // Fonction pour récupérer les bénévoles acceptés
 const fetchAcceptedVolunteers = async () => {
@@ -1148,9 +1167,10 @@ const fetchAcceptedVolunteers = async () => {
       query: { status: 'ACCEPTED' },
     })
     const applications = response.applications || response
-    acceptedVolunteers.value = applications.filter((app: any) => app.status === 'ACCEPTED')
+    volunteers.value = applications || []
   } catch (error) {
     console.error('Failed to fetch accepted volunteers:', error)
+    volunteers.value = []
   }
 }
 
@@ -1159,7 +1179,7 @@ const volunteersStatsIndividual = computed(() => {
   const volunteerStats = new Map<number, any>()
 
   // D'abord, ajouter tous les bénévoles acceptés avec 0 heures
-  acceptedVolunteers.value.forEach((application) => {
+  acceptedVolunteers.value?.forEach((application) => {
     if (application.user && !volunteerStats.has(application.user.id)) {
       volunteerStats.set(application.user.id, {
         user: application.user,

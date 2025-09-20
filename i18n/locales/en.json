@@ -832,9 +832,6 @@
       "allergies_label": "Allergies",
       "allergies_placeholder": "Eg: peanuts, gluten...",
       "applicant_info": "Applicant information",
-      "export_pdf": "Export to PDF",
-      "pdf_exported": "PDF exported",
-      "pdf_downloaded": "PDF has been downloaded successfully",
       "application_management": "Application management",
       "application_updated": "Application updated",
       "apply": "Apply as volunteer",
@@ -859,6 +856,51 @@
       "assigned_teams_all": "All assigned teams",
       "assigned_to_teams": "Assigned to {count} team | Assigned to {count} teams",
       "assigned_volunteers": "Assigned volunteers",
+      "auto_assignment": {
+        "allow_overtime": "Allow overtime",
+        "allow_overtime_help": "Allows slightly exceeding maximum hours if necessary",
+        "apply": "Apply",
+        "assignment_details": "Assignment details",
+        "assignments_applied": "Assignments applied",
+        "assignments_applied_description": "Assignments have been applied successfully. The schedule has been updated.",
+        "average_hours": "Avg h/volunteer",
+        "balance_score": "Balance score",
+        "balance_teams": "Balance teams",
+        "balance_teams_help": "Distributes volunteers evenly across different teams",
+        "beta_badge": "BETA",
+        "confirm_apply": "Are you sure you want to apply these assignments? This will replace all existing assignments.",
+        "description": "The automatic assignment algorithm intelligently distributes volunteers to time slots while respecting their preferences, availability, and your organizational constraints.",
+        "max_hours_help": "Limits the maximum number of hours a volunteer can work",
+        "max_hours_per_day": "Maximum hours per day",
+        "max_hours_per_day_help": "Limits the number of hours per day a volunteer can work",
+        "max_hours_per_day_placeholder": "e.g.: 6",
+        "max_hours_per_volunteer": "Maximum hours per volunteer",
+        "max_hours_placeholder": "Ex: 8",
+        "max_overtime_help_detailed": "Number of overtime hours allowed beyond the set limit",
+        "max_overtime_hours": "Maximum overtime hours",
+        "max_overtime_placeholder": "Ex: 2",
+        "min_hours_help": "Guarantees a minimum number of hours for each assigned volunteer",
+        "min_hours_per_day": "Minimum hours per day",
+        "min_hours_per_day_help": "Guarantees a minimum number of hours per day for each assigned volunteer",
+        "min_hours_per_day_placeholder": "e.g.: 1",
+        "min_hours_per_volunteer": "Minimum hours per volunteer",
+        "min_hours_placeholder": "Ex: 2",
+        "preview": "Preview",
+        "preview_generated": "Preview generated successfully",
+        "preview_results": "Preview results",
+        "prioritize_experience": "Prioritize experience",
+        "prioritize_experience_help": "Favors experienced volunteers for critical time slots",
+        "recommendations": "Recommendations",
+        "respect_availability": "Strictly respect availability",
+        "respect_availability_help": "Never assigns a volunteer to a slot where they're not available",
+        "satisfaction_rate": "Satisfaction rate",
+        "title": "Automatic Assignment",
+        "total_assignments": "Assignments",
+        "unassigned": "Unassigned",
+        "unassigned_slots": "Uncovered slots",
+        "unassigned_volunteers": "Unassigned volunteers",
+        "warnings": "Warnings"
+      },
       "average_per_volunteer": "Average per volunteer",
       "avoid_list_hint": "This information remains confidential and helps organizers create harmonious teams",
       "avoid_list_label": "Volunteers I prefer not to work shifts with (optional)",
@@ -909,6 +951,7 @@
       "experience_details_placeholder": "Briefly describe your volunteer experience (events, roles, etc.)",
       "experience_label": "I have volunteered at similar events before",
       "export": "Export",
+      "export_pdf": "Export to PDF",
       "external_link": "External link",
       "external_mode_note": "Volunteers will be managed via an external system",
       "external_url_placeholder": "https://...",
@@ -981,6 +1024,8 @@
       "notifications_history": "Notification history",
       "open": "Open",
       "page_description": "Overview of volunteering for this edition",
+      "pdf_downloaded": "PDF has been downloaded successfully",
+      "pdf_exported": "PDF exported",
       "pending": "Pending",
       "pending_with_phone_count": "{count} unconfirmed volunteer(s) with phone",
       "personal_info_disclaimer": "This information will be communicated to the organization's responsible parties to manage volunteer teams.",
@@ -1509,6 +1554,8 @@
       "team_distribution": {
         "all_teams": "All teams",
         "description": "Distribution of accepted volunteers in teams. Drag and drop to move or add to a team.",
+        "drop_volunteers_here": "Drag and drop volunteers here",
+        "empty_team": "Empty team",
         "manage_teams": "Manage teams",
         "max_label": "Max:",
         "modal": {
@@ -1551,46 +1598,6 @@
       "withdraw": "Withdraw",
       "withdrawal_error": "Error withdrawing application",
       "withdrawal_success": "Application withdrawn successfully"
-    }
-  },
-  "seo": {
-    "site_name": "Juggling Convention",
-    "site_description": "Find and manage your favorite juggling conventions. Collaborative platform for jugglers and event organizers.",
-    "homepage": {
-      "title": "Juggling Conventions",
-      "description": "Discover upcoming juggling conventions in France and Europe. Organize your favorite events and connect with the juggling community.",
-      "keywords": "juggling, convention, festival, event, juggler, show, workshop, training",
-      "og_title": "Juggling Convention - Find your next convention",
-      "og_description": "The reference platform to discover and organize juggling conventions in France and Europe.",
-      "twitter_title": "Juggling Convention - Juggling Events",
-      "twitter_description": "Discover upcoming juggling conventions and join the juggling community."
-    },
-    "edition": {
-      "title": "{name}",
-      "description": "Discover {name} by {convention} taking place {date} in {location}. Information, program and registration for this juggling convention.",
-      "keywords": "juggling, convention, {convention}, {location}, event, festival, show, workshop",
-      "og_title": "{name} - Juggling Convention",
-      "og_description": "Join us for {name} - {date}. Program, workshops and juggling shows.",
-      "twitter_title": "{name} - Juggling Convention",
-      "twitter_description": "{name} - {date}. Discover the program of this juggling convention."
-    },
-    "carpool": {
-      "title": "Carpool - {name}",
-      "description": "Organize your carpool for {name} by {convention}. Find travel companions or offer your free seats for {date} in {location}.",
-      "keywords": "carpool, transport, {convention}, {location}, sharing, economical, ecological",
-      "og_title": "Carpool for {name}",
-      "og_description": "Organize your transport for {name} - {date}. Carpool available.",
-      "twitter_title": "Carpool - {name}",
-      "twitter_description": "Find or offer a carpool for {name}."
-    },
-    "volunteers": {
-      "title": "Volunteering - {name}",
-      "description": "Join the volunteer team for {name} by {convention}. Participate in organizing this juggling event {date} in {location}.",
-      "keywords": "volunteering, volunteer, team, {convention}, {location}, organization, help",
-      "og_title": "Volunteering for {name}",
-      "og_description": "Join the volunteer team of {name} - {date}. Participate in the organization.",
-      "twitter_title": "Volunteering - {name}",
-      "twitter_description": "Become a volunteer for {name} and participate in the organization."
     }
   },
   "permissions": {
@@ -1722,6 +1729,46 @@
         "title": "Installation successful!"
       },
       "title": "Install app"
+    }
+  },
+  "seo": {
+    "carpool": {
+      "description": "Organize your carpool for {name} by {convention}. Find travel companions or offer your free seats for {date} in {location}.",
+      "keywords": "carpool, transport, {convention}, {location}, sharing, economical, ecological",
+      "og_description": "Organize your transport for {name} - {date}. Carpool available.",
+      "og_title": "Carpool for {name}",
+      "title": "Carpool - {name}",
+      "twitter_description": "Find or offer a carpool for {name}.",
+      "twitter_title": "Carpool - {name}"
+    },
+    "edition": {
+      "description": "Discover {name} by {convention} taking place {date} in {location}. Information, program and registration for this juggling convention.",
+      "keywords": "juggling, convention, {convention}, {location}, event, festival, show, workshop",
+      "og_description": "Join us for {name} - {date}. Program, workshops and juggling shows.",
+      "og_title": "{name} - Juggling Convention",
+      "title": "{name}",
+      "twitter_description": "{name} - {date}. Discover the program of this juggling convention.",
+      "twitter_title": "{name} - Juggling Convention"
+    },
+    "homepage": {
+      "description": "Discover upcoming juggling conventions in France and Europe. Organize your favorite events and connect with the juggling community.",
+      "keywords": "juggling, convention, festival, event, juggler, show, workshop, training",
+      "og_description": "The reference platform to discover and organize juggling conventions in France and Europe.",
+      "og_title": "Juggling Convention - Find your next convention",
+      "title": "Juggling Conventions",
+      "twitter_description": "Discover upcoming juggling conventions and join the juggling community.",
+      "twitter_title": "Juggling Convention - Juggling Events"
+    },
+    "site_description": "Find and manage your favorite juggling conventions. Collaborative platform for jugglers and event organizers.",
+    "site_name": "Juggling Convention",
+    "volunteers": {
+      "description": "Join the volunteer team for {name} by {convention}. Participate in organizing this juggling event {date} in {location}.",
+      "keywords": "volunteering, volunteer, team, {convention}, {location}, organization, help",
+      "og_description": "Join the volunteer team of {name} - {date}. Participate in the organization.",
+      "og_title": "Volunteering for {name}",
+      "title": "Volunteering - {name}",
+      "twitter_description": "Become a volunteer for {name} and participate in the organization.",
+      "twitter_title": "Volunteering - {name}"
     }
   },
   "services": {
