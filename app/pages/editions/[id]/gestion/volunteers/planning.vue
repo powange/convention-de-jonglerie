@@ -69,6 +69,16 @@
               >
                 {{ t('common.refresh') }}
               </UButton>
+              <UButton
+                size="sm"
+                color="primary"
+                variant="soft"
+                icon="i-heroicons-document-arrow-down"
+                :loading="exportingPdf"
+                @click="exportToPdf"
+              >
+                {{ t('editions.volunteers.export_pdf') }}
+              </UButton>
             </div>
             <div class="flex items-center gap-4">
               <!-- Filtre par équipes -->
@@ -394,6 +404,7 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 
 // État du composant
 const refreshing = ref(false)
+const exportingPdf = ref(false)
 
 // État des onglets de statistiques
 const activeStatsTab = ref('hours-per-volunteer') // heures par bénévole par défaut
@@ -693,6 +704,158 @@ const handleSlotDelete = async (slotId: string) => {
     })
   }
   slotModalData.value = null
+}
+
+const exportToPdf = async () => {
+  exportingPdf.value = true
+  try {
+    const { jsPDF } = await import('jspdf')
+
+    const doc = new jsPDF('p', 'mm', 'a4')
+    const pageHeight = doc.internal.pageSize.getHeight()
+    const margin = 15
+    let currentY = margin
+
+    // En-tête du document
+    doc.setFontSize(18)
+    doc.setFont('helvetica', 'bold')
+    const title = `Planning des bénévoles - ${edition.value?.name || 'Édition'}`
+    doc.text(title, margin, currentY)
+    currentY += 10
+
+    doc.setFontSize(10)
+    doc.setFont('helvetica', 'normal')
+    const subtitle = `${edition.value?.convention?.name || ''} - ${formatDateTimeRange(edition.value?.startDate || '', edition.value?.endDate || '')}`
+    doc.text(subtitle, margin, currentY)
+    currentY += 15
+
+    // Statistiques générales
+    doc.setFontSize(14)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Statistiques générales', margin, currentY)
+    currentY += 8
+
+    doc.setFontSize(10)
+    doc.setFont('helvetica', 'normal')
+    const stats = [
+      `Nombre total de bénévoles : ${volunteersStats.value.totalVolunteers}`,
+      `Heures totales de bénévolat : ${volunteersStats.value.totalHours.toFixed(1)}h`,
+      `Moyenne d'heures par bénévole : ${volunteersStats.value.averageHours.toFixed(1)}h`,
+      `Nombre total de créneaux : ${volunteersStats.value.totalSlots}`,
+    ]
+
+    stats.forEach((stat) => {
+      doc.text(stat, margin, currentY)
+      currentY += 6
+    })
+    currentY += 10
+
+    // Fonction pour vérifier si on a besoin d'une nouvelle page
+    const checkNewPage = (neededHeight: number) => {
+      if (currentY + neededHeight > pageHeight - margin) {
+        doc.addPage()
+        currentY = margin
+      }
+    }
+
+    // Planning par jour
+    if (volunteersStatsByDay.value.length > 0) {
+      checkNewPage(40)
+      doc.setFontSize(14)
+      doc.setFont('helvetica', 'bold')
+      doc.text('Planning par jour', margin, currentY)
+      currentY += 10
+
+      volunteersStatsByDay.value.forEach((dayStats) => {
+        checkNewPage(30 + dayStats.volunteers.length * 5)
+
+        doc.setFontSize(12)
+        doc.setFont('helvetica', 'bold')
+        doc.text(`${formatDate(dayStats.date)}`, margin, currentY)
+        currentY += 6
+
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'normal')
+        doc.text(
+          `${dayStats.totalVolunteers} bénévoles - ${dayStats.totalHours.toFixed(1)}h total`,
+          margin + 5,
+          currentY
+        )
+        currentY += 8
+
+        // Liste des bénévoles pour ce jour
+        dayStats.volunteers.forEach((volunteer: any) => {
+          const volunteerLine = `• ${volunteer.user.pseudo} : ${volunteer.hours.toFixed(1)}h (${volunteer.slots} créneaux)`
+          doc.text(volunteerLine, margin + 10, currentY)
+          currentY += 5
+        })
+        currentY += 5
+      })
+    }
+
+    // Nouvelle page pour les statistiques individuelles
+    doc.addPage()
+    currentY = margin
+
+    doc.setFontSize(14)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Statistiques par bénévole', margin, currentY)
+    currentY += 10
+
+    // Statistiques individuelles
+    volunteersStatsIndividual.value.forEach((volunteerStat) => {
+      checkNewPage(15 + (volunteerStat.dayDetails?.length || 0) * 4)
+
+      doc.setFontSize(11)
+      doc.setFont('helvetica', 'bold')
+      const volunteerName = `${volunteerStat.user.pseudo} (${volunteerStat.user.prenom || ''} ${volunteerStat.user.nom || ''})`
+      doc.text(volunteerName, margin, currentY)
+      currentY += 6
+
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'normal')
+      doc.text(
+        `Total : ${volunteerStat.totalHours.toFixed(1)}h sur ${volunteerStat.totalSlots} créneaux`,
+        margin + 5,
+        currentY
+      )
+      currentY += 5
+
+      // Détails par jour
+      if (volunteerStat.dayDetails && volunteerStat.dayDetails.length > 0) {
+        volunteerStat.dayDetails.forEach((dayDetail: any) => {
+          const dayLine = `  ${formatDate(dayDetail.date)} : ${dayDetail.hours.toFixed(1)}h (${dayDetail.slots} créneaux)`
+          doc.text(dayLine, margin + 10, currentY)
+          currentY += 4
+        })
+      } else {
+        doc.text('  Aucun créneau assigné', margin + 10, currentY)
+        currentY += 4
+      }
+      currentY += 3
+    })
+
+    // Télécharger le PDF
+    const fileName = `planning-benevoles-${edition.value?.name?.replace(/[^a-zA-Z0-9]/g, '-') || 'edition'}.pdf`
+    doc.save(fileName)
+
+    toast.add({
+      title: t('editions.volunteers.pdf_exported'),
+      description: t('editions.volunteers.pdf_downloaded'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (error: any) {
+    console.error("Erreur lors de l'export PDF:", error)
+    toast.add({
+      title: t('errors.error_occurred'),
+      description: "Erreur lors de l'export PDF",
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  } finally {
+    exportingPdf.value = false
+  }
 }
 
 const refreshData = async () => {
