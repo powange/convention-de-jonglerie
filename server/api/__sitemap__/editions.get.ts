@@ -1,6 +1,6 @@
 import { prisma } from '../../utils/prisma'
 
-export default defineSitemapEventHandler(async () => {
+export default defineEventHandler(async () => {
   try {
     // Récupérer toutes les éditions publiques (convention non archivée, éditions en ligne uniquement)
     const editions = await prisma.edition.findMany({
