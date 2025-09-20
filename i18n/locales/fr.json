@@ -1551,6 +1551,46 @@
       "photo_placeholder": "Cliquez pour changer votre photo de profil"
     }
   },
+  "seo": {
+    "site_name": "Convention de Jonglerie",
+    "site_description": "Trouvez et gérez vos conventions de jonglerie préférées. Plateforme collaborative pour les jongleurs et organisateurs d'événements.",
+    "homepage": {
+      "title": "Conventions de Jonglerie",
+      "description": "Découvrez les prochaines conventions de jonglerie en France et en Europe. Organisez vos événements favoris et connectez-vous avec la communauté de jongleurs.",
+      "keywords": "jonglerie, convention, festival, événement, jongleur, spectacle, atelier, stage",
+      "og_title": "Convention de Jonglerie - Trouvez votre prochaine convention",
+      "og_description": "La plateforme de référence pour découvrir et organiser les conventions de jonglerie en France et en Europe.",
+      "twitter_title": "Convention de Jonglerie - Événements de jonglerie",
+      "twitter_description": "Découvrez les prochaines conventions de jonglerie et rejoignez la communauté des jongleurs."
+    },
+    "edition": {
+      "title": "{name}",
+      "description": "Découvrez {name} de {convention} qui se déroule {date} à {location}. Informations, programme et inscription à cette convention de jonglerie.",
+      "keywords": "jonglerie, convention, {convention}, {location}, événement, festival, spectacle, atelier",
+      "og_title": "{name} - Convention de Jonglerie",
+      "og_description": "Rejoignez-nous pour {name} - {date}. Programme, ateliers et spectacles de jonglerie.",
+      "twitter_title": "{name} - Convention de Jonglerie",
+      "twitter_description": "{name} - {date}. Découvrez le programme de cette convention de jonglerie."
+    },
+    "carpool": {
+      "title": "Covoiturage - {name}",
+      "description": "Organisez votre covoiturage pour {name} de {convention}. Trouvez des compagnons de route ou proposez vos places libres pour {date} à {location}.",
+      "keywords": "covoiturage, transport, {convention}, {location}, partage, économique, écologique",
+      "og_title": "Covoiturage pour {name}",
+      "og_description": "Organisez votre transport pour {name} - {date}. Covoiturage disponible.",
+      "twitter_title": "Covoiturage - {name}",
+      "twitter_description": "Trouvez ou proposez un covoiturage pour {name}."
+    },
+    "volunteers": {
+      "title": "Bénévolat - {name}",
+      "description": "Rejoignez l'équipe de bénévoles pour {name} de {convention}. Participez à l'organisation de cet événement de jonglerie {date} à {location}.",
+      "keywords": "bénévolat, volontariat, équipe, {convention}, {location}, organisation, aide",
+      "og_title": "Bénévolat pour {name}",
+      "og_description": "Rejoignez l'équipe bénévole de {name} - {date}. Participez à l'organisation.",
+      "twitter_title": "Bénévolat - {name}",
+      "twitter_description": "Devenez bénévole pour {name} et participez à l'organisation."
+    }
+  },
   "permissions": {
     "addEdition": "Ajouter des éditions",
     "admin": "Administrateur",

@@ -208,13 +208,46 @@ import { useTranslatedConventionServices } from '~/composables/useConventionServ
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
+// SEO - Métadonnées de la page d'accueil
+const { t, locale } = useI18n()
+
+useSeoMeta({
+  title: () => t('seo.homepage.title'),
+  titleTemplate: () => `%s | ${t('seo.site_name')}`,
+  description: () => t('seo.homepage.description'),
+  keywords: () => t('seo.homepage.keywords'),
+  ogTitle: () => t('seo.homepage.og_title'),
+  ogDescription: () => t('seo.homepage.og_description'),
+  ogType: 'website',
+  ogLocale: () => locale.value,
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => t('seo.homepage.twitter_title'),
+  twitterDescription: () => t('seo.homepage.twitter_description'),
+})
+
+// Schema.org pour la page d'accueil
+useSchemaOrg([
+  defineWebSite({
+    name: () => t('seo.site_name'),
+    description: () => t('seo.site_description'),
+    url: () => useRequestURL().origin,
+    inLanguage: () => locale.value,
+    potentialAction: [
+      {
+        '@type': 'SearchAction',
+        target: () => `${useRequestURL().origin}/?search={search_term_string}`,
+        'query-input': 'required name=search_term_string',
+      },
+    ],
+  }),
+])
+
 // Lazy loading du composant HomeMap
 const HomeMap = defineAsyncComponent(() => import('~/components/HomeMap.vue'))
 
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
-const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 

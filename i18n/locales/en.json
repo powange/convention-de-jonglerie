@@ -1550,6 +1550,46 @@
       "withdrawal_success": "Application withdrawn successfully"
     }
   },
+  "seo": {
+    "site_name": "Juggling Convention",
+    "site_description": "Find and manage your favorite juggling conventions. Collaborative platform for jugglers and event organizers.",
+    "homepage": {
+      "title": "Juggling Conventions",
+      "description": "Discover upcoming juggling conventions in France and Europe. Organize your favorite events and connect with the juggling community.",
+      "keywords": "juggling, convention, festival, event, juggler, show, workshop, training",
+      "og_title": "Juggling Convention - Find your next convention",
+      "og_description": "The reference platform to discover and organize juggling conventions in France and Europe.",
+      "twitter_title": "Juggling Convention - Juggling Events",
+      "twitter_description": "Discover upcoming juggling conventions and join the juggling community."
+    },
+    "edition": {
+      "title": "{name}",
+      "description": "Discover {name} by {convention} taking place {date} in {location}. Information, program and registration for this juggling convention.",
+      "keywords": "juggling, convention, {convention}, {location}, event, festival, show, workshop",
+      "og_title": "{name} - Juggling Convention",
+      "og_description": "Join us for {name} - {date}. Program, workshops and juggling shows.",
+      "twitter_title": "{name} - Juggling Convention",
+      "twitter_description": "{name} - {date}. Discover the program of this juggling convention."
+    },
+    "carpool": {
+      "title": "Carpool - {name}",
+      "description": "Organize your carpool for {name} by {convention}. Find travel companions or offer your free seats for {date} in {location}.",
+      "keywords": "carpool, transport, {convention}, {location}, sharing, economical, ecological",
+      "og_title": "Carpool for {name}",
+      "og_description": "Organize your transport for {name} - {date}. Carpool available.",
+      "twitter_title": "Carpool - {name}",
+      "twitter_description": "Find or offer a carpool for {name}."
+    },
+    "volunteers": {
+      "title": "Volunteering - {name}",
+      "description": "Join the volunteer team for {name} by {convention}. Participate in organizing this juggling event {date} in {location}.",
+      "keywords": "volunteering, volunteer, team, {convention}, {location}, organization, help",
+      "og_title": "Volunteering for {name}",
+      "og_description": "Join the volunteer team of {name} - {date}. Participate in the organization.",
+      "twitter_title": "Volunteering - {name}",
+      "twitter_description": "Become a volunteer for {name} and participate in the organization."
+    }
+  },
   "permissions": {
     "addEdition": "Add editions",
     "admin": "Administrator",

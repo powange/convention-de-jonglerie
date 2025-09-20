@@ -70,7 +70,8 @@
       "Bash(/tmp/final_analysis.sh:*)",
       "Bash(git mv:*)",
       "WebSearch",
-      "WebFetch(domain:vueuse.org)"
+      "WebFetch(domain:vueuse.org)",
+      "WebFetch(domain:nuxtseo.com)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

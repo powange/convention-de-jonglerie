@@ -223,9 +223,11 @@ import { useRoute } from 'vue-router'
 // App components & stores
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { getEditionDisplayName } from '~/utils/editionName'
 import { markdownToHtml } from '~/utils/markdown'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+const { formatDateTimeRange } = useDateFormat()
 const toast = useToast()
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -236,6 +238,50 @@ const editionId = parseInt(route.params.id as string)
 defineExpose({})
 await editionStore.fetchEditionById(editionId)
 const edition = computed(() => editionStore.getEditionById(editionId))
+
+// SEO - Métadonnées pour la page bénévolat
+watch(
+  edition,
+  (newEdition) => {
+    if (newEdition) {
+      const editionName = getEditionDisplayName(newEdition)
+      const conventionName = newEdition.convention?.name || ''
+      const dateRange = formatDateTimeRange(newEdition.startDate, newEdition.endDate)
+
+      useSeoMeta({
+        title: () => t('seo.volunteers.title', { name: editionName }),
+        titleTemplate: () => `%s | ${t('seo.site_name')}`,
+        description: () =>
+          t('seo.volunteers.description', {
+            name: editionName,
+            convention: conventionName,
+            date: dateRange,
+            location: newEdition.location || '',
+          }),
+        keywords: () =>
+          t('seo.volunteers.keywords', {
+            convention: conventionName,
+            location: newEdition.location || '',
+          }),
+        ogTitle: () => t('seo.volunteers.og_title', { name: editionName }),
+        ogDescription: () =>
+          t('seo.volunteers.og_description', {
+            name: editionName,
+            date: dateRange,
+          }),
+        ogType: 'website',
+        ogLocale: () => locale.value,
+        twitterCard: 'summary',
+        twitterTitle: () => t('seo.volunteers.twitter_title', { name: editionName }),
+        twitterDescription: () =>
+          t('seo.volunteers.twitter_description', {
+            name: editionName,
+          }),
+      })
+    }
+  },
+  { immediate: true }
+)
 
 const isFavorited = computed(() => (_id: number) => {
   return edition.value?.favoritedBy.some((u) => u.id === authStore.user?.id)

@@ -1681,6 +1681,46 @@
       "title": "Installa app"
     }
   },
+  "seo": {
+    "carpool": {
+      "description": "Organizza il tuo viaggio condiviso per {name} di {convention}. Trova compagni di viaggio o offri i tuoi posti liberi per {date} a {location}.",
+      "keywords": "passaggio, trasporto, {convention}, {location}, condivisione, economico, ecologico",
+      "og_description": "Organizza il tuo trasporto per {name} - {date}. Passaggi disponibili.",
+      "og_title": "Passaggio per {name}",
+      "title": "Passaggio - {name}",
+      "twitter_description": "Trova o offri un passaggio per {name}.",
+      "twitter_title": "Passaggio - {name}"
+    },
+    "edition": {
+      "description": "Scopri {name} di {convention} che si svolge {date} a {location}. Informazioni, programma e iscrizione a questa convention di giocoleria.",
+      "keywords": "giocoleria, convention, {convention}, {location}, evento, festival, spettacolo, laboratorio",
+      "og_description": "Unisciti a noi per {name} - {date}. Programma, laboratori e spettacoli di giocoleria.",
+      "og_title": "{name} - Convention di Giocoleria",
+      "title": "{name}",
+      "twitter_description": "{name} - {date}. Scopri il programma di questa convention di giocoleria.",
+      "twitter_title": "{name} - Convention di Giocoleria"
+    },
+    "homepage": {
+      "description": "Scopri le prossime convention di giocoleria in Francia e in Europa. Organizza i tuoi eventi preferiti e connettiti con la comunità di giocolieri.",
+      "keywords": "giocoleria, convention, festival, evento, giocoliere, spettacolo, laboratorio, corso",
+      "og_description": "La piattaforma di riferimento per scoprire e organizzare convention di giocoleria in Francia e in Europa.",
+      "og_title": "Convention di Giocoleria - Trova la tua prossima convention",
+      "title": "Convention di Giocoleria",
+      "twitter_description": "Scopri le prossime convention di giocoleria e unisciti alla comunità dei giocolieri.",
+      "twitter_title": "Convention di Giocoleria - Eventi di giocoleria"
+    },
+    "site_description": "Trova e gestisci le tue convention di giocoleria preferite. Piattaforma collaborativa per giocolieri e organizzatori di eventi.",
+    "site_name": "Convention di Giocoleria",
+    "volunteers": {
+      "description": "Unisciti al team di volontari per {name} di {convention}. Partecipa all'organizzazione di questo evento di giocoleria {date} a {location}.",
+      "keywords": "volontariato, squadra, {convention}, {location}, organizzazione, aiuto",
+      "og_description": "Unisciti al team di volontari di {name} - {date}. Partecipa all'organizzazione.",
+      "og_title": "Volontariato per {name}",
+      "title": "Volontariato - {name}",
+      "twitter_description": "Diventa volontario per {name} e partecipa all'organizzazione.",
+      "twitter_title": "Volontariato - {name}"
+    }
+  },
   "services": {
     "accessibility": "Accessibilità disabili",
     "aerial_space": "Spazio aereo",

@@ -28,6 +28,7 @@ import { useRoute } from 'vue-router'
 // Auto-imported: EditionCarpoolSection
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { getEditionDisplayName } from '~/utils/editionName'
 
 // TODO: Ajouter le middleware d'authentification plus tard
 // definePageMeta({
@@ -38,10 +39,64 @@ const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
-const { t } = useI18n()
+const { t, locale } = useI18n()
+const { formatDateTimeRange } = useDateFormat()
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
+
+// Charger l'édition si pas encore dans le store
+onMounted(async () => {
+  try {
+    await editionStore.fetchEditionById(editionId, { force: true })
+  } catch (error) {
+    console.error('Failed to fetch edition:', error)
+  }
+})
+
+// SEO - Métadonnées pour la page covoiturage
+watch(
+  edition,
+  (newEdition) => {
+    if (newEdition) {
+      const editionName = getEditionDisplayName(newEdition)
+      const conventionName = newEdition.convention?.name || ''
+      const dateRange = formatDateTimeRange(newEdition.startDate, newEdition.endDate)
+
+      useSeoMeta({
+        title: () => t('seo.carpool.title', { name: editionName }),
+        titleTemplate: () => `%s | ${t('seo.site_name')}`,
+        description: () =>
+          t('seo.carpool.description', {
+            name: editionName,
+            convention: conventionName,
+            date: dateRange,
+            location: newEdition.location || '',
+          }),
+        keywords: () =>
+          t('seo.carpool.keywords', {
+            convention: conventionName,
+            location: newEdition.location || '',
+          }),
+        ogTitle: () => t('seo.carpool.og_title', { name: editionName }),
+        ogDescription: () =>
+          t('seo.carpool.og_description', {
+            name: editionName,
+            date: dateRange,
+          }),
+        ogType: 'website',
+        ogLocale: () => locale.value,
+        twitterCard: 'summary',
+        twitterTitle: () => t('seo.carpool.twitter_title', { name: editionName }),
+        twitterDescription: () =>
+          t('seo.carpool.twitter_description', {
+            name: editionName,
+          }),
+      })
+    }
+  },
+  { immediate: true }
+)
 
 // Paramètre pour mettre en évidence une offre spécifique
 const highlightOfferId = computed(() => {

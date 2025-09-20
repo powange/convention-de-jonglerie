@@ -1681,6 +1681,46 @@
       "title": "Instalar app"
     }
   },
+  "seo": {
+    "carpool": {
+      "description": "Organize a sua boleia para {name} de {convention}. Encontre companheiros de viagem ou ofereça os seus lugares livres para {date} em {location}.",
+      "keywords": "boleia, transporte, {convention}, {location}, partilha, económico, ecológico",
+      "og_description": "Organize o seu transporte para {name} - {date}. Boleias disponíveis.",
+      "og_title": "Boleia para {name}",
+      "title": "Boleia - {name}",
+      "twitter_description": "Encontre ou ofereça uma boleia para {name}.",
+      "twitter_title": "Boleia - {name}"
+    },
+    "edition": {
+      "description": "Descubra {name} de {convention} que acontece {date} em {location}. Informações, programa e inscrição para esta convenção de malabarismo.",
+      "keywords": "malabarismo, convenção, {convention}, {location}, evento, festival, espetáculo, workshop",
+      "og_description": "Junte-se a nós para {name} - {date}. Programa, workshops e espetáculos de malabarismo.",
+      "og_title": "{name} - Convenção de Malabarismo",
+      "title": "{name}",
+      "twitter_description": "{name} - {date}. Descubra o programa desta convenção de malabarismo.",
+      "twitter_title": "{name} - Convenção de Malabarismo"
+    },
+    "homepage": {
+      "description": "Descubra as próximas convenções de malabarismo em França e na Europa. Organize os seus eventos favoritos e conecte-se com a comunidade de malabaristas.",
+      "keywords": "malabarismo, convenção, festival, evento, malabarista, espetáculo, workshop, curso",
+      "og_description": "A plataforma de referência para descobrir e organizar convenções de malabarismo em França e na Europa.",
+      "og_title": "Convenção de Malabarismo - Encontre a sua próxima convenção",
+      "title": "Convenções de Malabarismo",
+      "twitter_description": "Descubra as próximas convenções de malabarismo e junte-se à comunidade de malabaristas.",
+      "twitter_title": "Convenção de Malabarismo - Eventos de malabarismo"
+    },
+    "site_description": "Encontre e gira as suas convenções de malabarismo favoritas. Plataforma colaborativa para malabaristas e organizadores de eventos.",
+    "site_name": "Convenção de Malabarismo",
+    "volunteers": {
+      "description": "Junte-se à equipa de voluntários para {name} de {convention}. Participe na organização deste evento de malabarismo {date} em {location}.",
+      "keywords": "voluntariado, equipa, {convention}, {location}, organização, ajuda",
+      "og_description": "Junte-se à equipa de voluntários de {name} - {date}. Participe na organização.",
+      "og_title": "Voluntariado para {name}",
+      "title": "Voluntariado - {name}",
+      "twitter_description": "Torne-se voluntário para {name} e participe na organização.",
+      "twitter_title": "Voluntariado - {name}"
+    }
+  },
   "services": {
     "accessibility": "Acessibilidade para deficientes",
     "aerial_space": "Espaço aéreo",

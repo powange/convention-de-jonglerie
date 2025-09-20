@@ -305,7 +305,7 @@ const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { getTranslatedServicesByCategory } = useTranslatedConventionServices()
 
 const editionId = parseInt(route.params.id as string)
@@ -323,6 +323,92 @@ try {
 
 // Maintenant utiliser directement le store qui est réactif
 const edition = computed(() => editionStore.getEditionById(editionId))
+
+// SEO - Métadonnées dynamiques pour l'édition
+watch(
+  edition,
+  (newEdition) => {
+    if (newEdition) {
+      const editionName = getEditionDisplayName(newEdition)
+      const conventionName = newEdition.convention?.name || ''
+      const description = newEdition.description || newEdition.convention?.description || ''
+      const imageUrl = newEdition.imageUrl
+        ? getImageUrl(newEdition.imageUrl, 'edition', newEdition.id)
+        : undefined
+      const dateRange = formatDateTimeRange(newEdition.startDate, newEdition.endDate)
+
+      useSeoMeta({
+        title: () => t('seo.edition.title', { name: editionName }),
+        titleTemplate: () => `%s | ${t('seo.site_name')}`,
+        description: () =>
+          t('seo.edition.description', {
+            name: editionName,
+            convention: conventionName,
+            date: dateRange,
+            location: newEdition.location || '',
+          }),
+        keywords: () =>
+          t('seo.edition.keywords', {
+            convention: conventionName,
+            location: newEdition.location || '',
+          }),
+        ogTitle: () => t('seo.edition.og_title', { name: editionName }),
+        ogDescription: () =>
+          t('seo.edition.og_description', {
+            name: editionName,
+            date: dateRange,
+          }),
+        ogType: 'event',
+        ogLocale: () => locale.value,
+        ogImage: imageUrl,
+        twitterCard: 'summary_large_image',
+        twitterTitle: () => t('seo.edition.twitter_title', { name: editionName }),
+        twitterDescription: () =>
+          t('seo.edition.twitter_description', {
+            name: editionName,
+            date: dateRange,
+          }),
+        twitterImage: imageUrl,
+      })
+
+      // Schema.org Event pour l'édition
+      useSchemaOrg([
+        defineEvent({
+          name: editionName,
+          description: description.substring(0, 200) + (description.length > 200 ? '...' : ''),
+          startDate: newEdition.startDate,
+          endDate: newEdition.endDate,
+          location: newEdition.location
+            ? {
+                '@type': 'Place',
+                name: newEdition.location,
+                address: newEdition.location,
+              }
+            : undefined,
+          image: imageUrl ? [imageUrl] : undefined,
+          url: () => `${useRequestURL().origin}/editions/${newEdition.id}`,
+          eventStatus: newEdition.status === 'published' ? 'EventScheduled' : 'EventCancelled',
+          organizer: {
+            '@type': 'Organization',
+            name: conventionName,
+            url: newEdition.convention
+              ? `${useRequestURL().origin}/conventions/${newEdition.convention.id}`
+              : undefined,
+          },
+          offers: newEdition.registrationPrice
+            ? {
+                '@type': 'Offer',
+                price: newEdition.registrationPrice,
+                priceCurrency: 'EUR',
+                availability: 'InStock',
+              }
+            : undefined,
+        }),
+      ])
+    }
+  },
+  { immediate: true }
+)
 
 // Description en HTML (rendu Markdown)
 const descriptionHtml = computedAsync(async () => {

@@ -3,6 +3,16 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
+
+  // Configuration SEO du site
+  site: {
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://convention-de-jonglerie.fr',
+    name: 'Convention de Jonglerie',
+    description:
+      "Trouvez et gérez vos conventions de jonglerie préférées. Plateforme collaborative pour les jongleurs et organisateurs d'événements.",
+    defaultLocale: 'fr',
+  },
+
   app: {
     head: {
       link: [
@@ -40,6 +50,7 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@vueuse/nuxt',
     'nuxt-file-storage',
+    '@nuxtjs/seo',
   ].filter(Boolean),
 
   // Restreindre les collections d'icônes empaquetées côté serveur
@@ -162,5 +173,51 @@ export default defineNuxtConfig({
     lazyHydration: true,
     // Optimiser la gestion d'erreur des chunks
     emitRouteChunkError: 'automatic',
+  },
+
+  // Configuration des modules SEO
+  robots: {
+    // Permettre l'indexation en production seulement
+    disallow: process.env.NODE_ENV !== 'production' ? ['/'] : [],
+    sitemap: '/sitemap.xml',
+  },
+
+  sitemap: {
+    // Exclure certaines routes du sitemap
+    exclude: [
+      '/admin/**',
+      '/login',
+      '/register',
+      '/logout',
+      '/verify-email',
+      '/auth/**',
+      '/profile',
+      '/my-**',
+      '/api/**',
+    ],
+    // Inclure les routes dynamiques importantes
+    sources: ['/api/__sitemap__/editions'],
+  },
+
+  ogImage: {
+    // Active la génération d'images OG
+    enabled: true,
+    defaults: {
+      // Utilise le logo comme fallback
+      component: 'NuxtSeo',
+      width: 1200,
+      height: 630,
+    },
+  },
+
+  schemaOrg: {
+    // Active Schema.org
+    enabled: true,
+  },
+
+  linkChecker: {
+    // Active la vérification des liens en dev
+    enabled: process.env.NODE_ENV !== 'production',
+    excludeLinks: ['mailto:*', 'tel:*'],
   },
 })

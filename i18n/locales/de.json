@@ -1681,6 +1681,46 @@
       "title": "App installieren"
     }
   },
+  "seo": {
+    "carpool": {
+      "description": "Organisieren Sie Ihre Fahrgemeinschaft für {name} von {convention}. Finden Sie Mitfahrer oder bieten Sie freie Plätze für {date} in {location} an.",
+      "keywords": "Fahrgemeinschaft, Transport, {convention}, {location}, Mitfahrgelegenheit, günstig, umweltfreundlich",
+      "og_description": "Organisieren Sie Ihren Transport für {name} - {date}. Fahrgemeinschaften verfügbar.",
+      "og_title": "Fahrgemeinschaft für {name}",
+      "title": "Fahrgemeinschaft - {name}",
+      "twitter_description": "Finden oder bieten Sie eine Fahrgemeinschaft für {name} an.",
+      "twitter_title": "Fahrgemeinschaft - {name}"
+    },
+    "edition": {
+      "description": "Entdecken Sie {name} von {convention}, die {date} in {location} stattfindet. Informationen, Programm und Anmeldung für diese Jonglier-Convention.",
+      "keywords": "Jonglieren, Convention, {convention}, {location}, Veranstaltung, Festival, Show, Workshop",
+      "og_description": "Begleiten Sie uns zu {name} - {date}. Programm, Workshops und Jonglier-Shows.",
+      "og_title": "{name} - Jonglier-Convention",
+      "title": "{name}",
+      "twitter_description": "{name} - {date}. Entdecken Sie das Programm dieser Jonglier-Convention.",
+      "twitter_title": "{name} - Jonglier-Convention"
+    },
+    "homepage": {
+      "description": "Entdecken Sie die nächsten Jonglier-Conventions in Frankreich und Europa. Organisieren Sie Ihre Lieblings-Events und vernetzen Sie sich mit der Jonglier-Community.",
+      "keywords": "Jonglieren, Convention, Festival, Veranstaltung, Jongleur, Show, Workshop, Kurs",
+      "og_description": "Die Referenz-Plattform zum Entdecken und Organisieren von Jonglier-Conventions in Frankreich und Europa.",
+      "og_title": "Jonglier-Convention - Finden Sie Ihre nächste Convention",
+      "title": "Jonglier-Conventions",
+      "twitter_description": "Entdecken Sie die nächsten Jonglier-Conventions und schließen Sie sich der Jonglier-Community an.",
+      "twitter_title": "Jonglier-Convention - Jonglier-Veranstaltungen"
+    },
+    "site_description": "Finden und verwalten Sie Ihre bevorzugten Jonglier-Conventions. Kollaborative Plattform für Jongleure und Veranstaltungsorganisatoren.",
+    "site_name": "Jonglier-Convention",
+    "volunteers": {
+      "description": "Schließen Sie sich dem Freiwilligenteam für {name} von {convention} an. Beteiligen Sie sich an der Organisation dieser Jonglier-Veranstaltung {date} in {location}.",
+      "keywords": "Freiwilligenarbeit, Ehrenamt, Team, {convention}, {location}, Organisation, Hilfe",
+      "og_description": "Schließen Sie sich dem Freiwilligenteam von {name} - {date} an. Beteiligen Sie sich an der Organisation.",
+      "og_title": "Freiwilligenarbeit für {name}",
+      "title": "Freiwilligenarbeit - {name}",
+      "twitter_description": "Werden Sie Freiwilliger für {name} und beteiligen Sie sich an der Organisation.",
+      "twitter_title": "Freiwilligenarbeit - {name}"
+    }
+  },
   "services": {
     "accessibility": "Barrierefreiheit",
     "aerial_space": "Luftakrobatik-Bereich",
