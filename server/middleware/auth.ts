@@ -59,6 +59,7 @@ export default defineEventHandler(async (event) => {
   const publicGetRoutes = [
     '/api/conventions', // Liste des conventions
     '/api/editions', // Liste des éditions
+    '/api/__sitemap__/editions', // Sitemap des éditions pour SEO
   ]
 
   // Routes publiques pour récupérer des détails spécifiques (avec pattern [id])
