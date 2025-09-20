@@ -74,7 +74,8 @@
       "WebFetch(domain:nuxtseo.com)",
       "Bash(/tmp/update-other-pages.sh:*)",
       "Bash(/tmp/fix-ogsitename.sh:*)",
-      "Bash(/tmp/remove-ogsitename.sh:*)"
+      "Bash(/tmp/remove-ogsitename.sh:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"
