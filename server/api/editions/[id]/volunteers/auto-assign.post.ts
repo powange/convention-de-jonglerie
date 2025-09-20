@@ -16,6 +16,7 @@ const constraintsSchema = z.object({
   respectStrictAvailability: z.boolean().optional(),
   allowOvertime: z.boolean().optional(),
   maxOvertimeHours: z.number().min(0).max(6).optional(),
+  keepExistingAssignments: z.boolean().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -100,8 +101,23 @@ export default defineEventHandler(async (event) => {
       }),
     ])
 
+    // Si on garde les assignations existantes, filtrer les bénévoles déjà assignés
+    let availableVolunteers = volunteers
+    if (constraints.keepExistingAssignments) {
+      // Récupérer les IDs des bénévoles déjà assignés
+      const assignedVolunteerIds = new Set(
+        timeSlots.flatMap((slot: any) =>
+          slot.assignments.map((assignment: any) => assignment.user.id)
+        )
+      )
+      // Filtrer uniquement les bénévoles non assignés
+      availableVolunteers = volunteers.filter(
+        (volunteer: any) => !assignedVolunteerIds.has(volunteer.user.id)
+      )
+    }
+
     // Conversion des données pour l'algorithme
-    const schedulerVolunteers = volunteers.map((volunteer: any) => ({
+    const schedulerVolunteers = availableVolunteers.map((volunteer: any) => ({
       id: volunteer.id,
       user: volunteer.user,
       availability: JSON.stringify({
@@ -129,7 +145,8 @@ export default defineEventHandler(async (event) => {
       end: slot.endDateTime.toISOString(),
       teamId: slot.teamId?.toString() || undefined,
       maxVolunteers: slot.maxVolunteers,
-      assignedVolunteers: slot.assignments.length,
+      // Si on garde les existantes, les comptabiliser dans les places déjà prises
+      assignedVolunteers: constraints.keepExistingAssignments ? slot.assignments.length : 0,
       description: slot.description || undefined,
       requiredSkills: [], // TODO: Ajouter si nécessaire
       priority: 3, // TODO: Calculer selon critères
@@ -153,7 +170,12 @@ export default defineEventHandler(async (event) => {
 
     // Application des assignations en base de données si demandé
     if (body.applyAssignments === true) {
-      await applyAssignments(editionId, result.assignments, user.id)
+      await applyAssignments(
+        editionId,
+        result.assignments,
+        user.id,
+        constraints.keepExistingAssignments
+      )
     }
 
     return {
@@ -186,20 +208,34 @@ export default defineEventHandler(async (event) => {
 async function applyAssignments(
   editionId: number,
   assignments: any[],
-  userId: number
+  userId: number,
+  keepExisting?: boolean
 ): Promise<void> {
   await prisma.$transaction(async (tx) => {
-    // 1. Supprimer toutes les assignations existantes pour cette édition
-    await tx.volunteerAssignment.deleteMany({
-      where: {
-        timeSlot: {
-          editionId,
+    // 1. Si on ne garde pas les existantes, les supprimer
+    if (!keepExisting) {
+      await tx.volunteerAssignment.deleteMany({
+        where: {
+          timeSlot: {
+            editionId,
+          },
         },
-      },
-    })
+      })
+    }
 
-    // 2. Créer les nouvelles assignations
+    // 2. Créer les nouvelles assignations aux créneaux
     for (const assignment of assignments) {
+      // Si on garde les existantes, vérifier qu'elle n'existe pas déjà
+      if (keepExisting) {
+        const existing = await tx.volunteerAssignment.findFirst({
+          where: {
+            timeSlotId: assignment.slotId,
+            userId: assignment.volunteerId,
+          },
+        })
+        if (existing) continue // Passer si l'assignation existe déjà
+      }
+
       await tx.volunteerAssignment.create({
         data: {
           timeSlotId: assignment.slotId,
@@ -210,10 +246,83 @@ async function applyAssignments(
       })
     }
 
-    // 3. Log de l'action
+    // 3. Assigner les bénévoles aux équipes correspondantes
+    await assignVolunteersToTeams(tx, editionId, assignments, keepExisting)
+
+    // 4. Log de l'action
     console.log(
       `Auto-assignation appliquée pour l'édition ${editionId} par l'utilisateur ${userId}`
     )
     console.log(`${assignments.length} assignations créées`)
   })
+}
+
+/**
+ * Assigne les bénévoles aux équipes correspondantes à leurs créneaux
+ */
+async function assignVolunteersToTeams(
+  tx: any,
+  editionId: number,
+  assignments: any[],
+  keepExisting?: boolean
+): Promise<void> {
+  // Grouper les assignations par bénévole
+  const volunteerTeams = new Map<number, Set<string>>()
+
+  for (const assignment of assignments) {
+    if (assignment.teamId) {
+      if (!volunteerTeams.has(assignment.volunteerId)) {
+        volunteerTeams.set(assignment.volunteerId, new Set())
+      }
+      volunteerTeams.get(assignment.volunteerId)!.add(assignment.teamId)
+    }
+  }
+
+  // Pour chaque bénévole, mettre à jour ses équipes assignées
+  for (const [volunteerId, teamIds] of volunteerTeams) {
+    // Récupérer l'application du bénévole
+    const application = await tx.editionVolunteerApplication.findUnique({
+      where: {
+        editionId_userId: {
+          editionId,
+          userId: volunteerId,
+        },
+      },
+      include: {
+        teams: true,
+      },
+    })
+
+    if (!application) continue
+
+    // Si on ne garde pas les existantes, supprimer les anciennes assignations d'équipes
+    if (!keepExisting) {
+      await tx.editionVolunteerApplication.update({
+        where: {
+          id: application.id,
+        },
+        data: {
+          teams: {
+            set: [], // Supprimer toutes les relations existantes
+          },
+        },
+      })
+    }
+
+    // Ajouter les nouvelles assignations d'équipes
+    const teamIdsArray = Array.from(teamIds)
+    if (teamIdsArray.length > 0) {
+      await tx.editionVolunteerApplication.update({
+        where: {
+          id: application.id,
+        },
+        data: {
+          teams: {
+            connect: teamIdsArray.map((teamId) => ({ id: teamId })),
+          },
+          assignedTeams: teamIdsArray, // Aussi mettre à jour le champ JSON
+        },
+      })
+    }
+  }
 }

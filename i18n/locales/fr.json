@@ -1067,7 +1067,11 @@
         "unassigned_volunteers": "Bénévoles non assignés",
         "unassigned_slots": "Créneaux non couverts",
         "preview_generated": "Aperçu généré avec succès",
+        "keep_existing": "Conserver les assignations existantes",
+        "keep_existing_help": "Ajoute uniquement les nouvelles assignations sans supprimer celles déjà en place",
         "confirm_apply": "Êtes-vous sûr de vouloir appliquer ces assignations ? Cela remplacera toutes les assignations existantes.",
+        "confirm_apply_keep_existing": "Êtes-vous sûr de vouloir appliquer ces assignations ? Les nouvelles assignations seront ajoutées aux existantes.",
+        "confirm_details": "Cette action va créer {count} nouvelle(s) assignation(s).",
         "assignments_applied": "Assignations appliquées",
         "assignments_applied_description": "Les assignations ont été appliquées avec succès. Le planning a été mis à jour."
       },
