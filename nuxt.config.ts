@@ -178,10 +178,8 @@ export default defineNuxtConfig({
   // Configuration des modules SEO
   robots: {
     // Permettre l'indexation uniquement sur le domaine principal en production
-    disallow: process.env.NODE_ENV !== 'production' ||
-              process.env.NUXT_ENV === 'staging' ||
-              process.env.NUXT_ENV === 'release' ||
-              !process.env.NUXT_PUBLIC_SITE_URL?.includes('juggling-convention.com')
+    disallow: process.env.NUXT_ENV === 'staging' ||
+              process.env.NUXT_ENV === 'release'
               ? ['/'] : [],
     sitemap: '/sitemap.xml',
   },
