@@ -205,6 +205,7 @@ export default defineNuxtConfig({
       '/favorites',
       '/notifications',
       '/api/**',
+      '/editions/add',
     ],
     // Inclure les routes dynamiques importantes
     sources: ['/api/__sitemap__/editions'],
