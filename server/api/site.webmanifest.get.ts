@@ -2,6 +2,9 @@ export default defineEventHandler(() => {
   const nodeEnv = process.env.NODE_ENV
   const nuxtEnv = process.env.NUXT_ENV || nodeEnv
 
+  // Version pour forcer la mise à jour du cache des icônes
+  const iconVersion = 'v2' // Incrémenter cette version pour forcer la mise à jour des icônes
+
   // Déterminer le nom selon l'environnement
   let appName = 'Juggling Convention'
   let shortName = 'JuggConv'
@@ -29,17 +32,17 @@ export default defineEventHandler(() => {
     orientation: 'portrait-primary',
     icons: [
       {
-        src: '/favicons/android-chrome-192x192.png',
+        src: `/favicons/android-chrome-192x192.png?v=${iconVersion}`,
         sizes: '192x192',
         type: 'image/png',
       },
       {
-        src: '/favicons/android-chrome-512x512.png',
+        src: `/favicons/android-chrome-512x512.png?v=${iconVersion}`,
         sizes: '512x512',
         type: 'image/png',
       },
       {
-        src: '/favicons/apple-touch-icon.png',
+        src: `/favicons/apple-touch-icon.png?v=${iconVersion}`,
         sizes: '180x180',
         type: 'image/png',
       },
