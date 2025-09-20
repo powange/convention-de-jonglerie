@@ -22,7 +22,7 @@ export default defineEventHandler(() => {
     short_name: shortName,
     description: 'Plateforme de découverte et gestion de conventions de jonglerie',
     theme_color: themeColor,
-    background_color: '#ffffff',
+    background_color: '#0f172a',
     display: 'standalone',
     scope: '/',
     start_url: '/',
