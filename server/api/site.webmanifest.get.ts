@@ -5,7 +5,7 @@ export default defineEventHandler(() => {
   // Déterminer le nom selon l'environnement
   let appName = 'Juggling Convention'
   let shortName = 'JuggConv'
-  let themeColor = '#3b82f6' // Bleu par défaut
+  let themeColor = '#0f172a' // Bleu par défaut
 
   if (nodeEnv === 'development') {
     appName = 'Juggling Convention DEV'
