@@ -358,9 +358,13 @@
     "verifying": "Verifying..."
   },
   "calendar": {
+    "add_to_calendar": "Add to calendar",
     "day": "Day",
+    "download_ics": "Download (.ics)",
+    "google_calendar": "Google Calendar",
     "list": "List",
     "month": "Month",
+    "outlook_calendar": "Outlook Calendar",
     "today": "Today",
     "week": "Week"
   },
@@ -1736,13 +1740,6 @@
     }
   },
   "seo": {
-    "organization": {
-      "description": "Collaborative platform dedicated to the juggling community, facilitating the discovery and organization of juggling events in France and Europe."
-    },
-    "search_action": {
-      "name": "Search for a convention",
-      "description": "Search for juggling conventions by name, location or organizer"
-    },
     "carpool": {
       "description": "Organize your carpool for {name} by {convention}. Find travel companions or offer your free seats for {date} in {location}.",
       "keywords": "carpool, transport, {convention}, {location}, sharing, economical, ecological",
@@ -1756,7 +1753,6 @@
       "description": "Discover {name} by {convention} taking place {date} in {location}. Information, program and registration for this juggling convention.",
       "keywords": "juggling, convention, {convention}, {location}, event, festival, show, workshop",
       "og_description": "Join us for {name} - {date}. Program, workshops and juggling shows.",
-      "og_title": "{name} - Juggling Convention",
       "title": "{name}",
       "twitter_description": "{name} - {date}. Discover the program of this juggling convention.",
       "twitter_title": "{name} - Juggling Convention"
@@ -1769,6 +1765,13 @@
       "title": "Juggling Conventions",
       "twitter_description": "Discover upcoming juggling conventions and join the juggling community.",
       "twitter_title": "Juggling Convention - Juggling Events"
+    },
+    "organization": {
+      "description": "Collaborative platform dedicated to the juggling community, facilitating the discovery and organization of juggling events in France and Europe."
+    },
+    "search_action": {
+      "description": "Search for juggling conventions by name, location or organizer",
+      "name": "Search for a convention"
     },
     "site_description": "Find and manage your favorite juggling conventions. Collaborative platform for jugglers and event organizers.",
     "site_name": "Juggling Convention",

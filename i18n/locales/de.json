@@ -358,9 +358,13 @@
     "verifying": "Verifizierung..."
   },
   "calendar": {
+    "add_to_calendar": "Zum Kalender hinzufügen",
     "day": "Tag",
+    "download_ics": "Herunterladen (.ics)",
+    "google_calendar": "Google Calendar",
     "list": "Liste",
     "month": "Monat",
+    "outlook_calendar": "Outlook Calendar",
     "today": "Heute",
     "week": "Woche"
   },
@@ -1736,13 +1740,6 @@
     }
   },
   "seo": {
-    "organization": {
-      "description": "Kollaborative Plattform für die Jonglier-Community, die die Entdeckung und Organisation von Jonglier-Veranstaltungen in Frankreich und Europa erleichtert."
-    },
-    "search_action": {
-      "name": "Nach einer Tagung suchen",
-      "description": "Suchen Sie nach Jonglier-Veranstaltungen nach Name, Ort oder Veranstalter"
-    },
     "carpool": {
       "description": "Organisieren Sie Ihre Fahrgemeinschaft für {name} von {convention}. Finden Sie Mitfahrer oder bieten Sie freie Plätze für {date} in {location} an.",
       "keywords": "Fahrgemeinschaft, Transport, {convention}, {location}, Mitfahrgelegenheit, günstig, umweltfreundlich",
@@ -1756,7 +1753,6 @@
       "description": "Entdecken Sie {name} von {convention}, die {date} in {location} stattfindet. Informationen, Programm und Anmeldung für diese Jonglier-Convention.",
       "keywords": "Jonglieren, Convention, {convention}, {location}, Veranstaltung, Festival, Show, Workshop",
       "og_description": "Begleiten Sie uns zu {name} - {date}. Programm, Workshops und Jonglier-Shows.",
-      "og_title": "{name} - Jonglier-Convention",
       "title": "{name}",
       "twitter_description": "{name} - {date}. Entdecken Sie das Programm dieser Jonglier-Convention.",
       "twitter_title": "{name} - Jonglier-Convention"
@@ -1769,6 +1765,13 @@
       "title": "Jonglier-Conventions",
       "twitter_description": "Entdecken Sie die nächsten Jonglier-Conventions und schließen Sie sich der Jonglier-Community an.",
       "twitter_title": "Jonglier-Convention - Jonglier-Veranstaltungen"
+    },
+    "organization": {
+      "description": "Kollaborative Plattform für die Jonglier-Community, die die Entdeckung und Organisation von Jonglier-Veranstaltungen in Frankreich und Europa erleichtert."
+    },
+    "search_action": {
+      "description": "Suchen Sie nach Jonglier-Veranstaltungen nach Name, Ort oder Veranstalter",
+      "name": "Nach einer Tagung suchen"
     },
     "site_description": "Finden und verwalten Sie Ihre bevorzugten Jonglier-Conventions. Kollaborative Plattform für Jongleure und Veranstaltungsorganisatoren.",
     "site_name": "Jonglier-Convention",

@@ -358,9 +358,13 @@
     "verifying": "Verificando..."
   },
   "calendar": {
+    "add_to_calendar": "Añadir al calendario",
     "day": "Día",
+    "download_ics": "Descargar (.ics)",
+    "google_calendar": "Google Calendar",
     "list": "Lista",
     "month": "Mes",
+    "outlook_calendar": "Outlook Calendar",
     "today": "Hoy",
     "week": "Semana"
   },
@@ -1736,13 +1740,6 @@
     }
   },
   "seo": {
-    "organization": {
-      "description": "Plataforma colaborativa dedicada a la comunidad de malabarismo, facilitando el descubrimiento y organización de eventos de malabarismo en Francia y Europa."
-    },
-    "search_action": {
-      "name": "Buscar una convención",
-      "description": "Busque convenciones de malabarismo por nombre, ubicación u organizador"
-    },
     "carpool": {
       "description": "Organiza tu viaje compartido para {name} de {convention}. Encuentra compañeros de viaje u ofrece tus asientos libres para {date} en {location}.",
       "keywords": "viaje compartido, transporte, {convention}, {location}, compartir, económico, ecológico",
@@ -1756,7 +1753,6 @@
       "description": "Descubre {name} de {convention} que tiene lugar {date} en {location}. Información, programa e inscripción a esta convención de malabarismo.",
       "keywords": "malabarismo, convención, {convention}, {location}, evento, festival, espectáculo, taller",
       "og_description": "Únete a nosotros para {name} - {date}. Programa, talleres y espectáculos de malabarismo.",
-      "og_title": "{name} - Convención de Malabarismo",
       "title": "{name}",
       "twitter_description": "{name} - {date}. Descubre el programa de esta convención de malabarismo.",
       "twitter_title": "{name} - Convención de Malabarismo"
@@ -1769,6 +1765,13 @@
       "title": "Convenciones de Malabarismo",
       "twitter_description": "Descubre las próximas convenciones de malabarismo y únete a la comunidad de malabaristas.",
       "twitter_title": "Convención de Malabarismo - Eventos de malabarismo"
+    },
+    "organization": {
+      "description": "Plataforma colaborativa dedicada a la comunidad de malabarismo, facilitando el descubrimiento y organización de eventos de malabarismo en Francia y Europa."
+    },
+    "search_action": {
+      "description": "Busque convenciones de malabarismo por nombre, ubicación u organizador",
+      "name": "Buscar una convención"
     },
     "site_description": "Encuentra y gestiona tus convenciones de malabarismo favoritas. Plataforma colaborativa para malabaristas y organizadores de eventos.",
     "site_name": "Convención de Malabarismo",

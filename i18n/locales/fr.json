@@ -443,7 +443,11 @@
     "month": "Mois",
     "today": "Aujourd'hui",
     "week": "Semaine",
-    "day": "Jour"
+    "day": "Jour",
+    "add_to_calendar": "Ajouter au calendrier",
+    "google_calendar": "Google Calendar",
+    "outlook_calendar": "Outlook Calendar",
+    "download_ics": "Télécharger (.ics)"
   },
   "carpool": {
     "departure_city": "Ville de départ",
@@ -1628,7 +1632,6 @@
       "title": "{name}",
       "description": "Découvrez {name} de {convention} qui se déroule {date} à {location}. Informations, programme et inscription à cette convention de jonglerie.",
       "keywords": "jonglerie, convention, {convention}, {location}, événement, festival, spectacle, atelier",
-      "og_title": "{name} - Convention de Jonglerie",
       "og_description": "Rejoignez-nous pour {name} - {date}. Programme, ateliers et spectacles de jonglerie.",
       "twitter_title": "{name} - Convention de Jonglerie",
       "twitter_description": "{name} - {date}. Découvrez le programme de cette convention de jonglerie."

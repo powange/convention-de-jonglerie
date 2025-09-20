@@ -358,9 +358,13 @@
     "verifying": "Weryfikacja..."
   },
   "calendar": {
+    "add_to_calendar": "Dodaj do kalendarza",
     "day": "Dzień",
+    "download_ics": "Pobierz (.ics)",
+    "google_calendar": "Google Calendar",
     "list": "Lista",
     "month": "Miesiąc",
+    "outlook_calendar": "Outlook Calendar",
     "today": "Dzisiaj",
     "week": "Tydzień"
   },
@@ -1736,13 +1740,6 @@
     }
   },
   "seo": {
-    "organization": {
-      "description": "Platforma współpracy dedykowana społeczności żonglerskiej, ułatwiająca odkrywanie i organizację wydarzeń żonglerskich we Francji i Europie."
-    },
-    "search_action": {
-      "name": "Szukaj konwencji",
-      "description": "Szukaj konwencji żonglerskich według nazwy, lokalizacji lub organizatora"
-    },
     "carpool": {
       "description": "Zorganizuj wspólną podróż na {name} od {convention}. Znajdź towarzyszy podróży lub zaoferuj wolne miejsca na {date} w {location}.",
       "keywords": "wspólna podróż, transport, {convention}, {location}, dzielenie się, ekonomiczny, ekologiczny",
@@ -1756,7 +1753,6 @@
       "description": "Odkryj {name} od {convention}, która odbywa się {date} w {location}. Informacje, program i rejestracja na tę konwencję żonglerską.",
       "keywords": "żonglerka, konwencja, {convention}, {location}, wydarzenie, festiwal, show, warsztat",
       "og_description": "Dołącz do nas na {name} - {date}. Program, warsztaty i pokazy żonglerskie.",
-      "og_title": "{name} - Konwencja żonglerska",
       "title": "{name}",
       "twitter_description": "{name} - {date}. Odkryj program tej konwencji żonglerskiej.",
       "twitter_title": "{name} - Konwencja żonglerska"
@@ -1769,6 +1765,13 @@
       "title": "Konwencje żonglerskie",
       "twitter_description": "Odkryj nadchodzące konwencje żonglerskie i dołącz do społeczności żonglerskiej.",
       "twitter_title": "Konwencja żonglerska - Wydarzenia żonglerskie"
+    },
+    "organization": {
+      "description": "Platforma współpracy dedykowana społeczności żonglerskiej, ułatwiająca odkrywanie i organizację wydarzeń żonglerskich we Francji i Europie."
+    },
+    "search_action": {
+      "description": "Szukaj konwencji żonglerskich według nazwy, lokalizacji lub organizatora",
+      "name": "Szukaj konwencji"
     },
     "site_description": "Znajdź i zarządzaj swoimi ulubionymi konwencjami żonglerskimi. Platforma współpracy dla żonglerzy i organizatorów wydarzeń.",
     "site_name": "Konwencja żonglerska",

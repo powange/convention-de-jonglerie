@@ -115,3 +115,137 @@ export function getCalendarButtonText(t: any) {
     day: t('calendar.day') || 'Day',
   }
 }
+
+/**
+ * Interface pour les données d'événement à ajouter au calendrier
+ */
+export interface CalendarEventData {
+  title: string
+  description?: string
+  location?: string
+  startDate: string
+  endDate: string
+  url?: string
+}
+
+/**
+ * Formate une date au format iCal (YYYYMMDDTHHMMSSZ)
+ */
+function formatDateForIcal(dateString: string): string {
+  const date = new Date(dateString)
+  return date
+    .toISOString()
+    .replace(/[-:]/g, '')
+    .replace(/\.\d{3}/, '')
+}
+
+/**
+ * Génère un lien Google Calendar
+ */
+export function generateGoogleCalendarLink(event: CalendarEventData): string {
+  const startDate = formatDateForIcal(event.startDate)
+  const endDate = formatDateForIcal(event.endDate)
+
+  const description = event.description || ''
+
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: event.title,
+    dates: `${startDate}/${endDate}`,
+    details: description,
+    location: event.location || '',
+    ...(event.url && { sprop: `website:${event.url}` }),
+  })
+
+  return `https://calendar.google.com/calendar/render?${params.toString()}`
+}
+
+/**
+ * Génère un lien Outlook Calendar
+ */
+export function generateOutlookCalendarLink(event: CalendarEventData): string {
+  const startDate = new Date(event.startDate).toISOString()
+  const endDate = new Date(event.endDate).toISOString()
+
+  const body = event.description || ''
+
+  const params = new URLSearchParams({
+    subject: event.title,
+    startdt: startDate,
+    enddt: endDate,
+    body,
+    location: event.location || '',
+    ...(event.url && { allday: 'false' }),
+  })
+
+  return `https://outlook.live.com/calendar/0/deeplink/compose?${params.toString()}`
+}
+
+/**
+ * Génère un fichier ICS pour les autres calendriers
+ */
+export function generateIcsFile(event: CalendarEventData): string {
+  const startDate = formatDateForIcal(event.startDate)
+  const endDate = formatDateForIcal(event.endDate)
+  const now = formatDateForIcal(new Date().toISOString())
+
+  const icsContent = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Juggling Convention//Event//EN',
+    'BEGIN:VEVENT',
+    `UID:${Date.now()}@convention-de-jonglerie.fr`,
+    `DTSTAMP:${now}`,
+    `DTSTART:${startDate}`,
+    `DTEND:${endDate}`,
+    `SUMMARY:${event.title}`,
+    ...(event.description ? [`DESCRIPTION:${event.description.replace(/\n/g, '\\n')}`] : []),
+    ...(event.location ? [`LOCATION:${event.location}`] : []),
+    ...(event.url ? [`URL:${event.url}`] : []),
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n')
+
+  return `data:text/calendar;charset=utf8,${encodeURIComponent(icsContent)}`
+}
+
+/**
+ * Options de calendrier disponibles
+ */
+export interface CalendarOption {
+  label: string
+  icon: string
+  action: (event: CalendarEventData) => void
+}
+
+/**
+ * Génère les options de calendrier avec traductions
+ */
+export function getCalendarOptions(event: CalendarEventData, t: any): CalendarOption[] {
+  return [
+    {
+      label: t('calendar.google_calendar') || 'Google Calendar',
+      icon: 'i-heroicons-calendar',
+      action: () => {
+        window.open(generateGoogleCalendarLink(event), '_blank')
+      },
+    },
+    {
+      label: t('calendar.outlook_calendar') || 'Outlook Calendar',
+      icon: 'i-heroicons-calendar',
+      action: () => {
+        window.open(generateOutlookCalendarLink(event), '_blank')
+      },
+    },
+    {
+      label: t('calendar.download_ics') || 'Télécharger (.ics)',
+      icon: 'i-heroicons-arrow-down-tray',
+      action: () => {
+        const link = document.createElement('a')
+        link.href = generateIcsFile(event)
+        link.download = `${event.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.ics`
+        link.click()
+      },
+    },
+  ]
+}

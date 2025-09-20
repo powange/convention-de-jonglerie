@@ -31,8 +31,8 @@
                   <span>{{ formatDateRange(edition.startDate, edition.endDate) }}</span>
                 </div>
 
-                <!-- Bouton En savoir plus -->
-                <div class="mt-3">
+                <!-- Boutons actions -->
+                <div class="mt-3 flex flex-wrap gap-2">
                   <UButton
                     variant="ghost"
                     size="sm"
@@ -42,6 +42,17 @@
                   >
                     {{ $t('editions.learn_more_about_convention') }}
                   </UButton>
+
+                  <UDropdownMenu :items="calendarOptions">
+                    <UButton
+                      variant="ghost"
+                      size="sm"
+                      icon="material-symbols:calendar-add-on"
+                      color="neutral"
+                    >
+                      {{ $t('calendar.add_to_calendar') }}
+                    </UButton>
+                  </UDropdownMenu>
                 </div>
               </div>
 
@@ -254,6 +265,7 @@ import { computed, ref } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition } from '~/types'
+import { getCalendarOptions, type CalendarEventData } from '~/utils/calendar'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { markdownToHtml } from '~/utils/markdown'
 
@@ -377,6 +389,44 @@ const getPageTitle = (page: string) => {
   }
   return titles[page] || t('editions.about_this_edition')
 }
+
+// Données de l'événement pour le calendrier
+const calendarEventData = computed<CalendarEventData>(() => {
+  const editionName = getEditionDisplayName(props.edition)
+  const conventionName = props.edition.convention?.name || ''
+
+  // Construire une adresse complète pour le calendrier
+  const locationParts = []
+  if (props.edition.addressLine1) locationParts.push(props.edition.addressLine1)
+  if (props.edition.addressLine2) locationParts.push(props.edition.addressLine2)
+  if (props.edition.postalCode) locationParts.push(props.edition.postalCode)
+  if (props.edition.city) locationParts.push(props.edition.city)
+  if (props.edition.region) locationParts.push(props.edition.region)
+  if (props.edition.country) locationParts.push(props.edition.country)
+
+  const location = locationParts.join(', ')
+
+  return {
+    title: editionName,
+    description: `${conventionName} - ${editionName}`,
+    location,
+    startDate: props.edition.startDate,
+    endDate: props.edition.endDate,
+    url: import.meta.client
+      ? `${window.location.origin}/editions/${props.edition.id}`
+      : `https://convention-de-jonglerie.fr/editions/${props.edition.id}`,
+  }
+})
+
+// Options de calendrier
+const calendarOptions = computed(() => {
+  const options = getCalendarOptions(calendarEventData.value, t)
+  return options.map((option) => ({
+    label: option.label,
+    icon: option.icon,
+    onSelect: option.action,
+  }))
+})
 
 // Gérer la revendication réussie
 const handleConventionClaimed = async () => {

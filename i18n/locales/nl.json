@@ -358,9 +358,13 @@
     "verifying": "Verifiëren..."
   },
   "calendar": {
+    "add_to_calendar": "Toevoegen aan kalender",
     "day": "Dag",
+    "download_ics": "Downloaden (.ics)",
+    "google_calendar": "Google Calendar",
     "list": "Lijst",
     "month": "Maand",
+    "outlook_calendar": "Outlook Calendar",
     "today": "Vandaag",
     "week": "Week"
   },
@@ -1736,13 +1740,6 @@
     }
   },
   "seo": {
-    "organization": {
-      "description": "Collaboratief platform gewijd aan de jongleer gemeenschap, dat de ontdekking en organisatie van jongleer evenementen in Frankrijk en Europa vergemakkelijkt."
-    },
-    "search_action": {
-      "name": "Zoek naar een conventie",
-      "description": "Zoek naar jongleer conventies op naam, locatie of organisator"
-    },
     "carpool": {
       "description": "Organiseer uw carpoolrit voor {name} van {convention}. Vind reisgenoten of bied uw vrije plaatsen aan voor {date} in {location}.",
       "keywords": "carpool, vervoer, {convention}, {location}, delen, economisch, milieuvriendelijk",
@@ -1756,7 +1753,6 @@
       "description": "Ontdek {name} van {convention} die plaatsvindt {date} in {location}. Informatie, programma en inschrijving voor deze jongleerconventie.",
       "keywords": "jongleren, conventie, {convention}, {location}, evenement, festival, show, workshop",
       "og_description": "Doe mee met ons voor {name} - {date}. Programma, workshops en jongleer-shows.",
-      "og_title": "{name} - Jongleerconventie",
       "title": "{name}",
       "twitter_description": "{name} - {date}. Ontdek het programma van deze jongleerconventie.",
       "twitter_title": "{name} - Jongleerconventie"
@@ -1769,6 +1765,13 @@
       "title": "Jongleerconventies",
       "twitter_description": "Ontdek de komende jongleerconventies en sluit je aan bij de jongleergemeenschap.",
       "twitter_title": "Jongleerconventie - Jongleerevenementen"
+    },
+    "organization": {
+      "description": "Collaboratief platform gewijd aan de jongleer gemeenschap, dat de ontdekking en organisatie van jongleer evenementen in Frankrijk en Europa vergemakkelijkt."
+    },
+    "search_action": {
+      "description": "Zoek naar jongleer conventies op naam, locatie of organisator",
+      "name": "Zoek naar een conventie"
     },
     "site_description": "Vind en beheer uw favoriete jongleerconventies. Collaboratief platform voor jongleurs en evenementorganisatoren.",
     "site_name": "Jongleerconventie",
