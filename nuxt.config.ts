@@ -193,10 +193,27 @@ export default defineNuxtConfig({
       '/auth/**',
       '/profile',
       '/my-**',
+      '/favorites',
+      '/notifications',
       '/api/**',
     ],
     // Inclure les routes dynamiques importantes
     sources: ['/api/__sitemap__/editions'],
+    // Définir explicitement les routes autorisées
+    urls: [
+      {
+        loc: '/',
+        lastmod: new Date(),
+        changefreq: 'daily',
+        priority: 1.0,
+      },
+      {
+        loc: '/privacy-policy',
+        lastmod: new Date(),
+        changefreq: 'monthly',
+        priority: 0.3,
+      },
+    ],
   },
 
   ogImage: {
