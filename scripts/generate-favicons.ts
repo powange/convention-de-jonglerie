@@ -40,7 +40,7 @@ async function run() {
   ]
 
   // Couleur de fond oklch(20.8% 0.042 265.755) convertie en RGB
-  const backgroundColorRgb = { r: 44, g: 50, b: 68 } // Approximation RGB de la couleur oklch
+  const backgroundColorRgb = { r: 15, g: 23, b: 42 } // Approximation RGB de la couleur oklch
 
   await Promise.all(
     specialFiles.map(async ({ size, name, needsBackground }) => {
