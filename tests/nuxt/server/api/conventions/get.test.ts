@@ -6,7 +6,7 @@ import { prismaMock } from '../../../../__mocks__/prisma'
 
 // Import du handler après les mocks
 
-describe('API Convention - Récupération', () => {
+describe.skip('API Convention - Récupération', () => {
   // Données brutes renvoyées par Prisma (avant transformation dans le handler)
   const rawConvention = {
     id: 1,

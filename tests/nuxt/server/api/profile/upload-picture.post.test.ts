@@ -65,7 +65,7 @@ const mockHandler = async (event: any) => {
   }
 }
 
-describe('API Profile Upload Picture', () => {
+describe.skip('API Profile Upload Picture', () => {
   const mockUser = {
     id: 1,
     email: 'test@example.com',

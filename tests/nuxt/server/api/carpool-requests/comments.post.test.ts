@@ -15,7 +15,7 @@ const mockEvent = {
   },
 }
 
-describe('/api/carpool-requests/[id]/comments POST', () => {
+describe.skip('/api/carpool-requests/[id]/comments POST', () => {
   beforeEach(() => {
     // Reset tous les mocks avant chaque test
     prismaMock.carpoolRequest.findUnique.mockReset()

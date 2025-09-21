@@ -1,23 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Mock du module prisma
-const mockPrisma = {
-  user: {
-    findUnique: vi.fn(),
-  },
-  edition: {
-    findUnique: vi.fn(),
-  },
-}
-
+// Mock du module prisma avec fonction factory pour éviter le hoisting
 vi.mock('../../../../server/utils/prisma', () => ({
-  prisma: mockPrisma,
+  prisma: {
+    user: {
+      findUnique: vi.fn(),
+    },
+    edition: {
+      findUnique: vi.fn(),
+    },
+  },
 }))
 
-// Import des fonctions après les mocks
-const { hasEditionEditPermission, hasEditionDeletePermission } = await import(
-  '../../../../server/utils/permissions'
-)
+import {
+  hasEditionEditPermission,
+  hasEditionDeletePermission,
+} from '../../../../server/utils/permissions'
+import { prisma } from '../../../../server/utils/prisma'
+
+// Récupérer les mocks pour les utiliser dans les tests
+const mockPrisma = prisma as any
 
 describe('Permissions', () => {
   beforeEach(() => {

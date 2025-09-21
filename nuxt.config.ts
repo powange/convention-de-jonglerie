@@ -178,17 +178,16 @@ export default defineNuxtConfig({
   // Configuration des modules SEO
   robots: {
     // Permettre l'indexation uniquement sur le domaine principal en production
-    disallow: process.env.NUXT_ENV === 'staging' ||
-              process.env.NUXT_ENV === 'release'
-              ? ['/'] : [],
+    disallow: process.env.NUXT_ENV === 'staging' || process.env.NUXT_ENV === 'release' ? ['/'] : [],
     sitemap: '/sitemap.xml',
   },
 
   sitemap: {
     // Désactiver le sitemap sur les environnements non-production
-    enabled: process.env.NODE_ENV === 'production' &&
-             process.env.NUXT_ENV !== 'staging' &&
-             process.env.NUXT_ENV !== 'release',
+    enabled:
+      process.env.NODE_ENV === 'production' &&
+      process.env.NUXT_ENV !== 'staging' &&
+      process.env.NUXT_ENV !== 'release',
     // Exclure certaines routes du sitemap
     exclude: [
       '/admin/**',
@@ -224,8 +223,8 @@ export default defineNuxtConfig({
   },
 
   ogImage: {
-    // Active la génération d'images OG
-    enabled: true,
+    // Active la génération d'images OG seulement si SSR est disponible
+    enabled: process.env.NODE_ENV !== 'test',
     defaults: {
       // Utilise le logo comme fallback
       component: 'NuxtSeo',

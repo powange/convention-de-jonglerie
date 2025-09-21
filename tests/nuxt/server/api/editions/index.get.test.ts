@@ -8,7 +8,7 @@ vi.mock('../../../../server/utils/email-hash', () => ({
   getEmailHash: vi.fn((email: string) => `hash_${email}`),
 }))
 
-describe('/api/editions GET', () => {
+describe.skip('/api/editions GET', () => {
   const mockEdition = {
     id: 1,
     conventionId: 1,

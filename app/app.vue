@@ -291,10 +291,12 @@ onMounted(async () => {
 // Configuration SEO conditionnelle pour empêcher l'indexation en staging/release
 const shouldDisallowIndexing = computed(() => {
   if (import.meta.server) {
-    return process.env.NODE_ENV !== 'production' ||
-           process.env.NUXT_ENV === 'staging' ||
-           process.env.NUXT_ENV === 'release' ||
-           !process.env.NUXT_PUBLIC_SITE_URL?.includes('juggling-convention.com')
+    return (
+      process.env.NODE_ENV !== 'production' ||
+      process.env.NUXT_ENV === 'staging' ||
+      process.env.NUXT_ENV === 'release' ||
+      !process.env.NUXT_PUBLIC_SITE_URL?.includes('juggling-convention.com')
+    )
   }
   return false
 })
@@ -302,7 +304,7 @@ const shouldDisallowIndexing = computed(() => {
 // Ajouter meta robots si nécessaire
 if (shouldDisallowIndexing.value) {
   useSeoMeta({
-    robots: 'noindex, nofollow, noarchive, nosnippet, noimageindex'
+    robots: 'noindex, nofollow, noarchive, nosnippet, noimageindex',
   })
 }
 

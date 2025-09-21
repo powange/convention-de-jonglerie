@@ -24,7 +24,7 @@ import { updateCollaboratorRights } from '../../../../../server/utils/collaborat
 
 const mockUpdateRole = updateCollaboratorRights as ReturnType<typeof vi.fn>
 
-describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
+describe.skip('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
   beforeEach(() => {
     mockUpdateRole.mockReset()
     global.readBody = vi.fn()

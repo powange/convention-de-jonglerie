@@ -402,8 +402,6 @@ const formatRelativeTime = (date: string) => {
 }
 
 const getUserActions = (user: AdminUser) => {
-  console.log('Creating actions for user:', user.pseudo)
-
   const actions: any[] = [
     // Action pour voir le profil
     {
