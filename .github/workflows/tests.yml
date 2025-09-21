@@ -18,7 +18,7 @@ env:
 jobs:
   # Job pour installer les dépendances une seule fois
   setup:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     outputs:
       deps-cache-key: ${{ steps.cache-keys.outputs.deps }}
@@ -34,6 +34,9 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
 
       - name: Generate cache keys
         id: cache-keys
@@ -98,7 +101,7 @@ jobs:
 
   # Job pour le linting (rapide, pas besoin de DB)
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 5
     needs: setup
 
@@ -110,6 +113,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
 
       - name: Restore Node dependencies
         uses: actions/cache@v4
@@ -139,7 +144,7 @@ jobs:
 
   # Job pour valider que le build fonctionne
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     needs: setup
 
@@ -151,6 +156,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
 
       - name: Restore Node dependencies
         uses: actions/cache@v4
@@ -183,7 +190,7 @@ jobs:
 
   # Tests en parallèle avec matrice
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 15
     needs: [setup, lint, build] # Attendre setup, lint et build avant de lancer les tests
 
@@ -198,7 +205,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:8.0
+        image: ${{ matrix.test-group.db && 'mysql:8.0' || '' }}
         env:
           MYSQL_ROOT_PASSWORD: rootpassword
           MYSQL_DATABASE: convention_db_test
@@ -220,6 +227,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
 
       - name: Restore Node dependencies
         uses: actions/cache@v4
@@ -265,7 +274,7 @@ jobs:
           retention-days: 7
 
       - name: Upload coverage reports
-        if: always()
+        if: always() && (matrix.test-group.name == 'unit' || matrix.test-group.name == 'database')
         uses: actions/upload-artifact@v4
         with:
           name: coverage-reports-${{ matrix.test-group.name }}-${{ github.run_id }}
