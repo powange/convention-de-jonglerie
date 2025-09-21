@@ -17,7 +17,7 @@ describe('/api/admin/error-logs GET', () => {
       userId: 1,
       resolved: false,
       createdAt: new Date(),
-      resolvedAt: null
+      resolvedAt: null,
     }
 
     expect(mockErrorLog).toHaveProperty('id')
@@ -32,7 +32,7 @@ describe('/api/admin/error-logs GET', () => {
       total: 0,
       page: 1,
       limit: 10,
-      totalPages: 0
+      totalPages: 0,
     }
 
     expect(mockResponse).toHaveProperty('logs')

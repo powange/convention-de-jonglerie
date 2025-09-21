@@ -13,7 +13,7 @@ describe('/api/files/convention POST', () => {
       name: 'convention.jpg',
       filename: 'convention.jpg',
       type: 'image/jpeg',
-      data: Buffer.from('fake image data')
+      data: Buffer.from('fake image data'),
     }
 
     expect(mockImageFile).toHaveProperty('name')
@@ -27,7 +27,7 @@ describe('/api/files/convention POST', () => {
       name: 'programme.pdf',
       filename: 'programme.pdf',
       type: 'application/pdf',
-      data: Buffer.from('fake pdf data')
+      data: Buffer.from('fake pdf data'),
     }
 
     expect(mockDocFile).toHaveProperty('name')
@@ -46,12 +46,14 @@ describe('/api/files/convention POST', () => {
 
   it('smoke test: structure de réponse', () => {
     const mockResponse = {
-      results: [{
-        originalName: 'convention.jpg',
-        success: true,
-        url: '/uploads/convention/123/convention.jpg',
-        type: 'poster'
-      }]
+      results: [
+        {
+          originalName: 'convention.jpg',
+          success: true,
+          url: '/uploads/convention/123/convention.jpg',
+          type: 'poster',
+        },
+      ],
     }
 
     expect(mockResponse).toHaveProperty('results')

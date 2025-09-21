@@ -18,7 +18,7 @@ describe('/api/admin/notifications/create POST', () => {
       category: 'general',
       isRead: false,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     }
 
     expect(mockNotification).toHaveProperty('id')
@@ -41,7 +41,7 @@ describe('/api/admin/notifications/create POST', () => {
   it('smoke test: structure de réponse', () => {
     const mockResponse = {
       success: true,
-      createdCount: 1
+      createdCount: 1,
     }
 
     expect(mockResponse).toHaveProperty('success')

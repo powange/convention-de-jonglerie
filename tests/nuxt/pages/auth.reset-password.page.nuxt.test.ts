@@ -9,4 +9,4 @@ describe('Page auth/reset-password', () => {
     // La logique complète est testée dans les tests d'intégration
     expect(true).toBe(true)
   })
-}) 
+})

@@ -17,7 +17,7 @@ describe('/api/carpool-offers/[id]/bookings POST', () => {
       status: 'PENDING',
       message: 'Je souhaiterais rejoindre votre covoiturage',
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     }
 
     expect(mockBooking).toHaveProperty('id')
@@ -40,12 +40,12 @@ describe('/api/carpool-offers/[id]/bookings POST', () => {
     const validSeats = [1, 2, 3, 4]
     const invalidSeats = [0, -1, 5, 10]
 
-    validSeats.forEach(seats => {
+    validSeats.forEach((seats) => {
       expect(seats).toBeGreaterThan(0)
       expect(seats).toBeLessThanOrEqual(4)
     })
 
-    invalidSeats.forEach(seats => {
+    invalidSeats.forEach((seats) => {
       expect(seats <= 0 || seats > 4).toBe(true)
     })
   })
@@ -57,9 +57,9 @@ describe('/api/carpool-offers/[id]/bookings POST', () => {
         carpoolOfferId: 1,
         userId: 2,
         requestedSeats: 2,
-        status: 'PENDING'
+        status: 'PENDING',
       },
-      message: 'Réservation créée avec succès'
+      message: 'Réservation créée avec succès',
     }
 
     expect(mockResponse).toHaveProperty('booking')
@@ -72,12 +72,12 @@ describe('/api/carpool-offers/[id]/bookings POST', () => {
     const requiredFields = ['carpoolOfferId', 'requestedSeats']
     const optionalFields = ['message', 'requestId']
 
-    requiredFields.forEach(field => {
+    requiredFields.forEach((field) => {
       expect(typeof field).toBe('string')
       expect(field.length).toBeGreaterThan(0)
     })
 
-    optionalFields.forEach(field => {
+    optionalFields.forEach((field) => {
       expect(typeof field).toBe('string')
     })
   })

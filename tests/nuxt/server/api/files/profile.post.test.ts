@@ -13,7 +13,7 @@ describe('/api/files/profile POST', () => {
       name: 'profile.jpg',
       filename: 'profile.jpg',
       type: 'image/jpeg',
-      data: Buffer.from('fake image data')
+      data: Buffer.from('fake image data'),
     }
 
     expect(mockFile).toHaveProperty('name')
@@ -33,11 +33,13 @@ describe('/api/files/profile POST', () => {
 
   it('smoke test: structure de réponse', () => {
     const mockResponse = {
-      results: [{
-        originalName: 'profile.jpg',
-        success: true,
-        url: '/uploads/profile/1/profile.jpg'
-      }]
+      results: [
+        {
+          originalName: 'profile.jpg',
+          success: true,
+          url: '/uploads/profile/1/profile.jpg',
+        },
+      ],
     }
 
     expect(mockResponse).toHaveProperty('results')
