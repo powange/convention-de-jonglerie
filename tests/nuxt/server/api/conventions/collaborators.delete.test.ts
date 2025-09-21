@@ -22,7 +22,7 @@ const mockEvent = {
 }
 const mockDeleteCollaborator = deleteConventionCollaborator as ReturnType<typeof vi.fn>
 
-describe.skip('/api/conventions/[id]/collaborators/[collaboratorId] DELETE', () => {
+describe('/api/conventions/[id]/collaborators/[collaboratorId] DELETE', () => {
   beforeEach(() => {
     mockDeleteCollaborator.mockReset()
   })

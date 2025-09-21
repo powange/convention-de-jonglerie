@@ -24,7 +24,7 @@ const mockUsedToken = {
   used: true,
 }
 
-describe.skip('/api/auth/verify-reset-token GET', () => {
+describe('/api/auth/verify-reset-token GET', () => {
   beforeEach(() => {
     prismaMock.passwordResetToken.findUnique.mockReset()
     global.getQuery = vi.fn()

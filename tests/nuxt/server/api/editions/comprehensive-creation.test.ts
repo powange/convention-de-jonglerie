@@ -15,7 +15,7 @@ vi.mock('../../../../../server/utils/move-temp-image', () => ({
   moveTempImageToEdition: vi.fn().mockResolvedValue('/uploads/editions/1/image.jpg'),
 }))
 
-describe.skip('/api/editions POST - Tests complets', () => {
+describe('/api/editions POST - Tests complets', () => {
   const mockUser = {
     id: 1,
     email: 'user@example.com',
@@ -69,7 +69,7 @@ describe.skip('/api/editions POST - Tests complets', () => {
     vi.mocked(moveTempImageToEdition).mockResolvedValue('/uploads/editions/1/image.jpg')
   })
 
-  describe.skip('Validation des données', () => {
+  describe('Validation des données', () => {
     it('devrait valider tous les champs requis', async () => {
       const requiredFieldsCases = [
         { field: 'postalCode', value: null },
@@ -153,7 +153,7 @@ describe.skip('/api/editions POST - Tests complets', () => {
     })
   })
 
-  describe.skip('Services et options', () => {
+  describe('Services et options', () => {
     it('devrait gérer tous les services possibles', async () => {
       const allServices = {
         conventionId: 1,
@@ -278,7 +278,7 @@ describe.skip('/api/editions POST - Tests complets', () => {
     })
   })
 
-  describe.skip('Liens externes et réseaux sociaux', () => {
+  describe('Liens externes et réseaux sociaux', () => {
     it('devrait valider et sauvegarder les liens externes', async () => {
       const dataWithLinks = {
         conventionId: 1,
@@ -339,7 +339,7 @@ describe.skip('/api/editions POST - Tests complets', () => {
     })
   })
 
-  describe.skip('Permissions et autorisation', () => {
+  describe('Permissions et autorisation', () => {
     it('devrait permettre au créateur de la convention', async () => {
       const editionData = {
         conventionId: 1,
@@ -463,7 +463,7 @@ describe.skip('/api/editions POST - Tests complets', () => {
     })
   })
 
-  describe.skip('Gestion des erreurs système', () => {
+  describe('Gestion des erreurs système', () => {
     it('devrait gérer les erreurs de base de données', async () => {
       prismaMock.convention.findUnique.mockRejectedValue(new Error('DB Connection failed'))
 
@@ -536,7 +536,7 @@ describe.skip('/api/editions POST - Tests complets', () => {
     })
   })
 
-  describe.skip('Cas limites et edge cases', () => {
+  describe('Cas limites et edge cases', () => {
     it('devrait gérer les caractères spéciaux dans les noms', async () => {
       vi.clearAllMocks()
       const specialCharsData = {

@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import handler from '../../../../../../server/api/editions/[id]/volunteers/info.get'
 import { prismaMock } from '../../../../../__mocks__/prisma'
 
-describe.skip('/api/editions/[id]/volunteers/info GET', () => {
+describe('/api/editions/[id]/volunteers/info GET', () => {
   const mockUser = {
     id: 1,
     email: 'user@example.com',
@@ -63,7 +63,7 @@ describe.skip('/api/editions/[id]/volunteers/info GET', () => {
     prismaMock.volunteerTeam.findMany.mockResolvedValue(mockVolunteerTeams)
   })
 
-  describe.skip('Mode INTERNAL', () => {
+  describe('Mode INTERNAL', () => {
     it('devrait retourner toutes les informations pour le mode interne', async () => {
       prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
 
@@ -152,7 +152,7 @@ describe.skip('/api/editions/[id]/volunteers/info GET', () => {
     })
   })
 
-  describe.skip('Mode EXTERNAL', () => {
+  describe('Mode EXTERNAL', () => {
     it('devrait retourner les informations pour le mode externe', async () => {
       const externalEdition = {
         ...mockEdition,
@@ -213,7 +213,7 @@ describe.skip('/api/editions/[id]/volunteers/info GET', () => {
     })
   })
 
-  describe.skip('Mode CLOSED', () => {
+  describe('Mode CLOSED', () => {
     it('devrait retourner les informations pour le mode fermé', async () => {
       const closedEdition = {
         ...mockEdition,
@@ -274,7 +274,7 @@ describe.skip('/api/editions/[id]/volunteers/info GET', () => {
     })
   })
 
-  describe.skip('Gestion des équipes', () => {
+  describe('Gestion des équipes', () => {
     it('devrait retourner les équipes avec leurs maxVolunteers', async () => {
       const customVolunteerTeams = [
         {
@@ -377,7 +377,7 @@ describe.skip('/api/editions/[id]/volunteers/info GET', () => {
     })
   })
 
-  describe.skip('Dates et horaires', () => {
+  describe('Dates et horaires', () => {
     it('devrait formater correctement les dates ISO', async () => {
       const editionWithDates = {
         ...mockEdition,
@@ -411,7 +411,7 @@ describe.skip('/api/editions/[id]/volunteers/info GET', () => {
     })
   })
 
-  describe.skip('Descriptions et textes', () => {
+  describe('Descriptions et textes', () => {
     it('devrait retourner la description complète', async () => {
       const editionWithLongDescription = {
         ...mockEdition,
@@ -463,7 +463,7 @@ describe.skip('/api/editions/[id]/volunteers/info GET', () => {
     })
   })
 
-  describe.skip('Cas limites et erreurs', () => {
+  describe('Cas limites et erreurs', () => {
     it("devrait gérer l'édition inexistante", async () => {
       prismaMock.edition.findUnique.mockResolvedValue(null)
 
@@ -514,7 +514,7 @@ describe.skip('/api/editions/[id]/volunteers/info GET', () => {
     })
   })
 
-  describe.skip('Performances et optimisation', () => {
+  describe('Performances et optimisation', () => {
     it('devrait utiliser select pour optimiser les requêtes', async () => {
       prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
 
@@ -572,7 +572,7 @@ describe.skip('/api/editions/[id]/volunteers/info GET', () => {
     })
   })
 
-  describe.skip('Sécurité et données sensibles', () => {
+  describe('Sécurité et données sensibles', () => {
     it("ne devrait pas exposer d'informations sensibles", async () => {
       const editionWithSensitiveData = {
         ...mockEdition,

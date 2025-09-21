@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { prismaMock } from '../../../__mocks__/prisma'
 
-describe.skip('Tests du mode admin', () => {
+describe('Tests du mode admin', () => {
   const adminUser = {
     id: 1,
     email: 'admin@example.com',
@@ -27,7 +27,7 @@ describe.skip('Tests du mode admin', () => {
     vi.clearAllMocks()
   })
 
-  describe.skip('Vérification des permissions admin', () => {
+  describe('Vérification des permissions admin', () => {
     it('devrait permettre accès aux admins globaux', async () => {
       prismaMock.user.findUnique.mockResolvedValue(adminUser)
 
@@ -54,7 +54,7 @@ describe.skip('Tests du mode admin', () => {
     })
   })
 
-  describe.skip('Gestion des utilisateurs', () => {
+  describe('Gestion des utilisateurs', () => {
     it('devrait permettre de lister tous les utilisateurs', async () => {
       const mockUsers = [adminUser, regularUser]
       prismaMock.user.findMany.mockResolvedValue(mockUsers)
@@ -142,7 +142,7 @@ describe.skip('Tests du mode admin', () => {
     })
   })
 
-  describe.skip('Gestion des conventions', () => {
+  describe('Gestion des conventions', () => {
     const mockConvention = {
       id: 1,
       name: 'Convention Test',
@@ -224,7 +224,7 @@ describe.skip('Tests du mode admin', () => {
     })
   })
 
-  describe.skip('Gestion des éditions', () => {
+  describe('Gestion des éditions', () => {
     const mockEdition = {
       id: 1,
       startDate: new Date('2024-06-01'),
@@ -306,7 +306,7 @@ describe.skip('Tests du mode admin', () => {
     })
   })
 
-  describe.skip('Statistiques admin', () => {
+  describe('Statistiques admin', () => {
     it('devrait calculer les statistiques des utilisateurs', async () => {
       // Mock des différents appels de count
       prismaMock.user.count
@@ -365,7 +365,7 @@ describe.skip('Tests du mode admin', () => {
     })
   })
 
-  describe.skip('Validation des données admin', () => {
+  describe('Validation des données admin', () => {
     it('devrait valider les données avant modification', async () => {
       const invalidUserData = {
         email: 'invalid-email',
@@ -399,7 +399,7 @@ describe.skip('Tests du mode admin', () => {
     })
   })
 
-  describe.skip('Logs et audit admin', () => {
+  describe('Logs et audit admin', () => {
     it('devrait enregistrer les actions admin', async () => {
       const adminAction = {
         adminId: 1,

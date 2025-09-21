@@ -8,7 +8,7 @@ vi.mock('../../../../../../server/utils/collaborator-management', () => ({
   canManageEditionVolunteers: vi.fn().mockResolvedValue(true),
 }))
 
-describe.skip('/api/editions/[id]/volunteers/settings PATCH', () => {
+describe('/api/editions/[id]/volunteers/settings PATCH', () => {
   const mockUser = {
     id: 1,
     email: 'user@example.com',
@@ -59,7 +59,7 @@ describe.skip('/api/editions/[id]/volunteers/settings PATCH', () => {
     global.getRouterParam = vi.fn().mockReturnValue('1')
   })
 
-  describe.skip('Mode de gestion des bénévoles', () => {
+  describe('Mode de gestion des bénévoles', () => {
     it('devrait permettre de passer en mode interne', async () => {
       const updateData = {
         mode: 'INTERNAL',
@@ -149,7 +149,7 @@ describe.skip('/api/editions/[id]/volunteers/settings PATCH', () => {
     })
   })
 
-  describe.skip('Validation des données', () => {
+  describe('Validation des données', () => {
     it('devrait valider les URLs externes', async () => {
       const invalidUrls = [
         'not-a-url',
@@ -375,7 +375,7 @@ describe.skip('/api/editions/[id]/volunteers/settings PATCH', () => {
     })
   })
 
-  describe.skip('Options de candidature', () => {
+  describe('Options de candidature', () => {
     it('devrait configurer toutes les options de candidature', async () => {
       const fullOptions = {
         mode: 'INTERNAL',
@@ -467,7 +467,7 @@ describe.skip('/api/editions/[id]/volunteers/settings PATCH', () => {
   // Les équipes sont maintenant gérées via le système VolunteerTeam
   // et non plus via l'API settings.patch.ts
 
-  describe.skip('Permissions', () => {
+  describe('Permissions', () => {
     it("devrait permettre au créateur de l'édition", async () => {
       const updateData = { mode: 'INTERNAL' }
 
@@ -568,7 +568,7 @@ describe.skip('/api/editions/[id]/volunteers/settings PATCH', () => {
     })
   })
 
-  describe.skip('Cas limites et erreurs', () => {
+  describe('Cas limites et erreurs', () => {
     it("devrait gérer l'édition inexistante", async () => {
       prismaMock.edition.findUnique.mockResolvedValue(null)
 

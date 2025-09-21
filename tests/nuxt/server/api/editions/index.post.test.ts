@@ -15,7 +15,7 @@ vi.mock('../../../../../server/utils/move-temp-image', () => ({
   moveTempImageToEdition: vi.fn().mockResolvedValue('/uploads/editions/1/image.jpg'),
 }))
 
-describe.skip('/api/editions POST', () => {
+describe('/api/editions POST', () => {
   const mockUser = {
     id: 1,
     email: 'user@example.com',

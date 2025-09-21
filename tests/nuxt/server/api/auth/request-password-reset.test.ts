@@ -14,7 +14,7 @@ vi.mock('../../../../server/utils/emailService', () => ({
   generatePasswordResetEmailHtml: vi.fn().mockReturnValue('<html>Reset link</html>'),
 }))
 
-describe.skip('API Request Password Reset', () => {
+describe('API Request Password Reset', () => {
   const mockUser = {
     id: 1,
     email: 'test@example.com',

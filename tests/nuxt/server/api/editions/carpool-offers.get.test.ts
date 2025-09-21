@@ -33,7 +33,7 @@ const mockPrisma = prisma as { carpoolOffer: { findMany: ReturnType<typeof vi.fn
 const mockCreateError = createError as ReturnType<typeof vi.fn>
 const mockDefineEventHandler = defineEventHandler as ReturnType<typeof vi.fn>
 
-describe.skip('GET /api/editions/[id]/carpool-offers', () => {
+describe('GET /api/editions/[id]/carpool-offers', () => {
   const mockEvent = {
     context: {
       params: {

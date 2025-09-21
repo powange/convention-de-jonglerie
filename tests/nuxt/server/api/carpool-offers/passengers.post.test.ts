@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-describe.skip('/api/carpool-offers/[id]/passengers POST (deprecated)', () => {
+describe('/api/carpool-offers/[id]/passengers POST (deprecated)', () => {
   it('retourne une erreur 410 - endpoint retiré', async () => {
     const { default: handler } = await import(
       '../../../../../server/api/carpool-offers/[id]/passengers.post'

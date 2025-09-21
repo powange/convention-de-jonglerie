@@ -17,7 +17,7 @@ const baseEvent = {
   },
 }
 
-describe.skip('/api/conventions/[id]/editions GET', () => {
+describe('/api/conventions/[id]/editions GET', () => {
   beforeEach(() => {
     mockCheck.mockReset()
     prismaMock.edition.findMany.mockReset()

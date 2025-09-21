@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import handler from '../../../../../../server/api/editions/[id]/volunteers/apply.post'
 import { prismaMock } from '../../../../../__mocks__/prisma'
 
-describe.skip('/api/editions/[id]/volunteers/apply POST', () => {
+describe('/api/editions/[id]/volunteers/apply POST', () => {
   const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
   const dayAfterTomorrow = new Date(Date.now() + 48 * 60 * 60 * 1000)
 
@@ -59,7 +59,7 @@ describe.skip('/api/editions/[id]/volunteers/apply POST', () => {
     prismaMock.volunteerTeam.findMany.mockResolvedValue(mockVolunteerTeams)
   })
 
-  describe.skip('Candidature basique', () => {
+  describe('Candidature basique', () => {
     it('devrait créer une candidature simple avec succès', async () => {
       const applicationData = {
         motivation: 'Je souhaite aider pour cette magnifique convention',
@@ -179,7 +179,7 @@ describe.skip('/api/editions/[id]/volunteers/apply POST', () => {
     })
   })
 
-  describe.skip('Options avancées de candidature', () => {
+  describe('Options avancées de candidature', () => {
     it('devrait sauvegarder toutes les options avancées', async () => {
       const completeApplication = {
         motivation: 'Candidature complète',
@@ -295,7 +295,7 @@ describe.skip('/api/editions/[id]/volunteers/apply POST', () => {
     })
   })
 
-  describe.skip('Validation des données', () => {
+  describe('Validation des données', () => {
     beforeEach(() => {
       prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
@@ -575,7 +575,7 @@ describe.skip('/api/editions/[id]/volunteers/apply POST', () => {
     })
   })
 
-  describe.skip('Gestion des candidatures existantes', () => {
+  describe('Gestion des candidatures existantes', () => {
     it('devrait rejeter une nouvelle candidature si une existe déjà', async () => {
       const existingApplication = {
         ...mockApplication,
@@ -642,7 +642,7 @@ describe.skip('/api/editions/[id]/volunteers/apply POST', () => {
     })
   })
 
-  describe.skip('Modes de candidature', () => {
+  describe('Modes de candidature', () => {
     it('devrait rejeter si les candidatures sont fermées', async () => {
       const closedEdition = {
         ...mockEdition,
@@ -661,7 +661,7 @@ describe.skip('/api/editions/[id]/volunteers/apply POST', () => {
     })
   })
 
-  describe.skip('Validation des disponibilités', () => {
+  describe('Validation des disponibilités', () => {
     it('devrait respecter la sélection manuelle si montage ou démontage coché', async () => {
       const applicationData = {
         motivation: 'Je veux aider pour montage et événement',
@@ -693,7 +693,7 @@ describe.skip('/api/editions/[id]/volunteers/apply POST', () => {
     })
   })
 
-  describe.skip('Permissions et authentification', () => {
+  describe('Permissions et authentification', () => {
     it('devrait rejeter les utilisateurs non connectés', async () => {
       global.readBody.mockResolvedValue({
         motivation: 'Candidature anonyme',
@@ -727,7 +727,7 @@ describe.skip('/api/editions/[id]/volunteers/apply POST', () => {
     })
   })
 
-  describe.skip('Gestion des erreurs', () => {
+  describe('Gestion des erreurs', () => {
     it("devrait gérer l'édition inexistante", async () => {
       prismaMock.edition.findUnique.mockResolvedValue(null)
 

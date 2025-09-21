@@ -22,7 +22,7 @@ const mockEventWithoutUser = {
 
 const mockDeleteConventionImage = deleteConventionImage as ReturnType<typeof vi.fn>
 
-describe.skip('/api/conventions/[id]/delete-image DELETE', () => {
+describe('/api/conventions/[id]/delete-image DELETE', () => {
   beforeEach(() => {
     mockDeleteConventionImage.mockReset()
     global.getRouterParam = vi.fn()
@@ -41,7 +41,7 @@ describe.skip('/api/conventions/[id]/delete-image DELETE', () => {
     })
   })
 
-  describe.skip('Authentification', () => {
+  describe('Authentification', () => {
     it('devrait rejeter si utilisateur non authentifié', async () => {
       global.getRouterParam.mockReturnValue('1')
 
@@ -65,7 +65,7 @@ describe.skip('/api/conventions/[id]/delete-image DELETE', () => {
     })
   })
 
-  describe.skip('Validation des paramètres', () => {
+  describe('Validation des paramètres', () => {
     it('devrait rejeter si ID de convention invalide (non numérique)', async () => {
       global.getRouterParam.mockReturnValue('abc')
 
@@ -129,7 +129,7 @@ describe.skip('/api/conventions/[id]/delete-image DELETE', () => {
     })
   })
 
-  describe.skip('Sécurité et permissions', () => {
+  describe('Sécurité et permissions', () => {
     it('devrait vérifier les permissions via deleteConventionImage', async () => {
       global.getRouterParam.mockReturnValue('1')
 
@@ -184,7 +184,7 @@ describe.skip('/api/conventions/[id]/delete-image DELETE', () => {
     })
   })
 
-  describe.skip('Gestion des erreurs', () => {
+  describe('Gestion des erreurs', () => {
     it('devrait gérer les erreurs de base de données', async () => {
       global.getRouterParam.mockReturnValue('1')
 
@@ -235,7 +235,7 @@ describe.skip('/api/conventions/[id]/delete-image DELETE', () => {
     })
   })
 
-  describe.skip('Réponse de succès', () => {
+  describe('Réponse de succès', () => {
     it('devrait retourner la structure de réponse correcte', async () => {
       global.getRouterParam.mockReturnValue('1')
 
@@ -280,7 +280,7 @@ describe.skip('/api/conventions/[id]/delete-image DELETE', () => {
     })
   })
 
-  describe.skip('Cas limites', () => {
+  describe('Cas limites', () => {
     it("devrait gérer l'ID 1", async () => {
       global.getRouterParam.mockReturnValue('1')
 
@@ -338,7 +338,7 @@ describe.skip('/api/conventions/[id]/delete-image DELETE', () => {
     })
   })
 
-  describe.skip('Intégration avec utils/image-deletion', () => {
+  describe('Intégration avec utils/image-deletion', () => {
     it('devrait appeler deleteConventionImage avec les bons paramètres', async () => {
       global.getRouterParam.mockReturnValue('456')
 

@@ -44,7 +44,7 @@ const mockUpdatedItem = {
 const mockHasPermission = hasEditionEditPermission as ReturnType<typeof vi.fn>
 let mockRequireUserSession: ReturnType<typeof vi.fn>
 
-describe.skip('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
+describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
   beforeEach(async () => {
     mockHasPermission.mockReset()
     const importsMod: any = await import('#imports')

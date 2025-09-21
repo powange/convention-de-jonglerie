@@ -22,7 +22,7 @@ const mockEvent = {
 }
 const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
 
-describe.skip('/api/conventions/my-conventions GET', () => {
+describe('/api/conventions/my-conventions GET', () => {
   beforeEach(() => {
     prismaMock.convention.findMany.mockReset()
     mockGetEmailHash.mockReset()

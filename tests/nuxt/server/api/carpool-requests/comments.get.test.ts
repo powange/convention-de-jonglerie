@@ -18,7 +18,7 @@ const mockEvent = {
 }
 const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
 
-describe.skip('/api/carpool-requests/[id]/comments GET', () => {
+describe('/api/carpool-requests/[id]/comments GET', () => {
   beforeEach(() => {
     prismaMock.carpoolRequestComment.findMany.mockReset()
     mockGetEmailHash.mockReset()

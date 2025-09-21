@@ -60,7 +60,7 @@ const mockLostFoundItems = [
   },
 ]
 
-describe.skip('/api/editions/[id]/lost-found GET', () => {
+describe('/api/editions/[id]/lost-found GET', () => {
   beforeEach(() => {
     prismaMock.edition.findUnique.mockReset()
     prismaMock.lostFoundItem.findMany.mockReset()

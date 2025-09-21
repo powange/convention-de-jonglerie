@@ -17,7 +17,7 @@ const baseEvent = {
   },
 }
 
-describe.skip('/api/conventions/[id]/collaborators/history GET', () => {
+describe('/api/conventions/[id]/collaborators/history GET', () => {
   beforeEach(() => {
     mockCheck.mockReset()
     prismaMock.collaboratorPermissionHistory.findMany.mockReset()

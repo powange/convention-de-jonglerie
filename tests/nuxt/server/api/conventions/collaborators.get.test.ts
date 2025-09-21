@@ -23,7 +23,7 @@ const mockEvent = {
 }
 const mockCheckPermission = checkUserConventionPermission as ReturnType<typeof vi.fn>
 
-describe.skip('/api/conventions/[id]/collaborators GET', () => {
+describe('/api/conventions/[id]/collaborators GET', () => {
   beforeEach(() => {
     mockCheckPermission.mockReset()
     prismaMock.conventionCollaborator.findMany.mockReset()

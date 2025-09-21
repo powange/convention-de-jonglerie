@@ -23,7 +23,7 @@ vi.mock('fs/promises', () => ({
   readFile: vi.fn().mockResolvedValue(Buffer.from('fake-image-data')),
 }))
 
-describe.skip('/api/editions/[id] PUT', () => {
+describe('/api/editions/[id] PUT', () => {
   const mockUser = {
     id: 1,
     email: 'user@example.com',

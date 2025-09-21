@@ -66,7 +66,7 @@ const mockHandler = async (event: any) => {
 // Mock des fonctions globales
 global.readBody = vi.fn()
 
-describe.skip('API Profile Change Password', () => {
+describe('API Profile Change Password', () => {
   const mockUser = {
     id: 1,
     email: 'test@example.com',
