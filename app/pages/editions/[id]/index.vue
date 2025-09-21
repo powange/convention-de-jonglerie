@@ -39,177 +39,120 @@
       <!-- Contenu des détails en grille responsive -->
       <div class="grid xl:grid-cols-5 2xl:grid-cols-5 gap-6">
         <!-- Contenu principal "A propos de cette édition" -->
-        <div class="xl:col-span-4 2xl:col-span-4">
+        <div class="xl:col-span-4 2xl:col-span-4 flex flex-col space-y-6">
           <UCard variant="subtle">
-            <template #header>
-              <!-- Affiche de l'édition et description -->
-              <div class="flex flex-col sm:flex-row gap-6">
-                <div v-if="edition.imageUrl" class="flex-shrink-0 self-center sm:self-start">
-                  <img
-                    :src="getImageUrl(edition.imageUrl, 'edition', edition.id) || ''"
-                    :alt="t('editions.poster_of', { name: getEditionDisplayName(edition) })"
-                    class="w-full sm:w-48 h-auto max-w-xs object-contain rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
-                    @click="showImageOverlay = true"
-                  />
-                </div>
-                <div class="flex-1">
-                  <h3 class="text-lg font-semibold mb-2">
-                    {{ $t('editions.about_this_edition') }}
-                  </h3>
-                  <div
-                    v-if="edition.description && descriptionHtml"
-                    class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
-                  >
-                    <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <div v-html="descriptionHtml" />
-                  </div>
-                  <p v-else class="text-gray-700 dark:text-gray-300">
-                    {{ t('editions.no_description_available') }}
-                  </p>
-                </div>
+            <!-- Affiche de l'édition et description -->
+            <div class="flex flex-col sm:flex-row gap-6">
+              <div v-if="edition.imageUrl" class="flex-shrink-0 self-center sm:self-start">
+                <img
+                  :src="getImageUrl(edition.imageUrl, 'edition', edition.id) || ''"
+                  :alt="t('editions.poster_of', { name: getEditionDisplayName(edition) })"
+                  class="w-full sm:w-48 h-auto max-w-xs object-contain rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
+                  @click="showImageOverlay = true"
+                />
               </div>
-            </template>
-
-            <div class="space-y-6">
-              <!-- Informations pratiques -->
-              <div class="space-y-3">
-                <h3 class="text-lg font-semibold">{{ $t('editions.practical_info') }}</h3>
-                <p class="text-sm text-gray-600">
-                  <UIcon name="i-heroicons-map-pin" class="inline mr-1" />
-                  <a
-                    :href="getGoogleMapsUrl(edition)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
-                  >
-                    {{ edition.addressLine1
-                    }}<span v-if="edition.addressLine2">, {{ edition.addressLine2 }}</span
-                    >, {{ edition.postalCode }} {{ edition.city
-                    }}<span v-if="edition.region">, {{ edition.region }}</span
-                    >, {{ edition.country }}
-                  </a>
-                </p>
-                <p class="text-sm text-gray-600">
-                  <UIcon name="i-heroicons-calendar" class="inline mr-1" />
-                  {{ formatDateTimeRange(edition.startDate, edition.endDate) }}
-                </p>
-
-                <!-- Collaborateurs -->
-                <div v-if="getAllCollaborators(edition).length > 0" class="pt-2">
-                  <div class="flex items-center gap-2 mb-2">
-                    <UIcon name="i-heroicons-users" class="text-gray-400" />
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{
-                      $t('editions.organizing_team')
-                    }}</span>
-                  </div>
-                  <div class="flex flex-wrap gap-2">
-                    <div
-                      v-for="collaborator in getAllCollaborators(edition)"
-                      :key="collaborator.id"
-                      class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-full text-sm"
-                      :title="collaboratorTitleTooltip(collaborator)"
-                    >
-                      <UiUserAvatar :user="collaborator.user" size="xs" />
-                      <span class="text-gray-700 dark:text-gray-300">{{
-                        collaborator.pseudo
-                      }}</span>
-                      <UBadge
-                        v-if="displayCollaboratorBadge(collaborator)"
-                        size="xs"
-                        color="neutral"
-                        variant="soft"
-                      >
-                        {{ displayCollaboratorBadge(collaborator) }}
-                      </UBadge>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Liens externes -->
-              <div
-                v-if="
-                  edition.officialWebsiteUrl ||
-                  edition.ticketingUrl ||
-                  edition.facebookUrl ||
-                  edition.instagramUrl
-                "
-                class="space-y-2"
-              >
-                <h3 class="text-lg font-semibold">{{ $t('editions.useful_links') }}</h3>
-                <div class="flex gap-2">
-                  <UButton
-                    v-if="edition.officialWebsiteUrl"
-                    icon="i-heroicons-globe-alt"
-                    :to="edition.officialWebsiteUrl"
-                    target="_blank"
-                    size="sm"
-                    color="primary"
-                    >{{ $t('editions.official_website') }}</UButton
-                  >
-                  <UButton
-                    v-if="edition.ticketingUrl"
-                    icon="i-heroicons-ticket"
-                    :to="edition.ticketingUrl"
-                    target="_blank"
-                    size="sm"
-                    >{{ $t('editions.ticketing') }}</UButton
-                  >
-                  <UButton
-                    v-if="edition.facebookUrl"
-                    icon="i-simple-icons-facebook"
-                    :to="edition.facebookUrl"
-                    target="_blank"
-                    size="sm"
-                    color="info"
-                    >Facebook</UButton
-                  >
-                  <UButton
-                    v-if="edition.instagramUrl"
-                    icon="i-simple-icons-instagram"
-                    :to="edition.instagramUrl"
-                    target="_blank"
-                    size="sm"
-                    color="error"
-                    >Instagram</UButton
-                  >
-                </div>
-              </div>
-
-              <!-- Services -->
-              <div class="space-y-4">
-                <h3 class="text-lg font-semibold">{{ $t('editions.services_offered') }}</h3>
+              <div class="flex-1">
+                <h3 class="text-lg font-semibold mb-2">
+                  {{ $t('editions.about_this_edition') }}
+                </h3>
                 <div
-                  v-if="getActiveServicesByCategory(edition).length === 0"
-                  class="text-gray-500 text-sm"
+                  v-if="edition.description && descriptionHtml"
+                  class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('editions.no_services') }}
+                  <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
+                  <!-- eslint-disable-next-line vue/no-v-html -->
+                  <div v-html="descriptionHtml" />
                 </div>
-                <div v-else class="space-y-4">
-                  <div
-                    v-for="category in getActiveServicesByCategory(edition)"
-                    :key="category.category"
-                    class="space-y-3"
+                <p v-else class="text-gray-700 dark:text-gray-300">
+                  {{ t('editions.no_description_available') }}
+                </p>
+              </div>
+            </div>
+          </UCard>
+
+          <!-- Liens externes -->
+          <UCard variant="subtle">
+            <div
+              v-if="
+                edition.officialWebsiteUrl ||
+                edition.ticketingUrl ||
+                edition.facebookUrl ||
+                edition.instagramUrl
+              "
+              class="space-y-2"
+            >
+              <h3 class="text-lg font-semibold">{{ $t('editions.useful_links') }}</h3>
+              <div class="flex gap-2">
+                <UButton
+                  v-if="edition.officialWebsiteUrl"
+                  icon="i-heroicons-globe-alt"
+                  :to="edition.officialWebsiteUrl"
+                  target="_blank"
+                  size="sm"
+                  color="primary"
+                  >{{ $t('editions.official_website') }}</UButton
+                >
+                <UButton
+                  v-if="edition.ticketingUrl"
+                  icon="i-heroicons-ticket"
+                  :to="edition.ticketingUrl"
+                  target="_blank"
+                  size="sm"
+                  >{{ $t('editions.ticketing') }}</UButton
+                >
+                <UButton
+                  v-if="edition.facebookUrl"
+                  icon="i-simple-icons-facebook"
+                  :to="edition.facebookUrl"
+                  target="_blank"
+                  size="sm"
+                  color="info"
+                  >Facebook</UButton
+                >
+                <UButton
+                  v-if="edition.instagramUrl"
+                  icon="i-simple-icons-instagram"
+                  :to="edition.instagramUrl"
+                  target="_blank"
+                  size="sm"
+                  color="error"
+                  >Instagram</UButton
+                >
+              </div>
+            </div>
+
+            <!-- Services -->
+            <div class="space-y-4">
+              <h3 class="text-lg font-semibold">{{ $t('editions.services_offered') }}</h3>
+              <div
+                v-if="getActiveServicesByCategory(edition).length === 0"
+                class="text-gray-500 text-sm"
+              >
+                {{ $t('editions.no_services') }}
+              </div>
+              <div v-else class="space-y-4">
+                <div
+                  v-for="category in getActiveServicesByCategory(edition)"
+                  :key="category.category"
+                  class="space-y-3"
+                >
+                  <h4
+                    class="text-lg font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2"
                   >
-                    <h4
-                      class="text-lg font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2"
+                    {{ category.label }}
+                  </h4>
+                  <div class="flex flex-wrap gap-3">
+                    <UBadge
+                      v-for="service in category.services"
+                      :key="service.key"
+                      color="neutral"
+                      variant="soft"
+                      size="xl"
+                      class="px-4 py-3"
                     >
-                      {{ category.label }}
-                    </h4>
-                    <div class="flex flex-wrap gap-3">
-                      <UBadge
-                        v-for="service in category.services"
-                        :key="service.key"
-                        color="neutral"
-                        variant="soft"
-                        size="xl"
-                        class="px-4 py-3"
-                      >
-                        <UIcon :name="service.icon" :class="service.color" size="24" class="mr-2" />
-                        <span class="text-base font-medium">{{ service.label }}</span>
-                      </UBadge>
-                    </div>
+                      <UIcon :name="service.icon" :class="service.color" size="24" class="mr-2" />
+                      <span class="text-base font-medium">{{ service.label }}</span>
+                    </UBadge>
                   </div>
                 </div>
               </div>
@@ -218,7 +161,62 @@
         </div>
 
         <!-- Liste des participants -->
-        <div class="xl:col-span-1 2xl:col-span-1">
+        <div class="xl:col-span-1 2xl:col-span-1 flex flex-col space-y-6">
+          <!-- Informations pratiques -->
+          <UCard variant="subtle">
+            <div class="space-y-3">
+              <h3 class="text-lg font-semibold">{{ $t('editions.practical_info') }}</h3>
+              <p class="text-sm text-gray-600">
+                <UIcon name="i-heroicons-map-pin" class="inline mr-1" />
+                <a
+                  :href="getGoogleMapsUrl(edition)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                >
+                  {{ edition.addressLine1
+                  }}<span v-if="edition.addressLine2">, {{ edition.addressLine2 }}</span
+                  >, {{ edition.postalCode }} {{ edition.city
+                  }}<span v-if="edition.region">, {{ edition.region }}</span
+                  >, {{ edition.country }}
+                </a>
+              </p>
+              <p class="text-sm text-gray-600">
+                <UIcon name="i-heroicons-calendar" class="inline mr-1" />
+                {{ formatDateTimeRange(edition.startDate, edition.endDate) }}
+              </p>
+
+              <!-- Collaborateurs -->
+              <div v-if="getAllCollaborators(edition).length > 0" class="pt-2">
+                <div class="flex items-center gap-2 mb-2">
+                  <UIcon name="i-heroicons-users" class="text-gray-400" />
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{
+                    $t('editions.organizing_team')
+                  }}</span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <div
+                    v-for="collaborator in getAllCollaborators(edition)"
+                    :key="collaborator.id"
+                    class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-full text-sm"
+                    :title="collaboratorTitleTooltip(collaborator)"
+                  >
+                    <UiUserAvatar :user="collaborator.user" size="xs" />
+                    <span class="text-gray-700 dark:text-gray-300">{{ collaborator.pseudo }}</span>
+                    <UBadge
+                      v-if="displayCollaboratorBadge(collaborator)"
+                      size="xs"
+                      color="neutral"
+                      variant="soft"
+                    >
+                      {{ displayCollaboratorBadge(collaborator) }}
+                    </UBadge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </UCard>
+
           <EditionParticipantsCard
             :participants="edition.attendingUsers"
             :is-attending="isAttending(edition.id)"
