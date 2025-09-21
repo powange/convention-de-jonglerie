@@ -592,7 +592,7 @@
 import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-// Auto-imported: EditionVolunteerInternalModeOptions
+import { useDebounce } from '~/composables/useDebounce'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { summarizeRights } from '~/utils/collaboratorRights'
@@ -839,8 +839,11 @@ const editCollaboratorRights = ref({
   perEdition: [],
 })
 
+// Debounce pour la recherche d'utilisateurs
+const debouncedSearchTerm = useDebounce(newCollaboratorSearchTerm, 300)
+
 // Watchers pour la recherche d'utilisateurs
-watch(newCollaboratorSearchTerm, async (searchTerm) => {
+watch(debouncedSearchTerm, async (searchTerm) => {
   if (!searchTerm || searchTerm.length < 2) {
     searchedUsers.value = []
     return

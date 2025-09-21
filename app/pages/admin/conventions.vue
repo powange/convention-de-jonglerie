@@ -373,7 +373,11 @@
           {{ $t('admin.no_conventions_found') }}
         </h3>
         <p class="mt-1 text-sm text-gray-500">
-          {{ searchQuery ? $t('admin.no_conventions_search') : $t('admin.no_conventions_yet') }}
+          {{
+            debouncedSearchQuery
+              ? $t('admin.no_conventions_search')
+              : $t('admin.no_conventions_yet')
+          }}
         </p>
       </div>
     </div>
@@ -381,6 +385,8 @@
 </template>
 
 <script setup>
+import { useDebounce } from '~/composables/useDebounce'
+
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
 
@@ -396,6 +402,7 @@ useHead({
 
 // État local
 const searchQuery = ref('')
+const debouncedSearchQuery = useDebounce(searchQuery, 300)
 const archivedFilter = ref('all')
 
 // Options de filtre
@@ -436,9 +443,9 @@ const filteredConventions = computed(() => {
     filtered = filtered.filter((conv) => conv.isArchived)
   }
 
-  // Filtre par recherche
-  if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase().trim()
+  // Filtre par recherche (avec debounce)
+  if (debouncedSearchQuery.value.trim()) {
+    const query = debouncedSearchQuery.value.toLowerCase().trim()
     filtered = filtered.filter((conv) => {
       return (
         conv.name.toLowerCase().includes(query) ||

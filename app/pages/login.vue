@@ -54,9 +54,50 @@
                 type="email"
                 required
                 :placeholder="t('auth.email_placeholder')"
-                icon="i-heroicons-envelope"
+                :icon="
+                  emailValidationStatus === 'validating'
+                    ? 'i-heroicons-clock'
+                    : 'i-heroicons-envelope'
+                "
+                :trailing-icon="
+                  emailValidationStatus === 'valid'
+                    ? emailExists
+                      ? 'i-heroicons-check-circle'
+                      : 'i-heroicons-user-plus'
+                    : emailValidationStatus === 'invalid'
+                      ? 'i-heroicons-x-circle'
+                      : undefined
+                "
+                :color="
+                  emailValidationStatus === 'valid'
+                    ? 'success'
+                    : emailValidationStatus === 'invalid'
+                      ? 'error'
+                      : undefined
+                "
                 class="w-full"
               />
+              <!-- Indication du statut -->
+              <div v-if="emailValidationStatus !== 'idle'" class="mt-1 text-xs">
+                <p v-if="emailValidationStatus === 'validating'" class="text-gray-500">
+                  {{ t('auth.validating_email') }}
+                </p>
+                <p
+                  v-else-if="emailValidationStatus === 'valid' && emailExists"
+                  class="text-green-600"
+                >
+                  {{ t('auth.email_found') }}
+                </p>
+                <p
+                  v-else-if="emailValidationStatus === 'valid' && !emailExists"
+                  class="text-blue-600"
+                >
+                  {{ t('auth.email_available') }}
+                </p>
+                <p v-else-if="emailValidationStatus === 'invalid'" class="text-red-600">
+                  {{ t('auth.invalid_email') }}
+                </p>
+              </div>
             </UFormField>
 
             <UButton
@@ -387,6 +428,7 @@
 import { reactive, ref, computed, watchEffect } from 'vue'
 import { z } from 'zod'
 
+import { useDebounce } from '~/composables/useDebounce'
 import { usePasswordStrength } from '~/composables/usePasswordStrength'
 import type { HttpError } from '~/types'
 
@@ -421,6 +463,12 @@ const step = ref<'email' | 'password' | 'register'>('email')
 // Étape email
 const emailSchema = z.object({ email: z.string().email(t('errors.invalid_email')) })
 const emailState = reactive({ email: '' })
+
+// Validation email en temps réel avec debounce
+const emailRef = computed(() => emailState.email)
+const debouncedEmail = useDebounce(emailRef, 500)
+const emailValidationStatus = ref<'idle' | 'validating' | 'valid' | 'invalid'>('idle')
+const emailExists = ref<boolean | null>(null)
 
 // Étape password
 const passwordSchema = z.object({
@@ -469,6 +517,36 @@ const personalAccountConfirmed = ref(false)
 // Computed pour afficher le formulaire d'inscription
 const canShowRegistrationForm = computed(() => {
   return emailAccessConfirmed.value && personalAccountConfirmed.value
+})
+
+// Watcher pour validation email en temps réel
+watch(debouncedEmail, async (email) => {
+  if (!email || !email.includes('@') || email.length < 5) {
+    emailValidationStatus.value = 'idle'
+    emailExists.value = null
+    return
+  }
+
+  // Vérifier si l'email est valide avec le schéma
+  const emailResult = emailSchema.safeParse({ email })
+  if (!emailResult.success) {
+    emailValidationStatus.value = 'invalid'
+    emailExists.value = null
+    return
+  }
+
+  emailValidationStatus.value = 'validating'
+  try {
+    const res = (await $fetch('/api/auth/check-email', {
+      method: 'POST',
+      body: { email },
+    })) as { exists: boolean }
+    emailExists.value = res.exists
+    emailValidationStatus.value = 'valid'
+  } catch {
+    emailValidationStatus.value = 'invalid'
+    emailExists.value = null
+  }
 })
 
 const handleEmailSubmit = async () => {
