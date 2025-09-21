@@ -40,7 +40,7 @@ jobs:
         run: |
           echo "deps=${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
           echo "prisma=${{ runner.os }}-prisma-${{ hashFiles('prisma/schema.prisma') }}-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
-          echo "nuxt=${{ runner.os }}-nuxt-${{ hashFiles('**/*.vue', '**/*.ts', '**/*.js', 'nuxt.config.ts', 'tsconfig.json') }}" >> $GITHUB_OUTPUT
+          echo "nuxt=${{ runner.os }}-nuxt-${{ hashFiles('nuxt.config.ts', 'tsconfig.json', 'app.config.ts') }}" >> $GITHUB_OUTPUT
 
       - name: Cache Node dependencies
         id: cache-deps
@@ -137,11 +137,55 @@ jobs:
       - name: Run linting
         run: npm run lint
 
+  # Job pour valider que le build fonctionne
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: setup
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Restore Node dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.npm
+          key: ${{ needs.setup.outputs.deps-cache-key }}
+          fail-on-cache-miss: true
+
+      - name: Restore Prisma client
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.prisma
+          key: ${{ needs.setup.outputs.prisma-cache-key }}
+          fail-on-cache-miss: true
+
+      - name: Build application
+        run: npm run build
+
+      - name: Upload build artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts-${{ github.run_id }}
+          path: |
+            .nuxt/
+            .output/
+          retention-days: 7
+
   # Tests en parallèle avec matrice
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: [setup, lint] # Attendre setup et lint avant de lancer les tests
+    timeout-minutes: 15
+    needs: [setup, lint, build] # Attendre setup, lint et build avant de lancer les tests
 
     strategy:
       fail-fast: false # Continue même si un test échoue
