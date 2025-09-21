@@ -105,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
@@ -120,7 +120,7 @@ const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
 const loading = ref(false)
-const posts = ref([])
+const posts = shallowRef([])
 const isSubmittingPost = ref(false)
 
 const newPostForm = reactive({

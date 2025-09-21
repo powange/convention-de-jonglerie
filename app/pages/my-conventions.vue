@@ -69,7 +69,7 @@
                   <h3 class="text-lg font-semibold">{{ convention.name }}</h3>
                   <p class="text-xs text-gray-500">
                     {{ $t('conventions.created_at') }}
-                    {{ new Date(convention.createdAt).toLocaleDateString() }}
+                    {{ formatCreatedDate(convention.createdAt) }}
                   </p>
                 </div>
               </div>
@@ -308,7 +308,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, h, watch } from 'vue'
+import { ref, onMounted, h, watch, computed } from 'vue'
 
 import { useAuthStore } from '~/stores/auth'
 import type { Convention, HttpError, Edition } from '~/types'
@@ -631,6 +631,11 @@ const getEditionsColumns = () => [
 const onEditionAction = (_action: unknown) => {
   // Cette fonction est appelée automatiquement par UTable
 }
+
+// Computed pour optimiser les calculs
+const formatCreatedDate = computed(() => {
+  return (dateString: string) => new Date(dateString).toLocaleDateString()
+})
 
 // Fonctions pour gérer les collaborateurs
 const openEditCollaboratorModal = (convention: Convention, collaborator: any) => {

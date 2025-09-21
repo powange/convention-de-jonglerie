@@ -33,7 +33,7 @@
           <div class="text-sm">
             <div class="flex items-center gap-1 justify-end mb-1">
               <UIcon name="i-heroicons-calendar" class="text-gray-400 w-4 h-4" />
-              <span class="font-medium">{{ formatDate(request.tripDate) }}</span>
+              <span class="font-medium">{{ formatTripDate(request.tripDate) }}</span>
             </div>
             <div class="flex items-center gap-1 justify-end mb-1">
               <UIcon name="i-heroicons-map-pin" class="text-gray-400 w-4 h-4" />
@@ -102,6 +102,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
+import { formatDate } from '~/utils/date'
 
 // Auto-imported: EditionCarpoolCommentsModal
 
@@ -153,15 +154,10 @@ const canEdit = computed(() => {
   return authStore.user && authStore.user.id === props.request.user.id
 })
 
-const formatDate = (date: string) => {
+// Utilise la fonction importée formatDate
+const formatTripDate = (date: string) => {
   const { locale } = useI18n()
-  return new Date(date).toLocaleString(locale.value, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  return formatDate(date, { locale: locale.value, includeTime: true, format: 'long' })
 }
 
 const handleDelete = async () => {

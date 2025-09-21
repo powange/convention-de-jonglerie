@@ -431,6 +431,7 @@
 </template>
 
 <script setup lang="ts">
+import { shallowRef } from 'vue'
 // Protection admin
 definePageMeta({
   middleware: ['auth-protected', 'super-admin'],
@@ -440,8 +441,8 @@ const toast = useToast()
 
 // État réactif
 const loading = ref(false)
-const logs = ref<any[]>([])
-const stats = ref({
+const logs = shallowRef<any[]>([])
+const stats = shallowRef({
   totalLast24h: 0,
   unresolvedCount: 0,
   errorTypes: [] as any[],

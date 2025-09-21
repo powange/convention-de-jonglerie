@@ -186,8 +186,8 @@
                     :class="getPasswordStrengthBarColor(i)"
                   />
                 </div>
-                <p class="text-xs" :class="getPasswordStrengthTextColor()">
-                  {{ getPasswordStrengthText() }}
+                <p class="text-xs" :class="passwordStrengthTextColor">
+                  {{ passwordStrengthText }}
                 </p>
               </div>
             </UFormField>
@@ -274,9 +274,10 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { z } from 'zod'
 
+import { usePasswordStrength } from '~/composables/usePasswordStrength'
 import type { HttpError } from '~/types'
 
 const toast = useToast()
@@ -314,84 +315,17 @@ const loading = ref(false)
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 
-// Fonctions pour l'indicateur de force du mot de passe
-const getPasswordStrength = () => {
-  const password = state.password
-  if (!password) return 0
-
-  let strength = 0
-
-  // Longueur
-  if (password.length >= 8) strength++
-
-  // Majuscule
-  if (/[A-Z]/.test(password)) strength++
-
-  // Chiffre
-  if (/\d/.test(password)) strength++
-
-  // Caractère spécial ou longueur > 12
-  if (/[!@#$%^&*(),.?":{}|<>]/.test(password) || password.length > 12) strength++
-
-  return strength
-}
-
-const getPasswordStrengthText = () => {
-  const strength = getPasswordStrength()
-  switch (strength) {
-    case 0:
-    case 1:
-      return t('auth.password_weak')
-    case 2:
-      return t('auth.password_medium')
-    case 3:
-      return t('auth.password_strong')
-    case 4:
-      return t('auth.password_very_strong')
-    default:
-      return ''
-  }
-}
-
-const getPasswordStrengthTextColor = () => {
-  const strength = getPasswordStrength()
-  switch (strength) {
-    case 0:
-    case 1:
-      return 'text-red-500'
-    case 2:
-      return 'text-orange-500'
-    case 3:
-      return 'text-green-500'
-    case 4:
-      return 'text-emerald-500'
-    default:
-      return 'text-gray-500'
-  }
-}
+// Utiliser le composable pour la force du mot de passe
+const passwordRef = computed(() => state.password)
+const {
+  strengthText: passwordStrengthText,
+  strengthTextColor: passwordStrengthTextColor,
+  getStrengthBarColor: getPasswordStrengthBarColor,
+} = usePasswordStrength(passwordRef)
 
 const onGoogleRegister = async () => {
   // Navigation externe pour forcer l'appel de la route serveur (/auth/google)
   await navigateTo('/auth/google', { external: true })
-}
-
-const getPasswordStrengthBarColor = (barIndex: number) => {
-  const strength = getPasswordStrength()
-  if (barIndex <= strength) {
-    switch (strength) {
-      case 1:
-        return 'bg-red-500'
-      case 2:
-        return 'bg-orange-500'
-      case 3:
-        return 'bg-green-500'
-      case 4:
-        return 'bg-emerald-500'
-      default:
-        return 'bg-gray-200 dark:bg-gray-700'
-    }
-  }
-  return 'bg-gray-200 dark:bg-gray-700'
 }
 
 const handleRegister = async () => {

@@ -184,7 +184,7 @@
                   </div>
                   <div class="flex items-center gap-1">
                     <UIcon name="i-heroicons-calendar" class="h-4 w-4" />
-                    <time>{{ formatDate(feedback.createdAt) }}</time>
+                    <time>{{ formatDateWithTime(feedback.createdAt) }}</time>
                   </div>
                   <div v-if="feedback.url" class="flex items-center gap-1">
                     <UIcon name="i-heroicons-link" class="h-4 w-4" />
@@ -372,7 +372,7 @@
                   {{ t('admin.feedback.created_at') }}
                 </label>
                 <p class="text-gray-900 dark:text-white">
-                  {{ formatDate(detailsModal.feedback.createdAt) }}
+                  {{ formatDateWithTime(detailsModal.feedback.createdAt) }}
                 </p>
               </div>
             </div>
@@ -423,6 +423,10 @@
 </template>
 
 <script setup lang="ts">
+import { shallowRef } from 'vue'
+
+import { formatDate } from '~/utils/date'
+
 definePageMeta({
   middleware: ['super-admin'],
 })
@@ -432,8 +436,8 @@ const toast = useToast()
 
 // État
 const loading = ref(false)
-const feedbacks = ref([])
-const stats = ref(null)
+const feedbacks = shallowRef([])
+const stats = shallowRef(null)
 const pagination = ref({
   page: 1,
   limit: 20,
@@ -569,14 +573,9 @@ function getTypeColor(type: string) {
   return colors[type] || 'neutral'
 }
 
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('fr-FR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+// Utilise la fonction importée formatDate avec les options appropriées
+function formatDateWithTime(dateString: string) {
+  return formatDate(dateString, { includeTime: true, format: 'medium' })
 }
 
 // Charger les données au montage

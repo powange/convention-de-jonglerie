@@ -29,6 +29,8 @@
 </template>
 
 <script setup lang="ts">
+import { shallowRef } from 'vue'
+
 interface Props {
   editionId: number
   edition: any
@@ -48,7 +50,7 @@ const { t } = useI18n()
 
 // Modal notification
 const showNotificationModal = ref(false)
-const volunteerApplications = ref([])
+const volunteerApplications = shallowRef([])
 
 // Gestion de la modal de notification
 const openNotificationModal = async () => {

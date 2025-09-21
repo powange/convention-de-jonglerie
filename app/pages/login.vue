@@ -328,8 +328,8 @@
                       :class="getPasswordStrengthBarColor(i)"
                     />
                   </div>
-                  <p class="text-xs" :class="getPasswordStrengthTextColor()">
-                    {{ getPasswordStrengthText() }}
+                  <p class="text-xs" :class="passwordStrengthTextColor">
+                    {{ passwordStrengthText }}
                   </p>
                 </div>
               </UFormField>
@@ -387,6 +387,7 @@
 import { reactive, ref, computed, watchEffect } from 'vue'
 import { z } from 'zod'
 
+import { usePasswordStrength } from '~/composables/usePasswordStrength'
 import type { HttpError } from '~/types'
 
 import { useAuthStore } from '../stores/auth'
@@ -447,6 +448,14 @@ const registerSchema = z
   })
 const registerState = reactive({ prenom: '', nom: '', pseudo: '', password: '', confirm: '' })
 
+// Utiliser le composable pour la force du mot de passe
+const passwordRef = computed(() => registerState.password)
+const {
+  strengthText: passwordStrengthText,
+  strengthTextColor: passwordStrengthTextColor,
+  getStrengthBarColor: getPasswordStrengthBarColor,
+} = usePasswordStrength(passwordRef)
+
 // UI state
 const showPassword = ref(false)
 const showRegisterPassword = ref(false)
@@ -461,72 +470,6 @@ const personalAccountConfirmed = ref(false)
 const canShowRegistrationForm = computed(() => {
   return emailAccessConfirmed.value && personalAccountConfirmed.value
 })
-
-// Indicateur de force du mot de passe (repris de register.vue)
-const getPasswordStrength = () => {
-  const password = registerState.password
-  if (!password) return 0
-  let strength = 0
-  if (password.length >= 8) strength++
-  if (/[A-Z]/.test(password)) strength++
-  if (/\d/.test(password)) strength++
-  if (/[!@#$%^&*(),.?":{}|<>]/.test(password) || password.length > 12) strength++
-  return strength
-}
-
-// Fonctions d'affichage pour l'indicateur (utilisées dans le template)
-const getPasswordStrengthText = () => {
-  const strength = getPasswordStrength()
-  switch (strength) {
-    case 0:
-    case 1:
-      return t('auth.password_weak')
-    case 2:
-      return t('auth.password_medium')
-    case 3:
-      return t('auth.password_strong')
-    case 4:
-      return t('auth.password_very_strong')
-    default:
-      return ''
-  }
-}
-
-const getPasswordStrengthTextColor = () => {
-  const strength = getPasswordStrength()
-  switch (strength) {
-    case 0:
-    case 1:
-      return 'text-red-500'
-    case 2:
-      return 'text-orange-500'
-    case 3:
-      return 'text-green-500'
-    case 4:
-      return 'text-emerald-500'
-    default:
-      return 'text-gray-500'
-  }
-}
-
-const getPasswordStrengthBarColor = (barIndex: number) => {
-  const strength = getPasswordStrength()
-  if (barIndex <= strength) {
-    switch (strength) {
-      case 1:
-        return 'bg-red-500'
-      case 2:
-        return 'bg-orange-500'
-      case 3:
-        return 'bg-green-500'
-      case 4:
-        return 'bg-emerald-500'
-      default:
-        return 'bg-gray-200 dark:bg-gray-700'
-    }
-  }
-  return 'bg-gray-200 dark:bg-gray-700'
-}
 
 const handleEmailSubmit = async () => {
   loading.value = true

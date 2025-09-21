@@ -266,6 +266,7 @@
 </template>
 
 <script setup lang="ts">
+import { formatDate } from '~/utils/date'
 // Type pour l'utilisateur depuis l'API
 interface UserProfile {
   id: number
@@ -329,15 +330,6 @@ const onProfilePictureChanged = async (newProfilePicture: string | null) => {
     // Rafraîchir les données depuis le serveur pour obtenir le bon format
     await refresh()
   }
-}
-
-// Fonction utilitaire pour formater les dates
-const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString(undefined, {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
 }
 
 // Actions administrateur
