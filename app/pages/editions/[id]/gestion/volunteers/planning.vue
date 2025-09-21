@@ -132,51 +132,11 @@
       </UCard>
 
       <!-- Alerte pour les chevauchements de créneaux -->
-      <UAlert
-        v-if="canManageVolunteers && overlapWarnings.length > 0"
-        color="warning"
-        variant="soft"
-        icon="i-heroicons-exclamation-triangle"
-        class="mt-6"
-      >
-        <template #title>
-          {{ t('editions.volunteers.scheduling_conflicts') || 'Conflits de planning détectés' }}
-        </template>
-        <template #description>
-          <div class="space-y-2">
-            <p class="text-sm">
-              {{ overlapWarnings.length }} bénévole(s) ont des créneaux qui se chevauchent :
-            </p>
-            <div class="space-y-1">
-              <div
-                v-for="warning in overlapWarnings"
-                :key="`${warning.volunteerId}-${warning.slot1.id}-${warning.slot2.id}`"
-                class="text-sm bg-amber-50 dark:bg-amber-900/20 p-2 rounded border-l-2 border-amber-400"
-              >
-                <div class="flex items-center gap-2 font-medium text-amber-800 dark:text-amber-200">
-                  <UiUserAvatar :user="warning.volunteer" size="xs" />
-                  {{ warning.volunteer.pseudo }}
-                </div>
-                <div class="text-xs text-amber-700 dark:text-amber-300 mt-1">
-                  <strong>{{ warning.slot1.title }}</strong>
-                  <span v-if="warning.slot1.teamName" class="text-amber-600 dark:text-amber-400">
-                    - {{ warning.slot1.teamName }}</span
-                  >
-                  <br />
-                  ({{ formatDateTimeRange(warning.slot1.start, warning.slot1.end) }})
-                  <br />
-                  <strong>{{ warning.slot2.title }}</strong>
-                  <span v-if="warning.slot2.teamName" class="text-amber-600 dark:text-amber-400">
-                    - {{ warning.slot2.teamName }}</span
-                  >
-                  <br />
-                  ({{ formatDateTimeRange(warning.slot2.start, warning.slot2.end) }})
-                </div>
-              </div>
-            </div>
-          </div>
-        </template>
-      </UAlert>
+      <EditionVolunteerPlanningOverlapWarningsAlert
+        :overlap-warnings="overlapWarnings"
+        :can-manage-volunteers="canManageVolunteers"
+        :format-date-time-range="formatDateTimeRange"
+      />
 
       <!-- Panneau d'auto-assignation -->
       <AutoAssignmentPanel
@@ -184,203 +144,25 @@
         :edition-id="editionId"
         :volunteers="acceptedVolunteers"
         :time-slots="convertedTimeSlots"
-        :teams="teams"
+        :teams="[...teams]"
         class="mt-6"
         @assignments-applied="refreshData"
       />
 
       <!-- Résumé des bénévoles par jour -->
-      <UCard
-        v-if="canManageVolunteers && volunteersStats.totalVolunteers > 0"
-        variant="soft"
-        class="mt-6"
-      >
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold flex items-center gap-2">
-              <UIcon name="i-heroicons-user-group" class="text-primary-500" />
-              {{ t('editions.volunteers.volunteers_summary') }}
-            </h3>
-            <UBadge color="primary" variant="soft">
-              {{ volunteersStats.totalVolunteers }} {{ t('editions.volunteers.volunteers') }}
-            </UBadge>
-          </div>
-        </template>
-
-        <div class="space-y-4">
-          <!-- Résumé global -->
-          <div
-            class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
-          >
-            <div class="text-center">
-              <div class="text-2xl font-bold text-primary-600">
-                {{ volunteersStats.totalHours.toFixed(1) }}h
-              </div>
-              <div class="text-sm text-gray-500">{{ t('editions.volunteers.total_hours') }}</div>
-            </div>
-            <div class="text-center">
-              <div class="text-2xl font-bold text-green-600">
-                {{ volunteersStats.averageHours.toFixed(1) }}h
-              </div>
-              <div class="text-sm text-gray-500">
-                {{ t('editions.volunteers.average_per_volunteer') }}
-              </div>
-            </div>
-            <div class="text-center">
-              <div class="text-2xl font-bold text-blue-600">{{ volunteersStats.totalSlots }}</div>
-              <div class="text-sm text-gray-500">
-                {{ t('editions.volunteers.total_assignments') }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Onglets pour les statistiques -->
-          <UTabs
-            :v-model="activeStatsTab"
-            :items="[
-              {
-                key: 'hours-per-volunteer',
-                label: 'Heures par bénévoles',
-                icon: 'i-heroicons-user-group',
-              },
-              {
-                key: 'hours-per-day',
-                label: 'Heures par jour',
-                icon: 'i-heroicons-calendar-days',
-              },
-            ]"
-            class="w-full"
-          >
-            <template #content="{ item }">
-              <div v-if="item.key === 'hours-per-day'" class="space-y-3 mt-4">
-                <!-- Détail par jour -->
-                <div class="space-y-2">
-                  <div
-                    v-for="dayStats in volunteersStatsByDay"
-                    :key="dayStats.date"
-                    class="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
-                  >
-                    <div class="flex items-center justify-between mb-3">
-                      <h5 class="font-medium text-gray-900 dark:text-white">
-                        {{ formatDate(dayStats.date) }}
-                      </h5>
-                      <div class="flex items-center gap-2">
-                        <UBadge color="neutral" variant="soft" size="sm">
-                          {{ dayStats.totalVolunteers }}
-                          {{ t('editions.volunteers.volunteers_short') }}
-                        </UBadge>
-                        <UBadge color="primary" variant="soft" size="sm">
-                          {{ dayStats.totalHours.toFixed(1) }}h
-                        </UBadge>
-                      </div>
-                    </div>
-
-                    <div class="space-y-1">
-                      <div
-                        v-for="volunteerStat in dayStats.volunteers"
-                        :key="`${dayStats.date}-${volunteerStat.user.id}`"
-                        class="flex items-center justify-between text-sm"
-                      >
-                        <div class="flex items-center gap-2">
-                          <UiUserAvatar :user="volunteerStat.user" size="xs" />
-                          <span class="text-gray-700 dark:text-gray-300">{{
-                            volunteerStat.user.pseudo
-                          }}</span>
-                          <span
-                            v-if="volunteerStat.user.prenom || volunteerStat.user.nom"
-                            class="text-gray-500 text-xs"
-                          >
-                            ({{ volunteerStat.user.prenom }} {{ volunteerStat.user.nom }})
-                          </span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                          <span class="text-gray-600 dark:text-gray-400"
-                            >{{ volunteerStat.hours.toFixed(1) }}h</span
-                          >
-                          <UBadge color="neutral" variant="soft" size="xs">
-                            {{ volunteerStat.slots }} {{ t('editions.volunteers.slots_short') }}
-                          </UBadge>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div v-else-if="item.key === 'hours-per-volunteer'" class="space-y-3 mt-4">
-                <!-- Statistiques par bénévole -->
-                <div class="space-y-2">
-                  <div
-                    v-for="volunteerStat in volunteersStatsIndividual"
-                    :key="volunteerStat.user.id"
-                    class="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
-                  >
-                    <div class="flex items-center justify-between mb-3">
-                      <div class="flex items-center gap-3">
-                        <UiUserAvatar :user="volunteerStat.user" />
-                        <div>
-                          <h5 class="font-medium text-gray-900 dark:text-white">
-                            {{ volunteerStat.user.pseudo }}
-                          </h5>
-                          <p
-                            v-if="volunteerStat.user.prenom || volunteerStat.user.nom"
-                            class="text-sm text-gray-500"
-                          >
-                            {{ volunteerStat.user.prenom }} {{ volunteerStat.user.nom }}
-                          </p>
-                        </div>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <UBadge color="primary" variant="soft">
-                          {{ volunteerStat.totalHours.toFixed(1) }}h
-                        </UBadge>
-                        <UBadge color="neutral" variant="soft">
-                          {{ volunteerStat.totalSlots }} {{ t('editions.volunteers.slots_short') }}
-                        </UBadge>
-                      </div>
-                    </div>
-
-                    <!-- Détail par jour pour ce bénévole -->
-                    <div
-                      v-if="volunteerStat.dayDetails && volunteerStat.dayDetails.length > 0"
-                      class="space-y-1"
-                    >
-                      <div
-                        v-for="dayDetail in volunteerStat.dayDetails"
-                        :key="dayDetail.date"
-                        class="flex items-center justify-between text-sm"
-                      >
-                        <div class="flex items-center gap-2">
-                          <UIcon name="i-heroicons-calendar" class="text-gray-400" size="14" />
-                          <span class="text-gray-700 dark:text-gray-300">
-                            {{ formatDate(dayDetail.date) }}
-                          </span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                          <span class="text-gray-600 dark:text-gray-400">
-                            {{ dayDetail.hours.toFixed(1) }}h
-                          </span>
-                          <UBadge color="neutral" variant="soft">
-                            {{ dayDetail.slots }} {{ t('editions.volunteers.slots_short') }}
-                          </UBadge>
-                        </div>
-                      </div>
-                    </div>
-                    <div v-else class="text-sm text-gray-500 italic">
-                      Aucun créneau assigné pour le moment
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </template>
-          </UTabs>
-        </div>
-      </UCard>
+      <EditionVolunteerPlanningVolunteersSummary
+        :can-manage-volunteers="canManageVolunteers"
+        :volunteers-stats="volunteersStats"
+        :volunteers-stats-by-day="volunteersStatsByDay"
+        :volunteers-stats-individual="volunteersStatsIndividual"
+        :active-stats-tab="activeStatsTab"
+        :format-date="formatDate"
+      />
 
       <!-- Modal de création/édition de créneau -->
       <SlotModal
         v-model="slotModalOpen"
-        :teams="teams"
+        :teams="[...teams]"
         :edition-id="editionId"
         :initial-slot="slotModalData"
         @save="handleSlotSave"
@@ -565,8 +347,8 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
     try {
       await updateTimeSlot(timeSlot.id, {
         title: timeSlot.title,
-        description: timeSlot.description,
-        teamId: timeSlot.teamId || undefined,
+        description: timeSlot.description ?? undefined,
+        teamId: timeSlot.teamId ?? undefined,
         startDateTime: timeSlot.start,
         endDateTime: timeSlot.end,
         maxVolunteers: timeSlot.maxVolunteers,
@@ -1010,8 +792,8 @@ const overlapWarnings = computed(() => {
     // Comparer tous les couples de créneaux
     for (let i = 0; i < slots.length; i++) {
       for (let j = i + 1; j < slots.length; j++) {
-        const slot1 = slots[i].slot
-        const slot2 = slots[j].slot
+        const slot1 = slots[i]?.slot
+        const slot2 = slots[j]?.slot
 
         // Vérifications minimales
         if (!slot1 || !slot2 || slot1.id === slot2.id) continue
@@ -1030,7 +812,7 @@ const overlapWarnings = computed(() => {
 
           warnings.push({
             volunteerId,
-            volunteer: slots[i].assignment.user,
+            volunteer: slots[i]?.assignment?.user,
             slot1: {
               id: slot1.id,
               title: slot1.title || 'Sans titre',
@@ -1127,7 +909,7 @@ const volunteersStatsByDay = computed(() => {
       })
     }
 
-    const day = dayStats.get(dayKey)
+    const day = dayStats.get(dayKey)!
 
     slot.assignedVolunteersList.forEach((assignment) => {
       const userId = assignment.user.id
