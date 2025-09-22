@@ -1,4 +1,5 @@
 import { requireAuth } from '../../utils/auth-utils'
+import { checkAdminMode } from '../../utils/collaborator-management'
 import { getEmailHash } from '../../utils/email-hash'
 import { prisma } from '../../utils/prisma'
 
@@ -18,12 +19,23 @@ export default defineEventHandler(async (event) => {
       imageUrl: true,
       isOnline: true,
     }
-    // Récupérer les conventions où l'utilisateur est auteur OU collaborateur
+    // Vérifier si l'utilisateur est en mode admin actif
+    const isInAdminMode = await checkAdminMode(user.id, event)
+
+    // Récupérer les conventions selon les permissions utilisateur
+    const whereClause = isInAdminMode
+      ? {
+          // Mode admin actif : toutes les conventions non archivées
+          isArchived: false,
+        }
+      : {
+          // Utilisateur normal ou admin pas en mode admin : conventions où il est auteur OU collaborateur
+          isArchived: false,
+          OR: [{ authorId: user.id }, { collaborators: { some: { userId: user.id } } }],
+        }
+
     const conventions = await prisma.convention.findMany({
-      where: {
-        isArchived: false,
-        OR: [{ authorId: user.id }, { collaborators: { some: { userId: user.id } } }],
-      },
+      where: whereClause,
       include: {
         author: {
           select: {
@@ -63,13 +75,15 @@ export default defineEventHandler(async (event) => {
     // Transformer les emails en emailHash pour les auteurs et collaborateurs
     const transformedConventions = conventions.map((convention) => ({
       ...convention,
-      author: (() => {
-        const { email, ...authorWithoutEmail } = convention.author
-        return {
-          ...authorWithoutEmail,
-          emailHash: getEmailHash(email),
-        }
-      })(),
+      author: convention.author
+        ? (() => {
+            const { email, ...authorWithoutEmail } = convention.author
+            return {
+              ...authorWithoutEmail,
+              emailHash: getEmailHash(email),
+            }
+          })()
+        : null,
       collaborators: convention.collaborators.map((collab: any) => ({
         id: collab.id,
         title: collab.title,

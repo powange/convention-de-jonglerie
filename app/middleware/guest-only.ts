@@ -1,9 +1,12 @@
 // Middleware pour rediriger les utilisateurs connectés
-export default defineNuxtRouteMiddleware(() => {
-  const authStore = useAuthStore()
+export default defineNuxtRouteMiddleware(async () => {
+  // Utiliser le composable useUserSession qui gère automatiquement serveur/client
+  const { loggedIn, user } = useUserSession()
 
-  // Si l'utilisateur est connecté, le rediriger vers l'accueil
-  if (authStore.isAuthenticated) {
+  // Attendre que l'état de session soit résolu
+  await nextTick()
+
+  if (loggedIn.value && user.value) {
     return navigateTo('/')
   }
 })
