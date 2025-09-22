@@ -87,6 +87,7 @@ describe('Système de conventions', () => {
         data: {
           name: conventionData.name,
           description: conventionData.description,
+          email: null,
           logo: null,
           authorId: mockUser.id,
         },

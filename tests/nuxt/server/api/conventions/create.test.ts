@@ -107,6 +107,7 @@ describe('API Convention - Création', () => {
       data: {
         name: 'Convention de Test',
         description: 'Une convention pour les tests',
+        email: null,
         logo: null,
         authorId: mockUser.id,
       },
