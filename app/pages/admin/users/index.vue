@@ -133,7 +133,7 @@
 
     <!-- Tableau des utilisateurs -->
     <UCard>
-      <UTable :data="filteredUsers" :columns="columns" :loading="loading" class="w-full" />
+      <UTable :data="users" :columns="columns" :loading="loading" class="w-full" />
 
       <!-- Pagination -->
       <div v-if="pagination.totalPages > 1" class="flex justify-center mt-6">
@@ -169,6 +169,9 @@ definePageMeta({
 const { t } = useI18n()
 
 // Types pour les utilisateurs (utilisé dans la page mais défini dans le composable)
+interface AdminUserWithConnection extends AdminUser {
+  isConnected: boolean
+}
 
 interface PaginationData {
   page: number
@@ -180,8 +183,12 @@ interface PaginationData {
 }
 
 interface UsersApiResponse {
-  users: AdminUser[]
+  users: AdminUserWithConnection[]
   pagination: PaginationData
+  connectionStats?: {
+    totalActiveConnections: number
+    totalActiveUsers: number
+  }
 }
 
 // Métadonnées de la page
@@ -195,7 +202,7 @@ useSeoMeta({
 
 // État réactif
 const loading = ref(false)
-const users = ref<AdminUser[]>([])
+const users = ref<AdminUserWithConnection[]>([])
 const pagination = ref<PaginationData>({
   page: 1,
   limit: 20,
@@ -213,30 +220,21 @@ const currentPage = ref(1)
 const onlineFilter = ref(false)
 
 // État pour le modal de suppression
-const userToDelete = ref<AdminUser | null>(null)
+const userToDelete = ref<AdminUserWithConnection | null>(null)
 const showDeletionModal = ref(false)
 
-// État pour les connexions actives
-const activeUserIds = ref<number[]>([])
-const loadingActiveConnections = ref(false)
-
-// Utilisateurs filtrés selon le statut en ligne
-const filteredUsers = computed(() => {
-  if (!onlineFilter.value) {
-    return users.value
-  }
-  return users.value.filter((user: AdminUser) => activeUserIds.value.includes(user.id))
-})
+// Plus besoin de filtrage côté client, tout est géré côté serveur
+// Les utilisateurs sont déjà filtrés selon le paramètre onlineOnly envoyé à l'API
 
 // Statistiques rapides
 const stats = computed(() => {
   const total = pagination.value.totalCount
-  const verified = users.value.filter((u: AdminUser) => u.isEmailVerified).length
-  const admins = users.value.filter((u: AdminUser) => u.isGlobalAdmin).length
+  const verified = users.value.filter((u: AdminUserWithConnection) => u.isEmailVerified).length
+  const admins = users.value.filter((u: AdminUserWithConnection) => u.isGlobalAdmin).length
   const creators = users.value.filter(
-    (u: AdminUser) => u._count.createdConventions > 0 || u._count.createdEditions > 0
+    (u: AdminUserWithConnection) => u._count.createdConventions > 0 || u._count.createdEditions > 0
   ).length
-  const online = users.value.filter((u: AdminUser) => activeUserIds.value.includes(u.id)).length
+  const online = users.value.filter((u: AdminUserWithConnection) => u.isConnected).length
 
   return { total, verified, admins, creators, online }
 })
@@ -247,22 +245,22 @@ const columns = [
     accessorKey: 'connectionStatus',
     header: '', // Pas de header pour la pastille
     cell: ({ row }: { row: any }) => {
-      const user = row.original as AdminUser
-      const isConnected = activeUserIds.value.includes(user.id)
+      const user = row.original as AdminUserWithConnectionWithConnection
+      const isConnected = user.isConnected
 
       return h(
         'div',
         {
           class: 'flex justify-center items-center',
-          title: isConnected ? t('admin.user_connected') : t('admin.user_offline')
+          title: isConnected ? t('admin.user_connected') : t('admin.user_offline'),
         },
         [
           h('div', {
             class: [
               'w-3 h-3 rounded-full',
-              isConnected ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
-            ]
-          })
+              isConnected ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600',
+            ],
+          }),
         ]
       )
     },
@@ -271,7 +269,7 @@ const columns = [
     accessorKey: 'identity',
     header: t('admin.user_column'),
     cell: ({ row }: { row: any }) => {
-      const user = row.original as AdminUser
+      const user = row.original as AdminUserWithConnection
       return h(resolveComponent('UiUserDisplayForAdmin'), {
         user: user,
         size: 'md',
@@ -283,7 +281,7 @@ const columns = [
     accessorKey: 'email',
     header: t('common.email'),
     cell: ({ row }: { row: any }) => {
-      const user = row.original as AdminUser
+      const user = row.original as AdminUserWithConnection
       return h('div', { class: 'flex items-center gap-2' }, [
         h('span', user.email),
         user.isEmailVerified
@@ -300,7 +298,7 @@ const columns = [
     accessorKey: 'role',
     header: t('admin.role'),
     cell: ({ row }: { row: any }) => {
-      const user = row.original as AdminUser
+      const user = row.original as AdminUserWithConnection
       return h(
         resolveComponent('UBadge'),
         {
@@ -315,7 +313,7 @@ const columns = [
     accessorKey: 'activity',
     header: t('admin.activity'),
     cell: ({ row }: { row: any }) => {
-      const user = row.original as AdminUser
+      const user = row.original as AdminUserWithConnection
       const activities = []
 
       if (user._count.createdConventions > 0) {
@@ -365,7 +363,7 @@ const columns = [
     accessorKey: 'createdAt',
     header: t('admin.registration'),
     cell: ({ row }: { row: any }) => {
-      const user = row.original as AdminUser
+      const user = row.original as AdminUserWithConnection
       return h(
         resolveComponent('UTooltip'),
         { text: formatDateTime(user.createdAt) },
@@ -383,7 +381,7 @@ const columns = [
     accessorKey: 'actions',
     header: t('common.actions'),
     cell: ({ row }: { row: any }) => {
-      const user = row.original as AdminUser
+      const user = row.original as AdminUserWithConnection
       return h(
         resolveComponent('UDropdownMenu'),
         {
@@ -459,7 +457,7 @@ const formatRelativeTime = (date: string) => {
   }).value
 }
 
-const getUserActions = (user: AdminUser) => {
+const getUserActions = (user: AdminUserWithConnection) => {
   const actions: any[] = [
     // Action pour voir le profil
     {
@@ -506,17 +504,20 @@ const getUserActions = (user: AdminUser) => {
 }
 
 // Fonctions d'action
-const promoteToAdmin = async (user: AdminUser) => {
+const promoteToAdmin = async (user: AdminUserWithConnection) => {
   try {
     const confirmMessage = t('admin.confirm_promote_to_admin', {
       name: `${user.prenom} ${user.nom}`,
     })
 
     if (confirm(confirmMessage)) {
-      const updatedUser = await $fetch<AdminUser>(`/api/admin/users/${user.id}/promote`, {
-        method: 'PUT',
-        body: { isGlobalAdmin: true },
-      })
+      const updatedUser = await $fetch<AdminUserWithConnection>(
+        `/api/admin/users/${user.id}/promote`,
+        {
+          method: 'PUT',
+          body: { isGlobalAdmin: true },
+        }
+      )
 
       // Mettre à jour l'utilisateur dans la liste locale
       const userIndex = users.value.findIndex((u) => u.id === user.id)
@@ -541,17 +542,20 @@ const promoteToAdmin = async (user: AdminUser) => {
   }
 }
 
-const demoteFromAdmin = async (user: AdminUser) => {
+const demoteFromAdmin = async (user: AdminUserWithConnection) => {
   try {
     const confirmMessage = t('admin.confirm_demote_from_admin', {
       name: `${user.prenom} ${user.nom}`,
     })
 
     if (confirm(confirmMessage)) {
-      const updatedUser = await $fetch<AdminUser>(`/api/admin/users/${user.id}/promote`, {
-        method: 'PUT',
-        body: { isGlobalAdmin: false },
-      })
+      const updatedUser = await $fetch<AdminUserWithConnection>(
+        `/api/admin/users/${user.id}/promote`,
+        {
+          method: 'PUT',
+          body: { isGlobalAdmin: false },
+        }
+      )
 
       // Mettre à jour l'utilisateur dans la liste locale
       const userIndex = users.value.findIndex((u) => u.id === user.id)
@@ -577,7 +581,7 @@ const demoteFromAdmin = async (user: AdminUser) => {
 }
 
 // Fonction pour ouvrir le modal de suppression
-const openDeletionModal = (user: AdminUser) => {
+const openDeletionModal = (user: AdminUserWithConnection) => {
   userToDelete.value = user
   showDeletionModal.value = true
 }
@@ -627,6 +631,7 @@ const fetchUsers = async () => {
       sortOrder,
       adminFilter: adminFilter.value,
       emailFilter: emailFilter.value,
+      onlineOnly: onlineFilter.value.toString(),
     }
 
     const data = await $fetch<UsersApiResponse>('/api/admin/users', {
@@ -656,41 +661,16 @@ const fetchUsers = async () => {
 
 // Fonction de rafraîchissement global
 const refreshData = async () => {
-  await Promise.all([
-    fetchUsers(),
-    fetchActiveConnections()
-  ])
-}
-
-// Fonction pour récupérer les connexions actives SSE
-const fetchActiveConnections = async () => {
-  if (loadingActiveConnections.value) return
-
-  loadingActiveConnections.value = true
-  try {
-    const data = await $fetch<{
-      activeUserIds: number[]
-      totalConnections: number
-      activeUsers: number
-    }>('/api/admin/users/active-connections')
-
-    activeUserIds.value = data.activeUserIds
-  } catch (error: any) {
-    console.error('Erreur lors du chargement des connexions actives:', error)
-    // Erreur silencieuse pour ne pas gêner l'interface
-  } finally {
-    loadingActiveConnections.value = false
-  }
+  await fetchUsers()
 }
 
 // Charger les données au montage
 onMounted(() => {
   fetchUsers()
-  fetchActiveConnections()
 
-  // Actualiser les connexions actives toutes les 30 secondes
+  // Actualiser les données toutes les 30 secondes
   const connectionInterval = setInterval(() => {
-    fetchActiveConnections()
+    fetchUsers()
   }, 30000)
 
   // Nettoyer l'intervalle au démontage
@@ -711,6 +691,12 @@ watch(emailFilter, () => {
 })
 
 watch(sortOption, () => {
+  currentPage.value = 1
+  fetchUsers()
+})
+
+// Réinitialiser la page et refetch quand on change le filtre online
+watch(onlineFilter, () => {
   currentPage.value = 1
   fetchUsers()
 })

@@ -1,4 +1,5 @@
 import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
+import { notificationStreamManager } from '../../../utils/notification-stream-manager'
 import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
@@ -43,8 +44,24 @@ export default defineEventHandler(async (event) => {
       searchConditions.isEmailVerified = false
     }
 
+    // Filtrage par utilisateurs en ligne uniquement
+    const onlineOnly = query.onlineOnly === 'true'
+
     // Calculer l'offset pour la pagination
     const offset = (page - 1) * limit
+
+    // Récupérer les connexions actives SSE
+    const activeConnections = notificationStreamManager.getStats()
+    const activeUserIds = activeConnections.connectionsByUser.map((conn) => conn.userId)
+
+    // Ajouter le filtre pour les utilisateurs en ligne si demandé
+    if (onlineOnly && activeUserIds.length > 0) {
+      searchConditions.id = { in: activeUserIds }
+    } else if (onlineOnly && activeUserIds.length === 0) {
+      // Si on demande seulement les utilisateurs en ligne mais qu'il n'y en a aucun,
+      // on retourne une condition impossible pour avoir un résultat vide
+      searchConditions.id = { equals: -1 }
+    }
 
     // Récupérer les utilisateurs avec pagination
     const [users, totalCount] = await Promise.all([
@@ -85,13 +102,19 @@ export default defineEventHandler(async (event) => {
       }),
     ])
 
+    // Ajouter le statut de connexion à chaque utilisateur
+    const usersWithConnectionStatus = users.map((user) => ({
+      ...user,
+      isConnected: activeUserIds.includes(user.id),
+    }))
+
     // Calculer les métadonnées de pagination
     const totalPages = Math.ceil(totalCount / limit)
     const hasNextPage = page < totalPages
     const hasPrevPage = page > 1
 
     return {
-      users,
+      users: usersWithConnectionStatus,
       pagination: {
         page,
         limit,
@@ -104,6 +127,10 @@ export default defineEventHandler(async (event) => {
         search,
         sortBy,
         sortOrder,
+      },
+      connectionStats: {
+        totalActiveConnections: activeConnections.totalConnections,
+        totalActiveUsers: activeConnections.activeUsers,
       },
     }
   } catch (error: unknown) {
