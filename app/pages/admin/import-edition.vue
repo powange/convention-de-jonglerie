@@ -35,7 +35,6 @@
                 <ul class="list-disc list-inside space-y-1 text-sm">
                   <li><code>convention.name</code> - Nom de la convention</li>
                   <li><code>convention.email</code> - Email de contact (pour revendication)</li>
-                  <li><code>edition.name</code> - Nom de l'édition</li>
                   <li><code>edition.startDate</code> - Date de début (YYYY-MM-DD)</li>
                   <li><code>edition.endDate</code> - Date de fin (YYYY-MM-DD)</li>
                   <li><code>edition.addressLine1</code> - Adresse</li>
@@ -49,6 +48,7 @@
                 <h4 class="font-semibold mb-2">{{ $t('admin.import.optional_fields') }}</h4>
                 <ul class="list-disc list-inside space-y-1 text-sm">
                   <li><code>convention.description</code> - Description de la convention</li>
+                  <li><code>edition.name</code> - Nom de l'édition (si omis, utilise le nom de la convention)</li>
                   <li><code>edition.description</code> - Description de l'édition</li>
                   <li><code>edition.addressLine2</code> - Complément d'adresse</li>
                   <li><code>edition.region</code> - Région</li>
