@@ -72,6 +72,26 @@
           class="w-full sm:w-48"
           @change="fetchUsers"
         />
+
+        <!-- Bouton rafraîchir -->
+        <UButton
+          icon="i-heroicons-arrow-path"
+          variant="outline"
+          color="neutral"
+          :loading="loading || loadingActiveConnections"
+          :title="t('common.refresh')"
+          @click="refreshData"
+        />
+      </div>
+
+      <!-- Filtres supplémentaires -->
+      <div class="flex flex-col sm:flex-row gap-4">
+        <!-- Checkbox utilisateurs en ligne -->
+        <UCheckbox
+          v-model="onlineFilter"
+          :label="t('admin.show_online_users_only')"
+          class="flex items-center"
+        />
       </div>
 
       <!-- Statistiques rapides -->
@@ -102,9 +122,9 @@
         </UCard>
         <UCard>
           <div class="text-center">
-            <div class="text-2xl font-bold text-purple-600">{{ stats.creators }}</div>
+            <div class="text-2xl font-bold text-green-500">{{ stats.online }}</div>
             <div class="text-sm text-gray-600 dark:text-gray-400">
-              {{ $t('admin.content_creators') }}
+              {{ $t('admin.users_online') }}
             </div>
           </div>
         </UCard>
@@ -113,7 +133,7 @@
 
     <!-- Tableau des utilisateurs -->
     <UCard>
-      <UTable :data="users" :columns="columns" :loading="loading" class="w-full" />
+      <UTable :data="filteredUsers" :columns="columns" :loading="loading" class="w-full" />
 
       <!-- Pagination -->
       <div v-if="pagination.totalPages > 1" class="flex justify-center mt-6">
@@ -190,10 +210,23 @@ const adminFilter = ref('all')
 const emailFilter = ref('all')
 const sortOption = ref('createdAt:desc')
 const currentPage = ref(1)
+const onlineFilter = ref(false)
 
 // État pour le modal de suppression
 const userToDelete = ref<AdminUser | null>(null)
 const showDeletionModal = ref(false)
+
+// État pour les connexions actives
+const activeUserIds = ref<number[]>([])
+const loadingActiveConnections = ref(false)
+
+// Utilisateurs filtrés selon le statut en ligne
+const filteredUsers = computed(() => {
+  if (!onlineFilter.value) {
+    return users.value
+  }
+  return users.value.filter((user: AdminUser) => activeUserIds.value.includes(user.id))
+})
 
 // Statistiques rapides
 const stats = computed(() => {
@@ -203,12 +236,37 @@ const stats = computed(() => {
   const creators = users.value.filter(
     (u: AdminUser) => u._count.createdConventions > 0 || u._count.createdEditions > 0
   ).length
+  const online = users.value.filter((u: AdminUser) => activeUserIds.value.includes(u.id)).length
 
-  return { total, verified, admins, creators }
+  return { total, verified, admins, creators, online }
 })
 
 // Configuration du tableau avec la nouvelle syntaxe
 const columns = [
+  {
+    accessorKey: 'connectionStatus',
+    header: '', // Pas de header pour la pastille
+    cell: ({ row }: { row: any }) => {
+      const user = row.original as AdminUser
+      const isConnected = activeUserIds.value.includes(user.id)
+
+      return h(
+        'div',
+        {
+          class: 'flex justify-center items-center',
+          title: isConnected ? t('admin.user_connected') : t('admin.user_offline')
+        },
+        [
+          h('div', {
+            class: [
+              'w-3 h-3 rounded-full',
+              isConnected ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
+            ]
+          })
+        ]
+      )
+    },
+  },
   {
     accessorKey: 'identity',
     header: t('admin.user_column'),
@@ -596,9 +654,49 @@ const fetchUsers = async () => {
   }
 }
 
+// Fonction de rafraîchissement global
+const refreshData = async () => {
+  await Promise.all([
+    fetchUsers(),
+    fetchActiveConnections()
+  ])
+}
+
+// Fonction pour récupérer les connexions actives SSE
+const fetchActiveConnections = async () => {
+  if (loadingActiveConnections.value) return
+
+  loadingActiveConnections.value = true
+  try {
+    const data = await $fetch<{
+      activeUserIds: number[]
+      totalConnections: number
+      activeUsers: number
+    }>('/api/admin/users/active-connections')
+
+    activeUserIds.value = data.activeUserIds
+  } catch (error: any) {
+    console.error('Erreur lors du chargement des connexions actives:', error)
+    // Erreur silencieuse pour ne pas gêner l'interface
+  } finally {
+    loadingActiveConnections.value = false
+  }
+}
+
 // Charger les données au montage
 onMounted(() => {
   fetchUsers()
+  fetchActiveConnections()
+
+  // Actualiser les connexions actives toutes les 30 secondes
+  const connectionInterval = setInterval(() => {
+    fetchActiveConnections()
+  }, 30000)
+
+  // Nettoyer l'intervalle au démontage
+  onUnmounted(() => {
+    clearInterval(connectionInterval)
+  })
 })
 
 // Watchers pour les changements de filtres
