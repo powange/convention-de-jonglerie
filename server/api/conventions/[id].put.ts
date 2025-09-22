@@ -173,6 +173,8 @@ export default defineEventHandler(async (event) => {
       data: {
         name: validatedData.name,
         description: validatedData.description || null,
+        // Ne mettre à jour l'email que si explicitement fourni dans validatedData
+        ...(validatedData.email !== undefined && { email: validatedData.email || null }),
         // Ne mettre à jour le logo que si explicitement fourni dans validatedData
         ...(validatedData.logo !== undefined && { logo: finalLogoFilename }),
       },

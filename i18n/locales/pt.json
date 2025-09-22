@@ -609,6 +609,8 @@
     },
     "convention_form": {
       "click_to_select_image": "Clique para seleccionar uma imagem",
+      "contact_email": "[TODO] Email de contact",
+      "contact_email_help": "[TODO] Adresse email utilisée pour les demandes de revendication d'éditions et les contacts liés à cette convention",
       "convention_logo": "Logótipo da convenção",
       "convention_logo_alt": "Logótipo da convenção",
       "convention_name": "Nome da convenção",
@@ -1366,6 +1368,7 @@
     "placeholders": {
       "address_complement": "Edifício A, Salão de festas...",
       "city_example": "Lisboa",
+      "contact_email": "[TODO] contact@convention.org",
       "convention_description": "Descreva a convenção, a sua história, as suas especificidades...",
       "convention_name_example": "Ex: Convenção Europeia de Malabarismo",
       "edition_name_example": "Nome da edição (ex: EJC 2024)",
@@ -1855,6 +1858,7 @@
     "departure_date_required": "Data de partida é obrigatória",
     "description_max_1000": "A descrição não pode exceder 1000 caracteres",
     "description_max_5000": "A descrição não pode exceder 5000 caracteres",
+    "email_format": "[TODO] L'adresse email n'est pas valide",
     "first_name_required": "O nome é obrigatório",
     "last_name_required": "O sobrenome é obrigatório",
     "message_required": "A mensagem é obrigatória",

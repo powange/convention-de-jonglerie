@@ -609,6 +609,8 @@
     },
     "convention_form": {
       "click_to_select_image": "Натисніть, щоб вибрати зображення",
+      "contact_email": "[TODO] Email de contact",
+      "contact_email_help": "[TODO] Adresse email utilisée pour les demandes de revendication d'éditions et les contacts liés à cette convention",
       "convention_logo": "Логотип конвенції",
       "convention_logo_alt": "Логотип конвенції",
       "convention_name": "Назва конвенції",
@@ -1366,6 +1368,7 @@
     "placeholders": {
       "address_complement": "Будівля A, зал для заходів...",
       "city_example": "Київ",
+      "contact_email": "[TODO] contact@convention.org",
       "convention_description": "Опишіть конвенцію, її історію, особливості...",
       "convention_name_example": "наприклад: Європейська Конвенція Жонглерів",
       "edition_name_example": "Назва видання (наприклад: EJC 2024)",
@@ -1855,6 +1858,7 @@
     "departure_date_required": "Дата від'їзду обов'язкова",
     "description_max_1000": "Опис не може перевищувати 1000 символів",
     "description_max_5000": "Опис не може перевищувати 5000 символів",
+    "email_format": "[TODO] L'adresse email n'est pas valide",
     "first_name_required": "Ім'я обов'язкове",
     "last_name_required": "Прізвище обов'язкове",
     "message_required": "Повідомлення обов'язкове",

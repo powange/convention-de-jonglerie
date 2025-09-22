@@ -609,6 +609,8 @@
     },
     "convention_form": {
       "click_to_select_image": "Klicken, um ein Bild auszuwählen",
+      "contact_email": "[TODO] Email de contact",
+      "contact_email_help": "[TODO] Adresse email utilisée pour les demandes de revendication d'éditions et les contacts liés à cette convention",
       "convention_logo": "Logo der Convention",
       "convention_logo_alt": "Convention-Logo",
       "convention_name": "Name der Convention",
@@ -1366,6 +1368,7 @@
     "placeholders": {
       "address_complement": "Gebäude A, Festsaal...",
       "city_example": "Berlin",
+      "contact_email": "[TODO] contact@convention.org",
       "convention_description": "Beschreibe die Convention, ihre Geschichte, ihre Besonderheiten...",
       "convention_name_example": "Z.B.: Europäische Jonglier-Convention",
       "edition_name_example": "Name der Auflage (z.B. EJC 2024)",
@@ -1855,6 +1858,7 @@
     "departure_date_required": "Abreisedatum ist erforderlich",
     "description_max_1000": "Beschreibung darf nicht länger als 1000 Zeichen sein",
     "description_max_5000": "Beschreibung darf nicht länger als 5000 Zeichen sein",
+    "email_format": "[TODO] L'adresse email n'est pas valide",
     "first_name_required": "Vorname ist erforderlich",
     "last_name_required": "Nachname ist erforderlich",
     "message_required": "Nachricht ist erforderlich",

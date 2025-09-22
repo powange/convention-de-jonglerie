@@ -609,6 +609,8 @@
     },
     "convention_form": {
       "click_to_select_image": "Kliknij, aby wybrać obraz",
+      "contact_email": "[TODO] Email de contact",
+      "contact_email_help": "[TODO] Adresse email utilisée pour les demandes de revendication d'éditions et les contacts liés à cette convention",
       "convention_logo": "Logo konwencji",
       "convention_logo_alt": "Logo konwencji",
       "convention_name": "Nazwa konwencji",
@@ -1366,6 +1368,7 @@
     "placeholders": {
       "address_complement": "Budynek A, Sala balowa...",
       "city_example": "Warszawa",
+      "contact_email": "[TODO] contact@convention.org",
       "convention_description": "Opisz konwencję, jej historię, specyficzne cechy...",
       "convention_name_example": "Np.: Europejska Konwencja Żonglerska",
       "edition_name_example": "Nazwa edycji (np. EJC 2024)",
@@ -1855,6 +1858,7 @@
     "departure_date_required": "Data wyjazdu jest wymagana",
     "description_max_1000": "Opis nie może przekroczyć 1000 znaków",
     "description_max_5000": "Opis nie może przekroczyć 5000 znaków",
+    "email_format": "[TODO] L'adresse email n'est pas valide",
     "first_name_required": "Imię jest wymagane",
     "last_name_required": "Nazwisko jest wymagane",
     "message_required": "Wiadomość jest wymagana",

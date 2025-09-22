@@ -223,6 +223,11 @@ const onlineFilter = ref(false)
 const userToDelete = ref<AdminUserWithConnection | null>(null)
 const showDeletionModal = ref(false)
 
+// État pour les stats de connexion
+const connectionStats = ref<{ totalActiveConnections: number; totalActiveUsers: number } | null>(
+  null
+)
+
 // Plus besoin de filtrage côté client, tout est géré côté serveur
 // Les utilisateurs sont déjà filtrés selon le paramètre onlineOnly envoyé à l'API
 
@@ -234,7 +239,10 @@ const stats = computed(() => {
   const creators = users.value.filter(
     (u: AdminUserWithConnection) => u._count.createdConventions > 0 || u._count.createdEditions > 0
   ).length
-  const online = users.value.filter((u: AdminUserWithConnection) => u.isConnected).length
+  // Utiliser les stats serveur si disponibles, sinon calculer côté client
+  const online =
+    connectionStats.value?.totalActiveUsers ??
+    users.value.filter((u: AdminUserWithConnection) => u.isConnected).length
 
   return { total, verified, admins, creators, online }
 })
@@ -640,6 +648,7 @@ const fetchUsers = async () => {
 
     users.value = data.users
     pagination.value = data.pagination
+    connectionStats.value = data.connectionStats || null
   } catch (error: any) {
     console.error('Error loading users:', error)
 

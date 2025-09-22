@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
     // Sanitisation
     const cleanName = validatedData.name.trim()
     const cleanDescription = validatedData.description?.trim() || null
+    const cleanEmail = validatedData.email?.trim() || null
     const cleanLogo = validatedData.logo?.trim() || null
 
     // Créer la convention
@@ -24,6 +25,7 @@ export default defineEventHandler(async (event) => {
       data: {
         name: cleanName,
         description: cleanDescription,
+        email: cleanEmail,
         logo: cleanLogo,
         authorId: user.id,
       },

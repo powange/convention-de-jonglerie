@@ -609,6 +609,8 @@
     },
     "convention_form": {
       "click_to_select_image": "Clicca per selezionare un'immagine",
+      "contact_email": "[TODO] Email de contact",
+      "contact_email_help": "[TODO] Adresse email utilisée pour les demandes de revendication d'éditions et les contacts liés à cette convention",
       "convention_logo": "Logo del convegno",
       "convention_logo_alt": "Logo del convegno",
       "convention_name": "Nome del convegno",
@@ -1366,6 +1368,7 @@
     "placeholders": {
       "address_complement": "Edificio A, Sala delle feste...",
       "city_example": "Roma",
+      "contact_email": "[TODO] contact@convention.org",
       "convention_description": "Descrivi il convegno, la sua storia, le sue specificità...",
       "convention_name_example": "Es: Convegno Europeo di Giocoleria",
       "edition_name_example": "Nome dell'edizione (es: EJC 2024)",
@@ -1855,6 +1858,7 @@
     "departure_date_required": "La data di partenza è obbligatoria",
     "description_max_1000": "La descrizione non può superare i 1000 caratteri",
     "description_max_5000": "La descrizione non può superare i 5000 caratteri",
+    "email_format": "[TODO] L'adresse email n'est pas valide",
     "first_name_required": "Il nome è obbligatorio",
     "last_name_required": "Il cognome è obbligatorio",
     "message_required": "Il messaggio è obbligatorio",

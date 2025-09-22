@@ -680,6 +680,8 @@
     },
     "convention_form": {
       "click_to_select_image": "Cliquez pour sélectionner une image",
+      "contact_email": "Email de contact",
+      "contact_email_help": "Adresse email utilisée pour les demandes de revendication d'éditions et les contacts liés à cette convention",
       "convention_logo": "Logo de la convention",
       "convention_logo_alt": "Logo de la convention",
       "convention_name": "Nom de la convention",
@@ -1367,6 +1369,7 @@
     "placeholders": {
       "address_complement": "Bâtiment A, Salle des fêtes...",
       "city_example": "Paris",
+      "contact_email": "contact@convention.org",
       "convention_description": "Décrivez la convention, son histoire, ses spécificités...",
       "convention_name_example": "Ex: Convention Européenne de Jonglerie",
       "edition_name_example": "Nom de l'édition (ex: EJC 2024)",
@@ -1815,6 +1818,7 @@
     "date_start_required": "La date de début est requise",
     "description_max_1000": "La description ne peut pas dépasser 1000 caractères",
     "description_max_5000": "La description ne peut pas dépasser 5000 caractères",
+    "email_format": "L'adresse email n'est pas valide",
     "name_max_100": "Le nom ne peut pas dépasser 100 caractères",
     "name_max_200": "Le nom ne peut pas dépasser 200 caractères",
     "name_min_3": "Le nom doit contenir au moins 3 caractères",

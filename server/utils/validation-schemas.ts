@@ -83,6 +83,7 @@ export const conventionSchema = z.object({
     .max(5000, 'La description ne peut pas dépasser 5000 caractères')
     .nullable()
     .optional(),
+  email: z.string().email('Email invalide').nullable().optional().or(z.literal('')),
   logo: z.string().nullable().optional(),
 })
 

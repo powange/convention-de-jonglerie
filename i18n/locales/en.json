@@ -609,6 +609,8 @@
     },
     "convention_form": {
       "click_to_select_image": "Click to select an image",
+      "contact_email": "Contact email",
+      "contact_email_help": "Email address used for edition claim requests and contacts related to this convention",
       "convention_logo": "Convention logo",
       "convention_logo_alt": "Convention logo",
       "convention_name": "Convention name",
@@ -1366,6 +1368,7 @@
     "placeholders": {
       "address_complement": "Building A, Function room...",
       "city_example": "London",
+      "contact_email": "contact@convention.org",
       "convention_description": "Describe the convention, its history, its specificities...",
       "convention_name_example": "e.g.: European Juggling Convention",
       "edition_name_example": "Edition name (e.g.: EJC 2024)",
@@ -1855,6 +1858,7 @@
     "departure_date_required": "Departure date is required",
     "description_max_1000": "Description cannot exceed 1000 characters",
     "description_max_5000": "Description cannot exceed 5000 characters",
+    "email_format": "Email address is not valid",
     "first_name_required": "First name is required",
     "last_name_required": "Last name is required",
     "message_required": "Message is required",

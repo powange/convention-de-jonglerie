@@ -21,6 +21,22 @@
       />
     </UFormField>
 
+    <!-- Email de contact -->
+    <UFormField :label="$t('components.convention_form.contact_email')" name="email">
+      <UInput
+        v-model="form.email"
+        type="email"
+        :placeholder="$t('forms.placeholders.contact_email')"
+        class="w-full"
+        @blur="trimField('email')"
+      />
+      <template #help>
+        <p class="text-sm text-gray-500">
+          {{ $t('components.convention_form.contact_email_help') }}
+        </p>
+      </template>
+    </UFormField>
+
     <!-- Logo -->
     <UFormField :label="$t('components.convention_form.convention_logo')" name="logo">
       <div class="space-y-4">
@@ -151,6 +167,7 @@ const uploadMode = ref<'file' | 'url'>('file')
 const form = reactive({
   name: '',
   description: '',
+  email: '',
   logo: '',
 })
 
@@ -164,6 +181,7 @@ const trimField = (fieldName: keyof typeof form) => {
 const trimAllFields = () => {
   trimField('name')
   trimField('description')
+  trimField('email')
   trimField('logo')
 }
 
@@ -235,6 +253,14 @@ const validate = (state: typeof form) => {
     })
   }
 
+  // Validation de l'email si fourni
+  if (state.email && state.email.trim()) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(state.email.trim())) {
+      errors.push({ path: 'email', message: t('validation.email_format') })
+    }
+  }
+
   // Valider l'URL du logo seulement en mode URL et si elle n'est pas vide
   if (state.logo && state.logo.trim() && !isValidUrl(state.logo.trim())) {
     errors.push({ path: 'logo', message: "L'URL du logo n'est pas valide" })
@@ -247,10 +273,11 @@ const validate = (state: typeof form) => {
 const onSubmit = async () => {
   trimAllFields()
 
-  // Données du formulaire sans l'image
+  // Données du formulaire
   const formData = {
     name: form.name.trim(),
     description: form.description.trim() || null,
+    email: form.email.trim() || null,
     logo: uploadMode.value === 'url' ? form.logo.trim() || null : form.logo || null,
   }
 
@@ -262,6 +289,7 @@ onMounted(() => {
   if (props.initialData) {
     form.name = props.initialData.name || ''
     form.description = props.initialData.description || ''
+    form.email = props.initialData.email || ''
     form.logo = props.initialData.logo || ''
   }
 })

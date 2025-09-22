@@ -609,6 +609,8 @@
     },
     "convention_form": {
       "click_to_select_image": "Klik for at vælge et billede",
+      "contact_email": "[TODO] Email de contact",
+      "contact_email_help": "[TODO] Adresse email utilisée pour les demandes de revendication d'éditions et les contacts liés à cette convention",
       "convention_logo": "Konventionslogo",
       "convention_logo_alt": "Konventionslogo",
       "convention_name": "Konventionsnavn",
@@ -1366,6 +1368,7 @@
     "placeholders": {
       "address_complement": "Bygning A, Festsal...",
       "city_example": "København",
+      "contact_email": "[TODO] contact@convention.org",
       "convention_description": "Beskriv konventionen, dens historie, dens særegenhed...",
       "convention_name_example": "F.eks: Europæisk Jonglørkonvention",
       "edition_name_example": "Udgavenavn (f.eks: EJC 2024)",
@@ -1855,6 +1858,7 @@
     "departure_date_required": "Afrejsedato er påkrævet",
     "description_max_1000": "Beskrivelsen må ikke overskride 1000 tegn",
     "description_max_5000": "Beskrivelsen må ikke overskride 5000 tegn",
+    "email_format": "[TODO] L'adresse email n'est pas valide",
     "first_name_required": "Fornavn er påkrævet",
     "last_name_required": "Efternavn er påkrævet",
     "message_required": "Besked er påkrævet",

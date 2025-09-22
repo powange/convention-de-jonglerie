@@ -609,6 +609,8 @@
     },
     "convention_form": {
       "click_to_select_image": "Klik om een afbeelding te selecteren",
+      "contact_email": "[TODO] Email de contact",
+      "contact_email_help": "[TODO] Adresse email utilisée pour les demandes de revendication d'éditions et les contacts liés à cette convention",
       "convention_logo": "Conventielogo",
       "convention_logo_alt": "Conventielogo",
       "convention_name": "Conventienaam",
@@ -1366,6 +1368,7 @@
     "placeholders": {
       "address_complement": "Gebouw A, Functiezaal...",
       "city_example": "Amsterdam",
+      "contact_email": "[TODO] contact@convention.org",
       "convention_description": "Beschrijf de conventie, haar geschiedenis, haar bijzonderheden...",
       "convention_name_example": "bijv.: Europees Jongleer Congres",
       "edition_name_example": "Editienaam (bijv.: EJC 2024)",
@@ -1855,6 +1858,7 @@
     "departure_date_required": "Vertrekdatum is vereist",
     "description_max_1000": "Beschrijving mag niet meer dan 1000 tekens bevatten",
     "description_max_5000": "Beschrijving mag niet meer dan 5000 tekens bevatten",
+    "email_format": "[TODO] L'adresse email n'est pas valide",
     "first_name_required": "Voornaam is vereist",
     "last_name_required": "Achternaam is vereist",
     "message_required": "Bericht is verplicht",

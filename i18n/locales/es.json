@@ -609,6 +609,8 @@
     },
     "convention_form": {
       "click_to_select_image": "Haz clic para seleccionar una imagen",
+      "contact_email": "[TODO] Email de contact",
+      "contact_email_help": "[TODO] Adresse email utilisée pour les demandes de revendication d'éditions et les contacts liés à cette convention",
       "convention_logo": "Logo de la convención",
       "convention_logo_alt": "Logo de la convención",
       "convention_name": "Nombre de la convención",
@@ -1366,6 +1368,7 @@
     "placeholders": {
       "address_complement": "Edificio A, Salón de eventos...",
       "city_example": "Madrid",
+      "contact_email": "[TODO] contact@convention.org",
       "convention_description": "Describe la convención, su historia, sus particularidades...",
       "convention_name_example": "Ej: Convención Europea de Malabares",
       "edition_name_example": "Nombre de la edición (ej: ECM 2024)",
@@ -1855,6 +1858,7 @@
     "departure_date_required": "La fecha de salida es requerida",
     "description_max_1000": "La descripción no puede exceder los 1000 caracteres",
     "description_max_5000": "La descripción no puede exceder los 5000 caracteres",
+    "email_format": "[TODO] L'adresse email n'est pas valide",
     "first_name_required": "El nombre es requerido",
     "last_name_required": "El apellido es requerido",
     "message_required": "El mensaje es obligatorio",

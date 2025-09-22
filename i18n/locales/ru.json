@@ -609,6 +609,8 @@
     },
     "convention_form": {
       "click_to_select_image": "Нажмите, чтобы выбрать изображение",
+      "contact_email": "[TODO] Email de contact",
+      "contact_email_help": "[TODO] Adresse email utilisée pour les demandes de revendication d'éditions et les contacts liés à cette convention",
       "convention_logo": "Логотип конвенции",
       "convention_logo_alt": "Логотип конвенции",
       "convention_name": "Название конвенции",
@@ -1366,6 +1368,7 @@
     "placeholders": {
       "address_complement": "Здание А, Функциональный зал...",
       "city_example": "Париж",
+      "contact_email": "[TODO] contact@convention.org",
       "convention_description": "Опишите конвенцию, ее историю, особенности...",
       "convention_name_example": "напр.: Европейская Конвенция Жонглирования",
       "edition_name_example": "Название издания (напр.: EJC 2024)",
@@ -1855,6 +1858,7 @@
     "departure_date_required": "Дата отъезда обязательна",
     "description_max_1000": "Описание не может превышать 1000 символов",
     "description_max_5000": "Описание не может превышать 5000 символов",
+    "email_format": "[TODO] L'adresse email n'est pas valide",
     "first_name_required": "Имя обязательно",
     "last_name_required": "Фамилия обязательна",
     "message_required": "Сообщение обязательно",
