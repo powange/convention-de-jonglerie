@@ -349,6 +349,13 @@
                             to: `/editions/${edition.id}/gestion`,
                           },
                         ],
+                        [
+                          {
+                            label: 'Exporter JSON',
+                            icon: 'i-heroicons-arrow-down-tray',
+                            click: () => exportEdition(edition.id),
+                          },
+                        ],
                       ]"
                     >
                       <UButton
@@ -381,6 +388,73 @@
         </p>
       </div>
     </div>
+
+    <!-- Modal d'export JSON -->
+    <UModal v-model="showExportModal">
+      <UCard>
+        <template #header>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-arrow-down-tray" class="text-primary-500" />
+              <h3 class="text-lg font-semibold">Export JSON</h3>
+            </div>
+            <UButton
+              color="neutral"
+              variant="ghost"
+              icon="i-heroicons-x-mark"
+              size="sm"
+              @click="showExportModal = false"
+            />
+          </div>
+        </template>
+
+        <div class="space-y-4">
+          <UAlert
+            icon="i-heroicons-information-circle"
+            color="info"
+            variant="soft"
+            title="Format d'export"
+            description="Ce JSON est formaté pour être réimporté via la page d'import d'édition."
+          />
+
+          <div class="relative">
+            <UTextarea
+              v-model="exportedJson"
+              :rows="15"
+              readonly
+              class="font-mono text-xs"
+              placeholder="Chargement..."
+            />
+            <UButton
+              v-if="exportedJson"
+              icon="i-heroicons-clipboard-document"
+              color="primary"
+              variant="soft"
+              size="sm"
+              class="absolute top-2 right-2"
+              @click="copyToClipboard"
+            >
+              {{ copied ? 'Copié !' : 'Copier' }}
+            </UButton>
+          </div>
+
+          <div v-if="exportError" class="mt-4">
+            <UAlert icon="i-heroicons-exclamation-triangle" color="error" variant="soft">
+              <template #title>Erreur d'export</template>
+              <template #description>{{ exportError }}</template>
+            </UAlert>
+          </div>
+        </div>
+
+        <template #footer>
+          <div class="flex justify-end gap-3">
+            <UButton color="neutral" variant="soft" @click="showExportModal = false">
+              Fermer
+            </UButton>
+          </div>
+        </template>
+      </UCard>
+    </UModal>
   </div>
 </template>
 
@@ -404,6 +478,12 @@ useHead({
 const searchQuery = ref('')
 const debouncedSearchQuery = useDebounce(searchQuery, 300)
 const archivedFilter = ref('all')
+
+// État pour l'export JSON
+const showExportModal = ref(false)
+const exportedJson = ref('')
+const exportError = ref('')
+const copied = ref(false)
 
 // Options de filtre
 const archivedFilterOptions = computed(() => [
@@ -529,6 +609,36 @@ const toggleArchiveConvention = async (conventionId, isArchived) => {
   } catch (error) {
     console.error("Erreur lors de l'archivage:", error)
     alert("Erreur lors de l'opération")
+  }
+}
+
+// Fonction pour exporter une édition en JSON
+const exportEdition = async (editionId) => {
+  try {
+    exportedJson.value = ''
+    exportError.value = ''
+    copied.value = false
+    showExportModal.value = true
+
+    const data = await $fetch(`/api/admin/editions/${editionId}/export`)
+    exportedJson.value = JSON.stringify(data, null, 2)
+  } catch (error) {
+    console.error("Erreur lors de l'export:", error)
+    exportError.value = error.data?.message || "Erreur lors de l'export de l'édition"
+  }
+}
+
+// Fonction pour copier dans le presse-papiers
+const copyToClipboard = async () => {
+  try {
+    await navigator.clipboard.writeText(exportedJson.value)
+    copied.value = true
+    setTimeout(() => {
+      copied.value = false
+    }, 2000)
+  } catch (error) {
+    console.error('Erreur lors de la copie:', error)
+    alert('Erreur lors de la copie dans le presse-papiers')
   }
 }
 </script>
