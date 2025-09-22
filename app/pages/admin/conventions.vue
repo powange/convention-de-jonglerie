@@ -463,6 +463,7 @@ import { useDebounce } from '~/composables/useDebounce'
 
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
+const { $fetch } = useNuxtApp()
 
 // Métadonnées de la page
 definePageMeta({
@@ -614,17 +615,24 @@ const toggleArchiveConvention = async (conventionId, isArchived) => {
 
 // Fonction pour exporter une édition en JSON
 const exportEdition = async (editionId) => {
+  console.log('exportEdition appelée avec ID:', editionId)
+
   try {
     exportedJson.value = ''
     exportError.value = ''
     copied.value = false
     showExportModal.value = true
 
+    console.log('Modal ouverte, récupération des données...')
     const data = await $fetch(`/api/admin/editions/${editionId}/export`)
+    console.log('Données reçues:', data)
+
     exportedJson.value = JSON.stringify(data, null, 2)
+    console.log('JSON formaté avec succès')
   } catch (error) {
     console.error("Erreur lors de l'export:", error)
-    exportError.value = error.data?.message || "Erreur lors de l'export de l'édition"
+    exportError.value = error.data?.message || error.message || "Erreur lors de l'export de l'édition"
+    console.log('Erreur définie:', exportError.value)
   }
 }
 

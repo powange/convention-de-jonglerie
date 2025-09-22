@@ -89,7 +89,7 @@ export default defineEventHandler(async (event) => {
 
   // Nettoyer les undefined pour avoir un JSON plus propre
   const cleanedData = JSON.parse(
-    JSON.stringify(exportData, (key, value) => (value === undefined ? undefined : value))
+    JSON.stringify(exportData, (key, value) => (value === undefined ? null : value))
   )
 
   return cleanedData
