@@ -613,7 +613,7 @@ const getEditionsColumns = () => [
           label: t('common.delete'),
           icon: 'i-heroicons-trash',
           color: 'error' as const,
-          onClick: () => deleteEdition(edition.id),
+          onSelect: () => deleteEdition(edition.id),
         })
       }
 

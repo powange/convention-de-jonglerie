@@ -154,13 +154,15 @@
                       icon: 'i-heroicons-pencil-square',
                       to: `/conventions/${convention.id}/edit`,
                     },
+                  ],
+                  [
                     ...(convention.isArchived
                       ? [
                           {
                             label: $t('admin.unarchive_convention'),
                             icon: 'i-heroicons-arrow-up-tray',
                             color: 'success',
-                            click: () =>
+                            onSelect: () =>
                               toggleArchiveConvention(convention.id, convention.isArchived),
                           },
                         ]
@@ -168,11 +170,17 @@
                           {
                             label: $t('admin.archive_convention'),
                             icon: 'i-heroicons-archive-box',
-                            color: 'error',
-                            click: () =>
+                            color: 'warning',
+                            onSelect: () =>
                               toggleArchiveConvention(convention.id, convention.isArchived),
                           },
                         ]),
+                    {
+                      label: $t('admin.pages.conventions.delete_convention_permanently'),
+                      icon: 'i-heroicons-trash',
+                      color: 'error',
+                      onSelect: () => deleteConventionPermanently(convention),
+                    },
                   ],
                 ]"
               >
@@ -559,6 +567,55 @@ const toggleArchiveConvention = async (conventionId, isArchived) => {
   } catch (error) {
     console.error("Erreur lors de l'archivage:", error)
     alert("Erreur lors de l'opération")
+  }
+}
+
+// Fonction pour supprimer définitivement une convention
+const deleteConventionPermanently = async (convention) => {
+  try {
+    const editionsCount = convention.editions.length
+    const collaboratorsCount = convention._count.collaborators
+
+    // Premier message de confirmation détaillé
+    const confirmMessage = t('admin.pages.conventions.confirm_delete_convention_permanently', {
+      name: convention.name,
+      editionsCount,
+      collaboratorsCount,
+    })
+
+    // Deuxième confirmation
+    const secondConfirm = t('admin.pages.conventions.confirm_delete_convention_permanently_final')
+
+    const firstConfirm = confirm(confirmMessage)
+
+    if (firstConfirm) {
+      const secondConfirmResult = confirm(secondConfirm)
+
+      if (secondConfirmResult) {
+        await $fetch(`/api/admin/conventions/${convention.id}`, {
+          method: 'DELETE',
+        })
+
+        // Rafraîchir les données
+        refresh()
+
+        // Message de succès
+        useToast().add({
+          title: t('admin.pages.conventions.convention_deleted_permanently'),
+          color: 'success',
+        })
+      }
+    }
+  } catch (error) {
+    console.error('Erreur lors de la suppression définitive:', error)
+    const errorMessage =
+      error.data?.message || t('admin.pages.conventions.error_deleting_convention')
+
+    useToast().add({
+      title: t('common.error'),
+      description: errorMessage,
+      color: 'error',
+    })
   }
 }
 

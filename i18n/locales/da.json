@@ -202,6 +202,15 @@
     "notification_management": "Meddelelseshåndtering",
     "notifications_sent": "Notifikationer sendt",
     "oldest_first": "Ældste først",
+    "pages": {
+      "conventions": {
+        "confirm_delete_convention_permanently": "⚠️ ADVARSEL: Er du sikker på, at du vil slette konventionen \"{name}\" permanent?\n\nDenne handling vil slette:\n- {editionsCount} udgave(r)\n- {collaboratorsCount} samarbejdspartner(e)\n- Alle tilknyttede data\n\nDenne handling kan IKKE fortrydes!",
+        "confirm_delete_convention_permanently_final": "Skriv JA for at bekræfte permanent sletning",
+        "convention_deleted_permanently": "Konvention slettet permanent med succes",
+        "delete_convention_permanently": "Slet permanent",
+        "error_deleting_convention": "Fejl ved sletning af konvention"
+      }
+    },
     "password_tokens_cleaned": "Adgangskode-tokens ryddet",
     "per_page": "per side",
     "profile_picture_alt": "Brugerens profilbillede",

@@ -260,6 +260,15 @@
       "import_another": "Importer une autre",
       "json_format": "Format JSON",
       "orphan_conventions": "Conventions orphelines"
+    },
+    "pages": {
+      "conventions": {
+        "delete_convention_permanently": "Supprimer définitivement",
+        "confirm_delete_convention_permanently": "⚠️ ATTENTION : Êtes-vous sûr de vouloir supprimer définitivement la convention \"{name}\" ?\n\nCette action supprimera :\n- {editionsCount} édition(s)\n- {collaboratorsCount} collaborateur(s)\n- Toutes les données associées\n\nCette action est IRRÉVERSIBLE !",
+        "confirm_delete_convention_permanently_final": "Tapez OUI pour confirmer la suppression définitive",
+        "convention_deleted_permanently": "Convention supprimée définitivement avec succès",
+        "error_deleting_convention": "Erreur lors de la suppression de la convention"
+      }
     }
   },
   "app": {

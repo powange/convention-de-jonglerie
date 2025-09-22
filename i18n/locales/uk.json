@@ -202,6 +202,15 @@
     "notification_management": "Керування сповіщеннями",
     "notifications_sent": "Сповіщення надіслано",
     "oldest_first": "Спочатку старі",
+    "pages": {
+      "conventions": {
+        "confirm_delete_convention_permanently": "⚠️ УВАГА: Ви впевнені, що хочете назавжди видалити конвенцію \"{name}\"?\n\nЦя дія видалить:\n- {editionsCount} видання\n- {collaboratorsCount} співробітника/співробітників\n- Всі пов'язані дані\n\nЦя дія НЕЗВОРОТНА!",
+        "confirm_delete_convention_permanently_final": "Введіть ТАК для підтвердження постійного видалення",
+        "convention_deleted_permanently": "Конвенцію успішно видалено назавжди",
+        "delete_convention_permanently": "Видалити назавжди",
+        "error_deleting_convention": "Помилка при видаленні конвенції"
+      }
+    },
     "password_tokens_cleaned": "Токени паролів очищено",
     "per_page": "на сторінку",
     "profile_picture_alt": "Фото профілю користувача",

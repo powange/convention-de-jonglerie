@@ -76,7 +76,8 @@
       "Bash(/tmp/fix-ogsitename.sh:*)",
       "Bash(/tmp/remove-ogsitename.sh:*)",
       "Bash(tree:*)",
-      "WebFetch(domain:image.nuxt.com)"
+      "WebFetch(domain:image.nuxt.com)",
+      "WebFetch(domain:www.facebook.com)"
     ],
     "deny": [],
     "ask": [],

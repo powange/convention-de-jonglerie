@@ -202,6 +202,15 @@
     "notification_management": "Zarządzanie powiadomieniami",
     "notifications_sent": "Powiadomienia wysłane",
     "oldest_first": "Najstarsi jako pierwsi",
+    "pages": {
+      "conventions": {
+        "confirm_delete_convention_permanently": "⚠️ OSTRZEŻENIE: Czy na pewno chcesz trwale usunąć konwencję \"{name}\"?\n\nTa czynność usunie:\n- {editionsCount} edycję/edycji\n- {collaboratorsCount} współpracownika/współpracowników\n- Wszystkie powiązane dane\n\nTa czynność jest NIEODWRACALNA!",
+        "confirm_delete_convention_permanently_final": "Wpisz TAK, aby potwierdzić trwałe usunięcie",
+        "convention_deleted_permanently": "Konwencja usunięta trwale pomyślnie",
+        "delete_convention_permanently": "Usuń trwale",
+        "error_deleting_convention": "Błąd podczas usuwania konwencji"
+      }
+    },
     "password_tokens_cleaned": "Tokeny hasła wyczyszczone",
     "per_page": "na stronę",
     "profile_picture_alt": "Zdjęcie profilowe użytkownika",

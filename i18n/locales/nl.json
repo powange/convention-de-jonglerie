@@ -202,6 +202,15 @@
     "notification_management": "Meldingenbeheer",
     "notifications_sent": "Meldingen verzonden",
     "oldest_first": "Oudste eerst",
+    "pages": {
+      "conventions": {
+        "confirm_delete_convention_permanently": "⚠️ WAARSCHUWING: Weet je zeker dat je de conventie \"{name}\" permanent wilt verwijderen?\n\nDeze actie zal verwijderen:\n- {editionsCount} editie(s)\n- {collaboratorsCount} medewerker(s)\n- Alle bijbehorende gegevens\n\nDeze actie is ONOMKEERBAAR!",
+        "confirm_delete_convention_permanently_final": "Typ JA om permanente verwijdering te bevestigen",
+        "convention_deleted_permanently": "Conventie succesvol permanent verwijderd",
+        "delete_convention_permanently": "Permanent verwijderen",
+        "error_deleting_convention": "Fout bij verwijderen van conventie"
+      }
+    },
     "password_tokens_cleaned": "Wachtwoord-tokens opgeruimd",
     "per_page": "per pagina",
     "profile_picture_alt": "Profielfoto van de gebruiker",

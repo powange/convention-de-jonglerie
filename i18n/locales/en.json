@@ -202,6 +202,15 @@
     "notification_management": "Notification Management",
     "notifications_sent": "Notifications sent",
     "oldest_first": "Oldest first",
+    "pages": {
+      "conventions": {
+        "confirm_delete_convention_permanently": "⚠️ WARNING: Are you sure you want to permanently delete the convention \"{name}\"?\n\nThis action will delete:\n- {editionsCount} edition(s)\n- {collaboratorsCount} collaborator(s)\n- All associated data\n\nThis action is IRREVERSIBLE!",
+        "confirm_delete_convention_permanently_final": "Type YES to confirm permanent deletion",
+        "convention_deleted_permanently": "Convention permanently deleted successfully",
+        "delete_convention_permanently": "Delete permanently",
+        "error_deleting_convention": "Error deleting convention"
+      }
+    },
     "password_tokens_cleaned": "Password tokens cleaned",
     "per_page": "per page",
     "profile_picture_alt": "User's profile picture",

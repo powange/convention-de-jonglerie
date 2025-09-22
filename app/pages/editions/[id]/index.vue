@@ -209,7 +209,7 @@
               class="space-y-2"
             >
               <h3 class="text-lg font-semibold">{{ $t('editions.useful_links') }}</h3>
-              <div class="flex gap-2">
+              <div class="flex flex-wrap gap-2">
                 <UButton
                   v-if="edition.officialWebsiteUrl"
                   icon="i-heroicons-globe-alt"

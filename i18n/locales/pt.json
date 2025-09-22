@@ -202,6 +202,15 @@
     "notification_management": "Gerenciamento de Notificações",
     "notifications_sent": "Notificações enviadas",
     "oldest_first": "Mais antigos primeiro",
+    "pages": {
+      "conventions": {
+        "confirm_delete_convention_permanently": "⚠️ AVISO: Tem certeza de que deseja excluir permanentemente a convenção \"{name}\"?\n\nEsta ação excluirá:\n- {editionsCount} edição/edições\n- {collaboratorsCount} colaborador/colaboradores\n- Todos os dados associados\n\nEsta ação é IRREVERSÍVEL!",
+        "confirm_delete_convention_permanently_final": "Digite SIM para confirmar a exclusão permanente",
+        "convention_deleted_permanently": "Convenção excluída permanentemente com sucesso",
+        "delete_convention_permanently": "Excluir permanentemente",
+        "error_deleting_convention": "Erro ao excluir convenção"
+      }
+    },
     "password_tokens_cleaned": "Tokens de senha limpos",
     "per_page": "por página",
     "profile_picture_alt": "Foto de perfil do utilizador",

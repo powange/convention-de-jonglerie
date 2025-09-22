@@ -480,7 +480,7 @@ const getUserActions = (user: AdminUserWithConnection) => {
     actions.push({
       label: t('admin.promote_to_admin'),
       icon: 'i-heroicons-shield-check',
-      onClick: () => {
+      onSelect: () => {
         console.log('Promote clicked for:', user.pseudo)
         promoteToAdmin(user)
       },
@@ -489,7 +489,7 @@ const getUserActions = (user: AdminUserWithConnection) => {
     actions.push({
       label: t('admin.demote'),
       icon: 'i-heroicons-shield-exclamation',
-      onClick: () => {
+      onSelect: () => {
         console.log('Demote clicked for:', user.pseudo)
         demoteFromAdmin(user)
       },
@@ -501,7 +501,7 @@ const getUserActions = (user: AdminUserWithConnection) => {
     actions.push({
       label: t('admin.delete_account'),
       icon: 'i-heroicons-trash',
-      onClick: () => {
+      onSelect: () => {
         console.log('Delete clicked for:', user.pseudo)
         openDeletionModal(user)
       },

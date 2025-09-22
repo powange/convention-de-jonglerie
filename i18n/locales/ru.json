@@ -202,6 +202,15 @@
     "notification_management": "Управление уведомлениями",
     "notifications_sent": "Уведомления отправлены",
     "oldest_first": "Старейшие сначала",
+    "pages": {
+      "conventions": {
+        "confirm_delete_convention_permanently": "⚠️ ВНИМАНИЕ: Вы уверены, что хотите навсегда удалить конвенцию \"{name}\"?\n\nЭто действие удалит:\n- {editionsCount} издание/издания\n- {collaboratorsCount} сотрудника/сотрудников\n- Все связанные данные\n\nЭто действие НЕОБРАТИМО!",
+        "confirm_delete_convention_permanently_final": "Введите ДА для подтверждения постоянного удаления",
+        "convention_deleted_permanently": "Конвенция успешно удалена навсегда",
+        "delete_convention_permanently": "Удалить навсегда",
+        "error_deleting_convention": "Ошибка при удалении конвенции"
+      }
+    },
     "password_tokens_cleaned": "Токены паролей очищены",
     "per_page": "на страницу",
     "profile_picture_alt": "Фото профиля пользователя",

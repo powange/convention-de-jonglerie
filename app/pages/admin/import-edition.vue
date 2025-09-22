@@ -35,8 +35,10 @@
                 <ul class="list-disc list-inside space-y-1 text-sm">
                   <li><code>convention.name</code> - Nom de la convention</li>
                   <li><code>convention.email</code> - Email de contact (pour revendication)</li>
-                  <li><code>edition.startDate</code> - Date de début (YYYY-MM-DD)</li>
-                  <li><code>edition.endDate</code> - Date de fin (YYYY-MM-DD)</li>
+                  <li>
+                    <code>edition.startDate</code> - Date de début (YYYY-MM-DD ou format ISO UTC)
+                  </li>
+                  <li><code>edition.endDate</code> - Date de fin (YYYY-MM-DD ou format ISO UTC)</li>
                   <li><code>edition.addressLine1</code> - Adresse</li>
                   <li><code>edition.city</code> - Ville</li>
                   <li><code>edition.country</code> - Pays</li>
@@ -61,6 +63,20 @@
                   <li><code>edition.instagramUrl</code> - Page Instagram</li>
                   <li><code>edition.officialWebsiteUrl</code> - Site officiel</li>
                 </ul>
+              </div>
+
+              <div>
+                <h4 class="font-semibold mb-2">Formats de dates acceptés</h4>
+                <p class="text-sm mb-2">Les dates peuvent être au format :</p>
+                <ul class="list-disc list-inside space-y-1 text-sm">
+                  <li><code>"2025-10-24"</code> - Date simple (recommandé)</li>
+                  <li><code>"2025-10-24T14:30:00"</code> - Date avec heure</li>
+                  <li><code>"2025-10-24T14:30:00Z"</code> - Date avec heure UTC</li>
+                  <li><code>"2025-10-24T14:30:00.000Z"</code> - Date complète ISO UTC</li>
+                </ul>
+                <p class="text-xs text-gray-600 mt-2">
+                  💡 Pour les événements multi-jours, le format date simple est recommandé.
+                </p>
               </div>
 
               <div>

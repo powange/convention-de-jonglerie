@@ -127,7 +127,7 @@ model Edition {
   volunteersAskTeardown        Boolean                         @default(false)
   carpoolOffers                CarpoolOffer[]
   carpoolRequests              CarpoolRequest[]
-  convention                   Convention                      @relation(fields: [conventionId], references: [id])
+  convention                   Convention                      @relation(fields: [conventionId], references: [id], onDelete: Cascade)
   creator                      User?                           @relation("CreatedEditions", fields: [creatorId], references: [id])
   collaboratorPermissions      EditionCollaboratorPermission[]
   editionPosts                 EditionPost[]
