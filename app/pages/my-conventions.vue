@@ -84,6 +84,15 @@
             </div>
           </template>
 
+          <!-- Email de contact -->
+          <a
+            v-if="convention.email"
+            :href="`mailto:${convention.email}`"
+            class="text-primary-600 hover:text-primary-700 hover:underline"
+          >
+            {{ convention.email }}
+          </a>
+
           <p
             v-if="convention.description"
             class="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-4"

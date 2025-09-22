@@ -475,6 +475,7 @@
     "close": "Close",
     "confirm": "Confirm",
     "confirmation": "Confirmation",
+    "contact_email": "Contact email",
     "continue": "Continue",
     "convention": "Convention",
     "country": "Country",
@@ -1368,7 +1369,7 @@
     "placeholders": {
       "address_complement": "Building A, Function room...",
       "city_example": "London",
-      "contact_email": "contact@convention.org",
+      "contact_email": "contact{'@'}convention.org",
       "convention_description": "Describe the convention, its history, its specificities...",
       "convention_name_example": "e.g.: European Juggling Convention",
       "edition_name_example": "Edition name (e.g.: EJC 2024)",

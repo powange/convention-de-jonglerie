@@ -191,6 +191,11 @@ const isValidUrl = (url: string): boolean => {
     return true
   }
 
+  // Accepter les noms de fichiers simples (sans slash, pour les images uploadées)
+  if (!url.includes('/') && !url.includes('\\')) {
+    return true
+  }
+
   // Accepter les URLs relatives (commençant par / ou ./)
   if (url.startsWith('/') || url.startsWith('./')) {
     return true

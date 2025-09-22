@@ -621,7 +621,8 @@
     "sort_tip": "Tri: cliquer sur les entêtes (Shift+clic pour multi)",
     "all": "Tout",
     "clear": "Effacer",
-    "continue": "Continuer"
+    "continue": "Continuer",
+    "contact_email": "Email de contact"
   },
   "components": {
     "carpool": {
@@ -1369,7 +1370,7 @@
     "placeholders": {
       "address_complement": "Bâtiment A, Salle des fêtes...",
       "city_example": "Paris",
-      "contact_email": "contact@convention.org",
+      "contact_email": "contact{'@'}convention.org",
       "convention_description": "Décrivez la convention, son histoire, ses spécificités...",
       "convention_name_example": "Ex: Convention Européenne de Jonglerie",
       "edition_name_example": "Nom de l'édition (ex: EJC 2024)",

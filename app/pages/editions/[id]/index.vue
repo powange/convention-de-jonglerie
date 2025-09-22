@@ -154,6 +154,18 @@
                 {{ formatDateTimeRange(edition.startDate, edition.endDate) }}
               </p>
 
+              <!-- Email de contact de la convention -->
+              <p v-if="edition.convention?.email" class="text-sm text-gray-600">
+                <UIcon name="i-heroicons-envelope" class="inline mr-1" />
+                <a
+                  :href="`mailto:${edition.convention.email}`"
+                  class="text-primary-600 hover:text-primary-700 hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  :aria-label="`${$t('common.contact_email')}: ${edition.convention.email}`"
+                >
+                  {{ edition.convention.email }}
+                </a>
+              </p>
+
               <!-- Collaborateurs -->
               <div v-if="getAllCollaborators(edition).length > 0" class="pt-2">
                 <div class="flex items-center gap-2 mb-2">

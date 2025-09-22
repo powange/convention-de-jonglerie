@@ -75,8 +75,8 @@ onMounted(async () => {
     convention.value = await $fetch(`/api/conventions/${conventionId}`)
 
     // Vérifier droits : admin global en mode admin, auteur ou collaborateur avec droit editConvention
-    const isAuthor = convention.value.authorId && convention.value.authorId === authStore.user?.id
-    const hasEditRight = convention.value.collaborators?.some(
+    const isAuthor = convention.value?.authorId && convention.value.authorId === authStore.user?.id
+    const hasEditRight = convention.value?.collaborators?.some(
       (collab) => collab.user.id === authStore.user?.id && collab.rights?.editConvention
     )
     const isAdminMode = authStore.isAdminModeActive
@@ -132,7 +132,7 @@ const handleUpdateConvention = async (
       body: formData,
     })
 
-    convention.value = updatedConvention
+    convention.value = updatedConvention as unknown as Convention
 
     toast.add({
       title: t('messages.convention_updated'),
