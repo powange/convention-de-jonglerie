@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div v-if="editionStore.loading">
+    <div v-if="editionStore.loading" role="status" aria-live="polite">
       <p>{{ $t('editions.loading_details') }}</p>
     </div>
-    <div v-else-if="!edition">
+    <div v-else-if="!edition" role="alert">
       <p>{{ $t('editions.not_found') }}</p>
     </div>
     <div v-else>
@@ -37,7 +37,7 @@
       />
 
       <!-- Contenu des détails en grille responsive -->
-      <div class="grid xl:grid-cols-5 2xl:grid-cols-5 gap-6">
+      <main class="grid xl:grid-cols-5 2xl:grid-cols-5 gap-6" role="main">
         <!-- Contenu principal "A propos de cette édition" -->
         <div class="xl:col-span-4 2xl:col-span-4 flex flex-col space-y-6">
           <UCard variant="subtle">
@@ -47,17 +47,23 @@
                 <img
                   :src="getImageUrl(edition.imageUrl, 'edition', edition.id) || ''"
                   :alt="t('editions.poster_of', { name: getEditionDisplayName(edition) })"
-                  class="w-full sm:w-48 h-auto max-w-xs object-contain rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
+                  role="button"
+                  tabindex="0"
+                  :aria-label="`${$t('editions.click_to_enlarge_poster')} ${getEditionDisplayName(edition)}`"
+                  class="w-full sm:w-48 h-auto max-w-xs object-contain rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary-500"
                   @click="showImageOverlay = true"
+                  @keydown.enter="showImageOverlay = true"
+                  @keydown.space.prevent="showImageOverlay = true"
                 />
               </div>
               <div class="flex-1">
-                <h3 class="text-lg font-semibold mb-2">
+                <h3 id="about-heading" class="text-lg font-semibold mb-2">
                   {{ $t('editions.about_this_edition') }}
                 </h3>
                 <div
                   v-if="edition.description && descriptionHtml"
                   class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
+                  aria-labelledby="about-heading"
                 >
                   <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
                   <!-- eslint-disable-next-line vue/no-v-html -->
@@ -72,8 +78,10 @@
 
           <UCard variant="subtle">
             <!-- Services -->
-            <div class="space-y-4">
-              <h3 class="text-lg font-semibold">{{ $t('editions.services_offered') }}</h3>
+            <section class="space-y-4" aria-labelledby="services-heading">
+              <h3 id="services-heading" class="text-lg font-semibold">
+                {{ $t('editions.services_offered') }}
+              </h3>
               <div
                 v-if="getActiveServicesByCategory(edition).length === 0"
                 class="text-gray-500 text-sm"
@@ -91,7 +99,7 @@
                   >
                     {{ category.label }}
                   </h4>
-                  <div class="flex flex-wrap gap-3">
+                  <div class="flex flex-wrap gap-3" role="list">
                     <UBadge
                       v-for="service in category.services"
                       :key="service.key"
@@ -99,14 +107,21 @@
                       variant="soft"
                       size="xl"
                       class="px-4 py-3"
+                      role="listitem"
                     >
-                      <UIcon :name="service.icon" :class="service.color" size="24" class="mr-2" />
+                      <UIcon
+                        :name="service.icon"
+                        :class="service.color"
+                        size="24"
+                        class="mr-2"
+                        aria-hidden="true"
+                      />
                       <span class="text-base font-medium">{{ service.label }}</span>
                     </UBadge>
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
           </UCard>
         </div>
 
@@ -114,15 +129,18 @@
         <div class="xl:col-span-1 2xl:col-span-1 flex flex-col space-y-6">
           <!-- Informations pratiques -->
           <UCard variant="subtle">
-            <div class="space-y-3">
-              <h3 class="text-lg font-semibold">{{ $t('editions.practical_info') }}</h3>
+            <section class="space-y-3" aria-labelledby="practical-info-heading">
+              <h3 id="practical-info-heading" class="text-lg font-semibold">
+                {{ $t('editions.practical_info') }}
+              </h3>
               <p class="text-sm text-gray-600">
                 <UIcon name="i-heroicons-map-pin" class="inline mr-1" />
                 <a
                   :href="getGoogleMapsUrl(edition)"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                  :aria-label="`${$t('editions.view_on_map')} - ${edition.city} (${$t('common.opens_in_new_tab')})`"
+                  class="text-blue-600 hover:text-blue-800 hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   {{ edition.addressLine1
                   }}<span v-if="edition.addressLine2">, {{ edition.addressLine2 }}</span
@@ -164,7 +182,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
           </UCard>
 
           <!-- Liens externes -->
@@ -226,7 +244,7 @@
             @toggle-attendance="toggleAttendance(edition.id)"
           />
         </div>
-      </div>
+      </main>
 
       <!-- Overlay pour l'affiche en grand -->
       <Teleport to="body">
@@ -240,8 +258,12 @@
         >
           <div
             v-if="showImageOverlay && edition?.imageUrl"
+            role="dialog"
+            aria-modal="true"
+            :aria-label="$t('editions.poster_modal')"
             class="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center p-4"
             @click="showImageOverlay = false"
+            @keydown.escape="showImageOverlay = false"
           >
             <div class="relative max-w-6xl max-h-[90vh]">
               <img
@@ -255,6 +277,7 @@
                 color="neutral"
                 variant="ghost"
                 size="lg"
+                :aria-label="$t('common.close')"
                 class="absolute top-4 right-4"
                 @click="showImageOverlay = false"
               />

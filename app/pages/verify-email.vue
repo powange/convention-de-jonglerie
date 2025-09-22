@@ -116,9 +116,19 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 import type { HttpError } from '~/types'
 
+// URL canonique pour éviter le contenu dupliqué avec les paramètres
+useSeoMeta({
+  canonical: '/verify-email',
+})
+
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
+
+// Middleware pour gérer l'accès à la vérification email
+definePageMeta({
+  middleware: 'verify-email-access',
+})
 const { t } = useI18n()
 
 // Email depuis la query string

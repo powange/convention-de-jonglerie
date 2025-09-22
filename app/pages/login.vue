@@ -457,6 +457,11 @@ const toast = useToast()
 const router = useRouter()
 const { t } = useI18n()
 
+// Middleware pour rediriger les utilisateurs connectés
+definePageMeta({
+  middleware: 'guest-only',
+})
+
 // Flow state
 const step = ref<'email' | 'password' | 'register'>('email')
 
@@ -574,13 +579,12 @@ const handlePasswordSubmit = async () => {
       color: 'success',
     })
     const returnTo = useRoute().query.returnTo as string
-    const shouldNotReturnTo =
-      returnTo &&
-      (returnTo.includes('/auth/reset-password') ||
-        returnTo.includes('/auth/forgot-password') ||
-        returnTo.includes('/login') ||
-        returnTo.includes('/verify-email'))
-    router.push(shouldNotReturnTo ? '/' : returnTo || '/')
+    const { isAuthPage, cleanReturnTo } = useReturnTo()
+
+    // Utiliser l'URL nettoyée ou rediriger vers l'accueil si c'est une page d'auth
+    const finalDestination = returnTo && !isAuthPage(returnTo) ? cleanReturnTo(returnTo) : '/'
+
+    router.push(finalDestination)
   } catch (e: unknown) {
     const error = e as HttpError
     let errorMessage = t('errors.login_failed')
@@ -633,7 +637,11 @@ watchEffect(() => {
     description = 'Connectez-vous à votre compte'
   }
 
-  useSeoMeta({ title, description })
+  useSeoMeta({
+    title,
+    description,
+    canonical: '/login',
+  })
 })
 
 const handleRegisterSubmit = async () => {

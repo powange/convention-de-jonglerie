@@ -64,7 +64,7 @@
       <div v-else class="pt-4 border-t text-center text-gray-500">
         <p class="text-sm">
           <NuxtLink
-            :to="`/login?returnTo=${encodeURIComponent($route.fullPath)}`"
+            :to="useReturnTo().buildLoginUrl($route.fullPath)"
             class="text-primary-600 hover:underline"
           >
             {{ $t('auth.login') }}

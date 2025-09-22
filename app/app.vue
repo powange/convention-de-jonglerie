@@ -232,7 +232,7 @@ const userMenuItems = computed(() => {
     {
       label: t('navigation.logout'),
       icon: 'i-heroicons-arrow-right-on-rectangle',
-      to: `/logout?returnTo=${encodeURIComponent(useRoute().fullPath)}`,
+      to: `/logout?returnTo=${encodeURIComponent(useReturnTo().cleanReturnTo(useRoute()))}`,
     }
   )
 

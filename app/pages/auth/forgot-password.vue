@@ -96,8 +96,18 @@
 import { reactive, ref } from 'vue'
 import { z } from 'zod'
 
+// URL canonique pour éviter le contenu dupliqué avec les paramètres
+useSeoMeta({
+  canonical: '/auth/forgot-password',
+})
+
 const toast = useToast()
 const { t } = useI18n()
+
+// Middleware pour rediriger les utilisateurs connectés
+definePageMeta({
+  middleware: 'guest-only',
+})
 
 const schema = z.object({
   email: z.string().email(t('errors.invalid_email')).min(1, t('errors.required_field')),

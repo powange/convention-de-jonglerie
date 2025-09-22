@@ -179,9 +179,19 @@
 import { reactive, ref, computed } from 'vue'
 import { z } from 'zod'
 
+// URL canonique pour éviter le contenu dupliqué avec les paramètres
+useSeoMeta({
+  canonical: '/auth/reset-password',
+})
+
 const route = useRoute()
 const toast = useToast()
 const { t } = useI18n()
+
+// Middleware pour rediriger les utilisateurs connectés
+definePageMeta({
+  middleware: 'guest-only',
+})
 
 const schema = z
   .object({

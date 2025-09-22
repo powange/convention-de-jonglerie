@@ -7,6 +7,11 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 
+// URL canonique pour éviter le contenu dupliqué avec les paramètres
+useSeoMeta({
+  canonical: '/logout',
+})
+
 const authStore = useAuthStore()
 const toast = useToast()
 const router = useRouter()
@@ -15,7 +20,10 @@ const { t } = useI18n()
 onMounted(async () => {
   // Récupérer la route actuelle avant la déconnexion
   const currentRoute = useRoute()
-  const returnTo = currentRoute.query.returnTo as string
+  const { cleanReturnTo } = useReturnTo()
+
+  // Nettoyer l'URL de destination (éviter les boucles returnTo)
+  const returnTo = cleanReturnTo(currentRoute)
 
   // Liste des pages qui nécessitent une authentification
   const protectedRoutes = [
