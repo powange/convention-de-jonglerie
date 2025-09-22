@@ -365,16 +365,20 @@
     </div>
 
     <!-- Modal d'export JSON -->
-    <UModal v-model:open="showExportModal">
-      <UButton label="Export JSON" />
+    <UModal
+      v-model:open="showExportModal"
+      title="Export JSON"
+      description="JSON formaté pour l'import d'édition"
+    >
+      <template #header>
+        <div class="flex items-center gap-2">
+          <UIcon name="i-heroicons-arrow-down-tray" class="text-primary-500" />
+          <span>Export JSON</span>
+        </div>
+      </template>
 
-      <template #content>
-        <div class="p-6 space-y-4">
-          <div class="flex items-center gap-2 mb-4">
-            <UIcon name="i-heroicons-arrow-down-tray" class="text-primary-500" />
-            <h3 class="text-lg font-semibold">Export JSON</h3>
-          </div>
-
+      <template #body>
+        <div class="space-y-4">
           <UAlert
             icon="i-heroicons-information-circle"
             color="info"
@@ -410,12 +414,14 @@
               <template #description>{{ exportError }}</template>
             </UAlert>
           </div>
+        </div>
+      </template>
 
-          <div class="flex justify-end gap-3 mt-6">
-            <UButton color="neutral" variant="soft" @click="showExportModal = false">
-              Fermer
-            </UButton>
-          </div>
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton color="neutral" variant="soft" @click="showExportModal = false">
+            Fermer
+          </UButton>
         </div>
       </template>
     </UModal>
