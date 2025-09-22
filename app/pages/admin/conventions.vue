@@ -365,24 +365,17 @@
     </div>
 
     <!-- Modal d'export JSON -->
-    <UModal v-model="showExportModal">
-      <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-arrow-down-tray" class="text-primary-500" />
-              <h3 class="text-lg font-semibold">Export JSON</h3>
-            </div>
-            <UButton
-              color="neutral"
-              variant="ghost"
-              icon="i-heroicons-x-mark"
-              size="sm"
-              @click="showExportModal = false"
-            />
-          </div>
-        </template>
+    <UModal v-model:open="showExportModal" title="Export JSON">
+      <div><!-- Trigger (vide car on ouvre programmatiquement) --></div>
 
+      <template #header>
+        <div class="flex items-center gap-2">
+          <UIcon name="i-heroicons-arrow-down-tray" class="text-primary-500" />
+          <span>Export JSON</span>
+        </div>
+      </template>
+
+      <template #body>
         <div class="space-y-4">
           <UAlert
             icon="i-heroicons-information-circle"
@@ -420,15 +413,15 @@
             </UAlert>
           </div>
         </div>
+      </template>
 
-        <template #footer>
-          <div class="flex justify-end gap-3">
-            <UButton color="neutral" variant="soft" @click="showExportModal = false">
-              Fermer
-            </UButton>
-          </div>
-        </template>
-      </UCard>
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton color="neutral" variant="soft" @click="showExportModal = false">
+            Fermer
+          </UButton>
+        </div>
+      </template>
     </UModal>
   </div>
 </template>
