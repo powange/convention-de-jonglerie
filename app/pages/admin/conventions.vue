@@ -330,44 +330,8 @@
                       </div>
                     </div>
 
-                    <!-- Bouton test export JSON -->
-                    <UButton
-                      icon="i-heroicons-arrow-down-tray"
-                      color="primary"
-                      variant="soft"
-                      size="xs"
-                      @click="exportEdition(edition.id)"
-                    >
-                      Test Export
-                    </UButton>
-
                     <UDropdownMenu
-                      :items="[
-                        [
-                          {
-                            label: $t('common.view'),
-                            icon: 'i-heroicons-eye',
-                            to: `/editions/${edition.id}`,
-                          },
-                          {
-                            label: $t('common.edit'),
-                            icon: 'i-heroicons-pencil-square',
-                            to: `/editions/${edition.id}/edit`,
-                          },
-                          {
-                            label: $t('common.manage'),
-                            icon: 'i-heroicons-cog-6-tooth',
-                            to: `/editions/${edition.id}/gestion`,
-                          },
-                        ],
-                        [
-                          {
-                            label: 'Exporter JSON',
-                            icon: 'i-heroicons-arrow-down-tray',
-                            click: () => exportEdition(edition.id),
-                          },
-                        ],
-                      ]"
+                      :items="getDropdownItems(edition.id)"
                     >
                       <UButton
                         color="neutral"
@@ -659,5 +623,35 @@ const copyToClipboard = async () => {
     console.error('Erreur lors de la copie:', error)
     alert('Erreur lors de la copie dans le presse-papiers')
   }
+}
+
+// Fonction pour générer les items du dropdown menu
+const getDropdownItems = (editionId) => {
+  return [
+    [
+      {
+        label: t('common.view'),
+        icon: 'i-heroicons-eye',
+        to: `/editions/${editionId}`,
+      },
+      {
+        label: t('common.edit'),
+        icon: 'i-heroicons-pencil-square',
+        to: `/editions/${editionId}/edit`,
+      },
+      {
+        label: t('common.manage'),
+        icon: 'i-heroicons-cog-6-tooth',
+        to: `/editions/${editionId}/gestion`,
+      },
+    ],
+    [
+      {
+        label: 'Exporter JSON',
+        icon: 'i-heroicons-arrow-down-tray',
+        click: () => exportEdition(editionId),
+      },
+    ],
+  ]
 }
 </script>
