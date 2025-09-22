@@ -330,6 +330,17 @@
                       </div>
                     </div>
 
+                    <!-- Bouton test export JSON -->
+                    <UButton
+                      icon="i-heroicons-arrow-down-tray"
+                      color="primary"
+                      variant="soft"
+                      size="xs"
+                      @click="exportEdition(edition.id)"
+                    >
+                      Test Export
+                    </UButton>
+
                     <UDropdownMenu
                       :items="[
                         [
