@@ -48,7 +48,10 @@
                 <h4 class="font-semibold mb-2">{{ $t('admin.import.optional_fields') }}</h4>
                 <ul class="list-disc list-inside space-y-1 text-sm">
                   <li><code>convention.description</code> - Description de la convention</li>
-                  <li><code>edition.name</code> - Nom de l'édition (si omis, utilise le nom de la convention)</li>
+                  <li>
+                    <code>edition.name</code> - Nom de l'édition (si omis, utilise le nom de la
+                    convention)
+                  </li>
                   <li><code>edition.description</code> - Description de l'édition</li>
                   <li><code>edition.addressLine2</code> - Complément d'adresse</li>
                   <li><code>edition.region</code> - Région</li>
@@ -329,15 +332,7 @@ const validateJson = (input: string): any => {
     errors.push(t('admin.import.missing_edition'))
   } else {
     // Vérifier les champs requis de l'édition
-    const requiredFields = [
-      'name',
-      'startDate',
-      'endDate',
-      'addressLine1',
-      'city',
-      'country',
-      'postalCode',
-    ]
+    const requiredFields = ['startDate', 'endDate', 'addressLine1', 'city', 'country', 'postalCode']
     for (const field of requiredFields) {
       if (!data.edition[field]) {
         errors.push(t('admin.import.missing_field', { field: `edition.${field}` }))

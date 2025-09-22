@@ -70,57 +70,7 @@
             </div>
           </UCard>
 
-          <!-- Liens externes -->
           <UCard variant="subtle">
-            <div
-              v-if="
-                edition.officialWebsiteUrl ||
-                edition.ticketingUrl ||
-                edition.facebookUrl ||
-                edition.instagramUrl
-              "
-              class="space-y-2"
-            >
-              <h3 class="text-lg font-semibold">{{ $t('editions.useful_links') }}</h3>
-              <div class="flex gap-2">
-                <UButton
-                  v-if="edition.officialWebsiteUrl"
-                  icon="i-heroicons-globe-alt"
-                  :to="edition.officialWebsiteUrl"
-                  target="_blank"
-                  size="sm"
-                  color="primary"
-                  >{{ $t('editions.official_website') }}</UButton
-                >
-                <UButton
-                  v-if="edition.ticketingUrl"
-                  icon="i-heroicons-ticket"
-                  :to="edition.ticketingUrl"
-                  target="_blank"
-                  size="sm"
-                  >{{ $t('editions.ticketing') }}</UButton
-                >
-                <UButton
-                  v-if="edition.facebookUrl"
-                  icon="i-simple-icons-facebook"
-                  :to="edition.facebookUrl"
-                  target="_blank"
-                  size="sm"
-                  color="info"
-                  >Facebook</UButton
-                >
-                <UButton
-                  v-if="edition.instagramUrl"
-                  icon="i-simple-icons-instagram"
-                  :to="edition.instagramUrl"
-                  target="_blank"
-                  size="sm"
-                  color="error"
-                  >Instagram</UButton
-                >
-              </div>
-            </div>
-
             <!-- Services -->
             <div class="space-y-4">
               <h3 class="text-lg font-semibold">{{ $t('editions.services_offered') }}</h3>
@@ -213,6 +163,58 @@
                     </UBadge>
                   </div>
                 </div>
+              </div>
+            </div>
+          </UCard>
+
+          <!-- Liens externes -->
+          <UCard variant="subtle">
+            <div
+              v-if="
+                edition.officialWebsiteUrl ||
+                edition.ticketingUrl ||
+                edition.facebookUrl ||
+                edition.instagramUrl
+              "
+              class="space-y-2"
+            >
+              <h3 class="text-lg font-semibold">{{ $t('editions.useful_links') }}</h3>
+              <div class="flex gap-2">
+                <UButton
+                  v-if="edition.officialWebsiteUrl"
+                  icon="i-heroicons-globe-alt"
+                  :to="edition.officialWebsiteUrl"
+                  target="_blank"
+                  size="sm"
+                  color="primary"
+                  >{{ $t('editions.official_website') }}</UButton
+                >
+                <UButton
+                  v-if="edition.ticketingUrl"
+                  icon="i-heroicons-ticket"
+                  :to="edition.ticketingUrl"
+                  target="_blank"
+                  size="sm"
+                  >{{ $t('editions.ticketing') }}</UButton
+                >
+                <UButton
+                  v-if="edition.facebookUrl"
+                  icon="i-simple-icons-facebook"
+                  :to="edition.facebookUrl"
+                  target="_blank"
+                  size="sm"
+                  color="info"
+                  >Facebook</UButton
+                >
+                <UButton
+                  v-if="edition.instagramUrl"
+                  icon="i-simple-icons-instagram"
+                  :to="edition.instagramUrl"
+                  target="_blank"
+                  size="sm"
+                  color="error"
+                  >Instagram</UButton
+                >
               </div>
             </div>
           </UCard>

@@ -1084,8 +1084,11 @@ const toggleOnlineStatus = async (isOnline: boolean) => {
       body: { isOnline },
     })
 
-    // Update local state
-    await editionStore.fetchEditionById(editionId)
+    // Update local state immediately
+    edition.value.isOnline = isOnline
+
+    // Also update in store
+    await editionStore.fetchEditionById(editionId, { force: true })
 
     const message = isOnline ? t('editions.edition_published') : t('editions.edition_set_offline')
     toast.add({

@@ -91,7 +91,12 @@
             <UButton
               color="primary"
               :loading="loading"
-              :disabled="verificationCode.length !== 6"
+              :disabled="
+                !verificationCode ||
+                (Array.isArray(verificationCode)
+                  ? verificationCode.filter((x) => x).length !== 6
+                  : verificationCode.length !== 6)
+              "
               @click="verifyCode"
             >
               {{ $t('conventions.claim.verify') }}
@@ -196,7 +201,9 @@ const verifyCode = async () => {
     await $fetch(`/api/conventions/${props.convention.id}/claim/verify`, {
       method: 'POST',
       body: {
-        code: verificationCode.value,
+        code: Array.isArray(verificationCode.value)
+          ? verificationCode.value.join('')
+          : verificationCode.value,
       },
     })
 
