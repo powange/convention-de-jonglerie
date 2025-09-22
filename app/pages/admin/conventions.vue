@@ -330,9 +330,7 @@
                       </div>
                     </div>
 
-                    <UDropdownMenu
-                      :items="getDropdownItems(edition.id)"
-                    >
+                    <UDropdownMenu :items="getDropdownItems(edition.id)">
                       <UButton
                         color="neutral"
                         variant="ghost"
@@ -370,13 +368,6 @@
       title="Export JSON"
       description="JSON formaté pour l'import d'édition"
     >
-      <template #header>
-        <div class="flex items-center gap-2">
-          <UIcon name="i-heroicons-arrow-down-tray" class="text-primary-500" />
-          <span>Export JSON</span>
-        </div>
-      </template>
-
       <template #body>
         <div class="space-y-4">
           <UAlert
@@ -387,26 +378,22 @@
             description="Ce JSON est formaté pour être réimporté via la page d'import d'édition."
           />
 
-          <div class="relative">
-            <UTextarea
-              v-model="exportedJson"
-              :rows="15"
-              readonly
-              class="font-mono text-xs"
-              placeholder="Chargement..."
-            />
-            <UButton
-              v-if="exportedJson"
-              icon="i-heroicons-clipboard-document"
-              color="primary"
-              variant="soft"
-              size="sm"
-              class="absolute top-2 right-2"
-              @click="copyToClipboard"
-            >
-              {{ copied ? 'Copié !' : 'Copier' }}
-            </UButton>
-          </div>
+          <UTextarea
+            v-model="exportedJson"
+            :rows="15"
+            readonly
+            class="font-mono w-full"
+            placeholder="Chargement..."
+          />
+          <UButton
+            v-if="exportedJson"
+            icon="i-heroicons-clipboard-document"
+            color="primary"
+            variant="soft"
+            @click="copyToClipboard"
+          >
+            {{ copied ? 'Copié !' : 'Copier' }}
+          </UButton>
 
           <div v-if="exportError" class="mt-4">
             <UAlert icon="i-heroicons-exclamation-triangle" color="error" variant="soft">
@@ -414,14 +401,6 @@
               <template #description>{{ exportError }}</template>
             </UAlert>
           </div>
-        </div>
-      </template>
-
-      <template #footer>
-        <div class="flex justify-end gap-3">
-          <UButton color="neutral" variant="soft" @click="showExportModal = false">
-            Fermer
-          </UButton>
         </div>
       </template>
     </UModal>
@@ -592,20 +571,14 @@ const exportEdition = async (editionId) => {
     exportError.value = ''
     copied.value = false
 
-    console.log('showExportModal avant:', showExportModal.value)
     showExportModal.value = true
-    console.log('showExportModal après:', showExportModal.value)
 
-    console.log('Modal ouverte, récupération des données...')
     const data = await $fetch(`/api/admin/editions/${editionId}/export`)
-    console.log('Données reçues:', data)
 
     exportedJson.value = JSON.stringify(data, null, 2)
-    console.log('JSON formaté avec succès')
   } catch (error) {
-    console.error("Erreur lors de l'export:", error)
-    exportError.value = error.data?.message || error.message || "Erreur lors de l'export de l'édition"
-    console.log('Erreur définie:', exportError.value)
+    exportError.value =
+      error.data?.message || error.message || "Erreur lors de l'export de l'édition"
   }
 }
 
@@ -647,7 +620,7 @@ const getDropdownItems = (editionId) => {
       {
         label: 'Exporter JSON',
         icon: 'i-heroicons-arrow-down-tray',
-        click: () => exportEdition(editionId),
+        onSelect: () => exportEdition(editionId),
       },
     ],
   ]
