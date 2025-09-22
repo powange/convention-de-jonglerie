@@ -152,7 +152,7 @@
 
           <div v-else class="space-y-4">
             <!-- Statistiques générales -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
                 <div class="flex items-center gap-3">
                   <UIcon name="i-heroicons-user-group" class="text-blue-600" size="24" />

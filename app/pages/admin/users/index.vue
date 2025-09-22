@@ -75,7 +75,7 @@
       </div>
 
       <!-- Statistiques rapides -->
-      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <UCard>
           <div class="text-center">
             <div class="text-2xl font-bold text-primary">{{ stats.total }}</div>
