@@ -194,9 +194,6 @@ export default defineEventHandler(async (event) => {
 
       // Offres de covoiturage récentes
       prisma.carpoolOffer.findMany({
-        where: {
-          editionId: { isSet: true }, // Exclure les offres sans édition
-        },
         select: {
           id: true,
           createdAt: true,
@@ -225,9 +222,6 @@ export default defineEventHandler(async (event) => {
 
       // Demandes de covoiturage récentes
       prisma.carpoolRequest.findMany({
-        where: {
-          editionId: { isSet: true }, // Exclure les demandes sans édition
-        },
         select: {
           id: true,
           createdAt: true,
