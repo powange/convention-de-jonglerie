@@ -12,7 +12,7 @@ const importSchema = z.object({
     logo: z.string().optional(),
   }),
   edition: z.object({
-    name: z.string().min(1),
+    name: z.string().min(1).optional(),
     description: z.string().optional(),
     startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -115,7 +115,7 @@ export default defineEventHandler(async (event) => {
     const edition = await prisma.edition.create({
       data: {
         conventionId: convention.id,
-        name: validatedData.edition.name,
+        name: validatedData.edition.name || null,
         description: validatedData.edition.description,
         startDate: new Date(validatedData.edition.startDate),
         endDate: new Date(validatedData.edition.endDate),
