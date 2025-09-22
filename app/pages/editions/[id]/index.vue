@@ -223,7 +223,6 @@
             :participants="edition.attendingUsers"
             :is-attending="isAttending(edition.id)"
             :is-authenticated="authStore.isAuthenticated"
-            class="lg:mt-0 mt-6"
             @toggle-attendance="toggleAttendance(edition.id)"
           />
         </div>
