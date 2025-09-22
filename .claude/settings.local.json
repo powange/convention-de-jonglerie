@@ -75,7 +75,8 @@
       "Bash(/tmp/update-other-pages.sh:*)",
       "Bash(/tmp/fix-ogsitename.sh:*)",
       "Bash(/tmp/remove-ogsitename.sh:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "WebFetch(domain:image.nuxt.com)"
     ],
     "deny": [],
     "ask": [],

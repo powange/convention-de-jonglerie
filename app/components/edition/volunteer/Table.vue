@@ -167,92 +167,96 @@
         <span class="hidden sm:inline">{{ t('editions.volunteers.export') }}</span>
       </UButton>
     </div>
-    <UTable
-      ref="tableRef"
-      v-model:sorting="sorting"
-      v-model:column-visibility="columnVisibility"
-      :data="tableData"
-      :columns="columns"
-      :loading="applicationsLoading"
-      class="border border-accented"
-      sticky
-    >
-      <template #actions-cell="{ row }">
-        <div v-if="props.canManageVolunteers">
-          <!-- Bouton Éditer disponible pour tous les statuts -->
-          <div class="flex flex-col items-start gap-1 mb-2">
-            <UButton
-              :label="t('common.edit')"
-              size="xs"
-              color="neutral"
-              variant="soft"
-              icon="i-heroicons-pencil"
-              @click="openEditApplicationModal(row.original)"
-            />
+
+    <UContextMenu :items="items">
+      <UTable
+        ref="tableRef"
+        v-model:sorting="sorting"
+        v-model:column-visibility="columnVisibility"
+        :data="tableData"
+        :columns="columns"
+        :loading="applicationsLoading"
+        class="border border-accented"
+        sticky
+        @contextmenu="onContextmenu"
+      >
+        <template #actions-cell="{ row }">
+          <div v-if="props.canManageVolunteers">
+            <!-- Bouton Éditer disponible pour tous les statuts -->
+            <div class="flex flex-col items-start gap-1 mb-2">
+              <UButton
+                :label="t('common.edit')"
+                size="xs"
+                color="neutral"
+                variant="soft"
+                icon="i-heroicons-pencil"
+                @click="openEditApplicationModal(row.original)"
+              />
+            </div>
+
+            <!-- Actions selon le statut -->
+            <div v-if="row.original.status === 'PENDING'" class="flex flex-col items-start gap-1">
+              <UButton
+                :label="t('editions.volunteers.action_accept')"
+                size="xs"
+                color="success"
+                variant="solid"
+                :loading="applicationsActingId === row.original.id && actingAction === 'ACCEPTED'"
+                @click="decideApplication(row.original, 'ACCEPTED')"
+              />
+              <UButton
+                :label="t('editions.volunteers.action_reject')"
+                size="xs"
+                color="error"
+                variant="solid"
+                :loading="applicationsActingId === row.original.id && actingAction === 'REJECTED'"
+                @click="decideApplication(row.original, 'REJECTED')"
+              />
+            </div>
+
+            <div
+              v-else-if="row.original.status === 'ACCEPTED'"
+              class="flex flex-col items-start gap-1"
+            >
+              <UButton
+                :label="t('editions.volunteers.action_edit_teams')"
+                size="xs"
+                color="primary"
+                variant="solid"
+                icon="i-heroicons-user-group"
+                @click="openEditTeamsModal(row.original)"
+              />
+              <UButton
+                :label="t('editions.volunteers.action_back_pending')"
+                size="xs"
+                color="warning"
+                variant="soft"
+                :loading="applicationsActingId === row.original.id && actingAction === 'PENDING'"
+                @click="confirmBackToPending(row.original)"
+              />
+            </div>
+
+            <div
+              v-else-if="row.original.status === 'REJECTED'"
+              class="flex flex-col items-start gap-1"
+            >
+              <UButton
+                :label="t('editions.volunteers.action_back_pending')"
+                size="xs"
+                color="warning"
+                variant="soft"
+                :loading="applicationsActingId === row.original.id && actingAction === 'PENDING'"
+                @click="confirmBackToPending(row.original)"
+              />
+            </div>
           </div>
 
-          <!-- Actions selon le statut -->
-          <div v-if="row.original.status === 'PENDING'" class="flex flex-col items-start gap-1">
-            <UButton
-              :label="t('editions.volunteers.action_accept')"
-              size="xs"
-              color="success"
-              variant="solid"
-              :loading="applicationsActingId === row.original.id && actingAction === 'ACCEPTED'"
-              @click="decideApplication(row.original, 'ACCEPTED')"
-            />
-            <UButton
-              :label="t('editions.volunteers.action_reject')"
-              size="xs"
-              color="error"
-              variant="solid"
-              :loading="applicationsActingId === row.original.id && actingAction === 'REJECTED'"
-              @click="decideApplication(row.original, 'REJECTED')"
-            />
-          </div>
-
-          <div
-            v-else-if="row.original.status === 'ACCEPTED'"
-            class="flex flex-col items-start gap-1"
-          >
-            <UButton
-              :label="t('editions.volunteers.action_edit_teams')"
-              size="xs"
-              color="primary"
-              variant="solid"
-              icon="i-heroicons-user-group"
-              @click="openEditTeamsModal(row.original)"
-            />
-            <UButton
-              :label="t('editions.volunteers.action_back_pending')"
-              size="xs"
-              color="warning"
-              variant="soft"
-              :loading="applicationsActingId === row.original.id && actingAction === 'PENDING'"
-              @click="confirmBackToPending(row.original)"
-            />
-          </div>
-
-          <div
-            v-else-if="row.original.status === 'REJECTED'"
-            class="flex flex-col items-start gap-1"
-          >
-            <UButton
-              :label="t('editions.volunteers.action_back_pending')"
-              size="xs"
-              color="warning"
-              variant="soft"
-              :loading="applicationsActingId === row.original.id && actingAction === 'PENDING'"
-              @click="confirmBackToPending(row.original)"
-            />
-          </div>
-        </div>
-
-        <span v-else class="text-xs text-gray-500 italic">
-          {{ t('common.no_permission') }}
-        </span>
-      </template>
-    </UTable>
+          <span v-else class="text-xs text-gray-500 italic">
+            {{ t('common.no_permission') }}
+          </span>
+        </template>
+      </UTable>
+    </UContextMenu>
     <div v-if="tableData.length === 0 && !applicationsLoading" class="text-xs text-gray-500 py-2">
       {{ t('editions.volunteers.no_applications') }}
     </div>
@@ -378,7 +382,7 @@
 <script setup lang="ts">
 import { h, resolveComponent, watch, onMounted, nextTick } from 'vue'
 
-import type { TableColumn } from '@nuxt/ui'
+import type { ContextMenuItem, TableColumn, TableRow } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
 
 interface Props {
@@ -1569,6 +1573,95 @@ const columns = computed((): TableColumn<any>[] => [
     header: t('common.actions'),
   },
 ])
+
+function getRowItems(row: TableRow<any>): ContextMenuItem[] {
+  const items: ContextMenuItem[] = [
+    {
+      type: 'label' as const,
+      label: `#${row.original.id} - ${row.original.user.pseudo} (${row.original.user.prenom} ${row.original.user.nom})`,
+    },
+  ]
+
+  if (props.canManageVolunteers) {
+    items.push({
+      label: t('common.edit'),
+      icon: 'i-heroicons-pencil-square',
+      onSelect() {
+        openEditApplicationModal(row.original)
+      },
+    })
+
+    if (row.original.status === 'PENDING') {
+      items.push({ type: 'separator' })
+      items.push({
+        label: t('editions.volunteers.action_accept'),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+        disabled:
+          applicationsActingId.value === row.original.id && actingAction.value === 'ACCEPTED',
+        onSelect() {
+          decideApplication(row.original, 'ACCEPTED')
+        },
+      })
+      items.push({
+        label: t('editions.volunteers.action_reject'),
+        icon: 'i-heroicons-x-circle',
+        color: 'error',
+        disabled:
+          applicationsActingId.value === row.original.id && actingAction.value === 'REJECTED',
+        onSelect() {
+          decideApplication(row.original, 'REJECTED')
+        },
+      })
+    }
+
+    if (row.original.status === 'ACCEPTED') {
+      items.push({
+        label: t('editions.volunteers.action_edit_teams'),
+        icon: 'i-heroicons-user-group',
+        color: 'primary',
+        onSelect() {
+          openEditTeamsModal(row.original)
+        },
+      })
+      items.push({ type: 'separator' })
+      items.push({
+        label: t('editions.volunteers.action_back_pending'),
+        icon: 'i-heroicons-arrow-uturn-left',
+        color: 'warning',
+        disabled:
+          applicationsActingId.value === row.original.id && actingAction.value === 'PENDING',
+        onSelect() {
+          confirmBackToPending(row.original)
+        },
+      })
+    } else if (row.original.status === 'REJECTED') {
+      items.push({ type: 'separator' })
+      items.push({
+        label: t('editions.volunteers.action_back_pending'),
+        icon: 'i-heroicons-arrow-uturn-left',
+        color: 'warning',
+        disabled:
+          applicationsActingId.value === row.original.id && actingAction.value === 'PENDING',
+        onSelect() {
+          confirmBackToPending(row.original)
+        },
+      })
+    }
+  } else {
+    items.push({
+      label: t('common.no_permission'),
+    })
+  }
+
+  return items
+}
+
+const items = ref<ContextMenuItem[]>([])
+
+function onContextmenu(_e: Event, row: TableRow<any>) {
+  items.value = getRowItems(row)
+}
 
 // Initialisation
 onMounted(() => {
