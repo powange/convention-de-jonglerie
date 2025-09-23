@@ -83,12 +83,28 @@ export async function renderRawPage(routePath: string) {
           startDate: new Date().toISOString(),
           endDate: new Date(Date.now() + 86400000).toISOString(),
           services: {},
+          favoritedBy: [],
+          convention: {
+            id: 1,
+            name: `Convention ${id}`,
+          },
         }
       }
       // Retour vide générique
       return {}
     } catch (e) {
       return {}
+    }
+  }
+
+  // Stub useFetch pour les pages SSR
+  ;(globalThis as any).useFetch = async (url: any) => {
+    const data = await (globalThis as any).$fetch(url)
+    return {
+      data: { value: data },
+      pending: { value: false },
+      error: { value: null },
+      refresh: () => Promise.resolve(),
     }
   }
   // Stub fetch global si absent
