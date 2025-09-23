@@ -105,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, shallowRef } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
@@ -149,7 +149,7 @@ watch(
 )
 
 const loading = ref(false)
-const posts = shallowRef([])
+const posts = ref([])
 const isSubmittingPost = ref(false)
 
 const newPostForm = reactive({
@@ -229,6 +229,7 @@ const deletePost = async (postId: number) => {
   try {
     await $fetch(`/api/editions/${editionId}/posts/${postId}`, { method: 'DELETE' })
 
+    // Filtrer les posts pour déclencher la réactivité
     posts.value = posts.value.filter((p) => p.id !== postId)
 
     toast.add({
@@ -243,6 +244,8 @@ const deletePost = async (postId: number) => {
       description: t('errors.cannot_delete_comment'),
       color: 'error',
     })
+    // Recharger les posts en cas d'erreur pour resynchroniser
+    await loadPosts()
   }
 }
 
@@ -255,9 +258,13 @@ const addComment = async (postId: number, content: string) => {
     })
 
     // Trouver le post et ajouter le commentaire
-    const post = posts.value.find((p) => p.id === postId)
-    if (post) {
-      post.comments.push(newComment)
+    const postIndex = posts.value.findIndex((p) => p.id === postId)
+    if (postIndex !== -1) {
+      // Créer une nouvelle référence pour déclencher la réactivité
+      posts.value[postIndex] = {
+        ...posts.value[postIndex],
+        comments: [...posts.value[postIndex].comments, newComment],
+      }
     }
 
     toast.add({
@@ -273,6 +280,8 @@ const addComment = async (postId: number, content: string) => {
       description: httpError?.data?.message || t('errors.cannot_publish_reply'),
       color: 'error',
     })
+    // Recharger les posts en cas d'erreur pour resynchroniser
+    await loadPosts()
   }
 }
 
@@ -284,9 +293,13 @@ const deleteComment = async (postId: number, commentId: number) => {
     })
 
     // Trouver le post et supprimer le commentaire
-    const post = posts.value.find((p) => p.id === postId)
-    if (post) {
-      post.comments = post.comments.filter((c) => c.id !== commentId)
+    const postIndex = posts.value.findIndex((p) => p.id === postId)
+    if (postIndex !== -1) {
+      // Créer une nouvelle référence pour déclencher la réactivité
+      posts.value[postIndex] = {
+        ...posts.value[postIndex],
+        comments: posts.value[postIndex].comments.filter((c) => c.id !== commentId),
+      }
     }
 
     toast.add({
@@ -301,6 +314,8 @@ const deleteComment = async (postId: number, commentId: number) => {
       description: t('errors.cannot_delete_reply'),
       color: 'error',
     })
+    // Recharger les posts en cas d'erreur pour resynchroniser
+    await loadPosts()
   }
 }
 

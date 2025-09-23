@@ -36,7 +36,7 @@
         </UButtonGroup>
 
         <!-- Export planning -->
-        <UDropdown
+        <UDropdownMenu
           v-if="acceptedApplications.length > 0"
           :items="exportMenuItems"
           class="w-full sm:w-auto"
@@ -50,7 +50,7 @@
           >
             {{ $t('pages.volunteers.export') }}
           </UButton>
-        </UDropdown>
+        </UDropdownMenu>
       </div>
     </div>
 
@@ -958,14 +958,14 @@ const exportMenuItems = [
     {
       label: t('pages.volunteers.export_pdf'),
       icon: 'i-heroicons-document-text',
-      click: () => exportPlanning('pdf'),
+      onSelect: () => exportPlanning('pdf'),
     },
   ],
   [
     {
       label: t('pages.volunteers.export_ical'),
       icon: 'i-heroicons-calendar',
-      click: () => exportPlanning('ical'),
+      onSelect: () => exportPlanning('ical'),
     },
   ],
 ]

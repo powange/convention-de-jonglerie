@@ -159,6 +159,22 @@ export const NotificationService = {
   },
 
   /**
+   * Marque une notification comme non lue
+   */
+  async markAsUnread(notificationId: string, userId: number) {
+    return await prisma.notification.update({
+      where: {
+        id: notificationId,
+        userId, // S'assurer que l'utilisateur est propriétaire
+      },
+      data: {
+        isRead: false,
+        readAt: null,
+      },
+    })
+  },
+
+  /**
    * Marque toutes les notifications d'un utilisateur comme lues
    */
   async markAllAsRead(userId: number, category?: string) {

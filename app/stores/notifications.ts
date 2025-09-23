@@ -154,6 +154,28 @@ export const useNotificationsStore = defineStore('notifications', {
     },
 
     /**
+     * Marque une notification comme non lue
+     */
+    async markAsUnread(notificationId: string) {
+      try {
+        await $fetch(`/api/notifications/${notificationId}/unread`, {
+          method: 'PATCH',
+        })
+
+        // Mettre à jour localement
+        const notification = this.notifications.find((n) => n.id === notificationId)
+        if (notification && notification.isRead) {
+          notification.isRead = false
+          notification.readAt = undefined
+          this.unreadCount++
+        }
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour de la notification:', error)
+        throw error
+      }
+    },
+
+    /**
      * Marque toutes les notifications comme lues
      */
     async markAllAsRead(category?: string) {

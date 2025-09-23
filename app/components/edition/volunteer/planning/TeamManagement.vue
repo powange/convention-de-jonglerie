@@ -32,18 +32,18 @@
               <h4 class="font-medium">{{ team.name }}</h4>
             </div>
             <div @click.stop>
-              <UDropdown
+              <UDropdownMenu
                 :items="[
                   [
                     {
                       label: t('common.edit'),
                       icon: 'i-heroicons-pencil',
-                      click: () => openEditTeamModal(team),
+                      onSelect: () => openEditTeamModal(team),
                     },
                     {
                       label: t('common.delete'),
                       icon: 'i-heroicons-trash',
-                      click: () => confirmDeleteTeam(team),
+                      onSelect: () => confirmDeleteTeam(team),
                     },
                   ],
                 ]"
@@ -54,7 +54,7 @@
                   icon="i-heroicons-ellipsis-vertical"
                   size="xs"
                 />
-              </UDropdown>
+              </UDropdownMenu>
             </div>
           </div>
 
@@ -254,6 +254,24 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Modal de confirmation pour suppression -->
+    <UiConfirmModal
+      v-model="showDeleteModal"
+      :title="t('editions.volunteers.confirm_delete')"
+      :description="
+        teamToDelete
+          ? t('editions.volunteers.confirm_delete_team', { name: teamToDelete.name })
+          : ''
+      "
+      :confirm-label="t('common.delete')"
+      :cancel-label="t('common.cancel')"
+      confirm-color="error"
+      icon-name="i-heroicons-trash"
+      icon-color="text-red-500"
+      @confirm="executeDeleteTeam"
+      @cancel="showDeleteModal = false"
+    />
   </UCard>
 </template>
 
@@ -403,27 +421,38 @@ const onTeamSubmit = async () => {
   }
 }
 
-const confirmDeleteTeam = async (team: VolunteerTeam) => {
-  if (confirm(t('editions.volunteers.confirm_delete_team', { name: team.name }))) {
-    try {
-      loading.value = true
-      await deleteTeam(team.id)
-      toast.add({
-        title: t('editions.volunteers.team_deleted'),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-      closeTeamModal()
-    } catch (error) {
-      toast.add({
-        title: t('errors.error_occurred'),
-        description: error.message || 'Erreur lors de la suppression',
-        icon: 'i-heroicons-x-circle',
-        color: 'error',
-      })
-    } finally {
-      loading.value = false
-    }
+// Modal de confirmation pour suppression
+const showDeleteModal = ref(false)
+const teamToDelete = ref<VolunteerTeam | null>(null)
+
+const confirmDeleteTeam = (team: VolunteerTeam) => {
+  teamToDelete.value = team
+  showDeleteModal.value = true
+}
+
+const executeDeleteTeam = async () => {
+  if (!teamToDelete.value) return
+
+  try {
+    loading.value = true
+    await deleteTeam(teamToDelete.value.id)
+    toast.add({
+      title: t('editions.volunteers.team_deleted'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+    closeTeamModal()
+  } catch (error) {
+    toast.add({
+      title: t('errors.error_occurred'),
+      description: error.message || 'Erreur lors de la suppression',
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  } finally {
+    loading.value = false
+    showDeleteModal.value = false
+    teamToDelete.value = null
   }
 }
 </script>

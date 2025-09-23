@@ -129,7 +129,12 @@
               <div>
                 <h3 class="text-lg font-semibold flex items-center gap-2">
                   {{ convention.name }}
-                  <UBadge v-if="convention.isArchived" color="amber" variant="soft" size="xs">
+                  <UBadge
+                    v-if="(convention as any).isArchived"
+                    color="warning"
+                    variant="soft"
+                    size="xs"
+                  >
                     {{ $t('common.archived') }}
                   </UBadge>
                 </h3>
@@ -141,10 +146,16 @@
             </div>
             <div class="flex items-center gap-3">
               <UBadge color="primary" variant="soft">
-                {{ $t('admin.editions_count', { count: convention._count.editions }) }}
+                {{
+                  $t('admin.editions_count', { count: (convention as any)._count?.editions || 0 })
+                }}
               </UBadge>
               <UBadge color="neutral" variant="soft">
-                {{ $t('admin.collaborators_count', { count: convention._count.collaborators }) }}
+                {{
+                  $t('admin.collaborators_count', {
+                    count: (convention as any)._count?.collaborators || 0,
+                  })
+                }}
               </UBadge>
               <UDropdownMenu
                 :items="[
@@ -156,14 +167,17 @@
                     },
                   ],
                   [
-                    ...(convention.isArchived
+                    ...((convention as any).isArchived
                       ? [
                           {
                             label: $t('admin.unarchive_convention'),
                             icon: 'i-heroicons-arrow-up-tray',
                             color: 'success',
                             onSelect: () =>
-                              toggleArchiveConvention(convention.id, convention.isArchived),
+                              toggleArchiveConvention(
+                                convention.id,
+                                (convention as any).isArchived
+                              ),
                           },
                         ]
                       : [
@@ -172,14 +186,17 @@
                             icon: 'i-heroicons-archive-box',
                             color: 'warning',
                             onSelect: () =>
-                              toggleArchiveConvention(convention.id, convention.isArchived),
+                              toggleArchiveConvention(
+                                convention.id,
+                                (convention as any).isArchived
+                              ),
                           },
                         ]),
                     {
                       label: $t('admin.pages.conventions.delete_convention_permanently'),
                       icon: 'i-heroicons-trash',
                       color: 'error',
-                      onSelect: () => deleteConventionPermanently(convention),
+                      onSelect: () => deleteConventionPermanently(convention as any),
                     },
                   ],
                 ]"
@@ -217,20 +234,25 @@
                     {{ formatAuthorName(collaborator.user) }}
                   </div>
                   <div class="flex items-center gap-1 text-xs text-gray-500">
-                    <UBadge v-if="collaborator.canEdit" color="blue" variant="soft" size="xs">
+                    <UBadge
+                      v-if="(collaborator as any).canEdit"
+                      color="info"
+                      variant="soft"
+                      size="xs"
+                    >
                       {{ $t('admin.can_edit') }}
                     </UBadge>
                     <UBadge
                       v-if="collaborator.canManageVolunteers"
-                      color="green"
+                      color="success"
                       variant="soft"
                       size="xs"
                     >
                       {{ $t('admin.can_manage_volunteers') }}
                     </UBadge>
                     <UBadge
-                      v-if="collaborator.canManageEditions"
-                      color="purple"
+                      v-if="(collaborator as any).canManageEditions"
+                      color="primary"
                       variant="soft"
                       size="xs"
                     >
@@ -307,12 +329,12 @@
                       <div class="flex items-center gap-1.5">
                         <UIcon name="i-heroicons-hand-raised" class="w-4 h-4 text-primary-500" />
                         <span class="text-lg font-semibold text-primary-600 dark:text-primary-400">
-                          {{ edition._count.volunteerApplications }}
+                          {{ (edition as any)._count?.volunteerApplications || 0 }}
                         </span>
                         <span class="text-sm text-gray-600 dark:text-gray-400">
                           {{
                             $t('admin.volunteers_count', {
-                              count: edition._count.volunteerApplications,
+                              count: (edition as any)._count?.volunteerApplications || 0,
                             })
                               .split(' ')
                               .slice(1)
@@ -323,12 +345,12 @@
                       <div class="flex items-center gap-1.5">
                         <UIcon name="i-heroicons-truck" class="w-4 h-4 text-green-500" />
                         <span class="text-lg font-semibold text-green-600 dark:text-green-400">
-                          {{ edition._count.carpoolOffers }}
+                          {{ (edition as any)._count?.carpoolOffers || 0 }}
                         </span>
                         <span class="text-sm text-gray-600 dark:text-gray-400">
                           {{
                             $t('admin.carpool_offers_count', {
-                              count: edition._count.carpoolOffers,
+                              count: (edition as any)._count?.carpoolOffers || 0,
                             })
                               .split(' ')
                               .slice(1)
@@ -412,11 +434,66 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Modal de confirmation pour archiver/désarchiver -->
+    <UiConfirmModal
+      v-model="showArchiveModal"
+      :title="t('admin.confirm_action')"
+      :description="
+        conventionToArchive?.isArchived
+          ? t('admin.confirm_unarchive_convention')
+          : t('admin.confirm_archive_convention')
+      "
+      :confirm-label="conventionToArchive?.isArchived ? t('admin.unarchive') : t('admin.archive')"
+      :cancel-label="t('common.cancel')"
+      confirm-color="warning"
+      icon-name="i-heroicons-archive-box"
+      icon-color="text-yellow-500"
+      @confirm="executeToggleArchive"
+      @cancel="showArchiveModal = false"
+    />
+
+    <!-- Premier modal de confirmation pour suppression -->
+    <UiConfirmModal
+      v-model="showDeleteModal"
+      :title="t('admin.confirm_delete')"
+      :description="
+        conventionToDelete
+          ? t('admin.pages.conventions.confirm_delete_convention_permanently', {
+              name: conventionToDelete.name,
+              editionsCount: conventionToDelete.editions?.length || 0,
+              collaboratorsCount: (conventionToDelete as any)?._count?.collaborators || 0,
+            })
+          : ''
+      "
+      :confirm-label="t('common.continue')"
+      :cancel-label="t('common.cancel')"
+      confirm-color="error"
+      icon-name="i-heroicons-exclamation-triangle"
+      icon-color="text-red-500"
+      @confirm="confirmFirstDelete"
+      @cancel="showDeleteModal = false"
+    />
+
+    <!-- Deuxième modal de confirmation pour suppression -->
+    <UiConfirmModal
+      v-model="showDeleteConfirmModal"
+      :title="t('admin.final_confirmation')"
+      :description="t('admin.pages.conventions.confirm_delete_convention_permanently_final')"
+      :confirm-label="t('admin.delete_permanently')"
+      :cancel-label="t('common.cancel')"
+      confirm-color="error"
+      icon-name="i-heroicons-trash"
+      icon-color="text-red-600"
+      @confirm="executeDeleteConvention"
+      @cancel="showDeleteConfirmModal = false"
+    />
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useDebounce } from '~/composables/useDebounce'
+import type { Convention } from '~/types'
 
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
@@ -466,7 +543,7 @@ const totalEditions = computed(() => {
 
 const activeConventions = computed(() => {
   if (!data.value?.conventions) return 0
-  return data.value.conventions.filter((conv) => !conv.isArchived).length
+  return data.value.conventions.filter((conv) => !(conv as any).isArchived).length
 })
 
 const filteredConventions = computed(() => {
@@ -476,9 +553,9 @@ const filteredConventions = computed(() => {
 
   // Filtre par statut archivé
   if (archivedFilter.value === 'active') {
-    filtered = filtered.filter((conv) => !conv.isArchived)
+    filtered = filtered.filter((conv) => !(conv as any).isArchived)
   } else if (archivedFilter.value === 'archived') {
-    filtered = filtered.filter((conv) => conv.isArchived)
+    filtered = filtered.filter((conv) => (conv as any).isArchived)
   }
 
   // Filtre par recherche (avec debounce)
@@ -488,8 +565,8 @@ const filteredConventions = computed(() => {
       return (
         conv.name.toLowerCase().includes(query) ||
         conv.description?.toLowerCase().includes(query) ||
-        conv.author.pseudo.toLowerCase().includes(query) ||
-        conv.author.email.toLowerCase().includes(query) ||
+        conv.author?.pseudo?.toLowerCase().includes(query) ||
+        conv.author?.email?.toLowerCase().includes(query) ||
         conv.editions.some(
           (edition) =>
             edition.name?.toLowerCase().includes(query) ||
@@ -504,7 +581,9 @@ const filteredConventions = computed(() => {
 })
 
 // Fonctions utilitaires
-const formatAuthorName = (author) => {
+const formatAuthorName = (
+  author: { prenom?: string | null; nom?: string | null; pseudo?: string } | null | undefined
+) => {
   if (!author) {
     return 'Auteur inconnu'
   }
@@ -514,7 +593,7 @@ const formatAuthorName = (author) => {
   return author.pseudo || 'Utilisateur anonyme'
 }
 
-const formatDate = (date) => {
+const formatDate = (date: string | Date) => {
   return new Date(date).toLocaleDateString('fr-FR', {
     year: 'numeric',
     month: 'long',
@@ -522,7 +601,7 @@ const formatDate = (date) => {
   })
 }
 
-const formatDateRange = (startDate, endDate) => {
+const formatDateRange = (startDate: string | Date, endDate: string | Date) => {
   const start = new Date(startDate)
   const end = new Date(endDate)
 
@@ -540,87 +619,98 @@ const formatDateRange = (startDate, endDate) => {
   return `${startStr} - ${endStr}`
 }
 
+// Modals de confirmation
+const showArchiveModal = ref(false)
+const showDeleteModal = ref(false)
+const showDeleteConfirmModal = ref(false)
+const conventionToArchive = ref<{ id: number; isArchived: boolean } | null>(null)
+const conventionToDelete = ref<Convention | null>(null)
+
 // Fonction pour archiver/désarchiver une convention
-const toggleArchiveConvention = async (conventionId, isArchived) => {
+const toggleArchiveConvention = (conventionId: number, isArchived: boolean) => {
+  conventionToArchive.value = { id: conventionId, isArchived }
+  showArchiveModal.value = true
+}
+
+const executeToggleArchive = async () => {
+  if (!conventionToArchive.value) return
+
   try {
-    const confirmMessage = isArchived
-      ? t('admin.confirm_unarchive_convention')
-      : t('admin.confirm_archive_convention')
+    await ($fetch as any)(`/api/conventions/${conventionToArchive.value.id}/archive`, {
+      method: 'PATCH',
+      body: { archived: !conventionToArchive.value.isArchived },
+    })
 
-    if (confirm(confirmMessage)) {
-      await $fetch(`/api/conventions/${conventionId}/archive`, {
-        method: 'PATCH',
-        body: { archived: !isArchived },
-      })
+    // Rafraîchir les données
+    refresh()
 
-      // Rafraîchir les données
-      refresh()
+    // Message de succès
+    const successMessage = !conventionToArchive.value.isArchived
+      ? t('admin.convention_archived')
+      : t('admin.convention_unarchived')
 
-      // Message de succès
-      const successMessage = !isArchived
-        ? t('admin.convention_archived')
-        : t('admin.convention_unarchived')
-
-      // Note: Dans une vraie app, on utiliserait un toast/notification
-      alert(successMessage)
-    }
+    useToast().add({
+      title: successMessage,
+      color: 'success',
+    })
   } catch (error) {
     console.error("Erreur lors de l'archivage:", error)
-    alert("Erreur lors de l'opération")
+    useToast().add({
+      title: t('common.error'),
+      description: "Erreur lors de l'opération",
+      color: 'error',
+    })
+  } finally {
+    showArchiveModal.value = false
+    conventionToArchive.value = null
   }
 }
 
 // Fonction pour supprimer définitivement une convention
-const deleteConventionPermanently = async (convention) => {
-  try {
-    const editionsCount = convention.editions.length
-    const collaboratorsCount = convention._count.collaborators
+const deleteConventionPermanently = (convention: Convention) => {
+  conventionToDelete.value = convention
+  showDeleteModal.value = true
+}
 
-    // Premier message de confirmation détaillé
-    const confirmMessage = t('admin.pages.conventions.confirm_delete_convention_permanently', {
-      name: convention.name,
-      editionsCount,
-      collaboratorsCount,
+const confirmFirstDelete = () => {
+  showDeleteModal.value = false
+  showDeleteConfirmModal.value = true
+}
+
+const executeDeleteConvention = async () => {
+  if (!conventionToDelete.value) return
+
+  try {
+    await ($fetch as any)(`/api/admin/conventions/${conventionToDelete.value.id}`, {
+      method: 'DELETE',
     })
 
-    // Deuxième confirmation
-    const secondConfirm = t('admin.pages.conventions.confirm_delete_convention_permanently_final')
+    // Rafraîchir les données
+    refresh()
 
-    const firstConfirm = confirm(confirmMessage)
-
-    if (firstConfirm) {
-      const secondConfirmResult = confirm(secondConfirm)
-
-      if (secondConfirmResult) {
-        await $fetch(`/api/admin/conventions/${convention.id}`, {
-          method: 'DELETE',
-        })
-
-        // Rafraîchir les données
-        refresh()
-
-        // Message de succès
-        useToast().add({
-          title: t('admin.pages.conventions.convention_deleted_permanently'),
-          color: 'success',
-        })
-      }
-    }
-  } catch (error) {
+    // Message de succès
+    useToast().add({
+      title: t('admin.pages.conventions.convention_deleted_permanently'),
+      color: 'success',
+    })
+  } catch (error: any) {
     console.error('Erreur lors de la suppression définitive:', error)
     const errorMessage =
-      error.data?.message || t('admin.pages.conventions.error_deleting_convention')
+      error?.data?.message || t('admin.pages.conventions.error_deleting_convention')
 
     useToast().add({
       title: t('common.error'),
       description: errorMessage,
       color: 'error',
     })
+  } finally {
+    showDeleteConfirmModal.value = false
+    conventionToDelete.value = null
   }
 }
 
 // Fonction pour exporter une édition en JSON
-const exportEdition = async (editionId) => {
+const exportEdition = async (editionId: number) => {
   console.log('exportEdition appelée avec ID:', editionId)
 
   try {
@@ -630,12 +720,12 @@ const exportEdition = async (editionId) => {
 
     showExportModal.value = true
 
-    const data = await $fetch(`/api/admin/editions/${editionId}/export`)
+    const data = (await $fetch(`/api/admin/editions/${editionId}/export`)) as any
 
     exportedJson.value = JSON.stringify(data, null, 2)
-  } catch (error) {
+  } catch (error: any) {
     exportError.value =
-      error.data?.message || error.message || "Erreur lors de l'export de l'édition"
+      error?.data?.message || error?.message || "Erreur lors de l'export de l'édition"
   }
 }
 
@@ -654,7 +744,7 @@ const copyToClipboard = async () => {
 }
 
 // Fonction pour générer les items du dropdown menu
-const getDropdownItems = (editionId) => {
+const getDropdownItems = (editionId: number) => {
   return [
     [
       {

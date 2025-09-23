@@ -202,6 +202,20 @@
         </UCard>
       </template>
     </UModal>
+
+    <!-- Modal de confirmation pour suppression -->
+    <UiConfirmModal
+      v-model="showDeleteModal"
+      :title="$t('notifications.confirm_delete_title')"
+      :description="$t('notifications.confirm_delete_description')"
+      :confirm-label="$t('common.delete')"
+      :cancel-label="$t('common.cancel')"
+      confirm-color="error"
+      icon-name="i-heroicons-trash"
+      icon-color="text-red-500"
+      @confirm="confirmDeleteNotification"
+      @cancel="showDeleteModal = false"
+    />
   </div>
 </template>
 
@@ -313,9 +327,20 @@ const handleNotificationClick = async (notification: Notification) => {
   }
 }
 
-const deleteNotification = async (notificationId: string) => {
+// Modal de confirmation pour suppression
+const showDeleteModal = ref(false)
+const notificationToDelete = ref<string | null>(null)
+
+const deleteNotification = (notificationId: string) => {
+  notificationToDelete.value = notificationId
+  showDeleteModal.value = true
+}
+
+const confirmDeleteNotification = async () => {
+  if (!notificationToDelete.value) return
+
   try {
-    await notificationsStore.deleteNotification(notificationId)
+    await notificationsStore.deleteNotification(notificationToDelete.value)
     toast.add({
       color: 'success',
       title: 'Supprimé',
@@ -327,6 +352,9 @@ const deleteNotification = async (notificationId: string) => {
       title: 'Erreur',
       description: 'Impossible de supprimer la notification',
     })
+  } finally {
+    showDeleteModal.value = false
+    notificationToDelete.value = null
   }
 }
 

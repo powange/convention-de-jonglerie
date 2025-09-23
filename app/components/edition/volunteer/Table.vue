@@ -377,6 +377,20 @@
     :team-options="teamOptionsForEdit"
     @save="handleEditApplicationSave"
   />
+
+  <!-- Modal de confirmation pour remettre en attente -->
+  <UiConfirmModal
+    v-model="showBackToPendingModal"
+    :title="t('editions.volunteers.confirm_action')"
+    :description="t('editions.volunteers.confirm_back_pending')"
+    :confirm-label="t('editions.volunteers.set_pending')"
+    :cancel-label="t('common.cancel')"
+    confirm-color="warning"
+    icon-name="i-heroicons-arrow-path"
+    icon-color="text-yellow-500"
+    @confirm="executeBackToPending"
+    @cancel="showBackToPendingModal = false"
+  />
 </template>
 
 <script setup lang="ts">
@@ -711,16 +725,23 @@ const decideApplication = async (app: any, status: 'ACCEPTED' | 'REJECTED' | 'PE
   }
 }
 
-// Fonction pour confirmer une action
-const confirmAction = (message: string): boolean => {
-  return (globalThis as any).confirm(message)
+// Modal de confirmation pour remettre en attente
+const showBackToPendingModal = ref(false)
+const applicationToPending = ref<any>(null)
+
+// Fonction pour ouvrir la confirmation de remise en attente
+const confirmBackToPending = (app: any) => {
+  applicationToPending.value = app
+  showBackToPendingModal.value = true
 }
 
-// Fonction pour remettre en attente avec confirmation
-const confirmBackToPending = (app: any) => {
-  if (confirmAction(t('editions.volunteers.confirm_back_pending'))) {
-    decideApplication(app, 'PENDING')
+// Fonction pour confirmer la remise en attente
+const executeBackToPending = () => {
+  if (applicationToPending.value) {
+    decideApplication(applicationToPending.value, 'PENDING')
   }
+  showBackToPendingModal.value = false
+  applicationToPending.value = null
 }
 
 // Fonctions pour la modal d'acceptation

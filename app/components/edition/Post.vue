@@ -115,6 +115,34 @@
       </div>
     </div>
   </UCard>
+
+  <!-- Modal de confirmation pour suppression de post -->
+  <UiConfirmModal
+    v-model="showDeletePostModal"
+    :title="$t('components.posts.confirm_delete_title')"
+    :description="$t('components.posts.confirm_delete_post')"
+    :confirm-label="$t('common.delete')"
+    :cancel-label="$t('common.cancel')"
+    confirm-color="error"
+    icon-name="i-heroicons-trash"
+    icon-color="text-red-500"
+    @confirm="confirmDeletePost"
+    @cancel="showDeletePostModal = false"
+  />
+
+  <!-- Modal de confirmation pour suppression de commentaire -->
+  <UiConfirmModal
+    v-model="showDeleteCommentModal"
+    :title="$t('components.posts.confirm_delete_title')"
+    :description="$t('components.posts.confirm_delete_comment')"
+    :confirm-label="$t('common.delete')"
+    :cancel-label="$t('common.cancel')"
+    confirm-color="error"
+    icon-name="i-heroicons-trash"
+    icon-color="text-red-500"
+    @confirm="confirmDeleteComment"
+    @cancel="showDeleteCommentModal = false"
+  />
 </template>
 
 <script setup lang="ts">
@@ -213,13 +241,32 @@ const submitReply = async () => {
   }
 }
 
+// Modal de confirmation pour suppression
+const showDeletePostModal = ref(false)
+const showDeleteCommentModal = ref(false)
+const commentToDelete = ref<number | null>(null)
+
 // Supprimer le post
 const deletePost = () => {
+  showDeletePostModal.value = true
+}
+
+const confirmDeletePost = () => {
   emit('delete-post', props.post.id)
+  showDeletePostModal.value = false
 }
 
 // Supprimer un commentaire
 const deleteComment = (commentId: number) => {
-  emit('delete-comment', props.post.id, commentId)
+  commentToDelete.value = commentId
+  showDeleteCommentModal.value = true
+}
+
+const confirmDeleteComment = () => {
+  if (commentToDelete.value) {
+    emit('delete-comment', props.post.id, commentToDelete.value)
+  }
+  showDeleteCommentModal.value = false
+  commentToDelete.value = null
 }
 </script>

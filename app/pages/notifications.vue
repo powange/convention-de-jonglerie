@@ -194,7 +194,7 @@
                     variant="ghost"
                     size="sm"
                     color="error"
-                    @click="deleteNotification(notification.id)"
+                    @click="confirmDeleteNotification(notification.id)"
                   />
                 </div>
               </div>
@@ -243,6 +243,20 @@
         </UButton>
       </div>
     </UCard>
+
+    <!-- Modal de confirmation pour suppression -->
+    <UiConfirmModal
+      v-model="showDeleteModal"
+      :title="$t('notifications.confirm_delete_title')"
+      :description="$t('notifications.confirm_delete_description')"
+      :confirm-label="$t('common.delete')"
+      :cancel-label="$t('common.cancel')"
+      confirm-color="error"
+      icon-name="i-heroicons-trash"
+      icon-color="text-red-500"
+      @confirm="executeDeleteNotification"
+      @cancel="showDeleteModal = false"
+    />
   </div>
 </template>
 
@@ -269,6 +283,10 @@ const toast = useToast()
 const selectedStatus = ref('all')
 const selectedCategory = ref('all')
 const stats = ref(null)
+
+// Modal de confirmation pour suppression
+const showDeleteModal = ref(false)
+const notificationToDelete = ref<string | null>(null)
 
 // Options statiques pour les filtres
 const statusOptions = [
@@ -432,8 +450,14 @@ const toggleReadStatus = async (notification: Notification) => {
         title: 'Marquée comme lue',
         description: 'Notification mise à jour',
       })
+    } else {
+      await notificationsStore.markAsUnread(notification.id)
+      toast.add({
+        color: 'success',
+        title: 'Marquée comme non lue',
+        description: 'Notification mise à jour',
+      })
     }
-    // Note: on pourrait ajouter une fonction markAsUnread si nécessaire
   } catch {
     toast.add({
       color: 'error',
@@ -443,9 +467,16 @@ const toggleReadStatus = async (notification: Notification) => {
   }
 }
 
-const deleteNotification = async (notificationId: string) => {
+const confirmDeleteNotification = (notificationId: string) => {
+  notificationToDelete.value = notificationId
+  showDeleteModal.value = true
+}
+
+const executeDeleteNotification = async () => {
+  if (!notificationToDelete.value) return
+
   try {
-    await notificationsStore.deleteNotification(notificationId)
+    await notificationsStore.deleteNotification(notificationToDelete.value)
     await loadStats()
     toast.add({
       color: 'success',
@@ -458,6 +489,9 @@ const deleteNotification = async (notificationId: string) => {
       title: 'Erreur',
       description: 'Impossible de supprimer la notification',
     })
+  } finally {
+    showDeleteModal.value = false
+    notificationToDelete.value = null
   }
 }
 
