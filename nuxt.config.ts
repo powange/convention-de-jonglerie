@@ -116,6 +116,7 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    // Private keys that are only available on the server
     sessionPassword: process.env.NUXT_SESSION_PASSWORD || '',
     emailEnabled: process.env.SEND_EMAILS || 'false', // Enable/disable real email sending
     smtpUser: process.env.SMTP_USER || '', // SMTP username for email sending
@@ -131,6 +132,7 @@ export default defineNuxtConfig({
       // Supporte aussi la convention Nuxt NUXT_PUBLIC_*
       recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '', // reCAPTCHA site key for client-side widget
       vapidPublicKey: process.env.NUXT_PUBLIC_VAPID_PUBLIC_KEY || '', // VAPID public key for push notifications
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000', // Base URL of the site
     },
   },
   vite: {
