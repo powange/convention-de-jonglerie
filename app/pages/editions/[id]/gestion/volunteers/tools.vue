@@ -56,7 +56,7 @@
                 description="Générez des documents PDF avec les informations de restauration pour chaque jour de l'événement."
               />
 
-              <UButtonGroup>
+              <UFieldGroup>
                 <USelect
                   v-model="selectedCateringDate"
                   :items="cateringDateOptions"
@@ -74,7 +74,7 @@
                 >
                   {{ t('editions.volunteers.generate') }}
                 </UButton>
-              </UButtonGroup>
+              </UFieldGroup>
             </div>
           </UCard>
         </div>

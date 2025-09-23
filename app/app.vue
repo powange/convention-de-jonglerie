@@ -18,15 +18,7 @@
               <div class="flex flex-col sm:flex-row gap-1 sm:gap-2">
                 <!-- Bouton de bascule clair/sombre -->
                 <ClientOnly>
-                  <UButton
-                    :icon="isDark ? 'i-heroicons-moon' : 'i-heroicons-sun'"
-                    color="neutral"
-                    variant="ghost"
-                    size="xs"
-                    class="sm:!size-sm"
-                    :title="isDark ? $t('navigation.light_mode') : $t('navigation.dark_mode')"
-                    @click="toggleColorMode"
-                  />
+                  <UColorModeSwitch size="sm" color="secondary" />
                   <template #fallback>
                     <div class="w-6 h-6 sm:w-8 sm:h-8" />
                   </template>
@@ -136,7 +128,6 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 const authStore = useAuthStore()
 const { locale, locales, setLocale, t } = useI18n()
-const colorMode = useColorMode()
 const toast = useToast()
 
 // État de chargement
@@ -144,21 +135,6 @@ const isLoading = ref(true)
 
 // État réactif pour la taille d'écran
 const isMobile = ref(false)
-
-// État du mode sombre
-const isDark = computed({
-  get() {
-    return colorMode.value === 'dark'
-  },
-  set(value) {
-    colorMode.preference = value ? 'dark' : 'light'
-  },
-})
-
-// Fonction pour basculer le mode couleur
-const toggleColorMode = () => {
-  isDark.value = !isDark.value
-}
 
 // Configuration des langues avec leurs drapeaux
 const languageConfig = {

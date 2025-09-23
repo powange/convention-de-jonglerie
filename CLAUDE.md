@@ -137,7 +137,7 @@ Processus de correction automatique complet qui :
 - **USelect** : Composant de sélection déroulante
 - **UTextarea** : Composant de zone de texte pour les formulaires
 - **UFormField** : Composant de champ de formulaire avec étiquette et validation
-- **UButtonGroup** : Composant de groupe de boutons pour les sélections multiples
+- **UFieldGroup** : Composant de groupe de boutons pour les sélections multiples
 - **UdropdownMenu** : Composant de menu déroulant pour les actions
 
 A Chaque fois que tu ajoutes un nouveau component Nuxt UI, ajoute-le à cette liste.

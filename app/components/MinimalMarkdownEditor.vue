@@ -10,7 +10,7 @@
           {{ t('common.editor.preview_mode') }}
         </UBadge>
         <div v-if="!showPreview || splitMode" class="flex flex-wrap gap-2">
-          <UButtonGroup size="xs" variant="ghost">
+          <UFieldGroup size="xs" variant="ghost">
             <UTooltip :text="t('common.editor.bold_tooltip')">
               <UButton :disabled="!canEdit" @click="surround('**', '**')">
                 <UIcon name="i-heroicons-bold" class="w-4 h-4" />
@@ -21,9 +21,9 @@
                 <UIcon name="i-material-symbols-format-italic" class="w-4 h-4" />
               </UButton>
             </UTooltip>
-          </UButtonGroup>
+          </UFieldGroup>
 
-          <UButtonGroup size="xs" variant="ghost">
+          <UFieldGroup size="xs" variant="ghost">
             <UTooltip :text="t('common.editor.heading1_tooltip')">
               <UButton :disabled="!canEdit" @click="insertHeading(1)">
                 <UIcon name="i-heroicons-h1" class="w-4 h-4" />
@@ -34,9 +34,9 @@
                 <UIcon name="i-heroicons-h2" class="w-4 h-4" />
               </UButton>
             </UTooltip>
-          </UButtonGroup>
+          </UFieldGroup>
 
-          <UButtonGroup size="xs" variant="ghost">
+          <UFieldGroup size="xs" variant="ghost">
             <UTooltip :text="t('common.editor.bullet_list_tooltip')">
               <UButton :disabled="!canEdit" @click="prependLines('- ')">
                 <UIcon name="i-heroicons-list-bullet" class="w-4 h-4" />
@@ -47,9 +47,9 @@
                 <UIcon name="i-heroicons-queue-list" class="w-4 h-4" />
               </UButton>
             </UTooltip>
-          </UButtonGroup>
+          </UFieldGroup>
 
-          <UButtonGroup size="xs" variant="ghost">
+          <UFieldGroup size="xs" variant="ghost">
             <UTooltip :text="t('common.editor.code_tooltip')">
               <UButton :disabled="!canEdit" @click="surround('`', '`')">
                 <UIcon name="i-heroicons-code-bracket" class="w-4 h-4" />
@@ -60,9 +60,9 @@
                 <UIcon name="i-heroicons-code-bracket-square" class="w-4 h-4" />
               </UButton>
             </UTooltip>
-          </UButtonGroup>
+          </UFieldGroup>
 
-          <UButtonGroup size="xs" variant="ghost">
+          <UFieldGroup size="xs" variant="ghost">
             <UTooltip :text="t('common.editor.quote_tooltip')">
               <UButton :disabled="!canEdit" @click="prependLines('> ')">
                 <UIcon name="i-heroicons-chat-bubble-left-right" class="w-4 h-4" />
@@ -73,7 +73,7 @@
                 <UIcon name="i-heroicons-link" class="w-4 h-4" />
               </UButton>
             </UTooltip>
-          </UButtonGroup>
+          </UFieldGroup>
         </div>
 
         <div class="flex gap-2">

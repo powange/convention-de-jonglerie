@@ -13,7 +13,7 @@
         :error="fieldErrors.setupStartDate"
       >
         <UPopover>
-          <UButtonGroup>
+          <UFieldGroup>
             <UButton
               :disabled="saving"
               variant="outline"
@@ -34,7 +34,7 @@
               :disabled="saving"
               @click="handleSetupStartDateClear"
             />
-          </UButtonGroup>
+          </UFieldGroup>
           <template #content>
             <UCalendar
               v-model="setupStartDate"
@@ -47,7 +47,7 @@
 
       <UFormField :label="t('editions.volunteers.setup_end_date_label')">
         <UPopover>
-          <UButtonGroup>
+          <UFieldGroup>
             <UButton
               :disabled="saving"
               variant="outline"
@@ -68,7 +68,7 @@
               :disabled="saving"
               @click="handleTeardownEndDateClear"
             />
-          </UButtonGroup>
+          </UFieldGroup>
           <template #content>
             <UCalendar
               v-model="teardownEndDate"

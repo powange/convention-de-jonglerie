@@ -14,7 +14,7 @@
       <!-- Contrôles d'affichage -->
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
         <!-- Toggle vue compacte/détaillée -->
-        <UButtonGroup size="sm" class="w-full sm:w-auto">
+        <UFieldGroup size="sm" class="w-full sm:w-auto">
           <UButton
             :variant="viewMode === 'detailed' ? 'solid' : 'ghost'"
             icon="i-heroicons-squares-2x2"
@@ -33,7 +33,7 @@
             <span class="hidden sm:inline">{{ $t('pages.volunteers.view_compact_short') }}</span>
             <span class="sm:hidden">{{ $t('pages.volunteers.view_compact') }}</span>
           </UButton>
-        </UButtonGroup>
+        </UFieldGroup>
 
         <!-- Export planning -->
         <UDropdownMenu
