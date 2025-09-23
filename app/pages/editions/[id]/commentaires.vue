@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="editionStore.loading">
+    <div v-if="editionLoading">
       <p>{{ $t('editions.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
@@ -110,7 +110,7 @@ import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-// import type { Edition } from '~/types';
+import type { Edition } from '~/types'
 
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -119,6 +119,35 @@ const toast = useToast()
 const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
+
+// Charger l'édition côté serveur ET client pour SSR/SEO
+const {
+  data: edition,
+  pending: editionLoading,
+  error,
+  refresh: _refreshEdition,
+} = await useFetch<Edition>(`/api/editions/${editionId}`)
+
+// Gestion des erreurs
+if (error.value) {
+  console.error('Failed to fetch edition:', error.value)
+  throw createError({
+    statusCode: error.value.statusCode || 404,
+    statusMessage: error.value.statusMessage || 'Edition not found',
+  })
+}
+
+// Synchroniser le store avec les données useFetch pour la compatibilité avec les autres pages
+watch(
+  edition,
+  (newEdition) => {
+    if (newEdition) {
+      editionStore.setEdition(newEdition)
+    }
+  },
+  { immediate: true }
+)
+
 const loading = ref(false)
 const posts = shallowRef([])
 const isSubmittingPost = ref(false)
@@ -126,8 +155,6 @@ const isSubmittingPost = ref(false)
 const newPostForm = reactive({
   content: '',
 })
-
-const edition = computed(() => editionStore.getEditionById(editionId))
 
 const isFavorited = computed(() => (editionId: number) => {
   return editionStore.editions
@@ -296,20 +323,6 @@ const toggleFavorite = async (id: number) => {
 }
 
 onMounted(async () => {
-  if (!edition.value) {
-    try {
-      const fetchedEdition = await editionStore.fetchEditionById(editionId)
-      // Ajouter l'édition au cache local
-      const existingIndex = editionStore.editions.findIndex((e) => e.id === editionId)
-      if (existingIndex === -1) {
-        editionStore.editions.push(fetchedEdition)
-      } else {
-        editionStore.editions[existingIndex] = fetchedEdition
-      }
-    } catch (error) {
-      console.error('Error loading edition:', error)
-    }
-  }
   await loadPosts()
 })
 </script>
