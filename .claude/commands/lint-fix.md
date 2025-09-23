@@ -13,13 +13,13 @@ Je vais effectuer un processus de correction optimisé :
 npm run lint:fix
 ```
 
-2. **Analyse des erreurs restantes** (seulement si erreur à la fin de l'étape 1)
+2. **Analyse des erreurs restantes** (seulement si `npm run lint:fix` a échoué)
 
 ```bash
 npm run lint
 ```
 
-3. **Correction manuelle** (si des erreurs persistent)
+3. **Correction manuelle** (si des erreurs persistent après l'étape 2)
    Je corrige manuellement les erreurs qui ne peuvent pas être auto-corrigées.
 
 4. **Formatage du code** (TOUJOURS exécuté à la fin)

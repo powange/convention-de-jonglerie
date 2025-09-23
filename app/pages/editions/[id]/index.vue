@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="editionStore.loading" role="status" aria-live="polite">
+    <div v-if="loading" role="status" aria-live="polite">
       <p>{{ $t('editions.loading_details') }}</p>
     </div>
     <div v-else-if="!edition" role="alert">
@@ -315,8 +315,8 @@ import { markdownToHtml } from '~/utils/markdown'
 const { formatDateTimeRange } = useDateFormat()
 
 const route = useRoute()
-const editionStore = useEditionStore()
 const authStore = useAuthStore()
+const editionStore = useEditionStore()
 const toast = useToast()
 const { t, locale } = useI18n()
 const { getTranslatedServicesByCategory } = useTranslatedConventionServices()
@@ -327,15 +327,33 @@ const { getImageUrl } = useImageUrl()
 
 // (Bloc bénévolat déplacé dans la page volunteers.vue)
 
-// Charger l'édition côté serveur ET client - forcer le rechargement pour avoir les données complètes
-try {
-  await editionStore.fetchEditionById(editionId, { force: true })
-} catch (error) {
-  console.error('Failed to fetch edition:', error)
+// Charger l'édition côté serveur ET client pour SSR/SEO
+const {
+  data: edition,
+  pending: loading,
+  error,
+  refresh: refreshEdition,
+} = await useFetch<Edition>(`/api/editions/${editionId}`)
+
+// Gestion des erreurs
+if (error.value) {
+  console.error('Failed to fetch edition:', error.value)
+  throw createError({
+    statusCode: error.value.statusCode || 404,
+    statusMessage: error.value.statusMessage || 'Edition not found',
+  })
 }
 
-// Maintenant utiliser directement le store qui est réactif
-const edition = computed(() => editionStore.getEditionById(editionId))
+// Synchroniser le store avec les données useFetch pour la compatibilité avec les autres pages
+watch(
+  edition,
+  (newEdition) => {
+    if (newEdition) {
+      editionStore.setEdition(newEdition)
+    }
+  },
+  { immediate: true }
+)
 
 // SEO - Métadonnées dynamiques pour l'édition
 watch(
@@ -467,7 +485,7 @@ const publishEdition = async () => {
     })
 
     // Update local state
-    await editionStore.fetchEditionById(editionId)
+    await refreshEdition()
 
     toast.add({
       title: t('editions.edition_published'),
@@ -486,7 +504,11 @@ const publishEdition = async () => {
 
 const toggleFavorite = async (id: number) => {
   try {
-    await editionStore.toggleFavorite(id)
+    await $fetch(`/api/editions/${id}/favorite`, { method: 'POST' })
+
+    // Rafraîchir les données pour mettre à jour l'état des favoris
+    await refreshEdition()
+
     toast.add({
       title: t('messages.favorite_status_updated'),
       icon: 'i-heroicons-check-circle',
@@ -508,7 +530,7 @@ const toggleAttendance = async (id: number) => {
     })
 
     // Recharger l'édition pour mettre à jour les données (forcer le rafraîchissement)
-    await editionStore.fetchEditionById(editionId, { force: true })
+    await refreshEdition()
 
     // Afficher le message traduit selon l'état
     const message = response.isAttending

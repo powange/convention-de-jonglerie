@@ -195,6 +195,18 @@ export const useEditionStore = defineStore('editions', {
       return p
     },
 
+    // Setter pour mettre à jour ou ajouter une édition dans le cache
+    setEdition(edition: Edition) {
+      const existingIndex = this.editions.findIndex((e) => e.id === edition.id)
+      if (existingIndex !== -1) {
+        // Mettre à jour l'édition existante
+        this.editions[existingIndex] = edition
+      } else {
+        // Ajouter la nouvelle édition
+        this.editions.push(edition)
+      }
+    },
+
     async addEdition(editionData: Omit<Edition, 'id' | 'creator' | 'creatorId' | 'favoritedBy'>) {
       this.loading = true
       this.error = null
@@ -203,7 +215,8 @@ export const useEditionStore = defineStore('editions', {
           method: 'POST',
           body: editionData,
         })
-        this.editions.push(newEdition)
+        // Utiliser setEdition pour éviter la duplication de logique
+        this.setEdition(newEdition)
         this.processEditions()
         return newEdition
       } catch (e: unknown) {

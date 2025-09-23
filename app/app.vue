@@ -330,11 +330,6 @@ onMounted(async () => {
 const shouldDisallowIndexing = computed(() => {
   // Vérifier si nous sommes côté serveur
   if (import.meta.server) {
-    console.log('Côté serveur')
-    // Vérifier les variables d'environnement
-    console.log('NODE_ENV:', process.env.NODE_ENV)
-    console.log('NUXT_ENV:', process.env.NUXT_ENV)
-    console.log('NUXT_PUBLIC_SITE_URL:', process.env.NUXT_PUBLIC_SITE_URL)
     return (
       process.env.NODE_ENV !== 'production' ||
       process.env.NUXT_ENV === 'staging' ||
