@@ -7,6 +7,16 @@
 ## Règles importantes
 
 - **NE JAMAIS lancer `npm run dev`** - Le serveur de développement est déjà en cours d'exécution
+- **Pour lire les logs de l'application, utiliser `npm run docker:dev:logs`**
+- L'url de l'application en développement est : http://localhost:3000
+- Avant de modifier un fichier, lis 3 autres fichiers pour comprendre le style de code et les conventions utilisées
+- A chaque fois que tu veux utiliser un component Nuxt UI, tu dois toujours vérifier la documentation officielle pour t'assurer de son bon usage sur le site : https://ui.nuxt.com/components
+- Toujours utiliser les composants Nuxt UI pour les éléments d'interface utilisateur courants (boutons, modals, cartes, etc.) au lieu de créer des composants personnalisés.
+- Toujours utiliser les icônes de la bibliothèque Nuxt Icon pour les icônes (https://nuxt.com/modules/icon) et éviter d'importer des SVG ou d'utiliser des images pour les icônes.
+- Toujours utiliser les classes utilitaires de Tailwind CSS pour le style et la mise en page
+- Toujours écrire les documentations en français dans un répertoire `docs/` à la racine du projet.
+- Ne jamais remplir les fichiers de langues (i38n) autre que le français (fr.json). Les autres langues seront remplie avec les commandes /check-i18n et /check-translations
+- Ne commit jamais sans que la commande `/commit-push` ait été demandée
 
 ## Détails du projet
 
@@ -115,3 +125,21 @@ Processus de correction automatique complet qui :
    ```bash
    npm run format
    ```
+
+## Components Nuxt UI utilisés
+
+- **UButton** : Boutons réutilisables avec différentes variantes
+- **UModal** : Composant modal pour les overlays
+- **UPagination** : Composant de pagination pour la navigation dans les listes
+- **UCard** : Composant de carte pour afficher les éditions
+- **UBadge** : Composant d'étiquette pour afficher les compteurs
+- **UInput** : Composant d'entrée pour les formulaires
+- **USelect** : Composant de sélection déroulante
+- **UTextarea** : Composant de zone de texte pour les formulaires
+- **UFormField** : Composant de champ de formulaire avec étiquette et validation
+- **UButtonGroup** : Composant de groupe de boutons pour les sélections multiples
+- **UdropdownMenu** : Composant de menu déroulant pour les actions
+
+A Chaque fois que tu ajoutes un nouveau component Nuxt UI, ajoute-le à cette liste.
+
+
