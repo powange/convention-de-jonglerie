@@ -515,7 +515,7 @@ const getActivityIcon = (type: string) => {
   const icons: Record<string, string> = {
     user_registered: 'i-heroicons-user-plus',
     convention_created: 'i-heroicons-building-library',
-    edition_created: 'i-heroicons-calendar-plus',
+    edition_created: 'material-symbols:calendar-add-on',
     admin_promoted: 'i-heroicons-shield-check',
   }
   return icons[type] || 'i-heroicons-information-circle'

@@ -132,9 +132,12 @@ import { computed, onMounted } from 'vue'
 
 import { useAuthStore } from './stores/auth'
 
+import type { DropdownMenuItem } from '@nuxt/ui'
+
 const authStore = useAuthStore()
 const { locale, locales, setLocale, t } = useI18n()
 const colorMode = useColorMode()
+const toast = useToast()
 
 // État de chargement
 const isLoading = ref(true)
@@ -188,9 +191,11 @@ const languageItems = computed(() => {
   }))
 })
 
+const isAdminModeActive = ref(false)
+
 // Configuration des items du dropdown utilisateur
-const userMenuItems = computed(() => {
-  const items = [
+const userMenuItems = computed((): DropdownMenuItem[] => {
+  const items: DropdownMenuItem[] = [
     {
       label: t('navigation.profile'),
       icon: 'i-heroicons-user',
@@ -219,25 +224,58 @@ const userMenuItems = computed(() => {
 
   // Ajouter le dashboard admin si super admin
   if (authStore.user?.isGlobalAdmin) {
+    items.push({ type: 'separator' as const })
     items.push({
       label: t('navigation.admin'),
       icon: 'i-heroicons-squares-2x2',
       to: '/admin',
     })
+
+    items.push({
+      label: isAdminModeActive.value
+        ? t('navigation.disable_admin_mode')
+        : t('navigation.enable_admin_mode'),
+      icon: isAdminModeActive.value ? 'i-heroicons-shield-exclamation' : 'i-heroicons-shield-check',
+      // Utiliser une checkbox pour le mode admin
+      type: 'checkbox' as const,
+      checked: isAdminModeActive.value,
+      onUpdateChecked: (checked: boolean) => toggleAdminMode(checked),
+    })
   }
 
   // Ajouter le séparateur et la déconnexion
-  items.push(
-    { label: '─────────────────', icon: 'i-heroicons-minus', to: '#' },
-    {
-      label: t('navigation.logout'),
-      icon: 'i-heroicons-arrow-right-on-rectangle',
-      to: `/logout?returnTo=${encodeURIComponent(useReturnTo().cleanReturnTo(useRoute()))}`,
-    }
-  )
+  items.push({ type: 'separator' as const })
+  items.push({
+    label: t('navigation.logout'),
+    icon: 'i-heroicons-arrow-right-on-rectangle',
+    to: `/logout?returnTo=${encodeURIComponent(useReturnTo().cleanReturnTo(useRoute()))}`,
+  })
 
   return items
 })
+
+// Fonction pour basculer le mode admin
+const toggleAdminMode = (checked: boolean) => {
+  console.log('Toggling admin mode:', checked)
+  isAdminModeActive.value = checked
+  if (checked) {
+    authStore.enableAdminMode()
+    toast.add({
+      title: t('profile.admin_mode_enabled'),
+      description: t('profile.admin_mode_enabled_desc'),
+      icon: 'i-heroicons-shield-check',
+      color: 'warning',
+    })
+  } else {
+    authStore.disableAdminMode()
+    toast.add({
+      title: t('profile.admin_mode_disabled'),
+      description: t('profile.admin_mode_disabled_desc'),
+      icon: 'i-heroicons-shield-exclamation',
+      color: 'neutral',
+    })
+  }
+}
 
 // Fonction pour changer de langue
 const changeLanguage = async (newLocale: string) => {
