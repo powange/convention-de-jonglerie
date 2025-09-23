@@ -50,7 +50,7 @@
               >
                 <UButton
                   variant="ghost"
-                  color="gray"
+                  color="neutral"
                   icon="i-heroicons-ellipsis-vertical"
                   size="xs"
                 />

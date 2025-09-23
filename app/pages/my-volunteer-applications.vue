@@ -474,7 +474,7 @@
               <h4 class="font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                 <UIcon name="i-heroicons-clock" class="text-blue-600 dark:text-blue-400" />
                 {{ $t('pages.volunteers.assigned_time_slots') }}
-                <UBadge color="blue" variant="soft" size="sm">
+                <UBadge color="info" variant="soft" size="sm">
                   {{ application.assignedTimeSlots.length }}
                 </UBadge>
               </h4>
@@ -557,7 +557,7 @@
                     application.status === 'ACCEPTED' && application.assignedTimeSlots?.length > 0
                   "
                   size="sm"
-                  color="blue"
+                  color="info"
                   variant="outline"
                   icon="i-heroicons-calendar-days"
                   @click="showPlanning(application)"
@@ -568,7 +568,7 @@
                 <UButton
                   v-if="application.status === 'ACCEPTED'"
                   size="sm"
-                  color="green"
+                  color="success"
                   variant="outline"
                   icon="i-heroicons-chat-bubble-bottom-center-text"
                   @click="contactOrganizer(application)"
@@ -678,7 +678,7 @@
                   application.status === 'ACCEPTED' && application.assignedTimeSlots?.length > 0
                 "
                 size="xs"
-                color="blue"
+                color="info"
                 variant="ghost"
                 icon="i-heroicons-calendar-days"
                 class="sm:w-auto w-8 h-8"
@@ -688,7 +688,7 @@
               <UButton
                 v-if="application.status === 'ACCEPTED'"
                 size="xs"
-                color="green"
+                color="success"
                 variant="ghost"
                 icon="i-heroicons-chat-bubble-bottom-center-text"
                 class="sm:w-auto w-8 h-8"
@@ -844,12 +844,12 @@
 
       <template #footer>
         <div class="flex justify-between">
-          <UButton color="gray" variant="ghost" @click="planningModalOpen = false">
+          <UButton color="neutral" variant="ghost" @click="planningModalOpen = false">
             {{ $t('common.close') }}
           </UButton>
           <div class="flex gap-2">
             <UButton
-              color="blue"
+              color="info"
               variant="outline"
               icon="i-heroicons-arrow-down-tray"
               @click="exportPlanning('pdf')"
@@ -857,7 +857,7 @@
               {{ $t('pages.volunteers.export_pdf') }}
             </UButton>
             <UButton
-              color="green"
+              color="success"
               variant="outline"
               icon="i-heroicons-calendar"
               @click="exportPlanning('ical')"

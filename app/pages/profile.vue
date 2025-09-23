@@ -216,6 +216,9 @@
             </div>
           </template>
 
+          <!-- Toggle Push Notifications -->
+          <NotificationsPushNotificationToggle class="mb-8" />
+
           <div class="flex items-center justify-between p-6">
             <div class="flex items-center gap-4">
               <UIcon name="i-heroicons-cog-6-tooth" class="w-6 h-6 text-gray-400" />
@@ -231,7 +234,7 @@
             <UButton
               icon="i-heroicons-cog-6-tooth"
               variant="soft"
-              color="blue"
+              color="info"
               size="lg"
               class="transition-all duration-200 hover:transform hover:scale-105"
               @click="showNotificationPreferencesModal = true"
@@ -430,123 +433,6 @@
           >
             {{ userHasPassword ? $t('profile.change_password') : $t('profile.set_password') }}
           </UButton>
-        </UCard>
-
-        <!-- Administration globale -->
-        <UCard
-          v-if="authStore.isGlobalAdmin"
-          class="shadow-lg border-0 bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20"
-        >
-          <template #header>
-            <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center"
-              >
-                <UIcon
-                  name="i-heroicons-shield-exclamation"
-                  class="w-5 h-5 text-orange-600 dark:text-orange-400"
-                />
-              </div>
-              <div>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                  {{ $t('profile.administration') }}
-                </h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                  {{ $t('profile.admin_privileges') }}
-                </p>
-              </div>
-            </div>
-          </template>
-
-          <div class="space-y-4">
-            <!-- Statut actuel -->
-            <div
-              class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border border-orange-200 dark:border-orange-800"
-            >
-              <div class="flex items-center gap-3">
-                <div
-                  class="w-8 h-8 bg-orange-100 dark:bg-orange-800 rounded-lg flex items-center justify-center"
-                >
-                  <UIcon
-                    name="i-heroicons-crown"
-                    class="w-4 h-4 text-orange-600 dark:text-orange-400"
-                  />
-                </div>
-                <div>
-                  <p class="font-medium text-gray-900 dark:text-white">
-                    {{ $t('profile.global_admin') }}
-                  </p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ $t('profile.mode') }}
-                    {{
-                      authStore.isAdminModeActive
-                        ? t('profile.admin_mode')
-                        : t('profile.normal_mode')
-                    }}
-                  </p>
-                </div>
-              </div>
-              <UBadge
-                :color="authStore.isAdminModeActive ? 'warning' : 'neutral'"
-                variant="soft"
-                size="lg"
-              >
-                {{
-                  authStore.isAdminModeActive
-                    ? t('profile.admin_active')
-                    : t('profile.normal_active')
-                }}
-              </UBadge>
-            </div>
-
-            <!-- Switch toggle -->
-            <div
-              class="p-4 bg-white dark:bg-gray-800 rounded-lg border border-orange-200 dark:border-orange-800"
-            >
-              <div class="flex items-center justify-between">
-                <div>
-                  <h4 class="font-medium text-gray-900 dark:text-white">
-                    {{ $t('profile.admin_mode') }}
-                  </h4>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {{
-                      authStore.isAdminModeActive
-                        ? t('profile.admin_access_all')
-                        : t('profile.activate_admin_privileges')
-                    }}
-                  </p>
-                </div>
-                <USwitch
-                  v-model="adminModeToggle"
-                  color="warning"
-                  size="lg"
-                  @update:model-value="toggleAdminMode"
-                />
-              </div>
-            </div>
-
-            <!-- Avertissement -->
-            <div
-              class="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4 border border-orange-200 dark:border-orange-800"
-            >
-              <div class="flex items-start gap-3">
-                <UIcon
-                  name="i-heroicons-exclamation-triangle"
-                  class="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5"
-                />
-                <div>
-                  <p class="text-sm font-medium text-orange-800 dark:text-orange-200 mb-1">
-                    {{ $t('profile.responsible_use') }}
-                  </p>
-                  <ul class="text-xs text-orange-700 dark:text-orange-300 space-y-1">
-                    <li>{{ $t('profile.admin_warning_1') }}</li>
-                    <li>{{ $t('profile.admin_warning_2') }}</li>
-                    <li>{{ $t('profile.admin_warning_3') }}</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
         </UCard>
       </div>
     </div>
@@ -946,7 +832,7 @@ const avatarKey = ref(Date.now()) // Pour forcer le rechargement de l'avatar
 const pictureValidationLoading = ref(false) // Loading lors de la validation
 
 // Gestion du mode administrateur
-const adminModeToggle = ref(authStore.isAdminModeActive)
+const _adminModeToggle = ref(authStore.isAdminModeActive)
 
 // État des préférences de notifications
 const notificationPreferences = reactive({
@@ -1246,7 +1132,7 @@ const onProfilePictureError = (error: string) => {
 }
 
 // Fonction pour basculer le mode administrateur
-const toggleAdminMode = (enabled: boolean) => {
+const _toggleAdminMode = (enabled: boolean) => {
   if (enabled) {
     authStore.enableAdminMode()
     toast.add({

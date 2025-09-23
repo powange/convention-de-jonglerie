@@ -520,7 +520,7 @@
           >
             <UButton
               variant="ghost"
-              color="gray"
+              color="neutral"
               size="sm"
               square
               icon="i-heroicons-ellipsis-horizontal"
