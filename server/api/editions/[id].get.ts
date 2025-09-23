@@ -1,3 +1,4 @@
+import { checkAdminMode } from '../../utils/collaborator-management'
 import { getEmailHash } from '../../utils/email-hash'
 import { prisma } from '../../utils/prisma'
 
@@ -83,6 +84,7 @@ export default defineEventHandler(async (event) => {
 
       // Normalize user id to number to avoid string/number mismatches
       const userId = Number(event.context.user.id)
+      const isAdminMode = await checkAdminMode(userId, event)
       const isCreator = edition.creatorId === userId
       const isConventionAuthor = edition.convention.authorId === userId
       const isCollaborator = edition.convention.collaborators?.some((c) => c.userId === userId)
@@ -90,7 +92,13 @@ export default defineEventHandler(async (event) => {
       // Les éditions orphelines (sans créateur et sans auteur de convention) sont considérées comme publiques
       const isOrphanEdition = !edition.creatorId && !edition.convention.authorId
 
-      if (!isCreator && !isConventionAuthor && !isCollaborator && !isOrphanEdition) {
+      if (
+        !isAdminMode &&
+        !isCreator &&
+        !isConventionAuthor &&
+        !isCollaborator &&
+        !isOrphanEdition
+      ) {
         throw createError({
           statusCode: 404,
           message: 'Edition not found',

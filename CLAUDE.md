@@ -141,5 +141,3 @@ Processus de correction automatique complet qui :
 - **UdropdownMenu** : Composant de menu déroulant pour les actions
 
 A Chaque fois que tu ajoutes un nouveau component Nuxt UI, ajoute-le à cette liste.
-
-
