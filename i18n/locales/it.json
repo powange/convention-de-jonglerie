@@ -142,7 +142,6 @@
     "filter_all_conventions": "Tutti i convegni",
     "filter_archived_conventions": "Convegni archiviati",
     "filter_sort": "Filtra e ordina",
-    "final_confirmation": "Conferma finale",
     "good_news": "Sono buone notizie!",
     "import": {
       "description": "Importa convenzioni ed edizioni da un file JSON",
@@ -210,7 +209,6 @@
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ ATTENZIONE: Sei sicuro di voler eliminare definitivamente la convenzione \"{name}\"?\n\nQuesta azione eliminerà:\n- {editionsCount} edizione/i\n- {collaboratorsCount} collaboratore/i\n- Tutti i dati associati\n\nQuesta azione è IRREVERSIBILE!",
-        "confirm_delete_convention_permanently_final": "Digita SÌ per confermare l'eliminazione definitiva",
         "convention_deleted_permanently": "Convenzione eliminata definitivamente con successo",
         "delete_convention_permanently": "Elimina definitivamente",
         "error_deleting_convention": "Errore nell'eliminazione della convenzione"
@@ -561,6 +559,8 @@
     "tip": "Consiglio",
     "title": "Titolo",
     "total": "Totale",
+    "type_name_to_confirm": "Digitare il nome per confermare",
+    "type_to_confirm": "Digitare « {name} » per confermare",
     "validate": "Convalida",
     "view": "Visualizza",
     "view_details": "Visualizza dettagli",
@@ -1458,11 +1458,9 @@
   "navigation": {
     "admin": "Amministrazione",
     "breadcrumb": "Breadcrumb",
-    "dark_mode": "Modalità scura",
     "disable_admin_mode": "Disattiva modalità admin",
     "discover_editions": "Scopri edizioni",
     "enable_admin_mode": "Attiva modalità admin",
-    "light_mode": "Modalità chiara",
     "loading_favorites": "Caricamento dei tuoi preferiti...",
     "login": "Accesso",
     "logout": "Disconnessione",

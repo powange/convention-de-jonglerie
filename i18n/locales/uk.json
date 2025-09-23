@@ -142,7 +142,6 @@
     "filter_all_conventions": "Всі конвенції",
     "filter_archived_conventions": "Архівовані конвенції",
     "filter_sort": "Фільтрувати та сортувати",
-    "final_confirmation": "Остаточне підтвердження",
     "good_news": "Це хороші новини!",
     "import": {
       "description": "Імпорт конвенцій та видань з JSON-файлу",
@@ -210,7 +209,6 @@
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ УВАГА: Ви впевнені, що хочете назавжди видалити конвенцію \"{name}\"?\n\nЦя дія видалить:\n- {editionsCount} видання\n- {collaboratorsCount} співробітника/співробітників\n- Всі пов'язані дані\n\nЦя дія НЕЗВОРОТНА!",
-        "confirm_delete_convention_permanently_final": "Введіть ТАК для підтвердження постійного видалення",
         "convention_deleted_permanently": "Конвенцію успішно видалено назавжди",
         "delete_convention_permanently": "Видалити назавжди",
         "error_deleting_convention": "Помилка при видаленні конвенції"
@@ -561,6 +559,8 @@
     "tip": "Порада",
     "title": "Заголовок",
     "total": "Всього",
+    "type_name_to_confirm": "Введіть ім'я для підтвердження",
+    "type_to_confirm": "Введіть « {name} » для підтвердження",
     "validate": "Підтвердити",
     "view": "Переглянути",
     "view_details": "Переглянути деталі",
@@ -1458,11 +1458,9 @@
   "navigation": {
     "admin": "Адміністрування",
     "breadcrumb": "Хлібні крихти",
-    "dark_mode": "Темний режим",
     "disable_admin_mode": "Вимкнути режим адміністратора",
     "discover_editions": "Відкрити видання",
     "enable_admin_mode": "Увімкнути режим адміністратора",
-    "light_mode": "Світлий режим",
     "loading_favorites": "Завантаження ваших улюблених...",
     "login": "Увійти",
     "logout": "Вийти",

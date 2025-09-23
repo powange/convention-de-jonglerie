@@ -142,7 +142,6 @@
     "filter_all_conventions": "Alle konventioner",
     "filter_archived_conventions": "Arkiverede konventioner",
     "filter_sort": "Filtrer og sorter",
-    "final_confirmation": "Endelig bekræftelse",
     "good_news": "Det er gode nyheder!",
     "import": {
       "description": "Importér konventioner og udgaver fra en JSON-fil",
@@ -210,7 +209,6 @@
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ ADVARSEL: Er du sikker på, at du vil slette konventionen \"{name}\" permanent?\n\nDenne handling vil slette:\n- {editionsCount} udgave(r)\n- {collaboratorsCount} samarbejdspartner(e)\n- Alle tilknyttede data\n\nDenne handling kan IKKE fortrydes!",
-        "confirm_delete_convention_permanently_final": "Skriv JA for at bekræfte permanent sletning",
         "convention_deleted_permanently": "Konvention slettet permanent med succes",
         "delete_convention_permanently": "Slet permanent",
         "error_deleting_convention": "Fejl ved sletning af konvention"
@@ -561,6 +559,8 @@
     "tip": "Tip",
     "title": "Titel",
     "total": "Total",
+    "type_name_to_confirm": "Indtast navnet for at bekræfte",
+    "type_to_confirm": "Indtast « {name} » for at bekræfte",
     "validate": "Valider",
     "view": "Se",
     "view_details": "Se detaljer",
@@ -1458,11 +1458,9 @@
   "navigation": {
     "admin": "Administration",
     "breadcrumb": "Brødkrumme",
-    "dark_mode": "Mørk tilstand",
     "disable_admin_mode": "Deaktiver admin-tilstand",
     "discover_editions": "Opdag udgaver",
     "enable_admin_mode": "Aktiver admin-tilstand",
-    "light_mode": "Lys tilstand",
     "loading_favorites": "Indlæser dine favoritter...",
     "login": "Log ind",
     "logout": "Log ud",

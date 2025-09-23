@@ -8,9 +8,27 @@
     </template>
 
     <template #body>
-      <p class="text-gray-700 dark:text-gray-300">
-        {{ computedDescription }}
-      </p>
+      <div class="space-y-4">
+        <p class="text-gray-700 dark:text-gray-300">
+          {{ computedDescription }}
+        </p>
+
+        <!-- Champ de validation par nom -->
+        <div v-if="requireNameConfirmation" class="space-y-2">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            {{ $t('common.type_to_confirm', { name: expectedName }) }}
+          </p>
+          <UFormField>
+            <UInput
+              v-model="nameInput"
+              :placeholder="computedNamePlaceholder"
+              :color="isNameValid ? 'primary' : 'error'"
+              class="w-full"
+              autofocus
+            />
+          </UFormField>
+        </div>
+      </div>
     </template>
 
     <template #footer>
@@ -28,8 +46,9 @@
           :variant="confirmVariant"
           :icon="confirmIcon"
           :loading="loading"
+          :disabled="requireNameConfirmation && !isNameValid"
           class="flex-1"
-          @click="$emit('confirm')"
+          @click="handleConfirm"
         >
           {{ computedConfirmLabel }}
         </UButton>
@@ -53,6 +72,10 @@ interface Props {
   iconName?: string
   iconColor?: string
   loading?: boolean
+  // Validation par nom
+  requireNameConfirmation?: boolean
+  expectedName?: string
+  nameConfirmationPlaceholder?: string
 }
 
 interface Emits {
@@ -70,6 +93,7 @@ const props = withDefaults(defineProps<Props>(), {
   iconName: 'i-heroicons-exclamation-triangle',
   iconColor: 'text-orange-500',
   loading: false,
+  requireNameConfirmation: false,
 })
 
 // Valeurs par défaut avec i18n
@@ -77,11 +101,35 @@ const computedTitle = computed(() => props.title || t('common.confirmation'))
 const computedDescription = computed(() => props.description || t('common.are_you_sure'))
 const computedConfirmLabel = computed(() => props.confirmLabel || t('common.confirm'))
 const computedCancelLabel = computed(() => props.cancelLabel || t('common.cancel'))
+const computedNamePlaceholder = computed(
+  () => props.nameConfirmationPlaceholder || t('common.type_name_to_confirm')
+)
+
+// État pour la validation par nom
+const nameInput = ref('')
+const isNameValid = computed(() => {
+  if (!props.requireNameConfirmation) return true
+  return nameInput.value.trim() === props.expectedName?.trim()
+})
 
 const emit = defineEmits<Emits>()
 
 const isOpen = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value),
+  set: (value) => {
+    emit('update:modelValue', value)
+    // Réinitialiser la saisie quand on ferme le modal
+    if (!value) {
+      nameInput.value = ''
+    }
+  },
 })
+
+// Gestion de la confirmation avec validation
+const handleConfirm = () => {
+  if (props.requireNameConfirmation && !isNameValid.value) {
+    return
+  }
+  emit('confirm')
+}
 </script>

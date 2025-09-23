@@ -196,7 +196,6 @@
     "unarchive": "Désarchiver",
     "archive": "Archiver",
     "confirm_delete": "Confirmer la suppression",
-    "final_confirmation": "Confirmation finale",
     "delete_permanently": "Supprimer définitivement",
     "cron_management": "Gestion des Tâches Automatisées",
     "cron_management_description": "Gérer et exécuter les tâches planifiées (cron jobs)",
@@ -271,7 +270,6 @@
       "conventions": {
         "delete_convention_permanently": "Supprimer définitivement",
         "confirm_delete_convention_permanently": "⚠️ ATTENTION : Êtes-vous sûr de vouloir supprimer définitivement la convention \"{name}\" ?\n\nCette action supprimera :\n- {editionsCount} édition(s)\n- {collaboratorsCount} collaborateur(s)\n- Toutes les données associées\n\nCette action est IRRÉVERSIBLE !",
-        "confirm_delete_convention_permanently_final": "Tapez OUI pour confirmer la suppression définitive",
         "convention_deleted_permanently": "Convention supprimée définitivement avec succès",
         "error_deleting_convention": "Erreur lors de la suppression de la convention"
       }
@@ -559,6 +557,8 @@
     "confirm": "Confirmer",
     "confirmation": "Confirmation",
     "are_you_sure": "Êtes-vous sûr de vouloir continuer ?",
+    "type_name_to_confirm": "Tapez le nom pour confirmer",
+    "type_to_confirm": "Tapez « {name} » pour confirmer",
     "convention": "Convention",
     "country": "Pays",
     "create": "Créer",
@@ -1477,11 +1477,9 @@
   "navigation": {
     "admin": "Administration",
     "breadcrumb": "Fil d'Ariane",
-    "dark_mode": "Mode sombre",
     "disable_admin_mode": "Désactiver le mode admin",
     "discover_editions": "Découvrir des éditions",
     "enable_admin_mode": "Activer le mode admin",
-    "light_mode": "Mode clair",
     "loading_favorites": "Chargement de vos favoris...",
     "login": "Connexion",
     "logout": "Déconnexion",

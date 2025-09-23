@@ -142,7 +142,6 @@
     "filter_all_conventions": "Todas las convenciones",
     "filter_archived_conventions": "Convenciones archivadas",
     "filter_sort": "Filtrar y ordenar",
-    "final_confirmation": "Confirmación final",
     "good_news": "¡Son buenas noticias!",
     "import": {
       "description": "Importar convenciones y ediciones desde un archivo JSON",
@@ -210,7 +209,6 @@
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ ADVERTENCIA: ¿Está seguro de que desea eliminar permanentemente la convención \"{name}\"?\n\nEsta acción eliminará:\n- {editionsCount} edición/es\n- {collaboratorsCount} colaborador/es\n- Todos los datos asociados\n\n¡Esta acción es IRREVERSIBLE!",
-        "confirm_delete_convention_permanently_final": "Escriba SÍ para confirmar la eliminación permanente",
         "convention_deleted_permanently": "Convención eliminada permanentemente con éxito",
         "delete_convention_permanently": "Eliminar permanentemente",
         "error_deleting_convention": "Error al eliminar la convención"
@@ -561,6 +559,8 @@
     "tip": "Consejo",
     "title": "Título",
     "total": "Total",
+    "type_name_to_confirm": "Escriba el nombre para confirmar",
+    "type_to_confirm": "Escriba « {name} » para confirmar",
     "validate": "Validar",
     "view": "Ver",
     "view_details": "Ver detalles",
@@ -1458,11 +1458,9 @@
   "navigation": {
     "admin": "Administración",
     "breadcrumb": "Migas de pan",
-    "dark_mode": "Modo oscuro",
     "disable_admin_mode": "Desactivar modo admin",
     "discover_editions": "Descubrir ediciones",
     "enable_admin_mode": "Activar modo admin",
-    "light_mode": "Modo claro",
     "loading_favorites": "Cargando tus favoritos...",
     "login": "Iniciar sesión",
     "logout": "Cerrar sesión",

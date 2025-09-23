@@ -142,7 +142,6 @@
     "filter_all_conventions": "Alle Conventions",
     "filter_archived_conventions": "Archivierte Conventions",
     "filter_sort": "Filtern und sortieren",
-    "final_confirmation": "Endgültige Bestätigung",
     "good_news": "Das sind gute Nachrichten!",
     "import": {
       "description": "Konventionen und Ausgaben aus einer JSON-Datei importieren",
@@ -210,7 +209,6 @@
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ ACHTUNG: Sind Sie sicher, dass Sie die Konvention \"{name}\" dauerhaft löschen möchten?\n\nDiese Aktion wird löschen:\n- {editionsCount} Ausgabe(n)\n- {collaboratorsCount} Mitarbeiter\n- Alle zugehörigen Daten\n\nDiese Aktion ist IRREVERSIBEL!",
-        "confirm_delete_convention_permanently_final": "Geben Sie JA ein, um die dauerhafte Löschung zu bestätigen",
         "convention_deleted_permanently": "Konvention erfolgreich dauerhaft gelöscht",
         "delete_convention_permanently": "Dauerhaft löschen",
         "error_deleting_convention": "Fehler beim Löschen der Konvention"
@@ -561,6 +559,8 @@
     "tip": "Tipp",
     "title": "Titel",
     "total": "Gesamt",
+    "type_name_to_confirm": "Geben Sie den Namen ein, um zu bestätigen",
+    "type_to_confirm": "Geben Sie « {name} » ein, um zu bestätigen",
     "validate": "Validieren",
     "view": "Anzeigen",
     "view_details": "Details anzeigen",
@@ -1458,11 +1458,9 @@
   "navigation": {
     "admin": "Verwaltung",
     "breadcrumb": "Brotkrümelnavigation",
-    "dark_mode": "Dunkler Modus",
     "disable_admin_mode": "Admin-Modus deaktivieren",
     "discover_editions": "Auflagen entdecken",
     "enable_admin_mode": "Admin-Modus aktivieren",
-    "light_mode": "Heller Modus",
     "loading_favorites": "Lade deine Favoriten...",
     "login": "Anmeldung",
     "logout": "Abmeldung",

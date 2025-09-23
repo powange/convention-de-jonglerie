@@ -453,7 +453,7 @@
       @cancel="showArchiveModal = false"
     />
 
-    <!-- Premier modal de confirmation pour suppression -->
+    <!-- Modal de confirmation pour suppression avec validation par nom -->
     <UiConfirmModal
       v-model="showDeleteModal"
       :title="t('admin.confirm_delete')"
@@ -466,27 +466,15 @@
             })
           : ''
       "
-      :confirm-label="t('common.continue')"
-      :cancel-label="t('common.cancel')"
-      confirm-color="error"
-      icon-name="i-heroicons-exclamation-triangle"
-      icon-color="text-red-500"
-      @confirm="confirmFirstDelete"
-      @cancel="showDeleteModal = false"
-    />
-
-    <!-- Deuxième modal de confirmation pour suppression -->
-    <UiConfirmModal
-      v-model="showDeleteConfirmModal"
-      :title="t('admin.final_confirmation')"
-      :description="t('admin.pages.conventions.confirm_delete_convention_permanently_final')"
       :confirm-label="t('admin.delete_permanently')"
       :cancel-label="t('common.cancel')"
       confirm-color="error"
       icon-name="i-heroicons-trash"
       icon-color="text-red-600"
+      :require-name-confirmation="true"
+      :expected-name="conventionToDelete?.name"
       @confirm="executeDeleteConvention"
-      @cancel="showDeleteConfirmModal = false"
+      @cancel="showDeleteModal = false"
     />
   </div>
 </template>
@@ -622,7 +610,6 @@ const formatDateRange = (startDate: string | Date, endDate: string | Date) => {
 // Modals de confirmation
 const showArchiveModal = ref(false)
 const showDeleteModal = ref(false)
-const showDeleteConfirmModal = ref(false)
 const conventionToArchive = ref<{ id: number; isArchived: boolean } | null>(null)
 const conventionToDelete = ref<Convention | null>(null)
 
@@ -672,11 +659,6 @@ const deleteConventionPermanently = (convention: Convention) => {
   showDeleteModal.value = true
 }
 
-const confirmFirstDelete = () => {
-  showDeleteModal.value = false
-  showDeleteConfirmModal.value = true
-}
-
 const executeDeleteConvention = async () => {
   if (!conventionToDelete.value) return
 
@@ -704,7 +686,7 @@ const executeDeleteConvention = async () => {
       color: 'error',
     })
   } finally {
-    showDeleteConfirmModal.value = false
+    showDeleteModal.value = false
     conventionToDelete.value = null
   }
 }

@@ -142,7 +142,6 @@
     "filter_all_conventions": "Alle conventies",
     "filter_archived_conventions": "Gearchiveerde conventies",
     "filter_sort": "Filteren en sorteren",
-    "final_confirmation": "Definitieve bevestiging",
     "good_news": "Dat is goed nieuws!",
     "import": {
       "description": "Conventies en edities importeren uit een JSON-bestand",
@@ -210,7 +209,6 @@
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ WAARSCHUWING: Weet je zeker dat je de conventie \"{name}\" permanent wilt verwijderen?\n\nDeze actie zal verwijderen:\n- {editionsCount} editie(s)\n- {collaboratorsCount} medewerker(s)\n- Alle bijbehorende gegevens\n\nDeze actie is ONOMKEERBAAR!",
-        "confirm_delete_convention_permanently_final": "Typ JA om permanente verwijdering te bevestigen",
         "convention_deleted_permanently": "Conventie succesvol permanent verwijderd",
         "delete_convention_permanently": "Permanent verwijderen",
         "error_deleting_convention": "Fout bij verwijderen van conventie"
@@ -561,6 +559,8 @@
     "tip": "Tip",
     "title": "Titel",
     "total": "Totaal",
+    "type_name_to_confirm": "Typ de naam om te bevestigen",
+    "type_to_confirm": "Typ « {name} » om te bevestigen",
     "validate": "Valideren",
     "view": "Bekijken",
     "view_details": "Details bekijken",
@@ -1458,11 +1458,9 @@
   "navigation": {
     "admin": "Administratie",
     "breadcrumb": "Kruimelpad",
-    "dark_mode": "Donkere modus",
     "disable_admin_mode": "Beheerdersmodus uitschakelen",
     "discover_editions": "Ontdek edities",
     "enable_admin_mode": "Beheerdersmodus inschakelen",
-    "light_mode": "Lichte modus",
     "loading_favorites": "Je favorieten laden...",
     "login": "Inloggen",
     "logout": "Uitloggen",

@@ -142,7 +142,6 @@
     "filter_all_conventions": "Все конвенции",
     "filter_archived_conventions": "Архивированные конвенции",
     "filter_sort": "Фильтровать и сортировать",
-    "final_confirmation": "Окончательное подтверждение",
     "good_news": "Это хорошие новости!",
     "import": {
       "description": "Импорт конвенций и изданий из JSON-файла",
@@ -210,7 +209,6 @@
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ ВНИМАНИЕ: Вы уверены, что хотите навсегда удалить конвенцию \"{name}\"?\n\nЭто действие удалит:\n- {editionsCount} издание/издания\n- {collaboratorsCount} сотрудника/сотрудников\n- Все связанные данные\n\nЭто действие НЕОБРАТИМО!",
-        "confirm_delete_convention_permanently_final": "Введите ДА для подтверждения постоянного удаления",
         "convention_deleted_permanently": "Конвенция успешно удалена навсегда",
         "delete_convention_permanently": "Удалить навсегда",
         "error_deleting_convention": "Ошибка при удалении конвенции"
@@ -561,6 +559,8 @@
     "tip": "Совет",
     "title": "Заголовок",
     "total": "Всего",
+    "type_name_to_confirm": "Введите имя для подтверждения",
+    "type_to_confirm": "Введите « {name} » для подтверждения",
     "validate": "Подтвердить",
     "view": "Просмотреть",
     "view_details": "Просмотреть детали",
@@ -1458,11 +1458,9 @@
   "navigation": {
     "admin": "Администрирование",
     "breadcrumb": "Хлебные крошки",
-    "dark_mode": "Тёмный режим",
     "disable_admin_mode": "Отключить режим администратора",
     "discover_editions": "Откройте издания",
     "enable_admin_mode": "Включить режим администратора",
-    "light_mode": "Светлый режим",
     "loading_favorites": "Загрузка ваших избранных...",
     "login": "Войти",
     "logout": "Выйти",

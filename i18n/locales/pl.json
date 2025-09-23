@@ -142,7 +142,6 @@
     "filter_all_conventions": "Wszystkie konwencje",
     "filter_archived_conventions": "Zarchiwizowane konwencje",
     "filter_sort": "Filtruj i sortuj",
-    "final_confirmation": "Ostateczne potwierdzenie",
     "good_news": "To dobre wieści!",
     "import": {
       "description": "Importuj konwencje i edycje z pliku JSON",
@@ -210,7 +209,6 @@
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ OSTRZEŻENIE: Czy na pewno chcesz trwale usunąć konwencję \"{name}\"?\n\nTa czynność usunie:\n- {editionsCount} edycję/edycji\n- {collaboratorsCount} współpracownika/współpracowników\n- Wszystkie powiązane dane\n\nTa czynność jest NIEODWRACALNA!",
-        "confirm_delete_convention_permanently_final": "Wpisz TAK, aby potwierdzić trwałe usunięcie",
         "convention_deleted_permanently": "Konwencja usunięta trwale pomyślnie",
         "delete_convention_permanently": "Usuń trwale",
         "error_deleting_convention": "Błąd podczas usuwania konwencji"
@@ -561,6 +559,8 @@
     "tip": "Porada",
     "title": "Tytuł",
     "total": "Suma",
+    "type_name_to_confirm": "Wpisz nazwę, aby potwierdzić",
+    "type_to_confirm": "Wpisz « {name} », aby potwierdzić",
     "validate": "Walidować",
     "view": "Zobacz",
     "view_details": "Zobacz szczegóły",
@@ -1458,11 +1458,9 @@
   "navigation": {
     "admin": "Administracja",
     "breadcrumb": "Okruszki nawigacyjne",
-    "dark_mode": "Tryb ciemny",
     "disable_admin_mode": "Wyłącz tryb administratora",
     "discover_editions": "Odkryj edycje",
     "enable_admin_mode": "Włącz tryb administratora",
-    "light_mode": "Tryb jasny",
     "loading_favorites": "Ładowanie ulubionych...",
     "login": "Logowanie",
     "logout": "Wyloguj",

@@ -142,7 +142,6 @@
     "filter_all_conventions": "All conventions",
     "filter_archived_conventions": "Archived conventions",
     "filter_sort": "Filter and sort",
-    "final_confirmation": "Final confirmation",
     "good_news": "That's good news!",
     "import": {
       "description": "Import conventions and editions from a JSON file",
@@ -210,7 +209,6 @@
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ WARNING: Are you sure you want to permanently delete the convention \"{name}\"?\n\nThis action will delete:\n- {editionsCount} edition(s)\n- {collaboratorsCount} collaborator(s)\n- All associated data\n\nThis action is IRREVERSIBLE!",
-        "confirm_delete_convention_permanently_final": "Type YES to confirm permanent deletion",
         "convention_deleted_permanently": "Convention permanently deleted successfully",
         "delete_convention_permanently": "Delete permanently",
         "error_deleting_convention": "Error deleting convention"
@@ -561,6 +559,8 @@
     "tip": "Tip",
     "title": "Title",
     "total": "Total",
+    "type_name_to_confirm": "Type the name to confirm",
+    "type_to_confirm": "Type « {name} » to confirm",
     "validate": "Validate",
     "view": "View",
     "view_details": "View details",
@@ -1458,11 +1458,9 @@
   "navigation": {
     "admin": "Administration",
     "breadcrumb": "Breadcrumb",
-    "dark_mode": "Dark mode",
     "disable_admin_mode": "Disable admin mode",
     "discover_editions": "Discover editions",
     "enable_admin_mode": "Enable admin mode",
-    "light_mode": "Light mode",
     "loading_favorites": "Loading your favorites...",
     "login": "Login",
     "logout": "Logout",
