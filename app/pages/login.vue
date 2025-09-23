@@ -640,7 +640,6 @@ watchEffect(() => {
   useSeoMeta({
     title,
     description,
-    canonical: '/login',
   })
 })
 

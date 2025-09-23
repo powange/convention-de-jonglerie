@@ -280,11 +280,6 @@ import { z } from 'zod'
 import { usePasswordStrength } from '~/composables/usePasswordStrength'
 import type { HttpError } from '~/types'
 
-// URL canonique pour éviter le contenu dupliqué avec les paramètres
-useSeoMeta({
-  canonical: '/register',
-})
-
 const toast = useToast()
 const { t } = useI18n()
 

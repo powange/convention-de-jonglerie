@@ -96,11 +96,6 @@
 import { reactive, ref } from 'vue'
 import { z } from 'zod'
 
-// URL canonique pour éviter le contenu dupliqué avec les paramètres
-useSeoMeta({
-  canonical: '/auth/forgot-password',
-})
-
 const toast = useToast()
 const { t } = useI18n()
 
