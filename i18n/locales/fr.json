@@ -1668,7 +1668,7 @@
     },
     "edition": {
       "title": "{name}",
-      "description": "Découvrez {name} de {convention} qui se déroule {date} à {location}. Informations, programme et inscription à cette convention de jonglerie.",
+      "description": "Découvrez {name} qui se déroule {date} à {location}. Informations, programme et inscription à cette convention de jonglerie.",
       "keywords": "jonglerie, convention, {convention}, {location}, événement, festival, spectacle, atelier",
       "og_description": "Rejoignez-nous pour {name} - {date}. Programme, ateliers et spectacles de jonglerie.",
       "twitter_title": "{name} - Convention de Jonglerie",
@@ -1676,7 +1676,7 @@
     },
     "carpool": {
       "title": "Covoiturage - {name}",
-      "description": "Organisez votre covoiturage pour {name} de {convention}. Trouvez des compagnons de route ou proposez vos places libres pour {date} à {location}.",
+      "description": "Organisez votre covoiturage pour {name}. Trouvez des compagnons de route ou proposez vos places libres pour {date} à {location}.",
       "keywords": "covoiturage, transport, {convention}, {location}, partage, économique, écologique",
       "og_title": "Covoiturage pour {name}",
       "og_description": "Organisez votre transport pour {name} - {date}. Covoiturage disponible.",
@@ -1685,7 +1685,7 @@
     },
     "volunteers": {
       "title": "Bénévolat - {name}",
-      "description": "Rejoignez l'équipe de bénévoles pour {name} de {convention}. Participez à l'organisation de cet événement de jonglerie {date} à {location}.",
+      "description": "Rejoignez l'équipe de bénévoles pour {name}. Participez à l'organisation de cet événement de jonglerie {date} à {location}.",
       "keywords": "bénévolat, volontariat, équipe, {convention}, {location}, organisation, aide",
       "og_title": "Bénévolat pour {name}",
       "og_description": "Rejoignez l'équipe bénévole de {name} - {date}. Participez à l'organisation.",

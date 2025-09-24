@@ -1770,7 +1770,7 @@
   },
   "seo": {
     "carpool": {
-      "description": "Organiseer uw carpoolrit voor {name} van {convention}. Vind reisgenoten of bied uw vrije plaatsen aan voor {date} in {location}.",
+      "description": "Organiseer je carpool naar {name}. Vind reisgenoten of bied je beschikbare plaatsen aan voor {date} in {location}.",
       "keywords": "carpool, vervoer, {convention}, {location}, delen, economisch, milieuvriendelijk",
       "og_description": "Organiseer uw vervoer voor {name} - {date}. Carpool beschikbaar.",
       "og_title": "Carpool voor {name}",
@@ -1779,7 +1779,7 @@
       "twitter_title": "Carpool - {name}"
     },
     "edition": {
-      "description": "Ontdek {name} van {convention} die plaatsvindt {date} in {location}. Informatie, programma en inschrijving voor deze jongleerconventie.",
+      "description": "Ontdek {name} die plaatsvindt {date} in {location}. Informatie, programma en inschrijving voor deze jongleerconventie.",
       "keywords": "jongleren, conventie, {convention}, {location}, evenement, festival, show, workshop",
       "og_description": "Doe mee met ons voor {name} - {date}. Programma, workshops en jongleer-shows.",
       "title": "{name}",
@@ -1805,7 +1805,7 @@
     "site_description": "Vind en beheer uw favoriete jongleerconventies. Collaboratief platform voor jongleurs en evenementorganisatoren.",
     "site_name": "Jongleerconventie",
     "volunteers": {
-      "description": "Sluit je aan bij het vrijwilligersteam voor {name} van {convention}. Neem deel aan de organisatie van dit jongleerevenement {date} in {location}.",
+      "description": "Sluit je aan bij het vrijwilligersteam voor {name}. Neem deel aan de organisatie van dit jongeer-evenement {date} in {location}.",
       "keywords": "vrijwilligerswerk, team, {convention}, {location}, organisatie, hulp",
       "og_description": "Sluit je aan bij het vrijwilligersteam van {name} - {date}. Neem deel aan de organisatie.",
       "og_title": "Vrijwilligerswerk voor {name}",

@@ -1770,7 +1770,7 @@
   },
   "seo": {
     "carpool": {
-      "description": "Zorganizuj wspólną podróż na {name} od {convention}. Znajdź towarzyszy podróży lub zaoferuj wolne miejsca na {date} w {location}.",
+      "description": "Zorganizuj wspólny przejazd na {name}. Znajdź towarzyszy podróży lub zaoferuj swoje wolne miejsca na {date} w {location}.",
       "keywords": "wspólna podróż, transport, {convention}, {location}, dzielenie się, ekonomiczny, ekologiczny",
       "og_description": "Zorganizuj transport na {name} - {date}. Dostępne wspólne podróże.",
       "og_title": "Wspólna podróż na {name}",
@@ -1779,7 +1779,7 @@
       "twitter_title": "Wspólna podróż - {name}"
     },
     "edition": {
-      "description": "Odkryj {name} od {convention}, która odbywa się {date} w {location}. Informacje, program i rejestracja na tę konwencję żonglerską.",
+      "description": "Odkryj {name}, która odbywa się {date} w {location}. Informacje, program i rejestracja na tę konwencję żonglerki.",
       "keywords": "żonglerka, konwencja, {convention}, {location}, wydarzenie, festiwal, show, warsztat",
       "og_description": "Dołącz do nas na {name} - {date}. Program, warsztaty i pokazy żonglerskie.",
       "title": "{name}",
@@ -1805,7 +1805,7 @@
     "site_description": "Znajdź i zarządzaj swoimi ulubionymi konwencjami żonglerskimi. Platforma współpracy dla żonglerzy i organizatorów wydarzeń.",
     "site_name": "Konwencja żonglerska",
     "volunteers": {
-      "description": "Dołącz do zespołu wolontariuszy dla {name} od {convention}. Wez udział w organizacji tego wydarzenia żonglerskiego {date} w {location}.",
+      "description": "Dołącz do zespołu wolontariuszy {name}. Weź udział w organizacji tego wydarzenia żonglerskiego {date} w {location}.",
       "keywords": "wolontariat, zespoł, {convention}, {location}, organizacja, pomoc",
       "og_description": "Dołącz do zespołu wolontariuszy {name} - {date}. Wez udział w organizacji.",
       "og_title": "Wolontariat dla {name}",

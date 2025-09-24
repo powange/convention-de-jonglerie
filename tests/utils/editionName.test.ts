@@ -46,17 +46,17 @@ describe('editionName utils', () => {
       expect(result).toBe('Festival de Jonglerie')
     })
 
-    it('devrait retourner "Édition sans nom" si pas de nom d\'édition ni de convention', () => {
+    it('devrait retourner une chaîne vide si pas de nom d\'édition ni de convention', () => {
       const edition = {
         name: null,
       }
 
       const result = getEditionDisplayName(edition)
 
-      expect(result).toBe('Édition sans nom')
+      expect(result).toBe('')
     })
 
-    it('devrait retourner "Édition sans nom" si convention est null', () => {
+    it('devrait retourner une chaîne vide si convention est null', () => {
       const edition = {
         name: null,
         convention: null,
@@ -64,10 +64,10 @@ describe('editionName utils', () => {
 
       const result = getEditionDisplayName(edition)
 
-      expect(result).toBe('Édition sans nom')
+      expect(result).toBe('')
     })
 
-    it('devrait retourner "Édition sans nom" si convention existe mais sans nom', () => {
+    it('devrait retourner une chaîne vide si convention existe mais sans nom', () => {
       const edition = {
         name: null,
         convention: {},
@@ -75,7 +75,7 @@ describe('editionName utils', () => {
 
       const result = getEditionDisplayName(edition as any)
 
-      expect(result).toBe('Édition sans nom')
+      expect(result).toBe('')
     })
 
     it('devrait gérer les propriétés undefined', () => {
@@ -151,30 +151,22 @@ describe('editionName utils', () => {
       expect(result).toBe('Festival de Jonglerie')
     })
 
-    it('devrait retourner "Édition sans nom" si pas de nom d\'édition ni de convention', () => {
-      const edition = { name: null }
-
-      const result = getEditionDisplayNameWithConvention(edition)
-
-      expect(result).toBe('Édition sans nom')
-    })
-
-    it('devrait retourner "Édition sans nom" si convention est null', () => {
+    it('devrait retourner une chaîne vide si convention est null', () => {
       const edition = { name: null }
       const convention = null
 
       const result = getEditionDisplayNameWithConvention(edition, convention as any)
 
-      expect(result).toBe('Édition sans nom')
+      expect(result).toBe('')
     })
 
-    it('devrait retourner "Édition sans nom" si convention existe mais sans nom', () => {
+    it('devrait retourner une chaîne vide si convention existe mais sans nom', () => {
       const edition = { name: null }
       const convention = {} as any
 
       const result = getEditionDisplayNameWithConvention(edition, convention)
 
-      expect(result).toBe('Édition sans nom')
+      expect(result).toBe('')
     })
 
     it('devrait gérer les propriétés undefined', () => {
@@ -193,14 +185,6 @@ describe('editionName utils', () => {
       const result = getEditionDisplayNameWithConvention(edition, convention)
 
       expect(result).toBe('Convention Test')
-    })
-
-    it('devrait fonctionner sans convention (undefined)', () => {
-      const edition = { name: 'Édition 2024' }
-
-      const result = getEditionDisplayNameWithConvention(edition)
-
-      expect(result).toBe('Édition 2024')
     })
 
     it('devrait gérer différents scénarios', () => {
@@ -223,7 +207,7 @@ describe('editionName utils', () => {
         {
           edition: { name: null },
           convention: undefined,
-          expected: 'Édition sans nom',
+          expected: '',
         },
         {
           edition: { name: undefined },
@@ -260,17 +244,6 @@ describe('editionName utils', () => {
       const result2 = getEditionDisplayNameWithConvention(edition2, convention)
 
       expect(result1).toBe(result2)
-    })
-
-    it("devrait gérer identiquement les cas d'absence totale de données", () => {
-      const edition1 = { name: null }
-      const edition2 = { name: null }
-
-      const result1 = getEditionDisplayName(edition1)
-      const result2 = getEditionDisplayNameWithConvention(edition2)
-
-      expect(result1).toBe(result2)
-      expect(result1).toBe('Édition sans nom')
     })
   })
 })

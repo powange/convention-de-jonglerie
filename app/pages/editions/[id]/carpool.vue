@@ -69,7 +69,6 @@ watch(
         description: () =>
           t('seo.carpool.description', {
             name: editionName,
-            convention: conventionName,
             date: dateRange,
             location: newEdition.location || '',
           }),

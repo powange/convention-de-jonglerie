@@ -374,7 +374,6 @@ watch(
         description: () =>
           t('seo.edition.description', {
             name: editionName,
-            convention: conventionName,
             date: dateRange,
             location: newEdition.location || '',
           }),
@@ -389,7 +388,7 @@ watch(
             name: editionName,
             date: dateRange,
           }),
-        ogType: 'event',
+        ogType: 'article',
         ogLocale: () => locale.value,
         ogImage: imageUrl,
         twitterCard: 'summary_large_image',

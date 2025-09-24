@@ -1770,7 +1770,7 @@
   },
   "seo": {
     "carpool": {
-      "description": "Organisieren Sie Ihre Fahrgemeinschaft für {name} von {convention}. Finden Sie Mitfahrer oder bieten Sie freie Plätze für {date} in {location} an.",
+      "description": "Organisieren Sie Ihre Mitfahrgelegenheit nach {name}. Finden Sie Mitreisende oder bieten Sie freie Plätze für {date} in {location} an.",
       "keywords": "Fahrgemeinschaft, Transport, {convention}, {location}, Mitfahrgelegenheit, günstig, umweltfreundlich",
       "og_description": "Organisieren Sie Ihren Transport für {name} - {date}. Fahrgemeinschaften verfügbar.",
       "og_title": "Fahrgemeinschaft für {name}",
@@ -1779,7 +1779,7 @@
       "twitter_title": "Fahrgemeinschaft - {name}"
     },
     "edition": {
-      "description": "Entdecken Sie {name} von {convention}, die {date} in {location} stattfindet. Informationen, Programm und Anmeldung für diese Jonglier-Convention.",
+      "description": "Entdecken Sie {name}, das {date} in {location} stattfindet. Informationen, Programm und Anmeldung zu dieser Jonglierkonvention.",
       "keywords": "Jonglieren, Convention, {convention}, {location}, Veranstaltung, Festival, Show, Workshop",
       "og_description": "Begleiten Sie uns zu {name} - {date}. Programm, Workshops und Jonglier-Shows.",
       "title": "{name}",
@@ -1805,7 +1805,7 @@
     "site_description": "Finden und verwalten Sie Ihre bevorzugten Jonglier-Conventions. Kollaborative Plattform für Jongleure und Veranstaltungsorganisatoren.",
     "site_name": "Jonglier-Convention",
     "volunteers": {
-      "description": "Schließen Sie sich dem Freiwilligenteam für {name} von {convention} an. Beteiligen Sie sich an der Organisation dieser Jonglier-Veranstaltung {date} in {location}.",
+      "description": "Schließen Sie sich dem Freiwilligenteam für {name} an. Helfen Sie bei der Organisation dieser Jonglierveranstaltung {date} in {location}.",
       "keywords": "Freiwilligenarbeit, Ehrenamt, Team, {convention}, {location}, Organisation, Hilfe",
       "og_description": "Schließen Sie sich dem Freiwilligenteam von {name} - {date} an. Beteiligen Sie sich an der Organisation.",
       "og_title": "Freiwilligenarbeit für {name}",

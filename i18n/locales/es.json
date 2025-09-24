@@ -1770,7 +1770,7 @@
   },
   "seo": {
     "carpool": {
-      "description": "Organiza tu viaje compartido para {name} de {convention}. Encuentra compañeros de viaje u ofrece tus asientos libres para {date} en {location}.",
+      "description": "Organiza tu viaje compartido a {name}. Encuentra compañeros de viaje u ofrece tus plazas disponibles para {date} en {location}.",
       "keywords": "viaje compartido, transporte, {convention}, {location}, compartir, económico, ecológico",
       "og_description": "Organiza tu transporte para {name} - {date}. Viajes compartidos disponibles.",
       "og_title": "Viaje compartido para {name}",
@@ -1779,7 +1779,7 @@
       "twitter_title": "Viaje compartido - {name}"
     },
     "edition": {
-      "description": "Descubre {name} de {convention} que tiene lugar {date} en {location}. Información, programa e inscripción a esta convención de malabarismo.",
+      "description": "Descubre {name} que tiene lugar {date} en {location}. Información, programa e inscripción para esta convención de malabares.",
       "keywords": "malabarismo, convención, {convention}, {location}, evento, festival, espectáculo, taller",
       "og_description": "Únete a nosotros para {name} - {date}. Programa, talleres y espectáculos de malabarismo.",
       "title": "{name}",
@@ -1805,7 +1805,7 @@
     "site_description": "Encuentra y gestiona tus convenciones de malabarismo favoritas. Plataforma colaborativa para malabaristas y organizadores de eventos.",
     "site_name": "Convención de Malabarismo",
     "volunteers": {
-      "description": "Únete al equipo de voluntarios para {name} de {convention}. Participa en la organización de este evento de malabarismo {date} en {location}.",
+      "description": "Únete al equipo de voluntarios para {name}. Participa en la organización de este evento de malabares {date} en {location}.",
       "keywords": "voluntariado, equipo, {convention}, {location}, organización, ayuda",
       "og_description": "Únete al equipo de voluntarios de {name} - {date}. Participa en la organización.",
       "og_title": "Voluntariado para {name}",

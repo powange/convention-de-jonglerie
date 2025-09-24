@@ -1770,7 +1770,7 @@
   },
   "seo": {
     "carpool": {
-      "description": "Organiser din samkørsel til {name} fra {convention}. Find rejsefæller eller tilbyd dine ledige pladser til {date} i {location}.",
+      "description": "Organiser din samkørsel til {name}. Find rejsefæller eller tilbyd dine ledige pladser til {date} i {location}.",
       "keywords": "samkørsel, transport, {convention}, {location}, deling, økonomisk, økologisk",
       "og_description": "Organiser din transport til {name} - {date}. Samkørsel tilgængelig.",
       "og_title": "Samkørsel til {name}",
@@ -1779,7 +1779,7 @@
       "twitter_title": "Samkørsel - {name}"
     },
     "edition": {
-      "description": "Opdag {name} fra {convention} som finder sted {date} i {location}. Information, program og tilmelding til denne jonglering convention.",
+      "description": "Opdag {name}, der finder sted {date} i {location}. Information, program og tilmelding til denne jonglørkonvention.",
       "keywords": "jonglering, convention, {convention}, {location}, begivenhed, festival, show, workshop",
       "og_description": "Deltag med os til {name} - {date}. Program, workshops og jonglering shows.",
       "title": "{name}",
@@ -1805,7 +1805,7 @@
     "site_description": "Find og håndter dine foretrukne jonglering conventions. Kollaborativ platform for jonglører og event arrangører.",
     "site_name": "Jonglering Convention",
     "volunteers": {
-      "description": "Tilslut dig frivilligholdet for {name} fra {convention}. Deltag i organiseringen af denne jonglering begivenhed {date} i {location}.",
+      "description": "Tilslut dig frivilligteamet til {name}. Deltag i organiseringen af dette jonglør-arrangement {date} i {location}.",
       "keywords": "frivilligt arbejde, hold, {convention}, {location}, organisering, hjælp",
       "og_description": "Tilslut dig frivilligholdet for {name} - {date}. Deltag i organiseringen.",
       "og_title": "Frivilligt arbejde for {name}",

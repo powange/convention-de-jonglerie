@@ -1770,7 +1770,7 @@
   },
   "seo": {
     "carpool": {
-      "description": "Organize your carpool for {name} by {convention}. Find travel companions or offer your free seats for {date} in {location}.",
+      "description": "Organize your carpool to {name}. Find travel companions or offer your available seats for {date} in {location}.",
       "keywords": "carpool, transport, {convention}, {location}, sharing, economical, ecological",
       "og_description": "Organize your transport for {name} - {date}. Carpool available.",
       "og_title": "Carpool for {name}",
@@ -1779,7 +1779,7 @@
       "twitter_title": "Carpool - {name}"
     },
     "edition": {
-      "description": "Discover {name} by {convention} taking place {date} in {location}. Information, program and registration for this juggling convention.",
+      "description": "Discover {name} taking place {date} in {location}. Information, program and registration for this juggling convention.",
       "keywords": "juggling, convention, {convention}, {location}, event, festival, show, workshop",
       "og_description": "Join us for {name} - {date}. Program, workshops and juggling shows.",
       "title": "{name}",
@@ -1805,7 +1805,7 @@
     "site_description": "Find and manage your favorite juggling conventions. Collaborative platform for jugglers and event organizers.",
     "site_name": "Juggling Convention",
     "volunteers": {
-      "description": "Join the volunteer team for {name} by {convention}. Participate in organizing this juggling event {date} in {location}.",
+      "description": "Join the volunteer team for {name}. Participate in organizing this juggling event {date} in {location}.",
       "keywords": "volunteering, volunteer, team, {convention}, {location}, organization, help",
       "og_description": "Join the volunteer team of {name} - {date}. Participate in the organization.",
       "og_title": "Volunteering for {name}",

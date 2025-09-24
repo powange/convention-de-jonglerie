@@ -254,7 +254,6 @@ watch(
         description: () =>
           t('seo.volunteers.description', {
             name: editionName,
-            convention: conventionName,
             date: dateRange,
             location: newEdition.location || '',
           }),

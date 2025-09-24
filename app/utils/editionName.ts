@@ -8,7 +8,7 @@ export function getEditionDisplayName(edition: {
   name?: string | null
   convention?: { name: string }
 }): string {
-  return edition.name || edition.convention?.name || 'Édition sans nom'
+  return edition.name || edition.convention?.name || ''
 }
 
 /**
@@ -16,7 +16,7 @@ export function getEditionDisplayName(edition: {
  */
 export function getEditionDisplayNameWithConvention(
   edition: { name?: string | null },
-  convention?: { name: string }
+  convention: { name: string }
 ): string {
-  return edition.name || convention?.name || 'Édition sans nom'
+  return edition.name || convention?.name || ''
 }
