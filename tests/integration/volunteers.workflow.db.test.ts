@@ -729,6 +729,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
           volunteersAskExperience: true,
           volunteersSetupStartDate: true,
           volunteersTeardownEndDate: true,
+          volunteersUpdatedAt: true,
           volunteersAskSetup: true,
           volunteersAskTeardown: true,
           volunteerApplications: { select: { id: true, status: true, userId: true } },
