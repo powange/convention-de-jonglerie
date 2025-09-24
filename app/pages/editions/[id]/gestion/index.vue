@@ -588,6 +588,7 @@ import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useDebounce } from '~/composables/useDebounce'
+import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { summarizeRights } from '~/utils/collaboratorRights'
@@ -607,8 +608,14 @@ const { t } = useI18n()
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
-// Gestion des erreurs de validation par champ
-const fieldErrors = ref<Record<string, string>>({})
+// Utiliser le composable pour les paramètres des bénévoles
+const {
+  settings: volunteersSettings,
+  updating: savingVolunteers,
+  fieldErrors,
+  fetchSettings: fetchVolunteersSettings,
+  updateSettings,
+} = useVolunteerSettings(editionId)
 
 // Fonction pour effacer l'erreur d'un champ spécifique
 const clearFieldError = (fieldName: string) => {
@@ -624,7 +631,6 @@ const volunteersOpenLocal = ref(false)
 const volunteersModeLocal = ref<'INTERNAL' | 'EXTERNAL'>('INTERNAL')
 const volunteersExternalUrlLocal = ref('')
 const volunteersUpdatedAt = ref<Date | null>(null)
-const savingVolunteers = ref(false)
 // Éviter d'envoyer des PATCH à l'initialisation quand on applique les valeurs serveur
 const volunteersInitialized = ref(false)
 // Nuxt UI URadioGroup utilise la prop `items` (pas `options`)
@@ -644,36 +650,35 @@ onMounted(async () => {
       console.error('Failed to fetch edition:', error)
     }
   }
-  if (edition.value) applyEditionVolunteerFields(edition.value as any)
+  // Charger les paramètres des bénévoles
+  await fetchVolunteersSettings()
+  applyVolunteerSettings()
 })
 
-watch(edition, (val) => {
-  if (val) {
-    applyEditionVolunteerFields(val as any)
+watch(volunteersSettings, () => {
+  applyVolunteerSettings()
+})
+
+function applyVolunteerSettings() {
+  if (volunteersSettings.value) {
+    volunteersOpenLocal.value = !!volunteersSettings.value.open
+    volunteersModeLocal.value = volunteersSettings.value.mode || 'INTERNAL'
+    volunteersExternalUrlLocal.value = volunteersSettings.value.externalUrl || ''
+    volunteersUpdatedAt.value = new Date()
+    // marquer initialisation terminée (prochain changement utilisateur déclenchera watchers)
+    volunteersInitialized.value = true
   }
-})
-
-function applyEditionVolunteerFields(src: any) {
-  volunteersOpenLocal.value = !!src.volunteersOpen
-  volunteersModeLocal.value = src.volunteersMode || 'INTERNAL'
-  volunteersExternalUrlLocal.value = src.volunteersExternalUrl || ''
-  const vu = src.volunteersUpdatedAt
-  volunteersUpdatedAt.value = vu ? new Date(vu) : null
-  // marquer initialisation terminée (prochain changement utilisateur déclenchera watchers)
-  volunteersInitialized.value = true
 }
 
 // Handlers explicites pour éviter double PATCH au chargement
 const handleToggleOpen = async (val: boolean) => {
-  if (!edition.value || !volunteersInitialized.value) return
-  savingVolunteers.value = true
+  if (!volunteersInitialized.value) return
   const previous = !val
+
   try {
-    const res: any = await $fetch(`/api/editions/${edition.value.id}/volunteers/settings`, {
-      method: 'PATCH' as any,
-      body: { open: val },
-    })
-    if (res?.settings) {
+    const updatedSettings = await updateSettings({ open: val })
+
+    if (updatedSettings) {
       volunteersUpdatedAt.value = new Date()
       await editionStore.fetchEditionById(editionId, { force: true })
       toast.add({
@@ -685,75 +690,61 @@ const handleToggleOpen = async (val: boolean) => {
   } catch (e: any) {
     volunteersOpenLocal.value = previous
     toast.add({
-      title: e?.message || t('common.error'),
+      title: e?.data?.message || e?.message || t('common.error'),
       color: 'error',
       icon: 'i-heroicons-x-circle',
     })
-  } finally {
-    savingVolunteers.value = false
   }
 }
 
 const handleChangeMode = async (_raw: any) => {
-  if (!edition.value || !volunteersInitialized.value) return
-  // éviter PATCH si pas de changement réel (comparaison avec valeur locale précédente déjà mise à jour par v-model)
-  // volunteersModeLocal contient déjà la nouvelle valeur; si description/URL pas modifiée inutile ? On laisse sauvegarde car le mode change effectivement côté serveur.
+  if (!volunteersInitialized.value) return
+  // volunteersModeLocal contient déjà la nouvelle valeur
   await persistVolunteerSettings()
 }
 
 const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {}) => {
-  if (!edition.value) return
-  savingVolunteers.value = true
-
   try {
     const body: any = {
       mode: volunteersModeLocal.value,
     }
-    if (volunteersModeLocal.value === 'EXTERNAL')
-      body.externalUrl = volunteersExternalUrlLocal.value.trim() || null
-    const res: any = await $fetch(`/api/editions/${edition.value.id}/volunteers/settings`, {
-      method: 'PATCH' as any,
-      body,
-    })
-    if (res?.settings) {
+    if (volunteersModeLocal.value === 'EXTERNAL') {
+      body.externalUrl = volunteersExternalUrlLocal.value.trim() || undefined
+    }
+
+    const updatedSettings = await updateSettings(body)
+
+    if (updatedSettings) {
       volunteersUpdatedAt.value = new Date()
 
       // Mettre à jour directement les données locales au lieu de re-fetch complet
       if (!options.skipRefetch && edition.value) {
-        // Mettre à jour seulement les champs bénévoles dans le store local
-        Object.assign(edition.value, {
-          volunteersMode: res.settings.volunteersMode,
-          volunteersExternalUrl: res.settings.volunteersExternalUrl,
-          volunteersUpdatedAt: res.settings.volunteersUpdatedAt,
-        })
+        // Mettre à jour le store local
+        await editionStore.fetchEditionById(editionId, { force: true })
       }
+
       toast.add({
         title: t('common.saved') || 'Sauvegardé',
         color: 'success',
         icon: 'i-heroicons-check-circle',
       })
     }
-  } catch (e: any) {
-    // Gérer les erreurs de validation par champ
-    if (e?.data?.data?.errors) {
-      fieldErrors.value = e.data.data.errors
+  } catch (error: any) {
+    // Les erreurs sont déjà gérées dans le composable
+    if (fieldErrors.value && Object.keys(fieldErrors.value).length > 0) {
       toast.add({
-        title: e.data.data.message || 'Erreurs de validation',
+        title: 'Erreurs de validation',
         description: 'Veuillez corriger les erreurs dans le formulaire',
         color: 'error',
         icon: 'i-heroicons-x-circle',
       })
     } else {
-      // Erreur générale
-      fieldErrors.value = {}
       toast.add({
-        title: e?.data?.message || e?.message || t('common.error'),
+        title: error?.data?.message || error?.message || t('common.error'),
         color: 'error',
         icon: 'i-heroicons-x-circle',
       })
     }
-  } finally {
-    savingVolunteers.value = false
   }
 }
 

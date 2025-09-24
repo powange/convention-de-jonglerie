@@ -264,9 +264,9 @@
             <!-- Préférences alimentaires et allergies -->
             <div
               v-if="
-                (application.edition.volunteersAskDiet &&
+                (application.volunteersSettings?.askDiet &&
                   application.dietaryPreference !== 'NONE') ||
-                (application.edition.volunteersAskAllergies && application.allergies)
+                (application.volunteersSettings?.askAllergies && application.allergies)
               "
             >
               <h4 class="font-medium text-gray-900 dark:text-white mb-2">
@@ -275,7 +275,7 @@
               <div class="text-sm space-y-1">
                 <div
                   v-if="
-                    application.edition.volunteersAskDiet &&
+                    application.volunteersSettings?.askDiet &&
                     application.dietaryPreference !== 'NONE'
                   "
                 >
@@ -286,7 +286,7 @@
                     $t(`pages.volunteers.dietary.${application.dietaryPreference.toLowerCase()}`)
                   }}</span>
                 </div>
-                <div v-if="application.edition.volunteersAskAllergies && application.allergies">
+                <div v-if="application.volunteersSettings?.askAllergies && application.allergies">
                   <span class="text-gray-600 dark:text-gray-400"
                     >{{ $t('pages.volunteers.allergies') }}:</span
                   >
@@ -298,7 +298,7 @@
             <!-- Préférences horaires -->
             <div
               v-if="
-                application.edition.volunteersAskTimePreferences &&
+                application.volunteersSettings?.askTimePreferences &&
                 application.timePreferences &&
                 Array.isArray(application.timePreferences) &&
                 application.timePreferences.length > 0
@@ -323,7 +323,7 @@
             <!-- Préférences d'équipes -->
             <div
               v-if="
-                application.edition.volunteersAskTeamPreferences &&
+                application.volunteersSettings?.askTeamPreferences &&
                 application.teamPreferences &&
                 Array.isArray(application.teamPreferences) &&
                 application.teamPreferences.length > 0
@@ -340,7 +340,7 @@
             </div>
 
             <!-- Animaux de compagnie -->
-            <div v-if="application.edition.volunteersAskPets && application.hasPets">
+            <div v-if="application.volunteersSettings?.askPets && application.hasPets">
               <h4 class="font-medium text-gray-900 dark:text-white mb-2">
                 {{ $t('pages.volunteers.pets') }}
               </h4>
@@ -361,7 +361,7 @@
             </div>
 
             <!-- Personnes mineures -->
-            <div v-if="application.edition.volunteersAskMinors && application.hasMinors">
+            <div v-if="application.volunteersSettings?.askMinors && application.hasMinors">
               <h4 class="font-medium text-gray-900 dark:text-white mb-2">
                 {{ $t('pages.volunteers.minors') }}
               </h4>
@@ -382,7 +382,7 @@
             </div>
 
             <!-- Véhicule -->
-            <div v-if="application.edition.volunteersAskVehicle && application.hasVehicle">
+            <div v-if="application.volunteersSettings?.askVehicle && application.hasVehicle">
               <h4 class="font-medium text-gray-900 dark:text-white mb-2">
                 {{ $t('pages.volunteers.vehicle') }}
               </h4>
@@ -403,7 +403,7 @@
             </div>
 
             <!-- Compagnon -->
-            <div v-if="application.edition.volunteersAskCompanion && application.companionName">
+            <div v-if="application.volunteersSettings?.askCompanion && application.companionName">
               <h4 class="font-medium text-gray-900 dark:text-white mb-2">
                 {{ $t('pages.volunteers.companion') }}
               </h4>
@@ -416,7 +416,7 @@
             </div>
 
             <!-- Liste à éviter -->
-            <div v-if="application.edition.volunteersAskAvoidList && application.avoidList">
+            <div v-if="application.volunteersSettings?.askAvoidList && application.avoidList">
               <h4 class="font-medium text-gray-900 dark:text-white mb-2">
                 {{ $t('pages.volunteers.avoid_list') }}
               </h4>
@@ -426,7 +426,7 @@
             </div>
 
             <!-- Compétences -->
-            <div v-if="application.edition.volunteersAskSkills && application.skills">
+            <div v-if="application.volunteersSettings?.askSkills && application.skills">
               <h4 class="font-medium text-gray-900 dark:text-white mb-2">
                 {{ $t('pages.volunteers.skills') }}
               </h4>
@@ -438,7 +438,7 @@
             <!-- Expérience -->
             <div
               v-if="
-                application.edition.volunteersAskExperience &&
+                application.volunteersSettings?.askExperience &&
                 (application.hasExperience || application.experienceDetails)
               "
             >
@@ -872,6 +872,12 @@
 </template>
 
 <script setup lang="ts">
+// Interface pour les applications enrichies avec les settings
+interface ApplicationWithSettings {
+  [key: string]: any
+  volunteersSettings?: any
+}
+
 definePageMeta({
   middleware: 'auth-protected',
 })
@@ -880,6 +886,26 @@ const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
 const { formatDateTimeWithGranularity } = useDateFormat()
 const toast = useToast()
+
+// Cache pour les settings des bénévoles par édition
+const volunteersSettingsCache = ref<Map<number, any>>(new Map())
+
+// Fonction pour récupérer les settings d'une édition
+const getVolunteerSettings = async (editionId: number) => {
+  if (volunteersSettingsCache.value.has(editionId)) {
+    return volunteersSettingsCache.value.get(editionId)
+  }
+
+  try {
+    const response = await $fetch(`/api/editions/${editionId}/volunteers/settings`)
+    const settings = (response as any)?.settings || response
+    volunteersSettingsCache.value.set(editionId, settings)
+    return settings
+  } catch (error) {
+    console.error(`Failed to fetch volunteer settings for edition ${editionId}:`, error)
+    return null
+  }
+}
 
 // États de la vue
 const viewMode = ref<'detailed' | 'compact'>('detailed')
@@ -895,27 +921,47 @@ const {
   refresh,
 } = await useFetch('/api/user/volunteer-applications')
 
+// Applications enrichies avec les settings de bénévoles
+const applicationsWithSettings = computed((): ApplicationWithSettings[] => {
+  if (!applications.value) return []
+
+  return applications.value.map((app) => ({
+    ...app,
+    volunteersSettings: volunteersSettingsCache.value.get(app.edition.id) || null,
+  })) as ApplicationWithSettings[]
+})
+
+// Précharger les settings pour toutes les éditions des candidatures
+watchEffect(async () => {
+  if (applications.value) {
+    const editionIds = [...new Set(applications.value.map((app) => app.edition.id))]
+    await Promise.all(editionIds.map((id) => getVolunteerSettings(id)))
+  }
+})
+
 // Applications filtrées selon l'onglet actif
 const filteredApplications = computed(() => {
-  if (!applications.value) return []
+  if (!applicationsWithSettings.value) return []
 
   switch (activeTab.value) {
     case 'pending':
-      return applications.value.filter((app) => app.status === 'PENDING')
+      return applicationsWithSettings.value.filter((app) => app.status === 'PENDING')
     case 'accepted':
-      return applications.value.filter((app) => app.status === 'ACCEPTED')
+      return applicationsWithSettings.value.filter((app) => app.status === 'ACCEPTED')
     case 'rejected':
-      return applications.value.filter((app) => app.status === 'REJECTED')
+      return applicationsWithSettings.value.filter((app) => app.status === 'REJECTED')
     case 'history':
-      return applications.value.filter((app) => ['REJECTED', 'WITHDRAWN'].includes(app.status))
+      return applicationsWithSettings.value.filter((app) =>
+        ['REJECTED', 'WITHDRAWN'].includes(app.status)
+      )
     default:
-      return applications.value
+      return applicationsWithSettings.value
   }
 })
 
 // Applications acceptées pour export
 const acceptedApplications = computed(() => {
-  return applications.value?.filter((app) => app.status === 'ACCEPTED') || []
+  return applicationsWithSettings.value?.filter((app) => app.status === 'ACCEPTED') || []
 })
 
 // Configuration des onglets
@@ -924,21 +970,21 @@ const tabs = computed(() => [
     id: 'all',
     label: t('common.all'),
     icon: 'i-heroicons-folder',
-    count: applications.value?.length || 0,
+    count: applicationsWithSettings.value?.length || 0,
     badgeColor: 'primary',
   },
   {
     id: 'pending',
     label: t('pages.volunteers.pending'),
     icon: 'i-heroicons-clock',
-    count: applications.value?.filter((app) => app.status === 'PENDING').length || 0,
+    count: applicationsWithSettings.value?.filter((app) => app.status === 'PENDING').length || 0,
     badgeColor: 'warning',
   },
   {
     id: 'accepted',
     label: t('pages.volunteers.accepted'),
     icon: 'i-heroicons-check-circle',
-    count: applications.value?.filter((app) => app.status === 'ACCEPTED').length || 0,
+    count: applicationsWithSettings.value?.filter((app) => app.status === 'ACCEPTED').length || 0,
     badgeColor: 'success',
   },
   {
@@ -946,8 +992,9 @@ const tabs = computed(() => [
     label: t('pages.volunteers.history'),
     icon: 'i-heroicons-archive-box',
     count:
-      applications.value?.filter((app) => ['REJECTED', 'WITHDRAWN'].includes(app.status)).length ||
-      0,
+      applicationsWithSettings.value?.filter((app) =>
+        ['REJECTED', 'WITHDRAWN'].includes(app.status)
+      ).length || 0,
     badgeColor: 'gray',
   },
 ])

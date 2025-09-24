@@ -216,6 +216,7 @@ import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 // App components & stores
+import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { getEditionDisplayName } from '~/utils/editionName'
@@ -228,6 +229,10 @@ const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const editionId = parseInt(route.params.id as string)
+
+// Utiliser le composable pour les paramètres des bénévoles
+const { settings: volunteersInfo, fetchSettings: fetchVolunteersSettings } =
+  useVolunteerSettings(editionId)
 
 // Expose constants early (avant tout await)
 defineExpose({})
@@ -303,35 +308,11 @@ const canManageEdition = computed(() => {
 })
 
 // Volunteer logic reused
-interface VolunteerApplication {
+interface _VolunteerApplication {
   id: number
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED'
 }
-interface VolunteerInfo {
-  open: boolean
-  description?: string
-  mode: 'INTERNAL' | 'EXTERNAL'
-  externalUrl?: string
-  counts: Record<string, number>
-  myApplication: VolunteerApplication | null
-  askDiet?: boolean
-  askAllergies?: boolean
-  askTimePreferences?: boolean
-  askTeamPreferences?: boolean
-  askPets?: boolean
-  askMinors?: boolean
-  askVehicle?: boolean
-  askCompanion?: boolean
-  askAvoidList?: boolean
-  askSkills?: boolean
-  askExperience?: boolean
-  askSetup?: boolean
-  askTeardown?: boolean
-  setupStartDate?: string
-  teardownEndDate?: string
-  teams?: { name: string; slots?: number }[]
-}
-const volunteersInfo = ref<VolunteerInfo | null>(null)
+// Removed VolunteerInfo interface - now using composable
 const volunteersDescriptionHtml = ref('')
 const showFullDescription = ref(false)
 // Computed simple pour le mode afin d'éviter des cascades de types lourdes
@@ -360,7 +341,7 @@ const volunteerStatusLabel = (s: string) =>
         : s
 const fetchVolunteersInfo = async () => {
   try {
-    volunteersInfo.value = (await $fetch(`/api/editions/${editionId}/volunteers/info`)) as any
+    await fetchVolunteersSettings()
     if (volunteersInfo.value?.description) {
       volunteersDescriptionHtml.value = await markdownToHtml(volunteersInfo.value.description)
     }

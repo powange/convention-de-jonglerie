@@ -15,6 +15,9 @@
         :description="$t('pages.access_denied.description')"
       />
     </div>
+    <div v-else-if="loadingSettings">
+      <p>{{ $t('editions.loading_details') }}</p>
+    </div>
     <div v-else>
       <!-- En-tête avec navigation -->
       <EditionHeader :edition="edition" current-page="gestion" />
@@ -53,8 +56,8 @@
               v-if="canEdit || canManageVolunteers"
               :edition-id="editionId"
               :initial-data="volunteersInternalData"
-              :edition-start-date="edition?.startDate"
-              :edition-end-date="edition?.endDate"
+              :edition-start-date="edition?.startDate ? new Date(edition.startDate) : undefined"
+              :edition-end-date="edition?.endDate ? new Date(edition.endDate) : undefined"
               @updated="handleVolunteerInternalOptionsUpdated"
             />
 
@@ -88,10 +91,10 @@
 </template>
 
 <script setup lang="ts">
-import { fromDate } from '@internationalized/date'
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
@@ -105,34 +108,20 @@ const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 const { teams: volunteerTeams } = useVolunteerTeams(editionId)
 
+// Utiliser le composable pour les paramètres des bénévoles
+const {
+  loading: loadingSettings,
+  error: settingsError,
+  fetchSettings: fetchVolunteersSettings,
+  getInternalData,
+} = useVolunteerSettings(editionId)
+
 // Variables pour les options internes
 const savingVolunteers = ref(false)
 
 // Données pour le composant des options internes
 const volunteersInternalData = computed(() => {
-  if (!edition.value) return {}
-  return {
-    setupStartDate: edition.value.volunteersSetupStartDate
-      ? fromDate(new Date(edition.value.volunteersSetupStartDate), 'UTC')
-      : null,
-    teardownEndDate: edition.value.volunteersTeardownEndDate
-      ? fromDate(new Date(edition.value.volunteersTeardownEndDate), 'UTC')
-      : null,
-    askSetup: edition.value.volunteersAskSetup,
-    askTeardown: edition.value.volunteersAskTeardown,
-    askDiet: edition.value.volunteersAskDiet,
-    askAllergies: edition.value.volunteersAskAllergies,
-    askPets: edition.value.volunteersAskPets,
-    askMinors: edition.value.volunteersAskMinors,
-    askVehicle: edition.value.volunteersAskVehicle,
-    askCompanion: edition.value.volunteersAskCompanion,
-    askAvoidList: edition.value.volunteersAskAvoidList,
-    askSkills: edition.value.volunteersAskSkills,
-    askExperience: edition.value.volunteersAskExperience,
-    askTimePreferences: edition.value.volunteersAskTimePreferences,
-    askTeamPreferences: edition.value.volunteersAskTeamPreferences,
-    teams: volunteerTeams.value || [],
-  }
+  return getInternalData([...(volunteerTeams.value || [])])
 })
 
 // Vérifier l'accès à cette page
@@ -155,11 +144,19 @@ const canManageVolunteers = computed(() => {
 })
 
 // Gestionnaire pour les mises à jour du composant des options internes
-const handleVolunteerInternalOptionsUpdated = async (settings: any) => {
-  // Mettre à jour les données locales avec les nouvelles valeurs du serveur
-  if (edition.value) {
-    Object.assign(edition.value, settings)
-    savingVolunteers.value = false
+const handleVolunteerInternalOptionsUpdated = async (_settings: any) => {
+  // Recharger les paramètres bénévoles depuis l'API pour avoir les données à jour
+  await fetchVolunteersSettings()
+  savingVolunteers.value = false
+
+  // Gérer les erreurs de rechargement
+  if (settingsError.value) {
+    toast.add({
+      title: t('common.error'),
+      description: settingsError.value,
+      color: 'error',
+    })
+  } else {
     toast.add({
       title: t('common.saved') || 'Sauvegardé',
       color: 'success',
@@ -168,14 +165,27 @@ const handleVolunteerInternalOptionsUpdated = async (settings: any) => {
   }
 }
 
-// Charger l'édition si nécessaire
+// Charger l'édition et les paramètres bénévoles
 onMounted(async () => {
+  // Charger l'édition si nécessaire
   if (!edition.value) {
     try {
       await editionStore.fetchEditionById(editionId, { force: true })
     } catch (error) {
       console.error('Failed to fetch edition:', error)
     }
+  }
+
+  // Charger les paramètres bénévoles
+  await fetchVolunteersSettings()
+
+  // Afficher les erreurs de chargement si nécessaire
+  if (settingsError.value) {
+    toast.add({
+      title: t('common.error'),
+      description: settingsError.value,
+      color: 'error',
+    })
   }
 })
 

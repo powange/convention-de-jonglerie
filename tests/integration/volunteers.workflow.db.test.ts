@@ -187,7 +187,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       prismaMock.volunteerTeam.findMany.mockResolvedValue(mockVolunteerTeams)
 
       // Un candidat consulte les informations (API publique)
-      const infoHandler = await import('../../server/api/editions/[id]/volunteers/info.get')
+      const infoHandler = await import('../../server/api/editions/[id]/volunteers/settings.get')
       const infoResult = await infoHandler.default({
         context: { user: null }, // Pas besoin d'être connecté
       } as any)
@@ -683,7 +683,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       prismaMock.edition.update.mockResolvedValue(commonEditionData)
 
       // Consultation des infos
-      const infoHandler = await import('../../server/api/editions/[id]/volunteers/info.get')
+      const infoHandler = await import('../../server/api/editions/[id]/volunteers/settings.get')
       const infoResult = await infoHandler.default({
         context: { user: null },
       } as any)
@@ -702,7 +702,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
 
       // Consultation des infos - ne devrait faire qu'une requête
-      const infoHandler = await import('../../server/api/editions/[id]/volunteers/info.get')
+      const infoHandler = await import('../../server/api/editions/[id]/volunteers/settings.get')
       await infoHandler.default({
         context: { user: null },
       } as any)

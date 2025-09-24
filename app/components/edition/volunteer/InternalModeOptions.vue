@@ -306,6 +306,7 @@
 import { type DateValue, fromDate, toCalendarDate } from '@internationalized/date'
 import { computed, ref, watch } from 'vue'
 
+import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useVolunteerTeams } from '~/composables/useVolunteerTeams'
 
 interface Props {
@@ -349,9 +350,8 @@ const toast = useToast()
 // Récupération des équipes depuis la nouvelle table
 const { teams: volunteerTeams } = useVolunteerTeams(props.editionId)
 
-// État local
-const saving = ref(false)
-const fieldErrors = ref<Record<string, string>>({})
+// Utiliser le composable pour les paramètres des bénévoles
+const { updating: saving, fieldErrors, updateSettings } = useVolunteerSettings(props.editionId)
 
 // Données du composant
 const setupStartDate = ref<DateValue | null>(props.initialData?.setupStartDate || null)
@@ -432,17 +432,12 @@ const handleTeardownEndDateClear = async () => {
 const persistSettings = async (data: any) => {
   if (!props.editionId) return
 
-  saving.value = true
-
   try {
-    const response: any = await $fetch(`/api/editions/${props.editionId}/volunteers/settings`, {
-      method: 'PATCH',
-      body: data,
-    })
+    const updatedSettings = await updateSettings(data)
 
-    if (response?.settings) {
+    if (updatedSettings) {
       // Émettre l'événement avec les nouvelles données
-      emit('updated', response.settings)
+      emit('updated', updatedSettings)
 
       toast.add({
         title: t('common.saved') || 'Sauvegardé',
@@ -451,26 +446,22 @@ const persistSettings = async (data: any) => {
       })
     }
   } catch (error: any) {
-    // Gérer les erreurs de validation par champ
-    if (error?.data?.data?.errors) {
-      fieldErrors.value = error.data.data.errors
+    // Les erreurs sont déjà gérées dans le composable
+    // On affiche juste le toast ici
+    if (fieldErrors.value && Object.keys(fieldErrors.value).length > 0) {
       toast.add({
-        title: error.data.data.message || 'Erreurs de validation',
+        title: 'Erreurs de validation',
         description: 'Veuillez corriger les erreurs dans le formulaire',
         color: 'error',
         icon: 'i-heroicons-x-circle',
       })
     } else {
-      // Erreur générale
-      fieldErrors.value = {}
       toast.add({
         title: error?.data?.message || error?.message || t('common.error'),
         color: 'error',
         icon: 'i-heroicons-x-circle',
       })
     }
-  } finally {
-    saving.value = false
   }
 }
 

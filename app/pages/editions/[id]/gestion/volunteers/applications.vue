@@ -561,6 +561,7 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useVolunteerTeams } from '~/composables/useVolunteerTeams'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
@@ -574,22 +575,15 @@ const { t } = useI18n()
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
-// Interface pour les informations des bénévoles
-interface VolunteerInfo {
-  open: boolean
-  description?: string
-  mode: 'INTERNAL' | 'EXTERNAL'
-  externalUrl?: string
-  counts: Record<string, number>
-  myApplication?: any
-}
+// Utiliser le composable pour les paramètres des bénévoles
+const { settings: volunteersInfo, fetchSettings: fetchVolunteersInfo } =
+  useVolunteerSettings(editionId)
 
-// Variables pour les informations des bénévoles
-const volunteersInfo = ref<VolunteerInfo | null>(null)
+// Variables pour le tableau des bénévoles
 const volunteerTableRef = ref<any>(null)
 
 // Mode des bénévoles
-const volunteersMode = computed(() => edition.value?.volunteersMode || 'INTERNAL')
+const volunteersMode = computed(() => volunteersInfo.value?.mode || 'INTERNAL')
 
 // Computed pour vérifier que toutes les données nécessaires sont chargées
 const isVolunteersDataReady = computed(() => {
@@ -613,7 +607,7 @@ const fetchTeamAssignments = async () => {
     const response = await $fetch(`/api/editions/${editionId}/volunteers/applications`, {
       query: { includeTeams: 'true', status: 'ACCEPTED' },
     })
-    const applications = response.applications || response
+    const applications = (response as any).applications || response
     acceptedVolunteers.value = applications.filter((app: any) => app.status === 'ACCEPTED')
     teamAssignments.value = applications.filter(
       (app: any) => app.status === 'ACCEPTED' && app.teams && app.teams.length > 0
@@ -1058,17 +1052,6 @@ const processMove = async (action: 'move' | 'add') => {
     targetTeamId.value = null
   } finally {
     isProcessingMove.value = false
-  }
-}
-
-// Fonction pour charger les informations des bénévoles
-const fetchVolunteersInfo = async () => {
-  try {
-    volunteersInfo.value = (await $fetch(
-      `/api/editions/${editionId}/volunteers/info`
-    )) as VolunteerInfo
-  } catch (error) {
-    console.error('Failed to fetch volunteers info:', error)
   }
 }
 

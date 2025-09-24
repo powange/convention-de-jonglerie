@@ -74,6 +74,7 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
@@ -85,18 +86,9 @@ const { t } = useI18n()
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
-// Interface pour les informations des bénévoles
-interface VolunteerInfo {
-  open: boolean
-  description?: string
-  mode: 'INTERNAL' | 'EXTERNAL'
-  externalUrl?: string
-  counts: Record<string, number>
-  myApplication?: any
-}
-
-// Variables pour les informations des bénévoles
-const volunteersInfo = ref<VolunteerInfo | null>(null)
+// Utiliser le composable pour les paramètres des bénévoles
+const { settings: volunteersInfo, fetchSettings: fetchVolunteersInfo } =
+  useVolunteerSettings(editionId)
 
 // Référence au composant de notifications
 const notificationsListRef = ref()
@@ -119,17 +111,6 @@ const canManageVolunteers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageVolunteers(edition.value, authStore.user.id)
 })
-
-// Fonction pour charger les informations des bénévoles
-const fetchVolunteersInfo = async () => {
-  try {
-    volunteersInfo.value = (await $fetch(
-      `/api/editions/${editionId}/volunteers/info`
-    )) as VolunteerInfo
-  } catch (error) {
-    console.error('Failed to fetch volunteers info:', error)
-  }
-}
 
 // Charger l'édition si nécessaire
 onMounted(async () => {

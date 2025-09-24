@@ -114,6 +114,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { markdownToHtml } from '~/utils/markdown'
@@ -127,14 +128,19 @@ const { t } = useI18n()
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
-// Gestion des erreurs de validation par champ
-const fieldErrors = ref<Record<string, string>>({})
+// Utiliser le composable pour les paramètres des bénévoles
+const {
+  settings: volunteersSettings,
+  updating: savingVolunteers,
+  fieldErrors,
+  fetchSettings: fetchVolunteersSettings,
+  updateSettings,
+} = useVolunteerSettings(editionId)
 
 // Variables pour la description des bénévoles
 const volunteersDescriptionLocal = ref('')
 const volunteersDescriptionOriginal = ref('')
 const volunteersDescriptionHtml = ref('')
-const savingVolunteers = ref(false)
 
 const volunteersDescriptionDirty = computed(
   () => volunteersDescriptionLocal.value !== volunteersDescriptionOriginal.value
@@ -166,16 +172,12 @@ const canManageVolunteers = computed(() => {
 const saveVolunteerDescription = async () => {
   if (volunteersDescriptionLocal.value.length > 5000) return
 
-  if (!edition.value) return
-
-  savingVolunteers.value = true
   try {
-    const res: any = await $fetch(`/api/editions/${edition.value.id}/volunteers/settings`, {
-      method: 'PATCH',
-      body: { description: volunteersDescriptionLocal.value.trim() || null },
+    const updatedSettings = await updateSettings({
+      description: volunteersDescriptionLocal.value.trim() || undefined,
     })
 
-    if (res?.settings) {
+    if (updatedSettings) {
       volunteersDescriptionOriginal.value = volunteersDescriptionLocal.value
       toast.add({
         title: t('common.saved') || 'Sauvegardé',
@@ -185,12 +187,10 @@ const saveVolunteerDescription = async () => {
     }
   } catch (e: any) {
     toast.add({
-      title: e?.message || t('common.error'),
+      title: e?.data?.message || e?.message || t('common.error'),
       color: 'error',
       icon: 'i-heroicons-x-circle',
     })
-  } finally {
-    savingVolunteers.value = false
   }
 }
 
@@ -211,10 +211,12 @@ const renderVolunteerDescriptionHtml = async () => {
   }
 }
 
-const applyEditionVolunteerFields = (src: any) => {
-  volunteersDescriptionLocal.value = src.volunteersDescription || ''
-  volunteersDescriptionOriginal.value = volunteersDescriptionLocal.value
-  renderVolunteerDescriptionHtml()
+const applyVolunteerSettings = () => {
+  if (volunteersSettings.value) {
+    volunteersDescriptionLocal.value = volunteersSettings.value.description || ''
+    volunteersDescriptionOriginal.value = volunteersDescriptionLocal.value
+    renderVolunteerDescriptionHtml()
+  }
 }
 
 // Watchers
@@ -222,13 +224,13 @@ watch(volunteersDescriptionLocal, () => {
   renderVolunteerDescriptionHtml()
 })
 
-watch(edition, (val) => {
+watch(volunteersSettings, (val) => {
   if (val) {
-    applyEditionVolunteerFields(val as any)
+    applyVolunteerSettings()
   }
 })
 
-// Charger l'édition si nécessaire
+// Charger l'édition et les paramètres si nécessaire
 onMounted(async () => {
   if (!edition.value) {
     try {
@@ -237,9 +239,10 @@ onMounted(async () => {
       console.error('Failed to fetch edition:', error)
     }
   }
-  if (edition.value) {
-    applyEditionVolunteerFields(edition.value as any)
-  }
+
+  // Charger les paramètres des bénévoles
+  await fetchVolunteersSettings()
+  applyVolunteerSettings()
 })
 
 // Métadonnées de la page

@@ -157,16 +157,31 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Ajouter explicitement les champs bénévolat (déjà présents sur edition)
-    // Juste pour clarté, on renvoie l'objet tel quel; pas de transformation supplémentaire nécessaire ici.
+    // Retourner l'édition en excluant les champs volunteersAsk* qui sont maintenant gérés par l'API /volunteers/settings
+    const {
+      volunteersAskDiet: _volunteersAskDiet,
+      volunteersAskAllergies: _volunteersAskAllergies,
+      volunteersAskTimePreferences: _volunteersAskTimePreferences,
+      volunteersAskTeamPreferences: _volunteersAskTeamPreferences,
+      volunteersAskPets: _volunteersAskPets,
+      volunteersAskMinors: _volunteersAskMinors,
+      volunteersAskVehicle: _volunteersAskVehicle,
+      volunteersAskCompanion: _volunteersAskCompanion,
+      volunteersAskAvoidList: _volunteersAskAvoidList,
+      volunteersAskSkills: _volunteersAskSkills,
+      volunteersAskExperience: _volunteersAskExperience,
+      volunteersAskSetup: _volunteersAskSetup,
+      volunteersAskTeardown: _volunteersAskTeardown,
+      ...editionWithoutVolunteersAskFields
+    } = edition as any
+
     return {
-      ...edition,
+      ...editionWithoutVolunteersAskFields,
+      // Garder seulement les champs volunteers encore utilisés côté client
       volunteersOpen: (edition as any).volunteersOpen,
       volunteersDescription: (edition as any).volunteersDescription,
       volunteersMode: (edition as any).volunteersMode,
       volunteersExternalUrl: (edition as any).volunteersExternalUrl,
-      volunteersAskDiet: (edition as any).volunteersAskDiet,
-      volunteersAskAllergies: (edition as any).volunteersAskAllergies,
       volunteersUpdatedAt: (edition as any).volunteersUpdatedAt,
     }
   } catch (error: any) {

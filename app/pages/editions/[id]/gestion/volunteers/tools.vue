@@ -105,6 +105,7 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
@@ -117,23 +118,15 @@ const { t } = useI18n()
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
-// Interface pour les informations des bénévoles
-interface VolunteerInfo {
-  open: boolean
-  description?: string
-  mode: 'INTERNAL' | 'EXTERNAL'
-  externalUrl?: string
-  counts: Record<string, number>
-  myApplication?: any
-  setupStartDate?: string
-  teardownEndDate?: string
-}
-
-// Variables pour les informations des bénévoles
-const volunteersInfo = ref<VolunteerInfo | null>(null)
+// Utiliser le composable pour les paramètres des bénévoles
+const {
+  settings: volunteersInfo,
+  error: volunteersInfoError,
+  fetchSettings: fetchVolunteersInfo,
+} = useVolunteerSettings(editionId)
 
 // Mode des bénévoles
-const volunteersMode = computed(() => edition.value?.volunteersMode || 'INTERNAL')
+const volunteersMode = computed(() => volunteersInfo.value?.mode || 'INTERNAL')
 
 // Variables pour la génération des PDFs de restauration
 const selectedCateringDate = ref<string | undefined>(undefined)
@@ -322,7 +315,11 @@ const generateCateringPdf = async () => {
 
         for (const diet of dietOrder) {
           if (slotData.dietaryCounts[diet]) {
-            doc.text(`  • ${dietLabels[diet]}: ${slotData.dietaryCounts[diet]}`, 30, yPosition)
+            doc.text(
+              `  • ${dietLabels[diet as keyof typeof dietLabels]}: ${slotData.dietaryCounts[diet]}`,
+              30,
+              yPosition
+            )
             yPosition += 6
           }
         }
@@ -367,17 +364,6 @@ const generateCateringPdf = async () => {
   }
 }
 
-// Fonction pour charger les informations des bénévoles
-const fetchVolunteersInfo = async () => {
-  try {
-    volunteersInfo.value = (await $fetch(
-      `/api/editions/${editionId}/volunteers/info`
-    )) as VolunteerInfo
-  } catch (error) {
-    console.error('Failed to fetch volunteers info:', error)
-  }
-}
-
 // Charger l'édition si nécessaire
 onMounted(async () => {
   if (!edition.value) {
@@ -389,6 +375,15 @@ onMounted(async () => {
   }
   // Charger les informations des bénévoles
   await fetchVolunteersInfo()
+
+  // Afficher les erreurs de chargement si nécessaire
+  if (volunteersInfoError.value) {
+    toast.add({
+      title: t('common.error'),
+      description: volunteersInfoError.value,
+      color: 'error',
+    })
+  }
 })
 
 // Métadonnées de la page
