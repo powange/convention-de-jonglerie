@@ -29,7 +29,6 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
     volunteersAskAvoidList: true,
     volunteersAskSkills: true,
     volunteersAskExperience: true,
-    // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
   }
 
   const mockApplication = {

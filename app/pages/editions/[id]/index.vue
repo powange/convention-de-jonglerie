@@ -29,12 +29,7 @@
       </UAlert>
 
       <!-- En-tête avec navigation -->
-      <EditionHeader
-        :edition="edition"
-        current-page="details"
-        :is-favorited="isFavorited(edition.id)"
-        @toggle-favorite="toggleFavorite(edition.id)"
-      />
+      <EditionHeader :edition="edition" current-page="details" />
 
       <!-- Contenu des détails en grille responsive -->
       <main class="grid xl:grid-cols-5 2xl:grid-cols-5 gap-6" role="main">
@@ -448,10 +443,6 @@ const descriptionHtml = computedAsync(async () => {
   return await markdownToHtml(edition.value.description)
 }, '')
 
-const isFavorited = computed(() => (_editionId: number) => {
-  return edition.value?.favoritedBy?.some((u) => u.id === authStore.user?.id) || false
-})
-
 const isAttending = computed(() => (_editionId: number) => {
   return edition.value?.attendingUsers?.some((u) => u.id === authStore.user?.id) || false
 })
@@ -498,27 +489,6 @@ const publishEdition = async () => {
       icon: 'i-heroicons-x-circle',
       color: 'error',
     })
-  }
-}
-
-const toggleFavorite = async (id: number) => {
-  try {
-    await $fetch(`/api/editions/${id}/favorite`, { method: 'POST' })
-
-    // Rafraîchir les données pour mettre à jour l'état des favoris
-    await refreshEdition()
-
-    toast.add({
-      title: t('messages.favorite_status_updated'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (e: unknown) {
-    const errorMessage =
-      e && typeof e === 'object' && 'message' in e && typeof e.message === 'string'
-        ? e.message
-        : t('errors.favorite_update_failed')
-    toast.add({ title: errorMessage, icon: 'i-heroicons-x-circle', color: 'error' })
   }
 }
 

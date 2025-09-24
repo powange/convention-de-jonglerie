@@ -21,9 +21,6 @@ export default defineEventHandler(async (event) => {
         creator: {
           select: { id: true, pseudo: true, profilePicture: true, updatedAt: true, email: true },
         },
-        favoritedBy: {
-          select: { id: true },
-        },
         attendingUsers: {
           select: {
             id: true,

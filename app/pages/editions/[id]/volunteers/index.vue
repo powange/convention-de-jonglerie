@@ -1,11 +1,6 @@
 <template>
   <div v-if="edition">
-    <EditionHeader
-      :edition="edition"
-      current-page="volunteers"
-      :is-favorited="isFavorited(edition.id)"
-      @toggle-favorite="toggleFavorite(edition.id)"
-    />
+    <EditionHeader :edition="edition" current-page="volunteers" />
 
     <UCard variant="soft" class="mb-6">
       <template #header>
@@ -281,17 +276,6 @@ watch(
   },
   { immediate: true }
 )
-
-const isFavorited = computed(() => (_id: number) => {
-  return edition.value?.favoritedBy.some((u) => u.id === authStore.user?.id)
-})
-const toggleFavorite = async (id: number) => {
-  try {
-    await editionStore.toggleFavorite(id)
-  } catch {
-    /* silent */
-  }
-}
 
 // Condition pour réduire la description (maintenant toujours false pour afficher entièrement)
 const shouldReduceDescription = computed(() => {

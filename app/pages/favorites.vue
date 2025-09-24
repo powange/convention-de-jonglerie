@@ -123,8 +123,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 
-import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { useFavoritesEditionsStore } from '~/stores/favoritesEditions'
 
 // Lazy loading des composants
 const FavoritesMap = defineAsyncComponent(() => import('~/components/FavoritesMap.vue'))
@@ -135,8 +135,8 @@ definePageMeta({
   middleware: 'auth-protected',
 })
 
-const authStore = useAuthStore()
 const editionStore = useEditionStore()
+const favoritesStore = useFavoritesEditionsStore()
 const toast = useToast()
 const { t } = useI18n()
 const route = useRoute()
@@ -174,7 +174,7 @@ const itemsPerPage = ref(12)
 // Calculer les éditions favorites de l'utilisateur triées par date de début
 const favoriteEditions = computed(() => {
   return editionStore.editions
-    .filter((edition) => edition.favoritedBy.some((user) => user.id === authStore.user?.id))
+    .filter((edition) => favoritesStore.isFavorite(edition.id))
     .sort((a, b) => {
       const dateA = new Date(a.startDate)
       const dateB = new Date(b.startDate)
@@ -191,7 +191,7 @@ const paginatedFavoriteEditions = computed(() => {
 
 const removeFavorite = async (id: number) => {
   try {
-    await editionStore.toggleFavorite(id)
+    await favoritesStore.toggleFavorite(id)
     toast.add({
       title: t('messages.removed_from_favorites'),
       icon: 'i-heroicons-star',
@@ -224,9 +224,13 @@ watch(
 
 onMounted(async () => {
   try {
-    // Charger toutes les éditions pour filtrer les favoris côté client
-    // Note: Pour les favoris, on charge toutes les pages car le filtrage se fait côté client
-    await editionStore.fetchEditions({ limit: 1000 })
+    // Initialiser les favoris en parallèle du chargement des éditions
+    await Promise.all([
+      // Charger toutes les éditions pour filtrer les favoris côté client
+      editionStore.fetchEditions({ limit: 1000 }),
+      // Initialiser le store des favoris
+      favoritesStore.ensureInitialized(),
+    ])
   } catch {
     toast.add({
       title: t('common.error'),

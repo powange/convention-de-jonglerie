@@ -153,7 +153,6 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
         volunteersAskPets: volunteerSettings.askPets,
         volunteersAskTimePreferences: volunteerSettings.askTimePreferences,
         volunteersAskTeamPreferences: volunteerSettings.askTeamPreferences,
-        // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
         volunteersSetupStartDate: new Date(volunteerSettings.setupStartDate),
         volunteersTeardownEndDate: new Date(volunteerSettings.setupEndDate),
       })
@@ -168,7 +167,6 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
 
       expect(settingsResult.success).toBe(true)
       expect(settingsResult.settings.volunteersMode).toBe('INTERNAL')
-      // Les équipes sont maintenant gérées via VolunteerTeam, pas via volunteersTeams
 
       // ========== ÉTAPE 2: Consultation des infos par un candidat ==========
 
@@ -183,7 +181,6 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
         volunteersAskPets: volunteerSettings.askPets,
         volunteersAskTimePreferences: volunteerSettings.askTimePreferences,
         volunteersAskTeamPreferences: volunteerSettings.askTeamPreferences,
-        // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
         volunteerApplications: [], // Pas encore de candidatures
       })
       // Mock des équipes VolunteerTeam pour info.get
@@ -214,7 +211,6 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
         volunteersAskPets: volunteerSettings.askPets,
         volunteersAskTimePreferences: volunteerSettings.askTimePreferences,
         volunteersAskTeamPreferences: volunteerSettings.askTeamPreferences,
-        // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
         volunteerApplications: [], // Pas encore de candidatures
       })
       // Mock des équipes VolunteerTeam pour apply.post
@@ -674,7 +670,6 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
         volunteersDescription: 'Description cohérente',
         volunteersAskDiet: true,
         volunteersAskAllergies: false,
-        // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
       }
 
       // Mock des équipes VolunteerTeam pour les tests de cohérence
@@ -736,7 +731,6 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
           volunteersTeardownEndDate: true,
           volunteersAskSetup: true,
           volunteersAskTeardown: true,
-          // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
           volunteerApplications: { select: { id: true, status: true, userId: true } },
         },
       })

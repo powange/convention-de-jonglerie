@@ -266,7 +266,6 @@ describe("Système d'éditions", () => {
         where: { id: 1 },
         include: expect.objectContaining({
           creator: expect.any(Object),
-          favoritedBy: expect.any(Object),
           convention: expect.any(Object),
         }),
       })

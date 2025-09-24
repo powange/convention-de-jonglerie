@@ -17,12 +17,7 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionHeader
-        :edition="edition"
-        current-page="gestion"
-        :is-favorited="isFavorited(edition.id)"
-        @toggle-favorite="toggleFavorite(edition.id)"
-      />
+      <EditionHeader :edition="edition" current-page="gestion" />
 
       <!-- Titre de la page -->
       <div class="mb-6">
@@ -85,7 +80,6 @@ import { useEditionStore } from '~/stores/editions'
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const toast = useToast()
 const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
@@ -125,27 +119,6 @@ const canManageVolunteers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageVolunteers(edition.value, authStore.user.id)
 })
-
-const isFavorited = computed(() => (_editionId: number) => {
-  return edition.value?.favoritedBy.some((u) => u.id === authStore.user?.id)
-})
-
-const toggleFavorite = async (id: number) => {
-  try {
-    await editionStore.toggleFavorite(id)
-    toast.add({
-      title: t('messages.favorite_status_updated'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (e: any) {
-    toast.add({
-      title: e?.message || t('errors.favorite_update_failed'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  }
-}
 
 // Fonction pour charger les informations des bénévoles
 const fetchVolunteersInfo = async () => {

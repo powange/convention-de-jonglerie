@@ -81,7 +81,6 @@ export default defineEventHandler(async (event) => {
         volunteersAskPets: true,
         volunteersAskMinors: true,
         volunteersAskVehicle: true,
-        // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
       },
     })
     if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })

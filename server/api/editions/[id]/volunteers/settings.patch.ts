@@ -173,7 +173,6 @@ export default defineEventHandler(async (event) => {
     data.volunteersTeardownEndDate = parsed.setupEndDate ? new Date(parsed.setupEndDate) : null
   if (parsed.askSetup !== undefined) data.volunteersAskSetup = parsed.askSetup
   if (parsed.askTeardown !== undefined) data.volunteersAskTeardown = parsed.askTeardown
-  // Note: Les équipes sont maintenant gérées via le système VolunteerTeam, pas via volunteersTeams
   if (Object.keys(data).length === 0) return { success: true, unchanged: true }
   data.volunteersUpdatedAt = new Date()
 
@@ -200,7 +199,6 @@ export default defineEventHandler(async (event) => {
       volunteersTeardownEndDate: true,
       volunteersAskSetup: true,
       volunteersAskTeardown: true,
-      // volunteersTeams: true, // Supprimé car maintenant géré via VolunteerTeam
       volunteersUpdatedAt: true,
     } as any,
   })) as any

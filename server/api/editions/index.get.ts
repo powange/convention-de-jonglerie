@@ -273,9 +273,6 @@ export default defineEventHandler(async (event) => {
         creator: {
           select: { id: true, pseudo: true },
         },
-        favoritedBy: {
-          select: { id: true },
-        },
         convention: {
           select: { id: true, name: true, description: true, logo: true },
         },

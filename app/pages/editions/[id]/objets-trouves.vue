@@ -1,13 +1,7 @@
 <template>
   <div>
     <!-- En-tête avec navigation -->
-    <EditionHeader
-      v-if="edition"
-      :edition="edition"
-      current-page="objets-trouves"
-      :is-favorited="isFavorited(edition.id)"
-      @toggle-favorite="toggleFavorite(edition.id)"
-    />
+    <EditionHeader v-if="edition" :edition="edition" current-page="objets-trouves" />
 
     <div class="max-w-6xl mx-auto px-4 py-8">
       <!-- Actions et message d'information -->
@@ -309,29 +303,6 @@ const canAddLostFound = computed(() => {
 })
 
 const canEditLostFound = computed(() => canAddLostFound.value)
-
-// Fonction pour les favoris
-const isFavorited = (_editionId: number) => {
-  return edition.value?.favoritedBy?.some((u) => u.id === authStore.user?.id) || false
-}
-
-const toggleFavorite = async (id: number) => {
-  try {
-    await editionStore.toggleFavorite(id)
-    toast.add({
-      title: t('messages.favorite_status_updated'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (e: unknown) {
-    const err: any = e
-    toast.add({
-      title: err?.message || t('errors.favorite_update_failed'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  }
-}
 
 // Fonctions
 

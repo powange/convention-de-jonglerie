@@ -8,12 +8,7 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionHeader
-        :edition="edition"
-        current-page="carpool"
-        :is-favorited="isFavorited(edition.id)"
-        @toggle-favorite="toggleFavorite(edition.id)"
-      />
+      <EditionHeader :edition="edition" current-page="carpool" />
 
       <!-- Contenu du covoiturage -->
       <EditionCarpoolSection :edition-id="edition.id" :highlight-offer-id="highlightOfferId" />
@@ -26,7 +21,6 @@ import { onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 // Auto-imported: EditionCarpoolSection
-import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { getEditionDisplayName } from '~/utils/editionName'
 
@@ -37,8 +31,6 @@ import { getEditionDisplayName } from '~/utils/editionName'
 
 const route = useRoute()
 const editionStore = useEditionStore()
-const authStore = useAuthStore()
-const toast = useToast()
 const { t, locale } = useI18n()
 const { formatDateTimeRange } = useDateFormat()
 
@@ -102,27 +94,6 @@ const highlightOfferId = computed(() => {
   const offerId = route.query.offerId
   return offerId ? parseInt(offerId as string) : null
 })
-
-const isFavorited = computed(() => (_editionId: number) => {
-  return edition.value?.favoritedBy?.some((u) => u.id === authStore.user?.id) || false
-})
-
-const toggleFavorite = async (id: number) => {
-  try {
-    await editionStore.toggleFavorite(id)
-    toast.add({
-      title: t('messages.favorite_status_updated'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (e: unknown) {
-    const title =
-      e && typeof e === 'object' && 'message' in e && typeof (e as any).message === 'string'
-        ? (e as any).message
-        : t('errors.favorite_update_failed')
-    toast.add({ title, icon: 'i-heroicons-x-circle', color: 'error' })
-  }
-}
 
 onMounted(async () => {
   if (!edition.value) {

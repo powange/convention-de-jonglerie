@@ -126,6 +126,25 @@ Processus de correction automatique complet qui :
    npm run format
    ```
 
+**Commande `/run-tests` :**
+
+Processus d'exécution des tests complet qui :
+
+1. **Exécution des tests unitaires**
+
+   ```bash
+   npm run test:unit:run
+   ```
+
+2. **Exécution des tests Nuxt**
+
+   ```bash
+   npm run test:nuxt:run
+   ```
+
+3. **Analyse et correction des erreurs** (si des tests échouent)
+   Analyse des erreurs de tests et correction manuelle des problèmes identifiés.
+
 ## Components Nuxt UI utilisés
 
 - **UButton** : Boutons réutilisables avec différentes variantes

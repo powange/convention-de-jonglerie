@@ -99,6 +99,7 @@
 <script setup lang="ts">
 import type { MapMarker } from '~/composables/useLeafletMap'
 import { useAuthStore } from '~/stores/auth'
+import { useFavoritesEditionsStore } from '~/stores/favoritesEditions'
 import type { Edition } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { createCustomMarkerIcon, getEditionStatus } from '~/utils/mapMarkers'
@@ -109,8 +110,14 @@ interface Props {
 
 const props = defineProps<Props>()
 const authStore = useAuthStore()
+const favoritesStore = useFavoritesEditionsStore()
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
+
+// Initialiser les favoris si l'utilisateur est authentifié
+if (authStore.isAuthenticated) {
+  favoritesStore.ensureInitialized()
+}
 
 // Utilitaire local pour éviter une dépendance circulaire avec mapUtils
 const formatDateRangeLocal = (startDate: string, endDate: string) => {
@@ -139,7 +146,7 @@ const editionsWithCoordinates = computed(() => {
 // Vérifier si l'utilisateur a mis en favori cette édition
 const isFavorited = (edition: Edition): boolean => {
   if (!authStore.user?.id) return false
-  return edition.favoritedBy.some((user) => user.id === authStore.user?.id)
+  return favoritesStore.isFavorite(edition.id)
 }
 
 // Fonction helper pour obtenir l'URL complète de l'image d'édition

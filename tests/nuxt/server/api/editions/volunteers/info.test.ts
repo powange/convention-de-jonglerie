@@ -33,7 +33,6 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
     volunteersTeardownEndDate: new Date('2024-06-05'),
     volunteersAskSetup: true,
     volunteersAskTeardown: true,
-    // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
     volunteerApplications: [],
   }
 
@@ -94,6 +93,7 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
         teams: mockVolunteerTeams,
         myApplication: null,
         counts: { total: 0 },
+        updatedAt: null,
       })
     })
 
@@ -111,7 +111,6 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
         volunteersAskAvoidList: false,
         volunteersAskSkills: false,
         volunteersAskExperience: false,
-        // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
       }
 
       prismaMock.edition.findUnique.mockResolvedValue(editionWithMinimalOptions)
@@ -189,6 +188,7 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
         teams: mockVolunteerTeams,
         myApplication: null,
         counts: { total: 0 },
+        updatedAt: null,
       })
     })
 
@@ -250,6 +250,7 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
         teams: mockVolunteerTeams,
         myApplication: null,
         counts: { total: 0 },
+        updatedAt: null,
       })
     })
 
@@ -542,9 +543,9 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
           volunteersAskExperience: true,
           volunteersSetupStartDate: true,
           volunteersTeardownEndDate: true,
+          volunteersUpdatedAt: true,
           volunteersAskSetup: true,
           volunteersAskTeardown: true,
-          // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
           volunteerApplications: { select: { id: true, status: true, userId: true } },
         },
       })
@@ -620,6 +621,7 @@ describe('/api/editions/[id]/volunteers/info GET', () => {
         'teams',
         'myApplication',
         'counts',
+        'updatedAt',
       ]
 
       expectedFields.forEach((field) => {

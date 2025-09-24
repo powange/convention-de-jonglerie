@@ -65,7 +65,7 @@
                   variant="ghost"
                   size="sm"
                   class="flex-shrink-0"
-                  @click="$emit('toggle-favorite')"
+                  @click="toggleFavorite"
                 />
               </div>
             </div>
@@ -89,7 +89,7 @@
             :color="isFavorited ? 'warning' : 'neutral'"
             variant="ghost"
             size="md"
-            @click="$emit('toggle-favorite')"
+            @click="toggleFavorite"
           >
             {{ isFavorited ? t('common.added') : t('common.add') }}
           </UButton>
@@ -260,10 +260,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { useFavoritesEditionsStore } from '~/stores/favoritesEditions'
 import type { Edition } from '~/types'
 import { getCalendarOptions, type CalendarEventData } from '~/utils/calendar'
 import { getEditionDisplayName } from '~/utils/editionName'
@@ -276,16 +277,14 @@ const { getImageUrl } = useImageUrl()
 interface Props {
   edition: Edition
   currentPage: 'details' | 'commentaires' | 'carpool' | 'gestion' | 'objets-trouves' | 'volunteers'
-  isFavorited?: boolean
 }
 
 const props = defineProps<Props>()
-defineEmits<{
-  'toggle-favorite': []
-}>()
 
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
+const favoritesStore = useFavoritesEditionsStore()
+const toast = useToast()
 
 // État des modales
 const showConventionModal = ref(false)
@@ -362,6 +361,44 @@ const hasEditionStarted = computed(() => {
   if (!props.edition) return false
   return new Date() >= new Date(props.edition.startDate)
 })
+
+// Gestion des favoris - Initialisation automatique si utilisateur connecté
+watch(
+  () => authStore.isAuthenticated,
+  async (isAuthenticated) => {
+    if (isAuthenticated && !favoritesStore.isInitialized) {
+      await favoritesStore.ensureInitialized()
+    }
+  },
+  { immediate: true }
+)
+
+const isFavorited = computed(() => {
+  return favoritesStore.isFavorite(props.edition.id)
+})
+
+const toggleFavorite = async () => {
+  if (!authStore.isAuthenticated) return
+
+  try {
+    await favoritesStore.toggleFavorite(props.edition.id)
+    toast.add({
+      title: t('messages.favorite_status_updated'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (e: unknown) {
+    const errorMessage =
+      e && typeof e === 'object' && 'message' in e && typeof e.message === 'string'
+        ? e.message
+        : t('errors.favorite_update_failed')
+    toast.add({
+      title: errorMessage,
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  }
+}
 
 // Formatter la plage de dates
 const formatDateRange = (start: string, end: string) => {

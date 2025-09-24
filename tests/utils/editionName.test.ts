@@ -46,7 +46,7 @@ describe('editionName utils', () => {
       expect(result).toBe('Festival de Jonglerie')
     })
 
-    it('devrait retourner une chaîne vide si pas de nom d\'édition ni de convention', () => {
+    it("devrait retourner une chaîne vide si pas de nom d'édition ni de convention", () => {
       const edition = {
         name: null,
       }

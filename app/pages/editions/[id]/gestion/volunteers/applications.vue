@@ -17,12 +17,7 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionHeader
-        :edition="edition"
-        current-page="gestion"
-        :is-favorited="isFavorited(edition.id)"
-        @toggle-favorite="toggleFavorite(edition.id)"
-      />
+      <EditionHeader :edition="edition" current-page="gestion" />
 
       <!-- Titre de la page -->
       <div class="mb-6">
@@ -790,27 +785,6 @@ const canViewVolunteersTable = computed(() => {
   )
   return !!collab
 })
-
-const isFavorited = computed(() => (_editionId: number) => {
-  return edition.value?.favoritedBy.some((u) => u.id === authStore.user?.id)
-})
-
-const toggleFavorite = async (id: number) => {
-  try {
-    await editionStore.toggleFavorite(id)
-    toast.add({
-      title: t('messages.favorite_status_updated'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (e: any) {
-    toast.add({
-      title: e?.message || t('errors.favorite_update_failed'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  }
-}
 
 // Fonctions de drag and drop
 const handleDragStart = (volunteer: any, fromTeamId?: string) => {

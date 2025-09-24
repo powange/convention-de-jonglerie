@@ -207,7 +207,7 @@ export const useEditionStore = defineStore('editions', {
       }
     },
 
-    async addEdition(editionData: Omit<Edition, 'id' | 'creator' | 'creatorId' | 'favoritedBy'>) {
+    async addEdition(editionData: Omit<Edition, 'id' | 'creator' | 'creatorId'>) {
       this.loading = true
       this.error = null
       try {
@@ -265,54 +265,6 @@ export const useEditionStore = defineStore('editions', {
         throw e
       } finally {
         this.loading = false
-      }
-    },
-
-    async toggleFavorite(id: number) {
-      this.error = null
-      const authStore = useAuthStore()
-      const currentUser = authStore.user
-
-      // Optimistic update - mise à jour locale immédiate
-      const editionIndex = this.editions.findIndex((e) => e.id === id)
-      if (editionIndex !== -1 && currentUser) {
-        const edition = this.editions[editionIndex]
-        if (edition) {
-          const isFavorited = edition.favoritedBy.some((u) => u.id === currentUser.id)
-          if (isFavorited) {
-            edition.favoritedBy = edition.favoritedBy.filter((u) => u.id !== currentUser.id)
-          } else {
-            // Type minimal compatible
-            edition.favoritedBy.push({ id: currentUser.id } as any)
-          }
-        }
-      }
-
-      try {
-        // Appel API en arrière-plan
-        await $fetch(`/api/editions/${id}/favorite`, {
-          method: 'POST',
-        })
-
-        // Mettre à jour avec la réponse du serveur si nécessaire
-        // Réponse minimaliste attendue { message, isFavorited }; on laisse l'état optimiste
-      } catch (e: unknown) {
-        // En cas d'erreur, annuler l'optimistic update
-        if (editionIndex !== -1 && currentUser) {
-          const edition = this.editions[editionIndex]
-          if (edition) {
-            const isFavorited = edition.favoritedBy.some((u) => u.id === currentUser.id)
-            if (isFavorited) {
-              edition.favoritedBy = edition.favoritedBy.filter((u) => u.id !== currentUser.id)
-            } else {
-              edition.favoritedBy.push({ id: currentUser.id } as any)
-            }
-          }
-        }
-
-        const error = e as HttpError
-        this.error = error.message || error.data?.message || 'Failed to toggle favorite'
-        throw e
       }
     },
 

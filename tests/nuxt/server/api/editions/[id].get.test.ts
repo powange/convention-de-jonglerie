@@ -56,7 +56,6 @@ describe('/api/editions/[id] GET', () => {
       profilePicture: null,
       updatedAt: new Date(),
     },
-    favoritedBy: [{ id: 2, email: 'fan@example.com', pseudo: 'fan' }],
     convention: {
       id: 1,
       name: 'Convention Test',
@@ -106,7 +105,6 @@ describe('/api/editions/[id] GET', () => {
       where: { id: 1 },
       include: expect.objectContaining({
         creator: expect.any(Object),
-        favoritedBy: expect.any(Object),
         convention: expect.any(Object),
       }),
     })
@@ -244,11 +242,6 @@ describe('/api/editions/[id] GET', () => {
             email: true,
             profilePicture: true,
             updatedAt: true,
-          },
-        },
-        favoritedBy: {
-          select: {
-            id: true,
           },
         },
         // Champs bénévolat nécessaires pour la page de gestion

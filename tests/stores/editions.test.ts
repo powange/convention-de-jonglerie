@@ -359,58 +359,6 @@ describe('useEditionStore', () => {
     })
   })
 
-  describe('Action toggleFavorite', () => {
-    beforeEach(() => {
-      editionStore.editions = [{ ...mockEdition, favoritedBy: [] }]
-    })
-
-    it('devrait ajouter aux favoris (optimistic update)', async () => {
-      vi.mocked($fetch).mockResolvedValue({ success: true })
-
-      await editionStore.toggleFavorite(1)
-
-      expect($fetch).toHaveBeenCalledWith('/api/editions/1/favorite', {
-        method: 'POST',
-      })
-
-      // Vérifier l'optimistic update
-      const edition = editionStore.editions[0]
-      expect(edition.favoritedBy).toHaveLength(1)
-      expect(edition.favoritedBy[0].id).toBe(mockUser.id)
-    })
-
-    it('devrait retirer des favoris (optimistic update)', async () => {
-      editionStore.editions[0].favoritedBy = [
-        {
-          id: mockUser.id,
-          email: mockUser.email,
-          pseudo: mockUser.pseudo,
-        },
-      ]
-      vi.mocked($fetch).mockResolvedValue({ success: true })
-
-      await editionStore.toggleFavorite(1)
-
-      // Vérifier l'optimistic update
-      const edition = editionStore.editions[0]
-      expect(edition.favoritedBy).toHaveLength(0)
-    })
-
-    it("devrait annuler l'optimistic update en cas d'erreur", async () => {
-      const mockError = { message: 'Network error' }
-      vi.mocked($fetch).mockRejectedValue(mockError)
-
-      // Commencer avec favori non ajouté
-      expect(editionStore.editions[0].favoritedBy).toHaveLength(0)
-
-      await expect(editionStore.toggleFavorite(1)).rejects.toEqual(mockError)
-
-      // L'optimistic update devrait être annulé
-      expect(editionStore.editions[0].favoritedBy).toHaveLength(0)
-      expect(editionStore.error).toBe('Network error')
-    })
-  })
-
   describe('Actions collaborateurs', () => {
     const mockCollaborator = {
       id: 1,

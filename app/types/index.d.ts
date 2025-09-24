@@ -44,7 +44,6 @@ export interface Edition {
   creator?: PublicUser
   conventionId: number
   convention?: ConventionWithCollaborators
-  favoritedBy: { id: number }[]
   attendingUsers?: PublicUser[]
   collaborators?: EditionCollaborator[]
   ticketingUrl?: string | null
@@ -216,4 +215,11 @@ export interface EditionVolunteerSettings {
 export interface ConventionFormData {
   name: string
   description?: string | null
+}
+
+// Interface pour les statistiques du profil utilisateur
+export interface ProfileStats {
+  conventionsCreated: number
+  editionsFavorited: number
+  favoritesReceived: number
 }

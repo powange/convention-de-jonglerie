@@ -112,7 +112,6 @@ model Edition {
   volunteersAskAllergies       Boolean                         @default(false)
   officialWebsiteUrl           String?
   volunteersAskTimePreferences Boolean                         @default(false)
-  volunteersTeams              Json?
   volunteersAskTeamPreferences Boolean                         @default(false)
   volunteersAskPets            Boolean                         @default(false)
   volunteersAskMinors          Boolean                         @default(false)

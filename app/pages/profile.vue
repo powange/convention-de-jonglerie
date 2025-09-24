@@ -289,7 +289,14 @@
                     $t('profile.conventions_created')
                   }}</span>
                 </div>
-                <UBadge color="primary" variant="soft" size="lg">{{ myConventionsCount }}</UBadge>
+                <UBadge color="primary" variant="soft" size="lg">
+                  <UIcon
+                    v-if="statsLoading"
+                    name="i-heroicons-arrow-path"
+                    class="animate-spin w-4 h-4"
+                  />
+                  <template v-else>{{ myConventionsCount }}</template>
+                </UBadge>
               </div>
             </div>
 
@@ -310,7 +317,14 @@
                     $t('profile.favorites')
                   }}</span>
                 </div>
-                <UBadge color="warning" variant="soft" size="lg">{{ favoritesCount }}</UBadge>
+                <UBadge color="warning" variant="soft" size="lg">
+                  <UIcon
+                    v-if="statsLoading"
+                    name="i-heroicons-arrow-path"
+                    class="animate-spin w-4 h-4"
+                  />
+                  <template v-else>{{ favoritesCount }}</template>
+                </UBadge>
               </div>
             </div>
 
@@ -331,7 +345,14 @@
                     $t('profile.favorites_received')
                   }}</span>
                 </div>
-                <UBadge color="error" variant="soft" size="lg">{{ totalFavoritesReceived }}</UBadge>
+                <UBadge color="error" variant="soft" size="lg">
+                  <UIcon
+                    v-if="statsLoading"
+                    name="i-heroicons-arrow-path"
+                    class="animate-spin w-4 h-4"
+                  />
+                  <template v-else>{{ totalFavoritesReceived }}</template>
+                </UBadge>
               </div>
             </div>
           </div>
@@ -813,6 +834,13 @@ const editionStore = useEditionStore()
 const toast = useToast()
 const { locale, t } = useI18n()
 
+// Statistiques du profil via l'API
+const {
+  stats: profileStats,
+  loading: statsLoading,
+  ensureInitialized: initStats,
+} = useProfileStats()
+
 // Computed pour formater la date d'inscription
 const formatMemberSince = computed(() => {
   const createdAt = authStore.user?.createdAt || Date.now()
@@ -914,24 +942,10 @@ const hasChanges = computed(() => {
   )
 })
 
-// Statistiques calculées
-const myConventionsCount = computed(() => {
-  return editionStore.editions.filter(
-    (edition) => edition.creatorId && edition.creatorId === authStore.user?.id
-  ).length
-})
-
-const favoritesCount = computed(() => {
-  return editionStore.editions.filter((edition) =>
-    edition.favoritedBy.some((user) => user.id === authStore.user?.id)
-  ).length
-})
-
-const totalFavoritesReceived = computed(() => {
-  return editionStore.editions
-    .filter((edition) => edition.creatorId && edition.creatorId === authStore.user?.id)
-    .reduce((total, edition) => total + edition.favoritedBy.length, 0)
-})
+// Statistiques basées sur l'API au lieu des calculs côté client
+const myConventionsCount = computed(() => profileStats.value?.conventionsCreated ?? 0)
+const favoritesCount = computed(() => profileStats.value?.editionsFavorited ?? 0)
+const totalFavoritesReceived = computed(() => profileStats.value?.favoritesReceived ?? 0)
 
 const resetForm = () => {
   state.email = authStore.user?.email || ''
@@ -1193,7 +1207,11 @@ const saveNotificationPreferences = async () => {
 }
 
 onMounted(async () => {
-  await editionStore.fetchEditions()
+  // Charger les statistiques et les éditions en parallèle
+  await Promise.all([
+    editionStore.fetchEditions(),
+    initStats(), // Initialiser les statistiques du profil
+  ])
 
   // Charger les préférences de notifications
   await loadNotificationPreferences()

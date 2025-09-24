@@ -8,12 +8,7 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionHeader
-        :edition="edition"
-        current-page="commentaires"
-        :is-favorited="isFavorited(edition.id)"
-        @toggle-favorite="toggleFavorite(edition.id)"
-      />
+      <EditionHeader :edition="edition" current-page="commentaires" />
 
       <!-- Contenu des commentaires -->
       <div class="space-y-6">
@@ -105,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
@@ -154,12 +149,6 @@ const isSubmittingPost = ref(false)
 
 const newPostForm = reactive({
   content: '',
-})
-
-const isFavorited = computed(() => (editionId: number) => {
-  return editionStore.editions
-    .find((c) => c.id === editionId)
-    ?.favoritedBy.some((u) => u.id === authStore.user?.id)
 })
 
 // Validation du nouveau post
@@ -316,24 +305,6 @@ const deleteComment = async (postId: number, commentId: number) => {
     })
     // Recharger les posts en cas d'erreur pour resynchroniser
     await loadPosts()
-  }
-}
-
-const toggleFavorite = async (id: number) => {
-  try {
-    await editionStore.toggleFavorite(id)
-    toast.add({
-      title: t('messages.favorite_status_updated'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (e: unknown) {
-    const err = e as { message?: string } | undefined
-    toast.add({
-      title: err?.message || t('errors.favorite_update_failed'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
   }
 }
 

@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
       volunteersTeardownEndDate: true,
       volunteersAskSetup: true,
       volunteersAskTeardown: true,
-      // Supprimé: volunteersTeams - maintenant géré via VolunteerTeam
+      volunteersUpdatedAt: true,
       volunteerApplications: { select: { id: true, status: true, userId: true } },
     },
   })
@@ -81,6 +81,7 @@ export default defineEventHandler(async (event) => {
     teardownEndDate: (edition as any).volunteersTeardownEndDate || null,
     askSetup: (edition as any).volunteersAskSetup || false,
     askTeardown: (edition as any).volunteersAskTeardown || false,
+    updatedAt: (edition as any).volunteersUpdatedAt || null,
     teams: volunteerTeams, // Nouveau système VolunteerTeam
     myApplication,
     counts,

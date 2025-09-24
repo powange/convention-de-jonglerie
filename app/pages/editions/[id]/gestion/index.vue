@@ -17,12 +17,7 @@
     </div>
     <div v-else>
       <!-- En-tête avec navigation -->
-      <EditionHeader
-        :edition="edition"
-        current-page="gestion"
-        :is-favorited="isFavorited(edition.id)"
-        @toggle-favorite="toggleFavorite(edition.id)"
-      />
+      <EditionHeader :edition="edition" current-page="gestion" />
 
       <!-- Contenu de gestion -->
       <div class="space-y-6">
@@ -1033,27 +1028,6 @@ const hasEditionStarted = computed(() => {
   if (!edition.value) return false
   return new Date() >= new Date(edition.value.startDate)
 })
-
-const isFavorited = computed(() => (_editionId: number) => {
-  return edition.value?.favoritedBy.some((u) => u.id === authStore.user?.id)
-})
-
-const toggleFavorite = async (id: number) => {
-  try {
-    await editionStore.toggleFavorite(id)
-    toast.add({
-      title: t('messages.favorite_status_updated'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (e: any) {
-    toast.add({
-      title: e?.message || t('errors.favorite_update_failed'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  }
-}
 
 const deleteEdition = async (id: number) => {
   if (confirm(t('pages.access_denied.confirm_delete_edition'))) {

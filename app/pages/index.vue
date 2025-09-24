@@ -207,6 +207,7 @@ import { onMounted, computed, reactive, watch, ref, defineAsyncComponent, toRaw 
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { useFavoritesEditionsStore } from '~/stores/favoritesEditions'
 
 // SEO - Métadonnées de la page d'accueil
 const { t, locale } = useI18n()
@@ -292,6 +293,7 @@ const HomeMap = defineAsyncComponent(() => import('~/components/HomeMap.vue'))
 
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
+const favoritesStore = useFavoritesEditionsStore()
 const toast = useToast()
 const route = useRoute()
 const router = useRouter()
@@ -558,18 +560,21 @@ const handleFilterUpdate = ({ key, value }: { key: string; value: any }) => {
   Object.assign(filters, { [key]: value })
 }
 
-onMounted(() => {
+onMounted(async () => {
   editionStore.fetchEditions({ ...filters, page: currentPage.value, limit: itemsPerPage.value })
   // Si on démarre en mode agenda ou carte, charger toutes les éditions aussi
   if (viewMode.value === 'agenda' || viewMode.value === 'map') {
     editionStore.fetchAllEditions(filters)
   }
+
+  // Initialiser les favoris si l'utilisateur est connecté
+  if (authStore.isAuthenticated) {
+    await favoritesStore.ensureInitialized()
+  }
 })
 
 const isFavorited = computed(() => (editionId: number) => {
-  return editionStore.editions
-    .find((c: any) => c.id === editionId)
-    ?.favoritedBy.some((u: any) => u.id === authStore.user?.id)
+  return favoritesStore.isFavorite(editionId)
 })
 
 // Réinitialiser la page courante quand les filtres changent
@@ -583,7 +588,7 @@ watch(
 
 const toggleFavorite = async (id: number) => {
   try {
-    await editionStore.toggleFavorite(id)
+    await favoritesStore.toggleFavorite(id)
     toast.add({
       title: t('messages.favorite_status_updated'),
       icon: 'i-heroicons-check-circle',
