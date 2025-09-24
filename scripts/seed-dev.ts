@@ -615,6 +615,7 @@ async function main() {
       volunteerSettingsCount++
 
       // Créer des équipes bénévoles avec le nouveau système VolunteerTeam
+      const teams: any[] = []
       if (Math.random() > 0.5) {
         const teamNames = [
           'Accueil',
@@ -633,12 +634,12 @@ async function main() {
           '#06b6d4', // cyan-500
         ]
         const numTeams = Math.floor(Math.random() * 4) + 2 // 2-5 équipes
-        const createdTeams: string[] = []
+        const createdTeamNames: string[] = []
 
         for (let i = 0; i < numTeams; i++) {
           const teamName = teamNames[Math.floor(Math.random() * teamNames.length)]
-          if (!createdTeams.includes(teamName)) {
-            await prisma.volunteerTeam.create({
+          if (!createdTeamNames.includes(teamName)) {
+            const team = await prisma.volunteerTeam.create({
               data: {
                 editionId: edition.id,
                 name: teamName,
@@ -647,7 +648,8 @@ async function main() {
                 maxVolunteers: Math.floor(Math.random() * 8) + 3, // 3-10 places par équipe
               },
             })
-            createdTeams.push(teamName)
+            teams.push(team)
+            createdTeamNames.push(teamName)
           }
         }
       }
@@ -778,8 +780,150 @@ async function main() {
         })
         volunteerApplicationsCount++
       }
+
+      // Créer des créneaux de bénévolat et assigner des bénévoles
+      if (teams.length > 0) {
+        console.log(`  Création de créneaux pour l'édition ${edition.name}...`)
+
+        // Récupérer les candidatures acceptées pour cette édition
+        const acceptedApplications = await prisma.editionVolunteerApplication.findMany({
+          where: {
+            editionId: edition.id,
+            status: 'ACCEPTED',
+          },
+          include: {
+            user: true,
+          },
+        })
+
+        // Créer des créneaux pour chaque jour de l'édition
+        const currentDate = new Date(edition.startDate)
+        const endDate = new Date(edition.endDate)
+        let totalTimeSlots = 0
+        let totalAssignments = 0
+
+        while (currentDate <= endDate) {
+          // Créer 3-6 créneaux par jour
+          const numSlots = Math.floor(Math.random() * 4) + 3
+
+          for (let slotIndex = 0; slotIndex < numSlots; slotIndex++) {
+            // Définir les heures de début et fin du créneau
+            const startHour = 8 + slotIndex * 3 // Créneaux de 3h commençant à 8h, 11h, 14h, 17h, 20h
+            const startDateTime = new Date(currentDate)
+            startDateTime.setHours(startHour, 0, 0, 0)
+
+            const endDateTime = new Date(startDateTime)
+            endDateTime.setHours(startHour + 3, 0, 0, 0) // Créneaux de 3 heures
+
+            // Choisir une équipe aléatoire ou pas d'équipe (créneau général)
+            const team = Math.random() > 0.3 ? teams[Math.floor(Math.random() * teams.length)] : null
+
+            // Définir le titre du créneau
+            const slotTitles = [
+              'Montage stands',
+              'Accueil participants',
+              'Animation ateliers',
+              'Service restauration',
+              'Gestion logistique',
+              'Support technique',
+              'Nettoyage espaces',
+              'Surveillance matériel',
+              'Information public',
+              'Préparation spectacle',
+            ]
+            const title = slotTitles[Math.floor(Math.random() * slotTitles.length)]
+
+            // Créer le créneau
+            const timeSlot = await prisma.volunteerTimeSlot.create({
+              data: {
+                editionId: edition.id,
+                teamId: team?.id || null,
+                title,
+                description: `${title} ${team ? `pour l'équipe ${team.name}` : '(créneau général)'}`,
+                startDateTime,
+                endDateTime,
+                maxVolunteers: Math.floor(Math.random() * 5) + 2, // 2-6 bénévoles max par créneau
+              },
+            })
+            totalTimeSlots++
+
+            // Assigner des bénévoles au créneau (50-80% de remplissage)
+            if (acceptedApplications.length > 0) {
+              const fillRate = 0.5 + Math.random() * 0.3 // Entre 50% et 80%
+              const numAssignments = Math.min(
+                Math.floor(timeSlot.maxVolunteers * fillRate),
+                acceptedApplications.length
+              )
+
+              // Mélanger les candidats et en prendre quelques-uns
+              const shuffledCandidates = [...acceptedApplications].sort(() => Math.random() - 0.5)
+
+              for (let i = 0; i < numAssignments; i++) {
+                const candidate = shuffledCandidates[i]
+
+                // Vérifier que ce bénévole n'est pas déjà assigné à ce créneau
+                const existingAssignment = await prisma.volunteerAssignment.findFirst({
+                  where: {
+                    timeSlotId: timeSlot.id,
+                    userId: candidate.userId,
+                  },
+                })
+
+                if (!existingAssignment) {
+                  // Vérifier la disponibilité du bénévole selon ses préférences horaires
+                  let isAvailable = true
+
+                  // Vérifier si le bénévole a des préférences d'équipe
+                  if (team && candidate.teamPreferences && Array.isArray(candidate.teamPreferences)) {
+                    // 70% de chance d'être assigné même si ce n'est pas l'équipe préférée
+                    isAvailable = candidate.teamPreferences.includes(team.name) || Math.random() > 0.3
+                  }
+
+                  // Vérifier les disponibilités setup/teardown/event
+                  const isSetupPeriod = startDateTime < new Date(edition.startDate)
+                  const isTeardownPeriod = startDateTime > new Date(edition.endDate)
+
+                  if (isSetupPeriod && candidate.setupAvailability === false) {
+                    isAvailable = false
+                  } else if (isTeardownPeriod && candidate.teardownAvailability === false) {
+                    isAvailable = false
+                  } else if (!isSetupPeriod && !isTeardownPeriod && candidate.eventAvailability === false) {
+                    isAvailable = false
+                  }
+
+                  if (isAvailable) {
+                    await prisma.volunteerAssignment.create({
+                      data: {
+                        timeSlotId: timeSlot.id,
+                        userId: candidate.userId,
+                        assignedById: edition.creatorId, // L'organisateur assigne les bénévoles
+                      },
+                    })
+
+                    // Mettre à jour le compteur d'assignés
+                    await prisma.volunteerTimeSlot.update({
+                      where: { id: timeSlot.id },
+                      data: { assignedVolunteers: { increment: 1 } },
+                    })
+                    totalAssignments++
+                  }
+                }
+              }
+            }
+          }
+
+          // Passer au jour suivant
+          currentDate.setDate(currentDate.getDate() + 1)
+        }
+
+        console.log(`    → ${totalTimeSlots} créneaux créés, ${totalAssignments} assignations`)
+      }
     }
   }
+
+  // Compter les créneaux et assignations totaux
+  const totalSlots = await prisma.volunteerTimeSlot.count()
+  const totalAssignments = await prisma.volunteerAssignment.count()
 
   console.log('Seed dev terminé avec succès !')
   if (doReset) console.log('(Reset préalable exécuté)')
@@ -792,6 +936,8 @@ async function main() {
   console.log('- Propositions de covoiturage et commentaires ajoutés')
   console.log(`- ${volunteerSettingsCount} éditions configurées avec appels à bénévoles`)
   console.log(`- ${volunteerApplicationsCount} candidatures de bénévolat créées (85% acceptées)`)
+  console.log(`- ${totalSlots} créneaux de bénévolat créés`)
+  console.log(`- ${totalAssignments} assignations de bénévoles aux créneaux`)
 }
 
 main()
