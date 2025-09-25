@@ -76,7 +76,7 @@
                 :content="{
                   align: 'end',
                   side: 'bottom',
-                  sideOffset: 8
+                  sideOffset: 8,
                 }"
               >
                 <UButton variant="ghost" color="neutral" class="rounded-full">

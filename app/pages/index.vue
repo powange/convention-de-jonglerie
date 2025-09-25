@@ -288,8 +288,9 @@ useSchemaOrg([
   }),
 ])
 
-// Lazy loading du composant HomeMap
+// Lazy loading optimisé des composants (une seule fois)
 const HomeMap = defineAsyncComponent(() => import('~/components/HomeMap.vue'))
+const HomeAgenda = defineAsyncComponent(() => import('~/components/HomeAgenda.vue'))
 
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
@@ -380,9 +381,6 @@ const updateUrlFromFilters = (extraParams: Record<string, any> = {}) => {
   router.push({ query })
 }
 
-// Lazy load agenda component (FullCalendar wrapper)
-const HomeAgenda = defineAsyncComponent(() => import('~/components/HomeAgenda.vue'))
-
 // Pagination
 const currentPage = ref(1)
 const itemsPerPage = ref(12)
@@ -391,67 +389,94 @@ const itemsPerPage = ref(12)
 const calendarStartDate = ref<CalendarDate | null>(null)
 const calendarEndDate = ref<CalendarDate | null>(null)
 
-// Compteur de filtres actifs
+// Memoisation du compteur de filtres actifs avec shallowRef pour la performance
 const activeFiltersCount = computed(() => {
+  // Early return si aucun filtre de base
+  const hasBaseFilters =
+    filters.name || filters.startDate || filters.endDate || filters.countries.length > 0
+
+  // Optimisation : si pas de filtres de base, vérifier rapidement les autres
+  if (!hasBaseFilters) {
+    // Vérifier le filtre temporel (par défaut: past=false, current=true, future=true)
+    const isTemporalDefault =
+      filters.showPast === false && filters.showCurrent === true && filters.showFuture === true
+    if (isTemporalDefault) {
+      // Compter uniquement les services actifs
+      return services.value.filter((service: any) => (filters as any)[service.key]).length
+    }
+  }
+
+  // Calcul complet si nécessaire
   let count = 0
   if (filters.name) count++
   if (filters.startDate) count++
   if (filters.endDate) count++
   if (filters.countries.length > 0) count++
-  // Compter le filtre temporel si pas tous cochés (par défaut showPast=false, showCurrent=true, showFuture=true)
+
+  // Filtre temporel
   if (!(filters.showPast === false && filters.showCurrent === true && filters.showFuture === true))
     count++
-  // Compter les services actifs
+
+  // Services actifs
   count += services.value.filter((service: any) => (filters as any)[service.key]).length
+
   return count
 })
 
 const filters = reactive(initFiltersFromUrl())
 
-// Créer une fonction debounced pour éviter les appels API trop fréquents
-// Délai de 300ms pour tous les changements de filtres pour éviter la surcharge
-const debouncedFetchEditions = useDebounceFn((newFilters: any) => {
+// Créer une fonction debounced pour le champ name uniquement
+const debouncedNameFetch = useDebounceFn((newFilters: any) => {
   editionStore.fetchEditions(newFilters)
 }, 300)
 
-// Variable pour tracker le dernier nom recherché
-let lastNameFilter = ''
+// Ref pour tracker le dernier nom pour éviter les appels inutiles
+const lastNameSearched = ref('')
 
-// Watcher pour appliquer automatiquement les filtres
+// Watcher principal optimisé - combine filters et currentPage
 watch(
-  [filters, currentPage],
+  [() => ({ ...filters }), currentPage],
   ([newFilters, newPage]) => {
-    // Si c'est uniquement le champ name qui a changé, utiliser le debounce
-    // Sinon (checkbox, dates, etc.), appliquer immédiatement pour une meilleure réactivité
-    const nameChanged = filters.name !== lastNameFilter
-    lastNameFilter = filters.name
-
     const filtersWithPage = { ...newFilters, page: newPage, limit: itemsPerPage.value }
 
-    if (nameChanged && filters.name !== '') {
-      // Debounce pour le champ de recherche texte
-      debouncedFetchEditions(filtersWithPage)
+    // Cas spécial pour le champ name avec debounce
+    const nameChanged = newFilters.name !== lastNameSearched.value
+
+    if (nameChanged) {
+      lastNameSearched.value = newFilters.name
+      if (newFilters.name) {
+        // Utiliser debounce pour la recherche textuelle
+        debouncedNameFetch(filtersWithPage)
+      } else {
+        // Application immédiate si le champ est vidé
+        editionStore.fetchEditions(filtersWithPage)
+      }
     } else {
-      // Application immédiate pour les autres filtres (checkbox, dates, pays)
+      // Application immédiate pour tous les autres changements
       editionStore.fetchEditions(filtersWithPage)
     }
 
-    // Si on est en mode agenda ou carte, charger aussi toutes les éditions
-    if (viewMode.value === 'agenda' || viewMode.value === 'map') {
-      editionStore.fetchAllEditions(newFilters)
-    }
-
-    // Mettre à jour l'URL avec les nouveaux filtres
+    // Mettre à jour l'URL
     updateUrlFromFilters()
   },
-  { deep: true, immediate: false }
+  { deep: true }
 )
 
-// Watcher pour charger toutes les éditions quand on passe en mode agenda ou carte
-watch(viewMode, (newViewMode) => {
-  if (newViewMode === 'agenda' || newViewMode === 'map') {
-    // Charger toutes les éditions avec les filtres actuels
+// Watcher séparé et optimisé pour les modes agenda/carte
+let allEditionsFetched = false
+watch(viewMode, (newViewMode, oldViewMode) => {
+  // Charger une seule fois lors du premier passage en mode agenda ou carte
+  if (
+    (newViewMode === 'agenda' || newViewMode === 'map') &&
+    (oldViewMode === 'grid' || !allEditionsFetched)
+  ) {
     editionStore.fetchAllEditions(filters)
+    allEditionsFetched = true
+  }
+
+  // Reset le flag si on retourne en mode grid
+  if (newViewMode === 'grid') {
+    allEditionsFetched = false
   }
 })
 
@@ -496,40 +521,25 @@ const updateEndDate = (date: CalendarDate | null) => {
   }
 }
 
-// Initialiser les CalendarDate quand les filtres changent
-watch(
-  () => filters.startDate,
-  (newValue) => {
-    if (newValue) {
-      const parts = newValue.split('-').map(Number)
-      if (parts.length === 3 && parts.every((part) => !isNaN(part))) {
-        const [year, month, day] = parts
-        if (year && month && day) {
-          calendarStartDate.value = new CalendarDate(year, month, day)
-        }
-      }
-    } else {
-      calendarStartDate.value = null
-    }
-  }
-)
+// Fonction helper pour convertir une date string en CalendarDate
+const parseCalendarDate = (dateString: string): CalendarDate | null => {
+  if (!dateString) return null
 
-watch(
-  () => filters.endDate,
-  (newValue) => {
-    if (newValue) {
-      const parts = newValue.split('-').map(Number)
-      if (parts.length === 3 && parts.every((part) => !isNaN(part))) {
-        const [year, month, day] = parts
-        if (year && month && day) {
-          calendarEndDate.value = new CalendarDate(year, month, day)
-        }
-      }
-    } else {
-      calendarEndDate.value = null
+  const parts = dateString.split('-').map(Number)
+  if (parts.length === 3 && parts.every((part) => !isNaN(part))) {
+    const [year, month, day] = parts
+    if (year && month && day) {
+      return new CalendarDate(year, month, day)
     }
   }
-)
+  return null
+}
+
+// Watcher unique pour les deux dates (plus efficace)
+watchEffect(() => {
+  calendarStartDate.value = parseCalendarDate(filters.startDate)
+  calendarEndDate.value = parseCalendarDate(filters.endDate)
+})
 
 const resetFilters = () => {
   filters.name = ''
@@ -561,29 +571,38 @@ const handleFilterUpdate = ({ key, value }: { key: string; value: any }) => {
 }
 
 onMounted(async () => {
-  editionStore.fetchEditions({ ...filters, page: currentPage.value, limit: itemsPerPage.value })
-  // Si on démarre en mode agenda ou carte, charger toutes les éditions aussi
+  // Charger les éditions initiales
+  const initialFilters = { ...filters, page: currentPage.value, limit: itemsPerPage.value }
+  const fetchPromises = [editionStore.fetchEditions(initialFilters)]
+
+  // Si on démarre en mode agenda ou carte, charger toutes les éditions en parallèle
   if (viewMode.value === 'agenda' || viewMode.value === 'map') {
-    editionStore.fetchAllEditions(filters)
+    fetchPromises.push(editionStore.fetchAllEditions(filters))
+    allEditionsFetched = true
   }
 
-  // Initialiser les favoris si l'utilisateur est connecté
+  // Initialiser les favoris en parallèle si connecté
   if (authStore.isAuthenticated) {
-    await favoritesStore.ensureInitialized()
+    fetchPromises.push(favoritesStore.ensureInitialized())
   }
+
+  // Exécuter tout en parallèle pour plus de performance
+  await Promise.all(fetchPromises)
 })
 
 const isFavorited = computed(() => (editionId: number) => {
   return favoritesStore.isFavorite(editionId)
 })
 
-// Réinitialiser la page courante quand les filtres changent
+// Réinitialiser la page courante quand les filtres changent (intégré au watcher principal)
 watch(
-  filters,
-  () => {
-    currentPage.value = 1
-  },
-  { deep: true }
+  () => ({ ...filters }),
+  (newFilters, oldFilters) => {
+    // Réinitialiser seulement si un filtre autre que la page a changé
+    if (JSON.stringify(newFilters) !== JSON.stringify(oldFilters)) {
+      currentPage.value = 1
+    }
+  }
 )
 
 const toggleFavorite = async (id: number) => {
