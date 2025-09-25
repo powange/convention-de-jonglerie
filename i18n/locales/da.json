@@ -32,6 +32,7 @@
     "confirm_archive_convention": "Er du sikker på, at du vil arkivere denne konvention?",
     "confirm_delete": "Bekræft sletning",
     "confirm_demote_from_admin": "Er du sikker på, at du vil degradere denne administrator?",
+    "confirm_impersonate": "Er du sikker på, at du vil logge ind som {name}?",
     "confirm_promote_to_admin": "Er du sikker på, at du vil forfremme denne bruger til administrator?",
     "confirm_unarchive_convention": "Er du sikker på, at du vil gendan denne konvention fra arkivet?",
     "convention_archived": "Konvention blev arkiveret med succes",
@@ -143,6 +144,12 @@
     "filter_archived_conventions": "Arkiverede konventioner",
     "filter_sort": "Filtrer og sorter",
     "good_news": "Det er gode nyheder!",
+    "impersonate_user": "Log ind som...",
+    "impersonating_as": "Logget ind som {pseudo} ({email})",
+    "impersonation_error": "Fejl under impersonifikation",
+    "impersonation_mode": "IMPERSONIFIKERINGSTILSTAND",
+    "impersonation_started": "Logget ind som {pseudo}",
+    "impersonation_stopped": "Tilbage til din administratorkonto",
     "import": {
       "description": "Importér konventioner og udgaver fra en JSON-fil",
       "documentation_intro": "JSON-formatet gør det muligt at importere en konvention og dens udgave. Oprettede konventioner er forældreløse (uden skaber) og kan gøres krav på via kontakt-e-mailen.",
@@ -206,6 +213,7 @@
     "notification_management": "Meddelelseshåndtering",
     "notifications_sent": "Notifikationer sendt",
     "oldest_first": "Ældste først",
+    "original_user": "Oprindelig bruger",
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ ADVARSEL: Er du sikker på, at du vil slette konventionen \"{name}\" permanent?\n\nDenne handling vil slette:\n- {editionsCount} udgave(r)\n- {collaboratorsCount} samarbejdspartner(e)\n- Alle tilknyttede data\n\nDenne handling kan IKKE fortrydes!",
@@ -235,6 +243,8 @@
     "select_deletion_reason": "Vælg en årsag til sletning",
     "show_online_users_only": "Vis kun onlinebrugere",
     "slots_processed": "Behandlede tidsrum",
+    "stop_impersonation": "Tilbage til min konto",
+    "stop_impersonation_error": "Fejl ved stop af impersonifikation",
     "success": "Succes",
     "super_admin": "Superadministrator",
     "super_administrators": "Superadministratorer",

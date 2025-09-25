@@ -32,6 +32,7 @@
     "confirm_archive_convention": "Sei sicuro di voler archiviare questo convegno?",
     "confirm_delete": "Conferma eliminazione",
     "confirm_demote_from_admin": "Sei sicuro di voler degradare questo amministratore?",
+    "confirm_impersonate": "Sei sicuro di voler accedere come {name}?",
     "confirm_promote_to_admin": "Sei sicuro di voler promuovere questo utente ad amministratore?",
     "confirm_unarchive_convention": "Sei sicuro di voler dearchiviare questo convegno?",
     "convention_archived": "Convegno archiviato con successo",
@@ -143,6 +144,12 @@
     "filter_archived_conventions": "Convegni archiviati",
     "filter_sort": "Filtra e ordina",
     "good_news": "Sono buone notizie!",
+    "impersonate_user": "Accedi come...",
+    "impersonating_as": "Connesso come {pseudo} ({email})",
+    "impersonation_error": "Errore durante l'impersonificazione",
+    "impersonation_mode": "MODALITÀ IMPERSONIFICAZIONE",
+    "impersonation_started": "Connesso come {pseudo}",
+    "impersonation_stopped": "Ritorno al tuo account amministratore",
     "import": {
       "description": "Importa convenzioni ed edizioni da un file JSON",
       "documentation_intro": "Il formato JSON consente di importare una convenzione e la sua edizione. Le convenzioni create sono orfane (senza creatore) e possono essere rivendicate tramite l'email di contatto.",
@@ -206,6 +213,7 @@
     "notification_management": "Gestione Notifiche",
     "notifications_sent": "Notifiche inviate",
     "oldest_first": "Più vecchi prima",
+    "original_user": "Utente originale",
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ ATTENZIONE: Sei sicuro di voler eliminare definitivamente la convenzione \"{name}\"?\n\nQuesta azione eliminerà:\n- {editionsCount} edizione/i\n- {collaboratorsCount} collaboratore/i\n- Tutti i dati associati\n\nQuesta azione è IRREVERSIBILE!",
@@ -235,6 +243,8 @@
     "select_deletion_reason": "Seleziona un motivo per la eliminazione",
     "show_online_users_only": "Mostra solo utenti online",
     "slots_processed": "Slot elaborati",
+    "stop_impersonation": "Torna al mio account",
+    "stop_impersonation_error": "Errore nell'arresto dell'impersonificazione",
     "success": "Successo",
     "super_admin": "Super amministratore",
     "super_administrators": "Super amministratori",

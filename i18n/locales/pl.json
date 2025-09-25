@@ -32,6 +32,7 @@
     "confirm_archive_convention": "Czy na pewno chcesz zarchiwizować tę konwencję?",
     "confirm_delete": "Potwierdź usunięcie",
     "confirm_demote_from_admin": "Czy na pewno chcesz zdegradować tego administratora?",
+    "confirm_impersonate": "Czy na pewno chcesz zalogować się jako {name}?",
     "confirm_promote_to_admin": "Czy na pewno chcesz promować tego użytkownika na administratora?",
     "confirm_unarchive_convention": "Czy na pewno chcesz przywrocić tę konwencję z archiwum?",
     "convention_archived": "Konwencja została pomyślnie zarchiwizowana",
@@ -143,6 +144,12 @@
     "filter_archived_conventions": "Zarchiwizowane konwencje",
     "filter_sort": "Filtruj i sortuj",
     "good_news": "To dobre wieści!",
+    "impersonate_user": "Zaloguj się jako...",
+    "impersonating_as": "Zalogowany jako {pseudo} ({email})",
+    "impersonation_error": "Błąd podczas personifikacji",
+    "impersonation_mode": "TRYB PERSONIFIKACJI",
+    "impersonation_started": "Zalogowany jako {pseudo}",
+    "impersonation_stopped": "Powrót do konta administratora",
     "import": {
       "description": "Importuj konwencje i edycje z pliku JSON",
       "documentation_intro": "Format JSON pozwala na importowanie konwencji i jej edycji. Utworzone konwencje są osierocone (bez twórcy) i mogą być zgłaszane przez email kontaktowy.",
@@ -206,6 +213,7 @@
     "notification_management": "Zarządzanie powiadomieniami",
     "notifications_sent": "Powiadomienia wysłane",
     "oldest_first": "Najstarsi jako pierwsi",
+    "original_user": "Oryginalny użytkownik",
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ OSTRZEŻENIE: Czy na pewno chcesz trwale usunąć konwencję \"{name}\"?\n\nTa czynność usunie:\n- {editionsCount} edycję/edycji\n- {collaboratorsCount} współpracownika/współpracowników\n- Wszystkie powiązane dane\n\nTa czynność jest NIEODWRACALNA!",
@@ -235,6 +243,8 @@
     "select_deletion_reason": "Wybierz powód usunięcia",
     "show_online_users_only": "Pokaż tylko użytkowników online",
     "slots_processed": "Przetworzone przedziały",
+    "stop_impersonation": "Powrót do mojego konta",
+    "stop_impersonation_error": "Błąd podczas zatrzymywania personifikacji",
     "success": "Sukces",
     "super_admin": "Super Administrator",
     "super_administrators": "Super administratorzy",

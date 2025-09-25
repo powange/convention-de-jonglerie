@@ -32,6 +32,7 @@
     "confirm_archive_convention": "Tem certeza de que deseja arquivar esta convenção?",
     "confirm_delete": "Confirmar exclusão",
     "confirm_demote_from_admin": "Tem certeza de que deseja rebaixar este administrador?",
+    "confirm_impersonate": "Tem certeza de que deseja fazer login como {name}?",
     "confirm_promote_to_admin": "Tem certeza de que deseja promover este usuário a administrador?",
     "confirm_unarchive_convention": "Tem certeza de que deseja desarquivar esta convenção?",
     "convention_archived": "Convenção arquivada com sucesso",
@@ -143,6 +144,12 @@
     "filter_archived_conventions": "Convenções arquivadas",
     "filter_sort": "Filtrar e ordenar",
     "good_news": "São boas notícias!",
+    "impersonate_user": "Fazer login como...",
+    "impersonating_as": "Logado como {pseudo} ({email})",
+    "impersonation_error": "Erro durante a personificação",
+    "impersonation_mode": "MODO PERSONIFICAÇÃO",
+    "impersonation_started": "Logado como {pseudo}",
+    "impersonation_stopped": "Retorno à sua conta de administrador",
     "import": {
       "description": "Importar convenções e edições de um arquivo JSON",
       "documentation_intro": "O formato JSON permite importar uma convenção e sua edição. Convenções criadas ficam órfãs (sem criador) e podem ser reivindicadas via email de contato.",
@@ -206,6 +213,7 @@
     "notification_management": "Gerenciamento de Notificações",
     "notifications_sent": "Notificações enviadas",
     "oldest_first": "Mais antigos primeiro",
+    "original_user": "Usuário original",
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ AVISO: Tem certeza de que deseja excluir permanentemente a convenção \"{name}\"?\n\nEsta ação excluirá:\n- {editionsCount} edição/edições\n- {collaboratorsCount} colaborador/colaboradores\n- Todos os dados associados\n\nEsta ação é IRREVERSÍVEL!",
@@ -235,6 +243,8 @@
     "select_deletion_reason": "Selecione um motivo para exclusão",
     "show_online_users_only": "Mostrar apenas usuários online",
     "slots_processed": "Horários processados",
+    "stop_impersonation": "Voltar à minha conta",
+    "stop_impersonation_error": "Erro ao parar a personificação",
     "success": "Sucesso",
     "super_admin": "Super Administrador",
     "super_administrators": "Super administradores",

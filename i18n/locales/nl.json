@@ -32,6 +32,7 @@
     "confirm_archive_convention": "Weet u zeker dat u deze conventie wilt archiveren?",
     "confirm_delete": "Verwijdering bevestigen",
     "confirm_demote_from_admin": "Weet je zeker dat je deze beheerder wilt degraderen?",
+    "confirm_impersonate": "Weet je zeker dat je wilt inloggen als {name}?",
     "confirm_promote_to_admin": "Weet je zeker dat je deze gebruiker wilt promoveren tot beheerder?",
     "confirm_unarchive_convention": "Weet u zeker dat u deze conventie wilt dearchiveren?",
     "convention_archived": "Conventie succesvol gearchiveerd",
@@ -143,6 +144,12 @@
     "filter_archived_conventions": "Gearchiveerde conventies",
     "filter_sort": "Filteren en sorteren",
     "good_news": "Dat is goed nieuws!",
+    "impersonate_user": "Inloggen als...",
+    "impersonating_as": "Ingelogd als {pseudo} ({email})",
+    "impersonation_error": "Fout tijdens imitatie",
+    "impersonation_mode": "IMITATIEMODUS",
+    "impersonation_started": "Ingelogd als {pseudo}",
+    "impersonation_stopped": "Terug naar uw beheerdersaccount",
     "import": {
       "description": "Conventies en edities importeren uit een JSON-bestand",
       "documentation_intro": "Het JSON-formaat maakt het mogelijk om een conventie en haar editie te importeren. Aangemaakte conventies zijn wees (zonder maker) en kunnen worden geclaimd via de contact-e-mail.",
@@ -206,6 +213,7 @@
     "notification_management": "Meldingenbeheer",
     "notifications_sent": "Meldingen verzonden",
     "oldest_first": "Oudste eerst",
+    "original_user": "Oorspronkelijke gebruiker",
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ WAARSCHUWING: Weet je zeker dat je de conventie \"{name}\" permanent wilt verwijderen?\n\nDeze actie zal verwijderen:\n- {editionsCount} editie(s)\n- {collaboratorsCount} medewerker(s)\n- Alle bijbehorende gegevens\n\nDeze actie is ONOMKEERBAAR!",
@@ -235,6 +243,8 @@
     "select_deletion_reason": "Selecteer een reden voor verwijdering",
     "show_online_users_only": "Alleen online gebruikers tonen",
     "slots_processed": "Verwerkte tijdsloten",
+    "stop_impersonation": "Terug naar mijn account",
+    "stop_impersonation_error": "Fout bij het stoppen van imitatie",
     "success": "Succes",
     "super_admin": "Super Beheerder",
     "super_administrators": "Super beheerders",

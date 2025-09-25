@@ -32,6 +32,7 @@
     "confirm_archive_convention": "Ви впевнені, що хочете архівувати цю конвенцію?",
     "confirm_delete": "Підтвердити видалення",
     "confirm_demote_from_admin": "Ви впевнені, що хочете знизити цього адміністратора?",
+    "confirm_impersonate": "Ви впевнені, що хочете увійти як {name}?",
     "confirm_promote_to_admin": "Ви впевнені, що хочете підвищити цього користувача до адміністратора?",
     "confirm_unarchive_convention": "Ви впевнені, що хочете розархівувати цю конвенцію?",
     "convention_archived": "Конвенцію успішно архівовано",
@@ -143,6 +144,12 @@
     "filter_archived_conventions": "Архівовані конвенції",
     "filter_sort": "Фільтрувати та сортувати",
     "good_news": "Це хороші новини!",
+    "impersonate_user": "Увійти як...",
+    "impersonating_as": "Увійшов як {pseudo} ({email})",
+    "impersonation_error": "Помилка під час уособлення",
+    "impersonation_mode": "РЕЖИМ УОСОБЛЕННЯ",
+    "impersonation_started": "Увійшов як {pseudo}",
+    "impersonation_stopped": "Повернення до вашого облікового запису адміністратора",
     "import": {
       "description": "Імпорт конвенцій та видань з JSON-файлу",
       "documentation_intro": "Формат JSON дозволяє імпортувати конвенцію та її видання. Створені конвенції залишаються сиротськими (без творця) і можуть бути затребувані через контактний email.",
@@ -206,6 +213,7 @@
     "notification_management": "Керування сповіщеннями",
     "notifications_sent": "Сповіщення надіслано",
     "oldest_first": "Спочатку старі",
+    "original_user": "Оригінальний користувач",
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ УВАГА: Ви впевнені, що хочете назавжди видалити конвенцію \"{name}\"?\n\nЦя дія видалить:\n- {editionsCount} видання\n- {collaboratorsCount} співробітника/співробітників\n- Всі пов'язані дані\n\nЦя дія НЕЗВОРОТНА!",
@@ -235,6 +243,8 @@
     "select_deletion_reason": "Виберіть причину видалення",
     "show_online_users_only": "Показати лише користувачів онлайн",
     "slots_processed": "Оброблені слоти",
+    "stop_impersonation": "Повернутися до мого облікового запису",
+    "stop_impersonation_error": "Помилка при зупинці уособлення",
     "success": "Успіх",
     "super_admin": "Супер Адмін",
     "super_administrators": "Супер адміністратори",

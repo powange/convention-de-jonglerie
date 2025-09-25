@@ -78,7 +78,7 @@
           icon="i-heroicons-arrow-path"
           variant="outline"
           color="neutral"
-          :loading="loading || loadingActiveConnections"
+          :loading="loading"
           :title="t('common.refresh')"
           @click="refreshData"
         />
@@ -161,6 +161,8 @@
 import { h, resolveComponent } from 'vue'
 
 import type { AdminUser } from '~/composables/useUserDeletion'
+import { useAuthStore } from '~/stores/auth'
+import { useImpersonationStore } from '~/stores/impersonation'
 
 definePageMeta({
   middleware: ['auth-protected', 'super-admin'],
@@ -253,7 +255,7 @@ const columns = [
     accessorKey: 'connectionStatus',
     header: '', // Pas de header pour la pastille
     cell: ({ row }: { row: any }) => {
-      const user = row.original as AdminUserWithConnectionWithConnection
+      const user = row.original as AdminUserWithConnection
       const isConnected = user.isConnected
 
       return h(
@@ -475,6 +477,17 @@ const getUserActions = (user: AdminUserWithConnection) => {
     },
   ]
 
+  // Action d'impersonation (seulement pour les utilisateurs non-admin)
+  if (!user.isGlobalAdmin) {
+    actions.push({
+      label: t('admin.impersonate_user'),
+      icon: 'i-heroicons-arrow-right-circle',
+      onSelect: () => {
+        impersonateUser(user)
+      },
+    })
+  }
+
   // Actions d'administration
   if (!user.isGlobalAdmin) {
     actions.push({
@@ -509,6 +522,54 @@ const getUserActions = (user: AdminUserWithConnection) => {
   }
 
   return [actions]
+}
+
+// Fonction d'impersonation
+const impersonateUser = async (user: AdminUserWithConnection) => {
+  try {
+    const confirmMessage = t('admin.confirm_impersonate', {
+      name: `${user.prenom} ${user.nom}`,
+    })
+
+    if (confirm(confirmMessage)) {
+      const result = await $fetch(`/api/admin/users/${user.id}/impersonate`, {
+        method: 'POST',
+      })
+
+      // Mettre à jour le store d'authentification avec le nouvel utilisateur
+      const authStore = useAuthStore()
+      if (result.user) {
+        authStore.user = result.user
+      }
+
+      // Démarrer l'impersonation dans le store
+      const impersonationStore = useImpersonationStore()
+      if (result.impersonation?.originalUser) {
+        impersonationStore.startImpersonation(result.impersonation.originalUser, result.user)
+      }
+
+      // Afficher le toast de succès
+      useToast().add({
+        title: t('common.success'),
+        description: t('admin.impersonation_started', { pseudo: user.pseudo }),
+        color: 'success',
+      })
+
+      // Rafraîchir les données de session
+      await refreshNuxtData()
+
+      // Naviguer vers la page d'accueil
+      await navigateTo('/')
+    }
+  } catch (error: any) {
+    console.error("Erreur lors de l'impersonation:", error)
+
+    useToast().add({
+      title: t('common.error'),
+      description: error.data?.message || t('admin.impersonation_error'),
+      color: 'error',
+    })
+  }
 }
 
 // Fonctions d'action

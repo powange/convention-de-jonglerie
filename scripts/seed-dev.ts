@@ -816,7 +816,8 @@ async function main() {
             endDateTime.setHours(startHour + 3, 0, 0, 0) // Créneaux de 3 heures
 
             // Choisir une équipe aléatoire ou pas d'équipe (créneau général)
-            const team = Math.random() > 0.3 ? teams[Math.floor(Math.random() * teams.length)] : null
+            const team =
+              Math.random() > 0.3 ? teams[Math.floor(Math.random() * teams.length)] : null
 
             // Définir le titre du créneau
             const slotTitles = [
@@ -874,9 +875,14 @@ async function main() {
                   let isAvailable = true
 
                   // Vérifier si le bénévole a des préférences d'équipe
-                  if (team && candidate.teamPreferences && Array.isArray(candidate.teamPreferences)) {
+                  if (
+                    team &&
+                    candidate.teamPreferences &&
+                    Array.isArray(candidate.teamPreferences)
+                  ) {
                     // 70% de chance d'être assigné même si ce n'est pas l'équipe préférée
-                    isAvailable = candidate.teamPreferences.includes(team.name) || Math.random() > 0.3
+                    isAvailable =
+                      candidate.teamPreferences.includes(team.name) || Math.random() > 0.3
                   }
 
                   // Vérifier les disponibilités setup/teardown/event
@@ -887,7 +893,11 @@ async function main() {
                     isAvailable = false
                   } else if (isTeardownPeriod && candidate.teardownAvailability === false) {
                     isAvailable = false
-                  } else if (!isSetupPeriod && !isTeardownPeriod && candidate.eventAvailability === false) {
+                  } else if (
+                    !isSetupPeriod &&
+                    !isTeardownPeriod &&
+                    candidate.eventAvailability === false
+                  ) {
                     isAvailable = false
                   }
 

@@ -32,6 +32,7 @@
     "confirm_archive_convention": "¿Está seguro de que desea archivar esta convención?",
     "confirm_delete": "Confirmar eliminación",
     "confirm_demote_from_admin": "¿Está seguro de que desea degradar a este administrador?",
+    "confirm_impersonate": "¿Estás seguro de que quieres iniciar sesión como {name}?",
     "confirm_promote_to_admin": "¿Está seguro de que desea promover a este usuario a administrador?",
     "confirm_unarchive_convention": "¿Está seguro de que desea desarchivar esta convención?",
     "convention_archived": "Convención archivada con éxito",
@@ -143,6 +144,12 @@
     "filter_archived_conventions": "Convenciones archivadas",
     "filter_sort": "Filtrar y ordenar",
     "good_news": "¡Son buenas noticias!",
+    "impersonate_user": "Iniciar sesión como...",
+    "impersonating_as": "Conectado como {pseudo} ({email})",
+    "impersonation_error": "Error durante la suplantación",
+    "impersonation_mode": "MODO SUPLANTACIÓN",
+    "impersonation_started": "Conectado como {pseudo}",
+    "impersonation_stopped": "Regreso a tu cuenta de administrador",
     "import": {
       "description": "Importar convenciones y ediciones desde un archivo JSON",
       "documentation_intro": "El formato JSON permite importar una convención y su edición. Las convenciones creadas quedan huérfanas (sin creador) y pueden reclamarse a través del email de contacto.",
@@ -206,6 +213,7 @@
     "notification_management": "Gestión de Notificaciones",
     "notifications_sent": "Notificaciones enviadas",
     "oldest_first": "Más antiguos primero",
+    "original_user": "Usuario original",
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ ADVERTENCIA: ¿Está seguro de que desea eliminar permanentemente la convención \"{name}\"?\n\nEsta acción eliminará:\n- {editionsCount} edición/es\n- {collaboratorsCount} colaborador/es\n- Todos los datos asociados\n\n¡Esta acción es IRREVERSIBLE!",
@@ -235,6 +243,8 @@
     "select_deletion_reason": "Seleccione un motivo de eliminación",
     "show_online_users_only": "Mostrar solo usuarios en línea",
     "slots_processed": "Franjas procesadas",
+    "stop_impersonation": "Volver a mi cuenta",
+    "stop_impersonation_error": "Error al detener la suplantación",
     "success": "Éxito",
     "super_admin": "Super administrador",
     "super_administrators": "Super administradores",

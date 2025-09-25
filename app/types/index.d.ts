@@ -3,8 +3,8 @@ export interface User {
   email: string
   pseudo: string
   imageUrl?: string | null
-  prenom: string
-  nom?: string
+  prenom?: string | null
+  nom?: string | null
   telephone?: string | null
   phone?: string | null // compat ancien champ
   profilePicture?: string | null
@@ -17,8 +17,8 @@ export interface User {
 export interface PublicUser {
   id: number
   pseudo: string
-  nom: string
-  prenom: string
+  nom?: string | null
+  prenom?: string | null
   emailHash: string
   profilePicture?: string | null
   updatedAt?: string

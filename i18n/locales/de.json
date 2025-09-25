@@ -32,6 +32,7 @@
     "confirm_archive_convention": "Sind Sie sicher, dass Sie diese Konvention archivieren möchten?",
     "confirm_delete": "Löschung bestätigen",
     "confirm_demote_from_admin": "Sind Sie sicher, dass Sie diesen Administrator zurückstufen möchten?",
+    "confirm_impersonate": "Sind Sie sicher, dass Sie sich als {name} anmelden möchten?",
     "confirm_promote_to_admin": "Sind Sie sicher, dass Sie diesen Benutzer zum Administrator befördern möchten?",
     "confirm_unarchive_convention": "Sind Sie sicher, dass Sie diese Konvention dearchivieren möchten?",
     "convention_archived": "Konvention erfolgreich archiviert",
@@ -143,6 +144,12 @@
     "filter_archived_conventions": "Archivierte Conventions",
     "filter_sort": "Filtern und sortieren",
     "good_news": "Das sind gute Nachrichten!",
+    "impersonate_user": "Anmelden als...",
+    "impersonating_as": "Angemeldet als {pseudo} ({email})",
+    "impersonation_error": "Fehler bei der Personifikation",
+    "impersonation_mode": "PERSONIFIKATIONSMODUS",
+    "impersonation_started": "Angemeldet als {pseudo}",
+    "impersonation_stopped": "Zurück zu Ihrem Administratorkonto",
     "import": {
       "description": "Konventionen und Ausgaben aus einer JSON-Datei importieren",
       "documentation_intro": "Das JSON-Format ermöglicht es, eine Konvention und ihre Ausgabe zu importieren. Erstellte Konventionen sind verwaist (ohne Ersteller) und können über die Kontakt-E-Mail beansprucht werden.",
@@ -206,6 +213,7 @@
     "notification_management": "Benachrichtigungsverwaltung",
     "notifications_sent": "Benachrichtigungen gesendet",
     "oldest_first": "Älteste zuerst",
+    "original_user": "Ursprünglicher Benutzer",
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ ACHTUNG: Sind Sie sicher, dass Sie die Konvention \"{name}\" dauerhaft löschen möchten?\n\nDiese Aktion wird löschen:\n- {editionsCount} Ausgabe(n)\n- {collaboratorsCount} Mitarbeiter\n- Alle zugehörigen Daten\n\nDiese Aktion ist IRREVERSIBEL!",
@@ -235,6 +243,8 @@
     "select_deletion_reason": "Wählen Sie einen Löschungsgrund",
     "show_online_users_only": "Nur Online-Benutzer anzeigen",
     "slots_processed": "Verarbeitete Zeitfenster",
+    "stop_impersonation": "Zurück zu meinem Konto",
+    "stop_impersonation_error": "Fehler beim Stoppen der Personifikation",
     "success": "Erfolg",
     "super_admin": "Super-Admin",
     "super_administrators": "Super-Administratoren",

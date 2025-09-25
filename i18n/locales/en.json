@@ -32,6 +32,7 @@
     "confirm_archive_convention": "Are you sure you want to archive this convention?",
     "confirm_delete": "Confirm deletion",
     "confirm_demote_from_admin": "Are you sure you want to demote this administrator?",
+    "confirm_impersonate": "Are you sure you want to log in as {name}?",
     "confirm_promote_to_admin": "Are you sure you want to promote this user to administrator?",
     "confirm_unarchive_convention": "Are you sure you want to unarchive this convention?",
     "convention_archived": "Convention archived successfully",
@@ -143,6 +144,12 @@
     "filter_archived_conventions": "Archived conventions",
     "filter_sort": "Filter and sort",
     "good_news": "That's good news!",
+    "impersonate_user": "Log in as...",
+    "impersonating_as": "Logged in as {pseudo} ({email})",
+    "impersonation_error": "Error during impersonation",
+    "impersonation_mode": "IMPERSONATION MODE",
+    "impersonation_started": "Logged in as {pseudo}",
+    "impersonation_stopped": "Returned to your administrator account",
     "import": {
       "description": "Import conventions and editions from a JSON file",
       "documentation_intro": "The JSON format allows importing a convention and its edition. Created conventions are orphaned (without creator) and can be claimed via the contact email.",
@@ -206,6 +213,7 @@
     "notification_management": "Notification Management",
     "notifications_sent": "Notifications sent",
     "oldest_first": "Oldest first",
+    "original_user": "Original user",
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ WARNING: Are you sure you want to permanently delete the convention \"{name}\"?\n\nThis action will delete:\n- {editionsCount} edition(s)\n- {collaboratorsCount} collaborator(s)\n- All associated data\n\nThis action is IRREVERSIBLE!",
@@ -235,6 +243,8 @@
     "select_deletion_reason": "Choose a reason",
     "show_online_users_only": "Show online users only",
     "slots_processed": "Slots processed",
+    "stop_impersonation": "Return to my account",
+    "stop_impersonation_error": "Error stopping impersonation",
     "success": "Success",
     "super_admin": "Super Admin",
     "super_administrators": "Super administrators",

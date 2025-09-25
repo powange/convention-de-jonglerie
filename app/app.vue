@@ -6,6 +6,9 @@
     </div>
 
     <ClientOnly>
+      <!-- Bannière d'impersonation -->
+      <UiImpersonationBanner />
+
       <UCard>
         <template #header>
           <div class="flex justify-between items-center">
@@ -70,6 +73,11 @@
               <UDropdownMenu
                 v-if="authStore.isAuthenticated && authStore.user"
                 :items="userMenuItems"
+                :content="{
+                  align: 'end',
+                  side: 'bottom',
+                  sideOffset: 8
+                }"
               >
                 <UButton variant="ghost" color="neutral" class="rounded-full">
                   <div class="flex items-center gap-2">
@@ -92,16 +100,15 @@
               </UDropdownMenu>
 
               <!-- Bouton connexion unique pour utilisateurs non connectés -->
-              <div v-else class="flex items-center gap-2">
-                <NuxtLink
-                  :to="{ path: '/login', query: { returnTo: $route.fullPath } }"
-                  class="w-full sm:w-auto"
-                >
-                  <UButton icon="i-heroicons-key" size="sm" color="neutral" variant="ghost">
-                    {{ $t('navigation.login') }}
-                  </UButton>
-                </NuxtLink>
-              </div>
+              <UButton
+                v-else
+                :label="$t('navigation.login')"
+                icon="i-heroicons-key"
+                size="sm"
+                color="neutral"
+                variant="ghost"
+                @click="navigateToLogin"
+              />
             </div>
           </div>
 
@@ -251,6 +258,14 @@ const toggleAdminMode = (checked: boolean) => {
       color: 'neutral',
     })
   }
+}
+
+// Fonction pour naviguer vers la page de login
+const navigateToLogin = async () => {
+  // Récupérer le returnTo depuis la route courante
+  const returnTo = useRoute().fullPath
+  const loginUrl = `/login?returnTo=${encodeURIComponent(returnTo)}`
+  await navigateTo(loginUrl)
 }
 
 // Fonction pour changer de langue

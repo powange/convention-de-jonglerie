@@ -32,6 +32,7 @@
     "confirm_archive_convention": "Вы уверены, что хотите архивировать эту конвенцию?",
     "confirm_delete": "Подтвердить удаление",
     "confirm_demote_from_admin": "Вы уверены, что хотите понизить этого администратора?",
+    "confirm_impersonate": "Вы уверены, что хотите войти как {name}?",
     "confirm_promote_to_admin": "Вы уверены, что хотите повысить этого пользователя до администратора?",
     "confirm_unarchive_convention": "Вы уверены, что хотите разархивировать эту конвенцию?",
     "convention_archived": "Конвенция успешно архивирована",
@@ -143,6 +144,12 @@
     "filter_archived_conventions": "Архивированные конвенции",
     "filter_sort": "Фильтровать и сортировать",
     "good_news": "Это хорошие новости!",
+    "impersonate_user": "Войти как...",
+    "impersonating_as": "Вошел как {pseudo} ({email})",
+    "impersonation_error": "Ошибка при олицетворении",
+    "impersonation_mode": "РЕЖИМ ОЛИЦЕТВОРЕНИЯ",
+    "impersonation_started": "Вошел как {pseudo}",
+    "impersonation_stopped": "Возврат к вашей учетной записи администратора",
     "import": {
       "description": "Импорт конвенций и изданий из JSON-файла",
       "documentation_intro": "Формат JSON позволяет импортировать конвенцию и её издание. Созданные конвенции остаются сиротскими (без создателя) и могут быть востребованы через контактный email.",
@@ -206,6 +213,7 @@
     "notification_management": "Управление уведомлениями",
     "notifications_sent": "Уведомления отправлены",
     "oldest_first": "Старейшие сначала",
+    "original_user": "Исходный пользователь",
     "pages": {
       "conventions": {
         "confirm_delete_convention_permanently": "⚠️ ВНИМАНИЕ: Вы уверены, что хотите навсегда удалить конвенцию \"{name}\"?\n\nЭто действие удалит:\n- {editionsCount} издание/издания\n- {collaboratorsCount} сотрудника/сотрудников\n- Все связанные данные\n\nЭто действие НЕОБРАТИМО!",
@@ -235,6 +243,8 @@
     "select_deletion_reason": "Выберите причину удаления",
     "show_online_users_only": "Показать только пользователей онлайн",
     "slots_processed": "Обработанные слоты",
+    "stop_impersonation": "Вернуться к моей учетной записи",
+    "stop_impersonation_error": "Ошибка при остановке олицетворения",
     "success": "Успех",
     "super_admin": "Супер Администратор",
     "super_administrators": "Супер администраторы",
