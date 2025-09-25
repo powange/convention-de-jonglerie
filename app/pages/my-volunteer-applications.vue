@@ -54,17 +54,17 @@
       </div>
     </div>
 
-    <!-- Navigation par tabs -->
-    <div class="border-b border-gray-200 dark:border-gray-700">
-      <nav class="flex space-x-4 sm:space-x-8 overflow-x-auto pb-0 scrollbar-hide">
+    <!-- Navigation par tabs sticky -->
+    <div class="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 -mx-4 px-4 sm:-mx-6 sm:px-6">
+      <nav class="flex space-x-1 sm:space-x-4 overflow-x-auto pb-0 scrollbar-hide">
         <button
           v-for="tab in tabs"
           :key="tab.id"
           :class="[
-            'py-3 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap flex items-center gap-1 sm:gap-2 transition-colors min-w-0 flex-shrink-0',
+            'py-3 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap flex items-center gap-1 sm:gap-2 transition-all duration-200 min-w-0 flex-shrink-0 rounded-t-lg',
             activeTab === tab.id
-              ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300',
+              ? 'border-primary-500 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-800',
           ]"
           @click="activeTab = tab.id"
         >
@@ -75,7 +75,7 @@
             :color="tab.badgeColor"
             variant="soft"
             size="sm"
-            class="flex-shrink-0"
+            class="flex-shrink-0 ml-1"
           >
             {{ tab.count }}
           </UBadge>
@@ -109,8 +109,8 @@
       <div v-if="viewMode === 'detailed'" class="space-y-6">
         <UCard
           v-for="application in filteredApplications"
-          :key="application.id"
-          class="hover:shadow-lg transition-shadow"
+          :key="`application-${application.id}`"
+          class="hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out"
         >
           <template #header>
             <div class="flex items-start justify-between">
@@ -188,7 +188,7 @@
                   class="flex flex-wrap gap-1 justify-end"
                 >
                   <UBadge
-                    v-for="team in application.assignedTeams as string[]"
+                    v-for="team in application.assignedTeams"
                     :key="team"
                     color="info"
                     variant="solid"
@@ -309,7 +309,7 @@
               </h4>
               <div class="flex flex-wrap gap-2">
                 <UBadge
-                  v-for="timeSlot in application.timePreferences as string[]"
+                  v-for="timeSlot in application.timePreferences"
                   :key="timeSlot"
                   color="neutral"
                   variant="soft"
@@ -333,7 +333,7 @@
                 {{ $t('pages.volunteers.team_preferences') }}
               </h4>
               <div class="text-sm text-gray-600 dark:text-gray-400">
-                <span v-for="(team, index) in application.teamPreferences as string[]" :key="team">
+                <span v-for="(team, index) in application.teamPreferences" :key="team">
                   {{ team }}<span v-if="index < application.teamPreferences.length - 1">, </span>
                 </span>
               </div>
@@ -540,16 +540,18 @@
 
           <!-- Actions -->
           <template #footer>
-            <div class="flex justify-between items-center">
+            <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-0">
               <div class="flex flex-wrap gap-2">
                 <UButton
                   :to="`/editions/${application.edition.id}`"
                   size="sm"
                   color="primary"
-                  variant="outline"
+                  variant="solid"
                   icon="i-heroicons-eye"
+                  class="flex-1 sm:flex-none"
                 >
-                  {{ $t('pages.volunteers.view_edition') }}
+                  <span class="hidden sm:inline">{{ $t('pages.volunteers.view_edition') }}</span>
+                  <span class="sm:hidden">Voir</span>
                 </UButton>
 
                 <UButton
@@ -560,9 +562,11 @@
                   color="info"
                   variant="outline"
                   icon="i-heroicons-calendar-days"
+                  class="flex-1 sm:flex-none"
                   @click="showPlanning(application)"
                 >
-                  {{ $t('pages.volunteers.view_planning') }}
+                  <span class="hidden sm:inline">{{ $t('pages.volunteers.view_planning') }}</span>
+                  <span class="sm:hidden">Planning</span>
                 </UButton>
 
                 <UButton
@@ -571,22 +575,26 @@
                   color="success"
                   variant="outline"
                   icon="i-heroicons-chat-bubble-bottom-center-text"
+                  class="flex-1 sm:flex-none"
                   @click="contactOrganizer(application)"
                 >
-                  {{ $t('pages.volunteers.contact_organizer') }}
+                  <span class="hidden sm:inline">{{ $t('pages.volunteers.contact_organizer') }}</span>
+                  <span class="sm:hidden">Contact</span>
                 </UButton>
               </div>
 
-              <div class="flex gap-2">
+              <!-- Actions critiques séparées -->
+              <div v-if="application.status === 'PENDING'" class="flex gap-2 justify-end">
                 <UButton
-                  v-if="application.status === 'PENDING'"
                   size="sm"
                   color="error"
-                  variant="ghost"
+                  variant="soft"
                   icon="i-heroicons-trash"
+                  class="flex-1 sm:flex-none"
                   @click="withdrawApplication(application.id)"
                 >
-                  {{ $t('pages.volunteers.withdraw') }}
+                  <span class="hidden sm:inline">{{ $t('pages.volunteers.withdraw') }}</span>
+                  <span class="sm:hidden">Retirer</span>
                 </UButton>
               </div>
             </div>
@@ -597,10 +605,10 @@
       <!-- Vue compacte -->
       <div v-else class="space-y-3">
         <div
-          v-for="application in filteredApplications"
-          :key="application.id"
-          class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all touch-manipulation"
-        >
+              v-for="application in filteredApplications"
+              :key="application.id"
+              class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-primary-300 hover:-translate-y-0.5 transition-all duration-200 ease-out touch-manipulation"
+            >
           <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
             <!-- Image -->
             <div class="flex-shrink-0">
@@ -712,7 +720,7 @@
     </div>
 
     <!-- État vide -->
-    <div v-else-if="activeTab === 'all'" class="text-center py-12">
+    <div v-else class="text-center py-12">
       <UIcon name="i-heroicons-hand-raised" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
       <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
         {{ $t('pages.volunteers.no_applications') }}
@@ -723,17 +731,6 @@
       <UButton to="/" color="primary" icon="i-heroicons-magnifying-glass">
         {{ $t('pages.volunteers.browse_conventions') }}
       </UButton>
-    </div>
-
-    <!-- État vide pour les onglets spécifiques -->
-    <div v-else class="text-center py-12">
-      <UIcon name="i-heroicons-folder-open" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-        {{ getEmptyStateTitle() }}
-      </h3>
-      <p class="text-gray-600 dark:text-gray-400">
-        {{ getEmptyStateDescription() }}
-      </p>
     </div>
 
     <!-- Modal Planning -->
@@ -921,13 +918,14 @@ const {
   refresh,
 } = await useFetch('/api/user/volunteer-applications')
 
-// Applications enrichies avec les settings de bénévoles
+// Applications enrichies avec les settings de bénévoles et état d'affichage
 const applicationsWithSettings = computed((): ApplicationWithSettings[] => {
   if (!applications.value) return []
 
   return applications.value.map((app) => ({
     ...app,
     volunteersSettings: volunteersSettingsCache.value.get(app.edition.id) || null,
+    showDetails: false, // Masqué par défaut
   })) as ApplicationWithSettings[]
 })
 
@@ -1203,6 +1201,11 @@ const contactOrganizer = (_application: any) => {
   })
 }
 
+// Fonction pour basculer l'affichage des détails (non utilisée après simplification)
+// const toggleDetails = (application: any) => {
+//   application.showDetails = !application.showDetails
+// }
+
 // Fonction pour formater la durée d'un créneau
 const formatSlotDuration = (startDateTime: string, endDateTime: string) => {
   const start = new Date(startDateTime)
@@ -1231,32 +1234,98 @@ const getUniqueTeamsCount = (assignments: any[]) => {
   return teamIds.size
 }
 
-// États vides personnalisés
-const getEmptyStateTitle = () => {
-  switch (activeTab.value) {
-    case 'pending':
-      return t('pages.volunteers.no_pending_applications')
-    case 'accepted':
-      return t('pages.volunteers.no_accepted_applications')
-    case 'history':
-      return t('pages.volunteers.no_history')
-    default:
-      return t('pages.volunteers.no_applications')
-  }
-}
+// États vides personnalisés (non utilisés après simplification)
+// const getEmptyStateIcon = () => {
+//   switch (activeTab.value) {
+//     case 'pending':
+//       return 'i-heroicons-clock'
+//     case 'accepted':
+//       return 'i-heroicons-check-circle'
+//     case 'history':
+//       return 'i-heroicons-archive-box'
+//     default:
+//       return 'i-heroicons-folder-open'
+//   }
+// }
 
-const getEmptyStateDescription = () => {
-  switch (activeTab.value) {
-    case 'pending':
-      return t('pages.volunteers.no_pending_description')
-    case 'accepted':
-      return t('pages.volunteers.no_accepted_description')
-    case 'history':
-      return t('pages.volunteers.no_history_description')
-    default:
-      return t('pages.volunteers.no_applications_description')
-  }
-}
+// const getEmptyStateTitle = () => {
+//   switch (activeTab.value) {
+//     case 'pending':
+//       return t('pages.volunteers.no_pending_applications')
+//     case 'accepted':
+//       return t('pages.volunteers.no_accepted_applications')
+//     case 'history':
+//       return t('pages.volunteers.no_history')
+//     default:
+//       return t('pages.volunteers.no_applications')
+//   }
+// }
+
+// const getEmptyStateDescription = () => {
+//   switch (activeTab.value) {
+//     case 'pending':
+//       return t('pages.volunteers.no_pending_description')
+//     case 'accepted':
+//       return t('pages.volunteers.no_accepted_description')
+//     case 'history':
+//       return t('pages.volunteers.no_history_description')
+//     default:
+//       return t('pages.volunteers.no_applications_description')
+//   }
+// }
+
+// const getEmptyStateActions = () => {
+//   const actions = []
+
+//   switch (activeTab.value) {
+//     case 'pending':
+//       actions.push({
+//         label: t('pages.volunteers.browse_conventions'),
+//         to: '/',
+//         color: 'primary',
+//         variant: 'solid',
+//         icon: 'i-heroicons-magnifying-glass'
+//       })
+//       break
+//     case 'accepted':
+//       actions.push({
+//         label: t('pages.volunteers.browse_conventions'),
+//         to: '/',
+//         color: 'primary',
+//         variant: 'solid',
+//         icon: 'i-heroicons-magnifying-glass'
+//       })
+//       break
+//     case 'history':
+//       actions.push({
+//         label: t('pages.volunteers.browse_conventions'),
+//         to: '/',
+//         color: 'primary',
+//         variant: 'outline',
+//         icon: 'i-heroicons-magnifying-glass'
+//       })
+//       if (acceptedApplications.value.length > 0) {
+//         actions.unshift({
+//           label: t('common.accepted'),
+//           to: '#',
+//           color: 'success',
+//           variant: 'solid',
+//           icon: 'i-heroicons-check-circle'
+//         })
+//       }
+//       break
+//     default:
+//       actions.push({
+//         label: t('pages.volunteers.browse_conventions'),
+//         to: '/',
+//         color: 'primary',
+//         variant: 'solid',
+//         icon: 'i-heroicons-magnifying-glass'
+//       })
+//   }
+
+//   return actions
+// }
 
 // SEO
 useSeoMeta({
@@ -1264,3 +1333,71 @@ useSeoMeta({
   description: t('pages.volunteers.applications_description'),
 })
 </script>
+
+<style scoped>
+/* Animations et transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.4s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.3s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.list-leave-active {
+  position: absolute;
+  width: 100%;
+}
+
+/* Amélioration du scroll horizontal pour les tabs */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Animation pour les badges de statut */
+.status-badge {
+  transition: all 0.2s ease;
+}
+
+.status-badge:hover {
+  transform: scale(1.05);
+}
+
+/* Animation pour le collapse des détails */
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top;
+}
+
+.slide-down-enter-from,
+.slide-down-leave-to {
+  opacity: 0;
+  transform: scaleY(0.95) translateY(-10px);
+}
+
+.slide-down-enter-to,
+.slide-down-leave-from {
+  opacity: 1;
+  transform: scaleY(1) translateY(0);
+}
+</style>
