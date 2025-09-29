@@ -190,6 +190,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
         departureDateTime: '2024-06-05_evening',
         dietaryPreference: 'VEGETARIAN',
         allergies: 'Arachides, gluten',
+        allergySeverity: 'SEVERE',
         emergencyContactName: 'Marie Urgence',
         emergencyContactPhone: '+33987654321',
         timePreferences: ['morning', 'evening'],
@@ -230,6 +231,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
           departureDateTime: completeApplication.departureDateTime,
           dietaryPreference: 'VEGETARIAN',
           allergies: completeApplication.allergies,
+          allergySeverity: completeApplication.allergySeverity,
           emergencyContactName: completeApplication.emergencyContactName,
           emergencyContactPhone: completeApplication.emergencyContactPhone,
           timePreferences: completeApplication.timePreferences,
@@ -827,6 +829,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
         arrivalDateTime: tomorrow.toISOString(),
         departureDateTime: dayAfterTomorrow.toISOString(),
         allergies: 'Allergie aux arachides',
+        allergySeverity: 'SEVERE',
         // Pas de contact d'urgence
       }
 
@@ -851,6 +854,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
         arrivalDateTime: tomorrow.toISOString(),
         departureDateTime: dayAfterTomorrow.toISOString(),
         allergies: 'Allergie aux arachides',
+        allergySeverity: 'SEVERE',
         emergencyContactName: 'Contact Urgence',
         emergencyContactPhone: '+33123456789',
       }
@@ -870,6 +874,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
       expect(prismaMock.editionVolunteerApplication.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           allergies: 'Allergie aux arachides',
+          allergySeverity: 'SEVERE',
           emergencyContactName: 'Contact Urgence',
           emergencyContactPhone: '+33123456789',
         }),

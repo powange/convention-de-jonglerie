@@ -133,6 +133,19 @@
                 >{{ $t('pages.volunteers.allergies') }}:</span
               >
               <span class="ml-2">{{ application.allergies }}</span>
+              <UBadge
+                v-if="application.allergySeverity"
+                :color="getAllergySeverityColor(application.allergySeverity)"
+                variant="solid"
+                size="xs"
+                class="ml-2"
+              >
+                {{
+                  $t(
+                    `editions.volunteers.allergy_severity_${application.allergySeverity.toLowerCase()}_short`
+                  )
+                }}
+              </UBadge>
             </div>
           </div>
         </div>
@@ -141,7 +154,8 @@
         <div
           v-if="
             (application.volunteersSettings?.askEmergencyContact ||
-              (application.volunteersSettings?.askAllergies && application.allergies)) &&
+              (application.allergySeverity &&
+                ['SEVERE', 'CRITICAL'].includes(application.allergySeverity))) &&
             (application.emergencyContactName || application.emergencyContactPhone)
           "
         >
@@ -314,4 +328,19 @@ const isOpen = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value),
 })
+
+const getAllergySeverityColor = (severity: string) => {
+  switch (severity) {
+    case 'CRITICAL':
+      return 'error'
+    case 'SEVERE':
+      return 'warning'
+    case 'MODERATE':
+      return 'info'
+    case 'LIGHT':
+      return 'neutral'
+    default:
+      return 'neutral'
+  }
+}
 </script>

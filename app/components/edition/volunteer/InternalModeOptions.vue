@@ -80,174 +80,210 @@
       </UFormField>
     </div>
 
-    <!-- Switch demander participation au montage -->
-    <USwitch
-      v-model="askSetup"
-      :disabled="saving || !setupStartDate"
-      color="primary"
-      class="mb-2"
-      :label="
-        !setupStartDate
-          ? t('editions.volunteers.ask_setup_label') +
-            ' (définissez d\'abord la date de début du montage)'
-          : t('editions.volunteers.ask_setup_label')
-      "
-      size="lg"
-      @update:model-value="handleChange('askSetup', $event)"
-    />
+    <!-- Section: Présence et disponibilité -->
+    <div class="space-y-4 mt-6">
+      <h3
+        class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+      >
+        {{ t('editions.volunteers.config_presence_title') }}
+      </h3>
 
-    <!-- Switch demander participation au démontage -->
-    <USwitch
-      v-model="askTeardown"
-      :disabled="saving || !teardownEndDate"
-      color="primary"
-      class="mb-2"
-      :label="
-        !teardownEndDate
-          ? t('editions.volunteers.ask_teardown_label') +
-            ' (définissez d\'abord la date de fin du démontage)'
-          : t('editions.volunteers.ask_teardown_label')
-      "
-      size="lg"
-      @update:model-value="handleChange('askTeardown', $event)"
-    />
+      <!-- Switch demander participation au montage -->
+      <USwitch
+        v-model="askSetup"
+        :disabled="saving || !setupStartDate"
+        color="primary"
+        class="mb-2"
+        :label="
+          !setupStartDate
+            ? t('editions.volunteers.ask_setup_label') +
+              ' (définissez d\'abord la date de début du montage)'
+            : t('editions.volunteers.ask_setup_label')
+        "
+        size="lg"
+        @update:model-value="handleChange('askSetup', $event)"
+      />
 
-    <!-- Switch demander régime alimentaire (mode interne uniquement) -->
-    <USwitch
-      v-model="askDiet"
-      :disabled="saving"
-      color="primary"
-      class="mb-2"
-      :label="t('editions.volunteers.ask_diet_label')"
-      size="lg"
-      @update:model-value="handleChange('askDiet', $event)"
-    />
+      <!-- Switch demander participation au démontage -->
+      <USwitch
+        v-model="askTeardown"
+        :disabled="saving || !teardownEndDate"
+        color="primary"
+        class="mb-2"
+        :label="
+          !teardownEndDate
+            ? t('editions.volunteers.ask_teardown_label') +
+              ' (définissez d\'abord la date de fin du démontage)'
+            : t('editions.volunteers.ask_teardown_label')
+        "
+        size="lg"
+        @update:model-value="handleChange('askTeardown', $event)"
+      />
+    </div>
 
-    <!-- Switch demander allergies (mode interne uniquement) -->
-    <USwitch
-      v-model="askAllergies"
-      :disabled="saving"
-      color="primary"
-      class="mb-2"
-      :label="t('editions.volunteers.ask_allergies_label')"
-      size="lg"
-      @update:model-value="handleChange('askAllergies', $event)"
-    />
+    <!-- Section: Préférences de créneaux -->
+    <div class="space-y-4 mt-6">
+      <h3
+        class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+      >
+        {{ t('editions.volunteers.config_shifts_preferences_title') }}
+      </h3>
 
-    <!-- Switch demander animaux de compagnie (mode interne uniquement) -->
-    <USwitch
-      v-model="askPets"
-      :disabled="saving"
-      color="primary"
-      class="mb-2"
-      :label="t('editions.volunteers.ask_pets_label')"
-      size="lg"
-      @update:model-value="handleChange('askPets', $event)"
-    />
+      <!-- Switch demander préférences d'équipes (mode interne uniquement) -->
+      <USwitch
+        v-model="askTeamPreferences"
+        :disabled="saving || volunteerTeams.length === 0"
+        color="primary"
+        class="mb-2"
+        :label="
+          volunteerTeams.length === 0
+            ? t('editions.volunteers.ask_team_preferences_label') +
+              ' (définissez d\'abord des équipes)'
+            : t('editions.volunteers.ask_team_preferences_label')
+        "
+        size="lg"
+        @update:model-value="handleChange('askTeamPreferences', $event)"
+      />
 
-    <!-- Switch demander personnes mineures (mode interne uniquement) -->
-    <USwitch
-      v-model="askMinors"
-      :disabled="saving"
-      color="primary"
-      class="mb-2"
-      :label="t('editions.volunteers.ask_minors_label')"
-      size="lg"
-      @update:model-value="handleChange('askMinors', $event)"
-    />
+      <!-- Switch demander préférences horaires (mode interne uniquement) -->
+      <USwitch
+        v-model="askTimePreferences"
+        :disabled="saving"
+        color="primary"
+        class="mb-2"
+        :label="t('editions.volunteers.ask_time_preferences_label')"
+        size="lg"
+        @update:model-value="handleChange('askTimePreferences', $event)"
+      />
 
-    <!-- Switch demander véhicule (mode interne uniquement) -->
-    <USwitch
-      v-model="askVehicle"
-      :disabled="saving"
-      color="primary"
-      class="mb-2"
-      :label="t('editions.volunteers.ask_vehicle_label')"
-      size="lg"
-      @update:model-value="handleChange('askVehicle', $event)"
-    />
+      <!-- Switch demander compagnon (mode interne uniquement) -->
+      <USwitch
+        v-model="askCompanion"
+        :disabled="saving"
+        color="primary"
+        class="mb-2"
+        :label="t('editions.volunteers.ask_companion_label')"
+        size="lg"
+        @update:model-value="handleChange('askCompanion', $event)"
+      />
 
-    <!-- Switch demander compagnon (mode interne uniquement) -->
-    <USwitch
-      v-model="askCompanion"
-      :disabled="saving"
-      color="primary"
-      class="mb-2"
-      :label="t('editions.volunteers.ask_companion_label')"
-      size="lg"
-      @update:model-value="handleChange('askCompanion', $event)"
-    />
+      <!-- Switch demander liste à éviter (mode interne uniquement) -->
+      <USwitch
+        v-model="askAvoidList"
+        :disabled="saving"
+        color="primary"
+        class="mb-2"
+        :label="t('editions.volunteers.ask_avoid_list_label')"
+        size="lg"
+        @update:model-value="handleChange('askAvoidList', $event)"
+      />
+    </div>
 
-    <!-- Switch demander liste à éviter (mode interne uniquement) -->
-    <USwitch
-      v-model="askAvoidList"
-      :disabled="saving"
-      color="primary"
-      class="mb-2"
-      :label="t('editions.volunteers.ask_avoid_list_label')"
-      size="lg"
-      @update:model-value="handleChange('askAvoidList', $event)"
-    />
+    <!-- Section: Informations personnelles -->
+    <div class="space-y-4 mt-6">
+      <h3
+        class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+      >
+        {{ t('editions.volunteers.config_about_you_title') }}
+      </h3>
 
-    <!-- Switch demander compétences/certifications -->
-    <USwitch
-      v-model="askSkills"
-      :disabled="saving"
-      color="primary"
-      class="mb-2"
-      :label="t('editions.volunteers.ask_skills_label')"
-      size="lg"
-      @update:model-value="handleChange('askSkills', $event)"
-    />
+      <!-- Switch demander régime alimentaire (mode interne uniquement) -->
+      <USwitch
+        v-model="askDiet"
+        :disabled="saving"
+        color="primary"
+        class="mb-2"
+        :label="t('editions.volunteers.ask_diet_label')"
+        size="lg"
+        @update:model-value="handleChange('askDiet', $event)"
+      />
 
-    <!-- Switch demander expérience bénévolat -->
-    <USwitch
-      v-model="askExperience"
-      :disabled="saving"
-      color="primary"
-      class="mb-2"
-      :label="t('editions.volunteers.ask_experience_label')"
-      size="lg"
-      @update:model-value="handleChange('askExperience', $event)"
-    />
+      <!-- Switch demander allergies (mode interne uniquement) -->
+      <USwitch
+        v-model="askAllergies"
+        :disabled="saving"
+        color="primary"
+        class="mb-2"
+        :label="t('editions.volunteers.ask_allergies_label')"
+        size="lg"
+        @update:model-value="handleChange('askAllergies', $event)"
+      />
 
-    <!-- Switch demander préférences horaires (mode interne uniquement) -->
-    <USwitch
-      v-model="askTimePreferences"
-      :disabled="saving"
-      color="primary"
-      class="mb-2"
-      :label="t('editions.volunteers.ask_time_preferences_label')"
-      size="lg"
-      @update:model-value="handleChange('askTimePreferences', $event)"
-    />
+      <!-- Switch demander contact d'urgence -->
+      <USwitch
+        v-model="askEmergencyContact"
+        :disabled="saving"
+        color="primary"
+        class="mb-2"
+        :label="t('editions.volunteers.ask_emergency_contact_label')"
+        size="lg"
+        @update:model-value="handleChange('askEmergencyContact', $event)"
+      />
 
-    <!-- Switch demander préférences d'équipes (mode interne uniquement) -->
-    <USwitch
-      v-model="askTeamPreferences"
-      :disabled="saving || volunteerTeams.length === 0"
-      color="primary"
-      class="mb-2"
-      :label="
-        volunteerTeams.length === 0
-          ? t('editions.volunteers.ask_team_preferences_label') +
-            ' (définissez d\'abord des équipes)'
-          : t('editions.volunteers.ask_team_preferences_label')
-      "
-      size="lg"
-      @update:model-value="handleChange('askTeamPreferences', $event)"
-    />
+      <!-- Switch demander animaux de compagnie (mode interne uniquement) -->
+      <USwitch
+        v-model="askPets"
+        :disabled="saving"
+        color="primary"
+        class="mb-2"
+        :label="t('editions.volunteers.ask_pets_label')"
+        size="lg"
+        @update:model-value="handleChange('askPets', $event)"
+      />
 
-    <!-- Switch demander contact d'urgence -->
-    <USwitch
-      v-model="askEmergencyContact"
-      :disabled="saving"
-      color="primary"
-      class="mb-2"
-      :label="t('editions.volunteers.ask_emergency_contact_label')"
-      size="lg"
-      @update:model-value="handleChange('askEmergencyContact', $event)"
-    />
+      <!-- Switch demander personnes mineures (mode interne uniquement) -->
+      <USwitch
+        v-model="askMinors"
+        :disabled="saving"
+        color="primary"
+        class="mb-2"
+        :label="t('editions.volunteers.ask_minors_label')"
+        size="lg"
+        @update:model-value="handleChange('askMinors', $event)"
+      />
+    </div>
+
+    <!-- Section: Ce que vous pouvez apporter -->
+    <div class="space-y-4 mt-6">
+      <h3
+        class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+      >
+        {{ t('editions.volunteers.config_what_you_can_bring_title') }}
+      </h3>
+
+      <!-- Switch demander véhicule (mode interne uniquement) -->
+      <USwitch
+        v-model="askVehicle"
+        :disabled="saving"
+        color="primary"
+        class="mb-2"
+        :label="t('editions.volunteers.ask_vehicle_label')"
+        size="lg"
+        @update:model-value="handleChange('askVehicle', $event)"
+      />
+
+      <!-- Switch demander compétences/certifications -->
+      <USwitch
+        v-model="askSkills"
+        :disabled="saving"
+        color="primary"
+        class="mb-2"
+        :label="t('editions.volunteers.ask_skills_label')"
+        size="lg"
+        @update:model-value="handleChange('askSkills', $event)"
+      />
+
+      <!-- Switch demander expérience bénévolat -->
+      <USwitch
+        v-model="askExperience"
+        :disabled="saving"
+        color="primary"
+        class="mb-2"
+        :label="t('editions.volunteers.ask_experience_label')"
+        size="lg"
+        @update:model-value="handleChange('askExperience', $event)"
+      />
+    </div>
 
     <!-- Équipes de bénévoles (affichage lecture seule) -->
     <div class="mt-6 space-y-4">

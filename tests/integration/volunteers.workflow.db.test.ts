@@ -233,6 +233,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
         departureDateTime: departureDate.toISOString(),
         dietaryPreference: 'VEGETARIAN',
         allergies: 'Aucune',
+        allergySeverity: 'LIGHT',
         emergencyContactName: 'Jean Dupont',
         emergencyContactPhone: '+33123456789',
         timePreferences: ['morning', 'evening'],
@@ -745,7 +746,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
   })
 
   describe("Tests spécifiques pour le contact d'urgence", () => {
-    it("devrait rendre le contact d'urgence obligatoire si allergies renseignées", async () => {
+    it("devrait rendre le contact d'urgence obligatoire si niveau de sévérité SEVERE ou CRITICAL", async () => {
       const { prismaMock } = await import('../__mocks__/prisma')
 
       // Édition avec contact d'urgence non demandé mais allergies demandées
@@ -767,23 +768,24 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
       prismaMock.volunteerTeam.findMany.mockResolvedValue([])
 
-      // Candidature avec allergies mais sans contact d'urgence
-      const applicationWithAllergiesNoContact = {
-        motivation: 'Candidature avec allergies',
+      // Candidature avec allergies SEVERE mais sans contact d'urgence
+      const applicationWithSevereAllergiesNoContact = {
+        motivation: 'Candidature avec allergies sévères',
         setupAvailability: true,
         eventAvailability: true,
         arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
         allergies: 'Allergie aux arachides',
+        allergySeverity: 'SEVERE',
         // Pas de contact d'urgence fourni
       }
 
-      global.readBody.mockResolvedValue(applicationWithAllergiesNoContact)
+      global.readBody.mockResolvedValue(applicationWithSevereAllergiesNoContact)
       global.getRouterParam.mockReturnValue('1')
 
       const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
 
-      // Devrait échouer car contact d'urgence requis à cause des allergies
+      // Devrait échouer car contact d'urgence requis à cause du niveau SEVERE
       await expect(
         applyHandler.default({
           context: {
@@ -792,6 +794,169 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
           },
         } as any)
       ).rejects.toThrow(/contact d'urgence/i)
+    })
+
+    it('devrait exiger le niveau de sévérité si allergies renseignées', async () => {
+      const { prismaMock } = await import('../__mocks__/prisma')
+
+      // Édition avec allergies demandées
+      const editionWithAllergies = {
+        volunteersOpen: true,
+        volunteersAskDiet: true,
+        volunteersAskAllergies: true,
+        volunteersAskTimePreferences: true,
+        volunteersAskTeamPreferences: true,
+        volunteersAskPets: true,
+        volunteersAskMinors: true,
+        volunteersAskVehicle: true,
+        volunteersAskEmergencyContact: false,
+      }
+
+      prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergies)
+      prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
+      prismaMock.user.findUnique.mockResolvedValue(mockUser)
+      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
+
+      // Candidature avec allergies mais sans niveau de sévérité
+      const applicationWithAllergiesNoSeverity = {
+        motivation: 'Candidature avec allergies',
+        setupAvailability: true,
+        eventAvailability: true,
+        arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+        allergies: 'Allergie aux arachides',
+        // Pas de allergySeverity fourni
+        emergencyContactName: 'Marie Dupont',
+        emergencyContactPhone: '+33987654321',
+      }
+
+      global.readBody.mockResolvedValue(applicationWithAllergiesNoSeverity)
+      global.getRouterParam.mockReturnValue('1')
+
+      const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
+
+      // Devrait échouer car niveau de sévérité requis pour les allergies
+      await expect(
+        applyHandler.default({
+          context: {
+            user: mockUser,
+            params: { id: '1' },
+          },
+        } as any)
+      ).rejects.toThrow(/sévérité/i)
+    })
+
+    it("devrait exiger un contact d'urgence pour les allergies SEVERE ou CRITICAL", async () => {
+      const { prismaMock } = await import('../__mocks__/prisma')
+
+      const editionBasic = {
+        volunteersOpen: true,
+        volunteersAskDiet: true,
+        volunteersAskAllergies: true,
+        volunteersAskTimePreferences: false,
+        volunteersAskTeamPreferences: false,
+        volunteersAskPets: false,
+        volunteersAskMinors: false,
+        volunteersAskVehicle: false,
+        volunteersAskEmergencyContact: false, // Contact d'urgence NON demandé
+      }
+
+      prismaMock.edition.findUnique.mockResolvedValue(editionBasic)
+      prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
+      prismaMock.user.findUnique.mockResolvedValue(mockUser)
+      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
+
+      // Candidature avec allergies CRITICAL mais sans contact d'urgence
+      const applicationCriticalNoContact = {
+        motivation: 'Candidature avec allergies critiques',
+        setupAvailability: true,
+        eventAvailability: true,
+        arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+        allergies: 'Allergie sévère aux arachides',
+        allergySeverity: 'CRITICAL',
+        // Pas de contact d'urgence fourni
+      }
+
+      global.readBody.mockResolvedValue(applicationCriticalNoContact)
+      global.getRouterParam.mockReturnValue('1')
+
+      const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
+
+      // Devrait échouer car contact d'urgence requis pour allergies CRITICAL
+      await expect(
+        applyHandler.default({
+          context: {
+            user: mockUser,
+            params: { id: '1' },
+          },
+        } as any)
+      ).rejects.toThrow(/contact d'urgence/i)
+    })
+
+    it("devrait accepter la candidature avec allergies LIGHT/MODERATE sans contact d'urgence", async () => {
+      const { prismaMock } = await import('../__mocks__/prisma')
+
+      const editionWithAllergies = {
+        volunteersOpen: true,
+        volunteersAskDiet: true,
+        volunteersAskAllergies: true,
+        volunteersAskTimePreferences: false,
+        volunteersAskTeamPreferences: false,
+        volunteersAskPets: false,
+        volunteersAskMinors: false,
+        volunteersAskVehicle: false,
+        volunteersAskEmergencyContact: false,
+      }
+
+      prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergies)
+      prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
+      prismaMock.user.findUnique.mockResolvedValue(mockUser)
+      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
+
+      // Candidature avec allergies LIGHT, pas de contact d'urgence requis
+      const applicationWithLightAllergies = {
+        motivation: 'Candidature avec allergies légères',
+        setupAvailability: true,
+        eventAvailability: true,
+        arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+        allergies: 'Allergie légère au pollen',
+        allergySeverity: 'LIGHT',
+        // Pas de contact d'urgence fourni - et c'est OK pour LIGHT
+      }
+
+      const createdApplication = {
+        id: 1,
+        editionId: 1,
+        userId: mockUser.id,
+        status: 'PENDING',
+        ...applicationWithLightAllergies,
+        edition: {
+          id: 1,
+          name: 'Test Edition',
+          conventionId: 1,
+          convention: { name: 'Test Convention' },
+        },
+      }
+
+      prismaMock.editionVolunteerApplication.create.mockResolvedValue(createdApplication)
+      prismaMock.notification.create.mockResolvedValue({})
+      global.readBody.mockResolvedValue(applicationWithLightAllergies)
+      global.getRouterParam.mockReturnValue('1')
+
+      const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
+
+      // Devrait réussir car contact d'urgence pas requis pour LIGHT
+      const result = await applyHandler.default({
+        context: {
+          user: mockUser,
+          params: { id: '1' },
+        },
+      } as any)
+
+      expect(result.success).toBe(true)
+      expect(result.application).toBeDefined()
     })
 
     it("devrait accepter la candidature avec contact d'urgence si allergies renseignées", async () => {
@@ -824,6 +989,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
         arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
         allergies: 'Allergie aux arachides',
+        allergySeverity: 'MODERATE',
         emergencyContactName: 'Marie Dupont',
         emergencyContactPhone: '+33987654321',
       }

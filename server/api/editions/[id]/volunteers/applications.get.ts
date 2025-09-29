@@ -183,6 +183,7 @@ export default defineEventHandler(async (event) => {
       userId: true,
       dietaryPreference: true,
       allergies: true,
+      allergySeverity: true,
       emergencyContactName: true,
       emergencyContactPhone: true,
       timePreferences: true,

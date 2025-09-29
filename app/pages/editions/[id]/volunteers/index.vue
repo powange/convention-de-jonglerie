@@ -374,6 +374,12 @@ const applyAsVolunteer = async (formData?: any) => {
           volunteersInfo.value?.askAllergies && formData?.allergies?.trim()
             ? formData.allergies.trim()
             : undefined,
+        allergySeverity:
+          volunteersInfo.value?.askAllergies &&
+          formData?.allergies?.trim() &&
+          formData?.allergySeverity
+            ? formData.allergySeverity
+            : undefined,
         timePreferences:
           volunteersInfo.value?.askTimePreferences && formData?.timePreferences?.length > 0
             ? formData.timePreferences
@@ -384,13 +390,15 @@ const applyAsVolunteer = async (formData?: any) => {
             : undefined,
         emergencyContactName:
           (volunteersInfo.value?.askEmergencyContact ||
-            (volunteersInfo.value?.askAllergies && formData?.allergies?.trim())) &&
+            (formData?.allergySeverity &&
+              ['SEVERE', 'CRITICAL'].includes(formData.allergySeverity))) &&
           formData?.emergencyContactName?.trim()
             ? formData.emergencyContactName.trim()
             : undefined,
         emergencyContactPhone:
           (volunteersInfo.value?.askEmergencyContact ||
-            (volunteersInfo.value?.askAllergies && formData?.allergies?.trim())) &&
+            (formData?.allergySeverity &&
+              ['SEVERE', 'CRITICAL'].includes(formData.allergySeverity))) &&
           formData?.emergencyContactPhone?.trim()
             ? formData.emergencyContactPhone.trim()
             : undefined,

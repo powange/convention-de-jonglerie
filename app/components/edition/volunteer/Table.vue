@@ -536,6 +536,7 @@ const tableData = computed(() =>
     nom: app.user.nom,
     dietaryPreference: (app as any).dietaryPreference,
     allergies: (app as any).allergies,
+    allergySeverity: (app as any).allergySeverity,
     emergencyContactName: (app as any).emergencyContactName,
     emergencyContactPhone: (app as any).emergencyContactPhone,
     hasPets: (app as any).hasPets,
@@ -1256,16 +1257,43 @@ const columns = computed((): TableColumn<any>[] => [
           accessorKey: 'allergies',
           header: ({ column }: any) =>
             getSortableHeader(column, t('editions.volunteers.table_allergies')),
-          cell: ({ row }: any) =>
-            row.original.allergies
-              ? h('span', { class: 'text-xs truncate block max-w-[160px]' }, row.original.allergies)
-              : '—',
+          cell: ({ row }: any) => {
+            if (!row.original.allergies) return '—'
+
+            const severityBadge = row.original.allergySeverity
+              ? h(
+                  'span',
+                  {
+                    class: [
+                      'inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ml-1',
+                      row.original.allergySeverity === 'CRITICAL'
+                        ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                        : row.original.allergySeverity === 'SEVERE'
+                          ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
+                          : row.original.allergySeverity === 'MODERATE'
+                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+                    ],
+                  },
+                  t(
+                    `editions.volunteers.allergy_severity_${row.original.allergySeverity.toLowerCase()}_short`
+                  )
+                )
+              : null
+
+            return h('div', { class: 'flex items-center gap-1' }, [
+              h('span', { class: 'text-xs truncate block max-w-[120px]' }, row.original.allergies),
+              severityBadge,
+            ])
+          },
         } as TableColumn<any>,
       ]
     : []),
-  // Colonne contact d'urgence si activée ou si allergies renseignées
+  // Colonne contact d'urgence si activée ou si allergies SEVERE/CRITICAL présentes
   ...(props.volunteersInfo?.askEmergencyContact ||
-  (props.volunteersInfo?.askAllergies && tableData.value.some((row: any) => row.allergies?.trim()))
+  tableData.value.some(
+    (row: any) => row.allergySeverity && ['SEVERE', 'CRITICAL'].includes(row.allergySeverity)
+  )
     ? [
         {
           accessorKey: 'emergencyContact',

@@ -254,9 +254,39 @@
                 :placeholder="t('editions.volunteers.allergies_placeholder')"
                 class="w-full"
                 :maxlength="300"
+                @change="handleAllergiesChange"
               />
             </UFormField>
             <p class="text-[11px] text-gray-500">{{ t('editions.volunteers.allergies_hint') }}</p>
+
+            <!-- Sévérité des allergies -->
+            <div v-if="formData.allergies?.trim()" class="mt-3">
+              <UFormField
+                :label="t('editions.volunteers.allergy_severity_label')"
+                :required="true"
+                :error="allergySeverityError"
+              >
+                <USelect
+                  v-model="formData.allergySeverity"
+                  :options="allergySeverityOptions"
+                  option-attribute="label"
+                  value-attribute="value"
+                  :placeholder="t('editions.volunteers.allergy_severity_placeholder')"
+                  class="w-full"
+                />
+              </UFormField>
+              <p
+                v-if="formData.allergySeverity"
+                class="text-[11px] mt-1"
+                :class="allergySeverityDescriptionClass"
+              >
+                {{
+                  t(
+                    `editions.volunteers.allergy_severity_${formData.allergySeverity?.toLowerCase()}_description`
+                  )
+                }}
+              </p>
+            </div>
           </div>
 
           <!-- Contact d'urgence -->
@@ -264,7 +294,11 @@
             <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
               {{ t('editions.volunteers.emergency_contact_title') }}
               <span
-                v-if="!volunteersInfo?.askEmergencyContact && formData.allergies?.trim()"
+                v-if="
+                  !volunteersInfo?.askEmergencyContact &&
+                  formData.allergySeverity &&
+                  ['SEVERE', 'CRITICAL'].includes(formData.allergySeverity)
+                "
                 class="text-orange-600 dark:text-orange-400 text-xs font-normal"
               >
                 ({{ t('editions.volunteers.emergency_contact_required_for_allergies') }})
@@ -581,6 +615,7 @@ const formData = ref({
   avoidList: '',
   dietPreference: 'NONE' as 'NONE' | 'VEGETARIAN' | 'VEGAN',
   allergies: '',
+  allergySeverity: undefined as 'LIGHT' | 'MODERATE' | 'SEVERE' | 'CRITICAL' | undefined,
   emergencyContactName: '',
   emergencyContactPhone: '',
   hasPets: false,
@@ -652,6 +687,36 @@ const availabilityError = computed(() => {
   return undefined
 })
 
+const allergySeverityError = computed(() => {
+  if (!showAllErrors.value && !touchedFields.value.has('allergySeverity')) return undefined
+  if (formData.value.allergies?.trim() && !formData.value.allergySeverity) {
+    return t('validation.allergy_severity_required')
+  }
+  return undefined
+})
+
+const allergySeverityOptions = computed(() => [
+  { value: 'LIGHT', label: t('editions.volunteers.allergy_severity_light') },
+  { value: 'MODERATE', label: t('editions.volunteers.allergy_severity_moderate') },
+  { value: 'SEVERE', label: t('editions.volunteers.allergy_severity_severe') },
+  { value: 'CRITICAL', label: t('editions.volunteers.allergy_severity_critical') },
+])
+
+const allergySeverityDescriptionClass = computed(() => {
+  switch (formData.value.allergySeverity) {
+    case 'CRITICAL':
+      return 'text-red-600 dark:text-red-400'
+    case 'SEVERE':
+      return 'text-orange-600 dark:text-orange-400'
+    case 'MODERATE':
+      return 'text-yellow-600 dark:text-yellow-400'
+    case 'LIGHT':
+      return 'text-gray-600 dark:text-gray-400'
+    default:
+      return 'text-gray-500'
+  }
+})
+
 const arrivalDateError = computed(() => {
   if (!showAllErrors.value && !touchedFields.value.has('arrivalDateTime')) return undefined
   if (
@@ -700,6 +765,7 @@ const validationErrors = computed(() => {
     phoneError.value,
     firstNameError.value,
     lastNameError.value,
+    allergySeverityError.value,
     emergencyContactNameError.value,
     emergencyContactPhoneError.value,
     motivationError.value,
@@ -726,8 +792,12 @@ const shouldAskEmergencyContact = computed(() => {
   // Demandé explicitement par l'organisateur
   if (props.volunteersInfo?.askEmergencyContact) return true
 
-  // Ou si allergies demandées ET renseignées
-  if (props.volunteersInfo?.askAllergies && formData.value.allergies?.trim()) return true
+  // Ou si niveau de sévérité est SEVERE ou CRITICAL
+  if (
+    formData.value.allergySeverity &&
+    ['SEVERE', 'CRITICAL'].includes(formData.value.allergySeverity)
+  )
+    return true
 
   return false
 })
@@ -869,6 +939,17 @@ const dietPreferenceItems = computed<{ value: 'NONE' | 'VEGETARIAN' | 'VEGAN'; l
 )
 
 // Methods
+const handleAllergiesChange = () => {
+  // Si on efface les allergies, on réinitialise le niveau de sévérité
+  if (!formData.value.allergies?.trim()) {
+    formData.value.allergySeverity = undefined
+  }
+  // Marquer le champ allergySeverity comme touché si on ajoute des allergies
+  if (formData.value.allergies?.trim()) {
+    markFieldTouched('allergySeverity')
+  }
+}
+
 const handleSubmit = () => {
   // Activer l'affichage de toutes les erreurs lors de la soumission
   showAllErrors.value = true
@@ -924,6 +1005,7 @@ watch(
         avoidList: '',
         dietPreference: 'NONE' as 'NONE' | 'VEGETARIAN' | 'VEGAN',
         allergies: '',
+        allergySeverity: undefined,
         emergencyContactName: '',
         emergencyContactPhone: '',
         hasPets: false,

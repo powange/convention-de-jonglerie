@@ -411,6 +411,7 @@ model EditionVolunteerApplication {
   status               VolunteerStatus   @default(PENDING)
   motivation           String?           @db.Text
   allergies            String?           @db.Text
+  allergySeverity      AllergySeverity?
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
   decidedAt            DateTime?
@@ -487,6 +488,13 @@ enum DietaryPreference {
   NONE
   VEGETARIAN
   VEGAN
+}
+
+enum AllergySeverity {
+  LIGHT
+  MODERATE
+  SEVERE
+  CRITICAL
 }
 
 enum BookingStatus {

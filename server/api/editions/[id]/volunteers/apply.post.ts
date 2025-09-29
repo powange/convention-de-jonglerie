@@ -27,6 +27,7 @@ const bodySchema = z.object({
   prenom: z.string().min(1, 'Prénom requis').max(100, 'Prénom trop long').optional(),
   dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).optional(),
   allergies: z.string().max(500).optional().nullable(),
+  allergySeverity: z.enum(['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']).optional().nullable(),
   timePreferences: z
     .array(
       z.enum(VALID_TIME_SLOTS, {
@@ -113,13 +114,18 @@ export default defineEventHandler(async (event) => {
     // Déterminer si le contact d'urgence est requis
     const shouldRequireEmergencyContact =
       edition.volunteersAskEmergencyContact ||
-      (edition.volunteersAskAllergies && parsed.allergies?.trim())
+      (parsed.allergySeverity && ['SEVERE', 'CRITICAL'].includes(parsed.allergySeverity))
 
     // Validations cumulées
     const missing: string[] = []
     if (!user.phone && !parsed.phone) missing.push('Téléphone')
     if (!user.nom && !parsed.nom) missing.push('Nom')
     if (!user.prenom && !parsed.prenom) missing.push('Prénom')
+
+    // Validation: si allergies renseignées, le niveau de sévérité est requis
+    if (edition.volunteersAskAllergies && parsed.allergies?.trim() && !parsed.allergySeverity) {
+      missing.push('Niveau de sévérité des allergies')
+    }
 
     // Validation contact d'urgence si demandé explicitement ou si allergies renseignées
     if (shouldRequireEmergencyContact) {
@@ -210,6 +216,10 @@ export default defineEventHandler(async (event) => {
           edition.volunteersAskAllergies && parsed.allergies?.trim()
             ? parsed.allergies.trim()
             : null,
+        allergySeverity:
+          edition.volunteersAskAllergies && parsed.allergies?.trim() && parsed.allergySeverity
+            ? parsed.allergySeverity
+            : null,
         timePreferences:
           edition.volunteersAskTimePreferences && parsed.timePreferences?.length
             ? parsed.timePreferences
@@ -280,6 +290,7 @@ export default defineEventHandler(async (event) => {
         status: true,
         dietaryPreference: true,
         allergies: true,
+        allergySeverity: true,
         timePreferences: true,
         teamPreferences: true,
         hasPets: true,

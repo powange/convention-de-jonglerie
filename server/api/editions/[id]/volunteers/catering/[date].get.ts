@@ -47,6 +47,7 @@ export default defineEventHandler(async (event) => {
       teardownAvailability: true,
       dietaryPreference: true,
       allergies: true,
+      allergySeverity: true,
       user: {
         select: {
           prenom: true,
