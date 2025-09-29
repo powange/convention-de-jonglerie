@@ -749,10 +749,17 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       const { prismaMock } = await import('../__mocks__/prisma')
 
       // Édition avec contact d'urgence non demandé mais allergies demandées
+      // Doit correspondre au select de l'API apply.post.ts
       const editionWithAllergies = {
-        ...mockEdition,
-        volunteersAskEmergencyContact: false,
+        volunteersOpen: true,
+        volunteersAskDiet: true,
         volunteersAskAllergies: true,
+        volunteersAskTimePreferences: true,
+        volunteersAskTeamPreferences: true,
+        volunteersAskPets: true,
+        volunteersAskMinors: true,
+        volunteersAskVehicle: true,
+        volunteersAskEmergencyContact: false,
       }
 
       prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergies)
@@ -790,10 +797,17 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       const { prismaMock } = await import('../__mocks__/prisma')
 
       // Édition avec contact d'urgence non demandé mais allergies demandées
+      // Doit correspondre au select de l'API apply.post.ts
       const editionWithAllergies = {
-        ...mockEdition,
-        volunteersAskEmergencyContact: false,
+        volunteersOpen: true,
+        volunteersAskDiet: true,
         volunteersAskAllergies: true,
+        volunteersAskTimePreferences: true,
+        volunteersAskTeamPreferences: true,
+        volunteersAskPets: true,
+        volunteersAskMinors: true,
+        volunteersAskVehicle: true,
+        volunteersAskEmergencyContact: false,
       }
 
       prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergies)
@@ -850,10 +864,17 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       const { prismaMock } = await import('../__mocks__/prisma')
 
       // Édition avec contact d'urgence non demandé et allergies demandées
+      // Doit correspondre au select de l'API apply.post.ts
       const editionWithAllergies = {
-        ...mockEdition,
-        volunteersAskEmergencyContact: false,
+        volunteersOpen: true,
+        volunteersAskDiet: true,
         volunteersAskAllergies: true,
+        volunteersAskTimePreferences: true,
+        volunteersAskTeamPreferences: true,
+        volunteersAskPets: true,
+        volunteersAskMinors: true,
+        volunteersAskVehicle: true,
+        volunteersAskEmergencyContact: false,
       }
 
       prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergies)
