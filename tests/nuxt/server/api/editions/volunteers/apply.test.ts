@@ -20,7 +20,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
     volunteersOpen: true,
     volunteersAskDiet: true,
     volunteersAskAllergies: true,
-    volunteersAskEmergencyContact: true,
+    volunteersAskEmergencyContact: false,
     volunteersAskTimePreferences: true,
     volunteersAskTeamPreferences: true,
     volunteersAskPets: true,

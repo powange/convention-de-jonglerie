@@ -110,6 +110,11 @@ export default defineEventHandler(async (event) => {
     })
     if (!user) throw createError({ statusCode: 401, message: 'Non authentifié' })
 
+    // Déterminer si le contact d'urgence est requis
+    const shouldRequireEmergencyContact =
+      (edition as any).volunteersAskEmergencyContact ||
+      (edition.volunteersAskAllergies && parsed.allergies?.trim())
+
     // Validations cumulées
     const missing: string[] = []
     if (!user.phone && !parsed.phone) missing.push('Téléphone')
@@ -130,11 +135,6 @@ export default defineEventHandler(async (event) => {
     }
 
     const finalPhone = user.phone || parsed.phone!
-
-    // Déterminer si le contact d'urgence est requis
-    const shouldRequireEmergencyContact =
-      (edition as any).volunteersAskEmergencyContact ||
-      (edition.volunteersAskAllergies && parsed.allergies?.trim())
 
     // Validation des disponibilités (au moins une requise)
     const hasAvailability =

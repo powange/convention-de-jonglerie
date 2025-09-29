@@ -81,7 +81,9 @@
       "WebFetch(domain:unhead.unjs.io)",
       "WebFetch(domain:ogp.me)",
       "Bash(NODE_ENV=test npx vitest run tests/nuxt/server/api/profile/stats.get.test.ts --config vitest.config.nuxt.ts)",
-      "Bash(NODE_ENV=test npx vitest --config vitest.config.nuxt.ts run tests/nuxt/server/api/editions/\\[id\\].get.test.ts)"
+      "Bash(NODE_ENV=test npx vitest --config vitest.config.nuxt.ts run tests/nuxt/server/api/editions/\\[id\\].get.test.ts)",
+      "Bash(NODE_ENV=test npx vitest run tests/nuxt/server/api/editions/volunteers/apply.test.ts --config vitest.config.nuxt.ts)",
+      "Bash(NODE_ENV=test npx vitest run tests/nuxt/server/api/editions/volunteers/settings.test.ts --config vitest.config.nuxt.ts)"
     ],
     "deny": [],
     "ask": [],
