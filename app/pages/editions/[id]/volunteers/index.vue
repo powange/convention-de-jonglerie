@@ -79,6 +79,16 @@
                 <UButton
                   v-if="volunteersInfo.myApplication.status === 'PENDING'"
                   size="xs"
+                  color="primary"
+                  variant="soft"
+                  icon="i-heroicons-pencil"
+                  @click="openEditApplicationModal"
+                >
+                  {{ t('editions.volunteers.edit_application') }}
+                </UButton>
+                <UButton
+                  v-if="volunteersInfo.myApplication.status === 'PENDING'"
+                  size="xs"
                   color="error"
                   variant="soft"
                   :loading="volunteersWithdrawing"
@@ -204,6 +214,19 @@
       @close="closeApplyModal"
       @submit="applyAsVolunteer"
     />
+
+    <!-- Modal édition de candidature -->
+    <EditionVolunteerApplicationModal
+      v-model="showEditApplicationModal"
+      :volunteers-info="volunteersInfo"
+      :edition="edition"
+      :user="authStore.user"
+      :applying="false"
+      :is-editing="true"
+      :existing-application="volunteersInfo?.myApplication"
+      @close="closeEditApplicationModal"
+      @update="updateVolunteerApplication"
+    />
   </div>
   <div v-else>
     <p>{{ t('editions.loading_details') }}</p>
@@ -212,13 +235,14 @@
 
 <script setup lang="ts">
 // Vue & libs
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 
 // App components & stores
 import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { requiresEmergencyContact } from '~/utils/allergy-severity'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { markdownToHtml } from '~/utils/markdown'
 
@@ -326,6 +350,7 @@ const volunteersApplying = ref(false)
 const volunteersWithdrawing = ref(false)
 // Suppression édition publique : editingVolunteers retiré
 const showApplyModal = ref(false)
+const showEditApplicationModal = ref(false)
 
 // Modal candidature helpers
 // Variables du formulaire déplacées dans EditionVolunteerApplicationModal
@@ -390,15 +415,13 @@ const applyAsVolunteer = async (formData?: any) => {
             : undefined,
         emergencyContactName:
           (volunteersInfo.value?.askEmergencyContact ||
-            (formData?.allergySeverity &&
-              ['SEVERE', 'CRITICAL'].includes(formData.allergySeverity))) &&
+            (formData?.allergySeverity && requiresEmergencyContact(formData.allergySeverity))) &&
           formData?.emergencyContactName?.trim()
             ? formData.emergencyContactName.trim()
             : undefined,
         emergencyContactPhone:
           (volunteersInfo.value?.askEmergencyContact ||
-            (formData?.allergySeverity &&
-              ['SEVERE', 'CRITICAL'].includes(formData.allergySeverity))) &&
+            (formData?.allergySeverity && requiresEmergencyContact(formData.allergySeverity))) &&
           formData?.emergencyContactPhone?.trim()
             ? formData.emergencyContactPhone.trim()
             : undefined,
@@ -459,6 +482,12 @@ const applyAsVolunteer = async (formData?: any) => {
     if (!(authStore.user as any)?.nom && formData?.lastName?.trim())
       (authStore.user as any).nom = formData.lastName.trim()
 
+    // Rafraîchir les données pour mettre à jour l'affichage de la page
+    await fetchVolunteersInfo()
+
+    // Attendre que le DOM soit mis à jour
+    await nextTick()
+
     showApplyModal.value = false
   } catch (e: any) {
     toast.add({ title: e?.message || t('common.error'), color: 'error' })
@@ -471,6 +500,12 @@ const withdrawApplication = async () => {
   try {
     await $fetch(`/api/editions/${editionId}/volunteers/apply`, { method: 'DELETE' } as any)
     if (volunteersInfo.value) volunteersInfo.value.myApplication = null
+
+    // Rafraîchir les données pour mettre à jour l'affichage de la page
+    await fetchVolunteersInfo()
+
+    // Attendre que le DOM soit mis à jour
+    await nextTick()
   } catch (e: any) {
     toast.add({ title: e?.message || t('common.error'), color: 'error' })
   } finally {
@@ -484,5 +519,72 @@ const openApplyModal = () => {
 }
 const closeApplyModal = () => {
   showApplyModal.value = false
+}
+
+// Gestion ouverture / fermeture modal édition de candidature
+const openEditApplicationModal = () => {
+  showEditApplicationModal.value = true
+}
+const closeEditApplicationModal = () => {
+  showEditApplicationModal.value = false
+}
+
+// Fonction pour mettre à jour une candidature existante
+const updateVolunteerApplication = async (data: any) => {
+  try {
+    // Appeler l'API pour sauvegarder les modifications
+    await $fetch(`/api/editions/${editionId}/volunteers/applications/${data.applicationId}`, {
+      method: 'PATCH',
+      body: {
+        teamPreferences: data.teamPreferences,
+        dietaryPreference: data.dietaryPreference,
+        allergies: data.allergies,
+        allergySeverity: data.allergySeverity,
+        setupAvailability: data.setupAvailability,
+        eventAvailability: data.eventAvailability,
+        teardownAvailability: data.teardownAvailability,
+        arrivalDateTime: data.arrivalDateTime,
+        departureDateTime: data.departureDateTime,
+        timePreferences: data.timePreferences,
+        emergencyContactName: data.emergencyContactName,
+        emergencyContactPhone: data.emergencyContactPhone,
+        hasPets: data.hasPets,
+        petsDetails: data.petsDetails,
+        hasMinors: data.hasMinors,
+        minorsDetails: data.minorsDetails,
+        hasVehicle: data.hasVehicle,
+        vehicleDetails: data.vehicleDetails,
+        companionName: data.companionName,
+        avoidList: data.avoidList,
+        skills: data.skills,
+        hasExperience: data.hasExperience,
+        experienceDetails: data.experienceDetails,
+        motivation: data.motivation,
+        modificationNote: data.modificationNote,
+      },
+    })
+
+    // Rafraîchir les données pour mettre à jour l'affichage
+    await fetchVolunteersInfo()
+
+    // Attendre que le DOM soit mis à jour
+    await nextTick()
+
+    // Fermer la modal
+    closeEditApplicationModal()
+
+    // Afficher un message de succès
+    toast.add({
+      title: t('editions.volunteers.application_updated'),
+      description: t('editions.volunteers.changes_saved_successfully'),
+      color: 'success',
+    })
+  } catch (error: any) {
+    toast.add({
+      title: t('common.error'),
+      description: error?.message || t('editions.volunteers.update_error'),
+      color: 'error',
+    })
+  }
 }
 </script>

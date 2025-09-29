@@ -371,11 +371,16 @@
   </UModal>
 
   <!-- Modal d'édition des candidatures -->
-  <EditionVolunteerApplicationEditModal
+  <EditionVolunteerApplicationModal
     v-model="editModalOpen"
-    :application="currentEditApplication"
-    :team-options="teamOptionsForEdit"
-    @save="handleEditApplicationSave"
+    :volunteers-info="volunteersInfo"
+    :edition="{ id: editionId }"
+    :user="currentEditApplication?.user"
+    :applying="false"
+    :is-editing="true"
+    :existing-application="currentEditApplication"
+    @close="closeEditApplicationModal"
+    @update="handleEditApplicationUpdate"
   />
 
   <!-- Modal de confirmation pour remettre en attente -->
@@ -395,6 +400,12 @@
 
 <script setup lang="ts">
 import { h, resolveComponent, watch, onMounted, nextTick } from 'vue'
+
+import {
+  getAllergySeverityInfo,
+  getAllergySeverityBadgeClasses,
+  requiresEmergencyContact,
+} from '~/utils/allergy-severity'
 
 import type { ContextMenuItem, TableColumn, TableRow } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
@@ -511,18 +522,6 @@ const availableTeamsForModal = computed(() => {
 
   // Sinon on montre toutes les équipes
   return allTeams
-})
-
-// Options d'équipes pour le modal d'édition (toutes les équipes disponibles)
-const teamOptionsForEdit = computed(() => {
-  if (!volunteerTeams.value.length) {
-    return []
-  }
-
-  return volunteerTeams.value.map((team: any) => ({
-    value: team.id,
-    label: team.name,
-  }))
 })
 
 // Computed pour les données du tableau
@@ -1266,18 +1265,10 @@ const columns = computed((): TableColumn<any>[] => [
                   {
                     class: [
                       'inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ml-1',
-                      row.original.allergySeverity === 'CRITICAL'
-                        ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                        : row.original.allergySeverity === 'SEVERE'
-                          ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
-                          : row.original.allergySeverity === 'MODERATE'
-                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+                      getAllergySeverityBadgeClasses(row.original.allergySeverity),
                     ],
                   },
-                  t(
-                    `editions.volunteers.allergy_severity_${row.original.allergySeverity.toLowerCase()}_short`
-                  )
+                  t(getAllergySeverityInfo(row.original.allergySeverity).label)
                 )
               : null
 
@@ -1292,7 +1283,7 @@ const columns = computed((): TableColumn<any>[] => [
   // Colonne contact d'urgence si activée ou si allergies SEVERE/CRITICAL présentes
   ...(props.volunteersInfo?.askEmergencyContact ||
   tableData.value.some(
-    (row: any) => row.allergySeverity && ['SEVERE', 'CRITICAL'].includes(row.allergySeverity)
+    (row: any) => row.allergySeverity && requiresEmergencyContact(row.allergySeverity)
   )
     ? [
         {
@@ -1780,20 +1771,46 @@ const openEditApplicationModal = (application: any) => {
   editModalOpen.value = true
 }
 
-// Fonction pour sauvegarder les modifications d'une candidature
-const handleEditApplicationSave = async (data: { application: any; changes: any }) => {
+// Fonction pour fermer le modal d'édition
+const closeEditApplicationModal = () => {
+  editModalOpen.value = false
+  currentEditApplication.value = null
+}
+
+// Fonction pour sauvegarder les modifications d'une candidature (ApplicationModal)
+const handleEditApplicationUpdate = async (data: any) => {
   try {
     // Appeler l'API pour sauvegarder les changements
-    await $fetch(
-      `/api/editions/${props.editionId}/volunteers/applications/${data.application.id}`,
-      {
-        method: 'PATCH',
-        body: {
-          teamPreferences: data.changes.teamPreferences,
-          modificationNote: data.changes.modificationNote,
-        },
-      } as any
-    )
+    await $fetch(`/api/editions/${props.editionId}/volunteers/applications/${data.applicationId}`, {
+      method: 'PATCH',
+      body: {
+        teamPreferences: data.teamPreferences,
+        dietaryPreference: data.dietaryPreference,
+        allergies: data.allergies,
+        allergySeverity: data.allergySeverity,
+        setupAvailability: data.setupAvailability,
+        eventAvailability: data.eventAvailability,
+        teardownAvailability: data.teardownAvailability,
+        arrivalDateTime: data.arrivalDateTime,
+        departureDateTime: data.departureDateTime,
+        timePreferences: data.timePreferences,
+        emergencyContactName: data.emergencyContactName,
+        emergencyContactPhone: data.emergencyContactPhone,
+        hasPets: data.hasPets,
+        petsDetails: data.petsDetails,
+        hasMinors: data.hasMinors,
+        minorsDetails: data.minorsDetails,
+        hasVehicle: data.hasVehicle,
+        vehicleDetails: data.vehicleDetails,
+        companionName: data.companionName,
+        avoidList: data.avoidList,
+        skills: data.skills,
+        hasExperience: data.hasExperience,
+        experienceDetails: data.experienceDetails,
+        motivation: data.motivation,
+        modificationNote: data.modificationNote,
+      },
+    } as any)
 
     // Rafraîchir les données
     emit('refreshVolunteersInfo')
@@ -1801,8 +1818,7 @@ const handleEditApplicationSave = async (data: { application: any; changes: any 
     refreshApplications()
 
     // Fermer le modal
-    editModalOpen.value = false
-    currentEditApplication.value = null
+    closeEditApplicationModal()
 
     toast.add({
       title: t('editions.volunteers.application_updated'),

@@ -2,8 +2,14 @@
   <UModal
     v-if="volunteersInfo?.mode === 'INTERNAL'"
     v-model:open="showModal"
-    :title="t('editions.volunteers.apply')"
-    :description="t('editions.volunteers.apply_description')"
+    :title="
+      props.isEditing ? t('editions.volunteers.edit_application') : t('editions.volunteers.apply')
+    "
+    :description="
+      props.isEditing
+        ? t('editions.volunteers.edit_application_description')
+        : t('editions.volunteers.apply_description')
+    "
     :dismissible="!applying"
     :ui="{ content: 'max-w-xl rounded-none' }"
   >
@@ -14,7 +20,7 @@
           <h3
             class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
           >
-            {{ t('editions.volunteers.personal_info_title') }}
+            {{ personalInfoTitle }}
           </h3>
 
           <!-- Champs nom/prénom (toujours affichés) -->
@@ -27,7 +33,12 @@
               <UInput
                 v-model="formData.firstName"
                 :placeholder="user?.prenom || t('editions.volunteers.first_name_placeholder')"
-                class="w-full"
+                :readonly="isOrganizerEditingApplication"
+                :disabled="isOrganizerEditingApplication"
+                :class="[
+                  'w-full',
+                  isOrganizerEditingApplication ? 'bg-gray-50 dark:bg-gray-800' : '',
+                ]"
                 @blur="markFieldTouched('firstName')"
               />
             </UFormField>
@@ -39,7 +50,12 @@
               <UInput
                 v-model="formData.lastName"
                 :placeholder="user?.nom || t('editions.volunteers.last_name_placeholder')"
-                class="w-full"
+                :readonly="isOrganizerEditingApplication"
+                :disabled="isOrganizerEditingApplication"
+                :class="[
+                  'w-full',
+                  isOrganizerEditingApplication ? 'bg-gray-50 dark:bg-gray-800' : '',
+                ]"
                 @blur="markFieldTouched('lastName')"
               />
             </UFormField>
@@ -64,7 +80,12 @@
                 v-model="formData.phone"
                 :placeholder="user?.phone || t('editions.volunteers.phone_placeholder')"
                 autocomplete="tel"
-                class="w-full"
+                :readonly="isOrganizerEditingApplication"
+                :disabled="isOrganizerEditingApplication"
+                :class="[
+                  'w-full',
+                  isOrganizerEditingApplication ? 'bg-gray-50 dark:bg-gray-800' : '',
+                ]"
                 @blur="markFieldTouched('phone')"
               />
             </UFormField>
@@ -80,7 +101,7 @@
           <h3
             class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
           >
-            {{ t('editions.volunteers.presence_title') }}
+            {{ presenceTitle }}
           </h3>
 
           <!-- Disponibilité montage -->
@@ -156,7 +177,7 @@
           <h3
             class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
           >
-            {{ t('editions.volunteers.shifts_preferences_title') }}
+            {{ shiftsPreferencesTitle }}
           </h3>
 
           <!-- Équipes préférées -->
@@ -230,7 +251,7 @@
           <h3
             class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
           >
-            {{ t('editions.volunteers.about_you_title') }}
+            {{ aboutYouTitle }}
           </h3>
 
           <!-- Régime alimentaire -->
@@ -268,22 +289,20 @@
               >
                 <USelect
                   v-model="formData.allergySeverity"
-                  :options="allergySeverityOptions"
-                  option-attribute="label"
-                  value-attribute="value"
+                  :items="allergySeverityOptions"
                   :placeholder="t('editions.volunteers.allergy_severity_placeholder')"
                   class="w-full"
                 />
               </UFormField>
               <p
                 v-if="formData.allergySeverity"
-                class="text-[11px] mt-1"
+                class="mt-1 px-2 py-1 text-sm rounded"
                 :class="allergySeverityDescriptionClass"
               >
                 {{
-                  t(
-                    `editions.volunteers.allergy_severity_${formData.allergySeverity?.toLowerCase()}_description`
-                  )
+                  formData.allergySeverity
+                    ? t(getAllergySeverityDescriptionKey(formData.allergySeverity))
+                    : ''
                 }}
               </p>
             </div>
@@ -292,12 +311,12 @@
           <!-- Contact d'urgence -->
           <div v-if="shouldAskEmergencyContact" class="space-y-3 w-full">
             <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ t('editions.volunteers.emergency_contact_title') }}
+              {{ emergencyContactTitle }}
               <span
                 v-if="
                   !volunteersInfo?.askEmergencyContact &&
                   formData.allergySeverity &&
-                  ['SEVERE', 'CRITICAL'].includes(formData.allergySeverity)
+                  requiresEmergencyContact(formData.allergySeverity)
                 "
                 class="text-orange-600 dark:text-orange-400 text-xs font-normal"
               >
@@ -392,7 +411,7 @@
           <h3
             class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
           >
-            {{ t('editions.volunteers.what_you_can_bring_title') }}
+            {{ whatYouCanBringTitle }}
           </h3>
 
           <!-- Véhicule à disposition -->
@@ -476,7 +495,7 @@
           <h3
             class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
           >
-            {{ t('editions.volunteers.additional_info_title') }}
+            {{ additionalInfoTitle }}
           </h3>
         </div>
 
@@ -504,6 +523,32 @@
           {{ t('editions.volunteers.motivation_hint', { max: MOTIVATION_MAX }) }}
         </p>
       </div>
+
+      <!-- Section: Ajout de l'organisateur (seulement si c'est un orga qui édite) -->
+      <div v-if="isOrganizerEditingApplication" class="space-y-4 w-full">
+        <h3
+          class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+        >
+          {{ t('editions.volunteers.organizer_addition_title') }}
+        </h3>
+
+        <!-- Note de modification -->
+        <UFormField
+          :label="t('editions.volunteers.modification_note')"
+          :help="t('editions.volunteers.modification_note_help')"
+        >
+          <UTextarea
+            v-model="formData.modificationNote"
+            :rows="3"
+            :placeholder="t('editions.volunteers.modification_note_placeholder')"
+            :maxlength="500"
+            class="w-full"
+          />
+          <div class="text-xs text-gray-500 mt-1 text-right">
+            {{ formData.modificationNote.length }}/500
+          </div>
+        </UFormField>
+      </div>
     </template>
 
     <template #footer="{ close }">
@@ -528,7 +573,7 @@
           icon="i-heroicons-paper-airplane"
           @click="handleSubmit"
         >
-          {{ t('editions.volunteers.apply') }}
+          {{ props.isEditing ? t('common.save') : t('editions.volunteers.apply') }}
         </UButton>
       </div>
     </template>
@@ -536,6 +581,14 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '~/stores/auth'
+import {
+  requiresEmergencyContact,
+  getAllergySeverityOptions,
+  getAllergySeverityDescriptionKey,
+  type AllergySeverityLevel,
+} from '~/utils/allergy-severity'
+
 interface VolunteerInfo {
   open: boolean
   description?: string
@@ -577,18 +630,22 @@ interface Props {
   edition: any
   user: User | null
   applying: boolean
+  // Mode édition
+  isEditing?: boolean
+  existingApplication?: any | null
 }
 
 interface Emits {
   (e: 'update:modelValue', value: boolean): void
   (e: 'close'): void
-  (e: 'submit', data: any): void
+  (e: 'submit' | 'update', data: any): void
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const { t } = useI18n()
+const authStore = useAuthStore()
 const { teams: volunteerTeams } = useVolunteerTeams(props.edition.id)
 
 const MOTIVATION_MAX = 2000
@@ -615,7 +672,7 @@ const formData = ref({
   avoidList: '',
   dietPreference: 'NONE' as 'NONE' | 'VEGETARIAN' | 'VEGAN',
   allergies: '',
-  allergySeverity: undefined as 'LIGHT' | 'MODERATE' | 'SEVERE' | 'CRITICAL' | undefined,
+  allergySeverity: undefined as AllergySeverityLevel | undefined,
   emergencyContactName: '',
   emergencyContactPhone: '',
   hasPets: false,
@@ -628,6 +685,7 @@ const formData = ref({
   hasExperience: false,
   experienceDetails: '',
   motivation: '',
+  modificationNote: '',
 })
 
 // Système de suivi des champs touchés
@@ -636,6 +694,58 @@ const showAllErrors = ref(false)
 
 // Computed properties
 const motivationTooLong = computed(() => formData.value.motivation.length > MOTIVATION_MAX)
+
+// Détermine si c'est un organisateur qui édite (pas le bénévole lui-même)
+const isOrganizerEditingApplication = computed(() => {
+  if (!props.isEditing) return false
+  if (!authStore.user) return false
+  if (!props.existingApplication) return false
+  // Si l'utilisateur connecté n'est pas le propriétaire de la candidature
+  return authStore.user.id !== props.existingApplication.user.id
+})
+
+// Titres conditionnels selon si c'est un organisateur ou l'utilisateur qui édite
+const personalInfoTitle = computed(() =>
+  isOrganizerEditingApplication.value
+    ? t('editions.volunteers.config_about_you_title')
+    : t('editions.volunteers.personal_info_title')
+)
+
+const presenceTitle = computed(() =>
+  isOrganizerEditingApplication.value
+    ? t('editions.volunteers.config_presence_title')
+    : t('editions.volunteers.presence_title')
+)
+
+const shiftsPreferencesTitle = computed(() =>
+  isOrganizerEditingApplication.value
+    ? t('editions.volunteers.config_shifts_preferences_title')
+    : t('editions.volunteers.shifts_preferences_title')
+)
+
+const whatYouCanBringTitle = computed(() =>
+  isOrganizerEditingApplication.value
+    ? t('editions.volunteers.config_what_you_can_bring_title')
+    : t('editions.volunteers.what_you_can_bring_title')
+)
+
+const aboutYouTitle = computed(() =>
+  isOrganizerEditingApplication.value
+    ? t('editions.volunteers.config_about_you_title')
+    : t('editions.volunteers.about_you_title')
+)
+
+const emergencyContactTitle = computed(() =>
+  isOrganizerEditingApplication.value
+    ? t('editions.volunteers.config_emergency_contact_title')
+    : t('editions.volunteers.emergency_contact_title')
+)
+
+const additionalInfoTitle = computed(() =>
+  isOrganizerEditingApplication.value
+    ? t('editions.volunteers.config_additional_info_title')
+    : t('editions.volunteers.additional_info_title')
+)
 
 // Fonction pour marquer un champ comme touché
 const markFieldTouched = (fieldName: string) => {
@@ -695,26 +805,17 @@ const allergySeverityError = computed(() => {
   return undefined
 })
 
-const allergySeverityOptions = computed(() => [
-  { value: 'LIGHT', label: t('editions.volunteers.allergy_severity_light') },
-  { value: 'MODERATE', label: t('editions.volunteers.allergy_severity_moderate') },
-  { value: 'SEVERE', label: t('editions.volunteers.allergy_severity_severe') },
-  { value: 'CRITICAL', label: t('editions.volunteers.allergy_severity_critical') },
-])
+const allergySeverityOptions = computed(() =>
+  getAllergySeverityOptions().map((option) => ({
+    value: option.value,
+    label: t(option.label),
+  }))
+)
 
 const allergySeverityDescriptionClass = computed(() => {
-  switch (formData.value.allergySeverity) {
-    case 'CRITICAL':
-      return 'text-red-600 dark:text-red-400'
-    case 'SEVERE':
-      return 'text-orange-600 dark:text-orange-400'
-    case 'MODERATE':
-      return 'text-yellow-600 dark:text-yellow-400'
-    case 'LIGHT':
-      return 'text-gray-600 dark:text-gray-400'
-    default:
-      return 'text-gray-500'
-  }
+  if (!formData.value.allergySeverity) return 'text-gray-500'
+
+  return getAllergySeverityBadgeClasses(formData.value.allergySeverity)
 })
 
 const arrivalDateError = computed(() => {
@@ -792,11 +893,8 @@ const shouldAskEmergencyContact = computed(() => {
   // Demandé explicitement par l'organisateur
   if (props.volunteersInfo?.askEmergencyContact) return true
 
-  // Ou si niveau de sévérité est SEVERE ou CRITICAL
-  if (
-    formData.value.allergySeverity &&
-    ['SEVERE', 'CRITICAL'].includes(formData.value.allergySeverity)
-  )
+  // Ou si niveau de sévérité nécessite un contact d'urgence
+  if (formData.value.allergySeverity && requiresEmergencyContact(formData.value.allergySeverity))
     return true
 
   return false
@@ -956,7 +1054,14 @@ const handleSubmit = () => {
 
   // Ne soumettre que si le formulaire est valide
   if (isFormValid.value) {
-    emit('submit', formData.value)
+    if (props.isEditing) {
+      emit('update', {
+        applicationId: props.existingApplication?.id,
+        ...formData.value,
+      })
+    } else {
+      emit('submit', formData.value)
+    }
   }
 }
 
@@ -984,42 +1089,94 @@ watch(
   }
 )
 
-// Reset form when modal opens
+// Function to populate form with existing application data
+const populateForm = () => {
+  if (props.isEditing && props.existingApplication) {
+    // Mode édition : pré-remplir avec les données existantes
+    const app = props.existingApplication
+    Object.assign(formData.value, {
+      phone: app.userSnapshotPhone || props.user?.phone || '',
+      firstName: props.user?.prenom || '',
+      lastName: props.user?.nom || '',
+      setupAvailability: app.setupAvailability ?? false,
+      teardownAvailability: app.teardownAvailability ?? false,
+      eventAvailability: app.eventAvailability ?? true,
+      arrivalDateTime: app.arrivalDateTime || undefined,
+      departureDateTime: app.departureDateTime || undefined,
+      teamPreferences: (app.teamPreferences as string[]) || [],
+      timePreferences: (app.timePreferences as string[]) || [],
+      companionName: app.companionName || '',
+      avoidList: app.avoidList || '',
+      dietPreference: app.dietaryPreference || 'NONE',
+      allergies: app.allergies || '',
+      allergySeverity: app.allergySeverity || undefined,
+      emergencyContactName: app.emergencyContactName || '',
+      emergencyContactPhone: app.emergencyContactPhone || '',
+      hasPets: app.hasPets ?? false,
+      petsDetails: app.petsDetails || '',
+      hasMinors: app.hasMinors ?? false,
+      minorsDetails: app.minorsDetails || '',
+      hasVehicle: app.hasVehicle ?? false,
+      vehicleDetails: app.vehicleDetails || '',
+      skills: app.skills || '',
+      hasExperience: app.hasExperience ?? false,
+      experienceDetails: app.experienceDetails || '',
+      motivation: app.motivation || '',
+      modificationNote: '', // Toujours réinitialiser la note de modification en mode édition
+    })
+  } else {
+    // Mode création : réinitialiser avec les infos utilisateur
+    Object.assign(formData.value, {
+      phone: props.user?.phone || '',
+      firstName: props.user?.prenom || '',
+      lastName: props.user?.nom || '',
+      setupAvailability: false,
+      teardownAvailability: false,
+      eventAvailability: true,
+      arrivalDateTime: undefined,
+      departureDateTime: undefined,
+      teamPreferences: [],
+      timePreferences: [],
+      companionName: '',
+      avoidList: '',
+      dietPreference: 'NONE' as 'NONE' | 'VEGETARIAN' | 'VEGAN',
+      allergies: '',
+      allergySeverity: undefined,
+      emergencyContactName: '',
+      emergencyContactPhone: '',
+      hasPets: false,
+      petsDetails: '',
+      hasMinors: false,
+      minorsDetails: '',
+      hasVehicle: false,
+      vehicleDetails: '',
+      skills: '',
+      hasExperience: false,
+      experienceDetails: '',
+      motivation: '',
+      modificationNote: '',
+    })
+  }
+}
+
+// Reset or populate form when modal opens
 watch(
   () => props.modelValue,
   (newValue) => {
     if (newValue) {
-      // Reset form data avec pré-remplissage des infos utilisateur
-      Object.assign(formData.value, {
-        phone: props.user?.phone || '',
-        firstName: props.user?.prenom || '',
-        lastName: props.user?.nom || '',
-        setupAvailability: false,
-        teardownAvailability: false,
-        eventAvailability: true,
-        arrivalDateTime: undefined,
-        departureDateTime: undefined,
-        teamPreferences: [],
-        timePreferences: [],
-        companionName: '',
-        avoidList: '',
-        dietPreference: 'NONE' as 'NONE' | 'VEGETARIAN' | 'VEGAN',
-        allergies: '',
-        allergySeverity: undefined,
-        emergencyContactName: '',
-        emergencyContactPhone: '',
-        hasPets: false,
-        petsDetails: '',
-        hasMinors: false,
-        minorsDetails: '',
-        hasVehicle: false,
-        vehicleDetails: '',
-        skills: '',
-        hasExperience: false,
-        experienceDetails: '',
-        motivation: '',
-      })
+      populateForm()
     }
   }
+)
+
+// Watch for changes in existingApplication to repopulate form
+watch(
+  () => props.existingApplication,
+  () => {
+    if (props.modelValue && props.isEditing) {
+      populateForm()
+    }
+  },
+  { deep: true }
 )
 </script>

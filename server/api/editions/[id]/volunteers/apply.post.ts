@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { requiresEmergencyContact } from '../../../../utils/allergy-severity'
 import { prisma } from '../../../../utils/prisma'
 import { handleValidationError } from '../../../../utils/validation-schemas'
 
@@ -114,7 +115,7 @@ export default defineEventHandler(async (event) => {
     // Déterminer si le contact d'urgence est requis
     const shouldRequireEmergencyContact =
       edition.volunteersAskEmergencyContact ||
-      (parsed.allergySeverity && ['SEVERE', 'CRITICAL'].includes(parsed.allergySeverity))
+      (parsed.allergySeverity && requiresEmergencyContact(parsed.allergySeverity))
 
     // Validations cumulées
     const missing: string[] = []

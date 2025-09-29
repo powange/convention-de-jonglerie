@@ -119,13 +119,13 @@
         </div>
         <USelect
           v-model="filters.type"
-          :options="typeOptions"
+          :items="typeOptions"
           :placeholder="t('admin.feedback.filter.type')"
           @change="fetchFeedbacks"
         />
         <USelect
           v-model="filters.resolved"
-          :options="statusOptions"
+          :items="statusOptions"
           :placeholder="t('admin.feedback.filter.status')"
           @change="fetchFeedbacks"
         />
@@ -140,7 +140,7 @@
           <p class="text-gray-500 mt-2">{{ t('common.loading') }}</p>
         </div>
 
-        <div v-else-if="feedbacks.length === 0" class="p-8 text-center">
+        <div v-else-if="!feedbacks || feedbacks.length === 0" class="p-8 text-center">
           <UIcon name="i-heroicons-inbox" class="h-12 w-12 mx-auto text-gray-400 mb-4" />
           <p class="text-gray-500">{{ t('admin.feedback.empty') }}</p>
         </div>
@@ -454,7 +454,7 @@ const filters = reactive({
 
 // Options pour les filtres
 const typeOptions = computed(() => [
-  { value: '', label: t('admin.feedback.filter.all_types') },
+  { value: null, label: t('admin.feedback.filter.all_types') },
   { value: 'BUG', label: t('admin.feedback.types.bug') },
   { value: 'SUGGESTION', label: t('admin.feedback.types.suggestion') },
   { value: 'GENERAL', label: t('admin.feedback.types.general') },
@@ -462,7 +462,7 @@ const typeOptions = computed(() => [
 ])
 
 const statusOptions = computed(() => [
-  { value: '', label: t('admin.feedback.filter.all_status') },
+  { value: null, label: t('admin.feedback.filter.all_status') },
   { value: 'false', label: t('admin.feedback.pending') },
   { value: 'true', label: t('admin.feedback.resolved') },
 ])

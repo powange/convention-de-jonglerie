@@ -38,7 +38,49 @@ export default defineEventHandler(async (event) => {
   let myApplication: any = null
   if (user) {
     const found = edition.volunteerApplications.find((a) => a.userId === user.id)
-    if (found) myApplication = { id: found.id, status: found.status }
+    if (found) {
+      // Récupérer les données complètes de la candidature
+      myApplication = await prisma.editionVolunteerApplication.findUnique({
+        where: { id: found.id },
+        select: {
+          id: true,
+          status: true,
+          motivation: true,
+          createdAt: true,
+          dietaryPreference: true,
+          allergies: true,
+          allergySeverity: true,
+          emergencyContactName: true,
+          emergencyContactPhone: true,
+          timePreferences: true,
+          teamPreferences: true,
+          assignedTeams: true,
+          setupAvailability: true,
+          teardownAvailability: true,
+          eventAvailability: true,
+          arrivalDateTime: true,
+          departureDateTime: true,
+          hasPets: true,
+          petsDetails: true,
+          hasMinors: true,
+          minorsDetails: true,
+          hasVehicle: true,
+          vehicleDetails: true,
+          companionName: true,
+          avoidList: true,
+          skills: true,
+          hasExperience: true,
+          experienceDetails: true,
+          userSnapshotPhone: true,
+          updatedAt: true,
+          decidedAt: true,
+          acceptanceNote: true,
+          user: {
+            select: { id: true, pseudo: true, email: true, phone: true, prenom: true, nom: true },
+          },
+        },
+      })
+    }
   }
   const counts = edition.volunteerApplications.reduce(
     (acc, a) => {

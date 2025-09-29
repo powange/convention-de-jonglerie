@@ -135,16 +135,11 @@
               <span class="ml-2">{{ application.allergies }}</span>
               <UBadge
                 v-if="application.allergySeverity"
-                :color="getAllergySeverityColor(application.allergySeverity)"
                 variant="solid"
-                size="xs"
                 class="ml-2"
+                :class="getAllergySeverityBadgeClasses(application.allergySeverity)"
               >
-                {{
-                  $t(
-                    `editions.volunteers.allergy_severity_${application.allergySeverity.toLowerCase()}_short`
-                  )
-                }}
+                {{ $t(getAllergySeverityInfo(application.allergySeverity).label) }}
               </UBadge>
             </div>
           </div>
@@ -155,7 +150,7 @@
           v-if="
             (application.volunteersSettings?.askEmergencyContact ||
               (application.allergySeverity &&
-                ['SEVERE', 'CRITICAL'].includes(application.allergySeverity))) &&
+                requiresEmergencyContact(application.allergySeverity))) &&
             (application.emergencyContactName || application.emergencyContactPhone)
           "
         >
@@ -307,6 +302,12 @@
 </template>
 
 <script setup lang="ts">
+import {
+  getAllergySeverityInfo,
+  getAllergySeverityBadgeClasses,
+  requiresEmergencyContact,
+} from '~/utils/allergy-severity'
+
 interface ApplicationWithSettings {
   [key: string]: any
   volunteersSettings?: any
@@ -328,19 +329,4 @@ const isOpen = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value),
 })
-
-const getAllergySeverityColor = (severity: string) => {
-  switch (severity) {
-    case 'CRITICAL':
-      return 'error'
-    case 'SEVERE':
-      return 'warning'
-    case 'MODERATE':
-      return 'info'
-    case 'LIGHT':
-      return 'neutral'
-    default:
-      return 'neutral'
-  }
-}
 </script>
