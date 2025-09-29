@@ -765,6 +765,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergies)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
+      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
 
       // Candidature avec allergies mais sans contact d'urgence
       const applicationWithAllergiesNoContact = {
@@ -813,6 +814,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergies)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
+      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
 
       // Candidature avec allergies ET contact d'urgence
       const applicationWithAllergiesAndContact = {
@@ -880,6 +882,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergies)
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
+      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
 
       // Candidature sans allergies ni contact d'urgence
       const applicationWithoutAllergies = {

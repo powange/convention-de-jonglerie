@@ -112,7 +112,7 @@ export default defineEventHandler(async (event) => {
 
     // Déterminer si le contact d'urgence est requis
     const shouldRequireEmergencyContact =
-      (edition as any).volunteersAskEmergencyContact ||
+      edition.volunteersAskEmergencyContact ||
       (edition.volunteersAskAllergies && parsed.allergies?.trim())
 
     // Validations cumulées
@@ -355,7 +355,9 @@ export default defineEventHandler(async (event) => {
         errorMsg.includes('déjà candidat') ||
         errorMsg.includes('recrutement fermé') ||
         errorMsg.includes('edition introuvable') ||
-        errorMsg.includes('non authentifié')
+        errorMsg.includes('non authentifié') ||
+        errorMsg.includes('contact d\'urgence') ||
+        errorMsg.includes('requis')
       ) {
         throw error
       }
