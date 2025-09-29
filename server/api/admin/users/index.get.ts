@@ -75,6 +75,7 @@ export default defineEventHandler(async (event) => {
           prenom: true,
           isEmailVerified: true,
           isGlobalAdmin: true,
+          authProvider: true,
           createdAt: true,
           updatedAt: true,
           profilePicture: true,

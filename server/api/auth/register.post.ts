@@ -33,13 +33,14 @@ export default defineEventHandler(async (event) => {
     const verificationCode = generateVerificationCode()
     const verificationExpiry = createFutureDate(TOKEN_DURATIONS.EMAIL_VERIFICATION)
 
-    const _user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         email: cleanEmail,
         password: hashedPassword,
         pseudo: cleanPseudo,
         nom: cleanNom,
         prenom: cleanPrenom,
+        authProvider: 'email',
         isEmailVerified: false,
         emailVerificationCode: verificationCode,
         verificationCodeExpiry: verificationExpiry,

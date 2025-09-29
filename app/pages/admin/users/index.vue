@@ -173,6 +173,7 @@ const { t } = useI18n()
 // Types pour les utilisateurs (utilisé dans la page mais défini dans le composable)
 interface AdminUserWithConnection extends AdminUser {
   isConnected: boolean
+  authProvider?: string
 }
 
 interface PaginationData {
@@ -374,6 +375,48 @@ const columns = [
     header: t('admin.registration'),
     cell: ({ row }: { row: any }) => {
       const user = row.original as AdminUserWithConnection
+
+      function getAuthProviderLabel(provider: string): string {
+        switch (provider) {
+          case 'email':
+            return t('admin.auth_provider_email')
+          case 'google':
+            return t('admin.auth_provider_google')
+          case 'facebook':
+            return t('admin.auth_provider_facebook')
+          default:
+            return t('admin.auth_provider_unknown')
+        }
+      }
+
+      function getAuthProviderIcon(provider: string): string {
+        switch (provider) {
+          case 'email':
+            return 'i-mdi-mail-ru'
+          case 'google':
+            return 'i-mdi-google'
+          case 'facebook':
+            return 'i-mdi-facebook'
+          default:
+            return 'i-heroicons-question-mark-circle'
+        }
+      }
+
+      function getAuthProviderColor(provider: string): string {
+        switch (provider) {
+          case 'email':
+            return 'neutral'
+          case 'google':
+            return 'error'
+          case 'facebook':
+            return 'info'
+          default:
+            return 'warning'
+        }
+      }
+
+      const provider = user.authProvider || 'unknown'
+
       return h(
         resolveComponent('UTooltip'),
         { text: formatDateTime(user.createdAt) },
@@ -382,6 +425,18 @@ const columns = [
             h('div', { class: 'text-sm cursor-help' }, [
               h('div', formatDate(user.createdAt)),
               h('div', { class: 'text-gray-500' }, formatRelativeTime(user.createdAt)),
+              h(resolveComponent('UIcon'), {
+                name: getAuthProviderIcon(provider),
+                class: 'w-4 h-4',
+              }),
+              h(
+                resolveComponent('UBadge'),
+                {
+                  color: getAuthProviderColor(provider),
+                  variant: 'soft',
+                },
+                () => getAuthProviderLabel(provider)
+              ),
             ]),
         }
       )

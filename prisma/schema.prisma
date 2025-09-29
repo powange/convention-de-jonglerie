@@ -16,6 +16,7 @@ model User {
   nom                      String?
   prenom                   String?
   password                 String?
+  authProvider             String                          @default("email") // "email", "google", "facebook"
   createdAt                DateTime                        @default(now())
   updatedAt                DateTime                        @updatedAt
   profilePicture           String?

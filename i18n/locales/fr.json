@@ -2,6 +2,10 @@
   "admin": {
     "active_administrators": "Administrateurs actifs",
     "activity": "Activité",
+    "auth_provider_email": "Email",
+    "auth_provider_google": "Google",
+    "auth_provider_facebook": "Facebook",
+    "auth_provider_unknown": "Inconnue",
     "administration_tools": "Outils d'Administration",
     "advanced_statistics": "Statistiques Avancées",
     "advanced_statistics_description": "Rapports détaillés et analytiques",

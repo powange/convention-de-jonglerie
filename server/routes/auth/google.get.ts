@@ -135,6 +135,7 @@ export default defineEventHandler(async (event) => {
         nom,
         prenom,
         password: null, // Pas de mot de passe pour les utilisateurs OAuth
+        authProvider: 'google',
         isEmailVerified: true,
         ...(picture ? { profilePicture: picture } : {}),
       },
