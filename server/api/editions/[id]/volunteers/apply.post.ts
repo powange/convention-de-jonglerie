@@ -356,7 +356,7 @@ export default defineEventHandler(async (event) => {
         errorMsg.includes('recrutement fermé') ||
         errorMsg.includes('edition introuvable') ||
         errorMsg.includes('non authentifié') ||
-        errorMsg.includes('contact d\'urgence') ||
+        errorMsg.includes("contact d'urgence") ||
         errorMsg.includes('requis')
       ) {
         throw error

@@ -75,7 +75,7 @@ async function waitForDatabase(maxRetries = 20) {
       await new Promise((resolve) => setTimeout(resolve, 1500))
     }
   }
-  throw new Error("La base de données n'est pas disponible après " + maxRetries + " tentatives")
+  throw new Error("La base de données n'est pas disponible après " + maxRetries + ' tentatives')
 }
 
 // Fonction pour nettoyer la base de données
