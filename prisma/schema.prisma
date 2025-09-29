@@ -121,6 +121,7 @@ model Edition {
   volunteersAskAvoidList       Boolean                         @default(false)
   volunteersAskSkills          Boolean                         @default(false)
   volunteersAskExperience      Boolean                         @default(false)
+  volunteersAskEmergencyContact Boolean                        @default(false)
   volunteersTeardownEndDate    DateTime?
   volunteersSetupStartDate     DateTime?
   volunteersAskSetup           Boolean                         @default(false)
@@ -435,6 +436,8 @@ model EditionVolunteerApplication {
   eventAvailability    Boolean?
   arrivalDateTime      String?
   departureDateTime    String?
+  emergencyContactName String?
+  emergencyContactPhone String?
   edition              Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user                 User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   teams                VolunteerTeam[]

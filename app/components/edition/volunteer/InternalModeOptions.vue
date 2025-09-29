@@ -238,6 +238,17 @@
       @update:model-value="handleChange('askTeamPreferences', $event)"
     />
 
+    <!-- Switch demander contact d'urgence -->
+    <USwitch
+      v-model="askEmergencyContact"
+      :disabled="saving"
+      color="primary"
+      class="mb-2"
+      :label="t('editions.volunteers.ask_emergency_contact_label')"
+      size="lg"
+      @update:model-value="handleChange('askEmergencyContact', $event)"
+    />
+
     <!-- Équipes de bénévoles (affichage lecture seule) -->
     <div class="mt-6 space-y-4">
       <div class="flex items-center justify-between">
@@ -328,6 +339,7 @@ interface Props {
     askExperience?: boolean
     askTimePreferences?: boolean
     askTeamPreferences?: boolean
+    askEmergencyContact?: boolean
     teams?: { name: string; slots?: number }[]
   }
   editionStartDate?: Date
@@ -369,6 +381,7 @@ const askSkills = ref(props.initialData?.askSkills || false)
 const askExperience = ref(props.initialData?.askExperience || false)
 const askTimePreferences = ref(props.initialData?.askTimePreferences || false)
 const askTeamPreferences = ref(props.initialData?.askTeamPreferences || false)
+const askEmergencyContact = ref(props.initialData?.askEmergencyContact || false)
 
 // Contraintes de dates
 const setupStartDateMaxValue = computed(() => {
@@ -485,6 +498,7 @@ watch(
       askExperience.value = newData.askExperience || false
       askTimePreferences.value = newData.askTimePreferences || false
       askTeamPreferences.value = newData.askTeamPreferences || false
+      askEmergencyContact.value = newData.askEmergencyContact || false
     }
   },
   { deep: true }

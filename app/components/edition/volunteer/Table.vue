@@ -536,6 +536,8 @@ const tableData = computed(() =>
     nom: app.user.nom,
     dietaryPreference: (app as any).dietaryPreference,
     allergies: (app as any).allergies,
+    emergencyContactName: (app as any).emergencyContactName,
+    emergencyContactPhone: (app as any).emergencyContactPhone,
     hasPets: (app as any).hasPets,
     petsDetails: (app as any).petsDetails,
     hasMinors: (app as any).hasMinors,
@@ -965,6 +967,7 @@ const getColumnLabel = (columnId: string): string => {
     presence: t('editions.volunteers.table_presence'),
     dietaryPreference: t('editions.volunteers.table_diet'),
     allergies: t('editions.volunteers.table_allergies'),
+    emergencyContact: t('pages.volunteers.emergency_contact'),
     hasPets: t('editions.volunteers.table_pets'),
     hasMinors: t('editions.volunteers.table_minors'),
     hasVehicle: t('editions.volunteers.table_vehicle'),
@@ -1257,6 +1260,40 @@ const columns = computed((): TableColumn<any>[] => [
             row.original.allergies
               ? h('span', { class: 'text-xs truncate block max-w-[160px]' }, row.original.allergies)
               : '—',
+        } as TableColumn<any>,
+      ]
+    : []),
+  // Colonne contact d'urgence si activée ou si allergies renseignées
+  ...(props.volunteersInfo?.askEmergencyContact ||
+  (props.volunteersInfo?.askAllergies && tableData.value.some((row: any) => row.allergies?.trim()))
+    ? [
+        {
+          accessorKey: 'emergencyContact',
+          header: t('pages.volunteers.emergency_contact'),
+          cell: ({ row }: any) => {
+            const name = row.original.emergencyContactName
+            const phone = row.original.emergencyContactPhone
+
+            if (!name && !phone) return h('span', '—')
+
+            const displayText = [name, phone].filter(Boolean).join(' - ')
+
+            return h(
+              resolveComponent('UTooltip'),
+              { text: displayText, openDelay: 200 },
+              {
+                default: () =>
+                  h(
+                    'div',
+                    {
+                      class: 'max-w-xs truncate cursor-help text-xs',
+                      title: displayText,
+                    },
+                    displayText
+                  ),
+              }
+            )
+          },
         } as TableColumn<any>,
       ]
     : []),

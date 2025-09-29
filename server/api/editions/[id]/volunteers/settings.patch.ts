@@ -53,6 +53,7 @@ const bodySchema = z
     askAvoidList: z.boolean().optional(),
     askSkills: z.boolean().optional(),
     askExperience: z.boolean().optional(),
+    askEmergencyContact: z.boolean().optional(),
     setupStartDate: z
       .string()
       .datetime('Format de date invalide - utilisez le format ISO 8601')
@@ -167,6 +168,8 @@ export default defineEventHandler(async (event) => {
   if (parsed.askAvoidList !== undefined) data.volunteersAskAvoidList = parsed.askAvoidList
   if (parsed.askSkills !== undefined) data.volunteersAskSkills = parsed.askSkills
   if (parsed.askExperience !== undefined) data.volunteersAskExperience = parsed.askExperience
+  if (parsed.askEmergencyContact !== undefined)
+    data.volunteersAskEmergencyContact = parsed.askEmergencyContact
   if (parsed.setupStartDate !== undefined)
     data.volunteersSetupStartDate = parsed.setupStartDate ? new Date(parsed.setupStartDate) : null
   if (parsed.setupEndDate !== undefined)
@@ -195,6 +198,7 @@ export default defineEventHandler(async (event) => {
       volunteersAskAvoidList: true,
       volunteersAskSkills: true,
       volunteersAskExperience: true,
+      volunteersAskEmergencyContact: true,
       volunteersSetupStartDate: true,
       volunteersTeardownEndDate: true,
       volunteersAskSetup: true,

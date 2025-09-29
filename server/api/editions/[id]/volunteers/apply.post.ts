@@ -60,6 +60,14 @@ const bodySchema = z.object({
   eventAvailability: z.boolean().optional(),
   arrivalDateTime: z.string().optional().nullable(),
   departureDateTime: z.string().optional().nullable(),
+  emergencyContactName: z.string().max(100).optional().nullable(),
+  emergencyContactPhone: z
+    .string()
+    .min(6, 'Téléphone contact urgence trop court')
+    .max(30, 'Téléphone contact urgence trop long')
+    .regex(/^[+0-9 ().-]{6,30}$/, 'Format téléphone contact urgence invalide')
+    .optional()
+    .nullable(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -81,6 +89,7 @@ export default defineEventHandler(async (event) => {
         volunteersAskPets: true,
         volunteersAskMinors: true,
         volunteersAskVehicle: true,
+        volunteersAskEmergencyContact: true,
       },
     })
     if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })
@@ -106,6 +115,13 @@ export default defineEventHandler(async (event) => {
     if (!user.phone && !parsed.phone) missing.push('Téléphone')
     if (!user.nom && !parsed.nom) missing.push('Nom')
     if (!user.prenom && !parsed.prenom) missing.push('Prénom')
+
+    // Validation contact d'urgence si demandé explicitement ou si allergies renseignées
+    if (shouldRequireEmergencyContact) {
+      if (!parsed.emergencyContactName?.trim()) missing.push("Nom du contact d'urgence")
+      if (!parsed.emergencyContactPhone?.trim()) missing.push("Téléphone du contact d'urgence")
+    }
+
     if (missing.length) {
       throw createError({
         statusCode: 400,
@@ -114,6 +130,11 @@ export default defineEventHandler(async (event) => {
     }
 
     const finalPhone = user.phone || parsed.phone!
+
+    // Déterminer si le contact d'urgence est requis
+    const shouldRequireEmergencyContact =
+      (edition as any).volunteersAskEmergencyContact ||
+      (edition.volunteersAskAllergies && parsed.allergies?.trim())
 
     // Validation des disponibilités (au moins une requise)
     const hasAvailability =
@@ -245,6 +266,14 @@ export default defineEventHandler(async (event) => {
         departureDateTime: parsed.departureDateTime?.trim()
           ? parsed.departureDateTime.trim()
           : null,
+        emergencyContactName:
+          shouldRequireEmergencyContact && parsed.emergencyContactName?.trim()
+            ? parsed.emergencyContactName.trim()
+            : null,
+        emergencyContactPhone:
+          shouldRequireEmergencyContact && parsed.emergencyContactPhone?.trim()
+            ? parsed.emergencyContactPhone.trim()
+            : null,
       },
       select: {
         id: true,

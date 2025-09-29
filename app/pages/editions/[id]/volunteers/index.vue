@@ -382,6 +382,18 @@ const applyAsVolunteer = async (formData?: any) => {
           volunteersInfo.value?.askTeamPreferences && formData?.teamPreferences?.length > 0
             ? formData.teamPreferences
             : undefined,
+        emergencyContactName:
+          (volunteersInfo.value?.askEmergencyContact ||
+            (volunteersInfo.value?.askAllergies && formData?.allergies?.trim())) &&
+          formData?.emergencyContactName?.trim()
+            ? formData.emergencyContactName.trim()
+            : undefined,
+        emergencyContactPhone:
+          (volunteersInfo.value?.askEmergencyContact ||
+            (volunteersInfo.value?.askAllergies && formData?.allergies?.trim())) &&
+          formData?.emergencyContactPhone?.trim()
+            ? formData.emergencyContactPhone.trim()
+            : undefined,
         hasPets: volunteersInfo.value?.askPets ? formData?.hasPets || undefined : undefined,
         petsDetails:
           volunteersInfo.value?.askPets && formData?.hasPets && formData?.petsDetails?.trim()

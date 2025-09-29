@@ -61,38 +61,6 @@
           </div>
         </div>
 
-        <!-- Préférences alimentaires et allergies -->
-        <div
-          v-if="
-            (application.volunteersSettings?.askDiet && application.dietaryPreference !== 'NONE') ||
-            (application.volunteersSettings?.askAllergies && application.allergies)
-          "
-        >
-          <h4 class="font-medium text-gray-900 dark:text-white mb-2">
-            {{ $t('pages.volunteers.dietary_preferences') }}
-          </h4>
-          <div class="text-sm space-y-1">
-            <div
-              v-if="
-                application.volunteersSettings?.askDiet && application.dietaryPreference !== 'NONE'
-              "
-            >
-              <span class="text-gray-600 dark:text-gray-400"
-                >{{ $t('pages.volunteers.diet') }}:</span
-              >
-              <span class="ml-2">{{
-                $t(`pages.volunteers.dietary.${application.dietaryPreference.toLowerCase()}`)
-              }}</span>
-            </div>
-            <div v-if="application.volunteersSettings?.askAllergies && application.allergies">
-              <span class="text-gray-600 dark:text-gray-400"
-                >{{ $t('pages.volunteers.allergies') }}:</span
-              >
-              <span class="ml-2">{{ application.allergies }}</span>
-            </div>
-          </div>
-        </div>
-
         <!-- Préférences horaires -->
         <div
           v-if="
@@ -134,6 +102,65 @@
             <span v-for="(team, index) in application.teamPreferences" :key="team">
               {{ team }}<span v-if="index < application.teamPreferences.length - 1">, </span>
             </span>
+          </div>
+        </div>
+
+        <!-- Préférences alimentaires et allergies -->
+        <div
+          v-if="
+            (application.volunteersSettings?.askDiet && application.dietaryPreference !== 'NONE') ||
+            (application.volunteersSettings?.askAllergies && application.allergies)
+          "
+        >
+          <h4 class="font-medium text-gray-900 dark:text-white mb-2">
+            {{ $t('pages.volunteers.dietary_preferences') }}
+          </h4>
+          <div class="text-sm space-y-1">
+            <div
+              v-if="
+                application.volunteersSettings?.askDiet && application.dietaryPreference !== 'NONE'
+              "
+            >
+              <span class="text-gray-600 dark:text-gray-400"
+                >{{ $t('pages.volunteers.diet') }}:</span
+              >
+              <span class="ml-2">{{
+                $t(`pages.volunteers.dietary.${application.dietaryPreference.toLowerCase()}`)
+              }}</span>
+            </div>
+            <div v-if="application.volunteersSettings?.askAllergies && application.allergies">
+              <span class="text-gray-600 dark:text-gray-400"
+                >{{ $t('pages.volunteers.allergies') }}:</span
+              >
+              <span class="ml-2">{{ application.allergies }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact d'urgence -->
+        <div
+          v-if="
+            (application.volunteersSettings?.askEmergencyContact ||
+              (application.volunteersSettings?.askAllergies && application.allergies)) &&
+            (application.emergencyContactName || application.emergencyContactPhone)
+          "
+        >
+          <h4 class="font-medium text-gray-900 dark:text-white mb-2">
+            {{ $t('pages.volunteers.emergency_contact') }}
+          </h4>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            <div v-if="application.emergencyContactName">
+              <span class="text-gray-600 dark:text-gray-400"
+                >{{ $t('pages.volunteers.emergency_contact_name') }}:</span
+              >
+              <span class="ml-2">{{ application.emergencyContactName }}</span>
+            </div>
+            <div v-if="application.emergencyContactPhone" class="mt-1">
+              <span class="text-gray-600 dark:text-gray-400"
+                >{{ $t('pages.volunteers.emergency_contact_phone') }}:</span
+              >
+              <span class="ml-2">{{ application.emergencyContactPhone }}</span>
+            </div>
           </div>
         </div>
 

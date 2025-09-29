@@ -1,5 +1,6 @@
 <template>
   <UModal
+    v-if="volunteersInfo?.mode === 'INTERNAL'"
     v-model:open="showModal"
     :title="t('editions.volunteers.apply')"
     :description="t('editions.volunteers.apply_description')"
@@ -75,7 +76,7 @@
         </div>
 
         <!-- Section: Votre présence -->
-        <div v-if="volunteersInfo?.mode === 'INTERNAL'" class="space-y-4 w-full">
+        <div class="space-y-4 w-full">
           <h3
             class="text-lg font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
           >
@@ -256,6 +257,49 @@
               />
             </UFormField>
             <p class="text-[11px] text-gray-500">{{ t('editions.volunteers.allergies_hint') }}</p>
+          </div>
+
+          <!-- Contact d'urgence -->
+          <div v-if="shouldAskEmergencyContact" class="space-y-3 w-full">
+            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {{ t('editions.volunteers.emergency_contact_title') }}
+              <span
+                v-if="!volunteersInfo?.askEmergencyContact && formData.allergies?.trim()"
+                class="text-orange-600 dark:text-orange-400 text-xs font-normal"
+              >
+                ({{ t('editions.volunteers.emergency_contact_required_for_allergies') }})
+              </span>
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+              <UFormField
+                :label="t('editions.volunteers.emergency_contact_name')"
+                :error="emergencyContactNameError"
+                class="w-full"
+              >
+                <UInput
+                  v-model="formData.emergencyContactName"
+                  :placeholder="t('editions.volunteers.emergency_contact_name_placeholder')"
+                  class="w-full"
+                  @blur="markFieldTouched('emergencyContactName')"
+                />
+              </UFormField>
+              <UFormField
+                :label="t('editions.volunteers.emergency_contact_phone')"
+                :error="emergencyContactPhoneError"
+                class="w-full"
+              >
+                <UInput
+                  v-model="formData.emergencyContactPhone"
+                  :placeholder="t('editions.volunteers.emergency_contact_phone_placeholder')"
+                  autocomplete="tel"
+                  class="w-full"
+                  @blur="markFieldTouched('emergencyContactPhone')"
+                />
+              </UFormField>
+            </div>
+            <p class="text-xs text-gray-500">
+              {{ t('editions.volunteers.emergency_contact_hint') }}
+            </p>
           </div>
 
           <!-- Animaux de compagnie -->
@@ -474,6 +518,7 @@ interface VolunteerInfo {
   askAvoidList: boolean
   askSkills: boolean
   askExperience: boolean
+  askEmergencyContact: boolean
   setupStartDate?: string
   teardownEndDate?: string
   askSetup: boolean
@@ -536,6 +581,8 @@ const formData = ref({
   avoidList: '',
   dietPreference: 'NONE' as 'NONE' | 'VEGETARIAN' | 'VEGAN',
   allergies: '',
+  emergencyContactName: '',
+  emergencyContactPhone: '',
   hasPets: false,
   petsDetails: '',
   hasMinors: false,
@@ -608,7 +655,6 @@ const availabilityError = computed(() => {
 const arrivalDateError = computed(() => {
   if (!showAllErrors.value && !touchedFields.value.has('arrivalDateTime')) return undefined
   if (
-    props.volunteersInfo?.mode === 'INTERNAL' &&
     (formData.value.setupAvailability ||
       formData.value.eventAvailability ||
       formData.value.teardownAvailability) &&
@@ -622,11 +668,28 @@ const arrivalDateError = computed(() => {
 const departureDateError = computed(() => {
   if (!showAllErrors.value && !touchedFields.value.has('departureDateTime')) return undefined
   if (
-    props.volunteersInfo?.mode === 'INTERNAL' &&
     (formData.value.eventAvailability || formData.value.teardownAvailability) &&
     !formData.value.departureDateTime
   ) {
     return t('validation.departure_date_required')
+  }
+  return undefined
+})
+
+const emergencyContactNameError = computed(() => {
+  if (!shouldAskEmergencyContact.value) return undefined
+  if (!showAllErrors.value && !touchedFields.value.has('emergencyContactName')) return undefined
+  if (!formData.value.emergencyContactName?.trim()) {
+    return t('validation.emergency_contact_name_required')
+  }
+  return undefined
+})
+
+const emergencyContactPhoneError = computed(() => {
+  if (!shouldAskEmergencyContact.value) return undefined
+  if (!showAllErrors.value && !touchedFields.value.has('emergencyContactPhone')) return undefined
+  if (!formData.value.emergencyContactPhone?.trim()) {
+    return t('validation.emergency_contact_phone_required')
   }
   return undefined
 })
@@ -637,6 +700,8 @@ const validationErrors = computed(() => {
     phoneError.value,
     firstNameError.value,
     lastNameError.value,
+    emergencyContactNameError.value,
+    emergencyContactPhoneError.value,
     motivationError.value,
     availabilityError.value,
     arrivalDateError.value,
@@ -649,27 +714,37 @@ const isFormValid = computed(() => validationErrors.value.length === 0)
 
 const showPreferencesSection = computed(() => {
   return (
-    (props.volunteersInfo?.askTimePreferences && props.volunteersInfo?.mode === 'INTERNAL') ||
-    (props.volunteersInfo?.askTeamPreferences &&
-      volunteerTeams.value.length > 0 &&
-      props.volunteersInfo?.mode === 'INTERNAL') ||
+    props.volunteersInfo?.askTimePreferences ||
+    (props.volunteersInfo?.askTeamPreferences && volunteerTeams.value.length > 0) ||
     props.volunteersInfo?.askCompanion ||
     props.volunteersInfo?.askAvoidList
   )
 })
 
+// Computed pour savoir si on doit demander le contact d'urgence
+const shouldAskEmergencyContact = computed(() => {
+  // Demandé explicitement par l'organisateur
+  if (props.volunteersInfo?.askEmergencyContact) return true
+
+  // Ou si allergies demandées ET renseignées
+  if (props.volunteersInfo?.askAllergies && formData.value.allergies?.trim()) return true
+
+  return false
+})
+
 const showAboutYouSection = computed(() => {
   return (
-    (props.volunteersInfo?.askDiet && props.volunteersInfo?.mode === 'INTERNAL') ||
-    (props.volunteersInfo?.askAllergies && props.volunteersInfo?.mode === 'INTERNAL') ||
-    (props.volunteersInfo?.askPets && props.volunteersInfo?.mode === 'INTERNAL') ||
-    (props.volunteersInfo?.askMinors && props.volunteersInfo?.mode === 'INTERNAL')
+    props.volunteersInfo?.askDiet ||
+    props.volunteersInfo?.askAllergies ||
+    props.volunteersInfo?.askPets ||
+    props.volunteersInfo?.askMinors ||
+    shouldAskEmergencyContact.value
   )
 })
 
 const showWhatYouCanBringSection = computed(() => {
   return (
-    (props.volunteersInfo?.askVehicle && props.volunteersInfo?.mode === 'INTERNAL') ||
+    props.volunteersInfo?.askVehicle ||
     props.volunteersInfo?.askSkills ||
     props.volunteersInfo?.askExperience
   )
@@ -849,6 +924,8 @@ watch(
         avoidList: '',
         dietPreference: 'NONE' as 'NONE' | 'VEGETARIAN' | 'VEGAN',
         allergies: '',
+        emergencyContactName: '',
+        emergencyContactPhone: '',
         hasPets: false,
         petsDetails: '',
         hasMinors: false,

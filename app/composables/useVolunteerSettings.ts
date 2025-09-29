@@ -23,6 +23,7 @@ export interface VolunteerSettings {
   askExperience?: boolean
   askTimePreferences?: boolean
   askTeamPreferences?: boolean
+  askEmergencyContact?: boolean
 }
 
 export const useVolunteerSettings = (editionId: number) => {
@@ -108,6 +109,7 @@ export const useVolunteerSettings = (editionId: number) => {
       askExperience: settings.value.askExperience,
       askTimePreferences: settings.value.askTimePreferences,
       askTeamPreferences: settings.value.askTeamPreferences,
+      askEmergencyContact: settings.value.askEmergencyContact,
       teams: volunteerTeams,
     }
   }

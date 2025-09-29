@@ -20,6 +20,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
     volunteersOpen: true,
     volunteersAskDiet: true,
     volunteersAskAllergies: true,
+    volunteersAskEmergencyContact: true,
     volunteersAskTimePreferences: true,
     volunteersAskTeamPreferences: true,
     volunteersAskPets: true,
@@ -189,6 +190,8 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
         departureDateTime: '2024-06-05_evening',
         dietaryPreference: 'VEGETARIAN',
         allergies: 'Arachides, gluten',
+        emergencyContactName: 'Marie Urgence',
+        emergencyContactPhone: '+33987654321',
         timePreferences: ['morning', 'evening'],
         teamPreferences: ['team1', 'team2'], // IDs des équipes VolunteerTeam
         hasPets: true,
@@ -227,6 +230,8 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
           departureDateTime: completeApplication.departureDateTime,
           dietaryPreference: 'VEGETARIAN',
           allergies: completeApplication.allergies,
+          emergencyContactName: completeApplication.emergencyContactName,
+          emergencyContactPhone: completeApplication.emergencyContactPhone,
           timePreferences: completeApplication.timePreferences,
           teamPreferences: completeApplication.teamPreferences,
           hasPets: true,
@@ -250,6 +255,7 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
         volunteersOpen: true,
         volunteersAskDiet: false,
         volunteersAskAllergies: false,
+        volunteersAskEmergencyContact: false,
         volunteersAskPets: false,
         volunteersAskMinors: false,
         volunteersAskVehicle: false,
@@ -269,6 +275,8 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
         // Ces options ne devraient pas être sauvegardées
         dietaryPreference: 'VEGAN',
         allergies: 'Aucune',
+        emergencyContactName: 'Contact Non Demandé',
+        emergencyContactPhone: '+33111111111',
         timePreferences: ['morning'],
         teamPreferences: ['team1'], // ID équipe VolunteerTeam
         skills: 'Beaucoup de compétences',
@@ -287,6 +295,8 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
       const createCall = prismaMock.editionVolunteerApplication.create.mock.calls[0][0]
       expect(createCall.data.dietaryPreference).toBe('NONE') // Valeur par défaut
       expect(createCall.data.allergies).toBeNull()
+      expect(createCall.data.emergencyContactName).toBeNull()
+      expect(createCall.data.emergencyContactPhone).toBeNull()
       expect(createCall.data.timePreferences).toBeNull()
       expect(createCall.data.teamPreferences).toBeNull()
       expect(createCall.data.skills).toBeNull()
@@ -756,6 +766,199 @@ describe('/api/editions/[id]/volunteers/apply POST', () => {
       const mockEvent = { context: { user: mockUser } }
 
       await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
+    })
+  })
+
+  describe("Validation du contact d'urgence", () => {
+    beforeEach(() => {
+      prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
+      prismaMock.user.findUnique.mockResolvedValue(mockUser)
+    })
+
+    it("devrait accepter une candidature avec contact d'urgence quand demandé", async () => {
+      const editionWithEmergencyContact = {
+        ...mockEdition,
+        volunteersAskEmergencyContact: true,
+      }
+
+      const applicationData = {
+        motivation: "Candidature avec contact d'urgence",
+        setupAvailability: true,
+        eventAvailability: true,
+        arrivalDateTime: tomorrow.toISOString(),
+        departureDateTime: dayAfterTomorrow.toISOString(),
+        emergencyContactName: 'Marie Dupont',
+        emergencyContactPhone: '+33987654321',
+      }
+
+      prismaMock.edition.findUnique.mockResolvedValue(editionWithEmergencyContact)
+      prismaMock.editionVolunteerApplication.create.mockResolvedValue({
+        ...mockApplication,
+        ...applicationData,
+      })
+
+      global.readBody.mockResolvedValue(applicationData)
+      const mockEvent = { context: { user: mockUser } }
+
+      const result = await handler(mockEvent as any)
+
+      expect(result.success).toBe(true)
+      expect(prismaMock.editionVolunteerApplication.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          emergencyContactName: 'Marie Dupont',
+          emergencyContactPhone: '+33987654321',
+        }),
+        select: expect.any(Object),
+      })
+    })
+
+    it("devrait exiger le contact d'urgence si allergies renseignées", async () => {
+      const editionWithAllergiesOnly = {
+        ...mockEdition,
+        volunteersAskEmergencyContact: false,
+        volunteersAskAllergies: true,
+      }
+
+      // Candidature avec allergies mais sans contact d'urgence
+      const applicationWithAllergiesNoContact = {
+        motivation: 'Candidature avec allergies',
+        setupAvailability: true,
+        eventAvailability: true,
+        arrivalDateTime: tomorrow.toISOString(),
+        departureDateTime: dayAfterTomorrow.toISOString(),
+        allergies: 'Allergie aux arachides',
+        // Pas de contact d'urgence
+      }
+
+      prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergiesOnly)
+      global.readBody.mockResolvedValue(applicationWithAllergiesNoContact)
+      const mockEvent = { context: { user: mockUser } }
+
+      await expect(handler(mockEvent as any)).rejects.toThrow(/contact.*urgence/i)
+    })
+
+    it("devrait accepter une candidature avec allergies ET contact d'urgence", async () => {
+      const editionWithAllergiesOnly = {
+        ...mockEdition,
+        volunteersAskEmergencyContact: false,
+        volunteersAskAllergies: true,
+      }
+
+      const applicationWithAllergiesAndContact = {
+        motivation: 'Candidature avec allergies et contact',
+        setupAvailability: true,
+        eventAvailability: true,
+        arrivalDateTime: tomorrow.toISOString(),
+        departureDateTime: dayAfterTomorrow.toISOString(),
+        allergies: 'Allergie aux arachides',
+        emergencyContactName: 'Contact Urgence',
+        emergencyContactPhone: '+33123456789',
+      }
+
+      prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergiesOnly)
+      prismaMock.editionVolunteerApplication.create.mockResolvedValue({
+        ...mockApplication,
+        ...applicationWithAllergiesAndContact,
+      })
+
+      global.readBody.mockResolvedValue(applicationWithAllergiesAndContact)
+      const mockEvent = { context: { user: mockUser } }
+
+      const result = await handler(mockEvent as any)
+
+      expect(result.success).toBe(true)
+      expect(prismaMock.editionVolunteerApplication.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          allergies: 'Allergie aux arachides',
+          emergencyContactName: 'Contact Urgence',
+          emergencyContactPhone: '+33123456789',
+        }),
+        select: expect.any(Object),
+      })
+    })
+
+    it("devrait accepter une candidature sans allergies ni contact d'urgence", async () => {
+      const editionWithAllergiesOnly = {
+        ...mockEdition,
+        volunteersAskEmergencyContact: false,
+        volunteersAskAllergies: true,
+      }
+
+      const applicationWithoutAllergies = {
+        motivation: 'Candidature sans allergies',
+        setupAvailability: true,
+        eventAvailability: true,
+        arrivalDateTime: tomorrow.toISOString(),
+        departureDateTime: dayAfterTomorrow.toISOString(),
+        // Pas d'allergies ni de contact d'urgence
+      }
+
+      prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergiesOnly)
+      prismaMock.editionVolunteerApplication.create.mockResolvedValue({
+        ...mockApplication,
+        ...applicationWithoutAllergies,
+      })
+
+      global.readBody.mockResolvedValue(applicationWithoutAllergies)
+      const mockEvent = { context: { user: mockUser } }
+
+      const result = await handler(mockEvent as any)
+
+      expect(result.success).toBe(true)
+      expect(prismaMock.editionVolunteerApplication.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          allergies: null,
+          emergencyContactName: null,
+          emergencyContactPhone: null,
+        }),
+        select: expect.any(Object),
+      })
+    })
+
+    it("devrait valider le format du téléphone de contact d'urgence", async () => {
+      const editionWithEmergencyContact = {
+        ...mockEdition,
+        volunteersAskEmergencyContact: true,
+      }
+
+      const applicationDataWithInvalidPhone = {
+        motivation: 'Test téléphone invalide',
+        setupAvailability: true,
+        eventAvailability: true,
+        arrivalDateTime: tomorrow.toISOString(),
+        departureDateTime: dayAfterTomorrow.toISOString(),
+        emergencyContactName: 'Marie Dupont',
+        emergencyContactPhone: 'abc123', // Format invalide
+      }
+
+      prismaMock.edition.findUnique.mockResolvedValue(editionWithEmergencyContact)
+      global.readBody.mockResolvedValue(applicationDataWithInvalidPhone)
+      const mockEvent = { context: { user: mockUser } }
+
+      await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
+    })
+
+    it("devrait valider la longueur du nom de contact d'urgence", async () => {
+      const editionWithEmergencyContact = {
+        ...mockEdition,
+        volunteersAskEmergencyContact: true,
+      }
+
+      const applicationDataWithLongName = {
+        motivation: 'Test nom trop long',
+        setupAvailability: true,
+        eventAvailability: true,
+        arrivalDateTime: tomorrow.toISOString(),
+        departureDateTime: dayAfterTomorrow.toISOString(),
+        emergencyContactName: 'a'.repeat(101), // Plus de 100 caractères
+        emergencyContactPhone: '+33123456789',
+      }
+
+      prismaMock.edition.findUnique.mockResolvedValue(editionWithEmergencyContact)
+      global.readBody.mockResolvedValue(applicationDataWithLongName)
+      const mockEvent = { context: { user: mockUser } }
+
+      await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
     })
   })
 })
