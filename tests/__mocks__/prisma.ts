@@ -36,6 +36,7 @@ export const prismaMock = {
   volunteerNotificationConfirmation: createModelMock(),
   volunteerAssignment: createModelMock(),
   apiErrorLog: createModelMock(),
+  notification: createModelMock(),
 
   // Modèles objets trouvés
   lostFoundItem: createModelMock(),
@@ -44,6 +45,7 @@ export const prismaMock = {
   // Modèles covoiturage
   carpoolOffer: createModelMock(),
   carpoolRequest: createModelMock(),
+  carpoolPassenger: createModelMock(),
   carpoolComment: createModelMock(),
   carpoolRequestComment: createModelMock(),
 

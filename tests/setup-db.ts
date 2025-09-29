@@ -47,7 +47,7 @@ if (process.env.TEST_WITH_DB === 'true') {
       console.error('❌ Erreur lors de la connexion à la DB de test:', err)
       throw err
     }
-  }, 30000)
+  }, 60000)
 
   // Pas de nettoyage entre les tests - les IDs uniques évitent les conflits
 
@@ -59,18 +59,23 @@ if (process.env.TEST_WITH_DB === 'true') {
 }
 
 // Fonction pour attendre que la DB soit prête
-async function waitForDatabase(maxRetries = 30) {
+async function waitForDatabase(maxRetries = 20) {
+  console.log('🔍 Vérification de la connexion à la base de données...')
+
   for (let i = 0; i < maxRetries; i++) {
     try {
       await prismaTest.$connect()
       await prismaTest.$queryRaw`SELECT 1`
+      console.log(`✅ Base de données prête après ${i + 1} tentative(s)`)
       return
-    } catch {
-      console.log(`⏳ Attente de la base de données... (${i + 1}/${maxRetries})`)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+    } catch (error) {
+      if (i < 5 || i % 5 === 0) {
+        console.log(`⏳ Attente de la base de données... (${i + 1}/${maxRetries})`)
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1500))
     }
   }
-  throw new Error("La base de données n'est pas disponible")
+  throw new Error("La base de données n'est pas disponible après " + maxRetries + " tentatives")
 }
 
 // Fonction pour nettoyer la base de données
@@ -87,11 +92,14 @@ async function cleanDatabase() {
     await prismaTest.carpoolOffer.deleteMany({})
     await prismaTest.editionPostComment.deleteMany({})
     await prismaTest.editionPost.deleteMany({})
+    await prismaTest.editionVolunteerApplication.deleteMany({})
+    await prismaTest.volunteerTeam.deleteMany({})
     await prismaTest.conventionCollaborator.deleteMany({})
     await prismaTest.edition.deleteMany({})
     await prismaTest.convention.deleteMany({})
     await prismaTest.user.deleteMany({})
-  } catch {
-    console.warn('Erreur lors du nettoyage de la DB:')
+    console.log('🗑️ Nettoyage DB terminé')
+  } catch (error) {
+    console.warn('⚠️ Erreur lors du nettoyage de la DB:', error?.message || error)
   }
 }

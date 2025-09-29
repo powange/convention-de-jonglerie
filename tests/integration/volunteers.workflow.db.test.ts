@@ -58,6 +58,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
     askPets: true,
     askTimePreferences: true,
     askTeamPreferences: true,
+    volunteersAskEmergencyContact: false,
     teams: [
       { id: 1, name: 'Accueil', slots: 5 },
       { id: 2, name: 'Technique', slots: 3 },
@@ -731,6 +732,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
           volunteersAskAvoidList: true,
           volunteersAskSkills: true,
           volunteersAskExperience: true,
+          volunteersAskEmergencyContact: true,
           volunteersSetupStartDate: true,
           volunteersTeardownEndDate: true,
           volunteersUpdatedAt: true,
