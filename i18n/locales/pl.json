@@ -80,6 +80,10 @@
     "execute_tasks": "Wykonaj ręcznie",
     "executing": "W toku...",
     "execution_time": "Czas wykonania",
+    "export_format_description": "Ten JSON jest sformatowany do ponownego importu przez stronę importu edycji.",
+    "export_format_title": "Format eksportu",
+    "export_json_description": "JSON sformatowany do importu edycji",
+    "export_json_title": "Eksport JSON",
     "favorites_count": "ulubione",
     "feedback": {
       "admin_notes": "Notatki admina",
@@ -190,6 +194,7 @@
     "last_execution_details": "Szczegóły ostatniego wykonania",
     "loading_activity": "Ładowanie ostatniej aktywności...",
     "loading_logs": "Ładowanie dzienników...",
+    "loading_placeholder": "Ładowanie...",
     "loading_tasks": "Ładowanie zadań...",
     "main_type": "Typ główny",
     "manage_editions": "Zarządzaj edycjami",
@@ -481,6 +486,7 @@
     "title": "Współpracownicy"
   },
   "common": {
+    "accepted": "Zaakceptowane",
     "actions": "Akcje",
     "active": "Aktywny",
     "add": "Dodaj",
@@ -1559,6 +1565,7 @@
     "volunteers": {
       "accepted": "Zaakceptowane",
       "allergies": "Alergie",
+      "application_details": "Szczegóły aplikacji",
       "applications_description": "Śledź status swoich zgłoszeń wolontariuszów na różnych konwentach",
       "applied_on": "Zgłoszono",
       "assigned_time_slots": "Przydzielone przedziały czasowe",
@@ -1602,9 +1609,12 @@
       "no_history_description": "Brak odrzuconych lub wycofanych aplikacji",
       "no_pending_applications": "Brak oczekujących aplikacji",
       "no_pending_description": "Obecnie nie masz żadnych aplikacji oczekujących na odpowiedź",
+      "no_rejected_applications": "Brak odrzuconych aplikacji",
+      "no_rejected_description": "Żadna z twoich aplikacji nie została odrzucona",
       "pending": "Oczekujące",
       "pets": "Zwierzęta domowe",
       "pets_details": "Szczegóły zwierząt",
+      "rejected": "Odrzucone",
       "setup": "Przygotowanie",
       "skills": "Umiejętności",
       "team_distribution": {
@@ -1649,6 +1659,7 @@
       "view_compact_short": "Kompaktowy",
       "view_detailed": "Widok szczegółowy",
       "view_detailed_short": "Szczegółowy",
+      "view_details": "Zobacz szczegóły",
       "view_edition": "Zobacz edycję",
       "view_planning": "Zobacz harmonogram",
       "withdraw": "Wycofaj",

@@ -80,6 +80,10 @@
     "execute_tasks": "Выполнить вручную",
     "executing": "Выполняется...",
     "execution_time": "Время выполнения",
+    "export_format_description": "Этот JSON отформатирован для повторного импорта через страницу импорта изданий.",
+    "export_format_title": "Формат экспорта",
+    "export_json_description": "JSON отформатированный для импорта изданий",
+    "export_json_title": "Экспорт JSON",
     "favorites_count": "избранных",
     "feedback": {
       "admin_notes": "Заметки администратора",
@@ -190,6 +194,7 @@
     "last_execution_details": "Детали последнего выполнения",
     "loading_activity": "Загрузка недавней активности...",
     "loading_logs": "Загрузка журналов...",
+    "loading_placeholder": "Загрузка...",
     "loading_tasks": "Загрузка задач...",
     "main_type": "Основной тип",
     "manage_editions": "Управлять изданиями",
@@ -481,6 +486,7 @@
     "title": "Сотрудники"
   },
   "common": {
+    "accepted": "Принято",
     "actions": "Действия",
     "active": "Активный",
     "add": "Добавить",
@@ -1559,6 +1565,7 @@
     "volunteers": {
       "accepted": "Принятые",
       "allergies": "Аллергии",
+      "application_details": "Детали заявки",
       "applications_description": "Отслеживайте статус ваших заявок на волонтёрство на различных конвенциях",
       "applied_on": "Подано",
       "assigned_time_slots": "Назначенные временные слоты",
@@ -1602,9 +1609,12 @@
       "no_history_description": "Нет отклонённых или отозванных заявок",
       "no_pending_applications": "Нет ожидающих заявок",
       "no_pending_description": "У вас в настоящее время нет заявок, ожидающих ответа",
+      "no_rejected_applications": "Нет отклонённых заявок",
+      "no_rejected_description": "Ни одна из ваших заявок не была отклонена",
       "pending": "В ожидании",
       "pets": "Домашние животные",
       "pets_details": "Детали о животных",
+      "rejected": "Отклонённые",
       "setup": "Подготовка",
       "skills": "Навыки",
       "team_distribution": {
@@ -1649,6 +1659,7 @@
       "view_compact_short": "Компактный",
       "view_detailed": "Подробный вид",
       "view_detailed_short": "Подробный",
+      "view_details": "Просмотреть детали",
       "view_edition": "Посмотреть издание",
       "view_planning": "Просмотреть расписание",
       "withdraw": "Отозвать",

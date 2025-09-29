@@ -80,6 +80,10 @@
     "execute_tasks": "Manuell ausführen",
     "executing": "Wird ausgeführt...",
     "execution_time": "Ausführungszeit",
+    "export_format_description": "Diese JSON ist formatiert für den Re-Import über die Editions-Import-Seite.",
+    "export_format_title": "Export-Format",
+    "export_json_description": "JSON formatiert für Editions-Import",
+    "export_json_title": "JSON-Export",
     "favorites_count": "Favorit(en)",
     "feedback": {
       "admin_notes": "Admin-Notizen",
@@ -190,6 +194,7 @@
     "last_execution_details": "Details der letzten Ausführung",
     "loading_activity": "Lade aktuelle Aktivität...",
     "loading_logs": "Protokolle laden...",
+    "loading_placeholder": "Laden...",
     "loading_tasks": "Lade Aufgaben...",
     "main_type": "Haupttyp",
     "manage_editions": "Ausgaben verwalten",
@@ -481,6 +486,7 @@
     "title": "Mitarbeiter"
   },
   "common": {
+    "accepted": "Akzeptiert",
     "actions": "Aktionen",
     "active": "Aktiv",
     "add": "Hinzufügen",
@@ -1559,6 +1565,7 @@
     "volunteers": {
       "accepted": "Akzeptiert",
       "allergies": "Allergien",
+      "application_details": "Bewerbungsdetails",
       "applications_description": "Verfolgen Sie den Status Ihrer Freiwilligenbewerbungen für verschiedene Conventions",
       "applied_on": "Beworben am",
       "assigned_time_slots": "Zugewiesene Zeitfenster",
@@ -1602,9 +1609,12 @@
       "no_history_description": "Keine abgelehnten oder zurückgezogenen Bewerbungen",
       "no_pending_applications": "Keine ausstehenden Bewerbungen",
       "no_pending_description": "Sie haben derzeit keine Bewerbungen, die auf Antwort warten",
+      "no_rejected_applications": "Keine abgelehnten Bewerbungen",
+      "no_rejected_description": "Keine Ihrer Bewerbungen wurde abgelehnt",
       "pending": "Ausstehend",
       "pets": "Haustiere",
       "pets_details": "Haustier-Details",
+      "rejected": "Abgelehnt",
       "setup": "Aufbau",
       "skills": "Fähigkeiten",
       "team_distribution": {
@@ -1649,6 +1659,7 @@
       "view_compact_short": "Kompakt",
       "view_detailed": "Detaillierte Ansicht",
       "view_detailed_short": "Detailliert",
+      "view_details": "Details anzeigen",
       "view_edition": "Edition anzeigen",
       "view_planning": "Planung anzeigen",
       "withdraw": "Zurückziehen",

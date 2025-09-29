@@ -80,6 +80,10 @@
     "execute_tasks": "Виконати вручну",
     "executing": "Виконується...",
     "execution_time": "Час виконання",
+    "export_format_description": "Цей JSON відформатований для повторного імпорту через сторінку імпорту видань.",
+    "export_format_title": "Формат експорту",
+    "export_json_description": "JSON відформатований для імпорту видань",
+    "export_json_title": "Експорт JSON",
     "favorites_count": "вибране",
     "feedback": {
       "admin_notes": "Нотатки адміністратора",
@@ -190,6 +194,7 @@
     "last_execution_details": "Деталі останнього виконання",
     "loading_activity": "Завантаження нещодавньої активності...",
     "loading_logs": "Завантаження журналів...",
+    "loading_placeholder": "Завантаження...",
     "loading_tasks": "Завантаження завдань...",
     "main_type": "Основний тип",
     "manage_editions": "Управляти виданнями",
@@ -481,6 +486,7 @@
     "title": "Співробітники"
   },
   "common": {
+    "accepted": "Прийнято",
     "actions": "Дії",
     "active": "Активний",
     "add": "Додати",
@@ -1559,6 +1565,7 @@
     "volunteers": {
       "accepted": "Прийняті",
       "allergies": "Алергії",
+      "application_details": "Деталі заявки",
       "applications_description": "Відстежуйте статус ваших заявок на волонтерство на різних конвенціях",
       "applied_on": "Подано",
       "assigned_time_slots": "Призначені часові слоти",
@@ -1602,9 +1609,12 @@
       "no_history_description": "Немає відхилених або відкликаних заявок",
       "no_pending_applications": "Немає очікуючих заявок",
       "no_pending_description": "У вас наразі немає заявок, що очікують відповіді",
+      "no_rejected_applications": "Немає відхилених заявок",
+      "no_rejected_description": "Жодна з ваших заявок не була відхилена",
       "pending": "В очікуванні",
       "pets": "Домашні тварини",
       "pets_details": "Деталі про тварин",
+      "rejected": "Відхилені",
       "setup": "Підготовка",
       "skills": "Навички",
       "team_distribution": {
@@ -1649,6 +1659,7 @@
       "view_compact_short": "Компактний",
       "view_detailed": "Детальний вид",
       "view_detailed_short": "Детальний",
+      "view_details": "Переглянути деталі",
       "view_edition": "Переглянути видання",
       "view_planning": "Переглянути планування",
       "withdraw": "Відкликати",

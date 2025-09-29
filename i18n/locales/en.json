@@ -80,6 +80,10 @@
     "execute_tasks": "Execute manually",
     "executing": "Running...",
     "execution_time": "Execution time",
+    "export_format_description": "This JSON is formatted for re-import via the edition import page.",
+    "export_format_title": "Export format",
+    "export_json_description": "JSON formatted for edition import",
+    "export_json_title": "JSON export",
     "favorites_count": "favorite(s)",
     "feedback": {
       "admin_notes": "Admin notes",
@@ -190,6 +194,7 @@
     "last_execution_details": "Last execution details",
     "loading_activity": "Loading recent activity...",
     "loading_logs": "Loading logs...",
+    "loading_placeholder": "Loading...",
     "loading_tasks": "Loading tasks...",
     "main_type": "Main Type",
     "manage_editions": "Manage editions",
@@ -481,6 +486,7 @@
     "title": "Collaborators"
   },
   "common": {
+    "accepted": "Accepted",
     "actions": "Actions",
     "active": "Active",
     "add": "Add",
@@ -1559,6 +1565,7 @@
     "volunteers": {
       "accepted": "Accepted",
       "allergies": "Allergies",
+      "application_details": "Application details",
       "applications_description": "Track the status of your volunteer applications for different conventions",
       "applied_on": "Applied on",
       "assigned_time_slots": "Assigned Time Slots",
@@ -1602,9 +1609,12 @@
       "no_history_description": "No rejected or withdrawn applications",
       "no_pending_applications": "No pending applications",
       "no_pending_description": "You currently have no applications awaiting response",
+      "no_rejected_applications": "No rejected applications",
+      "no_rejected_description": "None of your applications have been rejected",
       "pending": "Pending",
       "pets": "Pets",
       "pets_details": "Pet details",
+      "rejected": "Rejected",
       "setup": "Setup",
       "skills": "Skills",
       "team_distribution": {
@@ -1649,6 +1659,7 @@
       "view_compact_short": "Compact",
       "view_detailed": "Detailed view",
       "view_detailed_short": "Detailed",
+      "view_details": "View details",
       "view_edition": "View edition",
       "view_planning": "View schedule",
       "withdraw": "Withdraw",

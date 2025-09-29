@@ -395,8 +395,8 @@
     <!-- Modal d'export JSON -->
     <UModal
       v-model:open="showExportModal"
-      title="Export JSON"
-      description="JSON formaté pour l'import d'édition"
+      :title="$t('admin.export_json_title')"
+      :description="$t('admin.export_json_description')"
     >
       <template #body>
         <div class="space-y-4">
@@ -404,8 +404,8 @@
             icon="i-heroicons-information-circle"
             color="info"
             variant="soft"
-            title="Format d'export"
-            description="Ce JSON est formaté pour être réimporté via la page d'import d'édition."
+            :title="$t('admin.export_format_title')"
+            :description="$t('admin.export_format_description')"
           />
 
           <UTextarea
@@ -413,7 +413,7 @@
             :rows="15"
             readonly
             class="font-mono w-full"
-            placeholder="Chargement..."
+            :placeholder="$t('admin.loading_placeholder')"
           />
           <UButton
             v-if="exportedJson"

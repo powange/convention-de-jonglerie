@@ -80,6 +80,10 @@
     "execute_tasks": "Ejecutar manualmente",
     "executing": "En curso...",
     "execution_time": "Tiempo de ejecución",
+    "export_format_description": "Este JSON está formateado para ser reimportado a través de la página de importación de ediciones.",
+    "export_format_title": "Formato de exportación",
+    "export_json_description": "JSON formateado para importación de ediciones",
+    "export_json_title": "Exportación JSON",
     "favorites_count": "favorito(s)",
     "feedback": {
       "admin_notes": "Notas del administrador",
@@ -190,6 +194,7 @@
     "last_execution_details": "Detalles de la última ejecución",
     "loading_activity": "Cargando actividad reciente...",
     "loading_logs": "Cargando logs...",
+    "loading_placeholder": "Cargando...",
     "loading_tasks": "Cargando tareas...",
     "main_type": "Tipo principal",
     "manage_editions": "Gestionar ediciones",
@@ -481,6 +486,7 @@
     "title": "Colaboradores"
   },
   "common": {
+    "accepted": "Aceptado",
     "actions": "Acciones",
     "active": "Activo",
     "add": "Agregar",
@@ -1559,6 +1565,7 @@
     "volunteers": {
       "accepted": "Aceptadas",
       "allergies": "Alergias",
+      "application_details": "Detalles de la candidatura",
       "applications_description": "Sigue el estado de tus solicitudes de voluntariado para diferentes convenciones",
       "applied_on": "Solicitado el",
       "assigned_time_slots": "Franjas horarias asignadas",
@@ -1602,9 +1609,12 @@
       "no_history_description": "Ninguna solicitud rechazada o retirada",
       "no_pending_applications": "Ninguna solicitud pendiente",
       "no_pending_description": "Actualmente no tienes ninguna solicitud esperando respuesta",
+      "no_rejected_applications": "Ninguna candidatura rechazada",
+      "no_rejected_description": "Ninguna de tus candidaturas ha sido rechazada",
       "pending": "Pendiente",
       "pets": "Mascotas",
       "pets_details": "Detalles de mascotas",
+      "rejected": "Rechazadas",
       "setup": "Montaje",
       "skills": "Habilidades",
       "team_distribution": {
@@ -1649,6 +1659,7 @@
       "view_compact_short": "Compacta",
       "view_detailed": "Vista detallada",
       "view_detailed_short": "Detallada",
+      "view_details": "Ver detalles",
       "view_edition": "Ver edición",
       "view_planning": "Ver planificación",
       "withdraw": "Retirar",

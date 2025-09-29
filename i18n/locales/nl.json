@@ -80,6 +80,10 @@
     "execute_tasks": "Handmatig uitvoeren",
     "executing": "Bezig...",
     "execution_time": "Uitvoeringstijd",
+    "export_format_description": "Deze JSON is geformatteerd voor herimport via de editie-importpagina.",
+    "export_format_title": "Exportformaat",
+    "export_json_description": "JSON geformatteerd voor editie-import",
+    "export_json_title": "JSON-export",
     "favorites_count": "favoriet(en)",
     "feedback": {
       "admin_notes": "Beheerder notities",
@@ -190,6 +194,7 @@
     "last_execution_details": "Details laatste uitvoering",
     "loading_activity": "Recente activiteit laden...",
     "loading_logs": "Logboeken laden...",
+    "loading_placeholder": "Laden...",
     "loading_tasks": "Taken laden...",
     "main_type": "Hoofdtype",
     "manage_editions": "Edities beheren",
@@ -481,6 +486,7 @@
     "title": "Medewerkers"
   },
   "common": {
+    "accepted": "Geaccepteerd",
     "actions": "Acties",
     "active": "Actief",
     "add": "Toevoegen",
@@ -1559,6 +1565,7 @@
     "volunteers": {
       "accepted": "Geaccepteerd",
       "allergies": "Allergieën",
+      "application_details": "Aanvraagdetails",
       "applications_description": "Volg de status van je vrijwilligersaanvragen voor verschillende conventies",
       "applied_on": "Aangemeld op",
       "assigned_time_slots": "Toegewezen tijdsloten",
@@ -1602,9 +1609,12 @@
       "no_history_description": "Geen afgewezen of ingetrokken aanvragen",
       "no_pending_applications": "Geen openstaande aanvragen",
       "no_pending_description": "Je hebt momenteel geen aanvragen die wachten op antwoord",
+      "no_rejected_applications": "Geen afgewezen aanvragen",
+      "no_rejected_description": "Geen van uw aanvragen is afgewezen",
       "pending": "In afwachting",
       "pets": "Huisdieren",
       "pets_details": "Huisdierdetails",
+      "rejected": "Afgewezen",
       "setup": "Opbouw",
       "skills": "Vaardigheden",
       "team_distribution": {
@@ -1649,6 +1659,7 @@
       "view_compact_short": "Compact",
       "view_detailed": "Gedetailleerde weergave",
       "view_detailed_short": "Gedetailleerd",
+      "view_details": "Details bekijken",
       "view_edition": "Editie bekijken",
       "view_planning": "Planning bekijken",
       "withdraw": "Intrekken",
