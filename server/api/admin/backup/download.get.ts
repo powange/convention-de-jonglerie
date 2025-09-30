@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
       // Définir les en-têtes pour le téléchargement
       setHeader(event, 'Content-Type', 'application/sql')
       setHeader(event, 'Content-Disposition', `attachment; filename="${filename}"`)
-      setHeader(event, 'Content-Length', fileContent.length.toString())
+      setHeader(event, 'Content-Length', fileContent.length)
 
       return fileContent
     } catch (fileError: any) {
