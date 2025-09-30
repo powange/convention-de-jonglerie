@@ -1062,7 +1062,7 @@
       "management_title": "Gestão de candidaturas",
       "management_tools": "Ferramentas de gestão",
       "max_volunteers": "Número de voluntários necessários",
-      "max_volunteers_hint": "Número máximo de voluntários para esta equipa (opcional)",
+      "max_volunteers_hint": "Número máximo de voluntários para este turno",
       "max_volunteers_optional": "Número máximo de voluntários (opcional)",
       "max_volunteers_placeholder": "3",
       "minors_details_hint": "Essas informações ajudarão os organizadores a recebê-lo melhor",

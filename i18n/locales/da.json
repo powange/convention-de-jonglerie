@@ -1062,7 +1062,7 @@
       "management_title": "Ansøgningsstyring",
       "management_tools": "Administrationsværktøjer",
       "max_volunteers": "Antal frivillige påkrævet",
-      "max_volunteers_hint": "Maksimalt antal frivillige for dette hold (valgfrit)",
+      "max_volunteers_hint": "Maksimalt antal frivillige for dette tidsrum",
       "max_volunteers_optional": "Maksimalt antal frivillige (valgfrit)",
       "max_volunteers_placeholder": "3",
       "minors_details_hint": "Disse oplysninger vil hjælpe arrangørerne med at modtage dig bedre",

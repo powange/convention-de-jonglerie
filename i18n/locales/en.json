@@ -1062,7 +1062,7 @@
       "management_title": "Application Management",
       "management_tools": "Management tools",
       "max_volunteers": "Number of volunteers required",
-      "max_volunteers_hint": "Maximum number of volunteers for this team (optional)",
+      "max_volunteers_hint": "Maximum number of volunteers for this time slot",
       "max_volunteers_optional": "Maximum number of volunteers (optional)",
       "max_volunteers_placeholder": "3",
       "minors_details_hint": "This information will help organizers better accommodate you",

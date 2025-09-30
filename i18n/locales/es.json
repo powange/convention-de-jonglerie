@@ -1062,7 +1062,7 @@
       "management_title": "Gestión de solicitudes",
       "management_tools": "Herramientas de gestión",
       "max_volunteers": "Número de voluntarios requeridos",
-      "max_volunteers_hint": "Número máximo de voluntarios para este equipo (opcional)",
+      "max_volunteers_hint": "Número máximo de voluntarios para esta franja horaria",
       "max_volunteers_optional": "Número máximo de voluntarios (opcional)",
       "max_volunteers_placeholder": "3",
       "minors_details_hint": "Esta información ayudará a los organizadores a recibirle mejor",

@@ -1062,7 +1062,7 @@
       "management_title": "Bewerbungsverwaltung",
       "management_tools": "Verwaltungstools",
       "max_volunteers": "Anzahl benötigter Freiwilliger",
-      "max_volunteers_hint": "Maximale Anzahl von Freiwilligen für dieses Team (optional)",
+      "max_volunteers_hint": "Maximale Anzahl von Freiwilligen für diesen Zeitslot",
       "max_volunteers_optional": "Maximale Anzahl von Freiwilligen (optional)",
       "max_volunteers_placeholder": "3",
       "minors_details_hint": "Diese Informationen helfen den Organisatoren, Sie besser zu empfangen",

@@ -1062,7 +1062,7 @@
       "management_title": "Aanmelding beheer",
       "management_tools": "Beheertools",
       "max_volunteers": "Aantal vereiste vrijwilligers",
-      "max_volunteers_hint": "Maximum aantal vrijwilligers voor dit team (optioneel)",
+      "max_volunteers_hint": "Maximum aantal vrijwilligers voor dit tijdsslot",
       "max_volunteers_optional": "Maximum aantal vrijwilligers (optioneel)",
       "max_volunteers_placeholder": "3",
       "minors_details_hint": "Deze informatie helpt organisatoren u beter te ontvangen",

@@ -1062,7 +1062,7 @@
       "management_title": "Gestione candidature",
       "management_tools": "Strumenti di gestione",
       "max_volunteers": "Numero di volontari richiesti",
-      "max_volunteers_hint": "Numero massimo di volontari per questa squadra (opzionale)",
+      "max_volunteers_hint": "Numero massimo di volontari per questa fascia oraria",
       "max_volunteers_optional": "Numero massimo di volontari (opzionale)",
       "max_volunteers_placeholder": "3",
       "minors_details_hint": "Queste informazioni aiuteranno gli organizzatori ad accogliervi meglio",

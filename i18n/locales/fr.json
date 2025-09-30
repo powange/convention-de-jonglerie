@@ -1079,7 +1079,7 @@
       "volunteers_needed": "Bénévoles requis",
       "quick_duration": "Durées courantes",
       "invalid_duration": "Durée invalide",
-      "max_volunteers_hint": "Nombre maximum de bénévoles pour cette équipe (optionnel)",
+      "max_volunteers_hint": "Nombre maximum de bénévoles pour ce créneau",
       "select_volunteer": "Sélectionner un bénévole",
       "no_available_volunteers": "Aucun bénévole disponible",
       "no_volunteers_for_team": "Aucun bénévole assigné à cette équipe disponible",
