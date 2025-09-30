@@ -88,7 +88,8 @@
       "Bash(NODE_ENV=test npx vitest run tests/nuxt/pages/admin.feedback.page.nuxt.test.ts --config vitest.config.nuxt.ts)",
       "Bash(export NODE_ENV=test)",
       "Bash(NODE_ENV=test npx vitest run tests/nuxt/server/api/editions/volunteers/applications/index.post.test.ts --config vitest.config.nuxt.ts)",
-      "Bash(NODE_ENV=test npx vitest run tests/nuxt/server/api/editions/volunteers/applications --config vitest.config.nuxt.ts)"
+      "Bash(NODE_ENV=test npx vitest run tests/nuxt/server/api/editions/volunteers/applications --config vitest.config.nuxt.ts)",
+      "WebFetch(domain:www.npmjs.com)"
     ],
     "deny": [],
     "ask": [],

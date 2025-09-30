@@ -30,10 +30,9 @@ export const volunteerApplicationBodySchema = z.object({
   allergySeverity: z.enum(['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']).optional().nullable(),
   timePreferences: z
     .array(z.enum(VALID_TIME_SLOTS))
-    .refine(
-      (arr) => arr.every((slot) => VALID_TIME_SLOTS.includes(slot)),
-      { message: 'Créneau horaire invalide' }
-    )
+    .refine((arr) => arr.every((slot) => VALID_TIME_SLOTS.includes(slot)), {
+      message: 'Créneau horaire invalide',
+    })
     .max(8, 'Maximum 8 créneaux horaires')
     .refine(
       (arr) => {
@@ -246,11 +245,7 @@ export async function validateTeamPreferences(
 ): Promise<string[]> {
   const errors: string[] = []
 
-  if (
-    volunteersAskTeamPreferences &&
-    parsed.teamPreferences &&
-    parsed.teamPreferences.length > 0
-  ) {
+  if (volunteersAskTeamPreferences && parsed.teamPreferences && parsed.teamPreferences.length > 0) {
     // Récupérer les équipes du nouveau système
     const validTeams = await prisma.volunteerTeam.findMany({
       where: { editionId },
@@ -306,20 +301,27 @@ export function buildUpdateData(
   }
 
   // Disponibilités
-  if (parsed.setupAvailability !== undefined) updateData.setupAvailability = parsed.setupAvailability
-  if (parsed.teardownAvailability !== undefined) updateData.teardownAvailability = parsed.teardownAvailability
-  if (parsed.eventAvailability !== undefined) updateData.eventAvailability = parsed.eventAvailability
-  if (parsed.arrivalDateTime !== undefined) updateData.arrivalDateTime = parsed.arrivalDateTime || null
-  if (parsed.departureDateTime !== undefined) updateData.departureDateTime = parsed.departureDateTime || null
+  if (parsed.setupAvailability !== undefined)
+    updateData.setupAvailability = parsed.setupAvailability
+  if (parsed.teardownAvailability !== undefined)
+    updateData.teardownAvailability = parsed.teardownAvailability
+  if (parsed.eventAvailability !== undefined)
+    updateData.eventAvailability = parsed.eventAvailability
+  if (parsed.arrivalDateTime !== undefined)
+    updateData.arrivalDateTime = parsed.arrivalDateTime || null
+  if (parsed.departureDateTime !== undefined)
+    updateData.departureDateTime = parsed.departureDateTime || null
 
   // Préférences
   if (parsed.teamPreferences !== undefined) updateData.teamPreferences = parsed.teamPreferences
   if (parsed.timePreferences !== undefined) updateData.timePreferences = parsed.timePreferences
-  if (parsed.companionName !== undefined) updateData.companionName = parsed.companionName?.trim() || null
+  if (parsed.companionName !== undefined)
+    updateData.companionName = parsed.companionName?.trim() || null
   if (parsed.avoidList !== undefined) updateData.avoidList = parsed.avoidList?.trim() || null
 
   // Régime et allergies
-  if (parsed.dietaryPreference !== undefined) updateData.dietaryPreference = parsed.dietaryPreference
+  if (parsed.dietaryPreference !== undefined)
+    updateData.dietaryPreference = parsed.dietaryPreference
   if (parsed.allergies !== undefined) updateData.allergies = parsed.allergies?.trim() || null
   if (parsed.allergySeverity !== undefined) {
     updateData.allergySeverity = parsed.allergies?.trim() ? parsed.allergySeverity : null
@@ -335,9 +337,11 @@ export function buildUpdateData(
   if (parsed.hasPets !== undefined) updateData.hasPets = parsed.hasPets
   if (parsed.petsDetails !== undefined) updateData.petsDetails = parsed.petsDetails?.trim() || null
   if (parsed.hasMinors !== undefined) updateData.hasMinors = parsed.hasMinors
-  if (parsed.minorsDetails !== undefined) updateData.minorsDetails = parsed.minorsDetails?.trim() || null
+  if (parsed.minorsDetails !== undefined)
+    updateData.minorsDetails = parsed.minorsDetails?.trim() || null
   if (parsed.hasVehicle !== undefined) updateData.hasVehicle = parsed.hasVehicle
-  if (parsed.vehicleDetails !== undefined) updateData.vehicleDetails = parsed.vehicleDetails?.trim() || null
+  if (parsed.vehicleDetails !== undefined)
+    updateData.vehicleDetails = parsed.vehicleDetails?.trim() || null
   if (parsed.skills !== undefined) updateData.skills = parsed.skills?.trim() || null
   if (parsed.hasExperience !== undefined) updateData.hasExperience = parsed.hasExperience
   if (parsed.experienceDetails !== undefined) {

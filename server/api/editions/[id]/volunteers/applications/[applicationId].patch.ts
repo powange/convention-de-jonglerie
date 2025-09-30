@@ -126,7 +126,7 @@ export default defineEventHandler(async (event) => {
       if (Object.keys(userUpdateData).length) {
         await prisma.user.update({
           where: { id: application.user.id },
-          data: userUpdateData
+          data: userUpdateData,
         })
       }
     }
