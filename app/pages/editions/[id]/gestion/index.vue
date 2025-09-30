@@ -123,9 +123,7 @@
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-user-group" class="text-primary-500" />
-              <h2 class="text-lg font-semibold">
-                {{ $t('editions.volunteers.volunteer_management') }}
-              </h2>
+              <h2 class="text-lg font-semibold">Gestion bénévole</h2>
             </div>
 
             <!-- Mode de gestion des bénévoles -->
@@ -235,210 +233,96 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               <!-- Page bénévoles -->
-              <NuxtLink
+              <ManagementNavigationCard
                 v-if="canEdit || canManageVolunteers"
                 :to="`/editions/${edition.id}/gestion/volunteers/page`"
-                class="block"
-              >
-                <UCard
-                  class="hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700"
-                >
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                      <div class="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
-                        <UIcon
-                          name="i-heroicons-clipboard-document-list"
-                          class="h-5 w-5 text-indigo-600 dark:text-indigo-400"
-                        />
-                      </div>
-                      <div>
-                        <h3 class="font-medium">{{ $t('editions.volunteers.volunteer_page') }}</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">
-                          {{ $t('editions.volunteers.page_description') }}
-                        </p>
-                      </div>
-                    </div>
-                    <UIcon name="i-heroicons-arrow-right" class="h-4 w-4 text-gray-400" />
-                  </div>
-                </UCard>
-              </NuxtLink>
+                icon="i-heroicons-clipboard-document-list"
+                :title="$t('editions.volunteers.volunteer_page')"
+                :description="$t('editions.volunteers.page_description')"
+                color="indigo"
+              />
 
               <!-- Liens visibles uniquement en mode interne -->
               <template v-if="volunteersModeLocal === 'INTERNAL'">
                 <!-- Formulaire d'appel à bénévole -->
-                <NuxtLink
+                <ManagementNavigationCard
                   v-if="canEdit || canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/form`"
-                  class="block"
-                >
-                  <UCard
-                    class="hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center gap-3">
-                        <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                          <UIcon
-                            name="i-heroicons-megaphone"
-                            class="h-5 w-5 text-blue-600 dark:text-blue-400"
-                          />
-                        </div>
-                        <div>
-                          <h3 class="font-medium">
-                            {{ $t('editions.volunteers.volunteer_form') }}
-                          </h3>
-                          <p class="text-sm text-gray-600 dark:text-gray-400">
-                            {{ $t('editions.volunteers.form_description') }}
-                          </p>
-                        </div>
-                      </div>
-                      <UIcon name="i-heroicons-arrow-right" class="h-4 w-4 text-gray-400" />
-                    </div>
-                  </UCard>
-                </NuxtLink>
+                  icon="i-heroicons-megaphone"
+                  :title="$t('editions.volunteers.volunteer_form')"
+                  :description="$t('editions.volunteers.form_description')"
+                  color="blue"
+                />
 
                 <!-- Gestion des candidatures -->
-                <NuxtLink
+                <ManagementNavigationCard
                   v-if="canEdit || canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/applications`"
-                  class="block"
-                >
-                  <UCard
-                    class="hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center gap-3">
-                        <div class="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                          <UIcon
-                            name="i-heroicons-document-text"
-                            class="h-5 w-5 text-green-600 dark:text-green-400"
-                          />
-                        </div>
-                        <div>
-                          <h3 class="font-medium">
-                            {{ $t('editions.volunteers.application_management') }}
-                          </h3>
-                          <p class="text-sm text-gray-600 dark:text-gray-400">
-                            Consulter et traiter les candidatures
-                          </p>
-                        </div>
-                      </div>
-                      <UIcon name="i-heroicons-arrow-right" class="h-4 w-4 text-gray-400" />
-                    </div>
-                  </UCard>
-                </NuxtLink>
+                  icon="i-heroicons-document-text"
+                  :title="$t('editions.volunteers.application_management')"
+                  description="Consulter et traiter les candidatures"
+                  color="green"
+                />
 
                 <!-- Les équipes -->
-                <NuxtLink
+                <ManagementNavigationCard
                   v-if="canEdit || canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/teams`"
-                  class="block"
-                >
-                  <UCard
-                    class="hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center gap-3">
-                        <div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                          <UIcon
-                            name="i-heroicons-user-group"
-                            class="h-5 w-5 text-purple-600 dark:text-purple-400"
-                          />
-                        </div>
-                        <div>
-                          <h3 class="font-medium">{{ $t('editions.volunteers.teams') }}</h3>
-                          <p class="text-sm text-gray-600 dark:text-gray-400">
-                            Organiser les équipes de bénévoles
-                          </p>
-                        </div>
-                      </div>
-                      <UIcon name="i-heroicons-arrow-right" class="h-4 w-4 text-gray-400" />
-                    </div>
-                  </UCard>
-                </NuxtLink>
+                  icon="i-heroicons-user-group"
+                  :title="$t('editions.volunteers.teams')"
+                  description="Organiser les équipes de bénévoles"
+                  color="purple"
+                />
 
                 <!-- Planning -->
-                <NuxtLink :to="`/editions/${edition.id}/gestion/volunteers/planning`" class="block">
-                  <UCard
-                    class="hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center gap-3">
-                        <div class="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                          <UIcon
-                            name="i-heroicons-calendar-days"
-                            class="h-5 w-5 text-orange-600 dark:text-orange-400"
-                          />
-                        </div>
-                        <div>
-                          <h3 class="font-medium">{{ $t('editions.volunteers.planning') }}</h3>
-                          <p class="text-sm text-gray-600 dark:text-gray-400">
-                            Planifier les créneaux et missions
-                          </p>
-                        </div>
-                      </div>
-                      <UIcon name="i-heroicons-arrow-right" class="h-4 w-4 text-gray-400" />
-                    </div>
-                  </UCard>
-                </NuxtLink>
+                <ManagementNavigationCard
+                  :to="`/editions/${edition.id}/gestion/volunteers/planning`"
+                  icon="i-heroicons-calendar-days"
+                  :title="$t('editions.volunteers.planning')"
+                  description="Planifier les créneaux et missions"
+                  color="orange"
+                />
 
                 <!-- Notifications bénévoles -->
-                <NuxtLink
+                <ManagementNavigationCard
                   v-if="canEdit || canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/notifications`"
-                  class="block"
-                >
-                  <UCard
-                    class="hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center gap-3">
-                        <div class="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-                          <UIcon
-                            name="i-heroicons-bell"
-                            class="h-5 w-5 text-yellow-600 dark:text-yellow-400"
-                          />
-                        </div>
-                        <div>
-                          <h3 class="font-medium">
-                            {{ $t('editions.volunteers.volunteer_notifications') }}
-                          </h3>
-                          <p class="text-sm text-gray-600 dark:text-gray-400">
-                            Envoyer des notifications aux bénévoles
-                          </p>
-                        </div>
-                      </div>
-                      <UIcon name="i-heroicons-arrow-right" class="h-4 w-4 text-gray-400" />
-                    </div>
-                  </UCard>
-                </NuxtLink>
+                  icon="i-heroicons-bell"
+                  :title="$t('editions.volunteers.volunteer_notifications')"
+                  description="Envoyer des notifications aux bénévoles"
+                  color="yellow"
+                />
 
                 <!-- Outils de gestion -->
-                <NuxtLink :to="`/editions/${edition.id}/gestion/volunteers/tools`" class="block">
-                  <UCard
-                    class="hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center gap-3">
-                        <div class="p-2 bg-gray-100 dark:bg-gray-900/30 rounded-lg">
-                          <UIcon
-                            name="i-heroicons-wrench-screwdriver"
-                            class="h-5 w-5 text-gray-600 dark:text-gray-400"
-                          />
-                        </div>
-                        <div>
-                          <h3 class="font-medium">
-                            {{ $t('editions.volunteers.management_tools') }}
-                          </h3>
-                          <p class="text-sm text-gray-600 dark:text-gray-400">
-                            Outils avancés et génération de documents
-                          </p>
-                        </div>
-                      </div>
-                      <UIcon name="i-heroicons-arrow-right" class="h-4 w-4 text-gray-400" />
-                    </div>
-                  </UCard>
-                </NuxtLink>
+                <ManagementNavigationCard
+                  :to="`/editions/${edition.id}/gestion/volunteers/tools`"
+                  icon="i-heroicons-wrench-screwdriver"
+                  :title="$t('editions.volunteers.management_tools')"
+                  description="Outils avancés et génération de documents"
+                  color="gray"
+                />
               </template>
+            </div>
+          </div>
+        </UCard>
+
+        <!-- Billeterie -->
+        <UCard v-if="isCollaborator">
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-ticket" class="text-blue-500" />
+              <h2 class="text-lg font-semibold">Billeterie</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <!-- Contrôle d'accès -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/ticketing/access-control`"
+                icon="i-heroicons-shield-check"
+                title="Contrôle d'accès"
+                description="Scanner et valider les billets à l'entrée"
+                color="blue"
+              />
             </div>
           </div>
         </UCard>
