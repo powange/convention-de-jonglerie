@@ -85,7 +85,6 @@ export default defineEventHandler(async (event) => {
       console.log('Restauration de la base de données en cours...')
       execSync(mysqlCmd, {
         encoding: 'utf8',
-        shell: true,
         maxBuffer: 1024 * 1024 * 100, // 100MB buffer
       })
 

@@ -96,7 +96,7 @@ export default defineEventHandler(async (event) => {
       // Gérer le cas "NO_TEAM" (aucune équipe assignée)
       if (assignedTeamIds.includes('NO_TEAM')) {
         assignedTeamConditions.push({
-          teams: { none: {} },
+          teamAssignments: { none: {} },
         })
       }
 
@@ -104,9 +104,9 @@ export default defineEventHandler(async (event) => {
       const specificTeamIds = assignedTeamIds.filter((id) => id !== 'NO_TEAM')
       if (specificTeamIds.length > 0) {
         assignedTeamConditions.push({
-          teams: {
+          teamAssignments: {
             some: {
-              id: { in: specificTeamIds },
+              teamId: { in: specificTeamIds },
             },
           },
         })
@@ -170,47 +170,49 @@ export default defineEventHandler(async (event) => {
 
   const includeTeams = query.includeTeams === 'true'
 
-  const applications = await prisma.editionVolunteerApplication.findMany({
-    where,
-    orderBy,
-    // En cas d'export, pas de pagination
-    ...(isExport ? {} : { skip: (page - 1) * pageSize, take: pageSize }),
-    select: {
-      id: true,
-      status: true,
-      createdAt: true,
-      motivation: true,
-      userId: true,
-      dietaryPreference: true,
-      allergies: true,
-      allergySeverity: true,
-      emergencyContactName: true,
-      emergencyContactPhone: true,
-      timePreferences: true,
-      teamPreferences: true,
-      assignedTeams: true,
-      acceptanceNote: true,
-      hasPets: true,
-      petsDetails: true,
-      hasMinors: true,
-      minorsDetails: true,
-      hasVehicle: true,
-      vehicleDetails: true,
-      companionName: true,
-      avoidList: true,
-      skills: true,
-      hasExperience: true,
-      experienceDetails: true,
-      setupAvailability: true,
-      teardownAvailability: true,
-      eventAvailability: true,
-      arrivalDateTime: true,
-      departureDateTime: true,
-      user: {
-        select: { id: true, pseudo: true, email: true, phone: true, prenom: true, nom: true },
-      },
-      ...(includeTeams && {
-        teams: {
+  const selectFields: any = {
+    id: true,
+    status: true,
+    createdAt: true,
+    motivation: true,
+    userId: true,
+    dietaryPreference: true,
+    allergies: true,
+    allergySeverity: true,
+    emergencyContactName: true,
+    emergencyContactPhone: true,
+    timePreferences: true,
+    teamPreferences: true,
+    assignedTeams: true,
+    acceptanceNote: true,
+    hasPets: true,
+    petsDetails: true,
+    hasMinors: true,
+    minorsDetails: true,
+    hasVehicle: true,
+    vehicleDetails: true,
+    companionName: true,
+    avoidList: true,
+    skills: true,
+    hasExperience: true,
+    experienceDetails: true,
+    setupAvailability: true,
+    teardownAvailability: true,
+    eventAvailability: true,
+    arrivalDateTime: true,
+    departureDateTime: true,
+    user: {
+      select: { id: true, pseudo: true, email: true, phone: true, prenom: true, nom: true },
+    },
+  }
+
+  if (includeTeams) {
+    selectFields.teamAssignments = {
+      select: {
+        teamId: true,
+        isLeader: true,
+        assignedAt: true,
+        team: {
           select: {
             id: true,
             name: true,
@@ -219,8 +221,16 @@ export default defineEventHandler(async (event) => {
             maxVolunteers: true,
           },
         },
-      }),
-    },
+      },
+    }
+  }
+
+  const applications = await prisma.editionVolunteerApplication.findMany({
+    where,
+    orderBy,
+    // En cas d'export, pas de pagination
+    ...(isExport ? {} : { skip: (page - 1) * pageSize, take: pageSize }),
+    select: selectFields,
   })
 
   // Si c'est un export, générer le CSV

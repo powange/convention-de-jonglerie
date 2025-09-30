@@ -1693,7 +1693,12 @@
         "unassigned_volunteers": "Bénévoles non assignés",
         "volunteers_count": "{count} bénévole(s)",
         "empty_team": "Équipe vide",
-        "drop_volunteers_here": "Glissez-déposez des bénévoles ici"
+        "drop_volunteers_here": "Glissez-déposez des bénévoles ici",
+        "leader_badge": "Responsable",
+        "set_as_leader": "Définir comme responsable",
+        "remove_as_leader": "Retirer le rôle de responsable",
+        "leader_added": "Responsable ajouté",
+        "leader_removed": "Responsable retiré"
       }
     },
     "comments": {

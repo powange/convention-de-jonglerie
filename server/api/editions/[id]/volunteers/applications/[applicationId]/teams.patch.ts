@@ -68,26 +68,45 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Mettre à jour les relations avec les nouvelles équipes
+  // Supprimer toutes les assignations existantes et créer les nouvelles
+  await prisma.applicationTeamAssignment.deleteMany({
+    where: { applicationId },
+  })
+
+  // Créer les nouvelles assignations
+  if (teamIds.length > 0) {
+    await prisma.applicationTeamAssignment.createMany({
+      data: teamIds.map((teamId) => ({
+        applicationId,
+        teamId,
+        isLeader: false, // Par défaut, pas leader
+      })),
+    })
+  }
+
+  // Récupérer l'application mise à jour avec ses équipes
   const updated = await prisma.editionVolunteerApplication.update({
     where: { id: applicationId },
     data: {
       // Conserver l'ancien système pour compatibilité
       assignedTeams: parsed.teams,
-      // Utiliser le nouveau système de relations
-      teams: {
-        set: teamIds.map((id) => ({ id })),
-      },
     },
     select: {
       id: true,
       assignedTeams: true,
-      teams: {
+      teamAssignments: {
         select: {
-          id: true,
-          name: true,
-          color: true,
-          description: true,
+          teamId: true,
+          isLeader: true,
+          assignedAt: true,
+          team: {
+            select: {
+              id: true,
+              name: true,
+              color: true,
+              description: true,
+            },
+          },
         },
       },
     },

@@ -1686,6 +1686,9 @@
         "description": "Розподіл прийнятих волонтерів по командах. Перетягніть, щоб перемістити або додати до команди.",
         "drop_volunteers_here": "Перетягніть волонтерів сюди",
         "empty_team": "Порожня команда",
+        "leader_added": "Керівника додано",
+        "leader_badge": "Керівник",
+        "leader_removed": "Керівника видалено",
         "manage_teams": "Керувати командами",
         "max_label": "Макс:",
         "modal": {
@@ -1701,6 +1704,8 @@
         "no_assignments": "Призначень команд не знайдено",
         "no_assignments_description": "Прийняті волонтери з'являться тут після призначення до команд",
         "preferences_label": "Пер:",
+        "remove_as_leader": "Зняти роль керівника",
+        "set_as_leader": "Призначити керівником",
         "stats": {
           "assigned_volunteers": "Призначені волонтери",
           "total_assignments": "Всього призначень",

@@ -1686,6 +1686,9 @@
         "description": "Distribución de voluntarios aceptados en equipos. Arrastra y suelta para mover o agregar a un equipo.",
         "drop_volunteers_here": "Arrastra y suelta voluntarios aquí",
         "empty_team": "Equipo vacío",
+        "leader_added": "Responsable añadido",
+        "leader_badge": "Responsable",
+        "leader_removed": "Responsable retirado",
         "manage_teams": "Gestionar equipos",
         "max_label": "Máx:",
         "modal": {
@@ -1701,6 +1704,8 @@
         "no_assignments": "No se encontraron asignaciones de equipo",
         "no_assignments_description": "Los voluntarios aceptados aparecerán aquí una vez asignados a equipos",
         "preferences_label": "Pref:",
+        "remove_as_leader": "Retirar rol de responsable",
+        "set_as_leader": "Establecer como responsable",
         "stats": {
           "assigned_volunteers": "Voluntarios asignados",
           "total_assignments": "Asignaciones totales",

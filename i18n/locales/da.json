@@ -1686,6 +1686,9 @@
         "description": "Fordeling af accepterede frivillige i hold. Træk og slip for at flytte eller tilføje til et hold.",
         "drop_volunteers_here": "Træk og slip frivillige her",
         "empty_team": "Tom gruppe",
+        "leader_added": "Leder tilføjet",
+        "leader_badge": "Leder",
+        "leader_removed": "Leder fjernet",
         "manage_teams": "Administrer hold",
         "max_label": "Maks:",
         "modal": {
@@ -1701,6 +1704,8 @@
         "no_assignments": "Ingen holdtildeling fundet",
         "no_assignments_description": "Accepterede frivillige vil blive vist her, når de er tildelt til hold",
         "preferences_label": "Præf:",
+        "remove_as_leader": "Fjern lederrollen",
+        "set_as_leader": "Angiv som leder",
         "stats": {
           "assigned_volunteers": "Tildelte frivillige",
           "total_assignments": "Samlede tildelinger",

@@ -1686,6 +1686,9 @@
         "description": "Distribution of accepted volunteers in teams. Drag and drop to move or add to a team.",
         "drop_volunteers_here": "Drag and drop volunteers here",
         "empty_team": "Empty team",
+        "leader_added": "Leader added",
+        "leader_badge": "Leader",
+        "leader_removed": "Leader removed",
         "manage_teams": "Manage teams",
         "max_label": "Max:",
         "modal": {
@@ -1701,6 +1704,8 @@
         "no_assignments": "No team assignments found",
         "no_assignments_description": "Accepted volunteers will appear here once assigned to teams",
         "preferences_label": "Pref:",
+        "remove_as_leader": "Remove leader role",
+        "set_as_leader": "Set as leader",
         "stats": {
           "assigned_volunteers": "Assigned volunteers",
           "total_assignments": "Total assignments",

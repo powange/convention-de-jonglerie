@@ -195,7 +195,12 @@
                       {{ $t('pages.volunteers.team_distribution.stats.total_assignments') }}
                     </p>
                     <p class="text-xl font-semibold text-purple-600">
-                      {{ teamAssignments.reduce((total, app) => total + app.teams.length, 0) }}
+                      {{
+                        teamAssignments.reduce(
+                          (total, app) => total + (app.teamAssignments?.length || 0),
+                          0
+                        )
+                      }}
                     </p>
                   </div>
                 </div>
@@ -383,15 +388,47 @@
                         </div>
                       </div>
 
-                      <!-- Bouton de désassignation au survol -->
-                      <UButton
-                        icon="material-symbols-light:delete-outline"
+                      <!-- Badge responsable visible si leader -->
+                      <UBadge
+                        v-if="isTeamLeader(volunteer, team.id)"
+                        color="warning"
                         size="sm"
-                        color="error"
-                        variant="outline"
-                        class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
-                        @click.stop="unassignFromTeam(volunteer, team.id)"
-                      />
+                        class="ml-auto"
+                      >
+                        <UIcon name="i-heroicons-star-solid" size="12" />
+                        {{ $t('pages.volunteers.team_distribution.leader_badge') }}
+                      </UBadge>
+
+                      <!-- Boutons au survol -->
+                      <div
+                        class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                      >
+                        <!-- Toggle responsable -->
+                        <UButton
+                          :icon="
+                            isTeamLeader(volunteer, team.id)
+                              ? 'i-heroicons-star-solid'
+                              : 'i-heroicons-star'
+                          "
+                          size="sm"
+                          :color="isTeamLeader(volunteer, team.id) ? 'warning' : 'neutral'"
+                          variant="outline"
+                          :title="
+                            isTeamLeader(volunteer, team.id)
+                              ? $t('pages.volunteers.team_distribution.remove_as_leader')
+                              : $t('pages.volunteers.team_distribution.set_as_leader')
+                          "
+                          @click.stop="toggleTeamLeader(volunteer, team.id)"
+                        />
+                        <!-- Désassigner -->
+                        <UButton
+                          icon="material-symbols-light:delete-outline"
+                          size="sm"
+                          color="error"
+                          variant="outline"
+                          @click.stop="unassignFromTeam(volunteer, team.id)"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -446,8 +483,8 @@
                   {{ draggedVolunteer?.user?.prenom }} {{ draggedVolunteer?.user?.nom }}
                 </h4>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                  <template v-if="draggedVolunteer?.teams?.length > 1">
-                    {{ draggedVolunteer.teams.map((t) => t.name).join(', ') }} →
+                  <template v-if="draggedVolunteer?.teamAssignments?.length > 1">
+                    {{ draggedVolunteer.teamAssignments.map((t) => t.team.name).join(', ') }} →
                     {{ targetTeamName }}
                   </template>
                   <template v-else> {{ sourceTeamName }} → {{ targetTeamName }} </template>
@@ -480,7 +517,7 @@
                         {{ $t('pages.volunteers.team_distribution.modal.move') }}
                       </p>
                       <p class="text-sm text-gray-600 dark:text-gray-400">
-                        <template v-if="draggedVolunteer?.teams?.length > 1">
+                        <template v-if="draggedVolunteer?.teamAssignments?.length > 1">
                           {{
                             $t(
                               'pages.volunteers.team_distribution.modal.move_description_multiple',
@@ -520,7 +557,7 @@
                         {{ $t('pages.volunteers.team_distribution.modal.add') }}
                       </p>
                       <p class="text-sm text-gray-600 dark:text-gray-400">
-                        <template v-if="draggedVolunteer?.teams?.length > 1">
+                        <template v-if="draggedVolunteer?.teamAssignments?.length > 1">
                           {{
                             $t(
                               'pages.volunteers.team_distribution.modal.add_description_multiple',
@@ -608,10 +645,18 @@ const fetchTeamAssignments = async () => {
       query: { includeTeams: 'true', status: 'ACCEPTED' },
     })
     const applications = (response as any).applications || response
+
+    console.log('📊 Applications récupérées:', applications.length)
+    console.log('📊 Première application:', applications[0])
+
     acceptedVolunteers.value = applications.filter((app: any) => app.status === 'ACCEPTED')
     teamAssignments.value = applications.filter(
-      (app: any) => app.status === 'ACCEPTED' && app.teams && app.teams.length > 0
+      (app: any) =>
+        app.status === 'ACCEPTED' && app.teamAssignments && app.teamAssignments.length > 0
     )
+
+    console.log('✅ Accepted volunteers:', acceptedVolunteers.value.length)
+    console.log('✅ Team assignments:', teamAssignments.value.length)
   } catch (error) {
     console.error('Failed to fetch team assignments:', error)
   }
@@ -664,7 +709,7 @@ const unassignedVolunteers = computed(() => {
   }
 
   return acceptedVolunteers.value.filter(
-    (volunteer: any) => !volunteer.teams || volunteer.teams.length === 0
+    (volunteer: any) => !volunteer.teamAssignments || volunteer.teamAssignments.length === 0
   )
 })
 
@@ -677,12 +722,22 @@ const teamDistribution = computed(() => {
   return volunteerTeams.value
     .map((team) => {
       const assignedVolunteers = teamAssignments.value.filter((app) =>
-        app.teams.some((t: any) => t.id === team.id)
+        app.teamAssignments.some((t: any) => t.teamId === team.id)
       )
+
+      // Trier les bénévoles : responsables en premier
+      const sortedVolunteers = assignedVolunteers.sort((a, b) => {
+        const aIsLeader = isTeamLeader(a, team.id)
+        const bIsLeader = isTeamLeader(b, team.id)
+
+        if (aIsLeader && !bIsLeader) return -1
+        if (!aIsLeader && bIsLeader) return 1
+        return 0
+      })
 
       return {
         ...team,
-        volunteers: assignedVolunteers,
+        volunteers: sortedVolunteers,
         count: assignedVolunteers.length,
         utilizationRate: team.maxVolunteers
           ? Math.round((assignedVolunteers.length / team.maxVolunteers) * 100)
@@ -712,12 +767,15 @@ const sourceTeamName = computed(() => {
   }
 
   // Sinon, vérifier si le bénévole a des équipes
-  if (!draggedVolunteer.value?.teams || draggedVolunteer.value.teams.length === 0) {
+  if (
+    !draggedVolunteer.value?.teamAssignments ||
+    draggedVolunteer.value.teamAssignments.length === 0
+  ) {
     return 'Non assigné'
   }
 
   // Prendre la première équipe du bénévole
-  const firstTeam = draggedVolunteer.value.teams[0]
+  const firstTeam = draggedVolunteer.value.teamAssignments[0]?.team
   return firstTeam?.name || 'Équipe inconnue'
 })
 
@@ -814,7 +872,7 @@ const unassignFromTeam = async (volunteer: any, teamId: string) => {
     const volunteerId = volunteer.id
 
     // Récupérer les équipes actuelles du bénévole
-    const currentTeams = volunteer.teams?.map((t: any) => t.id) || []
+    const currentTeams = volunteer.teamAssignments?.map((t: any) => t.teamId) || []
 
     // Retirer l'équipe spécifiée
     const newTeams = currentTeams.filter((id: string) => id !== teamId)
@@ -851,6 +909,62 @@ const unassignFromTeam = async (volunteer: any, teamId: string) => {
 
     const errorMessage =
       error?.data?.message || error?.message || 'Impossible de désassigner le bénévole'
+
+    toast.add({
+      title: 'Erreur',
+      description: errorMessage,
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  }
+}
+
+// Vérifier si un bénévole est leader d'une équipe
+const isTeamLeader = (volunteer: any, teamId: string): boolean => {
+  if (!volunteer.teamAssignments) return false
+  const assignment = volunteer.teamAssignments.find((a: any) => a.teamId === teamId)
+  return assignment?.isLeader || false
+}
+
+// Toggle le statut de leader d'un bénévole pour une équipe
+const toggleTeamLeader = async (volunteer: any, teamId: string) => {
+  try {
+    const volunteerName = `${volunteer.user.prenom} ${volunteer.user.nom}`
+    const isCurrentlyLeader = isTeamLeader(volunteer, teamId)
+
+    await $fetch(
+      `/api/editions/${editionId}/volunteers/applications/${volunteer.id}/teams/${teamId}/leader`,
+      {
+        method: 'PATCH',
+        body: {
+          isLeader: !isCurrentlyLeader,
+        },
+      }
+    )
+
+    // Rafraîchir les données
+    await fetchTeamAssignments()
+    await fetchVolunteersInfo()
+
+    // Trouver le nom de l'équipe
+    const team = volunteerTeams.value.find((t) => t.id === teamId)
+    const teamName = team?.name || "l'équipe"
+
+    toast.add({
+      title: isCurrentlyLeader
+        ? $t('pages.volunteers.team_distribution.leader_removed')
+        : $t('pages.volunteers.team_distribution.leader_added'),
+      description: isCurrentlyLeader
+        ? `${volunteerName} n'est plus responsable de ${teamName}`
+        : `${volunteerName} est maintenant responsable de ${teamName}`,
+      icon: 'i-heroicons-star',
+      color: 'success',
+    })
+  } catch (error: any) {
+    console.error('Failed to toggle team leader:', error)
+
+    const errorMessage =
+      error?.data?.message || error?.message || 'Impossible de modifier le statut de responsable'
 
     toast.add({
       title: 'Erreur',
@@ -903,7 +1017,8 @@ const handleDrop = async (teamId: string) => {
   // Si le bénévole vient d'une équipe (sourceTeamId existe) et ce n'est pas la même équipe,
   // ouvrir la modal pour choisir déplacer ou ajouter
   // Aussi vérifier si le bénévole a des équipes dans ses données
-  const hasExistingTeams = draggedVolunteer.value.teams && draggedVolunteer.value.teams.length > 0
+  const hasExistingTeams =
+    draggedVolunteer.value.teamAssignments && draggedVolunteer.value.teamAssignments.length > 0
 
   if (
     (sourceTeamId.value && sourceTeamId.value !== teamId) ||
@@ -994,7 +1109,7 @@ const processMove = async (action: 'move' | 'add') => {
       newTeams = [targetTeamId.value]
     } else {
       // Ajouter : garder les équipes existantes et ajouter la nouvelle
-      const currentTeams = draggedVolunteer.value.teams?.map((t: any) => t.id) || []
+      const currentTeams = draggedVolunteer.value.teamAssignments?.map((t: any) => t.teamId) || []
       newTeams = [...currentTeams, targetTeamId.value]
       // Enlever les doublons au cas où
       newTeams = [...new Set(newTeams)]
