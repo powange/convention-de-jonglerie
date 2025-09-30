@@ -33,8 +33,11 @@ public/uploads/
 !public/uploads/.gitkeep
 
 # Backup folder (local development)
-backup/
+/backup
+/backups/*
 
 # Translation config files (generated)
 scripts/translation/translations-config.json
 scripts/translation/translations-config.template.json
+
+!.gitkeep

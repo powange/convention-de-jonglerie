@@ -3,7 +3,7 @@
 # Stage de base commun (image paramétrable)
 ARG BASE_NODE_IMAGE=node:22-slim
 FROM ${BASE_NODE_IMAGE} AS base
-RUN apt-get update && apt-get install -y curl openssl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl openssl default-mysql-client && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 # -------------------------
@@ -33,11 +33,11 @@ RUN npm prune --omit=dev && npx prisma generate
 # Stage runtime (production)
 # -------------------------
 FROM ${BASE_NODE_IMAGE} AS runtime
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y openssl default-mysql-client && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 # Dossiers requis au runtime
-RUN mkdir -p /app/public/uploads
+RUN mkdir -p /app/public/uploads /app/backups
 
 # Copier artefacts et dépendances depuis builder
 COPY --from=builder /app/.output ./.output

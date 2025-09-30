@@ -75,6 +75,7 @@ services:
       - ./scripts:/app/scripts:cached
       - ./prisma:/app/prisma:cached
       - ./public:/app/public:cached
+      - ./backups:/app/backups:cached
       # Persister les uploads comme en release (évite d'écraser en rebuild)
       - uploads_data:/app/public/uploads
       - uploads:/uploads

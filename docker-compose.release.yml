@@ -59,6 +59,7 @@ services:
       VAPID_PRIVATE_KEY: '${VAPID_PRIVATE_KEY}'
       VAPID_SUBJECT: '${VAPID_SUBJECT}'
     volumes:
+      - /home/powange/docker_workspaces/convention-de-jonglerie-release/backups:/app/backups
       - /home/powange/docker_workspaces/convention-de-jonglerie-release/uploads_data:/app/public/uploads
       - /home/powange/docker_workspaces/convention-de-jonglerie-release/uploads:/uploads
     depends_on:
