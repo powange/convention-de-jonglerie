@@ -406,6 +406,11 @@ import {
   getAllergySeverityBadgeClasses,
   requiresEmergencyContact,
 } from '~/utils/allergy-severity'
+import {
+  updateVolunteerApplication,
+  updateVolunteerApplicationStatus,
+  assignVolunteerTeams,
+} from '~/utils/volunteer-application-api'
 
 import type { ContextMenuItem, TableColumn, TableRow } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
@@ -701,13 +706,7 @@ const decideApplication = async (app: any, status: 'ACCEPTED' | 'REJECTED' | 'PE
   applicationsActingId.value = app.id
   actingAction.value = status
   try {
-    const res: any = await $fetch(
-      `/api/editions/${props.editionId}/volunteers/applications/${app.id}`,
-      {
-        method: 'PATCH',
-        body: { status },
-      } as any
-    )
+    const res: any = await updateVolunteerApplicationStatus(props.editionId, app.id, status)
     if (res?.application) {
       emit('refreshVolunteersInfo')
 
@@ -819,27 +818,21 @@ const confirmTeamsModal = async () => {
       // Mode acceptation : d'abord assigner les équipes, puis accepter
       if (selectedTeams.value.length > 0) {
         // D'abord assigner les équipes
-        await $fetch(
-          `/api/editions/${props.editionId}/volunteers/applications/${currentApplication.value.id}/teams`,
-          {
-            method: 'PATCH',
-            body: {
-              teams: selectedTeams.value,
-            },
-          } as any
+        await assignVolunteerTeams(
+          props.editionId,
+          currentApplication.value.id,
+          selectedTeams.value
         )
       }
 
       // Ensuite accepter le bénévole
-      await $fetch(
-        `/api/editions/${props.editionId}/volunteers/applications/${currentApplication.value.id}`,
+      await updateVolunteerApplicationStatus(
+        props.editionId,
+        currentApplication.value.id,
+        'ACCEPTED',
         {
-          method: 'PATCH',
-          body: {
-            status: 'ACCEPTED',
-            note: acceptNote.value || undefined,
-          },
-        } as any
+          note: acceptNote.value || undefined,
+        }
       )
 
       emit('refreshVolunteersInfo')
@@ -858,15 +851,7 @@ const confirmTeamsModal = async () => {
       })
     } else {
       // Mode édition : seulement assigner les équipes
-      await $fetch(
-        `/api/editions/${props.editionId}/volunteers/applications/${currentApplication.value.id}/teams`,
-        {
-          method: 'PATCH',
-          body: {
-            teams: selectedTeams.value,
-          },
-        } as any
-      )
+      await assignVolunteerTeams(props.editionId, currentApplication.value.id, selectedTeams.value)
 
       emit('refreshVolunteersInfo')
       emit('refreshTeamAssignments')
@@ -1780,37 +1765,8 @@ const closeEditApplicationModal = () => {
 // Fonction pour sauvegarder les modifications d'une candidature (ApplicationModal)
 const handleEditApplicationUpdate = async (data: any) => {
   try {
-    // Appeler l'API pour sauvegarder les changements
-    await $fetch(`/api/editions/${props.editionId}/volunteers/applications/${data.applicationId}`, {
-      method: 'PATCH',
-      body: {
-        teamPreferences: data.teamPreferences,
-        dietaryPreference: data.dietaryPreference,
-        allergies: data.allergies,
-        allergySeverity: data.allergySeverity,
-        setupAvailability: data.setupAvailability,
-        eventAvailability: data.eventAvailability,
-        teardownAvailability: data.teardownAvailability,
-        arrivalDateTime: data.arrivalDateTime,
-        departureDateTime: data.departureDateTime,
-        timePreferences: data.timePreferences,
-        emergencyContactName: data.emergencyContactName,
-        emergencyContactPhone: data.emergencyContactPhone,
-        hasPets: data.hasPets,
-        petsDetails: data.petsDetails,
-        hasMinors: data.hasMinors,
-        minorsDetails: data.minorsDetails,
-        hasVehicle: data.hasVehicle,
-        vehicleDetails: data.vehicleDetails,
-        companionName: data.companionName,
-        avoidList: data.avoidList,
-        skills: data.skills,
-        hasExperience: data.hasExperience,
-        experienceDetails: data.experienceDetails,
-        motivation: data.motivation,
-        modificationNote: data.modificationNote,
-      },
-    } as any)
+    // Appeler l'API pour sauvegarder les changements via l'utilitaire
+    await updateVolunteerApplication(props.editionId, data)
 
     // Rafraîchir les données
     emit('refreshVolunteersInfo')

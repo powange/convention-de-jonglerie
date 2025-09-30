@@ -216,7 +216,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
         volunteersAskTeamPreferences: volunteerSettings.askTeamPreferences,
         volunteerApplications: [], // Pas encore de candidatures
       })
-      // Mock des équipes VolunteerTeam pour apply.post
+      // Mock des équipes VolunteerTeam pour applications/index.post
       prismaMock.volunteerTeam.findMany.mockResolvedValue(mockVolunteerTeams)
       prismaMock.editionVolunteerApplication.findFirst.mockResolvedValue(null) // Pas de candidature existante
       prismaMock.user.findUnique.mockResolvedValue(mockUser)
@@ -261,7 +261,9 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
 
       // Candidature par l'utilisateur connecté
       global.getRouterParam.mockReturnValue('1')
-      const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
+      const applyHandler = await import(
+        '../../server/api/editions/[id]/volunteers/applications/index.post'
+      )
       const applicationResult = await applyHandler.default({
         context: {
           user: mockUser,
@@ -424,7 +426,9 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       global.readBody.mockResolvedValue(initialApplication)
       global.getRouterParam.mockReturnValue('1')
 
-      const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
+      const applyHandler = await import(
+        '../../server/api/editions/[id]/volunteers/applications/index.post'
+      )
       const firstResult = await applyHandler.default({
         context: {
           user: mockUser,
@@ -502,7 +506,9 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
 
       global.readBody.mockResolvedValue(duplicateApplication)
 
-      const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
+      const applyHandler = await import(
+        '../../server/api/editions/[id]/volunteers/applications/index.post'
+      )
       global.getRouterParam.mockReturnValue('1')
 
       await expect(
@@ -537,7 +543,9 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       global.readBody.mockResolvedValue(applicationData)
       global.getRouterParam.mockReturnValue('1')
 
-      const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
+      const applyHandler = await import(
+        '../../server/api/editions/[id]/volunteers/applications/index.post'
+      )
 
       await expect(
         applyHandler.default({
@@ -550,7 +558,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
     })
 
     // Test supprimé : le mode externe est maintenant géré côté frontend par redirection
-    // L'API apply.post n'effectue plus de vérification du mode externe
+    // L'API applications/index.post n'effectue plus de vérification du mode externe
   })
 
   describe('Validation des permissions dans le workflow', () => {
@@ -750,7 +758,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       const { prismaMock } = await import('../__mocks__/prisma')
 
       // Édition avec contact d'urgence non demandé mais allergies demandées
-      // Doit correspondre au select de l'API apply.post.ts
+      // Doit correspondre au select de l'API applications/index.post.ts
       const editionWithAllergies = {
         volunteersOpen: true,
         volunteersAskDiet: true,
@@ -783,7 +791,9 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       global.readBody.mockResolvedValue(applicationWithSevereAllergiesNoContact)
       global.getRouterParam.mockReturnValue('1')
 
-      const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
+      const applyHandler = await import(
+        '../../server/api/editions/[id]/volunteers/applications/index.post'
+      )
 
       // Devrait échouer car contact d'urgence requis à cause du niveau SEVERE
       await expect(
@@ -833,7 +843,9 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       global.readBody.mockResolvedValue(applicationWithAllergiesNoSeverity)
       global.getRouterParam.mockReturnValue('1')
 
-      const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
+      const applyHandler = await import(
+        '../../server/api/editions/[id]/volunteers/applications/index.post'
+      )
 
       // Devrait échouer car niveau de sévérité requis pour les allergies
       await expect(
@@ -881,7 +893,9 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       global.readBody.mockResolvedValue(applicationCriticalNoContact)
       global.getRouterParam.mockReturnValue('1')
 
-      const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
+      const applyHandler = await import(
+        '../../server/api/editions/[id]/volunteers/applications/index.post'
+      )
 
       // Devrait échouer car contact d'urgence requis pour allergies CRITICAL
       await expect(
@@ -945,7 +959,9 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       global.readBody.mockResolvedValue(applicationWithLightAllergies)
       global.getRouterParam.mockReturnValue('1')
 
-      const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
+      const applyHandler = await import(
+        '../../server/api/editions/[id]/volunteers/applications/index.post'
+      )
 
       // Devrait réussir car contact d'urgence pas requis pour LIGHT
       const result = await applyHandler.default({
@@ -963,7 +979,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       const { prismaMock } = await import('../__mocks__/prisma')
 
       // Édition avec contact d'urgence non demandé mais allergies demandées
-      // Doit correspondre au select de l'API apply.post.ts
+      // Doit correspondre au select de l'API applications/index.post.ts
       const editionWithAllergies = {
         volunteersOpen: true,
         volunteersAskDiet: true,
@@ -1013,7 +1029,9 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       global.readBody.mockResolvedValue(applicationWithAllergiesAndContact)
       global.getRouterParam.mockReturnValue('1')
 
-      const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
+      const applyHandler = await import(
+        '../../server/api/editions/[id]/volunteers/applications/index.post'
+      )
 
       const result = await applyHandler.default({
         context: {
@@ -1032,7 +1050,7 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       const { prismaMock } = await import('../__mocks__/prisma')
 
       // Édition avec contact d'urgence non demandé et allergies demandées
-      // Doit correspondre au select de l'API apply.post.ts
+      // Doit correspondre au select de l'API applications/index.post.ts
       const editionWithAllergies = {
         volunteersOpen: true,
         volunteersAskDiet: true,
@@ -1079,7 +1097,9 @@ describe("Workflow complet des bénévoles - Tests d'intégration", () => {
       global.readBody.mockResolvedValue(applicationWithoutAllergies)
       global.getRouterParam.mockReturnValue('1')
 
-      const applyHandler = await import('../../server/api/editions/[id]/volunteers/apply.post')
+      const applyHandler = await import(
+        '../../server/api/editions/[id]/volunteers/applications/index.post'
+      )
 
       const result = await applyHandler.default({
         context: {

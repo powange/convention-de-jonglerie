@@ -1,76 +1,16 @@
 import { z } from 'zod'
 
-import { requiresEmergencyContact } from '../../../../utils/allergy-severity'
-import { prisma } from '../../../../utils/prisma'
-import { handleValidationError } from '../../../../utils/validation-schemas'
-
-// Créneaux horaires valides pour les préférences
-const VALID_TIME_SLOTS = [
-  'early_morning',
-  'morning',
-  'lunch',
-  'early_afternoon',
-  'late_afternoon',
-  'evening',
-  'late_evening',
-  'night',
-] as const
-
-const bodySchema = z.object({
-  motivation: z.string().max(2000).optional().nullable(),
-  phone: z
-    .string()
-    .min(6, 'Téléphone trop court')
-    .max(30, 'Téléphone trop long')
-    .regex(/^[+0-9 ().-]{6,30}$/, 'Format de téléphone invalide')
-    .optional(),
-  nom: z.string().min(1, 'Nom requis').max(100, 'Nom trop long').optional(),
-  prenom: z.string().min(1, 'Prénom requis').max(100, 'Prénom trop long').optional(),
-  dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).optional(),
-  allergies: z.string().max(500).optional().nullable(),
-  allergySeverity: z.enum(['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']).optional().nullable(),
-  timePreferences: z
-    .array(
-      z.enum(VALID_TIME_SLOTS, {
-        errorMap: () => ({ message: 'Créneau horaire invalide' }),
-      })
-    )
-    .max(8, 'Maximum 8 créneaux horaires')
-    .refine(
-      (arr) => {
-        // Vérifier qu'il n'y a pas de doublons
-        const uniqueValues = new Set(arr)
-        return uniqueValues.size === arr.length
-      },
-      { message: 'Les créneaux horaires ne doivent pas contenir de doublons' }
-    )
-    .optional(),
-  teamPreferences: z.array(z.string()).max(20).optional(),
-  hasPets: z.boolean().optional(),
-  petsDetails: z.string().max(200).optional().nullable(),
-  hasMinors: z.boolean().optional(),
-  minorsDetails: z.string().max(200).optional().nullable(),
-  hasVehicle: z.boolean().optional(),
-  vehicleDetails: z.string().max(200).optional().nullable(),
-  companionName: z.string().max(300).optional().nullable(),
-  avoidList: z.string().max(500).optional().nullable(),
-  skills: z.string().max(1000).optional().nullable(),
-  hasExperience: z.boolean().optional(),
-  experienceDetails: z.string().max(500).optional().nullable(),
-  setupAvailability: z.boolean().optional(),
-  teardownAvailability: z.boolean().optional(),
-  eventAvailability: z.boolean().optional(),
-  arrivalDateTime: z.string().optional().nullable(),
-  departureDateTime: z.string().optional().nullable(),
-  emergencyContactName: z.string().max(100).optional().nullable(),
-  emergencyContactPhone: z
-    .string()
-    .min(6, 'Téléphone contact urgence trop court')
-    .max(30, 'Téléphone contact urgence trop long')
-    .regex(/^[+0-9 ().-]{6,30}$/, 'Format téléphone contact urgence invalide')
-    .optional()
-    .nullable(),
-})
+import { requiresEmergencyContact } from '../../../../../utils/allergy-severity'
+import {
+  volunteerApplicationBodySchema,
+  processPhoneLogic,
+  getUserUpdateData,
+  validateRequiredFields,
+  validateAvailability,
+  validateTeamPreferences,
+} from '../../../../../utils/editions/volunteers/applications'
+import { prisma } from '../../../../../utils/prisma'
+import { handleValidationError } from '../../../../../utils/validation-schemas'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -78,7 +18,7 @@ export default defineEventHandler(async (event) => {
     const editionId = parseInt(getRouterParam(event, 'id') || '0')
     if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
     const body = await readBody(event).catch(() => ({}))
-    const parsed = bodySchema.parse(body || {})
+    const parsed = volunteerApplicationBodySchema.parse(body || {})
 
     const edition = await prisma.edition.findUnique({
       where: { id: editionId },
@@ -112,28 +52,8 @@ export default defineEventHandler(async (event) => {
     })
     if (!user) throw createError({ statusCode: 401, message: 'Non authentifié' })
 
-    // Déterminer si le contact d'urgence est requis
-    const shouldRequireEmergencyContact =
-      edition.volunteersAskEmergencyContact ||
-      (parsed.allergySeverity && requiresEmergencyContact(parsed.allergySeverity))
-
-    // Validations cumulées
-    const missing: string[] = []
-    if (!user.phone && !parsed.phone) missing.push('Téléphone')
-    if (!user.nom && !parsed.nom) missing.push('Nom')
-    if (!user.prenom && !parsed.prenom) missing.push('Prénom')
-
-    // Validation: si allergies renseignées, le niveau de sévérité est requis
-    if (edition.volunteersAskAllergies && parsed.allergies?.trim() && !parsed.allergySeverity) {
-      missing.push('Niveau de sévérité des allergies')
-    }
-
-    // Validation contact d'urgence si demandé explicitement ou si allergies renseignées
-    if (shouldRequireEmergencyContact) {
-      if (!parsed.emergencyContactName?.trim()) missing.push("Nom du contact d'urgence")
-      if (!parsed.emergencyContactPhone?.trim()) missing.push("Téléphone du contact d'urgence")
-    }
-
+    // Validation des champs requis
+    const missing = validateRequiredFields(user, parsed, edition)
     if (missing.length) {
       throw createError({
         statusCode: 400,
@@ -141,66 +61,33 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const finalPhone = user.phone || parsed.phone!
-
-    // Validation des disponibilités (au moins une requise)
-    const hasAvailability =
-      parsed.setupAvailability || parsed.teardownAvailability || parsed.eventAvailability
-    if (!hasAvailability) {
+    // Validation des disponibilités
+    const availabilityErrors = validateAvailability(parsed)
+    if (availabilityErrors.length) {
       throw createError({
         statusCode: 400,
-        message: 'Au moins une disponibilité est requise',
+        message: availabilityErrors[0],
       })
     }
 
-    // Validation des dates d'arrivée/départ si disponibilité sélectionnée
-    if (
-      (parsed.setupAvailability || parsed.eventAvailability || parsed.teardownAvailability) &&
-      !parsed.arrivalDateTime
-    ) {
+    // Validation des préférences d'équipes
+    const teamErrors = await validateTeamPreferences(
+      parsed,
+      editionId,
+      edition.volunteersAskTeamPreferences
+    )
+    if (teamErrors.length) {
       throw createError({
         statusCode: 400,
-        message: "Date d'arrivée requise",
+        message: teamErrors[0],
       })
     }
 
-    if ((parsed.eventAvailability || parsed.teardownAvailability) && !parsed.departureDateTime) {
-      throw createError({
-        statusCode: 400,
-        message: 'Date de départ requise',
-      })
-    }
-
-    // Validation des préférences d'équipe (nouveau système VolunteerTeam)
-    if (
-      edition.volunteersAskTeamPreferences &&
-      parsed.teamPreferences &&
-      parsed.teamPreferences.length > 0
-    ) {
-      // Récupérer les équipes du nouveau système
-      const validTeams = await prisma.volunteerTeam.findMany({
-        where: { editionId },
-        select: { id: true, name: true },
-      })
-
-      const validTeamIds = validTeams.map((team) => team.id)
-      const validTeamNames = validTeams.map((team) => team.name)
-
-      // Vérifier si les IDs fournis sont valides
-      const invalidTeams = parsed.teamPreferences.filter((teamId) => !validTeamIds.includes(teamId))
-      if (invalidTeams.length > 0) {
-        throw createError({
-          statusCode: 400,
-          message: `Équipes invalides : ${invalidTeams.join(', ')}. Équipes valides : ${validTeamNames.join(', ')}`,
-        })
-      }
-    }
+    // Traitement du téléphone
+    const finalPhone = processPhoneLogic(user, parsed)
 
     // Mettre à jour user si des données manquent
-    const updateData: Record<string, any> = {}
-    if (!user.phone && parsed.phone) updateData.phone = parsed.phone
-    if (!user.nom && parsed.nom) updateData.nom = parsed.nom
-    if (!user.prenom && parsed.prenom) updateData.prenom = parsed.prenom
+    const updateData = getUserUpdateData(user, parsed)
     if (Object.keys(updateData).length) {
       await prisma.user.update({ where: { id: event.context.user.id }, data: updateData })
     }
@@ -278,11 +165,15 @@ export default defineEventHandler(async (event) => {
           ? parsed.departureDateTime.trim()
           : null,
         emergencyContactName:
-          shouldRequireEmergencyContact && parsed.emergencyContactName?.trim()
+          (edition.volunteersAskEmergencyContact ||
+            (parsed.allergySeverity && requiresEmergencyContact(parsed.allergySeverity))) &&
+          parsed.emergencyContactName?.trim()
             ? parsed.emergencyContactName.trim()
             : null,
         emergencyContactPhone:
-          shouldRequireEmergencyContact && parsed.emergencyContactPhone?.trim()
+          (edition.volunteersAskEmergencyContact ||
+            (parsed.allergySeverity && requiresEmergencyContact(parsed.allergySeverity))) &&
+          parsed.emergencyContactPhone?.trim()
             ? parsed.emergencyContactPhone.trim()
             : null,
       },

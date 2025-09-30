@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import handler from '../../../../../../server/api/editions/[id]/volunteers/apply.post'
-import { prismaMock } from '../../../../../__mocks__/prisma'
+import handler from '../../../../../../../server/api/editions/[id]/volunteers/applications/index.post'
+import { prismaMock } from '../../../../../../__mocks__/prisma'
 
-describe('/api/editions/[id]/volunteers/apply POST', () => {
+describe('/api/editions/[id]/volunteers/applications POST', () => {
   const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
   const dayAfterTomorrow = new Date(Date.now() + 48 * 60 * 60 * 1000)
 

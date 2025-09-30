@@ -636,6 +636,8 @@
 </template>
 
 <script setup lang="ts">
+import { withdrawVolunteerApplication } from '~/utils/volunteer-application-api'
+
 // Interface pour les applications enrichies avec les settings
 interface ApplicationWithSettings {
   [key: string]: any
@@ -929,14 +931,11 @@ const withdrawApplication = async (applicationId: number) => {
   }
 
   try {
-    // Pour l'instant, on peut utiliser l'API de suppression existante
-    // Il faudrait idéalement créer une API spécifique pour le retrait
-    await $fetch(
-      `/api/editions/${applications.value?.find((app) => app.id === applicationId)?.edition.id}/volunteers/apply`,
-      {
-        method: 'DELETE',
-      }
-    )
+    // Utiliser l'utilitaire pour retirer la candidature
+    const editionId = applications.value?.find((app) => app.id === applicationId)?.edition.id
+    if (!editionId) throw new Error('Edition introuvable')
+
+    await withdrawVolunteerApplication(editionId)
 
     toast.add({
       title: t('pages.volunteers.withdrawal_success'),

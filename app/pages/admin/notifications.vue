@@ -492,14 +492,14 @@
           </div>
         </template>
         <template #actions-cell="{ row }">
-          <UMenu
+          <UDropdownMenu
             :items="[
               [
                 {
                   label: 'Copier ID',
                   icon: 'i-heroicons-clipboard-document',
-                  click: () => {
-                    navigator.clipboard.writeText(row.original.id)
+                  onSelect: () => {
+                    navigator?.clipboard.writeText(row.original.id)
                     toast.add({ title: 'ID copié', color: 'success' })
                   },
                 },
@@ -507,7 +507,7 @@
                   label: row.original.isRead ? 'Marquer non lue' : 'Marquer comme lue',
                   icon: row.original.isRead ? 'i-heroicons-eye-slash' : 'i-heroicons-eye',
                   disabled: true,
-                  click: () => {
+                  onSelect: () => {
                     toast.add({
                       title: 'Fonctionnalité à venir',
                       description: 'Modification du statut de lecture en cours de développement',
@@ -521,11 +521,10 @@
             <UButton
               variant="ghost"
               color="neutral"
-              size="sm"
               square
               icon="i-heroicons-ellipsis-horizontal"
             />
-          </UMenu>
+          </UDropdownMenu>
         </template>
       </UTable>
 

@@ -9,6 +9,9 @@ export interface ApplicationData {
 }
 
 export interface UpdatedApplicationData {
+  // Données personnelles
+  phone?: string
+
   // Disponibilités
   setupAvailability?: boolean
   teardownAvailability?: boolean
@@ -55,6 +58,16 @@ export async function compareApplicationChanges(
   updatedData: UpdatedApplicationData
 ): Promise<ApplicationChanges> {
   const changes: string[] = []
+
+  // Comparer le téléphone
+  if (
+    updatedData.phone !== undefined &&
+    (updatedData.phone || '').trim() !== (originalData.userSnapshotPhone || '').trim()
+  ) {
+    const oldPhone = originalData.userSnapshotPhone?.trim() || 'Non renseigné'
+    const newPhone = updatedData.phone?.trim() || 'Non renseigné'
+    changes.push(`Téléphone modifié : ${oldPhone} → ${newPhone}`)
+  }
 
   // Comparer les préférences d'équipes
   if (updatedData.teamPreferences !== undefined) {
@@ -372,6 +385,8 @@ export async function compareApplicationChanges(
  */
 export function hasApplicationDataChanges(updatedData: UpdatedApplicationData): boolean {
   return (
+    // Données personnelles
+    updatedData.phone !== undefined ||
     // Disponibilités
     updatedData.setupAvailability !== undefined ||
     updatedData.teardownAvailability !== undefined ||

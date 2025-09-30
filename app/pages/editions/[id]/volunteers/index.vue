@@ -245,6 +245,11 @@ import { useEditionStore } from '~/stores/editions'
 import { requiresEmergencyContact } from '~/utils/allergy-severity'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { markdownToHtml } from '~/utils/markdown'
+import {
+  updateVolunteerApplication as updateVolunteerApplicationAPI,
+  submitVolunteerApplication,
+  withdrawVolunteerApplication,
+} from '~/utils/volunteer-application-api'
 
 const { t, locale } = useI18n()
 const { formatDateTimeRange } = useDateFormat()
@@ -377,101 +382,119 @@ const fetchVolunteersInfo = async () => {
 await fetchVolunteersInfo()
 
 // Fonctions d'édition/gestion supprimées de la page publique
+
+// Fonction helper pour transformer les données du formulaire selon la configuration de l'édition
+const mapFormDataToApplicationData = (formData: any) => {
+  return {
+    // Données personnelles
+    phone: formData?.phone?.trim() || undefined,
+    firstName: (authStore.user as any)?.prenom
+      ? undefined
+      : formData?.firstName?.trim() || undefined,
+    lastName: (authStore.user as any)?.nom ? undefined : formData?.lastName?.trim() || undefined,
+
+    // Motivation
+    motivation: formData?.motivation?.trim() || undefined,
+
+    // Régime et allergies
+    dietaryPreference:
+      volunteersInfo.value?.askDiet &&
+      formData?.dietPreference !== 'NONE' &&
+      formData?.dietPreference
+        ? formData.dietPreference
+        : undefined,
+    allergies:
+      volunteersInfo.value?.askAllergies && formData?.allergies?.trim()
+        ? formData.allergies.trim()
+        : undefined,
+    allergySeverity:
+      volunteersInfo.value?.askAllergies && formData?.allergies?.trim() && formData?.allergySeverity
+        ? formData.allergySeverity
+        : undefined,
+
+    // Contact d'urgence
+    emergencyContactName:
+      (volunteersInfo.value?.askEmergencyContact ||
+        (formData?.allergySeverity && requiresEmergencyContact(formData.allergySeverity))) &&
+      formData?.emergencyContactName?.trim()
+        ? formData.emergencyContactName.trim()
+        : undefined,
+    emergencyContactPhone:
+      (volunteersInfo.value?.askEmergencyContact ||
+        (formData?.allergySeverity && requiresEmergencyContact(formData.allergySeverity))) &&
+      formData?.emergencyContactPhone?.trim()
+        ? formData.emergencyContactPhone.trim()
+        : undefined,
+
+    // Préférences
+    timePreferences:
+      volunteersInfo.value?.askTimePreferences && formData?.timePreferences?.length > 0
+        ? formData.timePreferences
+        : undefined,
+    teamPreferences:
+      volunteersInfo.value?.askTeamPreferences && formData?.teamPreferences?.length > 0
+        ? formData.teamPreferences
+        : undefined,
+
+    // Informations personnelles
+    hasPets: volunteersInfo.value?.askPets ? formData?.hasPets || undefined : undefined,
+    petsDetails:
+      volunteersInfo.value?.askPets && formData?.hasPets && formData?.petsDetails?.trim()
+        ? formData.petsDetails.trim()
+        : undefined,
+    hasMinors: volunteersInfo.value?.askMinors ? formData?.hasMinors || undefined : undefined,
+    minorsDetails:
+      volunteersInfo.value?.askMinors && formData?.hasMinors && formData?.minorsDetails?.trim()
+        ? formData.minorsDetails.trim()
+        : undefined,
+    hasVehicle: volunteersInfo.value?.askVehicle ? formData?.hasVehicle || undefined : undefined,
+    vehicleDetails:
+      volunteersInfo.value?.askVehicle && formData?.hasVehicle && formData?.vehicleDetails?.trim()
+        ? formData.vehicleDetails.trim()
+        : undefined,
+
+    // Covoiturage
+    companionName:
+      volunteersInfo.value?.askCompanion && formData?.companionName?.trim()
+        ? formData.companionName.trim()
+        : undefined,
+    avoidList:
+      volunteersInfo.value?.askAvoidList && formData?.avoidList?.trim()
+        ? formData.avoidList.trim()
+        : undefined,
+
+    // Compétences et expérience
+    skills:
+      volunteersInfo.value?.askSkills && formData?.skills?.trim()
+        ? formData.skills.trim()
+        : undefined,
+    hasExperience: volunteersInfo.value?.askExperience ? formData?.hasExperience : undefined,
+    experienceDetails:
+      volunteersInfo.value?.askExperience &&
+      formData?.hasExperience &&
+      formData?.experienceDetails?.trim()
+        ? formData.experienceDetails.trim()
+        : undefined,
+
+    // Disponibilités
+    setupAvailability: volunteersInfo.value?.askSetup ? formData?.setupAvailability : undefined,
+    teardownAvailability: volunteersInfo.value?.askTeardown
+      ? formData?.teardownAvailability
+      : undefined,
+    eventAvailability: formData?.eventAvailability || undefined,
+    arrivalDateTime: formData?.arrivalDateTime || undefined,
+    departureDateTime: formData?.departureDateTime || undefined,
+  }
+}
+
 const applyAsVolunteer = async (formData?: any) => {
   volunteersApplying.value = true
   try {
-    const res: any = await $fetch(`/api/editions/${editionId}/volunteers/apply`, {
-      method: 'POST',
-      body: {
-        motivation: formData?.motivation?.trim() || undefined,
-        phone: formData?.phone?.trim() || undefined,
-        prenom: (authStore.user as any)?.prenom
-          ? undefined
-          : formData?.firstName?.trim() || undefined,
-        nom: (authStore.user as any)?.nom ? undefined : formData?.lastName?.trim() || undefined,
-        dietaryPreference:
-          volunteersInfo.value?.askDiet &&
-          formData?.dietPreference !== 'NONE' &&
-          formData?.dietPreference
-            ? formData.dietPreference
-            : undefined,
-        allergies:
-          volunteersInfo.value?.askAllergies && formData?.allergies?.trim()
-            ? formData.allergies.trim()
-            : undefined,
-        allergySeverity:
-          volunteersInfo.value?.askAllergies &&
-          formData?.allergies?.trim() &&
-          formData?.allergySeverity
-            ? formData.allergySeverity
-            : undefined,
-        timePreferences:
-          volunteersInfo.value?.askTimePreferences && formData?.timePreferences?.length > 0
-            ? formData.timePreferences
-            : undefined,
-        teamPreferences:
-          volunteersInfo.value?.askTeamPreferences && formData?.teamPreferences?.length > 0
-            ? formData.teamPreferences
-            : undefined,
-        emergencyContactName:
-          (volunteersInfo.value?.askEmergencyContact ||
-            (formData?.allergySeverity && requiresEmergencyContact(formData.allergySeverity))) &&
-          formData?.emergencyContactName?.trim()
-            ? formData.emergencyContactName.trim()
-            : undefined,
-        emergencyContactPhone:
-          (volunteersInfo.value?.askEmergencyContact ||
-            (formData?.allergySeverity && requiresEmergencyContact(formData.allergySeverity))) &&
-          formData?.emergencyContactPhone?.trim()
-            ? formData.emergencyContactPhone.trim()
-            : undefined,
-        hasPets: volunteersInfo.value?.askPets ? formData?.hasPets || undefined : undefined,
-        petsDetails:
-          volunteersInfo.value?.askPets && formData?.hasPets && formData?.petsDetails?.trim()
-            ? formData.petsDetails.trim()
-            : undefined,
-        hasMinors: volunteersInfo.value?.askMinors ? formData?.hasMinors || undefined : undefined,
-        minorsDetails:
-          volunteersInfo.value?.askMinors && formData?.hasMinors && formData?.minorsDetails?.trim()
-            ? formData.minorsDetails.trim()
-            : undefined,
-        hasVehicle: volunteersInfo.value?.askVehicle
-          ? formData?.hasVehicle || undefined
-          : undefined,
-        vehicleDetails:
-          volunteersInfo.value?.askVehicle &&
-          formData?.hasVehicle &&
-          formData?.vehicleDetails?.trim()
-            ? formData.vehicleDetails.trim()
-            : undefined,
-        companionName:
-          volunteersInfo.value?.askCompanion && formData?.companionName?.trim()
-            ? formData.companionName.trim()
-            : undefined,
-        avoidList:
-          volunteersInfo.value?.askAvoidList && formData?.avoidList?.trim()
-            ? formData.avoidList.trim()
-            : undefined,
-        skills:
-          volunteersInfo.value?.askSkills && formData?.skills?.trim()
-            ? formData.skills.trim()
-            : undefined,
-        hasExperience: volunteersInfo.value?.askExperience ? formData?.hasExperience : undefined,
-        experienceDetails:
-          volunteersInfo.value?.askExperience &&
-          formData?.hasExperience &&
-          formData?.experienceDetails?.trim()
-            ? formData.experienceDetails.trim()
-            : undefined,
-        setupAvailability: volunteersInfo.value?.askSetup ? formData?.setupAvailability : undefined,
-        teardownAvailability: volunteersInfo.value?.askTeardown
-          ? formData?.teardownAvailability
-          : undefined,
-        eventAvailability: formData?.eventAvailability || undefined,
-        arrivalDateTime: formData?.arrivalDateTime || undefined,
-        departureDateTime: formData?.departureDateTime || undefined,
-      },
-    } as any)
+    // Transformer les données du formulaire selon la configuration de l'édition
+    const applicationData = mapFormDataToApplicationData(formData)
+
+    // Appeler l'API via l'utilitaire
+    const res: any = await submitVolunteerApplication(editionId, applicationData)
     if (res?.application && volunteersInfo.value)
       volunteersInfo.value.myApplication = res.application
 
@@ -498,7 +521,7 @@ const applyAsVolunteer = async (formData?: any) => {
 const withdrawApplication = async () => {
   volunteersWithdrawing.value = true
   try {
-    await $fetch(`/api/editions/${editionId}/volunteers/apply`, { method: 'DELETE' } as any)
+    await withdrawVolunteerApplication(editionId)
     if (volunteersInfo.value) volunteersInfo.value.myApplication = null
 
     // Rafraîchir les données pour mettre à jour l'affichage de la page
@@ -532,37 +555,8 @@ const closeEditApplicationModal = () => {
 // Fonction pour mettre à jour une candidature existante
 const updateVolunteerApplication = async (data: any) => {
   try {
-    // Appeler l'API pour sauvegarder les modifications
-    await $fetch(`/api/editions/${editionId}/volunteers/applications/${data.applicationId}`, {
-      method: 'PATCH',
-      body: {
-        teamPreferences: data.teamPreferences,
-        dietaryPreference: data.dietaryPreference,
-        allergies: data.allergies,
-        allergySeverity: data.allergySeverity,
-        setupAvailability: data.setupAvailability,
-        eventAvailability: data.eventAvailability,
-        teardownAvailability: data.teardownAvailability,
-        arrivalDateTime: data.arrivalDateTime,
-        departureDateTime: data.departureDateTime,
-        timePreferences: data.timePreferences,
-        emergencyContactName: data.emergencyContactName,
-        emergencyContactPhone: data.emergencyContactPhone,
-        hasPets: data.hasPets,
-        petsDetails: data.petsDetails,
-        hasMinors: data.hasMinors,
-        minorsDetails: data.minorsDetails,
-        hasVehicle: data.hasVehicle,
-        vehicleDetails: data.vehicleDetails,
-        companionName: data.companionName,
-        avoidList: data.avoidList,
-        skills: data.skills,
-        hasExperience: data.hasExperience,
-        experienceDetails: data.experienceDetails,
-        motivation: data.motivation,
-        modificationNote: data.modificationNote,
-      },
-    })
+    // Appeler l'API pour sauvegarder les modifications via l'utilitaire
+    await updateVolunteerApplicationAPI(editionId, data)
 
     // Rafraîchir les données pour mettre à jour l'affichage
     await fetchVolunteersInfo()

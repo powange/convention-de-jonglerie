@@ -80,12 +80,7 @@
                 v-model="formData.phone"
                 :placeholder="user?.phone || t('editions.volunteers.phone_placeholder')"
                 autocomplete="tel"
-                :readonly="isOrganizerEditingApplication"
-                :disabled="isOrganizerEditingApplication"
-                :class="[
-                  'w-full',
-                  isOrganizerEditingApplication ? 'bg-gray-50 dark:bg-gray-800' : '',
-                ]"
+                class="w-full"
                 @blur="markFieldTouched('phone')"
               />
             </UFormField>
