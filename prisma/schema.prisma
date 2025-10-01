@@ -139,6 +139,7 @@ model Edition {
   volunteerNotificationGroups  VolunteerNotificationGroup[]
   volunteerTeams               VolunteerTeam[]
   volunteerTimeSlots           VolunteerTimeSlot[]
+  externalTicketing            ExternalTicketing?
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -752,5 +753,53 @@ model ApplicationTeamAssignment {
   @@id([applicationId, teamId])
   @@index([teamId])
   @@index([isLeader])
+}
+
+// ========== BILLETERIE EXTERNE ==========
+
+enum ExternalTicketingProvider {
+  HELLOASSO
+  BILLETWEB
+  WEEZEVENT
+  OTHER
+}
+
+enum ExternalTicketingStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}
+
+model ExternalTicketing {
+  id         String                     @id @default(cuid())
+  editionId  Int                        @unique
+  provider   ExternalTicketingProvider
+  status     ExternalTicketingStatus    @default(ACTIVE)
+  lastSyncAt DateTime?
+  createdAt  DateTime                   @default(now())
+  updatedAt  DateTime                   @updatedAt
+
+  edition         Edition          @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  helloAssoConfig HelloAssoConfig?
+
+  @@index([editionId])
+  @@index([provider])
+  @@index([status])
+}
+
+model HelloAssoConfig {
+  id                   String   @id @default(cuid())
+  externalTicketingId  String   @unique
+  clientId             String
+  clientSecret         String   // Encrypted
+  organizationSlug     String
+  formType             String   // Event, Membership, Donation, etc.
+  formSlug             String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  externalTicketing ExternalTicketing @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+
+  @@index([externalTicketingId])
 }
 

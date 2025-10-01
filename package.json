@@ -90,6 +90,7 @@
     "bcryptjs": "^3.0.2",
     "eslint": "^9.32.0",
     "flag-icons": "^7.5.0",
+    "helloasso-node": "^1.0.6",
     "html2canvas": "^1.4.1",
     "html5-qrcode": "^2.3.8",
     "jspdf": "^3.0.3",

@@ -66,6 +66,9 @@ services:
       # Force le polling pour Windows
       CHOKIDAR_USEPOLLING: 'true'
       CHOKIDAR_INTERVAL: '1000'
+      # Pour le chiffrement des données sensibles (ex: cartes bancaires)
+      ENCRYPTION_SECRET: '${ENCRYPTION_SECRET:-change-this-to-a-strong-random-secret-key-min-32-chars}'
+      ENCRYPTION_SALT: '${ENCRYPTION_SALT:-change-this-salt-to-random-value}'
     volumes:
       # Monter uniquement le code pour ne pas écraser node_modules
       - ./app:/app/app:cached

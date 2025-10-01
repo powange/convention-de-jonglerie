@@ -315,6 +315,15 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <!-- Lier une billeterie externe -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/ticketing/external`"
+                icon="i-heroicons-link"
+                title="Lier une billeterie externe"
+                description="Connecter HelloAsso ou autre plateforme"
+                color="purple"
+              />
+
               <!-- Contrôle d'accès -->
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/ticketing/access-control`"
