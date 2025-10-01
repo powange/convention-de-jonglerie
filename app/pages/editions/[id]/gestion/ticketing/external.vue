@@ -34,127 +34,252 @@
       <div class="space-y-6">
         <!-- HelloAsso -->
         <UCard>
-          <div class="space-y-4">
-            <div class="flex items-center gap-3">
-              <div class="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                <UIcon
-                  name="i-heroicons-ticket"
-                  class="h-8 w-8 text-orange-600 dark:text-orange-400"
-                />
+          <div class="space-y-6">
+            <!-- En-tête avec statut -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+                  <UIcon
+                    name="i-heroicons-ticket"
+                    class="h-8 w-8 text-orange-600 dark:text-orange-400"
+                  />
+                </div>
+                <div>
+                  <h2 class="text-lg font-semibold">HelloAsso</h2>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Plateforme de billetterie pour associations
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 class="text-lg font-semibold">HelloAsso</h2>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                  Plateforme de billetterie pour associations
-                </p>
-              </div>
+              <UBadge
+                v-if="hasExistingConfig"
+                color="success"
+                variant="soft"
+                size="lg"
+                class="flex items-center gap-1.5"
+              >
+                <UIcon name="i-heroicons-check-circle" class="h-4 w-4" />
+                Configuré
+              </UBadge>
             </div>
 
+            <!-- Alerte d'information -->
             <UAlert
+              v-if="!hasExistingConfig"
               icon="i-heroicons-information-circle"
               color="info"
               variant="soft"
               description="Connectez votre compte HelloAsso pour synchroniser automatiquement les billets et participants."
             />
 
-            <!-- Formulaire de connexion HelloAsso -->
-            <div class="space-y-4 pt-4">
-              <div
-                class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4"
-              >
-                <div class="flex items-start gap-2">
-                  <UIcon
-                    name="i-heroicons-information-circle"
-                    class="text-blue-600 dark:text-blue-400 mt-0.5"
-                  />
-                  <div class="text-sm">
-                    <p class="font-medium text-blue-900 dark:text-blue-100 mb-1">
-                      Obtenir vos identifiants API
-                    </p>
-                    <p class="text-blue-700 dark:text-blue-300">
-                      Rendez-vous sur votre
-                      <a
-                        href="https://auth.helloasso.com/admin/api"
-                        target="_blank"
-                        class="underline hover:text-blue-600"
-                      >
-                        espace HelloAsso → API & Webhooks
-                      </a>
-                      pour créer un client API et obtenir votre Client ID et Client Secret.
-                    </p>
+            <!-- Résumé de la configuration (si existante) -->
+            <div
+              v-if="hasExistingConfig"
+              class="bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-lg p-4"
+            >
+              <div class="flex items-start gap-3">
+                <UIcon
+                  name="i-heroicons-check-circle"
+                  class="text-success-600 dark:text-success-400 h-5 w-5 mt-0.5"
+                />
+                <div class="flex-1 min-w-0">
+                  <p class="font-medium text-success-900 dark:text-success-100 mb-2">
+                    Configuration active
+                  </p>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                    <div class="flex items-center gap-2">
+                      <span class="text-success-700 dark:text-success-300 font-medium">
+                        Organisation :
+                      </span>
+                      <span class="text-success-600 dark:text-success-400">
+                        {{ helloAssoOrganizationSlug }}
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-success-700 dark:text-success-300 font-medium">
+                        Formulaire :
+                      </span>
+                      <span class="text-success-600 dark:text-success-400">
+                        {{ helloAssoFormSlug }}
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <UButton
+                  variant="ghost"
+                  color="neutral"
+                  size="sm"
+                  :icon="showConfigForm ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+                  @click="showConfigForm = !showConfigForm"
+                >
+                  {{ showConfigForm ? 'Masquer' : 'Modifier' }}
+                </UButton>
               </div>
+            </div>
 
-              <div class="border-t pt-4">
-                <h3 class="font-medium mb-4">Identifiants API</h3>
+            <!-- Formulaire de connexion HelloAsso -->
+            <div v-if="!hasExistingConfig || showConfigForm" class="space-y-6">
+              <!-- Étape 1 : Guide et identifiants API -->
+              <div class="space-y-4">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="flex items-center justify-center w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-semibold text-sm"
+                  >
+                    1
+                  </div>
+                  <h3 class="font-semibold text-base">Identifiants API</h3>
+                </div>
 
-                <div class="space-y-4">
-                  <UFormField label="Client ID" required>
+                <div
+                  class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4"
+                >
+                  <div class="flex items-start gap-2">
+                    <UIcon
+                      name="i-heroicons-information-circle"
+                      class="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0"
+                    />
+                    <div class="text-sm">
+                      <p class="font-medium text-blue-900 dark:text-blue-100 mb-1">
+                        Obtenir vos identifiants API
+                      </p>
+                      <p class="text-blue-700 dark:text-blue-300">
+                        Consultez le
+                        <a
+                          href="https://centredaide.helloasso.com/association?question=comment-fonctionne-l-api-helloasso"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="underline hover:text-blue-600 font-medium"
+                        >
+                          guide HelloAsso
+                        </a>
+                        pour savoir comment créer un client API et obtenir vos identifiants.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <UFormField
+                    label="Client ID"
+                    hint="Identifiant public de votre client API"
+                    required
+                  >
                     <UInput
                       v-model="helloAssoClientId"
-                      placeholder="votre_client_id"
+                      placeholder="ex: abc123def456"
                       icon="i-heroicons-key"
                       type="text"
+                      size="lg"
+                      class="font-mono w-full"
                     />
                   </UFormField>
 
-                  <UFormField label="Client Secret" required>
+                  <UFormField
+                    label="Client Secret"
+                    hint="Clé secrète (chiffrée après enregistrement)"
+                    required
+                  >
                     <UInput
                       v-model="helloAssoClientSecret"
-                      placeholder="votre_client_secret"
+                      placeholder="••••••••••••••••"
                       icon="i-heroicons-lock-closed"
                       type="password"
+                      size="lg"
+                      class="font-mono w-full"
                     />
                   </UFormField>
                 </div>
               </div>
 
-              <div class="border-t pt-4">
-                <h3 class="font-medium mb-4">Configuration du formulaire</h3>
+              <!-- Étape 2 : Configuration du formulaire -->
+              <div class="space-y-4">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="flex items-center justify-center w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-semibold text-sm"
+                  >
+                    2
+                  </div>
+                  <h3 class="font-semibold text-base">Identifier votre formulaire</h3>
+                </div>
+
+                <div
+                  class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                >
+                  <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                    <span class="font-medium">Exemple d'URL HelloAsso :</span>
+                  </p>
+                  <code
+                    class="block text-xs bg-white dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-700 font-mono break-all"
+                  >
+                    https://www.helloasso.com/associations/<span
+                      class="text-primary-600 font-semibold"
+                      >slug-organisation</span
+                    >/evenements/<span class="text-primary-600 font-semibold">slug-formulaire</span>
+                  </code>
+                </div>
 
                 <div class="space-y-4">
-                  <UFormField label="Slug de l'organisation" required>
+                  <UFormField
+                    label="Slug de l'organisation"
+                    hint="Le nom de votre association dans l'URL"
+                    required
+                  >
                     <UInput
                       v-model="helloAssoOrganizationSlug"
-                      placeholder="mon-association"
+                      placeholder="ex: juggling-convention"
                       icon="i-heroicons-building-office"
+                      size="lg"
                     />
                   </UFormField>
 
-                  <UFormField label="Type de formulaire" required>
+                  <UFormField
+                    label="Type de formulaire"
+                    hint="Le type visible dans l'URL HelloAsso"
+                    required
+                  >
                     <USelect
                       v-model="helloAssoFormType"
                       :items="formTypeOptions"
                       placeholder="Sélectionnez un type"
+                      size="lg"
                     />
                   </UFormField>
 
-                  <UFormField label="Slug du formulaire" required>
+                  <UFormField
+                    label="Slug du formulaire"
+                    hint="Le nom de votre formulaire dans l'URL"
+                    required
+                  >
                     <UInput
                       v-model="helloAssoFormSlug"
-                      placeholder="billeterie-convention-2024"
+                      placeholder="ex: billeterie-convention-2025"
                       icon="i-heroicons-document-text"
+                      size="lg"
                     />
                   </UFormField>
                 </div>
               </div>
 
-              <div class="flex gap-2 pt-4 border-t">
+              <!-- Actions -->
+              <div class="flex flex-col sm:flex-row gap-3 pt-2">
                 <UButton
                   color="primary"
                   icon="i-heroicons-check-circle"
                   :disabled="!canSave"
                   :loading="saving"
+                  size="lg"
+                  class="flex-1 justify-center"
                   @click="saveHelloAssoConfig"
                 >
-                  Enregistrer la configuration
+                  {{ hasExistingConfig ? 'Mettre à jour' : 'Enregistrer la configuration' }}
                 </UButton>
                 <UButton
-                  variant="ghost"
+                  variant="outline"
                   icon="i-heroicons-arrow-path"
                   :disabled="!canSave"
                   :loading="testing"
+                  size="lg"
+                  class="flex-1 justify-center"
                   @click="testConnection"
                 >
                   Tester la connexion
@@ -162,54 +287,148 @@
               </div>
             </div>
 
+            <!-- Séparateur -->
+            <div v-if="hasExistingConfig" class="relative">
+              <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                <div class="w-full border-t border-gray-200 dark:border-gray-700" />
+              </div>
+            </div>
+
             <!-- Section tarifs et options (visible si configuré) -->
-            <div v-if="hasExistingConfig" class="space-y-4 pt-4 border-t">
-              <div class="flex items-center justify-between">
-                <h3 class="font-medium">Tarifs et options</h3>
+            <div v-if="hasExistingConfig" class="space-y-5">
+              <!-- En-tête avec statistiques -->
+              <div class="flex items-center justify-between flex-wrap gap-3">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="flex items-center justify-center w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-semibold text-sm"
+                  >
+                    3
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-base">Tarifs et options</h3>
+                    <p class="text-xs text-gray-500">Chargez les données depuis HelloAsso</p>
+                  </div>
+                </div>
                 <UButton
-                  size="sm"
                   color="primary"
                   variant="soft"
                   icon="i-heroicons-arrow-down-tray"
                   :loading="loadingTiers"
+                  size="lg"
                   @click="loadHelloAssoTiers"
                 >
-                  Charger depuis HelloAsso
+                  {{ tiersLoaded ? 'Recharger' : 'Charger depuis HelloAsso' }}
                 </UButton>
+              </div>
+
+              <!-- Statistiques rapides -->
+              <div
+                v-if="tiersLoaded && (loadedTiers.length > 0 || loadedOptions.length > 0)"
+                class="grid grid-cols-2 gap-4"
+              >
+                <div
+                  class="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-4"
+                >
+                  <div class="flex items-center gap-3">
+                    <div class="p-2 bg-primary-100 dark:bg-primary-900/40 rounded-lg">
+                      <UIcon
+                        name="i-heroicons-ticket"
+                        class="h-5 w-5 text-primary-600 dark:text-primary-400"
+                      />
+                    </div>
+                    <div>
+                      <p class="text-2xl font-bold text-primary-900 dark:text-primary-100">
+                        {{ loadedTiers.length }}
+                      </p>
+                      <p class="text-xs text-primary-600 dark:text-primary-400">
+                        {{ loadedTiers.length > 1 ? 'Tarifs' : 'Tarif' }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4"
+                >
+                  <div class="flex items-center gap-3">
+                    <div class="p-2 bg-orange-100 dark:bg-orange-900/40 rounded-lg">
+                      <UIcon
+                        name="i-heroicons-adjustments-horizontal"
+                        class="h-5 w-5 text-orange-600 dark:text-orange-400"
+                      />
+                    </div>
+                    <div>
+                      <p class="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                        {{ loadedOptions.length }}
+                      </p>
+                      <p class="text-xs text-orange-600 dark:text-orange-400">
+                        {{ loadedOptions.length > 1 ? 'Options' : 'Option' }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <!-- Affichage des tarifs -->
               <div v-if="loadedTiers && loadedTiers.length > 0" class="space-y-3">
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                  <h4 class="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">
-                    Tarifs disponibles ({{ loadedTiers.length }})
+                <div class="flex items-center gap-2 mb-2">
+                  <UIcon
+                    name="i-heroicons-ticket"
+                    class="h-5 w-5 text-primary-600 dark:text-primary-400"
+                  />
+                  <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    Tarifs disponibles
                   </h4>
-                  <div class="space-y-2">
-                    <div
-                      v-for="tier in loadedTiers"
-                      :key="tier.id"
-                      class="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600"
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div
+                    v-for="tier in loadedTiers"
+                    :key="tier.id"
+                    class="group relative bg-white dark:bg-gray-800 rounded-lg border-2 p-4 transition-all"
+                    :class="
+                      tier.isActive
+                        ? 'border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700'
+                        : 'border-gray-100 dark:border-gray-800 opacity-60'
+                    "
+                  >
+                    <!-- Badge statut -->
+                    <UBadge
+                      v-if="!tier.isActive"
+                      color="neutral"
+                      variant="soft"
+                      size="xs"
+                      class="absolute top-3 right-3"
                     >
-                      <div class="flex-1">
-                        <div class="font-medium text-sm">{{ tier.name }}</div>
-                        <div v-if="tier.description" class="text-xs text-gray-500 mt-1">
-                          {{ tier.description }}
+                      Inactif
+                    </UBadge>
+
+                    <div class="space-y-3">
+                      <!-- Nom et prix -->
+                      <div>
+                        <h5 class="font-semibold text-base text-gray-900 dark:text-white">
+                          {{ tier.name }}
+                        </h5>
+                        <div class="mt-1 flex items-baseline gap-1">
+                          <span
+                            class="text-2xl font-bold"
+                            :class="
+                              tier.isActive
+                                ? 'text-primary-600 dark:text-primary-400'
+                                : 'text-gray-400 dark:text-gray-600'
+                            "
+                          >
+                            {{ (tier.price / 100).toFixed(2) }}
+                          </span>
+                          <span class="text-sm text-gray-500">€</span>
                         </div>
                       </div>
-                      <div class="text-right">
-                        <div class="font-semibold text-primary-600 dark:text-primary-400">
-                          {{ (tier.price / 100).toFixed(2) }} €
-                        </div>
-                        <UBadge
-                          v-if="!tier.isActive"
-                          color="neutral"
-                          variant="soft"
-                          size="xs"
-                          class="mt-1"
-                        >
-                          Inactif
-                        </UBadge>
-                      </div>
+
+                      <!-- Description -->
+                      <p
+                        v-if="tier.description"
+                        class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2"
+                      >
+                        {{ tier.description }}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -217,49 +436,68 @@
 
               <!-- Affichage des options -->
               <div v-if="loadedOptions && loadedOptions.length > 0" class="space-y-3">
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                  <h4 class="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">
-                    Options disponibles ({{ loadedOptions.length }})
+                <div class="flex items-center gap-2 mb-2">
+                  <UIcon
+                    name="i-heroicons-adjustments-horizontal"
+                    class="h-5 w-5 text-orange-600 dark:text-orange-400"
+                  />
+                  <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    Options disponibles
                   </h4>
-                  <div class="space-y-2">
-                    <div
-                      v-for="option in loadedOptions"
-                      :key="option.id"
-                      class="p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600"
-                    >
-                      <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                          <div class="flex items-center gap-2">
-                            <span class="font-medium text-sm">{{ option.name }}</span>
-                            <UBadge
-                              v-if="option.isRequired"
-                              color="warning"
-                              variant="soft"
-                              size="xs"
+                </div>
+                <div class="space-y-2">
+                  <div
+                    v-for="option in loadedOptions"
+                    :key="option.id"
+                    class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:border-orange-300 dark:hover:border-orange-700 transition-colors"
+                  >
+                    <div class="flex items-start justify-between gap-4">
+                      <!-- Contenu principal -->
+                      <div class="flex-1 min-w-0">
+                        <!-- En-tête -->
+                        <div class="flex items-start gap-2 mb-2">
+                          <div class="flex-1">
+                            <h5 class="font-semibold text-sm text-gray-900 dark:text-white">
+                              {{ option.name }}
+                            </h5>
+                            <p
+                              v-if="option.description"
+                              class="text-xs text-gray-600 dark:text-gray-400 mt-0.5"
                             >
-                              Obligatoire
-                            </UBadge>
-                          </div>
-                          <div v-if="option.description" class="text-xs text-gray-500 mt-1">
-                            {{ option.description }}
-                          </div>
-                          <div v-if="option.choices && option.choices.length > 0" class="mt-2">
-                            <div class="text-xs text-gray-400 mb-1">Choix disponibles :</div>
-                            <div class="flex flex-wrap gap-1">
-                              <UBadge
-                                v-for="(choice, idx) in option.choices"
-                                :key="idx"
-                                color="neutral"
-                                variant="subtle"
-                                size="xs"
-                              >
-                                {{ choice }}
-                              </UBadge>
-                            </div>
+                              {{ option.description }}
+                            </p>
                           </div>
                         </div>
-                        <UBadge color="primary" variant="soft" size="xs">
+
+                        <!-- Choix disponibles -->
+                        <div
+                          v-if="option.choices && option.choices.length > 0"
+                          class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700"
+                        >
+                          <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                            Choix disponibles :
+                          </div>
+                          <div class="flex flex-wrap gap-1.5">
+                            <UBadge
+                              v-for="(choice, idx) in option.choices"
+                              :key="idx"
+                              color="neutral"
+                              variant="subtle"
+                              size="sm"
+                            >
+                              {{ choice }}
+                            </UBadge>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Badges latéraux -->
+                      <div class="flex flex-col gap-2 items-end flex-shrink-0">
+                        <UBadge color="primary" variant="soft" size="sm">
                           {{ option.type }}
+                        </UBadge>
+                        <UBadge v-if="option.isRequired" color="warning" variant="soft" size="sm">
+                          Obligatoire
                         </UBadge>
                       </div>
                     </div>
@@ -270,10 +508,18 @@
               <!-- Message si aucune donnée chargée -->
               <div
                 v-if="tiersLoaded && !loadedTiers?.length && !loadedOptions?.length"
-                class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                class="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700"
               >
-                <UIcon name="i-heroicons-inbox" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                <p class="text-sm text-gray-500">Aucun tarif ou option trouvé</p>
+                <UIcon
+                  name="i-heroicons-inbox"
+                  class="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600 mb-3"
+                />
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  Aucun tarif ou option trouvé
+                </p>
+                <p class="text-xs text-gray-500 mt-1">
+                  Vérifiez que votre formulaire HelloAsso contient des tarifs
+                </p>
               </div>
             </div>
           </div>
@@ -444,6 +690,7 @@ const tiersLoaded = ref(false)
 const loadedTiers = ref<any[]>([])
 const loadedOptions = ref<any[]>([])
 const hasExistingConfig = ref(false)
+const showConfigForm = ref(false)
 
 const saveHelloAssoConfig = async () => {
   if (!canSave.value || saving.value) return
@@ -514,7 +761,6 @@ const testConnection = async () => {
       description: `Formulaire trouvé : ${result.form.name} (${result.form.organizationName})`,
       icon: 'i-heroicons-check-circle',
       color: 'success',
-      timeout: 5000,
     })
   } catch (error: any) {
     console.error('Test connection error:', error)
@@ -523,7 +769,6 @@ const testConnection = async () => {
       description: error.data?.message || 'Impossible de se connecter à HelloAsso',
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
-      timeout: 5000,
     })
   } finally {
     testing.value = false

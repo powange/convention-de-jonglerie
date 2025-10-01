@@ -69,6 +69,8 @@ services:
       # Pour le chiffrement des données sensibles (ex: cartes bancaires)
       ENCRYPTION_SECRET: '${ENCRYPTION_SECRET:-change-this-to-a-strong-random-secret-key-min-32-chars}'
       ENCRYPTION_SALT: '${ENCRYPTION_SALT:-change-this-salt-to-random-value}'
+      # URL de l'API HelloAsso (par défaut: https://api.helloasso.com)
+      HELLOASSO_API_URL: '${HELLOASSO_API_URL:-https://api.helloasso.com}'
     volumes:
       # Monter uniquement le code pour ne pas écraser node_modules
       - ./app:/app/app:cached

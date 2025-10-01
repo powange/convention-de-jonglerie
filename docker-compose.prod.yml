@@ -56,6 +56,11 @@ services:
       NUXT_PUBLIC_VAPID_PUBLIC_KEY: '${NUXT_PUBLIC_VAPID_PUBLIC_KEY}'
       VAPID_PRIVATE_KEY: '${VAPID_PRIVATE_KEY}'
       VAPID_SUBJECT: '${VAPID_SUBJECT}'
+      # Pour le chiffrement des données sensibles (ex: cartes bancaires)
+      ENCRYPTION_SECRET: '${ENCRYPTION_SECRET:-change-this-to-a-strong-random-secret-key-min-32-chars}'
+      ENCRYPTION_SALT: '${ENCRYPTION_SALT:-change-this-salt-to-random-value}'
+      # URL de l'API HelloAsso (par défaut: https://api.helloasso.com)
+      HELLOASSO_API_URL: '${HELLOASSO_API_URL:-https://api.helloasso.com}'
     volumes:
       - /home/powange/docker_workspaces/convention-de-jonglerie-prod/backups:/app/backups
       - /home/powange/docker_workspaces/convention-de-jonglerie-prod/uploads_data:/app/public/uploads
