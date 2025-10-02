@@ -1,9 +1,7 @@
 /**
  * Utilitaire pour gérer les interactions avec l'API HelloAsso
- * Utilise le SDK officiel helloasso-node
+ * Utilise l'API REST directement pour une meilleure compatibilité
  */
-
-import HelloAsso from 'helloasso-node'
 
 // URL de base de l'API HelloAsso (configurable via variable d'environnement)
 const HELLOASSO_API_URL = process.env.HELLOASSO_API_URL || 'https://api.helloasso.com'
@@ -29,10 +27,10 @@ interface HelloAssoTier {
   label?: string
   name?: string
   description?: string
-  price: number
+  price?: number
   minAmount?: number
   maxAmount?: number
-  isActive: boolean
+  isActive?: boolean
   extraOptions?: HelloAssoExtraOption[]
 }
 
@@ -60,20 +58,6 @@ interface HelloAssoFormIdentifier {
 }
 
 /**
- * Crée et configure une instance du client API HelloAsso
- */
-function createHelloAssoClient(accessToken: string): HelloAsso.ApiClient {
-  const client = HelloAsso.ApiClient.instance
-  client.basePath = HELLOASSO_API_URL
-
-  // Configurer l'authentification OAuth2
-  const oauth2 = client.authentications['OAuth2'] as any
-  oauth2.accessToken = accessToken
-
-  return client
-}
-
-/**
  * Récupère un token d'accès OAuth2 depuis l'API HelloAsso
  */
 export async function getHelloAssoAccessToken(credentials: HelloAssoCredentials): Promise<string> {
@@ -82,7 +66,7 @@ export async function getHelloAssoAccessToken(credentials: HelloAssoCredentials)
     console.log('🔑 [HelloAsso] API URL:', HELLOASSO_API_URL)
     console.log('🔑 [HelloAsso] Client ID:', credentials.clientId)
 
-    const response = await $fetch<HelloAssoTokenResponse>(`${HELLOASSO_API_URL}/oauth2/token`, {
+    const response = await fetch(`${HELLOASSO_API_URL}/oauth2/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -94,18 +78,31 @@ export async function getHelloAssoAccessToken(credentials: HelloAssoCredentials)
       }),
     })
 
-    if (!response || !response.access_token) {
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`HTTP ${response.status}: ${errorText}`)
+    }
+
+    const data: HelloAssoTokenResponse = await response.json()
+
+    if (!data || !data.access_token) {
       throw new Error("Impossible d'obtenir un token d'accès")
     }
 
     console.log("✅ [HelloAsso] Token d'accès obtenu avec succès")
-    return response.access_token
+    return data.access_token
   } catch (error: any) {
     console.error('❌ [HelloAsso] Erreur lors de la récupération du token:', error)
-    throw createError({
-      statusCode: 401,
-      message: 'Identifiants HelloAsso invalides',
-    })
+
+    // Utiliser createError si disponible (contexte Nitro), sinon lancer une erreur standard
+    if (typeof createError !== 'undefined') {
+      throw createError({
+        statusCode: 401,
+        message: 'Identifiants HelloAsso invalides',
+      })
+    } else {
+      throw new Error('Identifiants HelloAsso invalides')
+    }
   }
 }
 
@@ -122,63 +119,58 @@ export async function getHelloAssoForm(
     console.log('📋 [HelloAsso] Form Type:', formIdentifier.formType)
     console.log('📋 [HelloAsso] Form Slug:', formIdentifier.formSlug)
 
-    // Créer le client API
-    createHelloAssoClient(accessToken)
+    // Utiliser directement l'API REST au lieu du SDK
+    const url = `${HELLOASSO_API_URL}/v5/organizations/${formIdentifier.organizationSlug}/forms/${formIdentifier.formType}/${formIdentifier.formSlug}/public`
+    console.log('📋 [HelloAsso] URL:', url)
 
-    // Créer l'instance de l'API Formulaires
-    const formulairesApi = new HelloAsso.FormulairesApi()
-
-    // Récupérer le formulaire avec promesse
-    return new Promise((resolve, reject) => {
-      formulairesApi.organizationsOrganizationSlugFormsFormTypeFormSlugPublicGet(
-        formIdentifier.organizationSlug,
-        formIdentifier.formType as any,
-        formIdentifier.formSlug,
-        (error: any, data: any, _response: any) => {
-          if (error) {
-            console.error('❌ [HelloAsso] Erreur lors de la récupération du formulaire:', error)
-
-            // Gestion des erreurs spécifiques
-            if (error.status === 401) {
-              reject(
-                createError({
-                  statusCode: 401,
-                  message: "Token d'accès invalide ou expiré",
-                })
-              )
-            } else if (error.status === 404) {
-              reject(
-                createError({
-                  statusCode: 404,
-                  message:
-                    'Formulaire introuvable. Vérifiez que le formulaire est publié et que les paramètres (slug organisation, type, slug formulaire) sont corrects.',
-                })
-              )
-            } else if (error.status === 403) {
-              reject(
-                createError({
-                  statusCode: 403,
-                  message:
-                    'Accès refusé. Vérifiez que votre client API a le privilège "AccessPublicData".',
-                })
-              )
-            } else {
-              reject(
-                createError({
-                  statusCode: 400,
-                  message: error.message || 'Erreur lors de la récupération du formulaire',
-                })
-              )
-            }
-          } else {
-            console.log('✅ [HelloAsso] Formulaire récupéré:', data.title)
-            resolve(data)
-          }
-        }
-      )
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      const statusCode = response.status
+
+      // Gestion des erreurs spécifiques
+      if (statusCode === 401) {
+        const error =
+          typeof createError !== 'undefined'
+            ? createError({ statusCode: 401, message: "Token d'accès invalide ou expiré" })
+            : new Error("Token d'accès invalide ou expiré")
+        throw error
+      } else if (statusCode === 404) {
+        const error =
+          typeof createError !== 'undefined'
+            ? createError({
+                statusCode: 404,
+                message:
+                  'Formulaire introuvable. Vérifiez que le formulaire est publié et que les paramètres (slug organisation, type, slug formulaire) sont corrects.',
+              })
+            : new Error('Formulaire introuvable')
+        throw error
+      } else if (statusCode === 403) {
+        const error =
+          typeof createError !== 'undefined'
+            ? createError({
+                statusCode: 403,
+                message:
+                  'Accès refusé. Vérifiez que votre client API a le privilège "AccessPublicData".',
+              })
+            : new Error('Accès refusé')
+        throw error
+      } else {
+        throw new Error(`HTTP ${statusCode}: ${errorText}`)
+      }
+    }
+
+    const data: HelloAssoFormResponse = await response.json()
+
+    console.log('✅ [HelloAsso] Formulaire récupéré:', data.title)
+    return data
   } catch (error: any) {
-    console.error('❌ [HelloAsso] Erreur dans getHelloAssoForm:', error)
+    console.error('❌ [HelloAsso] Erreur lors de la récupération du formulaire:', error)
     throw error
   }
 }
@@ -279,10 +271,11 @@ export async function getHelloAssoTiersAndOptions(
     id: tier.id,
     name: tier.label || tier.name || '',
     description: tier.description,
-    price: tier.price,
+    // HelloAsso utilise minAmount comme prix de base, price n'est pas toujours présent
+    price: tier.price ?? tier.minAmount ?? 0,
     minAmount: tier.minAmount,
     maxAmount: tier.maxAmount,
-    isActive: tier.isActive,
+    isActive: tier.isActive ?? true, // Actif par défaut si non spécifié
   }))
 
   const formattedOptions = options.map((option: HelloAssoExtraOption) => ({
@@ -349,64 +342,59 @@ async function getHelloAssoOrdersPage(
     totalCount: number
   }
 }> {
-  // Créer le client API
-  createHelloAssoClient(accessToken)
+  try {
+    // Construire l'URL avec les paramètres de requête
+    const params = new URLSearchParams({
+      pageIndex: String(pageIndex),
+      pageSize: String(pageSize),
+      withDetails: String(withDetails),
+      withCount: 'true',
+    })
 
-  // Créer l'instance de l'API Commandes
-  const commandesApi = new HelloAsso.CommandesApi()
+    const url = `${HELLOASSO_API_URL}/v5/organizations/${formIdentifier.organizationSlug}/forms/${formIdentifier.formType}/${formIdentifier.formSlug}/orders?${params}`
 
-  // Récupérer les commandes avec promesse
-  return new Promise((resolve, reject) => {
-    commandesApi.organizationsOrganizationSlugFormsFormTypeFormSlugOrdersGet(
-      formIdentifier.organizationSlug,
-      formIdentifier.formSlug,
-      formIdentifier.formType as any,
-      {
-        withDetails,
-        pageIndex,
-        pageSize,
-        withCount: true,
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
       },
-      (error: any, data: any, _response: any) => {
-        if (error) {
-          console.error('❌ [HelloAsso] Erreur lors de la récupération des commandes:', error)
+    })
 
-          // Gestion des erreurs spécifiques
-          if (error.status === 401) {
-            reject(
-              createError({
-                statusCode: 401,
-                message: "Token d'accès invalide ou expiré",
-              })
-            )
-          } else if (error.status === 404) {
-            reject(
-              createError({
-                statusCode: 404,
-                message: 'Formulaire introuvable',
-              })
-            )
-          } else if (error.status === 403) {
-            reject(
-              createError({
+    if (!response.ok) {
+      const errorText = await response.text()
+      const statusCode = response.status
+
+      // Gestion des erreurs spécifiques
+      if (statusCode === 401) {
+        const error =
+          typeof createError !== 'undefined'
+            ? createError({ statusCode: 401, message: "Token d'accès invalide ou expiré" })
+            : new Error("Token d'accès invalide ou expiré")
+        throw error
+      } else if (statusCode === 404) {
+        const error =
+          typeof createError !== 'undefined'
+            ? createError({ statusCode: 404, message: 'Formulaire introuvable' })
+            : new Error('Formulaire introuvable')
+        throw error
+      } else if (statusCode === 403) {
+        const error =
+          typeof createError !== 'undefined'
+            ? createError({
                 statusCode: 403,
                 message: 'Accès refusé. Vérifiez les permissions de votre client API',
               })
-            )
-          } else {
-            reject(
-              createError({
-                statusCode: 400,
-                message: error.message || 'Erreur lors de la récupération des commandes',
-              })
-            )
-          }
-        } else {
-          resolve(data)
-        }
+            : new Error('Accès refusé. Vérifiez les permissions de votre client API')
+        throw error
+      } else {
+        throw new Error(`HTTP ${statusCode}: ${errorText}`)
       }
-    )
-  })
+    }
+
+    return await response.json()
+  } catch (error: any) {
+    console.error('❌ [HelloAsso] Erreur lors de la récupération des commandes:', error)
+    throw error
+  }
 }
 
 /**

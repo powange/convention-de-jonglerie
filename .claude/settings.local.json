@@ -95,7 +95,8 @@
       "WebFetch(domain:dev.helloasso.com)",
       "Bash(npm info:*)",
       "Bash(/tmp/fix-participant-modal.sh:*)",
-      "Bash(/tmp/fix-external.sh:*)"
+      "Bash(/tmp/fix-external.sh:*)",
+      "Bash(npx tsx:*)"
     ],
     "deny": [],
     "ask": [],
