@@ -93,7 +93,9 @@
       "Bash(git log:*)",
       "WebFetch(domain:api.helloasso.com)",
       "WebFetch(domain:dev.helloasso.com)",
-      "Bash(npm info:*)"
+      "Bash(npm info:*)",
+      "Bash(/tmp/fix-participant-modal.sh:*)",
+      "Bash(/tmp/fix-external.sh:*)"
     ],
     "deny": [],
     "ask": [],
