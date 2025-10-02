@@ -137,17 +137,18 @@ function preprocessVueContent(content) {
     return ''
   })
 
-  // 2. Supprimer complètement le contenu de v-model (ne peut jamais contenir de traduction)
+  // 2. Supprimer complètement le contenu des directives conditionnelles et de liaison
+  // Ces directives ne peuvent jamais contenir de traduction directe (seulement des conditions JS)
   processedContent = processedContent.replace(
-    /(\s+v-model(?::\w+)?\s*=\s*)(["'])([^"']*)\2/g,
-    (match, directive, quote) => {
+    /(\s+v-(?:model|if|else-if|show|for)(?::\w+)?\s*=\s*)(["'])([^"']*)\2/g,
+    (_match, directive, quote) => {
       return directive + quote + quote
     }
   )
 
   // 3. Supprimer le contenu des autres directives Vue SEULEMENT si elles ne contiennent pas d'appels de traduction
   processedContent = processedContent.replace(
-    /(\s+(?:v-(?:if|show|for|bind|on|else-if)|[@:][\w-]*)\s*=\s*)(["'])([^"']*)\2/g,
+    /(\s+(?:v-(?:bind|on)|[@:][\w-]*)\s*=\s*)(["'])([^"']*)\2/g,
     (match, directive, quote, value) => {
       // Garder les directives qui contiennent $t( ou t(
       if (value.includes('$t(') || value.includes('t(')) {
