@@ -233,6 +233,11 @@ function extractI18nKeysFromFile(filePath) {
       continue // Ignorer les propriétés d'objets dans :key=
     }
 
+    // Vérifier si on est dans un contexte includes() (ex: .includes('helloasso.com'))
+    if (isInIncludesContext(content, matchStart)) {
+      continue // Ignorer les strings dans includes()
+    }
+
     // Filtrer les faux positifs
     // - Exclure les propriétés d'objets JavaScript communes
     const jsObjectPatterns = [
@@ -357,6 +362,21 @@ function extractHardcodedTexts(filePath) {
   }
 
   return hardcodedTexts
+}
+
+/**
+ * Vérifie si une string est dans un contexte includes()
+ * Retourne true si la string est utilisée dans une fonction includes()
+ */
+function isInIncludesContext(content, matchIndex) {
+  // Chercher en arrière pour voir si on est dans un contexte includes()
+  const maxLookback = 50 // Nombre de caractères à regarder en arrière
+  const startIndex = Math.max(0, matchIndex - maxLookback)
+  const beforeMatch = content.substring(startIndex, matchIndex)
+
+  // Vérifier si on a un pattern includes( juste avant notre match
+  // Pattern: .includes( ou includes( avec possibles espaces
+  return /\.includes\s*\(\s*$/.test(beforeMatch) || /\bincludes\s*\(\s*$/.test(beforeMatch)
 }
 
 function getLineNumber(content, index) {
