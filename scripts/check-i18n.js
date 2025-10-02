@@ -139,8 +139,9 @@ function preprocessVueContent(content) {
 
   // 2. Supprimer complètement le contenu des directives conditionnelles et de liaison
   // Ces directives ne peuvent jamais contenir de traduction directe (seulement des conditions JS)
+  // Supporte les modificateurs avec : et . (ex: v-model:value, v-model.number, v-model.trim)
   processedContent = processedContent.replace(
-    /(\s+v-(?:model|if|else-if|show|for)(?::\w+)?\s*=\s*)(["'])([^"']*)\2/g,
+    /(\s+v-(?:model|if|else-if|show|for)(?:[:.][\w-]+)*\s*=\s*)(["'])([^"']*)\2/g,
     (_match, directive, quote) => {
       return directive + quote + quote
     }
@@ -166,25 +167,34 @@ function preprocessVueContent(content) {
 }
 
 function extractI18nKeysFromFile(filePath) {
-  let content = fs.readFileSync(filePath, 'utf8')
-  const keys = new Set()
+  const originalContent = fs.readFileSync(filePath, 'utf8')
+  let content = originalContent
+  const keys = new Map() // Map<key, {line: number}>
 
   // Pour les fichiers Vue, prétraiter le contenu pour exclure les directives et interpolations
   if (filePath.endsWith('.vue')) {
     content = preprocessVueContent(content)
   }
 
+  // Fonction helper pour ajouter une clé avec sa ligne
+  const addKey = (key, index) => {
+    const line = getLineNumber(originalContent, index)
+    if (!keys.has(key)) {
+      keys.set(key, { line })
+    }
+  }
+
   // $t('key') ou $t("key")
   const tFunctionRegex = /\$t\(['"]([\w.]+)['"]/g
   let match
   while ((match = tFunctionRegex.exec(content)) !== null) {
-    keys.add(match[1])
+    addKey(match[1], match.index)
   }
 
   // t('key') ou t("key") - plus permissif pour capturer t(type.label) etc.
   const tMethodRegex = /\bt\(\s*['"]([\w.]+)['"]\s*\)/g
   while ((match = tMethodRegex.exec(content)) !== null) {
-    keys.add(match[1])
+    addKey(match[1], match.index)
   }
 
   // t(`key`) avec template littéraux (backticks)
@@ -201,11 +211,11 @@ function extractI18nKeysFromFile(filePath) {
       if (staticParts[0] && staticParts[0].endsWith('.')) {
         const prefix = staticParts[0]
         // Marquer le préfixe comme utilisé pour les clés dynamiques
-        keys.add('__DYNAMIC_PREFIX__' + prefix)
+        addKey('__DYNAMIC_PREFIX__' + prefix, match.index)
       }
     } else {
       // Template sans interpolation
-      keys.add(template)
+      addKey(template, match.index)
     }
   }
 
@@ -216,10 +226,10 @@ function extractI18nKeysFromFile(filePath) {
     if (template.includes('${')) {
       const staticParts = template.split(/\$\{[^}]+\}/)
       if (staticParts[0] && staticParts[0].endsWith('.')) {
-        keys.add('__DYNAMIC_PREFIX__' + staticParts[0])
+        addKey('__DYNAMIC_PREFIX__' + staticParts[0], match.index)
       }
     } else {
-      keys.add(template)
+      addKey(template, match.index)
     }
   }
 
@@ -235,11 +245,18 @@ function extractI18nKeysFromFile(filePath) {
 
     // Vérifier si on est dans un attribut :key= (faux positif fréquent)
     const matchStart = match.index
-    const beforeMatch = content.substring(Math.max(0, matchStart - 20), matchStart)
+    const beforeMatch = content.substring(Math.max(0, matchStart - 30), matchStart)
     const isInKeyAttribute = /:key\s*=\s*$/.test(beforeMatch)
 
     if (isInKeyAttribute) {
       continue // Ignorer les propriétés d'objets dans :key=
+    }
+
+    // Vérifier si on est dans une propriété accessorKey (définitions de colonnes de table)
+    const isInAccessorKey = /accessorKey\s*:\s*$/.test(beforeMatch)
+
+    if (isInAccessorKey) {
+      continue // Ignorer les valeurs dans accessorKey: 'user.email'
     }
 
     // Vérifier si on est dans un contexte includes() (ex: .includes('helloasso.com'))
@@ -299,14 +316,14 @@ function extractI18nKeysFromFile(filePath) {
       !isShortVarProperty &&
       /^[a-z]/.test(potentialKey)
     ) {
-      keys.add(potentialKey)
+      addKey(potentialKey, matchStart)
     }
   }
 
   // i18n.global.t('key') ou i18n.global.t("key")
   const globalTRegex = /i18n\.global\.t\(['"]([\w.]+)['"]/g
   while ((match = globalTRegex.exec(content)) !== null) {
-    keys.add(match[1])
+    addKey(match[1], match.index)
   }
 
   // useI18n et const { t } = useI18n()
@@ -314,7 +331,7 @@ function extractI18nKeysFromFile(filePath) {
   if (useI18nRegex.test(content)) {
     const localTRegex = /(?:^|\s)t\(['"]([\w.]+)['"]\s*\)/g
     while ((match = localTRegex.exec(content)) !== null) {
-      keys.add(match[1])
+      addKey(match[1], match.index)
     }
   }
 
@@ -496,7 +513,8 @@ async function main() {
   const localeKeys = new Set(Object.keys(flatLocale))
 
   // Collecter toutes les clés utilisées dans les fichiers
-  const usedKeys = new Set()
+  // Map<key, Array<{file, line}>>
+  const usedKeysMap = new Map()
   const hardcodedTexts = []
   const allFiles = await getAllRelevantFiles()
 
@@ -511,13 +529,26 @@ async function main() {
 
   for (const file of allFiles) {
     const keys = extractI18nKeysFromFile(file)
-    keys.forEach((key) => usedKeys.add(key))
+    const relativePath = path.relative(projectRoot, file)
+
+    keys.forEach((location, key) => {
+      if (!usedKeysMap.has(key)) {
+        usedKeysMap.set(key, [])
+      }
+      usedKeysMap.get(key).push({
+        file: relativePath,
+        line: location.line,
+      })
+    })
 
     const hardcoded = extractHardcodedTexts(file)
     if (hardcoded.length > 0) {
-      hardcodedTexts.push({ file: path.relative(projectRoot, file), texts: hardcoded })
+      hardcodedTexts.push({ file: relativePath, texts: hardcoded })
     }
   }
+
+  // Créer un Set simple pour la compatibilité avec le code existant
+  const usedKeys = new Set(usedKeysMap.keys())
 
   let hasErrors = false
 
@@ -544,7 +575,16 @@ async function main() {
     const missingKeys = [...cleanUsedKeys].filter((key) => !localeKeys.has(key))
     if (missingKeys.length > 0) {
       console.log(`${RED}✗ ${missingKeys.length} clé(s) manquante(s):${RESET}`)
-      missingKeys.forEach((key) => console.log(`  ${RED}- ${key}${RESET}`))
+      missingKeys.forEach((key) => {
+        console.log(`  ${RED}- ${key}${RESET}`)
+        // Afficher les emplacements où cette clé est utilisée
+        const locations = usedKeysMap.get(key)
+        if (locations && locations.length > 0) {
+          locations.forEach((loc) => {
+            console.log(`    ${CYAN}${loc.file}:${loc.line}${RESET}`)
+          })
+        }
+      })
       hasErrors = true
     } else {
       console.log(`${GREEN}✓ Toutes les clés utilisées sont présentes${RESET}`)
