@@ -137,9 +137,17 @@ function preprocessVueContent(content) {
     return ''
   })
 
-  // 2. Supprimer le contenu des directives Vue SEULEMENT si elles ne contiennent pas d'appels de traduction
+  // 2. Supprimer complètement le contenu de v-model (ne peut jamais contenir de traduction)
   processedContent = processedContent.replace(
-    /(\s+(?:v-(?:if|show|for|model|bind|on|else-if)|[@:][\w-]*)\s*=\s*)(["'])([^"']*)\2/g,
+    /(\s+v-model(?::\w+)?\s*=\s*)(["'])([^"']*)\2/g,
+    (match, directive, quote) => {
+      return directive + quote + quote
+    }
+  )
+
+  // 3. Supprimer le contenu des autres directives Vue SEULEMENT si elles ne contiennent pas d'appels de traduction
+  processedContent = processedContent.replace(
+    /(\s+(?:v-(?:if|show|for|bind|on|else-if)|[@:][\w-]*)\s*=\s*)(["'])([^"']*)\2/g,
     (match, directive, quote, value) => {
       // Garder les directives qui contiennent $t( ou t(
       if (value.includes('$t(') || value.includes('t(')) {
@@ -150,7 +158,7 @@ function preprocessVueContent(content) {
     }
   )
 
-  // 3. Supprimer les directives sans valeur (v-else)
+  // 4. Supprimer les directives sans valeur (v-else)
   processedContent = processedContent.replace(/\s+v-else\b/g, '')
 
   return processedContent
