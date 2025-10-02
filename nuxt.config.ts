@@ -51,6 +51,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     'nuxt-file-storage',
     '@nuxtjs/seo',
+    'nuxt-qrcode',
   ].filter(Boolean),
 
   // Restreindre les collections d'icônes empaquetées côté serveur
