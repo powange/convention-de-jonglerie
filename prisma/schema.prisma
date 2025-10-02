@@ -779,8 +779,11 @@ model ExternalTicketing {
   createdAt  DateTime                   @default(now())
   updatedAt  DateTime                   @updatedAt
 
-  edition         Edition          @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  helloAssoConfig HelloAssoConfig?
+  edition          Edition            @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  helloAssoConfig  HelloAssoConfig?
+  helloAssoTiers   HelloAssoTier[]
+  helloAssoOptions HelloAssoOption[]
+  helloAssoOrders  HelloAssoOrder[]
 
   @@index([editionId])
   @@index([provider])
@@ -801,5 +804,102 @@ model HelloAssoConfig {
   externalTicketing ExternalTicketing @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
 
   @@index([externalTicketingId])
+}
+
+model HelloAssoTier {
+  id                  Int      @id @default(autoincrement())
+  externalTicketingId String
+  helloAssoTierId     Int      // ID du tarif dans HelloAsso
+  name                String
+  description         String?  @db.Text
+  price               Int      // Prix en centimes
+  minAmount           Int?     // Montant minimum (pour tarifs libres)
+  maxAmount           Int?     // Montant maximum (pour tarifs libres)
+  isActive            Boolean  @default(true)
+  position            Int      @default(0) // Pour l'ordre d'affichage
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  externalTicketing ExternalTicketing @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+
+  @@unique([externalTicketingId, helloAssoTierId])
+  @@index([externalTicketingId])
+}
+
+model HelloAssoOption {
+  id                  Int      @id @default(autoincrement())
+  externalTicketingId String
+  helloAssoOptionId   String   // ID de l'option dans HelloAsso (peut être string ou int)
+  name                String
+  description         String?  @db.Text
+  type                String   // TextInput, CheckBox, Select, etc.
+  isRequired          Boolean  @default(false)
+  choices             Json?    // Array de choix pour les Select/MultipleChoice
+  position            Int      @default(0) // Pour l'ordre d'affichage
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  externalTicketing ExternalTicketing @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+
+  @@unique([externalTicketingId, helloAssoOptionId])
+  @@index([externalTicketingId])
+}
+
+model HelloAssoOrder {
+  id                  Int      @id @default(autoincrement())
+  externalTicketingId String
+  helloAssoOrderId    Int      // ID de la commande dans HelloAsso
+
+  // Informations du payeur
+  payerFirstName      String
+  payerLastName       String
+  payerEmail          String
+
+  // Montant et statut
+  amount              Int      // Montant total en centimes
+  status              String   // Processed, Refunded, etc.
+
+  // Date de la commande
+  orderDate           DateTime
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  externalTicketing   ExternalTicketing      @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  items               HelloAssoOrderItem[]
+
+  @@unique([externalTicketingId, helloAssoOrderId])
+  @@index([externalTicketingId])
+  @@index([payerEmail])
+}
+
+model HelloAssoOrderItem {
+  id              Int      @id @default(autoincrement())
+  orderId         Int      // Lien vers HelloAssoOrder
+  helloAssoItemId Int      // ID de l'item dans HelloAsso
+
+  // Informations du participant (peut différer du payeur)
+  firstName       String?
+  lastName        String?
+  email           String?
+
+  // Détails du billet
+  name            String   // Nom du tarif
+  amount          Int      // Prix payé en centimes
+  state           String   // Processed, Refunded, etc.
+  qrCode          String?  // Code QR pour le contrôle d'accès
+
+  // Champs personnalisés (réponses aux options)
+  customFields    Json?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  order           HelloAssoOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, helloAssoItemId])
+  @@index([orderId])
+  @@index([email])
+  @@index([qrCode])
 }
 

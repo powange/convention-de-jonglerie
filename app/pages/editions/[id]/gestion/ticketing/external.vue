@@ -105,20 +105,44 @@
                     </div>
                   </div>
                 </div>
-                <UButton
-                  variant="ghost"
-                  color="neutral"
-                  size="sm"
-                  :icon="showConfigForm ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
-                  @click="showConfigForm = !showConfigForm"
-                >
-                  {{ showConfigForm ? 'Masquer' : 'Modifier' }}
-                </UButton>
+                <div class="flex gap-2">
+                  <UButton
+                    variant="ghost"
+                    color="error"
+                    size="sm"
+                    icon="i-heroicons-trash"
+                    @click="confirmDisconnect"
+                  >
+                    Désassocier
+                  </UButton>
+                  <UButton
+                    variant="ghost"
+                    color="neutral"
+                    size="sm"
+                    icon="i-heroicons-pencil"
+                    @click="openConfigModal"
+                  >
+                    Modifier
+                  </UButton>
+                </div>
               </div>
             </div>
 
-            <!-- Formulaire de connexion HelloAsso -->
-            <div v-if="!hasExistingConfig || showConfigForm" class="space-y-6">
+            <!-- Bouton pour ouvrir la modal de configuration -->
+            <div v-if="!hasExistingConfig" class="pt-4">
+              <UButton
+                color="primary"
+                icon="i-heroicons-plus-circle"
+                size="lg"
+                class="justify-center"
+                @click="openConfigModal"
+              >
+                Configurer HelloAsso
+              </UButton>
+            </div>
+
+            <!-- Ancien formulaire (caché, remplacé par la modal) -->
+            <div v-if="false" class="space-y-6">
               <!-- Étape 1 : Guide et identifiants API -->
               <div class="space-y-4">
                 <div class="flex items-center gap-2">
@@ -287,223 +311,260 @@
               </div>
             </div>
 
-            <!-- Séparateur -->
-            <div v-if="hasExistingConfig" class="relative">
-              <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                <div class="w-full border-t border-gray-200 dark:border-gray-700" />
-              </div>
-            </div>
-
             <!-- Section tarifs et options (visible si configuré) -->
             <div v-if="hasExistingConfig" class="space-y-5">
               <!-- En-tête avec statistiques -->
               <div class="flex items-center justify-between flex-wrap gap-3">
                 <div class="flex items-center gap-2">
-                  <div
-                    class="flex items-center justify-center w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-semibold text-sm"
-                  >
-                    3
-                  </div>
                   <div>
-                    <h3 class="font-semibold text-base">Tarifs et options</h3>
+                    <h3 class="font-semibold text-base">Tarifs, options et participants</h3>
                     <p class="text-xs text-gray-500">Chargez les données depuis HelloAsso</p>
                   </div>
                 </div>
-                <UButton
-                  color="primary"
-                  variant="soft"
-                  icon="i-heroicons-arrow-down-tray"
-                  :loading="loadingTiers"
-                  size="lg"
-                  @click="loadHelloAssoTiers"
-                >
-                  {{ tiersLoaded ? 'Recharger' : 'Charger depuis HelloAsso' }}
-                </UButton>
-              </div>
-
-              <!-- Statistiques rapides -->
-              <div
-                v-if="tiersLoaded && (loadedTiers.length > 0 || loadedOptions.length > 0)"
-                class="grid grid-cols-2 gap-4"
-              >
-                <div
-                  class="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-4"
-                >
-                  <div class="flex items-center gap-3">
-                    <div class="p-2 bg-primary-100 dark:bg-primary-900/40 rounded-lg">
-                      <UIcon
-                        name="i-heroicons-ticket"
-                        class="h-5 w-5 text-primary-600 dark:text-primary-400"
-                      />
-                    </div>
-                    <div>
-                      <p class="text-2xl font-bold text-primary-900 dark:text-primary-100">
-                        {{ loadedTiers.length }}
-                      </p>
-                      <p class="text-xs text-primary-600 dark:text-primary-400">
-                        {{ loadedTiers.length > 1 ? 'Tarifs' : 'Tarif' }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4"
-                >
-                  <div class="flex items-center gap-3">
-                    <div class="p-2 bg-orange-100 dark:bg-orange-900/40 rounded-lg">
-                      <UIcon
-                        name="i-heroicons-adjustments-horizontal"
-                        class="h-5 w-5 text-orange-600 dark:text-orange-400"
-                      />
-                    </div>
-                    <div>
-                      <p class="text-2xl font-bold text-orange-900 dark:text-orange-100">
-                        {{ loadedOptions.length }}
-                      </p>
-                      <p class="text-xs text-orange-600 dark:text-orange-400">
-                        {{ loadedOptions.length > 1 ? 'Options' : 'Option' }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Affichage des tarifs -->
-              <div v-if="loadedTiers && loadedTiers.length > 0" class="space-y-3">
-                <div class="flex items-center gap-2 mb-2">
-                  <UIcon
-                    name="i-heroicons-ticket"
-                    class="h-5 w-5 text-primary-600 dark:text-primary-400"
-                  />
-                  <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                    Tarifs disponibles
-                  </h4>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div
-                    v-for="tier in loadedTiers"
-                    :key="tier.id"
-                    class="group relative bg-white dark:bg-gray-800 rounded-lg border-2 p-4 transition-all"
-                    :class="
-                      tier.isActive
-                        ? 'border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700'
-                        : 'border-gray-100 dark:border-gray-800 opacity-60'
-                    "
+                <div class="flex gap-2">
+                  <UButton
+                    color="primary"
+                    variant="soft"
+                    icon="i-heroicons-arrow-down-tray"
+                    :loading="loadingTiers"
+                    size="lg"
+                    @click="loadHelloAssoTiers"
                   >
-                    <!-- Badge statut -->
-                    <UBadge
-                      v-if="!tier.isActive"
-                      color="neutral"
-                      variant="soft"
-                      size="xs"
-                      class="absolute top-3 right-3"
-                    >
-                      Inactif
-                    </UBadge>
+                    {{ tiersLoaded ? 'Recharger' : 'Charger' }} tarifs
+                  </UButton>
+                  <UButton
+                    color="success"
+                    variant="soft"
+                    icon="i-heroicons-users"
+                    :loading="loadingOrders"
+                    size="lg"
+                    @click="loadHelloAssoOrders"
+                  >
+                    {{ ordersLoaded ? 'Recharger' : 'Charger' }} participants
+                  </UButton>
+                </div>
+              </div>
 
-                    <div class="space-y-3">
-                      <!-- Nom et prix -->
-                      <div>
-                        <h5 class="font-semibold text-base text-gray-900 dark:text-white">
-                          {{ tier.name }}
-                        </h5>
-                        <div class="mt-1 flex items-baseline gap-1">
-                          <span
-                            class="text-2xl font-bold"
-                            :class="
-                              tier.isActive
-                                ? 'text-primary-600 dark:text-primary-400'
-                                : 'text-gray-400 dark:text-gray-600'
-                            "
+              <UTabs
+                v-if="loadedTiers && loadedTiers.length > 0"
+                :items="items"
+                variant="link"
+                :ui="{ trigger: 'grow' }"
+                class="gap-4 w-full"
+              >
+                <template #tarifs>
+                  <!-- Affichage des tarifs -->
+                  <div v-if="loadedTiers && loadedTiers.length > 0" class="space-y-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div
+                        v-for="tier in loadedTiers"
+                        :key="tier.id"
+                        class="group relative bg-white dark:bg-gray-800 rounded-lg border-2 p-4 transition-all"
+                        :class="
+                          tier.isActive
+                            ? 'border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700'
+                            : 'border-gray-100 dark:border-gray-800 opacity-60'
+                        "
+                      >
+                        <!-- Badge statut -->
+                        <UBadge
+                          v-if="!tier.isActive"
+                          color="neutral"
+                          variant="soft"
+                          size="xs"
+                          class="absolute top-3 right-3"
+                        >
+                          Inactif
+                        </UBadge>
+
+                        <div class="space-y-3">
+                          <!-- Nom et prix -->
+                          <div>
+                            <h5 class="font-semibold text-base text-gray-900 dark:text-white">
+                              {{ tier.name }}
+                            </h5>
+                            <div class="mt-1 flex items-baseline gap-1">
+                              <span
+                                class="text-2xl font-bold"
+                                :class="
+                                  tier.isActive
+                                    ? 'text-primary-600 dark:text-primary-400'
+                                    : 'text-gray-400 dark:text-gray-600'
+                                "
+                              >
+                                {{ (tier.price / 100).toFixed(2) }}
+                              </span>
+                              <span class="text-sm text-gray-500">€</span>
+                            </div>
+                          </div>
+
+                          <!-- Description -->
+                          <p
+                            v-if="tier.description"
+                            class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2"
                           >
-                            {{ (tier.price / 100).toFixed(2) }}
-                          </span>
-                          <span class="text-sm text-gray-500">€</span>
+                            {{ tier.description }}
+                          </p>
                         </div>
                       </div>
-
-                      <!-- Description -->
-                      <p
-                        v-if="tier.description"
-                        class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2"
-                      >
-                        {{ tier.description }}
-                      </p>
                     </div>
                   </div>
-                </div>
-              </div>
+                </template>
 
-              <!-- Affichage des options -->
-              <div v-if="loadedOptions && loadedOptions.length > 0" class="space-y-3">
-                <div class="flex items-center gap-2 mb-2">
-                  <UIcon
-                    name="i-heroicons-adjustments-horizontal"
-                    class="h-5 w-5 text-orange-600 dark:text-orange-400"
-                  />
-                  <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                    Options disponibles
-                  </h4>
-                </div>
-                <div class="space-y-2">
-                  <div
-                    v-for="option in loadedOptions"
-                    :key="option.id"
-                    class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:border-orange-300 dark:hover:border-orange-700 transition-colors"
-                  >
-                    <div class="flex items-start justify-between gap-4">
-                      <!-- Contenu principal -->
-                      <div class="flex-1 min-w-0">
-                        <!-- En-tête -->
-                        <div class="flex items-start gap-2 mb-2">
-                          <div class="flex-1">
-                            <h5 class="font-semibold text-sm text-gray-900 dark:text-white">
-                              {{ option.name }}
-                            </h5>
-                            <p
-                              v-if="option.description"
-                              class="text-xs text-gray-600 dark:text-gray-400 mt-0.5"
+                <template #options>
+                  <!-- Affichage des options -->
+                  <div v-if="loadedOptions && loadedOptions.length > 0" class="space-y-3">
+                    <div class="space-y-2">
+                      <div
+                        v-for="option in loadedOptions"
+                        :key="option.id"
+                        class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:border-orange-300 dark:hover:border-orange-700 transition-colors"
+                      >
+                        <div class="flex items-start justify-between gap-4">
+                          <!-- Contenu principal -->
+                          <div class="flex-1 min-w-0">
+                            <!-- En-tête -->
+                            <div class="flex items-start gap-2 mb-2">
+                              <div class="flex-1">
+                                <h5 class="font-semibold text-sm text-gray-900 dark:text-white">
+                                  {{ option.name }}
+                                </h5>
+                                <p
+                                  v-if="option.description"
+                                  class="text-xs text-gray-600 dark:text-gray-400 mt-0.5"
+                                >
+                                  {{ option.description }}
+                                </p>
+                              </div>
+                            </div>
+
+                            <!-- Choix disponibles -->
+                            <div
+                              v-if="option.choices && option.choices.length > 0"
+                              class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700"
                             >
-                              {{ option.description }}
-                            </p>
+                              <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                Choix disponibles :
+                              </div>
+                              <div class="flex flex-wrap gap-1.5">
+                                <UBadge
+                                  v-for="(choice, idx) in option.choices"
+                                  :key="idx"
+                                  color="neutral"
+                                  variant="subtle"
+                                  size="sm"
+                                >
+                                  {{ choice }}
+                                </UBadge>
+                              </div>
+                            </div>
                           </div>
-                        </div>
 
-                        <!-- Choix disponibles -->
-                        <div
-                          v-if="option.choices && option.choices.length > 0"
-                          class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700"
-                        >
-                          <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                            Choix disponibles :
-                          </div>
-                          <div class="flex flex-wrap gap-1.5">
+                          <!-- Badges latéraux -->
+                          <div class="flex flex-col gap-2 items-end flex-shrink-0">
+                            <UBadge color="primary" variant="soft" size="sm">
+                              {{ option.type }}
+                            </UBadge>
                             <UBadge
-                              v-for="(choice, idx) in option.choices"
-                              :key="idx"
-                              color="neutral"
-                              variant="subtle"
+                              v-if="option.isRequired"
+                              color="warning"
+                              variant="soft"
                               size="sm"
                             >
-                              {{ choice }}
+                              Obligatoire
                             </UBadge>
                           </div>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </template>
 
-                      <!-- Badges latéraux -->
-                      <div class="flex flex-col gap-2 items-end flex-shrink-0">
-                        <UBadge color="primary" variant="soft" size="sm">
-                          {{ option.type }}
-                        </UBadge>
-                        <UBadge v-if="option.isRequired" color="warning" variant="soft" size="sm">
-                          Obligatoire
-                        </UBadge>
+                <template #participants>
+                  <!-- Affichage des participants -->
+                  <div v-if="loadedOrders && loadedOrders.length > 0" class="space-y-3">
+                    <div class="space-y-4">
+                      <div
+                        v-for="order in loadedOrders"
+                        :key="order.id"
+                        class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4"
+                      >
+                        <!-- En-tête de la commande -->
+                        <div
+                          class="flex items-start justify-between mb-3 pb-3 border-b border-gray-200 dark:border-gray-700"
+                        >
+                          <div>
+                            <div class="flex items-center gap-2">
+                              <UIcon
+                                name="i-heroicons-shopping-cart"
+                                class="h-5 w-5 text-primary-600 dark:text-primary-400"
+                              />
+                              <h5 class="font-semibold text-base text-gray-900 dark:text-white">
+                                {{ order.payer.firstName }} {{ order.payer.lastName }}
+                              </h5>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                              {{ order.payer.email }}
+                            </p>
+                          </div>
+                          <UBadge color="success" variant="soft">
+                            {{ order.items.length }}
+                            {{ order.items.length > 1 ? 'billets' : 'billet' }}
+                          </UBadge>
+                        </div>
+
+                        <!-- Items de la commande -->
+                        <div class="space-y-2">
+                          <div
+                            v-for="item in order.items"
+                            :key="item.id"
+                            class="flex items-start justify-between gap-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50"
+                          >
+                            <div class="flex-1 min-w-0">
+                              <div class="flex items-center gap-2 mb-1">
+                                <UIcon name="i-heroicons-ticket" class="h-4 w-4 text-gray-500" />
+                                <span class="font-medium text-sm text-gray-900 dark:text-white">
+                                  {{ item.name }}
+                                </span>
+                              </div>
+                              <div
+                                v-if="item.user"
+                                class="text-xs text-gray-600 dark:text-gray-400"
+                              >
+                                {{ item.user.firstName }} {{ item.user.lastName }}
+                                <span v-if="item.user.email" class="ml-1"
+                                  >({{ item.user.email }})</span
+                                >
+                              </div>
+                              <div
+                                v-if="item.qrCode"
+                                class="text-xs text-gray-500 dark:text-gray-500 mt-1 font-mono"
+                              >
+                                QR: {{ item.qrCode }}
+                              </div>
+                            </div>
+                            <div class="text-right flex-shrink-0">
+                              <div
+                                class="font-semibold text-sm text-primary-600 dark:text-primary-400"
+                              >
+                                {{ (item.amount / 100).toFixed(2) }} €
+                              </div>
+                              <UBadge
+                                :color="item.state === 'Processed' ? 'success' : 'neutral'"
+                                variant="subtle"
+                                size="xs"
+                                class="mt-1"
+                              >
+                                {{ item.state }}
+                              </UBadge>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                </template>
+              </UTabs>
 
               <!-- Message si aucune donnée chargée -->
               <div
@@ -545,6 +606,16 @@
           </div>
         </UCard>
       </div>
+
+      <!-- Modal de configuration HelloAsso -->
+      <HelloAssoConfigModal
+        ref="configModalRef"
+        v-model:open="showConfigModal"
+        :config="currentConfig"
+        :ticketing-url="edition?.ticketingUrl || undefined"
+        @save="handleConfigSave"
+        @test="handleConfigTest"
+      />
     </div>
   </div>
 </template>
@@ -553,8 +624,11 @@
 import { onMounted, computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+import HelloAssoConfigModal from '~/components/edition/ticketing/HelloAssoConfigModal.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+
+import type { TabsItem } from '@nuxt/ui'
 
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -570,14 +644,21 @@ const helloAssoOrganizationSlug = ref('')
 const helloAssoFormType = ref('Event')
 const helloAssoFormSlug = ref('')
 
-const formTypeOptions = [
-  { label: 'Événement', value: 'Event' },
-  { label: 'Billetterie', value: 'Ticketing' },
-  { label: 'Adhésion', value: 'Membership' },
-  { label: 'Don', value: 'Donation' },
-  { label: 'Crowdfunding', value: 'CrowdFunding' },
-  { label: 'Boutique', value: 'Shop' },
-]
+// Modal
+const showConfigModal = ref(false)
+const configModalRef = ref<InstanceType<typeof HelloAssoConfigModal> | null>(null)
+
+const currentConfig = computed(() => {
+  if (!hasExistingConfig.value) return undefined
+
+  return {
+    clientId: helloAssoClientId.value,
+    clientSecret: helloAssoClientSecret.value,
+    organizationSlug: helloAssoOrganizationSlug.value,
+    formType: helloAssoFormType.value,
+    formSlug: helloAssoFormSlug.value,
+  }
+})
 
 onMounted(async () => {
   if (!edition.value) {
@@ -585,11 +666,14 @@ onMounted(async () => {
       await editionStore.fetchEditionById(editionId, { force: true })
     } catch (error) {
       console.error('Failed to fetch edition:', error)
+      return
     }
   }
 
-  // Charger la configuration existante
-  await loadExistingConfig()
+  // Charger la configuration existante uniquement si l'utilisateur a accès
+  if (canAccess.value) {
+    await loadExistingConfig()
+  }
 })
 
 const loadExistingConfig = async () => {
@@ -690,7 +774,92 @@ const tiersLoaded = ref(false)
 const loadedTiers = ref<any[]>([])
 const loadedOptions = ref<any[]>([])
 const hasExistingConfig = ref(false)
-const showConfigForm = ref(false)
+
+// Ouvrir la modal de configuration
+const openConfigModal = () => {
+  showConfigModal.value = true
+}
+
+// Gestion de la sauvegarde depuis la modal
+const handleConfigSave = async (config: any) => {
+  try {
+    await $fetch(`/api/editions/${editionId}/ticketing/external`, {
+      method: 'POST',
+      body: {
+        provider: 'HELLOASSO',
+        helloAsso: {
+          clientId: config.clientId,
+          clientSecret: config.clientSecret,
+          organizationSlug: config.organizationSlug,
+          formType: config.formType,
+          formSlug: config.formSlug,
+        },
+      },
+    })
+
+    // Mettre à jour les valeurs locales
+    helloAssoClientId.value = config.clientId
+    helloAssoOrganizationSlug.value = config.organizationSlug
+    helloAssoFormType.value = config.formType
+    helloAssoFormSlug.value = config.formSlug
+    helloAssoClientSecret.value = ''
+
+    hasExistingConfig.value = true
+
+    toast.add({
+      title: 'Configuration enregistrée',
+      description: `HelloAsso configuré pour ${config.organizationSlug}`,
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    // Fermer la modal
+    showConfigModal.value = false
+  } catch (error: any) {
+    console.error('Failed to save config:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || 'Impossible de sauvegarder la configuration',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    configModalRef.value?.setSaving(false)
+  }
+}
+
+// Gestion du test de connexion depuis la modal
+const handleConfigTest = async (config: any) => {
+  try {
+    const result = await $fetch(`/api/editions/${editionId}/ticketing/test-helloasso`, {
+      method: 'POST',
+      body: {
+        clientId: config.clientId,
+        clientSecret: config.clientSecret,
+        organizationSlug: config.organizationSlug,
+        formType: config.formType,
+        formSlug: config.formSlug,
+      },
+    })
+
+    toast.add({
+      title: 'Connexion réussie !',
+      description: `Formulaire trouvé : ${(result as any).form.name} (${(result as any).form.organizationName})`,
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (error: any) {
+    console.error('Test connection error:', error)
+    toast.add({
+      title: 'Échec de la connexion',
+      description: error.data?.message || 'Impossible de se connecter à HelloAsso',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    configModalRef.value?.setTesting(false)
+  }
+}
 
 const saveHelloAssoConfig = async () => {
   if (!canSave.value || saving.value) return
@@ -738,6 +907,7 @@ const saveHelloAssoConfig = async () => {
 }
 
 const testing = ref(false)
+const disconnecting = ref(false)
 
 const testConnection = async () => {
   if (!canSave.value || testing.value) return
@@ -774,4 +944,123 @@ const testConnection = async () => {
     testing.value = false
   }
 }
+
+const confirmDisconnect = async () => {
+  if (disconnecting.value) return
+
+  const confirmed = confirm(
+    'Êtes-vous sûr de vouloir désassocier la billeterie HelloAsso ?\n\nCette action supprimera toutes les configurations et est irréversible.'
+  )
+
+  if (confirmed) {
+    await disconnectHelloAsso()
+  }
+}
+
+const disconnectHelloAsso = async () => {
+  if (disconnecting.value) return
+
+  disconnecting.value = true
+
+  try {
+    await $fetch(`/api/editions/${editionId}/ticketing/external`, {
+      method: 'DELETE',
+    })
+
+    toast.add({
+      title: 'Configuration supprimée',
+      description: 'La billeterie HelloAsso a été désassociée avec succès',
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    // Réinitialiser l'état
+    hasExistingConfig.value = false
+    tiersLoaded.value = false
+    loadedTiers.value = []
+    loadedOptions.value = []
+
+    // Réinitialiser les champs du formulaire
+    helloAssoClientId.value = ''
+    helloAssoClientSecret.value = ''
+    helloAssoOrganizationSlug.value = ''
+    helloAssoFormType.value = 'Event'
+    helloAssoFormSlug.value = ''
+  } catch (error: any) {
+    console.error('Failed to disconnect:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || 'Impossible de supprimer la configuration',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    disconnecting.value = false
+  }
+}
+
+const loadingOrders = ref(false)
+const ordersLoaded = ref(false)
+const loadedOrders = ref<any[]>([])
+const ordersStats = ref({ totalOrders: 0, totalItems: 0 })
+
+const loadHelloAssoOrders = async () => {
+  if (loadingOrders.value) return
+
+  loadingOrders.value = true
+  ordersLoaded.value = false
+  loadedOrders.value = []
+
+  try {
+    const response = await $fetch(`/api/editions/${editionId}/ticketing/helloasso-orders`)
+
+    loadedOrders.value = response.orders || []
+    ordersStats.value = response.stats || { totalOrders: 0, totalItems: 0 }
+    ordersLoaded.value = true
+
+    toast.add({
+      title: 'Participants chargés',
+      description: `${response.stats?.totalOrders || 0} commande(s) et ${response.stats?.totalItems || 0} participant(s) trouvé(s)`,
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (error: any) {
+    console.error('Failed to load orders:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || 'Impossible de charger les participants',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    loadingOrders.value = false
+  }
+}
+
+const items = computed(
+  () =>
+    [
+      {
+        label: 'Tarifs disponibles',
+        description: 'Modifiez les tarifs disponibles pour cet événement.',
+        icon: 'i-heroicons-ticket',
+        slot: 'tarifs' as const,
+        badge: loadedTiers.value.length,
+      },
+      {
+        label: 'Options disponibles',
+        description: 'Modifiez les options disponibles pour cet événement.',
+        icon: 'i-heroicons-adjustments-horizontal',
+        slot: 'options' as const,
+        badge: loadedOptions.value.length,
+      },
+      {
+        label: 'Participants',
+        description: 'Consultez la liste des participants.',
+        icon: 'i-heroicons-users',
+        slot: 'participants' as const,
+        badge: ordersStats.value.totalItems,
+      },
+    ] satisfies TabsItem[]
+)
 </script>

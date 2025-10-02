@@ -24,6 +24,7 @@ logs
 .env.*
 !.env.example
 !.env.docker.example
+!.env.portainer.example
 
 /app/generated/prisma
 lib/prisma.ts
