@@ -123,6 +123,20 @@ function findDuplicateValues(obj) {
   return duplicates
 }
 
+function removeComments(content) {
+  // Supprimer les commentaires JavaScript/TypeScript
+  let result = content
+
+  // 1. Supprimer les commentaires multi-lignes /* ... */
+  result = result.replace(/\/\*[\s\S]*?\*\//g, '')
+
+  // 2. Supprimer les commentaires de ligne // ...
+  // Attention à ne pas supprimer les // dans les strings
+  result = result.replace(/\/\/.*$/gm, '')
+
+  return result
+}
+
 function preprocessVueContent(content) {
   // Créer une copie du contenu pour le traitement
   let processedContent = content
@@ -174,6 +188,11 @@ function extractI18nKeysFromFile(filePath) {
   // Pour les fichiers Vue, prétraiter le contenu pour exclure les directives et interpolations
   if (filePath.endsWith('.vue')) {
     content = preprocessVueContent(content)
+  }
+
+  // Pour les fichiers TS/JS, supprimer les commentaires
+  if (filePath.endsWith('.ts') || filePath.endsWith('.js')) {
+    content = removeComments(content)
   }
 
   // Fonction helper pour ajouter une clé avec sa ligne
@@ -266,17 +285,7 @@ function extractI18nKeysFromFile(filePath) {
 
     // Filtrer les faux positifs
     // - Exclure les propriétés d'objets JavaScript communes
-    const jsObjectPatterns = [
-      'form',
-      'formState',
-      'teamFormState',
-      'pagination',
-      'user',
-      'resolveModal',
-      'detailsModal',
-      'leaflet',
-      'abc123',
-    ]
+    const jsObjectPatterns = ['leaflet']
 
     // Exceptions - ces patterns sont valides même s'ils commencent par un mot réservé
     const validI18nPatterns = []
