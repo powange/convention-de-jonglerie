@@ -392,7 +392,8 @@ async function getAllRelevantFiles() {
   let files = []
   for (const pattern of patterns) {
     const found = await glob(path.join(projectRoot, pattern).replace(/\\/g, '/'))
-    files = files.concat(found)
+    // glob v10+ retourne un itérable, il faut le convertir en tableau
+    files = files.concat([...found])
   }
 
   // Filtrer les fichiers exclus

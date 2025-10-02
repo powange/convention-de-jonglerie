@@ -342,6 +342,19 @@
                   }}</span>
                   <span class="sm:hidden">Contact</span>
                 </UButton>
+
+                <UButton
+                  v-if="application.status === 'ACCEPTED'"
+                  size="sm"
+                  color="primary"
+                  variant="outline"
+                  icon="i-heroicons-qr-code"
+                  class="flex-1 sm:flex-none"
+                  @click="showQrCode(application)"
+                >
+                  <span class="hidden sm:inline">Mon QR code</span>
+                  <span class="sm:hidden">QR</span>
+                </UButton>
               </div>
 
               <!-- Actions critiques séparées -->
@@ -465,6 +478,16 @@
                 @click="contactOrganizer(application)"
               />
               <UButton
+                v-if="application.status === 'ACCEPTED'"
+                size="xs"
+                color="primary"
+                variant="ghost"
+                icon="i-heroicons-qr-code"
+                class="sm:w-auto w-8 h-8"
+                square
+                @click="showQrCode(application)"
+              />
+              <UButton
                 v-if="application.status === 'PENDING'"
                 size="xs"
                 color="error"
@@ -498,6 +521,12 @@
     <VolunteersApplicationDetailsModal
       v-model="detailsModalOpen"
       :application="selectedApplicationForDetails"
+    />
+
+    <!-- Modal QR Code -->
+    <VolunteersQrCodeModal
+      v-model:open="qrCodeModalOpen"
+      :application="selectedApplicationForQrCode"
     />
 
     <!-- Modal Planning -->
@@ -679,6 +708,8 @@ const planningModalOpen = ref(false)
 const selectedApplication = ref<any>(null)
 const detailsModalOpen = ref(false)
 const selectedApplicationForDetails = ref<any>(null)
+const qrCodeModalOpen = ref(false)
+const selectedApplicationForQrCode = ref<any>(null)
 
 // Récupération des candidatures
 const {
@@ -1002,6 +1033,12 @@ const contactOrganizer = (_application: any) => {
     description: 'Cette fonctionnalité sera bientôt disponible',
     color: 'info',
   })
+}
+
+// Fonction pour afficher le QR code
+const showQrCode = (application: any) => {
+  selectedApplicationForQrCode.value = application
+  qrCodeModalOpen.value = true
 }
 
 // Fonction pour basculer l'affichage des détails (non utilisée après simplification)

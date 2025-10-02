@@ -123,7 +123,9 @@
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-user-group" class="text-primary-500" />
-              <h2 class="text-lg font-semibold">Gestion bénévole</h2>
+              <h2 class="text-lg font-semibold">
+                {{ $t('editions.ticketing.volunteer_management') }}
+              </h2>
             </div>
 
             <!-- Mode de gestion des bénévoles -->

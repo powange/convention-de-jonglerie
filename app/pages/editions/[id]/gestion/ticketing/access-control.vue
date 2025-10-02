@@ -37,7 +37,7 @@
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-qr-code" class="text-blue-500" />
-              <h2 class="text-lg font-semibold">Scanner un billet</h2>
+              <h2 class="text-lg font-semibold">{{ $t('editions.ticketing.scan_ticket') }}</h2>
             </div>
 
             <UAlert
@@ -49,35 +49,31 @@
 
             <!-- Zone de scan -->
             <div class="space-y-4">
-              <UFormField label="Code du billet">
-                <UInput
-                  v-model="ticketCode"
-                  placeholder="Scannez ou saisissez le code"
-                  size="xl"
-                  icon="i-heroicons-ticket"
-                  @keydown.enter="validateTicket"
-                />
+              <UFormField :label="$t('editions.ticketing.ticket_code_label')">
+                <UFieldGroup>
+                  <UInput
+                    v-model="ticketCode"
+                    :placeholder="$t('editions.ticketing.ticket_code_placeholder')"
+                    size="xl"
+                    icon="i-heroicons-ticket"
+                    @keydown.enter="validateTicket"
+                  />
+                  <UButton
+                    :label="$t('editions.ticketing.validate_ticket')"
+                    icon="i-heroicons-check-circle"
+                    color="success"
+                    size="lg"
+                    class="flex-1"
+                    :disabled="!ticketCode"
+                    :loading="validatingTicket"
+                    @click="validateTicket"
+                  />
+                </UFieldGroup>
               </UFormField>
 
               <div class="flex gap-2">
-                <UButton
-                  icon="i-heroicons-qr-code"
-                  color="primary"
-                  size="lg"
-                  class="flex-1"
-                  @click="startScanner"
-                >
+                <UButton icon="i-heroicons-qr-code" color="primary" size="lg" @click="startScanner">
                   Scanner un QR code
-                </UButton>
-                <UButton
-                  icon="i-heroicons-check-circle"
-                  color="success"
-                  size="lg"
-                  class="flex-1"
-                  :disabled="!ticketCode"
-                  @click="validateTicket"
-                >
-                  Valider
                 </UButton>
               </div>
             </div>
@@ -89,14 +85,16 @@
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-chart-bar" class="text-purple-500" />
-              <h2 class="text-lg font-semibold">Statistiques d'entrée</h2>
+              <h2 class="text-lg font-semibold">{{ $t('editions.ticketing.entry_stats') }}</h2>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                 <div class="flex items-center justify-between">
                   <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Validés aujourd'hui</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ $t('editions.ticketing.validated_today') }}
+                    </p>
                     <p class="text-2xl font-bold text-green-600 dark:text-green-400">0</p>
                   </div>
                   <UIcon name="i-heroicons-check-circle" class="text-green-500" size="32" />
@@ -106,7 +104,9 @@
               <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <div class="flex items-center justify-between">
                   <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Total des entrées</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ $t('editions.ticketing.total_entries') }}
+                    </p>
                     <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">0</p>
                   </div>
                   <UIcon name="i-heroicons-users" class="text-blue-500" size="32" />
@@ -116,7 +116,9 @@
               <div class="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
                 <div class="flex items-center justify-between">
                   <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Refusés</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ $t('editions.ticketing.refused') }}
+                    </p>
                     <p class="text-2xl font-bold text-red-600 dark:text-red-400">0</p>
                   </div>
                   <UIcon name="i-heroicons-x-circle" class="text-red-500" size="32" />
@@ -131,12 +133,14 @@
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-clock" class="text-orange-500" />
-              <h2 class="text-lg font-semibold">Dernières validations</h2>
+              <h2 class="text-lg font-semibold">
+                {{ $t('editions.ticketing.recent_validations') }}
+              </h2>
             </div>
 
             <div class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <UIcon name="i-heroicons-ticket" class="mx-auto h-12 w-12 text-gray-400 mb-2" />
-              <p class="text-sm text-gray-500">Aucune validation pour le moment</p>
+              <p class="text-sm text-gray-500">{{ $t('editions.ticketing.no_validation_yet') }}</p>
             </div>
           </div>
         </UCard>
@@ -144,6 +148,13 @@
 
       <!-- Scanner QR Code -->
       <TicketingQrCodeScanner v-model:open="scannerOpen" @scan="handleScan" />
+
+      <!-- Modal détails du participant -->
+      <TicketingParticipantDetailsModal
+        v-model:open="participantModalOpen"
+        :participant="selectedParticipant"
+        :type="participantType"
+      />
     </div>
   </div>
 </template>
@@ -165,6 +176,10 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 
 const ticketCode = ref('')
 const scannerOpen = ref(false)
+const participantModalOpen = ref(false)
+const selectedParticipant = ref<any>(null)
+const participantType = ref<'ticket' | 'volunteer'>('ticket')
+const validatingTicket = ref(false)
 
 onMounted(async () => {
   if (!edition.value) {
@@ -217,17 +232,50 @@ const handleScan = (code: string) => {
   validateTicket()
 }
 
-const validateTicket = () => {
-  if (!ticketCode.value) return
+const validateTicket = async () => {
+  if (!ticketCode.value || validatingTicket.value) return
 
-  // TODO: Implémenter la validation côté serveur
-  toast.add({
-    title: 'Billet scanné',
-    description: `Code: ${ticketCode.value}`,
-    icon: 'i-heroicons-check-circle',
-    color: 'success',
-  })
+  validatingTicket.value = true
 
-  ticketCode.value = ''
+  try {
+    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/verify`, {
+      method: 'POST',
+      body: {
+        qrCode: ticketCode.value,
+      },
+    })
+
+    if (result.found && result.participant) {
+      // Afficher la modal avec les détails du participant
+      selectedParticipant.value = result.participant
+      participantType.value = result.type || 'ticket'
+      participantModalOpen.value = true
+
+      toast.add({
+        title: result.type === 'volunteer' ? 'Bénévole trouvé' : 'Billet trouvé',
+        description: result.message,
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+    } else {
+      toast.add({
+        title: 'Billet introuvable',
+        description: result.message,
+        icon: 'i-heroicons-exclamation-triangle',
+        color: 'warning',
+      })
+    }
+  } catch (error: any) {
+    console.error('Failed to validate ticket:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || 'Impossible de vérifier le billet',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    validatingTicket.value = false
+    ticketCode.value = ''
+  }
 }
 </script>

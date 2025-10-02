@@ -220,7 +220,7 @@
                   :to="edition.ticketingUrl"
                   target="_blank"
                   size="sm"
-                  >{{ $t('editions.ticketing') }}</UButton
+                  >{{ $t('editions.ticketing_title') }}</UButton
                 >
                 <UButton
                   v-if="edition.facebookUrl"

@@ -151,7 +151,9 @@
                   >
                     1
                   </div>
-                  <h3 class="font-semibold text-base">Identifiants API</h3>
+                  <h3 class="font-semibold text-base">
+                    {{ $t('editions.ticketing.api_credentials') }}
+                  </h3>
                 </div>
 
                 <div
@@ -184,13 +186,13 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <UFormField
-                    label="Client ID"
+                    :label="$t('editions.ticketing.client_id_label')"
                     hint="Identifiant public de votre client API"
                     required
                   >
                     <UInput
                       v-model="helloAssoClientId"
-                      placeholder="ex: abc123def456"
+                      :placeholder="$t('editions.ticketing.client_id_placeholder')"
                       icon="i-heroicons-key"
                       type="text"
                       size="lg"
@@ -199,13 +201,13 @@
                   </UFormField>
 
                   <UFormField
-                    label="Client Secret"
+                    :label="$t('editions.ticketing.client_secret_label')"
                     hint="Clé secrète (chiffrée après enregistrement)"
                     required
                   >
                     <UInput
                       v-model="helloAssoClientSecret"
-                      placeholder="••••••••••••••••"
+                      :placeholder="$t('editions.ticketing.client_secret_placeholder')"
                       icon="i-heroicons-lock-closed"
                       type="password"
                       size="lg"
@@ -223,14 +225,18 @@
                   >
                     2
                   </div>
-                  <h3 class="font-semibold text-base">Identifier votre formulaire</h3>
+                  <h3 class="font-semibold text-base">
+                    {{ $t('editions.ticketing.identify_form') }}
+                  </h3>
                 </div>
 
                 <div
                   class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
                 >
                   <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                    <span class="font-medium">Exemple d'URL HelloAsso :</span>
+                    <span class="font-medium">{{
+                      $t('editions.ticketing.helloasso_url_example')
+                    }}</span>
                   </p>
                   <code
                     class="block text-xs bg-white dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-700 font-mono break-all"
@@ -238,45 +244,46 @@
                     https://www.helloasso.com/associations/<span
                       class="text-primary-600 font-semibold"
                       >slug-organisation</span
-                    >/evenements/<span class="text-primary-600 font-semibold">slug-formulaire</span>
+                    >{{ $t('editions.ticketing.helloasso_url_path')
+                    }}<span class="text-primary-600 font-semibold">slug-formulaire</span>
                   </code>
                 </div>
 
                 <div class="space-y-4">
                   <UFormField
-                    label="Slug de l'organisation"
+                    :label="$t('editions.ticketing.organization_slug_label')"
                     hint="Le nom de votre association dans l'URL"
                     required
                   >
                     <UInput
                       v-model="helloAssoOrganizationSlug"
-                      placeholder="ex: juggling-convention"
+                      :placeholder="$t('editions.ticketing.organization_slug_placeholder')"
                       icon="i-heroicons-building-office"
                       size="lg"
                     />
                   </UFormField>
 
                   <UFormField
-                    label="Type de formulaire"
+                    :label="$t('editions.ticketing.form_type_label')"
                     hint="Le type visible dans l'URL HelloAsso"
                     required
                   >
                     <USelect
                       v-model="helloAssoFormType"
                       :items="formTypeOptions"
-                      placeholder="Sélectionnez un type"
+                      :placeholder="$t('editions.ticketing.form_type_placeholder')"
                       size="lg"
                     />
                   </UFormField>
 
                   <UFormField
-                    label="Slug du formulaire"
+                    :label="$t('editions.ticketing.form_slug_label')"
                     hint="Le nom de votre formulaire dans l'URL"
                     required
                   >
                     <UInput
                       v-model="helloAssoFormSlug"
-                      placeholder="ex: billeterie-convention-2025"
+                      :placeholder="$t('editions.ticketing.form_slug_placeholder')"
                       icon="i-heroicons-document-text"
                       size="lg"
                     />
@@ -317,8 +324,12 @@
               <div class="flex items-center justify-between flex-wrap gap-3">
                 <div class="flex items-center gap-2">
                   <div>
-                    <h3 class="font-semibold text-base">Tarifs, options et participants</h3>
-                    <p class="text-xs text-gray-500">Chargez les données depuis HelloAsso</p>
+                    <h3 class="font-semibold text-base">
+                      {{ $t('editions.ticketing.tiers_options_participants') }}
+                    </h3>
+                    <p class="text-xs text-gray-500">
+                      {{ $t('editions.ticketing.load_data_from_helloasso') }}
+                    </p>
                   </div>
                 </div>
                 <div class="flex gap-2">
