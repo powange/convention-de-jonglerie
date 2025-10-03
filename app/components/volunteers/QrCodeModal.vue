@@ -25,28 +25,11 @@
         </div>
 
         <!-- QR Code -->
-        <div
-          class="flex justify-center p-6 bg-white dark:bg-gray-800 rounded-lg border-2 border-gray-200 dark:border-gray-700"
-        >
-          <div class="text-center">
-            <div class="inline-block p-4 bg-white rounded-lg">
-              <Qrcode
-                :value="qrCodeValue"
-                :options="{
-                  width: 200,
-                  margin: 1,
-                  errorCorrectionLevel: 'M',
-                  color: {
-                    dark: '#1f2937',
-                    light: '#ffffff',
-                  },
-                }"
-              />
-            </div>
-            <p class="mt-3 text-xs text-gray-500 dark:text-gray-400 font-mono">
-              {{ qrCodeValue }}
-            </p>
-          </div>
+        <div class="flex flex-col items-center justify-center p-6">
+          <Qrcode :value="qrCodeValue" variant="default" />
+          <p class="mt-3 text-xs text-gray-500 dark:text-gray-400 font-mono">
+            {{ qrCodeValue }}
+          </p>
         </div>
 
         <!-- Informations de l'application -->
