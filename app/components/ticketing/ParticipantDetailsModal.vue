@@ -194,6 +194,22 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Bouton dévalider en bas de la carte -->
+              <div
+                v-if="item.entryValidated"
+                class="mt-3 pt-3 border-t border-green-200 dark:border-green-800 flex justify-end"
+              >
+                <UButton
+                  color="error"
+                  variant="soft"
+                  size="xs"
+                  icon="i-heroicons-x-circle"
+                  @click="invalidateTicket(item.id)"
+                >
+                  Dévalider l'entrée
+                </UButton>
+              </div>
             </div>
           </div>
 
@@ -260,6 +276,43 @@
           </UBadge>
         </div>
 
+        <!-- Statut de validation d'entrée -->
+        <div
+          v-if="participant.volunteer.entryValidated"
+          class="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800"
+        >
+          <div class="flex items-start gap-3">
+            <UIcon
+              name="i-heroicons-check-circle-solid"
+              class="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5"
+            />
+            <div class="flex-1">
+              <p class="font-medium text-green-900 dark:text-green-100">Entrée déjà validée</p>
+              <p class="text-sm text-green-700 dark:text-green-300 mt-1">
+                <span v-if="participant.volunteer.entryValidatedBy">
+                  Validé par {{ participant.volunteer.entryValidatedBy.firstName }}
+                  {{ participant.volunteer.entryValidatedBy.lastName }}
+                </span>
+                <span v-else>Le bénévole a validé son entrée</span>
+                {{
+                  participant.volunteer.entryValidatedAt
+                    ? `le ${new Date(participant.volunteer.entryValidatedAt).toLocaleDateString(
+                        'fr-FR',
+                        {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        }
+                      )}`
+                    : ''
+                }}
+              </p>
+            </div>
+          </div>
+        </div>
+
         <!-- Informations du bénévole -->
         <div class="space-y-4">
           <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
@@ -322,10 +375,7 @@
         </div>
 
         <!-- Créneaux assignés -->
-        <div
-          v-if="participant.volunteer.timeSlots && participant.volunteer.timeSlots.length > 0"
-          class="space-y-4"
-        >
+        <div class="space-y-4">
           <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
             <UIcon name="i-heroicons-clock" class="text-orange-600 dark:text-orange-400" />
             <h4 class="font-semibold text-gray-900 dark:text-white">
@@ -333,7 +383,10 @@
             </h4>
           </div>
 
-          <div class="space-y-2">
+          <div
+            v-if="participant.volunteer.timeSlots && participant.volunteer.timeSlots.length > 0"
+            class="space-y-2"
+          >
             <div
               v-for="slot in participant.volunteer.timeSlots"
               :key="slot.id"
@@ -365,6 +418,14 @@
               </div>
             </div>
           </div>
+
+          <div
+            v-else
+            class="p-4 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-lg"
+          >
+            <UIcon name="i-heroicons-calendar-days" class="mx-auto h-8 w-8 mb-2 text-gray-400" />
+            <p class="text-sm">Aucun créneau assigné</p>
+          </div>
         </div>
       </div>
 
@@ -394,22 +455,65 @@
             color="success"
             icon="i-heroicons-check-circle"
             :loading="validating"
-            @click="validateSelectedParticipants"
+            @click="showValidateTicketsConfirm"
           >
             Valider l'entrée ({{ selectedParticipants.length }})
           </UButton>
           <UButton
             v-if="isVolunteer && participant && 'volunteer' in participant"
-            color="success"
-            icon="i-heroicons-check-circle"
-            @click="validateVolunteer"
+            :color="participant.volunteer.entryValidated ? 'error' : 'success'"
+            :icon="
+              participant.volunteer.entryValidated
+                ? 'i-heroicons-x-circle'
+                : 'i-heroicons-check-circle'
+            "
+            :loading="validating"
+            @click="
+              participant.volunteer.entryValidated ? showInvalidateConfirm() : showValidateConfirm()
+            "
           >
-            Marquer comme entré
+            {{ participant.volunteer.entryValidated ? "Dévalider l'entrée" : "Valider l'entrée" }}
           </UButton>
         </div>
       </div>
     </template>
   </UModal>
+
+  <!-- Modal de confirmation de validation -->
+  <UiConfirmModal
+    v-model="showValidateModal"
+    :title="
+      isTicket && selectedParticipants.length > 1 ? 'Valider les entrées' : 'Valider l\'entrée'
+    "
+    :description="
+      isTicket && selectedParticipants.length > 1
+        ? `Êtes-vous sûr de vouloir valider l'entrée de ces ${selectedParticipants.length} participants ?`
+        : 'Êtes-vous sûr de vouloir valider l\'entrée de ce participant ?'
+    "
+    confirm-label="Valider"
+    confirm-color="success"
+    confirm-icon="i-heroicons-check-circle"
+    icon-name="i-heroicons-information-circle"
+    icon-color="text-blue-500"
+    :loading="validating"
+    @confirm="confirmValidateEntry"
+    @cancel="showValidateModal = false"
+  />
+
+  <!-- Modal de confirmation de dévalidation -->
+  <UiConfirmModal
+    v-model="showInvalidateModal"
+    title="Dévalider l'entrée"
+    description="Êtes-vous sûr de vouloir dévalider l'entrée de ce participant ? Cette action annulera la validation."
+    confirm-label="Dévalider"
+    confirm-color="error"
+    confirm-icon="i-heroicons-x-circle"
+    icon-name="i-heroicons-exclamation-triangle"
+    icon-color="text-red-500"
+    :loading="validating"
+    @confirm="invalidateEntry"
+    @cancel="showInvalidateModal = false"
+  />
 </template>
 
 <script setup lang="ts">
@@ -471,13 +575,19 @@ interface VolunteerData {
       name: string
       isLeader: boolean
     }>
-    timeSlots: Array<{
+    timeSlots?: Array<{
       id: number
       title: string
       team?: string
       startDateTime: Date | string
       endDateTime: Date | string
     }>
+    entryValidated?: boolean
+    entryValidatedAt?: Date | string
+    entryValidatedBy?: {
+      firstName: string
+      lastName: string
+    }
   }
 }
 
@@ -492,6 +602,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:open': [value: boolean]
   validate: [participantIds: number[]]
+  invalidate: [participantId: number]
 }>()
 
 const isOpen = computed({
@@ -505,6 +616,9 @@ const isTicket = computed(() => props.type === 'ticket' || !props.type)
 // Gestion de la sélection des participants
 const selectedParticipants = ref<number[]>([])
 const validating = ref(false)
+const showValidateModal = ref(false)
+const showInvalidateModal = ref(false)
+const ticketToInvalidate = ref<number | null>(null)
 
 // Réinitialiser la sélection quand la modal s'ouvre
 watch(
@@ -526,19 +640,56 @@ const selectAllParticipants = () => {
   }
 }
 
-const validateSelectedParticipants = async () => {
+const showValidateTicketsConfirm = () => {
   if (selectedParticipants.value.length === 0) return
+  showValidateModal.value = true
+}
 
+const showValidateConfirm = () => {
+  showValidateModal.value = true
+}
+
+const confirmValidateEntry = async () => {
   validating.value = true
   try {
-    emit('validate', selectedParticipants.value)
+    // Si c'est un bénévole
+    if (props.participant && 'volunteer' in props.participant) {
+      emit('validate', [props.participant.volunteer.id])
+    }
+    // Si ce sont des tickets sélectionnés
+    else if (selectedParticipants.value.length > 0) {
+      emit('validate', selectedParticipants.value)
+    }
+    showValidateModal.value = false
   } finally {
     validating.value = false
   }
 }
 
-const validateVolunteer = () => {
-  // Pour les bénévoles, on pourra implémenter plus tard
-  console.log('Validation bénévole')
+const showInvalidateConfirm = () => {
+  showInvalidateModal.value = true
+}
+
+const invalidateTicket = (ticketId: number) => {
+  ticketToInvalidate.value = ticketId
+  showInvalidateModal.value = true
+}
+
+const invalidateEntry = async () => {
+  validating.value = true
+  try {
+    // Si c'est un bénévole
+    if (props.participant && 'volunteer' in props.participant) {
+      emit('invalidate', props.participant.volunteer.id)
+    }
+    // Si c'est un ticket
+    else if (ticketToInvalidate.value) {
+      emit('invalidate', ticketToInvalidate.value)
+    }
+    showInvalidateModal.value = false
+    ticketToInvalidate.value = null
+  } finally {
+    validating.value = false
+  }
 }
 </script>

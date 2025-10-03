@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
         }
       }
 
-      const application = await prisma.volunteerApplication.findFirst({
+      const application = await prisma.editionVolunteerApplication.findFirst({
         where: {
           id: applicationId,
           editionId: editionId,
@@ -46,8 +46,8 @@ export default defineEventHandler(async (event) => {
         include: {
           user: {
             select: {
-              firstName: true,
-              lastName: true,
+              prenom: true,
+              nom: true,
               email: true,
             },
           },
@@ -56,19 +56,44 @@ export default defineEventHandler(async (event) => {
               team: true,
             },
           },
-          timeSlotAssignments: {
-            include: {
-              timeSlot: {
-                include: {
-                  team: true,
-                },
-              },
-            },
-          },
         },
       })
 
       if (application) {
+        // Récupérer l'utilisateur qui a validé si applicable
+        let validatedByUser = null
+        if (application.entryValidatedBy) {
+          validatedByUser = await prisma.user.findUnique({
+            where: { id: application.entryValidatedBy },
+            select: {
+              prenom: true,
+              nom: true,
+            },
+          })
+        }
+
+        // Récupérer les créneaux assignés au bénévole
+        const volunteerAssignments = await prisma.volunteerAssignment.findMany({
+          where: {
+            userId: application.userId,
+            timeSlot: {
+              editionId: editionId,
+            },
+          },
+          include: {
+            timeSlot: {
+              include: {
+                team: true,
+              },
+            },
+          },
+          orderBy: {
+            timeSlot: {
+              startDateTime: 'asc',
+            },
+          },
+        })
+
         return {
           success: true,
           found: true,
@@ -78,8 +103,8 @@ export default defineEventHandler(async (event) => {
             volunteer: {
               id: application.id,
               user: {
-                firstName: application.user.firstName,
-                lastName: application.user.lastName,
+                firstName: application.user.prenom,
+                lastName: application.user.nom,
                 email: application.user.email,
               },
               teams: application.teamAssignments.map((assignment) => ({
@@ -87,16 +112,24 @@ export default defineEventHandler(async (event) => {
                 name: assignment.team.name,
                 isLeader: assignment.isLeader,
               })),
-              timeSlots: application.timeSlotAssignments.map((assignment) => ({
+              timeSlots: volunteerAssignments.map((assignment) => ({
                 id: assignment.timeSlot.id,
                 title: assignment.timeSlot.title,
                 team: assignment.timeSlot.team?.name,
                 startDateTime: assignment.timeSlot.startDateTime,
                 endDateTime: assignment.timeSlot.endDateTime,
               })),
+              entryValidated: application.entryValidated,
+              entryValidatedAt: application.entryValidatedAt,
+              entryValidatedBy: validatedByUser
+                ? {
+                    firstName: validatedByUser.prenom,
+                    lastName: validatedByUser.nom,
+                  }
+                : null,
             },
           },
-          message: `Bénévole trouvé : ${application.user.firstName} ${application.user.lastName}`,
+          message: `Bénévole trouvé : ${application.user.prenom} ${application.user.nom}`,
         }
       } else {
         return {

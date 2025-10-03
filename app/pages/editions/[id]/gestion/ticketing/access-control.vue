@@ -50,12 +50,20 @@
               />
 
               <!-- Zone de scan -->
-              <div class="flex items-center gap-4">
-                <UButton icon="i-heroicons-qr-code" color="primary" size="lg" @click="startScanner">
+              <div class="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
+                <UButton
+                  icon="i-heroicons-qr-code"
+                  color="primary"
+                  size="lg"
+                  class="w-full lg:w-auto"
+                  @click="startScanner"
+                >
                   Scanner un QR code
                 </UButton>
 
-                <span class="text-gray-500 dark:text-gray-400 font-medium">ou</span>
+                <div class="flex items-center justify-center">
+                  <span class="text-gray-500 dark:text-gray-400 font-medium">ou</span>
+                </div>
 
                 <UFieldGroup class="flex-1">
                   <UInput
@@ -129,7 +137,7 @@
                       <button
                         v-for="result in searchResults.tickets"
                         :key="result.participant.ticket.id"
-                        class="w-full text-left p-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        class="w-full text-left p-3 bg-gray-50 dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900/20 border-2 border-transparent hover:border-primary-500 rounded-lg transition-all cursor-pointer shadow-sm hover:shadow-md"
                         @click="selectSearchResult(result)"
                       >
                         <div class="flex items-center justify-between">
@@ -164,7 +172,7 @@
                       <button
                         v-for="result in searchResults.volunteers"
                         :key="result.participant.volunteer.id"
-                        class="w-full text-left p-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        class="w-full text-left p-3 bg-gray-50 dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900/20 border-2 border-transparent hover:border-primary-500 rounded-lg transition-all cursor-pointer shadow-sm hover:shadow-md"
                         @click="selectSearchResult(result)"
                       >
                         <div class="flex items-center justify-between">
@@ -333,6 +341,7 @@
         :participant="selectedParticipant"
         :type="participantType"
         @validate="handleValidateParticipants"
+        @invalidate="handleInvalidateEntry"
       />
     </div>
   </div>
@@ -494,16 +503,81 @@ const handleValidateParticipants = async (participantIds: number[]) => {
       color: 'success',
     })
 
-    // Fermer la modal
-    participantModalOpen.value = false
-
     // Recharger les statistiques et les dernières validations
     await Promise.all([loadStats(), loadRecentValidations()])
+
+    // Recharger le participant pour afficher le nouveau statut
+    if (participantType.value === 'volunteer' && selectedParticipant.value?.volunteer?.id) {
+      await reloadParticipant(selectedParticipant.value.volunteer.id, 'volunteer')
+    } else if (participantType.value === 'ticket' && selectedParticipant.value?.ticket?.qrCode) {
+      await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
+    }
   } catch (error: any) {
     console.error('Failed to validate participants:', error)
     toast.add({
       title: 'Erreur',
       description: error.data?.message || 'Impossible de valider les participants',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
+}
+
+const reloadParticipant = async (identifier: number | string, type: 'ticket' | 'volunteer') => {
+  try {
+    let qrCode: string
+    if (type === 'volunteer') {
+      qrCode = `volunteer-${identifier}`
+    } else {
+      qrCode = identifier as string
+    }
+
+    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/verify`, {
+      method: 'POST',
+      body: {
+        qrCode,
+      },
+    })
+
+    if (result.success && result.found) {
+      selectedParticipant.value = result.participant
+    }
+  } catch (error) {
+    console.error('Failed to reload participant:', error)
+  }
+}
+
+const handleInvalidateEntry = async (participantId: number) => {
+  try {
+    await $fetch(`/api/editions/${editionId}/ticketing/invalidate-entry`, {
+      method: 'POST',
+      body: {
+        participantId,
+        type: participantType.value,
+      },
+    })
+
+    toast.add({
+      title: 'Entrée dévalidée',
+      description: "L'entrée a été dévalidée avec succès",
+      icon: 'i-heroicons-x-circle',
+      color: 'success',
+    })
+
+    // Recharger les statistiques et les dernières validations
+    await Promise.all([loadStats(), loadRecentValidations()])
+
+    // Recharger le participant pour afficher le nouveau statut
+    if (participantType.value === 'volunteer' && selectedParticipant.value?.volunteer?.id) {
+      await reloadParticipant(selectedParticipant.value.volunteer.id, 'volunteer')
+    } else if (participantType.value === 'ticket' && selectedParticipant.value?.ticket?.qrCode) {
+      await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
+    }
+  } catch (error: any) {
+    console.error('Failed to invalidate entry:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || "Impossible de dévalider l'entrée",
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })

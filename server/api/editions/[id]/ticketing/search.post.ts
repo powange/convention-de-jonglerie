@@ -109,8 +109,10 @@ export default defineEventHandler(async (event) => {
         id: true,
         entryValidated: true,
         entryValidatedAt: true,
+        entryValidatedBy: true,
         user: {
           select: {
+            id: true,
             prenom: true,
             nom: true,
             email: true,
@@ -129,6 +131,47 @@ export default defineEventHandler(async (event) => {
         },
       },
       take: 20, // Limiter à 20 résultats
+    })
+
+    // Récupérer les utilisateurs qui ont validé les bénévoles
+    const volunteerValidatorIds = volunteers
+      .filter((v) => v.entryValidatedBy)
+      .map((v) => v.entryValidatedBy!)
+    const validatorUsers = await prisma.user.findMany({
+      where: { id: { in: volunteerValidatorIds } },
+      select: { id: true, prenom: true, nom: true },
+    })
+    const validatorMap = new Map(validatorUsers.map((u) => [u.id, u]))
+
+    // Récupérer les créneaux assignés aux bénévoles
+    const volunteerUserIds = volunteers.map((v) => v.user.id)
+    const volunteerAssignments = await prisma.volunteerAssignment.findMany({
+      where: {
+        userId: { in: volunteerUserIds },
+        timeSlot: {
+          editionId: editionId,
+        },
+      },
+      include: {
+        timeSlot: {
+          include: {
+            team: true,
+          },
+        },
+      },
+      orderBy: {
+        timeSlot: {
+          startDateTime: 'asc',
+        },
+      },
+    })
+    // Grouper les assignments par userId
+    const assignmentsByUserId = new Map<number, typeof volunteerAssignments>()
+    volunteerAssignments.forEach((assignment) => {
+      if (!assignmentsByUserId.has(assignment.userId)) {
+        assignmentsByUserId.set(assignment.userId, [])
+      }
+      assignmentsByUserId.get(assignment.userId)!.push(assignment)
     })
 
     const results = {
@@ -174,27 +217,46 @@ export default defineEventHandler(async (event) => {
           },
         },
       })),
-      volunteers: volunteers.map((application) => ({
-        type: 'volunteer',
-        participant: {
-          found: true,
-          volunteer: {
-            id: application.id,
-            user: {
-              firstName: application.user.prenom,
-              lastName: application.user.nom,
-              email: application.user.email,
+      volunteers: volunteers.map((application) => {
+        const validator = application.entryValidatedBy
+          ? validatorMap.get(application.entryValidatedBy)
+          : null
+        const assignments = assignmentsByUserId.get(application.user.id) || []
+        return {
+          type: 'volunteer',
+          participant: {
+            found: true,
+            volunteer: {
+              id: application.id,
+              user: {
+                firstName: application.user.prenom,
+                lastName: application.user.nom,
+                email: application.user.email,
+              },
+              teams: application.teamAssignments.map((assignment) => ({
+                id: assignment.team.id,
+                name: assignment.team.name,
+                isLeader: assignment.isLeader,
+              })),
+              timeSlots: assignments.map((assignment) => ({
+                id: assignment.timeSlot.id,
+                title: assignment.timeSlot.title,
+                team: assignment.timeSlot.team?.name,
+                startDateTime: assignment.timeSlot.startDateTime,
+                endDateTime: assignment.timeSlot.endDateTime,
+              })),
+              entryValidated: application.entryValidated,
+              entryValidatedAt: application.entryValidatedAt,
+              entryValidatedBy: validator
+                ? {
+                    firstName: validator.prenom,
+                    lastName: validator.nom,
+                  }
+                : null,
             },
-            teams: application.teamAssignments.map((assignment) => ({
-              id: assignment.team.id,
-              name: assignment.team.name,
-              isLeader: assignment.isLeader,
-            })),
-            entryValidated: application.entryValidated,
-            entryValidatedAt: application.entryValidatedAt,
           },
-        },
-      })),
+        }
+      }),
       total: orderItems.length + volunteers.length,
     }
 
