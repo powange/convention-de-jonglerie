@@ -440,6 +440,9 @@ model EditionVolunteerApplication {
   departureDateTime    String?
   emergencyContactName String?
   emergencyContactPhone String?
+  entryValidated       Boolean           @default(false)
+  entryValidatedAt     DateTime?
+  entryValidatedBy     Int?
   edition              Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user                 User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   teamAssignments      ApplicationTeamAssignment[]
@@ -448,6 +451,7 @@ model EditionVolunteerApplication {
   @@index([editionId])
   @@index([status])
   @@index([userId], map: "EditionVolunteerApplication_userId_fkey")
+  @@index([entryValidated])
 }
 
 model Feedback {
@@ -892,6 +896,11 @@ model HelloAssoOrderItem {
   // Champs personnalisés (réponses aux options)
   customFields    Json?
 
+  // Validation d'entrée
+  entryValidated  Boolean  @default(false)
+  entryValidatedAt DateTime?
+  entryValidatedBy Int?
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -901,5 +910,6 @@ model HelloAssoOrderItem {
   @@index([orderId])
   @@index([email])
   @@index([qrCode])
+  @@index([entryValidated])
 }
 

@@ -129,7 +129,13 @@ export default defineEventHandler(async (event) => {
           },
         },
         include: {
-          order: true,
+          order: {
+            include: {
+              items: {
+                orderBy: { id: 'asc' },
+              },
+            },
+          },
         },
       })
 
@@ -158,6 +164,19 @@ export default defineEventHandler(async (event) => {
                   lastName: orderItem.order.payerLastName,
                   email: orderItem.order.payerEmail,
                 },
+                items: orderItem.order.items.map((item) => ({
+                  id: item.helloAssoItemId,
+                  name: item.name,
+                  amount: item.amount,
+                  state: item.state,
+                  qrCode: item.qrCode,
+                  firstName: item.firstName,
+                  lastName: item.lastName,
+                  email: item.email,
+                  customFields: item.customFields as any,
+                  entryValidated: item.entryValidated,
+                  entryValidatedAt: item.entryValidatedAt,
+                })),
               },
               customFields: orderItem.customFields as any,
             },

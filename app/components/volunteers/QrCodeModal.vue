@@ -30,7 +30,18 @@
         >
           <div class="text-center">
             <div class="inline-block p-4 bg-white rounded-lg">
-              <img ref="qrCodeImg" :src="qrCodeDataUrl" alt="QR Code" class="w-52 h-52" />
+              <Qrcode
+                :value="qrCodeValue"
+                :options="{
+                  width: 200,
+                  margin: 1,
+                  errorCorrectionLevel: 'M',
+                  color: {
+                    dark: '#1f2937',
+                    light: '#ffffff',
+                  },
+                }"
+              />
             </div>
             <p class="mt-3 text-xs text-gray-500 dark:text-gray-400 font-mono">
               {{ qrCodeValue }}
@@ -82,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick } from 'vue'
 
 const props = defineProps<{
   open: boolean
@@ -104,26 +115,24 @@ const qrCodeValue = computed(() => {
   return applicationId.value ? `volunteer-${applicationId.value}` : ''
 })
 
-// Utiliser le composable useQRCode de nuxt-qrcode
-const qrCodeDataUrl = useQRCode(qrCodeValue, {
-  width: 200,
-  margin: 1,
-  errorCorrectionLevel: 'M',
-  color: {
-    dark: '#1f2937',
-    light: '#ffffff',
-  },
-})
-
 const getEditionDisplayName = (edition: any) => {
   return edition?.name || edition?.convention?.name || 'Édition'
 }
 
-const downloadQrCode = () => {
-  // Créer un lien de téléchargement à partir de la data URL
+const downloadQrCode = async () => {
+  await nextTick()
+
+  // Trouver le canvas généré par le composant Qrcode
+  const canvas = document.querySelector('canvas')
+  if (!canvas) {
+    console.error('Canvas QR code introuvable')
+    return
+  }
+
+  // Créer un lien de téléchargement à partir du canvas
   const link = document.createElement('a')
   link.download = `qr-code-volunteer-${applicationId.value}.png`
-  link.href = qrCodeDataUrl.value
+  link.href = canvas.toDataURL('image/png')
   link.click()
 }
 </script>

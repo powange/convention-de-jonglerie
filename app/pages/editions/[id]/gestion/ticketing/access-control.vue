@@ -32,29 +32,35 @@
 
       <!-- Contenu de la page -->
       <div class="space-y-6">
-        <!-- Scanner de billets -->
-        <UCard>
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-qr-code" class="text-blue-500" />
-              <h2 class="text-lg font-semibold">{{ $t('editions.ticketing.scan_ticket') }}</h2>
-            </div>
-
-            <UAlert
-              icon="i-heroicons-information-circle"
-              color="info"
-              variant="soft"
-              description="Utilisez un lecteur de QR code ou entrez manuellement le code du billet"
-            />
-
-            <!-- Zone de scan -->
+        <!-- Grille avec Scanner et Recherche -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Scanner de billets -->
+          <UCard>
             <div class="space-y-4">
-              <UFormField :label="$t('editions.ticketing.ticket_code_label')">
-                <UFieldGroup>
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-qr-code" class="text-blue-500" />
+                <h2 class="text-lg font-semibold">{{ $t('editions.ticketing.scan_ticket') }}</h2>
+              </div>
+
+              <UAlert
+                icon="i-heroicons-information-circle"
+                color="info"
+                variant="soft"
+                description="Scannez un QR code ou entrez manuellement le code du billet"
+              />
+
+              <!-- Zone de scan -->
+              <div class="flex items-center gap-4">
+                <UButton icon="i-heroicons-qr-code" color="primary" size="lg" @click="startScanner">
+                  Scanner un QR code
+                </UButton>
+
+                <span class="text-gray-500 dark:text-gray-400 font-medium">ou</span>
+
+                <UFieldGroup class="flex-1">
                   <UInput
                     v-model="ticketCode"
                     :placeholder="$t('editions.ticketing.ticket_code_placeholder')"
-                    size="xl"
                     icon="i-heroicons-ticket"
                     @keydown.enter="validateTicket"
                   />
@@ -62,23 +68,151 @@
                     :label="$t('editions.ticketing.validate_ticket')"
                     icon="i-heroicons-check-circle"
                     color="success"
-                    size="lg"
-                    class="flex-1"
                     :disabled="!ticketCode"
                     :loading="validatingTicket"
                     @click="validateTicket"
                   />
                 </UFieldGroup>
-              </UFormField>
-
-              <div class="flex gap-2">
-                <UButton icon="i-heroicons-qr-code" color="primary" size="lg" @click="startScanner">
-                  Scanner un QR code
-                </UButton>
               </div>
             </div>
-          </div>
-        </UCard>
+          </UCard>
+
+          <!-- Rechercher un billet -->
+          <UCard>
+            <div class="space-y-4">
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-magnifying-glass" class="text-purple-500" />
+                <h2 class="text-lg font-semibold">Chercher un billet</h2>
+              </div>
+
+              <UAlert
+                icon="i-heroicons-information-circle"
+                color="info"
+                variant="soft"
+                description="Recherchez un billet par nom, prénom ou email"
+              />
+
+              <!-- Zone de recherche -->
+              <div class="space-y-4">
+                <UFieldGroup class="w-full">
+                  <UInput
+                    v-model="searchTerm"
+                    placeholder="Nom, prénom ou email..."
+                    icon="i-heroicons-magnifying-glass"
+                    class="w-full"
+                    @keydown.enter="searchTickets"
+                  />
+                  <UButton
+                    icon="i-heroicons-magnifying-glass"
+                    color="primary"
+                    :disabled="!searchTerm || searchTerm.length < 2"
+                    :loading="searching"
+                    @click="searchTickets"
+                  />
+                </UFieldGroup>
+
+                <!-- Résultats de recherche -->
+                <div v-if="searchResults" class="space-y-2">
+                  <div class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ searchResults.total }} résultat{{
+                      searchResults.total > 1 ? 's' : ''
+                    }}
+                    trouvé{{ searchResults.total > 1 ? 's' : '' }}
+                  </div>
+
+                  <!-- Liste des billets -->
+                  <div v-if="searchResults.tickets.length > 0" class="space-y-2">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                      Billets ({{ searchResults.tickets.length }})
+                    </div>
+                    <div class="space-y-1 max-h-60 overflow-y-auto">
+                      <button
+                        v-for="result in searchResults.tickets"
+                        :key="result.participant.ticket.id"
+                        class="w-full text-left p-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        @click="selectSearchResult(result)"
+                      >
+                        <div class="flex items-center justify-between">
+                          <div>
+                            <div class="font-medium text-gray-900 dark:text-white">
+                              {{ result.participant.ticket.user.firstName }}
+                              {{ result.participant.ticket.user.lastName }}
+                            </div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                              {{ result.participant.ticket.user.email }}
+                            </div>
+                            <div class="text-xs text-gray-500 dark:text-gray-500">
+                              {{ result.participant.ticket.name }}
+                            </div>
+                          </div>
+                          <UIcon
+                            v-if="result.participant.ticket.entryValidated"
+                            name="i-heroicons-check-circle"
+                            class="text-green-500"
+                          />
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Liste des bénévoles -->
+                  <div v-if="searchResults.volunteers.length > 0" class="space-y-2">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                      Bénévoles ({{ searchResults.volunteers.length }})
+                    </div>
+                    <div class="space-y-1 max-h-60 overflow-y-auto">
+                      <button
+                        v-for="result in searchResults.volunteers"
+                        :key="result.participant.volunteer.id"
+                        class="w-full text-left p-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        @click="selectSearchResult(result)"
+                      >
+                        <div class="flex items-center justify-between">
+                          <div class="flex-1">
+                            <div class="font-medium text-gray-900 dark:text-white">
+                              {{ result.participant.volunteer.user.firstName }}
+                              {{ result.participant.volunteer.user.lastName }}
+                            </div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                              {{ result.participant.volunteer.user.email }}
+                            </div>
+                            <div
+                              v-if="result.participant.volunteer.teams.length > 0"
+                              class="text-xs text-gray-500 dark:text-gray-500"
+                            >
+                              Équipe{{ result.participant.volunteer.teams.length > 1 ? 's' : '' }}:
+                              {{ result.participant.volunteer.teams.map((t) => t.name).join(', ') }}
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            <UBadge color="purple">Bénévole</UBadge>
+                            <UIcon
+                              v-if="result.participant.volunteer.entryValidated"
+                              name="i-heroicons-check-circle"
+                              class="text-green-500"
+                            />
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Aucun résultat -->
+                  <div
+                    v-if="searchResults.total === 0"
+                    class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                  >
+                    <UIcon
+                      name="i-heroicons-magnifying-glass"
+                      class="mx-auto h-12 w-12 text-gray-400 mb-2"
+                    />
+                    <p class="text-sm text-gray-500">Aucun billet trouvé</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </UCard>
+        </div>
 
         <!-- Statistiques -->
         <UCard>
@@ -89,39 +223,51 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      {{ $t('editions.ticketing.validated_today') }}
-                    </p>
-                    <p class="text-2xl font-bold text-green-600 dark:text-green-400">0</p>
-                  </div>
-                  <UIcon name="i-heroicons-check-circle" class="text-green-500" size="32" />
-                </div>
-              </div>
-
               <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <div class="flex items-center justify-between">
                   <div>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
                       {{ $t('editions.ticketing.total_entries') }}
                     </p>
-                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">0</p>
+                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      {{ stats.totalValidated }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      {{ stats.validatedToday }}
+                      {{ $t('editions.ticketing.validated_today').toLowerCase() }}
+                    </p>
                   </div>
                   <UIcon name="i-heroicons-users" class="text-blue-500" size="32" />
                 </div>
               </div>
 
-              <div class="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+              <div class="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                 <div class="flex items-center justify-between">
                   <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      {{ $t('editions.ticketing.refused') }}
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Participants</p>
+                    <p class="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                      {{ stats.ticketsValidated }} / {{ stats.totalTickets }}
                     </p>
-                    <p class="text-2xl font-bold text-red-600 dark:text-red-400">0</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      {{ stats.ticketsValidatedToday }} aujourd'hui
+                    </p>
                   </div>
-                  <UIcon name="i-heroicons-x-circle" class="text-red-500" size="32" />
+                  <UIcon name="i-heroicons-ticket" class="text-orange-500" size="32" />
+                </div>
+              </div>
+
+              <div class="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Bénévoles</p>
+                    <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                      {{ stats.volunteersValidated }} / {{ stats.totalVolunteers }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      {{ stats.volunteersValidatedToday }} aujourd'hui
+                    </p>
+                  </div>
+                  <UIcon name="i-heroicons-user-group" class="text-purple-500" size="32" />
                 </div>
               </div>
             </div>
@@ -138,9 +284,41 @@
               </h2>
             </div>
 
-            <div class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div v-if="loadingValidations" class="text-center py-8">
+              <p class="text-sm text-gray-500">Chargement...</p>
+            </div>
+
+            <div
+              v-else-if="recentValidations.length === 0"
+              class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg"
+            >
               <UIcon name="i-heroicons-ticket" class="mx-auto h-12 w-12 text-gray-400 mb-2" />
               <p class="text-sm text-gray-500">{{ $t('editions.ticketing.no_validation_yet') }}</p>
+            </div>
+
+            <div v-else class="space-y-2">
+              <div
+                v-for="validation in recentValidations"
+                :key="validation.id"
+                class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+              >
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="font-medium text-gray-900 dark:text-white">
+                      {{ validation.firstName }} {{ validation.lastName }}
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ validation.name }}
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                      {{ formatValidationTime(validation.entryValidatedAt) }}
+                    </div>
+                    <UIcon name="i-heroicons-check-circle" class="text-green-500" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </UCard>
@@ -154,6 +332,7 @@
         v-model:open="participantModalOpen"
         :participant="selectedParticipant"
         :type="participantType"
+        @validate="handleValidateParticipants"
       />
     </div>
   </div>
@@ -180,6 +359,21 @@ const participantModalOpen = ref(false)
 const selectedParticipant = ref<any>(null)
 const participantType = ref<'ticket' | 'volunteer'>('ticket')
 const validatingTicket = ref(false)
+const searchTerm = ref('')
+const searching = ref(false)
+const searchResults = ref<any>(null)
+const recentValidations = ref<any[]>([])
+const loadingValidations = ref(false)
+const stats = ref({
+  validatedToday: 0,
+  totalValidated: 0,
+  ticketsValidated: 0,
+  volunteersValidated: 0,
+  ticketsValidatedToday: 0,
+  volunteersValidatedToday: 0,
+  totalTickets: 0,
+  totalVolunteers: 0,
+})
 
 onMounted(async () => {
   if (!edition.value) {
@@ -189,6 +383,9 @@ onMounted(async () => {
       console.error('Failed to fetch edition:', error)
     }
   }
+
+  // Charger les statistiques et les dernières validations
+  await Promise.all([loadStats(), loadRecentValidations()])
 })
 
 // Permissions calculées
@@ -277,5 +474,124 @@ const validateTicket = async () => {
     validatingTicket.value = false
     ticketCode.value = ''
   }
+}
+
+const handleValidateParticipants = async (participantIds: number[]) => {
+  try {
+    // Appeler l'API pour valider les participants
+    await $fetch(`/api/editions/${editionId}/ticketing/validate-entry`, {
+      method: 'POST',
+      body: {
+        participantIds,
+        type: participantType.value,
+      },
+    })
+
+    toast.add({
+      title: 'Entrée validée',
+      description: `${participantIds.length} participant${participantIds.length > 1 ? 's' : ''} validé${participantIds.length > 1 ? 's' : ''}`,
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    // Fermer la modal
+    participantModalOpen.value = false
+
+    // Recharger les statistiques et les dernières validations
+    await Promise.all([loadStats(), loadRecentValidations()])
+  } catch (error: any) {
+    console.error('Failed to validate participants:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || 'Impossible de valider les participants',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
+}
+
+const searchTickets = async () => {
+  if (!searchTerm.value || searchTerm.value.length < 2 || searching.value) return
+
+  searching.value = true
+  searchResults.value = null
+
+  try {
+    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/search`, {
+      method: 'POST',
+      body: {
+        searchTerm: searchTerm.value,
+      },
+    })
+
+    if (result.success) {
+      searchResults.value = result.results
+    }
+  } catch (error: any) {
+    console.error('Failed to search tickets:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || 'Impossible de rechercher les billets',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    searching.value = false
+  }
+}
+
+const selectSearchResult = (result: any) => {
+  // Afficher la modal avec les détails du participant
+  selectedParticipant.value = result.participant
+  participantType.value = result.type || 'ticket'
+  participantModalOpen.value = true
+
+  // Réinitialiser la recherche
+  searchTerm.value = ''
+  searchResults.value = null
+}
+
+const loadStats = async () => {
+  try {
+    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/stats`)
+
+    if (result.success) {
+      stats.value = result.stats
+    }
+  } catch (error: any) {
+    console.error('Failed to load stats:', error)
+  }
+}
+
+const loadRecentValidations = async () => {
+  loadingValidations.value = true
+
+  try {
+    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/recent-validations`)
+
+    if (result.success) {
+      recentValidations.value = result.validations
+    }
+  } catch (error: any) {
+    console.error('Failed to load recent validations:', error)
+  } finally {
+    loadingValidations.value = false
+  }
+}
+
+const formatValidationTime = (dateString: string) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+
+  if (diffMins < 1) return "À l'instant"
+  if (diffMins < 60) return `Il y a ${diffMins} min`
+
+  const diffHours = Math.floor(diffMins / 60)
+  if (diffHours < 24) return `Il y a ${diffHours}h`
+
+  const diffDays = Math.floor(diffHours / 24)
+  return `Il y a ${diffDays}j`
 }
 </script>

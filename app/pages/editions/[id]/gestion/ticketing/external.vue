@@ -535,7 +535,7 @@
                               <div class="flex items-center gap-2 mb-1">
                                 <UIcon name="i-heroicons-ticket" class="h-4 w-4 text-gray-500" />
                                 <span class="font-medium text-sm text-gray-900 dark:text-white">
-                                  {{ item.name }}
+                                  {{ item.name || item.type + ' - ' + item.priceCategory }}
                                 </span>
                               </div>
                               <div
@@ -632,7 +632,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import HelloAssoConfigModal from '~/components/edition/ticketing/HelloAssoConfigModal.vue'
@@ -654,6 +654,17 @@ const helloAssoClientSecret = ref('')
 const helloAssoOrganizationSlug = ref('')
 const helloAssoFormType = ref('Event')
 const helloAssoFormSlug = ref('')
+
+// Options pour le type de formulaire HelloAsso
+const formTypeOptions = [
+  { label: 'Événement', value: 'Event' },
+  { label: 'Billetterie', value: 'Ticketing' },
+  { label: 'Adhésion', value: 'Membership' },
+  { label: 'Formulaire', value: 'Form' },
+  { label: 'Crowdfunding', value: 'CrowdFunding' },
+  { label: 'Boutique', value: 'Shop' },
+  { label: 'Don', value: 'Donation' },
+]
 
 // Modal
 const showConfigModal = ref(false)
@@ -767,6 +778,14 @@ const canAccess = computed(() => {
   }
 
   return false
+})
+
+// Surveiller les changements de permissions (mode admin, etc.)
+watch(canAccess, async (newValue, oldValue) => {
+  // Si l'accès vient de passer à true et qu'on n'a pas encore chargé la config
+  if (newValue && !oldValue && !hasExistingConfig.value) {
+    await loadExistingConfig()
+  }
 })
 
 const canSave = computed(() => {

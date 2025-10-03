@@ -326,6 +326,24 @@
                 color="purple"
               />
 
+              <!-- Gérer les tarifs et options -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/ticketing/tiers`"
+                icon="i-heroicons-currency-euro"
+                title="Tarifs et options"
+                description="Gérer les tarifs et options de billeterie"
+                color="orange"
+              />
+
+              <!-- Gérer les commandes -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/ticketing/orders`"
+                icon="i-heroicons-shopping-cart"
+                title="Commandes"
+                description="Consulter les commandes et participants"
+                color="green"
+              />
+
               <!-- Contrôle d'accès -->
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/ticketing/access-control`"

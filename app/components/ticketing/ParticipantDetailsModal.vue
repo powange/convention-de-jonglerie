@@ -33,73 +33,6 @@
           </UBadge>
         </div>
 
-        <!-- Informations du participant -->
-        <div class="space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon name="i-heroicons-user" class="text-primary-600 dark:text-primary-400" />
-            <h4 class="font-semibold text-gray-900 dark:text-white">
-              {{ $t('editions.ticketing.participant') }}
-            </h4>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.full_name') }}
-              </p>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ participant.ticket.user.firstName }} {{ participant.ticket.user.lastName }}
-              </p>
-            </div>
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.email') }}
-              </p>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ participant.ticket.user.email }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Informations du tarif -->
-        <div class="space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon name="i-heroicons-ticket" class="text-orange-600 dark:text-orange-400" />
-            <h4 class="font-semibold text-gray-900 dark:text-white">
-              {{ $t('editions.ticketing.ticket') }}
-            </h4>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.ticket_type') }}
-              </p>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ participant.ticket.name }}
-              </p>
-            </div>
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.amount') }}
-              </p>
-              <p class="text-sm font-medium text-primary-600 dark:text-primary-400">
-                {{ (participant.ticket.amount / 100).toFixed(2) }} €
-              </p>
-            </div>
-          </div>
-
-          <div v-if="participant.ticket.qrCode">
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-              {{ $t('editions.ticketing.qr_code') }}
-            </p>
-            <p class="text-sm font-mono font-medium text-gray-900 dark:text-white">
-              {{ participant.ticket.qrCode }}
-            </p>
-          </div>
-        </div>
-
         <!-- Informations de la commande -->
         <div class="space-y-4">
           <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
@@ -136,6 +69,150 @@
             <p class="text-sm font-mono font-medium text-gray-900 dark:text-white">
               #{{ participant.ticket.order.id }}
             </p>
+          </div>
+        </div>
+
+        <!-- Informations des participants -->
+        <div
+          v-if="participant.ticket.order.items && participant.ticket.order.items.length > 0"
+          class="space-y-4"
+        >
+          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+            <UIcon name="i-heroicons-user" class="text-primary-600 dark:text-primary-400" />
+            <h4 class="font-semibold text-gray-900 dark:text-white">
+              {{
+                participant.ticket.order.items.length > 1
+                  ? 'Participants'
+                  : $t('editions.ticketing.participant')
+              }}
+            </h4>
+          </div>
+
+          <div class="space-y-3">
+            <div
+              v-for="item in participant.ticket.order.items"
+              :key="item.id"
+              class="p-3 rounded-lg relative"
+              :class="
+                item.entryValidated
+                  ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 opacity-75'
+                  : 'bg-gray-50 dark:bg-gray-900'
+              "
+            >
+              <!-- Badge "Déjà validé" en haut à droite -->
+              <div
+                v-if="item.entryValidated"
+                class="absolute top-2 right-2 flex items-center gap-1 text-xs font-medium text-green-600 dark:text-green-400"
+              >
+                <UIcon name="i-heroicons-check-circle-solid" class="h-4 w-4" />
+                Déjà validé
+              </div>
+
+              <div class="flex items-start gap-3">
+                <input
+                  v-if="!item.entryValidated"
+                  :id="`participant-${item.id}`"
+                  v-model="selectedParticipants"
+                  type="checkbox"
+                  :value="item.id"
+                  class="mt-1.5 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                />
+                <div
+                  v-else
+                  class="mt-1.5 h-4 w-4 rounded bg-green-100 dark:bg-green-900/30 flex items-center justify-center"
+                >
+                  <UIcon
+                    name="i-heroicons-check"
+                    class="h-3 w-3 text-green-600 dark:text-green-400"
+                  />
+                </div>
+
+                <div class="flex-1">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        {{ $t('editions.ticketing.full_name') }}
+                      </p>
+                      <p
+                        class="text-sm font-medium"
+                        :class="
+                          item.entryValidated
+                            ? 'text-gray-600 dark:text-gray-400'
+                            : 'text-gray-900 dark:text-white'
+                        "
+                      >
+                        {{ item.firstName || '-' }} {{ item.lastName || '-' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        {{ $t('editions.ticketing.email') }}
+                      </p>
+                      <p
+                        class="text-sm font-medium"
+                        :class="
+                          item.entryValidated
+                            ? 'text-gray-600 dark:text-gray-400'
+                            : 'text-gray-900 dark:text-white'
+                        "
+                      >
+                        {{ item.email || '-' }}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Type de billet</p>
+                        <p
+                          class="text-sm font-medium"
+                          :class="
+                            item.entryValidated
+                              ? 'text-gray-600 dark:text-gray-400'
+                              : 'text-gray-900 dark:text-white'
+                          "
+                        >
+                          {{ item.name }}
+                        </p>
+                      </div>
+                      <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                          {{ $t('editions.ticketing.amount') }}
+                        </p>
+                        <p
+                          class="text-sm font-medium"
+                          :class="
+                            item.entryValidated
+                              ? 'text-gray-600 dark:text-gray-400'
+                              : 'text-primary-600 dark:text-primary-400'
+                          "
+                        >
+                          {{ (item.amount / 100).toFixed(2) }} €
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bouton pour tout sélectionner/désélectionner -->
+          <div class="flex justify-end">
+            <UButton
+              v-if="
+                selectedParticipants.length <
+                participant.ticket.order.items.filter((item) => !item.entryValidated).length
+              "
+              variant="ghost"
+              size="sm"
+              @click="selectAllParticipants"
+            >
+              Tout sélectionner
+            </UButton>
+            <UButton v-else variant="ghost" size="sm" @click="selectedParticipants = []">
+              Tout désélectionner
+            </UButton>
           </div>
         </div>
 
@@ -299,34 +376,44 @@
     </template>
 
     <template #footer>
-      <div class="flex justify-end gap-2">
-        <UButton color="neutral" variant="soft" @click="isOpen = false"> Fermer </UButton>
-        <UButton
-          v-if="
-            isTicket &&
-            participant &&
-            'ticket' in participant &&
-            participant.ticket.state === 'Processed'
-          "
-          color="success"
-          icon="i-heroicons-check-circle"
+      <div class="flex justify-between items-center">
+        <div
+          v-if="isTicket && selectedParticipants.length > 0"
+          class="text-sm text-gray-600 dark:text-gray-400"
         >
-          Marquer comme entré
-        </UButton>
-        <UButton
-          v-if="isVolunteer && participant && 'volunteer' in participant"
-          color="success"
-          icon="i-heroicons-check-circle"
-        >
-          Marquer comme entré
-        </UButton>
+          {{ selectedParticipants.length }} participant{{
+            selectedParticipants.length > 1 ? 's' : ''
+          }}
+          sélectionné{{ selectedParticipants.length > 1 ? 's' : '' }}
+        </div>
+        <div v-else></div>
+        <div class="flex gap-2">
+          <UButton color="neutral" variant="soft" @click="isOpen = false"> Fermer </UButton>
+          <UButton
+            v-if="isTicket && selectedParticipants.length > 0"
+            color="success"
+            icon="i-heroicons-check-circle"
+            :loading="validating"
+            @click="validateSelectedParticipants"
+          >
+            Valider l'entrée ({{ selectedParticipants.length }})
+          </UButton>
+          <UButton
+            v-if="isVolunteer && participant && 'volunteer' in participant"
+            color="success"
+            icon="i-heroicons-check-circle"
+            @click="validateVolunteer"
+          >
+            Marquer comme entré
+          </UButton>
+        </div>
       </div>
     </template>
   </UModal>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 interface TicketData {
   ticket: {
@@ -347,6 +434,22 @@ interface TicketData {
         lastName: string
         email: string
       }
+      items?: Array<{
+        id: number
+        name: string
+        amount: number
+        state: string
+        qrCode?: string
+        firstName?: string
+        lastName?: string
+        email?: string
+        entryValidated?: boolean
+        entryValidatedAt?: string | Date
+        customFields?: Array<{
+          name: string
+          answer: string
+        }>
+      }>
     }
     customFields?: Array<{
       name: string
@@ -388,6 +491,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
+  validate: [participantIds: number[]]
 }>()
 
 const isOpen = computed({
@@ -397,4 +501,44 @@ const isOpen = computed({
 
 const isVolunteer = computed(() => props.type === 'volunteer')
 const isTicket = computed(() => props.type === 'ticket' || !props.type)
+
+// Gestion de la sélection des participants
+const selectedParticipants = ref<number[]>([])
+const validating = ref(false)
+
+// Réinitialiser la sélection quand la modal s'ouvre
+watch(
+  () => props.open,
+  (newValue) => {
+    if (newValue) {
+      selectedParticipants.value = []
+    }
+  }
+)
+
+const selectAllParticipants = () => {
+  if (props.participant && 'ticket' in props.participant) {
+    // Ne sélectionner que les participants non-validés
+    selectedParticipants.value =
+      props.participant.ticket.order.items
+        ?.filter((item) => !item.entryValidated)
+        .map((item) => item.id) || []
+  }
+}
+
+const validateSelectedParticipants = async () => {
+  if (selectedParticipants.value.length === 0) return
+
+  validating.value = true
+  try {
+    emit('validate', selectedParticipants.value)
+  } finally {
+    validating.value = false
+  }
+}
+
+const validateVolunteer = () => {
+  // Pour les bénévoles, on pourra implémenter plus tard
+  console.log('Validation bénévole')
+}
 </script>
