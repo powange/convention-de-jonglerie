@@ -94,6 +94,14 @@ export default defineEventHandler(async (event) => {
           },
         })
 
+        // Récupérer les articles à restituer pour les bénévoles
+        const volunteerReturnableItems = await prisma.editionVolunteerReturnableItem.findMany({
+          where: { editionId },
+          include: {
+            returnableItem: true,
+          },
+        })
+
         return {
           success: true,
           found: true,
@@ -118,6 +126,10 @@ export default defineEventHandler(async (event) => {
                 team: assignment.timeSlot.team?.name,
                 startDateTime: assignment.timeSlot.startDateTime,
                 endDateTime: assignment.timeSlot.endDateTime,
+              })),
+              returnableItems: volunteerReturnableItems.map((item) => ({
+                id: item.returnableItem.id,
+                name: item.returnableItem.name,
               })),
               entryValidated: application.entryValidated,
               entryValidatedAt: application.entryValidatedAt,

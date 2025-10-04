@@ -777,6 +777,10 @@ interface VolunteerData {
       startDateTime: Date | string
       endDateTime: Date | string
     }>
+    returnableItems?: Array<{
+      id: number
+      name: string
+    }>
     entryValidated?: boolean
     entryValidatedAt?: Date | string
     entryValidatedBy?: {
@@ -817,26 +821,44 @@ const ticketToInvalidate = ref<number | null>(null)
 
 // Gestion des articles à restituer
 const returnableItemsToDistribute = computed(() => {
-  if (!props.participant || !('ticket' in props.participant)) return []
+  const itemsList: Array<{ id: string; name: string; participantName?: string }> = []
 
-  // Récupérer tous les articles à restituer des participants sélectionnés
-  const itemsList: Array<{ id: string; name: string; participantName: string }> = []
+  // Articles pour les billets
+  if (props.participant && 'ticket' in props.participant) {
+    const itemsToCheck =
+      props.participant.ticket.order.items?.filter((item) =>
+        selectedParticipants.value.includes(item.id)
+      ) || []
 
-  const itemsToCheck =
-    props.participant.ticket.order.items?.filter((item) =>
-      selectedParticipants.value.includes(item.id)
-    ) || []
+    for (const item of itemsToCheck) {
+      const participantName =
+        `${item.firstName || ''} ${item.lastName || ''}`.trim() || 'Participant'
 
-  for (const item of itemsToCheck) {
-    const participantName = `${item.firstName || ''} ${item.lastName || ''}`.trim() || 'Participant'
+      if (item.tier?.returnableItems) {
+        for (const tierItem of item.tier.returnableItems) {
+          // Créer un ID unique par participant et article
+          itemsList.push({
+            id: `${item.id}-${tierItem.returnableItem.id}`,
+            name: `${tierItem.returnableItem.name} - ${participantName}`,
+            participantName,
+          })
+        }
+      }
+    }
+  }
 
-    if (item.tier?.returnableItems) {
-      for (const tierItem of item.tier.returnableItems) {
-        // Créer un ID unique par participant et article
+  // Articles pour les bénévoles
+  if (props.participant && 'volunteer' in props.participant) {
+    const volunteerName =
+      `${props.participant.volunteer.user.firstName} ${props.participant.volunteer.user.lastName}`.trim() ||
+      'Bénévole'
+
+    if (props.participant.volunteer.returnableItems) {
+      for (const item of props.participant.volunteer.returnableItems) {
         itemsList.push({
-          id: `${item.id}-${tierItem.returnableItem.id}`,
-          name: `${tierItem.returnableItem.name} - ${participantName}`,
-          participantName,
+          id: `volunteer-${item.id}`,
+          name: `${item.name} - ${volunteerName}`,
+          participantName: volunteerName,
         })
       }
     }

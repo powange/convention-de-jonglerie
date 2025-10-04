@@ -111,6 +111,27 @@
               :edition-id="editionId"
               @refresh="loadReturnableItems"
             />
+
+            <!-- Articles à restituer pour les bénévoles -->
+            <div class="mt-8">
+              <div class="border-t border-gray-200 dark:border-gray-800 pt-8">
+                <div class="mb-4">
+                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Articles à restituer pour les bénévoles
+                  </h2>
+                  <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Ces articles seront remis à tous les bénévoles lors de leur validation d'accès
+                  </p>
+                </div>
+
+                <TicketingVolunteerReturnableItemsList
+                  :items="volunteerReturnableItems"
+                  :loading="loadingVolunteerReturnableItems"
+                  :edition-id="editionId"
+                  @refresh="loadVolunteerReturnableItems"
+                />
+              </div>
+            </div>
           </template>
         </UTabs>
       </div>
@@ -159,6 +180,10 @@ const quotas = ref<any[]>([])
 // Items à restituer
 const loadingReturnableItems = ref(true)
 const returnableItems = ref<any[]>([])
+
+// Items à restituer pour bénévoles
+const loadingVolunteerReturnableItems = ref(true)
+const volunteerReturnableItems = ref<any[]>([])
 
 const lastSyncText = computed(() => {
   if (!lastSync.value) return 'Jamais'
@@ -219,6 +244,7 @@ onMounted(async () => {
     await loadData()
     await loadQuotas()
     await loadReturnableItems()
+    await loadVolunteerReturnableItems()
   }
 })
 
@@ -307,12 +333,28 @@ const loadReturnableItems = async () => {
   }
 }
 
+// Fonctions pour les items à restituer pour bénévoles
+const loadVolunteerReturnableItems = async () => {
+  loadingVolunteerReturnableItems.value = true
+  try {
+    const response = await $fetch(
+      `/api/editions/${editionId}/ticketing/volunteers/returnable-items`
+    )
+    volunteerReturnableItems.value = response.items
+  } catch (error) {
+    console.error('Failed to load volunteer returnable items:', error)
+  } finally {
+    loadingVolunteerReturnableItems.value = false
+  }
+}
+
 // Recharger les données quand les permissions changent (mode super admin)
 watch(canAccess, async (newValue, oldValue) => {
   if (newValue && !oldValue) {
     await loadData()
     await loadQuotas()
     await loadReturnableItems()
+    await loadVolunteerReturnableItems()
   }
 })
 </script>

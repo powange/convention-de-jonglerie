@@ -145,6 +145,7 @@ model Edition {
   returnableItems              ReturnableItem[]
   options                      HelloAssoOption[]
   helloAssoOrders              HelloAssoOrder[]
+  volunteerReturnableItems     EditionVolunteerReturnableItem[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -864,11 +865,27 @@ model ReturnableItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  edition Edition                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  tiers   TierReturnableItem[]
-  options OptionReturnableItem[]
+  edition                   Edition                          @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  tiers                     TierReturnableItem[]
+  options                   OptionReturnableItem[]
+  volunteerReturnableItems  EditionVolunteerReturnableItem[]
 
   @@index([editionId])
+}
+
+model EditionVolunteerReturnableItem {
+  id               Int      @id @default(autoincrement())
+  editionId        Int
+  returnableItemId Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  edition        Edition        @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  returnableItem ReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, returnableItemId])
+  @@index([editionId])
+  @@index([returnableItemId])
 }
 
 model TierQuota {
