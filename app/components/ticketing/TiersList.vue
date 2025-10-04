@@ -75,7 +75,7 @@
         <UBadge
           v-for="quotaRelation in tier.quotas"
           :key="quotaRelation.quota.id"
-          color="primary"
+          color="warning"
           variant="soft"
         >
           {{ quotaRelation.quota.title }}
@@ -91,7 +91,7 @@
         <UBadge
           v-for="itemRelation in tier.returnableItems"
           :key="itemRelation.returnableItem.id"
-          color="warning"
+          color="info"
           variant="soft"
         >
           {{ itemRelation.returnableItem.name }}

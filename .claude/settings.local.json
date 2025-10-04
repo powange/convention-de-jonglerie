@@ -97,7 +97,8 @@
       "Bash(/tmp/fix-participant-modal.sh:*)",
       "Bash(/tmp/fix-external.sh:*)",
       "Bash(npx tsx:*)",
-      "WebFetch(domain:heroicons.com)"
+      "WebFetch(domain:heroicons.com)",
+      "mcp__nuxt-ui-remote__get_component"
     ],
     "deny": [],
     "ask": [],

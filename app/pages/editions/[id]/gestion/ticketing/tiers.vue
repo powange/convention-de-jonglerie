@@ -87,7 +87,12 @@
           </template>
 
           <template #options>
-            <TicketingOptionsList :options="options" :loading="loading" />
+            <TicketingOptionsList
+              :options="options"
+              :loading="loading"
+              :edition-id="editionId"
+              @refresh="loadData"
+            />
           </template>
 
           <template #quotas>
@@ -228,20 +233,30 @@ const loadData = async () => {
       lastSync.value = configResponse.config?.lastSyncAt
         ? new Date(configResponse.config.lastSyncAt)
         : null
-
-      // Charger les tarifs et options depuis la BDD
-      const [tiersData, optionsData] = await Promise.all([
-        fetchTiers(editionId),
-        fetchOptions(editionId),
-      ])
-
-      tiers.value = tiersData
-      options.value = optionsData
     }
+
+    // Charger les tarifs et options depuis la BDD (indépendamment de la config)
+    await Promise.all([loadTiers(), loadOptions()])
   } catch (error) {
     console.error('Failed to load data:', error)
   } finally {
     loading.value = false
+  }
+}
+
+const loadTiers = async () => {
+  try {
+    tiers.value = await fetchTiers(editionId)
+  } catch (error) {
+    console.error('Failed to load tiers:', error)
+  }
+}
+
+const loadOptions = async () => {
+  try {
+    options.value = await fetchOptions(editionId)
+  } catch (error) {
+    console.error('Failed to load options:', error)
   }
 }
 

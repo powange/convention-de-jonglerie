@@ -143,6 +143,7 @@ model Edition {
   tiers                        HelloAssoTier[]
   ticketingQuotas              TicketingQuota[]
   returnableItems              ReturnableItem[]
+  options                      HelloAssoOption[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -848,8 +849,9 @@ model TicketingQuota {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  edition Edition     @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  edition Edition       @relation(fields: [editionId], references: [id], onDelete: Cascade)
   tiers   TierQuota[]
+  options OptionQuota[]
 
   @@index([editionId])
 }
@@ -861,8 +863,9 @@ model ReturnableItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  edition Edition              @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  edition Edition                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
   tiers   TierReturnableItem[]
+  options OptionReturnableItem[]
 
   @@index([editionId])
 }
@@ -893,10 +896,37 @@ model TierReturnableItem {
   @@index([returnableItemId])
 }
 
+model OptionQuota {
+  id       Int @id @default(autoincrement())
+  optionId Int
+  quotaId  Int
+
+  option HelloAssoOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  quota  TicketingQuota  @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+
+  @@unique([optionId, quotaId])
+  @@index([optionId])
+  @@index([quotaId])
+}
+
+model OptionReturnableItem {
+  id               Int @id @default(autoincrement())
+  optionId         Int
+  returnableItemId Int
+
+  option         HelloAssoOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  returnableItem ReturnableItem  @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+
+  @@unique([optionId, returnableItemId])
+  @@index([optionId])
+  @@index([returnableItemId])
+}
+
 model HelloAssoOption {
   id                  Int      @id @default(autoincrement())
-  externalTicketingId String
-  helloAssoOptionId   String   // ID de l'option dans HelloAsso (peut être string ou int)
+  externalTicketingId String?  // Null si option manuelle (non HelloAsso)
+  helloAssoOptionId   String?  // ID de l'option dans HelloAsso, null si option manuelle
+  editionId           Int      // Toujours associé à une édition
   name                String
   description         String?  @db.Text
   type                String   // TextInput, CheckBox, Select, etc.
@@ -906,10 +936,14 @@ model HelloAssoOption {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  externalTicketing ExternalTicketing @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  externalTicketing ExternalTicketing?      @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  edition           Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  quotas            OptionQuota[]
+  returnableItems   OptionReturnableItem[]
 
   @@unique([externalTicketingId, helloAssoOptionId])
   @@index([externalTicketingId])
+  @@index([editionId])
 }
 
 model HelloAssoOrder {

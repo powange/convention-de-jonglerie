@@ -16,17 +16,17 @@ export default defineEventHandler(async (event) => {
     })
 
   try {
-    // Récupérer les options HelloAsso (uniquement si une config existe)
-    const config = await prisma.externalTicketing.findUnique({
+    // Récupérer toutes les options de l'édition (HelloAsso et manuelles)
+    const options = await prisma.helloAssoOption.findMany({
       where: { editionId },
+      orderBy: [{ position: 'asc' }, { name: 'asc' }],
       include: {
-        helloAssoOptions: {
-          orderBy: { position: 'asc' },
-        },
+        quotas: { include: { quota: true } },
+        returnableItems: { include: { returnableItem: true } },
       },
     })
 
-    return config?.helloAssoOptions || []
+    return options
   } catch (error: any) {
     console.error('Failed to fetch options from DB:', error)
     throw createError({
