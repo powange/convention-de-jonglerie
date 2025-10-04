@@ -11,29 +11,42 @@
     <p class="text-xs text-gray-400 mt-1">Synchronisez depuis votre billeterie externe</p>
   </div>
 
-  <div v-else class="space-y-4">
+  <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     <UCard v-for="option in options" :key="option.id">
-      <div class="flex items-start justify-between gap-4">
-        <!-- Contenu -->
-        <div class="flex-1">
-          <div class="flex items-center gap-2 mb-2">
+      <template #header>
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex-1">
             <h3 class="font-semibold text-gray-900 dark:text-white">
               {{ option.name }}
             </h3>
-            <UBadge color="primary" variant="soft" size="xs">
-              {{ option.type }}
-            </UBadge>
-            <UBadge v-if="option.isRequired" color="warning" variant="soft" size="xs">
-              Obligatoire
-            </UBadge>
+            <div class="flex items-center gap-2 mt-1">
+              <UBadge color="primary" variant="soft" size="xs">
+                {{ option.type }}
+              </UBadge>
+              <UBadge v-if="option.isRequired" color="warning" variant="soft" size="xs">
+                Obligatoire
+              </UBadge>
+            </div>
           </div>
+          <img
+            v-if="option.helloAssoOptionId"
+            src="~/assets/img/helloasso/logo.svg"
+            alt="HelloAsso"
+            class="h-5 w-auto"
+            :title="`Synchronisé depuis HelloAsso (ID: ${option.helloAssoOptionId})`"
+          />
+        </div>
+      </template>
 
-          <p v-if="option.description" class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-            {{ option.description }}
-          </p>
+      <div class="space-y-3">
+        <p v-if="option.description" class="text-sm text-gray-600 dark:text-gray-400">
+          {{ option.description }}
+        </p>
 
-          <!-- Choix disponibles -->
-          <div v-if="option.choices && option.choices.length > 0" class="flex flex-wrap gap-1.5">
+        <!-- Choix disponibles -->
+        <div v-if="option.choices && option.choices.length > 0">
+          <p class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Choix :</p>
+          <div class="flex flex-wrap gap-1.5">
             <UBadge
               v-for="(choice, idx) in option.choices"
               :key="idx"
@@ -44,11 +57,6 @@
               {{ choice }}
             </UBadge>
           </div>
-
-          <!-- ID HelloAsso -->
-          <p class="text-xs text-gray-400 font-mono mt-3">
-            HelloAsso ID: {{ option.helloAssoOptionId }}
-          </p>
         </div>
       </div>
     </UCard>
