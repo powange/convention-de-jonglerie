@@ -76,7 +76,7 @@
         </div>
 
         <!-- Tabs pour tarifs et options -->
-        <UTabs :items="tabs" variant="link">
+        <UTabs v-model="activeTab" :items="tabs" variant="link">
           <template #tarifs>
             <TicketingTiersList
               :tiers="tiers"
@@ -114,8 +114,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { onMounted, computed, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
@@ -123,11 +123,23 @@ import { fetchOptions } from '~/utils/ticketing/options'
 import { fetchTiers } from '~/utils/ticketing/tiers'
 
 const route = useRoute()
+const router = useRouter()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
+
+// Gestion de l'onglet actif avec hash dans l'URL
+const activeTab = computed({
+  get() {
+    const hash = route.hash.replace('#', '')
+    return hash || 'tarifs'
+  },
+  set(tab: string) {
+    router.replace({ hash: `#${tab}` })
+  },
+})
 
 const loading = ref(true)
 const hasExternalTicketing = ref(false)
@@ -162,24 +174,28 @@ const tabs = computed(() => [
     label: 'Tarifs',
     icon: 'i-heroicons-ticket',
     slot: 'tarifs',
+    value: 'tarifs',
     badge: tiers.value.length,
   },
   {
     label: 'Options',
     icon: 'i-heroicons-adjustments-horizontal',
     slot: 'options',
+    value: 'options',
     badge: options.value.length,
   },
   {
     label: 'Quotas',
     icon: 'i-heroicons-chart-bar',
     slot: 'quotas',
+    value: 'quotas',
     badge: quotas.value.length,
   },
   {
     label: 'À restituer',
     icon: 'i-heroicons-gift',
     slot: 'arestituer',
+    value: 'arestituer',
     badge: returnableItems.value.length,
   },
 ])
@@ -275,4 +291,13 @@ const loadReturnableItems = async () => {
     loadingReturnableItems.value = false
   }
 }
+
+// Recharger les données quand les permissions changent (mode super admin)
+watch(canAccess, async (newValue, oldValue) => {
+  if (newValue && !oldValue) {
+    await loadData()
+    await loadQuotas()
+    await loadReturnableItems()
+  }
+})
 </script>
