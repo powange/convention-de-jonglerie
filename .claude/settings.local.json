@@ -98,7 +98,8 @@
       "Bash(/tmp/fix-external.sh:*)",
       "Bash(npx tsx:*)",
       "WebFetch(domain:heroicons.com)",
-      "mcp__nuxt-ui-remote__get_component"
+      "mcp__nuxt-ui-remote__get_component",
+      "SlashCommand(/translate-todos)"
     ],
     "deny": [],
     "ask": [],

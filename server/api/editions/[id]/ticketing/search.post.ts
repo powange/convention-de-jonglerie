@@ -180,7 +180,8 @@ export default defineEventHandler(async (event) => {
         participant: {
           found: true,
           ticket: {
-            id: item.helloAssoItemId,
+            id: item.id, // ID de HelloAssoOrderItem
+            helloAssoItemId: item.helloAssoItemId,
             name: item.name,
             amount: item.amount,
             state: item.state,
@@ -198,7 +199,8 @@ export default defineEventHandler(async (event) => {
                 email: item.order.payerEmail,
               },
               items: item.order.items.map((orderItem) => ({
-                id: orderItem.helloAssoItemId,
+                id: orderItem.id, // ID de HelloAssoOrderItem
+                helloAssoItemId: orderItem.helloAssoItemId,
                 name: orderItem.name,
                 type: orderItem.type,
                 amount: orderItem.amount,

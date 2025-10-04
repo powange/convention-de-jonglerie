@@ -48,48 +48,14 @@ export default defineEventHandler(async (event) => {
         message: `${result.count} bénévole${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`,
       }
     } else {
-      // Valider les billets
-      const config = await prisma.externalTicketing.findUnique({
-        where: { editionId },
-        include: {
-          helloAssoOrders: {
-            where: {
-              items: {
-                some: {
-                  helloAssoItemId: {
-                    in: body.participantIds,
-                  },
-                },
-              },
-            },
-            include: {
-              items: {
-                where: {
-                  helloAssoItemId: {
-                    in: body.participantIds,
-                  },
-                },
-              },
-            },
-          },
-        },
-      })
-
-      if (!config) {
-        throw createError({
-          statusCode: 404,
-          message: 'Configuration de billeterie introuvable',
-        })
-      }
-
-      // Mettre à jour les items pour marquer l'entrée comme validée
+      // Valider les billets en utilisant l'ID de HelloAssoOrderItem
       const result = await prisma.helloAssoOrderItem.updateMany({
         where: {
-          helloAssoItemId: {
+          id: {
             in: body.participantIds,
           },
           order: {
-            externalTicketingId: config.id,
+            editionId: editionId,
           },
         },
         data: {

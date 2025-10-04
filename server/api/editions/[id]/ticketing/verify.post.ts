@@ -158,7 +158,7 @@ export default defineEventHandler(async (event) => {
         where: {
           qrCode: body.qrCode,
           order: {
-            externalTicketingId: config.id,
+            editionId: editionId,
           },
         },
         include: {
@@ -191,7 +191,8 @@ export default defineEventHandler(async (event) => {
           participant: {
             found: true,
             ticket: {
-              id: orderItem.helloAssoItemId,
+              id: orderItem.id, // ID de HelloAssoOrderItem
+              helloAssoItemId: orderItem.helloAssoItemId,
               name: orderItem.name,
               amount: orderItem.amount,
               state: orderItem.state,
@@ -209,7 +210,8 @@ export default defineEventHandler(async (event) => {
                   email: orderItem.order.payerEmail,
                 },
                 items: orderItem.order.items.map((item) => ({
-                  id: item.helloAssoItemId,
+                  id: item.id, // ID de HelloAssoOrderItem (au lieu de helloAssoItemId qui peut être null)
+                  helloAssoItemId: item.helloAssoItemId,
                   name: item.name,
                   type: item.type,
                   amount: item.amount,

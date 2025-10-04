@@ -20,14 +20,23 @@
       <EditionHeader :edition="edition" current-page="gestion" />
 
       <!-- Titre de la page -->
-      <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <UIcon name="i-heroicons-shield-check" class="text-blue-600 dark:text-blue-400" />
-          Contrôle d'accès
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          Scanner et valider les billets à l'entrée
-        </p>
+      <div class="mb-6 flex items-start justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <UIcon name="i-heroicons-shield-check" class="text-blue-600 dark:text-blue-400" />
+            Contrôle d'accès
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400 mt-1">
+            Scanner et valider les billets à l'entrée
+          </p>
+        </div>
+        <UButton
+          icon="i-heroicons-user-plus"
+          color="primary"
+          @click="showAddParticipantModal = true"
+        >
+          {{ $t('editions.ticketing.add_participant') }}
+        </UButton>
       </div>
 
       <!-- Contenu de la page -->
@@ -311,6 +320,13 @@
         @validate="handleValidateParticipants"
         @invalidate="handleInvalidateEntry"
       />
+
+      <!-- Modal ajout de participant -->
+      <TicketingAddParticipantModal
+        v-model:open="showAddParticipantModal"
+        :edition-id="editionId"
+        @order-created="handleOrderCreated"
+      />
     </div>
   </div>
 </template>
@@ -333,6 +349,7 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 const ticketCode = ref('')
 const scannerOpen = ref(false)
 const participantModalOpen = ref(false)
+const showAddParticipantModal = ref(false)
 const selectedParticipant = ref<any>(null)
 const participantType = ref<'ticket' | 'volunteer'>('ticket')
 const validatingTicket = ref(false)
@@ -546,6 +563,43 @@ const handleInvalidateEntry = async (participantId: number) => {
     toast.add({
       title: 'Erreur',
       description: error.data?.message || "Impossible de dévalider l'entrée",
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
+}
+
+const handleOrderCreated = async (qrCode: string) => {
+  try {
+    // Appeler l'API verify pour récupérer les détails de la commande
+    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/verify`, {
+      method: 'POST',
+      body: {
+        qrCode,
+      },
+    })
+
+    if (result.found && result.participant) {
+      // Afficher la modal avec les détails du participant
+      selectedParticipant.value = result.participant
+      participantType.value = 'ticket'
+      participantModalOpen.value = true
+
+      toast.add({
+        title: 'Commande créée',
+        description: 'La commande a été créée avec succès',
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+
+      // Recharger les statistiques et les dernières validations
+      await Promise.all([loadStats(), loadRecentValidations()])
+    }
+  } catch (error: any) {
+    console.error('Failed to load created order:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || 'Impossible de charger la commande créée',
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })

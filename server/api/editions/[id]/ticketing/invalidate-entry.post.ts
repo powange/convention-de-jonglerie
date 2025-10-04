@@ -51,23 +51,12 @@ export default defineEventHandler(async (event) => {
         },
       })
     } else {
-      // Dévalider l'entrée d'un participant (ticket)
-      const config = await prisma.externalTicketing.findUnique({
-        where: { editionId },
-      })
-
-      if (!config) {
-        throw createError({
-          statusCode: 404,
-          message: 'Configuration de billeterie introuvable',
-        })
-      }
-
+      // Dévalider l'entrée d'un participant (ticket) en utilisant l'ID de HelloAssoOrderItem
       const orderItem = await prisma.helloAssoOrderItem.findFirst({
         where: {
-          helloAssoItemId: body.participantId,
+          id: body.participantId,
           order: {
-            externalTicketingId: config.id,
+            editionId: editionId,
           },
         },
       })

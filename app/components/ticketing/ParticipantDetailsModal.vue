@@ -35,11 +35,25 @@
 
         <!-- Informations de la commande -->
         <div class="space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon name="i-heroicons-shopping-cart" class="text-purple-600 dark:text-purple-400" />
-            <h4 class="font-semibold text-gray-900 dark:text-white">
-              {{ $t('editions.ticketing.order') }}
-            </h4>
+          <div
+            class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700"
+          >
+            <div class="flex items-center gap-2">
+              <UIcon
+                name="i-heroicons-shopping-cart"
+                class="text-purple-600 dark:text-purple-400"
+              />
+              <h4 class="font-semibold text-gray-900 dark:text-white">
+                {{ $t('editions.ticketing.order') }}
+              </h4>
+            </div>
+            <!-- Logo HelloAsso si c'est une commande HelloAsso -->
+            <img
+              v-if="participant.ticket.order.id"
+              src="~/assets/img/helloasso/logo.svg"
+              alt="HelloAsso"
+              class="h-5"
+            />
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -62,7 +76,7 @@
             </div>
           </div>
 
-          <div>
+          <div v-if="participant.ticket.order.id">
             <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
               {{ $t('editions.ticketing.order_id') }}
             </p>
