@@ -7,15 +7,19 @@ import { prisma } from '../../utils/prisma'
 
 import type { H3Error } from 'h3'
 
-// GET /api/users/search?q=term
+// GET /api/users/search?q=term ou ?email=term
 // Auth requis. Retourne jusqu'à 10 utilisateurs (id, pseudo, profilePicture?, emailHash)
 export default defineEventHandler(async (event) => {
   try {
     const { user } = await requireUserSession(event)
-    const schema = z.object({ q: z.string().min(2).max(50) })
-    const { q } = schema.parse(getQuery(event))
-    const term = q.trim()
-    if (term.length < 2) return []
+    const query = getQuery(event)
+    const schema = z.object({
+      q: z.string().min(2).max(50).optional(),
+      email: z.string().min(2).max(50).optional(),
+    })
+    const parsed = schema.parse(query)
+    const term = (parsed.q || parsed.email || '').trim()
+    if (term.length < 2) return { users: [] }
 
     // NOTE: Le paramètre Prisma `mode: 'insensitive'` n'est pas supporté avec MySQL (erreur "Unknown argument mode").
     // Les collations MySQL utf8mb4_* sont déjà généralement insensibles à la casse.
@@ -26,17 +30,29 @@ export default defineEventHandler(async (event) => {
         // Exclure l'utilisateur courant
         NOT: { id: (user as any).id },
       },
-      select: { id: true, pseudo: true, profilePicture: true, email: true },
+      select: {
+        id: true,
+        pseudo: true,
+        prenom: true,
+        nom: true,
+        profilePicture: true,
+        email: true,
+      },
       take: 10,
       orderBy: { pseudo: 'asc' },
     })
 
-    return users.map((u) => ({
-      id: u.id,
-      pseudo: u.pseudo,
-      profilePicture: u.profilePicture,
-      emailHash: getEmailHash(u.email),
-    }))
+    return {
+      users: users.map((u) => ({
+        id: u.id,
+        pseudo: u.pseudo,
+        prenom: u.prenom,
+        nom: u.nom,
+        profilePicture: u.profilePicture,
+        email: u.email,
+        emailHash: getEmailHash(u.email),
+      })),
+    }
   } catch (error: unknown) {
     if ((error as any)?.issues) {
       throw createError({ statusCode: 400, message: 'Requête invalide' })

@@ -35,22 +35,32 @@
         <!-- Gestion des candidatures -->
         <UCard v-if="canViewVolunteersTable" variant="soft">
           <template #header>
-            <div class="space-y-2">
-              <h3 class="text-lg font-semibold flex items-center gap-2">
-                <UIcon name="i-heroicons-clipboard-document-list" class="text-primary-500" />
-                {{ t('editions.volunteers.management_title') }}
-              </h3>
-              <p
-                v-if="volunteersMode === 'INTERNAL'"
-                class="text-sm text-blue-600 dark:text-blue-400 flex items-center gap-2"
+            <div class="flex items-start justify-between gap-4">
+              <div class="space-y-2 flex-1">
+                <h3 class="text-lg font-semibold flex items-center gap-2">
+                  <UIcon name="i-heroicons-clipboard-document-list" class="text-primary-500" />
+                  {{ t('editions.volunteers.management_title') }}
+                </h3>
+                <p
+                  v-if="volunteersMode === 'INTERNAL'"
+                  class="text-sm text-blue-600 dark:text-blue-400 flex items-center gap-2"
+                >
+                  <UIcon name="i-heroicons-information-circle" class="text-blue-500" size="16" />
+                  {{
+                    canManageVolunteers
+                      ? t('editions.volunteers.admin_only_note')
+                      : t('editions.volunteers.view_only_note')
+                  }}
+                </p>
+              </div>
+              <UButton
+                v-if="canManageVolunteers && volunteersMode === 'INTERNAL'"
+                color="primary"
+                icon="i-heroicons-user-plus"
+                @click="showAddVolunteerModal = true"
               >
-                <UIcon name="i-heroicons-information-circle" class="text-blue-500" size="16" />
-                {{
-                  canManageVolunteers
-                    ? t('editions.volunteers.admin_only_note')
-                    : t('editions.volunteers.view_only_note')
-                }}
-              </p>
+                {{ t('editions.volunteers.add_volunteer') }}
+              </UButton>
             </div>
           </template>
 
@@ -591,6 +601,13 @@
         </UModal>
       </div>
     </div>
+
+    <!-- Modale d'ajout de bénévole -->
+    <VolunteersAddVolunteerModal
+      v-model:open="showAddVolunteerModal"
+      :edition-id="editionId"
+      @volunteer-added="handleVolunteerAdded"
+    />
   </div>
 </template>
 
@@ -637,6 +654,7 @@ const sourceTeamId = ref<string | null>(null)
 const targetTeamId = ref<string | null>(null)
 const showMoveModal = ref(false)
 const isProcessingMove = ref(false)
+const showAddVolunteerModal = ref(false)
 
 // Fonction pour récupérer les assignations d'équipes
 const fetchTeamAssignments = async () => {
@@ -1093,6 +1111,20 @@ const directAssign = async (teamId: string) => {
 }
 
 // Fonction pour traiter les actions de déplacer/ajouter depuis la modal
+const handleVolunteerAdded = async () => {
+  toast.add({
+    title: t('editions.volunteers.volunteer_added_success'),
+    color: 'success',
+  })
+  // Recharger les données
+  await fetchVolunteersInfo()
+  await fetchTeamAssignments()
+  // Rafraîchir le tableau
+  if (volunteerTableRef.value?.refresh) {
+    volunteerTableRef.value.refresh()
+  }
+}
+
 const processMove = async (action: 'move' | 'add') => {
   if (!draggedVolunteer.value || !targetTeamId.value) return
 
