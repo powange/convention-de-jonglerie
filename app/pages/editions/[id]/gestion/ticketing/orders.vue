@@ -228,7 +228,7 @@
                           : 'text-gray-900 dark:text-white'
                       "
                     >
-                      {{ item.name }}
+                      {{ item.name || item.type }}
                     </span>
                     <UBadge v-if="item.entryValidated" color="success" variant="soft" size="xs">
                       <UIcon name="i-heroicons-check-circle" class="h-3 w-3 mr-1" />
@@ -241,7 +241,14 @@
                       {{ item.firstName }} {{ item.lastName }}
                       <span v-if="item.email" class="ml-1">({{ item.email }})</span>
                     </div>
-                    <div v-if="item.qrCode">
+                    <div
+                      v-if="
+                        item.qrCode &&
+                        item.type !== 'Donation' &&
+                        item.type !== 'Membership' &&
+                        item.type !== 'Payment'
+                      "
+                    >
                       <UButton
                         color="primary"
                         variant="soft"
@@ -324,6 +331,7 @@ import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { fetchOrders, type Order } from '~/utils/ticketing/orders'
 
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -335,7 +343,7 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 const loading = ref(true)
 const hasExternalTicketing = ref(false)
 const lastSync = ref<Date | null>(null)
-const orders = ref<any[]>([])
+const orders = ref<Order[]>([])
 const stats = ref({
   totalOrders: 0,
   totalItems: 0,
@@ -429,8 +437,7 @@ const loadData = async () => {
         : null
 
       // Charger les commandes depuis la BDD
-      const ordersResponse = await $fetch(`/api/editions/${editionId}/ticketing/orders-from-db`)
-      orders.value = ordersResponse.orders || []
+      orders.value = await fetchOrders(editionId)
 
       // Calculer les stats
       stats.value.totalOrders = orders.value.length

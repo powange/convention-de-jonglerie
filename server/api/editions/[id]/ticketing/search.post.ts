@@ -200,6 +200,7 @@ export default defineEventHandler(async (event) => {
               items: item.order.items.map((orderItem) => ({
                 id: orderItem.helloAssoItemId,
                 name: orderItem.name,
+                type: orderItem.type,
                 amount: orderItem.amount,
                 state: orderItem.state,
                 qrCode: orderItem.qrCode,

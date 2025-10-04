@@ -148,6 +148,7 @@ export default defineEventHandler(async (event) => {
             create: {
               externalTicketingId: config.id,
               helloAssoOptionId: String(option.id),
+              editionId: editionId,
               name: option.name,
               description: option.description,
               type: option.type,

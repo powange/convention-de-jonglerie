@@ -357,7 +357,7 @@
               </div>
 
               <UTabs
-                v-if="loadedTiers && loadedTiers.length > 0"
+                v-if="tiersLoaded || ordersLoaded"
                 :items="items"
                 variant="link"
                 :ui="{ trigger: 'grow' }"

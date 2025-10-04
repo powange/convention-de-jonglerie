@@ -256,8 +256,9 @@
                 :key="validation.id"
                 class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
               >
-                <div class="flex items-center justify-between">
-                  <div>
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex-1 min-w-0">
+                    <!-- Participant validé -->
                     <div class="font-medium text-gray-900 dark:text-white">
                       {{ validation.firstName }} {{ validation.lastName }}
                     </div>
@@ -265,11 +266,32 @@
                       {{ validation.name }}
                     </div>
                   </div>
-                  <div class="text-right">
+
+                  <div class="text-right flex-shrink-0 space-y-2">
                     <div class="text-xs text-gray-500 dark:text-gray-400">
                       {{ formatValidationTime(validation.entryValidatedAt) }}
                     </div>
-                    <UIcon name="i-heroicons-check-circle" class="text-green-500" />
+                    <!-- Validé par -->
+                    <div v-if="validation.validator" class="flex flex-col items-end gap-0.5">
+                      <UiUserDisplay
+                        :user="{
+                          ...validation.validator,
+                          pseudo: validation.validator.pseudo || validation.validator.prenom,
+                        }"
+                        size="sm"
+                      />
+                      <div class="text-xs text-gray-500 dark:text-gray-400">
+                        {{ validation.validator.prenom }} {{ validation.validator.nom }}
+                      </div>
+                    </div>
+                    <div v-else class="flex items-center justify-end gap-2">
+                      <span class="text-xs text-gray-500 dark:text-gray-400 italic">Inconnu</span>
+                      <div
+                        class="h-5 w-5 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center flex-shrink-0"
+                      >
+                        <UIcon name="i-heroicons-user" class="h-3 w-3 text-gray-500" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

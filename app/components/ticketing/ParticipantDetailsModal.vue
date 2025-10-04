@@ -73,24 +73,19 @@
         </div>
 
         <!-- Informations des participants -->
-        <div
-          v-if="participant.ticket.order.items && participant.ticket.order.items.length > 0"
-          class="space-y-4"
-        >
+        <div v-if="participantItems && participantItems.length > 0" class="space-y-4">
           <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
             <UIcon name="i-heroicons-user" class="text-primary-600 dark:text-primary-400" />
             <h4 class="font-semibold text-gray-900 dark:text-white">
               {{
-                participant.ticket.order.items.length > 1
-                  ? 'Participants'
-                  : $t('editions.ticketing.participant')
+                participantItems.length > 1 ? 'Participants' : $t('editions.ticketing.participant')
               }}
             </h4>
           </div>
 
           <div class="space-y-3">
             <div
-              v-for="item in participant.ticket.order.items"
+              v-for="item in participantItems"
               :key="item.id"
               class="p-3 rounded-lg relative"
               :class="
@@ -218,7 +213,7 @@
             <UButton
               v-if="
                 selectedParticipants.length <
-                participant.ticket.order.items.filter((item) => !item.entryValidated).length
+                participantItems.filter((item) => !item.entryValidated).length
               "
               variant="ghost"
               size="sm"
@@ -229,6 +224,177 @@
             <UButton v-else variant="ghost" size="sm" @click="selectedParticipants = []">
               Tout désélectionner
             </UButton>
+          </div>
+        </div>
+
+        <!-- Section Donations -->
+        <div v-if="donationItems && donationItems.length > 0" class="space-y-4">
+          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+            <UIcon name="i-heroicons-heart" class="text-pink-600 dark:text-pink-400" />
+            <h4 class="font-semibold text-gray-900 dark:text-white">
+              {{ donationItems.length > 1 ? 'Donations' : 'Donation' }}
+            </h4>
+          </div>
+
+          <div class="space-y-3">
+            <div
+              v-for="item in donationItems"
+              :key="item.id"
+              class="p-3 rounded-lg bg-pink-50 dark:bg-pink-900/20 border border-pink-200 dark:border-pink-800"
+            >
+              <div class="flex-1">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      {{ $t('editions.ticketing.full_name') }}
+                    </p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ item.firstName || '-' }} {{ item.lastName || '-' }}
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      {{ $t('editions.ticketing.email') }}
+                    </p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ item.email || '-' }}
+                    </p>
+                  </div>
+                </div>
+                <div class="mt-2 pt-2 border-t border-pink-200 dark:border-pink-700">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Type</p>
+                      <p class="text-sm font-medium text-gray-900 dark:text-white">
+                        {{ item.name || item.type }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        {{ $t('editions.ticketing.amount') }}
+                      </p>
+                      <p class="text-sm font-medium text-pink-600 dark:text-pink-400">
+                        {{ (item.amount / 100).toFixed(2) }} €
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Adhésions -->
+        <div v-if="membershipItems && membershipItems.length > 0" class="space-y-4">
+          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+            <UIcon name="i-heroicons-identification" class="text-blue-600 dark:text-blue-400" />
+            <h4 class="font-semibold text-gray-900 dark:text-white">
+              {{ membershipItems.length > 1 ? 'Adhésions' : 'Adhésion' }}
+            </h4>
+          </div>
+
+          <div class="space-y-3">
+            <div
+              v-for="item in membershipItems"
+              :key="item.id"
+              class="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
+            >
+              <div class="flex-1">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      {{ $t('editions.ticketing.full_name') }}
+                    </p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ item.firstName || '-' }} {{ item.lastName || '-' }}
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      {{ $t('editions.ticketing.email') }}
+                    </p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ item.email || '-' }}
+                    </p>
+                  </div>
+                </div>
+                <div class="mt-2 pt-2 border-t border-blue-200 dark:border-blue-700">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Type</p>
+                      <p class="text-sm font-medium text-gray-900 dark:text-white">
+                        {{ item.name || item.type }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        {{ $t('editions.ticketing.amount') }}
+                      </p>
+                      <p class="text-sm font-medium text-blue-600 dark:text-blue-400">
+                        {{ (item.amount / 100).toFixed(2) }} €
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Paiements -->
+        <div v-if="paymentItems && paymentItems.length > 0" class="space-y-4">
+          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+            <UIcon name="i-heroicons-credit-card" class="text-purple-600 dark:text-purple-400" />
+            <h4 class="font-semibold text-gray-900 dark:text-white">
+              {{ paymentItems.length > 1 ? 'Paiements' : 'Paiement' }}
+            </h4>
+          </div>
+
+          <div class="space-y-3">
+            <div
+              v-for="item in paymentItems"
+              :key="item.id"
+              class="p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800"
+            >
+              <div class="flex-1">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      {{ $t('editions.ticketing.full_name') }}
+                    </p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ item.firstName || '-' }} {{ item.lastName || '-' }}
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      {{ $t('editions.ticketing.email') }}
+                    </p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ item.email || '-' }}
+                    </p>
+                  </div>
+                </div>
+                <div class="mt-2 pt-2 border-t border-purple-200 dark:border-purple-700">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Type</p>
+                      <p class="text-sm font-medium text-gray-900 dark:text-white">
+                        {{ item.name || item.type }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        {{ $t('editions.ticketing.amount') }}
+                      </p>
+                      <p class="text-sm font-medium text-purple-600 dark:text-purple-400">
+                        {{ (item.amount / 100).toFixed(2) }} €
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -675,13 +841,36 @@ watch(
   }
 )
 
+// Computed pour séparer les items entre participants et types spéciaux
+const participantItems = computed(() => {
+  if (!props.participant || !('ticket' in props.participant)) return []
+  return (
+    props.participant.ticket.order.items?.filter(
+      (item) => item.type !== 'Donation' && item.type !== 'Membership' && item.type !== 'Payment'
+    ) || []
+  )
+})
+
+const donationItems = computed(() => {
+  if (!props.participant || !('ticket' in props.participant)) return []
+  return props.participant.ticket.order.items?.filter((item) => item.type === 'Donation') || []
+})
+
+const membershipItems = computed(() => {
+  if (!props.participant || !('ticket' in props.participant)) return []
+  return props.participant.ticket.order.items?.filter((item) => item.type === 'Membership') || []
+})
+
+const paymentItems = computed(() => {
+  if (!props.participant || !('ticket' in props.participant)) return []
+  return props.participant.ticket.order.items?.filter((item) => item.type === 'Payment') || []
+})
+
 const selectAllParticipants = () => {
   if (props.participant && 'ticket' in props.participant) {
-    // Ne sélectionner que les participants non-validés
+    // Ne sélectionner que les participants non-validés et non-donations
     selectedParticipants.value =
-      props.participant.ticket.order.items
-        ?.filter((item) => !item.entryValidated)
-        .map((item) => item.id) || []
+      participantItems.value.filter((item) => !item.entryValidated).map((item) => item.id) || []
   }
 }
 

@@ -104,15 +104,6 @@ export default defineEventHandler(async (event) => {
 
           // Créer ou mettre à jour les items
           for (const item of order.items) {
-            // Ignorer les donations et autres items qui ne sont pas des billets
-            if (item.type === 'Donation' || item.type === 'Membership' || item.type === 'Payment') {
-              console.log('⏭️  Item ignoré (type non-billet):', {
-                itemType: item.type,
-                itemAmount: item.amount,
-              })
-              continue
-            }
-
             // Trouver le tarif correspondant par l'ID HelloAsso du tarif
             const matchingTier = tiers.find((tier) => {
               // Utiliser le tierId de HelloAsso si disponible
@@ -159,7 +150,8 @@ export default defineEventHandler(async (event) => {
                 firstName: item.user?.firstName || order.payer.firstName,
                 lastName: item.user?.lastName || order.payer.lastName,
                 email: item.user?.email || order.payer.email,
-                name: item.name || `${item.type} - ${item.priceCategory}`,
+                name: item.name || null,
+                type: item.type,
                 amount: item.amount,
                 state: item.state,
                 qrCode: item.qrCode,
@@ -170,7 +162,8 @@ export default defineEventHandler(async (event) => {
                 firstName: item.user?.firstName || order.payer.firstName,
                 lastName: item.user?.lastName || order.payer.lastName,
                 email: item.user?.email || order.payer.email,
-                name: item.name || `${item.type} - ${item.priceCategory}`,
+                name: item.name || null,
+                type: item.type,
                 amount: item.amount,
                 state: item.state,
                 qrCode: item.qrCode,

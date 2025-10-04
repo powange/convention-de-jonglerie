@@ -106,9 +106,31 @@ export default defineEventHandler(async (event) => {
       })
       .slice(0, 10)
 
+    // Récupérer les infos des validateurs
+    const validatorIds = allValidations
+      .map((v) => v.entryValidatedBy)
+      .filter((id): id is number => id !== null && id !== undefined)
+    const validators = await prisma.user.findMany({
+      where: { id: { in: validatorIds } },
+      select: {
+        id: true,
+        pseudo: true,
+        prenom: true,
+        nom: true,
+        email: true,
+      },
+    })
+    const validatorMap = new Map(validators.map((v) => [v.id, v]))
+
+    // Ajouter les infos des validateurs aux validations
+    const validationsWithValidators = allValidations.map((v) => ({
+      ...v,
+      validator: v.entryValidatedBy ? validatorMap.get(v.entryValidatedBy) : null,
+    }))
+
     return {
       success: true,
-      validations: allValidations,
+      validations: validationsWithValidators,
     }
   } catch (error: any) {
     console.error('Database recent validations error:', error)

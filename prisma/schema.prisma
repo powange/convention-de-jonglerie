@@ -986,7 +986,8 @@ model HelloAssoOrderItem {
   email           String?
 
   // Détails du billet
-  name            String   // Nom du tarif
+  name            String?  // Nom du tarif
+  type            String?  // Type d'item HelloAsso (Donation, Payment, Membership, etc.)
   amount          Int      // Prix payé en centimes
   state           String   // Processed, Refunded, etc.
   qrCode          String?  // Code QR pour le contrôle d'accès
