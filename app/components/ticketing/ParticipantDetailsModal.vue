@@ -704,6 +704,8 @@ const confirmValidateEntry = async () => {
     // Si ce sont des tickets sélectionnés
     else if (selectedParticipants.value.length > 0) {
       emit('validate', selectedParticipants.value)
+      // Réinitialiser la sélection après validation
+      selectedParticipants.value = []
     }
     showValidateModal.value = false
   } finally {

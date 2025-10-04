@@ -14,7 +14,7 @@ export interface QuotaStats {
  * Calcule les statistiques d'utilisation des quotas pour une édition
  */
 export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
-  // Récupérer tous les quotas de l'édition avec leurs tarifs associés
+  // Récupérer tous les quotas de l'édition avec leurs tarifs et options associés
   const quotas = await prisma.ticketingQuota.findMany({
     where: { editionId },
     include: {
@@ -31,8 +31,30 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
           },
         },
       },
+      options: {
+        include: {
+          option: true,
+        },
+      },
     },
     orderBy: { title: 'asc' },
+  })
+
+  // Récupérer tous les order items avec leurs customFields pour analyser les options
+  const allOrderItems = await prisma.helloAssoOrderItem.findMany({
+    where: {
+      state: 'Processed',
+      order: {
+        externalTicketing: {
+          editionId: editionId,
+        },
+      },
+    },
+    select: {
+      id: true,
+      customFields: true,
+      entryValidated: true,
+    },
   })
 
   // Calculer les stats pour chaque quota
@@ -41,11 +63,33 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
     let currentCount = 0
     let validatedCount = 0
 
+    // 1. Compter les participants via les tarifs
     for (const tierQuota of quota.tiers) {
       for (const orderItem of tierQuota.tier.orderItems) {
         currentCount++
         if (orderItem.entryValidated) {
           validatedCount++
+        }
+      }
+    }
+
+    // 2. Compter les participants via les options (dans customFields)
+    for (const optionQuota of quota.options) {
+      const optionName = optionQuota.option.name
+
+      for (const orderItem of allOrderItems) {
+        if (orderItem.customFields && Array.isArray(orderItem.customFields)) {
+          // Vérifier si cet orderItem a sélectionné cette option
+          const hasOption = (orderItem.customFields as any[]).some(
+            (field) => field.name === optionName && field.answer
+          )
+
+          if (hasOption) {
+            currentCount++
+            if (orderItem.entryValidated) {
+              validatedCount++
+            }
+          }
         }
       }
     }
