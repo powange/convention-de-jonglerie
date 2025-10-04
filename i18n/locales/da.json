@@ -1108,7 +1108,7 @@
       "edit_slot_subtitle": "Rediger detaljerne for dette tidsrum",
       "edit_team": "Rediger hold",
       "edit_teams_title": "Edit assigned teams",
-      "email_placeholder": "eksempel@mail.com",
+      "email_placeholder": "eksempel{'@'}mail.com",
       "emergency_contact_hint": "Person at kontakte i tilfælde af nødsituation under begivenheden",
       "emergency_contact_name": "Navn på nødkontakt",
       "emergency_contact_name_placeholder": "F.eks: Anna Hansen",

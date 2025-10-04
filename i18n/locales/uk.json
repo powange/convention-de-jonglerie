@@ -1108,7 +1108,7 @@
       "edit_slot_subtitle": "Редагувати деталі цього слоту",
       "edit_team": "Редагувати команду",
       "edit_teams_title": "Edit assigned teams",
-      "email_placeholder": "приклад@mail.com",
+      "email_placeholder": "приклад{'@'}mail.com",
       "emergency_contact_hint": "Особа для зв'язку в екстреній ситуації під час заходу",
       "emergency_contact_name": "Ім'я екстреного контакту",
       "emergency_contact_name_placeholder": "Наприклад: Марія Іванова",

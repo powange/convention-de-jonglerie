@@ -1108,7 +1108,7 @@
       "edit_slot_subtitle": "Details van dit tijdslot bewerken",
       "edit_team": "Team bewerken",
       "edit_teams_title": "Edit assigned teams",
-      "email_placeholder": "voorbeeld@mail.com",
+      "email_placeholder": "voorbeeld{'@'}mail.com",
       "emergency_contact_hint": "Persoon om te contacteren in geval van nood tijdens het evenement",
       "emergency_contact_name": "Naam van noodcontact",
       "emergency_contact_name_placeholder": "Bijv.: Anna de Vries",

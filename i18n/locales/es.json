@@ -1108,7 +1108,7 @@
       "edit_slot_subtitle": "Editar los detalles de esta franja horaria",
       "edit_team": "Editar equipo",
       "edit_teams_title": "Edit assigned teams",
-      "email_placeholder": "ejemplo@mail.com",
+      "email_placeholder": "ejemplo{'@'}mail.com",
       "emergency_contact_hint": "Persona a contactar en caso de emergencia durante el evento",
       "emergency_contact_name": "Nombre del contacto de emergencia",
       "emergency_contact_name_placeholder": "Ej.: María García",

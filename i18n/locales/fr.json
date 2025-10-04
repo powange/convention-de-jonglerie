@@ -958,7 +958,7 @@
       "add_volunteer_title": "Ajouter un bénévole manuellement",
       "search_by_email": "Rechercher par email",
       "search_by_email_description": "Recherchez un utilisateur par son adresse email",
-      "email_placeholder": "exemple@mail.com",
+      "email_placeholder": "exemple{'@'}mail.com",
       "users_found": "Utilisateurs trouvés",
       "no_user_found": "Aucun utilisateur trouvé",
       "selected_user": "Utilisateur sélectionné",

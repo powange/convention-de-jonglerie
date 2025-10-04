@@ -1108,7 +1108,7 @@
       "edit_slot_subtitle": "Edytuj szczegóły tego przedziału",
       "edit_team": "Edytuj zespół",
       "edit_teams_title": "Edit assigned teams",
-      "email_placeholder": "przyklad@mail.com",
+      "email_placeholder": "przyklad{'@'}mail.com",
       "emergency_contact_hint": "Osoba do kontaktu w nagłych przypadkach podczas wydarzenia",
       "emergency_contact_name": "Nazwa kontaktu awaryjnego",
       "emergency_contact_name_placeholder": "Np.: Anna Kowalska",

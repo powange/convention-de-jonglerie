@@ -1108,7 +1108,7 @@
       "edit_slot_subtitle": "Edit this slot details",
       "edit_team": "Edit team",
       "edit_teams_title": "Edit assigned teams",
-      "email_placeholder": "example@mail.com",
+      "email_placeholder": "example{'@'}mail.com",
       "emergency_contact_hint": "Person to contact in case of emergency during the event",
       "emergency_contact_name": "Emergency contact name",
       "emergency_contact_name_placeholder": "E.g.: Jane Smith",

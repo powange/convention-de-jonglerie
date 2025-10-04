@@ -1108,7 +1108,7 @@
       "edit_slot_subtitle": "Изменить детали этого слота",
       "edit_team": "Редактировать команду",
       "edit_teams_title": "Edit assigned teams",
-      "email_placeholder": "пример@mail.com",
+      "email_placeholder": "пример{'@'}mail.com",
       "emergency_contact_hint": "Лицо для связи в экстренной ситуации во время мероприятия",
       "emergency_contact_name": "Имя экстренного контакта",
       "emergency_contact_name_placeholder": "Например: Мария Иванова",

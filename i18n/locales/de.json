@@ -1108,7 +1108,7 @@
       "edit_slot_subtitle": "Details dieses Zeitslots bearbeiten",
       "edit_team": "Team bearbeiten",
       "edit_teams_title": "Edit assigned teams",
-      "email_placeholder": "beispiel@mail.com",
+      "email_placeholder": "beispiel{'@'}mail.com",
       "emergency_contact_hint": "Person, die im Notfall während der Veranstaltung zu kontaktieren ist",
       "emergency_contact_name": "Name des Notfallkontakts",
       "emergency_contact_name_placeholder": "Z.B.: Maria Schmidt",
