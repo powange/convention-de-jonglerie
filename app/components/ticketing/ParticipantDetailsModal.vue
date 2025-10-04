@@ -496,6 +496,11 @@
     icon-name="i-heroicons-information-circle"
     icon-color="text-blue-500"
     :loading="validating"
+    :checklist-items="returnableItemsToDistribute"
+    checklist-title="Articles à remettre au participant"
+    checklist-icon="i-heroicons-gift"
+    checklist-icon-color="text-orange-600 dark:text-orange-400"
+    checklist-warning="Vous devez cocher tous les articles avant de pouvoir valider l'entrée"
     @confirm="confirmValidateEntry"
     @cancel="showValidateModal = false"
   />
@@ -553,6 +558,16 @@ interface TicketData {
           name: string
           answer: string
         }>
+        tier?: {
+          id: number
+          name: string
+          returnableItems?: Array<{
+            returnableItem: {
+              id: number
+              name: string
+            }
+          }>
+        }
       }>
     }
     customFields?: Array<{
@@ -619,6 +634,36 @@ const validating = ref(false)
 const showValidateModal = ref(false)
 const showInvalidateModal = ref(false)
 const ticketToInvalidate = ref<number | null>(null)
+
+// Gestion des articles à restituer
+const returnableItemsToDistribute = computed(() => {
+  if (!props.participant || !('ticket' in props.participant)) return []
+
+  // Récupérer tous les articles à restituer des participants sélectionnés
+  const itemsList: Array<{ id: string; name: string; participantName: string }> = []
+
+  const itemsToCheck =
+    props.participant.ticket.order.items?.filter((item) =>
+      selectedParticipants.value.includes(item.id)
+    ) || []
+
+  for (const item of itemsToCheck) {
+    const participantName = `${item.firstName || ''} ${item.lastName || ''}`.trim() || 'Participant'
+
+    if (item.tier?.returnableItems) {
+      for (const tierItem of item.tier.returnableItems) {
+        // Créer un ID unique par participant et article
+        itemsList.push({
+          id: `${item.id}-${tierItem.returnableItem.id}`,
+          name: `${tierItem.returnableItem.name} - ${participantName}`,
+          participantName,
+        })
+      }
+    }
+  }
+
+  return itemsList
+})
 
 // Réinitialiser la sélection quand la modal s'ouvre
 watch(

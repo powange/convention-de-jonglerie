@@ -23,6 +23,17 @@ export default defineEventHandler(async (event) => {
         helloAssoOrders: {
           include: {
             items: {
+              include: {
+                tier: {
+                  include: {
+                    returnableItems: {
+                      include: {
+                        returnableItem: true,
+                      },
+                    },
+                  },
+                },
+              },
               orderBy: { id: 'asc' },
             },
           },

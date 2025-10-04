@@ -1,5 +1,5 @@
-import { canAccessEditionData } from '../../../../utils/edition-permissions'
-import { prisma } from '../../../../utils/prisma'
+import { canAccessEditionData } from '../../../../../utils/edition-permissions'
+import { prisma } from '../../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
@@ -16,35 +16,22 @@ export default defineEventHandler(async (event) => {
     })
 
   try {
-    // Récupérer la configuration de billeterie externe
+    // Récupérer les options HelloAsso (uniquement si une config existe)
     const config = await prisma.externalTicketing.findUnique({
       where: { editionId },
       include: {
-        helloAssoTiers: {
-          orderBy: { price: 'asc' },
-        },
         helloAssoOptions: {
-          orderBy: { name: 'asc' },
+          orderBy: { position: 'asc' },
         },
       },
     })
 
-    if (!config) {
-      return {
-        tiers: [],
-        options: [],
-      }
-    }
-
-    return {
-      tiers: config.helloAssoTiers,
-      options: config.helloAssoOptions,
-    }
+    return config?.helloAssoOptions || []
   } catch (error: any) {
-    console.error('Failed to fetch tiers from DB:', error)
+    console.error('Failed to fetch options from DB:', error)
     throw createError({
       statusCode: 500,
-      message: 'Erreur lors de la récupération des tarifs',
+      message: 'Erreur lors de la récupération des options',
     })
   }
 })

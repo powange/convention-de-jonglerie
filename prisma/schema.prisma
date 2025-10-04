@@ -140,6 +140,9 @@ model Edition {
   volunteerTeams               VolunteerTeam[]
   volunteerTimeSlots           VolunteerTimeSlot[]
   externalTicketing            ExternalTicketing?
+  tiers                        HelloAssoTier[]
+  ticketingQuotas              TicketingQuota[]
+  returnableItems              ReturnableItem[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -812,8 +815,9 @@ model HelloAssoConfig {
 
 model HelloAssoTier {
   id                  Int      @id @default(autoincrement())
-  externalTicketingId String
-  helloAssoTierId     Int      // ID du tarif dans HelloAsso
+  externalTicketingId String?  // Null si tarif manuel (non HelloAsso)
+  helloAssoTierId     Int?     // ID du tarif dans HelloAsso, null si tarif manuel
+  editionId           Int      // Toujours associé à une édition
   name                String
   description         String?  @db.Text
   price               Int      // Prix en centimes
@@ -824,10 +828,69 @@ model HelloAssoTier {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  externalTicketing ExternalTicketing @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  externalTicketing ExternalTicketing?     @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  edition           Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  quotas            TierQuota[]
+  returnableItems   TierReturnableItem[]
+  orderItems        HelloAssoOrderItem[]
 
   @@unique([externalTicketingId, helloAssoTierId])
   @@index([externalTicketingId])
+  @@index([editionId])
+}
+
+model TicketingQuota {
+  id          Int      @id @default(autoincrement())
+  editionId   Int
+  title       String
+  description String?  @db.Text
+  quantity    Int      // Nombre (toujours positif)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  edition Edition     @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  tiers   TierQuota[]
+
+  @@index([editionId])
+}
+
+model ReturnableItem {
+  id        Int      @id @default(autoincrement())
+  editionId Int
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  edition Edition              @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  tiers   TierReturnableItem[]
+
+  @@index([editionId])
+}
+
+model TierQuota {
+  id      Int @id @default(autoincrement())
+  tierId  Int
+  quotaId Int
+
+  tier  HelloAssoTier  @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  quota TicketingQuota @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+
+  @@unique([tierId, quotaId])
+  @@index([tierId])
+  @@index([quotaId])
+}
+
+model TierReturnableItem {
+  id               Int @id @default(autoincrement())
+  tierId           Int
+  returnableItemId Int
+
+  tier           HelloAssoTier  @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  returnableItem ReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+
+  @@unique([tierId, returnableItemId])
+  @@index([tierId])
+  @@index([returnableItemId])
 }
 
 model HelloAssoOption {
@@ -881,6 +944,7 @@ model HelloAssoOrderItem {
   id              Int      @id @default(autoincrement())
   orderId         Int      // Lien vers HelloAssoOrder
   helloAssoItemId Int      // ID de l'item dans HelloAsso
+  tierId          Int?     // Lien vers le tarif HelloAsso
 
   // Informations du participant (peut différer du payeur)
   firstName       String?
@@ -905,9 +969,11 @@ model HelloAssoOrderItem {
   updatedAt       DateTime @updatedAt
 
   order           HelloAssoOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  tier            HelloAssoTier? @relation(fields: [tierId], references: [id])
 
   @@unique([orderId, helloAssoItemId])
   @@index([orderId])
+  @@index([tierId])
   @@index([email])
   @@index([qrCode])
   @@index([entryValidated])

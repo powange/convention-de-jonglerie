@@ -65,8 +65,15 @@ export default defineEventHandler(async (event) => {
     )
 
     // Sauvegarder les commandes et items en BDD
+    console.log('💾 Nombre de commandes à sauvegarder:', result.data?.length || 0)
     if (result.data && result.data.length > 0) {
       await prisma.$transaction(async (tx) => {
+        // Récupérer tous les tarifs de l'édition pour faire la correspondance
+        const tiers = await tx.helloAssoTier.findMany({
+          where: { editionId },
+        })
+        console.log('📊 Nombre de tarifs disponibles:', tiers.length)
+
         for (const order of result.data) {
           // Créer ou mettre à jour la commande
           const savedOrder = await tx.helloAssoOrder.upsert({
@@ -97,6 +104,47 @@ export default defineEventHandler(async (event) => {
 
           // Créer ou mettre à jour les items
           for (const item of order.items) {
+            // Ignorer les donations et autres items qui ne sont pas des billets
+            if (item.type === 'Donation' || item.type === 'Membership' || item.type === 'Payment') {
+              console.log('⏭️  Item ignoré (type non-billet):', {
+                itemType: item.type,
+                itemAmount: item.amount,
+              })
+              continue
+            }
+
+            // Trouver le tarif correspondant par l'ID HelloAsso du tarif
+            const matchingTier = tiers.find((tier) => {
+              // Utiliser le tierId de HelloAsso si disponible
+              if (item.tierId && tier.helloAssoTierId === item.tierId) {
+                return true
+              }
+              // Sinon, fallback sur le nom (et ignorer le prix pour les tarifs libres)
+              return tier.name === item.name || tier.name === item.priceCategory
+            })
+
+            // Log pour déboguer
+            if (!matchingTier) {
+              console.log('❌ Aucun tarif trouvé pour:', {
+                itemType: item.type,
+                itemTierId: item.tierId,
+                itemName: item.name,
+                itemPriceCategory: item.priceCategory,
+                itemAmount: item.amount,
+                availableTiers: tiers.map((t) => ({
+                  helloAssoTierId: t.helloAssoTierId,
+                  name: t.name,
+                  price: t.price,
+                })),
+              })
+            } else {
+              console.log('✅ Tarif trouvé:', {
+                tierName: matchingTier.name,
+                itemName: item.name,
+                itemTierId: item.tierId,
+              })
+            }
+
             await tx.helloAssoOrderItem.upsert({
               where: {
                 orderId_helloAssoItemId: {
@@ -107,6 +155,7 @@ export default defineEventHandler(async (event) => {
               create: {
                 orderId: savedOrder.id,
                 helloAssoItemId: item.id,
+                tierId: matchingTier?.id,
                 firstName: item.user?.firstName || order.payer.firstName,
                 lastName: item.user?.lastName || order.payer.lastName,
                 email: item.user?.email || order.payer.email,
@@ -117,6 +166,7 @@ export default defineEventHandler(async (event) => {
                 customFields: item.customFields || null,
               },
               update: {
+                tierId: matchingTier?.id,
                 firstName: item.user?.firstName || order.payer.firstName,
                 lastName: item.user?.lastName || order.payer.lastName,
                 email: item.user?.email || order.payer.email,

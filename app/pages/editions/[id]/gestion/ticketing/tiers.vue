@@ -63,41 +63,11 @@
         <!-- Stats -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <UCard>
-            <div class="flex items-center gap-4">
-              <div class="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-                <UIcon name="i-heroicons-ticket" class="h-6 w-6 text-primary-600" />
-              </div>
-              <div>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Tarifs disponibles</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                  {{ tiers.length }}
-                </p>
-              </div>
-            </div>
-          </UCard>
-
-          <UCard>
-            <div class="flex items-center gap-4">
-              <div class="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                <UIcon name="i-heroicons-adjustments-horizontal" class="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Options disponibles</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                  {{ options.length }}
-                </p>
-              </div>
-            </div>
-          </UCard>
-
-          <UCard>
-            <div class="flex items-center gap-4">
-              <div class="p-3 bg-success-100 dark:bg-success-900/30 rounded-lg">
-                <UIcon name="i-heroicons-clock" class="h-6 w-6 text-success-600" />
-              </div>
-              <div>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Dernière sync</p>
-                <p class="text-sm font-medium text-gray-900 dark:text-white">
+            <div class="flex items-center gap-3">
+              <UIcon name="i-heroicons-clock" class="h-5 w-5 text-success-600" />
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-gray-900 dark:text-white truncate">
+                  <span class="text-gray-600 dark:text-gray-400">Sync:</span>
                   {{ lastSyncText }}
                 </p>
               </div>
@@ -108,136 +78,34 @@
         <!-- Tabs pour tarifs et options -->
         <UTabs :items="tabs" variant="link">
           <template #tarifs>
-            <!-- Liste des tarifs -->
-            <div v-if="loading" class="text-center py-12">
-              <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 text-gray-400 animate-spin" />
-              <p class="text-sm text-gray-500 mt-2">Chargement...</p>
-            </div>
-
-            <div v-else-if="tiers.length === 0" class="text-center py-12">
-              <UIcon name="i-heroicons-inbox" class="h-12 w-12 text-gray-300 mb-3 mx-auto" />
-              <p class="text-sm text-gray-500">Aucun tarif trouvé</p>
-              <p class="text-xs text-gray-400 mt-1">Synchronisez depuis votre billeterie externe</p>
-            </div>
-
-            <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <UCard v-for="tier in tiers" :key="tier.id" :class="!tier.isActive && 'opacity-60'">
-                <div class="space-y-3">
-                  <!-- En-tête -->
-                  <div class="flex items-start justify-between">
-                    <h3 class="font-semibold text-gray-900 dark:text-white">
-                      {{ tier.name }}
-                    </h3>
-                    <UBadge v-if="!tier.isActive" color="neutral" variant="soft" size="xs">
-                      Inactif
-                    </UBadge>
-                  </div>
-
-                  <!-- Prix -->
-                  <div class="flex items-baseline gap-1">
-                    <span
-                      class="text-3xl font-bold"
-                      :class="
-                        tier.isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400'
-                      "
-                    >
-                      {{ (tier.price / 100).toFixed(2) }}
-                    </span>
-                    <span class="text-sm text-gray-500">€</span>
-                  </div>
-
-                  <!-- Description -->
-                  <p
-                    v-if="tier.description"
-                    class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3"
-                  >
-                    {{ tier.description }}
-                  </p>
-
-                  <!-- Montants min/max -->
-                  <div v-if="tier.minAmount || tier.maxAmount" class="text-xs text-gray-500">
-                    <div v-if="tier.minAmount" class="flex items-center gap-1">
-                      <span>Min:</span>
-                      <span class="font-medium">{{ (tier.minAmount / 100).toFixed(2) }}€</span>
-                    </div>
-                    <div v-if="tier.maxAmount" class="flex items-center gap-1">
-                      <span>Max:</span>
-                      <span class="font-medium">{{ (tier.maxAmount / 100).toFixed(2) }}€</span>
-                    </div>
-                  </div>
-
-                  <!-- ID HelloAsso -->
-                  <div class="pt-2 border-t border-gray-100 dark:border-gray-800">
-                    <p class="text-xs text-gray-400 font-mono">
-                      HelloAsso ID: {{ tier.helloAssoTierId }}
-                    </p>
-                  </div>
-                </div>
-              </UCard>
-            </div>
+            <TicketingTiersList
+              :tiers="tiers"
+              :loading="loading"
+              :edition-id="editionId"
+              @refresh="loadData"
+            />
           </template>
 
           <template #options>
-            <!-- Liste des options -->
-            <div v-if="loading" class="text-center py-12">
-              <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 text-gray-400 animate-spin" />
-              <p class="text-sm text-gray-500 mt-2">Chargement...</p>
-            </div>
+            <TicketingOptionsList :options="options" :loading="loading" />
+          </template>
 
-            <div v-else-if="options.length === 0" class="text-center py-12">
-              <UIcon name="i-heroicons-inbox" class="h-12 w-12 text-gray-300 mb-3 mx-auto" />
-              <p class="text-sm text-gray-500">Aucune option trouvée</p>
-              <p class="text-xs text-gray-400 mt-1">Synchronisez depuis votre billeterie externe</p>
-            </div>
+          <template #quotas>
+            <TicketingQuotasList
+              :quotas="quotas"
+              :loading="loadingQuotas"
+              :edition-id="editionId"
+              @refresh="loadQuotas"
+            />
+          </template>
 
-            <div v-else class="space-y-4">
-              <UCard v-for="option in options" :key="option.id">
-                <div class="flex items-start justify-between gap-4">
-                  <!-- Contenu -->
-                  <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-2">
-                      <h3 class="font-semibold text-gray-900 dark:text-white">
-                        {{ option.name }}
-                      </h3>
-                      <UBadge color="primary" variant="soft" size="xs">
-                        {{ option.type }}
-                      </UBadge>
-                      <UBadge v-if="option.isRequired" color="warning" variant="soft" size="xs">
-                        Obligatoire
-                      </UBadge>
-                    </div>
-
-                    <p
-                      v-if="option.description"
-                      class="text-sm text-gray-600 dark:text-gray-400 mb-3"
-                    >
-                      {{ option.description }}
-                    </p>
-
-                    <!-- Choix disponibles -->
-                    <div
-                      v-if="option.choices && option.choices.length > 0"
-                      class="flex flex-wrap gap-1.5"
-                    >
-                      <UBadge
-                        v-for="(choice, idx) in option.choices"
-                        :key="idx"
-                        color="neutral"
-                        variant="subtle"
-                        size="sm"
-                      >
-                        {{ choice }}
-                      </UBadge>
-                    </div>
-
-                    <!-- ID HelloAsso -->
-                    <p class="text-xs text-gray-400 font-mono mt-3">
-                      HelloAsso ID: {{ option.helloAssoOptionId }}
-                    </p>
-                  </div>
-                </div>
-              </UCard>
-            </div>
+          <template #arestituer>
+            <TicketingReturnableItemsList
+              :items="returnableItems"
+              :loading="loadingReturnableItems"
+              :edition-id="editionId"
+              @refresh="loadReturnableItems"
+            />
           </template>
         </UTabs>
       </div>
@@ -251,6 +119,8 @@ import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { fetchOptions } from '~/utils/ticketing/options'
+import { fetchTiers } from '~/utils/ticketing/tiers'
 
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -264,6 +134,14 @@ const hasExternalTicketing = ref(false)
 const lastSync = ref<Date | null>(null)
 const tiers = ref<any[]>([])
 const options = ref<any[]>([])
+
+// Quotas
+const loadingQuotas = ref(true)
+const quotas = ref<any[]>([])
+
+// Items à restituer
+const loadingReturnableItems = ref(true)
+const returnableItems = ref<any[]>([])
 
 const lastSyncText = computed(() => {
   if (!lastSync.value) return 'Jamais'
@@ -292,6 +170,18 @@ const tabs = computed(() => [
     slot: 'options',
     badge: options.value.length,
   },
+  {
+    label: 'Quotas',
+    icon: 'i-heroicons-chart-bar',
+    slot: 'quotas',
+    badge: quotas.value.length,
+  },
+  {
+    label: 'À restituer',
+    icon: 'i-heroicons-gift',
+    slot: 'arestituer',
+    badge: returnableItems.value.length,
+  },
 ])
 
 onMounted(async () => {
@@ -306,6 +196,8 @@ onMounted(async () => {
 
   if (canAccess.value) {
     await loadData()
+    await loadQuotas()
+    await loadReturnableItems()
   }
 })
 
@@ -321,10 +213,14 @@ const loadData = async () => {
         ? new Date(configResponse.config.lastSyncAt)
         : null
 
-      // Charger les tarifs depuis la BDD
-      const tiersResponse = await $fetch(`/api/editions/${editionId}/ticketing/tiers-from-db`)
-      tiers.value = tiersResponse.tiers || []
-      options.value = tiersResponse.options || []
+      // Charger les tarifs et options depuis la BDD
+      const [tiersData, optionsData] = await Promise.all([
+        fetchTiers(editionId),
+        fetchOptions(editionId),
+      ])
+
+      tiers.value = tiersData
+      options.value = optionsData
     }
   } catch (error) {
     console.error('Failed to load data:', error)
@@ -355,4 +251,28 @@ const canAccess = computed(() => {
   }
   return false
 })
+
+// Fonctions pour les quotas
+const loadQuotas = async () => {
+  loadingQuotas.value = true
+  try {
+    quotas.value = await $fetch(`/api/editions/${editionId}/ticketing/quotas`)
+  } catch (error) {
+    console.error('Failed to load quotas:', error)
+  } finally {
+    loadingQuotas.value = false
+  }
+}
+
+// Fonctions pour les items à restituer
+const loadReturnableItems = async () => {
+  loadingReturnableItems.value = true
+  try {
+    returnableItems.value = await $fetch(`/api/editions/${editionId}/ticketing/returnable-items`)
+  } catch (error) {
+    console.error('Failed to load returnable items:', error)
+  } finally {
+    loadingReturnableItems.value = false
+  }
+}
 </script>

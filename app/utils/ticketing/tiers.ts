@@ -1,0 +1,63 @@
+export interface Tier {
+  id: number
+  name: string
+  description: string | null
+  price: number
+  minAmount: number | null
+  maxAmount: number | null
+  isActive: boolean
+  helloAssoTierId: number | null
+  quotas?: Array<{
+    quota: {
+      id: number
+      title: string
+      description: string | null
+      quantity: number
+    }
+  }>
+  returnableItems?: Array<{
+    returnableItem: {
+      id: number
+      name: string
+    }
+  }>
+}
+
+export interface TierFormData {
+  name: string
+  description: string | null
+  price: number
+  minAmount: number | null
+  maxAmount: number | null
+  isActive: boolean
+  quotaIds: number[]
+  returnableItemIds: number[]
+}
+
+export async function fetchTiers(editionId: number): Promise<Tier[]> {
+  return await $fetch(`/api/editions/${editionId}/ticketing/tiers`)
+}
+
+export async function createTier(editionId: number, data: TierFormData): Promise<void> {
+  await $fetch(`/api/editions/${editionId}/ticketing/tiers`, {
+    method: 'POST',
+    body: data,
+  })
+}
+
+export async function updateTier(
+  editionId: number,
+  tierId: number,
+  data: TierFormData
+): Promise<void> {
+  await $fetch(`/api/editions/${editionId}/ticketing/tiers/${tierId}`, {
+    method: 'PUT',
+    body: data,
+  })
+}
+
+export async function deleteTier(editionId: number, tierId: number): Promise<void> {
+  await $fetch(`/api/editions/${editionId}/ticketing/tiers/${tierId}`, {
+    method: 'DELETE',
+  })
+}

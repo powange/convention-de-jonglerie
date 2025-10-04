@@ -165,6 +165,17 @@ export default defineEventHandler(async (event) => {
           order: {
             include: {
               items: {
+                include: {
+                  tier: {
+                    include: {
+                      returnableItems: {
+                        include: {
+                          returnableItem: true,
+                        },
+                      },
+                    },
+                  },
+                },
                 orderBy: { id: 'asc' },
               },
             },
@@ -209,6 +220,18 @@ export default defineEventHandler(async (event) => {
                   customFields: item.customFields as any,
                   entryValidated: item.entryValidated,
                   entryValidatedAt: item.entryValidatedAt,
+                  tier: item.tier
+                    ? {
+                        id: item.tier.id,
+                        name: item.tier.name,
+                        returnableItems: item.tier.returnableItems.map((ri) => ({
+                          returnableItem: {
+                            id: ri.returnableItem.id,
+                            name: ri.returnableItem.name,
+                          },
+                        })),
+                      }
+                    : null,
                 })),
               },
               customFields: orderItem.customFields as any,

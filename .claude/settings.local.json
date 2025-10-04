@@ -96,7 +96,8 @@
       "Bash(npm info:*)",
       "Bash(/tmp/fix-participant-modal.sh:*)",
       "Bash(/tmp/fix-external.sh:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "WebFetch(domain:heroicons.com)"
     ],
     "deny": [],
     "ask": [],

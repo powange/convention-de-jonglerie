@@ -93,6 +93,7 @@ export default defineEventHandler(async (event) => {
             create: {
               externalTicketingId: config.id,
               helloAssoTierId: tier.id,
+              editionId: editionId,
               name: tier.name,
               description: tier.description,
               price: tier.price,
