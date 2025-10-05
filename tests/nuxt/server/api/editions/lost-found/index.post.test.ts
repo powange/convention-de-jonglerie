@@ -11,7 +11,7 @@ vi.mock('#imports', async () => {
 import { requireUserSession } from '#imports'
 
 // Mock des utilitaires
-vi.mock('../../../../../server/utils/permissions', () => ({
+vi.mock('../../../../../../server/utils/permissions/permissions', () => ({
   hasEditionEditPermission: vi.fn(),
 }))
 
