@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // Import des mocks
 import { getEmailHash } from '../../../../../server/utils/email-hash'
 import { prisma } from '../../../../../server/utils/prisma'
-import handler from '../../../../server/api/editions/[id]/carpool-offers.get'
+import handler from '../../../../server/api/editions/[id]/carpool-offers/index.get'
 
 // Mock des utilitaires
 vi.mock('../../../../server/utils/email-hash', () => ({

@@ -145,6 +145,16 @@ Processus d'exécution des tests complet qui :
 3. **Analyse et correction des erreurs** (si des tests échouent)
    Analyse des erreurs de tests et correction manuelle des problèmes identifiés.
 
+**Commande `/quality-check` :**
+
+Processus complet de vérification de la qualité du code avant commit qui enchaîne :
+
+1. **Lint et correction** - Exécute `/lint-fix`
+2. **Tests** - Exécute `/run-tests`
+3. **Commit et push** - Exécute `/commit-push` si tout est OK
+
+Cette commande s'arrête si une étape échoue.
+
 ## Components Nuxt UI utilisés
 
 - **UButton** : Boutons réutilisables avec différentes variantes

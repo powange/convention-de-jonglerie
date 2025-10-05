@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 
 import { prismaMock } from '../../../../__mocks__/prisma'
-import handler from '../../../../server/api/editions/[id]/carpool-offers.post'
+import handler from '../../../../server/api/editions/[id]/carpool-offers/index.post'
 
 // Mock des modules Nuxt
 const mockEvent = {

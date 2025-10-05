@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import { getEmailHash } from '../../../../../server/utils/email-hash'
 import { prismaMock } from '../../../../__mocks__/prisma'
-import handler from '../../../../server/api/editions/[id]/carpool-requests.get'
+import handler from '../../../../server/api/editions/[id]/carpool-requests/index.get'
 
 // Import du mock après la déclaration
 
