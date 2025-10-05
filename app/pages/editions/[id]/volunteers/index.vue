@@ -2,6 +2,20 @@
   <div v-if="edition">
     <EditionHeader :edition="edition" current-page="volunteers" />
 
+    <!-- Planning Card - Visible seulement pour les bénévoles acceptés -->
+    <EditionVolunteerPlanningCard
+      v-if="
+        authStore.isAuthenticated &&
+        volunteersInfo?.myApplication?.status === 'ACCEPTED' &&
+        volunteersMode === 'INTERNAL'
+      "
+      :edition="edition"
+      :can-manage-volunteers="false"
+      :current-user-id="authStore.user?.id"
+      :format-date="formatDate"
+      :format-date-time-range="formatDateTimeRange"
+    />
+
     <UCard variant="soft" class="mb-6">
       <template #header>
         <div class="flex items-center justify-between">
@@ -206,6 +220,7 @@
 
     <!-- Modal candidature bénévole -->
     <EditionVolunteerApplicationModal
+      v-if="showApplyModal"
       v-model="showApplyModal"
       :volunteers-info="volunteersInfo"
       :edition="edition"
@@ -217,6 +232,7 @@
 
     <!-- Modal édition de candidature -->
     <EditionVolunteerApplicationModal
+      v-if="showEditApplicationModal"
       v-model="showEditApplicationModal"
       :volunteers-info="volunteersInfo"
       :edition="edition"
@@ -252,7 +268,7 @@ import {
 } from '~/utils/volunteer-application-api'
 
 const { t, locale } = useI18n()
-const { formatDateTimeRange } = useDateFormat()
+const { formatDateTimeRange, formatDate } = useDateFormat()
 const toast = useToast()
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -380,6 +396,7 @@ const fetchVolunteersInfo = async () => {
   }
 }
 await fetchVolunteersInfo()
+
 
 // Fonctions d'édition/gestion supprimées de la page publique
 

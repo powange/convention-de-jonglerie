@@ -1,4 +1,5 @@
 import { requireAuth, type AuthenticatedUser } from './auth-utils'
+import { prisma } from './prisma'
 
 /**
  * Vérifie que l'utilisateur a les permissions pour gérer les bénévoles d'une édition
@@ -141,4 +142,53 @@ export async function requireVolunteerReadAccess(
     statusCode: 403,
     message: 'Accès non autorisé',
   })
+}
+
+/**
+ * Vérifie si l'utilisateur est un bénévole accepté pour l'édition
+ * @param userId L'ID de l'utilisateur
+ * @param editionId L'ID de l'édition
+ * @returns true si l'utilisateur est un bénévole accepté
+ */
+export async function isAcceptedVolunteer(userId: number, editionId: number): Promise<boolean> {
+  const application = await prisma.editionVolunteerApplication.findFirst({
+    where: {
+      userId,
+      editionId,
+      status: 'ACCEPTED',
+    },
+  })
+
+  return !!application
+}
+
+/**
+ * Vérifie que l'utilisateur peut voir le planning des bénévoles
+ * Autorisé pour : les gestionnaires de bénévoles ET les bénévoles acceptés
+ * @param event L'événement Nuxt/Nitro
+ * @param editionId L'ID de l'édition
+ * @returns L'utilisateur authentifié
+ * @throws createError si pas autorisé
+ */
+export async function requireVolunteerPlanningAccess(
+  event: any,
+  editionId: number
+): Promise<AuthenticatedUser> {
+  const user = requireAuth(event)
+
+  // Vérifier si l'utilisateur est un bénévole accepté
+  const isVolunteer = await isAcceptedVolunteer(user.id, editionId)
+  if (isVolunteer) {
+    return user
+  }
+
+  // Sinon, vérifier les permissions de lecture classiques (collaborateurs, etc.)
+  try {
+    return await requireVolunteerReadAccess(event, editionId)
+  } catch {
+    throw createError({
+      statusCode: 403,
+      message: 'Accès non autorisé - vous devez être bénévole accepté ou gestionnaire',
+    })
+  }
 }

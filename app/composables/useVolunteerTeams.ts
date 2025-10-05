@@ -20,7 +20,7 @@ export interface CreateTeamData {
 
 export type UpdateTeamData = Partial<CreateTeamData>
 
-export function useVolunteerTeams(editionId: number) {
+export function useVolunteerTeams(editionId: MaybeRefOrGetter<number | undefined>) {
   const { $fetch } = useNuxtApp()
 
   // État réactif
@@ -30,10 +30,13 @@ export function useVolunteerTeams(editionId: number) {
 
   // Récupérer toutes les équipes
   const fetchTeams = async () => {
+    const id = toValue(editionId)
+    if (!id) return
+
     try {
       loading.value = true
       error.value = null
-      teams.value = await $fetch(`/api/editions/${editionId}/volunteer-teams`)
+      teams.value = await $fetch(`/api/editions/${id}/volunteer-teams`)
     } catch (err: any) {
       error.value = err.data?.message || 'Erreur lors du chargement des équipes'
       throw err
@@ -44,10 +47,13 @@ export function useVolunteerTeams(editionId: number) {
 
   // Créer une équipe
   const createTeam = async (teamData: CreateTeamData): Promise<VolunteerTeam> => {
+    const id = toValue(editionId)
+    if (!id) throw new Error('Edition ID is required')
+
     try {
       loading.value = true
       error.value = null
-      const newTeam = await $fetch(`/api/editions/${editionId}/volunteer-teams`, {
+      const newTeam = await $fetch(`/api/editions/${id}/volunteer-teams`, {
         method: 'POST',
         body: teamData,
       })
@@ -63,10 +69,13 @@ export function useVolunteerTeams(editionId: number) {
 
   // Mettre à jour une équipe
   const updateTeam = async (teamId: string, teamData: UpdateTeamData): Promise<VolunteerTeam> => {
+    const id = toValue(editionId)
+    if (!id) throw new Error('Edition ID is required')
+
     try {
       loading.value = true
       error.value = null
-      const updatedTeam = await $fetch(`/api/editions/${editionId}/volunteer-teams/${teamId}`, {
+      const updatedTeam = await $fetch(`/api/editions/${id}/volunteer-teams/${teamId}`, {
         method: 'PUT',
         body: teamData,
       })
@@ -85,10 +94,13 @@ export function useVolunteerTeams(editionId: number) {
 
   // Supprimer une équipe
   const deleteTeam = async (teamId: string): Promise<void> => {
+    const id = toValue(editionId)
+    if (!id) throw new Error('Edition ID is required')
+
     try {
       loading.value = true
       error.value = null
-      await $fetch(`/api/editions/${editionId}/volunteer-teams/${teamId}`, {
+      await $fetch(`/api/editions/${id}/volunteer-teams/${teamId}`, {
         method: 'DELETE',
       })
       teams.value = teams.value.filter((t) => t.id !== teamId)

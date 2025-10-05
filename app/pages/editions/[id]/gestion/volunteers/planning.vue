@@ -31,100 +31,23 @@
       </div>
 
       <!-- Contenu du planning -->
-      <UCard variant="soft">
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold flex items-center gap-2">
-              <UIcon name="i-heroicons-calendar-days" class="text-primary-500" />
-              {{ t('editions.volunteers.schedule_management') }}
-            </h3>
-          </div>
-        </template>
-
-        <div class="space-y-6">
-          <!-- Barre d'outils -->
-          <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-              <UButton
-                v-if="canManageVolunteers"
-                size="sm"
-                color="primary"
-                icon="i-heroicons-plus"
-                @click="openCreateSlotModal"
-              >
-                {{ t('editions.volunteers.create_time_slot') }}
-              </UButton>
-              <UButton
-                size="sm"
-                color="neutral"
-                variant="soft"
-                icon="i-heroicons-arrow-path"
-                :loading="refreshing"
-                @click="refreshData"
-              >
-                {{ t('common.refresh') }}
-              </UButton>
-              <UButton
-                size="sm"
-                color="primary"
-                variant="soft"
-                icon="i-heroicons-document-arrow-down"
-                :loading="exportingPdf"
-                @click="exportToPdf"
-              >
-                {{ t('editions.volunteers.export_pdf') }}
-              </UButton>
-            </div>
-            <div class="flex items-center gap-4">
-              <!-- Filtre par équipes -->
-              <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-600 dark:text-gray-400">Équipes :</span>
-                <USelect
-                  v-model="selectedTeams"
-                  :items="teamFilterOptions"
-                  option-attribute="label"
-                  value-attribute="value"
-                  multiple
-                  size="sm"
-                  class="min-w-[200px]"
-                  :placeholder="t('editions.volunteers.all_teams')"
-                />
-              </div>
-              <!-- Sélecteur de granularité -->
-              <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-600 dark:text-gray-400">Granularité :</span>
-                <USelect
-                  v-model="selectedGranularity"
-                  :items="granularityOptions"
-                  option-attribute="label"
-                  value-attribute="value"
-                  size="sm"
-                  class="min-w-[120px]"
-                />
-              </div>
-              <span class="text-xs text-gray-500">
-                {{ t('editions.volunteers.planning_tip') }}
-              </span>
-            </div>
-          </div>
-
-          <!-- Calendrier de planning -->
-          <div
-            class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
-          >
-            <div v-if="!ready || !edition" class="flex items-center justify-center py-8">
-              <UIcon name="i-heroicons-arrow-path" class="animate-spin text-gray-400" size="20" />
-              <span class="ml-2 text-base text-gray-500">{{ t('common.loading') }}</span>
-            </div>
-            <FullCalendar
-              v-else-if="calendarOptions && edition"
-              ref="calendarRef"
-              :options="calendarOptions"
-              class="volunteer-planning-calendar"
-            />
-          </div>
-        </div>
-      </UCard>
+      <EditionVolunteerPlanningCard
+        :edition="edition"
+        :teams="teams"
+        :time-slots="timeSlots"
+        :can-manage-volunteers="canManageVolunteers"
+        :refreshing="refreshing"
+        :volunteers-stats="volunteersStats"
+        :volunteers-stats-by-day="volunteersStatsByDay"
+        :volunteers-stats-individual="volunteersStatsIndividual"
+        :format-date="formatDate"
+        :format-date-time-range="formatDateTimeRange"
+        @create-slot="handleCreateSlot"
+        @slot-click="handleSlotClick"
+        @slot-update="handleSlotUpdate"
+        @slot-delete="handleSlotDelete"
+        @refresh="refreshData"
+      />
 
       <!-- Alerte pour les chevauchements de créneaux -->
       <EditionVolunteerPlanningOverlapWarningsAlert
@@ -169,7 +92,6 @@
 
 <script setup lang="ts">
 // Vue & libs
-import FullCalendar from '@fullcalendar/vue3'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -180,6 +102,11 @@ import { useDatetime } from '~/composables/useDatetime'
 import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '~/composables/useVolunteerSchedule'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import {
+  calculateVolunteersStats,
+  calculateVolunteersStatsByDay,
+  calculateVolunteersStatsIndividual,
+} from '~/utils/volunteer-stats'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -193,7 +120,6 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 
 // État du composant
 const refreshing = ref(false)
-const exportingPdf = ref(false)
 
 // État des onglets de statistiques
 const activeStatsTab = ref('hours-per-volunteer') // heures par bénévole par défaut
@@ -204,27 +130,6 @@ const volunteers = ref<any[]>([]) // Applications de bénévoles
 // État de la modal
 const slotModalOpen = ref(false)
 const slotModalData = ref<any>(null)
-
-// Configuration de la granularité temporelle
-const selectedGranularity = ref(30) // Granularité par défaut : 30 minutes
-const granularityOptions = [
-  { label: '15 minutes', value: 15 },
-  { label: '30 minutes', value: 30 },
-  { label: '60 minutes', value: 60 },
-]
-
-// Configuration du filtre d'équipes
-const selectedTeams = ref<string[]>([]) // Par défaut, toutes les équipes sont sélectionnées
-
-// Options pour le filtre d'équipes
-const teamFilterOptions = computed(() => {
-  if (!teams.value) return []
-
-  return teams.value.map((team) => ({
-    label: team.name,
-    value: team.id,
-  }))
-})
 
 // Utilisation des vraies APIs
 const { teams } = useVolunteerTeams(editionId)
@@ -266,98 +171,90 @@ const convertedTeams = computed(() => {
   )
 })
 
-// Équipes filtrées selon la sélection
-const filteredTeams = computed(() => {
-  if (selectedTeams.value.length === 0) {
-    // Si aucune équipe sélectionnée, afficher toutes les équipes
-    return convertedTeams.value
-  }
-
-  // Filtrer selon la sélection
-  return convertedTeams.value.filter((team) => selectedTeams.value.includes(team.id))
-})
-
-// Créneaux filtrés selon les équipes sélectionnées
-const filteredTimeSlots = computed(() => {
-  if (selectedTeams.value.length === 0) {
-    // Si aucune équipe sélectionnée, afficher tous les créneaux
-    return convertedTimeSlots.value
-  }
-
-  // Filtrer les créneaux selon les équipes sélectionnées
-  // Inclure aussi les créneaux "non assignés" (teamId null/undefined)
-  return convertedTimeSlots.value.filter(
-    (slot) => !slot.teamId || selectedTeams.value.includes(slot.teamId)
-  )
-})
-
-// Computed pour les dates avec fallbacks
-const editionStartDate = computed(
-  () => (edition.value?.startDate || new Date().toISOString().split('T')[0]) as string
-)
-const editionEndDate = computed(
-  () => (edition.value?.endDate || new Date().toISOString().split('T')[0]) as string
-)
-
-// Permissions calculées (doivent être définies avant useVolunteerSchedule)
+// Permissions calculées
 const canManageVolunteers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageVolunteers(edition.value, authStore.user.id)
 })
 
-// Configuration du calendrier de planning
-const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
-  editionStartDate: editionStartDate,
-  editionEndDate: editionEndDate,
-  teams: filteredTeams,
-  timeSlots: filteredTimeSlots,
-  readOnly: computed(() => !canManageVolunteers.value),
-  slotDuration: selectedGranularity,
-  onTimeSlotCreate: (start, end, resourceId) => {
-    // Les permissions sont déjà vérifiées par readOnly, ouvrir directement la modal
-    openSlotModal({
-      start,
-      end,
-      teamId: resourceId === 'unassigned' ? '' : resourceId,
+// Handlers pour les événements du composant de planning
+const handleCreateSlot = (data: { start: string; end: string; teamId: string }) => {
+  slotModalData.value = {
+    title: '',
+    description: '',
+    teamId: data.teamId || '',
+    startDateTime: toDatetimeLocal(data.start),
+    endDateTime: toDatetimeLocal(data.end),
+    maxVolunteers: 3,
+  }
+  slotModalOpen.value = true
+}
+
+const handleSlotClick = (slot: any) => {
+  slotModalData.value = {
+    id: slot.id,
+    title: slot.title,
+    description: slot.description || '',
+    teamId: slot.teamId || '',
+    startDateTime: toDatetimeLocal(slot.start),
+    endDateTime: toDatetimeLocal(slot.end),
+    maxVolunteers: slot.maxVolunteers,
+  }
+  slotModalOpen.value = true
+}
+
+const handleSlotUpdate = async (data: {
+  id: string
+  title: string
+  description?: string
+  teamId?: string
+  start: string
+  end: string
+  maxVolunteers: number
+}) => {
+  try {
+    await updateTimeSlot(data.id, {
+      title: data.title,
+      description: data.description,
+      teamId: data.teamId,
+      startDateTime: data.start,
+      endDateTime: data.end,
+      maxVolunteers: data.maxVolunteers,
     })
-  },
-  onTimeSlotClick: (timeSlot: VolunteerTimeSlot) => {
-    // Les permissions sont déjà vérifiées par readOnly, ouvrir directement la modal
-    const existingSlot = timeSlots.value.find((s) => s.id === timeSlot.id)
-    if (existingSlot) {
-      slotModalData.value = {
-        id: existingSlot.id,
-        title: existingSlot.title,
-        description: existingSlot.description || '',
-        teamId: existingSlot.teamId || '',
-        startDateTime: toDatetimeLocal(existingSlot.start),
-        endDateTime: toDatetimeLocal(existingSlot.end),
-        maxVolunteers: existingSlot.maxVolunteers,
-      }
-      slotModalOpen.value = true
-    }
-  },
-  onTimeSlotUpdate: async (timeSlot) => {
-    // Mise à jour directe lors du drag & drop ou resize
+    toast.add({
+      title: t('editions.volunteers.slot_updated'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (error: any) {
+    console.error('Erreur lors de la mise à jour du créneau:', error)
+
+    const errorMessage =
+      error.data?.message || error.message || error.statusText || 'Erreur lors de la mise à jour'
+
+    toast.add({
+      title: t('errors.error_occurred'),
+      description: errorMessage,
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  }
+}
+
+const handleSlotDelete = async (slotId: string) => {
+  if (confirm(t('editions.volunteers.confirm_delete_slot'))) {
     try {
-      await updateTimeSlot(timeSlot.id, {
-        title: timeSlot.title,
-        description: timeSlot.description ?? undefined,
-        teamId: timeSlot.teamId ?? undefined,
-        startDateTime: timeSlot.start,
-        endDateTime: timeSlot.end,
-        maxVolunteers: timeSlot.maxVolunteers,
-      })
+      await deleteTimeSlot(slotId)
       toast.add({
-        title: t('editions.volunteers.slot_updated'),
+        title: t('editions.volunteers.slot_deleted'),
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
     } catch (error: any) {
-      console.error('Erreur lors de la mise à jour du créneau:', error)
+      console.error('Erreur lors de la suppression du créneau:', error)
 
       const errorMessage =
-        error.data?.message || error.message || error.statusText || 'Erreur lors de la mise à jour'
+        error.data?.message || error.message || error.statusText || 'Erreur lors de la suppression'
 
       toast.add({
         title: t('errors.error_occurred'),
@@ -366,58 +263,7 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
         color: 'error',
       })
     }
-  },
-  onTimeSlotDelete: async (timeSlotId) => {
-    if (confirm(t('editions.volunteers.confirm_delete_slot'))) {
-      try {
-        await deleteTimeSlot(timeSlotId)
-        toast.add({
-          title: t('editions.volunteers.slot_deleted'),
-          icon: 'i-heroicons-check-circle',
-          color: 'success',
-        })
-      } catch (error: any) {
-        console.error('Erreur lors de la suppression du créneau:', error)
-
-        const errorMessage =
-          error.data?.message ||
-          error.message ||
-          error.statusText ||
-          'Erreur lors de la suppression'
-
-        toast.add({
-          title: t('errors.error_occurred'),
-          description: errorMessage,
-          icon: 'i-heroicons-x-circle',
-          color: 'error',
-        })
-      }
-    }
-  },
-})
-
-// Actions de la modal
-const openSlotModal = (initialData?: { start?: string; end?: string; teamId?: string }) => {
-  // Définir les données initiales
-  slotModalData.value = {
-    title: '',
-    description: '',
-    teamId: initialData?.teamId || '',
-    startDateTime: toDatetimeLocal(initialData?.start || ''),
-    endDateTime: toDatetimeLocal(initialData?.end || ''),
-    maxVolunteers: 3,
   }
-  slotModalOpen.value = true
-}
-
-const openCreateSlotModal = () => {
-  // Utiliser les dates de l'édition par défaut
-  const defaultStart = edition.value?.startDate ? `${edition.value.startDate}T09:00` : ''
-  const defaultEnd = edition.value?.startDate ? `${edition.value.startDate}T10:00` : ''
-  openSlotModal({
-    start: defaultStart,
-    end: defaultEnd,
-  })
 }
 
 // Handlers pour la modal
@@ -472,182 +318,6 @@ const handleSlotSave = async (slotData: any) => {
     })
   }
   slotModalData.value = null
-}
-
-const handleSlotDelete = async (slotId: string) => {
-  try {
-    await deleteTimeSlot(slotId)
-    toast.add({
-      title: t('editions.volunteers.slot_deleted'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error('Erreur lors de la suppression du créneau:', error)
-
-    const errorMessage =
-      error.data?.message || error.message || error.statusText || 'Erreur lors de la suppression'
-
-    toast.add({
-      title: t('errors.error_occurred'),
-      description: errorMessage,
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  }
-  slotModalData.value = null
-}
-
-const exportToPdf = async () => {
-  exportingPdf.value = true
-  try {
-    const { jsPDF } = await import('jspdf')
-
-    const doc = new jsPDF('p', 'mm', 'a4')
-    const pageHeight = doc.internal.pageSize.getHeight()
-    const margin = 15
-    let currentY = margin
-
-    // En-tête du document
-    doc.setFontSize(18)
-    doc.setFont('helvetica', 'bold')
-    const title = `Planning des bénévoles - ${edition.value?.name || 'Édition'}`
-    doc.text(title, margin, currentY)
-    currentY += 10
-
-    doc.setFontSize(10)
-    doc.setFont('helvetica', 'normal')
-    const subtitle = `${edition.value?.convention?.name || ''} - ${formatDateTimeRange(edition.value?.startDate || '', edition.value?.endDate || '')}`
-    doc.text(subtitle, margin, currentY)
-    currentY += 15
-
-    // Statistiques générales
-    doc.setFontSize(14)
-    doc.setFont('helvetica', 'bold')
-    doc.text('Statistiques générales', margin, currentY)
-    currentY += 8
-
-    doc.setFontSize(10)
-    doc.setFont('helvetica', 'normal')
-    const stats = [
-      `Nombre total de bénévoles : ${volunteersStats.value.totalVolunteers}`,
-      `Heures totales de bénévolat : ${volunteersStats.value.totalHours.toFixed(1)}h`,
-      `Moyenne d'heures par bénévole : ${volunteersStats.value.averageHours.toFixed(1)}h`,
-      `Nombre total de créneaux : ${volunteersStats.value.totalSlots}`,
-    ]
-
-    stats.forEach((stat) => {
-      doc.text(stat, margin, currentY)
-      currentY += 6
-    })
-    currentY += 10
-
-    // Fonction pour vérifier si on a besoin d'une nouvelle page
-    const checkNewPage = (neededHeight: number) => {
-      if (currentY + neededHeight > pageHeight - margin) {
-        doc.addPage()
-        currentY = margin
-      }
-    }
-
-    // Planning par jour
-    if (volunteersStatsByDay.value.length > 0) {
-      checkNewPage(40)
-      doc.setFontSize(14)
-      doc.setFont('helvetica', 'bold')
-      doc.text('Planning par jour', margin, currentY)
-      currentY += 10
-
-      volunteersStatsByDay.value.forEach((dayStats) => {
-        checkNewPage(30 + dayStats.volunteers.length * 5)
-
-        doc.setFontSize(12)
-        doc.setFont('helvetica', 'bold')
-        doc.text(`${formatDate(dayStats.date)}`, margin, currentY)
-        currentY += 6
-
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'normal')
-        doc.text(
-          `${dayStats.totalVolunteers} bénévoles - ${dayStats.totalHours.toFixed(1)}h total`,
-          margin + 5,
-          currentY
-        )
-        currentY += 8
-
-        // Liste des bénévoles pour ce jour
-        dayStats.volunteers.forEach((volunteer: any) => {
-          const volunteerLine = `• ${volunteer.user.pseudo} : ${volunteer.hours.toFixed(1)}h (${volunteer.slots} créneaux)`
-          doc.text(volunteerLine, margin + 10, currentY)
-          currentY += 5
-        })
-        currentY += 5
-      })
-    }
-
-    // Nouvelle page pour les statistiques individuelles
-    doc.addPage()
-    currentY = margin
-
-    doc.setFontSize(14)
-    doc.setFont('helvetica', 'bold')
-    doc.text('Statistiques par bénévole', margin, currentY)
-    currentY += 10
-
-    // Statistiques individuelles
-    volunteersStatsIndividual.value.forEach((volunteerStat) => {
-      checkNewPage(15 + (volunteerStat.dayDetails?.length || 0) * 4)
-
-      doc.setFontSize(11)
-      doc.setFont('helvetica', 'bold')
-      const volunteerName = `${volunteerStat.user.pseudo} (${volunteerStat.user.prenom || ''} ${volunteerStat.user.nom || ''})`
-      doc.text(volunteerName, margin, currentY)
-      currentY += 6
-
-      doc.setFontSize(10)
-      doc.setFont('helvetica', 'normal')
-      doc.text(
-        `Total : ${volunteerStat.totalHours.toFixed(1)}h sur ${volunteerStat.totalSlots} créneaux`,
-        margin + 5,
-        currentY
-      )
-      currentY += 5
-
-      // Détails par jour
-      if (volunteerStat.dayDetails && volunteerStat.dayDetails.length > 0) {
-        volunteerStat.dayDetails.forEach((dayDetail: any) => {
-          const dayLine = `  ${formatDate(dayDetail.date)} : ${dayDetail.hours.toFixed(1)}h (${dayDetail.slots} créneaux)`
-          doc.text(dayLine, margin + 10, currentY)
-          currentY += 4
-        })
-      } else {
-        doc.text('  Aucun créneau assigné', margin + 10, currentY)
-        currentY += 4
-      }
-      currentY += 3
-    })
-
-    // Télécharger le PDF
-    const fileName = `planning-benevoles-${edition.value?.name?.replace(/[^a-zA-Z0-9]/g, '-') || 'edition'}.pdf`
-    doc.save(fileName)
-
-    toast.add({
-      title: t('editions.volunteers.pdf_exported'),
-      description: t('editions.volunteers.pdf_downloaded'),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
-  } catch (error: any) {
-    console.error("Erreur lors de l'export PDF:", error)
-    toast.add({
-      title: t('errors.error_occurred'),
-      description: "Erreur lors de l'export PDF",
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  } finally {
-    exportingPdf.value = false
-  }
 }
 
 const refreshData = async () => {
@@ -831,111 +501,10 @@ const overlapWarnings = computed(() => {
   return warnings
 })
 
-// Calcul des statistiques des bénévoles
-const volunteersStats = computed(() => {
-  // Inclure tous les bénévoles acceptés
-  const totalVolunteers = acceptedVolunteers.value?.length || 0
-
-  if (totalVolunteers === 0) {
-    return {
-      totalVolunteers: 0,
-      totalHours: 0,
-      averageHours: 0,
-      totalSlots: 0,
-    }
-  }
-
-  const volunteerHours = new Map<number, number>()
-  const volunteerSlots = new Map<number, number>()
-  let totalHours = 0
-  let totalSlots = 0
-
-  const slotsWithAssignments = convertedTimeSlots.value.filter(
-    (slot) => slot.assignedVolunteersList && slot.assignedVolunteersList.length > 0
-  )
-
-  slotsWithAssignments.forEach((slot) => {
-    const startTime = new Date(slot.start)
-    const endTime = new Date(slot.end)
-    const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
-
-    slot.assignedVolunteersList?.forEach((assignment) => {
-      const userId = assignment.user.id
-      volunteerHours.set(userId, (volunteerHours.get(userId) || 0) + hours)
-      volunteerSlots.set(userId, (volunteerSlots.get(userId) || 0) + 1)
-      totalHours += hours
-      totalSlots += 1
-    })
-  })
-
-  const averageHours = totalVolunteers > 0 ? totalHours / totalVolunteers : 0
-
-  return {
-    totalVolunteers,
-    totalHours,
-    averageHours,
-    totalSlots,
-  }
-})
-
 // Données pour le composant d'auto-assignation
 const acceptedVolunteers = computed(() => {
   return volunteers.value?.filter((v) => v.status === 'ACCEPTED') || []
 })
-
-// Statistiques par jour
-const volunteersStatsByDay = computed(() => {
-  const dayStats = new Map<string, any>()
-
-  convertedTimeSlots.value.forEach((slot) => {
-    if (!slot.assignedVolunteersList || slot.assignedVolunteersList.length === 0) return
-
-    const startTime = new Date(slot.start)
-    const endTime = new Date(slot.end)
-    const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
-    const dayKey = startTime.toISOString().split('T')[0] // YYYY-MM-DD
-
-    if (!dayStats.has(dayKey)) {
-      dayStats.set(dayKey, {
-        date: dayKey,
-        volunteers: new Map<number, any>(),
-        totalHours: 0,
-        totalVolunteers: 0,
-      })
-    }
-
-    const day = dayStats.get(dayKey)!
-
-    slot.assignedVolunteersList.forEach((assignment) => {
-      const userId = assignment.user.id
-
-      if (!day.volunteers.has(userId)) {
-        day.volunteers.set(userId, {
-          user: assignment.user,
-          hours: 0,
-          slots: 0,
-        })
-      }
-
-      const volunteerStat = day.volunteers.get(userId)
-      volunteerStat.hours += hours
-      volunteerStat.slots += 1
-      day.totalHours += hours
-    })
-
-    day.totalVolunteers = day.volunteers.size
-  })
-
-  // Convertir en array et trier par date
-  return Array.from(dayStats.values())
-    .sort((a: any, b: any) => a.date.localeCompare(b.date))
-    .map((day) => ({
-      ...day,
-      volunteers: Array.from(day.volunteers.values()).sort((a: any, b: any) => b.hours - a.hours), // Trier par heures décroissantes
-    }))
-})
-
-// Liste des bénévoles acceptés pour les stats
 
 // Fonction pour récupérer les bénévoles acceptés
 const fetchAcceptedVolunteers = async () => {
@@ -951,78 +520,16 @@ const fetchAcceptedVolunteers = async () => {
   }
 }
 
-// Statistiques par bénévole individuel (incluant ceux sans créneaux)
-const volunteersStatsIndividual = computed(() => {
-  const volunteerStats = new Map<number, any>()
+// Calcul des statistiques des bénévoles en utilisant les utilitaires
+const volunteersStats = computed(() =>
+  calculateVolunteersStats(convertedTimeSlots.value, acceptedVolunteers.value)
+)
 
-  // D'abord, ajouter tous les bénévoles acceptés avec 0 heures
-  acceptedVolunteers.value?.forEach((application) => {
-    if (application.user && !volunteerStats.has(application.user.id)) {
-      volunteerStats.set(application.user.id, {
-        user: application.user,
-        totalHours: 0,
-        totalSlots: 0,
-        dayDetails: new Map<string, any>(),
-      })
-    }
-  })
+const volunteersStatsByDay = computed(() => calculateVolunteersStatsByDay(convertedTimeSlots.value))
 
-  // Ensuite, calculer les heures pour ceux qui ont des créneaux
-  convertedTimeSlots.value.forEach((slot) => {
-    if (!slot.assignedVolunteersList || slot.assignedVolunteersList.length === 0) return
-
-    const startTime = new Date(slot.start)
-    const endTime = new Date(slot.end)
-    const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
-    const dayKey = startTime.toISOString().split('T')[0] // YYYY-MM-DD
-
-    slot.assignedVolunteersList.forEach((assignment) => {
-      const userId = assignment.user.id
-
-      if (!volunteerStats.has(userId)) {
-        volunteerStats.set(userId, {
-          user: assignment.user,
-          totalHours: 0,
-          totalSlots: 0,
-          dayDetails: new Map<string, any>(),
-        })
-      }
-
-      const volunteerStat = volunteerStats.get(userId)
-      volunteerStat.totalHours += hours
-      volunteerStat.totalSlots += 1
-
-      // Ajouter les détails par jour
-      if (!volunteerStat.dayDetails.has(dayKey)) {
-        volunteerStat.dayDetails.set(dayKey, {
-          date: dayKey,
-          hours: 0,
-          slots: 0,
-        })
-      }
-
-      const dayDetail = volunteerStat.dayDetails.get(dayKey)
-      dayDetail.hours += hours
-      dayDetail.slots += 1
-    })
-  })
-
-  // Convertir en array et trier par nombre d'heures total décroissant
-  return Array.from(volunteerStats.values())
-    .map((volunteer) => ({
-      ...volunteer,
-      dayDetails: Array.from(volunteer.dayDetails.values()).sort((a: any, b: any) =>
-        a.date.localeCompare(b.date)
-      ), // Trier par date
-    }))
-    .sort((a, b) => {
-      // Trier par heures décroissantes, puis par nom
-      if (b.totalHours !== a.totalHours) {
-        return b.totalHours - a.totalHours
-      }
-      return (a.user.pseudo || '').localeCompare(b.user.pseudo || '')
-    })
-})
+const volunteersStatsIndividual = computed(() =>
+  calculateVolunteersStatsIndividual(convertedTimeSlots.value, acceptedVolunteers.value)
+)
 
 // Permissions calculées
 const canEdit = computed(() => {
@@ -1055,163 +562,3 @@ useSeoMeta({
   ogTitle: () => edition.value?.name || edition.value?.convention?.name || 'Convention',
 })
 </script>
-
-<style>
-/* Styles pour le planning des bénévoles */
-.volunteer-planning-calendar {
-  /* Timeline resource view styling */
-  --fc-border-color: rgb(229 231 235); /* gray-200 */
-  --fc-neutral-bg-color: rgb(249 250 251); /* gray-50 */
-}
-
-.volunteer-planning-calendar .fc-theme-standard .fc-resource-timeline-divider {
-  border-color: rgb(229 231 235);
-}
-
-.volunteer-planning-calendar .fc-theme-standard .fc-scrollgrid {
-  border-color: rgb(229 231 235);
-}
-
-.volunteer-planning-calendar .fc-theme-standard td,
-.volunteer-planning-calendar .fc-theme-standard th {
-  border-color: rgb(229 231 235);
-}
-
-.volunteer-planning-calendar .fc-resource {
-  background-color: rgb(249 250 251);
-  color: rgb(17 24 39);
-}
-
-.volunteer-planning-calendar .fc-event {
-  border: 1px solid;
-  border-radius: 0.375rem;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-
-.volunteer-planning-calendar .fc-event-title {
-  white-space: pre-line;
-  line-height: 1.3;
-  padding: 2px 4px;
-  font-size: 0.75rem;
-}
-
-.volunteer-planning-calendar .fc-event-main {
-  padding: 1px 2px;
-}
-
-/* Styles pour le contenu personnalisé des événements */
-.volunteer-planning-calendar .volunteer-slot-content {
-  padding: 2px 4px;
-  font-size: 0.75rem;
-  line-height: 1.2;
-}
-
-.volunteer-planning-calendar .slot-title {
-  font-weight: 500;
-  margin-bottom: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.volunteer-planning-calendar .slot-avatars {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  margin-top: 2px;
-}
-
-.volunteer-planning-calendar .volunteer-item {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 0.65rem;
-  line-height: 1.2;
-}
-
-.volunteer-planning-calendar .user-avatar {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background-color: rgb(99 102 241); /* indigo-500 */
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.45rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-}
-
-.volunteer-planning-calendar .volunteer-text {
-  color: inherit;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0;
-}
-
-.volunteer-planning-calendar .user-avatar-1 {
-  background-color: rgb(34 197 94); /* green-500 */
-}
-
-.volunteer-planning-calendar .user-avatar-2 {
-  background-color: rgb(251 146 60); /* orange-400 */
-}
-
-.volunteer-planning-calendar .user-avatar-3 {
-  background-color: rgb(168 85 247); /* purple-500 */
-}
-
-.volunteer-planning-calendar .user-avatar-4 {
-  background-color: rgb(236 72 153); /* pink-500 */
-}
-
-.volunteer-planning-calendar .fc-event:hover {
-  box-shadow:
-    0 4px 6px -1px rgb(0 0 0 / 0.1),
-    0 2px 4px -2px rgb(0 0 0 / 0.1);
-}
-
-/* Dark mode support avec toggle manuel Nuxt UI */
-.dark .volunteer-planning-calendar {
-  --fc-border-color: rgb(55 65 81); /* gray-700 */
-  --fc-neutral-bg-color: rgb(31 41 55); /* gray-800 */
-}
-
-.dark .volunteer-planning-calendar .fc-theme-standard .fc-resource-timeline-divider {
-  border-color: rgb(55 65 81);
-}
-
-.dark .volunteer-planning-calendar .fc-theme-standard .fc-scrollgrid {
-  border-color: rgb(55 65 81);
-}
-
-.dark .volunteer-planning-calendar .fc-theme-standard td,
-.dark .volunteer-planning-calendar .fc-theme-standard th {
-  border-color: rgb(55 65 81);
-}
-
-.dark .volunteer-planning-calendar .fc-resource {
-  background-color: rgb(31 41 55);
-  color: rgb(243 244 246);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .volunteer-planning-calendar .fc-toolbar {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .volunteer-planning-calendar .fc-toolbar-chunk {
-    display: flex;
-    justify-content: center;
-  }
-}
-</style>

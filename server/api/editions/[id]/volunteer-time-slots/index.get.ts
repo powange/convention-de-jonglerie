@@ -1,9 +1,7 @@
-import { canAccessEditionData } from '../../../../utils/edition-permissions'
 import { prisma } from '../../../../utils/prisma'
+import { requireVolunteerPlanningAccess, isAcceptedVolunteer } from '../../../../utils/volunteer-permissions'
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
-
   // Validation des paramètres
   const editionId = parseInt(getRouterParam(event, 'id') as string)
 
@@ -14,14 +12,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Vérifier l'accès aux données de l'édition (tous les collaborateurs)
-  const allowed = await canAccessEditionData(editionId, event.context.user.id, event)
-  if (!allowed) {
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour accéder à ces données',
-    })
-  }
+  // Vérifier l'accès au planning (bénévoles acceptés + gestionnaires)
+  const user = await requireVolunteerPlanningAccess(event, editionId)
+
+  // Vérifier si l'utilisateur est un bénévole accepté (pas un gestionnaire)
+  const isVolunteer = await isAcceptedVolunteer(user.id, editionId)
 
   try {
     // Récupérer les créneaux de bénévoles pour cette édition
@@ -45,7 +40,8 @@ export default defineEventHandler(async (event) => {
                 pseudo: true,
                 nom: true,
                 prenom: true,
-                email: true,
+                // Les bénévoles ne voient pas les emails des autres
+                email: isVolunteer ? false : true,
               },
             },
           },

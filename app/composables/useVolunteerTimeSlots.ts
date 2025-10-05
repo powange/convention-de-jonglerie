@@ -37,7 +37,7 @@ export interface CreateTimeSlotData {
 
 export type UpdateTimeSlotData = Partial<CreateTimeSlotData>
 
-export function useVolunteerTimeSlots(editionId: number) {
+export function useVolunteerTimeSlots(editionId: MaybeRefOrGetter<number | undefined>) {
   const { $fetch } = useNuxtApp()
 
   // État réactif
@@ -47,10 +47,13 @@ export function useVolunteerTimeSlots(editionId: number) {
 
   // Récupérer tous les créneaux
   const fetchTimeSlots = async () => {
+    const id = toValue(editionId)
+    if (!id) return
+
     try {
       loading.value = true
       error.value = null
-      timeSlots.value = await $fetch(`/api/editions/${editionId}/volunteer-time-slots`)
+      timeSlots.value = await $fetch(`/api/editions/${id}/volunteer-time-slots`)
     } catch (err: any) {
       error.value = err.data?.message || 'Erreur lors du chargement des créneaux'
       throw err
@@ -61,6 +64,9 @@ export function useVolunteerTimeSlots(editionId: number) {
 
   // Créer un créneau
   const createTimeSlot = async (slotData: CreateTimeSlotData): Promise<VolunteerTimeSlotAPI> => {
+    const id = toValue(editionId)
+    if (!id) throw new Error('Edition ID is required')
+
     try {
       loading.value = true
       error.value = null
@@ -78,7 +84,7 @@ export function useVolunteerTimeSlots(editionId: number) {
             : slotData.endDateTime,
       }
 
-      const newSlot = await $fetch(`/api/editions/${editionId}/volunteer-time-slots`, {
+      const newSlot = await $fetch(`/api/editions/${id}/volunteer-time-slots`, {
         method: 'POST',
         body: processedData,
       })
@@ -97,6 +103,9 @@ export function useVolunteerTimeSlots(editionId: number) {
     slotId: string,
     slotData: UpdateTimeSlotData
   ): Promise<VolunteerTimeSlotAPI> => {
+    const id = toValue(editionId)
+    if (!id) throw new Error('Edition ID is required')
+
     try {
       loading.value = true
       error.value = null
@@ -120,13 +129,10 @@ export function useVolunteerTimeSlots(editionId: number) {
             : slotData.endDateTime
       }
 
-      const updatedSlot = await $fetch(
-        `/api/editions/${editionId}/volunteer-time-slots/${slotId}`,
-        {
-          method: 'PUT',
-          body: processedData,
-        }
-      )
+      const updatedSlot = await $fetch(`/api/editions/${id}/volunteer-time-slots/${slotId}`, {
+        method: 'PUT',
+        body: processedData,
+      })
       const index = timeSlots.value.findIndex((s) => s.id === slotId)
       if (index !== -1) {
         timeSlots.value[index] = updatedSlot
@@ -142,10 +148,13 @@ export function useVolunteerTimeSlots(editionId: number) {
 
   // Supprimer un créneau
   const deleteTimeSlot = async (slotId: string): Promise<void> => {
+    const id = toValue(editionId)
+    if (!id) throw new Error('Edition ID is required')
+
     try {
       loading.value = true
       error.value = null
-      await $fetch(`/api/editions/${editionId}/volunteer-time-slots/${slotId}`, {
+      await $fetch(`/api/editions/${id}/volunteer-time-slots/${slotId}`, {
         method: 'DELETE',
       })
       timeSlots.value = timeSlots.value.filter((s) => s.id !== slotId)
