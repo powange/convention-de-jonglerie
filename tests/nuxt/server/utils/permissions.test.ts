@@ -15,7 +15,7 @@ vi.mock('../../../../server/utils/prisma', () => ({
 import {
   hasEditionEditPermission,
   hasEditionDeletePermission,
-} from '../../../../server/utils/permissions'
+} from '../../../../server/utils/permissions/permissions'
 import { prisma } from '../../../../server/utils/prisma'
 
 // Récupérer les mocks pour les utiliser dans les tests

@@ -1,5 +1,5 @@
-import { canAccessEditionData } from '../../../../../utils/edition-permissions'
 import { getEditionOptions } from '../../../../../utils/editions/ticketing/options'
+import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })

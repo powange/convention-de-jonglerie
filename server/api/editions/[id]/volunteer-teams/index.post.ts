@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 import { requireAuth } from '../../../../utils/auth-utils'
+import { requireVolunteerManagementAccess } from '../../../../utils/permissions/volunteer-permissions'
 import { prisma } from '../../../../utils/prisma'
-import { requireVolunteerManagementAccess } from '../../../../utils/volunteer-permissions'
 
 const createTeamSchema = z.object({
   name: z.string().min(1, "Le nom de l'équipe est requis").max(100),

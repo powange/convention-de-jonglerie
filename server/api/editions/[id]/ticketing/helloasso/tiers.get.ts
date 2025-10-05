@@ -1,6 +1,6 @@
-import { canAccessEditionData } from '../../../../../utils/edition-permissions'
 import { getHelloAssoTiersAndOptions } from '../../../../../utils/editions/ticketing/helloasso'
 import { decrypt } from '../../../../../utils/encryption'
+import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
 import { prisma } from '../../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {

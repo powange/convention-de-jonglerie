@@ -3,7 +3,7 @@ import { readFile } from 'fs/promises'
 import { z } from 'zod'
 
 import { requireAuth } from '../../utils/auth-utils'
-import { getConventionForEdit, validateConventionId } from '../../utils/convention-permissions'
+import { getConventionForEdit, validateConventionId } from '../../utils/permissions/convention-permissions'
 import { prisma } from '../../utils/prisma'
 import {
   updateConventionSchema,

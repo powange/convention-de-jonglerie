@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 
-import { hasEditionEditPermission } from '../../../../utils/permissions'
+import { hasEditionEditPermission } from '../../../../utils/permissions/permissions'
 import { prisma } from '../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {

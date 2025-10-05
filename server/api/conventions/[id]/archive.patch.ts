@@ -4,7 +4,7 @@ import { requireAuth } from '../../../utils/auth-utils'
 import {
   getConventionForArchive,
   validateConventionId,
-} from '../../../utils/convention-permissions'
+} from '../../../utils/permissions/convention-permissions'
 import { prisma } from '../../../utils/prisma'
 
 const schema = z.object({ archived: z.boolean() })

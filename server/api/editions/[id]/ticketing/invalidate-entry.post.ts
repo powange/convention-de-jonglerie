@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { canAccessEditionData } from '../../../../utils/edition-permissions'
+import { canAccessEditionData } from '../../../../utils/permissions/edition-permissions'
 import { prisma } from '../../../../utils/prisma'
 
 const bodySchema = z.object({

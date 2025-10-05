@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { prismaMock } from '../../../../../__mocks__/prisma'
-import { hasEditionEditPermission } from '../../../../../../server/utils/permissions'
+import { hasEditionEditPermission } from '../../../../../../server/utils/permissions/permissions'
 import handler from '../../../../../server/api/editions/[id]/lost-found/index.post'
 
 // S'assurer que requireUserSession est bien un mock vi.fn dans ce fichier

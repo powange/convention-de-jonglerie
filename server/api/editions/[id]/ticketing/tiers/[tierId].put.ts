@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { canAccessEditionData } from '../../../../../utils/edition-permissions'
 import { updateTier } from '../../../../../utils/editions/ticketing/tiers'
+import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
 
 const bodySchema = z.object({
   name: z.string().min(1),

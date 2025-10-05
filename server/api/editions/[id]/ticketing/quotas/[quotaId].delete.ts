@@ -1,4 +1,4 @@
-import { canAccessEditionData } from '../../../../../utils/edition-permissions'
+import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
 import { prisma } from '../../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {

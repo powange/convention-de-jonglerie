@@ -3,7 +3,7 @@ import {
   getConventionForDelete,
   shouldArchiveInsteadOfDelete,
   validateConventionId,
-} from '../../utils/convention-permissions'
+} from '../../utils/permissions/convention-permissions'
 import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {

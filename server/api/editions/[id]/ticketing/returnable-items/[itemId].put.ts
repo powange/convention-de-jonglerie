@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { canAccessEditionData } from '../../../../../utils/edition-permissions'
 import { updateReturnableItem } from '../../../../../utils/editions/ticketing/returnable-items'
+import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
 
 const updateItemSchema = z.object({
   name: z.string().min(1, 'Le nom est obligatoire'),

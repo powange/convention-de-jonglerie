@@ -1,13 +1,13 @@
 import { z } from 'zod'
 
 import { requireAuth } from '../../utils/auth-utils'
-import {
-  getConventionForEditionCreation,
-  validateConventionId,
-} from '../../utils/convention-permissions'
 import { normalizeDateToISO } from '../../utils/date-helpers'
 import { geocodeEdition } from '../../utils/geocoding'
 import { moveTempImageToEdition, moveTempImageFromPlaceholder } from '../../utils/move-temp-image'
+import {
+  getConventionForEditionCreation,
+  validateConventionId,
+} from '../../utils/permissions/convention-permissions'
 import { prisma } from '../../utils/prisma'
 import {
   editionSchema,

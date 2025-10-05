@@ -1,5 +1,5 @@
-import { canAccessEditionData } from '../../../../../utils/edition-permissions'
 import { deleteTier } from '../../../../../utils/editions/ticketing/tiers'
+import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })

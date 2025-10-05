@@ -1,6 +1,6 @@
 import { requireAuth } from '../../../../utils/auth-utils'
+import { requireVolunteerManagementAccess } from '../../../../utils/permissions/volunteer-permissions'
 import { prisma } from '../../../../utils/prisma'
-import { requireVolunteerManagementAccess } from '../../../../utils/volunteer-permissions'
 
 export default defineEventHandler(async (event) => {
   // Authentification requise

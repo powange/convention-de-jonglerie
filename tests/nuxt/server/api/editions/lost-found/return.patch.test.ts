@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import handler from '../../../../../../server/api/editions/[id]/lost-found/[itemId]/return.patch'
-import { hasEditionEditPermission } from '../../../../../../server/utils/permissions'
+import { hasEditionEditPermission } from '../../../../../../server/utils/permissions/permissions'
 import { prismaMock } from '../../../../../__mocks__/prisma'
 
 vi.mock('#imports', async () => {

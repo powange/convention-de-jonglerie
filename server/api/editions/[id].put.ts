@@ -2,8 +2,8 @@ import { z } from 'zod'
 
 import { requireAuth } from '../../utils/auth-utils'
 import { normalizeDateToISO } from '../../utils/date-helpers'
-import { getEditionForEdit, validateEditionId } from '../../utils/edition-permissions'
 import { geocodeEdition } from '../../utils/geocoding'
+import { getEditionForEdit, validateEditionId } from '../../utils/permissions/edition-permissions'
 import { prisma } from '../../utils/prisma'
 import {
   updateEditionSchema,

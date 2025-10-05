@@ -6,7 +6,7 @@ import {
   validateAndSanitize,
   handleValidationError,
 } from '../../../../../server/utils/validation-schemas'
-import { hasEditionEditPermission } from '../../../../utils/permissions'
+import { hasEditionEditPermission } from '../../../../utils/permissions/permissions'
 
 const prisma = new PrismaClient()
 

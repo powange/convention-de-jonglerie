@@ -1,5 +1,5 @@
 import { requireAuth } from '../../utils/auth-utils'
-import { getEditionForDelete, validateEditionId } from '../../utils/edition-permissions'
+import { getEditionForDelete, validateEditionId } from '../../utils/permissions/edition-permissions'
 import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {

@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
 import { requireAuth } from '../../../utils/auth-utils'
+import { getEmailHash } from '../../../utils/email-hash'
 import {
   getEditionForStatusManagement,
   validateEditionId,
-} from '../../../utils/edition-permissions'
-import { getEmailHash } from '../../../utils/email-hash'
+} from '../../../utils/permissions/edition-permissions'
 import { prisma } from '../../../utils/prisma'
 
 const statusSchema = z.object({

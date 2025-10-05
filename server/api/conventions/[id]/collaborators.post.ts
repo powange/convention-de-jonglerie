@@ -5,7 +5,7 @@ import {
   addConventionCollaborator,
   findUserByPseudoOrEmail,
 } from '../../../utils/collaborator-management'
-import { validateConventionId } from '../../../utils/convention-permissions'
+import { validateConventionId } from '../../../utils/permissions/convention-permissions'
 
 const addCollaboratorSchema = z
   .object({
