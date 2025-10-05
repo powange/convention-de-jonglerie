@@ -20,7 +20,7 @@
       <EditionHeader :edition="edition" current-page="gestion" />
 
       <!-- Titre de la page -->
-      <div class="mb-6 flex items-start justify-between">
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <UIcon name="i-heroicons-shield-check" class="text-blue-600 dark:text-blue-400" />
@@ -33,6 +33,7 @@
         <UButton
           icon="i-heroicons-user-plus"
           color="primary"
+          class="sm:flex-shrink-0"
           @click="showAddParticipantModal = true"
         >
           {{ $t('editions.ticketing.add_participant') }}
@@ -45,51 +46,65 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <!-- Scanner de billets -->
           <UCard>
-            <div class="space-y-4">
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-qr-code" class="text-blue-500" />
-                <h2 class="text-lg font-semibold">{{ $t('editions.ticketing.scan_ticket') }}</h2>
+            <div class="space-y-6">
+              <!-- En-tête -->
+              <div class="flex items-center gap-3">
+                <div
+                  class="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30"
+                >
+                  <UIcon
+                    name="i-heroicons-qr-code"
+                    class="h-6 w-6 text-blue-600 dark:text-blue-400"
+                  />
+                </div>
+                <div>
+                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    {{ $t('editions.ticketing.scan_ticket') }}
+                  </h2>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Scannez ou saisissez le code
+                  </p>
+                </div>
               </div>
 
-              <UAlert
-                icon="i-heroicons-information-circle"
-                color="info"
-                variant="soft"
-                description="Scannez un QR code ou entrez manuellement le code du billet"
-              />
-
-              <!-- Zone de scan -->
-              <div class="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
+              <!-- Scanner et saisie manuelle -->
+              <div class="flex flex-col xl:flex-row items-center xl:items-end gap-4">
+                <!-- Bouton Scanner -->
                 <UButton
                   icon="i-heroicons-qr-code"
                   color="primary"
-                  size="lg"
-                  class="w-full lg:w-auto"
+                  size="xl"
+                  variant="soft"
+                  class="xl:flex-1 justify-center h-[52px]"
                   @click="startScanner"
                 >
-                  Scanner un QR code
+                  <span class="font-semibold">Scanner un QR code</span>
                 </UButton>
 
-                <div class="flex items-center justify-center">
-                  <span class="text-gray-500 dark:text-gray-400 font-medium">ou</span>
-                </div>
-
-                <UFieldGroup class="flex-1">
-                  <UInput
-                    v-model="ticketCode"
-                    :placeholder="$t('editions.ticketing.ticket_code_placeholder')"
-                    icon="i-heroicons-ticket"
-                    @keydown.enter="validateTicket"
-                  />
-                  <UButton
-                    :label="$t('editions.ticketing.validate_ticket')"
-                    icon="i-heroicons-check-circle"
-                    color="success"
-                    :disabled="!ticketCode"
-                    :loading="validatingTicket"
-                    @click="validateTicket"
-                  />
-                </UFieldGroup>
+                <!-- Saisie manuelle -->
+                <UFormField
+                  label="Saisie manuelle du code"
+                  :label-class="'text-center lg:text-left'"
+                  class="xl:flex-1 w-full"
+                >
+                  <UFieldGroup class="w-full">
+                    <UInput
+                      v-model="ticketCode"
+                      :placeholder="$t('editions.ticketing.ticket_code_placeholder')"
+                      icon="i-heroicons-ticket"
+                      class="w-full"
+                      @keydown.enter="validateTicket"
+                    />
+                    <UButton
+                      :label="$t('editions.ticketing.validate_ticket')"
+                      icon="i-heroicons-check-circle"
+                      color="success"
+                      :disabled="!ticketCode"
+                      :loading="validatingTicket"
+                      @click="validateTicket"
+                    />
+                  </UFieldGroup>
+                </UFormField>
               </div>
             </div>
           </UCard>

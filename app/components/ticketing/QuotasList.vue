@@ -21,7 +21,7 @@
         :key="quota.id"
         class="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
       >
-        <UFieldGroup class="flex-1">
+        <UFieldGroup>
           <UInput
             :model-value="quota.title"
             placeholder="Titre du quota"
@@ -33,25 +33,28 @@
             :ui="{ base: 'w-32' }"
             @update:model-value="updateQuota(quota.id, { quantity: $event })"
           />
+          <UModal>
+            <UButton icon="i-heroicons-pencil" color="neutral" variant="outline" />
+            <template #body>
+              <UFormField label="description">
+                <textarea
+                  v-model="quota.description"
+                  placeholder="Description (optionnel)"
+                  color="neutral"
+                  variant="outline"
+                  class="w-full"
+                  @blur="updateQuota(quota.id, { description: $event.target.value || null })"
+                />
+              </UFormField>
+            </template>
+          </UModal>
+          <UButton icon="i-heroicons-trash" color="error" @click="confirmDeleteQuota(quota)" />
         </UFieldGroup>
-        <UInput
-          :model-value="quota.description || ''"
-          placeholder="Description (optionnel)"
-          class="flex-1"
-          @blur="updateQuota(quota.id, { description: $event.target.value || null })"
-        />
-        <UButton
-          icon="i-heroicons-trash"
-          color="error"
-          variant="ghost"
-          size="xs"
-          @click="confirmDeleteQuota(quota)"
-        />
       </div>
 
       <!-- Ligne d'ajout -->
-      <div class="flex items-center gap-2 py-2 px-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-        <UFieldGroup class="flex-1">
+      <div class="flex items-center py-2 px-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+        <UFieldGroup>
           <UInput v-model="form.title" placeholder="Nouveau quota..." @keydown.enter="handleSave" />
           <UInputNumber
             v-model="form.quantity"
@@ -59,21 +62,23 @@
             :ui="{ base: 'w-32' }"
             @keydown.enter="handleSave"
           />
+          <UModal>
+            <UButton icon="i-heroicons-pencil" color="neutral" variant="outline" />
+            <template #body>
+              <UFormField label="description">
+                <textarea
+                  v-model="form.description"
+                  placeholder="Description (optionnel)"
+                  color="neutral"
+                  variant="outline"
+                  class="w-full"
+                  @keydown.enter="handleSave"
+                />
+              </UFormField>
+            </template>
+          </UModal>
+          <UButton icon="i-heroicons-plus" color="primary" :loading="saving" @click="handleSave" />
         </UFieldGroup>
-        <UInput
-          v-model="form.description"
-          placeholder="Description (optionnel)"
-          class="flex-1"
-          @keydown.enter="handleSave"
-        />
-        <UButton
-          icon="i-heroicons-plus"
-          color="primary"
-          variant="ghost"
-          size="xs"
-          :loading="saving"
-          @click="handleSave"
-        />
       </div>
     </div>
   </div>
@@ -172,6 +177,8 @@ const updateQuota = async (
   updates: Partial<{ title: string; description: string | null; quantity: number }>
 ) => {
   const toast = useToast()
+
+  console.log(updates)
 
   try {
     // Trouver le quota à mettre à jour

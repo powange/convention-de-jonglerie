@@ -99,7 +99,8 @@
       "Bash(npx tsx:*)",
       "WebFetch(domain:heroicons.com)",
       "mcp__nuxt-ui-remote__get_component",
-      "SlashCommand(/translate-todos)"
+      "SlashCommand(/translate-todos)",
+      "mcp__nuxt-ui-remote__get_component_metadata"
     ],
     "deny": [],
     "ask": [],

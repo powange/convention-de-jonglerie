@@ -244,6 +244,9 @@
             </div>
           </UCard>
 
+          <!-- Mon billet (si l'utilisateur est connecté et a un billet) -->
+          <EditionMyTicketCard v-if="authStore.isAuthenticated" :edition-id="edition.id" />
+
           <EditionParticipantsCard
             :participants="edition.attendingUsers"
             :is-attending="isAttending(edition.id)"

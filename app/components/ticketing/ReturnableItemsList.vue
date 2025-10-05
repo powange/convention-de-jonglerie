@@ -22,37 +22,22 @@
         :key="item.id"
         class="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
       >
-        <UInput
-          :model-value="item.name"
-          placeholder="Nom de l'item"
-          class="flex-1"
-          @blur="updateItem(item.id, $event.target.value)"
-        />
-        <UButton
-          icon="i-heroicons-trash"
-          color="error"
-          variant="ghost"
-          size="xs"
-          @click="confirmDeleteItem(item)"
-        />
+        <UFieldGroup>
+          <UInput
+            :model-value="item.name"
+            placeholder="Nom de l'item"
+            @blur="updateItem(item.id, $event.target.value)"
+          />
+          <UButton icon="i-heroicons-trash" color="error" @click="confirmDeleteItem(item)" />
+        </UFieldGroup>
       </div>
 
       <!-- Ligne d'ajout -->
       <div class="flex items-center gap-2 py-2 px-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-        <UInput
-          v-model="form.name"
-          placeholder="Nouvel item..."
-          class="flex-1"
-          @keydown.enter="handleSave"
-        />
-        <UButton
-          icon="i-heroicons-plus"
-          color="primary"
-          variant="ghost"
-          size="xs"
-          :loading="saving"
-          @click="handleSave"
-        />
+        <UFieldGroup>
+          <UInput v-model="form.name" placeholder="Nouvel item..." @keydown.enter="handleSave" />
+          <UButton icon="i-heroicons-plus" color="primary" :loading="saving" @click="handleSave" />
+        </UFieldGroup>
       </div>
     </div>
   </div>

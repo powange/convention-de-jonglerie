@@ -932,7 +932,7 @@
       "total_entries": "Total des entrées",
       "recent_validations": "Dernières validations",
       "no_validation_yet": "Aucune validation pour le moment",
-      "ticket_code_placeholder": "Scannez ou saisissez le code",
+      "ticket_code_placeholder": "Saisissez le code du billet",
       "validate_ticket": "Valider le billet",
       "api_credentials": "Identifiants API",
       "identify_form": "Identifier votre formulaire",
