@@ -1,5 +1,5 @@
-import { canManageCollaborators } from './collaborator-management'
-import { prisma } from './prisma'
+import { canManageCollaborators } from '../collaborator-management'
+import { prisma } from '../prisma'
 
 import type { User, Convention, ConventionCollaborator } from '@prisma/client'
 

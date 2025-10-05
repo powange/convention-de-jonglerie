@@ -3,8 +3,8 @@ import { join, dirname } from 'path'
 
 import type { Convention, Edition, User } from '~/app/types'
 
-import { getConventionForEdit } from './convention-permissions'
 import { deleteFromBothLocations } from './copy-to-output'
+import { getConventionForEdit } from './permissions/convention-permissions'
 import { prisma } from './prisma'
 
 export interface ImageDeletionOptions {

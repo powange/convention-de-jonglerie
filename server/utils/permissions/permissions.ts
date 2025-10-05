@@ -1,4 +1,4 @@
-import { prisma } from './prisma'
+import { prisma } from '../prisma'
 
 /**
  * Vérifie si un utilisateur a les permissions de modification sur une édition

@@ -1,5 +1,5 @@
-import { checkAdminMode } from './collaborator-management'
-import { prisma } from './prisma'
+import { checkAdminMode } from '../collaborator-management'
+import { prisma } from '../prisma'
 
 import type { User, Edition, Convention, ConventionCollaborator } from '@prisma/client'
 
