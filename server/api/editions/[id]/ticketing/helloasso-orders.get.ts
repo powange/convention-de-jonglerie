@@ -86,6 +86,7 @@ export default defineEventHandler(async (event) => {
             create: {
               externalTicketingId: config.id,
               helloAssoOrderId: order.id,
+              editionId,
               payerFirstName: order.payer.firstName,
               payerLastName: order.payer.lastName,
               payerEmail: order.payer.email,
@@ -136,40 +137,50 @@ export default defineEventHandler(async (event) => {
               })
             }
 
-            await tx.helloAssoOrderItem.upsert({
+            // Vérifier si l'item existe déjà
+            const existingItem = await tx.helloAssoOrderItem.findFirst({
               where: {
-                orderId_helloAssoItemId: {
-                  orderId: savedOrder.id,
-                  helloAssoItemId: item.id,
-                },
-              },
-              create: {
                 orderId: savedOrder.id,
                 helloAssoItemId: item.id,
-                tierId: matchingTier?.id,
-                firstName: item.user?.firstName || order.payer.firstName,
-                lastName: item.user?.lastName || order.payer.lastName,
-                email: item.user?.email || order.payer.email,
-                name: item.name || null,
-                type: item.type,
-                amount: item.amount,
-                state: item.state,
-                qrCode: item.qrCode,
-                customFields: item.customFields || null,
-              },
-              update: {
-                tierId: matchingTier?.id,
-                firstName: item.user?.firstName || order.payer.firstName,
-                lastName: item.user?.lastName || order.payer.lastName,
-                email: item.user?.email || order.payer.email,
-                name: item.name || null,
-                type: item.type,
-                amount: item.amount,
-                state: item.state,
-                qrCode: item.qrCode,
-                customFields: item.customFields || null,
               },
             })
+
+            if (existingItem) {
+              // Mettre à jour l'item existant
+              await tx.helloAssoOrderItem.update({
+                where: { id: existingItem.id },
+                data: {
+                  tierId: matchingTier?.id,
+                  firstName: item.user?.firstName || order.payer.firstName,
+                  lastName: item.user?.lastName || order.payer.lastName,
+                  email: item.user?.email || order.payer.email,
+                  name: item.name || null,
+                  type: item.type,
+                  amount: item.amount,
+                  state: item.state,
+                  qrCode: item.qrCode,
+                  customFields: item.customFields || null,
+                },
+              })
+            } else {
+              // Créer un nouvel item
+              await tx.helloAssoOrderItem.create({
+                data: {
+                  orderId: savedOrder.id,
+                  helloAssoItemId: item.id,
+                  tierId: matchingTier?.id,
+                  firstName: item.user?.firstName || order.payer.firstName,
+                  lastName: item.user?.lastName || order.payer.lastName,
+                  email: item.user?.email || order.payer.email,
+                  name: item.name || null,
+                  type: item.type,
+                  amount: item.amount,
+                  state: item.state,
+                  qrCode: item.qrCode,
+                  customFields: item.customFields || null,
+                },
+              })
+            }
           }
         }
       })
