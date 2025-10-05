@@ -1,7 +1,7 @@
-import { canAccessEditionData } from '../../../../utils/edition-permissions'
-import { getHelloAssoTiersAndOptions } from '../../../../utils/editions/ticketing/helloasso'
-import { decrypt } from '../../../../utils/encryption'
-import { prisma } from '../../../../utils/prisma'
+import { canAccessEditionData } from '../../../../../utils/edition-permissions'
+import { getHelloAssoTiersAndOptions } from '../../../../../utils/editions/ticketing/helloasso'
+import { decrypt } from '../../../../../utils/encryption'
+import { prisma } from '../../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })

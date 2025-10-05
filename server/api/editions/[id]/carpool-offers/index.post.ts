@@ -1,5 +1,5 @@
-import { prisma } from '../../../utils/prisma'
-import { carpoolRequestSchema } from '../../../utils/validation-schemas'
+import { prisma } from '../../../../utils/prisma'
+import { carpoolOfferSchema } from '../../../../utils/validation-schemas'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Validation des données avec Zod
-  const validationResult = carpoolRequestSchema.safeParse(body)
+  const validationResult = carpoolOfferSchema.safeParse(body)
   if (!validationResult.success) {
     throw createError({
       statusCode: 400,
@@ -45,14 +45,15 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Créer la demande de covoiturage
-    const carpoolRequest = await prisma.carpoolRequest.create({
+    // Créer l'offre de covoiturage
+    const carpoolOffer = await prisma.carpoolOffer.create({
       data: {
         editionId,
         userId: event.context.user.id,
         tripDate: new Date(validatedData.tripDate),
         locationCity: validatedData.locationCity,
-        seatsNeeded: validatedData.seatsNeeded,
+        locationAddress: validatedData.locationAddress,
+        availableSeats: validatedData.availableSeats,
         direction: validatedData.direction,
         description: validatedData.description,
         phoneNumber: validatedData.phoneNumber,
@@ -69,9 +70,9 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    return carpoolRequest
+    return carpoolOffer
   } catch (error) {
-    console.error('Erreur lors de la création de la demande:', error)
+    console.error('Erreur lors de la création du covoiturage:', error)
     throw createError({
       statusCode: 500,
       message: 'Erreur serveur',

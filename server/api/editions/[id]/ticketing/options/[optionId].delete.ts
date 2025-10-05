@@ -1,5 +1,5 @@
 import { canAccessEditionData } from '../../../../../utils/edition-permissions'
-import { prisma } from '../../../../../utils/prisma'
+import { deleteOption } from '../../../../../utils/editions/ticketing/options'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
@@ -19,38 +19,10 @@ export default defineEventHandler(async (event) => {
     })
 
   try {
-    // Vérifier que l'option existe et appartient bien à l'édition
-    const existingOption = await prisma.helloAssoOption.findFirst({
-      where: {
-        id: optionId,
-        editionId,
-      },
-    })
-
-    if (!existingOption) {
-      throw createError({
-        statusCode: 404,
-        message: 'Option non trouvée',
-      })
-    }
-
-    // Ne pas permettre la suppression d'une option HelloAsso
-    if (existingOption.helloAssoOptionId !== null) {
-      throw createError({
-        statusCode: 400,
-        message: 'Les options HelloAsso ne peuvent pas être supprimées',
-      })
-    }
-
-    await prisma.helloAssoOption.delete({
-      where: { id: optionId },
-    })
-
-    return {
-      success: true,
-    }
+    return await deleteOption(optionId, editionId)
   } catch (error: any) {
     console.error('Delete option error:', error)
+    if (error.statusCode) throw error
     throw createError({
       statusCode: 500,
       message: "Erreur lors de la suppression de l'option",

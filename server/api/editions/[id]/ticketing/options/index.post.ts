@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { canAccessEditionData } from '../../../../../utils/edition-permissions'
-import { prisma } from '../../../../../utils/prisma'
+import { createOption } from '../../../../../utils/editions/ticketing/options'
 
 const bodySchema = z.object({
   name: z.string().min(1),
@@ -31,37 +31,7 @@ export default defineEventHandler(async (event) => {
   const body = bodySchema.parse(await readBody(event))
 
   try {
-    // Vérifier qu'il existe une configuration de billeterie externe pour cette édition
-    const externalTicketing = await prisma.externalTicketing.findUnique({
-      where: { editionId },
-    })
-
-    if (!externalTicketing) {
-      throw createError({
-        statusCode: 400,
-        message: 'Aucune configuration de billeterie externe trouvée',
-      })
-    }
-
-    const option = await prisma.helloAssoOption.create({
-      data: {
-        externalTicketingId: externalTicketing.id,
-        editionId,
-        name: body.name,
-        description: body.description,
-        type: body.type,
-        isRequired: body.isRequired,
-        choices: body.choices,
-        position: body.position,
-        // helloAssoOptionId reste null pour une option manuelle
-        quotas: {
-          create: body.quotaIds.map((quotaId) => ({ quotaId })),
-        },
-        returnableItems: {
-          create: body.returnableItemIds.map((returnableItemId) => ({ returnableItemId })),
-        },
-      },
-    })
+    const option = await createOption(editionId, body)
 
     return {
       success: true,
@@ -69,6 +39,7 @@ export default defineEventHandler(async (event) => {
     }
   } catch (error: any) {
     console.error('Create option error:', error)
+    if (error.statusCode) throw error
     throw createError({
       statusCode: 500,
       message: "Erreur lors de la création de l'option",

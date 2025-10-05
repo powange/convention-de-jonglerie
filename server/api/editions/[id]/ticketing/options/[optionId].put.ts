@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { canAccessEditionData } from '../../../../../utils/edition-permissions'
-import { prisma } from '../../../../../utils/prisma'
+import { updateOption } from '../../../../../utils/editions/ticketing/options'
 
 const bodySchema = z.object({
   name: z.string().min(1),
@@ -34,63 +34,7 @@ export default defineEventHandler(async (event) => {
   const body = bodySchema.parse(await readBody(event))
 
   try {
-    // Vérifier que l'option existe et appartient bien à l'édition
-    const existingOption = await prisma.helloAssoOption.findFirst({
-      where: {
-        id: optionId,
-        editionId,
-      },
-    })
-
-    if (!existingOption) {
-      throw createError({
-        statusCode: 404,
-        message: 'Option non trouvée',
-      })
-    }
-
-    const isHelloAssoOption = existingOption.helloAssoOptionId !== null
-
-    // Mettre à jour l'option avec ses relations
-    const option = await prisma.$transaction(async (tx) => {
-      // Supprimer les anciennes relations
-      await tx.optionQuota.deleteMany({ where: { optionId } })
-      await tx.optionReturnableItem.deleteMany({ where: { optionId } })
-
-      // Pour les options HelloAsso, on met à jour uniquement les relations
-      // Pour les options manuelles, on met à jour tout
-      if (isHelloAssoOption) {
-        return await tx.helloAssoOption.update({
-          where: { id: optionId },
-          data: {
-            quotas: {
-              create: body.quotaIds.map((quotaId) => ({ quotaId })),
-            },
-            returnableItems: {
-              create: body.returnableItemIds.map((returnableItemId) => ({ returnableItemId })),
-            },
-          },
-        })
-      } else {
-        return await tx.helloAssoOption.update({
-          where: { id: optionId },
-          data: {
-            name: body.name,
-            description: body.description,
-            type: body.type,
-            isRequired: body.isRequired,
-            choices: body.choices,
-            position: body.position,
-            quotas: {
-              create: body.quotaIds.map((quotaId) => ({ quotaId })),
-            },
-            returnableItems: {
-              create: body.returnableItemIds.map((returnableItemId) => ({ returnableItemId })),
-            },
-          },
-        })
-      }
-    })
+    const option = await updateOption(optionId, editionId, body)
 
     return {
       success: true,

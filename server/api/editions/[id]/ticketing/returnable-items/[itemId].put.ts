@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { canAccessEditionData } from '../../../../../utils/edition-permissions'
-import { prisma } from '../../../../../utils/prisma'
+import { updateReturnableItem } from '../../../../../utils/editions/ticketing/returnable-items'
 
 const updateItemSchema = z.object({
   name: z.string().min(1, 'Le nom est obligatoire'),
@@ -25,22 +25,6 @@ export default defineEventHandler(async (event) => {
       message: 'Droits insuffisants pour modifier ces données',
     })
 
-  // Vérifier que l'item existe et appartient à cette édition
-  const existingItem = await prisma.returnableItem.findUnique({
-    where: { id: itemId },
-  })
-
-  if (!existingItem) {
-    throw createError({ statusCode: 404, message: 'Item introuvable' })
-  }
-
-  if (existingItem.editionId !== editionId) {
-    throw createError({
-      statusCode: 403,
-      message: "Cet item n'appartient pas à cette édition",
-    })
-  }
-
   const body = await readBody(event)
   const validation = updateItemSchema.safeParse(body)
 
@@ -52,16 +36,10 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const item = await prisma.returnableItem.update({
-      where: { id: itemId },
-      data: {
-        name: validation.data.name,
-      },
-    })
-
-    return item
+    return await updateReturnableItem(itemId, editionId, validation.data)
   } catch (error: any) {
     console.error('Failed to update returnable item:', error)
+    if (error.statusCode) throw error
     throw createError({
       statusCode: 500,
       message: "Erreur lors de la modification de l'item à restituer",

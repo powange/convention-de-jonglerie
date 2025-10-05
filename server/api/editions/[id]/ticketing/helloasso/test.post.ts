@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { getHelloAssoOrders } from '../../../../utils/editions/ticketing/helloasso'
+import { testHelloAssoConnection } from '../../../../../utils/editions/ticketing/helloasso'
 
 const bodySchema = z.object({
   clientId: z.string().min(1),
@@ -8,8 +8,6 @@ const bodySchema = z.object({
   organizationSlug: z.string().min(1),
   formType: z.string().min(1),
   formSlug: z.string().min(1),
-  pageIndex: z.number().optional(),
-  pageSize: z.number().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -18,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const body = bodySchema.parse(await readBody(event))
 
   try {
-    const result = await getHelloAssoOrders(
+    const result = await testHelloAssoConnection(
       {
         clientId: body.clientId,
         clientSecret: body.clientSecret,
@@ -27,21 +25,17 @@ export default defineEventHandler(async (event) => {
         organizationSlug: body.organizationSlug,
         formType: body.formType,
         formSlug: body.formSlug,
-      },
-      {
-        withDetails: true,
-        pageIndex: body.pageIndex,
-        pageSize: body.pageSize,
       }
     )
 
     return {
-      success: true,
-      orders: result.data,
-      pagination: result.pagination,
+      ...result,
+      message: 'Connexion réussie',
     }
   } catch (error: any) {
-    console.error('HelloAsso orders error:', error)
+    console.error('HelloAsso test error:', error)
+
+    // L'utilitaire gère déjà les erreurs, on les relance simplement
     throw error
   }
 })

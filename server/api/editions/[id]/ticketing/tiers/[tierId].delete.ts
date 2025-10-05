@@ -1,5 +1,5 @@
 import { canAccessEditionData } from '../../../../../utils/edition-permissions'
-import { prisma } from '../../../../../utils/prisma'
+import { deleteTier } from '../../../../../utils/editions/ticketing/tiers'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
@@ -19,37 +19,7 @@ export default defineEventHandler(async (event) => {
     })
 
   try {
-    // Vérifier que le tarif existe et appartient à cette édition
-    const existingTier = await prisma.helloAssoTier.findFirst({
-      where: {
-        id: tierId,
-        editionId,
-      },
-    })
-
-    if (!existingTier) {
-      throw createError({
-        statusCode: 404,
-        message: 'Tarif introuvable',
-      })
-    }
-
-    // Vérifier que ce n'est pas un tarif HelloAsso (non supprimable)
-    if (existingTier.helloAssoTierId !== null) {
-      throw createError({
-        statusCode: 403,
-        message: 'Impossible de supprimer un tarif synchronisé depuis HelloAsso',
-      })
-    }
-
-    await prisma.helloAssoTier.delete({
-      where: { id: tierId },
-    })
-
-    return {
-      success: true,
-      message: 'Tarif supprimé avec succès',
-    }
+    return await deleteTier(tierId, editionId)
   } catch (error: any) {
     console.error('Delete tier error:', error)
     if (error.statusCode) throw error

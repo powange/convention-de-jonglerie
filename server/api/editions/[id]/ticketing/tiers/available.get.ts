@@ -1,5 +1,5 @@
-import { canAccessEditionData } from '../../../../utils/edition-permissions'
-import { prisma } from '../../../../utils/prisma'
+import { canAccessEditionData } from '../../../../../utils/edition-permissions'
+import { prisma } from '../../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })

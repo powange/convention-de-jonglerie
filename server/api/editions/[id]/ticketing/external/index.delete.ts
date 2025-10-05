@@ -1,5 +1,5 @@
-import { canManageEditionVolunteers } from '../../../../utils/collaborator-management'
-import { prisma } from '../../../../utils/prisma'
+import { canManageEditionVolunteers } from '../../../../../utils/collaborator-management'
+import { prisma } from '../../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })

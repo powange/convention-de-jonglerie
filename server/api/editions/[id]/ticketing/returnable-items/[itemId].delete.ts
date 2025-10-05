@@ -1,5 +1,5 @@
 import { canAccessEditionData } from '../../../../../utils/edition-permissions'
-import { prisma } from '../../../../../utils/prisma'
+import { deleteReturnableItem } from '../../../../../utils/editions/ticketing/returnable-items'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
@@ -19,30 +19,11 @@ export default defineEventHandler(async (event) => {
       message: 'Droits insuffisants pour modifier ces données',
     })
 
-  // Vérifier que l'item existe et appartient à cette édition
-  const existingItem = await prisma.returnableItem.findUnique({
-    where: { id: itemId },
-  })
-
-  if (!existingItem) {
-    throw createError({ statusCode: 404, message: 'Item introuvable' })
-  }
-
-  if (existingItem.editionId !== editionId) {
-    throw createError({
-      statusCode: 403,
-      message: "Cet item n'appartient pas à cette édition",
-    })
-  }
-
   try {
-    await prisma.returnableItem.delete({
-      where: { id: itemId },
-    })
-
-    return { success: true }
+    return await deleteReturnableItem(itemId, editionId)
   } catch (error: any) {
     console.error('Failed to delete returnable item:', error)
+    if (error.statusCode) throw error
     throw createError({
       statusCode: 500,
       message: "Erreur lors de la suppression de l'item à restituer",

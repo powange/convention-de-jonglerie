@@ -316,7 +316,7 @@ const fetchTiers = async () => {
   loadingTiers.value = true
   try {
     const response = await $fetch<{ tiers: Tier[] }>(
-      `/api/editions/${props.editionId}/ticketing/tiers-available`
+      `/api/editions/${props.editionId}/ticketing/tiers/available`
     )
     availableTiers.value = response.tiers
     // Initialiser les quantités à 0

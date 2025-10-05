@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { canAccessEditionData } from '../../../../../utils/edition-permissions'
-import { prisma } from '../../../../../utils/prisma'
+import { createReturnableItem } from '../../../../../utils/editions/ticketing/returnable-items'
 
 const createItemSchema = z.object({
   name: z.string().min(1, 'Le nom est obligatoire'),
@@ -32,14 +32,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const item = await prisma.returnableItem.create({
-      data: {
-        editionId,
-        name: validation.data.name,
-      },
-    })
-
-    return item
+    return await createReturnableItem(editionId, validation.data)
   } catch (error: any) {
     console.error('Failed to create returnable item:', error)
     throw createError({

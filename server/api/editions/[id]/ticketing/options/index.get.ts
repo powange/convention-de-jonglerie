@@ -1,5 +1,5 @@
 import { canAccessEditionData } from '../../../../../utils/edition-permissions'
-import { prisma } from '../../../../../utils/prisma'
+import { getEditionOptions } from '../../../../../utils/editions/ticketing/options'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
@@ -16,17 +16,7 @@ export default defineEventHandler(async (event) => {
     })
 
   try {
-    // Récupérer toutes les options de l'édition (HelloAsso et manuelles)
-    const options = await prisma.helloAssoOption.findMany({
-      where: { editionId },
-      orderBy: [{ position: 'asc' }, { name: 'asc' }],
-      include: {
-        quotas: { include: { quota: true } },
-        returnableItems: { include: { returnableItem: true } },
-      },
-    })
-
-    return options
+    return await getEditionOptions(editionId)
   } catch (error: any) {
     console.error('Failed to fetch options from DB:', error)
     throw createError({

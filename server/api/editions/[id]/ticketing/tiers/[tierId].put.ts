@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { canAccessEditionData } from '../../../../../utils/edition-permissions'
-import { prisma } from '../../../../../utils/prisma'
+import { updateTier } from '../../../../../utils/editions/ticketing/tiers'
 
 const bodySchema = z.object({
   name: z.string().min(1),
@@ -35,64 +35,7 @@ export default defineEventHandler(async (event) => {
   const body = bodySchema.parse(await readBody(event))
 
   try {
-    // Vérifier que le tarif existe et appartient à cette édition
-    const existingTier = await prisma.helloAssoTier.findFirst({
-      where: {
-        id: tierId,
-        editionId,
-      },
-    })
-
-    if (!existingTier) {
-      throw createError({
-        statusCode: 404,
-        message: 'Tarif introuvable',
-      })
-    }
-
-    const isHelloAssoTier = existingTier.helloAssoTierId !== null
-
-    // Mettre à jour le tarif avec ses relations
-    const tier = await prisma.$transaction(async (tx) => {
-      // Supprimer les anciennes relations
-      await tx.tierQuota.deleteMany({ where: { tierId } })
-      await tx.tierReturnableItem.deleteMany({ where: { tierId } })
-
-      // Pour les tarifs HelloAsso, on met à jour uniquement les relations
-      // Pour les tarifs manuels, on met à jour tout
-      if (isHelloAssoTier) {
-        return await tx.helloAssoTier.update({
-          where: { id: tierId },
-          data: {
-            quotas: {
-              create: body.quotaIds.map((quotaId) => ({ quotaId })),
-            },
-            returnableItems: {
-              create: body.returnableItemIds.map((returnableItemId) => ({ returnableItemId })),
-            },
-          },
-        })
-      } else {
-        return await tx.helloAssoTier.update({
-          where: { id: tierId },
-          data: {
-            name: body.name,
-            description: body.description,
-            price: body.price,
-            minAmount: body.minAmount,
-            maxAmount: body.maxAmount,
-            position: body.position,
-            isActive: body.isActive,
-            quotas: {
-              create: body.quotaIds.map((quotaId) => ({ quotaId })),
-            },
-            returnableItems: {
-              create: body.returnableItemIds.map((returnableItemId) => ({ returnableItemId })),
-            },
-          },
-        })
-      }
-    })
+    const tier = await updateTier(tierId, editionId, body)
 
     return {
       success: true,

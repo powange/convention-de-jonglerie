@@ -1,7 +1,7 @@
 import { createError } from 'h3'
 
-import { getEmailHash } from '../../../utils/email-hash'
-import { prisma } from '../../../utils/prisma'
+import { getEmailHash } from '../../../../utils/email-hash'
+import { prisma } from '../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const editionId = parseInt(event.context.params?.id as string)

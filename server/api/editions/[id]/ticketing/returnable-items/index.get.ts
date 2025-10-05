@@ -1,5 +1,5 @@
 import { canAccessEditionData } from '../../../../../utils/edition-permissions'
-import { prisma } from '../../../../../utils/prisma'
+import { getReturnableItems } from '../../../../../utils/editions/ticketing/returnable-items'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
@@ -16,12 +16,7 @@ export default defineEventHandler(async (event) => {
     })
 
   try {
-    const items = await prisma.returnableItem.findMany({
-      where: { editionId },
-      orderBy: { createdAt: 'asc' },
-    })
-
-    return items
+    return await getReturnableItems(editionId)
   } catch (error: any) {
     console.error('Failed to fetch returnable items:', error)
     throw createError({

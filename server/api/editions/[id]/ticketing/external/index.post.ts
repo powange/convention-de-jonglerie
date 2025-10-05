@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
-import { canManageEditionVolunteers } from '../../../../utils/collaborator-management'
-import { encrypt } from '../../../../utils/encryption'
-import { prisma } from '../../../../utils/prisma'
+import { canManageEditionVolunteers } from '../../../../../utils/collaborator-management'
+import { encrypt } from '../../../../../utils/encryption'
+import { prisma } from '../../../../../utils/prisma'
 
 const bodySchema = z.object({
   provider: z.enum(['HELLOASSO', 'BILLETWEB', 'WEEZEVENT', 'OTHER']),

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { canAccessEditionData } from '../../../../../utils/edition-permissions'
-import { prisma } from '../../../../../utils/prisma'
+import { createTier } from '../../../../../utils/editions/ticketing/tiers'
 
 const bodySchema = z.object({
   name: z.string().min(1),
@@ -32,25 +32,7 @@ export default defineEventHandler(async (event) => {
   const body = bodySchema.parse(await readBody(event))
 
   try {
-    const tier = await prisma.helloAssoTier.create({
-      data: {
-        editionId,
-        name: body.name,
-        description: body.description,
-        price: body.price,
-        minAmount: body.minAmount,
-        maxAmount: body.maxAmount,
-        position: body.position,
-        isActive: body.isActive,
-        // externalTicketingId et helloAssoTierId restent null pour un tarif manuel
-        quotas: {
-          create: body.quotaIds.map((quotaId) => ({ quotaId })),
-        },
-        returnableItems: {
-          create: body.returnableItemIds.map((returnableItemId) => ({ returnableItemId })),
-        },
-      },
-    })
+    const tier = await createTier(editionId, body)
 
     return {
       success: true,

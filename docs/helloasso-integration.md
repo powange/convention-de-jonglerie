@@ -16,10 +16,13 @@ L'intégration HelloAsso permet de connecter une édition de convention à une b
 ```
 server/
 ├── api/editions/[id]/ticketing/
-│   ├── external.get.ts              # Récupérer la configuration
-│   ├── external.post.ts             # Sauvegarder la configuration
-│   ├── test-helloasso.post.ts       # Tester la connexion
-│   └── helloasso-tiers.get.ts       # Récupérer tarifs et options
+│   ├── external/
+│   │   ├── index.get.ts             # Récupérer la configuration
+│   │   ├── index.post.ts            # Sauvegarder la configuration
+│   │   └── index.delete.ts          # Supprimer la configuration
+│   ├── helloasso/
+│   │   ├── test.post.ts             # Tester la connexion
+│   │   └── tiers.get.ts             # Récupérer tarifs et options
 ├── utils/
 │   ├── encryption.ts                # Chiffrement/déchiffrement
 │   └── editions/ticketing/
@@ -229,7 +232,7 @@ Crée ou met à jour la configuration de billeterie externe.
 }
 ```
 
-#### POST `/api/editions/:id/ticketing/test-helloasso`
+#### POST `/api/editions/:id/ticketing/helloasso/test`
 
 Teste la connexion à HelloAsso sans sauvegarder.
 

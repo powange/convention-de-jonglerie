@@ -67,7 +67,7 @@ const props = defineProps<{
 }>()
 
 const { data: quotaStatsData, pending } = await useFetch(
-  `/api/editions/${props.editionId}/ticketing/quota-stats`
+  `/api/editions/${props.editionId}/ticketing/quotas/stats`
 )
 const quotaStats = computed(() => quotaStatsData.value?.stats || [])
 </script>

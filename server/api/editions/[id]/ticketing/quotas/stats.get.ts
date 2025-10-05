@@ -1,5 +1,5 @@
-import { canAccessEditionData } from '../../../../utils/edition-permissions'
-import { getQuotaStats } from '../../../../utils/editions/ticketing/quota-stats'
+import { canAccessEditionData } from '../../../../../utils/edition-permissions'
+import { getQuotaStats } from '../../../../../utils/editions/ticketing/quota-stats'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })

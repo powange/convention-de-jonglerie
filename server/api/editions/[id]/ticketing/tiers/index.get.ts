@@ -1,5 +1,5 @@
 import { canAccessEditionData } from '../../../../../utils/edition-permissions'
-import { prisma } from '../../../../../utils/prisma'
+import { getEditionTiers } from '../../../../../utils/editions/ticketing/tiers'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
@@ -16,25 +16,7 @@ export default defineEventHandler(async (event) => {
     })
 
   try {
-    // Récupérer tous les tarifs de l'édition (HelloAsso + manuels)
-    const tiers = await prisma.helloAssoTier.findMany({
-      where: { editionId },
-      orderBy: [{ position: 'asc' }, { price: 'desc' }],
-      include: {
-        quotas: {
-          include: {
-            quota: true,
-          },
-        },
-        returnableItems: {
-          include: {
-            returnableItem: true,
-          },
-        },
-      },
-    })
-
-    return tiers
+    return await getEditionTiers(editionId)
   } catch (error: any) {
     console.error('Failed to fetch tiers from DB:', error)
     throw createError({

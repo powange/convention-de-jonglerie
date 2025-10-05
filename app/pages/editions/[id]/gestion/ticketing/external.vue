@@ -724,7 +724,7 @@ const loadHelloAssoTiers = async () => {
   loadedOptions.value = []
 
   try {
-    const response = await $fetch(`/api/editions/${editionId}/ticketing/helloasso-tiers`)
+    const response = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/tiers`)
 
     loadedTiers.value = response.tiers || []
     loadedOptions.value = response.options || []
@@ -861,7 +861,7 @@ const handleConfigSave = async (config: any) => {
 // Gestion du test de connexion depuis la modal
 const handleConfigTest = async (config: any) => {
   try {
-    const result = await $fetch(`/api/editions/${editionId}/ticketing/test-helloasso`, {
+    const result = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/test`, {
       method: 'POST',
       body: {
         clientId: config.clientId,
@@ -945,7 +945,7 @@ const testConnection = async () => {
   testing.value = true
 
   try {
-    const result = await $fetch(`/api/editions/${editionId}/ticketing/test-helloasso`, {
+    const result = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/test`, {
       method: 'POST',
       body: {
         clientId: helloAssoClientId.value,
@@ -1042,7 +1042,7 @@ const loadHelloAssoOrders = async () => {
   loadedOrders.value = []
 
   try {
-    const response = await $fetch(`/api/editions/${editionId}/ticketing/helloasso-orders`)
+    const response = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/orders`)
 
     loadedOrders.value = response.orders || []
     ordersStats.value = response.stats || { totalOrders: 0, totalItems: 0 }
