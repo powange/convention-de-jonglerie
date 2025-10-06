@@ -148,10 +148,10 @@
 </template>
 
 <script setup lang="ts">
-import { deleteOption, type Option } from '~/utils/ticketing/options'
+import { deleteOption, type TicketingOption } from '~/utils/ticketing/options'
 
 const props = defineProps<{
-  options: Option[]
+  options: TicketingOption[]
   loading: boolean
   editionId: number
 }>()
@@ -161,12 +161,12 @@ const emit = defineEmits<{
 }>()
 
 const optionModalOpen = ref(false)
-const selectedOption = ref<Option | null>(null)
+const selectedOption = ref<TicketingOption | null>(null)
 const deleteConfirmOpen = ref(false)
-const optionToDelete = ref<Option | null>(null)
+const optionToDelete = ref<TicketingOption | null>(null)
 const deleting = ref(false)
 
-const openOptionModal = (option?: Option) => {
+const openOptionModal = (option?: TicketingOption) => {
   selectedOption.value = option || null
   optionModalOpen.value = true
 }
@@ -175,7 +175,7 @@ const handleOptionSaved = () => {
   emit('refresh')
 }
 
-const confirmDeleteOption = (option: Option) => {
+const confirmDeleteOption = (option: TicketingOption) => {
   optionToDelete.value = option
   deleteConfirmOpen.value = true
 }

@@ -41,7 +41,7 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
   })
 
   // Récupérer tous les order items avec leurs customFields pour analyser les options
-  const allOrderItems = await prisma.helloAssoOrderItem.findMany({
+  const allOrderItems = await prisma.ticketingOrderItem.findMany({
     where: {
       state: 'Processed',
       order: {

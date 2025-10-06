@@ -397,7 +397,6 @@ const fetchVolunteersInfo = async () => {
 }
 await fetchVolunteersInfo()
 
-
 // Fonctions d'édition/gestion supprimées de la page publique
 
 // Fonction helper pour transformer les données du formulaire selon la configuration de l'édition

@@ -336,7 +336,7 @@ await $fetch(`/api/editions/${editionId}/ticketing/tiers/${tierId}`, {
 })
 ```
 
-### 3. Associer un Item à une Option
+### 3. Associer un Item à une TicketingOption
 
 ```typescript
 // Via la modification de l'option

@@ -48,8 +48,8 @@ export default defineEventHandler(async (event) => {
         message: `${result.count} bénévole${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`,
       }
     } else {
-      // Valider les billets en utilisant l'ID de HelloAssoOrderItem
-      const result = await prisma.helloAssoOrderItem.updateMany({
+      // Valider les billets en utilisant l'ID de OrderItem
+      const result = await prisma.ticketingOrderItem.updateMany({
         where: {
           id: {
             in: body.participantIds,

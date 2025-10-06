@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
     // Compter les validations de billets
     const ticketsValidatedToday = config
-      ? await prisma.helloAssoOrderItem.count({
+      ? await prisma.ticketingOrderItem.count({
           where: {
             order: {
               externalTicketingId: config.id,
@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
       : 0
 
     const totalTicketsValidated = config
-      ? await prisma.helloAssoOrderItem.count({
+      ? await prisma.ticketingOrderItem.count({
           where: {
             order: {
               externalTicketingId: config.id,
@@ -70,7 +70,7 @@ export default defineEventHandler(async (event) => {
 
     // Compter le nombre total de billets et bénévoles
     const totalTickets = config
-      ? await prisma.helloAssoOrderItem.count({
+      ? await prisma.ticketingOrderItem.count({
           where: {
             order: {
               externalTicketingId: config.id,

@@ -166,7 +166,7 @@ export default defineEventHandler(async (event) => {
         })
       }
 
-      const orderItem = await prisma.helloAssoOrderItem.findFirst({
+      const orderItem = await prisma.ticketingOrderItem.findFirst({
         where: {
           qrCode: body.qrCode,
           order: {
@@ -203,7 +203,7 @@ export default defineEventHandler(async (event) => {
           participant: {
             found: true,
             ticket: {
-              id: orderItem.id, // ID de HelloAssoOrderItem
+              id: orderItem.id, // ID de OrderItem
               helloAssoItemId: orderItem.helloAssoItemId,
               name: orderItem.name,
               amount: orderItem.amount,
@@ -222,7 +222,7 @@ export default defineEventHandler(async (event) => {
                   email: orderItem.order.payerEmail,
                 },
                 items: orderItem.order.items.map((item) => ({
-                  id: item.id, // ID de HelloAssoOrderItem (au lieu de helloAssoItemId qui peut être null)
+                  id: item.id, // ID de OrderItem (au lieu de helloAssoItemId qui peut être null)
                   helloAssoItemId: item.helloAssoItemId,
                   name: item.name,
                   type: item.type,

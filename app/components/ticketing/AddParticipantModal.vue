@@ -211,7 +211,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 
-interface Tier {
+interface TicketingTier {
   id: number
   name: string
   price: number
@@ -275,7 +275,7 @@ const errors = ref({
   payerEmail: '',
 })
 
-const availableTiers = ref<Tier[]>([])
+const availableTiers = ref<TicketingTier[]>([])
 const tierQuantities = ref<Record<number, number>>({})
 const selectedItems = ref<SelectedItem[]>([])
 
@@ -315,7 +315,7 @@ const formatPrice = (priceInCents: number) => {
 const fetchTiers = async () => {
   loadingTiers.value = true
   try {
-    const response = await $fetch<{ tiers: Tier[] }>(
+    const response = await $fetch<{ tiers: TicketingTier[] }>(
       `/api/editions/${props.editionId}/ticketing/tiers/available`
     )
     availableTiers.value = response.tiers

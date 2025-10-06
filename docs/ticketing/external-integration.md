@@ -47,9 +47,9 @@ model ExternalTicketing {
 
   edition          Edition            @relation(...)
   helloAssoConfig  HelloAssoConfig?
-  helloAssoTiers   HelloAssoTier[]
-  helloAssoOptions HelloAssoOption[]
-  helloAssoOrders  HelloAssoOrder[]
+  tiers            TicketingTier[]
+  options          TicketingOption[]
+  orders           TicketingOrder[]
 
   @@index([editionId])
   @@index([provider])
@@ -360,15 +360,15 @@ async function authenticate(clientId: string, clientSecret: string) {
    ```
 5. Extrait les tarifs (`tiers`) et options (`customFields`)
 6. Synchronise en base :
-   - Crée/met à jour `HelloAssoTier`
-   - Crée/met à jour `HelloAssoOption`
+   - Crée/met à jour `TicketingTier`
+   - Crée/met à jour `TicketingOption`
 
 **Réponse** :
 
 ```typescript
 {
-  tiers: HelloAssoTier[]
-  options: HelloAssoOption[]
+  tiers: TicketingTier[]
+  options: TicketingOption[]
 }
 ```
 
@@ -386,17 +386,17 @@ async function authenticate(clientId: string, clientSecret: string) {
    GET /v5/organizations/{slug}/forms/{formType}/{formSlug}/orders
    ```
 5. Pour chaque commande :
-   - Crée/met à jour `HelloAssoOrder`
+   - Crée/met à jour `TicketingOrder`
    - Pour chaque item :
      - Cherche le tarif correspondant
-     - Crée/met à jour `HelloAssoOrderItem`
+     - Crée/met à jour `TicketingOrderItem`
      - Génère un QR code si absent
 
 **Réponse** :
 
 ```typescript
 {
-  orders: HelloAssoOrder[]
+  orders: TicketingOrder[]
   stats: {
     totalOrders: number
     totalItems: number

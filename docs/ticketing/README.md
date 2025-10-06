@@ -18,7 +18,7 @@ docs/ticketing/
 
 ## Composants Principaux
 
-### 1. Tarifs (Tiers)
+### 1. Tarifs (TicketingTiers)
 
 Définition des différents types de billets disponibles (adulte, enfant, pass weekend, etc.)
 
@@ -82,15 +82,15 @@ Configuration et synchronisation avec les systèmes de billeterie externes (Hell
 ```
 ExternalTicketing          → Configuration de billeterie externe
 ├── HelloAssoConfig        → Configuration spécifique HelloAsso
-├── HelloAssoTier          → Tarifs (synchronisés ou manuels)
-├── HelloAssoOption        → Options (synchronisées ou manuelles)
-├── HelloAssoOrder         → Commandes
-│   └── HelloAssoOrderItem → Participants/billets
+├── TicketingTier                   → Tarifs (synchronisés ou manuels)
+├── TicketingOption                 → Options (synchronisées ou manuelles)
+├── TicketingOrder         → Commandes
+│   └── TicketingOrderItem → Participants/billets
 ├── TicketingQuota         → Quotas
 └── ReturnableItem         → Items à restituer
 
 Relations:
-- TierQuota             → Lien tarifs ↔ quotas
+- TicketingTierQuota             → Lien tarifs ↔ quotas
 - TierReturnableItem    → Lien tarifs ↔ items à restituer
 - OptionQuota           → Lien options ↔ quotas
 - OptionReturnableItem  → Lien options ↔ items à restituer

@@ -140,11 +140,11 @@ model Edition {
   volunteerTeams               VolunteerTeam[]
   volunteerTimeSlots           VolunteerTimeSlot[]
   externalTicketing            ExternalTicketing?
-  tiers                        HelloAssoTier[]
+  tiers                        TicketingTier[]
   ticketingQuotas              TicketingQuota[]
   returnableItems              ReturnableItem[]
-  options                      HelloAssoOption[]
-  helloAssoOrders              HelloAssoOrder[]
+  options                      TicketingOption[]
+  orders                       TicketingOrder[]
   volunteerReturnableItems     EditionVolunteerReturnableItem[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
@@ -791,9 +791,9 @@ model ExternalTicketing {
 
   edition          Edition            @relation(fields: [editionId], references: [id], onDelete: Cascade)
   helloAssoConfig  HelloAssoConfig?
-  helloAssoTiers   HelloAssoTier[]
-  helloAssoOptions HelloAssoOption[]
-  helloAssoOrders  HelloAssoOrder[]
+  tiers            TicketingTier[]
+  options          TicketingOption[]
+  orders           TicketingOrder[]
 
   @@index([editionId])
   @@index([provider])
@@ -816,7 +816,7 @@ model HelloAssoConfig {
   @@index([externalTicketingId])
 }
 
-model HelloAssoTier {
+model TicketingTier {
   id                  Int      @id @default(autoincrement())
   externalTicketingId String?  // Null si tarif manuel (non HelloAsso)
   helloAssoTierId     Int?     // ID du tarif dans HelloAsso, null si tarif manuel
@@ -833,9 +833,9 @@ model HelloAssoTier {
 
   externalTicketing ExternalTicketing?     @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
   edition           Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  quotas            TierQuota[]
+  quotas            TicketingTierQuota[]
   returnableItems   TierReturnableItem[]
-  orderItems        HelloAssoOrderItem[]
+  orderItems        TicketingOrderItem[]
 
   @@unique([externalTicketingId, helloAssoTierId])
   @@index([externalTicketingId])
@@ -852,7 +852,7 @@ model TicketingQuota {
   updatedAt   DateTime @updatedAt
 
   edition Edition       @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  tiers   TierQuota[]
+  tiers   TicketingTierQuota[]
   options OptionQuota[]
 
   @@index([editionId])
@@ -888,12 +888,12 @@ model EditionVolunteerReturnableItem {
   @@index([returnableItemId])
 }
 
-model TierQuota {
+model TicketingTierQuota {
   id      Int @id @default(autoincrement())
   tierId  Int
   quotaId Int
 
-  tier  HelloAssoTier  @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  tier  TicketingTier  @relation(fields: [tierId], references: [id], onDelete: Cascade)
   quota TicketingQuota @relation(fields: [quotaId], references: [id], onDelete: Cascade)
 
   @@unique([tierId, quotaId])
@@ -906,7 +906,7 @@ model TierReturnableItem {
   tierId           Int
   returnableItemId Int
 
-  tier           HelloAssoTier  @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  tier           TicketingTier  @relation(fields: [tierId], references: [id], onDelete: Cascade)
   returnableItem ReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
 
   @@unique([tierId, returnableItemId])
@@ -919,7 +919,7 @@ model OptionQuota {
   optionId Int
   quotaId  Int
 
-  option HelloAssoOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  option TicketingOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
   quota  TicketingQuota  @relation(fields: [quotaId], references: [id], onDelete: Cascade)
 
   @@unique([optionId, quotaId])
@@ -932,7 +932,7 @@ model OptionReturnableItem {
   optionId         Int
   returnableItemId Int
 
-  option         HelloAssoOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  option         TicketingOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
   returnableItem ReturnableItem  @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
 
   @@unique([optionId, returnableItemId])
@@ -940,7 +940,7 @@ model OptionReturnableItem {
   @@index([returnableItemId])
 }
 
-model HelloAssoOption {
+model TicketingOption {
   id                  Int      @id @default(autoincrement())
   externalTicketingId String?  // Null si option manuelle (non HelloAsso)
   helloAssoOptionId   String?  // ID de l'option dans HelloAsso, null si option manuelle
@@ -964,7 +964,7 @@ model HelloAssoOption {
   @@index([editionId])
 }
 
-model HelloAssoOrder {
+model TicketingOrder {
   id                  Int      @id @default(autoincrement())
   externalTicketingId String?  // Nullable pour les commandes manuelles
   helloAssoOrderId    Int?     // Nullable pour les commandes manuelles
@@ -987,7 +987,7 @@ model HelloAssoOrder {
 
   edition             Edition                @relation(fields: [editionId], references: [id], onDelete: Cascade)
   externalTicketing   ExternalTicketing?     @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
-  items               HelloAssoOrderItem[]
+  items               TicketingOrderItem[]
 
   @@unique([externalTicketingId, helloAssoOrderId])
   @@index([externalTicketingId])
@@ -995,9 +995,9 @@ model HelloAssoOrder {
   @@index([payerEmail])
 }
 
-model HelloAssoOrderItem {
+model TicketingOrderItem {
   id              Int      @id @default(autoincrement())
-  orderId         Int      // Lien vers HelloAssoOrder
+  orderId         Int      // Lien vers TicketingOrder
   helloAssoItemId Int?     // Nullable pour les participants ajoutés manuellement
   tierId          Int?     // Lien vers le tarif HelloAsso
 
@@ -1024,8 +1024,8 @@ model HelloAssoOrderItem {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  order           HelloAssoOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  tier            HelloAssoTier? @relation(fields: [tierId], references: [id])
+  order           TicketingOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  tier            TicketingTier? @relation(fields: [tierId], references: [id])
 
   @@index([orderId])
   @@index([tierId])

@@ -51,8 +51,8 @@ export default defineEventHandler(async (event) => {
         },
       })
     } else {
-      // Dévalider l'entrée d'un participant (ticket) en utilisant l'ID de HelloAssoOrderItem
-      const orderItem = await prisma.helloAssoOrderItem.findFirst({
+      // Dévalider l'entrée d'un participant (ticket) en utilisant l'ID de OrderItem
+      const orderItem = await prisma.ticketingOrderItem.findFirst({
         where: {
           id: body.participantId,
           order: {
@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
         })
       }
 
-      await prisma.helloAssoOrderItem.update({
+      await prisma.ticketingOrderItem.update({
         where: { id: orderItem.id },
         data: {
           entryValidated: false,

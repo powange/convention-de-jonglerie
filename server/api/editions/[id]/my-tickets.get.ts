@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     const allTickets: any[] = []
 
     // Récupérer tous les billets de l'utilisateur pour cette édition
-    const tickets = await prisma.helloAssoOrderItem.findMany({
+    const tickets = await prisma.ticketingOrderItem.findMany({
       where: {
         email: user.email,
         order: {

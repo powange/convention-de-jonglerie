@@ -349,7 +349,7 @@
                     icon="i-heroicons-users"
                     :loading="loadingOrders"
                     size="lg"
-                    @click="loadHelloAssoOrders"
+                    @click="loadOrdersFromHelloAsso"
                   >
                     {{ ordersLoaded ? 'Recharger' : 'Charger' }} participants
                   </UButton>
@@ -1034,7 +1034,7 @@ const ordersLoaded = ref(false)
 const loadedOrders = ref<any[]>([])
 const ordersStats = ref({ totalOrders: 0, totalItems: 0 })
 
-const loadHelloAssoOrders = async () => {
+const loadOrdersFromHelloAsso = async () => {
   if (loadingOrders.value) return
 
   loadingOrders.value = true

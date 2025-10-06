@@ -118,7 +118,7 @@ export default defineEventHandler(async (event) => {
     if (result.options && result.options.length > 0) {
       await prisma.$transaction(async (tx) => {
         // Récupérer les options existantes
-        const existingOptions = await tx.helloAssoOption.findMany({
+        const existingOptions = await tx.ticketingOption.findMany({
           where: { externalTicketingId: config.id },
         })
 
@@ -129,7 +129,7 @@ export default defineEventHandler(async (event) => {
           (o) => !fetchedOptionIds.has(o.helloAssoOptionId)
         )
         if (optionsToDelete.length > 0) {
-          await tx.helloAssoOption.deleteMany({
+          await tx.ticketingOption.deleteMany({
             where: {
               id: { in: optionsToDelete.map((o) => o.id) },
             },
@@ -138,7 +138,7 @@ export default defineEventHandler(async (event) => {
 
         // Créer ou mettre à jour les options
         for (const option of result.options) {
-          await tx.helloAssoOption.upsert({
+          await tx.ticketingOption.upsert({
             where: {
               externalTicketingId_helloAssoOptionId: {
                 externalTicketingId: config.id,

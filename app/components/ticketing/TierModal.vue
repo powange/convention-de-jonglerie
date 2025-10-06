@@ -176,7 +176,7 @@ import { computed, ref, watch } from 'vue'
 
 import { createTier, updateTier } from '~/utils/ticketing/tiers'
 
-interface Tier {
+interface TicketingTier {
   id: number
   name: string
   description?: string
@@ -192,7 +192,7 @@ interface Tier {
 
 const props = defineProps<{
   open: boolean
-  tier?: Tier
+  tier?: TicketingTier
   editionId: number
 }>()
 

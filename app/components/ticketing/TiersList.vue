@@ -148,10 +148,10 @@
 </template>
 
 <script setup lang="ts">
-import { deleteTier, type Tier } from '~/utils/ticketing/tiers'
+import { deleteTier, type TicketingTier } from '~/utils/ticketing/tiers'
 
 const props = defineProps<{
-  tiers: Tier[]
+  tiers: TicketingTier[]
   loading: boolean
   editionId: number
 }>()
@@ -161,12 +161,12 @@ const emit = defineEmits<{
 }>()
 
 const tierModalOpen = ref(false)
-const selectedTier = ref<Tier | null>(null)
+const selectedTier = ref<TicketingTier | null>(null)
 const deleteConfirmOpen = ref(false)
-const tierToDelete = ref<Tier | null>(null)
+const tierToDelete = ref<TicketingTier | null>(null)
 const deleting = ref(false)
 
-const openTierModal = (tier?: Tier) => {
+const openTierModal = (tier?: TicketingTier) => {
   selectedTier.value = tier || null
   tierModalOpen.value = true
 }
@@ -175,7 +175,7 @@ const handleTierSaved = () => {
   emit('refresh')
 }
 
-const confirmDeleteTier = (tier: Tier) => {
+const confirmDeleteTier = (tier: TicketingTier) => {
   tierToDelete.value = tier
   deleteConfirmOpen.value = true
 }

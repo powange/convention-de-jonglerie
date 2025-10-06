@@ -141,7 +141,7 @@ import { computed, ref, watch } from 'vue'
 
 import { createOption, updateOption } from '~/utils/ticketing/options'
 
-interface Option {
+interface TicketingOption {
   id: number
   name: string
   description?: string
@@ -156,7 +156,7 @@ interface Option {
 
 const props = defineProps<{
   open: boolean
-  option?: Option
+  option?: TicketingOption
   editionId: number
 }>()
 

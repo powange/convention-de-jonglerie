@@ -1,4 +1,4 @@
-export interface Tier {
+export interface TicketingTier {
   id: number
   name: string
   description: string | null
@@ -34,7 +34,7 @@ export interface TierFormData {
   returnableItemIds: number[]
 }
 
-export async function fetchTiers(editionId: number): Promise<Tier[]> {
+export async function fetchTiers(editionId: number): Promise<TicketingTier[]> {
   return await $fetch(`/api/editions/${editionId}/ticketing/tiers`)
 }
 

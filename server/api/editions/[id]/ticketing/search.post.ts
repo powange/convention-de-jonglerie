@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Rechercher dans les billets HelloAsso
-    const orderItems = await prisma.helloAssoOrderItem.findMany({
+    const orderItems = await prisma.ticketingOrderItem.findMany({
       where: {
         order: {
           externalTicketingId: config.id,
@@ -180,7 +180,7 @@ export default defineEventHandler(async (event) => {
         participant: {
           found: true,
           ticket: {
-            id: item.id, // ID de HelloAssoOrderItem
+            id: item.id, // ID de OrderItem
             helloAssoItemId: item.helloAssoItemId,
             name: item.name,
             amount: item.amount,
@@ -199,7 +199,7 @@ export default defineEventHandler(async (event) => {
                 email: item.order.payerEmail,
               },
               items: item.order.items.map((orderItem) => ({
-                id: orderItem.id, // ID de HelloAssoOrderItem
+                id: orderItem.id, // ID de OrderItem
                 helloAssoItemId: orderItem.helloAssoItemId,
                 name: orderItem.name,
                 type: orderItem.type,

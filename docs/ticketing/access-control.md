@@ -26,10 +26,10 @@ Afficher les dernières validations en temps réel.
 
 ## Modèle de Données
 
-### Champs de Validation dans `HelloAssoOrderItem`
+### Champs de Validation dans `TicketingOrderItem`
 
 ```prisma
-model HelloAssoOrderItem {
+model TicketingOrderItem {
   // ... autres champs
 
   // Validation d'entrée
@@ -137,8 +137,8 @@ const bodySchema = z.object({
     entryValidated: boolean
     entryValidatedAt: DateTime | null
     customFields: Json
-    order: HelloAssoOrder
-    tier: HelloAssoTier &
+    order: TicketingOrder
+    tier: TicketingTier &
       {
         returnableItems: Array<{ returnableItem: ReturnableItem }>,
       }
@@ -163,7 +163,7 @@ const bodySchema = z.object({
 
 ```typescript
 {
-  participantId: number // ID du HelloAssoOrderItem
+  participantId: number // ID du TicketingOrderItem
 }
 ```
 
@@ -189,7 +189,7 @@ const bodySchema = z.object({
 ```typescript
 {
   success: true
-  participant: HelloAssoOrderItem
+  participant: TicketingOrderItem
 }
 ```
 
@@ -236,7 +236,7 @@ const bodySchema = z.object({
 ```typescript
 {
   success: true
-  participant: HelloAssoOrderItem
+  participant: TicketingOrderItem
 }
 ```
 
@@ -302,7 +302,7 @@ const bodySchema = z.object({
 
 ```typescript
 {
-  participants: HelloAssoOrderItem[]
+  participants: TicketingOrderItem[]
   total: number
 }
 ```
@@ -360,8 +360,8 @@ const bodySchema = z.object({
 
 ```typescript
 {
-  'participant-found': (participant: HelloAssoOrderItem) => void
-  'validation-success': (participant: HelloAssoOrderItem) => void
+  'participant-found': (participant: TicketingOrderItem) => void
+  'validation-success': (participant: TicketingOrderItem) => void
   'error': (error: Error) => void
 }
 ```
@@ -395,7 +395,7 @@ const bodySchema = z.object({
 
 ```typescript
 {
-  participant: HelloAssoOrderItem
+  participant: TicketingOrderItem
   editionId: number
 }
 ```
@@ -632,7 +632,7 @@ console.log(`${participants.length} adultes non validés`)
    d. Indique les items à restituer
 5. Si déjà validé :
    a. Affiche erreur avec date/heure de validation
-   b. Option d'invalider (si permission)
+   b. TicketingOption d'invalider (si permission)
 ```
 
 ### Scénario 2 : Recherche Manuelle

@@ -1,4 +1,4 @@
-export interface Option {
+export interface TicketingOption {
   id: number
   name: string
   description: string | null
@@ -34,7 +34,7 @@ export interface OptionFormData {
   returnableItemIds: number[]
 }
 
-export async function fetchOptions(editionId: number): Promise<Option[]> {
+export async function fetchOptions(editionId: number): Promise<TicketingOption[]> {
   return await $fetch(`/api/editions/${editionId}/ticketing/options`)
 }
 

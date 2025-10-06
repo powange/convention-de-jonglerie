@@ -484,11 +484,7 @@ const exportToPdf = async () => {
 
       doc.setFontSize(14)
       doc.setFont('helvetica', 'bold')
-      doc.text(
-        isVolunteerView ? 'Mes créneaux' : 'Statistiques par bénévole',
-        margin,
-        currentY
-      )
+      doc.text(isVolunteerView ? 'Mes créneaux' : 'Statistiques par bénévole', margin, currentY)
       currentY += 10
 
       filteredStatsIndividual.forEach((volunteerStat) => {

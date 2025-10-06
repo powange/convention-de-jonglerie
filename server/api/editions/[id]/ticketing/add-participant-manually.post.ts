@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
 
     // Récupérer les tarifs demandés
     const tierIds = body.items.map((item) => item.tierId)
-    const tiers = await prisma.helloAssoTier.findMany({
+    const tiers = await prisma.ticketingTier.findMany({
       where: {
         id: { in: tierIds },
         externalTicketing: {
@@ -107,7 +107,7 @@ export default defineEventHandler(async (event) => {
     const qrCode = `onsite-${hash}`
 
     // Créer la commande
-    const order = await prisma.helloAssoOrder.create({
+    const order = await prisma.ticketingOrder.create({
       data: {
         editionId: editionId,
         externalTicketingId: null,
@@ -135,7 +135,7 @@ export default defineEventHandler(async (event) => {
           email: body.payerEmail,
         }
 
-        const orderItem = await prisma.helloAssoOrderItem.create({
+        const orderItem = await prisma.ticketingOrderItem.create({
           data: {
             orderId: order.id,
             helloAssoItemId: null,

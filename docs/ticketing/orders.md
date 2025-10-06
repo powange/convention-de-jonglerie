@@ -4,10 +4,10 @@ Les commandes représentent les achats de billets, qu'ils proviennent de HelloAs
 
 ## Modèle de Données
 
-### Table `HelloAssoOrder`
+### Table `TicketingOrder`
 
 ```prisma
-model HelloAssoOrder {
+model TicketingOrder {
   id                  Int      @id @default(autoincrement())
   externalTicketingId String?  // Null pour commandes manuelles
   helloAssoOrderId    Int?     // Null pour commandes manuelles
@@ -30,7 +30,7 @@ model HelloAssoOrder {
 
   edition             Edition                @relation(...)
   externalTicketing   ExternalTicketing?     @relation(...)
-  items               HelloAssoOrderItem[]   // Participants/billets
+  items               TicketingOrderItem[]   // Participants/billets
 
   @@unique([externalTicketingId, helloAssoOrderId])
   @@index([externalTicketingId])
@@ -39,12 +39,12 @@ model HelloAssoOrder {
 }
 ```
 
-### Table `HelloAssoOrderItem`
+### Table `TicketingOrderItem`
 
 ```prisma
-model HelloAssoOrderItem {
+model TicketingOrderItem {
   id              Int      @id @default(autoincrement())
-  orderId         Int      // Lien vers HelloAssoOrder
+  orderId         Int      // Lien vers TicketingOrder
   helloAssoItemId Int?     // Null pour ajouts manuels
   tierId          Int?     // Lien vers le tarif
 
@@ -71,8 +71,8 @@ model HelloAssoOrderItem {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  order           HelloAssoOrder @relation(...)
-  tier            HelloAssoTier? @relation(...)
+  order           TicketingOrder @relation(...)
+  tier            TicketingTier? @relation(...)
 
   @@index([orderId])
   @@index([tierId])
@@ -183,7 +183,7 @@ model HelloAssoOrderItem {
 
 ```typescript
 {
-  orders: HelloAssoOrder[]
+  orders: TicketingOrder[]
   stats: {
     totalOrders: number
     totalItems: number
@@ -197,10 +197,10 @@ model HelloAssoOrderItem {
 2. Authentifie avec OAuth2
 3. Récupère les commandes via l'API HelloAsso
 4. Pour chaque commande :
-   - Crée/met à jour `HelloAssoOrder`
+   - Crée/met à jour `TicketingOrder`
    - Pour chaque item :
      - Cherche le tarif correspondant
-     - Crée/met à jour `HelloAssoOrderItem`
+     - Crée/met à jour `TicketingOrderItem`
      - Génère un QR code unique si absent
 
 ---
@@ -238,8 +238,8 @@ model HelloAssoOrderItem {
 ```typescript
 {
   orders: Array<
-    HelloAssoOrder & {
-      items: HelloAssoOrderItem[]
+    TicketingOrder & {
+      items: TicketingOrderItem[]
       _count: { items: number }
     }
   >
@@ -312,9 +312,9 @@ const bodySchema = z.object({
 **Processus** :
 
 1. Valide les données
-2. Crée une commande manuelle (`HelloAssoOrder`)
+2. Crée une commande manuelle (`TicketingOrder`)
 3. Pour chaque quantité de tarif :
-   - Crée un `HelloAssoOrderItem`
+   - Crée un `TicketingOrderItem`
    - Génère un QR code unique
    - Stocke les `customFields`
 
@@ -323,8 +323,8 @@ const bodySchema = z.object({
 ```typescript
 {
   success: true
-  order: HelloAssoOrder
-  items: HelloAssoOrderItem[]
+  order: TicketingOrder
+  items: TicketingOrderItem[]
 }
 ```
 
@@ -336,12 +336,12 @@ const bodySchema = z.object({
 
 ### Fonctions Disponibles
 
-#### `getHelloAssoOrders(config, editionId)`
+#### `fetchOrdersFromHelloAsso(config, editionId)`
 
 Récupère et synchronise les commandes depuis HelloAsso.
 
 ```typescript
-const { orders, stats } = await getHelloAssoOrders(
+const { orders, stats } = await fetchOrdersFromHelloAsso(
   {
     clientId: '...',
     clientSecret: '...',
@@ -358,10 +358,10 @@ const { orders, stats } = await getHelloAssoOrders(
 1. Authentification OAuth2 avec HelloAsso
 2. Récupération des commandes via `GET /v5/organizations/{slug}/forms/{formType}/{formSlug}/orders`
 3. Pour chaque commande :
-   - Upsert `HelloAssoOrder`
+   - Upsert `TicketingOrder`
    - Pour chaque item :
      - Recherche du tarif correspondant par nom
-     - Upsert `HelloAssoOrderItem`
+     - Upsert `TicketingOrderItem`
      - Génération QR code si absent
 
 ---
@@ -413,7 +413,7 @@ const { orders, stats } = await getHelloAssoOrders(
 ### Mapping vers la Base de Données
 
 ```typescript
-// HelloAssoOrder
+// TicketingOrder
 {
   helloAssoOrderId: order.id,
   payerFirstName: order.payer.firstName,
@@ -424,7 +424,7 @@ const { orders, stats } = await getHelloAssoOrders(
   orderDate: order.date
 }
 
-// HelloAssoOrderItem
+// TicketingOrderItem
 {
   helloAssoItemId: item.id,
   firstName: item.user.firstName,
@@ -487,9 +487,9 @@ Le QR code est scanné lors du contrôle d'accès via :
 
 ```typescript
 {
-  participant: HelloAssoOrderItem & {
-    order: HelloAssoOrder
-    tier: HelloAssoTier
+  participant: TicketingOrderItem & {
+    order: TicketingOrder
+    tier: TicketingTier
   }
   editionId: number
 }
@@ -640,7 +640,7 @@ Vérifiez l'unicité des QR codes lors de la génération :
 
 ```typescript
 let qrCode = generateQRCode()
-while (await prisma.helloAssoOrderItem.findUnique({ where: { qrCode } })) {
+while (await prisma.orderItem.findUnique({ where: { qrCode } })) {
   qrCode = generateQRCode()
 }
 ```

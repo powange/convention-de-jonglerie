@@ -302,7 +302,7 @@ export async function getHelloAssoTiersAndOptions(
 /**
  * Récupère une page de commandes d'un formulaire HelloAsso
  */
-async function getHelloAssoOrdersPage(
+async function fetchOrdersPageFromHelloAsso(
   accessToken: string,
   formIdentifier: HelloAssoFormIdentifier,
   pageIndex: number,
@@ -400,7 +400,7 @@ async function getHelloAssoOrdersPage(
 /**
  * Récupère toutes les commandes d'un formulaire HelloAsso (toutes les pages)
  */
-export async function getHelloAssoOrders(
+export async function fetchOrdersFromHelloAsso(
   credentials: HelloAssoCredentials,
   formIdentifier: HelloAssoFormIdentifier,
   options?: {
@@ -458,7 +458,7 @@ export async function getHelloAssoOrders(
 
     // 2. Récupérer la première page pour connaître le nombre total de pages
     console.log('📦 [HelloAsso] Récupération de la page 1...')
-    const firstPageResult = await getHelloAssoOrdersPage(
+    const firstPageResult = await fetchOrdersPageFromHelloAsso(
       accessToken,
       formIdentifier,
       currentPage,
@@ -477,7 +477,7 @@ export async function getHelloAssoOrders(
     if (totalPages > 1) {
       for (currentPage = 2; currentPage <= totalPages; currentPage++) {
         console.log(`📦 [HelloAsso] Récupération de la page ${currentPage}/${totalPages}...`)
-        const pageResult = await getHelloAssoOrdersPage(
+        const pageResult = await fetchOrdersPageFromHelloAsso(
           accessToken,
           formIdentifier,
           currentPage,
@@ -500,7 +500,7 @@ export async function getHelloAssoOrders(
       },
     }
   } catch (error: any) {
-    console.error('❌ [HelloAsso] Erreur dans getHelloAssoOrders:', error)
+    console.error('❌ [HelloAsso] Erreur dans fetchOrdersFromHelloAsso:', error)
     throw error
   }
 }
@@ -536,7 +536,7 @@ export async function findTicketByQRCode(
 }> {
   try {
     // Récupérer toutes les commandes avec détails (pagination à gérer si nécessaire)
-    const orders = await getHelloAssoOrders(credentials, formIdentifier, {
+    const orders = await fetchOrdersFromHelloAsso(credentials, formIdentifier, {
       withDetails: true,
       pageSize: 100, // Ajuster selon les besoins
     })

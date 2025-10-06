@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { getHelloAssoOrders } from '../../../../../utils/editions/ticketing/helloasso'
+import { fetchOrdersFromHelloAsso } from '../../../../../utils/editions/ticketing/helloasso'
 
 const bodySchema = z.object({
   clientId: z.string().min(1),
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
   const body = bodySchema.parse(await readBody(event))
 
   try {
-    const result = await getHelloAssoOrders(
+    const result = await fetchOrdersFromHelloAsso(
       {
         clientId: body.clientId,
         clientSecret: body.clientSecret,

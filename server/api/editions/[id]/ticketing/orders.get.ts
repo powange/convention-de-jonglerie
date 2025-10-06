@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     const config = await prisma.externalTicketing.findUnique({
       where: { editionId },
       include: {
-        helloAssoOrders: {
+        orders: {
           include: {
             items: {
               include: {
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     }
 
     return {
-      orders: config.helloAssoOrders,
+      orders: config.orders,
     }
   } catch (error: any) {
     console.error('Failed to fetch orders from DB:', error)

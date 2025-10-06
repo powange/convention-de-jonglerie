@@ -15,7 +15,7 @@ export interface OptionData {
  * Récupère toutes les options d'une édition (HelloAsso et manuelles)
  */
 export async function getEditionOptions(editionId: number) {
-  return await prisma.helloAssoOption.findMany({
+  return await prisma.ticketingOption.findMany({
     where: { editionId },
     orderBy: [{ position: 'asc' }, { name: 'asc' }],
     include: {
@@ -41,7 +41,7 @@ export async function createOption(editionId: number, data: OptionData) {
     })
   }
 
-  return await prisma.helloAssoOption.create({
+  return await prisma.ticketingOption.create({
     data: {
       externalTicketingId: externalTicketing.id,
       editionId,
@@ -69,7 +69,7 @@ export async function createOption(editionId: number, data: OptionData) {
  */
 export async function updateOption(optionId: number, editionId: number, data: OptionData) {
   // Vérifier que l'option existe et appartient à l'édition
-  const existingOption = await prisma.helloAssoOption.findFirst({
+  const existingOption = await prisma.ticketingOption.findFirst({
     where: {
       id: optionId,
       editionId,
@@ -94,7 +94,7 @@ export async function updateOption(optionId: number, editionId: number, data: Op
     // Pour les options HelloAsso, on met à jour uniquement les relations
     // Pour les options manuelles, on met à jour tout
     if (isHelloAssoOption) {
-      return await tx.helloAssoOption.update({
+      return await tx.ticketingOption.update({
         where: { id: optionId },
         data: {
           quotas: {
@@ -108,7 +108,7 @@ export async function updateOption(optionId: number, editionId: number, data: Op
         },
       })
     } else {
-      return await tx.helloAssoOption.update({
+      return await tx.ticketingOption.update({
         where: { id: optionId },
         data: {
           name: data.name,
@@ -136,7 +136,7 @@ export async function updateOption(optionId: number, editionId: number, data: Op
  */
 export async function deleteOption(optionId: number, editionId: number) {
   // Vérifier que l'option existe et appartient à l'édition
-  const existingOption = await prisma.helloAssoOption.findFirst({
+  const existingOption = await prisma.ticketingOption.findFirst({
     where: {
       id: optionId,
       editionId,
@@ -158,7 +158,7 @@ export async function deleteOption(optionId: number, editionId: number) {
     })
   }
 
-  await prisma.helloAssoOption.delete({
+  await prisma.ticketingOption.delete({
     where: { id: optionId },
   })
 

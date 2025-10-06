@@ -1,4 +1,7 @@
-import { requireVolunteerPlanningAccess, isAcceptedVolunteer } from '../../../../utils/permissions/volunteer-permissions'
+import {
+  requireVolunteerPlanningAccess,
+  isAcceptedVolunteer,
+} from '../../../../utils/permissions/volunteer-permissions'
 import { prisma } from '../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {

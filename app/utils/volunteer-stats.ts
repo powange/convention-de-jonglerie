@@ -1,5 +1,5 @@
 /**
- * Utilitaires pour le calcul des statistiques des bénévoles
+ * Utilitaires pour le calcul des statistiques des bï¿½nï¿½voles
  */
 
 export interface VolunteerStats {
@@ -75,7 +75,7 @@ export interface AcceptedVolunteer {
 }
 
 /**
- * Calcule les statistiques globales des bénévoles
+ * Calcule les statistiques globales des bï¿½nï¿½voles
  */
 export function calculateVolunteersStats(
   timeSlots: TimeSlotWithAssignments[],
@@ -128,9 +128,7 @@ export function calculateVolunteersStats(
 /**
  * Calcule les statistiques par jour
  */
-export function calculateVolunteersStatsByDay(
-  timeSlots: TimeSlotWithAssignments[]
-): DayStats[] {
+export function calculateVolunteersStatsByDay(timeSlots: TimeSlotWithAssignments[]): DayStats[] {
   const dayStats = new Map<string, any>()
 
   timeSlots.forEach((slot) => {
@@ -177,12 +175,12 @@ export function calculateVolunteersStatsByDay(
     .sort((a: any, b: any) => a.date.localeCompare(b.date))
     .map((day) => ({
       ...day,
-      volunteers: Array.from(day.volunteers.values()).sort((a: any, b: any) => b.hours - a.hours), // Trier par heures décroissantes
+      volunteers: Array.from(day.volunteers.values()).sort((a: any, b: any) => b.hours - a.hours), // Trier par heures dï¿½croissantes
     }))
 }
 
 /**
- * Calcule les statistiques par bénévole individuel (incluant ceux sans créneaux)
+ * Calcule les statistiques par bï¿½nï¿½vole individuel (incluant ceux sans crï¿½neaux)
  */
 export function calculateVolunteersStatsIndividual(
   timeSlots: TimeSlotWithAssignments[],
@@ -190,7 +188,7 @@ export function calculateVolunteersStatsIndividual(
 ): VolunteerStatsIndividual[] {
   const volunteerStats = new Map<number, any>()
 
-  // D'abord, ajouter tous les bénévoles acceptés avec 0 heures
+  // D'abord, ajouter tous les bï¿½nï¿½voles acceptï¿½s avec 0 heures
   acceptedVolunteers.forEach((application) => {
     if (application.user && !volunteerStats.has(application.user.id)) {
       volunteerStats.set(application.user.id, {
@@ -202,7 +200,7 @@ export function calculateVolunteersStatsIndividual(
     }
   })
 
-  // Ensuite, calculer les heures pour ceux qui ont des créneaux
+  // Ensuite, calculer les heures pour ceux qui ont des crï¿½neaux
   timeSlots.forEach((slot) => {
     if (!slot.assignedVolunteersList || slot.assignedVolunteersList.length === 0) return
 
@@ -227,7 +225,7 @@ export function calculateVolunteersStatsIndividual(
       volunteerStat.totalHours += hours
       volunteerStat.totalSlots += 1
 
-      // Ajouter les détails par jour
+      // Ajouter les dï¿½tails par jour
       if (!volunteerStat.dayDetails.has(dayKey)) {
         volunteerStat.dayDetails.set(dayKey, {
           date: dayKey,
@@ -242,7 +240,7 @@ export function calculateVolunteersStatsIndividual(
     })
   })
 
-  // Convertir en array et trier par nombre d'heures total décroissant
+  // Convertir en array et trier par nombre d'heures total dï¿½croissant
   return Array.from(volunteerStats.values())
     .map((volunteer) => ({
       ...volunteer,
@@ -251,7 +249,7 @@ export function calculateVolunteersStatsIndividual(
       ), // Trier par date
     }))
     .sort((a, b) => {
-      // Trier par heures décroissantes, puis par nom
+      // Trier par heures dï¿½croissantes, puis par nom
       if (b.totalHours !== a.totalHours) {
         return b.totalHours - a.totalHours
       }

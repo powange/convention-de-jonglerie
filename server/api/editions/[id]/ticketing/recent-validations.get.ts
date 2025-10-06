@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     })
 
     const ticketValidations = config
-      ? await prisma.helloAssoOrderItem.findMany({
+      ? await prisma.ticketingOrderItem.findMany({
           where: {
             order: {
               externalTicketingId: config.id,

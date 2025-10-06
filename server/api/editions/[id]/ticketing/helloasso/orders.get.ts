@@ -1,4 +1,4 @@
-import { getHelloAssoOrders } from '../../../../../utils/editions/ticketing/helloasso'
+import { fetchOrdersFromHelloAsso } from '../../../../../utils/editions/ticketing/helloasso'
 import { decrypt } from '../../../../../utils/encryption'
 import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
 import { prisma } from '../../../../../utils/prisma'
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
     console.log('📦 [Endpoint] Form Slug:', haConfig.formSlug)
 
     // Récupérer les commandes via l'utilitaire (toutes les pages)
-    const result = await getHelloAssoOrders(
+    const result = await fetchOrdersFromHelloAsso(
       {
         clientId: haConfig.clientId,
         clientSecret,
@@ -69,14 +69,14 @@ export default defineEventHandler(async (event) => {
     if (result.data && result.data.length > 0) {
       await prisma.$transaction(async (tx) => {
         // Récupérer tous les tarifs de l'édition pour faire la correspondance
-        const tiers = await tx.helloAssoTier.findMany({
+        const tiers = await tx.ticketingTier.findMany({
           where: { editionId },
         })
         console.log('📊 Nombre de tarifs disponibles:', tiers.length)
 
         for (const order of result.data) {
           // Créer ou mettre à jour la commande
-          const savedOrder = await tx.helloAssoOrder.upsert({
+          const savedOrder = await tx.ticketingOrder.upsert({
             where: {
               externalTicketingId_helloAssoOrderId: {
                 externalTicketingId: config.id,
@@ -138,7 +138,7 @@ export default defineEventHandler(async (event) => {
             }
 
             // Vérifier si l'item existe déjà
-            const existingItem = await tx.helloAssoOrderItem.findFirst({
+            const existingItem = await tx.ticketingOrderItem.findFirst({
               where: {
                 orderId: savedOrder.id,
                 helloAssoItemId: item.id,
@@ -147,7 +147,7 @@ export default defineEventHandler(async (event) => {
 
             if (existingItem) {
               // Mettre à jour l'item existant
-              await tx.helloAssoOrderItem.update({
+              await tx.ticketingOrderItem.update({
                 where: { id: existingItem.id },
                 data: {
                   tierId: matchingTier?.id,
@@ -164,7 +164,7 @@ export default defineEventHandler(async (event) => {
               })
             } else {
               // Créer un nouvel item
-              await tx.helloAssoOrderItem.create({
+              await tx.ticketingOrderItem.create({
                 data: {
                   orderId: savedOrder.id,
                   helloAssoItemId: item.id,
@@ -193,11 +193,11 @@ export default defineEventHandler(async (event) => {
     })
 
     // Récupérer les statistiques
-    const totalOrders = await prisma.helloAssoOrder.count({
+    const totalOrders = await prisma.ticketingOrder.count({
       where: { externalTicketingId: config.id },
     })
 
-    const totalItems = await prisma.helloAssoOrderItem.count({
+    const totalItems = await prisma.ticketingOrderItem.count({
       where: {
         order: {
           externalTicketingId: config.id,

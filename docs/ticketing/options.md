@@ -18,7 +18,7 @@ Les options sont des champs supplémentaires lors de l'inscription permettant de
    - Entièrement modifiables
    - Supprimables
 
-### Propriétés d'une Option
+### Propriétés d'une TicketingOption
 
 ```typescript
 interface OptionData {
@@ -50,10 +50,10 @@ HelloAsso supporte différents types de champs personnalisés :
 
 ## Modèle de Données
 
-### Table `HelloAssoOption`
+### Table `TicketingOption`
 
 ```prisma
-model HelloAssoOption {
+model TicketingOption {
   id                  Int      @id @default(autoincrement())
   externalTicketingId String?  // Null si option manuelle
   helloAssoOptionId   String?  // ID HelloAsso, null si manuel
@@ -90,7 +90,7 @@ model OptionQuota {
   optionId Int
   quotaId  Int
 
-  option HelloAssoOption @relation(...)
+  option TicketingOption @relation(...)
   quota  TicketingQuota  @relation(...)
 
   @@unique([optionId, quotaId])
@@ -109,7 +109,7 @@ model OptionReturnableItem {
   optionId         Int
   returnableItemId Int
 
-  option         HelloAssoOption @relation(...)
+  option         TicketingOption @relation(...)
   returnableItem ReturnableItem  @relation(...)
 
   @@unique([optionId, returnableItemId])
@@ -129,12 +129,12 @@ model OptionReturnableItem {
 **Réponse** :
 
 ```typescript
-HelloAssoOption[] // Avec relations quotas et returnableItems
+TicketingOption[] // Avec relations quotas et returnableItems
 ```
 
 ---
 
-### Créer une Option Manuelle
+### Créer une TicketingOption Manuelle
 
 **Route** : `POST /api/editions/:id/ticketing/options`
 
@@ -175,7 +175,7 @@ const bodySchema = z.object({
 ```typescript
 {
   success: true
-  option: HelloAssoOption
+  option: TicketingOption
 }
 ```
 
@@ -185,7 +185,7 @@ const bodySchema = z.object({
 
 ---
 
-### Modifier une Option
+### Modifier une TicketingOption
 
 **Route** : `PUT /api/editions/:id/ticketing/options/:optionId`
 
@@ -195,25 +195,25 @@ const bodySchema = z.object({
 
 **Comportement** :
 
-- **Option HelloAsso** : Seules les relations (quotas, returnableItems) sont modifiables
-- **Option manuelle** : Tous les champs sont modifiables
+- **TicketingOption HelloAsso** : Seules les relations (quotas, returnableItems) sont modifiables
+- **TicketingOption manuelle** : Tous les champs sont modifiables
 
 **Réponse** :
 
 ```typescript
 {
   success: true
-  option: HelloAssoOption
+  option: TicketingOption
 }
 ```
 
 **Erreurs** :
 
-- `404` : Option introuvable
+- `404` : TicketingOption introuvable
 
 ---
 
-### Supprimer une Option Manuelle
+### Supprimer une TicketingOption Manuelle
 
 **Route** : `DELETE /api/editions/:id/ticketing/options/:optionId`
 
@@ -229,7 +229,7 @@ const bodySchema = z.object({
 
 **Erreurs** :
 
-- `404` : Option introuvable
+- `404` : TicketingOption introuvable
 - `400` : Impossible de supprimer une option HelloAsso
 
 ---
@@ -246,7 +246,7 @@ Récupère toutes les options d'une édition avec leurs relations.
 
 ```typescript
 const options = await getEditionOptions(editionId)
-// Retourne: HelloAssoOption[] avec quotas et returnableItems
+// Retourne: TicketingOption[] avec quotas et returnableItems
 ```
 
 #### `createOption(editionId: number, data: OptionData)`
@@ -347,7 +347,7 @@ await deleteOption(5, editionId)
 ```typescript
 {
   editionId: number
-  option?: HelloAssoOption | null
+  option?: TicketingOption | null
   quotas: TicketingQuota[]
   returnableItems: ReturnableItem[]
 }
@@ -363,12 +363,12 @@ await deleteOption(5, editionId)
 
 ```typescript
 // Déterminer si une option est HelloAsso
-export function isHelloAssoOption(option: HelloAssoOption): boolean {
+export function isHelloAssoOption(option: TicketingOption): boolean {
   return option.helloAssoOptionId !== null
 }
 
 // Vérifier si une option a des choix
-export function hasChoices(option: HelloAssoOption): boolean {
+export function hasChoices(option: TicketingOption): boolean {
   const typesWithChoices = ['Select', 'Radio', 'MultipleChoice']
   return typesWithChoices.includes(option.type)
 }
@@ -393,7 +393,7 @@ export function formatOptionType(type: string): string {
 
 ## Cas d'Usage
 
-### 1. Créer une Option "Régime Alimentaire"
+### 1. Créer une TicketingOption "Régime Alimentaire"
 
 ```typescript
 const option = await $fetch(`/api/editions/${editionId}/ticketing/options`, {
@@ -410,7 +410,7 @@ const option = await $fetch(`/api/editions/${editionId}/ticketing/options`, {
 })
 ```
 
-### 2. Créer une Option "Allergies" (Texte)
+### 2. Créer une TicketingOption "Allergies" (Texte)
 
 ```typescript
 const option = await $fetch(`/api/editions/${editionId}/ticketing/options`, {
@@ -425,7 +425,7 @@ const option = await $fetch(`/api/editions/${editionId}/ticketing/options`, {
 })
 ```
 
-### 3. Créer une Option "Taille T-shirt"
+### 3. Créer une TicketingOption "Taille T-shirt"
 
 ```typescript
 const option = await $fetch(`/api/editions/${editionId}/ticketing/options`, {
@@ -441,7 +441,7 @@ const option = await $fetch(`/api/editions/${editionId}/ticketing/options`, {
 })
 ```
 
-### 4. Modifier les Choix d'une Option
+### 4. Modifier les Choix d'une TicketingOption
 
 ```typescript
 await $fetch(`/api/editions/${editionId}/ticketing/options/${optionId}`, {
@@ -453,7 +453,7 @@ await $fetch(`/api/editions/${editionId}/ticketing/options/${optionId}`, {
 })
 ```
 
-### 5. Rendre une Option Obligatoire
+### 5. Rendre une TicketingOption Obligatoire
 
 ```typescript
 await $fetch(`/api/editions/${editionId}/ticketing/options/${optionId}`, {
@@ -469,7 +469,7 @@ await $fetch(`/api/editions/${editionId}/ticketing/options/${optionId}`, {
 
 ## Stockage des Réponses
 
-Les réponses aux options sont stockées dans le champ `customFields` de `HelloAssoOrderItem` (format JSON).
+Les réponses aux options sont stockées dans le champ `customFields` de `TicketingOrderItem` (format JSON).
 
 ### Structure HelloAsso
 
@@ -496,7 +496,7 @@ Les réponses aux options sont stockées dans le champ `customFields` de `HelloA
 
 ```typescript
 // Récupérer une réponse spécifique
-function getCustomFieldAnswer(item: HelloAssoOrderItem, optionName: string): string | null {
+function getCustomFieldAnswer(item: TicketingOrderItem, optionName: string): string | null {
   const customFields = item.customFields as Array<{ name: string; answer: string }>
   const field = customFields?.find((f) => f.name === optionName)
   return field?.answer ?? null

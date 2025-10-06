@@ -1,4 +1,4 @@
-# Gestion des Tarifs (Tiers)
+# Gestion des Tarifs (TicketingTiers)
 
 Les tarifs définissent les différents types de billets disponibles pour une édition (adulte, enfant, pass weekend, etc.).
 
@@ -36,10 +36,10 @@ interface TierData {
 
 ## Modèle de Données
 
-### Table `HelloAssoTier`
+### Table `TicketingTier`
 
 ```prisma
-model HelloAssoTier {
+model TicketingTier {
   id                  Int      @id @default(autoincrement())
   externalTicketingId String?  // Null si tarif manuel
   helloAssoTierId     Int?     // ID HelloAsso, null si manuel
@@ -56,9 +56,9 @@ model HelloAssoTier {
 
   externalTicketing ExternalTicketing?     @relation(...)
   edition           Edition                 @relation(...)
-  quotas            TierQuota[]            // Relations quotas
+  quotas            TicketingTierQuota[]            // Relations quotas
   returnableItems   TierReturnableItem[]   // Relations items
-  orderItems        HelloAssoOrderItem[]   // Billets vendus
+  orderItems        TicketingOrderItem[]   // Billets vendus
 
   @@unique([externalTicketingId, helloAssoTierId])
   @@index([externalTicketingId])
@@ -68,17 +68,17 @@ model HelloAssoTier {
 
 ### Relations
 
-#### TierQuota
+#### TicketingTierQuota
 
 Associe un tarif à un ou plusieurs quotas.
 
 ```prisma
-model TierQuota {
+model TicketingTierQuota {
   id      Int @id @default(autoincrement())
   tierId  Int
   quotaId Int
 
-  tier  HelloAssoTier  @relation(...)
+  tier  TicketingTier  @relation(...)
   quota TicketingQuota @relation(...)
 
   @@unique([tierId, quotaId])
@@ -97,7 +97,7 @@ model TierReturnableItem {
   tierId           Int
   returnableItemId Int
 
-  tier           HelloAssoTier  @relation(...)
+  tier           TicketingTier  @relation(...)
   returnableItem ReturnableItem @relation(...)
 
   @@unique([tierId, returnableItemId])
@@ -117,7 +117,7 @@ model TierReturnableItem {
 **Réponse** :
 
 ```typescript
-HelloAssoTier[] // Avec relations quotas et returnableItems
+TicketingTier[] // Avec relations quotas et returnableItems
 ```
 
 **Utilisation** : Liste complète des tarifs pour la gestion
@@ -134,7 +134,7 @@ HelloAssoTier[] // Avec relations quotas et returnableItems
 
 ```typescript
 {
-  tiers: HelloAssoTier[] // Seulement les tarifs actifs
+  tiers: TicketingTier[] // Seulement les tarifs actifs
 }
 ```
 
@@ -169,7 +169,7 @@ HelloAssoTier[] // Avec relations quotas et returnableItems
 ```typescript
 {
   success: true
-  tier: HelloAssoTier
+  tier: TicketingTier
 }
 ```
 
@@ -209,7 +209,7 @@ const bodySchema = z.object({
 ```typescript
 {
   success: true
-  tier: HelloAssoTier
+  tier: TicketingTier
 }
 ```
 
@@ -254,7 +254,7 @@ Récupère tous les tarifs d'une édition avec leurs relations.
 
 ```typescript
 const tiers = await getEditionTiers(editionId)
-// Retourne: HelloAssoTier[] avec quotas et returnableItems
+// Retourne: TicketingTier[] avec quotas et returnableItems
 ```
 
 #### `createTier(editionId: number, data: TierData)`
@@ -348,7 +348,7 @@ await deleteTier(5, editionId)
 ```typescript
 {
   editionId: number
-  tier?: HelloAssoTier | null // Si modification
+  tier?: TicketingTier | null // Si modification
   quotas: TicketingQuota[]
   returnableItems: ReturnableItem[]
 }
@@ -369,12 +369,12 @@ export function formatTierPrice(priceInCents: number): string {
 }
 
 // Déterminer si un tarif est HelloAsso
-export function isHelloAssoTier(tier: HelloAssoTier): boolean {
+export function isHelloAssoTier(tier: TicketingTier): boolean {
   return tier.helloAssoTierId !== null
 }
 
 // Vérifier si un tarif est un tarif libre
-export function isFreePriceTier(tier: HelloAssoTier): boolean {
+export function isFreePriceTier(tier: TicketingTier): boolean {
   return tier.minAmount !== null || tier.maxAmount !== null
 }
 ```
@@ -500,7 +500,7 @@ Après modification de la configuration HelloAsso, rechargez les tarifs pour syn
 
 ### Les quotas ne se décomptent pas
 
-**Cause** : Les relations `TierQuota` ne sont pas créées
+**Cause** : Les relations `TicketingTierQuota` ne sont pas créées
 **Solution** : Associez les tarifs aux quotas via l'interface ou l'API.
 
 ---
