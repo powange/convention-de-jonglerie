@@ -4,6 +4,7 @@ export interface VolunteerTeam {
   description?: string
   color: string
   maxVolunteers?: number
+  isRequired?: boolean
   createdAt: string
   updatedAt: string
   _count?: {
@@ -16,6 +17,7 @@ export interface CreateTeamData {
   description?: string
   color?: string
   maxVolunteers?: number
+  isRequired?: boolean
 }
 
 export type UpdateTeamData = Partial<CreateTeamData>

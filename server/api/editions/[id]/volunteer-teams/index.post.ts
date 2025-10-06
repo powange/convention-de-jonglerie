@@ -12,6 +12,7 @@ const createTeamSchema = z.object({
     .regex(/^#[0-9A-F]{6}$/i, 'La couleur doit être un code hexadécimal valide')
     .default('#6b7280'),
   maxVolunteers: z.number().int().positive().optional(),
+  isRequired: z.boolean().optional().default(false),
 })
 
 export default defineEventHandler(async (event) => {
@@ -70,6 +71,7 @@ export default defineEventHandler(async (event) => {
         description: body.description,
         color: body.color,
         maxVolunteers: body.maxVolunteers,
+        isRequired: body.isRequired,
       },
       include: {
         _count: {

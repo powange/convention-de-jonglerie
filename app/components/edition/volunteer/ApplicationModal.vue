@@ -1006,8 +1006,9 @@ const teamItems = computed(() => {
     return []
   }
   return volunteerTeams.value.map((team) => ({
-    label: team.name,
+    label: team.isRequired ? `${team.name} (${t('common.required')})` : team.name,
     value: team.id, // Utiliser l'ID au lieu du nom pour le nouveau système
+    disabled: team.isRequired, // Désactiver la case si obligatoire
   }))
 })
 
@@ -1173,5 +1174,21 @@ watch(
     }
   },
   { deep: true }
+)
+
+// Pré-sélectionner les équipes obligatoires
+watch(
+  [() => volunteerTeams.value, () => props.modelValue],
+  ([teams, isOpen]) => {
+    if (isOpen && teams.length > 0 && !props.isEditing) {
+      const requiredTeamIds = teams.filter((team) => team.isRequired).map((team) => team.id)
+      if (requiredTeamIds.length > 0) {
+        formData.value.teamPreferences = [
+          ...new Set([...formData.value.teamPreferences, ...requiredTeamIds]),
+        ]
+      }
+    }
+  },
+  { immediate: true }
 )
 </script>

@@ -30,6 +30,9 @@
             <div class="flex items-center gap-2 cursor-pointer" @click="openEditTeamModal(team)">
               <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: team.color }" />
               <h4 class="font-medium">{{ team.name }}</h4>
+              <UBadge v-if="team.isRequired" color="primary" variant="soft" size="xs">
+                {{ t('common.required') }}
+              </UBadge>
             </div>
             <div @click.stop>
               <UDropdownMenu
@@ -227,6 +230,17 @@
                 }}</span>
               </template>
             </UFormField>
+
+            <!-- Équipe obligatoire -->
+            <UFormField name="isRequired" :label="t('editions.volunteers.required_team')">
+              <USwitch v-model="teamFormState.isRequired">
+                <template #label>
+                  <span class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ t('editions.volunteers.required_team_hint') }}
+                  </span>
+                </template>
+              </USwitch>
+            </UFormField>
           </UForm>
         </div>
       </template>
@@ -295,7 +309,7 @@ const toast = useToast()
 const teamModalOpen = ref(false)
 const editingTeam = ref<VolunteerTeam | null>(null)
 const loading = ref(false)
-const expandedTeams = ref<Record<number, boolean>>({})
+const expandedTeams = ref<Record<string, boolean>>({})
 
 // API
 const { teams, createTeam, updateTeam, deleteTeam } = useVolunteerTeams(props.editionId)
@@ -306,6 +320,7 @@ const teamSchema = z.object({
   description: z.string().optional(),
   color: z.string().regex(/^#[0-9A-F]{6}$/i, t('errors.invalid_color')),
   maxVolunteers: z.number().int().positive().optional(),
+  isRequired: z.boolean().optional(),
 })
 
 // État du formulaire
@@ -314,6 +329,7 @@ const teamFormState = ref({
   description: '',
   color: '#3b82f6',
   maxVolunteers: undefined as number | undefined,
+  isRequired: false,
 })
 
 // Couleurs prédéfinies pour la palette
@@ -342,7 +358,7 @@ const teamModalTitle = computed(() =>
 )
 
 // Actions
-const toggleExpand = (teamId: number) => {
+const toggleExpand = (teamId: string) => {
   expandedTeams.value[teamId] = !expandedTeams.value[teamId]
 }
 
@@ -351,7 +367,7 @@ const openCreateTeamModal = () => {
   // Choisir une couleur aléatoire parmi celles qui ne sont pas déjà utilisées
   const usedColors = teams.value.map((team) => team.color)
   const availableColors = predefinedColors.filter((color) => !usedColors.includes(color))
-  const randomColor =
+  const randomColor: string =
     availableColors.length > 0
       ? availableColors[Math.floor(Math.random() * availableColors.length)]
       : predefinedColors[Math.floor(Math.random() * predefinedColors.length)]
@@ -361,6 +377,7 @@ const openCreateTeamModal = () => {
     description: '',
     color: randomColor,
     maxVolunteers: undefined,
+    isRequired: false,
   }
   teamModalOpen.value = true
 }
@@ -372,6 +389,7 @@ const openEditTeamModal = (team: VolunteerTeam) => {
     description: team.description || '',
     color: team.color,
     maxVolunteers: team.maxVolunteers,
+    isRequired: team.isRequired || false,
   }
   teamModalOpen.value = true
 }
@@ -390,6 +408,7 @@ const onTeamSubmit = async () => {
       description: teamFormState.value.description || undefined,
       color: teamFormState.value.color,
       maxVolunteers: teamFormState.value.maxVolunteers,
+      isRequired: teamFormState.value.isRequired,
     }
 
     if (editingTeam.value) {
@@ -409,7 +428,7 @@ const onTeamSubmit = async () => {
     }
 
     closeTeamModal()
-  } catch (error) {
+  } catch (error: any) {
     toast.add({
       title: t('errors.error_occurred'),
       description: error.message || 'Erreur lors de la sauvegarde',
@@ -442,7 +461,7 @@ const executeDeleteTeam = async () => {
       color: 'success',
     })
     closeTeamModal()
-  } catch (error) {
+  } catch (error: any) {
     toast.add({
       title: t('errors.error_occurred'),
       description: error.message || 'Erreur lors de la suppression',

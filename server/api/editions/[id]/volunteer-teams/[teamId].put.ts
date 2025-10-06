@@ -12,6 +12,7 @@ const updateTeamSchema = z.object({
     .regex(/^#[0-9A-F]{6}$/i, 'La couleur doit être un code hexadécimal valide')
     .optional(),
   maxVolunteers: z.number().int().positive().optional().nullable(),
+  isRequired: z.boolean().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -82,6 +83,7 @@ export default defineEventHandler(async (event) => {
     if (body.description !== undefined) updateData.description = body.description
     if (body.color !== undefined) updateData.color = body.color
     if (body.maxVolunteers !== undefined) updateData.maxVolunteers = body.maxVolunteers
+    if (body.isRequired !== undefined) updateData.isRequired = body.isRequired
 
     const team = await prisma.volunteerTeam.update({
       where: { id: teamId },
