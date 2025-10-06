@@ -130,7 +130,7 @@ interface VolunteerReturnableItem {
   name: string
 }
 
-interface ReturnableItem {
+interface TicketingReturnableItem {
   id: number
   name: string
 }
@@ -150,7 +150,7 @@ const deleteConfirmOpen = ref(false)
 const itemToDelete = ref<VolunteerReturnableItem | null>(null)
 const deleting = ref(false)
 const selectedItemId = ref<number | null>(null)
-const allReturnableItems = ref<ReturnableItem[]>([])
+const allReturnableItems = ref<TicketingReturnableItem[]>([])
 
 // Charger tous les articles à restituer disponibles
 const loadAllReturnableItems = async () => {

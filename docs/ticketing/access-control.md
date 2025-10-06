@@ -140,7 +140,7 @@ const bodySchema = z.object({
     order: TicketingOrder
     tier: TicketingTier &
       {
-        returnableItems: Array<{ returnableItem: ReturnableItem }>,
+        returnableItems: Array<{ returnableItem: TicketingReturnableItem }>,
       }
   }
 }

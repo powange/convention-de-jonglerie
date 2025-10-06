@@ -57,7 +57,7 @@ model TicketingTier {
   externalTicketing ExternalTicketing?     @relation(...)
   edition           Edition                 @relation(...)
   quotas            TicketingTierQuota[]            // Relations quotas
-  returnableItems   TierReturnableItem[]   // Relations items
+  returnableItems   TicketingTierReturnableItem[]   // Relations items
   orderItems        TicketingOrderItem[]   // Billets vendus
 
   @@unique([externalTicketingId, helloAssoTierId])
@@ -87,18 +87,18 @@ model TicketingTierQuota {
 
 **Exemple** : Le tarif "Adulte avec repas" consomme le quota "Places totales" ET le quota "Repas".
 
-#### TierReturnableItem
+#### TicketingTierReturnableItem
 
 Associe un tarif à un ou plusieurs items à restituer.
 
 ```prisma
-model TierReturnableItem {
+model TicketingTierReturnableItem {
   id               Int @id @default(autoincrement())
   tierId           Int
   returnableItemId Int
 
   tier           TicketingTier  @relation(...)
-  returnableItem ReturnableItem @relation(...)
+  returnableItem TicketingReturnableItem @relation(...)
 
   @@unique([tierId, returnableItemId])
 }
@@ -350,7 +350,7 @@ await deleteTier(5, editionId)
   editionId: number
   tier?: TicketingTier | null // Si modification
   quotas: TicketingQuota[]
-  returnableItems: ReturnableItem[]
+  returnableItems: TicketingReturnableItem[]
 }
 ```
 

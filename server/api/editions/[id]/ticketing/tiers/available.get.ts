@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
       where: { editionId },
       select: {
         id: true,
-        helloAssoTiers: {
+        tiers: {
           select: {
             id: true,
             name: true,
@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
     }
 
     return {
-      tiers: externalTicketing.helloAssoTiers,
+      tiers: externalTicketing.tiers,
     }
   } catch (error: any) {
     console.error('Erreur lors de la récupération des tarifs:', error)

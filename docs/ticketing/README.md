@@ -87,11 +87,11 @@ ExternalTicketing          → Configuration de billeterie externe
 ├── TicketingOrder         → Commandes
 │   └── TicketingOrderItem → Participants/billets
 ├── TicketingQuota         → Quotas
-└── ReturnableItem         → Items à restituer
+└── TicketingReturnableItem         → Items à restituer
 
 Relations:
 - TicketingTierQuota             → Lien tarifs ↔ quotas
-- TierReturnableItem    → Lien tarifs ↔ items à restituer
+- TicketingTierReturnableItem    → Lien tarifs ↔ items à restituer
 - TicketingOptionQuota           → Lien options ↔ quotas
 - TicketingOptionReturnableItem  → Lien options ↔ items à restituer
 ```

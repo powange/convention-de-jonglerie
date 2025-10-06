@@ -8,7 +8,7 @@ export interface ReturnableItemData {
  * Récupère tous les items à restituer d'une édition
  */
 export async function getReturnableItems(editionId: number) {
-  return await prisma.returnableItem.findMany({
+  return await prisma.ticketingReturnableItem.findMany({
     where: { editionId },
     orderBy: { createdAt: 'asc' },
   })
@@ -18,7 +18,7 @@ export async function getReturnableItems(editionId: number) {
  * Crée un nouvel item à restituer
  */
 export async function createReturnableItem(editionId: number, data: ReturnableItemData) {
-  return await prisma.returnableItem.create({
+  return await prisma.ticketingReturnableItem.create({
     data: {
       editionId,
       name: data.name,
@@ -35,7 +35,7 @@ export async function updateReturnableItem(
   data: ReturnableItemData
 ) {
   // Vérifier que l'item existe et appartient à cette édition
-  const existingItem = await prisma.returnableItem.findUnique({
+  const existingItem = await prisma.ticketingReturnableItem.findUnique({
     where: { id: itemId },
   })
 
@@ -50,7 +50,7 @@ export async function updateReturnableItem(
     })
   }
 
-  return await prisma.returnableItem.update({
+  return await prisma.ticketingReturnableItem.update({
     where: { id: itemId },
     data: {
       name: data.name,
@@ -63,7 +63,7 @@ export async function updateReturnableItem(
  */
 export async function deleteReturnableItem(itemId: number, editionId: number) {
   // Vérifier que l'item existe et appartient à cette édition
-  const existingItem = await prisma.returnableItem.findUnique({
+  const existingItem = await prisma.ticketingReturnableItem.findUnique({
     where: { id: itemId },
   })
 
@@ -78,7 +78,7 @@ export async function deleteReturnableItem(itemId: number, editionId: number) {
     })
   }
 
-  await prisma.returnableItem.delete({
+  await prisma.ticketingReturnableItem.delete({
     where: { id: itemId },
   })
 

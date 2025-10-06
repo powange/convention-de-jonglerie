@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-interface ReturnableItem {
+interface TicketingReturnableItem {
   id: number
   name: string
 }
@@ -69,7 +69,7 @@ interface ReturnableItemForm {
 }
 
 const props = defineProps<{
-  items: ReturnableItem[]
+  items: TicketingReturnableItem[]
   loading: boolean
   editionId: number
 }>()
@@ -80,14 +80,14 @@ const emit = defineEmits<{
 
 const saving = ref(false)
 const deleteConfirmOpen = ref(false)
-const itemToDelete = ref<ReturnableItem | null>(null)
+const itemToDelete = ref<TicketingReturnableItem | null>(null)
 const deleting = ref(false)
 
 const form = ref<ReturnableItemForm>({
   name: '',
 })
 
-const confirmDeleteItem = (item: ReturnableItem) => {
+const confirmDeleteItem = (item: TicketingReturnableItem) => {
   itemToDelete.value = item
   deleteConfirmOpen.value = true
 }

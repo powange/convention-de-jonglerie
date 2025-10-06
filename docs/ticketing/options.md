@@ -110,7 +110,7 @@ model TicketingOptionReturnableItem {
   returnableItemId Int
 
   option         TicketingOption @relation(...)
-  returnableItem ReturnableItem  @relation(...)
+  returnableItem TicketingReturnableItem  @relation(...)
 
   @@unique([optionId, returnableItemId])
 }
@@ -349,7 +349,7 @@ await deleteOption(5, editionId)
   editionId: number
   option?: TicketingOption | null
   quotas: TicketingQuota[]
-  returnableItems: ReturnableItem[]
+  returnableItems: TicketingReturnableItem[]
 }
 ```
 

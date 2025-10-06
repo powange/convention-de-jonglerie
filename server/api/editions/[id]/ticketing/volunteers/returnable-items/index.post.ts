@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Vérifier que l'article à restituer existe et appartient à l'édition
-    const returnableItem = await prisma.returnableItem.findFirst({
+    const returnableItem = await prisma.ticketingReturnableItem.findFirst({
       where: {
         id: body.returnableItemId,
         editionId,

@@ -88,8 +88,8 @@ export async function updateOption(optionId: number, editionId: number, data: Op
   // Mettre à jour l'option avec ses relations
   return await prisma.$transaction(async (tx) => {
     // Supprimer les anciennes relations
-    await tx.optionQuota.deleteMany({ where: { optionId } })
-    await tx.optionReturnableItem.deleteMany({ where: { optionId } })
+    await tx.ticketingOptionQuota.deleteMany({ where: { optionId } })
+    await tx.ticketingOptionReturnableItem.deleteMany({ where: { optionId } })
 
     // Pour les options HelloAsso, on met à jour uniquement les relations
     // Pour les options manuelles, on met à jour tout

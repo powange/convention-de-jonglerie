@@ -65,7 +65,7 @@ export default defineEventHandler(async (event) => {
       // Utiliser une transaction pour synchroniser les tarifs
       await prisma.$transaction(async (tx) => {
         // Récupérer les tarifs existants
-        const existingTiers = await tx.helloAssoTier.findMany({
+        const existingTiers = await tx.ticketingTier.findMany({
           where: { externalTicketingId: config.id },
         })
 
@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
         // Supprimer les tarifs qui n'existent plus dans HelloAsso
         const tiersToDelete = existingTiers.filter((t) => !fetchedTierIds.has(t.helloAssoTierId))
         if (tiersToDelete.length > 0) {
-          await tx.helloAssoTier.deleteMany({
+          await tx.ticketingTier.deleteMany({
             where: {
               id: { in: tiersToDelete.map((t) => t.id) },
             },
@@ -83,7 +83,7 @@ export default defineEventHandler(async (event) => {
 
         // Créer ou mettre à jour les tarifs
         for (const tier of result.tiers) {
-          await tx.helloAssoTier.upsert({
+          await tx.ticketingTier.upsert({
             where: {
               externalTicketingId_helloAssoTierId: {
                 externalTicketingId: config.id,

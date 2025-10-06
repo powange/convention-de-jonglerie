@@ -13,10 +13,10 @@ export interface TierData {
 }
 
 /**
- * Récupère tous les tarifs d'une édition (HelloAsso et manuels)
+ * Récupère tous les tarifs d'une édition (externes et manuels)
  */
 export async function getEditionTiers(editionId: number) {
-  return await prisma.helloAssoTier.findMany({
+  return await prisma.ticketingTier.findMany({
     where: { editionId },
     orderBy: [{ position: 'asc' }, { price: 'desc' }],
     include: {
@@ -38,7 +38,7 @@ export async function getEditionTiers(editionId: number) {
  * Crée un nouveau tarif manuel
  */
 export async function createTier(editionId: number, data: TierData) {
-  return await prisma.helloAssoTier.create({
+  return await prisma.ticketingTier.create({
     data: {
       editionId,
       name: data.name,
@@ -66,7 +66,7 @@ export async function createTier(editionId: number, data: TierData) {
  */
 export async function updateTier(tierId: number, editionId: number, data: TierData) {
   // Vérifier que le tarif existe et appartient à cette édition
-  const existingTier = await prisma.helloAssoTier.findFirst({
+  const existingTier = await prisma.ticketingTier.findFirst({
     where: {
       id: tierId,
       editionId,
@@ -85,13 +85,13 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
   // Mettre à jour le tarif avec ses relations
   return await prisma.$transaction(async (tx) => {
     // Supprimer les anciennes relations
-    await tx.tierQuota.deleteMany({ where: { tierId } })
-    await tx.tierReturnableItem.deleteMany({ where: { tierId } })
+    await tx.ticketingTierQuota.deleteMany({ where: { tierId } })
+    await tx.ticketingTierReturnableItem.deleteMany({ where: { tierId } })
 
     // Pour les tarifs HelloAsso, on met à jour uniquement les relations
     // Pour les tarifs manuels, on met à jour tout
     if (isHelloAssoTier) {
-      return await tx.helloAssoTier.update({
+      return await tx.ticketingTier.update({
         where: { id: tierId },
         data: {
           quotas: {
@@ -105,7 +105,7 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
         },
       })
     } else {
-      return await tx.helloAssoTier.update({
+      return await tx.ticketingTier.update({
         where: { id: tierId },
         data: {
           name: data.name,
@@ -134,7 +134,7 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
  */
 export async function deleteTier(tierId: number, editionId: number) {
   // Vérifier que le tarif existe et appartient à cette édition
-  const existingTier = await prisma.helloAssoTier.findFirst({
+  const existingTier = await prisma.ticketingTier.findFirst({
     where: {
       id: tierId,
       editionId,
@@ -156,7 +156,7 @@ export async function deleteTier(tierId: number, editionId: number) {
     })
   }
 
-  await prisma.helloAssoTier.delete({
+  await prisma.ticketingTier.delete({
     where: { id: tierId },
   })
 

@@ -258,7 +258,7 @@ export default defineEventHandler(async (event) => {
     updateData.assignedTeams = null
 
     // Supprimer le nouveau système (relations)
-    updateData.teams = {
+    updateData.teamAssignments = {
       set: [], // Supprimer toutes les relations avec les équipes
     }
   }
@@ -272,10 +272,14 @@ export default defineEventHandler(async (event) => {
       decidedAt: true,
       acceptanceNote: true,
       assignedTeams: true,
-      teams: {
+      teamAssignments: {
         select: {
-          id: true,
-          name: true,
+          team: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
     },

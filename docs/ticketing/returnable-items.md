@@ -4,10 +4,10 @@ Les items à restituer sont des objets prêtés aux participants qui doivent êt
 
 ## Modèle de Données
 
-### Table `ReturnableItem`
+### Table `TicketingReturnableItem`
 
 ```prisma
-model ReturnableItem {
+model TicketingReturnableItem {
   id        Int      @id @default(autoincrement())
   editionId Int
   name      String
@@ -15,7 +15,7 @@ model ReturnableItem {
   updatedAt DateTime @updatedAt
 
   edition                   Edition                          @relation(...)
-  tiers                     TierReturnableItem[]             // Tarifs liés
+  tiers                     TicketingTierReturnableItem[]             // Tarifs liés
   options                   TicketingOptionReturnableItem[]           // Options liées
   volunteerReturnableItems  EditionVolunteerReturnableItem[] // Bénévoles
 
@@ -35,7 +35,7 @@ interface ReturnableItemData {
 
 ### 1. Items Généraux (Tarifs)
 
-Items associés à des tarifs via `TierReturnableItem`.
+Items associés à des tarifs via `TicketingTierReturnableItem`.
 
 **Exemple** : Tous les participants avec le tarif "Pass Weekend" reçoivent un badge.
 
@@ -62,7 +62,7 @@ Items spécifiques aux bénévoles via `EditionVolunteerReturnableItem`.
 **Réponse** :
 
 ```typescript
-ReturnableItem[]
+TicketingReturnableItem[]
 ```
 
 ---
@@ -92,7 +92,7 @@ const createItemSchema = z.object({
 **Réponse** :
 
 ```typescript
-ReturnableItem
+TicketingReturnableItem
 ```
 
 ---
@@ -114,7 +114,7 @@ ReturnableItem
 **Réponse** :
 
 ```typescript
-ReturnableItem
+TicketingReturnableItem
 ```
 
 **Erreurs** :
@@ -154,7 +154,7 @@ Récupère tous les items d'une édition.
 
 ```typescript
 const items = await getReturnableItems(editionId)
-// Retourne: ReturnableItem[]
+// Retourne: TicketingReturnableItem[]
 ```
 
 #### `createReturnableItem(editionId: number, data: ReturnableItemData)`
@@ -211,7 +211,7 @@ model EditionVolunteerReturnableItem {
   updatedAt        DateTime @updatedAt
 
   edition        Edition        @relation(...)
-  returnableItem ReturnableItem @relation(...)
+  returnableItem TicketingReturnableItem @relation(...)
 
   @@unique([editionId, returnableItemId])
   @@index([editionId])
@@ -232,7 +232,7 @@ model EditionVolunteerReturnableItem {
 ```typescript
 Array<{
   id: number
-  returnableItem: ReturnableItem
+  returnableItem: TicketingReturnableItem
 }>
 ```
 
@@ -469,7 +469,7 @@ Implementez une validation qui vérifie que tous les items sont restitués avant
 ### Item n'apparaît pas dans la liste
 
 **Cause** : L'item n'est pas associé au tarif/option du participant
-**Solution** : Vérifiez les relations `TierReturnableItem` et `TicketingOptionReturnableItem`.
+**Solution** : Vérifiez les relations `TicketingTierReturnableItem` et `TicketingOptionReturnableItem`.
 
 ### Impossible de supprimer un item
 

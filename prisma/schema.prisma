@@ -142,10 +142,10 @@ model Edition {
   externalTicketing            ExternalTicketing?
   tiers                        TicketingTier[]
   ticketingQuotas              TicketingQuota[]
-  returnableItems              ReturnableItem[]
+  returnableItems              TicketingReturnableItem[]
   options                      TicketingOption[]
   orders                       TicketingOrder[]
-  volunteerReturnableItems     EditionVolunteerReturnableItem[]
+  volunteerTicketingReturnableItems     EditionVolunteerReturnableItem[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -834,7 +834,7 @@ model TicketingTier {
   externalTicketing ExternalTicketing?     @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
   edition           Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
   quotas            TicketingTierQuota[]
-  returnableItems   TierReturnableItem[]
+  returnableItems   TicketingTierReturnableItem[]
   orderItems        TicketingOrderItem[]
 
   @@unique([externalTicketingId, helloAssoTierId])
@@ -858,7 +858,7 @@ model TicketingQuota {
   @@index([editionId])
 }
 
-model ReturnableItem {
+model TicketingReturnableItem {
   id        Int      @id @default(autoincrement())
   editionId Int
   name      String
@@ -866,9 +866,9 @@ model ReturnableItem {
   updatedAt DateTime @updatedAt
 
   edition                   Edition                          @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  tiers                     TierReturnableItem[]
+  tiers                     TicketingTierReturnableItem[]
   options                   TicketingOptionReturnableItem[]
-  volunteerReturnableItems  EditionVolunteerReturnableItem[]
+  volunteerTicketingReturnableItems  EditionVolunteerReturnableItem[]
 
   @@index([editionId])
 }
@@ -881,7 +881,7 @@ model EditionVolunteerReturnableItem {
   updatedAt        DateTime @updatedAt
 
   edition        Edition        @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  returnableItem ReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+  returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
 
   @@unique([editionId, returnableItemId])
   @@index([editionId])
@@ -901,13 +901,13 @@ model TicketingTierQuota {
   @@index([quotaId])
 }
 
-model TierReturnableItem {
+model TicketingTierReturnableItem {
   id               Int @id @default(autoincrement())
   tierId           Int
   returnableItemId Int
 
   tier           TicketingTier  @relation(fields: [tierId], references: [id], onDelete: Cascade)
-  returnableItem ReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+  returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
 
   @@unique([tierId, returnableItemId])
   @@index([tierId])
@@ -933,7 +933,7 @@ model TicketingOptionReturnableItem {
   returnableItemId Int
 
   option         TicketingOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
-  returnableItem ReturnableItem  @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+  returnableItem TicketingReturnableItem  @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
 
   @@unique([optionId, returnableItemId])
   @@index([optionId])
