@@ -702,7 +702,9 @@ export class VolunteerScheduler {
       this.assignments.reduce(
         (total, assignment) => total + Math.max(assignment.confidence, 0),
         0
-      ) / Math.max(this.assignments.length, 1)
+      ) /
+      Math.max(this.assignments.length, 1) /
+      100 // Convertir en ratio (0-1)
 
     const warnings: string[] = []
     const recommendations: string[] = []

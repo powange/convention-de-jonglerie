@@ -59,11 +59,15 @@ export default defineEventHandler(async (event) => {
           },
         },
         teamPreferences: true,
-        teams: {
+        teamAssignments: {
           select: {
-            id: true,
-            name: true,
-            color: true,
+            team: {
+              select: {
+                id: true,
+                name: true,
+                color: true,
+              },
+            },
           },
         },
         timePreferences: true,
@@ -85,7 +89,7 @@ export default defineEventHandler(async (event) => {
       prenom: application.user.prenom,
       email: application.user.email,
       teamPreferences: application.teamPreferences,
-      assignedTeams: application.teams.map((team) => team.id), // Convertir les objets teams en array d'IDs
+      assignedTeams: application.teamAssignments.map((assignment) => assignment.team.id), // Convertir les teamAssignments en array d'IDs
       timePreferences: application.timePreferences,
       skills: application.skills,
       currentAssignments: application.user.volunteerAssignments,

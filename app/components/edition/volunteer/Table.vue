@@ -321,13 +321,13 @@
           <div class="space-y-2 max-h-60 overflow-y-auto">
             <div
               v-for="team in availableTeamsForModal"
-              :key="team.name"
+              :key="team.id"
               class="flex items-center gap-3 p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800"
             >
               <UCheckbox
-                :model-value="selectedTeams.includes(team.name)"
+                :model-value="selectedTeams.includes(team.id)"
                 :label="team.name"
-                @update:model-value="toggleTeamSelection(team.name)"
+                @update:model-value="toggleTeamSelection(team.id)"
               />
             </div>
           </div>
@@ -766,7 +766,7 @@ const openAcceptModal = (app: any) => {
   // Si une seule équipe disponible, la cocher par défaut
   nextTick(() => {
     if (availableTeamsForModal.value.length === 1 && availableTeamsForModal.value[0]) {
-      selectedTeams.value = [availableTeamsForModal.value[0].name]
+      selectedTeams.value = [availableTeamsForModal.value[0].id]
     }
   })
 }
@@ -778,10 +778,10 @@ const openEditTeamsModal = (app: any) => {
 
   // Si l'application a des équipes dans le nouveau système, les utiliser
   if (app.teams && app.teams.length > 0) {
-    selectedTeams.value = app.teams.map((team: any) => team.name)
+    selectedTeams.value = app.teams.map((team: any) => team.id)
   } else {
-    // Sinon, utiliser l'ancien système pour compatibilité
-    selectedTeams.value = app.assignedTeams || []
+    // Par défaut, aucune équipe sélectionnée
+    selectedTeams.value = []
   }
 
   acceptNote.value = ''
@@ -794,7 +794,7 @@ const openEditTeamsModal = (app: any) => {
       selectedTeams.value.length === 0 &&
       availableTeamsForModal.value[0]
     ) {
-      selectedTeams.value = [availableTeamsForModal.value[0].name]
+      selectedTeams.value = [availableTeamsForModal.value[0].id]
     }
   })
 }

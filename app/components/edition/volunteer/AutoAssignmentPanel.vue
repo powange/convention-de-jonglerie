@@ -32,59 +32,71 @@
           <!-- Contraintes -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <UFormField
-              :label="t('editions.volunteers.auto_assignment.min_hours_per_volunteer')"
-              :help="t('editions.volunteers.auto_assignment.min_hours_help')"
+              :label="t('editions.volunteers.auto_assignment.hours_per_volunteer')"
+              :help="t('editions.volunteers.auto_assignment.hours_per_volunteer_help')"
             >
-              <UInput
-                v-model="constraints.minHoursPerVolunteer"
-                type="number"
-                min="0"
-                max="12"
-                :placeholder="t('editions.volunteers.auto_assignment.min_hours_placeholder')"
-              />
+              <UFieldGroup>
+                <UButton
+                  :label="t('editions.volunteers.auto_assignment.minimum')"
+                  disabled
+                  variant="soft"
+                  color="neutral"
+                />
+                <UInput
+                  v-model="constraints.minHoursPerVolunteer"
+                  type="number"
+                  min="0"
+                  max="12"
+                  :placeholder="t('editions.volunteers.auto_assignment.min_placeholder')"
+                />
+                <UButton
+                  :label="t('editions.volunteers.auto_assignment.maximum')"
+                  disabled
+                  variant="soft"
+                  color="neutral"
+                />
+                <UInput
+                  v-model="constraints.maxHoursPerVolunteer"
+                  type="number"
+                  min="1"
+                  max="24"
+                  :placeholder="t('editions.volunteers.auto_assignment.max_placeholder')"
+                />
+              </UFieldGroup>
             </UFormField>
 
             <UFormField
-              :label="t('editions.volunteers.auto_assignment.max_hours_per_volunteer')"
-              :help="t('editions.volunteers.auto_assignment.max_hours_help')"
+              :label="t('editions.volunteers.auto_assignment.hours_per_day')"
+              :help="t('editions.volunteers.auto_assignment.hours_per_day_help')"
             >
-              <UInput
-                v-model="constraints.maxHoursPerVolunteer"
-                type="number"
-                min="1"
-                max="24"
-                :placeholder="t('editions.volunteers.auto_assignment.max_hours_placeholder')"
-              />
-            </UFormField>
-
-            <UFormField
-              :label="t('editions.volunteers.auto_assignment.min_hours_per_day')"
-              :help="t('editions.volunteers.auto_assignment.min_hours_per_day_help')"
-            >
-              <UInput
-                v-model="constraints.minHoursPerDay"
-                type="number"
-                min="0"
-                max="8"
-                :placeholder="
-                  t('editions.volunteers.auto_assignment.min_hours_per_day_placeholder')
-                "
-              />
-            </UFormField>
-
-            <UFormField
-              :label="t('editions.volunteers.auto_assignment.max_hours_per_day')"
-              :help="t('editions.volunteers.auto_assignment.max_hours_per_day_help')"
-            >
-              <UInput
-                v-model="constraints.maxHoursPerDay"
-                type="number"
-                min="1"
-                max="12"
-                :placeholder="
-                  t('editions.volunteers.auto_assignment.max_hours_per_day_placeholder')
-                "
-              />
+              <UFieldGroup>
+                <UButton
+                  :label="t('editions.volunteers.auto_assignment.minimum')"
+                  disabled
+                  variant="soft"
+                  color="neutral"
+                />
+                <UInput
+                  v-model="constraints.minHoursPerDay"
+                  type="number"
+                  min="0"
+                  max="8"
+                  :placeholder="t('editions.volunteers.auto_assignment.min_placeholder')"
+                />
+                <UButton
+                  :label="t('editions.volunteers.auto_assignment.maximum')"
+                  disabled
+                  variant="soft"
+                  color="neutral"
+                />
+                <UInput
+                  v-model="constraints.maxHoursPerDay"
+                  type="number"
+                  min="1"
+                  max="12"
+                  :placeholder="t('editions.volunteers.auto_assignment.max_placeholder')"
+                />
+              </UFieldGroup>
             </UFormField>
 
             <UFormField

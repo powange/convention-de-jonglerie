@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
 import { canManageEditionVolunteers } from '../../../../../../../../utils/collaborator-management'
+import {
+  getVolunteerTeamById,
+  setTeamLeader,
+} from '../../../../../../../../utils/editions/volunteers/teams'
 import { prisma } from '../../../../../../../../utils/prisma'
 
 const bodySchema = z.object({
@@ -30,7 +34,14 @@ export default defineEventHandler(async (event) => {
   // Vérifier que l'application existe et appartient à cette édition
   const application = await prisma.editionVolunteerApplication.findUnique({
     where: { id: applicationId },
-    select: { id: true, editionId: true, status: true },
+    select: {
+      id: true,
+      editionId: true,
+      status: true,
+      user: {
+        select: { id: true, pseudo: true, prenom: true, nom: true },
+      },
+    },
   })
 
   if (!application || application.editionId !== editionId)
@@ -43,60 +54,35 @@ export default defineEventHandler(async (event) => {
     })
 
   // Vérifier que l'équipe existe et appartient à cette édition
-  const team = await prisma.volunteerTeam.findUnique({
-    where: { id: teamId },
-    select: { id: true, editionId: true, name: true },
-  })
+  const team = await getVolunteerTeamById(teamId)
 
   if (!team || team.editionId !== editionId)
     throw createError({ statusCode: 404, message: 'Équipe introuvable' })
 
-  // Vérifier que l'assignation existe
-  const assignment = await prisma.applicationTeamAssignment.findUnique({
-    where: {
-      applicationId_teamId: {
-        applicationId,
-        teamId,
-      },
-    },
-  })
+  try {
+    // Mettre à jour le statut de leader
+    const updatedAssignment = await setTeamLeader(applicationId, teamId, parsed.isLeader)
 
-  if (!assignment)
-    throw createError({
-      statusCode: 404,
-      message: "Le bénévole n'est pas assigné à cette équipe",
-    })
-
-  // Mettre à jour le statut de leader
-  const updatedAssignment = await prisma.applicationTeamAssignment.update({
-    where: {
-      applicationId_teamId: {
-        applicationId,
-        teamId,
-      },
-    },
-    data: {
-      isLeader: parsed.isLeader,
-    },
-    include: {
-      application: {
-        select: {
-          user: {
-            select: { id: true, pseudo: true, prenom: true, nom: true },
-          },
+    return {
+      success: true,
+      assignment: {
+        ...updatedAssignment,
+        application: {
+          user: application.user,
         },
       },
-      team: {
-        select: { id: true, name: true, color: true },
-      },
-    },
-  })
-
-  return {
-    success: true,
-    assignment: updatedAssignment,
-    message: parsed.isLeader
-      ? `${updatedAssignment.application.user.pseudo} est maintenant responsable de l'équipe ${team.name}`
-      : `${updatedAssignment.application.user.pseudo} n'est plus responsable de l'équipe ${team.name}`,
+      message: parsed.isLeader
+        ? `${application.user.pseudo} est maintenant responsable de l'équipe ${team.name}`
+        : `${application.user.pseudo} n'est plus responsable de l'équipe ${team.name}`,
+    }
+  } catch (error: any) {
+    // Si l'assignation n'existe pas, Prisma lancera une erreur
+    if (error.code === 'P2025') {
+      throw createError({
+        statusCode: 404,
+        message: "Le bénévole n'est pas assigné à cette équipe",
+      })
+    }
+    throw error
   }
 })

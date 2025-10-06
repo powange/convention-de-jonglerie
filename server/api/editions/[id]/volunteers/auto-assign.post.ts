@@ -79,7 +79,11 @@ export default defineEventHandler(async (event) => {
               prenom: true,
             },
           },
-          teams: true,
+          teamAssignments: {
+            include: {
+              team: true,
+            },
+          },
         },
       }),
 
@@ -289,7 +293,11 @@ async function assignVolunteersToTeams(
         },
       },
       include: {
-        teams: true,
+        teamAssignments: {
+          include: {
+            team: true,
+          },
+        },
       },
     })
 
@@ -297,14 +305,9 @@ async function assignVolunteersToTeams(
 
     // Si on ne garde pas les existantes, supprimer les anciennes assignations d'équipes
     if (!keepExisting) {
-      await tx.editionVolunteerApplication.update({
+      await tx.applicationTeamAssignment.deleteMany({
         where: {
-          id: application.id,
-        },
-        data: {
-          teams: {
-            set: [], // Supprimer toutes les relations existantes
-          },
+          applicationId: application.id,
         },
       })
     }
@@ -312,15 +315,36 @@ async function assignVolunteersToTeams(
     // Ajouter les nouvelles assignations d'équipes
     const teamIdsArray = Array.from(teamIds)
     if (teamIdsArray.length > 0) {
+      // Créer les assignations d'équipes
+      for (const teamId of teamIdsArray) {
+        // Vérifier si l'assignation existe déjà
+        const existingAssignment = await tx.applicationTeamAssignment.findUnique({
+          where: {
+            applicationId_teamId: {
+              applicationId: application.id,
+              teamId: teamId,
+            },
+          },
+        })
+
+        if (!existingAssignment) {
+          await tx.applicationTeamAssignment.create({
+            data: {
+              applicationId: application.id,
+              teamId: teamId,
+              isLeader: false,
+            },
+          })
+        }
+      }
+
+      // Aussi mettre à jour le champ JSON
       await tx.editionVolunteerApplication.update({
         where: {
           id: application.id,
         },
         data: {
-          teams: {
-            connect: teamIdsArray.map((teamId) => ({ id: teamId })),
-          },
-          assignedTeams: teamIdsArray, // Aussi mettre à jour le champ JSON
+          assignedTeams: teamIdsArray,
         },
       })
     }

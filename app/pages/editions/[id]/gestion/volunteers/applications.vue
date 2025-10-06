@@ -743,14 +743,19 @@ const teamDistribution = computed(() => {
         app.teamAssignments.some((t: any) => t.teamId === team.id)
       )
 
-      // Trier les bénévoles : responsables en premier
+      // Trier les bénévoles : responsables en premier, puis par ordre alphabétique (prénom + nom)
       const sortedVolunteers = assignedVolunteers.sort((a, b) => {
         const aIsLeader = isTeamLeader(a, team.id)
         const bIsLeader = isTeamLeader(b, team.id)
 
+        // D'abord trier par statut de leader
         if (aIsLeader && !bIsLeader) return -1
         if (!aIsLeader && bIsLeader) return 1
-        return 0
+
+        // Ensuite trier alphabétiquement par prénom + nom
+        const aName = `${a.user.prenom || ''} ${a.user.nom || ''}`.trim().toLowerCase()
+        const bName = `${b.user.prenom || ''} ${b.user.nom || ''}`.trim().toLowerCase()
+        return aName.localeCompare(bName, 'fr')
       })
 
       return {

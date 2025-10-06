@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
 import { canManageEditionVolunteers } from '../../../../../../utils/collaborator-management'
+import {
+  assignVolunteerToTeams,
+  resolveTeamIdentifiers,
+} from '../../../../../../utils/editions/volunteers/teams'
 import { prisma } from '../../../../../../utils/prisma'
 
 const bodySchema = z.object({
@@ -41,81 +45,36 @@ export default defineEventHandler(async (event) => {
       message: 'Les équipes ne peuvent être assignées aux bénévoles rejetés',
     })
 
-  // Récupérer les équipes de cette édition pour faire le mapping noms -> IDs
-  const availableTeams = await prisma.volunteerTeam.findMany({
-    where: { editionId },
-    select: { id: true, name: true },
-  })
+  try {
+    // Résoudre les identifiants (IDs ou noms) en IDs d'équipes
+    const teamIds = await resolveTeamIdentifiers(editionId, parsed.teams)
 
-  // Mapper les noms/IDs d'équipes vers les IDs des VolunteerTeam
-  const teamIds: string[] = []
-  for (const teamIdentifier of parsed.teams) {
-    // Chercher d'abord par ID, puis par nom (pour compatibilité)
-    let team = availableTeams.find((t) => t.id === teamIdentifier)
-    if (!team) {
-      team = availableTeams.find(
-        (t) => t.name.toLowerCase().trim() === teamIdentifier.toLowerCase().trim()
-      )
+    // Assigner le bénévole aux équipes
+    const assignments = await assignVolunteerToTeams(applicationId, teamIds)
+
+    return {
+      success: true,
+      application: {
+        id: applicationId,
+        assignedTeams: teamIds,
+        teamAssignments: assignments.map((a) => ({
+          teamId: a.teamId,
+          isLeader: a.isLeader,
+          assignedAt: a.assignedAt,
+          team: a.team,
+        })),
+      },
+      teams: parsed.teams,
+      message: `Assigné à ${parsed.teams.length} équipe(s)`,
     }
-
-    if (team) {
-      teamIds.push(team.id)
-    } else {
+  } catch (error: any) {
+    // Si c'est une erreur de notre util, la propager avec le bon format
+    if (error.message?.includes('introuvable')) {
       throw createError({
         statusCode: 400,
-        message: `Équipe "${teamIdentifier}" introuvable dans cette édition`,
+        message: error.message,
       })
     }
-  }
-
-  // Supprimer toutes les assignations existantes et créer les nouvelles
-  await prisma.applicationTeamAssignment.deleteMany({
-    where: { applicationId },
-  })
-
-  // Créer les nouvelles assignations
-  if (teamIds.length > 0) {
-    await prisma.applicationTeamAssignment.createMany({
-      data: teamIds.map((teamId) => ({
-        applicationId,
-        teamId,
-        isLeader: false, // Par défaut, pas leader
-      })),
-    })
-  }
-
-  // Récupérer l'application mise à jour avec ses équipes
-  const updated = await prisma.editionVolunteerApplication.update({
-    where: { id: applicationId },
-    data: {
-      // Conserver l'ancien système pour compatibilité
-      assignedTeams: parsed.teams,
-    },
-    select: {
-      id: true,
-      assignedTeams: true,
-      teamAssignments: {
-        select: {
-          teamId: true,
-          isLeader: true,
-          assignedAt: true,
-          team: {
-            select: {
-              id: true,
-              name: true,
-              color: true,
-              description: true,
-            },
-          },
-        },
-      },
-    },
-  })
-
-  return {
-    success: true,
-    application: updated,
-    teams: parsed.teams,
-    message: `Assigné à ${parsed.teams.length} équipe(s)`,
+    throw error
   }
 })

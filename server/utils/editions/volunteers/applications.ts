@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { requiresEmergencyContact } from '../../../utils/allergy-severity'
-import { prisma } from '../../../utils/prisma'
+import { prisma } from '../../prisma'
 
 // Créneaux horaires valides pour les préférences
 export const VALID_TIME_SLOTS = [

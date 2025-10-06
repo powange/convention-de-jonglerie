@@ -132,8 +132,8 @@ const slotModalOpen = ref(false)
 const slotModalData = ref<any>(null)
 
 // Utilisation des vraies APIs
-const { teams } = useVolunteerTeams(editionId)
-const { timeSlots, createTimeSlot, updateTimeSlot, deleteTimeSlot } =
+const { teams, fetchTeams } = useVolunteerTeams(editionId)
+const { timeSlots, createTimeSlot, updateTimeSlot, deleteTimeSlot, fetchTimeSlots } =
   useVolunteerTimeSlots(editionId)
 
 // Conversion des données API pour compatibilité avec FullCalendar
@@ -323,10 +323,7 @@ const handleSlotSave = async (slotData: any) => {
 const refreshData = async () => {
   refreshing.value = true
   try {
-    // Recharger les données depuis l'API
-    const { fetchTeams } = useVolunteerTeams(editionId)
-    const { fetchTimeSlots } = useVolunteerTimeSlots(editionId)
-
+    // Recharger les données depuis l'API en utilisant les fonctions déjà définies
     await Promise.all([fetchTeams(), fetchTimeSlots(), fetchAcceptedVolunteers()])
   } catch {
     toast.add({
