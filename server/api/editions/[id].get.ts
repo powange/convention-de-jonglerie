@@ -183,6 +183,8 @@ export default defineEventHandler(async (event) => {
       volunteersMode: (edition as any).volunteersMode,
       volunteersExternalUrl: (edition as any).volunteersExternalUrl,
       volunteersUpdatedAt: (edition as any).volunteersUpdatedAt,
+      volunteersSetupStartDate: (edition as any).volunteersSetupStartDate,
+      volunteersTeardownEndDate: (edition as any).volunteersTeardownEndDate,
     }
   } catch (error: any) {
     // If the handler already threw an HTTP error (createError), rethrow it to preserve status

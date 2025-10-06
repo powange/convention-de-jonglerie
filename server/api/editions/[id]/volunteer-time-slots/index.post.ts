@@ -68,9 +68,17 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Vérifier que les dates sont dans la période de l'édition
-    const editionStart = new Date(edition.startDate)
-    const editionEnd = new Date(edition.endDate)
+    // Vérifier que les dates sont dans la période de l'édition (incluant montage/démontage)
+    // Utilise les dates de montage/démontage si définies, sinon les dates de l'édition
+    const editionStart = edition.volunteersSetupStartDate
+      ? new Date(edition.volunteersSetupStartDate)
+      : new Date(edition.startDate)
+    const editionEnd = edition.volunteersTeardownEndDate
+      ? new Date(edition.volunteersTeardownEndDate)
+      : new Date(edition.endDate)
+
+    // Ajouter un jour à la date de fin pour inclure tout le dernier jour (jusqu'à 23:59:59)
+    editionEnd.setDate(editionEnd.getDate() + 1)
 
     if (body.startDateTime < editionStart || body.endDateTime > editionEnd) {
       throw createError({

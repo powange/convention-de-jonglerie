@@ -72,6 +72,8 @@ export interface Edition {
   hasCashPayment: boolean
   hasCreditCardPayment: boolean
   hasAfjTokenPayment: boolean
+  volunteersSetupStartDate?: string | null
+  volunteersTeardownEndDate?: string | null
 }
 
 export interface Convention {

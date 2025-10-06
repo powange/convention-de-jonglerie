@@ -299,12 +299,27 @@ const filteredTimeSlots = computed(() => {
 })
 
 // Computed pour les dates avec fallbacks
-const editionStartDate = computed(
-  () => (props.edition?.startDate || new Date().toISOString().split('T')[0]) as string
-)
-const editionEndDate = computed(
-  () => (props.edition?.endDate || new Date().toISOString().split('T')[0]) as string
-)
+// Utilise les dates de montage/démontage si définies, sinon les dates de l'édition
+const editionStartDate = computed(() => {
+  if (props.edition?.volunteersSetupStartDate) {
+    return props.edition.volunteersSetupStartDate.split('T')[0]
+  }
+  return (props.edition?.startDate || new Date().toISOString().split('T')[0]) as string
+})
+
+const editionEndDate = computed(() => {
+  let endDate: string
+  if (props.edition?.volunteersTeardownEndDate) {
+    endDate = props.edition.volunteersTeardownEndDate.split('T')[0]
+  } else {
+    endDate = (props.edition?.endDate || new Date().toISOString().split('T')[0]) as string
+  }
+
+  // Ajouter un jour à la date de fin car validRange.end est exclusif dans FullCalendar
+  const date = new Date(endDate)
+  date.setDate(date.getDate() + 1)
+  return date.toISOString().split('T')[0]
+})
 
 // Configuration du calendrier de planning
 const { calendarOptions, ready } = useVolunteerSchedule({
