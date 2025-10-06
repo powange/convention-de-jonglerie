@@ -853,7 +853,7 @@ model TicketingQuota {
 
   edition Edition       @relation(fields: [editionId], references: [id], onDelete: Cascade)
   tiers   TicketingTierQuota[]
-  options OptionQuota[]
+  options TicketingOptionQuota[]
 
   @@index([editionId])
 }
@@ -867,7 +867,7 @@ model ReturnableItem {
 
   edition                   Edition                          @relation(fields: [editionId], references: [id], onDelete: Cascade)
   tiers                     TierReturnableItem[]
-  options                   OptionReturnableItem[]
+  options                   TicketingOptionReturnableItem[]
   volunteerReturnableItems  EditionVolunteerReturnableItem[]
 
   @@index([editionId])
@@ -914,7 +914,7 @@ model TierReturnableItem {
   @@index([returnableItemId])
 }
 
-model OptionQuota {
+model TicketingOptionQuota {
   id       Int @id @default(autoincrement())
   optionId Int
   quotaId  Int
@@ -927,7 +927,7 @@ model OptionQuota {
   @@index([quotaId])
 }
 
-model OptionReturnableItem {
+model TicketingOptionReturnableItem {
   id               Int @id @default(autoincrement())
   optionId         Int
   returnableItemId Int
@@ -956,8 +956,8 @@ model TicketingOption {
 
   externalTicketing ExternalTicketing?      @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
   edition           Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  quotas            OptionQuota[]
-  returnableItems   OptionReturnableItem[]
+  quotas            TicketingOptionQuota[]
+  returnableItems   TicketingOptionReturnableItem[]
 
   @@unique([externalTicketingId, helloAssoOptionId])
   @@index([externalTicketingId])

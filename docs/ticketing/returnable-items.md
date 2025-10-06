@@ -16,7 +16,7 @@ model ReturnableItem {
 
   edition                   Edition                          @relation(...)
   tiers                     TierReturnableItem[]             // Tarifs liés
-  options                   OptionReturnableItem[]           // Options liées
+  options                   TicketingOptionReturnableItem[]           // Options liées
   volunteerReturnableItems  EditionVolunteerReturnableItem[] // Bénévoles
 
   @@index([editionId])
@@ -41,7 +41,7 @@ Items associés à des tarifs via `TierReturnableItem`.
 
 ### 2. Items Conditionnels (Options)
 
-Items associés à des options via `OptionReturnableItem`.
+Items associés à des options via `TicketingOptionReturnableItem`.
 
 **Exemple** : Les participants qui répondent "Oui" à "T-shirt souven ir" reçoivent un badge textile.
 
@@ -469,7 +469,7 @@ Implementez une validation qui vérifie que tous les items sont restitués avant
 ### Item n'apparaît pas dans la liste
 
 **Cause** : L'item n'est pas associé au tarif/option du participant
-**Solution** : Vérifiez les relations `TierReturnableItem` et `OptionReturnableItem`.
+**Solution** : Vérifiez les relations `TierReturnableItem` et `TicketingOptionReturnableItem`.
 
 ### Impossible de supprimer un item
 

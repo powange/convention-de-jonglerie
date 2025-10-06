@@ -92,8 +92,8 @@ ExternalTicketing          → Configuration de billeterie externe
 Relations:
 - TicketingTierQuota             → Lien tarifs ↔ quotas
 - TierReturnableItem    → Lien tarifs ↔ items à restituer
-- OptionQuota           → Lien options ↔ quotas
-- OptionReturnableItem  → Lien options ↔ items à restituer
+- TicketingOptionQuota           → Lien options ↔ quotas
+- TicketingOptionReturnableItem  → Lien options ↔ items à restituer
 ```
 
 ### Flux de Données

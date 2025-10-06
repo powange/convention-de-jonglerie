@@ -18,7 +18,7 @@ model TicketingQuota {
 
   edition Edition       @relation(...)
   tiers   TicketingTierQuota[]   // Tarifs qui consomment ce quota
-  options OptionQuota[] // Options qui consomment ce quota
+  options TicketingOptionQuota[] // Options qui consomment ce quota
 
   @@index([editionId])
 }
@@ -74,7 +74,7 @@ TicketingQuota[]
 Le calcul se fait en comptant les `TicketingOrderItem` qui ont :
 
 1. Un tarif (`tierId`) lié au quota via `TicketingTierQuota`
-2. OU une réponse à une option (`customFields`) liée au quota via `OptionQuota`
+2. OU une réponse à une option (`customFields`) liée au quota via `TicketingOptionQuota`
 
 **Exemple** :
 
@@ -157,7 +157,7 @@ const bodySchema = z.object({
 }
 ```
 
-**Note** : La suppression supprime également les relations `TicketingTierQuota` et `OptionQuota` (cascade).
+**Note** : La suppression supprime également les relations `TicketingTierQuota` et `TicketingOptionQuota` (cascade).
 
 ---
 
@@ -193,7 +193,7 @@ const stats = await getQuotaStats(editionId)
 1. Récupère tous les quotas de l'édition
 2. Pour chaque quota :
    - Compte les items via `TicketingTierQuota` (items avec un `tierId` lié)
-   - Compte les items via `OptionQuota` (items avec réponse à option liée)
+   - Compte les items via `TicketingOptionQuota` (items avec réponse à option liée)
    - Somme les deux (en évitant les doublons si un item consomme le même quota 2 fois)
 3. Calcule `remaining` et `percentage`
 
@@ -351,7 +351,7 @@ Utilisez `QuotaStatsCard` pour surveiller l'utilisation en temps réel et ajuste
 
 ### Les statistiques ne se mettent pas à jour
 
-**Cause** : Les relations `TicketingTierQuota` ou `OptionQuota` ne sont pas créées
+**Cause** : Les relations `TicketingTierQuota` ou `TicketingOptionQuota` ne sont pas créées
 **Solution** : Associez les tarifs et options aux quotas correspondants.
 
 ### Quota négatif (plus de consommés que disponibles)

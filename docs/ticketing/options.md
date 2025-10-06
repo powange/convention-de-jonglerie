@@ -69,8 +69,8 @@ model TicketingOption {
 
   externalTicketing ExternalTicketing?      @relation(...)
   edition           Edition                 @relation(...)
-  quotas            OptionQuota[]           // Relations quotas
-  returnableItems   OptionReturnableItem[]  // Relations items
+  quotas            TicketingOptionQuota[]           // Relations quotas
+  returnableItems   TicketingOptionReturnableItem[]  // Relations items
 
   @@unique([externalTicketingId, helloAssoOptionId])
   @@index([externalTicketingId])
@@ -80,12 +80,12 @@ model TicketingOption {
 
 ### Relations
 
-#### OptionQuota
+#### TicketingOptionQuota
 
 Associe une option (avec une valeur spécifique) à un quota.
 
 ```prisma
-model OptionQuota {
+model TicketingOptionQuota {
   id       Int @id @default(autoincrement())
   optionId Int
   quotaId  Int
@@ -99,12 +99,12 @@ model OptionQuota {
 
 **Exemple** : L'option "Régime alimentaire = Végétarien" consomme le quota "Repas végétariens".
 
-#### OptionReturnableItem
+#### TicketingOptionReturnableItem
 
 Associe une option (avec une valeur spécifique) à un item à restituer.
 
 ```prisma
-model OptionReturnableItem {
+model TicketingOptionReturnableItem {
   id               Int @id @default(autoincrement())
   optionId         Int
   returnableItemId Int
