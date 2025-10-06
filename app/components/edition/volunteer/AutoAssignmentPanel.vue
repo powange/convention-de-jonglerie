@@ -121,6 +121,20 @@
             </UFormField>
 
             <UFormField
+              :label="t('editions.volunteers.auto_assignment.respect_team_preferences')"
+              :help="t('editions.volunteers.auto_assignment.respect_team_preferences_help')"
+            >
+              <USwitch v-model="constraints.respectStrictTeamPreferences" />
+            </UFormField>
+
+            <UFormField
+              :label="t('editions.volunteers.auto_assignment.respect_time_preferences')"
+              :help="t('editions.volunteers.auto_assignment.respect_time_preferences_help')"
+            >
+              <USwitch v-model="constraints.respectStrictTimePreferences" />
+            </UFormField>
+
+            <UFormField
               :label="t('editions.volunteers.auto_assignment.allow_overtime')"
               :help="t('editions.volunteers.auto_assignment.allow_overtime_help')"
             >
@@ -396,6 +410,8 @@ interface Constraints {
   balanceTeams: boolean
   prioritizeExperience: boolean
   respectStrictAvailability: boolean
+  respectStrictTeamPreferences: boolean
+  respectStrictTimePreferences: boolean
   allowOvertime: boolean
   maxOvertimeHours: number
   keepExistingAssignments: boolean
@@ -414,6 +430,8 @@ const constraints = ref<Constraints>({
   balanceTeams: true,
   prioritizeExperience: true,
   respectStrictAvailability: true,
+  respectStrictTeamPreferences: false,
+  respectStrictTimePreferences: false,
   allowOvertime: false,
   maxOvertimeHours: 2,
   keepExistingAssignments: false,

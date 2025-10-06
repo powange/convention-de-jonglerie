@@ -52,6 +52,7 @@
       <!-- Alerte pour les chevauchements de créneaux -->
       <EditionVolunteerPlanningOverlapWarningsAlert
         :overlap-warnings="overlapWarnings"
+        :preference-warnings="preferenceWarnings"
         :can-manage-volunteers="canManageVolunteers"
         :format-date-time-range="formatDateTimeRange"
       />
@@ -493,6 +494,57 @@ const overlapWarnings = computed(() => {
         }
       }
     }
+  })
+
+  return warnings
+})
+
+// Détection des conflits de préférences d'équipe
+const preferenceWarnings = computed(() => {
+  const warnings: Array<{
+    volunteerId: number
+    volunteer: any
+    slot: any
+    teamName: string
+  }> = []
+
+  // Créer un map des préférences d'équipe par bénévole
+  const volunteerTeamPreferences = new Map<number, string[]>()
+  acceptedVolunteers.value.forEach((volunteer) => {
+    if (volunteer.teamPreferences && Array.isArray(volunteer.teamPreferences)) {
+      volunteerTeamPreferences.set(volunteer.user.id, volunteer.teamPreferences)
+    }
+  })
+
+  // Vérifier chaque assignation
+  convertedTimeSlots.value.forEach((slot) => {
+    if (!slot || !slot.id || !slot.teamId) return
+    if (!slot.assignedVolunteersList || slot.assignedVolunteersList.length === 0) return
+
+    slot.assignedVolunteersList.forEach((assignment) => {
+      if (!assignment || !assignment.user || !assignment.user.id) return
+
+      const userId = assignment.user.id
+      const preferences = volunteerTeamPreferences.get(userId)
+
+      // Si le bénévole a des préférences d'équipe et que l'équipe du créneau n'en fait pas partie
+      if (preferences && preferences.length > 0 && !preferences.includes(slot.teamId)) {
+        const team = convertedTeams.value.find((t) => t.id === slot.teamId)
+
+        warnings.push({
+          volunteerId: userId,
+          volunteer: assignment.user,
+          slot: {
+            id: slot.id,
+            title: slot.title || 'Sans titre',
+            start: slot.start,
+            end: slot.end,
+            teamName: team?.name || null,
+          },
+          teamName: team?.name || 'Équipe inconnue',
+        })
+      }
+    })
   })
 
   return warnings

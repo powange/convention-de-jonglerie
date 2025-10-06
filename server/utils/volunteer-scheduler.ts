@@ -52,6 +52,8 @@ export interface SchedulingConstraints {
   balanceTeams?: boolean
   prioritizeExperience?: boolean
   respectStrictAvailability?: boolean
+  respectStrictTeamPreferences?: boolean
+  respectStrictTimePreferences?: boolean
   allowOvertime?: boolean
   maxOvertimeHours?: number
 }
@@ -148,12 +150,40 @@ export class VolunteerScheduler {
     }
 
     // Préférence d'équipe
-    if (slot.teamId && volunteer.teamPreferences?.some((pref) => pref.teamId === slot.teamId)) {
-      score += 15
+    if (slot.teamId) {
+      const hasTeamPreference = volunteer.teamPreferences?.some(
+        (pref) => pref.teamId === slot.teamId
+      )
+
+      if (hasTeamPreference) {
+        score += 15 // Bonus si l'équipe correspond aux préférences
+      } else if (
+        this.constraints.respectStrictTeamPreferences &&
+        volunteer.teamPreferences &&
+        volunteer.teamPreferences.length > 0
+      ) {
+        // Si on respecte strictement les préférences et que le bénévole a des préférences
+        // mais que l'équipe du créneau n'en fait pas partie, c'est impossible
+        return -1000
+      }
     }
 
     // Préférences horaires
     const timePreferenceBonus = this.calculateTimePreferenceBonus(volunteer, slot, availability)
+
+    // Si on respecte strictement les préférences horaires et que le bénévole en a
+    if (
+      this.constraints.respectStrictTimePreferences &&
+      availability.timePreferences &&
+      Array.isArray(availability.timePreferences) &&
+      availability.timePreferences.length > 0
+    ) {
+      // Si le créneau ne correspond pas aux préférences (bonus = 0), c'est impossible
+      if (timePreferenceBonus === 0) {
+        return -1000
+      }
+    }
+
     score += timePreferenceBonus
 
     // Expérience et compétences

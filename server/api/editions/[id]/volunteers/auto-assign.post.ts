@@ -14,6 +14,8 @@ const constraintsSchema = z.object({
   balanceTeams: z.boolean().optional(),
   prioritizeExperience: z.boolean().optional(),
   respectStrictAvailability: z.boolean().optional(),
+  respectStrictTeamPreferences: z.boolean().optional(),
+  respectStrictTimePreferences: z.boolean().optional(),
   allowOvertime: z.boolean().optional(),
   maxOvertimeHours: z.number().min(0).max(6).optional(),
   keepExistingAssignments: z.boolean().optional(),
