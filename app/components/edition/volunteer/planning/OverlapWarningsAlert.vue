@@ -94,6 +94,56 @@
         </div>
       </template>
     </UAlert>
+
+    <!-- Alertes de créneaux couvrant les repas -->
+    <UAlert
+      v-if="mealTimeWarnings.length > 0"
+      color="orange"
+      variant="soft"
+      icon="i-heroicons-exclamation-circle"
+    >
+      <template #title>
+        {{ t('editions.volunteers.meal_time_conflicts') || 'Conflits avec les horaires de repas' }}
+      </template>
+      <template #description>
+        <div class="space-y-2">
+          <p class="text-sm">
+            {{ mealTimeWarnings.length }} bénévole(s) ont des créneaux qui couvrent entièrement une
+            période de repas :
+          </p>
+          <div class="space-y-1">
+            <div
+              v-for="warning in mealTimeWarnings"
+              :key="`${warning.volunteerId}-${warning.slot.id}-${warning.mealPeriod}`"
+              class="text-sm bg-orange-50 dark:bg-orange-900/20 p-2 rounded border-l-2 border-orange-400"
+            >
+              <div class="flex items-center gap-2 font-medium text-orange-800 dark:text-orange-200">
+                <UiUserAvatar :user="warning.volunteer" size="xs" />
+                {{ warning.volunteer.pseudo }}
+              </div>
+              <div class="text-xs text-orange-700 dark:text-orange-300 mt-1">
+                <strong>{{ warning.slot.title }}</strong>
+                <span v-if="warning.slot.teamName" class="text-orange-600 dark:text-orange-400">
+                  - {{ warning.slot.teamName }}</span
+                >
+                <br />
+                ({{ formatDateTimeRange(warning.slot.start, warning.slot.end) }})
+                <br />
+                <span class="text-orange-600 dark:text-orange-400">
+                  {{
+                    warning.mealPeriod === 'lunch'
+                      ? t('editions.volunteers.covers_lunch_period') ||
+                        'Couvre toute la période du déjeuner (11h30-14h)'
+                      : t('editions.volunteers.covers_dinner_period') ||
+                        'Couvre toute la période du dîner (19h30-22h)'
+                  }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </UAlert>
   </div>
 </template>
 
@@ -136,9 +186,26 @@ interface PreferenceWarning {
   teamName: string
 }
 
+interface MealTimeWarning {
+  volunteerId: number
+  volunteer: {
+    pseudo: string
+    [key: string]: any
+  }
+  slot: {
+    id: string | number
+    title: string
+    teamName?: string
+    start: string
+    end: string
+  }
+  mealPeriod: 'lunch' | 'dinner'
+}
+
 interface Props {
   overlapWarnings: OverlapWarning[]
   preferenceWarnings: PreferenceWarning[]
+  mealTimeWarnings: MealTimeWarning[]
   canManageVolunteers: boolean
   formatDateTimeRange: (start: string, end: string) => string
 }

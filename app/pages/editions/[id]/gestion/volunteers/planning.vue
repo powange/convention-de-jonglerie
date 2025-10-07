@@ -53,6 +53,7 @@
       <EditionVolunteerPlanningOverlapWarningsAlert
         :overlap-warnings="overlapWarnings"
         :preference-warnings="preferenceWarnings"
+        :meal-time-warnings="mealTimeWarnings"
         :can-manage-volunteers="canManageVolunteers"
         :format-date-time-range="formatDateTimeRange"
       />
@@ -542,6 +543,93 @@ const preferenceWarnings = computed(() => {
             teamName: team?.name || null,
           },
           teamName: team?.name || 'Équipe inconnue',
+        })
+      }
+    })
+  })
+
+  return warnings
+})
+
+// Détection des conflits de repas (créneaux qui empêchent de manger)
+const mealTimeWarnings = computed(() => {
+  const warnings: Array<{
+    volunteerId: number
+    volunteer: any
+    slot: any
+    mealPeriod: 'lunch' | 'dinner'
+  }> = []
+
+  // Définir les périodes de repas
+  const LUNCH_START = { hour: 11, minute: 30 }
+  const LUNCH_END = { hour: 14, minute: 0 }
+  const DINNER_START = { hour: 19, minute: 30 }
+  const DINNER_END = { hour: 22, minute: 0 }
+
+  // Fonction pour vérifier si un créneau couvre entièrement une période de repas
+  const coversEntireMealPeriod = (
+    slotStart: string,
+    slotEnd: string,
+    mealStart: { hour: number; minute: number },
+    mealEnd: { hour: number; minute: number }
+  ) => {
+    const start = new Date(slotStart)
+    const end = new Date(slotEnd)
+
+    const mealStartTime = new Date(start)
+    mealStartTime.setHours(mealStart.hour, mealStart.minute, 0, 0)
+
+    const mealEndTime = new Date(start)
+    mealEndTime.setHours(mealEnd.hour, mealEnd.minute, 0, 0)
+
+    // Le créneau couvre la période de repas s'il commence avant ou au début du repas
+    // et se termine après ou à la fin du repas
+    return start <= mealStartTime && end >= mealEndTime
+  }
+
+  // Vérifier chaque assignation
+  convertedTimeSlots.value.forEach((slot) => {
+    if (!slot || !slot.id) return
+    if (!slot.assignedVolunteersList || slot.assignedVolunteersList.length === 0) return
+
+    slot.assignedVolunteersList.forEach((assignment) => {
+      if (!assignment || !assignment.user || !assignment.user.id) return
+
+      const userId = assignment.user.id
+
+      // Vérifier si le créneau couvre la période du déjeuner
+      if (coversEntireMealPeriod(slot.start, slot.end, LUNCH_START, LUNCH_END)) {
+        const team = convertedTeams.value.find((t) => t.id === slot.teamId)
+
+        warnings.push({
+          volunteerId: userId,
+          volunteer: assignment.user,
+          slot: {
+            id: slot.id,
+            title: slot.title || 'Sans titre',
+            start: slot.start,
+            end: slot.end,
+            teamName: team?.name || null,
+          },
+          mealPeriod: 'lunch',
+        })
+      }
+
+      // Vérifier si le créneau couvre la période du dîner
+      if (coversEntireMealPeriod(slot.start, slot.end, DINNER_START, DINNER_END)) {
+        const team = convertedTeams.value.find((t) => t.id === slot.teamId)
+
+        warnings.push({
+          volunteerId: userId,
+          volunteer: assignment.user,
+          slot: {
+            id: slot.id,
+            title: slot.title || 'Sans titre',
+            start: slot.start,
+            end: slot.end,
+            teamName: team?.name || null,
+          },
+          mealPeriod: 'dinner',
         })
       }
     })
