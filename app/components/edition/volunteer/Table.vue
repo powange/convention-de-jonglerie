@@ -1530,27 +1530,29 @@ const columns = computed((): TableColumn<any>[] => [
     accessorKey: 'assignedTeams',
     header: t('editions.volunteers.assigned_team'),
     cell: ({ row }: any) => {
-      // Priorité au nouveau système
-      const teams = row.original.teams
-      if (teams && teams.length > 0) {
+      // Priorité au nouveau système teamAssignments
+      const teamAssignments = row.original.teamAssignments
+      if (teamAssignments && teamAssignments.length > 0) {
         return h(
           'div',
           { class: 'flex flex-wrap gap-1' },
-          teams.map((team: any) =>
+          teamAssignments.map((assignment: any) =>
             h(
               resolveComponent('UBadge'),
               {
-                key: team.id,
+                key: assignment.teamId,
                 color: 'primary',
                 variant: 'soft',
                 size: 'sm',
-                style: {
-                  backgroundColor: team.color + '20',
-                  borderColor: team.color,
-                  color: team.color,
-                },
+                style: assignment.team?.color
+                  ? {
+                      backgroundColor: assignment.team.color + '20',
+                      borderColor: assignment.team.color,
+                      color: assignment.team.color,
+                    }
+                  : undefined,
               },
-              () => team.name
+              () => assignment.team?.name || assignment.teamId
             )
           )
         )

@@ -1761,9 +1761,11 @@
       "total_hours": "Total d'heures",
       "team_distribution": {
         "all_teams": "Toutes équipes",
-        "description": "Répartition des bénévoles acceptés dans les équipes. Glissez-déposez pour déplacer ou ajouter à une équipe.",
+        "description": "Répartition des bénévoles acceptés dans les équipes. Sur ordinateur, glissez-déposez pour déplacer. Sur mobile, cliquez pour sélectionner l'équipe.",
         "manage_teams": "Gérer les équipes",
         "max_label": "Max:",
+        "select_team_instruction": "Sélectionnez l'équipe de destination",
+        "drop_volunteers_here": "Glissez-déposez des bénévoles ici",
         "modal": {
           "add": "Ajouter",
           "add_description_multiple": "Garder le bénévole dans ses équipes actuelles et l'ajouter aussi à \"{targetTeam}\"",
@@ -1784,11 +1786,10 @@
           "unassigned": "Sans assignation"
         },
         "title": "Répartition par équipes",
-        "unassigned_description": "Ces bénévoles acceptés n'ont pas encore été assignés à une équipe. Vous pouvez les glisser-déposer dans une équipe ci-dessous.",
+        "unassigned_description": "Ces bénévoles acceptés n'ont pas encore été assignés à une équipe. Sur ordinateur : glissez-déposez. Sur mobile : cliquez pour sélectionner l'équipe.",
         "unassigned_volunteers": "Bénévoles non assignés",
         "volunteers_count": "{count} bénévole(s)",
         "empty_team": "Équipe vide",
-        "drop_volunteers_here": "Glissez-déposez des bénévoles ici",
         "leader_badge": "Responsable",
         "set_as_leader": "Définir comme responsable",
         "remove_as_leader": "Retirer le rôle de responsable",

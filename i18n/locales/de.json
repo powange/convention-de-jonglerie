@@ -1779,7 +1779,6 @@
       "team_distribution": {
         "all_teams": "Alle Teams",
         "description": "Verteilung der akzeptierten Freiwilligen in Teams. Ziehen und ablegen, um zu verschieben oder zu einem Team hinzuzufügen.",
-        "drop_volunteers_here": "Freiwillige hier hineinziehen",
         "empty_team": "Leeres Team",
         "leader_added": "Leiter hinzugefügt",
         "leader_badge": "Leiter",
@@ -1800,6 +1799,7 @@
         "no_assignments_description": "Akzeptierte Freiwillige werden hier angezeigt, sobald sie Teams zugewiesen sind",
         "preferences_label": "Präf:",
         "remove_as_leader": "Leiterrolle entfernen",
+        "select_team_instruction": "[TODO] Sélectionnez l'équipe de destination",
         "set_as_leader": "Als Leiter festlegen",
         "stats": {
           "assigned_volunteers": "Zugewiesene Freiwillige",

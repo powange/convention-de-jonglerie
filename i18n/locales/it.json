@@ -1779,7 +1779,6 @@
       "team_distribution": {
         "all_teams": "Tutte le squadre",
         "description": "Distribuzione dei volontari accettati nei team. Trascina e rilascia per spostare o aggiungere a una squadra.",
-        "drop_volunteers_here": "Trascina e rilascia volontari qui",
         "empty_team": "Team vuoto",
         "leader_added": "Responsabile aggiunto",
         "leader_badge": "Responsabile",
@@ -1800,6 +1799,7 @@
         "no_assignments_description": "I volontari accettati appariranno qui una volta assegnati alle squadre",
         "preferences_label": "Pref:",
         "remove_as_leader": "Rimuovi ruolo di responsabile",
+        "select_team_instruction": "[TODO] Sélectionnez l'équipe de destination",
         "set_as_leader": "Imposta come responsabile",
         "stats": {
           "assigned_volunteers": "Volontari assegnati",

@@ -1779,7 +1779,6 @@
       "team_distribution": {
         "all_teams": "Alle hold",
         "description": "Fordeling af accepterede frivillige i hold. Træk og slip for at flytte eller tilføje til et hold.",
-        "drop_volunteers_here": "Træk og slip frivillige her",
         "empty_team": "Tom gruppe",
         "leader_added": "Leder tilføjet",
         "leader_badge": "Leder",
@@ -1800,6 +1799,7 @@
         "no_assignments_description": "Accepterede frivillige vil blive vist her, når de er tildelt til hold",
         "preferences_label": "Præf:",
         "remove_as_leader": "Fjern lederrollen",
+        "select_team_instruction": "[TODO] Sélectionnez l'équipe de destination",
         "set_as_leader": "Angiv som leder",
         "stats": {
           "assigned_volunteers": "Tildelte frivillige",

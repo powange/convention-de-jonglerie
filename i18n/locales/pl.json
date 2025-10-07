@@ -1779,7 +1779,6 @@
       "team_distribution": {
         "all_teams": "Wszystkie zespoły",
         "description": "Rozkład zaakceptowanych wolontariuszy w zespołach. Przeciągnij i upuść, aby przenieść lub dodać do zespołu.",
-        "drop_volunteers_here": "Przeciągnij i upuść wolontariuszy tutaj",
         "empty_team": "Pusty zespół",
         "leader_added": "Lider dodany",
         "leader_badge": "Lider",
@@ -1800,6 +1799,7 @@
         "no_assignments_description": "Zaakceptowani wolontariusze pojawią się tutaj po przypisaniu do zespołów",
         "preferences_label": "Pref:",
         "remove_as_leader": "Usuń rolę lidera",
+        "select_team_instruction": "[TODO] Sélectionnez l'équipe de destination",
         "set_as_leader": "Ustaw jako lidera",
         "stats": {
           "assigned_volunteers": "Przypisani wolontariusze",

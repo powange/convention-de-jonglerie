@@ -1779,7 +1779,6 @@
       "team_distribution": {
         "all_teams": "Alle teams",
         "description": "Verdeling van geaccepteerde vrijwilligers in teams. Sleep en zet neer om te verplaatsen of toe te voegen aan een team.",
-        "drop_volunteers_here": "Sleep vrijwilligers hierheen",
         "empty_team": "Leeg team",
         "leader_added": "Leider toegevoegd",
         "leader_badge": "Leider",
@@ -1800,6 +1799,7 @@
         "no_assignments_description": "Geaccepteerde vrijwilligers verschijnen hier zodra ze zijn toegewezen aan teams",
         "preferences_label": "Voork:",
         "remove_as_leader": "Verwijder leiderrol",
+        "select_team_instruction": "[TODO] Sélectionnez l'équipe de destination",
         "set_as_leader": "Instellen als leider",
         "stats": {
           "assigned_volunteers": "Toegewezen vrijwilligers",

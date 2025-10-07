@@ -257,8 +257,10 @@
                     <div
                       v-for="volunteer in unassignedVolunteers"
                       :key="volunteer.id"
-                      draggable="true"
-                      class="flex items-center gap-3 text-sm cursor-move hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded"
+                      :draggable="!isMobile"
+                      class="flex items-center gap-3 text-sm p-2 rounded"
+                      :class="isMobile ? 'cursor-pointer' : 'cursor-move'"
+                      @click="handleVolunteerClick(volunteer)"
                       @dragstart="handleDragStart(volunteer)"
                       @dragend="handleDragEnd"
                     >
@@ -302,20 +304,24 @@
                 class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all"
                 :class="{
                   'border-primary-500 bg-primary-50 dark:bg-primary-900/20':
-                    dragOverTeam === team.id,
+                    !isMobile && dragOverTeam === team.id,
                   'opacity-50 cursor-not-allowed':
-                    draggedVolunteer && !isTeamInVolunteerPreferences(draggedVolunteer, team.id),
+                    !isMobile &&
+                    draggedVolunteer &&
+                    !isTeamInVolunteerPreferences(draggedVolunteer, team.id),
                   'border-green-300 dark:border-green-600':
-                    draggedVolunteer && isTeamInVolunteerPreferences(draggedVolunteer, team.id),
+                    !isMobile &&
+                    draggedVolunteer &&
+                    isTeamInVolunteerPreferences(draggedVolunteer, team.id),
                 }"
-                @dragover.prevent="handleDragOver(team.id)"
-                @dragleave="handleDragLeave"
-                @drop="handleDrop(team.id)"
+                @dragover.prevent="!isMobile && handleDragOver(team.id)"
+                @dragleave="!isMobile && handleDragLeave()"
+                @drop="!isMobile && handleDrop(team.id)"
               >
                 <div
                   class="px-4 py-3 border-l-4 flex items-center justify-between transition-colors"
                   :class="{
-                    'bg-primary-100 dark:bg-primary-900/30': dragOverTeam === team.id,
+                    'bg-primary-100 dark:bg-primary-900/30': !isMobile && dragOverTeam === team.id,
                   }"
                   :style="{ borderLeftColor: team.color }"
                 >
@@ -366,8 +372,10 @@
                     <div
                       v-for="volunteer in team.volunteers"
                       :key="volunteer.id"
-                      draggable="true"
-                      class="relative flex items-center gap-3 text-sm cursor-move hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded group"
+                      :draggable="!isMobile"
+                      class="relative flex items-center gap-3 text-sm p-2 rounded group hover:bg-gray-100 dark:hover:bg-gray-700"
+                      :class="isMobile ? 'cursor-pointer' : 'cursor-move'"
+                      @click="handleVolunteerClick(volunteer, team.id)"
                       @dragstart="handleDragStart(volunteer, team.id)"
                       @dragend="handleDragEnd"
                     >
@@ -449,16 +457,18 @@
                   class="px-4 py-6 bg-gray-50 dark:bg-gray-800/50 text-center border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-lg mx-4 mb-4"
                   :class="{
                     'border-primary-400 bg-primary-50 dark:bg-primary-900/20':
-                      dragOverTeam === team.id,
+                      !isMobile && dragOverTeam === team.id,
                     'border-green-400 bg-green-50 dark:bg-green-900/20':
-                      draggedVolunteer && isTeamInVolunteerPreferences(draggedVolunteer, team.id),
+                      !isMobile &&
+                      draggedVolunteer &&
+                      isTeamInVolunteerPreferences(draggedVolunteer, team.id),
                   }"
                 >
                   <UIcon name="i-heroicons-users" class="text-gray-400 mx-auto mb-2" size="24" />
                   <p class="text-sm text-gray-500 dark:text-gray-400">
                     {{ $t('pages.volunteers.team_distribution.empty_team') }}
                   </p>
-                  <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                  <p v-if="!isMobile" class="text-xs text-gray-400 dark:text-gray-500 mt-1">
                     {{ $t('pages.volunteers.team_distribution.drop_volunteers_here') }}
                   </p>
                 </div>
@@ -477,6 +487,82 @@
             </p>
           </div>
         </UCard>
+
+        <!-- Modal de sélection d'équipe -->
+        <UModal
+          v-model:open="showTeamSelectionModal"
+          :title="teamSelectionModalTitle"
+          @close="handleTeamSelectionModalClose"
+        >
+          <template #body>
+            <div class="space-y-4">
+              <div class="text-center">
+                <UiUserAvatar
+                  v-if="draggedVolunteer"
+                  :user="draggedVolunteer.user"
+                  size="lg"
+                  class="mx-auto mb-3"
+                />
+                <h4 class="text-lg font-medium text-gray-900 dark:text-white">
+                  {{ draggedVolunteer?.user?.prenom }} {{ draggedVolunteer?.user?.nom }}
+                </h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('pages.volunteers.team_distribution.select_team_instruction') }}
+                </p>
+              </div>
+
+              <!-- Liste des équipes disponibles -->
+              <div class="space-y-2 max-h-96 overflow-y-auto">
+                <button
+                  v-for="team in availableTeamsForSelection"
+                  :key="team.id"
+                  class="w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-all duration-200 text-left"
+                  :class="{
+                    'border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20':
+                      isTeamInVolunteerPreferences(draggedVolunteer, team.id),
+                    'border-gray-200 dark:border-gray-700 opacity-50 cursor-not-allowed':
+                      !isTeamInVolunteerPreferences(draggedVolunteer, team.id),
+                  }"
+                  :disabled="!isTeamInVolunteerPreferences(draggedVolunteer, team.id)"
+                  @click="handleTeamSelection(team.id)"
+                >
+                  <div
+                    class="w-4 h-4 rounded-full flex-shrink-0"
+                    :style="{ backgroundColor: team.color }"
+                  />
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium text-gray-900 dark:text-white truncate">
+                      {{ team.name }}
+                    </p>
+                    <p class="text-xs text-gray-500">
+                      {{ team.count || 0 }}
+                      {{
+                        $t('pages.volunteers.team_distribution.volunteers_count', {
+                          count: team.count || 0,
+                        })
+                      }}
+                      <span v-if="team.maxVolunteers"> / {{ team.maxVolunteers }} </span>
+                    </p>
+                  </div>
+                  <UIcon
+                    v-if="isTeamInVolunteerPreferences(draggedVolunteer, team.id)"
+                    name="i-heroicons-chevron-right"
+                    class="text-gray-400"
+                    size="20"
+                  />
+                </button>
+              </div>
+            </div>
+          </template>
+
+          <template #footer="{ close }">
+            <div class="flex justify-center">
+              <UButton color="neutral" variant="soft" @click="close">
+                {{ $t('common.cancel') }}
+              </UButton>
+            </div>
+          </template>
+        </UModal>
 
         <!-- Modal de choix déplacer/ajouter -->
         <UModal v-model:open="showMoveModal" :title="moveModalTitle" @close="handleModalClose">
@@ -653,8 +739,10 @@ const dragOverTeam = ref<string | null>(null)
 const sourceTeamId = ref<string | null>(null)
 const targetTeamId = ref<string | null>(null)
 const showMoveModal = ref(false)
+const showTeamSelectionModal = ref(false)
 const isProcessingMove = ref(false)
 const showAddVolunteerModal = ref(false)
+const isMobile = ref(false)
 
 // Fonction pour récupérer les assignations d'équipes
 const fetchTeamAssignments = async () => {
@@ -825,6 +913,16 @@ const moveModalTitle = computed(() => {
   return `Déplacer ${draggedVolunteer.value.user.prenom} ${draggedVolunteer.value.user.nom}`
 })
 
+const teamSelectionModalTitle = computed(() => {
+  if (!draggedVolunteer.value) return 'Sélectionner une équipe'
+  return `Assigner ${draggedVolunteer.value.user.prenom} ${draggedVolunteer.value.user.nom}`
+})
+
+// Liste des équipes disponibles pour la sélection (exclure l'équipe source si elle existe)
+const availableTeamsForSelection = computed(() => {
+  return teamDistribution.value.filter((team) => team.id !== sourceTeamId.value)
+})
+
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
@@ -861,7 +959,21 @@ const canViewVolunteersTable = computed(() => {
   return !!collab
 })
 
-// Fonctions de drag and drop
+// Détection du mobile
+const checkIfMobile = () => {
+  isMobile.value = window.innerWidth < 768 // Breakpoint md de Tailwind
+}
+
+// Fonction pour gérer le clic sur un bénévole (mobile uniquement)
+const handleVolunteerClick = (volunteer: any, fromTeamId?: string) => {
+  if (!isMobile.value) return // Ne rien faire sur desktop
+
+  draggedVolunteer.value = volunteer
+  sourceTeamId.value = fromTeamId || null
+  showTeamSelectionModal.value = true
+}
+
+// Fonctions de drag and drop (desktop uniquement)
 const handleDragStart = (volunteer: any, fromTeamId?: string) => {
   draggedVolunteer.value = volunteer
   sourceTeamId.value = fromTeamId || null
@@ -871,12 +983,71 @@ const handleDragEnd = () => {
   dragOverTeam.value = null
 
   // Ne pas reset les variables si la modal est ouverte
-  // car ces valeurs sont nécessaires pour les actions dans la modal
-  if (!showMoveModal.value) {
+  if (!showMoveModal.value && !showTeamSelectionModal.value) {
     draggedVolunteer.value = null
     sourceTeamId.value = null
     targetTeamId.value = null
   }
+}
+
+const handleDragOver = (teamId: string) => {
+  // Ne permettre le survol que si l'équipe est dans les préférences du bénévole
+  if (draggedVolunteer.value && isTeamInVolunteerPreferences(draggedVolunteer.value, teamId)) {
+    dragOverTeam.value = teamId
+  }
+}
+
+const handleDragLeave = () => {
+  dragOverTeam.value = null
+}
+
+const handleDrop = async (teamId: string) => {
+  if (!draggedVolunteer.value) return
+
+  // Vérifier que l'équipe est valide pour le bénévole (préférences ou pas de préférences)
+  if (!isTeamInVolunteerPreferences(draggedVolunteer.value, teamId)) {
+    toast.add({
+      title: 'Action non autorisée',
+      description: "Ce bénévole ne peut être assigné qu'aux équipes de sa préférence",
+      icon: 'i-heroicons-exclamation-triangle',
+      color: 'warning',
+    })
+    draggedVolunteer.value = null
+    dragOverTeam.value = null
+    return
+  }
+
+  // Vérifier si on glisse dans la même équipe - ne rien faire
+  if (sourceTeamId.value === teamId) {
+    draggedVolunteer.value = null
+    dragOverTeam.value = null
+    sourceTeamId.value = null
+    targetTeamId.value = null
+    return
+  }
+
+  // IMPORTANT: Définir targetTeamId AVANT d'ouvrir la modal
+  targetTeamId.value = teamId
+
+  // Si le bénévole vient d'une équipe (sourceTeamId existe) et ce n'est pas la même équipe,
+  // ouvrir la modal pour choisir déplacer ou ajouter
+  // Aussi vérifier si le bénévole a des équipes dans ses données
+  const hasExistingTeams =
+    draggedVolunteer.value.teamAssignments && draggedVolunteer.value.teamAssignments.length > 0
+
+  if (
+    (sourceTeamId.value && sourceTeamId.value !== teamId) ||
+    (hasExistingTeams && !sourceTeamId.value)
+  ) {
+    // Utiliser nextTick pour s'assurer que les valeurs sont mises à jour avant d'ouvrir la modal
+    await nextTick()
+    showMoveModal.value = true
+    dragOverTeam.value = null
+    return
+  }
+
+  // Sinon, procéder directement à l'assignation (bénévole non assigné)
+  await directAssign(teamId)
 }
 
 // Fonction pour gérer la fermeture de la modal
@@ -886,6 +1057,46 @@ const handleModalClose = () => {
   dragOverTeam.value = null
   sourceTeamId.value = null
   targetTeamId.value = null
+}
+
+// Fonction pour gérer la fermeture de la modal de sélection d'équipe
+const handleTeamSelectionModalClose = () => {
+  draggedVolunteer.value = null
+  dragOverTeam.value = null
+  sourceTeamId.value = null
+  targetTeamId.value = null
+}
+
+// Fonction pour gérer la sélection d'une équipe dans la modal
+const handleTeamSelection = async (teamId: string) => {
+  if (!draggedVolunteer.value) return
+
+  // Vérifier si on sélectionne la même équipe que la source
+  if (sourceTeamId.value === teamId) {
+    showTeamSelectionModal.value = false
+    draggedVolunteer.value = null
+    sourceTeamId.value = null
+    return
+  }
+
+  // Définir l'équipe cible
+  targetTeamId.value = teamId
+
+  // Fermer la modal de sélection
+  showTeamSelectionModal.value = false
+
+  // Vérifier si le bénévole a déjà des équipes assignées
+  const hasExistingTeams =
+    draggedVolunteer.value.teamAssignments && draggedVolunteer.value.teamAssignments.length > 0
+
+  if (hasExistingTeams) {
+    // Ouvrir la modal de choix déplacer/ajouter
+    await nextTick()
+    showMoveModal.value = true
+  } else {
+    // Assignation directe pour les bénévoles non assignés
+    await directAssign(teamId)
+  }
 }
 
 // Fonction pour désassigner un bénévole d'une équipe spécifique
@@ -996,66 +1207,6 @@ const toggleTeamLeader = async (volunteer: any, teamId: string) => {
       color: 'error',
     })
   }
-}
-
-const handleDragOver = (teamId: string) => {
-  // Ne permettre le survol que si l'équipe est dans les préférences du bénévole
-  if (draggedVolunteer.value && isTeamInVolunteerPreferences(draggedVolunteer.value, teamId)) {
-    dragOverTeam.value = teamId
-  }
-}
-
-const handleDragLeave = () => {
-  dragOverTeam.value = null
-}
-
-const handleDrop = async (teamId: string) => {
-  if (!draggedVolunteer.value) return
-
-  // Vérifier que l'équipe est valide pour le bénévole (préférences ou pas de préférences)
-  if (!isTeamInVolunteerPreferences(draggedVolunteer.value, teamId)) {
-    toast.add({
-      title: 'Action non autorisée',
-      description: "Ce bénévole ne peut être assigné qu'aux équipes de sa préférence",
-      icon: 'i-heroicons-exclamation-triangle',
-      color: 'warning',
-    })
-    draggedVolunteer.value = null
-    dragOverTeam.value = null
-    return
-  }
-
-  // Vérifier si on glisse dans la même équipe - ne rien faire
-  if (sourceTeamId.value === teamId) {
-    draggedVolunteer.value = null
-    dragOverTeam.value = null
-    sourceTeamId.value = null
-    targetTeamId.value = null
-    return
-  }
-
-  // IMPORTANT: Définir targetTeamId AVANT d'ouvrir la modal
-  targetTeamId.value = teamId
-
-  // Si le bénévole vient d'une équipe (sourceTeamId existe) et ce n'est pas la même équipe,
-  // ouvrir la modal pour choisir déplacer ou ajouter
-  // Aussi vérifier si le bénévole a des équipes dans ses données
-  const hasExistingTeams =
-    draggedVolunteer.value.teamAssignments && draggedVolunteer.value.teamAssignments.length > 0
-
-  if (
-    (sourceTeamId.value && sourceTeamId.value !== teamId) ||
-    (hasExistingTeams && !sourceTeamId.value)
-  ) {
-    // Utiliser nextTick pour s'assurer que les valeurs sont mises à jour avant d'ouvrir la modal
-    await nextTick()
-    showMoveModal.value = true
-    dragOverTeam.value = null
-    return
-  }
-
-  // Sinon, procéder directement à l'assignation (bénévole non assigné)
-  await directAssign(teamId)
 }
 
 // Fonction d'assignation directe (pour les bénévoles non assignés)
@@ -1221,6 +1372,10 @@ watch(showMoveModal, (newValue) => {
 
 // Charger l'édition si nécessaire
 onMounted(async () => {
+  // Détecter si on est sur mobile
+  checkIfMobile()
+  window.addEventListener('resize', checkIfMobile)
+
   if (!edition.value) {
     try {
       await editionStore.fetchEditionById(editionId, { force: true })
@@ -1232,6 +1387,11 @@ onMounted(async () => {
   await fetchVolunteersInfo()
   // Charger les assignations d'équipes
   await fetchTeamAssignments()
+})
+
+// Nettoyer le listener au démontage
+onUnmounted(() => {
+  window.removeEventListener('resize', checkIfMobile)
 })
 
 // Métadonnées de la page

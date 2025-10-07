@@ -1779,7 +1779,6 @@
       "team_distribution": {
         "all_teams": "Все команды",
         "description": "Распределение принятых волонтёров по командам. Перетащите, чтобы переместить или добавить в команду.",
-        "drop_volunteers_here": "Перетащите волонтёров сюда",
         "empty_team": "Пустая команда",
         "leader_added": "Руководитель добавлен",
         "leader_badge": "Руководитель",
@@ -1800,6 +1799,7 @@
         "no_assignments_description": "Принятые волонтёры появятся здесь после назначения в команды",
         "preferences_label": "Пред:",
         "remove_as_leader": "Убрать роль руководителя",
+        "select_team_instruction": "[TODO] Sélectionnez l'équipe de destination",
         "set_as_leader": "Назначить руководителем",
         "stats": {
           "assigned_volunteers": "Назначенные волонтёры",

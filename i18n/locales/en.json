@@ -1778,9 +1778,10 @@
       "skills": "Skills",
       "team_distribution": {
         "all_teams": "All teams",
-        "description": "Distribution of accepted volunteers in teams. Drag and drop to move or add to a team.",
-        "drop_volunteers_here": "Drag and drop volunteers here",
+        "description": "Distribution of accepted volunteers in teams. On desktop: drag and drop. On mobile: click to select a team.",
         "empty_team": "Empty team",
+        "select_team_instruction": "Select the destination team",
+        "drop_volunteers_here": "Drag and drop volunteers here",
         "leader_added": "Leader added",
         "leader_badge": "Leader",
         "leader_removed": "Leader removed",
@@ -1808,7 +1809,7 @@
           "unassigned": "Unassigned"
         },
         "title": "Team Distribution",
-        "unassigned_description": "These accepted volunteers have not yet been assigned to a team. You can drag and drop them to a team below.",
+        "unassigned_description": "These accepted volunteers have not yet been assigned to a team. On desktop: drag and drop. On mobile: click to select a team.",
         "unassigned_volunteers": "Unassigned volunteers",
         "volunteers_count": "{count} volunteer(s)"
       },
