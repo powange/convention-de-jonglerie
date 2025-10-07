@@ -83,17 +83,25 @@ export default defineEventHandler(async (event) => {
 })
 ```
 
-## APIs déjà migrées
+## État de la migration
 
-- ✅ `/api/admin/notifications/stats.get.ts`
-- ✅ `/api/admin/notifications/recent.get.ts`
+✅ **Migration terminée !** Toutes les APIs admin ont été migrées vers le système mutualisé.
 
-## APIs à migrer
+**Statistiques :**
+- 34 fichiers API dans `/server/api/admin/` utilisent `requireGlobalAdmin` ou `requireGlobalAdminFast`
+- 63 occurrences totales des fonctions d'authentification admin
+- 0 API restant à migrer
 
-- [ ] `/api/admin/users/*.ts`
-- [ ] `/api/admin/feedback/*.ts`
-- [ ] `/api/admin/conventions.get.ts`
-- [ ] Toutes les autres APIs dans `server/api/admin/`
+**APIs migrées incluent :**
+- `/api/admin/users/*` (gestion utilisateurs)
+- `/api/admin/feedback/*` (gestion feedback)
+- `/api/admin/notifications/*` (notifications)
+- `/api/admin/error-logs/*` (logs d'erreurs)
+- `/api/admin/backup/*` (sauvegardes)
+- `/api/admin/tasks/*` (tâches planifiées)
+- `/api/admin/conventions.get.ts` (liste conventions)
+- `/api/admin/editions/[id]/export.get.ts` (export éditions)
+- Et toutes les autres routes admin
 
 ## Bénéfices
 

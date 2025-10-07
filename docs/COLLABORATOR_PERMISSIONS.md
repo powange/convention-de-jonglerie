@@ -24,10 +24,11 @@ L'API retourne désormais un format **normalisé** pour chaque collaborateur :
     "addEdition": true,
     "editAllEditions": false,
     "deleteAllEditions": false,
+    "manageVolunteers": false,
   },
   "perEdition": [
     { "editionId": 10, "canEdit": true },
-    { "editionId": 11, "canEdit": true, "canDelete": true },
+    { "editionId": 11, "canEdit": true, "canDelete": true, "canManageVolunteers": true },
   ],
 }
 ```
@@ -42,22 +43,25 @@ L'API retourne désormais un format **normalisé** pour chaque collaborateur :
 | addEdition          | canAddEdition          | Créer de nouvelles éditions                           |
 | editAllEditions     | canEditAllEditions     | Modifier toutes les éditions                          |
 | deleteAllEditions   | canDeleteAllEditions   | Supprimer toutes les éditions                         |
+| manageVolunteers    | canManageVolunteers    | Gérer les bénévoles de toutes les éditions            |
 
 ## Droits par édition (`perEdition`)
 
 Chaque entrée de `perEdition` correspond à un enregistrement dans `EditionCollaboratorPermission` :
 
-| Champ     | Type    | Description                     |
-| --------- | ------- | ------------------------------- |
-| editionId | number  | Identifiant de l'édition ciblée |
-| canEdit   | boolean | Peut modifier cette édition     |
-| canDelete | boolean | Peut supprimer cette édition    |
+| Champ               | Type    | Description                                  |
+| ------------------- | ------- | -------------------------------------------- |
+| editionId           | number  | Identifiant de l'édition ciblée              |
+| canEdit             | boolean | Peut modifier cette édition                  |
+| canDelete           | boolean | Peut supprimer cette édition                 |
+| canManageVolunteers | boolean | Peut gérer les bénévoles de cette édition    |
 
 Règle de résolution effective :
 
 - Si `rights.editAllEditions` est `true`, `canEdit` ponctuels deviennent redondants (mais peuvent toujours être renvoyés).
 - Si `rights.deleteAllEditions` est `true`, `canDelete` ponctuels deviennent redondants.
-- Une entrée sans aucun des deux (canEdit/delete) est filtrée à l'enregistrement.
+- Si `rights.manageVolunteers` est `true`, `canManageVolunteers` ponctuels deviennent redondants.
+- Une entrée sans aucun des trois droits (canEdit/canDelete/canManageVolunteers) est filtrée à l'enregistrement.
 
 ## Endpoints
 
@@ -78,7 +82,9 @@ Body (exemples):
   "userIdentifier": "alice@example.org", // ou userId
   "title": "Organisateur",
   "rights": { "manageCollaborators": true, "addEdition": true },
-  "perEdition": [{ "editionId": 11, "canEdit": true }],
+  "perEdition": [
+    { "editionId": 11, "canEdit": true, "canManageVolunteers": true }
+  ],
 }
 ```
 
@@ -113,7 +119,10 @@ Body:
 ```jsonc
 {
   "rights": { "deleteConvention": true },
-  "perEdition": [{ "editionId": 12, "canEdit": true }],
+  "perEdition": [
+    { "editionId": 12, "canEdit": true },
+    { "editionId": 13, "canManageVolunteers": true }
+  ],
   "title": "Responsable contenu",
 }
 ```
@@ -145,6 +154,7 @@ Le front doit :
 3. Pour une édition donnée:
    - Modification autorisée si `rights.editAllEditions` OU entrée `perEdition` `canEdit` sur l'`editionId`.
    - Suppression autorisée si `rights.deleteAllEditions` OU entrée `perEdition` `canDelete`.
+   - Gestion bénévoles autorisée si `rights.manageVolunteers` OU entrée `perEdition` `canManageVolunteers`.
 
 Exemple helper:
 
@@ -153,6 +163,13 @@ function canEditEdition(collab, editionId) {
   return (
     collab.rights.editAllEditions ||
     collab.perEdition?.some((p) => p.editionId === editionId && p.canEdit)
+  )
+}
+
+function canManageEditionVolunteers(collab, editionId) {
+  return (
+    collab.rights.manageVolunteers ||
+    collab.perEdition?.some((p) => p.editionId === editionId && p.canManageVolunteers)
   )
 }
 ```
@@ -164,7 +181,7 @@ function canEditEdition(collab, editionId) {
 
 ## Validation & Nettoyage côté serveur
 
-- Les entrées `perEdition` sont filtrées pour ne conserver que celles où `canEdit` ou `canDelete` est `true`.
+- Les entrées `perEdition` sont filtrées pour ne conserver que celles où au moins un droit (`canEdit`, `canDelete`, ou `canManageVolunteers`) est `true`.
 - Tout `editionId` inexistant provoque une erreur 400.
 - Les listes volumineuses (>100 entrées) sont rejetées (sécurité basique anti-abus) si implémenté (à compléter si besoin).
 
