@@ -750,10 +750,10 @@ watch(debouncedSearchTerm, async (searchTerm) => {
 
   searchingUsers.value = true
   try {
-    const users = await $fetch('/api/users/search', {
+    const response = await $fetch<{ users: any[] }>('/api/users/search', {
       params: { q: searchTerm },
     })
-    searchedUsers.value = users as any[]
+    searchedUsers.value = response.users
   } catch (error) {
     console.error('Error searching users:', error)
     searchedUsers.value = []

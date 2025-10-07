@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { requireUserSession } from '#imports'
 
+import { checkAdminMode } from '../../utils/collaborator-management'
 import { getEmailHash } from '../../utils/email-hash'
 import { prisma } from '../../utils/prisma'
 
@@ -21,15 +22,23 @@ export default defineEventHandler(async (event) => {
     const term = (parsed.q || parsed.email || '').trim()
     if (term.length < 2) return { users: [] }
 
+    // Vérifier si l'utilisateur est en mode admin
+    const isInAdminMode = await checkAdminMode((user as any).id, event)
+
     // NOTE: Le paramètre Prisma `mode: 'insensitive'` n'est pas supporté avec MySQL (erreur "Unknown argument mode").
     // Les collations MySQL utf8mb4_* sont déjà généralement insensibles à la casse.
     // On supprime donc `mode` et on applique un simple contains.
+    const whereClause: any = {
+      OR: [{ pseudo: { contains: term } }, { email: { contains: term } }],
+    }
+
+    // Exclure l'utilisateur courant seulement si pas en mode admin
+    if (!isInAdminMode) {
+      whereClause.NOT = { id: (user as any).id }
+    }
+
     const users = await prisma.user.findMany({
-      where: {
-        OR: [{ pseudo: { contains: term } }, { email: { contains: term } }],
-        // Exclure l'utilisateur courant
-        NOT: { id: (user as any).id },
-      },
+      where: whereClause,
       select: {
         id: true,
         pseudo: true,

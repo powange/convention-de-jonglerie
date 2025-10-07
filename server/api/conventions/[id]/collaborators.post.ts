@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { requireAuth } from '../../../utils/auth-utils'
 import {
   addConventionCollaborator,
+  checkAdminMode,
   findUserByPseudoOrEmail,
 } from '../../../utils/collaborator-management'
 import { validateConventionId } from '../../../utils/permissions/convention-permissions'
@@ -84,8 +85,9 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Empêcher l'utilisateur de s'ajouter lui-même
-    if (userToAdd.id === user.id) {
+    // Empêcher l'utilisateur de s'ajouter lui-même (sauf en mode admin)
+    const isAdminMode = await checkAdminMode(user.id, event)
+    if (userToAdd.id === user.id && !isAdminMode) {
       throw createError({
         statusCode: 400,
         message: 'Vous ne pouvez pas vous ajouter comme collaborateur',
@@ -97,6 +99,7 @@ export default defineEventHandler(async (event) => {
       conventionId,
       userId: userToAdd.id,
       addedById: user.id,
+      event,
       rights,
       title: title ?? undefined,
       perEdition,

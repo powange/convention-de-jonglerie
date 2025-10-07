@@ -174,6 +174,7 @@ interface AddConventionCollaboratorInput {
   conventionId: number
   userId: number
   addedById: number
+  event?: any
   rights?: Partial<{
     editConvention: boolean
     deleteConvention: boolean
@@ -193,9 +194,9 @@ interface AddConventionCollaboratorInput {
 }
 
 export async function addConventionCollaborator(input: AddConventionCollaboratorInput) {
-  const { conventionId, userId: userToAddId, addedById, rights, title, perEdition } = input
+  const { conventionId, userId: userToAddId, addedById, event, rights, title, perEdition } = input
   // Vérifier les permissions
-  const canManage = await canManageCollaborators(conventionId, addedById)
+  const canManage = await canManageCollaborators(conventionId, addedById, event)
 
   if (!canManage) {
     throw createError({

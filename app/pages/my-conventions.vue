@@ -121,30 +121,21 @@
               </div>
             </div>
             <div v-if="convention.collaborators && convention.collaborators.length > 0">
-              <div class="flex flex-wrap gap-2">
-                <UBadge
+              <div class="flex flex-wrap gap-3">
+                <div
                   v-for="collaborator in convention.collaborators"
                   :key="collaborator.id"
-                  :color="
-                    rightsSummary(collaborator).color === 'warning'
-                      ? 'error'
-                      : rightsSummary(collaborator).color
-                  "
-                  variant="subtle"
-                  class="flex items-center gap-2 cursor-pointer hover:bg-opacity-80 transition-colors"
+                  class="bg-gray-50 dark:bg-gray-800 rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                   @click="openEditCollaboratorModal(convention, collaborator)"
                 >
-                  <div class="flex items-center gap-1.5">
-                    <UiUserAvatar :user="collaborator.user" size="sm" />
-                    <span>{{ collaborator.user?.pseudo || '' }}</span>
-                    <span
-                      v-if="collaborator.title && collaborator.title.trim()"
-                      class="text-xs opacity-75"
-                    >
-                      ({{ collaborator.title.trim() }})
-                    </span>
-                  </div>
-                </UBadge>
+                  <UiUserDisplay :user="collaborator.user" size="xs">
+                    <template v-if="collaborator.title" #datetime>
+                      <span class="text-xs text-gray-600 dark:text-gray-400">
+                        {{ collaborator.title }}
+                      </span>
+                    </template>
+                  </UiUserDisplay>
+                </div>
               </div>
             </div>
           </div>
@@ -321,7 +312,6 @@ import { ref, onMounted, h, watch, computed } from 'vue'
 
 import { useAuthStore } from '~/stores/auth'
 import type { Convention, HttpError, Edition } from '~/types'
-import { summarizeRights } from '~/utils/collaboratorRights'
 import { getEditionDisplayNameWithConvention } from '~/utils/editionName'
 
 const UButton = resolveComponent('UButton')
@@ -416,11 +406,11 @@ const searchUsers = async (query: string) => {
 
   try {
     searchingUsers.value = true
-    const response = await $fetch<any[]>('/api/users/search', {
+    const response = await $fetch<{ users: any[] }>('/api/users/search', {
       query: { q: query, limit: 10 },
     })
 
-    searchedUsers.value = response.map((user) => ({
+    searchedUsers.value = response.users.map((user) => ({
       id: user.id,
       label: user.pseudo,
       email: user.emailHash,
@@ -432,7 +422,7 @@ const searchUsers = async (query: string) => {
         : undefined,
       isRealUser: true,
     }))
-    console.log('Résultats de recherche:', response.length, searchedUsers.value)
+    console.log('Résultats de recherche:', response.users.length, searchedUsers.value)
   } catch (error) {
     console.error('Error searching users:', error)
     searchedUsers.value = []
@@ -559,6 +549,30 @@ const getEditionsColumns = () => [
         },
         () => getStatusText(edition)
       )
+    },
+  },
+  {
+    accessorKey: 'volunteers',
+    header: t('editions.volunteers.title'),
+    cell: ({ row }: TableCellParams) => {
+      const edition = row.original
+      const count = (edition as any)._count?.volunteerApplications || 0
+      return h('div', { class: 'flex items-center gap-1 text-sm' }, [
+        h('UIcon', { name: 'i-heroicons-hand-raised', class: 'w-4 h-4 text-primary-600' }),
+        h('span', {}, count.toString()),
+      ])
+    },
+  },
+  {
+    accessorKey: 'participants',
+    header: t('common.participants'),
+    cell: ({ row }: TableCellParams) => {
+      const edition = row.original
+      const count = (edition as any)._count?.ticketingParticipants || 0
+      return h('div', { class: 'flex items-center gap-1 text-sm' }, [
+        h('UIcon', { name: 'i-heroicons-user-group', class: 'w-4 h-4 text-success-600' }),
+        h('span', {}, count.toString()),
+      ])
     },
   },
   {
@@ -943,10 +957,6 @@ const canDeleteEdition = (convention: Convention, editionId: number) => {
   if (!collab) return false
   if (collab.rights?.deleteAllEditions) return true
   return (collab as any).perEdition?.some((p: any) => p.editionId === editionId && p.canDelete)
-}
-
-function rightsSummary(collaborator: any) {
-  return summarizeRights(collaborator.rights || {})
 }
 
 // Fonction pour obtenir le nom d'affichage d'une édition

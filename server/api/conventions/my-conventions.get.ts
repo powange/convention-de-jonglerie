@@ -18,6 +18,12 @@ export default defineEventHandler(async (event) => {
       country: true,
       imageUrl: true,
       isOnline: true,
+      _count: {
+        select: {
+          volunteerApplications: true,
+          ticketingParticipants: true,
+        },
+      },
     }
     // Vérifier si l'utilisateur est en mode admin actif
     const isInAdminMode = await checkAdminMode(user.id, event)
