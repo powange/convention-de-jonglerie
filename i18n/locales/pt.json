@@ -1779,6 +1779,7 @@
       "team_distribution": {
         "all_teams": "Todas as equipes",
         "description": "Distribuição de voluntários aceitos em equipes. Arraste e solte para mover ou adicionar a uma equipe.",
+        "drop_volunteers_here": "[TODO] Glissez-déposez des bénévoles ici",
         "empty_team": "Equipe vazia",
         "leader_added": "Responsável adicionado",
         "leader_badge": "Responsável",

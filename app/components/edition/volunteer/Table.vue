@@ -1499,27 +1499,29 @@ const columns = computed((): TableColumn<any>[] => [
             if (preferences.length === 0) return h('span', '—')
 
             const teams = volunteerTeams.value || []
-            const teamNames = preferences
-              .map((teamId: string) => {
-                const team = teams.find((t: any) => t.id === teamId)
-                return team?.name || teamId
-              })
-              .join(', ')
-
             return h(
-              resolveComponent('UTooltip'),
-              { text: teamNames, openDelay: 200 },
-              {
-                default: () =>
-                  h(
-                    'div',
-                    {
-                      class: 'max-w-xs truncate cursor-help text-xs',
-                      title: teamNames,
-                    },
-                    teamNames
-                  ),
-              }
+              'div',
+              { class: 'flex flex-wrap gap-1' },
+              preferences.map((teamId: string) => {
+                const team = teams.find((t: any) => t.id === teamId)
+                return h(
+                  resolveComponent('UBadge'),
+                  {
+                    key: teamId,
+                    color: 'neutral',
+                    variant: 'soft',
+                    size: 'sm',
+                    style: team?.color
+                      ? {
+                          backgroundColor: team.color + '20',
+                          borderColor: team.color,
+                          color: team.color,
+                        }
+                      : undefined,
+                  },
+                  () => team?.name || teamId
+                )
+              })
             )
           },
         } as TableColumn<any>,

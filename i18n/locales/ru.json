@@ -1779,6 +1779,7 @@
       "team_distribution": {
         "all_teams": "Все команды",
         "description": "Распределение принятых волонтёров по командам. Перетащите, чтобы переместить или добавить в команду.",
+        "drop_volunteers_here": "[TODO] Glissez-déposez des bénévoles ici",
         "empty_team": "Пустая команда",
         "leader_added": "Руководитель добавлен",
         "leader_badge": "Руководитель",

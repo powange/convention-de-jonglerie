@@ -1779,6 +1779,7 @@
       "team_distribution": {
         "all_teams": "Alle teams",
         "description": "Verdeling van geaccepteerde vrijwilligers in teams. Sleep en zet neer om te verplaatsen of toe te voegen aan een team.",
+        "drop_volunteers_here": "[TODO] Glissez-déposez des bénévoles ici",
         "empty_team": "Leeg team",
         "leader_added": "Leider toegevoegd",
         "leader_badge": "Leider",

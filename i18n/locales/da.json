@@ -1779,6 +1779,7 @@
       "team_distribution": {
         "all_teams": "Alle hold",
         "description": "Fordeling af accepterede frivillige i hold. Træk og slip for at flytte eller tilføje til et hold.",
+        "drop_volunteers_here": "[TODO] Glissez-déposez des bénévoles ici",
         "empty_team": "Tom gruppe",
         "leader_added": "Leder tilføjet",
         "leader_badge": "Leder",

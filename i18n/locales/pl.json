@@ -1779,6 +1779,7 @@
       "team_distribution": {
         "all_teams": "Wszystkie zespoły",
         "description": "Rozkład zaakceptowanych wolontariuszy w zespołach. Przeciągnij i upuść, aby przenieść lub dodać do zespołu.",
+        "drop_volunteers_here": "[TODO] Glissez-déposez des bénévoles ici",
         "empty_team": "Pusty zespół",
         "leader_added": "Lider dodany",
         "leader_badge": "Lider",
