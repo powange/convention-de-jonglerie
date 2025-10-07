@@ -101,7 +101,10 @@
       "mcp__nuxt-ui-remote__get_component",
       "SlashCommand(/translate-todos)",
       "mcp__nuxt-ui-remote__get_component_metadata",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "SlashCommand(/run-tests)",
+      "SlashCommand(/lint-fix)",
+      "SlashCommand(/commit-push)"
     ],
     "deny": [],
     "ask": [],
