@@ -1,4 +1,5 @@
 import { requireGlobalAdminWithDbCheck } from '../../utils/admin-auth'
+import { getEmailHash } from '../../utils/email-hash'
 import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
@@ -19,7 +20,16 @@ export default defineEventHandler(async (event) => {
           },
         },
         collaborators: {
-          include: {
+          select: {
+            id: true,
+            title: true,
+            canAddEdition: true,
+            canDeleteAllEditions: true,
+            canDeleteConvention: true,
+            canEditAllEditions: true,
+            canEditConvention: true,
+            canManageCollaborators: true,
+            canManageVolunteers: true,
             user: {
               select: {
                 id: true,
@@ -27,6 +37,7 @@ export default defineEventHandler(async (event) => {
                 email: true,
                 nom: true,
                 prenom: true,
+                profilePicture: true,
               },
             },
           },
@@ -65,9 +76,24 @@ export default defineEventHandler(async (event) => {
       orderBy: [{ createdAt: 'desc' }],
     })
 
+    // Transformer les données pour ajouter emailHash aux collaborateurs
+    const transformedConventions = conventions.map((convention) => ({
+      ...convention,
+      collaborators: convention.collaborators.map((collaborator) => {
+        const { email, ...userWithoutEmail } = collaborator.user
+        return {
+          ...collaborator,
+          user: {
+            ...userWithoutEmail,
+            emailHash: getEmailHash(email),
+          },
+        }
+      }),
+    }))
+
     return {
-      conventions,
-      total: conventions.length,
+      conventions: transformedConventions,
+      total: transformedConventions.length,
     }
   } catch (error: any) {
     console.error('Erreur lors de la récupération des conventions admin:', error)
