@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import handler from '../../../../../server/api/conventions/[id]/collaborators.post'
 import {
   addConventionCollaborator,
+  checkAdminMode,
   findUserByPseudoOrEmail,
 } from '../../../../../server/utils/collaborator-management'
 import { prismaMock } from '../../../../__mocks__/prisma'
@@ -10,6 +11,7 @@ import { prismaMock } from '../../../../__mocks__/prisma'
 // Mock des utilitaires de collaborateur
 vi.mock('../../../../../server/utils/collaborator-management', () => ({
   addConventionCollaborator: vi.fn(),
+  checkAdminMode: vi.fn(),
   findUserByPseudoOrEmail: vi.fn(),
 }))
 
@@ -37,13 +39,18 @@ const mockEvent = {
 
 const mockAddCollaborator = addConventionCollaborator as ReturnType<typeof vi.fn>
 const mockFindUser = findUserByPseudoOrEmail as ReturnType<typeof vi.fn>
+const mockCheckAdminMode = checkAdminMode as ReturnType<typeof vi.fn>
 
 describe('/api/conventions/[id]/collaborators POST', () => {
   beforeEach(() => {
     mockAddCollaborator.mockReset()
     mockFindUser.mockReset()
+    mockCheckAdminMode.mockReset()
     prismaMock.user.findUnique.mockReset()
     global.readBody = vi.fn()
+
+    // Par défaut, l'utilisateur n'est pas en mode admin
+    mockCheckAdminMode.mockResolvedValue(false)
   })
 
   it('devrait ajouter un collaborateur par userIdentifier avec succès', async () => {

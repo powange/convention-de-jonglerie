@@ -129,6 +129,12 @@ describe('/api/conventions/my-conventions GET', () => {
             country: true,
             imageUrl: true,
             isOnline: true,
+            _count: {
+              select: {
+                volunteerApplications: true,
+                ticketingParticipants: true,
+              },
+            },
           },
           orderBy: {
             startDate: 'asc',
