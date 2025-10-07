@@ -43,6 +43,8 @@ POST /api/editions/{editionId}/volunteers/auto-assign
     balanceTeams?: boolean,           // Équilibrer les équipes
     prioritizeExperience?: boolean,   // Prioriser l'expérience
     respectStrictAvailability?: boolean, // Respecter strictement les disponibilités
+    respectStrictTeamPreferences?: boolean, // Respecter strictement les préférences d'équipe
+    respectStrictTimePreferences?: boolean, // Respecter strictement les préférences horaires
     allowOvertime?: boolean,          // Autoriser les heures supplémentaires
     maxOvertimeHours?: number,        // Max 6h supplémentaires
     keepExistingAssignments?: boolean // Conserver les assignations existantes
@@ -146,6 +148,8 @@ Le score d'assignation combine plusieurs facteurs :
 
 - **Indisponibilité stricte** : -1000 points (impossible)
 - **Indisponibilité souple** : -50 points
+- **Équipe non préférée (mode strict)** : -1000 points (bloquant si `respectStrictTeamPreferences`)
+- **Créneau horaire non préféré (mode strict)** : -1000 points (bloquant si `respectStrictTimePreferences`)
 - **Dépassement heures max** : -100 à -200 points
 - **Heures supplémentaires** : -20 points
 - **Contraintes quotidiennes** : -80 à -1000 points
@@ -175,10 +179,12 @@ score < 0    → 10-39%  (faible confiance)
 - **Types de créneaux** : Montage, événement, démontage
 - **Préférences horaires** : 8 créneaux prédéfinis (matin, soir, nuit...)
 - **Créneaux bloqués** : Indisponibilités spécifiques
+- **Mode strict horaires** : Si `respectStrictTimePreferences` est activé, les bénévoles ne seront assignés QUE sur leurs créneaux horaires préférés
 
 ### Contraintes d'équipe
 
 - **Préférences d'équipe** : Bonus si le bénévole préfère l'équipe
+- **Mode strict équipes** : Si `respectStrictTeamPreferences` est activé, les bénévoles ne seront assignés QUE aux équipes qu'ils ont en préférence
 - **Équilibrage** : Répartition équitable entre équipes (optionnel)
 
 ## Types de données
@@ -355,6 +361,8 @@ const response = await fetch('/api/editions/123/volunteers/auto-assign', {
       balanceTeams: true,
       prioritizeExperience: true,
       respectStrictAvailability: true,
+      respectStrictTeamPreferences: true,   // Respecter strictement les préférences d'équipe
+      respectStrictTimePreferences: true,   // Respecter strictement les préférences horaires
       allowOvertime: false,
       keepExistingAssignments: true,
     },
@@ -396,7 +404,7 @@ const response = await fetch('/api/editions/123/volunteers/auto-assign', {
 #### Taux de satisfaction faible
 
 - **Cause** : Préférences non respectées
-- **Solution** : Vérifier les préférences horaires et d'équipes
+- **Solution** : Vérifier les préférences horaires et d'équipes, ou activer les modes stricts (`respectStrictTeamPreferences` et `respectStrictTimePreferences`)
 
 #### Créneaux non complétés
 
@@ -405,8 +413,8 @@ const response = await fetch('/api/editions/123/volunteers/auto-assign', {
 
 #### Bénévoles non assignés
 
-- **Cause** : Disponibilités limitées ou conflits
-- **Solution** : Vérifier les disponibilités et assouplir les contraintes
+- **Cause** : Disponibilités limitées ou conflits, ou modes stricts trop restrictifs
+- **Solution** : Vérifier les disponibilités et assouplir les contraintes, désactiver les modes stricts si nécessaire
 
 ### Debugging
 
