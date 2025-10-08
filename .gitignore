@@ -19,6 +19,9 @@ logs
 .idea
 .history
 
+# Test coverage
+coverage
+
 # Local env files
 .env
 .env.*
