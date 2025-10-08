@@ -4,7 +4,7 @@ import {
   createCustomMarkerIcon,
   getEditionStatus,
   type MarkerOptions,
-} from '../../app/utils/mapMarkers'
+} from '../../../app/utils/mapMarkers'
 
 // Mock Leaflet et Blob/URL APIs
 const mockLeafletIcon = vi.fn()
