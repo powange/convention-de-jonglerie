@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { useAvatar } from '../../app/utils/avatar'
+import { useAvatar } from '../../../app/utils/avatar'
 
 // Mock useGravatar
 const mockGetGravatarAvatar = vi.fn()

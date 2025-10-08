@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useProfileStats } from '../../app/composables/useProfileStats'
-import type { ProfileStats } from '../../app/types'
+import { useProfileStats } from '../../../app/composables/useProfileStats'
+import type { ProfileStats } from '../../../app/types'
 
 // Mock $fetch
 const mockFetch = vi.fn()

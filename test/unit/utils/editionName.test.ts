@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 import {
   getEditionDisplayName,
   getEditionDisplayNameWithConvention,
-} from '../../app/utils/editionName'
+} from '../../../app/utils/editionName'
 
 describe('editionName utils', () => {
   describe('getEditionDisplayName', () => {

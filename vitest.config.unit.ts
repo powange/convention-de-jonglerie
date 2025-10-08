@@ -12,11 +12,7 @@ export default defineConfig({
     reporters: ['dot'],
     silent: true,
     include: [
-      'test/utils/**/*.test.ts',
-      'test/composables/**/*.test.ts',
-      'test/stores/**/*.test.ts',
-      'test/feedback/**/*.test.ts',
-      'test/**/*.unit.test.ts',
+      'test/unit/**/*.test.ts',
     ],
     exclude: [
       '**/node_modules/**',

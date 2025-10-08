@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 
 // dynamic import to mirror runtime usage
 async function render(md: string) {
-  const mod = (await import('../../app/utils/markdown')) as {
+  const mod = (await import('../../../app/utils/markdown')) as {
     markdownToHtml: (s: string) => Promise<string>
   }
   return mod.markdownToHtml(md)

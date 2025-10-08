@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { useNotificationsStore, type Notification } from '../../app/stores/notifications'
+import { useNotificationsStore, type Notification } from '../../../app/stores/notifications'
 
 // Mock $fetch
 global.$fetch = vi.fn()

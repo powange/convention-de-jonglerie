@@ -70,8 +70,6 @@ export default defineVitestConfig({
     include: [
       // Tous les tests Nuxt centralisés ici
       'test/nuxt/**/*.test.ts',
-      // Support des fichiers explicitement suffixés .nuxt.test.ts où qu'ils soient
-      'test/**/*.nuxt.test.ts',
     ],
     exclude: [
       '**/node_modules/**',

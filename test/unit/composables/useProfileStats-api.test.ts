@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { prismaMock } from '../__mocks__/prisma'
+import { prismaMock } from '../../__mocks__/prisma'
 
 // Mock du handler API
 const mockHandler = async (event: any) => {

@@ -8,7 +8,7 @@ import {
   getServicesByCategory,
   type ConventionServiceKeys,
   type ConventionService,
-} from '../../app/utils/convention-services'
+} from '../../../app/utils/convention-services'
 
 describe('convention-services utils', () => {
   describe('conventionServices array', () => {

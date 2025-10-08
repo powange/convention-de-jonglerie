@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 
-import { getGravatarUrl, useGravatar } from '../../app/utils/gravatar'
+import { getGravatarUrl, useGravatar } from '../../../app/utils/gravatar'
 
 // Mock md5
 vi.mock('md5', () => ({

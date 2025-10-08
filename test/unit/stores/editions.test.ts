@@ -1,8 +1,8 @@
 import { setActivePinia, createPinia } from 'pinia'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
-import { useAuthStore } from '../../app/stores/auth'
-import { useEditionStore } from '../../app/stores/editions'
+import { useAuthStore } from '../../../app/stores/auth'
+import { useEditionStore } from '../../../app/stores/editions'
 
 // Mock des fonctions Nuxt
 global.$fetch = vi.fn() as any
