@@ -1,4 +1,4 @@
-import { prismaMock } from '@@/tests/__mocks__/prisma'
+import { prismaMock } from '@@/test/__mocks__/prisma'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 describe('Collaborateurs de convention', () => {

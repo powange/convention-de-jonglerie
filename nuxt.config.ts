@@ -61,7 +61,7 @@ export default defineNuxtConfig({
     serverBundle: 'remote',
   },
   nitro: {
-    ignore: ['**/*.spec.ts', '**/*.test.ts', 'tests/**', '__tests__/**', 'scripts/**'],
+    ignore: ['**/*.spec.ts', '**/*.test.ts', 'test/**', '__tests__/**', 'scripts/**'],
     externals: {
       external: ['node-cron'],
     },

@@ -6,7 +6,7 @@ export default defineConfig({
     globals: true,
     testTimeout: 10000,
     // Setup avec mocks centralisés
-    setupFiles: ['./tests/setup-mocks.ts'],
+    setupFiles: ['./test/setup-mocks.ts'],
     // Tests unitaires uniquement
     exclude: [
       '**/node_modules/**',

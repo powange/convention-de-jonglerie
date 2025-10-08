@@ -11,11 +11,11 @@ export default defineVitestConfig({
         },
       },
     },
-    setupFiles: ['./tests/e2e/setup.ts'],
+    setupFiles: ['./test/e2e/setup.ts'],
     testTimeout: 60000,
     hookTimeout: 60000,
     globals: true,
-    include: ['tests/e2e/**/*.test.ts'],
+    include: ['test/e2e/**/*.test.ts'],
     exclude: ['**/node_modules/**', '**/dist/**'],
   },
 })

@@ -104,11 +104,11 @@ onMounted(() => {
 
 ### Tests
 
-Les tests sont disponibles dans `tests/composables/useProfileStats-api.test.ts` (test unitaire optimisé avec mocks Prisma)
+Les tests sont disponibles dans `test/composables/useProfileStats-api.test.ts` (test unitaire optimisé avec mocks Prisma)
 
 ```bash
 # Lancer les tests spécifiques à cette route
-npm run test:unit:run -- tests/composables/useProfileStats-api.test.ts
+npm run test:unit:run -- test/composables/useProfileStats-api.test.ts
 ```
 
 > 💡 **Note :** Les tests ont été convertis d'un test e2e lourd (5+ min timeout) vers un test unitaire rapide (543ms) pour améliorer les performances et la fiabilité.

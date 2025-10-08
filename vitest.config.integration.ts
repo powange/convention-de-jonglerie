@@ -6,7 +6,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     // Configuration pour les tests d'intégration avec DB
-    setupFiles: ['./tests/setup-common.ts', './tests/setup-integration.ts', './tests/setup-db.ts'],
+    setupFiles: ['./test/setup-common.ts', './test/setup-integration.ts', './test/setup-db.ts'],
     // Augmenter le timeout pour les tests avec DB
     testTimeout: 30000,
     hookTimeout: 30000,
@@ -27,7 +27,7 @@ export default defineConfig({
     poolOptions: { threads: { minThreads: 1, maxThreads: 1 } },
     sequence: { concurrent: false },
     // Inclure seulement les vrais tests d'intégration (avec DB)
-    include: ['tests/integration/**/*.db.test.ts'],
+    include: ['test/integration/**/*.db.test.ts'],
   },
   build: {
     rollupOptions: {

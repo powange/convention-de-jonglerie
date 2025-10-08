@@ -374,4 +374,4 @@ test('should assign volunteer to teams', async () => {
 
 - [Documentation API Volunteers](./README.md)
 - [Schéma Prisma](../../prisma/schema.prisma)
-- [Tests des équipes](../../tests/integration/volunteer-teams.test.ts)
+- [Tests des équipes](../../test/integration/volunteer-teams.test.ts)

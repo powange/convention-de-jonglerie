@@ -45,7 +45,7 @@ services:
       # Monter le code source pour le hot-reload en dev
       - ./app:/app/app:cached
       - ./server:/app/server:cached
-      - ./tests:/app/tests:cached
+      - ./test:/app/test:cached
       - ./scripts:/app/scripts:cached
       - ./prisma:/app/prisma:cached
       - ./public:/app/public:cached
@@ -86,7 +86,7 @@ services:
     volumes:
       - ./app:/app/app:cached
       - ./server:/app/server:cached
-      - ./tests:/app/tests:cached
+      - ./test:/app/test:cached
       - ./scripts:/app/scripts:cached
       - ./prisma:/app/prisma:cached
       - ./public:/app/public:cached

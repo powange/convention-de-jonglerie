@@ -18,7 +18,7 @@ import authMiddleware from '../../../../server/middleware/auth'
 // Référence dynamique vers le mock pour pouvoir le reconfigurer
 let mockGetUserSession: ReturnType<typeof vi.fn> | undefined
 
-// Les fonctions sont mockées globalement dans tests/setup.ts, on les récupère depuis global
+// Les fonctions sont mockées globalement dans test/setup.ts, on les récupère depuis global
 const mockCreateError = global.createError as ReturnType<typeof vi.fn>
 const mockDefineEventHandler = global.defineEventHandler as ReturnType<typeof vi.fn>
 const mockUseRuntimeConfig = global.useRuntimeConfig as ReturnType<typeof vi.fn>

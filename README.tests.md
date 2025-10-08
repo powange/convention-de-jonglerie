@@ -7,7 +7,7 @@ Le projet sépare clairement les suites pour de meilleures perfs et une maintena
 1. Unit (sans Nuxt complet, sans DB)
 
 - Fichier config: `vitest.config.unit.ts`
-- Setup: `tests/setup-common.ts`, `tests/setup-mocks.ts`
+- Setup: `test/setup-common.ts`, `test/setup-mocks.ts`
 - Scripts:
   - `npm run test:unit` (watch)
   - `npm run test:unit:run` (one-shot)
@@ -16,7 +16,7 @@ Le projet sépare clairement les suites pour de meilleures perfs et une maintena
 2. Nuxt (runtime Nuxt, DB mockée)
 
 - Fichier config: `vitest.config.nuxt.ts`
-- Setup: `tests/setup-common.ts`, `tests/setup.ts`
+- Setup: `test/setup-common.ts`, `test/setup.ts`
 - Scripts:
   - `npm run test:nuxt` (watch)
   - `npm run test:nuxt:run` (one-shot)
@@ -31,7 +31,7 @@ Notes Auth (nuxt-auth-utils):
 3. Intégration/DB (Prisma + MySQL réels)
 
 - Fichier config: `vitest.config.integration.ts`
-- Setup: `tests/setup-common.ts`, `tests/setup-integration.ts`, `tests/setup-db.ts`
+- Setup: `test/setup-common.ts`, `test/setup-integration.ts`, `test/setup-db.ts`
 - Exécution mono-thread pour éviter les conflits DB
 - Scripts:
   - `npm run test:db` (watch si DB déjà prête)
@@ -41,7 +41,7 @@ Notes Auth (nuxt-auth-utils):
 4. E2E (Nuxt lancé + $fetch boîte noire)
 
 - Fichier config: `vitest.config.e2e.ts`
-- Setup: `tests/e2e/setup.ts`
+- Setup: `test/e2e/setup.ts`
 - Scripts:
   - `npm run test:e2e` / `npm run test:e2e:run`
 
@@ -55,12 +55,12 @@ Raccourci pour tout lancer (hors DB):
 - Base: `convention_db` (valeur par défaut)
 - Utilisateur: `convention_user` / `convention_password` (valeurs par défaut)
 - URL par défaut si aucune n’est fournie: `mysql://convention_user:convention_password@localhost:3307/convention_db`
-- Migrations gérées par `scripts/migrate-test.js` et `tests/setup-db.ts`
+- Migrations gérées par `scripts/migrate-test.js` et `test/setup-db.ts`
 
 ## Arborescence utile
 
 ```
-tests/
+test/
 ├── __mocks__/             # Mocks partagés
 ├── e2e/                   # E2E
 ├── integration/           # Tests DB (suffixe .db.test.ts)

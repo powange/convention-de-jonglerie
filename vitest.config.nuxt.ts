@@ -20,7 +20,7 @@ export default defineVitestConfig({
       // Mock du manifeste d'app Nuxt pour l'analyse des imports (non utilisé réellement en tests)
       {
         find: /^#app-manifest$/,
-        replacement: resolve(__dirname, 'tests/__mocks__/app-manifest.ts'),
+        replacement: resolve(__dirname, 'test/__mocks__/app-manifest.ts'),
       },
 
       // Alias pour contourner les problèmes avec les crochets dans les noms de fichiers
@@ -45,7 +45,7 @@ export default defineVitestConfig({
       // Alias regex pour le mock Prisma depuis différents niveaux: ../../__mocks__/prisma
       {
         find: /^(\.\.\/)+__mocks__\/prisma$/,
-        replacement: resolve(__dirname, 'tests/__mocks__/prisma.ts'),
+        replacement: resolve(__dirname, 'test/__mocks__/prisma.ts'),
       },
     ],
   },
@@ -61,7 +61,7 @@ export default defineVitestConfig({
         },
       },
     },
-    setupFiles: ['./tests/setup-common.ts', './tests/setup.ts'],
+    setupFiles: ['./test/setup-common.ts', './test/setup.ts'],
     testTimeout: 20000,
     hookTimeout: 20000,
     reporters: ['dot'],
@@ -69,18 +69,18 @@ export default defineVitestConfig({
     globals: true,
     include: [
       // Tous les tests Nuxt centralisés ici
-      'tests/nuxt/**/*.test.ts',
+      'test/nuxt/**/*.test.ts',
       // Support des fichiers explicitement suffixés .nuxt.test.ts où qu'ils soient
-      'tests/**/*.nuxt.test.ts',
+      'test/**/*.nuxt.test.ts',
     ],
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
-      'tests/e2e/**',
-      'tests/integration/**',
-      'tests/utils/**',
-      'tests/stores/**',
-      'tests/feedback/**',
+      'test/e2e/**',
+      'test/integration/**',
+      'test/utils/**',
+      'test/stores/**',
+      'test/feedback/**',
     ],
   },
   build: {

@@ -1,6 +1,6 @@
 # Convention de Jonglerie - Application Web
 
-![CI Tests](https://github.com/powange/convention-de-jonglerie/actions/workflows/tests.yml/badge.svg)
+![CI Tests](https://github.com/powange/convention-de-jonglerie/actions/workflows/test.yml/badge.svg)
 
 Ce projet est une application web complète (full-stack) dédiée à la gestion et à la découverte de conventions de jonglerie.
 

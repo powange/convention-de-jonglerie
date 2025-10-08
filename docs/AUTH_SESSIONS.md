@@ -1,6 +1,6 @@
 # Authentification par sessions (nuxt-auth-utils)
 
-Ce projet utilise des sessions scellées (nuxt-auth-utils) au lieu de JWT. Cette note résume l’usage côté serveur et la stratégie de tests/mocks.
+Ce projet utilise des sessions scellées (nuxt-auth-utils) au lieu de JWT. Cette note résume l’usage côté serveur et la stratégie de test/mocks.
 
 ## Prérequis
 
@@ -59,7 +59,7 @@ event.context.user = session?.user || null
 
 ### Mocks globaux
 
-- `tests/setup.ts` étend `#imports` et fournit des stubs par défaut pour `getUserSession` et `requireUserSession`.
+- `test/setup.ts` étend `#imports` et fournit des stubs par défaut pour `getUserSession` et `requireUserSession`.
 
 ### Mocks locaux par fichier de test
 

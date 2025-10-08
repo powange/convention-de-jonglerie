@@ -8,9 +8,9 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 
 ## Architecture des tests
 
-### 1. Tests unitaires API (`tests/server/api/feedback/`)
+### 1. Tests unitaires API (`test/server/api/feedback/`)
 
-**Fichier**: `tests/server/api/feedback/index.post.test.ts`
+**Fichier**: `test/server/api/feedback/index.post.test.ts`
 
 - ✅ Tests de création de feedback pour utilisateurs connectés
 - ✅ Tests de création de feedback pour utilisateurs anonymes
@@ -25,9 +25,9 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 - Intégration reCAPTCHA Google v2
 - Gestion des erreurs de base de données
 
-### 2. Tests unitaires Admin API (`tests/server/api/admin/feedback/`)
+### 2. Tests unitaires Admin API (`test/server/api/admin/feedback/`)
 
-**Fichier**: `tests/server/api/admin/feedback/index.get.test.ts`
+**Fichier**: `test/server/api/admin/feedback/index.get.test.ts`
 
 - ✅ Tests d'autorisation admin (403 pour non-admin)
 - ✅ Récupération paginée des feedbacks
@@ -35,7 +35,7 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 - ✅ Calcul des statistiques par type/statut
 - ✅ Gestion des erreurs
 
-**Fichier**: `tests/server/api/admin/feedback/resolve.put.test.ts`
+**Fichier**: `test/server/api/admin/feedback/resolve.put.test.ts`
 
 - ✅ Résolution/réouverture de feedbacks
 - ✅ Ajout de notes d'administration
@@ -43,9 +43,9 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 - ✅ Vérification des permissions
 - ✅ Gestion des feedbacks inexistants
 
-### 3. Tests d'intégration composant (`tests/components/`)
+### 3. Tests d'intégration composant (`test/components/`)
 
-**Fichier**: `tests/components/FeedbackModal.nuxt.test.ts`
+**Fichier**: `test/components/FeedbackModal.nuxt.test.ts`
 
 - ✅ Rendu conditionnel selon l'état d'authentification
 - ✅ Validation du formulaire côté client
@@ -54,9 +54,9 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 - ✅ Gestion des erreurs et messages toast
 - ✅ Événements de fermeture et réinitialisation
 
-### 4. Tests de page admin (`tests/pages/admin/`)
+### 4. Tests de page admin (`test/pages/admin/`)
 
-**Fichier**: `tests/pages/admin/feedback.nuxt.test.ts`
+**Fichier**: `test/pages/admin/feedback.nuxt.test.ts`
 
 - ✅ Rendu de l'interface d'administration
 - ✅ Affichage des statistiques
@@ -66,9 +66,9 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 - ✅ Pagination et navigation
 - ✅ Gestion des états de chargement
 
-### 5. Tests d'intégration base de données (`tests/integration/`)
+### 5. Tests d'intégration base de données (`test/integration/`)
 
-**Fichier**: `tests/integration/feedback.db.test.ts`
+**Fichier**: `test/integration/feedback.db.test.ts`
 
 - ✅ CRUD complet avec Prisma et MySQL
 - ✅ Relations utilisateur <-> feedback
@@ -77,9 +77,9 @@ Le système de feedback permet aux utilisateurs (connectés et anonymes) d'envoy
 - ✅ Calculs de statistiques
 - ✅ Gestion des utilisateurs supprimés
 
-### 6. Tests de sécurité (`tests/security/`)
+### 6. Tests de sécurité (`test/security/`)
 
-**Fichier**: `tests/security/feedback-security.test.ts`
+**Fichier**: `test/security/feedback-security.test.ts`
 
 - ✅ Contrôle d'accès et permissions
 - ✅ Validation et sanitisation des entrées
@@ -155,18 +155,18 @@ npm run test:run
 
 ```bash
 # Tests unitaires API seulement
-npm run test -- tests/server/api/feedback/
-npm run test -- tests/server/api/admin/feedback/
+npm run test -- test/server/api/feedback/
+npm run test -- test/server/api/admin/feedback/
 
 # Tests composants seulement
-npm run test -- tests/components/FeedbackModal.nuxt.test.ts
+npm run test -- test/components/FeedbackModal.nuxt.test.ts
 
 # Tests intégration seulement
-npm run test -- tests/integration/feedback.db.test.ts
-npm run test -- tests/pages/admin/feedback.nuxt.test.ts
+npm run test -- test/integration/feedback.db.test.ts
+npm run test -- test/pages/admin/feedback.nuxt.test.ts
 
 # Tests sécurité seulement
-npm run test -- tests/security/feedback-security.test.ts
+npm run test -- test/security/feedback-security.test.ts
 
 # Tous les tests feedback (pattern matching)
 npm run test -- --grep "feedback"
@@ -180,7 +180,7 @@ npm run test:db
 
 # Ou avec Docker
 docker-compose -f docker-compose.test.yml up -d
-npm run test -- tests/integration/feedback.db.test.ts
+npm run test -- test/integration/feedback.db.test.ts
 ```
 
 ### Mode développement

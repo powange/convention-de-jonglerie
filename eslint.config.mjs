@@ -34,7 +34,7 @@ export default withNuxt(
   },
   // Tests (Vitest) : relâcher no-explicit-any + règles import/unused
   {
-    files: ['tests/**/*.{js,ts,tsx,vue}'],
+    files: ['test/**/*.{js,ts,tsx,vue}'],
     languageOptions: {
       globals: {
         // Vitest
