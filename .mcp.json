@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "nuxt": {
+      "command": "npx",
+      "args": ["mcp-remote", "https://mcp.nuxt.com/sse"]
+    },
+    "nuxt-ui": {
+      "type": "http",
+      "url": "https://ui.nuxt.com/mcp"
+    },
+    "vitest-runner": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@madrus/vitest-mcp-server@latest"
+      ],
+      "env": {
+        "VITEST_PROJECT_DIR": "/Users/<your-username>/path/to/your/project/root"
+      }
+    }
+  }
+}
