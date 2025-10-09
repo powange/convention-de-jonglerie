@@ -4,7 +4,7 @@ import handler from '../../../../../server/api/conventions/[id]/collaborators/[c
 import { canManageCollaborators } from '../../../../../server/utils/collaborator-management'
 import { prismaMock } from '../../../../__mocks__/prisma'
 
-vi.mock('../../../../../server/utils/collaborator-management', () => ({
+vi.mock('../../../../../../server/utils/collaborator-management', () => ({
   canManageCollaborators: vi.fn(),
 }))
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import PWAInstallBanner from '~/components/PWAInstallBanner.vue'
+import PWAInstallBanner from '../../../app/components/PWAInstallBanner.vue'
 
 describe('PWAInstallBanner', () => {
   let mockBeforeInstallPromptEvent: any

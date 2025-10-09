@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import PushNotificationToggle from '~/components/notifications/PushNotificationToggle.vue'
+import PushNotificationToggle from '../../../../app/components/notifications/PushNotificationToggle.vue'
 
 describe('PushNotificationToggle', () => {
   beforeEach(() => {

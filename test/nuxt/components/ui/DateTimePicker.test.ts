@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import DateTimePicker from '~/components/ui/DateTimePicker.vue'
+import DateTimePicker from '../../../../app/components/ui/DateTimePicker.vue'
 
 describe('DateTimePicker', () => {
   it("affiche la date et l'heure correctement", async () => {

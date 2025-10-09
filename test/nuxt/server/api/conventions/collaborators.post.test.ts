@@ -9,7 +9,7 @@ import {
 import { prismaMock } from '../../../../__mocks__/prisma'
 
 // Mock des utilitaires de collaborateur
-vi.mock('../../../../../server/utils/collaborator-management', () => ({
+vi.mock('../../../../../../server/utils/collaborator-management', () => ({
   addConventionCollaborator: vi.fn(),
   checkAdminMode: vi.fn(),
   findUserByPseudoOrEmail: vi.fn(),

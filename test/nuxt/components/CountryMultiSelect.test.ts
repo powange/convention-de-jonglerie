@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import CountryMultiSelect from '~/components/CountryMultiSelect.vue'
+import CountryMultiSelect from '../../../app/components/CountryMultiSelect.vue'
 
 describe('CountryMultiSelect', () => {
   const mockCountries = [

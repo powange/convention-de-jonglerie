@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import FlagIcon from '~/components/FlagIcon.vue'
+import FlagIcon from '../../../app/components/FlagIcon.vue'
 
 describe('FlagIcon', () => {
   it('affiche le drapeau pour un code pays valide', async () => {

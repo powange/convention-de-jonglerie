@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import handler from '../../../../../server/api/conventions/[id]/collaborators/[collaboratorId].put'
 
 // Mock des utilitaires de collaborateur
-vi.mock('../../../../../server/utils/collaborator-management', () => ({
+vi.mock('../../../../../../server/utils/collaborator-management', () => ({
   updateCollaboratorRights: vi.fn(),
 }))
 

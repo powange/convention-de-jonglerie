@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import UserDeletionModal from '~/components/admin/UserDeletionModal.vue'
+import UserDeletionModal from '../../../../app/components/admin/UserDeletionModal.vue'
 
 describe('UserDeletionModal', () => {
   const mockUser = {

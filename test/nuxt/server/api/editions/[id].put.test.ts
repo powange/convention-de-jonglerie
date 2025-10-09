@@ -1,15 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+// Mock des utilitaires - DOIT être avant les imports
+const mockGeocodeEdition = vi.fn()
+
+vi.mock('../../../../../../server/utils/geocoding', () => ({
+  geocodeEdition: mockGeocodeEdition,
+}))
+
 import { prismaMock } from '../../../../__mocks__/prisma'
 import handler from '../../../../server/api/editions/[id].put'
-
-// Mock des utilitaires
-vi.mock('../../../../../server/utils/geocoding', () => ({
-  geocodeEdition: vi.fn().mockResolvedValue({
-    latitude: 48.8566,
-    longitude: 2.3522,
-  }),
-}))
 
 // Mock nuxt-file-storage
 vi.mock('nuxt-file-storage', () => ({
@@ -64,6 +63,12 @@ describe('/api/editions/[id] PUT', () => {
     vi.clearAllMocks()
     global.readBody = vi.fn()
     global.getRouterParam = vi.fn()
+
+    // Valeurs par défaut pour les mocks
+    mockGeocodeEdition.mockResolvedValue({
+      latitude: 48.8566,
+      longitude: 2.3522,
+    })
   })
 
   it('devrait permettre de modifier une édition', async () => {

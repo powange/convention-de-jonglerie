@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import ConfirmModal from '~/components/ui/ConfirmModal.vue'
+import ConfirmModal from '../../../../app/components/ui/ConfirmModal.vue'
 
 describe('ConfirmModal', () => {
   it('affiche le modal quand isOpen est true', async () => {

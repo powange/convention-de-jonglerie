@@ -1,19 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+// Mock des utilitaires - DOIT être avant les imports
+const mockGeocodeEdition = vi.fn()
+const mockMoveTempImage = vi.fn()
+
+vi.mock('../../../../../../server/utils/geocoding', () => ({
+  geocodeEdition: mockGeocodeEdition,
+}))
+vi.mock('../../../../../../server/utils/move-temp-image', () => ({
+  moveTempImageToEdition: mockMoveTempImage,
+}))
+
 import handler from '../../../../../server/api/editions/index.post'
 import { prismaMock } from '../../../../__mocks__/prisma'
-
-// Mock des utilitaires
-vi.mock('../../../../../server/utils/geocoding', () => ({
-  geocodeEdition: vi.fn().mockResolvedValue({
-    latitude: 48.8566,
-    longitude: 2.3522,
-  }),
-}))
-
-vi.mock('../../../../../server/utils/move-temp-image', () => ({
-  moveTempImageToEdition: vi.fn().mockResolvedValue('/uploads/editions/1/image.jpg'),
-}))
 
 describe('/api/editions POST - Tests complets', () => {
   const mockUser = {
@@ -54,19 +53,16 @@ describe('/api/editions POST - Tests complets', () => {
     favoritedBy: [],
   }
 
-  beforeEach(async () => {
+  beforeEach(() => {
     vi.clearAllMocks()
     global.readBody = vi.fn()
 
-    // Réinitialiser les mocks spécifiques
-    const { geocodeEdition } = await import('../../../../../server/utils/geocoding')
-    const { moveTempImageToEdition } = await import('../../../../../server/utils/move-temp-image')
-
-    vi.mocked(geocodeEdition).mockResolvedValue({
+    // Valeurs par défaut pour les mocks
+    mockGeocodeEdition.mockResolvedValue({
       latitude: 48.8566,
       longitude: 2.3522,
     })
-    vi.mocked(moveTempImageToEdition).mockResolvedValue('/uploads/editions/1/image.jpg')
+    mockMoveTempImage.mockResolvedValue('/uploads/editions/1/image.jpg')
   })
 
   describe('Validation des données', () => {
@@ -484,8 +480,7 @@ describe('/api/editions POST - Tests complets', () => {
     })
 
     it('devrait gérer les erreurs de géocodage gracieusement', async () => {
-      const { geocodeEdition } = await import('../../../../../server/utils/geocoding')
-      vi.mocked(geocodeEdition).mockRejectedValue(new Error('Service unavailable'))
+      mockGeocodeEdition.mockRejectedValue(new Error('Service unavailable'))
 
       prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
 
@@ -509,8 +504,7 @@ describe('/api/editions POST - Tests complets', () => {
     })
 
     it("devrait gérer les erreurs d'upload d'image", async () => {
-      const { moveTempImageToEdition } = await import('../../../../../server/utils/move-temp-image')
-      vi.mocked(moveTempImageToEdition).mockRejectedValue(new Error('Upload failed'))
+      mockMoveTempImage.mockRejectedValue(new Error('Upload failed'))
 
       prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
       prismaMock.edition.create.mockResolvedValue({ ...mockEdition, id: 1, imageUrl: null })

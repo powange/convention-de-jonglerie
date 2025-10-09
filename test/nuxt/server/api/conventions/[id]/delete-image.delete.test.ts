@@ -6,7 +6,7 @@ import handler from '../../../../../../server/api/conventions/[id]/delete-image.
 import { deleteConventionImage } from '../../../../../../server/utils/image-deletion'
 
 // Mock des modules externes
-vi.mock('../../../../../server/utils/image-deletion', () => ({
+vi.mock('../../../../../../server/utils/image-deletion', () => ({
   deleteConventionImage: vi.fn(),
 }))
 

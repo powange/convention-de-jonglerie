@@ -22,31 +22,6 @@ export default defineVitestConfig({
         find: /^#app-manifest$/,
         replacement: resolve(__dirname, 'test/__mocks__/app-manifest.ts'),
       },
-
-      // Alias pour contourner les problèmes avec les crochets dans les noms de fichiers
-      { find: '@server-editions', replacement: resolve(__dirname, 'server/api/editions/[id]') },
-      {
-        find: '@server-conventions',
-        replacement: resolve(__dirname, 'server/api/conventions/[id]'),
-      },
-      {
-        find: '@server-carpool-offers',
-        replacement: resolve(__dirname, 'server/api/carpool-offers/[id]'),
-      },
-      {
-        find: '@server-carpool-requests',
-        replacement: resolve(__dirname, 'server/api/carpool-requests/[id]'),
-      },
-
-      // Alias regex: tous les imports du type ../../server/... ou ../../../server/... pointent vers /server
-      { find: /^(\.\.\/)+server\//, replacement: resolve(__dirname, 'server') + '/' },
-      // Alias stable pour les imports commençant par 'server/...'
-      { find: /^server\//, replacement: resolve(__dirname, 'server') + '/' },
-      // Alias regex pour le mock Prisma depuis différents niveaux: ../../__mocks__/prisma
-      {
-        find: /^(\.\.\/)+__mocks__\/prisma$/,
-        replacement: resolve(__dirname, 'test/__mocks__/prisma.ts'),
-      },
     ],
   },
   test: {
@@ -72,13 +47,7 @@ export default defineVitestConfig({
       'test/nuxt/**/*.test.ts',
     ],
     exclude: [
-      '**/node_modules/**',
-      '**/dist/**',
-      'test/e2e/**',
-      'test/integration/**',
-      'test/utils/**',
-      'test/stores/**',
-      'test/feedback/**',
+      'test/nuxt/components/**/*.test.ts',
     ],
   },
   build: {

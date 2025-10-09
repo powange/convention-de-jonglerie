@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import NotificationsCenter from '~/components/notifications/Center.vue'
+import NotificationsCenter from '../../../../app/components/notifications/Center.vue'
 
 describe('NotificationsCenter', () => {
   const mockNotifications = [

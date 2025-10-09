@@ -1,25 +1,29 @@
-import bcrypt from 'bcryptjs'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import registerHandler from '../../../../../server/api/auth/register.post'
-import { sendEmail } from '../../../../../server/utils/emailService'
-import { prismaMock } from '../../../../__mocks__/prisma'
+// Mock des modules spécifiques - DOIT être avant les imports
+const mockSendEmail = vi.fn()
+const mockGenerateVerificationCode = vi.fn()
+const mockGenerateVerificationEmailHtml = vi.fn()
 
-// Import des mocks après leur définition
-
-// Import du handler après les mocks
-
-// Mock des modules spécifiques
-vi.mock('../../../../server/utils/emailService', () => ({
-  sendEmail: vi.fn().mockResolvedValue(true),
-  generateVerificationCode: vi.fn().mockReturnValue('123456'),
-  generateVerificationEmailHtml: vi.fn().mockReturnValue('<html>Code: 123456</html>'),
+vi.mock('../../../../../server/utils/emailService', () => ({
+  sendEmail: mockSendEmail,
+  generateVerificationCode: mockGenerateVerificationCode,
+  generateVerificationEmailHtml: mockGenerateVerificationEmailHtml,
 }))
+
+import bcrypt from 'bcryptjs'
+import registerHandler from '../../../../../server/api/auth/register.post'
+import { prismaMock } from '../../../../__mocks__/prisma'
 
 describe('API Register', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     global.readBody = vi.fn()
+
+    // Réinitialiser les mocks
+    mockSendEmail.mockResolvedValue(true)
+    mockGenerateVerificationCode.mockReturnValue('123456')
+    mockGenerateVerificationEmailHtml.mockReturnValue('<html>Code: 123456</html>')
   })
 
   it('devrait créer un nouvel utilisateur avec succès', async () => {
@@ -64,7 +68,7 @@ describe('API Register', () => {
       }),
     })
 
-    expect(sendEmail).toHaveBeenCalledWith({
+    expect(mockSendEmail).toHaveBeenCalledWith({
       to: 'test@example.com',
       subject: '🤹 Vérifiez votre compte - Conventions de Jonglerie',
       html: expect.stringContaining('123456'),

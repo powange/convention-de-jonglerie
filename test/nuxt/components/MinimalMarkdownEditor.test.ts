@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import MinimalMarkdownEditor from '~/components/MinimalMarkdownEditor.vue'
+import MinimalMarkdownEditor from '../../../app/components/MinimalMarkdownEditor.vue'
 
 describe('MinimalMarkdownEditor', () => {
   it('affiche le contenu markdown initial', async () => {

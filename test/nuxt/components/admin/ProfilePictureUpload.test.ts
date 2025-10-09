@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import ProfilePictureUpload from '~/components/admin/ProfilePictureUpload.vue'
+import ProfilePictureUpload from '../../../../app/components/admin/ProfilePictureUpload.vue'
 
 describe('ProfilePictureUpload', () => {
   it('affiche la zone de téléchargement', async () => {

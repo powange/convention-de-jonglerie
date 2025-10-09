@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import UserAvatar from '~/components/ui/UserAvatar.vue'
+import UserAvatar from '../../../../app/components/ui/UserAvatar.vue'
 
 describe('UserAvatar', () => {
   it("affiche le gravatar par défaut si pas d'image", async () => {

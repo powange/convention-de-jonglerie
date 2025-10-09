@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import AddressAutocomplete from '~/components/AddressAutocomplete.vue'
+import AddressAutocomplete from '../../../app/components/AddressAutocomplete.vue'
 
 describe('AddressAutocomplete', () => {
   it("affiche le champ d'adresse", async () => {

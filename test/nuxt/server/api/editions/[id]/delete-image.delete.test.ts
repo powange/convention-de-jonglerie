@@ -6,7 +6,7 @@ import handler from '../../../../../../server/api/editions/[id]/delete-image.del
 import { deleteEditionImage } from '../../../../../../server/utils/image-deletion'
 
 // Mock des modules externes
-vi.mock('../../../../../server/utils/image-deletion', () => ({
+vi.mock('../../../../../../server/utils/image-deletion', () => ({
   deleteEditionImage: vi.fn(),
 }))
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import EditionHeader from '~/components/edition/Header.vue'
+import EditionHeader from '../../../../app/components/edition/Header.vue'
 
 describe('EditionHeader', () => {
   const mockEdition = {

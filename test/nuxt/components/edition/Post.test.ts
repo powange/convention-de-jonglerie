@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import EditionPost from '~/components/edition/Post.vue'
+import EditionPost from '../../../../app/components/edition/Post.vue'
 
 describe('EditionPost', () => {
   const mockPost = {

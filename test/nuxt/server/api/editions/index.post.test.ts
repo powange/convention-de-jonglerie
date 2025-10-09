@@ -1,19 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+// Mock des utilitaires - DOIT être avant les imports
+const mockGeocodeEdition = vi.fn()
+const mockMoveTempImage = vi.fn()
+
+vi.mock('../../../../../../server/utils/geocoding', () => ({
+  geocodeEdition: mockGeocodeEdition,
+}))
+vi.mock('../../../../../../server/utils/move-temp-image', () => ({
+  moveTempImageToEdition: mockMoveTempImage,
+}))
+
 import handler from '../../../../../server/api/editions/index.post'
 import { prismaMock } from '../../../../__mocks__/prisma'
-
-// Mock des utilitaires
-vi.mock('../../../../../server/utils/geocoding', () => ({
-  geocodeEdition: vi.fn().mockResolvedValue({
-    latitude: 48.8566,
-    longitude: 2.3522,
-  }),
-}))
-
-vi.mock('../../../../../server/utils/move-temp-image', () => ({
-  moveTempImageToEdition: vi.fn().mockResolvedValue('/uploads/editions/1/image.jpg'),
-}))
 
 describe('/api/editions POST', () => {
   const mockUser = {
@@ -57,6 +56,13 @@ describe('/api/editions POST', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     global.readBody = vi.fn()
+
+    // Valeurs par défaut pour les mocks
+    mockGeocodeEdition.mockResolvedValue({
+      latitude: 48.8566,
+      longitude: 2.3522,
+    })
+    mockMoveTempImage.mockResolvedValue('/uploads/editions/1/image.jpg')
   })
 
   it('devrait créer une édition avec succès', async () => {
@@ -190,7 +196,7 @@ describe('/api/editions POST', () => {
 
     await handler(mockEvent as any)
 
-    expect(geocodeEdition).toHaveBeenCalledWith({
+    expect(mockGeocodeEdition).toHaveBeenCalledWith({
       addressLine1: editionData.addressLine1,
       addressLine2: undefined,
       city: editionData.city,
@@ -236,7 +242,7 @@ describe('/api/editions POST', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(moveTempImageToEdition).toHaveBeenCalledWith('/temp/123456.jpg', 1)
+    expect(mockMoveTempImage).toHaveBeenCalledWith('/temp/123456.jpg', 1)
     expect(result.imageUrl).toBe('/uploads/editions/1/image.jpg')
   })
 
@@ -328,8 +334,7 @@ describe('/api/editions POST', () => {
   })
 
   it('devrait gérer les erreurs de géocodage', async () => {
-    const { geocodeEdition } = await import('../../../../../server/utils/geocoding')
-    vi.mocked(geocodeEdition).mockRejectedValue(new Error('Geocoding failed'))
+    mockGeocodeEdition.mockRejectedValue(new Error('Geocoding failed'))
 
     prismaMock.convention.findUnique.mockResolvedValue(mockConvention)
 
