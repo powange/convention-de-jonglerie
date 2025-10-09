@@ -7,6 +7,14 @@ vi.mock('../../../../../server/utils/emailService', () => ({
   generateVerificationEmailHtml: vi.fn(),
 }))
 
+// Mock bcrypt pour accélérer les tests (éviter les vraies opérations cryptographiques)
+vi.mock('bcryptjs', () => ({
+  default: {
+    hash: vi.fn((password) => Promise.resolve(`hashed_${password}`)),
+    compare: vi.fn(() => Promise.resolve(true)),
+  },
+}))
+
 import {
   sendEmail,
   generateVerificationCode,
@@ -141,7 +149,6 @@ describe('API Register', () => {
     }
 
     prismaMock.user.create.mockResolvedValue(mockUser)
-    const hashSpy = vi.spyOn(bcrypt, 'hash')
 
     const requestBody = {
       email: 'test@example.com',
@@ -156,7 +163,15 @@ describe('API Register', () => {
 
     await registerHandler(mockEvent)
 
-    expect(hashSpy).toHaveBeenCalledWith('Password123!', 10)
+    // Vérifier que bcrypt.hash a été appelé avec le mot de passe
+    expect(bcrypt.hash).toHaveBeenCalledWith('Password123!', 10)
+
+    // Vérifier que le mot de passe haché a été utilisé
+    expect(prismaMock.user.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        password: 'hashed_Password123!',
+      }),
+    })
   })
 
   it("devrait normaliser l'email en minuscules", async () => {

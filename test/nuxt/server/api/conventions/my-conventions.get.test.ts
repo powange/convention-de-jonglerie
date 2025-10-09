@@ -131,7 +131,15 @@ describe('/api/conventions/my-conventions GET', () => {
             _count: {
               select: {
                 volunteerApplications: true,
-                ticketingParticipants: true,
+              },
+            },
+            orders: {
+              select: {
+                _count: {
+                  select: {
+                    items: true,
+                  },
+                },
               },
             },
           },

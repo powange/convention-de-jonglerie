@@ -21,7 +21,15 @@ export default defineEventHandler(async (event) => {
       _count: {
         select: {
           volunteerApplications: true,
-          ticketingParticipants: true,
+        },
+      },
+      orders: {
+        select: {
+          _count: {
+            select: {
+              items: true,
+            },
+          },
         },
       },
     }

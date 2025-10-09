@@ -47,8 +47,11 @@ let mockRequireUserSession: ReturnType<typeof vi.fn>
 describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
   beforeEach(async () => {
     mockHasPermission.mockReset()
-    const importsMod: any = await import('#imports')
-    mockRequireUserSession = importsMod.requireUserSession as ReturnType<typeof vi.fn>
+    // Initialiser mockRequireUserSession une seule fois (import mis en cache)
+    if (!mockRequireUserSession) {
+      const importsMod: any = await import('#imports')
+      mockRequireUserSession = importsMod.requireUserSession as ReturnType<typeof vi.fn>
+    }
     mockRequireUserSession.mockReset?.()
     prismaMock.lostFoundItem.findFirst.mockReset()
     prismaMock.lostFoundItem.update.mockReset()

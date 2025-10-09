@@ -47,6 +47,7 @@ describe("Middleware d'authentification", () => {
     }
   }
 
+  // Initialiser une seule fois le mock getUserSession
   beforeEach(async () => {
     vi.clearAllMocks()
     mockDefineEventHandler.mockImplementation((fn) => fn)
@@ -57,12 +58,16 @@ describe("Middleware d'authentification", () => {
       throw error
     })
 
-    // S'assurer que getUserSession est bien un vi.fn mockable
-    const importsMod: any = await import('#imports')
-    if (typeof importsMod.getUserSession !== 'function') {
-      importsMod.getUserSession = vi.fn(async () => ({ user: { id: 1 } }))
+    // Initialiser mockGetUserSession une seule fois (import mis en cache)
+    if (!mockGetUserSession) {
+      const importsMod: any = await import('#imports')
+      if (typeof importsMod.getUserSession !== 'function') {
+        importsMod.getUserSession = vi.fn(async () => ({ user: { id: 1 } }))
+      }
+      mockGetUserSession = importsMod.getUserSession as ReturnType<typeof vi.fn>
     }
-    mockGetUserSession = importsMod.getUserSession as ReturnType<typeof vi.fn>
+    // Reset le mock sans refaire l'import
+    mockGetUserSession.mockResolvedValue({ user: mockUser })
   })
 
   describe('Routes publiques', () => {
@@ -212,6 +217,7 @@ describe("Middleware d'authentification", () => {
 
         it(`devrait protéger POST ${route}`, async () => {
           const event = createMockEvent(route, 'POST')
+          mockGetUserSession.mockResolvedValue(null)
 
           await expect(authMiddleware(event as H3Event)).rejects.toThrow('Unauthorized')
         })

@@ -90,10 +90,23 @@ export async function renderRawPage(routePath: string) {
           },
         }
       }
-      // Retour vide générique
-      return {}
+      // Mock pour /api/conventions/my-conventions
+      if (url === '/api/conventions/my-conventions') {
+        return [
+          {
+            id: 1,
+            name: 'Test Convention 1',
+          },
+          {
+            id: 2,
+            name: 'Test Convention 2',
+          },
+        ]
+      }
+      // Retour vide générique (array vide pour éviter .map errors)
+      return []
     } catch (e) {
-      return {}
+      return []
     }
   }
 
