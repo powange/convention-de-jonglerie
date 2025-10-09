@@ -108,5 +108,6 @@
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits"
-  }
+  },
+  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner"]
 }
