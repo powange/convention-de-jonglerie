@@ -745,20 +745,17 @@ const showAddVolunteerModal = ref(false)
 const isMobile = ref(false)
 
 // Fonction pour récupérer les assignations d'équipes
+// Utilise une route dédiée sans pagination pour récupérer tous les bénévoles acceptés
 const fetchTeamAssignments = async () => {
   try {
-    const response = await $fetch(`/api/editions/${editionId}/volunteers/applications`, {
-      query: { includeTeams: 'true', status: 'ACCEPTED' },
-    })
-    const applications = (response as any).applications || response
+    const applications = await $fetch(`/api/editions/${editionId}/volunteers/team-assignments`)
 
     console.log('📊 Applications récupérées:', applications.length)
     console.log('📊 Première application:', applications[0])
 
-    acceptedVolunteers.value = applications.filter((app: any) => app.status === 'ACCEPTED')
+    acceptedVolunteers.value = applications
     teamAssignments.value = applications.filter(
-      (app: any) =>
-        app.status === 'ACCEPTED' && app.teamAssignments && app.teamAssignments.length > 0
+      (app: any) => app.teamAssignments && app.teamAssignments.length > 0
     )
 
     console.log('✅ Accepted volunteers:', acceptedVolunteers.value.length)
