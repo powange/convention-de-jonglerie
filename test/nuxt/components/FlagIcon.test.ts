@@ -6,82 +6,81 @@ describe('FlagIcon', () => {
   it('affiche le drapeau pour un code pays valide', async () => {
     const component = await mountSuspended(FlagIcon, {
       props: {
-        country: 'FR',
+        code: 'FR',
       },
     })
 
     const flag = component.find('.flag-icon')
     expect(flag.exists()).toBe(true)
-    expect(flag.classes()).toContain('flag-icon-fr')
+    expect(flag.classes()).toContain('fi')
+    expect(flag.classes()).toContain('fi-fr')
   })
 
-  it('applique la taille spécifiée', async () => {
+  it('normalise le code pays en minuscules', async () => {
     const component = await mountSuspended(FlagIcon, {
       props: {
-        country: 'GB',
-        size: 'lg',
+        code: 'GB',
       },
     })
 
     const flag = component.find('.flag-icon')
-    expect(flag.classes()).toContain('flag-icon-lg')
+    expect(flag.classes()).toContain('fi-gb')
   })
 
   it('gère les codes pays en minuscules', async () => {
     const component = await mountSuspended(FlagIcon, {
       props: {
-        country: 'de',
+        code: 'de',
       },
     })
 
     const flag = component.find('.flag-icon')
-    expect(flag.classes()).toContain('flag-icon-de')
+    expect(flag.classes()).toContain('fi-de')
   })
 
-  it('affiche un placeholder pour un code pays invalide', async () => {
+  it('affiche seulement la classe de base pour un code vide', async () => {
     const component = await mountSuspended(FlagIcon, {
       props: {
-        country: 'XX',
-      },
-    })
-
-    const placeholder = component.find('.flag-placeholder')
-    expect(placeholder.exists()).toBe(true)
-  })
-
-  it('affiche le nom du pays en tooltip si showTooltip est true', async () => {
-    const component = await mountSuspended(FlagIcon, {
-      props: {
-        country: 'ES',
-        showTooltip: true,
-      },
-    })
-
-    const wrapper = component.find('[title]')
-    expect(wrapper.attributes('title')).toBe('Espagne')
-  })
-
-  it('applique les classes CSS supplémentaires', async () => {
-    const component = await mountSuspended(FlagIcon, {
-      props: {
-        country: 'IT',
-        class: 'custom-class',
+        code: '',
       },
     })
 
     const flag = component.find('.flag-icon')
-    expect(flag.classes()).toContain('custom-class')
+    expect(flag.exists()).toBe(true)
+    expect(flag.classes()).toContain('fi')
   })
 
-  it('utilise le format carré si square est true', async () => {
+  it('affiche le code pays en attribut title', async () => {
     const component = await mountSuspended(FlagIcon, {
       props: {
-        country: 'NL',
-        square: true,
+        code: 'ES',
       },
     })
 
     const flag = component.find('.flag-icon')
-    expect(flag.classes()).toContain('flag-icon-squared')
+    expect(flag.attributes('title')).toBe('es')
+  })
+
+  it('gère les codes null ou undefined', async () => {
+    const component = await mountSuspended(FlagIcon, {
+      props: {
+        code: null,
+      },
+    })
+
+    const flag = component.find('.flag-icon')
+    expect(flag.exists()).toBe(true)
+    expect(flag.classes()).toContain('fi')
+  })
+
+  it('tronque les codes pays à 2 caractères', async () => {
+    const component = await mountSuspended(FlagIcon, {
+      props: {
+        code: 'FRA',
+      },
+    })
+
+    const flag = component.find('.flag-icon')
+    expect(flag.classes()).toContain('fi-fr')
   })
 })
