@@ -63,7 +63,7 @@ export async function isNotificationAllowed(
   notificationType: keyof NotificationPreferences
 ): Promise<boolean> {
   const preferences = await getUserNotificationPreferences(userId)
-  return preferences[notificationType]
+  return preferences[notificationType] ?? true // Par défaut activé si pas défini
 }
 
 /**
