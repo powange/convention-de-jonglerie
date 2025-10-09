@@ -1,18 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import requestPasswordResetHandler from '../../../../../server/api/auth/request-password-reset.post'
-import { sendEmail } from '../../../../../server/utils/emailService'
-import { prismaMock } from '../../../../__mocks__/prisma'
+// Mock des modules spécifiques - DOIT être avant les imports
+const mockSendEmail = vi.fn()
+const mockGeneratePasswordResetEmailHtml = vi.fn()
 
-// Import des mocks après leur définition
-
-// Import du handler après les mocks
-
-// Mock des modules spécifiques
-vi.mock('../../../../server/utils/emailService', () => ({
-  sendEmail: vi.fn().mockResolvedValue(true),
-  generatePasswordResetEmailHtml: vi.fn().mockReturnValue('<html>Reset link</html>'),
+vi.mock('../../../../../server/utils/emailService', () => ({
+  sendEmail: mockSendEmail,
+  generatePasswordResetEmailHtml: mockGeneratePasswordResetEmailHtml,
 }))
+
+import requestPasswordResetHandler from '../../../../../server/api/auth/request-password-reset.post'
+import { prismaMock } from '../../../../__mocks__/prisma'
 
 describe('API Request Password Reset', () => {
   const mockUser = {
@@ -23,6 +21,8 @@ describe('API Request Password Reset', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSendEmail.mockResolvedValue(true)
+    mockGeneratePasswordResetEmailHtml.mockReturnValue('<html>Reset link</html>')
   })
 
   it('devrait envoyer un email de réinitialisation pour un utilisateur existant', async () => {
@@ -59,7 +59,7 @@ describe('API Request Password Reset', () => {
       }),
     })
 
-    expect(sendEmail).toHaveBeenCalledWith(
+    expect(mockSendEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         to: mockUser.email,
         subject: 'Réinitialisation de votre mot de passe - Conventions de Jonglerie',
@@ -86,7 +86,7 @@ describe('API Request Password Reset', () => {
     })
 
     expect(prismaMock.passwordResetToken.create).not.toHaveBeenCalled()
-    expect(sendEmail).not.toHaveBeenCalled()
+    expect(mockSendEmail).not.toHaveBeenCalled()
   })
 
   it("devrait valider le format de l'email", async () => {
@@ -152,7 +152,7 @@ describe('API Request Password Reset', () => {
 
     await requestPasswordResetHandler(mockEvent)
 
-    expect(sendEmail).toHaveBeenCalledWith(
+    expect(mockSendEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         to: mockUser.email,
         subject: 'Réinitialisation de votre mot de passe - Conventions de Jonglerie',
@@ -163,7 +163,7 @@ describe('API Request Password Reset', () => {
 
   it("devrait gérer les erreurs lors de l'envoi d'email", async () => {
     prismaMock.user.findUnique.mockResolvedValue(mockUser)
-    sendEmail.mockRejectedValue(new Error('Email service error'))
+    mockSendEmail.mockRejectedValue(new Error('Email service error'))
 
     const requestBody = {
       email: 'test@example.com',
