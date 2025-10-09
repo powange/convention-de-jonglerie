@@ -1,14 +1,13 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+
+// Mock des utilitaires - DOIT être avant les imports
+const mockDeleteCollaborator = vi.fn()
+
+vi.mock('../../../../../server/utils/collaborator-management', () => ({
+  deleteConventionCollaborator: mockDeleteCollaborator,
+}))
 
 import handler from '../../../../../server/api/conventions/[id]/collaborators/[collaboratorId].delete'
-
-// Import des mocks après la déclaration
-import { deleteConventionCollaborator } from '../../../../../server/utils/collaborator-management'
-
-// Mock des utilitaires de collaborateur
-vi.mock('../../../../server/utils/collaborator-management', () => ({
-  deleteConventionCollaborator: vi.fn(),
-}))
 
 const mockEvent = {
   context: {
@@ -20,7 +19,6 @@ const mockEvent = {
     },
   },
 }
-const mockDeleteCollaborator = deleteConventionCollaborator as ReturnType<typeof vi.fn>
 
 describe('/api/conventions/[id]/collaborators/[collaboratorId] DELETE', () => {
   beforeEach(() => {
