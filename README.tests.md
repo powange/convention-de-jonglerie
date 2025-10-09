@@ -2,11 +2,11 @@
 
 ## Suites et usages
 
-Le projet sépare clairement les suites pour de meilleures perfs et une maintenance simple.
+Le projet utilise une configuration multi-projet Vitest pour de meilleures perfs et une maintenance simple.
 
 1. Unit (sans Nuxt complet, sans DB)
 
-- Fichier config: `vitest.config.unit.ts`
+- Projet: `unit` dans `vitest.config.ts`
 - Setup: `test/setup-common.ts`, `test/setup-mocks.ts`
 - Scripts:
   - `npm run test:unit` (watch)
@@ -15,7 +15,7 @@ Le projet sépare clairement les suites pour de meilleures perfs et une maintena
 
 2. Nuxt (runtime Nuxt, DB mockée)
 
-- Fichier config: `vitest.config.nuxt.ts`
+- Projet: `nuxt` dans `vitest.config.ts`
 - Setup: `test/setup-common.ts`, `test/setup.ts`
 - Scripts:
   - `npm run test:nuxt` (watch)

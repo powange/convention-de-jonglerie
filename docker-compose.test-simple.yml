@@ -16,7 +16,7 @@ services:
       - ./prisma:/app/prisma:cached
       - ./public:/app/public:cached
       - ./nuxt.config.ts:/app/nuxt.config.ts:cached
-      - ./vitest.config.unit.ts:/app/vitest.config.unit.ts:cached
+      - ./vitest.config.ts:/app/vitest.config.ts:cached
       - node_modules:/app/node_modules
     command:
       - sh
@@ -27,7 +27,7 @@ services:
           echo "node_modules absent: installation des dépendances..."
           npm ci
         fi
-        npx vitest run --config vitest.config.unit.ts --silent
+        npx vitest run --project unit --silent
 
 volumes:
   node_modules:
