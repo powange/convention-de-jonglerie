@@ -11,7 +11,11 @@ vi.mock('../../../../../server/utils/rate-limiter', () => ({
   emailRateLimiter: vi.fn(),
 }))
 
-import { sendEmail, generateVerificationCode, generateVerificationEmailHtml } from '../../../../../server/utils/emailService'
+import {
+  sendEmail,
+  generateVerificationCode,
+  generateVerificationEmailHtml,
+} from '../../../../../server/utils/emailService'
 import { emailRateLimiter } from '../../../../../server/utils/rate-limiter'
 import handler from '../../../../../server/api/auth/resend-verification.post'
 import { prismaMock } from '../../../../__mocks__/prisma'

@@ -10,7 +10,10 @@ vi.mock('../../../../../server/utils/move-temp-image', () => ({
 }))
 
 import { geocodeEdition } from '../../../../../server/utils/geocoding'
-import { moveTempImageToEdition, moveTempImageFromPlaceholder } from '../../../../../server/utils/move-temp-image'
+import {
+  moveTempImageToEdition,
+  moveTempImageFromPlaceholder,
+} from '../../../../../server/utils/move-temp-image'
 import handler from '../../../../../server/api/editions/index.post'
 import { prismaMock } from '../../../../__mocks__/prisma'
 

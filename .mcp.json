@@ -10,10 +10,7 @@
     },
     "vitest-runner": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@madrus/vitest-mcp-server@latest"
-      ],
+      "args": ["-y", "@madrus/vitest-mcp-server@latest"],
       "env": {
         "VITEST_PROJECT_DIR": "/Users/<your-username>/path/to/your/project/root"
       }

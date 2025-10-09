@@ -11,9 +11,7 @@ export default defineConfig({
     setupFiles: ['./test/setup-common.ts', './test/setup-mocks.ts'],
     reporters: ['dot'],
     silent: true,
-    include: [
-      'test/unit/**/*.test.ts',
-    ],
+    include: ['test/unit/**/*.test.ts'],
     exclude: [
       '**/node_modules/**',
       '**/dist/**',

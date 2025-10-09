@@ -49,12 +49,12 @@ L'API retourne désormais un format **normalisé** pour chaque collaborateur :
 
 Chaque entrée de `perEdition` correspond à un enregistrement dans `EditionCollaboratorPermission` :
 
-| Champ               | Type    | Description                                  |
-| ------------------- | ------- | -------------------------------------------- |
-| editionId           | number  | Identifiant de l'édition ciblée              |
-| canEdit             | boolean | Peut modifier cette édition                  |
-| canDelete           | boolean | Peut supprimer cette édition                 |
-| canManageVolunteers | boolean | Peut gérer les bénévoles de cette édition    |
+| Champ               | Type    | Description                               |
+| ------------------- | ------- | ----------------------------------------- |
+| editionId           | number  | Identifiant de l'édition ciblée           |
+| canEdit             | boolean | Peut modifier cette édition               |
+| canDelete           | boolean | Peut supprimer cette édition              |
+| canManageVolunteers | boolean | Peut gérer les bénévoles de cette édition |
 
 Règle de résolution effective :
 
@@ -82,9 +82,7 @@ Body (exemples):
   "userIdentifier": "alice@example.org", // ou userId
   "title": "Organisateur",
   "rights": { "manageCollaborators": true, "addEdition": true },
-  "perEdition": [
-    { "editionId": 11, "canEdit": true, "canManageVolunteers": true }
-  ],
+  "perEdition": [{ "editionId": 11, "canEdit": true, "canManageVolunteers": true }],
 }
 ```
 
@@ -121,7 +119,7 @@ Body:
   "rights": { "deleteConvention": true },
   "perEdition": [
     { "editionId": 12, "canEdit": true },
-    { "editionId": 13, "canManageVolunteers": true }
+    { "editionId": 13, "canManageVolunteers": true },
   ],
   "title": "Responsable contenu",
 }

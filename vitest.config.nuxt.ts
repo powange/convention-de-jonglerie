@@ -46,12 +46,7 @@ export default defineVitestConfig({
       // Tous les tests Nuxt centralisés ici
       'test/nuxt/**/*.test.ts',
     ],
-    exclude: [
-      'test/nuxt/components/admin/**/*.test.ts',
-      'test/nuxt/components/edition/**/*.test.ts',
-      'test/nuxt/components/notifications/**/*.test.ts',
-      'test/nuxt/components/ui/**/*.test.ts',
-    ],
+    exclude: [],
   },
   build: {
     rollupOptions: { external: ['**/*.spec.ts', '**/*.test.ts'] },

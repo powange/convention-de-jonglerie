@@ -88,11 +88,13 @@ export default defineEventHandler(async (event) => {
 ✅ **Migration terminée !** Toutes les APIs admin ont été migrées vers le système mutualisé.
 
 **Statistiques :**
+
 - 34 fichiers API dans `/server/api/admin/` utilisent `requireGlobalAdmin` ou `requireGlobalAdminFast`
 - 63 occurrences totales des fonctions d'authentification admin
 - 0 API restant à migrer
 
 **APIs migrées incluent :**
+
 - `/api/admin/users/*` (gestion utilisateurs)
 - `/api/admin/feedback/*` (gestion feedback)
 - `/api/admin/notifications/*` (notifications)

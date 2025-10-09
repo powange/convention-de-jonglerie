@@ -24,7 +24,7 @@ import { prisma } from '../../../../../server/utils/prisma'
 import handler from '../../../../../server/api/editions/[id]/carpool-offers/index.get'
 
 const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
-const mockFindMany = (prisma.carpoolOffer.findMany) as ReturnType<typeof vi.fn>
+const mockFindMany = prisma.carpoolOffer.findMany as ReturnType<typeof vi.fn>
 
 // Cast des mocks globaux
 const mockCreateError = global.createError as ReturnType<typeof vi.fn>

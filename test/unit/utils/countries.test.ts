@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest'
 
-import { countryToCode, getCountryCode, formatCountriesForSelect } from '../../../app/utils/countries'
+import {
+  countryToCode,
+  getCountryCode,
+  formatCountriesForSelect,
+} from '../../../app/utils/countries'
 
 describe('countries utils', () => {
   describe('countryToCode', () => {

@@ -7,7 +7,11 @@ vi.mock('../../../../../server/utils/emailService', () => ({
   generateVerificationEmailHtml: vi.fn(),
 }))
 
-import { sendEmail, generateVerificationCode, generateVerificationEmailHtml } from '../../../../../server/utils/emailService'
+import {
+  sendEmail,
+  generateVerificationCode,
+  generateVerificationEmailHtml,
+} from '../../../../../server/utils/emailService'
 import bcrypt from 'bcryptjs'
 import registerHandler from '../../../../../server/api/auth/register.post'
 import { prismaMock } from '../../../../__mocks__/prisma'

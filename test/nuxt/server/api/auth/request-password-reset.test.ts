@@ -11,7 +11,9 @@ import requestPasswordResetHandler from '../../../../../server/api/auth/request-
 import { prismaMock } from '../../../../__mocks__/prisma'
 
 const mockSendEmail = sendEmail as ReturnType<typeof vi.fn>
-const mockGeneratePasswordResetEmailHtml = generatePasswordResetEmailHtml as ReturnType<typeof vi.fn>
+const mockGeneratePasswordResetEmailHtml = generatePasswordResetEmailHtml as ReturnType<
+  typeof vi.fn
+>
 
 describe('API Request Password Reset', () => {
   const mockUser = {

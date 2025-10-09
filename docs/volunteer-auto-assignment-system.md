@@ -361,8 +361,8 @@ const response = await fetch('/api/editions/123/volunteers/auto-assign', {
       balanceTeams: true,
       prioritizeExperience: true,
       respectStrictAvailability: true,
-      respectStrictTeamPreferences: true,   // Respecter strictement les préférences d'équipe
-      respectStrictTimePreferences: true,   // Respecter strictement les préférences horaires
+      respectStrictTeamPreferences: true, // Respecter strictement les préférences d'équipe
+      respectStrictTimePreferences: true, // Respecter strictement les préférences horaires
       allowOvertime: false,
       keepExistingAssignments: true,
     },

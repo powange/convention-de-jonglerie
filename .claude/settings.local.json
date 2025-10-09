@@ -100,7 +100,10 @@
       "Bash(NODE_ENV=test npx vitest run test/nuxt/components --config vitest.config.nuxt.ts)",
       "Bash(NODE_ENV=test npx vitest run --config vitest.config.nuxt.ts test/nuxt/components/AddressAutocomplete.test.ts)",
       "Bash(NODE_ENV=test npx vitest run --config vitest.config.nuxt.ts test/nuxt/components)",
-      "Bash(NODE_ENV=test npx vitest run --config vitest.config.nuxt.ts test/nuxt/components/*)"
+      "Bash(NODE_ENV=test npx vitest run --config vitest.config.nuxt.ts test/nuxt/components/*)",
+      "Bash(NODE_ENV=test npx vitest run --config vitest.config.nuxt.ts test/nuxt/components/ui)",
+      "Bash(NODE_ENV=test npx vitest run --config vitest.config.nuxt.ts test/nuxt/components/notifications)",
+      "Bash(NODE_ENV=test npx vitest run --config vitest.config.nuxt.ts test/nuxt/components/admin test/nuxt/components/edition)"
     ],
     "deny": [],
     "ask": [],

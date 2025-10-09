@@ -7,7 +7,11 @@ vi.mock('../../../../../server/utils/collaborator-management', () => ({
   findUserByPseudoOrEmail: vi.fn(),
 }))
 
-import { addConventionCollaborator, checkAdminMode, findUserByPseudoOrEmail } from '../../../../../server/utils/collaborator-management'
+import {
+  addConventionCollaborator,
+  checkAdminMode,
+  findUserByPseudoOrEmail,
+} from '../../../../../server/utils/collaborator-management'
 import handler from '../../../../../server/api/conventions/[id]/collaborators.post'
 import { prismaMock } from '../../../../__mocks__/prisma'
 
@@ -34,8 +38,6 @@ const mockEvent = {
     },
   },
 }
-
-
 
 describe('/api/conventions/[id]/collaborators POST', () => {
   beforeEach(() => {
