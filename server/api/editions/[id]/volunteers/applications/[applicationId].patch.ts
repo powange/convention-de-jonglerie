@@ -259,7 +259,7 @@ export default defineEventHandler(async (event) => {
 
     // Supprimer le nouveau système (relations)
     updateData.teamAssignments = {
-      set: [], // Supprimer toutes les relations avec les équipes
+      deleteMany: {}, // Supprimer toutes les relations avec les équipes
     }
   }
 

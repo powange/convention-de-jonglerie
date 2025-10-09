@@ -58,10 +58,7 @@ export default defineEventHandler(async (event) => {
         },
       },
     },
-    orderBy: [
-      { user: { prenom: 'asc' } },
-      { user: { nom: 'asc' } },
-    ],
+    orderBy: [{ user: { prenom: 'asc' } }, { user: { nom: 'asc' } }],
   })
 
   return applications

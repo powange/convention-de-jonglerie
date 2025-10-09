@@ -43,14 +43,33 @@ export default defineConfig({
           alias: [
             {
               find: /^#app\/(.*)$/,
-              replacement: resolve(fileURLToPath(new URL('.', import.meta.url)), 'node_modules/nuxt/dist/app') + '/$1',
+              replacement:
+                resolve(
+                  fileURLToPath(new URL('.', import.meta.url)),
+                  'node_modules/nuxt/dist/app'
+                ) + '/$1',
             },
-            { find: /^#app$/, replacement: resolve(fileURLToPath(new URL('.', import.meta.url)), 'node_modules/nuxt/dist/app') },
-            { find: /^#build\/(.*)$/, replacement: resolve(fileURLToPath(new URL('.', import.meta.url)), '.nuxt') + '/$1' },
-            { find: /^#build$/, replacement: resolve(fileURLToPath(new URL('.', import.meta.url)), '.nuxt') },
+            {
+              find: /^#app$/,
+              replacement: resolve(
+                fileURLToPath(new URL('.', import.meta.url)),
+                'node_modules/nuxt/dist/app'
+              ),
+            },
+            {
+              find: /^#build\/(.*)$/,
+              replacement: resolve(fileURLToPath(new URL('.', import.meta.url)), '.nuxt') + '/$1',
+            },
+            {
+              find: /^#build$/,
+              replacement: resolve(fileURLToPath(new URL('.', import.meta.url)), '.nuxt'),
+            },
             {
               find: /^#app-manifest$/,
-              replacement: resolve(fileURLToPath(new URL('.', import.meta.url)), 'test/__mocks__/app-manifest.ts'),
+              replacement: resolve(
+                fileURLToPath(new URL('.', import.meta.url)),
+                'test/__mocks__/app-manifest.ts'
+              ),
             },
           ],
         },

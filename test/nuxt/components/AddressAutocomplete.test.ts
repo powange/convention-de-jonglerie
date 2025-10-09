@@ -47,7 +47,7 @@ describe('AddressAutocomplete', () => {
     })
   })
 
-  describe('Recherche d\'adresses', () => {
+  describe("Recherche d'adresses", () => {
     it('permet la recherche d adresses', async () => {
       // Mock global de $fetch
       vi.stubGlobal(
