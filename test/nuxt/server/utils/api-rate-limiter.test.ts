@@ -87,14 +87,17 @@ describe('API Rate Limiters', () => {
       const anonEvent = createMockEvent('/api/uploads', '192.168.1.1')
 
       // Utilisateur connecté peut uploader (clé: upload:42)
-      await expect(uploadRateLimiter(userEvent as H3Event)).resolves.toBeUndefined()
+      const result1 = await uploadRateLimiter(userEvent as H3Event)
+      expect(result1).toBeUndefined()
 
       // Utilisateur anonyme peut aussi uploader (clé: upload:anonymous)
-      await expect(uploadRateLimiter(anonEvent as H3Event)).resolves.toBeUndefined()
+      const result2 = await uploadRateLimiter(anonEvent as H3Event)
+      expect(result2).toBeUndefined()
 
       // Deux utilisateurs différents peuvent aussi uploader
       const user2Event = createMockEvent('/api/uploads', '192.168.1.1', { id: 99 })
-      await expect(uploadRateLimiter(user2Event as H3Event)).resolves.toBeUndefined()
+      const result3 = await uploadRateLimiter(user2Event as H3Event)
+      expect(result3).toBeUndefined()
     })
   })
 
@@ -149,10 +152,12 @@ describe('API Rate Limiters', () => {
       const event2 = createMockEvent('/api/search', '192.168.2.2') // IP différente
 
       // IP 1 fait quelques recherches
-      await expect(searchRateLimiter(event1 as H3Event)).resolves.toBeUndefined()
+      const result1 = await searchRateLimiter(event1 as H3Event)
+      expect(result1).toBeUndefined()
 
       // IP 2 peut encore faire des recherches (clé différente)
-      await expect(searchRateLimiter(event2 as H3Event)).resolves.toBeUndefined()
+      const result2 = await searchRateLimiter(event2 as H3Event)
+      expect(result2).toBeUndefined()
     })
   })
 })

@@ -1,16 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock des modules spécifiques - DOIT être avant les imports
-const mockSendEmail = vi.fn()
-const mockGeneratePasswordResetEmailHtml = vi.fn()
-
 vi.mock('../../../../../server/utils/emailService', () => ({
-  sendEmail: mockSendEmail,
-  generatePasswordResetEmailHtml: mockGeneratePasswordResetEmailHtml,
+  sendEmail: vi.fn(),
+  generatePasswordResetEmailHtml: vi.fn(),
 }))
 
+import { sendEmail, generatePasswordResetEmailHtml } from '../../../../../server/utils/emailService'
 import requestPasswordResetHandler from '../../../../../server/api/auth/request-password-reset.post'
 import { prismaMock } from '../../../../__mocks__/prisma'
+
+const mockSendEmail = sendEmail as ReturnType<typeof vi.fn>
+const mockGeneratePasswordResetEmailHtml = generatePasswordResetEmailHtml as ReturnType<typeof vi.fn>
 
 describe('API Request Password Reset', () => {
   const mockUser = {

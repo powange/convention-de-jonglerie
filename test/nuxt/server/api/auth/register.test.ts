@@ -1,19 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock des modules spécifiques - DOIT être avant les imports
-const mockSendEmail = vi.fn()
-const mockGenerateVerificationCode = vi.fn()
-const mockGenerateVerificationEmailHtml = vi.fn()
-
 vi.mock('../../../../../server/utils/emailService', () => ({
-  sendEmail: mockSendEmail,
-  generateVerificationCode: mockGenerateVerificationCode,
-  generateVerificationEmailHtml: mockGenerateVerificationEmailHtml,
+  sendEmail: vi.fn(),
+  generateVerificationCode: vi.fn(),
+  generateVerificationEmailHtml: vi.fn(),
 }))
 
+import { sendEmail, generateVerificationCode, generateVerificationEmailHtml } from '../../../../../server/utils/emailService'
 import bcrypt from 'bcryptjs'
 import registerHandler from '../../../../../server/api/auth/register.post'
 import { prismaMock } from '../../../../__mocks__/prisma'
+
+const mockSendEmail = sendEmail as ReturnType<typeof vi.fn>
+const mockGenerateVerificationCode = generateVerificationCode as ReturnType<typeof vi.fn>
+const mockGenerateVerificationEmailHtml = generateVerificationEmailHtml as ReturnType<typeof vi.fn>
 
 describe('API Register', () => {
   beforeEach(() => {

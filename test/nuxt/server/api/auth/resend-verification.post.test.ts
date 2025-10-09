@@ -1,23 +1,25 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
-const mockSendEmail = vi.fn()
-const mockGenerateVerificationCode = vi.fn()
-const mockGenerateVerificationEmailHtml = vi.fn()
-const mockEmailRateLimiter = vi.fn()
-
 vi.mock('../../../../../server/utils/emailService', () => ({
-  sendEmail: mockSendEmail,
-  generateVerificationCode: mockGenerateVerificationCode,
-  generateVerificationEmailHtml: mockGenerateVerificationEmailHtml,
+  sendEmail: vi.fn(),
+  generateVerificationCode: vi.fn(),
+  generateVerificationEmailHtml: vi.fn(),
 }))
 
 vi.mock('../../../../../server/utils/rate-limiter', () => ({
-  emailRateLimiter: mockEmailRateLimiter,
+  emailRateLimiter: vi.fn(),
 }))
 
+import { sendEmail, generateVerificationCode, generateVerificationEmailHtml } from '../../../../../server/utils/emailService'
+import { emailRateLimiter } from '../../../../../server/utils/rate-limiter'
 import handler from '../../../../../server/api/auth/resend-verification.post'
 import { prismaMock } from '../../../../__mocks__/prisma'
+
+const mockSendEmail = sendEmail as ReturnType<typeof vi.fn>
+const mockGenerateVerificationCode = generateVerificationCode as ReturnType<typeof vi.fn>
+const mockGenerateVerificationEmailHtml = generateVerificationEmailHtml as ReturnType<typeof vi.fn>
+const mockEmailRateLimiter = emailRateLimiter as ReturnType<typeof vi.fn>
 
 interface TestEventContext {
   body?: any

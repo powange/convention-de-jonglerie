@@ -1,14 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
-const mockGeocodeEdition = vi.fn()
-
-vi.mock('../../../../../../server/utils/geocoding', () => ({
-  geocodeEdition: mockGeocodeEdition,
+vi.mock('../../../../../server/utils/geocoding', () => ({
+  geocodeEdition: vi.fn(),
 }))
 
+import { geocodeEdition } from '../../../../../server/utils/geocoding'
 import { prismaMock } from '../../../../__mocks__/prisma'
-import handler from '../../../../server/api/editions/[id].put'
+import handler from '../../../../../server/api/editions/[id].put'
+
+const mockGeocodeEdition = geocodeEdition as ReturnType<typeof vi.fn>
 
 // Mock nuxt-file-storage
 vi.mock('nuxt-file-storage', () => ({

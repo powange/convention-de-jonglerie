@@ -1,22 +1,21 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import { getEmailHash } from '../../../../../server/utils/email-hash'
-import { prismaMock } from '../../../../__mocks__/prisma'
-import handler from '../../../../server/api/editions/[id]/carpool-requests/index.get'
-
-// Import du mock après la déclaration
-
-// Mock du module getEmailHash
-vi.mock('../../../../server/utils/email-hash', () => ({
+// Mock des utilitaires - DOIT être avant les imports
+vi.mock('../../../../../server/utils/email-hash', () => ({
   getEmailHash: vi.fn(),
 }))
+
+import { getEmailHash } from '../../../../../server/utils/email-hash'
+import { prismaMock } from '../../../../__mocks__/prisma'
+import handler from '../../../../../server/api/editions/[id]/carpool-requests/index.get'
+
+const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {
     params: { id: '1' },
   },
 }
-const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
 
 describe('/api/editions/[id]/carpool-requests GET', () => {
   beforeEach(() => {

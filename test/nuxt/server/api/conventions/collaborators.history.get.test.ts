@@ -1,12 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import handler from '../../../../../server/api/conventions/[id]/collaborators/history.get'
-import { checkUserConventionPermission } from '../../../../../server/utils/collaborator-management'
-import { prismaMock } from '../../../../__mocks__/prisma'
-
-vi.mock('../../../../../../server/utils/collaborator-management', () => ({
+// Mock des utilitaires - DOIT être avant les imports
+vi.mock('../../../../../server/utils/collaborator-management', () => ({
   checkUserConventionPermission: vi.fn(),
 }))
+
+import { checkUserConventionPermission } from '../../../../../server/utils/collaborator-management'
+import handler from '../../../../../server/api/conventions/[id]/collaborators/history.get'
+import { prismaMock } from '../../../../__mocks__/prisma'
 
 const mockCheck = checkUserConventionPermission as ReturnType<typeof vi.fn>
 

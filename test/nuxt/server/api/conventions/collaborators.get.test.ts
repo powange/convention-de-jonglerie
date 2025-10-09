@@ -1,15 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import { checkUserConventionPermission } from '../../../../../server/utils/collaborator-management'
-import { prismaMock } from '../../../../__mocks__/prisma'
-import handler from '../../../../server/api/conventions/[id]/collaborators.get'
-
-// Import des mocks après la déclaration
-
-// Mock des utilitaires de collaborateur
-vi.mock('../../../../server/utils/collaborator-management', () => ({
+// Mock des utilitaires - DOIT être avant les imports
+vi.mock('../../../../../server/utils/collaborator-management', () => ({
   checkUserConventionPermission: vi.fn(),
 }))
+
+import { checkUserConventionPermission } from '../../../../../server/utils/collaborator-management'
+import { prismaMock } from '../../../../__mocks__/prisma'
+import handler from '../../../../../server/api/conventions/[id]/collaborators.get'
+
+const mockCheckPermission = checkUserConventionPermission as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {
@@ -21,7 +21,6 @@ const mockEvent = {
     },
   },
 }
-const mockCheckPermission = checkUserConventionPermission as ReturnType<typeof vi.fn>
 
 describe('/api/conventions/[id]/collaborators GET', () => {
   beforeEach(() => {

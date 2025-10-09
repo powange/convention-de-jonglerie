@@ -1,18 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
-const mockGeocodeEdition = vi.fn()
-const mockMoveTempImage = vi.fn()
-
-vi.mock('../../../../../../server/utils/geocoding', () => ({
-  geocodeEdition: mockGeocodeEdition,
+vi.mock('../../../../../server/utils/geocoding', () => ({
+  geocodeEdition: vi.fn(),
 }))
-vi.mock('../../../../../../server/utils/move-temp-image', () => ({
-  moveTempImageToEdition: mockMoveTempImage,
+vi.mock('../../../../../server/utils/move-temp-image', () => ({
+  moveTempImageToEdition: vi.fn(),
+  moveTempImageFromPlaceholder: vi.fn(),
 }))
 
+import { geocodeEdition } from '../../../../../server/utils/geocoding'
+import { moveTempImageToEdition, moveTempImageFromPlaceholder } from '../../../../../server/utils/move-temp-image'
 import handler from '../../../../../server/api/editions/index.post'
 import { prismaMock } from '../../../../__mocks__/prisma'
+
+const mockGeocodeEdition = geocodeEdition as ReturnType<typeof vi.fn>
+const mockMoveTempImage = moveTempImageToEdition as ReturnType<typeof vi.fn>
+const mockMoveTempImageFromPlaceholder = moveTempImageFromPlaceholder as ReturnType<typeof vi.fn>
 
 describe('/api/editions POST', () => {
   const mockUser = {
@@ -168,8 +172,6 @@ describe('/api/editions POST', () => {
   })
 
   it("devrait géocoder l'adresse pour obtenir les coordonnées", async () => {
-    const { geocodeEdition } = await import('../../../../../server/utils/geocoding')
-
     const editionData = {
       conventionId: 1,
       name: 'Edition 2024',
@@ -206,8 +208,6 @@ describe('/api/editions POST', () => {
   })
 
   it("devrait gérer l'upload d'image", async () => {
-    const { moveTempImageToEdition } = await import('../../../../../server/utils/move-temp-image')
-
     const editionData = {
       conventionId: 1,
       name: 'Edition 2024',
@@ -334,6 +334,7 @@ describe('/api/editions POST', () => {
   })
 
   it('devrait gérer les erreurs de géocodage', async () => {
+    mockGeocodeEdition.mockReset()
     mockGeocodeEdition.mockRejectedValue(new Error('Geocoding failed'))
 
     prismaMock.convention.findUnique.mockResolvedValue(mockConvention)

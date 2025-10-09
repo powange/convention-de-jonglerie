@@ -1,18 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
-const mockGeocodeEdition = vi.fn()
-const mockMoveTempImage = vi.fn()
-
-vi.mock('../../../../../../server/utils/geocoding', () => ({
-  geocodeEdition: mockGeocodeEdition,
+vi.mock('../../../../../server/utils/geocoding', () => ({
+  geocodeEdition: vi.fn(),
 }))
-vi.mock('../../../../../../server/utils/move-temp-image', () => ({
-  moveTempImageToEdition: mockMoveTempImage,
+vi.mock('../../../../../server/utils/move-temp-image', () => ({
+  moveTempImageToEdition: vi.fn(),
+  moveTempImageFromPlaceholder: vi.fn(),
 }))
 
+import { geocodeEdition } from '../../../../../server/utils/geocoding'
+import { moveTempImageToEdition } from '../../../../../server/utils/move-temp-image'
 import handler from '../../../../../server/api/editions/index.post'
 import { prismaMock } from '../../../../__mocks__/prisma'
+
+const mockGeocodeEdition = geocodeEdition as ReturnType<typeof vi.fn>
+const mockMoveTempImage = moveTempImageToEdition as ReturnType<typeof vi.fn>
 
 describe('/api/editions POST - Tests complets', () => {
   const mockUser = {

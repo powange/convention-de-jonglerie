@@ -1,12 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { prismaMock } from '../../../../__mocks__/prisma'
-import handler from '../../../../server/api/editions/[id].get'
-
-// Mock des utilitaires
-vi.mock('../../../../server/utils/email-hash', () => ({
-  getEmailHash: vi.fn((email: string) => (email ? `hash_${email}` : '')),
+// Mock des utilitaires - DOIT être avant les imports
+vi.mock('../../../../../server/utils/email-hash', () => ({
+  getEmailHash: vi.fn(),
 }))
+
+import { getEmailHash } from '../../../../../server/utils/email-hash'
+import { prismaMock } from '../../../../__mocks__/prisma'
+import handler from '../../../../../server/api/editions/[id].get'
+
+const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
 
 describe('/api/editions/[id] GET', () => {
   const mockEdition = {
@@ -83,6 +86,8 @@ describe('/api/editions/[id] GET', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     global.getRouterParam = vi.fn()
+    mockGetEmailHash.mockReset()
+    mockGetEmailHash.mockImplementation((email: string) => (email ? `hash_${email}` : ''))
   })
 
   it('devrait retourner une édition par ID', async () => {

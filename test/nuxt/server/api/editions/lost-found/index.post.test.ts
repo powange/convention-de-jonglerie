@@ -1,19 +1,21 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { prismaMock } from '../../../../../__mocks__/prisma'
-import { hasEditionEditPermission } from '../../../../../../server/utils/permissions/permissions'
-import handler from '../../../../../server/api/editions/[id]/lost-found/index.post'
+
+// Mock des utilitaires - DOIT être avant les imports
+vi.mock('../../../../../../server/utils/permissions/permissions', () => ({
+  hasEditionEditPermission: vi.fn(),
+}))
 
 // S'assurer que requireUserSession est bien un mock vi.fn dans ce fichier
 vi.mock('#imports', async () => {
   const actual = await vi.importActual<any>('#imports')
   return { ...actual, requireUserSession: vi.fn(async () => ({ user: { id: 1 } })) }
 })
-import { requireUserSession } from '#imports'
 
-// Mock des utilitaires
-vi.mock('../../../../../../server/utils/permissions/permissions', () => ({
-  hasEditionEditPermission: vi.fn(),
-}))
+import { hasEditionEditPermission } from '../../../../../../server/utils/permissions/permissions'
+import { prismaMock } from '../../../../../__mocks__/prisma'
+import handler from '../../../../../../server/api/editions/[id]/lost-found/index.post'
+
+const mockHasPermission = hasEditionEditPermission as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {
@@ -55,7 +57,6 @@ const mockLostFoundItem = {
   comments: [],
 }
 
-const mockHasPermission = hasEditionEditPermission as ReturnType<typeof vi.fn>
 let mockRequireUserSession: ReturnType<typeof vi.fn>
 
 describe('/api/editions/[id]/lost-found POST', () => {

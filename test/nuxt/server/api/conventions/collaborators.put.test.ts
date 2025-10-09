@@ -1,11 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import handler from '../../../../../server/api/conventions/[id]/collaborators/[collaboratorId].put'
-
-// Mock des utilitaires de collaborateur
-vi.mock('../../../../../../server/utils/collaborator-management', () => ({
+// Mock des utilitaires - DOIT être avant les imports
+vi.mock('../../../../../server/utils/collaborator-management', () => ({
   updateCollaboratorRights: vi.fn(),
 }))
+
+import { updateCollaboratorRights } from '../../../../../server/utils/collaborator-management'
+import handler from '../../../../../server/api/conventions/[id]/collaborators/[collaboratorId].put'
+
+const mockUpdateRole = updateCollaboratorRights as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {
@@ -17,12 +20,6 @@ const mockEvent = {
     },
   },
 }
-
-// Import des mocks après la déclaration
-
-import { updateCollaboratorRights } from '../../../../../server/utils/collaborator-management'
-
-const mockUpdateRole = updateCollaboratorRights as ReturnType<typeof vi.fn>
 
 describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
   beforeEach(() => {

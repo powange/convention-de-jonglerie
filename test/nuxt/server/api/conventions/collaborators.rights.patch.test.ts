@@ -1,12 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import handler from '../../../../../server/api/conventions/[id]/collaborators/[collaboratorId]/rights.patch'
-import { canManageCollaborators } from '../../../../../server/utils/collaborator-management'
-import { prismaMock } from '../../../../__mocks__/prisma'
-
-vi.mock('../../../../../../server/utils/collaborator-management', () => ({
+// Mock des utilitaires - DOIT être avant les imports
+vi.mock('../../../../../server/utils/collaborator-management', () => ({
   canManageCollaborators: vi.fn(),
 }))
+
+import { canManageCollaborators } from '../../../../../server/utils/collaborator-management'
+import handler from '../../../../../server/api/conventions/[id]/collaborators/[collaboratorId]/rights.patch'
+import { prismaMock } from '../../../../__mocks__/prisma'
 
 const mockCanManage = canManageCollaborators as ReturnType<typeof vi.fn>
 

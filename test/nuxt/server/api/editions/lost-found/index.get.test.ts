@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import { prismaMock } from '../../../../../__mocks__/prisma'
-import handler from '../../../../../server/api/editions/[id]/lost-found/index.get'
+import handler from '../../../../../../server/api/editions/[id]/lost-found/index.get'
 
 const mockEvent = {}
 

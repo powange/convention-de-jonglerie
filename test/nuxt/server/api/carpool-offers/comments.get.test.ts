@@ -1,14 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
-const mockGetEmailHash = vi.fn()
-
 vi.mock('../../../../../server/utils/email-hash', () => ({
-  getEmailHash: mockGetEmailHash,
+  getEmailHash: vi.fn(),
 }))
 
+import { getEmailHash } from '../../../../../server/utils/email-hash'
 import { prismaMock } from '../../../../__mocks__/prisma'
-import handler from '../../../../server/api/carpool-offers/[id]/comments.get'
+import handler from '../../../../../server/api/carpool-offers/[id]/comments.get'
+
+const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {

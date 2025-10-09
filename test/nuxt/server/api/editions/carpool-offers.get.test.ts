@@ -1,17 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Import du handler après les mocks
-// Import des mocks
-import { getEmailHash } from '../../../../../server/utils/email-hash'
-import { prisma } from '../../../../../server/utils/prisma'
-import handler from '../../../../server/api/editions/[id]/carpool-offers/index.get'
-
-// Mock des utilitaires
-vi.mock('../../../../server/utils/email-hash', () => ({
+// Mock des utilitaires - DOIT être avant les imports
+vi.mock('../../../../../server/utils/email-hash', () => ({
   getEmailHash: vi.fn(),
 }))
 
-vi.mock('../../../../server/utils/prisma', () => ({
+vi.mock('../../../../../server/utils/prisma', () => ({
   prisma: {
     carpoolOffer: {
       findMany: vi.fn(),
@@ -25,13 +19,16 @@ vi.mock('#imports', () => ({
   defineEventHandler: vi.fn(),
 }))
 
-// Cast des mocks
-const createError = global.createError as ReturnType<typeof vi.fn>
-const defineEventHandler = global.defineEventHandler as ReturnType<typeof vi.fn>
+import { getEmailHash } from '../../../../../server/utils/email-hash'
+import { prisma } from '../../../../../server/utils/prisma'
+import handler from '../../../../../server/api/editions/[id]/carpool-offers/index.get'
+
 const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
-const mockPrisma = prisma as { carpoolOffer: { findMany: ReturnType<typeof vi.fn> } }
-const mockCreateError = createError as ReturnType<typeof vi.fn>
-const mockDefineEventHandler = defineEventHandler as ReturnType<typeof vi.fn>
+const mockFindMany = (prisma.carpoolOffer.findMany) as ReturnType<typeof vi.fn>
+
+// Cast des mocks globaux
+const mockCreateError = global.createError as ReturnType<typeof vi.fn>
+const mockDefineEventHandler = global.defineEventHandler as ReturnType<typeof vi.fn>
 
 describe('GET /api/editions/[id]/carpool-offers', () => {
   const mockEvent = {
@@ -100,11 +97,11 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       },
     ]
 
-    mockPrisma.carpoolOffer.findMany.mockResolvedValue(mockOffers)
+    mockFindMany.mockResolvedValue(mockOffers)
 
     const result = await handler(mockEvent)
 
-    expect(mockPrisma.carpoolOffer.findMany).toHaveBeenCalledWith({
+    expect(mockFindMany).toHaveBeenCalledWith({
       where: { editionId: 1 },
       include: {
         user: true,
@@ -156,13 +153,13 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
   })
 
   it('devrait gérer les erreurs de base de données', async () => {
-    mockPrisma.carpoolOffer.findMany.mockRejectedValue(new Error('DB Error'))
+    mockFindMany.mockRejectedValue(new Error('DB Error'))
 
     await expect(handler(mockEvent)).rejects.toThrow('Erreur serveur')
   })
 
   it('devrait retourner un tableau vide si aucune offre', async () => {
-    mockPrisma.carpoolOffer.findMany.mockResolvedValue([])
+    mockFindMany.mockResolvedValue([])
 
     const result = await handler(mockEvent)
 
@@ -187,11 +184,11 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       },
     ]
 
-    mockPrisma.carpoolOffer.findMany.mockResolvedValue(mockOffers)
+    mockFindMany.mockResolvedValue(mockOffers)
 
     await handler(mockEvent)
 
-    expect(mockPrisma.carpoolOffer.findMany).toHaveBeenCalledWith(
+    expect(mockFindMany).toHaveBeenCalledWith(
       expect.objectContaining({
         orderBy: { tripDate: 'asc' },
       })
@@ -239,7 +236,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       },
     ]
 
-    mockPrisma.carpoolOffer.findMany.mockResolvedValue(mockOffers)
+    mockFindMany.mockResolvedValue(mockOffers)
 
     const result = await handler(mockEvent)
 
@@ -276,7 +273,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       },
     ]
 
-    mockPrisma.carpoolOffer.findMany.mockResolvedValue(mockOffers)
+    mockFindMany.mockResolvedValue(mockOffers)
 
     const result = await handler(mockEvent)
 
@@ -298,11 +295,11 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       },
     }
 
-    mockPrisma.carpoolOffer.findMany.mockResolvedValue([])
+    mockFindMany.mockResolvedValue([])
 
     await handler(eventWithStringId)
 
-    expect(mockPrisma.carpoolOffer.findMany).toHaveBeenCalledWith(
+    expect(mockFindMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { editionId: 123 },
       })

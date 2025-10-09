@@ -1,19 +1,19 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import handler from '../../../../../server/api/conventions/[id]/collaborators.post'
-import {
-  addConventionCollaborator,
-  checkAdminMode,
-  findUserByPseudoOrEmail,
-} from '../../../../../server/utils/collaborator-management'
-import { prismaMock } from '../../../../__mocks__/prisma'
-
-// Mock des utilitaires de collaborateur
-vi.mock('../../../../../../server/utils/collaborator-management', () => ({
+// Mock des utilitaires - DOIT être avant les imports
+vi.mock('../../../../../server/utils/collaborator-management', () => ({
   addConventionCollaborator: vi.fn(),
   checkAdminMode: vi.fn(),
   findUserByPseudoOrEmail: vi.fn(),
 }))
+
+import { addConventionCollaborator, checkAdminMode, findUserByPseudoOrEmail } from '../../../../../server/utils/collaborator-management'
+import handler from '../../../../../server/api/conventions/[id]/collaborators.post'
+import { prismaMock } from '../../../../__mocks__/prisma'
+
+const mockAddCollaborator = addConventionCollaborator as ReturnType<typeof vi.fn>
+const mockFindUser = findUserByPseudoOrEmail as ReturnType<typeof vi.fn>
+const mockCheckAdminMode = checkAdminMode as ReturnType<typeof vi.fn>
 
 // Mock de @prisma/client pour capturer les nouvelles instances
 vi.mock('@prisma/client', async (importOriginal) => {
@@ -35,11 +35,7 @@ const mockEvent = {
   },
 }
 
-// Import des mocks après la déclaration
 
-const mockAddCollaborator = addConventionCollaborator as ReturnType<typeof vi.fn>
-const mockFindUser = findUserByPseudoOrEmail as ReturnType<typeof vi.fn>
-const mockCheckAdminMode = checkAdminMode as ReturnType<typeof vi.fn>
 
 describe('/api/conventions/[id]/collaborators POST', () => {
   beforeEach(() => {

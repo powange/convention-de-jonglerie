@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { prismaMock } from '../../../../__mocks__/prisma'
-import handler from '../../../../server/api/editions/[id].delete'
+import handler from '../../../../../server/api/editions/[id].delete'
 
 describe('/api/editions/[id] DELETE', () => {
   const mockUser = {
