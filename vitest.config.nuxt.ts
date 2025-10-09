@@ -47,7 +47,10 @@ export default defineVitestConfig({
       'test/nuxt/**/*.test.ts',
     ],
     exclude: [
-      'test/nuxt/components/**/*.test.ts',
+      'test/nuxt/components/admin/**/*.test.ts',
+      'test/nuxt/components/edition/**/*.test.ts',
+      'test/nuxt/components/notifications/**/*.test.ts',
+      'test/nuxt/components/ui/**/*.test.ts',
     ],
   },
   build: {

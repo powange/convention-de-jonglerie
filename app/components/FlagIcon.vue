@@ -1,5 +1,5 @@
 <template>
-  <span :class="flagClass" class="flag-icon" :title="(normalized || props.code || '') as string" />
+  <span :class="flagClass" class="flag-icon" :title="(normalized || props.code || '')" />
 </template>
 
 <script setup lang="ts">
