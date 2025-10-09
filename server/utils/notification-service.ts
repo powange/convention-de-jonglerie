@@ -1,11 +1,13 @@
 import {
   isNotificationAllowed,
+  isEmailNotificationAllowed,
   NotificationTypeMapping,
   type NotificationType as CustomNotificationType,
 } from './notification-preferences'
 import { notificationStreamManager } from './notification-stream-manager'
 import { prisma } from './prisma'
 import { pushNotificationService } from './push-notification-service'
+import { sendEmail, generateNotificationEmailHtml } from './emailService'
 
 import type { NotificationType } from '@prisma/client'
 
@@ -102,6 +104,50 @@ export const NotificationService = {
     } catch (error) {
       console.error('[NotificationService] Erreur envoi Push:', error)
       // Ne pas faire échouer la création de notification si Push échoue
+    }
+
+    // Envoyer aussi par email si les préférences le permettent
+    if (data.notificationType) {
+      try {
+        const preferenceKey = NotificationTypeMapping[data.notificationType]
+        const emailAllowed = await isEmailNotificationAllowed(data.userId, preferenceKey)
+
+        if (emailAllowed) {
+          const user = await prisma.user.findUnique({
+            where: { id: data.userId },
+            select: { email: true, prenom: true, pseudo: true },
+          })
+
+          if (user?.email) {
+            const prenom = user.prenom || user.pseudo || 'Utilisateur'
+            const emailHtml = generateNotificationEmailHtml(
+              prenom,
+              data.title,
+              data.message,
+              data.actionUrl,
+              data.actionText
+            )
+
+            const emailSent = await sendEmail({
+              to: user.email,
+              subject: data.title,
+              html: emailHtml,
+              text: data.message,
+            })
+
+            console.log(
+              `[NotificationService] Email notification ${notification.id} ${emailSent ? 'envoyé' : 'non envoyé'} à ${user.email}`
+            )
+          }
+        } else {
+          console.log(
+            `[NotificationService] Email notification bloquée par les préférences utilisateur ${data.userId}`
+          )
+        }
+      } catch (error) {
+        console.error('[NotificationService] Erreur envoi Email:', error)
+        // Ne pas faire échouer la création de notification si Email échoue
+      }
     }
 
     return notification

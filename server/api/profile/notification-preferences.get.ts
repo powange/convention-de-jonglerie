@@ -7,6 +7,12 @@ const defaultPreferences = {
   conventionNews: true,
   systemNotifications: true,
   carpoolUpdates: true,
+  // Par défaut, les notifications email sont activées
+  emailVolunteerReminders: true,
+  emailApplicationUpdates: true,
+  emailConventionNews: true,
+  emailSystemNotifications: true,
+  emailCarpoolUpdates: true,
 }
 
 export default defineEventHandler(async (event) => {
@@ -23,7 +29,12 @@ export default defineEventHandler(async (event) => {
     })
 
     // Si l'utilisateur n'a pas de préférences, retourner les défauts
-    const preferences = user?.notificationPreferences || defaultPreferences
+    // Merge avec les defaults pour s'assurer que toutes les clés sont présentes
+    const userPrefs = (user?.notificationPreferences as any) || {}
+    const preferences = {
+      ...defaultPreferences,
+      ...userPrefs,
+    }
 
     return {
       success: true,

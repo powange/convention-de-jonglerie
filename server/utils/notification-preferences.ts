@@ -6,6 +6,12 @@ export interface NotificationPreferences {
   conventionNews: boolean
   systemNotifications: boolean
   carpoolUpdates: boolean
+  // Préférences email pour chaque type de notification
+  emailVolunteerReminders: boolean
+  emailApplicationUpdates: boolean
+  emailConventionNews: boolean
+  emailSystemNotifications: boolean
+  emailCarpoolUpdates: boolean
 }
 
 // Préférences par défaut (tout activé)
@@ -15,6 +21,12 @@ const defaultPreferences: NotificationPreferences = {
   conventionNews: true,
   systemNotifications: true,
   carpoolUpdates: true,
+  // Par défaut, les notifications email sont activées
+  emailVolunteerReminders: true,
+  emailApplicationUpdates: true,
+  emailConventionNews: true,
+  emailSystemNotifications: true,
+  emailCarpoolUpdates: true,
 }
 
 /**
@@ -52,6 +64,19 @@ export async function isNotificationAllowed(
 ): Promise<boolean> {
   const preferences = await getUserNotificationPreferences(userId)
   return preferences[notificationType]
+}
+
+/**
+ * Vérifie si l'envoi d'email est autorisé pour un type de notification
+ */
+export async function isEmailNotificationAllowed(
+  userId: number,
+  notificationType: keyof NotificationPreferences
+): Promise<boolean> {
+  const preferences = await getUserNotificationPreferences(userId)
+  // Convertir le type de notification en clé d'email
+  const emailKey = `email${notificationType.charAt(0).toUpperCase()}${notificationType.slice(1)}` as keyof NotificationPreferences
+  return preferences[emailKey] ?? true // Par défaut activé si pas défini
 }
 
 /**

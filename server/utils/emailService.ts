@@ -194,6 +194,60 @@ export function generateAccountDeletionEmailHtml(
   `
 }
 
+export function generateNotificationEmailHtml(
+  prenom: string,
+  title: string,
+  message: string,
+  actionUrl?: string,
+  actionText?: string
+): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${title}</title>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #3b82f6; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #f8fafc; padding: 30px; border-radius: 0 0 8px 8px; }
+            .message { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; white-space: pre-wrap; }
+            .button { display: inline-block; background: #3b82f6; color: white !important; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+            .button:hover { background: #2563eb; }
+            .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🤹 ${title}</h1>
+            </div>
+            <div class="content">
+                <p>Bonjour ${prenom},</p>
+
+                <div class="message">${message}</div>
+
+                ${actionUrl && actionText ? `
+                <div style="text-align: center;">
+                    <a href="${process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000'}${actionUrl}" class="button">${actionText}</a>
+                </div>
+                ` : ''}
+
+                <p>Cordialement,<br>
+                L'équipe des Conventions de Jonglerie</p>
+            </div>
+            <div class="footer">
+                <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+                <p>Vous pouvez gérer vos préférences de notifications dans votre <a href="${process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/profile">profil</a>.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+  `
+}
+
 export function generatePasswordResetEmailHtml(resetLink: string, prenom: string): string {
   return `
     <!DOCTYPE html>
