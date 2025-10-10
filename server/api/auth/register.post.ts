@@ -63,7 +63,7 @@ export default defineEventHandler(async (event) => {
       to: cleanEmail,
       subject: '🤹 Vérifiez votre compte - Conventions de Jonglerie',
       html: emailHtml,
-      text: `Bonjour ${cleanPrenom}, votre code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier : ${config.app.baseURL}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
+      text: `Bonjour ${cleanPrenom}, votre code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier : ${config.public.siteUrl}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
     })
 
     if (!emailSent) {

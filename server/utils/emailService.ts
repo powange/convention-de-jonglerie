@@ -16,7 +16,7 @@ export interface EmailOptions {
 
 export function getSiteUrl(): string {
   const config = useRuntimeConfig()
-  return config.app.baseURL
+  return config.public.siteUrl
 }
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {

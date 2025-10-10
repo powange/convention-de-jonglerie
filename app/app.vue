@@ -325,7 +325,7 @@ const shouldDisallowIndexing = computed(() => {
       process.env.NODE_ENV !== 'production' ||
       process.env.NUXT_ENV === 'staging' ||
       process.env.NUXT_ENV === 'release' ||
-      !process.env.NUXT_APP_BASE_URL?.includes('juggling-convention.com')
+      !process.env.NUXT_APP_SITE_URL?.includes('juggling-convention.com')
     )
   }
   return false
