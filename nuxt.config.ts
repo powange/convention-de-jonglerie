@@ -15,6 +15,7 @@ export default defineNuxtConfig({
   },
 
   app: {
+    baseURL: process.env.NUXT_APP_BASE_URL || 'https://juggling-convention.com',
     head: {
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/logos/logo-jc.svg' },
