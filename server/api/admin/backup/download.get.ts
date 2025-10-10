@@ -23,9 +23,7 @@ export default defineEventHandler(async (event) => {
       const fileContent = await readFile(backupPath)
 
       // Définir le Content-Type selon le type de fichier
-      const contentType = filename.endsWith('.tar.gz')
-        ? 'application/gzip'
-        : 'application/sql'
+      const contentType = filename.endsWith('.tar.gz') ? 'application/gzip' : 'application/sql'
 
       // Définir les en-têtes pour le téléchargement
       setHeader(event, 'Content-Type', contentType)

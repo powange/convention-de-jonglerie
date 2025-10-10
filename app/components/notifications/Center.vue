@@ -161,7 +161,7 @@
                   </div>
                 </div>
 
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 whitespace-pre-line">
                   {{ notification.message }}
                 </p>
 

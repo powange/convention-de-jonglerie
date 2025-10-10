@@ -34,6 +34,34 @@
       <div class="space-y-6">
         <!-- Outils disponibles si on peut gérer les bénévoles -->
         <div v-if="volunteersMode === 'INTERNAL'" class="space-y-6">
+          <!-- Notifier les bénévoles de leurs créneaux -->
+          <UCard>
+            <template #header>
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-bell" class="text-orange-500" />
+                <h2 class="text-lg font-semibold">Notifier les bénévoles de leurs créneaux</h2>
+              </div>
+            </template>
+
+            <div class="space-y-4">
+              <UAlert
+                icon="i-heroicons-information-circle"
+                color="info"
+                variant="soft"
+                description="Envoyez une notification et un email à tous les bénévoles acceptés pour les informer que leurs créneaux sont disponibles."
+              />
+
+              <UButton
+                color="primary"
+                icon="i-heroicons-bell"
+                :loading="sendingNotifications"
+                @click="showNotifyModal = true"
+              >
+                Notifier tous les bénévoles acceptés
+              </UButton>
+            </div>
+          </UCard>
+
           <!-- Interface génération informations restauration -->
           <UCard>
             <template #header>
@@ -97,6 +125,43 @@
           </div>
         </UCard>
       </div>
+
+      <!-- Modal de confirmation pour l'envoi des notifications -->
+      <UModal v-model:open="showNotifyModal" title="Confirmer l'envoi des notifications">
+        <template #body>
+          <div class="space-y-4">
+            <UAlert
+              icon="i-heroicons-exclamation-triangle"
+              color="warning"
+              variant="soft"
+              title="Attention"
+              description="Vous allez envoyer une notification et un email à tous les bénévoles acceptés pour les informer que leurs créneaux sont disponibles."
+            />
+            <p class="text-gray-600 dark:text-gray-400">Cette action enverra :</p>
+            <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1">
+              <li>Une notification dans l'application</li>
+              <li>Un email récapitulatif avec tous les créneaux assignés</li>
+              <li>Un lien vers la page "Mes candidatures"</li>
+            </ul>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Les bénévoles recevront uniquement les créneaux qui leur ont été assignés.
+            </p>
+          </div>
+        </template>
+        <template #footer>
+          <div class="flex justify-end gap-3">
+            <UButton variant="outline" @click="showNotifyModal = false"> Annuler </UButton>
+            <UButton
+              color="primary"
+              icon="i-heroicons-bell"
+              :loading="sendingNotifications"
+              @click="sendScheduleNotifications"
+            >
+              Confirmer l'envoi
+            </UButton>
+          </div>
+        </template>
+      </UModal>
     </div>
   </div>
 </template>
@@ -131,6 +196,37 @@ const volunteersMode = computed(() => volunteersInfo.value?.mode || 'INTERNAL')
 // Variables pour la génération des PDFs de restauration
 const selectedCateringDate = ref<string | undefined>(undefined)
 const generatingCateringPdf = ref(false)
+
+// Variables pour l'envoi des notifications de créneaux
+const showNotifyModal = ref(false)
+const sendingNotifications = ref(false)
+
+// Fonction pour envoyer les notifications de créneaux aux bénévoles acceptés
+const sendScheduleNotifications = async () => {
+  sendingNotifications.value = true
+  try {
+    const result = await $fetch(`/api/editions/${editionId}/volunteers/notify-schedules`, {
+      method: 'POST',
+    })
+
+    toast.add({
+      title: t('common.success'),
+      description: result.message || 'Notifications envoyées avec succès',
+      color: 'success',
+    })
+
+    showNotifyModal.value = false
+  } catch (error: any) {
+    toast.add({
+      title: t('common.error'),
+      description:
+        error?.data?.message || error?.message || "Erreur lors de l'envoi des notifications",
+      color: 'error',
+    })
+  } finally {
+    sendingNotifications.value = false
+  }
+}
 
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {

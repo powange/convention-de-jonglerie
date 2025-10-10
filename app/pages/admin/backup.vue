@@ -116,12 +116,7 @@
             <div>
               <div class="flex items-center gap-2 mb-1">
                 <h4 class="font-medium">{{ backup.filename }}</h4>
-                <UBadge
-                  v-if="backup.type === 'archive'"
-                  color="success"
-                  variant="subtle"
-                  size="sm"
-                >
+                <UBadge v-if="backup.type === 'archive'" color="success" variant="subtle" size="sm">
                   <UIcon name="i-heroicons-photo" class="h-3 w-3" />
                   Avec images
                 </UBadge>

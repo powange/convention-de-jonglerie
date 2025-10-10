@@ -86,6 +86,7 @@ export async function isEmailNotificationAllowed(
 export const NotificationTypeMapping = {
   // Rappels de créneaux bénévoles
   volunteer_reminder: 'volunteerReminders' as const,
+  volunteer_schedule: 'volunteerReminders' as const,
 
   // Candidatures bénévoles
   volunteer_application_submitted: 'applicationUpdates' as const,

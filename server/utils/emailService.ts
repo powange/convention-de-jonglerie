@@ -6,6 +6,7 @@ import AccountDeletionEmail from '../emails/AccountDeletionEmail.vue'
 import NotificationEmail from '../emails/NotificationEmail.vue'
 import PasswordResetEmail from '../emails/PasswordResetEmail.vue'
 import VerificationEmail from '../emails/VerificationEmail.vue'
+import VolunteerScheduleEmail from '../emails/VolunteerScheduleEmail.vue'
 
 export interface EmailOptions {
   to: string
@@ -178,6 +179,41 @@ export async function generatePasswordResetEmailHtml(
     {
       prenom,
       resetLink,
+      baseUrl,
+    },
+    {
+      pretty: true,
+    }
+  )
+  return html
+}
+
+/**
+ * Génère l'email pour les créneaux de bénévolat
+ */
+export async function generateVolunteerScheduleEmailHtml(
+  prenom: string,
+  conventionName: string,
+  editionName: string,
+  timeSlots: Array<{
+    date: Date
+    timeOfDay: 'MORNING' | 'AFTERNOON' | 'EVENING'
+    teamName: string
+    startTime?: string
+    endTime?: string
+  }>,
+  actionUrl: string
+): Promise<string> {
+  const baseUrl = getSiteUrl()
+
+  const html = await render(
+    VolunteerScheduleEmail,
+    {
+      prenom,
+      conventionName,
+      editionName,
+      timeSlots,
+      actionUrl,
       baseUrl,
     },
     {

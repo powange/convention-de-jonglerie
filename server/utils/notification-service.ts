@@ -391,15 +391,15 @@ export const NotificationHelpers = {
     // Ajouter la liste des équipes si présente
     if (assignedTeams && assignedTeams.length > 0) {
       if (assignedTeams.length === 1) {
-        message += `<br><br>Vous êtes assigné(e) à l'équipe : ${assignedTeams[0]}`
+        message += `\n\nVous êtes assigné(e) à l'équipe : ${assignedTeams[0]}`
       } else {
-        message += `<br><br>Vous êtes assigné(e) aux équipes :<br>• ${assignedTeams.join('<br>• ')}`
+        message += `\n\nVous êtes assigné(e) aux équipes :\n• ${assignedTeams.join('\n• ')}`
       }
     }
 
     // Ajouter le message de l'organisateur si présent
     if (organizerNote?.trim()) {
-      message += `<br><br>Message de l'organisateur :<br>"${organizerNote.trim()}"`
+      message += `\n\nMessage de l'organisateur :\n"${organizerNote.trim()}"`
     }
 
     return await NotificationService.create({

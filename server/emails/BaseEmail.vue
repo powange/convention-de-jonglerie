@@ -7,19 +7,9 @@ interface Props {
   headerColor?: 'primary' | 'error'
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  headerColor: 'primary',
-})
+defineProps<Props>()
 
-const headerGradient =
-  props.headerColor === 'error'
-    ? 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)'
-    : 'linear-gradient(135deg, #7c3aed 0%, #6366f1 100%)'
-
-const headerShadow =
-  props.headerColor === 'error'
-    ? '0 4px 6px rgba(220, 38, 38, 0.2)'
-    : '0 4px 6px rgba(124, 58, 237, 0.2)'
+const headerBackground = '#0f172a'
 </script>
 
 <template>
@@ -37,12 +27,11 @@ const headerShadow =
         <!-- Header -->
         <Section
           :style="{
-            background: headerGradient,
+            background: headerBackground,
             color: 'white',
             padding: '20px',
             textAlign: 'center',
             borderRadius: '8px 8px 0 0',
-            boxShadow: headerShadow,
           }"
         >
           <Img

@@ -1,11 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock des modules spécifiques - DOIT être avant les imports
-vi.mock('../../../../../server/utils/emailService', () => ({
-  sendEmail: vi.fn(),
-  generateVerificationCode: vi.fn(),
-  generateVerificationEmailHtml: vi.fn(),
-}))
+vi.mock('../../../../../server/utils/emailService', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    sendEmail: vi.fn(),
+    generateVerificationCode: vi.fn(),
+    generateVerificationEmailHtml: vi.fn(() => Promise.resolve('<html>Code: 123456</html>')),
+  }
+})
 
 // Mock bcrypt pour accélérer les tests (éviter les vraies opérations cryptographiques)
 vi.mock('bcryptjs', () => ({
@@ -36,7 +40,7 @@ describe('API Register', () => {
     // Réinitialiser les mocks
     mockSendEmail.mockResolvedValue(true)
     mockGenerateVerificationCode.mockReturnValue('123456')
-    mockGenerateVerificationEmailHtml.mockReturnValue('<html>Code: 123456</html>')
+    mockGenerateVerificationEmailHtml.mockResolvedValue('<html>Code: 123456</html>')
   })
 
   it('devrait créer un nouvel utilisateur avec succès', async () => {
@@ -215,7 +219,7 @@ describe('API Register', () => {
     }
 
     prismaMock.user.create.mockResolvedValue(mockUser)
-    sendEmail.mockResolvedValue(false)
+    mockSendEmail.mockResolvedValue(false)
 
     const requestBody = {
       email: 'test@example.com',

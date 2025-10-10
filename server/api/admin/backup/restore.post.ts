@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
         if (!sqlFile) {
           throw createError({
             statusCode: 400,
-            statusMessage: 'Aucun fichier SQL trouvé dans l\'archive',
+            statusMessage: "Aucun fichier SQL trouvé dans l'archive",
           })
         }
 
@@ -101,7 +101,7 @@ export default defineEventHandler(async (event) => {
         if (!sqlFile) {
           throw createError({
             statusCode: 400,
-            statusMessage: 'Aucun fichier SQL trouvé dans l\'archive',
+            statusMessage: "Aucun fichier SQL trouvé dans l'archive",
           })
         }
 
@@ -203,7 +203,7 @@ export default defineEventHandler(async (event) => {
         try {
           await rm(tempExtractDir, { recursive: true, force: true })
         } catch (cleanupError) {
-          console.warn('Impossible de supprimer le dossier temporaire d\'extraction:', cleanupError)
+          console.warn("Impossible de supprimer le dossier temporaire d'extraction:", cleanupError)
         }
       }
     }

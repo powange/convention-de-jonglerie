@@ -83,7 +83,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Créer l'archive tar.gz avec le SQL et les uploads (si présents)
-    console.log('Création de l\'archive tar.gz...')
+    console.log("Création de l'archive tar.gz...")
 
     let tarCmd: string
     if (hasUploads) {

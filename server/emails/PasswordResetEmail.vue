@@ -28,14 +28,13 @@ defineProps<Props>()
         :href="resetLink"
         :style="{
           display: 'inline-block',
-          background: 'linear-gradient(135deg, #7c3aed 0%, #6366f1 100%)',
+          background: 'oklch(79.2% .209 151.711)',
           color: 'white',
           padding: '12px 30px',
           textDecoration: 'none',
           borderRadius: '6px',
           fontWeight: 'bold',
           margin: '20px 0',
-          boxShadow: '0 2px 4px rgba(124, 58, 237, 0.3)',
         }"
       >
         Réinitialiser mon mot de passe
