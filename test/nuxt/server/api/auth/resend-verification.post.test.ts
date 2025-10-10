@@ -360,8 +360,8 @@ describe('/api/auth/resend-verification POST', () => {
   })
 
   it("devrait utiliser l'URL de base de l'environnement si disponible", async () => {
-    const originalEnv = process.env.NUXT_APP_PUBLIC_SITE_URL
-    process.env.NUXT_APP_PUBLIC_SITE_URL = 'https://example.com'
+    const originalEnv = process.env.NUXT_PUBLIC_SITE_URL
+    process.env.NUXT_PUBLIC_SITE_URL = 'https://example.com'
 
     const requestBody = {
       email: 'user@example.com',
@@ -378,9 +378,9 @@ describe('/api/auth/resend-verification POST', () => {
 
     // Restaurer l'environnement
     if (originalEnv) {
-      process.env.NUXT_APP_PUBLIC_SITE_URL = originalEnv
+      process.env.NUXT_PUBLIC_SITE_URL = originalEnv
     } else {
-      delete process.env.NUXT_APP_PUBLIC_SITE_URL
+      delete process.env.NUXT_PUBLIC_SITE_URL
     }
   })
 })

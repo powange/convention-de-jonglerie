@@ -7,7 +7,7 @@ export default defineNuxtConfig({
 
   // Configuration SEO du site
   site: {
-    url: process.env.NUXT_APP_PUBLIC_SITE_URL || 'https://juggling-convention.com',
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://juggling-convention.com',
     name: 'Juggling Convention',
     description:
       'Find and manage your favorite juggling conventions. Collaborative platform for jugglers and event organizers.',
@@ -137,7 +137,7 @@ export default defineNuxtConfig({
       // Supporte aussi la convention Nuxt NUXT_PUBLIC_*
       recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '', // reCAPTCHA site key for client-side widget
       vapidPublicKey: process.env.NUXT_PUBLIC_VAPID_PUBLIC_KEY || '', // VAPID public key for push notifications
-      siteUrl: process.env.NUXT_APP_PUBLIC_SITE_URL || 'http://localhost:3000', // Base URL of the site
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || '', // Base URL of the site
     },
   },
   vite: {

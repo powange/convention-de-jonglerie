@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
     process.env.NODE_ENV !== 'production' ||
     process.env.NUXT_ENV === 'staging' ||
     process.env.NUXT_ENV === 'release' ||
-    !process.env.NUXT_APP_PUBLIC_SITE_URL?.includes('juggling-convention.com')
+    !process.env.NUXT_PUBLIC_SITE_URL?.includes('juggling-convention.com')
 
   if (shouldDisallowIndexing) {
     // Ajouter les headers pour empêcher l'indexation
