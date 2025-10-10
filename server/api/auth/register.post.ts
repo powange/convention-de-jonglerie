@@ -55,13 +55,15 @@ export default defineEventHandler(async (event) => {
       },
     })
 
+    const config = useRuntimeConfig()
+
     // Envoyer l'email de vérification
     const emailHtml = await generateVerificationEmailHtml(verificationCode, cleanPrenom, cleanEmail)
     const emailSent = await sendEmail({
       to: cleanEmail,
       subject: '🤹 Vérifiez votre compte - Conventions de Jonglerie',
       html: emailHtml,
-      text: `Bonjour ${cleanPrenom}, votre code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier : ${process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
+      text: `Bonjour ${cleanPrenom}, votre code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier : ${config.app.baseURL}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
     })
 
     if (!emailSent) {

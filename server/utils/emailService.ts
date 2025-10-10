@@ -14,6 +14,11 @@ export interface EmailOptions {
   text?: string
 }
 
+export function getSiteUrl(): string {
+  const config = useRuntimeConfig()
+  return config.app.baseURL
+}
+
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   const config = useRuntimeConfig()
   // Priorité aux variables d'environnement runtime (conteneur) pour éviter les valeurs figées au build
@@ -89,8 +94,7 @@ export async function generateVerificationEmailHtml(
   prenom: string,
   email: string
 ): Promise<string> {
-  const config = useRuntimeConfig()
-  const baseUrl = (config.public.baseUrl as string) || 'http://localhost:3000'
+  const baseUrl = getSiteUrl()
 
   const html = await render(
     VerificationEmail,
@@ -114,8 +118,7 @@ export async function generateAccountDeletionEmailHtml(
   prenom: string,
   reason: { title: string; message: string }
 ): Promise<string> {
-  const config = useRuntimeConfig()
-  const baseUrl = (config.public.baseUrl as string) || 'http://localhost:3000'
+  const baseUrl = getSiteUrl()
 
   const html = await render(
     AccountDeletionEmail,
@@ -142,8 +145,7 @@ export async function generateNotificationEmailHtml(
   actionUrl?: string,
   actionText?: string
 ): Promise<string> {
-  const config = useRuntimeConfig()
-  const baseUrl = (config.public.baseUrl as string) || 'http://localhost:3000'
+  const baseUrl = getSiteUrl()
 
   const html = await render(
     NotificationEmail,
@@ -169,8 +171,7 @@ export async function generatePasswordResetEmailHtml(
   resetLink: string,
   prenom: string
 ): Promise<string> {
-  const config = useRuntimeConfig()
-  const baseUrl = (config.public.baseUrl as string) || 'http://localhost:3000'
+  const baseUrl = getSiteUrl()
 
   const html = await render(
     PasswordResetEmail,
