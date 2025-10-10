@@ -38,6 +38,7 @@ services:
       NUXT_HOST: '0.0.0.0'
       NUXT_PORT: '3000'
       NODE_ENV: 'development'
+      NUXT_APP_SITE_URL: '${NUXT_APP_SITE_URL:-http://localhost:3000}'
       # Secret de session requis par nuxt-auth-utils (32+ caractères)
       # Remplacez via un fichier .env local: NUXT_SESSION_PASSWORD=...
       NUXT_SESSION_PASSWORD: '${NUXT_SESSION_PASSWORD:-dev_session_password_change_me_at_least_32_chars}'

@@ -36,6 +36,7 @@ services:
       NUXT_PORT: '3000'
       NODE_ENV: 'production'
       NUXT_ENV: 'release'
+      NUXT_APP_SITE_URL: '${NUXT_APP_SITE_URL}'
       NUXT_SESSION_PASSWORD: '${NUXT_SESSION_PASSWORD}'
       SEND_EMAILS: '${SEND_EMAILS}'
       SMTP_USER: '${SMTP_USER}'
