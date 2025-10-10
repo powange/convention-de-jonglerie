@@ -6,13 +6,14 @@ import BaseEmail from './BaseEmail.vue'
 interface Props {
   prenom: string
   resetLink: string
+  baseUrl: string
 }
 
 defineProps<Props>()
 </script>
 
 <template>
-  <BaseEmail title="🔐 Réinitialisation de mot de passe">
+  <BaseEmail title="🔐 Réinitialisation de mot de passe" :base-url="baseUrl">
     <Text>Bonjour {{ prenom }},</Text>
 
     <Text

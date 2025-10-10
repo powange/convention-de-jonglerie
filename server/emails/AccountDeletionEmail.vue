@@ -7,13 +7,14 @@ interface Props {
   prenom: string
   reasonTitle: string
   reasonMessage: string
+  baseUrl: string
 }
 
 defineProps<Props>()
 </script>
 
 <template>
-  <BaseEmail title="⚠️ Suppression de votre compte" header-color="error">
+  <BaseEmail title="⚠️ Suppression de votre compte" header-color="error" :base-url="baseUrl">
     <Text>Bonjour {{ prenom }},</Text>
 
     <Text

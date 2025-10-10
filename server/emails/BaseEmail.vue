@@ -3,14 +3,13 @@ import { Html, Head, Container, Section, Img, Heading, Text } from '@vue-email/c
 
 interface Props {
   title: string
+  baseUrl: string
   headerColor?: 'primary' | 'error'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   headerColor: 'primary',
 })
-
-const baseUrl = process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
 const headerGradient =
   props.headerColor === 'error'

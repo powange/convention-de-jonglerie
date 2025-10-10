@@ -7,16 +7,16 @@ interface Props {
   code: string
   prenom: string
   email: string
+  baseUrl: string
 }
 
 const props = defineProps<Props>()
 
-const baseUrl = process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-const verifyUrl = `${baseUrl}/verify-email?email=${encodeURIComponent(props.email)}`
+const verifyUrl = `${props.baseUrl}/verify-email?email=${encodeURIComponent(props.email)}`
 </script>
 
 <template>
-  <BaseEmail title="Vérification de votre compte">
+  <BaseEmail title="Vérification de votre compte" :base-url="baseUrl">
     <Text>Bonjour {{ prenom }},</Text>
 
     <Text>Bienvenue dans la communauté des conventions de jonglerie ! 🎪</Text>

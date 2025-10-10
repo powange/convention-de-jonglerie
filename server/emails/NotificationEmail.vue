@@ -7,17 +7,16 @@ interface Props {
   title: string
   prenom: string
   message: string
+  baseUrl: string
   actionUrl?: string
   actionText?: string
 }
 
 defineProps<Props>()
-
-const baseUrl = process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 </script>
 
 <template>
-  <BaseEmail :title="title">
+  <BaseEmail :title="title" :base-url="baseUrl">
     <Text>Bonjour {{ prenom }},</Text>
 
     <Section

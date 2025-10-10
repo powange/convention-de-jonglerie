@@ -89,12 +89,16 @@ export async function generateVerificationEmailHtml(
   prenom: string,
   email: string
 ): Promise<string> {
+  const config = useRuntimeConfig()
+  const baseUrl = (config.public.baseUrl as string) || 'http://localhost:3000'
+
   const html = await render(
     VerificationEmail,
     {
       code,
       prenom,
       email,
+      baseUrl,
     },
     {
       pretty: true,
@@ -110,12 +114,16 @@ export async function generateAccountDeletionEmailHtml(
   prenom: string,
   reason: { title: string; message: string }
 ): Promise<string> {
+  const config = useRuntimeConfig()
+  const baseUrl = (config.public.baseUrl as string) || 'http://localhost:3000'
+
   const html = await render(
     AccountDeletionEmail,
     {
       prenom,
       reasonTitle: reason.title,
       reasonMessage: reason.message,
+      baseUrl,
     },
     {
       pretty: true,
@@ -134,12 +142,16 @@ export async function generateNotificationEmailHtml(
   actionUrl?: string,
   actionText?: string
 ): Promise<string> {
+  const config = useRuntimeConfig()
+  const baseUrl = (config.public.baseUrl as string) || 'http://localhost:3000'
+
   const html = await render(
     NotificationEmail,
     {
       title,
       prenom,
       message,
+      baseUrl,
       actionUrl,
       actionText,
     },
@@ -157,11 +169,15 @@ export async function generatePasswordResetEmailHtml(
   resetLink: string,
   prenom: string
 ): Promise<string> {
+  const config = useRuntimeConfig()
+  const baseUrl = (config.public.baseUrl as string) || 'http://localhost:3000'
+
   const html = await render(
     PasswordResetEmail,
     {
       prenom,
       resetLink,
+      baseUrl,
     },
     {
       pretty: true,
