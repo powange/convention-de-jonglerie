@@ -40,7 +40,7 @@ Notes Auth (nuxt-auth-utils):
 
 4. E2E (Nuxt lancé + $fetch boîte noire)
 
-- Fichier config: `vitest.config.e2e.ts`
+- Projet: `e2e` dans `vitest.config.ts`
 - Setup: `test/e2e/setup.ts`
 - Scripts:
   - `npm run test:e2e` / `npm run test:e2e:run`
