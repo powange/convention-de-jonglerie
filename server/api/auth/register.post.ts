@@ -33,6 +33,13 @@ export default defineEventHandler(async (event) => {
     const verificationCode = generateVerificationCode()
     const verificationExpiry = createFutureDate(TOKEN_DURATIONS.EMAIL_VERIFICATION)
 
+    // Détecter la langue préférée de l'utilisateur depuis l'en-tête Accept-Language
+    const acceptLanguage = getHeader(event, 'accept-language') || 'fr'
+    const preferredLanguage = acceptLanguage.split(',')[0].split('-')[0].toLowerCase()
+    // Langues supportées
+    const supportedLanguages = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pl', 'pt', 'ru', 'uk', 'da']
+    const userLanguage = supportedLanguages.includes(preferredLanguage) ? preferredLanguage : 'fr'
+
     await prisma.user.create({
       data: {
         email: cleanEmail,
@@ -44,11 +51,12 @@ export default defineEventHandler(async (event) => {
         isEmailVerified: false,
         emailVerificationCode: verificationCode,
         verificationCodeExpiry: verificationExpiry,
+        preferredLanguage: userLanguage,
       },
     })
 
     // Envoyer l'email de vérification
-    const emailHtml = generateVerificationEmailHtml(verificationCode, cleanPrenom, cleanEmail)
+    const emailHtml = await generateVerificationEmailHtml(verificationCode, cleanPrenom, cleanEmail)
     const emailSent = await sendEmail({
       to: cleanEmail,
       subject: '🤹 Vérifiez votre compte - Conventions de Jonglerie',

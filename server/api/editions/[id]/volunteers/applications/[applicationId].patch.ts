@@ -285,5 +285,30 @@ export default defineEventHandler(async (event) => {
     },
   })
 
+  // Envoyer une notification selon le changement de statut
+  try {
+    const editionName = `${application.edition.convention.name}${application.edition.name ? ' - ' + application.edition.name : ''}`
+    const { NotificationHelpers } = await import('../../../../../utils/notification-service')
+
+    if (target === 'ACCEPTED') {
+      // Récupérer les noms des équipes assignées
+      const assignedTeamNames = updated.teamAssignments.map((ta) => ta.team.name)
+      await NotificationHelpers.volunteerAccepted(
+        application.user.id,
+        editionName,
+        editionId,
+        assignedTeamNames,
+        updated.acceptanceNote
+      )
+    } else if (target === 'REJECTED') {
+      await NotificationHelpers.volunteerRejected(application.user.id, editionName, editionId)
+    } else if (target === 'PENDING') {
+      await NotificationHelpers.volunteerBackToPending(application.user.id, editionName, editionId)
+    }
+  } catch (notificationError) {
+    // Ne pas faire échouer la mise à jour si la notification échoue
+    console.error("Erreur lors de l'envoi de la notification:", notificationError)
+  }
+
   return { success: true, application: updated }
 })

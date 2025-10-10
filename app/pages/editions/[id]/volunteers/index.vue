@@ -510,9 +510,7 @@ const applyAsVolunteer = async (formData?: any) => {
     const applicationData = mapFormDataToApplicationData(formData)
 
     // Appeler l'API via l'utilitaire
-    const res: any = await submitVolunteerApplication(editionId, applicationData)
-    if (res?.application && volunteersInfo.value)
-      volunteersInfo.value.myApplication = res.application
+    await submitVolunteerApplication(editionId, applicationData)
 
     // Mettre à jour les infos utilisateur si nécessaire
     if (formData?.phone?.trim()) (authStore.user as any).phone = formData.phone.trim()
@@ -538,7 +536,6 @@ const withdrawApplication = async () => {
   volunteersWithdrawing.value = true
   try {
     await withdrawVolunteerApplication(editionId)
-    if (volunteersInfo.value) volunteersInfo.value.myApplication = null
 
     // Rafraîchir les données pour mettre à jour l'affichage de la page
     await fetchVolunteersInfo()

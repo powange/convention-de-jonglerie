@@ -50,20 +50,21 @@ export const useNotificationStream = () => {
     connectionStats.value.error = null
 
     try {
+      console.log('[SSE Client] Tentative de connexion à /api/notifications/stream')
       eventSource = new EventSource('/api/notifications/stream')
+      console.log('[SSE Client] EventSource créé, readyState:', eventSource.readyState)
 
       // Événement de connexion établie
       eventSource.addEventListener('connected', (event) => {
         const data = JSON.parse(event.data)
 
+        console.log('[SSE Client] ✅ Connexion SSE établie:', data.connectionId)
         connectionStats.value.isConnected = true
         connectionStats.value.isConnecting = false
         connectionStats.value.connectionId = data.connectionId
         connectionStats.value.reconnectAttempts = 0
         connectionStats.value.error = null
         reconnectDelay = 1000 // Reset delay
-
-        // Pas de toast ni de log pour éviter le spam
       })
 
       // Réception de nouvelles notifications
@@ -103,7 +104,11 @@ export const useNotificationStream = () => {
       })
 
       // Gestion des erreurs
-      eventSource.onerror = () => {
+      eventSource.onerror = (error) => {
+        console.error('[SSE Client] Erreur de connexion:', {
+          readyState: eventSource?.readyState,
+          error,
+        })
         connectionStats.value.isConnected = false
         connectionStats.value.isConnecting = false
         connectionStats.value.error = 'Connection error'

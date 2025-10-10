@@ -506,13 +506,8 @@
                 {
                   label: row.original.isRead ? 'Marquer non lue' : 'Marquer comme lue',
                   icon: row.original.isRead ? 'i-heroicons-eye-slash' : 'i-heroicons-eye',
-                  disabled: true,
-                  onSelect: () => {
-                    toast.add({
-                      title: 'Fonctionnalité à venir',
-                      description: 'Modification du statut de lecture en cours de développement',
-                      color: 'info',
-                    })
+                  onSelect: async () => {
+                    await toggleNotificationReadStatus(row.original)
                   },
                 },
               ],
@@ -1431,6 +1426,38 @@ const resetTestForm = () => {
   // Reset des variables de recherche
   searchedUsers.value = []
   searchQuery.value = ''
+}
+
+// Fonction pour basculer le statut de lecture d'une notification
+const toggleNotificationReadStatus = async (notification: RecentNotification) => {
+  try {
+    const endpoint = notification.isRead
+      ? `/api/notifications/${notification.id}/unread`
+      : `/api/notifications/${notification.id}/read`
+
+    await $fetch(endpoint, {
+      method: 'PATCH',
+    })
+
+    // Mettre à jour localement
+    notification.isRead = !notification.isRead
+    notification.readAt = notification.isRead ? new Date().toISOString() : null
+
+    toast.add({
+      color: 'success',
+      title: notification.isRead ? 'Marquée comme lue' : 'Marquée comme non lue',
+    })
+
+    // Rafraîchir les statistiques
+    await loadStats()
+  } catch (error) {
+    console.error('Erreur lors de la modification du statut:', error)
+    toast.add({
+      color: 'error',
+      title: 'Erreur',
+      description: 'Impossible de modifier le statut de lecture',
+    })
+  }
 }
 
 const loadStats = async () => {

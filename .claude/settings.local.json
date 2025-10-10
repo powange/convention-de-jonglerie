@@ -103,7 +103,9 @@
       "Bash(NODE_ENV=test npx vitest run --config vitest.config.nuxt.ts test/nuxt/components/*)",
       "Bash(NODE_ENV=test npx vitest run --config vitest.config.nuxt.ts test/nuxt/components/ui)",
       "Bash(NODE_ENV=test npx vitest run --config vitest.config.nuxt.ts test/nuxt/components/notifications)",
-      "Bash(NODE_ENV=test npx vitest run --config vitest.config.nuxt.ts test/nuxt/components/admin test/nuxt/components/edition)"
+      "Bash(NODE_ENV=test npx vitest run --config vitest.config.nuxt.ts test/nuxt/components/admin test/nuxt/components/edition)",
+      "mcp__nuxt-ui__get_component",
+      "WebFetch(domain:vuemail.net)"
     ],
     "deny": [],
     "ask": [],

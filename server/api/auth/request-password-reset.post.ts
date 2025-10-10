@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
     const resetLink = `${getRequestURL(event).origin}/auth/reset-password?token=${token}`
 
     // Envoyer l'email
-    const emailHtml = generatePasswordResetEmailHtml(resetLink, user.prenom)
+    const emailHtml = await generatePasswordResetEmailHtml(resetLink, user.prenom)
     await sendEmail({
       to: user.email,
       subject: 'Réinitialisation de votre mot de passe - Conventions de Jonglerie',

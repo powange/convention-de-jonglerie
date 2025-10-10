@@ -217,19 +217,13 @@ export default defineEventHandler(async (event) => {
 
     // Envoyer une notification de confirmation de candidature
     try {
-      await prisma.notification.create({
-        data: {
-          userId: event.context.user.id,
-          type: 'SUCCESS',
-          title: 'Candidature de bénévolat envoyée ! 🎉',
-          message: `Votre candidature pour "${application.edition.convention.name}${application.edition.name ? ' - ' + application.edition.name : ''}" a été envoyée avec succès. Les organisateurs vont l'examiner.`,
-          category: 'volunteer',
-          entityType: 'Edition',
-          entityId: editionId.toString(),
-          actionUrl: '/my-volunteer-applications',
-          actionText: 'Voir mes candidatures',
-        },
-      })
+      const editionName = `${application.edition.convention.name}${application.edition.name ? ' - ' + application.edition.name : ''}`
+      const { NotificationHelpers } = await import('../../../../../utils/notification-service')
+      await NotificationHelpers.volunteerApplicationSubmitted(
+        event.context.user.id,
+        editionName,
+        editionId
+      )
     } catch (notificationError) {
       // Ne pas faire échouer l'application si la notification échoue
       console.error("Erreur lors de l'envoi de la notification:", notificationError)

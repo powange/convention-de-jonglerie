@@ -1,3 +1,4 @@
+import vue from '@vitejs/plugin-vue'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -67,6 +68,9 @@ export default defineNuxtConfig({
     },
     experimental: {
       tasks: true,
+    },
+    rollupConfig: {
+      plugins: [vue()],
     },
   },
   i18n: {

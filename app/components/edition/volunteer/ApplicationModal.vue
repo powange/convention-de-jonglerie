@@ -651,11 +651,11 @@ const showModal = computed({
   set: (value) => emit('update:modelValue', value),
 })
 
-// Form data
+// Form data - Initialize with user data if available
 const formData = ref({
-  phone: '',
-  firstName: '',
-  lastName: '',
+  phone: props.user?.phone || '',
+  firstName: props.user?.prenom || '',
+  lastName: props.user?.nom || '',
   setupAvailability: false,
   teardownAvailability: false,
   eventAvailability: true,
@@ -1091,9 +1091,10 @@ const populateForm = () => {
     // Mode édition : pré-remplir avec les données existantes
     const app = props.existingApplication
     Object.assign(formData.value, {
-      phone: app.userSnapshotPhone || props.user?.phone || '',
-      firstName: props.user?.prenom || '',
-      lastName: props.user?.nom || '',
+      // Utiliser les données actuelles de l'utilisateur en priorité, puis les données enregistrées
+      phone: props.user?.phone || app.userSnapshotPhone || '',
+      firstName: props.user?.prenom || app.userSnapshotFirstName || '',
+      lastName: props.user?.nom || app.userSnapshotLastName || '',
       setupAvailability: app.setupAvailability ?? false,
       teardownAvailability: app.teardownAvailability ?? false,
       eventAvailability: app.eventAvailability ?? true,
@@ -1121,7 +1122,7 @@ const populateForm = () => {
       modificationNote: '', // Toujours réinitialiser la note de modification en mode édition
     })
   } else {
-    // Mode création : réinitialiser avec les infos utilisateur
+    // Mode création : utiliser les infos utilisateur actuelles
     Object.assign(formData.value, {
       phone: props.user?.phone || '',
       firstName: props.user?.prenom || '',

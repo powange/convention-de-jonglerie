@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     throw error
   }
 
-  const { email, pseudo, nom, prenom, telephone, profilePicture } = validatedData
+  const { email, pseudo, nom, prenom, telephone, profilePicture, preferredLanguage } = validatedData
 
   try {
     // Vérifier si l'email est déjà utilisé par un autre utilisateur
@@ -145,6 +145,8 @@ export default defineEventHandler(async (event) => {
         phone: telephone && telephone.trim() !== '' ? telephone.trim() : null,
         // Ne mettre à jour la photo que si explicitement fournie dans validatedData
         ...(profilePicture !== undefined && { profilePicture: finalProfileFilename }),
+        // Mettre à jour la langue préférée si fournie
+        ...(preferredLanguage !== undefined && { preferredLanguage }),
       },
       select: {
         id: true,
@@ -154,6 +156,7 @@ export default defineEventHandler(async (event) => {
         prenom: true,
         phone: true,
         profilePicture: true,
+        preferredLanguage: true,
         createdAt: true,
         updatedAt: true,
       },

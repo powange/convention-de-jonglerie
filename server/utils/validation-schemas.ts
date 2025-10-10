@@ -70,6 +70,13 @@ export const updateProfileSchema = z.object({
   email: emailSchema,
   telephone: phoneSchema.optional(),
   profilePicture: z.string().nullable().optional(),
+  preferredLanguage: z
+    .string()
+    .refine(
+      (val) => ['fr', 'en', 'de', 'es', 'it', 'nl', 'pl', 'pt', 'ru', 'uk', 'da'].includes(val),
+      'Langue non supportée'
+    )
+    .optional(),
 })
 
 // Schémas de convention

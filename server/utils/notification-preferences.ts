@@ -75,7 +75,8 @@ export async function isEmailNotificationAllowed(
 ): Promise<boolean> {
   const preferences = await getUserNotificationPreferences(userId)
   // Convertir le type de notification en clé d'email
-  const emailKey = `email${notificationType.charAt(0).toUpperCase()}${notificationType.slice(1)}` as keyof NotificationPreferences
+  const emailKey =
+    `email${notificationType.charAt(0).toUpperCase()}${notificationType.slice(1)}` as keyof NotificationPreferences
   return preferences[emailKey] ?? true // Par défaut activé si pas défini
 }
 
@@ -87,6 +88,7 @@ export const NotificationTypeMapping = {
   volunteer_reminder: 'volunteerReminders' as const,
 
   // Candidatures bénévoles
+  volunteer_application_submitted: 'applicationUpdates' as const,
   volunteer_application_accepted: 'applicationUpdates' as const,
   volunteer_application_rejected: 'applicationUpdates' as const,
   volunteer_application_modified: 'applicationUpdates' as const,

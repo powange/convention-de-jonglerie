@@ -99,7 +99,10 @@ export default defineEventHandler(async (event) => {
 
     // Envoyer un email de notification à l'utilisateur avant suppression
     try {
-      const emailHtml = generateAccountDeletionEmailHtml(userToDelete.prenom || '', deletionReason)
+      const emailHtml = await generateAccountDeletionEmailHtml(
+        userToDelete.prenom || '',
+        deletionReason
+      )
       const emailSent = await sendEmail({
         to: userToDelete.email,
         subject: `⚠️  Suppression de votre compte - ${deletionReason.title}`,

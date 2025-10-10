@@ -375,7 +375,7 @@
     v-model="editModalOpen"
     :volunteers-info="volunteersInfo"
     :edition="{ id: editionId }"
-    :user="currentEditApplication?.user"
+    :user="currentEditApplication?.user ?? null"
     :applying="false"
     :is-editing="true"
     :existing-application="currentEditApplication"

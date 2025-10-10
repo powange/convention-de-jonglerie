@@ -152,6 +152,16 @@
                   class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
                 />
               </UFormField>
+
+              <UFormField :label="t('profile.preferred_language')" name="preferredLanguage">
+                <USelect
+                  v-model="state.preferredLanguage"
+                  icon="i-heroicons-language"
+                  :items="languageOptions"
+                  size="lg"
+                  class="transition-all duration-200 focus-within:transform focus-within:scale-[1.02]"
+                />
+              </UFormField>
             </div>
 
             <!-- Actions avec indicateur de modifications -->
@@ -949,6 +959,21 @@ const notificationPreferences = reactive({
 
 const notificationPreferencesLoading = ref(false)
 
+// Options de langues disponibles
+const languageOptions = [
+  { value: 'fr', label: 'Français' },
+  { value: 'en', label: 'English' },
+  { value: 'de', label: 'Deutsch' },
+  { value: 'es', label: 'Español' },
+  { value: 'it', label: 'Italiano' },
+  { value: 'nl', label: 'Nederlands' },
+  { value: 'pl', label: 'Polski' },
+  { value: 'pt', label: 'Português' },
+  { value: 'ru', label: 'Русский' },
+  { value: 'uk', label: 'Українська' },
+  { value: 'da', label: 'Dansk' },
+]
+
 // Schéma de validation pour le profil
 const schema = z.object({
   email: z.string().email(t('errors.invalid_email')),
@@ -959,6 +984,7 @@ const schema = z.object({
     .string()
     .optional()
     .refine((val) => !val || /^\+?[0-9\s\-()]+$/.test(val), t('errors.invalid_phone_number')),
+  preferredLanguage: z.string().optional(),
 })
 
 // Schéma pour le changement de mot de passe
@@ -998,6 +1024,7 @@ const state = reactive({
   nom: (authStore.user as any)?.nom || '',
   prenom: (authStore.user as any)?.prenom || '',
   telephone: (authStore.user as any)?.telephone || (authStore.user as any)?.phone || '',
+  preferredLanguage: (authStore.user as any)?.preferredLanguage || 'fr',
 })
 
 // État du formulaire de mot de passe
@@ -1014,7 +1041,9 @@ const hasChanges = computed(() => {
     state.pseudo !== (authStore.user?.pseudo || '') ||
     state.nom !== ((authStore.user as any)?.nom || '') ||
     state.prenom !== ((authStore.user as any)?.prenom || '') ||
-    state.telephone !== ((authStore.user as any)?.telephone || (authStore.user as any)?.phone || '')
+    state.telephone !==
+      ((authStore.user as any)?.telephone || (authStore.user as any)?.phone || '') ||
+    state.preferredLanguage !== ((authStore.user as any)?.preferredLanguage || 'fr')
   )
 })
 
@@ -1029,6 +1058,7 @@ const resetForm = () => {
   state.nom = (authStore.user as any)?.nom || ''
   state.prenom = (authStore.user as any)?.prenom || ''
   state.telephone = (authStore.user as any)?.telephone || (authStore.user as any)?.phone || ''
+  state.preferredLanguage = (authStore.user as any)?.preferredLanguage || 'fr'
 }
 
 const updateProfile = async () => {
@@ -1044,6 +1074,7 @@ const updateProfile = async () => {
         nom: state.nom || '',
         prenom: state.prenom || '',
         telephone: state.telephone || '',
+        preferredLanguage: state.preferredLanguage || 'fr',
       },
     })
 
@@ -1245,8 +1276,11 @@ const _toggleAdminMode = (enabled: boolean) => {
 // Fonction pour charger les préférences de notifications
 const loadNotificationPreferences = async () => {
   try {
-    const { preferences } = await $fetch('/api/profile/notification-preferences')
-    Object.assign(notificationPreferences, preferences)
+    const response = await $fetch<{
+      success: boolean
+      preferences: typeof notificationPreferences
+    }>('/api/profile/notification-preferences')
+    Object.assign(notificationPreferences, response.preferences)
   } catch (error) {
     console.error('Erreur lors du chargement des préférences:', error)
     // En cas d'erreur, garder les valeurs par défaut (tout activé)
