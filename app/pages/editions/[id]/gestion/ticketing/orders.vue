@@ -441,10 +441,11 @@ const loadData = async () => {
 
       // Calculer les stats
       stats.value.totalOrders = orders.value.length
-      stats.value.totalItems = orders.value.reduce(
-        (sum, order) => sum + (order.items?.length || 0),
-        0
-      )
+      stats.value.totalItems = orders.value.reduce((sum, order) => {
+        // Ne compter que les billets (exclure les donations)
+        const ticketItems = order.items?.filter((item) => item.type !== 'Donation') || []
+        return sum + ticketItems.length
+      }, 0)
       stats.value.totalAmount = orders.value.reduce((sum, order) => sum + order.amount, 0)
     }
   } catch (error) {

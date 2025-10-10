@@ -10,6 +10,7 @@ env:
   NODE_ENV: test
   DATABASE_URL: mysql://root:rootpassword@localhost:3306/convention_db_test
   NUXT_SESSION_PASSWORD: test_session_password_32_chars_min
+  NUXT_PUBLIC_SITE_URL: http://localhost:3000
   # Désactiver les emails en test
   SEND_EMAILS: false
   # Bypass reCAPTCHA en test
