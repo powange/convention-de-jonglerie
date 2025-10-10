@@ -30,7 +30,7 @@ Notes Auth (nuxt-auth-utils):
 
 3. Intégration/DB (Prisma + MySQL réels)
 
-- Fichier config: `vitest.config.integration.ts`
+- Projet: `integration` dans `vitest.config.ts`
 - Setup: `test/setup-common.ts`, `test/setup-integration.ts`, `test/setup-db.ts`
 - Exécution mono-thread pour éviter les conflits DB
 - Scripts:

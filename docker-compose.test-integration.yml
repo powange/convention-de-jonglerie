@@ -46,7 +46,6 @@ services:
       - ./prisma:/app/prisma:cached
       - ./public:/app/public:cached
       - ./nuxt.config.ts:/app/nuxt.config.ts:cached
-      - ./vitest.config.integration.ts:/app/vitest.config.integration.ts:cached
       - node_modules:/app/node_modules
       - nuxt_cache:/app/.nuxt
       - output_cache:/app/.output

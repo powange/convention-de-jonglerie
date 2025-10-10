@@ -42,7 +42,7 @@ try {
   execSync('node scripts/migrate-test.js', { stdio: 'inherit' })
 
   // Lancer les tests
-  execSync('npx vitest run --config vitest.config.integration.ts', { stdio: 'inherit' })
+  execSync('npx vitest run --project integration', { stdio: 'inherit' })
   console.log("✅ Tests d'intégration terminés !")
 } catch (error) {
   console.error("❌ Erreur lors des tests d'intégration:", error.message)
