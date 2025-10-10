@@ -1,3 +1,4 @@
+import { sendEmail, generateNotificationEmailHtml } from './emailService'
 import {
   isNotificationAllowed,
   isEmailNotificationAllowed,
@@ -7,7 +8,6 @@ import {
 import { notificationStreamManager } from './notification-stream-manager'
 import { prisma } from './prisma'
 import { pushNotificationService } from './push-notification-service'
-import { sendEmail, generateNotificationEmailHtml } from './emailService'
 
 import type { NotificationType } from '@prisma/client'
 
@@ -115,12 +115,20 @@ export const NotificationService = {
         if (emailAllowed) {
           const user = await prisma.user.findUnique({
             where: { id: data.userId },
-            select: { email: true, prenom: true, pseudo: true },
+            select: { email: true, prenom: true, pseudo: true, preferredLanguage: true },
           })
 
           if (user?.email) {
             const prenom = user.prenom || user.pseudo || 'Utilisateur'
-            const emailHtml = generateNotificationEmailHtml(
+            const preferredLanguage = user.preferredLanguage || 'fr'
+
+            // TODO: Implémenter la traduction des emails selon la langue préférée
+            // Pour l'instant, les emails sont envoyés en français
+            console.log(
+              `[NotificationService] Langue préférée de l'utilisateur ${data.userId}: ${preferredLanguage}`
+            )
+
+            const emailHtml = await generateNotificationEmailHtml(
               prenom,
               data.title,
               data.message,
@@ -351,14 +359,54 @@ export const NotificationHelpers = {
   },
 
   /**
+   * Notification de candidature de bénévolat soumise
+   */
+  async volunteerApplicationSubmitted(userId: number, editionName: string, editionId: number) {
+    return await NotificationService.create({
+      userId,
+      type: 'SUCCESS',
+      title: 'Candidature de bénévolat envoyée ! 🎉',
+      message: `Votre candidature pour "${editionName}" a été envoyée avec succès. Les organisateurs vont l'examiner.`,
+      category: 'volunteer',
+      entityType: 'Edition',
+      entityId: editionId.toString(),
+      actionUrl: '/my-volunteer-applications',
+      actionText: 'Voir mes candidatures',
+      notificationType: 'volunteer_application_submitted',
+    })
+  },
+
+  /**
    * Notification de candidature de bénévolat acceptée
    */
-  async volunteerAccepted(userId: number, editionName: string, editionId: number) {
+  async volunteerAccepted(
+    userId: number,
+    editionName: string,
+    editionId: number,
+    assignedTeams?: string[],
+    organizerNote?: string | null
+  ) {
+    let message = `Votre candidature de bénévolat pour "${editionName}" a été acceptée.`
+
+    // Ajouter la liste des équipes si présente
+    if (assignedTeams && assignedTeams.length > 0) {
+      if (assignedTeams.length === 1) {
+        message += `<br><br>Vous êtes assigné(e) à l'équipe : ${assignedTeams[0]}`
+      } else {
+        message += `<br><br>Vous êtes assigné(e) aux équipes :<br>• ${assignedTeams.join('<br>• ')}`
+      }
+    }
+
+    // Ajouter le message de l'organisateur si présent
+    if (organizerNote?.trim()) {
+      message += `<br><br>Message de l'organisateur :<br>"${organizerNote.trim()}"`
+    }
+
     return await NotificationService.create({
       userId,
       type: 'SUCCESS',
       title: 'Candidature acceptée ! ✅',
-      message: `Votre candidature de bénévolat pour "${editionName}" a été acceptée.`,
+      message,
       category: 'volunteer',
       entityType: 'Edition',
       entityId: editionId.toString(),
@@ -383,6 +431,24 @@ export const NotificationHelpers = {
       actionUrl: `/editions/${editionId}`,
       actionText: "Voir l'édition",
       notificationType: 'volunteer_application_rejected',
+    })
+  },
+
+  /**
+   * Notification de candidature remise en attente
+   */
+  async volunteerBackToPending(userId: number, editionName: string, editionId: number) {
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      title: 'Candidature remise en attente',
+      message: `Votre candidature de bénévolat pour "${editionName}" a été remise en attente par les organisateurs.`,
+      category: 'volunteer',
+      entityType: 'Edition',
+      entityId: editionId.toString(),
+      actionUrl: '/my-volunteer-applications',
+      actionText: 'Voir ma candidature',
+      notificationType: 'volunteer_application_modified',
     })
   },
 

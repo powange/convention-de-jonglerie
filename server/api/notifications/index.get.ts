@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { requireUserSession } from '#imports'
 
+import { getEmailHash } from '../../utils/email-hash'
 import { NotificationService } from '../../utils/notification-service'
 
 const querySchema = z.object({
@@ -43,12 +44,22 @@ export default defineEventHandler(async (event) => {
       offset: parsed.offset || 0,
     })
 
+    // Mapper les notifications pour ajouter emailHash et retirer l'email
+    const mappedNotifications = notifications.map((notification) => ({
+      ...notification,
+      user: {
+        id: notification.user.id,
+        pseudo: notification.user.pseudo,
+        emailHash: getEmailHash(notification.user.email),
+      },
+    }))
+
     // Obtenir aussi le nombre total de notifications non lues
     const unreadCount = await NotificationService.getUnreadCount(user.id, parsed.category)
 
     return {
       success: true,
-      notifications,
+      notifications: mappedNotifications,
       unreadCount,
       pagination: {
         limit: parsed.limit || 50,
