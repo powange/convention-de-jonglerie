@@ -592,6 +592,7 @@
     "opens_in_new_tab": "открывается в новой вкладке",
     "optional": "Необязательно",
     "or": "Или",
+    "participants": "Участники",
     "password": "Пароль",
     "postal_code": "Почтовый индекс",
     "previous": "Назад",
@@ -1779,7 +1780,7 @@
       "team_distribution": {
         "all_teams": "Все команды",
         "description": "Распределение принятых волонтёров по командам. Перетащите, чтобы переместить или добавить в команду.",
-        "drop_volunteers_here": "[TODO] Glissez-déposez des bénévoles ici",
+        "drop_volunteers_here": "Перетащите волонтёров сюда",
         "empty_team": "Пустая команда",
         "leader_added": "Руководитель добавлен",
         "leader_badge": "Руководитель",
@@ -1800,7 +1801,7 @@
         "no_assignments_description": "Принятые волонтёры появятся здесь после назначения в команды",
         "preferences_label": "Пред:",
         "remove_as_leader": "Убрать роль руководителя",
-        "select_team_instruction": "[TODO] Sélectionnez l'équipe de destination",
+        "select_team_instruction": "Выберите команду назначения",
         "set_as_leader": "Назначить руководителем",
         "stats": {
           "assigned_volunteers": "Назначенные волонтёры",
@@ -1902,6 +1903,7 @@
     "photo_updated": "Фото обновлено",
     "picture": "Фото профиля",
     "platform_activity": "Ваша активность на платформе",
+    "preferred_language": "Предпочитаемый язык",
     "profile_picture_changed": "Ваше фото профиля изменено",
     "profile_picture_deleted": "Ваше фото профиля удалено",
     "profile_updated": "Профиль обновлен",

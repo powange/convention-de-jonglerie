@@ -592,6 +592,7 @@
     "opens_in_new_tab": "opent in nieuw tabblad",
     "optional": "Optioneel",
     "or": "Of",
+    "participants": "Deelnemers",
     "password": "Wachtwoord",
     "postal_code": "Postcode",
     "previous": "Vorige",
@@ -1779,7 +1780,7 @@
       "team_distribution": {
         "all_teams": "Alle teams",
         "description": "Verdeling van geaccepteerde vrijwilligers in teams. Sleep en zet neer om te verplaatsen of toe te voegen aan een team.",
-        "drop_volunteers_here": "[TODO] Glissez-déposez des bénévoles ici",
+        "drop_volunteers_here": "Sleep vrijwilligers hier naartoe",
         "empty_team": "Leeg team",
         "leader_added": "Leider toegevoegd",
         "leader_badge": "Leider",
@@ -1800,7 +1801,7 @@
         "no_assignments_description": "Geaccepteerde vrijwilligers verschijnen hier zodra ze zijn toegewezen aan teams",
         "preferences_label": "Voork:",
         "remove_as_leader": "Verwijder leiderrol",
-        "select_team_instruction": "[TODO] Sélectionnez l'équipe de destination",
+        "select_team_instruction": "Selecteer het bestemmingsteam",
         "set_as_leader": "Instellen als leider",
         "stats": {
           "assigned_volunteers": "Toegewezen vrijwilligers",
@@ -1902,6 +1903,7 @@
     "photo_updated": "Foto bijgewerkt",
     "picture": "Profielfoto",
     "platform_activity": "Je activiteit op het platform",
+    "preferred_language": "Voorkeurstaal",
     "profile_picture_changed": "Je profielfoto is gewijzigd",
     "profile_picture_deleted": "Je profielfoto is verwijderd",
     "profile_updated": "Profiel bijgewerkt",

@@ -592,6 +592,7 @@
     "opens_in_new_tab": "åbner i nyt faneblad",
     "optional": "Valgfrit",
     "or": "Eller",
+    "participants": "Deltagere",
     "password": "Adgangskode",
     "postal_code": "Postnummer",
     "previous": "Forrige",
@@ -1779,7 +1780,7 @@
       "team_distribution": {
         "all_teams": "Alle hold",
         "description": "Fordeling af accepterede frivillige i hold. Træk og slip for at flytte eller tilføje til et hold.",
-        "drop_volunteers_here": "[TODO] Glissez-déposez des bénévoles ici",
+        "drop_volunteers_here": "Træk og slip frivillige her",
         "empty_team": "Tom gruppe",
         "leader_added": "Leder tilføjet",
         "leader_badge": "Leder",
@@ -1800,7 +1801,7 @@
         "no_assignments_description": "Accepterede frivillige vil blive vist her, når de er tildelt til hold",
         "preferences_label": "Præf:",
         "remove_as_leader": "Fjern lederrollen",
-        "select_team_instruction": "[TODO] Sélectionnez l'équipe de destination",
+        "select_team_instruction": "Vælg destinationsteamet",
         "set_as_leader": "Angiv som leder",
         "stats": {
           "assigned_volunteers": "Tildelte frivillige",
@@ -1902,6 +1903,7 @@
     "photo_updated": "Foto opdateret",
     "picture": "Profilbillede",
     "platform_activity": "Din aktivitet på platformen",
+    "preferred_language": "Foretrukket sprog",
     "profile_picture_changed": "Dit profilbillede er blevet ændret",
     "profile_picture_deleted": "Dit profilbillede er blevet slettet",
     "profile_updated": "Profil opdateret",

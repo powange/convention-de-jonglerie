@@ -592,6 +592,7 @@
     "opens_in_new_tab": "öffnet in neuem Tab",
     "optional": "Optional",
     "or": "Oder",
+    "participants": "Teilnehmer",
     "password": "Passwort",
     "postal_code": "Postleitzahl",
     "previous": "Zurück",
@@ -1779,7 +1780,7 @@
       "team_distribution": {
         "all_teams": "Alle Teams",
         "description": "Verteilung der akzeptierten Freiwilligen in Teams. Ziehen und ablegen, um zu verschieben oder zu einem Team hinzuzufügen.",
-        "drop_volunteers_here": "[TODO] Glissez-déposez des bénévoles ici",
+        "drop_volunteers_here": "Freiwillige hier ablegen",
         "empty_team": "Leeres Team",
         "leader_added": "Leiter hinzugefügt",
         "leader_badge": "Leiter",
@@ -1800,7 +1801,7 @@
         "no_assignments_description": "Akzeptierte Freiwillige werden hier angezeigt, sobald sie Teams zugewiesen sind",
         "preferences_label": "Präf:",
         "remove_as_leader": "Leiterrolle entfernen",
-        "select_team_instruction": "[TODO] Sélectionnez l'équipe de destination",
+        "select_team_instruction": "Wählen Sie das Zielteam aus",
         "set_as_leader": "Als Leiter festlegen",
         "stats": {
           "assigned_volunteers": "Zugewiesene Freiwillige",
@@ -1902,6 +1903,7 @@
     "photo_updated": "Foto aktualisiert",
     "picture": "Profilbild",
     "platform_activity": "Deine Aktivität auf der Plattform",
+    "preferred_language": "Bevorzugte Sprache",
     "profile_picture_changed": "Dein Profilbild wurde geändert",
     "profile_picture_deleted": "Dein Profilbild wurde gelöscht",
     "profile_updated": "Profil aktualisiert",

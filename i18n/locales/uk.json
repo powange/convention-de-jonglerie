@@ -592,6 +592,7 @@
     "opens_in_new_tab": "відкривається в новій вкладці",
     "optional": "Необов'язково",
     "or": "Або",
+    "participants": "Учасники",
     "password": "Пароль",
     "postal_code": "Поштовий індекс",
     "previous": "Назад",
@@ -1779,7 +1780,7 @@
       "team_distribution": {
         "all_teams": "Всі команди",
         "description": "Розподіл прийнятих волонтерів по командах. Перетягніть, щоб перемістити або додати до команди.",
-        "drop_volunteers_here": "[TODO] Glissez-déposez des bénévoles ici",
+        "drop_volunteers_here": "Перетягніть волонтерів сюди",
         "empty_team": "Порожня команда",
         "leader_added": "Керівника додано",
         "leader_badge": "Керівник",
@@ -1800,7 +1801,7 @@
         "no_assignments_description": "Прийняті волонтери з'являться тут після призначення до команд",
         "preferences_label": "Пер:",
         "remove_as_leader": "Зняти роль керівника",
-        "select_team_instruction": "[TODO] Sélectionnez l'équipe de destination",
+        "select_team_instruction": "Виберіть команду призначення",
         "set_as_leader": "Призначити керівником",
         "stats": {
           "assigned_volunteers": "Призначені волонтери",
@@ -1902,6 +1903,7 @@
     "photo_updated": "Фото оновлено",
     "picture": "Фото профілю",
     "platform_activity": "Ваша активність на платформі",
+    "preferred_language": "Бажана мова",
     "profile_picture_changed": "Ваше фото профілю змінено",
     "profile_picture_deleted": "Ваше фото профілю видалено",
     "profile_updated": "Профіль оновлено",

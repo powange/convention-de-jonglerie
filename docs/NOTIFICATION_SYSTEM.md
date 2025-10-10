@@ -79,15 +79,15 @@ enum NotificationType {
 
 ### Catégories de notifications
 
-| Catégorie | Description | Exemples |
-|-----------|-------------|----------|
-| `system` | Notifications système | Mise à jour, maintenance |
-| `volunteer` | Bénévolat | Candidature acceptée/refusée |
-| `comment` | Commentaires | Nouveau commentaire sur édition |
-| `lost_found` | Objets trouvés | Objet déclaré trouvé/rendu |
-| `carpool` | Covoiturage | Réservation, annulation |
-| `ticketing` | Billetterie | Commande, rappel événement |
-| `convention` | Conventions | Nouvelle édition, modification |
+| Catégorie    | Description           | Exemples                        |
+| ------------ | --------------------- | ------------------------------- |
+| `system`     | Notifications système | Mise à jour, maintenance        |
+| `volunteer`  | Bénévolat             | Candidature acceptée/refusée    |
+| `comment`    | Commentaires          | Nouveau commentaire sur édition |
+| `lost_found` | Objets trouvés        | Objet déclaré trouvé/rendu      |
+| `carpool`    | Covoiturage           | Réservation, annulation         |
+| `ticketing`  | Billetterie           | Commande, rappel événement      |
+| `convention` | Conventions           | Nouvelle édition, modification  |
 
 ### Types de notifications disponibles
 
@@ -118,12 +118,14 @@ const NOTIFICATION_TYPES = [
 Récupère les notifications de l'utilisateur connecté.
 
 **Query Parameters:**
+
 - `limit` (number, optionnel) : Nombre de notifications à récupérer (défaut: 50, max: 100)
 - `offset` (number, optionnel) : Offset pour la pagination (défaut: 0)
 - `category` (string, optionnel) : Filtrer par catégorie
 - `unreadOnly` (boolean, optionnel) : Uniquement les non lues
 
 **Réponse:**
+
 ```json
 {
   "success": true,
@@ -160,12 +162,14 @@ Récupère les notifications de l'utilisateur connecté.
 Connexion SSE pour recevoir les notifications en temps réel.
 
 **Événements SSE:**
+
 - `connected` : Connexion établie avec `connectionId`
 - `notification` : Nouvelle notification
 - `refresh` : Signal de rafraîchissement
 - `heartbeat` : Keepalive (toutes les 30s)
 
 **Exemple d'utilisation:**
+
 ```typescript
 const eventSource = new EventSource('/api/notifications/stream')
 
@@ -180,10 +184,13 @@ eventSource.addEventListener('notification', (event) => {
 Marque une notification comme lue.
 
 **Réponse:**
+
 ```json
 {
   "success": true,
-  "notification": { /* ... */ }
+  "notification": {
+    /* ... */
+  }
 }
 ```
 
@@ -196,6 +203,7 @@ Marque une notification comme non lue.
 Marque toutes les notifications comme lues.
 
 **Query Parameters:**
+
 - `category` (string, optionnel) : Catégorie spécifique
 
 ### DELETE `/api/notifications/:id`
@@ -207,6 +215,7 @@ Supprime une notification.
 Récupère les préférences de notifications de l'utilisateur.
 
 **Réponse:**
+
 ```json
 {
   "success": true,
@@ -231,6 +240,7 @@ Récupère les préférences de notifications de l'utilisateur.
 Met à jour les préférences de notifications.
 
 **Body:**
+
 ```json
 {
   "volunteer_application_accepted": {
@@ -246,6 +256,7 @@ Met à jour les préférences de notifications.
 Enregistre un abonnement push notification.
 
 **Body:**
+
 ```json
 {
   "subscription": {
@@ -286,6 +297,7 @@ await NotificationService.create({
 ```
 
 **Comportement:**
+
 1. Vérifie les préférences utilisateur pour ce type de notification
 2. Sauvegarde la notification en base de données (si autorisée)
 3. Envoie via SSE aux clients connectés
@@ -326,67 +338,33 @@ await NotificationHelpers.volunteerAccepted(
   userId,
   editionName,
   editionId,
-  assignedTeams,      // Optionnel: ['Accueil', 'Bar']
-  organizerNote       // Optionnel: "Merci pour ta candidature!"
+  assignedTeams, // Optionnel: ['Accueil', 'Bar']
+  organizerNote // Optionnel: "Merci pour ta candidature!"
 )
 
 // Candidature soumise
-await NotificationHelpers.volunteerApplicationSubmitted(
-  userId,
-  editionName,
-  editionId
-)
+await NotificationHelpers.volunteerApplicationSubmitted(userId, editionName, editionId)
 
 // Candidature refusée
-await NotificationHelpers.volunteerRejected(
-  userId,
-  editionName,
-  editionId
-)
+await NotificationHelpers.volunteerRejected(userId, editionName, editionId)
 
 // Candidature remise en attente
-await NotificationHelpers.volunteerBackToPending(
-  userId,
-  editionName,
-  editionId
-)
+await NotificationHelpers.volunteerBackToPending(userId, editionName, editionId)
 
 // Nouvel objet trouvé
-await NotificationHelpers.lostItemFound(
-  userId,
-  itemDescription,
-  editionId
-)
+await NotificationHelpers.lostItemFound(userId, itemDescription, editionId)
 
 // Objet réclamé
-await NotificationHelpers.lostItemClaimed(
-  userId,
-  itemDescription,
-  editionId
-)
+await NotificationHelpers.lostItemClaimed(userId, itemDescription, editionId)
 
 // Objet rendu
-await NotificationHelpers.lostItemReturned(
-  userId,
-  itemDescription,
-  editionId
-)
+await NotificationHelpers.lostItemReturned(userId, itemDescription, editionId)
 
 // Nouveau commentaire
-await NotificationHelpers.newComment(
-  userId,
-  editionName,
-  editionId,
-  commentAuthor
-)
+await NotificationHelpers.newComment(userId, editionName, editionId, commentAuthor)
 
 // Rappel d'événement
-await NotificationHelpers.eventReminder(
-  userId,
-  eventName,
-  eventDate,
-  editionId
-)
+await NotificationHelpers.eventReminder(userId, eventName, eventDate, editionId)
 ```
 
 ## Préférences de notifications
@@ -407,7 +385,7 @@ Définies dans `notification-preferences.ts` :
 const DEFAULT_PREFERENCES = {
   volunteer_application_accepted: {
     enabled: true,
-    emailEnabled: true,    // Email activé par défaut
+    emailEnabled: true, // Email activé par défaut
     pushEnabled: true,
   },
   volunteer_application_rejected: {
@@ -417,7 +395,7 @@ const DEFAULT_PREFERENCES = {
   },
   comment_on_edition: {
     enabled: true,
-    emailEnabled: false,   // Pas d'email par défaut
+    emailEnabled: false, // Pas d'email par défaut
     pushEnabled: true,
   },
   // ... autres types
@@ -440,6 +418,7 @@ const pushAllowed = await isPushNotificationAllowed(userId, notificationType)
 ### Gestion pour les utilisateurs sans préférences
 
 Si un utilisateur n'a pas encore configuré ses préférences :
+
 1. Les préférences par défaut sont utilisées
 2. Aucune ligne n'est créée en base de données (économie de ressources)
 3. Lors de la première modification, les préférences sont sauvegardées
@@ -464,10 +443,12 @@ server/emails/
 Template de base partagé par tous les emails :
 
 **Props:**
+
 - `title` : Titre de l'email
 - `headerColor` : `'primary'` (violet) ou `'error'` (rouge)
 
 **Features:**
+
 - Logo de l'application
 - Design dark mode (violet/indigo)
 - Responsive
@@ -478,6 +459,7 @@ Template de base partagé par tous les emails :
 Template pour les notifications génériques.
 
 **Props:**
+
 ```typescript
 {
   title: string,
@@ -489,6 +471,7 @@ Template pour les notifications génériques.
 ```
 
 **Exemple d'utilisation:**
+
 ```typescript
 const html = await generateNotificationEmailHtml(
   'John',
@@ -514,18 +497,12 @@ await sendEmail({
 import { sendEmail, generateNotificationEmailHtml } from './emailService'
 
 // Générer le HTML
-const html = await generateNotificationEmailHtml(
-  prenom,
-  title,
-  message,
-  actionUrl,
-  actionText
-)
+const html = await generateNotificationEmailHtml(prenom, title, message, actionUrl, actionText)
 
 // Envoyer
 const success = await sendEmail({
   to: 'user@example.com',
-  subject: 'Titre de l\'email',
+  subject: "Titre de l'email",
   html,
   text: 'Version texte brut (optionnel)',
 })
@@ -542,6 +519,7 @@ SMTP_PASS=your-app-password
 ```
 
 **Mode simulation** (`SEND_EMAILS=false`) :
+
 - Les emails ne sont pas envoyés
 - Le contenu est affiché dans les logs console
 - Utile pour le développement
@@ -569,6 +547,7 @@ const user = await prisma.user.findUnique({
 Le système utilise Server-Sent Events pour pousser les notifications en temps réel.
 
 **Avantages SSE vs WebSocket:**
+
 - ✅ Unidirectionnel (serveur → client) : adapté aux notifications
 - ✅ Auto-reconnexion native du navigateur
 - ✅ Compatible avec HTTP/2
@@ -585,11 +564,14 @@ Gère les connexions SSE actives et la distribution des notifications.
 
 ```typescript
 // Map userId → Set<connexions>
-const activeConnections = new Map<number, Set<{
-  id: string,
-  writer: H3ResponseWriter,
-  createdAt: number,
-}>>()
+const activeConnections = new Map<
+  number,
+  Set<{
+    id: string
+    writer: H3ResponseWriter
+    createdAt: number
+  }>
+>()
 ```
 
 #### Méthodes principales
@@ -614,6 +596,7 @@ notificationStreamManager.cleanup()
 #### Heartbeat (keepalive)
 
 Un heartbeat est envoyé toutes les 30 secondes à toutes les connexions actives pour :
+
 - Maintenir la connexion ouverte
 - Détecter les connexions mortes
 - Respecter les timeouts des proxies
@@ -631,11 +614,11 @@ Composable: `app/composables/useNotificationStream.ts`
 
 ```typescript
 const {
-  isConnected,        // Connexion établie
-  isConnecting,       // Tentative de connexion
-  connectionStats,    // Statistiques de connexion
-  connect,            // Se connecter manuellement
-  disconnect,         // Se déconnecter
+  isConnected, // Connexion établie
+  isConnecting, // Tentative de connexion
+  connectionStats, // Statistiques de connexion
+  connect, // Se connecter manuellement
+  disconnect, // Se déconnecter
 } = useNotificationStream()
 ```
 
@@ -695,23 +678,25 @@ eventSource.addEventListener('heartbeat', () => {
 Si SSE n'est pas disponible (firewall, proxy, etc.), le système bascule automatiquement sur du polling HTTP.
 
 **Configuration polling:**
+
 ```typescript
-const POLLING_INTERVAL = 30000  // 30 secondes
+const POLLING_INTERVAL = 30000 // 30 secondes
 ```
 
 **Logique de fallback:**
+
 ```typescript
 // Si SSE ne se connecte pas après quelques secondes
 watchEffect(() => {
   if (!isConnected.value && !isConnecting.value && authStore.user) {
-    startPolling()  // Démarrer le polling
+    startPolling() // Démarrer le polling
   }
 })
 
 // Si SSE se reconnecte
 watch(isConnected, (connected) => {
   if (connected) {
-    stopPolling()  // Arrêter le polling
+    stopPolling() // Arrêter le polling
   }
 })
 ```
@@ -882,6 +867,7 @@ const recentNotifications = computed(() => {
 Fichier: `app/pages/notifications.vue`
 
 Page dédiée affichant toutes les notifications avec :
+
 - Filtrage par catégorie
 - Recherche par titre/message
 - Pagination complète
@@ -924,6 +910,7 @@ Fichier: `app/pages/admin/notifications.vue`
 Statistiques globales des notifications.
 
 **Réponse:**
+
 ```json
 {
   "total": 1234,
@@ -947,6 +934,7 @@ Statistiques globales des notifications.
 Liste des notifications récentes (toutes utilisateurs).
 
 **Query Parameters:**
+
 - `limit` : Nombre de notifications
 - `offset` : Pagination
 - `userId` : Filtrer par utilisateur
@@ -957,17 +945,18 @@ Liste des notifications récentes (toutes utilisateurs).
 Créer une notification admin.
 
 **Body:**
+
 ```json
 {
-  "userId": 123,           // ou null pour broadcast
+  "userId": 123, // ou null pour broadcast
   "type": "INFO",
   "title": "Maintenance prévue",
   "message": "Le site sera en maintenance ce soir de 22h à minuit.",
   "category": "system",
   "actionUrl": "/",
   "actionText": "Retour à l'accueil",
-  "forceEmail": true,      // Forcer l'envoi d'email
-  "forcePush": true        // Forcer la push notification
+  "forceEmail": true, // Forcer l'envoi d'email
+  "forcePush": true // Forcer la push notification
 }
 ```
 
@@ -980,6 +969,7 @@ Fichier de configuration: `server/api/cron/notifications.ts`
 **Fréquence:** Quotidienne (2h du matin)
 
 **Actions:**
+
 - Supprime les notifications lues de plus de 30 jours
 - Supprime les notifications non lues de plus de 90 jours
 - Nettoie les abonnements push expirés
@@ -998,6 +988,7 @@ WHERE isRead = false AND createdAt < DATE_SUB(NOW(), INTERVAL 90 DAY)
 **Fréquence:** Toutes les 30 secondes
 
 **Action:**
+
 - Envoie un événement `heartbeat` à toutes les connexions SSE actives
 - Nettoie les connexions qui ne répondent plus
 
@@ -1006,6 +997,7 @@ WHERE isRead = false AND createdAt < DATE_SUB(NOW(), INTERVAL 90 DAY)
 ### Création de notifications
 
 1. **Toujours utiliser NotificationHelpers** plutôt que `NotificationService.create()` directement
+
    ```typescript
    // ✅ BON
    await NotificationHelpers.volunteerAccepted(userId, editionName, editionId)
@@ -1015,15 +1007,17 @@ WHERE isRead = false AND createdAt < DATE_SUB(NOW(), INTERVAL 90 DAY)
    ```
 
 2. **Respecter les types de notifications** définis dans `notification-preferences.ts`
+
    ```typescript
    // ✅ BON
    notificationType: 'volunteer_application_accepted'
 
    // ❌ MAUVAIS
-   notificationType: 'volunteer-accepted'  // Non défini
+   notificationType: 'volunteer-accepted' // Non défini
    ```
 
 3. **Fournir des actionUrl et actionText pertinents**
+
    ```typescript
    // ✅ BON
    actionUrl: '/my-volunteer-applications',
@@ -1037,6 +1031,7 @@ WHERE isRead = false AND createdAt < DATE_SUB(NOW(), INTERVAL 90 DAY)
 ### Messages d'emails
 
 1. **Support du HTML** : Les messages peuvent contenir du HTML
+
    ```typescript
    // ✅ BON
    message: 'Candidature acceptée !<br><br>Équipe : <strong>Accueil</strong>'
@@ -1046,6 +1041,7 @@ WHERE isRead = false AND createdAt < DATE_SUB(NOW(), INTERVAL 90 DAY)
    ```
 
 2. **Éviter les espaces indésirables** : Les templates consolidés évitent les espaces
+
    ```vue
    <!-- ✅ BON -->
    <Text>Bonjour {{ prenom }},</Text>
@@ -1059,6 +1055,7 @@ WHERE isRead = false AND createdAt < DATE_SUB(NOW(), INTERVAL 90 DAY)
 ### Gestion des erreurs
 
 1. **Ne pas bloquer l'exécution** si l'envoi échoue
+
    ```typescript
    // Les notifications sont envoyées en "fire and forget"
    // Les erreurs sont loggées mais ne bloquent pas le flux
@@ -1078,6 +1075,7 @@ WHERE isRead = false AND createdAt < DATE_SUB(NOW(), INTERVAL 90 DAY)
 ### Performance
 
 1. **Utiliser la pagination** pour les listes longues
+
    ```typescript
    // ✅ BON
    await notificationsStore.loadMore()
@@ -1087,6 +1085,7 @@ WHERE isRead = false AND createdAt < DATE_SUB(NOW(), INTERVAL 90 DAY)
    ```
 
 2. **Nettoyer les connexions SSE** à la déconnexion
+
    ```typescript
    onBeforeUnmount(() => {
      disconnect()
@@ -1095,7 +1094,7 @@ WHERE isRead = false AND createdAt < DATE_SUB(NOW(), INTERVAL 90 DAY)
 
 3. **Limiter les requêtes polling** (30s minimum)
    ```typescript
-   const POLLING_INTERVAL = 30000  // 30 secondes
+   const POLLING_INTERVAL = 30000 // 30 secondes
    ```
 
 ## Sécurité
@@ -1103,6 +1102,7 @@ WHERE isRead = false AND createdAt < DATE_SUB(NOW(), INTERVAL 90 DAY)
 ### Protection de la vie privée
 
 1. **EmailHash** : Les emails ne sont jamais exposés dans les réponses API
+
    ```typescript
    user: {
      id: 123,
@@ -1148,12 +1148,14 @@ const querySchema = z.object({
 ### Tests unitaires
 
 Fichiers de tests :
+
 - `test/unit/stores/notifications.test.ts` : Store Pinia
 - Tests intégrés dans les endpoints API
 
 ### Tests d'intégration
 
 Les notifications sont testées dans le contexte des features :
+
 - `test/nuxt/features/volunteers.test.ts` : Notifications de bénévolat
 - `test/nuxt/server/api/notifications/*.test.ts` : API endpoints
 
@@ -1164,6 +1166,7 @@ Les notifications sont testées dans le contexte des features :
    - Pas besoin de configuration SMTP
 
 2. **Tester SSE**
+
    ```bash
    curl -N http://localhost:3000/api/notifications/stream
    ```
@@ -1179,15 +1182,18 @@ Les notifications sont testées dans le contexte des features :
 ### SSE ne se connecte pas
 
 **Symptômes:**
+
 - Indicateur rouge dans le NotificationCenter
 - Polling actif en permanence
 
 **Causes possibles:**
+
 1. Proxy/firewall bloquant SSE
 2. CORS mal configuré
 3. Session expirée
 
 **Solutions:**
+
 ```typescript
 // Vérifier les logs du client
 console.log('[SSE Client] Erreur de connexion:', error)
@@ -1197,24 +1203,28 @@ console.log('[SSE Server] Connexion établie pour userId:', userId)
 
 // Forcer la reconnexion
 disconnect()
-await new Promise(r => setTimeout(r, 1000))
+await new Promise((r) => setTimeout(r, 1000))
 connect()
 ```
 
 ### Notifications non reçues
 
 **Checklist:**
+
 1. ✅ Vérifier les préférences utilisateur
+
    ```typescript
    const prefs = await $fetch('/api/notifications/preferences')
    ```
 
 2. ✅ Vérifier que la notification a bien été créée en base
+
    ```sql
    SELECT * FROM Notification WHERE userId = ? ORDER BY createdAt DESC LIMIT 10
    ```
 
 3. ✅ Vérifier les logs serveur
+
    ```bash
    npm run docker:dev:logs
    ```
@@ -1228,6 +1238,7 @@ connect()
 ### Emails non envoyés
 
 **Checklist:**
+
 1. ✅ Vérifier `SEND_EMAILS=true`
 2. ✅ Vérifier les credentials SMTP
 3. ✅ Vérifier les préférences email de l'utilisateur
@@ -1236,6 +1247,7 @@ connect()
 ### Push notifications non reçues
 
 **Checklist:**
+
 1. ✅ Vérifier les clés VAPID
 2. ✅ Vérifier l'abonnement push
    ```typescript
@@ -1281,6 +1293,7 @@ Permettre aux utilisateurs de créer des canaux personnalisés :
 ### Analytics
 
 Tracking des notifications :
+
 - Taux d'ouverture
 - Taux de clic sur les actions
 - Temps moyen avant lecture

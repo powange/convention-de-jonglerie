@@ -592,6 +592,7 @@
     "opens_in_new_tab": "otwiera w nowej karcie",
     "optional": "Opcjonalne",
     "or": "Lub",
+    "participants": "Uczestnicy",
     "password": "Hasło",
     "postal_code": "Kod pocztowy",
     "previous": "Wstecz",
@@ -1779,7 +1780,7 @@
       "team_distribution": {
         "all_teams": "Wszystkie zespoły",
         "description": "Rozkład zaakceptowanych wolontariuszy w zespołach. Przeciągnij i upuść, aby przenieść lub dodać do zespołu.",
-        "drop_volunteers_here": "[TODO] Glissez-déposez des bénévoles ici",
+        "drop_volunteers_here": "Przeciągnij i upuść wolontariuszy tutaj",
         "empty_team": "Pusty zespół",
         "leader_added": "Lider dodany",
         "leader_badge": "Lider",
@@ -1800,7 +1801,7 @@
         "no_assignments_description": "Zaakceptowani wolontariusze pojawią się tutaj po przypisaniu do zespołów",
         "preferences_label": "Pref:",
         "remove_as_leader": "Usuń rolę lidera",
-        "select_team_instruction": "[TODO] Sélectionnez l'équipe de destination",
+        "select_team_instruction": "Wybierz zespół docelowy",
         "set_as_leader": "Ustaw jako lidera",
         "stats": {
           "assigned_volunteers": "Przypisani wolontariusze",
@@ -1902,6 +1903,7 @@
     "photo_updated": "Zdjęcie zaktualizowane",
     "picture": "Zdjęcie profilowe",
     "platform_activity": "Twoja aktywność na platformie",
+    "preferred_language": "Preferowany język",
     "profile_picture_changed": "Twoje zdjęcie profilowe zostało zmienione",
     "profile_picture_deleted": "Twoje zdjęcie profilowe zostało usunięte",
     "profile_updated": "Profil zaktualizowany",

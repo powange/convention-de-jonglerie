@@ -592,6 +592,7 @@
     "opens_in_new_tab": "abre em nova aba",
     "optional": "Opcional",
     "or": "Ou",
+    "participants": "Participantes",
     "password": "Palavra-passe",
     "postal_code": "Código postal",
     "previous": "Anterior",
@@ -1779,7 +1780,7 @@
       "team_distribution": {
         "all_teams": "Todas as equipes",
         "description": "Distribuição de voluntários aceitos em equipes. Arraste e solte para mover ou adicionar a uma equipe.",
-        "drop_volunteers_here": "[TODO] Glissez-déposez des bénévoles ici",
+        "drop_volunteers_here": "Arraste e solte voluntários aqui",
         "empty_team": "Equipe vazia",
         "leader_added": "Responsável adicionado",
         "leader_badge": "Responsável",
@@ -1800,7 +1801,7 @@
         "no_assignments_description": "Voluntários aceitos aparecerão aqui uma vez atribuídos a equipes",
         "preferences_label": "Pref:",
         "remove_as_leader": "Remover papel de responsável",
-        "select_team_instruction": "[TODO] Sélectionnez l'équipe de destination",
+        "select_team_instruction": "Selecione a equipe de destino",
         "set_as_leader": "Definir como responsável",
         "stats": {
           "assigned_volunteers": "Voluntários atribuídos",
@@ -1902,6 +1903,7 @@
     "photo_updated": "Foto actualizada",
     "picture": "Foto de perfil",
     "platform_activity": "A sua actividade na plataforma",
+    "preferred_language": "Idioma preferido",
     "profile_picture_changed": "A sua foto de perfil foi alterada",
     "profile_picture_deleted": "A sua foto de perfil foi eliminada",
     "profile_updated": "Perfil actualizado",
