@@ -60,9 +60,10 @@ export default defineEventHandler(async (event) => {
     })
 
     const config = useRuntimeConfig()
+    const prenom = user.prenom || user.pseudo || 'Utilisateur'
 
     // Envoyer l'email de vérification
-    const emailHtml = await generateVerificationEmailHtml(verificationCode, user.prenom ?? user.pseudo, cleanEmail)
+    const emailHtml = await generateVerificationEmailHtml(verificationCode, prenom, cleanEmail)
     const emailSent = await sendEmail({
       to: cleanEmail,
       subject: '🤹 Nouveau code de vérification - Conventions de Jonglerie',
