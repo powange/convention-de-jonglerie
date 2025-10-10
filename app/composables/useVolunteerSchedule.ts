@@ -261,23 +261,52 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
           const volunteerContainer = document.createElement('div')
           volunteerContainer.className = 'volunteer-item'
 
-          // Créer l'avatar
-          const avatar = document.createElement('div')
-          avatar.className = `user-avatar user-avatar-${index % 5}`
+          // Créer l'avatar (image ou initiales)
+          let avatar: HTMLElement
 
-          // Initiales pour l'avatar
-          let initials = ''
-          if (user.pseudo) {
-            initials = user.pseudo.substring(0, 2).toUpperCase()
-          } else if (user.prenom || user.nom) {
-            const firstName = user.prenom || ''
-            const lastName = user.nom || ''
-            initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase()
-          } else {
-            initials = 'U'
+          // Déterminer l'URL de l'avatar
+          let avatarUrl = ''
+          if (user.profilePicture) {
+            // Photo de profil personnalisée avec cache-busting
+            const version = user.updatedAt ? new Date(user.updatedAt).getTime() : Date.now()
+            avatarUrl = `${user.profilePicture}?v=${version}`
+          } else if (user.emailHash) {
+            // Gravatar via emailHash
+            avatarUrl = `https://www.gravatar.com/avatar/${user.emailHash}?s=28&d=mp`
           }
 
-          avatar.textContent = initials
+          if (avatarUrl) {
+            // Créer une image pour l'avatar
+            avatar = document.createElement('img')
+            avatar.setAttribute('src', avatarUrl)
+            avatar.setAttribute('alt', user.pseudo || 'Avatar')
+            avatar.className = 'user-avatar'
+            avatar.style.width = '14px'
+            avatar.style.height = '14px'
+            avatar.style.borderRadius = '50%'
+            avatar.style.objectFit = 'cover'
+            avatar.style.border = '1px solid rgba(255, 255, 255, 0.8)'
+            avatar.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.1)'
+            avatar.style.flexShrink = '0'
+          } else {
+            // Fallback: créer un div avec initiales
+            avatar = document.createElement('div')
+            avatar.className = `user-avatar user-avatar-${index % 5}`
+
+            // Initiales pour l'avatar
+            let initials = ''
+            if (user.pseudo) {
+              initials = user.pseudo.substring(0, 2).toUpperCase()
+            } else if (user.prenom || user.nom) {
+              const firstName = user.prenom || ''
+              const lastName = user.nom || ''
+              initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase()
+            } else {
+              initials = 'U'
+            }
+
+            avatar.textContent = initials
+          }
 
           // Créer le texte d'affichage
           const textSpan = document.createElement('span')

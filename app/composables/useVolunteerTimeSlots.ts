@@ -19,7 +19,10 @@ export interface VolunteerTimeSlotAPI {
       pseudo: string
       nom?: string
       prenom?: string
-      email: string
+      emailHash: string
+      email?: string // Optionnel - présent pour les gestionnaires
+      profilePicture?: string | null
+      updatedAt: string
     }
   }>
   color: string

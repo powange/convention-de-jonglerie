@@ -1,3 +1,4 @@
+import { getEmailHash } from '../../../../utils/email-hash'
 import {
   requireVolunteerPlanningAccess,
   isAcceptedVolunteer,
@@ -43,8 +44,9 @@ export default defineEventHandler(async (event) => {
                 pseudo: true,
                 nom: true,
                 prenom: true,
-                // Les bénévoles ne voient pas les emails des autres
-                email: isVolunteer ? false : true,
+                email: true,
+                profilePicture: true,
+                updatedAt: true,
               },
             },
           },
@@ -71,7 +73,20 @@ export default defineEventHandler(async (event) => {
       team: slot.team,
       maxVolunteers: slot.maxVolunteers,
       assignedVolunteers: slot._count.assignments,
-      assignments: slot.assignments,
+      assignments: slot.assignments.map((assignment) => ({
+        ...assignment,
+        user: {
+          id: assignment.user.id,
+          pseudo: assignment.user.pseudo,
+          nom: assignment.user.nom,
+          prenom: assignment.user.prenom,
+          emailHash: getEmailHash(assignment.user.email),
+          // Les gestionnaires ont aussi accès à l'email en clair
+          ...(isVolunteer ? {} : { email: assignment.user.email }),
+          profilePicture: assignment.user.profilePicture,
+          updatedAt: assignment.user.updatedAt,
+        },
+      })),
       color: slot.team?.color || '#6b7280',
       resourceId: slot.teamId || 'unassigned',
     }))

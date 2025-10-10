@@ -339,7 +339,9 @@
                 pseudo: volunteer.pseudo,
                 nom: volunteer.nom,
                 prenom: volunteer.prenom,
-                email: volunteer.email,
+                emailHash: volunteer.emailHash,
+                profilePicture: volunteer.profilePicture,
+                updatedAt: volunteer.updatedAt,
               }"
               size="sm"
             />
@@ -422,7 +424,10 @@ interface Assignment {
     pseudo: string
     nom: string | null
     prenom: string | null
-    email: string
+    emailHash: string
+    email?: string // Optionnel - présent pour les gestionnaires
+    profilePicture: string | null
+    updatedAt: string
   }
   assignedBy: {
     id: number
@@ -437,7 +442,10 @@ interface AvailableVolunteer {
   pseudo: string
   nom: string | null
   prenom: string | null
-  email: string
+  emailHash: string
+  email?: string // Optionnel - présent pour les gestionnaires
+  profilePicture: string | null
+  updatedAt: string
   teamPreferences: any[]
   assignedTeams: string[] // Array d'IDs des équipes assignées
   timePreferences: any[]

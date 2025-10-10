@@ -192,14 +192,7 @@ const convertedTimeSlots = computed(() => {
       assignedVolunteers: slot.assignedVolunteers,
       color: slot.color,
       description: slot.description,
-      assignedVolunteersList: [...(slot.assignments || [])].map((assignment: any) => ({
-        ...assignment,
-        user: {
-          ...assignment.user,
-          nom: assignment.user.nom ?? null,
-          prenom: assignment.user.prenom ?? null,
-        },
-      })),
+      assignedVolunteersList: [...(slot.assignments || [])], // Copie directe des assignments
     })
   )
 })

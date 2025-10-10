@@ -1,4 +1,5 @@
 import { requireAuth } from '../../../../../utils/auth-utils'
+import { getEmailHash } from '../../../../../utils/email-hash'
 import { requireVolunteerManagementAccess } from '../../../../../utils/permissions/volunteer-permissions'
 import { prisma } from '../../../../../utils/prisma'
 
@@ -56,6 +57,8 @@ export default defineEventHandler(async (event) => {
             nom: true,
             prenom: true,
             email: true,
+            profilePicture: true,
+            updatedAt: true,
           },
         },
         assignedBy: {
@@ -70,7 +73,22 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    return assignments
+    // Formater les assignations - gestionnaires ont emailHash pour avatars + email pour contact
+    const formattedAssignments = assignments.map((assignment) => ({
+      ...assignment,
+      user: {
+        id: assignment.user.id,
+        pseudo: assignment.user.pseudo,
+        nom: assignment.user.nom,
+        prenom: assignment.user.prenom,
+        emailHash: getEmailHash(assignment.user.email),
+        email: assignment.user.email,
+        profilePicture: assignment.user.profilePicture,
+        updatedAt: assignment.user.updatedAt,
+      },
+    }))
+
+    return formattedAssignments
   } catch (error) {
     if (error.statusCode) {
       throw error
