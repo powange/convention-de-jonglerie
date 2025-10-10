@@ -105,11 +105,18 @@
       "Bash(NODE_ENV=test npx vitest run --config vitest.config.nuxt.ts test/nuxt/components/notifications)",
       "Bash(NODE_ENV=test npx vitest run --config vitest.config.nuxt.ts test/nuxt/components/admin test/nuxt/components/edition)",
       "mcp__nuxt-ui__get_component",
-      "WebFetch(domain:vuemail.net)"
+      "WebFetch(domain:vuemail.net)",
+      "Bash(NODE_ENV=test npx vitest run test/nuxt/pages/auth.reset-password.page.nuxt.test.ts --config vitest.config.nuxt.ts)",
+      "Bash(NODE_ENV=test npx vitest run test/nuxt/pages/auth.reset-password.page.nuxt.test.ts)",
+      "Bash(NODE_ENV=test npx vitest run test/nuxt/server/api/auth/resend-verification.post.test.ts)"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits"
   },
-  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner"]
+  "enabledMcpjsonServers": [
+    "nuxt",
+    "nuxt-ui",
+    "vitest-runner"
+  ]
 }

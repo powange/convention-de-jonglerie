@@ -4,6 +4,7 @@ import {
   sendEmail,
   generateVerificationCode,
   generateVerificationEmailHtml,
+  getSiteUrl,
 } from '../../utils/emailService'
 import { prisma } from '../../utils/prisma'
 import { emailRateLimiter } from '../../utils/rate-limiter'
@@ -59,8 +60,8 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    const config = useRuntimeConfig()
     const prenom = user.prenom || user.pseudo || 'Utilisateur'
+    const siteUrl = getSiteUrl()
 
     // Envoyer l'email de vérification
     const emailHtml = await generateVerificationEmailHtml(verificationCode, prenom, cleanEmail)
@@ -68,7 +69,7 @@ export default defineEventHandler(async (event) => {
       to: cleanEmail,
       subject: '🤹 Nouveau code de vérification - Conventions de Jonglerie',
       html: emailHtml,
-      text: `Bonjour ${user.prenom}, votre nouveau code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier : ${config.public.siteUrl}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
+      text: `Bonjour ${user.prenom}, votre nouveau code de vérification est : ${verificationCode}. Cliquez sur ce lien pour vérifier : ${siteUrl}/verify-email?email=${encodeURIComponent(cleanEmail)}`,
     })
 
     if (!emailSent) {

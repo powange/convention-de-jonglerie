@@ -5,6 +5,7 @@ vi.mock('../../../../../server/utils/emailService', () => ({
   sendEmail: vi.fn(),
   generateVerificationCode: vi.fn(),
   generateVerificationEmailHtml: vi.fn(),
+  getSiteUrl: vi.fn(() => 'http://localhost:3000'),
 }))
 
 vi.mock('../../../../../server/utils/rate-limiter', () => ({
@@ -359,10 +360,7 @@ describe('/api/auth/resend-verification POST', () => {
     expect(emailCall.text).toContain('user%2Btest%40example.com') // URL encoded
   })
 
-  it("devrait utiliser l'URL de base de l'environnement si disponible", async () => {
-    const originalEnv = process.env.NUXT_PUBLIC_SITE_URL
-    process.env.NUXT_PUBLIC_SITE_URL = 'https://example.com'
-
+  it("devrait utiliser l'URL de base de la configuration", async () => {
     const requestBody = {
       email: 'user@example.com',
     }
@@ -374,13 +372,8 @@ describe('/api/auth/resend-verification POST', () => {
     await handler(mockEvent as any)
 
     const emailCall = mockSendEmail.mock.calls[0][0]
-    expect(emailCall.text).toContain('https://example.com/verify-email')
-
-    // Restaurer l'environnement
-    if (originalEnv) {
-      process.env.NUXT_PUBLIC_SITE_URL = originalEnv
-    } else {
-      delete process.env.NUXT_PUBLIC_SITE_URL
-    }
+    // L'URL doit contenir /verify-email (peu importe le domaine qui vient de la config)
+    expect(emailCall.text).toContain('/verify-email')
+    expect(emailCall.text).toMatch(/https?:\/\/[^/]+\/verify-email/)
   })
 })

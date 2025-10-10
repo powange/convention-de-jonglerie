@@ -1,5 +1,5 @@
 import { execSync } from 'child_process'
-import { readFile, writeFile } from 'fs/promises'
+import { readFile, writeFile, mkdir, rm } from 'fs/promises'
 import { tmpdir } from 'os'
 import path from 'path'
 
@@ -8,7 +8,10 @@ export default defineEventHandler(async (event) => {
   const _user = await requireGlobalAdminWithDbCheck(event)
 
   try {
+    const config = useRuntimeConfig()
+    const uploadsMountPath = config.fileStorage?.mount || '/uploads'
     let sqlContent: string
+    let tempExtractDir: string | null = null
 
     // Vérifier si c'est un upload de fichier ou une restauration depuis un fichier existant
     const contentType = getHeader(event, 'content-type') || ''
@@ -24,28 +27,93 @@ export default defineEventHandler(async (event) => {
       }
 
       const fileData = form[0]
-      if (!fileData.data || !fileData.filename?.endsWith('.sql')) {
+      const filename = fileData.filename || ''
+
+      if (!fileData.data) {
         throw createError({
           statusCode: 400,
-          statusMessage: 'Fichier SQL invalide',
+          statusMessage: 'Fichier invalide',
         })
       }
 
-      sqlContent = fileData.data.toString('utf8')
+      // Gérer les archives tar.gz ou les fichiers SQL
+      if (filename.endsWith('.tar.gz')) {
+        // Extraire l'archive
+        tempExtractDir = path.join(tmpdir(), `restore-${Date.now()}`)
+        await mkdir(tempExtractDir, { recursive: true })
+
+        const tempArchivePath = path.join(tempExtractDir, 'backup.tar.gz')
+        await writeFile(tempArchivePath, fileData.data)
+
+        // Extraire l'archive
+        execSync(`tar -xzf "${tempArchivePath}" -C "${tempExtractDir}"`, {
+          maxBuffer: 1024 * 1024 * 100,
+        })
+
+        // Trouver le fichier SQL dans l'archive
+        const files = execSync(`find "${tempExtractDir}" -name "*.sql"`, { encoding: 'utf8' })
+        const sqlFile = files.trim().split('\n')[0]
+
+        if (!sqlFile) {
+          throw createError({
+            statusCode: 400,
+            statusMessage: 'Aucun fichier SQL trouvé dans l\'archive',
+          })
+        }
+
+        sqlContent = await readFile(sqlFile, 'utf8')
+      } else if (filename.endsWith('.sql')) {
+        sqlContent = fileData.data.toString('utf8')
+      } else {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Format de fichier invalide. Utilisez .sql ou .tar.gz',
+        })
+      }
     } else {
       // Restauration depuis un fichier existant
       const body = await readBody(event)
       const { filename } = body
 
-      if (!filename || !filename.endsWith('.sql')) {
+      if (!filename) {
         throw createError({
           statusCode: 400,
-          statusMessage: 'Nom de fichier invalide',
+          statusMessage: 'Nom de fichier manquant',
         })
       }
 
       const backupPath = path.join(process.cwd(), 'backups', filename)
-      sqlContent = await readFile(backupPath, 'utf8')
+
+      // Gérer les archives tar.gz ou les fichiers SQL
+      if (filename.endsWith('.tar.gz')) {
+        // Extraire l'archive
+        tempExtractDir = path.join(tmpdir(), `restore-${Date.now()}`)
+        await mkdir(tempExtractDir, { recursive: true })
+
+        execSync(`tar -xzf "${backupPath}" -C "${tempExtractDir}"`, {
+          maxBuffer: 1024 * 1024 * 100,
+        })
+
+        // Trouver le fichier SQL dans l'archive
+        const files = execSync(`find "${tempExtractDir}" -name "*.sql"`, { encoding: 'utf8' })
+        const sqlFile = files.trim().split('\n')[0]
+
+        if (!sqlFile) {
+          throw createError({
+            statusCode: 400,
+            statusMessage: 'Aucun fichier SQL trouvé dans l\'archive',
+          })
+        }
+
+        sqlContent = await readFile(sqlFile, 'utf8')
+      } else if (filename.endsWith('.sql')) {
+        sqlContent = await readFile(backupPath, 'utf8')
+      } else {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Format de fichier invalide. Utilisez .sql ou .tar.gz',
+        })
+      }
     }
 
     // Obtenir les informations de connexion à la base de données
@@ -88,19 +156,61 @@ export default defineEventHandler(async (event) => {
         maxBuffer: 1024 * 1024 * 100, // 100MB buffer
       })
 
-      console.log('Restauration terminée avec succès')
+      console.log('Base de données restaurée avec succès')
+
+      // Restaurer les fichiers uploads si présents dans l'archive
+      if (tempExtractDir) {
+        const extractedUploadsPath = path.join(tempExtractDir, uploadsMountPath.replace(/^\//, ''))
+        try {
+          await import('fs').then((fs) => fs.promises.access(extractedUploadsPath))
+
+          // Le dossier uploads existe dans l'archive, le restaurer
+          // Le chemin de destination dépend si uploadsMountPath est absolu ou relatif
+          const uploadsDestPath = path.isAbsolute(uploadsMountPath)
+            ? uploadsMountPath
+            : path.join(process.cwd(), uploadsMountPath)
+
+          // Supprimer l'ancien dossier uploads s'il existe
+          try {
+            await rm(uploadsDestPath, { recursive: true, force: true })
+          } catch {
+            // Le dossier n'existe pas, ce n'est pas grave
+          }
+
+          // Créer le dossier de destination
+          await mkdir(uploadsDestPath, { recursive: true })
+
+          // Copier le CONTENU du dossier uploads de l'archive vers la destination
+          // On utilise /* pour copier le contenu et pas le dossier lui-même
+          execSync(`cp -r "${extractedUploadsPath}"/* "${uploadsDestPath}"/`, {
+            maxBuffer: 1024 * 1024 * 100,
+          })
+
+          console.log('Fichiers uploads restaurés avec succès')
+        } catch (error) {
+          console.log('Aucun fichier uploads à restaurer dans cette archive', error)
+        }
+      }
     } finally {
-      // Nettoyer le fichier temporaire
+      // Nettoyer les fichiers temporaires
       try {
         await import('fs').then((fs) => fs.promises.unlink(tempFilePath))
       } catch (cleanupError) {
-        console.warn('Impossible de supprimer le fichier temporaire:', cleanupError)
+        console.warn('Impossible de supprimer le fichier SQL temporaire:', cleanupError)
+      }
+
+      if (tempExtractDir) {
+        try {
+          await rm(tempExtractDir, { recursive: true, force: true })
+        } catch (cleanupError) {
+          console.warn('Impossible de supprimer le dossier temporaire d\'extraction:', cleanupError)
+        }
       }
     }
 
     return {
       success: true,
-      message: 'Base de données restaurée avec succès',
+      message: 'Base de données et fichiers restaurés avec succès',
     }
   } catch (error: any) {
     console.error('Erreur lors de la restauration:', error)

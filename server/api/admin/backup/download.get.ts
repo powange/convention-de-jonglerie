@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     const query = getQuery(event)
     const filename = query.filename as string
 
-    if (!filename || !filename.endsWith('.sql')) {
+    if (!filename || (!filename.endsWith('.sql') && !filename.endsWith('.tar.gz'))) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Nom de fichier invalide',
@@ -22,8 +22,13 @@ export default defineEventHandler(async (event) => {
     try {
       const fileContent = await readFile(backupPath)
 
+      // Définir le Content-Type selon le type de fichier
+      const contentType = filename.endsWith('.tar.gz')
+        ? 'application/gzip'
+        : 'application/sql'
+
       // Définir les en-têtes pour le téléchargement
-      setHeader(event, 'Content-Type', 'application/sql')
+      setHeader(event, 'Content-Type', contentType)
       setHeader(event, 'Content-Disposition', `attachment; filename="${filename}"`)
       setHeader(event, 'Content-Length', fileContent.length)
 

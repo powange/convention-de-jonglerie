@@ -60,7 +60,7 @@
             <input
               ref="fileInput"
               type="file"
-              accept=".sql"
+              accept=".sql,.tar.gz"
               class="hidden"
               @change="handleFileUpload"
             />
@@ -114,7 +114,22 @@
               />
             </div>
             <div>
-              <h4 class="font-medium">{{ backup.filename }}</h4>
+              <div class="flex items-center gap-2 mb-1">
+                <h4 class="font-medium">{{ backup.filename }}</h4>
+                <UBadge
+                  v-if="backup.type === 'archive'"
+                  color="success"
+                  variant="subtle"
+                  size="sm"
+                >
+                  <UIcon name="i-heroicons-photo" class="h-3 w-3" />
+                  Avec images
+                </UBadge>
+                <UBadge v-else color="gray" variant="subtle" size="sm">
+                  <UIcon name="i-heroicons-circle-stack" class="h-3 w-3" />
+                  SQL uniquement
+                </UBadge>
+              </div>
               <div class="flex items-center gap-4 text-sm text-gray-500">
                 <span class="flex items-center gap-1">
                   <UIcon name="i-heroicons-calendar" class="h-4 w-4" />
@@ -221,6 +236,7 @@ interface Backup {
   filename: string
   createdAt: string
   size: number
+  type?: 'archive' | 'sql'
 }
 
 const backups = ref<Backup[]>([])
@@ -295,7 +311,7 @@ const handleFileUpload = (event: Event) => {
   const file = target.files?.[0]
 
   if (file) {
-    if (!file.name.endsWith('.sql')) {
+    if (!file.name.endsWith('.sql') && !file.name.endsWith('.tar.gz')) {
       toast.add({
         color: 'error',
         title: t('common.error'),

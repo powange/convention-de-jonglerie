@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const { filename } = body
 
-    if (!filename || !filename.endsWith('.sql')) {
+    if (!filename || (!filename.endsWith('.sql') && !filename.endsWith('.tar.gz'))) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Nom de fichier invalide',

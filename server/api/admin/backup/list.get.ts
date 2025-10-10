@@ -11,11 +11,11 @@ export default defineEventHandler(async (event) => {
     // Lire le contenu du dossier backup
     const files = await readdir(backupDir)
 
-    // Filtrer les fichiers .sql et obtenir leurs informations
+    // Filtrer les fichiers .sql et .tar.gz et obtenir leurs informations
     const backups = []
 
     for (const file of files) {
-      if (file.endsWith('.sql')) {
+      if (file.endsWith('.sql') || file.endsWith('.tar.gz')) {
         const filePath = path.join(backupDir, file)
         const fileStat = await stat(filePath)
 
@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
           filename: file,
           createdAt: fileStat.birthtime.toISOString(),
           size: fileStat.size,
+          type: file.endsWith('.tar.gz') ? 'archive' : 'sql',
         })
       }
     }

@@ -16,7 +16,7 @@ export interface EmailOptions {
 
 export function getSiteUrl(): string {
   const config = useRuntimeConfig()
-  return config.public.siteUrl
+  return config.public.siteUrl || 'http://localhost:3000'
 }
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
