@@ -265,7 +265,7 @@
                       @dragend="handleDragEnd"
                     >
                       <UIcon name="i-heroicons-bars-3" class="text-gray-400" size="16" />
-                      <UiUserAvatar :user="volunteer.user" size="sm" class="flex-shrink-0" />
+                      <UiUserAvatar :user="volunteer.user" size="md" class="flex-shrink-0" />
                       <div class="min-w-0 flex-1">
                         <p class="text-gray-700 dark:text-gray-300 font-medium truncate">
                           {{ volunteer.user.prenom }} {{ volunteer.user.nom }}
@@ -380,7 +380,7 @@
                       @dragend="handleDragEnd"
                     >
                       <UIcon name="i-heroicons-bars-3" class="text-gray-400" size="16" />
-                      <UiUserAvatar :user="volunteer.user" size="sm" class="flex-shrink-0" />
+                      <UiUserAvatar :user="volunteer.user" size="md" class="flex-shrink-0" />
                       <div class="min-w-0 flex-1">
                         <p class="text-gray-700 dark:text-gray-300 font-medium truncate">
                           {{ volunteer.user.prenom }} {{ volunteer.user.nom }}
