@@ -18,6 +18,15 @@
           <UButton variant="ghost" color="neutral" size="sm" @click="openFeedbackModal">
             {{ t('footer.feedback') }}
           </UButton>
+          <NuxtLink
+            to="https://www.facebook.com/profile.php?id=61582110660179"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-1"
+            :title="t('footer.facebook')"
+          >
+            <UIcon name="i-simple-icons-facebook" class="w-5 h-5" />
+          </NuxtLink>
         </div>
       </div>
     </div>

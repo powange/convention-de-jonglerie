@@ -29,7 +29,10 @@
         </div>
 
         <!-- Description de l'équipe -->
-        <p v-if="team.team.description" class="text-xs text-gray-600 dark:text-gray-400 mb-3 whitespace-pre-line">
+        <p
+          v-if="team.team.description"
+          class="text-xs text-gray-600 dark:text-gray-400 mb-3 whitespace-pre-line"
+        >
           {{ team.team.description }}
         </p>
 
@@ -44,13 +47,19 @@
           </h5>
 
           <!-- État de chargement -->
-          <div v-if="loadingTeams[team.teamId]" class="flex items-center gap-2 text-xs text-gray-500">
+          <div
+            v-if="loadingTeams[team.teamId]"
+            class="flex items-center gap-2 text-xs text-gray-500"
+          >
             <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
             {{ t('common.loading') }}
           </div>
 
           <!-- Liste des membres -->
-          <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2">
+          <div
+            v-else
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2"
+          >
             <div
               v-for="member in teamMembers[team.teamId]"
               :key="member.id"
@@ -82,10 +91,7 @@
         </div>
 
         <!-- Message si aucun membre -->
-        <div
-          v-else-if="!loadingTeams[team.teamId]"
-          class="text-xs text-gray-500 italic"
-        >
+        <div v-else-if="!loadingTeams[team.teamId]" class="text-xs text-gray-500 italic">
           {{ t('editions.volunteers.no_team_members') }}
         </div>
       </div>

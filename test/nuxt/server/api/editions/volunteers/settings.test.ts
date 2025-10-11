@@ -264,7 +264,6 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
     })
   })
 
-
   describe('Dates et horaires', () => {
     it('devrait formater correctement les dates ISO', async () => {
       const editionWithDates = {

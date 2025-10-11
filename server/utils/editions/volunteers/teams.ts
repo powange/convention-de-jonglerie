@@ -90,7 +90,6 @@ export async function assignVolunteerToTeams(applicationId: number, teamIds: str
       })
     }
 
-
     // Récupérer et retourner les assignations créées
     return await tx.applicationTeamAssignment.findMany({
       where: { applicationId },
@@ -149,7 +148,6 @@ export async function addVolunteerToTeam(applicationId: number, teamId: string) 
       },
     })
 
-
     return assignment
   })
 }
@@ -170,7 +168,6 @@ export async function removeVolunteerFromTeam(applicationId: number, teamId: str
         },
       },
     })
-
   })
 }
 

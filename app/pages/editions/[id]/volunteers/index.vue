@@ -16,7 +16,7 @@
         :format-date="formatDate"
         :format-date-time-range="formatDateTimeRange"
       />
-      
+
       <!-- Carte "Mes équipes" - Visible pour les leaders d'équipes -->
       <EditionVolunteerMyTeamsCard
         v-if="
@@ -52,13 +52,7 @@
 
         <div class="space-y-6">
           <!-- Candidature existante (affichée en premier si l'utilisateur a postulé) -->
-          <div
-            v-if="
-              authStore.isAuthenticated &&
-              volunteersMode === 'INTERNAL' &&
-              myApplication
-            "
-          >
+          <div v-if="authStore.isAuthenticated && volunteersMode === 'INTERNAL' && myApplication">
             <UCard
               variant="subtle"
               class="border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-gray-800/40"
@@ -135,7 +129,9 @@
                 <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
                 <!-- eslint-disable vue/no-v-html -->
                 <div
-                  :class="[shouldReduceDescription && !showFullDescription ? 'overflow-hidden' : '']"
+                  :class="[
+                    shouldReduceDescription && !showFullDescription ? 'overflow-hidden' : '',
+                  ]"
                   :style="
                     shouldReduceDescription && !showFullDescription
                       ? {
@@ -191,13 +187,7 @@
           </div>
 
           <!-- Bouton pour postuler (seulement si l'utilisateur n'a pas encore postulé) -->
-          <div
-            v-if="
-              authStore.isAuthenticated &&
-              volunteersMode === 'INTERNAL' &&
-              !myApplication
-            "
-          >
+          <div v-if="authStore.isAuthenticated && volunteersMode === 'INTERNAL' && !myApplication">
             <div v-if="!volunteersInfo?.open" class="text-sm text-gray-500 flex items-center gap-2">
               <UIcon name="i-heroicons-lock-closed" /> {{ t('editions.volunteers.closed_message') }}
             </div>
@@ -417,10 +407,7 @@ const fetchMyApplication = async () => {
 
 const fetchVolunteersInfo = async () => {
   try {
-    await Promise.all([
-      fetchVolunteersSettings(),
-      fetchMyApplication(),
-    ])
+    await Promise.all([fetchVolunteersSettings(), fetchMyApplication()])
     if (volunteersInfo.value?.description) {
       volunteersDescriptionHtml.value = await markdownToHtml(volunteersInfo.value.description)
     }

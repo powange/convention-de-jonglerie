@@ -3,6 +3,7 @@
 ## Problème résolu
 
 Les images de profil provenant de Google (`lh3.googleusercontent.com`) génèrent souvent des erreurs 429 (Too Many Requests) en raison du rate limiting imposé par Google. Cela se produit lorsque :
+
 - Plusieurs utilisateurs ont des photos Google
 - Les images sont rechargées fréquemment
 - Beaucoup d'avatars sont affichés en même temps (ex: liste de bénévoles)
@@ -23,12 +24,14 @@ Un système de cache côté client avec fallback automatique qui :
 **Fichier :** `app/composables/useImageLoader.ts`
 
 **Fonctionnalités :**
+
 - Cache dans localStorage avec durée de vie de 24h
 - Détection automatique des erreurs de chargement
 - Fallback immédiat vers une URL alternative
 - Nettoyage automatique des entrées expirées
 
 **Structure du cache :**
+
 ```typescript
 {
   [url: string]: {
@@ -44,6 +47,7 @@ Un système de cache côté client avec fallback automatique qui :
 **Fichier :** `app/components/ui/UserAvatar.vue`
 
 **Modifications :**
+
 - Détection des images externes (non-Gravatar, non-data:)
 - Utilisation du `useImageLoader` uniquement pour les images externes
 - Génération automatique d'une URL de fallback (initiales ou Gravatar)
@@ -122,13 +126,14 @@ Selon les données de l'utilisateur, le fallback suit cet ordre :
 Le cache est configurable dans `app/composables/useImageLoader.ts` :
 
 ```typescript
-const CACHE_KEY = 'image-load-cache'         // Clé localStorage
-const CACHE_DURATION = 24 * 60 * 60 * 1000   // Durée de vie : 24h
+const CACHE_KEY = 'image-load-cache' // Clé localStorage
+const CACHE_DURATION = 24 * 60 * 60 * 1000 // Durée de vie : 24h
 ```
 
 ## Tests
 
 Les tests unitaires existants continuent de fonctionner sans modification :
+
 - `test/unit/utils/avatar.test.ts` (15 tests)
 - `test/nuxt/components/ui/UserAvatar.test.ts` (4 tests)
 

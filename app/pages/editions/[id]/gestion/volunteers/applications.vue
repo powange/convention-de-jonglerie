@@ -258,7 +258,9 @@
                       v-for="volunteer in unassignedVolunteers"
                       :key="volunteer.id"
                       :volunteer="volunteer"
-                      :team-preferences-text="getTeamNamesFromPreferences(volunteer.teamPreferences)"
+                      :team-preferences-text="
+                        getTeamNamesFromPreferences(volunteer.teamPreferences)
+                      "
                       :is-mobile="isMobile"
                       @click="handleVolunteerClick"
                       @dragstart="handleDragStart"
@@ -347,7 +349,9 @@
                       :key="volunteer.id"
                       :volunteer="volunteer"
                       :team-id="team.id"
-                      :team-preferences-text="getTeamNamesFromPreferences(volunteer.teamPreferences)"
+                      :team-preferences-text="
+                        getTeamNamesFromPreferences(volunteer.teamPreferences)
+                      "
                       :is-mobile="isMobile"
                       @click="handleVolunteerClick"
                       @dragstart="handleDragStart"

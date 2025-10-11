@@ -339,7 +339,6 @@ async function assignVolunteersToTeams(
           })
         }
       }
-
     }
   }
 }
