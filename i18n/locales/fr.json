@@ -1764,6 +1764,7 @@
       "assigned_time_slots": "Créneaux assignés",
       "unnamed_slot": "Créneau sans titre",
       "total_hours": "Total d'heures",
+      "my_slots_title": "Mes Créneaux",
       "team_distribution": {
         "all_teams": "Toutes équipes",
         "description": "Répartition des bénévoles acceptés dans les équipes. Sur ordinateur, glissez-déposez pour déplacer. Sur mobile, cliquez pour sélectionner l'équipe.",

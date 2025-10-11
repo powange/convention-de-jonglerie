@@ -1545,6 +1545,7 @@
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Все права защищены.",
+    "facebook": "Подписывайтесь на нас в Facebook",
     "feedback": "Оставьте нам отзыв",
     "language_selector": "Изменить язык",
     "privacy": "Политика конфиденциальности"
@@ -1764,6 +1765,7 @@
       "motivation": "Мотивация",
       "my_applications": "Мои заявки волонтёра",
       "my_planning": "Моё расписание",
+      "my_slots_title": "Мои Временные Слоты",
       "no_accepted_applications": "Нет принятых заявок",
       "no_accepted_description": "У вас пока нет принятых заявок",
       "no_applications": "Нет заявок",

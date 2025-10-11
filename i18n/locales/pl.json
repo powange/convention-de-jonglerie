@@ -1545,6 +1545,7 @@
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Wszelkie prawa zastrzeżone.",
+    "facebook": "Śledź nas na Facebooku",
     "feedback": "Podziel się opinią",
     "language_selector": "Zmień język",
     "privacy": "Polityka Prywatności"
@@ -1764,6 +1765,7 @@
       "motivation": "Motywacja",
       "my_applications": "Moje zgłoszenia wolontariuszów",
       "my_planning": "Mój harmonogram",
+      "my_slots_title": "Moje Sloty Czasowe",
       "no_accepted_applications": "Brak zaakceptowanych aplikacji",
       "no_accepted_description": "Nie masz jeszcze żadnych zaakceptowanych aplikacji",
       "no_applications": "Brak zgłoszeń",

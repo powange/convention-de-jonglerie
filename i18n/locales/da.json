@@ -1545,6 +1545,7 @@
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Alle rettigheder forbeholdes.",
+    "facebook": "Følg os på Facebook",
     "feedback": "Giv os feedback",
     "language_selector": "Skift sprog",
     "privacy": "Privatlivspolitik"
@@ -1764,6 +1765,7 @@
       "motivation": "Motivation",
       "my_applications": "Mine frivillig-ansøgninger",
       "my_planning": "Min planlægning",
+      "my_slots_title": "Mine Tidsrum",
       "no_accepted_applications": "Ingen accepterede ansøgninger",
       "no_accepted_description": "Du har endnu ikke nogen accepterede ansøgninger",
       "no_applications": "Ingen ansøgninger",

@@ -236,41 +236,11 @@
                 </UBadge>
               </h4>
               <div class="space-y-3">
-                <div
+                <VolunteersTimeSlotCard
                   v-for="assignment in application.assignedTimeSlots"
                   :key="assignment.id"
-                  class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
-                >
-                  <div class="flex items-start justify-between gap-3">
-                    <div class="flex-1 min-w-0">
-                      <p class="font-medium text-blue-900 dark:text-blue-100 text-sm mb-1">
-                        {{ assignment.timeSlot.title || $t('pages.volunteers.unnamed_slot') }}
-                      </p>
-                      <div
-                        class="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300 mb-2"
-                      >
-                        <UIcon name="i-heroicons-calendar-days" class="w-3 h-3" />
-                        <span>
-                          {{
-                            formatSlotDateTime(
-                              assignment.timeSlot.startDateTime,
-                              assignment.timeSlot.endDateTime
-                            )
-                          }}
-                        </span>
-                      </div>
-                      <div v-if="assignment.timeSlot.team" class="flex items-center gap-2">
-                        <div
-                          class="w-2 h-2 rounded-full flex-shrink-0"
-                          :style="{ backgroundColor: assignment.timeSlot.team.color || '#6b7280' }"
-                        ></div>
-                        <span class="text-xs text-gray-600 dark:text-gray-400 truncate">
-                          {{ assignment.timeSlot.team.name }}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  :time-slot="assignment.timeSlot"
+                />
               </div>
               <div class="mt-2 text-xs text-blue-600 dark:text-blue-400">
                 {{ $t('pages.volunteers.total_hours') }}:
@@ -588,50 +558,12 @@
           <h4 class="font-medium text-gray-900 dark:text-white">
             {{ $t('pages.volunteers.assigned_time_slots') }}
           </h4>
-          <div
+          <VolunteersTimeSlotCard
             v-for="assignment in selectedApplication.assignedTimeSlots"
             :key="assignment.id"
-            class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
-          >
-            <div class="flex items-start justify-between gap-3">
-              <div class="flex-1 min-w-0">
-                <p class="font-medium text-gray-900 dark:text-white mb-1">
-                  {{ assignment.timeSlot.title || $t('pages.volunteers.unnamed_slot') }}
-                </p>
-                <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  <UIcon name="i-heroicons-calendar-days" class="w-4 h-4" />
-                  <span>
-                    {{
-                      formatSlotDateTime(
-                        assignment.timeSlot.startDateTime,
-                        assignment.timeSlot.endDateTime
-                      )
-                    }}
-                  </span>
-                </div>
-                <div v-if="assignment.timeSlot.team" class="flex items-center gap-2">
-                  <div
-                    class="w-3 h-3 rounded-full flex-shrink-0"
-                    :style="{ backgroundColor: assignment.timeSlot.team.color || '#6b7280' }"
-                  ></div>
-                  <span class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ assignment.timeSlot.team.name }}
-                  </span>
-                </div>
-                <p v-if="assignment.timeSlot.description" class="text-sm text-gray-500 mt-2">
-                  {{ assignment.timeSlot.description }}
-                </p>
-              </div>
-              <div class="text-right text-sm text-gray-500">
-                {{
-                  formatSlotDuration(
-                    assignment.timeSlot.startDateTime,
-                    assignment.timeSlot.endDateTime
-                  )
-                }}
-              </div>
-            </div>
-          </div>
+            :time-slot="assignment.timeSlot"
+            show-duration
+          />
         </div>
       </div>
 
@@ -918,29 +850,6 @@ const getStatusIcon = (status: string) => {
   }
 }
 
-// Fonction pour formater les dates et heures des créneaux
-const formatSlotDateTime = (startDateTime: string, endDateTime: string) => {
-  const start = new Date(startDateTime)
-  const end = new Date(endDateTime)
-
-  const dateStr = start.toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'short',
-  })
-
-  const startTimeStr = start.toLocaleTimeString('fr-FR', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-
-  const endTimeStr = end.toLocaleTimeString('fr-FR', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-
-  return `${dateStr} • ${startTimeStr} - ${endTimeStr}`
-}
-
 // Fonction pour calculer le total d'heures
 const calculateTotalHours = (assignments: any[]) => {
   let totalMs = 0
@@ -1045,20 +954,6 @@ const showQrCode = (application: any) => {
 // const toggleDetails = (application: any) => {
 //   application.showDetails = !application.showDetails
 // }
-
-// Fonction pour formater la durée d'un créneau
-const formatSlotDuration = (startDateTime: string, endDateTime: string) => {
-  const start = new Date(startDateTime)
-  const end = new Date(endDateTime)
-  const durationMs = end.getTime() - start.getTime()
-  const hours = Math.floor(durationMs / (1000 * 60 * 60))
-  const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60))
-
-  if (hours > 0) {
-    return minutes > 0 ? `${hours}h${minutes}m` : `${hours}h`
-  }
-  return `${minutes}m`
-}
 
 // Fonction pour compter les équipes uniques
 const getUniqueTeamsCount = (assignments: any[]) => {

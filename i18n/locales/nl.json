@@ -1545,6 +1545,7 @@
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Alle rechten voorbehouden.",
+    "facebook": "Volg ons op Facebook",
     "feedback": "Geef ons feedback",
     "language_selector": "Taal wijzigen",
     "privacy": "Privacybeleid"
@@ -1764,6 +1765,7 @@
       "motivation": "Motivatie",
       "my_applications": "Mijn vrijwilligersaanvragen",
       "my_planning": "Mijn planning",
+      "my_slots_title": "Mijn Tijdslots",
       "no_accepted_applications": "Geen geaccepteerde aanvragen",
       "no_accepted_description": "Je hebt nog geen geaccepteerde aanvragen",
       "no_applications": "Geen aanvragen",

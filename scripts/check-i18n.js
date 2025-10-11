@@ -285,7 +285,7 @@ function extractI18nKeysFromFile(filePath) {
 
     // Filtrer les faux positifs
     // - Exclure les propriétés d'objets JavaScript communes
-    const jsObjectPatterns = ['leaflet']
+    const jsObjectPatterns = ['leaflet', 'backup.tar.gz']
 
     // Exceptions - ces patterns sont valides même s'ils commencent par un mot réservé
     const validI18nPatterns = []

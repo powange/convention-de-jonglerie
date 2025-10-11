@@ -1545,6 +1545,7 @@
   },
   "footer": {
     "copyright": "© {year} Juggling Convention. Tutti i diritti riservati.",
+    "facebook": "Seguici su Facebook",
     "feedback": "Dacci un feedback",
     "language_selector": "Cambia lingua",
     "privacy": "Politica sulla Privacy"
@@ -1764,6 +1765,7 @@
       "motivation": "Motivazione",
       "my_applications": "Le mie candidature volontarie",
       "my_planning": "La mia pianificazione",
+      "my_slots_title": "I Miei Turni",
       "no_accepted_applications": "Nessuna candidatura accettata",
       "no_accepted_description": "Non hai ancora nessuna candidatura accettata",
       "no_applications": "Nessuna candidatura",

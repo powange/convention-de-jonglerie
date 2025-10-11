@@ -88,5 +88,49 @@ export default defineEventHandler(async (event) => {
   })
 
   // Retourner null si pas de candidature (pas d'erreur 404)
-  return application
+  if (!application) {
+    return null
+  }
+
+  // Récupérer les créneaux assignés si la candidature est acceptée
+  let assignedTimeSlots = []
+  if (application.status === 'ACCEPTED') {
+    assignedTimeSlots = await prisma.volunteerAssignment.findMany({
+      where: {
+        userId: user.id,
+        timeSlot: {
+          editionId,
+        },
+      },
+      select: {
+        id: true,
+        assignedAt: true,
+        timeSlot: {
+          select: {
+            id: true,
+            title: true,
+            startDateTime: true,
+            endDateTime: true,
+            team: {
+              select: {
+                id: true,
+                name: true,
+                color: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        timeSlot: {
+          startDateTime: 'asc',
+        },
+      },
+    })
+  }
+
+  return {
+    ...application,
+    assignedTimeSlots,
+  }
 })

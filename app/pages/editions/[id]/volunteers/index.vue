@@ -17,6 +17,17 @@
         :format-date-time-range="formatDateTimeRange"
       />
 
+      <!-- Carte "Mes créneaux" - Visible pour les bénévoles acceptés -->
+      <EditionVolunteerMySlotsCard
+        v-if="
+          authStore.isAuthenticated &&
+          myApplication?.status === 'ACCEPTED' &&
+          volunteersMode === 'INTERNAL'
+        "
+        :edition-id="editionId"
+        :user-id="authStore.user?.id"
+      />
+
       <!-- Carte "Mes équipes" - Visible pour les leaders d'équipes -->
       <EditionVolunteerMyTeamsCard
         v-if="
