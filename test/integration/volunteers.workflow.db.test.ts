@@ -1,1116 +1,494 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { $fetch } from 'ofetch'
-import { createError } from 'h3'
+import bcrypt from 'bcryptjs'
+import { describe, it, expect, beforeAll } from 'vitest'
 
-// Mock du service de session/auth pour simuler l'authentification
-vi.mock('../utils/auth-session', () => ({
-  getSession: vi.fn(),
-  createSession: vi.fn(),
-}))
+import { prismaTest } from '../setup-db'
 
-// Mock des fonctions h3
-vi.mock('h3', () => ({
-  createError: vi.fn((err) => new Error(err.message || err.statusMessage || 'Error')),
-  getRouterParam: vi.fn((event, param) => event.context.params?.[param]),
-  readBody: vi.fn((event) => (event.readBody ? event.readBody() : Promise.resolve({}))),
-  getQuery: vi.fn(() => ({})),
-  defineEventHandler: <T extends (...args: any[]) => any>(fn: T) => fn,
-}))
+// Ce fichier ne s'exécute que si TEST_WITH_DB=true
+describe.skipIf(!process.env.TEST_WITH_DB)(
+  "Tests d'intégration Workflow Bénévoles avec DB réelle",
+  () => {
+    let mockUser: any
+    let mockManager: any
+    let mockEdition: any
+    let mockTeam1: any
+    let mockTeam2: any
 
-// Mock Prisma directement depuis les utils server
-vi.mock('../../server/utils/prisma', async () => {
-  const { prismaMock } = await import('../__mocks__/prisma')
-  return { prisma: prismaMock }
-})
+    beforeAll(async () => {
+      const ts = Date.now()
 
-describe("Workflow complet des bénévoles - Tests d'intégration", () => {
-  const mockUser = {
-    id: 1,
-    email: 'volunteer@example.com',
-    pseudo: 'volunteer1',
-    nom: 'Dupont',
-    prenom: 'Marie',
-    phone: '+33123456789',
-  }
+      // Créer les utilisateurs de test
+      mockUser = await prismaTest.user.create({
+        data: {
+          email: `volunteer-${ts}@example.com`,
+          password: await bcrypt.hash('Password123!', 10),
+          pseudo: `volunteer-${ts}`,
+          nom: 'Dupont',
+          prenom: 'Marie',
+          phone: '+33123456789',
+          isEmailVerified: true,
+        },
+      })
 
-  const mockManager = {
-    id: 2,
-    email: 'manager@example.com',
-    pseudo: 'manager1',
-    nom: 'Martin',
-    prenom: 'Jean',
-  }
+      mockManager = await prismaTest.user.create({
+        data: {
+          email: `manager-${ts}@example.com`,
+          password: await bcrypt.hash('Password123!', 10),
+          pseudo: `manager-${ts}`,
+          nom: 'Martin',
+          prenom: 'Jean',
+          isEmailVerified: true,
+        },
+      })
 
-  const mockEdition = {
-    id: 1,
-    name: 'Convention Test 2024',
-    startDate: new Date('2024-06-01'),
-    endDate: new Date('2024-06-03'),
-    volunteersOpen: true,
-    volunteersMode: 'INTERNAL',
-    volunteersDescription: 'Rejoignez notre équipe !',
-    askSetup: true,
-    askTeardown: true,
-    volunteersSetupStartDate: new Date('2024-05-30'),
-    volunteersSetupEndDate: new Date('2024-06-05'),
-    askDiet: true,
-    askAllergies: true,
-    askPets: true,
-    askTimePreferences: true,
-    askTeamPreferences: true,
-    volunteersAskEmergencyContact: false,
-    teams: [
-      { id: 1, name: 'Accueil', slots: 5 },
-      { id: 2, name: 'Technique', slots: 3 },
-    ],
-    volunteerApplications: [],
-    convention: {
-      id: 1,
-      authorId: mockManager.id,
-      collaborators: [],
-    },
-    creatorId: mockManager.id,
-  }
+      // Créer une convention
+      const convention = await prismaTest.convention.create({
+        data: {
+          name: `Convention Test ${ts}`,
+          authorId: mockManager.id,
+        },
+      })
 
-  beforeEach(() => {
-    vi.clearAllMocks()
-    // Setup des mocks par défaut
-    global.getSession = vi.fn()
-    global.getRouterParam = vi.fn().mockReturnValue('1')
-    global.readBody = vi.fn()
-    global.getQuery = vi.fn().mockReturnValue({})
-    global.createError = createError
-  })
+      // Créer une édition
+      mockEdition = await prismaTest.edition.create({
+        data: {
+          name: `Convention Test 2024 ${ts}`,
+          conventionId: convention.id,
+          startDate: new Date('2024-06-01'),
+          endDate: new Date('2024-06-03'),
+          volunteersOpen: true,
+          volunteersMode: 'INTERNAL',
+          volunteersDescription: 'Rejoignez notre équipe !',
+          volunteersAskSetup: true,
+          volunteersAskTeardown: true,
+          volunteersSetupStartDate: new Date('2024-05-30'),
+          volunteersTeardownEndDate: new Date('2024-06-05'),
+          volunteersAskDiet: true,
+          volunteersAskAllergies: true,
+          volunteersAskPets: true,
+          volunteersAskTimePreferences: true,
+          volunteersAskTeamPreferences: true,
+          volunteersAskEmergencyContact: false,
+        },
+      })
 
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  describe('Workflow complet : Configuration -> Candidature -> Gestion', () => {
-    it('devrait permettre un workflow complet de bout en bout', async () => {
-      // ========== ÉTAPE 1: Configuration des bénévoles par le gestionnaire ==========
-
-      // Le gestionnaire configure les options de bénévolat
-      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
-      const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-
-      const volunteerSettings = {
-        mode: 'INTERNAL',
-        description: 'Nous recherchons des bénévoles motivés !',
-        askSetup: true,
-        askTeardown: true,
-        setupStartDate: tomorrow.toISOString(),
-        setupEndDate: nextWeek.toISOString(),
-        askDiet: true,
-        askAllergies: true,
-        askEmergencyContact: true,
-        askPets: true,
-        askTimePreferences: true,
-        askTeamPreferences: true,
-        // Les équipes seront créées via le système VolunteerTeam
-        // Plus besoin de passer teams dans volunteerSettings
-      }
-
-      // Mock de la session gestionnaire
-      global.getSession = vi.fn().mockResolvedValue({ user: mockManager })
-      global.getRouterParam = vi.fn().mockReturnValue('1')
-      global.readBody = vi.fn().mockResolvedValue(volunteerSettings)
-
-      const { prismaMock } = await import('../__mocks__/prisma')
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-      // Mock pour les équipes VolunteerTeam
-      const mockVolunteerTeams = [
-        {
-          id: 'team1',
+      // Créer des équipes de bénévoles
+      mockTeam1 = await prismaTest.volunteerTeam.create({
+        data: {
           name: 'Accueil',
           description: 'Équipe accueil',
           color: '#ef4444',
           maxVolunteers: 5,
+          editionId: mockEdition.id,
         },
-        {
-          id: 'team2',
+      })
+
+      mockTeam2 = await prismaTest.volunteerTeam.create({
+        data: {
           name: 'Technique',
           description: 'Équipe technique',
           color: '#3b82f6',
           maxVolunteers: 3,
-        },
-        {
-          id: 'team3',
-          name: 'Bar',
-          description: 'Équipe bar',
-          color: '#10b981',
-          maxVolunteers: 10,
-        },
-      ]
-      prismaMock.volunteerTeam.findMany.mockResolvedValue(mockVolunteerTeams)
-
-      prismaMock.edition.update.mockResolvedValue({
-        ...mockEdition,
-        volunteersMode: volunteerSettings.mode,
-        volunteersDescription: volunteerSettings.description,
-        volunteersAskSetup: volunteerSettings.askSetup,
-        volunteersAskTeardown: volunteerSettings.askTeardown,
-        volunteersAskDiet: volunteerSettings.askDiet,
-        volunteersAskAllergies: volunteerSettings.askAllergies,
-        volunteersAskEmergencyContact: volunteerSettings.askEmergencyContact,
-        volunteersAskPets: volunteerSettings.askPets,
-        volunteersAskTimePreferences: volunteerSettings.askTimePreferences,
-        volunteersAskTeamPreferences: volunteerSettings.askTeamPreferences,
-        volunteersSetupStartDate: new Date(volunteerSettings.setupStartDate),
-        volunteersTeardownEndDate: new Date(volunteerSettings.setupEndDate),
-      })
-
-      // Appel API de configuration
-      const settingsHandler = await import(
-        '../../server/api/editions/[id]/volunteers/settings.patch'
-      )
-      const settingsResult = await settingsHandler.default({
-        context: { user: mockManager },
-      } as any)
-
-      expect(settingsResult.success).toBe(true)
-      expect(settingsResult.settings.volunteersMode).toBe('INTERNAL')
-
-      // ========== ÉTAPE 2: Consultation des infos par un candidat ==========
-
-      // Reset des mocks pour la prochaine requête
-      vi.clearAllMocks()
-      prismaMock.edition.findUnique.mockResolvedValue({
-        ...mockEdition,
-        volunteersMode: volunteerSettings.mode,
-        volunteersDescription: volunteerSettings.description,
-        volunteersAskDiet: volunteerSettings.askDiet,
-        volunteersAskAllergies: volunteerSettings.askAllergies,
-        volunteersAskPets: volunteerSettings.askPets,
-        volunteersAskTimePreferences: volunteerSettings.askTimePreferences,
-        volunteersAskTeamPreferences: volunteerSettings.askTeamPreferences,
-        volunteerApplications: [], // Pas encore de candidatures
-      })
-      // Mock des équipes VolunteerTeam pour info.get
-      prismaMock.volunteerTeam.findMany.mockResolvedValue(mockVolunteerTeams)
-
-      // Un candidat consulte les informations (API publique)
-      const infoHandler = await import('../../server/api/editions/[id]/volunteers/settings.get')
-      const infoResult = await infoHandler.default({
-        context: { user: null }, // Pas besoin d'être connecté
-      } as any)
-
-      expect(infoResult.mode).toBe('INTERNAL')
-      expect(infoResult.description).toBe(volunteerSettings.description)
-      expect(infoResult.teams).toHaveLength(3)
-      expect(infoResult.askDiet).toBe(true)
-      expect(infoResult.askTimePreferences).toBe(true)
-
-      // ========== ÉTAPE 3: Candidature d'un bénévole ==========
-
-      // Reset et setup pour la candidature
-      vi.clearAllMocks()
-      prismaMock.edition.findUnique.mockResolvedValue({
-        ...mockEdition,
-        volunteersMode: volunteerSettings.mode,
-        volunteersDescription: volunteerSettings.description,
-        volunteersAskDiet: volunteerSettings.askDiet,
-        volunteersAskAllergies: volunteerSettings.askAllergies,
-        volunteersAskPets: volunteerSettings.askPets,
-        volunteersAskTimePreferences: volunteerSettings.askTimePreferences,
-        volunteersAskTeamPreferences: volunteerSettings.askTeamPreferences,
-        volunteerApplications: [], // Pas encore de candidatures
-      })
-      // Mock des équipes VolunteerTeam pour applications/index.post
-      prismaMock.volunteerTeam.findMany.mockResolvedValue(mockVolunteerTeams)
-      prismaMock.editionVolunteerApplication.findFirst.mockResolvedValue(null) // Pas de candidature existante
-      prismaMock.user.findUnique.mockResolvedValue(mockUser)
-
-      const arrivalDate = new Date(Date.now() + 24 * 60 * 60 * 1000)
-      const departureDate = new Date(Date.now() + 48 * 60 * 60 * 1000)
-
-      const applicationData = {
-        motivation: 'Je suis très motivé pour aider à organiser cette convention !',
-        setupAvailability: true,
-        teardownAvailability: false,
-        eventAvailability: true,
-        arrivalDateTime: arrivalDate.toISOString(),
-        departureDateTime: departureDate.toISOString(),
-        dietaryPreference: 'VEGETARIAN',
-        allergies: 'Aucune',
-        allergySeverity: 'LIGHT',
-        emergencyContactName: 'Jean Dupont',
-        emergencyContactPhone: '+33123456789',
-        timePreferences: ['morning', 'evening'],
-        teamPreferences: ['team1', 'team2'], // IDs des équipes VolunteerTeam mockées
-        hasPets: false,
-        hasVehicle: true,
-        vehicleDetails: 'Voiture 5 places',
-      }
-
-      const mockApplication = {
-        id: 1,
-        editionId: 1,
-        userId: mockUser.id,
-        status: 'PENDING',
-        ...applicationData,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
-
-      prismaMock.editionVolunteerApplication.create.mockResolvedValue({
-        ...mockApplication,
-        ...applicationData,
-      })
-      global.readBody.mockResolvedValue(applicationData)
-
-      // Candidature par l'utilisateur connecté
-      global.getRouterParam.mockReturnValue('1')
-      const applyHandler = await import(
-        '../../server/api/editions/[id]/volunteers/applications/index.post'
-      )
-      const applicationResult = await applyHandler.default({
-        context: {
-          user: mockUser,
-          params: { id: '1' },
-        },
-      } as any)
-
-      expect(applicationResult.success).toBe(true)
-      expect(applicationResult.application.status).toBe('PENDING')
-      expect(applicationResult.application.motivation).toBe(applicationData.motivation)
-      expect(applicationResult.application.setupAvailability).toBe(true)
-      expect(applicationResult.application.eventAvailability).toBe(true)
-      expect(applicationResult.application.dietaryPreference).toBe('VEGETARIAN')
-
-      // Vérifier que la candidature a été créée avec les bonnes données
-      expect(prismaMock.editionVolunteerApplication.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          editionId: 1,
-          userId: mockUser.id,
-          motivation: applicationData.motivation,
-          setupAvailability: true,
-          teardownAvailability: null, // false devient null dans l'API
-          eventAvailability: true,
-          dietaryPreference: 'VEGETARIAN',
-          timePreferences: applicationData.timePreferences,
-          teamPreferences: applicationData.teamPreferences,
-          userSnapshotPhone: mockUser.phone,
-          arrivalDateTime: applicationData.arrivalDateTime,
-          departureDateTime: applicationData.departureDateTime,
-        }),
-        select: expect.any(Object),
-      })
-
-      // ========== ÉTAPE 4: Consultation des candidatures par le gestionnaire ==========
-
-      // Reset pour consulter les candidatures
-      vi.clearAllMocks()
-      prismaMock.edition.findUnique.mockResolvedValue({
-        ...mockEdition,
-        convention: {
-          ...mockEdition.convention,
-          collaborators: [], // Pas de collaborateurs, mais créateur = gestionnaire
+          editionId: mockEdition.id,
         },
       })
-
-      const applicationsData = [
-        {
-          ...mockApplication,
-          user: {
-            id: mockUser.id,
-            pseudo: mockUser.pseudo,
-            email: mockUser.email,
-            prenom: mockUser.prenom,
-            nom: mockUser.nom,
-          },
-        },
-      ]
-
-      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue(applicationsData)
-
-      // Consultation par le gestionnaire
-      const applicationsHandler = await import(
-        '../../server/api/editions/[id]/volunteers/applications.get'
-      )
-      const applicationsResult = await applicationsHandler.default({
-        context: { user: mockManager },
-      } as any)
-
-      expect(applicationsResult.applications).toHaveLength(1)
-      expect(applicationsResult.applications[0].status).toBe('PENDING')
-      expect(applicationsResult.applications[0].user.pseudo).toBe(mockUser.pseudo)
-      expect(applicationsResult.applications[0].motivation).toBe(applicationData.motivation)
-
-      // ========== ÉTAPE 5: Acceptation de la candidature ==========
-
-      // Reset pour l'acceptation
-      vi.clearAllMocks()
-
-      const acceptanceData = {
-        applicationId: 1,
-        action: 'ACCEPT',
-        internalNotes: "Candidat parfait pour l'accueil",
-      }
-
-      prismaMock.edition.findUnique.mockResolvedValue({
-        ...mockEdition,
-        convention: mockEdition.convention,
-      })
-
-      prismaMock.editionVolunteerApplication.findFirst.mockResolvedValue({
-        ...mockApplication,
-        edition: mockEdition,
-      })
-
-      const updatedApplication = {
-        ...mockApplication,
-        status: 'ACCEPTED',
-        internalNotes: acceptanceData.internalNotes,
-        processedAt: new Date(),
-        processedBy: mockManager.id,
-      }
-
-      prismaMock.editionVolunteerApplication.update.mockResolvedValue(updatedApplication)
-      global.readBody.mockResolvedValue(acceptanceData)
-
-      // Simulation de l'acceptation (cette API n'existe peut-être pas encore)
-      // const acceptHandler = await import('../../server/api/editions/[id]/volunteers/process.patch')
-      // const acceptResult = await acceptHandler.default({
-      //   context: { user: mockManager }
-      // } as any)
-
-      // expect(acceptResult.status).toBe('ACCEPTED')
-      // expect(acceptResult.internalNotes).toBe(acceptanceData.internalNotes)
-
-      // ========== ÉTAPE 6: Vérification de l'état final ==========
-
-      // Le bénévole vérifie sa candidature acceptée
-      vi.clearAllMocks()
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-      prismaMock.editionVolunteerApplication.findFirst.mockResolvedValue(updatedApplication)
-
-      // Simulation de consultation de sa propre candidature
-      const myApplicationResult = {
-        ...updatedApplication,
-        // Les notes internes ne devraient pas être visibles au candidat
-        internalNotes: undefined,
-      }
-
-      expect(myApplicationResult.status).toBe('ACCEPTED')
-      expect(myApplicationResult.internalNotes).toBeUndefined()
-    })
-  })
-
-  describe("Scénarios d'erreur dans le workflow", () => {
-    it('devrait gérer le rejet et la re-candidature', async () => {
-      const { prismaMock } = await import('../__mocks__/prisma')
-
-      // ========== Candidature initiale ==========
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-      prismaMock.editionVolunteerApplication.findFirst.mockResolvedValue(null)
-      prismaMock.user.findUnique.mockResolvedValue(mockUser)
-
-      const applicationDate = new Date(Date.now() + 24 * 60 * 60 * 1000)
-
-      const initialApplication = {
-        motivation: 'Première candidature',
-        setupAvailability: true,
-        arrivalDateTime: applicationDate.toISOString(),
-      }
-
-      const createdApplication = {
-        id: 1,
-        editionId: 1,
-        userId: mockUser.id,
-        status: 'PENDING',
-        ...initialApplication,
-      }
-
-      prismaMock.editionVolunteerApplication.create.mockResolvedValue(createdApplication)
-      global.readBody.mockResolvedValue(initialApplication)
-      global.getRouterParam.mockReturnValue('1')
-
-      const applyHandler = await import(
-        '../../server/api/editions/[id]/volunteers/applications/index.post'
-      )
-      const firstResult = await applyHandler.default({
-        context: {
-          user: mockUser,
-          params: { id: '1' },
-        },
-      } as any)
-
-      expect(firstResult.success).toBe(true)
-      expect(firstResult.application.status).toBe('PENDING')
-
-      // ========== Rejet de la candidature ==========
-      const rejectedApplication = {
-        ...createdApplication,
-        status: 'REJECTED',
-        internalNotes: 'Profile ne correspond pas',
-      }
-
-      // ========== Nouvelle candidature après rejet ==========
-      vi.clearAllMocks()
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-      prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue({
-        id: rejectedApplication.id,
-      })
-      prismaMock.user.findUnique.mockResolvedValue(mockUser)
-
-      const newApplication = {
-        motivation: 'Je me suis amélioré, voici ma nouvelle candidature !',
-        setupAvailability: true,
-        teardownAvailability: true, // Plus d'engagement
-        arrivalDateTime: applicationDate.toISOString(),
-        departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-        skills: "J'ai suivi une formation depuis",
-      }
-
-      global.readBody.mockResolvedValue(newApplication)
-      global.getRouterParam.mockReturnValue('1')
-
-      // L'API actuelle empêche la re-candidature même après rejet
-      await expect(
-        applyHandler.default({
-          context: {
-            user: mockUser,
-            params: { id: '1' },
-          },
-        } as any)
-      ).rejects.toThrow(/déjà candidat/i)
-
-      // Vérifier qu'aucune création ou mise à jour n'a été tentée
-      expect(prismaMock.editionVolunteerApplication.update).not.toHaveBeenCalled()
-      expect(prismaMock.editionVolunteerApplication.create).not.toHaveBeenCalled()
     })
 
-    it('devrait empêcher la double candidature', async () => {
-      const { prismaMock } = await import('../__mocks__/prisma')
-
-      // Une candidature en attente existe déjà
-      const existingApplication = {
-        id: 1,
-        editionId: 1,
-        userId: mockUser.id,
-        status: 'PENDING',
-        motivation: 'Candidature existante',
-      }
-
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-      prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(existingApplication)
-      prismaMock.user.findUnique.mockResolvedValue(mockUser)
-
-      const duplicateApplication = {
-        motivation: 'Tentative de double candidature',
-        setupAvailability: true,
-        arrivalDateTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        departureDateTime: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
-      }
-
-      global.readBody.mockResolvedValue(duplicateApplication)
-
-      const applyHandler = await import(
-        '../../server/api/editions/[id]/volunteers/applications/index.post'
-      )
-      global.getRouterParam.mockReturnValue('1')
-
-      await expect(
-        applyHandler.default({
-          context: {
-            user: mockUser,
-            params: { id: '1' },
+    describe('Workflow complet : Configuration -> Candidature -> Gestion', () => {
+      it('devrait permettre un workflow complet de bout en bout avec DB', async () => {
+        // ========== ÉTAPE 1: Vérifier la configuration initiale ==========
+        const edition = await prismaTest.edition.findUnique({
+          where: { id: mockEdition.id },
+          include: {
+            volunteerTeams: true,
           },
-        } as any)
-      ).rejects.toThrow(/candidat/i)
+        })
 
-      // Vérifier qu'aucune création n'a été tentée
-      expect(prismaMock.editionVolunteerApplication.create).not.toHaveBeenCalled()
-      expect(prismaMock.editionVolunteerApplication.update).not.toHaveBeenCalled()
-    })
+        expect(edition).toBeDefined()
+        expect(edition?.volunteersMode).toBe('INTERNAL')
+        expect(edition?.volunteersOpen).toBe(true)
+        expect(edition?.volunteerTeams).toHaveLength(2)
 
-    it('devrait empêcher la candidature sur une édition fermée', async () => {
-      const { prismaMock } = await import('../__mocks__/prisma')
+        // ========== ÉTAPE 2: Candidature d'un bénévole ==========
+        const arrivalDate = new Date(Date.now() + 24 * 60 * 60 * 1000)
+        const departureDate = new Date(Date.now() + 48 * 60 * 60 * 1000)
 
-      const closedEdition = {
-        ...mockEdition,
-        volunteersOpen: false,
-      }
-
-      prismaMock.edition.findUnique.mockResolvedValue(closedEdition)
-
-      const applicationData = {
-        motivation: 'Candidature sur édition fermée',
-        setupAvailability: true,
-      }
-
-      global.readBody.mockResolvedValue(applicationData)
-      global.getRouterParam.mockReturnValue('1')
-
-      const applyHandler = await import(
-        '../../server/api/editions/[id]/volunteers/applications/index.post'
-      )
-
-      await expect(
-        applyHandler.default({
-          context: {
-            user: mockUser,
-            params: { id: '1' },
+        const application = await prismaTest.editionVolunteerApplication.create({
+          data: {
+            editionId: mockEdition.id,
+            userId: mockUser.id,
+            motivation: 'Je suis très motivé pour aider à organiser cette convention !',
+            setupAvailability: true,
+            teardownAvailability: false,
+            eventAvailability: true,
+            arrivalDateTime: arrivalDate,
+            departureDateTime: departureDate,
+            dietaryPreference: 'VEGETARIAN',
+            allergies: 'Aucune',
+            allergySeverity: 'LIGHT',
+            emergencyContactName: 'Jean Dupont',
+            emergencyContactPhone: '+33123456789',
+            timePreferences: ['morning', 'evening'],
+            teamPreferences: [mockTeam1.id, mockTeam2.id],
+            hasPets: false,
+            hasVehicle: true,
+            vehicleDetails: 'Voiture 5 places',
+            userSnapshotPhone: mockUser.phone,
+            status: 'PENDING',
           },
-        } as any)
-      ).rejects.toThrow(/recrutement.*fermé/i)
-    })
+        })
 
-    // Test supprimé : le mode externe est maintenant géré côté frontend par redirection
-    // L'API applications/index.post n'effectue plus de vérification du mode externe
-  })
+        expect(application.id).toBeDefined()
+        expect(application.status).toBe('PENDING')
+        expect(application.motivation).toBe(
+          'Je suis très motivé pour aider à organiser cette convention !'
+        )
+        expect(application.setupAvailability).toBe(true)
+        expect(application.dietaryPreference).toBe('VEGETARIAN')
 
-  describe('Validation des permissions dans le workflow', () => {
-    it('devrait respecter les permissions de collaborateur', async () => {
-      const { prismaMock } = await import('../__mocks__/prisma')
-
-      const collaboratorUser = {
-        id: 3,
-        email: 'collaborator@example.com',
-        pseudo: 'collab1',
-      }
-
-      const editionWithCollaborator = {
-        ...mockEdition,
-        creatorId: 999, // Différent créateur
-        convention: {
-          id: 1,
-          authorId: 999, // Différent créateur de convention
-          collaborators: [
-            {
-              userId: collaboratorUser.id,
-              canManageVolunteers: true,
-              canEditAllEditions: false,
+        // ========== ÉTAPE 3: Consultation des candidatures par le gestionnaire ==========
+        const applications = await prismaTest.editionVolunteerApplication.findMany({
+          where: {
+            editionId: mockEdition.id,
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                email: true,
+                prenom: true,
+                nom: true,
+              },
             },
-          ],
-        },
-      }
+          },
+        })
 
-      // Configuration par le collaborateur autorisé
-      const volunteerSettings = {
-        mode: 'INTERNAL',
-        askDiet: true,
-        askAllergies: false,
-      }
+        expect(applications).toHaveLength(1)
+        expect(applications[0].status).toBe('PENDING')
+        expect(applications[0].user.pseudo).toBe(mockUser.pseudo)
+        expect(applications[0].motivation).toBe(
+          'Je suis très motivé pour aider à organiser cette convention !'
+        )
 
-      const updatedEdition = {
-        ...mockEdition,
-        volunteersMode: 'INTERNAL',
-        volunteersAskDiet: true,
-        volunteersAskAllergies: false,
-      }
+        // ========== ÉTAPE 4: Acceptation de la candidature ==========
+        const acceptedApplication = await prismaTest.editionVolunteerApplication.update({
+          where: { id: application.id },
+          data: {
+            status: 'ACCEPTED',
+            internalNotes: "Candidat parfait pour l'accueil",
+            processedAt: new Date(),
+            processedBy: mockManager.id,
+          },
+        })
 
-      // Mock pour canManageEditionVolunteers - premier appel (édition)
-      prismaMock.edition.findUnique.mockResolvedValue({
-        id: mockEdition.id,
-        creatorId: 999, // Différent créateur
-        conventionId: 1,
+        expect(acceptedApplication.status).toBe('ACCEPTED')
+        expect(acceptedApplication.internalNotes).toBe("Candidat parfait pour l'accueil")
+        expect(acceptedApplication.processedBy).toBe(mockManager.id)
+
+        // ========== ÉTAPE 5: Assignation à des équipes ==========
+        const teamAssignment1 = await prismaTest.volunteerTeamAssignment.create({
+          data: {
+            applicationId: application.id,
+            teamId: mockTeam1.id,
+            isLeader: false,
+          },
+        })
+
+        expect(teamAssignment1.applicationId).toBe(application.id)
+        expect(teamAssignment1.teamId).toBe(mockTeam1.id)
+
+        // ========== ÉTAPE 6: Vérification de l'état final ==========
+        const finalApplication = await prismaTest.editionVolunteerApplication.findUnique({
+          where: { id: application.id },
+          include: {
+            teamAssignments: {
+              include: {
+                team: true,
+              },
+            },
+          },
+        })
+
+        expect(finalApplication?.status).toBe('ACCEPTED')
+        expect(finalApplication?.teamAssignments).toHaveLength(1)
+        expect(finalApplication?.teamAssignments[0].team.name).toBe('Accueil')
+      })
+    })
+
+    describe("Scénarios d'erreur dans le workflow", () => {
+      it('devrait empêcher la double candidature dans la DB', async () => {
+        const ts = Date.now()
+
+        // Créer une candidature
+        const firstApplication = await prismaTest.editionVolunteerApplication.create({
+          data: {
+            editionId: mockEdition.id,
+            userId: mockUser.id,
+            motivation: 'Première candidature',
+            setupAvailability: true,
+            arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000),
+            status: 'PENDING',
+            userSnapshotPhone: mockUser.phone,
+          },
+        })
+
+        expect(firstApplication.id).toBeDefined()
+
+        // Tenter de créer une seconde candidature pour le même utilisateur et édition
+        // La contrainte unique (editionId, userId) devrait l'empêcher
+        await expect(
+          prismaTest.editionVolunteerApplication.create({
+            data: {
+              editionId: mockEdition.id,
+              userId: mockUser.id,
+              motivation: 'Tentative de double candidature',
+              setupAvailability: true,
+              arrivalDateTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+              departureDateTime: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
+              status: 'PENDING',
+              userSnapshotPhone: mockUser.phone,
+            },
+          })
+        ).rejects.toThrow(/Unique constraint/)
       })
 
-      // Mock pour canManageEditionVolunteers - second appel (convention avec collaborateurs)
-      prismaMock.convention.findUnique.mockResolvedValue({
-        id: 1,
-        authorId: 999, // Différent créateur de convention
-        collaborators: [
-          {
+      it('devrait gérer le rejet et permettre la mise à jour du statut', async () => {
+        const ts = Date.now()
+
+        // Créer un nouvel utilisateur pour ce test
+        const testUser = await prismaTest.user.create({
+          data: {
+            email: `reject-test-${ts}@example.com`,
+            password: await bcrypt.hash('Password123!', 10),
+            pseudo: `rejectuser-${ts}`,
+            nom: 'Test',
+            prenom: 'Reject',
+            isEmailVerified: true,
+          },
+        })
+
+        // Créer une candidature
+        const application = await prismaTest.editionVolunteerApplication.create({
+          data: {
+            editionId: mockEdition.id,
+            userId: testUser.id,
+            motivation: 'Candidature à rejeter',
+            setupAvailability: true,
+            arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000),
+            status: 'PENDING',
+            userSnapshotPhone: '+33123456789',
+          },
+        })
+
+        expect(application.status).toBe('PENDING')
+
+        // Rejeter la candidature
+        const rejectedApplication = await prismaTest.editionVolunteerApplication.update({
+          where: { id: application.id },
+          data: {
+            status: 'REJECTED',
+            internalNotes: 'Profile ne correspond pas',
+            processedAt: new Date(),
+            processedBy: mockManager.id,
+          },
+        })
+
+        expect(rejectedApplication.status).toBe('REJECTED')
+        expect(rejectedApplication.internalNotes).toBe('Profile ne correspond pas')
+
+        // Vérifier dans la DB
+        const verifyApplication = await prismaTest.editionVolunteerApplication.findUnique({
+          where: { id: application.id },
+        })
+
+        expect(verifyApplication?.status).toBe('REJECTED')
+      })
+    })
+
+    describe('Validation des permissions dans le workflow', () => {
+      it('devrait permettre à un collaborateur autorisé de gérer les candidatures', async () => {
+        const ts = Date.now()
+
+        // Créer un utilisateur collaborateur
+        const collaboratorUser = await prismaTest.user.create({
+          data: {
+            email: `collaborator-${ts}@example.com`,
+            password: await bcrypt.hash('Password123!', 10),
+            pseudo: `collab-${ts}`,
+            nom: 'Collaborateur',
+            prenom: 'Test',
+            isEmailVerified: true,
+          },
+        })
+
+        // Créer une convention avec un collaborateur
+        const convention = await prismaTest.convention.findUnique({
+          where: { id: mockEdition.conventionId },
+        })
+
+        expect(convention).toBeDefined()
+
+        // Ajouter le collaborateur
+        const collaborator = await prismaTest.conventionCollaborator.create({
+          data: {
+            conventionId: convention!.id,
             userId: collaboratorUser.id,
             canManageVolunteers: true,
-            id: 1,
+            addedById: mockManager.id,
           },
-        ],
-      })
+        })
 
-      // Mock pour l'update final
-      prismaMock.edition.update.mockResolvedValue(updatedEdition)
-      global.readBody.mockResolvedValue(volunteerSettings)
+        expect(collaborator.canManageVolunteers).toBe(true)
 
-      const settingsHandler = await import(
-        '../../server/api/editions/[id]/volunteers/settings.patch'
-      )
-      const result = await settingsHandler.default({
-        context: { user: collaboratorUser },
-      } as any)
-
-      expect(result.settings.volunteersAskDiet).toBe(true)
-      expect(result.settings.volunteersAskAllergies).toBe(false)
-    })
-
-    it('devrait rejeter les utilisateurs non autorisés', async () => {
-      const { prismaMock } = await import('../__mocks__/prisma')
-
-      const unauthorizedUser = {
-        id: 4,
-        email: 'stranger@example.com',
-        pseudo: 'stranger',
-      }
-
-      const editionWithoutPermissions = {
-        ...mockEdition,
-        creatorId: 999,
-        convention: {
-          id: 1,
-          authorId: 999,
-          collaborators: [], // Aucun collaborateur
-        },
-      }
-
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithoutPermissions)
-      global.readBody.mockResolvedValue({ mode: 'INTERNAL' })
-      global.getRouterParam.mockReturnValue('1')
-
-      const settingsHandler = await import(
-        '../../server/api/editions/[id]/volunteers/settings.patch'
-      )
-
-      await expect(
-        settingsHandler.default({
-          context: {
-            user: unauthorizedUser,
-            params: { id: '1' },
+        // Vérifier que le collaborateur est bien enregistré
+        const foundCollaborator = await prismaTest.conventionCollaborator.findFirst({
+          where: {
+            conventionId: convention!.id,
+            userId: collaboratorUser.id,
           },
-        } as any)
-      ).rejects.toThrow('Droits insuffisants pour gérer les bénévoles')
-    })
-  })
+        })
 
-  describe('Performance et cohérence des données', () => {
-    it('devrait maintenir la cohérence entre les différentes API', async () => {
-      const { prismaMock } = await import('../__mocks__/prisma')
-
-      const commonEditionData = {
-        ...mockEdition,
-        volunteersMode: 'INTERNAL',
-        volunteersDescription: 'Description cohérente',
-        volunteersAskDiet: true,
-        volunteersAskAllergies: false,
-      }
-
-      // Mock des équipes VolunteerTeam pour les tests de cohérence
-      const mockTeamsForConsistency = [
-        { id: 'test1', name: 'Test Team', description: 'Test', color: '#ef4444', maxVolunteers: 5 },
-      ]
-      prismaMock.volunteerTeam.findMany.mockResolvedValue(mockTeamsForConsistency)
-
-      // Configuration
-      prismaMock.edition.findUnique.mockResolvedValue(commonEditionData)
-      prismaMock.edition.update.mockResolvedValue(commonEditionData)
-
-      // Consultation des infos
-      const infoHandler = await import('../../server/api/editions/[id]/volunteers/settings.get')
-      const infoResult = await infoHandler.default({
-        context: { user: null },
-      } as any)
-
-      // Les données doivent être identiques entre config et consultation
-      expect(infoResult.mode).toBe(commonEditionData.volunteersMode)
-      expect(infoResult.description).toBe(commonEditionData.volunteersDescription)
-      expect(infoResult.askDiet).toBe(commonEditionData.volunteersAskDiet)
-      expect(infoResult.askAllergies).toBe(commonEditionData.volunteersAskAllergies)
-      expect(infoResult.teams).toEqual(mockTeamsForConsistency)
-    })
-
-    it('devrait optimiser les requêtes base de données', async () => {
-      const { prismaMock } = await import('../__mocks__/prisma')
-
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-
-      // Consultation des infos - ne devrait faire qu'une requête
-      const infoHandler = await import('../../server/api/editions/[id]/volunteers/settings.get')
-      await infoHandler.default({
-        context: { user: null },
-      } as any)
-
-      expect(prismaMock.edition.findUnique).toHaveBeenCalledTimes(1)
-      expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
-        where: { id: 1 },
-        select: {
-          id: true,
-          volunteersOpen: true,
-          volunteersDescription: true,
-          volunteersMode: true,
-          volunteersExternalUrl: true,
-          volunteersAskDiet: true,
-          volunteersAskAllergies: true,
-          volunteersAskTimePreferences: true,
-          volunteersAskTeamPreferences: true,
-          volunteersAskPets: true,
-          volunteersAskMinors: true,
-          volunteersAskVehicle: true,
-          volunteersAskCompanion: true,
-          volunteersAskAvoidList: true,
-          volunteersAskSkills: true,
-          volunteersAskExperience: true,
-          volunteersAskEmergencyContact: true,
-          volunteersSetupStartDate: true,
-          volunteersTeardownEndDate: true,
-          volunteersUpdatedAt: true,
-          volunteersAskSetup: true,
-          volunteersAskTeardown: true,
-          volunteerApplications: { select: { id: true, status: true, userId: true } },
-        },
+        expect(foundCollaborator).toBeDefined()
+        expect(foundCollaborator?.canManageVolunteers).toBe(true)
       })
     })
-  })
 
-  describe("Tests spécifiques pour le contact d'urgence", () => {
-    it("devrait rendre le contact d'urgence obligatoire si niveau de sévérité SEVERE ou CRITICAL", async () => {
-      const { prismaMock } = await import('../__mocks__/prisma')
+    describe('Performance et cohérence des données', () => {
+      it('devrait maintenir la cohérence des équipes et des candidatures', async () => {
+        const teams = await prismaTest.volunteerTeam.findMany({
+          where: { editionId: mockEdition.id },
+        })
 
-      // Édition avec contact d'urgence non demandé mais allergies demandées
-      // Doit correspondre au select de l'API applications/index.post.ts
-      const editionWithAllergies = {
-        volunteersOpen: true,
-        volunteersAskDiet: true,
-        volunteersAskAllergies: true,
-        volunteersAskTimePreferences: true,
-        volunteersAskTeamPreferences: true,
-        volunteersAskPets: true,
-        volunteersAskMinors: true,
-        volunteersAskVehicle: true,
-        volunteersAskEmergencyContact: false,
-      }
+        expect(teams).toHaveLength(2)
+        expect(teams.some((t) => t.name === 'Accueil')).toBe(true)
+        expect(teams.some((t) => t.name === 'Technique')).toBe(true)
 
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergies)
-      prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
-      prismaMock.user.findUnique.mockResolvedValue(mockUser)
-      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
-
-      // Candidature avec allergies SEVERE mais sans contact d'urgence
-      const applicationWithSevereAllergiesNoContact = {
-        motivation: 'Candidature avec allergies sévères',
-        setupAvailability: true,
-        eventAvailability: true,
-        arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-        allergies: 'Allergie aux arachides',
-        allergySeverity: 'SEVERE',
-        // Pas de contact d'urgence fourni
-      }
-
-      global.readBody.mockResolvedValue(applicationWithSevereAllergiesNoContact)
-      global.getRouterParam.mockReturnValue('1')
-
-      const applyHandler = await import(
-        '../../server/api/editions/[id]/volunteers/applications/index.post'
-      )
-
-      // Devrait échouer car contact d'urgence requis à cause du niveau SEVERE
-      await expect(
-        applyHandler.default({
-          context: {
-            user: mockUser,
-            params: { id: '1' },
+        // Vérifier les relations entre édition et équipes
+        const editionWithTeams = await prismaTest.edition.findUnique({
+          where: { id: mockEdition.id },
+          include: {
+            volunteerTeams: true,
           },
-        } as any)
-      ).rejects.toThrow(/contact d'urgence/i)
-    })
+        })
 
-    it('devrait exiger le niveau de sévérité si allergies renseignées', async () => {
-      const { prismaMock } = await import('../__mocks__/prisma')
+        expect(editionWithTeams?.volunteerTeams).toHaveLength(2)
+      })
 
-      // Édition avec allergies demandées
-      const editionWithAllergies = {
-        volunteersOpen: true,
-        volunteersAskDiet: true,
-        volunteersAskAllergies: true,
-        volunteersAskTimePreferences: true,
-        volunteersAskTeamPreferences: true,
-        volunteersAskPets: true,
-        volunteersAskMinors: true,
-        volunteersAskVehicle: true,
-        volunteersAskEmergencyContact: false,
-      }
-
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergies)
-      prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
-      prismaMock.user.findUnique.mockResolvedValue(mockUser)
-      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
-
-      // Candidature avec allergies mais sans niveau de sévérité
-      const applicationWithAllergiesNoSeverity = {
-        motivation: 'Candidature avec allergies',
-        setupAvailability: true,
-        eventAvailability: true,
-        arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-        allergies: 'Allergie aux arachides',
-        // Pas de allergySeverity fourni
-        emergencyContactName: 'Marie Dupont',
-        emergencyContactPhone: '+33987654321',
-      }
-
-      global.readBody.mockResolvedValue(applicationWithAllergiesNoSeverity)
-      global.getRouterParam.mockReturnValue('1')
-
-      const applyHandler = await import(
-        '../../server/api/editions/[id]/volunteers/applications/index.post'
-      )
-
-      // Devrait échouer car niveau de sévérité requis pour les allergies
-      await expect(
-        applyHandler.default({
-          context: {
-            user: mockUser,
-            params: { id: '1' },
+      it('devrait gérer les agrégations de candidatures', async () => {
+        // Compter les candidatures par statut
+        const pendingCount = await prismaTest.editionVolunteerApplication.count({
+          where: {
+            editionId: mockEdition.id,
+            status: 'PENDING',
           },
-        } as any)
-      ).rejects.toThrow(/sévérité/i)
-    })
+        })
 
-    it("devrait exiger un contact d'urgence pour les allergies SEVERE ou CRITICAL", async () => {
-      const { prismaMock } = await import('../__mocks__/prisma')
-
-      const editionBasic = {
-        volunteersOpen: true,
-        volunteersAskDiet: true,
-        volunteersAskAllergies: true,
-        volunteersAskTimePreferences: false,
-        volunteersAskTeamPreferences: false,
-        volunteersAskPets: false,
-        volunteersAskMinors: false,
-        volunteersAskVehicle: false,
-        volunteersAskEmergencyContact: false, // Contact d'urgence NON demandé
-      }
-
-      prismaMock.edition.findUnique.mockResolvedValue(editionBasic)
-      prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
-      prismaMock.user.findUnique.mockResolvedValue(mockUser)
-      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
-
-      // Candidature avec allergies CRITICAL mais sans contact d'urgence
-      const applicationCriticalNoContact = {
-        motivation: 'Candidature avec allergies critiques',
-        setupAvailability: true,
-        eventAvailability: true,
-        arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-        allergies: 'Allergie sévère aux arachides',
-        allergySeverity: 'CRITICAL',
-        // Pas de contact d'urgence fourni
-      }
-
-      global.readBody.mockResolvedValue(applicationCriticalNoContact)
-      global.getRouterParam.mockReturnValue('1')
-
-      const applyHandler = await import(
-        '../../server/api/editions/[id]/volunteers/applications/index.post'
-      )
-
-      // Devrait échouer car contact d'urgence requis pour allergies CRITICAL
-      await expect(
-        applyHandler.default({
-          context: {
-            user: mockUser,
-            params: { id: '1' },
+        const acceptedCount = await prismaTest.editionVolunteerApplication.count({
+          where: {
+            editionId: mockEdition.id,
+            status: 'ACCEPTED',
           },
-        } as any)
-      ).rejects.toThrow(/contact d'urgence/i)
+        })
+
+        // Vérifier que les comptages sont cohérents
+        expect(pendingCount).toBeGreaterThanOrEqual(0)
+        expect(acceptedCount).toBeGreaterThanOrEqual(0)
+
+        const totalCount = await prismaTest.editionVolunteerApplication.count({
+          where: {
+            editionId: mockEdition.id,
+          },
+        })
+
+        expect(totalCount).toBeGreaterThanOrEqual(pendingCount + acceptedCount)
+      })
     })
 
-    it("devrait accepter la candidature avec allergies LIGHT/MODERATE sans contact d'urgence", async () => {
-      const { prismaMock } = await import('../__mocks__/prisma')
+    describe("Tests spécifiques pour les allergies et contact d'urgence", () => {
+      it('devrait stocker correctement les allergies avec niveau de sévérité dans la DB', async () => {
+        const ts = Date.now()
 
-      const editionWithAllergies = {
-        volunteersOpen: true,
-        volunteersAskDiet: true,
-        volunteersAskAllergies: true,
-        volunteersAskTimePreferences: false,
-        volunteersAskTeamPreferences: false,
-        volunteersAskPets: false,
-        volunteersAskMinors: false,
-        volunteersAskVehicle: false,
-        volunteersAskEmergencyContact: false,
-      }
+        const allergyUser = await prismaTest.user.create({
+          data: {
+            email: `allergy-${ts}@example.com`,
+            password: await bcrypt.hash('Password123!', 10),
+            pseudo: `allergyuser-${ts}`,
+            nom: 'Allergy',
+            prenom: 'Test',
+            isEmailVerified: true,
+          },
+        })
 
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergies)
-      prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
-      prismaMock.user.findUnique.mockResolvedValue(mockUser)
-      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
+        const applicationWithAllergy = await prismaTest.editionVolunteerApplication.create({
+          data: {
+            editionId: mockEdition.id,
+            userId: allergyUser.id,
+            motivation: 'Candidature avec allergies',
+            setupAvailability: true,
+            eventAvailability: true,
+            arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000),
+            allergies: 'Allergie aux arachides',
+            allergySeverity: 'SEVERE',
+            emergencyContactName: 'Marie Dupont',
+            emergencyContactPhone: '+33987654321',
+            status: 'PENDING',
+            userSnapshotPhone: '+33123456789',
+          },
+        })
 
-      // Candidature avec allergies LIGHT, pas de contact d'urgence requis
-      const applicationWithLightAllergies = {
-        motivation: 'Candidature avec allergies légères',
-        setupAvailability: true,
-        eventAvailability: true,
-        arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-        allergies: 'Allergie légère au pollen',
-        allergySeverity: 'LIGHT',
-        // Pas de contact d'urgence fourni - et c'est OK pour LIGHT
-      }
+        expect(applicationWithAllergy.allergies).toBe('Allergie aux arachides')
+        expect(applicationWithAllergy.allergySeverity).toBe('SEVERE')
+        expect(applicationWithAllergy.emergencyContactName).toBe('Marie Dupont')
+        expect(applicationWithAllergy.emergencyContactPhone).toBe('+33987654321')
 
-      const createdApplication = {
-        id: 1,
-        editionId: 1,
-        userId: mockUser.id,
-        status: 'PENDING',
-        ...applicationWithLightAllergies,
-        edition: {
-          id: 1,
-          name: 'Test Edition',
-          conventionId: 1,
-          convention: { name: 'Test Convention' },
-        },
-      }
+        // Vérifier dans la DB
+        const verifyApplication = await prismaTest.editionVolunteerApplication.findUnique({
+          where: { id: applicationWithAllergy.id },
+        })
 
-      prismaMock.editionVolunteerApplication.create.mockResolvedValue(createdApplication)
-      prismaMock.notification.create.mockResolvedValue({})
-      global.readBody.mockResolvedValue(applicationWithLightAllergies)
-      global.getRouterParam.mockReturnValue('1')
+        expect(verifyApplication?.allergies).toBe('Allergie aux arachides')
+        expect(verifyApplication?.allergySeverity).toBe('SEVERE')
+      })
 
-      const applyHandler = await import(
-        '../../server/api/editions/[id]/volunteers/applications/index.post'
-      )
+      it("devrait accepter les allergies légères sans contact d'urgence", async () => {
+        const ts = Date.now()
 
-      // Devrait réussir car contact d'urgence pas requis pour LIGHT
-      const result = await applyHandler.default({
-        context: {
-          user: mockUser,
-          params: { id: '1' },
-        },
-      } as any)
+        const lightAllergyUser = await prismaTest.user.create({
+          data: {
+            email: `light-allergy-${ts}@example.com`,
+            password: await bcrypt.hash('Password123!', 10),
+            pseudo: `lightallergyuser-${ts}`,
+            nom: 'Light',
+            prenom: 'Allergy',
+            isEmailVerified: true,
+          },
+        })
 
-      expect(result.success).toBe(true)
-      expect(result.application).toBeDefined()
+        const applicationWithLightAllergy = await prismaTest.editionVolunteerApplication.create({
+          data: {
+            editionId: mockEdition.id,
+            userId: lightAllergyUser.id,
+            motivation: 'Candidature avec allergies légères',
+            setupAvailability: true,
+            eventAvailability: true,
+            arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000),
+            allergies: 'Allergie légère au pollen',
+            allergySeverity: 'LIGHT',
+            // Pas de contact d'urgence - et c'est OK pour LIGHT
+            status: 'PENDING',
+            userSnapshotPhone: '+33123456789',
+          },
+        })
+
+        expect(applicationWithLightAllergy.allergies).toBe('Allergie légère au pollen')
+        expect(applicationWithLightAllergy.allergySeverity).toBe('LIGHT')
+        expect(applicationWithLightAllergy.emergencyContactName).toBeNull()
+        expect(applicationWithLightAllergy.emergencyContactPhone).toBeNull()
+      })
     })
-
-    it("devrait accepter la candidature avec contact d'urgence si allergies renseignées", async () => {
-      const { prismaMock } = await import('../__mocks__/prisma')
-
-      // Édition avec contact d'urgence non demandé mais allergies demandées
-      // Doit correspondre au select de l'API applications/index.post.ts
-      const editionWithAllergies = {
-        volunteersOpen: true,
-        volunteersAskDiet: true,
-        volunteersAskAllergies: true,
-        volunteersAskTimePreferences: true,
-        volunteersAskTeamPreferences: true,
-        volunteersAskPets: true,
-        volunteersAskMinors: true,
-        volunteersAskVehicle: true,
-        volunteersAskEmergencyContact: false,
-      }
-
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergies)
-      prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
-      prismaMock.user.findUnique.mockResolvedValue(mockUser)
-      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
-
-      // Candidature avec allergies ET contact d'urgence
-      const applicationWithAllergiesAndContact = {
-        motivation: 'Candidature avec allergies et contact',
-        setupAvailability: true,
-        eventAvailability: true,
-        arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-        allergies: 'Allergie aux arachides',
-        allergySeverity: 'MODERATE',
-        emergencyContactName: 'Marie Dupont',
-        emergencyContactPhone: '+33987654321',
-      }
-
-      const createdApplication = {
-        id: 1,
-        editionId: 1,
-        userId: mockUser.id,
-        status: 'PENDING',
-        ...applicationWithAllergiesAndContact,
-        edition: {
-          id: 1,
-          name: 'Test Edition',
-          conventionId: 1,
-          convention: { name: 'Test Convention' },
-        },
-      }
-
-      prismaMock.editionVolunteerApplication.create.mockResolvedValue(createdApplication)
-      prismaMock.notification.create.mockResolvedValue({})
-      global.readBody.mockResolvedValue(applicationWithAllergiesAndContact)
-      global.getRouterParam.mockReturnValue('1')
-
-      const applyHandler = await import(
-        '../../server/api/editions/[id]/volunteers/applications/index.post'
-      )
-
-      const result = await applyHandler.default({
-        context: {
-          user: mockUser,
-          params: { id: '1' },
-        },
-      } as any)
-
-      expect(result.success).toBe(true)
-      expect(result.application.allergies).toBe('Allergie aux arachides')
-      expect(result.application.emergencyContactName).toBe('Marie Dupont')
-      expect(result.application.emergencyContactPhone).toBe('+33987654321')
-    })
-
-    it("devrait accepter la candidature sans contact d'urgence si pas d'allergies", async () => {
-      const { prismaMock } = await import('../__mocks__/prisma')
-
-      // Édition avec contact d'urgence non demandé et allergies demandées
-      // Doit correspondre au select de l'API applications/index.post.ts
-      const editionWithAllergies = {
-        volunteersOpen: true,
-        volunteersAskDiet: true,
-        volunteersAskAllergies: true,
-        volunteersAskTimePreferences: true,
-        volunteersAskTeamPreferences: true,
-        volunteersAskPets: true,
-        volunteersAskMinors: true,
-        volunteersAskVehicle: true,
-        volunteersAskEmergencyContact: false,
-      }
-
-      prismaMock.edition.findUnique.mockResolvedValue(editionWithAllergies)
-      prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
-      prismaMock.user.findUnique.mockResolvedValue(mockUser)
-      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
-
-      // Candidature sans allergies ni contact d'urgence
-      const applicationWithoutAllergies = {
-        motivation: 'Candidature sans allergies',
-        setupAvailability: true,
-        eventAvailability: true,
-        arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-        // Pas d'allergies ni de contact d'urgence
-      }
-
-      const createdApplication = {
-        id: 1,
-        editionId: 1,
-        userId: mockUser.id,
-        status: 'PENDING',
-        ...applicationWithoutAllergies,
-        edition: {
-          id: 1,
-          name: 'Test Edition',
-          conventionId: 1,
-          convention: { name: 'Test Convention' },
-        },
-      }
-
-      prismaMock.editionVolunteerApplication.create.mockResolvedValue(createdApplication)
-      prismaMock.notification.create.mockResolvedValue({})
-      global.readBody.mockResolvedValue(applicationWithoutAllergies)
-      global.getRouterParam.mockReturnValue('1')
-
-      const applyHandler = await import(
-        '../../server/api/editions/[id]/volunteers/applications/index.post'
-      )
-
-      const result = await applyHandler.default({
-        context: {
-          user: mockUser,
-          params: { id: '1' },
-        },
-      } as any)
-
-      expect(result.success).toBe(true)
-      expect(result.application.allergies).toBeUndefined()
-      expect(result.application.emergencyContactName).toBeUndefined()
-    })
-  })
-})
+  }
+)

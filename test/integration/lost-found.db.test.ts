@@ -1,299 +1,318 @@
+import bcrypt from 'bcryptjs'
 import { describe, it, expect, beforeEach } from 'vitest'
 
-import { prismaMock } from '../__mocks__/prisma'
+import { prismaTest } from '../setup-db'
 
-// Mock Prisma pour les tests d'intégration
-const prisma = prismaMock
+// Ce fichier ne s'exécute que si TEST_WITH_DB=true
+describe.skipIf(!process.env.TEST_WITH_DB)(
+  "Tests d'intégration Lost & Found avec DB réelle",
+  () => {
+    let testUser: { id: number; email: string; pseudo: string }
+    let testEdition: { id: number; name: string }
 
-describe('Lost Found System - Database Integration', () => {
-  beforeEach(() => {
-    // Les mocks sont automatiquement réinitialisés
-  })
+    // Le nettoyage est géré globalement par setup-db.ts
 
-  describe('LostFoundItem CRUD', () => {
-    it('devrait pouvoir créer un objet trouvé', async () => {
-      const mockLostFoundItem = {
-        id: 1,
-        editionId: 123,
-        userId: 1,
-        description: 'Jongle ball rouge trouvé près de la scène',
-        imageUrl: '/uploads/lost-found/1/image.jpg',
-        status: 'LOST',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
+    beforeEach(async () => {
+      const timestamp = Date.now()
 
-      prisma.lostFoundItem.create.mockResolvedValue(mockLostFoundItem)
-
-      const result = await prisma.lostFoundItem.create({
+      // Créer un utilisateur de test
+      testUser = await prismaTest.user.create({
         data: {
-          editionId: 123,
-          userId: 1,
-          description: 'Jongle ball rouge trouvé près de la scène',
-          imageUrl: '/uploads/lost-found/1/image.jpg',
-          status: 'LOST',
+          email: `lostfound-${timestamp}@example.com`,
+          password: await bcrypt.hash('Password123!', 10),
+          pseudo: `lostfound-${timestamp}`,
+          nom: 'Lost',
+          prenom: 'Found',
+          isEmailVerified: true,
         },
       })
 
-      expect(result).toEqual(mockLostFoundItem)
-      expect(prisma.lostFoundItem.create).toHaveBeenCalledWith({
+      // Créer une édition de test
+      testEdition = await prismaTest.edition.create({
         data: {
-          editionId: 123,
-          userId: 1,
-          description: 'Jongle ball rouge trouvé près de la scène',
-          imageUrl: '/uploads/lost-found/1/image.jpg',
-          status: 'LOST',
-        },
-      })
-    })
-
-    it('devrait pouvoir récupérer des objets trouvés', async () => {
-      const mockItems = [
-        {
-          id: 1,
-          description: 'Jongle ball rouge',
-          status: 'LOST',
-          user: { id: 1, pseudo: 'testuser' },
-        },
-        {
-          id: 2,
-          description: 'Diabolo bleu',
-          status: 'RETURNED',
-          user: { id: 2, pseudo: 'testuser2' },
-        },
-      ]
-
-      prisma.lostFoundItem.findMany.mockResolvedValue(mockItems)
-
-      const result = await prisma.lostFoundItem.findMany({
-        where: { editionId: 123 },
-        include: {
-          user: {
-            select: { id: true, pseudo: true },
-          },
-        },
-      })
-
-      expect(result).toEqual(mockItems)
-      expect(result).toHaveLength(2)
-    })
-
-    it('devrait pouvoir mettre à jour le statut', async () => {
-      const mockUpdatedItem = {
-        id: 1,
-        status: 'RETURNED',
-        updatedAt: new Date(),
-      }
-
-      prisma.lostFoundItem.update.mockResolvedValue(mockUpdatedItem)
-
-      const result = await prisma.lostFoundItem.update({
-        where: { id: 1 },
-        data: { status: 'RETURNED' },
-      })
-
-      expect(result.status).toBe('RETURNED')
-      expect(prisma.lostFoundItem.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: { status: 'RETURNED' },
-      })
-    })
-  })
-
-  describe('LostFoundComment CRUD', () => {
-    it('devrait pouvoir créer un commentaire', async () => {
-      const mockComment = {
-        id: 1,
-        lostFoundItemId: 1,
-        userId: 2,
-        content: "Je pense que c'est le mien",
-        createdAt: new Date(),
-        user: {
-          id: 2,
-          pseudo: 'testuser2',
-          prenom: 'Test2',
-          nom: 'User2',
-        },
-      }
-
-      prisma.lostFoundComment.create.mockResolvedValue(mockComment)
-
-      const result = await prisma.lostFoundComment.create({
-        data: {
-          lostFoundItemId: 1,
-          userId: 2,
-          content: "Je pense que c'est le mien",
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              pseudo: true,
-              prenom: true,
-              nom: true,
+          name: `Edition Lost Found ${timestamp}`,
+          startDate: new Date('2024-06-01'),
+          endDate: new Date('2024-06-03'),
+          convention: {
+            create: {
+              name: `Convention Lost Found ${timestamp}`,
+              authorId: testUser.id,
             },
           },
         },
       })
-
-      expect(result).toEqual(mockComment)
-      expect(result.content).toBe("Je pense que c'est le mien")
     })
 
-    it('devrait pouvoir lister les commentaires par objet', async () => {
-      const mockComments = [
-        {
-          id: 1,
-          content: 'Premier commentaire',
-          user: { pseudo: 'user1' },
-        },
-        {
-          id: 2,
-          content: 'Deuxième commentaire',
-          user: { pseudo: 'user2' },
-        },
-      ]
+    describe('LostFoundItem CRUD', () => {
+      it('devrait créer un objet trouvé dans la DB', async () => {
+        const lostItem = await prismaTest.lostFoundItem.create({
+          data: {
+            editionId: testEdition.id,
+            userId: testUser.id,
+            description: 'Jongle ball rouge trouvé près de la scène',
+            status: 'LOST',
+          },
+        })
 
-      prisma.lostFoundComment.findMany.mockResolvedValue(mockComments)
+        expect(lostItem.id).toBeDefined()
+        expect(lostItem.description).toBe('Jongle ball rouge trouvé près de la scène')
+        expect(lostItem.status).toBe('LOST')
+        expect(lostItem.editionId).toBe(testEdition.id)
+        expect(lostItem.userId).toBe(testUser.id)
 
-      const result = await prisma.lostFoundComment.findMany({
-        where: { lostFoundItemId: 1 },
-        include: {
-          user: { select: { pseudo: true } },
-        },
-        orderBy: { createdAt: 'asc' },
+        // Vérifier que l'objet existe dans la DB
+        const foundItem = await prismaTest.lostFoundItem.findUnique({
+          where: { id: lostItem.id },
+          include: {
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+              },
+            },
+          },
+        })
+
+        expect(foundItem).toBeDefined()
+        expect(foundItem?.user.pseudo).toBe(testUser.pseudo)
       })
 
-      expect(result).toEqual(mockComments)
-      expect(result).toHaveLength(2)
-    })
-  })
+      it('devrait récupérer des objets trouvés avec leurs relations', async () => {
+        // Créer plusieurs objets
+        await prismaTest.lostFoundItem.create({
+          data: {
+            editionId: testEdition.id,
+            userId: testUser.id,
+            description: 'Jongle ball rouge',
+            status: 'LOST',
+          },
+        })
 
-  describe('Opérations complexes', () => {
-    it('devrait pouvoir récupérer des objets avec commentaires', async () => {
-      const mockItemsWithComments = [
-        {
-          id: 1,
-          description: 'Objet avec commentaires',
-          user: { pseudo: 'creator' },
-          comments: [
+        await prismaTest.lostFoundItem.create({
+          data: {
+            editionId: testEdition.id,
+            userId: testUser.id,
+            description: 'Diabolo bleu',
+            status: 'RETURNED',
+          },
+        })
+
+        const items = await prismaTest.lostFoundItem.findMany({
+          where: { editionId: testEdition.id },
+          include: {
+            user: {
+              select: { id: true, pseudo: true },
+            },
+          },
+        })
+
+        expect(items).toHaveLength(2)
+        expect(items[0].user.pseudo).toBe(testUser.pseudo)
+        expect(items.some((item) => item.status === 'LOST')).toBe(true)
+        expect(items.some((item) => item.status === 'RETURNED')).toBe(true)
+      })
+
+      it('devrait mettre à jour le statut dans la DB', async () => {
+        const lostItem = await prismaTest.lostFoundItem.create({
+          data: {
+            editionId: testEdition.id,
+            userId: testUser.id,
+            description: 'Objet à retourner',
+            status: 'LOST',
+          },
+        })
+
+        expect(lostItem.status).toBe('LOST')
+
+        const updatedItem = await prismaTest.lostFoundItem.update({
+          where: { id: lostItem.id },
+          data: { status: 'RETURNED' },
+        })
+
+        expect(updatedItem.status).toBe('RETURNED')
+
+        // Vérifier dans la DB
+        const verifyItem = await prismaTest.lostFoundItem.findUnique({
+          where: { id: lostItem.id },
+        })
+
+        expect(verifyItem?.status).toBe('RETURNED')
+      })
+    })
+
+    describe('LostFoundComment CRUD', () => {
+      let testLostItem: { id: number }
+
+      beforeEach(async () => {
+        testLostItem = await prismaTest.lostFoundItem.create({
+          data: {
+            editionId: testEdition.id,
+            userId: testUser.id,
+            description: 'Objet avec commentaires',
+            status: 'LOST',
+          },
+        })
+      })
+
+      it('devrait créer un commentaire dans la DB', async () => {
+        const comment = await prismaTest.lostFoundComment.create({
+          data: {
+            lostFoundItemId: testLostItem.id,
+            userId: testUser.id,
+            content: "Je pense que c'est le mien",
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                pseudo: true,
+                prenom: true,
+                nom: true,
+              },
+            },
+          },
+        })
+
+        expect(comment.id).toBeDefined()
+        expect(comment.content).toBe("Je pense que c'est le mien")
+        expect(comment.user.pseudo).toBe(testUser.pseudo)
+      })
+
+      it('devrait lister les commentaires par objet', async () => {
+        // Créer plusieurs commentaires
+        await prismaTest.lostFoundComment.create({
+          data: {
+            lostFoundItemId: testLostItem.id,
+            userId: testUser.id,
+            content: 'Premier commentaire',
+          },
+        })
+
+        await prismaTest.lostFoundComment.create({
+          data: {
+            lostFoundItemId: testLostItem.id,
+            userId: testUser.id,
+            content: 'Deuxième commentaire',
+          },
+        })
+
+        const comments = await prismaTest.lostFoundComment.findMany({
+          where: { lostFoundItemId: testLostItem.id },
+          include: {
+            user: { select: { pseudo: true } },
+          },
+          orderBy: { createdAt: 'asc' },
+        })
+
+        expect(comments).toHaveLength(2)
+        expect(comments[0].content).toBe('Premier commentaire')
+        expect(comments[1].content).toBe('Deuxième commentaire')
+      })
+    })
+
+    describe('Opérations complexes avec DB', () => {
+      it('devrait récupérer des objets avec commentaires (requête complexe)', async () => {
+        const lostItem = await prismaTest.lostFoundItem.create({
+          data: {
+            editionId: testEdition.id,
+            userId: testUser.id,
+            description: 'Objet avec commentaires',
+            status: 'LOST',
+          },
+        })
+
+        await prismaTest.lostFoundComment.create({
+          data: {
+            lostFoundItemId: lostItem.id,
+            userId: testUser.id,
+            content: 'Commentaire 1',
+          },
+        })
+
+        const itemsWithComments = await prismaTest.lostFoundItem.findMany({
+          where: { editionId: testEdition.id },
+          include: {
+            user: { select: { pseudo: true } },
+            comments: {
+              include: {
+                user: { select: { pseudo: true } },
+              },
+            },
+          },
+        })
+
+        expect(itemsWithComments).toHaveLength(1)
+        expect(itemsWithComments[0].comments).toHaveLength(1)
+        expect(itemsWithComments[0].comments[0].content).toBe('Commentaire 1')
+      })
+
+      it('devrait grouper par utilisateur (agrégation)', async () => {
+        // Créer plusieurs objets pour le même utilisateur
+        await prismaTest.lostFoundItem.createMany({
+          data: [
             {
-              id: 1,
-              content: 'Commentaire 1',
-              user: { pseudo: 'commenter1' },
+              editionId: testEdition.id,
+              userId: testUser.id,
+              description: 'Objet 1',
+              status: 'LOST',
+            },
+            {
+              editionId: testEdition.id,
+              userId: testUser.id,
+              description: 'Objet 2',
+              status: 'LOST',
             },
           ],
-        },
-      ]
+        })
 
-      prisma.lostFoundItem.findMany.mockResolvedValue(mockItemsWithComments)
+        const grouped = await prismaTest.lostFoundItem.groupBy({
+          by: ['userId'],
+          where: { editionId: testEdition.id },
+          _count: { id: true },
+        })
 
-      const result = await prisma.lostFoundItem.findMany({
-        where: { editionId: 123 },
-        include: {
-          user: { select: { pseudo: true } },
-          comments: {
-            include: {
-              user: { select: { pseudo: true } },
-            },
+        expect(grouped).toHaveLength(1)
+        expect(grouped[0].userId).toBe(testUser.id)
+        expect(grouped[0]._count.id).toBe(2)
+      })
+    })
+
+    describe('Suppression en cascade', () => {
+      it("devrait supprimer les commentaires lors de la suppression de l'objet", async () => {
+        const lostItem = await prismaTest.lostFoundItem.create({
+          data: {
+            editionId: testEdition.id,
+            userId: testUser.id,
+            description: 'Objet à supprimer',
+            status: 'LOST',
           },
-        },
-      })
+        })
 
-      expect(result).toEqual(mockItemsWithComments)
-      expect(result[0].comments).toHaveLength(1)
-    })
-
-    it('devrait pouvoir grouper par utilisateur', async () => {
-      const mockGroupedData = [
-        { userId: 1, _count: { id: 2 } },
-        { userId: 2, _count: { id: 1 } },
-      ]
-
-      prisma.lostFoundItem.groupBy.mockResolvedValue(mockGroupedData)
-
-      const result = await prisma.lostFoundItem.groupBy({
-        by: ['userId'],
-        where: { editionId: 123 },
-        _count: { id: true },
-      })
-
-      expect(result).toEqual(mockGroupedData)
-      expect(result).toHaveLength(2)
-    })
-  })
-
-  describe('Validation des appels Prisma', () => {
-    it("devrait vérifier les paramètres de création d'objet trouvé", async () => {
-      prisma.lostFoundItem.create.mockResolvedValue({ id: 1 })
-
-      await prisma.lostFoundItem.create({
-        data: {
-          editionId: 123,
-          userId: 1,
-          description: 'Test object',
-          status: 'LOST',
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              pseudo: true,
-              prenom: true,
-              nom: true,
-              profilePicture: true,
-            },
+        await prismaTest.lostFoundComment.create({
+          data: {
+            lostFoundItemId: lostItem.id,
+            userId: testUser.id,
+            content: 'Commentaire à supprimer',
           },
-        },
-      })
+        })
 
-      expect(prisma.lostFoundItem.create).toHaveBeenCalledWith({
-        data: {
-          editionId: 123,
-          userId: 1,
-          description: 'Test object',
-          status: 'LOST',
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              pseudo: true,
-              prenom: true,
-              nom: true,
-              profilePicture: true,
-            },
-          },
-        },
+        // Vérifier que le commentaire existe
+        const commentsBefore = await prismaTest.lostFoundComment.count({
+          where: { lostFoundItemId: lostItem.id },
+        })
+        expect(commentsBefore).toBe(1)
+
+        // Supprimer l'objet (devrait supprimer les commentaires en cascade)
+        await prismaTest.lostFoundItem.delete({
+          where: { id: lostItem.id },
+        })
+
+        // Vérifier que les commentaires ont été supprimés
+        const commentsAfter = await prismaTest.lostFoundComment.count({
+          where: { lostFoundItemId: lostItem.id },
+        })
+        expect(commentsAfter).toBe(0)
       })
     })
-
-    it('devrait vérifier les paramètres de recherche avec filtres', async () => {
-      prisma.lostFoundItem.findMany.mockResolvedValue([])
-
-      await prisma.lostFoundItem.findMany({
-        where: {
-          editionId: 123,
-          status: 'LOST',
-        },
-        include: {
-          user: { select: { pseudo: true } },
-          comments: { orderBy: { createdAt: 'asc' } },
-        },
-        orderBy: { createdAt: 'desc' },
-      })
-
-      expect(prisma.lostFoundItem.findMany).toHaveBeenCalledWith({
-        where: {
-          editionId: 123,
-          status: 'LOST',
-        },
-        include: {
-          user: { select: { pseudo: true } },
-          comments: { orderBy: { createdAt: 'asc' } },
-        },
-        orderBy: { createdAt: 'desc' },
-      })
-    })
-  })
-})
+  }
+)

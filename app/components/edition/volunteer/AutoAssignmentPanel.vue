@@ -199,7 +199,7 @@
 
           <!-- Résultats de l'aperçu -->
           <div v-if="previewResult" class="space-y-4">
-            <UDivider :label="t('editions.volunteers.auto_assignment.preview_results')" />
+            <USeparator :label="t('editions.volunteers.auto_assignment.preview_results')" />
 
             <!-- Statistiques -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
