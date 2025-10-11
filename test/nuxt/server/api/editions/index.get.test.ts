@@ -101,7 +101,7 @@ describe('/api/editions GET', () => {
 
     expect(prismaMock.edition.findMany).toHaveBeenCalledWith({
       where: {},
-      include: expect.any(Object),
+      select: expect.any(Object),
       orderBy: { startDate: 'asc' },
       skip: 10, // (page 2 - 1) * limit 10
       take: 10,
@@ -243,7 +243,7 @@ describe('/api/editions GET', () => {
 
     expect(prismaMock.edition.findMany).toHaveBeenCalledWith({
       where: {},
-      include: expect.any(Object),
+      select: expect.any(Object),
       orderBy: { startDate: 'asc' },
       skip: 0,
       take: 12,
@@ -283,7 +283,7 @@ describe('/api/editions GET', () => {
     })
     expect(prismaMock.edition.findMany).toHaveBeenCalledWith({
       where: { isOnline: true },
-      include: expect.any(Object),
+      select: expect.any(Object),
       orderBy: { startDate: 'asc' },
       skip: 0,
       take: 12,
@@ -304,7 +304,7 @@ describe('/api/editions GET', () => {
     })
     expect(prismaMock.edition.findMany).toHaveBeenCalledWith({
       where: {},
-      include: expect.any(Object),
+      select: expect.any(Object),
       orderBy: { startDate: 'asc' },
       skip: 0,
       take: 12,
