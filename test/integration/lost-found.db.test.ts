@@ -33,6 +33,10 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
           name: `Edition Lost Found ${timestamp}`,
           startDate: new Date('2024-06-01'),
           endDate: new Date('2024-06-03'),
+          addressLine1: '123 Test Street',
+          city: 'Paris',
+          country: 'France',
+          postalCode: '75001',
           convention: {
             create: {
               name: `Convention Lost Found ${timestamp}`,

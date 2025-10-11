@@ -55,6 +55,10 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
           conventionId: convention.id,
           startDate: new Date('2024-06-01'),
           endDate: new Date('2024-06-03'),
+          addressLine1: '123 Test Street',
+          city: 'Paris',
+          country: 'France',
+          postalCode: '75001',
           volunteersOpen: true,
           volunteersMode: 'INTERNAL',
           volunteersDescription: 'Rejoignez notre équipe !',
@@ -109,8 +113,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
         expect(edition?.volunteerTeams).toHaveLength(2)
 
         // ========== ÉTAPE 2: Candidature d'un bénévole ==========
-        const arrivalDate = new Date(Date.now() + 24 * 60 * 60 * 1000)
-        const departureDate = new Date(Date.now() + 48 * 60 * 60 * 1000)
+        const arrivalDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        const departureDate = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
 
         const application = await prismaTest.editionVolunteerApplication.create({
           data: {
@@ -175,18 +179,17 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
           where: { id: application.id },
           data: {
             status: 'ACCEPTED',
-            internalNotes: "Candidat parfait pour l'accueil",
-            processedAt: new Date(),
-            processedBy: mockManager.id,
+            decidedAt: new Date(),
+            acceptanceNote: "Candidat parfait pour l'accueil",
           },
         })
 
         expect(acceptedApplication.status).toBe('ACCEPTED')
-        expect(acceptedApplication.internalNotes).toBe("Candidat parfait pour l'accueil")
-        expect(acceptedApplication.processedBy).toBe(mockManager.id)
+        expect(acceptedApplication.acceptanceNote).toBe("Candidat parfait pour l'accueil")
+        expect(acceptedApplication.decidedAt).toBeDefined()
 
         // ========== ÉTAPE 5: Assignation à des équipes ==========
-        const teamAssignment1 = await prismaTest.volunteerTeamAssignment.create({
+        const teamAssignment1 = await prismaTest.applicationTeamAssignment.create({
           data: {
             applicationId: application.id,
             teamId: mockTeam1.id,
@@ -219,17 +222,30 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
       it('devrait empêcher la double candidature dans la DB', async () => {
         const ts = Date.now()
 
+        // Créer un nouvel utilisateur pour ce test
+        const testUser = await prismaTest.user.create({
+          data: {
+            email: `double-app-${ts}@example.com`,
+            password: await bcrypt.hash('Password123!', 10),
+            pseudo: `doubleapp-${ts}`,
+            nom: 'Double',
+            prenom: 'Application',
+            isEmailVerified: true,
+            phone: '+33123456789',
+          },
+        })
+
         // Créer une candidature
         const firstApplication = await prismaTest.editionVolunteerApplication.create({
           data: {
             editionId: mockEdition.id,
-            userId: mockUser.id,
+            userId: testUser.id,
             motivation: 'Première candidature',
             setupAvailability: true,
-            arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
-            departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000),
+            arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
             status: 'PENDING',
-            userSnapshotPhone: mockUser.phone,
+            userSnapshotPhone: testUser.phone,
           },
         })
 
@@ -241,13 +257,13 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
           prismaTest.editionVolunteerApplication.create({
             data: {
               editionId: mockEdition.id,
-              userId: mockUser.id,
+              userId: testUser.id,
               motivation: 'Tentative de double candidature',
               setupAvailability: true,
-              arrivalDateTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-              departureDateTime: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
+              arrivalDateTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+              departureDateTime: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
               status: 'PENDING',
-              userSnapshotPhone: mockUser.phone,
+              userSnapshotPhone: testUser.phone,
             },
           })
         ).rejects.toThrow(/Unique constraint/)
@@ -275,8 +291,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
             userId: testUser.id,
             motivation: 'Candidature à rejeter',
             setupAvailability: true,
-            arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
-            departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000),
+            arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
             status: 'PENDING',
             userSnapshotPhone: '+33123456789',
           },
@@ -289,14 +305,12 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
           where: { id: application.id },
           data: {
             status: 'REJECTED',
-            internalNotes: 'Profile ne correspond pas',
-            processedAt: new Date(),
-            processedBy: mockManager.id,
+            decidedAt: new Date(),
           },
         })
 
         expect(rejectedApplication.status).toBe('REJECTED')
-        expect(rejectedApplication.internalNotes).toBe('Profile ne correspond pas')
+        expect(rejectedApplication.decidedAt).toBeDefined()
 
         // Vérifier dans la DB
         const verifyApplication = await prismaTest.editionVolunteerApplication.findUnique({
@@ -428,8 +442,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
             motivation: 'Candidature avec allergies',
             setupAvailability: true,
             eventAvailability: true,
-            arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
-            departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000),
+            arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
             allergies: 'Allergie aux arachides',
             allergySeverity: 'SEVERE',
             emergencyContactName: 'Marie Dupont',
@@ -474,8 +488,8 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
             motivation: 'Candidature avec allergies légères',
             setupAvailability: true,
             eventAvailability: true,
-            arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
-            departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000),
+            arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
             allergies: 'Allergie légère au pollen',
             allergySeverity: 'LIGHT',
             // Pas de contact d'urgence - et c'est OK pour LIGHT
