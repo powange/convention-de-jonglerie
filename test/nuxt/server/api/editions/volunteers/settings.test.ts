@@ -59,8 +59,6 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     global.getRouterParam = vi.fn().mockReturnValue('1')
-    // Mock des équipes VolunteerTeam par défaut
-    prismaMock.volunteerTeam.findMany.mockResolvedValue(mockVolunteerTeams)
   })
 
   describe('Mode INTERNAL', () => {
@@ -92,8 +90,6 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         teardownEndDate: mockEdition.volunteersTeardownEndDate,
         askSetup: true,
         askTeardown: true,
-        teams: mockVolunteerTeams,
-        myApplication: null,
         counts: { total: 0 },
         updatedAt: null,
       })
@@ -116,8 +112,6 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
       }
 
       prismaMock.edition.findUnique.mockResolvedValue(editionWithMinimalOptions)
-      // Pas d'équipes pour ce test
-      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
 
       const mockEvent = { context: { user: null } }
       const result = await handler(mockEvent as any)
@@ -133,7 +127,6 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
       expect(result.askAvoidList).toBe(false)
       expect(result.askSkills).toBe(false)
       expect(result.askExperience).toBe(false)
-      expect(result.teams).toEqual([])
     })
 
     it('devrait gérer les dates nulles de montage/démontage', async () => {
@@ -188,8 +181,6 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         teardownEndDate: mockEdition.volunteersTeardownEndDate,
         askSetup: true,
         askTeardown: true,
-        teams: mockVolunteerTeams,
-        myApplication: null,
         counts: { total: 0 },
         updatedAt: null,
       })
@@ -210,8 +201,6 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
       expect(result.mode).toBe('EXTERNAL')
       expect(result.externalUrl).toBe('https://external.example.com')
       expect(result).toHaveProperty('askDiet')
-      expect(result).toHaveProperty('teams')
-      expect(result).toHaveProperty('myApplication')
       expect(result).toHaveProperty('counts')
     })
   })
@@ -251,8 +240,6 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         teardownEndDate: mockEdition.volunteersTeardownEndDate,
         askSetup: true,
         askTeardown: true,
-        teams: mockVolunteerTeams,
-        myApplication: null,
         counts: { total: 0 },
         updatedAt: null,
       })
@@ -273,114 +260,10 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
       expect(result).toHaveProperty('open')
       expect(result).toHaveProperty('description')
       expect(result).toHaveProperty('askDiet')
-      expect(result).toHaveProperty('teams')
-      expect(result).toHaveProperty('myApplication')
       expect(result).toHaveProperty('counts')
     })
   })
 
-  describe('Gestion des équipes', () => {
-    it('devrait retourner les équipes avec leurs maxVolunteers', async () => {
-      const customVolunteerTeams = [
-        {
-          id: 'team1',
-          name: 'Accueil',
-          description: 'Équipe accueil',
-          color: '#ef4444',
-          maxVolunteers: 10,
-        },
-        {
-          id: 'team2',
-          name: 'Technique',
-          description: 'Équipe technique',
-          color: '#3b82f6',
-          maxVolunteers: 5,
-        },
-        {
-          id: 'team3',
-          name: 'Bar',
-          description: 'Équipe bar',
-          color: '#10b981',
-          maxVolunteers: null,
-        },
-        {
-          id: 'team4',
-          name: 'Sécurité',
-          description: 'Équipe sécurité',
-          color: '#f59e0b',
-          maxVolunteers: 2,
-        },
-      ]
-
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-      prismaMock.volunteerTeam.findMany.mockResolvedValue(customVolunteerTeams)
-
-      const mockEvent = { context: { user: null } }
-      const result = await handler(mockEvent as any)
-
-      expect(result.teams).toHaveLength(4)
-      expect(result.teams[0]).toEqual(customVolunteerTeams[0])
-      expect(result.teams[1]).toEqual(customVolunteerTeams[1])
-      expect(result.teams[2]).toEqual(customVolunteerTeams[2])
-      expect(result.teams[3]).toEqual(customVolunteerTeams[3])
-    })
-
-    it('devrait gérer les éditions sans équipes', async () => {
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-      prismaMock.volunteerTeam.findMany.mockResolvedValue([])
-
-      const mockEvent = { context: { user: null } }
-      const result = await handler(mockEvent as any)
-
-      expect(result.teams).toEqual([])
-    })
-
-    it("devrait retourner les équipes dans l'ordre de la base", async () => {
-      const unsortedVolunteerTeams = [
-        {
-          id: 'team3',
-          name: 'Zzz Dernier',
-          description: 'Last team',
-          color: '#ef4444',
-          maxVolunteers: 1,
-        },
-        {
-          id: 'team1',
-          name: 'Accueil',
-          description: 'First team',
-          color: '#3b82f6',
-          maxVolunteers: 10,
-        },
-        {
-          id: 'team2',
-          name: 'Bar',
-          description: 'Middle team',
-          color: '#10b981',
-          maxVolunteers: 5,
-        },
-        {
-          id: 'team4',
-          name: 'Aaa Premier',
-          description: 'Early team',
-          color: '#f59e0b',
-          maxVolunteers: 2,
-        },
-      ]
-
-      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
-      prismaMock.volunteerTeam.findMany.mockResolvedValue(unsortedVolunteerTeams)
-
-      const mockEvent = { context: { user: null } }
-      const result = await handler(mockEvent as any)
-
-      expect(result.teams.map((t) => t.name)).toEqual([
-        'Zzz Dernier',
-        'Accueil',
-        'Bar',
-        'Aaa Premier',
-      ])
-    })
-  })
 
   describe('Dates et horaires', () => {
     it('devrait formater correctement les dates ISO', async () => {
@@ -556,25 +439,13 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
       })
     })
 
-    it('devrait faire les requêtes nécessaires (edition + volunteerTeam)', async () => {
+    it('devrait faire uniquement la requête edition', async () => {
       prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
 
       const mockEvent = { context: { user: null } }
       await handler(mockEvent as any)
 
       expect(prismaMock.edition.findUnique).toHaveBeenCalledTimes(1)
-      expect(prismaMock.volunteerTeam.findMany).toHaveBeenCalledTimes(1)
-      expect(prismaMock.volunteerTeam.findMany).toHaveBeenCalledWith({
-        where: { editionId: 1 },
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          color: true,
-          maxVolunteers: true,
-        },
-        orderBy: { name: 'asc' },
-      })
     })
   })
 
@@ -624,8 +495,6 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         'teardownEndDate',
         'askSetup',
         'askTeardown',
-        'teams',
-        'myApplication',
         'counts',
         'updatedAt',
       ]

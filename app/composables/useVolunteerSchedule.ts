@@ -439,15 +439,28 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
   )
 
   // Watcher pour la granularité
-  watch(slotDurationMinutes, (newDuration) => {
-    if (calendarRef.value && calendarRef.value.getApi) {
-      const calendarApi = calendarRef.value.getApi()
-      if (calendarApi) {
-        // Mettre à jour la configuration de slotDuration
-        calendarApi.setOption('slotDuration', `00:${String(newDuration).padStart(2, '0')}:00`)
-      }
-    }
-  })
+  watch(
+    slotDurationMinutes,
+    (newDuration) => {
+      const formattedDuration = `00:${String(newDuration).padStart(2, '0')}:00`
+
+      // Mettre à jour l'option dans calendarOptions
+      calendarOptions.slotDuration = formattedDuration
+
+      // Mettre à jour aussi via l'API si le calendrier est déjà initialisé
+      nextTick(() => {
+        if (calendarRef.value && ready.value) {
+          const calendarApi = calendarRef.value.getApi?.()
+          if (calendarApi) {
+            calendarApi.setOption('slotDuration', formattedDuration)
+            // Forcer le re-render du calendrier
+            calendarApi.refetchEvents()
+          }
+        }
+      })
+    },
+    { immediate: false }
+  )
 
   // Initialisation
   onMounted(() => {

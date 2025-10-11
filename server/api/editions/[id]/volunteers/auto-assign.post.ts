@@ -340,15 +340,6 @@ async function assignVolunteersToTeams(
         }
       }
 
-      // Aussi mettre à jour le champ JSON
-      await tx.editionVolunteerApplication.update({
-        where: {
-          id: application.id,
-        },
-        data: {
-          assignedTeams: teamIdsArray,
-        },
-      })
     }
   }
 }

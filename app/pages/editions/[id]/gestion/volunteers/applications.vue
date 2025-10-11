@@ -254,43 +254,16 @@
                 <!-- Liste des bénévoles non assignés -->
                 <div class="px-4 py-3 bg-gray-50 dark:bg-gray-800/50">
                   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    <div
+                    <VolunteersVolunteerCard
                       v-for="volunteer in unassignedVolunteers"
                       :key="volunteer.id"
-                      :draggable="!isMobile"
-                      class="flex items-center gap-3 text-sm p-2 rounded"
-                      :class="isMobile ? 'cursor-pointer' : 'cursor-move'"
-                      @click="handleVolunteerClick(volunteer)"
-                      @dragstart="handleDragStart(volunteer)"
+                      :volunteer="volunteer"
+                      :team-preferences-text="getTeamNamesFromPreferences(volunteer.teamPreferences)"
+                      :is-mobile="isMobile"
+                      @click="handleVolunteerClick"
+                      @dragstart="handleDragStart"
                       @dragend="handleDragEnd"
-                    >
-                      <UIcon name="i-heroicons-bars-3" class="text-gray-400" size="16" />
-                      <UiUserAvatar :user="volunteer.user" size="md" class="flex-shrink-0" />
-                      <div class="min-w-0 flex-1">
-                        <p class="text-gray-700 dark:text-gray-300 font-medium truncate">
-                          {{ volunteer.user.prenom }} {{ volunteer.user.nom }}
-                        </p>
-                        <p class="text-xs text-gray-500 truncate">{{ volunteer.user.email }}</p>
-                        <div class="flex items-center gap-1 mt-1">
-                          <div
-                            v-if="volunteer.teamPreferences && volunteer.teamPreferences.length > 0"
-                            class="flex items-center gap-1"
-                          >
-                            <UIcon name="i-heroicons-heart" class="text-red-500" size="12" />
-                            <span class="text-xs text-gray-600 dark:text-gray-400">
-                              {{ $t('pages.volunteers.team_distribution.preferences_label') }}
-                              {{ getTeamNamesFromPreferences(volunteer.teamPreferences) }}
-                            </span>
-                          </div>
-                          <div v-else class="flex items-center gap-1">
-                            <UIcon name="i-heroicons-globe-alt" class="text-blue-500" size="12" />
-                            <span class="text-xs text-blue-600 dark:text-blue-400">
-                              {{ $t('pages.volunteers.team_distribution.all_teams') }}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    />
                   </div>
                 </div>
               </div>
@@ -369,85 +342,19 @@
                   class="px-4 py-3 bg-gray-50 dark:bg-gray-800/50"
                 >
                   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    <div
+                    <VolunteersVolunteerCard
                       v-for="volunteer in team.volunteers"
                       :key="volunteer.id"
-                      :draggable="!isMobile"
-                      class="relative flex items-center gap-3 text-sm p-2 rounded group hover:bg-gray-100 dark:hover:bg-gray-700"
-                      :class="isMobile ? 'cursor-pointer' : 'cursor-move'"
-                      @click="handleVolunteerClick(volunteer, team.id)"
-                      @dragstart="handleDragStart(volunteer, team.id)"
+                      :volunteer="volunteer"
+                      :team-id="team.id"
+                      :team-preferences-text="getTeamNamesFromPreferences(volunteer.teamPreferences)"
+                      :is-mobile="isMobile"
+                      @click="handleVolunteerClick"
+                      @dragstart="handleDragStart"
                       @dragend="handleDragEnd"
-                    >
-                      <UIcon name="i-heroicons-bars-3" class="text-gray-400" size="16" />
-                      <UiUserAvatar :user="volunteer.user" size="md" class="flex-shrink-0" />
-                      <div class="min-w-0 flex-1">
-                        <p class="text-gray-700 dark:text-gray-300 font-medium truncate">
-                          {{ volunteer.user.prenom }} {{ volunteer.user.nom }}
-                        </p>
-                        <p class="text-xs text-gray-500 truncate">{{ volunteer.user.email }}</p>
-                        <div class="flex items-center gap-1 mt-1">
-                          <div
-                            v-if="volunteer.teamPreferences && volunteer.teamPreferences.length > 0"
-                            class="flex items-center gap-1"
-                          >
-                            <UIcon name="i-heroicons-heart" class="text-red-500" size="12" />
-                            <span class="text-xs text-gray-600 dark:text-gray-400">
-                              {{ $t('pages.volunteers.team_distribution.preferences_label') }}
-                              {{ getTeamNamesFromPreferences(volunteer.teamPreferences) }}
-                            </span>
-                          </div>
-                          <div v-else class="flex items-center gap-1">
-                            <UIcon name="i-heroicons-globe-alt" class="text-blue-500" size="12" />
-                            <span class="text-xs text-blue-600 dark:text-blue-400">
-                              {{ $t('pages.volunteers.team_distribution.all_teams') }}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Badge responsable visible si leader -->
-                      <UBadge
-                        v-if="isTeamLeader(volunteer, team.id)"
-                        color="warning"
-                        size="sm"
-                        class="ml-auto"
-                      >
-                        <UIcon name="i-heroicons-star-solid" size="12" />
-                        {{ $t('pages.volunteers.team_distribution.leader_badge') }}
-                      </UBadge>
-
-                      <!-- Boutons au survol -->
-                      <div
-                        class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
-                      >
-                        <!-- Toggle responsable -->
-                        <UButton
-                          :icon="
-                            isTeamLeader(volunteer, team.id)
-                              ? 'i-heroicons-star-solid'
-                              : 'i-heroicons-star'
-                          "
-                          size="sm"
-                          :color="isTeamLeader(volunteer, team.id) ? 'warning' : 'neutral'"
-                          variant="outline"
-                          :title="
-                            isTeamLeader(volunteer, team.id)
-                              ? $t('pages.volunteers.team_distribution.remove_as_leader')
-                              : $t('pages.volunteers.team_distribution.set_as_leader')
-                          "
-                          @click.stop="toggleTeamLeader(volunteer, team.id)"
-                        />
-                        <!-- Désassigner -->
-                        <UButton
-                          icon="material-symbols-light:delete-outline"
-                          size="sm"
-                          color="error"
-                          variant="outline"
-                          @click.stop="unassignFromTeam(volunteer, team.id)"
-                        />
-                      </div>
-                    </div>
+                      @toggle-leader="toggleTeamLeader"
+                      @unassign="unassignFromTeam"
+                    />
                   </div>
                 </div>
 
@@ -580,7 +487,7 @@
                 </h4>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   <template v-if="draggedVolunteer?.teamAssignments?.length > 1">
-                    {{ draggedVolunteer.teamAssignments.map((t) => t.team.name).join(', ') }} →
+                    {{ draggedVolunteer.teamAssignments.map((t: any) => t.team.name).join(', ') }} →
                     {{ targetTeamName }}
                   </template>
                   <template v-else> {{ sourceTeamName }} → {{ targetTeamName }} </template>
@@ -750,16 +657,10 @@ const fetchTeamAssignments = async () => {
   try {
     const applications = await $fetch(`/api/editions/${editionId}/volunteers/team-assignments`)
 
-    console.log('📊 Applications récupérées:', applications.length)
-    console.log('📊 Première application:', applications[0])
-
     acceptedVolunteers.value = applications
     teamAssignments.value = applications.filter(
       (app: any) => app.teamAssignments && app.teamAssignments.length > 0
     )
-
-    console.log('✅ Accepted volunteers:', acceptedVolunteers.value.length)
-    console.log('✅ Team assignments:', teamAssignments.value.length)
   } catch (error) {
     console.error('Failed to fetch team assignments:', error)
   }
@@ -860,15 +761,15 @@ const sourceTeamName = computed(() => {
   // Si on a sourceTeamId (cas normal), utiliser celui-ci
   if (sourceTeamId.value) {
     // Chercher d'abord dans teamDistribution (données affichées)
-    let team = teamDistribution.value.find((t) => t.id === sourceTeamId.value)
-    if (team) {
-      return team.name
+    const teamInDistribution = teamDistribution.value.find((t) => t.id === sourceTeamId.value)
+    if (teamInDistribution) {
+      return teamInDistribution.name
     }
 
     // Sinon chercher dans volunteerTeams (données originales)
-    team = volunteerTeams.value.find((t) => t.id === sourceTeamId.value)
-    if (team) {
-      return team.name
+    const teamInList = volunteerTeams.value.find((t) => t.id === sourceTeamId.value)
+    if (teamInList) {
+      return teamInList.name
     }
 
     return 'Équipe inconnue'
@@ -891,15 +792,15 @@ const targetTeamName = computed(() => {
   if (!targetTeamId.value) return 'Équipe cible'
 
   // Chercher d'abord dans teamDistribution (données affichées)
-  let team = teamDistribution.value.find((t) => t.id === targetTeamId.value)
-  if (team) {
-    return team.name
+  const teamInDistribution = teamDistribution.value.find((t) => t.id === targetTeamId.value)
+  if (teamInDistribution) {
+    return teamInDistribution.name
   }
 
   // Sinon chercher dans volunteerTeams (données originales)
-  team = volunteerTeams.value.find((t) => t.id === targetTeamId.value)
-  if (team) {
-    return team.name
+  const teamInList = volunteerTeams.value.find((t) => t.id === targetTeamId.value)
+  if (teamInList) {
+    return teamInList.name
   }
 
   return 'Équipe inconnue'

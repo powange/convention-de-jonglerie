@@ -26,8 +26,20 @@ export default defineEventHandler(async (event) => {
         emergencyContactPhone: true,
         timePreferences: true,
         teamPreferences: true,
-        assignedTeams: true,
         acceptanceNote: true,
+        teamAssignments: {
+          select: {
+            teamId: true,
+            isLeader: true,
+            team: {
+              select: {
+                id: true,
+                name: true,
+                color: true,
+              },
+            },
+          },
+        },
         setupAvailability: true,
         teardownAvailability: true,
         eventAvailability: true,
@@ -141,11 +153,9 @@ export default defineEventHandler(async (event) => {
           })
         : []
 
-      const assignedTeamsWithNames = app.assignedTeams
-        ? app.assignedTeams.map((teamId: any) => {
-            const team = app.edition.volunteerTeams.find((t: any) => t.id === teamId)
-            return team ? team.name : teamId
-          })
+      // Construire la liste des équipes assignées avec leurs noms depuis teamAssignments
+      const assignedTeamsWithNames = app.teamAssignments
+        ? app.teamAssignments.map((assignment: any) => assignment.team.name)
         : []
 
       // Filtrer les créneaux assignés pour cette édition

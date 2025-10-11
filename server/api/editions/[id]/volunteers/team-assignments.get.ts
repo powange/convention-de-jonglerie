@@ -1,3 +1,4 @@
+import { getEmailHash } from '../../../../utils/email-hash'
 import { canAccessEditionData } from '../../../../utils/permissions/edition-permissions'
 import { prisma } from '../../../../utils/prisma'
 
@@ -61,5 +62,14 @@ export default defineEventHandler(async (event) => {
     orderBy: [{ user: { prenom: 'asc' } }, { user: { nom: 'asc' } }],
   })
 
-  return applications
+  // Transformer les données pour ajouter le hash de l'email
+  const applicationsWithEmailHash = applications.map((application) => ({
+    ...application,
+    user: {
+      ...application.user,
+      emailHash: getEmailHash(application.user.email),
+    },
+  }))
+
+  return applicationsWithEmailHash
 })

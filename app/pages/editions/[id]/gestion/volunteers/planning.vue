@@ -30,54 +30,56 @@
         </p>
       </div>
 
-      <!-- Contenu du planning -->
-      <EditionVolunteerPlanningCard
-        :edition="edition"
-        :teams="teams"
-        :time-slots="timeSlots"
-        :can-manage-volunteers="canManageVolunteers"
-        :refreshing="refreshing"
-        :volunteers-stats="volunteersStats"
-        :volunteers-stats-by-day="volunteersStatsByDay"
-        :volunteers-stats-individual="volunteersStatsIndividual"
-        :format-date="formatDate"
-        :format-date-time-range="formatDateTimeRange"
-        @create-slot="handleCreateSlot"
-        @slot-click="handleSlotClick"
-        @slot-update="handleSlotUpdate"
-        @slot-delete="handleSlotDelete"
-        @refresh="refreshData"
-      />
+      <div class="space-y-6">
+        <!-- Contenu du planning -->
+        <EditionVolunteerPlanningCard
+          :edition="edition"
+          :teams="teams"
+          :time-slots="timeSlots"
+          :can-manage-volunteers="canManageVolunteers"
+          :refreshing="refreshing"
+          :volunteers-stats="volunteersStats"
+          :volunteers-stats-by-day="volunteersStatsByDay"
+          :volunteers-stats-individual="volunteersStatsIndividual"
+          :format-date="formatDate"
+          :format-date-time-range="formatDateTimeRange"
+          @create-slot="handleCreateSlot"
+          @slot-click="handleSlotClick"
+          @slot-update="handleSlotUpdate"
+          @slot-delete="handleSlotDelete"
+          @refresh="refreshData"
+        />
 
-      <!-- Alerte pour les chevauchements de créneaux -->
-      <EditionVolunteerPlanningOverlapWarningsAlert
-        :overlap-warnings="overlapWarnings"
-        :preference-warnings="preferenceWarnings"
-        :meal-time-warnings="mealTimeWarnings"
-        :can-manage-volunteers="canManageVolunteers"
-        :format-date-time-range="formatDateTimeRange"
-      />
+        <!-- Alerte pour les chevauchements de créneaux -->
+        <EditionVolunteerPlanningOverlapWarningsAlert
+          :overlap-warnings="overlapWarnings"
+          :preference-warnings="preferenceWarnings"
+          :meal-time-warnings="mealTimeWarnings"
+          :can-manage-volunteers="canManageVolunteers"
+          :format-date-time-range="formatDateTimeRange"
+        />
 
-      <!-- Panneau d'auto-assignation -->
-      <AutoAssignmentPanel
-        v-if="canManageVolunteers"
-        :edition-id="editionId"
-        :volunteers="acceptedVolunteers"
-        :time-slots="convertedTimeSlots"
-        :teams="[...teams]"
-        class="mt-6"
-        @assignments-applied="refreshData"
-      />
+        <!-- Panneau d'auto-assignation -->
+        <AutoAssignmentPanel
+          v-if="canManageVolunteers"
+          :edition-id="editionId"
+          :volunteers="acceptedVolunteers"
+          :time-slots="convertedTimeSlots"
+          :teams="[...teams]"
+          class="mt-6"
+          @assignments-applied="refreshData"
+        />
 
-      <!-- Résumé des bénévoles par jour -->
-      <EditionVolunteerPlanningVolunteersSummary
-        :can-manage-volunteers="canManageVolunteers"
-        :volunteers-stats="volunteersStats"
-        :volunteers-stats-by-day="volunteersStatsByDay"
-        :volunteers-stats-individual="volunteersStatsIndividual"
-        :active-stats-tab="activeStatsTab"
-        :format-date="formatDate"
-      />
+        <!-- Résumé des bénévoles par jour -->
+        <EditionVolunteerPlanningVolunteersSummary
+          :can-manage-volunteers="canManageVolunteers"
+          :volunteers-stats="volunteersStats"
+          :volunteers-stats-by-day="volunteersStatsByDay"
+          :volunteers-stats-individual="volunteersStatsIndividual"
+          :active-stats-tab="activeStatsTab"
+          :format-date="formatDate"
+        />
+      </div>
 
       <!-- Modal de création/édition de créneau -->
       <SlotModal

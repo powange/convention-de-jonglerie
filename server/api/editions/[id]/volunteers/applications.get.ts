@@ -183,7 +183,6 @@ export default defineEventHandler(async (event) => {
     emergencyContactPhone: true,
     timePreferences: true,
     teamPreferences: true,
-    assignedTeams: true,
     acceptanceNote: true,
     hasPets: true,
     petsDetails: true,

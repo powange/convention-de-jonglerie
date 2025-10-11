@@ -108,7 +108,9 @@
       "WebFetch(domain:vuemail.net)",
       "Bash(NODE_ENV=test npx vitest run test/nuxt/pages/auth.reset-password.page.nuxt.test.ts --config vitest.config.nuxt.ts)",
       "Bash(NODE_ENV=test npx vitest run test/nuxt/pages/auth.reset-password.page.nuxt.test.ts)",
-      "Bash(NODE_ENV=test npx vitest run test/nuxt/server/api/auth/resend-verification.post.test.ts)"
+      "Bash(NODE_ENV=test npx vitest run test/nuxt/server/api/auth/resend-verification.post.test.ts)",
+      "SlashCommand(/quality-check)",
+      "mcp__nuxt__search_nuxt_docs"
     ],
     "deny": [],
     "ask": [],

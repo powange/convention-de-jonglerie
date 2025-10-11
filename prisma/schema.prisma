@@ -427,7 +427,6 @@ model EditionVolunteerApplication {
   dietaryPreference    DietaryPreference @default(NONE)
   timePreferences      Json?
   teamPreferences      Json?
-  assignedTeams        Json?
   acceptanceNote       String?           @db.Text
   hasPets              Boolean?
   petsDetails          String?           @db.Text

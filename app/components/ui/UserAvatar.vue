@@ -1,10 +1,11 @@
 <template>
-  <img :src="avatarUrl" :alt="altText" :class="avatarClasses" :style="customSizeStyle" />
+  <img :src="displayUrl" :alt="altText" :class="avatarClasses" :style="customSizeStyle" />
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 
+import { useImageLoader } from '~/composables/useImageLoader'
 import { useAvatar } from '~/utils/avatar'
 
 interface User {
@@ -44,15 +45,46 @@ const sizeMap = {
 const cssClassMap = {
   xs: 'w-4 h-4',
   sm: 'w-5 h-5',
-  md: 'w-8 h-8',
-  lg: 'w-10 h-10',
+  md: 'w-10 h-10',
+  lg: 'w-15 h-15',
   xl: 'w-32 h-32',
 } as const
 
-const avatarUrl = computed(() => {
-  const pixelSize = typeof props.size === 'number' ? props.size : sizeMap[props.size]
-  return getUserAvatar(props.user, pixelSize)
+const pixelSize = computed(() => {
+  return typeof props.size === 'number' ? props.size : sizeMap[props.size]
 })
+
+const avatarUrl = computed(() => {
+  return getUserAvatar(props.user, pixelSize.value)
+})
+
+// Générer une URL de fallback (avatar avec initiales ou Gravatar)
+const fallbackUrl = computed(() => {
+  return getUserAvatar(
+    {
+      ...props.user,
+      profilePicture: null, // Force l'utilisation du fallback
+    },
+    pixelSize.value
+  )
+})
+
+// Détecter si l'URL est une image externe (Google, etc.)
+const isExternalImage = computed(() => {
+  const url = avatarUrl.value
+  return (
+    url.startsWith('http://') ||
+    (url.startsWith('https://') && !url.includes('gravatar.com') && !url.startsWith('data:'))
+  )
+})
+
+// Utiliser le système de cache et retry uniquement pour les images externes
+const { currentUrl } = isExternalImage.value
+  ? useImageLoader(avatarUrl.value, fallbackUrl.value)
+  : { currentUrl: avatarUrl }
+
+// URL finale à afficher
+const displayUrl = computed(() => currentUrl.value)
 
 const altText = computed(() => {
   if (props.user.pseudo) {

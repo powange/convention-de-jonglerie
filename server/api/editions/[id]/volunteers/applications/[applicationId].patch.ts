@@ -254,10 +254,7 @@ export default defineEventHandler(async (event) => {
 
   // Si on remet en attente, supprimer toutes les assignations d'équipes
   if (target === 'PENDING') {
-    // Supprimer l'ancien système (JSON)
-    updateData.assignedTeams = null
-
-    // Supprimer le nouveau système (relations)
+    // Supprimer les relations avec les équipes
     updateData.teamAssignments = {
       deleteMany: {}, // Supprimer toutes les relations avec les équipes
     }
@@ -271,7 +268,6 @@ export default defineEventHandler(async (event) => {
       status: true,
       decidedAt: true,
       acceptanceNote: true,
-      assignedTeams: true,
       teamAssignments: {
         select: {
           team: {

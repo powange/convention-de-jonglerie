@@ -321,7 +321,7 @@ const { calendarOptions, ready } = useVolunteerSchedule({
   teams: filteredTeams,
   timeSlots: filteredTimeSlots,
   readOnly: computed(() => !props.canManageVolunteers),
-  slotDuration: selectedGranularity,
+  slotDuration: computed(() => selectedGranularity.value),
   onTimeSlotCreate: (start, end, resourceId) => {
     emit('create-slot', {
       start,

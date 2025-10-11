@@ -90,13 +90,6 @@ export async function assignVolunteerToTeams(applicationId: number, teamIds: str
       })
     }
 
-    // Mettre à jour le champ JSON assignedTeams pour compatibilité
-    await tx.editionVolunteerApplication.update({
-      where: { id: applicationId },
-      data: {
-        assignedTeams: uniqueTeamIds,
-      },
-    })
 
     // Récupérer et retourner les assignations créées
     return await tx.applicationTeamAssignment.findMany({
@@ -156,18 +149,6 @@ export async function addVolunteerToTeam(applicationId: number, teamId: string) 
       },
     })
 
-    // Mettre à jour le champ JSON assignedTeams pour compatibilité
-    const currentAssignments = await tx.applicationTeamAssignment.findMany({
-      where: { applicationId },
-      select: { teamId: true },
-    })
-
-    await tx.editionVolunteerApplication.update({
-      where: { id: applicationId },
-      data: {
-        assignedTeams: currentAssignments.map((a) => a.teamId),
-      },
-    })
 
     return assignment
   })
@@ -190,18 +171,6 @@ export async function removeVolunteerFromTeam(applicationId: number, teamId: str
       },
     })
 
-    // Mettre à jour le champ JSON assignedTeams pour compatibilité
-    const remainingAssignments = await tx.applicationTeamAssignment.findMany({
-      where: { applicationId },
-      select: { teamId: true },
-    })
-
-    await tx.editionVolunteerApplication.update({
-      where: { id: applicationId },
-      data: {
-        assignedTeams: remainingAssignments.map((a) => a.teamId),
-      },
-    })
   })
 }
 
