@@ -901,7 +901,6 @@ import { reactive, ref, computed, onMounted } from 'vue'
 import { z } from 'zod'
 
 import { useAuthStore } from '~/stores/auth'
-import { useEditionStore } from '~/stores/editions'
 import type { HttpError, User } from '~/types'
 
 // Protéger cette page avec le middleware d'authentification
@@ -910,7 +909,6 @@ definePageMeta({
 })
 
 const authStore = useAuthStore()
-const editionStore = useEditionStore()
 const toast = useToast()
 const { locale, t } = useI18n()
 
@@ -1317,11 +1315,8 @@ const saveNotificationPreferences = async () => {
 }
 
 onMounted(async () => {
-  // Charger les statistiques et les éditions en parallèle
-  await Promise.all([
-    editionStore.fetchEditions(),
-    initStats(), // Initialiser les statistiques du profil
-  ])
+  // Charger les statistiques du profil
+  await initStats()
 
   // Charger les préférences de notifications
   await loadNotificationPreferences()
