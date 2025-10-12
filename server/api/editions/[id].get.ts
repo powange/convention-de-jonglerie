@@ -1,3 +1,4 @@
+import { optionalAuth } from '../../utils/auth-utils'
 import { checkAdminMode } from '../../utils/collaborator-management'
 import { getEmailHash } from '../../utils/email-hash'
 import { prisma } from '../../utils/prisma'
@@ -72,7 +73,8 @@ export default defineEventHandler(async (event) => {
     // (legacy records / tests), treat it as online.
     if (edition.isOnline === false) {
       // Check if user is authenticated
-      if (!event.context.user) {
+      const user = optionalAuth(event)
+      if (!user) {
         throw createError({
           statusCode: 404,
           message: 'Edition not found',
@@ -80,7 +82,7 @@ export default defineEventHandler(async (event) => {
       }
 
       // Normalize user id to number to avoid string/number mismatches
-      const userId = Number(event.context.user.id)
+      const userId = Number(user.id)
       const isAdminMode = await checkAdminMode(userId, event)
       const isCreator = edition.creatorId === userId
       const isConventionAuthor = edition.convention.authorId === userId

@@ -1,12 +1,10 @@
+import { requireAuth } from '../../../../../../utils/auth-utils'
 import { prisma } from '../../../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
+  const user = requireAuth(event)
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   const groupId = getRouterParam(event, 'groupId')
-
-  if (!event.context.user) {
-    throw createError({ statusCode: 401, message: 'Non authentifié' })
-  }
 
   if (!groupId) {
     throw createError({ statusCode: 400, message: 'ID de groupe requis' })
@@ -28,7 +26,7 @@ export default defineEventHandler(async (event) => {
   const volunteerApplication = await prisma.editionVolunteerApplication.findFirst({
     where: {
       editionId,
-      userId: event.context.user.id,
+      userId: user.id,
       status: 'ACCEPTED',
     },
   })
@@ -41,7 +39,7 @@ export default defineEventHandler(async (event) => {
   const existingConfirmation = await prisma.volunteerNotificationConfirmation.findFirst({
     where: {
       volunteerNotificationGroupId: groupId,
-      userId: event.context.user.id,
+      userId: user.id,
     },
   })
 
@@ -72,7 +70,7 @@ export default defineEventHandler(async (event) => {
   // Chercher la notification qui correspond à ce groupe et cet utilisateur
   const userNotification = await prisma.notification.findFirst({
     where: {
-      userId: event.context.user.id,
+      userId: user.id,
       category: 'volunteer',
       entityType: 'Edition',
       entityId: editionId.toString(),

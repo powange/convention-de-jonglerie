@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { requireAuth } from '../../../../utils/auth-utils'
 import { canManageEditionVolunteers } from '../../../../utils/collaborator-management'
 import { NotificationService } from '../../../../utils/notification-service'
 import { prisma } from '../../../../utils/prisma'
@@ -14,14 +15,11 @@ const notificationSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const user = requireAuth(event)
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
 
-  if (!event.context.user) {
-    throw createError({ statusCode: 401, message: 'Non authentifié' })
-  }
-
   // Vérifier les permissions
-  const canManage = await canManageEditionVolunteers(editionId, event.context.user.id, event)
+  const canManage = await canManageEditionVolunteers(editionId, user.id, event)
   if (!canManage) {
     throw createError({ statusCode: 403, message: 'Droits insuffisants' })
   }
@@ -87,7 +85,7 @@ export default defineEventHandler(async (event) => {
   const notificationGroup = await prisma.volunteerNotificationGroup.create({
     data: {
       editionId,
-      senderId: event.context.user.id,
+      senderId: user.id,
       title,
       message,
       targetType,

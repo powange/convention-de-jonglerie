@@ -712,7 +712,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
       })
       const mockEvent = { context: { user: null } }
 
-      await expect(handler(mockEvent as any)).rejects.toThrow('Non authentifié')
+      await expect(handler(mockEvent as any)).rejects.toThrow('Unauthorized')
     })
 
     it('devrait fonctionner avec des utilisateurs authentifiés', async () => {

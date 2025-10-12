@@ -1,3 +1,4 @@
+import { requireAuth } from '../../../../utils/auth-utils'
 import { canManageEditionVolunteers } from '../../../../utils/collaborator-management'
 import {
   sendEmail,
@@ -10,12 +11,7 @@ import { prisma } from '../../../../utils/prisma'
 export default defineEventHandler(async (event) => {
   try {
     // Vérifier l'authentification
-    if (!event.context.user) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Non authentifié',
-      })
-    }
+    const user = requireAuth(event)
 
     const editionId = parseInt(getRouterParam(event, 'id') || '0')
     if (!editionId || isNaN(editionId)) {
@@ -26,7 +22,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Vérifier les permissions
-    const allowed = await canManageEditionVolunteers(editionId, event.context.user.id, event)
+    const allowed = await canManageEditionVolunteers(editionId, user.id, event)
     if (!allowed) {
       throw createError({
         statusCode: 403,

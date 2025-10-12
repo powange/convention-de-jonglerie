@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { requiresEmergencyContact } from '../../../../../utils/allergy-severity'
+import { requireAuth } from '../../../../../utils/auth-utils'
 import {
   volunteerApplicationBodySchema,
   processPhoneLogic,
@@ -14,7 +15,7 @@ import { handleValidationError } from '../../../../../utils/validation-schemas'
 
 export default defineEventHandler(async (event) => {
   try {
-    if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
+    const authenticatedUser = requireAuth(event)
     const editionId = parseInt(getRouterParam(event, 'id') || '0')
     if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
     const body = await readBody(event).catch(() => ({}))
@@ -40,14 +41,14 @@ export default defineEventHandler(async (event) => {
 
     // Vérifier candidature existante
     const existing = await prisma.editionVolunteerApplication.findUnique({
-      where: { editionId_userId: { editionId, userId: event.context.user.id } },
+      where: { editionId_userId: { editionId, userId: authenticatedUser.id } },
       select: { id: true },
     })
     if (existing) throw createError({ statusCode: 409, message: 'Déjà candidat' })
 
     // Téléphone requis : si pas déjà défini dans user et pas fourni -> erreur
     const user = await prisma.user.findUnique({
-      where: { id: event.context.user.id },
+      where: { id: authenticatedUser.id },
       select: { phone: true, nom: true, prenom: true },
     })
     if (!user) throw createError({ statusCode: 401, message: 'Non authentifié' })
@@ -89,13 +90,13 @@ export default defineEventHandler(async (event) => {
     // Mettre à jour user si des données manquent
     const updateData = getUserUpdateData(user, parsed)
     if (Object.keys(updateData).length) {
-      await prisma.user.update({ where: { id: event.context.user.id }, data: updateData })
+      await prisma.user.update({ where: { id: authenticatedUser.id }, data: updateData })
     }
 
     const application = await prisma.editionVolunteerApplication.create({
       data: {
         editionId,
-        userId: event.context.user.id,
+        userId: authenticatedUser.id,
         motivation: parsed.motivation || null,
         userSnapshotPhone: finalPhone,
         dietaryPreference:
@@ -220,7 +221,7 @@ export default defineEventHandler(async (event) => {
       const editionName = `${application.edition.convention.name}${application.edition.name ? ' - ' + application.edition.name : ''}`
       const { NotificationHelpers } = await import('../../../../../utils/notification-service')
       await NotificationHelpers.volunteerApplicationSubmitted(
-        event.context.user.id,
+        authenticatedUser.id,
         editionName,
         editionId
       )

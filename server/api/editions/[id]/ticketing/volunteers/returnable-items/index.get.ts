@@ -1,14 +1,15 @@
+import { requireAuth } from '../../../../../../utils/auth-utils'
 import { canAccessEditionData } from '../../../../../../utils/permissions/edition-permissions'
 import { prisma } from '../../../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
+  const user = requireAuth(event)
 
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
 
   // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, event.context.user.id, event)
+  const allowed = await canAccessEditionData(editionId, user.id, event)
   if (!allowed)
     throw createError({
       statusCode: 403,

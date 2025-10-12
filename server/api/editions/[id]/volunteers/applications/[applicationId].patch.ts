@@ -1,3 +1,4 @@
+import { requireAuth } from '../../../../../utils/auth-utils'
 import { canManageEditionVolunteers } from '../../../../../utils/collaborator-management'
 import {
   volunteerApplicationPatchSchema,
@@ -13,7 +14,7 @@ import {
 } from '../../../../../utils/volunteer-application-diff'
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
+  const user = requireAuth(event)
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   const applicationId = parseInt(getRouterParam(event, 'applicationId') || '0')
   if (!editionId || !applicationId)
@@ -29,7 +30,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const allowed = await canManageEditionVolunteers(editionId, event.context.user.id, event)
+  const allowed = await canManageEditionVolunteers(editionId, user.id, event)
   if (!allowed)
     throw createError({
       statusCode: 403,
@@ -185,7 +186,7 @@ export default defineEventHandler(async (event) => {
 
     // Envoyer une notification au bénévole s'il y a des modifications ou une note
     // MAIS seulement si la modification n'est pas faite par le bénévole lui-même
-    const isOwnApplication = application.user.id === event.context.user.id
+    const isOwnApplication = application.user.id === user.id
     if (!isOwnApplication && (changes.length > 0 || parsed.modificationNote?.trim())) {
       try {
         const displayName = application.edition.name || application.edition.convention.name

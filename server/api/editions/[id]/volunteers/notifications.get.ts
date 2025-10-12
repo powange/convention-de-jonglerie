@@ -1,16 +1,14 @@
+import { requireAuth } from '../../../../utils/auth-utils'
 import { canManageEditionVolunteers } from '../../../../utils/collaborator-management'
 import { getEmailHash } from '../../../../utils/email-hash'
 import { prisma } from '../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
+  const user = requireAuth(event)
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
 
-  if (!event.context.user) {
-    throw createError({ statusCode: 401, message: 'Non authentifié' })
-  }
-
   // Vérifier les permissions
-  const canManage = await canManageEditionVolunteers(editionId, event.context.user.id, event)
+  const canManage = await canManageEditionVolunteers(editionId, user.id, event)
   if (!canManage) {
     throw createError({ statusCode: 403, message: 'Droits insuffisants' })
   }
