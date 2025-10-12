@@ -1,8 +1,8 @@
 import { createHash } from 'node:crypto'
 
-import { requireAuth } from '../../../../../utils/auth-utils'
-import { hasEditionEditPermission } from '../../../../../utils/permissions/permissions'
-import { prisma } from '../../../../../utils/prisma'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { hasEditionEditPermission } from '@@/server/utils/permissions/permissions'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   try {

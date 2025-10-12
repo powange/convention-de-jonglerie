@@ -1,7 +1,7 @@
-import { requireAuth } from '../../../../../../utils/auth-utils'
-import { canManageEditionVolunteers } from '../../../../../../utils/collaborator-management'
-import { getEmailHash } from '../../../../../../utils/email-hash'
-import { prisma } from '../../../../../../utils/prisma'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
+import { getEmailHash } from '@@/server/utils/email-hash'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)

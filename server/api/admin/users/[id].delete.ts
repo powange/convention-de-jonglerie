@@ -1,9 +1,8 @@
+import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { getEmailHash } from '@@/server/utils/email-hash'
+import { sendEmail, generateAccountDeletionEmailHtml } from '@@/server/utils/emailService'
+import { prisma } from '@@/server/utils/prisma'
 import { readBody } from 'h3'
-
-import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
-import { getEmailHash } from '../../../utils/email-hash'
-import { sendEmail, generateAccountDeletionEmailHtml } from '../../../utils/emailService'
-import { prisma } from '../../../utils/prisma'
 
 // Raisons prédéfinies pour la suppression de comptes
 const DELETION_REASONS = {

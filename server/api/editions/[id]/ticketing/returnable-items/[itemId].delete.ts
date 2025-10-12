@@ -1,5 +1,5 @@
-import { deleteReturnableItem } from '../../../../../utils/editions/ticketing/returnable-items'
-import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
+import { deleteReturnableItem } from '@@/server/utils/editions/ticketing/returnable-items'
+import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)

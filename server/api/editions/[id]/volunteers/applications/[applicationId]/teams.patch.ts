@@ -1,12 +1,11 @@
-import { z } from 'zod'
-
-import { requireAuth } from '../../../../../../utils/auth-utils'
-import { canManageEditionVolunteers } from '../../../../../../utils/collaborator-management'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import {
   assignVolunteerToTeams,
   resolveTeamIdentifiers,
-} from '../../../../../../utils/editions/volunteers/teams'
-import { prisma } from '../../../../../../utils/prisma'
+} from '@@/server/utils/editions/volunteers/teams'
+import { prisma } from '@@/server/utils/prisma'
+import { z } from 'zod'
 
 const bodySchema = z.object({
   teams: z.array(z.string()), // Noms ou IDs des équipes pour l'assignation

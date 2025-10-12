@@ -1,5 +1,5 @@
-import { requireAuth } from '../../utils/auth-utils'
-import { deleteProfilePicture } from '../../utils/image-deletion'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { deleteProfilePicture } from '@@/server/utils/image-deletion'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)

@@ -1,8 +1,7 @@
+import { prisma } from '@@/server/utils/prisma'
+import { validateAndSanitize, handleValidationError } from '@@/server/utils/validation-schemas'
 import { getRequestIP } from 'h3'
 import { z } from 'zod'
-
-import { prisma } from '../../utils/prisma'
-import { validateAndSanitize, handleValidationError } from '../../utils/validation-schemas'
 
 import type { FeedbackType } from '@prisma/client'
 

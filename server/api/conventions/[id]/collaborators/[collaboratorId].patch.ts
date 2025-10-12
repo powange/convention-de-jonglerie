@@ -1,8 +1,7 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { canManageCollaborators } from '@@/server/utils/collaborator-management'
+import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
-
-import { requireAuth } from '../../../../utils/auth-utils'
-import { canManageCollaborators } from '../../../../utils/collaborator-management'
-import { prisma } from '../../../../utils/prisma'
 
 // Schéma combiné (droits globaux + perEdition + title)
 const perEditionSchema = z.object({

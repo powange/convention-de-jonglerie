@@ -1,9 +1,8 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
+import { prisma } from '@@/server/utils/prisma'
+import { VolunteerScheduler } from '@@/server/utils/volunteer-scheduler'
 import { z } from 'zod'
-
-import { requireAuth } from '../../../../utils/auth-utils'
-import { canManageEditionVolunteers } from '../../../../utils/collaborator-management'
-import { prisma } from '../../../../utils/prisma'
-import { VolunteerScheduler } from '../../../../utils/volunteer-scheduler'
 
 // Schéma de validation pour les contraintes
 const constraintsSchema = z.object({

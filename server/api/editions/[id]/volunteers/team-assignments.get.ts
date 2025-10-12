@@ -1,7 +1,7 @@
-import { requireAuth } from '../../../../utils/auth-utils'
-import { getEmailHash } from '../../../../utils/email-hash'
-import { canAccessEditionData } from '../../../../utils/permissions/edition-permissions'
-import { prisma } from '../../../../utils/prisma'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
+import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
+import { prisma } from '@@/server/utils/prisma'
 
 /**
  * Route dédiée pour récupérer tous les bénévoles acceptés avec leurs assignations d'équipes

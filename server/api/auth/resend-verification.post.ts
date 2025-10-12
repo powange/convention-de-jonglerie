@@ -1,14 +1,13 @@
-import { z } from 'zod'
-
 import {
   sendEmail,
   generateVerificationCode,
   generateVerificationEmailHtml,
   getSiteUrl,
-} from '../../utils/emailService'
-import { prisma } from '../../utils/prisma'
-import { emailRateLimiter } from '../../utils/rate-limiter'
-import { handleValidationError } from '../../utils/validation-schemas'
+} from '@@/server/utils/emailService'
+import { prisma } from '@@/server/utils/prisma'
+import { emailRateLimiter } from '@@/server/utils/rate-limiter'
+import { handleValidationError } from '@@/server/utils/validation-schemas'
+import { z } from 'zod'
 
 const resendVerificationSchema = z.object({
   email: z.string().email('Adresse email invalide'),

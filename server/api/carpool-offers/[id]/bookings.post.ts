@@ -1,6 +1,6 @@
-import { requireAuth } from '../../../utils/auth-utils'
-import { NotificationHelpers } from '../../../utils/notification-service'
-import { prisma } from '../../../utils/prisma'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { NotificationHelpers } from '@@/server/utils/notification-service'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)

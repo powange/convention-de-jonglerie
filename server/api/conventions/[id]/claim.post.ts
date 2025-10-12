@@ -1,7 +1,7 @@
-import { requireAuth } from '../../../utils/auth-utils'
-import { createFutureDate, TOKEN_DURATIONS } from '../../../utils/date-utils'
-import { sendEmail } from '../../../utils/emailService'
-import { prisma } from '../../../utils/prisma'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
+import { sendEmail } from '@@/server/utils/emailService'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   try {

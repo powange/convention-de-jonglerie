@@ -1,9 +1,8 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
+import { NotificationService } from '@@/server/utils/notification-service'
+import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
-
-import { requireAuth } from '../../../../utils/auth-utils'
-import { canManageEditionVolunteers } from '../../../../utils/collaborator-management'
-import { NotificationService } from '../../../../utils/notification-service'
-import { prisma } from '../../../../utils/prisma'
 
 const notificationSchema = z.object({
   targetType: z.enum(['all', 'teams']),

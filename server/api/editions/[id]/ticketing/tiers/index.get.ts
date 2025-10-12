@@ -1,6 +1,6 @@
-import { requireAuth } from '../../../../../utils/auth-utils'
-import { getEditionTiers } from '../../../../../utils/editions/ticketing/tiers'
-import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEditionTiers } from '@@/server/utils/editions/ticketing/tiers'
+import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)

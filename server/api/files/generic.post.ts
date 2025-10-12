@@ -1,4 +1,4 @@
-import { requireGlobalAdmin } from '../../utils/auth-utils'
+import { requireGlobalAdmin } from '@@/server/utils/auth-utils'
 
 import type { ServerFile } from 'nuxt-file-storage'
 

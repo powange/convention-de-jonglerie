@@ -1,10 +1,9 @@
+import { checkAdminMode } from '@@/server/utils/collaborator-management'
+import { getEmailHash } from '@@/server/utils/email-hash'
+import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
 import { requireUserSession } from '#imports'
-
-import { checkAdminMode } from '../../utils/collaborator-management'
-import { getEmailHash } from '../../utils/email-hash'
-import { prisma } from '../../utils/prisma'
 
 import type { H3Error } from 'h3'
 

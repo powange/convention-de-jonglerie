@@ -1,8 +1,7 @@
+import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { NotificationService } from '@@/server/utils/notification-service'
+import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
-
-import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
-import { NotificationService } from '../../../utils/notification-service'
-import { prisma } from '../../../utils/prisma'
 
 const bodySchema = z.object({
   userId: z.number().int().positive(),

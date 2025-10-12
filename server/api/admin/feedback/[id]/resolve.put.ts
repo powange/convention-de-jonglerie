@@ -1,8 +1,7 @@
+import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { prisma } from '@@/server/utils/prisma'
+import { validateAndSanitize, handleValidationError } from '@@/server/utils/validation-schemas'
 import { z } from 'zod'
-
-import { requireGlobalAdminWithDbCheck } from '../../../../utils/admin-auth'
-import { prisma } from '../../../../utils/prisma'
-import { validateAndSanitize, handleValidationError } from '../../../../utils/validation-schemas'
 
 const resolveSchema = z.object({
   resolved: z.boolean(),

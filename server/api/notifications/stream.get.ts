@@ -1,5 +1,5 @@
-import { requireAuth } from '../../utils/auth-utils'
-import { notificationStreamManager } from '../../utils/notification-stream-manager'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { notificationStreamManager } from '@@/server/utils/notification-stream-manager'
 
 export default defineEventHandler(async (event) => {
   // Vérification de l'authentification

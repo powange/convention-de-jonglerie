@@ -1,9 +1,9 @@
-import { getEmailHash } from '../../../../utils/email-hash'
+import { getEmailHash } from '@@/server/utils/email-hash'
 import {
   requireVolunteerPlanningAccess,
   isAcceptedVolunteer,
-} from '../../../../utils/permissions/volunteer-permissions'
-import { prisma } from '../../../../utils/prisma'
+} from '@@/server/utils/permissions/volunteer-permissions'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   // Validation des paramètres

@@ -1,7 +1,6 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
-
-import { requireAuth } from '../../utils/auth-utils'
-import { prisma } from '../../utils/prisma'
 
 const notificationPreferencesSchema = z.object({
   volunteerReminders: z.boolean(),

@@ -1,8 +1,7 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
+import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
-
-import { requireAuth } from '../../../../utils/auth-utils'
-import { requireVolunteerManagementAccess } from '../../../../utils/permissions/volunteer-permissions'
-import { prisma } from '../../../../utils/prisma'
 
 const createTimeSlotSchema = z
   .object({

@@ -1,4 +1,4 @@
-import { requireGlobalAdminWithDbCheck } from '../../utils/admin-auth'
+import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 
 export default defineEventHandler(async (event) => {
   try {

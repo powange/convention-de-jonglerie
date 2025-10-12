@@ -1,6 +1,5 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
 import { PrismaClient } from '@prisma/client'
-
-import { requireAuth } from '../../../../../utils/auth-utils'
 
 const prisma = new PrismaClient()
 

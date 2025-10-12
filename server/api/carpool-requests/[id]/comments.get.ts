@@ -1,4 +1,4 @@
-import { getCommentsForEntity } from '../../../utils/commentsHandler'
+import { getCommentsForEntity } from '@@/server/utils/commentsHandler'
 
 export default defineEventHandler(async (event) => {
   return getCommentsForEntity(event, {

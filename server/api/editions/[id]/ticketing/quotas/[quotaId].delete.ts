@@ -1,5 +1,5 @@
-import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
-import { prisma } from '../../../../../utils/prisma'
+import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)

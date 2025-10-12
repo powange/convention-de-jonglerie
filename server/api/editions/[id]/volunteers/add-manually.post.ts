@@ -1,8 +1,7 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
+import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
-
-import { requireAuth } from '../../../../utils/auth-utils'
-import { canManageEditionVolunteers } from '../../../../utils/collaborator-management'
-import { prisma } from '../../../../utils/prisma'
 
 const bodySchema = z.object({
   userId: z.number(),

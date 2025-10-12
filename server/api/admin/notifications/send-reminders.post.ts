@@ -1,6 +1,6 @@
-import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
-import { NotificationHelpers } from '../../../utils/notification-service'
-import { prisma } from '../../../utils/prisma'
+import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { NotificationHelpers } from '@@/server/utils/notification-service'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification et les droits admin (mutualisé)

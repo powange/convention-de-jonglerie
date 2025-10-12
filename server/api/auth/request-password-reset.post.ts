@@ -1,10 +1,9 @@
 import { randomBytes } from 'node:crypto'
 
+import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
+import { sendEmail, generatePasswordResetEmailHtml } from '@@/server/utils/emailService'
+import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
-
-import { createFutureDate, TOKEN_DURATIONS } from '../../utils/date-utils'
-import { sendEmail, generatePasswordResetEmailHtml } from '../../utils/emailService'
-import { prisma } from '../../utils/prisma'
 
 const requestPasswordResetSchema = z.object({
   email: z.string().email(),

@@ -1,5 +1,5 @@
-import { requireAuth } from '../../../../utils/auth-utils'
-import { deleteConventionCollaborator } from '../../../../utils/collaborator-management'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { deleteConventionCollaborator } from '@@/server/utils/collaborator-management'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)

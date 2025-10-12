@@ -1,6 +1,6 @@
-import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
-import { notificationStreamManager } from '../../../utils/notification-stream-manager'
-import { prisma } from '../../../utils/prisma'
+import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { notificationStreamManager } from '@@/server/utils/notification-stream-manager'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   try {

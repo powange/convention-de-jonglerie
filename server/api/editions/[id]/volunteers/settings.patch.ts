@@ -1,9 +1,8 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
+import { prisma } from '@@/server/utils/prisma'
+import { handleValidationError } from '@@/server/utils/validation-schemas'
 import { z } from 'zod'
-
-import { requireAuth } from '../../../../utils/auth-utils'
-import { canManageEditionVolunteers } from '../../../../utils/collaborator-management'
-import { prisma } from '../../../../utils/prisma'
-import { handleValidationError } from '../../../../utils/validation-schemas'
 
 const bodySchema = z
   .object({

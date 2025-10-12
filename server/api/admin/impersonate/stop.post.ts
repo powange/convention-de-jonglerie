@@ -1,6 +1,6 @@
-import { getUserSession, setUserSession, clearUserSession } from '#imports'
+import { prisma } from '@@/server/utils/prisma'
 
-import { prisma } from '../../../utils/prisma'
+import { getUserSession, setUserSession, clearUserSession } from '#imports'
 
 export default defineEventHandler(async (event) => {
   // Récupérer la session actuelle

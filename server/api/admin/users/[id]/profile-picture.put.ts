@@ -1,7 +1,6 @@
+import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
-
-import { requireGlobalAdminWithDbCheck } from '../../../../utils/admin-auth'
-import { prisma } from '../../../../utils/prisma'
 
 const updateProfilePictureSchema = z.object({
   profilePicture: z.string().min(1, 'Chemin de fichier requis').nullable(),

@@ -1,6 +1,6 @@
-import { requireUserSession } from '#imports'
+import { prisma } from '@@/server/utils/prisma'
 
-import { prisma } from '../../utils/prisma'
+import { requireUserSession } from '#imports'
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event)

@@ -1,17 +1,17 @@
-import { requireAuth } from '../../../../../utils/auth-utils'
-import { canManageEditionVolunteers } from '../../../../../utils/collaborator-management'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import {
   volunteerApplicationPatchSchema,
   validateAllergiesUpdate,
   buildUpdateData,
   getUserUpdateData,
-} from '../../../../../utils/editions/volunteers/applications'
-import { NotificationService } from '../../../../../utils/notification-service'
-import { prisma } from '../../../../../utils/prisma'
+} from '@@/server/utils/editions/volunteers/applications'
+import { NotificationService } from '@@/server/utils/notification-service'
+import { prisma } from '@@/server/utils/prisma'
 import {
   compareApplicationChanges,
   hasApplicationDataChanges,
-} from '../../../../../utils/volunteer-application-diff'
+} from '@@/server/utils/volunteer-application-diff'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
@@ -285,7 +285,7 @@ export default defineEventHandler(async (event) => {
   // Envoyer une notification selon le changement de statut
   try {
     const editionName = `${application.edition.convention.name}${application.edition.name ? ' - ' + application.edition.name : ''}`
-    const { NotificationHelpers } = await import('../../../../../utils/notification-service')
+    const { NotificationHelpers } = await import('@@/server/utils/notification-service')
 
     if (target === 'ACCEPTED') {
       // Récupérer les noms des équipes assignées

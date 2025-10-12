@@ -1,6 +1,5 @@
+import { getEmailHash } from '@@/server/utils/email-hash'
 import { PrismaClient } from '@prisma/client'
-
-import { getEmailHash } from '../../../../utils/email-hash'
 
 const prisma = new PrismaClient()
 

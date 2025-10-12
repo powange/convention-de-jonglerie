@@ -1,8 +1,7 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { updateCollaboratorRights } from '@@/server/utils/collaborator-management'
+import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
-
-import { requireAuth } from '../../../../utils/auth-utils'
-import { updateCollaboratorRights } from '../../../../utils/collaborator-management'
-import { prisma } from '../../../../utils/prisma'
 
 const updateRightsSchema = z.object({
   rights: z

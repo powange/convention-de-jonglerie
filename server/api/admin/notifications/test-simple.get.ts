@@ -1,4 +1,4 @@
-import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
+import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
 
 /**
  * API de test simple pour vérifier la connectivité admin

@@ -1,8 +1,7 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { createReturnableItem } from '@@/server/utils/editions/ticketing/returnable-items'
+import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { z } from 'zod'
-
-import { requireAuth } from '../../../../../../utils/auth-utils'
-import { createReturnableItem } from '../../../../../utils/editions/ticketing/returnable-items'
-import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
 
 const createItemSchema = z.object({
   name: z.string().min(1, 'Le nom est obligatoire'),

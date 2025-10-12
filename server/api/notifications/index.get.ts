@@ -1,8 +1,7 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
+import { NotificationService } from '@@/server/utils/notification-service'
 import { z } from 'zod'
-
-import { requireAuth } from '../../utils/auth-utils'
-import { getEmailHash } from '../../utils/email-hash'
-import { NotificationService } from '../../utils/notification-service'
 
 const querySchema = z.object({
   isRead: z

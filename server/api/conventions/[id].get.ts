@@ -1,5 +1,5 @@
-import { getEmailHash } from '../../utils/email-hash'
-import { prisma } from '../../utils/prisma'
+import { getEmailHash } from '@@/server/utils/email-hash'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   // Cette route est publique pour permettre la consultation des conventions

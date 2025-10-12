@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const { email } = parse.data
-  const { prisma } = await import('../../utils/prisma')
+  const { prisma } = await import('@@/server/utils/prisma')
 
   const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } })
   return { exists: !!user }

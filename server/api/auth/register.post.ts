@@ -1,16 +1,15 @@
-import bcrypt from 'bcryptjs'
-import { z } from 'zod'
-
-import { createFutureDate, TOKEN_DURATIONS } from '../../utils/date-utils'
+import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
 import {
   sendEmail,
   generateVerificationCode,
   generateVerificationEmailHtml,
   getSiteUrl,
-} from '../../utils/emailService'
-import { prisma } from '../../utils/prisma'
-import { registerRateLimiter } from '../../utils/rate-limiter'
-import { registerSchema, handleValidationError } from '../../utils/validation-schemas'
+} from '@@/server/utils/emailService'
+import { prisma } from '@@/server/utils/prisma'
+import { registerRateLimiter } from '@@/server/utils/rate-limiter'
+import { registerSchema, handleValidationError } from '@@/server/utils/validation-schemas'
+import bcrypt from 'bcryptjs'
+import { z } from 'zod'
 
 export default defineEventHandler(async (event) => {
   try {

@@ -1,8 +1,7 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
+import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
-
-import { requireAuth } from '../../../../../../utils/auth-utils'
-import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
-import { prisma } from '../../../../../utils/prisma'
 
 const createQuotaSchema = z.object({
   title: z.string().min(1, 'Le titre est obligatoire'),

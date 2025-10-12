@@ -1,12 +1,11 @@
-import { z } from 'zod'
-
-import { requireAuth } from '../../../utils/auth-utils'
+import { requireAuth } from '@@/server/utils/auth-utils'
 import {
   addConventionCollaborator,
   checkAdminMode,
   findUserByPseudoOrEmail,
-} from '../../../utils/collaborator-management'
-import { validateConventionId } from '../../../utils/permissions/convention-permissions'
+} from '@@/server/utils/collaborator-management'
+import { validateConventionId } from '@@/server/utils/permissions/convention-permissions'
+import { z } from 'zod'
 
 const addCollaboratorSchema = z
   .object({

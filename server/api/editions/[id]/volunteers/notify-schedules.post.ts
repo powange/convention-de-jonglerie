@@ -1,12 +1,12 @@
-import { requireAuth } from '../../../../utils/auth-utils'
-import { canManageEditionVolunteers } from '../../../../utils/collaborator-management'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { canManageEditionVolunteers } from '@@/server/utils/collaborator-management'
 import {
   sendEmail,
   generateVolunteerScheduleEmailHtml,
   getSiteUrl,
-} from '../../../../utils/emailService'
-import { NotificationService } from '../../../../utils/notification-service'
-import { prisma } from '../../../../utils/prisma'
+} from '@@/server/utils/emailService'
+import { NotificationService } from '@@/server/utils/notification-service'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   try {

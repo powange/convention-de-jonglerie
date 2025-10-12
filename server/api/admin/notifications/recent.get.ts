@@ -1,6 +1,6 @@
-import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
-import { getEmailHash } from '../../../utils/email-hash'
-import { prisma } from '../../../utils/prisma'
+import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { getEmailHash } from '@@/server/utils/email-hash'
+import { prisma } from '@@/server/utils/prisma'
 
 /**
  * API Admin - Récupérer les notifications récentes

@@ -1,5 +1,5 @@
-import { requireAuth } from '../../utils/auth-utils'
-import { prisma } from '../../utils/prisma'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { prisma } from '@@/server/utils/prisma'
 
 // Préférences par défaut (tout activé)
 const defaultPreferences = {

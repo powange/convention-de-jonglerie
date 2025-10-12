@@ -1,5 +1,5 @@
-import { requireGlobalAdminWithDbCheck } from '../../utils/admin-auth'
-import { prisma } from '../../utils/prisma'
+import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { prisma } from '@@/server/utils/prisma'
 
 import type { H3Error } from 'h3'
 

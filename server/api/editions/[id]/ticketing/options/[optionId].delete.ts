@@ -1,6 +1,6 @@
-import { requireAuth } from '../../../../../utils/auth-utils'
-import { deleteOption } from '../../../../../utils/editions/ticketing/options'
-import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { deleteOption } from '@@/server/utils/editions/ticketing/options'
+import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)

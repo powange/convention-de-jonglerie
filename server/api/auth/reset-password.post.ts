@@ -1,8 +1,7 @@
+import { prisma } from '@@/server/utils/prisma'
+import { passwordSchema } from '@@/server/utils/validation-schemas'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
-
-import { prisma } from '../../utils/prisma'
-import { passwordSchema } from '../../utils/validation-schemas'
 
 const resetPasswordSchema = z.object({
   token: z.string(),

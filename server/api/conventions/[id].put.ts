@@ -1,18 +1,17 @@
 import { readFile } from 'fs/promises'
 
-import { z } from 'zod'
-
-import { requireAuth } from '../../utils/auth-utils'
+import { requireAuth } from '@@/server/utils/auth-utils'
 import {
   getConventionForEdit,
   validateConventionId,
-} from '../../utils/permissions/convention-permissions'
-import { prisma } from '../../utils/prisma'
+} from '@@/server/utils/permissions/convention-permissions'
+import { prisma } from '@@/server/utils/prisma'
 import {
   updateConventionSchema,
   validateAndSanitize,
   handleValidationError,
-} from '../../utils/validation-schemas'
+} from '@@/server/utils/validation-schemas'
+import { z } from 'zod'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification

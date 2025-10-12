@@ -1,6 +1,6 @@
-import { requireAuth } from '../../../../utils/auth-utils'
-import { prisma } from '../../../../utils/prisma'
-import { carpoolRequestSchema } from '../../../../utils/validation-schemas'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { prisma } from '@@/server/utils/prisma'
+import { carpoolRequestSchema } from '@@/server/utils/validation-schemas'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)

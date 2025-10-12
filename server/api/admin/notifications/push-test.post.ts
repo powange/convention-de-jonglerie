@@ -1,7 +1,6 @@
+import { requireGlobalAdminWithDbCheck } from '@@/server/utils/admin-auth'
+import { pushNotificationService } from '@@/server/utils/push-notification-service'
 import { z } from 'zod'
-
-import { requireGlobalAdminWithDbCheck } from '../../../utils/admin-auth'
-import { pushNotificationService } from '../../../utils/push-notification-service'
 
 const testPushSchema = z.object({
   userId: z.number().optional(),

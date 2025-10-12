@@ -1,7 +1,6 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { testHelloAssoConnection } from '@@/server/utils/editions/ticketing/helloasso'
 import { z } from 'zod'
-
-import { requireAuth } from '../../../../../utils/auth-utils'
-import { testHelloAssoConnection } from '../../../../../utils/editions/ticketing/helloasso'
 
 const bodySchema = z.object({
   clientId: z.string().min(1),

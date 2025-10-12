@@ -1,12 +1,11 @@
-import { z } from 'zod'
-
-import { requireAuth } from '../../../utils/auth-utils'
-import { getEmailHash } from '../../../utils/email-hash'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
 import {
   getEditionForStatusManagement,
   validateEditionId,
-} from '../../../utils/permissions/edition-permissions'
-import { prisma } from '../../../utils/prisma'
+} from '@@/server/utils/permissions/edition-permissions'
+import { prisma } from '@@/server/utils/prisma'
+import { z } from 'zod'
 
 const statusSchema = z.object({
   isOnline: z.boolean(),

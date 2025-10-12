@@ -1,4 +1,4 @@
-import { requireAuth } from '../../utils/auth-utils'
+import { requireAuth } from '@@/server/utils/auth-utils'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     // Vérification de sécurité : seuls les admins peuvent uploader pour d'autres utilisateurs
     if (targetUserId !== user.id) {
       // Vérifier que l'utilisateur connecté est un admin
-      const { prisma } = await import('../../utils/prisma')
+      const { prisma } = await import('@@/server/utils/prisma')
       const currentUser = await prisma.user.findUnique({
         where: { id: user.id },
         select: { isGlobalAdmin: true },

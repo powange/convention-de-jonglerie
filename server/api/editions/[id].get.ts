@@ -1,7 +1,7 @@
-import { optionalAuth } from '../../utils/auth-utils'
-import { checkAdminMode } from '../../utils/collaborator-management'
-import { getEmailHash } from '../../utils/email-hash'
-import { prisma } from '../../utils/prisma'
+import { optionalAuth } from '@@/server/utils/auth-utils'
+import { checkAdminMode } from '@@/server/utils/collaborator-management'
+import { getEmailHash } from '@@/server/utils/email-hash'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const editionId = parseInt(event.context.params?.id as string)

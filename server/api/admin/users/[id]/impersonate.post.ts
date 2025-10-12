@@ -1,6 +1,6 @@
-import { getUserSession, setUserSession } from '#imports'
+import { prisma } from '@@/server/utils/prisma'
 
-import { prisma } from '../../../../utils/prisma'
+import { getUserSession, setUserSession } from '#imports'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification et les droits super admin

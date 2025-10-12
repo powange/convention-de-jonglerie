@@ -1,7 +1,5 @@
-import { z } from 'zod'
-
-import { requiresEmergencyContact } from '../../../../../utils/allergy-severity'
-import { requireAuth } from '../../../../../utils/auth-utils'
+import { requiresEmergencyContact } from '@@/server/utils/allergy-severity'
+import { requireAuth } from '@@/server/utils/auth-utils'
 import {
   volunteerApplicationBodySchema,
   processPhoneLogic,
@@ -9,9 +7,10 @@ import {
   validateRequiredFields,
   validateAvailability,
   validateTeamPreferences,
-} from '../../../../../utils/editions/volunteers/applications'
-import { prisma } from '../../../../../utils/prisma'
-import { handleValidationError } from '../../../../../utils/validation-schemas'
+} from '@@/server/utils/editions/volunteers/applications'
+import { prisma } from '@@/server/utils/prisma'
+import { handleValidationError } from '@@/server/utils/validation-schemas'
+import { z } from 'zod'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -219,7 +218,7 @@ export default defineEventHandler(async (event) => {
     // Envoyer une notification de confirmation de candidature
     try {
       const editionName = `${application.edition.convention.name}${application.edition.name ? ' - ' + application.edition.name : ''}`
-      const { NotificationHelpers } = await import('../../../../../utils/notification-service')
+      const { NotificationHelpers } = await import('@@/server/utils/notification-service')
       await NotificationHelpers.volunteerApplicationSubmitted(
         authenticatedUser.id,
         editionName,

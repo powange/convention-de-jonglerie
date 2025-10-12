@@ -1,3 +1,5 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { hasEditionEditPermission } from '@@/server/utils/permissions/permissions'
 import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 
@@ -6,8 +8,6 @@ import {
   validateAndSanitize,
   handleValidationError,
 } from '../../../../../server/utils/validation-schemas'
-import { requireAuth } from '../../../../utils/auth-utils'
-import { hasEditionEditPermission } from '../../../../utils/permissions/permissions'
 
 const prisma = new PrismaClient()
 

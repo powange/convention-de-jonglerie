@@ -1,11 +1,10 @@
-import { z } from 'zod'
-
-import { requireAuth } from '../../../utils/auth-utils'
+import { requireAuth } from '@@/server/utils/auth-utils'
 import {
   getConventionForArchive,
   validateConventionId,
-} from '../../../utils/permissions/convention-permissions'
-import { prisma } from '../../../utils/prisma'
+} from '@@/server/utils/permissions/convention-permissions'
+import { prisma } from '@@/server/utils/prisma'
+import { z } from 'zod'
 
 const schema = z.object({ archived: z.boolean() })
 

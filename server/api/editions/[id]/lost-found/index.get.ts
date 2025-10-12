@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 
-import { prisma } from '../../../../utils/prisma'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   try {

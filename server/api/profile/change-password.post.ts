@@ -1,13 +1,12 @@
-import bcrypt from 'bcryptjs'
-import { z } from 'zod'
-
-import { requireAuth } from '../../utils/auth-utils'
-import { prisma } from '../../utils/prisma'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { prisma } from '@@/server/utils/prisma'
 import {
   changePasswordSchema,
   validateAndSanitize,
   handleValidationError,
-} from '../../utils/validation-schemas'
+} from '@@/server/utils/validation-schemas'
+import bcrypt from 'bcryptjs'
+import { z } from 'zod'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)

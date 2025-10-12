@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 
-import { requireAuth } from '../../../../../../utils/auth-utils'
-import { prisma } from '../../../../../../utils/prisma'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { prisma } from '@@/server/utils/prisma'
 
 /**
  * Récupère les membres d'une équipe de bénévoles

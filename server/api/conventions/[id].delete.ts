@@ -1,10 +1,10 @@
-import { requireAuth } from '../../utils/auth-utils'
+import { requireAuth } from '@@/server/utils/auth-utils'
 import {
   getConventionForDelete,
   shouldArchiveInsteadOfDelete,
   validateConventionId,
-} from '../../utils/permissions/convention-permissions'
-import { prisma } from '../../utils/prisma'
+} from '@@/server/utils/permissions/convention-permissions'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification

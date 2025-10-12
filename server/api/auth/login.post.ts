@@ -1,11 +1,10 @@
+import { prisma } from '@@/server/utils/prisma'
+import { authRateLimiter } from '@@/server/utils/rate-limiter'
+import { handleValidationError } from '@@/server/utils/validation-schemas'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
 import { setUserSession } from '#imports'
-
-import { prisma } from '../../utils/prisma'
-import { authRateLimiter } from '../../utils/rate-limiter'
-import { handleValidationError } from '../../utils/validation-schemas'
 
 // Schéma de validation pour le login
 const loginSchema = z.object({

@@ -1,8 +1,7 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { createTier } from '@@/server/utils/editions/ticketing/tiers'
+import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { z } from 'zod'
-
-import { requireAuth } from '../../../../../utils/auth-utils'
-import { createTier } from '../../../../../utils/editions/ticketing/tiers'
-import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
 
 const bodySchema = z.object({
   name: z.string().min(1),

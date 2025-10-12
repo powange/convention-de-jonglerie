@@ -1,5 +1,5 @@
-import { requireAuth } from '../../../utils/auth-utils'
-import { NotificationService } from '../../../utils/notification-service'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { NotificationService } from '@@/server/utils/notification-service'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification

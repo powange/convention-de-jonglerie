@@ -1,6 +1,6 @@
-import { requireAuth } from '../../../utils/auth-utils'
-import { validateConventionId } from '../../../utils/permissions/convention-permissions'
-import { prisma } from '../../../utils/prisma'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { validateConventionId } from '@@/server/utils/permissions/convention-permissions'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification et droits admin

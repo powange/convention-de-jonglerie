@@ -1,7 +1,7 @@
-import { requireAuth } from '../../../../utils/auth-utils'
-import { getEmailHash } from '../../../../utils/email-hash'
-import { requireVolunteerManagementAccess } from '../../../../utils/permissions/volunteer-permissions'
-import { prisma } from '../../../../utils/prisma'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
+import { requireVolunteerManagementAccess } from '@@/server/utils/permissions/volunteer-permissions'
+import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   // Authentification requise

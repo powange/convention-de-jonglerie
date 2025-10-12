@@ -1,8 +1,7 @@
+import { NotificationHelpers } from '@@/server/utils/notification-service'
+import { prisma } from '@@/server/utils/prisma'
+import { handleValidationError } from '@@/server/utils/validation-schemas'
 import { z } from 'zod'
-
-import { NotificationHelpers } from '../../utils/notification-service'
-import { prisma } from '../../utils/prisma'
-import { handleValidationError } from '../../utils/validation-schemas'
 
 const verifyEmailSchema = z.object({
   email: z.string().email('Adresse email invalide'),

@@ -1,8 +1,7 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { prisma } from '@@/server/utils/prisma'
+import { conventionSchema, handleValidationError } from '@@/server/utils/validation-schemas'
 import { z } from 'zod'
-
-import { requireAuth } from '../../utils/auth-utils'
-import { prisma } from '../../utils/prisma'
-import { conventionSchema, handleValidationError } from '../../utils/validation-schemas'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
@@ -86,7 +85,7 @@ export default defineEventHandler(async (event) => {
         },
       },
     })
-    const { getEmailHash } = await import('../../utils/email-hash')
+    const { getEmailHash } = await import('@@/server/utils/email-hash')
     const transformed = {
       ...conventionWithCollaborators,
       author: conventionWithCollaborators?.author

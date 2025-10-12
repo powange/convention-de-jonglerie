@@ -1,15 +1,17 @@
-import { z } from 'zod'
-
-import { requireAuth } from '../../utils/auth-utils'
-import { normalizeDateToISO } from '../../utils/date-helpers'
-import { geocodeEdition } from '../../utils/geocoding'
-import { getEditionForEdit, validateEditionId } from '../../utils/permissions/edition-permissions'
-import { prisma } from '../../utils/prisma'
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { normalizeDateToISO } from '@@/server/utils/date-helpers'
+import { geocodeEdition } from '@@/server/utils/geocoding'
+import {
+  getEditionForEdit,
+  validateEditionId,
+} from '@@/server/utils/permissions/edition-permissions'
+import { prisma } from '@@/server/utils/prisma'
 import {
   updateEditionSchema,
   validateAndSanitize,
   handleValidationError,
-} from '../../utils/validation-schemas'
+} from '@@/server/utils/validation-schemas'
+import { z } from 'zod'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
