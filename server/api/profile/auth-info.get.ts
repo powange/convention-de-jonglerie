@@ -1,3 +1,4 @@
+import { requireAuth } from '../../utils/auth-utils'
 import { prisma } from '../../utils/prisma'
 
 function getAuthProviderLabel(provider: string): string {
@@ -14,14 +15,7 @@ function getAuthProviderLabel(provider: string): string {
 }
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
-
-  if (!user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   try {
     // Récupérer les informations de l'utilisateur

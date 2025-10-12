@@ -44,7 +44,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
     it('devrait rejeter si utilisateur non authentifié', async () => {
       global.getRouterParam.mockReturnValue('1')
 
-      await expect(handler(mockEventWithoutUser as any)).rejects.toThrow('Non authentifié')
+      await expect(handler(mockEventWithoutUser as any)).rejects.toThrow('Unauthorized')
     })
 
     it('devrait accepter si utilisateur authentifié', async () => {

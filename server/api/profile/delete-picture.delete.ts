@@ -1,14 +1,8 @@
+import { requireAuth } from '../../utils/auth-utils'
 import { deleteProfilePicture } from '../../utils/image-deletion'
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
-
-  if (!user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   try {
     // Utiliser l'utilitaire de suppression

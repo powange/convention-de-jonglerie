@@ -1,14 +1,9 @@
+import { requireAuth } from '../../utils/auth-utils'
 import { notificationStreamManager } from '../../utils/notification-stream-manager'
 
 export default defineEventHandler(async (event) => {
   // Vérification de l'authentification
-  const user = event.context.user
-  if (!user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Authentication required for notification stream',
-    })
-  }
+  const user = requireAuth(event)
 
   console.log(`[SSE] Nouvelle connexion de streaming pour user ${user.id}`)
 

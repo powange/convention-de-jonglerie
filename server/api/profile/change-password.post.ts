@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
+import { requireAuth } from '../../utils/auth-utils'
 import { prisma } from '../../utils/prisma'
 import {
   changePasswordSchema,
@@ -9,14 +10,7 @@ import {
 } from '../../utils/validation-schemas'
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
-
-  if (!user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   const body = await readBody(event)
 
