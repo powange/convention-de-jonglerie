@@ -7,7 +7,7 @@ vi.mock('../../../../../server/utils/geocoding', () => ({
 
 import { geocodeEdition } from '../../../../../server/utils/geocoding'
 import { prismaMock } from '../../../../__mocks__/prisma'
-import handler from '../../../../../server/api/editions/[id].put'
+import handler from '../../../../../server/api/editions/[id]/index.put'
 
 const mockGeocodeEdition = geocodeEdition as ReturnType<typeof vi.fn>
 

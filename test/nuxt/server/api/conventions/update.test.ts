@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { prismaMock } from '../../../../__mocks__/prisma'
 
 // Import du handler après les mocks
-import updateConventionHandler from '../../../../../server/api/conventions/[id].put'
+import updateConventionHandler from '../../../../../server/api/conventions/[id]/index.put'
 
 describe('API Convention - Mise à jour', () => {
   const mockUser = {

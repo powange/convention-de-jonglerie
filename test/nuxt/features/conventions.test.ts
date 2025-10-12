@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import deleteConventionHandler from '../../../server/api/conventions/[id].delete'
-import getConventionHandler from '../../../server/api/conventions/[id].get'
-import updateConventionHandler from '../../../server/api/conventions/[id].put'
+import deleteConventionHandler from '../../../server/api/conventions/[id]/index.delete'
+import getConventionHandler from '../../../server/api/conventions/[id]/index.get'
+import updateConventionHandler from '../../../server/api/conventions/[id]/index.put'
 import createConventionHandler from '../../../server/api/conventions/index.post'
 import { prismaMock } from '../../__mocks__/prisma'
 

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock des handlers d'API
-import deleteEditionHandler from '../../../server/api/editions/[id].delete'
-import getEditionHandler from '../../../server/api/editions/[id].get'
-import updateEditionHandler from '../../../server/api/editions/[id].put'
+import deleteEditionHandler from '../../../server/api/editions/[id]/index.delete'
+import getEditionHandler from '../../../server/api/editions/[id]/index.get'
+import updateEditionHandler from '../../../server/api/editions/[id]/index.put'
 import getEditionsHandler from '../../../server/api/editions/index.get'
 import createEditionHandler from '../../../server/api/editions/index.post'
 import { prismaMock } from '../../__mocks__/prisma'

@@ -7,7 +7,7 @@ vi.mock('../../../../../server/utils/email-hash', () => ({
 
 import { getEmailHash } from '../../../../../server/utils/email-hash'
 import { prismaMock } from '../../../../__mocks__/prisma'
-import handler from '../../../../../server/api/editions/[id].get'
+import handler from '../../../../../server/api/editions/[id]/index.get'
 
 const mockGetEmailHash = getEmailHash as ReturnType<typeof vi.fn>
 

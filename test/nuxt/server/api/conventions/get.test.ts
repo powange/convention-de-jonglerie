@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import getConventionHandler from '../../../../../server/api/conventions/[id].get'
+import getConventionHandler from '../../../../../server/api/conventions/[id]/index.get'
 import { getEmailHash } from '../../../../../server/utils/email-hash'
 import { prismaMock } from '../../../../__mocks__/prisma'
 
