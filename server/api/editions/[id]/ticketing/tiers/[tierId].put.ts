@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { requireAuth } from '../../../../../utils/auth-utils'
 import { updateTier } from '../../../../../utils/editions/ticketing/tiers'
 import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
 
@@ -16,7 +17,7 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
+  const user = requireAuth(event)
 
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   const tierId = parseInt(getRouterParam(event, 'tierId') || '0')
@@ -25,7 +26,7 @@ export default defineEventHandler(async (event) => {
   if (!tierId) throw createError({ statusCode: 400, message: 'Tarif invalide' })
 
   // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, event.context.user.id, event)
+  const allowed = await canAccessEditionData(editionId, user.id, event)
   if (!allowed)
     throw createError({
       statusCode: 403,

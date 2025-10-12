@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { requireAuth } from '../../../../../utils/auth-utils'
 import { testHelloAssoConnection } from '../../../../../utils/editions/ticketing/helloasso'
 
 const bodySchema = z.object({
@@ -11,7 +12,7 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
+  requireAuth(event)
 
   const body = bodySchema.parse(await readBody(event))
 

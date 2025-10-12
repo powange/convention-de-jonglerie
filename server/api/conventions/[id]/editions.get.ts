@@ -1,15 +1,14 @@
+import { requireAuth } from '../../../utils/auth-utils'
 import { checkUserConventionPermission } from '../../../utils/collaborator-management'
 import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
+  const user = requireAuth(event)
   const conventionId = parseInt(getRouterParam(event, 'id') || '0')
-  if (!event.context.user) {
-    throw createError({ statusCode: 401, message: 'Non authentifié' })
-  }
   if (!conventionId) {
     throw createError({ statusCode: 400, message: 'ID invalide' })
   }
-  const perm = await checkUserConventionPermission(conventionId, event.context.user.id)
+  const perm = await checkUserConventionPermission(conventionId, user.id)
   if (!perm.hasPermission) {
     throw createError({ statusCode: 403, message: 'Accès refusé' })
   }

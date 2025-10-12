@@ -85,7 +85,7 @@ describe('/api/conventions/[id]/collaborators/history GET', () => {
   it('rejette non authentifié', async () => {
     await expect(
       handler({ ...baseEvent, context: { ...baseEvent.context, user: null } } as any)
-    ).rejects.toThrow('Non authentifié')
+    ).rejects.toThrow('Unauthorized')
   })
 
   it('rejette si pas permission', async () => {

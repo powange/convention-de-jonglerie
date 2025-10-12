@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { requireAuth } from '../../utils/auth-utils'
 import { prisma } from '../../utils/prisma'
 
 const notificationPreferencesSchema = z.object({
@@ -17,16 +18,14 @@ const notificationPreferencesSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) {
-    throw createError({ statusCode: 401, message: 'Non authentifié' })
-  }
+  const user = requireAuth(event)
 
   const body = await readBody(event)
   const preferences = notificationPreferencesSchema.parse(body)
 
   try {
     const updatedUser = await prisma.user.update({
-      where: { id: event.context.user.id },
+      where: { id: user.id },
       data: {
         notificationPreferences: preferences,
       },

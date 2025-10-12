@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { requireAuth } from '../../../../../utils/auth-utils'
 import { canManageEditionVolunteers } from '../../../../../utils/collaborator-management'
 import { encrypt } from '../../../../../utils/encryption'
 import { prisma } from '../../../../../utils/prisma'
@@ -18,13 +19,13 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
+  const user = requireAuth(event)
 
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
 
   // Vérifier les permissions (même logique que gestion bénévoles)
-  const allowed = await canManageEditionVolunteers(editionId, event.context.user.id, event)
+  const allowed = await canManageEditionVolunteers(editionId, user.id, event)
   if (!allowed)
     throw createError({
       statusCode: 403,

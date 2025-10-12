@@ -1,12 +1,8 @@
+import { requireAuth } from '../../../utils/auth-utils'
 import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Unauthorized',
-    })
-  }
+  const user = requireAuth(event)
 
   const editionId = parseInt(event.context.params?.id as string)
 
@@ -30,24 +26,26 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: event.context.user.id },
+    const userWithFavorites = await prisma.user.findUnique({
+      where: { id: user.id },
       include: { favoriteEditions: true },
     })
 
-    if (!user) {
+    if (!userWithFavorites) {
       throw createError({
         statusCode: 404,
         message: 'User not found',
       })
     }
 
-    const isFavorited = user.favoriteEditions.some((edition) => edition.id === editionId)
+    const isFavorited = userWithFavorites.favoriteEditions.some(
+      (edition) => edition.id === editionId
+    )
 
     if (isFavorited) {
       // Remove from favorites
       await prisma.user.update({
-        where: { id: event.context.user.id },
+        where: { id: user.id },
         data: {
           favoriteEditions: {
             disconnect: { id: editionId },
@@ -58,7 +56,7 @@ export default defineEventHandler(async (event) => {
     } else {
       // Add to favorites
       await prisma.user.update({
-        where: { id: event.context.user.id },
+        where: { id: user.id },
         data: {
           favoriteEditions: {
             connect: { id: editionId },

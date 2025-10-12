@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { requireAuth } from '../../../../utils/auth-utils'
 import { updateCollaboratorRights } from '../../../../utils/collaborator-management'
 import { prisma } from '../../../../utils/prisma'
 
@@ -31,6 +32,7 @@ const updateRightsSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   try {
+    const user = requireAuth(event)
     const conventionId = parseInt(getRouterParam(event, 'id') as string)
     const collaboratorId = parseInt(getRouterParam(event, 'collaboratorId') as string)
     const body = await readBody(event)
@@ -43,14 +45,6 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 400,
         message: 'Aucune donnée à mettre à jour',
-      })
-    }
-
-    // Vérifier l'authentification (le middleware s'en charge déjà)
-    if (!event.context.user) {
-      throw createError({
-        statusCode: 401,
-        message: 'Non authentifié',
       })
     }
 
@@ -74,7 +68,7 @@ export default defineEventHandler(async (event) => {
     const updatedCollaborator = await updateCollaboratorRights({
       conventionId,
       collaboratorId,
-      userId: event.context.user.id,
+      userId: user.id,
       rights,
       title: title ?? undefined,
       perEdition,
@@ -114,7 +108,7 @@ export default defineEventHandler(async (event) => {
           data: {
             conventionId,
             targetUserId: target?.userId,
-            actorId: event.context.user.id,
+            actorId: user.id,
             changeType: 'RIGHTS_UPDATED',
             before: beforeSnapshot as any,
             after: afterSnapshot as any,

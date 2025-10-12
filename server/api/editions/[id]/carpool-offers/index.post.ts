@@ -1,14 +1,9 @@
+import { requireAuth } from '../../../../utils/auth-utils'
 import { prisma } from '../../../../utils/prisma'
 import { carpoolOfferSchema } from '../../../../utils/validation-schemas'
 
 export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   const editionId = parseInt(event.context.params?.id as string)
   const body = await readBody(event)
@@ -49,7 +44,7 @@ export default defineEventHandler(async (event) => {
     const carpoolOffer = await prisma.carpoolOffer.create({
       data: {
         editionId,
-        userId: event.context.user.id,
+        userId: user.id,
         tripDate: new Date(validatedData.tripDate),
         locationCity: validatedData.locationCity,
         locationAddress: validatedData.locationAddress,

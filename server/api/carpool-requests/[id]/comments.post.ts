@@ -1,13 +1,8 @@
+import { requireAuth } from '../../../utils/auth-utils'
 import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   const carpoolRequestId = parseInt(event.context.params?.id as string)
   const body = await readBody(event)
@@ -44,7 +39,7 @@ export default defineEventHandler(async (event) => {
     const comment = await prisma.carpoolRequestComment.create({
       data: {
         carpoolRequestId,
-        userId: event.context.user.id,
+        userId: user.id,
         content: body.content,
       },
       include: {

@@ -1,18 +1,13 @@
+import { requireAuth } from '../../utils/auth-utils'
 import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   try {
     const applications = await prisma.editionVolunteerApplication.findMany({
       where: {
-        userId: event.context.user.id,
+        userId: user.id,
       },
       select: {
         id: true,
@@ -109,7 +104,7 @@ export default defineEventHandler(async (event) => {
     if (editionIds.length > 0) {
       volunteerAssignments = await prisma.volunteerAssignment.findMany({
         where: {
-          userId: event.context.user.id,
+          userId: user.id,
           timeSlot: {
             editionId: {
               in: editionIds,

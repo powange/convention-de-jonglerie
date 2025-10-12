@@ -1,13 +1,8 @@
+import { requireAuth } from '../../utils/auth-utils'
 import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   try {
     const body = await readBody(event)
@@ -54,7 +49,7 @@ export default defineEventHandler(async (event) => {
             include: {
               collaborators: {
                 where: {
-                  userId: event.context.user.id,
+                  userId: user.id,
                   OR: [{ canEditAllEditions: true }, { canEditConvention: true }],
                 },
               },
@@ -70,10 +65,10 @@ export default defineEventHandler(async (event) => {
         })
       }
 
-      const isCreator = edition.createdBy === event.context.user.id
-      const isConventionAuthor = edition.convention.authorId === event.context.user.id
+      const isCreator = edition.createdBy === user.id
+      const isConventionAuthor = edition.convention.authorId === user.id
       const isCollaborator = edition.convention.collaborators.length > 0
-      const isGlobalAdmin = event.context.user.isGlobalAdmin || false
+      const isGlobalAdmin = user.isGlobalAdmin || false
 
       if (!isCreator && !isConventionAuthor && !isCollaborator && !isGlobalAdmin) {
         throw createError({

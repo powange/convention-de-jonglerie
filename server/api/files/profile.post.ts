@@ -1,11 +1,7 @@
+import { requireAuth } from '../../utils/auth-utils'
+
 export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   try {
     const body = await readBody(event)
@@ -19,14 +15,14 @@ export default defineEventHandler(async (event) => {
     }
 
     // Récupérer l'ID utilisateur depuis les métadonnées ou utiliser l'utilisateur connecté par défaut
-    const targetUserId = body.metadata?.entityId || event.context.user.id
+    const targetUserId = body.metadata?.entityId || user.id
 
     // Vérification de sécurité : seuls les admins peuvent uploader pour d'autres utilisateurs
-    if (targetUserId !== event.context.user.id) {
+    if (targetUserId !== user.id) {
       // Vérifier que l'utilisateur connecté est un admin
       const { prisma } = await import('../../utils/prisma')
       const currentUser = await prisma.user.findUnique({
-        where: { id: event.context.user.id },
+        where: { id: user.id },
         select: { isGlobalAdmin: true },
       })
 
@@ -39,7 +35,7 @@ export default defineEventHandler(async (event) => {
     }
 
     console.log('=== UPLOAD PROFILE FILES ===')
-    console.log('Connected user ID:', event.context.user.id)
+    console.log('Connected user ID:', user.id)
     console.log('Target user ID:', targetUserId)
     console.log('Files count:', body.files.length)
 

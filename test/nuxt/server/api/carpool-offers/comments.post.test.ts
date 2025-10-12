@@ -81,7 +81,7 @@ describe('/api/carpool-offers/[id]/comments POST', () => {
       context: { ...mockEvent.context, user: null },
     }
 
-    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Non authentifié')
+    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Unauthorized')
   })
 
   it("devrait rejeter un ID d'offre de covoiturage invalide", async () => {

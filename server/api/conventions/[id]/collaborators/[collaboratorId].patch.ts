@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { requireAuth } from '../../../../utils/auth-utils'
 import { canManageCollaborators } from '../../../../utils/collaborator-management'
 import { prisma } from '../../../../utils/prisma'
 
@@ -29,9 +30,9 @@ const payloadSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const user = requireAuth(event)
   const conventionId = parseInt(getRouterParam(event, 'id') || '0')
   const collaboratorId = parseInt(getRouterParam(event, 'collaboratorId') || '0')
-  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
   const body = await readBody(event).catch(() => ({}))
   const parsed = payloadSchema.parse(body || {})
 
@@ -39,7 +40,7 @@ export default defineEventHandler(async (event) => {
   if (!parsed.rights && parsed.title === undefined && !parsed.perEdition)
     return { success: true, unchanged: true }
 
-  const canManage = await canManageCollaborators(conventionId, event.context.user.id, event)
+  const canManage = await canManageCollaborators(conventionId, user.id, event)
   if (!canManage) throw createError({ statusCode: 403, message: 'Permission insuffisante' })
 
   const collaborator = await prisma.conventionCollaborator.findUnique({
@@ -136,7 +137,7 @@ export default defineEventHandler(async (event) => {
         data: {
           conventionId,
           targetUserId: collaborator.userId,
-          actorId: event.context.user.id,
+          actorId: user.id,
           changeType: perEditionInput ? 'PER_EDITIONS_UPDATED' : 'RIGHTS_UPDATED',
           before: beforeSnapshot as any,
           after: afterSnapshot as any,

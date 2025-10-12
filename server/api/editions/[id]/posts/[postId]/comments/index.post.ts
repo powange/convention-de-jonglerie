@@ -6,19 +6,13 @@ import {
   validateAndSanitize,
   handleValidationError,
 } from '../../../../../../../server/utils/validation-schemas'
+import { requireAuth } from '../../../../../../utils/auth-utils'
 import { hasEditionEditPermission } from '../../../../../../utils/permissions/permissions'
 
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
-  const user = event.context.user
+  const user = requireAuth(event)
 
   const editionId = parseInt(getRouterParam(event, 'id')!)
   const postId = parseInt(getRouterParam(event, 'postId')!)

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { requireAuth } from '../../../../../utils/auth-utils'
 import { updateOption } from '../../../../../utils/editions/ticketing/options'
 import { canAccessEditionData } from '../../../../../utils/permissions/edition-permissions'
 
@@ -15,7 +16,7 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) throw createError({ statusCode: 401, message: 'Non authentifié' })
+  const user = requireAuth(event)
 
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   const optionId = parseInt(getRouterParam(event, 'optionId') || '0')
@@ -24,7 +25,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Paramètres invalides' })
 
   // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, event.context.user.id, event)
+  const allowed = await canAccessEditionData(editionId, user.id, event)
   if (!allowed)
     throw createError({
       statusCode: 403,

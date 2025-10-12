@@ -82,7 +82,7 @@ describe('/api/conventions/[id]/collaborators/[collaboratorId] PUT', () => {
 
     global.readBody.mockResolvedValue(requestBody)
 
-    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Non authentifié')
+    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Unauthorized')
   })
 
   it('devrait rejeter un ID de convention invalide', async () => {

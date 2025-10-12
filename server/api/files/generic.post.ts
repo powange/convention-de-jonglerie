@@ -1,3 +1,5 @@
+import { requireGlobalAdmin } from '../../utils/auth-utils'
+
 import type { ServerFile } from 'nuxt-file-storage'
 
 interface RequestBody {
@@ -9,21 +11,8 @@ interface RequestBody {
 }
 
 export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
-
-  // Restreindre aux administrateurs globaux pour la sécurité
-  if (!event.context.user.isGlobalAdmin) {
-    throw createError({
-      statusCode: 403,
-      message: 'Accès réservé aux administrateurs',
-    })
-  }
+  // Vérifier l'authentification et que l'utilisateur est admin global
+  requireGlobalAdmin(event)
 
   try {
     const { files, metadata } = await readBody<RequestBody>(event)

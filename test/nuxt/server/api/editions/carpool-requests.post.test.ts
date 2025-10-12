@@ -99,7 +99,7 @@ describe('/api/editions/[id]/carpool-requests POST', () => {
       context: { ...mockEvent.context, user: null },
     }
 
-    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Non authentifié')
+    await expect(handler(eventWithoutUser as any)).rejects.toThrow('Unauthorized')
   })
 
   it("devrait rejeter un ID d'édition invalide", async () => {

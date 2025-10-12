@@ -1,10 +1,9 @@
+import { requireAuth } from '../../../../utils/auth-utils'
 import { NotificationService } from '../../../../utils/notification-service'
 import { prisma } from '../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) {
-    throw createError({ statusCode: 401, message: 'Non authentifié' })
-  }
+  const user = requireAuth(event)
 
   const offerId = parseInt(event.context.params?.id as string)
   const bookingId = parseInt(event.context.params?.bookingId as string)
@@ -33,7 +32,7 @@ export default defineEventHandler(async (event) => {
   // Droits:
   // - ACCEPT/REJECT: uniquement le créateur de l'offre
   // - CANCEL: le demandeur de la réservation
-  const userId = event.context.user.id
+  const userId = user.id
   if ((action === 'ACCEPT' || action === 'REJECT') && offer.userId !== userId) {
     throw createError({ statusCode: 403, message: 'Action non autorisée' })
   }

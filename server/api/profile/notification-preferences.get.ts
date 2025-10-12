@@ -1,3 +1,4 @@
+import { requireAuth } from '../../utils/auth-utils'
 import { prisma } from '../../utils/prisma'
 
 // Préférences par défaut (tout activé)
@@ -16,13 +17,11 @@ const defaultPreferences = {
 }
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) {
-    throw createError({ statusCode: 401, message: 'Non authentifié' })
-  }
+  const user = requireAuth(event)
 
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: event.context.user.id },
+    const userWithPrefs = await prisma.user.findUnique({
+      where: { id: user.id },
       select: {
         notificationPreferences: true,
       },
@@ -30,7 +29,7 @@ export default defineEventHandler(async (event) => {
 
     // Si l'utilisateur n'a pas de préférences, retourner les défauts
     // Merge avec les defaults pour s'assurer que toutes les clés sont présentes
-    const userPrefs = (user?.notificationPreferences as any) || {}
+    const userPrefs = (userWithPrefs?.notificationPreferences as any) || {}
     const preferences = {
       ...defaultPreferences,
       ...userPrefs,

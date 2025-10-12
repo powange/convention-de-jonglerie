@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { requireAuth } from '../../utils/auth-utils'
 import { prisma } from '../../utils/prisma'
 
 const updateCarpoolOfferSchema = z.object({
@@ -17,14 +18,7 @@ const updateCarpoolOfferSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  // Vérifier l'authentification
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
-
+  const user = requireAuth(event)
   const offerId = parseInt(getRouterParam(event, 'id') as string)
 
   if (isNaN(offerId)) {
@@ -58,7 +52,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Seul le créateur peut modifier son offre
-    if (existingOffer.userId !== event.context.user.id) {
+    if (existingOffer.userId !== user.id) {
       throw createError({
         statusCode: 403,
         message: "Vous n'avez pas les droits pour modifier cette offre",

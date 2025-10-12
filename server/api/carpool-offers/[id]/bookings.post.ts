@@ -1,10 +1,9 @@
+import { requireAuth } from '../../../utils/auth-utils'
 import { NotificationHelpers } from '../../../utils/notification-service'
 import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user) {
-    throw createError({ statusCode: 401, message: 'Non authentifié' })
-  }
+  const user = requireAuth(event)
 
   const offerId = parseInt(event.context.params?.id as string)
   if (!offerId) {
@@ -34,7 +33,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Le créateur ne peut pas réserver sur sa propre offre
-  if (offer.userId === event.context.user.id) {
+  if (offer.userId === user.id) {
     throw createError({
       statusCode: 400,
       message: 'Impossible de réserver votre propre offre',
@@ -44,7 +43,7 @@ export default defineEventHandler(async (event) => {
   // Si requestId fourni, vérifier l'existence et l'appartenance à l'utilisateur courant
   if (requestId) {
     const req = await prisma.carpoolRequest.findUnique({ where: { id: requestId } })
-    if (!req || req.userId !== event.context.user.id || req.editionId !== offer.editionId) {
+    if (!req || req.userId !== user.id || req.editionId !== offer.editionId) {
       throw createError({ statusCode: 400, message: 'Demande invalide' })
     }
   }
@@ -60,7 +59,7 @@ export default defineEventHandler(async (event) => {
 
   // Option: éviter multi-PENDING du même utilisateur sur la même offre
   const existingPending = await prisma.carpoolBooking.findFirst({
-    where: { carpoolOfferId: offerId, requesterId: event.context.user.id, status: 'PENDING' },
+    where: { carpoolOfferId: offerId, requesterId: user.id, status: 'PENDING' },
   })
   if (existingPending) {
     throw createError({ statusCode: 400, message: 'Une réservation en attente existe déjà' })
@@ -69,7 +68,7 @@ export default defineEventHandler(async (event) => {
   const booking = await prisma.carpoolBooking.create({
     data: {
       carpoolOfferId: offerId,
-      requesterId: event.context.user.id,
+      requesterId: user.id,
       seats,
       message,
       requestId,

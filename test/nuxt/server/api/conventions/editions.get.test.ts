@@ -58,7 +58,7 @@ describe('/api/conventions/[id]/editions GET', () => {
   it('rejette utilisateur non authentifié', async () => {
     await expect(
       handler({ ...baseEvent, context: { ...baseEvent.context, user: null } } as any)
-    ).rejects.toThrow('Non authentifié')
+    ).rejects.toThrow('Unauthorized')
   })
 
   it('rejette si pas de permission', async () => {
