@@ -5,12 +5,6 @@ vi.mock('../../../../../../server/utils/permissions/permissions', () => ({
   hasEditionEditPermission: vi.fn(),
 }))
 
-// S'assurer que requireUserSession est bien un mock vi.fn dans ce fichier
-vi.mock('#imports', async () => {
-  const actual = await vi.importActual<any>('#imports')
-  return { ...actual, requireUserSession: vi.fn(async () => ({ user: { id: 1 } })) }
-})
-
 import { hasEditionEditPermission } from '../../../../../../server/utils/permissions/permissions'
 import { prismaMock } from '../../../../../__mocks__/prisma'
 import handler from '../../../../../../server/api/editions/[id]/lost-found/index.post'
@@ -20,6 +14,7 @@ const mockHasPermission = hasEditionEditPermission as ReturnType<typeof vi.fn>
 const mockEvent = {
   context: {
     params: { id: '1' },
+    user: { id: 1, email: 'test@example.com', pseudo: 'testuser', isGlobalAdmin: false },
   },
 }
 
@@ -57,17 +52,15 @@ const mockLostFoundItem = {
   comments: [],
 }
 
-let mockRequireUserSession: ReturnType<typeof vi.fn>
+const mockEventWithoutUser = {
+  context: {
+    params: { id: '1' },
+  },
+}
 
 describe('/api/editions/[id]/lost-found POST', () => {
   beforeEach(async () => {
     mockHasPermission.mockReset()
-    // Initialiser mockRequireUserSession une seule fois (import mis en cache)
-    if (!mockRequireUserSession) {
-      const importsMod: any = await import('#imports')
-      mockRequireUserSession = importsMod.requireUserSession as ReturnType<typeof vi.fn>
-    }
-    mockRequireUserSession.mockReset?.()
     prismaMock.edition.findUnique.mockReset()
     prismaMock.lostFoundItem.create.mockReset()
     global.readBody = vi.fn()
@@ -81,7 +74,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
     }
 
     global.readBody.mockResolvedValue(requestBody)
-    ;(mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } })
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.create.mockResolvedValue(mockLostFoundItem)
@@ -110,7 +102,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
     }
 
     global.readBody.mockResolvedValue(requestBody)
-    ;(mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } })
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.create.mockResolvedValue({
@@ -140,15 +131,10 @@ describe('/api/editions/[id]/lost-found POST', () => {
   })
 
   it('devrait rejeter si non authentifié (pas de session)', async () => {
-    ;(mockRequireUserSession as any).mockRejectedValueOnce(
-      Object.assign(new Error('Unauthorized'), { statusCode: 401 })
-    )
-
-    await expect(handler(mockEvent as any)).rejects.toThrow('Unauthorized')
+    await expect(handler(mockEventWithoutUser as any)).rejects.toThrow('Unauthorized')
   })
 
   it('devrait rejeter si édition non trouvée', async () => {
-    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
     prismaMock.edition.findUnique.mockResolvedValue(null)
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Édition non trouvée')
@@ -161,7 +147,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
       endDate: new Date(Date.now() + 3 * 86400000),
     }
 
-    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
     prismaMock.edition.findUnique.mockResolvedValue(futureEdition)
 
     await expect(handler(mockEvent as any)).rejects.toThrow(
@@ -170,7 +155,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
   })
 
   it("devrait rejeter si utilisateur n'est pas collaborateur", async () => {
-    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(false)
 
@@ -185,7 +169,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
     }
 
     global.readBody.mockResolvedValue(requestBody)
-    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
 
@@ -198,7 +181,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
     }
 
     global.readBody.mockResolvedValue(requestBody)
-    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
 
@@ -211,7 +193,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
     }
 
     global.readBody.mockResolvedValue(requestBody)
-    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
 
@@ -224,7 +205,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
     }
 
     global.readBody.mockResolvedValue(requestBody)
-    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.create.mockResolvedValue(mockLostFoundItem)
@@ -241,7 +221,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
 
   it('devrait gérer les erreurs de base de données', async () => {
     global.readBody.mockResolvedValue({ description: 'Test item' })
-    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.create.mockRejectedValue(new Error('DB Error'))
@@ -255,7 +234,6 @@ describe('/api/editions/[id]/lost-found POST', () => {
       message: 'Permission denied',
     }
 
-    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockRejectedValue(httpError)
 

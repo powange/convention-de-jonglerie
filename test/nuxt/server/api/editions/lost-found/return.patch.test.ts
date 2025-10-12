@@ -5,18 +5,24 @@ vi.mock('../../../../../../server/utils/permissions/permissions', () => ({
   hasEditionEditPermission: vi.fn(),
 }))
 
-vi.mock('#imports', async () => {
-  const actual = await vi.importActual<any>('#imports')
-  return { ...actual, requireUserSession: vi.fn(async () => ({ user: { id: 1 } })) }
-})
-
 import { hasEditionEditPermission } from '../../../../../../server/utils/permissions/permissions'
 import handler from '../../../../../../server/api/editions/[id]/lost-found/[itemId]/return.patch'
 import { prismaMock } from '../../../../../__mocks__/prisma'
 
 const mockHasPermission = hasEditionEditPermission as ReturnType<typeof vi.fn>
 
-const mockEvent = {}
+const mockEvent = {
+  context: {
+    params: { id: '1', itemId: '1' },
+    user: { id: 1, email: 'test@example.com', pseudo: 'testuser', isGlobalAdmin: false },
+  },
+}
+
+const mockEventWithoutUser = {
+  context: {
+    params: { id: '1', itemId: '1' },
+  },
+}
 
 const mockLostFoundItem = {
   id: 1,
@@ -42,17 +48,9 @@ const mockUpdatedItem = {
   comments: [],
 }
 
-let mockRequireUserSession: ReturnType<typeof vi.fn>
-
 describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
   beforeEach(async () => {
     mockHasPermission.mockReset()
-    // Initialiser mockRequireUserSession une seule fois (import mis en cache)
-    if (!mockRequireUserSession) {
-      const importsMod: any = await import('#imports')
-      mockRequireUserSession = importsMod.requireUserSession as ReturnType<typeof vi.fn>
-    }
-    mockRequireUserSession.mockReset?.()
     prismaMock.lostFoundItem.findFirst.mockReset()
     prismaMock.lostFoundItem.update.mockReset()
     global.getRouterParam = vi
@@ -62,7 +60,6 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
   })
 
   it('devrait marquer un objet comme rendu', async () => {
-    ;(mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } })
     prismaMock.lostFoundItem.findFirst.mockResolvedValue(mockLostFoundItem)
     mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.update.mockResolvedValue(mockUpdatedItem)
@@ -98,7 +95,6 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
     const returnedItem = { ...mockLostFoundItem, status: 'RETURNED' }
     const toggledItem = { ...mockUpdatedItem, status: 'LOST' }
 
-    ;(mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } })
     prismaMock.lostFoundItem.findFirst.mockResolvedValue(returnedItem)
     mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.update.mockResolvedValue(toggledItem)
@@ -126,15 +122,10 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
   })
 
   it('devrait rejeter si non authentifié (pas de session)', async () => {
-    ;(mockRequireUserSession as any).mockRejectedValueOnce(
-      Object.assign(new Error('Unauthorized'), { statusCode: 401 })
-    )
-
-    await expect(handler(mockEvent as any)).rejects.toThrow('Unauthorized')
+    await expect(handler(mockEventWithoutUser as any)).rejects.toThrow('Unauthorized')
   })
 
   it('devrait rejeter si objet trouvé non trouvé', async () => {
-    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
     prismaMock.lostFoundItem.findFirst.mockResolvedValue(null)
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Objet trouvé non trouvé')
@@ -145,7 +136,6 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
       .fn()
       .mockReturnValueOnce('2') // editionId différent
       .mockReturnValueOnce('1') // itemId
-    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
     prismaMock.lostFoundItem.findFirst.mockResolvedValue(null) // Pas trouvé car mauvaise édition
 
     await expect(handler(mockEvent as any)).rejects.toThrow('Objet trouvé non trouvé')
@@ -159,7 +149,6 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
   })
 
   it("devrait rejeter si utilisateur n'est pas collaborateur", async () => {
-    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
     prismaMock.lostFoundItem.findFirst.mockResolvedValue(mockLostFoundItem)
     mockHasPermission.mockResolvedValue(false)
 
@@ -169,7 +158,6 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
   })
 
   it('devrait inclure les détails utilisateur et commentaires', async () => {
-    ;(mockRequireUserSession as any).mockResolvedValueOnce({ user: { id: 1 } })
     prismaMock.lostFoundItem.findFirst.mockResolvedValue(mockLostFoundItem)
     mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.update.mockResolvedValue(mockUpdatedItem)
@@ -191,7 +179,6 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
     const originalDate = new Date('2024-01-04T10:00:00Z')
     const testItem = { ...mockLostFoundItem, updatedAt: originalDate }
 
-    ;(mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } })
     prismaMock.lostFoundItem.findFirst.mockResolvedValue(testItem)
     mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.update.mockResolvedValue(mockUpdatedItem)
@@ -211,7 +198,6 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
   })
 
   it('devrait gérer les erreurs de base de données', async () => {
-    ;(mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } })
     prismaMock.lostFoundItem.findFirst.mockResolvedValue(mockLostFoundItem)
     mockHasPermission.mockResolvedValue(true)
     prismaMock.lostFoundItem.update.mockRejectedValue(new Error('DB Error'))
@@ -225,7 +211,6 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
       statusMessage: 'Access denied',
     }
 
-    ;(mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } })
     prismaMock.lostFoundItem.findFirst.mockResolvedValue(mockLostFoundItem)
     mockHasPermission.mockRejectedValue(httpError)
 
@@ -234,7 +219,6 @@ describe('/api/editions/[id]/lost-found/[itemId]/return PATCH', () => {
 
   it('devrait traiter correctement les IDs numériques', async () => {
     global.getRouterParam = vi.fn().mockReturnValueOnce('123').mockReturnValueOnce('456')
-    ;(mockRequireUserSession as any).mockResolvedValue({ user: { id: 1 } })
     prismaMock.lostFoundItem.findFirst.mockResolvedValue({
       ...mockLostFoundItem,
       id: 456,

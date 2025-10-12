@@ -1,15 +1,8 @@
-import { requireUserSession } from '#imports'
-
+import { requireAuth } from '../../../utils/auth-utils'
 import { prisma } from '../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  const { user } = await requireUserSession(event)
-  if (!user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   const { endpoint } = await readBody(event)
 

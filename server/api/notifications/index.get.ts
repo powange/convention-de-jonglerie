@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
-import { requireUserSession } from '#imports'
-
+import { requireAuth } from '../../utils/auth-utils'
 import { getEmailHash } from '../../utils/email-hash'
 import { NotificationService } from '../../utils/notification-service'
 
@@ -23,14 +22,7 @@ const querySchema = z.object({
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
-  const { user } = await requireUserSession(event)
-
-  if (!user?.id) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   const query = getQuery(event)
   const parsed = querySchema.parse(query)

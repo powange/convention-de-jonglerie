@@ -1,17 +1,9 @@
-import { requireUserSession } from '#imports'
-
+import { requireAuth } from '../../../utils/auth-utils'
 import { NotificationService } from '../../../utils/notification-service'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
-  const { user } = await requireUserSession(event)
-
-  if (!user?.id) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   const notificationId = getRouterParam(event, 'id')
 
@@ -30,7 +22,7 @@ export default defineEventHandler(async (event) => {
       message: 'Notification marquée comme lue',
       notification,
     }
-  } catch (error) {
+  } catch (error: any) {
     // Vérifier si c'est une erreur de permission (notification non trouvée)
     if (error.code === 'P2025') {
       throw createError({

@@ -1,17 +1,9 @@
-import { requireUserSession } from '#imports'
-
+import { requireAuth } from '../../utils/auth-utils'
 import { NotificationService } from '../../utils/notification-service'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
-  const { user } = await requireUserSession(event)
-
-  if (!user?.id) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   try {
     const stats = await NotificationService.getStats(user.id)

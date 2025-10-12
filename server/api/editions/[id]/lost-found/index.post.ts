@@ -1,11 +1,11 @@
 import { createHash } from 'node:crypto'
 
+import { requireAuth } from '../../../../utils/auth-utils'
 import { hasEditionEditPermission } from '../../../../utils/permissions/permissions'
 import { prisma } from '../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   try {
-    const { requireUserSession } = await import('#imports')
     const editionId = parseInt(getRouterParam(event, 'id') as string)
     const body = await readBody(event)
 
@@ -16,9 +16,8 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Vérifier l'authentification via la session scellée
-    const { user } = await requireUserSession(event)
-    const userId = (user as any).id
+    const user = requireAuth(event)
+    const userId = user.id
 
     // Récupérer l'édition et ses dates
     const edition = await prisma.edition.findUnique({

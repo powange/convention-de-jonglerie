@@ -1,11 +1,11 @@
 import { createHash } from 'node:crypto'
 
+import { requireAuth } from '../../../../../utils/auth-utils'
 import { hasEditionEditPermission } from '../../../../../utils/permissions/permissions'
 import { prisma } from '../../../../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   try {
-    const { requireUserSession } = await import('#imports')
     const editionId = parseInt(getRouterParam(event, 'id') as string)
     const itemId = parseInt(getRouterParam(event, 'itemId') as string)
 
@@ -16,16 +16,8 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Vérifier l'authentification
-    const { user } = await requireUserSession(event)
+    const user = requireAuth(event)
     const userId = user.id
-
-    if (!userId) {
-      throw createError({
-        statusCode: 401,
-        message: 'Token invalide',
-      })
-    }
 
     // Vérifier que l'objet trouvé existe et appartient à l'édition
     const lostFoundItem = await prisma.lostFoundItem.findFirst({

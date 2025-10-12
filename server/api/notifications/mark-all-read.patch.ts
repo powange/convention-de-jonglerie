@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
-import { requireUserSession } from '#imports'
-
+import { requireAuth } from '../../utils/auth-utils'
 import { NotificationService } from '../../utils/notification-service'
 
 const bodySchema = z.object({
@@ -10,14 +9,7 @@ const bodySchema = z.object({
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
-  const { user } = await requireUserSession(event)
-
-  if (!user?.id) {
-    throw createError({
-      statusCode: 401,
-      message: 'Non authentifié',
-    })
-  }
+  const user = requireAuth(event)
 
   const body = await readBody(event).catch(() => ({}))
   const parsed = bodySchema.parse(body)
