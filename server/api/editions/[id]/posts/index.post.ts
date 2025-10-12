@@ -7,7 +7,7 @@ import {
   editionPostSchema,
   validateAndSanitize,
   handleValidationError,
-} from '../../../../../server/utils/validation-schemas'
+} from '@@/server/utils/validation-schemas'
 
 const prisma = new PrismaClient()
 
