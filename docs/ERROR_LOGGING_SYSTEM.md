@@ -157,18 +157,6 @@ Marque un log comme résolu/non résolu.
 
 ## Tests et Développement
 
-### API de Test
-
-Une API de test est disponible pour les administrateurs :
-
-```bash
-POST /api/admin/test-error-logging
-{
-  "type": "validation|database|authentication|authorization|not-found|server-error|custom",
-  "message": "Message personnalisé (pour type 'custom')"
-}
-```
-
 ### Logging Manuel
 
 Pour logger une erreur manuellement dans votre code :
