@@ -46,11 +46,14 @@ export const useAuthStore = defineStore('auth', {
       return response
     },
     async logout() {
+      // IMPORTANT: D'abord effacer la session serveur, PUIS nettoyer le store
       try {
         await $fetch('/api/auth/logout', { method: 'POST' })
       } catch {
         // ignore network/log out errors
       }
+
+      // Ensuite nettoyer le state local
       this.user = null
       this.rememberMe = false
       this.adminMode = false

@@ -70,45 +70,47 @@
               <NotificationsCenter v-if="authStore.isAuthenticated" />
 
               <!-- Dropdown utilisateur ou boutons connexion -->
-              <UDropdownMenu
-                v-if="authStore.isAuthenticated && authStore.user"
-                :items="userMenuItems"
-                :content="{
-                  align: 'end',
-                  side: 'bottom',
-                  sideOffset: 8,
-                }"
-              >
-                <UButton variant="ghost" color="neutral" class="rounded-full">
-                  <div class="flex items-center gap-2">
-                    <UiUserAvatar :user="authStore.user" size="md" border />
-                    <div class="hidden sm:flex flex-col items-start">
-                      <span class="text-sm font-medium">{{ displayName }}</span>
-                      <UBadge
-                        v-if="authStore.isAdminModeActive"
-                        color="warning"
-                        variant="soft"
-                        size="xs"
-                        class="px-1"
-                      >
-                        👑 Admin
-                      </UBadge>
+              <div :key="`auth-section-${authKey}`">
+                <UDropdownMenu
+                  v-if="authStore.isAuthenticated && authStore.user"
+                  :items="userMenuItems"
+                  :content="{
+                    align: 'end',
+                    side: 'bottom',
+                    sideOffset: 8,
+                  }"
+                >
+                  <UButton variant="ghost" color="neutral" class="rounded-full">
+                    <div class="flex items-center gap-2">
+                      <UiUserAvatar :user="authStore.user" size="md" border />
+                      <div class="hidden sm:flex flex-col items-start">
+                        <span class="text-sm font-medium">{{ displayName }}</span>
+                        <UBadge
+                          v-if="authStore.isAdminModeActive"
+                          color="warning"
+                          variant="soft"
+                          size="xs"
+                          class="px-1"
+                        >
+                          👑 Admin
+                        </UBadge>
+                      </div>
+                      <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 text-gray-400" />
                     </div>
-                    <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 text-gray-400" />
-                  </div>
-                </UButton>
-              </UDropdownMenu>
+                  </UButton>
+                </UDropdownMenu>
 
-              <!-- Bouton connexion unique pour utilisateurs non connectés -->
-              <UButton
-                v-else
-                :label="$t('navigation.login')"
-                icon="i-heroicons-key"
-                size="sm"
-                color="neutral"
-                variant="ghost"
-                @click="navigateToLogin"
-              />
+                <!-- Bouton connexion unique pour utilisateurs non connectés -->
+                <UButton
+                  v-else
+                  :label="$t('navigation.login')"
+                  icon="i-heroicons-key"
+                  size="sm"
+                  color="neutral"
+                  variant="ghost"
+                  :to="loginUrl"
+                />
+              </div>
             </div>
           </div>
 
@@ -260,14 +262,6 @@ const toggleAdminMode = (checked: boolean) => {
   }
 }
 
-// Fonction pour naviguer vers la page de login
-const navigateToLogin = async () => {
-  // Récupérer le returnTo depuis la route courante
-  const returnTo = useRoute().fullPath
-  const loginUrl = `/login?returnTo=${encodeURIComponent(returnTo)}`
-  await navigateTo(loginUrl)
-}
-
 // Fonction pour changer de langue
 const changeLanguage = async (newLocale: string) => {
   await setLocale(newLocale as any)
@@ -340,6 +334,20 @@ if (shouldDisallowIndexing.value) {
 
 // Calculer le nom d'affichage
 const displayName = computed(() => authStore.user?.pseudo || authStore.user?.prenom || '')
+
+// Route actuelle pour la redirection après login
+const route = useRoute()
+const loginUrl = computed(() => `/login?returnTo=${encodeURIComponent(route.fullPath)}`)
+
+// Forcer un re-render complet après logout
+const authKey = ref(0)
+watch(
+  () => authStore.isAuthenticated,
+  () => {
+    // Incrémenter la clé pour forcer Vue à recréer complètement la section
+    authKey.value++
+  }
+)
 </script>
 
 <style>

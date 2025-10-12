@@ -31,6 +31,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // 3. Décision finale
   if (!authStore.user) {
     const { buildLoginUrl } = useReturnTo()
-    return navigateTo(buildLoginUrl(to))
+    return navigateTo(buildLoginUrl(to.fullPath))
   }
 })
