@@ -8,6 +8,7 @@
 
 - **NE JAMAIS lancer `npm run dev`** - Le serveur de développement est déjà en cours d'exécution
 - **Pour lire les logs de l'application, utiliser `npm run docker:dev:logs`**
+- **NE JAMAIS exécuter les migrations Prisma** - L'utilisateur s'occupe toujours de créer et d'appliquer les migrations. Fournir uniquement la commande de migration sans l'exécuter.
 - L'url de l'application en développement est : http://localhost:3000
 - Avant de modifier un fichier, lis 3 autres fichiers pour comprendre le style de code et les conventions utilisées
 - **A chaque fois que tu utilises un composant Nuxt UI, tu DOIS OBLIGATOIREMENT consulter sa documentation via le MCP Nuxt UI** (`mcp__nuxt-ui__get_component`) pour vérifier la syntaxe exacte des props, slots et événements avant de l'utiliser. Ne jamais deviner ou supposer l'API d'un composant.

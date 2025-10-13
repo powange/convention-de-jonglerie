@@ -37,6 +37,7 @@ export default defineEventHandler(async (event) => {
     conventionId,
     name,
     description,
+    program,
     imageUrl,
     startDate,
     endDate,
@@ -94,6 +95,7 @@ export default defineEventHandler(async (event) => {
         conventionId: validConventionId,
         name: name?.trim() || null,
         description,
+        program,
         imageUrl: null, // On met null d'abord
         startDate: normalizeDateToISO(startDate) || startDate,
         endDate: normalizeDateToISO(endDate) || endDate,

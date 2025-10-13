@@ -71,6 +71,21 @@
             </div>
           </UCard>
 
+          <!-- Programme de l'édition -->
+          <UCard v-if="edition.program && programHtml" variant="subtle">
+            <div class="space-y-4">
+              <h3 class="text-lg font-semibold">{{ $t('editions.program') }}</h3>
+              <div
+                class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
+                aria-labelledby="program-heading"
+              >
+                <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <div v-html="programHtml" />
+              </div>
+            </div>
+          </UCard>
+
           <UCard variant="subtle">
             <!-- Services -->
             <section class="space-y-4" aria-labelledby="services-heading">
@@ -444,6 +459,14 @@ const descriptionHtml = computedAsync(async () => {
     return ''
   }
   return await markdownToHtml(edition.value.description)
+}, '')
+
+// Programme en HTML (rendu Markdown)
+const programHtml = computedAsync(async () => {
+  if (!edition.value?.program) {
+    return ''
+  }
+  return await markdownToHtml(edition.value.program)
 }, '')
 
 const isAttending = computed(() => (_editionId: number) => {

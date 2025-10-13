@@ -28,6 +28,7 @@ export interface Edition {
   id: number
   name?: string | null
   description?: string
+  program?: string | null
   imageUrl?: string | null
   startDate: string
   endDate: string
@@ -167,6 +168,7 @@ export interface EditionFormData {
   conventionId?: number
   name?: string | null
   description?: string
+  program?: string | null
   imageUrl?: string
   startDate: string
   endDate: string

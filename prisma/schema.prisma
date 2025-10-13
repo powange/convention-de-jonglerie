@@ -62,6 +62,7 @@ model Edition {
   id                           Int                             @id @default(autoincrement())
   name                         String?
   description                  String?                         @db.Text
+  program                      String?                         @db.Text
   createdAt                    DateTime                        @default(now())
   updatedAt                    DateTime                        @updatedAt
   creatorId                    Int?                            // Nullable pour éditions importées
