@@ -38,7 +38,7 @@
         <!-- Sélection d'équipes (si applicable) -->
         <div v-if="formData.targetType === 'teams' && teamsOptions.length > 0">
           <UFormField :label="t('editions.volunteers.select_teams')" class="w-full">
-            <div class="space-y-2 max-h-32 overflow-y-auto">
+            <div class="space-y-2 overflow-y-auto">
               <div
                 v-for="(team, index) in teamsOptions"
                 :key="`team-${index}-${team.value}`"
@@ -48,7 +48,6 @@
                   :id="`team-checkbox-${index}`"
                   :model-value="formData.selectedTeams.includes(team.value)"
                   :label="team.label"
-                  class="text-sm"
                   @update:model-value="(checked) => handleTeamChange(team.value, checked)"
                 />
               </div>
@@ -88,7 +87,7 @@
           <!-- Liste des destinataires -->
           <div
             v-if="selectedRecipients.length > 0"
-            class="text-sm text-blue-600 dark:text-blue-300"
+            class="text-blue-600 dark:text-blue-300"
           >
             <div class="max-h-32 overflow-y-auto space-y-1">
               <div
