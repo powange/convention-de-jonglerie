@@ -1,8 +1,8 @@
 <template>
   <UCard variant="subtle">
     <template #header>
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
+      <div class="flex items-start justify-between">
+        <div class="flex items-start gap-3">
           <div v-if="displayImageUrl" class="flex-shrink-0">
             <img
               :src="displayImageUrl"
@@ -43,7 +43,8 @@
       </p>
       <p class="text-sm font-semibold flex items-center gap-1">
         <UIcon name="i-heroicons-map-pin" class="text-gray-400" size="16" />
-        {{ edition.city }}, <FlagIcon :country="edition.country" size="sm" class="mx-1" />
+        {{ edition.city }},
+        <FlagIcon :code="getCountryCode(edition.country)" size="sm" class="mx-1" />
         {{ edition.country }}
       </p>
     </div>
@@ -81,6 +82,7 @@
 <script setup lang="ts">
 import { useTranslatedConventionServices } from '~/composables/useConventionServices'
 import type { Edition } from '~/types'
+import { getCountryCode } from '~/utils/countries'
 import { getEditionDisplayName } from '~/utils/editionName'
 
 interface Props {
@@ -131,6 +133,6 @@ const displayImageAlt = computed(() => {
 // Fonction pour obtenir les services actifs traduits
 const getActiveServices = (edition: Edition) => {
   const services = getTranslatedServices.value
-  return services.filter((service) => edition[service.key])
+  return services.filter((service) => (edition as any)[service.key])
 }
 </script>
