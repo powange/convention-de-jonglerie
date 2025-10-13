@@ -1,4 +1,5 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { NotificationService } from '@@/server/utils/notification-service'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
@@ -41,6 +42,84 @@ export default defineEventHandler(async (event) => {
           entryValidatedBy: user.id,
         },
       })
+
+      // Envoyer des notifications aux responsables d'équipes
+      // Pour chaque bénévole validé
+      for (const applicationId of body.participantIds) {
+        try {
+          // Récupérer les informations du bénévole et ses équipes
+          const application = await prisma.editionVolunteerApplication.findUnique({
+            where: { id: applicationId },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  pseudo: true,
+                  prenom: true,
+                  nom: true,
+                },
+              },
+              teamAssignments: {
+                include: {
+                  team: {
+                    select: {
+                      id: true,
+                      name: true,
+                      // Récupérer les leaders de l'équipe via ApplicationTeamAssignment
+                    },
+                  },
+                },
+              },
+            },
+          })
+
+          if (!application) continue
+
+          // Pour chaque équipe du bénévole
+          for (const teamAssignment of application.teamAssignments) {
+            // Trouver les leaders de cette équipe
+            const teamLeaders = await prisma.applicationTeamAssignment.findMany({
+              where: {
+                teamId: teamAssignment.teamId,
+                isLeader: true,
+              },
+              include: {
+                application: {
+                  select: {
+                    userId: true,
+                  },
+                },
+              },
+            })
+
+            // Envoyer une notification à chaque leader
+            for (const leader of teamLeaders) {
+              const volunteerName =
+                `${application.user.prenom || ''} ${application.user.nom || ''}`.trim() ||
+                application.user.pseudo
+
+              await NotificationService.create({
+                userId: leader.application.userId,
+                type: 'INFO',
+                title: "Arrivée d'un bénévole 🎉",
+                message: `${volunteerName} (@${application.user.pseudo}) vient de scanner son billet et est arrivé sur la convention - Équipe ${teamAssignment.team.name}`,
+                category: 'volunteer',
+                entityType: 'EditionVolunteerApplication',
+                entityId: application.id.toString(),
+                actionUrl: `/editions/${editionId}/gestion/volunteers/planning`,
+                actionText: 'Voir le planning',
+                notificationType: 'volunteer_arrival',
+              })
+            }
+          }
+        } catch (notifError) {
+          // Ne pas bloquer la validation si l'envoi de notification échoue
+          console.error(
+            `Erreur lors de l'envoi de notification pour le bénévole ${applicationId}:`,
+            notifError
+          )
+        }
+      }
 
       return {
         success: true,

@@ -93,6 +93,7 @@ export const NotificationTypeMapping = {
   volunteer_application_accepted: 'applicationUpdates' as const,
   volunteer_application_rejected: 'applicationUpdates' as const,
   volunteer_application_modified: 'applicationUpdates' as const,
+  volunteer_arrival: 'applicationUpdates' as const,
 
   // Nouvelles conventions
   new_convention: 'conventionNews' as const,
