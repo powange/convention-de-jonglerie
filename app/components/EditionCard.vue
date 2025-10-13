@@ -7,7 +7,7 @@
             <img
               :src="displayImageUrl"
               :alt="displayImageAlt"
-              class="w-16 h-16 object-cover rounded-lg"
+              class="w-16 h-auto object-contain rounded-lg"
             />
           </div>
           <div
@@ -43,7 +43,8 @@
       </p>
       <p class="text-sm font-semibold flex items-center gap-1">
         <UIcon name="i-heroicons-map-pin" class="text-gray-400" size="16" />
-        {{ edition.city }}, {{ edition.country }}
+        {{ edition.city }}, <FlagIcon :country="edition.country" size="sm" class="mx-1" />
+        {{ edition.country }}
       </p>
     </div>
 

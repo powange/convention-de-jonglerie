@@ -597,6 +597,7 @@
     "postal_code": "Postcode",
     "previous": "Vorige",
     "private": "Privé",
+    "program": "[TODO] Programme",
     "quantity": "Hoeveelheid",
     "refresh": "Vernieuwen",
     "remove": "Verwijderen",
@@ -720,6 +721,7 @@
       "poster_alt": "Editieposter",
       "poster_placeholder": "Klik om editieposter te selecteren",
       "previous": "Vorige",
+      "program_placeholder": "[TODO] Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
       "social_networks_description": "Deel uw pagina's om de zichtbaarheid te vergroten",
       "social_networks_title": "Sociale netwerken",
       "step_about_description": "Editiebeschrijving",
@@ -898,6 +900,7 @@
     "poster_of": "Poster van {name}",
     "posts": "Berichten",
     "practical_info": "Praktische informatie",
+    "program": "[TODO] Programme",
     "publish_edition": "Editie publiceren",
     "returned": "✅ Teruggegeven",
     "services_offered": "Aangeboden diensten",
@@ -2078,6 +2081,7 @@
     "name_max_100": "Naam mag niet meer dan 100 tekens bevatten",
     "name_max_200": "Naam mag niet meer dan 200 tekens bevatten",
     "name_min_3": "Naam moet minstens 3 tekens bevatten",
-    "phone_required": "Telefoonnummer is vereist"
+    "phone_required": "Telefoonnummer is vereist",
+    "program_max_10000": "[TODO] Le programme ne peut pas dépasser 10000 caractères"
   }
 }

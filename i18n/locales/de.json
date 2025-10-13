@@ -597,6 +597,7 @@
     "postal_code": "Postleitzahl",
     "previous": "Zurück",
     "private": "Privat",
+    "program": "[TODO] Programme",
     "quantity": "Menge",
     "refresh": "Aktualisieren",
     "remove": "Entfernen",
@@ -720,6 +721,7 @@
       "poster_alt": "Ausgabe-Poster",
       "poster_placeholder": "Klicken Sie, um das Ausgabe-Poster auszuwählen",
       "previous": "Zurück",
+      "program_placeholder": "[TODO] Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
       "social_networks_description": "Teilen Sie Ihre Seiten, um die Sichtbarkeit zu erhöhen",
       "social_networks_title": "Soziale Netzwerke",
       "step_about_description": "Ausgabebeschreibung",
@@ -898,6 +900,7 @@
     "poster_of": "Poster von {name}",
     "posts": "Publikationen",
     "practical_info": "Praktische Informationen",
+    "program": "[TODO] Programme",
     "publish_edition": "Edition veröffentlichen",
     "returned": "✅ Zurückgegeben",
     "services_offered": "Angebotene Services",
@@ -2078,6 +2081,7 @@
     "name_max_100": "Name darf nicht länger als 100 Zeichen sein",
     "name_max_200": "Name darf nicht länger als 200 Zeichen sein",
     "name_min_3": "Name muss mindestens 3 Zeichen enthalten",
-    "phone_required": "Telefonnummer ist erforderlich"
+    "phone_required": "Telefonnummer ist erforderlich",
+    "program_max_10000": "[TODO] Le programme ne peut pas dépasser 10000 caractères"
   }
 }

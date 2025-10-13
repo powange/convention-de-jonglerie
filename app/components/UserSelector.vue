@@ -13,13 +13,14 @@
       class="flex-1"
       @update:search-term="(v) => emit('update:searchTerm', v)"
     >
-      <template #leading>
+      <template #leading="{ modelValue: selectedValue }">
         <UiUserAvatar
-          v-if="internalValue"
+          v-if="selectedValue"
           :user="{
-            pseudo: internalValue.label.split(' — ')[0],
-            profilePicture: internalValue.avatar?.src,
-            emailHash: '',
+            id: selectedValue.id,
+            pseudo: selectedValue.pseudo,
+            profilePicture: selectedValue.profilePicture,
+            emailHash: selectedValue.emailHash,
           }"
           size="xs"
         />
@@ -29,9 +30,10 @@
       <template #item-leading="{ item }">
         <UiUserAvatar
           :user="{
-            pseudo: item.label.split(' — ')[0],
-            profilePicture: item.avatar?.src,
-            emailHash: '',
+            id: item.id,
+            pseudo: item.pseudo,
+            profilePicture: item.profilePicture,
+            emailHash: item.emailHash,
           }"
           size="xs"
         />
@@ -74,14 +76,15 @@
       >
         <UiUserAvatar
           :user="{
-            pseudo: user.label.split(' — ')[0],
-            profilePicture: user.avatar?.src,
-            emailHash: '',
+            id: user.id,
+            pseudo: user.pseudo,
+            profilePicture: user.profilePicture,
+            emailHash: user.emailHash,
           }"
           size="xs"
           class="mr-1"
         />
-        {{ user.label.split(' ')[0] }}
+        {{ user.pseudo }}
       </UButton>
     </div>
   </div>
@@ -93,8 +96,10 @@ import { ref, toRefs, watch, computed } from 'vue'
 export interface UserSelectItem {
   id: number
   label: string
+  pseudo: string
   email: string
-  avatar?: { src: string; alt: string }
+  emailHash: string
+  profilePicture?: string | null
   isRealUser?: boolean
 }
 
@@ -112,8 +117,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   placeholder: 'Rechercher un utilisateur...',
   showClearButton: true,
-  testUsers: undefined,
-  testUsersLabel: undefined,
 })
 
 const emit = defineEmits<{
@@ -140,24 +143,11 @@ const internalValue = ref<UserSelectItem | undefined>(props.modelValue ?? undefi
 const itemsForSelect = computed(() => {
   const src = searchedUsers.value || []
   return src.map((u) => {
-    // normalize possible fields returned by different endpoints
-    const pseudo = (u as any).pseudo ?? (u as any).label ?? ''
-    const email = (u as any).email ?? (u as any).emailAddress ?? ''
-    const profilePicture = (u as any).profilePicture ?? (u as any).avatar?.src ?? undefined
-    const avatar = profilePicture ? { src: profilePicture, alt: pseudo || '' } : undefined
-
-    // Build a friendly label without introducing 'undefined' strings
-    const baseLabel = pseudo || String((u as any).id || '')
-    const fullLabel = email ? `${baseLabel} — ${email}` : baseLabel
-
     return {
-      // preserve original properties (id, etc.) and expose expected fields
-      id: (u as any).id,
-      label: fullLabel,
-      email,
-      avatar,
       // keep other original data accessible if needed
       ...u,
+      // preserve original properties (id, etc.) and expose expected fields
+      label: u.pseudo + ' - ' + u.email,
     } as UserSelectItem & Record<string, any>
   })
 })
@@ -189,4 +179,3 @@ watch(internalValue, (val) => {
   emit('update:modelValue', val ?? null)
 })
 </script>
-<!-- thomas.devoue@example.com -->

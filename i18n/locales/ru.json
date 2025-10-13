@@ -597,6 +597,7 @@
     "postal_code": "Почтовый индекс",
     "previous": "Назад",
     "private": "Частный",
+    "program": "[TODO] Programme",
     "quantity": "Количество",
     "refresh": "Обновить",
     "remove": "Удалить",
@@ -720,6 +721,7 @@
       "poster_alt": "Постер издания",
       "poster_placeholder": "Нажмите, чтобы выбрать постер издания",
       "previous": "Предыдущий",
+      "program_placeholder": "[TODO] Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
       "social_networks_description": "Поделитесь своими страницами для повышения видимости",
       "social_networks_title": "Социальные сети",
       "step_about_description": "Описание издания",
@@ -898,6 +900,7 @@
     "poster_of": "Постер {name}",
     "posts": "Посты",
     "practical_info": "Практическая информация",
+    "program": "[TODO] Programme",
     "publish_edition": "Опубликовать издание",
     "returned": "✅ Возвращено",
     "services_offered": "Предлагаемые услуги",
@@ -2078,6 +2081,7 @@
     "name_max_100": "Имя не может превышать 100 символов",
     "name_max_200": "Имя не может превышать 200 символов",
     "name_min_3": "Имя должно содержать не менее 3 символов",
-    "phone_required": "Номер телефона обязателен"
+    "phone_required": "Номер телефона обязателен",
+    "program_max_10000": "[TODO] Le programme ne peut pas dépasser 10000 caractères"
   }
 }

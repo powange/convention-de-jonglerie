@@ -597,6 +597,7 @@
     "postal_code": "Поштовий індекс",
     "previous": "Назад",
     "private": "Приватний",
+    "program": "[TODO] Programme",
     "quantity": "Кількість",
     "refresh": "Оновити",
     "remove": "Видалити",
@@ -720,6 +721,7 @@
       "poster_alt": "Постер видання",
       "poster_placeholder": "Натисніть, щоб вибрати постер видання",
       "previous": "Попередній",
+      "program_placeholder": "[TODO] Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
       "social_networks_description": "Поділіться своїми сторінками для підвищення видимості",
       "social_networks_title": "Соціальні мережі",
       "step_about_description": "Опис видання",
@@ -898,6 +900,7 @@
     "poster_of": "Постер {name}",
     "posts": "Пости",
     "practical_info": "Практична інформація",
+    "program": "[TODO] Programme",
     "publish_edition": "Опублікувати видання",
     "returned": "✅ Повернуто",
     "services_offered": "Пропоновані послуги",
@@ -2078,6 +2081,7 @@
     "name_max_100": "Ім'я не може перевищувати 100 символів",
     "name_max_200": "Ім'я не може перевищувати 200 символів",
     "name_min_3": "Ім'я повинно містити не менше 3 символів",
-    "phone_required": "Номер телефону обов'язковий"
+    "phone_required": "Номер телефону обов'язковий",
+    "program_max_10000": "[TODO] Le programme ne peut pas dépasser 10000 caractères"
   }
 }

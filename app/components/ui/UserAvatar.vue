@@ -9,6 +9,7 @@ import { useImageLoader } from '~/composables/useImageLoader'
 import { useAvatar } from '~/utils/avatar'
 
 interface User {
+  id?: number
   email?: string
   emailHash?: string
   profilePicture?: string | null

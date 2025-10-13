@@ -597,6 +597,7 @@
     "postal_code": "Kod pocztowy",
     "previous": "Wstecz",
     "private": "Prywatne",
+    "program": "[TODO] Programme",
     "quantity": "Ilość",
     "refresh": "Odśwież",
     "remove": "Usuń",
@@ -720,6 +721,7 @@
       "poster_alt": "Plakat edycji",
       "poster_placeholder": "Kliknij, aby wybrać plakat edycji",
       "previous": "Poprzedni",
+      "program_placeholder": "[TODO] Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
       "social_networks_description": "Udostępnij swoje strony, aby zwiększyć widoczność",
       "social_networks_title": "Sieci społecznościowe",
       "step_about_description": "Opis edycji",
@@ -898,6 +900,7 @@
     "poster_of": "Plakat {name}",
     "posts": "Posty",
     "practical_info": "Informacje praktyczne",
+    "program": "[TODO] Programme",
     "publish_edition": "Opublikuj edycję",
     "returned": "✅ Zwrócone",
     "services_offered": "Oferowane usługi",
@@ -2078,6 +2081,7 @@
     "name_max_100": "Nazwa nie może przekroczyć 100 znaków",
     "name_max_200": "Nazwa nie może przekroczyć 200 znaków",
     "name_min_3": "Nazwa musi zawierać co najmniej 3 znaki",
-    "phone_required": "Numer telefonu jest wymagany"
+    "phone_required": "Numer telefonu jest wymagany",
+    "program_max_10000": "[TODO] Le programme ne peut pas dépasser 10000 caractères"
   }
 }

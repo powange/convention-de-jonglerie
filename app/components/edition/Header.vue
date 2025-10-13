@@ -10,7 +10,7 @@
                 getImageUrl(edition.convention.logo, 'convention', edition.convention?.id) || ''
               "
               :alt="edition.convention.name"
-              class="w-16 h-16 object-cover rounded-lg shadow-md"
+              class="w-16 h-auto object-contain rounded-lg shadow-md"
             />
           </div>
           <div

@@ -597,6 +597,7 @@
     "postal_code": "Postnummer",
     "previous": "Forrige",
     "private": "Privat",
+    "program": "[TODO] Programme",
     "quantity": "Antal",
     "refresh": "Opdater",
     "remove": "Fjern",
@@ -720,6 +721,7 @@
       "poster_alt": "Udgaveplakat",
       "poster_placeholder": "Klik for at vælge udgaveplakat",
       "previous": "Forrige",
+      "program_placeholder": "[TODO] Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
       "social_networks_description": "Del dine sider for at øge synligheden",
       "social_networks_title": "Sociale netværk",
       "step_about_description": "Udgavebeskrivelse",
@@ -898,6 +900,7 @@
     "poster_of": "Plakat for {name}",
     "posts": "Opslag",
     "practical_info": "Praktiske oplysninger",
+    "program": "[TODO] Programme",
     "publish_edition": "Publicer udgave",
     "returned": "✅ Returneret",
     "services_offered": "Tilbudte tjenester",
@@ -2078,6 +2081,7 @@
     "name_max_100": "Navnet må ikke overskride 100 tegn",
     "name_max_200": "Navnet må ikke overskride 200 tegn",
     "name_min_3": "Navnet skal indeholde mindst 3 tegn",
-    "phone_required": "Telefonnummer er påkrævet"
+    "phone_required": "Telefonnummer er påkrævet",
+    "program_max_10000": "[TODO] Le programme ne peut pas dépasser 10000 caractères"
   }
 }
