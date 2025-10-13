@@ -41,6 +41,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 import TeamManagement from '~/components/edition/volunteer/planning/TeamManagement.vue'
+import { useAccessControlPermissions } from '~/composables/useAccessControlPermissions'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
@@ -51,12 +52,19 @@ const authStore = useAuthStore()
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
+// Vérifier le statut de contrôle d'accès pour les bénévoles
+const { canAccessAccessControl } = useAccessControlPermissions(editionId)
+
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return (
+  // Accès pour gestionnaires classiques
+  const hasManagementAccess =
     canEdit.value || canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
-  )
+  // OU accès pour bénévoles en créneau actif de contrôle d'accès
+  const hasAccessControlAccess = canAccessAccessControl.value
+
+  return hasManagementAccess || hasAccessControlAccess
 })
 
 // Permissions calculées

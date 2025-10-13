@@ -685,6 +685,7 @@ model VolunteerTeam {
   color        String              @default("#6b7280") @db.VarChar(7)
   maxVolunteers Int?
   isRequired   Boolean             @default(false)
+  isAccessControlTeam Boolean       @default(false)
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
 

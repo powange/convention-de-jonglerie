@@ -12,6 +12,7 @@ const createTeamSchema = z.object({
     .default('#6b7280'),
   maxVolunteers: z.number().int().positive().optional(),
   isRequired: z.boolean().optional().default(false),
+  isAccessControlTeam: z.boolean().optional().default(false),
 })
 
 export default defineEventHandler(async (event) => {
@@ -71,6 +72,7 @@ export default defineEventHandler(async (event) => {
         color: body.color,
         maxVolunteers: body.maxVolunteers,
         isRequired: body.isRequired,
+        isAccessControlTeam: body.isAccessControlTeam,
       },
       include: {
         _count: {

@@ -1356,6 +1356,8 @@
       "max_volunteers_optional": "Nombre maximum de bénévoles (optionnel)",
       "required_team": "Rendre obligatoire",
       "required_team_hint": "Les bénévoles devront obligatoirement sélectionner cette équipe",
+      "access_control_team": "Équipe de contrôle d'accès",
+      "access_control_team_hint": "Cette équipe s'occupe du contrôle d'accès et de la validation des entrées",
       "edit_team": "Modifier l'équipe",
       "team_updated": "Équipe mise à jour",
       "team_created": "Équipe créée",

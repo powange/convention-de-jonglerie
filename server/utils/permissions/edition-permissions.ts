@@ -321,3 +321,23 @@ export function validateEditionId(id: string | undefined): number {
 
   return editionId
 }
+
+/**
+ * Vérifie si un utilisateur peut accéder aux données d'une édition
+ * en tant que gestionnaire OU en tant que bénévole en créneau de contrôle d'accès actif
+ */
+export async function canAccessEditionDataOrAccessControl(
+  editionId: number,
+  userId: number,
+  event?: any
+): Promise<boolean> {
+  // Vérifier d'abord les permissions de gestion classiques
+  const hasManagementAccess = await canAccessEditionData(editionId, userId, event)
+  if (hasManagementAccess) return true
+
+  // Si pas d'accès en gestion, vérifier si l'utilisateur est en créneau actif de contrôle d'accès
+  const { isActiveAccessControlVolunteer } = await import('./access-control-permissions')
+  const hasAccessControlAccess = await isActiveAccessControlVolunteer(userId, editionId)
+
+  return hasAccessControlAccess
+}

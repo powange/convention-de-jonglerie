@@ -241,6 +241,20 @@
                 </template>
               </USwitch>
             </UFormField>
+
+            <!-- Équipe de contrôle d'accès -->
+            <UFormField
+              name="isAccessControlTeam"
+              :label="t('editions.volunteers.access_control_team')"
+            >
+              <USwitch v-model="teamFormState.isAccessControlTeam">
+                <template #label>
+                  <span class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ t('editions.volunteers.access_control_team_hint') }}
+                  </span>
+                </template>
+              </USwitch>
+            </UFormField>
           </UForm>
         </div>
       </template>
@@ -321,6 +335,7 @@ const teamSchema = z.object({
   color: z.string().regex(/^#[0-9A-F]{6}$/i, t('errors.invalid_color')),
   maxVolunteers: z.number().int().positive().optional(),
   isRequired: z.boolean().optional(),
+  isAccessControlTeam: z.boolean().optional(),
 })
 
 // État du formulaire
@@ -330,6 +345,7 @@ const teamFormState = ref({
   color: '#3b82f6',
   maxVolunteers: undefined as number | undefined,
   isRequired: false,
+  isAccessControlTeam: false,
 })
 
 // Couleurs prédéfinies pour la palette
@@ -378,6 +394,7 @@ const openCreateTeamModal = () => {
     color: randomColor,
     maxVolunteers: undefined,
     isRequired: false,
+    isAccessControlTeam: false,
   }
   teamModalOpen.value = true
 }
@@ -390,6 +407,7 @@ const openEditTeamModal = (team: VolunteerTeam) => {
     color: team.color,
     maxVolunteers: team.maxVolunteers,
     isRequired: team.isRequired || false,
+    isAccessControlTeam: team.isAccessControlTeam || false,
   }
   teamModalOpen.value = true
 }
@@ -409,6 +427,7 @@ const onTeamSubmit = async () => {
       color: teamFormState.value.color,
       maxVolunteers: teamFormState.value.maxVolunteers,
       isRequired: teamFormState.value.isRequired,
+      isAccessControlTeam: teamFormState.value.isAccessControlTeam,
     }
 
     if (editingTeam.value) {

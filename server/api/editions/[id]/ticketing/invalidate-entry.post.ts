@@ -1,5 +1,5 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
+import { canAccessEditionDataOrAccessControl } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
@@ -14,12 +14,13 @@ export default defineEventHandler(async (event) => {
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
   if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
 
-  // Vérifier les permissions
-  const allowed = await canAccessEditionData(editionId, user.id, event)
+  // Vérifier les permissions (gestionnaires OU bénévoles en créneau actif de contrôle d'accès)
+  const allowed = await canAccessEditionDataOrAccessControl(editionId, user.id, event)
   if (!allowed)
     throw createError({
       statusCode: 403,
-      message: 'Droits insuffisants pour accéder à cette fonctionnalité',
+      message:
+        "Droits insuffisants pour accéder à cette fonctionnalité - vous devez être gestionnaire ou en créneau actif de contrôle d'accès",
     })
 
   const body = bodySchema.parse(await readBody(event))
