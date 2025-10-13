@@ -14,6 +14,9 @@ const updateCarpoolOfferSchema = z.object({
     .optional(),
   description: z.string().max(500, 'Description trop longue (500 caractères max)').optional(),
   phoneNumber: z.string().max(20, 'Numéro de téléphone trop long').optional().nullable(),
+  smokingAllowed: z.boolean().optional(),
+  petsAllowed: z.boolean().optional(),
+  musicAllowed: z.boolean().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -78,6 +81,15 @@ export default defineEventHandler(async (event) => {
     }
     if (validatedData.phoneNumber !== undefined) {
       updateData.phoneNumber = validatedData.phoneNumber?.trim() || null
+    }
+    if (validatedData.smokingAllowed !== undefined) {
+      updateData.smokingAllowed = validatedData.smokingAllowed
+    }
+    if (validatedData.petsAllowed !== undefined) {
+      updateData.petsAllowed = validatedData.petsAllowed
+    }
+    if (validatedData.musicAllowed !== undefined) {
+      updateData.musicAllowed = validatedData.musicAllowed
     }
 
     // Mettre à jour l'offre

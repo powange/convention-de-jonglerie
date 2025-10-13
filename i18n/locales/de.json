@@ -467,6 +467,7 @@
     "meeting_location": "Treffpunkt",
     "music_allowed": "Musik erlaubt",
     "music_description": "Sie sind einverstanden, während der Fahrt Musik zu hören",
+    "no_city_found": "[TODO] Aucune ville trouvée",
     "offer": {
       "available_seats": "Verfügbare Plätze",
       "create": "Mitfahrangebot erstellen",
@@ -498,13 +499,11 @@
     "smoking_allowed": "Rauchen erlaubt",
     "smoking_description": "Sie erlauben Raucher in Ihrem Fahrzeug oder sind Raucher",
     "trip_details": "Reisedetails",
+    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
     "validation": {
       "date_invalid": "Ungültiges Datum",
-      "date_required": "Abfahrtsdatum ist erforderlich",
       "departure_address_required": "Die Abfahrtsadresse ist erforderlich",
       "departure_city_required": "Die Abfahrtsstadt ist erforderlich",
-      "direction_invalid": "Ungültige Fahrtrichtung",
-      "direction_required": "Fahrtrichtung ist erforderlich",
       "seats_max": "Maximal 8 Plätze",
       "seats_min": "Mindestens 1 Platz"
     }

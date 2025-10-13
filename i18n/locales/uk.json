@@ -467,6 +467,7 @@
     "meeting_location": "Місце зустрічі",
     "music_allowed": "Музика дозволена",
     "music_description": "Ви згодні слухати музику під час поїздки",
+    "no_city_found": "[TODO] Aucune ville trouvée",
     "offer": {
       "available_seats": "Доступні місця",
       "create": "Створити пропозицію спільної поїздки",
@@ -498,13 +499,11 @@
     "smoking_allowed": "Куріння дозволено",
     "smoking_description": "Ви дозволяєте курців у вашому автомобілі або палите самі",
     "trip_details": "Деталі подорожі",
+    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
     "validation": {
       "date_invalid": "Недійсна дата",
-      "date_required": "Потрібна дата відправлення",
       "departure_address_required": "Адреса відправлення обов'язкова",
       "departure_city_required": "Місто відправлення обов'язкове",
-      "direction_invalid": "Напрямок подорожі invalide",
-      "direction_required": "Напрямок подорожі обов'язковий",
       "seats_max": "Максимум 8 місць",
       "seats_min": "Щонайменше 1 місце"
     }

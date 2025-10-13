@@ -467,6 +467,7 @@
     "meeting_location": "Local de encontro",
     "music_allowed": "Música permitida",
     "music_description": "Concorda em ouvir música durante a viagem",
+    "no_city_found": "[TODO] Aucune ville trouvée",
     "offer": {
       "available_seats": "Lugares disponíveis",
       "create": "Criar oferta de carona",
@@ -498,13 +499,11 @@
     "smoking_allowed": "Fumar permitido",
     "smoking_description": "Permite fumadores no seu veículo ou é fumador",
     "trip_details": "Detalhes da viagem",
+    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
     "validation": {
       "date_invalid": "Data inválida",
-      "date_required": "Data de partida é obrigatória",
       "departure_address_required": "O endereço de partida é obrigatório",
       "departure_city_required": "A cidade de partida é obrigatória",
-      "direction_invalid": "Direção da viagem invalide",
-      "direction_required": "A direção da viagem é obrigatória",
       "seats_max": "Máximo de 8 lugares",
       "seats_min": "Pelo menos 1 lugar"
     }

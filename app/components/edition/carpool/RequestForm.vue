@@ -3,7 +3,8 @@
     :form-type="'request'"
     :edition-id="editionId"
     :initial-data="initialData"
-    @submit="handleSubmit"
+    :is-editing="isEditing"
+    @success="handleSuccess"
     @cancel="handleCancel"
   />
 </template>
@@ -14,13 +15,14 @@
 interface Props {
   editionId: string
   initialData?: any
+  isEditing?: boolean
 }
 
 defineProps<Props>()
-const emit = defineEmits(['created', 'cancel'])
+const emit = defineEmits(['success', 'cancel'])
 
-const handleSubmit = (data: any) => {
-  emit('created', data)
+const handleSuccess = (data: any) => {
+  emit('success', data)
 }
 
 const handleCancel = () => {

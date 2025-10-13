@@ -467,6 +467,7 @@
     "meeting_location": "Mødested",
     "music_allowed": "Musik tilladt",
     "music_description": "Du er enig i at lytte til musik under turen",
+    "no_city_found": "[TODO] Aucune ville trouvée",
     "offer": {
       "available_seats": "Ledige pladser",
       "create": "Opret samkørselstilbud",
@@ -498,13 +499,11 @@
     "smoking_allowed": "Rygning tilladt",
     "smoking_description": "Du tillader rygere i dit køretøj eller er ryger",
     "trip_details": "Rejsedetaljer",
+    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
     "validation": {
       "date_invalid": "Ugyldig dato",
-      "date_required": "Afrejsedato er påkrævet",
       "departure_address_required": "Afgangsadressen er påkrævet",
       "departure_city_required": "Afgangsbyen er påkrævet",
-      "direction_invalid": "Rejsens retning invalide",
-      "direction_required": "Rejsens retning er påkrævet",
       "seats_max": "Maksimalt 8 pladser",
       "seats_min": "Mindst 1 plads"
     }

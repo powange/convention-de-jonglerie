@@ -192,6 +192,9 @@ model CarpoolOffer {
   direction        CarpoolDirection   @default(TO_EVENT)
   description      String?            @db.Text
   phoneNumber      String?
+  smokingAllowed   Boolean            @default(false)
+  petsAllowed      Boolean            @default(false)
+  musicAllowed     Boolean            @default(false)
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   editionId        Int

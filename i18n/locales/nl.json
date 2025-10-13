@@ -467,6 +467,7 @@
     "meeting_location": "Ontmoetingsplaats",
     "music_allowed": "Muziek toegestaan",
     "music_description": "Je gaat akkoord met muziek luisteren tijdens de rit",
+    "no_city_found": "[TODO] Aucune ville trouvée",
     "offer": {
       "available_seats": "Beschikbare plaatsen",
       "create": "Carpoolaanbod maken",
@@ -498,13 +499,11 @@
     "smoking_allowed": "Roken toegestaan",
     "smoking_description": "Je staat rokers toe in je voertuig of bent roker",
     "trip_details": "Reisdetails",
+    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
     "validation": {
       "date_invalid": "Ongeldige datum",
-      "date_required": "Vertrekdatum is vereist",
       "departure_address_required": "Het vertrekadres is verplicht",
       "departure_city_required": "De vertrekstad is verplicht",
-      "direction_invalid": "Richting van de reis invalide",
-      "direction_required": "De reisrichting is verplicht",
       "seats_max": "Maximaal 8 plaatsen",
       "seats_min": "Minimaal 1 plaats"
     }

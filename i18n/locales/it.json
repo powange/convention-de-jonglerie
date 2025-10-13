@@ -467,6 +467,7 @@
     "meeting_location": "Luogo di incontro",
     "music_allowed": "Musica consentita",
     "music_description": "Sei d'accordo ad ascoltare musica durante il viaggio",
+    "no_city_found": "[TODO] Aucune ville trouvée",
     "offer": {
       "available_seats": "Posti disponibili",
       "create": "Crea offerta di car pooling",
@@ -498,13 +499,11 @@
     "smoking_allowed": "Fumo consentito",
     "smoking_description": "Permetti fumatori nel tuo veicolo o sei fumatore",
     "trip_details": "Dettagli del viaggio",
+    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
     "validation": {
       "date_invalid": "Data non valida",
-      "date_required": "La data di partenza è obbligatoria",
       "departure_address_required": "L'indirizzo di partenza è richiesto",
       "departure_city_required": "La città di partenza è richiesta",
-      "direction_invalid": "Direzione del viaggio non valida",
-      "direction_required": "La direzione del viaggio è richiesta",
       "seats_max": "Massimo 8 posti",
       "seats_min": "Almeno 1 posto"
     }

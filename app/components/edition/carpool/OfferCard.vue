@@ -77,7 +77,40 @@
       </div>
 
       <!-- Description -->
-      <p v-if="offer.description" class="text-sm text-gray-600">{{ offer.description }}</p>
+      <p v-if="offer.description" class="text-sm text-gray-600 dark:text-gray-400">
+        {{ offer.description }}
+      </p>
+
+      <!-- Préférences -->
+      <div class="flex flex-wrap gap-2">
+        <UBadge
+          v-if="offer.smokingAllowed"
+          color="neutral"
+          variant="soft"
+          class="flex items-center gap-1"
+        >
+          <UIcon name="i-heroicons-no-symbol" class="w-4 h-4" />
+          {{ $t('carpool.smoking_allowed') }}
+        </UBadge>
+        <UBadge
+          v-if="offer.petsAllowed"
+          color="neutral"
+          variant="soft"
+          class="flex items-center gap-1"
+        >
+          <UIcon name="i-heroicons-heart" class="w-4 h-4" />
+          {{ $t('carpool.pets_allowed') }}
+        </UBadge>
+        <UBadge
+          v-if="offer.musicAllowed"
+          color="neutral"
+          variant="soft"
+          class="flex items-center gap-1"
+        >
+          <UIcon name="i-heroicons-musical-note" class="w-4 h-4" />
+          {{ $t('carpool.music_allowed') }}
+        </UBadge>
+      </div>
 
       <!-- Ma réservation (pour l'utilisateur connecté non propriétaire) -->
       <div
@@ -222,6 +255,9 @@ interface CarpoolOffer {
   remainingSeats?: number
   description?: string
   phoneNumber?: string
+  smokingAllowed?: boolean
+  petsAllowed?: boolean
+  musicAllowed?: boolean
   createdAt: string
   user: {
     id: number

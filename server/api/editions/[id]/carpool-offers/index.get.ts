@@ -63,6 +63,10 @@ export default defineEventHandler(async (event) => {
         description: offer.description,
         // n'exposer le contact que pour le propriétaire ou un réservant ACCEPTED
         phoneNumber: viewerIsOwner || viewerHasAccepted ? offer.phoneNumber : null,
+        smokingAllowed: offer.smokingAllowed,
+        petsAllowed: offer.petsAllowed,
+        musicAllowed: offer.musicAllowed,
+        direction: offer.direction,
         createdAt: offer.createdAt,
         updatedAt: offer.updatedAt,
         remainingSeats: Math.max(

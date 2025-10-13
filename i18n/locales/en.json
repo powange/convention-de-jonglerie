@@ -467,6 +467,7 @@
     "meeting_location": "Meeting location",
     "music_allowed": "Music allowed",
     "music_description": "You're okay with listening to music during the trip",
+    "no_city_found": "[TODO] Aucune ville trouvée",
     "offer": {
       "available_seats": "Available seats",
       "create": "Create carpool offer",
@@ -498,13 +499,11 @@
     "smoking_allowed": "Smoking allowed",
     "smoking_description": "You allow smokers in your vehicle or are a smoker",
     "trip_details": "Trip details",
+    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
     "validation": {
       "date_invalid": "Invalid date",
-      "date_required": "Departure date is required",
       "departure_address_required": "Departure address is required",
       "departure_city_required": "Departure city is required",
-      "direction_invalid": "Invalid trip direction",
-      "direction_required": "Trip direction is required",
       "seats_max": "Maximum 8 seats",
       "seats_min": "At least 1 seat"
     }

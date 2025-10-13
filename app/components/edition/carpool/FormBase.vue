@@ -52,34 +52,36 @@
             :required="true"
             :description="locationLabels.cityHint"
           >
-            <div class="relative">
-              <UInput
-                v-model="form.locationCity"
-                :placeholder="locationLabels.cityPlaceholder"
-                icon="i-heroicons-map-pin"
-                size="lg"
-                class="w-full"
-              />
-              <div
-                v-if="showDepartureSuggestions && departureSuggestions.length > 0"
-                class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto"
-              >
-                <button
-                  v-for="suggestion in departureSuggestions"
-                  :key="suggestion.id"
-                  type="button"
-                  class="w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-b-0"
-                  @click="selectSuggestion('locationCity', suggestion)"
-                >
-                  <div class="font-medium text-gray-900 dark:text-gray-100">
-                    {{ suggestion.name }}
-                  </div>
+            <UInputMenu
+              v-model="selectedCity"
+              v-model:search-term="searchTerm"
+              :items="citySuggestions"
+              :loading="loadingSuggestions"
+              :placeholder="locationLabels.cityPlaceholder"
+              icon="i-heroicons-map-pin"
+              size="lg"
+              class="w-full"
+              ignore-filter
+              label-key="name"
+            >
+              <template #item-label="{ item }">
+                <div>
+                  <div class="font-medium">{{ item.name }}</div>
                   <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ suggestion.city }}, {{ suggestion.country }}
+                    {{ item.city }}, {{ item.country }}
                   </div>
-                </button>
-              </div>
-            </div>
+                </div>
+              </template>
+              <template #empty>
+                <div class="text-center py-2 text-sm text-gray-500">
+                  {{
+                    searchTerm.length < 3
+                      ? $t('carpool.type_at_least_3_chars')
+                      : $t('carpool.no_city_found')
+                  }}
+                </div>
+              </template>
+            </UInputMenu>
           </UFormField>
 
           <!-- Adresse précise (pour les offres seulement) -->
@@ -189,8 +191,8 @@
           </UFormField>
         </div>
 
-        <!-- Options supplémentaires -->
-        <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+        <!-- Options supplémentaires (uniquement pour les offres) -->
+        <div v-if="formType === 'offer'" class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
           <h4 class="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-4">
             <UIcon name="i-heroicons-adjustments-horizontal" class="text-primary-500" />
             {{ $t('carpool.preferences') }}
@@ -212,7 +214,6 @@
             />
 
             <USwitch
-              v-if="formType === 'offer'"
               v-model="form.musicAllowed"
               :label="$t('carpool.music_allowed')"
               :description="$t('carpool.music_description')"
@@ -265,7 +266,9 @@
               size="lg"
               icon="i-heroicons-paper-airplane"
             >
-              {{ loading ? $t('common.creating') : $t('common.create') }}
+              {{
+                loading ? $t('common.saving') : isEditing ? $t('common.save') : $t('common.create')
+              }}
             </UButton>
           </div>
         </div>
@@ -275,6 +278,7 @@
 </template>
 
 <script setup lang="ts">
+import { refDebounced } from '@vueuse/core'
 import { watch } from 'vue'
 import { z } from 'zod'
 
@@ -282,12 +286,12 @@ interface Props {
   formType: 'offer' | 'request'
   editionId: string
   initialData?: any
+  isEditing?: boolean
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits(['submit', 'cancel'])
+const emit = defineEmits(['success', 'cancel'])
 
-const { $api } = useNuxtApp()
 const toast = useToast()
 const { t, locale } = useI18n()
 
@@ -347,25 +351,25 @@ const locationLabels = computed(() => {
   }
 })
 
-// Suggestions d'adresses
-const departureSuggestions = ref<any[]>([])
-const showDepartureSuggestions = ref(false)
+// Suggestions d'adresses - pour UInputMenu
+const searchTerm = ref('')
+const searchTermDebounced = refDebounced(searchTerm, 300)
+const selectedCity = ref<any>(null)
 
 // Schéma de validation
 const baseSchema = z.object({
   locationCity: z.string().min(1, t('carpool.validation.departure_city_required')),
-  tripDate: z.date({
-    required_error: t('carpool.validation.date_required'),
-    invalid_type_error: t('carpool.validation.date_invalid'),
-  }),
-  direction: z.enum(['TO_EVENT', 'FROM_EVENT'], {
-    required_error: t('carpool.validation.direction_required'),
-    invalid_type_error: t('carpool.validation.direction_invalid'),
-  }),
+  tripDate: z
+    .union([z.date(), z.string().transform((val) => new Date(val))])
+    .refine((date) => date instanceof Date && !isNaN(date.getTime()), {
+      message: t('carpool.validation.date_invalid'),
+    }),
+  direction: z.enum(['TO_EVENT', 'FROM_EVENT']),
   description: z.string().optional(),
   phoneNumber: z.string().optional(),
   smokingAllowed: z.boolean().optional(),
   petsAllowed: z.boolean().optional(),
+  musicAllowed: z.boolean().optional(),
 })
 
 const schema = computed(() => {
@@ -376,7 +380,6 @@ const schema = computed(() => {
         .number()
         .min(1, t('carpool.validation.seats_min'))
         .max(8, t('carpool.validation.seats_max')),
-      musicAllowed: z.boolean().optional(),
     })
   } else {
     return baseSchema.extend({
@@ -392,36 +395,45 @@ const schema = computed(() => {
 const isFormValid = computed(() => {
   try {
     schema.value.parse(form)
+    console.log('Form is valid!')
     return true
-  } catch {
+  } catch (error) {
+    console.error('Form validation error:', error)
     return false
   }
 })
 
-// Recherche de suggestions d'adresses
-const fetchSuggestions = useDebounceFn(async (_field: 'locationCity', query: string) => {
+// Utilisation de $fetch dans un watcher pour récupérer les suggestions
+const citySuggestions = ref<any[]>([])
+const loadingSuggestions = ref(false)
+
+watch(searchTermDebounced, async (query) => {
   if (!query || query.length < 3) {
-    departureSuggestions.value = []
-    showDepartureSuggestions.value = false
+    citySuggestions.value = []
     return
   }
 
+  loadingSuggestions.value = true
+
   try {
-    // Utiliser la locale actuelle pour l'API Nominatim
     const currentLocale = locale.value || 'fr'
-    // Privilégier les résultats en Europe (vous pouvez ajuster selon vos besoins)
     const countryCodes = 'fr,be,ch,de,es,it,nl,gb,lu'
-    const response = await fetch(
+
+    const data = await $fetch<any[]>(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=${currentLocale}&countrycodes=${countryCodes}&addressdetails=1&featuretype=settlement&class=place&type=city,town,village`
     )
-    const data = await response.json()
+
+    if (!data) {
+      citySuggestions.value = []
+      return
+    }
 
     // Filtrer uniquement les résultats avec addresstype = "city", "town" ou "village"
     const filteredData = data.filter((item: any) =>
       ['city', 'town', 'village'].includes(item.addresstype)
     )
 
-    const suggestions = filteredData.map((item: any) => ({
+    citySuggestions.value = filteredData.map((item: any) => ({
       id: item.place_id,
       name: item.display_name.split(',')[0],
       city: item.display_name.split(',')[1]?.trim() || '',
@@ -430,30 +442,31 @@ const fetchSuggestions = useDebounceFn(async (_field: 'locationCity', query: str
       lon: parseFloat(item.lon),
       fullAddress: item.display_name,
     }))
-
-    departureSuggestions.value = suggestions
-    showDepartureSuggestions.value = true
   } catch (error) {
     console.error("Erreur lors de la recherche d'adresses:", error)
+    citySuggestions.value = []
+  } finally {
+    loadingSuggestions.value = false
   }
-}, 300)
-
-// Sélection d'une suggestion
-const selectSuggestion = (_field: 'locationCity', suggestion: any) => {
-  form.locationCity = suggestion.name
-  form.departureCoordinates = { lat: suggestion.lat, lon: suggestion.lon }
-  showDepartureSuggestions.value = false
-}
+})
 
 // Soumission du formulaire
 const onSubmit = async () => {
   loading.value = true
 
   try {
-    const endpoint =
+    let endpoint =
       props.formType === 'offer'
         ? `/api/editions/${props.editionId}/carpool-offers`
         : `/api/editions/${props.editionId}/carpool-requests`
+
+    // En mode édition, ajouter l'ID dans l'endpoint
+    if (props.isEditing && props.initialData?.id) {
+      endpoint =
+        props.formType === 'offer'
+          ? `/api/carpool-offers/${props.initialData.id}`
+          : `/api/carpool-requests/${props.initialData.id}`
+    }
 
     const payload = {
       ...form,
@@ -465,24 +478,32 @@ const onSubmit = async () => {
       delete payload.seatsNeeded
     } else {
       delete payload.availableSeats
+      delete payload.locationAddress
+      delete payload.smokingAllowed
+      delete payload.petsAllowed
       delete payload.musicAllowed
     }
 
-    const response = await $api(endpoint, {
-      method: 'POST',
+    const response = await $fetch(endpoint, {
+      method: props.isEditing ? 'PUT' : 'POST',
       body: payload,
     })
 
     toast.add({
       title: t('common.success'),
-      description:
-        props.formType === 'offer' ? t('carpool.offer.created') : t('carpool.request.created'),
+      description: props.isEditing
+        ? props.formType === 'offer'
+          ? t('carpool.offer.updated')
+          : t('carpool.request.updated')
+        : props.formType === 'offer'
+          ? t('carpool.offer.created')
+          : t('carpool.request.created'),
       color: 'success',
     })
 
-    emit('submit', response)
+    emit('success', response)
   } catch (error: any) {
-    console.error('Erreur lors de la création:', error)
+    console.error('Erreur lors de la soumission:', error)
     toast.add({
       title: t('common.error'),
       description: error.data?.message || t('errors.generic'),
@@ -493,21 +514,23 @@ const onSubmit = async () => {
   }
 }
 
-// Watcher pour l'autocomplete de la ville
-watch(
-  () => form.locationCity,
-  (newValue) => {
-    fetchSuggestions('locationCity', newValue)
+// Watcher pour la sélection d'une ville
+watch(selectedCity, (newCity) => {
+  if (newCity) {
+    form.locationCity = newCity.name
+    form.departureCoordinates = { lat: newCity.lat, lon: newCity.lon }
   }
-)
+})
 
-// Fermer les suggestions lors d'un clic en dehors
+// Initialiser selectedCity si on édite
 onMounted(() => {
-  document.addEventListener('click', (e) => {
-    const target = e.target as HTMLElement
-    if (!target.closest('[name="locationCity"]')) {
-      showDepartureSuggestions.value = false
+  if (props.initialData?.locationCity) {
+    selectedCity.value = {
+      name: props.initialData.locationCity,
+      lat: props.initialData.departureCoordinates?.lat,
+      lon: props.initialData.departureCoordinates?.lon,
     }
-  })
+    searchTerm.value = props.initialData.locationCity
+  }
 })
 </script>

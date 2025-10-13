@@ -467,6 +467,7 @@
     "meeting_location": "Место встречи",
     "music_allowed": "Музыка разрешена",
     "music_description": "Вы согласны слушать музыку во время поездки",
+    "no_city_found": "[TODO] Aucune ville trouvée",
     "offer": {
       "available_seats": "Доступные места",
       "create": "Создать предложение попутки",
@@ -498,13 +499,11 @@
     "smoking_allowed": "Разрешено курение",
     "smoking_description": "Вы разрешаете курильщиков в вашем автомобиле или курите сами",
     "trip_details": "Детали поездки",
+    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
     "validation": {
       "date_invalid": "Недействительная дата",
-      "date_required": "Требуется дата отправления",
       "departure_address_required": "Адрес отправления обязателен",
       "departure_city_required": "Город отправления обязателен",
-      "direction_invalid": "Направление поездки invalide",
-      "direction_required": "Направление поездки обязательно",
       "seats_max": "Максимум 8 мест",
       "seats_min": "Как минимум 1 место"
     }

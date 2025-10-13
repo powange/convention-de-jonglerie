@@ -562,7 +562,6 @@
       "create_description": "Proposez des places dans votre véhicule pour l'événement",
       "edit_description": "Modifiez les détails de votre offre de covoiturage",
       "created": "Offre de covoiturage créée",
-      "updated": "Offre de covoiturage mise à jour",
       "seats_placeholder": "Ex: 3",
       "seats_description": "Nombre de places libres dans votre véhicule"
     },
@@ -572,7 +571,6 @@
       "create_description": "Recherchez un trajet pour vous rendre à l'événement",
       "edit_description": "Modifiez les détails de votre demande de covoiturage",
       "created": "Demande de covoiturage créée",
-      "updated": "Demande de covoiturage mise à jour",
       "required_seats": "Nombre de places recherchées",
       "seats_placeholder": "Ex: 2",
       "seats_description": "Nombre de places dont vous avez besoin pour votre groupe"
@@ -583,8 +581,11 @@
     "smoking_allowed": "Fumeur accepté",
     "validation": {
       "date_invalid": "Date invalide",
+      "date_required": "La date de départ est requise",
       "departure_city_required": "La ville de départ est requise",
       "departure_address_required": "L'adresse de départ est requise",
+      "direction_required": "La direction du trajet est requise",
+      "direction_invalid": "Direction du trajet invalide",
       "seats_max": "Maximum 8 places",
       "seats_min": "Au moins 1 place"
     },
