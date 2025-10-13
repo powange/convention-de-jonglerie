@@ -85,10 +85,7 @@
           </div>
 
           <!-- Liste des destinataires -->
-          <div
-            v-if="selectedRecipients.length > 0"
-            class="text-blue-600 dark:text-blue-300"
-          >
+          <div v-if="selectedRecipients.length > 0" class="text-blue-600 dark:text-blue-300">
             <div class="max-h-32 overflow-y-auto space-y-1">
               <div
                 v-for="recipient in selectedRecipients"

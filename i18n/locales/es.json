@@ -597,7 +597,7 @@
     "postal_code": "Código postal",
     "previous": "Anterior",
     "private": "Privado",
-    "program": "[TODO] Programme",
+    "program": "Programa",
     "quantity": "Cantidad",
     "refresh": "Actualizar",
     "remove": "Quitar",
@@ -721,7 +721,7 @@
       "poster_alt": "Cartel de la edición",
       "poster_placeholder": "Haga clic para seleccionar el cartel de la edición",
       "previous": "Anterior",
-      "program_placeholder": "[TODO] Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
+      "program_placeholder": "Describe el programa de la edición (horarios, talleres, espectáculos...)",
       "social_networks_description": "Comparte tus páginas para aumentar la visibilidad",
       "social_networks_title": "Redes sociales",
       "step_about_description": "Descripción de la edición",
@@ -755,15 +755,15 @@
       "yellow_border_favorite": "Borde amarillo = Favorito"
     },
     "posts": {
+      "comments_count": "{count} comentario | {count} comentarios",
       "confirm_delete_comment": "¿Estás seguro de que quieres eliminar este comentario? Esta acción es irreversible.",
       "confirm_delete_post": "¿Estás seguro de que quieres eliminar esta publicación? Esta acción es irreversible.",
       "confirm_delete_title": "Confirmar eliminación",
+      "pinned": "Fijado",
       "publish": "Publicar",
-      "replies_count": "{count} respuesta | {count} respuestas",
-      "reply": "Responder",
-      "reply_to_comment": "Responder a este comentario",
-      "your_reply": "Tu respuesta",
-      "your_reply_placeholder": "Tu respuesta..."
+      "reply_to_post": "Comenta esta publicación",
+      "your_comment": "Tu comentario",
+      "your_comment_placeholder": "Tu comentario..."
     }
   },
   "conventions": {
@@ -900,7 +900,7 @@
     "poster_of": "Cartel de {name}",
     "posts": "Publicaciones",
     "practical_info": "Información práctica",
-    "program": "[TODO] Programme",
+    "program": "Programa",
     "publish_edition": "Publicar edición",
     "returned": "✅ Devuelto",
     "services_offered": "Servicios ofrecidos",
@@ -1413,6 +1413,7 @@
     "cannot_load_comments": "No se pueden cargar los comentarios",
     "cannot_load_convention": "No se pueden cargar los datos de la convención",
     "cannot_load_editions": "No se pueden cargar las ediciones",
+    "cannot_pin_post": "No se puede fijar la publicación",
     "cannot_publish_comment": "No se puede publicar el comentario",
     "cannot_publish_reply": "No se puede publicar la respuesta",
     "cannot_remove_favorite": "No se puede eliminar de favoritos",
@@ -1626,6 +1627,10 @@
     "login_success": "¡Inicio de sesión exitoso!",
     "offer_deleted": "Oferta eliminada",
     "offer_deleted_successfully": "Tu oferta de viaje compartido ha sido eliminada exitosamente",
+    "post_pinned": "Publicación fijada",
+    "post_pinned_successfully": "La publicación se ha fijado correctamente",
+    "post_unpinned": "Publicación desfijada",
+    "post_unpinned_successfully": "La publicación se ha desfijado correctamente",
     "removed_from_favorites": "Eliminado de favoritos",
     "reply_deleted": "Respuesta eliminada",
     "reply_deleted_successfully": "La respuesta ha sido eliminada exitosamente",
@@ -2082,6 +2087,6 @@
     "name_max_200": "El nombre no puede exceder los 200 caracteres",
     "name_min_3": "El nombre debe contener al menos 3 caracteres",
     "phone_required": "El número de teléfono es requerido",
-    "program_max_10000": "[TODO] Le programme ne peut pas dépasser 10000 caractères"
+    "program_max_10000": "El programa no puede exceder 10000 caracteres"
   }
 }

@@ -89,9 +89,11 @@
             :key="post.id"
             :post="post"
             :current-user-id="authStore.user?.id"
+            :can-pin="canManageEdition"
             @delete-post="deletePost"
             @add-comment="addComment"
             @delete-comment="deleteComment"
+            @toggle-pin="togglePin"
           />
         </div>
       </div>
@@ -149,6 +151,12 @@ const isSubmittingPost = ref(false)
 
 const newPostForm = reactive({
   content: '',
+})
+
+// Vérifier si l'utilisateur peut gérer l'édition (organisateur)
+const canManageEdition = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canEditEdition(edition.value, authStore.user.id)
 })
 
 // Validation du nouveau post
@@ -301,6 +309,48 @@ const deleteComment = async (postId: number, commentId: number) => {
     toast.add({
       title: t('common.error'),
       description: t('errors.cannot_delete_reply'),
+      color: 'error',
+    })
+    // Recharger les posts en cas d'erreur pour resynchroniser
+    await loadPosts()
+  }
+}
+
+// Épingler/désépingler un post
+const togglePin = async (postId: number, currentPinned: boolean) => {
+  try {
+    const newPinned = !currentPinned
+
+    await $fetch(`/api/editions/${editionId}/posts/${postId}/pin`, {
+      method: 'PATCH',
+      body: { pinned: newPinned },
+    })
+
+    // Mettre à jour le post localement
+    const postIndex = posts.value.findIndex((p) => p.id === postId)
+    if (postIndex !== -1) {
+      posts.value[postIndex] = {
+        ...posts.value[postIndex],
+        pinned: newPinned,
+      }
+    }
+
+    // Recharger les posts pour avoir le bon tri (épinglés en premier)
+    await loadPosts()
+
+    toast.add({
+      title: newPinned ? t('messages.post_pinned') : t('messages.post_unpinned'),
+      description: newPinned
+        ? t('messages.post_pinned_successfully')
+        : t('messages.post_unpinned_successfully'),
+      color: 'success',
+    })
+  } catch (error: unknown) {
+    console.error("Erreur lors de l'épinglage du post:", error)
+    const httpError = error as { data?: { message?: string } } | undefined
+    toast.add({
+      title: t('common.error'),
+      description: httpError?.data?.message || t('errors.cannot_pin_post'),
       color: 'error',
     })
     // Recharger les posts en cas d'erreur pour resynchroniser

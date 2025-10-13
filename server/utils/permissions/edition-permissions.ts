@@ -1,7 +1,13 @@
 import { checkAdminMode } from '../collaborator-management'
 import { prisma } from '../prisma'
 
-import type { User, Edition, Convention, ConventionCollaborator } from '@prisma/client'
+import type {
+  User,
+  Edition,
+  Convention,
+  ConventionCollaborator,
+  EditionCollaboratorPermission,
+} from '@prisma/client'
 
 /**
  * Type pour une édition avec ses relations nécessaires aux permissions
@@ -10,6 +16,11 @@ export type EditionWithPermissions = Edition & {
   convention: Convention & {
     collaborators: ConventionCollaborator[]
   }
+  collaboratorPermissions?: (EditionCollaboratorPermission & {
+    collaborator: {
+      userId: number
+    }
+  })[]
 }
 
 /**
@@ -59,6 +70,15 @@ export async function getEditionWithPermissions(
           },
         },
       },
+      collaboratorPermissions: {
+        include: {
+          collaborator: {
+            select: {
+              userId: true,
+            },
+          },
+        },
+      },
     },
   })
 }
@@ -71,14 +91,26 @@ export function canEditEdition(edition: EditionWithPermissions, user: User): boo
   const isConventionAuthor = edition.convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
-  // Vérifier si l'utilisateur est collaborateur avec droits d'édition
-  const hasEditRights =
+  // Vérifier si l'utilisateur est collaborateur avec droits d'édition au niveau convention
+  const hasConventionEditRights =
     edition.convention.collaborators?.some(
       (collab) =>
         collab.userId === user.id && (collab.canEditAllEditions || collab.canEditConvention)
     ) || false
 
-  return isCreator || isConventionAuthor || hasEditRights || isGlobalAdmin
+  // Vérifier si l'utilisateur a des droits d'édition spécifiques à cette édition
+  const hasEditionEditRights =
+    edition.collaboratorPermissions?.some(
+      (perm) => perm.collaborator.userId === user.id && perm.canEdit === true
+    ) || false
+
+  return (
+    isCreator ||
+    isConventionAuthor ||
+    hasConventionEditRights ||
+    hasEditionEditRights ||
+    isGlobalAdmin
+  )
 }
 
 /**
@@ -89,15 +121,27 @@ export function canDeleteEdition(edition: EditionWithPermissions, user: User): b
   const isConventionAuthor = edition.convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
-  // Vérifier si l'utilisateur est collaborateur avec droits de suppression
-  const hasDeleteRights =
+  // Vérifier si l'utilisateur est collaborateur avec droits de suppression au niveau convention
+  const hasConventionDeleteRights =
     edition.convention.collaborators?.some(
       (collab) =>
         collab.userId === user.id &&
         (collab.canDeleteAllEditions || collab.canDeleteConvention || collab.canEditAllEditions)
     ) || false
 
-  return isCreator || isConventionAuthor || hasDeleteRights || isGlobalAdmin
+  // Vérifier si l'utilisateur a des droits de suppression spécifiques à cette édition
+  const hasEditionDeleteRights =
+    edition.collaboratorPermissions?.some(
+      (perm) => perm.collaborator.userId === user.id && perm.canDelete === true
+    ) || false
+
+  return (
+    isCreator ||
+    isConventionAuthor ||
+    hasConventionDeleteRights ||
+    hasEditionDeleteRights ||
+    isGlobalAdmin
+  )
 }
 
 /**

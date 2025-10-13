@@ -597,7 +597,7 @@
     "postal_code": "Поштовий індекс",
     "previous": "Назад",
     "private": "Приватний",
-    "program": "[TODO] Programme",
+    "program": "Програма",
     "quantity": "Кількість",
     "refresh": "Оновити",
     "remove": "Видалити",
@@ -721,7 +721,7 @@
       "poster_alt": "Постер видання",
       "poster_placeholder": "Натисніть, щоб вибрати постер видання",
       "previous": "Попередній",
-      "program_placeholder": "[TODO] Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
+      "program_placeholder": "Опишіть програму видання (розклад, майстер-класи, шоу...)",
       "social_networks_description": "Поділіться своїми сторінками для підвищення видимості",
       "social_networks_title": "Соціальні мережі",
       "step_about_description": "Опис видання",
@@ -755,15 +755,15 @@
       "yellow_border_favorite": "Жовта рамка = Улюблене"
     },
     "posts": {
+      "comments_count": "{count} коментар | {count} коментарі",
       "confirm_delete_comment": "Ви впевнені, що хочете видалити цей коментар? Ця дія незворотна.",
       "confirm_delete_post": "Ви впевнені, що хочете видалити цей пост? Ця дія незворотна.",
       "confirm_delete_title": "Підтвердити видалення",
+      "pinned": "Закріплено",
       "publish": "Опублікувати",
-      "replies_count": "{count} відповідь | {count} відповідей",
-      "reply": "Відповісти",
-      "reply_to_comment": "Відповісти на цей коментар",
-      "your_reply": "Ваша відповідь",
-      "your_reply_placeholder": "Ваша відповідь..."
+      "reply_to_post": "Прокоментуйте цю публікацію",
+      "your_comment": "Ваш коментар",
+      "your_comment_placeholder": "Ваш коментар..."
     }
   },
   "conventions": {
@@ -900,7 +900,7 @@
     "poster_of": "Постер {name}",
     "posts": "Пости",
     "practical_info": "Практична інформація",
-    "program": "[TODO] Programme",
+    "program": "Програма",
     "publish_edition": "Опублікувати видання",
     "returned": "✅ Повернуто",
     "services_offered": "Пропоновані послуги",
@@ -1413,6 +1413,7 @@
     "cannot_load_comments": "Неможливо завантажити коментарі",
     "cannot_load_convention": "Неможливо завантажити дані конвенції",
     "cannot_load_editions": "Неможливо завантажити видання",
+    "cannot_pin_post": "Неможливо закріпити публікацію",
     "cannot_publish_comment": "Неможливо опублікувати коментар",
     "cannot_publish_reply": "Неможливо опублікувати відповідь",
     "cannot_remove_favorite": "Неможливо видалити з улюблених",
@@ -1626,6 +1627,10 @@
     "login_success": "Успішний вхід!",
     "offer_deleted": "Пропозицію видалено",
     "offer_deleted_successfully": "Вашу пропозицію сумісної поїздки успішно видалено",
+    "post_pinned": "Публікацію закріплено",
+    "post_pinned_successfully": "Публікацію успішно закріплено",
+    "post_unpinned": "Публікацію відкріплено",
+    "post_unpinned_successfully": "Публікацію успішно відкріплено",
     "removed_from_favorites": "Видалено з улюблених",
     "reply_deleted": "Відповідь видалено",
     "reply_deleted_successfully": "Відповідь успішно видалено",
@@ -2082,6 +2087,6 @@
     "name_max_200": "Ім'я не може перевищувати 200 символів",
     "name_min_3": "Ім'я повинно містити не менше 3 символів",
     "phone_required": "Номер телефону обов'язковий",
-    "program_max_10000": "[TODO] Le programme ne peut pas dépasser 10000 caractères"
+    "program_max_10000": "Програма не може перевищувати 10000 символів"
   }
 }

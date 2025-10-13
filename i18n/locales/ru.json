@@ -597,7 +597,7 @@
     "postal_code": "Почтовый индекс",
     "previous": "Назад",
     "private": "Частный",
-    "program": "[TODO] Programme",
+    "program": "Программа",
     "quantity": "Количество",
     "refresh": "Обновить",
     "remove": "Удалить",
@@ -721,7 +721,7 @@
       "poster_alt": "Постер издания",
       "poster_placeholder": "Нажмите, чтобы выбрать постер издания",
       "previous": "Предыдущий",
-      "program_placeholder": "[TODO] Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
+      "program_placeholder": "Опишите программу издания (расписание, мастер-классы, шоу...)",
       "social_networks_description": "Поделитесь своими страницами для повышения видимости",
       "social_networks_title": "Социальные сети",
       "step_about_description": "Описание издания",
@@ -755,15 +755,15 @@
       "yellow_border_favorite": "Желтая граница = Избранное"
     },
     "posts": {
+      "comments_count": "{count} комментарий | {count} комментария",
       "confirm_delete_comment": "Вы уверены, что хотите удалить этот комментарий? Это действие необратимо.",
       "confirm_delete_post": "Вы уверены, что хотите удалить этот пост? Это действие необратимо.",
       "confirm_delete_title": "Подтвердить удаление",
+      "pinned": "Закреплено",
       "publish": "Опубликовать",
-      "replies_count": "{count} ответ | {count} ответов",
-      "reply": "Ответить",
-      "reply_to_comment": "Ответить на этот комментарий",
-      "your_reply": "Ваш ответ",
-      "your_reply_placeholder": "Ваш ответ..."
+      "reply_to_post": "Прокомментируйте эту публикацию",
+      "your_comment": "Ваш комментарий",
+      "your_comment_placeholder": "Ваш комментарий..."
     }
   },
   "conventions": {
@@ -900,7 +900,7 @@
     "poster_of": "Постер {name}",
     "posts": "Посты",
     "practical_info": "Практическая информация",
-    "program": "[TODO] Programme",
+    "program": "Программа",
     "publish_edition": "Опубликовать издание",
     "returned": "✅ Возвращено",
     "services_offered": "Предлагаемые услуги",
@@ -1413,6 +1413,7 @@
     "cannot_load_comments": "Невозможно загрузить комментарии",
     "cannot_load_convention": "Невозможно загрузить данные конвенции",
     "cannot_load_editions": "Невозможно загрузить издания",
+    "cannot_pin_post": "Невозможно закрепить публикацию",
     "cannot_publish_comment": "Невозможно опубликовать комментарий",
     "cannot_publish_reply": "Невозможно опубликовать ответ",
     "cannot_remove_favorite": "Невозможно удалить из избранных",
@@ -1626,6 +1627,10 @@
     "login_success": "Успешный вход!",
     "offer_deleted": "Предложение удалено",
     "offer_deleted_successfully": "Ваше предложение совместной поездки успешно удалено",
+    "post_pinned": "Публикация закреплена",
+    "post_pinned_successfully": "Публикация успешно закреплена",
+    "post_unpinned": "Публикация откреплена",
+    "post_unpinned_successfully": "Публикация успешно откреплена",
     "removed_from_favorites": "Удалено из избранных",
     "reply_deleted": "Ответ удален",
     "reply_deleted_successfully": "Ответ успешно удален",
@@ -2082,6 +2087,6 @@
     "name_max_200": "Имя не может превышать 200 символов",
     "name_min_3": "Имя должно содержать не менее 3 символов",
     "phone_required": "Номер телефона обязателен",
-    "program_max_10000": "[TODO] Le programme ne peut pas dépasser 10000 caractères"
+    "program_max_10000": "Программа не может превышать 10000 символов"
   }
 }

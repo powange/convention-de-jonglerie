@@ -597,7 +597,7 @@
     "postal_code": "Código postal",
     "previous": "Anterior",
     "private": "Privado",
-    "program": "[TODO] Programme",
+    "program": "Programa",
     "quantity": "Quantidade",
     "refresh": "Atualizar",
     "remove": "Remover",
@@ -721,7 +721,7 @@
       "poster_alt": "Cartaz da edição",
       "poster_placeholder": "Clique para selecionar o cartaz da edição",
       "previous": "Anterior",
-      "program_placeholder": "[TODO] Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
+      "program_placeholder": "Descreva o programa da edição (horários, workshops, espetáculos...)",
       "social_networks_description": "Partilhe as suas páginas para aumentar a visibilidade",
       "social_networks_title": "Redes sociais",
       "step_about_description": "Descrição da edição",
@@ -755,15 +755,15 @@
       "yellow_border_favorite": "Contorno amarelo = Favorito"
     },
     "posts": {
+      "comments_count": "{count} comentário | {count} comentários",
       "confirm_delete_comment": "Tem certeza de que deseja excluir este comentário? Esta ação é irreversível.",
       "confirm_delete_post": "Tem certeza de que deseja excluir esta postagem? Esta ação é irreversível.",
       "confirm_delete_title": "Confirmar exclusão",
+      "pinned": "Fixado",
       "publish": "Publicar",
-      "replies_count": "{count} resposta | {count} respostas",
-      "reply": "Responder",
-      "reply_to_comment": "Responda a este comentário",
-      "your_reply": "A sua resposta",
-      "your_reply_placeholder": "A sua resposta..."
+      "reply_to_post": "Comente esta publicação",
+      "your_comment": "Seu comentário",
+      "your_comment_placeholder": "Seu comentário..."
     }
   },
   "conventions": {
@@ -900,7 +900,7 @@
     "poster_of": "Cartaz de {name}",
     "posts": "Publicações",
     "practical_info": "Informações práticas",
-    "program": "[TODO] Programme",
+    "program": "Programa",
     "publish_edition": "Publicar edição",
     "returned": "✅ Devolvido",
     "services_offered": "Serviços oferecidos",
@@ -1413,6 +1413,7 @@
     "cannot_load_comments": "Não é possível carregar comentários",
     "cannot_load_convention": "Impossível carregar os dados da convenção",
     "cannot_load_editions": "Impossível carregar as edições",
+    "cannot_pin_post": "Não é possível fixar a publicação",
     "cannot_publish_comment": "Impossível publicar o comentário",
     "cannot_publish_reply": "Impossível publicar a resposta",
     "cannot_remove_favorite": "Não é possível remover dos favoritos",
@@ -1626,6 +1627,10 @@
     "login_success": "Sessão iniciada com sucesso!",
     "offer_deleted": "Oferta eliminada",
     "offer_deleted_successfully": "A sua oferta de boleia foi eliminada com sucesso",
+    "post_pinned": "Publicação fixada",
+    "post_pinned_successfully": "A publicação foi fixada com sucesso",
+    "post_unpinned": "Publicação desafixada",
+    "post_unpinned_successfully": "A publicação foi desafixada com sucesso",
     "removed_from_favorites": "Removido dos favoritos",
     "reply_deleted": "Resposta eliminada",
     "reply_deleted_successfully": "A resposta foi eliminada com sucesso",
@@ -2082,6 +2087,6 @@
     "name_max_200": "O nome não pode exceder 200 caracteres",
     "name_min_3": "O nome deve conter pelo menos 3 caracteres",
     "phone_required": "O número de telefone é obrigatório",
-    "program_max_10000": "[TODO] Le programme ne peut pas dépasser 10000 caractères"
+    "program_max_10000": "O programa não pode exceder 10000 caracteres"
   }
 }

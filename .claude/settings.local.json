@@ -110,7 +110,8 @@
       "Bash(NODE_ENV=test npx vitest run test/nuxt/pages/auth.reset-password.page.nuxt.test.ts)",
       "Bash(NODE_ENV=test npx vitest run test/nuxt/server/api/auth/resend-verification.post.test.ts)",
       "SlashCommand(/quality-check)",
-      "mcp__nuxt__search_nuxt_docs"
+      "mcp__nuxt__search_nuxt_docs",
+      "mcp__nuxt-ui__list_components"
     ],
     "deny": [],
     "ask": [],

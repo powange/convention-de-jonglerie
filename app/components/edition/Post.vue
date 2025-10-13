@@ -5,15 +5,34 @@
       <div class="flex items-start justify-between">
         <UiUserDisplay :user="post.user" :datetime="post.createdAt" size="lg" />
 
-        <!-- Menu d'actions -->
-        <UButton
-          v-if="canDeletePost"
-          color="neutral"
-          variant="ghost"
-          icon="i-heroicons-trash"
-          size="sm"
-          @click="deletePost"
-        />
+        <!-- Menu d'actions et badge -->
+        <div class="flex items-center gap-2">
+          <!-- Badge épinglé -->
+          <UBadge v-if="post.pinned" color="primary" variant="subtle" size="sm">
+            <div class="flex items-center gap-1">
+              <UIcon name="i-heroicons-bookmark-solid" />
+              <span>{{ $t('components.posts.pinned') }}</span>
+            </div>
+          </UBadge>
+
+          <!-- Boutons d'action -->
+          <UButton
+            v-if="canPin"
+            color="neutral"
+            variant="ghost"
+            :icon="post.pinned ? 'i-heroicons-bookmark-solid' : 'i-heroicons-bookmark'"
+            size="sm"
+            @click="togglePin"
+          />
+          <UButton
+            v-if="canDeletePost"
+            color="neutral"
+            variant="ghost"
+            icon="i-heroicons-trash"
+            size="sm"
+            @click="deletePost"
+          />
+        </div>
       </div>
     </template>
 
@@ -25,45 +44,85 @@
     <!-- Actions du post -->
     <div class="flex items-center gap-4 py-2 border-t border-gray-200 dark:border-gray-700">
       <UButton
-        v-if="authStore.isAuthenticated"
-        color="neutral"
-        variant="ghost"
-        size="sm"
-        :icon="showReplyForm ? 'i-heroicons-x-mark' : 'i-heroicons-chat-bubble-left'"
-        @click="toggleReplyForm"
-      >
-        {{ showReplyForm ? $t('common.cancel') : $t('components.posts.reply') }}
-      </UButton>
-
-      <UButton
-        v-if="post.comments.length > 0"
         color="neutral"
         variant="ghost"
         size="sm"
         :icon="showComments ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
         @click="showComments = !showComments"
       >
-        {{ $t('components.posts.replies_count', { count: post.comments.length }) }}
+        {{ $t('components.posts.comments_count', { count: post.comments.length }) }}
       </UButton>
     </div>
 
-    <!-- Formulaire de réponse -->
+    <!-- Liste des commentaires -->
+    <div v-if="post.comments.length > 0 && showComments" class="mt-4 ml-8 space-y-2">
+      <UChatMessage
+        v-for="comment in post.comments"
+        :id="String(comment.id)"
+        :key="comment.id"
+        role="user"
+        :parts="[{ type: 'text', text: comment.content }]"
+        :avatar="{
+          src: comment.user.profilePicture,
+          alt: comment.user.pseudo,
+        }"
+        variant="soft"
+        side="left"
+        :actions="
+          canDeleteComment(comment)
+            ? [
+                {
+                  icon: 'i-heroicons-trash',
+                  color: 'error',
+                  onClick: () => deleteComment(comment.id),
+                },
+              ]
+            : undefined
+        "
+      >
+        <template #leading>
+          <div class="flex flex-col items-start">
+            <UiUserAvatar
+              :user="{
+                id: comment.user.id,
+                pseudo: comment.user.pseudo,
+                profilePicture: comment.user.profilePicture,
+                emailHash: comment.user.emailHash,
+              }"
+              size="md"
+            />
+            <span class="text-xs font-medium mt-1">{{ comment.user.pseudo }}</span>
+          </div>
+        </template>
+        <template #content>
+          <div class="flex flex-col gap-1">
+            <p class="whitespace-pre-wrap">{{ comment.content }}</p>
+            <span class="text-[10px] text-gray-400 dark:text-gray-500 opacity-70">{{
+              formatDateTime(comment.createdAt)
+            }}</span>
+          </div>
+        </template>
+      </UChatMessage>
+    </div>
+
+    <!-- Formulaire de commentaire -->
     <div
-      v-if="showReplyForm && authStore.isAuthenticated"
-      class="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+      v-if="showComments && authStore.isAuthenticated"
+      class="mt-4 ml-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
     >
       <UForm :state="replyForm" :validate="validateReply" @submit="submitReply">
-        <UFormField :label="$t('components.posts.your_reply')" name="content" required>
+        <UFormField :label="$t('components.posts.your_comment')" name="content" required>
           <UTextarea
             v-model="replyForm.content"
-            :placeholder="$t('components.posts.your_reply_placeholder')"
-            :rows="3"
+            :placeholder="$t('components.posts.your_comment_placeholder')"
+            :rows="1"
             :maxlength="1000"
+            autoresize
             class="w-full"
           />
           <template #help>
             <div class="flex justify-between text-xs">
-              <span>{{ $t('components.posts.reply_to_comment') }}</span>
+              <span>{{ $t('components.posts.reply_to_post') }}</span>
               <span :class="replyForm.content.length > 900 ? 'text-warning-500' : 'text-gray-500'">
                 {{ replyForm.content.length }}/1000
               </span>
@@ -71,10 +130,7 @@
           </template>
         </UFormField>
 
-        <div class="flex justify-end gap-2 mt-3">
-          <UButton type="button" color="neutral" variant="ghost" size="sm" @click="toggleReplyForm">
-            {{ $t('common.cancel') }}
-          </UButton>
+        <div class="flex justify-end mt-3">
           <UButton
             type="submit"
             size="sm"
@@ -85,34 +141,6 @@
           </UButton>
         </div>
       </UForm>
-    </div>
-
-    <!-- Liste des commentaires -->
-    <div v-if="post.comments.length > 0 && showComments" class="mt-4 space-y-3">
-      <div
-        v-for="comment in post.comments"
-        :key="comment.id"
-        class="flex gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
-      >
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between">
-            <UiUserDisplay :user="comment.user" :datetime="comment.createdAt" size="md" />
-
-            <!-- Menu d'actions pour le commentaire -->
-            <UButton
-              v-if="canDeleteComment(comment)"
-              color="neutral"
-              variant="ghost"
-              icon="i-heroicons-trash"
-              size="xs"
-              @click="deleteComment(comment.id)"
-            />
-          </div>
-          <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 whitespace-pre-wrap">
-            {{ comment.content }}
-          </p>
-        </div>
-      </div>
     </div>
   </UCard>
 
@@ -171,11 +199,13 @@ interface Post {
   createdAt: string
   user: User
   comments: Comment[]
+  pinned: boolean
 }
 
 interface Props {
   post: Post
   currentUserId?: number
+  canPin?: boolean
 }
 
 const props = defineProps<Props>()
@@ -183,11 +213,12 @@ const emit = defineEmits<{
   'delete-post': [postId: number]
   'add-comment': [postId: number, content: string]
   'delete-comment': [postId: number, commentId: number]
+  'toggle-pin': [postId: number, currentPinned: boolean]
 }>()
 
 const authStore = useAuthStore()
+const { formatDateTime } = useDateFormat()
 
-const showReplyForm = ref(false)
 const showComments = ref(false)
 const isSubmittingReply = ref(false)
 
@@ -220,22 +251,13 @@ const validateReply = (state: ReplyFormState) => {
   return errors
 }
 
-// Basculer le formulaire de réponse
-const toggleReplyForm = () => {
-  showReplyForm.value = !showReplyForm.value
-  if (!showReplyForm.value) {
-    replyForm.content = ''
-  }
-}
-
 // Soumettre une réponse
 const submitReply = async () => {
   isSubmittingReply.value = true
   try {
     await emit('add-comment', props.post.id, replyForm.content.trim())
     replyForm.content = ''
-    showReplyForm.value = false
-    showComments.value = true // Ouvrir les commentaires pour voir la nouvelle réponse
+    showComments.value = true // Garder les commentaires ouverts pour voir le nouveau commentaire
   } finally {
     isSubmittingReply.value = false
   }
@@ -268,5 +290,10 @@ const confirmDeleteComment = () => {
   }
   showDeleteCommentModal.value = false
   commentToDelete.value = null
+}
+
+// Épingler/désépingler le post
+const togglePin = () => {
+  emit('toggle-pin', props.post.id, props.post.pinned)
 }
 </script>

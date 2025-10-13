@@ -597,7 +597,7 @@
     "postal_code": "Postal code",
     "previous": "Previous",
     "private": "Private",
-    "program": "[TODO] Programme",
+    "program": "Program",
     "quantity": "Quantity",
     "refresh": "Refresh",
     "remove": "Remove",
@@ -721,7 +721,7 @@
       "poster_alt": "Edition poster",
       "poster_placeholder": "Click to select the edition poster",
       "previous": "Previous",
-      "program_placeholder": "[TODO] Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
+      "program_placeholder": "Describe the edition's program (schedule, workshops, shows...)",
       "social_networks_description": "Share your pages to increase visibility",
       "social_networks_title": "Social Networks",
       "step_about_description": "Edition description",
@@ -755,15 +755,15 @@
       "yellow_border_favorite": "Yellow border = Favorite"
     },
     "posts": {
+      "comments_count": "{count} comment | {count} comments",
       "confirm_delete_comment": "Are you sure you want to delete this comment? This action is irreversible.",
       "confirm_delete_post": "Are you sure you want to delete this post? This action is irreversible.",
       "confirm_delete_title": "Confirm deletion",
+      "pinned": "Pinned",
       "publish": "Publish",
-      "replies_count": "{count} reply | {count} replies",
-      "reply": "Reply",
-      "reply_to_comment": "Reply to this comment",
-      "your_reply": "Your reply",
-      "your_reply_placeholder": "Your reply..."
+      "reply_to_post": "Comment on this post",
+      "your_comment": "Your comment",
+      "your_comment_placeholder": "Your comment..."
     }
   },
   "conventions": {
@@ -900,7 +900,7 @@
     "poster_of": "Poster of {name}",
     "posts": "Posts",
     "practical_info": "Practical information",
-    "program": "[TODO] Programme",
+    "program": "Program",
     "publish_edition": "Publish edition",
     "returned": "✅ Returned",
     "services_offered": "Services offered",
@@ -1413,6 +1413,7 @@
     "cannot_load_comments": "Cannot load comments",
     "cannot_load_convention": "Cannot load convention data",
     "cannot_load_editions": "Cannot load editions",
+    "cannot_pin_post": "Cannot pin post",
     "cannot_publish_comment": "Cannot publish comment",
     "cannot_publish_reply": "Cannot publish reply",
     "cannot_remove_favorite": "Cannot remove from favorites",
@@ -1626,6 +1627,10 @@
     "login_success": "Login successful!",
     "offer_deleted": "Offer deleted",
     "offer_deleted_successfully": "Your carpool offer has been successfully deleted",
+    "post_pinned": "Post pinned",
+    "post_pinned_successfully": "Post has been pinned successfully",
+    "post_unpinned": "Post unpinned",
+    "post_unpinned_successfully": "Post has been unpinned successfully",
     "removed_from_favorites": "Removed from favorites",
     "reply_deleted": "Reply deleted",
     "reply_deleted_successfully": "The reply has been successfully deleted",
@@ -2082,6 +2087,6 @@
     "name_max_200": "Name cannot exceed 200 characters",
     "name_min_3": "Name must contain at least 3 characters",
     "phone_required": "Phone number is required",
-    "program_max_10000": "[TODO] Le programme ne peut pas dépasser 10000 caractères"
+    "program_max_10000": "The program cannot exceed 10000 characters"
   }
 }

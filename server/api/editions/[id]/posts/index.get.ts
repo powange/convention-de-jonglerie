@@ -52,7 +52,10 @@ export default defineEventHandler(async (event) => {
           orderBy: { createdAt: 'asc' },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [
+        { pinned: 'desc' }, // Posts épinglés en premier
+        { createdAt: 'desc' }, // Puis par date de création
+      ],
     })
 
     // Transformer les emails en emailHash

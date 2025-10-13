@@ -597,7 +597,7 @@
     "postal_code": "Postnummer",
     "previous": "Forrige",
     "private": "Privat",
-    "program": "[TODO] Programme",
+    "program": "Program",
     "quantity": "Antal",
     "refresh": "Opdater",
     "remove": "Fjern",
@@ -721,7 +721,7 @@
       "poster_alt": "Udgaveplakat",
       "poster_placeholder": "Klik for at vælge udgaveplakat",
       "previous": "Forrige",
-      "program_placeholder": "[TODO] Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
+      "program_placeholder": "Beskriv programmet for udgaven (tider, workshops, forestillinger...)",
       "social_networks_description": "Del dine sider for at øge synligheden",
       "social_networks_title": "Sociale netværk",
       "step_about_description": "Udgavebeskrivelse",
@@ -755,15 +755,15 @@
       "yellow_border_favorite": "Gul kant = Favorit"
     },
     "posts": {
+      "comments_count": "{count} kommentar | {count} kommentarer",
       "confirm_delete_comment": "Er du sikker på, at du vil slette denne kommentar? Denne handling kan ikke fortrydes.",
       "confirm_delete_post": "Er du sikker på, at du vil slette dette indlæg? Denne handling kan ikke fortrydes.",
       "confirm_delete_title": "Bekræft sletning",
+      "pinned": "Fastgjort",
       "publish": "Offentliggør",
-      "replies_count": "{count} svar | {count} svar",
-      "reply": "Svar",
-      "reply_to_comment": "Svar på denne kommentar",
-      "your_reply": "Dit svar",
-      "your_reply_placeholder": "Dit svar..."
+      "reply_to_post": "Kommenter denne publikation",
+      "your_comment": "Din kommentar",
+      "your_comment_placeholder": "Din kommentar..."
     }
   },
   "conventions": {
@@ -900,7 +900,7 @@
     "poster_of": "Plakat for {name}",
     "posts": "Opslag",
     "practical_info": "Praktiske oplysninger",
-    "program": "[TODO] Programme",
+    "program": "Program",
     "publish_edition": "Publicer udgave",
     "returned": "✅ Returneret",
     "services_offered": "Tilbudte tjenester",
@@ -1413,6 +1413,7 @@
     "cannot_load_comments": "Kan ikke indlæse kommentarer",
     "cannot_load_convention": "Kan ikke indlæse konventionsdata",
     "cannot_load_editions": "Kan ikke indlæse udgaver",
+    "cannot_pin_post": "Kan ikke fastgøre indlægget",
     "cannot_publish_comment": "Kan ikke offentliggøre kommentar",
     "cannot_publish_reply": "Kan ikke offentliggøre svar",
     "cannot_remove_favorite": "Kan ikke fjerne fra favoritter",
@@ -1626,6 +1627,10 @@
     "login_success": "Login vellykket!",
     "offer_deleted": "Tilbud slettet",
     "offer_deleted_successfully": "Dit samkørselstilbud blev slettet med succes",
+    "post_pinned": "Indlæg fastgjort",
+    "post_pinned_successfully": "Indlægget er blevet fastgjort",
+    "post_unpinned": "Indlæg frigivet",
+    "post_unpinned_successfully": "Indlægget er blevet frigivet",
     "removed_from_favorites": "Fjernet fra favoritter",
     "reply_deleted": "Svar slettet",
     "reply_deleted_successfully": "Svaret blev slettet med succes",
@@ -2082,6 +2087,6 @@
     "name_max_200": "Navnet må ikke overskride 200 tegn",
     "name_min_3": "Navnet skal indeholde mindst 3 tegn",
     "phone_required": "Telefonnummer er påkrævet",
-    "program_max_10000": "[TODO] Le programme ne peut pas dépasser 10000 caractères"
+    "program_max_10000": "Programmet må ikke overstige 10000 tegn"
   }
 }

@@ -597,7 +597,7 @@
     "postal_code": "Postcode",
     "previous": "Vorige",
     "private": "Privé",
-    "program": "[TODO] Programme",
+    "program": "Programma",
     "quantity": "Hoeveelheid",
     "refresh": "Vernieuwen",
     "remove": "Verwijderen",
@@ -721,7 +721,7 @@
       "poster_alt": "Editieposter",
       "poster_placeholder": "Klik om editieposter te selecteren",
       "previous": "Vorige",
-      "program_placeholder": "[TODO] Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
+      "program_placeholder": "Beschrijf het programma van de editie (tijdschema, workshops, voorstellingen...)",
       "social_networks_description": "Deel uw pagina's om de zichtbaarheid te vergroten",
       "social_networks_title": "Sociale netwerken",
       "step_about_description": "Editiebeschrijving",
@@ -755,15 +755,15 @@
       "yellow_border_favorite": "Gele rand = Favoriet"
     },
     "posts": {
+      "comments_count": "{count} reactie | {count} reacties",
       "confirm_delete_comment": "Weet je zeker dat je deze opmerking wilt verwijderen? Deze actie is onomkeerbaar.",
       "confirm_delete_post": "Weet je zeker dat je dit bericht wilt verwijderen? Deze actie is onomkeerbaar.",
       "confirm_delete_title": "Verwijdering bevestigen",
+      "pinned": "Vastgezet",
       "publish": "Publiceren",
-      "replies_count": "{count} antwoord | {count} antwoorden",
-      "reply": "Antwoorden",
-      "reply_to_comment": "Antwoord op deze opmerking",
-      "your_reply": "Je antwoord",
-      "your_reply_placeholder": "Je antwoord..."
+      "reply_to_post": "Reageer op deze publicatie",
+      "your_comment": "Jouw reactie",
+      "your_comment_placeholder": "Jouw reactie..."
     }
   },
   "conventions": {
@@ -900,7 +900,7 @@
     "poster_of": "Poster van {name}",
     "posts": "Berichten",
     "practical_info": "Praktische informatie",
-    "program": "[TODO] Programme",
+    "program": "Programma",
     "publish_edition": "Editie publiceren",
     "returned": "✅ Teruggegeven",
     "services_offered": "Aangeboden diensten",
@@ -1413,6 +1413,7 @@
     "cannot_load_comments": "Kan opmerkingen niet laden",
     "cannot_load_convention": "Kan conventiegegevens niet laden",
     "cannot_load_editions": "Kan edities niet laden",
+    "cannot_pin_post": "Kan bericht niet vastzetten",
     "cannot_publish_comment": "Kan opmerking niet publiceren",
     "cannot_publish_reply": "Kan antwoord niet publiceren",
     "cannot_remove_favorite": "Kan niet uit favorieten verwijderen",
@@ -1626,6 +1627,10 @@
     "login_success": "Succesvol ingelogd!",
     "offer_deleted": "Aanbieding verwijderd",
     "offer_deleted_successfully": "Je meerijdaanbieding is succesvol verwijderd",
+    "post_pinned": "Bericht vastgezet",
+    "post_pinned_successfully": "Bericht is succesvol vastgezet",
+    "post_unpinned": "Bericht losgemaakt",
+    "post_unpinned_successfully": "Bericht is succesvol losgemaakt",
     "removed_from_favorites": "Verwijderd uit favorieten",
     "reply_deleted": "Antwoord verwijderd",
     "reply_deleted_successfully": "Het antwoord is succesvol verwijderd",
@@ -2082,6 +2087,6 @@
     "name_max_200": "Naam mag niet meer dan 200 tekens bevatten",
     "name_min_3": "Naam moet minstens 3 tekens bevatten",
     "phone_required": "Telefoonnummer is vereist",
-    "program_max_10000": "[TODO] Le programme ne peut pas dépasser 10000 caractères"
+    "program_max_10000": "Het programma mag niet meer dan 10000 tekens bevatten"
   }
 }

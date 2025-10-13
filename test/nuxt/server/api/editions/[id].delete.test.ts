@@ -306,6 +306,15 @@ describe('/api/editions/[id] DELETE', () => {
     expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
       include: {
+        collaboratorPermissions: {
+          include: {
+            collaborator: {
+              select: {
+                userId: true,
+              },
+            },
+          },
+        },
         convention: {
           include: {
             collaborators: {
