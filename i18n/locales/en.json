@@ -467,7 +467,7 @@
     "meeting_location": "Meeting location",
     "music_allowed": "Music allowed",
     "music_description": "You're okay with listening to music during the trip",
-    "no_city_found": "[TODO] Aucune ville trouvée",
+    "no_city_found": "No city found",
     "offer": {
       "available_seats": "Available seats",
       "create": "Create carpool offer",
@@ -475,7 +475,8 @@
       "created": "Carpool offer created",
       "edit_description": "Edit your carpool offer details",
       "seats_description": "Number of available seats in your vehicle",
-      "seats_placeholder": "e.g., 3"
+      "seats_placeholder": "e.g., 3",
+      "updated": "Carpool offer updated"
     },
     "pets_allowed": "Pets allowed",
     "pets_description": "You accept pets or travel with animals",
@@ -491,7 +492,8 @@
       "edit_description": "Edit your carpool request details",
       "required_seats": "Required seats",
       "seats_description": "Number of seats you need for your group",
-      "seats_placeholder": "e.g., 2"
+      "seats_placeholder": "e.g., 2",
+      "updated": "Carpool request updated"
     },
     "route": "Route",
     "select_date_time": "Select a date and time",
@@ -499,7 +501,7 @@
     "smoking_allowed": "Smoking allowed",
     "smoking_description": "You allow smokers in your vehicle or are a smoker",
     "trip_details": "Trip details",
-    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
+    "type_at_least_3_chars": "Type at least 3 characters to search",
     "validation": {
       "date_invalid": "Invalid date",
       "departure_address_required": "Departure address is required",
@@ -542,7 +544,6 @@
     "convention": "Convention",
     "country": "Country",
     "create": "Create",
-    "creating": "Creating...",
     "date": "Date",
     "dates": "Dates",
     "day": "Day",
@@ -987,6 +988,8 @@
       "accept_note_label": "Acceptance note (optional)",
       "accept_note_placeholder": "Add a note or instructions for this volunteer...",
       "acceptance_note_title": "Acceptance note",
+      "access_control_team": "Access control team",
+      "access_control_team_hint": "This team handles access control and entry validation",
       "action_accept": "Accept",
       "action_back_pending": "Back to pending",
       "action_edit_teams": "Assign teams",

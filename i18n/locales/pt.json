@@ -467,7 +467,7 @@
     "meeting_location": "Local de encontro",
     "music_allowed": "Música permitida",
     "music_description": "Concorda em ouvir música durante a viagem",
-    "no_city_found": "[TODO] Aucune ville trouvée",
+    "no_city_found": "Nenhuma cidade encontrada",
     "offer": {
       "available_seats": "Lugares disponíveis",
       "create": "Criar oferta de carona",
@@ -475,7 +475,8 @@
       "created": "Oferta de carona criada",
       "edit_description": "Edite os detalhes da sua oferta de carona",
       "seats_description": "Número de lugares livres no seu veículo",
-      "seats_placeholder": "ex.: 3"
+      "seats_placeholder": "ex.: 3",
+      "updated": "Oferta de carona atualizada"
     },
     "pets_allowed": "Animais permitidos",
     "pets_description": "Aceita animais de estimação ou viaja com animais",
@@ -491,7 +492,8 @@
       "edit_description": "Edite os detalhes do seu pedido de carona",
       "required_seats": "Lugares necessários",
       "seats_description": "Número de lugares que precisa para o seu grupo",
-      "seats_placeholder": "ex.: 2"
+      "seats_placeholder": "ex.: 2",
+      "updated": "Pedido de carona atualizado"
     },
     "route": "Rota",
     "select_date_time": "Selecionar data e hora",
@@ -499,7 +501,7 @@
     "smoking_allowed": "Fumar permitido",
     "smoking_description": "Permite fumadores no seu veículo ou é fumador",
     "trip_details": "Detalhes da viagem",
-    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
+    "type_at_least_3_chars": "Digite pelo menos 3 caracteres para pesquisar",
     "validation": {
       "date_invalid": "Data inválida",
       "departure_address_required": "O endereço de partida é obrigatório",
@@ -542,7 +544,6 @@
     "convention": "Convenção",
     "country": "País",
     "create": "Criar",
-    "creating": "A criar...",
     "date": "Data",
     "dates": "Datas",
     "day": "Dia",
@@ -987,6 +988,8 @@
       "accept_note_label": "Nota de aceitação (opcional)",
       "accept_note_placeholder": "Adicione uma nota ou instruções para este voluntário...",
       "acceptance_note_title": "Nota de aceitação",
+      "access_control_team": "Equipe de controle de acesso",
+      "access_control_team_hint": "Esta equipe cuida do controle de acesso e validação de entradas",
       "action_accept": "Aceitar",
       "action_back_pending": "Voltar para pendente",
       "action_edit_teams": "Atribuir equipes",

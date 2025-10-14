@@ -467,7 +467,7 @@
     "meeting_location": "Miejsce spotkania",
     "music_allowed": "Muzyka dozwolona",
     "music_description": "Zgadzasz się na słuchanie muzyki podczas podróży",
-    "no_city_found": "[TODO] Aucune ville trouvée",
+    "no_city_found": "Nie znaleziono miasta",
     "offer": {
       "available_seats": "Dostępne miejsca",
       "create": "Utwórz ofertę wspólnego przejazdu",
@@ -475,7 +475,8 @@
       "created": "Oferta wspólnego przejazdu utworzona",
       "edit_description": "Edytuj szczegóły swojej oferty wspólnego przejazdu",
       "seats_description": "Liczba wolnych miejsc w twoim pojeździe",
-      "seats_placeholder": "np. 3"
+      "seats_placeholder": "np. 3",
+      "updated": "Oferta carpoolingu zaktualizowana"
     },
     "pets_allowed": "Zwierzęta dozwolone",
     "pets_description": "Akceptujesz zwierzęta lub podróżujesz ze zwierzętami",
@@ -491,7 +492,8 @@
       "edit_description": "Edytuj szczegóły swojego zapytania o wspólny przejazd",
       "required_seats": "Wymagane miejsca",
       "seats_description": "Liczba miejsc potrzebnych dla twojej grupy",
-      "seats_placeholder": "np. 2"
+      "seats_placeholder": "np. 2",
+      "updated": "Prośba o carpoling zaktualizowana"
     },
     "route": "Trasa",
     "select_date_time": "Wybierz datę i godzinę",
@@ -499,7 +501,7 @@
     "smoking_allowed": "Palenie dozwolone",
     "smoking_description": "Zezwalasz na palenie w swoim pojeździe lub palisz",
     "trip_details": "Szczegóły podróży",
-    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
+    "type_at_least_3_chars": "Wpisz co najmniej 3 znaki, aby wyszukać",
     "validation": {
       "date_invalid": "Nieprawidłowa data",
       "departure_address_required": "Adres wyjazdu jest wymagany",
@@ -542,7 +544,6 @@
     "convention": "Konwencja",
     "country": "Kraj",
     "create": "Utwórz",
-    "creating": "Tworzenie...",
     "date": "Data",
     "dates": "Daty",
     "day": "Dzień",
@@ -987,6 +988,8 @@
       "accept_note_label": "Notatka akceptacji (opcjonalne)",
       "accept_note_placeholder": "Dodaj notatkę lub instrukcje dla tego wolontariusza...",
       "acceptance_note_title": "Notatka akceptacji",
+      "access_control_team": "Zespół kontroli dostępu",
+      "access_control_team_hint": "Ten zespół zajmuje się kontrolą dostępu i walidacją wejść",
       "action_accept": "Zaakceptuj",
       "action_back_pending": "Wróć do oczekujących",
       "action_edit_teams": "Przypisz zespoły",

@@ -556,6 +556,8 @@ model ApiErrorLog {
   path            String   // URL path sans query params
   userAgent       String?  @db.Text
   ip              String?
+  referer         String?  @db.Text // Page d'origine de la requête
+  origin          String?  // Domaine d'origine
   
   // Données de la requête
   headers         Json?    // Headers de la requête (sans données sensibles)

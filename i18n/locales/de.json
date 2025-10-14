@@ -467,7 +467,7 @@
     "meeting_location": "Treffpunkt",
     "music_allowed": "Musik erlaubt",
     "music_description": "Sie sind einverstanden, während der Fahrt Musik zu hören",
-    "no_city_found": "[TODO] Aucune ville trouvée",
+    "no_city_found": "Keine Stadt gefunden",
     "offer": {
       "available_seats": "Verfügbare Plätze",
       "create": "Mitfahrangebot erstellen",
@@ -475,7 +475,8 @@
       "created": "Mitfahrangebot erstellt",
       "edit_description": "Bearbeiten Sie die Details Ihres Mitfahrangebots",
       "seats_description": "Anzahl freier Plätze in Ihrem Fahrzeug",
-      "seats_placeholder": "z. B. 3"
+      "seats_placeholder": "z. B. 3",
+      "updated": "Fahrgemeinschaftsangebot aktualisiert"
     },
     "pets_allowed": "Haustiere erlaubt",
     "pets_description": "Sie akzeptieren Haustiere oder reisen mit Haustieren",
@@ -491,7 +492,8 @@
       "edit_description": "Bearbeiten Sie die Details Ihrer Mitfahranfrage",
       "required_seats": "Benötigte Plätze",
       "seats_description": "Anzahl der Plätze, die Sie für Ihre Gruppe benötigen",
-      "seats_placeholder": "z. B. 2"
+      "seats_placeholder": "z. B. 2",
+      "updated": "Fahrgemeinschaftsanfrage aktualisiert"
     },
     "route": "Route",
     "select_date_time": "Datum und Uhrzeit wählen",
@@ -499,7 +501,7 @@
     "smoking_allowed": "Rauchen erlaubt",
     "smoking_description": "Sie erlauben Raucher in Ihrem Fahrzeug oder sind Raucher",
     "trip_details": "Reisedetails",
-    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
+    "type_at_least_3_chars": "Geben Sie mindestens 3 Zeichen ein, um zu suchen",
     "validation": {
       "date_invalid": "Ungültiges Datum",
       "departure_address_required": "Die Abfahrtsadresse ist erforderlich",
@@ -542,7 +544,6 @@
     "convention": "Convention",
     "country": "Land",
     "create": "Erstellen",
-    "creating": "Wird erstellt...",
     "date": "Datum",
     "dates": "Termine",
     "day": "Tag",
@@ -987,6 +988,8 @@
       "accept_note_label": "Akzeptanznotiz (optional)",
       "accept_note_placeholder": "Fügen Sie eine Notiz oder Anweisungen für diesen Freiwilligen hinzu...",
       "acceptance_note_title": "Akzeptanznotiz",
+      "access_control_team": "Zugangskontrollteam",
+      "access_control_team_hint": "Dieses Team kümmert sich um die Zugangskontrolle und die Validierung der Eintrittskarten",
       "action_accept": "Akzeptieren",
       "action_back_pending": "Zurück zu ausstehend",
       "action_edit_teams": "Teams zuweisen",

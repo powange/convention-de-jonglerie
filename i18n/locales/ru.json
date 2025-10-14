@@ -467,7 +467,7 @@
     "meeting_location": "Место встречи",
     "music_allowed": "Музыка разрешена",
     "music_description": "Вы согласны слушать музыку во время поездки",
-    "no_city_found": "[TODO] Aucune ville trouvée",
+    "no_city_found": "Город не найден",
     "offer": {
       "available_seats": "Доступные места",
       "create": "Создать предложение попутки",
@@ -475,7 +475,8 @@
       "created": "Предложение попутки создано",
       "edit_description": "Измените детали вашего предложения попутки",
       "seats_description": "Количество свободных мест в вашем автомобиле",
-      "seats_placeholder": "напр., 3"
+      "seats_placeholder": "напр., 3",
+      "updated": "Предложение совместной поездки обновлено"
     },
     "pets_allowed": "Разрешены животные",
     "pets_description": "Вы принимаете домашних животных или путешествуете с ними",
@@ -491,7 +492,8 @@
       "edit_description": "Измените детали вашего запроса попутки",
       "required_seats": "Требуемые места",
       "seats_description": "Количество мест, необходимых для вашей группы",
-      "seats_placeholder": "напр., 2"
+      "seats_placeholder": "напр., 2",
+      "updated": "Запрос совместной поездки обновлён"
     },
     "route": "Маршрут",
     "select_date_time": "Выберите дату и время",
@@ -499,7 +501,7 @@
     "smoking_allowed": "Разрешено курение",
     "smoking_description": "Вы разрешаете курильщиков в вашем автомобиле или курите сами",
     "trip_details": "Детали поездки",
-    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
+    "type_at_least_3_chars": "Введите не менее 3 символов для поиска",
     "validation": {
       "date_invalid": "Недействительная дата",
       "departure_address_required": "Адрес отправления обязателен",
@@ -542,7 +544,6 @@
     "convention": "Конвенция",
     "country": "Страна",
     "create": "Создать",
-    "creating": "Создание...",
     "date": "Дата",
     "dates": "Даты",
     "day": "День",
@@ -987,6 +988,8 @@
       "accept_note_label": "Примечание к принятию (необязательно)",
       "accept_note_placeholder": "Добавьте примечание или инструкции для этого волонтёра...",
       "acceptance_note_title": "Примечание к принятию",
+      "access_control_team": "Команда контроля доступа",
+      "access_control_team_hint": "Эта команда отвечает за контроль доступа и проверку входных билетов",
       "action_accept": "Принять",
       "action_back_pending": "Вернуть в ожидание",
       "action_edit_teams": "Назначить команды",

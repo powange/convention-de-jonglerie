@@ -467,7 +467,7 @@
     "meeting_location": "Luogo di incontro",
     "music_allowed": "Musica consentita",
     "music_description": "Sei d'accordo ad ascoltare musica durante il viaggio",
-    "no_city_found": "[TODO] Aucune ville trouvée",
+    "no_city_found": "Nessuna città trovata",
     "offer": {
       "available_seats": "Posti disponibili",
       "create": "Crea offerta di car pooling",
@@ -475,7 +475,8 @@
       "created": "Offerta di car pooling creata",
       "edit_description": "Modifica i dettagli della tua offerta di carpool",
       "seats_description": "Numero di posti liberi nel tuo veicolo",
-      "seats_placeholder": "es. 3"
+      "seats_placeholder": "es. 3",
+      "updated": "Offerta di carpooling aggiornata"
     },
     "pets_allowed": "Animali ammessi",
     "pets_description": "Accetti animali domestici o viaggi con animali",
@@ -491,7 +492,8 @@
       "edit_description": "Modifica i dettagli della tua richiesta di carpool",
       "required_seats": "Posti richiesti",
       "seats_description": "Numero di posti necessari per il tuo gruppo",
-      "seats_placeholder": "es. 2"
+      "seats_placeholder": "es. 2",
+      "updated": "Richiesta di carpooling aggiornata"
     },
     "route": "Percorso",
     "select_date_time": "Seleziona data e ora",
@@ -499,7 +501,7 @@
     "smoking_allowed": "Fumo consentito",
     "smoking_description": "Permetti fumatori nel tuo veicolo o sei fumatore",
     "trip_details": "Dettagli del viaggio",
-    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
+    "type_at_least_3_chars": "Digita almeno 3 caratteri per cercare",
     "validation": {
       "date_invalid": "Data non valida",
       "departure_address_required": "L'indirizzo di partenza è richiesto",
@@ -542,7 +544,6 @@
     "convention": "Convegno",
     "country": "Paese",
     "create": "Crea",
-    "creating": "Creazione in corso...",
     "date": "Data",
     "dates": "Date",
     "day": "Giorno",
@@ -987,6 +988,8 @@
       "accept_note_label": "Nota di accettazione (opzionale)",
       "accept_note_placeholder": "Aggiungi una nota o istruzioni per questo volontario...",
       "acceptance_note_title": "Nota di accettazione",
+      "access_control_team": "Squadra di controllo accessi",
+      "access_control_team_hint": "Questa squadra gestisce il controllo degli accessi e la validazione degli ingressi",
       "action_accept": "Accetta",
       "action_back_pending": "Torna in attesa",
       "action_edit_teams": "Assegna squadre",

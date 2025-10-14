@@ -98,6 +98,8 @@ export default defineEventHandler(async (event) => {
       path: true,
       userAgent: true,
       ip: true,
+      referer: true, // Page d'origine
+      origin: true, // Domaine d'origine
       resolved: true,
       resolvedBy: true,
       resolvedAt: true,
@@ -114,8 +116,8 @@ export default defineEventHandler(async (event) => {
       },
       // Inclure certaines métadonnées utiles sans exposer les données sensibles
       queryParams: true,
+      body: true, // Inclure le body (sanitisé) pour le debug
       headers: false, // Pas dans la liste par défaut (trop verbeux)
-      body: false, // Pas dans la liste par défaut (peut être sensible)
       stack: false, // Pas dans la liste par défaut (très verbeux)
     },
   })

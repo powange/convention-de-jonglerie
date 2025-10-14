@@ -467,7 +467,7 @@
     "meeting_location": "Lugar de encuentro",
     "music_allowed": "Música permitida",
     "music_description": "Estás de acuerdo con escuchar música durante el viaje",
-    "no_city_found": "[TODO] Aucune ville trouvée",
+    "no_city_found": "Ninguna ciudad encontrada",
     "offer": {
       "available_seats": "Plazas disponibles",
       "create": "Crear oferta de viaje compartido",
@@ -475,7 +475,8 @@
       "created": "Oferta de viaje creada",
       "edit_description": "Edita los detalles de tu oferta de viaje compartido",
       "seats_description": "Número de plazas libres en tu vehículo",
-      "seats_placeholder": "p. ej., 3"
+      "seats_placeholder": "p. ej., 3",
+      "updated": "Oferta de viaje compartido actualizada"
     },
     "pets_allowed": "Se permiten mascotas",
     "pets_description": "Aceptas mascotas o viajas con mascotas",
@@ -491,7 +492,8 @@
       "edit_description": "Edita los detalles de tu solicitud de viaje compartido",
       "required_seats": "Plazas requeridas",
       "seats_description": "Número de plazas que necesitas para tu grupo",
-      "seats_placeholder": "p. ej., 2"
+      "seats_placeholder": "p. ej., 2",
+      "updated": "Solicitud de viaje compartido actualizada"
     },
     "route": "Ruta",
     "select_date_time": "Seleccionar fecha y hora",
@@ -499,7 +501,7 @@
     "smoking_allowed": "Se permite fumar",
     "smoking_description": "Permites fumadores en tu vehículo o eres fumador",
     "trip_details": "Detalles del viaje",
-    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
+    "type_at_least_3_chars": "Escriba al menos 3 caracteres para buscar",
     "validation": {
       "date_invalid": "Fecha inválida",
       "departure_address_required": "La dirección de salida es obligatoria",
@@ -542,7 +544,6 @@
     "convention": "Convención",
     "country": "País",
     "create": "Crear",
-    "creating": "Creando...",
     "date": "Fecha",
     "dates": "Fechas",
     "day": "Día",
@@ -987,6 +988,8 @@
       "accept_note_label": "Nota de aceptación (opcional)",
       "accept_note_placeholder": "Añade una nota o instrucciones para este voluntario...",
       "acceptance_note_title": "Nota de aceptación",
+      "access_control_team": "Equipo de control de acceso",
+      "access_control_team_hint": "Este equipo se encarga del control de acceso y la validación de entradas",
       "action_accept": "Aceptar",
       "action_back_pending": "Volver a pendiente",
       "action_edit_teams": "Asignar equipos",

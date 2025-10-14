@@ -467,7 +467,7 @@
     "meeting_location": "Mødested",
     "music_allowed": "Musik tilladt",
     "music_description": "Du er enig i at lytte til musik under turen",
-    "no_city_found": "[TODO] Aucune ville trouvée",
+    "no_city_found": "Ingen by fundet",
     "offer": {
       "available_seats": "Ledige pladser",
       "create": "Opret samkørselstilbud",
@@ -475,7 +475,8 @@
       "created": "Samkørselstilbud oprettet",
       "edit_description": "Rediger detaljerne i dit samkørselstilbud",
       "seats_description": "Antal ledige pladser i dit køretøj",
-      "seats_placeholder": "fx 3"
+      "seats_placeholder": "fx 3",
+      "updated": "Samkørselstilbud opdateret"
     },
     "pets_allowed": "Kæledyr tilladt",
     "pets_description": "Du accepterer kæledyr eller rejser med kæledyr",
@@ -491,7 +492,8 @@
       "edit_description": "Rediger detaljerne i din samkørselsanmodning",
       "required_seats": "Ønskede pladser",
       "seats_description": "Antal pladser du har brug for til din gruppe",
-      "seats_placeholder": "fx 2"
+      "seats_placeholder": "fx 2",
+      "updated": "Samkørselsanmodning opdateret"
     },
     "route": "Rute",
     "select_date_time": "Vælg dato og tidspunkt",
@@ -499,7 +501,7 @@
     "smoking_allowed": "Rygning tilladt",
     "smoking_description": "Du tillader rygere i dit køretøj eller er ryger",
     "trip_details": "Rejsedetaljer",
-    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
+    "type_at_least_3_chars": "Indtast mindst 3 tegn for at søge",
     "validation": {
       "date_invalid": "Ugyldig dato",
       "departure_address_required": "Afgangsadressen er påkrævet",
@@ -542,7 +544,6 @@
     "convention": "Konvention",
     "country": "Land",
     "create": "Opret",
-    "creating": "Opretter...",
     "date": "Dato",
     "dates": "Datoer",
     "day": "Dag",
@@ -987,6 +988,8 @@
       "accept_note_label": "Acceptnotat (valgfrit)",
       "accept_note_placeholder": "Tilføj en note eller instruktioner til denne frivillige...",
       "acceptance_note_title": "Acceptnotat",
+      "access_control_team": "Adgangskontrolteam",
+      "access_control_team_hint": "Dette team tager sig af adgangskontrol og validering af billetter",
       "action_accept": "Accepter",
       "action_back_pending": "Tilbage til afventende",
       "action_edit_teams": "Tildel hold",

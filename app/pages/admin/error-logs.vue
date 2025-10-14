@@ -202,7 +202,7 @@
                     <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
                       {{ log.message }}
                     </h4>
-                    <div class="mt-1 flex items-center gap-4 text-xs text-gray-500">
+                    <div class="mt-1 flex flex-wrap items-center gap-4 text-xs text-gray-500">
                       <span class="flex items-center gap-1">
                         <UIcon name="i-heroicons-calendar" />
                         {{ formatDateTime(log.createdAt) }}
@@ -218,6 +218,10 @@
                       <span v-if="log.ip" class="flex items-center gap-1">
                         <UIcon name="i-heroicons-globe-alt" />
                         {{ log.ip }}
+                      </span>
+                      <span v-if="log.referer" class="flex items-center gap-1">
+                        <UIcon name="i-heroicons-arrow-left-on-rectangle" />
+                        {{ truncateUrl(log.referer) }}
                       </span>
                     </div>
                   </div>
@@ -269,7 +273,12 @@
     </UCard>
 
     <!-- Slideover de détails -->
-    <USlideover v-model:open="showLogDetails" :title="$t('admin.error_details')" side="left">
+    <USlideover
+      v-model:open="showLogDetails"
+      :title="$t('admin.error_details')"
+      side="left"
+      :ui="{ content: 'w-full max-w-3xl' }"
+    >
       <template #body>
         <div v-if="selectedLog" class="space-y-6">
           <!-- Date et heure -->
@@ -334,6 +343,44 @@
                   selectedLog.user.email
                 }})
               </div>
+              <div
+                v-if="selectedLog.referer"
+                class="p-3 bg-gray-50 dark:bg-gray-800 rounded col-span-2"
+              >
+                <strong>Page d'origine (referer):</strong>
+                <a
+                  :href="selectedLog.referer"
+                  target="_blank"
+                  class="text-blue-600 dark:text-blue-400 hover:underline break-all"
+                >
+                  {{ selectedLog.referer }}
+                </a>
+              </div>
+              <div
+                v-if="selectedLog.origin"
+                class="p-3 bg-gray-50 dark:bg-gray-800 rounded col-span-2"
+              >
+                <strong>Domaine d'origine (origin):</strong> {{ selectedLog.origin }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Body POST/PUT si disponible -->
+          <div v-if="selectedLog.body && Object.keys(selectedLog.body).length > 0">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Corps de la requête (body)
+            </label>
+            <div
+              class="bg-gray-50 dark:bg-gray-800 p-3 rounded overflow-x-auto border border-gray-200 dark:border-gray-700"
+            >
+              <JsonViewer
+                :value="selectedLog.body"
+                :expand-depth="2"
+                copyable
+                boxed
+                sort
+                theme="dark"
+              />
             </div>
           </div>
 
@@ -351,14 +398,42 @@
             />
           </div>
 
-          <!-- Données supplémentaires -->
+          <!-- Paramètres de requête -->
           <div v-if="selectedLog.queryParams && Object.keys(selectedLog.queryParams).length > 0">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Paramètres de requête
             </label>
-            <pre class="text-xs bg-gray-50 dark:bg-gray-800 p-3 rounded overflow-x-auto">{{
-              JSON.stringify(selectedLog.queryParams, null, 2)
-            }}</pre>
+            <div
+              class="bg-gray-50 dark:bg-gray-800 p-3 rounded overflow-x-auto border border-gray-200 dark:border-gray-700"
+            >
+              <JsonViewer
+                :value="selectedLog.queryParams"
+                :expand-depth="3"
+                copyable
+                boxed
+                sort
+                theme="dark"
+              />
+            </div>
+          </div>
+
+          <!-- Headers HTTP -->
+          <div v-if="selectedLog.headers && Object.keys(selectedLog.headers).length > 0">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              En-têtes HTTP
+            </label>
+            <div
+              class="bg-gray-50 dark:bg-gray-800 p-3 rounded overflow-x-auto border border-gray-200 dark:border-gray-700"
+            >
+              <JsonViewer
+                :value="selectedLog.headers"
+                :expand-depth="1"
+                copyable
+                boxed
+                sort
+                theme="dark"
+              />
+            </div>
           </div>
 
           <!-- Section de résolution -->
@@ -518,6 +593,20 @@ const getStatusCodeColor = (statusCode: number) => {
   if (statusCode >= 400) return 'warning'
   if (statusCode >= 300) return 'warning'
   return 'success'
+}
+
+const truncateUrl = (url: string, maxLength: number = 50) => {
+  if (url.length <= maxLength) return url
+  try {
+    const urlObj = new URL(url)
+    const path = urlObj.pathname
+    if (path.length > maxLength - 10) {
+      return `${path.substring(0, maxLength - 13)}...`
+    }
+    return `${urlObj.pathname}${urlObj.search ? '?' : ''}`
+  } catch {
+    return url.substring(0, maxLength) + '...'
+  }
 }
 
 // Chargement des logs

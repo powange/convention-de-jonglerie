@@ -467,7 +467,7 @@
     "meeting_location": "Місце зустрічі",
     "music_allowed": "Музика дозволена",
     "music_description": "Ви згодні слухати музику під час поїздки",
-    "no_city_found": "[TODO] Aucune ville trouvée",
+    "no_city_found": "Місто не знайдено",
     "offer": {
       "available_seats": "Доступні місця",
       "create": "Створити пропозицію спільної поїздки",
@@ -475,7 +475,8 @@
       "created": "Пропозицію спільної поїздки створено",
       "edit_description": "Редагуйте деталі вашої пропозиції спільної поїздки",
       "seats_description": "Кількість вільних місць у вашому автомобілі",
-      "seats_placeholder": "напр., 3"
+      "seats_placeholder": "напр., 3",
+      "updated": "Пропозицію спільної поїздки оновлено"
     },
     "pets_allowed": "Домашні тварини дозволені",
     "pets_description": "Ви приймаєте домашніх тварин або подорожуєте з ними",
@@ -491,7 +492,8 @@
       "edit_description": "Редагуйте деталі вашого запиту на спільну поїздку",
       "required_seats": "Потрібні місця",
       "seats_description": "Кількість місць, необхідних для вашої групи",
-      "seats_placeholder": "напр., 2"
+      "seats_placeholder": "напр., 2",
+      "updated": "Запит спільної поїздки оновлено"
     },
     "route": "Маршрут",
     "select_date_time": "Виберіть дату і час",
@@ -499,7 +501,7 @@
     "smoking_allowed": "Куріння дозволено",
     "smoking_description": "Ви дозволяєте курців у вашому автомобілі або палите самі",
     "trip_details": "Деталі подорожі",
-    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
+    "type_at_least_3_chars": "Введіть принаймні 3 символи для пошуку",
     "validation": {
       "date_invalid": "Недійсна дата",
       "departure_address_required": "Адреса відправлення обов'язкова",
@@ -542,7 +544,6 @@
     "convention": "Конвенція",
     "country": "Країна",
     "create": "Створити",
-    "creating": "Створення...",
     "date": "Дата",
     "dates": "Дати",
     "day": "День",
@@ -987,6 +988,8 @@
       "accept_note_label": "Нотатка прийняття (необов'язково)",
       "accept_note_placeholder": "Додайте нотатку або інструкції для цього волонтера...",
       "acceptance_note_title": "Примітка прийняття",
+      "access_control_team": "Команда контролю доступу",
+      "access_control_team_hint": "Ця команда займається контролем доступу та перевіркою квитків на вхід",
       "action_accept": "Прийняти",
       "action_back_pending": "Повернути в очікування",
       "action_edit_teams": "Призначити команди",

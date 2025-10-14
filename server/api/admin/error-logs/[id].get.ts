@@ -24,6 +24,8 @@ export default defineEventHandler(async (event) => {
       path: true,
       userAgent: true,
       ip: true,
+      referer: true, // Page d'origine
+      origin: true, // Domaine d'origine
       headers: true,
       body: true,
       queryParams: true,

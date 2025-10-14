@@ -467,7 +467,7 @@
     "meeting_location": "Ontmoetingsplaats",
     "music_allowed": "Muziek toegestaan",
     "music_description": "Je gaat akkoord met muziek luisteren tijdens de rit",
-    "no_city_found": "[TODO] Aucune ville trouvée",
+    "no_city_found": "Geen stad gevonden",
     "offer": {
       "available_seats": "Beschikbare plaatsen",
       "create": "Carpoolaanbod maken",
@@ -475,7 +475,8 @@
       "created": "Carpoolaanbod aangemaakt",
       "edit_description": "Bewerk de details van je carpool aanbod",
       "seats_description": "Aantal vrije plaatsen in je voertuig",
-      "seats_placeholder": "bijv. 3"
+      "seats_placeholder": "bijv. 3",
+      "updated": "Carpoolaanbod bijgewerkt"
     },
     "pets_allowed": "Huisdieren toegestaan",
     "pets_description": "Je accepteert huisdieren of reist met huisdieren",
@@ -491,7 +492,8 @@
       "edit_description": "Bewerk de details van je carpool verzoek",
       "required_seats": "Benodigde plaatsen",
       "seats_description": "Aantal plaatsen dat je nodig hebt voor je groep",
-      "seats_placeholder": "bijv. 2"
+      "seats_placeholder": "bijv. 2",
+      "updated": "Carpoolverzoek bijgewerkt"
     },
     "route": "Route",
     "select_date_time": "Selecteer datum en tijd",
@@ -499,7 +501,7 @@
     "smoking_allowed": "Roken toegestaan",
     "smoking_description": "Je staat rokers toe in je voertuig of bent roker",
     "trip_details": "Reisdetails",
-    "type_at_least_3_chars": "[TODO] Tapez au moins 3 caractères pour rechercher",
+    "type_at_least_3_chars": "Typ minimaal 3 tekens om te zoeken",
     "validation": {
       "date_invalid": "Ongeldige datum",
       "departure_address_required": "Het vertrekadres is verplicht",
@@ -542,7 +544,6 @@
     "convention": "Conventie",
     "country": "Land",
     "create": "Aanmaken",
-    "creating": "Bezig met maken...",
     "date": "Datum",
     "dates": "Datums",
     "day": "Dag",
@@ -987,6 +988,8 @@
       "accept_note_label": "Acceptatienotitie (optioneel)",
       "accept_note_placeholder": "Voeg een notitie of instructies toe voor deze vrijwilliger...",
       "acceptance_note_title": "Acceptatienotitie",
+      "access_control_team": "Toegangscontroleteam",
+      "access_control_team_hint": "Dit team verzorgt toegangscontrole en validatie van toegangskaarten",
       "action_accept": "Accepteren",
       "action_back_pending": "Terug naar in afwachting",
       "action_edit_teams": "Teams toewijzen",

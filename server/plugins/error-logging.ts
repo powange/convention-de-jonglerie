@@ -32,12 +32,27 @@ export default async function errorLoggingPlugin(nitroApp: NitroApp) {
       ) {
         try {
           // Essayer de lire le body s'il n'a pas encore été lu
+          // Note: readBody peut échouer si le body a déjà été consommé
           const body = await readBody(event).catch(() => null)
           if (body) {
             event.context._body = body
           }
         } catch {
           // Ignorer les erreurs de lecture du body
+          // Le body pourrait être dans event.context.body si déjà parsé
+        }
+      }
+
+      // Si le body n'est toujours pas disponible, vérifier d'autres emplacements
+      if (!event.context._body && !event.context.body) {
+        // Essayer de récupérer depuis les données brutes si possible
+        try {
+          // Certaines routes peuvent stocker le body ailleurs
+          if ((event as any)._body) {
+            event.context._body = (event as any)._body
+          }
+        } catch {
+          // Ignorer
         }
       }
 

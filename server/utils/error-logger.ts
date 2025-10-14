@@ -183,13 +183,25 @@ export async function logApiError({ error, statusCode, event }: ErrorInfo): Prom
     // Récupérer l'utilisateur connecté si disponible
     const userId = event.context.user?.id || null
 
+    // Récupérer le referer (page d'origine)
+    const referer = getHeader(event, 'referer') || getHeader(event, 'referrer') || undefined
+
+    // Récupérer l'origin (domaine d'origine)
+    const origin = getHeader(event, 'origin') || undefined
+
     // Lire le body de manière sécurisée (peut échouer)
     let body: any = null
     try {
       // Ne pas relire le body s'il a déjà été lu
-      if (event.node.req.method !== 'GET' && event.node.req.method !== 'HEAD') {
+      if (method !== 'GET' && method !== 'HEAD') {
         // Le body peut déjà avoir été lu par l'API
         body = event.context._body || null
+
+        // Si le body n'est pas dans le contexte, essayer de le récupérer depuis les données brutes
+        if (!body && event.node.req.readable === false) {
+          // Le body a déjà été consommé, mais peut-être disponible ailleurs
+          body = event.context.body || null
+        }
       }
     } catch {
       // Ignorer les erreurs de lecture du body
@@ -207,6 +219,8 @@ export async function logApiError({ error, statusCode, event }: ErrorInfo): Prom
         path,
         userAgent,
         ip,
+        referer,
+        origin,
         headers: sanitizeHeaders(getHeaders(event)),
         body: body ? sanitizeBody(body) : null,
         queryParams: Object.fromEntries(urlObj.searchParams.entries()),
