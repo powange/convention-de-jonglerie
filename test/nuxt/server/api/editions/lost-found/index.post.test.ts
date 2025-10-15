@@ -48,6 +48,7 @@ const mockLostFoundItem = {
     prenom: 'John',
     nom: 'Doe',
     profilePicture: null,
+    emailHash: '55502f40dc8b7c769880b10874abc9d0', // MD5 hash of 'test@example.com'
   },
   comments: [],
 }
@@ -76,7 +77,13 @@ describe('/api/editions/[id]/lost-found POST', () => {
     global.readBody.mockResolvedValue(requestBody)
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
-    prismaMock.lostFoundItem.create.mockResolvedValue(mockLostFoundItem)
+    prismaMock.lostFoundItem.create.mockResolvedValue({
+      ...mockLostFoundItem,
+      user: {
+        ...mockLostFoundItem.user,
+        email: 'test@example.com', // Inclure l'email pour que getEmailHash fonctionne
+      },
+    })
 
     const result = await handler(mockEvent as any)
 
@@ -108,6 +115,10 @@ describe('/api/editions/[id]/lost-found POST', () => {
       ...mockLostFoundItem,
       description: 'Clés trouvées dans les toilettes',
       imageUrl: null,
+      user: {
+        ...mockLostFoundItem.user,
+        email: 'test@example.com', // Inclure l'email pour que getEmailHash fonctionne
+      },
     })
 
     const result = await handler(mockEvent as any)
@@ -207,7 +218,13 @@ describe('/api/editions/[id]/lost-found POST', () => {
     global.readBody.mockResolvedValue(requestBody)
     prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
     mockHasPermission.mockResolvedValue(true)
-    prismaMock.lostFoundItem.create.mockResolvedValue(mockLostFoundItem)
+    prismaMock.lostFoundItem.create.mockResolvedValue({
+      ...mockLostFoundItem,
+      user: {
+        ...mockLostFoundItem.user,
+        email: 'test@example.com', // Inclure l'email pour que getEmailHash fonctionne
+      },
+    })
 
     await handler(mockEvent as any)
 

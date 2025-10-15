@@ -2,6 +2,29 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
+import type { Prisma } from '@prisma/client'
+
+type VolunteerApplication = Prisma.EditionVolunteerApplicationGetPayload<{
+  select: {
+    id: true
+    userId: true
+    arrivalDateTime: true
+    departureDateTime: true
+    setupAvailability: true
+    teardownAvailability: true
+    dietaryPreference: true
+    allergies: true
+    allergySeverity: true
+    user: {
+      select: {
+        prenom: true
+        nom: true
+        pseudo: true
+      }
+    }
+  }
+}>
+
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
 
@@ -103,7 +126,7 @@ export default defineEventHandler(async (event) => {
   })
 
   // Analyser la présence par créneaux (matin, midi, soir)
-  const analyzeTimeSlotPresence = (app: any) => {
+  const analyzeTimeSlotPresence = (app: VolunteerApplication) => {
     const presence = { morning: false, noon: false, evening: false }
 
     // Vérifier si le bénévole est présent ce jour-là
@@ -163,7 +186,17 @@ export default defineEventHandler(async (event) => {
   const result = {
     date: targetDate,
     dateType,
-    slots: {} as Record<string, any>,
+    slots: {} as Record<
+      string,
+      {
+        totalVolunteers: number
+        dietaryCounts: Record<string, number>
+        allergies: Array<{
+          volunteer: { prenom: string; nom: string; pseudo: string }
+          allergies: string | null
+        }>
+      }
+    >,
   }
 
   for (const slot of timeSlots) {

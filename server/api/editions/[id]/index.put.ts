@@ -1,3 +1,4 @@
+import { isHttpError } from '@@/server/types/prisma-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { normalizeDateToISO } from '@@/server/utils/date-helpers'
 import { geocodeEdition } from '@@/server/utils/geocoding'
@@ -12,6 +13,8 @@ import {
   handleValidationError,
 } from '@@/server/utils/validation-schemas'
 import { z } from 'zod'
+
+import type { Prisma } from '@prisma/client'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
@@ -238,7 +241,7 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    const updatedData: any = {
+    const updatedData: Prisma.EditionUpdateInput = {
       conventionId: conventionId !== undefined ? conventionId : edition.conventionId,
       name: name !== undefined ? name?.trim() || null : edition.name,
       description: description || edition.description,
@@ -316,10 +319,10 @@ export default defineEventHandler(async (event) => {
       },
     })
     return updatedEdition
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Erreur lors de la mise à jour de l'édition:", error)
 
-    if ((error as any)?.statusCode) {
+    if (isHttpError(error)) {
       throw error
     }
 

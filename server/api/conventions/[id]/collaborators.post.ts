@@ -104,8 +104,16 @@ export default defineEventHandler(async (event) => {
       perEdition,
     })
 
-    const anyCollab: any = collaborator as any
     // Structure normalisée (avec sous‑objet rights et tableau perEdition)
+    const collabWithPermissions = collaborator as typeof collaborator & {
+      perEditionPermissions?: Array<{
+        editionId: number
+        canEdit: boolean
+        canDelete: boolean
+        canManageVolunteers: boolean
+      }>
+    }
+
     return {
       success: true,
       collaborator: {
@@ -120,7 +128,7 @@ export default defineEventHandler(async (event) => {
           editAllEditions: collaborator.canEditAllEditions,
           deleteAllEditions: collaborator.canDeleteAllEditions,
         },
-        perEdition: (anyCollab.perEditionPermissions || []).map((p: any) => ({
+        perEdition: (collabWithPermissions.perEditionPermissions || []).map((p) => ({
           editionId: p.editionId,
           canEdit: p.canEdit,
           canDelete: p.canDelete,
