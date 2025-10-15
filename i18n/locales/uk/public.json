@@ -1,0 +1,232 @@
+{
+  "homepage": {
+    "agenda": "Порядок денний",
+    "current_editions": "Поточні видання",
+    "filters": "Фільтри",
+    "finished_editions": "Завершені видання",
+    "grid": "Сітка",
+    "map": "Карта",
+    "no_conventions_found": "Конвенції не знайдено. Будьте першим, хто додасть одну!",
+    "no_conventions_match_criteria": "Жодна конвенція не відповідає вашим критеріям пошуку",
+    "period": "Період",
+    "searched_services": "Шукані послуги",
+    "upcoming_editions": "Майбутні видання"
+  },
+  "pages": {
+    "access_denied": {
+      "confirm_delete_edition": "Ви впевнені, що хочете видалити це видання?",
+      "description": "У вас немає прав для доступу до цієї сторінки.",
+      "title": "Доступ заборонено"
+    },
+    "add_convention": {
+      "description": "Конвенція об'єднує кілька видань одного жонглерського заходу.",
+      "submit_button": "Створити конвенцію",
+      "title": "Створити нову конвенцію"
+    },
+    "add_edition": {
+      "submit_button": "Додати видання",
+      "title": "Додати нове видання"
+    },
+    "add_edition_for_convention": {
+      "convention_not_found_description": "Конвенція, яку ви шукаєте, не існує або у вас немає прав додати до неї видання.",
+      "for_convention": "Для конвенції \"{name}\"",
+      "loading_convention": "Завантаження даних конвенції...",
+      "submit_button": "Створити видання"
+    },
+    "comments": {
+      "be_first_to_comment": "Будьте першим, хто поділиться своїм досвідом!",
+      "comment_placeholder": "Поділіться своїм досвідом, задайте питання...",
+      "login_to_participate": "Увійдіть, щоб взяти участь в обговоренні",
+      "no_comments": "Поки що немає коментарів.",
+      "share_experience": "Поділіться своїм досвідом або задайте питання",
+      "write_comment": "Написати коментар",
+      "your_comment": "Ваш коментар"
+    },
+    "edit_convention": {
+      "convention_not_found_or_no_rights": "Конвенція, яку ви шукаєте, не існує або у вас немає прав її редагувати.",
+      "editing_convention": "Редагування конвенції \"{name}\"",
+      "loading_convention_data": "Завантаження даних конвенції...",
+      "submit_button": "Оновити конвенцію"
+    },
+    "edit_edition": {
+      "submit_button": "Оновити видання"
+    },
+    "favorites": {
+      "editions_in_favorites": "{count} видання | {count} видань в улюблених",
+      "no_favorites_added": "Ви ще не додали жодного видання до улюблених."
+    },
+    "management": {
+      "delete_edition": "Видалити видання",
+      "edit_edition": "Редагувати видання",
+      "lost_found_active_description": "Ви можете керувати загубленими речами під час проведення видання.",
+      "manage_lost_found": "Керувати загубленими та знайденими"
+    },
+    "objets_trouves": {
+      "photo_alt": "Фото знайденого предмета"
+    },
+    "profile": {
+      "photo_alt": "Фото профілю",
+      "photo_placeholder": "Натисніть, щоб змінити фото профілю"
+    },
+    "volunteers": {
+      "accepted": "Прийняті",
+      "allergies": "Алергії",
+      "application_details": "Деталі заявки",
+      "applications_description": "Відстежуйте статус ваших заявок на волонтерство на різних конвенціях",
+      "applied_on": "Подано",
+      "assigned_time_slots": "Призначені часові слоти",
+      "availability": "Доступність",
+      "avoid_list": "Список уникнення",
+      "browse_conventions": "Переглянути конвенції",
+      "companion": "Компаньйон",
+      "companion_name": "Ім'я компаньйона",
+      "confirm_withdraw": "Ви впевнені, що хочете відкликати свою заявку?",
+      "contact_organizer": "Зв'язатися з організатором",
+      "dates": "Дати",
+      "diet": "Дієта",
+      "dietary": {
+        "none": "Немає",
+        "other": "Інша",
+        "vegan": "Веганська",
+        "vegetarian": "Вегетаріанська"
+      },
+      "dietary_preferences": "Дієтичні уподобання",
+      "emergency_contact": "Екстрений контакт",
+      "emergency_contact_name": "Ім'я екстреного контакту",
+      "emergency_contact_phone": "Телефон екстреного контакту",
+      "event": "Подія",
+      "experience": "Досвід",
+      "experience_details": "Деталі досвіду",
+      "export": "Експорт",
+      "export_ical": "Експорт iCal",
+      "export_pdf": "Експорт PDF",
+      "has_experience": "Має досвід",
+      "has_minors": "У супроводі неповнолітніх",
+      "has_pets": "Має домашніх тварин",
+      "has_vehicle": "Має транспорт",
+      "history": "Історія",
+      "minors": "Неповнолітні",
+      "minors_details": "Деталі про неповнолітніх",
+      "motivation": "Мотивація",
+      "my_applications": "Мої заявки волонтера",
+      "my_planning": "Моє планування",
+      "my_slots_title": "Мої Часові Слоти",
+      "no_accepted_applications": "Немає прийнятих заявок",
+      "no_accepted_description": "У вас поки немає прийнятих заявок",
+      "no_applications": "Немає заявок",
+      "no_applications_description": "Ви ще не подавали заявку на волонтерство на жодній конвенції",
+      "no_history": "Немає історії",
+      "no_history_description": "Немає відхилених або відкликаних заявок",
+      "no_pending_applications": "Немає очікуючих заявок",
+      "no_pending_description": "У вас наразі немає заявок, що очікують відповіді",
+      "no_rejected_applications": "Немає відхилених заявок",
+      "no_rejected_description": "Жодна з ваших заявок не була відхилена",
+      "pending": "В очікуванні",
+      "pets": "Домашні тварини",
+      "pets_details": "Деталі про тварин",
+      "rejected": "Відхилені",
+      "setup": "Підготовка",
+      "skills": "Навички",
+      "team_distribution": {
+        "all_teams": "Всі команди",
+        "description": "Розподіл прийнятих волонтерів по командах. Перетягніть, щоб перемістити або додати до команди.",
+        "drop_volunteers_here": "Перетягніть волонтерів сюди",
+        "empty_team": "Порожня команда",
+        "leader_added": "Керівника додано",
+        "leader_badge": "Керівник",
+        "leader_removed": "Керівника видалено",
+        "manage_teams": "Керувати командами",
+        "max_label": "Макс:",
+        "modal": {
+          "add": "Додати",
+          "add_description_multiple": "Залишити волонтера в поточних командах і також додати до \"{targetTeam}\"",
+          "add_description_single": "Залишити волонтера в \"{sourceTeam}\" і призначити також до \"{targetTeam}\"",
+          "cancel": "Скасувати",
+          "move": "Перемістити",
+          "move_description_multiple": "Видалити волонтера з усіх поточних команд і помістити в \"{targetTeam}\"",
+          "move_description_single": "Видалити волонтера з \"{sourceTeam}\" і помістити в \"{targetTeam}\"",
+          "question": "Що ви хочете зробити?"
+        },
+        "no_assignments": "Призначень команд не знайдено",
+        "no_assignments_description": "Прийняті волонтери з'являться тут після призначення до команд",
+        "preferences_label": "Пер:",
+        "remove_as_leader": "Зняти роль керівника",
+        "select_team_instruction": "Виберіть команду призначення",
+        "set_as_leader": "Призначити керівником",
+        "stats": {
+          "assigned_volunteers": "Призначені волонтери",
+          "total_assignments": "Всього призначень",
+          "total_teams": "Всього команд",
+          "unassigned": "Не призначені"
+        },
+        "title": "Розподіл по командах",
+        "unassigned_description": "Ці прийняті волонтери ще не призначені до команди. Ви можете перетягнути їх до команди нижче.",
+        "unassigned_volunteers": "Непризначені волонтери",
+        "volunteers_count": "{count} волонтер(ів)"
+      },
+      "team_preferences": "Командні переваги",
+      "teardown": "Розбирання",
+      "time_preferences": "Часові уподобання",
+      "total_hours": "Загальна кількість годин",
+      "unnamed_slot": "Слот без назви",
+      "vehicle": "Транспорт",
+      "vehicle_details": "Деталі про транспорт",
+      "view_compact": "Компактний вид",
+      "view_compact_short": "Компактний",
+      "view_detailed": "Детальний вид",
+      "view_detailed_short": "Детальний",
+      "view_details": "Переглянути деталі",
+      "view_edition": "Переглянути видання",
+      "view_planning": "Переглянути планування",
+      "withdraw": "Відкликати",
+      "withdrawal_error": "Помилка при відкликанні заявки",
+      "withdrawal_success": "Заявка успішно відкликана"
+    }
+  },
+  "seo": {
+    "carpool": {
+      "description": "Організуйте спільну поїздку на {name}. Знайдіть супутників або запропонуйте вільні місця на {date} в {location}.",
+      "keywords": "спільна подорож, транспорт, {convention}, {location}, спільне використання, економно, екологічно",
+      "og_description": "Організуйте свій транспорт на {name} - {date}. Спільні подорожі доступні.",
+      "og_title": "Спільна подорож на {name}",
+      "title": "Спільна подорож - {name}",
+      "twitter_description": "Знайдіть або запропонуйте спільну подорож на {name}.",
+      "twitter_title": "Спільна подорож - {name}"
+    },
+    "edition": {
+      "description": "Відкрийте для себе {name}, що проходить {date} в {location}. Інформація, програма та реєстрація на цей з'їзд жонглерів.",
+      "keywords": "жонглювання, конвенція, {convention}, {location}, подія, фестиваль, шоу, майстер-клас",
+      "og_description": "Приєднуйтеся до нас на {name} - {date}. Програма, майстер-класи та шоу жонглювання.",
+      "title": "{name}",
+      "twitter_description": "{name} - {date}. Відкрийте програму цієї конвенції жонглювання.",
+      "twitter_title": "{name} - Конвенція жонглювання"
+    },
+    "homepage": {
+      "description": "Відкрийте найближчі конвенції жонглювання у Франції та Європі. Організуйте свої улюблені події та з'єднайтеся з спільнотою жонглерів.",
+      "keywords": "жонглювання, конвенція, фестиваль, подія, жонглер, шоу, майстер-клас, курс",
+      "og_description": "Опорна платформа для відкриття та організації конвенцій жонглювання у Франції та Європі.",
+      "og_title": "Конвенція жонглювання - Знайдіть свою наступну конвенцію",
+      "title": "Конвенції жонглювання",
+      "twitter_description": "Відкрийте найближчі конвенції жонглювання та приєднайтеся до спільноти жонглерів.",
+      "twitter_title": "Конвенція жонглювання - Події жонглювання"
+    },
+    "organization": {
+      "description": "Співпрацююча платформа, присвячена спільноті жонглерів, що полегшує пошук та організацію жонглерських заходів у Франції та Європі."
+    },
+    "search_action": {
+      "description": "Пошук жонглерських конвенцій за назвою, місцем або організатором",
+      "name": "Пошук конвенції"
+    },
+    "site_description": "Знайдіть та керуйте своїми улюбленими конвенціями жонглювання. Платформа співпраці для жонглерів та організаторів подій.",
+    "site_name": "Конвенція жонглювання",
+    "volunteers": {
+      "description": "Приєднайтеся до команди волонтерів {name}. Беріть участь в організації цієї події жонглювання {date} в {location}.",
+      "keywords": "волонтерство, команда, {convention}, {location}, організація, допомога",
+      "og_description": "Приєднайтеся до команди волонтерів {name} - {date}. Возьміть участь в організації.",
+      "og_title": "Волонтерство для {name}",
+      "title": "Волонтерство - {name}",
+      "twitter_description": "Станьте волонтером для {name} та возьміть участь в організації.",
+      "twitter_title": "Волонтерство - {name}"
+    }
+  }
+}

@@ -10,6 +10,120 @@ const __dirname = path.dirname(__filename)
 const LOCALES_DIR = path.join(__dirname, '..', '..', 'i18n', 'locales')
 const CONFIG_FILE = path.join(__dirname, 'translations-config.json')
 
+/**
+ * Configuration de la répartition des clés par domaine
+ */
+const SPLIT_CONFIG = {
+  common: [
+    'common',
+    'navigation',
+    'footer',
+    'errors',
+    'messages',
+    'validation',
+    'countries',
+    'dates',
+    'log',
+    'c',
+    'calendar',
+  ],
+  admin: ['admin', 'feedback'],
+  edition: ['editions', 'conventions', 'collaborators', 'carpool', 'diet'],
+  auth: ['auth', 'profile', 'permissions'],
+  public: ['homepage', 'pages', 'seo'],
+  components: ['components', 'forms', 'upload', 'notifications', 'push_notifications'],
+  app: ['app', 'pwa', 'services'],
+}
+
+/**
+ * Charge tous les fichiers JSON d'un dossier de langue et les fusionne
+ */
+function loadLocaleFiles(locale) {
+  const localeDir = path.join(LOCALES_DIR, locale)
+
+  if (!fs.existsSync(localeDir) || !fs.statSync(localeDir).isDirectory()) {
+    return null
+  }
+
+  const files = fs.readdirSync(localeDir).filter((file) => file.endsWith('.json'))
+
+  if (files.length === 0) {
+    return null
+  }
+
+  // Fusionner tous les fichiers de cette langue
+  const mergedData = {}
+  for (const file of files) {
+    const filePath = path.join(localeDir, file)
+    const content = fs.readFileSync(filePath, 'utf8')
+    const data = JSON.parse(content)
+    Object.assign(mergedData, data)
+  }
+
+  return mergedData
+}
+
+/**
+ * Détermine le fichier de domaine cible pour une clé donnée
+ */
+function getTargetFile(key) {
+  const topLevelKey = key.split('.')[0]
+  for (const [file, keys] of Object.entries(SPLIT_CONFIG)) {
+    if (keys.includes(topLevelKey)) {
+      return file
+    }
+  }
+  return 'common' // Par défaut
+}
+
+/**
+ * Écrit les données dans les fichiers de domaine d'une langue
+ */
+function writeLocaleFiles(locale, data) {
+  const localeDir = path.join(LOCALES_DIR, locale)
+
+  // S'assurer que le dossier de la langue existe
+  if (!fs.existsSync(localeDir)) {
+    fs.mkdirSync(localeDir, { recursive: true })
+  }
+
+  // Organiser les données par fichier de domaine
+  const fileContents = {}
+  for (const file of Object.keys(SPLIT_CONFIG)) {
+    fileContents[file] = {}
+  }
+
+  // Répartir les clés dans les bons fichiers
+  for (const [key, value] of Object.entries(data)) {
+    const targetFile = getTargetFile(key)
+    fileContents[targetFile][key] = value
+  }
+
+  // Fonction de tri récursif des clés
+  const sortKeys = (obj) => {
+    if (Array.isArray(obj) || obj === null || typeof obj !== 'object') return obj
+    const out = {}
+    for (const key of Object.keys(obj).sort()) out[key] = sortKeys(obj[key])
+    return out
+  }
+
+  // Écrire chaque fichier de domaine
+  let updatedFiles = 0
+  for (const [file, content] of Object.entries(fileContents)) {
+    const filePath = path.join(localeDir, `${file}.json`)
+    if (Object.keys(content).length > 0) {
+      const sorted = sortKeys(content)
+      fs.writeFileSync(filePath, JSON.stringify(sorted, null, 2) + '\n', 'utf8')
+      updatedFiles++
+    } else if (fs.existsSync(filePath)) {
+      // Supprimer les fichiers vides
+      fs.unlinkSync(filePath)
+    }
+  }
+
+  return updatedFiles
+}
+
 // Couleurs pour l'affichage
 const colors = {
   reset: '\x1b[0m',
@@ -100,27 +214,31 @@ function applyTranslations() {
   console.log(`${colors.cyan}Clés à traiter: ${keyPaths.length}${colors.reset}`)
   console.log(`${colors.cyan}Fichier de configuration: ${CONFIG_FILE}${colors.reset}\n`)
 
-  // Obtenir la liste des fichiers de langue
+  // Obtenir la liste des dossiers de langue
   const languageFiles = fs
     .readdirSync(LOCALES_DIR)
-    .filter((file) => file.endsWith('.json'))
-    .map((file) => file.replace('.json', ''))
+    .filter((item) => {
+      const itemPath = path.join(LOCALES_DIR, item)
+      return fs.statSync(itemPath).isDirectory()
+    })
     .sort()
 
   let totalUpdates = 0
   let totalFiles = 0
 
-  // Traiter chaque fichier de langue
+  // Traiter chaque langue
   for (const lang of languageFiles) {
-    console.log(`${colors.bold}Traitement de ${lang}.json:${colors.reset}`)
+    console.log(`${colors.bold}Traitement de ${lang}/:${colors.reset}`)
 
-    const filePath = path.join(LOCALES_DIR, `${lang}.json`)
     let data
     let fileModified = false
 
     try {
-      const content = fs.readFileSync(filePath, 'utf-8')
-      data = JSON.parse(content)
+      data = loadLocaleFiles(lang)
+      if (!data) {
+        console.log(`  ${colors.red}✗ Erreur: Aucun fichier de traduction trouvé${colors.reset}`)
+        continue
+      }
     } catch (error) {
       console.log(`  ${colors.red}✗ Erreur de lecture: ${error.message}${colors.reset}`)
       continue
@@ -169,11 +287,13 @@ function applyTranslations() {
       totalUpdates++
     }
 
-    // Sauvegarder le fichier si modifié
+    // Sauvegarder les fichiers si modifiés
     if (fileModified) {
       try {
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + '\n', 'utf-8')
-        console.log(`  ${colors.green}✓ Fichier sauvegardé${colors.reset}`)
+        const updatedFiles = writeLocaleFiles(lang, data)
+        console.log(
+          `  ${colors.green}✓ ${updatedFiles} fichier(s) de domaine sauvegardé(s)${colors.reset}`
+        )
         totalFiles++
       } catch (error) {
         console.log(`  ${colors.red}✗ Erreur de sauvegarde: ${error.message}${colors.reset}`)
@@ -182,7 +302,7 @@ function applyTranslations() {
       console.log(`  ${colors.blue}ℹ Aucune modification nécessaire${colors.reset}`)
     }
 
-    console.log() // Ligne vide entre les fichiers
+    console.log() // Ligne vide entre les langues
   }
 
   // Résumé final

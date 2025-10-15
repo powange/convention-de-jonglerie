@@ -19,7 +19,7 @@ const CYAN = '\x1b[36m'
 const BOLD = '\x1b[1m'
 
 const projectRoot = path.resolve(__dirname, '..')
-const localeFile = path.join(projectRoot, 'i18n', 'locales', 'fr.json')
+const localeDir = path.join(projectRoot, 'i18n', 'locales', 'fr')
 
 // Fichiers à exclure de l'analyse (qui génèrent des faux positifs)
 // Ces fichiers contiennent leurs propres traductions intégrées
@@ -28,12 +28,45 @@ const EXCLUDED_FILES = [
   // Ajouter d'autres fichiers ici si nécessaire
 ]
 
-function loadLocaleFile() {
+/**
+ * Charge tous les fichiers de traduction depuis le dossier de locale
+ * et les fusionne en un seul objet
+ */
+function loadLocaleFiles() {
   try {
-    const content = fs.readFileSync(localeFile, 'utf8')
-    return JSON.parse(content)
+    // Vérifier que le dossier existe
+    if (!fs.existsSync(localeDir)) {
+      console.error(`${RED}Erreur: Le dossier ${localeDir} n'existe pas${RESET}`)
+      process.exit(1)
+    }
+
+    // Lister tous les fichiers JSON dans le dossier
+    const files = fs.readdirSync(localeDir).filter((file) => file.endsWith('.json'))
+
+    if (files.length === 0) {
+      console.error(`${RED}Erreur: Aucun fichier de traduction trouvé dans ${localeDir}${RESET}`)
+      process.exit(1)
+    }
+
+    // Fusionner tous les fichiers
+    const mergedData = {}
+    for (const file of files) {
+      const filePath = path.join(localeDir, file)
+      const content = fs.readFileSync(filePath, 'utf8')
+      const data = JSON.parse(content)
+      Object.assign(mergedData, data)
+    }
+
+    console.log(
+      `${CYAN}Chargé ${files.length} fichier(s) de traduction: ${files.join(', ')}${RESET}\n`
+    )
+
+    return mergedData
   } catch (error) {
-    console.error(`${RED}Erreur lors du chargement de ${localeFile}:${RESET}`, error.message)
+    console.error(
+      `${RED}Erreur lors du chargement des fichiers de traduction:${RESET}`,
+      error.message
+    )
     process.exit(1)
   }
 }
@@ -516,8 +549,8 @@ async function main() {
 
   console.log(`\n${BOLD}${BLUE}=== Vérification i18n ===${RESET}\n`)
 
-  // Charger le fichier de locale
-  const localeData = loadLocaleFile()
+  // Charger les fichiers de locale
+  const localeData = loadLocaleFiles()
   const flatLocale = flattenObject(localeData)
   const localeKeys = new Set(Object.keys(flatLocale))
 
@@ -633,19 +666,83 @@ async function main() {
 
         if (answer === 'oui' || answer === 'o' || answer === 'y' || answer === 'yes') {
           try {
-            // Créer une sauvegarde
-            const backupPath = localeFile.replace('.json', `.backup.${Date.now()}.json`)
-            fs.copyFileSync(localeFile, backupPath)
-            console.log(`${GREEN}✓ Sauvegarde créée: ${path.basename(backupPath)}${RESET}`)
+            // Créer un dossier de sauvegarde
+            const backupDir = path.join(
+              projectRoot,
+              'i18n',
+              'locales-backup',
+              `backup-${Date.now()}`
+            )
+            fs.mkdirSync(backupDir, { recursive: true })
+
+            // Sauvegarder tous les fichiers
+            const files = fs.readdirSync(localeDir).filter((file) => file.endsWith('.json'))
+            for (const file of files) {
+              const srcPath = path.join(localeDir, file)
+              const dstPath = path.join(backupDir, file)
+              fs.copyFileSync(srcPath, dstPath)
+            }
+            console.log(`${GREEN}✓ Sauvegarde créée: ${path.basename(backupDir)}${RESET}`)
 
             // Supprimer les clés inutilisées
             const updatedLocaleData = removeKeysFromObject(localeData, unusedKeys)
 
-            // Réécrire le fichier
-            fs.writeFileSync(localeFile, JSON.stringify(updatedLocaleData, null, 2) + '\n', 'utf8')
+            // Redistribuer les clés dans les bons fichiers
+            // On utilise la même logique que split-i18n.js
+            const SPLIT_CONFIG = {
+              common: [
+                'common',
+                'navigation',
+                'footer',
+                'errors',
+                'messages',
+                'validation',
+                'countries',
+                'dates',
+                'log',
+                'c',
+                'calendar',
+              ],
+              admin: ['admin', 'feedback'],
+              edition: ['editions', 'conventions', 'collaborators', 'carpool', 'diet'],
+              auth: ['auth', 'profile', 'permissions'],
+              public: ['homepage', 'pages', 'seo'],
+              components: ['components', 'forms', 'upload', 'notifications', 'push_notifications'],
+              app: ['app', 'pwa', 'services'],
+            }
+
+            const getTargetFile = (key) => {
+              for (const [file, keys] of Object.entries(SPLIT_CONFIG)) {
+                if (keys.includes(key)) {
+                  return file
+                }
+              }
+              return 'common'
+            }
+
+            // Organiser les données mises à jour par fichier
+            const fileContents = {}
+            for (const file of Object.keys(SPLIT_CONFIG)) {
+              fileContents[file] = {}
+            }
+
+            for (const [key, value] of Object.entries(updatedLocaleData)) {
+              const targetFile = getTargetFile(key)
+              fileContents[targetFile][key] = value
+            }
+
+            // Écrire les fichiers mis à jour
+            let updatedFiles = 0
+            for (const [file, data] of Object.entries(fileContents)) {
+              if (Object.keys(data).length > 0) {
+                const filePath = path.join(localeDir, `${file}.json`)
+                fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + '\n', 'utf8')
+                updatedFiles++
+              }
+            }
 
             console.log(`${GREEN}✓ ${unusedKeys.length} clé(s) supprimée(s) avec succès !${RESET}`)
-            console.log(`${CYAN}Fichier mis à jour: ${path.basename(localeFile)}${RESET}`)
+            console.log(`${CYAN}${updatedFiles} fichier(s) mis à jour${RESET}`)
           } catch (error) {
             console.error(`${RED}❌ Erreur lors de la suppression: ${error.message}${RESET}`)
             process.exit(1)

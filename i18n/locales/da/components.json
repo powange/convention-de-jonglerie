@@ -1,0 +1,221 @@
+{
+  "components": {
+    "carpool": {
+      "accept": "Accepter",
+      "add_comment_placeholder": "Tilføj en kommentar...",
+      "added_on": "Tilføjet den {date}",
+      "address": "Adresse",
+      "available_seats": "Antal ledige pladser",
+      "be_first_to_comment": "Vær den første til at kommentere dette {type}!",
+      "be_first_to_offer": "Vær den første til at tilbyde samkørsel for denne udgave!",
+      "book_seats": "Reserver",
+      "comments": "Kommentarer",
+      "confirm_booking": "Bekræft reservation",
+      "confirm_delete_offer": "Er du sikker på, at du vil slette dette samkørselstilbud?",
+      "confirm_delete_request": "Er du sikker på, at du vil slette denne samkørselsanmodning?",
+      "confirmed_passengers": "Bekræftede medpassagerer",
+      "contact": "Kontakt",
+      "contact_user": "Kontakt {name}",
+      "delete_offer": "Slet tilbud",
+      "delete_request": "Slet anmodning",
+      "departure_date_time": "Afrejsedato og -tid",
+      "edit_offer": "Rediger samkørselstilbud",
+      "edit_request": "Rediger samkørselsanmodning",
+      "how_many_seats_needed": "Hvor mange pladser søger du?",
+      "loading_comments": "Indlæser kommentarer...",
+      "my_booking": "Min reservation",
+      "no_comments": "Ingen kommentarer",
+      "no_offers": "Ingen samkørselstilbud",
+      "no_pending_bookings": "Ingen afventende reservationer",
+      "no_requests": "Ingen samkørselsanmodninger",
+      "no_requests_published": "Ingen anmodninger er offentliggjort endnu.",
+      "offer": "tilbud",
+      "offered_on": "Tilbudt den {date}",
+      "offers_long": "Samkørselstilbud",
+      "offers_short": "Tilbud",
+      "pending_bookings": "Afventende reservationer",
+      "propose_carpool": "Foreslå samkørsel",
+      "publish": "Offentliggør",
+      "reject": "Afvis",
+      "request": "anmodning",
+      "request_carpool": "Anmod om samkørsel",
+      "requested_on": "Anmodet den {date}",
+      "requested_seats": "{count} anmodet plads | {count} anmodede pladser",
+      "requests_long": "Samkørselsanmodninger",
+      "requests_short": "Anmodninger",
+      "seats_available": "{count} ledig plads | {count} ledige pladser",
+      "seats_needed": "{count} søgt plads | {count} søgte pladser",
+      "suggestions": "Forslag",
+      "to_add_comment": "for at tilføje en kommentar",
+      "view_comments": "Se kommentarer ({count})"
+    },
+    "collaborators_rights_panel": {
+      "per_edition": "Rettigheder pr. udgave",
+      "per_edition_hint": "Ingen specifikke rettigheder defineret for udgaver",
+      "title_placeholder": "Titel eller rolle (valgfrit)"
+    },
+    "convention_form": {
+      "click_to_select_image": "Klik for at vælge et billede",
+      "contact_email": "Kontakt email",
+      "contact_email_help": "E-mailadresse brugt til anmodninger om udgavekrav og kontakter relateret til denne konvention",
+      "convention_logo": "Konventionslogo",
+      "convention_logo_alt": "Konventionslogo",
+      "convention_name": "Konventionsnavn",
+      "external_url": "Ekstern URL",
+      "image_deleted": "Billede slettet",
+      "image_uploaded": "Billede uploadet",
+      "loading_error_description": "Kan ikke indlæse billede fra denne URL",
+      "loading_error_title": "Indlæsningsfejl",
+      "logo_preview": "Logo forhåndsvisning:",
+      "logo_url_description": "URL til konventionslogoets billede",
+      "upload_file": "Upload fil"
+    },
+    "country_multi_select": {
+      "placeholder": "Vælg lande..."
+    },
+    "country_select": {
+      "no_countries_found": "Ingen lande fundet",
+      "search_country_placeholder": "Søg efter et land..."
+    },
+    "date_time_picker": {
+      "placeholder": "Vælg en dato"
+    },
+    "edition_form": {
+      "address_tip": "Indtast en komplet adresse i søgefeltet for automatisk at udfylde alle felterne nedenfor. En præcis adresse vil også muliggøre geolokalisering af dit arrangement på kortet.",
+      "convention_description_placeholder": "Beskrivelse af konventionen",
+      "convention_poster_optional": "Konventionsplakat (valgfrit)",
+      "country_placeholder": "Landets navn",
+      "facebook_page": "Facebook-side",
+      "instagram_account": "Instagram-konto",
+      "next": "Næste",
+      "official_website_link": "Officiel hjemmeside",
+      "poster_alt": "Udgaveplakat",
+      "poster_placeholder": "Klik for at vælge udgaveplakat",
+      "previous": "Forrige",
+      "program_placeholder": "Beskriv programmet for udgaven (tider, workshops, forestillinger...)",
+      "social_networks_description": "Del dine sider for at øge synligheden",
+      "social_networks_title": "Sociale netværk",
+      "step_about_description": "Udgavebeskrivelse",
+      "step_about_title": "Om",
+      "step_external_links_description": "Billetsalg og sociale netværk",
+      "step_external_links_title": "Eksterne links",
+      "step_general_description": "Generelle Oplysninger",
+      "step_general_title": "Generelle Oplysninger",
+      "step_services_title": "Tilbudte Tjenester",
+      "ticketing_link": "Billetsalgslink",
+      "ticketing_section_description": "Information om køb af billetter",
+      "ticketing_section_title": "Billetsalg"
+    },
+    "favorites_map": {
+      "all_favorites": "Alle er favoritter",
+      "editions_with_location": "{count} udgave med placering | {count} udgaver med placering",
+      "no_upcoming_favorites": "Ingen kommende favoritudgaver med tilgængelig placering",
+      "past": "Tidligere",
+      "upcoming": "Kommende"
+    },
+    "map": {
+      "editions_on_map": "{count} udgave på kortet | {count} udgaver på kortet",
+      "incomplete_address_warning": "Udgaver uden fuldstændig adresse kan ikke vises på kortet.",
+      "loading": "Indlæser kort...",
+      "no_editions_with_location": "Ingen udgaver med placering",
+      "ongoing": "Igangværende",
+      "past": "Tidligere",
+      "temporal_status": "Tidsstatus",
+      "upcoming": "Kommende",
+      "without_coordinates": "({count} uden koordinater)",
+      "yellow_border_favorite": "Gul kant = Favorit"
+    },
+    "posts": {
+      "comments_count": "{count} kommentar | {count} kommentarer",
+      "confirm_delete_comment": "Er du sikker på, at du vil slette denne kommentar? Denne handling kan ikke fortrydes.",
+      "confirm_delete_post": "Er du sikker på, at du vil slette dette indlæg? Denne handling kan ikke fortrydes.",
+      "confirm_delete_title": "Bekræft sletning",
+      "pinned": "Fastgjort",
+      "publish": "Offentliggør",
+      "reply_to_post": "Kommenter denne publikation",
+      "your_comment": "Din kommentar",
+      "your_comment_placeholder": "Din kommentar..."
+    }
+  },
+  "forms": {
+    "buttons": {
+      "publishing": "Offentliggør...",
+      "submitting": "Indsender..."
+    },
+    "labels": {
+      "address_complement": "Adressetillæg",
+      "convention_name": "Konventionsnavn",
+      "edition_name_optional": "Udgavenavn (valgfrit)",
+      "from_date": "Fra",
+      "full_address": "Fuldstændig adresse",
+      "select_date": "Vælg en dato",
+      "until_date": "Til"
+    },
+    "placeholders": {
+      "address_complement": "Bygning A, Festsal...",
+      "city_example": "København",
+      "contact_email": "kontakt{'@'}convention.org",
+      "convention_description": "Beskriv konventionen, dens historie, dens særegenhed...",
+      "convention_name_example": "F.eks: Europæisk Jonglørkonvention",
+      "edition_name_example": "Udgavenavn (f.eks: EJC 2024)",
+      "search_by_name": "Søg efter navn",
+      "select_convention": "Vælg en konvention",
+      "select_countries": "Vælg lande...",
+      "start_typing_address": "Begynd at skrive en adresse..."
+    }
+  },
+  "notifications": {
+    "confirm_delete_description": "Er du sikker på, at du vil slette denne notifikation?",
+    "confirm_delete_title": "Slet notifikation",
+    "loading": "Indlæser des notifications...",
+    "manage_description": "Administrer dine beskeder og præferencer",
+    "none_found": "Ingen beskeder fundet",
+    "push": {
+      "blocked": "Notifikationer blokeret i browserindstillinger",
+      "description": "Modtag notifikationer selv når applikationen er lukket",
+      "disabled": "Notifikationer deaktiveret",
+      "enabled": "Notifikationer aktiveret på denne enhed",
+      "not_supported": "Push-notifikationer understøttes ikke på denne browser",
+      "test_button": "Test en notifikation",
+      "title": "Push-notifikationer"
+    },
+    "this_week": "Denne uge",
+    "unread": "Ulæste"
+  },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Få besked om samkørsel-bookinger og beskeder",
+        "important": "Gå ikke glip af vigtig information der vedrører dig",
+        "reminders": "Modtag påmindelser om dine yndlings-konventioner",
+        "volunteer": "Modtag opdateringer om dine frivillig-ansøgninger"
+      },
+      "description": "Aktivér push-notifikationer for at holde dig opdateret om dine samkørsler, frivillig-ansøgninger og yndlings-konventioner.",
+      "enable": "Aktivér notifikationer",
+      "not_now": "Ikke nu",
+      "privacy": {
+        "description": "Du kan deaktivere notifikationer når som helst i dine indstillinger.",
+        "title": "Respekterer dit privatliv"
+      },
+      "title": "Hold dig informeret i realtid"
+    }
+  },
+  "upload": {
+    "delete_message": "Billede slettet",
+    "error": "Fejl under upload",
+    "error_message": "Upload fejl",
+    "errors": {
+      "file_too_large": "Fil for stor. Maksimal størrelse: {maxSize}",
+      "invalid_file_extension": "Ugyldig filendelse. Accepterede endelser: {allowedExtensions}",
+      "invalid_file_type": "Ugyldig filtype. Accepterede formater: {allowedTypes}"
+    },
+    "formats_accepted": "Accepterede formater",
+    "logo_url_optional_placeholder": "URL til convention logo (valgfrit)",
+    "max_size": "Maksimal størrelse",
+    "select_file": "Vælg fil",
+    "success_message": "Billede uploadet med succes!",
+    "upload": "Upload",
+    "upload_error": "Upload fejl",
+    "uploading": "Uploader..."
+  }
+}

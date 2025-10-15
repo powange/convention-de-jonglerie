@@ -19,23 +19,66 @@ const BOLD = '\x1b[1m'
 const projectRoot = path.resolve(__dirname, '..')
 const localesDir = path.join(projectRoot, 'i18n', 'locales')
 
+/**
+ * Charge tous les fichiers de traduction depuis le dossier de locales
+ * Structure: i18n/locales/{langue}/{domaine}.json
+ * et les fusionne en un seul objet par langue
+ */
 function loadLocaleFiles() {
   const locales = {}
-  const files = fs.readdirSync(localesDir).filter((file) => file.endsWith('.json'))
 
-  for (const file of files) {
-    const locale = file.replace('.json', '')
-    const filePath = path.join(localesDir, file)
-
-    try {
-      const content = fs.readFileSync(filePath, 'utf8')
-      locales[locale] = JSON.parse(content)
-    } catch (error) {
-      console.error(`${RED}Erreur lors du chargement de ${file}:${RESET}`, error.message)
+  try {
+    // Vérifier que le dossier existe
+    if (!fs.existsSync(localesDir)) {
+      console.error(`${RED}Erreur: Le dossier ${localesDir} n'existe pas${RESET}`)
+      process.exit(1)
     }
-  }
 
-  return locales
+    // Lister tous les dossiers de langue
+    const localeDirs = fs.readdirSync(localesDir).filter((item) => {
+      const itemPath = path.join(localesDir, item)
+      return fs.statSync(itemPath).isDirectory()
+    })
+
+    if (localeDirs.length === 0) {
+      console.error(`${RED}Erreur: Aucun dossier de langue trouvé dans ${localesDir}${RESET}`)
+      process.exit(1)
+    }
+
+    // Pour chaque langue, charger tous les fichiers JSON et les fusionner
+    for (const locale of localeDirs) {
+      const localeDir = path.join(localesDir, locale)
+      const files = fs.readdirSync(localeDir).filter((file) => file.endsWith('.json'))
+
+      if (files.length === 0) {
+        console.warn(
+          `${YELLOW}Avertissement: Aucun fichier de traduction trouvé dans ${locale}/${RESET}`
+        )
+        continue
+      }
+
+      // Fusionner tous les fichiers de cette langue
+      const mergedData = {}
+      for (const file of files) {
+        const filePath = path.join(localeDir, file)
+        const content = fs.readFileSync(filePath, 'utf8')
+        const data = JSON.parse(content)
+        Object.assign(mergedData, data)
+      }
+
+      locales[locale] = mergedData
+    }
+
+    console.log(`${CYAN}Chargé ${localeDirs.length} langue(s): ${localeDirs.join(', ')}${RESET}`)
+
+    return locales
+  } catch (error) {
+    console.error(
+      `${RED}Erreur lors du chargement des fichiers de traduction:${RESET}`,
+      error.message
+    )
+    process.exit(1)
+  }
 }
 
 function flattenObject(obj, prefix = '') {
@@ -93,6 +136,93 @@ function countTodoKeys(locales) {
   }
 
   return { todoStats, totalTodoKeys }
+}
+
+/**
+ * Configuration de la répartition des clés par domaine
+ * Correspond à la structure de split-i18n.js
+ */
+const SPLIT_CONFIG = {
+  common: [
+    'common',
+    'navigation',
+    'footer',
+    'errors',
+    'messages',
+    'validation',
+    'countries',
+    'dates',
+    'log',
+    'c',
+    'calendar',
+  ],
+  admin: ['admin', 'feedback'],
+  edition: ['editions', 'conventions', 'collaborators', 'carpool', 'diet'],
+  auth: ['auth', 'profile', 'permissions'],
+  public: ['homepage', 'pages', 'seo'],
+  components: ['components', 'forms', 'upload', 'notifications', 'push_notifications'],
+  app: ['app', 'pwa', 'services'],
+}
+
+/**
+ * Détermine le fichier de domaine cible pour une clé donnée
+ */
+function getTargetFile(key) {
+  const topLevelKey = key.split('.')[0]
+  for (const [file, keys] of Object.entries(SPLIT_CONFIG)) {
+    if (keys.includes(topLevelKey)) {
+      return file
+    }
+  }
+  return 'common' // Par défaut
+}
+
+/**
+ * Écrit les données dans les fichiers de domaine d'une langue
+ */
+function writeLocaleFiles(locale, data) {
+  const localeDir = path.join(localesDir, locale)
+
+  // S'assurer que le dossier de la langue existe
+  if (!fs.existsSync(localeDir)) {
+    fs.mkdirSync(localeDir, { recursive: true })
+  }
+
+  // Organiser les données par fichier de domaine
+  const fileContents = {}
+  for (const file of Object.keys(SPLIT_CONFIG)) {
+    fileContents[file] = {}
+  }
+
+  // Répartir les clés dans les bons fichiers
+  for (const [key, value] of Object.entries(data)) {
+    const targetFile = getTargetFile(key)
+    fileContents[targetFile][key] = value
+  }
+
+  // Fonction de tri récursif des clés
+  const sortKeys = (obj) => {
+    if (Array.isArray(obj) || obj === null || typeof obj !== 'object') return obj
+    const out = {}
+    for (const key of Object.keys(obj).sort()) out[key] = sortKeys(obj[key])
+    return out
+  }
+
+  // Écrire chaque fichier de domaine
+  let updatedFiles = 0
+  for (const [file, content] of Object.entries(fileContents)) {
+    const filePath = path.join(localeDir, `${file}.json`)
+    if (Object.keys(content).length > 0) {
+      const sorted = sortKeys(content)
+      fs.writeFileSync(filePath, JSON.stringify(sorted, null, 2) + '\n', 'utf8')
+      updatedFiles++
+    } else if (fs.existsSync(filePath)) {
+      // Supprimer les fichiers vides
+      fs.unlinkSync(filePath)
+    }
+  }
+
+  return updatedFiles
 }
 
 function compareTranslations(locales, referenceLocale = 'fr') {
@@ -259,7 +389,6 @@ async function main() {
   if (pruneExtra) {
     for (const [locale, data] of Object.entries(languagesToShow)) {
       if (data.extraKeys.length > 0) {
-        const localePath = path.join(localesDir, `${locale}.json`)
         // Recharger contenu brut pour reconstruire proprement
         const original = locales[locale]
         // Aplatir
@@ -284,20 +413,14 @@ async function main() {
             }
           }
         }
-        // Tri récursif des clés
-        const sortKeys = (obj) => {
-          if (Array.isArray(obj) || obj === null || typeof obj !== 'object') return obj
-          const out = {}
-          for (const key of Object.keys(obj).sort()) out[key] = sortKeys(obj[key])
-          return out
-        }
-        const sorted = sortKeys(rebuilt)
-        fs.writeFileSync(localePath, JSON.stringify(sorted, null, 2) + '\n', 'utf8')
+
+        // Écrire dans les fichiers de domaine
+        const updatedFiles = writeLocaleFiles(locale, rebuilt)
         console.log(
-          `${YELLOW}Pruned ${data.extraKeys.length} clé(s) en trop dans ${locale}.json${RESET}`
+          `${YELLOW}Pruned ${data.extraKeys.length} clé(s) en trop dans ${locale}/ (${updatedFiles} fichier(s) mis à jour)${RESET}`
         )
         // Mettre à jour les données en mémoire pour le reporting
-        locales[locale] = sorted
+        locales[locale] = rebuilt
       }
     }
     // Recalculer les résultats après prune
@@ -320,7 +443,6 @@ async function main() {
         }
       }
       if (keysToFill.length > 0) {
-        const localePath = path.join(localesDir, `${locale}.json`)
         const original = locales[locale]
         const flat = flattenObject(original)
         let added = 0
@@ -360,17 +482,14 @@ async function main() {
               }
             }
           }
-          const sortKeys = (obj) => {
-            if (Array.isArray(obj) || obj === null || typeof obj !== 'object') return obj
-            const out = {}
-            for (const key of Object.keys(obj).sort()) out[key] = sortKeys(obj[key])
-            return out
-          }
-          const sorted = sortKeys(rebuilt)
-          fs.writeFileSync(localePath, JSON.stringify(sorted, null, 2) + '\n', 'utf8')
-          locales[locale] = sorted
+
+          // Écrire dans les fichiers de domaine
+          const updatedFiles = writeLocaleFiles(locale, rebuilt)
+          locales[locale] = rebuilt
           const modeNote = fillMode === 'copy' ? '' : ` (mode ${fillMode})`
-          console.log(`${GREEN}Filled ${added} clé(s) dans ${locale}.json${modeNote}${RESET}`)
+          console.log(
+            `${GREEN}Filled ${added} clé(s) dans ${locale}/ (${updatedFiles} fichier(s) mis à jour)${modeNote}${RESET}`
+          )
         }
       }
     }

@@ -1,0 +1,221 @@
+{
+  "components": {
+    "carpool": {
+      "accept": "Accepteren",
+      "add_comment_placeholder": "Voeg een opmerking toe...",
+      "added_on": "Toegevoegd op {date}",
+      "address": "Adres",
+      "available_seats": "Aantal beschikbare plaatsen",
+      "be_first_to_comment": "Wees de eerste om te reageren op deze {type}!",
+      "be_first_to_offer": "Wees de eerste om een rit aan te bieden voor deze editie!",
+      "book_seats": "Plaatsen reserveren",
+      "comments": "Opmerkingen",
+      "confirm_booking": "Reservering bevestigen",
+      "confirm_delete_offer": "Weet je zeker dat je deze meerijdaanbieding wilt verwijderen?",
+      "confirm_delete_request": "Weet je zeker dat je dit meerijdverzoek wilt verwijderen?",
+      "confirmed_passengers": "Bevestigde passagiers",
+      "contact": "Contact",
+      "contact_user": "Contact {name}",
+      "delete_offer": "Aanbieding verwijderen",
+      "delete_request": "Verzoek verwijderen",
+      "departure_date_time": "Vertrekdatum en -tijd",
+      "edit_offer": "Meerijdaanbieding bewerken",
+      "edit_request": "Meerijdverzoek bewerken",
+      "how_many_seats_needed": "Hoeveel plaatsen heb je nodig?",
+      "loading_comments": "Opmerkingen laden...",
+      "my_booking": "Mijn reservering",
+      "no_comments": "Geen opmerkingen",
+      "no_offers": "Geen meerijdaanbiedingen",
+      "no_pending_bookings": "Geen reserveringen in afwachting",
+      "no_requests": "Geen meerijdverzoeken",
+      "no_requests_published": "Er zijn nog geen verzoeken gepubliceerd.",
+      "offer": "aanbieding",
+      "offered_on": "Aangeboden op {date}",
+      "offers_long": "Meerijdaanbiedingen",
+      "offers_short": "Aanbiedingen",
+      "pending_bookings": "In afwachting van reserveringen",
+      "propose_carpool": "Rit aanbieden",
+      "publish": "Publiceren",
+      "reject": "Weigeren",
+      "request": "verzoek",
+      "request_carpool": "Rit aanvragen",
+      "requested_on": "Aangevraagd op {date}",
+      "requested_seats": "{count} aangevraagde plaats | {count} aangevraagde plaatsen",
+      "requests_long": "Meerijdverzoeken",
+      "requests_short": "Verzoeken",
+      "seats_available": "{count} plaats beschikbaar | {count} plaatsen beschikbaar",
+      "seats_needed": "{count} plaats nodig | {count} plaatsen nodig",
+      "suggestions": "Suggesties",
+      "to_add_comment": "om een opmerking toe te voegen",
+      "view_comments": "Bekijk opmerkingen ({count})"
+    },
+    "collaborators_rights_panel": {
+      "per_edition": "Rechten per editie",
+      "per_edition_hint": "Geen specifieke rechten gedefinieerd voor edities",
+      "title_placeholder": "Titel of rol (optioneel)"
+    },
+    "convention_form": {
+      "click_to_select_image": "Klik om een afbeelding te selecteren",
+      "contact_email": "Contact e-mail",
+      "contact_email_help": "E-mailadres gebruikt voor editie-claimverzoeken en contacten gerelateerd aan deze conventie",
+      "convention_logo": "Conventielogo",
+      "convention_logo_alt": "Conventielogo",
+      "convention_name": "Conventienaam",
+      "external_url": "Externe URL",
+      "image_deleted": "Afbeelding verwijderd",
+      "image_uploaded": "Afbeelding geüpload",
+      "loading_error_description": "Kan afbeelding niet laden vanaf deze URL",
+      "loading_error_title": "Laadfout",
+      "logo_preview": "Logo voorbeeld:",
+      "logo_url_description": "URL van het conventielogo-afbeelding",
+      "upload_file": "Bestand uploaden"
+    },
+    "country_multi_select": {
+      "placeholder": "Landen selecteren..."
+    },
+    "country_select": {
+      "no_countries_found": "Geen landen gevonden",
+      "search_country_placeholder": "Zoek een land..."
+    },
+    "date_time_picker": {
+      "placeholder": "Selecteer een datum"
+    },
+    "edition_form": {
+      "address_tip": "Voer een volledig adres in het zoekveld in om automatisch alle onderstaande velden in te vullen. Een nauwkeurig adres maakt het ook mogelijk om uw evenement op de kaart te lokaliseren.",
+      "convention_description_placeholder": "Beschrijving van de conventie",
+      "convention_poster_optional": "Conventieposter (Optioneel)",
+      "country_placeholder": "Naam van het land",
+      "facebook_page": "Facebookpagina",
+      "instagram_account": "Instagram-account",
+      "next": "Volgende",
+      "official_website_link": "Officiële website",
+      "poster_alt": "Editieposter",
+      "poster_placeholder": "Klik om editieposter te selecteren",
+      "previous": "Vorige",
+      "program_placeholder": "Beschrijf het programma van de editie (tijdschema, workshops, voorstellingen...)",
+      "social_networks_description": "Deel uw pagina's om de zichtbaarheid te vergroten",
+      "social_networks_title": "Sociale netwerken",
+      "step_about_description": "Editiebeschrijving",
+      "step_about_title": "Over",
+      "step_external_links_description": "Ticketing en sociale netwerken",
+      "step_external_links_title": "Externe links",
+      "step_general_description": "Algemene Informatie",
+      "step_general_title": "Algemene Informatie",
+      "step_services_title": "Aangeboden Diensten",
+      "ticketing_link": "Ticketverkooplink",
+      "ticketing_section_description": "Informatie voor het kopen van tickets",
+      "ticketing_section_title": "Ticketverkoop"
+    },
+    "favorites_map": {
+      "all_favorites": "Alle zijn favorieten",
+      "editions_with_location": "{count} editie met locatie | {count} edities met locatie",
+      "no_upcoming_favorites": "Geen aankomende favoriete edities met beschikbare locatie",
+      "past": "Afgelopen",
+      "upcoming": "Aankomend"
+    },
+    "map": {
+      "editions_on_map": "{count} editie op kaart | {count} edities op kaart",
+      "incomplete_address_warning": "Edities zonder volledig adres kunnen niet op de kaart worden weergegeven.",
+      "loading": "Kaart laden...",
+      "no_editions_with_location": "Geen edities met locatie",
+      "ongoing": "Lopend",
+      "past": "Afgelopen",
+      "temporal_status": "Temporele status",
+      "upcoming": "Aankomend",
+      "without_coordinates": "({count} zonder coördinaten)",
+      "yellow_border_favorite": "Gele rand = Favoriet"
+    },
+    "posts": {
+      "comments_count": "{count} reactie | {count} reacties",
+      "confirm_delete_comment": "Weet je zeker dat je deze opmerking wilt verwijderen? Deze actie is onomkeerbaar.",
+      "confirm_delete_post": "Weet je zeker dat je dit bericht wilt verwijderen? Deze actie is onomkeerbaar.",
+      "confirm_delete_title": "Verwijdering bevestigen",
+      "pinned": "Vastgezet",
+      "publish": "Publiceren",
+      "reply_to_post": "Reageer op deze publicatie",
+      "your_comment": "Jouw reactie",
+      "your_comment_placeholder": "Jouw reactie..."
+    }
+  },
+  "forms": {
+    "buttons": {
+      "publishing": "Publiceren...",
+      "submitting": "Verzenden..."
+    },
+    "labels": {
+      "address_complement": "Adresaanvulling",
+      "convention_name": "Conventienaam",
+      "edition_name_optional": "Editienaam (optioneel)",
+      "from_date": "Van",
+      "full_address": "Volledig Adres",
+      "select_date": "Selecteer een datum",
+      "until_date": "Tot"
+    },
+    "placeholders": {
+      "address_complement": "Gebouw A, Functiezaal...",
+      "city_example": "Amsterdam",
+      "contact_email": "contact{'@'}convention.org",
+      "convention_description": "Beschrijf de conventie, haar geschiedenis, haar bijzonderheden...",
+      "convention_name_example": "bijv.: Europees Jongleer Congres",
+      "edition_name_example": "Editienaam (bijv.: EJC 2024)",
+      "search_by_name": "Zoeken op naam",
+      "select_convention": "Selecteer een conventie",
+      "select_countries": "Selecteer landen...",
+      "start_typing_address": "Begin met het typen van een adres..."
+    }
+  },
+  "notifications": {
+    "confirm_delete_description": "Weet je zeker dat je deze melding wilt verwijderen?",
+    "confirm_delete_title": "Melding verwijderen",
+    "loading": "Laden des notifications...",
+    "manage_description": "Beheer je meldingen en voorkeuren",
+    "none_found": "Geen meldingen gevonden",
+    "push": {
+      "blocked": "Meldingen geblokkeerd in browserinstellingen",
+      "description": "Ontvang meldingen zelfs wanneer de applicatie gesloten is",
+      "disabled": "Meldingen uitgeschakeld",
+      "enabled": "Meldingen ingeschakeld op dit apparaat",
+      "not_supported": "Push-meldingen niet ondersteund op deze browser",
+      "test_button": "Test een melding",
+      "title": "Push-meldingen"
+    },
+    "this_week": "Deze week",
+    "unread": "Ongelezen"
+  },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Ontvang meldingen van carpool-boekingen en berichten",
+        "important": "Mis geen belangrijke informatie die jou betreft",
+        "reminders": "Ontvang herinneringen voor je favoriete conventies",
+        "volunteer": "Ontvang updates over je vrijwilligersaanmeldingen"
+      },
+      "description": "Schakel push-notificaties in om op de hoogte te blijven van je carpools, vrijwilligersaanmeldingen en favoriete conventies.",
+      "enable": "Notificaties inschakelen",
+      "not_now": "Niet nu",
+      "privacy": {
+        "description": "Je kunt notificaties altijd uitschakelen in je instellingen.",
+        "title": "Privacyvriendelijk"
+      },
+      "title": "Blijf real-time geïnformeerd"
+    }
+  },
+  "upload": {
+    "delete_message": "Afbeelding verwijderd",
+    "error": "Fout tijdens uploaden",
+    "error_message": "Upload fout",
+    "errors": {
+      "file_too_large": "Bestand te groot. Maximale grootte: {maxSize}",
+      "invalid_file_extension": "Ongeldige bestandsextensie. Geaccepteerde extensies: {allowedExtensions}",
+      "invalid_file_type": "Ongeldig bestandstype. Geaccepteerde formaten: {allowedTypes}"
+    },
+    "formats_accepted": "Geaccepteerde formaten",
+    "logo_url_optional_placeholder": "URL van het conventie logo (optioneel)",
+    "max_size": "Maximale grootte",
+    "select_file": "Bestand selecteren",
+    "success_message": "Afbeelding succesvol geüpload!",
+    "upload": "Uploaden",
+    "upload_error": "Upload fout",
+    "uploading": "Upload bezig..."
+  }
+}

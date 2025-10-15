@@ -1,0 +1,221 @@
+{
+  "components": {
+    "carpool": {
+      "accept": "Zaakceptuj",
+      "add_comment_placeholder": "Dodaj komentarz...",
+      "added_on": "Dodano {date}",
+      "address": "Adres",
+      "available_seats": "Liczba dostępnych miejsc",
+      "be_first_to_comment": "Bądź pierwszy, który skomentuje tę {type}!",
+      "be_first_to_offer": "Bądź pierwszy, który zaoferuje wspólny przejazd na tę edycję!",
+      "book_seats": "Zarezerwuj",
+      "comments": "Komentarze",
+      "confirm_booking": "Potwierdź rezerwację",
+      "confirm_delete_offer": "Czy na pewno chcesz usunąć tę ofertę wspólnego przejazdu?",
+      "confirm_delete_request": "Czy na pewno chcesz usunąć tę prośbę o wspólny przejazd?",
+      "confirmed_passengers": "Potwierdzeni pasażerowie",
+      "contact": "Kontakt",
+      "contact_user": "Skontaktuj się z {name}",
+      "delete_offer": "Usuń ofertę",
+      "delete_request": "Usuń prośbę",
+      "departure_date_time": "Data i godzina wyjazdu",
+      "edit_offer": "Edytuj ofertę wspólnego przejazdu",
+      "edit_request": "Edytuj prośbę o wspólny przejazd",
+      "how_many_seats_needed": "Ile miejsc szukasz?",
+      "loading_comments": "Ładowanie komentarzy...",
+      "my_booking": "Moja rezerwacja",
+      "no_comments": "Brak komentarzy",
+      "no_offers": "Brak ofert wspólnych przejazdów",
+      "no_pending_bookings": "Brak oczekujących rezerwacji",
+      "no_requests": "Brak próśb o wspólne przejazdy",
+      "no_requests_published": "Nie opublikowano jeszcze żadnych próśb.",
+      "offer": "ofertę",
+      "offered_on": "Zaoferowane {date}",
+      "offers_long": "Oferty wspólnych przejazdów",
+      "offers_short": "Oferty",
+      "pending_bookings": "Oczekujące rezerwacje",
+      "propose_carpool": "Zaproponuj wspólny przejazd",
+      "publish": "Opublikuj",
+      "reject": "Odrzuć",
+      "request": "prośbę",
+      "request_carpool": "Poproś o wspólny przejazd",
+      "requested_on": "Poproszono {date}",
+      "requested_seats": "{count} miejsce wymagane | {count} miejsca wymagane | {count} miejsc wymaganych",
+      "requests_long": "Prośby o wspólne przejazdy",
+      "requests_short": "Prośby",
+      "seats_available": "{count} dostępne miejsce | {count} dostępnych miejsc",
+      "seats_needed": "{count} szukane miejsce | {count} szukanych miejsc",
+      "suggestions": "Sugestie",
+      "to_add_comment": "aby dodać komentarz",
+      "view_comments": "Zobacz komentarze ({count})"
+    },
+    "collaborators_rights_panel": {
+      "per_edition": "Prawa na edycję",
+      "per_edition_hint": "Nie zdefiniowano konkretnych praw dla edycji",
+      "title_placeholder": "Tytuł lub rola (opcjonalnie)"
+    },
+    "convention_form": {
+      "click_to_select_image": "Kliknij, aby wybrać obraz",
+      "contact_email": "Email kontaktowy",
+      "contact_email_help": "Adres email używany do zgłoszeń roszczeń edycji i kontaktów związanych z tą konwencją",
+      "convention_logo": "Logo konwencji",
+      "convention_logo_alt": "Logo konwencji",
+      "convention_name": "Nazwa konwencji",
+      "external_url": "Zewnętrzny URL",
+      "image_deleted": "Obraz usunięty",
+      "image_uploaded": "Obraz przesłany",
+      "loading_error_description": "Nie można załadować obrazu z tego adresu URL",
+      "loading_error_title": "Błąd ładowania",
+      "logo_preview": "Podgląd logo:",
+      "logo_url_description": "URL obrazu logo konwencji",
+      "upload_file": "Prześlij plik"
+    },
+    "country_multi_select": {
+      "placeholder": "Wybierz kraje..."
+    },
+    "country_select": {
+      "no_countries_found": "Nie znaleziono krajów",
+      "search_country_placeholder": "Szukaj kraju..."
+    },
+    "date_time_picker": {
+      "placeholder": "Wybierz datę"
+    },
+    "edition_form": {
+      "address_tip": "Wpisz pełny adres w polu wyszukiwania, aby automatycznie wypełnić wszystkie poniższe pola. Dokładny adres pozwoli również geolokalizować Twoje wydarzenie na mapie.",
+      "convention_description_placeholder": "Opis konwencji",
+      "convention_poster_optional": "Plakat konwencji (Opcjonalny)",
+      "country_placeholder": "Nazwa kraju",
+      "facebook_page": "Strona Facebook",
+      "instagram_account": "Konto Instagram",
+      "next": "Następny",
+      "official_website_link": "Strona oficjalna",
+      "poster_alt": "Plakat edycji",
+      "poster_placeholder": "Kliknij, aby wybrać plakat edycji",
+      "previous": "Poprzedni",
+      "program_placeholder": "Opisz program edycji (harmonogram, warsztaty, pokazy...)",
+      "social_networks_description": "Udostępnij swoje strony, aby zwiększyć widoczność",
+      "social_networks_title": "Sieci społecznościowe",
+      "step_about_description": "Opis edycji",
+      "step_about_title": "O",
+      "step_external_links_description": "Bilety i sieci społecznościowe",
+      "step_external_links_title": "Linki zewnętrzne",
+      "step_general_description": "Informacje Ogólne",
+      "step_general_title": "Informacje Ogólne",
+      "step_services_title": "Oferowane Usługi",
+      "ticketing_link": "Link do biletów",
+      "ticketing_section_description": "Informacje o zakupie biletów",
+      "ticketing_section_title": "Bilety"
+    },
+    "favorites_map": {
+      "all_favorites": "Wszystkie są ulubione",
+      "editions_with_location": "{count} edycja z lokalizacją | {count} edycji z lokalizacją",
+      "no_upcoming_favorites": "Brak nadchodzących ulubionych edycji z dostępną lokalizacją",
+      "past": "Przeszłe",
+      "upcoming": "Nadchodzące"
+    },
+    "map": {
+      "editions_on_map": "{count} edycja na mapie | {count} edycji na mapie",
+      "incomplete_address_warning": "Edycje bez pełnego adresu nie mogą być wyświetlane na mapie.",
+      "loading": "Ładowanie mapy...",
+      "no_editions_with_location": "Brak edycji z lokalizacją",
+      "ongoing": "W toku",
+      "past": "Przeszłe",
+      "temporal_status": "Status czasowy",
+      "upcoming": "Nadchodzące",
+      "without_coordinates": "({count} bez współrzędnych)",
+      "yellow_border_favorite": "Żółta ramka = Ulubione"
+    },
+    "posts": {
+      "comments_count": "{count} komentarz | {count} komentarze",
+      "confirm_delete_comment": "Czy na pewno chcesz usunąć ten komentarz? Ta akcja jest nieodwracalna.",
+      "confirm_delete_post": "Czy na pewno chcesz usunąć ten post? Ta akcja jest nieodwracalna.",
+      "confirm_delete_title": "Potwierdź usunięcie",
+      "pinned": "Przypięte",
+      "publish": "Opublikuj",
+      "reply_to_post": "Skomentuj ten wpis",
+      "your_comment": "Twój komentarz",
+      "your_comment_placeholder": "Twój komentarz..."
+    }
+  },
+  "forms": {
+    "buttons": {
+      "publishing": "Publikowanie...",
+      "submitting": "Wysyłanie..."
+    },
+    "labels": {
+      "address_complement": "Uzupełnienie adresu",
+      "convention_name": "Nazwa konwencji",
+      "edition_name_optional": "Nazwa edycji (opcjonalna)",
+      "from_date": "Od",
+      "full_address": "Pełny Adres",
+      "select_date": "Wybierz datę",
+      "until_date": "Do"
+    },
+    "placeholders": {
+      "address_complement": "Budynek A, Sala balowa...",
+      "city_example": "Warszawa",
+      "contact_email": "kontakt{'@'}convention.org",
+      "convention_description": "Opisz konwencję, jej historię, specyficzne cechy...",
+      "convention_name_example": "Np.: Europejska Konwencja Żonglerska",
+      "edition_name_example": "Nazwa edycji (np. EJC 2024)",
+      "search_by_name": "Szukaj po nazwie",
+      "select_convention": "Wybierz konwencję",
+      "select_countries": "Wybierz kraje...",
+      "start_typing_address": "Zacznij wpisywać adres..."
+    }
+  },
+  "notifications": {
+    "confirm_delete_description": "Czy na pewno chcesz usunąć to powiadomienie?",
+    "confirm_delete_title": "Usuń powiadomienie",
+    "loading": "Ładowanie des notifications...",
+    "manage_description": "Zarządzaj powiadomieniami i preferencjami",
+    "none_found": "Nie znaleziono powiadomień",
+    "push": {
+      "blocked": "Powiadomienia zablokowane w ustawieniach przeglądarki",
+      "description": "Otrzymuj powiadomienia nawet gdy aplikacja jest zamknięta",
+      "disabled": "Powiadomienia wyłączone",
+      "enabled": "Powiadomienia włączone na tym urządzeniu",
+      "not_supported": "Powiadomienia push nie są obsługiwane w tej przeglądarce",
+      "test_button": "Przetestuj powiadomienie",
+      "title": "Powiadomienia push"
+    },
+    "this_week": "W tym tygodniu",
+    "unread": "Nieprzeczytane"
+  },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Otrzymuj powiadomienia o rezerwacjach i wiadomościach dotyczących wspólnych przejazdów",
+        "important": "Nie przegap ważnych informacji dotyczących Ciebie",
+        "reminders": "Otrzymuj przypomnienia o swoich ulubionych konwentach",
+        "volunteer": "Otrzymuj aktualizacje dotyczące swoich aplikacji wolontariuszy"
+      },
+      "description": "Włącz powiadomienia push, aby być na bieżąco z wspólnymi przejazdami, aplikacjami wolontariuszy i ulubionymi konwentami.",
+      "enable": "Włącz powiadomienia",
+      "not_now": "Nie teraz",
+      "privacy": {
+        "description": "Możesz wyłączyć powiadomienia w każdej chwili w swoich ustawieniach.",
+        "title": "Szanuje prywatność"
+      },
+      "title": "Bądź informowany w czasie rzeczywistym"
+    }
+  },
+  "upload": {
+    "delete_message": "Obraz usunięty",
+    "error": "Błąd podczas przesyłania",
+    "error_message": "Błąd przesyłania",
+    "errors": {
+      "file_too_large": "Plik za duży. Maksymalny rozmiar: {maxSize}",
+      "invalid_file_extension": "Nieprawidłowe rozszerzenie pliku. Akceptowane rozszerzenia: {allowedExtensions}",
+      "invalid_file_type": "Nieprawidłowy typ pliku. Akceptowane formaty: {allowedTypes}"
+    },
+    "formats_accepted": "Akceptowane formaty",
+    "logo_url_optional_placeholder": "URL logo konwencji (opcjonalne)",
+    "max_size": "Maksymalny rozmiar",
+    "select_file": "Wybierz plik",
+    "success_message": "Obraz przesłany pomyślnie!",
+    "upload": "Prześlij",
+    "upload_error": "Błąd przesyłania",
+    "uploading": "Przesyłanie..."
+  }
+}

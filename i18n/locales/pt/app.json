@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Convenção de Malabarismo"
+  },
+  "pwa": {
+    "install": {
+      "button": "Instalar agora",
+      "cancelled": {
+        "description": "Você pode instalar o app mais tarde através das configurações do navegador.",
+        "title": "Instalação cancelada"
+      },
+      "description": "Adicione o app Juggling Convention à sua tela inicial para acesso rápido e uma experiência ideal.",
+      "error": {
+        "description": "Ocorreu um erro durante a instalação. Tente novamente.",
+        "title": "Erro de instalação"
+      },
+      "later": "Mais tarde",
+      "success": {
+        "description": "O app foi adicionado à sua tela inicial.",
+        "title": "Instalação bem-sucedida!"
+      },
+      "title": "Instalar app"
+    }
+  },
+  "services": {
+    "accessibility": "Acessibilidade para deficientes",
+    "aerial_space": "Espaço aéreo",
+    "afj_token_payment": "Pagamento com fichas AFJ",
+    "atm": "Multibanco",
+    "canteen": "Cantina",
+    "cash_payment": "Pagamento em dinheiro",
+    "categories": {
+      "accommodation": "Alojamento",
+      "activities": "Actividades",
+      "amenities": "Comodidades",
+      "food": "Restauração",
+      "payment": "Pagamentos"
+    },
+    "concert": "Concerto",
+    "credit_card_payment": "Pagamento com cartão",
+    "family_camping": "Campismo familiar",
+    "fire_space": "Espaço de fogo",
+    "food_trucks": "Food trucks",
+    "gala": "Gala",
+    "gym": "Ginásio",
+    "kids_zone": "Zona para crianças",
+    "long_show": "Espectáculo longo",
+    "open_stage": "Palco aberto",
+    "pets_accepted": "Animais aceites",
+    "showers": "Chuveiros",
+    "slackline_space": "Espaço slackline",
+    "sleeping_room": "Sala de descanso",
+    "tent_camping": "Campismo com tenda",
+    "toilets": "WC",
+    "truck_camping": "Campismo com camião",
+    "workshops": "Workshops"
+  }
+}

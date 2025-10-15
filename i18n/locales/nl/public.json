@@ -1,0 +1,232 @@
+{
+  "homepage": {
+    "agenda": "Agenda",
+    "current_editions": "Huidige edities",
+    "filters": "Filters",
+    "finished_editions": "Afgelopen edities",
+    "grid": "Raster",
+    "map": "Kaart",
+    "no_conventions_found": "Geen conventies gevonden. Wees de eerste om er een toe te voegen!",
+    "no_conventions_match_criteria": "Geen conventies voldoen aan je zoekcriteria",
+    "period": "Periode",
+    "searched_services": "Gezochte diensten",
+    "upcoming_editions": "Aankomende edities"
+  },
+  "pages": {
+    "access_denied": {
+      "confirm_delete_edition": "Weet je zeker dat je deze editie wilt verwijderen?",
+      "description": "Je hebt niet de rechten om deze pagina te bekijken.",
+      "title": "Toegang geweigerd"
+    },
+    "add_convention": {
+      "description": "Een conventie brengt verschillende edities van hetzelfde jongleerevenement samen.",
+      "submit_button": "Conventie aanmaken",
+      "title": "Een nieuwe conventie aanmaken"
+    },
+    "add_edition": {
+      "submit_button": "Editie toevoegen",
+      "title": "Een nieuwe editie toevoegen"
+    },
+    "add_edition_for_convention": {
+      "convention_not_found_description": "De conventie die je zoekt bestaat niet of je hebt niet de rechten om er een editie aan toe te voegen.",
+      "for_convention": "Voor de conventie \"{name}\"",
+      "loading_convention": "Conventiegegevens laden...",
+      "submit_button": "Editie aanmaken"
+    },
+    "comments": {
+      "be_first_to_comment": "Wees de eerste om je ervaring te delen!",
+      "comment_placeholder": "Deel je ervaring, stel je vragen...",
+      "login_to_participate": "Log in om deel te nemen aan de discussie",
+      "no_comments": "Nog geen opmerkingen.",
+      "share_experience": "Deel je ervaring of stel je vragen",
+      "write_comment": "Schrijf een opmerking",
+      "your_comment": "Je opmerking"
+    },
+    "edit_convention": {
+      "convention_not_found_or_no_rights": "De conventie die je zoekt bestaat niet of je hebt niet de rechten om deze te bewerken.",
+      "editing_convention": "Conventie \"{name}\" bewerken",
+      "loading_convention_data": "Conventiegegevens laden...",
+      "submit_button": "Conventie bijwerken"
+    },
+    "edit_edition": {
+      "submit_button": "Editie bijwerken"
+    },
+    "favorites": {
+      "editions_in_favorites": "{count} editie | {count} edities in favorieten",
+      "no_favorites_added": "Je hebt nog geen editie aan je favorieten toegevoegd."
+    },
+    "management": {
+      "delete_edition": "Editie verwijderen",
+      "edit_edition": "Editie bewerken",
+      "lost_found_active_description": "Je kunt gevonden voorwerpen beheren terwijl de editie bezig is.",
+      "manage_lost_found": "Gevonden voorwerpen beheren"
+    },
+    "objets_trouves": {
+      "photo_alt": "Foto van het gevonden voorwerp"
+    },
+    "profile": {
+      "photo_alt": "Profielfoto",
+      "photo_placeholder": "Klik om je profielfoto te wijzigen"
+    },
+    "volunteers": {
+      "accepted": "Geaccepteerd",
+      "allergies": "Allergieën",
+      "application_details": "Aanvraagdetails",
+      "applications_description": "Volg de status van je vrijwilligersaanvragen voor verschillende conventies",
+      "applied_on": "Aangemeld op",
+      "assigned_time_slots": "Toegewezen tijdsloten",
+      "availability": "Beschikbaarheid",
+      "avoid_list": "Te vermijden lijst",
+      "browse_conventions": "Conventies bekijken",
+      "companion": "Begeleider",
+      "companion_name": "Naam begeleider",
+      "confirm_withdraw": "Weet je zeker dat je je aanmelding wilt intrekken?",
+      "contact_organizer": "Contact organisator",
+      "dates": "Data",
+      "diet": "Dieet",
+      "dietary": {
+        "none": "Geen",
+        "other": "Anders",
+        "vegan": "Veganistisch",
+        "vegetarian": "Vegetarisch"
+      },
+      "dietary_preferences": "Dieetvoorkeuren",
+      "emergency_contact": "Noodcontact",
+      "emergency_contact_name": "Naam van noodcontact",
+      "emergency_contact_phone": "Telefoon van noodcontact",
+      "event": "Evenement",
+      "experience": "Ervaring",
+      "experience_details": "Ervaringsdetails",
+      "export": "Exporteren",
+      "export_ical": "iCal exporteren",
+      "export_pdf": "PDF exporteren",
+      "has_experience": "Heeft ervaring",
+      "has_minors": "Vergezeld van minderjarigen",
+      "has_pets": "Heeft huisdieren",
+      "has_vehicle": "Heeft voertuig",
+      "history": "Geschiedenis",
+      "minors": "Minderjarigen",
+      "minors_details": "Details minderjarigen",
+      "motivation": "Motivatie",
+      "my_applications": "Mijn vrijwilligersaanvragen",
+      "my_planning": "Mijn planning",
+      "my_slots_title": "Mijn Tijdslots",
+      "no_accepted_applications": "Geen geaccepteerde aanvragen",
+      "no_accepted_description": "Je hebt nog geen geaccepteerde aanvragen",
+      "no_applications": "Geen aanvragen",
+      "no_applications_description": "Je hebt je nog niet aangemeld als vrijwilliger voor een conventie",
+      "no_history": "Geen geschiedenis",
+      "no_history_description": "Geen afgewezen of ingetrokken aanvragen",
+      "no_pending_applications": "Geen openstaande aanvragen",
+      "no_pending_description": "Je hebt momenteel geen aanvragen die wachten op antwoord",
+      "no_rejected_applications": "Geen afgewezen aanvragen",
+      "no_rejected_description": "Geen van uw aanvragen is afgewezen",
+      "pending": "In afwachting",
+      "pets": "Huisdieren",
+      "pets_details": "Huisdierdetails",
+      "rejected": "Afgewezen",
+      "setup": "Opbouw",
+      "skills": "Vaardigheden",
+      "team_distribution": {
+        "all_teams": "Alle teams",
+        "description": "Verdeling van geaccepteerde vrijwilligers in teams. Sleep en zet neer om te verplaatsen of toe te voegen aan een team.",
+        "drop_volunteers_here": "Sleep vrijwilligers hier naartoe",
+        "empty_team": "Leeg team",
+        "leader_added": "Leider toegevoegd",
+        "leader_badge": "Leider",
+        "leader_removed": "Leider verwijderd",
+        "manage_teams": "Teams beheren",
+        "max_label": "Max:",
+        "modal": {
+          "add": "Toevoegen",
+          "add_description_multiple": "Houd de vrijwilliger in hun huidige teams en voeg ze ook toe aan \"{targetTeam}\"",
+          "add_description_single": "Houd de vrijwilliger in \"{sourceTeam}\" en wijs ze ook toe aan \"{targetTeam}\"",
+          "cancel": "Annuleren",
+          "move": "Verplaatsen",
+          "move_description_multiple": "Verwijder de vrijwilliger uit al hun huidige teams en plaats ze in \"{targetTeam}\"",
+          "move_description_single": "Verwijder de vrijwilliger uit \"{sourceTeam}\" en plaats ze in \"{targetTeam}\"",
+          "question": "Wat wil je doen?"
+        },
+        "no_assignments": "Geen teamtoewijzingen gevonden",
+        "no_assignments_description": "Geaccepteerde vrijwilligers verschijnen hier zodra ze zijn toegewezen aan teams",
+        "preferences_label": "Voork:",
+        "remove_as_leader": "Verwijder leiderrol",
+        "select_team_instruction": "Selecteer het bestemmingsteam",
+        "set_as_leader": "Instellen als leider",
+        "stats": {
+          "assigned_volunteers": "Toegewezen vrijwilligers",
+          "total_assignments": "Totale toewijzingen",
+          "total_teams": "Totale teams",
+          "unassigned": "Niet toegewezen"
+        },
+        "title": "Teamverdeling",
+        "unassigned_description": "Deze geaccepteerde vrijwilligers zijn nog niet toegewezen aan een team. Je kunt ze slepen en neerzetten bij een team hieronder.",
+        "unassigned_volunteers": "Niet-toegewezen vrijwilligers",
+        "volunteers_count": "{count} vrijwilliger(s)"
+      },
+      "team_preferences": "Teamvoorkeuren",
+      "teardown": "Afbouw",
+      "time_preferences": "Tijdvoorkeuren",
+      "total_hours": "Totaal aantal uren",
+      "unnamed_slot": "Naamloos tijdslot",
+      "vehicle": "Voertuig",
+      "vehicle_details": "Voertuigdetails",
+      "view_compact": "Compacte weergave",
+      "view_compact_short": "Compact",
+      "view_detailed": "Gedetailleerde weergave",
+      "view_detailed_short": "Gedetailleerd",
+      "view_details": "Details bekijken",
+      "view_edition": "Editie bekijken",
+      "view_planning": "Planning bekijken",
+      "withdraw": "Intrekken",
+      "withdrawal_error": "Fout bij intrekken aanmelding",
+      "withdrawal_success": "Aanmelding succesvol ingetrokken"
+    }
+  },
+  "seo": {
+    "carpool": {
+      "description": "Organiseer je carpool naar {name}. Vind reisgenoten of bied je beschikbare plaatsen aan voor {date} in {location}.",
+      "keywords": "carpool, vervoer, {convention}, {location}, delen, economisch, milieuvriendelijk",
+      "og_description": "Organiseer uw vervoer voor {name} - {date}. Carpool beschikbaar.",
+      "og_title": "Carpool voor {name}",
+      "title": "Carpool - {name}",
+      "twitter_description": "Vind of bied een carpool aan voor {name}.",
+      "twitter_title": "Carpool - {name}"
+    },
+    "edition": {
+      "description": "Ontdek {name} die plaatsvindt {date} in {location}. Informatie, programma en inschrijving voor deze jongleerconventie.",
+      "keywords": "jongleren, conventie, {convention}, {location}, evenement, festival, show, workshop",
+      "og_description": "Doe mee met ons voor {name} - {date}. Programma, workshops en jongleer-shows.",
+      "title": "{name}",
+      "twitter_description": "{name} - {date}. Ontdek het programma van deze jongleerconventie.",
+      "twitter_title": "{name} - Jongleerconventie"
+    },
+    "homepage": {
+      "description": "Ontdek de komende jongleerconventies in Frankrijk en Europa. Organiseer uw favoriete evenementen en maak contact met de jongleergemeenschap.",
+      "keywords": "jongleren, conventie, festival, evenement, jongleur, show, workshop, cursus",
+      "og_description": "Het referentieplatform om jongleerconventies in Frankrijk en Europa te ontdekken en organiseren.",
+      "og_title": "Jongleerconventie - Vind uw volgende conventie",
+      "title": "Jongleerconventies",
+      "twitter_description": "Ontdek de komende jongleerconventies en sluit je aan bij de jongleergemeenschap.",
+      "twitter_title": "Jongleerconventie - Jongleerevenementen"
+    },
+    "organization": {
+      "description": "Collaboratief platform gewijd aan de jongleer gemeenschap, dat de ontdekking en organisatie van jongleer evenementen in Frankrijk en Europa vergemakkelijkt."
+    },
+    "search_action": {
+      "description": "Zoek naar jongleer conventies op naam, locatie of organisator",
+      "name": "Zoek naar een conventie"
+    },
+    "site_description": "Vind en beheer uw favoriete jongleerconventies. Collaboratief platform voor jongleurs en evenementorganisatoren.",
+    "site_name": "Jongleerconventie",
+    "volunteers": {
+      "description": "Sluit je aan bij het vrijwilligersteam voor {name}. Neem deel aan de organisatie van dit jongeer-evenement {date} in {location}.",
+      "keywords": "vrijwilligerswerk, team, {convention}, {location}, organisatie, hulp",
+      "og_description": "Sluit je aan bij het vrijwilligersteam van {name} - {date}. Neem deel aan de organisatie.",
+      "og_title": "Vrijwilligerswerk voor {name}",
+      "title": "Vrijwilligerswerk - {name}",
+      "twitter_description": "Wordt vrijwilliger voor {name} en neem deel aan de organisatie.",
+      "twitter_title": "Vrijwilligerswerk - {name}"
+    }
+  }
+}

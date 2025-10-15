@@ -1,0 +1,221 @@
+{
+  "components": {
+    "carpool": {
+      "accept": "Aceptar",
+      "add_comment_placeholder": "Agregar comentario...",
+      "added_on": "Agregado el {date}",
+      "address": "Dirección",
+      "available_seats": "Número de asientos disponibles",
+      "be_first_to_comment": "¡Sé el primero en comentar esta {type}!",
+      "be_first_to_offer": "¡Sé el primero en proponer un viaje compartido para esta edición!",
+      "book_seats": "Reservar",
+      "comments": "Comentarios",
+      "confirm_booking": "Confirmar reserva",
+      "confirm_delete_offer": "¿Estás seguro de que quieres eliminar esta oferta de viaje compartido?",
+      "confirm_delete_request": "¿Estás seguro de que quieres eliminar esta solicitud de viaje compartido?",
+      "confirmed_passengers": "Pasajeros confirmados",
+      "contact": "Contacto",
+      "contact_user": "Contactar {name}",
+      "delete_offer": "Eliminar oferta",
+      "delete_request": "Eliminar solicitud",
+      "departure_date_time": "Fecha y hora de salida",
+      "edit_offer": "Editar oferta de viaje compartido",
+      "edit_request": "Editar solicitud de viaje compartido",
+      "how_many_seats_needed": "¿Cuántos asientos necesitas?",
+      "loading_comments": "Cargando comentarios...",
+      "my_booking": "Mi reserva",
+      "no_comments": "Sin comentarios",
+      "no_offers": "Sin ofertas de viaje compartido",
+      "no_pending_bookings": "Sin reservas pendientes",
+      "no_requests": "Sin solicitudes de viaje compartido",
+      "no_requests_published": "No se han publicado solicitudes por el momento.",
+      "offer": "oferta",
+      "offered_on": "Ofrecido el {date}",
+      "offers_long": "Ofertas de viaje compartido",
+      "offers_short": "Ofertas",
+      "pending_bookings": "Reservas pendientes",
+      "propose_carpool": "Proponer viaje compartido",
+      "publish": "Publicar",
+      "reject": "Rechazar",
+      "request": "solicitud",
+      "request_carpool": "Solicitar viaje compartido",
+      "requested_on": "Solicitado el {date}",
+      "requested_seats": "{count} asiento solicitado | {count} asientos solicitados",
+      "requests_long": "Solicitudes de viaje compartido",
+      "requests_short": "Solicitudes",
+      "seats_available": "{count} asiento disponible | {count} asientos disponibles",
+      "seats_needed": "{count} asiento necesario | {count} asientos necesarios",
+      "suggestions": "Sugerencias",
+      "to_add_comment": "para agregar un comentario",
+      "view_comments": "Ver comentarios ({count})"
+    },
+    "collaborators_rights_panel": {
+      "per_edition": "Derechos por edición",
+      "per_edition_hint": "No se han definido derechos específicos para las ediciones",
+      "title_placeholder": "Título o rol (opcional)"
+    },
+    "convention_form": {
+      "click_to_select_image": "Haz clic para seleccionar una imagen",
+      "contact_email": "Email de contacto",
+      "contact_email_help": "Dirección de email utilizada para solicitudes de reclamación de ediciones y contactos relacionados con esta convención",
+      "convention_logo": "Logo de la convención",
+      "convention_logo_alt": "Logo de la convención",
+      "convention_name": "Nombre de la convención",
+      "external_url": "URL externa",
+      "image_deleted": "Imagen eliminada",
+      "image_uploaded": "Imagen subida",
+      "loading_error_description": "No se puede cargar la imagen desde esta URL",
+      "loading_error_title": "Error de carga",
+      "logo_preview": "Vista previa del logo:",
+      "logo_url_description": "URL de la imagen del logo de la convención",
+      "upload_file": "Subir archivo"
+    },
+    "country_multi_select": {
+      "placeholder": "Seleccionar países..."
+    },
+    "country_select": {
+      "no_countries_found": "No se encontraron países",
+      "search_country_placeholder": "Buscar país..."
+    },
+    "date_time_picker": {
+      "placeholder": "Seleccionar una fecha"
+    },
+    "edition_form": {
+      "address_tip": "Ingrese una dirección completa en el campo de búsqueda para completar automáticamente todos los campos a continuación. Una dirección precisa también permitirá geolocalizar su evento en el mapa.",
+      "convention_description_placeholder": "Descripción de la convención",
+      "convention_poster_optional": "Cartel de la convención (Opcional)",
+      "country_placeholder": "Nombre del país",
+      "facebook_page": "Página de Facebook",
+      "instagram_account": "Cuenta de Instagram",
+      "next": "Siguiente",
+      "official_website_link": "Sitio oficial",
+      "poster_alt": "Cartel de la edición",
+      "poster_placeholder": "Haga clic para seleccionar el cartel de la edición",
+      "previous": "Anterior",
+      "program_placeholder": "Describe el programa de la edición (horarios, talleres, espectáculos...)",
+      "social_networks_description": "Comparte tus páginas para aumentar la visibilidad",
+      "social_networks_title": "Redes sociales",
+      "step_about_description": "Descripción de la edición",
+      "step_about_title": "Acerca de",
+      "step_external_links_description": "Venta de entradas y redes sociales",
+      "step_external_links_title": "Enlaces externos",
+      "step_general_description": "Información General",
+      "step_general_title": "Información General",
+      "step_services_title": "Servicios Ofrecidos",
+      "ticketing_link": "Enlace de venta de entradas",
+      "ticketing_section_description": "Información para comprar entradas",
+      "ticketing_section_title": "Venta de entradas"
+    },
+    "favorites_map": {
+      "all_favorites": "Todas son favoritas",
+      "editions_with_location": "{count} edición con ubicación | {count} ediciones con ubicación",
+      "no_upcoming_favorites": "Sin ediciones favoritas próximas con ubicación disponible",
+      "past": "Pasadas",
+      "upcoming": "Próximas"
+    },
+    "map": {
+      "editions_on_map": "{count} edición en el mapa | {count} ediciones en el mapa",
+      "incomplete_address_warning": "Las ediciones sin dirección completa no pueden mostrarse en el mapa.",
+      "loading": "Cargando mapa...",
+      "no_editions_with_location": "Sin ediciones con ubicación",
+      "ongoing": "En curso",
+      "past": "Pasadas",
+      "temporal_status": "Estado temporal",
+      "upcoming": "Próximas",
+      "without_coordinates": "({count} sin coordenadas)",
+      "yellow_border_favorite": "Borde amarillo = Favorito"
+    },
+    "posts": {
+      "comments_count": "{count} comentario | {count} comentarios",
+      "confirm_delete_comment": "¿Estás seguro de que quieres eliminar este comentario? Esta acción es irreversible.",
+      "confirm_delete_post": "¿Estás seguro de que quieres eliminar esta publicación? Esta acción es irreversible.",
+      "confirm_delete_title": "Confirmar eliminación",
+      "pinned": "Fijado",
+      "publish": "Publicar",
+      "reply_to_post": "Comenta esta publicación",
+      "your_comment": "Tu comentario",
+      "your_comment_placeholder": "Tu comentario..."
+    }
+  },
+  "forms": {
+    "buttons": {
+      "publishing": "Publicando...",
+      "submitting": "Enviando..."
+    },
+    "labels": {
+      "address_complement": "Complemento de dirección",
+      "convention_name": "Nombre de la convención",
+      "edition_name_optional": "Nombre de la edición (opcional)",
+      "from_date": "Desde",
+      "full_address": "Dirección Completa",
+      "select_date": "Seleccionar fecha",
+      "until_date": "Hasta"
+    },
+    "placeholders": {
+      "address_complement": "Edificio A, Salón de eventos...",
+      "city_example": "Madrid",
+      "contact_email": "contacto{'@'}convention.org",
+      "convention_description": "Describe la convención, su historia, sus particularidades...",
+      "convention_name_example": "Ej: Convención Europea de Malabares",
+      "edition_name_example": "Nombre de la edición (ej: ECM 2024)",
+      "search_by_name": "Buscar por nombre",
+      "select_convention": "Selecciona una convención",
+      "select_countries": "Seleccionar países...",
+      "start_typing_address": "Comienza a escribir una dirección..."
+    }
+  },
+  "notifications": {
+    "confirm_delete_description": "¿Estás seguro de que quieres eliminar esta notificación?",
+    "confirm_delete_title": "Eliminar notificación",
+    "loading": "Cargando notificaciones...",
+    "manage_description": "Gestiona tus notificaciones y preferencias",
+    "none_found": "No se encontraron notificaciones",
+    "push": {
+      "blocked": "Notificaciones bloqueadas en la configuración del navegador",
+      "description": "Reciba notificaciones incluso cuando la aplicación esté cerrada",
+      "disabled": "Notificaciones desactivadas",
+      "enabled": "Notificaciones activadas en este dispositivo",
+      "not_supported": "Notificaciones push no soportadas en este navegador",
+      "test_button": "Probar una notificación",
+      "title": "Notificaciones push"
+    },
+    "this_week": "Esta semana",
+    "unread": "No leídas"
+  },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Recibe notificaciones de reservas y mensajes de viajes compartidos",
+        "important": "No te pierdas información importante que te concierne",
+        "reminders": "Recibe recordatorios de tus convenciones favoritas",
+        "volunteer": "Recibe actualizaciones sobre tus solicitudes de voluntariado"
+      },
+      "description": "Activa las notificaciones push para mantenerte informado sobre tus viajes compartidos, solicitudes de voluntariado y convenciones favoritas.",
+      "enable": "Activar notificaciones",
+      "not_now": "Ahora no",
+      "privacy": {
+        "description": "Puedes desactivar las notificaciones en cualquier momento en tu configuración.",
+        "title": "Respetuoso con la privacidad"
+      },
+      "title": "Mantente informado en tiempo real"
+    }
+  },
+  "upload": {
+    "delete_message": "Imagen eliminada",
+    "error": "Error durante la carga",
+    "error_message": "Error de subida",
+    "errors": {
+      "file_too_large": "Archivo demasiado grande",
+      "invalid_file_extension": "Extensión de archivo inválida",
+      "invalid_file_type": "Tipo de archivo inválido"
+    },
+    "formats_accepted": "Formatos aceptados",
+    "logo_url_optional_placeholder": "URL del logo de la convención (opcional)",
+    "max_size": "Tamaño máximo",
+    "select_file": "Seleccionar archivo",
+    "success_message": "¡Imagen subida con éxito!",
+    "upload": "Subir",
+    "upload_error": "Error de subida",
+    "uploading": "Subiendo..."
+  }
+}

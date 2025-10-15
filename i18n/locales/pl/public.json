@@ -1,0 +1,232 @@
+{
+  "homepage": {
+    "agenda": "Agenda",
+    "current_editions": "Bieżące edycje",
+    "filters": "Filtry",
+    "finished_editions": "Zakończone edycje",
+    "grid": "Siatka",
+    "map": "Mapa",
+    "no_conventions_found": "Nie znaleziono konwencji. Bądź pierwszy, który ją doda!",
+    "no_conventions_match_criteria": "Żadna konwencja nie spełnia twoich kryteriów wyszukiwania",
+    "period": "Okres",
+    "searched_services": "Szukane usługi",
+    "upcoming_editions": "Nadchodzące edycje"
+  },
+  "pages": {
+    "access_denied": {
+      "confirm_delete_edition": "Czy na pewno chcesz usunąć tę edycję?",
+      "description": "Nie masz uprawnień do tej strony.",
+      "title": "Dostęp zabroniony"
+    },
+    "add_convention": {
+      "description": "Konwencja grupuje kilka edycji tego samego wydarzenia żonglerskiego.",
+      "submit_button": "Utwórz konwencję",
+      "title": "Utwórz nową konwencję"
+    },
+    "add_edition": {
+      "submit_button": "Dodaj edycję",
+      "title": "Dodaj nową edycję"
+    },
+    "add_edition_for_convention": {
+      "convention_not_found_description": "Konwencja, której szukasz, nie istnieje lub nie masz uprawnień do dodania do niej edycji.",
+      "for_convention": "Dla konwencji \"{name}\"",
+      "loading_convention": "Ładowanie danych konwencji...",
+      "submit_button": "Utwórz edycję"
+    },
+    "comments": {
+      "be_first_to_comment": "Bądź pierwszy, który podzieli się doświadczeniem!",
+      "comment_placeholder": "Podziel się swoim doświadczeniem, zadaj pytania...",
+      "login_to_participate": "Zaloguj się, aby uczestniczyć w dyskusji",
+      "no_comments": "Brak komentarzy na razie.",
+      "share_experience": "Podziel się doświadczeniem lub zadaj pytania",
+      "write_comment": "Napisz komentarz",
+      "your_comment": "Twój komentarz"
+    },
+    "edit_convention": {
+      "convention_not_found_or_no_rights": "Konwencja, której szukasz, nie istnieje lub nie masz uprawnień do jej edytowania.",
+      "editing_convention": "Edytowanie konwencji \"{name}\"",
+      "loading_convention_data": "Ładowanie danych konwencji...",
+      "submit_button": "Zaktualizuj konwencję"
+    },
+    "edit_edition": {
+      "submit_button": "Zaktualizuj edycję"
+    },
+    "favorites": {
+      "editions_in_favorites": "{count} edycja w ulubionych | {count} edycji w ulubionych",
+      "no_favorites_added": "Nie dodałeś jeszcze żadnej edycji do ulubionych."
+    },
+    "management": {
+      "delete_edition": "Usuń edycję",
+      "edit_edition": "Edytuj edycję",
+      "lost_found_active_description": "Możesz zarządzać rzeczami znalezionymi w trakcie trwania edycji.",
+      "manage_lost_found": "Zarządzaj rzeczami znalezionymi"
+    },
+    "objets_trouves": {
+      "photo_alt": "Zdjęcie znalezionego przedmiotu"
+    },
+    "profile": {
+      "photo_alt": "Zdjęcie profilowe",
+      "photo_placeholder": "Kliknij, aby zmienić swoje zdjęcie profilowe"
+    },
+    "volunteers": {
+      "accepted": "Zaakceptowane",
+      "allergies": "Alergie",
+      "application_details": "Szczegóły aplikacji",
+      "applications_description": "Śledź status swoich zgłoszeń wolontariuszów na różnych konwentach",
+      "applied_on": "Zgłoszono",
+      "assigned_time_slots": "Przydzielone przedziały czasowe",
+      "availability": "Dostępność",
+      "avoid_list": "Lista do unikania",
+      "browse_conventions": "Przeglądaj konwenty",
+      "companion": "Towarzysz",
+      "companion_name": "Imię towarzysza",
+      "confirm_withdraw": "Czy na pewno chcesz wycofać swoje zgłoszenie?",
+      "contact_organizer": "Skontaktuj się z organizatorem",
+      "dates": "Daty",
+      "diet": "Dieta",
+      "dietary": {
+        "none": "Brak",
+        "other": "Inna",
+        "vegan": "Wegańska",
+        "vegetarian": "Wegetariańska"
+      },
+      "dietary_preferences": "Preferencje żywieniowe",
+      "emergency_contact": "Kontakt awaryjny",
+      "emergency_contact_name": "Nazwa kontaktu awaryjnego",
+      "emergency_contact_phone": "Telefon kontaktu awaryjnego",
+      "event": "Wydarzenie",
+      "experience": "Doświadczenie",
+      "experience_details": "Szczegóły doświadczenia",
+      "export": "Eksportuj",
+      "export_ical": "Eksportuj iCal",
+      "export_pdf": "Eksportuj PDF",
+      "has_experience": "Ma doświadczenie",
+      "has_minors": "Z osobami niepełnoletnimi",
+      "has_pets": "Ma zwierzęta domowe",
+      "has_vehicle": "Ma pojazd",
+      "history": "Historia",
+      "minors": "Osoby niepełnoletnie",
+      "minors_details": "Szczegóły osób niepełnoletnich",
+      "motivation": "Motywacja",
+      "my_applications": "Moje zgłoszenia wolontariuszów",
+      "my_planning": "Mój harmonogram",
+      "my_slots_title": "Moje Sloty Czasowe",
+      "no_accepted_applications": "Brak zaakceptowanych aplikacji",
+      "no_accepted_description": "Nie masz jeszcze żadnych zaakceptowanych aplikacji",
+      "no_applications": "Brak zgłoszeń",
+      "no_applications_description": "Nie zgłosiłeś się jeszcze jako wolontariusz na żadnym konwencie",
+      "no_history": "Brak historii",
+      "no_history_description": "Brak odrzuconych lub wycofanych aplikacji",
+      "no_pending_applications": "Brak oczekujących aplikacji",
+      "no_pending_description": "Obecnie nie masz żadnych aplikacji oczekujących na odpowiedź",
+      "no_rejected_applications": "Brak odrzuconych aplikacji",
+      "no_rejected_description": "Żadna z twoich aplikacji nie została odrzucona",
+      "pending": "Oczekujące",
+      "pets": "Zwierzęta domowe",
+      "pets_details": "Szczegóły zwierząt",
+      "rejected": "Odrzucone",
+      "setup": "Przygotowanie",
+      "skills": "Umiejętności",
+      "team_distribution": {
+        "all_teams": "Wszystkie zespoły",
+        "description": "Rozkład zaakceptowanych wolontariuszy w zespołach. Przeciągnij i upuść, aby przenieść lub dodać do zespołu.",
+        "drop_volunteers_here": "Przeciągnij i upuść wolontariuszy tutaj",
+        "empty_team": "Pusty zespół",
+        "leader_added": "Lider dodany",
+        "leader_badge": "Lider",
+        "leader_removed": "Lider usunięty",
+        "manage_teams": "Zarządzaj zespołami",
+        "max_label": "Maks:",
+        "modal": {
+          "add": "Dodaj",
+          "add_description_multiple": "Zachowaj wolontariusza w jego obecnych zespołach i dodaj go także do \"{targetTeam}\"",
+          "add_description_single": "Zachowaj wolontariusza w \"{sourceTeam}\" i przypisz go także do \"{targetTeam}\"",
+          "cancel": "Anuluj",
+          "move": "Przenieś",
+          "move_description_multiple": "Usuń wolontariusza ze wszystkich jego obecnych zespołów i umieść go w \"{targetTeam}\"",
+          "move_description_single": "Usuń wolontariusza z \"{sourceTeam}\" i umieść go w \"{targetTeam}\"",
+          "question": "Co chciałbyś zrobić?"
+        },
+        "no_assignments": "Nie znaleziono przypisań zespołów",
+        "no_assignments_description": "Zaakceptowani wolontariusze pojawią się tutaj po przypisaniu do zespołów",
+        "preferences_label": "Pref:",
+        "remove_as_leader": "Usuń rolę lidera",
+        "select_team_instruction": "Wybierz zespół docelowy",
+        "set_as_leader": "Ustaw jako lidera",
+        "stats": {
+          "assigned_volunteers": "Przypisani wolontariusze",
+          "total_assignments": "Łączne przypisania",
+          "total_teams": "Łączne zespoły",
+          "unassigned": "Nieprzypisani"
+        },
+        "title": "Podział na zespoły",
+        "unassigned_description": "Ci zaakceptowani wolontariusze nie zostali jeszcze przypisani do zespołu. Możesz przeciągnąć i upuścić ich do zespołu poniżej.",
+        "unassigned_volunteers": "Nieprzypisani wolontariusze",
+        "volunteers_count": "{count} wolontariusz(y)"
+      },
+      "team_preferences": "Preferencje zespołów",
+      "teardown": "Sprzątanie",
+      "time_preferences": "Preferencje czasowe",
+      "total_hours": "Łączna liczba godzin",
+      "unnamed_slot": "Przedział bez nazwy",
+      "vehicle": "Pojazd",
+      "vehicle_details": "Szczegóły pojazdu",
+      "view_compact": "Widok kompaktowy",
+      "view_compact_short": "Kompaktowy",
+      "view_detailed": "Widok szczegółowy",
+      "view_detailed_short": "Szczegółowy",
+      "view_details": "Zobacz szczegóły",
+      "view_edition": "Zobacz edycję",
+      "view_planning": "Zobacz harmonogram",
+      "withdraw": "Wycofaj",
+      "withdrawal_error": "Błąd podczas wycofywania zgłoszenia",
+      "withdrawal_success": "Zgłoszenie wycofane pomyślnie"
+    }
+  },
+  "seo": {
+    "carpool": {
+      "description": "Zorganizuj wspólny przejazd na {name}. Znajdź towarzyszy podróży lub zaoferuj swoje wolne miejsca na {date} w {location}.",
+      "keywords": "wspólna podróż, transport, {convention}, {location}, dzielenie się, ekonomiczny, ekologiczny",
+      "og_description": "Zorganizuj transport na {name} - {date}. Dostępne wspólne podróże.",
+      "og_title": "Wspólna podróż na {name}",
+      "title": "Wspólna podróż - {name}",
+      "twitter_description": "Znajdź lub zaproponuj wspólną podróż na {name}.",
+      "twitter_title": "Wspólna podróż - {name}"
+    },
+    "edition": {
+      "description": "Odkryj {name}, która odbywa się {date} w {location}. Informacje, program i rejestracja na tę konwencję żonglerki.",
+      "keywords": "żonglerka, konwencja, {convention}, {location}, wydarzenie, festiwal, show, warsztat",
+      "og_description": "Dołącz do nas na {name} - {date}. Program, warsztaty i pokazy żonglerskie.",
+      "title": "{name}",
+      "twitter_description": "{name} - {date}. Odkryj program tej konwencji żonglerskiej.",
+      "twitter_title": "{name} - Konwencja żonglerska"
+    },
+    "homepage": {
+      "description": "Odkryj nadchodzące konwencje żonglerskie we Francji i Europie. Organizuj swoje ulubione wydarzenia i połącz się ze społecznością żonglerską.",
+      "keywords": "żonglerka, konwencja, festiwal, wydarzenie, żongler, show, warsztat, kurs",
+      "og_description": "Platforma referencyjna do odkrywania i organizowania konwencji żonglerskich we Francji i Europie.",
+      "og_title": "Konwencja żonglerska - Znajdź swoją następną konwencję",
+      "title": "Konwencje żonglerskie",
+      "twitter_description": "Odkryj nadchodzące konwencje żonglerskie i dołącz do społeczności żonglerskiej.",
+      "twitter_title": "Konwencja żonglerska - Wydarzenia żonglerskie"
+    },
+    "organization": {
+      "description": "Platforma współpracy dedykowana społeczności żonglerskiej, ułatwiająca odkrywanie i organizację wydarzeń żonglerskich we Francji i Europie."
+    },
+    "search_action": {
+      "description": "Szukaj konwencji żonglerskich według nazwy, lokalizacji lub organizatora",
+      "name": "Szukaj konwencji"
+    },
+    "site_description": "Znajdź i zarządzaj swoimi ulubionymi konwencjami żonglerskimi. Platforma współpracy dla żonglerzy i organizatorów wydarzeń.",
+    "site_name": "Konwencja żonglerska",
+    "volunteers": {
+      "description": "Dołącz do zespołu wolontariuszy {name}. Weź udział w organizacji tego wydarzenia żonglerskiego {date} w {location}.",
+      "keywords": "wolontariat, zespoł, {convention}, {location}, organizacja, pomoc",
+      "og_description": "Dołącz do zespołu wolontariuszy {name} - {date}. Wez udział w organizacji.",
+      "og_title": "Wolontariat dla {name}",
+      "title": "Wolontariat - {name}",
+      "twitter_description": "Zostań wolontariuszem dla {name} i wez udział w organizacji.",
+      "twitter_title": "Wolontariat - {name}"
+    }
+  }
+}

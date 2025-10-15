@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Juggling Convention"
+  },
+  "pwa": {
+    "install": {
+      "button": "Install now",
+      "cancelled": {
+        "description": "You can install the app later from your browser settings.",
+        "title": "Installation cancelled"
+      },
+      "description": "Add the Juggling Convention app to your home screen for quick access and an optimal experience.",
+      "error": {
+        "description": "An error occurred during installation. Please try again.",
+        "title": "Installation error"
+      },
+      "later": "Later",
+      "success": {
+        "description": "The app has been added to your home screen.",
+        "title": "Installation successful!"
+      },
+      "title": "Install app"
+    }
+  },
+  "services": {
+    "accessibility": "Disability accessibility",
+    "aerial_space": "Aerial space",
+    "afj_token_payment": "AFJ token payment",
+    "atm": "ATM",
+    "canteen": "Canteen",
+    "cash_payment": "Cash payment",
+    "categories": {
+      "accommodation": "Accommodation",
+      "activities": "Activities",
+      "amenities": "Amenities",
+      "food": "Food & Drink",
+      "payment": "Payment"
+    },
+    "concert": "Concert",
+    "credit_card_payment": "Credit card payment",
+    "family_camping": "Family camping",
+    "fire_space": "Fire space",
+    "food_trucks": "Food trucks",
+    "gala": "Gala",
+    "gym": "Gymnasium",
+    "kids_zone": "Kids zone",
+    "long_show": "Long show",
+    "open_stage": "Open stage",
+    "pets_accepted": "Pets accepted",
+    "showers": "Showers",
+    "slackline_space": "Slackline space",
+    "sleeping_room": "Sleeping room",
+    "tent_camping": "Tent camping",
+    "toilets": "Toilets",
+    "truck_camping": "RV camping",
+    "workshops": "Workshops"
+  }
+}

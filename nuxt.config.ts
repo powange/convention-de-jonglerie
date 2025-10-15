@@ -74,19 +74,64 @@ export default defineNuxtConfig({
     },
   },
   i18n: {
+    lazy: true, // Activer le lazy loading
     defaultLocale: 'en',
     locales: [
-      { code: 'en', name: 'English', file: 'en.json' },
-      { code: 'da', name: 'Dansk', file: 'da.json' },
-      { code: 'de', name: 'Deutsch', file: 'de.json' },
-      { code: 'es', name: 'Español', file: 'es.json' },
-      { code: 'fr', name: 'Français', file: 'fr.json' },
-      { code: 'it', name: 'Italiano', file: 'it.json' },
-      { code: 'nl', name: 'Nederlands', file: 'nl.json' },
-      { code: 'pl', name: 'Polski', file: 'pl.json' },
-      { code: 'pt', name: 'Português', file: 'pt.json' },
-      { code: 'ru', name: 'Русский', file: 'ru.json' },
-      { code: 'uk', name: 'Українська', file: 'uk.json' },
+      {
+        code: 'en',
+        name: 'English',
+        files: ['en/common.json', 'en/components.json', 'en/app.json', 'en/public.json'],
+      },
+      {
+        code: 'da',
+        name: 'Dansk',
+        files: ['da/common.json', 'da/components.json', 'da/app.json', 'da/public.json'],
+      },
+      {
+        code: 'de',
+        name: 'Deutsch',
+        files: ['de/common.json', 'de/components.json', 'de/app.json', 'de/public.json'],
+      },
+      {
+        code: 'es',
+        name: 'Español',
+        files: ['es/common.json', 'es/components.json', 'es/app.json', 'es/public.json'],
+      },
+      {
+        code: 'fr',
+        name: 'Français',
+        files: ['fr/common.json', 'fr/components.json', 'fr/app.json', 'fr/public.json'],
+      },
+      {
+        code: 'it',
+        name: 'Italiano',
+        files: ['it/common.json', 'it/components.json', 'it/app.json', 'it/public.json'],
+      },
+      {
+        code: 'nl',
+        name: 'Nederlands',
+        files: ['nl/common.json', 'nl/components.json', 'nl/app.json', 'nl/public.json'],
+      },
+      {
+        code: 'pl',
+        name: 'Polski',
+        files: ['pl/common.json', 'pl/components.json', 'pl/app.json', 'pl/public.json'],
+      },
+      {
+        code: 'pt',
+        name: 'Português',
+        files: ['pt/common.json', 'pt/components.json', 'pt/app.json', 'pt/public.json'],
+      },
+      {
+        code: 'ru',
+        name: 'Русский',
+        files: ['ru/common.json', 'ru/components.json', 'ru/app.json', 'ru/public.json'],
+      },
+      {
+        code: 'uk',
+        name: 'Українська',
+        files: ['uk/common.json', 'uk/components.json', 'uk/app.json', 'uk/public.json'],
+      },
     ],
     langDir: 'locales/',
     compilation: {

@@ -1,0 +1,232 @@
+{
+  "homepage": {
+    "agenda": "Agenda",
+    "current_editions": "Ediciones actuales",
+    "filters": "Filtros",
+    "finished_editions": "Ediciones terminadas",
+    "grid": "Cuadrícula",
+    "map": "Mapa",
+    "no_conventions_found": "No se encontraron convenciones. ¡Sé el primero en agregar una!",
+    "no_conventions_match_criteria": "Ninguna convención coincide con tus criterios de búsqueda",
+    "period": "Período",
+    "searched_services": "Servicios buscados",
+    "upcoming_editions": "Próximas ediciones"
+  },
+  "pages": {
+    "access_denied": {
+      "confirm_delete_edition": "¿Estás seguro de que quieres eliminar esta edición?",
+      "description": "No tienes permisos para acceder a esta página.",
+      "title": "Acceso denegado"
+    },
+    "add_convention": {
+      "description": "Una convención agrupa múltiples ediciones del mismo evento de malabares.",
+      "submit_button": "Crear convención",
+      "title": "Crear una nueva convención"
+    },
+    "add_edition": {
+      "submit_button": "Agregar edición",
+      "title": "Agregar una nueva edición"
+    },
+    "add_edition_for_convention": {
+      "convention_not_found_description": "La convención que buscas no existe o no tienes permisos para agregar una edición.",
+      "for_convention": "Para la convención \"{name}\"",
+      "loading_convention": "Cargando datos de la convención...",
+      "submit_button": "Crear edición"
+    },
+    "comments": {
+      "be_first_to_comment": "¡Sé el primero en compartir tu experiencia!",
+      "comment_placeholder": "Comparte tu experiencia, haz tus preguntas...",
+      "login_to_participate": "Inicia sesión para participar en la discusión",
+      "no_comments": "Sin comentarios por el momento.",
+      "share_experience": "Comparte tu experiencia o haz tus preguntas",
+      "write_comment": "Escribir comentario",
+      "your_comment": "Tu comentario"
+    },
+    "edit_convention": {
+      "convention_not_found_or_no_rights": "La convención que buscas no existe o no tienes permisos para editarla.",
+      "editing_convention": "Editando convención \"{name}\"",
+      "loading_convention_data": "Cargando datos de la convención...",
+      "submit_button": "Actualizar convención"
+    },
+    "edit_edition": {
+      "submit_button": "Actualizar edición"
+    },
+    "favorites": {
+      "editions_in_favorites": "{count} edición en favoritos | {count} ediciones en favoritos",
+      "no_favorites_added": "Aún no has agregado ninguna edición a tus favoritos."
+    },
+    "management": {
+      "delete_edition": "Eliminar edición",
+      "edit_edition": "Editar edición",
+      "lost_found_active_description": "Puedes gestionar los objetos perdidos durante el transcurso de la edición.",
+      "manage_lost_found": "Gestionar objetos perdidos"
+    },
+    "objets_trouves": {
+      "photo_alt": "Foto del objeto encontrado"
+    },
+    "profile": {
+      "photo_alt": "Foto de perfil",
+      "photo_placeholder": "Haga clic para cambiar su foto de perfil"
+    },
+    "volunteers": {
+      "accepted": "Aceptadas",
+      "allergies": "Alergias",
+      "application_details": "Detalles de la candidatura",
+      "applications_description": "Sigue el estado de tus solicitudes de voluntariado para diferentes convenciones",
+      "applied_on": "Solicitado el",
+      "assigned_time_slots": "Franjas horarias asignadas",
+      "availability": "Disponibilidad",
+      "avoid_list": "Lista a evitar",
+      "browse_conventions": "Explorar convenciones",
+      "companion": "Acompañante",
+      "companion_name": "Nombre del acompañante",
+      "confirm_withdraw": "¿Estás seguro de que quieres retirar tu solicitud?",
+      "contact_organizer": "Contactar organizador",
+      "dates": "Fechas",
+      "diet": "Dieta",
+      "dietary": {
+        "none": "Ninguna",
+        "other": "Otra",
+        "vegan": "Vegano",
+        "vegetarian": "Vegetariano"
+      },
+      "dietary_preferences": "Preferencias alimentarias",
+      "emergency_contact": "Contacto de emergencia",
+      "emergency_contact_name": "Nombre del contacto de emergencia",
+      "emergency_contact_phone": "Teléfono del contacto de emergencia",
+      "event": "Evento",
+      "experience": "Experiencia",
+      "experience_details": "Detalles de experiencia",
+      "export": "Exportar",
+      "export_ical": "Exportar iCal",
+      "export_pdf": "Exportar PDF",
+      "has_experience": "Tiene experiencia",
+      "has_minors": "Acompañado de menores",
+      "has_pets": "Tiene mascotas",
+      "has_vehicle": "Tiene vehículo",
+      "history": "Historial",
+      "minors": "Menores",
+      "minors_details": "Detalles de menores",
+      "motivation": "Motivación",
+      "my_applications": "Mis solicitudes de voluntariado",
+      "my_planning": "Mi planificación",
+      "my_slots_title": "Mis Franjas Horarias",
+      "no_accepted_applications": "Ninguna solicitud aceptada",
+      "no_accepted_description": "Aún no tienes ninguna solicitud aceptada",
+      "no_applications": "Sin solicitudes",
+      "no_applications_description": "Aún no te has postulado como voluntario para ninguna convención",
+      "no_history": "Sin historial",
+      "no_history_description": "Ninguna solicitud rechazada o retirada",
+      "no_pending_applications": "Ninguna solicitud pendiente",
+      "no_pending_description": "Actualmente no tienes ninguna solicitud esperando respuesta",
+      "no_rejected_applications": "Ninguna candidatura rechazada",
+      "no_rejected_description": "Ninguna de tus candidaturas ha sido rechazada",
+      "pending": "Pendiente",
+      "pets": "Mascotas",
+      "pets_details": "Detalles de mascotas",
+      "rejected": "Rechazadas",
+      "setup": "Montaje",
+      "skills": "Habilidades",
+      "team_distribution": {
+        "all_teams": "Todos los equipos",
+        "description": "Distribución de voluntarios aceptados en equipos. Arrastra y suelta para mover o agregar a un equipo.",
+        "drop_volunteers_here": "Arrastra y suelta voluntarios aquí",
+        "empty_team": "Equipo vacío",
+        "leader_added": "Responsable añadido",
+        "leader_badge": "Responsable",
+        "leader_removed": "Responsable retirado",
+        "manage_teams": "Gestionar equipos",
+        "max_label": "Máx:",
+        "modal": {
+          "add": "Agregar",
+          "add_description_multiple": "Mantener el voluntario en sus equipos actuales y agregarlo también a \"{targetTeam}\"",
+          "add_description_single": "Mantener el voluntario en \"{sourceTeam}\" y asignarlo también a \"{targetTeam}\"",
+          "cancel": "Cancelar",
+          "move": "Mover",
+          "move_description_multiple": "Remover el voluntario de todos sus equipos actuales y colocarlo en \"{targetTeam}\"",
+          "move_description_single": "Remover el voluntario de \"{sourceTeam}\" y colocarlo en \"{targetTeam}\"",
+          "question": "¿Qué te gustaría hacer?"
+        },
+        "no_assignments": "No se encontraron asignaciones de equipo",
+        "no_assignments_description": "Los voluntarios aceptados aparecerán aquí una vez asignados a equipos",
+        "preferences_label": "Pref:",
+        "remove_as_leader": "Retirar rol de responsable",
+        "select_team_instruction": "Seleccione el equipo de destino",
+        "set_as_leader": "Establecer como responsable",
+        "stats": {
+          "assigned_volunteers": "Voluntarios asignados",
+          "total_assignments": "Asignaciones totales",
+          "total_teams": "Total equipos",
+          "unassigned": "Sin asignar"
+        },
+        "title": "Distribución por equipos",
+        "unassigned_description": "Estos voluntarios aceptados aún no han sido asignados a un equipo. Puedes arrastrarlos y soltarlos en un equipo a continuación.",
+        "unassigned_volunteers": "Voluntarios sin asignar",
+        "volunteers_count": "{count} voluntario(s)"
+      },
+      "team_preferences": "Preferencias de equipo",
+      "teardown": "Desmontaje",
+      "time_preferences": "Preferencias horarias",
+      "total_hours": "Total de horas",
+      "unnamed_slot": "Franja sin título",
+      "vehicle": "Vehículo",
+      "vehicle_details": "Detalles del vehículo",
+      "view_compact": "Vista compacta",
+      "view_compact_short": "Compacta",
+      "view_detailed": "Vista detallada",
+      "view_detailed_short": "Detallada",
+      "view_details": "Ver detalles",
+      "view_edition": "Ver edición",
+      "view_planning": "Ver planificación",
+      "withdraw": "Retirar",
+      "withdrawal_error": "Error al retirar la solicitud",
+      "withdrawal_success": "Solicitud retirada con éxito"
+    }
+  },
+  "seo": {
+    "carpool": {
+      "description": "Organiza tu viaje compartido a {name}. Encuentra compañeros de viaje u ofrece tus plazas disponibles para {date} en {location}.",
+      "keywords": "viaje compartido, transporte, {convention}, {location}, compartir, económico, ecológico",
+      "og_description": "Organiza tu transporte para {name} - {date}. Viajes compartidos disponibles.",
+      "og_title": "Viaje compartido para {name}",
+      "title": "Viaje compartido - {name}",
+      "twitter_description": "Encuentra u ofrece un viaje compartido para {name}.",
+      "twitter_title": "Viaje compartido - {name}"
+    },
+    "edition": {
+      "description": "Descubre {name} que tiene lugar {date} en {location}. Información, programa e inscripción para esta convención de malabares.",
+      "keywords": "malabarismo, convención, {convention}, {location}, evento, festival, espectáculo, taller",
+      "og_description": "Únete a nosotros para {name} - {date}. Programa, talleres y espectáculos de malabarismo.",
+      "title": "{name}",
+      "twitter_description": "{name} - {date}. Descubre el programa de esta convención de malabarismo.",
+      "twitter_title": "{name} - Convención de Malabarismo"
+    },
+    "homepage": {
+      "description": "Descubre las próximas convenciones de malabarismo en Francia y Europa. Organiza tus eventos favoritos y conéctate con la comunidad de malabaristas.",
+      "keywords": "malabarismo, convención, festival, evento, malabarista, espectáculo, taller, curso",
+      "og_description": "La plataforma de referencia para descubrir y organizar convenciones de malabarismo en Francia y Europa.",
+      "og_title": "Convención de Malabarismo - Encuentra tu próxima convención",
+      "title": "Convenciones de Malabarismo",
+      "twitter_description": "Descubre las próximas convenciones de malabarismo y únete a la comunidad de malabaristas.",
+      "twitter_title": "Convención de Malabarismo - Eventos de malabarismo"
+    },
+    "organization": {
+      "description": "Plataforma colaborativa dedicada a la comunidad de malabarismo, facilitando el descubrimiento y organización de eventos de malabarismo en Francia y Europa."
+    },
+    "search_action": {
+      "description": "Busque convenciones de malabarismo por nombre, ubicación u organizador",
+      "name": "Buscar una convención"
+    },
+    "site_description": "Encuentra y gestiona tus convenciones de malabarismo favoritas. Plataforma colaborativa para malabaristas y organizadores de eventos.",
+    "site_name": "Convención de Malabarismo",
+    "volunteers": {
+      "description": "Únete al equipo de voluntarios para {name}. Participa en la organización de este evento de malabares {date} en {location}.",
+      "keywords": "voluntariado, equipo, {convention}, {location}, organización, ayuda",
+      "og_description": "Únete al equipo de voluntarios de {name} - {date}. Participa en la organización.",
+      "og_title": "Voluntariado para {name}",
+      "title": "Voluntariado - {name}",
+      "twitter_description": "Convértete en voluntario para {name} y participa en la organización.",
+      "twitter_title": "Voluntariado - {name}"
+    }
+  }
+}

@@ -1,0 +1,221 @@
+{
+  "components": {
+    "carpool": {
+      "accept": "Прийняти",
+      "add_comment_placeholder": "Додати коментар...",
+      "added_on": "Додано {date}",
+      "address": "Адреса",
+      "available_seats": "Кількість доступних місць",
+      "be_first_to_comment": "Будьте першим, хто прокоментує цю {type}!",
+      "be_first_to_offer": "Будьте першим, хто запропонує підвезення для цього видання!",
+      "book_seats": "Забронювати",
+      "comments": "Коментарі",
+      "confirm_booking": "Підтвердити бронювання",
+      "confirm_delete_offer": "Ви впевнені, що хочете видалити цю пропозицію сумісної поїздки?",
+      "confirm_delete_request": "Ви впевнені, що хочете видалити цей запит сумісної поїздки?",
+      "confirmed_passengers": "Підтверджені пасажири",
+      "contact": "Контакт",
+      "contact_user": "Зв'язатися з {name}",
+      "delete_offer": "Видалити пропозицію",
+      "delete_request": "Видалити запит",
+      "departure_date_time": "Дата та час відправлення",
+      "edit_offer": "Редагувати пропозицію сумісної поїздки",
+      "edit_request": "Редагувати запит сумісної поїздки",
+      "how_many_seats_needed": "Скільки місць вам потрібно?",
+      "loading_comments": "Завантаження коментарів...",
+      "my_booking": "Моє бронювання",
+      "no_comments": "Немає коментарів",
+      "no_offers": "Немає пропозицій сумісних поїздок",
+      "no_pending_bookings": "Немає очікуваних бронювань",
+      "no_requests": "Немає запитів на сумісні поїздки",
+      "no_requests_published": "Поки що не було опубліковано жодних запитів.",
+      "offer": "пропозицію",
+      "offered_on": "Запропоновано {date}",
+      "offers_long": "Пропозиції сумісних поїздок",
+      "offers_short": "Пропозиції",
+      "pending_bookings": "Очікувані бронювання",
+      "propose_carpool": "Запропонувати підвезення",
+      "publish": "Опублікувати",
+      "reject": "Відхилити",
+      "request": "запит",
+      "request_carpool": "Запросити підвезення",
+      "requested_on": "Запитано {date}",
+      "requested_seats": "{count} запитане місце | {count} запитаних місця | {count} запитаних місць",
+      "requests_long": "Запити сумісних поїздок",
+      "requests_short": "Запити",
+      "seats_available": "{count} доступне місце | {count} доступних місць",
+      "seats_needed": "{count} потрібне місце | {count} потрібних місць",
+      "suggestions": "Пропозиції",
+      "to_add_comment": "щоб додати коментар",
+      "view_comments": "Переглянути коментарі ({count})"
+    },
+    "collaborators_rights_panel": {
+      "per_edition": "Права за виданнями",
+      "per_edition_hint": "Для випусків не визначено конкретних прав",
+      "title_placeholder": "Назва або роль (необов'язково)"
+    },
+    "convention_form": {
+      "click_to_select_image": "Натисніть, щоб вибрати зображення",
+      "contact_email": "Контактний email",
+      "contact_email_help": "Адреса електронної пошти для запитів щодо прав на видання та контактів, пов'язаних з цією конвенцією",
+      "convention_logo": "Логотип конвенції",
+      "convention_logo_alt": "Логотип конвенції",
+      "convention_name": "Назва конвенції",
+      "external_url": "Зовнішнє посилання",
+      "image_deleted": "Зображення видалено",
+      "image_uploaded": "Зображення завантажено",
+      "loading_error_description": "Не вдається завантажити зображення з цього URL",
+      "loading_error_title": "Помилка завантаження",
+      "logo_preview": "Попередній перегляд логотипу:",
+      "logo_url_description": "URL зображення логотипу конвенції",
+      "upload_file": "Завантажити файл"
+    },
+    "country_multi_select": {
+      "placeholder": "Вибрати країни..."
+    },
+    "country_select": {
+      "no_countries_found": "Країни не знайдено",
+      "search_country_placeholder": "Пошук країни..."
+    },
+    "date_time_picker": {
+      "placeholder": "Вибрати дату"
+    },
+    "edition_form": {
+      "address_tip": "Введіть повну адресу в поле пошуку, щоб автоматично заповнити всі поля нижче. Точна адреса також дозволить геолокалізувати вашу подію на карті.",
+      "convention_description_placeholder": "Опис конвенції",
+      "convention_poster_optional": "Постер конвенції (необов'язково)",
+      "country_placeholder": "Назва країни",
+      "facebook_page": "Сторінка Facebook",
+      "instagram_account": "Обліковий запис Instagram",
+      "next": "Наступний",
+      "official_website_link": "Офіційний сайт",
+      "poster_alt": "Постер видання",
+      "poster_placeholder": "Натисніть, щоб вибрати постер видання",
+      "previous": "Попередній",
+      "program_placeholder": "Опишіть програму видання (розклад, майстер-класи, шоу...)",
+      "social_networks_description": "Поділіться своїми сторінками для підвищення видимості",
+      "social_networks_title": "Соціальні мережі",
+      "step_about_description": "Опис видання",
+      "step_about_title": "Про",
+      "step_external_links_description": "Квитки та соціальні мережі",
+      "step_external_links_title": "Зовнішні посилання",
+      "step_general_description": "Загальна інформація",
+      "step_general_title": "Загальна інформація",
+      "step_services_title": "Пропоновані послуги",
+      "ticketing_link": "Посилання на квитки",
+      "ticketing_section_description": "Інформація для придбання квитків",
+      "ticketing_section_title": "Квитки"
+    },
+    "favorites_map": {
+      "all_favorites": "Всі улюблені",
+      "editions_with_location": "{count} видання з розташуванням | {count} видань з розташуванням",
+      "no_upcoming_favorites": "Немає майбутніх улюблених видань з доступним розташуванням",
+      "past": "Минулі",
+      "upcoming": "Майбутні"
+    },
+    "map": {
+      "editions_on_map": "{count} видання на карті | {count} видань на карті",
+      "incomplete_address_warning": "Видання без повної адреси не можуть бути відображені на карті.",
+      "loading": "Завантаження карти...",
+      "no_editions_with_location": "Немає видань з розташуванням",
+      "ongoing": "Поточні",
+      "past": "Минулі",
+      "temporal_status": "Часовий статус",
+      "upcoming": "Майбутні",
+      "without_coordinates": "({count} без координат)",
+      "yellow_border_favorite": "Жовта рамка = Улюблене"
+    },
+    "posts": {
+      "comments_count": "{count} коментар | {count} коментарі",
+      "confirm_delete_comment": "Ви впевнені, що хочете видалити цей коментар? Ця дія незворотна.",
+      "confirm_delete_post": "Ви впевнені, що хочете видалити цей пост? Ця дія незворотна.",
+      "confirm_delete_title": "Підтвердити видалення",
+      "pinned": "Закріплено",
+      "publish": "Опублікувати",
+      "reply_to_post": "Прокоментуйте цю публікацію",
+      "your_comment": "Ваш коментар",
+      "your_comment_placeholder": "Ваш коментар..."
+    }
+  },
+  "forms": {
+    "buttons": {
+      "publishing": "Публікація...",
+      "submitting": "Надсилання..."
+    },
+    "labels": {
+      "address_complement": "Доповнення до адреси",
+      "convention_name": "Назва конвенції",
+      "edition_name_optional": "Назва видання (необов'язково)",
+      "from_date": "Від",
+      "full_address": "Повна адреса",
+      "select_date": "Вибрати дату",
+      "until_date": "До"
+    },
+    "placeholders": {
+      "address_complement": "Будівля A, зал для заходів...",
+      "city_example": "Київ",
+      "contact_email": "contact{'@'}convention.org",
+      "convention_description": "Опишіть конвенцію, її історію, особливості...",
+      "convention_name_example": "наприклад: Європейська Конвенція Жонглерів",
+      "edition_name_example": "Назва видання (наприклад: EJC 2024)",
+      "search_by_name": "Пошук за назвою",
+      "select_convention": "Вибрати конвенцію",
+      "select_countries": "Вибрати країни...",
+      "start_typing_address": "Почніть вводити адресу..."
+    }
+  },
+  "notifications": {
+    "confirm_delete_description": "Ви впевнені, що хочете видалити це сповіщення?",
+    "confirm_delete_title": "Видалити сповіщення",
+    "loading": "Завантаження сповіщень...",
+    "manage_description": "Керуйте своїми сповіщеннями та налаштуваннями",
+    "none_found": "Сповіщень не знайдено",
+    "push": {
+      "blocked": "Сповіщення заблоковані в налаштуваннях браузера",
+      "description": "Отримуйте сповіщення навіть коли додаток закритий",
+      "disabled": "Сповіщення відключені",
+      "enabled": "Сповіщення увімкнені на цьому пристрої",
+      "not_supported": "Push-сповіщення не підтримуються в цьому браузері",
+      "test_button": "Тестувати сповіщення",
+      "title": "Push-сповіщення"
+    },
+    "this_week": "Цього тижня",
+    "unread": "Непрочитані"
+  },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Отримуйте сповіщення про бронювання та повідомлення спільних поїздок",
+        "important": "Не пропустіть важливу інформацію, що стосується вас",
+        "reminders": "Отримуйте нагадування про ваші улюблені конвенції",
+        "volunteer": "Отримуйте оновлення щодо ваших заявок волонтера"
+      },
+      "description": "Увімкніть push-сповіщення, щоб бути в курсі ваших спільних поїздок, заявок волонтера та улюблених конвенцій.",
+      "enable": "Увімкнути сповіщення",
+      "not_now": "Не зараз",
+      "privacy": {
+        "description": "Ви можете вимкнути сповіщення в будь-який час у налаштуваннях.",
+        "title": "Дружній до приватності"
+      },
+      "title": "Залишайтеся інформованими в режимі реального часу"
+    }
+  },
+  "upload": {
+    "delete_message": "Зображення видалено",
+    "error": "Помилка при завантаженні",
+    "error_message": "Помилка завантаження",
+    "errors": {
+      "file_too_large": "Файл занадто великий. Максимальний розмір: {maxSize}",
+      "invalid_file_extension": "Недопустиме розширення файлу. Прийнятні розширення: {allowedExtensions}",
+      "invalid_file_type": "Недопустимий тип файлу. Прийнятні формати: {allowedTypes}"
+    },
+    "formats_accepted": "Прийнятні формати",
+    "logo_url_optional_placeholder": "URL логотипу конвенції (необов'язково)",
+    "max_size": "Максимальний розмір",
+    "select_file": "Вибрати файл",
+    "success_message": "Зображення успішно завантажено!",
+    "upload": "Завантажити",
+    "upload_error": "Помилка завантаження",
+    "uploading": "Завантаження..."
+  }
+}

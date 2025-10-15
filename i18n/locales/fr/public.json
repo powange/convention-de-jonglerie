@@ -1,0 +1,232 @@
+{
+  "homepage": {
+    "current_editions": "Éditions en cours",
+    "filters": "Filtres",
+    "finished_editions": "Éditions terminées",
+    "grid": "Grille",
+    "map": "Carte",
+    "agenda": "Agenda",
+    "no_conventions_found": "Aucune convention trouvée. Soyez le premier à en ajouter une !",
+    "no_conventions_match_criteria": "Aucune convention ne correspond à vos critères de recherche",
+    "period": "Période",
+    "searched_services": "Services recherchés",
+    "upcoming_editions": "Éditions à venir"
+  },
+  "pages": {
+    "access_denied": {
+      "confirm_delete_edition": "Êtes-vous sûr de vouloir supprimer cette édition ?",
+      "description": "Vous n'avez pas les droits pour accéder à cette page.",
+      "title": "Accès refusé"
+    },
+    "add_convention": {
+      "description": "Une convention regroupe plusieurs éditions d'un même événement de jonglerie.",
+      "submit_button": "Créer la convention",
+      "title": "Créer une nouvelle convention"
+    },
+    "add_edition": {
+      "submit_button": "Ajouter l'édition",
+      "title": "Ajouter une nouvelle édition"
+    },
+    "add_edition_for_convention": {
+      "convention_not_found_description": "La convention que vous cherchez n'existe pas ou vous n'avez pas les droits pour y ajouter une édition.",
+      "for_convention": "Pour la convention \"{name}\"",
+      "loading_convention": "Chargement des données de la convention...",
+      "submit_button": "Créer l'édition"
+    },
+    "volunteers": {
+      "my_applications": "Mes candidatures bénévoles",
+      "applications_description": "Suivez l'état de vos candidatures pour être bénévole aux différentes conventions",
+      "applied_on": "Postulé le",
+      "pending": "En attente",
+      "accepted": "Acceptées",
+      "rejected": "Rejetées",
+      "history": "Historique",
+      "no_pending_applications": "Aucune candidature en attente",
+      "no_accepted_applications": "Aucune candidature acceptée",
+      "no_rejected_applications": "Aucune candidature rejetée",
+      "no_history": "Aucun historique",
+      "no_pending_description": "Vous n'avez actuellement aucune candidature en attente de réponse",
+      "no_accepted_description": "Vous n'avez pas encore de candidature acceptée",
+      "no_rejected_description": "Aucune de vos candidatures n'a été rejetée",
+      "no_history_description": "Aucune candidature passée ou retirée",
+      "view_details": "Voir les détails",
+      "application_details": "Détails de la candidature",
+      "view_detailed": "Vue détaillée",
+      "view_compact": "Vue compacte",
+      "view_detailed_short": "Détaillée",
+      "view_compact_short": "Compacte",
+      "export": "Exporter",
+      "export_pdf": "Export PDF",
+      "export_ical": "Export iCal",
+      "view_planning": "Voir planning",
+      "contact_organizer": "Contacter organisateur",
+      "my_planning": "Mon planning",
+      "motivation": "Motivation",
+      "availability": "Disponibilités",
+      "setup": "Montage",
+      "event": "Événement",
+      "teardown": "Démontage",
+      "dates": "Dates",
+      "dietary_preferences": "Préférences alimentaires",
+      "diet": "Régime",
+      "dietary": {
+        "none": "Aucun",
+        "vegetarian": "Végétarien",
+        "vegan": "Végétalien",
+        "other": "Autre"
+      },
+      "allergies": "Allergies",
+      "emergency_contact": "Contact d'urgence",
+      "emergency_contact_name": "Nom du contact d'urgence",
+      "emergency_contact_phone": "Téléphone du contact d'urgence",
+      "time_preferences": "Préférences horaires",
+      "team_preferences": "Préférences d'équipes",
+      "pets": "Animaux de compagnie",
+      "has_pets": "Possède des animaux",
+      "pets_details": "Détails sur les animaux",
+      "minors": "Personnes mineures",
+      "has_minors": "Accompagné de mineurs",
+      "minors_details": "Détails sur les mineurs",
+      "vehicle": "Véhicule",
+      "has_vehicle": "Possède un véhicule",
+      "vehicle_details": "Détails du véhicule",
+      "companion": "Accompagnant",
+      "companion_name": "Nom de l'accompagnant",
+      "avoid_list": "Liste à éviter",
+      "skills": "Compétences",
+      "experience": "Expérience",
+      "has_experience": "A de l'expérience",
+      "experience_details": "Détails de l'expérience",
+      "view_edition": "Voir l'édition",
+      "withdraw": "Retirer",
+      "no_applications": "Aucune candidature",
+      "no_applications_description": "Vous n'avez pas encore postulé comme bénévole pour une convention",
+      "browse_conventions": "Parcourir les conventions",
+      "confirm_withdraw": "Êtes-vous sûr de vouloir retirer votre candidature ?",
+      "withdrawal_success": "Candidature retirée avec succès",
+      "withdrawal_error": "Erreur lors du retrait de la candidature",
+      "assigned_time_slots": "Créneaux assignés",
+      "unnamed_slot": "Créneau sans titre",
+      "total_hours": "Total d'heures",
+      "my_slots_title": "Mes Créneaux",
+      "team_distribution": {
+        "all_teams": "Toutes équipes",
+        "description": "Répartition des bénévoles acceptés dans les équipes. Sur ordinateur, glissez-déposez pour déplacer. Sur mobile, cliquez pour sélectionner l'équipe.",
+        "manage_teams": "Gérer les équipes",
+        "max_label": "Max:",
+        "select_team_instruction": "Sélectionnez l'équipe de destination",
+        "drop_volunteers_here": "Glissez-déposez des bénévoles ici",
+        "modal": {
+          "add": "Ajouter",
+          "add_description_multiple": "Garder le bénévole dans ses équipes actuelles et l'ajouter aussi à \"{targetTeam}\"",
+          "add_description_single": "Garder le bénévole dans \"{sourceTeam}\" et l'assigner aussi à \"{targetTeam}\"",
+          "cancel": "Annuler",
+          "move": "Déplacer",
+          "move_description_multiple": "Retirer le bénévole de toutes ses équipes actuelles et le placer dans \"{targetTeam}\"",
+          "move_description_single": "Retirer le bénévole de \"{sourceTeam}\" et le placer dans \"{targetTeam}\"",
+          "question": "Que souhaitez-vous faire ?"
+        },
+        "no_assignments": "Aucune assignation d'équipe trouvée",
+        "no_assignments_description": "Les bénévoles acceptés apparaîtront ici une fois assignés à des équipes",
+        "preferences_label": "Préf:",
+        "stats": {
+          "assigned_volunteers": "Bénévoles assignés",
+          "total_assignments": "Assignations totales",
+          "total_teams": "Total équipes",
+          "unassigned": "Sans assignation"
+        },
+        "title": "Répartition par équipes",
+        "unassigned_description": "Ces bénévoles acceptés n'ont pas encore été assignés à une équipe. Sur ordinateur : glissez-déposez. Sur mobile : cliquez pour sélectionner l'équipe.",
+        "unassigned_volunteers": "Bénévoles non assignés",
+        "volunteers_count": "{count} bénévole(s)",
+        "empty_team": "Équipe vide",
+        "leader_badge": "Responsable",
+        "set_as_leader": "Définir comme responsable",
+        "remove_as_leader": "Retirer le rôle de responsable",
+        "leader_added": "Responsable ajouté",
+        "leader_removed": "Responsable retiré"
+      }
+    },
+    "comments": {
+      "be_first_to_comment": "Soyez le premier à partager votre expérience !",
+      "comment_placeholder": "Partagez votre expérience, posez vos questions...",
+      "login_to_participate": "Connectez-vous pour participer à la discussion",
+      "no_comments": "Aucune publication pour le moment.",
+      "share_experience": "Partagez votre expérience ou posez vos questions",
+      "write_comment": "Écrire une publication",
+      "your_comment": "Votre publication"
+    },
+    "edit_convention": {
+      "convention_not_found_or_no_rights": "La convention que vous cherchez n'existe pas ou vous n'avez pas les droits pour la modifier.",
+      "editing_convention": "Modification de la convention \"{name}\"",
+      "loading_convention_data": "Chargement des données de la convention...",
+      "submit_button": "Mettre à jour la convention"
+    },
+    "edit_edition": {
+      "submit_button": "Mettre à jour l'édition"
+    },
+    "favorites": {
+      "editions_in_favorites": "{count} édition en favoris | {count} éditions en favoris",
+      "no_favorites_added": "Vous n'avez pas encore ajouté d'édition à vos favoris."
+    },
+    "management": {
+      "delete_edition": "Supprimer l'édition",
+      "edit_edition": "Modifier l'édition",
+      "lost_found_active_description": "Vous pouvez gérer les objets trouvés pendant le déroulement de l'édition.",
+      "manage_lost_found": "Gérer les objets trouvés"
+    },
+    "objets_trouves": {
+      "photo_alt": "Photo de l'objet trouvé"
+    },
+    "profile": {
+      "photo_alt": "Photo de profil",
+      "photo_placeholder": "Cliquez pour changer votre photo de profil"
+    }
+  },
+  "seo": {
+    "site_name": "Convention de Jonglerie",
+    "site_description": "Trouvez et gérez vos conventions de jonglerie préférées. Plateforme collaborative pour les jongleurs et organisateurs d'événements.",
+    "organization": {
+      "description": "Plateforme collaborative dédiée à la communauté de jonglerie, facilitant la découverte et l'organisation d'événements de jonglerie en France et en Europe."
+    },
+    "search_action": {
+      "name": "Rechercher une convention",
+      "description": "Recherchez des conventions de jonglerie par nom, lieu ou organisateur"
+    },
+    "homepage": {
+      "title": "Conventions de Jonglerie",
+      "description": "Découvrez les prochaines conventions de jonglerie en France et en Europe. Organisez vos événements favoris et connectez-vous avec la communauté de jongleurs.",
+      "keywords": "jonglerie, convention, festival, événement, jongleur, spectacle, atelier, stage",
+      "og_title": "Convention de Jonglerie - Trouvez votre prochaine convention",
+      "og_description": "La plateforme de référence pour découvrir et organiser les conventions de jonglerie en France et en Europe.",
+      "twitter_title": "Convention de Jonglerie - Événements de jonglerie",
+      "twitter_description": "Découvrez les prochaines conventions de jonglerie et rejoignez la communauté des jongleurs."
+    },
+    "edition": {
+      "title": "{name}",
+      "description": "Découvrez {name} qui se déroule {date} à {location}. Informations, programme et inscription à cette convention de jonglerie.",
+      "keywords": "jonglerie, convention, {convention}, {location}, événement, festival, spectacle, atelier",
+      "og_description": "Rejoignez-nous pour {name} - {date}. Programme, ateliers et spectacles de jonglerie.",
+      "twitter_title": "{name} - Convention de Jonglerie",
+      "twitter_description": "{name} - {date}. Découvrez le programme de cette convention de jonglerie."
+    },
+    "carpool": {
+      "title": "Covoiturage - {name}",
+      "description": "Organisez votre covoiturage pour {name}. Trouvez des compagnons de route ou proposez vos places libres pour {date} à {location}.",
+      "keywords": "covoiturage, transport, {convention}, {location}, partage, économique, écologique",
+      "og_title": "Covoiturage pour {name}",
+      "og_description": "Organisez votre transport pour {name} - {date}. Covoiturage disponible.",
+      "twitter_title": "Covoiturage - {name}",
+      "twitter_description": "Trouvez ou proposez un covoiturage pour {name}."
+    },
+    "volunteers": {
+      "title": "Bénévolat - {name}",
+      "description": "Rejoignez l'équipe de bénévoles pour {name}. Participez à l'organisation de cet événement de jonglerie {date} à {location}.",
+      "keywords": "bénévolat, volontariat, équipe, {convention}, {location}, organisation, aide",
+      "og_title": "Bénévolat pour {name}",
+      "og_description": "Rejoignez l'équipe bénévole de {name} - {date}. Participez à l'organisation.",
+      "twitter_title": "Bénévolat - {name}",
+      "twitter_description": "Devenez bénévole pour {name} et participez à l'organisation."
+    }
+  }
+}

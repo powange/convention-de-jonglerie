@@ -10,6 +10,34 @@ const __dirname = path.dirname(__filename)
 const LOCALES_DIR = path.join(__dirname, '..', '..', 'i18n', 'locales')
 const REFERENCE_LANG = 'fr' // Langue de référence
 
+/**
+ * Charge tous les fichiers JSON d'un dossier de langue et les fusionne
+ */
+function loadLocaleFiles(locale) {
+  const localeDir = path.join(LOCALES_DIR, locale)
+
+  if (!fs.existsSync(localeDir) || !fs.statSync(localeDir).isDirectory()) {
+    return null
+  }
+
+  const files = fs.readdirSync(localeDir).filter((file) => file.endsWith('.json'))
+
+  if (files.length === 0) {
+    return null
+  }
+
+  // Fusionner tous les fichiers de cette langue
+  const mergedData = {}
+  for (const file of files) {
+    const filePath = path.join(localeDir, file)
+    const content = fs.readFileSync(filePath, 'utf8')
+    const data = JSON.parse(content)
+    Object.assign(mergedData, data)
+  }
+
+  return mergedData
+}
+
 // Couleurs pour l'affichage
 const colors = {
   reset: '\x1b[0m',
@@ -54,10 +82,13 @@ function getNestedValue(obj, keyPath) {
  * Charge et analyse tous les fichiers de langue
  */
 function analyzeLanguageFiles() {
+  // Lister tous les dossiers de langue
   const languageFiles = fs
     .readdirSync(LOCALES_DIR)
-    .filter((file) => file.endsWith('.json'))
-    .map((file) => file.replace('.json', ''))
+    .filter((item) => {
+      const itemPath = path.join(LOCALES_DIR, item)
+      return fs.statSync(itemPath).isDirectory()
+    })
     .sort()
 
   console.log(`${colors.blue}${colors.bold}=== DIAGNOSTIC DES CLÉS [TODO] ===${colors.reset}\n`)
@@ -69,10 +100,15 @@ function analyzeLanguageFiles() {
   const allTodoKeys = new Set()
 
   for (const lang of languageFiles) {
-    const filePath = path.join(LOCALES_DIR, `${lang}.json`)
     try {
-      const content = fs.readFileSync(filePath, 'utf-8')
-      const data = JSON.parse(content)
+      const data = loadLocaleFiles(lang)
+      if (!data) {
+        console.error(
+          `${colors.red}Erreur: Aucun fichier de traduction trouvé pour ${lang}${colors.reset}`
+        )
+        continue
+      }
+
       languageData[lang] = data
 
       // Trouver les clés TODO dans cette langue
@@ -80,7 +116,7 @@ function analyzeLanguageFiles() {
       Object.keys(todoKeys).forEach((key) => allTodoKeys.add(key))
     } catch (error) {
       console.error(
-        `${colors.red}Erreur lors du chargement de ${lang}.json: ${error.message}${colors.reset}`
+        `${colors.red}Erreur lors du chargement de ${lang}: ${error.message}${colors.reset}`
       )
     }
   }

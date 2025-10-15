@@ -1,0 +1,221 @@
+{
+  "components": {
+    "carpool": {
+      "accept": "Accetta",
+      "add_comment_placeholder": "Aggiungi un commento...",
+      "added_on": "Aggiunto il {date}",
+      "address": "Indirizzo",
+      "available_seats": "Numero di posti disponibili",
+      "be_first_to_comment": "Sii il primo a commentare questa {type}!",
+      "be_first_to_offer": "Sii il primo a proporre una condivisione auto per questa edizione!",
+      "book_seats": "Prenota",
+      "comments": "Commenti",
+      "confirm_booking": "Conferma prenotazione",
+      "confirm_delete_offer": "Sei sicuro di voler eliminare questa offerta di condivisione auto?",
+      "confirm_delete_request": "Sei sicuro di voler eliminare questa richiesta di condivisione auto?",
+      "confirmed_passengers": "Passeggeri confermati",
+      "contact": "Contatto",
+      "contact_user": "Contatta {name}",
+      "delete_offer": "Elimina offerta",
+      "delete_request": "Elimina richiesta",
+      "departure_date_time": "Data e ora di partenza",
+      "edit_offer": "Modifica offerta condivisione auto",
+      "edit_request": "Modifica richiesta condivisione auto",
+      "how_many_seats_needed": "Quanti posti stai cercando?",
+      "loading_comments": "Caricamento commenti...",
+      "my_booking": "La mia prenotazione",
+      "no_comments": "Nessun commento",
+      "no_offers": "Nessuna offerta di condivisione auto",
+      "no_pending_bookings": "Nessuna prenotazione in sospeso",
+      "no_requests": "Nessuna richiesta di condivisione auto",
+      "no_requests_published": "Nessuna richiesta è stata pubblicata al momento.",
+      "offer": "offerta",
+      "offered_on": "Offerto il {date}",
+      "offers_long": "Offerte condivisione auto",
+      "offers_short": "Offerte",
+      "pending_bookings": "Prenotazioni in sospeso",
+      "propose_carpool": "Proponi condivisione auto",
+      "publish": "Pubblica",
+      "reject": "Rifiuta",
+      "request": "richiesta",
+      "request_carpool": "Richiedi condivisione auto",
+      "requested_on": "Richiesto il {date}",
+      "requested_seats": "{count} posto richiesto | {count} posti richiesti",
+      "requests_long": "Richieste condivisione auto",
+      "requests_short": "Richieste",
+      "seats_available": "{count} posto disponibile | {count} posti disponibili",
+      "seats_needed": "{count} posto cercato | {count} posti cercati",
+      "suggestions": "Suggerimenti",
+      "to_add_comment": "per aggiungere un commento",
+      "view_comments": "Visualizza commenti ({count})"
+    },
+    "collaborators_rights_panel": {
+      "per_edition": "Diritti per edizione",
+      "per_edition_hint": "Nessun diritto specifico definito per le edizioni",
+      "title_placeholder": "Titolo o ruolo (opzionale)"
+    },
+    "convention_form": {
+      "click_to_select_image": "Clicca per selezionare un'immagine",
+      "contact_email": "Email di contatto",
+      "contact_email_help": "Indirizzo email utilizzato per le richieste di rivendicazione delle edizioni e i contatti relativi a questa convention",
+      "convention_logo": "Logo del convegno",
+      "convention_logo_alt": "Logo del convegno",
+      "convention_name": "Nome del convegno",
+      "external_url": "URL esterno",
+      "image_deleted": "Immagine eliminata",
+      "image_uploaded": "Immagine caricata",
+      "loading_error_description": "Impossibile caricare l'immagine da questo URL",
+      "loading_error_title": "Errore di caricamento",
+      "logo_preview": "Anteprima logo:",
+      "logo_url_description": "URL dell'immagine del logo del convegno",
+      "upload_file": "Carica file"
+    },
+    "country_multi_select": {
+      "placeholder": "Seleziona paesi..."
+    },
+    "country_select": {
+      "no_countries_found": "Nessun paese trovato",
+      "search_country_placeholder": "Cerca un paese..."
+    },
+    "date_time_picker": {
+      "placeholder": "Seleziona una data"
+    },
+    "edition_form": {
+      "address_tip": "Inserisci un indirizzo completo nel campo di ricerca per compilare automaticamente tutti i campi sottostanti. Un indirizzo preciso permetterà anche di geolocalizzare il tuo evento sulla mappa.",
+      "convention_description_placeholder": "Descrizione della convention",
+      "convention_poster_optional": "Poster del convegno (Opzionale)",
+      "country_placeholder": "Nome del paese",
+      "facebook_page": "Pagina Facebook",
+      "instagram_account": "Account Instagram",
+      "next": "Successivo",
+      "official_website_link": "Sito ufficiale",
+      "poster_alt": "Poster dell'edizione",
+      "poster_placeholder": "Clicca per selezionare il poster dell'edizione",
+      "previous": "Precedente",
+      "program_placeholder": "Descrivi il programma dell'edizione (orari, laboratori, spettacoli...)",
+      "social_networks_description": "Condividi le tue pagine per aumentare la visibilità",
+      "social_networks_title": "Reti sociali",
+      "step_about_description": "Descrizione dell'edizione",
+      "step_about_title": "Informazioni",
+      "step_external_links_description": "Biglietteria e social network",
+      "step_external_links_title": "Link esterni",
+      "step_general_description": "Informazioni Generali",
+      "step_general_title": "Informazioni Generali",
+      "step_services_title": "Servizi Offerti",
+      "ticketing_link": "Link biglietteria",
+      "ticketing_section_description": "Informazioni per l'acquisto dei biglietti",
+      "ticketing_section_title": "Biglietteria"
+    },
+    "favorites_map": {
+      "all_favorites": "Tutte sono preferite",
+      "editions_with_location": "{count} edizione con localizzazione | {count} edizioni con localizzazione",
+      "no_upcoming_favorites": "Nessuna edizione preferita futura con localizzazione disponibile",
+      "past": "Passate",
+      "upcoming": "Future"
+    },
+    "map": {
+      "editions_on_map": "{count} edizione sulla mappa | {count} edizioni sulla mappa",
+      "incomplete_address_warning": "Le edizioni senza indirizzo completo non possono essere visualizzate sulla mappa.",
+      "loading": "Caricamento mappa...",
+      "no_editions_with_location": "Nessuna edizione con localizzazione",
+      "ongoing": "In corso",
+      "past": "Passate",
+      "temporal_status": "Stato temporale",
+      "upcoming": "Future",
+      "without_coordinates": "({count} senza coordinate)",
+      "yellow_border_favorite": "Contorno giallo = Preferito"
+    },
+    "posts": {
+      "comments_count": "{count} commento | {count} commenti",
+      "confirm_delete_comment": "Sei sicuro di voler eliminare questo commento? Questa azione è irreversibile.",
+      "confirm_delete_post": "Sei sicuro di voler eliminare questo post? Questa azione è irreversibile.",
+      "confirm_delete_title": "Conferma eliminazione",
+      "pinned": "In evidenza",
+      "publish": "Pubblica",
+      "reply_to_post": "Commenta questa pubblicazione",
+      "your_comment": "Il tuo commento",
+      "your_comment_placeholder": "Il tuo commento..."
+    }
+  },
+  "forms": {
+    "buttons": {
+      "publishing": "Pubblicazione...",
+      "submitting": "Invio..."
+    },
+    "labels": {
+      "address_complement": "Complemento indirizzo",
+      "convention_name": "Nome del convegno",
+      "edition_name_optional": "Nome dell'edizione (opzionale)",
+      "from_date": "Dal",
+      "full_address": "Indirizzo Completo",
+      "select_date": "Seleziona una data",
+      "until_date": "Fino al"
+    },
+    "placeholders": {
+      "address_complement": "Edificio A, Sala delle feste...",
+      "city_example": "Roma",
+      "contact_email": "contatto{'@'}convention.org",
+      "convention_description": "Descrivi il convegno, la sua storia, le sue specificità...",
+      "convention_name_example": "Es: Convegno Europeo di Giocoleria",
+      "edition_name_example": "Nome dell'edizione (es: EJC 2024)",
+      "search_by_name": "Cerca per nome",
+      "select_convention": "Seleziona un convegno",
+      "select_countries": "Seleziona paesi...",
+      "start_typing_address": "Inizia a digitare un indirizzo..."
+    }
+  },
+  "notifications": {
+    "confirm_delete_description": "Sei sicuro di voler eliminare questa notifica?",
+    "confirm_delete_title": "Elimina notifica",
+    "loading": "Caricamento notifiche...",
+    "manage_description": "Gestisci le tue notifiche e preferenze",
+    "none_found": "Nessuna notifica trovata",
+    "push": {
+      "blocked": "Notifiche bloccate nelle impostazioni del browser",
+      "description": "Ricevi notifiche anche quando l'applicazione è chiusa",
+      "disabled": "Notifiche disattivate",
+      "enabled": "Notifiche attivate su questo dispositivo",
+      "not_supported": "Notifiche push non supportate su questo browser",
+      "test_button": "Testa una notifica",
+      "title": "Notifiche push"
+    },
+    "this_week": "Questa settimana",
+    "unread": "Non lette"
+  },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Ricevi notifiche per prenotazioni e messaggi di carpooling",
+        "important": "Non perdere informazioni importanti che ti riguardano",
+        "reminders": "Ricevi promemoria per le tue convention preferite",
+        "volunteer": "Ricevi aggiornamenti sulle tue candidature come volontario"
+      },
+      "description": "Abilita le notifiche push per rimanere informato sui tuoi carpooling, candidature come volontario e convention preferite.",
+      "enable": "Abilita notifiche",
+      "not_now": "Non ora",
+      "privacy": {
+        "description": "Puoi disabilitare le notifiche in qualsiasi momento nelle tue impostazioni.",
+        "title": "Rispettoso della privacy"
+      },
+      "title": "Rimani informato in tempo reale"
+    }
+  },
+  "upload": {
+    "delete_message": "Immagine eliminata",
+    "error": "Errore durante il caricamento",
+    "error_message": "Errore di caricamento",
+    "errors": {
+      "file_too_large": "File troppo grande",
+      "invalid_file_extension": "Estensione file non valida",
+      "invalid_file_type": "Tipo di file non valido"
+    },
+    "formats_accepted": "Formati accettati",
+    "logo_url_optional_placeholder": "URL del logo della convention (opzionale)",
+    "max_size": "Dimensione massima",
+    "select_file": "Seleziona file",
+    "success_message": "Immagine caricata con successo!",
+    "upload": "Carica",
+    "upload_error": "Errore di caricamento",
+    "uploading": "Caricamento..."
+  }
+}

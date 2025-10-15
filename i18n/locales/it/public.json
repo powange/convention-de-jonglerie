@@ -1,0 +1,232 @@
+{
+  "homepage": {
+    "agenda": "Programma",
+    "current_editions": "Edizioni in corso",
+    "filters": "Filtri",
+    "finished_editions": "Edizioni terminate",
+    "grid": "Griglia",
+    "map": "Mappa",
+    "no_conventions_found": "Nessun convegno trovato. Sii il primo ad aggiungerne uno!",
+    "no_conventions_match_criteria": "Nessun convegno corrisponde ai tuoi criteri di ricerca",
+    "period": "Periodo",
+    "searched_services": "Servizi ricercati",
+    "upcoming_editions": "Edizioni future"
+  },
+  "pages": {
+    "access_denied": {
+      "confirm_delete_edition": "Sei sicuro di voler eliminare questa edizione?",
+      "description": "Non hai i diritti per accedere a questa pagina.",
+      "title": "Accesso negato"
+    },
+    "add_convention": {
+      "description": "Un convegno raggruppa più edizioni di uno stesso evento di giocoleria.",
+      "submit_button": "Crea il convegno",
+      "title": "Crea un nuovo convegno"
+    },
+    "add_edition": {
+      "submit_button": "Aggiungi l'edizione",
+      "title": "Aggiungi una nuova edizione"
+    },
+    "add_edition_for_convention": {
+      "convention_not_found_description": "Il convegno che stai cercando non esiste o non hai i diritti per aggiungervi un'edizione.",
+      "for_convention": "Per il convegno \"{name}\"",
+      "loading_convention": "Caricamento dati convegno...",
+      "submit_button": "Crea l'edizione"
+    },
+    "comments": {
+      "be_first_to_comment": "Sii il primo a condividere la tua esperienza!",
+      "comment_placeholder": "Condividi la tua esperienza, fai le tue domande...",
+      "login_to_participate": "Accedi per partecipare alla discussione",
+      "no_comments": "Nessun commento per il momento.",
+      "share_experience": "Condividi la tua esperienza o fai domande",
+      "write_comment": "Scrivi un commento",
+      "your_comment": "Il tuo commento"
+    },
+    "edit_convention": {
+      "convention_not_found_or_no_rights": "Il convegno che stai cercando non esiste o non hai i diritti per modificarlo.",
+      "editing_convention": "Modifica del convegno \"{name}\"",
+      "loading_convention_data": "Caricamento dati convegno...",
+      "submit_button": "Aggiorna il convegno"
+    },
+    "edit_edition": {
+      "submit_button": "Aggiorna l'edizione"
+    },
+    "favorites": {
+      "editions_in_favorites": "{count} edizione nei preferiti | {count} edizioni nei preferiti",
+      "no_favorites_added": "Non hai ancora aggiunto edizioni ai tuoi preferiti."
+    },
+    "management": {
+      "delete_edition": "Elimina edizione",
+      "edit_edition": "Modifica edizione",
+      "lost_found_active_description": "Puoi gestire gli oggetti smarriti mentre l'edizione è in corso.",
+      "manage_lost_found": "Gestisci oggetti smarriti"
+    },
+    "objets_trouves": {
+      "photo_alt": "Foto dell'oggetto trovato"
+    },
+    "profile": {
+      "photo_alt": "Foto profilo",
+      "photo_placeholder": "Clicca per cambiare la tua foto profilo"
+    },
+    "volunteers": {
+      "accepted": "Accettate",
+      "allergies": "Allergie",
+      "application_details": "Dettagli della candidatura",
+      "applications_description": "Segui lo stato delle tue candidature come volontario per diverse convention",
+      "applied_on": "Candidato il",
+      "assigned_time_slots": "Slot temporali assegnati",
+      "availability": "Disponibilità",
+      "avoid_list": "Lista da evitare",
+      "browse_conventions": "Sfoglia convention",
+      "companion": "Compagno",
+      "companion_name": "Nome del compagno",
+      "confirm_withdraw": "Sei sicuro di voler ritirare la tua candidatura?",
+      "contact_organizer": "Contatta organizzatore",
+      "dates": "Date",
+      "diet": "Dieta",
+      "dietary": {
+        "none": "Nessuna",
+        "other": "Altra",
+        "vegan": "Vegano",
+        "vegetarian": "Vegetariano"
+      },
+      "dietary_preferences": "Preferenze alimentari",
+      "emergency_contact": "Contatto di emergenza",
+      "emergency_contact_name": "Nome del contatto di emergenza",
+      "emergency_contact_phone": "Telefono del contatto di emergenza",
+      "event": "Evento",
+      "experience": "Esperienza",
+      "experience_details": "Dettagli esperienza",
+      "export": "Esporta",
+      "export_ical": "Esporta iCal",
+      "export_pdf": "Esporta PDF",
+      "has_experience": "Ha esperienza",
+      "has_minors": "Accompagnato da minori",
+      "has_pets": "Ha animali domestici",
+      "has_vehicle": "Ha veicolo",
+      "history": "Cronologia",
+      "minors": "Minori",
+      "minors_details": "Dettagli sui minori",
+      "motivation": "Motivazione",
+      "my_applications": "Le mie candidature volontarie",
+      "my_planning": "La mia pianificazione",
+      "my_slots_title": "I Miei Turni",
+      "no_accepted_applications": "Nessuna candidatura accettata",
+      "no_accepted_description": "Non hai ancora nessuna candidatura accettata",
+      "no_applications": "Nessuna candidatura",
+      "no_applications_description": "Non ti sei ancora candidato come volontario per nessuna convention",
+      "no_history": "Nessuna cronologia",
+      "no_history_description": "Nessuna candidatura rifiutata o ritirata",
+      "no_pending_applications": "Nessuna candidatura in sospeso",
+      "no_pending_description": "Al momento non hai candidature in attesa di risposta",
+      "no_rejected_applications": "Nessuna candidatura respinta",
+      "no_rejected_description": "Nessuna delle tue candidature è stata respinta",
+      "pending": "In sospeso",
+      "pets": "Animali domestici",
+      "pets_details": "Dettagli animali domestici",
+      "rejected": "Respinte",
+      "setup": "Allestimento",
+      "skills": "Competenze",
+      "team_distribution": {
+        "all_teams": "Tutte le squadre",
+        "description": "Distribuzione dei volontari accettati nei team. Trascina e rilascia per spostare o aggiungere a una squadra.",
+        "drop_volunteers_here": "Trascina e rilascia i volontari qui",
+        "empty_team": "Team vuoto",
+        "leader_added": "Responsabile aggiunto",
+        "leader_badge": "Responsabile",
+        "leader_removed": "Responsabile rimosso",
+        "manage_teams": "Gestisci squadre",
+        "max_label": "Max:",
+        "modal": {
+          "add": "Aggiungi",
+          "add_description_multiple": "Mantieni il volontario nelle sue squadre attuali e aggiungilo anche a \"{targetTeam}\"",
+          "add_description_single": "Mantieni il volontario in \"{sourceTeam}\" e assegnalo anche a \"{targetTeam}\"",
+          "cancel": "Annulla",
+          "move": "Sposta",
+          "move_description_multiple": "Rimuovi il volontario da tutte le sue squadre attuali e posizionalo in \"{targetTeam}\"",
+          "move_description_single": "Rimuovi il volontario da \"{sourceTeam}\" e posizionalo in \"{targetTeam}\"",
+          "question": "Cosa vorresti fare?"
+        },
+        "no_assignments": "Nessuna assegnazione di squadra trovata",
+        "no_assignments_description": "I volontari accettati appariranno qui una volta assegnati alle squadre",
+        "preferences_label": "Pref:",
+        "remove_as_leader": "Rimuovi ruolo di responsabile",
+        "select_team_instruction": "Seleziona la squadra di destinazione",
+        "set_as_leader": "Imposta come responsabile",
+        "stats": {
+          "assigned_volunteers": "Volontari assegnati",
+          "total_assignments": "Assegnazioni totali",
+          "total_teams": "Squadre totali",
+          "unassigned": "Non assegnati"
+        },
+        "title": "Distribuzione per squadre",
+        "unassigned_description": "Questi volontari accettati non sono ancora stati assegnati a una squadra. Puoi trascinarli e rilasciarli in una squadra qui sotto.",
+        "unassigned_volunteers": "Volontari non assegnati",
+        "volunteers_count": "{count} volontario/i"
+      },
+      "team_preferences": "Preferenze di squadra",
+      "teardown": "Smontaggio",
+      "time_preferences": "Preferenze orarie",
+      "total_hours": "Ore totali",
+      "unnamed_slot": "Slot senza titolo",
+      "vehicle": "Veicolo",
+      "vehicle_details": "Dettagli del veicolo",
+      "view_compact": "Vista compatta",
+      "view_compact_short": "Compatta",
+      "view_detailed": "Vista dettagliata",
+      "view_detailed_short": "Dettagliata",
+      "view_details": "Visualizza dettagli",
+      "view_edition": "Visualizza edizione",
+      "view_planning": "Visualizza pianificazione",
+      "withdraw": "Ritira",
+      "withdrawal_error": "Errore nel ritiro della candidatura",
+      "withdrawal_success": "Candidatura ritirata con successo"
+    }
+  },
+  "seo": {
+    "carpool": {
+      "description": "Organizza il tuo carpooling per {name}. Trova compagni di viaggio o offri i tuoi posti disponibili per {date} a {location}.",
+      "keywords": "passaggio, trasporto, {convention}, {location}, condivisione, economico, ecologico",
+      "og_description": "Organizza il tuo trasporto per {name} - {date}. Passaggi disponibili.",
+      "og_title": "Passaggio per {name}",
+      "title": "Passaggio - {name}",
+      "twitter_description": "Trova o offri un passaggio per {name}.",
+      "twitter_title": "Passaggio - {name}"
+    },
+    "edition": {
+      "description": "Scopri {name} che si svolge {date} a {location}. Informazioni, programma e iscrizione per questa convention di giocoleria.",
+      "keywords": "giocoleria, convention, {convention}, {location}, evento, festival, spettacolo, laboratorio",
+      "og_description": "Unisciti a noi per {name} - {date}. Programma, laboratori e spettacoli di giocoleria.",
+      "title": "{name}",
+      "twitter_description": "{name} - {date}. Scopri il programma di questa convention di giocoleria.",
+      "twitter_title": "{name} - Convention di Giocoleria"
+    },
+    "homepage": {
+      "description": "Scopri le prossime convention di giocoleria in Francia e in Europa. Organizza i tuoi eventi preferiti e connettiti con la comunità di giocolieri.",
+      "keywords": "giocoleria, convention, festival, evento, giocoliere, spettacolo, laboratorio, corso",
+      "og_description": "La piattaforma di riferimento per scoprire e organizzare convention di giocoleria in Francia e in Europa.",
+      "og_title": "Convention di Giocoleria - Trova la tua prossima convention",
+      "title": "Convention di Giocoleria",
+      "twitter_description": "Scopri le prossime convention di giocoleria e unisciti alla comunità dei giocolieri.",
+      "twitter_title": "Convention di Giocoleria - Eventi di giocoleria"
+    },
+    "organization": {
+      "description": "Piattaforma collaborativa dedicata alla comunità del giocoliere, che facilita la scoperta e l'organizzazione di eventi di giocoleria in Francia e in Europa."
+    },
+    "search_action": {
+      "description": "Cerca convention di giocoleria per nome, luogo o organizzatore",
+      "name": "Cerca una convention"
+    },
+    "site_description": "Trova e gestisci le tue convention di giocoleria preferite. Piattaforma collaborativa per giocolieri e organizzatori di eventi.",
+    "site_name": "Convention di Giocoleria",
+    "volunteers": {
+      "description": "Unisciti al team di volontari per {name}. Partecipa all'organizzazione di questo evento di giocoleria {date} a {location}.",
+      "keywords": "volontariato, squadra, {convention}, {location}, organizzazione, aiuto",
+      "og_description": "Unisciti al team di volontari di {name} - {date}. Partecipa all'organizzazione.",
+      "og_title": "Volontariato per {name}",
+      "title": "Volontariato - {name}",
+      "twitter_description": "Diventa volontario per {name} e partecipa all'organizzazione.",
+      "twitter_title": "Volontariato - {name}"
+    }
+  }
+}

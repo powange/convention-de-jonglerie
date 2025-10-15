@@ -115,7 +115,10 @@
       "Bash(NODE_ENV=test npx vitest run:*)",
       "Bash(TEST_WITH_DB=true npx vitest run:*)",
       "Bash(npm audit:*)",
-      "Bash(sort:*)"
+      "Bash(sort:*)",
+      "Bash([ -d .nuxt ])",
+      "Bash(npx nuxt:*)",
+      "Bash(npx eslint:*)"
     ],
     "deny": [],
     "ask": [],

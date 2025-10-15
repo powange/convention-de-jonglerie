@@ -1,0 +1,232 @@
+{
+  "homepage": {
+    "agenda": "Dagsorden",
+    "current_editions": "Aktuelle udgaver",
+    "filters": "Filtre",
+    "finished_editions": "Afsluttede udgaver",
+    "grid": "Gitter",
+    "map": "Kort",
+    "no_conventions_found": "Ingen konventioner fundet. Vær den første til at tilføje en!",
+    "no_conventions_match_criteria": "Ingen konventioner matcher dine søgekriterier",
+    "period": "Periode",
+    "searched_services": "Søgte tjenester",
+    "upcoming_editions": "Kommende udgaver"
+  },
+  "pages": {
+    "access_denied": {
+      "confirm_delete_edition": "Er du sikker på, at du vil slette denne udgave?",
+      "description": "Du har ikke rettigheder til at få adgang til denne side.",
+      "title": "Adgang nægtet"
+    },
+    "add_convention": {
+      "description": "En konvention grupperer flere udgaver af samme jonglørbegivenhed.",
+      "submit_button": "Opret konventionen",
+      "title": "Opret en ny konvention"
+    },
+    "add_edition": {
+      "submit_button": "Tilføj udgaven",
+      "title": "Tilføj en ny udgave"
+    },
+    "add_edition_for_convention": {
+      "convention_not_found_description": "Konventionen, du leder efter, eksisterer ikke, eller du har ikke rettigheder til at tilføje en udgave til den.",
+      "for_convention": "For konventionen \"{name}\"",
+      "loading_convention": "Indlæser konventionsdata...",
+      "submit_button": "Opret udgaven"
+    },
+    "comments": {
+      "be_first_to_comment": "Vær den første til at dele din oplevelse!",
+      "comment_placeholder": "Del din oplevelse, stil dine spørgsmål...",
+      "login_to_participate": "Log ind for at deltage i diskussionen",
+      "no_comments": "Ingen kommentarer endnu.",
+      "share_experience": "Del din oplevelse eller stil dine spørgsmål",
+      "write_comment": "Skriv en kommentar",
+      "your_comment": "Din kommentar"
+    },
+    "edit_convention": {
+      "convention_not_found_or_no_rights": "Konventionen, du leder efter, eksisterer ikke, eller du har ikke rettigheder til at redigere den.",
+      "editing_convention": "Redigering af konventionen \"{name}\"",
+      "loading_convention_data": "Indlæser konventionsdata...",
+      "submit_button": "Opdater konventionen"
+    },
+    "edit_edition": {
+      "submit_button": "Opdater udgaven"
+    },
+    "favorites": {
+      "editions_in_favorites": "{count} udgave i favoritter | {count} udgaver i favoritter",
+      "no_favorites_added": "Du har endnu ikke tilføjet nogen udgaver til dine favoritter."
+    },
+    "management": {
+      "delete_edition": "Slet udgaven",
+      "edit_edition": "Rediger udgaven",
+      "lost_found_active_description": "Du kan administrere hittegods mens udgaven er i gang.",
+      "manage_lost_found": "Administrer hittegods"
+    },
+    "objets_trouves": {
+      "photo_alt": "Foto af den fundne genstand"
+    },
+    "profile": {
+      "photo_alt": "Profilbillede",
+      "photo_placeholder": "Klik for at ændre dit profilbillede"
+    },
+    "volunteers": {
+      "accepted": "Accepterede",
+      "allergies": "Allergier",
+      "application_details": "Ansøgningsdetaljer",
+      "applications_description": "Følg status på dine frivillig-ansøgninger til forskellige konventioner",
+      "applied_on": "Ansøgt den",
+      "assigned_time_slots": "Tildelte tidsrum",
+      "availability": "Tilgængelighed",
+      "avoid_list": "Undgåelsesliste",
+      "browse_conventions": "Gennemse konventioner",
+      "companion": "Ledsager",
+      "companion_name": "Ledsagernavn",
+      "confirm_withdraw": "Er du sikker på, at du vil trække din ansøgning tilbage?",
+      "contact_organizer": "Kontakt arrangør",
+      "dates": "Datoer",
+      "diet": "Diæt",
+      "dietary": {
+        "none": "Ingen",
+        "other": "Andet",
+        "vegan": "Vegansk",
+        "vegetarian": "Vegetarisk"
+      },
+      "dietary_preferences": "Kostvaner",
+      "emergency_contact": "Nødkontakt",
+      "emergency_contact_name": "Navn på nødkontakt",
+      "emergency_contact_phone": "Telefon til nødkontakt",
+      "event": "Begivenhed",
+      "experience": "Erfaring",
+      "experience_details": "Erfaringsdetaljer",
+      "export": "Eksporter",
+      "export_ical": "Eksporter iCal",
+      "export_pdf": "Eksporter PDF",
+      "has_experience": "Har erfaring",
+      "has_minors": "Ledsaget af mindreårige",
+      "has_pets": "Har kæledyr",
+      "has_vehicle": "Har køretøj",
+      "history": "Historik",
+      "minors": "Mindreårige",
+      "minors_details": "Detaljer om mindreårige",
+      "motivation": "Motivation",
+      "my_applications": "Mine frivillig-ansøgninger",
+      "my_planning": "Min planlægning",
+      "my_slots_title": "Mine Tidsrum",
+      "no_accepted_applications": "Ingen accepterede ansøgninger",
+      "no_accepted_description": "Du har endnu ikke nogen accepterede ansøgninger",
+      "no_applications": "Ingen ansøgninger",
+      "no_applications_description": "Du har endnu ikke ansøgt som frivillig til nogen konvention",
+      "no_history": "Ingen historik",
+      "no_history_description": "Ingen afviste eller tilbagetrukne ansøgninger",
+      "no_pending_applications": "Ingen ventende ansøgninger",
+      "no_pending_description": "Du har i øjeblikket ingen ansøgninger, der afventer svar",
+      "no_rejected_applications": "Ingen afviste ansøgninger",
+      "no_rejected_description": "Ingen af dine ansøgninger er blevet afvist",
+      "pending": "Afventer",
+      "pets": "Kæledyr",
+      "pets_details": "Kæledyrsdetaljer",
+      "rejected": "Afvist",
+      "setup": "Opsætning",
+      "skills": "Færdigheder",
+      "team_distribution": {
+        "all_teams": "Alle hold",
+        "description": "Fordeling af accepterede frivillige i hold. Træk og slip for at flytte eller tilføje til et hold.",
+        "drop_volunteers_here": "Træk og slip frivillige her",
+        "empty_team": "Tom gruppe",
+        "leader_added": "Leder tilføjet",
+        "leader_badge": "Leder",
+        "leader_removed": "Leder fjernet",
+        "manage_teams": "Administrer hold",
+        "max_label": "Maks:",
+        "modal": {
+          "add": "Tilføj",
+          "add_description_multiple": "Behold frivillig i deres nuværende hold og tilføj dem også til \"{targetTeam}\"",
+          "add_description_single": "Behold frivillig i \"{sourceTeam}\" og tildel dem også til \"{targetTeam}\"",
+          "cancel": "Annuller",
+          "move": "Flyt",
+          "move_description_multiple": "Fjern frivillig fra alle deres nuværende hold og placer dem i \"{targetTeam}\"",
+          "move_description_single": "Fjern frivillig fra \"{sourceTeam}\" og placer dem i \"{targetTeam}\"",
+          "question": "Hvad vil du gerne gøre?"
+        },
+        "no_assignments": "Ingen holdtildeling fundet",
+        "no_assignments_description": "Accepterede frivillige vil blive vist her, når de er tildelt til hold",
+        "preferences_label": "Præf:",
+        "remove_as_leader": "Fjern lederrollen",
+        "select_team_instruction": "Vælg destinationsteamet",
+        "set_as_leader": "Angiv som leder",
+        "stats": {
+          "assigned_volunteers": "Tildelte frivillige",
+          "total_assignments": "Samlede tildelinger",
+          "total_teams": "Samlede hold",
+          "unassigned": "Ikke tildelt"
+        },
+        "title": "Fordeling efter hold",
+        "unassigned_description": "Disse accepterede frivillige er endnu ikke blevet tildelt til et hold. Du kan trække og slippe dem til et hold nedenfor.",
+        "unassigned_volunteers": "Ikke-tildelte frivillige",
+        "volunteers_count": "{count} frivillig(e)"
+      },
+      "team_preferences": "Holdpræferencer",
+      "teardown": "Nedtagning",
+      "time_preferences": "Tidspræferencer",
+      "total_hours": "Total timer",
+      "unnamed_slot": "Unavngivet tidsrum",
+      "vehicle": "Køretøj",
+      "vehicle_details": "Køretøjsdetaljer",
+      "view_compact": "Kompakt visning",
+      "view_compact_short": "Kompakt",
+      "view_detailed": "Detaljeret visning",
+      "view_detailed_short": "Detaljeret",
+      "view_details": "Se detaljer",
+      "view_edition": "Se udgave",
+      "view_planning": "Se planlægning",
+      "withdraw": "Trække tilbage",
+      "withdrawal_error": "Fejl ved at trække ansøgning tilbage",
+      "withdrawal_success": "Ansøgning trukket tilbage succesfuldt"
+    }
+  },
+  "seo": {
+    "carpool": {
+      "description": "Organiser din samkørsel til {name}. Find rejsefæller eller tilbyd dine ledige pladser til {date} i {location}.",
+      "keywords": "samkørsel, transport, {convention}, {location}, deling, økonomisk, økologisk",
+      "og_description": "Organiser din transport til {name} - {date}. Samkørsel tilgængelig.",
+      "og_title": "Samkørsel til {name}",
+      "title": "Samkørsel - {name}",
+      "twitter_description": "Find eller tilbyd samkørsel til {name}.",
+      "twitter_title": "Samkørsel - {name}"
+    },
+    "edition": {
+      "description": "Opdag {name}, der finder sted {date} i {location}. Information, program og tilmelding til denne jonglørkonvention.",
+      "keywords": "jonglering, convention, {convention}, {location}, begivenhed, festival, show, workshop",
+      "og_description": "Deltag med os til {name} - {date}. Program, workshops og jonglering shows.",
+      "title": "{name}",
+      "twitter_description": "{name} - {date}. Opdag programmet for denne jonglering convention.",
+      "twitter_title": "{name} - Jonglering Convention"
+    },
+    "homepage": {
+      "description": "Opdag de kommende jonglering conventions i Frankrig og Europa. Organiser dine foretrukne begivenheder og forbind dig med jonglering fællesskabet.",
+      "keywords": "jonglering, convention, festival, begivenhed, jonglør, show, workshop, kursus",
+      "og_description": "Referenceplatformen til at opdage og organisere jonglering conventions i Frankrig og Europa.",
+      "og_title": "Jonglering Convention - Find din næste convention",
+      "title": "Jonglering Conventions",
+      "twitter_description": "Opdag de kommende jonglering conventions og bliv del af jonglering fællesskabet.",
+      "twitter_title": "Jonglering Convention - Jonglering begivenheder"
+    },
+    "organization": {
+      "description": "Kollaborativ platform dedikeret til jonglørfællesskabet, der letter opdagelsen og organisationen af jonglør begivenheder i Frankrig og Europa."
+    },
+    "search_action": {
+      "description": "Søg efter jonglør konventioner efter navn, sted eller arrangør",
+      "name": "Søg efter en konvention"
+    },
+    "site_description": "Find og håndter dine foretrukne jonglering conventions. Kollaborativ platform for jonglører og event arrangører.",
+    "site_name": "Jonglering Convention",
+    "volunteers": {
+      "description": "Tilslut dig frivilligteamet til {name}. Deltag i organiseringen af dette jonglør-arrangement {date} i {location}.",
+      "keywords": "frivilligt arbejde, hold, {convention}, {location}, organisering, hjælp",
+      "og_description": "Tilslut dig frivilligholdet for {name} - {date}. Deltag i organiseringen.",
+      "og_title": "Frivilligt arbejde for {name}",
+      "title": "Frivilligt arbejde - {name}",
+      "twitter_description": "Bliv frivillig for {name} og deltag i organiseringen.",
+      "twitter_title": "Frivilligt arbejde - {name}"
+    }
+  }
+}

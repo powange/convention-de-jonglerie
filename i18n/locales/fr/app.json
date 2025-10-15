@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Convention de Jonglerie"
+  },
+  "services": {
+    "accessibility": "Accessibilité handicapé",
+    "aerial_space": "Espace aérien",
+    "afj_token_payment": "Paiement jetons AFJ",
+    "atm": "Distributeur automatique de billets",
+    "canteen": "Cantine",
+    "cash_payment": "Paiement liquide",
+    "categories": {
+      "accommodation": "Hébergement",
+      "activities": "Activités",
+      "amenities": "Commodités",
+      "food": "Restauration",
+      "payment": "Paiements"
+    },
+    "concert": "Concert",
+    "credit_card_payment": "Paiement CB",
+    "family_camping": "Camping famille",
+    "fire_space": "Fire space",
+    "food_trucks": "Food trucks",
+    "gala": "Gala",
+    "gym": "Gymnase",
+    "kids_zone": "Zone enfants",
+    "long_show": "Spectacle long",
+    "open_stage": "Scène ouverte",
+    "pets_accepted": "Animaux acceptés",
+    "showers": "Douches",
+    "slackline_space": "Espace slackline",
+    "tent_camping": "Camping tente",
+    "toilets": "WC",
+    "truck_camping": "Camping camion",
+    "workshops": "Workshops",
+    "sleeping_room": "Salle de couchage"
+  },
+  "pwa": {
+    "install": {
+      "title": "Installer l'application",
+      "description": "Ajoutez l'application Juggling Convention à votre écran d'accueil pour un accès rapide et une expérience optimale.",
+      "button": "Installer maintenant",
+      "later": "Plus tard",
+      "success": {
+        "title": "Installation réussie !",
+        "description": "L'application a été ajoutée à votre écran d'accueil."
+      },
+      "cancelled": {
+        "title": "Installation annulée",
+        "description": "Vous pourrez installer l'application plus tard depuis les paramètres de votre navigateur."
+      },
+      "error": {
+        "title": "Erreur d'installation",
+        "description": "Une erreur s'est produite lors de l'installation. Veuillez réessayer."
+      }
+    }
+  }
+}

@@ -1,0 +1,232 @@
+{
+  "homepage": {
+    "agenda": "Agenda",
+    "current_editions": "Current editions",
+    "filters": "Filters",
+    "finished_editions": "Finished editions",
+    "grid": "Grid",
+    "map": "Map",
+    "no_conventions_found": "No conventions found. Be the first to add one!",
+    "no_conventions_match_criteria": "No conventions match your search criteria",
+    "period": "Period",
+    "searched_services": "Searched services",
+    "upcoming_editions": "Upcoming editions"
+  },
+  "pages": {
+    "access_denied": {
+      "confirm_delete_edition": "Are you sure you want to delete this edition?",
+      "description": "You don't have the rights to access this page.",
+      "title": "Access denied"
+    },
+    "add_convention": {
+      "description": "A convention brings together several editions of the same juggling event.",
+      "submit_button": "Create convention",
+      "title": "Create a new convention"
+    },
+    "add_edition": {
+      "submit_button": "Add edition",
+      "title": "Add a new edition"
+    },
+    "add_edition_for_convention": {
+      "convention_not_found_description": "The convention you are looking for does not exist or you don't have the rights to add an edition to it.",
+      "for_convention": "For the convention \"{name}\"",
+      "loading_convention": "Loading convention data...",
+      "submit_button": "Create edition"
+    },
+    "comments": {
+      "be_first_to_comment": "Be the first to share your experience!",
+      "comment_placeholder": "Share your experience, ask your questions...",
+      "login_to_participate": "Log in to participate in the discussion",
+      "no_comments": "No comments yet.",
+      "share_experience": "Share your experience or ask your questions",
+      "write_comment": "Write a comment",
+      "your_comment": "Your comment"
+    },
+    "edit_convention": {
+      "convention_not_found_or_no_rights": "The convention you are looking for does not exist or you don't have the rights to edit it.",
+      "editing_convention": "Editing convention \"{name}\"",
+      "loading_convention_data": "Loading convention data...",
+      "submit_button": "Update convention"
+    },
+    "edit_edition": {
+      "submit_button": "Update edition"
+    },
+    "favorites": {
+      "editions_in_favorites": "{count} edition | {count} editions in favorites",
+      "no_favorites_added": "You haven't added any edition to your favorites yet."
+    },
+    "management": {
+      "delete_edition": "Delete edition",
+      "edit_edition": "Edit edition",
+      "lost_found_active_description": "You can manage lost & found items while the edition is running.",
+      "manage_lost_found": "Manage lost & found"
+    },
+    "objets_trouves": {
+      "photo_alt": "Photo of found item"
+    },
+    "profile": {
+      "photo_alt": "Profile photo",
+      "photo_placeholder": "Click to change your profile photo"
+    },
+    "volunteers": {
+      "accepted": "Accepted",
+      "allergies": "Allergies",
+      "application_details": "Application details",
+      "applications_description": "Track the status of your volunteer applications for different conventions",
+      "applied_on": "Applied on",
+      "assigned_time_slots": "Assigned Time Slots",
+      "availability": "Availability",
+      "avoid_list": "Avoid list",
+      "browse_conventions": "Browse conventions",
+      "companion": "Companion",
+      "companion_name": "Companion name",
+      "confirm_withdraw": "Are you sure you want to withdraw your application?",
+      "contact_organizer": "Contact organizer",
+      "dates": "Dates",
+      "diet": "Diet",
+      "dietary": {
+        "none": "None",
+        "other": "Other",
+        "vegan": "Vegan",
+        "vegetarian": "Vegetarian"
+      },
+      "dietary_preferences": "Dietary preferences",
+      "emergency_contact": "Emergency contact",
+      "emergency_contact_name": "Emergency contact name",
+      "emergency_contact_phone": "Emergency contact phone",
+      "event": "Event",
+      "experience": "Experience",
+      "experience_details": "Experience details",
+      "export": "Export",
+      "export_ical": "Export iCal",
+      "export_pdf": "Export PDF",
+      "has_experience": "Has experience",
+      "has_minors": "Accompanied by minors",
+      "has_pets": "Has pets",
+      "has_vehicle": "Has vehicle",
+      "history": "History",
+      "minors": "Minors",
+      "minors_details": "Minor details",
+      "motivation": "Motivation",
+      "my_applications": "My volunteer applications",
+      "my_planning": "My schedule",
+      "my_slots_title": "My Time Slots",
+      "no_accepted_applications": "No accepted applications",
+      "no_accepted_description": "You don't have any accepted applications yet",
+      "no_applications": "No applications",
+      "no_applications_description": "You haven't applied as a volunteer for any convention yet",
+      "no_history": "No history",
+      "no_history_description": "No rejected or withdrawn applications",
+      "no_pending_applications": "No pending applications",
+      "no_pending_description": "You currently have no applications awaiting response",
+      "no_rejected_applications": "No rejected applications",
+      "no_rejected_description": "None of your applications have been rejected",
+      "pending": "Pending",
+      "pets": "Pets",
+      "pets_details": "Pet details",
+      "rejected": "Rejected",
+      "setup": "Setup",
+      "skills": "Skills",
+      "team_distribution": {
+        "all_teams": "All teams",
+        "description": "Distribution of accepted volunteers in teams. On desktop: drag and drop. On mobile: click to select a team.",
+        "drop_volunteers_here": "Drag and drop volunteers here",
+        "empty_team": "Empty team",
+        "leader_added": "Leader added",
+        "leader_badge": "Leader",
+        "leader_removed": "Leader removed",
+        "manage_teams": "Manage teams",
+        "max_label": "Max:",
+        "modal": {
+          "add": "Add",
+          "add_description_multiple": "Keep the volunteer in their current teams and also add them to \"{targetTeam}\"",
+          "add_description_single": "Keep the volunteer in \"{sourceTeam}\" and also assign them to \"{targetTeam}\"",
+          "cancel": "Cancel",
+          "move": "Move",
+          "move_description_multiple": "Remove the volunteer from all their current teams and place them in \"{targetTeam}\"",
+          "move_description_single": "Remove the volunteer from \"{sourceTeam}\" and place them in \"{targetTeam}\"",
+          "question": "What would you like to do?"
+        },
+        "no_assignments": "No team assignments found",
+        "no_assignments_description": "Accepted volunteers will appear here once assigned to teams",
+        "preferences_label": "Pref:",
+        "remove_as_leader": "Remove leader role",
+        "select_team_instruction": "Select the destination team",
+        "set_as_leader": "Set as leader",
+        "stats": {
+          "assigned_volunteers": "Assigned volunteers",
+          "total_assignments": "Total assignments",
+          "total_teams": "Total teams",
+          "unassigned": "Unassigned"
+        },
+        "title": "Team Distribution",
+        "unassigned_description": "These accepted volunteers have not yet been assigned to a team. On desktop: drag and drop. On mobile: click to select a team.",
+        "unassigned_volunteers": "Unassigned volunteers",
+        "volunteers_count": "{count} volunteer(s)"
+      },
+      "team_preferences": "Team preferences",
+      "teardown": "Teardown",
+      "time_preferences": "Time preferences",
+      "total_hours": "Total hours",
+      "unnamed_slot": "Unnamed slot",
+      "vehicle": "Vehicle",
+      "vehicle_details": "Vehicle details",
+      "view_compact": "Compact view",
+      "view_compact_short": "Compact",
+      "view_detailed": "Detailed view",
+      "view_detailed_short": "Detailed",
+      "view_details": "View details",
+      "view_edition": "View edition",
+      "view_planning": "View schedule",
+      "withdraw": "Withdraw",
+      "withdrawal_error": "Error withdrawing application",
+      "withdrawal_success": "Application withdrawn successfully"
+    }
+  },
+  "seo": {
+    "carpool": {
+      "description": "Organize your carpool to {name}. Find travel companions or offer your available seats for {date} in {location}.",
+      "keywords": "carpool, transport, {convention}, {location}, sharing, economical, ecological",
+      "og_description": "Organize your transport for {name} - {date}. Carpool available.",
+      "og_title": "Carpool for {name}",
+      "title": "Carpool - {name}",
+      "twitter_description": "Find or offer a carpool for {name}.",
+      "twitter_title": "Carpool - {name}"
+    },
+    "edition": {
+      "description": "Discover {name} taking place {date} in {location}. Information, program and registration for this juggling convention.",
+      "keywords": "juggling, convention, {convention}, {location}, event, festival, show, workshop",
+      "og_description": "Join us for {name} - {date}. Program, workshops and juggling shows.",
+      "title": "{name}",
+      "twitter_description": "{name} - {date}. Discover the program of this juggling convention.",
+      "twitter_title": "{name} - Juggling Convention"
+    },
+    "homepage": {
+      "description": "Discover upcoming juggling conventions in France and Europe. Organize your favorite events and connect with the juggling community.",
+      "keywords": "juggling, convention, festival, event, juggler, show, workshop, training",
+      "og_description": "The reference platform to discover and organize juggling conventions in France and Europe.",
+      "og_title": "Juggling Convention - Find your next convention",
+      "title": "Juggling Conventions",
+      "twitter_description": "Discover upcoming juggling conventions and join the juggling community.",
+      "twitter_title": "Juggling Convention - Juggling Events"
+    },
+    "organization": {
+      "description": "Collaborative platform dedicated to the juggling community, facilitating the discovery and organization of juggling events in France and Europe."
+    },
+    "search_action": {
+      "description": "Search for juggling conventions by name, location or organizer",
+      "name": "Search for a convention"
+    },
+    "site_description": "Find and manage your favorite juggling conventions. Collaborative platform for jugglers and event organizers.",
+    "site_name": "Juggling Convention",
+    "volunteers": {
+      "description": "Join the volunteer team for {name}. Participate in organizing this juggling event {date} in {location}.",
+      "keywords": "volunteering, volunteer, team, {convention}, {location}, organization, help",
+      "og_description": "Join the volunteer team of {name} - {date}. Participate in the organization.",
+      "og_title": "Volunteering for {name}",
+      "title": "Volunteering - {name}",
+      "twitter_description": "Become a volunteer for {name} and participate in the organization.",
+      "twitter_title": "Volunteering - {name}"
+    }
+  }
+}

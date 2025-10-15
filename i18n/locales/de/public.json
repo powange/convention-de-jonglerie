@@ -1,0 +1,232 @@
+{
+  "homepage": {
+    "agenda": "Programm",
+    "current_editions": "Laufende Auflagen",
+    "filters": "Filter",
+    "finished_editions": "Beendete Auflagen",
+    "grid": "Raster",
+    "map": "Karte",
+    "no_conventions_found": "Keine Convention gefunden. Sei der erste, der eine hinzufügt!",
+    "no_conventions_match_criteria": "Keine Convention entspricht deinen Suchkriterien",
+    "period": "Zeitraum",
+    "searched_services": "Gesuchte Services",
+    "upcoming_editions": "Kommende Auflagen"
+  },
+  "pages": {
+    "access_denied": {
+      "confirm_delete_edition": "Bist du sicher, dass du diese Auflage löschen möchtest?",
+      "description": "Du hast keine Berechtigung, auf diese Seite zuzugreifen.",
+      "title": "Zugang verweigert"
+    },
+    "add_convention": {
+      "description": "Eine Convention gruppiert mehrere Auflagen derselben Jonglier-Veranstaltung.",
+      "submit_button": "Convention erstellen",
+      "title": "Neue Convention erstellen"
+    },
+    "add_edition": {
+      "submit_button": "Auflage hinzufügen",
+      "title": "Neue Auflage hinzufügen"
+    },
+    "add_edition_for_convention": {
+      "convention_not_found_description": "Die Convention, die du suchst, existiert nicht oder du hast keine Berechtigung, eine Auflage hinzuzufügen.",
+      "for_convention": "Für die Convention \"{name}\"",
+      "loading_convention": "Lade Convention-Daten...",
+      "submit_button": "Auflage erstellen"
+    },
+    "comments": {
+      "be_first_to_comment": "Sei der erste, der seine Erfahrung teilt!",
+      "comment_placeholder": "Teile deine Erfahrung, stelle deine Fragen...",
+      "login_to_participate": "Melde dich an, um an der Diskussion teilzunehmen",
+      "no_comments": "Noch keine Kommentare.",
+      "share_experience": "Teile deine Erfahrung oder stelle deine Fragen",
+      "write_comment": "Kommentar schreiben",
+      "your_comment": "Dein Kommentar"
+    },
+    "edit_convention": {
+      "convention_not_found_or_no_rights": "Die Convention, die du suchst, existiert nicht oder du hast keine Berechtigung, sie zu bearbeiten.",
+      "editing_convention": "Bearbeitung der Convention \"{name}\"",
+      "loading_convention_data": "Lade Convention-Daten...",
+      "submit_button": "Convention aktualisieren"
+    },
+    "edit_edition": {
+      "submit_button": "Auflage aktualisieren"
+    },
+    "favorites": {
+      "editions_in_favorites": "{count} Auflage in Favoriten | {count} Auflagen in Favoriten",
+      "no_favorites_added": "Du hast noch keine Auflage zu deinen Favoriten hinzugefügt."
+    },
+    "management": {
+      "delete_edition": "Auflage löschen",
+      "edit_edition": "Auflage bearbeiten",
+      "lost_found_active_description": "Du kannst Fundsachen während der laufenden Auflage verwalten.",
+      "manage_lost_found": "Fundsachen verwalten"
+    },
+    "objets_trouves": {
+      "photo_alt": "Foto des gefundenen Gegenstands"
+    },
+    "profile": {
+      "photo_alt": "Profilfoto",
+      "photo_placeholder": "Klicken Sie, um Ihr Profilfoto zu ändern"
+    },
+    "volunteers": {
+      "accepted": "Akzeptiert",
+      "allergies": "Allergien",
+      "application_details": "Bewerbungsdetails",
+      "applications_description": "Verfolgen Sie den Status Ihrer Freiwilligenbewerbungen für verschiedene Conventions",
+      "applied_on": "Beworben am",
+      "assigned_time_slots": "Zugewiesene Zeitfenster",
+      "availability": "Verfügbarkeit",
+      "avoid_list": "Vermeidungsliste",
+      "browse_conventions": "Conventions durchsuchen",
+      "companion": "Begleitung",
+      "companion_name": "Name der Begleitung",
+      "confirm_withdraw": "Sind Sie sicher, dass Sie Ihre Bewerbung zurückziehen möchten?",
+      "contact_organizer": "Organisator kontaktieren",
+      "dates": "Termine",
+      "diet": "Diät",
+      "dietary": {
+        "none": "Keine",
+        "other": "Andere",
+        "vegan": "Vegan",
+        "vegetarian": "Vegetarisch"
+      },
+      "dietary_preferences": "Ernährungsvorlieben",
+      "emergency_contact": "Notfallkontakt",
+      "emergency_contact_name": "Name des Notfallkontakts",
+      "emergency_contact_phone": "Telefonnummer des Notfallkontakts",
+      "event": "Veranstaltung",
+      "experience": "Erfahrung",
+      "experience_details": "Erfahrungsdetails",
+      "export": "Exportieren",
+      "export_ical": "iCal exportieren",
+      "export_pdf": "PDF exportieren",
+      "has_experience": "Hat Erfahrung",
+      "has_minors": "Begleitet von Minderjährigen",
+      "has_pets": "Hat Haustiere",
+      "has_vehicle": "Hat Fahrzeug",
+      "history": "Verlauf",
+      "minors": "Minderjährige",
+      "minors_details": "Details zu Minderjährigen",
+      "motivation": "Motivation",
+      "my_applications": "Meine Freiwilligenbewerbungen",
+      "my_planning": "Meine Planung",
+      "my_slots_title": "Meine Zeitfenster",
+      "no_accepted_applications": "Keine akzeptierten Bewerbungen",
+      "no_accepted_description": "Sie haben noch keine akzeptierten Bewerbungen",
+      "no_applications": "Keine Bewerbungen",
+      "no_applications_description": "Sie haben sich noch nicht als Freiwilliger für eine Convention beworben",
+      "no_history": "Kein Verlauf",
+      "no_history_description": "Keine abgelehnten oder zurückgezogenen Bewerbungen",
+      "no_pending_applications": "Keine ausstehenden Bewerbungen",
+      "no_pending_description": "Sie haben derzeit keine Bewerbungen, die auf Antwort warten",
+      "no_rejected_applications": "Keine abgelehnten Bewerbungen",
+      "no_rejected_description": "Keine Ihrer Bewerbungen wurde abgelehnt",
+      "pending": "Ausstehend",
+      "pets": "Haustiere",
+      "pets_details": "Haustier-Details",
+      "rejected": "Abgelehnt",
+      "setup": "Aufbau",
+      "skills": "Fähigkeiten",
+      "team_distribution": {
+        "all_teams": "Alle Teams",
+        "description": "Verteilung der akzeptierten Freiwilligen in Teams. Ziehen und ablegen, um zu verschieben oder zu einem Team hinzuzufügen.",
+        "drop_volunteers_here": "Freiwillige hier ablegen",
+        "empty_team": "Leeres Team",
+        "leader_added": "Leiter hinzugefügt",
+        "leader_badge": "Leiter",
+        "leader_removed": "Leiter entfernt",
+        "manage_teams": "Teams verwalten",
+        "max_label": "Max:",
+        "modal": {
+          "add": "Hinzufügen",
+          "add_description_multiple": "Freiwilligen in ihren aktuellen Teams behalten und auch zu \"{targetTeam}\" hinzufügen",
+          "add_description_single": "Freiwilligen in \"{sourceTeam}\" behalten und auch zu \"{targetTeam}\" zuweisen",
+          "cancel": "Abbrechen",
+          "move": "Verschieben",
+          "move_description_multiple": "Freiwilligen aus allen aktuellen Teams entfernen und in \"{targetTeam}\" platzieren",
+          "move_description_single": "Freiwilligen aus \"{sourceTeam}\" entfernen und in \"{targetTeam}\" platzieren",
+          "question": "Was möchten Sie tun?"
+        },
+        "no_assignments": "Keine Teamzuweisungen gefunden",
+        "no_assignments_description": "Akzeptierte Freiwillige werden hier angezeigt, sobald sie Teams zugewiesen sind",
+        "preferences_label": "Präf:",
+        "remove_as_leader": "Leiterrolle entfernen",
+        "select_team_instruction": "Wählen Sie das Zielteam aus",
+        "set_as_leader": "Als Leiter festlegen",
+        "stats": {
+          "assigned_volunteers": "Zugewiesene Freiwillige",
+          "total_assignments": "Gesamtzuweisungen",
+          "total_teams": "Teams insgesamt",
+          "unassigned": "Nicht zugewiesen"
+        },
+        "title": "Teamverteilung",
+        "unassigned_description": "Diese akzeptierten Freiwilligen wurden noch keinem Team zugewiesen. Sie können sie per Drag & Drop zu einem Team unten hinzufügen.",
+        "unassigned_volunteers": "Nicht zugewiesene Freiwillige",
+        "volunteers_count": "{count} Freiwillige(r)"
+      },
+      "team_preferences": "Team-Präferenzen",
+      "teardown": "Abbau",
+      "time_preferences": "Zeitpräferenzen",
+      "total_hours": "Gesamtstunden",
+      "unnamed_slot": "Unbenanntes Zeitfenster",
+      "vehicle": "Fahrzeug",
+      "vehicle_details": "Fahrzeug-Details",
+      "view_compact": "Kompakte Ansicht",
+      "view_compact_short": "Kompakt",
+      "view_detailed": "Detaillierte Ansicht",
+      "view_detailed_short": "Detailliert",
+      "view_details": "Details anzeigen",
+      "view_edition": "Edition anzeigen",
+      "view_planning": "Planung anzeigen",
+      "withdraw": "Zurückziehen",
+      "withdrawal_error": "Fehler beim Zurückziehen der Bewerbung",
+      "withdrawal_success": "Bewerbung erfolgreich zurückgezogen"
+    }
+  },
+  "seo": {
+    "carpool": {
+      "description": "Organisieren Sie Ihre Mitfahrgelegenheit nach {name}. Finden Sie Mitreisende oder bieten Sie freie Plätze für {date} in {location} an.",
+      "keywords": "Fahrgemeinschaft, Transport, {convention}, {location}, Mitfahrgelegenheit, günstig, umweltfreundlich",
+      "og_description": "Organisieren Sie Ihren Transport für {name} - {date}. Fahrgemeinschaften verfügbar.",
+      "og_title": "Fahrgemeinschaft für {name}",
+      "title": "Fahrgemeinschaft - {name}",
+      "twitter_description": "Finden oder bieten Sie eine Fahrgemeinschaft für {name} an.",
+      "twitter_title": "Fahrgemeinschaft - {name}"
+    },
+    "edition": {
+      "description": "Entdecken Sie {name}, das {date} in {location} stattfindet. Informationen, Programm und Anmeldung zu dieser Jonglierkonvention.",
+      "keywords": "Jonglieren, Convention, {convention}, {location}, Veranstaltung, Festival, Show, Workshop",
+      "og_description": "Begleiten Sie uns zu {name} - {date}. Programm, Workshops und Jonglier-Shows.",
+      "title": "{name}",
+      "twitter_description": "{name} - {date}. Entdecken Sie das Programm dieser Jonglier-Convention.",
+      "twitter_title": "{name} - Jonglier-Convention"
+    },
+    "homepage": {
+      "description": "Entdecken Sie die nächsten Jonglier-Conventions in Frankreich und Europa. Organisieren Sie Ihre Lieblings-Events und vernetzen Sie sich mit der Jonglier-Community.",
+      "keywords": "Jonglieren, Convention, Festival, Veranstaltung, Jongleur, Show, Workshop, Kurs",
+      "og_description": "Die Referenz-Plattform zum Entdecken und Organisieren von Jonglier-Conventions in Frankreich und Europa.",
+      "og_title": "Jonglier-Convention - Finden Sie Ihre nächste Convention",
+      "title": "Jonglier-Conventions",
+      "twitter_description": "Entdecken Sie die nächsten Jonglier-Conventions und schließen Sie sich der Jonglier-Community an.",
+      "twitter_title": "Jonglier-Convention - Jonglier-Veranstaltungen"
+    },
+    "organization": {
+      "description": "Kollaborative Plattform für die Jonglier-Community, die die Entdeckung und Organisation von Jonglier-Veranstaltungen in Frankreich und Europa erleichtert."
+    },
+    "search_action": {
+      "description": "Suchen Sie nach Jonglier-Veranstaltungen nach Name, Ort oder Veranstalter",
+      "name": "Nach einer Tagung suchen"
+    },
+    "site_description": "Finden und verwalten Sie Ihre bevorzugten Jonglier-Conventions. Kollaborative Plattform für Jongleure und Veranstaltungsorganisatoren.",
+    "site_name": "Jonglier-Convention",
+    "volunteers": {
+      "description": "Schließen Sie sich dem Freiwilligenteam für {name} an. Helfen Sie bei der Organisation dieser Jonglierveranstaltung {date} in {location}.",
+      "keywords": "Freiwilligenarbeit, Ehrenamt, Team, {convention}, {location}, Organisation, Hilfe",
+      "og_description": "Schließen Sie sich dem Freiwilligenteam von {name} - {date} an. Beteiligen Sie sich an der Organisation.",
+      "og_title": "Freiwilligenarbeit für {name}",
+      "title": "Freiwilligenarbeit - {name}",
+      "twitter_description": "Werden Sie Freiwilliger für {name} und beteiligen Sie sich an der Organisation.",
+      "twitter_title": "Freiwilligenarbeit - {name}"
+    }
+  }
+}

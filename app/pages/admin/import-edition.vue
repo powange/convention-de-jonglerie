@@ -112,14 +112,14 @@
 
       <!-- Import Form -->
       <div class="space-y-4">
-        <UFormGroup :label="$t('admin.import.json_input')" required>
+        <UFormField :label="$t('admin.import.json_input')" required>
           <UTextarea
             v-model="jsonInput"
             :rows="15"
             :placeholder="$t('admin.import.json_placeholder')"
             class="font-mono w-full"
           />
-        </UFormGroup>
+        </UFormField>
 
         <div class="flex gap-3">
           <UButton

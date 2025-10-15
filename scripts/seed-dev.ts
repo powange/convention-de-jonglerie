@@ -935,6 +935,388 @@ async function main() {
   const totalSlots = await prisma.volunteerTimeSlot.count()
   const totalAssignments = await prisma.volunteerAssignment.count()
 
+  // Ajouter des réservations de covoiturage
+  console.log('Ajout des réservations de covoiturage...')
+  let carpoolBookingsCount = 0
+  let carpoolPassengersCount = 0
+
+  const allOffers = await prisma.carpoolOffer.findMany({
+    include: { user: true },
+  })
+
+  for (const offer of allOffers) {
+    // 60% des offres ont au moins une réservation
+    if (Math.random() > 0.4) {
+      const numBookings = Math.min(
+        Math.floor(Math.random() * 2) + 1, // 1-2 réservations par offre
+        offer.availableSeats
+      )
+
+      // Sélectionner des utilisateurs aléatoires qui ne sont pas l'auteur de l'offre
+      const potentialBookers = createdUsers.filter((u) => u.id !== offer.userId)
+
+      for (let i = 0; i < numBookings; i++) {
+        const booker = potentialBookers[Math.floor(Math.random() * potentialBookers.length)]
+
+        // Vérifier qu'il n'a pas déjà réservé cette offre
+        const existingBooking = await prisma.carpoolBooking.findFirst({
+          where: {
+            carpoolOfferId: offer.id,
+            requesterId: booker.id,
+          },
+        })
+
+        if (!existingBooking) {
+          const status =
+            Math.random() > 0.2 ? 'CONFIRMED' : Math.random() > 0.5 ? 'PENDING' : 'CANCELLED'
+
+          await prisma.carpoolBooking.create({
+            data: {
+              carpoolOfferId: offer.id,
+              requesterId: booker.id,
+              seats: 1,
+              message:
+                Math.random() > 0.5
+                  ? ['Merci !', "J'ai du matériel, est-ce OK ?", 'À quelle heure ?'][
+                      Math.floor(Math.random() * 3)
+                    ]
+                  : null,
+              status,
+            },
+          })
+          carpoolBookingsCount++
+
+          // Si confirmé, ajouter comme passager
+          if (status === 'CONFIRMED') {
+            await prisma.carpoolPassenger.create({
+              data: {
+                carpoolOfferId: offer.id,
+                userId: booker.id,
+                addedById: offer.userId,
+              },
+            })
+            carpoolPassengersCount++
+          }
+        }
+      }
+    }
+  }
+
+  // Ajouter des objets trouvés/perdus
+  console.log('Ajout des objets trouvés/perdus...')
+  let lostFoundCount = 0
+
+  for (const edition of createdEditions) {
+    // 40% des éditions ont des objets trouvés/perdus
+    if (Math.random() > 0.6) {
+      const numItems = Math.floor(Math.random() * 4) + 1 // 1-4 objets par édition
+
+      for (let i = 0; i < numItems; i++) {
+        const randomUser = createdUsers[Math.floor(Math.random() * createdUsers.length)]
+        const isLost = Math.random() > 0.5
+
+        const lostItems = [
+          'Massues de jonglerie bleues',
+          'Diabolo rouge avec baguettes',
+          'Portefeuille noir',
+          'Clés de voiture avec porte-clés jongleur',
+          'Téléphone Samsung',
+          'Sac à dos vert avec matériel de jonglerie',
+          'Veste polaire noire',
+          'Lunettes de soleil',
+          'Gourde en métal',
+          'Chargeur de téléphone',
+        ]
+
+        const foundItems = [
+          'Balles de jonglerie trouvées près du gymnase',
+          'Téléphone trouvé dans les toilettes',
+          'Porte-monnaie trouvé',
+          'Foulards de jonglerie trouvés',
+          'Chapeau oublié',
+          'Écharpe trouvée',
+          'Bouteille thermos trouvée',
+        ]
+
+        const itemDescription = isLost
+          ? lostItems[Math.floor(Math.random() * lostItems.length)]
+          : foundItems[Math.floor(Math.random() * foundItems.length)]
+
+        const item = await prisma.lostFoundItem.create({
+          data: {
+            editionId: edition.id,
+            userId: randomUser.id,
+            description: itemDescription,
+            status: isLost ? 'LOST' : 'FOUND',
+          },
+        })
+        lostFoundCount++
+
+        // Ajouter des commentaires sur certains objets
+        if (Math.random() > 0.6) {
+          const numComments = Math.floor(Math.random() * 2) + 1
+          for (let j = 0; j < numComments; j++) {
+            const commentUser = createdUsers[Math.floor(Math.random() * createdUsers.length)]
+            await prisma.lostFoundComment.create({
+              data: {
+                lostFoundItemId: item.id,
+                userId: commentUser.id,
+                content: [
+                  'Je pense avoir vu ça !',
+                  "C'est peut-être à moi",
+                  'Où puis-je le récupérer ?',
+                  "Merci pour l'info !",
+                ][Math.floor(Math.random() * 4)],
+              },
+            })
+          }
+        }
+      }
+    }
+  }
+
+  // Ajouter des feedbacks
+  console.log('Ajout des feedbacks...')
+  let feedbackCount = 0
+
+  const feedbackTypes = ['BUG', 'SUGGESTION', 'COMPLAINT', 'QUESTION', 'OTHER'] as const
+  const feedbackSubjects = {
+    BUG: [
+      "Erreur lors de la création d'une édition",
+      "Problème d'affichage sur mobile",
+      'Impossible de modifier mon profil',
+      'Les notifications ne fonctionnent pas',
+    ],
+    SUGGESTION: [
+      'Ajouter un mode sombre',
+      'Améliorer le système de recherche',
+      'Ajouter des filtres avancés',
+      "Permettre l'export en PDF",
+    ],
+    COMPLAINT: [
+      'Convention supprimée sans préavis',
+      'Délai de réponse trop long',
+      'Interface pas intuitive',
+    ],
+    QUESTION: [
+      'Comment ajouter un collaborateur ?',
+      'Comment fonctionne le système de bénévolat ?',
+      'Puis-je supprimer mon compte ?',
+    ],
+    OTHER: ['Merci pour cette super app !', 'Question générale'],
+  }
+
+  const feedbackMessages = {
+    BUG: [
+      "J'ai essayé de créer une édition mais j'obtiens une erreur 500. Pouvez-vous regarder ?",
+      'Sur mobile, les boutons sont trop petits et se chevauchent.',
+      'Impossible de sauvegarder mes modifications de profil.',
+    ],
+    SUGGESTION: [
+      "Ce serait génial d'avoir un mode sombre pour utiliser l'app le soir.",
+      'La recherche pourrait être améliorée avec des filtres par date et lieu.',
+      "Un export PDF des éditions serait très utile pour l'impression.",
+    ],
+    COMPLAINT: [
+      "Ma convention a été supprimée sans que je sois prévenu. C'est inacceptable !",
+      "J'attends une réponse depuis 2 semaines...",
+    ],
+    QUESTION: [
+      "Je ne trouve pas comment ajouter un collaborateur à ma convention. Pouvez-vous m'aider ?",
+      'Comment puis-je configurer le système de bénévolat pour mon édition ?',
+    ],
+    OTHER: ['Bravo pour cette application, elle est vraiment bien faite !'],
+  }
+
+  for (let i = 0; i < 15; i++) {
+    const type = feedbackTypes[Math.floor(Math.random() * feedbackTypes.length)]
+    const randomUser =
+      Math.random() > 0.3 ? createdUsers[Math.floor(Math.random() * createdUsers.length)] : null
+
+    const subjects = feedbackSubjects[type]
+    const messages = feedbackMessages[type]
+
+    await prisma.feedback.create({
+      data: {
+        type,
+        subject: subjects[Math.floor(Math.random() * subjects.length)],
+        message: messages[Math.floor(Math.random() * messages.length)],
+        email: randomUser?.email || 'anonymous@example.com',
+        name: randomUser ? `${randomUser.prenom} ${randomUser.nom}` : 'Utilisateur anonyme',
+        userId: randomUser?.id,
+        resolved: Math.random() > 0.4, // 60% résolus
+        adminNotes: Math.random() > 0.5 ? 'Traité et résolu' : null,
+      },
+    })
+    feedbackCount++
+  }
+
+  // Ajouter des demandes de réclamation de conventions
+  console.log('Ajout des demandes de réclamation de conventions...')
+  let claimRequestsCount = 0
+
+  const conventionsToClaimFor = await prisma.convention.findMany({
+    take: 2, // 2 conventions avec des demandes de réclamation
+  })
+
+  for (const convention of conventionsToClaimFor) {
+    // Sélectionner 1-2 utilisateurs qui veulent réclamer cette convention
+    const numClaims = Math.floor(Math.random() * 2) + 1
+    const potentialClaimers = createdUsers.filter((u) => u.id !== convention.authorId)
+
+    for (let i = 0; i < numClaims; i++) {
+      const claimer = potentialClaimers[Math.floor(Math.random() * potentialClaimers.length)]
+
+      // Vérifier qu'il n'a pas déjà fait une demande
+      const existingClaim = await prisma.conventionClaimRequest.findFirst({
+        where: {
+          conventionId: convention.id,
+          userId: claimer.id,
+        },
+      })
+
+      if (!existingClaim) {
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase()
+        const expiresAt = new Date()
+        expiresAt.setHours(expiresAt.getHours() + 1) // Expire dans 1h
+
+        await prisma.conventionClaimRequest.create({
+          data: {
+            conventionId: convention.id,
+            userId: claimer.id,
+            code,
+            expiresAt,
+            isVerified: Math.random() > 0.5, // 50% vérifiés
+            verifiedAt: Math.random() > 0.5 ? new Date() : null,
+          },
+        })
+        claimRequestsCount++
+      }
+    }
+  }
+
+  // Ajouter des données de billetterie pour certaines éditions
+  console.log('Ajout des données de billetterie...')
+  let ticketingEditionsCount = 0
+  let ticketingTiersCount = 0
+  let ticketingQuotasCount = 0
+  let ticketingReturnableItemsCount = 0
+
+  // Sélectionner 40% des éditions futures pour avoir de la billetterie
+  const futureEditions = createdEditions.filter((e) => new Date(e.startDate) > new Date())
+
+  for (const edition of futureEditions) {
+    if (Math.random() > 0.6) {
+      // 40% des éditions futures ont de la billetterie
+      // Créer des tarifs pour l'édition
+      const tierNames = [
+        { name: 'Tarif plein', description: 'Accès complet à la convention', price: 2500 }, // 25€
+        { name: 'Tarif réduit', description: 'Étudiants, chômeurs', price: 1500 }, // 15€
+        { name: 'Tarif enfant', description: 'Moins de 12 ans', price: 1000 }, // 10€
+        { name: 'Pass journée', description: 'Accès pour une journée', price: 800 }, // 8€
+      ]
+
+      const createdTiers: any[] = []
+      for (let i = 0; i < tierNames.length; i++) {
+        const tierData = tierNames[i]
+        const tier = await prisma.ticketingTier.create({
+          data: {
+            editionId: edition.id,
+            name: tierData.name,
+            description: tierData.description,
+            price: tierData.price,
+            position: i,
+            isActive: true,
+          },
+        })
+        createdTiers.push(tier)
+        ticketingTiersCount++
+      }
+
+      // Créer des quotas (nombre de places, repas, etc.)
+      const quotaNames = [
+        { title: 'Places disponibles', description: 'Nombre total de participants', quantity: 200 },
+        { title: 'Repas samedi soir', description: 'Repas collectif', quantity: 150 },
+        { title: 'Repas dimanche midi', description: 'Repas collectif', quantity: 120 },
+        { title: 'Places camping', description: 'Emplacements camping', quantity: 80 },
+      ]
+
+      const createdQuotas: any[] = []
+      for (const quotaData of quotaNames) {
+        const quota = await prisma.ticketingQuota.create({
+          data: {
+            editionId: edition.id,
+            title: quotaData.title,
+            description: quotaData.description,
+            quantity: quotaData.quantity,
+          },
+        })
+        createdQuotas.push(quota)
+        ticketingQuotasCount++
+      }
+
+      // Associer les tarifs aux quotas
+      // Tous les tarifs consomment le quota "Places disponibles"
+      const placesQuota = createdQuotas[0]
+      for (const tier of createdTiers) {
+        await prisma.ticketingTierQuota.create({
+          data: {
+            tierId: tier.id,
+            quotaId: placesQuota.id,
+          },
+        })
+      }
+
+      // Créer des objets consignés (gobelets, assiettes, etc.)
+      const returnableItemNames = [
+        'Gobelet réutilisable',
+        'Assiette réutilisable',
+        'Bol réutilisable',
+        'Couverts réutilisables',
+      ]
+
+      const createdReturnableItems: any[] = []
+      for (const itemName of returnableItemNames) {
+        const returnableItem = await prisma.ticketingReturnableItem.create({
+          data: {
+            editionId: edition.id,
+            name: itemName,
+          },
+        })
+        createdReturnableItems.push(returnableItem)
+        ticketingReturnableItemsCount++
+      }
+
+      // Associer les objets consignés aux tarifs plein et réduit
+      for (const tier of createdTiers.slice(0, 2)) {
+        // Seulement tarif plein et réduit
+        for (const item of createdReturnableItems) {
+          await prisma.ticketingTierReturnableItem.create({
+            data: {
+              tierId: tier.id,
+              returnableItemId: item.id,
+            },
+          })
+        }
+      }
+
+      // Associer certains objets consignés aux bénévoles
+      if (Math.random() > 0.5) {
+        for (const item of createdReturnableItems.slice(0, 2)) {
+          // Gobelets et assiettes
+          await prisma.editionVolunteerReturnableItem.create({
+            data: {
+              editionId: edition.id,
+              returnableItemId: item.id,
+            },
+          })
+        }
+      }
+
+      ticketingEditionsCount++
+    }
+  }
+
   console.log('Seed dev terminé avec succès !')
   if (doReset) console.log('(Reset préalable exécuté)')
   console.log(
@@ -944,10 +1326,19 @@ async function main() {
   console.log(`- ${createdEditions.length} éditions créées avec dates variées`)
   console.log('- Posts et commentaires ajoutés sur les éditions')
   console.log('- Propositions de covoiturage et commentaires ajoutés')
+  console.log(`- ${carpoolBookingsCount} réservations de covoiturage créées`)
+  console.log(`- ${carpoolPassengersCount} passagers confirmés`)
+  console.log(`- ${lostFoundCount} objets trouvés/perdus ajoutés`)
+  console.log(`- ${feedbackCount} feedbacks créés (60% résolus)`)
+  console.log(`- ${claimRequestsCount} demandes de réclamation de conventions`)
   console.log(`- ${volunteerSettingsCount} éditions configurées avec appels à bénévoles`)
   console.log(`- ${volunteerApplicationsCount} candidatures de bénévolat créées (85% acceptées)`)
   console.log(`- ${totalSlots} créneaux de bénévolat créés`)
   console.log(`- ${totalAssignments} assignations de bénévoles aux créneaux`)
+  console.log(`- ${ticketingEditionsCount} éditions avec billetterie`)
+  console.log(`- ${ticketingTiersCount} tarifs de billetterie créés`)
+  console.log(`- ${ticketingQuotasCount} quotas de billetterie créés`)
+  console.log(`- ${ticketingReturnableItemsCount} objets consignés créés`)
 }
 
 main()

@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Juggling Convention"
+  },
+  "pwa": {
+    "install": {
+      "button": "Installer nu",
+      "cancelled": {
+        "description": "Du kan installere appen senere fra dine browserindstillinger.",
+        "title": "Installation annulleret"
+      },
+      "description": "Tilføj Juggling Convention-appen til din startskærm for hurtig adgang og en optimal oplevelse.",
+      "error": {
+        "description": "Der opstod en fejl under installationen. Prøv igen.",
+        "title": "Installationsfejl"
+      },
+      "later": "Senere",
+      "success": {
+        "description": "Appen er blevet tilføjet til din startskærm.",
+        "title": "Installation lykkedes!"
+      },
+      "title": "Installer app"
+    }
+  },
+  "services": {
+    "accessibility": "Handicaptilgængelighed",
+    "aerial_space": "Luftakrobatik område",
+    "afj_token_payment": "AFJ token betaling",
+    "atm": "Hæveautomat",
+    "canteen": "Kantine",
+    "cash_payment": "Kontant betaling",
+    "categories": {
+      "accommodation": "Indkvartering",
+      "activities": "Aktiviteter",
+      "amenities": "Faciliteter",
+      "food": "Forplejning",
+      "payment": "Betalinger"
+    },
+    "concert": "Koncert",
+    "credit_card_payment": "Kreditkortbetaling",
+    "family_camping": "Familiecamping",
+    "fire_space": "Ildplads",
+    "food_trucks": "Foodtrucks",
+    "gala": "Galla",
+    "gym": "Gymnasium",
+    "kids_zone": "Børnezone",
+    "long_show": "Langt show",
+    "open_stage": "Åben scene",
+    "pets_accepted": "Kæledyr accepteret",
+    "showers": "Brusere",
+    "slackline_space": "Slackline område",
+    "sleeping_room": "Sovesal",
+    "tent_camping": "Teltcamping",
+    "toilets": "Toiletter",
+    "truck_camping": "Autocamping",
+    "workshops": "Workshops"
+  }
+}

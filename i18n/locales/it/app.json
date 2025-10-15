@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Convegni di Giocoleria"
+  },
+  "pwa": {
+    "install": {
+      "button": "Installa ora",
+      "cancelled": {
+        "description": "Puoi installare l'app più tardi dalle impostazioni del browser.",
+        "title": "Installazione annullata"
+      },
+      "description": "Aggiungi l'app Juggling Convention alla schermata iniziale per accesso rapido ed esperienza ottimale.",
+      "error": {
+        "description": "Si è verificato un errore durante l'installazione. Riprova.",
+        "title": "Errore di installazione"
+      },
+      "later": "Più tardi",
+      "success": {
+        "description": "L'app è stata aggiunta alla schermata iniziale.",
+        "title": "Installazione riuscita!"
+      },
+      "title": "Installa app"
+    }
+  },
+  "services": {
+    "accessibility": "Accessibilità disabili",
+    "aerial_space": "Spazio aereo",
+    "afj_token_payment": "Pagamento gettoni AFJ",
+    "atm": "Bancomat",
+    "canteen": "Mensa",
+    "cash_payment": "Pagamento in contanti",
+    "categories": {
+      "accommodation": "Alloggio",
+      "activities": "Attività",
+      "amenities": "Servizi",
+      "food": "Ristorazione",
+      "payment": "Pagamenti"
+    },
+    "concert": "Concerto",
+    "credit_card_payment": "Pagamento carta di credito",
+    "family_camping": "Campeggio famiglia",
+    "fire_space": "Spazio fuoco",
+    "food_trucks": "Food truck",
+    "gala": "Gala",
+    "gym": "Palestra",
+    "kids_zone": "Zona bambini",
+    "long_show": "Spettacolo lungo",
+    "open_stage": "Palco aperto",
+    "pets_accepted": "Animali accettati",
+    "showers": "Docce",
+    "slackline_space": "Spazio slackline",
+    "sleeping_room": "Sala di riposo",
+    "tent_camping": "Campeggio tenda",
+    "toilets": "Servizi igienici",
+    "truck_camping": "Campeggio camion",
+    "workshops": "Workshop"
+  }
+}

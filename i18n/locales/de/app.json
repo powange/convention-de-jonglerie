@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Jonglier-Convention"
+  },
+  "pwa": {
+    "install": {
+      "button": "Jetzt installieren",
+      "cancelled": {
+        "description": "Sie können die App später über Ihre Browser-Einstellungen installieren.",
+        "title": "Installation abgebrochen"
+      },
+      "description": "Fügen Sie die Juggling Convention App zu Ihrem Startbildschirm hinzu für schnellen Zugriff und optimale Erfahrung.",
+      "error": {
+        "description": "Ein Fehler ist bei der Installation aufgetreten. Bitte versuchen Sie es erneut.",
+        "title": "Installationsfehler"
+      },
+      "later": "Später",
+      "success": {
+        "description": "Die App wurde zu Ihrem Startbildschirm hinzugefügt.",
+        "title": "Installation erfolgreich!"
+      },
+      "title": "App installieren"
+    }
+  },
+  "services": {
+    "accessibility": "Barrierefreiheit",
+    "aerial_space": "Luftakrobatik-Bereich",
+    "afj_token_payment": "AFJ-Token-Zahlung",
+    "atm": "Geldautomat",
+    "canteen": "Kantine",
+    "cash_payment": "Barzahlung",
+    "categories": {
+      "accommodation": "Unterkunft",
+      "activities": "Aktivitäten",
+      "amenities": "Annehmlichkeiten",
+      "food": "Verpflegung",
+      "payment": "Zahlungen"
+    },
+    "concert": "Konzert",
+    "credit_card_payment": "Kartenzahlung",
+    "family_camping": "Familien-Camping",
+    "fire_space": "Feuer-Bereich",
+    "food_trucks": "Food Trucks",
+    "gala": "Gala",
+    "gym": "Turnhalle",
+    "kids_zone": "Kinderbereich",
+    "long_show": "Lange Show",
+    "open_stage": "Offene Bühne",
+    "pets_accepted": "Haustiere erlaubt",
+    "showers": "Duschen",
+    "slackline_space": "Slackline-Bereich",
+    "sleeping_room": "Schlafsaal",
+    "tent_camping": "Zelt-Camping",
+    "toilets": "Toiletten",
+    "truck_camping": "Wohnwagen-Camping",
+    "workshops": "Workshops"
+  }
+}

@@ -74,11 +74,11 @@
             </p>
           </div>
 
-          <UFormGroup :label="$t('conventions.claim.verification_code')" required>
+          <UFormField :label="$t('conventions.claim.verification_code')" required>
             <div class="flex justify-center">
               <UPinInput v-model="verificationCode" :length="6" placeholder="0" size="lg" />
             </div>
-          </UFormGroup>
+          </UFormField>
 
           <div v-if="codeExpiry" class="text-center text-sm text-gray-500">
             {{ $t('conventions.claim.expires_at', { time: formatTime(codeExpiry) }) }}

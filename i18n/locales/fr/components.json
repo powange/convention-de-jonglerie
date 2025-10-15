@@ -1,0 +1,221 @@
+{
+  "components": {
+    "carpool": {
+      "accept": "Accepter",
+      "add_comment_placeholder": "Ajouter un commentaire...",
+      "added_on": "Ajouté le {date}",
+      "address": "Adresse",
+      "available_seats": "Nombre de places disponibles",
+      "be_first_to_comment": "Soyez le premier à commenter cette {type} !",
+      "be_first_to_offer": "Soyez le premier à proposer un covoiturage pour cette édition !",
+      "book_seats": "Réserver",
+      "comments": "Commentaires",
+      "confirm_booking": "Confirmer la réservation",
+      "confirm_delete_offer": "Êtes-vous sûr de vouloir supprimer cette offre de covoiturage ?",
+      "confirm_delete_request": "Êtes-vous sûr de vouloir supprimer cette demande de covoiturage ?",
+      "confirmed_passengers": "Covoitureurs confirmés",
+      "contact": "Contact",
+      "contact_user": "Contacter {name}",
+      "delete_offer": "Supprimer l'offre",
+      "delete_request": "Supprimer la demande",
+      "departure_date_time": "Date et heure de départ",
+      "edit_offer": "Modifier l'offre de covoiturage",
+      "edit_request": "Modifier la demande de covoiturage",
+      "how_many_seats_needed": "Combien de places recherchez-vous ?",
+      "loading_comments": "Chargement des commentaires...",
+      "my_booking": "Ma réservation",
+      "no_comments": "Aucun commentaire",
+      "no_offers": "Aucune offre de covoiturage",
+      "no_pending_bookings": "Aucune réservation en attente",
+      "no_requests": "Aucune demande de covoiturage",
+      "no_requests_published": "Aucune demande n'a été publiée pour le moment.",
+      "offer": "offre",
+      "offered_on": "Proposé le {date}",
+      "offers_long": "Offres de covoiturage",
+      "offers_short": "Offres",
+      "pending_bookings": "Réservations en attente",
+      "propose_carpool": "Proposer un covoiturage",
+      "publish": "Publier",
+      "reject": "Refuser",
+      "request": "demande",
+      "request_carpool": "Demander un covoiturage",
+      "requested_on": "Demandé le {date}",
+      "requested_seats": "{count} place demandée | {count} places demandées",
+      "requests_long": "Demandes de covoiturage",
+      "requests_short": "Demandes",
+      "seats_available": "{count} place disponible | {count} places disponibles",
+      "seats_needed": "{count} place recherchée | {count} places recherchées",
+      "suggestions": "Suggestions",
+      "to_add_comment": "pour ajouter un commentaire",
+      "view_comments": "Voir les commentaires ({count})"
+    },
+    "collaborators_rights_panel": {
+      "per_edition": "Droits par édition",
+      "per_edition_hint": "Aucun droit spécifique défini pour les éditions",
+      "title_placeholder": "Titre / fonction (optionnel)"
+    },
+    "convention_form": {
+      "click_to_select_image": "Cliquez pour sélectionner une image",
+      "contact_email": "Email de contact",
+      "contact_email_help": "Adresse email utilisée pour les demandes de revendication d'éditions et les contacts liés à cette convention",
+      "convention_logo": "Logo de la convention",
+      "convention_logo_alt": "Logo de la convention",
+      "convention_name": "Nom de la convention",
+      "external_url": "URL externe",
+      "image_deleted": "Image supprimée",
+      "image_uploaded": "Image uploadée",
+      "loading_error_description": "Impossible de charger l'image depuis cette URL",
+      "loading_error_title": "Erreur de chargement",
+      "logo_preview": "Aperçu du logo :",
+      "logo_url_description": "URL vers l'image du logo de la convention",
+      "upload_file": "Upload fichier"
+    },
+    "country_multi_select": {
+      "placeholder": "Sélectionner des pays..."
+    },
+    "country_select": {
+      "no_countries_found": "Aucun pays trouvé",
+      "search_country_placeholder": "Rechercher un pays..."
+    },
+    "date_time_picker": {
+      "placeholder": "Sélectionner une date"
+    },
+    "edition_form": {
+      "address_tip": "Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte.",
+      "convention_description_placeholder": "Description de la convention",
+      "convention_poster_optional": "Affiche de la convention (Optionnel)",
+      "country_placeholder": "Nom du pays",
+      "facebook_page": "Page Facebook",
+      "program_placeholder": "Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
+      "instagram_account": "Compte Instagram",
+      "next": "Suivant",
+      "official_website_link": "Site officiel",
+      "poster_alt": "Poster de l'édition",
+      "poster_placeholder": "Cliquez pour sélectionner le poster de l'édition",
+      "previous": "Précédent",
+      "social_networks_description": "Partagez vos pages pour augmenter la visibilité",
+      "social_networks_title": "Réseaux sociaux",
+      "step_about_description": "Description de l'édition",
+      "step_about_title": "À propos",
+      "step_external_links_description": "Billetterie et réseaux sociaux",
+      "step_external_links_title": "Liens externes",
+      "step_general_description": "Informations Générales",
+      "step_general_title": "Informations Générales",
+      "step_services_title": "Services Proposés",
+      "ticketing_link": "Lien de la billetterie",
+      "ticketing_section_description": "Informations pour l'achat de billets",
+      "ticketing_section_title": "Billetterie"
+    },
+    "favorites_map": {
+      "all_favorites": "Toutes sont favorites",
+      "editions_with_location": "{count} édition avec localisation | {count} éditions avec localisation",
+      "no_upcoming_favorites": "Aucune édition favorite à venir avec localisation disponible",
+      "past": "Passées",
+      "upcoming": "À venir"
+    },
+    "map": {
+      "editions_on_map": "{count} édition sur la carte | {count} éditions sur la carte",
+      "incomplete_address_warning": "Les éditions sans adresse complète ne peuvent pas être affichées sur la carte.",
+      "loading": "Chargement de la carte...",
+      "no_editions_with_location": "Aucune édition avec localisation",
+      "ongoing": "En cours",
+      "past": "Passées",
+      "temporal_status": "Statut temporel",
+      "upcoming": "À venir",
+      "without_coordinates": "({count} sans coordonnées)",
+      "yellow_border_favorite": "Contour jaune = Favori"
+    },
+    "posts": {
+      "publish": "Publier",
+      "comments_count": "{count} commentaire | {count} commentaires",
+      "confirm_delete_title": "Confirmer la suppression",
+      "confirm_delete_post": "Êtes-vous sûr de vouloir supprimer cette publication ? Cette action est irréversible.",
+      "confirm_delete_comment": "Êtes-vous sûr de vouloir supprimer ce commentaire ? Cette action est irréversible.",
+      "reply_to_post": "Commentez cette publication",
+      "your_comment": "Votre commentaire",
+      "your_comment_placeholder": "Votre commentaire...",
+      "pinned": "Épinglé"
+    }
+  },
+  "forms": {
+    "buttons": {
+      "publishing": "Publication...",
+      "submitting": "Envoi..."
+    },
+    "labels": {
+      "address_complement": "Complément d'adresse",
+      "convention_name": "Nom de la convention",
+      "edition_name_optional": "Nom de l'édition (optionnel)",
+      "from_date": "À partir du",
+      "full_address": "Adresse Complète",
+      "select_date": "Sélectionner une date",
+      "until_date": "Jusqu'au"
+    },
+    "placeholders": {
+      "address_complement": "Bâtiment A, Salle des fêtes...",
+      "city_example": "Paris",
+      "contact_email": "contact{'@'}convention.org",
+      "convention_description": "Décrivez la convention, son histoire, ses spécificités...",
+      "convention_name_example": "Ex: Convention Européenne de Jonglerie",
+      "edition_name_example": "Nom de l'édition (ex: EJC 2024)",
+      "search_by_name": "Rechercher par nom",
+      "select_convention": "Sélectionnez une convention",
+      "select_countries": "Sélectionner des pays...",
+      "start_typing_address": "Commencez à taper une adresse..."
+    }
+  },
+  "notifications": {
+    "manage_description": "Gérez vos notifications et préférences",
+    "unread": "Non lues",
+    "confirm_delete_title": "Supprimer la notification",
+    "confirm_delete_description": "Êtes-vous sûr de vouloir supprimer cette notification ?",
+    "this_week": "Cette semaine",
+    "push": {
+      "title": "Notifications push",
+      "description": "Recevez des notifications même lorsque l'application est fermée",
+      "enabled": "Notifications activées sur cet appareil",
+      "blocked": "Notifications bloquées dans les paramètres du navigateur",
+      "disabled": "Notifications désactivées",
+      "not_supported": "Notifications push non supportées sur ce navigateur",
+      "test_button": "Tester une notification"
+    },
+    "loading": "Chargement des notifications...",
+    "none_found": "Aucune notification trouvée"
+  },
+  "upload": {
+    "delete_message": "Image supprimée",
+    "error_message": "Erreur d'upload",
+    "errors": {
+      "file_too_large": "Fichier trop volumineux",
+      "invalid_file_extension": "Extension de fichier invalide",
+      "invalid_file_type": "Type de fichier invalide"
+    },
+    "formats_accepted": "Formats acceptés",
+    "logo_url_optional_placeholder": "URL du logo (optionnel)",
+    "max_size": "Taille maximale",
+    "select_file": "Sélectionner un fichier",
+    "success_message": "Image uploadée avec succès !",
+    "upload": "Upload",
+    "upload_error": "Erreur d'upload",
+    "uploading": "Upload en cours...",
+    "error": "Erreur lors de l'upload"
+  },
+  "push_notifications": {
+    "promo_modal": {
+      "title": "Restez informé en temps réel",
+      "description": "Activez les notifications push pour être tenu au courant de vos covoiturages, candidatures de bénévolat et conventions favorites.",
+      "benefits": {
+        "carpool": "Soyez notifié des réservations et messages de covoiturage",
+        "volunteer": "Recevez les mises à jour sur vos candidatures de bénévolat",
+        "reminders": "Recevez des rappels pour vos conventions favorites",
+        "important": "Ne manquez pas les informations importantes vous concernant"
+      },
+      "privacy": {
+        "title": "Respectueux de votre vie privée",
+        "description": "Vous pouvez désactiver les notifications à tout moment dans vos paramètres."
+      },
+      "enable": "Activer les notifications",
+      "not_now": "Pas maintenant"
+    }
+  }
+}

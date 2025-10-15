@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Jongleerconventie"
+  },
+  "pwa": {
+    "install": {
+      "button": "Nu installeren",
+      "cancelled": {
+        "description": "Je kunt de app later installeren via je browserinstellingen.",
+        "title": "Installatie geannuleerd"
+      },
+      "description": "Voeg de Juggling Convention app toe aan je startscherm voor snelle toegang en een optimale ervaring.",
+      "error": {
+        "description": "Er is een fout opgetreden tijdens de installatie. Probeer opnieuw.",
+        "title": "Installatiefout"
+      },
+      "later": "Later",
+      "success": {
+        "description": "De app is toegevoegd aan je startscherm.",
+        "title": "Installatie succesvol!"
+      },
+      "title": "App installeren"
+    }
+  },
+  "services": {
+    "accessibility": "Toegankelijkheid voor gehandicapten",
+    "aerial_space": "Luchtruimte",
+    "afj_token_payment": "AFJ-tokenbetaling",
+    "atm": "Geldautomaat",
+    "canteen": "Kantine",
+    "cash_payment": "Contante betaling",
+    "categories": {
+      "accommodation": "Accommodatie",
+      "activities": "Activiteiten",
+      "amenities": "Voorzieningen",
+      "food": "Eten & Drinken",
+      "payment": "Betaling"
+    },
+    "concert": "Concert",
+    "credit_card_payment": "Creditcardbetaling",
+    "family_camping": "Familiekamperen",
+    "fire_space": "Vuurruimte",
+    "food_trucks": "Foodtrucks",
+    "gala": "Gala",
+    "gym": "Sporthal",
+    "kids_zone": "Kinderzone",
+    "long_show": "Lange show",
+    "open_stage": "Open podium",
+    "pets_accepted": "Huisdieren toegestaan",
+    "showers": "Douches",
+    "slackline_space": "Slackline ruimte",
+    "sleeping_room": "Slaapzaal",
+    "tent_camping": "Tentenkamp",
+    "toilets": "Toiletten",
+    "truck_camping": "Camperkamperen",
+    "workshops": "Workshops"
+  }
+}

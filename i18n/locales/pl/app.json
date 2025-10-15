@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Konwencja Żonglerska"
+  },
+  "pwa": {
+    "install": {
+      "button": "Zainstaluj teraz",
+      "cancelled": {
+        "description": "Możesz zainstalować aplikację później z ustawień przeglądarki.",
+        "title": "Instalacja anulowana"
+      },
+      "description": "Dodaj aplikację Juggling Convention do ekranu głównego dla szybkiego dostępu i optymalnego doświadczenia.",
+      "error": {
+        "description": "Wystąpił błąd podczas instalacji. Spróbuj ponownie.",
+        "title": "Błąd instalacji"
+      },
+      "later": "Później",
+      "success": {
+        "description": "Aplikacja została dodana do ekranu głównego.",
+        "title": "Instalacja udana!"
+      },
+      "title": "Zainstaluj aplikację"
+    }
+  },
+  "services": {
+    "accessibility": "Dostępność dla niepełnosprawnych",
+    "aerial_space": "Przestrzeń powietrzna",
+    "afj_token_payment": "Płatność żetonami AFJ",
+    "atm": "Bankomat",
+    "canteen": "Kantyna",
+    "cash_payment": "Płatność gotówką",
+    "categories": {
+      "accommodation": "Zakwaterowanie",
+      "activities": "Aktywności",
+      "amenities": "Udogodnienia",
+      "food": "Gastronomia",
+      "payment": "Płatności"
+    },
+    "concert": "Koncert",
+    "credit_card_payment": "Płatność kartą",
+    "family_camping": "Camping rodzinny",
+    "fire_space": "Przestrzeń do fire show",
+    "food_trucks": "Food trucki",
+    "gala": "Gala",
+    "gym": "Siłownia",
+    "kids_zone": "Strefa dziecięca",
+    "long_show": "Długi spektakl",
+    "open_stage": "Otwarta scena",
+    "pets_accepted": "Zwierzęta akceptowane",
+    "showers": "Prysznice",
+    "slackline_space": "Przestrzeń do slackline",
+    "sleeping_room": "Sala wypoczynkowa",
+    "tent_camping": "Camping namiotowy",
+    "toilets": "Toalety",
+    "truck_camping": "Camping dla kamperów",
+    "workshops": "Warsztaty"
+  }
+}
