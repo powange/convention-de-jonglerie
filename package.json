@@ -136,7 +136,6 @@
     "@vue/test-utils": "^2.4.6",
     "cross-env": "^10.0.0",
     "glob": "^11.0.3",
-    "happy-dom": "^20.0.0",
     "nuxt-file-storage": "^0.3.0",
     "prettier": "^3.3.3",
     "prisma": "^6.17.1",
