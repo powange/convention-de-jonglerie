@@ -3,6 +3,11 @@ import { canManageCollaborators } from '@@/server/utils/collaborator-management'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
+import type {
+  CollaboratorUpdateInput,
+  CollaboratorPermissionSnapshot,
+} from '@@/server/types/prisma-helpers'
+
 // Schéma combiné (droits globaux + perEdition + title)
 const perEditionSchema = z.object({
   editionId: z.number().int().positive(),
@@ -49,7 +54,7 @@ export default defineEventHandler(async (event) => {
   if (!collaborator || collaborator.conventionId !== conventionId)
     throw createError({ statusCode: 404, message: 'Collaborateur introuvable' })
 
-  const beforeSnapshot = {
+  const beforeSnapshot: CollaboratorPermissionSnapshot = {
     title: collaborator.title,
     rights: {
       canEditConvention: collaborator.canEditConvention,
@@ -68,7 +73,7 @@ export default defineEventHandler(async (event) => {
     })),
   }
 
-  const updateData: any = {}
+  const updateData: CollaboratorUpdateInput = {}
   if (parsed.title !== undefined) updateData.title = parsed.title || null
   if (parsed.rights) {
     if (parsed.rights.editConvention !== undefined)
@@ -112,7 +117,7 @@ export default defineEventHandler(async (event) => {
       } else newPerEdition = []
     }
 
-    const afterSnapshot = {
+    const afterSnapshot: CollaboratorPermissionSnapshot = {
       title: updated.title,
       rights: {
         canEditConvention: updated.canEditConvention,
@@ -138,9 +143,9 @@ export default defineEventHandler(async (event) => {
           targetUserId: collaborator.userId,
           actorId: user.id,
           changeType: perEditionInput ? 'PER_EDITIONS_UPDATED' : 'RIGHTS_UPDATED',
-          before: beforeSnapshot as any,
-          after: afterSnapshot as any,
-        } as any,
+          before: beforeSnapshot,
+          after: afterSnapshot,
+        },
       })
     }
     return { updated, perEdition: afterSnapshot.perEdition }

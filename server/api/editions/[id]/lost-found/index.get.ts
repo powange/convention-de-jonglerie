@@ -1,5 +1,5 @@
-import { createHash } from 'node:crypto'
-
+import { isHttpError } from '@@/server/types/prisma-helpers'
+import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
@@ -61,28 +61,30 @@ export default defineEventHandler(async (event) => {
       orderBy: { createdAt: 'desc' },
     })
     const items = rawItems.map((item) => {
-      const userEmail = (item.user as any).email as string | undefined
-      const emailHash = userEmail
-        ? createHash('md5').update(userEmail.trim().toLowerCase()).digest('hex')
-        : undefined
-      const user = { ...item.user, emailHash }
-      delete (user as any).email
+      const { email, ...userWithoutEmail } = item.user
+      const user = {
+        ...userWithoutEmail,
+        emailHash: getEmailHash(email),
+      }
+
       const comments = item.comments.map((c) => {
-        const cEmail = (c.user as any).email as string | undefined
-        const cHash = cEmail
-          ? createHash('md5').update(cEmail.trim().toLowerCase()).digest('hex')
-          : undefined
-        const cUser = { ...c.user, emailHash: cHash }
-        delete (cUser as any).email
-        return { ...c, user: cUser }
+        const { email: commentEmail, ...commentUserWithoutEmail } = c.user
+        return {
+          ...c,
+          user: {
+            ...commentUserWithoutEmail,
+            emailHash: getEmailHash(commentEmail),
+          },
+        }
       })
+
       return { ...item, user, comments }
     })
     return items
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la récupération des objets trouvés:', error)
 
-    if (error.statusCode) {
+    if (isHttpError(error)) {
       throw error
     }
 

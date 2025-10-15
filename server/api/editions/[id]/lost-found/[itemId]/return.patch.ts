@@ -1,6 +1,6 @@
-import { createHash } from 'node:crypto'
-
+import { isHttpError } from '@@/server/types/prisma-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEmailHash } from '@@/server/utils/email-hash'
 import { hasEditionEditPermission } from '@@/server/utils/permissions/permissions'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -80,26 +80,28 @@ export default defineEventHandler(async (event) => {
         },
       },
     })
-    const email = (rawItem.user as any).email as string | undefined
-    const emailHash = email
-      ? createHash('md5').update(email.trim().toLowerCase()).digest('hex')
-      : undefined
-    const itemUser = { ...rawItem.user, emailHash }
-    delete (itemUser as any).email
+    const { email, ...userWithoutEmail } = rawItem.user
+    const itemUser = {
+      ...userWithoutEmail,
+      emailHash: getEmailHash(email),
+    }
+
     const comments = rawItem.comments.map((c) => {
-      const cEmail = (c.user as any).email as string | undefined
-      const cHash = cEmail
-        ? createHash('md5').update(cEmail.trim().toLowerCase()).digest('hex')
-        : undefined
-      const cUser = { ...c.user, emailHash: cHash }
-      delete (cUser as any).email
-      return { ...c, user: cUser }
+      const { email: commentEmail, ...commentUserWithoutEmail } = c.user
+      return {
+        ...c,
+        user: {
+          ...commentUserWithoutEmail,
+          emailHash: getEmailHash(commentEmail),
+        },
+      }
     })
+
     return { ...rawItem, user: itemUser, comments }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la mise à jour du statut:', error)
 
-    if (error.statusCode) {
+    if (isHttpError(error)) {
       throw error
     }
 

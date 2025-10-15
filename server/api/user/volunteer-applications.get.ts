@@ -142,15 +142,15 @@ export default defineEventHandler(async (event) => {
     // Traitement pour remplacer les IDs des équipes par leurs noms et ajouter les créneaux assignés
     const applicationsWithTeamNames = applications.map((app) => {
       const teamPreferencesWithNames = app.teamPreferences
-        ? app.teamPreferences.map((teamId: any) => {
-            const team = app.edition.volunteerTeams.find((t: any) => t.id === teamId)
+        ? (app.teamPreferences as unknown as string[]).map((teamId) => {
+            const team = app.edition.volunteerTeams.find((t) => t.id === teamId)
             return team ? team.name : teamId
           })
         : []
 
       // Construire la liste des équipes assignées avec leurs noms depuis teamAssignments
       const assignedTeamsWithNames = app.teamAssignments
-        ? app.teamAssignments.map((assignment: any) => assignment.team.name)
+        ? app.teamAssignments.map((assignment) => assignment.team.name)
         : []
 
       // Filtrer les créneaux assignés pour cette édition
