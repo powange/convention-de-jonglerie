@@ -1,9 +1,3 @@
-import allLocales from '@fullcalendar/core/locales-all'
-import interactionPlugin from '@fullcalendar/interaction'
-import resourceTimelinePlugin from '@fullcalendar/resource-timeline'
-import timelinePlugin from '@fullcalendar/timeline'
-
-// Import supprimé car non utilisé directement dans ce fichier
 import type { CalendarOptions, EventInput, ResourceInput } from '@fullcalendar/core'
 import type { ComputedRef, Ref } from 'vue'
 
@@ -72,6 +66,25 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
   const calendarRef = ref<any>(null)
   const ready = ref(false)
+  const plugins = shallowRef<any[]>([])
+  const allLocales = shallowRef<any[]>([])
+
+  // Charger les plugins dynamiquement
+  const loadPlugins = async () => {
+    try {
+      const [resourceTimeline, timeline, interaction, locales] = await Promise.all([
+        import('@fullcalendar/resource-timeline'),
+        import('@fullcalendar/timeline'),
+        import('@fullcalendar/interaction'),
+        import('@fullcalendar/core/locales-all'),
+      ])
+
+      plugins.value = [resourceTimeline.default, timeline.default, interaction.default]
+      allLocales.value = locales.default
+    } catch (error) {
+      console.error('Error loading FullCalendar plugins:', error)
+    }
+  }
 
   // Configuration des ressources (équipes + "Non assigné")
   const resources = computed((): ResourceInput[] => {
@@ -132,8 +145,8 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
   // Configuration du calendrier
   const calendarOptions = reactive<CalendarOptions>({
-    plugins: [resourceTimelinePlugin, timelinePlugin, interactionPlugin],
-    locales: allLocales,
+    plugins: plugins.value,
+    locales: allLocales.value,
     locale: locale.value,
 
     // Vue timeline par ressource
@@ -391,6 +404,12 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     },
   })
 
+  // Watcher pour mettre à jour les plugins et locales quand ils sont chargés
+  watch([plugins, allLocales], ([newPlugins, newLocales]) => {
+    calendarOptions.plugins = newPlugins
+    calendarOptions.locales = newLocales
+  })
+
   // Watchers pour mettre à jour les ressources et événements
   watch(
     resources,
@@ -463,7 +482,8 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
   )
 
   // Initialisation
-  onMounted(() => {
+  onMounted(async () => {
+    await loadPlugins()
     nextTick(() => {
       ready.value = true
     })

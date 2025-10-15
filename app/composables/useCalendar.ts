@@ -1,8 +1,3 @@
-import allLocales from '@fullcalendar/core/locales-all'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin from '@fullcalendar/interaction'
-import listPlugin from '@fullcalendar/list'
-
 import {
   formatEventsForCalendar,
   getCalendarLocale,
@@ -41,6 +36,25 @@ export function useCalendar(options: UseCalendarOptions) {
 
   const calendarRef = ref<any>(null)
   const ready = ref(false)
+  const plugins = shallowRef<any[]>([])
+  const allLocales = shallowRef<any[]>([])
+
+  // Charger les plugins dynamiquement
+  const loadPlugins = async () => {
+    try {
+      const [dayGrid, list, interaction, locales] = await Promise.all([
+        import('@fullcalendar/daygrid'),
+        import('@fullcalendar/list'),
+        import('@fullcalendar/interaction'),
+        import('@fullcalendar/core/locales-all'),
+      ])
+
+      plugins.value = [dayGrid.default, list.default, interaction.default]
+      allLocales.value = locales.default
+    } catch (error) {
+      console.error('Error loading FullCalendar plugins:', error)
+    }
+  }
 
   // Événements formatés pour FullCalendar
   const events = computed(() => {
@@ -69,8 +83,8 @@ export function useCalendar(options: UseCalendarOptions) {
 
   // Options réactives selon l'exemple officiel Nuxt 3
   const calendarOptions = reactive<CalendarOptions>({
-    plugins: [dayGridPlugin, listPlugin, interactionPlugin],
-    locales: allLocales,
+    plugins: plugins.value,
+    locales: allLocales.value,
     initialView,
     initialDate: getSavedDate(),
     height,
@@ -111,6 +125,12 @@ export function useCalendar(options: UseCalendarOptions) {
     },
   })
 
+  // Watcher pour mettre à jour les plugins et locales quand ils sont chargés
+  watch([plugins, allLocales], ([newPlugins, newLocales]) => {
+    calendarOptions.plugins = newPlugins
+    calendarOptions.locales = newLocales
+  })
+
   // Watcher pour mettre à jour les événements
   watch(
     events,
@@ -121,7 +141,8 @@ export function useCalendar(options: UseCalendarOptions) {
   )
 
   // Initialisation
-  onMounted(() => {
+  onMounted(async () => {
+    await loadPlugins()
     nextTick(() => {
       ready.value = true
       // S'assurer que les événements sont chargés au démarrage

@@ -1,10 +1,10 @@
 <template>
   <UCard variant="outline">
-    <div v-if="!ready" class="flex items-center gap-2 text-sm text-gray-500 p-4">
+    <UiLazyFullCalendar v-if="ready" ref="calendarRef" :options="calendarOptions" class="fc-theme-standard" />
+    <div v-else class="flex items-center gap-2 text-sm text-gray-500 p-4">
       <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
       <span>{{ t('common.loading') }}...</span>
     </div>
-    <FullCalendar v-else ref="calendarRef" :options="calendarOptions" class="fc-theme-standard" />
 
     <!-- Modal d'aperçu d'édition -->
     <UModal v-model:open="modalOpen" size="lg">
@@ -76,8 +76,6 @@
 </template>
 
 <script setup lang="ts">
-import FullCalendar from '@fullcalendar/vue3'
-// FullCalendar v6 (packages daygrid/list) n'expose pas de fichiers CSS séparés dans ce build ESM; styles de base intégrés.
 import { DateTime } from 'luxon'
 
 import { getActiveServices, type ConventionService } from '~/utils/convention-services'

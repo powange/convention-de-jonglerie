@@ -78,23 +78,22 @@
 
       <!-- Calendrier de planning -->
       <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <div v-if="!ready || !edition" class="flex items-center justify-center py-8">
-          <UIcon name="i-heroicons-arrow-path" class="animate-spin text-gray-400" size="20" />
-          <span class="ml-2 text-base text-gray-500">{{ t('common.loading') }}</span>
-        </div>
-        <FullCalendar
-          v-else-if="calendarOptions && edition"
+        <UiLazyFullCalendar
+          v-if="ready && calendarOptions && edition"
           ref="calendarRef"
           :options="calendarOptions"
           class="volunteer-planning-calendar"
         />
+        <div v-else class="flex items-center justify-center py-8">
+          <UIcon name="i-heroicons-arrow-path" class="animate-spin text-gray-400" size="20" />
+          <span class="ml-2 text-base text-gray-500">{{ t('common.loading') }}</span>
+        </div>
       </div>
     </div>
   </UCard>
 </template>
 
 <script setup lang="ts">
-import FullCalendar from '@fullcalendar/vue3'
 import { computed, ref } from 'vue'
 
 import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '~/composables/useVolunteerSchedule'
@@ -144,7 +143,7 @@ const emit = defineEmits<Emits>()
 
 const { t } = useI18n()
 const toast = useToast()
-const calendarRef = ref<InstanceType<typeof FullCalendar>>()
+const calendarRef = ref<any>()
 
 // Récupération automatique des teams et timeSlots si non fournis
 const editionId = computed(() => props.edition?.id)
