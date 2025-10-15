@@ -80,7 +80,7 @@ export default defineEventHandler(async (event) => {
       ...result,
       stats,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Push Test] Erreur:', error)
 
     if (error.name === 'ZodError') {

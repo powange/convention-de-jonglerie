@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
       success: true,
       option,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Create option error:', error)
     if (error.statusCode) throw error
     throw createError({

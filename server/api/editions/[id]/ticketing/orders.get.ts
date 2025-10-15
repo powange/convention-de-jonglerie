@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
     return {
       orders: config.orders,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to fetch orders from DB:', error)
     throw createError({
       statusCode: 500,

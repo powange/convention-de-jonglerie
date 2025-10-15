@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     return await getReturnableItems(editionId)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to fetch returnable items:', error)
     throw createError({
       statusCode: 500,

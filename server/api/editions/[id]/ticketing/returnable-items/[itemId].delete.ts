@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     return await deleteReturnableItem(itemId, editionId)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to delete returnable item:', error)
     if (error.statusCode) throw error
     throw createError({

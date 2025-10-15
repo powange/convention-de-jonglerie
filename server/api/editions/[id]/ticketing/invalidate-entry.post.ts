@@ -82,7 +82,7 @@ export default defineEventHandler(async (event) => {
       success: true,
       message: 'Entrée dévalidée avec succès',
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Invalidate entry error:', error)
     if (error.statusCode) throw error
     throw createError({

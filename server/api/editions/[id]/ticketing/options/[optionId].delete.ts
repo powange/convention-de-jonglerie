@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     return await deleteOption(optionId, editionId)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Delete option error:', error)
     if (error.statusCode) throw error
     throw createError({

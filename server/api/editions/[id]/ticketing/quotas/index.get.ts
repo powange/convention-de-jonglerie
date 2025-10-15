@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     })
 
     return quotas
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to fetch quotas:', error)
     throw createError({
       statusCode: 500,

@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
     })
 
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to delete quota:', error)
     throw createError({
       statusCode: 500,

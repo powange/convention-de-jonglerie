@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
     })
 
     return { success: true, message: 'Post supprimé avec succès' }
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error.statusCode) {
       throw error
     }

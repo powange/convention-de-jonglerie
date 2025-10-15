@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
     return {
       tiers: externalTicketing.tiers,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la récupération des tarifs:', error)
     throw createError({
       statusCode: 500,

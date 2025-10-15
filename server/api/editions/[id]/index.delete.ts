@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     })
 
     return { message: 'Edition deleted successfully' }
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Si c'est déjà une erreur HTTP (createError), on la relance
     if (error.statusCode) {
       throw error

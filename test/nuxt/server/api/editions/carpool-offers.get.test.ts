@@ -67,6 +67,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
           profilePicture: null,
           updatedAt: new Date(),
         },
+        bookings: [],
         passengers: [
           {
             id: 1,
@@ -105,6 +106,9 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       where: { editionId: 1 },
       include: {
         user: true,
+        bookings: {
+          include: { requester: true },
+        },
         passengers: {
           include: { user: true },
           orderBy: { addedAt: 'asc' },
@@ -172,6 +176,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         id: 1,
         tripDate: new Date('2024-06-20T10:00:00Z'),
         user: { id: 1, email: 'user1@test.com', pseudo: 'user1' },
+        bookings: [],
         passengers: [],
         comments: [],
       },
@@ -179,6 +184,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         id: 2,
         tripDate: new Date('2024-06-15T10:00:00Z'),
         user: { id: 2, email: 'user2@test.com', pseudo: 'user2' },
+        bookings: [],
         passengers: [],
         comments: [],
       },
@@ -206,6 +212,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
           profilePicture: 'avatar.jpg',
           updatedAt: new Date(),
         },
+        bookings: [],
         passengers: [
           {
             id: 1,
@@ -268,6 +275,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
           profilePicture: 'avatar.jpg',
           updatedAt: new Date('2024-01-01'),
         },
+        bookings: [],
         passengers: [],
         comments: [],
       },

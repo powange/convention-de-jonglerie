@@ -67,7 +67,7 @@ export default defineEventHandler(async (event) => {
       teams: parsed.teams,
       message: `Assigné à ${parsed.teams.length} équipe(s)`,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Si c'est une erreur de notre util, la propager avec le bon format
     if (error.message?.includes('introuvable')) {
       throw createError({

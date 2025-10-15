@@ -262,7 +262,7 @@ export default defineEventHandler(async (event) => {
         }
       }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Database verify QR code error:', error)
     throw createError({
       statusCode: 500,

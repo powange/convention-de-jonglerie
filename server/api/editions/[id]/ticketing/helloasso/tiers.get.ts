@@ -175,7 +175,7 @@ export default defineEventHandler(async (event) => {
     })
 
     return result
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('HelloAsso tiers fetch error:', error)
 
     // L'utilitaire gère déjà les erreurs, on les relance simplement

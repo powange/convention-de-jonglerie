@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
         updatedAt: item.updatedAt,
       })),
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la récupération des articles à restituer pour bénévoles:', error)
     throw createError({
       statusCode: 500,

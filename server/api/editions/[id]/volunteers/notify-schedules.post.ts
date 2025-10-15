@@ -203,7 +203,7 @@ export default defineEventHandler(async (event) => {
       errors: errorCount,
       total: acceptedVolunteers.length,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Erreur lors de l'envoi des notifications:", error)
 
     // Re-lancer les erreurs déjà formatées

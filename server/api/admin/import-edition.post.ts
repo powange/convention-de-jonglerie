@@ -176,7 +176,7 @@ export default defineEventHandler(async (event) => {
       editionId: edition.id,
       message: 'Import réussi',
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[ADMIN IMPORT] Erreur lors de l'import:", error)
 
     if (error.statusCode) {

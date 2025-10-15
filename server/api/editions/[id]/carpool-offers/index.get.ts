@@ -20,6 +20,11 @@ export default defineEventHandler(async (event) => {
       },
       include: {
         user: true,
+        bookings: {
+          include: {
+            requester: true,
+          },
+        },
         passengers: {
           include: {
             user: true,
@@ -42,15 +47,14 @@ export default defineEventHandler(async (event) => {
 
     // Transformer les données pour masquer les emails et ajouter les hash
     const transformedOffers = carpoolOffers.map((offer) => {
-      const bookings = (offer as any).bookings ?? []
+      const bookings = offer.bookings ?? []
       const passengers = offer.passengers ?? []
       const comments = offer.comments ?? []
       const availableSeats = typeof offer.availableSeats === 'number' ? offer.availableSeats : 0
 
       const viewerIsOwner = !!viewerId && viewerId === offer.userId
       const viewerHasAccepted =
-        !!viewerId &&
-        bookings.some((b: any) => b.status === 'ACCEPTED' && b.requesterId === viewerId)
+        !!viewerId && bookings.some((b) => b.status === 'ACCEPTED' && b.requesterId === viewerId)
 
       return {
         id: offer.id,
@@ -73,8 +77,8 @@ export default defineEventHandler(async (event) => {
           0,
           availableSeats -
             bookings
-              .filter((b: any) => b.status === 'ACCEPTED')
-              .reduce((s: number, b: any) => s + (b.seats || 0), 0)
+              .filter((b) => b.status === 'ACCEPTED')
+              .reduce((s: number, b) => s + (b.seats || 0), 0)
         ),
         user: offer.user
           ? {
@@ -100,7 +104,7 @@ export default defineEventHandler(async (event) => {
             : undefined,
         })),
         // Exposer les réservations avec requester anonymisé
-        bookings: bookings.map((b: any) => ({
+        bookings: bookings.map((b) => ({
           id: b.id,
           carpoolOfferId: b.carpoolOfferId,
           requestId: b.requestId,

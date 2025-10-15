@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   try {
     const stats = await getQuotaStats(editionId)
     return { stats }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to fetch quota stats:', error)
     throw createError({
       statusCode: 500,

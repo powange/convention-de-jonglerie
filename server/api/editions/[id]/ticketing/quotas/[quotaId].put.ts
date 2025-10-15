@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
     })
 
     return quota
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to update quota:', error)
     throw createError({
       statusCode: 500,

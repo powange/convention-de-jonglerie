@@ -169,7 +169,7 @@ export default defineEventHandler(async (event) => {
         itemCount: orderItems.length,
       },
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Erreur lors de l'ajout manuel du participant:", error)
     throw error
   }

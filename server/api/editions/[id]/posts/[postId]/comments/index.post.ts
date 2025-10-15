@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
     })
 
     return newComment
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       handleValidationError(error)
     }

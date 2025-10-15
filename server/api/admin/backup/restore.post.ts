@@ -212,7 +212,7 @@ export default defineEventHandler(async (event) => {
       success: true,
       message: 'Base de données et fichiers restaurés avec succès',
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la restauration:', error)
 
     throw createError({

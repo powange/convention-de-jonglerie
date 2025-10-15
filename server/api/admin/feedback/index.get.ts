@@ -90,7 +90,7 @@ export default defineEventHandler(async (event) => {
       },
       stats: statsFormatted,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la récupération des feedbacks:', error?.message, error)
     // Mode debug optionnel pour admin: ?debug=1 retourne détails (sans données sensibles majeures)
     const query = getQuery(event)

@@ -133,7 +133,7 @@ export default defineEventHandler(async (event) => {
       success: true,
       application,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Erreur lors de l'ajout manuel du bénévole:", error)
     throw error
   }

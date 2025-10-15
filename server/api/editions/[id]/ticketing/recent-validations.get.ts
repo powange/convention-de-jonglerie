@@ -133,7 +133,7 @@ export default defineEventHandler(async (event) => {
       success: true,
       validations: validationsWithValidators,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Database recent validations error:', error)
     throw createError({
       statusCode: 500,

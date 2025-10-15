@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     return await getEditionTiers(editionId)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to fetch tiers from DB:', error)
     throw createError({
       statusCode: 500,

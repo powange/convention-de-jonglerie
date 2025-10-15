@@ -100,7 +100,7 @@ export default defineEventHandler(async (event) => {
         totalVolunteers: totalVolunteers,
       },
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Database stats error:', error)
     throw createError({
       statusCode: 500,

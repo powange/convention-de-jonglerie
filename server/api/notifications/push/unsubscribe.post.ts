@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
       success: true,
       message: 'Subscription désactivée',
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Push Unsubscribe] Erreur:', error)
 
     if (error.name === 'ZodError') {

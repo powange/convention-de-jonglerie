@@ -117,7 +117,7 @@ export default defineEventHandler(async (event) => {
       size: archiveStats.size,
       includesUploads: hasUploads,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la création de la sauvegarde:', error)
 
     throw createError({

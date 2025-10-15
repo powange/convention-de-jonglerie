@@ -85,7 +85,7 @@ export default defineEventHandler(async (event) => {
 
     setResponseStatus(event, 204)
     return null
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`[DELETE SLOT ERROR] Erreur détaillée:`, {
       message: error.message,
       statusCode: error.statusCode,

@@ -4,6 +4,8 @@ import { prisma } from '@@/server/utils/prisma'
 import { handleValidationError } from '@@/server/utils/validation-schemas'
 import { z } from 'zod'
 
+import type { EditionUpdateInput } from '@@/server/types/prisma-helpers'
+
 const bodySchema = z
   .object({
     open: z.boolean().optional(),
@@ -126,10 +128,10 @@ export default defineEventHandler(async (event) => {
   }
 
   // Permission: auteur convention ou collaborateur avec droit gestion bénévoles
-  const edition = (await prisma.edition.findUnique({
+  const edition = await prisma.edition.findUnique({
     where: { id: editionId },
-    select: { conventionId: true, volunteersMode: true } as any,
-  })) as any
+    select: { conventionId: true, volunteersMode: true },
+  })
   if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })
   const allowed = await canManageEditionVolunteers(editionId, user.id, event)
   if (!allowed)
@@ -138,7 +140,7 @@ export default defineEventHandler(async (event) => {
       message: 'Droits insuffisants pour gérer les bénévoles',
     })
 
-  const data: any = {}
+  const data: EditionUpdateInput = {}
   if (parsed.open !== undefined) data.volunteersOpen = parsed.open
   if (parsed.description !== undefined) data.volunteersDescription = parsed.description || null
   if (parsed.mode !== undefined) data.volunteersMode = parsed.mode
@@ -179,7 +181,7 @@ export default defineEventHandler(async (event) => {
   if (Object.keys(data).length === 0) return { success: true, unchanged: true }
   data.volunteersUpdatedAt = new Date()
 
-  const updated = (await prisma.edition.update({
+  const updated = await prisma.edition.update({
     where: { id: editionId },
     data,
     select: {
@@ -204,7 +206,7 @@ export default defineEventHandler(async (event) => {
       volunteersAskSetup: true,
       volunteersAskTeardown: true,
       volunteersUpdatedAt: true,
-    } as any,
-  })) as any
+    },
+  })
   return { success: true, settings: updated }
 })

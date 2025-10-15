@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
       result,
       timestamp: new Date().toISOString(),
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`❌ Erreur lors de l'exécution de la tâche ${taskName}:`, error)
 
     throw createError({

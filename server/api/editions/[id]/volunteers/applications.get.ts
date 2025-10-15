@@ -2,6 +2,9 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
+import type { VolunteerApplicationWhereInput } from '@@/server/types/prisma-helpers'
+import type { Prisma } from '@prisma/client'
+
 const DEFAULT_PAGE_SIZE = 20
 
 export default defineEventHandler(async (event) => {
@@ -32,7 +35,7 @@ export default defineEventHandler(async (event) => {
   const sortSecondary = (query.sortSecondary as string) || '' // format "field:dir,field2:dir"
   const search = (query.search as string)?.trim()
   // Construction de la clause WHERE
-  const conditions: any[] = [{ editionId }]
+  const conditions: VolunteerApplicationWhereInput[] = [{ editionId }]
 
   // Filtre par statut
   if (statusFilter) {
@@ -143,7 +146,7 @@ export default defineEventHandler(async (event) => {
 
   const where = conditions.length === 1 ? conditions[0] : { AND: conditions }
   const total = await prisma.editionVolunteerApplication.count({ where })
-  const primary: any = (() => {
+  const primary: Prisma.EditionVolunteerApplicationOrderByWithRelationInput = (() => {
     if (sortFieldRaw === 'pseudo') return { user: { pseudo: sortDirRaw } }
     if (sortFieldRaw === 'prenom') return { user: { prenom: sortDirRaw } }
     if (sortFieldRaw === 'nom') return { user: { nom: sortDirRaw } }
@@ -151,7 +154,7 @@ export default defineEventHandler(async (event) => {
     if (sortFieldRaw === 'status') return { status: sortDirRaw }
     return { createdAt: sortDirRaw }
   })()
-  const orderBy: any[] = [primary]
+  const orderBy: Prisma.EditionVolunteerApplicationOrderByWithRelationInput[] = [primary]
   if (sortSecondary) {
     const parts = sortSecondary
       .split(',')
@@ -171,7 +174,7 @@ export default defineEventHandler(async (event) => {
 
   const includeTeams = query.includeTeams === 'true'
 
-  const selectFields: any = {
+  const selectFields: Prisma.EditionVolunteerApplicationSelect = {
     id: true,
     status: true,
     createdAt: true,
@@ -274,8 +277,11 @@ export default defineEventHandler(async (event) => {
     ]
 
     const csvRows = applications.map((app) => {
-      const formatArray = (arr: any) => (Array.isArray(arr) ? arr.join('; ') : arr || '')
-      const formatDate = (date: any) => (date ? new Date(date).toLocaleString('fr-FR') : '')
+      const formatArray = (arr: unknown) => (Array.isArray(arr) ? arr.join('; ') : arr || '')
+      const formatDate = (date: unknown) =>
+        date instanceof Date || typeof date === 'string'
+          ? new Date(date).toLocaleString('fr-FR')
+          : ''
       const formatBoolean = (bool: boolean | null) => (bool ? 'Oui' : 'Non')
 
       // Format spécial pour les dates avec granularité (format: date_granularity)

@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     return await updateReturnableItem(itemId, editionId, validation.data)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to update returnable item:', error)
     if (error.statusCode) throw error
     throw createError({

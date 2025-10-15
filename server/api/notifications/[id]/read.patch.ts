@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
       message: 'Notification marquée comme lue',
       notification,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Vérifier si c'est une erreur de permission (notification non trouvée)
     if (error.code === 'P2025') {
       throw createError({

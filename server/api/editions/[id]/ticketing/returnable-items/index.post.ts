@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     return await createReturnableItem(editionId, validation.data)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to create returnable item:', error)
     throw createError({
       statusCode: 500,

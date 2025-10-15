@@ -95,7 +95,7 @@ export default defineEventHandler(async (event) => {
       conventions: transformedConventions,
       total: transformedConventions.length,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la récupération des conventions admin:', error)
 
     // Si c'est déjà une erreur HTTP, la relancer

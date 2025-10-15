@@ -77,7 +77,7 @@ export default defineEventHandler(async (event) => {
         updatedAt: item.updatedAt,
       },
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Erreur lors de l'ajout de l'article pour bénévoles:", error)
     if (error.statusCode) throw error
     throw createError({

@@ -1,3 +1,4 @@
+import { isHttpError } from '@@/server/types/prisma-helpers'
 import { optionalAuth } from '@@/server/utils/auth-utils'
 import { checkAdminMode } from '@@/server/utils/collaborator-management'
 import { getEmailHash } from '@@/server/utils/email-hash'
@@ -109,53 +110,53 @@ export default defineEventHandler(async (event) => {
     if (edition) {
       // Transformer creator - ajouter emailHash et supprimer email
       if (edition.creator && edition.creator.email) {
+        const { email, ...creatorWithoutEmail } = edition.creator
         edition.creator = {
-          ...edition.creator,
-          emailHash: getEmailHash(edition.creator.email),
-        } as any
-        delete (edition.creator as any).email
+          ...creatorWithoutEmail,
+          emailHash: getEmailHash(email),
+        }
       }
 
       // Transformer les collaborateurs de la convention
       if (edition.convention?.collaborators) {
-        edition.convention.collaborators = edition.convention.collaborators.map((collab) => ({
-          ...collab,
-          // Construire un objet rights cohérent (si les colonnes existent)
-          rights: {
-            editConvention: (collab as any).canEditConvention ?? false,
-            deleteConvention: (collab as any).canDeleteConvention ?? false,
-            manageCollaborators: (collab as any).canManageCollaborators ?? false,
-            manageVolunteers: (collab as any).canManageVolunteers ?? false,
-            addEdition: (collab as any).canAddEdition ?? false,
-            editAllEditions: (collab as any).canEditAllEditions ?? false,
-            deleteAllEditions: (collab as any).canDeleteAllEditions ?? false,
-          },
-          // Transformer les droits par édition
-          perEditionRights: ((collab as any).perEditionPermissions || []).map((per: any) => ({
-            editionId: per.editionId,
-            canEdit: per.canEdit ?? false,
-            canDelete: per.canDelete ?? false,
-            canManageVolunteers: per.canManageVolunteers ?? false,
-          })),
-          user: (() => {
-            const { email, ...userWithoutEmail } = collab.user
-            return {
+        edition.convention.collaborators = edition.convention.collaborators.map((collab) => {
+          const { email, ...userWithoutEmail } = collab.user
+          return {
+            ...collab,
+            // Construire un objet rights cohérent (si les colonnes existent)
+            rights: {
+              editConvention: collab.canEditConvention ?? false,
+              deleteConvention: collab.canDeleteConvention ?? false,
+              manageCollaborators: collab.canManageCollaborators ?? false,
+              manageVolunteers: collab.canManageVolunteers ?? false,
+              addEdition: collab.canAddEdition ?? false,
+              editAllEditions: collab.canEditAllEditions ?? false,
+              deleteAllEditions: collab.canDeleteAllEditions ?? false,
+            },
+            // Transformer les droits par édition
+            perEditionRights: (collab.perEditionPermissions || []).map((per) => ({
+              editionId: per.editionId,
+              canEdit: per.canEdit ?? false,
+              canDelete: per.canDelete ?? false,
+              canManageVolunteers: per.canManageVolunteers ?? false,
+            })),
+            user: {
               ...userWithoutEmail,
               emailHash: getEmailHash(email),
-            }
-          })(),
-        })) as any
+            },
+          }
+        })
       }
 
       // Transformer les participants (attendingUsers)
       if (edition.attendingUsers) {
         edition.attendingUsers = edition.attendingUsers.map((user) => {
-          const { email, ...userWithoutEmail } = user as any
+          const { email, ...userWithoutEmail } = user
           return {
             ...userWithoutEmail,
             emailHash: getEmailHash(email),
           }
-        }) as any
+        })
       }
     }
 
@@ -174,23 +175,24 @@ export default defineEventHandler(async (event) => {
       volunteersAskExperience: _volunteersAskExperience,
       volunteersAskSetup: _volunteersAskSetup,
       volunteersAskTeardown: _volunteersAskTeardown,
+      volunteersAskEmergencyContact: _volunteersAskEmergencyContact,
       ...editionWithoutVolunteersAskFields
-    } = edition as any
+    } = edition
 
     return {
       ...editionWithoutVolunteersAskFields,
       // Garder seulement les champs volunteers encore utilisés côté client
-      volunteersOpen: (edition as any).volunteersOpen,
-      volunteersDescription: (edition as any).volunteersDescription,
-      volunteersMode: (edition as any).volunteersMode,
-      volunteersExternalUrl: (edition as any).volunteersExternalUrl,
-      volunteersUpdatedAt: (edition as any).volunteersUpdatedAt,
-      volunteersSetupStartDate: (edition as any).volunteersSetupStartDate,
-      volunteersTeardownEndDate: (edition as any).volunteersTeardownEndDate,
+      volunteersOpen: edition.volunteersOpen,
+      volunteersDescription: edition.volunteersDescription,
+      volunteersMode: edition.volunteersMode,
+      volunteersExternalUrl: edition.volunteersExternalUrl,
+      volunteersUpdatedAt: edition.volunteersUpdatedAt,
+      volunteersSetupStartDate: edition.volunteersSetupStartDate,
+      volunteersTeardownEndDate: edition.volunteersTeardownEndDate,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     // If the handler already threw an HTTP error (createError), rethrow it to preserve status
-    if (error && (error.statusCode || error.status)) {
+    if (isHttpError(error)) {
       throw error
     }
     console.error('Erreur API edition:', error)

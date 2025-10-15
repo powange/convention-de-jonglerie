@@ -82,7 +82,7 @@ export default defineEventHandler(async (event) => {
         subscriptionId: created.id,
       }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Push Subscribe] Erreur:', error)
 
     if (error.name === 'ZodError') {

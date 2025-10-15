@@ -78,7 +78,7 @@ export default defineEventHandler(async (event) => {
       message: pinned ? 'Publication épinglée avec succès' : 'Publication désépinglée avec succès',
       post: updatedPost,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error.statusCode) {
       throw error
     }

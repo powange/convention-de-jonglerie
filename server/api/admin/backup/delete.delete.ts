@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
       }
       throw fileError
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la suppression:', error)
 
     throw createError({

@@ -267,7 +267,7 @@ export default defineEventHandler(async (event) => {
       success: true,
       results,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Database search error:', error)
     throw createError({
       statusCode: 500,

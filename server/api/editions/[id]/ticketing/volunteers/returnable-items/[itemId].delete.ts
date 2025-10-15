@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
       success: true,
       message: 'Article retiré des bénévoles avec succès',
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Erreur lors de la suppression de l'article pour bénévoles:", error)
     if (error.statusCode) throw error
     throw createError({

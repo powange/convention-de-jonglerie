@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
         message: 'Aucun billet trouvé avec ce QR code',
       }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('HelloAsso verify QR code error:', error)
     throw error
   }

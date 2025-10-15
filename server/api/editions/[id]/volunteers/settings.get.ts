@@ -40,31 +40,31 @@ export default defineEventHandler(async (event) => {
       acc[a.status] = (acc[a.status] || 0) + 1
       return acc
     },
-    { total: 0 } as any
+    { total: 0, PENDING: 0, ACCEPTED: 0, REJECTED: 0 } as Record<string, number>
   )
 
   return {
     open: edition.volunteersOpen,
     description: edition.volunteersDescription || null,
-    mode: (edition as any).volunteersMode || 'INTERNAL',
-    externalUrl: (edition as any).volunteersExternalUrl || null,
-    askDiet: (edition as any).volunteersAskDiet || false,
-    askAllergies: (edition as any).volunteersAskAllergies || false,
-    askTimePreferences: (edition as any).volunteersAskTimePreferences || false,
-    askTeamPreferences: (edition as any).volunteersAskTeamPreferences || false,
-    askPets: (edition as any).volunteersAskPets || false,
-    askMinors: (edition as any).volunteersAskMinors || false,
-    askVehicle: (edition as any).volunteersAskVehicle || false,
-    askCompanion: (edition as any).volunteersAskCompanion || false,
-    askAvoidList: (edition as any).volunteersAskAvoidList || false,
-    askSkills: (edition as any).volunteersAskSkills || false,
-    askExperience: (edition as any).volunteersAskExperience || false,
-    askEmergencyContact: (edition as any).volunteersAskEmergencyContact || false,
-    setupStartDate: (edition as any).volunteersSetupStartDate || null,
-    teardownEndDate: (edition as any).volunteersTeardownEndDate || null,
-    askSetup: (edition as any).volunteersAskSetup || false,
-    askTeardown: (edition as any).volunteersAskTeardown || false,
-    updatedAt: (edition as any).volunteersUpdatedAt || null,
+    mode: edition.volunteersMode || 'INTERNAL',
+    externalUrl: edition.volunteersExternalUrl || null,
+    askDiet: edition.volunteersAskDiet || false,
+    askAllergies: edition.volunteersAskAllergies || false,
+    askTimePreferences: edition.volunteersAskTimePreferences || false,
+    askTeamPreferences: edition.volunteersAskTeamPreferences || false,
+    askPets: edition.volunteersAskPets || false,
+    askMinors: edition.volunteersAskMinors || false,
+    askVehicle: edition.volunteersAskVehicle || false,
+    askCompanion: edition.volunteersAskCompanion || false,
+    askAvoidList: edition.volunteersAskAvoidList || false,
+    askSkills: edition.volunteersAskSkills || false,
+    askExperience: edition.volunteersAskExperience || false,
+    askEmergencyContact: edition.volunteersAskEmergencyContact || false,
+    setupStartDate: edition.volunteersSetupStartDate || null,
+    teardownEndDate: edition.volunteersTeardownEndDate || null,
+    askSetup: edition.volunteersAskSetup || false,
+    askTeardown: edition.volunteersAskTeardown || false,
+    updatedAt: edition.volunteersUpdatedAt || null,
     counts,
   }
 })

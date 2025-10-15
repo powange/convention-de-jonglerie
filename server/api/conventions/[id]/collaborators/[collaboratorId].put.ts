@@ -1,7 +1,13 @@
+import { isHttpError } from '@@/server/types/prisma-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { updateCollaboratorRights } from '@@/server/utils/collaborator-management'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
+
+import type {
+  CollaboratorWithPermissions,
+  CollaboratorPermissionSnapshot,
+} from '@@/server/types/prisma-helpers'
 
 const updateRightsSchema = z.object({
   rights: z
@@ -64,29 +70,29 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    const updatedCollaborator = await updateCollaboratorRights({
+    const updatedCollaborator = (await updateCollaboratorRights({
       conventionId,
       collaboratorId,
       userId: user.id,
       rights,
       title: title ?? undefined,
       perEdition,
-    })
+    })) as CollaboratorWithPermissions
 
-    if (before) {
-      const afterSnapshot = {
+    if (before && updatedCollaborator) {
+      const afterSnapshot: CollaboratorPermissionSnapshot = {
         title: updatedCollaborator.title,
         rights: {
-          canEditConvention: (updatedCollaborator as any).canEditConvention,
-          canDeleteConvention: (updatedCollaborator as any).canDeleteConvention,
-          canManageCollaborators: (updatedCollaborator as any).canManageCollaborators,
-          canManageVolunteers: (updatedCollaborator as any).canManageVolunteers,
-          canAddEdition: (updatedCollaborator as any).canAddEdition,
-          canEditAllEditions: (updatedCollaborator as any).canEditAllEditions,
-          canDeleteAllEditions: (updatedCollaborator as any).canDeleteAllEditions,
+          canEditConvention: updatedCollaborator.canEditConvention,
+          canDeleteConvention: updatedCollaborator.canDeleteConvention,
+          canManageCollaborators: updatedCollaborator.canManageCollaborators,
+          canManageVolunteers: updatedCollaborator.canManageVolunteers,
+          canAddEdition: updatedCollaborator.canAddEdition,
+          canEditAllEditions: updatedCollaborator.canEditAllEditions,
+          canDeleteAllEditions: updatedCollaborator.canDeleteAllEditions,
         },
       }
-      const beforeSnapshot = {
+      const beforeSnapshot: CollaboratorPermissionSnapshot = {
         title: before.title,
         rights: {
           canEditConvention: before.canEditConvention,
@@ -106,43 +112,48 @@ export default defineEventHandler(async (event) => {
         await prisma.collaboratorPermissionHistory.create({
           data: {
             conventionId,
-            targetUserId: target?.userId,
+            targetUserId: target?.userId ?? null,
             actorId: user.id,
             changeType: 'RIGHTS_UPDATED',
-            before: beforeSnapshot as any,
-            after: afterSnapshot as any,
-          } as any,
+            before: beforeSnapshot,
+            after: afterSnapshot,
+          },
         })
       }
     }
 
-    const anyCollab: any = updatedCollaborator as any
+    if (!updatedCollaborator) {
+      throw createError({
+        statusCode: 500,
+        message: 'Échec de la mise à jour du collaborateur',
+      })
+    }
+
     return {
       success: true,
       collaborator: {
-        id: anyCollab.id,
-        title: anyCollab.title,
+        id: updatedCollaborator.id,
+        title: updatedCollaborator.title,
         rights: {
-          editConvention: anyCollab.canEditConvention,
-          deleteConvention: anyCollab.canDeleteConvention,
-          manageCollaborators: anyCollab.canManageCollaborators,
-          manageVolunteers: anyCollab.canManageVolunteers,
-          addEdition: anyCollab.canAddEdition,
-          editAllEditions: anyCollab.canEditAllEditions,
-          deleteAllEditions: anyCollab.canDeleteAllEditions,
+          editConvention: updatedCollaborator.canEditConvention,
+          deleteConvention: updatedCollaborator.canDeleteConvention,
+          manageCollaborators: updatedCollaborator.canManageCollaborators,
+          manageVolunteers: updatedCollaborator.canManageVolunteers,
+          addEdition: updatedCollaborator.canAddEdition,
+          editAllEditions: updatedCollaborator.canEditAllEditions,
+          deleteAllEditions: updatedCollaborator.canDeleteAllEditions,
         },
-        perEdition: (anyCollab.perEditionPermissions || []).map((p: any) => ({
+        perEdition: (updatedCollaborator.perEditionPermissions || []).map((p) => ({
           editionId: p.editionId,
           canEdit: p.canEdit,
           canDelete: p.canDelete,
           canManageVolunteers: p.canManageVolunteers,
         })),
-        user: anyCollab.user,
+        user: updatedCollaborator.user,
       },
     }
   } catch (error: unknown) {
-    const httpError = error as { statusCode?: number; message?: string }
-    if (httpError.statusCode) {
+    if (isHttpError(error)) {
       throw error
     }
     console.error('Erreur lors de la mise à jour du rôle:', error)

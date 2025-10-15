@@ -215,7 +215,7 @@ export default defineEventHandler(async (event) => {
         totalItems,
       },
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('HelloAsso orders fetch error:', error)
     throw error
   }

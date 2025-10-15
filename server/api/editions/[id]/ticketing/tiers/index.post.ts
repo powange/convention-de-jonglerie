@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
       success: true,
       tier,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Create tier error:', error)
     throw createError({
       statusCode: 500,

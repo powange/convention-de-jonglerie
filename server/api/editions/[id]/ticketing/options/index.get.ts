@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     return await getEditionOptions(editionId)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to fetch options from DB:', error)
     throw createError({
       statusCode: 500,

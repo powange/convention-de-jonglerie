@@ -2,10 +2,16 @@
 // Removed unused types import (frontend types not needed server-side)
 import { prisma } from './prisma'
 
+import type {
+  CollaboratorPermissionSnapshot,
+  CollaboratorRemovalSnapshot,
+  PrismaTransaction,
+} from '../types/prisma-helpers'
+
 /**
  * Vérifie si un utilisateur a les droits d'admin ET que le mode admin est activé
  */
-export async function checkAdminMode(userId: number, event?: any): Promise<boolean> {
+export async function checkAdminMode(userId: number, event?: H3Event): Promise<boolean> {
   // Vérifier d'abord si l'utilisateur est globalAdmin
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -76,7 +82,7 @@ export async function checkUserConventionPermission(
 export async function canManageCollaborators(
   conventionId: number,
   userId: number,
-  event?: any
+  event?: H3Event
 ): Promise<boolean> {
   // Vérifier le mode admin en premier
   const isAdminMode = await checkAdminMode(userId, event)
@@ -101,7 +107,7 @@ export async function canManageCollaborators(
 export async function canManageVolunteers(
   conventionId: number,
   userId: number,
-  event?: any
+  event?: H3Event
 ): Promise<boolean> {
   // Vérifier le mode admin en premier
   const isAdminMode = await checkAdminMode(userId, event)
@@ -126,7 +132,7 @@ export async function canManageVolunteers(
 export async function canManageEditionVolunteers(
   editionId: number,
   userId: number,
-  event?: any
+  event?: H3Event
 ): Promise<boolean> {
   // Vérifier le mode admin en premier
   const isAdminMode = await checkAdminMode(userId, event)
@@ -174,7 +180,7 @@ interface AddConventionCollaboratorInput {
   conventionId: number
   userId: number
   addedById: number
-  event?: any
+  event?: H3Event
   rights?: Partial<{
     editConvention: boolean
     deleteConvention: boolean
@@ -219,7 +225,7 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
   }
 
   // Créer le collaborateur
-  return await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx: PrismaTransaction) => {
     const collaborator = await tx.conventionCollaborator.create({
       data: {
         conventionId,
@@ -262,31 +268,32 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
 
     // Historique CREATED
     if (withPerEdition) {
+      const snapshot: CollaboratorPermissionSnapshot = {
+        title: withPerEdition.title,
+        rights: {
+          canEditConvention: withPerEdition.canEditConvention,
+          canDeleteConvention: withPerEdition.canDeleteConvention,
+          canManageCollaborators: withPerEdition.canManageCollaborators,
+          canAddEdition: withPerEdition.canAddEdition,
+          canEditAllEditions: withPerEdition.canEditAllEditions,
+          canDeleteAllEditions: withPerEdition.canDeleteAllEditions,
+          canManageVolunteers: withPerEdition.canManageVolunteers,
+        },
+        perEdition: (withPerEdition.perEditionPermissions || []).map((p) => ({
+          editionId: p.editionId,
+          canEdit: p.canEdit,
+          canDelete: p.canDelete,
+          canManageVolunteers: p.canManageVolunteers,
+        })),
+      }
       await tx.collaboratorPermissionHistory.create({
         data: {
           conventionId,
           targetUserId: withPerEdition.userId,
           actorId: addedById,
           changeType: 'CREATED',
-          after: {
-            title: withPerEdition.title,
-            rights: {
-              canEditConvention: withPerEdition.canEditConvention,
-              canDeleteConvention: withPerEdition.canDeleteConvention,
-              canManageCollaborators: withPerEdition.canManageCollaborators,
-              canAddEdition: withPerEdition.canAddEdition,
-              canEditAllEditions: withPerEdition.canEditAllEditions,
-              canDeleteAllEditions: withPerEdition.canDeleteAllEditions,
-              canManageVolunteers: withPerEdition.canManageVolunteers,
-            },
-            perEdition: (withPerEdition.perEditionPermissions || []).map((p) => ({
-              editionId: p.editionId,
-              canEdit: p.canEdit,
-              canDelete: p.canDelete,
-              canManageVolunteers: p.canManageVolunteers,
-            })),
-          } as any,
-        } as any,
+          after: snapshot,
+        },
       })
     }
     return withPerEdition
@@ -352,7 +359,7 @@ export async function deleteConventionCollaborator(
   }
 
   // Snapshot avant suppression
-  const before = {
+  const before: CollaboratorPermissionSnapshot = {
     // On n'enregistre plus les infos user redondantes (pseudo / id) car targetUserId suffit
     title: collaborator.title,
     rights: {
@@ -366,7 +373,14 @@ export async function deleteConventionCollaborator(
     },
   }
 
-  await prisma.$transaction(async (tx) => {
+  const after: CollaboratorRemovalSnapshot = {
+    removed: true,
+    removedAt: new Date().toISOString(),
+    removedCollaboratorId: collaborator.id,
+    removedUserId: collaborator.userId,
+  }
+
+  await prisma.$transaction(async (tx: PrismaTransaction) => {
     // Historiser AVANT suppression en mettant collaboratorId à null pour conserver la ligne après delete
     await tx.collaboratorPermissionHistory.create({
       data: {
@@ -374,14 +388,9 @@ export async function deleteConventionCollaborator(
         targetUserId: collaborator.userId,
         actorId: userId,
         changeType: 'REMOVED',
-        before: before as any,
-        after: {
-          removed: true,
-          removedAt: new Date().toISOString(),
-          removedCollaboratorId: collaborator.id,
-          removedUserId: collaborator.userId,
-        } as any,
-      } as any,
+        before,
+        after,
+      },
     })
     await tx.conventionCollaborator.delete({ where: { id: collaboratorId } })
   })
@@ -449,7 +458,7 @@ export async function updateCollaboratorRights(params: {
   })
   if (!collaborator || collaborator.conventionId !== conventionId)
     throw createError({ statusCode: 404, message: 'Collaborateur introuvable' })
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: PrismaTransaction) => {
     await tx.conventionCollaborator.update({
       where: { id: collaboratorId },
       data: {

@@ -90,7 +90,7 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         teardownEndDate: mockEdition.volunteersTeardownEndDate,
         askSetup: true,
         askTeardown: true,
-        counts: { total: 0 },
+        counts: { total: 0, PENDING: 0, ACCEPTED: 0, REJECTED: 0 },
         updatedAt: null,
       })
     })
@@ -181,7 +181,7 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         teardownEndDate: mockEdition.volunteersTeardownEndDate,
         askSetup: true,
         askTeardown: true,
-        counts: { total: 0 },
+        counts: { total: 0, PENDING: 0, ACCEPTED: 0, REJECTED: 0 },
         updatedAt: null,
       })
     })
@@ -240,7 +240,7 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         teardownEndDate: mockEdition.volunteersTeardownEndDate,
         askSetup: true,
         askTeardown: true,
-        counts: { total: 0 },
+        counts: { total: 0, PENDING: 0, ACCEPTED: 0, REJECTED: 0 },
         updatedAt: null,
       })
     })

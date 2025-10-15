@@ -113,7 +113,8 @@
       "mcp__nuxt__search_nuxt_docs",
       "mcp__nuxt-ui__list_components",
       "Bash(NODE_ENV=test npx vitest run:*)",
-      "Bash(TEST_WITH_DB=true npx vitest run:*)"
+      "Bash(TEST_WITH_DB=true npx vitest run:*)",
+      "Bash(npm audit:*)"
     ],
     "deny": [],
     "ask": [],

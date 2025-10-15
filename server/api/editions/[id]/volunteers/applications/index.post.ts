@@ -32,6 +32,10 @@ export default defineEventHandler(async (event) => {
         volunteersAskMinors: true,
         volunteersAskVehicle: true,
         volunteersAskEmergencyContact: true,
+        volunteersAskCompanion: true,
+        volunteersAskAvoidList: true,
+        volunteersAskSkills: true,
+        volunteersAskExperience: true,
       },
     })
     if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })
@@ -113,46 +117,37 @@ export default defineEventHandler(async (event) => {
             ? parsed.timePreferences
             : null,
         teamPreferences:
-          (edition as any).volunteersAskTeamPreferences && parsed.teamPreferences?.length
+          edition.volunteersAskTeamPreferences && parsed.teamPreferences?.length
             ? parsed.teamPreferences
             : null,
-        hasPets: (edition as any).volunteersAskPets && parsed.hasPets ? parsed.hasPets : null,
+        hasPets: edition.volunteersAskPets && parsed.hasPets ? parsed.hasPets : null,
         petsDetails:
-          (edition as any).volunteersAskPets && parsed.hasPets && parsed.petsDetails?.trim()
+          edition.volunteersAskPets && parsed.hasPets && parsed.petsDetails?.trim()
             ? parsed.petsDetails.trim()
             : null,
-        hasMinors:
-          (edition as any).volunteersAskMinors && parsed.hasMinors ? parsed.hasMinors : null,
+        hasMinors: edition.volunteersAskMinors && parsed.hasMinors ? parsed.hasMinors : null,
         minorsDetails:
-          (edition as any).volunteersAskMinors && parsed.hasMinors && parsed.minorsDetails?.trim()
+          edition.volunteersAskMinors && parsed.hasMinors && parsed.minorsDetails?.trim()
             ? parsed.minorsDetails.trim()
             : null,
-        hasVehicle:
-          (edition as any).volunteersAskVehicle && parsed.hasVehicle ? parsed.hasVehicle : null,
+        hasVehicle: edition.volunteersAskVehicle && parsed.hasVehicle ? parsed.hasVehicle : null,
         vehicleDetails:
-          (edition as any).volunteersAskVehicle &&
-          parsed.hasVehicle &&
-          parsed.vehicleDetails?.trim()
+          edition.volunteersAskVehicle && parsed.hasVehicle && parsed.vehicleDetails?.trim()
             ? parsed.vehicleDetails.trim()
             : null,
         companionName:
-          (edition as any).volunteersAskCompanion && parsed.companionName?.trim()
+          edition.volunteersAskCompanion && parsed.companionName?.trim()
             ? parsed.companionName.trim()
             : null,
         avoidList:
-          (edition as any).volunteersAskAvoidList && parsed.avoidList?.trim()
+          edition.volunteersAskAvoidList && parsed.avoidList?.trim()
             ? parsed.avoidList.trim()
             : null,
-        skills:
-          (edition as any).volunteersAskSkills && parsed.skills?.trim()
-            ? parsed.skills.trim()
-            : null,
+        skills: edition.volunteersAskSkills && parsed.skills?.trim() ? parsed.skills.trim() : null,
         hasExperience:
-          (edition as any).volunteersAskExperience && parsed.hasExperience
-            ? parsed.hasExperience
-            : null,
+          edition.volunteersAskExperience && parsed.hasExperience ? parsed.hasExperience : null,
         experienceDetails:
-          (edition as any).volunteersAskExperience &&
+          edition.volunteersAskExperience &&
           parsed.hasExperience &&
           parsed.experienceDetails?.trim()
             ? parsed.experienceDetails.trim()

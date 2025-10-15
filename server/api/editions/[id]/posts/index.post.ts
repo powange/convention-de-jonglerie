@@ -79,7 +79,7 @@ export default defineEventHandler(async (event) => {
     })
 
     return newPost
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       handleValidationError(error)
     }

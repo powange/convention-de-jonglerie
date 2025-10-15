@@ -151,7 +151,7 @@ export default defineEventHandler(async (event) => {
         message: `${result.count} participant${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`,
       }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Database validate entry error:', error)
     throw createError({
       statusCode: 500,

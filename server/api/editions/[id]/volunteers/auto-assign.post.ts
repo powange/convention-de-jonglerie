@@ -4,6 +4,25 @@ import { prisma } from '@@/server/utils/prisma'
 import { VolunteerScheduler } from '@@/server/utils/volunteer-scheduler'
 import { z } from 'zod'
 
+import type { PrismaTransaction, AutoAssignmentResult } from '@@/server/types/prisma-helpers'
+import type { Prisma } from '@prisma/client'
+
+// Types pour les données récupérées de la base de données
+type VolunteerWithTeamAssignments = Prisma.EditionVolunteerApplicationGetPayload<{
+  include: {
+    user: { select: { id: true; pseudo: true; nom: true; prenom: true } }
+    teamAssignments: { include: { team: true } }
+  }
+}>
+
+type TimeSlotWithAssignments = Prisma.VolunteerTimeSlotGetPayload<{
+  include: {
+    assignments: { include: { user: true } }
+  }
+}>
+
+type Team = Prisma.VolunteerTeamGetPayload<object>
+
 // Schéma de validation pour les contraintes
 const constraintsSchema = z.object({
   maxHoursPerVolunteer: z.number().min(1).max(24).optional(),
@@ -111,39 +130,41 @@ export default defineEventHandler(async (event) => {
     if (constraints.keepExistingAssignments) {
       // Récupérer les IDs des bénévoles déjà assignés
       const assignedVolunteerIds = new Set(
-        timeSlots.flatMap((slot: any) =>
-          slot.assignments.map((assignment: any) => assignment.user.id)
+        timeSlots.flatMap((slot: TimeSlotWithAssignments) =>
+          slot.assignments.map((assignment) => assignment.user.id)
         )
       )
       // Filtrer uniquement les bénévoles non assignés
       availableVolunteers = volunteers.filter(
-        (volunteer: any) => !assignedVolunteerIds.has(volunteer.user.id)
+        (volunteer: VolunteerWithTeamAssignments) => !assignedVolunteerIds.has(volunteer.user.id)
       )
     }
 
     // Conversion des données pour l'algorithme
-    const schedulerVolunteers = availableVolunteers.map((volunteer: any) => ({
-      id: volunteer.id,
-      user: volunteer.user,
-      availability: JSON.stringify({
-        setup: volunteer.setupAvailability || false,
-        teardown: volunteer.teardownAvailability || false,
-        event: volunteer.eventAvailability || false,
-        timePreferences: volunteer.timePreferences || null,
-      }),
-      experience: volunteer.hasExperience
-        ? volunteer.experienceDetails || 'Expérience confirmée'
-        : '',
-      motivation: volunteer.motivation || '',
-      phone: volunteer.userSnapshotPhone,
-      teamPreferences: volunteer.teamPreferences
-        ? Array.isArray(volunteer.teamPreferences)
-          ? volunteer.teamPreferences
-          : []
-        : [],
-    }))
+    const schedulerVolunteers = availableVolunteers.map(
+      (volunteer: VolunteerWithTeamAssignments) => ({
+        id: volunteer.id,
+        user: volunteer.user,
+        availability: JSON.stringify({
+          setup: volunteer.setupAvailability || false,
+          teardown: volunteer.teardownAvailability || false,
+          event: volunteer.eventAvailability || false,
+          timePreferences: volunteer.timePreferences || null,
+        }),
+        experience: volunteer.hasExperience
+          ? volunteer.experienceDetails || 'Expérience confirmée'
+          : '',
+        motivation: volunteer.motivation || '',
+        phone: volunteer.userSnapshotPhone,
+        teamPreferences: volunteer.teamPreferences
+          ? Array.isArray(volunteer.teamPreferences)
+            ? volunteer.teamPreferences
+            : []
+          : [],
+      })
+    )
 
-    const schedulerTimeSlots = timeSlots.map((slot: any) => ({
+    const schedulerTimeSlots = timeSlots.map((slot: TimeSlotWithAssignments) => ({
       id: slot.id.toString(),
       title: slot.title || 'Créneau sans titre',
       start: slot.startDateTime.toISOString(),
@@ -157,7 +178,7 @@ export default defineEventHandler(async (event) => {
       priority: 3, // TODO: Calculer selon critères
     }))
 
-    const schedulerTeams = teams.map((team: any) => ({
+    const schedulerTeams = teams.map((team: Team) => ({
       id: team.id,
       name: team.name,
       color: team.color,
@@ -188,21 +209,31 @@ export default defineEventHandler(async (event) => {
       result,
       preview: body.applyAssignments !== true, // Indique si c'est un aperçu ou une application
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Erreur lors de l'auto-assignation:", error)
 
     // Gestion des erreurs de validation Zod
-    if (error.issues) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'issues' in error &&
+      Array.isArray((error as { issues: unknown[] }).issues)
+    ) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Contraintes invalides',
-        data: error.issues,
+        data: (error as { issues: unknown[] }).issues,
       })
     }
 
+    const errorMessage =
+      error && typeof error === 'object' && 'message' in error && typeof error.message === 'string'
+        ? error.message
+        : "Erreur lors de l'auto-assignation"
+
     throw createError({
       statusCode: 500,
-      statusMessage: error.message || "Erreur lors de l'auto-assignation",
+      statusMessage: errorMessage,
     })
   }
 })
@@ -212,7 +243,7 @@ export default defineEventHandler(async (event) => {
  */
 async function applyAssignments(
   editionId: number,
-  assignments: any[],
+  assignments: AutoAssignmentResult[],
   userId: number,
   keepExisting?: boolean
 ): Promise<void> {
@@ -266,9 +297,9 @@ async function applyAssignments(
  * Assigne les bénévoles aux équipes correspondantes à leurs créneaux
  */
 async function assignVolunteersToTeams(
-  tx: any,
+  tx: PrismaTransaction,
   editionId: number,
-  assignments: any[],
+  assignments: AutoAssignmentResult[],
   keepExisting?: boolean
 ): Promise<void> {
   // Grouper les assignations par bénévole

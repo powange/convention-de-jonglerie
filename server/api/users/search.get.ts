@@ -1,11 +1,10 @@
+import { hasIssues, isHttpError, type UserWhereInput } from '@@/server/types/prisma-helpers'
 import { checkAdminMode } from '@@/server/utils/collaborator-management'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
 import { requireUserSession } from '#imports'
-
-import type { H3Error } from 'h3'
 
 // GET /api/users/search?q=term ou ?email=term
 // Auth requis. Retourne jusqu'à 10 utilisateurs (id, pseudo, profilePicture?, emailHash)
@@ -22,18 +21,18 @@ export default defineEventHandler(async (event) => {
     if (term.length < 2) return { users: [] }
 
     // Vérifier si l'utilisateur est en mode admin
-    const isInAdminMode = await checkAdminMode((user as any).id, event)
+    const isInAdminMode = await checkAdminMode(user.id, event)
 
     // NOTE: Le paramètre Prisma `mode: 'insensitive'` n'est pas supporté avec MySQL (erreur "Unknown argument mode").
     // Les collations MySQL utf8mb4_* sont déjà généralement insensibles à la casse.
     // On supprime donc `mode` et on applique un simple contains.
-    const whereClause: any = {
+    const whereClause: UserWhereInput = {
       OR: [{ pseudo: { contains: term } }, { email: { contains: term } }],
     }
 
     // Exclure l'utilisateur courant seulement si pas en mode admin
     if (!isInAdminMode) {
-      whereClause.NOT = { id: (user as any).id }
+      whereClause.NOT = { id: user.id }
     }
 
     const users = await prisma.user.findMany({
@@ -62,10 +61,10 @@ export default defineEventHandler(async (event) => {
       })),
     }
   } catch (error: unknown) {
-    if ((error as any)?.issues) {
+    if (hasIssues(error)) {
       throw createError({ statusCode: 400, message: 'Requête invalide' })
     }
-    if ((error as H3Error)?.statusCode) throw error
+    if (isHttpError(error)) throw error
     console.error('Erreur recherche utilisateurs:', error)
     throw createError({ statusCode: 500, message: 'Erreur serveur' })
   }

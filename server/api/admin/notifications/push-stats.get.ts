@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
         count: day._count,
       })),
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Push Stats] Erreur:', error)
 
     throw createError({

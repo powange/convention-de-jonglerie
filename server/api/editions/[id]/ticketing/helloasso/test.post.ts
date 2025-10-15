@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
       ...result,
       message: 'Connexion réussie',
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('HelloAsso test error:', error)
 
     // L'utilitaire gère déjà les erreurs, on les relance simplement

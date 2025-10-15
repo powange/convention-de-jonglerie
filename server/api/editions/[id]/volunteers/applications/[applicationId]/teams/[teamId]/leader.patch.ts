@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
         ? `${application.user.pseudo} est maintenant responsable de l'équipe ${team.name}`
         : `${application.user.pseudo} n'est plus responsable de l'équipe ${team.name}`,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Si l'assignation n'existe pas, Prisma lancera une erreur
     if (error.code === 'P2025') {
       throw createError({

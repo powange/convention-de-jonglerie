@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
     backups.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
     return backups
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Si le dossier n'existe pas, retourner une liste vide
     if (error.code === 'ENOENT') {
       return []

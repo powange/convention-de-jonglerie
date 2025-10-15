@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
       orders: result.data,
       pagination: result.pagination,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('HelloAsso orders error:', error)
     throw error
   }

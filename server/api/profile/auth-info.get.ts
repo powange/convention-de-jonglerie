@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
       hasPassword: userInfo.password !== null,
       isOAuth: userInfo.password === null,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Erreur lors de la récupération des infos d'auth:", error)
 
     if (error.statusCode) {
