@@ -122,6 +122,14 @@ export interface CollaboratorRemovalSnapshot {
 }
 
 /**
+ * Type pour les snapshots d'archivage de convention
+ */
+export interface ConventionArchiveSnapshot {
+  isArchived: boolean
+  archivedAt?: Date | null
+}
+
+/**
  * Type pour les collaborateurs avec permissions par édition
  */
 export type CollaboratorWithPermissions = Prisma.ConventionCollaboratorGetPayload<{

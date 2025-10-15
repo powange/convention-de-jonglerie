@@ -1,3 +1,4 @@
+import { isHttpError } from '@@/server/types/prisma-helpers'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 
@@ -61,7 +62,7 @@ export default defineEventHandler(async (event) => {
             }
           })()
         : null,
-      collaborators: convention.collaborators.map((c: any) => ({
+      collaborators: convention.collaborators.map((c) => ({
         id: c.id,
         addedAt: c.addedAt,
         title: c.title ?? null,
@@ -75,12 +76,12 @@ export default defineEventHandler(async (event) => {
         },
         user: c.user,
       })),
-    } as any
+    }
 
     return transformed
-  } catch (error) {
+  } catch (error: unknown) {
     // Si c'est déjà une erreur HTTP, la relancer
-    if ((error as any)?.statusCode) {
+    if (isHttpError(error)) {
       throw error
     }
 

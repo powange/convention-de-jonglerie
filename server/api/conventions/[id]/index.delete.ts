@@ -1,3 +1,4 @@
+import { isHttpError } from '@@/server/types/prisma-helpers'
 import { requireAuth } from '@@/server/utils/auth-utils'
 import {
   getConventionForDelete,
@@ -5,6 +6,8 @@ import {
   validateConventionId,
 } from '@@/server/utils/permissions/convention-permissions'
 import { prisma } from '@@/server/utils/prisma'
+
+import type { ConventionArchiveSnapshot } from '@@/server/types/prisma-helpers'
 
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
@@ -23,14 +26,19 @@ export default defineEventHandler(async (event) => {
           where: { id: conventionId },
           data: { isArchived: true, archivedAt: new Date() },
         })
+        const before: ConventionArchiveSnapshot = { isArchived: false }
+        const after: ConventionArchiveSnapshot = {
+          isArchived: true,
+          archivedAt: archived.archivedAt,
+        }
         await prisma.collaboratorPermissionHistory.create({
           data: {
             conventionId,
             actorId: user.id,
             changeType: 'ARCHIVED',
             targetUserId: null,
-            before: { isArchived: false } as any,
-            after: { isArchived: true, archivedAt: archived.archivedAt } as any,
+            before,
+            after,
           },
         })
       }
@@ -39,8 +47,8 @@ export default defineEventHandler(async (event) => {
       await prisma.convention.delete({ where: { id: conventionId } })
       return { message: 'Convention supprimée avec succès' }
     }
-  } catch (error) {
-    if (typeof error === 'object' && error && 'statusCode' in error) throw error as any
+  } catch (error: unknown) {
+    if (isHttpError(error)) throw error
     console.error('Erreur lors de la suppression/archivage de la convention:', error)
     throw createError({
       statusCode: 500,

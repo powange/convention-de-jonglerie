@@ -3,13 +3,15 @@ import { checkAdminMode } from '@@/server/utils/collaborator-management'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 
+import type { Prisma } from '@prisma/client'
+
 export default defineEventHandler(async (event) => {
   // Vérifier l'authentification
   const user = requireAuth(event)
 
   try {
     // Editions must include isOnline (non-nullable boolean with default false)
-    const editionsSelect: any = {
+    const editionsSelect: Prisma.EditionSelect = {
       id: true,
       name: true,
       startDate: true,
@@ -98,7 +100,7 @@ export default defineEventHandler(async (event) => {
             }
           })()
         : null,
-      collaborators: convention.collaborators.map((collab: any) => ({
+      collaborators: convention.collaborators.map((collab) => ({
         id: collab.id,
         title: collab.title,
         addedAt: collab.addedAt,
@@ -118,7 +120,7 @@ export default defineEventHandler(async (event) => {
           editAllEditions: collab.canEditAllEditions,
           deleteAllEditions: collab.canDeleteAllEditions,
         },
-        perEdition: (collab.perEditionPermissions || []).map((p: any) => ({
+        perEdition: (collab.perEditionPermissions || []).map((p) => ({
           editionId: p.editionId,
           canEdit: p.canEdit,
           canDelete: p.canDelete,

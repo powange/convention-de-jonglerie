@@ -6,6 +6,8 @@ import {
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
+import type { ConventionArchiveSnapshot } from '@@/server/types/prisma-helpers'
+
 const schema = z.object({ archived: z.boolean() })
 
 export default defineEventHandler(async (event) => {
@@ -22,12 +24,20 @@ export default defineEventHandler(async (event) => {
     return { success: true, archived, unchanged: true }
   }
 
-  const before = { isArchived: convention.isArchived, archivedAt: convention.archivedAt }
+  const before: ConventionArchiveSnapshot = {
+    isArchived: convention.isArchived,
+    archivedAt: convention.archivedAt,
+  }
   const now = new Date()
   const updated = await prisma.convention.update({
     where: { id: conventionId },
     data: { isArchived: archived, archivedAt: archived ? now : null },
   })
+
+  const after: ConventionArchiveSnapshot = {
+    isArchived: updated.isArchived,
+    archivedAt: updated.archivedAt,
+  }
 
   await prisma.collaboratorPermissionHistory.create({
     data: {
@@ -35,9 +45,9 @@ export default defineEventHandler(async (event) => {
       actorId: user.id,
       changeType: archived ? 'ARCHIVED' : 'UNARCHIVED',
       targetUserId: null,
-      before: before as any,
-      after: { isArchived: updated.isArchived, archivedAt: updated.archivedAt } as any,
-    } as any,
+      before,
+      after,
+    },
   })
 
   return { success: true, archived: updated.isArchived, archivedAt: updated.archivedAt }
