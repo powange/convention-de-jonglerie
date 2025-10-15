@@ -72,6 +72,19 @@ export default defineNuxtConfig({
     rollupConfig: {
       plugins: [vue()],
     },
+    // Compression des assets statiques (gzip et brotli)
+    compressPublicAssets: {
+      gzip: true,
+      brotli: true,
+    },
+    // Configuration du cache pour les assets statiques
+    publicAssets: [
+      {
+        // Assets statiques dans /public avec cache de 1 mois
+        dir: '../public',
+        maxAge: 60 * 60 * 24 * 30, // 30 jours
+      },
+    ],
   },
   i18n: {
     lazy: true, // Activer le lazy loading
