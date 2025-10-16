@@ -9,6 +9,8 @@
       "be_first_to_comment": "Sei der erste, der dieses {type} kommentiert!",
       "be_first_to_offer": "Sei der erste, der eine Fahrgemeinschaft für diese Auflage anbietet!",
       "book_seats": "Buchen",
+      "booking_message": "Nachricht an den Fahrer (optional)",
+      "booking_message_placeholder": "Z.B.: Ich habe viel Gepäck, kann ich 2 Plätze nehmen?",
       "comments": "Kommentare",
       "confirm_booking": "Buchung bestätigen",
       "confirm_delete_offer": "Bist du sicher, dass du dieses Fahrgemeinschafts-Angebot löschen möchtest?",
@@ -45,6 +47,12 @@
       "requests_short": "Anfragen",
       "seats_available": "{count} Platz verfügbar | {count} Plätze verfügbar",
       "seats_needed": "{count} Platz gesucht | {count} Plätze gesucht",
+      "status": {
+        "accepted": "Akzeptiert",
+        "cancelled": "Storniert",
+        "pending": "Ausstehend",
+        "rejected": "Abgelehnt"
+      },
       "suggestions": "Vorschläge",
       "to_add_comment": "um einen Kommentar hinzuzufügen",
       "view_comments": "Kommentare anzeigen ({count})"

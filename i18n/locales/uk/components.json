@@ -9,6 +9,8 @@
       "be_first_to_comment": "Будьте першим, хто прокоментує цю {type}!",
       "be_first_to_offer": "Будьте першим, хто запропонує підвезення для цього видання!",
       "book_seats": "Забронювати",
+      "booking_message": "Повідомлення водієві (необов'язково)",
+      "booking_message_placeholder": "Напр.: У мене багато багажу, чи можу я зайняти 2 місця?",
       "comments": "Коментарі",
       "confirm_booking": "Підтвердити бронювання",
       "confirm_delete_offer": "Ви впевнені, що хочете видалити цю пропозицію сумісної поїздки?",
@@ -45,6 +47,12 @@
       "requests_short": "Запити",
       "seats_available": "{count} доступне місце | {count} доступних місць",
       "seats_needed": "{count} потрібне місце | {count} потрібних місць",
+      "status": {
+        "accepted": "Прийнято",
+        "cancelled": "Скасовано",
+        "pending": "Очікування",
+        "rejected": "Відхилено"
+      },
       "suggestions": "Пропозиції",
       "to_add_comment": "щоб додати коментар",
       "view_comments": "Переглянути коментарі ({count})"

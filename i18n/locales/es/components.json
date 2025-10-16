@@ -9,6 +9,8 @@
       "be_first_to_comment": "¡Sé el primero en comentar esta {type}!",
       "be_first_to_offer": "¡Sé el primero en proponer un viaje compartido para esta edición!",
       "book_seats": "Reservar",
+      "booking_message": "Mensaje para el conductor (opcional)",
+      "booking_message_placeholder": "Ej.: Tengo mucho equipaje, ¿puedo ocupar 2 asientos?",
       "comments": "Comentarios",
       "confirm_booking": "Confirmar reserva",
       "confirm_delete_offer": "¿Estás seguro de que quieres eliminar esta oferta de viaje compartido?",
@@ -45,6 +47,12 @@
       "requests_short": "Solicitudes",
       "seats_available": "{count} asiento disponible | {count} asientos disponibles",
       "seats_needed": "{count} asiento necesario | {count} asientos necesarios",
+      "status": {
+        "accepted": "Aceptada",
+        "cancelled": "Cancelada",
+        "pending": "Pendiente",
+        "rejected": "Rechazada"
+      },
       "suggestions": "Sugerencias",
       "to_add_comment": "para agregar un comentario",
       "view_comments": "Ver comentarios ({count})"

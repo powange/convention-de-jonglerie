@@ -9,6 +9,8 @@
       "be_first_to_comment": "Bądź pierwszy, który skomentuje tę {type}!",
       "be_first_to_offer": "Bądź pierwszy, który zaoferuje wspólny przejazd na tę edycję!",
       "book_seats": "Zarezerwuj",
+      "booking_message": "Wiadomość do kierowcy (opcjonalnie)",
+      "booking_message_placeholder": "Np.: Mam dużo bagażu, czy mogę zająć 2 miejsca?",
       "comments": "Komentarze",
       "confirm_booking": "Potwierdź rezerwację",
       "confirm_delete_offer": "Czy na pewno chcesz usunąć tę ofertę wspólnego przejazdu?",
@@ -45,6 +47,12 @@
       "requests_short": "Prośby",
       "seats_available": "{count} dostępne miejsce | {count} dostępnych miejsc",
       "seats_needed": "{count} szukane miejsce | {count} szukanych miejsc",
+      "status": {
+        "accepted": "Zaakceptowana",
+        "cancelled": "Anulowana",
+        "pending": "Oczekująca",
+        "rejected": "Odrzucona"
+      },
       "suggestions": "Sugestie",
       "to_add_comment": "aby dodać komentarz",
       "view_comments": "Zobacz komentarze ({count})"

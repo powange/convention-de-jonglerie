@@ -133,11 +133,14 @@
                     : 'warning'
             "
             variant="soft"
-            >{{ myBooking.status }}</UBadge
+            >{{ bookingStatusLabel }}</UBadge
           >
         </div>
         <div class="mt-1 text-sm text-gray-700 dark:text-gray-300">
           {{ $t('components.carpool.requested_seats', { count: myBooking.seats }) }}
+        </div>
+        <div v-if="myBooking.message" class="mt-2 text-sm text-gray-600 dark:text-gray-400 italic">
+          "{{ myBooking.message }}"
         </div>
         <div
           v-if="myBooking.status === 'PENDING' || myBooking.status === 'ACCEPTED'"
@@ -173,8 +176,11 @@
 
       <!-- Section commentaires -->
       <div class="pt-4">
-        <div class="flex items-center justify-between">
-          <div v-if="authStore.isAuthenticated" class="flex gap-2">
+        <div
+          class="flex items-center"
+          :class="authStore.isAuthenticated && !canEdit ? 'justify-between' : 'justify-end'"
+        >
+          <div v-if="authStore.isAuthenticated && !canEdit" class="flex gap-2">
             <UButton
               :disabled="remainingSeats <= 0"
               color="primary"
@@ -217,6 +223,14 @@
                   {{ n }}
                 </UButton>
               </div>
+            </UFormField>
+            <UFormField :label="$t('components.carpool.booking_message')">
+              <UTextarea
+                v-model="bookingMessage"
+                :placeholder="$t('components.carpool.booking_message_placeholder')"
+                :rows="3"
+                class="w-full"
+              />
             </UFormField>
             <div class="flex justify-end gap-2">
               <UButton variant="ghost" @click="showBookingModal = false">{{
@@ -384,12 +398,20 @@ const acceptedBookings = computed(() =>
 )
 
 // Ma réservation sur cette offre (dernier en date si plusieurs)
-const myBookings = ref<Array<{ id: number; seats: number; status: string; createdAt: string }>>([])
+const myBookings = ref<
+  Array<{ id: number; seats: number; status: string; message?: string; createdAt: string }>
+>([])
 const myBooking = computed(() => {
   if (!myBookings.value.length) return null as any
   return [...myBookings.value].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )[0]
+})
+
+const bookingStatusLabel = computed(() => {
+  if (!myBooking.value) return ''
+  const statusKey = myBooking.value.status.toLowerCase()
+  return t(`components.carpool.status.${statusKey}`)
 })
 
 const loadMyBookings = async () => {
@@ -412,6 +434,7 @@ watch(
 // Réservation
 const showBookingModal = ref(false)
 const bookingSeats = ref(1)
+const bookingMessage = ref('')
 const isBooking = ref(false)
 
 const submitBooking = async () => {
@@ -420,7 +443,10 @@ const submitBooking = async () => {
     isBooking.value = true
     await $fetch(`/api/carpool-offers/${props.offer.id}/bookings`, {
       method: 'POST',
-      body: { seats: bookingSeats.value },
+      body: {
+        seats: bookingSeats.value,
+        message: bookingMessage.value.trim() || undefined,
+      },
     } as any)
     toast.add({
       title: t('messages.booking_requested'),
@@ -429,6 +455,7 @@ const submitBooking = async () => {
       icon: 'i-heroicons-check-circle',
     })
     showBookingModal.value = false
+    bookingMessage.value = ''
     await loadMyBookings()
   } catch (error: unknown) {
     const httpError = error as { data?: { message?: string }; message?: string }

@@ -9,6 +9,8 @@
       "be_first_to_comment": "Seja o primeiro a comentar esta {type}!",
       "be_first_to_offer": "Seja o primeiro a propor uma boleia para esta edição!",
       "book_seats": "Reservar",
+      "booking_message": "Mensagem para o motorista (opcional)",
+      "booking_message_placeholder": "Ex.: Tenho muita bagagem, posso ocupar 2 lugares?",
       "comments": "Comentários",
       "confirm_booking": "Confirmar reserva",
       "confirm_delete_offer": "Tem a certeza de que quer eliminar esta oferta de boleia?",
@@ -45,6 +47,12 @@
       "requests_short": "Pedidos",
       "seats_available": "{count} lugar disponível | {count} lugares disponíveis",
       "seats_needed": "{count} lugar procurado | {count} lugares procurados",
+      "status": {
+        "accepted": "Aceite",
+        "cancelled": "Cancelada",
+        "pending": "Pendente",
+        "rejected": "Rejeitada"
+      },
       "suggestions": "Sugestões",
       "to_add_comment": "para adicionar um comentário",
       "view_comments": "Ver comentários ({count})"

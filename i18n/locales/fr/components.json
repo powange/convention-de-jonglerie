@@ -9,6 +9,8 @@
       "be_first_to_comment": "Soyez le premier à commenter cette {type} !",
       "be_first_to_offer": "Soyez le premier à proposer un covoiturage pour cette édition !",
       "book_seats": "Réserver",
+      "booking_message": "Message pour le conducteur (optionnel)",
+      "booking_message_placeholder": "Ex: J'ai beaucoup de bagages, puis-je prendre 2 places ?",
       "comments": "Commentaires",
       "confirm_booking": "Confirmer la réservation",
       "confirm_delete_offer": "Êtes-vous sûr de vouloir supprimer cette offre de covoiturage ?",
@@ -45,6 +47,12 @@
       "requests_short": "Demandes",
       "seats_available": "{count} place disponible | {count} places disponibles",
       "seats_needed": "{count} place recherchée | {count} places recherchées",
+      "status": {
+        "pending": "En attente",
+        "accepted": "Acceptée",
+        "rejected": "Refusée",
+        "cancelled": "Annulée"
+      },
       "suggestions": "Suggestions",
       "to_add_comment": "pour ajouter un commentaire",
       "view_comments": "Voir les commentaires ({count})"

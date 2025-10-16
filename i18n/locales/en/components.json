@@ -9,6 +9,8 @@
       "be_first_to_comment": "Be the first to comment on this {type}!",
       "be_first_to_offer": "Be the first to offer a ride for this edition!",
       "book_seats": "Book",
+      "booking_message": "Message for the driver (optional)",
+      "booking_message_placeholder": "E.g.: I have a lot of luggage, can I take 2 seats?",
       "comments": "Comments",
       "confirm_booking": "Confirm booking",
       "confirm_delete_offer": "Are you sure you want to delete this carpool offer?",
@@ -45,6 +47,12 @@
       "requests_short": "Requests",
       "seats_available": "{count} seat available | {count} seats available",
       "seats_needed": "{count} seat needed | {count} seats needed",
+      "status": {
+        "accepted": "Accepted",
+        "cancelled": "Cancelled",
+        "pending": "Pending",
+        "rejected": "Rejected"
+      },
       "suggestions": "Suggestions",
       "to_add_comment": "to add a comment",
       "view_comments": "View comments ({count})"

@@ -9,6 +9,8 @@
       "be_first_to_comment": "Sii il primo a commentare questa {type}!",
       "be_first_to_offer": "Sii il primo a proporre una condivisione auto per questa edizione!",
       "book_seats": "Prenota",
+      "booking_message": "Messaggio per il conducente (facoltativo)",
+      "booking_message_placeholder": "Es.: Ho molti bagagli, posso occupare 2 posti?",
       "comments": "Commenti",
       "confirm_booking": "Conferma prenotazione",
       "confirm_delete_offer": "Sei sicuro di voler eliminare questa offerta di condivisione auto?",
@@ -45,6 +47,12 @@
       "requests_short": "Richieste",
       "seats_available": "{count} posto disponibile | {count} posti disponibili",
       "seats_needed": "{count} posto cercato | {count} posti cercati",
+      "status": {
+        "accepted": "Accettata",
+        "cancelled": "Annullata",
+        "pending": "In attesa",
+        "rejected": "Rifiutata"
+      },
       "suggestions": "Suggerimenti",
       "to_add_comment": "per aggiungere un commento",
       "view_comments": "Visualizza commenti ({count})"

@@ -9,6 +9,8 @@
       "be_first_to_comment": "Wees de eerste om te reageren op deze {type}!",
       "be_first_to_offer": "Wees de eerste om een rit aan te bieden voor deze editie!",
       "book_seats": "Plaatsen reserveren",
+      "booking_message": "Bericht voor de bestuurder (optioneel)",
+      "booking_message_placeholder": "Bijv.: Ik heb veel bagage, mag ik 2 plaatsen innemen?",
       "comments": "Opmerkingen",
       "confirm_booking": "Reservering bevestigen",
       "confirm_delete_offer": "Weet je zeker dat je deze meerijdaanbieding wilt verwijderen?",
@@ -45,6 +47,12 @@
       "requests_short": "Verzoeken",
       "seats_available": "{count} plaats beschikbaar | {count} plaatsen beschikbaar",
       "seats_needed": "{count} plaats nodig | {count} plaatsen nodig",
+      "status": {
+        "accepted": "Geaccepteerd",
+        "cancelled": "Geannuleerd",
+        "pending": "In afwachting",
+        "rejected": "Afgewezen"
+      },
       "suggestions": "Suggesties",
       "to_add_comment": "om een opmerking toe te voegen",
       "view_comments": "Bekijk opmerkingen ({count})"

@@ -9,6 +9,8 @@
       "be_first_to_comment": "Будьте первым, кто прокомментирует это {type}!",
       "be_first_to_offer": "Будьте первым, кто предложит поездку для этого издания!",
       "book_seats": "Забронировать",
+      "booking_message": "Сообщение водителю (необязательно)",
+      "booking_message_placeholder": "Напр.: У меня много багажа, могу ли я занять 2 места?",
       "comments": "Комментарии",
       "confirm_booking": "Подтвердить бронирование",
       "confirm_delete_offer": "Вы уверены, что хотите удалить это предложение совместной поездки?",
@@ -45,6 +47,12 @@
       "requests_short": "Запросы",
       "seats_available": "{count} место доступно | {count} мест доступно",
       "seats_needed": "{count} место нужно | {count} мест нужно",
+      "status": {
+        "accepted": "Принята",
+        "cancelled": "Отменена",
+        "pending": "В ожидании",
+        "rejected": "Отклонена"
+      },
       "suggestions": "Предложения",
       "to_add_comment": "чтобы добавить комментарий",
       "view_comments": "Просмотреть комментарии ({count})"
