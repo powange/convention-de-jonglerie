@@ -81,6 +81,7 @@ nitro: {
 ```
 
 **Bénéfices** :
+
 - **Compression automatique** : Fichiers JS/CSS réduits de 70-80%
 - **Brotli** : Meilleure compression que gzip (navigateurs modernes)
 - **Gzip** : Fallback pour navigateurs plus anciens
@@ -150,6 +151,7 @@ curl -I http://localhost:3000/
 ### 3. Lighthouse / PageSpeed Insights
 
 Les scores devraient montrer :
+
 - ✅ "Serve static assets with an efficient cache policy"
 - ✅ "Enable text compression"
 

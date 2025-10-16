@@ -1,4 +1,15 @@
 {
+  "calendar": {
+    "add_to_calendar": "Add to calendar",
+    "day": "Day",
+    "download_ics": "Download (.ics)",
+    "google_calendar": "Google Calendar",
+    "list": "List",
+    "month": "Month",
+    "outlook_calendar": "Outlook Calendar",
+    "today": "Today",
+    "week": "Week"
+  },
   "common": {
     "accepted": "Accepted",
     "actions": "Actions",
@@ -279,16 +290,5 @@
     "name_min_3": "Name must contain at least 3 characters",
     "phone_required": "Phone number is required",
     "program_max_10000": "The program cannot exceed 10000 characters"
-  },
-  "calendar": {
-    "add_to_calendar": "Add to calendar",
-    "day": "Day",
-    "download_ics": "Download (.ics)",
-    "google_calendar": "Google Calendar",
-    "list": "List",
-    "month": "Month",
-    "outlook_calendar": "Outlook Calendar",
-    "today": "Today",
-    "week": "Week"
   }
 }

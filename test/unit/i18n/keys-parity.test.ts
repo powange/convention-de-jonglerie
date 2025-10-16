@@ -8,12 +8,10 @@ describe('i18n lost&found new keys parity', () => {
   const localesDir = path.resolve(__dirname, '../../../i18n/locales')
 
   // Lister tous les dossiers de langue
-  const localeDirs = fs
-    .readdirSync(localesDir)
-    .filter((item) => {
-      const itemPath = path.join(localesDir, item)
-      return fs.statSync(itemPath).isDirectory()
-    })
+  const localeDirs = fs.readdirSync(localesDir).filter((item) => {
+    const itemPath = path.join(localesDir, item)
+    return fs.statSync(itemPath).isDirectory()
+  })
 
   const requiredKeys = ['editions.lost_found_before_start', 'editions.items_appear_when_started']
   const deprecatedKeys = [

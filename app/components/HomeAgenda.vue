@@ -1,6 +1,11 @@
 <template>
   <UCard variant="outline">
-    <UiLazyFullCalendar v-if="ready" ref="calendarRef" :options="calendarOptions" class="fc-theme-standard" />
+    <UiLazyFullCalendar
+      v-if="ready"
+      ref="calendarRef"
+      :options="calendarOptions"
+      class="fc-theme-standard"
+    />
     <div v-else class="flex items-center gap-2 text-sm text-gray-500 p-4">
       <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
       <span>{{ t('common.loading') }}...</span>

@@ -1,4 +1,15 @@
 {
+  "calendar": {
+    "add_to_calendar": "Додати до календаря",
+    "day": "День",
+    "download_ics": "Завантажити (.ics)",
+    "google_calendar": "Google Calendar",
+    "list": "Список",
+    "month": "Місяць",
+    "outlook_calendar": "Outlook Calendar",
+    "today": "Сьогодні",
+    "week": "Тиждень"
+  },
   "common": {
     "accepted": "Прийнято",
     "actions": "Дії",
@@ -279,16 +290,5 @@
     "name_min_3": "Ім'я повинно містити не менше 3 символів",
     "phone_required": "Номер телефону обов'язковий",
     "program_max_10000": "Програма не може перевищувати 10000 символів"
-  },
-  "calendar": {
-    "add_to_calendar": "Додати до календаря",
-    "day": "День",
-    "download_ics": "Завантажити (.ics)",
-    "google_calendar": "Google Calendar",
-    "list": "Список",
-    "month": "Місяць",
-    "outlook_calendar": "Outlook Calendar",
-    "today": "Сьогодні",
-    "week": "Тиждень"
   }
 }

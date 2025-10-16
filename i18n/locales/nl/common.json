@@ -1,4 +1,15 @@
 {
+  "calendar": {
+    "add_to_calendar": "Toevoegen aan kalender",
+    "day": "Dag",
+    "download_ics": "Downloaden (.ics)",
+    "google_calendar": "Google Calendar",
+    "list": "Lijst",
+    "month": "Maand",
+    "outlook_calendar": "Outlook Calendar",
+    "today": "Vandaag",
+    "week": "Week"
+  },
   "common": {
     "accepted": "Geaccepteerd",
     "actions": "Acties",
@@ -279,16 +290,5 @@
     "name_min_3": "Naam moet minstens 3 tekens bevatten",
     "phone_required": "Telefoonnummer is vereist",
     "program_max_10000": "Het programma mag niet meer dan 10000 tekens bevatten"
-  },
-  "calendar": {
-    "add_to_calendar": "Toevoegen aan kalender",
-    "day": "Dag",
-    "download_ics": "Downloaden (.ics)",
-    "google_calendar": "Google Calendar",
-    "list": "Lijst",
-    "month": "Maand",
-    "outlook_calendar": "Outlook Calendar",
-    "today": "Vandaag",
-    "week": "Week"
   }
 }

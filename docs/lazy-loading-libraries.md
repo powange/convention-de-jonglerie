@@ -12,9 +12,11 @@ Ce document détaille la stratégie de lazy loading des bibliothèques tierces l
 ## Leaflet (Cartes interactives)
 
 ### État actuel
+
 ✅ **Déjà en lazy loading**
 
 ### Implémentation
+
 Le composable `useLeafletMap.ts` charge Leaflet dynamiquement via CDN :
 
 ```typescript
@@ -30,10 +32,12 @@ const loadLeaflet = async () => {
 ```
 
 ### Composants utilisant Leaflet
+
 - `app/components/HomeMap.vue` : Carte des conventions sur la page d'accueil
 - `app/components/FavoritesMap.vue` : Carte des favoris
 
 ### Avantages
+
 - Leaflet (~145 KB) n'est chargé que sur les pages avec des cartes
 - Chargement depuis le CDN avec cache navigateur
 - Pas d'impact sur le bundle principal
@@ -43,9 +47,11 @@ const loadLeaflet = async () => {
 ## FullCalendar (Calendriers)
 
 ### État actuel
+
 ❌ **PAS encore en lazy loading** - Importé statiquement
 
 ### Packages installés
+
 ```json
 {
   "@fullcalendar/core": "^6.1.15",
@@ -62,6 +68,7 @@ const loadLeaflet = async () => {
 **Taille estimée** : ~300-400 KB (tous les plugins combinés)
 
 ### Composants utilisant FullCalendar
+
 1. **HomeAgenda.vue** : Agenda des éditions sur la page d'accueil
    - Plugins utilisés : daygrid, list, interaction
    - Utilise le composable `useCalendar.ts`
@@ -73,6 +80,7 @@ const loadLeaflet = async () => {
 ### Implémentation actuelle
 
 #### Composable `useCalendar.ts`
+
 ```typescript
 import allLocales from '@fullcalendar/core/locales-all'
 import dayGridPlugin from '@fullcalendar/daygrid'
@@ -81,6 +89,7 @@ import listPlugin from '@fullcalendar/list'
 ```
 
 #### Composants
+
 ```vue
 <template>
   <FullCalendar ref="calendarRef" :options="calendarOptions" />
@@ -94,6 +103,7 @@ import FullCalendar from '@fullcalendar/vue3'
 ### Plan d'implémentation du lazy loading
 
 #### Étape 1 : Créer un composant wrapper
+
 Créer `app/components/ui/LazyFullCalendar.vue` :
 
 ```vue
@@ -148,6 +158,7 @@ defineExpose({
 ```
 
 #### Étape 2 : Adapter le composable `useCalendar.ts`
+
 ```typescript
 // Remplacer les imports statiques par des imports dynamiques
 export function useCalendar(options: UseCalendarOptions) {
@@ -177,17 +188,21 @@ export function useCalendar(options: UseCalendarOptions) {
 ```
 
 #### Étape 3 : Mettre à jour les composants
+
 Remplacer :
+
 ```vue
 import FullCalendar from '@fullcalendar/vue3'
 ```
 
 Par :
+
 ```vue
 import LazyFullCalendar from '~/components/ui/LazyFullCalendar.vue'
 ```
 
 Et dans le template :
+
 ```vue
 <LazyFullCalendar ref="calendarRef" :options="calendarOptions" />
 ```
@@ -195,10 +210,12 @@ Et dans le template :
 ### Impact attendu
 
 #### Avant
+
 - Bundle initial : inclut FullCalendar (~300-400 KB)
 - Chargé sur toutes les pages, même celles qui ne l'utilisent pas
 
 #### Après
+
 - Bundle initial : réduit de ~300-400 KB
 - FullCalendar chargé uniquement sur :
   - Page d'accueil (HomeAgenda)
@@ -206,12 +223,14 @@ Et dans le template :
 - Lazy load via code splitting automatique de Vite
 
 ### Avantages
+
 - Réduction significative du bundle initial
 - Amélioration du Time to Interactive (TTI)
 - Meilleure expérience sur mobile et connexions lentes
 - Code splitting automatique par route
 
 ### Inconvénients potentiels
+
 - Léger délai lors du premier affichage du calendrier
 - Complexité légèrement accrue du code
 - Nécessité de gérer l'état de chargement
@@ -220,10 +239,10 @@ Et dans le template :
 
 ## Résumé
 
-| Bibliothèque | Taille estimée | Status Lazy Loading | Impact |
-|--------------|----------------|---------------------|---------|
-| **Leaflet** | ~145 KB | ✅ Déjà implémenté | Pas dans le bundle initial |
-| **FullCalendar** | ~300-400 KB | ❌ À implémenter | Réduction majeure du bundle |
+| Bibliothèque     | Taille estimée | Status Lazy Loading | Impact                      |
+| ---------------- | -------------- | ------------------- | --------------------------- |
+| **Leaflet**      | ~145 KB        | ✅ Déjà implémenté  | Pas dans le bundle initial  |
+| **FullCalendar** | ~300-400 KB    | ❌ À implémenter    | Réduction majeure du bundle |
 
 **Gain total potentiel** : ~300-400 KB du bundle initial (soit ~30-40% de réduction sur un bundle typique de 1 MB)
 
