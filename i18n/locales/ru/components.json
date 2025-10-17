@@ -172,24 +172,6 @@
       "start_typing_address": "Начните вводить адрес..."
     }
   },
-  "notifications": {
-    "confirm_delete_description": "Вы уверены, что хотите удалить это уведомление?",
-    "confirm_delete_title": "Удалить уведомление",
-    "loading": "Загрузка des notifications...",
-    "manage_description": "Управляйте своими уведомлениями и настройками",
-    "none_found": "Уведомления не найдены",
-    "push": {
-      "blocked": "Уведомления заблокированы в настройках браузера",
-      "description": "Получайте уведомления даже когда приложение закрыто",
-      "disabled": "Уведомления отключены",
-      "enabled": "Уведомления включены на этом устройстве",
-      "not_supported": "Push-уведомления не поддерживаются в этом браузере",
-      "test_button": "Тестировать уведомление",
-      "title": "Push-уведомления"
-    },
-    "this_week": "На этой неделе",
-    "unread": "Непрочитанные"
-  },
   "push_notifications": {
     "promo_modal": {
       "benefits": {

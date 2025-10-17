@@ -172,24 +172,6 @@
       "start_typing_address": "Start typing an address..."
     }
   },
-  "notifications": {
-    "confirm_delete_description": "Are you sure you want to delete this notification?",
-    "confirm_delete_title": "Delete notification",
-    "loading": "Loading notifications...",
-    "manage_description": "Manage your notifications and preferences",
-    "none_found": "No notifications found",
-    "push": {
-      "blocked": "Notifications blocked in browser settings",
-      "description": "Receive notifications even when the application is closed",
-      "disabled": "Notifications disabled",
-      "enabled": "Notifications enabled on this device",
-      "not_supported": "Push notifications not supported on this browser",
-      "test_button": "Test a notification",
-      "title": "Push notifications"
-    },
-    "this_week": "This week",
-    "unread": "Unread"
-  },
   "push_notifications": {
     "promo_modal": {
       "benefits": {

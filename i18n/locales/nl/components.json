@@ -172,24 +172,6 @@
       "start_typing_address": "Begin met het typen van een adres..."
     }
   },
-  "notifications": {
-    "confirm_delete_description": "Weet je zeker dat je deze melding wilt verwijderen?",
-    "confirm_delete_title": "Melding verwijderen",
-    "loading": "Laden des notifications...",
-    "manage_description": "Beheer je meldingen en voorkeuren",
-    "none_found": "Geen meldingen gevonden",
-    "push": {
-      "blocked": "Meldingen geblokkeerd in browserinstellingen",
-      "description": "Ontvang meldingen zelfs wanneer de applicatie gesloten is",
-      "disabled": "Meldingen uitgeschakeld",
-      "enabled": "Meldingen ingeschakeld op dit apparaat",
-      "not_supported": "Push-meldingen niet ondersteund op deze browser",
-      "test_button": "Test een melding",
-      "title": "Push-meldingen"
-    },
-    "this_week": "Deze week",
-    "unread": "Ongelezen"
-  },
   "push_notifications": {
     "promo_modal": {
       "benefits": {

@@ -8,21 +8,34 @@ import {
 import { notificationStreamManager } from './notification-stream-manager'
 import { prisma } from './prisma'
 import { pushNotificationService } from './push-notification-service'
+import { translateServerSide } from './server-i18n'
 
 import type { NotificationType } from '@prisma/client'
 
+/**
+ * Données pour créer une notification
+ * Doit contenir SOIT des clés de traduction SOIT du texte libre
+ */
 export interface CreateNotificationData {
   userId: number
   type: NotificationType
-  title: string
-  message: string
   category?: string
   entityType?: string
   entityId?: string
   actionUrl?: string
-  actionText?: string
   // Type de notification pour vérifier les préférences
   notificationType?: CustomNotificationType
+
+  // SYSTÈME DE TRADUCTION (notifications système)
+  titleKey?: string
+  messageKey?: string
+  translationParams?: Record<string, any>
+  actionTextKey?: string
+
+  // TEXTE LIBRE (notifications custom/orgas)
+  titleText?: string
+  messageText?: string
+  actionText?: string
 }
 
 export interface NotificationFilters {
@@ -41,6 +54,16 @@ export const NotificationService = {
    * Crée une nouvelle notification
    */
   async create(data: CreateNotificationData) {
+    // Validation : au moins un système doit être utilisé
+    const hasTranslationKeys = !!(data.titleKey || data.messageKey)
+    const hasTextFields = !!(data.titleText || data.messageText)
+
+    if (!hasTranslationKeys && !hasTextFields) {
+      throw new Error(
+        'Au moins un système doit être utilisé (titleKey/messageKey OU titleText/messageText)'
+      )
+    }
+
     // Vérifier les préférences utilisateur si un type de notification est spécifié
     if (data.notificationType) {
       const preferenceKey = NotificationTypeMapping[data.notificationType]
@@ -65,13 +88,20 @@ export const NotificationService = {
       data: {
         userId: data.userId,
         type: data.type,
-        title: data.title,
-        message: data.message,
+        // Système de traduction
+        titleKey: data.titleKey,
+        messageKey: data.messageKey,
+        translationParams: data.translationParams,
+        actionTextKey: data.actionTextKey,
+        // Texte libre
+        titleText: data.titleText,
+        messageText: data.messageText,
+        actionText: data.actionText,
+        // Métadonnées
         category: data.category,
         entityType: data.entityType,
         entityId: data.entityId,
         actionUrl: data.actionUrl,
-        actionText: data.actionText,
       },
       include: {
         user: {
@@ -79,6 +109,7 @@ export const NotificationService = {
             id: true,
             pseudo: true,
             email: true,
+            preferredLanguage: true,
           },
         },
       },
@@ -97,9 +128,33 @@ export const NotificationService = {
 
     // Envoyer aussi en push notification si disponible
     try {
-      const pushSent = await pushNotificationService.sendNotification(notification)
+      // Traduire la notification pour le push selon la langue préférée de l'utilisateur
+      const userLang = notification.user.preferredLanguage || 'fr'
+
+      const pushData = {
+        title: notification.titleKey
+          ? translateServerSide(
+              notification.titleKey,
+              notification.translationParams || {},
+              userLang
+            )
+          : notification.titleText || '',
+        body: notification.messageKey
+          ? translateServerSide(
+              notification.messageKey,
+              notification.translationParams || {},
+              userLang
+            )
+          : notification.messageText || '',
+        data: {
+          url: notification.actionUrl,
+          notificationId: notification.id,
+        },
+      }
+
+      const pushSent = await pushNotificationService.sendToUser(notification.userId, pushData)
       console.log(
-        `[NotificationService] Notification ${notification.id} ${pushSent ? 'envoyée' : 'non envoyée'} via Push`
+        `[NotificationService] Notification ${notification.id} ${pushSent ? 'envoyée' : 'non envoyée'} via Push (langue: ${userLang})`
       )
     } catch (error) {
       console.error('[NotificationService] Erreur envoi Push:', error)
@@ -122,29 +177,48 @@ export const NotificationService = {
             const prenom = user.prenom || user.pseudo || 'Utilisateur'
             const preferredLanguage = user.preferredLanguage || 'fr'
 
-            // TODO: Implémenter la traduction des emails selon la langue préférée
-            // Pour l'instant, les emails sont envoyés en français
-            console.log(
-              `[NotificationService] Langue préférée de l'utilisateur ${data.userId}: ${preferredLanguage}`
-            )
+            // Traduire le contenu de l'email selon la langue préférée
+            const emailTitle = notification.titleKey
+              ? translateServerSide(
+                  notification.titleKey,
+                  notification.translationParams || {},
+                  preferredLanguage
+                )
+              : notification.titleText || ''
+
+            const emailMessage = notification.messageKey
+              ? translateServerSide(
+                  notification.messageKey,
+                  notification.translationParams || {},
+                  preferredLanguage
+                )
+              : notification.messageText || ''
+
+            const emailActionText = notification.actionTextKey
+              ? translateServerSide(
+                  notification.actionTextKey,
+                  notification.translationParams || {},
+                  preferredLanguage
+                )
+              : notification.actionText
 
             const emailHtml = await generateNotificationEmailHtml(
               prenom,
-              data.title,
-              data.message,
-              data.actionUrl,
-              data.actionText
+              emailTitle,
+              emailMessage,
+              notification.actionUrl,
+              emailActionText
             )
 
             const emailSent = await sendEmail({
               to: user.email,
-              subject: data.title,
+              subject: emailTitle,
               html: emailHtml,
-              text: data.message,
+              text: emailMessage,
             })
 
             console.log(
-              `[NotificationService] Email notification ${notification.id} ${emailSent ? 'envoyé' : 'non envoyé'} à ${user.email}`
+              `[NotificationService] Email notification ${notification.id} ${emailSent ? 'envoyé' : 'non envoyé'} à ${user.email} (langue: ${preferredLanguage})`
             )
           }
         } else {
@@ -330,12 +404,11 @@ export const NotificationHelpers = {
     return await NotificationService.create({
       userId,
       type: 'SUCCESS',
-      title: 'Bienvenue ! 🎉',
-      message:
-        'Votre compte a été créé avec succès. Découvrez les conventions de jonglerie près de chez vous !',
+      titleKey: 'notifications.welcome.title',
+      messageKey: 'notifications.welcome.message',
+      actionTextKey: 'notifications.welcome.action',
       category: 'system',
       actionUrl: '/',
-      actionText: 'Voir les conventions',
       notificationType: 'welcome',
     })
   },
@@ -347,13 +420,14 @@ export const NotificationHelpers = {
     return await NotificationService.create({
       userId,
       type: 'INFO',
-      title: 'Nouvelle convention ajoutée',
-      message: `La convention "${conventionName}" vient d'être ajoutée à la plateforme.`,
+      titleKey: 'notifications.edition.new_convention.title',
+      messageKey: 'notifications.edition.new_convention.message',
+      translationParams: { conventionName },
+      actionTextKey: 'notifications.common.view_details',
       category: 'edition',
       entityType: 'Convention',
       entityId: conventionId.toString(),
       actionUrl: `/conventions/${conventionId}`,
-      actionText: 'Voir les détails',
       notificationType: 'new_convention',
     })
   },
@@ -365,13 +439,14 @@ export const NotificationHelpers = {
     return await NotificationService.create({
       userId,
       type: 'SUCCESS',
-      title: 'Candidature de bénévolat envoyée ! 🎉',
-      message: `Votre candidature pour "${editionName}" a été envoyée avec succès. Les organisateurs vont l'examiner.`,
+      titleKey: 'notifications.volunteer.application_submitted.title',
+      messageKey: 'notifications.volunteer.application_submitted.message',
+      translationParams: { editionName },
+      actionTextKey: 'notifications.volunteer.application_submitted.action',
       category: 'volunteer',
       entityType: 'Edition',
       entityId: editionId.toString(),
       actionUrl: '/my-volunteer-applications',
-      actionText: 'Voir mes candidatures',
       notificationType: 'volunteer_application_submitted',
     })
   },
@@ -386,32 +461,38 @@ export const NotificationHelpers = {
     assignedTeams?: string[],
     organizerNote?: string | null
   ) {
-    let message = `Votre candidature de bénévolat pour "${editionName}" a été acceptée.`
+    // Choisir la bonne clé de message selon le contexte
+    let messageKey = 'notifications.volunteer.application_accepted.message'
+    const translationParams: Record<string, any> = { editionName }
 
-    // Ajouter la liste des équipes si présente
-    if (assignedTeams && assignedTeams.length > 0) {
-      if (assignedTeams.length === 1) {
-        message += `\n\nVous êtes assigné(e) à l'équipe : ${assignedTeams[0]}`
-      } else {
-        message += `\n\nVous êtes assigné(e) aux équipes :\n• ${assignedTeams.join('\n• ')}`
-      }
+    // Version avec équipes et note
+    if (assignedTeams && assignedTeams.length > 0 && organizerNote?.trim()) {
+      messageKey = 'notifications.volunteer.application_accepted.message_complete'
+      translationParams.teams = assignedTeams.join('\n• ')
+      translationParams.note = organizerNote.trim()
     }
-
-    // Ajouter le message de l'organisateur si présent
-    if (organizerNote?.trim()) {
-      message += `\n\nMessage de l'organisateur :\n"${organizerNote.trim()}"`
+    // Version avec équipes uniquement
+    else if (assignedTeams && assignedTeams.length > 0) {
+      messageKey = 'notifications.volunteer.application_accepted.message_with_teams'
+      translationParams.teams = assignedTeams.join('\n• ')
+    }
+    // Version avec note uniquement
+    else if (organizerNote?.trim()) {
+      messageKey = 'notifications.volunteer.application_accepted.message_with_note'
+      translationParams.note = organizerNote.trim()
     }
 
     return await NotificationService.create({
       userId,
       type: 'SUCCESS',
-      title: 'Candidature acceptée ! ✅',
-      message,
+      titleKey: 'notifications.volunteer.application_accepted.title',
+      messageKey,
+      translationParams,
+      actionTextKey: 'notifications.volunteer.application_accepted.action',
       category: 'volunteer',
       entityType: 'Edition',
       entityId: editionId.toString(),
       actionUrl: `/editions/${editionId}/volunteers`,
-      actionText: 'Voir les détails',
       notificationType: 'volunteer_application_accepted',
     })
   },
@@ -423,13 +504,14 @@ export const NotificationHelpers = {
     return await NotificationService.create({
       userId,
       type: 'WARNING',
-      title: 'Candidature non retenue',
-      message: `Votre candidature de bénévolat pour "${editionName}" n'a pas été retenue cette fois.`,
+      titleKey: 'notifications.volunteer.application_rejected.title',
+      messageKey: 'notifications.volunteer.application_rejected.message',
+      translationParams: { editionName },
+      actionTextKey: 'notifications.volunteer.application_rejected.action',
       category: 'volunteer',
       entityType: 'Edition',
       entityId: editionId.toString(),
       actionUrl: `/editions/${editionId}`,
-      actionText: "Voir l'édition",
       notificationType: 'volunteer_application_rejected',
     })
   },
@@ -441,13 +523,14 @@ export const NotificationHelpers = {
     return await NotificationService.create({
       userId,
       type: 'INFO',
-      title: 'Candidature remise en attente',
-      message: `Votre candidature de bénévolat pour "${editionName}" a été remise en attente par les organisateurs.`,
+      titleKey: 'notifications.volunteer.back_to_pending.title',
+      messageKey: 'notifications.volunteer.back_to_pending.message',
+      translationParams: { editionName },
+      actionTextKey: 'notifications.volunteer.back_to_pending.action',
       category: 'volunteer',
       entityType: 'Edition',
       entityId: editionId.toString(),
       actionUrl: '/my-volunteer-applications',
-      actionText: 'Voir ma candidature',
       notificationType: 'volunteer_application_modified',
     })
   },
@@ -459,13 +542,14 @@ export const NotificationHelpers = {
     return await NotificationService.create({
       userId,
       type: 'INFO',
-      title: "Rappel d'événement 📅",
-      message: `L'édition "${editionName}" commence dans ${daysUntil} jour${daysUntil > 1 ? 's' : ''} !`,
+      titleKey: 'notifications.edition.reminder.title',
+      messageKey: 'notifications.edition.reminder.message',
+      translationParams: { editionName, daysUntil },
+      actionTextKey: 'notifications.edition.reminder.action',
       category: 'edition',
       entityType: 'Edition',
       entityId: editionId.toString(),
       actionUrl: `/editions/${editionId}`,
-      actionText: 'Voir les détails',
     })
   },
 
@@ -476,8 +560,9 @@ export const NotificationHelpers = {
     return await NotificationService.create({
       userId,
       type: 'ERROR',
-      title: 'Erreur système',
-      message: `Une erreur s'est produite : ${errorMessage}`,
+      titleKey: 'notifications.system.error.title',
+      messageKey: 'notifications.system.error.message',
+      translationParams: { errorMessage },
       category: 'system',
       notificationType: 'system_error',
     })
@@ -491,7 +576,7 @@ export const NotificationHelpers = {
     requesterName: string,
     offerId: number,
     seats: number,
-    message?: string
+    note?: string
   ) {
     // Récupérer l'ID de l'édition pour construire la bonne URL
     const offer = await prisma.carpoolOffer.findUnique({
@@ -503,16 +588,27 @@ export const NotificationHelpers = {
       ? `/editions/${offer.editionId}/covoiturage?offerId=${offerId}`
       : `/carpool-offers/${offerId}`
 
+    // Choisir la bonne clé selon si il y a un message ou non
+    const messageKey = note
+      ? 'notifications.carpool.booking_received.message_with_note'
+      : 'notifications.carpool.booking_received.message'
+
+    const translationParams: Record<string, any> = { requesterName, seats }
+    if (note) {
+      translationParams.note = note
+    }
+
     return await NotificationService.create({
       userId,
       type: 'INFO',
-      title: 'Nouvelle demande de covoiturage 🚗',
-      message: `${requesterName} souhaite réserver ${seats} place${seats > 1 ? 's' : ''} dans votre covoiturage${message ? ` : "${message}"` : '.'}`,
+      titleKey: 'notifications.carpool.booking_received.title',
+      messageKey,
+      translationParams,
+      actionTextKey: 'notifications.carpool.booking_received.action',
       category: 'carpool',
       entityType: 'CarpoolOffer',
       entityId: offerId.toString(),
       actionUrl,
-      actionText: 'Voir la demande',
       notificationType: 'carpool_booking_received',
     })
   },
@@ -538,21 +634,20 @@ export const NotificationHelpers = {
       ? `/editions/${offer.editionId}/covoiturage?offerId=${offerId}`
       : `/carpool-offers/${offerId}`
 
-    const dateStr = tripDate.toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    })
+    // Note: La date sera formatée côté client selon la locale
+    const dateStr = tripDate.toISOString()
+
     return await NotificationService.create({
       userId,
       type: 'SUCCESS',
-      title: 'Demande de covoiturage acceptée ! ✅',
-      message: `${ownerName} a accepté votre demande de ${seats} place${seats > 1 ? 's' : ''} pour le trajet au départ de ${locationCity} le ${dateStr}.`,
+      titleKey: 'notifications.carpool.booking_accepted.title',
+      messageKey: 'notifications.carpool.booking_accepted.message',
+      translationParams: { ownerName, seats, locationCity, date: dateStr },
+      actionTextKey: 'notifications.carpool.booking_accepted.action',
       category: 'carpool',
       entityType: 'CarpoolOffer',
       entityId: offerId.toString(),
       actionUrl,
-      actionText: 'Voir les détails',
       notificationType: 'carpool_booking_accepted',
     })
   },
@@ -580,13 +675,14 @@ export const NotificationHelpers = {
     return await NotificationService.create({
       userId,
       type: 'WARNING',
-      title: 'Demande de covoiturage refusée',
-      message: `${ownerName} a refusé votre demande de ${seats} place${seats > 1 ? 's' : ''} pour le trajet au départ de ${locationCity}.`,
+      titleKey: 'notifications.carpool.booking_rejected.title',
+      messageKey: 'notifications.carpool.booking_rejected.message',
+      translationParams: { ownerName, seats, locationCity },
+      actionTextKey: 'notifications.carpool.booking_rejected.action',
       category: 'carpool',
       entityType: 'CarpoolOffer',
       entityId: offerId.toString(),
       actionUrl,
-      actionText: "Voir d'autres offres",
       notificationType: 'carpool_booking_rejected',
     })
   },
@@ -612,22 +708,20 @@ export const NotificationHelpers = {
       ? `/editions/${offer.editionId}/covoiturage?offerId=${offerId}`
       : `/carpool-offers/${offerId}`
 
-    const dateStr = tripDate.toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    })
+    // Note: La date sera formatée côté client selon la locale
+    const dateStr = tripDate.toISOString()
 
     return await NotificationService.create({
       userId,
       type: 'INFO',
-      title: 'Réservation annulée 📅',
-      message: `${passengerName} a annulé sa réservation de ${seats} place${seats > 1 ? 's' : ''} pour le trajet au départ de ${locationCity} le ${dateStr}.`,
+      titleKey: 'notifications.carpool.booking_cancelled.title',
+      messageKey: 'notifications.carpool.booking_cancelled.message',
+      translationParams: { passengerName, seats, locationCity, date: dateStr },
+      actionTextKey: 'notifications.carpool.booking_cancelled.action',
       category: 'carpool',
       entityType: 'CarpoolOffer',
       entityId: offerId.toString(),
       actionUrl,
-      actionText: 'Voir le covoiturage',
       notificationType: 'carpool_booking_cancelled',
     })
   },

@@ -1,0 +1,80 @@
+{
+  "notifications": {
+    "carpool": {
+      "booking_accepted": {
+        "action": "Details ansehen",
+        "message": "{ownerName} hat Ihre Anfrage für {seats} Platz/Plätze für die Fahrt von {locationCity} am {date} akzeptiert",
+        "title": "Anfrage akzeptiert! ✅"
+      },
+      "booking_cancelled": {
+        "action": "Mitfahrgelegenheit ansehen",
+        "message": "{passengerName} hat seine/ihre Reservierung von {seats} Platz/Plätzen für die Fahrt von {locationCity} am {date} storniert",
+        "title": "Reservierung storniert 📅"
+      },
+      "booking_received": {
+        "action": "Anfrage ansehen",
+        "message": "{requesterName} möchte {seats} Platz/Plätze in Ihrer Mitfahrgelegenheit reservieren",
+        "message_with_note": "{requesterName} möchte {seats} Platz/Plätze reservieren: \"{note}\"",
+        "title": "Neue Mitfahranfrage 🚗"
+      },
+      "booking_rejected": {
+        "action": "Andere Angebote ansehen",
+        "message": "{ownerName} hat Ihre Anfrage für {seats} Platz/Plätze für die Fahrt von {locationCity} abgelehnt",
+        "title": "Anfrage abgelehnt"
+      }
+    },
+    "common": {
+      "close": "Schließen",
+      "view": "Ansehen",
+      "view_details": "Details ansehen"
+    },
+    "edition": {
+      "new_convention": {
+        "action": "Details ansehen",
+        "message": "Die Convention \"{conventionName}\" wurde gerade zur Plattform hinzugefügt.",
+        "title": "Neue Convention hinzugefügt"
+      },
+      "reminder": {
+        "action": "Details ansehen",
+        "message": "Die Edition \"{editionName}\" beginnt in {daysUntil} Tag(en)!",
+        "title": "Veranstaltungserinnerung 📅"
+      }
+    },
+    "system": {
+      "error": {
+        "message": "Ein Fehler ist aufgetreten: {errorMessage}",
+        "title": "Systemfehler"
+      }
+    },
+    "volunteer": {
+      "application_accepted": {
+        "action": "Details ansehen",
+        "message": "Ihre Freiwilligenbewerbung für \"{editionName}\" wurde angenommen.",
+        "message_complete": "Ihre Bewerbung für \"{editionName}\" wurde angenommen.\n\nSie wurden den folgenden Teams zugewiesen:\n• {teams}\n\nNachricht vom Organisator:\n\"{note}\"",
+        "message_with_note": "Ihre Bewerbung für \"{editionName}\" wurde angenommen.\n\nNachricht vom Organisator:\n\"{note}\"",
+        "message_with_teams": "Ihre Bewerbung für \"{editionName}\" wurde angenommen.\n\nSie wurden den folgenden Teams zugewiesen:\n• {teams}",
+        "title": "Bewerbung angenommen! ✅"
+      },
+      "application_rejected": {
+        "action": "Edition ansehen",
+        "message": "Ihre Freiwilligenbewerbung für \"{editionName}\" wurde dieses Mal leider nicht angenommen.",
+        "title": "Bewerbung nicht angenommen"
+      },
+      "application_submitted": {
+        "action": "Meine Bewerbungen ansehen",
+        "message": "Ihre Bewerbung für \"{editionName}\" wurde erfolgreich eingereicht. Die Organisatoren werden sie prüfen.",
+        "title": "Bewerbung eingereicht! 🎉"
+      },
+      "back_to_pending": {
+        "action": "Meine Bewerbung ansehen",
+        "message": "Ihre Freiwilligenbewerbung für \"{editionName}\" wurde von den Organisatoren zurück auf ausstehend gesetzt.",
+        "title": "Bewerbung zurück auf ausstehend"
+      }
+    },
+    "welcome": {
+      "action": "Conventions ansehen",
+      "message": "Ihr Konto wurde erfolgreich erstellt. Entdecken Sie Jonglier-Conventions in Ihrer Nähe!",
+      "title": "Willkommen! 🎉"
+    }
+  }
+}

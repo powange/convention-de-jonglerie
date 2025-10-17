@@ -142,7 +142,7 @@
               <div class="flex-1 min-w-0">
                 <div class="flex items-start justify-between">
                   <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                    {{ notification.title }}
+                    {{ getNotificationTitle(notification) }}
                   </h4>
                   <div class="flex items-center gap-1 ml-2">
                     <!-- Indicateur non lu -->
@@ -162,7 +162,7 @@
                 </div>
 
                 <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 whitespace-pre-line">
-                  {{ notification.message }}
+                  {{ getNotificationMessage(notification) }}
                 </p>
 
                 <div class="flex items-center justify-between mt-2">
@@ -172,13 +172,13 @@
 
                   <!-- Bouton d'action si présent -->
                   <UButton
-                    v-if="notification.actionText && notification.actionUrl"
+                    v-if="getNotificationActionText(notification) && notification.actionUrl"
                     variant="ghost"
                     size="xs"
                     :to="notification.actionUrl"
                     @click.stop
                   >
-                    {{ notification.actionText }}
+                    {{ getNotificationActionText(notification) }}
                   </UButton>
                 </div>
               </div>
@@ -271,7 +271,35 @@ const getNotificationIconColor = (type: string) => {
   }
 }
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
+
+// Méthodes de traduction pour le système hybride
+const getNotificationTitle = (notification: Notification) => {
+  // Système de traduction - utiliser la clé
+  if (notification.titleKey) {
+    return t(notification.titleKey, notification.translationParams || {})
+  }
+  // Texte libre - afficher directement
+  return notification.titleText || ''
+}
+
+const getNotificationMessage = (notification: Notification) => {
+  // Système de traduction - utiliser la clé
+  if (notification.messageKey) {
+    return t(notification.messageKey, notification.translationParams || {})
+  }
+  // Texte libre - afficher directement
+  return notification.messageText || ''
+}
+
+const getNotificationActionText = (notification: Notification) => {
+  // Système de traduction - utiliser la clé
+  if (notification.actionTextKey) {
+    return t(notification.actionTextKey, notification.translationParams || {})
+  }
+  // Texte libre - afficher directement
+  return notification.actionText || null
+}
 
 const formatRelativeTime = (dateString: string) => {
   const date = new Date(dateString)

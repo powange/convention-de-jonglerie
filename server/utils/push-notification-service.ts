@@ -2,8 +2,6 @@ import webpush from 'web-push'
 
 import { prisma } from './prisma'
 
-import type { Notification } from '@prisma/client'
-
 // Interface pour les données de notification push
 interface PushNotificationData {
   title: string
@@ -135,22 +133,6 @@ class PushNotificationService {
       console.error("[Push Service] Erreur lors de l'envoi à tous:", error)
       return 0
     }
-  }
-
-  /**
-   * Envoyer une notification depuis un objet Notification de la DB
-   */
-  async sendNotification(notification: Notification): Promise<boolean> {
-    const data: PushNotificationData = {
-      title: notification.title,
-      message: notification.message,
-      url: notification.actionUrl || '/',
-      actionText: notification.actionText || 'Voir',
-      id: notification.id.toString(),
-      type: notification.type,
-    }
-
-    return this.sendToUser(notification.userId, data)
   }
 
   /**

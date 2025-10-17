@@ -1,0 +1,40 @@
+{
+  "feedback": {
+    "description": "Pomóż nam udoskonalić platformę, dzieląc się swoimi komentarzami, sugestiami lub zgłoszeniami błędów.",
+    "email": {
+      "label": "Twój email",
+      "placeholder": "twoj{'@'}email.com"
+    },
+    "guest": {
+      "info": "Jako gość, podaj swoje dane kontaktowe w celu ewentualnego kontaktu zwrotnego."
+    },
+    "message": {
+      "label": "Szczegółowa wiadomość",
+      "placeholder": "Opisz szczegółowo swoją opinię, sugestię lub napotkany problem..."
+    },
+    "name": {
+      "label": "Twoje imię",
+      "placeholder": "Twoje imię i nazwisko"
+    },
+    "recaptcha": {
+      "and": "oraz",
+      "apply": "Google",
+      "privacy_policy": "Polityka prywatności",
+      "protected_by": "Ta strona jest chroniona przez reCAPTCHA i obowiązują",
+      "terms_of_service": "Warunki korzystania"
+    },
+    "subject": {
+      "label": "Temat",
+      "placeholder": "Krótko opisz swoją opinię"
+    },
+    "title": "Cenimy Twoją opinię",
+    "type": {
+      "label": "Typ opinii",
+      "placeholder": "Wybierz typ"
+    },
+    "url": {
+      "label": "Powiązana strona (automatyczne)",
+      "placeholder": "URL strony"
+    }
+  }
+}

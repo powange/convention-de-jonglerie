@@ -1,0 +1,80 @@
+{
+  "notifications": {
+    "carpool": {
+      "booking_accepted": {
+        "action": "View details",
+        "message": "{ownerName} has accepted your request for {seats} seat(s) for the trip from {locationCity} on {date}",
+        "title": "Request accepted! ✅"
+      },
+      "booking_cancelled": {
+        "action": "View carpool",
+        "message": "{passengerName} has cancelled their booking of {seats} seat(s) for the trip from {locationCity} on {date}",
+        "title": "Booking cancelled 📅"
+      },
+      "booking_received": {
+        "action": "View request",
+        "message": "{requesterName} wants to book {seats} seat(s) in your carpool",
+        "message_with_note": "{requesterName} wants to book {seats} seat(s): \"{note}\"",
+        "title": "New carpool request 🚗"
+      },
+      "booking_rejected": {
+        "action": "View other offers",
+        "message": "{ownerName} has declined your request for {seats} seat(s) for the trip from {locationCity}",
+        "title": "Request declined"
+      }
+    },
+    "common": {
+      "close": "Close",
+      "view": "View",
+      "view_details": "View details"
+    },
+    "edition": {
+      "new_convention": {
+        "action": "View details",
+        "message": "The convention \"{conventionName}\" has just been added to the platform.",
+        "title": "New convention added"
+      },
+      "reminder": {
+        "action": "View details",
+        "message": "The edition \"{editionName}\" starts in {daysUntil} day(s)!",
+        "title": "Event reminder 📅"
+      }
+    },
+    "system": {
+      "error": {
+        "message": "An error occurred: {errorMessage}",
+        "title": "System error"
+      }
+    },
+    "volunteer": {
+      "application_accepted": {
+        "action": "View details",
+        "message": "Your volunteer application for \"{editionName}\" has been accepted.",
+        "message_complete": "Your application for \"{editionName}\" has been accepted.\n\nYou have been assigned to the following teams:\n• {teams}\n\nMessage from the organizer:\n\"{note}\"",
+        "message_with_note": "Your application for \"{editionName}\" has been accepted.\n\nMessage from the organizer:\n\"{note}\"",
+        "message_with_teams": "Your application for \"{editionName}\" has been accepted.\n\nYou have been assigned to the following teams:\n• {teams}",
+        "title": "Application accepted! ✅"
+      },
+      "application_rejected": {
+        "action": "View edition",
+        "message": "Your volunteer application for \"{editionName}\" was not accepted this time.",
+        "title": "Application not accepted"
+      },
+      "application_submitted": {
+        "action": "View my applications",
+        "message": "Your application for \"{editionName}\" has been successfully submitted. The organizers will review it.",
+        "title": "Application submitted! 🎉"
+      },
+      "back_to_pending": {
+        "action": "View my application",
+        "message": "Your volunteer application for \"{editionName}\" has been put back to pending by the organizers.",
+        "title": "Application back to pending"
+      }
+    },
+    "welcome": {
+      "action": "View conventions",
+      "message": "Your account has been successfully created. Discover juggling conventions near you!",
+      "title": "Welcome! 🎉"
+    }
+  }
+}

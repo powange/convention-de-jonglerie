@@ -1,0 +1,80 @@
+{
+  "notifications": {
+    "carpool": {
+      "booking_accepted": {
+        "action": "Ver detalhes",
+        "message": "{ownerName} aceitou o seu pedido de {seats} lugar(es) para a viagem de {locationCity} em {date}",
+        "title": "Pedido aceite! ✅"
+      },
+      "booking_cancelled": {
+        "action": "Ver boleia",
+        "message": "{passengerName} cancelou a sua reserva de {seats} lugar(es) para a viagem de {locationCity} em {date}",
+        "title": "Reserva cancelada 📅"
+      },
+      "booking_received": {
+        "action": "Ver pedido",
+        "message": "{requesterName} quer reservar {seats} lugar(es) na sua boleia",
+        "message_with_note": "{requesterName} quer reservar {seats} lugar(es): \"{note}\"",
+        "title": "Novo pedido de boleia 🚗"
+      },
+      "booking_rejected": {
+        "action": "Ver outras ofertas",
+        "message": "{ownerName} recusou o seu pedido de {seats} lugar(es) para a viagem de {locationCity}",
+        "title": "Pedido recusado"
+      }
+    },
+    "common": {
+      "close": "Fechar",
+      "view": "Ver",
+      "view_details": "Ver detalhes"
+    },
+    "edition": {
+      "new_convention": {
+        "action": "Ver detalhes",
+        "message": "A convenção \"{conventionName}\" acabou de ser adicionada à plataforma.",
+        "title": "Nova convenção adicionada"
+      },
+      "reminder": {
+        "action": "Ver detalhes",
+        "message": "A edição \"{editionName}\" começa em {daysUntil} dia(s)!",
+        "title": "Lembrete de evento 📅"
+      }
+    },
+    "system": {
+      "error": {
+        "message": "Ocorreu um erro: {errorMessage}",
+        "title": "Erro do sistema"
+      }
+    },
+    "volunteer": {
+      "application_accepted": {
+        "action": "Ver detalhes",
+        "message": "A sua candidatura de voluntário para \"{editionName}\" foi aceite.",
+        "message_complete": "A sua candidatura para \"{editionName}\" foi aceite.\n\nFoi atribuído às seguintes equipas:\n• {teams}\n\nMensagem do organizador:\n\"{note}\"",
+        "message_with_note": "A sua candidatura para \"{editionName}\" foi aceite.\n\nMensagem do organizador:\n\"{note}\"",
+        "message_with_teams": "A sua candidatura para \"{editionName}\" foi aceite.\n\nFoi atribuído às seguintes equipas:\n• {teams}",
+        "title": "Candidatura aceite! ✅"
+      },
+      "application_rejected": {
+        "action": "Ver edição",
+        "message": "A sua candidatura de voluntário para \"{editionName}\" não foi aceite desta vez.",
+        "title": "Candidatura não aceite"
+      },
+      "application_submitted": {
+        "action": "Ver as minhas candidaturas",
+        "message": "A sua candidatura para \"{editionName}\" foi enviada com sucesso. Os organizadores irão analisá-la.",
+        "title": "Candidatura enviada! 🎉"
+      },
+      "back_to_pending": {
+        "action": "Ver a minha candidatura",
+        "message": "A sua candidatura de voluntário para \"{editionName}\" foi colocada de volta a pendente pelos organizadores.",
+        "title": "Candidatura de volta a pendente"
+      }
+    },
+    "welcome": {
+      "action": "Ver convenções",
+      "message": "A sua conta foi criada com sucesso. Descubra convenções de malabarismo perto de si!",
+      "title": "Bem-vindo! 🎉"
+    }
+  }
+}

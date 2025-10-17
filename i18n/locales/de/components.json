@@ -172,24 +172,6 @@
       "start_typing_address": "Beginne eine Adresse zu tippen..."
     }
   },
-  "notifications": {
-    "confirm_delete_description": "Sind Sie sicher, dass Sie diese Benachrichtigung löschen möchten?",
-    "confirm_delete_title": "Benachrichtigung löschen",
-    "loading": "Laden des notifications...",
-    "manage_description": "Verwalten Sie Ihre Benachrichtigungen und Einstellungen",
-    "none_found": "Keine Benachrichtigungen gefunden",
-    "push": {
-      "blocked": "Benachrichtigungen in den Browsereinstellungen blockiert",
-      "description": "Erhalten Sie Benachrichtigungen auch wenn die Anwendung geschlossen ist",
-      "disabled": "Benachrichtigungen deaktiviert",
-      "enabled": "Benachrichtigungen auf diesem Gerät aktiviert",
-      "not_supported": "Push-Benachrichtigungen werden von diesem Browser nicht unterstützt",
-      "test_button": "Eine Benachrichtigung testen",
-      "title": "Push-Benachrichtigungen"
-    },
-    "this_week": "Diese Woche",
-    "unread": "Ungelesen"
-  },
   "push_notifications": {
     "promo_modal": {
       "benefits": {

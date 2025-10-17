@@ -1,0 +1,40 @@
+{
+  "feedback": {
+    "description": "Help ons het platform te verbeteren door je opmerkingen, suggesties of bugrapporten te delen.",
+    "email": {
+      "label": "Je e-mail",
+      "placeholder": "jouw{'@'}email.nl"
+    },
+    "guest": {
+      "info": "Als bezoeker, geef alsjeblieft je contactgegevens voor mogelijke follow-up."
+    },
+    "message": {
+      "label": "Gedetailleerd bericht",
+      "placeholder": "Beschrijf in detail je feedback, suggestie of het probleem dat je hebt ondervonden..."
+    },
+    "name": {
+      "label": "Je naam",
+      "placeholder": "Je voor- en achternaam"
+    },
+    "recaptcha": {
+      "and": "en",
+      "apply": "zijn van toepassing",
+      "privacy_policy": "Privacybeleid",
+      "protected_by": "Deze site wordt beschermd door reCAPTCHA en de",
+      "terms_of_service": "Servicevoorwaarden"
+    },
+    "subject": {
+      "label": "Onderwerp",
+      "placeholder": "Beschrijf kort je feedback"
+    },
+    "title": "We waarderen je feedback",
+    "type": {
+      "label": "Feedbacktype",
+      "placeholder": "Selecteer een type"
+    },
+    "url": {
+      "label": "Gerelateerde pagina (automatisch)",
+      "placeholder": "Pagina-URL"
+    }
+  }
+}

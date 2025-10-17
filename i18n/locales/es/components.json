@@ -172,24 +172,6 @@
       "start_typing_address": "Comienza a escribir una dirección..."
     }
   },
-  "notifications": {
-    "confirm_delete_description": "¿Estás seguro de que quieres eliminar esta notificación?",
-    "confirm_delete_title": "Eliminar notificación",
-    "loading": "Cargando notificaciones...",
-    "manage_description": "Gestiona tus notificaciones y preferencias",
-    "none_found": "No se encontraron notificaciones",
-    "push": {
-      "blocked": "Notificaciones bloqueadas en la configuración del navegador",
-      "description": "Reciba notificaciones incluso cuando la aplicación esté cerrada",
-      "disabled": "Notificaciones desactivadas",
-      "enabled": "Notificaciones activadas en este dispositivo",
-      "not_supported": "Notificaciones push no soportadas en este navegador",
-      "test_button": "Probar una notificación",
-      "title": "Notificaciones push"
-    },
-    "this_week": "Esta semana",
-    "unread": "No leídas"
-  },
   "push_notifications": {
     "promo_modal": {
       "benefits": {

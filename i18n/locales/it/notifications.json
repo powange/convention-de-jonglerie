@@ -1,0 +1,80 @@
+{
+  "notifications": {
+    "carpool": {
+      "booking_accepted": {
+        "action": "Vedi dettagli",
+        "message": "{ownerName} ha accettato la tua richiesta di {seats} posto/i per il viaggio da {locationCity} il {date}",
+        "title": "Richiesta accettata! ✅"
+      },
+      "booking_cancelled": {
+        "action": "Vedi car pooling",
+        "message": "{passengerName} ha cancellato la prenotazione di {seats} posto/i per il viaggio da {locationCity} il {date}",
+        "title": "Prenotazione cancellata 📅"
+      },
+      "booking_received": {
+        "action": "Vedi richiesta",
+        "message": "{requesterName} vuole prenotare {seats} posto/i nel tuo car pooling",
+        "message_with_note": "{requesterName} vuole prenotare {seats} posto/i: \"{note}\"",
+        "title": "Nuova richiesta di car pooling 🚗"
+      },
+      "booking_rejected": {
+        "action": "Vedi altre offerte",
+        "message": "{ownerName} ha rifiutato la tua richiesta di {seats} posto/i per il viaggio da {locationCity}",
+        "title": "Richiesta rifiutata"
+      }
+    },
+    "common": {
+      "close": "Chiudi",
+      "view": "Vedi",
+      "view_details": "Vedi dettagli"
+    },
+    "edition": {
+      "new_convention": {
+        "action": "Vedi dettagli",
+        "message": "La convention \"{conventionName}\" è appena stata aggiunta alla piattaforma.",
+        "title": "Nuova convention aggiunta"
+      },
+      "reminder": {
+        "action": "Vedi dettagli",
+        "message": "L'edizione \"{editionName}\" inizia tra {daysUntil} giorno/i!",
+        "title": "Promemoria evento 📅"
+      }
+    },
+    "system": {
+      "error": {
+        "message": "Si è verificato un errore: {errorMessage}",
+        "title": "Errore di sistema"
+      }
+    },
+    "volunteer": {
+      "application_accepted": {
+        "action": "Vedi dettagli",
+        "message": "La tua candidatura da volontario per \"{editionName}\" è stata accettata.",
+        "message_complete": "La tua candidatura per \"{editionName}\" è stata accettata.\n\nSei stato assegnato ai seguenti team:\n• {teams}\n\nMessaggio dall'organizzatore:\n\"{note}\"",
+        "message_with_note": "La tua candidatura per \"{editionName}\" è stata accettata.\n\nMessaggio dall'organizzatore:\n\"{note}\"",
+        "message_with_teams": "La tua candidatura per \"{editionName}\" è stata accettata.\n\nSei stato assegnato ai seguenti team:\n• {teams}",
+        "title": "Candidatura accettata! ✅"
+      },
+      "application_rejected": {
+        "action": "Vedi edizione",
+        "message": "La tua candidatura da volontario per \"{editionName}\" non è stata accettata questa volta.",
+        "title": "Candidatura non accettata"
+      },
+      "application_submitted": {
+        "action": "Vedi le mie candidature",
+        "message": "La tua candidatura per \"{editionName}\" è stata inviata con successo. Gli organizzatori la esamineranno.",
+        "title": "Candidatura inviata! 🎉"
+      },
+      "back_to_pending": {
+        "action": "Vedi la mia candidatura",
+        "message": "La tua candidatura da volontario per \"{editionName}\" è stata rimessa in attesa dagli organizzatori.",
+        "title": "Candidatura tornata in attesa"
+      }
+    },
+    "welcome": {
+      "action": "Vedi convention",
+      "message": "Il tuo account è stato creato con successo. Scopri le convention di giocoleria vicino a te!",
+      "title": "Benvenuto! 🎉"
+    }
+  }
+}

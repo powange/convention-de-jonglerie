@@ -1,0 +1,40 @@
+{
+  "feedback": {
+    "description": "Help us improve the platform by sharing your comments, suggestions or bug reports.",
+    "email": {
+      "label": "Your email",
+      "placeholder": "your{'@'}email.com"
+    },
+    "guest": {
+      "info": "As a visitor, please provide your contact details for potential follow-up."
+    },
+    "message": {
+      "label": "Detailed message",
+      "placeholder": "Describe in detail your feedback, suggestion or the problem encountered..."
+    },
+    "name": {
+      "label": "Your name",
+      "placeholder": "Your first and last name"
+    },
+    "recaptcha": {
+      "and": "and",
+      "apply": "apply",
+      "privacy_policy": "Privacy Policy",
+      "protected_by": "This site is protected by reCAPTCHA and the",
+      "terms_of_service": "Terms of Service"
+    },
+    "subject": {
+      "label": "Subject",
+      "placeholder": "Briefly describe your feedback"
+    },
+    "title": "We value your feedback",
+    "type": {
+      "label": "Feedback type",
+      "placeholder": "Select a type"
+    },
+    "url": {
+      "label": "Related page (automatic)",
+      "placeholder": "Page URL"
+    }
+  }
+}

@@ -172,24 +172,6 @@
       "start_typing_address": "Begynd at skrive en adresse..."
     }
   },
-  "notifications": {
-    "confirm_delete_description": "Er du sikker på, at du vil slette denne notifikation?",
-    "confirm_delete_title": "Slet notifikation",
-    "loading": "Indlæser des notifications...",
-    "manage_description": "Administrer dine beskeder og præferencer",
-    "none_found": "Ingen beskeder fundet",
-    "push": {
-      "blocked": "Notifikationer blokeret i browserindstillinger",
-      "description": "Modtag notifikationer selv når applikationen er lukket",
-      "disabled": "Notifikationer deaktiveret",
-      "enabled": "Notifikationer aktiveret på denne enhed",
-      "not_supported": "Push-notifikationer understøttes ikke på denne browser",
-      "test_button": "Test en notifikation",
-      "title": "Push-notifikationer"
-    },
-    "this_week": "Denne uge",
-    "unread": "Ulæste"
-  },
   "push_notifications": {
     "promo_modal": {
       "benefits": {

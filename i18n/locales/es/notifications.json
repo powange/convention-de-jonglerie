@@ -1,0 +1,80 @@
+{
+  "notifications": {
+    "carpool": {
+      "booking_accepted": {
+        "action": "Ver detalles",
+        "message": "{ownerName} ha aceptado tu solicitud de {seats} asiento(s) para el viaje desde {locationCity} el {date}",
+        "title": "¡Solicitud aceptada! ✅"
+      },
+      "booking_cancelled": {
+        "action": "Ver viaje compartido",
+        "message": "{passengerName} ha cancelado su reserva de {seats} asiento(s) para el viaje desde {locationCity} el {date}",
+        "title": "Reserva cancelada 📅"
+      },
+      "booking_received": {
+        "action": "Ver solicitud",
+        "message": "{requesterName} quiere reservar {seats} asiento(s) en tu viaje compartido",
+        "message_with_note": "{requesterName} quiere reservar {seats} asiento(s): \"{note}\"",
+        "title": "Nueva solicitud de viaje compartido 🚗"
+      },
+      "booking_rejected": {
+        "action": "Ver otras ofertas",
+        "message": "{ownerName} ha rechazado tu solicitud de {seats} asiento(s) para el viaje desde {locationCity}",
+        "title": "Solicitud rechazada"
+      }
+    },
+    "common": {
+      "close": "Cerrar",
+      "view": "Ver",
+      "view_details": "Ver detalles"
+    },
+    "edition": {
+      "new_convention": {
+        "action": "Ver detalles",
+        "message": "La convención \"{conventionName}\" acaba de ser añadida a la plataforma.",
+        "title": "Nueva convención añadida"
+      },
+      "reminder": {
+        "action": "Ver detalles",
+        "message": "La edición \"{editionName}\" comienza en {daysUntil} día(s)!",
+        "title": "Recordatorio de evento 📅"
+      }
+    },
+    "system": {
+      "error": {
+        "message": "Se produjo un error: {errorMessage}",
+        "title": "Error del sistema"
+      }
+    },
+    "volunteer": {
+      "application_accepted": {
+        "action": "Ver detalles",
+        "message": "Tu solicitud de voluntariado para \"{editionName}\" ha sido aceptada.",
+        "message_complete": "Tu solicitud para \"{editionName}\" ha sido aceptada.\n\nHas sido asignado a los siguientes equipos:\n• {teams}\n\nMensaje del organizador:\n\"{note}\"",
+        "message_with_note": "Tu solicitud para \"{editionName}\" ha sido aceptada.\n\nMensaje del organizador:\n\"{note}\"",
+        "message_with_teams": "Tu solicitud para \"{editionName}\" ha sido aceptada.\n\nHas sido asignado a los siguientes equipos:\n• {teams}",
+        "title": "¡Solicitud aceptada! ✅"
+      },
+      "application_rejected": {
+        "action": "Ver edición",
+        "message": "Tu solicitud de voluntariado para \"{editionName}\" no ha sido aceptada en esta ocasión.",
+        "title": "Solicitud no aceptada"
+      },
+      "application_submitted": {
+        "action": "Ver mis solicitudes",
+        "message": "Tu solicitud para \"{editionName}\" ha sido enviada con éxito. Los organizadores la revisarán.",
+        "title": "¡Solicitud enviada! 🎉"
+      },
+      "back_to_pending": {
+        "action": "Ver mi solicitud",
+        "message": "Tu solicitud de voluntariado para \"{editionName}\" ha sido puesta en espera nuevamente por los organizadores.",
+        "title": "Solicitud en espera nuevamente"
+      }
+    },
+    "welcome": {
+      "action": "Ver convenciones",
+      "message": "Tu cuenta ha sido creada con éxito. ¡Descubre convenciones de malabares cerca de ti!",
+      "title": "¡Bienvenido! 🎉"
+    }
+  }
+}

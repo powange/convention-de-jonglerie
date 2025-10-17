@@ -1,0 +1,40 @@
+{
+  "feedback": {
+    "description": "Helfen Sie uns, die Plattform zu verbessern, indem Sie uns Ihre Kommentare, Vorschläge oder Fehlerberichte mitteilen.",
+    "email": {
+      "label": "Ihre E-Mail",
+      "placeholder": "ihre{'@'}email.com"
+    },
+    "guest": {
+      "info": "Als Besucher geben Sie bitte Ihre Kontaktdaten für eine mögliche Nachverfolgung an."
+    },
+    "message": {
+      "label": "Detaillierte Nachricht",
+      "placeholder": "Beschreiben Sie detailliert Ihr Feedback, Ihren Vorschlag oder das aufgetretene Problem..."
+    },
+    "name": {
+      "label": "Ihr Name",
+      "placeholder": "Ihr Vor- und Nachname"
+    },
+    "recaptcha": {
+      "and": "und die",
+      "apply": "von Google",
+      "privacy_policy": "Datenschutzerklärung",
+      "protected_by": "Diese Website wird durch reCAPTCHA geschützt und es gelten die",
+      "terms_of_service": "Nutzungsbedingungen"
+    },
+    "subject": {
+      "label": "Betreff",
+      "placeholder": "Beschreiben Sie kurz Ihr Feedback"
+    },
+    "title": "Wir schätzen Ihr Feedback",
+    "type": {
+      "label": "Feedback-Typ",
+      "placeholder": "Einen Typ auswählen"
+    },
+    "url": {
+      "label": "Verwandte Seite (automatisch)",
+      "placeholder": "Seiten-URL"
+    }
+  }
+}

@@ -162,7 +162,7 @@
               <div class="flex items-start justify-between">
                 <div class="flex-1">
                   <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
-                    {{ notification.title }}
+                    {{ getNotificationTitle(notification) }}
                     <UBadge
                       v-if="!notification.isRead"
                       color="secondary"
@@ -173,7 +173,7 @@
                     </UBadge>
                   </h3>
                   <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 whitespace-pre-line">
-                    {{ notification.message }}
+                    {{ getNotificationMessage(notification) }}
                   </p>
                 </div>
 
@@ -223,9 +223,12 @@
               </div>
 
               <!-- Bouton d'action -->
-              <div v-if="notification.actionText && notification.actionUrl" class="mt-4">
+              <div
+                v-if="getNotificationActionText(notification) && notification.actionUrl"
+                class="mt-4"
+              >
                 <UButton :to="notification.actionUrl" variant="outline" size="sm">
-                  {{ notification.actionText }}
+                  {{ getNotificationActionText(notification) }}
                 </UButton>
               </div>
             </div>
@@ -278,6 +281,7 @@ useSeoMeta({
 const notificationsStore = useNotificationsStore()
 const authStore = useAuthStore()
 const toast = useToast()
+const { t } = useI18n()
 
 // État réactif
 const selectedStatus = ref('all')
@@ -317,6 +321,34 @@ const weeklyCount = computed(() => {
   return notifications.value.filter((notification) => new Date(notification.createdAt) > oneWeekAgo)
     .length
 })
+
+// Méthodes de traduction pour le système hybride
+const getNotificationTitle = (notification: Notification) => {
+  // Système de traduction - utiliser la clé
+  if (notification.titleKey) {
+    return t(notification.titleKey, notification.translationParams || {})
+  }
+  // Texte libre - afficher directement
+  return notification.titleText || ''
+}
+
+const getNotificationMessage = (notification: Notification) => {
+  // Système de traduction - utiliser la clé
+  if (notification.messageKey) {
+    return t(notification.messageKey, notification.translationParams || {})
+  }
+  // Texte libre - afficher directement
+  return notification.messageText || ''
+}
+
+const getNotificationActionText = (notification: Notification) => {
+  // Système de traduction - utiliser la clé
+  if (notification.actionTextKey) {
+    return t(notification.actionTextKey, notification.translationParams || {})
+  }
+  // Texte libre - afficher directement
+  return notification.actionText || null
+}
 
 // Méthodes utilitaires
 const getNotificationIcon = (type: string) => {

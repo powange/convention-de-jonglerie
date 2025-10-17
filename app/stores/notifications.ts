@@ -4,17 +4,55 @@ export interface Notification {
   id: string
   userId: number
   type: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR'
-  title: string
-  message: string
+
+  // Système de traduction (notifications système)
+  titleKey?: string
+  messageKey?: string
+  translationParams?: Record<string, any>
+  actionTextKey?: string
+
+  // Texte libre (notifications custom/orgas)
+  titleText?: string
+  messageText?: string
+  actionText?: string
+
   category?: string
   entityType?: string
   entityId?: string
   isRead: boolean
   readAt?: string
   actionUrl?: string
-  actionText?: string
   createdAt: string
   updatedAt: string
+}
+
+/**
+ * Type pour les notifications de l'API qui peuvent avoir l'ancienne structure
+ * Avant la migration : { title, message, actionText }
+ * Après la migration : { titleKey/titleText, messageKey/messageText, actionTextKey/actionText }
+ */
+interface RawNotification extends Notification {
+  // Anciens champs (avant migration)
+  title?: string
+  message?: string
+}
+
+/**
+ * Normalise une notification pour assurer la compatibilité avec l'ancienne structure
+ * Convertit { title, message } → { titleText, messageText }
+ */
+function normalizeNotification(raw: RawNotification): Notification {
+  const notification: Notification = { ...raw }
+
+  // Si l'ancienne structure est utilisée (avant migration), la convertir
+  if (raw.title && !raw.titleText && !raw.titleKey) {
+    notification.titleText = raw.title
+  }
+  if (raw.message && !raw.messageText && !raw.messageKey) {
+    notification.messageText = raw.message
+  }
+
+  return notification
 }
 
 export interface NotificationFilters {
@@ -89,15 +127,18 @@ export const useNotificationsStore = defineStore('notifications', {
 
         const response = await $fetch<{
           success: boolean
-          notifications: Notification[]
+          notifications: RawNotification[]
           unreadCount: number
           pagination: { limit: number; offset: number; hasMore: boolean }
         }>(`/api/notifications?${params}`)
 
+        // Normaliser les notifications pour la compatibilité
+        const normalizedNotifications = response.notifications.map(normalizeNotification)
+
         if (append) {
-          this.notifications.push(...response.notifications)
+          this.notifications.push(...normalizedNotifications)
         } else {
-          this.notifications = response.notifications
+          this.notifications = normalizedNotifications
         }
 
         this.unreadCount = response.unreadCount
@@ -280,25 +321,33 @@ export const useNotificationsStore = defineStore('notifications', {
     /**
      * Ajoute une notification reçue en temps réel via SSE
      */
-    addRealTimeNotification(notification: Notification) {
+    addRealTimeNotification(notification: RawNotification) {
       // Vérifier si la notification n'existe pas déjà
       const exists = this.notifications.some((n) => n.id === notification.id)
       if (exists) {
         return
       }
 
+      // Normaliser la notification pour la compatibilité
+      const normalizedNotification = normalizeNotification(notification)
+
       // Ajouter la notification en tête de liste
-      this.notifications.unshift(notification)
+      this.notifications.unshift(normalizedNotification)
 
       // Mettre à jour le compteur de non lues
-      if (!notification.isRead) {
+      if (!normalizedNotification.isRead) {
         this.unreadCount++
       }
 
       // Marquer le timestamp de la dernière mise à jour
       this.lastRealTimeUpdate = new Date()
 
-      console.log('[Store] Notification temps réel ajoutée:', notification.title)
+      console.log(
+        '[Store] Notification temps réel ajoutée:',
+        normalizedNotification.titleKey ||
+          normalizedNotification.titleText ||
+          normalizedNotification.id
+      )
     },
 
     /**

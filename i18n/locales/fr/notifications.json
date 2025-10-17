@@ -1,0 +1,20 @@
+{
+  "notifications": {
+    "manage_description": "Gérez vos notifications et préférences",
+    "unread": "Non lues",
+    "confirm_delete_title": "Supprimer la notification",
+    "confirm_delete_description": "Êtes-vous sûr de vouloir supprimer cette notification ?",
+    "this_week": "Cette semaine",
+    "push": {
+      "title": "Notifications push",
+      "description": "Recevez des notifications même lorsque l'application est fermée",
+      "enabled": "Notifications activées sur cet appareil",
+      "blocked": "Notifications bloquées dans les paramètres du navigateur",
+      "disabled": "Notifications désactivées",
+      "not_supported": "Notifications push non supportées sur ce navigateur",
+      "test_button": "Tester une notification"
+    },
+    "loading": "Chargement des notifications...",
+    "none_found": "Aucune notification trouvée"
+  }
+}

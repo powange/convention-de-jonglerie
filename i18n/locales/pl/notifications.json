@@ -1,0 +1,80 @@
+{
+  "notifications": {
+    "carpool": {
+      "booking_accepted": {
+        "action": "Zobacz szczegóły",
+        "message": "{ownerName} zaakceptował Twoją prośbę o {seats} miejsce/a na podróż z {locationCity} w dniu {date}",
+        "title": "Prośba zaakceptowana! ✅"
+      },
+      "booking_cancelled": {
+        "action": "Zobacz wspólny przejazd",
+        "message": "{passengerName} anulował swoją rezerwację {seats} miejsc/a na podróż z {locationCity} w dniu {date}",
+        "title": "Rezerwacja anulowana 📅"
+      },
+      "booking_received": {
+        "action": "Zobacz prośbę",
+        "message": "{requesterName} chce zarezerwować {seats} miejsce/a w Twoim wspólnym przejeździe",
+        "message_with_note": "{requesterName} chce zarezerwować {seats} miejsce/a: \"{note}\"",
+        "title": "Nowa prośba o wspólny przejazd 🚗"
+      },
+      "booking_rejected": {
+        "action": "Zobacz inne oferty",
+        "message": "{ownerName} odrzucił Twoją prośbę o {seats} miejsce/a na podróż z {locationCity}",
+        "title": "Prośba odrzucona"
+      }
+    },
+    "common": {
+      "close": "Zamknij",
+      "view": "Zobacz",
+      "view_details": "Zobacz szczegóły"
+    },
+    "edition": {
+      "new_convention": {
+        "action": "Zobacz szczegóły",
+        "message": "Konwencja \"{conventionName}\" została właśnie dodana do platformy.",
+        "title": "Dodano nową konwencję"
+      },
+      "reminder": {
+        "action": "Zobacz szczegóły",
+        "message": "Edycja \"{editionName}\" zaczyna się za {daysUntil} dzień/dni!",
+        "title": "Przypomnienie o wydarzeniu 📅"
+      }
+    },
+    "system": {
+      "error": {
+        "message": "Wystąpił błąd: {errorMessage}",
+        "title": "Błąd systemu"
+      }
+    },
+    "volunteer": {
+      "application_accepted": {
+        "action": "Zobacz szczegóły",
+        "message": "Twoje zgłoszenie wolontariusza do \"{editionName}\" zostało zaakceptowane.",
+        "message_complete": "Twoje zgłoszenie do \"{editionName}\" zostało zaakceptowane.\n\nZostałeś przypisany do następujących zespołów:\n• {teams}\n\nWiadomość od organizatora:\n\"{note}\"",
+        "message_with_note": "Twoje zgłoszenie do \"{editionName}\" zostało zaakceptowane.\n\nWiadomość od organizatora:\n\"{note}\"",
+        "message_with_teams": "Twoje zgłoszenie do \"{editionName}\" zostało zaakceptowane.\n\nZostałeś przypisany do następujących zespołów:\n• {teams}",
+        "title": "Zgłoszenie zaakceptowane! ✅"
+      },
+      "application_rejected": {
+        "action": "Zobacz edycję",
+        "message": "Twoje zgłoszenie wolontariusza do \"{editionName}\" nie zostało tym razem zaakceptowane.",
+        "title": "Zgłoszenie odrzucone"
+      },
+      "application_submitted": {
+        "action": "Zobacz moje zgłoszenia",
+        "message": "Twoje zgłoszenie do \"{editionName}\" zostało wysłane pomyślnie. Organizatorzy je sprawdzą.",
+        "title": "Zgłoszenie wysłane! 🎉"
+      },
+      "back_to_pending": {
+        "action": "Zobacz moje zgłoszenie",
+        "message": "Twoje zgłoszenie wolontariusza do \"{editionName}\" zostało z powrotem ustawione w oczekiwaniu przez organizatorów.",
+        "title": "Zgłoszenie z powrotem w oczekiwaniu"
+      }
+    },
+    "welcome": {
+      "action": "Zobacz konwencje",
+      "message": "Twoje konto zostało pomyślnie utworzone. Odkryj konwencje żonglerskie w Twojej okolicy!",
+      "title": "Witamy! 🎉"
+    }
+  }
+}

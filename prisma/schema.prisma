@@ -591,29 +591,37 @@ model Notification {
   id          String           @id @default(cuid())
   userId      Int
   user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   // Contenu de la notification
   type        NotificationType
-  title       String
-  message     String           @db.Text
-  
+
+  // SYSTÈME DE TRADUCTION (notifications système)
+  titleKey          String?          // Clé de traduction pour le titre
+  messageKey        String?          // Clé de traduction pour le message
+  translationParams Json?            // Paramètres pour les traductions (noms, dates, etc.)
+  actionTextKey     String?          // Clé de traduction pour le texte du bouton
+
+  // TEXTE LIBRE (notifications custom/orgas)
+  titleText         String?          @db.Text // Texte libre pour le titre
+  messageText       String?          @db.Text // Texte libre pour le message
+  actionText        String?          // Texte libre pour le bouton d'action
+
   // Métadonnées pour le contexte
   category    String?          // 'edition', 'volunteer', 'system', etc.
   entityType  String?          // Type d'entité liée (Edition, User, etc.)
   entityId    String?          // ID de l'entité liée
-  
+
   // États de lecture
   isRead      Boolean          @default(false)
   readAt      DateTime?
-  
+
   // Actions optionnelles
   actionUrl   String?          @db.Text // URL vers laquelle rediriger
-  actionText  String?          // Texte du bouton d'action
-  
+
   // Timestamps
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-  
+
   // Index pour optimiser les requêtes
   @@index([userId])
   @@index([isRead])

@@ -1,0 +1,80 @@
+{
+  "notifications": {
+    "carpool": {
+      "booking_accepted": {
+        "action": "Se detaljer",
+        "message": "{ownerName} har accepteret din anmodning om {seats} plads(er) for rejsen fra {locationCity} den {date}",
+        "title": "Anmodning accepteret! ✅"
+      },
+      "booking_cancelled": {
+        "action": "Se samkørsel",
+        "message": "{passengerName} har annulleret sin reservation af {seats} plads(er) for rejsen fra {locationCity} den {date}",
+        "title": "Reservation annulleret 📅"
+      },
+      "booking_received": {
+        "action": "Se anmodning",
+        "message": "{requesterName} ønsker at reservere {seats} plads(er) i din samkørsel",
+        "message_with_note": "{requesterName} ønsker at reservere {seats} plads(er): \"{note}\"",
+        "title": "Ny samkørselsanmodning 🚗"
+      },
+      "booking_rejected": {
+        "action": "Se andre tilbud",
+        "message": "{ownerName} har afvist din anmodning om {seats} plads(er) for rejsen fra {locationCity}",
+        "title": "Anmodning afvist"
+      }
+    },
+    "common": {
+      "close": "Luk",
+      "view": "Se",
+      "view_details": "Se detaljer"
+    },
+    "edition": {
+      "new_convention": {
+        "action": "Se detaljer",
+        "message": "Festivalen \"{conventionName}\" er lige blevet tilføjet til platformen.",
+        "title": "Ny festival tilføjet"
+      },
+      "reminder": {
+        "action": "Se detaljer",
+        "message": "Udgaven \"{editionName}\" starter om {daysUntil} dag(e)!",
+        "title": "Begivenhedspåmindelse 📅"
+      }
+    },
+    "system": {
+      "error": {
+        "message": "Der opstod en fejl: {errorMessage}",
+        "title": "Systemfejl"
+      }
+    },
+    "volunteer": {
+      "application_accepted": {
+        "action": "Se detaljer",
+        "message": "Din frivillig-ansøgning til \"{editionName}\" er blevet accepteret.",
+        "message_complete": "Din ansøgning til \"{editionName}\" er blevet accepteret.\n\nDu er tildelt følgende hold:\n• {teams}\n\nBesked fra arrangøren:\n\"{note}\"",
+        "message_with_note": "Din ansøgning til \"{editionName}\" er blevet accepteret.\n\nBesked fra arrangøren:\n\"{note}\"",
+        "message_with_teams": "Din ansøgning til \"{editionName}\" er blevet accepteret.\n\nDu er tildelt følgende hold:\n• {teams}",
+        "title": "Ansøgning accepteret! ✅"
+      },
+      "application_rejected": {
+        "action": "Se udgaven",
+        "message": "Din frivillig-ansøgning til \"{editionName}\" blev desværre ikke accepteret denne gang.",
+        "title": "Ansøgning ikke accepteret"
+      },
+      "application_submitted": {
+        "action": "Se mine ansøgninger",
+        "message": "Din ansøgning til \"{editionName}\" er blevet indsendt. Arrangørerne vil gennemgå den.",
+        "title": "Ansøgning indsendt! 🎉"
+      },
+      "back_to_pending": {
+        "action": "Se min ansøgning",
+        "message": "Din frivillig-ansøgning til \"{editionName}\" er sat i venteposition af arrangørerne.",
+        "title": "Ansøgning sat i venteposition"
+      }
+    },
+    "welcome": {
+      "action": "Se festivaler",
+      "message": "Din konto er blevet oprettet. Opdag jongleringsfestivaler tæt på dig!",
+      "title": "Velkommen! 🎉"
+    }
+  }
+}

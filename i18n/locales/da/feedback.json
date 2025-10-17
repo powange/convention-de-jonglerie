@@ -1,0 +1,40 @@
+{
+  "feedback": {
+    "description": "Hjælp os med at forbedre platformen ved at dele dine kommentarer, forslag eller fejlrapporter.",
+    "email": {
+      "label": "Din email",
+      "placeholder": "din{'@'}email.com"
+    },
+    "guest": {
+      "info": "Som gæst bedes du oplyse dine kontaktoplysninger for mulig opfølgning."
+    },
+    "message": {
+      "label": "Detaljeret besked",
+      "placeholder": "Beskriv detaljeret din feedback, forslag eller problemet du stødte på..."
+    },
+    "name": {
+      "label": "Dit navn",
+      "placeholder": "Dit for- og efternavn"
+    },
+    "recaptcha": {
+      "and": "og",
+      "apply": "gælder",
+      "privacy_policy": "Privatlivspolitik",
+      "protected_by": "Dette websted er beskyttet af reCAPTCHA, og Googles",
+      "terms_of_service": "Servicevilkår"
+    },
+    "subject": {
+      "label": "Emne",
+      "placeholder": "Beskriv kort din feedback"
+    },
+    "title": "Vi værdsætter din feedback",
+    "type": {
+      "label": "Feedback-type",
+      "placeholder": "Vælg en type"
+    },
+    "url": {
+      "label": "Relateret side (automatisk)",
+      "placeholder": "Side-URL"
+    }
+  }
+}

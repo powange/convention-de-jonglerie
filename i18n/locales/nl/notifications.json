@@ -1,0 +1,80 @@
+{
+  "notifications": {
+    "carpool": {
+      "booking_accepted": {
+        "action": "Bekijk details",
+        "message": "{ownerName} heeft je verzoek voor {seats} plaats(en) voor de reis vanaf {locationCity} op {date} geaccepteerd",
+        "title": "Verzoek geaccepteerd! ✅"
+      },
+      "booking_cancelled": {
+        "action": "Bekijk carpool",
+        "message": "{passengerName} heeft zijn/haar reservering van {seats} plaats(en) voor de reis vanaf {locationCity} op {date} geannuleerd",
+        "title": "Reservering geannuleerd 📅"
+      },
+      "booking_received": {
+        "action": "Bekijk verzoek",
+        "message": "{requesterName} wil {seats} plaats(en) reserveren in je carpool",
+        "message_with_note": "{requesterName} wil {seats} plaats(en) reserveren: \"{note}\"",
+        "title": "Nieuw carpoolverzoek 🚗"
+      },
+      "booking_rejected": {
+        "action": "Bekijk andere aanbiedingen",
+        "message": "{ownerName} heeft je verzoek voor {seats} plaats(en) voor de reis vanaf {locationCity} geweigerd",
+        "title": "Verzoek geweigerd"
+      }
+    },
+    "common": {
+      "close": "Sluiten",
+      "view": "Bekijken",
+      "view_details": "Bekijk details"
+    },
+    "edition": {
+      "new_convention": {
+        "action": "Bekijk details",
+        "message": "De conventie \"{conventionName}\" is zojuist toegevoegd aan het platform.",
+        "title": "Nieuwe conventie toegevoegd"
+      },
+      "reminder": {
+        "action": "Bekijk details",
+        "message": "De editie \"{editionName}\" begint over {daysUntil} dag(en)!",
+        "title": "Evenement herinnering 📅"
+      }
+    },
+    "system": {
+      "error": {
+        "message": "Er is een fout opgetreden: {errorMessage}",
+        "title": "Systeemfout"
+      }
+    },
+    "volunteer": {
+      "application_accepted": {
+        "action": "Bekijk details",
+        "message": "Je vrijwilligersaanmelding voor \"{editionName}\" is geaccepteerd.",
+        "message_complete": "Je aanmelding voor \"{editionName}\" is geaccepteerd.\n\nJe bent toegewezen aan de volgende teams:\n• {teams}\n\nBericht van de organisator:\n\"{note}\"",
+        "message_with_note": "Je aanmelding voor \"{editionName}\" is geaccepteerd.\n\nBericht van de organisator:\n\"{note}\"",
+        "message_with_teams": "Je aanmelding voor \"{editionName}\" is geaccepteerd.\n\nJe bent toegewezen aan de volgende teams:\n• {teams}",
+        "title": "Aanmelding geaccepteerd! ✅"
+      },
+      "application_rejected": {
+        "action": "Bekijk editie",
+        "message": "Je vrijwilligersaanmelding voor \"{editionName}\" is deze keer niet geaccepteerd.",
+        "title": "Aanmelding niet geaccepteerd"
+      },
+      "application_submitted": {
+        "action": "Bekijk mijn aanmeldingen",
+        "message": "Je aanmelding voor \"{editionName}\" is succesvol ingediend. De organisatoren zullen deze beoordelen.",
+        "title": "Aanmelding ingediend! 🎉"
+      },
+      "back_to_pending": {
+        "action": "Bekijk mijn aanmelding",
+        "message": "Je vrijwilligersaanmelding voor \"{editionName}\" is door de organisatoren terug in afwachting gezet.",
+        "title": "Aanmelding terug in afwachting"
+      }
+    },
+    "welcome": {
+      "action": "Bekijk conventies",
+      "message": "Je account is succesvol aangemaakt. Ontdek jongleerconventies bij jou in de buurt!",
+      "title": "Welkom! 🎉"
+    }
+  }
+}
