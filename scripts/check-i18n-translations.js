@@ -5,6 +5,14 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { parseArgs } from 'util'
 
+import {
+  LOCALES_DIR,
+  loadLocaleFiles as sharedLoadLocaleFiles,
+  writeLocaleFiles,
+  flattenObject,
+  unflattenObject,
+} from './translation/shared-config.js'
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -17,7 +25,7 @@ const CYAN = '\x1b[36m'
 const BOLD = '\x1b[1m'
 
 const projectRoot = path.resolve(__dirname, '..')
-const localesDir = path.join(projectRoot, 'i18n', 'locales')
+const localesDir = LOCALES_DIR
 
 /**
  * Charge tous les fichiers de traduction depuis le dossier de locales
@@ -45,28 +53,16 @@ function loadLocaleFiles() {
       process.exit(1)
     }
 
-    // Pour chaque langue, charger tous les fichiers JSON et les fusionner
+    // Pour chaque langue, charger tous les fichiers JSON avec la fonction partagée
     for (const locale of localeDirs) {
-      const localeDir = path.join(localesDir, locale)
-      const files = fs.readdirSync(localeDir).filter((file) => file.endsWith('.json'))
-
-      if (files.length === 0) {
+      const data = sharedLoadLocaleFiles(locale)
+      if (data) {
+        locales[locale] = data
+      } else {
         console.warn(
           `${YELLOW}Avertissement: Aucun fichier de traduction trouvé dans ${locale}/${RESET}`
         )
-        continue
       }
-
-      // Fusionner tous les fichiers de cette langue
-      const mergedData = {}
-      for (const file of files) {
-        const filePath = path.join(localeDir, file)
-        const content = fs.readFileSync(filePath, 'utf8')
-        const data = JSON.parse(content)
-        Object.assign(mergedData, data)
-      }
-
-      locales[locale] = mergedData
     }
 
     console.log(`${CYAN}Chargé ${localeDirs.length} langue(s): ${localeDirs.join(', ')}${RESET}`)
@@ -79,22 +75,6 @@ function loadLocaleFiles() {
     )
     process.exit(1)
   }
-}
-
-function flattenObject(obj, prefix = '') {
-  let result = {}
-
-  for (const key in obj) {
-    const fullKey = prefix ? `${prefix}.${key}` : key
-
-    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-      Object.assign(result, flattenObject(obj[key], fullKey))
-    } else {
-      result[fullKey] = obj[key]
-    }
-  }
-
-  return result
 }
 
 /**
@@ -138,93 +118,6 @@ function countTodoKeys(locales) {
   return { todoStats, totalTodoKeys }
 }
 
-/**
- * Configuration de la répartition des clés par domaine
- * Correspond à la structure de split-i18n.js
- */
-const SPLIT_CONFIG = {
-  common: [
-    'common',
-    'navigation',
-    'footer',
-    'errors',
-    'messages',
-    'validation',
-    'countries',
-    'dates',
-    'log',
-    'c',
-    'calendar',
-  ],
-  admin: ['admin', 'feedback'],
-  edition: ['editions', 'conventions', 'collaborators', 'carpool', 'diet'],
-  auth: ['auth', 'profile', 'permissions'],
-  public: ['homepage', 'pages', 'seo'],
-  components: ['components', 'forms', 'upload', 'notifications', 'push_notifications'],
-  app: ['app', 'pwa', 'services'],
-}
-
-/**
- * Détermine le fichier de domaine cible pour une clé donnée
- */
-function getTargetFile(key) {
-  const topLevelKey = key.split('.')[0]
-  for (const [file, keys] of Object.entries(SPLIT_CONFIG)) {
-    if (keys.includes(topLevelKey)) {
-      return file
-    }
-  }
-  return 'common' // Par défaut
-}
-
-/**
- * Écrit les données dans les fichiers de domaine d'une langue
- */
-function writeLocaleFiles(locale, data) {
-  const localeDir = path.join(localesDir, locale)
-
-  // S'assurer que le dossier de la langue existe
-  if (!fs.existsSync(localeDir)) {
-    fs.mkdirSync(localeDir, { recursive: true })
-  }
-
-  // Organiser les données par fichier de domaine
-  const fileContents = {}
-  for (const file of Object.keys(SPLIT_CONFIG)) {
-    fileContents[file] = {}
-  }
-
-  // Répartir les clés dans les bons fichiers
-  for (const [key, value] of Object.entries(data)) {
-    const targetFile = getTargetFile(key)
-    fileContents[targetFile][key] = value
-  }
-
-  // Fonction de tri récursif des clés
-  const sortKeys = (obj) => {
-    if (Array.isArray(obj) || obj === null || typeof obj !== 'object') return obj
-    const out = {}
-    for (const key of Object.keys(obj).sort()) out[key] = sortKeys(obj[key])
-    return out
-  }
-
-  // Écrire chaque fichier de domaine
-  let updatedFiles = 0
-  for (const [file, content] of Object.entries(fileContents)) {
-    const filePath = path.join(localeDir, `${file}.json`)
-    if (Object.keys(content).length > 0) {
-      const sorted = sortKeys(content)
-      fs.writeFileSync(filePath, JSON.stringify(sorted, null, 2) + '\n', 'utf8')
-      updatedFiles++
-    } else if (fs.existsSync(filePath)) {
-      // Supprimer les fichiers vides
-      fs.unlinkSync(filePath)
-    }
-  }
-
-  return updatedFiles
-}
-
 function compareTranslations(locales, referenceLocale = 'fr') {
   if (!locales[referenceLocale]) {
     console.error(
@@ -258,6 +151,85 @@ function compareTranslations(locales, referenceLocale = 'fr') {
   return results
 }
 
+/**
+ * Compare la structure fichier par fichier pour détecter les clés dans les mauvais fichiers
+ * Retourne un objet { locale: { key: { expected: 'file.json', actual: 'file.json' } } }
+ */
+function compareFileStructure(referenceLocale = 'fr') {
+  const misplacedKeys = {}
+
+  try {
+    // Lister tous les dossiers de langue
+    const localeDirs = fs.readdirSync(localesDir).filter((item) => {
+      const itemPath = path.join(localesDir, item)
+      return fs.statSync(itemPath).isDirectory()
+    })
+
+    // Charger la structure fichier par fichier de la référence
+    const refDir = path.join(localesDir, referenceLocale)
+    if (!fs.existsSync(refDir)) {
+      return misplacedKeys
+    }
+
+    const refFiles = fs
+      .readdirSync(refDir)
+      .filter((f) => f.endsWith('.json'))
+      .map((f) => f.replace('.json', ''))
+
+    // Construire le mapping référence: clé -> fichier
+    const refMapping = {}
+    for (const fileName of refFiles) {
+      const filePath = path.join(refDir, `${fileName}.json`)
+      const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+      const flat = flattenObject(content)
+      for (const key of Object.keys(flat)) {
+        refMapping[key] = fileName
+      }
+    }
+
+    // Comparer avec chaque langue
+    for (const locale of localeDirs) {
+      if (locale === referenceLocale) continue
+
+      const localeDir = path.join(localesDir, locale)
+      const localeFiles = fs
+        .readdirSync(localeDir)
+        .filter((f) => f.endsWith('.json'))
+        .map((f) => f.replace('.json', ''))
+
+      // Construire le mapping pour cette langue
+      const localeMapping = {}
+      for (const fileName of localeFiles) {
+        const filePath = path.join(localeDir, `${fileName}.json`)
+        const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+        const flat = flattenObject(content)
+        for (const key of Object.keys(flat)) {
+          localeMapping[key] = fileName
+        }
+      }
+
+      // Trouver les clés mal placées
+      for (const [key, refFile] of Object.entries(refMapping)) {
+        const actualFile = localeMapping[key]
+        if (actualFile && actualFile !== refFile) {
+          if (!misplacedKeys[locale]) {
+            misplacedKeys[locale] = {}
+          }
+          misplacedKeys[locale][key] = {
+            expected: refFile,
+            actual: actualFile,
+          }
+        }
+      }
+    }
+
+    return misplacedKeys
+  } catch (error) {
+    console.error(`${RED}Erreur lors de la comparaison de structure:${RESET}`, error.message)
+    return misplacedKeys
+  }
+}
+
 function showHelp() {
   console.log(`
 ${BOLD}${BLUE}Comparaison des traductions i18n${RESET}
@@ -273,6 +245,7 @@ ${BOLD}Options:${RESET}
   -f, --fill               Ajoute automatiquement les clés manquantes (copie valeur de la référence)
   --fill-mode <mode>   Mode de remplissage: copy (défaut), empty, todo
   --refill             Force le remplacement des valeurs identiques à la référence selon fill-mode
+  --fix-structure          Réorganise les clés mal placées vers les bons fichiers
   -h, --help               Affiche cette aide
 
 ${BOLD}Exemples:${RESET}
@@ -320,6 +293,10 @@ async function main() {
       type: 'boolean',
       description: 'Force le traitement aussi des clés dont la valeur est identique à la référence',
     },
+    'fix-structure': {
+      type: 'boolean',
+      description: 'Réorganise les clés mal placées vers les bons fichiers selon la référence',
+    },
     help: {
       type: 'boolean',
       short: 'h',
@@ -348,6 +325,7 @@ async function main() {
   const fillMissing = args.values.fill
   const fillMode = (args.values['fill-mode'] || 'copy').toLowerCase()
   const refill = args.values.refill || false
+  const fixStructure = args.values['fix-structure'] || false
   if (fillMissing && !['copy', 'empty', 'todo'].includes(fillMode)) {
     console.error(`${RED}Mode fill invalide: ${fillMode} (attendu: copy | empty | todo)${RESET}`)
     process.exit(1)
@@ -359,8 +337,18 @@ async function main() {
   const locales = loadLocaleFiles()
   const availableLocales = Object.keys(locales).sort()
 
+  // Charger la langue de référence avec le mapping pour savoir dans quel fichier se trouve chaque clé
+  const referenceWithMapping = sharedLoadLocaleFiles(referenceLocale, true)
+  const referenceFileMapping = referenceWithMapping ? referenceWithMapping.fileMapping : null
+
   console.log(`${CYAN}Langues disponibles: ${availableLocales.join(', ')}${RESET}`)
-  console.log(`${CYAN}Langue de référence: ${referenceLocale}${RESET}\n`)
+  console.log(`${CYAN}Langue de référence: ${referenceLocale}${RESET}`)
+  if (referenceFileMapping) {
+    console.log(
+      `${CYAN}Mode intelligent: utilisation du mapping de fichiers depuis ${referenceLocale}/${RESET}`
+    )
+  }
+  console.log()
 
   if (!locales[referenceLocale]) {
     console.error(`${RED}Erreur: Le fichier ${referenceLocale}.json n'existe pas${RESET}`)
@@ -378,12 +366,53 @@ async function main() {
   // Compter les clés TODO
   const { todoStats, totalTodoKeys } = countTodoKeys(locales)
 
+  // Vérifier la structure fichier par fichier
+  const misplacedKeys = compareFileStructure(referenceLocale)
+
   let hasErrors = false
   let totalMissing = 0
   let totalExtra = 0
+  let totalMisplaced = 0
 
   // Filtrer par langue si spécifié
   const languagesToShow = targetLang ? { [targetLang]: results[targetLang] } : results
+
+  // Option fix-structure: réorganiser les clés mal placées avant l'affichage détaillé
+  if (fixStructure) {
+    for (const locale of Object.keys(languagesToShow)) {
+      const misplacedForLocale = misplacedKeys[locale]
+      if (misplacedForLocale && Object.keys(misplacedForLocale).length > 0) {
+        console.log(
+          `${CYAN}Réorganisation de ${locale}/ (${Object.keys(misplacedForLocale).length} clé(s))...${RESET}`
+        )
+
+        // Charger toutes les données de cette langue (aplaties)
+        const localeData = locales[locale]
+        const flat = flattenObject(localeData)
+
+        // Écrire dans les fichiers avec le mapping de référence
+        // writeLocaleFiles attend des données aplaties
+        const updatedFiles = writeLocaleFiles(locale, flat, referenceFileMapping)
+
+        console.log(
+          `${GREEN}✓ ${Object.keys(misplacedForLocale).length} clé(s) réorganisée(s) dans ${locale}/ (${updatedFiles} fichier(s) mis à jour)${RESET}`
+        )
+
+        // Mettre à jour les données en mémoire (garder imbriqué pour la suite)
+        locales[locale] = localeData
+      }
+    }
+
+    // Recalculer la structure après réorganisation
+    const updatedMisplaced = compareFileStructure(referenceLocale)
+    for (const [loc, data] of Object.entries(updatedMisplaced)) {
+      if (languagesToShow[loc]) {
+        misplacedKeys[loc] = data
+      }
+    }
+
+    console.log()
+  }
 
   // Option prune: supprimer les clés en trop avant l'affichage détaillé
   if (pruneExtra) {
@@ -395,27 +424,11 @@ async function main() {
         const flat = flattenObject(original)
         // Retirer les extra
         for (const k of data.extraKeys) delete flat[k]
-        // Reconstruire imbriqué
-        const rebuilt = {}
-        for (const [k, v] of Object.entries(flat)) {
-          const parts = k.split('.').filter(Boolean)
-          let cursor = rebuilt
-          for (let i = 0; i < parts.length; i++) {
-            const p = parts[i]
-            const last = i === parts.length - 1
-            if (last) {
-              cursor[p] = v
-            } else {
-              if (typeof cursor[p] !== 'object' || cursor[p] === null || Array.isArray(cursor[p])) {
-                cursor[p] = {}
-              }
-              cursor = cursor[p]
-            }
-          }
-        }
+        // Reconstruire imbriqué avec la fonction partagée
+        const rebuilt = unflattenObject(flat)
 
-        // Écrire dans les fichiers de domaine
-        const updatedFiles = writeLocaleFiles(locale, rebuilt)
+        // Écrire dans les fichiers de domaine (utilise le mapping de la référence si disponible)
+        const updatedFiles = writeLocaleFiles(locale, rebuilt, referenceFileMapping)
         console.log(
           `${YELLOW}Pruned ${data.extraKeys.length} clé(s) en trop dans ${locale}/ (${updatedFiles} fichier(s) mis à jour)${RESET}`
         )
@@ -466,25 +479,11 @@ async function main() {
           }
         }
         if (added > 0) {
-          // reconstruire imbriqué
-          const rebuilt = {}
-          for (const [k, v] of Object.entries(flat)) {
-            const parts = k.split('.')
-            let cursor = rebuilt
-            for (let i = 0; i < parts.length; i++) {
-              const p = parts[i]
-              const last = i === parts.length - 1
-              if (last) cursor[p] = v
-              else {
-                if (typeof cursor[p] !== 'object' || cursor[p] === null || Array.isArray(cursor[p]))
-                  cursor[p] = {}
-                cursor = cursor[p]
-              }
-            }
-          }
+          // Reconstruire imbriqué avec la fonction partagée
+          const rebuilt = unflattenObject(flat)
 
-          // Écrire dans les fichiers de domaine
-          const updatedFiles = writeLocaleFiles(locale, rebuilt)
+          // Écrire dans les fichiers de domaine (utilise le mapping de la référence si disponible)
+          const updatedFiles = writeLocaleFiles(locale, rebuilt, referenceFileMapping)
           locales[locale] = rebuilt
           const modeNote = fillMode === 'copy' ? '' : ` (mode ${fillMode})`
           console.log(
@@ -533,6 +532,21 @@ async function main() {
         console.log(`\n${GREEN}✓ Aucune clé en trop${RESET}`)
       }
 
+      // Clés dans les mauvais fichiers
+      const misplacedForLocale = misplacedKeys[locale]
+      if (misplacedForLocale && Object.keys(misplacedForLocale).length > 0) {
+        const count = Object.keys(misplacedForLocale).length
+        console.log(`\n${YELLOW}⚠ ${count} clé(s) dans le mauvais fichier:${RESET}`)
+        for (const [key, files] of Object.entries(misplacedForLocale)) {
+          console.log(
+            `  ${YELLOW}• ${key}${RESET}\n    Attendu: ${CYAN}${files.expected}.json${RESET}\n    Actuel: ${RED}${files.actual}.json${RESET}`
+          )
+        }
+        totalMisplaced += count
+      } else {
+        console.log(`\n${GREEN}✓ Toutes les clés sont dans les bons fichiers${RESET}`)
+      }
+
       console.log('')
     }
   }
@@ -555,6 +569,7 @@ async function main() {
   if (!targetLang && !summaryOnly) {
     console.log(`\nTotal clés manquantes: ${totalMissing}`)
     console.log(`Total clés en trop: ${totalExtra}`)
+    console.log(`Total clés mal placées: ${totalMisplaced}`)
     console.log(`Total clés [TODO]: ${totalTodoKeys}`)
   }
 

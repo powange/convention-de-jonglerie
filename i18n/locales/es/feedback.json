@@ -5,6 +5,14 @@
       "label": "Tu email",
       "placeholder": "tu{'@'}email.com"
     },
+    "error": {
+      "captcha_not_loaded": "El captcha aún no está cargado, por favor espere",
+      "captcha_required": "Por favor complete el captcha",
+      "name_required": "El nombre es obligatorio",
+      "name_required_desc": "Por favor indique su nombre para que podamos identificar su comentario",
+      "submit": "Se produjo un error al enviar su comentario",
+      "title": "Error al enviar"
+    },
     "guest": {
       "info": "Como visitante, por favor proporciona tus datos de contacto para un posible seguimiento."
     },
@@ -27,14 +35,43 @@
       "label": "Asunto",
       "placeholder": "Describe brevemente tu comentario"
     },
+    "submit": "Enviar comentario",
+    "success": {
+      "message": "Su mensaje ha sido enviado a nuestro equipo. Lo revisaremos lo antes posible.",
+      "title": "¡Gracias por su comentario!",
+      "toast": "Su comentario se ha enviado correctamente"
+    },
     "title": "Valoramos tus comentarios",
     "type": {
       "label": "Tipo de comentario",
       "placeholder": "Selecciona un tipo"
     },
+    "types": {
+      "bug": "Informar de un error",
+      "complaint": "Informar de un problema",
+      "general": "Comentario general",
+      "suggestion": "Sugerencia de mejora"
+    },
     "url": {
       "label": "Página relacionada (automático)",
       "placeholder": "URL de la página"
+    },
+    "validation": {
+      "email": {
+        "invalid": "Email no válido"
+      },
+      "message": {
+        "max": "El mensaje no puede exceder los 5000 caracteres",
+        "min": "El mensaje debe tener al menos 20 caracteres"
+      },
+      "name": {
+        "max": "El nombre no puede exceder los 100 caracteres",
+        "min": "El nombre debe tener al menos 2 caracteres"
+      },
+      "subject": {
+        "max": "El asunto no puede exceder los 200 caracteres",
+        "min": "El asunto debe tener al menos 5 caracteres"
+      }
     }
   }
 }

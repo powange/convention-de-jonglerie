@@ -24,13 +24,12 @@
       }
     },
     "common": {
-      "close": "Luk",
-      "view": "Se",
       "view_details": "Se detaljer"
     },
+    "confirm_delete_description": "Er du sikker på, at du vil slette denne notifikation?",
+    "confirm_delete_title": "Slet notifikation",
     "edition": {
       "new_convention": {
-        "action": "Se detaljer",
         "message": "Festivalen \"{conventionName}\" er lige blevet tilføjet til platformen.",
         "title": "Ny festival tilføjet"
       },
@@ -40,12 +39,26 @@
         "title": "Begivenhedspåmindelse 📅"
       }
     },
+    "loading": "Indlæser notifikationer...",
+    "manage_description": "Administrer dine notifikationer og præferencer",
+    "none_found": "Ingen notifikationer fundet",
+    "push": {
+      "blocked": "Notifikationer blokeret i browserindstillinger",
+      "description": "Modtag notifikationer selv når applikationen er lukket",
+      "disabled": "Notifikationer deaktiveret",
+      "enabled": "Notifikationer aktiveret på denne enhed",
+      "not_supported": "Push-notifikationer understøttes ikke af denne browser",
+      "test_button": "Test en notifikation",
+      "title": "Push-notifikationer"
+    },
     "system": {
       "error": {
         "message": "Der opstod en fejl: {errorMessage}",
         "title": "Systemfejl"
       }
     },
+    "this_week": "Denne uge",
+    "unread": "Ulæst",
     "volunteer": {
       "application_accepted": {
         "action": "Se detaljer",

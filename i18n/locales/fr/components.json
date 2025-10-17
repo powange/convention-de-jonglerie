@@ -48,10 +48,10 @@
       "seats_available": "{count} place disponible | {count} places disponibles",
       "seats_needed": "{count} place recherchée | {count} places recherchées",
       "status": {
-        "pending": "En attente",
         "accepted": "Acceptée",
-        "rejected": "Refusée",
-        "cancelled": "Annulée"
+        "cancelled": "Annulée",
+        "pending": "En attente",
+        "rejected": "Refusée"
       },
       "suggestions": "Suggestions",
       "to_add_comment": "pour ajouter un commentaire",
@@ -94,13 +94,13 @@
       "convention_poster_optional": "Affiche de la convention (Optionnel)",
       "country_placeholder": "Nom du pays",
       "facebook_page": "Page Facebook",
-      "program_placeholder": "Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
       "instagram_account": "Compte Instagram",
       "next": "Suivant",
       "official_website_link": "Site officiel",
       "poster_alt": "Poster de l'édition",
       "poster_placeholder": "Cliquez pour sélectionner le poster de l'édition",
       "previous": "Précédent",
+      "program_placeholder": "Décrivez le programme de l'édition (horaires, ateliers, spectacles...)",
       "social_networks_description": "Partagez vos pages pour augmenter la visibilité",
       "social_networks_title": "Réseaux sociaux",
       "step_about_description": "Description de l'édition",
@@ -134,15 +134,15 @@
       "yellow_border_favorite": "Contour jaune = Favori"
     },
     "posts": {
-      "publish": "Publier",
       "comments_count": "{count} commentaire | {count} commentaires",
-      "confirm_delete_title": "Confirmer la suppression",
-      "confirm_delete_post": "Êtes-vous sûr de vouloir supprimer cette publication ? Cette action est irréversible.",
       "confirm_delete_comment": "Êtes-vous sûr de vouloir supprimer ce commentaire ? Cette action est irréversible.",
+      "confirm_delete_post": "Êtes-vous sûr de vouloir supprimer cette publication ? Cette action est irréversible.",
+      "confirm_delete_title": "Confirmer la suppression",
+      "pinned": "Épinglé",
+      "publish": "Publier",
       "reply_to_post": "Commentez cette publication",
       "your_comment": "Votre commentaire",
-      "your_comment_placeholder": "Votre commentaire...",
-      "pinned": "Épinglé"
+      "your_comment_placeholder": "Votre commentaire..."
     }
   },
   "forms": {
@@ -172,8 +172,27 @@
       "start_typing_address": "Commencez à taper une adresse..."
     }
   },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Soyez notifié des réservations et messages de covoiturage",
+        "important": "Ne manquez pas les informations importantes vous concernant",
+        "reminders": "Recevez des rappels pour vos conventions favorites",
+        "volunteer": "Recevez les mises à jour sur vos candidatures de bénévolat"
+      },
+      "description": "Activez les notifications push pour être tenu au courant de vos covoiturages, candidatures de bénévolat et conventions favorites.",
+      "enable": "Activer les notifications",
+      "not_now": "Pas maintenant",
+      "privacy": {
+        "description": "Vous pouvez désactiver les notifications à tout moment dans vos paramètres.",
+        "title": "Respectueux de votre vie privée"
+      },
+      "title": "Restez informé en temps réel"
+    }
+  },
   "upload": {
     "delete_message": "Image supprimée",
+    "error": "Erreur lors de l'upload",
     "error_message": "Erreur d'upload",
     "errors": {
       "file_too_large": "Fichier trop volumineux",
@@ -187,25 +206,6 @@
     "success_message": "Image uploadée avec succès !",
     "upload": "Upload",
     "upload_error": "Erreur d'upload",
-    "uploading": "Upload en cours...",
-    "error": "Erreur lors de l'upload"
-  },
-  "push_notifications": {
-    "promo_modal": {
-      "title": "Restez informé en temps réel",
-      "description": "Activez les notifications push pour être tenu au courant de vos covoiturages, candidatures de bénévolat et conventions favorites.",
-      "benefits": {
-        "carpool": "Soyez notifié des réservations et messages de covoiturage",
-        "volunteer": "Recevez les mises à jour sur vos candidatures de bénévolat",
-        "reminders": "Recevez des rappels pour vos conventions favorites",
-        "important": "Ne manquez pas les informations importantes vous concernant"
-      },
-      "privacy": {
-        "title": "Respectueux de votre vie privée",
-        "description": "Vous pouvez désactiver les notifications à tout moment dans vos paramètres."
-      },
-      "enable": "Activer les notifications",
-      "not_now": "Pas maintenant"
-    }
+    "uploading": "Upload en cours..."
   }
 }

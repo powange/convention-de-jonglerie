@@ -5,6 +5,14 @@
       "label": "Ihre E-Mail",
       "placeholder": "ihre{'@'}email.com"
     },
+    "error": {
+      "captcha_not_loaded": "Das Captcha ist noch nicht geladen, bitte warten Sie",
+      "captcha_required": "Bitte füllen Sie das Captcha aus",
+      "name_required": "Der Name ist erforderlich",
+      "name_required_desc": "Bitte geben Sie Ihren Namen an, damit wir Ihr Feedback identifizieren können",
+      "submit": "Beim Senden Ihres Feedbacks ist ein Fehler aufgetreten",
+      "title": "Fehler beim Senden"
+    },
     "guest": {
       "info": "Als Besucher geben Sie bitte Ihre Kontaktdaten für eine mögliche Nachverfolgung an."
     },
@@ -27,14 +35,43 @@
       "label": "Betreff",
       "placeholder": "Beschreiben Sie kurz Ihr Feedback"
     },
+    "submit": "Feedback senden",
+    "success": {
+      "message": "Ihre Nachricht wurde an unser Team übermittelt. Wir werden sie so schnell wie möglich prüfen.",
+      "title": "Vielen Dank für Ihr Feedback!",
+      "toast": "Ihr Feedback wurde erfolgreich gesendet"
+    },
     "title": "Wir schätzen Ihr Feedback",
     "type": {
       "label": "Feedback-Typ",
       "placeholder": "Einen Typ auswählen"
     },
+    "types": {
+      "bug": "Fehler melden",
+      "complaint": "Problem melden",
+      "general": "Allgemeine Anmerkung",
+      "suggestion": "Verbesserungsvorschlag"
+    },
     "url": {
       "label": "Verwandte Seite (automatisch)",
       "placeholder": "Seiten-URL"
+    },
+    "validation": {
+      "email": {
+        "invalid": "Ungültige E-Mail"
+      },
+      "message": {
+        "max": "Die Nachricht darf 5000 Zeichen nicht überschreiten",
+        "min": "Die Nachricht muss mindestens 20 Zeichen lang sein"
+      },
+      "name": {
+        "max": "Der Name darf 100 Zeichen nicht überschreiten",
+        "min": "Der Name muss mindestens 2 Zeichen lang sein"
+      },
+      "subject": {
+        "max": "Der Betreff darf 200 Zeichen nicht überschreiten",
+        "min": "Der Betreff muss mindestens 5 Zeichen lang sein"
+      }
     }
   }
 }

@@ -24,13 +24,12 @@
       }
     },
     "common": {
-      "close": "Fechar",
-      "view": "Ver",
       "view_details": "Ver detalhes"
     },
+    "confirm_delete_description": "Tem certeza de que deseja excluir esta notificação?",
+    "confirm_delete_title": "Excluir notificação",
     "edition": {
       "new_convention": {
-        "action": "Ver detalhes",
         "message": "A convenção \"{conventionName}\" acabou de ser adicionada à plataforma.",
         "title": "Nova convenção adicionada"
       },
@@ -40,12 +39,26 @@
         "title": "Lembrete de evento 📅"
       }
     },
+    "loading": "Carregando notificações...",
+    "manage_description": "Gerir as suas notificações e preferências",
+    "none_found": "Nenhuma notificação encontrada",
+    "push": {
+      "blocked": "Notificações bloqueadas nas configurações do navegador",
+      "description": "Receba notificações mesmo quando a aplicação está fechada",
+      "disabled": "Notificações desativadas",
+      "enabled": "Notificações ativadas neste dispositivo",
+      "not_supported": "Notificações push não suportadas neste navegador",
+      "test_button": "Testar uma notificação",
+      "title": "Notificações push"
+    },
     "system": {
       "error": {
         "message": "Ocorreu um erro: {errorMessage}",
         "title": "Erro do sistema"
       }
     },
+    "this_week": "Esta semana",
+    "unread": "Não lidas",
     "volunteer": {
       "application_accepted": {
         "action": "Ver detalhes",

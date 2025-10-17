@@ -2,6 +2,26 @@
   "app": {
     "title": "Convention de Jonglerie"
   },
+  "pwa": {
+    "install": {
+      "button": "Installer maintenant",
+      "cancelled": {
+        "description": "Vous pourrez installer l'application plus tard depuis les paramètres de votre navigateur.",
+        "title": "Installation annulée"
+      },
+      "description": "Ajoutez l'application Juggling Convention à votre écran d'accueil pour un accès rapide et une expérience optimale.",
+      "error": {
+        "description": "Une erreur s'est produite lors de l'installation. Veuillez réessayer.",
+        "title": "Erreur d'installation"
+      },
+      "later": "Plus tard",
+      "success": {
+        "description": "L'application a été ajoutée à votre écran d'accueil.",
+        "title": "Installation réussie !"
+      },
+      "title": "Installer l'application"
+    }
+  },
   "services": {
     "accessibility": "Accessibilité handicapé",
     "aerial_space": "Espace aérien",
@@ -29,30 +49,10 @@
     "pets_accepted": "Animaux acceptés",
     "showers": "Douches",
     "slackline_space": "Espace slackline",
+    "sleeping_room": "Salle de couchage",
     "tent_camping": "Camping tente",
     "toilets": "WC",
     "truck_camping": "Camping camion",
-    "workshops": "Workshops",
-    "sleeping_room": "Salle de couchage"
-  },
-  "pwa": {
-    "install": {
-      "title": "Installer l'application",
-      "description": "Ajoutez l'application Juggling Convention à votre écran d'accueil pour un accès rapide et une expérience optimale.",
-      "button": "Installer maintenant",
-      "later": "Plus tard",
-      "success": {
-        "title": "Installation réussie !",
-        "description": "L'application a été ajoutée à votre écran d'accueil."
-      },
-      "cancelled": {
-        "title": "Installation annulée",
-        "description": "Vous pourrez installer l'application plus tard depuis les paramètres de votre navigateur."
-      },
-      "error": {
-        "title": "Erreur d'installation",
-        "description": "Une erreur s'est produite lors de l'installation. Veuillez réessayer."
-      }
-    }
+    "workshops": "Workshops"
   }
 }

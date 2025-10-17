@@ -5,6 +5,14 @@
       "label": "Din email",
       "placeholder": "din{'@'}email.com"
     },
+    "error": {
+      "captcha_not_loaded": "Captcha'en er endnu ikke indlæst, vent venligst",
+      "captcha_required": "Udfyld venligst captcha'en",
+      "name_required": "Navnet er påkrævet",
+      "name_required_desc": "Angiv venligst dit navn, så vi kan identificere din feedback",
+      "submit": "Der opstod en fejl ved afsendelse af din feedback",
+      "title": "Fejl ved afsendelse"
+    },
     "guest": {
       "info": "Som gæst bedes du oplyse dine kontaktoplysninger for mulig opfølgning."
     },
@@ -27,14 +35,43 @@
       "label": "Emne",
       "placeholder": "Beskriv kort din feedback"
     },
+    "submit": "Send feedback",
+    "success": {
+      "message": "Din besked er blevet sendt til vores team. Vi vil gennemgå den hurtigst muligt.",
+      "title": "Tak for din feedback!",
+      "toast": "Din feedback er blevet sendt"
+    },
     "title": "Vi værdsætter din feedback",
     "type": {
       "label": "Feedback-type",
       "placeholder": "Vælg en type"
     },
+    "types": {
+      "bug": "Rapporter en fejl",
+      "complaint": "Rapporter et problem",
+      "general": "Generel kommentar",
+      "suggestion": "Forbedringsforslag"
+    },
     "url": {
       "label": "Relateret side (automatisk)",
       "placeholder": "Side-URL"
+    },
+    "validation": {
+      "email": {
+        "invalid": "Ugyldig e-mail"
+      },
+      "message": {
+        "max": "Beskeden må ikke overstige 5000 tegn",
+        "min": "Beskeden skal være mindst 20 tegn"
+      },
+      "name": {
+        "max": "Navnet må ikke overstige 100 tegn",
+        "min": "Navnet skal være mindst 2 tegn"
+      },
+      "subject": {
+        "max": "Emnet må ikke overstige 200 tegn",
+        "min": "Emnet skal være mindst 5 tegn"
+      }
     }
   }
 }

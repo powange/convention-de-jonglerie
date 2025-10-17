@@ -24,13 +24,12 @@
       }
     },
     "common": {
-      "close": "Schließen",
-      "view": "Ansehen",
       "view_details": "Details ansehen"
     },
+    "confirm_delete_description": "Sind Sie sicher, dass Sie diese Benachrichtigung löschen möchten?",
+    "confirm_delete_title": "Benachrichtigung löschen",
     "edition": {
       "new_convention": {
-        "action": "Details ansehen",
         "message": "Die Convention \"{conventionName}\" wurde gerade zur Plattform hinzugefügt.",
         "title": "Neue Convention hinzugefügt"
       },
@@ -40,12 +39,26 @@
         "title": "Veranstaltungserinnerung 📅"
       }
     },
+    "loading": "Benachrichtigungen werden geladen...",
+    "manage_description": "Verwalten Sie Ihre Benachrichtigungen und Einstellungen",
+    "none_found": "Keine Benachrichtigungen gefunden",
+    "push": {
+      "blocked": "Benachrichtigungen in den Browsereinstellungen blockiert",
+      "description": "Erhalten Sie Benachrichtigungen auch wenn die Anwendung geschlossen ist",
+      "disabled": "Benachrichtigungen deaktiviert",
+      "enabled": "Benachrichtigungen auf diesem Gerät aktiviert",
+      "not_supported": "Push-Benachrichtigungen werden von diesem Browser nicht unterstützt",
+      "test_button": "Eine Benachrichtigung testen",
+      "title": "Push-Benachrichtigungen"
+    },
     "system": {
       "error": {
         "message": "Ein Fehler ist aufgetreten: {errorMessage}",
         "title": "Systemfehler"
       }
     },
+    "this_week": "Diese Woche",
+    "unread": "Ungelesen",
     "volunteer": {
       "application_accepted": {
         "action": "Details ansehen",

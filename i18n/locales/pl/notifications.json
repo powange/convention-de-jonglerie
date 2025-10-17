@@ -24,13 +24,12 @@
       }
     },
     "common": {
-      "close": "Zamknij",
-      "view": "Zobacz",
       "view_details": "Zobacz szczegóły"
     },
+    "confirm_delete_description": "Czy na pewno chcesz usunąć to powiadomienie?",
+    "confirm_delete_title": "Usuń powiadomienie",
     "edition": {
       "new_convention": {
-        "action": "Zobacz szczegóły",
         "message": "Konwencja \"{conventionName}\" została właśnie dodana do platformy.",
         "title": "Dodano nową konwencję"
       },
@@ -40,12 +39,26 @@
         "title": "Przypomnienie o wydarzeniu 📅"
       }
     },
+    "loading": "Ładowanie powiadomień...",
+    "manage_description": "Zarządzaj swoimi powiadomieniami i preferencjami",
+    "none_found": "Nie znaleziono powiadomień",
+    "push": {
+      "blocked": "Powiadomienia zablokowane w ustawieniach przeglądarki",
+      "description": "Otrzymuj powiadomienia nawet gdy aplikacja jest zamknięta",
+      "disabled": "Powiadomienia wyłączone",
+      "enabled": "Powiadomienia włączone na tym urządzeniu",
+      "not_supported": "Powiadomienia push nie są obsługiwane w tej przeglądarce",
+      "test_button": "Przetestuj powiadomienie",
+      "title": "Powiadomienia push"
+    },
     "system": {
       "error": {
         "message": "Wystąpił błąd: {errorMessage}",
         "title": "Błąd systemu"
       }
     },
+    "this_week": "W tym tygodniu",
+    "unread": "Nieprzeczytane",
     "volunteer": {
       "application_accepted": {
         "action": "Zobacz szczegóły",

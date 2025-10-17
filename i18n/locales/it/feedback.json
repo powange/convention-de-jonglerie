@@ -5,6 +5,14 @@
       "label": "La tua email",
       "placeholder": "tua{'@'}email.com"
     },
+    "error": {
+      "captcha_not_loaded": "Il captcha non è ancora caricato, attendere prego",
+      "captcha_required": "Si prega di completare il captcha",
+      "name_required": "Il nome è obbligatorio",
+      "name_required_desc": "Si prega di indicare il proprio nome in modo da poter identificare il feedback",
+      "submit": "Si è verificato un errore durante l'invio del feedback",
+      "title": "Errore durante l'invio"
+    },
     "guest": {
       "info": "Come visitatore, fornisci i tuoi dati di contatto per un eventuale follow-up."
     },
@@ -27,14 +35,43 @@
       "label": "Oggetto",
       "placeholder": "Descrivi brevemente il tuo feedback"
     },
+    "submit": "Invia feedback",
+    "success": {
+      "message": "Il tuo messaggio è stato inviato al nostro team. Lo esamineremo il prima possibile.",
+      "title": "Grazie per il tuo feedback!",
+      "toast": "Il tuo feedback è stato inviato con successo"
+    },
     "title": "Apprezziamo il tuo feedback",
     "type": {
       "label": "Tipo di feedback",
       "placeholder": "Seleziona un tipo"
     },
+    "types": {
+      "bug": "Segnala un bug",
+      "complaint": "Segnala un problema",
+      "general": "Commento generale",
+      "suggestion": "Suggerimento di miglioramento"
+    },
     "url": {
       "label": "Pagina correlata (automatico)",
       "placeholder": "URL della pagina"
+    },
+    "validation": {
+      "email": {
+        "invalid": "Email non valida"
+      },
+      "message": {
+        "max": "Il messaggio non può superare i 5000 caratteri",
+        "min": "Il messaggio deve contenere almeno 20 caratteri"
+      },
+      "name": {
+        "max": "Il nome non può superare i 100 caratteri",
+        "min": "Il nome deve contenere almeno 2 caratteri"
+      },
+      "subject": {
+        "max": "L'oggetto non può superare i 200 caratteri",
+        "min": "L'oggetto deve contenere almeno 5 caratteri"
+      }
     }
   }
 }

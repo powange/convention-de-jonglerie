@@ -5,6 +5,14 @@
       "label": "Twój email",
       "placeholder": "twoj{'@'}email.com"
     },
+    "error": {
+      "captcha_not_loaded": "Captcha nie jest jeszcze załadowana, proszę czekać",
+      "captcha_required": "Proszę wypełnić captcha",
+      "name_required": "Nazwa jest wymagana",
+      "name_required_desc": "Proszę podać swoje imię, abyśmy mogli zidentyfikować Twoją opinię",
+      "submit": "Wystąpił błąd podczas wysyłania opinii",
+      "title": "Błąd podczas wysyłania"
+    },
     "guest": {
       "info": "Jako gość, podaj swoje dane kontaktowe w celu ewentualnego kontaktu zwrotnego."
     },
@@ -27,14 +35,43 @@
       "label": "Temat",
       "placeholder": "Krótko opisz swoją opinię"
     },
+    "submit": "Wyślij opinię",
+    "success": {
+      "message": "Twoja wiadomość została przesłana do naszego zespołu. Przeanalizujemy ją jak najszybciej.",
+      "title": "Dziękujemy za opinię!",
+      "toast": "Twoja opinia została wysłana"
+    },
     "title": "Cenimy Twoją opinię",
     "type": {
       "label": "Typ opinii",
       "placeholder": "Wybierz typ"
     },
+    "types": {
+      "bug": "Zgłoś błąd",
+      "complaint": "Zgłoś problem",
+      "general": "Ogólny komentarz",
+      "suggestion": "Sugestia poprawy"
+    },
     "url": {
       "label": "Powiązana strona (automatyczne)",
       "placeholder": "URL strony"
+    },
+    "validation": {
+      "email": {
+        "invalid": "Nieprawidłowy email"
+      },
+      "message": {
+        "max": "Wiadomość nie może przekraczać 5000 znaków",
+        "min": "Wiadomość musi zawierać co najmniej 20 znaków"
+      },
+      "name": {
+        "max": "Nazwa nie może przekraczać 100 znaków",
+        "min": "Nazwa musi zawierać co najmniej 2 znaki"
+      },
+      "subject": {
+        "max": "Temat nie może przekraczać 200 znaków",
+        "min": "Temat musi zawierać co najmniej 5 znaków"
+      }
     }
   }
 }

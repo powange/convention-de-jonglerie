@@ -5,6 +5,14 @@
       "label": "Your email",
       "placeholder": "your{'@'}email.com"
     },
+    "error": {
+      "captcha_not_loaded": "The captcha is not yet loaded, please wait",
+      "captcha_required": "Please complete the captcha",
+      "name_required": "Name is required",
+      "name_required_desc": "Please provide your name so we can identify your feedback",
+      "submit": "An error occurred while sending your feedback",
+      "title": "Error sending"
+    },
     "guest": {
       "info": "As a visitor, please provide your contact details for potential follow-up."
     },
@@ -27,14 +35,43 @@
       "label": "Subject",
       "placeholder": "Briefly describe your feedback"
     },
+    "submit": "Send feedback",
+    "success": {
+      "message": "Your message has been sent to our team. We will review it as soon as possible.",
+      "title": "Thank you for your feedback!",
+      "toast": "Your feedback has been sent successfully"
+    },
     "title": "We value your feedback",
     "type": {
       "label": "Feedback type",
       "placeholder": "Select a type"
     },
+    "types": {
+      "bug": "Report a bug",
+      "complaint": "Report a problem",
+      "general": "General comment",
+      "suggestion": "Improvement suggestion"
+    },
     "url": {
       "label": "Related page (automatic)",
       "placeholder": "Page URL"
+    },
+    "validation": {
+      "email": {
+        "invalid": "Invalid email"
+      },
+      "message": {
+        "max": "The message cannot exceed 5000 characters",
+        "min": "The message must be at least 20 characters"
+      },
+      "name": {
+        "max": "The name cannot exceed 100 characters",
+        "min": "The name must be at least 2 characters"
+      },
+      "subject": {
+        "max": "The subject cannot exceed 200 characters",
+        "min": "The subject must be at least 5 characters"
+      }
     }
   }
 }

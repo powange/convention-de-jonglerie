@@ -118,7 +118,11 @@
       "Bash(sort:*)",
       "Bash([ -d .nuxt ])",
       "Bash(npx nuxt:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(do if grep -q '\"\"notifications\"\"' \"i18n/locales/$lang/components.json\")",
+      "Bash(then echo \"❌ $lang: Notifications trouvées\")",
+      "Bash(else echo \"✓ $lang: Pas de notifications\")",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": [],

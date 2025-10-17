@@ -16,8 +16,11 @@
 - Toujours utiliser les icônes de la bibliothèque Nuxt Icon pour les icônes (https://nuxt.com/modules/icon) et éviter d'importer des SVG ou d'utiliser des images pour les icônes.
 - Toujours utiliser les classes utilitaires de Tailwind CSS pour le style et la mise en page
 - Toujours écrire les documentations en français dans un répertoire `docs/` à la racine du projet.
-- Ne jamais remplir les fichiers de langues (i18n) autre que le français. Les autres langues seront remplies avec les commandes /check-i18n et /check-translations
-- **Structure i18n avec lazy loading** : Les traductions sont organisées par domaine dans `i18n/locales/{langue}/`. Modifier uniquement les fichiers français (`i18n/locales/fr/`), les autres langues seront synchronisées automatiquement
+- **Règle de traduction i18n** :
+  - **De ta propre initiative** : Ne modifier QUE les fichiers français (`i18n/locales/fr/`). Ne JAMAIS remplir les autres langues spontanément.
+  - **Avec la commande `/translate-todos`** : Tu DOIS traduire toutes les langues comme demandé dans la commande. Cette commande t'autorise explicitement à traduire.
+  - Les autres langues seront synchronisées automatiquement via `/check-i18n` et `/check-translations` en mode [TODO] pour traduction ultérieure.
+- **Structure i18n avec lazy loading** : Les traductions sont organisées par domaine dans `i18n/locales/{langue}/`. Le système utilise un mapping intelligent basé sur la structure du français.
 - Ne commit jamais sans que la commande `/commit-push` ait été demandée
 
 ## Détails du projet

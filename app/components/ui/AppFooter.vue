@@ -48,9 +48,7 @@ const { t } = useI18n()
 const showFeedbackModal = ref(false)
 
 function openFeedbackModal() {
-  console.log('Ouverture de la modal feedback')
   showFeedbackModal.value = true
-  console.log('showFeedbackModal.value:', showFeedbackModal.value)
 }
 </script>
 

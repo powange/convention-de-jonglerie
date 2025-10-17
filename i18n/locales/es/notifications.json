@@ -24,13 +24,12 @@
       }
     },
     "common": {
-      "close": "Cerrar",
-      "view": "Ver",
       "view_details": "Ver detalles"
     },
+    "confirm_delete_description": "¿Está seguro de que desea eliminar esta notificación?",
+    "confirm_delete_title": "Eliminar notificación",
     "edition": {
       "new_convention": {
-        "action": "Ver detalles",
         "message": "La convención \"{conventionName}\" acaba de ser añadida a la plataforma.",
         "title": "Nueva convención añadida"
       },
@@ -40,12 +39,26 @@
         "title": "Recordatorio de evento 📅"
       }
     },
+    "loading": "Cargando notificaciones...",
+    "manage_description": "Gestiona tus notificaciones y preferencias",
+    "none_found": "No se encontraron notificaciones",
+    "push": {
+      "blocked": "Notificaciones bloqueadas en la configuración del navegador",
+      "description": "Recibe notificaciones incluso cuando la aplicación está cerrada",
+      "disabled": "Notificaciones desactivadas",
+      "enabled": "Notificaciones activadas en este dispositivo",
+      "not_supported": "Notificaciones push no compatibles con este navegador",
+      "test_button": "Probar una notificación",
+      "title": "Notificaciones push"
+    },
     "system": {
       "error": {
         "message": "Se produjo un error: {errorMessage}",
         "title": "Error del sistema"
       }
     },
+    "this_week": "Esta semana",
+    "unread": "No leídas",
     "volunteer": {
       "application_accepted": {
         "action": "Ver detalles",

@@ -24,13 +24,12 @@
       }
     },
     "common": {
-      "close": "Sluiten",
-      "view": "Bekijken",
       "view_details": "Bekijk details"
     },
+    "confirm_delete_description": "Weet je zeker dat je deze melding wilt verwijderen?",
+    "confirm_delete_title": "Melding verwijderen",
     "edition": {
       "new_convention": {
-        "action": "Bekijk details",
         "message": "De conventie \"{conventionName}\" is zojuist toegevoegd aan het platform.",
         "title": "Nieuwe conventie toegevoegd"
       },
@@ -40,12 +39,26 @@
         "title": "Evenement herinnering 📅"
       }
     },
+    "loading": "Meldingen laden...",
+    "manage_description": "Beheer je meldingen en voorkeuren",
+    "none_found": "Geen meldingen gevonden",
+    "push": {
+      "blocked": "Meldingen geblokkeerd in browserinstellingen",
+      "description": "Ontvang meldingen zelfs wanneer de applicatie is gesloten",
+      "disabled": "Meldingen uitgeschakeld",
+      "enabled": "Meldingen ingeschakeld op dit apparaat",
+      "not_supported": "Push-meldingen worden niet ondersteund op deze browser",
+      "test_button": "Test een melding",
+      "title": "Push-meldingen"
+    },
     "system": {
       "error": {
         "message": "Er is een fout opgetreden: {errorMessage}",
         "title": "Systeemfout"
       }
     },
+    "this_week": "Deze week",
+    "unread": "Ongelezen",
     "volunteer": {
       "application_accepted": {
         "action": "Bekijk details",

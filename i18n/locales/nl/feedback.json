@@ -5,6 +5,14 @@
       "label": "Je e-mail",
       "placeholder": "jouw{'@'}email.nl"
     },
+    "error": {
+      "captcha_not_loaded": "De captcha is nog niet geladen, even geduld",
+      "captcha_required": "Vul de captcha in",
+      "name_required": "Naam is verplicht",
+      "name_required_desc": "Geef uw naam op zodat we uw feedback kunnen identificeren",
+      "submit": "Er is een fout opgetreden bij het verzenden van uw feedback",
+      "title": "Fout bij verzenden"
+    },
     "guest": {
       "info": "Als bezoeker, geef alsjeblieft je contactgegevens voor mogelijke follow-up."
     },
@@ -27,14 +35,43 @@
       "label": "Onderwerp",
       "placeholder": "Beschrijf kort je feedback"
     },
+    "submit": "Feedback verzenden",
+    "success": {
+      "message": "Uw bericht is verzonden naar ons team. We zullen het zo snel mogelijk bekijken.",
+      "title": "Bedankt voor uw feedback!",
+      "toast": "Uw feedback is succesvol verzonden"
+    },
     "title": "We waarderen je feedback",
     "type": {
       "label": "Feedbacktype",
       "placeholder": "Selecteer een type"
     },
+    "types": {
+      "bug": "Een bug melden",
+      "complaint": "Een probleem melden",
+      "general": "Algemene opmerking",
+      "suggestion": "Verbeteringsvoorstel"
+    },
     "url": {
       "label": "Gerelateerde pagina (automatisch)",
       "placeholder": "Pagina-URL"
+    },
+    "validation": {
+      "email": {
+        "invalid": "Ongeldig e-mailadres"
+      },
+      "message": {
+        "max": "Het bericht mag niet meer dan 5000 tekens bevatten",
+        "min": "Het bericht moet minimaal 20 tekens bevatten"
+      },
+      "name": {
+        "max": "De naam mag niet meer dan 100 tekens bevatten",
+        "min": "De naam moet minimaal 2 tekens bevatten"
+      },
+      "subject": {
+        "max": "Het onderwerp mag niet meer dan 200 tekens bevatten",
+        "min": "Het onderwerp moet minimaal 5 tekens bevatten"
+      }
     }
   }
 }
