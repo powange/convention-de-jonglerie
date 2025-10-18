@@ -151,6 +151,9 @@ interface PermissionMeta {
   label: string
 }
 
+// Lazy load des traductions permissions via le composable (avant le rendu)
+await useLazyI18n('permissions')
+
 const props = withDefaults(
   defineProps<{
     modelValue: ModelValue

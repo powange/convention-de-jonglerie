@@ -11,38 +11,38 @@
           icon="i-heroicons-information-circle"
           color="info"
           variant="soft"
-          title="Tarif HelloAsso"
+          :title="$t('ticketing.tiers.modal.title')"
           description="Ce tarif est synchronisé depuis HelloAsso. Seuls les quotas et articles à restituer peuvent être modifiés."
         />
 
-        <UFormField label="Nom du tarif" name="name" required>
+        <UFormField :label="$t('ticketing.tiers.modal.name_label')" name="name" required>
           <UInput
             v-model="form.name"
             :disabled="isHelloAssoTier"
-            placeholder="Ex: Pass 3 jours"
+            :placeholder="$t('ticketing.tiers.modal.name_placeholder')"
             size="lg"
             class="w-full"
           />
         </UFormField>
 
-        <UFormField label="Description" name="description">
+        <UFormField :label="$t('ticketing.tiers.modal.description_label')" name="description">
           <UTextarea
             v-model="form.description"
             :disabled="isHelloAssoTier"
-            placeholder="Description du tarif (optionnel)"
+            :placeholder="$t('ticketing.tiers.modal.description_placeholder')"
             :rows="3"
             class="w-full"
           />
         </UFormField>
 
-        <UFormField label="Prix (€)" name="price" required>
+        <UFormField :label="$t('ticketing.tiers.modal.price_label')" name="price" required>
           <UInput
             v-model="form.priceInEuros"
             :disabled="isHelloAssoTier"
             type="number"
             step="0.01"
             min="0"
-            placeholder="0.00"
+            :placeholder="$t('ticketing.tiers.modal.price_placeholder')"
             size="lg"
             class="w-full"
           />
@@ -51,7 +51,7 @@
         <div
           class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800"
         >
-          <UFormField label="Tarif libre" name="isFree">
+          <UFormField :label="$t('ticketing.tiers.modal.free_price_label')" name="isFree">
             <div class="flex items-start gap-3">
               <USwitch v-model="form.isFree" :disabled="isHelloAssoTier" class="mt-1" />
               <div class="flex-1">
@@ -67,26 +67,26 @@
           </UFormField>
 
           <div v-if="form.isFree" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-            <UFormField label="Montant minimum (€)" name="minAmount">
+            <UFormField :label="$t('ticketing.tiers.modal.min_amount_label')" name="minAmount">
               <UInput
                 v-model="form.minAmountInEuros"
                 :disabled="isHelloAssoTier"
                 type="number"
                 step="0.01"
                 min="0"
-                placeholder="0.00"
+                :placeholder="$t('ticketing.tiers.modal.min_amount_placeholder')"
                 class="w-full"
               />
             </UFormField>
 
-            <UFormField label="Montant maximum (€)" name="maxAmount">
+            <UFormField :label="$t('ticketing.tiers.modal.max_amount_label')" name="maxAmount">
               <UInput
                 v-model="form.maxAmountInEuros"
                 :disabled="isHelloAssoTier"
                 type="number"
                 step="0.01"
                 min="0"
-                placeholder="0.00"
+                :placeholder="$t('ticketing.tiers.modal.max_amount_placeholder')"
                 class="w-full"
               />
             </UFormField>
@@ -95,7 +95,7 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <UFormField
-            label="Position d'affichage"
+            :label="$t('ticketing.tiers.modal.position_label')"
             name="position"
             help="Ordre d'affichage (0 = premier)"
           >
@@ -104,12 +104,12 @@
               :disabled="isHelloAssoTier"
               type="number"
               min="0"
-              placeholder="0"
+              :placeholder="$t('ticketing.tiers.modal.position_placeholder')"
               class="w-full"
             />
           </UFormField>
 
-          <UFormField label="Statut" name="isActive">
+          <UFormField :label="$t('ticketing.tiers.modal.status_label')" name="isActive">
             <div class="flex items-start gap-3 pt-2">
               <USwitch v-model="form.isActive" :disabled="isHelloAssoTier" class="mt-1" />
               <div class="flex-1">
@@ -124,35 +124,42 @@
           </UFormField>
         </div>
 
-        <UFormField label="Quotas associés" name="quotas">
+        <UFormField :label="$t('ticketing.tiers.modal.quotas_label')" name="quotas">
           <USelectMenu
             v-model="form.quotaIds"
             :items="quotas.map((q) => ({ label: q.title, value: q.id }))"
             value-key="value"
             multiple
             searchable
-            placeholder="Sélectionner des quotas"
+            :placeholder="$t('ticketing.tiers.modal.quotas_placeholder')"
             class="w-full"
           >
             <template #label>
-              <span v-if="form.quotaIds.length === 0">Aucun quota sélectionné</span>
+              <span v-if="form.quotaIds.length === 0">{{
+                $t('ticketing.tiers.modal.no_quota_selected')
+              }}</span>
               <span v-else>{{ form.quotaIds.length }} quota(s) sélectionné(s)</span>
             </template>
           </USelectMenu>
         </UFormField>
 
-        <UFormField label="Articles à restituer" name="returnableItems">
+        <UFormField
+          :label="$t('ticketing.tiers.modal.returnable_items_label')"
+          name="returnableItems"
+        >
           <USelectMenu
             v-model="form.returnableItemIds"
             :items="returnableItems.map((item) => ({ label: item.name, value: item.id }))"
             value-key="value"
             multiple
             searchable
-            placeholder="Sélectionner des articles"
+            :placeholder="$t('ticketing.tiers.modal.returnable_items_placeholder')"
             class="w-full"
           >
             <template #label>
-              <span v-if="form.returnableItemIds.length === 0">Aucun article sélectionné</span>
+              <span v-if="form.returnableItemIds.length === 0">{{
+                $t('ticketing.tiers.modal.no_item_selected')
+              }}</span>
               <span v-else>{{ form.returnableItemIds.length }} article(s) sélectionné(s)</span>
             </template>
           </USelectMenu>

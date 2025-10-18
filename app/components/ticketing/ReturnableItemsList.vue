@@ -2,7 +2,7 @@
   <!-- Chargement -->
   <div v-if="loading" class="text-center py-12">
     <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 text-gray-400 animate-spin" />
-    <p class="text-sm text-gray-500 mt-2">Chargement...</p>
+    <p class="text-sm text-gray-500 mt-2">{{ $t('ticketing.returnable_items.list.loading') }}</p>
   </div>
 
   <div v-else class="space-y-4">
@@ -11,7 +11,7 @@
       icon="i-heroicons-information-circle"
       color="info"
       variant="soft"
-      title="Articles à remettre aux participants"
+      :title="$t('ticketing.returnable_items.list.title')"
       description="Listez ici les articles à remettre à l'accueil lors de la validation ou de l'achat d'un billet (bracelets, pass camping, goodies, etc.)"
     />
 
@@ -25,7 +25,7 @@
         <UFieldGroup>
           <UInput
             :model-value="item.name"
-            placeholder="Nom de l'item"
+            :placeholder="$t('ticketing.returnable_items.list.name_placeholder')"
             @blur="updateItem(item.id, $event.target.value)"
           />
           <UButton icon="i-heroicons-trash" color="error" @click="confirmDeleteItem(item)" />
@@ -35,7 +35,11 @@
       <!-- Ligne d'ajout -->
       <div class="flex items-center gap-2 py-2 px-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
         <UFieldGroup>
-          <UInput v-model="form.name" placeholder="Nouvel item..." @keydown.enter="handleSave" />
+          <UInput
+            v-model="form.name"
+            :placeholder="$t('ticketing.returnable_items.list.add_placeholder')"
+            @keydown.enter="handleSave"
+          />
           <UButton icon="i-heroicons-plus" color="primary" :loading="saving" @click="handleSave" />
         </UFieldGroup>
       </div>
@@ -45,9 +49,9 @@
   <!-- Modal de confirmation de suppression d'item à restituer -->
   <UiConfirmModal
     v-model="deleteConfirmOpen"
-    title="Supprimer l'item"
+    :title="$t('ticketing.returnable_items.list.delete_title')"
     :description="`Êtes-vous sûr de vouloir supprimer l'item '${itemToDelete?.name}' ?`"
-    confirm-label="Supprimer"
+    :confirm-label="$t('ticketing.returnable_items.list.delete_label')"
     confirm-color="error"
     confirm-icon="i-heroicons-trash"
     icon-name="i-heroicons-exclamation-triangle"

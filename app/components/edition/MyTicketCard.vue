@@ -58,7 +58,7 @@
               <img
                 v-if="ticket.isHelloAsso"
                 src="~/assets/img/helloasso/logo.svg"
-                alt="HelloAsso"
+                :alt="$t('ticketing.my_ticket.logo_alt')"
                 class="h-4"
               />
               <!-- Bouton QR Code -->
@@ -92,8 +92,8 @@
               class="text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5"
             />
             <div class="text-sm text-purple-700 dark:text-purple-300">
-              <p class="font-medium mb-1">Comment utiliser ce QR code</p>
-              <p>Présentez ce QR code à l'entrée pour valider votre billet.</p>
+              <p class="font-medium mb-1">{{ $t('ticketing.my_ticket.how_to_use_title') }}</p>
+              <p>{{ $t('ticketing.my_ticket.how_to_use_description') }}</p>
             </div>
           </div>
         </div>

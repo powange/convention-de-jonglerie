@@ -95,7 +95,6 @@ export default defineNuxtConfig({
         name: 'English',
         files: [
           'en/common.json',
-          'en/feedback.json',
           'en/notifications.json',
           'en/components.json',
           'en/app.json',
@@ -107,7 +106,6 @@ export default defineNuxtConfig({
         name: 'Dansk',
         files: [
           'da/common.json',
-          'da/feedback.json',
           'da/notifications.json',
           'da/components.json',
           'da/app.json',
@@ -119,7 +117,6 @@ export default defineNuxtConfig({
         name: 'Deutsch',
         files: [
           'de/common.json',
-          'de/feedback.json',
           'de/notifications.json',
           'de/components.json',
           'de/app.json',
@@ -131,7 +128,6 @@ export default defineNuxtConfig({
         name: 'Español',
         files: [
           'es/common.json',
-          'es/feedback.json',
           'es/notifications.json',
           'es/components.json',
           'es/app.json',
@@ -143,7 +139,6 @@ export default defineNuxtConfig({
         name: 'Français',
         files: [
           'fr/common.json',
-          'fr/feedback.json',
           'fr/notifications.json',
           'fr/components.json',
           'fr/app.json',
@@ -155,7 +150,6 @@ export default defineNuxtConfig({
         name: 'Italiano',
         files: [
           'it/common.json',
-          'it/feedback.json',
           'it/notifications.json',
           'it/components.json',
           'it/app.json',
@@ -167,7 +161,6 @@ export default defineNuxtConfig({
         name: 'Nederlands',
         files: [
           'nl/common.json',
-          'nl/feedback.json',
           'nl/notifications.json',
           'nl/components.json',
           'nl/app.json',
@@ -179,7 +172,6 @@ export default defineNuxtConfig({
         name: 'Polski',
         files: [
           'pl/common.json',
-          'pl/feedback.json',
           'pl/notifications.json',
           'pl/components.json',
           'pl/app.json',
@@ -191,7 +183,6 @@ export default defineNuxtConfig({
         name: 'Português',
         files: [
           'pt/common.json',
-          'pt/feedback.json',
           'pt/notifications.json',
           'pt/components.json',
           'pt/app.json',
@@ -203,7 +194,6 @@ export default defineNuxtConfig({
         name: 'Русский',
         files: [
           'ru/common.json',
-          'ru/feedback.json',
           'ru/notifications.json',
           'ru/components.json',
           'ru/app.json',
@@ -215,7 +205,6 @@ export default defineNuxtConfig({
         name: 'Українська',
         files: [
           'uk/common.json',
-          'uk/feedback.json',
           'uk/notifications.json',
           'uk/components.json',
           'uk/app.json',

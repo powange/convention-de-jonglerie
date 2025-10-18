@@ -190,6 +190,9 @@
 <script setup lang="ts">
 import { z } from 'zod'
 
+// Lazy load des traductions feedback via le composable (avant le rendu)
+await useLazyI18n('feedback')
+
 // Utilisation de defineModel pour v-model
 const open = defineModel<boolean>('open', { default: false })
 

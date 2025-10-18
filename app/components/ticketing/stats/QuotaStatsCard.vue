@@ -3,7 +3,7 @@
     <div class="space-y-4">
       <div class="flex items-center gap-2">
         <UIcon name="i-heroicons-chart-bar-square" class="text-indigo-500" />
-        <h2 class="text-lg font-semibold">Statistiques des quotas</h2>
+        <h2 class="text-lg font-semibold">{{ $t('ticketing.quotas.stats.title') }}</h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -30,7 +30,9 @@
 
             <div class="space-y-2">
               <div class="flex items-center justify-between text-sm">
-                <span class="text-gray-600 dark:text-gray-400">Utilisé</span>
+                <span class="text-gray-600 dark:text-gray-400">{{
+                  $t('ticketing.quotas.stats.used')
+                }}</span>
                 <span class="font-medium text-gray-900 dark:text-white">
                   {{ quota.currentCount }} / {{ quota.quantity }}
                 </span>
@@ -48,7 +50,9 @@
 
               <!-- Nombre de validés -->
               <div class="flex items-center justify-between text-xs">
-                <span class="text-gray-500 dark:text-gray-500">Validés</span>
+                <span class="text-gray-500 dark:text-gray-500">{{
+                  $t('ticketing.quotas.stats.validated')
+                }}</span>
                 <span class="font-medium text-gray-700 dark:text-gray-300">
                   {{ quota.validatedCount }}
                 </span>

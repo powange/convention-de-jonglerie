@@ -38,7 +38,9 @@
             <p class="text-sm font-semibold text-gray-900 dark:text-white break-words">
               {{ item.name }}
             </p>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Remis à tous les bénévoles</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {{ $t('ticketing.returnable_items.volunteer.given_to_all') }}
+            </p>
           </div>
 
           <!-- Bouton supprimer -->
@@ -82,7 +84,7 @@
         <USelect
           v-model="selectedItemId"
           :items="availableReturnableItems"
-          placeholder="Choisir un article à restituer..."
+          :placeholder="$t('ticketing.returnable_items.volunteer.choose_placeholder')"
           size="lg"
           :disabled="availableReturnableItems.length === 0"
         />
@@ -110,9 +112,9 @@
   <!-- Modal de confirmation de suppression -->
   <UiConfirmModal
     v-model="deleteConfirmOpen"
-    title="Retirer cet article ?"
+    :title="$t('ticketing.returnable_items.volunteer.remove_title')"
     :description="`L'article '${itemToDelete?.name}' ne sera plus remis automatiquement aux bénévoles lors de leur validation d'accès.`"
-    confirm-label="Retirer l'article"
+    :confirm-label="$t('ticketing.returnable_items.volunteer.remove_label')"
     confirm-color="error"
     confirm-icon="i-heroicons-trash"
     icon-name="i-heroicons-exclamation-triangle"

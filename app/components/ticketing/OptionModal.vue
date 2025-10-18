@@ -11,31 +11,31 @@
           icon="i-heroicons-information-circle"
           color="info"
           variant="soft"
-          title="Option HelloAsso"
+          :title="$t('ticketing.options.modal.title')"
           description="Cette option est synchronisée depuis HelloAsso et ne peut pas être modifiée."
         />
 
-        <UFormField label="Nom de l'option" name="name" required>
+        <UFormField :label="$t('ticketing.options.modal.name_label')" name="name" required>
           <UInput
             v-model="form.name"
             :disabled="isHelloAssoOption"
-            placeholder="Ex: T-shirt convention"
+            :placeholder="$t('ticketing.options.modal.name_placeholder')"
             size="lg"
             class="w-full"
           />
         </UFormField>
 
-        <UFormField label="Description" name="description">
+        <UFormField :label="$t('ticketing.options.modal.description_label')" name="description">
           <UTextarea
             v-model="form.description"
             :disabled="isHelloAssoOption"
-            placeholder="Description de l'option (optionnel)"
+            :placeholder="$t('ticketing.options.modal.description_placeholder')"
             :rows="3"
             class="w-full"
           />
         </UFormField>
 
-        <UFormField label="Type d'option" name="type" required>
+        <UFormField :label="$t('ticketing.options.modal.type_label')" name="type" required>
           <USelect
             v-model="form.type"
             :disabled="isHelloAssoOption"
@@ -45,7 +45,7 @@
           />
         </UFormField>
 
-        <UFormField label="Option obligatoire" name="isRequired">
+        <UFormField :label="$t('ticketing.options.modal.is_mandatory_label')" name="isRequired">
           <div class="flex items-start gap-3">
             <USwitch v-model="form.isRequired" :disabled="isHelloAssoOption" class="mt-1" />
             <div class="flex-1">
@@ -61,21 +61,21 @@
 
         <UFormField
           v-if="form.type === 'ChoixMultiple' || form.type === 'ChoixUnique'"
-          label="Choix disponibles"
+          :label="$t('ticketing.options.modal.choices_label')"
           name="choices"
           help="Un choix par ligne"
         >
           <UTextarea
             v-model="choicesText"
             :disabled="isHelloAssoOption"
-            placeholder="Option 1&#10;Option 2&#10;Option 3"
+            :placeholder="$t('ticketing.options.modal.choices_placeholder')"
             :rows="5"
             class="w-full"
           />
         </UFormField>
 
         <UFormField
-          label="Position d'affichage"
+          :label="$t('ticketing.options.modal.position_label')"
           name="position"
           help="Ordre d'affichage (0 = premier)"
         >
@@ -84,40 +84,47 @@
             :disabled="isHelloAssoOption"
             type="number"
             min="0"
-            placeholder="0"
+            :placeholder="$t('ticketing.options.modal.position_placeholder')"
             class="w-full"
           />
         </UFormField>
 
-        <UFormField label="Quotas associés" name="quotas">
+        <UFormField :label="$t('ticketing.options.modal.quotas_label')" name="quotas">
           <USelectMenu
             v-model="form.quotaIds"
             :items="quotas.map((q) => ({ label: q.title, value: q.id }))"
             value-key="value"
             multiple
             searchable
-            placeholder="Sélectionner des quotas"
+            :placeholder="$t('ticketing.options.modal.quotas_placeholder')"
             class="w-full"
           >
             <template #label>
-              <span v-if="form.quotaIds.length === 0">Aucun quota sélectionné</span>
+              <span v-if="form.quotaIds.length === 0">{{
+                $t('ticketing.options.modal.no_quota_selected')
+              }}</span>
               <span v-else>{{ form.quotaIds.length }} quota(s) sélectionné(s)</span>
             </template>
           </USelectMenu>
         </UFormField>
 
-        <UFormField label="Articles à restituer" name="returnableItems">
+        <UFormField
+          :label="$t('ticketing.tiers.modal.returnable_items_label')"
+          name="returnableItems"
+        >
           <USelectMenu
             v-model="form.returnableItemIds"
             :items="returnableItems.map((item) => ({ label: item.name, value: item.id }))"
             value-key="value"
             multiple
             searchable
-            placeholder="Sélectionner des articles"
+            :placeholder="$t('ticketing.tiers.modal.returnable_items_placeholder')"
             class="w-full"
           >
             <template #label>
-              <span v-if="form.returnableItemIds.length === 0">Aucun article sélectionné</span>
+              <span v-if="form.returnableItemIds.length === 0">{{
+                $t('ticketing.tiers.modal.no_item_selected')
+              }}</span>
               <span v-else>{{ form.returnableItemIds.length }} article(s) sélectionné(s)</span>
             </template>
           </USelectMenu>

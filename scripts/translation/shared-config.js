@@ -11,6 +11,11 @@ const __dirname = path.dirname(__filename)
  * Configuration centralisée de la répartition des clés par domaine
  * Cette configuration est utilisée par tous les scripts de traduction
  * pour garantir la cohérence de l'organisation des fichiers.
+ *
+ * Note sur le lazy loading:
+ * - Les fichiers listés ici sont généralement chargés globalement via nuxt.config.ts
+ * - Certains fichiers peuvent être exclus de la config globale et chargés au niveau
+ *   composant via le composable useLazyI18n() (ex: permissions.json)
  */
 export const SPLIT_CONFIG = {
   common: [
@@ -26,12 +31,15 @@ export const SPLIT_CONFIG = {
     'c',
     'calendar',
   ],
-  admin: ['admin', 'feedback'],
+  admin: ['admin'],
   edition: ['editions', 'conventions', 'collaborators', 'carpool', 'diet'],
-  auth: ['auth', 'profile', 'permissions'],
+  auth: ['auth', 'profile'],
+  permissions: ['permissions'], // Chargé au niveau composant via useLazyI18n('permissions')
+  feedback: ['feedback'], // Chargé au niveau composant via useLazyI18n('feedback')
   public: ['homepage', 'pages', 'seo'],
   components: ['components', 'forms', 'upload'],
   notifications: ['notifications', 'push_notifications'],
+  ticketing: ['ticketing'],
   app: ['app', 'pwa', 'services'],
 }
 

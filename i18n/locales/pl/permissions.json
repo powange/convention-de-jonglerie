@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "addEdition": "Dodaj edycje",
+    "admin": "Administrator",
+    "deleteAllEditions": "Usuń wszystkie edycje",
+    "deleteConvention": "Usuń konwencję",
+    "editAllEditions": "Edytuj wszystkie edycje",
+    "editConvention": "Edytuj konwencję",
+    "editor": "Redaktor",
+    "manageCollaborators": "Zarządzaj współpracownikami",
+    "manageVolunteers": "Zarządzaj wolontariuszami",
+    "manager": "Menedżer",
+    "moderator": "Moderator",
+    "viewer": "Przeglądający"
+  }
+}

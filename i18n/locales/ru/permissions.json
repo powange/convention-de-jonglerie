@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "addEdition": "Добавить издания",
+    "admin": "Администратор",
+    "deleteAllEditions": "Удалить все издания",
+    "deleteConvention": "Удалить конвенцию",
+    "editAllEditions": "Редактировать все издания",
+    "editConvention": "Редактировать конвенцию",
+    "editor": "Редактор",
+    "manageCollaborators": "Управлять соавторами",
+    "manageVolunteers": "Управлять волонтёрами",
+    "manager": "Менеджер",
+    "moderator": "Модератор",
+    "viewer": "Зритель"
+  }
+}

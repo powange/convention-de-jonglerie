@@ -51,7 +51,7 @@
             <img
               v-if="participant.ticket.order.id"
               src="~/assets/img/helloasso/logo.svg"
-              alt="HelloAsso"
+              :alt="$t('ticketing.participant.logo_alt')"
               class="h-5"
             />
           </div>
@@ -172,7 +172,9 @@
                   <div class="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Type de billet</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                          {{ $t('ticketing.participant.ticket_type') }}
+                        </p>
                         <p
                           class="text-sm font-medium"
                           :class="
@@ -278,7 +280,9 @@
                 <div class="mt-2 pt-2 border-t border-pink-200 dark:border-pink-700">
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Type</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        {{ $t('ticketing.participant.type') }}
+                      </p>
                       <p class="text-sm font-medium text-gray-900 dark:text-white">
                         {{ item.name || item.type }}
                       </p>
@@ -335,7 +339,9 @@
                 <div class="mt-2 pt-2 border-t border-blue-200 dark:border-blue-700">
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Type</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        {{ $t('ticketing.participant.type') }}
+                      </p>
                       <p class="text-sm font-medium text-gray-900 dark:text-white">
                         {{ item.name || item.type }}
                       </p>
@@ -392,7 +398,9 @@
                 <div class="mt-2 pt-2 border-t border-purple-200 dark:border-purple-700">
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Type</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        {{ $t('ticketing.participant.type') }}
+                      </p>
                       <p class="text-sm font-medium text-gray-900 dark:text-white">
                         {{ item.name || item.type }}
                       </p>
@@ -467,13 +475,15 @@
               class="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5"
             />
             <div class="flex-1">
-              <p class="font-medium text-green-900 dark:text-green-100">Entrée déjà validée</p>
+              <p class="font-medium text-green-900 dark:text-green-100">
+                {{ $t('ticketing.participant.entry_validated') }}
+              </p>
               <p class="text-sm text-green-700 dark:text-green-300 mt-1">
                 <span v-if="participant.volunteer.entryValidatedBy">
                   Validé par {{ participant.volunteer.entryValidatedBy.firstName }}
                   {{ participant.volunteer.entryValidatedBy.lastName }}
                 </span>
-                <span v-else>Le bénévole a validé son entrée</span>
+                <span v-else>{{ $t('ticketing.participant.volunteer_validated') }}</span>
                 {{
                   participant.volunteer.entryValidatedAt
                     ? `le ${new Date(participant.volunteer.entryValidatedAt).toLocaleDateString(
@@ -604,7 +614,7 @@
             class="p-4 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-lg"
           >
             <UIcon name="i-heroicons-calendar-days" class="mx-auto h-8 w-8 mb-2 text-gray-400" />
-            <p class="text-sm">Aucun créneau assigné</p>
+            <p class="text-sm">{{ $t('ticketing.participant.no_slot_assigned') }}</p>
           </div>
         </div>
       </div>

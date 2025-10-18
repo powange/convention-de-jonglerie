@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "addEdition": "Edities toevoegen",
+    "admin": "Beheerder",
+    "deleteAllEditions": "Alle edities verwijderen",
+    "deleteConvention": "Conventie verwijderen",
+    "editAllEditions": "Alle edities bewerken",
+    "editConvention": "Conventie bewerken",
+    "editor": "Redacteur",
+    "manageCollaborators": "Medewerkers beheren",
+    "manageVolunteers": "Vrijwilligers beheren",
+    "manager": "Manager",
+    "moderator": "Moderator",
+    "viewer": "Kijker"
+  }
+}

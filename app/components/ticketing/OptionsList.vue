@@ -9,12 +9,12 @@
   <!-- Liste des options -->
   <div v-if="loading" class="text-center py-12">
     <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 text-gray-400 animate-spin" />
-    <p class="text-sm text-gray-500 mt-2">Chargement...</p>
+    <p class="text-sm text-gray-500 mt-2">{{ $t('ticketing.options.list.loading') }}</p>
   </div>
 
   <div v-else-if="options.length === 0" class="text-center py-12">
     <UIcon name="i-heroicons-inbox" class="h-12 w-12 text-gray-300 mb-3 mx-auto" />
-    <p class="text-sm text-gray-500">Aucune option trouvée</p>
+    <p class="text-sm text-gray-500">{{ $t('ticketing.options.list.none_found') }}</p>
     <p class="text-xs text-gray-400 mt-1">
       Ajoutez une option manuelle ou synchronisez depuis votre billeterie externe
     </p>
@@ -40,7 +40,7 @@
           <img
             v-if="option.helloAssoOptionId"
             src="~/assets/img/helloasso/logo.svg"
-            alt="HelloAsso"
+            :alt="$t('ticketing.options.list.logo_alt')"
             class="h-5 w-auto"
             :title="`Synchronisé depuis HelloAsso (ID: ${option.helloAssoOptionId})`"
           />

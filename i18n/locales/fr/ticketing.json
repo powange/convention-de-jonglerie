@@ -1,0 +1,117 @@
+{
+  "ticketing": {
+    "access_control": {
+      "loading": "Chargement...",
+      "manual_input_label": "Saisie manuelle du code",
+      "no_ticket_found": "Aucun billet trouvé",
+      "scan_qr_title": "Scanner un QR code",
+      "search_placeholder": "Nom, prénom ou email...",
+      "search_ticket_title": "Chercher un billet",
+      "ticket_found": "Billet trouvé",
+      "unknown": "Inconnu",
+      "volunteer_badge": "Bénévole",
+      "volunteer_found": "Bénévole trouvé"
+    },
+    "my_ticket": {
+      "how_to_use_description": "Présentez ce QR code à l'entrée pour valider votre billet.",
+      "how_to_use_title": "Comment utiliser ce QR code",
+      "logo_alt": "HelloAsso"
+    },
+    "options": {
+      "list": {
+        "loading": "Chargement...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Aucune option trouvée"
+      },
+      "modal": {
+        "choices_label": "Choix disponibles",
+        "choices_placeholder": "Option 1\nOption 2\nOption 3",
+        "description_label": "Description",
+        "description_placeholder": "Description de l'option (optionnel)",
+        "is_mandatory_label": "Option obligatoire",
+        "name_label": "Nom de l'option",
+        "name_placeholder": "Ex: T-shirt convention",
+        "no_quota_selected": "Aucun quota sélectionné",
+        "position_label": "Position d'affichage",
+        "position_placeholder": "0",
+        "quotas_label": "Quotas associés",
+        "quotas_placeholder": "Sélectionner des quotas",
+        "title": "Option HelloAsso",
+        "type_label": "Type d'option"
+      }
+    },
+    "participant": {
+      "entry_validated": "Entrée déjà validée",
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Aucun créneau assigné",
+      "ticket_type": "Type de billet",
+      "type": "Type",
+      "volunteer_validated": "Le bénévole a validé son entrée"
+    },
+    "quotas": {
+      "list": {
+        "description_label": "description",
+        "description_placeholder": "Description (optionnel)",
+        "loading": "Chargement...",
+        "name_placeholder": "Titre du quota",
+        "title": "Gestion des quotas"
+      },
+      "stats": {
+        "title": "Statistiques des quotas",
+        "used": "Utilisé",
+        "validated": "Validés"
+      }
+    },
+    "returnable_items": {
+      "list": {
+        "add_placeholder": "Nouvel item...",
+        "delete_label": "Supprimer",
+        "delete_title": "Supprimer l'item",
+        "loading": "Chargement...",
+        "name_placeholder": "Nom de l'item",
+        "title": "Articles à remettre aux participants"
+      },
+      "volunteer": {
+        "choose_placeholder": "Choisir un article à restituer...",
+        "given_to_all": "Remis à tous les bénévoles",
+        "remove_label": "Retirer l'article",
+        "remove_title": "Retirer cet article ?"
+      }
+    },
+    "stats": {
+      "participants": "Participants",
+      "volunteers": "Bénévoles"
+    },
+    "tiers": {
+      "list": {
+        "inactive": "Inactif",
+        "loading": "Chargement...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Aucun tarif trouvé"
+      },
+      "modal": {
+        "description_label": "Description",
+        "description_placeholder": "Description du tarif (optionnel)",
+        "free_price_label": "Tarif libre",
+        "max_amount_label": "Montant maximum (€)",
+        "max_amount_placeholder": "0.00",
+        "min_amount_label": "Montant minimum (€)",
+        "min_amount_placeholder": "0.00",
+        "name_label": "Nom du tarif",
+        "name_placeholder": "Ex: Pass 3 jours",
+        "no_quota_selected": "Aucun quota sélectionné",
+        "no_item_selected": "Aucun article sélectionné",
+        "position_label": "Position d'affichage",
+        "position_placeholder": "0",
+        "price_label": "Prix (€)",
+        "price_placeholder": "0.00",
+        "quotas_label": "Quotas associés",
+        "quotas_placeholder": "Sélectionner des quotas",
+        "returnable_items_label": "Articles à restituer",
+        "returnable_items_placeholder": "Sélectionner des articles",
+        "status_label": "Statut",
+        "title": "Tarif HelloAsso"
+      }
+    }
+  }
+}

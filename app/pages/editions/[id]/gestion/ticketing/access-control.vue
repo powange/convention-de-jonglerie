@@ -83,7 +83,7 @@
 
                 <!-- Saisie manuelle -->
                 <UFormField
-                  label="Saisie manuelle du code"
+                  :label="$t('ticketing.access_control.manual_input_label')"
                   :label-class="'text-center lg:text-left'"
                   class="xl:flex-1 w-full"
                 >
@@ -129,7 +129,7 @@
                 <UFieldGroup class="w-full">
                   <UInput
                     v-model="searchTerm"
-                    placeholder="Nom, prénom ou email..."
+                    :placeholder="$t('ticketing.access_control.search_placeholder')"
                     icon="i-heroicons-magnifying-glass"
                     class="w-full"
                     @keydown.enter="searchTickets"
@@ -190,7 +190,9 @@
                   <!-- Liste des bénévoles -->
                   <div v-if="searchResults.volunteers.length > 0" class="space-y-2">
                     <div class="text-sm font-medium text-gray-900 dark:text-white">
-                      Bénévoles ({{ searchResults.volunteers.length }})
+                      {{ $t('ticketing.access_control.volunteer_badge') }} ({{
+                        searchResults.volunteers.length
+                      }})
                     </div>
                     <div class="space-y-1 max-h-60 overflow-y-auto">
                       <button
@@ -217,7 +219,9 @@
                             </div>
                           </div>
                           <div class="flex items-center gap-2">
-                            <UBadge color="purple">Bénévole</UBadge>
+                            <UBadge color="purple">{{
+                              $t('ticketing.access_control.volunteer_badge')
+                            }}</UBadge>
                             <UIcon
                               v-if="result.participant.volunteer.entryValidated"
                               name="i-heroicons-check-circle"
@@ -238,7 +242,9 @@
                       name="i-heroicons-magnifying-glass"
                       class="mx-auto h-12 w-12 text-gray-400 mb-2"
                     />
-                    <p class="text-sm text-gray-500">Aucun billet trouvé</p>
+                    <p class="text-sm text-gray-500">
+                      {{ $t('ticketing.access_control.no_ticket_found') }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -263,7 +269,7 @@
             </div>
 
             <div v-if="loadingValidations" class="text-center py-8">
-              <p class="text-sm text-gray-500">Chargement...</p>
+              <p class="text-sm text-gray-500">{{ $t('ticketing.access_control.loading') }}</p>
             </div>
 
             <div
@@ -309,7 +315,9 @@
                       </div>
                     </div>
                     <div v-else class="flex items-center justify-end gap-2">
-                      <span class="text-xs text-gray-500 dark:text-gray-400 italic">Inconnu</span>
+                      <span class="text-xs text-gray-500 dark:text-gray-400 italic">{{
+                        $t('ticketing.access_control.unknown')
+                      }}</span>
                       <div
                         class="h-5 w-5 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center flex-shrink-0"
                       >
@@ -357,6 +365,7 @@ const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
+const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
@@ -458,7 +467,10 @@ const validateTicket = async () => {
       participantModalOpen.value = true
 
       toast.add({
-        title: result.type === 'volunteer' ? 'Bénévole trouvé' : 'Billet trouvé',
+        title:
+          result.type === 'volunteer'
+            ? t('ticketing.access_control.volunteer_found')
+            : t('ticketing.access_control.ticket_found'),
         description: result.message,
         icon: 'i-heroicons-check-circle',
         color: 'success',

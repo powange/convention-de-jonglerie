@@ -28,7 +28,9 @@
         <div class="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Participants</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                {{ $t('ticketing.stats.participants') }}
+              </p>
               <p class="text-2xl font-bold text-orange-600 dark:text-orange-400">
                 {{ stats.ticketsValidated }} / {{ stats.totalTickets }}
               </p>
@@ -43,7 +45,9 @@
         <div class="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Bénévoles</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                {{ $t('ticketing.stats.volunteers') }}
+              </p>
               <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">
                 {{ stats.volunteersValidated }} / {{ stats.totalVolunteers }}
               </p>

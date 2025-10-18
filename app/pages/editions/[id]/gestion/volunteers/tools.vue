@@ -39,7 +39,9 @@
             <template #header>
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-bell" class="text-orange-500" />
-                <h2 class="text-lg font-semibold">Notifier les bénévoles de leurs créneaux</h2>
+                <h2 class="text-lg font-semibold">
+                  {{ $t('editions.volunteers.notify_volunteers_slots') }}
+                </h2>
               </div>
             </template>
 

@@ -347,7 +347,7 @@
                 v-if="selectedLog.referer"
                 class="p-3 bg-gray-50 dark:bg-gray-800 rounded col-span-2"
               >
-                <strong>Page d'origine (referer):</strong>
+                <strong>{{ $t('admin.error_logs.referer_page') }}</strong>
                 <a
                   :href="selectedLog.referer"
                   target="_blank"
@@ -360,7 +360,7 @@
                 v-if="selectedLog.origin"
                 class="p-3 bg-gray-50 dark:bg-gray-800 rounded col-span-2"
               >
-                <strong>Domaine d'origine (origin):</strong> {{ selectedLog.origin }}
+                <strong>{{ $t('admin.error_logs.origin_domain') }}</strong> {{ selectedLog.origin }}
               </div>
             </div>
           </div>

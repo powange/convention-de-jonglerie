@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "addEdition": "Tilføj udgaver",
+    "admin": "Administrator",
+    "deleteAllEditions": "Slet alle udgaver",
+    "deleteConvention": "Slet konvention",
+    "editAllEditions": "Rediger alle udgaver",
+    "editConvention": "Rediger konvention",
+    "editor": "Redaktør",
+    "manageCollaborators": "Administrer samarbejdspartnere",
+    "manageVolunteers": "Administrer frivillige",
+    "manager": "Manager",
+    "moderator": "Moderator",
+    "viewer": "Læser"
+  }
+}

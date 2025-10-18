@@ -1,7 +1,7 @@
 <template>
   <div v-if="loading" class="text-center py-12">
     <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 text-gray-400 animate-spin" />
-    <p class="text-sm text-gray-500 mt-2">Chargement...</p>
+    <p class="text-sm text-gray-500 mt-2">{{ $t('ticketing.quotas.list.loading') }}</p>
   </div>
 
   <div v-else class="space-y-4">
@@ -10,7 +10,7 @@
       icon="i-heroicons-information-circle"
       color="info"
       variant="soft"
-      title="Gestion des quotas"
+      :title="$t('ticketing.quotas.list.title')"
       description="Définissez ici les quotas pour limiter l'accès à certaines prestations (spectacles, activités, entrées, etc.)"
     />
 
@@ -24,7 +24,7 @@
         <UFieldGroup>
           <UInput
             :model-value="quota.title"
-            placeholder="Titre du quota"
+            :placeholder="$t('ticketing.quotas.list.name_placeholder')"
             @blur="updateQuota(quota.id, { title: $event.target.value })"
           />
           <UInputNumber
@@ -36,10 +36,10 @@
           <UModal>
             <UButton icon="i-heroicons-pencil" color="neutral" variant="outline" />
             <template #body>
-              <UFormField label="description">
+              <UFormField :label="$t('ticketing.quotas.list.description_label')">
                 <textarea
                   v-model="quota.description"
-                  placeholder="Description (optionnel)"
+                  :placeholder="$t('ticketing.quotas.list.description_placeholder')"
                   color="neutral"
                   variant="outline"
                   class="w-full"
@@ -55,7 +55,11 @@
       <!-- Ligne d'ajout -->
       <div class="flex items-center py-2 px-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
         <UFieldGroup>
-          <UInput v-model="form.title" placeholder="Nouveau quota..." @keydown.enter="handleSave" />
+          <UInput
+            v-model="form.title"
+            :placeholder="$t('ticketing.quotas.list.name_placeholder')"
+            @keydown.enter="handleSave"
+          />
           <UInputNumber
             v-model="form.quantity"
             :min="1"
@@ -65,10 +69,10 @@
           <UModal>
             <UButton icon="i-heroicons-pencil" color="neutral" variant="outline" />
             <template #body>
-              <UFormField label="description">
+              <UFormField :label="$t('ticketing.quotas.list.description_label')">
                 <textarea
                   v-model="form.description"
-                  placeholder="Description (optionnel)"
+                  :placeholder="$t('ticketing.quotas.list.description_placeholder')"
                   color="neutral"
                   variant="outline"
                   class="w-full"
