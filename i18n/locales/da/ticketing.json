@@ -1,0 +1,115 @@
+{
+  "ticketing": {
+    "access_control": {
+      "loading": "Indlæser...",
+      "manual_input_label": "Manuel kodeinput",
+      "no_ticket_found": "Ingen billet fundet",
+      "search_placeholder": "Navn, fornavn eller e-mail...",
+      "ticket_found": "Billet fundet",
+      "unknown": "Ukendt",
+      "volunteer_badge": "Frivillig",
+      "volunteer_found": "Frivillig fundet"
+    },
+    "my_ticket": {
+      "how_to_use_description": "Vis denne QR-kode ved indgangen for at validere din billet.",
+      "how_to_use_title": "Sådan bruges denne QR-kode",
+      "logo_alt": "HelloAsso"
+    },
+    "options": {
+      "list": {
+        "loading": "Indlæser...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Ingen muligheder fundet"
+      },
+      "modal": {
+        "choices_label": "Tilgængelige valg",
+        "choices_placeholder": "Mulighed 1\nMulighed 2\nMulighed 3",
+        "description_label": "Beskrivelse",
+        "description_placeholder": "Beskrivelse af muligheden (valgfrit)",
+        "is_mandatory_label": "Obligatorisk mulighed",
+        "name_label": "Navn på muligheden",
+        "name_placeholder": "F.eks: T-shirt fra kongressen",
+        "no_quota_selected": "Ingen kvote valgt",
+        "position_label": "Visningsposition",
+        "position_placeholder": "0",
+        "quotas_label": "Tilknyttede kvoter",
+        "quotas_placeholder": "Vælg kvoter",
+        "title": "HelloAsso mulighed",
+        "type_label": "Type mulighed"
+      }
+    },
+    "participant": {
+      "entry_validated": "Adgang allerede valideret",
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Ingen tidsrum tildelt",
+      "ticket_type": "Billettype",
+      "type": "Type",
+      "volunteer_validated": "Frivillig har valideret sin adgang"
+    },
+    "quotas": {
+      "list": {
+        "description_label": "beskrivelse",
+        "description_placeholder": "Beskrivelse (valgfrit)",
+        "loading": "Indlæser...",
+        "name_placeholder": "Kvotens titel",
+        "title": "Kvoterstyring"
+      },
+      "stats": {
+        "title": "Kvotestatistik",
+        "used": "Brugt",
+        "validated": "Valideret"
+      }
+    },
+    "returnable_items": {
+      "list": {
+        "add_placeholder": "Ny vare...",
+        "delete_label": "Slet",
+        "delete_title": "Slet varen",
+        "loading": "Indlæser...",
+        "name_placeholder": "Navn på varen",
+        "title": "Varer til udlevering til deltagere"
+      },
+      "volunteer": {
+        "choose_placeholder": "Vælg en vare til returnering...",
+        "given_to_all": "Udleveret til alle frivillige",
+        "remove_label": "Fjern varen",
+        "remove_title": "Fjern denne vare?"
+      }
+    },
+    "stats": {
+      "participants": "Deltagere",
+      "volunteers": "Frivillige"
+    },
+    "tiers": {
+      "list": {
+        "inactive": "Inaktiv",
+        "loading": "Indlæser...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Ingen priser fundet"
+      },
+      "modal": {
+        "description_label": "Beskrivelse",
+        "description_placeholder": "Beskrivelse af pris (valgfrit)",
+        "free_price_label": "Fri pris",
+        "max_amount_label": "Maksimumbeløb (€)",
+        "max_amount_placeholder": "0,00",
+        "min_amount_label": "Minimumsbeløb (€)",
+        "min_amount_placeholder": "0,00",
+        "name_label": "Navn på pris",
+        "name_placeholder": "F.eks: 3-dages pas",
+        "no_item_selected": "Ingen vare valgt",
+        "no_quota_selected": "Ingen kvote valgt",
+        "position_label": "Visningsposition",
+        "position_placeholder": "0",
+        "price_label": "Pris (€)",
+        "price_placeholder": "0,00",
+        "quotas_label": "Tilknyttede kvoter",
+        "quotas_placeholder": "Vælg kvoter",
+        "returnable_items_label": "Varer til returnering",
+        "returnable_items_placeholder": "Vælg varer",
+        "status_label": "Status",
+        "title": "HelloAsso pris"
+      }
+    }
+  }
+}

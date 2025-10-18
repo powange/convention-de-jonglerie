@@ -106,6 +106,8 @@
     "error_details": "Szczegóły błędu",
     "error_logs": {
       "need_investigation": "Wymagają badań",
+      "origin_domain": "Domena pochodzenia (origin):",
+      "referer_page": "Strona pochodzenia (referer):",
       "unresolved": "Nierozwiązane błędy"
     },
     "errors_24h": "Błędy (24h)",

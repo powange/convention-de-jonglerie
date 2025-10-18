@@ -1,0 +1,115 @@
+{
+  "ticketing": {
+    "access_control": {
+      "loading": "Lädt...",
+      "manual_input_label": "Manuelle Codeeingabe",
+      "no_ticket_found": "Kein Ticket gefunden",
+      "search_placeholder": "Name, Vorname oder E-Mail...",
+      "ticket_found": "Ticket gefunden",
+      "unknown": "Unbekannt",
+      "volunteer_badge": "Freiwilliger",
+      "volunteer_found": "Freiwilliger gefunden"
+    },
+    "my_ticket": {
+      "how_to_use_description": "Zeigen Sie diesen QR-Code am Eingang, um Ihr Ticket zu validieren.",
+      "how_to_use_title": "So verwenden Sie diesen QR-Code",
+      "logo_alt": "HelloAsso"
+    },
+    "options": {
+      "list": {
+        "loading": "Lädt...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Keine Optionen gefunden"
+      },
+      "modal": {
+        "choices_label": "Verfügbare Optionen",
+        "choices_placeholder": "Option 1\nOption 2\nOption 3",
+        "description_label": "Beschreibung",
+        "description_placeholder": "Beschreibung der Option (optional)",
+        "is_mandatory_label": "Pflichtfeld",
+        "name_label": "Name der Option",
+        "name_placeholder": "Z.B.: Kongress-T-Shirt",
+        "no_quota_selected": "Kein Kontingent ausgewählt",
+        "position_label": "Anzeigeposition",
+        "position_placeholder": "0",
+        "quotas_label": "Zugeordnete Kontingente",
+        "quotas_placeholder": "Kontingente auswählen",
+        "title": "HelloAsso-Option",
+        "type_label": "Optionstyp"
+      }
+    },
+    "participant": {
+      "entry_validated": "Eintritt bereits validiert",
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Kein Zeitfenster zugewiesen",
+      "ticket_type": "Ticketart",
+      "type": "Typ",
+      "volunteer_validated": "Der Freiwillige hat seinen Eintritt validiert"
+    },
+    "quotas": {
+      "list": {
+        "description_label": "Beschreibung",
+        "description_placeholder": "Beschreibung (optional)",
+        "loading": "Lädt...",
+        "name_placeholder": "Titel des Kontingents",
+        "title": "Kontingentverwaltung"
+      },
+      "stats": {
+        "title": "Kontingentstatistiken",
+        "used": "Verwendet",
+        "validated": "Validiert"
+      }
+    },
+    "returnable_items": {
+      "list": {
+        "add_placeholder": "Neuer Artikel...",
+        "delete_label": "Löschen",
+        "delete_title": "Artikel löschen",
+        "loading": "Lädt...",
+        "name_placeholder": "Name des Artikels",
+        "title": "An Teilnehmer auszuhändigende Artikel"
+      },
+      "volunteer": {
+        "choose_placeholder": "Artikel zur Rückgabe auswählen...",
+        "given_to_all": "An alle Freiwilligen ausgehändigt",
+        "remove_label": "Artikel entfernen",
+        "remove_title": "Diesen Artikel entfernen?"
+      }
+    },
+    "stats": {
+      "participants": "Teilnehmer",
+      "volunteers": "Freiwillige"
+    },
+    "tiers": {
+      "list": {
+        "inactive": "Inaktiv",
+        "loading": "Lädt...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Keine Tarife gefunden"
+      },
+      "modal": {
+        "description_label": "Beschreibung",
+        "description_placeholder": "Beschreibung des Tarifs (optional)",
+        "free_price_label": "Freier Preis",
+        "max_amount_label": "Höchstbetrag (€)",
+        "max_amount_placeholder": "0,00",
+        "min_amount_label": "Mindestbetrag (€)",
+        "min_amount_placeholder": "0,00",
+        "name_label": "Name des Tarifs",
+        "name_placeholder": "Z.B.: 3-Tages-Pass",
+        "no_item_selected": "Kein Artikel ausgewählt",
+        "no_quota_selected": "Kein Kontingent ausgewählt",
+        "position_label": "Anzeigeposition",
+        "position_placeholder": "0",
+        "price_label": "Preis (€)",
+        "price_placeholder": "0,00",
+        "quotas_label": "Zugeordnete Kontingente",
+        "quotas_placeholder": "Kontingente auswählen",
+        "returnable_items_label": "Zurückzugebende Artikel",
+        "returnable_items_placeholder": "Artikel auswählen",
+        "status_label": "Status",
+        "title": "HelloAsso-Tarif"
+      }
+    }
+  }
+}

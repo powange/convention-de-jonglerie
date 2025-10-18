@@ -172,24 +172,6 @@
       "start_typing_address": "Beginne eine Adresse zu tippen..."
     }
   },
-  "push_notifications": {
-    "promo_modal": {
-      "benefits": {
-        "carpool": "Erhalten Sie Benachrichtigungen über Mitfahrgelegenheit-Buchungen und Nachrichten",
-        "important": "Verpassen Sie keine wichtigen Informationen, die Sie betreffen",
-        "reminders": "Erhalten Sie Erinnerungen für Ihre Lieblings-Conventions",
-        "volunteer": "Erhalten Sie Updates zu Ihren Freiwilligen-Bewerbungen"
-      },
-      "description": "Aktivieren Sie Push-Benachrichtigungen, um über Ihre Fahrgemeinschaften, Freiwilligen-Bewerbungen und Lieblings-Conventions informiert zu bleiben.",
-      "enable": "Benachrichtigungen aktivieren",
-      "not_now": "Nicht jetzt",
-      "privacy": {
-        "description": "Sie können Benachrichtigungen jederzeit in Ihren Einstellungen deaktivieren.",
-        "title": "Respektiert Ihre Privatsphäre"
-      },
-      "title": "Bleiben Sie in Echtzeit informiert"
-    }
-  },
   "upload": {
     "delete_message": "Bild gelöscht",
     "error": "Fehler beim Hochladen",

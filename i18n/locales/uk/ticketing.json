@@ -1,0 +1,115 @@
+{
+  "ticketing": {
+    "access_control": {
+      "loading": "Завантаження...",
+      "manual_input_label": "Ручне введення коду",
+      "no_ticket_found": "Квиток не знайдено",
+      "search_placeholder": "Прізвище, ім'я або email...",
+      "ticket_found": "Квиток знайдено",
+      "unknown": "Невідомо",
+      "volunteer_badge": "Волонтер",
+      "volunteer_found": "Волонтера знайдено"
+    },
+    "my_ticket": {
+      "how_to_use_description": "Покажіть цей QR-код на вході для валідації квитка.",
+      "how_to_use_title": "Як використовувати цей QR-код",
+      "logo_alt": "HelloAsso"
+    },
+    "options": {
+      "list": {
+        "loading": "Завантаження...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Параметри не знайдено"
+      },
+      "modal": {
+        "choices_label": "Доступні варіанти",
+        "choices_placeholder": "Варіант 1\nВаріант 2\nВаріант 3",
+        "description_label": "Опис",
+        "description_placeholder": "Опис параметра (необов'язково)",
+        "is_mandatory_label": "Обов'язковий параметр",
+        "name_label": "Назва параметра",
+        "name_placeholder": "Напр: Футболка конвенції",
+        "no_quota_selected": "Квоту не вибрано",
+        "position_label": "Позиція відображення",
+        "position_placeholder": "0",
+        "quotas_label": "Пов'язані квоти",
+        "quotas_placeholder": "Вибрати квоти",
+        "title": "Параметр HelloAsso",
+        "type_label": "Тип параметра"
+      }
+    },
+    "participant": {
+      "entry_validated": "Вхід вже підтверджено",
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Часовий проміжок не призначено",
+      "ticket_type": "Тип квитка",
+      "type": "Тип",
+      "volunteer_validated": "Волонтер підтвердив свій вхід"
+    },
+    "quotas": {
+      "list": {
+        "description_label": "опис",
+        "description_placeholder": "Опис (необов'язково)",
+        "loading": "Завантаження...",
+        "name_placeholder": "Назва квоти",
+        "title": "Управління квотами"
+      },
+      "stats": {
+        "title": "Статистика квот",
+        "used": "Використано",
+        "validated": "Підтверджено"
+      }
+    },
+    "returnable_items": {
+      "list": {
+        "add_placeholder": "Новий елемент...",
+        "delete_label": "Видалити",
+        "delete_title": "Видалити елемент",
+        "loading": "Завантаження...",
+        "name_placeholder": "Назва елемента",
+        "title": "Предмети для видачі учасникам"
+      },
+      "volunteer": {
+        "choose_placeholder": "Вибрати предмет для повернення...",
+        "given_to_all": "Видано всім волонтерам",
+        "remove_label": "Видалити предмет",
+        "remove_title": "Видалити цей предмет?"
+      }
+    },
+    "stats": {
+      "participants": "Учасники",
+      "volunteers": "Волонтери"
+    },
+    "tiers": {
+      "list": {
+        "inactive": "Неактивно",
+        "loading": "Завантаження...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Тарифи не знайдено"
+      },
+      "modal": {
+        "description_label": "Опис",
+        "description_placeholder": "Опис тарифу (необов'язково)",
+        "free_price_label": "Вільна ціна",
+        "max_amount_label": "Максимальна сума (€)",
+        "max_amount_placeholder": "0,00",
+        "min_amount_label": "Мінімальна сума (€)",
+        "min_amount_placeholder": "0,00",
+        "name_label": "Назва тарифу",
+        "name_placeholder": "Напр: 3-денний пропуск",
+        "no_item_selected": "Предмет не вибрано",
+        "no_quota_selected": "Квоту не вибрано",
+        "position_label": "Позиція відображення",
+        "position_placeholder": "0",
+        "price_label": "Ціна (€)",
+        "price_placeholder": "0,00",
+        "quotas_label": "Пов'язані квоти",
+        "quotas_placeholder": "Вибрати квоти",
+        "returnable_items_label": "Предмети для повернення",
+        "returnable_items_placeholder": "Вибрати предмети",
+        "status_label": "Статус",
+        "title": "Тариф HelloAsso"
+      }
+    }
+  }
+}

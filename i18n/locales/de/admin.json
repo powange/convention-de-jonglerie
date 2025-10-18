@@ -106,6 +106,8 @@
     "error_details": "Fehlerdetails",
     "error_logs": {
       "need_investigation": "Untersuchung erforderlich",
+      "origin_domain": "Ursprungsdomäne (origin):",
+      "referer_page": "Ursprungsseite (referer):",
       "unresolved": "Ungelöste Fehler"
     },
     "errors_24h": "Fehler (24h)",

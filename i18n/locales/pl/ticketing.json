@@ -1,0 +1,115 @@
+{
+  "ticketing": {
+    "access_control": {
+      "loading": "Ładowanie...",
+      "manual_input_label": "Ręczne wprowadzenie kodu",
+      "no_ticket_found": "Nie znaleziono biletu",
+      "search_placeholder": "Nazwisko, imię lub e-mail...",
+      "ticket_found": "Znaleziono bilet",
+      "unknown": "Nieznany",
+      "volunteer_badge": "Wolontariusz",
+      "volunteer_found": "Znaleziono wolontariusza"
+    },
+    "my_ticket": {
+      "how_to_use_description": "Pokaż ten kod QR przy wejściu, aby zwalidować swój bilet.",
+      "how_to_use_title": "Jak używać tego kodu QR",
+      "logo_alt": "HelloAsso"
+    },
+    "options": {
+      "list": {
+        "loading": "Ładowanie...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Nie znaleziono opcji"
+      },
+      "modal": {
+        "choices_label": "Dostępne wybory",
+        "choices_placeholder": "Opcja 1\nOpcja 2\nOpcja 3",
+        "description_label": "Opis",
+        "description_placeholder": "Opis opcji (opcjonalnie)",
+        "is_mandatory_label": "Opcja obowiązkowa",
+        "name_label": "Nazwa opcji",
+        "name_placeholder": "Np: Koszulka konwencji",
+        "no_quota_selected": "Nie wybrano kwoty",
+        "position_label": "Pozycja wyświetlania",
+        "position_placeholder": "0",
+        "quotas_label": "Powiązane kwoty",
+        "quotas_placeholder": "Wybierz kwoty",
+        "title": "Opcja HelloAsso",
+        "type_label": "Typ opcji"
+      }
+    },
+    "participant": {
+      "entry_validated": "Wejście już zwalidowane",
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Nie przypisano przedziału czasowego",
+      "ticket_type": "Typ biletu",
+      "type": "Typ",
+      "volunteer_validated": "Wolontariusz zwalidował swoje wejście"
+    },
+    "quotas": {
+      "list": {
+        "description_label": "opis",
+        "description_placeholder": "Opis (opcjonalnie)",
+        "loading": "Ładowanie...",
+        "name_placeholder": "Tytuł kwoty",
+        "title": "Zarządzanie kwotami"
+      },
+      "stats": {
+        "title": "Statystyki kwot",
+        "used": "Używany",
+        "validated": "Zwalidowany"
+      }
+    },
+    "returnable_items": {
+      "list": {
+        "add_placeholder": "Nowy przedmiot...",
+        "delete_label": "Usuń",
+        "delete_title": "Usuń przedmiot",
+        "loading": "Ładowanie...",
+        "name_placeholder": "Nazwa przedmiotu",
+        "title": "Przedmioty do przekazania uczestnikom"
+      },
+      "volunteer": {
+        "choose_placeholder": "Wybierz przedmiot do zwrotu...",
+        "given_to_all": "Przekazano wszystkim wolontariuszom",
+        "remove_label": "Usuń przedmiot",
+        "remove_title": "Usunąć ten przedmiot?"
+      }
+    },
+    "stats": {
+      "participants": "Uczestnicy",
+      "volunteers": "Wolontariusze"
+    },
+    "tiers": {
+      "list": {
+        "inactive": "Nieaktywny",
+        "loading": "Ładowanie...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Nie znaleziono taryf"
+      },
+      "modal": {
+        "description_label": "Opis",
+        "description_placeholder": "Opis taryfy (opcjonalnie)",
+        "free_price_label": "Cena dowolna",
+        "max_amount_label": "Maksymalna kwota (€)",
+        "max_amount_placeholder": "0,00",
+        "min_amount_label": "Minimalna kwota (€)",
+        "min_amount_placeholder": "0,00",
+        "name_label": "Nazwa taryfy",
+        "name_placeholder": "Np: Karnet 3-dniowy",
+        "no_item_selected": "Nie wybrano przedmiotu",
+        "no_quota_selected": "Nie wybrano kwoty",
+        "position_label": "Pozycja wyświetlania",
+        "position_placeholder": "0",
+        "price_label": "Cena (€)",
+        "price_placeholder": "0,00",
+        "quotas_label": "Powiązane kwoty",
+        "quotas_placeholder": "Wybierz kwoty",
+        "returnable_items_label": "Przedmioty do zwrotu",
+        "returnable_items_placeholder": "Wybierz przedmioty",
+        "status_label": "Status",
+        "title": "Taryfa HelloAsso"
+      }
+    }
+  }
+}

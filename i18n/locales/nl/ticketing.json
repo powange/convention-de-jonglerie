@@ -1,0 +1,115 @@
+{
+  "ticketing": {
+    "access_control": {
+      "loading": "Laden...",
+      "manual_input_label": "Handmatige code-invoer",
+      "no_ticket_found": "Geen ticket gevonden",
+      "search_placeholder": "Achternaam, voornaam of e-mail...",
+      "ticket_found": "Ticket gevonden",
+      "unknown": "Onbekend",
+      "volunteer_badge": "Vrijwilliger",
+      "volunteer_found": "Vrijwilliger gevonden"
+    },
+    "my_ticket": {
+      "how_to_use_description": "Toon deze QR-code bij de ingang om je ticket te valideren.",
+      "how_to_use_title": "Hoe gebruik je deze QR-code",
+      "logo_alt": "HelloAsso"
+    },
+    "options": {
+      "list": {
+        "loading": "Laden...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Geen opties gevonden"
+      },
+      "modal": {
+        "choices_label": "Beschikbare keuzes",
+        "choices_placeholder": "Optie 1\nOptie 2\nOptie 3",
+        "description_label": "Beschrijving",
+        "description_placeholder": "Beschrijving van de optie (optioneel)",
+        "is_mandatory_label": "Verplichte optie",
+        "name_label": "Naam van de optie",
+        "name_placeholder": "Bijv: Conventie T-shirt",
+        "no_quota_selected": "Geen quotum geselecteerd",
+        "position_label": "Weergavepositie",
+        "position_placeholder": "0",
+        "quotas_label": "Gekoppelde quota",
+        "quotas_placeholder": "Selecteer quota",
+        "title": "HelloAsso optie",
+        "type_label": "Type optie"
+      }
+    },
+    "participant": {
+      "entry_validated": "Toegang al gevalideerd",
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Geen tijdslot toegewezen",
+      "ticket_type": "Tickettype",
+      "type": "Type",
+      "volunteer_validated": "De vrijwilliger heeft zijn toegang gevalideerd"
+    },
+    "quotas": {
+      "list": {
+        "description_label": "beschrijving",
+        "description_placeholder": "Beschrijving (optioneel)",
+        "loading": "Laden...",
+        "name_placeholder": "Titel van het quotum",
+        "title": "Quotumbeheer"
+      },
+      "stats": {
+        "title": "Quotumstatistieken",
+        "used": "Gebruikt",
+        "validated": "Gevalideerd"
+      }
+    },
+    "returnable_items": {
+      "list": {
+        "add_placeholder": "Nieuw artikel...",
+        "delete_label": "Verwijderen",
+        "delete_title": "Artikel verwijderen",
+        "loading": "Laden...",
+        "name_placeholder": "Naam van het artikel",
+        "title": "Artikelen om aan deelnemers te geven"
+      },
+      "volunteer": {
+        "choose_placeholder": "Kies een artikel om terug te geven...",
+        "given_to_all": "Gegeven aan alle vrijwilligers",
+        "remove_label": "Artikel verwijderen",
+        "remove_title": "Dit artikel verwijderen?"
+      }
+    },
+    "stats": {
+      "participants": "Deelnemers",
+      "volunteers": "Vrijwilligers"
+    },
+    "tiers": {
+      "list": {
+        "inactive": "Inactief",
+        "loading": "Laden...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Geen tarieven gevonden"
+      },
+      "modal": {
+        "description_label": "Beschrijving",
+        "description_placeholder": "Beschrijving van het tarief (optioneel)",
+        "free_price_label": "Vrije prijs",
+        "max_amount_label": "Maximumbedrag (€)",
+        "max_amount_placeholder": "0,00",
+        "min_amount_label": "Minimumbedrag (€)",
+        "min_amount_placeholder": "0,00",
+        "name_label": "Naam van het tarief",
+        "name_placeholder": "Bijv: 3-dagen pas",
+        "no_item_selected": "Geen artikel geselecteerd",
+        "no_quota_selected": "Geen quotum geselecteerd",
+        "position_label": "Weergavepositie",
+        "position_placeholder": "0",
+        "price_label": "Prijs (€)",
+        "price_placeholder": "0,00",
+        "quotas_label": "Gekoppelde quota",
+        "quotas_placeholder": "Selecteer quota",
+        "returnable_items_label": "Terug te geven artikelen",
+        "returnable_items_placeholder": "Selecteer artikelen",
+        "status_label": "Status",
+        "title": "HelloAsso tarief"
+      }
+    }
+  }
+}

@@ -1,4 +1,22 @@
 {
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Soyez notifié des réservations et messages de covoiturage",
+        "important": "Ne manquez pas les informations importantes vous concernant",
+        "reminders": "Recevez des rappels pour vos conventions favorites",
+        "volunteer": "Recevez les mises à jour sur vos candidatures de bénévolat"
+      },
+      "description": "Activez les notifications push pour être tenu au courant de vos covoiturages, candidatures de bénévolat et conventions favorites.",
+      "enable": "Activer les notifications",
+      "not_now": "Pas maintenant",
+      "privacy": {
+        "description": "Vous pouvez désactiver les notifications à tout moment dans vos paramètres.",
+        "title": "Respectueux de votre vie privée"
+      },
+      "title": "Restez informé en temps réel"
+    }
+  },
   "notifications": {
     "carpool": {
       "booking_accepted": {

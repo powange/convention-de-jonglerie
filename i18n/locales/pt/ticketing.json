@@ -1,0 +1,115 @@
+{
+  "ticketing": {
+    "access_control": {
+      "loading": "Carregando...",
+      "manual_input_label": "Entrada manual do código",
+      "no_ticket_found": "Nenhum bilhete encontrado",
+      "search_placeholder": "Sobrenome, nome ou e-mail...",
+      "ticket_found": "Bilhete encontrado",
+      "unknown": "Desconhecido",
+      "volunteer_badge": "Voluntário",
+      "volunteer_found": "Voluntário encontrado"
+    },
+    "my_ticket": {
+      "how_to_use_description": "Apresente este código QR na entrada para validar o seu bilhete.",
+      "how_to_use_title": "Como usar este código QR",
+      "logo_alt": "HelloAsso"
+    },
+    "options": {
+      "list": {
+        "loading": "Carregando...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Nenhuma opção encontrada"
+      },
+      "modal": {
+        "choices_label": "Escolhas disponíveis",
+        "choices_placeholder": "Opção 1\nOpção 2\nOpção 3",
+        "description_label": "Descrição",
+        "description_placeholder": "Descrição da opção (opcional)",
+        "is_mandatory_label": "Opção obrigatória",
+        "name_label": "Nome da opção",
+        "name_placeholder": "Ex: Camiseta da convenção",
+        "no_quota_selected": "Nenhuma quota selecionada",
+        "position_label": "Posição de exibição",
+        "position_placeholder": "0",
+        "quotas_label": "Quotas associadas",
+        "quotas_placeholder": "Selecionar quotas",
+        "title": "Opção HelloAsso",
+        "type_label": "Tipo de opção"
+      }
+    },
+    "participant": {
+      "entry_validated": "Entrada já validada",
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Nenhum horário atribuído",
+      "ticket_type": "Tipo de bilhete",
+      "type": "Tipo",
+      "volunteer_validated": "O voluntário validou a sua entrada"
+    },
+    "quotas": {
+      "list": {
+        "description_label": "descrição",
+        "description_placeholder": "Descrição (opcional)",
+        "loading": "Carregando...",
+        "name_placeholder": "Título da quota",
+        "title": "Gestão de quotas"
+      },
+      "stats": {
+        "title": "Estatísticas de quotas",
+        "used": "Usado",
+        "validated": "Validado"
+      }
+    },
+    "returnable_items": {
+      "list": {
+        "add_placeholder": "Novo artigo...",
+        "delete_label": "Excluir",
+        "delete_title": "Excluir artigo",
+        "loading": "Carregando...",
+        "name_placeholder": "Nome do artigo",
+        "title": "Artigos a serem entregues aos participantes"
+      },
+      "volunteer": {
+        "choose_placeholder": "Escolher um artigo para devolver...",
+        "given_to_all": "Entregue a todos os voluntários",
+        "remove_label": "Remover artigo",
+        "remove_title": "Remover este artigo?"
+      }
+    },
+    "stats": {
+      "participants": "Participantes",
+      "volunteers": "Voluntários"
+    },
+    "tiers": {
+      "list": {
+        "inactive": "Inativo",
+        "loading": "Carregando...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Nenhuma tarifa encontrada"
+      },
+      "modal": {
+        "description_label": "Descrição",
+        "description_placeholder": "Descrição da tarifa (opcional)",
+        "free_price_label": "Preço livre",
+        "max_amount_label": "Valor máximo (€)",
+        "max_amount_placeholder": "0,00",
+        "min_amount_label": "Valor mínimo (€)",
+        "min_amount_placeholder": "0,00",
+        "name_label": "Nome da tarifa",
+        "name_placeholder": "Ex: Passe de 3 dias",
+        "no_item_selected": "Nenhum artigo selecionado",
+        "no_quota_selected": "Nenhuma quota selecionada",
+        "position_label": "Posição de exibição",
+        "position_placeholder": "0",
+        "price_label": "Preço (€)",
+        "price_placeholder": "0,00",
+        "quotas_label": "Quotas associadas",
+        "quotas_placeholder": "Selecionar quotas",
+        "returnable_items_label": "Artigos a devolver",
+        "returnable_items_placeholder": "Selecionar artigos",
+        "status_label": "Estado",
+        "title": "Tarifa HelloAsso"
+      }
+    }
+  }
+}

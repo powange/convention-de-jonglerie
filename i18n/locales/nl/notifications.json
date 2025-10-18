@@ -89,5 +89,23 @@
       "message": "Je account is succesvol aangemaakt. Ontdek jongleerconventies bij jou in de buurt!",
       "title": "Welkom! 🎉"
     }
+  },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Ontvang meldingen van carpool-boekingen en berichten",
+        "important": "Mis geen belangrijke informatie die jou betreft",
+        "reminders": "Ontvang herinneringen voor je favoriete conventies",
+        "volunteer": "Ontvang updates over je vrijwilligersaanmeldingen"
+      },
+      "description": "Schakel push-notificaties in om op de hoogte te blijven van je carpools, vrijwilligersaanmeldingen en favoriete conventies.",
+      "enable": "Notificaties inschakelen",
+      "not_now": "Niet nu",
+      "privacy": {
+        "description": "Je kunt notificaties altijd uitschakelen in je instellingen.",
+        "title": "Privacyvriendelijk"
+      },
+      "title": "Blijf real-time geïnformeerd"
+    }
   }
 }

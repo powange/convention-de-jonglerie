@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 const bodySchema = z.object({
   returnableItemId: z.number(),
+  teamId: z.string().nullable().optional(), // NULL ou undefined = global, string = équipe spécifique
 })
 
 export default defineEventHandler(async (event) => {
@@ -39,20 +40,39 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Vérifier que l'association n'existe pas déjà
-    const existing = await prisma.editionVolunteerReturnableItem.findUnique({
-      where: {
-        editionId_returnableItemId: {
+    // Si teamId est fourni, vérifier que l'équipe existe
+    if (body.teamId) {
+      const team = await prisma.volunteerTeam.findFirst({
+        where: {
+          id: body.teamId,
           editionId,
-          returnableItemId: body.returnableItemId,
         },
+      })
+
+      if (!team) {
+        throw createError({
+          statusCode: 404,
+          message: 'Équipe introuvable',
+        })
+      }
+    }
+
+    // Vérifier que l'association n'existe pas déjà (même article + même scope)
+    // Note: On utilise findFirst au lieu de findUnique car Prisma ne permet pas
+    // d'utiliser null dans une contrainte unique composite
+    const existing = await prisma.editionVolunteerReturnableItem.findFirst({
+      where: {
+        editionId,
+        returnableItemId: body.returnableItemId,
+        teamId: body.teamId ?? null,
       },
     })
 
     if (existing) {
+      const scope = body.teamId ? 'cette équipe' : 'tous les bénévoles'
       throw createError({
         statusCode: 400,
-        message: 'Cet article est déjà associé aux bénévoles',
+        message: `Cet article est déjà associé à ${scope}`,
       })
     }
 
@@ -61,9 +81,17 @@ export default defineEventHandler(async (event) => {
       data: {
         editionId,
         returnableItemId: body.returnableItemId,
+        teamId: body.teamId ?? null,
       },
       include: {
         returnableItem: true,
+        team: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
       },
     })
 
@@ -72,7 +100,9 @@ export default defineEventHandler(async (event) => {
       item: {
         id: item.id,
         returnableItemId: item.returnableItemId,
+        teamId: item.teamId,
         name: item.returnableItem.name,
+        team: item.team,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
       },

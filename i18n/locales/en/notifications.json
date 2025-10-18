@@ -89,5 +89,23 @@
       "message": "Your account has been successfully created. Discover juggling conventions near you!",
       "title": "Welcome! 🎉"
     }
+  },
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Get notified of carpool bookings and messages",
+        "important": "Don't miss important information concerning you",
+        "reminders": "Receive reminders for your favorite conventions",
+        "volunteer": "Receive updates on your volunteer applications"
+      },
+      "description": "Enable push notifications to stay informed about your carpools, volunteer applications, and favorite conventions.",
+      "enable": "Enable notifications",
+      "not_now": "Not now",
+      "privacy": {
+        "description": "You can disable notifications anytime in your settings.",
+        "title": "Privacy friendly"
+      },
+      "title": "Stay informed in real time"
+    }
   }
 }

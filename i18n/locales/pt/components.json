@@ -172,24 +172,6 @@
       "start_typing_address": "Comece a escrever uma morada..."
     }
   },
-  "push_notifications": {
-    "promo_modal": {
-      "benefits": {
-        "carpool": "Seja notificado sobre reservas e mensagens de caronas",
-        "important": "Não perca informações importantes que lhe dizem respeito",
-        "reminders": "Receba lembretes das suas convenções favoritas",
-        "volunteer": "Receba atualizações sobre suas candidaturas de voluntário"
-      },
-      "description": "Ative as notificações push para se manter informado sobre suas caronas, candidaturas de voluntário e convenções favoritas.",
-      "enable": "Ativar notificações",
-      "not_now": "Agora não",
-      "privacy": {
-        "description": "Pode desativar as notificações a qualquer momento nas suas definições.",
-        "title": "Respeitoso da privacidade"
-      },
-      "title": "Mantenha-se informado em tempo real"
-    }
-  },
   "upload": {
     "delete_message": "Imagem excluída",
     "error": "Erro durante o carregamento",

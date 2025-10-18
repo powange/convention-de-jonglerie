@@ -94,13 +94,49 @@ export default defineEventHandler(async (event) => {
           },
         })
 
-        // Récupérer les articles à restituer pour les bénévoles
-        const volunteerReturnableItems = await prisma.editionVolunteerReturnableItem.findMany({
-          where: { editionId },
+        // Récupérer les articles à restituer pour ce bénévole
+        // Logique de surcharge : si le bénévole a une équipe avec des articles spécifiques,
+        // on utilise ces articles au lieu des articles globaux
+        const teamIds = application.teamAssignments.map((assignment) => assignment.teamId)
+
+        // Récupérer d'abord les articles spécifiques aux équipes du bénévole
+        const teamSpecificItems = await prisma.editionVolunteerReturnableItem.findMany({
+          where: {
+            editionId,
+            teamId: { in: teamIds },
+          },
           include: {
             returnableItem: true,
+            team: true,
           },
         })
+
+        let volunteerReturnableItems
+        if (teamSpecificItems.length > 0) {
+          // Le bénévole a au moins une équipe avec des articles spécifiques
+          // On utilise UNIQUEMENT ces articles (surcharge)
+          volunteerReturnableItems = teamSpecificItems
+        } else {
+          // Pas d'articles spécifiques, on utilise les articles globaux
+          volunteerReturnableItems = await prisma.editionVolunteerReturnableItem.findMany({
+            where: {
+              editionId,
+              teamId: null, // Articles globaux uniquement
+            },
+            include: {
+              returnableItem: true,
+            },
+          })
+        }
+
+        // Dédupliquer les articles (si le bénévole est dans plusieurs équipes avec le même article)
+        const uniqueItems = new Map()
+        volunteerReturnableItems.forEach((item) => {
+          if (!uniqueItems.has(item.returnableItem.id)) {
+            uniqueItems.set(item.returnableItem.id, item.returnableItem)
+          }
+        })
+        const deduplicatedItems = Array.from(uniqueItems.values())
 
         return {
           success: true,
@@ -127,9 +163,9 @@ export default defineEventHandler(async (event) => {
                 startDateTime: assignment.timeSlot.startDateTime,
                 endDateTime: assignment.timeSlot.endDateTime,
               })),
-              returnableItems: volunteerReturnableItems.map((item) => ({
-                id: item.returnableItem.id,
-                name: item.returnableItem.name,
+              returnableItems: deduplicatedItems.map((item) => ({
+                id: item.id,
+                name: item.name,
               })),
               entryValidated: application.entryValidated,
               entryValidatedAt: application.entryValidatedAt,

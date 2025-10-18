@@ -47,6 +47,19 @@ const translationLoaders: Record<string, Record<string, () => Promise<any>>> = {
     ru: () => import('../../i18n/locales/ru/auth.json'),
     uk: () => import('../../i18n/locales/uk/auth.json'),
   },
+  ticketing: {
+    en: () => import('../../i18n/locales/en/ticketing.json'),
+    da: () => import('../../i18n/locales/da/ticketing.json'),
+    de: () => import('../../i18n/locales/de/ticketing.json'),
+    es: () => import('../../i18n/locales/es/ticketing.json'),
+    fr: () => import('../../i18n/locales/fr/ticketing.json'),
+    it: () => import('../../i18n/locales/it/ticketing.json'),
+    nl: () => import('../../i18n/locales/nl/ticketing.json'),
+    pl: () => import('../../i18n/locales/pl/ticketing.json'),
+    pt: () => import('../../i18n/locales/pt/ticketing.json'),
+    ru: () => import('../../i18n/locales/ru/ticketing.json'),
+    uk: () => import('../../i18n/locales/uk/ticketing.json'),
+  },
 }
 
 export default defineNuxtRouteMiddleware(async (to) => {
@@ -73,11 +86,27 @@ export default defineNuxtRouteMiddleware(async (to) => {
     '/forgot-password': ['auth'],
   }
 
+  // Regex pour les routes dynamiques nécessitant des traductions spécifiques
+  const dynamicRoutePatterns: Array<{ pattern: RegExp; translations: string[] }> = [
+    {
+      pattern: /^\/editions\/\d+\/gestion\/ticketing/,
+      translations: ['ticketing'],
+    },
+  ]
+
   // Déterminer quels fichiers de traduction charger
   const translationsToLoad: string[] = []
 
+  // Vérifier les routes statiques
   for (const [route, translations] of Object.entries(routeTranslations)) {
     if (to.path.startsWith(route)) {
+      translationsToLoad.push(...translations)
+    }
+  }
+
+  // Vérifier les routes dynamiques avec regex
+  for (const { pattern, translations } of dynamicRoutePatterns) {
+    if (pattern.test(to.path)) {
       translationsToLoad.push(...translations)
     }
   }

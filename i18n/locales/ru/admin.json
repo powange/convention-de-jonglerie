@@ -106,6 +106,8 @@
     "error_details": "Детали ошибки",
     "error_logs": {
       "need_investigation": "Требуют расследования",
+      "origin_domain": "Домен происхождения (origin):",
+      "referer_page": "Страница происхождения (referer):",
       "unresolved": "Нерешённые ошибки"
     },
     "errors_24h": "Ошибки (24ч)",

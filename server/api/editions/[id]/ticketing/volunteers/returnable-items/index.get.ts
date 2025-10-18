@@ -21,19 +21,33 @@ export default defineEventHandler(async (event) => {
       where: { editionId },
       include: {
         returnableItem: true,
-      },
-      orderBy: {
-        returnableItem: {
-          name: 'asc',
+        team: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
         },
       },
+      orderBy: [
+        {
+          teamId: 'asc', // NULL en premier (global), puis les équipes
+        },
+        {
+          returnableItem: {
+            name: 'asc',
+          },
+        },
+      ],
     })
 
     return {
       items: items.map((item) => ({
         id: item.id,
         returnableItemId: item.returnableItemId,
+        teamId: item.teamId,
         name: item.returnableItem.name,
+        team: item.team,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
       })),

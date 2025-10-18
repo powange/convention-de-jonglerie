@@ -1,0 +1,115 @@
+{
+  "ticketing": {
+    "access_control": {
+      "loading": "Loading...",
+      "manual_input_label": "Manual code entry",
+      "no_ticket_found": "No ticket found",
+      "search_placeholder": "Last name, first name or email...",
+      "ticket_found": "Ticket found",
+      "unknown": "Unknown",
+      "volunteer_badge": "Volunteer",
+      "volunteer_found": "Volunteer found"
+    },
+    "my_ticket": {
+      "how_to_use_description": "Show this QR code at the entrance to validate your ticket.",
+      "how_to_use_title": "How to use this QR code",
+      "logo_alt": "HelloAsso"
+    },
+    "options": {
+      "list": {
+        "loading": "Loading...",
+        "logo_alt": "HelloAsso",
+        "none_found": "No options found"
+      },
+      "modal": {
+        "choices_label": "Available choices",
+        "choices_placeholder": "Option 1\nOption 2\nOption 3",
+        "description_label": "Description",
+        "description_placeholder": "Option description (optional)",
+        "is_mandatory_label": "Mandatory option",
+        "name_label": "Option name",
+        "name_placeholder": "E.g: Convention T-shirt",
+        "no_quota_selected": "No quota selected",
+        "position_label": "Display position",
+        "position_placeholder": "0",
+        "quotas_label": "Associated quotas",
+        "quotas_placeholder": "Select quotas",
+        "title": "HelloAsso option",
+        "type_label": "Option type"
+      }
+    },
+    "participant": {
+      "entry_validated": "Entry already validated",
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "No slot assigned",
+      "ticket_type": "Ticket type",
+      "type": "Type",
+      "volunteer_validated": "The volunteer has validated their entry"
+    },
+    "quotas": {
+      "list": {
+        "description_label": "description",
+        "description_placeholder": "Description (optional)",
+        "loading": "Loading...",
+        "name_placeholder": "Quota title",
+        "title": "Quota management"
+      },
+      "stats": {
+        "title": "Quota statistics",
+        "used": "Used",
+        "validated": "Validated"
+      }
+    },
+    "returnable_items": {
+      "list": {
+        "add_placeholder": "New item...",
+        "delete_label": "Delete",
+        "delete_title": "Delete item",
+        "loading": "Loading...",
+        "name_placeholder": "Item name",
+        "title": "Items to be given to participants"
+      },
+      "volunteer": {
+        "choose_placeholder": "Choose an item to return...",
+        "given_to_all": "Given to all volunteers",
+        "remove_label": "Remove item",
+        "remove_title": "Remove this item?"
+      }
+    },
+    "stats": {
+      "participants": "Participants",
+      "volunteers": "Volunteers"
+    },
+    "tiers": {
+      "list": {
+        "inactive": "Inactive",
+        "loading": "Loading...",
+        "logo_alt": "HelloAsso",
+        "none_found": "No tiers found"
+      },
+      "modal": {
+        "description_label": "Description",
+        "description_placeholder": "Tier description (optional)",
+        "free_price_label": "Pay what you want",
+        "max_amount_label": "Maximum amount (€)",
+        "max_amount_placeholder": "0.00",
+        "min_amount_label": "Minimum amount (€)",
+        "min_amount_placeholder": "0.00",
+        "name_label": "Tier name",
+        "name_placeholder": "E.g: 3-day pass",
+        "no_item_selected": "No item selected",
+        "no_quota_selected": "No quota selected",
+        "position_label": "Display position",
+        "position_placeholder": "0",
+        "price_label": "Price (€)",
+        "price_placeholder": "0.00",
+        "quotas_label": "Associated quotas",
+        "quotas_placeholder": "Select quotas",
+        "returnable_items_label": "Items to return",
+        "returnable_items_placeholder": "Select items",
+        "status_label": "Status",
+        "title": "HelloAsso tier"
+      }
+    }
+  }
+}

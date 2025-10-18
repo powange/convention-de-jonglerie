@@ -109,7 +109,7 @@
               :items="returnableItems"
               :loading="loadingReturnableItems"
               :edition-id="editionId"
-              @refresh="loadReturnableItems"
+              @refresh="onReturnableItemsRefresh"
             />
 
             <!-- Articles à restituer pour les bénévoles -->
@@ -125,6 +125,7 @@
                 </div>
 
                 <TicketingVolunteerReturnableItemsList
+                  :key="volunteerReturnableItemsKey"
                   :items="volunteerReturnableItems"
                   :loading="loadingVolunteerReturnableItems"
                   :edition-id="editionId"
@@ -184,6 +185,7 @@ const returnableItems = ref<any[]>([])
 // Items à restituer pour bénévoles
 const loadingVolunteerReturnableItems = ref(true)
 const volunteerReturnableItems = ref<any[]>([])
+const volunteerReturnableItemsKey = ref(0) // Clé pour forcer le rechargement du composant
 
 const lastSyncText = computed(() => {
   if (!lastSync.value) return 'Jamais'
@@ -331,6 +333,14 @@ const loadReturnableItems = async () => {
   } finally {
     loadingReturnableItems.value = false
   }
+}
+
+// Quand les articles à restituer changent, forcer un rechargement des articles bénévoles
+// pour que la liste des articles disponibles se mette à jour
+const onReturnableItemsRefresh = async () => {
+  await loadReturnableItems()
+  // Forcer un rechargement du composant bénévole en changeant la clé
+  volunteerReturnableItemsKey.value++
 }
 
 // Fonctions pour les items à restituer pour bénévoles

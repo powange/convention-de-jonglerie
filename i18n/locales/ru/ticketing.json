@@ -1,0 +1,115 @@
+{
+  "ticketing": {
+    "access_control": {
+      "loading": "Загрузка...",
+      "manual_input_label": "Ручной ввод кода",
+      "no_ticket_found": "Билет не найден",
+      "search_placeholder": "Фамилия, имя или email...",
+      "ticket_found": "Билет найден",
+      "unknown": "Неизвестно",
+      "volunteer_badge": "Волонтёр",
+      "volunteer_found": "Волонтёр найден"
+    },
+    "my_ticket": {
+      "how_to_use_description": "Покажите этот QR-код на входе для валидации билета.",
+      "how_to_use_title": "Как использовать этот QR-код",
+      "logo_alt": "HelloAsso"
+    },
+    "options": {
+      "list": {
+        "loading": "Загрузка...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Параметры не найдены"
+      },
+      "modal": {
+        "choices_label": "Доступные варианты",
+        "choices_placeholder": "Вариант 1\nВариант 2\nВариант 3",
+        "description_label": "Описание",
+        "description_placeholder": "Описание параметра (необязательно)",
+        "is_mandatory_label": "Обязательный параметр",
+        "name_label": "Название параметра",
+        "name_placeholder": "Напр: Футболка конвенции",
+        "no_quota_selected": "Квота не выбрана",
+        "position_label": "Позиция отображения",
+        "position_placeholder": "0",
+        "quotas_label": "Связанные квоты",
+        "quotas_placeholder": "Выбрать квоты",
+        "title": "Параметр HelloAsso",
+        "type_label": "Тип параметра"
+      }
+    },
+    "participant": {
+      "entry_validated": "Вход уже подтвержден",
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Временной интервал не назначен",
+      "ticket_type": "Тип билета",
+      "type": "Тип",
+      "volunteer_validated": "Волонтёр подтвердил свой вход"
+    },
+    "quotas": {
+      "list": {
+        "description_label": "описание",
+        "description_placeholder": "Описание (необязательно)",
+        "loading": "Загрузка...",
+        "name_placeholder": "Название квоты",
+        "title": "Управление квотами"
+      },
+      "stats": {
+        "title": "Статистика квот",
+        "used": "Использовано",
+        "validated": "Подтверждено"
+      }
+    },
+    "returnable_items": {
+      "list": {
+        "add_placeholder": "Новый элемент...",
+        "delete_label": "Удалить",
+        "delete_title": "Удалить элемент",
+        "loading": "Загрузка...",
+        "name_placeholder": "Название элемента",
+        "title": "Предметы для выдачи участникам"
+      },
+      "volunteer": {
+        "choose_placeholder": "Выбрать предмет для возврата...",
+        "given_to_all": "Выдано всем волонтёрам",
+        "remove_label": "Удалить предмет",
+        "remove_title": "Удалить этот предмет?"
+      }
+    },
+    "stats": {
+      "participants": "Участники",
+      "volunteers": "Волонтёры"
+    },
+    "tiers": {
+      "list": {
+        "inactive": "Неактивно",
+        "loading": "Загрузка...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Тарифы не найдены"
+      },
+      "modal": {
+        "description_label": "Описание",
+        "description_placeholder": "Описание тарифа (необязательно)",
+        "free_price_label": "Свободная цена",
+        "max_amount_label": "Максимальная сумма (€)",
+        "max_amount_placeholder": "0,00",
+        "min_amount_label": "Минимальная сумма (€)",
+        "min_amount_placeholder": "0,00",
+        "name_label": "Название тарифа",
+        "name_placeholder": "Напр: 3-дневный пропуск",
+        "no_item_selected": "Предмет не выбран",
+        "no_quota_selected": "Квота не выбрана",
+        "position_label": "Позиция отображения",
+        "position_placeholder": "0",
+        "price_label": "Цена (€)",
+        "price_placeholder": "0,00",
+        "quotas_label": "Связанные квоты",
+        "quotas_placeholder": "Выбрать квоты",
+        "returnable_items_label": "Предметы для возврата",
+        "returnable_items_placeholder": "Выбрать предметы",
+        "status_label": "Статус",
+        "title": "Тариф HelloAsso"
+      }
+    }
+  }
+}

@@ -106,6 +106,8 @@
     "error_details": "Error Details",
     "error_logs": {
       "need_investigation": "Need investigation",
+      "origin_domain": "Origin domain:",
+      "referer_page": "Referer page:",
       "unresolved": "Unresolved errors"
     },
     "errors_24h": "Errors (24h)",

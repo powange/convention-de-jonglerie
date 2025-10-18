@@ -675,7 +675,7 @@ async function main() {
             )
             fs.mkdirSync(backupDir, { recursive: true })
 
-            // Sauvegarder tous les fichiers
+            // Sauvegarder tous les fichiers français uniquement
             const files = fs.readdirSync(localeDir).filter((file) => file.endsWith('.json'))
             for (const file of files) {
               const srcPath = path.join(localeDir, file)
@@ -684,10 +684,7 @@ async function main() {
             }
             console.log(`${GREEN}✓ Sauvegarde créée: ${path.basename(backupDir)}${RESET}`)
 
-            // Supprimer les clés inutilisées
-            const updatedLocaleData = removeKeysFromObject(localeData, unusedKeys)
-
-            // Redistribuer les clés dans les bons fichiers
+            // Configuration pour redistribuer les clés dans les bons fichiers
             // On utilise la même logique que split-i18n.js
             const SPLIT_CONFIG = {
               common: [
@@ -703,12 +700,17 @@ async function main() {
                 'c',
                 'calendar',
               ],
-              admin: ['admin', 'feedback'],
+              admin: ['admin'],
               edition: ['editions', 'conventions', 'collaborators', 'carpool', 'diet'],
-              auth: ['auth', 'profile', 'permissions'],
+              auth: ['auth', 'profile'],
               public: ['homepage', 'pages', 'seo'],
-              components: ['components', 'forms', 'upload', 'notifications', 'push_notifications'],
+              components: ['components', 'forms', 'upload'],
               app: ['app', 'pwa', 'services'],
+              // Fichiers séparés
+              feedback: ['feedback'],
+              notifications: ['notifications', 'push_notifications'],
+              permissions: ['permissions'],
+              ticketing: ['ticketing'],
             }
 
             const getTargetFile = (key) => {
@@ -719,6 +721,9 @@ async function main() {
               }
               return 'common'
             }
+
+            // Supprimer les clés inutilisées du français uniquement
+            const updatedLocaleData = removeKeysFromObject(localeData, unusedKeys)
 
             // Organiser les données mises à jour par fichier
             const fileContents = {}
@@ -743,12 +748,17 @@ async function main() {
 
             console.log(`${GREEN}✓ ${unusedKeys.length} clé(s) supprimée(s) avec succès !${RESET}`)
             console.log(`${CYAN}${updatedFiles} fichier(s) mis à jour${RESET}`)
+
+            // Si on a supprimé des clés, on arrête ici (ne pas continuer les autres étapes)
+            process.exit(0)
           } catch (error) {
             console.error(`${RED}❌ Erreur lors de la suppression: ${error.message}${RESET}`)
             process.exit(1)
           }
         } else {
           console.log(`${YELLOW}Suppression annulée.${RESET}`)
+          // Si l'utilisateur annule, on arrête aussi (ne pas continuer les autres étapes)
+          process.exit(0)
         }
       } else {
         console.log(

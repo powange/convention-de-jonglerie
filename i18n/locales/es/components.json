@@ -172,24 +172,6 @@
       "start_typing_address": "Comienza a escribir una dirección..."
     }
   },
-  "push_notifications": {
-    "promo_modal": {
-      "benefits": {
-        "carpool": "Recibe notificaciones de reservas y mensajes de viajes compartidos",
-        "important": "No te pierdas información importante que te concierne",
-        "reminders": "Recibe recordatorios de tus convenciones favoritas",
-        "volunteer": "Recibe actualizaciones sobre tus solicitudes de voluntariado"
-      },
-      "description": "Activa las notificaciones push para mantenerte informado sobre tus viajes compartidos, solicitudes de voluntariado y convenciones favoritas.",
-      "enable": "Activar notificaciones",
-      "not_now": "Ahora no",
-      "privacy": {
-        "description": "Puedes desactivar las notificaciones en cualquier momento en tu configuración.",
-        "title": "Respetuoso con la privacidad"
-      },
-      "title": "Mantente informado en tiempo real"
-    }
-  },
   "upload": {
     "delete_message": "Imagen eliminada",
     "error": "Error durante la carga",
