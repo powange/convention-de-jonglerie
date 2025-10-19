@@ -1250,27 +1250,6 @@ const onProfilePictureError = (error: string) => {
   })
 }
 
-// Fonction pour basculer le mode administrateur
-const _toggleAdminMode = (enabled: boolean) => {
-  if (enabled) {
-    authStore.enableAdminMode()
-    toast.add({
-      title: t('profile.admin_mode_enabled'),
-      description: t('profile.admin_mode_enabled_desc'),
-      icon: 'i-heroicons-shield-check',
-      color: 'warning',
-    })
-  } else {
-    authStore.disableAdminMode()
-    toast.add({
-      title: t('profile.admin_mode_disabled'),
-      description: t('profile.admin_mode_disabled_desc'),
-      icon: 'i-heroicons-user',
-      color: 'info',
-    })
-  }
-}
-
 // Fonction pour charger les préférences de notifications
 const loadNotificationPreferences = async () => {
   try {

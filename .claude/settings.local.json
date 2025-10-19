@@ -122,7 +122,10 @@
       "Bash(do if grep -q '\"\"notifications\"\"' \"i18n/locales/$lang/components.json\")",
       "Bash(then echo \"❌ $lang: Notifications trouvées\")",
       "Bash(else echo \"✓ $lang: Pas de notifications\")",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(do echo \"=== $lang ===\" grep -A3 \"admin_mode_enabled\" i18n/locales/$lang/auth.json)",
+      "Bash(do echo \"$lang\")",
+      "Bash(do echo -n \"$lang: \")"
     ],
     "deny": [],
     "ask": [],

@@ -251,6 +251,12 @@
     "request_deleted_successfully": "Je meerijdverzoek is succesvol verwijderd",
     "verification_code_sent": "Een verificatiecode is naar je verzonden."
   },
+  "admin_mode": {
+    "admin_mode_disabled": "Beheerdersmodus uitgeschakeld",
+    "admin_mode_disabled_desc": "Je gebruikt nu de normale gebruikersinterface",
+    "admin_mode_enabled": "Beheerdersmodus ingeschakeld",
+    "admin_mode_enabled_desc": "Je hebt nu toegang tot alle beheerdersrechten"
+  },
   "navigation": {
     "admin": "Administratie",
     "breadcrumb": "Kruimelpad",

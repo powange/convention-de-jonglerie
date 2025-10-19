@@ -636,16 +636,16 @@ const toggleAdminMode = (enabled: boolean) => {
   if (enabled) {
     authStore.enableAdminMode()
     toast.add({
-      title: t('profile.admin_mode_enabled'),
-      description: t('profile.admin_mode_enabled_desc'),
+      title: t('admin_mode.admin_mode_enabled'),
+      description: t('admin_mode.admin_mode_enabled_desc'),
       icon: 'i-heroicons-shield-check',
       color: 'warning',
     })
   } else {
     authStore.disableAdminMode()
     toast.add({
-      title: t('profile.admin_mode_disabled'),
-      description: t('profile.admin_mode_disabled_desc'),
+      title: t('admin_mode.admin_mode_disabled'),
+      description: t('admin_mode.admin_mode_disabled_desc'),
       icon: 'i-heroicons-shield-exclamation',
       color: 'neutral',
     })

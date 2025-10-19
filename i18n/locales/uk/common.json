@@ -251,6 +251,12 @@
     "request_deleted_successfully": "Ваш запит на сумісну поїздку успішно видалено",
     "verification_code_sent": "Вам надіслано код підтвердження."
   },
+  "admin_mode": {
+    "admin_mode_disabled": "Режим адміністратора вимкнуто",
+    "admin_mode_disabled_desc": "Тепер ви використовуєте звичайний інтерфейс користувача",
+    "admin_mode_enabled": "Режим адміністратора увімкнуто",
+    "admin_mode_enabled_desc": "Тепер ви маєте доступ до всіх прав адміністратора"
+  },
   "navigation": {
     "admin": "Адміністрування",
     "breadcrumb": "Хлібні крихти",

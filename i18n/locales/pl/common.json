@@ -251,6 +251,12 @@
     "request_deleted_successfully": "Twoja prośba o wspólny przejazd została pomyślnie usunięta",
     "verification_code_sent": "Kod weryfikacyjny został do ciebie wysłany."
   },
+  "admin_mode": {
+    "admin_mode_disabled": "Tryb administratora wyłączony",
+    "admin_mode_disabled_desc": "Używasz teraz normalnego interfejsu użytkownika",
+    "admin_mode_enabled": "Tryb administratora włączony",
+    "admin_mode_enabled_desc": "Masz teraz dostęp do wszystkich uprawnień administratora"
+  },
   "navigation": {
     "admin": "Administracja",
     "breadcrumb": "Okruszki nawigacyjne",

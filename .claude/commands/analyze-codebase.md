@@ -188,4 +188,4 @@ Provide:
 
 Think deeply about the codebase structure and provide comprehensive insights that would be valuable for new developers joining the project or for architectural decision-making.
 
-At the end, write all of the output into a file called "codebase_analysis.md"
+At the end, write all of the output into a file called "codebase_analysis.md" and create a menu at beginning with links to each section for easy navigation.

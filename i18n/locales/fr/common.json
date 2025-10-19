@@ -251,6 +251,12 @@
     "request_deleted_successfully": "Votre demande de covoiturage a été supprimée avec succès",
     "verification_code_sent": "Un code de vérification vous a été envoyé."
   },
+  "admin_mode": {
+    "admin_mode_disabled": "Mode administrateur désactivé",
+    "admin_mode_disabled_desc": "Vous utilisez maintenant l'interface utilisateur normale",
+    "admin_mode_enabled": "Mode administrateur activé",
+    "admin_mode_enabled_desc": "Vous avez maintenant accès à tous les privilèges d'administrateur"
+  },
   "navigation": {
     "admin": "Administration",
     "breadcrumb": "Fil d'Ariane",

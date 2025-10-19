@@ -251,6 +251,12 @@
     "request_deleted_successfully": "Deine Fahrgemeinschafts-Anfrage wurde erfolgreich gelöscht",
     "verification_code_sent": "Ein Bestätigungscode wurde dir gesendet."
   },
+  "admin_mode": {
+    "admin_mode_disabled": "Administrator-Modus deaktiviert",
+    "admin_mode_disabled_desc": "Du verwendest jetzt die normale Benutzeroberfläche",
+    "admin_mode_enabled": "Administrator-Modus aktiviert",
+    "admin_mode_enabled_desc": "Du hast jetzt Zugang zu allen Administrator-Privilegien"
+  },
   "navigation": {
     "admin": "Verwaltung",
     "breadcrumb": "Brotkrümelnavigation",

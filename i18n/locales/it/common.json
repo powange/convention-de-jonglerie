@@ -251,6 +251,12 @@
     "request_deleted_successfully": "La tua richiesta di condivisione auto è stata eliminata con successo",
     "verification_code_sent": "Ti è stato inviato un codice di verifica."
   },
+  "admin_mode": {
+    "admin_mode_disabled": "Modalità amministratore disattivata",
+    "admin_mode_disabled_desc": "Stai ora usando l'interfaccia utente normale",
+    "admin_mode_enabled": "Modalità amministratore attivata",
+    "admin_mode_enabled_desc": "Ora hai accesso a tutti i privilegi amministratore"
+  },
   "navigation": {
     "admin": "Amministrazione",
     "breadcrumb": "Breadcrumb",

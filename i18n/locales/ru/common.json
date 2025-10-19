@@ -251,6 +251,12 @@
     "request_deleted_successfully": "Ваш запрос совместной поездки успешно удален",
     "verification_code_sent": "Код подтверждения отправлен вам."
   },
+  "admin_mode": {
+    "admin_mode_disabled": "Режим администратора отключен",
+    "admin_mode_disabled_desc": "Теперь вы используете обычный пользовательский интерфейс",
+    "admin_mode_enabled": "Режим администратора включен",
+    "admin_mode_enabled_desc": "Теперь у вас есть доступ ко всем привилегиям администратора"
+  },
   "navigation": {
     "admin": "Администрирование",
     "breadcrumb": "Хлебные крошки",

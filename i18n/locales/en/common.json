@@ -251,6 +251,12 @@
     "request_deleted_successfully": "Your carpool request has been successfully deleted",
     "verification_code_sent": "A verification code has been sent to you."
   },
+  "admin_mode": {
+    "admin_mode_disabled": "Administrator mode disabled",
+    "admin_mode_disabled_desc": "You are now using the normal user interface",
+    "admin_mode_enabled": "Administrator mode enabled",
+    "admin_mode_enabled_desc": "You now have access to all administrator privileges"
+  },
   "navigation": {
     "admin": "Administration",
     "breadcrumb": "Breadcrumb",
