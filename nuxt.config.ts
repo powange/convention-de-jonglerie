@@ -211,6 +211,28 @@ export default defineNuxtConfig({
           'uk/public.json',
         ],
       },
+      {
+        code: 'cs',
+        name: 'Čeština',
+        files: [
+          'cs/common.json',
+          'cs/notifications.json',
+          'cs/components.json',
+          'cs/app.json',
+          'cs/public.json',
+        ],
+      },
+      {
+        code: 'sv',
+        name: 'Svenska',
+        files: [
+          'sv/common.json',
+          'sv/notifications.json',
+          'sv/components.json',
+          'sv/app.json',
+          'sv/public.json',
+        ],
+      },
     ],
     langDir: 'locales/',
     compilation: {

@@ -1,0 +1,77 @@
+{
+  "feedback": {
+    "description": "Pomozte nám zlepšit platformu zasláním připomínek, návrhů nebo hlášení chyb.",
+    "email": {
+      "label": "Váš e-mail",
+      "placeholder": "your{'@'}email.com"
+    },
+    "error": {
+      "captcha_not_loaded": "Captcha se ještě nenačetla, počkejte prosím.",
+      "captcha_required": "Vyplňte prosím captcha",
+      "name_required": "Název je povinný",
+      "name_required_desc": "Zadejte prosím své jméno, abychom mohli identifikovat vaši zpětnou vazbu.",
+      "submit": "Při odesílání vrácení došlo k chybě",
+      "title": "Chyba při odesílání"
+    },
+    "guest": {
+      "info": "Jako návštěvník nám prosím zanechte své kontaktní údaje pro případné další kroky."
+    },
+    "message": {
+      "label": "Podrobná zpráva",
+      "placeholder": "Podrobně popište svou zpětnou vazbu, návrh nebo problém..."
+    },
+    "name": {
+      "label": "Vaše jméno",
+      "placeholder": "Vaše jméno a příjmení"
+    },
+    "recaptcha": {
+      "and": "a",
+      "apply": "použít",
+      "privacy_policy": "Zásady ochrany osobních údajů",
+      "protected_by": "Tyto stránky jsou chráněny pomocí reCAPTCHA a",
+      "terms_of_service": "Podmínky používání"
+    },
+    "subject": {
+      "label": "Předmět",
+      "placeholder": "Stručně popište svůj návrat"
+    },
+    "submit": "Odeslat zpět",
+    "success": {
+      "message": "Vaše zpráva byla předána našemu týmu. Co nejdříve ji prověříme.",
+      "title": "Děkujeme za váš názor!",
+      "toast": "Vaše zpětná vazba byla úspěšně odeslána"
+    },
+    "title": "Váš názor je pro nás důležitý",
+    "type": {
+      "label": "Typ vrácení",
+      "placeholder": "Vyberte typ"
+    },
+    "types": {
+      "bug": "Nahlásit chybu",
+      "complaint": "Nahlásit problém",
+      "general": "Obecné připomínky",
+      "suggestion": "Návrh na zlepšení"
+    },
+    "url": {
+      "label": "Dotčená stránka (automatická)",
+      "placeholder": "Adresa URL stránky"
+    },
+    "validation": {
+      "email": {
+        "invalid": "Neplatný e-mail"
+      },
+      "message": {
+        "max": "Zpráva nesmí přesáhnout 5000 znaků",
+        "min": "Zpráva musí mít alespoň 20 znaků"
+      },
+      "name": {
+        "max": "Název nesmí přesáhnout 100 znaků",
+        "min": "Název musí být dlouhý alespoň 2 znaky"
+      },
+      "subject": {
+        "max": "Předmět nesmí přesáhnout 200 znaků",
+        "min": "Předmět musí být dlouhý alespoň 5 znaků"
+      }
+    }
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Upozorňování na rezervace a zprávy o spolujízdě",
+        "important": "Nepropásněte důležité informace o sobě.",
+        "reminders": "Dostávejte upomínky na své oblíbené konference",
+        "volunteer": "Dostávejte aktuální informace o svých žádostech o dobrovolnictví"
+      },
+      "description": "Aktivujte si push oznámení, abyste měli aktuální informace o spolujízdách, dobrovolnických přihláškách a oblíbených sjezdech.",
+      "enable": "Aktivace oznámení",
+      "not_now": "Teď ne",
+      "privacy": {
+        "description": "Oznámení můžete kdykoli deaktivovat v nastavení.",
+        "title": "Respektování vašeho soukromí"
+      },
+      "title": "Zůstaňte informováni v reálném čase"
+    }
+  },
+  "notifications": {
+    "carpool": {
+      "booking_accepted": {
+        "action": "Viz podrobnosti",
+        "message": "{jméno majitele} přijalo vaši žádost o {místa k sezení} na cestu z {místa} dne {datum}.",
+        "title": "Žádost přijata! ✅"
+      },
+      "booking_cancelled": {
+        "action": "Viz spolujízda",
+        "message": "{jméno cestujícího} zrušil rezervaci {míst} na cestu z {místaCity} dne {datum}.",
+        "title": "Rezervace zrušena 📅"
+      },
+      "booking_received": {
+        "action": "Viz žádost",
+        "message": "{jméno žadatele} si přeje rezervovat {místa} ve vaší spolujízdě",
+        "message_with_note": "{jméno žadatele} si přeje rezervovat {místa} : \"{poznámka}\".",
+        "title": "Nová žádost o spolujízdu 🚗"
+      },
+      "booking_rejected": {
+        "action": "Podívejte se na další nabídky",
+        "message": "{jméno majitele} odmítlo vaši žádost o {místa k sezení} pro cestu z {místa}.",
+        "title": "Žádost zamítnuta"
+      }
+    },
+    "common": {
+      "view_details": "Viz podrobnosti"
+    },
+    "confirm_delete_description": "Opravdu chcete toto oznámení odstranit?",
+    "confirm_delete_title": "Odstranění oznámení",
+    "edition": {
+      "new_convention": {
+        "message": "Do platformy byla právě přidána konvence \"{conventionName}\".",
+        "title": "Přidána nová dohoda"
+      },
+      "reminder": {
+        "action": "Viz podrobnosti",
+        "message": "Edice \"{název edice}\" začíná za {dnyDokud} den(y) !",
+        "title": "Vyvolání události 📅"
+      }
+    },
+    "loading": "Načítání oznámení...",
+    "manage_description": "Správa oznámení a předvoleb",
+    "none_found": "Nebylo nalezeno žádné oznámení",
+    "push": {
+      "blocked": "Blokovaná oznámení v nastavení prohlížeče",
+      "description": "Přijímání oznámení, i když je aplikace zavřená.",
+      "disabled": "Vypnutá oznámení",
+      "enabled": "Oznámení aktivovaná v tomto zařízení",
+      "not_supported": "Oznámení Push nejsou v tomto prohlížeči podporována",
+      "test_button": "Testování oznámení",
+      "title": "Oznámení Push"
+    },
+    "system": {
+      "error": {
+        "message": "Došlo k chybě: {errorMessage}",
+        "title": "Chyba systému"
+      }
+    },
+    "this_week": "Tento týden",
+    "unread": "Nepřečtené",
+    "volunteer": {
+      "application_accepted": {
+        "action": "Viz podrobnosti",
+        "message": "Vaše přihláška jako dobrovolníka pro \"{název vydání}\" byla přijata.",
+        "message_complete": "Vaše žádost o \"{název vydání}\" byla přijata.\n\nByli jste zařazeni do následujících týmů:\n- {týmy} byly zařazeny do těchto týmů: {týmy}\n\nZpráva od organizátora:\n\"{poznámka}\"",
+        "message_with_note": "Vaše žádost o \"{název vydání}\" byla přijata.\n\nZpráva od organizátora:\n\"{poznámka}\"",
+        "message_with_teams": "Vaše žádost o \"{název vydání}\" byla přijata.\n\nByli jste zařazeni do následujících týmů:\n- {týmy} byly zařazeny do těchto týmů: {týmy}",
+        "title": "Přihláška přijata! ✅"
+      },
+      "application_rejected": {
+        "action": "Viz vydání",
+        "message": "Vaše žádost o dobrovolnictví pro \"{název vydání}\" nebyla tentokrát přijata.",
+        "title": "Žádost nebyla přijata"
+      },
+      "application_submitted": {
+        "action": "Podívejte se na mé aplikace",
+        "message": "Vaše žádost o \"{název vydání}\" byla úspěšně odeslána. Organizátoři ji prověří.",
+        "title": "Přihláška odeslána! 🎉"
+      },
+      "back_to_pending": {
+        "action": "Viz moje žádost",
+        "message": "Organizátoři pozastavili vaši přihlášku jako dobrovolníka na \"{název edice}\".",
+        "title": "Pozastavení žádosti"
+      }
+    },
+    "welcome": {
+      "action": "Viz dohody",
+      "message": "Váš účet byl úspěšně vytvořen. Zjistěte informace o žonglérských sjezdech ve vašem okolí!",
+      "title": "Vítejte! 🎉"
+    }
+  }
+}

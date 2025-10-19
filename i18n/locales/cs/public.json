@@ -1,0 +1,232 @@
+{
+  "homepage": {
+    "agenda": "Agenda",
+    "current_editions": "Aktuální vydání",
+    "filters": "Filtry",
+    "finished_editions": "Hotová vydání",
+    "grid": "Síť",
+    "map": "Karta",
+    "no_conventions_found": "Nebyla nalezena žádná konvence. Buďte první, kdo ji přidá!",
+    "no_conventions_match_criteria": "Vašim vyhledávacím kritériím neodpovídají žádné dohody",
+    "period": "Období",
+    "searched_services": "Vyhledávané služby",
+    "upcoming_editions": "Připravovaná vydání"
+  },
+  "pages": {
+    "access_denied": {
+      "confirm_delete_edition": "Jste si jistí, že chcete toto vydání vyřadit?",
+      "description": "K přístupu na tuto stránku nemáte práva.",
+      "title": "Přístup odepřen"
+    },
+    "add_convention": {
+      "description": "Sjezd sdružuje několik ročníků jedné žonglérské akce.",
+      "submit_button": "Vytvoření dohody",
+      "title": "Vytvoření nové dohody"
+    },
+    "add_edition": {
+      "submit_button": "Přidat vydání",
+      "title": "Přidání nové edice"
+    },
+    "add_edition_for_convention": {
+      "convention_not_found_description": "Hledaná konvence neexistuje nebo k ní nemáte práva přidat edici.",
+      "for_convention": "Pro konvenci \"{jméno}\"",
+      "loading_convention": "Načítání údajů o smlouvě...",
+      "submit_button": "Vytvořit edici"
+    },
+    "comments": {
+      "be_first_to_comment": "Buďte první, kdo se podělí o své zkušenosti!",
+      "comment_placeholder": "Podělte se o své zkušenosti, položte své otázky...",
+      "login_to_participate": "Přihlaste se a zapojte se do diskuse",
+      "no_comments": "Prozatím bez zveřejnění.",
+      "share_experience": "Podělte se o své zkušenosti nebo položte své otázky",
+      "write_comment": "Napište publikaci",
+      "your_comment": "Vaše publikace"
+    },
+    "edit_convention": {
+      "convention_not_found_or_no_rights": "Smlouva, kterou hledáte, neexistuje nebo nemáte právo ji upravit.",
+      "editing_convention": "Úprava konvence \"{jméno}\"",
+      "loading_convention_data": "Načítání údajů o smlouvě...",
+      "submit_button": "Aktualizace dohody"
+    },
+    "edit_edition": {
+      "submit_button": "Aktualizované vydání"
+    },
+    "favorites": {
+      "editions_in_favorites": "{count} oblíbená vydání | {count} oblíbená vydání",
+      "no_favorites_added": "Zatím jste si nepřidali edici do oblíbených."
+    },
+    "management": {
+      "delete_edition": "Smazat upravit",
+      "edit_edition": "Úprava úprav",
+      "lost_found_active_description": "Nalezené objekty můžete spravovat i během úprav.",
+      "manage_lost_found": "Správa ztraceného majetku"
+    },
+    "objets_trouves": {
+      "photo_alt": "Fotografie nalezeného předmětu"
+    },
+    "profile": {
+      "photo_alt": "Profilový obrázek",
+      "photo_placeholder": "Klikněte pro změnu profilové fotografie"
+    },
+    "volunteers": {
+      "accepted": "Přijato",
+      "allergies": "Alergie",
+      "application_details": "Podrobnosti o aplikaci",
+      "applications_description": "Sledujte stav svých žádostí o dobrovolnictví na různých kongresech.",
+      "applied_on": "Aplikováno na",
+      "assigned_time_slots": "Přidělené sloty",
+      "availability": "Dostupnost",
+      "avoid_list": "Seznam, kterému se vyhnout",
+      "browse_conventions": "Procházet konvence",
+      "companion": "Společník",
+      "companion_name": "Jméno doprovázející osoby",
+      "confirm_withdraw": "Jste si jistý, že chcete svou kandidaturu stáhnout?",
+      "contact_organizer": "Kontakt na organizátora",
+      "dates": "Data",
+      "diet": "Dieta",
+      "dietary": {
+        "none": "Ne",
+        "other": "Další",
+        "vegan": "Vegan",
+        "vegetarian": "Vegetariánské"
+      },
+      "dietary_preferences": "Potravinové preference",
+      "emergency_contact": "Kontakt pro případ nouze",
+      "emergency_contact_name": "Jméno nouzového kontaktu",
+      "emergency_contact_phone": "Telefonní číslo pro případ nouze",
+      "event": "Událost",
+      "experience": "Zkušenosti",
+      "experience_details": "Podrobnosti o experimentu",
+      "export": "Export",
+      "export_ical": "Export do iCal",
+      "export_pdf": "Exportovat PDF",
+      "has_experience": "Má zkušenosti",
+      "has_minors": "Doprovod nezletilých osob",
+      "has_pets": "Vlastní zvířata",
+      "has_vehicle": "Vlastní vozidlo",
+      "history": "Historie",
+      "minors": "Nezletilí",
+      "minors_details": "Podrobnosti o nezletilých osobách",
+      "motivation": "Motivace",
+      "my_applications": "Moje přihlášky jako dobrovolník",
+      "my_planning": "Můj rozvrh",
+      "my_slots_title": "Moje sloty",
+      "no_accepted_applications": "Žádné žádosti nejsou přijímány",
+      "no_accepted_description": "Ještě nemáte přijatou žádost",
+      "no_applications": "Žádné žádosti",
+      "no_applications_description": "Ještě jste se nepřihlásili jako dobrovolník na konferenci.",
+      "no_history": "Žádná historie",
+      "no_history_description": "Žádné žádosti nebyly podány ani staženy",
+      "no_pending_applications": "Žádné žádosti v řízení",
+      "no_pending_description": "V současné době nemáte žádnou žádost, která by čekala na odpověď.",
+      "no_rejected_applications": "Žádná žádost nebyla zamítnuta",
+      "no_rejected_description": "Žádná z vašich žádostí nebyla zamítnuta",
+      "pending": "Na počkání",
+      "pets": "Domácí zvířata",
+      "pets_details": "Podrobnosti o zvířatech",
+      "rejected": "Odmítnuto",
+      "setup": "Montáž",
+      "skills": "Dovednosti",
+      "team_distribution": {
+        "all_teams": "Všechny týmy",
+        "description": "Rozdělení dobrovolníků do týmů. Na počítači přesouvejte přetažením myší. Na mobilním telefonu vyberte tým kliknutím.",
+        "drop_volunteers_here": "Přetáhněte dobrovolníky sem",
+        "empty_team": "Prázdný tým",
+        "leader_added": "Přidána odpovědná osoba",
+        "leader_badge": "Manažer",
+        "leader_removed": "Odstranění manažera",
+        "manage_teams": "Řízení týmů",
+        "max_label": "Max:",
+        "modal": {
+          "add": "Přidat",
+          "add_description_multiple": "Dobrovolníka ponechte v jeho současném týmu a přidejte ho také do \"{cílový tým}\".",
+          "add_description_single": "Dobrovolníka ponechte v \"{sourceTeam}\" a přiřaďte ho také do \"{targetTeam}\".",
+          "cancel": "Zrušit",
+          "move": "Přesun",
+          "move_description_multiple": "Odeberte dobrovolníka ze všech jeho současných týmů a umístěte ho do \"{cílový tým}\".",
+          "move_description_single": "Odeberte dobrovolníka z \"{sourceTeam}\" a umístěte ho do \"{targetTeam}\".",
+          "question": "Co byste chtěli dělat?"
+        },
+        "no_assignments": "Nebylo nalezeno žádné přiřazení k týmu",
+        "no_assignments_description": "Přijatí dobrovolníci se zde objeví, jakmile budou přiřazeni k týmům.",
+        "preferences_label": "Pref:",
+        "remove_as_leader": "Odstranění role manažera",
+        "select_team_instruction": "Výběr cílového týmu",
+        "set_as_leader": "Definice odpovědnosti",
+        "stats": {
+          "assigned_volunteers": "Přidělení dobrovolníci",
+          "total_assignments": "Celkový počet úkolů",
+          "total_teams": "Týmy celkem",
+          "unassigned": "Nepřidělené"
+        },
+        "title": "Rozdělení podle týmů",
+        "unassigned_description": "Tito přijatí dobrovolníci zatím nebyli přiřazeni k žádnému týmu. V počítači: přetáhněte a pusťte. Na mobilním telefonu: kliknutím vyberte tým.",
+        "unassigned_volunteers": "Nezařazení dobrovolníci",
+        "volunteers_count": "{počet} dobrovolníků"
+      },
+      "team_preferences": "Preference týmu",
+      "teardown": "Demontáž",
+      "time_preferences": "Časové preference",
+      "total_hours": "Celkový počet hodin",
+      "unnamed_slot": "Slot bez názvu",
+      "vehicle": "Vozidlo",
+      "vehicle_details": "Podrobnosti o vozidle",
+      "view_compact": "Kompaktní zobrazení",
+      "view_compact_short": "Kompaktní",
+      "view_detailed": "Podrobný pohled",
+      "view_detailed_short": "Podrobné informace na",
+      "view_details": "Viz podrobnosti",
+      "view_edition": "Viz vydání",
+      "view_planning": "Viz plánování",
+      "withdraw": "Odstranění stránky",
+      "withdrawal_error": "Chyba při stažení žádosti",
+      "withdrawal_success": "Úspěšné stažení žádosti"
+    }
+  },
+  "seo": {
+    "carpool": {
+      "description": "Zorganizujte spolujízdu pro {jméno}. Najděte spolucestující nebo nabídněte svá volná místa na {datum} v {místě}.",
+      "keywords": "spolujízda, doprava, {dohoda}, {pronájem}, sdílení, ekonomické, ekologické",
+      "og_description": "Zajistěte si dopravu na {jméno} - {datum}. Možnost spolujízdy.",
+      "og_title": "Spolujízda pro {jméno}",
+      "title": "Spolujízda - {jméno}",
+      "twitter_description": "Najděte nebo navrhněte spolujízdu pro {jméno}.",
+      "twitter_title": "Spolujízda - {jméno}"
+    },
+    "edition": {
+      "description": "Objevte {název}, který se koná {datum} na {místě}. Informace, program a registrace na tuto žonglérskou akci.",
+      "keywords": "žonglování, konvence, {konference}, {místo}, událost, festival, show, workshop",
+      "og_description": "Připojte se k nám na {jméno} - {datum}. Program, workshopy a žonglérské show.",
+      "title": "{jméno}",
+      "twitter_description": "{jméno} - {datum}. Objevte program tohoto žonglérského setkání.",
+      "twitter_title": "{jméno} - Žonglérská konvence"
+    },
+    "homepage": {
+      "description": "Přečtěte si informace o nadcházejících žonglérských sjezdech ve Francii a Evropě. Pořádejte své oblíbené akce a spojte se s žonglérskou komunitou.",
+      "keywords": "žonglování, festival, akce, žonglér, show, workshop, kurz",
+      "og_description": "Referenční platforma pro vyhledávání a organizování žonglérských srazů ve Francii a v Evropě.",
+      "og_title": "Žonglérská konvence - Najděte si příští konvenci",
+      "title": "Žonglování s konvencemi",
+      "twitter_description": "Zjistěte informace o nadcházejících žonglérských sjezdech a připojte se k žonglérské komunitě.",
+      "twitter_title": "Žonglérská konvence - Žonglérské akce"
+    },
+    "organization": {
+      "description": "Platforma spolupráce věnovaná žonglérské komunitě, která usnadňuje objevování a organizaci žonglérských akcí ve Francii a Evropě."
+    },
+    "search_action": {
+      "description": "Vyhledávání žonglérských srazů podle názvu, místa nebo pořadatele",
+      "name": "Vyhledání dohody"
+    },
+    "site_description": "Najděte a spravujte své oblíbené žonglérské srazy. Platforma pro spolupráci žonglérů a organizátorů akcí.",
+    "site_name": "Žonglérská konvence",
+    "volunteers": {
+      "description": "Připojte se k týmu dobrovolníků pro {jméno}. Pomozte zorganizovat žonglérskou akci {date} na {místo}.",
+      "keywords": "dobrovolnictví, tým, {dohoda}, {pronájem}, organizace, pomoc",
+      "og_description": "Připojte se k dobrovolnickému týmu {jméno} - {datum}. Podílejte se na organizaci.",
+      "og_title": "Dobrovolník pro {jméno}",
+      "title": "Dobrovolnictví - {jméno}",
+      "twitter_description": "Staňte se dobrovolníkem pro {jméno} a pomozte s organizací akce.",
+      "twitter_title": "Dobrovolnictví - {jméno}"
+    }
+  }
+}

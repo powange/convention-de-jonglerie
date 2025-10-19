@@ -1,0 +1,232 @@
+{
+  "homepage": {
+    "agenda": "Dagordning",
+    "current_editions": "Aktuella utgåvor",
+    "filters": "Filter",
+    "finished_editions": "Färdiga utgåvor",
+    "grid": "Rutnät",
+    "map": "Kort",
+    "no_conventions_found": "Ingen konvention hittades. Bli den första att lägga till en!",
+    "no_conventions_match_criteria": "Inga avtal motsvarar dina sökkriterier",
+    "period": "Period",
+    "searched_services": "Tjänster som efterfrågas",
+    "upcoming_editions": "Kommande utgåvor"
+  },
+  "pages": {
+    "access_denied": {
+      "confirm_delete_edition": "Är du säker på att du vill skrota den här utgåvan?",
+      "description": "Du har inte rätt att komma åt den här sidan.",
+      "title": "Åtkomst nekad"
+    },
+    "add_convention": {
+      "description": "Ett konvent sammanför flera upplagor av samma jongleringsevenemang.",
+      "submit_button": "Skapa avtalet",
+      "title": "Skapa ett nytt avtal"
+    },
+    "add_edition": {
+      "submit_button": "Lägg till utgåva",
+      "title": "Lägg till en ny utgåva"
+    },
+    "add_edition_for_convention": {
+      "convention_not_found_description": "Den konvention du söker finns inte eller så har du inte rätt att lägga till en utgåva av den.",
+      "for_convention": "För \"{namn}\"-konventionen",
+      "loading_convention": "Laddar avtalsdata...",
+      "submit_button": "Skapa utgåva"
+    },
+    "comments": {
+      "be_first_to_comment": "Bli först med att dela med dig av dina erfarenheter!",
+      "comment_placeholder": "Dela med dig av dina erfarenheter, ställ dina frågor...",
+      "login_to_participate": "Logga in för att delta i diskussionen",
+      "no_comments": "Ingen publicering för närvarande.",
+      "share_experience": "Dela med dig av dina erfarenheter eller ställ dina frågor",
+      "write_comment": "Skriva en publikation",
+      "your_comment": "Din publikation"
+    },
+    "edit_convention": {
+      "convention_not_found_or_no_rights": "Det avtal du letar efter finns inte eller så har du inte rätt att ändra det.",
+      "editing_convention": "Ändring av \"{namn}\"-konventionen",
+      "loading_convention_data": "Laddar avtalsdata...",
+      "submit_button": "Uppdatering av avtalet"
+    },
+    "edit_edition": {
+      "submit_button": "Uppdatera utgåvan"
+    },
+    "favorites": {
+      "editions_in_favorites": "{antal} favoritutgåvor | {antal} favoritutgåvor",
+      "no_favorites_added": "Du har ännu inte lagt till en utgåva bland dina favoriter."
+    },
+    "management": {
+      "delete_edition": "Radera redigera",
+      "edit_edition": "Ändra redigering",
+      "lost_found_active_description": "Du kan hantera upphittade objekt medan redigeringen pågår.",
+      "manage_lost_found": "Hantering av hittegods"
+    },
+    "objets_trouves": {
+      "photo_alt": "Foto av upphittat föremål"
+    },
+    "profile": {
+      "photo_alt": "Profilbild",
+      "photo_placeholder": "Klicka för att ändra ditt profilfoto"
+    },
+    "volunteers": {
+      "accepted": "Accepterad",
+      "allergies": "Allergier",
+      "application_details": "Detaljer om ansökan",
+      "applications_description": "Följ statusen för dina ansökningar om att arbeta som volontär vid de olika kongresserna",
+      "applied_on": "Tillämpad på",
+      "assigned_time_slots": "Tilldelade platser",
+      "availability": "Tillgänglighet",
+      "avoid_list": "Lista att undvika",
+      "browse_conventions": "Bläddra bland konventioner",
+      "companion": "Kompanjon",
+      "companion_name": "Namn på den medföljande personen",
+      "confirm_withdraw": "Är du säker på att du vill dra tillbaka din kandidatur?",
+      "contact_organizer": "Kontakta arrangören",
+      "dates": "Datum",
+      "diet": "Diet",
+      "dietary": {
+        "none": "Nej",
+        "other": "Övriga",
+        "vegan": "Vegansk",
+        "vegetarian": "Vegetarisk"
+      },
+      "dietary_preferences": "Preferenser för mat",
+      "emergency_contact": "Kontaktperson i nödsituationer",
+      "emergency_contact_name": "Namn på kontaktperson i nödsituation",
+      "emergency_contact_phone": "Telefonnummer för kontakt i nödsituationer",
+      "event": "Händelse",
+      "experience": "Erfarenhet",
+      "experience_details": "Detaljer om experimentet",
+      "export": "Export",
+      "export_ical": "iCal-export",
+      "export_pdf": "Exportera PDF",
+      "has_experience": "Har erfarenhet",
+      "has_minors": "Ledsagade av minderåriga",
+      "has_pets": "Äger djur",
+      "has_vehicle": "Äger ett fordon",
+      "history": "Historia",
+      "minors": "Minderåriga",
+      "minors_details": "Detaljer om minderåriga",
+      "motivation": "Motivering",
+      "my_applications": "Mina volontäransökningar",
+      "my_planning": "Mitt schema",
+      "my_slots_title": "Mina spelautomater",
+      "no_accepted_applications": "Inga ansökningar accepteras",
+      "no_accepted_description": "Du har ännu inte fått någon ansökan beviljad",
+      "no_applications": "Inga applikationer",
+      "no_applications_description": "Du har ännu inte ansökt om att bli volontär för ett konvent",
+      "no_history": "Ingen historia",
+      "no_history_description": "Inga ansökningar inlämnade eller återkallade",
+      "no_pending_applications": "Inga ansökningar under behandling",
+      "no_pending_description": "Du har för närvarande inga ansökningar som väntar på svar",
+      "no_rejected_applications": "Inga ansökningar har avslagits",
+      "no_rejected_description": "Ingen av dina ansökningar har avslagits",
+      "pending": "I vänteläge",
+      "pets": "Husdjur",
+      "pets_details": "Uppgifter om djur",
+      "rejected": "Avvisad",
+      "setup": "Montering",
+      "skills": "Färdigheter",
+      "team_distribution": {
+        "all_teams": "Alla lag",
+        "description": "Fördelning av volontärer till team. På en dator drar du och släpper för att flytta. På mobilen klickar du för att välja team.",
+        "drop_volunteers_here": "Dra och släpp volontärer här",
+        "empty_team": "Tomt lag",
+        "leader_added": "Ansvarig person tillagd",
+        "leader_badge": "Chef",
+        "leader_removed": "Chef borttagen",
+        "manage_teams": "Leda team",
+        "max_label": "Max:",
+        "modal": {
+          "add": "Lägg till",
+          "add_description_multiple": "Behåll volontärerna i deras nuvarande team och lägg även till dem i \"{targetTeam}\".",
+          "add_description_single": "Behåll volontären i \"{sourceTeam}\" och tilldela honom också till \"{targetTeam}\".",
+          "cancel": "Avbryt",
+          "move": "Flytta",
+          "move_description_multiple": "Ta bort volontären från alla hans nuvarande lag och placera honom i \"{targetTeam}\".",
+          "move_description_single": "Ta bort volontären från \"{sourceTeam}\" och placera den i \"{targetTeam}\".",
+          "question": "Vad skulle du vilja göra?"
+        },
+        "no_assignments": "Inga teamuppdrag hittades",
+        "no_assignments_description": "Godkända volontärer kommer att visas här när de har tilldelats team.",
+        "preferences_label": "Pref:",
+        "remove_as_leader": "Ta bort rollen som chef",
+        "select_team_instruction": "Välj destinationsteam",
+        "set_as_leader": "Definiera ansvarig",
+        "stats": {
+          "assigned_volunteers": "Tilldelade volontärer",
+          "total_assignments": "Totalt antal uppdrag",
+          "total_teams": "Totalt antal lag",
+          "unassigned": "Ej tilldelad"
+        },
+        "title": "Fördelning per lag",
+        "unassigned_description": "Dessa accepterade volontärer har ännu inte tilldelats något team. På en dator: dra och släpp. På mobilen: klicka för att välja team.",
+        "unassigned_volunteers": "Volontärer som inte tilldelats",
+        "volunteers_count": "{antal} volontär(er)"
+      },
+      "team_preferences": "Teamets preferenser",
+      "teardown": "Demontering",
+      "time_preferences": "Tidspreferenser",
+      "total_hours": "Totalt antal timmar",
+      "unnamed_slot": "Obetitlad plats",
+      "vehicle": "Fordon",
+      "vehicle_details": "Uppgifter om fordonet",
+      "view_compact": "Kompakt vy",
+      "view_compact_short": "Kompakt",
+      "view_detailed": "Detaljerad vy",
+      "view_detailed_short": "Detaljerad",
+      "view_details": "Se mer information",
+      "view_edition": "Se upplagan",
+      "view_planning": "Se planering",
+      "withdraw": "Ta bort",
+      "withdrawal_error": "Fel vid återkallande av ansökan",
+      "withdrawal_success": "Ansökan framgångsrikt återkallad"
+    }
+  },
+  "seo": {
+    "carpool": {
+      "description": "Organisera din samåkning för {namn}. Hitta medresenärer eller erbjud dina lediga platser för {datum} på {plats}.",
+      "keywords": "bilpool, transport, {överenskommelse}, {hyra}, delning, ekonomisk, ekologisk",
+      "og_description": "Ordna din transport till {namn} - {datum}. Samåkning tillgänglig.",
+      "og_title": "Samåkning för {namn}",
+      "title": "Samåkning - {namn}",
+      "twitter_description": "Hitta eller föreslå en bilpool för {namn}.",
+      "twitter_title": "Samåkning - {namn}"
+    },
+    "edition": {
+      "description": "Upptäck {namn} som äger rum {datum} på {plats}. Information, program och anmälan till detta jongleringskonvent.",
+      "keywords": "jonglering, konvent, {konvent}, {plats}, evenemang, festival, show, workshop",
+      "og_description": "Följ med oss till {namn} - {datum}. Program, workshops och jongleringsshower.",
+      "title": "{namn}",
+      "twitter_description": "{namn} - {datum}. Upptäck programmet för detta jongleringskonvent.",
+      "twitter_title": "{namn} - Jongleringskonvention"
+    },
+    "homepage": {
+      "description": "Ta reda på kommande jongleringskongresser i Frankrike och Europa. Organisera dina favoritevenemang och få kontakt med jongleringsgemenskapen.",
+      "keywords": "jonglering, konvent, festival, event, jonglör, show, workshop, kurs",
+      "og_description": "Referensplattformen för att upptäcka och organisera jongleringskongresser i Frankrike och Europa.",
+      "og_title": "Jongleringskonvent - Hitta ditt nästa konvent",
+      "title": "Jonglering av konventioner",
+      "twitter_description": "Ta reda på mer om kommande jongleringskonvent och bli en del av jongleringsgemenskapen.",
+      "twitter_title": "Jongleringskonvention - Jongleringsevenemang"
+    },
+    "organization": {
+      "description": "Samarbetsplattform för jongleringsgemenskapen, som underlättar upptäckt och organisering av jongleringsevenemang i Frankrike och Europa."
+    },
+    "search_action": {
+      "description": "Sök jongleringskongresser efter namn, plats eller arrangör",
+      "name": "Sök efter ett avtal"
+    },
+    "site_description": "Hitta och hantera dina favoritkonvent för jonglering. Samarbetsplattform för jonglörer och evenemangsarrangörer.",
+    "site_name": "Jonglering av konvention",
+    "volunteers": {
+      "description": "Gå med i teamet av volontärer för {namn}. Hjälp till att organisera detta jongleringsevenemang {datum} på {plats}.",
+      "keywords": "volontärarbete, team, {överenskommelse}, {hyra}, organisation, hjälp",
+      "og_description": "Gå med i volontärteamet {namn} - {datum}. Delta i organisationen.",
+      "og_title": "Volontär för {namn}",
+      "title": "Volontärarbete - {namn}",
+      "twitter_description": "Volontär för {namn} och hjälp till att organisera evenemanget.",
+      "twitter_title": "Volontärarbete - {namn}"
+    }
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "feedback": {
+    "description": "Hjälp oss att förbättra plattformen genom att skicka oss dina kommentarer, förslag eller felrapporter.",
+    "email": {
+      "label": "Din e-postadress",
+      "placeholder": "din{'@'}email.com"
+    },
+    "error": {
+      "captcha_not_loaded": "Captcha har ännu inte laddats, vänligen vänta.",
+      "captcha_required": "Vänligen fyll i captcha",
+      "name_required": "Namnet är obligatoriskt",
+      "name_required_desc": "Ange ditt namn så att vi kan identifiera din feedback",
+      "submit": "Ett fel inträffade när du skickade din retur",
+      "title": "Fel vid sändning"
+    },
+    "guest": {
+      "info": "Som besökare ber vi dig att lämna dina kontaktuppgifter för eventuell uppföljning."
+    },
+    "message": {
+      "label": "Detaljerat meddelande",
+      "placeholder": "Beskriv din feedback, ditt förslag eller ditt problem i detalj..."
+    },
+    "name": {
+      "label": "Ditt namn",
+      "placeholder": "Ditt för- och efternamn"
+    },
+    "recaptcha": {
+      "and": "och",
+      "apply": "tillämpa",
+      "privacy_policy": "Integritetspolicy",
+      "protected_by": "Denna webbplats är skyddad av reCAPTCHA och",
+      "terms_of_service": "Villkor och anvisningar för användning"
+    },
+    "subject": {
+      "label": "Ämne",
+      "placeholder": "Beskriv kortfattat din avkastning"
+    },
+    "submit": "Skicka retur",
+    "success": {
+      "message": "Ditt meddelande har vidarebefordrats till vårt team. Vi kommer att undersöka det så snart som möjligt.",
+      "title": "Tack för din feedback!",
+      "toast": "Din feedback har skickats framgångsrikt"
+    },
+    "title": "Din åsikt är viktig för oss",
+    "type": {
+      "label": "Typ av avkastning",
+      "placeholder": "Välj en typ"
+    },
+    "types": {
+      "bug": "Rapportera en bugg",
+      "complaint": "Rapportera ett problem",
+      "general": "Allmänna kommentarer",
+      "suggestion": "Förslag till förbättringar"
+    },
+    "url": {
+      "label": "Berörd sida (automatisk)",
+      "placeholder": "Sidans URL"
+    },
+    "validation": {
+      "email": {
+        "invalid": "Ogiltig e-post"
+      },
+      "message": {
+        "max": "Meddelandet får inte överstiga 5000 tecken",
+        "min": "Meddelandet måste vara minst 20 tecken långt"
+      },
+      "name": {
+        "max": "Namnet får inte överstiga 100 tecken",
+        "min": "Namnet måste vara minst 2 tecken långt"
+      },
+      "subject": {
+        "max": "Ämnet får inte överstiga 200 tecken",
+        "min": "Ämnet måste vara minst 5 tecken långt"
+      }
+    }
+  }
+}

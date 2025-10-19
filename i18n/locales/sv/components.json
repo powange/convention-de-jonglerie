@@ -1,0 +1,193 @@
+{
+  "components": {
+    "carpool": {
+      "accept": "Acceptera",
+      "add_comment_placeholder": "Lägg till en kommentar...",
+      "added_on": "Lagt till den {datum}",
+      "address": "Adress",
+      "available_seats": "Antal tillgängliga platser",
+      "be_first_to_comment": "Bli först med att kommentera detta {typ}!",
+      "be_first_to_offer": "Bli först med att föreslå en samåkning för denna utgåva!",
+      "book_seats": "Bok",
+      "booking_message": "Meddelande till föraren (valfritt)",
+      "booking_message_placeholder": "T.ex.: Jag har mycket bagage, kan jag ta 2 platser?",
+      "comments": "Kommentarer",
+      "confirm_booking": "Bekräfta bokningen",
+      "confirm_delete_offer": "Är du säker på att du vill säga upp den här bildelningstjänsten?",
+      "confirm_delete_request": "Är du säker på att du vill ta bort den här samåkningsförfrågan?",
+      "confirmed_passengers": "Bekräftade samåkare",
+      "contact": "Kontakt",
+      "contact_user": "Kontakt {namn}",
+      "delete_offer": "Ta bort erbjudande",
+      "delete_request": "Ta bort begäran",
+      "departure_date_time": "Datum och tid för avresa",
+      "edit_offer": "Modifiera erbjudandet om samåkning",
+      "edit_request": "Ändra begäran om bilpool",
+      "how_many_seats_needed": "Hur många platser söker du?",
+      "loading_comments": "Laddar kommentarer...",
+      "my_booking": "Min reservation",
+      "no_comments": "Ingen kommentar",
+      "no_offers": "Inget erbjudande om bildelning",
+      "no_pending_bookings": "Inga pågående bokningar",
+      "no_requests": "Inga önskemål om samåkning",
+      "no_requests_published": "Hittills har inga ansökningar publicerats.",
+      "offer": "erbjudande",
+      "offered_on": "Förslag framlagt den {datum}",
+      "offers_long": "Erbjudanden om samåkning",
+      "offers_short": "Erbjudanden",
+      "pending_bookings": "Väntande bokningar",
+      "propose_carpool": "Föreslå en bilpool",
+      "publish": "Publicera",
+      "reject": "Avvisa",
+      "request": "begäran",
+      "request_carpool": "Begär en bilpool",
+      "requested_on": "Begärd den {datum}",
+      "requested_seats": "{antal} platser begärda | {antal} platser begärda",
+      "requests_long": "Önskemål om samåkning",
+      "requests_short": "Förfrågningar",
+      "seats_available": "{antal} platser tillgängliga | {antal} platser tillgängliga",
+      "seats_needed": "{antal} platser sökta | {antal} platser sökta",
+      "status": {
+        "accepted": "Accepterad",
+        "cancelled": "Avbruten",
+        "pending": "I vänteläge",
+        "rejected": "Avböjde"
+      },
+      "suggestions": "Förslag",
+      "to_add_comment": "för att lägga till en kommentar",
+      "view_comments": "Visa kommentarer ({antal})"
+    },
+    "collaborators_rights_panel": {
+      "per_edition": "Rättigheter per utgåva",
+      "per_edition_hint": "Inga specifika rättigheter definierade för editioner",
+      "title_placeholder": "Titel / funktion (tillval)"
+    },
+    "convention_form": {
+      "click_to_select_image": "Klicka för att välja en bild",
+      "contact_email": "Kontakta oss via e-post",
+      "contact_email_help": "E-postadress som används för begäran om utgivningsbevis och kontakter i samband med detta avtal",
+      "convention_logo": "Konventets logotyp",
+      "convention_logo_alt": "Konventets logotyp",
+      "convention_name": "Avtalets namn",
+      "external_url": "Extern webbadress",
+      "image_deleted": "Bild raderad",
+      "image_uploaded": "Uppladdad bild",
+      "loading_error_description": "Det går inte att ladda en bild från den här URL:en",
+      "loading_error_title": "Fel vid laddning",
+      "logo_preview": "Förhandsgranskning av logotyp :",
+      "logo_url_description": "URL till bilden av kongressens logotyp",
+      "upload_file": "Ladda upp fil"
+    },
+    "country_multi_select": {
+      "placeholder": "Välj länder..."
+    },
+    "country_select": {
+      "no_countries_found": "Inga länder hittades",
+      "search_country_placeholder": "Sök efter ett land..."
+    },
+    "date_time_picker": {
+      "placeholder": "Välj ett datum"
+    },
+    "edition_form": {
+      "address_tip": "Ange en fullständig adress i sökfältet för att automatiskt fylla i alla fält nedan. En exakt adress gör också att din utgåva kan geolokaliseras på kartan.",
+      "convention_description_placeholder": "Beskrivning av avtalet",
+      "convention_poster_optional": "Kongressaffisch (valfritt)",
+      "country_placeholder": "Landets namn",
+      "facebook_page": "Facebook-sida",
+      "instagram_account": "Instagram-konto",
+      "next": "Nästa",
+      "official_website_link": "Officiell webbplats",
+      "poster_alt": "Posterutgåva",
+      "poster_placeholder": "Klicka för att välja upplagans affisch",
+      "previous": "Föregående",
+      "program_placeholder": "Beskriv programmet (tider, workshops, föreställningar etc.)",
+      "social_networks_description": "Dela dina sidor för att öka synligheten",
+      "social_networks_title": "Sociala nätverk",
+      "step_about_description": "Beskrivning av upplagan",
+      "step_about_title": "Om oss",
+      "step_external_links_description": "Biljettförsäljning och sociala nätverk",
+      "step_external_links_title": "Externa länkar",
+      "step_general_description": "Allmän information",
+      "step_general_title": "Allmän information",
+      "step_services_title": "Tjänster som erbjuds",
+      "ticketing_link": "Länk till biljettförsäljning",
+      "ticketing_section_description": "Information om biljettköp",
+      "ticketing_section_title": "Biljetter"
+    },
+    "favorites_map": {
+      "all_favorites": "Alla är favoriter",
+      "editions_with_location": "{antal} utgåvor med lokalisering | {antal} utgåvor med lokalisering",
+      "no_upcoming_favorites": "Ingen kommande favoritutgåva med tillgänglig plats",
+      "past": "Tidigare",
+      "upcoming": "Kommer inom kort"
+    },
+    "map": {
+      "editions_on_map": "{antal} kartutgåva | {antal} kartutgåva",
+      "incomplete_address_warning": "Utgåvor utan fullständig adress kan inte visas på kartan.",
+      "loading": "Ladda kortet...",
+      "no_editions_with_location": "Ingen upplaga med plats",
+      "ongoing": "Pågående arbete",
+      "past": "Tidigare",
+      "temporal_status": "Temporär status",
+      "upcoming": "Kommer inom kort",
+      "without_coordinates": "({antal} utan koordinater)",
+      "yellow_border_favorite": "Gul kontur = Favorit"
+    },
+    "posts": {
+      "comments_count": "{antal} kommentarer | {antal} kommentarer",
+      "confirm_delete_comment": "Är du säker på att du vill ta bort den här kommentaren? Denna åtgärd är oåterkallelig.",
+      "confirm_delete_post": "Är du säker på att du vill ta bort denna publikation? Denna åtgärd är oåterkallelig.",
+      "confirm_delete_title": "Bekräfta borttagningen",
+      "pinned": "Pinned",
+      "publish": "Publicera",
+      "reply_to_post": "Kommentera denna publikation",
+      "your_comment": "Dina kommentarer",
+      "your_comment_placeholder": "Din kommentar..."
+    }
+  },
+  "forms": {
+    "buttons": {
+      "publishing": "Publikation...",
+      "submitting": "Skickar..."
+    },
+    "labels": {
+      "address_complement": "Ytterligare adress",
+      "convention_name": "Avtalets namn",
+      "edition_name_optional": "Utgåvans namn (valfritt)",
+      "from_date": "Från",
+      "full_address": "Fullständig adress",
+      "select_date": "Välj ett datum",
+      "until_date": "Fram till"
+    },
+    "placeholders": {
+      "address_complement": "Byggnad A, Salle des fêtes...",
+      "city_example": "Paris",
+      "contact_email": "kontakt{'@'}convention.org",
+      "convention_description": "Beskriv avtalet, dess historia, dess särdrag...",
+      "convention_name_example": "Ex: Europeiska jongleringskonventionen",
+      "edition_name_example": "Upplagans namn (t.ex. EJC 2024)",
+      "search_by_name": "Sök efter namn",
+      "select_convention": "Välj en kongress",
+      "select_countries": "Välj länder...",
+      "start_typing_address": "Börja skriva in en adress..."
+    }
+  },
+  "upload": {
+    "delete_message": "Bild raderad",
+    "error": "Fel vid uppladdning",
+    "error_message": "Fel vid uppladdning",
+    "errors": {
+      "file_too_large": "Filen är för stor",
+      "invalid_file_extension": "Ogiltig filändelse",
+      "invalid_file_type": "Ogiltig filtyp"
+    },
+    "formats_accepted": "Accepterade format",
+    "logo_url_optional_placeholder": "URL för logotyp (valfritt)",
+    "max_size": "Maximal storlek",
+    "select_file": "Välj en fil",
+    "success_message": "Bilden har laddats upp framgångsrikt!",
+    "upload": "Ladda upp",
+    "upload_error": "Fel vid uppladdning",
+    "uploading": "Uppladdning pågår..."
+  }
+}

@@ -158,6 +158,8 @@ const languageConfig = {
   pt: { name: 'Português', flag: 'fi fi-pt' },
   ru: { name: 'Русский', flag: 'fi fi-ru' },
   uk: { name: 'Українська', flag: 'fi fi-ua' },
+  cs: { name: 'Čeština', flag: 'fi fi-cz' },
+  sv: { name: 'Svenska', flag: 'fi fi-se' },
 }
 
 // Langue courante avec son drapeau

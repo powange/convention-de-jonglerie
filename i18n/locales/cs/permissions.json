@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "addEdition": "Přidávání edic",
+    "admin": "Ředitel",
+    "deleteAllEditions": "Smazat všechny edice",
+    "deleteConvention": "Vymazat dohodu",
+    "editAllEditions": "Upravit všechny edice",
+    "editConvention": "Úprava dohody",
+    "editor": "Vydavatel",
+    "manageCollaborators": "Řízení zaměstnanců",
+    "manageVolunteers": "Řízení dobrovolníků",
+    "manager": "Pokročilé řízení",
+    "moderator": "Moderátor",
+    "viewer": "Hráč"
+  }
+}

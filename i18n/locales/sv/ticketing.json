@@ -1,0 +1,115 @@
+{
+  "ticketing": {
+    "access_control": {
+      "loading": "Laddar...",
+      "manual_input_label": "Manuell kodinmatning",
+      "no_ticket_found": "Inga biljetter hittades",
+      "search_placeholder": "Efternamn, förnamn eller e-post...",
+      "ticket_found": "Biljett hittades",
+      "unknown": "Okänd",
+      "volunteer_badge": "Frivilligarbetare",
+      "volunteer_found": "Volontär hittad"
+    },
+    "my_ticket": {
+      "how_to_use_description": "Visa upp denna QR-kod vid entrén för att validera din biljett.",
+      "how_to_use_title": "Så här använder du denna QR-kod",
+      "logo_alt": "HelloAsso"
+    },
+    "options": {
+      "list": {
+        "loading": "Laddar...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Inga alternativ hittades"
+      },
+      "modal": {
+        "choices_label": "Tillgängliga valmöjligheter",
+        "choices_placeholder": "Alternativ 1\nAlternativ 2\nAlternativ 3",
+        "description_label": "Beskrivning",
+        "description_placeholder": "Beskrivning av alternativ (valfritt)",
+        "is_mandatory_label": "Obligatoriskt alternativ",
+        "name_label": "Alternativets namn",
+        "name_placeholder": "Ex: T-shirt för kongress",
+        "no_quota_selected": "Ingen kvot vald",
+        "position_label": "Displayens position",
+        "position_placeholder": "0",
+        "quotas_label": "Tillhörande kvoter",
+        "quotas_placeholder": "Välja kvoter",
+        "title": "HejAsso-alternativet",
+        "type_label": "Typ av option"
+      }
+    },
+    "participant": {
+      "entry_validated": "Posten är redan validerad",
+      "logo_alt": "HelloAsso",
+      "no_slot_assigned": "Ingen slot tilldelad",
+      "ticket_type": "Typ av biljett",
+      "type": "Typ",
+      "volunteer_validated": "Volontären har validerat sin post"
+    },
+    "quotas": {
+      "list": {
+        "description_label": "beskrivning",
+        "description_placeholder": "Beskrivning (valfritt)",
+        "loading": "Laddar...",
+        "name_placeholder": "Titel på kvot",
+        "title": "Hantering av kvoter"
+      },
+      "stats": {
+        "title": "Kvotstatistik",
+        "used": "Begagnad",
+        "validated": "Validerad"
+      }
+    },
+    "returnable_items": {
+      "list": {
+        "add_placeholder": "Nytt föremål...",
+        "delete_label": "Radera",
+        "delete_title": "Ta bort objekt",
+        "loading": "Laddar...",
+        "name_placeholder": "Artikelns namn",
+        "title": "Föremål som ska delas ut till deltagarna"
+      },
+      "volunteer": {
+        "choose_placeholder": "Välja en vara att returnera...",
+        "given_to_all": "Presenteras till alla volontärer",
+        "remove_label": "Ta bort artikel",
+        "remove_title": "Dra tillbaka den här artikeln?"
+      }
+    },
+    "stats": {
+      "participants": "Deltagare",
+      "volunteers": "Volontärer"
+    },
+    "tiers": {
+      "list": {
+        "inactive": "Inaktiv",
+        "loading": "Laddar...",
+        "logo_alt": "HelloAsso",
+        "none_found": "Inga tariffer hittades"
+      },
+      "modal": {
+        "description_label": "Beskrivning",
+        "description_placeholder": "Beskrivning av tulltaxan (valfritt)",
+        "free_price_label": "Fri entré",
+        "max_amount_label": "Högsta belopp (€)",
+        "max_amount_placeholder": "0.00",
+        "min_amount_label": "Lägsta belopp (€)",
+        "min_amount_placeholder": "0.00",
+        "name_label": "Tulltaxans namn",
+        "name_placeholder": "Ex: 3-dagars pass",
+        "no_quota_selected": "Ingen kvot vald",
+        "no_item_selected": "Inga artiklar valda",
+        "position_label": "Displayens position",
+        "position_placeholder": "0",
+        "price_label": "Pris (€)",
+        "price_placeholder": "0.00",
+        "quotas_label": "Tillhörande kvoter",
+        "quotas_placeholder": "Välja kvoter",
+        "returnable_items_label": "Föremål som ska återlämnas",
+        "returnable_items_placeholder": "Välj objekt",
+        "status_label": "Status",
+        "title": "HelloAsso pris"
+      }
+    }
+  }
+}

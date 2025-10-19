@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Jonglering av konvention"
+  },
+  "pwa": {
+    "install": {
+      "button": "Installera nu",
+      "cancelled": {
+        "description": "Du kan installera programmet senare från dina webbläsarinställningar.",
+        "title": "Installation avbruten"
+      },
+      "description": "Lägg till Juggling Convention-applikationen på din startskärm för snabb åtkomst och en optimal upplevelse.",
+      "error": {
+        "description": "Ett fel har inträffat under installationen. Vänligen försök igen.",
+        "title": "Installationsfel"
+      },
+      "later": "Senare",
+      "success": {
+        "description": "Applikationen har lagts till på din startskärm.",
+        "title": "Framgångsrik installation!"
+      },
+      "title": "Installera programmet"
+    }
+  },
+  "services": {
+    "accessibility": "Tillgänglighet för funktionshindrade",
+    "aerial_space": "Luftrum",
+    "afj_token_payment": "Betalning av AFJ-tokens",
+    "atm": "Distributeur automatique de billets",
+    "canteen": "Cantine",
+    "cash_payment": "Kontant betalning",
+    "categories": {
+      "accommodation": "Hosting",
+      "activities": "Aktiviteter",
+      "amenities": "Bekvämligheter",
+      "food": "Catering",
+      "payment": "Betalningar"
+    },
+    "concert": "Konsert",
+    "credit_card_payment": "Betalning med kreditkort",
+    "family_camping": "Camping för hela familjen",
+    "fire_space": "Brandutrymme",
+    "food_trucks": "Food trucks",
+    "gala": "Gala",
+    "gym": "Gymnasium",
+    "kids_zone": "Barnens zon",
+    "long_show": "Lång show",
+    "open_stage": "Öppen scen",
+    "pets_accepted": "Husdjur tillåtna",
+    "showers": "Duschar",
+    "slackline_space": "Slackline-område",
+    "sleeping_room": "Sovrum",
+    "tent_camping": "Campingtält",
+    "toilets": "WC",
+    "truck_camping": "Camping med lastbil",
+    "workshops": "Verkstäder"
+  }
+}

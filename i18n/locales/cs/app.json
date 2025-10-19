@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Žonglérská konvence"
+  },
+  "pwa": {
+    "install": {
+      "button": "Nainstalovat nyní",
+      "cancelled": {
+        "description": "Aplikaci můžete nainstalovat později z nastavení prohlížeče.",
+        "title": "Instalace zrušena"
+      },
+      "description": "Přidejte si aplikaci Žonglérská konvence na domovskou obrazovku, abyste k ní měli rychlý přístup a optimální zážitek.",
+      "error": {
+        "description": "Při instalaci došlo k chybě. Zkuste to prosím znovu.",
+        "title": "Chyba instalace"
+      },
+      "later": "Později",
+      "success": {
+        "description": "Aplikace byla přidána na domovskou obrazovku.",
+        "title": "Úspěšná instalace!"
+      },
+      "title": "Instalace aplikace"
+    }
+  },
+  "services": {
+    "accessibility": "Bezbariérový přístup",
+    "aerial_space": "Vzdušný prostor",
+    "afj_token_payment": "Platba žetonů AFJ",
+    "atm": "Automatický výdej hotovosti",
+    "canteen": "Jídelna",
+    "cash_payment": "Platba v hotovosti",
+    "categories": {
+      "accommodation": "Hostování",
+      "activities": "Aktivity",
+      "amenities": "Vybavení",
+      "food": "Catering",
+      "payment": "Platby"
+    },
+    "concert": "Koncert",
+    "credit_card_payment": "Platba kreditní kartou",
+    "family_camping": "Rodinné kempování",
+    "fire_space": "Požární prostor",
+    "food_trucks": "Food trucky",
+    "gala": "Gala",
+    "gym": "Gymnázium",
+    "kids_zone": "Dětská zóna",
+    "long_show": "Dlouhá výstava",
+    "open_stage": "Otevřená scéna",
+    "pets_accepted": "Domácí zvířata povolena",
+    "showers": "Sprchy",
+    "slackline_space": "Slackline zóna",
+    "sleeping_room": "Místnost na spaní",
+    "tent_camping": "Kempinkový stan",
+    "toilets": "WC",
+    "truck_camping": "Truck camping",
+    "workshops": "Workshopy"
+  }
+}

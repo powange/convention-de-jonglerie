@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "addEdition": "Lägga till editioner",
+    "admin": "Direktör",
+    "deleteAllEditions": "Radera alla utgåvor",
+    "deleteConvention": "Ta bort avtalet",
+    "editAllEditions": "Ändra alla utgåvor",
+    "editConvention": "Ändring av avtalet",
+    "editor": "Utgivare",
+    "manageCollaborators": "Leda medarbetare",
+    "manageVolunteers": "Hantering av volontärer",
+    "manager": "Avancerad hantering",
+    "moderator": "Moderator",
+    "viewer": "Spelare"
+  }
+}

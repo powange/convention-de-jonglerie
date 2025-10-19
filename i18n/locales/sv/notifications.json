@@ -1,0 +1,111 @@
+{
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Få information om bokningar och meddelanden om samåkning",
+        "important": "Missa inte viktig information om dig själv",
+        "reminders": "Få påminnelser om dina favoritkonventioner",
+        "volunteer": "Få uppdateringar om dina volontäransökningar"
+      },
+      "description": "Aktivera pushnotiser för att hålla dig uppdaterad om dina bilpooler, volontäransökningar och favoritkonvent.",
+      "enable": "Aktivera meddelanden",
+      "not_now": "Inte nu",
+      "privacy": {
+        "description": "Du kan när som helst avaktivera aviseringar i dina inställningar.",
+        "title": "Respekt för din integritet"
+      },
+      "title": "Håll dig informerad i realtid"
+    }
+  },
+  "notifications": {
+    "carpool": {
+      "booking_accepted": {
+        "action": "Se mer information",
+        "message": "{ägarnamn} har accepterat din begäran om {platser} för resan från {platsCity} på {datum}.",
+        "title": "Begäran accepterad! ✅"
+      },
+      "booking_cancelled": {
+        "action": "Se samåkning",
+        "message": "{passagerarnamn} har avbokat sin bokning av {platser} för resan från {platsCity} på {datum}.",
+        "title": "Bokningen avbokad 📅"
+      },
+      "booking_received": {
+        "action": "Se begäran",
+        "message": "{anmälarens namn} skulle vilja reservera {platser} i din bilpool",
+        "message_with_note": "{Frågeställarnamn} önskar reservera {platser} plats(er) : \"{not}\".",
+        "title": "Ny begäran om samåkning 🚗"
+      },
+      "booking_rejected": {
+        "action": "Se andra erbjudanden",
+        "message": "{ägarnamn} har avslagit din begäran om {platser} för resan från {platsCity}.",
+        "title": "Begäran avslås"
+      }
+    },
+    "common": {
+      "view_details": "Se mer information"
+    },
+    "confirm_delete_description": "Är du säker på att du vill ta bort detta meddelande?",
+    "confirm_delete_title": "Ta bort meddelande",
+    "edition": {
+      "new_convention": {
+        "message": "Konventionen \"{konventionnamn}\" har just lagts till i plattformen.",
+        "title": "Nytt avtal tillagt"
+      },
+      "reminder": {
+        "action": "Se mer information",
+        "message": "Utgåvan \"{utgåvanamn}\" startar i {dagarTill} dag(ar) !",
+        "title": "Återkallande av händelse 📅"
+      }
+    },
+    "loading": "Laddar meddelanden...",
+    "manage_description": "Hantera dina meddelanden och preferenser",
+    "none_found": "Ingen anmälan hittades",
+    "push": {
+      "blocked": "Blockerade meddelanden i webbläsarinställningarna",
+      "description": "Få meddelanden även när applikationen är stängd",
+      "disabled": "Notifieringar inaktiverade",
+      "enabled": "Meddelanden aktiverade på den här enheten",
+      "not_supported": "Push-meddelanden stöds inte i den här webbläsaren",
+      "test_button": "Testa ett meddelande",
+      "title": "Push-meddelanden"
+    },
+    "system": {
+      "error": {
+        "message": "Ett fel har inträffat: {errorMessage}",
+        "title": "Systemfel"
+      }
+    },
+    "this_week": "Denna vecka",
+    "unread": "Oläst",
+    "volunteer": {
+      "application_accepted": {
+        "action": "Se mer information",
+        "message": "Din ansökan om att bli volontär för \"{editionName}\" har accepterats.",
+        "message_complete": "Din ansökan om \"{editionName}\" har accepterats.\n\nDu har blivit tilldelad följande lag:\n- {team}\n\nMeddelande från arrangören:\n\"{not}\"",
+        "message_with_note": "Din ansökan om \"{editionName}\" har accepterats.\n\nMeddelande från arrangören:\n\"{not}\"",
+        "message_with_teams": "Din ansökan om \"{editionName}\" har accepterats.\n\nDu har blivit tilldelad följande lag:\n- {team}",
+        "title": "Ansökan accepterad! ✅"
+      },
+      "application_rejected": {
+        "action": "Se upplagan",
+        "message": "Din ansökan om att bli volontär för \"{editionName}\" har inte accepterats den här gången.",
+        "title": "Ansökan har inte accepterats"
+      },
+      "application_submitted": {
+        "action": "Se mina ansökningar",
+        "message": "Din ansökan till \"{editionName}\" har skickats in. Arrangörerna kommer att granska den.",
+        "title": "Ansökan skickad! 🎉"
+      },
+      "back_to_pending": {
+        "action": "Se min ansökan",
+        "message": "Din ansökan om att arbeta som volontär för \"{editionName}\" har lagts på is av arrangörerna.",
+        "title": "Ansökan läggs på is"
+      }
+    },
+    "welcome": {
+      "action": "Se avtalen",
+      "message": "Ditt konto har skapats framgångsrikt. Ta reda på mer om jongleringskongresser nära dig!",
+      "title": "Välkomna! 🎉"
+    }
+  }
+}

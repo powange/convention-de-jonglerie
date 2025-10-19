@@ -1,0 +1,193 @@
+{
+  "components": {
+    "carpool": {
+      "accept": "Přijmout",
+      "add_comment_placeholder": "Přidat komentář...",
+      "added_on": "Přidáno dne {date}",
+      "address": "Adresa",
+      "available_seats": "Počet volných míst",
+      "be_first_to_comment": "Buďte první, kdo okomentuje tento {typ}!",
+      "be_first_to_offer": "Buďte první, kdo navrhne spolujízdu pro toto vydání!",
+      "book_seats": "Kniha",
+      "booking_message": "Zpráva pro řidiče (nepovinné)",
+      "booking_message_placeholder": "Např.: Mám hodně zavazadel, mohu si vzít 2 sedadla?",
+      "comments": "Komentáře",
+      "confirm_booking": "Potvrzení rezervace",
+      "confirm_delete_offer": "Určitě chcete tuto službu sdílení aut zrušit?",
+      "confirm_delete_request": "Opravdu chcete tuto žádost o spolujízdu smazat?",
+      "confirmed_passengers": "Potvrzení spolujezdci",
+      "contact": "Kontakt",
+      "contact_user": "Kontakt {jméno}",
+      "delete_offer": "Smazat nabídku",
+      "delete_request": "Odstranit požadavek",
+      "departure_date_time": "Datum a čas odjezdu",
+      "edit_offer": "Úprava nabídky spolujízdy",
+      "edit_request": "Úprava žádosti o spolujízdu",
+      "how_many_seats_needed": "Kolik míst hledáte?",
+      "loading_comments": "Načítání komentářů...",
+      "my_booking": "Moje rezervace",
+      "no_comments": "Bez komentáře",
+      "no_offers": "Žádná nabídka sdílení aut",
+      "no_pending_bookings": "Žádné rezervace čekají na vyřízení",
+      "no_requests": "Žádné žádosti o spolujízdu",
+      "no_requests_published": "Dosud nebyla zveřejněna žádná žádost.",
+      "offer": "nabídka",
+      "offered_on": "Navrženo dne {datum}",
+      "offers_long": "Nabídky spolujízdy",
+      "offers_short": "Nabídky",
+      "pending_bookings": "Čekající rezervace",
+      "propose_carpool": "Navrhnout spolujízdu",
+      "publish": "Zveřejnit",
+      "reject": "Odpady",
+      "request": "žádost",
+      "request_carpool": "Žádost o spolujízdu",
+      "requested_on": "Vyžádáno dne {datum}",
+      "requested_seats": "{count} požadované místo | {count} požadované místo",
+      "requests_long": "Žádosti o spolujízdu",
+      "requests_short": "Žádosti",
+      "seats_available": "{count} volných míst | {count} volných míst",
+      "seats_needed": "{count} prohledané místo | {count} prohledaná místa",
+      "status": {
+        "accepted": "Přijato",
+        "cancelled": "Zrušeno",
+        "pending": "Na počkání",
+        "rejected": "Odmítnuto"
+      },
+      "suggestions": "Návrhy",
+      "to_add_comment": "přidat komentář",
+      "view_comments": "Zobrazit komentáře ({count})"
+    },
+    "collaborators_rights_panel": {
+      "per_edition": "Práva podle vydání",
+      "per_edition_hint": "Pro edice nejsou definována žádná zvláštní práva",
+      "title_placeholder": "Název / funkce (nepovinné)"
+    },
+    "convention_form": {
+      "click_to_select_image": "Kliknutím vyberete obrázek",
+      "contact_email": "Kontaktní e-mail",
+      "contact_email_help": "E-mailová adresa používaná pro žádosti o reklamaci vydání a kontakty související s touto smlouvou.",
+      "convention_logo": "Logo Konventu",
+      "convention_logo_alt": "Logo Konventu",
+      "convention_name": "Název dohody",
+      "external_url": "Externí adresa URL",
+      "image_deleted": "Obrázek odstraněn",
+      "image_uploaded": "Nahraný obrázek",
+      "loading_error_description": "Nelze načíst obrázek z této adresy URL",
+      "loading_error_title": "Chyba načítání",
+      "logo_preview": "Náhled loga :",
+      "logo_url_description": "Adresa URL na obrázek loga konference",
+      "upload_file": "Nahrát soubor"
+    },
+    "country_multi_select": {
+      "placeholder": "Vybrané země..."
+    },
+    "country_select": {
+      "no_countries_found": "Nebyly nalezeny žádné země",
+      "search_country_placeholder": "Vyhledejte zemi..."
+    },
+    "date_time_picker": {
+      "placeholder": "Vyberte datum"
+    },
+    "edition_form": {
+      "address_tip": "Zadáním celé adresy do vyhledávacího pole se automaticky předvyplní všechna níže uvedená pole. Přesná adresa také umožní geolokaci vašeho vydání na mapě.",
+      "convention_description_placeholder": "Popis dohody",
+      "convention_poster_optional": "Plakát konference (volitelný)",
+      "country_placeholder": "Název země",
+      "facebook_page": "Stránka na Facebooku",
+      "instagram_account": "Účet na Instagramu",
+      "next": "Další",
+      "official_website_link": "Oficiální webové stránky",
+      "poster_alt": "Vydání plakátu",
+      "poster_placeholder": "Kliknutím vyberete plakát edice",
+      "previous": "Předchozí",
+      "program_placeholder": "Popište program (časy, workshopy, představení atd.)",
+      "social_networks_description": "Sdílejte své stránky pro zvýšení viditelnosti",
+      "social_networks_title": "Sociální sítě",
+      "step_about_description": "Popis edice",
+      "step_about_title": "O nás",
+      "step_external_links_description": "Prodej vstupenek a sociální sítě",
+      "step_external_links_title": "Externí odkazy",
+      "step_general_description": "Obecné informace",
+      "step_general_title": "Obecné informace",
+      "step_services_title": "Nabízené služby",
+      "ticketing_link": "Odkaz na prodej vstupenek",
+      "ticketing_section_description": "Informace o nákupu vstupenek",
+      "ticketing_section_title": "Vstupenky"
+    },
+    "favorites_map": {
+      "all_favorites": "Všichni jsou oblíbení",
+      "editions_with_location": "{count} vydání s lokalizací | {count} vydání s lokalizací",
+      "no_upcoming_favorites": "Není k dispozici žádné oblíbené vydání s lokalitou",
+      "past": "Minulost",
+      "upcoming": "Již brzy"
+    },
+    "map": {
+      "editions_on_map": "{count} vydání mapy | {count} vydání mapy",
+      "incomplete_address_warning": "Edice bez úplné adresy nelze na mapě zobrazit.",
+      "loading": "Načítání karty...",
+      "no_editions_with_location": "Žádné vydání s umístěním",
+      "ongoing": "Probíhá",
+      "past": "Minulost",
+      "temporal_status": "Časový stav",
+      "upcoming": "Již brzy",
+      "without_coordinates": "({count} bez souřadnic)",
+      "yellow_border_favorite": "Žlutý obrys = oblíbený"
+    },
+    "posts": {
+      "comments_count": "{count} komentář | {count} komentáře",
+      "confirm_delete_comment": "Určitě chcete tento komentář smazat? Tato akce je nevratná.",
+      "confirm_delete_post": "Opravdu chcete tuto publikaci smazat? Tato akce je nevratná.",
+      "confirm_delete_title": "Potvrzení odstranění",
+      "pinned": "Připnuté",
+      "publish": "Zveřejnit",
+      "reply_to_post": "Komentář k této publikaci",
+      "your_comment": "Vaše připomínky",
+      "your_comment_placeholder": "Váš komentář..."
+    }
+  },
+  "forms": {
+    "buttons": {
+      "publishing": "Publikace...",
+      "submitting": "Odeslání..."
+    },
+    "labels": {
+      "address_complement": "Další adresa",
+      "convention_name": "Název dohody",
+      "edition_name_optional": "Název edice (nepovinné)",
+      "from_date": "Z",
+      "full_address": "Úplná adresa",
+      "select_date": "Vyberte datum",
+      "until_date": "Až do"
+    },
+    "placeholders": {
+      "address_complement": "Budova A, Salle des fêtes...",
+      "city_example": "Paris",
+      "contact_email": "contact{'@'}convention.org",
+      "convention_description": "Popište dohodu, její historii, její specifické rysy...",
+      "convention_name_example": "Například: Evropská žonglérská konvence",
+      "edition_name_example": "Název edice (např. EJC 2024)",
+      "search_by_name": "Vyhledávání podle jména",
+      "select_convention": "Vyberte konvenci",
+      "select_countries": "Vybrané země...",
+      "start_typing_address": "Začněte psát adresu..."
+    }
+  },
+  "upload": {
+    "delete_message": "Obrázek odstraněn",
+    "error": "Chyba při nahrávání",
+    "error_message": "Chyba při nahrávání",
+    "errors": {
+      "file_too_large": "Příliš velký soubor",
+      "invalid_file_extension": "Nesprávná přípona souboru",
+      "invalid_file_type": "Nesprávný typ souboru"
+    },
+    "formats_accepted": "Přijaté formáty",
+    "logo_url_optional_placeholder": "Adresa URL loga (nepovinné)",
+    "max_size": "Maximální velikost",
+    "select_file": "Výběr souboru",
+    "success_message": "Obrázek byl úspěšně nahrán!",
+    "upload": "Nahrát",
+    "upload_error": "Chyba při nahrávání",
+    "uploading": "Nahrávání probíhá..."
+  }
+}
