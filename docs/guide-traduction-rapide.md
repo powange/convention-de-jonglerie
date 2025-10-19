@@ -2,66 +2,102 @@
 
 ## Option recommandée : Script DeepL automatisé
 
-### Étape 1 : Installer DeepL
-
-```bash
-npm install --save-dev deepl-node
-```
-
-### Étape 2 : Obtenir une clé API DeepL (GRATUIT)
+### Étape 1 : Configuration de la clé API DeepL (GRATUIT)
 
 1. Allez sur https://www.deepl.com/pro-api
 2. Créez un compte **DeepL API Free**
 3. Copiez votre clé API
-4. **Limite gratuite : 500 000 caractères/mois** (largement suffisant)
-
-### Étape 3 : Exécuter la traduction
+4. Ajoutez-la dans votre fichier `.env` :
 
 ```bash
-DEEPL_API_KEY=votre_cle_api_ici node scripts/translate-with-deepl.js
+# DeepL API pour traduction automatique (gratuit jusqu'à 500k caractères/mois)
+DEEPL_API_KEY="votre_clé_api_ici"
 ```
 
-**Durée estimée :** 15-20 minutes pour traduire les 22 fichiers
+**Limite gratuite : 500 000 caractères/mois** (largement suffisant)
+
+### Étape 2 : Exécuter la traduction
+
+#### Mode incrémental (recommandé)
+Traduit uniquement les nouvelles clés, préserve les traductions existantes :
+
+```bash
+npm run i18n:translate
+```
+
+#### Mode force
+Retraduit tout en écrasant les traductions existantes :
+
+```bash
+npm run i18n:translate:force
+```
+
+**Durée estimée :**
+- Mode incrémental (avec fichiers existants) : ~1 minute
+- Mode force (première fois) : 15-20 minutes pour 22 fichiers
 
 ### Résultat attendu
 
+#### Mode incrémental (avec fichiers existants)
 ```
 🌍 Traduction automatique avec DeepL
 
-Configuration:
-  Source: FR (Français)
-  Cibles: Suédois, Tchèque
-  Fichiers: 11
-  Total traductions: 22
+Mode: 🔄 INCRÉMENTAL (nouvelles clés uniquement)
+
+📄 Traduction de admin.json vers sv...
+  ℹ️  Fichier existant détecté - Mode incrémental activé
+  ✓ Préservé: admin.active
+  ✓ Préservé: admin.active_administrators
+  ... [toutes les clés préservées]
+✅ admin.json traité avec succès
+   📊 Nouvelles traductions: 0 | Préservées: 273 | Erreurs: 0
+
+============================================================
+✅ TRADUCTION TERMINÉE
+============================================================
+
+📊 Statistiques globales:
+  ✨ Nouvelles traductions: 0
+  ✓  Traductions préservées: 3970
+  ❌ Erreurs: 0
+  📝 Total de clés traitées: 3970
+
+💡 Astuce:
+   Les traductions existantes ont été préservées.
+   Pour tout retraduire, utilisez: npm run i18n:translate:force
+```
+
+#### Mode force (première traduction)
+```
+🌍 Traduction automatique avec DeepL
+
+Mode: ⚡ FORCE (retraduit tout)
 
 ============================================================
 🇸🇪 TRADUCTION VERS SUÉDOIS (SV)
 ============================================================
 
 📄 Traduction de common.json vers sv...
-  Traduction: calendar.add_to_calendar
-  Traduction: calendar.day
+  🔄 Traduction: calendar.add_to_calendar
+  🔄 Traduction: calendar.day
   ... [300+ clés]
-✅ common.json traduit avec succès
-
-📄 Traduction de auth.json vers sv...
-  ... [50+ clés]
-✅ auth.json traduit avec succès
+✅ common.json traité avec succès
+   📊 Nouvelles traductions: 300 | Préservées: 0 | Erreurs: 0
 
 [...]
-
-============================================================
-🇨🇿 TRADUCTION VERS TCHÈQUE (CS)
-============================================================
-
-[Même processus...]
 
 ============================================================
 ✅ TRADUCTION TERMINÉE
 ============================================================
 
+📊 Statistiques globales:
+  ✨ Nouvelles traductions: 3970
+  ✓  Traductions préservées: 0
+  ❌ Erreurs: 5
+  📝 Total de clés traitées: 3975
+
 Prochaines étapes:
-1. Vérifier les traductions générées
+1. Vérifier les nouvelles traductions générées
 2. Faire réviser par un locuteur natif si possible
 3. Tester l'application: npm run dev
 4. Vérifier la parité: npm run check-translations
