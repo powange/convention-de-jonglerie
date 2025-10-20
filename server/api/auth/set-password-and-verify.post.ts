@@ -1,14 +1,16 @@
 import { NotificationHelpers } from '@@/server/utils/notification-service'
 import { prisma } from '@@/server/utils/prisma'
-import { handleValidationError } from '@@/server/utils/validation-schemas'
+import { handleValidationError, passwordSchema } from '@@/server/utils/validation-schemas'
+import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
-const verifyEmailSchema = z.object({
+const setPasswordSchema = z.object({
   email: z.string().email('Adresse email invalide'),
   code: z
     .string()
     .length(6, 'Le code doit contenir exactement 6 chiffres')
     .regex(/^\d{6}$/, 'Le code doit contenir uniquement des chiffres'),
+  password: passwordSchema,
 })
 
 export default defineEventHandler(async (event) => {
@@ -16,7 +18,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
     // Validation des données
-    const validatedData = verifyEmailSchema.parse(body)
+    const validatedData = setPasswordSchema.parse(body)
 
     // Rechercher l'utilisateur
     const user = await prisma.user.findUnique({
@@ -60,53 +62,37 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Vérifier si l'utilisateur a besoin de créer un mot de passe
-    const needsPassword = !user.password
+    // Hacher le mot de passe
+    const hashedPassword = await bcrypt.hash(validatedData.password, 10)
 
-    // Si l'utilisateur a déjà un mot de passe, activer le compte directement
-    if (!needsPassword) {
-      // Activer le compte
-      const updatedUser = await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          isEmailVerified: true,
-          emailVerificationCode: null,
-          verificationCodeExpiry: null,
-        },
-      })
+    // Activer le compte et définir le mot de passe
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        isEmailVerified: true,
+        emailVerificationCode: null,
+        verificationCodeExpiry: null,
+      },
+    })
 
-      // Envoyer une notification de bienvenue
-      try {
-        await NotificationHelpers.welcome(updatedUser.id)
-      } catch (notificationError) {
-        // Ne pas faire échouer la vérification si la notification échoue
-        console.error("Erreur lors de l'envoi de la notification de bienvenue:", notificationError)
-      }
-
-      return {
-        message: 'Email vérifié avec succès ! Votre compte est maintenant actif.',
-        needsPassword: false,
-        user: {
-          id: updatedUser.id,
-          email: updatedUser.email,
-          pseudo: updatedUser.pseudo,
-          nom: updatedUser.nom,
-          prenom: updatedUser.prenom,
-          isEmailVerified: updatedUser.isEmailVerified,
-        },
-      }
+    // Envoyer une notification de bienvenue
+    try {
+      await NotificationHelpers.welcome(updatedUser.id)
+    } catch (notificationError) {
+      // Ne pas faire échouer la vérification si la notification échoue
+      console.error("Erreur lors de l'envoi de la notification de bienvenue:", notificationError)
     }
 
-    // Si l'utilisateur n'a pas de mot de passe, retourner un flag pour la création de mot de passe
     return {
-      message: 'Code vérifié avec succès. Veuillez créer votre mot de passe.',
-      needsPassword: true,
+      message: 'Mot de passe créé avec succès ! Votre compte est maintenant actif.',
       user: {
-        id: user.id,
-        email: user.email,
-        pseudo: user.pseudo,
-        nom: user.nom,
-        prenom: user.prenom,
+        id: updatedUser.id,
+        email: updatedUser.email,
+        pseudo: updatedUser.pseudo,
+        nom: updatedUser.nom,
+        prenom: updatedUser.prenom,
+        isEmailVerified: updatedUser.isEmailVerified,
       },
     }
   } catch (error) {
@@ -120,7 +106,7 @@ export default defineEventHandler(async (event) => {
       throw error
     }
 
-    console.error('Erreur lors de la vérification email:', error)
+    console.error('Erreur lors de la création du mot de passe:', error)
     throw createError({
       statusCode: 500,
       message: 'Erreur serveur interne',

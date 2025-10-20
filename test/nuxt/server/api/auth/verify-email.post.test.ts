@@ -11,6 +11,19 @@ const mockUser = {
   pseudo: 'testuser',
   nom: 'Doe',
   prenom: 'John',
+  password: 'hashed_password', // Utilisateur avec mot de passe existant
+  isEmailVerified: false,
+  emailVerificationCode: '123456',
+  verificationCodeExpiry: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes dans le futur
+}
+
+const mockUserWithoutPassword = {
+  id: 1,
+  email: 'user@example.com',
+  pseudo: 'testuser',
+  nom: 'Doe',
+  prenom: 'John',
+  password: null, // Utilisateur sans mot de passe (invitation)
   isEmailVerified: false,
   emailVerificationCode: '123456',
   verificationCodeExpiry: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes dans le futur
@@ -44,6 +57,7 @@ describe('/api/auth/verify-email POST', () => {
 
     expect(result).toEqual({
       message: 'Email vérifié avec succès ! Votre compte est maintenant actif.',
+      needsPassword: false,
       user: {
         id: mockVerifiedUser.id,
         email: mockVerifiedUser.email,
@@ -66,6 +80,33 @@ describe('/api/auth/verify-email POST', () => {
         verificationCodeExpiry: null,
       },
     })
+  })
+
+  it('devrait retourner needsPassword: true pour un utilisateur sans mot de passe', async () => {
+    const requestBody = {
+      email: 'user@example.com',
+      code: '123456',
+    }
+
+    global.readBody.mockResolvedValue(requestBody)
+    prismaMock.user.findUnique.mockResolvedValue(mockUserWithoutPassword)
+
+    const result = await handler(mockEvent as any)
+
+    expect(result).toEqual({
+      message: 'Code vérifié avec succès. Veuillez créer votre mot de passe.',
+      needsPassword: true,
+      user: {
+        id: mockUserWithoutPassword.id,
+        email: mockUserWithoutPassword.email,
+        pseudo: mockUserWithoutPassword.pseudo,
+        nom: mockUserWithoutPassword.nom,
+        prenom: mockUserWithoutPassword.prenom,
+      },
+    })
+
+    // Vérifier que update n'est PAS appelé pour ce cas
+    expect(prismaMock.user.update).not.toHaveBeenCalled()
   })
 
   it("devrait normaliser l'email (trim et lowercase)", async () => {

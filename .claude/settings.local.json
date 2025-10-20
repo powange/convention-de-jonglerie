@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "45000"
+  },
   "permissions": {
     "allow": [
       "WebFetch(domain:ui.nuxt.com)",
@@ -125,7 +128,11 @@
       "Bash(fi)",
       "Bash(do echo \"=== $lang ===\" grep -A3 \"admin_mode_enabled\" i18n/locales/$lang/auth.json)",
       "Bash(do echo \"$lang\")",
-      "Bash(do echo -n \"$lang: \")"
+      "Bash(do echo -n \"$lang: \")",
+      "Bash(DEEPL_API_KEY=\"359ae8e7-be24-40b1-b9ee-4923e9da852d:fx\" node scripts/translate-with-deepl.js)",
+      "Bash(do echo \"=== Vérification de la langue: $lang ===\" echo \"Nombre total de clés dans common.json:\" grep -o '\"\"\"\"[^\"\"\"\"]*\"\"\"\":' \"i18n/locales/$lang/common.json\")",
+      "Bash(wc -l echo \"\" echo \"Échantillon de traductions (10 premières clés du calendrier):\" head -15 \"i18n/locales/$lang/common.json\" echo \"\" echo \"Vérification des clés problématiques (rate-limited):\" grep -E \"(conventions_count|services\\.atm|services\\.canteen|continue_with)\" \"i18n/locales/$lang/admin.json\" \"i18n/locales/$lang/auth.json\")",
+      "Bash(DEEPL_API_KEY=\"test\" node scripts/translate-with-deepl.js --help)"
     ],
     "deny": [],
     "ask": [],

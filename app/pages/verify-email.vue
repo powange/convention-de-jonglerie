@@ -21,18 +21,18 @@
       <UCard class="shadow-xl border-0 backdrop-blur-sm bg-white/80 dark:bg-gray-800/80">
         <div class="space-y-6">
           <!-- Instructions -->
-          <div class="text-center">
+          <div v-if="!needsPassword" class="text-center">
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
               {{ $t('auth.enter_6_digit_code') }}
             </p>
           </div>
 
-          <!-- Saisie du code -->
-          <div class="space-y-4">
+          <!-- Mode vérification : Saisie du code -->
+          <div v-if="!needsPassword" class="space-y-4">
             <div class="flex justify-center">
               <div class="flex gap-2">
                 <UInput
-                  v-for="(digit, index) in codeDigits"
+                  v-for="(_digit, index) in codeDigits"
                   :key="index"
                   :ref="(el) => setDigitRef(index, el)"
                   v-model="codeDigits[index]"
@@ -60,23 +60,122 @@
                 }}
               </p>
             </div>
+
+            <!-- Bouton de vérification -->
+            <UButton
+              :loading="loading"
+              :disabled="!isValidCode"
+              size="lg"
+              block
+              class="mt-6"
+              icon="i-heroicons-check-circle"
+              @click="handleVerification"
+            >
+              {{ loading ? t('auth.verifying') : t('auth.verify_code') }}
+            </UButton>
           </div>
 
-          <!-- Bouton de vérification -->
-          <UButton
-            :loading="loading"
-            :disabled="!isValidCode"
-            size="lg"
-            block
-            class="mt-6"
-            icon="i-heroicons-check-circle"
-            @click="handleVerification"
-          >
-            {{ loading ? t('auth.verifying') : t('auth.verify_code') }}
-          </UButton>
+          <!-- Mode création de mot de passe -->
+          <div v-else class="space-y-6">
+            <div class="text-center">
+              <UIcon name="i-heroicons-check-circle" class="text-green-500 text-3xl mb-2" />
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                {{ $t('auth.code_verified_create_password') }}
+              </p>
+            </div>
 
-          <!-- Actions supplémentaires -->
-          <div class="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <!-- Formulaire de création de mot de passe -->
+            <div class="space-y-4">
+              <UFormField :label="$t('auth.password')" required>
+                <UInput
+                  v-model="password"
+                  type="password"
+                  :placeholder="$t('auth.password_placeholder')"
+                  icon="i-heroicons-lock-closed"
+                />
+              </UFormField>
+
+              <UFormField :label="$t('auth.confirm_password')" required>
+                <UInput
+                  v-model="confirmPassword"
+                  type="password"
+                  :placeholder="$t('auth.confirm_password_placeholder')"
+                  icon="i-heroicons-lock-closed"
+                />
+              </UFormField>
+
+              <!-- Validation du mot de passe (utilise la même validation que le serveur) -->
+              <div class="space-y-2 text-xs">
+                <div class="flex items-center gap-2">
+                  <UIcon
+                    :name="
+                      password.length >= 8 ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'
+                    "
+                    :class="password.length >= 8 ? 'text-green-500' : 'text-gray-400'"
+                  />
+                  <span :class="password.length >= 8 ? 'text-green-600' : 'text-gray-500'">
+                    {{ $t('auth.password_min_length') }}
+                  </span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <UIcon
+                    :name="
+                      /[A-Z]/.test(password) ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'
+                    "
+                    :class="/[A-Z]/.test(password) ? 'text-green-500' : 'text-gray-400'"
+                  />
+                  <span :class="/[A-Z]/.test(password) ? 'text-green-600' : 'text-gray-500'">
+                    {{ $t('auth.password_uppercase') }}
+                  </span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <UIcon
+                    :name="
+                      /[0-9]/.test(password) ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'
+                    "
+                    :class="/[0-9]/.test(password) ? 'text-green-500' : 'text-gray-400'"
+                  />
+                  <span :class="/[0-9]/.test(password) ? 'text-green-600' : 'text-gray-500'">
+                    {{ $t('auth.password_number') }}
+                  </span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <UIcon
+                    :name="
+                      isPasswordConfirmed ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'
+                    "
+                    :class="isPasswordConfirmed ? 'text-green-500' : 'text-gray-400'"
+                  />
+                  <span :class="isPasswordConfirmed ? 'text-green-600' : 'text-gray-500'">
+                    {{ $t('auth.passwords_match') }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Message d'erreur -->
+              <div v-if="hasError" class="text-center">
+                <p class="text-sm text-red-500">{{ errorMessage }}</p>
+              </div>
+            </div>
+
+            <!-- Bouton de création -->
+            <UButton
+              :loading="loading"
+              :disabled="!isPasswordValid || !isPasswordConfirmed"
+              size="lg"
+              block
+              icon="i-heroicons-key"
+              @click="handleSetPassword"
+            >
+              {{ loading ? t('auth.creating_password') : t('auth.create_password_and_activate') }}
+            </UButton>
+          </div>
+
+          <!-- Actions supplémentaires (seulement en mode vérification) -->
+          <div
+            v-if="!needsPassword"
+            class="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700"
+          >
             <!-- Renvoyer le code -->
             <div class="text-center">
               <UButton
@@ -136,6 +235,11 @@ const loading = ref(false)
 const hasError = ref(false)
 const errorMessage = ref('')
 
+// État de création de mot de passe
+const needsPassword = ref(false)
+const password = ref('')
+const confirmPassword = ref('')
+
 // Timer et cooldown
 const timeRemaining = ref(15 * 60) // 15 minutes en secondes
 const resendCooldown = ref(0)
@@ -148,6 +252,18 @@ const isValidCode = computed(() => {
 })
 
 const fullCode = computed(() => codeDigits.value.join(''))
+
+// Validation du mot de passe (même validation que le schéma server)
+const isPasswordValid = computed(() => {
+  if (!password.value || password.value.length < 8) return false
+  if (!/[A-Z]/.test(password.value)) return false
+  if (!/[0-9]/.test(password.value)) return false
+  return true
+})
+
+const isPasswordConfirmed = computed(() => {
+  return password.value === confirmPassword.value && password.value.length > 0
+})
 
 // Gestion des refs pour les inputs
 const setDigitRef = (index: number, el: any) => {
@@ -222,7 +338,11 @@ const handleVerification = async () => {
   hasError.value = false
 
   try {
-    await $fetch('/api/auth/verify-email', {
+    const response = await $fetch<{
+      needsPassword: boolean
+      message: string
+      user: { id: number; email: string }
+    }>('/api/auth/verify-email', {
       method: 'POST',
       body: {
         email: email.value,
@@ -230,6 +350,13 @@ const handleVerification = async () => {
       },
     })
 
+    // Si l'utilisateur a besoin de créer un mot de passe, afficher le formulaire
+    if (response.needsPassword) {
+      needsPassword.value = true
+      return
+    }
+
+    // Sinon, rediriger vers la page de connexion
     toast.add({
       title: t('auth.email_verified_success'),
       description: t('auth.account_now_active'),
@@ -253,6 +380,40 @@ const handleVerification = async () => {
     } else {
       errorMessage.value = t('errors.server_error')
     }
+  } finally {
+    loading.value = false
+  }
+}
+
+// Création du mot de passe
+const handleSetPassword = async () => {
+  if (!isPasswordValid.value || !isPasswordConfirmed.value) return
+
+  loading.value = true
+  hasError.value = false
+
+  try {
+    await $fetch('/api/auth/set-password-and-verify', {
+      method: 'POST',
+      body: {
+        email: email.value,
+        code: fullCode.value,
+        password: password.value,
+      },
+    })
+
+    toast.add({
+      title: t('auth.password_created_success'),
+      description: t('auth.account_now_active'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    router.push('/login')
+  } catch (e: unknown) {
+    const error = e as HttpError
+    hasError.value = true
+    errorMessage.value = error.message || t('errors.server_error')
   } finally {
     loading.value = false
   }

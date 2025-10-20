@@ -110,7 +110,7 @@
     "title": "Titel",
     "total": "Totalt",
     "type_name_to_confirm": "Skriv in namnet för att bekräfta",
-    "type_to_confirm": "Skriv \"{namn}\" för att bekräfta",
+    "type_to_confirm": "Skriv \"{name}\" för att bekräfta",
     "validate": "Bekräfta",
     "view": "Se",
     "view_details": "Se mer information",
@@ -122,9 +122,9 @@
     "czech_republic": "Tjeckien"
   },
   "dates": {
-    "date_range": "Från {startdatum} till {slutdatum}",
-    "date_range_with_time": "Från {startdatum} till {slutdatum}",
-    "same_day_with_time": "På {datum} från {starttid} till {sluttid}"
+    "date_range": "Från {startDate} till {endDate}",
+    "date_range_with_time": "Från {startDate} till {endDate}",
+    "same_day_with_time": "På {date} från {startTime} till {endTime}"
   },
   "errors": {
     "access_denied": "Obehörig åtkomst",
@@ -227,9 +227,9 @@
     "comment_published": "Publikation skapad",
     "comment_published_successfully": "Din publikation har skapats framgångsrikt",
     "convention_created": "En lyckad kongress!",
-    "convention_created_desc": "Konventionen \"{namn}\" har skapats framgångsrikt",
+    "convention_created_desc": "Konventionen \"{name}\" har skapats framgångsrikt",
     "convention_updated": "Uppdaterat avtal!",
-    "convention_updated_desc": "Konventionen \"{namn}\" har uppdaterats framgångsrikt",
+    "convention_updated_desc": "Konventionen \"{name}\" har uppdaterats framgångsrikt",
     "edition_created": "En lyckad utgåva!",
     "edition_created_successfully": "Utgåvan skapades framgångsrikt",
     "edition_deleted": "Utgåvan har raderats framgångsrikt!",

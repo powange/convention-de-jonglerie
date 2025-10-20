@@ -19,6 +19,7 @@ DEEPL_API_KEY="votre_clé_api_ici"
 ### Étape 2 : Exécuter la traduction
 
 #### Mode incrémental (recommandé)
+
 Traduit uniquement les nouvelles clés, préserve les traductions existantes :
 
 ```bash
@@ -26,6 +27,7 @@ npm run i18n:translate
 ```
 
 #### Mode force
+
 Retraduit tout en écrasant les traductions existantes :
 
 ```bash
@@ -33,12 +35,14 @@ npm run i18n:translate:force
 ```
 
 **Durée estimée :**
+
 - Mode incrémental (avec fichiers existants) : ~1 minute
 - Mode force (première fois) : 15-20 minutes pour 22 fichiers
 
 ### Résultat attendu
 
 #### Mode incrémental (avec fichiers existants)
+
 ```
 🌍 Traduction automatique avec DeepL
 
@@ -68,6 +72,7 @@ Mode: 🔄 INCRÉMENTAL (nouvelles clés uniquement)
 ```
 
 #### Mode force (première traduction)
+
 ```
 🌍 Traduction automatique avec DeepL
 
@@ -110,16 +115,19 @@ Si vous préférez traduire manuellement ou réviser les traductions DeepL :
 ### Fichiers par ordre de priorité
 
 #### 🔴 Priorité 1 (Interface de base)
+
 1. **common.json** (~300 clés) - Boutons, actions, messages communs
 2. **app.json** (~40 clés) - Titre app, menu principal
 3. **auth.json** (~50 clés) - Connexion, inscription
 
 #### 🟡 Priorité 2 (Fonctionnalités principales)
+
 4. **components.json** (~200 clés) - Textes des composants UI
 5. **edition.json** (~150 clés) - Gestion des éditions
 6. **public.json** (~80 clés) - Pages publiques
 
 #### 🟢 Priorité 3 (Fonctionnalités avancées)
+
 7. **notifications.json** (~100 clés)
 8. **ticketing.json** (~120 clés)
 9. **admin.json** (~80 clés)
@@ -129,17 +137,20 @@ Si vous préférez traduire manuellement ou réviser les traductions DeepL :
 ### Outils de traduction manuelle
 
 #### Option A : DeepL Web (gratuit)
+
 1. Ouvrir https://www.deepl.com/translator
 2. Copier le contenu JSON
 3. Traduire par sections
 4. Coller dans les fichiers
 
 #### Option B : Google Translate (moins précis)
+
 Même processus mais avec translate.google.com
 
 ### Exemple de traduction d'un fichier
 
 **Original (fr/app.json) :**
+
 ```json
 {
   "title": "Convention de Jonglerie",
@@ -149,6 +160,7 @@ Même processus mais avec translate.google.com
 ```
 
 **Suédois (sv/app.json) :**
+
 ```json
 {
   "title": "Jongleringskongress",
@@ -158,6 +170,7 @@ Même processus mais avec translate.google.com
 ```
 
 **Tchèque (cs/app.json) :**
+
 ```json
 {
   "title": "Žonglovací konvence",
@@ -193,9 +206,11 @@ Puis changez la langue dans le sélecteur et naviguez dans l'interface.
 ### 1. Caractères spéciaux
 
 **Suédois :** å, ä, ö
+
 - Exemple : "Lägg till" (Ajouter), "Spara" (Enregistrer)
 
 **Tchèque :** č, ě, š, ř, ž, ý, á, í, é, ú, ů
+
 - Exemple : "Přidat" (Ajouter), "Uložit" (Enregistrer)
 
 ### 2. Variables dans les traductions
@@ -209,6 +224,7 @@ Ne PAS traduire les variables entre accolades :
 ```
 
 Devient en suédois :
+
 ```json
 {
   "welcome": "Välkommen {name}!"
@@ -237,15 +253,18 @@ Les formats sont gérés par code, mais soyez conscients des différences.
 ## Estimation des coûts
 
 ### DeepL API Free
+
 - **Gratuit** : 500 000 caractères/mois
 - Projet estimé : ~60 000 caractères total
 - **Coût : 0€** (dans la limite gratuite)
 
 ### DeepL API Pro (si dépassement)
+
 - **19,99€/mois** : 1 million caractères
 - ou **4,99€ + 20€/million** supplémentaire
 
 ### Traduction humaine (alternative)
+
 - **0,08-0,12€/mot**
 - Projet estimé : ~2000 mots/langue
 - **Coût : 320-480€ par langue**
@@ -277,18 +296,23 @@ Les formats sont gérés par code, mais soyez conscients des différences.
 ## FAQ
 
 ### Q : DeepL est-il gratuit ?
+
 **R :** Oui, jusqu'à 500 000 caractères/mois. Largement suffisant pour ce projet.
 
 ### Q : Les traductions DeepL sont-elles bonnes ?
+
 **R :** DeepL est considéré comme le meilleur traducteur automatique, bien meilleur que Google Translate pour les langues européennes.
 
 ### Q : Dois-je tout réviser ?
+
 **R :** Au minimum, révisez les 3 fichiers prioritaires (common, auth, app). Le reste peut être utilisé tel quel et corrigé si nécessaire.
 
 ### Q : Combien de temps pour tout traduire manuellement ?
+
 **R :** ~15-20 heures par langue = 30-40 heures total. **Pas recommandé.**
 
 ### Q : Puis-je demander à la communauté ?
+
 **R :** Oui ! Vous pouvez utiliser Crowdin ou poster sur les forums de jonglerie suédois/tchèques.
 
 ## Ressources
@@ -296,10 +320,12 @@ Les formats sont gérés par code, mais soyez conscients des différences.
 ### Communautés de jonglerie
 
 **Suède :**
+
 - Stockholm Juggling Convention
 - Forum : svenskjonglering.se
 
 **République tchèque :**
+
 - Prague Juggling Convention
 - Forum : jonglerovani.cz
 

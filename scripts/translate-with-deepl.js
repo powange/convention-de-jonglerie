@@ -75,7 +75,7 @@ if (!DEEPL_API_KEY) {
   console.error('❌ Erreur: DEEPL_API_KEY non définie')
   console.log('\nAssurez-vous que votre fichier .env contient :')
   console.log('  DEEPL_API_KEY="votre_clé_deepl"')
-  console.log('\nOu fournissez-la via variable d\'environnement :')
+  console.log("\nOu fournissez-la via variable d'environnement :")
   console.log('  DEEPL_API_KEY=your_key node scripts/translate-with-deepl.js')
   console.log('\nPour obtenir une clé gratuite : https://www.deepl.com/pro-api')
   process.exit(1)
@@ -138,7 +138,7 @@ async function translateObject(obj, targetLang, path = '', existingObj = {}) {
           stats.translated++
 
           // Pause pour respecter les limites de taux
-          await new Promise(resolve => setTimeout(resolve, 100))
+          await new Promise((resolve) => setTimeout(resolve, 100))
         } catch (error) {
           console.error(`  ❌ Erreur pour ${currentPath}:`, error.message)
           result[key] = existingValue || value // Garder la valeur existante ou originale
@@ -196,7 +196,12 @@ async function translateFile(filename, targetLangCode, targetDir) {
     }
 
     // Traduire avec fusion incrémentale
-    const translatedContent = await translateObject(sourceContent, targetLangCode, '', existingContent)
+    const translatedContent = await translateObject(
+      sourceContent,
+      targetLangCode,
+      '',
+      existingContent
+    )
 
     // Calculer les stats pour ce fichier
     fileStats.translated = stats.translated - beforeStats.translated
@@ -207,7 +212,9 @@ async function translateFile(filename, targetLangCode, targetDir) {
     writeFileSync(targetPath, JSON.stringify(translatedContent, null, 2) + '\n', 'utf-8')
 
     console.log(`✅ ${filename} traité avec succès`)
-    console.log(`   📊 Nouvelles traductions: ${fileStats.translated} | Préservées: ${fileStats.preserved} | Erreurs: ${fileStats.errors}`)
+    console.log(
+      `   📊 Nouvelles traductions: ${fileStats.translated} | Préservées: ${fileStats.preserved} | Erreurs: ${fileStats.errors}`
+    )
   } catch (error) {
     console.error(`❌ Erreur lors de la traduction de ${filename}:`, error.message)
   }
@@ -218,10 +225,12 @@ async function translateFile(filename, targetLangCode, targetDir) {
  */
 async function main() {
   console.log('🌍 Traduction automatique avec DeepL\n')
-  console.log(`Mode: ${FORCE_MODE ? '⚡ FORCE (retraduit tout)' : '🔄 INCRÉMENTAL (nouvelles clés uniquement)'}`)
+  console.log(
+    `Mode: ${FORCE_MODE ? '⚡ FORCE (retraduit tout)' : '🔄 INCRÉMENTAL (nouvelles clés uniquement)'}`
+  )
   console.log('\nConfiguration:')
   console.log(`  Source: ${SOURCE_LANG} (Français)`)
-  console.log(`  Cibles: ${TARGET_LANGS.map(l => l.name).join(', ')}`)
+  console.log(`  Cibles: ${TARGET_LANGS.map((l) => l.name).join(', ')}`)
   console.log(`  Fichiers: ${FILES_TO_TRANSLATE.length}`)
   console.log(`  Total fichiers à traiter: ${FILES_TO_TRANSLATE.length * TARGET_LANGS.length}\n`)
 
@@ -232,10 +241,12 @@ async function main() {
       console.log(`📊 Utilisation DeepL:`)
       console.log(`  Caractères utilisés: ${usage.character.count.toLocaleString()}`)
       console.log(`  Limite: ${usage.character.limit.toLocaleString()}`)
-      console.log(`  Restants: ${(usage.character.limit - usage.character.count).toLocaleString()}\n`)
+      console.log(
+        `  Restants: ${(usage.character.limit - usage.character.count).toLocaleString()}\n`
+      )
     }
   } catch (error) {
-    console.log('⚠️  Impossible de récupérer l\'utilisation de l\'API\n')
+    console.log("⚠️  Impossible de récupérer l'utilisation de l'API\n")
   }
 
   // Réinitialiser les statistiques
@@ -272,7 +283,7 @@ async function main() {
   console.log('\nProchaines étapes:')
   console.log('1. Vérifier les nouvelles traductions générées')
   console.log('2. Faire réviser par un locuteur natif si possible')
-  console.log('3. Tester l\'application: npm run dev')
+  console.log("3. Tester l'application: npm run dev")
   console.log('4. Vérifier la parité: npm run check-translations')
 }
 

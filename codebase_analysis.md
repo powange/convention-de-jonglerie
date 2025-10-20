@@ -27,10 +27,13 @@
 ## 1. Vue d'ensemble du projet
 
 ### Type de projet
+
 Application web full-stack collaborative pour la gestion et découverte de conventions de jonglerie.
 
 ### Objectif
+
 Plateforme permettant aux jongleurs et organisateurs de:
+
 - Découvrir et consulter des conventions de jonglerie
 - Gérer des événements (éditions) avec détails complets
 - Collaborer sur l'organisation d'événements
@@ -39,7 +42,9 @@ Plateforme permettant aux jongleurs et organisateurs de:
 - Communiquer via posts et objets trouvés
 
 ### Architecture
+
 **Monolithe modulaire** basé sur Nuxt 4 avec approche full-stack:
+
 - **Frontend:** Nuxt.js 4 + Vue 3 + Nuxt UI
 - **Backend:** Nitro (serveur Nuxt intégré)
 - **Base de données:** MySQL + Prisma ORM
@@ -50,13 +55,16 @@ Plateforme permettant aux jongleurs et organisateurs de:
 ## 2. Architecture détaillée
 
 ### Pattern architectural
+
 **Modèle MVC adapté à Nuxt:**
+
 - **Models:** Schéma Prisma (`prisma/schema.prisma`)
 - **Views:** Composants Vue + Pages Nuxt (`app/pages`, `app/components`)
 - **Controllers:** API handlers (`server/api`)
 - **State Management:** Pinia stores (`app/stores`)
 
 ### Principes de conception
+
 1. **Convention over Configuration:** Structure Nuxt auto-importée
 2. **Modularité:** Séparation claire frontend/backend/database
 3. **Type Safety:** TypeScript strict sur tout le projet
@@ -143,45 +151,50 @@ Plateforme permettant aux jongleurs et organisateurs de:
 ## 4. Stack technique
 
 ### Runtime et Framework
+
 - **Node.js:** v22.x (requis)
 - **Nuxt.js:** v4.1.1 (framework principal)
 - **Vue.js:** v3.5.17 (framework réactif)
 - **TypeScript:** v5.8.3 (langage principal)
 
 ### Frontend
-| Technologie | Version | Rôle |
-|------------|---------|------|
-| **Nuxt UI** | v4.0.0 | Bibliothèque composants (Tailwind CSS + Headless UI) |
-| **Pinia** | v3.0.3 | Gestion d'état (remplacement Vuex) |
-| **VueUse** | v13.6.0 | Collection de composables utilitaires |
-| **@nuxtjs/i18n** | v10.0.3 | Internationalisation (11 langues) |
-| **Nuxt Image** | v1.10.0 | Optimisation images |
-| **FullCalendar** | v6.1.15+ | Calendrier planning bénévoles |
-| **Leaflet** | - | Cartes interactives (via composant custom) |
+
+| Technologie      | Version  | Rôle                                                 |
+| ---------------- | -------- | ---------------------------------------------------- |
+| **Nuxt UI**      | v4.0.0   | Bibliothèque composants (Tailwind CSS + Headless UI) |
+| **Pinia**        | v3.0.3   | Gestion d'état (remplacement Vuex)                   |
+| **VueUse**       | v13.6.0  | Collection de composables utilitaires                |
+| **@nuxtjs/i18n** | v10.0.3  | Internationalisation (11 langues)                    |
+| **Nuxt Image**   | v1.10.0  | Optimisation images                                  |
+| **FullCalendar** | v6.1.15+ | Calendrier planning bénévoles                        |
+| **Leaflet**      | -        | Cartes interactives (via composant custom)           |
 
 ### Backend
-| Technologie | Version | Rôle |
-|------------|---------|------|
-| **Nitro** | (intégré Nuxt) | Moteur serveur API |
-| **Prisma** | v6.17.1 | ORM pour MySQL |
-| **MySQL** | - | Base de données relationnelle |
-| **nuxt-auth-utils** | v0.5.23 | Sessions scellées (sans JWT) |
-| **bcryptjs** | v3.0.2 | Hachage mots de passe |
-| **nodemailer** | v7.0.5 | Envoi d'emails |
-| **node-cron** | v3.0.3 | Tâches planifiées |
-| **web-push** | v3.6.7 | Notifications push |
+
+| Technologie         | Version        | Rôle                          |
+| ------------------- | -------------- | ----------------------------- |
+| **Nitro**           | (intégré Nuxt) | Moteur serveur API            |
+| **Prisma**          | v6.17.1        | ORM pour MySQL                |
+| **MySQL**           | -              | Base de données relationnelle |
+| **nuxt-auth-utils** | v0.5.23        | Sessions scellées (sans JWT)  |
+| **bcryptjs**        | v3.0.2         | Hachage mots de passe         |
+| **nodemailer**      | v7.0.5         | Envoi d'emails                |
+| **node-cron**       | v3.0.3         | Tâches planifiées             |
+| **web-push**        | v3.6.7         | Notifications push            |
 
 ### Build & Dev Tools
-| Outil | Version | Usage |
-|-------|---------|-------|
-| **ESLint** | v9.32.0 | Linter JavaScript/TypeScript |
-| **Prettier** | v3.3.3 | Formatage code |
-| **Vitest** | v3.2.4 | Framework de tests |
-| **@nuxt/test-utils** | v3.19.2 | Tests Nuxt |
-| **Happy DOM** | v18.0.1 | DOM virtuel pour tests |
-| **Docker** | - | Conteneurisation |
+
+| Outil                | Version | Usage                        |
+| -------------------- | ------- | ---------------------------- |
+| **ESLint**           | v9.32.0 | Linter JavaScript/TypeScript |
+| **Prettier**         | v3.3.3  | Formatage code               |
+| **Vitest**           | v3.2.4  | Framework de tests           |
+| **@nuxt/test-utils** | v3.19.2 | Tests Nuxt                   |
+| **Happy DOM**        | v18.0.1 | DOM virtuel pour tests       |
+| **Docker**           | -       | Conteneurisation             |
 
 ### Optimisations
+
 - **Lazy loading:** i18n par composant/route
 - **Code splitting:** Chunks optimisés
 - **Image optimization:** @nuxt/image avec formats modernes
@@ -197,6 +210,7 @@ Plateforme permettant aux jongleurs et organisateurs de:
 **Entités principales:**
 
 #### 1. **User** (Utilisateurs)
+
 ```prisma
 - id, email, pseudo, password (bcrypt)
 - authProvider (email, google, facebook)
@@ -206,6 +220,7 @@ Plateforme permettant aux jongleurs et organisateurs de:
 ```
 
 #### 2. **Convention** (Conventions)
+
 ```prisma
 - id, name, description, logo, email
 - authorId (créateur)
@@ -213,6 +228,7 @@ Plateforme permettant aux jongleurs et organisateurs de:
 ```
 
 #### 3. **Edition** (Éditions d'une convention)
+
 ```prisma
 - id, name, description, program
 - dates (startDate, endDate)
@@ -223,6 +239,7 @@ Plateforme permettant aux jongleurs et organisateurs de:
 ```
 
 #### 4. **ConventionCollaborator** (Système de permissions)
+
 ```prisma
 - Droits globaux: canEditConvention, canDeleteConvention,
   canManageCollaborators, canAddEdition, canEditAllEditions,
@@ -232,12 +249,14 @@ Plateforme permettant aux jongleurs et organisateurs de:
 ```
 
 #### 5. **EditionCollaboratorPermission**
+
 ```prisma
 - Permissions ciblées par édition
 - canEdit, canDelete, canManageVolunteers
 ```
 
 #### 6. **EditionVolunteerApplication** (Candidatures bénévoles)
+
 ```prisma
 - status (PENDING/ACCEPTED/REJECTED)
 - motivation, allergies, dietaryPreference
@@ -247,12 +266,14 @@ Plateforme permettant aux jongleurs et organisateurs de:
 ```
 
 #### 7. **VolunteerTeam** & **VolunteerTimeSlot**
+
 ```prisma
 - Équipes de bénévoles avec planning
 - Créneaux horaires avec assignations
 ```
 
 #### 8. **Ticketing** (Système de billeterie)
+
 ```prisma
 - ExternalTicketing (HELLOASSO, BILLETWEB, etc.)
 - TicketingTier (tarifs)
@@ -263,6 +284,7 @@ Plateforme permettant aux jongleurs et organisateurs de:
 ```
 
 #### 9. **Carpool** (Covoiturage)
+
 ```prisma
 - CarpoolOffer & CarpoolRequest
 - CarpoolBooking (réservations)
@@ -271,6 +293,7 @@ Plateforme permettant aux jongleurs et organisateurs de:
 ```
 
 #### 10. **Notification**
+
 ```prisma
 - Système double: traductions i18n (titleKey, messageKey)
   OU texte libre (titleText, messageText)
@@ -278,6 +301,7 @@ Plateforme permettant aux jongleurs et organisateurs de:
 ```
 
 #### 11. **Autres tables**
+
 - `EditionPost` & `EditionPostComment` (forum éditions)
 - `LostFoundItem` & `LostFoundComment` (objets trouvés)
 - `Feedback` (retours utilisateurs)
@@ -292,6 +316,7 @@ Plateforme permettant aux jongleurs et organisateurs de:
 ## 6. API et endpoints
 
 ### Architecture API
+
 - **Pattern:** RESTful
 - **Format:** JSON
 - **Auth:** Cookie de session (nuxt-auth-utils)
@@ -301,6 +326,7 @@ Plateforme permettant aux jongleurs et organisateurs de:
 ### Endpoints par domaine
 
 #### Authentification (`/api/auth`)
+
 ```
 POST   /api/auth/register              # Inscription
 POST   /api/auth/login                 # Connexion
@@ -312,6 +338,7 @@ POST   /api/auth/reset-password        # Réinitialisation
 ```
 
 #### Conventions (`/api/conventions`)
+
 ```
 GET    /api/conventions/my-conventions
 POST   /api/conventions
@@ -326,6 +353,7 @@ POST   /api/conventions/:id/claim/verify
 ```
 
 #### Collaborateurs (`/api/conventions/:id/collaborators`)
+
 ```
 GET    /api/conventions/:id/collaborators
 POST   /api/conventions/:id/collaborators
@@ -336,6 +364,7 @@ GET    /api/conventions/:id/collaborators/history
 ```
 
 #### Éditions (`/api/editions`)
+
 ```
 POST   /api/editions
 GET    /api/editions/:id
@@ -345,6 +374,7 @@ DELETE /api/editions/:id/delete-image
 ```
 
 #### Bénévoles (`/api/editions/:id/volunteers`)
+
 ```
 GET    /api/editions/:id/volunteers/applications
 POST   /api/editions/:id/volunteers/applications
@@ -363,6 +393,7 @@ GET    /api/editions/:id/volunteers/notification/:groupId
 ```
 
 #### Planning bénévoles (`/api/editions/:id/volunteer-time-slots`)
+
 ```
 GET    /api/editions/:id/volunteer-time-slots
 POST   /api/editions/:id/volunteer-time-slots
@@ -373,6 +404,7 @@ DELETE /api/editions/:id/volunteer-time-slots/:slotId/assignments/:userId
 ```
 
 #### Billeterie (`/api/editions/:id/ticketing`)
+
 ```
 GET    /api/editions/:id/ticketing/helloasso/sync   # Synchronisation
 GET    /api/editions/:id/ticketing/tiers
@@ -385,6 +417,7 @@ POST   /api/editions/:id/ticketing/options
 ```
 
 #### Covoiturage
+
 ```
 GET/POST /api/carpool-offers
 GET/PUT/DELETE /api/carpool-offers/:id
@@ -396,6 +429,7 @@ GET/POST /api/carpool-offers/:id/comments
 ```
 
 #### Autres
+
 ```
 GET/POST /api/editions/:id/posts              # Forum
 GET/POST /api/editions/:id/lost-found         # Objets trouvés
@@ -407,6 +441,7 @@ GET/POST /api/files/*                         # Upload fichiers
 ```
 
 #### Admin (`/api/admin`)
+
 ```
 GET    /api/admin/users
 GET    /api/admin/conventions
@@ -427,6 +462,7 @@ POST   /api/admin/tasks/clean-expired-tokens
 ### Architecture composants
 
 #### Pages principales (`app/pages/`)
+
 ```
 ├── index.vue                    # Accueil (liste éditions + carte)
 ├── login.vue / register.vue     # Authentification
@@ -453,6 +489,7 @@ POST   /api/admin/tasks/clean-expired-tokens
 ```
 
 #### Composants clés
+
 ```
 components/
 ├── ui/                          # Composants UI génériques
@@ -485,6 +522,7 @@ components/
 ### Stores Pinia (`app/stores/`)
 
 #### 1. **auth.ts** (138 lignes)
+
 ```typescript
 state: {
   user: User | null
@@ -492,14 +530,15 @@ state: {
   adminMode: boolean
 }
 actions: {
-  login(), logout(), register()
+  ;(login(), logout(), register())
   initializeAuth()
-  enableAdminMode(), disableAdminMode()
+  ;(enableAdminMode(), disableAdminMode())
   updateUser()
 }
 ```
 
 #### 2. **editions.ts** (500+ lignes)
+
 ```typescript
 state: {
   editions: Edition[]
@@ -514,14 +553,16 @@ actions: {
 ```
 
 #### 3. **favoritesEditions.ts**
+
 ```typescript
 actions: {
   fetchFavorites()
-  addFavorite(), removeFavorite()
+  ;(addFavorite(), removeFavorite())
 }
 ```
 
 #### 4. **notifications.ts** (350+ lignes)
+
 ```typescript
 state: {
   notifications: Notification[]
@@ -536,23 +577,26 @@ actions: {
 ```
 
 #### 5. **impersonation.ts**
+
 ```typescript
 state: {
   isImpersonating: boolean
   originalAdmin: User | null
 }
 actions: {
-  startImpersonation(), stopImpersonation()
+  ;(startImpersonation(), stopImpersonation())
 }
 ```
 
 ### Composables (`app/composables/`)
+
 - `useReturnTo()`: Gestion redirections post-auth
 - `useDateFormat()`: Formatage dates i18n
 - `useCollaboratorTitle()`: Titres collaborateurs
 - `useNotificationStream()`: SSE notifications temps réel
 
 ### Middleware (`app/middleware/`)
+
 - `authenticated.ts`: Routes protégées
 - `guest-only.ts`: Routes invités uniquement
 - `super-admin.ts`: Routes admin uniquement
@@ -560,6 +604,7 @@ actions: {
 - `load-translations.global.ts`: Lazy loading i18n
 
 ### Internationalisation
+
 - **11 langues:** fr, en, de, es, it, nl, pl, pt, ru, uk, da
 - **Lazy loading:** Par domaine (common, auth, admin, etc.)
 - **Structure:** `i18n/locales/{langue}/{domaine}.json`
@@ -569,21 +614,25 @@ actions: {
 ## 8. Système d'authentification
 
 ### Architecture auth
+
 **nuxt-auth-utils** (sessions scellées, sans JWT)
 
 #### Fonctionnement
+
 1. **Login:** `POST /api/auth/login` → Cookie de session httpOnly
 2. **Session serveur:** Cookie chiffré avec `NUXT_SESSION_PASSWORD`
 3. **Vérification:** Middleware `server/middleware/auth.ts`
 4. **Frontend:** Store Pinia + localStorage/sessionStorage (UX)
 
 #### Sécurité
+
 - **Hachage:** bcryptjs pour mots de passe
 - **Sessions:** Cookies httpOnly, secure en production
 - **CSRF:** Protection intégrée Nuxt
 - **reCAPTCHA:** v3 sur inscription/login (configurable)
 
 #### Fonctionnalités
+
 - Inscription avec vérification email (code 6 chiffres)
 - Connexion email/pseudo + mot de passe
 - "Se souvenir de moi" (UX uniquement)
@@ -593,17 +642,21 @@ actions: {
 - Impersonation (admin peut se connecter comme un user)
 
 #### Permissions
+
 **Système granulaire à 2 niveaux:**
+
 1. **Global admin:** `isGlobalAdmin` (accès dashboard admin)
 2. **Collaborateur:** Droits par convention + par édition
 
 **Droits collaborateur:**
+
 - `editConvention`, `deleteConvention`
 - `manageCollaborators`
 - `addEdition`, `editAllEditions`, `deleteAllEditions`
 - `manageVolunteers`
 
 **Droits par édition:**
+
 - `canEdit`, `canDelete`, `canManageVolunteers` sur éditions spécifiques
 
 ---
@@ -611,6 +664,7 @@ actions: {
 ## 9. Fonctionnalités principales
 
 ### 1. Gestion Conventions & Éditions
+
 - CRUD complet conventions et éditions
 - Upload images (logo convention, image édition)
 - Géolocalisation automatique (API Nominatim)
@@ -620,6 +674,7 @@ actions: {
 - Carte interactive Leaflet
 
 ### 2. Système collaboratif
+
 - Ajout collaborateurs par email/pseudo
 - Permissions granulaires (7 droits globaux)
 - Permissions par édition (canEdit/canDelete/canManageVolunteers)
@@ -627,6 +682,7 @@ actions: {
 - Revendication de conventions (via email)
 
 ### 3. Bénévolat
+
 - Candidature bénévole avec formulaire détaillé
 - 15+ champs optionnels configurables par édition
 - Gestion équipes bénévoles
@@ -637,6 +693,7 @@ actions: {
 - Objets consignés par équipe
 
 ### 4. Billeterie
+
 - Intégration HelloAsso (sync automatique)
 - Gestion manuelle tarifs/options
 - Quotas (nombre de places)
@@ -645,6 +702,7 @@ actions: {
 - Export commandes
 
 ### 5. Covoiturage
+
 - Offres de covoiturage (aller/retour)
 - Demandes de covoiturage
 - Système de réservation
@@ -652,6 +710,7 @@ actions: {
 - Filtres (fumeur, animaux, musique)
 
 ### 6. Communication
+
 - Posts par édition (forum)
 - Commentaires sur posts
 - Objets trouvés/perdus
@@ -661,6 +720,7 @@ actions: {
 - Push notifications (Web Push API)
 
 ### 7. Administration
+
 - Dashboard admin (stats globales)
 - Gestion utilisateurs
 - Gestion conventions/éditions
@@ -671,6 +731,7 @@ actions: {
 - Impersonation utilisateurs
 
 ### 8. Internationalisation
+
 - 11 langues disponibles
 - Lazy loading par route/composant
 - Détection langue navigateur
@@ -678,6 +739,7 @@ actions: {
 - Traductions complètes (2000+ clés)
 
 ### 9. SEO & Performance
+
 - Meta tags dynamiques par page
 - Open Graph images
 - Sitemap.xml généré
@@ -694,18 +756,21 @@ actions: {
 ### Configuration Vitest (4 projets)
 
 #### 1. **Tests unitaires** (`test/unit/`)
+
 - **Environnement:** happy-dom
 - **Cible:** Utilitaires, composables isolés
 - **Exemples:** `gravatar.test.ts`, `countries.test.ts`
 - **Commande:** `npm run test:unit`
 
 #### 2. **Tests Nuxt** (`test/nuxt/`)
+
 - **Environnement:** nuxt (avec contexte complet)
 - **Cible:** Composants, pages, API handlers
 - **Setup:** Mocks `#imports` (getUserSession, etc.)
 - **Commande:** `npm run test:nuxt`
 
 #### 3. **Tests intégration DB** (`test/integration/`)
+
 - **Environnement:** node
 - **Cible:** Workflows complets avec base de données
 - **Exemples:** `auth.db.test.ts`, `conventions.db.test.ts`
@@ -713,17 +778,20 @@ actions: {
 - **Note:** Nécessite Docker (MySQL test)
 
 #### 4. **Tests E2E** (`test/e2e/`)
+
 - **Environnement:** nuxt (serveur démarré)
 - **Cible:** Parcours utilisateur complets
 - **Commande:** `npm run test:e2e`
 
 ### Couverture
+
 - **Tests unitaires:** ~80 fichiers
 - **Tests Nuxt:** ~120 fichiers
 - **Tests intégration:** ~10 fichiers
 - **Total:** ~1500+ tests
 
 ### Scripts disponibles
+
 ```bash
 npm test                    # Tous tests unitaires
 npm run test:unit           # Tests unitaires
@@ -741,6 +809,7 @@ npm run test:ui             # Interface Vitest UI
 ### Environnements
 
 #### Développement (local)
+
 ```bash
 # Sans Docker
 npm install
@@ -753,6 +822,7 @@ npm run docker:dev:logs     # Voir logs
 ```
 
 #### Production
+
 ```bash
 # Build
 npm run build
@@ -765,7 +835,9 @@ npm run docker:release:up
 ```
 
 ### Docker Compose
+
 **8 configurations Docker:**
+
 1. `docker-compose.dev.yml` - Développement (hot reload)
 2. `docker-compose.prod.yml` - Production
 3. `docker-compose.release.yml` - Release
@@ -774,12 +846,14 @@ npm run docker:release:up
 ### Variables d'environnement requises
 
 #### Obligatoires
+
 ```env
 DATABASE_URL="mysql://user:password@host:port/db"
 NUXT_SESSION_PASSWORD="secret_32_chars_minimum"
 ```
 
 #### Optionnelles
+
 ```env
 # Emails
 SEND_EMAILS=false                     # true pour envoi réel
@@ -806,7 +880,9 @@ MYSQL_PASSWORD=convention_password
 ```
 
 ### CI/CD
+
 **GitHub Actions:** `.github/workflows/tests.yml`
+
 - Lint + Tests à chaque push
 - Badge CI sur README
 
@@ -993,12 +1069,14 @@ RÉSOLUTION EFFECTIVE:
 ### Points forts
 
 ✅ **Architecture solide**
+
 - Séparation claire frontend/backend
 - Type safety complet (TypeScript)
 - ORM Prisma bien structuré
 - Tests exhaustifs (unit + integration + e2e)
 
 ✅ **Sécurité**
+
 - Sessions scellées (meilleure pratique vs JWT)
 - Hachage bcrypt
 - Permissions granulaires avancées
@@ -1006,6 +1084,7 @@ RÉSOLUTION EFFECTIVE:
 - reCAPTCHA
 
 ✅ **Performance**
+
 - Lazy loading i18n
 - Code splitting optimisé
 - Compression assets
@@ -1013,12 +1092,14 @@ RÉSOLUTION EFFECTIVE:
 - Cache HTTP
 
 ✅ **Maintenabilité**
+
 - Documentation technique complète (23 fichiers docs/)
 - Code bien commenté
 - Conventions de nommage cohérentes
 - Tests couvrant ~80% du code
 
 ✅ **Expérience utilisateur**
+
 - 11 langues
 - Interface moderne (Nuxt UI)
 - Notifications temps réel
@@ -1090,15 +1171,18 @@ RÉSOLUTION EFFECTIVE:
 ### Risques identifiés
 
 ⚠️ **Scalabilité**
+
 - Système notifications peut devenir gourmand (polling vs WebSocket)
 - Upload fichiers sans limitation stricte taille
 - Pas de CDN pour assets statiques mentionné
 
 ⚠️ **Dépendances**
+
 - Nuxt 4 récent (potentiellement instable)
 - Beaucoup de dépendances (146 total) - risque maintenance
 
 ⚠️ **Backup**
+
 - Système backup présent mais pas de stratégie DR documentée
 - Pas de réplication DB mentionnée
 

@@ -5,6 +5,7 @@
 ## Résumé
 
 Deux nouvelles langues ont été ajoutées au projet :
+
 - 🇸🇪 **Suédois (sv)** - Svenska
 - 🇨🇿 **Tchèque (cs)** - Čeština
 
@@ -86,8 +87,8 @@ Ajout des drapeaux dans le sélecteur de langue :
 ```typescript
 const languageConfig = {
   // ... autres langues ...
-  cs: { name: 'Čeština', flag: 'fi fi-cz' },  // 🇨🇿 Drapeau tchèque
-  sv: { name: 'Svenska', flag: 'fi fi-se' },  // 🇸🇪 Drapeau suédois
+  cs: { name: 'Čeština', flag: 'fi fi-cz' }, // 🇨🇿 Drapeau tchèque
+  sv: { name: 'Svenska', flag: 'fi fi-se' }, // 🇸🇪 Drapeau suédois
 }
 ```
 
@@ -99,24 +100,28 @@ Les fichiers de traduction **contiennent actuellement le texte français**.
 Ils doivent être traduits en suédois et en tchèque.
 
 **Fichiers concernés (22 fichiers au total) :**
+
 - 11 fichiers pour le suédois (`i18n/locales/sv/*.json`)
 - 11 fichiers pour le tchèque (`i18n/locales/cs/*.json`)
 
 ### Options de traduction
 
 #### Option 1 : Traduction professionnelle (recommandé)
+
 - Faire appel à des traducteurs natifs
 - Coût : ~0.08-0.12€/mot
 - Estimation : ~2000 mots par langue = 320-480€ par langue
 - Délai : 1-2 semaines
 
 #### Option 2 : Traduction automatique + révision
+
 - Utiliser un service comme DeepL API
 - Faire réviser par un natif
 - Coût : Gratuit (DeepL) + révision ~100-200€
 - Délai : quelques jours
 
 #### Option 3 : Traduction communautaire
+
 - Utiliser une plateforme comme Crowdin ou Weblate
 - Faire traduire par la communauté de jonglerie
 - Coût : Gratuit
@@ -157,6 +162,7 @@ npm run dev
 ### 1. Traduction des fichiers (PRIORITAIRE)
 
 **Suédois (sv) - 11 fichiers à traduire :**
+
 - [ ] `i18n/locales/sv/common.json` (~300 clés)
 - [ ] `i18n/locales/sv/auth.json` (~50 clés)
 - [ ] `i18n/locales/sv/admin.json` (~80 clés)
@@ -170,6 +176,7 @@ npm run dev
 - [ ] `i18n/locales/sv/feedback.json` (~20 clés)
 
 **Tchèque (cs) - 11 fichiers à traduire :**
+
 - [ ] `i18n/locales/cs/common.json` (~300 clés)
 - [ ] `i18n/locales/cs/auth.json` (~50 clés)
 - [ ] `i18n/locales/cs/admin.json` (~80 clés)
@@ -222,6 +229,7 @@ La bibliothèque `flag-icons` est déjà installée et configurée.
 ### Ordre d'affichage
 
 Les langues apparaissent dans l'ordre suivant dans le sélecteur :
+
 1. English (en)
 2. Dansk (da)
 3. Deutsch (de)
@@ -241,10 +249,12 @@ Les langues apparaissent dans l'ordre suivant dans le sélecteur :
 ### Traducteurs potentiels
 
 **Pour le suédois :**
+
 - Communauté de jonglerie suédoise
 - Conventions : Stockholm Juggling Convention, Göteborg Juggling Convention
 
 **Pour le tchèque :**
+
 - Communauté de jonglerie tchèque
 - Conventions : Prague Juggling Convention, Brno Juggling Festival
 
@@ -266,6 +276,7 @@ Les langues apparaissent dans l'ordre suivant dans le sélecteur :
 Voici un exemple de ce qui doit être traduit dans `common.json` :
 
 ### Avant (français)
+
 ```json
 {
   "loading": "Chargement...",
@@ -277,6 +288,7 @@ Voici un exemple de ce qui doit être traduit dans `common.json` :
 ```
 
 ### Après (suédois)
+
 ```json
 {
   "loading": "Laddar...",
@@ -288,6 +300,7 @@ Voici un exemple de ce qui doit être traduit dans `common.json` :
 ```
 
 ### Après (tchèque)
+
 ```json
 {
   "loading": "Načítání...",

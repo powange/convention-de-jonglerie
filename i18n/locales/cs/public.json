@@ -29,7 +29,7 @@
     },
     "add_edition_for_convention": {
       "convention_not_found_description": "Hledaná konvence neexistuje nebo k ní nemáte práva přidat edici.",
-      "for_convention": "Pro konvenci \"{jméno}\"",
+      "for_convention": "Pro konvenci \"{name}\"",
       "loading_convention": "Načítání údajů o smlouvě...",
       "submit_button": "Vytvořit edici"
     },
@@ -44,7 +44,7 @@
     },
     "edit_convention": {
       "convention_not_found_or_no_rights": "Smlouva, kterou hledáte, neexistuje nebo nemáte právo ji upravit.",
-      "editing_convention": "Úprava konvence \"{jméno}\"",
+      "editing_convention": "Úprava konvence \"{name}\"",
       "loading_convention_data": "Načítání údajů o smlouvě...",
       "submit_button": "Aktualizace dohody"
     },
@@ -139,11 +139,11 @@
         "max_label": "Max:",
         "modal": {
           "add": "Přidat",
-          "add_description_multiple": "Dobrovolníka ponechte v jeho současném týmu a přidejte ho také do \"{cílový tým}\".",
+          "add_description_multiple": "Dobrovolníka ponechte v jeho současném týmu a přidejte ho také do \"{targetTeam}\".",
           "add_description_single": "Dobrovolníka ponechte v \"{sourceTeam}\" a přiřaďte ho také do \"{targetTeam}\".",
           "cancel": "Zrušit",
           "move": "Přesun",
-          "move_description_multiple": "Odeberte dobrovolníka ze všech jeho současných týmů a umístěte ho do \"{cílový tým}\".",
+          "move_description_multiple": "Odeberte dobrovolníka ze všech jeho současných týmů a umístěte ho do \"{targetTeam}\".",
           "move_description_single": "Odeberte dobrovolníka z \"{sourceTeam}\" a umístěte ho do \"{targetTeam}\".",
           "question": "Co byste chtěli dělat?"
         },
@@ -162,7 +162,7 @@
         "title": "Rozdělení podle týmů",
         "unassigned_description": "Tito přijatí dobrovolníci zatím nebyli přiřazeni k žádnému týmu. V počítači: přetáhněte a pusťte. Na mobilním telefonu: kliknutím vyberte tým.",
         "unassigned_volunteers": "Nezařazení dobrovolníci",
-        "volunteers_count": "{počet} dobrovolníků"
+        "volunteers_count": "{count} dobrovolníků"
       },
       "team_preferences": "Preference týmu",
       "teardown": "Demontáž",
@@ -185,21 +185,21 @@
   },
   "seo": {
     "carpool": {
-      "description": "Zorganizujte spolujízdu pro {jméno}. Najděte spolucestující nebo nabídněte svá volná místa na {datum} v {místě}.",
-      "keywords": "spolujízda, doprava, {dohoda}, {pronájem}, sdílení, ekonomické, ekologické",
-      "og_description": "Zajistěte si dopravu na {jméno} - {datum}. Možnost spolujízdy.",
-      "og_title": "Spolujízda pro {jméno}",
-      "title": "Spolujízda - {jméno}",
-      "twitter_description": "Najděte nebo navrhněte spolujízdu pro {jméno}.",
-      "twitter_title": "Spolujízda - {jméno}"
+      "description": "Zorganizujte spolujízdu pro {name}. Najděte spolucestující nebo nabídněte svá volná místa na {date} v {location}.",
+      "keywords": "spolujízda, doprava, {convention}, {rental}, sdílení, ekonomické, ekologické",
+      "og_description": "Zajistěte si dopravu na {name} - {date}. Možnost spolujízdy.",
+      "og_title": "Spolujízda pro {name}",
+      "title": "Spolujízda - {name}",
+      "twitter_description": "Najděte nebo navrhněte spolujízdu pro {name}.",
+      "twitter_title": "Spolujízda - {name}"
     },
     "edition": {
-      "description": "Objevte {název}, který se koná {datum} na {místě}. Informace, program a registrace na tuto žonglérskou akci.",
-      "keywords": "žonglování, konvence, {konference}, {místo}, událost, festival, show, workshop",
-      "og_description": "Připojte se k nám na {jméno} - {datum}. Program, workshopy a žonglérské show.",
-      "title": "{jméno}",
-      "twitter_description": "{jméno} - {datum}. Objevte program tohoto žonglérského setkání.",
-      "twitter_title": "{jméno} - Žonglérská konvence"
+      "description": "Objevte {name}, který se koná {date} na {location}. Informace, program a registrace na tuto žonglérskou akci.",
+      "keywords": "žonglování, konvence, {konference}, {location}, událost, festival, show, workshop",
+      "og_description": "Připojte se k nám na {name} - {date}. Program, workshopy a žonglérské show.",
+      "title": "{name}",
+      "twitter_description": "{name} - {date}. Objevte program tohoto žonglérského setkání.",
+      "twitter_title": "{name} - Žonglérská konvence"
     },
     "homepage": {
       "description": "Přečtěte si informace o nadcházejících žonglérských sjezdech ve Francii a Evropě. Pořádejte své oblíbené akce a spojte se s žonglérskou komunitou.",
@@ -220,13 +220,13 @@
     "site_description": "Najděte a spravujte své oblíbené žonglérské srazy. Platforma pro spolupráci žonglérů a organizátorů akcí.",
     "site_name": "Žonglérská konvence",
     "volunteers": {
-      "description": "Připojte se k týmu dobrovolníků pro {jméno}. Pomozte zorganizovat žonglérskou akci {date} na {místo}.",
-      "keywords": "dobrovolnictví, tým, {dohoda}, {pronájem}, organizace, pomoc",
-      "og_description": "Připojte se k dobrovolnickému týmu {jméno} - {datum}. Podílejte se na organizaci.",
-      "og_title": "Dobrovolník pro {jméno}",
-      "title": "Dobrovolnictví - {jméno}",
-      "twitter_description": "Staňte se dobrovolníkem pro {jméno} a pomozte s organizací akce.",
-      "twitter_title": "Dobrovolnictví - {jméno}"
+      "description": "Připojte se k týmu dobrovolníků pro {name}. Pomozte zorganizovat žonglérskou akci {date} na {location}.",
+      "keywords": "dobrovolnictví, tým, {convention}, {rental}, organizace, pomoc",
+      "og_description": "Připojte se k dobrovolnickému týmu {name} - {date}. Podílejte se na organizaci.",
+      "og_title": "Dobrovolník pro {name}",
+      "title": "Dobrovolnictví - {name}",
+      "twitter_description": "Staňte se dobrovolníkem pro {name} a pomozte s organizací akce.",
+      "twitter_title": "Dobrovolnictví - {name}"
     }
   }
 }

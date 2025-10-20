@@ -21,23 +21,23 @@
     "carpool": {
       "booking_accepted": {
         "action": "Se mer information",
-        "message": "{ägarnamn} har accepterat din begäran om {platser} för resan från {platsCity} på {datum}.",
+        "message": "{ownerName} har accepterat din begäran om {seats} för resan från {locationCity} på {date}.",
         "title": "Begäran accepterad! ✅"
       },
       "booking_cancelled": {
         "action": "Se samåkning",
-        "message": "{passagerarnamn} har avbokat sin bokning av {platser} för resan från {platsCity} på {datum}.",
+        "message": "{passengerName} har avbokat sin bokning av {seats} för resan från {locationCity} på {date}.",
         "title": "Bokningen avbokad 📅"
       },
       "booking_received": {
         "action": "Se begäran",
-        "message": "{anmälarens namn} skulle vilja reservera {platser} i din bilpool",
-        "message_with_note": "{Frågeställarnamn} önskar reservera {platser} plats(er) : \"{not}\".",
+        "message": "{requesterName} skulle vilja reservera {seats} i din bilpool",
+        "message_with_note": "{requesterName} önskar reservera {seats} plats(er) : \"{note}\".",
         "title": "Ny begäran om samåkning 🚗"
       },
       "booking_rejected": {
         "action": "Se andra erbjudanden",
-        "message": "{ägarnamn} har avslagit din begäran om {platser} för resan från {platsCity}.",
+        "message": "{ownerName} har avslagit din begäran om {seats} för resan från {locationCity}.",
         "title": "Begäran avslås"
       }
     },
@@ -48,12 +48,12 @@
     "confirm_delete_title": "Ta bort meddelande",
     "edition": {
       "new_convention": {
-        "message": "Konventionen \"{konventionnamn}\" har just lagts till i plattformen.",
+        "message": "Konventionen \"{conventionName}\" har just lagts till i plattformen.",
         "title": "Nytt avtal tillagt"
       },
       "reminder": {
         "action": "Se mer information",
-        "message": "Utgåvan \"{utgåvanamn}\" startar i {dagarTill} dag(ar) !",
+        "message": "Utgåvan \"{editionName}\" startar i {daysUntil} dag(ar) !",
         "title": "Återkallande av händelse 📅"
       }
     },
@@ -81,9 +81,9 @@
       "application_accepted": {
         "action": "Se mer information",
         "message": "Din ansökan om att bli volontär för \"{editionName}\" har accepterats.",
-        "message_complete": "Din ansökan om \"{editionName}\" har accepterats.\n\nDu har blivit tilldelad följande lag:\n- {team}\n\nMeddelande från arrangören:\n\"{not}\"",
-        "message_with_note": "Din ansökan om \"{editionName}\" har accepterats.\n\nMeddelande från arrangören:\n\"{not}\"",
-        "message_with_teams": "Din ansökan om \"{editionName}\" har accepterats.\n\nDu har blivit tilldelad följande lag:\n- {team}",
+        "message_complete": "Din ansökan om \"{editionName}\" har accepterats.\n\nDu har blivit tilldelad följande lag:\n- {teams}\n\nMeddelande från arrangören:\n\"{note}\"",
+        "message_with_note": "Din ansökan om \"{editionName}\" har accepterats.\n\nMeddelande från arrangören:\n\"{note}\"",
+        "message_with_teams": "Din ansökan om \"{editionName}\" har accepterats.\n\nDu har blivit tilldelad följande lag:\n- {teams}",
         "title": "Ansökan accepterad! ✅"
       },
       "application_rejected": {

@@ -21,23 +21,23 @@
     "carpool": {
       "booking_accepted": {
         "action": "Viz podrobnosti",
-        "message": "{jméno majitele} přijalo vaši žádost o {místa k sezení} na cestu z {místa} dne {datum}.",
+        "message": "{ownerName} přijalo vaši žádost o {seats} na cestu z {locationCity} dne {date}.",
         "title": "Žádost přijata! ✅"
       },
       "booking_cancelled": {
         "action": "Viz spolujízda",
-        "message": "{jméno cestujícího} zrušil rezervaci {míst} na cestu z {místaCity} dne {datum}.",
+        "message": "{passengerName} zrušil rezervaci {seats} na cestu z {locationCity} dne {date}.",
         "title": "Rezervace zrušena 📅"
       },
       "booking_received": {
         "action": "Viz žádost",
-        "message": "{jméno žadatele} si přeje rezervovat {místa} ve vaší spolujízdě",
-        "message_with_note": "{jméno žadatele} si přeje rezervovat {místa} : \"{poznámka}\".",
+        "message": "{requesterName} si přeje rezervovat {seats} ve vaší spolujízdě",
+        "message_with_note": "{requesterName} si přeje rezervovat {seats} : \"{note}\".",
         "title": "Nová žádost o spolujízdu 🚗"
       },
       "booking_rejected": {
         "action": "Podívejte se na další nabídky",
-        "message": "{jméno majitele} odmítlo vaši žádost o {místa k sezení} pro cestu z {místa}.",
+        "message": "{ownerName} odmítlo vaši žádost o {seats} pro cestu z {locationCity}.",
         "title": "Žádost zamítnuta"
       }
     },
@@ -53,7 +53,7 @@
       },
       "reminder": {
         "action": "Viz podrobnosti",
-        "message": "Edice \"{název edice}\" začíná za {dnyDokud} den(y) !",
+        "message": "Edice \"{editionName}\" začíná za {daysUntil} den(y) !",
         "title": "Vyvolání události 📅"
       }
     },
@@ -80,25 +80,25 @@
     "volunteer": {
       "application_accepted": {
         "action": "Viz podrobnosti",
-        "message": "Vaše přihláška jako dobrovolníka pro \"{název vydání}\" byla přijata.",
-        "message_complete": "Vaše žádost o \"{název vydání}\" byla přijata.\n\nByli jste zařazeni do následujících týmů:\n- {týmy} byly zařazeny do těchto týmů: {týmy}\n\nZpráva od organizátora:\n\"{poznámka}\"",
-        "message_with_note": "Vaše žádost o \"{název vydání}\" byla přijata.\n\nZpráva od organizátora:\n\"{poznámka}\"",
-        "message_with_teams": "Vaše žádost o \"{název vydání}\" byla přijata.\n\nByli jste zařazeni do následujících týmů:\n- {týmy} byly zařazeny do těchto týmů: {týmy}",
+        "message": "Vaše přihláška jako dobrovolníka pro \"{editionName}\" byla přijata.",
+        "message_complete": "Vaše žádost o \"{editionName}\" byla přijata.\n\nByli jste zařazeni do následujících týmů:\n• {teams}\n\nZpráva od organizátora:\n\"{note}\"",
+        "message_with_note": "Vaše žádost o \"{editionName}\" byla přijata.\n\nZpráva od organizátora:\n\"{note}\"",
+        "message_with_teams": "Vaše žádost o \"{editionName}\" byla přijata.\n\nByli jste zařazeni do následujících týmů:\n• {teams}",
         "title": "Přihláška přijata! ✅"
       },
       "application_rejected": {
         "action": "Viz vydání",
-        "message": "Vaše žádost o dobrovolnictví pro \"{název vydání}\" nebyla tentokrát přijata.",
+        "message": "Vaše žádost o dobrovolnictví pro \"{editionName}\" nebyla tentokrát přijata.",
         "title": "Žádost nebyla přijata"
       },
       "application_submitted": {
         "action": "Podívejte se na mé aplikace",
-        "message": "Vaše žádost o \"{název vydání}\" byla úspěšně odeslána. Organizátoři ji prověří.",
+        "message": "Vaše žádost o \"{editionName}\" byla úspěšně odeslána. Organizátoři ji prověří.",
         "title": "Přihláška odeslána! 🎉"
       },
       "back_to_pending": {
         "action": "Viz moje žádost",
-        "message": "Organizátoři pozastavili vaši přihlášku jako dobrovolníka na \"{název edice}\".",
+        "message": "Organizátoři pozastavili vaši přihlášku jako dobrovolníka na \"{editionName}\".",
         "title": "Pozastavení žádosti"
       }
     },

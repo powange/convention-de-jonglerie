@@ -3,7 +3,7 @@
     "carpool": {
       "accept": "Acceptera",
       "add_comment_placeholder": "Lägg till en kommentar...",
-      "added_on": "Lagt till den {datum}",
+      "added_on": "Lagt till den {date}",
       "address": "Adress",
       "available_seats": "Antal tillgängliga platser",
       "be_first_to_comment": "Bli först med att kommentera detta {typ}!",
@@ -17,7 +17,7 @@
       "confirm_delete_request": "Är du säker på att du vill ta bort den här samåkningsförfrågan?",
       "confirmed_passengers": "Bekräftade samåkare",
       "contact": "Kontakt",
-      "contact_user": "Kontakt {namn}",
+      "contact_user": "Kontakt {name}",
       "delete_offer": "Ta bort erbjudande",
       "delete_request": "Ta bort begäran",
       "departure_date_time": "Datum och tid för avresa",
@@ -32,7 +32,7 @@
       "no_requests": "Inga önskemål om samåkning",
       "no_requests_published": "Hittills har inga ansökningar publicerats.",
       "offer": "erbjudande",
-      "offered_on": "Förslag framlagt den {datum}",
+      "offered_on": "Förslag framlagt den {date}",
       "offers_long": "Erbjudanden om samåkning",
       "offers_short": "Erbjudanden",
       "pending_bookings": "Väntande bokningar",
@@ -41,12 +41,12 @@
       "reject": "Avvisa",
       "request": "begäran",
       "request_carpool": "Begär en bilpool",
-      "requested_on": "Begärd den {datum}",
-      "requested_seats": "{antal} platser begärda | {antal} platser begärda",
+      "requested_on": "Begärd den {date}",
+      "requested_seats": "{count} platser begärda | {count} platser begärda",
       "requests_long": "Önskemål om samåkning",
       "requests_short": "Förfrågningar",
-      "seats_available": "{antal} platser tillgängliga | {antal} platser tillgängliga",
-      "seats_needed": "{antal} platser sökta | {antal} platser sökta",
+      "seats_available": "{count} platser tillgängliga | {count} platser tillgängliga",
+      "seats_needed": "{count} platser sökta | {count} platser sökta",
       "status": {
         "accepted": "Accepterad",
         "cancelled": "Avbruten",
@@ -55,7 +55,7 @@
       },
       "suggestions": "Förslag",
       "to_add_comment": "för att lägga till en kommentar",
-      "view_comments": "Visa kommentarer ({antal})"
+      "view_comments": "Visa kommentarer ({count})"
     },
     "collaborators_rights_panel": {
       "per_edition": "Rättigheter per utgåva",
@@ -116,13 +116,13 @@
     },
     "favorites_map": {
       "all_favorites": "Alla är favoriter",
-      "editions_with_location": "{antal} utgåvor med lokalisering | {antal} utgåvor med lokalisering",
+      "editions_with_location": "{count} utgåvor med lokalisering | {count} utgåvor med lokalisering",
       "no_upcoming_favorites": "Ingen kommande favoritutgåva med tillgänglig plats",
       "past": "Tidigare",
       "upcoming": "Kommer inom kort"
     },
     "map": {
-      "editions_on_map": "{antal} kartutgåva | {antal} kartutgåva",
+      "editions_on_map": "{count} kartutgåva | {count} kartutgåva",
       "incomplete_address_warning": "Utgåvor utan fullständig adress kan inte visas på kartan.",
       "loading": "Ladda kortet...",
       "no_editions_with_location": "Ingen upplaga med plats",
@@ -130,11 +130,11 @@
       "past": "Tidigare",
       "temporal_status": "Temporär status",
       "upcoming": "Kommer inom kort",
-      "without_coordinates": "({antal} utan koordinater)",
+      "without_coordinates": "({count} utan koordinater)",
       "yellow_border_favorite": "Gul kontur = Favorit"
     },
     "posts": {
-      "comments_count": "{antal} kommentarer | {antal} kommentarer",
+      "comments_count": "{count} kommentarer | {count} kommentarer",
       "confirm_delete_comment": "Är du säker på att du vill ta bort den här kommentaren? Denna åtgärd är oåterkallelig.",
       "confirm_delete_post": "Är du säker på att du vill ta bort denna publikation? Denna åtgärd är oåterkallelig.",
       "confirm_delete_title": "Bekräfta borttagningen",
