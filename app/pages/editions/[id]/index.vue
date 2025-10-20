@@ -387,7 +387,9 @@ const editionDateRange = computed(() =>
 // Définir les métadonnées pour SSR
 // Après await useFetch, passer directement les computed (sans arrow functions) à useSeoMeta
 // Solution de: https://github.com/nuxt/nuxt/issues/23470#issuecomment-1741174856
-const seoTitle = computed(() => `${t('seo.edition.title', { name: editionName.value })} | ${t('seo.site_name')}`)
+const seoTitle = computed(
+  () => `${t('seo.edition.title', { name: editionName.value })} | ${t('seo.site_name')}`
+)
 const seoDescription = computed(() =>
   t('seo.edition.description', {
     name: editionName.value,

@@ -360,7 +360,11 @@ export default defineNuxtConfig({
       '/editions/add',
     ],
     // Inclure les routes dynamiques importantes
-    sources: ['/api/__sitemap__/editions', '/api/__sitemap__/carpool', '/api/__sitemap__/volunteers'],
+    sources: [
+      '/api/__sitemap__/editions',
+      '/api/__sitemap__/carpool',
+      '/api/__sitemap__/volunteers',
+    ],
     // Définir explicitement les routes autorisées
     urls: [
       {

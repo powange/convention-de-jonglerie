@@ -181,7 +181,7 @@ describe('useAuthStore', () => {
 
       expect($fetch).toHaveBeenCalledWith('/api/auth/login', {
         method: 'POST',
-        body: { identifier: 'test@example.com', password: 'password' },
+        body: { identifier: 'test@example.com', password: 'password', rememberMe: false },
       })
 
       expect(authStore.user).toEqual(mockUser)

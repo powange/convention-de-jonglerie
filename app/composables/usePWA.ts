@@ -13,7 +13,8 @@ export function usePWA() {
 
     // Vérifier via le manifest
     const isManifestPWA =
-      document.referrer.includes('android-app://') || window.matchMedia('(display-mode: standalone)').matches
+      document.referrer.includes('android-app://') ||
+      window.matchMedia('(display-mode: standalone)').matches
 
     isPWA.value = isStandalone || isIOSPWA || isManifestPWA
   }
