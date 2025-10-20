@@ -369,92 +369,79 @@ watch(
 )
 
 // SEO - Métadonnées dynamiques pour l'édition
-// Utiliser computed au lieu de watch pour garantir que les métadonnées sont disponibles dès le SSR
-const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))
-const conventionName = computed(() => edition.value?.convention?.name || '')
-const editionDescription = computed(
-  () => edition.value?.description || edition.value?.convention?.description || ''
-)
-const editionImageUrl = computed(() =>
-  edition.value?.imageUrl
-    ? getImageUrl(edition.value.imageUrl, 'edition', edition.value.id)
-    : undefined
-)
-const editionDateRange = computed(() =>
-  edition.value ? formatDateTimeRange(edition.value.startDate, edition.value.endDate) : ''
-)
+// Calculer les valeurs immédiatement après le fetch (edition.value est déjà chargé grâce à await)
+const editionName = edition.value ? getEditionDisplayName(edition.value) : `Edition ${editionId}`
+const conventionName = edition.value?.convention?.name || ''
+const editionDescription = edition.value?.description || edition.value?.convention?.description || ''
+const editionImageUrl = edition.value?.imageUrl
+  ? getImageUrl(edition.value.imageUrl, 'edition', edition.value.id)
+  : undefined
+const editionDateRange = edition.value
+  ? formatDateTimeRange(edition.value.startDate, edition.value.endDate)
+  : ''
 
-// Définir les métadonnées avec computed pour SSR
+// Définir les métadonnées pour SSR avec les valeurs calculées
 useSeoMeta({
-  title: () => t('seo.edition.title', { name: editionName.value }),
-  titleTemplate: () => `%s | ${t('seo.site_name')}`,
-  description: () =>
-    t('seo.edition.description', {
-      name: editionName.value,
-      date: editionDateRange.value,
-      location: edition.value?.location || '',
-    }),
-  keywords: () =>
-    t('seo.edition.keywords', {
-      convention: conventionName.value,
-      location: edition.value?.location || '',
-    }),
-  ogTitle: () => editionName.value || conventionName.value,
-  ogDescription: () =>
-    t('seo.edition.og_description', {
-      name: editionName.value,
-      date: editionDateRange.value,
-    }),
+  title: t('seo.edition.title', { name: editionName }),
+  titleTemplate: `%s | ${t('seo.site_name')}`,
+  description: t('seo.edition.description', {
+    name: editionName,
+    date: editionDateRange,
+    location: edition.value?.location || '',
+  }),
+  keywords: t('seo.edition.keywords', {
+    convention: conventionName,
+    location: edition.value?.location || '',
+  }),
+  ogTitle: editionName || conventionName || `Edition ${editionId}`,
+  ogDescription: t('seo.edition.og_description', {
+    name: editionName,
+    date: editionDateRange,
+  }),
   ogType: 'article',
-  ogLocale: () => locale.value,
-  ogImage: () => editionImageUrl.value,
+  ogLocale: locale.value,
+  ogImage: editionImageUrl,
   twitterCard: 'summary_large_image',
-  twitterTitle: () => t('seo.edition.twitter_title', { name: editionName.value }),
-  twitterDescription: () =>
-    t('seo.edition.twitter_description', {
-      name: editionName.value,
-      date: editionDateRange.value,
-    }),
-  twitterImage: () => editionImageUrl.value,
+  twitterTitle: t('seo.edition.twitter_title', { name: editionName }),
+  twitterDescription: t('seo.edition.twitter_description', {
+    name: editionName,
+    date: editionDateRange,
+  }),
+  twitterImage: editionImageUrl,
 })
 
 // Schema.org Event pour l'édition
 useSchemaOrg([
   defineEvent({
-    name: () => editionName.value,
-    description: () =>
-      editionDescription.value.substring(0, 200) +
-      (editionDescription.value.length > 200 ? '...' : ''),
-    startDate: () => edition.value?.startDate || '',
-    endDate: () => edition.value?.endDate || '',
-    location: () =>
-      edition.value?.location
-        ? {
-            '@type': 'Place',
-            name: edition.value.location,
-            address: edition.value.location,
-          }
-        : undefined,
-    image: () => (editionImageUrl.value ? [editionImageUrl.value] : undefined),
-    url: () => `${useRequestURL().origin}/editions/${edition.value?.id || editionId}`,
-    eventStatus: () =>
-      edition.value?.status === 'published' ? 'EventScheduled' : 'EventCancelled',
-    organizer: () => ({
+    name: editionName,
+    description: editionDescription.substring(0, 200) + (editionDescription.length > 200 ? '...' : ''),
+    startDate: edition.value?.startDate || '',
+    endDate: edition.value?.endDate || '',
+    location: edition.value?.location
+      ? {
+          '@type': 'Place',
+          name: edition.value.location,
+          address: edition.value.location,
+        }
+      : undefined,
+    image: editionImageUrl ? [editionImageUrl] : undefined,
+    url: `${useRequestURL().origin}/editions/${edition.value?.id || editionId}`,
+    eventStatus: edition.value?.status === 'published' ? 'EventScheduled' : 'EventCancelled',
+    organizer: {
       '@type': 'Organization',
-      name: conventionName.value,
+      name: conventionName,
       url: edition.value?.convention
         ? `${useRequestURL().origin}/conventions/${edition.value.convention.id}`
         : undefined,
-    }),
-    offers: () =>
-      edition.value?.registrationPrice
-        ? {
-            '@type': 'Offer',
-            price: edition.value.registrationPrice,
-            priceCurrency: 'EUR',
-            availability: 'InStock',
-          }
-        : undefined,
+    },
+    offers: edition.value?.registrationPrice
+      ? {
+          '@type': 'Offer',
+          price: edition.value.registrationPrice,
+          priceCurrency: 'EUR',
+          availability: 'InStock',
+        }
+      : undefined,
   }),
 ])
 
