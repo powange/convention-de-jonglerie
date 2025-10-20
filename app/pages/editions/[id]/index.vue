@@ -384,38 +384,50 @@ const editionDateRange = computed(() =>
   edition.value ? formatDateTimeRange(edition.value.startDate, edition.value.endDate) : ''
 )
 
-// Définir les métadonnées pour SSR - utiliser des fonctions pour accéder aux computed
+// Définir les métadonnées pour SSR
+// Après await useFetch, passer directement les computed (sans arrow functions) à useSeoMeta
+// Solution de: https://github.com/nuxt/nuxt/issues/23470#issuecomment-1741174856
+const seoTitle = computed(() => `${t('seo.edition.title', { name: editionName.value })} | ${t('seo.site_name')}`)
+const seoDescription = computed(() =>
+  t('seo.edition.description', {
+    name: editionName.value,
+    date: editionDateRange.value,
+    location: edition.value?.location || '',
+  })
+)
+const seoKeywords = computed(() =>
+  t('seo.edition.keywords', {
+    convention: conventionName.value,
+    location: edition.value?.location || '',
+  })
+)
+const seoOgDescription = computed(() =>
+  t('seo.edition.og_description', {
+    name: editionName.value,
+    date: editionDateRange.value,
+  })
+)
+const seoTwitterTitle = computed(() => t('seo.edition.twitter_title', { name: editionName.value }))
+const seoTwitterDescription = computed(() =>
+  t('seo.edition.twitter_description', {
+    name: editionName.value,
+    date: editionDateRange.value,
+  })
+)
+
 useSeoMeta({
-  title: () => t('seo.edition.title', { name: editionName.value }),
-  titleTemplate: () => `%s | ${t('seo.site_name')}`,
-  description: () =>
-    t('seo.edition.description', {
-      name: editionName.value,
-      date: editionDateRange.value,
-      location: edition.value?.location || '',
-    }),
-  keywords: () =>
-    t('seo.edition.keywords', {
-      convention: conventionName.value,
-      location: edition.value?.location || '',
-    }),
-  ogTitle: () => editionName.value || conventionName.value,
-  ogDescription: () =>
-    t('seo.edition.og_description', {
-      name: editionName.value,
-      date: editionDateRange.value,
-    }),
+  title: seoTitle,
+  description: seoDescription,
+  keywords: seoKeywords,
+  ogTitle: editionName,
+  ogDescription: seoOgDescription,
   ogType: 'article',
-  ogLocale: () => locale.value,
-  ogImage: () => editionImageUrl.value,
+  ogLocale: locale,
+  ogImage: editionImageUrl,
   twitterCard: 'summary_large_image',
-  twitterTitle: () => t('seo.edition.twitter_title', { name: editionName.value }),
-  twitterDescription: () =>
-    t('seo.edition.twitter_description', {
-      name: editionName.value,
-      date: editionDateRange.value,
-    }),
-  twitterImage: () => editionImageUrl.value,
+  twitterTitle: seoTwitterTitle,
+  twitterDescription: seoTwitterDescription,
+  twitterImage: editionImageUrl,
 })
 
 // Schema.org Event pour l'édition
