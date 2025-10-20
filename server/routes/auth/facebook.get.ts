@@ -159,20 +159,40 @@ export default defineEventHandler(async (event) => {
 
   // Ouvrir la session utilisateur
   const { setUserSession } = (await import('#imports')) as any
-  await setUserSession(event, {
-    user: {
-      id: dbUser.id,
-      email: dbUser.email,
-      pseudo: dbUser.pseudo,
-      nom: dbUser.nom,
-      prenom: dbUser.prenom,
-      profilePicture: dbUser.profilePicture,
-      isGlobalAdmin: dbUser.isGlobalAdmin,
-      createdAt: dbUser.createdAt,
-      updatedAt: dbUser.updatedAt,
-      isEmailVerified: dbUser.isEmailVerified,
+
+  // Vérifier si l'utilisateur est en mode PWA
+  const isPWA = getCookie(event, 'pwa_mode') === 'true'
+
+  // Si PWA, session de 90 jours, sinon 30 jours (défaut configuré)
+  const sessionConfig = isPWA
+    ? {
+        maxAge: 60 * 60 * 24 * 90, // 90 jours pour les PWA
+      }
+    : undefined // Utilise la config par défaut (30 jours)
+
+  await setUserSession(
+    event,
+    {
+      user: {
+        id: dbUser.id,
+        email: dbUser.email,
+        pseudo: dbUser.pseudo,
+        nom: dbUser.nom,
+        prenom: dbUser.prenom,
+        profilePicture: dbUser.profilePicture,
+        isGlobalAdmin: dbUser.isGlobalAdmin,
+        createdAt: dbUser.createdAt,
+        updatedAt: dbUser.updatedAt,
+        isEmailVerified: dbUser.isEmailVerified,
+      },
     },
-  })
+    sessionConfig
+  )
+
+  // Nettoyer le cookie PWA
+  if (isPWA) {
+    setCookie(event, 'pwa_mode', '', { maxAge: 0 })
+  }
 
   // Récupérer le returnTo depuis le cookie et nettoyer le cookie
   const returnTo = getCookie(event, 'oauth_returnTo_fb')

@@ -435,6 +435,16 @@ import type { HttpError } from '~/types'
 import { useAuthStore } from '../stores/auth'
 
 const onGoogleLogin = async () => {
+  // Détecter si on est en mode PWA et stocker l'info dans un cookie
+  if (import.meta.client) {
+    const isPWA =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true
+    if (isPWA) {
+      document.cookie = `pwa_mode=true; path=/; max-age=600; SameSite=Lax`
+    }
+  }
+
   // Navigation externe pour forcer l'appel de la route serveur (/server/routes/auth/google.get.ts)
   const returnTo = useRoute().query.returnTo as string
   const googleUrl = returnTo
@@ -444,6 +454,16 @@ const onGoogleLogin = async () => {
 }
 
 const onFacebookLogin = async () => {
+  // Détecter si on est en mode PWA et stocker l'info dans un cookie
+  if (import.meta.client) {
+    const isPWA =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true
+    if (isPWA) {
+      document.cookie = `pwa_mode=true; path=/; max-age=600; SameSite=Lax`
+    }
+  }
+
   // Navigation externe pour forcer l'appel de la route serveur (/server/routes/auth/facebook.get.ts)
   const returnTo = useRoute().query.returnTo as string
   const facebookUrl = returnTo
