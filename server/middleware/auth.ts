@@ -24,6 +24,7 @@ export default defineEventHandler(async (event) => {
       '/api/auth/register',
       '/api/auth/login',
       '/api/auth/verify-email',
+      '/api/auth/set-password-and-verify',
       '/api/auth/resend-verification',
       '/api/auth/request-password-reset',
       '/api/auth/reset-password',
