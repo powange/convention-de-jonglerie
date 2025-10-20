@@ -10,6 +10,7 @@ import { setUserSession } from '#imports'
 const loginSchema = z.object({
   identifier: z.string().min(1, 'Email ou pseudo requis'),
   password: z.string().min(1, 'Mot de passe requis'),
+  rememberMe: z.boolean().optional().default(false),
 })
 
 export default defineEventHandler(async (event) => {
@@ -20,7 +21,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
     // Validation des données d'entrée
-    const { identifier, password } = loginSchema.parse(body)
+    const { identifier, password, rememberMe } = loginSchema.parse(body)
 
     // Sanitisation : trim des espaces
     const cleanIdentifier = identifier.trim()
@@ -79,20 +80,31 @@ export default defineEventHandler(async (event) => {
     })
 
     // Définir la session côté serveur (cookies scellés via nuxt-auth-utils)
-    await setUserSession(event, {
-      user: {
-        id: user.id,
-        email: user.email,
-        pseudo: user.pseudo,
-        nom: user.nom,
-        prenom: user.prenom,
-        phone: user.phone,
-        isGlobalAdmin: user.isGlobalAdmin,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        isEmailVerified: user.isEmailVerified,
+    // Si "Se souvenir de moi" est coché, la session dure 90 jours, sinon 30 jours (défaut configuré)
+    const sessionConfig = rememberMe
+      ? {
+          maxAge: 60 * 60 * 24 * 90, // 90 jours pour "Se souvenir de moi"
+        }
+      : undefined // Utilise la config par défaut (30 jours configuré dans nuxt.config.ts)
+
+    await setUserSession(
+      event,
+      {
+        user: {
+          id: user.id,
+          email: user.email,
+          pseudo: user.pseudo,
+          nom: user.nom,
+          prenom: user.prenom,
+          phone: user.phone,
+          isGlobalAdmin: user.isGlobalAdmin,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+          isEmailVerified: user.isEmailVerified,
+        },
       },
-    })
+      sessionConfig
+    )
 
     return {
       user: {

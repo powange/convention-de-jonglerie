@@ -268,6 +268,9 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     // Private keys that are only available on the server
+    session: {
+      maxAge: 60 * 60 * 24 * 30, // 30 jours par défaut (peut être overridé par login avec "remember me")
+    },
     sessionPassword: process.env.NUXT_SESSION_PASSWORD || '',
     emailEnabled: process.env.SEND_EMAILS || 'false', // Enable/disable real email sending
     smtpUser: process.env.SMTP_USER || '', // SMTP username for email sending
