@@ -151,10 +151,10 @@
             <h3
               class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2"
             >
-              {{ $t('common.password') }}
+              {{ $t('auth.password') }}
             </h3>
 
-            <UFormField :label="$t('common.password')" name="password">
+            <UFormField :label="$t('auth.password')" name="password">
               <UInput
                 v-model="state.password"
                 :type="showPassword ? 'text' : 'password'"

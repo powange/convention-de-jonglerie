@@ -165,7 +165,7 @@
             class="space-y-6"
             @submit="handlePasswordSubmit"
           >
-            <UFormField :label="t('common.password')" name="password">
+            <UFormField :label="t('auth.password')" name="password">
               <UInput
                 v-model="passwordState.password"
                 :type="showPassword ? 'text' : 'password'"
@@ -335,7 +335,7 @@
               />
             </UFormField>
             <div class="grid grid-cols-1 gap-4">
-              <UFormField :label="t('common.password')" name="password">
+              <UFormField :label="t('auth.password')" name="password">
                 <UInput
                   v-model="registerState.password"
                   :type="showRegisterPassword ? 'text' : 'password'"
