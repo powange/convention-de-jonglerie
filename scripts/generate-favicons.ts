@@ -16,21 +16,60 @@ async function run() {
 
   // Remplacer les zones noires (fill rgb(5,12,10)) par blanc pour les favicons
   svgContent = svgContent.replace(/fill="rgb\(5,12,10\)"/g, 'fill="#ffffff"')
+
+  // Couleur de fond oklch(20.8% 0.042 265.755) convertie en RGB
+  const backgroundColorRgb = { r: 15, g: 23, b: 43 } // Approximation RGB de la couleur oklch
+
   const sizes = [16, 32, 48, 64, 96, 180, 192, 256, 384, 512]
 
   await Promise.all(
     sizes.map(async (size) => {
       const file = path.join(outDir, `favicon-${size}x${size}.png`)
-      await sharp(Buffer.from(svgContent))
-        .resize(size, size)
+
+      // Créer le logo sur fond coloré
+      const logoBuffer = await sharp(Buffer.from(svgContent)).resize(size, size).png().toBuffer()
+
+      await sharp({
+        create: {
+          width: size,
+          height: size,
+          channels: 4,
+          background: backgroundColorRgb,
+        },
+      })
+        .composite([
+          {
+            input: logoBuffer,
+            top: 0,
+            left: 0,
+          },
+        ])
         .png({ compressionLevel: 9 })
         .toFile(file)
     })
   )
 
-  // Générer favicon.ico (16,32,48)
-  const icoBuffer = await sharp(Buffer.from(svgContent)).resize(48, 48).png().toBuffer()
-  await writeFile(path.join(outDir, 'favicon.png'), icoBuffer)
+  // Générer favicon.png avec fond (48x48)
+  const logoBuffer48 = await sharp(Buffer.from(svgContent)).resize(48, 48).png().toBuffer()
+  const faviconWithBackground = await sharp({
+    create: {
+      width: 48,
+      height: 48,
+      channels: 4,
+      background: backgroundColorRgb,
+    },
+  })
+    .composite([
+      {
+        input: logoBuffer48,
+        top: 0,
+        left: 0,
+      },
+    ])
+    .png({ compressionLevel: 9 })
+    .toBuffer()
+
+  await writeFile(path.join(outDir, 'favicon.png'), faviconWithBackground)
 
   // Générer les noms spéciaux attendus par les PWA et navigateurs
   const specialFiles = [
@@ -38,9 +77,6 @@ async function run() {
     { size: 512, name: 'android-chrome-512x512.png', needsBackground: true },
     { size: 180, name: 'apple-touch-icon.png', needsBackground: true },
   ]
-
-  // Couleur de fond oklch(20.8% 0.042 265.755) convertie en RGB
-  const backgroundColorRgb = { r: 15, g: 23, b: 43 } // Approximation RGB de la couleur oklch
 
   await Promise.all(
     specialFiles.map(async ({ size, name, needsBackground }) => {
