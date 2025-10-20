@@ -72,6 +72,12 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Mettre à jour la date de dernière connexion
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() },
+    })
+
     // Définir la session côté serveur (cookies scellés via nuxt-auth-utils)
     await setUserSession(event, {
       user: {

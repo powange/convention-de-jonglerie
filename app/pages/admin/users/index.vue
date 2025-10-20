@@ -174,6 +174,7 @@ const { t } = useI18n()
 interface AdminUserWithConnection extends AdminUser {
   isConnected: boolean
   authProvider?: string
+  lastLoginAt?: string | null
 }
 
 interface PaginationData {
@@ -443,6 +444,29 @@ const columns = [
     },
   },
   {
+    accessorKey: 'lastLoginAt',
+    header: t('admin.last_login'),
+    cell: ({ row }: { row: any }) => {
+      const user = row.original as AdminUserWithConnection
+
+      if (!user.lastLoginAt) {
+        return h('div', { class: 'text-sm text-gray-400' }, t('admin.never_connected'))
+      }
+
+      return h(
+        resolveComponent('UTooltip'),
+        { text: formatDateTime(user.lastLoginAt) },
+        {
+          default: () =>
+            h('div', { class: 'text-sm cursor-help' }, [
+              h('div', formatDate(user.lastLoginAt)),
+              h('div', { class: 'text-gray-500' }, formatRelativeTime(user.lastLoginAt)),
+            ]),
+        }
+      )
+    },
+  },
+  {
     accessorKey: 'actions',
     header: t('common.actions'),
     cell: ({ row }: { row: any }) => {
@@ -482,6 +506,8 @@ const emailFilterOptions = [
 const sortOptions = [
   { label: t('admin.newest_first'), value: 'createdAt:desc' },
   { label: t('admin.oldest_first'), value: 'createdAt:asc' },
+  { label: t('admin.last_login_recent'), value: 'lastLoginAt:desc' },
+  { label: t('admin.last_login_oldest'), value: 'lastLoginAt:asc' },
   { label: t('admin.name_a_z'), value: 'nom:asc' },
   { label: t('admin.name_z_a'), value: 'nom:desc' },
   { label: t('admin.email_a_z'), value: 'email:asc' },

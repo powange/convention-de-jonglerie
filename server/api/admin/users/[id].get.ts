@@ -30,6 +30,7 @@ export default defineEventHandler(async (event) => {
         isGlobalAdmin: true,
         createdAt: true,
         updatedAt: true,
+        lastLoginAt: true,
         profilePicture: true,
         _count: {
           select: {

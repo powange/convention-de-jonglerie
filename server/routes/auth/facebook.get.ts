@@ -151,6 +151,12 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // Mettre à jour la date de dernière connexion
+  await prisma.user.update({
+    where: { id: dbUser.id },
+    data: { lastLoginAt: new Date() },
+  })
+
   // Ouvrir la session utilisateur
   const { setUserSession } = (await import('#imports')) as any
   await setUserSession(event, {

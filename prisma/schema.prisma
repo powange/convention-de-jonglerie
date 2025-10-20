@@ -19,6 +19,7 @@ model User {
   authProvider             String                          @default("email") // "email", "google", "facebook"
   createdAt                DateTime                        @default(now())
   updatedAt                DateTime                        @updatedAt
+  lastLoginAt              DateTime?
   profilePicture           String?
   emailVerificationCode    String?
   isEmailVerified          Boolean                         @default(false)

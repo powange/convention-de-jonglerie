@@ -78,6 +78,7 @@ export default defineEventHandler(async (event) => {
           authProvider: true,
           createdAt: true,
           updatedAt: true,
+          lastLoginAt: true,
           profilePicture: true,
           _count: {
             select: {
@@ -90,11 +91,13 @@ export default defineEventHandler(async (event) => {
         orderBy:
           sortBy === 'createdAt'
             ? { createdAt: sortOrder }
-            : sortBy === 'email'
-              ? { email: sortOrder }
-              : sortBy === 'nom'
-                ? { nom: sortOrder }
-                : { createdAt: sortOrder },
+            : sortBy === 'lastLoginAt'
+              ? { lastLoginAt: sortOrder }
+              : sortBy === 'email'
+                ? { email: sortOrder }
+                : sortBy === 'nom'
+                  ? { nom: sortOrder }
+                  : { createdAt: sortOrder },
         skip: offset,
         take: limit,
       }),
