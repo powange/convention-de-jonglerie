@@ -9,14 +9,13 @@ export default defineEventHandler(async () => {
           isArchived: false,
         },
         isOnline: true, // Inclure uniquement les éditions en ligne
-        volunteerApplicationsOpen: true, // Candidatures bénévoles ouvertes
+        volunteersOpen: true, // Candidatures bénévoles ouvertes
       },
       select: {
         id: true,
         updatedAt: true,
         startDate: true,
         endDate: true,
-        volunteerApplicationDeadline: true,
         _count: {
           select: {
             volunteerApplications: true,
@@ -27,46 +26,44 @@ export default defineEventHandler(async () => {
     })
 
     return editions.map((edition) => {
-      // Priorité plus élevée pour les éditions avec deadline proche
+      // Priorité plus élevée pour les éditions à venir avec candidatures ouvertes
       const now = new Date()
       const isUpcoming = new Date(edition.startDate) > now
-      const deadline = edition.volunteerApplicationDeadline
-        ? new Date(edition.volunteerApplicationDeadline)
-        : null
+      const startDate = new Date(edition.startDate)
 
-      // Calculer la priorité en fonction de la deadline et de l'activité
+      // Calculer la priorité en fonction de la proximité de l'événement et de l'activité
       let priority = 0.5 // Priorité de base pour les pages de bénévolat
 
-      if (deadline && deadline > now) {
-        // Calculer les jours restants jusqu'à la deadline
-        const daysUntilDeadline = Math.floor(
-          (deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+      if (isUpcoming) {
+        // Calculer les jours restants jusqu'au début
+        const daysUntilStart = Math.floor(
+          (startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
         )
 
-        if (daysUntilDeadline <= 7) {
-          priority = 0.9 // Très haute priorité si deadline dans 7 jours
-        } else if (daysUntilDeadline <= 30) {
-          priority = 0.8 // Haute priorité si deadline dans 30 jours
-        } else if (isUpcoming) {
-          priority = 0.7 // Priorité moyenne pour éditions à venir
+        if (daysUntilStart <= 30) {
+          priority = 0.9 // Très haute priorité si début dans 30 jours
+        } else if (daysUntilStart <= 60) {
+          priority = 0.8 // Haute priorité si début dans 60 jours
+        } else if (daysUntilStart <= 90) {
+          priority = 0.7 // Priorité moyenne pour éditions dans 90 jours
+        } else {
+          priority = 0.6 // Priorité normale pour éditions plus lointaines
         }
-      } else if (isUpcoming) {
-        priority = 0.6 // Priorité moyenne si pas de deadline mais édition à venir
       }
 
-      // Augmenter la priorité s'il y a beaucoup d'équipes
-      if (edition._count.volunteerTeams > 5) {
+      // Augmenter la priorité s'il y a beaucoup d'équipes ou de candidatures
+      if (edition._count.volunteerTeams > 5 || edition._count.volunteerApplications > 20) {
         priority = Math.min(priority + 0.1, 1.0)
       }
 
-      // Fréquence de changement en fonction de la deadline
+      // Fréquence de changement en fonction de la proximité de l'événement
       let changefreq: 'daily' | 'weekly' | 'monthly' = 'weekly'
-      if (deadline && deadline > now) {
-        const daysUntilDeadline = Math.floor(
-          (deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+      if (isUpcoming) {
+        const daysUntilStart = Math.floor(
+          (startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
         )
-        if (daysUntilDeadline <= 14) {
-          changefreq = 'daily' // Changements quotidiens près de la deadline
+        if (daysUntilStart <= 30) {
+          changefreq = 'daily' // Changements quotidiens si début proche
         }
       }
 
