@@ -1,5 +1,4 @@
 <template>
-  <ClientOnly>
     <UPage>
       <UPageBody>
         <UContainer>
@@ -7,5 +6,4 @@
         </UContainer>
       </UPageBody>
     </UPage>
-  </ClientOnly>
 </template>

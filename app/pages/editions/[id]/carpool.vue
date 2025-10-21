@@ -57,7 +57,6 @@ watch(
 
       useSeoMeta({
         title: () => t('seo.carpool.title', { name: editionName }),
-        titleTemplate: () => `%s | ${t('seo.site_name')}`,
         description: () =>
           t('seo.carpool.description', {
             name: editionName,

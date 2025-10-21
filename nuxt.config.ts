@@ -16,6 +16,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
+      titleTemplate: '%s | Juggling Convention',
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/logos/logo-jc.svg' },
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicons/favicon-32x32.png' },

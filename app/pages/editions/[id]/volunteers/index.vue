@@ -313,7 +313,6 @@ watch(
 
       useSeoMeta({
         title: () => t('seo.volunteers.title', { name: editionName }),
-        titleTemplate: () => `%s | ${t('seo.site_name')}`,
         description: () =>
           t('seo.volunteers.description', {
             name: editionName,

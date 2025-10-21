@@ -212,9 +212,10 @@ import { useFavoritesEditionsStore } from '~/stores/favoritesEditions'
 // SEO - Métadonnées de la page d'accueil
 const { t, locale } = useI18n()
 
+const useRequestURLOrigin = useRequestURL().origin
+
 useSeoMeta({
   title: () => t('seo.homepage.title'),
-  titleTemplate: () => `%s | ${t('seo.site_name')}`,
   description: () => t('seo.homepage.description'),
   keywords: () => t('seo.homepage.keywords'),
   ogTitle: () => t('seo.homepage.og_title'),
@@ -231,12 +232,12 @@ useSchemaOrg([
   defineWebSite({
     name: () => t('seo.site_name'),
     description: () => t('seo.site_description'),
-    url: () => useRequestURL().origin,
+    url: () => useRequestURLOrigin,
     inLanguage: () => locale.value,
     potentialAction: [
       {
         '@type': 'SearchAction',
-        target: () => `${useRequestURL().origin}/?name={search_term_string}`,
+        target: () => `${useRequestURLOrigin}/?name={search_term_string}`,
         'query-input': 'required name=search_term_string',
         description: () => t('seo.search_action.description'),
         name: () => t('seo.search_action.name'),
@@ -247,8 +248,8 @@ useSchemaOrg([
     name: 'Juggling Convention',
     alternateName: 'Convention de Jonglerie',
     description: () => t('seo.organization.description'),
-    url: () => useRequestURL().origin,
-    logo: () => `${useRequestURL().origin}/logos/logo-jc.svg`,
+    url: () => useRequestURLOrigin,
+    logo: () => `${useRequestURLOrigin}/logos/logo-jc.svg`,
     foundingDate: '2024',
     organizationType: 'Organization',
     knowsAbout: [

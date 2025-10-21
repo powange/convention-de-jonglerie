@@ -338,6 +338,8 @@ const editionId = parseInt(route.params.id as string)
 const showImageOverlay = ref(false)
 const { getImageUrl } = useImageUrl()
 
+const useRequestURLOrigin = useRequestURL().origin
+
 // (Bloc bénévolat déplacé dans la page volunteers.vue)
 
 // Charger l'édition côté serveur ET client pour SSR/SEO
@@ -387,9 +389,8 @@ const editionDateRange = computed(() =>
 // Définir les métadonnées pour SSR
 // Après await useFetch, passer directement les computed (sans arrow functions) à useSeoMeta
 // Solution de: https://github.com/nuxt/nuxt/issues/23470#issuecomment-1741174856
-const seoTitle = computed(
-  () => `${t('seo.edition.title', { name: editionName.value })} | ${t('seo.site_name')}`
-)
+// Note: Le module @nuxtjs/seo ajoute automatiquement ogSiteName au titre, donc on ne l'ajoute pas ici
+const seoTitle = computed(() => editionName.value)
 const seoDescription = computed(() =>
   t('seo.edition.description', {
     name: editionName.value,
@@ -450,14 +451,14 @@ useSchemaOrg([
           }
         : undefined,
     image: () => (editionImageUrl.value ? [editionImageUrl.value] : undefined),
-    url: () => `${useRequestURL().origin}/editions/${edition.value?.id || editionId}`,
+    url: () => `${useRequestURLOrigin}/editions/${edition.value?.id || editionId}`,
     eventStatus: () =>
       edition.value?.status === 'published' ? 'EventScheduled' : 'EventCancelled',
     organizer: () => ({
       '@type': 'Organization',
       name: conventionName.value,
       url: edition.value?.convention
-        ? `${useRequestURL().origin}/conventions/${edition.value.convention.id}`
+        ? `${useRequestURLOrigin}/conventions/${edition.value.convention.id}`
         : undefined,
     }),
     offers: () =>
