@@ -108,6 +108,7 @@ import { useRoute } from 'vue-router'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition } from '~/types'
+import { getEditionDisplayName } from '~/utils/editionName'
 
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -357,6 +358,25 @@ const togglePin = async (postId: number, currentPinned: boolean) => {
     await loadPosts()
   }
 }
+
+// Métadonnées SEO avec le nom de l'édition
+const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))
+
+const seoTitle = computed(() => {
+  if (!edition.value) return 'Commentaires'
+  return `Commentaires - ${editionName.value}`
+})
+
+const seoDescription = computed(() => {
+  if (!edition.value) return ''
+  const name = editionName.value
+  return `Lisez les commentaires et avis des participants sur ${name}. Partagez votre expérience et vos impressions sur cette convention de jonglerie.`
+})
+
+useSeoMeta({
+  title: seoTitle,
+  description: seoDescription,
+})
 
 onMounted(async () => {
   await loadPosts()

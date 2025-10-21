@@ -351,14 +351,11 @@ const {
 } = await useFetch<Edition>(`/api/editions/${editionId}`)
 
 // Charger les tiers actifs publics pour le Schema.org (sans authentification requise)
-const { data: tiers } = await useFetch<any[]>(
-  `/api/editions/${editionId}/ticketing/tiers/public`,
-  {
-    // Charger côté serveur pour le SEO
-    server: true,
-    lazy: true,
-  }
-)
+const { data: tiers } = await useFetch<any[]>(`/api/editions/${editionId}/ticketing/tiers/public`, {
+  // Charger côté serveur pour le SEO
+  server: true,
+  lazy: true,
+})
 
 // Gestion des erreurs
 if (error.value) {
