@@ -350,6 +350,16 @@ const {
   refresh: refreshEdition,
 } = await useFetch<Edition>(`/api/editions/${editionId}`)
 
+// Charger les tiers actifs publics pour le Schema.org (sans authentification requise)
+const { data: tiers } = await useFetch<any[]>(
+  `/api/editions/${editionId}/ticketing/tiers/public`,
+  {
+    // Charger côté serveur pour le SEO
+    server: true,
+    lazy: true,
+  }
+)
+
 // Gestion des erreurs
 if (error.value) {
   console.error('Failed to fetch edition:', error.value)
@@ -443,17 +453,35 @@ useSchemaOrg([
     startDate: () => edition.value?.startDate || '',
     endDate: () => edition.value?.endDate || '',
     location: () =>
-      edition.value?.location
+      edition.value?.city
         ? {
             '@type': 'Place',
-            name: edition.value.location,
-            address: edition.value.location,
+            name: `${edition.value.city}, ${edition.value.country}`,
+            address: {
+              '@type': 'PostalAddress',
+              streetAddress: [edition.value.addressLine1, edition.value.addressLine2]
+                .filter(Boolean)
+                .join(', '),
+              addressLocality: edition.value.city,
+              addressRegion: edition.value.region || undefined,
+              postalCode: edition.value.postalCode,
+              addressCountry: edition.value.country,
+            },
+            geo:
+              edition.value.latitude && edition.value.longitude
+                ? {
+                    '@type': 'GeoCoordinates',
+                    latitude: edition.value.latitude,
+                    longitude: edition.value.longitude,
+                  }
+                : undefined,
           }
         : undefined,
     image: () => (editionImageUrl.value ? [editionImageUrl.value] : undefined),
     url: () => `${useRequestURLOrigin}/editions/${edition.value?.id || editionId}`,
-    eventStatus: () =>
-      edition.value?.status === 'published' ? 'EventScheduled' : 'EventCancelled',
+    eventStatus: 'EventScheduled',
+    eventAttendanceMode: () =>
+      edition.value?.isOnline ? 'OnlineEventAttendanceMode' : 'OfflineEventAttendanceMode',
     organizer: () => ({
       '@type': 'Organization',
       name: conventionName.value,
@@ -462,13 +490,16 @@ useSchemaOrg([
         : undefined,
     }),
     offers: () =>
-      edition.value?.registrationPrice
-        ? {
+      tiers.value && tiers.value.length > 0
+        ? tiers.value.map((tier: any) => ({
             '@type': 'Offer',
-            price: edition.value.registrationPrice,
+            name: tier.name,
+            price: tier.price,
             priceCurrency: 'EUR',
-            availability: 'InStock',
-          }
+            availability: tier.quota && tier.soldCount >= tier.quota ? 'SoldOut' : 'InStock',
+            validFrom: tier.startDate || edition.value?.startDate,
+            validThrough: tier.endDate || edition.value?.endDate,
+          }))
         : undefined,
   }),
 ])

@@ -117,6 +117,10 @@ export default defineEventHandler(async (event) => {
   const isPublicVolunteersSettings =
     path.match(/^\/api\/editions\/\d+\/volunteers\/settings$/) && requestMethod === 'GET'
 
+  // Public GET route pour les tarifs actifs (pour le SEO Schema.org)
+  const isPublicTiers =
+    path.match(/^\/api\/editions\/\d+\/ticketing\/tiers\/public$/) && requestMethod === 'GET'
+
   if (
     isPublicCarpoolOffers ||
     isPublicCarpoolRequests ||
@@ -124,7 +128,8 @@ export default defineEventHandler(async (event) => {
     isPublicCarpoolRequestComments ||
     isPublicEditionPosts ||
     isPublicVolunteersInfo ||
-    isPublicVolunteersSettings
+    isPublicVolunteersSettings ||
+    isPublicTiers
   ) {
     // Ces routes sont publiques, mais on hydrate tout de même la session si présente
     // pour permettre un rendu conditionnel côté API (ex: téléphone visible si réservation ACCEPTED)
