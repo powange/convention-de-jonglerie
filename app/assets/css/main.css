@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+:root {
+  --ui-container: --spacing(4) auto;
+  --ui-header-height: --spacing(25);
+}
+
 /* Thème Midnight Circus - Override pour le mode sombre */
 
 /* Mode sombre Midnight Circus */
