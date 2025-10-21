@@ -5,7 +5,6 @@ Allow: /privacy-policy
 
 # Exclure les pages privées et d'administration
 Disallow: /admin/
-Disallow: /login
 Disallow: /register
 Disallow: /logout
 Disallow: /verify-email
