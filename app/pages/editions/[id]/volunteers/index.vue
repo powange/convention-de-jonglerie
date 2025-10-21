@@ -282,7 +282,7 @@ import {
   withdrawVolunteerApplication,
 } from '~/utils/volunteer-application-api'
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const { formatDateTimeRange, formatDate } = useDateFormat()
 const toast = useToast()
 const route = useRoute()
@@ -302,47 +302,30 @@ defineExpose({})
 await editionStore.fetchEditionById(editionId)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
-// SEO - Métadonnées pour la page bénévolat
-watch(
-  edition,
-  (newEdition) => {
-    if (newEdition) {
-      const editionName = getEditionDisplayName(newEdition)
-      const conventionName = newEdition.convention?.name || ''
-      const dateRange = formatDateTimeRange(newEdition.startDate, newEdition.endDate)
+// Métadonnées SEO avec le nom de l'édition
+const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))
 
-      useSeoMeta({
-        title: () => t('seo.volunteers.title', { name: editionName }),
-        description: () =>
-          t('seo.volunteers.description', {
-            name: editionName,
-            date: dateRange,
-            location: newEdition.location || '',
-          }),
-        keywords: () =>
-          t('seo.volunteers.keywords', {
-            convention: conventionName,
-            location: newEdition.location || '',
-          }),
-        ogTitle: () => t('seo.volunteers.og_title', { name: editionName }),
-        ogDescription: () =>
-          t('seo.volunteers.og_description', {
-            name: editionName,
-            date: dateRange,
-          }),
-        ogType: 'website',
-        ogLocale: () => locale.value,
-        twitterCard: 'summary',
-        twitterTitle: () => t('seo.volunteers.twitter_title', { name: editionName }),
-        twitterDescription: () =>
-          t('seo.volunteers.twitter_description', {
-            name: editionName,
-          }),
-      })
-    }
-  },
-  { immediate: true }
+const editionDateRange = computed(() =>
+  edition.value ? formatDateTimeRange(edition.value.startDate, edition.value.endDate) : ''
 )
+
+const seoTitle = computed(() => {
+  if (!edition.value) return 'Bénévolat'
+  return `Bénévolat - ${editionName.value}`
+})
+
+const seoDescription = computed(() => {
+  if (!edition.value) return ''
+  const name = editionName.value
+  const date = editionDateRange.value
+  const location = edition.value.city || ''
+  return `Rejoignez l'équipe de bénévoles pour ${name}. Participez à l'organisation de cet événement de jonglerie ${date} à ${location}.`
+})
+
+useSeoMeta({
+  title: seoTitle,
+  description: seoDescription,
+})
 
 // Condition pour réduire la description (maintenant toujours false pour afficher entièrement)
 const shouldReduceDescription = computed(() => {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="editionStore.loading">
+    <div v-if="editionLoading">
       <p>{{ $t('editions.loading_details') }}</p>
     </div>
     <div v-else-if="!edition">
@@ -17,72 +17,41 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
-// Auto-imported: EditionCarpoolSection
 import { useEditionStore } from '~/stores/editions'
+import type { Edition } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
-
-// TODO: Ajouter le middleware d'authentification plus tard
-// definePageMeta({
-//   middleware: 'auth-protected'
-// });
 
 const route = useRoute()
 const editionStore = useEditionStore()
-const { t, locale } = useI18n()
 const { formatDateTimeRange } = useDateFormat()
 
 const editionId = parseInt(route.params.id as string)
-const edition = computed(() => editionStore.getEditionById(editionId))
 
-// Charger l'édition si pas encore dans le store
-onMounted(async () => {
-  try {
-    await editionStore.fetchEditionById(editionId, { force: true })
-  } catch (error) {
-    console.error('Failed to fetch edition:', error)
-  }
-})
+// Charger l'édition côté serveur ET client pour SSR/SEO
+const {
+  data: edition,
+  pending: editionLoading,
+  error,
+} = await useFetch<Edition>(`/api/editions/${editionId}`)
 
-// SEO - Métadonnées pour la page covoiturage
+// Gestion des erreurs
+if (error.value) {
+  console.error('Failed to fetch edition:', error.value)
+  throw createError({
+    statusCode: error.value.statusCode || 404,
+    statusMessage: error.value.statusMessage || 'Edition not found',
+  })
+}
+
+// Synchroniser le store avec les données useFetch pour la compatibilité avec les autres pages
 watch(
   edition,
   (newEdition) => {
     if (newEdition) {
-      const editionName = getEditionDisplayName(newEdition)
-      const conventionName = newEdition.convention?.name || ''
-      const dateRange = formatDateTimeRange(newEdition.startDate, newEdition.endDate)
-
-      useSeoMeta({
-        title: () => t('seo.carpool.title', { name: editionName }),
-        description: () =>
-          t('seo.carpool.description', {
-            name: editionName,
-            date: dateRange,
-            location: newEdition.location || '',
-          }),
-        keywords: () =>
-          t('seo.carpool.keywords', {
-            convention: conventionName,
-            location: newEdition.location || '',
-          }),
-        ogTitle: () => t('seo.carpool.og_title', { name: editionName }),
-        ogDescription: () =>
-          t('seo.carpool.og_description', {
-            name: editionName,
-            date: dateRange,
-          }),
-        ogType: 'website',
-        ogLocale: () => locale.value,
-        twitterCard: 'summary',
-        twitterTitle: () => t('seo.carpool.twitter_title', { name: editionName }),
-        twitterDescription: () =>
-          t('seo.carpool.twitter_description', {
-            name: editionName,
-          }),
-      })
+      editionStore.setEdition(newEdition)
     }
   },
   { immediate: true }
@@ -94,13 +63,28 @@ const highlightOfferId = computed(() => {
   return offerId ? parseInt(offerId as string) : null
 })
 
-onMounted(async () => {
-  if (!edition.value) {
-    try {
-      await editionStore.fetchEditionById(editionId)
-    } catch (error) {
-      console.error('Failed to fetch edition:', error)
-    }
-  }
+// Métadonnées SEO avec le nom de l'édition
+const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))
+
+const editionDateRange = computed(() =>
+  edition.value ? formatDateTimeRange(edition.value.startDate, edition.value.endDate) : ''
+)
+
+const seoTitle = computed(() => {
+  if (!edition.value) return 'Covoiturage'
+  return `Covoiturage - ${editionName.value}`
+})
+
+const seoDescription = computed(() => {
+  if (!edition.value) return ''
+  const name = editionName.value
+  const date = editionDateRange.value
+  const location = edition.value.location || ''
+  return `Organisez votre covoiturage pour ${name}. Trouvez des compagnons de route ou proposez vos places libres pour ${date} à ${location}.`
+})
+
+useSeoMeta({
+  title: seoTitle,
+  description: seoDescription,
 })
 </script>
