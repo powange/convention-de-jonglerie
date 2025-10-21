@@ -79,7 +79,7 @@ const seoDescription = computed(() => {
   if (!edition.value) return ''
   const name = editionName.value
   const date = editionDateRange.value
-  const location = edition.value.location || ''
+  const location = edition.value.city || ''
   return `Organisez votre covoiturage pour ${name}. Trouvez des compagnons de route ou proposez vos places libres pour ${date} à ${location}.`
 })
 
