@@ -348,7 +348,6 @@ export default defineNuxtConfig({
     // Exclure certaines routes du sitemap
     exclude: [
       '/admin/**',
-      '/login',
       '/register',
       '/logout',
       '/verify-email',
