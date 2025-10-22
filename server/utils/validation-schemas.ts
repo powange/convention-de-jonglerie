@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { SUPPORTED_LOCALE_CODES } from '~/utils/locales'
+
 // Schémas de base réutilisables
 export const emailSchema = z.string().email('Email invalide').min(1, 'Email requis')
 export const passwordSchema = z
@@ -72,10 +74,7 @@ export const updateProfileSchema = z.object({
   profilePicture: z.string().nullable().optional(),
   preferredLanguage: z
     .string()
-    .refine(
-      (val) => ['fr', 'en', 'de', 'es', 'it', 'nl', 'pl', 'pt', 'ru', 'uk', 'da'].includes(val),
-      'Langue non supportée'
-    )
+    .refine((val) => SUPPORTED_LOCALE_CODES.includes(val as any), 'Langue non supportée')
     .optional(),
 })
 
@@ -285,8 +284,7 @@ export const carpoolOfferSchema = z.object({
     .min(1, 'Au moins 1 place disponible')
     .max(8, 'Maximum 8 places'),
   direction: z.enum(['TO_EVENT', 'FROM_EVENT'], {
-    required_error: 'Direction requise',
-    invalid_type_error: 'Direction invalide',
+    message: 'Direction invalide',
   }),
   description: z.string().max(500, 'La description ne peut pas dépasser 500 caractères').optional(),
   phoneNumber: phoneSchema,
@@ -305,8 +303,7 @@ export const carpoolRequestSchema = z.object({
     .max(8, 'Maximum 8 personnes')
     .default(1),
   direction: z.enum(['TO_EVENT', 'FROM_EVENT'], {
-    required_error: 'Direction requise',
-    invalid_type_error: 'Direction invalide',
+    message: 'Direction invalide',
   }),
   description: z.string().max(500, 'La description ne peut pas dépasser 500 caractères').optional(),
   phoneNumber: phoneSchema,

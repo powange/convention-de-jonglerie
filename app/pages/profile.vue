@@ -902,6 +902,7 @@ import { z } from 'zod'
 
 import { useAuthStore } from '~/stores/auth'
 import type { HttpError, User } from '~/types'
+import { LOCALES_CONFIG } from '~/utils/locales'
 
 // Protéger cette page avec le middleware d'authentification
 definePageMeta({
@@ -957,20 +958,11 @@ const notificationPreferences = reactive({
 
 const notificationPreferencesLoading = ref(false)
 
-// Options de langues disponibles
-const languageOptions = [
-  { value: 'fr', label: 'Français' },
-  { value: 'en', label: 'English' },
-  { value: 'de', label: 'Deutsch' },
-  { value: 'es', label: 'Español' },
-  { value: 'it', label: 'Italiano' },
-  { value: 'nl', label: 'Nederlands' },
-  { value: 'pl', label: 'Polski' },
-  { value: 'pt', label: 'Português' },
-  { value: 'ru', label: 'Русский' },
-  { value: 'uk', label: 'Українська' },
-  { value: 'da', label: 'Dansk' },
-]
+// Options de langues disponibles (basées sur la configuration centralisée)
+const languageOptions = LOCALES_CONFIG.map((locale) => ({
+  value: locale.code,
+  label: locale.name,
+}))
 
 // Schéma de validation pour le profil
 const schema = z.object({

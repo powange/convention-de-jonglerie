@@ -233,7 +233,8 @@ export default defineEventHandler(async (event) => {
     const acceptLanguage = getHeader(event, 'accept-language') || 'fr'
     const preferredLanguage = acceptLanguage.split(',')[0].split('-')[0].toLowerCase()
     // Langues supportées
-    const supportedLanguages = ['fr', 'en', 'de', 'es', 'it', 'nl', 'pl', 'pt', 'ru', 'uk', 'da']
+    const { SUPPORTED_LOCALE_CODES } = await import('~/utils/locales')
+    const supportedLanguages = [...SUPPORTED_LOCALE_CODES]
     const userLanguage = supportedLanguages.includes(preferredLanguage) ? preferredLanguage : 'fr'
 
     // Créer l'utilisateur sans mot de passe

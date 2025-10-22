@@ -208,6 +208,7 @@ import { useTranslatedConventionServices } from '~/composables/useConventionServ
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { useFavoritesEditionsStore } from '~/stores/favoritesEditions'
+import { SUPPORTED_LOCALE_CODES } from '~/utils/locales'
 
 // SEO - Métadonnées de la page d'accueil
 const { t, locale } = useI18n()
@@ -265,7 +266,7 @@ useSchemaOrg([
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'Customer Service',
-      availableLanguage: ['fr', 'en', 'de', 'es', 'it', 'nl', 'pl', 'pt', 'ru', 'uk', 'da'],
+      availableLanguage: SUPPORTED_LOCALE_CODES,
     },
     address: {
       '@type': 'PostalAddress',

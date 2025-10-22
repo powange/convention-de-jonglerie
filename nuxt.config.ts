@@ -1,6 +1,8 @@
 import vue from '@vitejs/plugin-vue'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
+import { LOCALES_CONFIG, DEFAULT_LOCALE } from './app/utils/locales'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -11,7 +13,7 @@ export default defineNuxtConfig({
     name: 'Juggling Convention',
     description:
       'Find and manage your favorite juggling conventions. Collaborative platform for jugglers and event organizers.',
-    defaultLocale: 'en',
+    defaultLocale: DEFAULT_LOCALE,
   },
 
   app: {
@@ -94,158 +96,14 @@ export default defineNuxtConfig({
   },
   i18n: {
     lazy: true, // Activer le lazy loading
-    defaultLocale: 'en',
-    locales: [
-      {
-        code: 'en',
-        name: 'English',
-        files: [
-          'en/common.json',
-          'en/notifications.json',
-          'en/components.json',
-          'en/app.json',
-          'en/public.json',
-        ],
-      },
-      {
-        code: 'da',
-        name: 'Dansk',
-        files: [
-          'da/common.json',
-          'da/notifications.json',
-          'da/components.json',
-          'da/app.json',
-          'da/public.json',
-        ],
-      },
-      {
-        code: 'de',
-        name: 'Deutsch',
-        files: [
-          'de/common.json',
-          'de/notifications.json',
-          'de/components.json',
-          'de/app.json',
-          'de/public.json',
-        ],
-      },
-      {
-        code: 'es',
-        name: 'Español',
-        files: [
-          'es/common.json',
-          'es/notifications.json',
-          'es/components.json',
-          'es/app.json',
-          'es/public.json',
-        ],
-      },
-      {
-        code: 'fr',
-        name: 'Français',
-        files: [
-          'fr/common.json',
-          'fr/notifications.json',
-          'fr/components.json',
-          'fr/app.json',
-          'fr/public.json',
-        ],
-      },
-      {
-        code: 'it',
-        name: 'Italiano',
-        files: [
-          'it/common.json',
-          'it/notifications.json',
-          'it/components.json',
-          'it/app.json',
-          'it/public.json',
-        ],
-      },
-      {
-        code: 'nl',
-        name: 'Nederlands',
-        files: [
-          'nl/common.json',
-          'nl/notifications.json',
-          'nl/components.json',
-          'nl/app.json',
-          'nl/public.json',
-        ],
-      },
-      {
-        code: 'pl',
-        name: 'Polski',
-        files: [
-          'pl/common.json',
-          'pl/notifications.json',
-          'pl/components.json',
-          'pl/app.json',
-          'pl/public.json',
-        ],
-      },
-      {
-        code: 'pt',
-        name: 'Português',
-        files: [
-          'pt/common.json',
-          'pt/notifications.json',
-          'pt/components.json',
-          'pt/app.json',
-          'pt/public.json',
-        ],
-      },
-      {
-        code: 'ru',
-        name: 'Русский',
-        files: [
-          'ru/common.json',
-          'ru/notifications.json',
-          'ru/components.json',
-          'ru/app.json',
-          'ru/public.json',
-        ],
-      },
-      {
-        code: 'uk',
-        name: 'Українська',
-        files: [
-          'uk/common.json',
-          'uk/notifications.json',
-          'uk/components.json',
-          'uk/app.json',
-          'uk/public.json',
-        ],
-      },
-      {
-        code: 'cs',
-        name: 'Čeština',
-        files: [
-          'cs/common.json',
-          'cs/notifications.json',
-          'cs/components.json',
-          'cs/app.json',
-          'cs/public.json',
-        ],
-      },
-      {
-        code: 'sv',
-        name: 'Svenska',
-        files: [
-          'sv/common.json',
-          'sv/notifications.json',
-          'sv/components.json',
-          'sv/app.json',
-          'sv/public.json',
-        ],
-      },
-    ],
+    defaultLocale: DEFAULT_LOCALE,
+    locales: LOCALES_CONFIG as any, // Cast nécessaire pour la compatibilité avec @nuxtjs/i18n
     langDir: 'locales/',
     compilation: {
       strictMessage: false,
       escapeHtml: false,
     },
-    strategy: 'no_prefix',
+    strategy: 'prefix_except_default',
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'i18n_redirected',
