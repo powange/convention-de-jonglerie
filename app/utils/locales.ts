@@ -223,23 +223,27 @@ export function getLocaleName(code: string): string | undefined {
 }
 
 /**
+ * Mapping des codes de langues vers les classes CSS des drapeaux (flag-icons)
+ */
+const FLAG_MAP: Record<string, string> = {
+  en: 'fi fi-gb',
+  da: 'fi fi-dk',
+  de: 'fi fi-de',
+  es: 'fi fi-es',
+  fr: 'fi fi-fr',
+  it: 'fi fi-it',
+  nl: 'fi fi-nl',
+  pl: 'fi fi-pl',
+  pt: 'fi fi-pt',
+  ru: 'fi fi-ru',
+  uk: 'fi fi-ua',
+  cs: 'fi fi-cz',
+  sv: 'fi fi-se',
+} as const
+
+/**
  * Retourne le flag d'une locale à partir de son code
  */
 export function languageCodeToFlag(code: string): string | undefined {
-  const flags: Record<string, string> = {
-    en: 'fi fi-gb',
-    da: 'fi fi-dk',
-    de: 'fi fi-de',
-    es: 'fi fi-es',
-    fr: 'fi fi-fr',
-    it: 'fi fi-it',
-    nl: 'fi fi-nl',
-    pl: 'fi fi-pl',
-    pt: 'fi fi-pt',
-    ru: 'fi fi-ru',
-    uk: 'fi fi-ua',
-    cs: 'fi fi-cz',
-    sv: 'fi fi-se',
-  }
-  return flags[code]
+  return FLAG_MAP[code]
 }

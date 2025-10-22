@@ -106,6 +106,7 @@ export default defineNuxtConfig({
           'cs/components.json',
           'cs/app.json',
           'cs/public.json',
+          'cs/feedback.json',
         ],
       },
       {
@@ -118,6 +119,7 @@ export default defineNuxtConfig({
           'da/components.json',
           'da/app.json',
           'da/public.json',
+          'da/feedback.json',
         ],
       },
       {
@@ -130,6 +132,7 @@ export default defineNuxtConfig({
           'de/components.json',
           'de/app.json',
           'de/public.json',
+          'de/feedback.json',
         ],
       },
       {
@@ -142,6 +145,7 @@ export default defineNuxtConfig({
           'en/components.json',
           'en/app.json',
           'en/public.json',
+          'en/feedback.json',
         ],
       },
       {
@@ -154,6 +158,7 @@ export default defineNuxtConfig({
           'es/components.json',
           'es/app.json',
           'es/public.json',
+          'es/feedback.json',
         ],
       },
       {
@@ -166,6 +171,7 @@ export default defineNuxtConfig({
           'fr/components.json',
           'fr/app.json',
           'fr/public.json',
+          'fr/feedback.json',
         ],
       },
       {
@@ -178,6 +184,7 @@ export default defineNuxtConfig({
           'it/components.json',
           'it/app.json',
           'it/public.json',
+          'it/feedback.json',
         ],
       },
       {
@@ -190,6 +197,7 @@ export default defineNuxtConfig({
           'nl/components.json',
           'nl/app.json',
           'nl/public.json',
+          'nl/feedback.json',
         ],
       },
       {
@@ -202,6 +210,7 @@ export default defineNuxtConfig({
           'pl/components.json',
           'pl/app.json',
           'pl/public.json',
+          'pl/feedback.json',
         ],
       },
       {
@@ -214,6 +223,7 @@ export default defineNuxtConfig({
           'pt/components.json',
           'pt/app.json',
           'pt/public.json',
+          'pt/feedback.json',
         ],
       },
       {
@@ -226,6 +236,7 @@ export default defineNuxtConfig({
           'ru/components.json',
           'ru/app.json',
           'ru/public.json',
+          'ru/feedback.json',
         ],
       },
       {
@@ -238,6 +249,7 @@ export default defineNuxtConfig({
           'sv/components.json',
           'sv/app.json',
           'sv/public.json',
+          'sv/feedback.json',
         ],
       },
       {
@@ -250,6 +262,7 @@ export default defineNuxtConfig({
           'uk/components.json',
           'uk/app.json',
           'uk/public.json',
+          'uk/feedback.json',
         ],
       },
     ],
