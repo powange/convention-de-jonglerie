@@ -36,6 +36,7 @@ describe('API Register', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     global.readBody = vi.fn()
+    global.getHeader = vi.fn(() => 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7')
 
     // Réinitialiser les mocks
     mockSendEmail.mockResolvedValue(true)

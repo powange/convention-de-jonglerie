@@ -21,7 +21,9 @@
   - **Avec la commande `/translate-todos`** : Tu DOIS traduire toutes les langues comme demandé dans la commande. Cette commande t'autorise explicitement à traduire.
   - Les autres langues seront synchronisées automatiquement via `/check-i18n` et `/check-translations` en mode [TODO] pour traduction ultérieure.
 - **Structure i18n avec lazy loading** : Les traductions sont organisées par domaine dans `i18n/locales/{langue}/`. Le système utilise un mapping intelligent basé sur la structure du français.
-- Ne commit jamais sans que la commande `/commit-push` ait été demandée
+- **Règle de commit** : Ne commit jamais sans que la commande `/commit-push` ait été demandée
+  - Exception : Si une commande slash (comme `/quality-check`) inclut explicitement `/commit-push` dans son workflow, alors le commit est autorisé
+  - Toujours attendre l'instruction explicite de commit de l'utilisateur ou d'une commande slash qui l'inclut
 
 ## Détails du projet
 

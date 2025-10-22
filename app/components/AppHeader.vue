@@ -1,14 +1,16 @@
 <template>
-  <UHeader :ui="{ title: 'items-center', toggle: 'hidden' }">
+  <UHeader :ui="{ title: '', toggle: 'hidden' }">
     <template #title>
-      <UiLogoJc class="h-16 w-auto text-black dark:text-white" />
-      <span class="ml-2 text-sm sm:text-xl font-bold">{{ $t('app.title') }}</span>
+      <div class="flex flex-col items-start sm:flex-row sm:items-center gap-1 sm:gap-2">
+        <UiLogoJc class="h-16 w-auto text-black dark:text-white" />
+        <span class="text-sm sm:text-xl font-bold">{{ $t('app.title') }}</span>
+      </div>
     </template>
 
     <template #right>
       <ClientOnly>
         <!-- Groupe de boutons superposés sur mobile -->
-        <div class="flex flex-col sm:flex-row gap-1 sm:gap-2">
+        <div class="flex flex-row gap-2">
           <!-- Bouton de bascule clair/sombre -->
           <ClientOnly>
             <UColorModeSwitch size="sm" color="secondary" />
