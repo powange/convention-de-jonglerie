@@ -20,17 +20,23 @@
           <!-- Sélecteur de langue -->
           <UiSelectLanguage />
         </div>
-        
+
         <!-- Navigation principale -->
         <div v-if="authStore.isAuthenticated" class="hidden md:flex items-center gap-2">
-          <UButton icon="i-heroicons-star" size="sm" color="neutral" variant="ghost" to="/favorites">
+          <UButton
+            icon="i-heroicons-star"
+            size="sm"
+            color="neutral"
+            variant="ghost"
+            to="/favorites"
+          >
             {{ $t('navigation.my_favorites') }}
           </UButton>
         </div>
-        
+
         <!-- Centre de notifications (si connecté) -->
         <NotificationsCenter v-if="authStore.isAuthenticated" />
-        
+
         <!-- Dropdown utilisateur ou boutons connexion -->
         <div :key="`auth-section-${authKey}`">
           <UDropdownMenu

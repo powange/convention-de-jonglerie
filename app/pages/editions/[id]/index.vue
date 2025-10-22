@@ -55,20 +55,18 @@
                 <h3 id="about-heading" class="text-lg font-semibold mb-2">
                   {{ $t('editions.about_this_edition') }}
                 </h3>
-                <ClientOnly>
-                  <div
-                    v-if="edition.description && descriptionHtml"
-                    class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
-                    aria-labelledby="about-heading"
-                  >
-                    <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <div v-html="descriptionHtml" />
-                  </div>
-                  <p v-else class="text-gray-700 dark:text-gray-300">
-                    {{ t('editions.no_description_available') }}
-                  </p>
-                </ClientOnly>
+                <div
+                  v-if="edition.description && descriptionHtml"
+                  class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
+                  aria-labelledby="about-heading"
+                >
+                  <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
+                  <!-- eslint-disable-next-line vue/no-v-html -->
+                  <div v-html="descriptionHtml" />
+                </div>
+                <p v-else class="text-gray-700 dark:text-gray-300">
+                  {{ t('editions.no_description_available') }}
+                </p>
               </div>
             </div>
           </UCard>
@@ -505,21 +503,24 @@ useSchemaOrg([
   }),
 ])
 
-// Description en HTML (rendu Markdown)
-const descriptionHtml = computedAsync(async () => {
-  if (!edition.value?.description) {
-    return ''
+// Description en HTML (rendu Markdown) - utilise useAsyncData pour le SSR
+const { data: descriptionHtml } = await useAsyncData(
+  `edition-description-${route.params.id}`,
+  async () => {
+    if (!edition.value?.description) {
+      return ''
+    }
+    return await markdownToHtml(edition.value.description)
   }
-  return await markdownToHtml(edition.value.description)
-}, '')
+)
 
-// Programme en HTML (rendu Markdown)
-const programHtml = computedAsync(async () => {
+// Programme en HTML (rendu Markdown) - utilise useAsyncData pour le SSR
+const { data: programHtml } = await useAsyncData(`edition-program-${route.params.id}`, async () => {
   if (!edition.value?.program) {
     return ''
   }
   return await markdownToHtml(edition.value.program)
-}, '')
+})
 
 const isAttending = computed(() => (_editionId: number) => {
   return edition.value?.attendingUsers?.some((u) => u.id === authStore.user?.id) || false
