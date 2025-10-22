@@ -301,6 +301,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Private keys that are only available on the server
     session: {
+      password: process.env.NUXT_SESSION_PASSWORD || '',
       maxAge: 60 * 60 * 24 * 30, // 30 jours par défaut (peut être overridé par login avec "remember me")
     },
     sessionPassword: process.env.NUXT_SESSION_PASSWORD || '',

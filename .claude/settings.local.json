@@ -137,7 +137,8 @@
       "Bash(npm run format:*)",
       "Bash(npm run test:unit:run:*)",
       "Bash(npm run test:nuxt:run:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "WebFetch(domain:juggling-convention.com)"
     ],
     "deny": [],
     "ask": [],
