@@ -7,52 +7,34 @@
       class="sm:!size-sm"
       :title="$t('footer.language_selector')"
     >
-      <span v-if="currentLanguage?.flag" :class="currentLanguage.flag" class="w-4 h-3" />
+      <span v-if="currentLanguageFlag" :class="currentLanguageFlag" class="w-4 h-3" />
     </UButton>
 
     <!-- Slots pour les drapeaux de chaque langue -->
     <template v-for="lang in locales" :key="lang.code" #[`lang-${lang.code}-leading`]>
-      <span
-        :class="languageConfig[lang.code as keyof typeof languageConfig]?.flag"
-        class="w-4 h-3 shrink-0"
-      />
+      <span :class="languageCodeToFlag(lang.code)" class="w-4 h-3 shrink-0" />
     </template>
   </UDropdownMenu>
 </template>
 
 <script setup lang="ts">
+import { languageCodeToFlag } from '~~/app/utils/locales'
+
 const { locale, locales, setLocale } = useI18n()
 
-// Configuration des langues avec leurs drapeaux
-const languageConfig = {
-  en: { name: 'English', flag: 'fi fi-gb' },
-  da: { name: 'Dansk', flag: 'fi fi-dk' },
-  de: { name: 'Deutsch', flag: 'fi fi-de' },
-  es: { name: 'Español', flag: 'fi fi-es' },
-  fr: { name: 'Français', flag: 'fi fi-fr' },
-  it: { name: 'Italiano', flag: 'fi fi-it' },
-  nl: { name: 'Nederlands', flag: 'fi fi-nl' },
-  pl: { name: 'Polski', flag: 'fi fi-pl' },
-  pt: { name: 'Português', flag: 'fi fi-pt' },
-  ru: { name: 'Русский', flag: 'fi fi-ru' },
-  uk: { name: 'Українська', flag: 'fi fi-ua' },
-  cs: { name: 'Čeština', flag: 'fi fi-cz' },
-  sv: { name: 'Svenska', flag: 'fi fi-se' },
-}
-
 // Langue courante avec son drapeau
-const currentLanguage = computed(() => {
-  return languageConfig[locale.value as keyof typeof languageConfig]
+const currentLanguageFlag = computed(() => {
+  return languageCodeToFlag(locale.value)
 })
 
 // Configuration des items du dropdown de langues
 const languageItems = computed(() => {
   return locales.value.map((lang) => ({
-    label: languageConfig[lang.code as keyof typeof languageConfig]?.name,
+    label: lang.name,
     onSelect: () => changeLanguage(lang.code),
     class: locale.value === lang.code ? 'bg-gray-100 dark:bg-gray-700' : '',
     slot: `lang-${lang.code}`,
-    flagClass: languageConfig[lang.code as keyof typeof languageConfig]?.flag,
+    flagClass: languageCodeToFlag(lang.code),
   }))
 })
 

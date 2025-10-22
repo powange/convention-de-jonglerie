@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const DICTIONARY_FILE = path.join(__dirname, 'translation-dictionary.js')
-const LANGUAGES = ['en', 'es', 'de', 'it', 'nl', 'pl', 'pt', 'ru', 'uk', 'da']
+const LANGUAGES = ['en', 'es', 'de', 'it', 'nl', 'pl', 'pt', 'ru', 'uk', 'da', 'cs', 'sv']
 
 const rl = readline.createInterface({
   input: process.stdin,

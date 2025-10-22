@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { SUPPORTED_LOCALE_CODES } from '~/utils/locales'
+import { getSupportedLocalesCodes } from '~/utils/locales'
 
 // Schémas de base réutilisables
 export const emailSchema = z.string().email('Email invalide').min(1, 'Email requis')
@@ -74,7 +74,7 @@ export const updateProfileSchema = z.object({
   profilePicture: z.string().nullable().optional(),
   preferredLanguage: z
     .string()
-    .refine((val) => SUPPORTED_LOCALE_CODES.includes(val as any), 'Langue non supportée')
+    .refine((val) => getSupportedLocalesCodes().includes(val as any), 'Langue non supportée')
     .optional(),
 })
 

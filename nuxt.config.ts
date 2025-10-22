@@ -1,8 +1,6 @@
 import vue from '@vitejs/plugin-vue'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
-import { LOCALES_CONFIG, DEFAULT_LOCALE } from './app/utils/locales'
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -13,7 +11,7 @@ export default defineNuxtConfig({
     name: 'Juggling Convention',
     description:
       'Find and manage your favorite juggling conventions. Collaborative platform for jugglers and event organizers.',
-    defaultLocale: DEFAULT_LOCALE,
+    defaultLocale: 'en',
   },
 
   app: {
@@ -96,8 +94,165 @@ export default defineNuxtConfig({
   },
   i18n: {
     lazy: true, // Activer le lazy loading
-    defaultLocale: DEFAULT_LOCALE,
-    locales: LOCALES_CONFIG as any, // Cast nécessaire pour la compatibilité avec @nuxtjs/i18n
+    defaultLocale: 'en',
+    locales: [
+      {
+        code: 'cs',
+        language: 'cs',
+        name: 'Čeština',
+        files: [
+          'cs/common.json',
+          'cs/notifications.json',
+          'cs/components.json',
+          'cs/app.json',
+          'cs/public.json',
+        ],
+      },
+      {
+        code: 'da',
+        language: 'da',
+        name: 'Dansk',
+        files: [
+          'da/common.json',
+          'da/notifications.json',
+          'da/components.json',
+          'da/app.json',
+          'da/public.json',
+        ],
+      },
+      {
+        code: 'de',
+        language: 'de',
+        name: 'Deutsch',
+        files: [
+          'de/common.json',
+          'de/notifications.json',
+          'de/components.json',
+          'de/app.json',
+          'de/public.json',
+        ],
+      },
+      {
+        code: 'en',
+        language: 'en',
+        name: 'English',
+        files: [
+          'en/common.json',
+          'en/notifications.json',
+          'en/components.json',
+          'en/app.json',
+          'en/public.json',
+        ],
+      },
+      {
+        code: 'es',
+        language: 'es',
+        name: 'Español',
+        files: [
+          'es/common.json',
+          'es/notifications.json',
+          'es/components.json',
+          'es/app.json',
+          'es/public.json',
+        ],
+      },
+      {
+        code: 'fr',
+        language: 'fr',
+        name: 'Français',
+        files: [
+          'fr/common.json',
+          'fr/notifications.json',
+          'fr/components.json',
+          'fr/app.json',
+          'fr/public.json',
+        ],
+      },
+      {
+        code: 'it',
+        language: 'it',
+        name: 'Italiano',
+        files: [
+          'it/common.json',
+          'it/notifications.json',
+          'it/components.json',
+          'it/app.json',
+          'it/public.json',
+        ],
+      },
+      {
+        code: 'nl',
+        language: 'nl',
+        name: 'Nederlands',
+        files: [
+          'nl/common.json',
+          'nl/notifications.json',
+          'nl/components.json',
+          'nl/app.json',
+          'nl/public.json',
+        ],
+      },
+      {
+        code: 'pl',
+        language: 'pl',
+        name: 'Polski',
+        files: [
+          'pl/common.json',
+          'pl/notifications.json',
+          'pl/components.json',
+          'pl/app.json',
+          'pl/public.json',
+        ],
+      },
+      {
+        code: 'pt',
+        language: 'pt',
+        name: 'Português',
+        files: [
+          'pt/common.json',
+          'pt/notifications.json',
+          'pt/components.json',
+          'pt/app.json',
+          'pt/public.json',
+        ],
+      },
+      {
+        code: 'ru',
+        language: 'ru',
+        name: 'Русский',
+        files: [
+          'ru/common.json',
+          'ru/notifications.json',
+          'ru/components.json',
+          'ru/app.json',
+          'ru/public.json',
+        ],
+      },
+      {
+        code: 'sv',
+        language: 'sv',
+        name: 'Svenska',
+        files: [
+          'sv/common.json',
+          'sv/notifications.json',
+          'sv/components.json',
+          'sv/app.json',
+          'sv/public.json',
+        ],
+      },
+      {
+        code: 'uk',
+        language: 'uk',
+        name: 'Українська',
+        files: [
+          'uk/common.json',
+          'uk/notifications.json',
+          'uk/components.json',
+          'uk/app.json',
+          'uk/public.json',
+        ],
+      },
+    ],
     langDir: 'locales/',
     compilation: {
       strictMessage: false,

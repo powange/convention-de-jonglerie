@@ -202,6 +202,13 @@ export const LOCALES_CONFIG: LocaleConfig[] = [
 export const DEFAULT_LOCALE: SupportedLocaleCode = 'en'
 
 /**
+ * Retourne la liste des codes de langues supportées
+ */
+export function getSupportedLocalesCodes(): readonly SupportedLocaleCode[] {
+  return SUPPORTED_LOCALE_CODES
+}
+
+/**
  * Vérifie si un code de langue est supporté
  */
 export function isSupportedLocale(locale: string): locale is SupportedLocaleCode {
@@ -213,4 +220,26 @@ export function isSupportedLocale(locale: string): locale is SupportedLocaleCode
  */
 export function getLocaleName(code: string): string | undefined {
   return LOCALES_CONFIG.find((l) => l.code === code)?.name
+}
+
+/**
+ * Retourne le flag d'une locale à partir de son code
+ */
+export function languageCodeToFlag(code: string): string | undefined {
+  const flags: Record<string, string> = {
+    en: 'fi fi-gb',
+    da: 'fi fi-dk',
+    de: 'fi fi-de',
+    es: 'fi fi-es',
+    fr: 'fi fi-fr',
+    it: 'fi fi-it',
+    nl: 'fi fi-nl',
+    pl: 'fi fi-pl',
+    pt: 'fi fi-pt',
+    ru: 'fi fi-ru',
+    uk: 'fi fi-ua',
+    cs: 'fi fi-cz',
+    sv: 'fi fi-se',
+  }
+  return flags[code]
 }

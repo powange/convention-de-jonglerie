@@ -17,7 +17,7 @@ const TEMPLATE_PATH = path.join(__dirname, 'translations-config.template.json')
 const OUTPUT_PATH = path.join(__dirname, 'translations-config.json')
 
 // Langues à traiter (sans le français qui est la source)
-const LANGUAGES = ['da', 'de', 'en', 'es', 'it', 'nl', 'pl', 'pt', 'ru', 'uk']
+const LANGUAGES = ['da', 'de', 'en', 'es', 'it', 'nl', 'pl', 'pt', 'ru', 'uk', 'cs', 'sv']
 
 // Mapping des clés vers leurs chemins dans les fichiers de backup
 const KEY_MAPPINGS = {

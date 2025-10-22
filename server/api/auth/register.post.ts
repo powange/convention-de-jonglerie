@@ -37,8 +37,8 @@ export default defineEventHandler(async (event) => {
     const acceptLanguage = getHeader(event, 'accept-language') || 'fr'
     const preferredLanguage = acceptLanguage.split(',')[0].split('-')[0].toLowerCase()
     // Langues supportées
-    const { SUPPORTED_LOCALE_CODES } = await import('~/utils/locales')
-    const supportedLanguages = [...SUPPORTED_LOCALE_CODES]
+    const { getSupportedLocalesCodes } = await import('~/utils/locales')
+    const supportedLanguages = [...getSupportedLocalesCodes()]
     const userLanguage = supportedLanguages.includes(preferredLanguage) ? preferredLanguage : 'fr'
 
     await prisma.user.create({

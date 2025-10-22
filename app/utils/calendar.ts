@@ -68,6 +68,10 @@ export function getCalendarLocale(locale: string): string {
     'uk-UA': 'uk',
     da: 'da',
     'da-DK': 'da',
+    cs: 'cs',
+    'cs-CZ': 'cs',
+    sv: 'sv',
+    'sv-SE': 'sv',
   }
 
   // Recherche exacte
