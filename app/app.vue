@@ -35,6 +35,14 @@ import { computed, onMounted } from 'vue'
 // État de chargement
 const isLoading = ref(true)
 
+// Mettre à jour l'attribut lang du HTML selon la locale active
+const { locale } = useI18n()
+useHead(() => ({
+  htmlAttrs: {
+    lang: locale.value,
+  },
+}))
+
 // Utiliser nextTick pour s'assurer que nous sommes côté client après hydration
 onMounted(async () => {
   // Le plugin auth.client.ts s'occupe maintenant de l'initialisation de l'authentification
