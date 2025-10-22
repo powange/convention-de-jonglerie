@@ -6,72 +6,74 @@
     </template>
 
     <template #right>
-      <!-- Groupe de boutons superposés sur mobile -->
-      <div class="flex flex-col sm:flex-row gap-1 sm:gap-2">
-        <!-- Bouton de bascule clair/sombre -->
-        <ClientOnly>
-          <UColorModeSwitch size="sm" color="secondary" />
-          <template #fallback>
-            <div class="w-6 h-6 sm:w-8 sm:h-8" />
-          </template>
-        </ClientOnly>
+      <ClientOnly>
+        <!-- Groupe de boutons superposés sur mobile -->
+        <div class="flex flex-col sm:flex-row gap-1 sm:gap-2">
+          <!-- Bouton de bascule clair/sombre -->
+          <ClientOnly>
+            <UColorModeSwitch size="sm" color="secondary" />
+            <template #fallback>
+              <div class="w-6 h-6 sm:w-8 sm:h-8" />
+            </template>
+          </ClientOnly>
 
-        <!-- Sélecteur de langue -->
-        <UiSelectLanguage />
-      </div>
-
-      <!-- Navigation principale -->
-      <div v-if="authStore.isAuthenticated" class="hidden md:flex items-center gap-2">
-        <UButton icon="i-heroicons-star" size="sm" color="neutral" variant="ghost" to="/favorites">
-          {{ $t('navigation.my_favorites') }}
-        </UButton>
-      </div>
-
-      <!-- Centre de notifications (si connecté) -->
-      <NotificationsCenter v-if="authStore.isAuthenticated" />
-
-      <!-- Dropdown utilisateur ou boutons connexion -->
-      <div :key="`auth-section-${authKey}`">
-        <UDropdownMenu
-          v-if="authStore.isAuthenticated && authStore.user"
-          :items="userMenuItems"
-          :content="{
-            align: 'end',
-            side: 'bottom',
-            sideOffset: 8,
-          }"
-        >
-          <UButton variant="ghost" color="neutral" class="rounded-full">
-            <div class="flex items-center gap-2">
-              <UiUserAvatar :user="authStore.user" size="md" border />
-              <div class="hidden sm:flex flex-col items-start">
-                <span class="text-sm font-medium">{{ displayName }}</span>
-                <UBadge
-                  v-if="authStore.isAdminModeActive"
-                  color="warning"
-                  variant="soft"
-                  size="xs"
-                  class="px-1"
-                >
-                  👑 Admin
-                </UBadge>
-              </div>
-              <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 text-gray-400" />
-            </div>
+          <!-- Sélecteur de langue -->
+          <UiSelectLanguage />
+        </div>
+        
+        <!-- Navigation principale -->
+        <div v-if="authStore.isAuthenticated" class="hidden md:flex items-center gap-2">
+          <UButton icon="i-heroicons-star" size="sm" color="neutral" variant="ghost" to="/favorites">
+            {{ $t('navigation.my_favorites') }}
           </UButton>
-        </UDropdownMenu>
+        </div>
+        
+        <!-- Centre de notifications (si connecté) -->
+        <NotificationsCenter v-if="authStore.isAuthenticated" />
+        
+        <!-- Dropdown utilisateur ou boutons connexion -->
+        <div :key="`auth-section-${authKey}`">
+          <UDropdownMenu
+            v-if="authStore.isAuthenticated && authStore.user"
+            :items="userMenuItems"
+            :content="{
+              align: 'end',
+              side: 'bottom',
+              sideOffset: 8,
+            }"
+          >
+            <UButton variant="ghost" color="neutral" class="rounded-full">
+              <div class="flex items-center gap-2">
+                <UiUserAvatar :user="authStore.user" size="md" border />
+                <div class="hidden sm:flex flex-col items-start">
+                  <span class="text-sm font-medium">{{ displayName }}</span>
+                  <UBadge
+                    v-if="authStore.isAdminModeActive"
+                    color="warning"
+                    variant="soft"
+                    size="xs"
+                    class="px-1"
+                  >
+                    👑 Admin
+                  </UBadge>
+                </div>
+                <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 text-gray-400" />
+              </div>
+            </UButton>
+          </UDropdownMenu>
 
-        <!-- Bouton connexion unique pour utilisateurs non connectés -->
-        <UButton
-          v-else
-          :label="$t('navigation.login')"
-          icon="i-heroicons-key"
-          size="sm"
-          color="neutral"
-          variant="ghost"
-          :to="loginUrl"
-        />
-      </div>
+          <!-- Bouton connexion unique pour utilisateurs non connectés -->
+          <UButton
+            v-else
+            :label="$t('navigation.login')"
+            icon="i-heroicons-key"
+            size="sm"
+            color="neutral"
+            variant="ghost"
+            :to="loginUrl"
+          />
+        </div>
+      </ClientOnly>
     </template>
   </UHeader>
 </template>
