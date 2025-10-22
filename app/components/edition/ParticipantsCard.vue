@@ -11,13 +11,15 @@
         </div>
 
         <!-- Checkbox "Je participe" -->
-        <div v-if="isAuthenticated" class="flex items-center gap-2">
-          <UCheckbox
-            :model-value="isAttending"
-            :label="$t('editions.i_attend')"
-            @update:model-value="$emit('toggle-attendance')"
-          />
-        </div>
+        <ClientOnly>
+          <div v-if="isAuthenticated" class="flex items-center gap-2">
+            <UCheckbox
+              :model-value="isAttending"
+              :label="$t('editions.i_attend')"
+              @update:model-value="$emit('toggle-attendance')"
+            />
+          </div>
+        </ClientOnly>
       </div>
     </template>
 

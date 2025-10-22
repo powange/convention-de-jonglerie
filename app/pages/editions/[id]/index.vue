@@ -55,18 +55,20 @@
                 <h3 id="about-heading" class="text-lg font-semibold mb-2">
                   {{ $t('editions.about_this_edition') }}
                 </h3>
-                <div
-                  v-if="edition.description && descriptionHtml"
-                  class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
-                  aria-labelledby="about-heading"
-                >
-                  <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
-                  <!-- eslint-disable-next-line vue/no-v-html -->
-                  <div v-html="descriptionHtml" />
-                </div>
-                <p v-else class="text-gray-700 dark:text-gray-300">
-                  {{ t('editions.no_description_available') }}
-                </p>
+                <ClientOnly>
+                  <div
+                    v-if="edition.description && descriptionHtml"
+                    class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
+                    aria-labelledby="about-heading"
+                  >
+                    <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
+                    <!-- eslint-disable-next-line vue/no-v-html -->
+                    <div v-html="descriptionHtml" />
+                  </div>
+                  <p v-else class="text-gray-700 dark:text-gray-300">
+                    {{ t('editions.no_description_available') }}
+                  </p>
+                </ClientOnly>
               </div>
             </div>
           </UCard>
@@ -260,7 +262,9 @@
           </UCard>
 
           <!-- Mon billet (si l'utilisateur est connecté et a un billet) -->
-          <EditionMyTicketCard v-if="authStore.isAuthenticated" :edition-id="edition.id" />
+          <ClientOnly>
+            <EditionMyTicketCard v-if="authStore.isAuthenticated" :edition-id="edition.id" />
+          </ClientOnly>
 
           <EditionParticipantsCard
             :participants="edition.attendingUsers"

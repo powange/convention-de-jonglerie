@@ -57,47 +57,49 @@
               </div>
 
               <!-- Actions mobile -->
-              <div v-if="authStore.isAuthenticated" class="sm:hidden flex items-center gap-2">
-                <!-- Bouton favori mobile -->
-                <UButton
-                  :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-                  :color="isFavorited ? 'warning' : 'neutral'"
-                  variant="ghost"
-                  size="sm"
-                  class="flex-shrink-0"
-                  @click="toggleFavorite"
-                />
-              </div>
+              <ClientOnly>
+                <div v-if="authStore.isAuthenticated" class="sm:hidden flex items-center gap-2">
+                  <!-- Bouton favori mobile -->
+                  <UButton
+                    :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+                    :color="isFavorited ? 'warning' : 'neutral'"
+                    variant="ghost"
+                    size="sm"
+                    class="flex-shrink-0"
+                    @click="toggleFavorite"
+                  />
+                </div>
+              </ClientOnly>
             </div>
           </div>
         </div>
 
         <!-- Actions desktop -->
-        <div v-if="authStore.isAuthenticated" class="hidden sm:flex gap-3">
-          <!-- Bouton revendication -->
+        <ClientOnly>
+          <div v-if="authStore.isAuthenticated" class="hidden sm:flex gap-3">
+            <!-- Bouton revendication -->
 
-          <!-- Modale de revendication -->
-          <ConventionClaimModal
-            v-if="canClaimConvention"
-            :convention="edition.convention"
-            @claimed="handleConventionClaimed"
-          />
+            <!-- Modale de revendication -->
+            <ConventionClaimModal
+              v-if="canClaimConvention"
+              :convention="edition.convention"
+              @claimed="handleConventionClaimed"
+            />
 
-          <!-- Bouton favori -->
-          <UButton
-            :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-            :color="isFavorited ? 'warning' : 'neutral'"
-            variant="ghost"
-            size="md"
-            @click="toggleFavorite"
-          >
-            {{ isFavorited ? t('common.added') : t('common.add') }}
-          </UButton>
-        </div>
+            <!-- Bouton favori -->
+            <UButton
+              :icon="isFavorited ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+              :color="isFavorited ? 'warning' : 'neutral'"
+              variant="ghost"
+              size="md"
+              @click="toggleFavorite"
+            >
+              {{ isFavorited ? t('common.added') : t('common.add') }}
+            </UButton>
+          </div>
+        </ClientOnly>
       </div>
     </div>
-
-    <div></div>
 
     <!-- Navigation par onglets -->
     <div class="border-b border-gray-200">
@@ -197,20 +199,22 @@
           <span class="hidden sm:inline">{{ t('editions.lost_found') }}</span>
         </NuxtLink>
 
-        <NuxtLink
-          v-if="canAccess"
-          :to="`/editions/${edition.id}/gestion`"
-          :class="[
-            'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
-            currentPage === 'gestion'
-              ? 'border-primary-500 text-primary-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-          ]"
-          :title="t('editions.management')"
-        >
-          <UIcon name="i-heroicons-cog" :class="['sm:mr-1']" size="24" class="sm:!w-4 sm:!h-4" />
-          <span class="hidden sm:inline">{{ t('editions.management') }}</span>
-        </NuxtLink>
+        <ClientOnly>
+          <NuxtLink
+            v-if="canAccess"
+            :to="`/editions/${edition.id}/gestion`"
+            :class="[
+              'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
+              currentPage === 'gestion'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+            ]"
+            :title="t('editions.management')"
+          >
+            <UIcon name="i-heroicons-cog" :class="['sm:mr-1']" size="24" class="sm:!w-4 sm:!h-4" />
+            <span class="hidden sm:inline">{{ t('editions.management') }}</span>
+          </NuxtLink>
+        </ClientOnly>
       </nav>
 
       <!-- Titre de la page courante sur mobile -->
