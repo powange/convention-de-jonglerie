@@ -15,6 +15,7 @@ export const useDateFormat = () => {
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      timeZone: 'Europe/Paris',
     })
   }
 
@@ -27,6 +28,7 @@ export const useDateFormat = () => {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
+      timeZone: 'Europe/Paris',
     })
   }
 
@@ -44,14 +46,17 @@ export const useDateFormat = () => {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric',
+          timeZone: 'Europe/Paris',
         }),
         startTime: startDate.toLocaleTimeString(locale.value, {
           hour: '2-digit',
           minute: '2-digit',
+          timeZone: 'Europe/Paris',
         }),
         endTime: endDate.toLocaleTimeString(locale.value, {
           hour: '2-digit',
           minute: '2-digit',
+          timeZone: 'Europe/Paris',
         }),
       })
     }
