@@ -153,6 +153,7 @@ model Edition {
   options                           TicketingOption[]
   orders                            TicketingOrder[]
   volunteerTicketingReturnableItems EditionVolunteerReturnableItem[]
+  tierCustomFields                  TicketingTierCustomField[]
   workshops                         Workshop[]
   workshopLocations                 WorkshopLocation[]
 
@@ -882,9 +883,10 @@ model TicketingQuota {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  edition Edition                @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  tiers   TicketingTierQuota[]
-  options TicketingOptionQuota[]
+  edition      Edition                           @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  tiers        TicketingTierQuota[]
+  options      TicketingOptionQuota[]
+  customFields TicketingTierCustomFieldQuota[]
 
   @@index([editionId])
 }
@@ -896,10 +898,11 @@ model TicketingReturnableItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  edition                           Edition                          @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  edition                           Edition                                   @relation(fields: [editionId], references: [id], onDelete: Cascade)
   tiers                             TicketingTierReturnableItem[]
   options                           TicketingOptionReturnableItem[]
   volunteerTicketingReturnableItems EditionVolunteerReturnableItem[]
+  customFields                      TicketingTierCustomFieldReturnableItem[]
 
   @@index([editionId])
 }
@@ -1125,8 +1128,9 @@ model WorkshopLocation {
 
 model TicketingTierCustomField {
   id                     Int      @id @default(autoincrement())
-  helloAssoCustomFieldId Int // ID du custom field dans HelloAsso
-  externalTicketingId    String // Lien vers la configuration HelloAsso
+  helloAssoCustomFieldId Int? // ID du custom field dans HelloAsso (null si manuel)
+  externalTicketingId    String? // Lien vers la configuration HelloAsso (null si manuel)
+  editionId              Int // Lien direct vers l'édition
   label                  String   @db.Text
   type                   String // YesNo, ChoiceList, TextInput, etc.
   isRequired             Boolean  @default(false)
@@ -1134,11 +1138,15 @@ model TicketingTierCustomField {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
-  externalTicketing ExternalTicketing                     @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  externalTicketing ExternalTicketing?                                @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  edition           Edition                                           @relation(fields: [editionId], references: [id], onDelete: Cascade)
   tiers             TicketingTierCustomFieldAssociation[]
+  quotas            TicketingTierCustomFieldQuota[]
+  returnableItems   TicketingTierCustomFieldReturnableItem[]
 
   @@unique([externalTicketingId, helloAssoCustomFieldId])
   @@index([externalTicketingId])
+  @@index([editionId])
 }
 
 model TicketingTierCustomFieldAssociation {
@@ -1152,4 +1160,34 @@ model TicketingTierCustomFieldAssociation {
   @@unique([tierId, customFieldId])
   @@index([tierId])
   @@index([customFieldId])
+}
+
+// Association custom field -> quota (avec choix optionnel pour ChoiceList)
+model TicketingTierCustomFieldQuota {
+  id            Int     @id @default(autoincrement())
+  customFieldId Int
+  quotaId       Int
+  choiceValue   String? // Si le custom field est de type ChoiceList, le choix spécifique qui déclenche le quota
+
+  customField TicketingTierCustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+  quota       TicketingQuota           @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+
+  @@unique([customFieldId, quotaId, choiceValue])
+  @@index([customFieldId])
+  @@index([quotaId])
+}
+
+// Association custom field -> article à restituer (avec choix optionnel pour ChoiceList)
+model TicketingTierCustomFieldReturnableItem {
+  id               Int     @id @default(autoincrement())
+  customFieldId    Int
+  returnableItemId Int
+  choiceValue      String? // Si le custom field est de type ChoiceList, le choix spécifique qui déclenche la restitution
+
+  customField    TicketingTierCustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+  returnableItem TicketingReturnableItem  @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+
+  @@unique([customFieldId, returnableItemId, choiceValue])
+  @@index([customFieldId])
+  @@index([returnableItemId])
 }

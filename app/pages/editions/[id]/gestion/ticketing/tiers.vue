@@ -105,6 +105,15 @@
             />
           </template>
 
+          <template #customfields>
+            <TicketingCustomFieldsList
+              :custom-fields="customFields"
+              :loading="loadingCustomFields"
+              :edition-id="editionId"
+              @refresh="loadCustomFields"
+            />
+          </template>
+
           <template #quotas>
             <TicketingQuotasList
               :quotas="quotas"
@@ -185,6 +194,10 @@ const lastSync = ref<Date | null>(null)
 const tiers = ref<any[]>([])
 const options = ref<any[]>([])
 
+// Custom fields
+const loadingCustomFields = ref(true)
+const customFields = ref<any[]>([])
+
 // Quotas
 const loadingQuotas = ref(true)
 const quotas = ref<any[]>([])
@@ -228,6 +241,13 @@ const tabs = computed(() => [
     badge: options.value.length,
   },
   {
+    label: 'Champs personnalisés',
+    icon: 'i-heroicons-document-text',
+    slot: 'customfields',
+    value: 'customfields',
+    badge: customFields.value.length,
+  },
+  {
     label: 'Quotas',
     icon: 'i-heroicons-chart-bar',
     slot: 'quotas',
@@ -255,6 +275,7 @@ onMounted(async () => {
 
   if (canAccess.value) {
     await loadData()
+    await loadCustomFields()
     await loadQuotas()
     await loadReturnableItems()
     await loadVolunteerReturnableItems()
@@ -299,6 +320,17 @@ const loadOptions = async () => {
   }
 }
 
+const loadCustomFields = async () => {
+  loadingCustomFields.value = true
+  try {
+    customFields.value = await $fetch(`/api/editions/${editionId}/ticketing/custom-fields`)
+  } catch (error) {
+    console.error('Failed to load custom fields:', error)
+  } finally {
+    loadingCustomFields.value = false
+  }
+}
+
 const refreshData = async () => {
   if (refreshing.value) return
 
@@ -311,10 +343,11 @@ const refreshData = async () => {
 
     // Recharger les données
     await loadData()
+    await loadCustomFields()
 
     toast.add({
       title: 'Données actualisées',
-      description: 'Les tarifs et options ont été synchronisés avec succès',
+      description: 'Les tarifs, options et champs personnalisés ont été synchronisés avec succès',
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
@@ -405,6 +438,7 @@ const loadVolunteerReturnableItems = async () => {
 watch(canAccess, async (newValue, oldValue) => {
   if (newValue && !oldValue) {
     await loadData()
+    await loadCustomFields()
     await loadQuotas()
     await loadReturnableItems()
     await loadVolunteerReturnableItems()

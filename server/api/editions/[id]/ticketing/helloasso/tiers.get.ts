@@ -169,6 +169,7 @@ export default defineEventHandler(async (event) => {
                 create: {
                   externalTicketingId: config.id,
                   helloAssoCustomFieldId: customField.id,
+                  editionId: editionId,
                   label: customField.label,
                   type: customField.type,
                   isRequired: customField.isRequired,
