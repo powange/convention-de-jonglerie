@@ -261,6 +261,13 @@ export async function getHelloAssoTiersAndOptions(
   // 3. Extraire les tarifs
   const tiers = formResponse.tiers || []
 
+  // 3.1 Extraire les custom fields du formulaire (champs globaux)
+  const formCustomFields = formResponse.customFields || []
+  console.log(
+    `🎫 [HelloAsso] Found ${formCustomFields.length} custom fields at form level`,
+    JSON.stringify(formCustomFields, null, 2)
+  )
+
   // 4. Extraire les options depuis extraOptions de chaque tier
   const allOptionsMap = new Map<number | string, HelloAssoExtraOption>()
 
@@ -280,16 +287,23 @@ export async function getHelloAssoTiersAndOptions(
   console.log(`Found ${tiers.length} tiers and ${options.length} extra options`)
 
   // 5. Formater les données pour le frontend
-  const formattedTiers = tiers.map((tier: HelloAssoTier) => ({
-    id: tier.id,
-    name: tier.label || tier.name || '',
-    description: tier.description,
-    // HelloAsso utilise minAmount comme prix de base, price n'est pas toujours présent
-    price: tier.price ?? tier.minAmount ?? 0,
-    minAmount: tier.minAmount,
-    maxAmount: tier.maxAmount,
-    isActive: tier.isActive ?? true, // Actif par défaut si non spécifié
-  }))
+  const formattedTiers = tiers.map((tier: HelloAssoTier) => {
+    // Les custom fields peuvent être soit au niveau du tier, soit hérités du formulaire
+    const tierCustomFields = tier.customFields || formCustomFields
+    console.log(`🎫 [HelloAsso] Tier "${tier.label || tier.name}" has ${tierCustomFields.length} custom fields`)
+
+    return {
+      id: tier.id,
+      name: tier.label || tier.name || '',
+      description: tier.description,
+      // HelloAsso utilise minAmount comme prix de base, price n'est pas toujours présent
+      price: tier.price ?? tier.minAmount ?? 0,
+      minAmount: tier.minAmount,
+      maxAmount: tier.maxAmount,
+      isActive: tier.isActive ?? true, // Actif par défaut si non spécifié
+      customFields: tierCustomFields, // Inclure les custom fields (du tier ou du formulaire)
+    }
+  })
 
   const formattedOptions = options.map((option: HelloAssoExtraOption) => ({
     id: option.id ?? option.name ?? '',
