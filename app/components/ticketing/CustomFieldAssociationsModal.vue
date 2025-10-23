@@ -8,17 +8,41 @@
       <div class="space-y-6">
         <!-- Information sur le custom field -->
         <UAlert icon="i-heroicons-information-circle" color="info" variant="soft">
-          <template #title>Associations par choix</template>
+          <template #title>Associations</template>
           <template #description>
             <div class="space-y-1">
-              <p>Configurez les quotas et articles à restituer pour chaque choix de la liste.</p>
+              <p>
+                Configurez les tarifs, quotas et articles à restituer pour ce champ personnalisé.
+              </p>
               <p class="text-xs">
-                Si vous laissez "Tous les choix", l'association s'appliquera à tous les choix.
-                Sinon, sélectionnez un choix spécifique.
+                Pour les champs de type "Liste de choix", vous pouvez associer par choix spécifique
+                ou pour tous les choix.
               </p>
             </div>
           </template>
         </UAlert>
+
+        <!-- Section Tarifs -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="font-semibold text-gray-900 dark:text-white">Tarifs associés</h4>
+          </div>
+
+          <div v-if="loadingTiers" class="flex justify-center py-4">
+            <UIcon name="i-heroicons-arrow-path" class="h-6 w-6 animate-spin text-primary-500" />
+          </div>
+
+          <UCheckboxGroup
+            v-else-if="availableTiers.length > 0"
+            v-model="selectedTierIds"
+            :items="tierItems"
+            class="space-y-2"
+          />
+
+          <p v-else class="text-sm text-gray-500">Aucun tarif disponible</p>
+        </div>
+
+        <UDivider />
 
         <!-- Section Quotas -->
         <div class="space-y-4">
@@ -200,6 +224,11 @@ interface Quota {
   title: string
 }
 
+interface Tier {
+  id: number
+  name: string
+}
+
 interface ReturnableItem {
   id: number
   name: string
@@ -232,13 +261,24 @@ const isOpen = computed({
 })
 
 const saving = ref(false)
+const loadingTiers = ref(false)
 const loadingQuotas = ref(false)
 const loadingReturnableItems = ref(false)
+const availableTiers = ref<Tier[]>([])
 const availableQuotas = ref<Quota[]>([])
 const availableReturnableItems = ref<ReturnableItem[]>([])
 
+const selectedTierIds = ref<number[]>([])
 const quotaAssociations = ref<QuotaAssociation[]>([])
 const returnableItemAssociations = ref<ReturnableItemAssociation[]>([])
+
+// Items pour le UCheckboxGroup des tarifs
+const tierItems = computed(() =>
+  availableTiers.value.map((tier) => ({
+    label: tier.name,
+    value: tier.id,
+  }))
+)
 
 // Options de choix pour les selects
 const choiceOptions = computed(() => {
@@ -272,6 +312,18 @@ const addReturnableItemAssociation = () => {
 
 const removeReturnableItemAssociation = (index: number) => {
   returnableItemAssociations.value.splice(index, 1)
+}
+
+const loadTiers = async () => {
+  loadingTiers.value = true
+  try {
+    const response = await $fetch(`/api/editions/${props.editionId}/ticketing/tiers/available`)
+    availableTiers.value = response.tiers || []
+  } catch (error) {
+    console.error('Erreur lors du chargement des tarifs:', error)
+  } finally {
+    loadingTiers.value = false
+  }
 }
 
 const loadQuotas = async () => {
@@ -323,6 +375,7 @@ const save = async () => {
       {
         method: 'PUT',
         body: {
+          tierIds: selectedTierIds.value,
           quotas: validQuotas,
           returnableItems: validReturnableItems,
         },
@@ -331,7 +384,7 @@ const save = async () => {
 
     toast.add({
       title: 'Associations mises à jour',
-      description: 'Les associations ont été enregistrées avec succès',
+      description: 'Les tarifs, quotas et articles ont été enregistrés avec succès',
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
@@ -356,7 +409,10 @@ watch(
   () => props.open,
   async (newValue) => {
     if (newValue && props.customField) {
-      await Promise.all([loadQuotas(), loadReturnableItems()])
+      await Promise.all([loadTiers(), loadQuotas(), loadReturnableItems()])
+
+      // Charger les associations de tarifs existantes
+      selectedTierIds.value = props.customField.tiers?.map((t) => t.tier.id) || []
 
       // Charger les associations existantes
       if (props.customField.quotas && props.customField.quotas.length > 0) {

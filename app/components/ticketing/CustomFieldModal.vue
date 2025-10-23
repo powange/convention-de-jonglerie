@@ -76,19 +76,14 @@
             <UIcon name="i-heroicons-arrow-path" class="h-6 w-6 animate-spin text-primary-500" />
           </div>
 
-          <div v-else class="space-y-2">
-            <UCheckbox
-              v-for="tier in availableTiers"
-              :key="tier.id"
-              v-model="selectedTierIds"
-              :value="tier.id"
-              :label="tier.name"
-            />
-          </div>
+          <UCheckboxGroup
+            v-else-if="availableTiers.length > 0"
+            v-model="selectedTierIds"
+            :items="tierItems"
+            class="space-y-2"
+          />
 
-          <p v-if="!loadingTiers && availableTiers.length === 0" class="text-sm text-gray-500">
-            Aucun tarif disponible
-          </p>
+          <p v-else class="text-sm text-gray-500">Aucun tarif disponible</p>
         </div>
 
         <!-- Note pour les associations avancées -->
@@ -181,6 +176,13 @@ const typeOptions = [
   { label: 'Texte long', value: 'FreeText' },
 ]
 
+const tierItems = computed(() =>
+  availableTiers.value.map((tier) => ({
+    label: tier.name,
+    value: tier.id,
+  }))
+)
+
 const isFormValid = computed(() => {
   if (!form.value.label || !form.value.type) return false
   if (form.value.type === 'ChoiceList' && form.value.values.length === 0) return false
@@ -206,7 +208,7 @@ const removeValue = (index: number) => {
 const loadTiers = async () => {
   loadingTiers.value = true
   try {
-    const response = await $fetch(`/api/editions/${props.editionId}/ticketing/tiers/available.get`)
+    const response = await $fetch(`/api/editions/${props.editionId}/ticketing/tiers/available`)
     availableTiers.value = response.tiers || []
   } catch (error) {
     console.error('Erreur lors du chargement des tarifs:', error)

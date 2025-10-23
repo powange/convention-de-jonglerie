@@ -4,6 +4,7 @@ import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
 const bodySchema = z.object({
+  tierIds: z.array(z.number()).optional(),
   quotas: z
     .array(
       z.object({
@@ -50,7 +51,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { quotas, returnableItems } = validation.data
+  const { tierIds, quotas, returnableItems } = validation.data
 
   try {
     // Vérifier que le custom field existe et appartient à l'édition
@@ -73,17 +74,49 @@ export default defineEventHandler(async (event) => {
 
     // Utiliser une transaction pour mettre à jour les associations
     await prisma.$transaction(async (tx) => {
-      // 1. Supprimer toutes les associations existantes pour les quotas
+      // 1. Supprimer toutes les associations existantes pour les tarifs
+      await tx.ticketingTierCustomFieldAssociation.deleteMany({
+        where: { customFieldId },
+      })
+
+      // 2. Créer les nouvelles associations de tarifs
+      if (tierIds && tierIds.length > 0) {
+        for (const tierId of tierIds) {
+          // Vérifier que le tarif existe et appartient à l'édition
+          const existingTier = await tx.ticketingTier.findFirst({
+            where: {
+              id: tierId,
+              editionId,
+            },
+          })
+
+          if (!existingTier) {
+            throw createError({
+              statusCode: 404,
+              message: `Tarif ${tierId} introuvable`,
+            })
+          }
+
+          await tx.ticketingTierCustomFieldAssociation.create({
+            data: {
+              tierId,
+              customFieldId,
+            },
+          })
+        }
+      }
+
+      // 3. Supprimer toutes les associations existantes pour les quotas
       await tx.ticketingTierCustomFieldQuota.deleteMany({
         where: { customFieldId },
       })
 
-      // 2. Supprimer toutes les associations existantes pour les articles à restituer
+      // 4. Supprimer toutes les associations existantes pour les articles à restituer
       await tx.ticketingTierCustomFieldReturnableItem.deleteMany({
         where: { customFieldId },
       })
 
-      // 3. Créer les nouvelles associations de quotas
+      // 5. Créer les nouvelles associations de quotas
       if (quotas && quotas.length > 0) {
         for (const quota of quotas) {
           // Vérifier que le quota existe et appartient à l'édition
@@ -111,7 +144,7 @@ export default defineEventHandler(async (event) => {
         }
       }
 
-      // 4. Créer les nouvelles associations d'articles à restituer
+      // 6. Créer les nouvelles associations d'articles à restituer
       if (returnableItems && returnableItems.length > 0) {
         for (const item of returnableItems) {
           // Vérifier que l'article existe et appartient à l'édition
