@@ -7,6 +7,7 @@ import { z } from 'zod'
 const bodySchema = z.object({
   participantIds: z.array(z.number()).min(1),
   type: z.enum(['ticket', 'volunteer']).optional().default('ticket'),
+  markAsPaid: z.boolean().optional().default(false),
 })
 
 export default defineEventHandler(async (event) => {
@@ -144,6 +145,51 @@ export default defineEventHandler(async (event) => {
           entryValidatedBy: user.id,
         },
       })
+
+      // Si le paiement est confirmé, mettre à jour le statut de la commande et des items
+      if (body.markAsPaid) {
+        // Récupérer les items validés pour obtenir les IDs de commandes
+        const validatedItems = await prisma.ticketingOrderItem.findMany({
+          where: {
+            id: {
+              in: body.participantIds,
+            },
+          },
+          select: {
+            orderId: true,
+            state: true,
+          },
+        })
+
+        // Extraire les IDs uniques des commandes
+        const orderIds = [...new Set(validatedItems.map((item) => item.orderId))]
+
+        // Mettre à jour le statut des commandes de "Pending" à "Onsite"
+        await prisma.ticketingOrder.updateMany({
+          where: {
+            id: {
+              in: orderIds,
+            },
+            status: 'Pending',
+          },
+          data: {
+            status: 'Onsite',
+          },
+        })
+
+        // Mettre à jour le statut des items de "Pending" à "Processed"
+        await prisma.ticketingOrderItem.updateMany({
+          where: {
+            id: {
+              in: body.participantIds,
+            },
+            state: 'Pending',
+          },
+          data: {
+            state: 'Processed',
+          },
+        })
+      }
 
       return {
         success: true,

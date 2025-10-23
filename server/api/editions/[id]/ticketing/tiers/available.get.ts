@@ -1,6 +1,6 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { getEditionTiers } from '@@/server/utils/editions/ticketing/tiers'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
-import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
@@ -17,31 +17,33 @@ export default defineEventHandler(async (event) => {
     })
 
   try {
-    // Récupérer les tarifs depuis la billeterie externe
-    const externalTicketing = await prisma.externalTicketing.findFirst({
-      where: { editionId },
-      select: {
-        id: true,
-        tiers: {
-          select: {
-            id: true,
-            name: true,
-            price: true,
-            description: true,
-          },
-          orderBy: {
-            name: 'asc',
-          },
-        },
-      },
-    })
+    // Récupérer le paramètre de query pour afficher tous les tarifs ou seulement les valides
+    const query = getQuery(event)
+    const showAll = query.showAll === 'true'
 
-    if (!externalTicketing) {
-      return { tiers: [] }
+    // Récupérer tous les tarifs de l'édition
+    const allTiers = await getEditionTiers(editionId)
+
+    // Si showAll est false, filtrer les tarifs par date de validité
+    let tiers = allTiers
+    if (!showAll) {
+      const now = new Date()
+      tiers = allTiers.filter((tier) => {
+        // Si validFrom est défini, vérifier qu'on est après cette date
+        const validFrom = tier.validFrom ? new Date(tier.validFrom) : null
+        const startValid = !validFrom || validFrom <= now
+
+        // Si validUntil est défini, vérifier qu'on est avant cette date
+        const validUntil = tier.validUntil ? new Date(tier.validUntil) : null
+        const endValid = !validUntil || validUntil >= now
+
+        // Le tarif est valide si les deux conditions sont vraies
+        return startValid && endValid
+      })
     }
 
     return {
-      tiers: externalTicketing.tiers,
+      tiers,
     }
   } catch (error: unknown) {
     console.error('Erreur lors de la récupération des tarifs:', error)

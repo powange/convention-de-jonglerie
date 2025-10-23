@@ -497,7 +497,7 @@ const validateTicket = async () => {
   }
 }
 
-const handleValidateParticipants = async (participantIds: number[]) => {
+const handleValidateParticipants = async (participantIds: number[], markAsPaid = false) => {
   try {
     // Appeler l'API pour valider les participants
     await $fetch(`/api/editions/${editionId}/ticketing/validate-entry`, {
@@ -505,6 +505,7 @@ const handleValidateParticipants = async (participantIds: number[]) => {
       body: {
         participantIds,
         type: participantType.value,
+        markAsPaid,
       },
     })
 

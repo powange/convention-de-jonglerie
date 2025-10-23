@@ -26,11 +26,12 @@
           Commandes et participants
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
-          Consultez les commandes importées depuis votre billeterie externe
+          Consultez les commandes importées depuis votre billeterie externe et celles créées
+          manuellement
         </p>
       </div>
 
-      <!-- Message si pas de configuration -->
+      <!-- Message informatif si pas de configuration externe -->
       <UAlert
         v-if="!hasExternalTicketing"
         icon="i-heroicons-information-circle"
@@ -38,12 +39,13 @@
         variant="soft"
         class="mb-6"
       >
-        <template #title>Aucune billeterie externe configurée</template>
+        <template #title>Billeterie externe non configurée</template>
         <template #description>
           <div class="space-y-2">
             <p>
-              Vous devez d'abord connecter une billeterie externe (HelloAsso, etc.) pour importer
-              les commandes.
+              Vous pouvez connecter une billeterie externe (HelloAsso, etc.) pour importer
+              automatiquement les commandes, mais vous pouvez également créer des commandes
+              manuellement via le contrôle d'accès.
             </p>
             <UButton
               :to="`/editions/${edition.id}/gestion/ticketing/external`"
@@ -52,14 +54,14 @@
               size="sm"
               icon="i-heroicons-arrow-right"
             >
-              Configurer une billeterie
+              Configurer une billeterie externe
             </UButton>
           </div>
         </template>
       </UAlert>
 
       <!-- Contenu principal -->
-      <div v-else class="space-y-6">
+      <div class="space-y-6">
         <!-- Stats -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <UCard>
@@ -181,10 +183,24 @@
                     {{ order.payerFirstName }} {{ order.payerLastName }}
                   </h3>
                   <UBadge
-                    :color="order.status === 'Processed' ? 'success' : 'neutral'"
+                    :color="
+                      order.status === 'Processed'
+                        ? 'success'
+                        : order.status === 'Pending'
+                          ? 'warning'
+                          : order.status === 'Onsite'
+                            ? 'info'
+                            : 'neutral'
+                    "
                     variant="soft"
                   >
-                    {{ order.status }}
+                    {{
+                      order.status === 'Pending'
+                        ? 'En attente de paiement'
+                        : order.status === 'Onsite'
+                          ? 'Sur place'
+                          : order.status
+                    }}
                   </UBadge>
                   <img
                     v-if="order.externalTicketing?.provider === 'HELLOASSO'"
@@ -193,6 +209,17 @@
                     class="h-5 w-auto"
                     :title="`Commande provenant de HelloAsso (ID: ${order.helloAssoOrderId})`"
                   />
+                  <UBadge
+                    v-else-if="!order.externalTicketing"
+                    color="purple"
+                    variant="soft"
+                    size="sm"
+                  >
+                    <template #leading>
+                      <UIcon name="i-heroicons-user-plus" class="h-3 w-3" />
+                    </template>
+                    Manuelle
+                  </UBadge>
                 </div>
                 <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                   <div class="flex items-center gap-1">
@@ -473,10 +500,10 @@ const loadData = async () => {
       lastSync.value = configResponse.config?.lastSyncAt
         ? new Date(configResponse.config.lastSyncAt)
         : null
-
-      // Charger les commandes paginées (les stats seront aussi chargées si pas de recherche)
-      await loadOrders()
     }
+
+    // Charger les commandes paginées dans tous les cas (les stats seront aussi chargées si pas de recherche)
+    await loadOrders()
   } catch (error) {
     console.error('Failed to load data:', error)
   }

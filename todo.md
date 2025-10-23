@@ -4,3 +4,5 @@ export du planning bénévoles
 
 Mutualiser la Validation du mot de passe
 faire les tests d'ajout de candidat (utilisateur existant ou création d'utilisateur)
+
+notification 30 min avant un workshop

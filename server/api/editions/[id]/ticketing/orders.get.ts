@@ -23,24 +23,6 @@ export default defineEventHandler(async (event) => {
   const search = (query.search as string) || ''
 
   try {
-    // Récupérer la configuration de billeterie externe
-    const config = await prisma.externalTicketing.findUnique({
-      where: { editionId },
-      select: { id: true },
-    })
-
-    if (!config) {
-      return {
-        orders: [],
-        pagination: {
-          page: 1,
-          limit,
-          total: 0,
-          totalPages: 0,
-        },
-      }
-    }
-
     // Construire la condition de recherche
     const searchCondition = search
       ? {
@@ -64,18 +46,18 @@ export default defineEventHandler(async (event) => {
         }
       : {}
 
-    // Compter le nombre total de commandes
+    // Compter le nombre total de commandes (toutes les commandes de l'édition)
     const total = await prisma.ticketingOrder.count({
       where: {
-        externalTicketingId: config.id,
+        editionId,
         ...searchCondition,
       },
     })
 
-    // Récupérer les commandes paginées
+    // Récupérer les commandes paginées (toutes les commandes de l'édition)
     const orders = await prisma.ticketingOrder.findMany({
       where: {
-        externalTicketingId: config.id,
+        editionId,
         ...searchCondition,
       },
       include: {
@@ -108,7 +90,7 @@ export default defineEventHandler(async (event) => {
     let stats = null
     if (!search) {
       const allOrders = await prisma.ticketingOrder.findMany({
-        where: { externalTicketingId: config.id },
+        where: { editionId },
         select: {
           amount: true,
           items: {

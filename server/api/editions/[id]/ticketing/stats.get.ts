@@ -20,36 +20,33 @@ export default defineEventHandler(async (event) => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
-    // Récupérer la configuration de billeterie
-    const config = await prisma.externalTicketing.findUnique({
-      where: { editionId },
+    // Compter les validations de billets (externes et manuels, hors donations)
+    const ticketsValidatedToday = await prisma.ticketingOrderItem.count({
+      where: {
+        order: {
+          editionId: editionId,
+        },
+        type: {
+          not: 'Donation',
+        },
+        entryValidated: true,
+        entryValidatedAt: {
+          gte: today,
+        },
+      },
     })
 
-    // Compter les validations de billets
-    const ticketsValidatedToday = config
-      ? await prisma.ticketingOrderItem.count({
-          where: {
-            order: {
-              externalTicketingId: config.id,
-            },
-            entryValidated: true,
-            entryValidatedAt: {
-              gte: today,
-            },
-          },
-        })
-      : 0
-
-    const totalTicketsValidated = config
-      ? await prisma.ticketingOrderItem.count({
-          where: {
-            order: {
-              externalTicketingId: config.id,
-            },
-            entryValidated: true,
-          },
-        })
-      : 0
+    const totalTicketsValidated = await prisma.ticketingOrderItem.count({
+      where: {
+        order: {
+          editionId: editionId,
+        },
+        type: {
+          not: 'Donation',
+        },
+        entryValidated: true,
+      },
+    })
 
     // Compter les validations de bénévoles
     const volunteersValidatedToday = await prisma.editionVolunteerApplication.count({
@@ -69,16 +66,23 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    // Compter le nombre total de billets et bénévoles
-    const totalTickets = config
-      ? await prisma.ticketingOrderItem.count({
-          where: {
-            order: {
-              externalTicketingId: config.id,
-            },
+    // Compter le nombre total de billets (externes et manuels, hors donations) et bénévoles
+    // Utiliser la même approche que orders.get.ts pour garantir la cohérence
+    const allOrders = await prisma.ticketingOrder.findMany({
+      where: { editionId },
+      select: {
+        items: {
+          select: {
+            type: true,
           },
-        })
-      : 0
+        },
+      },
+    })
+
+    const totalTickets = allOrders.reduce((sum, order) => {
+      const ticketItems = order.items.filter((item) => item.type !== 'Donation')
+      return sum + ticketItems.length
+    }, 0)
 
     const totalVolunteers = await prisma.editionVolunteerApplication.count({
       where: {

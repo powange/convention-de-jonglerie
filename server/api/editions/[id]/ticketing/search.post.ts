@@ -25,26 +25,11 @@ export default defineEventHandler(async (event) => {
   const searchTerm = body.searchTerm.toLowerCase().trim()
 
   try {
-    // Récupérer la configuration de billeterie
-    const config = await prisma.externalTicketing.findUnique({
-      where: { editionId },
-      include: {
-        helloAssoConfig: true,
-      },
-    })
-
-    if (!config || !config.helloAssoConfig) {
-      throw createError({
-        statusCode: 404,
-        message: 'Configuration HelloAsso introuvable',
-      })
-    }
-
-    // Rechercher dans les billets HelloAsso
+    // Rechercher dans tous les billets de l'édition (externes et manuels)
     const orderItems = await prisma.ticketingOrderItem.findMany({
       where: {
         order: {
-          externalTicketingId: config.id,
+          editionId,
         },
         OR: [
           {

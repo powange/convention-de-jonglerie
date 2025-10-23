@@ -8,6 +8,7 @@ import { z } from 'zod'
 const itemSchema = z.object({
   tierId: z.number(),
   quantity: z.number().min(1),
+  customAmount: z.number().optional(), // Montant personnalisé en centimes pour les tarifs à prix libre
   customParticipants: z
     .array(
       z.object({
@@ -26,6 +27,8 @@ const bodySchema = z.object({
   payerEmail: z.string().email(),
   // Liste des tarifs sélectionnés avec quantités et participants personnalisés
   items: z.array(itemSchema).min(1),
+  // Statut de paiement
+  isPaid: z.boolean().default(true),
 })
 
 export default defineEventHandler(async (event) => {
@@ -66,14 +69,13 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Récupérer les tarifs demandés
+    // Récupérer les tarifs demandés (externes et manuels)
     const tierIds = body.items.map((item) => item.tierId)
+    const uniqueTierIds = [...new Set(tierIds)]
     const tiers = await prisma.ticketingTier.findMany({
       where: {
-        id: { in: tierIds },
-        externalTicketing: {
-          editionId,
-        },
+        id: { in: uniqueTierIds },
+        editionId: editionId,
       },
       select: {
         id: true,
@@ -82,7 +84,7 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    if (tiers.length !== tierIds.length) {
+    if (tiers.length !== uniqueTierIds.length) {
       throw createError({
         statusCode: 400,
         message: 'Certains tarifs sont invalides',
@@ -95,7 +97,9 @@ export default defineEventHandler(async (event) => {
     // Calculer le montant total
     const totalAmount = body.items.reduce((sum, item) => {
       const tier = tierMap.get(item.tierId)
-      return sum + (tier?.price || 0) * item.quantity
+      // Utiliser le montant personnalisé si disponible, sinon le prix du tarif
+      const itemPrice = item.customAmount ?? tier?.price ?? 0
+      return sum + itemPrice * item.quantity
     }, 0)
 
     // Créer la date de commande
@@ -116,7 +120,7 @@ export default defineEventHandler(async (event) => {
         payerLastName: body.payerLastName,
         payerEmail: body.payerEmail,
         amount: totalAmount,
-        status: 'Onsite',
+        status: body.isPaid ? 'Onsite' : 'Pending',
         orderDate,
       },
     })
@@ -126,6 +130,8 @@ export default defineEventHandler(async (event) => {
     for (const item of body.items) {
       const tier = tierMap.get(item.tierId)!
       const customParticipants = item.customParticipants || []
+      // Utiliser le montant personnalisé si disponible, sinon le prix du tarif
+      const itemPrice = item.customAmount ?? tier.price
 
       // Créer un item pour chaque quantité
       for (let i = 0; i < item.quantity; i++) {
@@ -145,8 +151,8 @@ export default defineEventHandler(async (event) => {
             email: participant.email,
             name: tier.name,
             type: null,
-            amount: tier.price,
-            state: 'Processed',
+            amount: itemPrice,
+            state: body.isPaid ? 'Processed' : 'Pending',
             qrCode, // Même QR code pour tous les items de la commande
             entryValidated: false,
           },

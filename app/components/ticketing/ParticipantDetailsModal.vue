@@ -15,20 +15,36 @@
               {{ $t('editions.ticketing.ticket_status') }}
             </p>
             <p class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ participant.ticket.state }}
+              {{
+                participant.ticket.state === 'Processed'
+                  ? 'Valide'
+                  : participant.ticket.state === 'Pending'
+                    ? 'En attente de paiement'
+                    : participant.ticket.state === 'Cancelled'
+                      ? 'Annulé'
+                      : participant.ticket.state
+              }}
             </p>
           </div>
           <UBadge
-            :color="participant.ticket.state === 'Processed' ? 'success' : 'neutral'"
+            :color="
+              participant.ticket.state === 'Processed'
+                ? 'success'
+                : participant.ticket.state === 'Pending'
+                  ? 'warning'
+                  : 'neutral'
+            "
             variant="soft"
             size="lg"
           >
             {{
               participant.ticket.state === 'Processed'
                 ? 'Valide'
-                : participant.ticket.state === 'Cancelled'
-                  ? 'Annulé'
-                  : participant.ticket.state
+                : participant.ticket.state === 'Pending'
+                  ? 'En attente de paiement'
+                  : participant.ticket.state === 'Cancelled'
+                    ? 'Annulé'
+                    : participant.ticket.state
             }}
           </UBadge>
         </div>
@@ -709,6 +725,92 @@
     @confirm="invalidateEntry"
     @cancel="showInvalidateModal = false"
   />
+
+  <!-- Modal de confirmation de paiement -->
+  <UModal v-model:open="showPaymentConfirmModal" title="Confirmer le paiement">
+    <template #body>
+      <div class="space-y-4">
+        <UAlert
+          icon="i-heroicons-exclamation-triangle"
+          color="warning"
+          variant="soft"
+          title="Paiement en attente"
+          description="Cette commande n'a pas encore été marquée comme payée. Souhaitez-vous confirmer le paiement avant de valider l'entrée ?"
+        />
+
+        <div class="space-y-3">
+          <div
+            class="p-4 rounded-lg border-2 cursor-pointer transition-all"
+            :class="
+              paymentConfirmedChoice
+                ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                : 'border-gray-200 dark:border-gray-700 hover:border-green-300'
+            "
+            @click="paymentConfirmedChoice = true"
+          >
+            <div class="flex items-center gap-3">
+              <UIcon
+                :name="paymentConfirmedChoice ? 'i-heroicons-check-circle' : 'i-heroicons-circle'"
+                :class="
+                  paymentConfirmedChoice
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-gray-400 dark:text-gray-600'
+                "
+                class="h-6 w-6"
+              />
+              <div>
+                <p class="font-medium text-gray-900 dark:text-white">Paiement reçu</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  Le participant a payé et la commande sera marquée comme payée
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="p-4 rounded-lg border-2 cursor-pointer transition-all"
+            :class="
+              !paymentConfirmedChoice
+                ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+                : 'border-gray-200 dark:border-gray-700 hover:border-orange-300'
+            "
+            @click="paymentConfirmedChoice = false"
+          >
+            <div class="flex items-center gap-3">
+              <UIcon
+                :name="!paymentConfirmedChoice ? 'i-heroicons-check-circle' : 'i-heroicons-circle'"
+                :class="
+                  !paymentConfirmedChoice
+                    ? 'text-orange-600 dark:text-orange-400'
+                    : 'text-gray-400 dark:text-gray-600'
+                "
+                class="h-6 w-6"
+              />
+              <div>
+                <p class="font-medium text-gray-900 dark:text-white">
+                  Paiement non reçu (continuer sans payer)
+                </p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  Valider l'entrée sans marquer la commande comme payée
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template #footer>
+      <div class="flex gap-2 justify-end">
+        <UButton color="neutral" variant="soft" @click="showPaymentConfirmModal = false">
+          Annuler
+        </UButton>
+        <UButton color="primary" icon="i-heroicons-check" @click="confirmPaymentAndContinue">
+          Continuer
+        </UButton>
+      </div>
+    </template>
+  </UModal>
 </template>
 
 <script setup lang="ts">
@@ -827,6 +929,8 @@ const selectedParticipants = ref<number[]>([])
 const validating = ref(false)
 const showValidateModal = ref(false)
 const showInvalidateModal = ref(false)
+const showPaymentConfirmModal = ref(false)
+const paymentConfirmedChoice = ref(true)
 const ticketToInvalidate = ref<number | null>(null)
 
 // Gestion des articles à restituer
@@ -922,10 +1026,27 @@ const selectAllParticipants = () => {
 
 const showValidateTicketsConfirm = () => {
   if (selectedParticipants.value.length === 0) return
+
+  // Vérifier si la commande est en attente de paiement
+  if (props.participant && 'ticket' in props.participant) {
+    if (props.participant.ticket.state === 'Pending') {
+      showPaymentConfirmModal.value = true
+      return
+    }
+  }
+
   showValidateModal.value = true
 }
 
 const showValidateConfirm = () => {
+  // Vérifier si la commande est en attente de paiement
+  if (props.participant && 'ticket' in props.participant) {
+    if (props.participant.ticket.state === 'Pending') {
+      showPaymentConfirmModal.value = true
+      return
+    }
+  }
+
   showValidateModal.value = true
 }
 
@@ -934,18 +1055,26 @@ const confirmValidateEntry = async () => {
   try {
     // Si c'est un bénévole
     if (props.participant && 'volunteer' in props.participant) {
-      emit('validate', [props.participant.volunteer.id])
+      emit('validate', [props.participant.volunteer.id], paymentConfirmedChoice.value)
     }
     // Si ce sont des tickets sélectionnés
     else if (selectedParticipants.value.length > 0) {
-      emit('validate', selectedParticipants.value)
+      emit('validate', selectedParticipants.value, paymentConfirmedChoice.value)
       // Réinitialiser la sélection après validation
       selectedParticipants.value = []
     }
     showValidateModal.value = false
+    // Réinitialiser le choix de paiement pour la prochaine validation
+    paymentConfirmedChoice.value = true
   } finally {
     validating.value = false
   }
+}
+
+const confirmPaymentAndContinue = () => {
+  // Fermer la modal de paiement et ouvrir la modal de validation
+  showPaymentConfirmModal.value = false
+  showValidateModal.value = true
 }
 
 const showInvalidateConfirm = () => {
