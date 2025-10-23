@@ -184,20 +184,10 @@
     }
   },
   "seo": {
-    "carpool": {
-      "description": "Organiseer je carpool naar {name}. Vind reisgenoten of bied je beschikbare plaatsen aan voor {date} in {location}.",
-      "keywords": "carpool, vervoer, {convention}, {location}, delen, economisch, milieuvriendelijk",
-      "og_description": "Organiseer uw vervoer voor {name} - {date}. Carpool beschikbaar.",
-      "og_title": "Carpool voor {name}",
-      "title": "Carpool - {name}",
-      "twitter_description": "Vind of bied een carpool aan voor {name}.",
-      "twitter_title": "Carpool - {name}"
-    },
     "edition": {
       "description": "Ontdek {name} die plaatsvindt {date} in {location}. Informatie, programma en inschrijving voor deze jongleerconventie.",
       "keywords": "jongleren, conventie, {convention}, {location}, evenement, festival, show, workshop",
       "og_description": "Doe mee met ons voor {name} - {date}. Programma, workshops en jongleer-shows.",
-      "title": "{name}",
       "twitter_description": "{name} - {date}. Ontdek het programma van deze jongleerconventie.",
       "twitter_title": "{name} - Jongleerconventie"
     },
@@ -218,15 +208,6 @@
       "name": "Zoek naar een conventie"
     },
     "site_description": "Vind en beheer uw favoriete jongleerconventies. Collaboratief platform voor jongleurs en evenementorganisatoren.",
-    "site_name": "Jongleerconventie",
-    "volunteers": {
-      "description": "Sluit je aan bij het vrijwilligersteam voor {name}. Neem deel aan de organisatie van dit jongeer-evenement {date} in {location}.",
-      "keywords": "vrijwilligerswerk, team, {convention}, {location}, organisatie, hulp",
-      "og_description": "Sluit je aan bij het vrijwilligersteam van {name} - {date}. Neem deel aan de organisatie.",
-      "og_title": "Vrijwilligerswerk voor {name}",
-      "title": "Vrijwilligerswerk - {name}",
-      "twitter_description": "Wordt vrijwilliger voor {name} en neem deel aan de organisatie.",
-      "twitter_title": "Vrijwilligerswerk - {name}"
-    }
+    "site_name": "Jongleerconventie"
   }
 }

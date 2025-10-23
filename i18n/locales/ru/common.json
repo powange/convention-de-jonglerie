@@ -1,4 +1,10 @@
 {
+  "admin_mode": {
+    "admin_mode_disabled": "Режим администратора отключен",
+    "admin_mode_disabled_desc": "Теперь вы используете обычный пользовательский интерфейс",
+    "admin_mode_enabled": "Режим администратора включен",
+    "admin_mode_enabled_desc": "Теперь у вас есть доступ ко всем привилегиям администратора"
+  },
   "calendar": {
     "add_to_calendar": "Добавить в календарь",
     "day": "День",
@@ -62,6 +68,7 @@
       "toggle_preview": "Переключить предпросмотр"
     },
     "email": "Email",
+    "end": "[TODO] Fin",
     "end_date": "Дата окончания",
     "error": "Ошибка",
     "export_success": "Экспорт успешен",
@@ -101,6 +108,7 @@
     "show_less": "Показать меньше",
     "show_more": "Показать больше",
     "sort_tip": "Сортировка: нажмите на заголовки (Shift+клик для нескольких)",
+    "start": "[TODO] Début",
     "start_date": "Дата начала",
     "status": "Статус",
     "success": "Успех",
@@ -249,12 +257,6 @@
     "request_deleted": "Запрос удален",
     "request_deleted_successfully": "Ваш запрос совместной поездки успешно удален",
     "verification_code_sent": "Код подтверждения отправлен вам."
-  },
-  "admin_mode": {
-    "admin_mode_disabled": "Режим администратора отключен",
-    "admin_mode_disabled_desc": "Теперь вы используете обычный пользовательский интерфейс",
-    "admin_mode_enabled": "Режим администратора включен",
-    "admin_mode_enabled_desc": "Теперь у вас есть доступ ко всем привилегиям администратора"
   },
   "navigation": {
     "admin": "Администрирование",

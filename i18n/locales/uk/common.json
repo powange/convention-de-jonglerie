@@ -1,4 +1,10 @@
 {
+  "admin_mode": {
+    "admin_mode_disabled": "Режим адміністратора вимкнуто",
+    "admin_mode_disabled_desc": "Тепер ви використовуєте звичайний інтерфейс користувача",
+    "admin_mode_enabled": "Режим адміністратора увімкнуто",
+    "admin_mode_enabled_desc": "Тепер ви маєте доступ до всіх прав адміністратора"
+  },
   "calendar": {
     "add_to_calendar": "Додати до календаря",
     "day": "День",
@@ -62,6 +68,7 @@
       "toggle_preview": "Переключити попередній перегляд"
     },
     "email": "Електронна пошта",
+    "end": "[TODO] Fin",
     "end_date": "Дата закінчення",
     "error": "Помилка",
     "export_success": "Експорт успішний",
@@ -101,6 +108,7 @@
     "show_less": "Показати менше",
     "show_more": "Показати більше",
     "sort_tip": "Сортування: натисніть на заголовки (Shift+клік для кількох)",
+    "start": "[TODO] Début",
     "start_date": "Дата початку",
     "status": "Статус",
     "success": "Успіх",
@@ -249,12 +257,6 @@
     "request_deleted": "Запит видалено",
     "request_deleted_successfully": "Ваш запит на сумісну поїздку успішно видалено",
     "verification_code_sent": "Вам надіслано код підтвердження."
-  },
-  "admin_mode": {
-    "admin_mode_disabled": "Режим адміністратора вимкнуто",
-    "admin_mode_disabled_desc": "Тепер ви використовуєте звичайний інтерфейс користувача",
-    "admin_mode_enabled": "Режим адміністратора увімкнуто",
-    "admin_mode_enabled_desc": "Тепер ви маєте доступ до всіх прав адміністратора"
   },
   "navigation": {
     "admin": "Адміністрування",

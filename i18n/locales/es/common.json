@@ -1,4 +1,10 @@
 {
+  "admin_mode": {
+    "admin_mode_disabled": "Modo administrador deshabilitado",
+    "admin_mode_disabled_desc": "Ahora estás usando la interfaz de usuario normal",
+    "admin_mode_enabled": "Modo administrador habilitado",
+    "admin_mode_enabled_desc": "Ahora tienes acceso a todos los privilegios de administrador"
+  },
   "calendar": {
     "add_to_calendar": "Añadir al calendario",
     "day": "Día",
@@ -62,6 +68,7 @@
       "toggle_preview": "Alternar vista previa"
     },
     "email": "Email",
+    "end": "[TODO] Fin",
     "end_date": "Fecha de fin",
     "error": "Error",
     "export_success": "Exportación exitosa",
@@ -101,6 +108,7 @@
     "show_less": "Mostrar menos",
     "show_more": "Mostrar más",
     "sort_tip": "Ordenar: haga clic en los encabezados (Shift+clic para múltiples)",
+    "start": "[TODO] Début",
     "start_date": "Fecha de inicio",
     "status": "Estado",
     "success": "Éxito",
@@ -249,12 +257,6 @@
     "request_deleted": "Solicitud eliminada",
     "request_deleted_successfully": "Tu solicitud de viaje compartido ha sido eliminada exitosamente",
     "verification_code_sent": "Se te ha enviado un código de verificación."
-  },
-  "admin_mode": {
-    "admin_mode_disabled": "Modo administrador deshabilitado",
-    "admin_mode_disabled_desc": "Ahora estás usando la interfaz de usuario normal",
-    "admin_mode_enabled": "Modo administrador habilitado",
-    "admin_mode_enabled_desc": "Ahora tienes acceso a todos los privilegios de administrador"
   },
   "navigation": {
     "admin": "Administración",

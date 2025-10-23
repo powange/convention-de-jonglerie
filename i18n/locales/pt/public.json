@@ -184,20 +184,10 @@
     }
   },
   "seo": {
-    "carpool": {
-      "description": "Organize sua carona para {name}. Encontre companheiros de viagem ou ofereça seus lugares disponíveis para {date} em {location}.",
-      "keywords": "boleia, transporte, {convention}, {location}, partilha, económico, ecológico",
-      "og_description": "Organize o seu transporte para {name} - {date}. Boleias disponíveis.",
-      "og_title": "Boleia para {name}",
-      "title": "Boleia - {name}",
-      "twitter_description": "Encontre ou ofereça uma boleia para {name}.",
-      "twitter_title": "Boleia - {name}"
-    },
     "edition": {
       "description": "Descubra {name} que acontece {date} em {location}. Informações, programa e inscrição para esta convenção de malabares.",
       "keywords": "malabarismo, convenção, {convention}, {location}, evento, festival, espetáculo, workshop",
       "og_description": "Junte-se a nós para {name} - {date}. Programa, workshops e espetáculos de malabarismo.",
-      "title": "{name}",
       "twitter_description": "{name} - {date}. Descubra o programa desta convenção de malabarismo.",
       "twitter_title": "{name} - Convenção de Malabarismo"
     },
@@ -218,15 +208,6 @@
       "name": "Procurar uma convenção"
     },
     "site_description": "Encontre e gira as suas convenções de malabarismo favoritas. Plataforma colaborativa para malabaristas e organizadores de eventos.",
-    "site_name": "Convenção de Malabarismo",
-    "volunteers": {
-      "description": "Junte-se à equipe de voluntários para {name}. Participe da organização deste evento de malabares {date} em {location}.",
-      "keywords": "voluntariado, equipa, {convention}, {location}, organização, ajuda",
-      "og_description": "Junte-se à equipa de voluntários de {name} - {date}. Participe na organização.",
-      "og_title": "Voluntariado para {name}",
-      "title": "Voluntariado - {name}",
-      "twitter_description": "Torne-se voluntário para {name} e participe na organização.",
-      "twitter_title": "Voluntariado - {name}"
-    }
+    "site_name": "Convenção de Malabarismo"
   }
 }

@@ -184,20 +184,10 @@
     }
   },
   "seo": {
-    "carpool": {
-      "description": "Zorganizujte spolujízdu pro {name}. Najděte spolucestující nebo nabídněte svá volná místa na {date} v {location}.",
-      "keywords": "spolujízda, doprava, {convention}, {rental}, sdílení, ekonomické, ekologické",
-      "og_description": "Zajistěte si dopravu na {name} - {date}. Možnost spolujízdy.",
-      "og_title": "Spolujízda pro {name}",
-      "title": "Spolujízda - {name}",
-      "twitter_description": "Najděte nebo navrhněte spolujízdu pro {name}.",
-      "twitter_title": "Spolujízda - {name}"
-    },
     "edition": {
       "description": "Objevte {name}, který se koná {date} na {location}. Informace, program a registrace na tuto žonglérskou akci.",
       "keywords": "žonglování, konvence, {konference}, {location}, událost, festival, show, workshop",
       "og_description": "Připojte se k nám na {name} - {date}. Program, workshopy a žonglérské show.",
-      "title": "{name}",
       "twitter_description": "{name} - {date}. Objevte program tohoto žonglérského setkání.",
       "twitter_title": "{name} - Žonglérská konvence"
     },
@@ -218,15 +208,6 @@
       "name": "Vyhledání dohody"
     },
     "site_description": "Najděte a spravujte své oblíbené žonglérské srazy. Platforma pro spolupráci žonglérů a organizátorů akcí.",
-    "site_name": "Žonglérská konvence",
-    "volunteers": {
-      "description": "Připojte se k týmu dobrovolníků pro {name}. Pomozte zorganizovat žonglérskou akci {date} na {location}.",
-      "keywords": "dobrovolnictví, tým, {convention}, {rental}, organizace, pomoc",
-      "og_description": "Připojte se k dobrovolnickému týmu {name} - {date}. Podílejte se na organizaci.",
-      "og_title": "Dobrovolník pro {name}",
-      "title": "Dobrovolnictví - {name}",
-      "twitter_description": "Staňte se dobrovolníkem pro {name} a pomozte s organizací akce.",
-      "twitter_title": "Dobrovolnictví - {name}"
-    }
+    "site_name": "Žonglérská konvence"
   }
 }

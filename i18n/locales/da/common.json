@@ -1,4 +1,10 @@
 {
+  "admin_mode": {
+    "admin_mode_disabled": "Administratortilstand deaktiveret",
+    "admin_mode_disabled_desc": "Du bruger nu den normale brugerinterface",
+    "admin_mode_enabled": "Administratortilstand aktiveret",
+    "admin_mode_enabled_desc": "Du har nu adgang til alle administratorprivilegier"
+  },
   "calendar": {
     "add_to_calendar": "Tilføj til kalender",
     "day": "Dag",
@@ -62,6 +68,7 @@
       "toggle_preview": "Skift forhåndsvisning"
     },
     "email": "Email",
+    "end": "[TODO] Fin",
     "end_date": "Slutdato",
     "error": "Fejl",
     "export_success": "Eksport lykkedes",
@@ -101,6 +108,7 @@
     "show_less": "Vis mindre",
     "show_more": "Vis mere",
     "sort_tip": "Sorter: klik på overskrifter (Shift+klik for flere)",
+    "start": "[TODO] Début",
     "start_date": "Startdato",
     "status": "Status",
     "success": "Succes",
@@ -249,12 +257,6 @@
     "request_deleted": "Anmodning slettet",
     "request_deleted_successfully": "Din samkørselsanmodning blev slettet med succes",
     "verification_code_sent": "En bekræftelseskode er sendt til dig."
-  },
-  "admin_mode": {
-    "admin_mode_disabled": "Administratortilstand deaktiveret",
-    "admin_mode_disabled_desc": "Du bruger nu den normale brugerinterface",
-    "admin_mode_enabled": "Administratortilstand aktiveret",
-    "admin_mode_enabled_desc": "Du har nu adgang til alle administratorprivilegier"
   },
   "navigation": {
     "admin": "Administration",

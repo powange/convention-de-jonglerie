@@ -40,6 +40,7 @@ export const SPLIT_CONFIG = {
   components: ['components', 'forms', 'upload'],
   notifications: ['notifications', 'push_notifications'],
   ticketing: ['ticketing'],
+  workshops: ['workshops'],
   app: ['app', 'pwa', 'services'],
 }
 

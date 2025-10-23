@@ -1,4 +1,10 @@
 {
+  "admin_mode": {
+    "admin_mode_disabled": "Modalità amministratore disattivata",
+    "admin_mode_disabled_desc": "Stai ora usando l'interfaccia utente normale",
+    "admin_mode_enabled": "Modalità amministratore attivata",
+    "admin_mode_enabled_desc": "Ora hai accesso a tutti i privilegi amministratore"
+  },
   "calendar": {
     "add_to_calendar": "Aggiungi al calendario",
     "day": "Giorno",
@@ -62,6 +68,7 @@
       "toggle_preview": "Attiva anteprima"
     },
     "email": "Email",
+    "end": "[TODO] Fin",
     "end_date": "Data di fine",
     "error": "Errore",
     "export_success": "Esportazione riuscita",
@@ -101,6 +108,7 @@
     "show_less": "Mostra meno",
     "show_more": "Mostra di più",
     "sort_tip": "Ordina: clicca sulle intestazioni (Shift+clic per multi)",
+    "start": "[TODO] Début",
     "start_date": "Data di inizio",
     "status": "Stato",
     "success": "Successo",
@@ -249,12 +257,6 @@
     "request_deleted": "Richiesta eliminata",
     "request_deleted_successfully": "La tua richiesta di condivisione auto è stata eliminata con successo",
     "verification_code_sent": "Ti è stato inviato un codice di verifica."
-  },
-  "admin_mode": {
-    "admin_mode_disabled": "Modalità amministratore disattivata",
-    "admin_mode_disabled_desc": "Stai ora usando l'interfaccia utente normale",
-    "admin_mode_enabled": "Modalità amministratore attivata",
-    "admin_mode_enabled_desc": "Ora hai accesso a tutti i privilegi amministratore"
   },
   "navigation": {
     "admin": "Amministrazione",

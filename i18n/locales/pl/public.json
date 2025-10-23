@@ -184,20 +184,10 @@
     }
   },
   "seo": {
-    "carpool": {
-      "description": "Zorganizuj wspólny przejazd na {name}. Znajdź towarzyszy podróży lub zaoferuj swoje wolne miejsca na {date} w {location}.",
-      "keywords": "wspólna podróż, transport, {convention}, {location}, dzielenie się, ekonomiczny, ekologiczny",
-      "og_description": "Zorganizuj transport na {name} - {date}. Dostępne wspólne podróże.",
-      "og_title": "Wspólna podróż na {name}",
-      "title": "Wspólna podróż - {name}",
-      "twitter_description": "Znajdź lub zaproponuj wspólną podróż na {name}.",
-      "twitter_title": "Wspólna podróż - {name}"
-    },
     "edition": {
       "description": "Odkryj {name}, która odbywa się {date} w {location}. Informacje, program i rejestracja na tę konwencję żonglerki.",
       "keywords": "żonglerka, konwencja, {convention}, {location}, wydarzenie, festiwal, show, warsztat",
       "og_description": "Dołącz do nas na {name} - {date}. Program, warsztaty i pokazy żonglerskie.",
-      "title": "{name}",
       "twitter_description": "{name} - {date}. Odkryj program tej konwencji żonglerskiej.",
       "twitter_title": "{name} - Konwencja żonglerska"
     },
@@ -218,15 +208,6 @@
       "name": "Szukaj konwencji"
     },
     "site_description": "Znajdź i zarządzaj swoimi ulubionymi konwencjami żonglerskimi. Platforma współpracy dla żonglerzy i organizatorów wydarzeń.",
-    "site_name": "Konwencja żonglerska",
-    "volunteers": {
-      "description": "Dołącz do zespołu wolontariuszy {name}. Weź udział w organizacji tego wydarzenia żonglerskiego {date} w {location}.",
-      "keywords": "wolontariat, zespoł, {convention}, {location}, organizacja, pomoc",
-      "og_description": "Dołącz do zespołu wolontariuszy {name} - {date}. Wez udział w organizacji.",
-      "og_title": "Wolontariat dla {name}",
-      "title": "Wolontariat - {name}",
-      "twitter_description": "Zostań wolontariuszem dla {name} i wez udział w organizacji.",
-      "twitter_title": "Wolontariat - {name}"
-    }
+    "site_name": "Konwencja żonglerska"
   }
 }

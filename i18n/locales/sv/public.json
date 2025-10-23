@@ -184,20 +184,10 @@
     }
   },
   "seo": {
-    "carpool": {
-      "description": "Organisera din samåkning för {name}. Hitta medresenärer eller erbjud dina lediga platser för {date} på {location}.",
-      "keywords": "bilpool, transport, {convention}, {rental}, delning, ekonomisk, ekologisk",
-      "og_description": "Ordna din transport till {name} - {date}. Samåkning tillgänglig.",
-      "og_title": "Samåkning för {name}",
-      "title": "Samåkning - {name}",
-      "twitter_description": "Hitta eller föreslå en bilpool för {name}.",
-      "twitter_title": "Samåkning - {name}"
-    },
     "edition": {
       "description": "Upptäck {name} som äger rum {date} på {location}. Information, program och anmälan till detta jongleringskonvent.",
       "keywords": "jonglering, konvent, {konvent}, {location}, evenemang, festival, show, workshop",
       "og_description": "Följ med oss till {name} - {date}. Program, workshops och jongleringsshower.",
-      "title": "{name}",
       "twitter_description": "{name} - {date}. Upptäck programmet för detta jongleringskonvent.",
       "twitter_title": "{name} - Jongleringskonvention"
     },
@@ -218,15 +208,6 @@
       "name": "Sök efter ett avtal"
     },
     "site_description": "Hitta och hantera dina favoritkonvent för jonglering. Samarbetsplattform för jonglörer och evenemangsarrangörer.",
-    "site_name": "Jonglering av konvention",
-    "volunteers": {
-      "description": "Gå med i teamet av volontärer för {name}. Hjälp till att organisera detta jongleringsevenemang {date} på {location}.",
-      "keywords": "volontärarbete, team, {convention}, {rental}, organisation, hjälp",
-      "og_description": "Gå med i volontärteamet {name} - {date}. Delta i organisationen.",
-      "og_title": "Volontär för {name}",
-      "title": "Volontärarbete - {name}",
-      "twitter_description": "Volontär för {name} och hjälp till att organisera evenemanget.",
-      "twitter_title": "Volontärarbete - {name}"
-    }
+    "site_name": "Jonglering av konvention"
   }
 }

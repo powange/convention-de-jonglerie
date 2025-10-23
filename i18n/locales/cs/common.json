@@ -1,4 +1,10 @@
 {
+  "admin_mode": {
+    "admin_mode_disabled": "Režim správce je zakázán",
+    "admin_mode_disabled_desc": "Nyní používáte běžné uživatelské rozhraní",
+    "admin_mode_enabled": "Aktivovaný režim správce",
+    "admin_mode_enabled_desc": "Nyní máte plná práva správce"
+  },
   "calendar": {
     "add_to_calendar": "Přidat do kalendáře",
     "day": "Den",
@@ -62,6 +68,7 @@
       "toggle_preview": "Přepínání náhledů"
     },
     "email": "E-mail",
+    "end": "[TODO] Fin",
     "end_date": "Datum ukončení",
     "error": "Chyba",
     "export_success": "Úspěšný vývoz",
@@ -101,6 +108,7 @@
     "show_less": "Zobrazit méně",
     "show_more": "Zobrazit více",
     "sort_tip": "Třídění: klikněte na záhlaví (Shift+klik pro více položek).",
+    "start": "[TODO] Début",
     "start_date": "Datum zahájení",
     "status": "Stav",
     "success": "Úspěch",
@@ -249,12 +257,6 @@
     "request_deleted": "Žádost vymazána",
     "request_deleted_successfully": "Vaše žádost o spolujízdu byla úspěšně smazána",
     "verification_code_sent": "Byl vám zaslán ověřovací kód."
-  },
-  "admin_mode": {
-    "admin_mode_disabled": "Režim správce je zakázán",
-    "admin_mode_disabled_desc": "Nyní používáte běžné uživatelské rozhraní",
-    "admin_mode_enabled": "Aktivovaný režim správce",
-    "admin_mode_enabled_desc": "Nyní máte plná práva správce"
   },
   "navigation": {
     "admin": "Správa",

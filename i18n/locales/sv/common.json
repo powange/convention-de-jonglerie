@@ -1,4 +1,10 @@
 {
+  "admin_mode": {
+    "admin_mode_disabled": "Administratörsläge avaktiverat",
+    "admin_mode_disabled_desc": "Du använder nu det normala användargränssnittet",
+    "admin_mode_enabled": "Administratörsläge aktiverat",
+    "admin_mode_enabled_desc": "Du har nu fullständiga administratörsbehörigheter"
+  },
   "calendar": {
     "add_to_calendar": "Lägg till i kalender",
     "day": "Dag",
@@ -62,6 +68,7 @@
       "toggle_preview": "Toggle förhandsgranskning"
     },
     "email": "E-post",
+    "end": "[TODO] Fin",
     "end_date": "Slutdatum",
     "error": "Fel",
     "export_success": "Framgångsrik export",
@@ -101,6 +108,7 @@
     "show_less": "Visa mindre",
     "show_more": "Visa mer",
     "sort_tip": "Sortering: klicka på rubrikerna (Shift+klick för flera)",
+    "start": "[TODO] Début",
     "start_date": "Startdatum",
     "status": "Status",
     "success": "Framgång",
@@ -249,12 +257,6 @@
     "request_deleted": "Begäran raderad",
     "request_deleted_successfully": "Din begäran om samåkning har tagits bort",
     "verification_code_sent": "En verifieringskod har skickats till dig."
-  },
-  "admin_mode": {
-    "admin_mode_disabled": "Administratörsläge avaktiverat",
-    "admin_mode_disabled_desc": "Du använder nu det normala användargränssnittet",
-    "admin_mode_enabled": "Administratörsläge aktiverat",
-    "admin_mode_enabled_desc": "Du har nu fullständiga administratörsbehörigheter"
   },
   "navigation": {
     "admin": "Administration",

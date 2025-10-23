@@ -1,4 +1,10 @@
 {
+  "admin_mode": {
+    "admin_mode_disabled": "Administrator-Modus deaktiviert",
+    "admin_mode_disabled_desc": "Du verwendest jetzt die normale Benutzeroberfläche",
+    "admin_mode_enabled": "Administrator-Modus aktiviert",
+    "admin_mode_enabled_desc": "Du hast jetzt Zugang zu allen Administrator-Privilegien"
+  },
   "calendar": {
     "add_to_calendar": "Zum Kalender hinzufügen",
     "day": "Tag",
@@ -62,6 +68,7 @@
       "toggle_preview": "Vorschau umschalten"
     },
     "email": "E-Mail",
+    "end": "[TODO] Fin",
     "end_date": "Enddatum",
     "error": "Fehler",
     "export_success": "Export erfolgreich",
@@ -101,6 +108,7 @@
     "show_less": "Weniger anzeigen",
     "show_more": "Mehr anzeigen",
     "sort_tip": "Sortieren: Klicken Sie auf die Kopfzeilen (Shift+Klick für mehrere)",
+    "start": "[TODO] Début",
     "start_date": "Startdatum",
     "status": "Status",
     "success": "Erfolg",
@@ -249,12 +257,6 @@
     "request_deleted": "Anfrage gelöscht",
     "request_deleted_successfully": "Deine Fahrgemeinschafts-Anfrage wurde erfolgreich gelöscht",
     "verification_code_sent": "Ein Bestätigungscode wurde dir gesendet."
-  },
-  "admin_mode": {
-    "admin_mode_disabled": "Administrator-Modus deaktiviert",
-    "admin_mode_disabled_desc": "Du verwendest jetzt die normale Benutzeroberfläche",
-    "admin_mode_enabled": "Administrator-Modus aktiviert",
-    "admin_mode_enabled_desc": "Du hast jetzt Zugang zu allen Administrator-Privilegien"
   },
   "navigation": {
     "admin": "Verwaltung",
