@@ -53,6 +53,17 @@ export default defineEventHandler(async (event) => {
         order: {
           include: {
             items: {
+              include: {
+                tier: {
+                  include: {
+                    returnableItems: {
+                      include: {
+                        returnableItem: true,
+                      },
+                    },
+                  },
+                },
+              },
               orderBy: { id: 'asc' },
             },
           },
@@ -159,6 +170,60 @@ export default defineEventHandler(async (event) => {
       assignmentsByUserId.get(assignment.userId)!.push(assignment)
     })
 
+    // Récupérer les articles à restituer pour chaque bénévole
+    const returnableItemsByVolunteerId = new Map<number, Array<{ id: number; name: string }>>()
+
+    for (const volunteer of volunteers) {
+      const teamIds = volunteer.teamAssignments.map((assignment) => assignment.team.id)
+
+      // Récupérer d'abord les articles spécifiques aux équipes du bénévole
+      const teamSpecificItems = await prisma.editionVolunteerReturnableItem.findMany({
+        where: {
+          editionId,
+          teamId: { in: teamIds },
+        },
+        include: {
+          returnableItem: true,
+          team: true,
+        },
+      })
+
+      let volunteerReturnableItems
+      if (teamSpecificItems.length > 0) {
+        // Le bénévole a au moins une équipe avec des articles spécifiques
+        // On utilise UNIQUEMENT ces articles (surcharge)
+        volunteerReturnableItems = teamSpecificItems
+      } else {
+        // Pas d'articles spécifiques, on utilise les articles globaux
+        volunteerReturnableItems = await prisma.editionVolunteerReturnableItem.findMany({
+          where: {
+            editionId,
+            teamId: null, // Articles globaux uniquement
+          },
+          include: {
+            returnableItem: true,
+          },
+        })
+      }
+
+      // Dédupliquer les articles (si le bénévole est dans plusieurs équipes avec le même article)
+      const uniqueItems = new Map()
+      volunteerReturnableItems.forEach((item) => {
+        if (!uniqueItems.has(item.returnableItem.id)) {
+          uniqueItems.set(item.returnableItem.id, item.returnableItem)
+        }
+      })
+      const deduplicatedItems = Array.from(uniqueItems.values())
+
+      returnableItemsByVolunteerId.set(
+        volunteer.id,
+        deduplicatedItems.map((item) => ({
+          id: item.id,
+          name: item.name,
+        }))
+      )
+    }
+
     const results = {
       tickets: orderItems.map((item) => ({
         type: 'ticket',
@@ -199,6 +264,18 @@ export default defineEventHandler(async (event) => {
                 customFields: orderItem.customFields as any,
                 entryValidated: orderItem.entryValidated,
                 entryValidatedAt: orderItem.entryValidatedAt,
+                tier: orderItem.tier
+                  ? {
+                      id: orderItem.tier.id,
+                      name: orderItem.tier.name,
+                      returnableItems: orderItem.tier.returnableItems.map((ri) => ({
+                        returnableItem: {
+                          id: ri.returnableItem.id,
+                          name: ri.returnableItem.name,
+                        },
+                      })),
+                    }
+                  : null,
               })),
             },
             customFields: item.customFields as any,
@@ -212,6 +289,7 @@ export default defineEventHandler(async (event) => {
           ? validatorMap.get(application.entryValidatedBy)
           : null
         const assignments = assignmentsByUserId.get(application.user.id) || []
+        const returnableItems = returnableItemsByVolunteerId.get(application.id) || []
         return {
           type: 'volunteer',
           participant: {
@@ -235,6 +313,7 @@ export default defineEventHandler(async (event) => {
                 startDateTime: assignment.timeSlot.startDateTime,
                 endDateTime: assignment.timeSlot.endDateTime,
               })),
+              returnableItems: returnableItems,
               entryValidated: application.entryValidated,
               entryValidatedAt: application.entryValidatedAt,
               entryValidatedBy: validator
