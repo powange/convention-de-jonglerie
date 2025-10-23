@@ -32,7 +32,8 @@
             v-model="formState.title"
             :placeholder="$t('editions.volunteers.slot_title_placeholder')"
             icon="i-heroicons-tag"
-            autofocus
+            :autofocus="!readOnly"
+            :disabled="readOnly"
             class="w-full"
           />
         </UFormField>
@@ -43,6 +44,7 @@
             v-model="formState.description"
             :placeholder="t('editions.volunteers.slot_description_placeholder')"
             :rows="3"
+            :disabled="readOnly"
             resize
             class="w-full"
           />
@@ -64,6 +66,7 @@
               v-model="formState.teamId"
               :items="enhancedTeamOptions"
               :placeholder="t('editions.volunteers.select_team')"
+              :disabled="readOnly"
               icon="i-heroicons-user-group"
             >
               <template #item-label="{ item }">
@@ -124,6 +127,7 @@
                 v-model="formState.startDateTime"
                 type="datetime-local"
                 icon="i-heroicons-play"
+                :disabled="readOnly"
                 @change="onStartDateChange"
               />
             </UFormField>
@@ -132,13 +136,14 @@
                 v-model="formState.endDateTime"
                 type="datetime-local"
                 icon="i-heroicons-stop"
+                :disabled="readOnly"
                 :class="dateValidationClass"
               />
             </UFormField>
           </div>
 
           <!-- Raccourcis durée -->
-          <div class="flex flex-wrap gap-2">
+          <div v-if="!readOnly" class="flex flex-wrap gap-2">
             <span class="text-xs text-gray-500 dark:text-gray-400 mr-2"
               >{{ t('editions.volunteers.quick_duration') }}:</span
             >
@@ -177,11 +182,12 @@
                 min="1"
                 max="50"
                 :placeholder="$t('editions.volunteers.max_volunteers_placeholder')"
+                :disabled="readOnly"
                 icon="i-heroicons-users"
                 class="flex-1"
               />
               <!-- Boutons rapides -->
-              <div class="flex gap-1">
+              <div v-if="!readOnly" class="flex gap-1">
                 <UButton
                   v-for="num in [1, 2, 3, 5, 10]"
                   :key="num"
@@ -240,6 +246,7 @@
                 </div>
               </div>
               <UButton
+                v-if="!readOnly"
                 color="error"
                 variant="ghost"
                 size="xs"
@@ -256,7 +263,10 @@
           </div>
 
           <!-- Ajouter un bénévole -->
-          <div v-if="assignments.length < formState.maxVolunteers" class="border-t pt-3">
+          <div
+            v-if="!readOnly && assignments.length < formState.maxVolunteers"
+            class="border-t pt-3"
+          >
             <UButton
               color="warning"
               variant="soft"
@@ -272,6 +282,13 @@
     </template>
     <template #footer>
       <div
+        v-if="readOnly"
+        class="flex justify-end items-center pt-4 border-t border-gray-200 dark:border-gray-700"
+      >
+        <UButton color="primary" @click="close">{{ t('common.close') }}</UButton>
+      </div>
+      <div
+        v-else
         class="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700"
       >
         <div>
@@ -396,9 +413,12 @@ interface Props {
     startDateTime?: string
     endDateTime?: string
   }
+  readOnly?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  readOnly: false,
+})
 
 // Emits
 const emit = defineEmits<{
@@ -592,6 +612,20 @@ watch(
         endDateTime: newSlot.endDateTime || '',
         maxVolunteers: newSlot.maxVolunteers || 3,
       }
+
+      // Si les assignations sont déjà fournies (mode lecture seule), les utiliser directement
+      if (newSlot.assignedVolunteersList && Array.isArray(newSlot.assignedVolunteersList)) {
+        assignments.value = newSlot.assignedVolunteersList.map((assignment: any) => ({
+          id: assignment.id,
+          user: assignment.user,
+          assignedBy: assignment.assignedBy || null,
+          assignedAt: assignment.assignedAt,
+        }))
+        console.log(
+          '[SlotModal] Assignations chargées depuis initialSlot:',
+          assignments.value.length
+        )
+      }
     } else {
       // Réinitialiser le formulaire
       formState.value = {
@@ -603,6 +637,7 @@ watch(
         endDateTime: '',
         maxVolunteers: 3,
       }
+      assignments.value = []
     }
 
     // Si une seule équipe disponible, la sélectionner automatiquement
@@ -709,13 +744,18 @@ const onDelete = async () => {
 
 // Fonctions d'assignation
 const fetchAssignments = async () => {
-  if (!formState.value.id) return
+  if (!formState.value.id) {
+    console.log("[SlotModal] fetchAssignments: pas d'ID de créneau")
+    return
+  }
 
   try {
+    console.log('[SlotModal] Chargement des assignations pour le créneau', formState.value.id)
     const response = await $fetch(
       `/api/editions/${props.editionId}/volunteer-time-slots/${formState.value.id}/assignments`
     )
     assignments.value = response as Assignment[]
+    console.log('[SlotModal] Assignations chargées:', assignments.value.length)
   } catch (error) {
     console.error('Erreur lors de la récupération des assignations:', error)
   }
@@ -784,13 +824,18 @@ const unassignVolunteer = async (assignmentId: string) => {
 }
 
 // Charger les assignations à l'ouverture
-watch(isOpen, (newValue) => {
-  if (newValue) {
-    if (formState.value.id) {
+watch([isOpen, () => formState.value.id], ([isOpenValue, slotId]) => {
+  console.log('[SlotModal] Modal ouverte:', isOpenValue, 'readOnly:', props.readOnly, 'ID:', slotId)
+  if (isOpenValue) {
+    if (slotId) {
+      console.log('[SlotModal] Chargement des données pour le créneau', slotId)
       fetchAssignments()
-      fetchAvailableVolunteers()
+      // Ne charger les bénévoles disponibles qu'en mode édition
+      if (!props.readOnly) {
+        fetchAvailableVolunteers()
+      }
     }
-    if (!formState.value.id) {
+    if (!slotId && !props.readOnly) {
       nextTick(() => {
         titleInput.value?.focus()
       })

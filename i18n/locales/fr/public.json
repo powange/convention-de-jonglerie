@@ -184,26 +184,12 @@
     }
   },
   "seo": {
-    "carpool": {
-      "description": "Organisez votre covoiturage pour {name}. Trouvez des compagnons de route ou proposez vos places libres pour {date} à {location}.",
-      "keywords": "covoiturage, transport, {convention}, {location}, partage, économique, écologique",
-      "og_description": "Organisez votre transport pour {name} - {date}. Covoiturage disponible.",
-      "og_title": "Covoiturage pour {name}",
-      "title": "Covoiturage - {name}",
-      "twitter_description": "Trouvez ou proposez un covoiturage pour {name}.",
-      "twitter_title": "Covoiturage - {name}"
-    },
     "edition": {
       "description": "Découvrez {name} qui se déroule {date} à {location}. Informations, programme et inscription à cette convention de jonglerie.",
       "keywords": "jonglerie, convention, {convention}, {location}, événement, festival, spectacle, atelier",
       "og_description": "Rejoignez-nous pour {name} - {date}. Programme, ateliers et spectacles de jonglerie.",
-      "title": "{name}",
       "twitter_description": "{name} - {date}. Découvrez le programme de cette convention de jonglerie.",
       "twitter_title": "{name} - Convention de Jonglerie"
-    },
-    "edition_comments": {
-      "title": "Commentaires - {name}",
-      "description": "Lisez les commentaires et avis des participants sur {name}. Partagez votre expérience et vos impressions sur cette convention de jonglerie."
     },
     "homepage": {
       "description": "Découvrez les prochaines conventions de jonglerie en France et en Europe. Organisez vos événements favoris et connectez-vous avec la communauté de jongleurs.",
@@ -222,15 +208,6 @@
       "name": "Rechercher une convention"
     },
     "site_description": "Trouvez et gérez vos conventions de jonglerie préférées. Plateforme collaborative pour les jongleurs et organisateurs d'événements.",
-    "site_name": "Convention de Jonglerie",
-    "volunteers": {
-      "description": "Rejoignez l'équipe de bénévoles pour {name}. Participez à l'organisation de cet événement de jonglerie {date} à {location}.",
-      "keywords": "bénévolat, volontariat, équipe, {convention}, {location}, organisation, aide",
-      "og_description": "Rejoignez l'équipe bénévole de {name} - {date}. Participez à l'organisation.",
-      "og_title": "Bénévolat pour {name}",
-      "title": "Bénévolat - {name}",
-      "twitter_description": "Devenez bénévole pour {name} et participez à l'organisation.",
-      "twitter_title": "Bénévolat - {name}"
-    }
+    "site_name": "Convention de Jonglerie"
   }
 }

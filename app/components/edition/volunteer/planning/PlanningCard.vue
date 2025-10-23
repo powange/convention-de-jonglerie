@@ -272,11 +272,22 @@ const convertedTeams = computed(() => {
 
 // Équipes filtrées selon la sélection
 const filteredTeams = computed(() => {
-  if (selectedTeams.value.length === 0) {
-    return convertedTeams.value
+  let teams = convertedTeams.value
+
+  // Filtrer selon la sélection manuelle d'équipes
+  if (selectedTeams.value.length > 0) {
+    teams = teams.filter((team) => selectedTeams.value.includes(team.id))
   }
 
-  return convertedTeams.value.filter((team) => selectedTeams.value.includes(team.id))
+  // Si l'utilisateur n'a pas les droits de gestion, masquer les équipes sans créneaux
+  if (!props.canManageVolunteers) {
+    teams = teams.filter((team) => {
+      // Vérifier si cette équipe a au moins un créneau
+      return convertedTimeSlots.value.some((slot) => slot.teamId === team.id)
+    })
+  }
+
+  return teams
 })
 
 // Créneaux filtrés selon les équipes sélectionnées

@@ -270,7 +270,12 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         const avatarsDiv = document.createElement('div')
         avatarsDiv.className = 'slot-avatars'
 
-        assignedVolunteersList.forEach((assignment: any) => {
+        // Limiter l'affichage à 4 bénévoles maximum
+        const maxDisplay = 4
+        const volunteersToDisplay = assignedVolunteersList.slice(0, maxDisplay)
+        const remainingCount = assignedVolunteersList.length - maxDisplay
+
+        volunteersToDisplay.forEach((assignment: any) => {
           const user = assignment.user
           const volunteerContainer = document.createElement('div')
           volunteerContainer.className = 'volunteer-item'
@@ -307,6 +312,21 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
           avatarsDiv.appendChild(volunteerContainer)
         })
 
+        // Si il y a plus de bénévoles que le maximum affiché, ajouter une ligne "+X bénévoles"
+        if (remainingCount > 0) {
+          const moreContainer = document.createElement('div')
+          moreContainer.className = 'volunteer-item volunteer-more'
+          moreContainer.style.fontStyle = 'italic'
+          moreContainer.style.fontSize = '0.65rem'
+
+          const moreText = document.createElement('span')
+          moreText.className = 'volunteer-text'
+          moreText.textContent = `+${remainingCount} ${remainingCount === 1 ? 'bénévole' : 'bénévoles'}`
+
+          moreContainer.appendChild(moreText)
+          avatarsDiv.appendChild(moreContainer)
+        }
+
         container.appendChild(avatarsDiv)
       }
 
@@ -328,13 +348,10 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
     // Gestion des événements
     eventClick: (info) => {
-      // Ne pas déclencher les callbacks si en mode lecture seule
-      if (isReadOnly.value) {
-        return
-      }
+      // En mode lecture seule, permettre le clic pour afficher les détails (onTimeSlotClick)
+      // mais pas pour éditer (onTimeSlotUpdate)
+      const callback = isReadOnly.value ? onTimeSlotClick : onTimeSlotClick || onTimeSlotUpdate
 
-      // Appeler le callback pour le clic si fourni, sinon utiliser onTimeSlotUpdate
-      const callback = onTimeSlotClick || onTimeSlotUpdate
       if (callback) {
         const event = info.event
         // Utiliser le titre original depuis extendedProps

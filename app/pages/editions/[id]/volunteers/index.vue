@@ -3,42 +3,45 @@
     <EditionHeader :edition="edition" current-page="volunteers" />
 
     <div class="space-y-6">
-      <!-- Planning Card - Visible seulement pour les bénévoles acceptés -->
-      <EditionVolunteerPlanningCard
-        v-if="
-          authStore.isAuthenticated &&
-          myApplication?.status === 'ACCEPTED' &&
-          volunteersMode === 'INTERNAL'
-        "
-        :edition="edition"
-        :can-manage-volunteers="false"
-        :current-user-id="authStore.user?.id"
-        :format-date="formatDate"
-        :format-date-time-range="formatDateTimeRange"
-      />
+      <ClientOnly>
+        <!-- Planning Card - Visible seulement pour les bénévoles acceptés -->
+        <EditionVolunteerPlanningCard
+          v-if="
+            authStore.isAuthenticated &&
+            myApplication?.status === 'ACCEPTED' &&
+            volunteersMode === 'INTERNAL'
+          "
+          :edition="edition"
+          :can-manage-volunteers="false"
+          :current-user-id="authStore.user?.id"
+          :format-date="formatDate"
+          :format-date-time-range="formatDateTimeRange"
+          @slot-click="openSlotDetailsModal"
+        />
 
-      <!-- Carte "Mes créneaux" - Visible pour les bénévoles acceptés -->
-      <EditionVolunteerMySlotsCard
-        v-if="
-          authStore.isAuthenticated &&
-          myApplication?.status === 'ACCEPTED' &&
-          volunteersMode === 'INTERNAL'
-        "
-        :edition-id="editionId"
-        :user-id="authStore.user?.id"
-      />
+        <!-- Carte "Mes créneaux" - Visible pour les bénévoles acceptés -->
+        <EditionVolunteerMySlotsCard
+          v-if="
+            authStore.isAuthenticated &&
+            myApplication?.status === 'ACCEPTED' &&
+            volunteersMode === 'INTERNAL'
+          "
+          :edition-id="editionId"
+          :user-id="authStore.user?.id"
+        />
 
-      <!-- Carte "Mes équipes" - Visible pour les leaders d'équipes -->
-      <EditionVolunteerMyTeamsCard
-        v-if="
-          authStore.isAuthenticated &&
-          myApplication?.status === 'ACCEPTED' &&
-          volunteersMode === 'INTERNAL' &&
-          myApplication?.teamAssignments?.length > 0
-        "
-        :edition-id="editionId"
-        :team-assignments="myApplication.teamAssignments"
-      />
+        <!-- Carte "Mes équipes" - Visible pour les leaders d'équipes -->
+        <EditionVolunteerMyTeamsCard
+          v-if="
+            authStore.isAuthenticated &&
+            myApplication?.status === 'ACCEPTED' &&
+            volunteersMode === 'INTERNAL' &&
+            myApplication?.teamAssignments?.length > 0
+          "
+          :edition-id="editionId"
+          :team-assignments="myApplication.teamAssignments"
+        />
+      </ClientOnly>
 
       <UCard variant="soft" class="mb-6">
         <template #header>
@@ -62,76 +65,80 @@
         </template>
 
         <div class="space-y-6">
-          <!-- Candidature existante (affichée en premier si l'utilisateur a postulé) -->
-          <div v-if="authStore.isAuthenticated && volunteersMode === 'INTERNAL' && myApplication">
-            <UCard
-              variant="subtle"
-              class="border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-gray-800/40"
-            >
-              <div class="space-y-2">
-                <div class="flex items-center justify-between">
-                  <h4 class="text-sm font-semibold flex items-center gap-1">
-                    <UIcon name="i-heroicons-user" class="text-primary-500" />
-                    {{ t('editions.volunteers.my_application_title') }}
-                  </h4>
-                  <UBadge
-                    :color="volunteerStatusColor(myApplication.status)"
-                    variant="soft"
-                    class="uppercase"
-                  >
-                    {{ volunteerStatusLabel(myApplication.status) }}
-                  </UBadge>
+          <ClientOnly>
+            <!-- Candidature existante (affichée en premier si l'utilisateur a postulé) -->
+            <div v-if="authStore.isAuthenticated && volunteersMode === 'INTERNAL' && myApplication">
+              <UCard
+                variant="subtle"
+                class="border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-gray-800/40"
+              >
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <h4 class="text-sm font-semibold flex items-center gap-1">
+                      <UIcon name="i-heroicons-user" class="text-primary-500" />
+                      {{ t('editions.volunteers.my_application_title') }}
+                    </h4>
+                    <UBadge
+                      :color="volunteerStatusColor(myApplication.status)"
+                      variant="soft"
+                      class="uppercase"
+                    >
+                      {{ volunteerStatusLabel(myApplication.status) }}
+                    </UBadge>
+                  </div>
+                  <div class="text-xs space-y-1">
+                    <span
+                      v-if="myApplication.status === 'PENDING'"
+                      class="block text-gray-600 dark:text-gray-400"
+                      >{{ t('editions.volunteers.my_application_pending') }}</span
+                    >
+                    <span
+                      v-else-if="myApplication.status === 'ACCEPTED'"
+                      class="block text-gray-600 dark:text-gray-400"
+                      >{{ t('editions.volunteers.my_application_accepted') }}</span
+                    >
+                    <span
+                      v-else-if="myApplication.status === 'REJECTED'"
+                      class="block text-gray-600 dark:text-gray-400"
+                      >{{ t('editions.volunteers.my_application_rejected') }}</span
+                    >
+                  </div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <UButton
+                      color="primary"
+                      variant="soft"
+                      icon="i-heroicons-list-bullet"
+                      :to="'/my-volunteer-applications'"
+                    >
+                      {{
+                        t('editions.volunteers.view_all_applications') || 'Voir mes candidatures'
+                      }}
+                    </UButton>
+                    <UButton
+                      v-if="myApplication.status === 'PENDING'"
+                      size="xs"
+                      color="primary"
+                      variant="soft"
+                      icon="i-heroicons-pencil"
+                      @click="openEditApplicationModal"
+                    >
+                      {{ t('editions.volunteers.edit_application') }}
+                    </UButton>
+                    <UButton
+                      v-if="myApplication.status === 'PENDING'"
+                      size="xs"
+                      color="error"
+                      variant="soft"
+                      :loading="volunteersWithdrawing"
+                      @click="withdrawApplication"
+                    >
+                      {{ t('editions.volunteers.withdraw') }}
+                    </UButton>
+                  </div>
                 </div>
-                <div class="text-xs space-y-1">
-                  <span
-                    v-if="myApplication.status === 'PENDING'"
-                    class="block text-gray-600 dark:text-gray-400"
-                    >{{ t('editions.volunteers.my_application_pending') }}</span
-                  >
-                  <span
-                    v-else-if="myApplication.status === 'ACCEPTED'"
-                    class="block text-gray-600 dark:text-gray-400"
-                    >{{ t('editions.volunteers.my_application_accepted') }}</span
-                  >
-                  <span
-                    v-else-if="myApplication.status === 'REJECTED'"
-                    class="block text-gray-600 dark:text-gray-400"
-                    >{{ t('editions.volunteers.my_application_rejected') }}</span
-                  >
-                </div>
-                <div class="flex flex-wrap items-center gap-2">
-                  <UButton
-                    color="primary"
-                    variant="soft"
-                    icon="i-heroicons-list-bullet"
-                    :to="'/my-volunteer-applications'"
-                  >
-                    {{ t('editions.volunteers.view_all_applications') || 'Voir mes candidatures' }}
-                  </UButton>
-                  <UButton
-                    v-if="myApplication.status === 'PENDING'"
-                    size="xs"
-                    color="primary"
-                    variant="soft"
-                    icon="i-heroicons-pencil"
-                    @click="openEditApplicationModal"
-                  >
-                    {{ t('editions.volunteers.edit_application') }}
-                  </UButton>
-                  <UButton
-                    v-if="myApplication.status === 'PENDING'"
-                    size="xs"
-                    color="error"
-                    variant="soft"
-                    :loading="volunteersWithdrawing"
-                    @click="withdrawApplication"
-                  >
-                    {{ t('editions.volunteers.withdraw') }}
-                  </UButton>
-                </div>
-              </div>
-            </UCard>
-          </div>
+              </UCard>
+            </div>
+          </ClientOnly>
 
           <!-- Description -->
           <div>
@@ -197,38 +204,46 @@
             }}</span>
           </div>
 
-          <!-- Bouton pour postuler (seulement si l'utilisateur n'a pas encore postulé) -->
-          <div v-if="authStore.isAuthenticated && volunteersMode === 'INTERNAL' && !myApplication">
-            <div v-if="!volunteersInfo?.open" class="text-sm text-gray-500 flex items-center gap-2">
-              <UIcon name="i-heroicons-lock-closed" /> {{ t('editions.volunteers.closed_message') }}
-            </div>
-            <div v-else>
-              <UCard
-                variant="subtle"
-                class="border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-gray-800/40"
+          <ClientOnly>
+            <!-- Bouton pour postuler (seulement si l'utilisateur n'a pas encore postulé) -->
+            <div
+              v-if="authStore.isAuthenticated && volunteersMode === 'INTERNAL' && !myApplication"
+            >
+              <div
+                v-if="!volunteersInfo?.open"
+                class="text-sm text-gray-500 flex items-center gap-2"
               >
-                <div class="flex items-center justify-between gap-4">
-                  <div class="text-xs text-gray-600 dark:text-gray-400">
-                    {{ t('editions.volunteers.apply_description') }}
+                <UIcon name="i-heroicons-lock-closed" />
+                {{ t('editions.volunteers.closed_message') }}
+              </div>
+              <div v-else>
+                <UCard
+                  variant="subtle"
+                  class="border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-gray-800/40"
+                >
+                  <div class="flex items-center justify-between gap-4">
+                    <div class="text-xs text-gray-600 dark:text-gray-400">
+                      {{ t('editions.volunteers.apply_description') }}
+                    </div>
+                    <UButton
+                      size="sm"
+                      color="primary"
+                      icon="i-heroicons-hand-raised"
+                      @click="openApplyModal"
+                    >
+                      {{ t('editions.volunteers.apply') }}
+                    </UButton>
                   </div>
-                  <UButton
-                    size="sm"
-                    color="primary"
-                    icon="i-heroicons-hand-raised"
-                    @click="openApplyModal"
-                  >
-                    {{ t('editions.volunteers.apply') }}
-                  </UButton>
-                </div>
-              </UCard>
+                </UCard>
+              </div>
             </div>
-          </div>
-          <div
-            v-else-if="!authStore.isAuthenticated && volunteersMode === 'INTERNAL'"
-            class="text-sm text-gray-500"
-          >
-            {{ t('editions.volunteers.login_prompt') }}
-          </div>
+            <div
+              v-else-if="!authStore.isAuthenticated && volunteersMode === 'INTERNAL'"
+              class="text-sm text-gray-500"
+            >
+              {{ t('editions.volunteers.login_prompt') }}
+            </div>
+          </ClientOnly>
         </div>
       </UCard>
 
@@ -257,6 +272,14 @@
         @close="closeEditApplicationModal"
         @update="updateVolunteerApplication"
       />
+
+      <!-- Modal détails de créneau (lecture seule) -->
+      <EditionVolunteerPlanningSlotDetailsModal
+        v-if="showSlotDetailsModal && selectedSlot"
+        v-model="showSlotDetailsModal"
+        :time-slot="selectedSlot"
+        :teams="(fetchedTeams as any) || []"
+      />
     </div>
   </div>
   <div v-else>
@@ -271,6 +294,7 @@ import { useRoute } from 'vue-router'
 
 // App components & stores
 import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
+import { useVolunteerTeams } from '~/composables/useVolunteerTeams'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { requiresEmergencyContact } from '~/utils/allergy-severity'
@@ -294,8 +318,16 @@ const editionId = parseInt(route.params.id as string)
 const { settings: volunteersInfo, fetchSettings: fetchVolunteersSettings } =
   useVolunteerSettings(editionId)
 
+// Récupérer les équipes pour la modal de créneau
+const editionIdComputed = computed(() => editionId)
+const { teams: fetchedTeams } = useVolunteerTeams(editionIdComputed)
+
 // Candidature de l'utilisateur
 const myApplication = ref<any>(null)
+
+// Modal de détails de créneau
+const showSlotDetailsModal = ref(false)
+const selectedSlot = ref<any>(null)
 
 // Expose constants early (avant tout await)
 defineExpose({})
@@ -606,5 +638,25 @@ const updateVolunteerApplication = async (data: any) => {
       color: 'error',
     })
   }
+}
+
+// Fonction pour ouvrir la modal de détails du créneau
+const openSlotDetailsModal = (slot: any) => {
+  // Préparer les données du créneau pour la modal
+  // On passe directement les assignations déjà chargées par l'API
+  selectedSlot.value = {
+    id: slot.id,
+    editionId: editionId,
+    title: slot.title,
+    description: slot.description,
+    teamId: slot.teamId,
+    start: slot.start,
+    end: slot.end,
+    maxVolunteers: slot.maxVolunteers,
+    assignedVolunteers: slot.assignedVolunteers,
+    assignedVolunteersList: slot.assignments || [], // Passer les assignations déjà chargées
+    color: slot.color,
+  }
+  showSlotDetailsModal.value = true
 }
 </script>
