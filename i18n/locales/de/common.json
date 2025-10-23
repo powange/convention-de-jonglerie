@@ -68,7 +68,7 @@
       "toggle_preview": "Vorschau umschalten"
     },
     "email": "E-Mail",
-    "end": "[TODO] Fin",
+    "end": "Ende",
     "end_date": "Enddatum",
     "error": "Fehler",
     "export_success": "Export erfolgreich",
@@ -108,7 +108,7 @@
     "show_less": "Weniger anzeigen",
     "show_more": "Mehr anzeigen",
     "sort_tip": "Sortieren: Klicken Sie auf die Kopfzeilen (Shift+Klick für mehrere)",
-    "start": "[TODO] Début",
+    "start": "Anfang",
     "start_date": "Startdatum",
     "status": "Status",
     "success": "Erfolg",

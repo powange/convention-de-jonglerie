@@ -68,7 +68,7 @@
       "toggle_preview": "Voorbeeld wisselen"
     },
     "email": "E-mail",
-    "end": "[TODO] Fin",
+    "end": "Einde",
     "end_date": "Einddatum",
     "error": "Fout",
     "export_success": "Export succesvol",
@@ -108,7 +108,7 @@
     "show_less": "Minder tonen",
     "show_more": "Meer tonen",
     "sort_tip": "Sorteren: klik op headers (Shift+klik voor meerdere)",
-    "start": "[TODO] Début",
+    "start": "Begin",
     "start_date": "Startdatum",
     "status": "Status",
     "success": "Succes",

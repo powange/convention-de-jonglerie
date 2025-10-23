@@ -86,8 +86,18 @@ const translator = new Translator(DEEPL_API_KEY)
 // Configuration
 const SOURCE_LANG = 'FR' // Langue source (français)
 const TARGET_LANGS = [
-  { code: 'SV', dir: 'sv', name: 'Suédois' },
   { code: 'CS', dir: 'cs', name: 'Tchèque' },
+  { code: 'DA', dir: 'da', name: 'Danois' },
+  { code: 'DE', dir: 'de', name: 'Allemand' },
+  { code: 'EN-GB', dir: 'en', name: 'Anglais' },
+  { code: 'ES', dir: 'es', name: 'Espagnol' },
+  { code: 'IT', dir: 'it', name: 'Italien' },
+  { code: 'NL', dir: 'nl', name: 'Néerlandais' },
+  { code: 'PL', dir: 'pl', name: 'Polonais' },
+  { code: 'PT-PT', dir: 'pt', name: 'Portugais' },
+  { code: 'RU', dir: 'ru', name: 'Russe' },
+  { code: 'SV', dir: 'sv', name: 'Suédois' },
+  { code: 'UK', dir: 'uk', name: 'Ukrainien' },
 ]
 
 const I18N_DIR = 'i18n/locales'
@@ -106,6 +116,7 @@ const FILES_TO_TRANSLATE = [
   'permissions.json',
   'public.json',
   'ticketing.json',
+  'workshops.json',
 ]
 
 // Statistiques de traduction

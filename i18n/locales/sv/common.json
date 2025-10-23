@@ -68,7 +68,7 @@
       "toggle_preview": "Toggle förhandsgranskning"
     },
     "email": "E-post",
-    "end": "[TODO] Fin",
+    "end": "Slut",
     "end_date": "Slutdatum",
     "error": "Fel",
     "export_success": "Framgångsrik export",
@@ -108,7 +108,7 @@
     "show_less": "Visa mindre",
     "show_more": "Visa mer",
     "sort_tip": "Sortering: klicka på rubrikerna (Shift+klick för flera)",
-    "start": "[TODO] Début",
+    "start": "Start",
     "start_date": "Startdatum",
     "status": "Status",
     "success": "Framgång",

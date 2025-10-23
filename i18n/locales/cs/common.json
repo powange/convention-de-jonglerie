@@ -68,7 +68,7 @@
       "toggle_preview": "Přepínání náhledů"
     },
     "email": "E-mail",
-    "end": "[TODO] Fin",
+    "end": "Konec",
     "end_date": "Datum ukončení",
     "error": "Chyba",
     "export_success": "Úspěšný vývoz",
@@ -108,7 +108,7 @@
     "show_less": "Zobrazit méně",
     "show_more": "Zobrazit více",
     "sort_tip": "Třídění: klikněte na záhlaví (Shift+klik pro více položek).",
-    "start": "[TODO] Début",
+    "start": "Začátek",
     "start_date": "Datum zahájení",
     "status": "Stav",
     "success": "Úspěch",

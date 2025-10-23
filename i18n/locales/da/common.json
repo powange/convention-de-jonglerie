@@ -68,7 +68,7 @@
       "toggle_preview": "Skift forhåndsvisning"
     },
     "email": "Email",
-    "end": "[TODO] Fin",
+    "end": "Slut",
     "end_date": "Slutdato",
     "error": "Fejl",
     "export_success": "Eksport lykkedes",
@@ -108,7 +108,7 @@
     "show_less": "Vis mindre",
     "show_more": "Vis mere",
     "sort_tip": "Sorter: klik på overskrifter (Shift+klik for flere)",
-    "start": "[TODO] Début",
+    "start": "Start",
     "start_date": "Startdato",
     "status": "Status",
     "success": "Succes",

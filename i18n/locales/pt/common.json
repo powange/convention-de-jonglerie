@@ -68,7 +68,7 @@
       "toggle_preview": "Alternar visualização"
     },
     "email": "E-mail",
-    "end": "[TODO] Fin",
+    "end": "Fim",
     "end_date": "Data de fim",
     "error": "Erro",
     "export_success": "Exportação bem-sucedida",
@@ -108,7 +108,7 @@
     "show_less": "Mostrar menos",
     "show_more": "Mostrar mais",
     "sort_tip": "Ordenar: clique nos cabeçalhos (Shift+clique para múltiplos)",
-    "start": "[TODO] Début",
+    "start": "Início",
     "start_date": "Data de início",
     "status": "Estado",
     "success": "Sucesso",
