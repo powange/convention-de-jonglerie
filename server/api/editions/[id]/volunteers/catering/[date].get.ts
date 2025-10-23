@@ -225,6 +225,7 @@ export default defineEventHandler(async (event) => {
           pseudo: app.user.pseudo,
         },
         allergies: app.allergies,
+        allergySeverity: app.allergySeverity,
       }))
 
     result.slots[slot] = {

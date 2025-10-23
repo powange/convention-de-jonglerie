@@ -10,151 +10,151 @@ datasource db {
 }
 
 model User {
-  id                       Int                             @id @default(autoincrement())
-  email                    String                          @unique
-  pseudo                   String                          @unique
-  nom                      String?
-  prenom                   String?
-  password                 String?
-  authProvider             String                          @default("email") // "email", "google", "facebook"
-  createdAt                DateTime                        @default(now())
-  updatedAt                DateTime                        @updatedAt
-  lastLoginAt              DateTime?
-  profilePicture           String?
-  emailVerificationCode    String?
-  isEmailVerified          Boolean                         @default(false)
-  verificationCodeExpiry   DateTime?
-  isGlobalAdmin            Boolean                         @default(false)
-  phone                    String?
-  preferredLanguage        String                          @default("fr")
-  notificationPreferences  Json?
-  carpoolBookings          CarpoolBooking[]
-  carpoolComments          CarpoolComment[]
-  carpoolOffers            CarpoolOffer[]
-  carpoolPassengers        CarpoolPassenger[]
-  carpoolRequests          CarpoolRequest[]
-  carpoolRequestComments   CarpoolRequestComment[]
-  permissionHistoryActions CollaboratorPermissionHistory[] @relation("CollaboratorPermissionHistory_actor")
-  targetUserHistories      CollaboratorPermissionHistory[] @relation("CollaboratorPermissionHistory_target")
-  createdConventions       Convention[]
-  addedCollaborators       ConventionCollaborator[]        @relation("AddedCollaborators")
-  collaborations           ConventionCollaborator[]
-  createdEditions          Edition[]                       @relation("CreatedEditions")
-  editionPosts             EditionPost[]
-  editionPostComments      EditionPostComment[]
-  volunteerApplications    EditionVolunteerApplication[]
-  feedbacks                Feedback[]
-  apiErrorLogs             ApiErrorLog[]
-  notifications            Notification[]
-  lostFoundComments        LostFoundComment[]
-  lostFoundItems           LostFoundItem[]
-  passwordResetTokens      PasswordResetToken[]
-  favoriteEditions         Edition[]                       @relation("FavoriteEditions")
-  attendingEditions        Edition[]                       @relation("AttendingEditions")
-  pushSubscriptions        PushSubscription[]
-  volunteerNotificationGroups VolunteerNotificationGroup[]
+  id                                 Int                                 @id @default(autoincrement())
+  email                              String                              @unique
+  pseudo                             String                              @unique
+  nom                                String?
+  prenom                             String?
+  password                           String?
+  authProvider                       String                              @default("email") // "email", "google", "facebook"
+  createdAt                          DateTime                            @default(now())
+  updatedAt                          DateTime                            @updatedAt
+  lastLoginAt                        DateTime?
+  profilePicture                     String?
+  emailVerificationCode              String?
+  isEmailVerified                    Boolean                             @default(false)
+  verificationCodeExpiry             DateTime?
+  isGlobalAdmin                      Boolean                             @default(false)
+  phone                              String?
+  preferredLanguage                  String                              @default("fr")
+  notificationPreferences            Json?
+  carpoolBookings                    CarpoolBooking[]
+  carpoolComments                    CarpoolComment[]
+  carpoolOffers                      CarpoolOffer[]
+  carpoolPassengers                  CarpoolPassenger[]
+  carpoolRequests                    CarpoolRequest[]
+  carpoolRequestComments             CarpoolRequestComment[]
+  permissionHistoryActions           CollaboratorPermissionHistory[]     @relation("CollaboratorPermissionHistory_actor")
+  targetUserHistories                CollaboratorPermissionHistory[]     @relation("CollaboratorPermissionHistory_target")
+  createdConventions                 Convention[]
+  addedCollaborators                 ConventionCollaborator[]            @relation("AddedCollaborators")
+  collaborations                     ConventionCollaborator[]
+  createdEditions                    Edition[]                           @relation("CreatedEditions")
+  editionPosts                       EditionPost[]
+  editionPostComments                EditionPostComment[]
+  volunteerApplications              EditionVolunteerApplication[]
+  feedbacks                          Feedback[]
+  apiErrorLogs                       ApiErrorLog[]
+  notifications                      Notification[]
+  lostFoundComments                  LostFoundComment[]
+  lostFoundItems                     LostFoundItem[]
+  passwordResetTokens                PasswordResetToken[]
+  favoriteEditions                   Edition[]                           @relation("FavoriteEditions")
+  attendingEditions                  Edition[]                           @relation("AttendingEditions")
+  pushSubscriptions                  PushSubscription[]
+  volunteerNotificationGroups        VolunteerNotificationGroup[]
   volunteerNotificationConfirmations VolunteerNotificationConfirmation[]
-  volunteerAssignments         VolunteerAssignment[]        @relation("VolunteerAssignment_user")
-  assignedVolunteerSlots       VolunteerAssignment[]        @relation("VolunteerAssignment_assignedBy")
-  claimRequests                ConventionClaimRequest[]
-  workshops                    Workshop[]
-  workshopFavorites            WorkshopFavorite[]
+  volunteerAssignments               VolunteerAssignment[]               @relation("VolunteerAssignment_user")
+  assignedVolunteerSlots             VolunteerAssignment[]               @relation("VolunteerAssignment_assignedBy")
+  claimRequests                      ConventionClaimRequest[]
+  workshops                          Workshop[]
+  workshopFavorites                  WorkshopFavorite[]
 }
 
 model Edition {
-  id                           Int                             @id @default(autoincrement())
-  name                         String?
-  description                  String?                         @db.Text
-  program                      String?                         @db.Text
-  createdAt                    DateTime                        @default(now())
-  updatedAt                    DateTime                        @updatedAt
-  creatorId                    Int?                            // Nullable pour éditions importées
-  endDate                      DateTime
-  startDate                    DateTime
-  addressLine1                 String
-  addressLine2                 String?
-  city                         String
-  country                      String
-  postalCode                   String
-  region                       String?
-  latitude                     Float?
-  longitude                    Float?
-  facebookUrl                  String?
-  instagramUrl                 String?
-  ticketingUrl                 String?
-  acceptsPets                  Boolean                         @default(false)
-  hasFoodTrucks                Boolean                         @default(false)
-  hasGym                       Boolean                         @default(false)
-  hasKidsZone                  Boolean                         @default(false)
-  hasTentCamping               Boolean                         @default(false)
-  hasTruckCamping              Boolean                         @default(false)
-  imageUrl                     String?
-  hasAccessibility             Boolean                         @default(false)
-  hasAerialSpace               Boolean                         @default(false)
-  hasCantine                   Boolean                         @default(false)
-  hasConcert                   Boolean                         @default(false)
-  hasFamilyCamping             Boolean                         @default(false)
-  hasSleepingRoom              Boolean                         @default(false)
-  hasFireSpace                 Boolean                         @default(false)
-  hasGala                      Boolean                         @default(false)
-  hasOpenStage                 Boolean                         @default(false)
-  hasShowers                   Boolean                         @default(false)
-  hasSlacklineSpace            Boolean                         @default(false)
-  hasToilets                   Boolean                         @default(false)
-  hasWorkshops                 Boolean                         @default(false)
-  hasCashPayment               Boolean                         @default(false)
-  hasCreditCardPayment         Boolean                         @default(false)
-  hasAfjTokenPayment           Boolean                         @default(false)
-  conventionId                 Int
-  hasATM                       Boolean                         @default(false)
-  hasLongShow                  Boolean                         @default(false)
-  isOnline                     Boolean                         @default(false)
-  volunteersDescription        String?                         @db.Text
-  volunteersOpen               Boolean                         @default(false)
-  volunteersUpdatedAt          DateTime?
-  volunteersExternalUrl        String?
-  volunteersMode               VolunteerMode                   @default(INTERNAL)
-  volunteersAskDiet            Boolean                         @default(false)
-  volunteersAskAllergies       Boolean                         @default(false)
-  officialWebsiteUrl           String?
-  volunteersAskTimePreferences Boolean                         @default(false)
-  volunteersAskTeamPreferences Boolean                         @default(false)
-  volunteersAskPets            Boolean                         @default(false)
-  volunteersAskMinors          Boolean                         @default(false)
-  volunteersAskVehicle         Boolean                         @default(false)
-  volunteersAskCompanion       Boolean                         @default(false)
-  volunteersAskAvoidList       Boolean                         @default(false)
-  volunteersAskSkills          Boolean                         @default(false)
-  volunteersAskExperience      Boolean                         @default(false)
-  volunteersAskEmergencyContact Boolean                        @default(false)
-  volunteersTeardownEndDate    DateTime?
-  volunteersSetupStartDate     DateTime?
-  volunteersAskSetup           Boolean                         @default(false)
-  volunteersAskTeardown        Boolean                         @default(false)
-  workshopsEnabled             Boolean                         @default(false)
-  workshopLocationsFreeInput   Boolean                         @default(false)
-  carpoolOffers                CarpoolOffer[]
-  carpoolRequests              CarpoolRequest[]
-  convention                   Convention                      @relation(fields: [conventionId], references: [id], onDelete: Cascade)
-  creator                      User?                           @relation("CreatedEditions", fields: [creatorId], references: [id])
-  collaboratorPermissions      EditionCollaboratorPermission[]
-  editionPosts                 EditionPost[]
-  volunteerApplications        EditionVolunteerApplication[]
-  lostFoundItems               LostFoundItem[]
-  favoritedBy                  User[]                          @relation("FavoriteEditions")
-  attendingUsers               User[]                          @relation("AttendingEditions")
-  volunteerNotificationGroups  VolunteerNotificationGroup[]
-  volunteerTeams               VolunteerTeam[]
-  volunteerTimeSlots           VolunteerTimeSlot[]
-  externalTicketing            ExternalTicketing?
-  tiers                        TicketingTier[]
-  ticketingQuotas              TicketingQuota[]
-  returnableItems              TicketingReturnableItem[]
-  options                      TicketingOption[]
-  orders                       TicketingOrder[]
-  volunteerTicketingReturnableItems     EditionVolunteerReturnableItem[]
-  workshops                    Workshop[]
-  workshopLocations            WorkshopLocation[]
+  id                                Int                              @id @default(autoincrement())
+  name                              String?
+  description                       String?                          @db.Text
+  program                           String?                          @db.Text
+  createdAt                         DateTime                         @default(now())
+  updatedAt                         DateTime                         @updatedAt
+  creatorId                         Int? // Nullable pour éditions importées
+  endDate                           DateTime
+  startDate                         DateTime
+  addressLine1                      String
+  addressLine2                      String?
+  city                              String
+  country                           String
+  postalCode                        String
+  region                            String?
+  latitude                          Float?
+  longitude                         Float?
+  facebookUrl                       String?
+  instagramUrl                      String?
+  ticketingUrl                      String?
+  acceptsPets                       Boolean                          @default(false)
+  hasFoodTrucks                     Boolean                          @default(false)
+  hasGym                            Boolean                          @default(false)
+  hasKidsZone                       Boolean                          @default(false)
+  hasTentCamping                    Boolean                          @default(false)
+  hasTruckCamping                   Boolean                          @default(false)
+  imageUrl                          String?
+  hasAccessibility                  Boolean                          @default(false)
+  hasAerialSpace                    Boolean                          @default(false)
+  hasCantine                        Boolean                          @default(false)
+  hasConcert                        Boolean                          @default(false)
+  hasFamilyCamping                  Boolean                          @default(false)
+  hasSleepingRoom                   Boolean                          @default(false)
+  hasFireSpace                      Boolean                          @default(false)
+  hasGala                           Boolean                          @default(false)
+  hasOpenStage                      Boolean                          @default(false)
+  hasShowers                        Boolean                          @default(false)
+  hasSlacklineSpace                 Boolean                          @default(false)
+  hasToilets                        Boolean                          @default(false)
+  hasWorkshops                      Boolean                          @default(false)
+  hasCashPayment                    Boolean                          @default(false)
+  hasCreditCardPayment              Boolean                          @default(false)
+  hasAfjTokenPayment                Boolean                          @default(false)
+  conventionId                      Int
+  hasATM                            Boolean                          @default(false)
+  hasLongShow                       Boolean                          @default(false)
+  isOnline                          Boolean                          @default(false)
+  volunteersDescription             String?                          @db.Text
+  volunteersOpen                    Boolean                          @default(false)
+  volunteersUpdatedAt               DateTime?
+  volunteersExternalUrl             String?
+  volunteersMode                    VolunteerMode                    @default(INTERNAL)
+  volunteersAskDiet                 Boolean                          @default(false)
+  volunteersAskAllergies            Boolean                          @default(false)
+  officialWebsiteUrl                String?
+  volunteersAskTimePreferences      Boolean                          @default(false)
+  volunteersAskTeamPreferences      Boolean                          @default(false)
+  volunteersAskPets                 Boolean                          @default(false)
+  volunteersAskMinors               Boolean                          @default(false)
+  volunteersAskVehicle              Boolean                          @default(false)
+  volunteersAskCompanion            Boolean                          @default(false)
+  volunteersAskAvoidList            Boolean                          @default(false)
+  volunteersAskSkills               Boolean                          @default(false)
+  volunteersAskExperience           Boolean                          @default(false)
+  volunteersAskEmergencyContact     Boolean                          @default(false)
+  volunteersTeardownEndDate         DateTime?
+  volunteersSetupStartDate          DateTime?
+  volunteersAskSetup                Boolean                          @default(false)
+  volunteersAskTeardown             Boolean                          @default(false)
+  workshopsEnabled                  Boolean                          @default(false)
+  workshopLocationsFreeInput        Boolean                          @default(false)
+  carpoolOffers                     CarpoolOffer[]
+  carpoolRequests                   CarpoolRequest[]
+  convention                        Convention                       @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  creator                           User?                            @relation("CreatedEditions", fields: [creatorId], references: [id])
+  collaboratorPermissions           EditionCollaboratorPermission[]
+  editionPosts                      EditionPost[]
+  volunteerApplications             EditionVolunteerApplication[]
+  lostFoundItems                    LostFoundItem[]
+  favoritedBy                       User[]                           @relation("FavoriteEditions")
+  attendingUsers                    User[]                           @relation("AttendingEditions")
+  volunteerNotificationGroups       VolunteerNotificationGroup[]
+  volunteerTeams                    VolunteerTeam[]
+  volunteerTimeSlots                VolunteerTimeSlot[]
+  externalTicketing                 ExternalTicketing?
+  tiers                             TicketingTier[]
+  ticketingQuotas                   TicketingQuota[]
+  returnableItems                   TicketingReturnableItem[]
+  options                           TicketingOption[]
+  orders                            TicketingOrder[]
+  volunteerTicketingReturnableItems EditionVolunteerReturnableItem[]
+  workshops                         Workshop[]
+  workshopLocations                 WorkshopLocation[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -185,52 +185,52 @@ model ConventionCollaborator {
 }
 
 enum CarpoolDirection {
-  TO_EVENT     // Aller vers la convention
-  FROM_EVENT   // Retour depuis la convention
+  TO_EVENT // Aller vers la convention
+  FROM_EVENT // Retour depuis la convention
 }
 
 model CarpoolOffer {
-  id               Int                @id @default(autoincrement())
-  userId           Int
-  tripDate         DateTime
-  locationCity     String
-  locationAddress  String
-  availableSeats   Int
-  direction        CarpoolDirection   @default(TO_EVENT)
-  description      String?            @db.Text
-  phoneNumber      String?
-  smokingAllowed   Boolean            @default(false)
-  petsAllowed      Boolean            @default(false)
-  musicAllowed     Boolean            @default(false)
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  editionId        Int
-  bookings         CarpoolBooking[]
-  comments         CarpoolComment[]
-  edition          Edition            @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  passengers       CarpoolPassenger[]
+  id              Int                @id @default(autoincrement())
+  userId          Int
+  tripDate        DateTime
+  locationCity    String
+  locationAddress String
+  availableSeats  Int
+  direction       CarpoolDirection   @default(TO_EVENT)
+  description     String?            @db.Text
+  phoneNumber     String?
+  smokingAllowed  Boolean            @default(false)
+  petsAllowed     Boolean            @default(false)
+  musicAllowed    Boolean            @default(false)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  editionId       Int
+  bookings        CarpoolBooking[]
+  comments        CarpoolComment[]
+  edition         Edition            @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  passengers      CarpoolPassenger[]
 
   @@index([editionId], map: "CarpoolOffer_editionId_fkey")
   @@index([userId], map: "CarpoolOffer_userId_fkey")
 }
 
 model CarpoolRequest {
-  id            Int                     @id @default(autoincrement())
-  userId        Int
-  tripDate      DateTime
-  locationCity  String
-  seatsNeeded   Int                     @default(1)
-  direction     CarpoolDirection        @default(TO_EVENT)
-  description   String?                 @db.Text
-  phoneNumber   String?
-  createdAt     DateTime                @default(now())
-  updatedAt     DateTime                @updatedAt
-  editionId     Int
-  bookings      CarpoolBooking[]
-  edition       Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  user          User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  comments      CarpoolRequestComment[]
+  id           Int                     @id @default(autoincrement())
+  userId       Int
+  tripDate     DateTime
+  locationCity String
+  seatsNeeded  Int                     @default(1)
+  direction    CarpoolDirection        @default(TO_EVENT)
+  description  String?                 @db.Text
+  phoneNumber  String?
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+  editionId    Int
+  bookings     CarpoolBooking[]
+  edition      Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user         User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments     CarpoolRequestComment[]
 
   @@index([editionId], map: "CarpoolRequest_editionId_fkey")
   @@index([userId], map: "CarpoolRequest_userId_fkey")
@@ -302,10 +302,10 @@ model Convention {
   name              String
   description       String?                         @db.Text
   logo              String?
-  email             String?                         // Email pour revendication
+  email             String? // Email pour revendication
   createdAt         DateTime                        @default(now())
   updatedAt         DateTime                        @updatedAt
-  authorId          Int?                            // Nullable pour conventions importées
+  authorId          Int? // Nullable pour conventions importées
   archivedAt        DateTime?
   isArchived        Boolean                         @default(false)
   permissionHistory CollaboratorPermissionHistory[]
@@ -426,45 +426,45 @@ model LostFoundComment {
 }
 
 model EditionVolunteerApplication {
-  id                   Int               @id @default(autoincrement())
-  editionId            Int
-  userId               Int
-  status               VolunteerStatus   @default(PENDING)
-  motivation           String?           @db.Text
-  allergies            String?           @db.Text
-  allergySeverity      AllergySeverity?
-  createdAt            DateTime          @default(now())
-  updatedAt            DateTime          @updatedAt
-  decidedAt            DateTime?
-  userSnapshotPhone    String?
-  dietaryPreference    DietaryPreference @default(NONE)
-  timePreferences      Json?
-  teamPreferences      Json?
-  acceptanceNote       String?           @db.Text
-  hasPets              Boolean?
-  petsDetails          String?           @db.Text
-  hasMinors            Boolean?
-  minorsDetails        String?           @db.Text
-  hasVehicle           Boolean?
-  vehicleDetails       String?           @db.Text
-  companionName        String?           @db.Text
-  avoidList            String?           @db.Text
-  skills               String?           @db.Text
-  hasExperience        Boolean?
-  experienceDetails    String?           @db.Text
-  setupAvailability    Boolean?
-  teardownAvailability Boolean?
-  eventAvailability    Boolean?
-  arrivalDateTime      String?
-  departureDateTime    String?
-  emergencyContactName String?
+  id                    Int                         @id @default(autoincrement())
+  editionId             Int
+  userId                Int
+  status                VolunteerStatus             @default(PENDING)
+  motivation            String?                     @db.Text
+  allergies             String?                     @db.Text
+  allergySeverity       AllergySeverity?
+  createdAt             DateTime                    @default(now())
+  updatedAt             DateTime                    @updatedAt
+  decidedAt             DateTime?
+  userSnapshotPhone     String?
+  dietaryPreference     DietaryPreference           @default(NONE)
+  timePreferences       Json?
+  teamPreferences       Json?
+  acceptanceNote        String?                     @db.Text
+  hasPets               Boolean?
+  petsDetails           String?                     @db.Text
+  hasMinors             Boolean?
+  minorsDetails         String?                     @db.Text
+  hasVehicle            Boolean?
+  vehicleDetails        String?                     @db.Text
+  companionName         String?                     @db.Text
+  avoidList             String?                     @db.Text
+  skills                String?                     @db.Text
+  hasExperience         Boolean?
+  experienceDetails     String?                     @db.Text
+  setupAvailability     Boolean?
+  teardownAvailability  Boolean?
+  eventAvailability     Boolean?
+  arrivalDateTime       String?
+  departureDateTime     String?
+  emergencyContactName  String?
   emergencyContactPhone String?
-  entryValidated       Boolean           @default(false)
-  entryValidatedAt     DateTime?
-  entryValidatedBy     Int?
-  edition              Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  user                 User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  teamAssignments      ApplicationTeamAssignment[]
+  entryValidated        Boolean                     @default(false)
+  entryValidatedAt      DateTime?
+  entryValidatedBy      Int?
+  edition               Edition                     @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user                  User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamAssignments       ApplicationTeamAssignment[]
 
   @@unique([editionId, userId])
   @@index([editionId])
@@ -549,42 +549,42 @@ enum VolunteerStatus {
 // ========== LOGS D'ERREURS ==========
 
 model ApiErrorLog {
-  id              String   @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   // Informations sur l'erreur
-  message         String   @db.Text
-  statusCode      Int
-  stack           String?  @db.LongText
-  errorType       String?  // Type d'erreur (ValidationError, DatabaseError, etc.)
-  
+  message    String  @db.Text
+  statusCode Int
+  stack      String? @db.LongText
+  errorType  String? // Type d'erreur (ValidationError, DatabaseError, etc.)
+
   // Contexte de la requête
-  method          String   // GET, POST, PUT, DELETE, etc.
-  url             String   @db.Text
-  path            String   // URL path sans query params
-  userAgent       String?  @db.Text
-  ip              String?
-  referer         String?  @db.Text // Page d'origine de la requête
-  origin          String?  // Domaine d'origine
-  
+  method    String // GET, POST, PUT, DELETE, etc.
+  url       String  @db.Text
+  path      String // URL path sans query params
+  userAgent String? @db.Text
+  ip        String?
+  referer   String? @db.Text // Page d'origine de la requête
+  origin    String? // Domaine d'origine
+
   // Données de la requête
-  headers         Json?    // Headers de la requête (sans données sensibles)
-  body            Json?    // Corps de la requête (sans données sensibles)
-  queryParams     Json?    // Paramètres de requête
-  
+  headers     Json? // Headers de la requête (sans données sensibles)
+  body        Json? // Corps de la requête (sans données sensibles)
+  queryParams Json? // Paramètres de requête
+
   // Informations utilisateur
-  userId          Int?
-  user            User?    @relation(fields: [userId], references: [id])
-  
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id])
+
   // Métadonnées
-  resolved        Boolean  @default(false)  // Marqué comme résolu par un admin
-  resolvedBy      Int?
-  resolvedAt      DateTime?
-  adminNotes      String?  @db.Text
-  
+  resolved   Boolean   @default(false) // Marqué comme résolu par un admin
+  resolvedBy Int?
+  resolvedAt DateTime?
+  adminNotes String?   @db.Text
+
   // Timestamps
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([createdAt])
   @@index([statusCode])
   @@index([path])
@@ -595,39 +595,39 @@ model ApiErrorLog {
 // ========== NOTIFICATIONS ==========
 
 model Notification {
-  id          String           @id @default(cuid())
-  userId      Int
-  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId Int
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Contenu de la notification
-  type        NotificationType
+  type NotificationType
 
   // SYSTÈME DE TRADUCTION (notifications système)
-  titleKey          String?          // Clé de traduction pour le titre
-  messageKey        String?          // Clé de traduction pour le message
-  translationParams Json?            // Paramètres pour les traductions (noms, dates, etc.)
-  actionTextKey     String?          // Clé de traduction pour le texte du bouton
+  titleKey          String? // Clé de traduction pour le titre
+  messageKey        String? // Clé de traduction pour le message
+  translationParams Json? // Paramètres pour les traductions (noms, dates, etc.)
+  actionTextKey     String? // Clé de traduction pour le texte du bouton
 
   // TEXTE LIBRE (notifications custom/orgas)
-  titleText         String?          @db.Text // Texte libre pour le titre
-  messageText       String?          @db.Text // Texte libre pour le message
-  actionText        String?          // Texte libre pour le bouton d'action
+  titleText   String? @db.Text // Texte libre pour le titre
+  messageText String? @db.Text // Texte libre pour le message
+  actionText  String? // Texte libre pour le bouton d'action
 
   // Métadonnées pour le contexte
-  category    String?          // 'edition', 'volunteer', 'system', etc.
-  entityType  String?          // Type d'entité liée (Edition, User, etc.)
-  entityId    String?          // ID de l'entité liée
+  category   String? // 'edition', 'volunteer', 'system', etc.
+  entityType String? // Type d'entité liée (Edition, User, etc.)
+  entityId   String? // ID de l'entité liée
 
   // États de lecture
-  isRead      Boolean          @default(false)
-  readAt      DateTime?
+  isRead Boolean   @default(false)
+  readAt DateTime?
 
   // Actions optionnelles
-  actionUrl   String?          @db.Text // URL vers laquelle rediriger
+  actionUrl String? @db.Text // URL vers laquelle rediriger
 
   // Timestamps
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Index pour optimiser les requêtes
   @@index([userId])
@@ -644,15 +644,15 @@ enum NotificationType {
 }
 
 model PushSubscription {
-  id         String   @id @default(cuid())
-  userId     Int
-  endpoint   String   @db.VarChar(500)
-  p256dh     String   @db.VarChar(255)
-  auth       String   @db.VarChar(255)
-  isActive   Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  userId    Int
+  endpoint  String   @db.VarChar(500)
+  p256dh    String   @db.VarChar(255)
+  auth      String   @db.VarChar(255)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, endpoint])
   @@index([userId])
@@ -661,32 +661,32 @@ model PushSubscription {
 // ========== NOTIFICATIONS BÉNÉVOLES ==========
 
 model VolunteerNotificationGroup {
-  id             String                          @id @default(cuid())
+  id             String   @id @default(cuid())
   editionId      Int
   senderId       Int
   title          String
-  message        String                          @db.Text
-  targetType     String                          // 'all' ou 'teams'
-  selectedTeams  Json?                           // Array des équipes sélectionnées si targetType = 'teams'
+  message        String   @db.Text
+  targetType     String // 'all' ou 'teams'
+  selectedTeams  Json? // Array des équipes sélectionnées si targetType = 'teams'
   recipientCount Int
-  sentAt         DateTime                        @default(now())
+  sentAt         DateTime @default(now())
 
-  edition        Edition                         @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  sender         User                            @relation(fields: [senderId], references: [id])
-  confirmations  VolunteerNotificationConfirmation[]
+  edition       Edition                             @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  sender        User                                @relation(fields: [senderId], references: [id])
+  confirmations VolunteerNotificationConfirmation[]
 
   @@index([editionId])
   @@index([senderId])
 }
 
 model VolunteerNotificationConfirmation {
-  id                           String                     @id @default(cuid())
+  id                           String    @id @default(cuid())
   volunteerNotificationGroupId String
   userId                       Int
   confirmedAt                  DateTime?
 
-  notificationGroup            VolunteerNotificationGroup @relation(fields: [volunteerNotificationGroupId], references: [id], onDelete: Cascade)
-  user                         User                       @relation(fields: [userId], references: [id])
+  notificationGroup VolunteerNotificationGroup @relation(fields: [volunteerNotificationGroupId], references: [id], onDelete: Cascade)
+  user              User                       @relation(fields: [userId], references: [id])
 
   @@unique([volunteerNotificationGroupId, userId])
   @@index([userId])
@@ -695,20 +695,20 @@ model VolunteerNotificationConfirmation {
 // ========== PLANNING BÉNÉVOLES ==========
 
 model VolunteerTeam {
-  id           String              @id @default(cuid())
-  editionId    Int
-  name         String
-  description  String?             @db.Text
-  color        String              @default("#6b7280") @db.VarChar(7)
-  maxVolunteers Int?
-  isRequired   Boolean             @default(false)
-  isAccessControlTeam Boolean       @default(false)
-  isVisibleToVolunteers Boolean     @default(true)
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
+  id                    String   @id @default(cuid())
+  editionId             Int
+  name                  String
+  description           String?  @db.Text
+  color                 String   @default("#6b7280") @db.VarChar(7)
+  maxVolunteers         Int?
+  isRequired            Boolean  @default(false)
+  isAccessControlTeam   Boolean  @default(false)
+  isVisibleToVolunteers Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
-  edition      Edition             @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  timeSlots    VolunteerTimeSlot[]
+  edition              Edition                          @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  timeSlots            VolunteerTimeSlot[]
   assignedApplications ApplicationTeamAssignment[]
   returnableItems      EditionVolunteerReturnableItem[]
 
@@ -716,36 +716,36 @@ model VolunteerTeam {
 }
 
 model VolunteerTimeSlot {
-  id                 String                @id @default(cuid())
+  id                 String   @id @default(cuid())
   editionId          Int
   teamId             String?
   title              String?
-  description        String?               @db.Text
+  description        String?  @db.Text
   startDateTime      DateTime
   endDateTime        DateTime
-  maxVolunteers      Int                   @default(1)
-  assignedVolunteers Int                   @default(0)
-  createdAt          DateTime              @default(now())
-  updatedAt          DateTime              @updatedAt
+  maxVolunteers      Int      @default(1)
+  assignedVolunteers Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  edition            Edition               @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  team               VolunteerTeam?        @relation(fields: [teamId], references: [id], onDelete: SetNull)
-  assignments        VolunteerAssignment[]
+  edition     Edition               @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  team        VolunteerTeam?        @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  assignments VolunteerAssignment[]
 
   @@index([editionId])
   @@index([teamId])
 }
 
 model VolunteerAssignment {
-  id           String            @id @default(cuid())
+  id           String   @id @default(cuid())
   timeSlotId   String
   userId       Int
-  assignedAt   DateTime          @default(now())
+  assignedAt   DateTime @default(now())
   assignedById Int
 
-  timeSlot     VolunteerTimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
-  user         User              @relation("VolunteerAssignment_user", fields: [userId], references: [id], onDelete: Cascade)
-  assignedBy   User              @relation("VolunteerAssignment_assignedBy", fields: [assignedById], references: [id], onDelete: Cascade)
+  timeSlot   VolunteerTimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
+  user       User              @relation("VolunteerAssignment_user", fields: [userId], references: [id], onDelete: Cascade)
+  assignedBy User              @relation("VolunteerAssignment_assignedBy", fields: [assignedById], references: [id], onDelete: Cascade)
 
   @@unique([timeSlotId, userId])
   @@index([timeSlotId])
@@ -756,20 +756,20 @@ model VolunteerAssignment {
 // ========== REVENDICATION DE CONVENTIONS ==========
 
 model ConventionClaimRequest {
-  id           String      @id @default(cuid())
+  id           String    @id @default(cuid())
   conventionId Int
   userId       Int
-  code         String      @unique  // Code de vérification envoyé par email
-  expiresAt    DateTime    // Expiration du code (ex: 1h)
-  isVerified   Boolean     @default(false)
+  code         String    @unique // Code de vérification envoyé par email
+  expiresAt    DateTime // Expiration du code (ex: 1h)
+  isVerified   Boolean   @default(false)
   verifiedAt   DateTime?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  convention   Convention  @relation(fields: [conventionId], references: [id], onDelete: Cascade)
-  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  convention Convention @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([conventionId, userId])  // Un seul claim actif par convention/utilisateur
+  @@unique([conventionId, userId]) // Un seul claim actif par convention/utilisateur
   @@index([conventionId])
   @@index([userId])
   @@index([code])
@@ -781,11 +781,11 @@ model ConventionClaimRequest {
 model ApplicationTeamAssignment {
   applicationId Int
   teamId        String
-  isLeader      Boolean                     @default(false)
-  assignedAt    DateTime                    @default(now())
+  isLeader      Boolean  @default(false)
+  assignedAt    DateTime @default(now())
 
-  application   EditionVolunteerApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  team          VolunteerTeam               @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  application EditionVolunteerApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  team        VolunteerTeam               @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@id([applicationId, teamId])
   @@index([teamId])
@@ -808,19 +808,20 @@ enum ExternalTicketingStatus {
 }
 
 model ExternalTicketing {
-  id         String                     @id @default(cuid())
-  editionId  Int                        @unique
+  id         String                    @id @default(cuid())
+  editionId  Int                       @unique
   provider   ExternalTicketingProvider
-  status     ExternalTicketingStatus    @default(ACTIVE)
+  status     ExternalTicketingStatus   @default(ACTIVE)
   lastSyncAt DateTime?
-  createdAt  DateTime                   @default(now())
-  updatedAt  DateTime                   @updatedAt
+  createdAt  DateTime                  @default(now())
+  updatedAt  DateTime                  @updatedAt
 
-  edition          Edition            @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  edition          Edition                    @relation(fields: [editionId], references: [id], onDelete: Cascade)
   helloAssoConfig  HelloAssoConfig?
   tiers            TicketingTier[]
   options          TicketingOption[]
   orders           TicketingOrder[]
+  tierCustomFields TicketingTierCustomField[]
 
   @@index([editionId])
   @@index([provider])
@@ -828,15 +829,15 @@ model ExternalTicketing {
 }
 
 model HelloAssoConfig {
-  id                   String   @id @default(cuid())
-  externalTicketingId  String   @unique
-  clientId             String
-  clientSecret         String   // Encrypted
-  organizationSlug     String
-  formType             String   // Event, Membership, Donation, etc.
-  formSlug             String
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  externalTicketingId String   @unique
+  clientId            String
+  clientSecret        String // Encrypted
+  organizationSlug    String
+  formType            String // Event, Membership, Donation, etc.
+  formSlug            String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   externalTicketing ExternalTicketing @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
 
@@ -844,27 +845,28 @@ model HelloAssoConfig {
 }
 
 model TicketingTier {
-  id                  Int      @id @default(autoincrement())
-  externalTicketingId String?  // Null si tarif manuel (non HelloAsso)
-  helloAssoTierId     Int?     // ID du tarif dans HelloAsso, null si tarif manuel
-  editionId           Int      // Toujours associé à une édition
+  id                  Int       @id @default(autoincrement())
+  externalTicketingId String? // Null si tarif manuel (non HelloAsso)
+  helloAssoTierId     Int? // ID du tarif dans HelloAsso, null si tarif manuel
+  editionId           Int // Toujours associé à une édition
   name                String
-  description         String?  @db.Text
-  price               Int      // Prix en centimes
-  minAmount           Int?     // Montant minimum (pour tarifs libres)
-  maxAmount           Int?     // Montant maximum (pour tarifs libres)
-  isActive            Boolean  @default(true)
-  position            Int      @default(0) // Pour l'ordre d'affichage
+  description         String?   @db.Text
+  price               Int // Prix en centimes
+  minAmount           Int? // Montant minimum (pour tarifs libres)
+  maxAmount           Int? // Montant maximum (pour tarifs libres)
+  isActive            Boolean   @default(true)
+  position            Int       @default(0) // Pour l'ordre d'affichage
   validFrom           DateTime? // Date de début de validité (optionnel)
   validUntil          DateTime? // Date de fin de validité (optionnel)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
-  externalTicketing ExternalTicketing?     @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
-  edition           Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  externalTicketing ExternalTicketing?                    @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  edition           Edition                               @relation(fields: [editionId], references: [id], onDelete: Cascade)
   quotas            TicketingTierQuota[]
   returnableItems   TicketingTierReturnableItem[]
   orderItems        TicketingOrderItem[]
+  customFields      TicketingTierCustomFieldAssociation[]
 
   @@unique([externalTicketingId, helloAssoTierId])
   @@index([externalTicketingId])
@@ -876,11 +878,11 @@ model TicketingQuota {
   editionId   Int
   title       String
   description String?  @db.Text
-  quantity    Int      // Nombre (toujours positif)
+  quantity    Int // Nombre (toujours positif)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  edition Edition       @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  edition Edition                @relation(fields: [editionId], references: [id], onDelete: Cascade)
   tiers   TicketingTierQuota[]
   options TicketingOptionQuota[]
 
@@ -894,10 +896,10 @@ model TicketingReturnableItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  edition                   Edition                          @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  tiers                     TicketingTierReturnableItem[]
-  options                   TicketingOptionReturnableItem[]
-  volunteerTicketingReturnableItems  EditionVolunteerReturnableItem[]
+  edition                           Edition                          @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  tiers                             TicketingTierReturnableItem[]
+  options                           TicketingOptionReturnableItem[]
+  volunteerTicketingReturnableItems EditionVolunteerReturnableItem[]
 
   @@index([editionId])
 }
@@ -906,11 +908,11 @@ model EditionVolunteerReturnableItem {
   id               Int      @id @default(autoincrement())
   editionId        Int
   returnableItemId Int
-  teamId           String?  // NULL = global (tous les bénévoles), défini = équipe spécifique
+  teamId           String? // NULL = global (tous les bénévoles), défini = équipe spécifique
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  edition        Edition                @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  edition        Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
   returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
   team           VolunteerTeam?          @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
@@ -974,21 +976,21 @@ model TicketingOptionReturnableItem {
 
 model TicketingOption {
   id                  Int      @id @default(autoincrement())
-  externalTicketingId String?  // Null si option manuelle (non HelloAsso)
-  helloAssoOptionId   String?  // ID de l'option dans HelloAsso, null si option manuelle
-  editionId           Int      // Toujours associé à une édition
+  externalTicketingId String? // Null si option manuelle (non HelloAsso)
+  helloAssoOptionId   String? // ID de l'option dans HelloAsso, null si option manuelle
+  editionId           Int // Toujours associé à une édition
   name                String
   description         String?  @db.Text
-  type                String   // TextInput, CheckBox, Select, etc.
+  type                String // TextInput, CheckBox, Select, etc.
   isRequired          Boolean  @default(false)
-  choices             Json?    // Array de choix pour les Select/MultipleChoice
-  price               Int?     // Prix de l'option en centimes (null si pas de prix)
+  choices             Json? // Array de choix pour les Select/MultipleChoice
+  price               Int? // Prix de l'option en centimes (null si pas de prix)
   position            Int      @default(0) // Pour l'ordre d'affichage
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  externalTicketing ExternalTicketing?      @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
-  edition           Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  externalTicketing ExternalTicketing?              @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  edition           Edition                         @relation(fields: [editionId], references: [id], onDelete: Cascade)
   quotas            TicketingOptionQuota[]
   returnableItems   TicketingOptionReturnableItem[]
 
@@ -998,29 +1000,29 @@ model TicketingOption {
 }
 
 model TicketingOrder {
-  id                  Int      @id @default(autoincrement())
-  externalTicketingId String?  // Nullable pour les commandes manuelles
-  helloAssoOrderId    Int?     // Nullable pour les commandes manuelles
-  editionId           Int      // Lien direct vers l'édition
+  id                  Int     @id @default(autoincrement())
+  externalTicketingId String? // Nullable pour les commandes manuelles
+  helloAssoOrderId    Int? // Nullable pour les commandes manuelles
+  editionId           Int // Lien direct vers l'édition
 
   // Informations du payeur
-  payerFirstName      String
-  payerLastName       String
-  payerEmail          String
+  payerFirstName String
+  payerLastName  String
+  payerEmail     String
 
   // Montant et statut
-  amount              Int      // Montant total en centimes
-  status              String   // Processed, Refunded, etc.
+  amount Int // Montant total en centimes
+  status String // Processed, Refunded, etc.
 
   // Date de la commande
-  orderDate           DateTime
+  orderDate DateTime
 
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  edition             Edition                @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  externalTicketing   ExternalTicketing?     @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
-  items               TicketingOrderItem[]
+  edition           Edition              @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  externalTicketing ExternalTicketing?   @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  items             TicketingOrderItem[]
 
   @@unique([externalTicketingId, helloAssoOrderId])
   @@index([externalTicketingId])
@@ -1029,36 +1031,36 @@ model TicketingOrder {
 }
 
 model TicketingOrderItem {
-  id              Int      @id @default(autoincrement())
-  orderId         Int      // Lien vers TicketingOrder
-  helloAssoItemId Int?     // Nullable pour les participants ajoutés manuellement
-  tierId          Int?     // Lien vers le tarif HelloAsso
+  id              Int  @id @default(autoincrement())
+  orderId         Int // Lien vers TicketingOrder
+  helloAssoItemId Int? // Nullable pour les participants ajoutés manuellement
+  tierId          Int? // Lien vers le tarif HelloAsso
 
   // Informations du participant (peut différer du payeur)
-  firstName       String?
-  lastName        String?
-  email           String?
+  firstName String?
+  lastName  String?
+  email     String?
 
   // Détails du billet
-  name            String?  // Nom du tarif
-  type            String?  // Type d'item HelloAsso (Donation, Payment, Membership, etc.)
-  amount          Int      // Prix payé en centimes
-  state           String   // Processed, Refunded, etc.
-  qrCode          String?  // Code QR pour le contrôle d'accès
+  name   String? // Nom du tarif
+  type   String? // Type d'item HelloAsso (Donation, Payment, Membership, etc.)
+  amount Int // Prix payé en centimes
+  state  String // Processed, Refunded, etc.
+  qrCode String? // Code QR pour le contrôle d'accès
 
   // Champs personnalisés (réponses aux options)
-  customFields    Json?
+  customFields Json?
 
   // Validation d'entrée
-  entryValidated  Boolean  @default(false)
+  entryValidated   Boolean   @default(false)
   entryValidatedAt DateTime?
   entryValidatedBy Int?
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  order           TicketingOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  tier            TicketingTier? @relation(fields: [tierId], references: [id])
+  order TicketingOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  tier  TicketingTier? @relation(fields: [tierId], references: [id])
 
   @@index([orderId])
   @@index([tierId])
@@ -1100,8 +1102,8 @@ model WorkshopFavorite {
   userId     Int
   createdAt  DateTime @default(now())
 
-  workshop   Workshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workshop Workshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([workshopId, userId])
   @@index([workshopId])
@@ -1109,11 +1111,11 @@ model WorkshopFavorite {
 }
 
 model WorkshopLocation {
-  id        Int        @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   editionId Int
   name      String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   edition   Edition    @relation(fields: [editionId], references: [id], onDelete: Cascade)
   workshops Workshop[]
@@ -1121,3 +1123,33 @@ model WorkshopLocation {
   @@index([editionId])
 }
 
+model TicketingTierCustomField {
+  id                     Int      @id @default(autoincrement())
+  helloAssoCustomFieldId Int // ID du custom field dans HelloAsso
+  externalTicketingId    String // Lien vers la configuration HelloAsso
+  label                  String   @db.Text
+  type                   String // YesNo, ChoiceList, TextInput, etc.
+  isRequired             Boolean  @default(false)
+  values                 Json? // Array de valeurs possibles (pour ChoiceList)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  externalTicketing ExternalTicketing                     @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  tiers             TicketingTierCustomFieldAssociation[]
+
+  @@unique([externalTicketingId, helloAssoCustomFieldId])
+  @@index([externalTicketingId])
+}
+
+model TicketingTierCustomFieldAssociation {
+  id            Int @id @default(autoincrement())
+  tierId        Int
+  customFieldId Int
+
+  tier        TicketingTier            @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  customField TicketingTierCustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+
+  @@unique([tierId, customFieldId])
+  @@index([tierId])
+  @@index([customFieldId])
+}

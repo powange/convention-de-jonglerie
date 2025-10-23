@@ -499,6 +499,92 @@
                   </div>
                 </template>
 
+                <template #customFields>
+                  <!-- Affichage des custom fields -->
+                  <div v-if="loadedCustomFields && loadedCustomFields.length > 0" class="space-y-3">
+                    <div class="space-y-2">
+                      <div
+                        v-for="customField in loadedCustomFields"
+                        :key="customField.id"
+                        class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:border-purple-300 dark:hover:border-purple-700 transition-colors"
+                      >
+                        <div class="flex items-start justify-between gap-4">
+                          <!-- Contenu principal -->
+                          <div class="flex-1 min-w-0">
+                            <!-- En-tête -->
+                            <div class="flex items-start gap-2 mb-2">
+                              <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                  <h5 class="font-semibold text-sm text-gray-900 dark:text-white">
+                                    {{ customField.label }}
+                                  </h5>
+                                </div>
+                              </div>
+                            </div>
+
+                            <!-- Tarifs associés -->
+                            <div
+                              v-if="customField.tiers && customField.tiers.length > 0"
+                              class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700"
+                            >
+                              <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                Tarifs concernés :
+                              </div>
+                              <div class="flex flex-wrap gap-1.5">
+                                <UBadge
+                                  v-for="tier in customField.tiers"
+                                  :key="tier"
+                                  color="neutral"
+                                  variant="subtle"
+                                  size="sm"
+                                >
+                                  {{ tier }}
+                                </UBadge>
+                              </div>
+                            </div>
+
+                            <!-- Valeurs disponibles -->
+                            <div
+                              v-if="customField.values && customField.values.length > 0"
+                              class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700"
+                            >
+                              <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                Valeurs possibles :
+                              </div>
+                              <div class="flex flex-wrap gap-1.5">
+                                <UBadge
+                                  v-for="(value, idx) in customField.values"
+                                  :key="idx"
+                                  color="primary"
+                                  variant="subtle"
+                                  size="sm"
+                                >
+                                  {{ value }}
+                                </UBadge>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Badges latéraux -->
+                          <div class="flex flex-col gap-2 items-end flex-shrink-0">
+                            <UBadge color="purple" variant="soft" size="sm">
+                              {{ customField.type }}
+                            </UBadge>
+                            <UBadge
+                              v-if="customField.isRequired"
+                              color="warning"
+                              variant="soft"
+                              size="sm"
+                            >
+                              Obligatoire
+                            </UBadge>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+
                 <template #participants>
                   <!-- Affichage des participants -->
                   <div v-if="loadedOrders && loadedOrders.length > 0" class="space-y-3">
@@ -730,17 +816,43 @@ const loadHelloAssoTiers = async () => {
   tiersLoaded.value = false
   loadedTiers.value = []
   loadedOptions.value = []
+  loadedCustomFields.value = []
 
   try {
     const response = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/tiers`)
 
     loadedTiers.value = response.tiers || []
     loadedOptions.value = response.options || []
+
+    // Extraire les custom fields des tarifs
+    const customFieldsMap = new Map()
+    if (response.tiers) {
+      for (const tier of response.tiers) {
+        if (tier.customFields && tier.customFields.length > 0) {
+          for (const customField of tier.customFields) {
+            if (!customFieldsMap.has(customField.id)) {
+              customFieldsMap.set(customField.id, {
+                id: customField.id,
+                label: customField.label,
+                type: customField.type,
+                isRequired: customField.isRequired,
+                values: customField.values || [],
+                tiers: [],
+              })
+            }
+            // Ajouter le nom du tarif à la liste des tarifs concernés
+            customFieldsMap.get(customField.id).tiers.push(tier.name)
+          }
+        }
+      }
+    }
+    loadedCustomFields.value = Array.from(customFieldsMap.values())
+
     tiersLoaded.value = true
 
     toast.add({
       title: 'Tarifs chargés',
-      description: `${response.tiers?.length || 0} tarif(s) et ${response.options?.length || 0} option(s) trouvé(s)`,
+      description: `${response.tiers?.length || 0} tarif(s), ${response.options?.length || 0} option(s) et ${loadedCustomFields.value.length} champ(s) personnalisé(s) trouvé(s)`,
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
@@ -1075,6 +1187,8 @@ const loadOrdersFromHelloAsso = async () => {
   }
 }
 
+const loadedCustomFields = ref<any[]>([])
+
 const items = computed(
   () =>
     [
@@ -1091,6 +1205,13 @@ const items = computed(
         icon: 'i-heroicons-adjustments-horizontal',
         slot: 'options' as const,
         badge: loadedOptions.value.length,
+      },
+      {
+        label: 'Champs personnalisés',
+        description: 'Consultez les champs personnalisés des tarifs.',
+        icon: 'i-heroicons-pencil-square',
+        slot: 'customFields' as const,
+        badge: loadedCustomFields.value.length,
       },
       {
         label: 'Participants',

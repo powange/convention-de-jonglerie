@@ -61,6 +61,11 @@ export default defineEventHandler(async (event) => {
       }
     )
 
+    // Logger le retour complet de l'API HelloAsso
+    console.log('🎫 [HelloAsso API] Retour complet:', JSON.stringify(result, null, 2))
+    console.log('🎫 [HelloAsso API] Nombre de tarifs reçus:', result.tiers?.length || 0)
+    console.log("🎫 [HelloAsso API] Nombre d'options reçues:", result.options?.length || 0)
+
     // Sauvegarder les tarifs en BDD
     if (result.tiers && result.tiers.length > 0) {
       // Utiliser une transaction pour synchroniser les tarifs
@@ -73,7 +78,9 @@ export default defineEventHandler(async (event) => {
         const fetchedTierIds = new Set(result.tiers.map((t) => t.id))
 
         // Supprimer les tarifs qui n'existent plus dans HelloAsso
-        const tiersToDelete = existingTiers.filter((t) => !fetchedTierIds.has(t.helloAssoTierId))
+        const tiersToDelete = existingTiers.filter(
+          (t) => t.helloAssoTierId !== null && !fetchedTierIds.has(t.helloAssoTierId)
+        )
         if (tiersToDelete.length > 0) {
           await tx.ticketingTier.deleteMany({
             where: {
@@ -82,9 +89,9 @@ export default defineEventHandler(async (event) => {
           })
         }
 
-        // Créer ou mettre à jour les tarifs
+        // Créer ou mettre à jour les tarifs et leurs customFields
         for (const tier of result.tiers) {
-          await tx.ticketingTier.upsert({
+          const upsertedTier = await tx.ticketingTier.upsert({
             where: {
               externalTicketingId_helloAssoTierId: {
                 externalTicketingId: config.id,
@@ -111,6 +118,50 @@ export default defineEventHandler(async (event) => {
               isActive: tier.isActive,
             },
           })
+
+          // Gérer les customFields pour ce tarif
+          if (tier.customFields && tier.customFields.length > 0) {
+            for (const customField of tier.customFields) {
+              // Créer ou mettre à jour le customField
+              const upsertedCustomField = await tx.ticketingTierCustomField.upsert({
+                where: {
+                  externalTicketingId_helloAssoCustomFieldId: {
+                    externalTicketingId: config.id,
+                    helloAssoCustomFieldId: customField.id,
+                  },
+                },
+                create: {
+                  externalTicketingId: config.id,
+                  helloAssoCustomFieldId: customField.id,
+                  label: customField.label,
+                  type: customField.type,
+                  isRequired: customField.isRequired,
+                  values: customField.values,
+                },
+                update: {
+                  label: customField.label,
+                  type: customField.type,
+                  isRequired: customField.isRequired,
+                  values: customField.values,
+                },
+              })
+
+              // Créer l'association tier-customField si elle n'existe pas déjà
+              await tx.ticketingTierCustomFieldAssociation.upsert({
+                where: {
+                  tierId_customFieldId: {
+                    tierId: upsertedTier.id,
+                    customFieldId: upsertedCustomField.id,
+                  },
+                },
+                create: {
+                  tierId: upsertedTier.id,
+                  customFieldId: upsertedCustomField.id,
+                },
+                update: {},
+              })
+            }
+          }
         }
       })
     }
@@ -127,7 +178,7 @@ export default defineEventHandler(async (event) => {
 
         // Supprimer les options qui n'existent plus dans HelloAsso
         const optionsToDelete = existingOptions.filter(
-          (o) => !fetchedOptionIds.has(o.helloAssoOptionId)
+          (o) => o.helloAssoOptionId !== null && !fetchedOptionIds.has(o.helloAssoOptionId)
         )
         if (optionsToDelete.length > 0) {
           await tx.ticketingOption.deleteMany({

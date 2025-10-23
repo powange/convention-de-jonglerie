@@ -22,6 +22,14 @@ interface HelloAssoFormResponse {
   [key: string]: any
 }
 
+interface HelloAssoCustomField {
+  id: number
+  label: string
+  type: string // YesNo, ChoiceList, TextInput, etc.
+  isRequired: boolean
+  values?: string[] // Valeurs possibles pour les ChoiceList
+}
+
 interface HelloAssoTier {
   id: number
   label?: string
@@ -31,6 +39,7 @@ interface HelloAssoTier {
   minAmount?: number
   maxAmount?: number
   isActive?: boolean
+  customFields?: HelloAssoCustomField[]
   extraOptions?: HelloAssoExtraOption[]
 }
 
@@ -246,6 +255,8 @@ export async function getHelloAssoTiersAndOptions(
 
   // 2. Récupérer le formulaire
   const formResponse = await getHelloAssoForm(accessToken, formIdentifier)
+
+  console.log('🎫 [HelloAsso API formResponse] :', JSON.stringify(formResponse, null, 2))
 
   // 3. Extraire les tarifs
   const tiers = formResponse.tiers || []

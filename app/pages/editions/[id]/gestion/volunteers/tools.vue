@@ -372,13 +372,18 @@ const generateCateringPdf = async () => {
 
     // Labels des créneaux temporels en français
     const timeSlotLabels = {
-      MORNING: 'Matin',
-      AFTERNOON: 'Après-midi',
-      EVENING: 'Soir',
+      morning: 'Matin',
+      noon: 'Midi',
+      evening: 'Soir',
     }
 
     for (const [slotKey, slotLabel] of Object.entries(timeSlotLabels)) {
       const slotData = (cateringData as any).slots[slotKey]
+
+      // Vérifier que le slot existe avant d'y accéder
+      if (!slotData) {
+        continue
+      }
 
       if (yPosition > 250) {
         doc.addPage()
@@ -399,7 +404,7 @@ const generateCateringPdf = async () => {
       yPosition += 8
 
       // Répartition par régime
-      if (Object.keys(slotData.dietaryCounts).length > 0) {
+      if (slotData.dietaryCounts && Object.keys(slotData.dietaryCounts).length > 0) {
         doc.text('Régimes alimentaires:', 25, yPosition)
         yPosition += 6
 
@@ -429,9 +434,20 @@ const generateCateringPdf = async () => {
         doc.text('Allergies:', 25, yPosition)
         yPosition += 6
 
+        // Labels pour les niveaux de sévérité
+        const severityLabels = {
+          LIGHT: 'légère',
+          MODERATE: 'modérée',
+          SEVERE: 'sévère',
+          CRITICAL: 'critique',
+        }
+
         for (const allergy of slotData.allergies) {
-          const name = `${allergy.firstName} ${allergy.lastName}`
-          doc.text(`  • ${name}: ${allergy.allergies}`, 30, yPosition)
+          const name = `${allergy.volunteer.prenom} ${allergy.volunteer.nom}`
+          const severityText = allergy.allergySeverity
+            ? ` (sévérité: ${severityLabels[allergy.allergySeverity as keyof typeof severityLabels] || allergy.allergySeverity})`
+            : ''
+          doc.text(`  • ${name}: ${allergy.allergies}${severityText}`, 30, yPosition)
           yPosition += 6
 
           if (yPosition > 270) {
