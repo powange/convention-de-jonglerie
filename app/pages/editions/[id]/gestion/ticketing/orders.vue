@@ -61,7 +61,7 @@
       <!-- Contenu principal -->
       <div v-else class="space-y-6">
         <!-- Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <UCard>
             <div class="flex items-center gap-4">
               <div class="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
@@ -106,6 +106,23 @@
 
           <UCard>
             <div class="flex items-center gap-4">
+              <div class="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+                <UIcon name="i-heroicons-heart" class="h-6 w-6 text-orange-600" />
+              </div>
+              <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Donations</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                  {{ stats.totalDonations }}
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-500">
+                  {{ (stats.totalDonationsAmount / 100).toFixed(2) }}€
+                </p>
+              </div>
+            </div>
+          </UCard>
+
+          <UCard>
+            <div class="flex items-center gap-4">
               <div class="p-3 bg-success-100 dark:bg-success-900/30 rounded-lg">
                 <UIcon name="i-heroicons-clock" class="h-6 w-6 text-success-600" />
               </div>
@@ -141,7 +158,7 @@
           <p class="text-sm text-gray-500 mt-2">Chargement...</p>
         </div>
 
-        <div v-else-if="filteredOrders.length === 0" class="text-center py-12">
+        <div v-else-if="orders.length === 0" class="text-center py-12">
           <UIcon name="i-heroicons-inbox" class="h-12 w-12 text-gray-300 mb-3 mx-auto" />
           <p class="text-sm text-gray-500">
             {{ searchQuery ? 'Aucun résultat trouvé' : 'Aucune commande trouvée' }}
@@ -152,11 +169,7 @@
         </div>
 
         <div v-else class="space-y-4">
-          <UCard
-            v-for="order in filteredOrders"
-            :key="order.id"
-            class="hover:shadow-md transition-shadow"
-          >
+          <UCard v-for="order in orders" :key="order.id" class="hover:shadow-md transition-shadow">
             <!-- En-tête de la commande -->
             <div
               class="flex items-start justify-between mb-4 pb-4 border-b border-gray-200 dark:border-gray-700"
@@ -173,6 +186,13 @@
                   >
                     {{ order.status }}
                   </UBadge>
+                  <img
+                    v-if="order.externalTicketing?.provider === 'HELLOASSO'"
+                    src="~/assets/img/helloasso/logo.svg"
+                    alt="HelloAsso"
+                    class="h-5 w-auto"
+                    :title="`Commande provenant de HelloAsso (ID: ${order.helloAssoOrderId})`"
+                  />
                 </div>
                 <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                   <div class="flex items-center gap-1">
@@ -281,9 +301,9 @@
           <!-- Pagination -->
           <div v-if="totalPages > 1" class="flex justify-center">
             <UPagination
-              v-model="currentPage"
-              :total="filteredOrders.length"
-              :page-size="pageSize"
+              v-model:page="currentPage"
+              :total="totalOrders"
+              :items-per-page="pageSize"
             />
           </div>
         </div>
@@ -326,7 +346,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
@@ -348,11 +368,15 @@ const stats = ref({
   totalOrders: 0,
   totalItems: 0,
   totalAmount: 0,
+  totalDonations: 0,
+  totalDonationsAmount: 0,
 })
 
 const searchQuery = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
+const totalPages = ref(0)
+const totalOrders = ref(0)
 
 // Modal QR Code
 const isQrModalOpen = ref(false)
@@ -377,27 +401,6 @@ const lastSyncText = computed(() => {
   return "À l'instant"
 })
 
-const filteredOrders = computed(() => {
-  if (!searchQuery.value) return orders.value
-
-  const query = searchQuery.value.toLowerCase()
-  return orders.value.filter(
-    (order) =>
-      order.payerFirstName.toLowerCase().includes(query) ||
-      order.payerLastName.toLowerCase().includes(query) ||
-      order.payerEmail.toLowerCase().includes(query) ||
-      order.items?.some(
-        (item: any) =>
-          item.name.toLowerCase().includes(query) ||
-          item.firstName?.toLowerCase().includes(query) ||
-          item.lastName?.toLowerCase().includes(query) ||
-          item.email?.toLowerCase().includes(query)
-      )
-  )
-})
-
-const totalPages = computed(() => Math.ceil(filteredOrders.value.length / pageSize.value))
-
 const formatDate = (date: string | Date) => {
   const d = new Date(date)
   return d.toLocaleDateString('fr-FR', {
@@ -408,6 +411,42 @@ const formatDate = (date: string | Date) => {
     minute: '2-digit',
   })
 }
+
+// Charger les commandes avec pagination
+const loadOrders = async () => {
+  loading.value = true
+  try {
+    const response = await fetchOrders(editionId, {
+      page: currentPage.value,
+      limit: pageSize.value,
+      search: searchQuery.value,
+    })
+
+    orders.value = response.orders
+    totalPages.value = response.pagination.totalPages
+    totalOrders.value = response.pagination.total
+
+    // Mettre à jour les stats si elles sont retournées
+    if (response.stats) {
+      stats.value = response.stats
+    }
+  } catch (error) {
+    console.error('Failed to load orders:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Réinitialiser à la page 1 quand on effectue une recherche
+watch(searchQuery, () => {
+  currentPage.value = 1
+  loadOrders()
+})
+
+// Charger les commandes quand on change de page
+watch(currentPage, () => {
+  loadOrders()
+})
 
 onMounted(async () => {
   if (!edition.value) {
@@ -425,7 +464,6 @@ onMounted(async () => {
 })
 
 const loadData = async () => {
-  loading.value = true
   try {
     // Charger la configuration
     const configResponse = await $fetch(`/api/editions/${editionId}/ticketing/external`)
@@ -436,22 +474,11 @@ const loadData = async () => {
         ? new Date(configResponse.config.lastSyncAt)
         : null
 
-      // Charger les commandes depuis la BDD
-      orders.value = await fetchOrders(editionId)
-
-      // Calculer les stats
-      stats.value.totalOrders = orders.value.length
-      stats.value.totalItems = orders.value.reduce((sum, order) => {
-        // Ne compter que les billets (exclure les donations)
-        const ticketItems = order.items?.filter((item) => item.type !== 'Donation') || []
-        return sum + ticketItems.length
-      }, 0)
-      stats.value.totalAmount = orders.value.reduce((sum, order) => sum + order.amount, 0)
+      // Charger les commandes paginées (les stats seront aussi chargées si pas de recherche)
+      await loadOrders()
     }
   } catch (error) {
     console.error('Failed to load data:', error)
-  } finally {
-    loading.value = false
   }
 }
 

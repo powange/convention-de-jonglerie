@@ -34,9 +34,38 @@ export interface Order {
   status: string
   orderDate: Date
   items?: OrderItem[]
+  externalTicketing?: {
+    provider: 'HELLOASSO' | 'BILLETWEB' | 'WEEZEVENT' | 'OTHER'
+  } | null
 }
 
-export async function fetchOrders(editionId: number): Promise<Order[]> {
-  const response = await $fetch(`/api/editions/${editionId}/ticketing/orders`)
-  return response.orders || []
+export interface OrdersResponse {
+  orders: Order[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+  stats: {
+    totalOrders: number
+    totalItems: number
+    totalAmount: number
+    totalDonations: number
+    totalDonationsAmount: number
+  } | null
+}
+
+export async function fetchOrders(
+  editionId: number,
+  options?: { page?: number; limit?: number; search?: string }
+): Promise<OrdersResponse> {
+  const params = new URLSearchParams()
+  if (options?.page) params.append('page', options.page.toString())
+  if (options?.limit) params.append('limit', options.limit.toString())
+  if (options?.search) params.append('search', options.search)
+
+  const url = `/api/editions/${editionId}/ticketing/orders${params.toString() ? `?${params.toString()}` : ''}`
+  const response = await $fetch<OrdersResponse>(url)
+  return response
 }
