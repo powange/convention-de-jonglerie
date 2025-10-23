@@ -383,6 +383,34 @@
                     />
                   </UFormField>
                 </div>
+
+                <!-- Options sélectionnées -->
+                <div
+                  v-if="item.customFields && item.customFields.length > 0"
+                  class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700"
+                >
+                  <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Options sélectionnées :
+                  </p>
+                  <div class="space-y-1.5">
+                    <div
+                      v-for="field in item.customFields"
+                      :key="field.name"
+                      class="flex items-start justify-between text-sm"
+                    >
+                      <div class="flex-1">
+                        <span class="text-gray-600 dark:text-gray-400">{{ field.name }}:</span>
+                        <span class="ml-1 text-gray-900 dark:text-white">{{ field.answer }}</span>
+                      </div>
+                      <span
+                        v-if="getOptionPrice(field.optionId)"
+                        class="text-sm font-medium text-primary-600 dark:text-primary-400 ml-2"
+                      >
+                        + {{ formatPrice(getOptionPrice(field.optionId)) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -689,11 +717,33 @@ const canGoNext = computed(() => {
 const canSubmit = computed(() => true)
 
 const totalAmount = computed(() => {
-  return selectedItems.value.reduce((sum, item) => sum + item.price, 0)
+  return selectedItems.value.reduce((sum, item) => {
+    // Prix du billet
+    let itemTotal = item.price
+
+    // Ajouter le prix des options
+    if (item.customFields) {
+      item.customFields.forEach((field) => {
+        const optionPrice = getOptionPrice(field.optionId)
+        if (optionPrice) {
+          itemTotal += optionPrice
+        }
+      })
+    }
+
+    return sum + itemTotal
+  }, 0)
 })
 
 const formatPrice = (priceInCents: number) => {
   return (priceInCents / 100).toFixed(2) + ' €'
+}
+
+// Récupérer le prix d'une option par son ID
+const getOptionPrice = (optionId?: number): number => {
+  if (!optionId) return 0
+  const option = editionOptions.value.find((opt) => opt.id === optionId)
+  return option?.price || 0
 }
 
 const getItemAmountError = (item: SelectedItem) => {
