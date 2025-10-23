@@ -384,9 +384,118 @@
                   </UFormField>
                 </div>
 
+                <!-- Custom Fields du tarif -->
+                <div
+                  v-if="getTierCustomFields(item.tierId).length > 0"
+                  class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700"
+                >
+                  <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Informations complémentaires :
+                  </p>
+                  <div class="space-y-3">
+                    <div
+                      v-for="customField in getTierCustomFields(item.tierId)"
+                      :key="customField.id"
+                      class="space-y-2"
+                    >
+                      <UFormField
+                        :label="customField.label + (customField.isRequired ? ' *' : '')"
+                        :required="customField.isRequired"
+                      >
+                        <!-- TextInput -->
+                        <UInput
+                          v-if="customField.type === 'TextInput'"
+                          :model-value="getTierCustomFieldAnswer(item, customField.id)"
+                          :placeholder="`Saisir ${customField.label.toLowerCase()}`"
+                          @update:model-value="
+                            (value: string) =>
+                              setTierCustomFieldAnswer(
+                                item,
+                                customField.id,
+                                customField.label,
+                                value
+                              )
+                          "
+                        />
+
+                        <!-- YesNo -->
+                        <UCheckbox
+                          v-else-if="customField.type === 'YesNo'"
+                          :model-value="getTierCustomFieldAnswer(item, customField.id) === 'true'"
+                          label="Oui"
+                          @update:model-value="
+                            (value: boolean) =>
+                              setTierCustomFieldAnswer(
+                                item,
+                                customField.id,
+                                customField.label,
+                                value ? 'true' : 'false'
+                              )
+                          "
+                        />
+
+                        <!-- ChoiceList -->
+                        <USelect
+                          v-else-if="customField.type === 'ChoiceList' && customField.values"
+                          :model-value="getTierCustomFieldAnswer(item, customField.id)"
+                          :items="
+                            customField.values.map((choice: string) => ({
+                              label: choice,
+                              value: choice,
+                            }))
+                          "
+                          placeholder="Sélectionner une option"
+                          @update:model-value="
+                            (value: string) =>
+                              setTierCustomFieldAnswer(
+                                item,
+                                customField.id,
+                                customField.label,
+                                value
+                              )
+                          "
+                        />
+
+                        <!-- FreeText -->
+                        <UTextarea
+                          v-else-if="customField.type === 'FreeText'"
+                          :model-value="getTierCustomFieldAnswer(item, customField.id)"
+                          :placeholder="`Saisir ${customField.label.toLowerCase()}`"
+                          :rows="3"
+                          @update:model-value="
+                            (value: string) =>
+                              setTierCustomFieldAnswer(
+                                item,
+                                customField.id,
+                                customField.label,
+                                value
+                              )
+                          "
+                        />
+
+                        <!-- Type par défaut : TextInput -->
+                        <UInput
+                          v-else
+                          :model-value="getTierCustomFieldAnswer(item, customField.id)"
+                          :placeholder="`Saisir ${customField.label.toLowerCase()}`"
+                          @update:model-value="
+                            (value: string) =>
+                              setTierCustomFieldAnswer(
+                                item,
+                                customField.id,
+                                customField.label,
+                                value
+                              )
+                          "
+                        />
+                      </UFormField>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Options sélectionnées -->
                 <div
-                  v-if="item.customFields && item.customFields.length > 0"
+                  v-if="item.customFields && item.customFields.filter((f) => f.optionId).length > 0"
                   class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700"
                 >
                   <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -573,6 +682,14 @@ interface TicketingQuota {
   }>
 }
 
+interface TierCustomField {
+  id: number
+  label: string
+  type: string // YesNo, ChoiceList, TextInput, etc.
+  isRequired: boolean
+  values?: string[] // Valeurs possibles pour les ChoiceList
+}
+
 interface TicketingTier {
   id: number
   name: string
@@ -580,6 +697,7 @@ interface TicketingTier {
   description: string | null
   minAmount: number | null
   maxAmount: number | null
+  customFields?: TierCustomField[]
   quotas?: Array<{
     quota: TicketingQuota
   }>
@@ -587,6 +705,7 @@ interface TicketingTier {
 
 interface CustomField {
   optionId?: number // ID de l'option (pour les billets créés manuellement)
+  customFieldId?: number // ID du custom field du tarif
   name: string
   answer: string
 }
@@ -701,12 +820,22 @@ const canGoNext = computed(() => {
       }
       // Vérifier les infos participant si différent de l'acheteur
       if (item.isDifferentParticipant) {
-        return (
+        const validParticipant =
           item.firstName.trim().length > 0 &&
           item.lastName.trim().length > 0 &&
           /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item.email)
-        )
+        if (!validParticipant) return false
       }
+
+      // Vérifier que tous les custom fields obligatoires sont remplis
+      const tierCustomFields = getTierCustomFields(item.tierId)
+      const requiredCustomFieldsFilled = tierCustomFields.every((customField) => {
+        if (!customField.isRequired) return true
+        const answer = getTierCustomFieldAnswer(item, customField.id)
+        return answer && answer.trim().length > 0
+      })
+      if (!requiredCustomFieldsFilled) return false
+
       return true
     })
   }
@@ -767,6 +896,42 @@ const getOptionsForTier = (tierId: number): TicketingOption[] => {
   console.log('🔍 [getOptionsForTier] tierId:', tierId)
   console.log("🔍 [getOptionsForTier] Options de l'édition:", editionOptions.value)
   return editionOptions.value
+}
+
+// Récupérer les custom fields d'un tarif
+const getTierCustomFields = (tierId: number): TierCustomField[] => {
+  const tier = availableTiers.value.find((t) => t.id === tierId)
+  return tier?.customFields || []
+}
+
+// Récupérer la réponse d'un custom field pour un item
+const getTierCustomFieldAnswer = (item: SelectedItem, customFieldId: number): string => {
+  if (!item.customFields) return ''
+  const field = item.customFields.find((f) => f.customFieldId === customFieldId)
+  return field?.answer || ''
+}
+
+// Définir la réponse d'un custom field pour un item
+const setTierCustomFieldAnswer = (
+  item: SelectedItem,
+  customFieldId: number,
+  label: string,
+  answer: string
+) => {
+  if (!item.customFields) {
+    item.customFields = []
+  }
+
+  const existingIndex = item.customFields.findIndex((f) => f.customFieldId === customFieldId)
+  if (existingIndex >= 0) {
+    item.customFields[existingIndex].answer = answer
+  } else {
+    item.customFields.push({
+      customFieldId,
+      name: label,
+      answer,
+    })
+  }
 }
 
 // Vérifier si une option est activée pour un item

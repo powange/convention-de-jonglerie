@@ -40,6 +40,11 @@ export async function getEditionTiers(editionId: number) {
           returnableItem: true,
         },
       },
+      customFields: {
+        include: {
+          customField: true,
+        },
+      },
     },
   })
 }

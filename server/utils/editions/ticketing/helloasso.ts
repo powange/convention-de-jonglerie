@@ -290,7 +290,9 @@ export async function getHelloAssoTiersAndOptions(
   const formattedTiers = tiers.map((tier: HelloAssoTier) => {
     // Les custom fields peuvent être soit au niveau du tier, soit hérités du formulaire
     const tierCustomFields = tier.customFields || formCustomFields
-    console.log(`🎫 [HelloAsso] Tier "${tier.label || tier.name}" has ${tierCustomFields.length} custom fields`)
+    console.log(
+      `🎫 [HelloAsso] Tier "${tier.label || tier.name}" has ${tierCustomFields.length} custom fields`
+    )
 
     return {
       id: tier.id,

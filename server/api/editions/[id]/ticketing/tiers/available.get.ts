@@ -42,8 +42,14 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Formater les tarifs pour inclure les custom fields dans un format exploitable
+    const formattedTiers = tiers.map((tier) => ({
+      ...tier,
+      customFields: tier.customFields?.map((cf) => cf.customField) || [],
+    }))
+
     return {
-      tiers,
+      tiers: formattedTiers,
     }
   } catch (error: unknown) {
     console.error('Erreur lors de la récupération des tarifs:', error)

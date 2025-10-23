@@ -258,6 +258,39 @@
                       </div>
                     </div>
                   </div>
+
+                  <!-- Champs personnalisés du tarif -->
+                  <div
+                    v-if="item.customFields && item.customFields.length > 0"
+                    class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700"
+                  >
+                    <p
+                      class="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium uppercase tracking-wide"
+                    >
+                      Informations complémentaires
+                    </p>
+                    <div class="space-y-2">
+                      <div
+                        v-for="(field, idx) in item.customFields"
+                        :key="idx"
+                        class="p-2 rounded bg-gray-50 dark:bg-gray-800/50"
+                      >
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+                          {{ field.name }}
+                        </p>
+                        <p
+                          class="text-sm font-medium"
+                          :class="
+                            item.entryValidated
+                              ? 'text-gray-600 dark:text-gray-400'
+                              : 'text-gray-900 dark:text-white'
+                          "
+                        >
+                          {{ field.answer }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -471,30 +504,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Options choisies (si disponibles) -->
-        <div v-if="participant.ticket.customFields && participant.ticket.customFields.length > 0">
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon
-              name="i-heroicons-adjustments-horizontal"
-              class="text-blue-600 dark:text-blue-400"
-            />
-            <h4 class="font-semibold text-gray-900 dark:text-white">
-              {{ $t('editions.ticketing.options') }}
-            </h4>
-          </div>
-
-          <div class="space-y-2 mt-4">
-            <div
-              v-for="(field, idx) in participant.ticket.customFields"
-              :key="idx"
-              class="p-3 rounded-lg bg-gray-50 dark:bg-gray-900"
-            >
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ field.name }}</p>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">{{ field.answer }}</p>
             </div>
           </div>
         </div>

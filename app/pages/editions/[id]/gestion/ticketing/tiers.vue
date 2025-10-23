@@ -71,6 +71,16 @@
                   {{ lastSyncText }}
                 </p>
               </div>
+              <UButton
+                icon="i-heroicons-arrow-path"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                :loading="refreshing"
+                @click="refreshData"
+              >
+                Actualiser
+              </UButton>
             </div>
           </UCard>
         </div>
@@ -169,6 +179,7 @@ const activeTab = computed({
 })
 
 const loading = ref(true)
+const refreshing = ref(false)
 const hasExternalTicketing = ref(false)
 const lastSync = ref<Date | null>(null)
 const tiers = ref<any[]>([])
@@ -285,6 +296,38 @@ const loadOptions = async () => {
     options.value = await fetchOptions(editionId)
   } catch (error) {
     console.error('Failed to load options:', error)
+  }
+}
+
+const refreshData = async () => {
+  if (refreshing.value) return
+
+  refreshing.value = true
+  const toast = useToast()
+
+  try {
+    // Appeler l'API pour synchroniser avec HelloAsso
+    await $fetch(`/api/editions/${editionId}/ticketing/helloasso/tiers`)
+
+    // Recharger les données
+    await loadData()
+
+    toast.add({
+      title: 'Données actualisées',
+      description: 'Les tarifs et options ont été synchronisés avec succès',
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (error: any) {
+    console.error('Failed to refresh data:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || 'Impossible de synchroniser les données',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    refreshing.value = false
   }
 }
 
