@@ -48,11 +48,23 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 400,
         message:
-          "Impossible d'annuler une commande provenant d'une billetterie externe. Veuillez annuler la commande directement sur la plateforme externe.",
+          "Impossible d'annuler ou supprimer une commande provenant d'une billetterie externe. Veuillez annuler la commande directement sur la plateforme externe.",
       })
     }
 
-    // Changer le statut de la commande à "Refunded" au lieu de la supprimer
+    // Si la commande est déjà annulée (Refunded), la supprimer définitivement
+    if (order.status === 'Refunded') {
+      await prisma.ticketingOrder.delete({
+        where: { id: orderId },
+      })
+
+      return {
+        success: true,
+        message: 'Commande supprimée avec succès',
+      }
+    }
+
+    // Sinon, changer le statut de la commande à "Refunded" (annuler)
     await prisma.ticketingOrder.update({
       where: { id: orderId },
       data: {
@@ -69,7 +81,7 @@ export default defineEventHandler(async (event) => {
     if (error.statusCode) throw error
     throw createError({
       statusCode: 500,
-      message: "Erreur lors de l'annulation de la commande",
+      message: "Erreur lors de l'annulation ou de la suppression de la commande",
     })
   }
 })

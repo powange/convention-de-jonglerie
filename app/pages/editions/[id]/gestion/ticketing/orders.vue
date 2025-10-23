@@ -249,16 +249,20 @@
                     (order.items?.length || 0) > 1 ? 's' : ''
                   }}
                 </UBadge>
-                <!-- Bouton d'annulation (seulement pour les commandes manuelles non annulées) -->
+                <!-- Bouton d'annulation/suppression (seulement pour les commandes manuelles) -->
                 <UButton
-                  v-if="!order.externalTicketing && order.status !== 'Refunded'"
-                  color="error"
+                  v-if="!order.externalTicketing"
+                  :color="order.status === 'Refunded' ? 'error' : 'warning'"
                   variant="soft"
                   size="xs"
-                  icon="i-heroicons-trash"
+                  :icon="order.status === 'Refunded' ? 'i-heroicons-trash' : 'i-heroicons-x-circle'"
                   @click="showCancelModal(order)"
                 >
-                  {{ $t('ticketing.orders.cancel_order') }}
+                  {{
+                    order.status === 'Refunded'
+                      ? $t('ticketing.orders.delete_order')
+                      : $t('ticketing.orders.cancel_order')
+                  }}
                 </UButton>
               </div>
             </div>
@@ -385,15 +389,26 @@
       </template>
     </UModal>
 
-    <!-- Modal d'annulation de commande -->
-    <UModal v-model:open="isCancelModalOpen" :title="$t('ticketing.orders.cancel_order_confirm')">
+    <!-- Modal d'annulation/suppression de commande -->
+    <UModal
+      v-model:open="isCancelModalOpen"
+      :title="
+        orderToCancel?.status === 'Refunded'
+          ? $t('ticketing.orders.delete_order_confirm')
+          : $t('ticketing.orders.cancel_order_confirm')
+      "
+    >
       <template #body>
         <div v-if="orderToCancel" class="space-y-4">
           <UAlert
             icon="i-heroicons-exclamation-triangle"
             color="error"
             variant="soft"
-            :description="$t('ticketing.orders.cancel_order_confirm_message')"
+            :description="
+              orderToCancel.status === 'Refunded'
+                ? $t('ticketing.orders.delete_order_confirm_message')
+                : $t('ticketing.orders.cancel_order_confirm_message')
+            "
           />
 
           <!-- Informations de la commande -->
@@ -445,8 +460,12 @@
           >
             {{
               isCanceling
-                ? $t('ticketing.orders.canceling_order')
-                : $t('ticketing.orders.cancel_order')
+                ? orderToCancel?.status === 'Refunded'
+                  ? $t('ticketing.orders.deleting_order')
+                  : $t('ticketing.orders.canceling_order')
+                : orderToCancel?.status === 'Refunded'
+                  ? $t('ticketing.orders.delete_order')
+                  : $t('ticketing.orders.cancel_order')
             }}
           </UButton>
         </div>
@@ -466,6 +485,7 @@ import { fetchOrders, type Order } from '~/utils/ticketing/orders'
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
+const { t: $t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
@@ -510,9 +530,10 @@ const showCancelModal = (order: Order) => {
 const cancelOrder = async () => {
   if (!orderToCancel.value) return
 
+  const isDeleting = orderToCancel.value.status === 'Refunded'
   isCanceling.value = true
   try {
-    await $fetch<{ success: boolean; message: string }>(
+    const response = await $fetch<{ success: boolean; message: string }>(
       `/api/editions/${editionId}/ticketing/orders/${orderToCancel.value.id}`,
       {
         method: 'DELETE',
@@ -528,16 +549,22 @@ const cancelOrder = async () => {
 
     // Message de succès
     useToast().add({
-      title: 'Commande annulée',
-      description: 'La commande a été annulée avec succès',
+      title: isDeleting
+        ? $t('ticketing.orders.order_deleted')
+        : $t('ticketing.orders.order_canceled'),
+      description: response.message,
       color: 'success',
       icon: 'i-heroicons-check-circle',
     })
   } catch (error: any) {
-    console.error('Failed to cancel order:', error)
+    console.error('Failed to cancel/delete order:', error)
     useToast().add({
-      title: 'Erreur',
-      description: error.data?.message || "Erreur lors de l'annulation de la commande",
+      title: $t('common.error'),
+      description:
+        error.data?.message ||
+        (isDeleting
+          ? $t('ticketing.orders.delete_order_error')
+          : $t('ticketing.orders.cancel_order_error')),
       color: 'error',
       icon: 'i-heroicons-exclamation-circle',
     })

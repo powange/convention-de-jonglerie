@@ -18,8 +18,16 @@
     "orders": {
       "cancel_order": "Annuler la commande",
       "cancel_order_confirm": "Êtes-vous sûr de vouloir annuler cette commande ?",
-      "cancel_order_confirm_message": "Cette action supprimera définitivement la commande et tous les billets associés. Cette action ne peut pas être annulée.",
-      "canceling_order": "Annulation en cours..."
+      "cancel_order_confirm_message": "Cette action annulera la commande et bloquera tous les billets associés. Les billets ne pourront plus être utilisés.",
+      "canceling_order": "Annulation en cours...",
+      "cancel_order_error": "Erreur lors de l'annulation de la commande",
+      "order_canceled": "Commande annulée",
+      "delete_order": "Supprimer la commande",
+      "delete_order_confirm": "Êtes-vous sûr de vouloir supprimer cette commande ?",
+      "delete_order_confirm_message": "Cette action supprimera définitivement la commande et tous les billets associés de la base de données. Cette action ne peut pas être annulée.",
+      "deleting_order": "Suppression en cours...",
+      "delete_order_error": "Erreur lors de la suppression de la commande",
+      "order_deleted": "Commande supprimée"
     },
     "options": {
       "list": {

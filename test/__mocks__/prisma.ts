@@ -49,6 +49,15 @@ export const prismaMock = {
   carpoolComment: createModelMock(),
   carpoolRequestComment: createModelMock(),
 
+  // Modèles billetterie
+  ticketingOrder: createModelMock(),
+  ticketingOrderItem: createModelMock(),
+  ticketingTier: createModelMock(),
+  ticketingQuota: createModelMock(),
+  ticketingOption: createModelMock(),
+  ticketingReturnableItem: createModelMock(),
+  externalTicketing: createModelMock(),
+
   // Méthodes Prisma
   $connect: vi.fn(),
   $disconnect: vi.fn(),
