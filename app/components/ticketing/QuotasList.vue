@@ -182,8 +182,6 @@ const updateQuota = async (
 ) => {
   const toast = useToast()
 
-  console.log(updates)
-
   try {
     // Trouver le quota à mettre à jour
     const quota = props.quotas.find((q) => q.id === quotaId)

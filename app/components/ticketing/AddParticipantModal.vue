@@ -118,8 +118,8 @@
           </div>
         </div>
 
-        <!-- Étape 2 : Sélection des options -->
-        <div v-if="currentStep === 2" class="space-y-4">
+        <!-- Étape 2 : Sélection des options (uniquement si des options existent) -->
+        <div v-if="hasOptions && currentStep === optionsStepIndex" class="space-y-4">
           <p class="text-sm text-gray-600 dark:text-gray-400">
             Sélectionnez les options pour chaque billet
           </p>
@@ -299,7 +299,7 @@
         </div>
 
         <!-- Étape 3 : Récapitulatif et personnalisation -->
-        <div v-if="currentStep === 3" class="space-y-4">
+        <div v-if="currentStep === summaryStepIndex" class="space-y-4">
           <p class="text-sm text-gray-600 dark:text-gray-400">
             {{ $t('editions.ticketing.customize_participants_description') }}
           </p>
@@ -540,7 +540,7 @@
         </div>
 
         <!-- Étape 4 : Confirmation du paiement -->
-        <div v-if="currentStep === 4" class="space-y-4">
+        <div v-if="currentStep === paymentStepIndex" class="space-y-4">
           <div class="text-center py-6">
             <div
               class="mx-auto w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4"
@@ -635,7 +635,12 @@
           <UButton color="neutral" variant="ghost" @click="closeModal">
             {{ $t('common.cancel') }}
           </UButton>
-          <UButton v-if="currentStep < 4" color="primary" :disabled="!canGoNext" @click="nextStep">
+          <UButton
+            v-if="currentStep < paymentStepIndex"
+            color="primary"
+            :disabled="!canGoNext"
+            @click="nextStep"
+          >
             {{ $t('common.next') }}
           </UButton>
           <UButton
@@ -748,19 +753,35 @@ const loadingTiers = ref(false)
 const error = ref('')
 const paymentConfirmed = ref(true)
 
-const stepperItems = computed(() => [
-  { title: t('editions.ticketing.buyer_info') },
-  { title: t('editions.ticketing.select_tiers') },
-  { title: 'Options' },
-  { title: t('editions.ticketing.summary') },
-  { title: 'Paiement' },
-])
+const stepperItems = computed(() => {
+  const steps = [
+    { title: t('editions.ticketing.buyer_info') },
+    { title: t('editions.ticketing.select_tiers') },
+  ]
+
+  // N'ajouter l'étape "Options" que s'il y a des options disponibles
+  if (editionOptions.value && editionOptions.value.length > 0) {
+    steps.push({ title: 'Options' })
+  }
+
+  steps.push({ title: t('editions.ticketing.summary') })
+  steps.push({ title: 'Paiement' })
+
+  return steps
+})
+
+// Indices des étapes (s'adaptent si l'étape Options est absente)
+const hasOptions = computed(() => editionOptions.value && editionOptions.value.length > 0)
+const optionsStepIndex = 2
+const summaryStepIndex = computed(() => (hasOptions.value ? 3 : 2))
+const paymentStepIndex = computed(() => (hasOptions.value ? 4 : 3))
 
 const currentStepTitle = computed(() => {
   if (currentStep.value === 0) return t('editions.ticketing.add_participant_title')
   if (currentStep.value === 1) return t('editions.ticketing.select_tiers')
-  if (currentStep.value === 2) return 'Sélection des options'
-  if (currentStep.value === 3) return t('editions.ticketing.summary_and_customize')
+  if (hasOptions.value && currentStep.value === optionsStepIndex) return 'Sélection des options'
+  if (currentStep.value === summaryStepIndex.value)
+    return t('editions.ticketing.summary_and_customize')
   return 'Confirmation du paiement'
 })
 
@@ -794,7 +815,7 @@ const canGoNext = computed(() => {
     // Au moins un tarif sélectionné
     return Object.values(tierQuantities.value).some((qty) => qty > 0)
   }
-  if (currentStep.value === 2) {
+  if (hasOptions.value && currentStep.value === optionsStepIndex) {
     // Vérifier que toutes les options activées sont remplies
     return selectedItems.value.every((item) => {
       const options = getOptionsForTier(item.tierId) || []
@@ -811,7 +832,7 @@ const canGoNext = computed(() => {
       })
     })
   }
-  if (currentStep.value === 3) {
+  if (currentStep.value === summaryStepIndex.value) {
     // Vérifier que tous les montants personnalisés sont valides
     return selectedItems.value.every((item) => {
       // Vérifier les montants pour les tarifs à prix libre
@@ -892,9 +913,7 @@ const getItemAmountError = (item: SelectedItem) => {
 // Récupérer toutes les options pour un tarif donné
 // Note: Pour l'instant, on retourne toutes les options de l'édition pour tous les tarifs
 // car il n'y a pas de liaison Tier -> Quota -> Option dans la base de données
-const getOptionsForTier = (tierId: number): TicketingOption[] => {
-  console.log('🔍 [getOptionsForTier] tierId:', tierId)
-  console.log("🔍 [getOptionsForTier] Options de l'édition:", editionOptions.value)
+const getOptionsForTier = (_tierId: number): TicketingOption[] => {
   return editionOptions.value
 }
 
@@ -1006,7 +1025,6 @@ const fetchOptions = async () => {
     const response = await $fetch<TicketingOption[]>(
       `/api/editions/${props.editionId}/ticketing/options`
     )
-    console.log('📦 [fetchOptions] Options reçues:', response)
     // L'API retourne directement un tableau
     editionOptions.value = response
   } catch (err: any) {
@@ -1027,8 +1045,6 @@ const fetchTiers = async () => {
         },
       }
     )
-    console.log("📦 [fetchTiers] Réponse de l'API:", response)
-    console.log('📦 [fetchTiers] Tarifs reçus:', response.tiers)
     availableTiers.value = response.tiers
     // Initialiser les quantités à 0
     tierQuantities.value = response.tiers.reduce(
@@ -1050,7 +1066,7 @@ const nextStep = () => {
   if (!canGoNext.value) return
 
   if (currentStep.value === 1) {
-    // Générer la liste des items sélectionnés pour l'étape 2 (options)
+    // Générer la liste des items sélectionnés
     selectedItems.value = []
     for (const tier of availableTiers.value) {
       const quantity = tierQuantities.value[tier.id] || 0
@@ -1084,12 +1100,24 @@ const nextStep = () => {
     }
   }
 
-  currentStep.value++
+  // Si on est à l'étape 1 (sélection des tarifs) et qu'il n'y a pas d'options
+  // Passer directement à l'étape récapitulatif (sauter l'étape Options)
+  if (currentStep.value === 1 && !hasOptions.value) {
+    currentStep.value = summaryStepIndex.value
+  } else {
+    currentStep.value++
+  }
 }
 
 const previousStep = () => {
   if (currentStep.value > 0) {
-    currentStep.value--
+    // Si on est à l'étape récapitulatif et qu'il n'y a pas d'options
+    // Revenir directement à l'étape sélection des tarifs (sauter l'étape Options)
+    if (currentStep.value === summaryStepIndex.value && !hasOptions.value) {
+      currentStep.value = 1
+    } else {
+      currentStep.value--
+    }
   }
 }
 

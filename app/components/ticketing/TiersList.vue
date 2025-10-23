@@ -20,124 +20,181 @@
     </p>
   </div>
 
-  <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <UCard v-for="tier in tiers" :key="tier.id" :class="!tier.isActive && 'opacity-60'">
-      <template #header>
-        <!-- En-tête -->
-        <div class="flex items-start justify-between gap-2">
-          <h3 class="font-semibold text-gray-900 dark:text-white flex-1">
-            {{ tier.name }}
-          </h3>
-          <div class="flex items-center gap-2">
-            <img
-              v-if="tier.helloAssoTierId"
-              src="~/assets/img/helloasso/logo.svg"
-              :alt="$t('ticketing.tiers.list.logo_alt')"
-              class="h-5 w-auto"
-              :title="`Synchronisé depuis HelloAsso (ID: ${tier.helloAssoTierId})`"
-            />
-            <UBadge v-if="!tier.isActive" color="neutral" variant="soft">
-              {{ $t('ticketing.tiers.list.inactive') }}
-            </UBadge>
-          </div>
-        </div>
-      </template>
-
-      <!-- Prix -->
-      <div class="flex items-baseline gap-1">
-        <span
-          class="text-3xl font-bold"
-          :class="tier.isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400'"
+  <div v-else class="space-y-3">
+    <UCard
+      v-for="(tier, index) in sortedTiers"
+      :key="tier.id"
+      :class="[
+        'transition-all duration-200',
+        !tier.isActive && 'opacity-60',
+        draggedTierId === tier.id && 'opacity-50',
+        dragOverTierId === tier.id && 'border-primary-500 border-2',
+      ]"
+      draggable="true"
+      @dragstart="handleDragStart(tier, $event)"
+      @dragend="handleDragEnd"
+      @dragover.prevent="handleDragOver(tier, $event)"
+      @drop="handleDrop(tier, $event)"
+    >
+      <div class="flex items-center gap-4">
+        <!-- Poignée de drag -->
+        <div
+          class="cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          title="Glisser pour réordonner"
         >
-          {{ (tier.price / 100).toFixed(2) }}
-        </span>
-        <span class="text-sm text-gray-500">€</span>
-      </div>
-
-      <!-- Description -->
-      <p v-if="tier.description" class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
-        {{ tier.description }}
-      </p>
-
-      <!-- Montants min/max -->
-      <div v-if="tier.minAmount || tier.maxAmount" class="text-sm text-gray-500">
-        <div v-if="tier.minAmount" class="flex items-center gap-1">
-          <span>Min:</span>
-          <span class="font-medium">{{ (tier.minAmount / 100).toFixed(2) }}€</span>
+          <UIcon name="i-heroicons-bars-3" class="h-5 w-5" />
         </div>
-        <div v-if="tier.maxAmount" class="flex items-center gap-1">
-          <span>Max:</span>
-          <span class="font-medium">{{ (tier.maxAmount / 100).toFixed(2) }}€</span>
-        </div>
-      </div>
 
-      <!-- Quotas associés -->
-      <div v-if="tier.quotas && tier.quotas.length > 0" class="flex flex-wrap gap-1">
-        <p class="font-medium text-gray-700 dark:text-gray-300">Quotas :</p>
-        <UBadge
-          v-for="quotaRelation in tier.quotas"
-          :key="quotaRelation.quota.id"
-          color="warning"
-          variant="soft"
-        >
-          {{ quotaRelation.quota.title }}
-        </UBadge>
-      </div>
-
-      <!-- Articles à restituer -->
-      <div
-        v-if="tier.returnableItems && tier.returnableItems.length > 0"
-        class="flex flex-wrap gap-1"
-      >
-        <p class="font-medium text-gray-700 dark:text-gray-300">À restituer :</p>
-        <UBadge
-          v-for="itemRelation in tier.returnableItems"
-          :key="itemRelation.returnableItem.id"
-          color="info"
-          variant="soft"
-        >
-          {{ itemRelation.returnableItem.name }}
-        </UBadge>
-      </div>
-
-      <!-- Dates de validité -->
-      <div
-        v-if="tier.validFrom || tier.validUntil"
-        class="flex flex-col gap-1 pt-3 border-t border-gray-200 dark:border-gray-700"
-      >
-        <p class="text-xs font-medium text-gray-600 dark:text-gray-400">Période de validité :</p>
-        <div class="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">
-          <UIcon name="i-heroicons-calendar" class="h-4 w-4" />
-          <span v-if="tier.validFrom"> Du {{ formatDate(tier.validFrom) }} </span>
-          <span v-if="tier.validFrom && tier.validUntil">-</span>
-          <span v-if="tier.validUntil">
-            {{ tier.validFrom ? 'au' : "Jusqu'au" }} {{ formatDate(tier.validUntil) }}
+        <!-- Numéro de position -->
+        <div class="flex-shrink-0 w-8 text-center">
+          <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
+            {{ index + 1 }}
           </span>
         </div>
-      </div>
 
-      <template #footer>
+        <!-- Informations principales -->
+        <div class="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+          <!-- Nom et badges -->
+          <div class="md:col-span-4 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="font-semibold text-gray-900 dark:text-white truncate" :title="tier.name">
+                {{ tier.name }}
+              </h3>
+              <img
+                v-if="tier.helloAssoTierId"
+                src="~/assets/img/helloasso/logo.svg"
+                :alt="$t('ticketing.tiers.list.logo_alt')"
+                class="h-4 w-auto flex-shrink-0"
+                :title="`Synchronisé depuis HelloAsso (ID: ${tier.helloAssoTierId})`"
+              />
+              <UBadge v-if="!tier.isActive" color="neutral" variant="soft" size="xs">
+                {{ $t('ticketing.tiers.list.inactive') }}
+              </UBadge>
+            </div>
+            <p
+              v-if="tier.description"
+              class="text-xs text-gray-600 dark:text-gray-400 line-clamp-1"
+              :title="tier.description"
+            >
+              {{ tier.description }}
+            </p>
+          </div>
+
+          <!-- Prix -->
+          <div class="md:col-span-2">
+            <div class="flex items-baseline gap-1">
+              <span
+                class="text-xl font-bold"
+                :class="tier.isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400'"
+              >
+                {{ (tier.price / 100).toFixed(2) }}
+              </span>
+              <span class="text-xs text-gray-500">€</span>
+            </div>
+            <div v-if="tier.minAmount || tier.maxAmount" class="text-xs text-gray-500 mt-1">
+              <span v-if="tier.minAmount">Min: {{ (tier.minAmount / 100).toFixed(2) }}€</span>
+              <span v-if="tier.minAmount && tier.maxAmount"> • </span>
+              <span v-if="tier.maxAmount">Max: {{ (tier.maxAmount / 100).toFixed(2) }}€</span>
+            </div>
+          </div>
+
+          <!-- Quotas -->
+          <div class="md:col-span-2 min-w-0">
+            <div v-if="tier.quotas && tier.quotas.length > 0" class="flex flex-wrap gap-1">
+              <UBadge
+                v-for="quotaRelation in tier.quotas.slice(0, 2)"
+                :key="quotaRelation.quota.id"
+                color="warning"
+                variant="soft"
+                size="xs"
+              >
+                {{ quotaRelation.quota.title }}
+              </UBadge>
+              <UBadge
+                v-if="tier.quotas.length > 2"
+                color="warning"
+                variant="soft"
+                size="xs"
+                :title="tier.quotas.map((q) => q.quota.title).join(', ')"
+              >
+                +{{ tier.quotas.length - 2 }}
+              </UBadge>
+            </div>
+            <span v-else class="text-xs text-gray-400">-</span>
+          </div>
+
+          <!-- Articles à restituer -->
+          <div class="md:col-span-2 min-w-0">
+            <div
+              v-if="tier.returnableItems && tier.returnableItems.length > 0"
+              class="flex flex-wrap gap-1"
+            >
+              <UBadge
+                v-for="itemRelation in tier.returnableItems.slice(0, 2)"
+                :key="itemRelation.returnableItem.id"
+                color="info"
+                variant="soft"
+                size="xs"
+              >
+                {{ itemRelation.returnableItem.name }}
+              </UBadge>
+              <UBadge
+                v-if="tier.returnableItems.length > 2"
+                color="info"
+                variant="soft"
+                size="xs"
+                :title="tier.returnableItems.map((i) => i.returnableItem.name).join(', ')"
+              >
+                +{{ tier.returnableItems.length - 2 }}
+              </UBadge>
+            </div>
+            <span v-else class="text-xs text-gray-400">-</span>
+          </div>
+
+          <!-- Période de validité -->
+          <div class="md:col-span-2 min-w-0">
+            <div
+              v-if="tier.validFrom || tier.validUntil"
+              class="text-xs text-gray-600 dark:text-gray-400 space-y-1"
+            >
+              <div v-if="tier.validFrom" class="flex items-center gap-1">
+                <UIcon
+                  name="i-heroicons-arrow-right-circle"
+                  class="h-3 w-3 flex-shrink-0 text-success-500"
+                />
+                <span class="truncate">{{ formatDateShort(tier.validFrom) }}</span>
+              </div>
+              <div v-if="tier.validUntil" class="flex items-center gap-1">
+                <UIcon
+                  name="i-heroicons-arrow-left-circle"
+                  class="h-3 w-3 flex-shrink-0 text-error-500"
+                />
+                <span class="truncate">{{ formatDateShort(tier.validUntil) }}</span>
+              </div>
+            </div>
+            <span v-else class="text-xs text-gray-400">-</span>
+          </div>
+        </div>
+
         <!-- Actions -->
-        <div class="flex gap-2">
+        <div class="flex-shrink-0 flex gap-2">
           <UButton
             icon="i-heroicons-pencil"
             color="primary"
-            variant="soft"
+            variant="ghost"
+            size="sm"
             @click="openTierModal(tier)"
-          >
-            Modifier
-          </UButton>
+          />
           <UButton
             v-if="!tier.helloAssoTierId"
             icon="i-heroicons-trash"
             color="error"
-            variant="soft"
+            variant="ghost"
+            size="sm"
             @click="confirmDeleteTier(tier)"
-          >
-            Supprimer
-          </UButton>
+          />
         </div>
-      </template>
+      </div>
     </UCard>
   </div>
 
@@ -184,6 +241,103 @@ const deleteConfirmOpen = ref(false)
 const tierToDelete = ref<TicketingTier | null>(null)
 const deleting = ref(false)
 
+// Drag and drop
+const draggedTierId = ref<number | null>(null)
+const dragOverTierId = ref<number | null>(null)
+const sortedTiers = ref<TicketingTier[]>([])
+
+// Initialiser sortedTiers avec les props.tiers
+watch(
+  () => props.tiers,
+  (newTiers) => {
+    sortedTiers.value = [...newTiers]
+  },
+  { immediate: true }
+)
+
+const handleDragStart = (tier: TicketingTier, event: DragEvent) => {
+  draggedTierId.value = tier.id
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/html', '')
+  }
+}
+
+const handleDragEnd = () => {
+  draggedTierId.value = null
+  dragOverTierId.value = null
+}
+
+const handleDragOver = (tier: TicketingTier, _event: DragEvent) => {
+  dragOverTierId.value = tier.id
+}
+
+const handleDrop = async (targetTier: TicketingTier, event: DragEvent) => {
+  event.preventDefault()
+
+  if (!draggedTierId.value || draggedTierId.value === targetTier.id) {
+    draggedTierId.value = null
+    dragOverTierId.value = null
+    return
+  }
+
+  const draggedIndex = sortedTiers.value.findIndex((t) => t.id === draggedTierId.value)
+  const targetIndex = sortedTiers.value.findIndex((t) => t.id === targetTier.id)
+
+  if (draggedIndex === -1 || targetIndex === -1) {
+    draggedTierId.value = null
+    dragOverTierId.value = null
+    return
+  }
+
+  // Réorganiser localement
+  const newTiers = [...sortedTiers.value]
+  const [draggedTier] = newTiers.splice(draggedIndex, 1)
+  newTiers.splice(targetIndex, 0, draggedTier)
+  sortedTiers.value = newTiers
+
+  // Mettre à jour les positions en base de données
+  await updateTiersPositions(newTiers)
+
+  draggedTierId.value = null
+  dragOverTierId.value = null
+}
+
+const updateTiersPositions = async (tiers: TicketingTier[]) => {
+  const toast = useToast()
+
+  try {
+    // Créer la liste des positions à envoyer à l'API
+    const positions = tiers.map((tier, index) => ({
+      id: tier.id,
+      position: index,
+    }))
+
+    await $fetch(`/api/editions/${props.editionId}/ticketing/tiers/reorder`, {
+      method: 'PUT',
+      body: { positions },
+    })
+
+    toast.add({
+      title: 'Ordre mis à jour',
+      description: "L'ordre des tarifs a été enregistré",
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    // Rafraîchir les données
+    emit('refresh')
+  } catch (error: any) {
+    console.error('Failed to update tiers positions:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || "Impossible de mettre à jour l'ordre des tarifs",
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
+}
+
 const openTierModal = (tier?: TicketingTier) => {
   selectedTier.value = tier || null
   tierModalOpen.value = true
@@ -229,11 +383,11 @@ const deleteTierAction = async () => {
   }
 }
 
-const formatDate = (date: string | Date) => {
+const formatDateShort = (date: string | Date) => {
   const d = new Date(date)
   return d.toLocaleDateString('fr-FR', {
     day: '2-digit',
-    month: 'long',
+    month: '2-digit',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
