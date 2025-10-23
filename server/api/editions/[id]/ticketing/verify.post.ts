@@ -1,6 +1,10 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import {
+  calculateReturnableItemsForTicket,
+  returnableItemsIncludes,
+} from '@@/server/utils/ticketing/returnable-items'
 import { z } from 'zod'
 
 const bodySchema = z.object({
@@ -215,13 +219,7 @@ export default defineEventHandler(async (event) => {
               items: {
                 include: {
                   tier: {
-                    include: {
-                      returnableItems: {
-                        include: {
-                          returnableItem: true,
-                        },
-                      },
-                    },
+                    include: returnableItemsIncludes,
                   },
                 },
                 orderBy: { id: 'asc' },
@@ -277,12 +275,7 @@ export default defineEventHandler(async (event) => {
                     ? {
                         id: item.tier.id,
                         name: item.tier.name,
-                        returnableItems: item.tier.returnableItems.map((ri) => ({
-                          returnableItem: {
-                            id: ri.returnableItem.id,
-                            name: ri.returnableItem.name,
-                          },
-                        })),
+                        returnableItems: calculateReturnableItemsForTicket(item),
                       }
                     : null,
                 })),

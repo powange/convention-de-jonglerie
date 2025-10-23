@@ -906,6 +906,8 @@ interface TicketData {
               id: number
               name: string
             }
+            source?: 'tier' | 'customField'
+            customFieldName?: string
           }>
         }
       }>
@@ -986,6 +988,10 @@ const ticketToInvalidate = ref<number | null>(null)
 const returnableItemsToDistribute = computed(() => {
   const itemsList: Array<{ id: string; name: string; participantName?: string }> = []
 
+  console.log('=== DEBUG returnableItemsToDistribute ===')
+  console.log('props.participant:', props.participant)
+  console.log('selectedParticipants:', selectedParticipants.value)
+
   // Articles pour les billets
   if (props.participant && 'ticket' in props.participant) {
     const itemsToCheck =
@@ -993,19 +999,36 @@ const returnableItemsToDistribute = computed(() => {
         selectedParticipants.value.includes(item.id)
       ) || []
 
+    console.log('itemsToCheck:', itemsToCheck.length, 'items')
+
     for (const item of itemsToCheck) {
       const participantName =
         `${item.firstName || ''} ${item.lastName || ''}`.trim() || 'Participant'
 
+      console.log(`Checking item ${item.id} (${participantName}):`)
+      console.log('  - tier:', item.tier)
+      console.log('  - returnableItems:', item.tier?.returnableItems)
+
       if (item.tier?.returnableItems) {
+        console.log(`  - Found ${item.tier.returnableItems.length} returnable items`)
         for (const tierItem of item.tier.returnableItems) {
+          // Construire le nom avec origine si disponible
+          let itemName = tierItem.returnableItem.name
+          if (tierItem.source === 'customField' && tierItem.customFieldName) {
+            itemName = `${tierItem.returnableItem.name} (${tierItem.customFieldName})`
+          }
+
+          console.log(`  - Adding: ${itemName}`)
+
           // Créer un ID unique par participant et article
           itemsList.push({
             id: `${item.id}-${tierItem.returnableItem.id}`,
-            name: `${tierItem.returnableItem.name} - ${participantName}`,
+            name: `${itemName} - ${participantName}`,
             participantName,
           })
         }
+      } else {
+        console.log('  - No returnable items')
       }
     }
   }
@@ -1026,6 +1049,9 @@ const returnableItemsToDistribute = computed(() => {
       }
     }
   }
+
+  console.log(`Total returnable items in modal: ${itemsList.length}`)
+  console.log('Items list:', itemsList)
 
   return itemsList
 })
