@@ -674,9 +674,8 @@ const selectSearchResult = (result: any) => {
   isRefundedOrder.value = result.isRefunded || false
   participantModalOpen.value = true
 
-  // Réinitialiser la recherche
-  searchTerm.value = ''
-  searchResults.value = null
+  // Ne plus réinitialiser la recherche pour conserver le terme et les résultats
+  // L'utilisateur peut ainsi revenir aux résultats après avoir fermé la modal
 }
 
 const loadStats = async () => {
