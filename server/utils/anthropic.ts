@@ -341,7 +341,7 @@ export async function extractTextFromImage(
     {
       ...options,
       systemPrompt:
-        'Tu es un système OCR (reconnaissance optique de caractères). Ta tâche est d\'extraire tout le texte visible dans les images de manière précise et structurée.',
+        "Tu es un système OCR (reconnaissance optique de caractères). Ta tâche est d'extraire tout le texte visible dans les images de manière précise et structurée.",
     }
   )
 }

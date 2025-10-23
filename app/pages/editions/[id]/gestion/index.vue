@@ -364,13 +364,25 @@
                 <UIcon name="i-heroicons-academic-cap" class="text-green-500" />
                 <h2 class="text-lg font-semibold">Workshops</h2>
               </div>
-              <UBadge :color="workshopsEnabledLocal ? 'success' : 'neutral'" variant="soft">
-                {{
-                  workshopsEnabledLocal
-                    ? $t('common.active') || 'Actif'
-                    : $t('common.inactive') || 'Inactif'
-                }}
-              </UBadge>
+              <div class="flex items-center gap-2">
+                <UButton
+                  v-if="canEdit && workshopsEnabledLocal"
+                  size="sm"
+                  color="primary"
+                  variant="soft"
+                  icon="i-heroicons-photo"
+                  @click="openImportWorkshopsModal"
+                >
+                  {{ $t('workshops.import_from_image') }}
+                </UButton>
+                <UBadge :color="workshopsEnabledLocal ? 'success' : 'neutral'" variant="soft">
+                  {{
+                    workshopsEnabledLocal
+                      ? $t('common.active') || 'Actif'
+                      : $t('common.inactive') || 'Inactif'
+                  }}
+                </UBadge>
+              </div>
             </div>
 
             <div
@@ -623,6 +635,13 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Modal d'import de workshops depuis une image -->
+    <WorkshopsImportFromImageModal
+      v-model:open="importWorkshopsModalOpen"
+      :edition-id="editionId"
+      @success="handleWorkshopsImportSuccess"
+    />
   </div>
 </template>
 
@@ -1020,6 +1039,9 @@ const searchedUsers = ref<any[]>([])
 const searchingUsers = ref(false)
 const savingCollaborator = ref(false)
 
+// État pour la modal d'import de workshops
+const importWorkshopsModalOpen = ref(false)
+
 const newCollaboratorRights = ref({
   rights: {
     editConvention: false,
@@ -1284,5 +1306,21 @@ const toggleOnlineStatus = async (isOnline: boolean) => {
       color: 'error',
     })
   }
+}
+
+// Fonctions pour la modal d'import de workshops
+const openImportWorkshopsModal = () => {
+  importWorkshopsModalOpen.value = true
+}
+
+const handleWorkshopsImportSuccess = () => {
+  // La modal se ferme automatiquement
+  // On pourrait recharger les données si nécessaire
+  toast.add({
+    title: t('workshops.import_complete'),
+    description: t('workshops.import_complete_description'),
+    icon: 'i-heroicons-check-circle',
+    color: 'success',
+  })
 }
 </script>

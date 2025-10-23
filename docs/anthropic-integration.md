@@ -21,6 +21,7 @@ ANTHROPIC_API_KEY=sk-ant-api03-xxxxxxxxxxxxxxxxxxxxx
 ```
 
 Pour obtenir une clé API :
+
 1. Créez un compte sur [console.anthropic.com](https://console.anthropic.com)
 2. Générez une clé API dans les paramètres
 3. Copiez la clé dans votre fichier `.env`
@@ -38,14 +39,11 @@ import { askClaude, CLAUDE_MODELS } from '~/server/utils/anthropic'
 export default defineEventHandler(async (event) => {
   const { text } = await readBody(event)
 
-  const response = await askClaude(
-    `Résume ce texte en 3 points clés : ${text}`,
-    {
-      model: CLAUDE_MODELS.SONNET_3_5,
-      maxTokens: 500,
-      temperature: 0.7,
-    }
-  )
+  const response = await askClaude(`Résume ce texte en 3 points clés : ${text}`, {
+    model: CLAUDE_MODELS.SONNET_3_5,
+    maxTokens: 500,
+    temperature: 0.7,
+  })
 
   return { summary: response }
 })
@@ -63,7 +61,7 @@ export default defineEventHandler(async (event) => {
     [
       { role: 'user', content: 'Bonjour Claude' },
       { role: 'assistant', content: 'Bonjour ! Comment puis-je vous aider ?' },
-      { role: 'user', content: 'Peux-tu m\'aider avec du TypeScript ?' },
+      { role: 'user', content: "Peux-tu m'aider avec du TypeScript ?" },
     ],
     {
       systemPrompt: 'Tu es un expert en développement TypeScript et Nuxt.js',
@@ -137,11 +135,11 @@ Le module exporte les modèles Claude disponibles via `CLAUDE_MODELS` :
 import { CLAUDE_MODELS } from '~/server/utils/anthropic'
 
 // Modèles disponibles :
-CLAUDE_MODELS.SONNET_4        // 'claude-sonnet-4-20250514' (le plus récent)
-CLAUDE_MODELS.SONNET_3_5      // 'claude-3-5-sonnet-20241022' (recommandé, excellent rapport qualité/prix)
-CLAUDE_MODELS.OPUS_3          // 'claude-3-opus-20240229' (le plus puissant)
-CLAUDE_MODELS.SONNET_3        // 'claude-3-sonnet-20240229'
-CLAUDE_MODELS.HAIKU_3         // 'claude-3-haiku-20240307' (le plus rapide et économique)
+CLAUDE_MODELS.SONNET_4 // 'claude-sonnet-4-20250514' (le plus récent)
+CLAUDE_MODELS.SONNET_3_5 // 'claude-3-5-sonnet-20241022' (recommandé, excellent rapport qualité/prix)
+CLAUDE_MODELS.OPUS_3 // 'claude-3-opus-20240229' (le plus puissant)
+CLAUDE_MODELS.SONNET_3 // 'claude-3-sonnet-20240229'
+CLAUDE_MODELS.HAIKU_3 // 'claude-3-haiku-20240307' (le plus rapide et économique)
 ```
 
 ## Cas d'usage pour les conventions de jonglerie
@@ -234,7 +232,60 @@ export default defineEventHandler(async (event) => {
 })
 ```
 
-### 4. Traduction contextuelle
+### 4. Extraction de workshops depuis une image
+
+Extraire automatiquement les informations de workshops depuis une photo de programme :
+
+```typescript
+// server/api/editions/[id]/workshops/extract-from-image.post.ts
+import { requireAuth } from '@@/server/utils/auth-utils'
+import Anthropic from '@anthropic-ai/sdk'
+
+export default defineEventHandler(async (event) => {
+  const user = requireAuth(event)
+  const editionId = parseInt(getRouterParam(event, 'id')!)
+
+  // Vérifier les permissions (organisateur, collaborateur ou super admin)
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    include: { convention: { include: { collaborators: true } } },
+  })
+
+  const isCreator = edition.creatorId === user.id
+  const isCollaborator = edition.convention?.collaborators?.some(
+    (collab) => collab.userId === user.id
+  )
+  const isSuperAdmin = user.isGlobalAdmin || false
+
+  if (!isCreator && !isCollaborator && !isSuperAdmin) {
+    throw createError({ statusCode: 403, message: 'Accès non autorisé' })
+  }
+
+  // Extraire les workshops via Claude
+  const { image } = await readBody(event)
+  const anthropic = new Anthropic({ apiKey: config.anthropicApiKey })
+
+  const message = await anthropic.messages.create({
+    model: 'claude-3-5-sonnet-20241022',
+    max_tokens: 4096,
+    messages: [
+      {
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: image } },
+          { type: 'text', text: 'Extrais les workshops de cette image...' },
+        ],
+      },
+    ],
+  })
+
+  return { workshops: JSON.parse(message.content[0].text) }
+})
+```
+
+**Permissions** : Organisateurs, collaborateurs et super admins uniquement.
+
+### 5. Traduction contextuelle
 
 Traduire du contenu en tenant compte du contexte :
 
