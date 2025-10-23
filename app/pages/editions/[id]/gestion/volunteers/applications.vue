@@ -1177,9 +1177,9 @@ const handleVolunteerAdded = async () => {
   // Recharger les données
   await fetchVolunteersInfo()
   await fetchTeamAssignments()
-  // Rafraîchir le tableau
-  if (volunteerTableRef.value?.refresh) {
-    volunteerTableRef.value.refresh()
+  // Rafraîchir le tableau si la méthode existe
+  if (volunteerTableRef.value?.refreshApplications) {
+    await volunteerTableRef.value.refreshApplications()
   }
 }
 

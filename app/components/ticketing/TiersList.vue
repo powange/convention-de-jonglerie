@@ -100,6 +100,22 @@
         </UBadge>
       </div>
 
+      <!-- Dates de validité -->
+      <div
+        v-if="tier.validFrom || tier.validUntil"
+        class="flex flex-col gap-1 pt-3 border-t border-gray-200 dark:border-gray-700"
+      >
+        <p class="text-xs font-medium text-gray-600 dark:text-gray-400">Période de validité :</p>
+        <div class="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">
+          <UIcon name="i-heroicons-calendar" class="h-4 w-4" />
+          <span v-if="tier.validFrom"> Du {{ formatDate(tier.validFrom) }} </span>
+          <span v-if="tier.validFrom && tier.validUntil">-</span>
+          <span v-if="tier.validUntil">
+            {{ tier.validFrom ? 'au' : "Jusqu'au" }} {{ formatDate(tier.validUntil) }}
+          </span>
+        </div>
+      </div>
+
       <template #footer>
         <!-- Actions -->
         <div class="flex gap-2">
@@ -211,5 +227,16 @@ const deleteTierAction = async () => {
   } finally {
     deleting.value = false
   }
+}
+
+const formatDate = (date: string | Date) => {
+  const d = new Date(date)
+  return d.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 </script>

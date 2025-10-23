@@ -1005,11 +1005,14 @@ const teamItems = computed(() => {
   if (!props.volunteersInfo?.askTeamPreferences || !volunteerTeams.value.length) {
     return []
   }
-  return volunteerTeams.value.map((team) => ({
-    label: team.isRequired ? `${team.name} (${t('common.required')})` : team.name,
-    value: team.id, // Utiliser l'ID au lieu du nom pour le nouveau système
-    disabled: team.isRequired, // Désactiver la case si obligatoire
-  }))
+  // Filtrer les équipes visibles aux bénévoles
+  return volunteerTeams.value
+    .filter((team) => team.isVisibleToVolunteers !== false)
+    .map((team) => ({
+      label: team.isRequired ? `${team.name} (${t('common.required')})` : team.name,
+      value: team.id, // Utiliser l'ID au lieu du nom pour le nouveau système
+      disabled: team.isRequired, // Désactiver la case si obligatoire
+    }))
 })
 
 // Items de créneaux horaires pour UCheckboxGroup

@@ -13,6 +13,7 @@ const updateTeamSchema = z.object({
   maxVolunteers: z.number().int().positive().optional().nullable(),
   isRequired: z.boolean().optional(),
   isAccessControlTeam: z.boolean().optional(),
+  isVisibleToVolunteers: z.boolean().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -86,6 +87,8 @@ export default defineEventHandler(async (event) => {
     if (body.isRequired !== undefined) updateData.isRequired = body.isRequired
     if (body.isAccessControlTeam !== undefined)
       updateData.isAccessControlTeam = body.isAccessControlTeam
+    if (body.isVisibleToVolunteers !== undefined)
+      updateData.isVisibleToVolunteers = body.isVisibleToVolunteers
 
     const team = await prisma.volunteerTeam.update({
       where: { id: teamId },

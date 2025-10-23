@@ -703,6 +703,7 @@ model VolunteerTeam {
   maxVolunteers Int?
   isRequired   Boolean             @default(false)
   isAccessControlTeam Boolean       @default(false)
+  isVisibleToVolunteers Boolean     @default(true)
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
 
@@ -854,6 +855,8 @@ model TicketingTier {
   maxAmount           Int?     // Montant maximum (pour tarifs libres)
   isActive            Boolean  @default(true)
   position            Int      @default(0) // Pour l'ordre d'affichage
+  validFrom           DateTime? // Date de début de validité (optionnel)
+  validUntil          DateTime? // Date de fin de validité (optionnel)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 

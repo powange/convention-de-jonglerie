@@ -8,6 +8,8 @@ export interface TierData {
   maxAmount?: number | null
   position: number
   isActive: boolean
+  validFrom?: string | null
+  validUntil?: string | null
   quotaIds?: number[]
   returnableItemIds?: number[]
 }
@@ -48,6 +50,8 @@ export async function createTier(editionId: number, data: TierData) {
       maxAmount: data.maxAmount,
       position: data.position,
       isActive: data.isActive,
+      validFrom: data.validFrom ? new Date(data.validFrom) : null,
+      validUntil: data.validUntil ? new Date(data.validUntil) : null,
       // externalTicketingId et helloAssoTierId restent null pour un tarif manuel
       quotas: {
         create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
@@ -88,12 +92,14 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
     await tx.ticketingTierQuota.deleteMany({ where: { tierId } })
     await tx.ticketingTierReturnableItem.deleteMany({ where: { tierId } })
 
-    // Pour les tarifs HelloAsso, on met à jour uniquement les relations
+    // Pour les tarifs HelloAsso, on met à jour les dates de validité et les relations
     // Pour les tarifs manuels, on met à jour tout
     if (isHelloAssoTier) {
       return await tx.ticketingTier.update({
         where: { id: tierId },
         data: {
+          validFrom: data.validFrom ? new Date(data.validFrom) : null,
+          validUntil: data.validUntil ? new Date(data.validUntil) : null,
           quotas: {
             create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
           },
@@ -115,6 +121,8 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           maxAmount: data.maxAmount,
           position: data.position,
           isActive: data.isActive,
+          validFrom: data.validFrom ? new Date(data.validFrom) : null,
+          validUntil: data.validUntil ? new Date(data.validUntil) : null,
           quotas: {
             create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
           },

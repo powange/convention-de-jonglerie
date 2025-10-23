@@ -11,6 +11,8 @@ const bodySchema = z.object({
   maxAmount: z.number().int().min(0).nullable().optional(),
   position: z.number().int().min(0).default(0),
   isActive: z.boolean().default(true),
+  validFrom: z.string().nullable().optional(),
+  validUntil: z.string().nullable().optional(),
   quotaIds: z.array(z.number().int()).optional().default([]),
   returnableItemIds: z.array(z.number().int()).optional().default([]),
 })

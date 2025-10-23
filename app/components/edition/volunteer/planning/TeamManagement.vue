@@ -255,6 +255,17 @@
                 </template>
               </USwitch>
             </UFormField>
+
+            <!-- Visibilité pour les bénévoles -->
+            <UFormField name="isVisibleToVolunteers" label="Visibilité pour les bénévoles">
+              <USwitch v-model="teamFormState.isVisibleToVolunteers">
+                <template #label>
+                  <span class="text-sm text-gray-600 dark:text-gray-400">
+                    Cette équipe est visible lors de la candidature des bénévoles
+                  </span>
+                </template>
+              </USwitch>
+            </UFormField>
           </UForm>
         </div>
       </template>
@@ -336,6 +347,7 @@ const teamSchema = z.object({
   maxVolunteers: z.number().int().positive().optional(),
   isRequired: z.boolean().optional(),
   isAccessControlTeam: z.boolean().optional(),
+  isVisibleToVolunteers: z.boolean().optional(),
 })
 
 // État du formulaire
@@ -346,6 +358,7 @@ const teamFormState = ref({
   maxVolunteers: undefined as number | undefined,
   isRequired: false,
   isAccessControlTeam: false,
+  isVisibleToVolunteers: true,
 })
 
 // Couleurs prédéfinies pour la palette
@@ -395,6 +408,7 @@ const openCreateTeamModal = () => {
     maxVolunteers: undefined,
     isRequired: false,
     isAccessControlTeam: false,
+    isVisibleToVolunteers: true,
   }
   teamModalOpen.value = true
 }
@@ -408,6 +422,7 @@ const openEditTeamModal = (team: VolunteerTeam) => {
     maxVolunteers: team.maxVolunteers,
     isRequired: team.isRequired || false,
     isAccessControlTeam: team.isAccessControlTeam || false,
+    isVisibleToVolunteers: team.isVisibleToVolunteers ?? true,
   }
   teamModalOpen.value = true
 }
@@ -428,6 +443,7 @@ const onTeamSubmit = async () => {
       maxVolunteers: teamFormState.value.maxVolunteers,
       isRequired: teamFormState.value.isRequired,
       isAccessControlTeam: teamFormState.value.isAccessControlTeam,
+      isVisibleToVolunteers: teamFormState.value.isVisibleToVolunteers,
     }
 
     if (editingTeam.value) {

@@ -12,7 +12,7 @@
           color="info"
           variant="soft"
           :title="$t('ticketing.tiers.modal.title')"
-          description="Ce tarif est synchronisé depuis HelloAsso. Seuls les quotas et articles à restituer peuvent être modifiés."
+          description="Ce tarif est synchronisé depuis HelloAsso. Seuls les quotas, articles à restituer et dates de validité peuvent être modifiés."
         />
 
         <UFormField :label="$t('ticketing.tiers.modal.name_label')" name="name" required>
@@ -124,6 +124,39 @@
           </UFormField>
         </div>
 
+        <div
+          class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800"
+        >
+          <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">
+            Dates de validité (optionnel)
+          </h3>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+            Définissez une période pendant laquelle ce tarif sera disponible à l'achat
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <UFormField label="Date de début" name="validFrom">
+              <UInput
+                v-model="form.validFrom"
+                type="datetime-local"
+                icon="i-heroicons-calendar"
+                placeholder="Aucune limite"
+                class="w-full"
+              />
+            </UFormField>
+
+            <UFormField label="Date de fin" name="validUntil">
+              <UInput
+                v-model="form.validUntil"
+                type="datetime-local"
+                icon="i-heroicons-calendar"
+                placeholder="Aucune limite"
+                class="w-full"
+              />
+            </UFormField>
+          </div>
+        </div>
+
         <UFormField :label="$t('ticketing.tiers.modal.quotas_label')" name="quotas">
           <USelectMenu
             v-model="form.quotaIds"
@@ -192,6 +225,8 @@ interface TicketingTier {
   maxAmount?: number
   isActive: boolean
   position: number
+  validFrom?: string | Date | null
+  validUntil?: string | Date | null
   helloAssoTierId?: number
   quotas?: any[]
   returnableItems?: any[]
@@ -229,6 +264,8 @@ const form = ref({
   position: 0,
   isActive: true,
   isFree: false,
+  validFrom: null as string | null,
+  validUntil: null as string | null,
   quotaIds: [] as number[],
   returnableItemIds: [] as number[],
 })
@@ -268,6 +305,12 @@ watch(
           position: props.tier.position,
           isActive: props.tier.isActive,
           isFree: !!(props.tier.minAmount || props.tier.maxAmount),
+          validFrom: props.tier.validFrom
+            ? new Date(props.tier.validFrom).toISOString().slice(0, 16)
+            : null,
+          validUntil: props.tier.validUntil
+            ? new Date(props.tier.validUntil).toISOString().slice(0, 16)
+            : null,
           quotaIds: props.tier.quotas?.map((q: any) => q.quotaId) || [],
           returnableItemIds: props.tier.returnableItems?.map((r: any) => r.returnableItemId) || [],
         }
@@ -282,6 +325,8 @@ watch(
           position: 0,
           isActive: true,
           isFree: false,
+          validFrom: null,
+          validUntil: null,
           quotaIds: [],
           returnableItemIds: [],
         }
@@ -319,6 +364,8 @@ const handleSubmit = async () => {
           : null,
       position: form.value.position,
       isActive: form.value.isActive,
+      validFrom: form.value.validFrom || null,
+      validUntil: form.value.validUntil || null,
       quotaIds: form.value.quotaIds,
       returnableItemIds: form.value.returnableItemIds,
     }

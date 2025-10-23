@@ -13,6 +13,7 @@ const createTeamSchema = z.object({
   maxVolunteers: z.number().int().positive().optional(),
   isRequired: z.boolean().optional().default(false),
   isAccessControlTeam: z.boolean().optional().default(false),
+  isVisibleToVolunteers: z.boolean().optional().default(true),
 })
 
 export default defineEventHandler(async (event) => {
@@ -73,6 +74,7 @@ export default defineEventHandler(async (event) => {
         maxVolunteers: body.maxVolunteers,
         isRequired: body.isRequired,
         isAccessControlTeam: body.isAccessControlTeam,
+        isVisibleToVolunteers: body.isVisibleToVolunteers,
       },
       include: {
         _count: {
