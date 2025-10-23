@@ -5,6 +5,7 @@ export interface TicketingOption {
   type: string
   isRequired: boolean
   choices: string[] | null
+  price: number | null
   position: number
   helloAssoOptionId: number | null
   quotas?: Array<{
@@ -29,6 +30,7 @@ export interface OptionFormData {
   type: string
   isRequired: boolean
   choices: string[] | null
+  price: number | null
   position: number
   quotaIds: number[]
   returnableItemIds: number[]

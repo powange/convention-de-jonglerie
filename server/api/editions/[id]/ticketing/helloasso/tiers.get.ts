@@ -155,6 +155,7 @@ export default defineEventHandler(async (event) => {
               type: option.type,
               isRequired: option.isRequired,
               choices: option.choices,
+              price: option.price, // Prix de l'option en centimes
             },
             update: {
               name: option.name,
@@ -162,6 +163,7 @@ export default defineEventHandler(async (event) => {
               type: option.type,
               isRequired: option.isRequired,
               choices: option.choices,
+              price: option.price, // Prix de l'option en centimes
             },
           })
         }

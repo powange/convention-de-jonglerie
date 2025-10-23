@@ -44,6 +44,7 @@ interface HelloAssoExtraOption {
   isRequired?: boolean
   values?: string[]
   choices?: string[]
+  price?: number // Prix de l'option en centimes
 }
 
 interface HelloAssoCredentials {
@@ -237,6 +238,7 @@ export async function getHelloAssoTiersAndOptions(
     type: string
     isRequired: boolean
     choices: string[]
+    price: number | null
   }>
 }> {
   // 1. Obtenir un token
@@ -285,6 +287,7 @@ export async function getHelloAssoTiersAndOptions(
     type: option.type || 'TextInput',
     isRequired: option.isMandatory ?? option.isRequired ?? false,
     choices: option.values ?? option.choices ?? [],
+    price: option.price ?? null, // Prix en centimes
   }))
 
   return {

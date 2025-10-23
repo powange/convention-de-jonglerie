@@ -6,6 +6,7 @@ export interface OptionData {
   type: string
   isRequired: boolean
   choices?: string[] | null
+  price?: number | null // Prix en centimes
   position: number
   quotaIds?: number[]
   returnableItemIds?: number[]
@@ -50,6 +51,7 @@ export async function createOption(editionId: number, data: OptionData) {
       type: data.type,
       isRequired: data.isRequired,
       choices: data.choices,
+      price: data.price,
       position: data.position,
       // helloAssoOptionId reste null pour une option manuelle
       quotas: {
@@ -116,6 +118,7 @@ export async function updateOption(optionId: number, editionId: number, data: Op
           type: data.type,
           isRequired: data.isRequired,
           choices: data.choices,
+          price: data.price,
           position: data.position,
           quotas: {
             create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),

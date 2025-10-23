@@ -437,9 +437,17 @@
                             <!-- En-tête -->
                             <div class="flex items-start gap-2 mb-2">
                               <div class="flex-1">
-                                <h5 class="font-semibold text-sm text-gray-900 dark:text-white">
-                                  {{ option.name }}
-                                </h5>
+                                <div class="flex items-center gap-2">
+                                  <h5 class="font-semibold text-sm text-gray-900 dark:text-white">
+                                    {{ option.name }}
+                                  </h5>
+                                  <span
+                                    v-if="option.price"
+                                    class="text-sm font-semibold text-primary-600 dark:text-primary-400"
+                                  >
+                                    + {{ (option.price / 100).toFixed(2) }} €
+                                  </span>
+                                </div>
                                 <p
                                   v-if="option.description"
                                   class="text-xs text-gray-600 dark:text-gray-400 mt-0.5"

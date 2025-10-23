@@ -25,9 +25,17 @@
       <template #header>
         <div class="flex items-start justify-between gap-2">
           <div class="flex-1">
-            <h3 class="font-semibold text-gray-900 dark:text-white">
-              {{ option.name }}
-            </h3>
+            <div class="flex items-center gap-2">
+              <h3 class="font-semibold text-gray-900 dark:text-white">
+                {{ option.name }}
+              </h3>
+              <span
+                v-if="option.price"
+                class="text-sm font-semibold text-primary-600 dark:text-primary-400"
+              >
+                + {{ (option.price / 100).toFixed(2) }} €
+              </span>
+            </div>
             <div class="flex items-center gap-2 mt-1">
               <UBadge color="primary" variant="soft" size="xs">
                 {{ option.type }}

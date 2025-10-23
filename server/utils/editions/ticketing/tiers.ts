@@ -24,7 +24,15 @@ export async function getEditionTiers(editionId: number) {
     include: {
       quotas: {
         include: {
-          quota: true,
+          quota: {
+            include: {
+              options: {
+                include: {
+                  option: true,
+                },
+              },
+            },
+          },
         },
       },
       returnableItems: {

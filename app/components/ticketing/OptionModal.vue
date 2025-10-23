@@ -35,11 +35,32 @@
           />
         </UFormField>
 
+        <UFormField
+          label="Prix de l'option"
+          name="price"
+          help="Prix supplémentaire en euros (laisser vide si l'option est gratuite)"
+        >
+          <UInput
+            v-model.number="priceInEuros"
+            :disabled="isHelloAssoOption"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+            size="lg"
+            class="w-full"
+          >
+            <template #trailing>
+              <span class="text-gray-500">€</span>
+            </template>
+          </UInput>
+        </UFormField>
+
         <UFormField :label="$t('ticketing.options.modal.type_label')" name="type" required>
           <USelect
             v-model="form.type"
             :disabled="isHelloAssoOption"
-            :options="typeOptions"
+            :items="typeOptions"
             size="lg"
             class="w-full"
           />
@@ -60,7 +81,7 @@
         </UFormField>
 
         <UFormField
-          v-if="form.type === 'ChoixMultiple' || form.type === 'ChoixUnique'"
+          v-if="form.type === 'MultipleChoice' || form.type === 'Select'"
           :label="$t('ticketing.options.modal.choices_label')"
           name="choices"
           help="Un choix par ligne"
@@ -155,6 +176,7 @@ interface TicketingOption {
   type: string
   isRequired: boolean
   choices?: string[]
+  price?: number | null
   position: number
   helloAssoOptionId?: number
   quotas?: any[]
@@ -185,16 +207,21 @@ const isHelloAssoOption = computed(
 )
 
 const typeOptions = [
-  { label: 'Texte', value: 'Texte' },
-  { label: 'Choix unique', value: 'ChoixUnique' },
-  { label: 'Choix multiple', value: 'ChoixMultiple' },
-  { label: 'Case à cocher', value: 'CaseACocher' },
+  { label: 'Texte court', value: 'TextInput' },
+  { label: 'Texte long', value: 'FreeText' },
+  { label: 'Liste de choix', value: 'ChoiceList' },
+  { label: 'Oui/Non', value: 'YesNo' },
+  { label: 'Date', value: 'Date' },
+  { label: 'Numéro de téléphone', value: 'Phone' },
+  { label: 'Code postal', value: 'Zipcode' },
+  { label: 'Nombre', value: 'Number' },
+  { label: 'Fichier', value: 'File' },
 ]
 
 const form = ref({
   name: '',
   description: '',
-  type: 'Texte',
+  type: 'TextInput',
   isRequired: false,
   position: 0,
   quotaIds: [] as number[],
@@ -202,6 +229,7 @@ const form = ref({
 })
 
 const choicesText = ref('')
+const priceInEuros = ref<number | null>(null)
 
 // Charger les quotas et items disponibles
 const quotas = ref<any[]>([])
@@ -240,18 +268,21 @@ watch(
             props.option.returnableItems?.map((r: any) => r.returnableItemId) || [],
         }
         choicesText.value = props.option.choices?.join('\n') || ''
+        // Convertir le prix de centimes en euros
+        priceInEuros.value = props.option.price ? props.option.price / 100 : null
       } else {
         // Mode création
         form.value = {
           name: '',
           description: '',
-          type: 'Texte',
+          type: 'TextInput',
           isRequired: false,
           position: 0,
           quotaIds: [],
           returnableItemIds: [],
         }
         choicesText.value = ''
+        priceInEuros.value = null
       }
     }
   }
@@ -279,9 +310,11 @@ const handleSubmit = async () => {
       isRequired: form.value.isRequired,
       position: form.value.position,
       choices:
-        form.value.type === 'ChoixMultiple' || form.value.type === 'ChoixUnique'
+        form.value.type === 'MultipleChoice' || form.value.type === 'Select'
           ? choicesText.value.split('\n').filter((c) => c.trim())
           : null,
+      // Convertir le prix d'euros en centimes (ou null si vide)
+      price: priceInEuros.value ? Math.round(priceInEuros.value * 100) : null,
       quotaIds: form.value.quotaIds,
       returnableItemIds: form.value.returnableItemIds,
     }

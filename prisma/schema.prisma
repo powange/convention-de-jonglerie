@@ -982,6 +982,7 @@ model TicketingOption {
   type                String   // TextInput, CheckBox, Select, etc.
   isRequired          Boolean  @default(false)
   choices             Json?    // Array de choix pour les Select/MultipleChoice
+  price               Int?     // Prix de l'option en centimes (null si pas de prix)
   position            Int      @default(0) // Pour l'ordre d'affichage
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt

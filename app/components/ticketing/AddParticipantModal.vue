@@ -118,8 +118,188 @@
           </div>
         </div>
 
-        <!-- Étape 3 : Récapitulatif et personnalisation -->
+        <!-- Étape 2 : Sélection des options -->
         <div v-if="currentStep === 2" class="space-y-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Sélectionnez les options pour chaque billet
+          </p>
+
+          <div v-if="selectedItems.length === 0" class="text-center py-8">
+            <p class="text-gray-500">Aucun billet sélectionné</p>
+          </div>
+
+          <div v-else class="space-y-4">
+            <div
+              v-for="(item, index) in selectedItems"
+              :key="`${item.tierId}-${index}`"
+              class="p-4 border rounded-lg dark:border-gray-700"
+            >
+              <div class="space-y-3">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <h4 class="font-medium text-gray-900 dark:text-white">{{ item.tierName }}</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Billet {{ index + 1 }}</p>
+                  </div>
+                  <UBadge color="primary" variant="soft"
+                    >{{ $t('common.item') }} {{ index + 1 }}</UBadge
+                  >
+                </div>
+
+                <!-- Options pour ce billet -->
+                <div v-if="getOptionsForTier(item.tierId).length > 0" class="space-y-3 mt-3">
+                  <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Options :</p>
+                  <div
+                    v-for="option in getOptionsForTier(item.tierId)"
+                    :key="option.id"
+                    class="space-y-2 p-3 border rounded-lg dark:border-gray-700"
+                  >
+                    <!-- Checkbox pour activer/désactiver l'option -->
+                    <div class="flex items-center justify-between">
+                      <UCheckbox
+                        :model-value="isOptionEnabled(item, option.id)"
+                        :disabled="option.isRequired"
+                        :label="option.name + (option.isRequired ? ' *' : '')"
+                        @update:model-value="
+                          (enabled: boolean) => toggleOption(item, option.id, option.name, enabled)
+                        "
+                      />
+                      <span
+                        v-if="option.price"
+                        class="text-sm font-medium text-gray-900 dark:text-white"
+                      >
+                        + {{ formatPrice(option.price) }}
+                      </span>
+                    </div>
+
+                    <!-- Champ de saisie si l'option est activée -->
+                    <div v-if="isOptionEnabled(item, option.id)" class="pl-6 mt-2">
+                      <!-- TextInput -->
+                      <div v-if="option.type === 'TextInput'">
+                        <UInput
+                          :model-value="getOptionAnswer(item, option.name)"
+                          :placeholder="`Saisir ${option.name.toLowerCase()}`"
+                          @update:model-value="
+                            (value: string) => setOptionAnswer(item, option.id, option.name, value)
+                          "
+                        />
+                      </div>
+
+                      <!-- FreeText (texte long) -->
+                      <div v-else-if="option.type === 'FreeText'">
+                        <UTextarea
+                          :model-value="getOptionAnswer(item, option.name)"
+                          :placeholder="`Saisir ${option.name.toLowerCase()}`"
+                          :rows="3"
+                          @update:model-value="
+                            (value: string) => setOptionAnswer(item, option.id, option.name, value)
+                          "
+                        />
+                      </div>
+
+                      <!-- YesNo (valeur oui/non) -->
+                      <div v-else-if="option.type === 'YesNo'">
+                        <UCheckbox
+                          :model-value="getOptionAnswer(item, option.name) === 'true'"
+                          label="Oui"
+                          @update:model-value="
+                            (value: boolean) =>
+                              setOptionAnswer(
+                                item,
+                                option.id,
+                                option.name,
+                                value ? 'true' : 'false'
+                              )
+                          "
+                        />
+                      </div>
+
+                      <!-- ChoiceList (liste de choix) -->
+                      <div v-else-if="option.type === 'ChoiceList' && option.choices">
+                        <USelect
+                          :model-value="getOptionAnswer(item, option.name)"
+                          :items="
+                            option.choices.map((choice: string) => ({
+                              label: choice,
+                              value: choice,
+                            }))
+                          "
+                          placeholder="Sélectionner une option"
+                          @update:model-value="
+                            (value: string) => setOptionAnswer(item, option.id, option.name, value)
+                          "
+                        />
+                      </div>
+
+                      <!-- Date -->
+                      <div v-else-if="option.type === 'Date'">
+                        <UInput
+                          :model-value="getOptionAnswer(item, option.name)"
+                          type="date"
+                          @update:model-value="
+                            (value: string) => setOptionAnswer(item, option.id, option.name, value)
+                          "
+                        />
+                      </div>
+
+                      <!-- Phone -->
+                      <div v-else-if="option.type === 'Phone'">
+                        <UInput
+                          :model-value="getOptionAnswer(item, option.name)"
+                          type="tel"
+                          placeholder="Numéro de téléphone"
+                          @update:model-value="
+                            (value: string) => setOptionAnswer(item, option.id, option.name, value)
+                          "
+                        />
+                      </div>
+
+                      <!-- Zipcode -->
+                      <div v-else-if="option.type === 'Zipcode'">
+                        <UInput
+                          :model-value="getOptionAnswer(item, option.name)"
+                          placeholder="Code postal"
+                          @update:model-value="
+                            (value: string) => setOptionAnswer(item, option.id, option.name, value)
+                          "
+                        />
+                      </div>
+
+                      <!-- Number -->
+                      <div v-else-if="option.type === 'Number'">
+                        <UInput
+                          :model-value="getOptionAnswer(item, option.name)"
+                          type="number"
+                          placeholder="Nombre"
+                          @update:model-value="
+                            (value: string) => setOptionAnswer(item, option.id, option.name, value)
+                          "
+                        />
+                      </div>
+
+                      <!-- File -->
+                      <div v-else-if="option.type === 'File'">
+                        <UInput
+                          type="file"
+                          @change="(event: any) => handleFileUpload(event, item, option)"
+                        />
+                        <p class="text-xs text-gray-500 mt-1">
+                          {{ getOptionAnswer(item, option.name) || 'Aucun fichier sélectionné' }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else class="text-sm text-gray-500 italic">
+                  Aucune option disponible pour ce tarif
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Étape 3 : Récapitulatif et personnalisation -->
+        <div v-if="currentStep === 3" class="space-y-4">
           <p class="text-sm text-gray-600 dark:text-gray-400">
             {{ $t('editions.ticketing.customize_participants_description') }}
           </p>
@@ -223,7 +403,7 @@
         </div>
 
         <!-- Étape 4 : Confirmation du paiement -->
-        <div v-if="currentStep === 3" class="space-y-4">
+        <div v-if="currentStep === 4" class="space-y-4">
           <div class="text-center py-6">
             <div
               class="mx-auto w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4"
@@ -318,7 +498,7 @@
           <UButton color="neutral" variant="ghost" @click="closeModal">
             {{ $t('common.cancel') }}
           </UButton>
-          <UButton v-if="currentStep < 3" color="primary" :disabled="!canGoNext" @click="nextStep">
+          <UButton v-if="currentStep < 4" color="primary" :disabled="!canGoNext" @click="nextStep">
             {{ $t('common.next') }}
           </UButton>
           <UButton
@@ -339,6 +519,32 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 
+interface TicketingOption {
+  id: number
+  name: string
+  type:
+    | 'Date'
+    | 'TextInput'
+    | 'FreeText'
+    | 'ChoiceList'
+    | 'File'
+    | 'YesNo'
+    | 'Phone'
+    | 'Zipcode'
+    | 'Number'
+  isRequired: boolean
+  choices: string[] | null
+  price: number | null
+}
+
+interface TicketingQuota {
+  id: number
+  name: string
+  options: Array<{
+    option: TicketingOption
+  }>
+}
+
 interface TicketingTier {
   id: number
   name: string
@@ -346,6 +552,15 @@ interface TicketingTier {
   description: string | null
   minAmount: number | null
   maxAmount: number | null
+  quotas?: Array<{
+    quota: TicketingQuota
+  }>
+}
+
+interface CustomField {
+  optionId?: number // ID de l'option (pour les billets créés manuellement)
+  name: string
+  answer: string
 }
 
 interface SelectedItem {
@@ -358,6 +573,8 @@ interface SelectedItem {
   firstName: string
   lastName: string
   email: string
+  customFields?: CustomField[]
+  enabledOptions?: number[] // IDs des options activées pour cet item
 }
 
 interface Props {
@@ -387,6 +604,7 @@ const paymentConfirmed = ref(true)
 const stepperItems = computed(() => [
   { title: t('editions.ticketing.buyer_info') },
   { title: t('editions.ticketing.select_tiers') },
+  { title: 'Options' },
   { title: t('editions.ticketing.summary') },
   { title: 'Paiement' },
 ])
@@ -394,7 +612,8 @@ const stepperItems = computed(() => [
 const currentStepTitle = computed(() => {
   if (currentStep.value === 0) return t('editions.ticketing.add_participant_title')
   if (currentStep.value === 1) return t('editions.ticketing.select_tiers')
-  if (currentStep.value === 2) return t('editions.ticketing.summary_and_customize')
+  if (currentStep.value === 2) return 'Sélection des options'
+  if (currentStep.value === 3) return t('editions.ticketing.summary_and_customize')
   return 'Confirmation du paiement'
 })
 
@@ -414,6 +633,7 @@ const availableTiers = ref<TicketingTier[]>([])
 const tierQuantities = ref<Record<number, number>>({})
 const selectedItems = ref<SelectedItem[]>([])
 const showAllTiers = ref(false)
+const editionOptions = ref<TicketingOption[]>([])
 
 const canGoNext = computed(() => {
   if (currentStep.value === 0) {
@@ -428,6 +648,23 @@ const canGoNext = computed(() => {
     return Object.values(tierQuantities.value).some((qty) => qty > 0)
   }
   if (currentStep.value === 2) {
+    // Vérifier que toutes les options activées sont remplies
+    return selectedItems.value.every((item) => {
+      const options = getOptionsForTier(item.tierId) || []
+      return options.every((option) => {
+        // Ignorer les options non activées
+        if (!isOptionEnabled(item, option.id)) return true
+
+        // Pour les CheckBox (type question oui/non), pas besoin de validation
+        if (option.type === 'CheckBox') return true
+
+        // Pour les autres types, vérifier qu'il y a une réponse
+        const answer = getOptionAnswer(item, option.name)
+        return answer && answer.trim().length > 0
+      })
+    })
+  }
+  if (currentStep.value === 3) {
     // Vérifier que tous les montants personnalisés sont valides
     return selectedItems.value.every((item) => {
       // Vérifier les montants pour les tarifs à prix libre
@@ -473,6 +710,97 @@ const getItemAmountError = (item: SelectedItem) => {
   return ''
 }
 
+// Récupérer toutes les options pour un tarif donné
+// Note: Pour l'instant, on retourne toutes les options de l'édition pour tous les tarifs
+// car il n'y a pas de liaison Tier -> Quota -> Option dans la base de données
+const getOptionsForTier = (tierId: number): TicketingOption[] => {
+  console.log('🔍 [getOptionsForTier] tierId:', tierId)
+  console.log("🔍 [getOptionsForTier] Options de l'édition:", editionOptions.value)
+  return editionOptions.value
+}
+
+// Vérifier si une option est activée pour un item
+const isOptionEnabled = (item: SelectedItem, optionId: number): boolean => {
+  if (!item.enabledOptions) return false
+  return item.enabledOptions.includes(optionId)
+}
+
+// Activer/désactiver une option pour un item
+const toggleOption = (
+  item: SelectedItem,
+  optionId: number,
+  optionName: string,
+  enabled: boolean
+) => {
+  if (!item.enabledOptions) {
+    item.enabledOptions = []
+  }
+
+  if (enabled) {
+    // Activer l'option
+    if (!item.enabledOptions.includes(optionId)) {
+      item.enabledOptions.push(optionId)
+    }
+  } else {
+    // Désactiver l'option et supprimer sa réponse
+    item.enabledOptions = item.enabledOptions.filter((id) => id !== optionId)
+    if (item.customFields) {
+      item.customFields = item.customFields.filter((f) => f.optionId !== optionId)
+    }
+  }
+}
+
+// Récupérer la réponse d'une option pour un item donné
+const getOptionAnswer = (item: SelectedItem, optionName: string): string => {
+  if (!item.customFields) return ''
+  const field = item.customFields.find((f) => f.name === optionName)
+  return field?.answer || ''
+}
+
+// Définir la réponse d'une option pour un item donné
+const setOptionAnswer = (
+  item: SelectedItem,
+  optionId: number,
+  optionName: string,
+  answer: string
+) => {
+  if (!item.customFields) {
+    item.customFields = []
+  }
+
+  const existingFieldIndex = item.customFields.findIndex((f) => f.optionId === optionId)
+  if (existingFieldIndex !== -1) {
+    item.customFields[existingFieldIndex].answer = answer
+  } else {
+    item.customFields.push({ optionId, name: optionName, answer })
+  }
+}
+
+const handleFileUpload = (event: Event, item: SelectedItem, option: TicketingOption) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (file) {
+    // Pour l'instant, on stocke juste le nom du fichier
+    // Dans une future version, on pourrait implémenter l'upload vers un serveur
+    setOptionAnswer(item, option.id, option.name, file.name)
+  }
+}
+
+const fetchOptions = async () => {
+  try {
+    const response = await $fetch<TicketingOption[]>(
+      `/api/editions/${props.editionId}/ticketing/options`
+    )
+    console.log('📦 [fetchOptions] Options reçues:', response)
+    // L'API retourne directement un tableau
+    editionOptions.value = response
+  } catch (err: any) {
+    console.error('Error fetching options:', err)
+    // Ne pas afficher d'erreur si pas d'options
+    editionOptions.value = []
+  }
+}
+
 const fetchTiers = async () => {
   loadingTiers.value = true
   try {
@@ -484,6 +812,8 @@ const fetchTiers = async () => {
         },
       }
     )
+    console.log("📦 [fetchTiers] Réponse de l'API:", response)
+    console.log('📦 [fetchTiers] Tarifs reçus:', response.tiers)
     availableTiers.value = response.tiers
     // Initialiser les quantités à 0
     tierQuantities.value = response.tiers.reduce(
@@ -505,7 +835,7 @@ const nextStep = () => {
   if (!canGoNext.value) return
 
   if (currentStep.value === 1) {
-    // Générer la liste des items sélectionnés pour l'étape 3
+    // Générer la liste des items sélectionnés pour l'étape 2 (options)
     selectedItems.value = []
     for (const tier of availableTiers.value) {
       const quantity = tierQuantities.value[tier.id] || 0
@@ -517,6 +847,11 @@ const nextStep = () => {
       }
 
       for (let i = 0; i < quantity; i++) {
+        // Pré-activer les options requises
+        const requiredOptions = (editionOptions.value || [])
+          .filter((opt) => opt.isRequired)
+          .map((opt) => opt.id)
+
         selectedItems.value.push({
           tierId: tier.id,
           tierName: tier.name,
@@ -527,6 +862,8 @@ const nextStep = () => {
           firstName: form.value.payerFirstName,
           lastName: form.value.payerLastName,
           email: form.value.payerEmail,
+          customFields: [],
+          enabledOptions: requiredOptions,
         })
       }
     }
@@ -572,6 +909,17 @@ const submitOrder = async () => {
           firstName: item.firstName,
           lastName: item.lastName,
           email: item.email,
+          customFields:
+            item.customFields && item.customFields.length > 0 ? item.customFields : undefined,
+        })
+      } else {
+        // Même si le participant n'est pas différent, on doit envoyer les customFields
+        itemsByTierAndPrice[key].customParticipants.push({
+          firstName: form.value.payerFirstName,
+          lastName: form.value.payerLastName,
+          email: form.value.payerEmail,
+          customFields:
+            item.customFields && item.customFields.length > 0 ? item.customFields : undefined,
         })
       }
     }
@@ -620,12 +968,13 @@ const closeModal = () => {
   error.value = ''
 }
 
-// Charger les tarifs quand le modal s'ouvre
+// Charger les tarifs et options quand le modal s'ouvre
 watch(
   () => props.open,
   (newValue) => {
     if (newValue) {
       fetchTiers()
+      fetchOptions()
     }
   }
 )

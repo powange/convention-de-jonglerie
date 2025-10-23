@@ -15,6 +15,15 @@ const itemSchema = z.object({
         firstName: z.string().min(1),
         lastName: z.string().min(1),
         email: z.string().email(),
+        customFields: z
+          .array(
+            z.object({
+              optionId: z.number().optional(), // ID de l'option (pour les billets créés manuellement)
+              name: z.string(),
+              answer: z.string(),
+            })
+          )
+          .optional(),
       })
     )
     .optional(),
@@ -139,6 +148,7 @@ export default defineEventHandler(async (event) => {
           firstName: body.payerFirstName,
           lastName: body.payerLastName,
           email: body.payerEmail,
+          customFields: undefined,
         }
 
         const orderItem = await prisma.ticketingOrderItem.create({
@@ -155,6 +165,7 @@ export default defineEventHandler(async (event) => {
             state: body.isPaid ? 'Processed' : 'Pending',
             qrCode, // Même QR code pour tous les items de la commande
             entryValidated: false,
+            customFields: participant.customFields || null,
           },
         })
 
