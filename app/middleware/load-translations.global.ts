@@ -68,6 +68,21 @@ const translationLoaders: Record<string, Record<string, () => Promise<any>>> = {
     cs: () => import('~~/i18n/locales/cs/ticketing.json'),
     sv: () => import('~~/i18n/locales/sv/ticketing.json'),
   },
+  workshops: {
+    en: () => import('~~/i18n/locales/en/workshops.json'),
+    da: () => import('~~/i18n/locales/da/workshops.json'),
+    de: () => import('~~/i18n/locales/de/workshops.json'),
+    es: () => import('~~/i18n/locales/es/workshops.json'),
+    fr: () => import('~~/i18n/locales/fr/workshops.json'),
+    it: () => import('~~/i18n/locales/it/workshops.json'),
+    nl: () => import('~~/i18n/locales/nl/workshops.json'),
+    pl: () => import('~~/i18n/locales/pl/workshops.json'),
+    pt: () => import('~~/i18n/locales/pt/workshops.json'),
+    ru: () => import('~~/i18n/locales/ru/workshops.json'),
+    uk: () => import('~~/i18n/locales/uk/workshops.json'),
+    cs: () => import('~~/i18n/locales/cs/workshops.json'),
+    sv: () => import('~~/i18n/locales/sv/workshops.json'),
+  },
 }
 
 export default defineNuxtRouteMiddleware(async (to) => {
@@ -99,6 +114,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
     {
       pattern: /^\/editions\/\d+\/gestion\/ticketing/,
       translations: ['ticketing'],
+    },
+    {
+      pattern: /^\/editions\/\d+\/workshops/,
+      translations: ['workshops'],
     },
   ]
 

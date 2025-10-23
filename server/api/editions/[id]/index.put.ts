@@ -71,6 +71,8 @@ export default defineEventHandler(async (event) => {
     hasShowers,
     hasAccessibility,
     hasWorkshops,
+    workshopsEnabled,
+    workshopLocationsFreeInput,
     hasCashPayment,
     hasCreditCardPayment,
     hasAfjTokenPayment,
@@ -242,7 +244,6 @@ export default defineEventHandler(async (event) => {
     }
 
     const updatedData: Prisma.EditionUpdateInput = {
-      conventionId: conventionId !== undefined ? conventionId : edition.conventionId,
       name: name !== undefined ? name?.trim() || null : edition.name,
       description: description || edition.description,
       program: program !== undefined ? program : edition.program,
@@ -254,6 +255,11 @@ export default defineEventHandler(async (event) => {
       city: city || edition.city,
       region: region || edition.region,
       country: country || edition.country,
+    }
+
+    // Gérer le changement de convention si spécifié
+    if (conventionId !== undefined && conventionId !== edition.conventionId) {
+      updatedData.convention = { connect: { id: conventionId } }
     }
 
     if (ticketingUrl !== undefined) updatedData.ticketingUrl = ticketingUrl
@@ -279,6 +285,9 @@ export default defineEventHandler(async (event) => {
     if (hasShowers !== undefined) updatedData.hasShowers = hasShowers
     if (hasAccessibility !== undefined) updatedData.hasAccessibility = hasAccessibility
     if (hasWorkshops !== undefined) updatedData.hasWorkshops = hasWorkshops
+    if (workshopsEnabled !== undefined) updatedData.workshopsEnabled = workshopsEnabled
+    if (workshopLocationsFreeInput !== undefined)
+      updatedData.workshopLocationsFreeInput = workshopLocationsFreeInput
     if (hasCashPayment !== undefined) updatedData.hasCashPayment = hasCashPayment
     if (hasCreditCardPayment !== undefined) updatedData.hasCreditCardPayment = hasCreditCardPayment
     if (hasAfjTokenPayment !== undefined) updatedData.hasAfjTokenPayment = hasAfjTokenPayment

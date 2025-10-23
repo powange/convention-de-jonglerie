@@ -126,3 +126,41 @@ export const formatDateRange = (
 
   return `${start} - ${end}`
 }
+
+/**
+ * Convertit une string datetime-local en objet Date (temps local)
+ * @param datetimeLocal - String au format "YYYY-MM-DDTHH:MM"
+ * @returns Objet Date en temps local
+ */
+export const parseDateTimeLocal = (datetimeLocal: string): Date => {
+  const [datePart, timePart] = datetimeLocal.split('T')
+  const [year, month, day] = datePart.split('-').map(Number)
+  const [hour, minute] = timePart.split(':').map(Number)
+  return new Date(year, month - 1, day, hour, minute)
+}
+
+/**
+ * Convertit un objet Date en string datetime-local
+ * @param date - Objet Date
+ * @returns String au format "YYYY-MM-DDTHH:MM"
+ */
+export const formatDateTimeLocal = (date: Date): string => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hour = String(date.getHours()).padStart(2, '0')
+  const minute = String(date.getMinutes()).padStart(2, '0')
+  return `${year}-${month}-${day}T${hour}:${minute}`
+}
+
+/**
+ * Ajoute des heures à une date datetime-local
+ * @param datetimeLocal - String au format "YYYY-MM-DDTHH:MM"
+ * @param hours - Nombre d'heures à ajouter (peut être décimal)
+ * @returns String datetime-local avec les heures ajoutées
+ */
+export const addHoursToDateTimeLocal = (datetimeLocal: string, hours: number): string => {
+  const date = parseDateTimeLocal(datetimeLocal)
+  const newDate = new Date(date.getTime() + hours * 60 * 60 * 1000)
+  return formatDateTimeLocal(newDate)
+}

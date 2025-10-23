@@ -70,6 +70,7 @@ export interface Edition {
   hasShowers: boolean
   hasAccessibility: boolean
   hasWorkshops: boolean
+  workshopsEnabled?: boolean
   hasCashPayment: boolean
   hasCreditCardPayment: boolean
   hasAfjTokenPayment: boolean
@@ -201,6 +202,7 @@ export interface EditionFormData {
   hasShowers?: boolean
   hasAccessibility?: boolean
   hasWorkshops?: boolean
+  workshopsEnabled?: boolean
   hasCashPayment?: boolean
   hasCreditCardPayment?: boolean
   hasAfjTokenPayment: boolean

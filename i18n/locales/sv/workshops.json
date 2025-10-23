@@ -1,0 +1,33 @@
+{
+  "workshops": {
+    "title": "[TODO]",
+    "add_workshop": "[TODO]",
+    "propose_workshop": "[TODO]",
+    "edit_workshop": "[TODO]",
+    "delete_workshop": "[TODO]",
+    "workshop_added": "[TODO]",
+    "workshop_updated": "[TODO]",
+    "workshop_deleted": "[TODO]",
+    "confirm_delete": "[TODO]",
+    "no_workshops": "[TODO]",
+    "workshops_not_enabled": "[TODO]",
+    "workshops_enabled": "[TODO]",
+    "workshops_enabled_description": "[TODO]",
+    "enable_workshops": "[TODO]",
+    "enable_workshops_description": "[TODO]",
+    "workshop_title": "[TODO]",
+    "workshop_title_placeholder": "[TODO]",
+    "workshop_description": "[TODO]",
+    "workshop_description_placeholder": "[TODO]",
+    "start_datetime": "[TODO]",
+    "end_datetime": "[TODO]",
+    "max_participants": "[TODO]",
+    "max_participants_placeholder": "[TODO]",
+    "max_participants_label": "[TODO]",
+    "proposed_by": "[TODO]",
+    "time_range": "[TODO]",
+    "save_error": "[TODO]",
+    "delete_error": "[TODO]",
+    "load_error": "[TODO]"
+  }
+}

@@ -160,6 +160,8 @@ export const editionSchema = z
     hasShowers: z.boolean().optional(),
     hasAccessibility: z.boolean().optional(),
     hasWorkshops: z.boolean().optional(),
+    workshopsEnabled: z.boolean().optional(),
+    workshopLocationsFreeInput: z.boolean().optional(),
     hasCashPayment: z.boolean().optional(),
     hasCreditCardPayment: z.boolean().optional(),
     hasAfjTokenPayment: z.boolean().optional(),
@@ -246,6 +248,8 @@ export const updateEditionSchema = z
     hasShowers: z.boolean().optional(),
     hasAccessibility: z.boolean().optional(),
     hasWorkshops: z.boolean().optional(),
+    workshopsEnabled: z.boolean().optional(),
+    workshopLocationsFreeInput: z.boolean().optional(),
     hasCashPayment: z.boolean().optional(),
     hasCreditCardPayment: z.boolean().optional(),
     hasAfjTokenPayment: z.boolean().optional(),
@@ -402,3 +406,63 @@ export function handleValidationError(error: z.ZodError) {
     },
   })
 }
+
+// Schémas de workshop
+export const workshopSchema = z
+  .object({
+    title: z
+      .string()
+      .min(3, 'Le titre doit contenir au moins 3 caractères')
+      .max(200, 'Le titre ne peut pas dépasser 200 caractères'),
+    description: z
+      .string()
+      .max(5000, 'La description ne peut pas dépasser 5000 caractères')
+      .nullable()
+      .optional(),
+    startDateTime: dateSchema,
+    endDateTime: dateSchema,
+    maxParticipants: z
+      .number()
+      .int('Le nombre maximum de participants doit être un entier')
+      .positive('Le nombre maximum de participants doit être positif')
+      .nullable()
+      .optional(),
+    locationId: z
+      .number()
+      .int('ID de lieu invalide')
+      .positive('ID de lieu invalide')
+      .nullable()
+      .optional(),
+    locationName: z
+      .string()
+      .min(1, 'Le nom du lieu est requis')
+      .max(100, 'Le nom du lieu ne peut pas dépasser 100 caractères')
+      .nullable()
+      .optional(),
+    editionStartDate: dateSchema.optional(), // Pour la validation
+    editionEndDate: dateSchema.optional(), // Pour la validation
+  })
+  .refine((data) => new Date(data.endDateTime) > new Date(data.startDateTime), {
+    message: 'La date de fin doit être après la date de début',
+    path: ['endDateTime'],
+  })
+  .refine(
+    (data) => {
+      // Si les dates d'édition sont fournies, vérifier que le workshop est pendant l'édition
+      if (data.editionStartDate && data.editionEndDate) {
+        const workshopStart = new Date(data.startDateTime)
+        const workshopEnd = new Date(data.endDateTime)
+        const editionStart = new Date(data.editionStartDate)
+        const editionEnd = new Date(data.editionEndDate)
+
+        return workshopStart >= editionStart && workshopEnd <= editionEnd
+      }
+      return true
+    },
+    {
+      message: "Le workshop doit se dérouler pendant les dates de l'édition",
+      path: ['startDateTime'],
+    }
+  )
+
+export const updateWorkshopSchema = workshopSchema.partial()

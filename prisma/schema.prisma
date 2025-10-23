@@ -57,6 +57,8 @@ model User {
   volunteerAssignments         VolunteerAssignment[]        @relation("VolunteerAssignment_user")
   assignedVolunteerSlots       VolunteerAssignment[]        @relation("VolunteerAssignment_assignedBy")
   claimRequests                ConventionClaimRequest[]
+  workshops                    Workshop[]
+  workshopFavorites            WorkshopFavorite[]
 }
 
 model Edition {
@@ -129,6 +131,8 @@ model Edition {
   volunteersSetupStartDate     DateTime?
   volunteersAskSetup           Boolean                         @default(false)
   volunteersAskTeardown        Boolean                         @default(false)
+  workshopsEnabled             Boolean                         @default(false)
+  workshopLocationsFreeInput   Boolean                         @default(false)
   carpoolOffers                CarpoolOffer[]
   carpoolRequests              CarpoolRequest[]
   convention                   Convention                      @relation(fields: [conventionId], references: [id], onDelete: Cascade)
@@ -149,6 +153,8 @@ model Edition {
   options                      TicketingOption[]
   orders                       TicketingOrder[]
   volunteerTicketingReturnableItems     EditionVolunteerReturnableItem[]
+  workshops                    Workshop[]
+  workshopLocations            WorkshopLocation[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -1056,5 +1062,58 @@ model TicketingOrderItem {
   @@index([email])
   @@index([qrCode])
   @@index([entryValidated])
+}
+
+// ========== WORKSHOPS ==========
+
+model Workshop {
+  id              Int                @id @default(autoincrement())
+  editionId       Int
+  creatorId       Int
+  title           String
+  description     String?            @db.Text
+  startDateTime   DateTime
+  endDateTime     DateTime
+  maxParticipants Int?
+  locationId      Int?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  edition         Edition            @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  creator         User               @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  location        WorkshopLocation?  @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  favorites       WorkshopFavorite[]
+
+  @@index([editionId])
+  @@index([creatorId])
+  @@index([startDateTime])
+  @@index([locationId])
+}
+
+model WorkshopFavorite {
+  id         Int      @id @default(autoincrement())
+  workshopId Int
+  userId     Int
+  createdAt  DateTime @default(now())
+
+  workshop   Workshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workshopId, userId])
+  @@index([workshopId])
+  @@index([userId])
+}
+
+model WorkshopLocation {
+  id        Int        @id @default(autoincrement())
+  editionId Int
+  name      String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  edition   Edition    @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  workshops Workshop[]
+
+  @@index([editionId])
 }
 

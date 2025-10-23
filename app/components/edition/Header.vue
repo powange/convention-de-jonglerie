@@ -180,6 +180,26 @@
         </NuxtLink>
 
         <NuxtLink
+          v-if="workshopsTabVisible"
+          :to="`/editions/${edition.id}/workshops`"
+          :class="[
+            'py-3 px-3 sm:py-2 sm:px-1 border-b-2 font-medium text-sm flex items-center',
+            currentPage === 'workshops'
+              ? 'border-primary-500 text-primary-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+          ]"
+          title="Workshops"
+        >
+          <UIcon
+            name="i-heroicons-academic-cap"
+            :class="['sm:mr-1']"
+            size="24"
+            class="sm:!w-4 sm:!h-4"
+          />
+          <span class="hidden sm:inline">Workshops</span>
+        </NuxtLink>
+
+        <NuxtLink
           v-if="hasEditionStarted"
           :to="`/editions/${edition.id}/objets-trouves`"
           :class="[
@@ -280,7 +300,14 @@ const { getImageUrl } = useImageUrl()
 
 interface Props {
   edition: Edition
-  currentPage: 'details' | 'commentaires' | 'carpool' | 'gestion' | 'objets-trouves' | 'volunteers'
+  currentPage:
+    | 'details'
+    | 'commentaires'
+    | 'carpool'
+    | 'gestion'
+    | 'objets-trouves'
+    | 'volunteers'
+    | 'workshops'
 }
 
 const props = defineProps<Props>()
@@ -366,6 +393,12 @@ const hasEditionStarted = computed(() => {
   return new Date() >= new Date(props.edition.startDate)
 })
 
+// Visibilité onglet workshops: activé
+const workshopsTabVisible = computed<boolean>(() => {
+  if (!props.edition) return false
+  return (props.edition as any).workshopsEnabled === true
+})
+
 // Gestion des favoris - Initialisation automatique si utilisateur connecté
 watch(
   () => authStore.isAuthenticated,
@@ -426,6 +459,7 @@ const getPageTitle = (page: string) => {
     carpool: t('editions.carpool'),
     'objets-trouves': t('editions.lost_found'),
     volunteers: t('editions.volunteers.title'),
+    workshops: 'Workshops',
     gestion: t('editions.management'),
   }
   return titles[page] || t('editions.about_this_edition')
