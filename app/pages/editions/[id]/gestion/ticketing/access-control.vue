@@ -340,6 +340,7 @@
         v-model:open="participantModalOpen"
         :participant="selectedParticipant"
         :type="participantType"
+        :is-refunded="isRefundedOrder"
         @validate="handleValidateParticipants"
         @invalidate="handleInvalidateEntry"
       />
@@ -376,6 +377,7 @@ const participantModalOpen = ref(false)
 const showAddParticipantModal = ref(false)
 const selectedParticipant = ref<any>(null)
 const participantType = ref<'ticket' | 'volunteer'>('ticket')
+const isRefundedOrder = ref(false)
 const validatingTicket = ref(false)
 const searchTerm = ref('')
 const searching = ref(false)
@@ -464,6 +466,7 @@ const validateTicket = async () => {
       // Afficher la modal avec les détails du participant
       selectedParticipant.value = result.participant
       participantType.value = result.type || 'ticket'
+      isRefundedOrder.value = result.isRefunded || false
       participantModalOpen.value = true
 
       toast.add({
@@ -668,6 +671,7 @@ const selectSearchResult = (result: any) => {
   // Afficher la modal avec les détails du participant
   selectedParticipant.value = result.participant
   participantType.value = result.type || 'ticket'
+  isRefundedOrder.value = result.isRefunded || false
   participantModalOpen.value = true
 
   // Réinitialiser la recherche

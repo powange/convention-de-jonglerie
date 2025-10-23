@@ -8,46 +8,15 @@
     <template #body>
       <!-- Affichage pour un billet -->
       <div v-if="isTicket && participant && 'ticket' in participant" class="space-y-6">
-        <!-- Statut du billet -->
-        <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-900">
-          <div>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ $t('editions.ticketing.ticket_status') }}
-            </p>
-            <p class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{
-                participant.ticket.state === 'Processed'
-                  ? 'Valide'
-                  : participant.ticket.state === 'Pending'
-                    ? 'En attente de paiement'
-                    : participant.ticket.state === 'Cancelled'
-                      ? 'Annulé'
-                      : participant.ticket.state
-              }}
-            </p>
-          </div>
-          <UBadge
-            :color="
-              participant.ticket.state === 'Processed'
-                ? 'success'
-                : participant.ticket.state === 'Pending'
-                  ? 'warning'
-                  : 'neutral'
-            "
-            variant="soft"
-            size="lg"
-          >
-            {{
-              participant.ticket.state === 'Processed'
-                ? 'Valide'
-                : participant.ticket.state === 'Pending'
-                  ? 'En attente de paiement'
-                  : participant.ticket.state === 'Cancelled'
-                    ? 'Annulé'
-                    : participant.ticket.state
-            }}
-          </UBadge>
-        </div>
+        <!-- Alerte pour les commandes annulées -->
+        <UAlert
+          v-if="isRefunded"
+          icon="i-heroicons-exclamation-triangle"
+          color="error"
+          variant="soft"
+          title="Commande annulée"
+          description="Cette commande a été annulée. Les billets ne peuvent pas être validés."
+        />
 
         <!-- Informations de la commande -->
         <div class="space-y-4">
@@ -92,13 +61,44 @@
             </div>
           </div>
 
-          <div v-if="participant.ticket.order.id">
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-              {{ $t('editions.ticketing.order_id') }}
-            </p>
-            <p class="text-sm font-mono font-medium text-gray-900 dark:text-white">
-              #{{ participant.ticket.order.id }}
-            </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div v-if="participant.ticket.order.id">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                {{ $t('editions.ticketing.order_id') }}
+              </p>
+              <p class="text-sm font-mono font-medium text-gray-900 dark:text-white">
+                #{{ participant.ticket.order.id }}
+              </p>
+            </div>
+            <div v-if="participant.ticket.order.status">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Statut de la commande</p>
+              <UBadge
+                :color="
+                  participant.ticket.order.status === 'Processed'
+                    ? 'success'
+                    : participant.ticket.order.status === 'Pending'
+                      ? 'warning'
+                      : participant.ticket.order.status === 'Onsite'
+                        ? 'info'
+                        : participant.ticket.order.status === 'Refunded'
+                          ? 'error'
+                          : 'neutral'
+                "
+                variant="soft"
+              >
+                {{
+                  participant.ticket.order.status === 'Processed'
+                    ? 'Payée'
+                    : participant.ticket.order.status === 'Pending'
+                      ? 'En attente de paiement'
+                      : participant.ticket.order.status === 'Onsite'
+                        ? 'Sur place'
+                        : participant.ticket.order.status === 'Refunded'
+                          ? 'Annulée'
+                          : participant.ticket.order.status
+                }}
+              </UBadge>
+            </div>
           </div>
         </div>
 
@@ -135,7 +135,7 @@
 
               <div class="flex items-start gap-3">
                 <input
-                  v-if="!item.entryValidated"
+                  v-if="!item.entryValidated && !isRefunded"
                   :id="`participant-${item.id}`"
                   v-model="selectedParticipants"
                   type="checkbox"
@@ -144,11 +144,22 @@
                 />
                 <div
                   v-else
-                  class="mt-1.5 h-4 w-4 rounded bg-green-100 dark:bg-green-900/30 flex items-center justify-center"
+                  class="mt-1.5 h-4 w-4 rounded flex items-center justify-center"
+                  :class="
+                    item.entryValidated
+                      ? 'bg-green-100 dark:bg-green-900/30'
+                      : 'bg-gray-100 dark:bg-gray-800'
+                  "
                 >
                   <UIcon
+                    v-if="item.entryValidated"
                     name="i-heroicons-check"
                     class="h-3 w-3 text-green-600 dark:text-green-400"
+                  />
+                  <UIcon
+                    v-else-if="isRefunded"
+                    name="i-heroicons-x-mark"
+                    class="h-3 w-3 text-red-600 dark:text-red-400"
                   />
                 </div>
 
@@ -186,7 +197,7 @@
                     </div>
                   </div>
                   <div class="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
                           {{ $t('ticketing.participant.ticket_type') }}
@@ -216,6 +227,34 @@
                         >
                           {{ (item.amount / 100).toFixed(2) }} €
                         </p>
+                      </div>
+                      <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                          Statut du billet
+                        </p>
+                        <UBadge
+                          :color="
+                            item.state === 'Processed'
+                              ? 'success'
+                              : item.state === 'Pending'
+                                ? 'warning'
+                                : item.state === 'Refunded'
+                                  ? 'error'
+                                  : 'neutral'
+                          "
+                          variant="soft"
+                          size="xs"
+                        >
+                          {{
+                            item.state === 'Processed'
+                              ? 'Valide'
+                              : item.state === 'Pending'
+                                ? 'En attente'
+                                : item.state === 'Refunded'
+                                  ? 'Remboursé'
+                                  : item.state
+                          }}
+                        </UBadge>
                       </div>
                     </div>
                   </div>
@@ -657,7 +696,7 @@
         <div class="flex gap-2">
           <UButton color="neutral" variant="soft" @click="isOpen = false"> Fermer </UButton>
           <UButton
-            v-if="isTicket && selectedParticipants.length > 0"
+            v-if="isTicket && selectedParticipants.length > 0 && !isRefunded"
             color="success"
             icon="i-heroicons-check-circle"
             :loading="validating"
@@ -908,6 +947,7 @@ const props = defineProps<{
   open: boolean
   participant?: ParticipantData
   type?: 'ticket' | 'volunteer'
+  isRefunded?: boolean // Indique si la commande est annulée
 }>()
 
 const emit = defineEmits<{

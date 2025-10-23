@@ -190,7 +190,9 @@
                           ? 'warning'
                           : order.status === 'Onsite'
                             ? 'info'
-                            : 'neutral'
+                            : order.status === 'Refunded'
+                              ? 'error'
+                              : 'neutral'
                     "
                     variant="soft"
                   >
@@ -199,7 +201,9 @@
                         ? 'En attente de paiement'
                         : order.status === 'Onsite'
                           ? 'Sur place'
-                          : order.status
+                          : order.status === 'Refunded'
+                            ? 'Annulée'
+                            : order.status
                     }}
                   </UBadge>
                   <img
@@ -211,7 +215,7 @@
                   />
                   <UBadge
                     v-else-if="!order.externalTicketing"
-                    color="purple"
+                    color="secondary"
                     variant="soft"
                     size="sm"
                   >
@@ -236,15 +240,26 @@
                   </div>
                 </div>
               </div>
-              <div class="text-right">
+              <div class="text-right flex flex-col items-end gap-2">
                 <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
                   {{ (order.amount / 100).toFixed(2) }}€
                 </div>
-                <UBadge color="primary" variant="subtle" size="sm" class="mt-1">
+                <UBadge color="primary" variant="subtle" size="sm">
                   {{ order.items?.length || 0 }} billet{{
                     (order.items?.length || 0) > 1 ? 's' : ''
                   }}
                 </UBadge>
+                <!-- Bouton d'annulation (seulement pour les commandes manuelles non annulées) -->
+                <UButton
+                  v-if="!order.externalTicketing && order.status !== 'Refunded'"
+                  color="error"
+                  variant="soft"
+                  size="xs"
+                  icon="i-heroicons-trash"
+                  @click="showCancelModal(order)"
+                >
+                  {{ $t('ticketing.orders.cancel_order') }}
+                </UButton>
               </div>
             </div>
 
@@ -369,6 +384,74 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Modal d'annulation de commande -->
+    <UModal v-model:open="isCancelModalOpen" :title="$t('ticketing.orders.cancel_order_confirm')">
+      <template #body>
+        <div v-if="orderToCancel" class="space-y-4">
+          <UAlert
+            icon="i-heroicons-exclamation-triangle"
+            color="error"
+            variant="soft"
+            :description="$t('ticketing.orders.cancel_order_confirm_message')"
+          />
+
+          <!-- Informations de la commande -->
+          <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">Payeur :</span>
+              <span class="font-medium text-gray-900 dark:text-white">
+                {{ orderToCancel.payerFirstName }} {{ orderToCancel.payerLastName }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">Email :</span>
+              <span class="font-medium text-gray-900 dark:text-white">
+                {{ orderToCancel.payerEmail }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">Montant :</span>
+              <span class="font-medium text-gray-900 dark:text-white">
+                {{ (orderToCancel.amount / 100).toFixed(2) }}€
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">Billets :</span>
+              <span class="font-medium text-gray-900 dark:text-white">
+                {{ orderToCancel.items?.length || 0 }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex items-center justify-end gap-3">
+          <UButton
+            color="neutral"
+            variant="soft"
+            :disabled="isCanceling"
+            @click="isCancelModalOpen = false"
+          >
+            {{ $t('common.cancel') }}
+          </UButton>
+          <UButton
+            color="error"
+            variant="solid"
+            :loading="isCanceling"
+            :disabled="isCanceling"
+            @click="cancelOrder"
+          >
+            {{
+              isCanceling
+                ? $t('ticketing.orders.canceling_order')
+                : $t('ticketing.orders.cancel_order')
+            }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -412,6 +495,55 @@ const selectedItem = ref<any>(null)
 const showQrCode = (item: any) => {
   selectedItem.value = item
   isQrModalOpen.value = true
+}
+
+// Modal et logique d'annulation de commande
+const isCancelModalOpen = ref(false)
+const orderToCancel = ref<Order | null>(null)
+const isCanceling = ref(false)
+
+const showCancelModal = (order: Order) => {
+  orderToCancel.value = order
+  isCancelModalOpen.value = true
+}
+
+const cancelOrder = async () => {
+  if (!orderToCancel.value) return
+
+  isCanceling.value = true
+  try {
+    await $fetch<{ success: boolean; message: string }>(
+      `/api/editions/${editionId}/ticketing/orders/${orderToCancel.value.id}`,
+      {
+        method: 'DELETE',
+      }
+    )
+
+    // Fermer la modal
+    isCancelModalOpen.value = false
+    orderToCancel.value = null
+
+    // Recharger les commandes
+    await loadOrders()
+
+    // Message de succès
+    useToast().add({
+      title: 'Commande annulée',
+      description: 'La commande a été annulée avec succès',
+      color: 'success',
+      icon: 'i-heroicons-check-circle',
+    })
+  } catch (error: any) {
+    console.error('Failed to cancel order:', error)
+    useToast().add({
+      title: 'Erreur',
+      description: error.data?.message || "Erreur lors de l'annulation de la commande",
+      color: 'error',
+      icon: 'i-heroicons-exclamation-circle',
+    })
+  } finally {
+    isCanceling.value = false
+  }
 }
 
 const lastSyncText = computed(() => {

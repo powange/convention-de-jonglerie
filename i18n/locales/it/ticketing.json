@@ -38,6 +38,12 @@
         "type_label": "Tipo di opzione"
       }
     },
+    "orders": {
+      "cancel_order": "[TODO]",
+      "cancel_order_confirm": "[TODO]",
+      "cancel_order_confirm_message": "[TODO]",
+      "canceling_order": "[TODO]"
+    },
     "participant": {
       "entry_validated": "Ingresso già convalidato",
       "logo_alt": "HelloAsso",

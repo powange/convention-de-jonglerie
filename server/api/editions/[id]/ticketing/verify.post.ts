@@ -236,6 +236,7 @@ export default defineEventHandler(async (event) => {
           success: true,
           found: true,
           type: 'ticket',
+          isRefunded: orderItem.order.status === 'Refunded', // Nouveau flag pour indiquer si la commande est annulée
           participant: {
             found: true,
             ticket: {
@@ -252,6 +253,7 @@ export default defineEventHandler(async (event) => {
               },
               order: {
                 id: orderItem.order.helloAssoOrderId,
+                status: orderItem.order.status,
                 payer: {
                   firstName: orderItem.order.payerFirstName,
                   lastName: orderItem.order.payerLastName,

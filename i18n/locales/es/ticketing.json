@@ -38,6 +38,12 @@
         "type_label": "Tipo de opción"
       }
     },
+    "orders": {
+      "cancel_order": "[TODO] Cancelar pedido",
+      "cancel_order_confirm": "[TODO] ¿Está seguro de que desea cancelar este pedido?",
+      "cancel_order_confirm_message": "[TODO] Esta acción eliminará permanentemente el pedido y todas las entradas asociadas. Esta acción no se puede deshacer.",
+      "canceling_order": "[TODO] Cancelando..."
+    },
     "participant": {
       "entry_validated": "Entrada ya validada",
       "logo_alt": "HelloAsso",

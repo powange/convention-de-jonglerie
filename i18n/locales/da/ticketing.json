@@ -38,6 +38,12 @@
         "type_label": "Type mulighed"
       }
     },
+    "orders": {
+      "cancel_order": "[TODO]",
+      "cancel_order_confirm": "[TODO]",
+      "cancel_order_confirm_message": "[TODO]",
+      "canceling_order": "[TODO]"
+    },
     "participant": {
       "entry_validated": "Adgang allerede valideret",
       "logo_alt": "HelloAsso",

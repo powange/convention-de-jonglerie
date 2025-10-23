@@ -38,6 +38,12 @@
         "type_label": "Option type"
       }
     },
+    "orders": {
+      "cancel_order": "Cancel order",
+      "cancel_order_confirm": "Are you sure you want to cancel this order?",
+      "cancel_order_confirm_message": "This action will permanently delete the order and all associated tickets. This action cannot be undone.",
+      "canceling_order": "Canceling..."
+    },
     "participant": {
       "entry_validated": "Entry already validated",
       "logo_alt": "HelloAsso",
