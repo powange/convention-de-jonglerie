@@ -711,6 +711,7 @@ async function main() {
               notifications: ['notifications', 'push_notifications'],
               permissions: ['permissions'],
               ticketing: ['ticketing'],
+              workshops: ['workshops'],
             }
 
             const getTargetFile = (key) => {
