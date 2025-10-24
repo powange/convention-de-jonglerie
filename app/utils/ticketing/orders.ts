@@ -58,12 +58,15 @@ export interface OrdersResponse {
 
 export async function fetchOrders(
   editionId: number,
-  options?: { page?: number; limit?: number; search?: string }
+  options?: { page?: number; limit?: number; search?: string; tierIds?: number[] }
 ): Promise<OrdersResponse> {
   const params = new URLSearchParams()
   if (options?.page) params.append('page', options.page.toString())
   if (options?.limit) params.append('limit', options.limit.toString())
   if (options?.search) params.append('search', options.search)
+  if (options?.tierIds && options.tierIds.length > 0) {
+    params.append('tierIds', options.tierIds.join(','))
+  }
 
   const url = `/api/editions/${editionId}/ticketing/orders${params.toString() ? `?${params.toString()}` : ''}`
   const response = await $fetch<OrdersResponse>(url)

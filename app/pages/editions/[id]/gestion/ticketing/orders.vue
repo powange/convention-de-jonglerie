@@ -140,17 +140,72 @@
 
         <!-- Filtre de recherche -->
         <UCard>
-          <div class="flex items-center gap-4">
-            <UInput
-              v-model="searchQuery"
-              placeholder="Rechercher par nom, email..."
-              icon="i-heroicons-magnifying-glass"
-              class="flex-1"
-              size="lg"
-            />
-            <UButton color="primary" variant="soft" icon="i-heroicons-funnel" size="lg">
-              Filtres
-            </UButton>
+          <div class="space-y-4">
+            <div class="flex items-center gap-4">
+              <UInput
+                v-model="searchQuery"
+                placeholder="Rechercher par nom, email..."
+                icon="i-heroicons-magnifying-glass"
+                class="flex-1"
+                size="lg"
+              />
+              <UButton
+                color="primary"
+                variant="soft"
+                icon="i-heroicons-funnel"
+                size="lg"
+                @click="isFiltersOpen = !isFiltersOpen"
+              >
+                Filtres
+                <UBadge
+                  v-if="selectedTierIds.length > 0"
+                  color="primary"
+                  variant="solid"
+                  size="xs"
+                  class="ml-2"
+                >
+                  {{ selectedTierIds.length }}
+                </UBadge>
+              </UButton>
+            </div>
+
+            <!-- Section des filtres (cachée par défaut) -->
+            <div v-if="isFiltersOpen" class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Filtrer par tarifs
+                </label>
+                <USelect
+                  v-model="selectedTierIds"
+                  :items="tierSelectItems"
+                  multiple
+                  placeholder="Sélectionner des tarifs"
+                  value-key="value"
+                  size="md"
+                  class="w-full"
+                >
+                  <template #item-label="{ item }">
+                    <div class="flex items-center justify-between w-full">
+                      <span>{{ item.label }}</span>
+                      <span class="text-xs text-gray-500 dark:text-gray-400">
+                        {{ (item.price / 100).toFixed(2) }}€
+                      </span>
+                    </div>
+                  </template>
+                </USelect>
+                <div v-if="selectedTierIds.length > 0" class="mt-2">
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    size="xs"
+                    icon="i-heroicons-x-mark"
+                    @click="selectedTierIds = []"
+                  >
+                    Réinitialiser les filtres
+                  </UButton>
+                </div>
+              </div>
+            </div>
           </div>
         </UCard>
 
@@ -481,6 +536,7 @@ import { useRoute } from 'vue-router'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { fetchOrders, type Order } from '~/utils/ticketing/orders'
+import { fetchTiers, type TicketingTier } from '~/utils/ticketing/tiers'
 
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -507,6 +563,11 @@ const currentPage = ref(1)
 const pageSize = ref(20)
 const totalPages = ref(0)
 const totalOrders = ref(0)
+
+// Filtre par tarifs
+const tiers = ref<TicketingTier[]>([])
+const selectedTierIds = ref<number[]>([])
+const isFiltersOpen = ref(false)
 
 // Modal QR Code
 const isQrModalOpen = ref(false)
@@ -606,6 +667,7 @@ const loadOrders = async () => {
       page: currentPage.value,
       limit: pageSize.value,
       search: searchQuery.value,
+      tierIds: selectedTierIds.value.length > 0 ? selectedTierIds.value : undefined,
     })
 
     orders.value = response.orders
@@ -623,8 +685,17 @@ const loadOrders = async () => {
   }
 }
 
-// Réinitialiser à la page 1 quand on effectue une recherche
-watch(searchQuery, () => {
+// Computed pour transformer les tarifs en items pour le select
+const tierSelectItems = computed(() => {
+  return tiers.value.map((tier) => ({
+    label: tier.name,
+    value: tier.id,
+    price: tier.price,
+  }))
+})
+
+// Réinitialiser à la page 1 quand on effectue une recherche ou change les filtres
+watch([searchQuery, selectedTierIds], () => {
   currentPage.value = 1
   loadOrders()
 })
@@ -651,9 +722,14 @@ onMounted(async () => {
 
 const loadData = async () => {
   try {
-    // Charger la configuration
-    const configResponse = await $fetch(`/api/editions/${editionId}/ticketing/external`)
+    // Charger la configuration et les tarifs en parallèle
+    const [configResponse, tiersData] = await Promise.all([
+      $fetch(`/api/editions/${editionId}/ticketing/external`),
+      fetchTiers(editionId),
+    ])
+
     hasExternalTicketing.value = configResponse.hasConfig
+    tiers.value = tiersData
 
     if (configResponse.hasConfig) {
       lastSync.value = configResponse.config?.lastSyncAt

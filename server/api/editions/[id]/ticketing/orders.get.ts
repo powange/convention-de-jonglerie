@@ -16,11 +16,13 @@ export default defineEventHandler(async (event) => {
       message: 'Droits insuffisants pour accéder à ces données',
     })
 
-  // Paramètres de pagination
+  // Paramètres de pagination et filtres
   const query = getQuery(event)
   const page = parseInt(query.page as string) || 1
   const limit = parseInt(query.limit as string) || 20
   const search = (query.search as string) || ''
+  const tierIdsParam = (query.tierIds as string) || ''
+  const tierIds = tierIdsParam ? tierIdsParam.split(',').map((id) => parseInt(id)) : []
 
   try {
     // Construire la condition de recherche
@@ -46,11 +48,26 @@ export default defineEventHandler(async (event) => {
         }
       : {}
 
+    // Construire la condition de filtre par tarifs
+    const tierCondition =
+      tierIds.length > 0
+        ? {
+            items: {
+              some: {
+                tierId: {
+                  in: tierIds,
+                },
+              },
+            },
+          }
+        : {}
+
     // Compter le nombre total de commandes (toutes les commandes de l'édition)
     const total = await prisma.ticketingOrder.count({
       where: {
         editionId,
         ...searchCondition,
+        ...tierCondition,
       },
     })
 
@@ -59,6 +76,7 @@ export default defineEventHandler(async (event) => {
       where: {
         editionId,
         ...searchCondition,
+        ...tierCondition,
       },
       include: {
         externalTicketing: {

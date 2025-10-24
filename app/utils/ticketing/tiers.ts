@@ -35,7 +35,7 @@ export interface TierFormData {
 }
 
 export async function fetchTiers(editionId: number): Promise<TicketingTier[]> {
-  return await $fetch(`/api/editions/${editionId}/ticketing/tiers`)
+  return await $fetch(`/api/editions/${editionId}/ticketing/tiers/`)
 }
 
 export async function createTier(editionId: number, data: TierFormData): Promise<void> {
