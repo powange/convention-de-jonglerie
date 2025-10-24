@@ -197,7 +197,7 @@ const convertedTimeSlots = computed(() => {
 })
 
 // Calcul automatique des stats individuelles si non fournies (pour les bénévoles)
-const computedStatsIndividual = computed((): VolunteerStatsIndividual[] => {
+const _computedStatsIndividual = computed((): VolunteerStatsIndividual[] => {
   // Si fourni en prop, l'utiliser
   if (props.volunteersStatsIndividual) {
     return props.volunteersStatsIndividual
@@ -379,6 +379,7 @@ const exportToPdf = async () => {
     const { jsPDF } = await import('jspdf')
 
     const doc = new jsPDF('p', 'mm', 'a4')
+    const pageWidth = doc.internal.pageSize.getWidth()
     const pageHeight = doc.internal.pageSize.getHeight()
     const margin = 15
     let currentY = margin
@@ -386,14 +387,10 @@ const exportToPdf = async () => {
     // Déterminer si on filtre pour un bénévole spécifique
     const isVolunteerView = props.currentUserId && !props.canManageVolunteers
 
-    // Filtrer les stats individuelles si c'est un bénévole
-    const filteredStatsIndividual = isVolunteerView
-      ? computedStatsIndividual.value.filter((v) => v.user.id === props.currentUserId)
-      : computedStatsIndividual.value
-
     // En-tête du document
     doc.setFontSize(18)
     doc.setFont('helvetica', 'bold')
+    doc.setTextColor(59, 130, 246) // Bleu primary
     const title = isVolunteerView
       ? `Mon planning - ${props.edition?.name || 'Édition'}`
       : `Planning des bénévoles - ${props.edition?.name || 'Édition'}`
@@ -402,43 +399,28 @@ const exportToPdf = async () => {
 
     doc.setFontSize(10)
     doc.setFont('helvetica', 'normal')
+    doc.setTextColor(107, 114, 128) // Gris
     const subtitle = `${props.edition?.convention?.name || ''} - ${props.formatDateTimeRange(props.edition?.startDate || '', props.edition?.endDate || '')}`
     doc.text(subtitle, margin, currentY)
     currentY += 15
+    doc.setTextColor(0, 0, 0) // Réinitialiser en noir
 
-    // Statistiques (adaptées pour bénévole)
-    if (isVolunteerView && filteredStatsIndividual.length > 0) {
-      const myStats = filteredStatsIndividual[0]
+    // Statistiques générales (uniquement pour gestionnaires)
+    if (!isVolunteerView) {
       doc.setFontSize(14)
       doc.setFont('helvetica', 'bold')
-      doc.text('Mes statistiques', margin, currentY)
-      currentY += 8
-
-      doc.setFontSize(10)
-      doc.setFont('helvetica', 'normal')
-      const stats = [
-        `Heures totales : ${myStats.totalHours.toFixed(1)}h`,
-        `Nombre de créneaux : ${myStats.totalSlots}`,
-      ]
-
-      stats.forEach((stat) => {
-        doc.text(stat, margin, currentY)
-        currentY += 6
-      })
-      currentY += 10
-    } else if (!isVolunteerView) {
-      doc.setFontSize(14)
-      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(59, 130, 246) // Bleu primary
       doc.text('Statistiques générales', margin, currentY)
       currentY += 8
 
       doc.setFontSize(10)
       doc.setFont('helvetica', 'normal')
+      doc.setTextColor(0, 0, 0) // Noir
       const stats = [
         `Nombre total de bénévoles : ${props.volunteersStats?.totalVolunteers || 0}`,
         `Heures totales de bénévolat : ${props.volunteersStats?.totalHours.toFixed(1) || '0.0'}h`,
         `Moyenne d'heures par bénévole : ${props.volunteersStats?.averageHours.toFixed(1) || '0.0'}h`,
-        `Nombre total de créneaux : ${props.volunteersStats?.totalSlots || 0}`,
+        `Nombre total de créneaux : ${props.timeSlots?.length || 0}`,
       ]
 
       stats.forEach((stat) => {
@@ -456,88 +438,150 @@ const exportToPdf = async () => {
       }
     }
 
-    // Planning par jour (uniquement pour gestionnaires)
-    if (!isVolunteerView && props.volunteersStatsByDay && props.volunteersStatsByDay.length > 0) {
+    // Fonction helper pour tronquer le texte si trop long
+    const truncateText = (text: string, maxWidth: number): string => {
+      const textWidth = doc.getTextWidth(text)
+      if (textWidth <= maxWidth) return text
+
+      let truncated = text
+      while (doc.getTextWidth(truncated + '...') > maxWidth && truncated.length > 0) {
+        truncated = truncated.slice(0, -1)
+      }
+      return truncated + '...'
+    }
+
+    // Liste chronologique des créneaux avec bénévoles
+    // Utiliser convertedTimeSlots qui contient assignedVolunteersList
+    const slotsToExport = convertedTimeSlots.value
+    if (slotsToExport && slotsToExport.length > 0) {
       checkNewPage(40)
       doc.setFontSize(14)
       doc.setFont('helvetica', 'bold')
-      doc.text('Planning par jour', margin, currentY)
+      doc.setTextColor(59, 130, 246) // Bleu primary
+      doc.text('Créneaux par ordre chronologique', margin, currentY)
+      doc.setTextColor(0, 0, 0) // Réinitialiser en noir
       currentY += 10
 
-      props.volunteersStatsByDay.forEach((dayStats) => {
-        checkNewPage(30 + dayStats.volunteers.length * 5)
+      // Trier les créneaux par date de début
+      const sortedSlots = [...slotsToExport].sort((a, b) => {
+        return new Date(a.start).getTime() - new Date(b.start).getTime()
+      })
 
-        doc.setFontSize(12)
-        doc.setFont('helvetica', 'bold')
-        doc.text(`${props.formatDate(dayStats.date)}`, margin, currentY)
-        currentY += 6
+      // Filtrer pour le bénévole si c'est une vue bénévole
+      const filteredSlots = isVolunteerView
+        ? sortedSlots.filter(
+            (slot) =>
+              slot.assignedVolunteersList &&
+              slot.assignedVolunteersList.some(
+                (assignment: any) => assignment.user.id === props.currentUserId
+              )
+          )
+        : sortedSlots
 
+      if (filteredSlots.length === 0) {
         doc.setFontSize(10)
         doc.setFont('helvetica', 'normal')
-        doc.text(
-          `${dayStats.totalVolunteers} bénévoles - ${dayStats.totalHours.toFixed(1)}h total`,
-          margin + 5,
-          currentY
-        )
-        currentY += 8
+        doc.text('Aucun créneau trouvé.', margin, currentY)
+        currentY += 6
+      } else {
+        filteredSlots.forEach((slot) => {
+          // Calculer la hauteur nécessaire pour ce créneau
+          const volunteersCount = slot.assignedVolunteersList?.length || 0
+          const slotHeight = 20 + volunteersCount * 5
+          checkNewPage(slotHeight)
 
-        // Liste des bénévoles pour ce jour
-        dayStats.volunteers.forEach((volunteer: any) => {
-          doc.setFontSize(10)
-          doc.setFont('helvetica', 'normal')
-          const volunteerLine = `• ${volunteer.user.pseudo} : ${volunteer.hours.toFixed(1)}h (${volunteer.slots} créneaux)`
-          doc.text(volunteerLine, margin + 10, currentY)
-          currentY += 5
-        })
-        currentY += 5
-      })
-    }
+          // Trouver le nom de l'équipe
+          const team = internalTeams.value?.find((t) => t.id === slot.teamId)
+          const teamName = team?.name || 'Sans équipe'
 
-    // Statistiques individuelles (seulement pour gestionnaires ou détails du bénévole)
-    if (filteredStatsIndividual.length > 0) {
-      if (!isVolunteerView) {
-        doc.addPage()
-        currentY = margin
-      }
+          // Couleur de fond pour le créneau (très léger)
+          doc.setFillColor(249, 250, 251) // Gris très clair
+          doc.rect(margin - 2, currentY - 5, pageWidth - margin * 2 + 4, slotHeight - 3, 'F')
 
-      doc.setFontSize(14)
-      doc.setFont('helvetica', 'bold')
-      doc.text(isVolunteerView ? 'Mes créneaux' : 'Statistiques par bénévole', margin, currentY)
-      currentY += 10
+          // Pastille de couleur de l'équipe
+          const teamColor = slot.color || team?.color || '#6B7280' // Couleur de l'équipe ou gris par défaut
+          // Convertir la couleur hex en RGB
+          const hexToRgb = (hex: string) => {
+            const cleanHex = hex.replace('#', '')
+            return {
+              r: parseInt(cleanHex.substring(0, 2), 16),
+              g: parseInt(cleanHex.substring(2, 4), 16),
+              b: parseInt(cleanHex.substring(4, 6), 16),
+            }
+          }
+          const rgb = hexToRgb(teamColor)
+          doc.setFillColor(rgb.r, rgb.g, rgb.b)
+          doc.circle(margin + 2, currentY - 2, 2, 'F') // Pastille de 4mm de diamètre
 
-      filteredStatsIndividual.forEach((volunteerStat) => {
-        checkNewPage(15 + (volunteerStat.dayDetails?.length || 0) * 4)
-
-        if (!isVolunteerView) {
+          // En-tête du créneau avec horaires (décalé pour laisser la place à la pastille)
           doc.setFontSize(11)
           doc.setFont('helvetica', 'bold')
-          const volunteerName = `${volunteerStat.user.pseudo} (${volunteerStat.user.prenom || ''} ${volunteerStat.user.nom || ''})`
-          doc.text(volunteerName, margin, currentY)
+          doc.setTextColor(17, 24, 39) // Gris foncé
+          const slotTitle = truncateText(slot.title || 'Sans titre', pageWidth - margin * 2 - 70)
+          doc.text(slotTitle, margin + 7, currentY)
+
+          // Horaires à droite
+          doc.setFontSize(9)
+          doc.setFont('helvetica', 'normal')
+          doc.setTextColor(107, 114, 128) // Gris
+          const timeRange = props.formatDateTimeRange(slot.start, slot.end)
+          const timeRangeWidth = doc.getTextWidth(timeRange)
+          doc.text(timeRange, pageWidth - margin - timeRangeWidth, currentY)
           currentY += 6
-        }
 
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'normal')
-        doc.text(
-          `Total : ${volunteerStat.totalHours.toFixed(1)}h sur ${volunteerStat.totalSlots} créneaux`,
-          margin + 5,
-          currentY
-        )
-        currentY += 5
+          // Équipe et nombre de bénévoles
+          doc.setFontSize(9)
+          doc.setFont('helvetica', 'normal')
+          doc.setTextColor(59, 130, 246) // Bleu pour l'équipe
+          const teamInfo = `Équipe : ${teamName} • ${volunteersCount}/${slot.maxVolunteers || '∞'} bénévoles`
+          doc.text(teamInfo, margin + 5, currentY)
+          currentY += 5
 
-        // Détails par jour
-        if (volunteerStat.dayDetails && volunteerStat.dayDetails.length > 0) {
-          volunteerStat.dayDetails.forEach((dayDetail: any) => {
-            const dayLine = `  ${props.formatDate(dayDetail.date)} : ${dayDetail.hours.toFixed(1)}h (${dayDetail.slots} créneaux)`
-            doc.text(dayLine, margin + 10, currentY)
-            currentY += 4
-          })
-        } else {
-          doc.text('  Aucun créneau assigné', margin + 10, currentY)
-          currentY += 4
-        }
-        currentY += 3
-      })
+          // Liste des bénévoles assignés
+          if (volunteersCount > 0) {
+            doc.setFontSize(9)
+            doc.setFont('helvetica', 'normal')
+            doc.setTextColor(17, 24, 39) // Gris foncé
+
+            slot.assignedVolunteersList.forEach((assignment: any) => {
+              const pseudo = assignment.user.pseudo || ''
+              const firstName = assignment.user.prenom || ''
+              const lastName = assignment.user.nom || ''
+              const fullName = `${firstName} ${lastName}`.trim()
+
+              // Afficher pseudo (nom prénom) ou juste le nom si pas de pseudo
+              let volunteerName = ''
+              if (pseudo && fullName) {
+                volunteerName = `${pseudo} (${fullName})`
+              } else if (pseudo) {
+                volunteerName = pseudo
+              } else if (fullName) {
+                volunteerName = fullName
+              } else {
+                volunteerName = 'Bénévole'
+              }
+
+              const volunteerText = `  • ${volunteerName}`
+              doc.text(
+                truncateText(volunteerText, pageWidth - margin * 2 - 10),
+                margin + 10,
+                currentY
+              )
+              currentY += 5
+            })
+          } else {
+            doc.setFontSize(9)
+            doc.setFont('helvetica', 'italic')
+            doc.setTextColor(156, 163, 175) // Gris clair
+            doc.text('  Aucun bénévole assigné', margin + 10, currentY)
+            currentY += 5
+          }
+
+          doc.setTextColor(0, 0, 0) // Réinitialiser en noir
+
+          currentY += 3 // Espacement entre les créneaux
+        })
+      }
     }
 
     // Télécharger le PDF
