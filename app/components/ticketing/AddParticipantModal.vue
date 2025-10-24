@@ -157,7 +157,7 @@
                     <div class="flex items-center justify-between">
                       <UCheckbox
                         :model-value="isOptionEnabled(item, option.id)"
-                        :disabled="option.isRequired"
+                        :disabled="option.isRequired && option.type !== 'YesNo'"
                         :label="option.name + (option.isRequired ? ' *' : '')"
                         @update:model-value="
                           (enabled: boolean) => toggleOption(item, option.id, option.name, enabled)
@@ -852,6 +852,10 @@ const canGoNext = computed(() => {
       const tierCustomFields = getTierCustomFields(item.tierId)
       const requiredCustomFieldsFilled = tierCustomFields.every((customField) => {
         if (!customField.isRequired) return true
+        
+        // Pour les champs YesNo, ne pas cocher est valide (équivaut à "No")
+        if (customField.type === 'YesNo') return true
+        
         const answer = getTierCustomFieldAnswer(item, customField.id)
         return answer && answer.trim().length > 0
       })
@@ -1078,9 +1082,9 @@ const nextStep = () => {
       }
 
       for (let i = 0; i < quantity; i++) {
-        // Pré-activer les options requises
+        // Pré-activer les options requises (sauf YesNo car ne pas cocher = "No")
         const requiredOptions = (editionOptions.value || [])
-          .filter((opt) => opt.isRequired)
+          .filter((opt) => opt.isRequired && opt.type !== 'YesNo')
           .map((opt) => opt.id)
 
         selectedItems.value.push({
