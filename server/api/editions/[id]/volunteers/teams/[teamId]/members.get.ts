@@ -4,8 +4,9 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 
 /**
- * Récupère les membres d'une équipe de bénévoles
+ * Récupère les membres d'une équipe de bénévoles avec leurs coordonnées
  * Vérifie que l'utilisateur connecté est leader de cette équipe
+ * Renvoie l'email et le téléphone des membres pour permettre au leader de les contacter
  */
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
@@ -54,6 +55,7 @@ export default defineEventHandler(async (event) => {
       assignedAt: true,
       application: {
         select: {
+          userSnapshotPhone: true,
           user: {
             select: {
               id: true,
@@ -73,15 +75,17 @@ export default defineEventHandler(async (event) => {
     ],
   })
 
-  // Formater les données avec le hash de l'email
+  // Formater les données avec l'email et le téléphone complets
   return teamAssignments.map((assignment) => ({
     id: assignment.application.user.id,
     pseudo: assignment.application.user.pseudo,
     prenom: assignment.application.user.prenom,
     nom: assignment.application.user.nom,
+    email: assignment.application.user.email,
     emailHash: createHash('md5')
       .update(assignment.application.user.email.toLowerCase().trim())
       .digest('hex'),
+    phone: assignment.application.userSnapshotPhone,
     profilePicture: assignment.application.user.profilePicture,
     isLeader: assignment.isLeader,
     assignedAt: assignment.assignedAt,

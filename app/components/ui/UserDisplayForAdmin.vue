@@ -14,6 +14,9 @@
       <p v-if="showEmail && user.email" class="text-sm text-gray-500 dark:text-gray-400 truncate">
         {{ user.email }}
       </p>
+      <p v-if="showPhone && user.phone" class="text-sm text-gray-500 dark:text-gray-400 truncate">
+        {{ user.phone }}
+      </p>
     </div>
   </div>
 </template>
@@ -26,6 +29,7 @@ interface User {
   prenom?: string | null
   email?: string
   emailHash?: string
+  phone?: string | null
   profilePicture?: string | null
   updatedAt?: string
 }
@@ -35,6 +39,7 @@ interface Props {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | number
   border?: boolean
   showEmail?: boolean
+  showPhone?: boolean
   avatarClass?: string
 }
 
@@ -42,6 +47,7 @@ withDefaults(defineProps<Props>(), {
   size: 'lg',
   border: true,
   showEmail: true,
+  showPhone: false,
   avatarClass: 'ring-2 ring-gray-200 dark:ring-gray-700',
 })
 </script>

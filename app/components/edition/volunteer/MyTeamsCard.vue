@@ -71,11 +71,14 @@
                   pseudo: member.pseudo,
                   prenom: member.prenom,
                   nom: member.nom,
+                  email: member.email,
                   emailHash: member.emailHash,
+                  phone: member.phone,
                   profilePicture: member.profilePicture,
                 }"
                 size="md"
-                :show-email="false"
+                :show-email="true"
+                :show-phone="true"
                 :border="false"
                 avatar-class=""
               >
@@ -105,7 +108,9 @@ interface TeamMember {
   pseudo: string
   prenom: string | null
   nom: string | null
+  email: string
   emailHash: string
+  phone: string | null
   profilePicture: string | null
   isLeader: boolean
   assignedAt: string
