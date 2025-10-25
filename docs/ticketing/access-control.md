@@ -290,11 +290,7 @@ const bodySchema = z.object({
 
 ```typescript
 {
-  searchTerm?: string
-  validated?: boolean      // Filtre par statut de validation
-  tierId?: number         // Filtre par tarif
-  dateFrom?: DateTime     // Filtre par date de commande
-  dateTo?: DateTime
+  searchTerm: string // Minimum 2 caractères
 }
 ```
 
@@ -302,10 +298,52 @@ const bodySchema = z.object({
 
 ```typescript
 {
-  participants: TicketingOrderItem[]
-  total: number
+  success: true,
+  results: {
+    tickets: Array<{
+      type: 'ticket',
+      isRefunded: boolean,
+      participant: {
+        found: true,
+        ticket: TicketingOrderItem & {
+          user: { firstName, lastName, email },
+          order: { ... }
+        }
+      }
+    }>,
+    volunteers: Array<{
+      type: 'volunteer',
+      participant: {
+        found: true,
+        volunteer: {
+          id: number,
+          user: { firstName, lastName, email },
+          teams: Array<{ id, name, isLeader }>,
+          timeSlots: Array<{ id, title, team, startDateTime, endDateTime }>,
+          returnableItems: Array<{ id, name }>,
+          entryValidated: boolean,
+          entryValidatedAt: DateTime | null,
+          entryValidatedBy: { firstName, lastName } | null
+        }
+      }
+    }>,
+    total: number
+  }
 }
 ```
+
+**Filtrage des bénévoles** :
+
+La recherche ne retourne **que les bénévoles disponibles pendant l'événement**.
+Les bénévoles qui ont explicitement indiqué être disponibles uniquement pour le montage et/ou démontage (`eventAvailability = false`) ne sont **pas inclus** dans les résultats.
+
+**Critères d'inclusion pour les bénévoles** :
+
+- Statut : `ACCEPTED`
+- Disponibilité événement : `eventAvailability = true` OU `eventAvailability = null` (anciens bénévoles avant l'ajout du champ)
+- Correspondance : prénom, nom ou email contient le terme de recherche (insensible à la casse)
+
+**Limite** : 20 résultats maximum par type (billets et bénévoles)
 
 ---
 

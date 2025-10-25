@@ -70,32 +70,48 @@ export default defineEventHandler(async (event) => {
       take: 20, // Limiter à 20 résultats
     })
 
-    // Rechercher dans les bénévoles
+    // Rechercher dans les bénévoles disponibles pendant l'événement
+    // On exclut ceux qui sont uniquement disponibles pour le montage/démontage
     const volunteers = await prisma.editionVolunteerApplication.findMany({
       where: {
         editionId: editionId,
         status: 'ACCEPTED',
+        // Filtrer les bénévoles disponibles pendant l'événement
+        // eventAvailability peut être null (anciens bénévoles) ou true (explicitement disponible)
+        // On exclut uniquement ceux qui ont explicitement indiqué qu'ils ne sont PAS disponibles pendant l'événement
         OR: [
           {
-            user: {
-              prenom: {
-                contains: searchTerm,
-              },
-            },
+            eventAvailability: true,
           },
           {
-            user: {
-              nom: {
-                contains: searchTerm,
-              },
-            },
+            eventAvailability: null, // Inclure les anciens bénévoles (avant l'ajout de ce champ)
           },
+        ],
+        AND: [
           {
-            user: {
-              email: {
-                contains: searchTerm,
+            OR: [
+              {
+                user: {
+                  prenom: {
+                    contains: searchTerm,
+                  },
+                },
               },
-            },
+              {
+                user: {
+                  nom: {
+                    contains: searchTerm,
+                  },
+                },
+              },
+              {
+                user: {
+                  email: {
+                    contains: searchTerm,
+                  },
+                },
+              },
+            ],
           },
         ],
       },

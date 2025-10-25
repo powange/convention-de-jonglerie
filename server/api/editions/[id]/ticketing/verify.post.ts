@@ -46,6 +46,15 @@ export default defineEventHandler(async (event) => {
           id: applicationId,
           editionId: editionId,
           status: 'ACCEPTED',
+          // Filtrer les bénévoles disponibles pendant l'événement
+          OR: [
+            {
+              eventAvailability: true,
+            },
+            {
+              eventAvailability: null, // Inclure les anciens bénévoles (avant l'ajout de ce champ)
+            },
+          ],
         },
         include: {
           user: {
