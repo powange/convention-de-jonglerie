@@ -19,13 +19,61 @@ export default defineEventHandler(async (event) => {
 
   // Vérifier les permissions
   const canManage = await canManageEditionVolunteers(editionId, user.id, event)
+
+  // Si l'utilisateur ne peut pas gérer, vérifier s'il est team leader
+  let isTeamLeader = false
+  let leaderTeamNames: string[] = []
+
   if (!canManage) {
-    throw createError({ statusCode: 403, message: 'Droits insuffisants' })
+    // Vérifier si l'utilisateur est team leader
+    const leaderAssignments = await prisma.applicationTeamAssignment.findMany({
+      where: {
+        isLeader: true,
+        application: {
+          userId: user.id,
+          editionId,
+          status: 'ACCEPTED',
+        },
+      },
+      select: {
+        team: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    })
+
+    if (leaderAssignments.length === 0) {
+      throw createError({ statusCode: 403, message: 'Droits insuffisants' })
+    }
+
+    isTeamLeader = true
+    leaderTeamNames = leaderAssignments.map((a) => a.team.name)
   }
 
   // Valider les données
   const body = await readBody(event)
   const { targetType, selectedTeams, message } = notificationSchema.parse(body)
+
+  // Si team leader, forcer le targetType à 'teams' et valider les équipes
+  if (isTeamLeader) {
+    if (targetType !== 'teams' || !selectedTeams || selectedTeams.length === 0) {
+      throw createError({
+        statusCode: 400,
+        message: "Les responsables d'équipe doivent cibler des équipes spécifiques",
+      })
+    }
+
+    // Vérifier que toutes les équipes sélectionnées sont bien celles dont l'utilisateur est responsable
+    const invalidTeams = selectedTeams.filter((team) => !leaderTeamNames.includes(team))
+    if (invalidTeams.length > 0) {
+      throw createError({
+        statusCode: 403,
+        message: `Vous n'êtes pas responsable de ces équipes : ${invalidTeams.join(', ')}`,
+      })
+    }
+  }
 
   // Récupérer l'édition avec les informations de la convention
   const edition = await prisma.edition.findUnique({
@@ -50,12 +98,16 @@ export default defineEventHandler(async (event) => {
 
   // Si on cible des équipes spécifiques
   if (targetType === 'teams' && selectedTeams && selectedTeams.length > 0) {
-    // Pour les champs JSON avec arrays, utiliser OR avec array_contains pour chaque équipe
-    whereClause.OR = selectedTeams.map((team) => ({
-      assignedTeams: {
-        array_contains: team,
+    // Utiliser la relation teamAssignments au lieu du champ JSON assignedTeams
+    whereClause.teamAssignments = {
+      some: {
+        team: {
+          name: {
+            in: selectedTeams,
+          },
+        },
       },
-    }))
+    }
   }
 
   // Récupérer les bénévoles acceptés
@@ -112,8 +164,8 @@ export default defineEventHandler(async (event) => {
       return await NotificationService.create({
         userId: volunteer.user.id,
         type: 'INFO',
-        title,
-        message,
+        titleText: title,
+        messageText: message,
         category: 'volunteer',
         entityType: 'Edition',
         entityId: editionId.toString(),

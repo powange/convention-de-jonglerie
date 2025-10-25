@@ -11,11 +11,25 @@ export default defineEventHandler(async (event) => {
   const canManage = await canManageEditionVolunteers(editionId, user.id, event)
 
   // Vérifier si l'utilisateur est team leader
-  const query = getQuery(event)
-  const isTeamLeader = query.leaderOnly === 'true'
+  let isTeamLeader = false
 
-  if (!canManage && !isTeamLeader) {
-    throw createError({ statusCode: 403, message: 'Droits insuffisants' })
+  if (!canManage) {
+    const leaderAssignments = await prisma.applicationTeamAssignment.findMany({
+      where: {
+        isLeader: true,
+        application: {
+          userId: user.id,
+          editionId,
+          status: 'ACCEPTED',
+        },
+      },
+    })
+
+    if (leaderAssignments.length === 0) {
+      throw createError({ statusCode: 403, message: 'Droits insuffisants' })
+    }
+
+    isTeamLeader = true
   }
 
   // Pour les team leaders, ne récupérer que leurs propres notifications
@@ -83,12 +97,16 @@ export default defineEventHandler(async (event) => {
         Array.isArray(notification.selectedTeams) &&
         notification.selectedTeams.length > 0
       ) {
-        // Pour les champs JSON avec arrays, utiliser OR avec array_contains pour chaque équipe
-        whereClause.OR = (notification.selectedTeams as string[]).map((team: string) => ({
-          assignedTeams: {
-            array_contains: team,
+        // Utiliser la relation teamAssignments au lieu du champ JSON assignedTeams
+        whereClause.teamAssignments = {
+          some: {
+            team: {
+              name: {
+                in: notification.selectedTeams as string[],
+              },
+            },
           },
-        }))
+        }
       }
 
       const allRecipients = await prisma.editionVolunteerApplication.findMany({

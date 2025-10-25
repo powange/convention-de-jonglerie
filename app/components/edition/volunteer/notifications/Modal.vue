@@ -41,8 +41,8 @@
             <div class="space-y-2 overflow-y-auto">
               <UCheckbox
                 v-for="(team, index) in teamsOptions"
-                :key="`team-${index}-${team.value}`"
                 :id="`team-checkbox-${index}`"
+                :key="`team-${index}-${team.value}`"
                 :model-value="formData.selectedTeams.includes(team.value)"
                 :label="team.label"
                 @update:model-value="(checked: boolean) => handleTeamChange(team.value, checked)"

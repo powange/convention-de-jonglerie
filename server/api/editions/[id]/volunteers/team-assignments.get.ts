@@ -14,17 +14,53 @@ export default defineEventHandler(async (event) => {
   if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
 
   const allowed = await canAccessEditionData(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      statusCode: 403,
-      message: 'Droits insuffisants pour accéder à ces données',
+
+  // Si l'utilisateur n'a pas accès complet, vérifier s'il est team leader
+  let isTeamLeader = false
+  let leaderTeamIds: string[] = []
+
+  if (!allowed) {
+    // Vérifier si l'utilisateur est team leader
+    const leaderAssignments = await prisma.applicationTeamAssignment.findMany({
+      where: {
+        isLeader: true,
+        application: {
+          userId: user.id,
+          editionId,
+          status: 'ACCEPTED',
+        },
+      },
+      select: {
+        teamId: true,
+      },
     })
+
+    if (leaderAssignments.length === 0) {
+      throw createError({
+        statusCode: 403,
+        message: 'Droits insuffisants pour accéder à ces données',
+      })
+    }
+
+    isTeamLeader = true
+    leaderTeamIds = leaderAssignments.map((a) => a.teamId)
+  }
 
   // Récupérer tous les bénévoles acceptés avec leurs équipes
   const applications = await prisma.editionVolunteerApplication.findMany({
     where: {
       editionId,
       status: 'ACCEPTED',
+      // Si team leader, filtrer uniquement les bénévoles de ses équipes
+      ...(isTeamLeader && {
+        teamAssignments: {
+          some: {
+            teamId: {
+              in: leaderTeamIds,
+            },
+          },
+        },
+      }),
     },
     select: {
       id: true,
