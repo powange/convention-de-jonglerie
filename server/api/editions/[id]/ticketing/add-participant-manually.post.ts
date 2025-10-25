@@ -2,6 +2,7 @@ import { createHash } from 'crypto'
 
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
+import { applyCustomName } from '@@/server/utils/editions/ticketing/tiers'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
 
@@ -89,6 +90,7 @@ export default defineEventHandler(async (event) => {
       select: {
         id: true,
         name: true,
+        customName: true,
         price: true,
       },
     })
@@ -100,8 +102,11 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Appliquer le nom personnalisé
+    const tiersWithCustomName = tiers.map(applyCustomName)
+
     // Créer un map des tarifs pour un accès rapide
-    const tierMap = new Map(tiers.map((tier) => [tier.id, tier]))
+    const tierMap = new Map(tiersWithCustomName.map((tier) => [tier.id, tier]))
 
     // Calculer le montant total
     const totalAmount = body.items.reduce((sum, item) => {

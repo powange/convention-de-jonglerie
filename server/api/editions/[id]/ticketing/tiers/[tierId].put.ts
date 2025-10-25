@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 const bodySchema = z.object({
   name: z.string().min(1),
+  customName: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
   price: z.number().int().min(0),
   minAmount: z.number().int().min(0).nullable().optional(),

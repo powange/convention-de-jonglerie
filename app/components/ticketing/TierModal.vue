@@ -15,11 +15,28 @@
           description="Ce tarif est synchronisé depuis HelloAsso. Seuls les quotas, articles à restituer et dates de validité peuvent être modifiés."
         />
 
-        <UFormField :label="$t('ticketing.tiers.modal.name_label')" name="name" required>
+        <UFormField 
+          :label="isHelloAssoTier ? 'Nom original (HelloAsso)' : $t('ticketing.tiers.modal.name_label')" 
+          name="name" 
+          :required="!isHelloAssoTier"
+        >
           <UInput
             v-model="form.name"
             :disabled="isHelloAssoTier"
             :placeholder="$t('ticketing.tiers.modal.name_placeholder')"
+            size="lg"
+            class="w-full"
+          />
+        </UFormField>
+
+        <UFormField 
+          :label="isHelloAssoTier ? 'Nom personnalisé (optionnel)' : 'Nom d\'affichage (optionnel)'" 
+          name="customName"
+          :help="isHelloAssoTier ? 'Laissez vide pour utiliser le nom HelloAsso' : 'Laissez vide pour utiliser le nom principal'"
+        >
+          <UInput
+            v-model="form.customName"
+            placeholder="Nom personnalisé pour l'affichage"
             size="lg"
             class="w-full"
           />
@@ -219,6 +236,8 @@ import { createTier, updateTier } from '~/utils/ticketing/tiers'
 interface TicketingTier {
   id: number
   name: string
+  customName?: string
+  originalName?: string // Nom original HelloAsso si applicable
   description?: string
   price: number
   minAmount?: number
@@ -257,6 +276,7 @@ const isHelloAssoTier = computed(
 
 const form = ref({
   name: '',
+  customName: '',
   description: '',
   priceInEuros: '0',
   minAmountInEuros: '',
@@ -297,7 +317,8 @@ watch(
       if (props.tier) {
         // Mode édition
         form.value = {
-          name: props.tier.name,
+          name: props.tier.originalName || props.tier.name,
+          customName: props.tier.customName || '',
           description: props.tier.description || '',
           priceInEuros: (props.tier.price / 100).toFixed(2),
           minAmountInEuros: props.tier.minAmount ? (props.tier.minAmount / 100).toFixed(2) : '',
@@ -318,6 +339,7 @@ watch(
         // Mode création
         form.value = {
           name: '',
+          customName: '',
           description: '',
           priceInEuros: '0',
           minAmountInEuros: '',
@@ -352,6 +374,7 @@ const handleSubmit = async () => {
   try {
     const data = {
       name: form.value.name.trim(),
+      customName: form.value.customName.trim() || null,
       description: form.value.description.trim() || null,
       price: Math.round(parseFloat(form.value.priceInEuros) * 100),
       minAmount:

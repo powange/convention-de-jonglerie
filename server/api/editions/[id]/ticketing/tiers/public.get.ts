@@ -1,4 +1,5 @@
 import { prisma } from '@@/server/utils/prisma'
+import { applyCustomName } from '@@/server/utils/editions/ticketing/tiers'
 
 /**
  * Route publique pour récupérer les tarifs actifs d'une édition
@@ -17,6 +18,7 @@ export default defineEventHandler(async (event) => {
       select: {
         id: true,
         name: true,
+        customName: true,
         description: true,
         price: true,
         position: true,
@@ -24,7 +26,8 @@ export default defineEventHandler(async (event) => {
       orderBy: [{ position: 'asc' }, { price: 'desc' }],
     })
 
-    return tiers
+    // Appliquer le nom personnalisé
+    return tiers.map(applyCustomName)
   } catch (error: unknown) {
     console.error('Failed to fetch public tiers from DB:', error)
     throw createError({

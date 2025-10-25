@@ -851,6 +851,7 @@ model TicketingTier {
   helloAssoTierId     Int? // ID du tarif dans HelloAsso, null si tarif manuel
   editionId           Int // Toujours associé à une édition
   name                String
+  customName          String? // Nom personnalisé (prioritaire sur name si défini)
   description         String?   @db.Text
   price               Int // Prix en centimes
   minAmount           Int? // Montant minimum (pour tarifs libres)

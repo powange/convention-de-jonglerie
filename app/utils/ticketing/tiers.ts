@@ -1,6 +1,8 @@
 export interface TicketingTier {
   id: number
   name: string
+  customName?: string | null
+  originalName?: string // Nom original HelloAsso si applicable (retourné par l'API avec includeOriginalName)
   description: string | null
   price: number
   minAmount: number | null
@@ -25,6 +27,7 @@ export interface TicketingTier {
 
 export interface TierFormData {
   name: string
+  customName?: string | null
   description: string | null
   price: number
   minAmount: number | null

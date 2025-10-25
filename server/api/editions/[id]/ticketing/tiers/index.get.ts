@@ -17,7 +17,8 @@ export default defineEventHandler(async (event) => {
     })
 
   try {
-    return await getEditionTiers(editionId)
+    // Pour l'administration des tiers, on retourne les deux noms
+    return await getEditionTiers(editionId, { includeOriginalName: true })
   } catch (error: unknown) {
     console.error('Failed to fetch tiers from DB:', error)
     throw createError({

@@ -2,6 +2,7 @@ import { prisma } from '../../prisma'
 
 export interface TierData {
   name: string
+  customName?: string | null
   description?: string | null
   price: number
   minAmount?: number | null
@@ -15,10 +16,20 @@ export interface TierData {
 }
 
 /**
+ * Applique le nom personnalisé si défini
+ */
+export function applyCustomName<T extends { name: string; customName?: string | null }>(tier: T): T {
+  return {
+    ...tier,
+    name: tier.customName || tier.name,
+  }
+}
+
+/**
  * Récupère tous les tarifs d'une édition (externes et manuels)
  */
-export async function getEditionTiers(editionId: number) {
-  return await prisma.ticketingTier.findMany({
+export async function getEditionTiers(editionId: number, options?: { includeOriginalName?: boolean }) {
+  const tiers = await prisma.ticketingTier.findMany({
     where: { editionId },
     orderBy: [{ position: 'asc' }, { price: 'desc' }],
     include: {
@@ -47,6 +58,18 @@ export async function getEditionTiers(editionId: number) {
       },
     },
   })
+
+  // Si includeOriginalName est true, on retourne les deux noms (pour l'édition)
+  if (options?.includeOriginalName) {
+    return tiers.map(tier => ({
+      ...tier,
+      originalName: tier.name,
+      name: tier.customName || tier.name,
+    }))
+  }
+
+  // Sinon, on surcharge le name avec customName si défini
+  return tiers.map(applyCustomName)
 }
 
 /**
@@ -57,6 +80,7 @@ export async function createTier(editionId: number, data: TierData) {
     data: {
       editionId,
       name: data.name,
+      customName: data.customName,
       description: data.description,
       price: data.price,
       minAmount: data.minAmount,
@@ -105,12 +129,13 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
     await tx.ticketingTierQuota.deleteMany({ where: { tierId } })
     await tx.ticketingTierReturnableItem.deleteMany({ where: { tierId } })
 
-    // Pour les tarifs HelloAsso, on met à jour les dates de validité et les relations
+    // Pour les tarifs HelloAsso, on met à jour le customName, les dates de validité et les relations
     // Pour les tarifs manuels, on met à jour tout
     if (isHelloAssoTier) {
       return await tx.ticketingTier.update({
         where: { id: tierId },
         data: {
+          customName: data.customName,
           validFrom: data.validFrom ? new Date(data.validFrom) : null,
           validUntil: data.validUntil ? new Date(data.validUntil) : null,
           quotas: {
@@ -128,6 +153,7 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
         where: { id: tierId },
         data: {
           name: data.name,
+          customName: data.customName,
           description: data.description,
           price: data.price,
           minAmount: data.minAmount,
