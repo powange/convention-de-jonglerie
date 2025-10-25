@@ -18,7 +18,9 @@ export interface TierData {
 /**
  * Applique le nom personnalisé si défini
  */
-export function applyCustomName<T extends { name: string; customName?: string | null }>(tier: T): T {
+export function applyCustomName<T extends { name: string; customName?: string | null }>(
+  tier: T
+): T {
   return {
     ...tier,
     name: tier.customName || tier.name,
@@ -28,7 +30,10 @@ export function applyCustomName<T extends { name: string; customName?: string | 
 /**
  * Récupère tous les tarifs d'une édition (externes et manuels)
  */
-export async function getEditionTiers(editionId: number, options?: { includeOriginalName?: boolean }) {
+export async function getEditionTiers(
+  editionId: number,
+  options?: { includeOriginalName?: boolean }
+) {
   const tiers = await prisma.ticketingTier.findMany({
     where: { editionId },
     orderBy: [{ position: 'asc' }, { price: 'desc' }],
@@ -61,7 +66,7 @@ export async function getEditionTiers(editionId: number, options?: { includeOrig
 
   // Si includeOriginalName est true, on retourne les deux noms (pour l'édition)
   if (options?.includeOriginalName) {
-    return tiers.map(tier => ({
+    return tiers.map((tier) => ({
       ...tier,
       originalName: tier.name,
       name: tier.customName || tier.name,

@@ -852,10 +852,10 @@ const canGoNext = computed(() => {
       const tierCustomFields = getTierCustomFields(item.tierId)
       const requiredCustomFieldsFilled = tierCustomFields.every((customField) => {
         if (!customField.isRequired) return true
-        
+
         // Pour les champs YesNo, ne pas cocher est valide (équivaut à "No")
         if (customField.type === 'YesNo') return true
-        
+
         const answer = getTierCustomFieldAnswer(item, customField.id)
         return answer && answer.trim().length > 0
       })

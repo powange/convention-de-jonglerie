@@ -15,9 +15,11 @@
           description="Ce tarif est synchronisé depuis HelloAsso. Seuls les quotas, articles à restituer et dates de validité peuvent être modifiés."
         />
 
-        <UFormField 
-          :label="isHelloAssoTier ? 'Nom original (HelloAsso)' : $t('ticketing.tiers.modal.name_label')" 
-          name="name" 
+        <UFormField
+          :label="
+            isHelloAssoTier ? 'Nom original (HelloAsso)' : $t('ticketing.tiers.modal.name_label')
+          "
+          name="name"
           :required="!isHelloAssoTier"
         >
           <UInput
@@ -29,10 +31,14 @@
           />
         </UFormField>
 
-        <UFormField 
-          :label="isHelloAssoTier ? 'Nom personnalisé (optionnel)' : 'Nom d\'affichage (optionnel)'" 
+        <UFormField
+          :label="isHelloAssoTier ? 'Nom personnalisé (optionnel)' : 'Nom d\'affichage (optionnel)'"
           name="customName"
-          :help="isHelloAssoTier ? 'Laissez vide pour utiliser le nom HelloAsso' : 'Laissez vide pour utiliser le nom principal'"
+          :help="
+            isHelloAssoTier
+              ? 'Laissez vide pour utiliser le nom HelloAsso'
+              : 'Laissez vide pour utiliser le nom principal'
+          "
         >
           <UInput
             v-model="form.customName"
@@ -296,6 +302,7 @@ const toDateTimeLocal = (dateString: string | Date) => {
 }
 
 // Fonction pour convertir une date en format date (sans heure)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const toDateOnly = (dateString: string | Date) => {
   const date = new Date(dateString)
   const tzOffset = date.getTimezoneOffset() * 60000
@@ -306,10 +313,10 @@ const toDateOnly = (dateString: string | Date) => {
 // Fonction pour détecter si les dates correspondent à "toute la journée"
 const isAllDayDates = (validFrom: string | null, validUntil: string | null) => {
   if (!validFrom || !validUntil) return false
-  
+
   const startDate = new Date(validFrom)
   const endDate = new Date(validUntil)
-  
+
   // Vérifier si l'heure de début est 00:00 et l'heure de fin est 23:59
   return (
     startDate.getHours() === 0 &&
@@ -320,16 +327,17 @@ const isAllDayDates = (validFrom: string | null, validUntil: string | null) => {
 }
 
 // Fonction pour convertir une date en "toute la journée"
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const setAllDayTimes = (dateFrom: string | null, dateUntil: string | null) => {
   if (!dateFrom || !dateUntil) return { from: dateFrom, until: dateUntil }
-  
+
   // Extraire seulement la partie date et ajouter les heures
   const fromDateOnly = dateFrom.slice(0, 10)
   const untilDateOnly = dateUntil.slice(0, 10)
-  
+
   return {
     from: `${fromDateOnly}T00:00`,
-    until: `${untilDateOnly}T23:59`
+    until: `${untilDateOnly}T23:59`,
   }
 }
 
@@ -382,9 +390,11 @@ watch(
       if (props.tier) {
         // Mode édition
         const validFromLocal = props.tier.validFrom ? toDateTimeLocal(props.tier.validFrom) : null
-        const validUntilLocal = props.tier.validUntil ? toDateTimeLocal(props.tier.validUntil) : null
+        const validUntilLocal = props.tier.validUntil
+          ? toDateTimeLocal(props.tier.validUntil)
+          : null
         const isAllDay = isAllDayDates(validFromLocal, validUntilLocal)
-        
+
         form.value = {
           name: props.tier.originalName || props.tier.name,
           customName: props.tier.customName || '',
@@ -432,7 +442,7 @@ watch(
       // Passage vers "toute la journée"
       let fromDate = null
       let untilDate = null
-      
+
       // Extraire les dates existantes (enlever les heures si elles existent)
       if (form.value.validFrom) {
         fromDate = form.value.validFrom.slice(0, 10)
@@ -440,7 +450,7 @@ watch(
       if (form.value.validUntil) {
         untilDate = form.value.validUntil.slice(0, 10)
       }
-      
+
       // Si on a au moins une date, configurer les deux
       if (fromDate || untilDate) {
         const targetDate = fromDate || untilDate
@@ -462,27 +472,27 @@ watch(
 // Computed pour obtenir les dates finales avec les bonnes heures
 const finalValidFrom = computed(() => {
   if (!form.value.validFrom) return null
-  
+
   if (form.value.isAllDay) {
     // En mode "toute la journée", assurer les heures 00:00
-    return form.value.validFrom.length === 10 
-      ? `${form.value.validFrom}T00:00` 
+    return form.value.validFrom.length === 10
+      ? `${form.value.validFrom}T00:00`
       : form.value.validFrom.slice(0, 10) + 'T00:00'
   }
-  
+
   return form.value.validFrom
 })
 
 const finalValidUntil = computed(() => {
   if (!form.value.validUntil) return null
-  
+
   if (form.value.isAllDay) {
     // En mode "toute la journée", assurer les heures 23:59
-    return form.value.validUntil.length === 10 
-      ? `${form.value.validUntil}T23:59` 
+    return form.value.validUntil.length === 10
+      ? `${form.value.validUntil}T23:59`
       : form.value.validUntil.slice(0, 10) + 'T23:59'
   }
-  
+
   return form.value.validUntil
 })
 
