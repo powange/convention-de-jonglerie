@@ -89,10 +89,18 @@ services:
       - ./prisma:/app/prisma:cached
       - ./public:/app/public:cached
       - ./backups:/app/backups:cached
+      - ./lib:/app/lib:cached
+      - ./types:/app/types:cached
       # Persister les uploads comme en release (évite d'écraser en rebuild)
       - uploads_data:/app/public/uploads
       - uploads:/uploads
+      # Fichiers de configuration
       - ./nuxt.config.ts:/app/nuxt.config.ts:cached
+      - ./app.config.ts:/app/app.config.ts:cached
+      - ./eslint.config.mjs:/app/eslint.config.mjs:cached
+      - ./tsconfig.json:/app/tsconfig.json:cached
+      - ./vitest.config.ts:/app/vitest.config.ts:cached
+      - ./vitest.config.ui.ts:/app/vitest.config.ui.ts:cached
       # Caches/deps persistants côté Docker
       - ./node_modules:/app/node_modules
       - ./.nuxt:/app/.nuxt

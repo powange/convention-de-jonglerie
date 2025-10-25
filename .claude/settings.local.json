@@ -138,7 +138,8 @@
       "Bash(npm run test:unit:run:*)",
       "Bash(npm run test:nuxt:run:*)",
       "Bash(npm run lint:*)",
-      "WebFetch(domain:juggling-convention.com)"
+      "WebFetch(domain:juggling-convention.com)",
+      "Bash(sudo chmod:*)"
     ],
     "deny": [],
     "ask": [],

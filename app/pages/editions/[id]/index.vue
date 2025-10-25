@@ -264,6 +264,11 @@
             <EditionMyTicketCard v-if="authStore.isAuthenticated" :edition-id="edition.id" />
           </ClientOnly>
 
+          <!-- Carte artiste (si l'utilisateur est artiste pour cette édition) -->
+          <ClientOnly>
+            <EditionMyArtistCard v-if="authStore.isAuthenticated" :edition-id="edition.id" />
+          </ClientOnly>
+
           <EditionParticipantsCard
             :participants="edition.attendingUsers"
             :is-attending="isAttending(edition.id)"

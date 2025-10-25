@@ -59,6 +59,7 @@ model User {
   claimRequests                      ConventionClaimRequest[]
   workshops                          Workshop[]
   workshopFavorites                  WorkshopFavorite[]
+  artistProfiles                     EditionArtist[]
 }
 
 model Edition {
@@ -156,6 +157,8 @@ model Edition {
   tierCustomFields                  TicketingTierCustomField[]
   workshops                         Workshop[]
   workshopLocations                 WorkshopLocation[]
+  artists                           EditionArtist[]
+  shows                             Show[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -1125,6 +1128,59 @@ model WorkshopLocation {
   workshops Workshop[]
 
   @@index([editionId])
+}
+
+model EditionArtist {
+  id                Int               @id @default(autoincrement())
+  editionId         Int
+  userId            Int
+  arrivalDateTime   String?
+  departureDateTime String?
+  dietaryPreference DietaryPreference @default(NONE)
+  allergies         String?           @db.Text
+  allergySeverity   AllergySeverity?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  edition Edition      @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shows   ShowArtist[]
+
+  @@unique([editionId, userId])
+  @@index([editionId])
+  @@index([userId])
+}
+
+model Show {
+  id            Int      @id @default(autoincrement())
+  editionId     Int
+  title         String
+  description   String?  @db.Text
+  startDateTime DateTime
+  duration      Int?
+  location      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  edition Edition      @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  artists ShowArtist[]
+
+  @@index([editionId])
+  @@index([startDateTime])
+}
+
+model ShowArtist {
+  id        Int      @id @default(autoincrement())
+  showId    Int
+  artistId  Int
+  createdAt DateTime @default(now())
+
+  show   Show          @relation(fields: [showId], references: [id], onDelete: Cascade)
+  artist EditionArtist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@unique([showId, artistId])
+  @@index([showId])
+  @@index([artistId])
 }
 
 model TicketingTierCustomField {

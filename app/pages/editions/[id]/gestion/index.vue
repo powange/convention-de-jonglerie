@@ -358,6 +358,43 @@
           </div>
         </UCard>
 
+        <!-- Gestion des artistes -->
+        <UCard v-if="isCollaborator">
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-star" class="text-yellow-500" />
+              <h2 class="text-lg font-semibold">{{ $t('edition.artists.title') }}</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <!-- Liste des artistes -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/artists`"
+                icon="i-heroicons-users"
+                :title="$t('edition.artists.list_title')"
+                :description="
+                  $t(
+                    'edition.artists.manage_artists_description',
+                    'Gérer les artistes et leurs informations'
+                  )
+                "
+                color="yellow"
+              />
+
+              <!-- Gestion des spectacles -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/artists/shows`"
+                icon="i-heroicons-sparkles"
+                :title="$t('edition.shows.list_title')"
+                :description="
+                  $t('edition.shows.manage_shows_description', 'Créer et organiser les spectacles')
+                "
+                color="purple"
+              />
+            </div>
+          </div>
+        </UCard>
+
         <!-- Workshops -->
         <UCard v-if="isCollaborator">
           <div class="space-y-4">
