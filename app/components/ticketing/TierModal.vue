@@ -151,11 +151,28 @@
             Définissez une période pendant laquelle ce tarif sera disponible à l'achat
           </p>
 
+          <!-- Option "Toute la journée" -->
+          <div class="mb-4">
+            <UFormField name="isAllDay">
+              <div class="flex items-start gap-3">
+                <USwitch v-model="form.isAllDay" class="mt-1" />
+                <div class="flex-1">
+                  <label for="isAllDay" class="text-sm font-medium text-gray-900 dark:text-white">
+                    Toute la journée
+                  </label>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Date de début à 00h00 et date de fin à 23h59
+                  </p>
+                </div>
+              </div>
+            </UFormField>
+          </div>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <UFormField label="Date de début" name="validFrom">
               <UInput
                 v-model="form.validFrom"
-                type="datetime-local"
+                :type="form.isAllDay ? 'date' : 'datetime-local'"
                 icon="i-heroicons-calendar"
                 placeholder="Aucune limite"
                 class="w-full"
@@ -165,7 +182,7 @@
             <UFormField label="Date de fin" name="validUntil">
               <UInput
                 v-model="form.validUntil"
-                type="datetime-local"
+                :type="form.isAllDay ? 'date' : 'datetime-local'"
                 icon="i-heroicons-calendar"
                 placeholder="Aucune limite"
                 class="w-full"
@@ -278,6 +295,44 @@ const toDateTimeLocal = (dateString: string | Date) => {
   return localDate.toISOString().slice(0, 16)
 }
 
+// Fonction pour convertir une date en format date (sans heure)
+const toDateOnly = (dateString: string | Date) => {
+  const date = new Date(dateString)
+  const tzOffset = date.getTimezoneOffset() * 60000
+  const localDate = new Date(date.getTime() - tzOffset)
+  return localDate.toISOString().slice(0, 10)
+}
+
+// Fonction pour détecter si les dates correspondent à "toute la journée"
+const isAllDayDates = (validFrom: string | null, validUntil: string | null) => {
+  if (!validFrom || !validUntil) return false
+  
+  const startDate = new Date(validFrom)
+  const endDate = new Date(validUntil)
+  
+  // Vérifier si l'heure de début est 00:00 et l'heure de fin est 23:59
+  return (
+    startDate.getHours() === 0 &&
+    startDate.getMinutes() === 0 &&
+    endDate.getHours() === 23 &&
+    endDate.getMinutes() === 59
+  )
+}
+
+// Fonction pour convertir une date en "toute la journée"
+const setAllDayTimes = (dateFrom: string | null, dateUntil: string | null) => {
+  if (!dateFrom || !dateUntil) return { from: dateFrom, until: dateUntil }
+  
+  // Extraire seulement la partie date et ajouter les heures
+  const fromDateOnly = dateFrom.slice(0, 10)
+  const untilDateOnly = dateUntil.slice(0, 10)
+  
+  return {
+    from: `${fromDateOnly}T00:00`,
+    until: `${untilDateOnly}T23:59`
+  }
+}
+
 // Vérifie si c'est un tarif HelloAsso (lecture seule sauf quotas et items)
 const isHelloAssoTier = computed(
   () => props.tier?.helloAssoTierId !== null && props.tier?.helloAssoTierId !== undefined
@@ -295,6 +350,7 @@ const form = ref({
   isFree: false,
   validFrom: null as string | null,
   validUntil: null as string | null,
+  isAllDay: false,
   quotaIds: [] as number[],
   returnableItemIds: [] as number[],
 })
@@ -325,6 +381,10 @@ watch(
 
       if (props.tier) {
         // Mode édition
+        const validFromLocal = props.tier.validFrom ? toDateTimeLocal(props.tier.validFrom) : null
+        const validUntilLocal = props.tier.validUntil ? toDateTimeLocal(props.tier.validUntil) : null
+        const isAllDay = isAllDayDates(validFromLocal, validUntilLocal)
+        
         form.value = {
           name: props.tier.originalName || props.tier.name,
           customName: props.tier.customName || '',
@@ -335,12 +395,9 @@ watch(
           position: props.tier.position,
           isActive: props.tier.isActive,
           isFree: !!(props.tier.minAmount || props.tier.maxAmount),
-          validFrom: props.tier.validFrom
-            ? toDateTimeLocal(props.tier.validFrom)
-            : null,
-          validUntil: props.tier.validUntil
-            ? toDateTimeLocal(props.tier.validUntil)
-            : null,
+          validFrom: validFromLocal,
+          validUntil: validUntilLocal,
+          isAllDay,
           quotaIds: props.tier.quotas?.map((q: any) => q.quotaId) || [],
           returnableItemIds: props.tier.returnableItems?.map((r: any) => r.returnableItemId) || [],
         }
@@ -358,6 +415,7 @@ watch(
           isFree: false,
           validFrom: null,
           validUntil: null,
+          isAllDay: false,
           quotaIds: [],
           returnableItemIds: [],
         }
@@ -365,6 +423,68 @@ watch(
     }
   }
 )
+
+// Watcher pour gérer automatiquement les heures quand "Toute la journée" est activé/désactivé
+watch(
+  () => form.value.isAllDay,
+  (isAllDay, wasAllDay) => {
+    if (isAllDay && !wasAllDay) {
+      // Passage vers "toute la journée"
+      let fromDate = null
+      let untilDate = null
+      
+      // Extraire les dates existantes (enlever les heures si elles existent)
+      if (form.value.validFrom) {
+        fromDate = form.value.validFrom.slice(0, 10)
+      }
+      if (form.value.validUntil) {
+        untilDate = form.value.validUntil.slice(0, 10)
+      }
+      
+      // Si on a au moins une date, configurer les deux
+      if (fromDate || untilDate) {
+        const targetDate = fromDate || untilDate
+        form.value.validFrom = targetDate
+        form.value.validUntil = targetDate
+      }
+    } else if (!isAllDay && wasAllDay) {
+      // Passage vers datetime précis - on garde les dates mais on ajoute des heures par défaut
+      if (form.value.validFrom) {
+        form.value.validFrom = `${form.value.validFrom}T00:00`
+      }
+      if (form.value.validUntil) {
+        form.value.validUntil = `${form.value.validUntil}T23:59`
+      }
+    }
+  }
+)
+
+// Computed pour obtenir les dates finales avec les bonnes heures
+const finalValidFrom = computed(() => {
+  if (!form.value.validFrom) return null
+  
+  if (form.value.isAllDay) {
+    // En mode "toute la journée", assurer les heures 00:00
+    return form.value.validFrom.length === 10 
+      ? `${form.value.validFrom}T00:00` 
+      : form.value.validFrom.slice(0, 10) + 'T00:00'
+  }
+  
+  return form.value.validFrom
+})
+
+const finalValidUntil = computed(() => {
+  if (!form.value.validUntil) return null
+  
+  if (form.value.isAllDay) {
+    // En mode "toute la journée", assurer les heures 23:59
+    return form.value.validUntil.length === 10 
+      ? `${form.value.validUntil}T23:59` 
+      : form.value.validUntil.slice(0, 10) + 'T23:59'
+  }
+  
+  return form.value.validUntil
+})
 
 const handleSubmit = async () => {
   const toast = useToast()
@@ -396,8 +516,8 @@ const handleSubmit = async () => {
           : null,
       position: form.value.position,
       isActive: form.value.isActive,
-      validFrom: form.value.validFrom || null,
-      validUntil: form.value.validUntil || null,
+      validFrom: finalValidFrom.value,
+      validUntil: finalValidUntil.value,
       quotaIds: form.value.quotaIds,
       returnableItemIds: form.value.returnableItemIds,
     }
