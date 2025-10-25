@@ -160,6 +160,7 @@
 <script setup lang="ts">
 interface Props {
   editionId: number
+  isTeamLeader?: boolean
 }
 
 interface Volunteer {
@@ -245,7 +246,12 @@ const openConfirmationsModal = (notification: Notification) => {
 const loadNotifications = async () => {
   try {
     loading.value = true
-    const data = await $fetch(`/api/editions/${props.editionId}/volunteers/notifications`)
+
+    // Ajouter le paramètre leaderOnly si l'utilisateur est team leader
+    const queryParams = props.isTeamLeader ? '?leaderOnly=true' : ''
+    const data = await $fetch(
+      `/api/editions/${props.editionId}/volunteers/notifications${queryParams}`
+    )
     notifications.value = data
   } catch (error) {
     console.error('Erreur lors du chargement des notifications:', error)

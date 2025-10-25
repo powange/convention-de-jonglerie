@@ -497,6 +497,27 @@ export const useEditionStore = defineStore('editions', {
       return edition.convention.collaborators.some((collab) => collab.user.id === userId)
     },
 
+    // Vérifier si l'utilisateur est responsable d'au moins une équipe de bénévoles
+    async isTeamLeader(editionId: number, _userId: number): Promise<boolean> {
+      const authStore = useAuthStore()
+
+      // Les admins globaux ne sont pas considérés comme team leaders
+      // (ils ont déjà accès via leurs droits admin)
+      if (authStore.isAdminModeActive) {
+        return false
+      }
+
+      try {
+        const response = await $fetch<{ isTeamLeader: boolean }>(
+          `/api/editions/${editionId}/volunteers/is-team-leader`
+        )
+        return response.isTeamLeader
+      } catch (error) {
+        console.error('Error checking team leader status:', error)
+        return false
+      }
+    },
+
     // Récupérer toutes les éditions sans pagination (pour l'agenda)
     async fetchAllEditions(filters?: Omit<EditionFilters, 'page' | 'limit'>) {
       this.loading = true

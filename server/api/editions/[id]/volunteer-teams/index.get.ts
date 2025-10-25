@@ -1,3 +1,4 @@
+import { optionalAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
@@ -11,6 +12,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Vérifier le paramètre leaderOnly
+  const query = getQuery(event)
+  const leaderOnly = query.leaderOnly === 'true'
+
   try {
     // Vérifier que l'édition existe
     const edition = await prisma.edition.findUnique({
@@ -23,6 +28,73 @@ export default defineEventHandler(async (event) => {
         statusCode: 404,
         message: 'Édition non trouvée',
       })
+    }
+
+    // Si leaderOnly, l'utilisateur doit être connecté et on filtre par ses équipes
+    if (leaderOnly) {
+      const user = optionalAuth(event)
+
+      if (!user) {
+        throw createError({
+          statusCode: 401,
+          message: 'Authentification requise',
+        })
+      }
+
+      // Récupérer uniquement les équipes dont l'utilisateur est leader
+      const leaderAssignments = await prisma.applicationTeamAssignment.findMany({
+        where: {
+          isLeader: true,
+          application: {
+            userId: user.id,
+            editionId,
+            status: 'ACCEPTED',
+          },
+        },
+        select: {
+          team: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              color: true,
+              maxVolunteers: true,
+              isRequired: true,
+              isAccessControlTeam: true,
+              isVisibleToVolunteers: true,
+              createdAt: true,
+              updatedAt: true,
+              _count: {
+                select: {
+                  timeSlots: true,
+                  assignments: {
+                    where: {
+                      application: {
+                        status: 'ACCEPTED',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      })
+
+      // Extraire les équipes uniques et ajouter le nombre de bénévoles assignés
+      const uniqueTeams = new Map()
+
+      for (const assignment of leaderAssignments) {
+        const team = assignment.team
+        if (!uniqueTeams.has(team.id)) {
+          uniqueTeams.set(team.id, {
+            ...team,
+            assignedVolunteersCount: team._count?.assignments || 0,
+          })
+        }
+      }
+
+      return Array.from(uniqueTeams.values())
     }
 
     // Récupérer les équipes de bénévoles pour cette édition

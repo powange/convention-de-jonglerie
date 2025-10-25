@@ -164,6 +164,7 @@ interface Props {
   edition: any
   volunteersInfo: any
   volunteerApplications?: any[]
+  isTeamLeader?: boolean
 }
 
 interface Emits {
@@ -181,8 +182,10 @@ const emit = defineEmits<Emits>()
 const { t } = useI18n()
 const toast = useToast()
 
-// Utiliser le nouveau système VolunteerTeam
-const { teams: volunteerTeams } = useVolunteerTeams(props.edition.id)
+// Utiliser le nouveau système VolunteerTeam avec filtrage pour les team leaders
+const { teams: volunteerTeams } = useVolunteerTeams(props.edition.id, {
+  leaderOnly: props.isTeamLeader || false,
+})
 
 const messageMaxLength = 500
 
@@ -197,9 +200,9 @@ const isOpen = computed({
   },
 })
 
-// Form data
+// Form data - Pour les team leaders, forcer le mode "teams"
 const formData = ref({
-  targetType: 'all' as 'all' | 'teams',
+  targetType: (props.isTeamLeader ? 'teams' : 'all') as 'all' | 'teams',
   selectedTeams: [] as string[],
   message: '',
 })
@@ -214,17 +217,31 @@ const notificationTitle = computed(() => {
   return `${t('editions.volunteers.notification_title_prefix')} - ${displayName}`
 })
 
-const recipientOptions = computed(() => [
-  {
-    value: 'all',
-    label: t('editions.volunteers.all_accepted_volunteers'),
-  },
-  {
-    value: 'teams',
-    label: t('editions.volunteers.specific_teams'),
-    disabled: !teamsOptions.value.length,
-  },
-])
+const recipientOptions = computed(() => {
+  // Pour les team leaders, ne montrer que l'option "équipes spécifiques"
+  if (props.isTeamLeader) {
+    return [
+      {
+        value: 'teams',
+        label: t('editions.volunteers.specific_teams'),
+        disabled: !teamsOptions.value.length,
+      },
+    ]
+  }
+
+  // Pour les managers, montrer toutes les options
+  return [
+    {
+      value: 'all',
+      label: t('editions.volunteers.all_accepted_volunteers'),
+    },
+    {
+      value: 'teams',
+      label: t('editions.volunteers.specific_teams'),
+      disabled: !teamsOptions.value.length,
+    },
+  ]
+})
 
 const teamsOptions = computed(() => {
   if (!volunteerTeams.value || volunteerTeams.value.length === 0) return []

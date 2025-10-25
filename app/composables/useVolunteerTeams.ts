@@ -26,7 +26,10 @@ export interface CreateTeamData {
 
 export type UpdateTeamData = Partial<CreateTeamData>
 
-export function useVolunteerTeams(editionId: MaybeRefOrGetter<number | undefined>) {
+export function useVolunteerTeams(
+  editionId: MaybeRefOrGetter<number | undefined>,
+  options?: { leaderOnly?: boolean }
+) {
   const { $fetch } = useNuxtApp()
 
   // État réactif
@@ -42,7 +45,10 @@ export function useVolunteerTeams(editionId: MaybeRefOrGetter<number | undefined
     try {
       loading.value = true
       error.value = null
-      teams.value = await $fetch(`/api/editions/${id}/volunteer-teams`)
+
+      // Ajouter le paramètre leaderOnly si nécessaire
+      const queryParams = options?.leaderOnly ? '?leaderOnly=true' : ''
+      teams.value = await $fetch(`/api/editions/${id}/volunteer-teams${queryParams}`)
     } catch (err: any) {
       error.value = err.data?.message || 'Erreur lors du chargement des équipes'
       throw err

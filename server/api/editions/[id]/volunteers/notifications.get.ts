@@ -9,15 +9,27 @@ export default defineEventHandler(async (event) => {
 
   // Vérifier les permissions
   const canManage = await canManageEditionVolunteers(editionId, user.id, event)
-  if (!canManage) {
+
+  // Vérifier si l'utilisateur est team leader
+  const query = getQuery(event)
+  const isTeamLeader = query.leaderOnly === 'true'
+
+  if (!canManage && !isTeamLeader) {
     throw createError({ statusCode: 403, message: 'Droits insuffisants' })
+  }
+
+  // Pour les team leaders, ne récupérer que leurs propres notifications
+  const notificationsWhere: any = {
+    editionId,
+  }
+
+  if (isTeamLeader && !canManage) {
+    notificationsWhere.senderId = user.id
   }
 
   // Récupérer la liste des notifications envoyées avec toutes les confirmations
   const notifications = await prisma.volunteerNotificationGroup.findMany({
-    where: {
-      editionId,
-    },
+    where: notificationsWhere,
     include: {
       sender: {
         select: {

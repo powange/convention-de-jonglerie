@@ -6,12 +6,17 @@
       :edition="edition"
       :volunteers-info="volunteersInfo"
       :can-manage-volunteers="canManageVolunteers"
+      :is-team-leader="isTeamLeader"
       :accepted-volunteers-count="acceptedVolunteersCount"
       @notification-sent="onNotificationSent"
     />
 
     <!-- Historique des notifications -->
-    <EditionVolunteerNotificationsHistory ref="historyRef" :edition-id="editionId" />
+    <EditionVolunteerNotificationsHistory
+      ref="historyRef"
+      :edition-id="editionId"
+      :is-team-leader="isTeamLeader"
+    />
   </div>
 </template>
 
@@ -21,6 +26,7 @@ interface Props {
   edition: any
   volunteersInfo: any
   canManageVolunteers: boolean
+  isTeamLeader?: boolean
   acceptedVolunteersCount: number
 }
 

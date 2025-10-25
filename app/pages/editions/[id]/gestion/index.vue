@@ -119,7 +119,7 @@
         </UCard>
 
         <!-- Gestion bénévole -->
-        <UCard v-if="isCollaborator">
+        <UCard v-if="isCollaborator || isTeamLeaderValue">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-user-group" class="text-primary-500" />
@@ -276,8 +276,9 @@
                   color="purple"
                 />
 
-                <!-- Planning -->
+                <!-- Planning (visible pour les team leaders) -->
                 <ManagementNavigationCard
+                  v-if="canEdit || canManageVolunteers || isTeamLeaderValue"
                   :to="`/editions/${edition.id}/gestion/volunteers/planning`"
                   icon="i-heroicons-calendar-days"
                   :title="$t('editions.volunteers.planning')"
@@ -285,9 +286,9 @@
                   color="orange"
                 />
 
-                <!-- Notifications bénévoles -->
+                <!-- Notifications bénévoles (visible pour les team leaders) -->
                 <ManagementNavigationCard
-                  v-if="canEdit || canManageVolunteers"
+                  v-if="canEdit || canManageVolunteers || isTeamLeaderValue"
                   :to="`/editions/${edition.id}/gestion/volunteers/notifications`"
                   icon="i-heroicons-bell"
                   :title="$t('editions.volunteers.volunteer_notifications')"
@@ -295,8 +296,9 @@
                   color="yellow"
                 />
 
-                <!-- Outils de gestion -->
+                <!-- Outils de gestion (visible pour les team leaders) -->
                 <ManagementNavigationCard
+                  v-if="canEdit || canManageVolunteers || isTeamLeaderValue"
                   :to="`/editions/${edition.id}/gestion/volunteers/tools`"
                   icon="i-heroicons-wrench-screwdriver"
                   :title="$t('editions.volunteers.management_tools')"
@@ -887,6 +889,11 @@ onMounted(async () => {
   if (edition.value?.workshopsEnabled) {
     await fetchWorkshopLocations()
   }
+
+  // Vérifier si l'utilisateur est team leader
+  if (authStore.user?.id) {
+    isTeamLeaderValue.value = await editionStore.isTeamLeader(editionId, authStore.user.id)
+  }
 })
 
 watch(volunteersSettings, () => {
@@ -992,6 +999,9 @@ const canAccess = computed(() => {
   // Utilisateurs avec des droits spécifiques
   if (canEdit.value || canManageVolunteers.value) return true
 
+  // Responsables d'équipe de bénévoles
+  if (isTeamLeaderValue.value) return true
+
   // Tous les collaborateurs de la convention (même sans droits)
   if (edition.value.convention?.collaborators) {
     return edition.value.convention.collaborators.some(
@@ -1041,6 +1051,9 @@ const savingCollaborator = ref(false)
 
 // État pour la modal d'import de workshops
 const importWorkshopsModalOpen = ref(false)
+
+// État pour vérifier si l'utilisateur est team leader
+const isTeamLeaderValue = ref(false)
 
 const newCollaboratorRights = ref({
   rights: {

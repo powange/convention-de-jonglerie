@@ -3,7 +3,10 @@
     <!-- Section notification des bénévoles -->
     <div class="mb-6">
       <!-- Bouton envoyer notification -->
-      <div v-if="canManageVolunteers && acceptedVolunteersCount > 0" class="flex justify-center">
+      <div
+        v-if="(canManageVolunteers || isTeamLeader) && acceptedVolunteersCount > 0"
+        class="flex justify-center"
+      >
         <UButton
           size="lg"
           color="primary"
@@ -22,6 +25,7 @@
       :edition="edition"
       :volunteers-info="volunteersInfo"
       :volunteer-applications="volunteerApplications"
+      :is-team-leader="isTeamLeader"
       @close="closeNotificationModal"
       @sent="onNotificationSent"
     />
@@ -36,6 +40,7 @@ interface Props {
   edition: any
   volunteersInfo: any
   canManageVolunteers: boolean
+  isTeamLeader?: boolean
   acceptedVolunteersCount: number
 }
 

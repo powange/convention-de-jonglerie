@@ -33,13 +33,21 @@
       <!-- Contenu des notifications bénévoles -->
       <div class="space-y-6">
         <!-- Section notification des bénévoles -->
-        <UCard v-if="canManageVolunteers">
+        <UCard v-if="canManageVolunteers || isTeamLeaderValue">
           <div class="space-y-4">
             <UAlert
+              v-if="canManageVolunteers"
               icon="i-heroicons-information-circle"
               color="info"
               variant="soft"
               description="Envoyez des notifications et gérez les communications avec les bénévoles acceptés pour cette édition."
+            />
+            <UAlert
+              v-else-if="isTeamLeaderValue"
+              icon="i-heroicons-information-circle"
+              color="info"
+              variant="soft"
+              description="En tant que responsable d'équipe, vous pouvez envoyer des notifications aux bénévoles de vos équipes."
             />
 
             <EditionVolunteerNotifications
@@ -48,6 +56,7 @@
               :edition="edition"
               :volunteers-info="volunteersInfo"
               :can-manage-volunteers="canManageVolunteers"
+              :is-team-leader="isTeamLeaderValue"
               :accepted-volunteers-count="volunteersInfo?.counts?.ACCEPTED ?? 0"
             />
           </div>
@@ -93,11 +102,17 @@ const { settings: volunteersInfo, fetchSettings: fetchVolunteersInfo } =
 // Référence au composant de notifications
 const notificationsListRef = ref()
 
+// État pour vérifier si l'utilisateur est team leader
+const isTeamLeaderValue = ref(false)
+
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return (
-    canEdit.value || canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
+    canEdit.value ||
+    canManageVolunteers.value ||
+    isTeamLeaderValue.value ||
+    authStore.user?.id === edition.value?.creatorId
   )
 })
 
@@ -123,6 +138,11 @@ onMounted(async () => {
   }
   // Charger les informations des bénévoles
   await fetchVolunteersInfo()
+
+  // Vérifier si l'utilisateur est team leader
+  if (authStore.user?.id) {
+    isTeamLeaderValue.value = await editionStore.isTeamLeader(editionId, authStore.user.id)
+  }
 })
 
 // Métadonnées de la page
