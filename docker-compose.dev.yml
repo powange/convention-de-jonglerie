@@ -30,9 +30,10 @@ services:
         BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:22-slim}
     container_name: convention-app-dev
     working_dir: /app
+    user: "${UID:-1000}:${GID:-1000}"
     # Exécuter les migrations Prisma (idempotent) puis démarrer Nuxt en mode dev.
-    # Optimisé pour réduire les temps de démarrage
-    command: sh -lc "echo 'Starting app initialization...' && npx prisma generate && npx prisma migrate deploy && echo 'Ready! Starting Nuxt...' && npm run dev"
+    # Optimisé pour réduire les temps de démarrage avec gestion des permissions
+    command: sh -lc "/app/scripts/docker-start.sh"
     environment:
       DATABASE_URL: 'mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}'
       NUXT_HOST: '0.0.0.0'
