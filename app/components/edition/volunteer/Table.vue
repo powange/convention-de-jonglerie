@@ -374,7 +374,7 @@
   <EditionVolunteerApplicationModal
     v-model="editModalOpen"
     :volunteers-info="volunteersInfo"
-    :edition="{ id: editionId }"
+    :edition="props.edition || { id: editionId }"
     :user="currentEditApplication?.user ?? null"
     :applying="false"
     :is-editing="true"
@@ -418,6 +418,7 @@ import type { Column } from '@tanstack/vue-table'
 interface Props {
   volunteersInfo: any
   editionId: number
+  edition?: any
   canManageVolunteers: boolean
 }
 

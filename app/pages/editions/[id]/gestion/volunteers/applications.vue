@@ -95,6 +95,7 @@
                   ref="volunteerTableRef"
                   :volunteers-info="volunteersInfo"
                   :edition-id="editionId"
+                  :edition="edition"
                   :can-manage-volunteers="canManageVolunteers"
                   @refresh-volunteers-info="fetchVolunteersInfo"
                   @refresh-team-assignments="fetchTeamAssignments"

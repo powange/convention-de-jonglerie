@@ -30,7 +30,7 @@ services:
         BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:22-slim}
     container_name: convention-app-dev
     working_dir: /app
-    user: "${UID:-1000}:${GID:-1000}"
+    user: '${UID:-1000}:${GID:-1000}'
     # Exécuter les migrations Prisma (idempotent) puis démarrer Nuxt en mode dev.
     # Optimisé pour réduire les temps de démarrage avec gestion des permissions
     command: sh -lc "/app/scripts/docker-start.sh"
