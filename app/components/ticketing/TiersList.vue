@@ -162,14 +162,14 @@
                   name="i-heroicons-arrow-right-circle"
                   class="h-3 w-3 flex-shrink-0 text-success-500"
                 />
-                <span class="truncate">{{ formatDateShort(tier.validFrom) }}</span>
+                <span class="truncate">{{ formatDateTime(tier.validFrom) }}</span>
               </div>
               <div v-if="tier.validUntil" class="flex items-center gap-1">
                 <UIcon
                   name="i-heroicons-arrow-left-circle"
                   class="h-3 w-3 flex-shrink-0 text-error-500"
                 />
-                <span class="truncate">{{ formatDateShort(tier.validUntil) }}</span>
+                <span class="truncate">{{ formatDateTime(tier.validUntil) }}</span>
               </div>
             </div>
             <span v-else class="text-xs text-gray-400">-</span>
@@ -383,14 +383,5 @@ const deleteTierAction = async () => {
   }
 }
 
-const formatDateShort = (date: string | Date) => {
-  const d = new Date(date)
-  return d.toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
+const { formatDateTime } = useDateFormat()
 </script>

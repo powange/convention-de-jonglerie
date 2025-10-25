@@ -269,6 +269,15 @@ const isOpen = computed({
 
 const saving = ref(false)
 
+// Fonction pour convertir une date en format datetime-local sans décalage horaire
+const toDateTimeLocal = (dateString: string | Date) => {
+  const date = new Date(dateString)
+  // Créer une nouvelle date en ajustant pour le fuseau horaire local
+  const tzOffset = date.getTimezoneOffset() * 60000
+  const localDate = new Date(date.getTime() - tzOffset)
+  return localDate.toISOString().slice(0, 16)
+}
+
 // Vérifie si c'est un tarif HelloAsso (lecture seule sauf quotas et items)
 const isHelloAssoTier = computed(
   () => props.tier?.helloAssoTierId !== null && props.tier?.helloAssoTierId !== undefined
@@ -327,10 +336,10 @@ watch(
           isActive: props.tier.isActive,
           isFree: !!(props.tier.minAmount || props.tier.maxAmount),
           validFrom: props.tier.validFrom
-            ? new Date(props.tier.validFrom).toISOString().slice(0, 16)
+            ? toDateTimeLocal(props.tier.validFrom)
             : null,
           validUntil: props.tier.validUntil
-            ? new Date(props.tier.validUntil).toISOString().slice(0, 16)
+            ? toDateTimeLocal(props.tier.validUntil)
             : null,
           quotaIds: props.tier.quotas?.map((q: any) => q.quotaId) || [],
           returnableItemIds: props.tier.returnableItems?.map((r: any) => r.returnableItemId) || [],
