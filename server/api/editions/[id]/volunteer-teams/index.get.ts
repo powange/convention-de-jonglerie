@@ -67,13 +67,16 @@ export default defineEventHandler(async (event) => {
               _count: {
                 select: {
                   timeSlots: true,
-                  assignments: {
-                    where: {
-                      application: {
-                        status: 'ACCEPTED',
-                      },
-                    },
+                },
+              },
+              assignments: {
+                where: {
+                  application: {
+                    status: 'ACCEPTED',
                   },
+                },
+                select: {
+                  id: true,
                 },
               },
             },
@@ -88,8 +91,18 @@ export default defineEventHandler(async (event) => {
         const team = assignment.team
         if (!uniqueTeams.has(team.id)) {
           uniqueTeams.set(team.id, {
-            ...team,
-            assignedVolunteersCount: team._count?.assignments || 0,
+            id: team.id,
+            name: team.name,
+            description: team.description,
+            color: team.color,
+            maxVolunteers: team.maxVolunteers,
+            isRequired: team.isRequired,
+            isAccessControlTeam: team.isAccessControlTeam,
+            isVisibleToVolunteers: team.isVisibleToVolunteers,
+            createdAt: team.createdAt,
+            updatedAt: team.updatedAt,
+            _count: team._count,
+            assignedVolunteersCount: team.assignments?.length || 0,
           })
         }
       }

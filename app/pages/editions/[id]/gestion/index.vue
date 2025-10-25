@@ -276,9 +276,9 @@
                   color="purple"
                 />
 
-                <!-- Planning (visible pour les team leaders) -->
+                <!-- Planning (pas visible pour les team leaders seuls) -->
                 <ManagementNavigationCard
-                  v-if="canEdit || canManageVolunteers || isTeamLeaderValue"
+                  v-if="canEdit || canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/planning`"
                   icon="i-heroicons-calendar-days"
                   :title="$t('editions.volunteers.planning')"
@@ -296,9 +296,9 @@
                   color="yellow"
                 />
 
-                <!-- Outils de gestion (visible pour les team leaders) -->
+                <!-- Outils de gestion (pas visible pour les team leaders seuls) -->
                 <ManagementNavigationCard
-                  v-if="canEdit || canManageVolunteers || isTeamLeaderValue"
+                  v-if="canEdit || canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/tools`"
                   icon="i-heroicons-wrench-screwdriver"
                   :title="$t('editions.volunteers.management_tools')"
@@ -500,8 +500,8 @@
           </div>
         </UCard>
 
-        <!-- Objets trouvés -->
-        <UCard>
+        <!-- Objets trouvés (pas visible pour les team leaders seuls) -->
+        <UCard v-if="!isTeamLeaderValue || canEdit || canManageVolunteers">
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">

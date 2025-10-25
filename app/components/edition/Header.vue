@@ -320,6 +320,9 @@ const toast = useToast()
 // État des modales
 const showConventionModal = ref(false)
 
+// État pour vérifier si l'utilisateur est team leader
+const isTeamLeaderValue = ref(false)
+
 // Description de la convention en HTML (rendu Markdown)
 const conventionDescriptionHtml = computedAsync(async () => {
   if (!props.edition?.convention?.description) {
@@ -351,6 +354,11 @@ const canAccess = computed(() => {
   const canEdit = editionStore.canEditEdition(props.edition, authStore.user.id)
   const canManageVolunteers = editionStore.canManageVolunteers(props.edition, authStore.user.id)
   if (canEdit || canManageVolunteers) {
+    return true
+  }
+
+  // Responsables d'équipe de bénévoles
+  if (isTeamLeaderValue.value) {
     return true
   }
 
@@ -405,6 +413,13 @@ watch(
   async (isAuthenticated) => {
     if (isAuthenticated && !favoritesStore.isInitialized) {
       await favoritesStore.ensureInitialized()
+    }
+
+    // Vérifier si l'utilisateur est team leader quand il se connecte
+    if (isAuthenticated && authStore.user?.id && props.edition?.id) {
+      isTeamLeaderValue.value = await editionStore.isTeamLeader(props.edition.id, authStore.user.id)
+    } else {
+      isTeamLeaderValue.value = false
     }
   },
   { immediate: true }

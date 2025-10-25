@@ -9,6 +9,7 @@ export interface VolunteerTeam {
   isVisibleToVolunteers?: boolean
   createdAt: string
   updatedAt: string
+  assignedVolunteersCount?: number
   _count?: {
     timeSlots: number
   }

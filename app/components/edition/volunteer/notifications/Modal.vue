@@ -39,18 +39,14 @@
         <div v-if="formData.targetType === 'teams' && teamsOptions.length > 0">
           <UFormField :label="t('editions.volunteers.select_teams')" class="w-full">
             <div class="space-y-2 overflow-y-auto">
-              <div
+              <UCheckbox
                 v-for="(team, index) in teamsOptions"
                 :key="`team-${index}-${team.value}`"
-                class="flex items-center"
-              >
-                <UCheckbox
-                  :id="`team-checkbox-${index}`"
-                  :model-value="formData.selectedTeams.includes(team.value)"
-                  :label="team.label"
-                  @update:model-value="(checked) => handleTeamChange(team.value, checked)"
-                />
-              </div>
+                :id="`team-checkbox-${index}`"
+                :model-value="formData.selectedTeams.includes(team.value)"
+                :label="team.label"
+                @update:model-value="(checked: boolean) => handleTeamChange(team.value, checked)"
+              />
             </div>
           </UFormField>
         </div>
@@ -183,7 +179,7 @@ const { t } = useI18n()
 const toast = useToast()
 
 // Utiliser le nouveau système VolunteerTeam avec filtrage pour les team leaders
-const { teams: volunteerTeams } = useVolunteerTeams(props.edition.id, {
+const { teams: volunteerTeams, fetchTeams } = useVolunteerTeams(props.edition.id, {
   leaderOnly: props.isTeamLeader || false,
 })
 
@@ -314,25 +310,20 @@ const markFieldTouched = (field: string) => {
 }
 
 const handleTeamChange = (teamName: string, checked: boolean) => {
-  console.log('handleTeamChange called with:', teamName, checked)
-  const index = formData.value.selectedTeams.indexOf(teamName)
-  console.log('Current selectedTeams:', formData.value.selectedTeams)
-  console.log('Team index:', index)
-
-  if (checked && index === -1) {
-    formData.value.selectedTeams.push(teamName)
-    console.log('Added team:', teamName)
-  } else if (!checked && index > -1) {
-    formData.value.selectedTeams.splice(index, 1)
-    console.log('Removed team:', teamName)
+  if (checked) {
+    // Ajouter l'équipe si elle n'est pas déjà présente
+    if (!formData.value.selectedTeams.includes(teamName)) {
+      formData.value.selectedTeams = [...formData.value.selectedTeams, teamName]
+    }
+  } else {
+    // Retirer l'équipe
+    formData.value.selectedTeams = formData.value.selectedTeams.filter((t) => t !== teamName)
   }
-
-  console.log('New selectedTeams:', formData.value.selectedTeams)
 }
 
 const resetForm = () => {
   formData.value = {
-    targetType: 'all',
+    targetType: (props.isTeamLeader ? 'teams' : 'all') as 'all' | 'teams',
     selectedTeams: [],
     message: '',
   }
@@ -399,12 +390,14 @@ const confirmSend = async () => {
   }
 }
 
-// Watch for modal changes to reset form
+// Watch for modal changes to reset form and reload teams
 watch(
   () => props.modelValue,
-  (newValue) => {
+  async (newValue) => {
     if (newValue) {
       resetForm()
+      // Recharger les équipes pour s'assurer d'avoir les bonnes données
+      await fetchTeams()
     }
   }
 )
