@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
                   timeSlots: true,
                 },
               },
-              assignments: {
+              assignedApplications: {
                 where: {
                   application: {
                     status: 'ACCEPTED',
@@ -102,7 +102,7 @@ export default defineEventHandler(async (event) => {
             createdAt: team.createdAt,
             updatedAt: team.updatedAt,
             _count: team._count,
-            assignedVolunteersCount: team.assignments?.length || 0,
+            assignedVolunteersCount: team.assignedApplications?.length || 0,
           })
         }
       }
