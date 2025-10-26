@@ -1,5 +1,4 @@
 import { hasIssues, isHttpError, type UserWhereInput } from '@@/server/types/prisma-helpers'
-import { checkAdminMode } from '@@/server/utils/collaborator-management'
 import { getEmailHash } from '@@/server/utils/email-hash'
 import { prisma } from '@@/server/utils/prisma'
 import { z } from 'zod'
@@ -10,7 +9,7 @@ import { requireUserSession } from '#imports'
 // Auth requis. Retourne jusqu'à 10 utilisateurs (id, pseudo, profilePicture?, emailHash)
 export default defineEventHandler(async (event) => {
   try {
-    const { user } = await requireUserSession(event)
+    await requireUserSession(event)
     const query = getQuery(event)
     const schema = z.object({
       q: z.string().min(2).max(50).optional(),
@@ -20,9 +19,6 @@ export default defineEventHandler(async (event) => {
     const term = (parsed.q || parsed.email || '').trim()
     if (term.length < 2) return { users: [] }
 
-    // Vérifier si l'utilisateur est en mode admin
-    const isInAdminMode = await checkAdminMode(user.id, event)
-
     // NOTE: Le paramètre Prisma `mode: 'insensitive'` n'est pas supporté avec MySQL (erreur "Unknown argument mode").
     // Les collations MySQL utf8mb4_* sont déjà généralement insensibles à la casse.
     // On supprime donc `mode` et on applique un simple contains.
@@ -30,10 +26,7 @@ export default defineEventHandler(async (event) => {
       OR: [{ pseudo: { contains: term } }, { email: { contains: term } }],
     }
 
-    // Exclure l'utilisateur courant seulement si pas en mode admin
-    if (!isInAdminMode) {
-      whereClause.NOT = { id: user.id }
-    }
+    // Note: On n'exclut plus l'utilisateur courant pour permettre de s'ajouter soi-même comme artiste
 
     const users = await prisma.user.findMany({
       where: whereClause,

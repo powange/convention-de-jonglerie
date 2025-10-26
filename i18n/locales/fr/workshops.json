@@ -67,11 +67,6 @@
     "only_images_allowed": "Seules les images sont acceptées",
     "max_file_size": "La taille maximale du fichier est de 10 Mo",
     "import_complete": "Import terminé",
-    "import_complete_description": "Les workshops ont été importés avec succès",
-    "import_permission_error": "Seuls les organisateurs et super admins peuvent importer des workshops depuis une image",
-    "ai_service_unavailable": "Le service d'extraction par IA est temporairement indisponible",
-    "ai_credits_insufficient": "Crédits insuffisants pour l'extraction. Veuillez contacter l'administrateur.",
-    "ai_service_misconfigured": "Le service d'extraction par IA est mal configuré. Veuillez contacter l'administrateur.",
-    "ai_rate_limit": "Trop de requêtes d'extraction. Veuillez réessayer dans quelques instants."
+    "import_complete_description": "Les workshops ont été importés avec succès"
   }
 }

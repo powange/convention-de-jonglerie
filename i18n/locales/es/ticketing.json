@@ -42,7 +42,15 @@
       "cancel_order": "[TODO] Cancelar pedido",
       "cancel_order_confirm": "[TODO] ¿Está seguro de que desea cancelar este pedido?",
       "cancel_order_confirm_message": "[TODO] Esta acción eliminará permanentemente el pedido y todas las entradas asociadas. Esta acción no se puede deshacer.",
-      "canceling_order": "[TODO] Cancelando..."
+      "cancel_order_error": "[TODO] Erreur lors de l'annulation de la commande",
+      "canceling_order": "[TODO] Cancelando...",
+      "delete_order": "[TODO] Supprimer la commande",
+      "delete_order_confirm": "[TODO] Êtes-vous sûr de vouloir supprimer cette commande ?",
+      "delete_order_confirm_message": "[TODO] Cette action supprimera définitivement la commande et tous les billets associés de la base de données. Cette action ne peut pas être annulée.",
+      "delete_order_error": "[TODO] Erreur lors de la suppression de la commande",
+      "deleting_order": "[TODO] Suppression en cours...",
+      "order_canceled": "[TODO] Commande annulée",
+      "order_deleted": "[TODO] Commande supprimée"
     },
     "participant": {
       "entry_validated": "Entrada ya validada",

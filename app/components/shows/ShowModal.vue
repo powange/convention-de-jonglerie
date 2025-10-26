@@ -1,6 +1,6 @@
 <template>
-  <UModal v-model="isOpen" :title="title">
-    <UCard>
+  <UModal v-model:open="isOpen" :title="title">
+    <template #body>
       <form class="space-y-4" @submit.prevent="handleSubmit">
         <!-- Titre -->
         <UFormField :label="$t('edition.shows.show_title')" required>
@@ -18,36 +18,35 @@
 
         <!-- Date et heure -->
         <UFormField :label="$t('edition.shows.start_datetime')" required>
-          <UiDateTimePicker
+          <UInput
             v-model="formData.startDateTime"
+            type="datetime-local"
             :placeholder="$t('edition.shows.start_datetime')"
             required
           />
         </UFormField>
 
-        <!-- Durée et lieu -->
-        <div class="grid grid-cols-2 gap-4">
-          <UFormField :label="$t('edition.shows.duration')">
-            <UInput
-              v-model.number="formData.duration"
-              type="number"
-              min="0"
-              :placeholder="$t('edition.shows.duration')"
-            />
-          </UFormField>
+        <!-- Durée -->
+        <UFormField :label="$t('edition.shows.duration')">
+          <UInput
+            v-model.number="formData.duration"
+            type="number"
+            min="0"
+            :placeholder="$t('edition.shows.duration')"
+          />
+        </UFormField>
 
-          <UFormField :label="$t('edition.shows.location')">
-            <UInput v-model="formData.location" :placeholder="$t('edition.shows.location')" />
-          </UFormField>
-        </div>
+        <!-- Lieu -->
+        <UFormField :label="$t('edition.shows.location')">
+          <UInput v-model="formData.location" :placeholder="$t('edition.shows.location')" />
+        </UFormField>
 
         <!-- Sélection des artistes -->
         <UFormField :label="$t('edition.shows.artists')">
           <USelect
             v-model="formData.artistIds"
-            :options="artistOptions"
-            option-attribute="label"
-            value-attribute="value"
+            :items="artistOptions"
+            value-key="value"
             multiple
             :placeholder="$t('edition.shows.select_artists')"
           />
@@ -78,11 +77,13 @@
           </UButton>
         </div>
       </form>
-    </UCard>
+    </template>
   </UModal>
 </template>
 
 <script setup lang="ts">
+import { formatDateTimeLocal, parseDateTimeLocal } from '~/utils/date'
+
 const props = defineProps<{
   modelValue: boolean
   show?: any
@@ -142,10 +143,13 @@ const fetchArtists = async () => {
 const handleSubmit = async () => {
   loading.value = true
   try {
+    // Convertir la date datetime-local en Date (temps local), puis en ISO
+    const localDate = parseDateTimeLocal(formData.value.startDateTime)
+
     const payload = {
       title: formData.value.title,
       description: formData.value.description || null,
-      startDateTime: formData.value.startDateTime,
+      startDateTime: localDate.toISOString(),
       duration: formData.value.duration,
       location: formData.value.location || null,
       artistIds: formData.value.artistIds,
@@ -201,10 +205,18 @@ watch(
   () => props.show,
   (newShow) => {
     if (newShow) {
+      // Convertir la date ISO en format datetime-local (YYYY-MM-DDTHH:mm)
+      // Utilise formatDateTimeLocal pour éviter les décalages de timezone
+      let formattedDateTime = ''
+      if (newShow.startDateTime) {
+        const date = new Date(newShow.startDateTime)
+        formattedDateTime = formatDateTimeLocal(date)
+      }
+
       formData.value = {
         title: newShow.title || '',
         description: newShow.description || '',
-        startDateTime: newShow.startDateTime || '',
+        startDateTime: formattedDateTime,
         duration: newShow.duration || null,
         location: newShow.location || '',
         artistIds: newShow.artists?.map((showArtist: any) => showArtist.artistId) || [],

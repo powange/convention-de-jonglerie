@@ -194,21 +194,22 @@ definePageMeta({
 const route = useRoute()
 const { t } = useI18n()
 const toast = useToast()
-const editionStore = useEditionsStore()
+const editionStore = useEditionStore()
+const authStore = useAuthStore()
 const { formatDateTime } = useDateFormat()
 
 const editionId = computed(() => parseInt(route.params.id as string))
-const edition = computed(() => editionStore.currentEdition)
+const edition = computed(() => editionStore.getEditionById(editionId.value))
 
 // Permissions
 const canAccess = computed(() => {
-  if (!edition.value) return false
-  return editionStore.canEditEdition(edition.value.id)
+  if (!edition.value || !authStore.user) return false
+  return editionStore.canEditEdition(edition.value, authStore.user.id)
 })
 
 const canEdit = computed(() => {
-  if (!edition.value) return false
-  return editionStore.canEditEdition(edition.value.id)
+  if (!edition.value || !authStore.user) return false
+  return editionStore.canEditEdition(edition.value, authStore.user.id)
 })
 
 // Données
@@ -229,7 +230,7 @@ const sortedShows = computed(() => {
 // Charger l'édition
 onMounted(async () => {
   if (!edition.value || edition.value.id !== editionId.value) {
-    await editionStore.fetchEdition(editionId.value)
+    await editionStore.fetchEditionById(editionId.value)
   }
   await fetchShows()
 })

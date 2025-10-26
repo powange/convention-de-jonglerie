@@ -1,12 +1,15 @@
 <template>
-  <UModal v-model="isOpen" :title="title">
-    <UCard>
+  <UModal v-model:open="isOpen" :title="title">
+    <template #body>
       <form class="space-y-4" @submit.prevent="handleSubmit">
         <!-- Sélection utilisateur existant OU création nouveau -->
         <div v-if="!artist" class="space-y-4">
           <UFormField :label="$t('edition.artists.search_user')">
             <UserSelector
-              v-model="selectedUserId"
+              v-model="selectedUser"
+              v-model:search-term="searchTerm"
+              :searched-users="searchedUsers"
+              :searching-users="searchingUsers"
               :placeholder="$t('edition.artists.select_user')"
               @update:model-value="handleUserSelection"
             />
@@ -28,55 +31,46 @@
               v-model="formData.email"
               type="email"
               :placeholder="$t('edition.artists.user_email')"
-              :disabled="!!selectedUserId"
+              :disabled="!!selectedUser"
             />
           </UFormField>
 
-          <div class="grid grid-cols-2 gap-4">
-            <UFormField :label="$t('edition.artists.user_firstname')">
-              <UInput
-                v-model="formData.prenom"
-                :placeholder="$t('edition.artists.user_firstname')"
-                :disabled="!!selectedUserId"
-              />
-            </UFormField>
+          <UFormField :label="$t('edition.artists.user_firstname')">
+            <UInput
+              v-model="formData.prenom"
+              :placeholder="$t('edition.artists.user_firstname')"
+              :disabled="!!selectedUser"
+            />
+          </UFormField>
 
-            <UFormField :label="$t('edition.artists.user_lastname')">
-              <UInput
-                v-model="formData.nom"
-                :placeholder="$t('edition.artists.user_lastname')"
-                :disabled="!!selectedUserId"
-              />
-            </UFormField>
-          </div>
+          <UFormField :label="$t('edition.artists.user_lastname')">
+            <UInput
+              v-model="formData.nom"
+              :placeholder="$t('edition.artists.user_lastname')"
+              :disabled="!!selectedUser"
+            />
+          </UFormField>
         </div>
 
         <!-- Informations artiste -->
-        <div class="grid grid-cols-2 gap-4">
-          <UFormField :label="$t('edition.artists.arrival')">
-            <UInput
-              v-model="formData.arrivalDateTime"
-              type="text"
-              :placeholder="$t('edition.artists.arrival')"
-            />
-          </UFormField>
+        <UFormField :label="$t('edition.artists.arrival')">
+          <UInput
+            v-model="formData.arrivalDateTime"
+            type="datetime-local"
+            :placeholder="$t('edition.artists.arrival')"
+          />
+        </UFormField>
 
-          <UFormField :label="$t('edition.artists.departure')">
-            <UInput
-              v-model="formData.departureDateTime"
-              type="text"
-              :placeholder="$t('edition.artists.departure')"
-            />
-          </UFormField>
-        </div>
+        <UFormField :label="$t('edition.artists.departure')">
+          <UInput
+            v-model="formData.departureDateTime"
+            type="datetime-local"
+            :placeholder="$t('edition.artists.departure')"
+          />
+        </UFormField>
 
         <UFormField :label="$t('edition.artists.dietary_preference')">
-          <USelect
-            v-model="formData.dietaryPreference"
-            :options="dietaryOptions"
-            option-attribute="label"
-            value-attribute="value"
-          />
+          <USelect v-model="formData.dietaryPreference" :items="dietaryOptions" value-key="value" />
         </UFormField>
 
         <UFormField :label="$t('edition.artists.allergies')">
@@ -90,9 +84,8 @@
         <UFormField v-if="formData.allergies" :label="$t('edition.artists.allergy_severity')">
           <USelect
             v-model="formData.allergySeverity"
-            :options="allergySeverityOptions"
-            option-attribute="label"
-            value-attribute="value"
+            :items="allergySeverityOptions"
+            value-key="value"
           />
         </UFormField>
 
@@ -106,11 +99,14 @@
           </UButton>
         </div>
       </form>
-    </UCard>
+    </template>
   </UModal>
 </template>
 
 <script setup lang="ts">
+import { getAllergySeveritySelectOptions } from '~/utils/allergy-severity'
+import { formatDateTimeLocal } from '~/utils/date'
+
 const props = defineProps<{
   modelValue: boolean
   artist?: any
@@ -134,7 +130,10 @@ const title = computed(() =>
   props.artist ? t('edition.artists.edit_artist') : t('edition.artists.add_artist')
 )
 
-const selectedUserId = ref<number | null>(null)
+const selectedUser = ref<any>(null)
+const searchTerm = ref('')
+const searchedUsers = ref<any[]>([])
+const searchingUsers = ref(false)
 const loading = ref(false)
 
 const formData = ref({
@@ -148,23 +147,58 @@ const formData = ref({
   allergySeverity: null as string | null,
 })
 
-const dietaryOptions = [
-  { label: t('common.none'), value: 'NONE' },
-  { label: 'Végétarien', value: 'VEGETARIAN' },
-  { label: 'Vegan', value: 'VEGAN' },
-]
+const dietaryOptions = computed(() => [
+  { label: t('diet.none'), value: 'NONE' },
+  { label: t('diet.vegetarian'), value: 'VEGETARIAN' },
+  { label: t('diet.vegan'), value: 'VEGAN' },
+])
 
-const allergySeverityOptions = [
-  { label: 'Légère', value: 'LIGHT' },
-  { label: 'Modérée', value: 'MODERATE' },
-  { label: 'Sévère', value: 'SEVERE' },
-  { label: 'Critique', value: 'CRITICAL' },
-]
+const allergySeverityOptions = computed(() =>
+  getAllergySeveritySelectOptions().map((option) => ({
+    value: option.value,
+    label: t(option.label),
+  }))
+)
 
-const handleUserSelection = (userId: number | null) => {
-  selectedUserId.value = userId
-  if (userId) {
-    // Effacer les champs email/nom/prénom si un utilisateur est sélectionné
+// Recherche d'utilisateurs
+watch(searchTerm, async (newTerm) => {
+  if (newTerm.length < 2) {
+    searchedUsers.value = []
+    return
+  }
+
+  searchingUsers.value = true
+  try {
+    const response = await $fetch<{ users: any[] }>('/api/users/search', {
+      params: { q: newTerm },
+    })
+    searchedUsers.value = (response.users || []).map((user) => ({
+      id: user.id,
+      label: `${user.pseudo} (${user.email})`,
+      pseudo: user.pseudo,
+      email: user.email,
+      prenom: user.prenom,
+      nom: user.nom,
+      emailHash: user.emailHash,
+      profilePicture: user.profilePicture,
+    }))
+  } catch (error) {
+    console.error('Error searching users:', error)
+    searchedUsers.value = []
+  } finally {
+    searchingUsers.value = false
+  }
+})
+
+const handleUserSelection = (user: any) => {
+  selectedUser.value = user
+  if (user) {
+    // Pré-remplir les champs avec les données de l'utilisateur sélectionné (en lecture seule)
+    formData.value.email = user.email || ''
+    formData.value.prenom = user.prenom || ''
+    formData.value.nom = user.nom || ''
+  } else {
+    // Si l'utilisateur est déselectionné, vider les champs
     formData.value.email = ''
     formData.value.prenom = ''
     formData.value.nom = ''
@@ -191,8 +225,8 @@ const handleSubmit = async () => {
       toast.add({ title: t('edition.artists.artist_updated'), color: 'success' })
     } else {
       // Mode ajout
-      if (selectedUserId.value) {
-        payload.userId = selectedUserId.value
+      if (selectedUser.value) {
+        payload.userId = selectedUser.value.id
       } else {
         payload.email = formData.value.email
         payload.prenom = formData.value.prenom
@@ -225,7 +259,9 @@ const closeModal = () => {
 }
 
 const resetForm = () => {
-  selectedUserId.value = null
+  selectedUser.value = null
+  searchTerm.value = ''
+  searchedUsers.value = []
   formData.value = {
     email: '',
     prenom: '',
@@ -238,6 +274,25 @@ const resetForm = () => {
   }
 }
 
+// Fonction helper pour convertir une date en format datetime-local
+const toDateTimeLocal = (dateString: string | null | undefined): string => {
+  if (!dateString) return ''
+
+  // Si la date est déjà au format datetime-local (YYYY-MM-DDTHH:mm), la retourner telle quelle
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(dateString)) {
+    return dateString
+  }
+
+  // Sinon, tenter de parser et convertir au format datetime-local
+  // Utilise formatDateTimeLocal pour éviter les décalages de timezone
+  try {
+    const date = new Date(dateString)
+    return formatDateTimeLocal(date)
+  } catch {
+    return ''
+  }
+}
+
 // Charger les données de l'artiste en mode édition
 watch(
   () => props.artist,
@@ -247,8 +302,8 @@ watch(
         email: '',
         prenom: '',
         nom: '',
-        arrivalDateTime: newArtist.arrivalDateTime || '',
-        departureDateTime: newArtist.departureDateTime || '',
+        arrivalDateTime: toDateTimeLocal(newArtist.arrivalDateTime),
+        departureDateTime: toDateTimeLocal(newArtist.departureDateTime),
         dietaryPreference: newArtist.dietaryPreference || 'NONE',
         allergies: newArtist.allergies || '',
         allergySeverity: newArtist.allergySeverity || null,
