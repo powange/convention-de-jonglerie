@@ -780,7 +780,8 @@
       "show_title": "Titre du spectacle",
       "show_updated": "Spectacle modifié avec succès",
       "start_datetime": "Date et heure de début",
-      "title": "Spectacles"
+      "title": "Spectacles",
+      "items_to_receive": "Articles à récupérer"
     }
   }
 }

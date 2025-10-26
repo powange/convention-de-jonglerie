@@ -35,6 +35,18 @@ export default defineEventHandler(async (event) => {
                 startDateTime: true,
                 location: true,
               },
+              include: {
+                returnableItems: {
+                  include: {
+                    returnableItem: {
+                      select: {
+                        id: true,
+                        name: true,
+                      },
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -47,13 +59,24 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    // Récupérer et dédupliquer les articles à restituer depuis tous les spectacles
+    const uniqueItems = new Map()
+    artist.shows.forEach((showArtist) => {
+      showArtist.show.returnableItems.forEach((item) => {
+        if (!uniqueItems.has(item.returnableItem.id)) {
+          uniqueItems.set(item.returnableItem.id, item.returnableItem)
+        }
+      })
+    })
+    const deduplicatedItems = Array.from(uniqueItems.values())
+
     return {
       artist: {
         id: artist.id,
         firstName: artist.user.prenom,
         lastName: artist.user.nom,
         email: artist.user.email,
-        qrCode: `volunteer-${artist.id}`, // Format compatible avec le contrôle d'accès
+        qrCode: `artist-${artist.id}`, // Format compatible avec le contrôle d'accès
         arrivalDateTime: artist.arrivalDateTime,
         departureDateTime: artist.departureDateTime,
         dietaryPreference: artist.dietaryPreference,
@@ -64,6 +87,10 @@ export default defineEventHandler(async (event) => {
           title: sa.show.title,
           startDateTime: sa.show.startDateTime,
           location: sa.show.location,
+        })),
+        returnableItems: deduplicatedItems.map((item) => ({
+          id: item.id,
+          name: item.name,
         })),
       },
     }

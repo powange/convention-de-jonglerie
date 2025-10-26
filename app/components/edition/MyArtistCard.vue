@@ -67,6 +67,27 @@
                 </UBadge>
               </div>
             </div>
+
+            <!-- Articles à récupérer -->
+            <div
+              v-if="artist.returnableItems && artist.returnableItems.length > 0"
+              class="space-y-1"
+            >
+              <p class="text-xs font-medium text-gray-700 dark:text-gray-300">
+                {{ $t('edition.shows.items_to_receive', 'Articles à récupérer') }} :
+              </p>
+              <div class="flex flex-wrap gap-1">
+                <UBadge
+                  v-for="item in artist.returnableItems"
+                  :key="item.id"
+                  color="blue"
+                  variant="subtle"
+                  size="sm"
+                >
+                  {{ item.name }}
+                </UBadge>
+              </div>
+            </div>
           </div>
 
           <!-- Actions -->
@@ -154,6 +175,28 @@
                 </span>
               </div>
             </div>
+            <div
+              v-if="artist.returnableItems && artist.returnableItems.length > 0"
+              class="flex items-start gap-2 text-gray-600 dark:text-gray-400"
+            >
+              <UIcon name="i-heroicons-gift" class="w-4 h-4 mt-0.5" />
+              <div>
+                <p class="text-xs font-medium mb-1">
+                  {{ $t('edition.shows.items_to_receive', 'Articles à récupérer') }}
+                </p>
+                <div class="flex flex-wrap gap-1">
+                  <UBadge
+                    v-for="item in artist.returnableItems"
+                    :key="item.id"
+                    color="blue"
+                    variant="subtle"
+                    size="sm"
+                  >
+                    {{ item.name }}
+                  </UBadge>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -169,6 +212,11 @@ interface ArtistShow {
   location: string | null
 }
 
+interface ReturnableItem {
+  id: number
+  name: string
+}
+
 interface Artist {
   id: number
   firstName: string
@@ -181,6 +229,7 @@ interface Artist {
   allergies: string | null
   allergySeverity: string | null
   shows: ArtistShow[]
+  returnableItems: ReturnableItem[]
 }
 
 const props = defineProps<{
