@@ -199,6 +199,113 @@ export default defineEventHandler(async (event) => {
           message: 'Aucun bénévole accepté trouvé avec ce QR code',
         }
       }
+    } else if (body.qrCode.startsWith('artist-')) {
+      // Recherche d'un artiste
+      const artistId = parseInt(body.qrCode.replace('artist-', ''))
+
+      if (isNaN(artistId)) {
+        return {
+          success: true,
+          found: false,
+          message: 'QR code artiste invalide',
+        }
+      }
+
+      const artist = await prisma.editionArtist.findFirst({
+        where: {
+          id: artistId,
+          editionId: editionId,
+        },
+        include: {
+          user: {
+            select: {
+              prenom: true,
+              nom: true,
+              email: true,
+            },
+          },
+          shows: {
+            include: {
+              show: {
+                include: {
+                  returnableItems: {
+                    include: {
+                      returnableItem: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      })
+
+      if (artist) {
+        // Récupérer l'utilisateur qui a validé si applicable
+        let validatedByUser = null
+        if (artist.entryValidatedBy) {
+          validatedByUser = await prisma.user.findUnique({
+            where: { id: artist.entryValidatedBy },
+            select: {
+              prenom: true,
+              nom: true,
+            },
+          })
+        }
+
+        // Récupérer et dédupliquer les articles à restituer depuis tous les spectacles
+        const uniqueItems = new Map()
+        artist.shows.forEach((showArtist) => {
+          showArtist.show.returnableItems.forEach((item) => {
+            if (!uniqueItems.has(item.returnableItem.id)) {
+              uniqueItems.set(item.returnableItem.id, item.returnableItem)
+            }
+          })
+        })
+        const deduplicatedItems = Array.from(uniqueItems.values())
+
+        return {
+          success: true,
+          found: true,
+          type: 'artist',
+          participant: {
+            found: true,
+            artist: {
+              id: artist.id,
+              user: {
+                firstName: artist.user.prenom,
+                lastName: artist.user.nom,
+                email: artist.user.email,
+              },
+              shows: artist.shows.map((showArtist) => ({
+                id: showArtist.show.id,
+                title: showArtist.show.title,
+                startDateTime: showArtist.show.startDateTime,
+                location: showArtist.show.location,
+              })),
+              returnableItems: deduplicatedItems.map((item) => ({
+                id: item.id,
+                name: item.name,
+              })),
+              entryValidated: artist.entryValidated,
+              entryValidatedAt: artist.entryValidatedAt,
+              entryValidatedBy: validatedByUser
+                ? {
+                    firstName: validatedByUser.prenom,
+                    lastName: validatedByUser.nom,
+                  }
+                : null,
+            },
+          },
+          message: `Artiste trouvé : ${artist.user.prenom} ${artist.user.nom}`,
+        }
+      } else {
+        return {
+          success: true,
+          found: false,
+          message: 'Aucun artiste trouvé avec ce QR code',
+        }
+      }
     } else {
       // Recherche d'un billet HelloAsso
       const config = await prisma.externalTicketing.findUnique({

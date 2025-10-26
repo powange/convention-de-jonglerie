@@ -10,6 +10,7 @@ const showSchema = z.object({
   duration: z.number().int().positive().optional().nullable(),
   location: z.string().optional().nullable(),
   artistIds: z.array(z.number().int().positive()).optional().default([]),
+  returnableItemIds: z.array(z.number().int().positive()).optional().default([]),
 })
 
 export default defineEventHandler(async (event) => {
@@ -70,6 +71,11 @@ export default defineEventHandler(async (event) => {
             artistId,
           })),
         },
+        returnableItems: {
+          create: validatedData.returnableItemIds.map((returnableItemId) => ({
+            returnableItemId,
+          })),
+        },
       },
       include: {
         artists: {
@@ -84,6 +90,16 @@ export default defineEventHandler(async (event) => {
                     nom: true,
                   },
                 },
+              },
+            },
+          },
+        },
+        returnableItems: {
+          include: {
+            returnableItem: {
+              select: {
+                id: true,
+                name: true,
               },
             },
           },

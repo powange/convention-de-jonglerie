@@ -67,6 +67,37 @@
           {{ $t('edition.shows.no_artists_selected') }}
         </p>
 
+        <!-- Sélection des articles à restituer -->
+        <UFormField :label="$t('edition.shows.returnable_items')">
+          <USelectMenu
+            v-model="formData.returnableItemIds"
+            :items="returnableItemOptions"
+            value-key="value"
+            multiple
+            searchable
+            :placeholder="$t('edition.shows.select_returnable_items')"
+          >
+            <template #label>
+              <span v-if="formData.returnableItemIds.length === 0">
+                {{ $t('edition.shows.no_items_selected') }}
+              </span>
+              <span v-else>{{ formData.returnableItemIds.length }} article(s) sélectionné(s)</span>
+            </template>
+          </USelectMenu>
+        </UFormField>
+
+        <!-- Liste des articles sélectionnés -->
+        <div v-if="selectedReturnableItems.length > 0" class="flex flex-wrap gap-2">
+          <UBadge
+            v-for="item in selectedReturnableItems"
+            :key="item.id"
+            color="blue"
+            variant="subtle"
+          >
+            {{ item.name }}
+          </UBadge>
+        </div>
+
         <!-- Actions -->
         <div class="flex justify-end gap-2 pt-4">
           <UButton color="neutral" variant="soft" @click="closeModal">
@@ -109,6 +140,7 @@ const title = computed(() =>
 
 const loading = ref(false)
 const artists = ref<any[]>([])
+const returnableItems = ref<any[]>([])
 
 const formData = ref({
   title: '',
@@ -117,6 +149,7 @@ const formData = ref({
   duration: null as number | null,
   location: '',
   artistIds: [] as number[],
+  returnableItemIds: [] as number[],
 })
 
 const artistOptions = computed(() => {
@@ -130,6 +163,17 @@ const selectedArtists = computed(() => {
   return artists.value.filter((artist) => formData.value.artistIds.includes(artist.id))
 })
 
+const returnableItemOptions = computed(() => {
+  return returnableItems.value.map((item) => ({
+    label: item.name,
+    value: item.id,
+  }))
+})
+
+const selectedReturnableItems = computed(() => {
+  return returnableItems.value.filter((item) => formData.value.returnableItemIds.includes(item.id))
+})
+
 // Charger les artistes disponibles
 const fetchArtists = async () => {
   try {
@@ -137,6 +181,16 @@ const fetchArtists = async () => {
     artists.value = response.artists || []
   } catch (error) {
     console.error('Error fetching artists:', error)
+  }
+}
+
+// Charger les articles à restituer disponibles
+const fetchReturnableItems = async () => {
+  try {
+    const response = await $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`)
+    returnableItems.value = response || []
+  } catch (error) {
+    console.error('Error fetching returnable items:', error)
   }
 }
 
@@ -153,6 +207,7 @@ const handleSubmit = async () => {
       duration: formData.value.duration,
       location: formData.value.location || null,
       artistIds: formData.value.artistIds,
+      returnableItemIds: formData.value.returnableItemIds,
     }
 
     if (props.show) {
@@ -197,6 +252,7 @@ const resetForm = () => {
     duration: null,
     location: '',
     artistIds: [],
+    returnableItemIds: [],
   }
 }
 
@@ -220,6 +276,7 @@ watch(
         duration: newShow.duration || null,
         location: newShow.location || '',
         artistIds: newShow.artists?.map((showArtist: any) => showArtist.artistId) || [],
+        returnableItemIds: newShow.returnableItems?.map((item: any) => item.returnableItemId) || [],
       }
     } else {
       resetForm()
@@ -228,8 +285,9 @@ watch(
   { immediate: true }
 )
 
-// Charger les artistes au montage
+// Charger les données au montage
 onMounted(() => {
   fetchArtists()
+  fetchReturnableItems()
 })
 </script>

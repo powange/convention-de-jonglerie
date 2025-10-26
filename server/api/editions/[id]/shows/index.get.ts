@@ -38,6 +38,16 @@ export default defineEventHandler(async (event) => {
             },
           },
         },
+        returnableItems: {
+          include: {
+            returnableItem: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
       },
       orderBy: {
         startDateTime: 'asc',
