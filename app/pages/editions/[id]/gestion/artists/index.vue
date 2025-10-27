@@ -109,7 +109,7 @@
                 </th>
                 <th
                   v-if="canEdit"
-                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
+                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[300px]"
                 >
                   {{ $t('edition.artists.organizer_notes') }}
                 </th>
@@ -142,10 +142,10 @@
                   {{ artist.user.phone || '-' }}
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                  {{ artist.arrivalDateTime || '-' }}
+                  {{ artist.arrivalDateTime ? formatDateTime(artist.arrivalDateTime) : '-' }}
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                  {{ artist.departureDateTime || '-' }}
+                  {{ artist.departureDateTime ? formatDateTime(artist.departureDateTime) : '-' }}
                 </td>
                 <td class="px-4 py-3 text-sm">
                   <div v-if="artist.shows && artist.shows.length > 0" class="flex flex-wrap gap-1">
@@ -159,7 +159,7 @@
                       {{ showArtist.show.title }}
                     </UBadge>
                   </div>
-                  <span v-else class="text-gray-400">{{ $t('edition.artists.no_shows') }}</span>
+                  <span v-else class="text-gray-400">-</span>
                 </td>
                 <td class="px-4 py-3 text-sm">
                   <div v-if="artist.payment" class="flex items-center gap-2">
@@ -187,17 +187,45 @@
                   </div>
                   <span v-else class="text-gray-400">-</span>
                 </td>
-                <td v-if="canEdit" class="px-4 py-3 text-sm">
-                  <UTextarea
-                    :model-value="artist.organizerNotes || ''"
-                    :placeholder="$t('edition.artists.notes_placeholder')"
-                    :rows="2"
-                    size="sm"
-                    @update:model-value="(value) => updateArtistNotes(artist.id, value)"
-                  />
+                <td v-if="canEdit" class="px-4 py-3 text-sm min-w-[300px]">
+                  <div class="flex items-start gap-2">
+                    <div class="flex-1 min-w-0">
+                      <UPopover v-if="artist.organizerNotes" mode="hover" :open-delay="200">
+                        <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line line-clamp-3 cursor-help">
+                          {{ artist.organizerNotes }}
+                        </p>
+                        <template #content>
+                          <div class="p-4 max-w-md">
+                            <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                              {{ artist.organizerNotes }}
+                            </p>
+                          </div>
+                        </template>
+                      </UPopover>
+                      <p v-else class="text-gray-400 italic text-xs">
+                        {{ $t('edition.artists.no_notes') }}
+                      </p>
+                    </div>
+                    <UButton
+                      icon="i-heroicons-pencil-square"
+                      color="neutral"
+                      variant="ghost"
+                      size="xs"
+                      :title="$t('edition.artists.edit_notes')"
+                      @click="openNotesModal(artist)"
+                    />
+                  </div>
                 </td>
                 <td v-if="canEdit" class="px-4 py-3 text-sm text-right">
                   <div class="flex items-center justify-end gap-2">
+                    <UButton
+                      icon="i-heroicons-cake"
+                      color="primary"
+                      variant="ghost"
+                      size="sm"
+                      :title="$t('edition.artists.meals.manage_meals')"
+                      @click="openMealsModal(artist)"
+                    />
                     <UButton
                       icon="i-heroicons-pencil"
                       color="primary"
@@ -229,6 +257,24 @@
       @artist-saved="handleArtistSaved"
     />
 
+    <!-- Modal repas -->
+    <ArtistsMealsModal
+      v-if="showMealsModal"
+      v-model="showMealsModal"
+      :artist="selectedArtistForMeals"
+      :edition-id="editionId"
+      @meals-saved="handleMealsSaved"
+    />
+
+    <!-- Modal notes organisateur -->
+    <ArtistsOrganizerNotesModal
+      v-if="showNotesModal"
+      v-model="showNotesModal"
+      :artist="selectedArtistForNotes"
+      :edition-id="editionId"
+      @notes-saved="handleNotesSaved"
+    />
+
     <!-- Modal confirmation suppression -->
     <UiConfirmModal
       v-model="showDeleteConfirm"
@@ -250,6 +296,7 @@ const { t } = useI18n()
 const toast = useToast()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
+const { formatDateTime } = useDateFormat()
 
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))
@@ -270,6 +317,10 @@ const artists = ref<any[]>([])
 const loading = ref(false)
 const showArtistModal = ref(false)
 const selectedArtist = ref<any>(null)
+const showMealsModal = ref(false)
+const selectedArtistForMeals = ref<any>(null)
+const showNotesModal = ref(false)
+const selectedArtistForNotes = ref<any>(null)
 const showDeleteConfirm = ref(false)
 const artistToDelete = ref<any>(null)
 
@@ -345,26 +396,30 @@ const deleteArtist = async () => {
   }
 }
 
-// Mettre à jour les notes de l'organisateur
-const updateArtistNotes = useDebounceFn(async (artistId: number, notes: string) => {
-  try {
-    await $fetch(`/api/editions/${editionId.value}/artists/${artistId}/notes`, {
-      method: 'PATCH',
-      body: {
-        organizerNotes: notes || null,
-      },
-    })
-    // Mettre à jour localement
-    const artist = artists.value.find((a) => a.id === artistId)
-    if (artist) {
-      artist.organizerNotes = notes
-    }
-  } catch (error) {
-    console.error('Error updating organizer notes:', error)
-    toast.add({
-      title: 'Erreur lors de la mise à jour des notes',
-      color: 'error',
-    })
-  }
-}, 500)
+// Ouvrir le modal de gestion des repas
+const openMealsModal = (artist: any) => {
+  selectedArtistForMeals.value = artist
+  showMealsModal.value = true
+}
+
+// Gérer la sauvegarde des repas
+const handleMealsSaved = () => {
+  // On pourrait rafraîchir les artistes si on veut afficher des infos sur les repas
+  toast.add({
+    title: t('edition.artists.meals.meals_updated'),
+    color: 'success',
+  })
+}
+
+// Ouvrir le modal de gestion des notes
+const openNotesModal = (artist: any) => {
+  selectedArtistForNotes.value = artist
+  showNotesModal.value = true
+}
+
+// Gérer la sauvegarde des notes
+const handleNotesSaved = () => {
+  // Rafraîchir les artistes pour obtenir les notes mises à jour
+  fetchArtists()
+}
 </script>
