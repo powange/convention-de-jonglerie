@@ -14,7 +14,7 @@ export interface QuotaStats {
  * Calcule les statistiques d'utilisation des quotas pour une édition
  */
 export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
-  // Récupérer tous les quotas de l'édition avec leurs tarifs et options associés
+  // Récupérer tous les quotas de l'édition avec leurs tarifs, options et custom fields associés
   const quotas = await prisma.ticketingQuota.findMany({
     where: { editionId },
     include: {
@@ -34,6 +34,11 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
       options: {
         include: {
           option: true,
+        },
+      },
+      customFields: {
+        include: {
+          customField: true,
         },
       },
     },
@@ -85,6 +90,38 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
           )
 
           if (hasOption) {
+            currentCount++
+            if (orderItem.entryValidated) {
+              validatedCount++
+            }
+          }
+        }
+      }
+    }
+
+    // 3. Compter les participants via les custom fields (champs personnalisés de tarifs)
+    for (const customFieldQuota of quota.customFields) {
+      const customFieldLabel = customFieldQuota.customField.label
+      const choiceValue = customFieldQuota.choiceValue
+
+      for (const orderItem of allOrderItems) {
+        if (orderItem.customFields && Array.isArray(orderItem.customFields)) {
+          // Vérifier si cet orderItem a ce custom field avec le bon choix
+          const hasCustomField = (orderItem.customFields as any[]).some((field) => {
+            if (field.name !== customFieldLabel) {
+              return false
+            }
+
+            // Si choiceValue est null, on compte tous les participants qui ont répondu à ce champ
+            if (choiceValue === null) {
+              return !!field.answer
+            }
+
+            // Sinon, on vérifie que la réponse correspond au choix spécifique
+            return field.answer === choiceValue
+          })
+
+          if (hasCustomField) {
             currentCount++
             if (orderItem.entryValidated) {
               validatedCount++
