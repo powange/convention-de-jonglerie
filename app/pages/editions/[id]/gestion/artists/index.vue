@@ -113,6 +113,11 @@
                   {{ $t('edition.artists.reimbursement_max_actual') }}
                 </th>
                 <th
+                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  {{ $t('edition.artists.accommodation') }}
+                </th>
+                <th
                   v-if="canEdit"
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[300px]"
                 >
@@ -279,6 +284,35 @@
                     </div>
                   </div>
                   <span v-else class="text-gray-400">-</span>
+                </td>
+                <td class="px-4 py-3 text-sm">
+                  <div v-if="artist.accommodationAutonomous" class="flex items-center gap-2">
+                    <UIcon name="i-heroicons-check-circle" class="h-5 w-5 text-success-500" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300">
+                      {{ $t('edition.artists.accommodation_autonomous_yes') }}
+                    </span>
+                  </div>
+                  <UPopover v-else-if="artist.accommodationProposal" mode="hover" :open-delay="200">
+                    <div class="flex items-center gap-2 cursor-help">
+                      <UIcon name="i-heroicons-home" class="h-5 w-5 text-primary-500" />
+                      <span class="text-sm text-gray-700 dark:text-gray-300 line-clamp-1">
+                        {{ artist.accommodationProposal }}
+                      </span>
+                    </div>
+                    <template #content>
+                      <div class="p-4 max-w-md">
+                        <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                          {{ artist.accommodationProposal }}
+                        </p>
+                      </div>
+                    </template>
+                  </UPopover>
+                  <div v-else class="flex items-center gap-2">
+                    <UIcon name="i-heroicons-question-mark-circle" class="h-5 w-5 text-gray-400" />
+                    <span class="text-sm text-gray-400">
+                      {{ $t('edition.artists.accommodation_not_specified') }}
+                    </span>
+                  </div>
                 </td>
                 <td v-if="canEdit" class="px-4 py-3 text-sm min-w-[300px]">
                   <div class="flex items-start gap-2">

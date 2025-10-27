@@ -202,6 +202,28 @@
               />
             </UFormField>
           </div>
+
+          <!-- Hébergement -->
+          <h3 class="text-lg font-semibold mb-3">
+            {{ $t('edition.artists.accommodation_section') }}
+          </h3>
+
+          <UFormField :label="$t('edition.artists.accommodation_autonomous')">
+            <UCheckbox
+              v-model="formData.accommodationAutonomous"
+              :label="$t('edition.artists.accommodation_autonomous_label')"
+            />
+          </UFormField>
+
+          <div v-if="!formData.accommodationAutonomous">
+            <UFormField :label="$t('edition.artists.accommodation_proposal')">
+              <UTextarea
+                v-model="formData.accommodationProposal"
+                :placeholder="$t('edition.artists.accommodation_proposal_placeholder')"
+                :rows="3"
+              />
+            </UFormField>
+          </div>
         </div>
 
         <!-- Actions -->
@@ -266,6 +288,8 @@ const formData = ref({
   reimbursementMax: '',
   reimbursementActual: '',
   reimbursementActualPaid: false,
+  accommodationAutonomous: false,
+  accommodationProposal: '',
 })
 
 // Vérifier si l'utilisateur est créé manuellement (authProvider = MANUAL)
@@ -349,6 +373,8 @@ const handleSubmit = async () => {
         ? parseFloat(formData.value.reimbursementActual)
         : null,
       reimbursementActualPaid: formData.value.reimbursementActualPaid,
+      accommodationAutonomous: formData.value.accommodationAutonomous,
+      accommodationProposal: formData.value.accommodationProposal || null,
     }
 
     if (props.artist) {
@@ -420,6 +446,8 @@ const resetForm = () => {
     reimbursementMax: '',
     reimbursementActual: '',
     reimbursementActualPaid: false,
+    accommodationAutonomous: false,
+    accommodationProposal: '',
   }
 }
 
@@ -464,6 +492,8 @@ watch(
           ? newArtist.reimbursementActual.toString()
           : '',
         reimbursementActualPaid: newArtist.reimbursementActualPaid || false,
+        accommodationAutonomous: newArtist.accommodationAutonomous || false,
+        accommodationProposal: newArtist.accommodationProposal || '',
       }
     } else {
       resetForm()

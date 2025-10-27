@@ -17,10 +17,34 @@
     <div class="space-y-2">
       <!-- Liste des quotas existants -->
       <div
-        v-for="quota in quotas"
+        v-for="(quota, index) in sortedQuotas"
         :key="quota.id"
         class="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+        :class="[
+          draggedQuotaId === quota.id && 'opacity-50',
+          dragOverQuotaId === quota.id && 'border-primary-500 border-2',
+        ]"
+        draggable="true"
+        @dragstart="handleDragStart(quota, $event)"
+        @dragend="handleDragEnd"
+        @dragover.prevent="handleDragOver(quota, $event)"
+        @drop="handleDrop(quota, $event)"
       >
+        <!-- Poignée de drag -->
+        <div
+          class="cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          title="Glisser pour réordonner"
+        >
+          <UIcon name="i-heroicons-bars-3" class="h-5 w-5" />
+        </div>
+
+        <!-- Numéro de position -->
+        <div class="flex-shrink-0 w-8 text-center">
+          <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
+            {{ index + 1 }}
+          </span>
+        </div>
+
         <UFieldGroup>
           <UInput
             :model-value="quota.title"
@@ -132,11 +156,25 @@ const deleteConfirmOpen = ref(false)
 const quotaToDelete = ref<Quota | null>(null)
 const deleting = ref(false)
 
+// Drag and drop
+const draggedQuotaId = ref<number | null>(null)
+const dragOverQuotaId = ref<number | null>(null)
+const sortedQuotas = ref<Quota[]>([])
+
 const form = ref<QuotaForm>({
   title: '',
   description: '',
   quantity: 1,
 })
+
+// Initialiser sortedQuotas avec les props.quotas
+watch(
+  () => props.quotas,
+  (newQuotas) => {
+    sortedQuotas.value = [...newQuotas]
+  },
+  { immediate: true }
+)
 
 const confirmDeleteQuota = (quota: Quota) => {
   quotaToDelete.value = quota
@@ -293,6 +331,89 @@ const handleSave = async () => {
     })
   } finally {
     saving.value = false
+  }
+}
+
+const handleDragStart = (quota: Quota, event: DragEvent) => {
+  draggedQuotaId.value = quota.id
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/html', '')
+  }
+}
+
+const handleDragEnd = () => {
+  draggedQuotaId.value = null
+  dragOverQuotaId.value = null
+}
+
+const handleDragOver = (quota: Quota, _event: DragEvent) => {
+  dragOverQuotaId.value = quota.id
+}
+
+const handleDrop = async (targetQuota: Quota, event: DragEvent) => {
+  event.preventDefault()
+
+  if (!draggedQuotaId.value || draggedQuotaId.value === targetQuota.id) {
+    draggedQuotaId.value = null
+    dragOverQuotaId.value = null
+    return
+  }
+
+  const draggedIndex = sortedQuotas.value.findIndex((q) => q.id === draggedQuotaId.value)
+  const targetIndex = sortedQuotas.value.findIndex((q) => q.id === targetQuota.id)
+
+  if (draggedIndex === -1 || targetIndex === -1) {
+    draggedQuotaId.value = null
+    dragOverQuotaId.value = null
+    return
+  }
+
+  // Réorganiser localement
+  const newQuotas = [...sortedQuotas.value]
+  const [draggedQuota] = newQuotas.splice(draggedIndex, 1)
+  newQuotas.splice(targetIndex, 0, draggedQuota)
+  sortedQuotas.value = newQuotas
+
+  // Mettre à jour les positions en base de données
+  await updateQuotasPositions(newQuotas)
+
+  draggedQuotaId.value = null
+  dragOverQuotaId.value = null
+}
+
+const updateQuotasPositions = async (quotas: Quota[]) => {
+  const toast = useToast()
+
+  try {
+    // Créer la liste des positions à envoyer à l'API
+    const positions = quotas.map((quota, index) => ({
+      id: quota.id,
+      position: index,
+    }))
+
+    await $fetch(`/api/editions/${props.editionId}/ticketing/quotas/reorder`, {
+      method: 'PUT',
+      body: { positions },
+    })
+
+    toast.add({
+      title: 'Ordre mis à jour',
+      description: "L'ordre des quotas a été enregistré",
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    // Rafraîchir les données
+    emit('refresh')
+  } catch (error: any) {
+    console.error('Failed to update quotas positions:', error)
+    toast.add({
+      title: 'Erreur',
+      description: error.data?.message || "Impossible de mettre à jour l'ordre des quotas",
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
   }
 }
 </script>

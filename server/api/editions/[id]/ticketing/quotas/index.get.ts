@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   try {
     const quotas = await prisma.ticketingQuota.findMany({
       where: { editionId },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { position: 'asc' },
     })
 
     return quotas

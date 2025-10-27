@@ -14,6 +14,8 @@ const updateArtistSchema = z.object({
   reimbursementMax: z.number().optional().nullable(),
   reimbursementActual: z.number().optional().nullable(),
   reimbursementActualPaid: z.boolean().optional(),
+  accommodationAutonomous: z.boolean().optional(),
+  accommodationProposal: z.string().optional().nullable(),
   // Champs utilisateur (modifiables uniquement si authProvider = MANUAL)
   userEmail: z.string().email().optional(),
   userPrenom: z.string().min(1).optional(),
@@ -139,6 +141,8 @@ export default defineEventHandler(async (event) => {
         reimbursementMax: validatedData.reimbursementMax,
         reimbursementActual: validatedData.reimbursementActual,
         reimbursementActualPaid: validatedData.reimbursementActualPaid,
+        accommodationAutonomous: validatedData.accommodationAutonomous,
+        accommodationProposal: validatedData.accommodationProposal,
       },
       include: {
         user: {
