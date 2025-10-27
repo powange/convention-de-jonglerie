@@ -168,13 +168,18 @@
 
           <!-- Information sur les repas -->
           <UAlert
+            v-if="mealInfoMessage"
             icon="i-heroicons-information-circle"
             color="info"
             variant="soft"
             :title="t('editions.volunteers.meals_info_title')"
-            :description="t('editions.volunteers.meals_info_description')"
             class="mt-4"
-          />
+          >
+            <template #description>
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div v-html="mealInfoMessage"></div>
+            </template>
+          </UAlert>
         </div>
 
         <!-- Section: Comment vous voyez vos créneaux -->
@@ -638,6 +643,8 @@ interface Props {
   // Mode édition
   isEditing?: boolean
   existingApplication?: any | null
+  // Droits d'organisateur
+  canManageEdition?: boolean
 }
 
 interface Emits {
@@ -700,12 +707,21 @@ const showAllErrors = ref(false)
 // Computed properties
 const motivationTooLong = computed(() => formData.value.motivation.length > MOTIVATION_MAX)
 
+// Détermine si l'utilisateur a des droits d'organisateur
+const hasOrganizerRights = computed(() => {
+  return props.canManageEdition === true
+})
+
 // Détermine si c'est un organisateur qui édite (pas le bénévole lui-même)
 const isOrganizerEditingApplication = computed(() => {
   if (!props.isEditing) return false
   if (!authStore.user) return false
   if (!props.existingApplication) return false
-  // Si l'utilisateur connecté n'est pas le propriétaire de la candidature
+
+  // Si l'utilisateur a les droits d'organisateur, il est considéré comme organisateur
+  if (hasOrganizerRights.value) return true
+
+  // Sinon, vérifier si c'est quelqu'un d'autre qui édite
   return authStore.user.id !== props.existingApplication.user.id
 })
 
@@ -923,6 +939,99 @@ const showWhatYouCanBringSection = computed(() => {
   )
 })
 
+// Fonction pour obtenir les repas disponibles selon le moment d'arrivée
+const getAvailableMealsOnArrival = (timeOfDay: string): string[] => {
+  switch (timeOfDay) {
+    case 'morning':
+    case 'early_morning':
+      return ['petit-déjeuner', 'déjeuner', 'dîner']
+    case 'noon':
+      return ['déjeuner', 'dîner']
+    case 'afternoon':
+    case 'early_afternoon':
+    case 'late_afternoon':
+    case 'evening':
+    case 'late_evening':
+    case 'night':
+      return ['dîner']
+    default:
+      return []
+  }
+}
+
+// Fonction pour obtenir les repas disponibles selon le moment de départ
+const getAvailableMealsOnDeparture = (timeOfDay: string): string[] => {
+  switch (timeOfDay) {
+    case 'morning':
+    case 'early_morning':
+      return ['petit-déjeuner']
+    case 'noon':
+    case 'afternoon':
+    case 'early_afternoon':
+    case 'late_afternoon':
+      return ['petit-déjeuner', 'déjeuner']
+    case 'evening':
+    case 'late_evening':
+    case 'night':
+      return ['petit-déjeuner', 'déjeuner', 'dîner']
+    default:
+      return []
+  }
+}
+
+// Message d'information dynamique sur les repas
+const mealInfoMessage = computed(() => {
+  const arrivalDateTime = formData.value.arrivalDateTime
+  const departureDateTime = formData.value.departureDateTime
+
+  // Ne rien afficher si aucune date n'est sélectionnée
+  if (!arrivalDateTime && !departureDateTime) {
+    return ''
+  }
+
+  const messages: string[] = []
+
+  // Analyser l'arrivée
+  if (arrivalDateTime) {
+    const [_arrivalDate, arrivalTime] = arrivalDateTime.split('_')
+    const meals = getAvailableMealsOnArrival(arrivalTime)
+    if (meals.length > 0) {
+      messages.push(`Le jour de votre arrivée : ${meals.join(', ')}`)
+    } else {
+      messages.push(`Le jour de votre arrivée : aucun repas`)
+    }
+  }
+
+  // Analyser le départ
+  if (departureDateTime) {
+    const [_departureDate, departureTime] = departureDateTime.split('_')
+    const meals = getAvailableMealsOnDeparture(departureTime)
+    if (meals.length > 0) {
+      messages.push(`Le jour de votre départ : ${meals.join(', ')}`)
+    } else {
+      messages.push(`Le jour de votre départ : aucun repas`)
+    }
+  }
+
+  // Ajouter une note sur les jours intermédiaires si les dates sont différentes
+  if (arrivalDateTime && departureDateTime) {
+    const [arrivalDate] = arrivalDateTime.split('_')
+    const [departureDate] = departureDateTime.split('_')
+
+    if (arrivalDate !== departureDate) {
+      const arrival = new Date(arrivalDate)
+      const departure = new Date(departureDate)
+      const daysDiff = Math.floor((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24))
+
+      if (daysDiff > 1) {
+        messages.push(`Les jours intermédiaires : petit-déjeuner, déjeuner et dîner`)
+      }
+    }
+  }
+
+  return messages.join('.<br>') + '.'
+})
+
 // Helper function to generate date options with time granularity
 const generateDateTimeOptions = (
   startDate: Date,
@@ -1021,7 +1130,8 @@ const teamItems = computed(() => {
     .map((team) => ({
       label: team.isRequired ? `${team.name} (${t('common.required')})` : team.name,
       value: team.id, // Utiliser l'ID au lieu du nom pour le nouveau système
-      disabled: team.isRequired, // Désactiver la case si obligatoire
+      // Désactiver les équipes obligatoires sauf si c'est un organisateur qui édite
+      disabled: team.isRequired && !isOrganizerEditingApplication.value,
     }))
 })
 
@@ -1103,6 +1213,20 @@ const populateForm = () => {
   if (props.isEditing && props.existingApplication) {
     // Mode édition : pré-remplir avec les données existantes
     const app = props.existingApplication
+
+    // Récupérer les équipes existantes
+    let teamPreferences = (app.teamPreferences as string[]) || []
+
+    // Si c'est le bénévole lui-même qui édite (pas un organisateur), ajouter les équipes obligatoires
+    if (!isOrganizerEditingApplication.value) {
+      const requiredTeamIds = volunteerTeams.value
+        .filter((team) => team.isRequired)
+        .map((team) => team.id)
+
+      // Fusionner avec les équipes existantes
+      teamPreferences = [...new Set([...teamPreferences, ...requiredTeamIds])]
+    }
+
     Object.assign(formData.value, {
       // Utiliser les données actuelles de l'utilisateur en priorité, puis les données enregistrées
       phone: props.user?.phone || app.userSnapshotPhone || '',
@@ -1113,7 +1237,7 @@ const populateForm = () => {
       eventAvailability: app.eventAvailability ?? true,
       arrivalDateTime: app.arrivalDateTime || undefined,
       departureDateTime: app.departureDateTime || undefined,
-      teamPreferences: (app.teamPreferences as string[]) || [],
+      teamPreferences,
       timePreferences: (app.timePreferences as string[]) || [],
       companionName: app.companionName || '',
       avoidList: app.avoidList || '',
@@ -1136,6 +1260,11 @@ const populateForm = () => {
     })
   } else {
     // Mode création : utiliser les infos utilisateur actuelles
+    // Pré-sélectionner les équipes obligatoires
+    const requiredTeamIds = volunteerTeams.value
+      .filter((team) => team.isRequired)
+      .map((team) => team.id)
+
     Object.assign(formData.value, {
       phone: props.user?.phone || '',
       firstName: props.user?.prenom || '',
@@ -1145,7 +1274,7 @@ const populateForm = () => {
       eventAvailability: true,
       arrivalDateTime: undefined,
       departureDateTime: undefined,
-      teamPreferences: [],
+      teamPreferences: requiredTeamIds,
       timePreferences: [],
       companionName: '',
       avoidList: '',
@@ -1190,16 +1319,25 @@ watch(
   { deep: true }
 )
 
-// Pré-sélectionner les équipes obligatoires
+// Pré-sélectionner les équipes obligatoires quand elles sont chargées
 watch(
   [() => volunteerTeams.value, () => props.modelValue],
   ([teams, isOpen]) => {
-    if (isOpen && teams.length > 0 && !props.isEditing) {
+    // Seulement en mode création (pas édition) et quand le modal est ouvert
+    if (isOpen && !props.isEditing && teams && teams.length > 0) {
       const requiredTeamIds = teams.filter((team) => team.isRequired).map((team) => team.id)
+
+      // Ne mettre à jour que si les équipes obligatoires ne sont pas déjà toutes sélectionnées
       if (requiredTeamIds.length > 0) {
-        formData.value.teamPreferences = [
-          ...new Set([...formData.value.teamPreferences, ...requiredTeamIds]),
-        ]
+        const missingRequired = requiredTeamIds.filter(
+          (id) => !formData.value.teamPreferences.includes(id)
+        )
+
+        if (missingRequired.length > 0) {
+          formData.value.teamPreferences = [
+            ...new Set([...formData.value.teamPreferences, ...requiredTeamIds]),
+          ]
+        }
       }
     }
   },

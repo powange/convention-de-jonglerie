@@ -265,6 +265,7 @@
         :edition="edition"
         :user="authStore.user"
         :applying="volunteersApplying"
+        :can-manage-edition="canManageEdition"
         @close="closeApplyModal"
         @submit="applyAsVolunteer"
       />
@@ -279,6 +280,7 @@
         :applying="false"
         :is-editing="true"
         :existing-application="myApplication"
+        :can-manage-edition="canManageEdition"
         @close="closeEditApplicationModal"
         @update="updateVolunteerApplication"
       />

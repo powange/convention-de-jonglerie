@@ -400,6 +400,7 @@
     :applying="false"
     :is-editing="true"
     :existing-application="currentEditApplication"
+    :can-manage-edition="true"
     @close="closeEditApplicationModal"
     @update="handleEditApplicationUpdate"
   />
