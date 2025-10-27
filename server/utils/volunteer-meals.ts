@@ -8,7 +8,7 @@ import type { VolunteerMealType } from '@prisma/client'
  * - Arrivée matin (early_morning, morning) → petit-déj + déjeuner + dîner
  * - Arrivée midi (lunch) → déjeuner + dîner
  * - Arrivée après-midi (early_afternoon, late_afternoon) → dîner seulement
- * - Arrivée soir (evening, late_evening, night) → aucun repas
+ * - Arrivée soir (evening, late_evening, night) → dîner seulement
  */
 export function getAvailableMealsOnArrival(timeOfDay: string): VolunteerMealType[] {
   switch (timeOfDay) {
@@ -19,11 +19,10 @@ export function getAvailableMealsOnArrival(timeOfDay: string): VolunteerMealType
       return ['LUNCH', 'DINNER']
     case 'early_afternoon':
     case 'late_afternoon':
-      return ['DINNER']
     case 'evening':
     case 'late_evening':
     case 'night':
-      return []
+      return ['DINNER']
     default:
       return ['BREAKFAST', 'LUNCH', 'DINNER']
   }
@@ -32,8 +31,8 @@ export function getAvailableMealsOnArrival(timeOfDay: string): VolunteerMealType
 /**
  * Détermine quels types de repas sont disponibles selon l'heure de départ
  * Règles inverses :
- * - Départ matin (early_morning, morning) → rien (part avant le petit-déj)
- * - Départ midi (lunch) → petit-déj seulement
+ * - Départ matin (early_morning, morning) → petit-déj
+ * - Départ midi (lunch) → petit-déj + déjeuner
  * - Départ après-midi (early_afternoon, late_afternoon) → petit-déj + déjeuner
  * - Départ soir (evening, late_evening, night) → petit-déj + déjeuner + dîner
  */
@@ -41,9 +40,8 @@ export function getAvailableMealsOnDeparture(timeOfDay: string): VolunteerMealTy
   switch (timeOfDay) {
     case 'early_morning':
     case 'morning':
-      return []
-    case 'lunch':
       return ['BREAKFAST']
+    case 'lunch':
     case 'early_afternoon':
     case 'late_afternoon':
       return ['BREAKFAST', 'LUNCH']
