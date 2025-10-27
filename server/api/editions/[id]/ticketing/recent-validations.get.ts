@@ -17,38 +17,32 @@ export default defineEventHandler(async (event) => {
     })
 
   try {
-    // Récupérer les validations de billets
-    const config = await prisma.externalTicketing.findUnique({
-      where: { editionId },
+    // Récupérer les validations de billets (externes et manuels)
+    const ticketValidations = await prisma.ticketingOrderItem.findMany({
+      where: {
+        order: {
+          editionId: editionId,
+        },
+        entryValidated: true,
+        entryValidatedAt: {
+          not: null,
+        },
+      },
+      orderBy: {
+        entryValidatedAt: 'desc',
+      },
+      take: 10,
+      select: {
+        id: true,
+        helloAssoItemId: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        name: true,
+        entryValidatedAt: true,
+        entryValidatedBy: true,
+      },
     })
-
-    const ticketValidations = config
-      ? await prisma.ticketingOrderItem.findMany({
-          where: {
-            order: {
-              externalTicketingId: config.id,
-            },
-            entryValidated: true,
-            entryValidatedAt: {
-              not: null,
-            },
-          },
-          orderBy: {
-            entryValidatedAt: 'desc',
-          },
-          take: 10,
-          select: {
-            id: true,
-            helloAssoItemId: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            name: true,
-            entryValidatedAt: true,
-            entryValidatedBy: true,
-          },
-        })
-      : []
 
     // Récupérer les validations de bénévoles
     const volunteerValidations = await prisma.editionVolunteerApplication.findMany({
