@@ -149,39 +149,21 @@
                 </td>
                 <td class="px-4 py-3 text-sm">
                   <div
-                    v-if="
-                      show.returnableItems &&
-                      show.returnableItems.length > 0 &&
-                      show.artists &&
-                      show.artists.length > 0
-                    "
-                    class="space-y-2"
+                    v-if="show.returnableItems && show.returnableItems.length > 0"
+                    class="flex flex-wrap gap-1"
                   >
-                    <div class="flex flex-wrap gap-1">
-                      <UBadge
-                        v-for="showArtist in show.artists"
-                        :key="showArtist.artist.id"
-                        color="orange"
-                        variant="subtle"
-                        size="sm"
-                      >
-                        {{ showArtist.artist.user.prenom }} {{ showArtist.artist.user.nom }}
-                      </UBadge>
-                    </div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">
-                      <UIcon name="i-heroicons-arrow-path" class="inline-block w-3 h-3" />
-                      {{ show.returnableItems.length }}
-                      {{ show.returnableItems.length === 1 ? 'article' : 'articles' }}
-                    </div>
+                    <UBadge
+                      v-for="item in show.returnableItems"
+                      :key="item.returnableItem.id"
+                      color="orange"
+                      variant="subtle"
+                      size="sm"
+                    >
+                      {{ item.returnableItem.name }}
+                    </UBadge>
                   </div>
-                  <span
-                    v-else-if="!show.returnableItems || show.returnableItems.length === 0"
-                    class="text-gray-400 text-xs"
-                  >
-                    {{ $t('edition.shows.no_returnable_items') }}
-                  </span>
                   <span v-else class="text-gray-400 text-xs">
-                    {{ $t('edition.shows.no_artists_selected') }}
+                    {{ $t('edition.shows.no_returnable_items') }}
                   </span>
                 </td>
                 <td v-if="canEdit" class="px-4 py-3 text-sm text-right">

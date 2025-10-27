@@ -4,7 +4,12 @@
       <form class="space-y-4" @submit.prevent="handleSubmit">
         <!-- Titre -->
         <UFormField :label="$t('edition.shows.show_title')" required>
-          <UInput v-model="formData.title" :placeholder="$t('edition.shows.show_title')" required />
+          <UInput
+            v-model="formData.title"
+            :placeholder="$t('edition.shows.show_title')"
+            required
+            class="w-full"
+          />
         </UFormField>
 
         <!-- Description -->
@@ -13,6 +18,7 @@
             v-model="formData.description"
             :placeholder="$t('edition.shows.description')"
             rows="3"
+            class="w-full"
           />
         </UFormField>
 
@@ -38,7 +44,11 @@
 
         <!-- Lieu -->
         <UFormField :label="$t('edition.shows.location')">
-          <UInput v-model="formData.location" :placeholder="$t('edition.shows.location')" />
+          <UInput
+            v-model="formData.location"
+            :placeholder="$t('edition.shows.location')"
+            class="w-full"
+          />
         </UFormField>
 
         <!-- Sélection des artistes -->
@@ -49,6 +59,7 @@
             value-key="value"
             multiple
             :placeholder="$t('edition.shows.select_artists')"
+            class="w-full"
           />
         </UFormField>
 
@@ -57,7 +68,7 @@
           <UBadge
             v-for="artist in selectedArtists"
             :key="artist.id"
-            color="purple"
+            color="warning"
             variant="subtle"
           >
             {{ artist.user.prenom }} {{ artist.user.nom }}
@@ -76,6 +87,7 @@
             multiple
             searchable
             :placeholder="$t('edition.shows.select_returnable_items')"
+            class="w-full"
           >
             <template #label>
               <span v-if="formData.returnableItemIds.length === 0">
@@ -91,7 +103,7 @@
           <UBadge
             v-for="item in selectedReturnableItems"
             :key="item.id"
-            color="blue"
+            color="info"
             variant="subtle"
           >
             {{ item.name }}
