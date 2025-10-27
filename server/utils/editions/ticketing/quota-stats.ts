@@ -37,7 +37,7 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
         },
       },
     },
-    orderBy: { title: 'asc' },
+    orderBy: { position: 'asc' },
   })
 
   // Récupérer tous les order items avec leurs customFields pour analyser les options
