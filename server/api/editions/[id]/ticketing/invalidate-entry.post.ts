@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 const bodySchema = z.object({
   participantId: z.number(),
-  type: z.enum(['ticket', 'volunteer']).optional().default('volunteer'),
+  type: z.enum(['ticket', 'volunteer', 'artist']).optional().default('volunteer'),
 })
 
 export default defineEventHandler(async (event) => {
@@ -44,6 +44,30 @@ export default defineEventHandler(async (event) => {
       }
 
       await prisma.editionVolunteerApplication.update({
+        where: { id: body.participantId },
+        data: {
+          entryValidated: false,
+          entryValidatedAt: null,
+          entryValidatedBy: null,
+        },
+      })
+    } else if (body.type === 'artist') {
+      // Dévalider l'entrée d'un artiste
+      const artist = await prisma.editionArtist.findFirst({
+        where: {
+          id: body.participantId,
+          editionId: editionId,
+        },
+      })
+
+      if (!artist) {
+        throw createError({
+          statusCode: 404,
+          message: 'Artiste introuvable',
+        })
+      }
+
+      await prisma.editionArtist.update({
         where: { id: body.participantId },
         data: {
           entryValidated: false,

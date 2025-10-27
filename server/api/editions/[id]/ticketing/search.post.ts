@@ -70,6 +70,70 @@ export default defineEventHandler(async (event) => {
       take: 20, // Limiter à 20 résultats
     })
 
+    // Rechercher dans les artistes
+    const artists = await prisma.editionArtist.findMany({
+      where: {
+        editionId: editionId,
+        OR: [
+          {
+            user: {
+              prenom: {
+                contains: searchTerm,
+              },
+            },
+          },
+          {
+            user: {
+              nom: {
+                contains: searchTerm,
+              },
+            },
+          },
+          {
+            user: {
+              email: {
+                contains: searchTerm,
+              },
+            },
+          },
+        ],
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            prenom: true,
+            nom: true,
+            email: true,
+          },
+        },
+        shows: {
+          include: {
+            show: {
+              include: {
+                returnableItems: {
+                  include: {
+                    returnableItem: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      take: 20, // Limiter à 20 résultats
+    })
+
+    // Récupérer les utilisateurs qui ont validé les artistes
+    const artistValidatorIds = artists
+      .filter((a) => a.entryValidatedBy)
+      .map((a) => a.entryValidatedBy!)
+    const artistValidatorUsers = await prisma.user.findMany({
+      where: { id: { in: artistValidatorIds } },
+      select: { id: true, prenom: true, nom: true },
+    })
+    const artistValidatorMap = new Map(artistValidatorUsers.map((u) => [u.id, u]))
+
     // Rechercher dans les bénévoles disponibles pendant l'événement
     // On exclut ceux qui sont uniquement disponibles pour le montage/démontage
     const volunteers = await prisma.editionVolunteerApplication.findMany({
@@ -238,6 +302,30 @@ export default defineEventHandler(async (event) => {
       )
     }
 
+    // Récupérer les articles à restituer pour chaque artiste
+    const returnableItemsByArtistId = new Map<number, Array<{ id: number; name: string }>>()
+
+    for (const artist of artists) {
+      // Récupérer et dédupliquer les articles à restituer depuis tous les spectacles
+      const uniqueItems = new Map()
+      artist.shows.forEach((showArtist) => {
+        showArtist.show.returnableItems.forEach((item) => {
+          if (!uniqueItems.has(item.returnableItem.id)) {
+            uniqueItems.set(item.returnableItem.id, item.returnableItem)
+          }
+        })
+      })
+      const deduplicatedItems = Array.from(uniqueItems.values())
+
+      returnableItemsByArtistId.set(
+        artist.id,
+        deduplicatedItems.map((item) => ({
+          id: item.id,
+          name: item.name,
+        }))
+      )
+    }
+
     const results = {
       tickets: orderItems.map((item) => ({
         type: 'ticket',
@@ -335,7 +423,42 @@ export default defineEventHandler(async (event) => {
           },
         }
       }),
-      total: orderItems.length + volunteers.length,
+      artists: artists.map((artist) => {
+        const validator = artist.entryValidatedBy
+          ? artistValidatorMap.get(artist.entryValidatedBy)
+          : null
+        const returnableItems = returnableItemsByArtistId.get(artist.id) || []
+        return {
+          type: 'artist',
+          participant: {
+            found: true,
+            artist: {
+              id: artist.id,
+              user: {
+                firstName: artist.user.prenom,
+                lastName: artist.user.nom,
+                email: artist.user.email,
+              },
+              shows: artist.shows.map((showArtist) => ({
+                id: showArtist.show.id,
+                title: showArtist.show.title,
+                startDateTime: showArtist.show.startDateTime,
+                location: showArtist.show.location,
+              })),
+              returnableItems: returnableItems,
+              entryValidated: artist.entryValidated,
+              entryValidatedAt: artist.entryValidatedAt,
+              entryValidatedBy: validator
+                ? {
+                    firstName: validator.prenom,
+                    lastName: validator.nom,
+                  }
+                : null,
+            },
+          },
+        }
+      }),
+      total: orderItems.length + volunteers.length + artists.length,
     }
 
     return {

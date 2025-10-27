@@ -187,6 +187,51 @@
                     </div>
                   </div>
 
+                  <!-- Liste des artistes -->
+                  <div
+                    v-if="searchResults.artists && searchResults.artists.length > 0"
+                    class="space-y-2"
+                  >
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                      Artistes ({{ searchResults.artists.length }})
+                    </div>
+                    <div class="space-y-1 max-h-60 overflow-y-auto">
+                      <button
+                        v-for="result in searchResults.artists"
+                        :key="result.participant.artist.id"
+                        class="w-full text-left p-3 bg-gray-50 dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900/20 border-2 border-transparent hover:border-primary-500 rounded-lg transition-all cursor-pointer shadow-sm hover:shadow-md"
+                        @click="selectSearchResult(result)"
+                      >
+                        <div class="flex items-center justify-between">
+                          <div class="flex-1">
+                            <div class="font-medium text-gray-900 dark:text-white">
+                              {{ result.participant.artist.user.firstName }}
+                              {{ result.participant.artist.user.lastName }}
+                            </div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                              {{ result.participant.artist.user.email }}
+                            </div>
+                            <div
+                              v-if="result.participant.artist.shows.length > 0"
+                              class="text-xs text-gray-500 dark:text-gray-500"
+                            >
+                              Spectacle{{ result.participant.artist.shows.length > 1 ? 's' : '' }}:
+                              {{ result.participant.artist.shows.map((s) => s.title).join(', ') }}
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            <UBadge color="yellow">Artiste</UBadge>
+                            <UIcon
+                              v-if="result.participant.artist.entryValidated"
+                              name="i-heroicons-check-circle"
+                              class="text-green-500"
+                            />
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
                   <!-- Liste des bénévoles -->
                   <div v-if="searchResults.volunteers.length > 0" class="space-y-2">
                     <div class="text-sm font-medium text-gray-900 dark:text-white">

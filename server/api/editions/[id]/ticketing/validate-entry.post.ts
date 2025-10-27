@@ -6,7 +6,7 @@ import { z } from 'zod'
 
 const bodySchema = z.object({
   participantIds: z.array(z.number()).min(1),
-  type: z.enum(['ticket', 'volunteer']).optional().default('ticket'),
+  type: z.enum(['ticket', 'volunteer', 'artist']).optional().default('ticket'),
   markAsPaid: z.boolean().optional().default(false),
 })
 
@@ -127,6 +127,27 @@ export default defineEventHandler(async (event) => {
         success: true,
         validated: result.count,
         message: `${result.count} bénévole${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`,
+      }
+    } else if (body.type === 'artist') {
+      // Valider les artistes
+      const result = await prisma.editionArtist.updateMany({
+        where: {
+          id: {
+            in: body.participantIds,
+          },
+          editionId: editionId,
+        },
+        data: {
+          entryValidated: true,
+          entryValidatedAt: new Date(),
+          entryValidatedBy: user.id,
+        },
+      })
+
+      return {
+        success: true,
+        validated: result.count,
+        message: `${result.count} artiste${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`,
       }
     } else {
       // Valider les billets en utilisant l'ID de OrderItem
