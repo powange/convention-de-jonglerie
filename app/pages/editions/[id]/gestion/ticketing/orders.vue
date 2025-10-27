@@ -364,6 +364,24 @@
                     </div>
                     <div
                       v-if="
+                        item.customFields &&
+                        Array.isArray(item.customFields) &&
+                        item.customFields.length > 0
+                      "
+                      class="space-y-0.5 mt-1"
+                    >
+                      <div
+                        v-for="field in item.customFields"
+                        :key="field.name"
+                        class="flex items-start gap-1"
+                      >
+                        <UIcon name="i-heroicons-tag" class="h-3 w-3 inline flex-shrink-0 mt-0.5" />
+                        <span class="font-medium">{{ field.name }} :</span>
+                        <span class="text-gray-500 dark:text-gray-500">{{ field.answer }}</span>
+                      </div>
+                    </div>
+                    <div
+                      v-if="
                         item.qrCode &&
                         item.type !== 'Donation' &&
                         item.type !== 'Membership' &&
