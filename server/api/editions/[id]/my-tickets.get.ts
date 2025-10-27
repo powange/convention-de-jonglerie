@@ -76,6 +76,33 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Récupérer l'artiste de l'utilisateur pour cette édition
+    const artist = await prisma.editionArtist.findFirst({
+      where: {
+        userId: user.id,
+        editionId,
+      },
+      include: {
+        user: true,
+      },
+    })
+
+    if (artist) {
+      allTickets.push({
+        id: artist.id,
+        type: 'artist',
+        firstName: artist.user.prenom,
+        lastName: artist.user.nom,
+        email: artist.user.email,
+        qrCode: `artist-${artist.id}`,
+        tierName: 'Artiste',
+        amount: 0,
+        isHelloAsso: false,
+        entryValidated: artist.entryValidated,
+        entryValidatedAt: artist.entryValidatedAt,
+      })
+    }
+
     return {
       tickets: allTickets,
     }

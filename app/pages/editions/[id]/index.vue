@@ -259,14 +259,9 @@
             </div>
           </UCard>
 
-          <!-- Mon billet (si l'utilisateur est connecté et a un billet) -->
+          <!-- Mon billet (si l'utilisateur est connecté et a un billet, bénévole ou artiste) -->
           <ClientOnly>
             <EditionMyTicketCard v-if="authStore.isAuthenticated" :edition-id="edition.id" />
-          </ClientOnly>
-
-          <!-- Carte artiste (si l'utilisateur est artiste pour cette édition) -->
-          <ClientOnly>
-            <EditionMyArtistCard v-if="authStore.isAuthenticated" :edition-id="edition.id" />
           </ClientOnly>
 
           <EditionParticipantsCard

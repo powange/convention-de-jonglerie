@@ -323,6 +323,9 @@ const showConventionModal = ref(false)
 // État pour vérifier si l'utilisateur est team leader
 const isTeamLeaderValue = ref(false)
 
+// État pour vérifier si l'utilisateur est un bénévole accepté
+const isAcceptedVolunteer = ref(false)
+
 // Description de la convention en HTML (rendu Markdown)
 const conventionDescriptionHtml = computedAsync(async () => {
   if (!props.edition?.convention?.description) {
@@ -381,7 +384,7 @@ const canClaimConvention = computed(() => {
   return !convention.authorId && !!convention.email
 })
 
-// Visibilité onglet bénévoles: ouvert OU utilisateur peut éditer/gérer bénévoles
+// Visibilité onglet bénévoles: ouvert OU utilisateur peut éditer/gérer bénévoles OU utilisateur est bénévole accepté
 const volunteersTabVisible = computed<boolean>(() => {
   if (!props.edition) return false
   // Toujours visible pour les éditeurs et gestionnaires de bénévoles (gestion interne même fermé au public)
@@ -389,6 +392,9 @@ const volunteersTabVisible = computed<boolean>(() => {
     const canEdit = editionStore.canEditEdition(props.edition, authStore.user.id)
     const canManageVolunteers = editionStore.canManageVolunteers(props.edition, authStore.user.id)
     if (canEdit || canManageVolunteers) return true
+
+    // Visible pour les bénévoles acceptés même si les candidatures sont fermées
+    if (isAcceptedVolunteer.value) return true
   }
   // Visible publiquement uniquement si ouvert
   // edition.volunteersOpen peut ne pas encore être dans le type Edition (ajout récent), cast temporaire
@@ -418,8 +424,19 @@ watch(
     // Vérifier si l'utilisateur est team leader quand il se connecte
     if (isAuthenticated && authStore.user?.id && props.edition?.id) {
       isTeamLeaderValue.value = await editionStore.isTeamLeader(props.edition.id, authStore.user.id)
+
+      // Vérifier si l'utilisateur est un bénévole accepté
+      try {
+        const response = await $fetch(
+          `/api/editions/${props.edition.id}/volunteers/applications/status`
+        )
+        isAcceptedVolunteer.value = response.status === 'ACCEPTED'
+      } catch {
+        isAcceptedVolunteer.value = false
+      }
     } else {
       isTeamLeaderValue.value = false
+      isAcceptedVolunteer.value = false
     }
   },
   { immediate: true }

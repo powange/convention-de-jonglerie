@@ -46,7 +46,9 @@
                   name="i-heroicons-check-circle-solid"
                   class="h-4 w-4 text-green-600 dark:text-green-400"
                 />
-                <span class="text-xs font-medium text-green-600 dark:text-green-400">
+                <span
+                  class="text-xs font-medium text-green-600 dark:text-green-400 whitespace-nowrap"
+                >
                   Entrée validée
                 </span>
               </div>
