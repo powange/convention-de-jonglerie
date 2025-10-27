@@ -89,6 +89,59 @@
           />
         </UFormField>
 
+        <!-- Paiement et défraiement -->
+        <div class="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+            {{ $t('edition.artists.payment_section') }}
+          </h3>
+
+          <div class="grid grid-cols-2 gap-4">
+            <UFormField :label="$t('edition.artists.payment_amount')">
+              <UInput
+                v-model="formData.payment"
+                type="number"
+                step="0.01"
+                min="0"
+                :placeholder="$t('edition.artists.payment_amount_placeholder')"
+              >
+                <template #trailing>
+                  <span class="text-gray-500 dark:text-gray-400 text-sm">€</span>
+                </template>
+              </UInput>
+            </UFormField>
+
+            <UFormField :label="$t('edition.artists.payment_status')">
+              <UCheckbox
+                v-model="formData.paymentPaid"
+                :label="$t('edition.artists.payment_paid')"
+              />
+            </UFormField>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <UFormField :label="$t('edition.artists.reimbursement_amount')">
+              <UInput
+                v-model="formData.reimbursement"
+                type="number"
+                step="0.01"
+                min="0"
+                :placeholder="$t('edition.artists.reimbursement_amount_placeholder')"
+              >
+                <template #trailing>
+                  <span class="text-gray-500 dark:text-gray-400 text-sm">€</span>
+                </template>
+              </UInput>
+            </UFormField>
+
+            <UFormField :label="$t('edition.artists.reimbursement_status')">
+              <UCheckbox
+                v-model="formData.reimbursementPaid"
+                :label="$t('edition.artists.reimbursement_paid')"
+              />
+            </UFormField>
+          </div>
+        </div>
+
         <!-- Actions -->
         <div class="flex justify-end gap-2 pt-4">
           <UButton color="neutral" variant="soft" @click="closeModal">
@@ -145,6 +198,10 @@ const formData = ref({
   dietaryPreference: 'NONE',
   allergies: '',
   allergySeverity: null as string | null,
+  payment: '',
+  paymentPaid: false,
+  reimbursement: '',
+  reimbursementPaid: false,
 })
 
 const dietaryOptions = computed(() => [
@@ -214,6 +271,10 @@ const handleSubmit = async () => {
       dietaryPreference: formData.value.dietaryPreference,
       allergies: formData.value.allergies || null,
       allergySeverity: formData.value.allergySeverity,
+      payment: formData.value.payment ? parseFloat(formData.value.payment) : null,
+      paymentPaid: formData.value.paymentPaid,
+      reimbursement: formData.value.reimbursement ? parseFloat(formData.value.reimbursement) : null,
+      reimbursementPaid: formData.value.reimbursementPaid,
     }
 
     if (props.artist) {
@@ -271,6 +332,10 @@ const resetForm = () => {
     dietaryPreference: 'NONE',
     allergies: '',
     allergySeverity: null,
+    payment: '',
+    paymentPaid: false,
+    reimbursement: '',
+    reimbursementPaid: false,
   }
 }
 
@@ -307,6 +372,10 @@ watch(
         dietaryPreference: newArtist.dietaryPreference || 'NONE',
         allergies: newArtist.allergies || '',
         allergySeverity: newArtist.allergySeverity || null,
+        payment: newArtist.payment ? newArtist.payment.toString() : '',
+        paymentPaid: newArtist.paymentPaid || false,
+        reimbursement: newArtist.reimbursement ? newArtist.reimbursement.toString() : '',
+        reimbursementPaid: newArtist.reimbursementPaid || false,
       }
     } else {
       resetForm()

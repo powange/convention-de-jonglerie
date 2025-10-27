@@ -1156,6 +1156,10 @@ model EditionArtist {
   entryValidated      Boolean           @default(false)
   entryValidatedAt    DateTime?
   entryValidatedBy    Int?
+  payment             Decimal?          @db.Decimal(10, 2)
+  paymentPaid         Boolean           @default(false)
+  reimbursement       Decimal?          @db.Decimal(10, 2)
+  reimbursementPaid   Boolean           @default(false)
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 

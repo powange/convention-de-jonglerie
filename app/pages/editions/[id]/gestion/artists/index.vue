@@ -93,6 +93,16 @@
                   {{ $t('edition.artists.shows') }}
                 </th>
                 <th
+                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  {{ $t('edition.artists.payment_amount') }}
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  {{ $t('edition.artists.reimbursement_amount') }}
+                </th>
+                <th
                   v-if="canEdit"
                   class="px-4 py-3 text-right text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
@@ -136,6 +146,32 @@
                     </UBadge>
                   </div>
                   <span v-else class="text-gray-400">{{ $t('edition.artists.no_shows') }}</span>
+                </td>
+                <td class="px-4 py-3 text-sm">
+                  <div v-if="artist.payment" class="flex items-center gap-2">
+                    <span class="font-medium">{{ artist.payment }}€</span>
+                    <UBadge
+                      :color="artist.paymentPaid ? 'success' : 'warning'"
+                      variant="soft"
+                      size="sm"
+                    >
+                      {{ artist.paymentPaid ? '✓' : '○' }}
+                    </UBadge>
+                  </div>
+                  <span v-else class="text-gray-400">-</span>
+                </td>
+                <td class="px-4 py-3 text-sm">
+                  <div v-if="artist.reimbursement" class="flex items-center gap-2">
+                    <span class="font-medium">{{ artist.reimbursement }}€</span>
+                    <UBadge
+                      :color="artist.reimbursementPaid ? 'success' : 'warning'"
+                      variant="soft"
+                      size="sm"
+                    >
+                      {{ artist.reimbursementPaid ? '✓' : '○' }}
+                    </UBadge>
+                  </div>
+                  <span v-else class="text-gray-400">-</span>
                 </td>
                 <td v-if="canEdit" class="px-4 py-3 text-sm text-right">
                   <div class="flex items-center justify-end gap-2">

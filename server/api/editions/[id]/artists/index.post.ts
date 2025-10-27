@@ -13,6 +13,10 @@ const artistSchema = z.object({
   dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).default('NONE'),
   allergies: z.string().optional().nullable(),
   allergySeverity: z.enum(['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']).optional().nullable(),
+  payment: z.number().optional().nullable(),
+  paymentPaid: z.boolean().optional(),
+  reimbursement: z.number().optional().nullable(),
+  reimbursementPaid: z.boolean().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -119,6 +123,10 @@ export default defineEventHandler(async (event) => {
         dietaryPreference: validatedData.dietaryPreference,
         allergies: validatedData.allergies,
         allergySeverity: validatedData.allergySeverity,
+        payment: validatedData.payment,
+        paymentPaid: validatedData.paymentPaid ?? false,
+        reimbursement: validatedData.reimbursement,
+        reimbursementPaid: validatedData.reimbursementPaid ?? false,
       },
       include: {
         user: {
