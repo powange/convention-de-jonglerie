@@ -93,6 +93,11 @@
                   {{ $t('edition.artists.departure') }}
                 </th>
                 <th
+                  class="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  {{ $t('edition.artists.meals.title') }}
+                </th>
+                <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                   {{ $t('edition.artists.shows') }}
@@ -105,7 +110,7 @@
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('edition.artists.reimbursement_amount') }}
+                  {{ $t('edition.artists.reimbursement_max_actual') }}
                 </th>
                 <th
                   v-if="canEdit"
@@ -147,6 +152,84 @@
                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                   {{ artist.departureDateTime ? formatDateTime(artist.departureDateTime) : '-' }}
                 </td>
+                <td class="px-4 py-3 text-sm text-center">
+                  <UPopover mode="hover" :open-delay="200">
+                    <UBadge
+                      :color="
+                        artist.mealSelections && artist.mealSelections.length > 0
+                          ? 'primary'
+                          : 'neutral'
+                      "
+                      variant="soft"
+                      class="cursor-help"
+                    >
+                      {{ artist.mealSelections?.length || 0 }}
+                    </UBadge>
+                    <template #content>
+                      <div class="p-4 min-w-[250px]">
+                        <div class="flex items-center justify-between mb-3">
+                          <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
+                            {{ $t('edition.artists.meals.title') }}
+                          </h3>
+                          <UButton
+                            icon="i-heroicons-pencil-square"
+                            color="primary"
+                            variant="ghost"
+                            size="xs"
+                            :title="$t('edition.artists.meals.manage_meals')"
+                            @click="openMealsModal(artist)"
+                          />
+                        </div>
+                        <div
+                          v-if="artist.mealSelections && artist.mealSelections.length > 0"
+                          class="space-y-2"
+                        >
+                          <div
+                            v-for="selection in artist.mealSelections"
+                            :key="selection.id"
+                            class="flex items-center justify-between text-xs"
+                          >
+                            <div class="flex items-center gap-2">
+                              <UIcon
+                                :name="
+                                  selection.meal.mealType === 'BREAKFAST'
+                                    ? 'i-heroicons-sun'
+                                    : selection.meal.mealType === 'LUNCH'
+                                      ? 'i-heroicons-cake'
+                                      : 'i-heroicons-moon'
+                                "
+                                class="h-4 w-4 text-gray-500"
+                              />
+                              <span class="text-gray-700 dark:text-gray-300">
+                                {{
+                                  new Date(selection.meal.date).toLocaleDateString('fr-FR', {
+                                    weekday: 'short',
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                  })
+                                }}
+                                -
+                                {{
+                                  $t(`common.meal_types.${selection.meal.mealType.toLowerCase()}`)
+                                }}
+                              </span>
+                            </div>
+                            <UBadge
+                              :color="selection.accepted ? 'success' : 'neutral'"
+                              variant="soft"
+                              size="xs"
+                            >
+                              {{ selection.accepted ? '✓' : '○' }}
+                            </UBadge>
+                          </div>
+                        </div>
+                        <p v-else class="text-sm text-gray-500 dark:text-gray-400 italic">
+                          Aucun repas configuré
+                        </p>
+                      </div>
+                    </template>
+                  </UPopover>
+                </td>
                 <td class="px-4 py-3 text-sm">
                   <div v-if="artist.shows && artist.shows.length > 0" class="flex flex-wrap gap-1">
                     <UBadge
@@ -175,15 +258,25 @@
                   <span v-else class="text-gray-400">-</span>
                 </td>
                 <td class="px-4 py-3 text-sm">
-                  <div v-if="artist.reimbursement" class="flex items-center gap-2">
-                    <span class="font-medium">{{ artist.reimbursement }}€</span>
-                    <UBadge
-                      :color="artist.reimbursementPaid ? 'success' : 'warning'"
-                      variant="soft"
-                      size="sm"
-                    >
-                      {{ artist.reimbursementPaid ? '✓' : '○' }}
-                    </UBadge>
+                  <div
+                    v-if="artist.reimbursementMax || artist.reimbursementActual"
+                    class="space-y-1"
+                  >
+                    <div v-if="artist.reimbursementMax" class="flex items-center gap-2">
+                      <span class="text-xs text-gray-500">Max:</span>
+                      <span class="font-medium">{{ artist.reimbursementMax }}€</span>
+                    </div>
+                    <div v-if="artist.reimbursementActual" class="flex items-center gap-2">
+                      <span class="text-xs text-gray-500">Réel:</span>
+                      <span class="font-medium">{{ artist.reimbursementActual }}€</span>
+                      <UBadge
+                        :color="artist.reimbursementActualPaid ? 'success' : 'warning'"
+                        variant="soft"
+                        size="sm"
+                      >
+                        {{ artist.reimbursementActualPaid ? '✓' : '○' }}
+                      </UBadge>
+                    </div>
                   </div>
                   <span v-else class="text-gray-400">-</span>
                 </td>
@@ -220,14 +313,6 @@
                 </td>
                 <td v-if="canEdit" class="px-4 py-3 text-sm text-right">
                   <div class="flex items-center justify-end gap-2">
-                    <UButton
-                      icon="i-heroicons-cake"
-                      color="primary"
-                      variant="ghost"
-                      size="sm"
-                      :title="$t('edition.artists.meals.manage_meals')"
-                      @click="openMealsModal(artist)"
-                    />
                     <UButton
                       icon="i-heroicons-pencil"
                       color="primary"
@@ -406,7 +491,8 @@ const openMealsModal = (artist: any) => {
 
 // Gérer la sauvegarde des repas
 const handleMealsSaved = () => {
-  // On pourrait rafraîchir les artistes si on veut afficher des infos sur les repas
+  // Rafraîchir les artistes pour obtenir les repas mis à jour
+  fetchArtists()
   toast.add({
     title: t('edition.artists.meals.meals_updated'),
     color: 'success',

@@ -46,6 +46,19 @@ export default defineEventHandler(async (event) => {
             },
           },
         },
+        mealSelections: {
+          include: {
+            meal: {
+              select: {
+                id: true,
+                date: true,
+                mealType: true,
+                phase: true,
+              },
+            },
+          },
+          orderBy: [{ meal: { date: 'asc' } }, { meal: { mealType: 'asc' } }],
+        },
       },
       orderBy: {
         createdAt: 'desc',

@@ -15,8 +15,9 @@ const artistSchema = z.object({
   allergySeverity: z.enum(['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']).optional().nullable(),
   payment: z.number().optional().nullable(),
   paymentPaid: z.boolean().optional(),
-  reimbursement: z.number().optional().nullable(),
-  reimbursementPaid: z.boolean().optional(),
+  reimbursementMax: z.number().optional().nullable(),
+  reimbursementActual: z.number().optional().nullable(),
+  reimbursementActualPaid: z.boolean().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -126,8 +127,9 @@ export default defineEventHandler(async (event) => {
         allergySeverity: validatedData.allergySeverity,
         payment: validatedData.payment,
         paymentPaid: validatedData.paymentPaid ?? false,
-        reimbursement: validatedData.reimbursement,
-        reimbursementPaid: validatedData.reimbursementPaid ?? false,
+        reimbursementMax: validatedData.reimbursementMax,
+        reimbursementActual: validatedData.reimbursementActual,
+        reimbursementActualPaid: validatedData.reimbursementActualPaid ?? false,
       },
       include: {
         user: {

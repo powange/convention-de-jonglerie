@@ -17,5 +17,5 @@ Artistes : nom et description des numéros pour gala
 Artistes : préférence repas avant/après spectacle
 Artistes : workshop proposé (oui/non + description)
 Artistes : commentaire particulier visible par l'artiste
-Ajouter le nombre achetés sur les tarifs
+Ajouter le nombre achetés sur les tarifs {cm:2025-10-27}
 Modifier le tableau des commandes pour afficher les statistiques

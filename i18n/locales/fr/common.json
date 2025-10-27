@@ -301,5 +301,10 @@
     "name_min_3": "Le nom doit contenir au moins 3 caractères",
     "phone_required": "Le numéro de téléphone est requis",
     "program_max_10000": "Le programme ne peut pas dépasser 10000 caractères"
+  },
+  "meal_types": {
+    "breakfast": "Petit-déjeuner",
+    "lunch": "Déjeuner",
+    "dinner": "Dîner"
   }
 }

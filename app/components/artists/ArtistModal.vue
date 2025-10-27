@@ -164,13 +164,13 @@
           </div>
 
           <div class="grid grid-cols-2 gap-4">
-            <UFormField :label="$t('edition.artists.reimbursement_amount')">
+            <UFormField :label="$t('edition.artists.reimbursement_max')">
               <UInput
-                v-model="formData.reimbursement"
+                v-model="formData.reimbursementMax"
                 type="number"
                 step="0.01"
                 min="0"
-                :placeholder="$t('edition.artists.reimbursement_amount_placeholder')"
+                :placeholder="$t('edition.artists.reimbursement_max_placeholder')"
               >
                 <template #trailing>
                   <span class="text-gray-500 dark:text-gray-400 text-sm">€</span>
@@ -178,9 +178,26 @@
               </UInput>
             </UFormField>
 
+            <UFormField :label="$t('edition.artists.reimbursement_actual')">
+              <UInput
+                v-model="formData.reimbursementActual"
+                type="number"
+                step="0.01"
+                min="0"
+                :placeholder="$t('edition.artists.reimbursement_actual_placeholder')"
+              >
+                <template #trailing>
+                  <span class="text-gray-500 dark:text-gray-400 text-sm">€</span>
+                </template>
+              </UInput>
+            </UFormField>
+          </div>
+
+          <div v-if="formData.reimbursementActual" class="grid grid-cols-2 gap-4">
+            <div></div>
             <UFormField :label="$t('edition.artists.reimbursement_status')">
               <UCheckbox
-                v-model="formData.reimbursementPaid"
+                v-model="formData.reimbursementActualPaid"
                 :label="$t('edition.artists.reimbursement_paid')"
               />
             </UFormField>
@@ -246,8 +263,9 @@ const formData = ref({
   allergySeverity: null as string | null,
   payment: '',
   paymentPaid: false,
-  reimbursement: '',
-  reimbursementPaid: false,
+  reimbursementMax: '',
+  reimbursementActual: '',
+  reimbursementActualPaid: false,
 })
 
 // Vérifier si l'utilisateur est créé manuellement (authProvider = MANUAL)
@@ -324,8 +342,13 @@ const handleSubmit = async () => {
       allergySeverity: formData.value.allergySeverity,
       payment: formData.value.payment ? parseFloat(formData.value.payment) : null,
       paymentPaid: formData.value.paymentPaid,
-      reimbursement: formData.value.reimbursement ? parseFloat(formData.value.reimbursement) : null,
-      reimbursementPaid: formData.value.reimbursementPaid,
+      reimbursementMax: formData.value.reimbursementMax
+        ? parseFloat(formData.value.reimbursementMax)
+        : null,
+      reimbursementActual: formData.value.reimbursementActual
+        ? parseFloat(formData.value.reimbursementActual)
+        : null,
+      reimbursementActualPaid: formData.value.reimbursementActualPaid,
     }
 
     if (props.artist) {
@@ -394,8 +417,9 @@ const resetForm = () => {
     allergySeverity: null,
     payment: '',
     paymentPaid: false,
-    reimbursement: '',
-    reimbursementPaid: false,
+    reimbursementMax: '',
+    reimbursementActual: '',
+    reimbursementActualPaid: false,
   }
 }
 
@@ -435,8 +459,11 @@ watch(
         allergySeverity: newArtist.allergySeverity || null,
         payment: newArtist.payment ? newArtist.payment.toString() : '',
         paymentPaid: newArtist.paymentPaid || false,
-        reimbursement: newArtist.reimbursement ? newArtist.reimbursement.toString() : '',
-        reimbursementPaid: newArtist.reimbursementPaid || false,
+        reimbursementMax: newArtist.reimbursementMax ? newArtist.reimbursementMax.toString() : '',
+        reimbursementActual: newArtist.reimbursementActual
+          ? newArtist.reimbursementActual.toString()
+          : '',
+        reimbursementActualPaid: newArtist.reimbursementActualPaid || false,
       }
     } else {
       resetForm()

@@ -1,4 +1,5 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { canEditEdition } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
@@ -22,15 +23,18 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Vérifier que l'utilisateur a les permissions pour gérer cet artiste
+    // Vérifier que l'utilisateur a les permissions pour éditer cette édition
     const edition = await prisma.edition.findUnique({
       where: { id: editionId },
       include: {
         convention: {
           include: {
-            collaborators: {
-              where: { userId: user.id },
-            },
+            collaborators: true,
+          },
+        },
+        collaboratorPermissions: {
+          include: {
+            collaborator: true,
           },
         },
       },
@@ -40,20 +44,10 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 404, message: 'Édition introuvable' })
     }
 
-    const isCreator = edition.convention.creatorId === user.id
-    const isCollaborator = edition.convention.collaborators.length > 0
-    const hasPermission =
-      user.isGlobalAdmin ||
-      isCreator ||
-      (isCollaborator &&
-        edition.convention.collaborators[0].rights.some(
-          (r: any) => r === 'MANAGE_ARTISTS' || r === 'FULL_ACCESS'
-        ))
-
-    if (!hasPermission) {
+    if (!canEditEdition(edition, user)) {
       throw createError({
         statusCode: 403,
-        message: "Vous n'avez pas la permission de gérer les artistes",
+        message: "Vous n'êtes pas autorisé à gérer les artistes de cette édition",
       })
     }
 

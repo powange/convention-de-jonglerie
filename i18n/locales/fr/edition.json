@@ -757,6 +757,7 @@
       "list_title": "Gestion des artistes",
       "manage_artists_description": "Gérez les artistes invités à cette édition",
       "meals": {
+        "title": "Repas",
         "manage_meals": "Gérer les repas",
         "meals_updated": "Repas mis à jour avec succès"
       },
@@ -780,6 +781,11 @@
       "qr_code_instructions": "Présentez ce code QR à l'entrée pour accéder à votre espace artiste",
       "reimbursement_amount": "Montant du défraiement",
       "reimbursement_amount_placeholder": "Ex: 50.00",
+      "reimbursement_max": "Défraiement maximum",
+      "reimbursement_max_placeholder": "Ex: 100.00",
+      "reimbursement_actual": "Défraiement réel",
+      "reimbursement_actual_placeholder": "Ex: 75.00",
+      "reimbursement_max_actual": "Défraiement Max / Réel",
       "reimbursement_paid": "Défraiement remboursé",
       "reimbursement_status": "Statut du défraiement",
       "qr_code_instructions_title": "Comment utiliser votre QR Code",
