@@ -73,10 +73,20 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Mettre à jour la date de dernière connexion
+    // Mettre à jour la date de dernière connexion et le authProvider si nécessaire
+    const updateData: { lastLoginAt: Date; authProvider?: string } = {
+      lastLoginAt: new Date(),
+    }
+
+    // Si l'utilisateur a été créé manuellement (authProvider = MANUAL),
+    // on met à jour son authProvider vers 'email' lors de sa première connexion
+    if (user.authProvider === 'MANUAL') {
+      updateData.authProvider = 'email'
+    }
+
     await prisma.user.update({
       where: { id: user.id },
-      data: { lastLoginAt: new Date() },
+      data: updateData,
     })
 
     // Définir la session côté serveur (cookies scellés via nuxt-auth-utils)

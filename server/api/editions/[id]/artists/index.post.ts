@@ -90,6 +90,7 @@ export default defineEventHandler(async (event) => {
             nom: validatedData.nom,
             pseudo: `${validatedData.prenom.toLowerCase()}_${validatedData.nom.toLowerCase()}_${Date.now()}`,
             isEmailVerified: false,
+            authProvider: 'MANUAL', // Utilisateur créé manuellement
           },
         })
         targetUserId = newUser.id

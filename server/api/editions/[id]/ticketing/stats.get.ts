@@ -48,8 +48,44 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    // Compter les validations de bénévoles
+    // Compter les validations de bénévoles (uniquement ACCEPTED et disponibles pendant l'événement)
     const volunteersValidatedToday = await prisma.editionVolunteerApplication.count({
+      where: {
+        editionId: editionId,
+        status: 'ACCEPTED',
+        entryValidated: true,
+        entryValidatedAt: {
+          gte: today,
+        },
+        OR: [
+          {
+            eventAvailability: true,
+          },
+          {
+            eventAvailability: null, // Inclure les anciens bénévoles (avant l'ajout de ce champ)
+          },
+        ],
+      },
+    })
+
+    const totalVolunteersValidated = await prisma.editionVolunteerApplication.count({
+      where: {
+        editionId: editionId,
+        status: 'ACCEPTED',
+        entryValidated: true,
+        OR: [
+          {
+            eventAvailability: true,
+          },
+          {
+            eventAvailability: null, // Inclure les anciens bénévoles (avant l'ajout de ce champ)
+          },
+        ],
+      },
+    })
+
+    // Compter les validations d'artistes
+    const artistsValidatedToday = await prisma.editionArtist.count({
       where: {
         editionId: editionId,
         entryValidated: true,
@@ -59,7 +95,7 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    const totalVolunteersValidated = await prisma.editionVolunteerApplication.count({
+    const totalArtistsValidated = await prisma.editionArtist.count({
       where: {
         editionId: editionId,
         entryValidated: true,
@@ -88,20 +124,37 @@ export default defineEventHandler(async (event) => {
       where: {
         editionId: editionId,
         status: 'ACCEPTED',
+        OR: [
+          {
+            eventAvailability: true,
+          },
+          {
+            eventAvailability: null, // Inclure les anciens bénévoles (avant l'ajout de ce champ)
+          },
+        ],
+      },
+    })
+
+    const totalArtists = await prisma.editionArtist.count({
+      where: {
+        editionId: editionId,
       },
     })
 
     return {
       success: true,
       stats: {
-        validatedToday: ticketsValidatedToday + volunteersValidatedToday,
-        totalValidated: totalTicketsValidated + totalVolunteersValidated,
+        validatedToday: ticketsValidatedToday + volunteersValidatedToday + artistsValidatedToday,
+        totalValidated: totalTicketsValidated + totalVolunteersValidated + totalArtistsValidated,
         ticketsValidated: totalTicketsValidated,
         volunteersValidated: totalVolunteersValidated,
+        artistsValidated: totalArtistsValidated,
         ticketsValidatedToday: ticketsValidatedToday,
         volunteersValidatedToday: volunteersValidatedToday,
+        artistsValidatedToday: artistsValidatedToday,
         totalTickets: totalTickets,
         totalVolunteers: totalVolunteers,
+        totalArtists: totalArtists,
       },
     }
   } catch (error: unknown) {

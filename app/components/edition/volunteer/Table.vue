@@ -1806,6 +1806,17 @@ function getRowItems(row: TableRow<any>): ContextMenuItem[] {
           decideApplication(row.original, 'REJECTED')
         },
       })
+      if (row.original.source === 'MANUAL') {
+        items.push({ type: 'separator' })
+        items.push({
+          label: t('editions.volunteers.action_delete'),
+          icon: 'i-heroicons-trash',
+          color: 'error',
+          onSelect() {
+            confirmDeleteApplication(row.original)
+          },
+        })
+      }
     }
 
     if (row.original.status === 'ACCEPTED') {
@@ -1828,6 +1839,17 @@ function getRowItems(row: TableRow<any>): ContextMenuItem[] {
           confirmBackToPending(row.original)
         },
       })
+      if (row.original.source === 'MANUAL') {
+        items.push({ type: 'separator' })
+        items.push({
+          label: t('editions.volunteers.action_delete'),
+          icon: 'i-heroicons-trash',
+          color: 'error',
+          onSelect() {
+            confirmDeleteApplication(row.original)
+          },
+        })
+      }
     } else if (row.original.status === 'REJECTED') {
       items.push({ type: 'separator' })
       items.push({
@@ -1840,6 +1862,17 @@ function getRowItems(row: TableRow<any>): ContextMenuItem[] {
           confirmBackToPending(row.original)
         },
       })
+      if (row.original.source === 'MANUAL') {
+        items.push({ type: 'separator' })
+        items.push({
+          label: t('editions.volunteers.action_delete'),
+          icon: 'i-heroicons-trash',
+          color: 'error',
+          onSelect() {
+            confirmDeleteApplication(row.original)
+          },
+        })
+      }
     }
   } else {
     items.push({

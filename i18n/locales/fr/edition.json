@@ -777,6 +777,8 @@
       "title": "Artistes",
       "user_email": "Email",
       "user_firstname": "Prénom",
+      "user_info": "Informations de l'utilisateur",
+      "user_info_readonly": "Les informations de l'utilisateur ne peuvent pas être modifiées car il ne s'agit pas d'un utilisateur créé manuellement",
       "user_lastname": "Nom"
     },
     "shows": {

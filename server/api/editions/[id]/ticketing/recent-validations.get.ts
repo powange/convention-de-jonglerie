@@ -77,6 +77,33 @@ export default defineEventHandler(async (event) => {
       },
     })
 
+    // Récupérer les validations d'artistes
+    const artistValidations = await prisma.editionArtist.findMany({
+      where: {
+        editionId: editionId,
+        entryValidated: true,
+        entryValidatedAt: {
+          not: null,
+        },
+      },
+      orderBy: {
+        entryValidatedAt: 'desc',
+      },
+      take: 10,
+      select: {
+        id: true,
+        entryValidatedAt: true,
+        entryValidatedBy: true,
+        user: {
+          select: {
+            prenom: true,
+            nom: true,
+            email: true,
+          },
+        },
+      },
+    })
+
     // Fusionner et trier les validations
     const allValidations = [
       ...ticketValidations.map((v) => ({
@@ -96,6 +123,16 @@ export default defineEventHandler(async (event) => {
         lastName: v.user.nom,
         email: v.user.email,
         name: 'Bénévole',
+        entryValidatedAt: v.entryValidatedAt,
+        entryValidatedBy: v.entryValidatedBy,
+      })),
+      ...artistValidations.map((v) => ({
+        id: v.id,
+        type: 'artist' as const,
+        firstName: v.user.prenom,
+        lastName: v.user.nom,
+        email: v.user.email,
+        name: 'Artiste',
         entryValidatedAt: v.entryValidatedAt,
         entryValidatedBy: v.entryValidatedBy,
       })),

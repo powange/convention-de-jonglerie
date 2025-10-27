@@ -13,6 +13,11 @@ const updateArtistSchema = z.object({
   paymentPaid: z.boolean().optional(),
   reimbursement: z.number().optional().nullable(),
   reimbursementPaid: z.boolean().optional(),
+  // Champs utilisateur (modifiables uniquement si authProvider = MANUAL)
+  userEmail: z.string().email().optional(),
+  userPrenom: z.string().min(1).optional(),
+  userNom: z.string().min(1).optional(),
+  userPhone: z.string().optional().nullable(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -63,6 +68,14 @@ export default defineEventHandler(async (event) => {
         id: artistId,
         editionId,
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            authProvider: true,
+          },
+        },
+      },
     })
 
     if (!existingArtist) {
@@ -74,6 +87,42 @@ export default defineEventHandler(async (event) => {
 
     const body = await readBody(event)
     const validatedData = updateArtistSchema.parse(body)
+
+    // Vérifier si des modifications d'utilisateur sont demandées
+    const hasUserUpdates =
+      validatedData.userEmail ||
+      validatedData.userPrenom ||
+      validatedData.userNom ||
+      validatedData.userPhone !== undefined
+
+    // Si des modifications d'utilisateur sont demandées, vérifier que authProvider = MANUAL
+    if (hasUserUpdates && existingArtist.user.authProvider !== 'MANUAL') {
+      throw createError({
+        statusCode: 403,
+        message:
+          "Les informations de l'utilisateur ne peuvent être modifiées que pour les utilisateurs créés manuellement",
+      })
+    }
+
+    // Mettre à jour l'utilisateur si authProvider = MANUAL et que des modifications sont demandées
+    if (hasUserUpdates && existingArtist.user.authProvider === 'MANUAL') {
+      const userUpdateData: {
+        email?: string
+        prenom?: string
+        nom?: string
+        phone?: string | null
+      } = {}
+
+      if (validatedData.userEmail) userUpdateData.email = validatedData.userEmail
+      if (validatedData.userPrenom) userUpdateData.prenom = validatedData.userPrenom
+      if (validatedData.userNom) userUpdateData.nom = validatedData.userNom
+      if (validatedData.userPhone !== undefined) userUpdateData.phone = validatedData.userPhone
+
+      await prisma.user.update({
+        where: { id: existingArtist.user.id },
+        data: userUpdateData,
+      })
+    }
 
     // Mettre à jour l'artiste
     const updatedArtist = await prisma.editionArtist.update({
@@ -97,6 +146,7 @@ export default defineEventHandler(async (event) => {
             prenom: true,
             nom: true,
             phone: true,
+            authProvider: true,
           },
         },
         shows: {

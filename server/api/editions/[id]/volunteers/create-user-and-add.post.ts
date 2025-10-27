@@ -246,7 +246,7 @@ export default defineEventHandler(async (event) => {
         pseudo,
         nom: cleanNom,
         prenom: cleanPrenom,
-        authProvider: 'email',
+        authProvider: 'MANUAL', // Utilisateur créé manuellement
         isEmailVerified: false,
         emailVerificationCode: verificationCode,
         verificationCodeExpiry: verificationExpiry,

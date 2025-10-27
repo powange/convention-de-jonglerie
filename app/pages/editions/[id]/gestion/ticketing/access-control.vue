@@ -434,10 +434,13 @@ const stats = ref({
   totalValidated: 0,
   ticketsValidated: 0,
   volunteersValidated: 0,
+  artistsValidated: 0,
   ticketsValidatedToday: 0,
   volunteersValidatedToday: 0,
+  artistsValidatedToday: 0,
   totalTickets: 0,
   totalVolunteers: 0,
+  totalArtists: 0,
 })
 
 onMounted(async () => {

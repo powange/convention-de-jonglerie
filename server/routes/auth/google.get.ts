@@ -154,10 +154,20 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Mettre à jour la date de dernière connexion
+  // Mettre à jour la date de dernière connexion et le authProvider si nécessaire
+  const updateData: { lastLoginAt: Date; authProvider?: string } = {
+    lastLoginAt: new Date(),
+  }
+
+  // Si l'utilisateur a été créé manuellement (authProvider = MANUAL),
+  // on met à jour son authProvider vers 'google' lors de sa première connexion
+  if (dbUser.authProvider === 'MANUAL') {
+    updateData.authProvider = 'google'
+  }
+
   await prisma.user.update({
     where: { id: dbUser.id },
-    data: { lastLoginAt: new Date() },
+    data: updateData,
   })
 
   // Ouvrir la session utilisateur

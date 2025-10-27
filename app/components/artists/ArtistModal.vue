@@ -2,7 +2,7 @@
   <UModal v-model:open="isOpen" :title="title">
     <template #body>
       <form class="space-y-4" @submit.prevent="handleSubmit">
-        <!-- Sélection utilisateur existant OU création nouveau -->
+        <!-- Sélection utilisateur existant OU création nouveau (mode ajout) -->
         <div v-if="!artist" class="space-y-4">
           <UFormField :label="$t('edition.artists.search_user')">
             <UserSelector
@@ -50,6 +50,51 @@
               :disabled="!!selectedUser"
             />
           </UFormField>
+        </div>
+
+        <!-- Informations utilisateur (mode édition) -->
+        <div v-else class="space-y-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+            {{ $t('edition.artists.user_info') }}
+          </h3>
+
+          <UFormField :label="$t('edition.artists.user_email')">
+            <UInput
+              v-model="formData.email"
+              type="email"
+              :placeholder="$t('edition.artists.user_email')"
+              :disabled="!isManualUser"
+            />
+          </UFormField>
+
+          <UFormField :label="$t('edition.artists.user_firstname')">
+            <UInput
+              v-model="formData.prenom"
+              :placeholder="$t('edition.artists.user_firstname')"
+              :disabled="!isManualUser"
+            />
+          </UFormField>
+
+          <UFormField :label="$t('edition.artists.user_lastname')">
+            <UInput
+              v-model="formData.nom"
+              :placeholder="$t('edition.artists.user_lastname')"
+              :disabled="!isManualUser"
+            />
+          </UFormField>
+
+          <UFormField :label="$t('editions.ticketing.phone')">
+            <UInput
+              v-model="formData.phone"
+              type="tel"
+              :placeholder="$t('editions.ticketing.phone')"
+              :disabled="!isManualUser"
+            />
+          </UFormField>
+
+          <div v-if="!isManualUser" class="text-xs text-gray-500 dark:text-gray-400">
+            {{ $t('edition.artists.user_info_readonly') }}
+          </div>
         </div>
 
         <!-- Informations artiste -->
@@ -193,6 +238,7 @@ const formData = ref({
   email: '',
   prenom: '',
   nom: '',
+  phone: '',
   arrivalDateTime: '',
   departureDateTime: '',
   dietaryPreference: 'NONE',
@@ -202,6 +248,11 @@ const formData = ref({
   paymentPaid: false,
   reimbursement: '',
   reimbursementPaid: false,
+})
+
+// Vérifier si l'utilisateur est créé manuellement (authProvider = MANUAL)
+const isManualUser = computed(() => {
+  return props.artist && props.artist.user && props.artist.user.authProvider === 'MANUAL'
 })
 
 const dietaryOptions = computed(() => [
@@ -279,6 +330,14 @@ const handleSubmit = async () => {
 
     if (props.artist) {
       // Mode modification
+      // Ajouter les champs user si l'utilisateur est MANUAL
+      if (isManualUser.value) {
+        payload.userEmail = formData.value.email
+        payload.userPrenom = formData.value.prenom
+        payload.userNom = formData.value.nom
+        payload.userPhone = formData.value.phone || null
+      }
+
       await $fetch(`/api/editions/${props.editionId}/artists/${props.artist.id}`, {
         method: 'PUT',
         body: payload,
@@ -327,6 +386,7 @@ const resetForm = () => {
     email: '',
     prenom: '',
     nom: '',
+    phone: '',
     arrivalDateTime: '',
     departureDateTime: '',
     dietaryPreference: 'NONE',
@@ -364,9 +424,10 @@ watch(
   (newArtist) => {
     if (newArtist) {
       formData.value = {
-        email: '',
-        prenom: '',
-        nom: '',
+        email: newArtist.user?.email || '',
+        prenom: newArtist.user?.prenom || '',
+        nom: newArtist.user?.nom || '',
+        phone: newArtist.user?.phone || '',
         arrivalDateTime: toDateTimeLocal(newArtist.arrivalDateTime),
         departureDateTime: toDateTimeLocal(newArtist.departureDateTime),
         dietaryPreference: newArtist.dietaryPreference || 'NONE',
