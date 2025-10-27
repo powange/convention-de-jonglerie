@@ -1,0 +1,150 @@
+import { requireAuth } from '@@/server/utils/auth-utils'
+import { prisma } from '@@/server/utils/prisma'
+
+export default defineEventHandler(async (event) => {
+  const user = requireAuth(event)
+
+  const editionId = parseInt(getRouterParam(event, 'id') || '0')
+  if (!editionId) throw createError({ statusCode: 400, message: 'Edition invalide' })
+
+  try {
+    // Récupérer le bénévole
+    const volunteer = await prisma.editionVolunteerApplication.findUnique({
+      where: {
+        editionId_userId: {
+          editionId,
+          userId: user.id,
+        },
+      },
+      select: {
+        id: true,
+        status: true,
+        setupAvailability: true,
+        teardownAvailability: true,
+        eventAvailability: true,
+        arrivalDateTime: true,
+        departureDateTime: true,
+      },
+    })
+
+    if (!volunteer) {
+      throw createError({
+        statusCode: 404,
+        message: "Vous n'êtes pas bénévole pour cette édition",
+      })
+    }
+
+    if (volunteer.status !== 'ACCEPTED') {
+      throw createError({
+        statusCode: 403,
+        message: "Votre candidature n'a pas encore été acceptée",
+      })
+    }
+
+    // Récupérer tous les repas activés pour l'édition
+    const allMeals = await prisma.volunteerMeal.findMany({
+      where: {
+        editionId,
+        enabled: true,
+      },
+      orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
+    })
+
+    // Filtrer les repas selon les disponibilités du bénévole
+    const filteredMeals = allMeals.filter((meal) => {
+      // Filtrer par phase selon les disponibilités
+      if (meal.phase === 'SETUP' && !volunteer.setupAvailability) return false
+      if (meal.phase === 'TEARDOWN' && !volunteer.teardownAvailability) return false
+      if (meal.phase === 'EVENT' && !volunteer.eventAvailability) return false
+
+      // Filtrer par dates d'arrivée et de départ si renseignées
+      const mealDate = new Date(meal.date)
+      mealDate.setUTCHours(0, 0, 0, 0)
+
+      if (volunteer.arrivalDateTime) {
+        const arrivalDate = new Date(volunteer.arrivalDateTime)
+        arrivalDate.setUTCHours(0, 0, 0, 0)
+        if (mealDate < arrivalDate) return false
+      }
+
+      if (volunteer.departureDateTime) {
+        const departureDate = new Date(volunteer.departureDateTime)
+        departureDate.setUTCHours(0, 0, 0, 0)
+        if (mealDate > departureDate) return false
+      }
+
+      return true
+    })
+
+    // Récupérer les sélections existantes
+    const existingSelections = await prisma.volunteerMealSelection.findMany({
+      where: {
+        volunteerId: volunteer.id,
+        mealId: {
+          in: filteredMeals.map((m) => m.id),
+        },
+      },
+    })
+
+    // Créer un map des sélections existantes
+    const selectionsMap = new Map(existingSelections.map((s) => [s.mealId, s]))
+
+    // Créer les sélections manquantes avec accepted=true par défaut
+    const selectionsToCreate = filteredMeals
+      .filter((meal) => !selectionsMap.has(meal.id))
+      .map((meal) => ({
+        volunteerId: volunteer.id,
+        mealId: meal.id,
+        accepted: true,
+      }))
+
+    if (selectionsToCreate.length > 0) {
+      await prisma.volunteerMealSelection.createMany({
+        data: selectionsToCreate,
+      })
+
+      // Récupérer les nouvelles sélections
+      const newSelections = await prisma.volunteerMealSelection.findMany({
+        where: {
+          volunteerId: volunteer.id,
+          mealId: {
+            in: selectionsToCreate.map((s) => s.mealId),
+          },
+        },
+      })
+
+      // Ajouter les nouvelles sélections au map
+      newSelections.forEach((s) => selectionsMap.set(s.mealId, s))
+    }
+
+    // Construire le résultat avec les repas et leurs sélections
+    const mealsWithSelections = filteredMeals.map((meal) => {
+      const selection = selectionsMap.get(meal.id)
+      return {
+        id: meal.id,
+        date: meal.date,
+        mealType: meal.mealType,
+        phase: meal.phase,
+        selectionId: selection?.id,
+        accepted: selection?.accepted ?? true,
+      }
+    })
+
+    return {
+      success: true,
+      meals: mealsWithSelections,
+    }
+  } catch (error: unknown) {
+    console.error('Failed to fetch volunteer meals:', error)
+
+    // Propager les erreurs HTTP existantes
+    if (error && typeof error === 'object' && 'statusCode' in error) {
+      throw error
+    }
+
+    throw createError({
+      statusCode: 500,
+      message: 'Erreur lors de la récupération de vos repas',
+    })
+  }
+})

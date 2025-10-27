@@ -476,6 +476,7 @@ model EditionVolunteerApplication {
   user                  User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
   addedBy               User?                       @relation("ManuallyAddedVolunteers", fields: [addedById], references: [id], onDelete: SetNull)
   teamAssignments       ApplicationTeamAssignment[]
+  mealSelections        VolunteerMealSelection[]
 
   @@unique([editionId, userId])
   @@index([editionId])
@@ -1177,10 +1178,11 @@ model EditionArtist {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
-  edition              Edition      @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  user                 User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  entryValidatedByUser User?        @relation("ArtistEntryValidator", fields: [entryValidatedBy], references: [id], onDelete: SetNull)
+  edition              Edition                @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user                 User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entryValidatedByUser User?                  @relation("ArtistEntryValidator", fields: [entryValidatedBy], references: [id], onDelete: SetNull)
   shows                ShowArtist[]
+  mealSelections       ArtistMealSelection[]
 
   @@unique([editionId, userId])
   @@index([editionId])
@@ -1314,9 +1316,43 @@ model VolunteerMeal {
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
 
-  edition Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  edition              Edition                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  mealSelections       VolunteerMealSelection[]
+  artistMealSelections ArtistMealSelection[]
 
   @@unique([editionId, date, mealType])
   @@index([editionId])
   @@index([date])
+}
+
+model VolunteerMealSelection {
+  id          Int      @id @default(autoincrement())
+  volunteerId Int
+  mealId      Int
+  accepted    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  volunteer EditionVolunteerApplication @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  meal      VolunteerMeal               @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([volunteerId, mealId])
+  @@index([volunteerId])
+  @@index([mealId])
+}
+
+model ArtistMealSelection {
+  id        Int      @id @default(autoincrement())
+  artistId  Int
+  mealId    Int
+  accepted  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  artist EditionArtist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  meal   VolunteerMeal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([artistId, mealId])
+  @@index([artistId])
+  @@index([mealId])
 }

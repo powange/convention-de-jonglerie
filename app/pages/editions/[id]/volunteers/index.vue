@@ -41,6 +41,16 @@
           :edition-id="editionId"
           :team-assignments="myApplication.teamAssignments"
         />
+
+        <!-- Carte "Mes repas" - Visible pour les bénévoles acceptés -->
+        <EditionVolunteerMealsCard
+          v-if="
+            authStore.isAuthenticated &&
+            myApplication?.status === 'ACCEPTED' &&
+            volunteersMode === 'INTERNAL'
+          "
+          :edition-id="editionId"
+        />
       </ClientOnly>
 
       <UCard variant="soft" class="mb-6">

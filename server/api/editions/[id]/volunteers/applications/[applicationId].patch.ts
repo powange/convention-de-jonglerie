@@ -12,6 +12,10 @@ import {
   compareApplicationChanges,
   hasApplicationDataChanges,
 } from '@@/server/utils/volunteer-application-diff'
+import {
+  createVolunteerMealSelections,
+  deleteVolunteerMealSelections,
+} from '@@/server/utils/volunteer-meals'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
@@ -253,12 +257,14 @@ export default defineEventHandler(async (event) => {
     updateData.acceptanceNote = parsed.note
   }
 
-  // Si on remet en attente, supprimer toutes les assignations d'équipes
+  // Si on remet en attente, supprimer toutes les assignations d'équipes et les repas
   if (target === 'PENDING') {
     // Supprimer les relations avec les équipes
     updateData.teamAssignments = {
       deleteMany: {}, // Supprimer toutes les relations avec les équipes
     }
+    // Supprimer les sélections de repas
+    await deleteVolunteerMealSelections(applicationId)
   }
 
   const updated = await prisma.editionVolunteerApplication.update({
@@ -281,6 +287,16 @@ export default defineEventHandler(async (event) => {
       },
     },
   })
+
+  // Si on accepte le bénévole, créer automatiquement ses sélections de repas
+  if (target === 'ACCEPTED') {
+    try {
+      await createVolunteerMealSelections(applicationId, editionId)
+    } catch (mealError) {
+      // Ne pas faire échouer l'acceptation si la création des repas échoue
+      console.error('Erreur lors de la création des repas du bénévole:', mealError)
+    }
+  }
 
   // Envoyer une notification selon le changement de statut
   try {

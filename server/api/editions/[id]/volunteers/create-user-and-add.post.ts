@@ -3,6 +3,7 @@ import { canManageEditionVolunteers } from '@@/server/utils/collaborator-managem
 import { createFutureDate, TOKEN_DURATIONS } from '@@/server/utils/date-utils'
 import { sendEmail, generateVerificationCode, getSiteUrl } from '@@/server/utils/emailService'
 import { prisma } from '@@/server/utils/prisma'
+import { createVolunteerMealSelections } from '@@/server/utils/volunteer-meals'
 import { z } from 'zod'
 
 const bodySchema = z.object({
@@ -282,6 +283,14 @@ export default defineEventHandler(async (event) => {
         status: true,
       },
     })
+
+    // Créer automatiquement les sélections de repas
+    try {
+      await createVolunteerMealSelections(application.id, editionId)
+    } catch (mealError) {
+      console.error('Erreur lors de la création des repas du bénévole:', mealError)
+      // Ne pas faire échouer l'ajout si la création des repas échoue
+    }
 
     // Envoyer l'email d'invitation personnalisé
     try {

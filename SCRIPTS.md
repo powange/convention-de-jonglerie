@@ -14,6 +14,29 @@
 
 ## 🛠️ Scripts métier
 
+### Assignation des repas aux bénévoles acceptés
+
+Assigne automatiquement les repas aux bénévoles déjà acceptés qui n'ont pas encore de sélections de repas.
+
+```bash
+npm run db:assign-meals
+```
+
+**Fonctionnement** :
+
+- Recherche tous les bénévoles avec statut `ACCEPTED`
+- Filtre ceux qui n'ont aucune sélection de repas
+- Crée automatiquement les sélections selon leurs disponibilités (setup/event/teardown) et dates d'arrivée/départ
+- Tous les repas sont cochés par défaut (`accepted=true`)
+
+**Sécurité** :
+
+- Ne modifie jamais les sélections existantes
+- Peut être exécuté plusieurs fois sans risque (idempotent)
+- En cas d'erreur sur un bénévole, continue avec les suivants
+
+Voir [scripts/README-assign-meals.md](scripts/README-assign-meals.md) pour plus de détails.
+
 ### Migration droits collaborateurs
 
 Exécuter une migration douce des anciens rôles vers les nouveaux booléens de droits.
