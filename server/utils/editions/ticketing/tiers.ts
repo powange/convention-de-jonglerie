@@ -9,6 +9,7 @@ export interface TierData {
   maxAmount?: number | null
   position: number
   isActive: boolean
+  countAsParticipant?: boolean
   validFrom?: string | null
   validUntil?: string | null
   quotaIds?: number[]
@@ -101,6 +102,7 @@ export async function createTier(editionId: number, data: TierData) {
       maxAmount: data.maxAmount,
       position: data.position,
       isActive: data.isActive,
+      countAsParticipant: data.countAsParticipant ?? true,
       validFrom: data.validFrom ? new Date(data.validFrom) : null,
       validUntil: data.validUntil ? new Date(data.validUntil) : null,
       // externalTicketingId et helloAssoTierId restent null pour un tarif manuel
@@ -150,6 +152,7 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
         where: { id: tierId },
         data: {
           customName: data.customName,
+          countAsParticipant: data.countAsParticipant ?? true,
           validFrom: data.validFrom ? new Date(data.validFrom) : null,
           validUntil: data.validUntil ? new Date(data.validUntil) : null,
           quotas: {
@@ -174,6 +177,7 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           maxAmount: data.maxAmount,
           position: data.position,
           isActive: data.isActive,
+          countAsParticipant: data.countAsParticipant ?? true,
           validFrom: data.validFrom ? new Date(data.validFrom) : null,
           validUntil: data.validUntil ? new Date(data.validUntil) : null,
           quotas: {

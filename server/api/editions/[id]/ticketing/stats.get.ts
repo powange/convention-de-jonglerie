@@ -20,14 +20,15 @@ export default defineEventHandler(async (event) => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
-    // Compter les validations de billets (externes et manuels, hors donations)
-    // Note: type peut être null pour les participants ajoutés manuellement
+    // Compter les validations de billets (uniquement les tarifs avec countAsParticipant = true)
     const ticketsValidatedToday = await prisma.ticketingOrderItem.count({
       where: {
         order: {
           editionId: editionId,
         },
-        OR: [{ type: { not: 'Donation' } }, { type: null }],
+        tier: {
+          countAsParticipant: true,
+        },
         entryValidated: true,
         entryValidatedAt: {
           gte: today,
@@ -40,7 +41,9 @@ export default defineEventHandler(async (event) => {
         order: {
           editionId: editionId,
         },
-        OR: [{ type: { not: 'Donation' } }, { type: null }],
+        tier: {
+          countAsParticipant: true,
+        },
         entryValidated: true,
       },
     })
@@ -99,25 +102,17 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    // Compter le nombre total de billets (externes et manuels, hors donations) et bénévoles
-    // Utiliser la même approche que orders.get.ts pour garantir la cohérence
-    // Note: type peut être null pour les participants ajoutés manuellement
-    const allOrders = await prisma.ticketingOrder.findMany({
-      where: { editionId },
-      select: {
-        items: {
-          select: {
-            type: true,
-          },
+    // Compter le nombre total de billets (uniquement les tarifs avec countAsParticipant = true)
+    const totalTickets = await prisma.ticketingOrderItem.count({
+      where: {
+        order: {
+          editionId: editionId,
+        },
+        tier: {
+          countAsParticipant: true,
         },
       },
     })
-
-    const totalTickets = allOrders.reduce((sum, order) => {
-      // Exclure uniquement les donations (inclut null, Registration, etc.)
-      const ticketItems = order.items.filter((item) => item.type !== 'Donation')
-      return sum + ticketItems.length
-    }, 0)
 
     const totalVolunteers = await prisma.editionVolunteerApplication.count({
       where: {

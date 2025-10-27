@@ -147,6 +147,24 @@
           </UFormField>
         </div>
 
+        <UFormField label="Comptabilisation des participants" name="countAsParticipant">
+          <div class="flex items-start gap-3">
+            <UCheckbox v-model="form.countAsParticipant" class="mt-1" />
+            <div class="flex-1">
+              <label
+                for="countAsParticipant"
+                class="text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Compter comme participant dans les statistiques
+              </label>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Décochez cette option si ce tarif ne représente pas un participant physique (ex:
+                don, prestation annexe)
+              </p>
+            </div>
+          </div>
+        </UFormField>
+
         <div
           class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800"
         >
@@ -266,6 +284,7 @@ interface TicketingTier {
   minAmount?: number
   maxAmount?: number
   isActive: boolean
+  countAsParticipant?: boolean
   position: number
   validFrom?: string | Date | null
   validUntil?: string | Date | null
@@ -355,6 +374,7 @@ const form = ref({
   maxAmountInEuros: '',
   position: 0,
   isActive: true,
+  countAsParticipant: true,
   isFree: false,
   validFrom: null as string | null,
   validUntil: null as string | null,
@@ -404,6 +424,7 @@ watch(
           maxAmountInEuros: props.tier.maxAmount ? (props.tier.maxAmount / 100).toFixed(2) : '',
           position: props.tier.position,
           isActive: props.tier.isActive,
+          countAsParticipant: props.tier.countAsParticipant ?? true,
           isFree: !!(props.tier.minAmount || props.tier.maxAmount),
           validFrom: validFromLocal,
           validUntil: validUntilLocal,
@@ -422,6 +443,7 @@ watch(
           maxAmountInEuros: '',
           position: 0,
           isActive: true,
+          countAsParticipant: true,
           isFree: false,
           validFrom: null,
           validUntil: null,
@@ -526,6 +548,7 @@ const handleSubmit = async () => {
           : null,
       position: form.value.position,
       isActive: form.value.isActive,
+      countAsParticipant: form.value.countAsParticipant,
       validFrom: finalValidFrom.value,
       validUntil: finalValidUntil.value,
       quotaIds: form.value.quotaIds,

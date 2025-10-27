@@ -888,6 +888,7 @@ model TicketingTier {
   maxAmount           Int? // Montant maximum (pour tarifs libres)
   isActive            Boolean   @default(true)
   position            Int       @default(0) // Pour l'ordre d'affichage
+  countAsParticipant  Boolean   @default(true) // Si ce tarif compte comme participant dans les stats
   validFrom           DateTime? // Date de début de validité (optionnel)
   validUntil          DateTime? // Date de fin de validité (optionnel)
   createdAt           DateTime  @default(now())

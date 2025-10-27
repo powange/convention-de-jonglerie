@@ -158,82 +158,19 @@
                   {{ artist.departureDateTime ? formatDateTime(artist.departureDateTime) : '-' }}
                 </td>
                 <td class="px-4 py-3 text-sm text-center">
-                  <UPopover mode="hover" :open-delay="200">
-                    <UBadge
-                      :color="
-                        artist.mealSelections && artist.mealSelections.length > 0
-                          ? 'primary'
-                          : 'neutral'
-                      "
-                      variant="soft"
-                      class="cursor-help"
-                    >
-                      {{ artist.mealSelections?.length || 0 }}
-                    </UBadge>
-                    <template #content>
-                      <div class="p-4 min-w-[250px]">
-                        <div class="flex items-center justify-between mb-3">
-                          <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
-                            {{ $t('edition.artists.meals.title') }}
-                          </h3>
-                          <UButton
-                            icon="i-heroicons-pencil-square"
-                            color="primary"
-                            variant="ghost"
-                            size="xs"
-                            :title="$t('edition.artists.meals.manage_meals')"
-                            @click="openMealsModal(artist)"
-                          />
-                        </div>
-                        <div
-                          v-if="artist.mealSelections && artist.mealSelections.length > 0"
-                          class="space-y-2"
-                        >
-                          <div
-                            v-for="selection in artist.mealSelections"
-                            :key="selection.id"
-                            class="flex items-center justify-between text-xs"
-                          >
-                            <div class="flex items-center gap-2">
-                              <UIcon
-                                :name="
-                                  selection.meal.mealType === 'BREAKFAST'
-                                    ? 'i-heroicons-sun'
-                                    : selection.meal.mealType === 'LUNCH'
-                                      ? 'i-heroicons-cake'
-                                      : 'i-heroicons-moon'
-                                "
-                                class="h-4 w-4 text-gray-500"
-                              />
-                              <span class="text-gray-700 dark:text-gray-300">
-                                {{
-                                  new Date(selection.meal.date).toLocaleDateString('fr-FR', {
-                                    weekday: 'short',
-                                    day: '2-digit',
-                                    month: '2-digit',
-                                  })
-                                }}
-                                -
-                                {{
-                                  $t(`common.meal_types.${selection.meal.mealType.toLowerCase()}`)
-                                }}
-                              </span>
-                            </div>
-                            <UBadge
-                              :color="selection.accepted ? 'success' : 'neutral'"
-                              variant="soft"
-                              size="xs"
-                            >
-                              {{ selection.accepted ? '✓' : '○' }}
-                            </UBadge>
-                          </div>
-                        </div>
-                        <p v-else class="text-sm text-gray-500 dark:text-gray-400 italic">
-                          Aucun repas configuré
-                        </p>
-                      </div>
-                    </template>
-                  </UPopover>
+                  <UButton
+                    :color="
+                      artist.mealSelections && artist.mealSelections.length > 0
+                        ? 'primary'
+                        : 'neutral'
+                    "
+                    variant="soft"
+                    size="sm"
+                    @click="openMealsModal(artist)"
+                  >
+                    <span class="font-medium">{{ artist.mealSelections?.length || 0 }}</span>
+                    <UIcon name="i-heroicons-chevron-right" class="ml-1 h-4 w-4" />
+                  </UButton>
                 </td>
                 <td class="px-4 py-3 text-sm">
                   <div v-if="artist.shows && artist.shows.length > 0" class="flex flex-wrap gap-1">
@@ -292,21 +229,17 @@
                       {{ $t('edition.artists.accommodation_autonomous_yes') }}
                     </span>
                   </div>
-                  <UPopover v-else-if="artist.accommodationProposal" mode="hover" :open-delay="200">
-                    <div class="flex items-center gap-2 cursor-help">
-                      <UIcon name="i-heroicons-home" class="h-5 w-5 text-primary-500" />
-                      <span class="text-sm text-gray-700 dark:text-gray-300 line-clamp-1">
-                        {{ artist.accommodationProposal }}
-                      </span>
-                    </div>
-                    <template #content>
-                      <div class="p-4 max-w-md">
-                        <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
-                          {{ artist.accommodationProposal }}
-                        </p>
-                      </div>
-                    </template>
-                  </UPopover>
+                  <button
+                    v-else-if="artist.accommodationProposal"
+                    class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer w-full text-left"
+                    @click="openAccommodationModal(artist)"
+                  >
+                    <UIcon name="i-heroicons-home" class="h-5 w-5 text-primary-500 flex-shrink-0" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300 line-clamp-1 flex-1">
+                      {{ artist.accommodationProposal }}
+                    </span>
+                    <UIcon name="i-heroicons-chevron-right" class="h-4 w-4 text-primary-500" />
+                  </button>
                   <div v-else class="flex items-center gap-2">
                     <UIcon name="i-heroicons-question-mark-circle" class="h-5 w-5 text-gray-400" />
                     <span class="text-sm text-gray-400">
@@ -315,35 +248,32 @@
                   </div>
                 </td>
                 <td v-if="canEdit" class="px-4 py-3 text-sm min-w-[300px]">
-                  <div class="flex items-start gap-2">
-                    <div class="flex-1 min-w-0">
-                      <UPopover v-if="artist.organizerNotes" mode="hover" :open-delay="200">
-                        <p
-                          class="text-gray-700 dark:text-gray-300 whitespace-pre-line line-clamp-3 cursor-help"
-                        >
-                          {{ artist.organizerNotes }}
-                        </p>
-                        <template #content>
-                          <div class="p-4 max-w-md">
-                            <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
-                              {{ artist.organizerNotes }}
-                            </p>
-                          </div>
-                        </template>
-                      </UPopover>
-                      <p v-else class="text-gray-400 italic text-xs">
-                        {{ $t('edition.artists.no_notes') }}
-                      </p>
+                  <button
+                    v-if="artist.organizerNotes"
+                    class="w-full text-left p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                    @click="openNotesModal(artist)"
+                  >
+                    <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line line-clamp-3">
+                      {{ artist.organizerNotes }}
+                    </p>
+                    <div class="flex items-center gap-1 text-xs text-primary-500 mt-1">
+                      <span>{{ $t('common.view_more') }}</span>
+                      <UIcon name="i-heroicons-chevron-right" class="h-3 w-3" />
                     </div>
-                    <UButton
-                      icon="i-heroicons-pencil-square"
-                      color="neutral"
-                      variant="ghost"
-                      size="xs"
-                      :title="$t('edition.artists.edit_notes')"
-                      @click="openNotesModal(artist)"
-                    />
-                  </div>
+                  </button>
+                  <button
+                    v-else
+                    class="w-full text-left p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                    @click="openNotesModal(artist)"
+                  >
+                    <p class="text-gray-400 italic text-xs">
+                      {{ $t('edition.artists.no_notes') }}
+                    </p>
+                    <div class="flex items-center gap-1 text-xs text-primary-500 mt-1">
+                      <span>{{ $t('common.add') }}</span>
+                      <UIcon name="i-heroicons-plus" class="h-3 w-3" />
+                    </div>
+                  </button>
                 </td>
                 <td v-if="canEdit" class="px-4 py-3 text-sm text-right">
                   <div class="flex items-center justify-end gap-2">
@@ -396,6 +326,14 @@
       @notes-saved="handleNotesSaved"
     />
 
+    <!-- Modal hébergement -->
+    <ArtistsAccommodationModal
+      v-if="showAccommodationModal"
+      v-model="showAccommodationModal"
+      :artist="selectedArtistForAccommodation"
+      :accommodation-proposal="selectedArtistForAccommodation?.accommodationProposal || ''"
+    />
+
     <!-- Modal confirmation suppression -->
     <UiConfirmModal
       v-model="showDeleteConfirm"
@@ -442,6 +380,8 @@ const showMealsModal = ref(false)
 const selectedArtistForMeals = ref<any>(null)
 const showNotesModal = ref(false)
 const selectedArtistForNotes = ref<any>(null)
+const showAccommodationModal = ref(false)
+const selectedArtistForAccommodation = ref<any>(null)
 const showDeleteConfirm = ref(false)
 const artistToDelete = ref<any>(null)
 
@@ -543,5 +483,11 @@ const openNotesModal = (artist: any) => {
 const handleNotesSaved = () => {
   // Rafraîchir les artistes pour obtenir les notes mises à jour
   fetchArtists()
+}
+
+// Ouvrir le modal d'hébergement
+const openAccommodationModal = (artist: any) => {
+  selectedArtistForAccommodation.value = artist
+  showAccommodationModal.value = true
 }
 </script>
