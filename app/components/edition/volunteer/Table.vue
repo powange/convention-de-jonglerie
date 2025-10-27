@@ -212,6 +212,15 @@
                 :loading="applicationsActingId === row.original.id && actingAction === 'REJECTED'"
                 @click="decideApplication(row.original, 'REJECTED')"
               />
+              <UButton
+                v-if="row.original.source === 'MANUAL'"
+                :label="t('editions.volunteers.action_delete')"
+                size="xs"
+                color="error"
+                variant="soft"
+                icon="i-heroicons-trash"
+                @click="confirmDeleteApplication(row.original)"
+              />
             </div>
 
             <div
@@ -234,6 +243,15 @@
                 :loading="applicationsActingId === row.original.id && actingAction === 'PENDING'"
                 @click="confirmBackToPending(row.original)"
               />
+              <UButton
+                v-if="row.original.source === 'MANUAL'"
+                :label="t('editions.volunteers.action_delete')"
+                size="xs"
+                color="error"
+                variant="soft"
+                icon="i-heroicons-trash"
+                @click="confirmDeleteApplication(row.original)"
+              />
             </div>
 
             <div
@@ -247,6 +265,15 @@
                 variant="soft"
                 :loading="applicationsActingId === row.original.id && actingAction === 'PENDING'"
                 @click="confirmBackToPending(row.original)"
+              />
+              <UButton
+                v-if="row.original.source === 'MANUAL'"
+                :label="t('editions.volunteers.action_delete')"
+                size="xs"
+                color="error"
+                variant="soft"
+                icon="i-heroicons-trash"
+                @click="confirmDeleteApplication(row.original)"
               />
             </div>
           </div>
@@ -262,25 +289,19 @@
     </div>
   </div>
 
-  <div class="flex flex-wrap items-center gap-3 text-xs">
+  <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
     <span>{{ filteredCountLabel }}</span>
-    <span v-if="serverPagination.totalPages > 1" class="flex items-center gap-2">
-      <UButton
-        size="xs"
-        variant="ghost"
-        :disabled="serverPagination.page === 1 || applicationsLoading"
-        icon="i-heroicons-chevron-left"
-        @click="goToPage(serverPagination.page - 1)"
-      />
-      <span>{{ serverPagination.page }} / {{ serverPagination.totalPages }}</span>
-      <UButton
-        size="xs"
-        variant="ghost"
-        :disabled="serverPagination.page === serverPagination.totalPages || applicationsLoading"
-        icon="i-heroicons-chevron-right"
-        @click="goToPage(serverPagination.page + 1)"
-      />
-    </span>
+    <UPagination
+      v-if="serverPagination.totalPages > 1"
+      v-model:page="serverPagination.page"
+      :total="serverPagination.total"
+      :items-per-page="serverPagination.pageSize"
+      :disabled="applicationsLoading"
+      size="xs"
+      :show-edges="false"
+      :sibling-count="1"
+      @update:page="refreshApplications"
+    />
   </div>
 
   <!-- Modal unifiée pour acceptation et modification des équipes -->
@@ -395,6 +416,20 @@
     icon-color="text-yellow-500"
     @confirm="executeBackToPending"
     @cancel="showBackToPendingModal = false"
+  />
+
+  <!-- Modal de confirmation pour supprimer une candidature ajoutée manuellement -->
+  <UiConfirmModal
+    v-model="showDeleteModal"
+    :title="t('editions.volunteers.confirm_delete_title')"
+    :description="t('editions.volunteers.confirm_delete_description')"
+    :confirm-label="t('editions.volunteers.delete_application')"
+    :cancel-label="t('common.cancel')"
+    confirm-color="error"
+    icon-name="i-heroicons-trash"
+    icon-color="text-red-500"
+    @confirm="executeDeleteApplication"
+    @cancel="showDeleteModal = false"
   />
 </template>
 
@@ -604,12 +639,6 @@ const resetApplicationsFilters = () => {
   refreshApplications()
 }
 
-const goToPage = (p: number) => {
-  if (p < 1 || p > serverPagination.value.totalPages) return
-  serverPagination.value.page = p
-  refreshApplications()
-}
-
 const refreshApplications = async () => {
   applicationsLoading.value = true
   try {
@@ -744,6 +773,44 @@ const executeBackToPending = () => {
   }
   showBackToPendingModal.value = false
   applicationToPending.value = null
+}
+
+// Modal de confirmation pour supprimer une candidature ajoutée manuellement
+const showDeleteModal = ref(false)
+const applicationToDelete = ref<any>(null)
+
+// Fonction pour ouvrir la confirmation de suppression
+const confirmDeleteApplication = (app: any) => {
+  applicationToDelete.value = app
+  showDeleteModal.value = true
+}
+
+// Fonction pour exécuter la suppression
+const executeDeleteApplication = async () => {
+  if (!applicationToDelete.value) return
+
+  try {
+    await $fetch(
+      `/api/editions/${props.editionId}/volunteers/applications/${applicationToDelete.value.id}`,
+      {
+        method: 'DELETE',
+      }
+    )
+
+    toast.add({
+      title: t('editions.volunteers.application_deleted'),
+      description: t('editions.volunteers.volunteer_removed_successfully'),
+      color: 'success',
+    })
+
+    emit('refreshVolunteersInfo')
+    refreshApplications()
+  } catch (e: any) {
+    toast.add({ title: e?.message || t('common.error'), color: 'error' })
+  } finally {
+    showDeleteModal.value = false
+    applicationToDelete.value = null
+  }
 }
 
 // Fonctions pour la modal d'acceptation
@@ -1634,6 +1701,65 @@ const columns = computed((): TableColumn<any>[] => [
         }
       )
     },
+  },
+  {
+    id: 'source',
+    header: t('editions.volunteers.table_source'),
+    cell: ({ row }) => {
+      const source = row.original.source
+      const addedBy = row.original.addedBy
+      const addedAt = row.original.addedAt
+
+      // Si c'est une candidature spontanée
+      if (source === 'APPLICATION') {
+        return h(
+          resolveComponent('UBadge'),
+          {
+            color: 'neutral',
+            variant: 'soft',
+            class: 'text-xs',
+          },
+          () => t('editions.volunteers.source_application')
+        )
+      }
+
+      // Si c'est un ajout manuel
+      if (source === 'MANUAL') {
+        // Construire le texte du tooltip
+        const addedByName = addedBy
+          ? `${addedBy.prenom || ''} ${addedBy.nom || ''}`.trim() || addedBy.pseudo
+          : t('common.unknown')
+        const addedAtFormatted = addedAt ? formatDate(addedAt) : ''
+
+        const tooltipText = t('editions.volunteers.added_manually_tooltip', {
+          name: addedByName,
+          date: addedAtFormatted,
+        })
+
+        return h(
+          resolveComponent('UTooltip'),
+          {
+            text: tooltipText,
+            arrow: true,
+          },
+          {
+            default: () =>
+              h(
+                resolveComponent('UBadge'),
+                {
+                  color: 'primary',
+                  variant: 'soft',
+                  class: 'text-xs cursor-help',
+                },
+                () => t('editions.volunteers.source_manual')
+              ),
+          }
+        )
+      }
+
+      return h('span', '—')
+    },
+    size: 120,
   },
   {
     id: 'actions',

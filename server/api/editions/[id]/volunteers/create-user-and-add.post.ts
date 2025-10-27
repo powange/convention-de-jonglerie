@@ -273,6 +273,9 @@ export default defineEventHandler(async (event) => {
         setupAvailability: null,
         teardownAvailability: null,
         eventAvailability: null,
+        source: 'MANUAL',
+        addedById: user.id,
+        addedAt: new Date(),
       },
       select: {
         id: true,

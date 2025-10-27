@@ -43,6 +43,7 @@ model User {
   editionPosts                       EditionPost[]
   editionPostComments                EditionPostComment[]
   volunteerApplications              EditionVolunteerApplication[]
+  manuallyAddedVolunteers            EditionVolunteerApplication[]       @relation("ManuallyAddedVolunteers")
   feedbacks                          Feedback[]
   apiErrorLogs                       ApiErrorLog[]
   notifications                      Notification[]
@@ -467,8 +468,12 @@ model EditionVolunteerApplication {
   entryValidated        Boolean                     @default(false)
   entryValidatedAt      DateTime?
   entryValidatedBy      Int?
+  source                VolunteerApplicationSource  @default(APPLICATION)
+  addedById             Int?
+  addedAt               DateTime?
   edition               Edition                     @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user                  User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addedBy               User?                       @relation("ManuallyAddedVolunteers", fields: [addedById], references: [id], onDelete: SetNull)
   teamAssignments       ApplicationTeamAssignment[]
 
   @@unique([editionId, userId])
@@ -476,6 +481,8 @@ model EditionVolunteerApplication {
   @@index([status])
   @@index([userId], map: "EditionVolunteerApplication_userId_fkey")
   @@index([entryValidated])
+  @@index([source])
+  @@index([addedById])
 }
 
 model Feedback {
@@ -549,6 +556,11 @@ enum VolunteerStatus {
   PENDING
   ACCEPTED
   REJECTED
+}
+
+enum VolunteerApplicationSource {
+  APPLICATION // Candidature spontanée via formulaire
+  MANUAL      // Ajout manuel par un organisateur
 }
 
 // ========== LOGS D'ERREURS ==========

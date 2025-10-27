@@ -204,6 +204,9 @@ export default defineEventHandler(async (event) => {
     eventAvailability: true,
     arrivalDateTime: true,
     departureDateTime: true,
+    source: true,
+    addedById: true,
+    addedAt: true,
     user: {
       select: {
         id: true,
@@ -214,6 +217,14 @@ export default defineEventHandler(async (event) => {
         nom: true,
         profilePicture: true,
         updatedAt: true,
+      },
+    },
+    addedBy: {
+      select: {
+        id: true,
+        pseudo: true,
+        prenom: true,
+        nom: true,
       },
     },
   }
