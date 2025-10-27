@@ -161,6 +161,7 @@ model Edition {
   workshopLocations                 WorkshopLocation[]
   artists                           EditionArtist[]
   shows                             Show[]
+  volunteerMeals                    VolunteerMeal[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
   @@index([conventionId], map: "Edition_conventionId_fkey")
@@ -560,7 +561,7 @@ enum VolunteerStatus {
 
 enum VolunteerApplicationSource {
   APPLICATION // Candidature spontanée via formulaire
-  MANUAL      // Ajout manuel par un organisateur
+  MANUAL // Ajout manuel par un organisateur
 }
 
 // ========== LOGS D'ERREURS ==========
@@ -824,6 +825,18 @@ enum ExternalTicketingStatus {
   ERROR
 }
 
+enum VolunteerMealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+}
+
+enum VolunteerMealPhase {
+  SETUP
+  EVENT
+  TEARDOWN
+}
+
 model ExternalTicketing {
   id         String                    @id @default(cuid())
   editionId  Int                       @unique
@@ -900,7 +913,7 @@ model TicketingQuota {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  edition      Edition                           @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  edition      Edition                         @relation(fields: [editionId], references: [id], onDelete: Cascade)
   tiers        TicketingTierQuota[]
   options      TicketingOptionQuota[]
   customFields TicketingTierCustomFieldQuota[]
@@ -915,7 +928,7 @@ model TicketingReturnableItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  edition                           Edition                                   @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  edition                           Edition                                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
   tiers                             TicketingTierReturnableItem[]
   options                           TicketingOptionReturnableItem[]
   volunteerTicketingReturnableItems EditionVolunteerReturnableItem[]
@@ -961,7 +974,7 @@ model TicketingTierReturnableItem {
   tierId           Int
   returnableItemId Int
 
-  tier           TicketingTier  @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  tier           TicketingTier           @relation(fields: [tierId], references: [id], onDelete: Cascade)
   returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
 
   @@unique([tierId, returnableItemId])
@@ -987,8 +1000,8 @@ model TicketingOptionReturnableItem {
   optionId         Int
   returnableItemId Int
 
-  option         TicketingOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
-  returnableItem TicketingReturnableItem  @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+  option         TicketingOption         @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
 
   @@unique([optionId, returnableItemId])
   @@index([optionId])
@@ -1094,22 +1107,22 @@ model TicketingOrderItem {
 // ========== WORKSHOPS ==========
 
 model Workshop {
-  id              Int                @id @default(autoincrement())
+  id              Int      @id @default(autoincrement())
   editionId       Int
   creatorId       Int
   title           String
-  description     String?            @db.Text
+  description     String?  @db.Text
   startDateTime   DateTime
   endDateTime     DateTime
   maxParticipants Int?
   locationId      Int?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  edition         Edition            @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  creator         User               @relation(fields: [creatorId], references: [id], onDelete: Cascade)
-  location        WorkshopLocation?  @relation(fields: [locationId], references: [id], onDelete: SetNull)
-  favorites       WorkshopFavorite[]
+  edition   Edition            @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  creator   User               @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  location  WorkshopLocation?  @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  favorites WorkshopFavorite[]
 
   @@index([editionId])
   @@index([creatorId])
@@ -1145,29 +1158,29 @@ model WorkshopLocation {
 }
 
 model EditionArtist {
-  id                  Int               @id @default(autoincrement())
-  editionId           Int
-  userId              Int
-  arrivalDateTime     String?
-  departureDateTime   String?
-  dietaryPreference   DietaryPreference @default(NONE)
-  allergies           String?           @db.Text
-  allergySeverity     AllergySeverity?
-  entryValidated      Boolean           @default(false)
-  entryValidatedAt    DateTime?
-  entryValidatedBy    Int?
-  payment             Decimal?          @db.Decimal(10, 2)
-  paymentPaid         Boolean           @default(false)
-  reimbursement       Decimal?          @db.Decimal(10, 2)
-  reimbursementPaid   Boolean           @default(false)
-  organizerNotes      String?           @db.Text
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
+  id                Int               @id @default(autoincrement())
+  editionId         Int
+  userId            Int
+  arrivalDateTime   String?
+  departureDateTime String?
+  dietaryPreference DietaryPreference @default(NONE)
+  allergies         String?           @db.Text
+  allergySeverity   AllergySeverity?
+  entryValidated    Boolean           @default(false)
+  entryValidatedAt  DateTime?
+  entryValidatedBy  Int?
+  payment           Decimal?          @db.Decimal(10, 2)
+  paymentPaid       Boolean           @default(false)
+  reimbursement     Decimal?          @db.Decimal(10, 2)
+  reimbursementPaid Boolean           @default(false)
+  organizerNotes    String?           @db.Text
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 
-  edition             Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  entryValidatedByUser User?            @relation("ArtistEntryValidator", fields: [entryValidatedBy], references: [id], onDelete: SetNull)
-  shows               ShowArtist[]
+  edition              Edition      @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  user                 User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entryValidatedByUser User?        @relation("ArtistEntryValidator", fields: [entryValidatedBy], references: [id], onDelete: SetNull)
+  shows                ShowArtist[]
 
   @@unique([editionId, userId])
   @@index([editionId])
@@ -1176,15 +1189,15 @@ model EditionArtist {
 }
 
 model Show {
-  id              Int      @id @default(autoincrement())
-  editionId       Int
-  title           String
-  description     String?  @db.Text
-  startDateTime   DateTime
-  duration        Int?
-  location        String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  editionId     Int
+  title         String
+  description   String?  @db.Text
+  startDateTime DateTime
+  duration      Int?
+  location      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   edition         Edition              @relation(fields: [editionId], references: [id], onDelete: Cascade)
   artists         ShowArtist[]
@@ -1215,7 +1228,7 @@ model ShowReturnableItem {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  show           Show                   @relation(fields: [showId], references: [id], onDelete: Cascade)
+  show           Show                    @relation(fields: [showId], references: [id], onDelete: Cascade)
   returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
 
   @@unique([showId, returnableItemId])
@@ -1235,8 +1248,8 @@ model TicketingTierCustomField {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
-  externalTicketing ExternalTicketing?                                @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
-  edition           Edition                                           @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  externalTicketing ExternalTicketing?                       @relation(fields: [externalTicketingId], references: [id], onDelete: Cascade)
+  edition           Edition                                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
   tiers             TicketingTierCustomFieldAssociation[]
   quotas            TicketingTierCustomFieldQuota[]
   returnableItems   TicketingTierCustomFieldReturnableItem[]
@@ -1287,4 +1300,23 @@ model TicketingTierCustomFieldReturnableItem {
   @@unique([customFieldId, returnableItemId, choiceValue])
   @@index([customFieldId])
   @@index([returnableItemId])
+}
+
+// ========== VOLUNTEER MEALS ==========
+
+model VolunteerMeal {
+  id        Int                @id @default(autoincrement())
+  editionId Int
+  date      DateTime           @db.Date
+  mealType  VolunteerMealType
+  enabled   Boolean            @default(true)
+  phase     VolunteerMealPhase
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  edition Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, date, mealType])
+  @@index([editionId])
+  @@index([date])
 }
