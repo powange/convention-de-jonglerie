@@ -53,7 +53,7 @@
         </div>
 
         <!-- Informations principales -->
-        <div class="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+        <div class="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-13 gap-4 items-center">
           <!-- Nom et badges -->
           <div class="md:col-span-4 min-w-0">
             <div class="flex items-center gap-2 mb-1">
@@ -95,6 +95,38 @@
               <span v-if="tier.minAmount">Min: {{ (tier.minAmount / 100).toFixed(2) }}€</span>
               <span v-if="tier.minAmount && tier.maxAmount"> • </span>
               <span v-if="tier.maxAmount">Max: {{ (tier.maxAmount / 100).toFixed(2) }}€</span>
+            </div>
+          </div>
+
+          <!-- Billets vendus -->
+          <div class="md:col-span-1 text-center">
+            <div
+              class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md"
+              :class="
+                tier.soldCount && tier.soldCount > 0
+                  ? 'bg-success-50 dark:bg-success-900/20'
+                  : 'bg-gray-50 dark:bg-gray-800'
+              "
+            >
+              <UIcon
+                name="i-heroicons-ticket"
+                class="h-3.5 w-3.5"
+                :class="
+                  tier.soldCount && tier.soldCount > 0
+                    ? 'text-success-600 dark:text-success-400'
+                    : 'text-gray-400'
+                "
+              />
+              <span
+                class="text-sm font-semibold"
+                :class="
+                  tier.soldCount && tier.soldCount > 0
+                    ? 'text-success-700 dark:text-success-400'
+                    : 'text-gray-500'
+                "
+              >
+                {{ tier.soldCount || 0 }}
+              </span>
             </div>
           </div>
 

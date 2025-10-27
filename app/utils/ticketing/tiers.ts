@@ -9,6 +9,7 @@ export interface TicketingTier {
   maxAmount: number | null
   isActive: boolean
   helloAssoTierId: number | null
+  soldCount?: number // Nombre de billets vendus pour ce tarif
   quotas?: Array<{
     quota: {
       id: number

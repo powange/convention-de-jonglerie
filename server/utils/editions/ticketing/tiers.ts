@@ -61,6 +61,11 @@ export async function getEditionTiers(
           customField: true,
         },
       },
+      _count: {
+        select: {
+          orderItems: true,
+        },
+      },
     },
   })
 
@@ -70,11 +75,15 @@ export async function getEditionTiers(
       ...tier,
       originalName: tier.name,
       name: tier.customName || tier.name,
+      soldCount: tier._count.orderItems,
     }))
   }
 
   // Sinon, on surcharge le name avec customName si défini
-  return tiers.map(applyCustomName)
+  return tiers.map((tier) => ({
+    ...applyCustomName(tier),
+    soldCount: tier._count.orderItems,
+  }))
 }
 
 /**
