@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 
-import { createVolunteerMealSelections } from '../server/utils/volunteer-meals'
+import { createVolunteerMealSelections } from '../server/utils/volunteer-meals.js'
 
 const prisma = new PrismaClient()
 

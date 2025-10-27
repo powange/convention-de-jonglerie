@@ -4,7 +4,7 @@ import { spawn } from 'node:child_process'
 import bcrypt from 'bcryptjs'
 import { config } from 'dotenv'
 
-import { prisma } from '../server/utils/prisma'
+import { prisma } from '../server/utils/prisma.js'
 
 config()
 
