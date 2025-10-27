@@ -18,7 +18,13 @@ export default defineEventHandler(async (event) => {
           userId: user.id,
         },
       },
-      include: {
+      select: {
+        id: true,
+        arrivalDateTime: true,
+        departureDateTime: true,
+        dietaryPreference: true,
+        allergies: true,
+        allergySeverity: true,
         user: {
           select: {
             prenom: true,
@@ -27,17 +33,15 @@ export default defineEventHandler(async (event) => {
           },
         },
         shows: {
-          include: {
+          select: {
             show: {
               select: {
                 id: true,
                 title: true,
                 startDateTime: true,
                 location: true,
-              },
-              include: {
                 returnableItems: {
-                  include: {
+                  select: {
                     returnableItem: {
                       select: {
                         id: true,

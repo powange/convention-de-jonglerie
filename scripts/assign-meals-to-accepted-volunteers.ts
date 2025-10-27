@@ -1,3 +1,21 @@
+/**
+ * Script pour assigner automatiquement les repas aux bénévoles acceptés
+ *
+ * ⚠️ IMPORTANT: Ce script ne fonctionne QU'EN DÉVELOPPEMENT LOCAL
+ *
+ * En production, utilisez plutôt la route API :
+ * POST /api/admin/assign-meals-volunteers
+ *
+ * Via l'interface admin :
+ * - Accédez à /admin
+ * - Cliquez sur la carte "Repas bénévoles"
+ *
+ * Via cURL en production :
+ * curl -X POST https://your-domain.com/api/admin/assign-meals-volunteers \
+ *   -H "Cookie: nuxt-session=YOUR_ADMIN_SESSION" \
+ *   -H "Content-Type: application/json"
+ */
+
 import { PrismaClient } from '@prisma/client'
 
 import { createVolunteerMealSelections } from '../server/utils/volunteer-meals.js'

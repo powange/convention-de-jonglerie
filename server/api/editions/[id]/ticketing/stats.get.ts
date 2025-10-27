@@ -27,10 +27,7 @@ export default defineEventHandler(async (event) => {
         order: {
           editionId: editionId,
         },
-        OR: [
-          { type: { not: 'Donation' } },
-          { type: null },
-        ],
+        OR: [{ type: { not: 'Donation' } }, { type: null }],
         entryValidated: true,
         entryValidatedAt: {
           gte: today,
@@ -43,10 +40,7 @@ export default defineEventHandler(async (event) => {
         order: {
           editionId: editionId,
         },
-        OR: [
-          { type: { not: 'Donation' } },
-          { type: null },
-        ],
+        OR: [{ type: { not: 'Donation' } }, { type: null }],
         entryValidated: true,
       },
     })

@@ -18,18 +18,10 @@
     </template>
 
     <template #footer="{ close }">
-      <UButton
-        color="neutral"
-        variant="outline"
-        @click="close"
-      >
+      <UButton color="neutral" variant="outline" @click="close">
         {{ $t('common.cancel') }}
       </UButton>
-      <UButton
-        color="primary"
-        :loading="saving"
-        @click="saveNotes"
-      >
+      <UButton color="primary" :loading="saving" @click="saveNotes">
         {{ $t('common.save') }}
       </UButton>
     </template>
@@ -59,11 +51,15 @@ const artistName = computed(() => {
 })
 
 // Initialiser les notes quand la modal s'ouvre
-watch(() => props.artist, (newArtist) => {
-  if (newArtist) {
-    localNotes.value = newArtist.organizerNotes || ''
-  }
-}, { immediate: true })
+watch(
+  () => props.artist,
+  (newArtist) => {
+    if (newArtist) {
+      localNotes.value = newArtist.organizerNotes || ''
+    }
+  },
+  { immediate: true }
+)
 
 const saveNotes = async () => {
   if (!props.artist?.id) return

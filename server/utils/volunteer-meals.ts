@@ -109,7 +109,7 @@ export async function createVolunteerMealSelections(
       // Si c'est le jour d'arrivée, vérifier l'heure
       if (mealDate.getTime() === arrivalDate.getTime()) {
         const availableMeals = getAvailableMealsOnArrival(arrivalTimeOfDay)
-        if (!availableMeals.includes(meal.type)) return false
+        if (!availableMeals.includes(meal.mealType)) return false
       }
     }
 
@@ -124,7 +124,7 @@ export async function createVolunteerMealSelections(
       // Si c'est le jour de départ, vérifier l'heure
       if (mealDate.getTime() === departureDate.getTime()) {
         const availableMeals = getAvailableMealsOnDeparture(departureTimeOfDay)
-        if (!availableMeals.includes(meal.type)) return false
+        if (!availableMeals.includes(meal.mealType)) return false
       }
     }
 

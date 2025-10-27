@@ -191,7 +191,9 @@
                   <div class="flex items-start gap-2">
                     <div class="flex-1 min-w-0">
                       <UPopover v-if="artist.organizerNotes" mode="hover" :open-delay="200">
-                        <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line line-clamp-3 cursor-help">
+                        <p
+                          class="text-gray-700 dark:text-gray-300 whitespace-pre-line line-clamp-3 cursor-help"
+                        >
                           {{ artist.organizerNotes }}
                         </p>
                         <template #content>
