@@ -21,14 +21,16 @@ export default defineEventHandler(async (event) => {
     today.setHours(0, 0, 0, 0)
 
     // Compter les validations de billets (externes et manuels, hors donations)
+    // Note: type peut être null pour les participants ajoutés manuellement
     const ticketsValidatedToday = await prisma.ticketingOrderItem.count({
       where: {
         order: {
           editionId: editionId,
         },
-        type: {
-          not: 'Donation',
-        },
+        OR: [
+          { type: { not: 'Donation' } },
+          { type: null },
+        ],
         entryValidated: true,
         entryValidatedAt: {
           gte: today,
@@ -41,9 +43,10 @@ export default defineEventHandler(async (event) => {
         order: {
           editionId: editionId,
         },
-        type: {
-          not: 'Donation',
-        },
+        OR: [
+          { type: { not: 'Donation' } },
+          { type: null },
+        ],
         entryValidated: true,
       },
     })
@@ -104,6 +107,7 @@ export default defineEventHandler(async (event) => {
 
     // Compter le nombre total de billets (externes et manuels, hors donations) et bénévoles
     // Utiliser la même approche que orders.get.ts pour garantir la cohérence
+    // Note: type peut être null pour les participants ajoutés manuellement
     const allOrders = await prisma.ticketingOrder.findMany({
       where: { editionId },
       select: {
@@ -116,6 +120,7 @@ export default defineEventHandler(async (event) => {
     })
 
     const totalTickets = allOrders.reduce((sum, order) => {
+      // Exclure uniquement les donations (inclut null, Registration, etc.)
       const ticketItems = order.items.filter((item) => item.type !== 'Donation')
       return sum + ticketItems.length
     }, 0)
