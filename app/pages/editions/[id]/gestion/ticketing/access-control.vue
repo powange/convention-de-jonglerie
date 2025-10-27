@@ -545,7 +545,11 @@ const validateTicket = async () => {
   }
 }
 
-const handleValidateParticipants = async (participantIds: number[], markAsPaid = false) => {
+const handleValidateParticipants = async (
+  participantIds: number[],
+  markAsPaid = false,
+  phone: string | null = null
+) => {
   try {
     // Appeler l'API pour valider les participants
     await $fetch(`/api/editions/${editionId}/ticketing/validate-entry`, {
@@ -554,6 +558,7 @@ const handleValidateParticipants = async (participantIds: number[], markAsPaid =
         participantIds,
         type: participantType.value,
         markAsPaid,
+        phone,
       },
     })
 
@@ -570,6 +575,8 @@ const handleValidateParticipants = async (participantIds: number[], markAsPaid =
     // Recharger le participant pour afficher le nouveau statut
     if (participantType.value === 'volunteer' && selectedParticipant.value?.volunteer?.id) {
       await reloadParticipant(selectedParticipant.value.volunteer.id, 'volunteer')
+    } else if (participantType.value === 'artist' && selectedParticipant.value?.artist?.id) {
+      await reloadParticipant(selectedParticipant.value.artist.id, 'artist')
     } else if (participantType.value === 'ticket' && selectedParticipant.value?.ticket?.qrCode) {
       await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
     }
@@ -584,11 +591,16 @@ const handleValidateParticipants = async (participantIds: number[], markAsPaid =
   }
 }
 
-const reloadParticipant = async (identifier: number | string, type: 'ticket' | 'volunteer') => {
+const reloadParticipant = async (
+  identifier: number | string,
+  type: 'ticket' | 'volunteer' | 'artist'
+) => {
   try {
     let qrCode: string
     if (type === 'volunteer') {
       qrCode = `volunteer-${identifier}`
+    } else if (type === 'artist') {
+      qrCode = `artist-${identifier}`
     } else {
       qrCode = identifier as string
     }
@@ -631,6 +643,8 @@ const handleInvalidateEntry = async (participantId: number) => {
     // Recharger le participant pour afficher le nouveau statut
     if (participantType.value === 'volunteer' && selectedParticipant.value?.volunteer?.id) {
       await reloadParticipant(selectedParticipant.value.volunteer.id, 'volunteer')
+    } else if (participantType.value === 'artist' && selectedParticipant.value?.artist?.id) {
+      await reloadParticipant(selectedParticipant.value.artist.id, 'artist')
     } else if (participantType.value === 'ticket' && selectedParticipant.value?.ticket?.qrCode) {
       await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
     }

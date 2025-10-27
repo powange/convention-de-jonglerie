@@ -80,6 +80,11 @@
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
+                  {{ $t('editions.ticketing.phone') }}
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
                   {{ $t('edition.artists.arrival') }}
                 </th>
                 <th
@@ -101,6 +106,12 @@
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                   {{ $t('edition.artists.reimbursement_amount') }}
+                </th>
+                <th
+                  v-if="canEdit"
+                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  {{ $t('edition.artists.organizer_notes') }}
                 </th>
                 <th
                   v-if="canEdit"
@@ -126,6 +137,9 @@
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                   {{ artist.user.email }}
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                  {{ artist.user.phone || '-' }}
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                   {{ artist.arrivalDateTime || '-' }}
@@ -172,6 +186,15 @@
                     </UBadge>
                   </div>
                   <span v-else class="text-gray-400">-</span>
+                </td>
+                <td v-if="canEdit" class="px-4 py-3 text-sm">
+                  <UTextarea
+                    :model-value="artist.organizerNotes || ''"
+                    :placeholder="$t('edition.artists.notes_placeholder')"
+                    :rows="2"
+                    size="sm"
+                    @update:model-value="(value) => updateArtistNotes(artist.id, value)"
+                  />
                 </td>
                 <td v-if="canEdit" class="px-4 py-3 text-sm text-right">
                   <div class="flex items-center justify-end gap-2">
@@ -321,4 +344,27 @@ const deleteArtist = async () => {
     artistToDelete.value = null
   }
 }
+
+// Mettre à jour les notes de l'organisateur
+const updateArtistNotes = useDebounceFn(async (artistId: number, notes: string) => {
+  try {
+    await $fetch(`/api/editions/${editionId.value}/artists/${artistId}/notes`, {
+      method: 'PATCH',
+      body: {
+        organizerNotes: notes || null,
+      },
+    })
+    // Mettre à jour localement
+    const artist = artists.value.find((a) => a.id === artistId)
+    if (artist) {
+      artist.organizerNotes = notes
+    }
+  } catch (error) {
+    console.error('Error updating organizer notes:', error)
+    toast.add({
+      title: 'Erreur lors de la mise à jour des notes',
+      color: 'error',
+    })
+  }
+}, 500)
 </script>

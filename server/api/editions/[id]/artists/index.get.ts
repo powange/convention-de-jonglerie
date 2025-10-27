@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
@@ -49,9 +51,18 @@ export default defineEventHandler(async (event) => {
       },
     })
 
+    // Ajouter le hash de l'email pour chaque artiste
+    const artistsWithEmailHash = artists.map((artist) => ({
+      ...artist,
+      user: {
+        ...artist.user,
+        emailHash: createHash('md5').update(artist.user.email.toLowerCase().trim()).digest('hex'),
+      },
+    }))
+
     return {
       success: true,
-      artists,
+      artists: artistsWithEmailHash,
     }
   } catch (error: unknown) {
     console.error('Erreur lors de la récupération des artistes:', error)

@@ -594,6 +594,18 @@
                 {{ participant.volunteer.user.email }}
               </p>
             </div>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                {{ $t('editions.ticketing.phone') }}
+              </p>
+              <UInput
+                v-model="editablePhone"
+                type="tel"
+                placeholder="06 12 34 56 78"
+                icon="i-heroicons-phone"
+                size="sm"
+              />
+            </div>
           </div>
         </div>
 
@@ -683,6 +695,149 @@
         </div>
       </div>
 
+      <!-- Affichage pour un artiste -->
+      <div v-else-if="isArtist && participant && 'artist' in participant" class="space-y-6">
+        <!-- Badge artiste -->
+        <div
+          class="flex items-center justify-between p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20"
+        >
+          <div>
+            <p class="text-sm text-yellow-600 dark:text-yellow-400">
+              {{ $t('editions.ticketing.access_type') }}
+            </p>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white">Artiste</p>
+          </div>
+          <UBadge color="yellow" variant="soft" size="lg"> Artiste invité </UBadge>
+        </div>
+
+        <!-- Statut de validation d'entrée -->
+        <div
+          v-if="participant.artist.entryValidated"
+          class="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800"
+        >
+          <div class="flex items-start gap-3">
+            <UIcon
+              name="i-heroicons-check-circle-solid"
+              class="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5"
+            />
+            <div class="flex-1">
+              <p class="font-medium text-green-900 dark:text-green-100">
+                {{ $t('ticketing.participant.entry_validated') }}
+              </p>
+              <p class="text-sm text-green-700 dark:text-green-300 mt-1">
+                <span v-if="participant.artist.entryValidatedBy">
+                  Validé par {{ participant.artist.entryValidatedBy.firstName }}
+                  {{ participant.artist.entryValidatedBy.lastName }}
+                </span>
+                <span v-else>Entrée validée</span>
+                {{
+                  participant.artist.entryValidatedAt
+                    ? `le ${new Date(participant.artist.entryValidatedAt).toLocaleDateString(
+                        'fr-FR',
+                        {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        }
+                      )}`
+                    : ''
+                }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informations de l'artiste -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+            <UIcon name="i-heroicons-user" class="text-primary-600 dark:text-primary-400" />
+            <h4 class="font-semibold text-gray-900 dark:text-white">Artiste</h4>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                {{ $t('editions.ticketing.full_name') }}
+              </p>
+              <p class="text-sm font-medium text-gray-900 dark:text-white">
+                {{ participant.artist.user.firstName }} {{ participant.artist.user.lastName }}
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                {{ $t('editions.ticketing.email') }}
+              </p>
+              <p class="text-sm font-medium text-gray-900 dark:text-white">
+                {{ participant.artist.user.email }}
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                {{ $t('editions.ticketing.phone') }}
+              </p>
+              <UInput
+                v-model="editablePhone"
+                type="tel"
+                placeholder="06 12 34 56 78"
+                icon="i-heroicons-phone"
+                size="sm"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Spectacles assignés -->
+        <div
+          v-if="participant.artist.shows && participant.artist.shows.length > 0"
+          class="space-y-4"
+        >
+          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+            <UIcon name="i-heroicons-star" class="text-yellow-600 dark:text-yellow-400" />
+            <h4 class="font-semibold text-gray-900 dark:text-white">Spectacles</h4>
+          </div>
+
+          <div class="space-y-2">
+            <div
+              v-for="show in participant.artist.shows"
+              :key="show.id"
+              class="p-3 rounded-lg bg-gray-50 dark:bg-gray-900"
+            >
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <div class="flex items-center gap-2">
+                  <UIcon
+                    name="i-heroicons-sparkles"
+                    class="h-4 w-4 text-yellow-500 flex-shrink-0"
+                  />
+                  <span class="text-sm font-medium text-gray-900 dark:text-white">
+                    {{ show.title }}
+                  </span>
+                </div>
+              </div>
+              <div class="text-xs text-gray-600 dark:text-gray-400 ml-6">
+                {{
+                  new Date(show.startDateTime).toLocaleString('fr-FR', {
+                    dateStyle: 'short',
+                    timeStyle: 'short',
+                  })
+                }}
+                <span v-if="show.location"> - {{ show.location }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message si aucun spectacle -->
+        <div
+          v-else
+          class="p-4 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-lg"
+        >
+          <UIcon name="i-heroicons-star" class="mx-auto h-8 w-8 mb-2 text-gray-400" />
+          <p class="text-sm">Aucun spectacle assigné</p>
+        </div>
+      </div>
+
       <!-- Message si aucun participant -->
       <div v-else class="py-8 text-center">
         <UIcon name="i-heroicons-user-circle" class="mx-auto h-16 w-16 text-gray-400 mb-3" />
@@ -727,6 +882,21 @@
             "
           >
             {{ participant.volunteer.entryValidated ? "Dévalider l'entrée" : "Valider l'entrée" }}
+          </UButton>
+          <UButton
+            v-if="isArtist && participant && 'artist' in participant"
+            :color="participant.artist.entryValidated ? 'error' : 'success'"
+            :icon="
+              participant.artist.entryValidated
+                ? 'i-heroicons-x-circle'
+                : 'i-heroicons-check-circle'
+            "
+            :loading="validating"
+            @click="
+              participant.artist.entryValidated ? showInvalidateConfirm() : showValidateConfirm()
+            "
+          >
+            {{ participant.artist.entryValidated ? "Dévalider l'entrée" : "Valider l'entrée" }}
           </UButton>
         </div>
       </div>
@@ -878,6 +1048,7 @@ interface TicketData {
     }
     order: {
       id: number
+      status?: string
       payer: {
         firstName: string
         lastName: string
@@ -886,6 +1057,7 @@ interface TicketData {
       items?: Array<{
         id: number
         name: string
+        type?: string
         amount: number
         state: string
         qrCode?: string
@@ -926,6 +1098,7 @@ interface VolunteerData {
       firstName: string
       lastName: string
       email: string
+      phone?: string | null
     }
     teams: Array<{
       id: number
@@ -952,18 +1125,46 @@ interface VolunteerData {
   }
 }
 
-type ParticipantData = TicketData | VolunteerData
+interface ArtistData {
+  artist: {
+    id: number
+    user: {
+      firstName: string
+      lastName: string
+      email: string
+      phone?: string | null
+    }
+    shows: Array<{
+      id: number
+      title: string
+      startDateTime: Date | string
+      location?: string
+    }>
+    returnableItems?: Array<{
+      id: number
+      name: string
+    }>
+    entryValidated?: boolean
+    entryValidatedAt?: Date | string
+    entryValidatedBy?: {
+      firstName: string
+      lastName: string
+    }
+  }
+}
+
+type ParticipantData = TicketData | VolunteerData | ArtistData
 
 const props = defineProps<{
   open: boolean
   participant?: ParticipantData
-  type?: 'ticket' | 'volunteer'
+  type?: 'ticket' | 'volunteer' | 'artist'
   isRefunded?: boolean // Indique si la commande est annulée
 }>()
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  validate: [participantIds: number[]]
+  validate: [participantIds: number[], markAsPaid?: boolean, phone?: string | null]
   invalidate: [participantId: number]
 }>()
 
@@ -973,7 +1174,10 @@ const isOpen = computed({
 })
 
 const isVolunteer = computed(() => props.type === 'volunteer')
-const isTicket = computed(() => props.type === 'ticket' || !props.type)
+const isArtist = computed(() => props.type === 'artist')
+const isTicket = computed(
+  () => props.type === 'ticket' || (!props.type && !isVolunteer.value && !isArtist.value)
+)
 
 // Gestion de la sélection des participants
 const selectedParticipants = ref<number[]>([])
@@ -983,6 +1187,9 @@ const showInvalidateModal = ref(false)
 const showPaymentConfirmModal = ref(false)
 const paymentConfirmedChoice = ref(true)
 const ticketToInvalidate = ref<number | null>(null)
+
+// Gestion du téléphone éditable pour artistes et bénévoles
+const editablePhone = ref<string | null>(null)
 
 // Gestion des articles à restituer
 const returnableItemsToDistribute = computed(() => {
@@ -1035,6 +1242,23 @@ const returnableItemsToDistribute = computed(() => {
     }
   }
 
+  // Articles pour les artistes
+  if (props.participant && 'artist' in props.participant) {
+    const artistName =
+      `${props.participant.artist.user.firstName} ${props.participant.artist.user.lastName}`.trim() ||
+      'Artiste'
+
+    if (props.participant.artist.returnableItems) {
+      for (const item of props.participant.artist.returnableItems) {
+        itemsList.push({
+          id: `artist-${item.id}`,
+          name: `${item.name} - ${artistName}`,
+          participantName: artistName,
+        })
+      }
+    }
+  }
+
   return itemsList
 })
 
@@ -1044,6 +1268,14 @@ watch(
   (newValue) => {
     if (newValue) {
       selectedParticipants.value = []
+      // Initialiser le téléphone éditable
+      if (props.participant && 'volunteer' in props.participant) {
+        editablePhone.value = props.participant.volunteer.user.phone || null
+      } else if (props.participant && 'artist' in props.participant) {
+        editablePhone.value = props.participant.artist.user.phone || null
+      } else {
+        editablePhone.value = null
+      }
     }
   }
 )
@@ -1112,11 +1344,25 @@ const confirmValidateEntry = async () => {
   try {
     // Si c'est un bénévole
     if (props.participant && 'volunteer' in props.participant) {
-      emit('validate', [props.participant.volunteer.id], paymentConfirmedChoice.value)
+      emit(
+        'validate',
+        [props.participant.volunteer.id],
+        paymentConfirmedChoice.value,
+        editablePhone.value
+      )
+    }
+    // Si c'est un artiste
+    else if (props.participant && 'artist' in props.participant) {
+      emit(
+        'validate',
+        [props.participant.artist.id],
+        paymentConfirmedChoice.value,
+        editablePhone.value
+      )
     }
     // Si ce sont des tickets sélectionnés
     else if (selectedParticipants.value.length > 0) {
-      emit('validate', selectedParticipants.value, paymentConfirmedChoice.value)
+      emit('validate', selectedParticipants.value, paymentConfirmedChoice.value, null)
       // Réinitialiser la sélection après validation
       selectedParticipants.value = []
     }
@@ -1149,6 +1395,10 @@ const invalidateEntry = async () => {
     // Si c'est un bénévole
     if (props.participant && 'volunteer' in props.participant) {
       emit('invalidate', props.participant.volunteer.id)
+    }
+    // Si c'est un artiste
+    else if (props.participant && 'artist' in props.participant) {
+      emit('invalidate', props.participant.artist.id)
     }
     // Si c'est un ticket
     else if (ticketToInvalidate.value) {

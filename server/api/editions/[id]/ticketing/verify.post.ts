@@ -56,12 +56,19 @@ export default defineEventHandler(async (event) => {
             },
           ],
         },
-        include: {
+        select: {
+          id: true,
+          userId: true,
+          entryValidated: true,
+          entryValidatedAt: true,
+          entryValidatedBy: true,
+          userSnapshotPhone: true,
           user: {
             select: {
               prenom: true,
               nom: true,
               email: true,
+              phone: true,
             },
           },
           teamAssignments: {
@@ -163,6 +170,7 @@ export default defineEventHandler(async (event) => {
                 firstName: application.user.prenom,
                 lastName: application.user.nom,
                 email: application.user.email,
+                phone: application.userSnapshotPhone || application.user.phone,
               },
               teams: application.teamAssignments.map((assignment) => ({
                 id: assignment.team.id,
@@ -222,6 +230,7 @@ export default defineEventHandler(async (event) => {
               prenom: true,
               nom: true,
               email: true,
+              phone: true,
             },
           },
           shows: {
@@ -276,6 +285,7 @@ export default defineEventHandler(async (event) => {
                 firstName: artist.user.prenom,
                 lastName: artist.user.nom,
                 email: artist.user.email,
+                phone: artist.user.phone,
               },
               shows: artist.shows.map((showArtist) => ({
                 id: showArtist.show.id,

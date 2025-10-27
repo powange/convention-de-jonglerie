@@ -140,7 +140,8 @@
       "Bash(npm run lint:*)",
       "WebFetch(domain:juggling-convention.com)",
       "Bash(sudo chmod:*)",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "Bash(sudo rm:*)"
     ],
     "deny": [],
     "ask": [],

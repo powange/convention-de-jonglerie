@@ -1160,6 +1160,7 @@ model EditionArtist {
   paymentPaid         Boolean           @default(false)
   reimbursement       Decimal?          @db.Decimal(10, 2)
   reimbursementPaid   Boolean           @default(false)
+  organizerNotes      String?           @db.Text
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 

@@ -8,6 +8,7 @@ const bodySchema = z.object({
   participantIds: z.array(z.number()).min(1),
   type: z.enum(['ticket', 'volunteer', 'artist']).optional().default('ticket'),
   markAsPaid: z.boolean().optional().default(false),
+  phone: z.string().nullable().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -30,6 +31,22 @@ export default defineEventHandler(async (event) => {
   try {
     if (body.type === 'volunteer') {
       // Valider les bénévoles
+      const updateData: {
+        entryValidated: boolean
+        entryValidatedAt: Date
+        entryValidatedBy: number
+        userSnapshotPhone?: string | null
+      } = {
+        entryValidated: true,
+        entryValidatedAt: new Date(),
+        entryValidatedBy: user.id,
+      }
+
+      // Mettre à jour le téléphone snapshot si fourni
+      if (body.phone !== undefined) {
+        updateData.userSnapshotPhone = body.phone
+      }
+
       const result = await prisma.editionVolunteerApplication.updateMany({
         where: {
           id: {
@@ -38,11 +55,7 @@ export default defineEventHandler(async (event) => {
           editionId: editionId,
           status: 'ACCEPTED',
         },
-        data: {
-          entryValidated: true,
-          entryValidatedAt: new Date(),
-          entryValidatedBy: user.id,
-        },
+        data: updateData,
       })
 
       // Envoyer des notifications aux responsables d'équipes
@@ -143,6 +156,36 @@ export default defineEventHandler(async (event) => {
           entryValidatedBy: user.id,
         },
       })
+
+      // Mettre à jour le téléphone de l'artiste si fourni
+      if (body.phone !== undefined) {
+        // Récupérer les artistes pour obtenir leurs userIds
+        const artists = await prisma.editionArtist.findMany({
+          where: {
+            id: {
+              in: body.participantIds,
+            },
+            editionId: editionId,
+          },
+          select: {
+            userId: true,
+          },
+        })
+
+        const userIds = artists.map((artist) => artist.userId)
+
+        // Mettre à jour le téléphone dans la table User
+        await prisma.user.updateMany({
+          where: {
+            id: {
+              in: userIds,
+            },
+          },
+          data: {
+            phone: body.phone,
+          },
+        })
+      }
 
       return {
         success: true,
