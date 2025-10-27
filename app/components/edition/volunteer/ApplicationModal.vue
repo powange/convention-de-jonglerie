@@ -165,6 +165,16 @@
               />
             </UFormField>
           </div>
+
+          <!-- Information sur les repas -->
+          <UAlert
+            icon="i-heroicons-information-circle"
+            color="info"
+            variant="soft"
+            :title="t('editions.volunteers.meals_info_title')"
+            :description="t('editions.volunteers.meals_info_description')"
+            class="mt-4"
+          />
         </div>
 
         <!-- Section: Comment vous voyez vos créneaux -->

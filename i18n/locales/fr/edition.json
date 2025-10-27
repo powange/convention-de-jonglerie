@@ -333,6 +333,8 @@
       "apply": "Postuler comme bénévole",
       "apply_description": "Soumettez votre candidature pour aider pendant l'édition.",
       "arrival_time_label": "Quand comptez-vous arriver ?",
+      "meals_info_title": "Repas inclus selon vos horaires",
+      "meals_info_description": "Arrivée matin : petit-déj + déjeuner + dîner | Arrivée midi : déjeuner + dîner | Arrivée après-midi/soir : dîner seulement. Départ matin : petit-déj | Départ midi/après-midi : petit-déj + déjeuner | Départ soir : petit-déj + déjeuner + dîner",
       "ask_allergies_label": "Demander les allergies",
       "ask_avoid_list_label": "Demander les personnes à éviter",
       "ask_companion_label": "Demander les bénévoles préférés",
