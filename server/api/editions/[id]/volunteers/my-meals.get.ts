@@ -1,5 +1,9 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { prisma } from '@@/server/utils/prisma'
+import {
+  getAvailableMealsOnArrival,
+  getAvailableMealsOnDeparture,
+} from '@@/server/utils/volunteer-meals'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
@@ -62,15 +66,33 @@ export default defineEventHandler(async (event) => {
       mealDate.setUTCHours(0, 0, 0, 0)
 
       if (volunteer.arrivalDateTime) {
-        const arrivalDate = new Date(volunteer.arrivalDateTime)
+        // Format: YYYY-MM-DD_timeOfDay
+        const [arrivalDatePart, arrivalTimeOfDay] = volunteer.arrivalDateTime.split('_')
+        const arrivalDate = new Date(arrivalDatePart)
         arrivalDate.setUTCHours(0, 0, 0, 0)
+
         if (mealDate < arrivalDate) return false
+
+        // Si c'est le jour d'arrivée, vérifier l'heure
+        if (mealDate.getTime() === arrivalDate.getTime()) {
+          const availableMeals = getAvailableMealsOnArrival(arrivalTimeOfDay)
+          if (!availableMeals.includes(meal.mealType)) return false
+        }
       }
 
       if (volunteer.departureDateTime) {
-        const departureDate = new Date(volunteer.departureDateTime)
+        // Format: YYYY-MM-DD_timeOfDay
+        const [departureDatePart, departureTimeOfDay] = volunteer.departureDateTime.split('_')
+        const departureDate = new Date(departureDatePart)
         departureDate.setUTCHours(0, 0, 0, 0)
+
         if (mealDate > departureDate) return false
+
+        // Si c'est le jour de départ, vérifier l'heure
+        if (mealDate.getTime() === departureDate.getTime()) {
+          const availableMeals = getAvailableMealsOnDeparture(departureTimeOfDay)
+          if (!availableMeals.includes(meal.mealType)) return false
+        }
       }
 
       return true

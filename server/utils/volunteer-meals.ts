@@ -1,5 +1,61 @@
 import { prisma } from './prisma'
 
+import type { VolunteerMealType } from '@prisma/client'
+
+/**
+ * Détermine quels types de repas sont disponibles selon l'heure d'arrivée
+ * Règles :
+ * - Arrivée matin (early_morning, morning) → petit-déj + déjeuner + dîner
+ * - Arrivée midi (lunch) → déjeuner + dîner
+ * - Arrivée après-midi (early_afternoon, late_afternoon) → dîner seulement
+ * - Arrivée soir (evening, late_evening, night) → aucun repas
+ */
+export function getAvailableMealsOnArrival(timeOfDay: string): VolunteerMealType[] {
+  switch (timeOfDay) {
+    case 'early_morning':
+    case 'morning':
+      return ['BREAKFAST', 'LUNCH', 'DINNER']
+    case 'lunch':
+      return ['LUNCH', 'DINNER']
+    case 'early_afternoon':
+    case 'late_afternoon':
+      return ['DINNER']
+    case 'evening':
+    case 'late_evening':
+    case 'night':
+      return []
+    default:
+      return ['BREAKFAST', 'LUNCH', 'DINNER']
+  }
+}
+
+/**
+ * Détermine quels types de repas sont disponibles selon l'heure de départ
+ * Règles inverses :
+ * - Départ matin (early_morning, morning) → rien (part avant le petit-déj)
+ * - Départ midi (lunch) → petit-déj seulement
+ * - Départ après-midi (early_afternoon, late_afternoon) → petit-déj + déjeuner
+ * - Départ soir (evening, late_evening, night) → petit-déj + déjeuner + dîner
+ */
+export function getAvailableMealsOnDeparture(timeOfDay: string): VolunteerMealType[] {
+  switch (timeOfDay) {
+    case 'early_morning':
+    case 'morning':
+      return []
+    case 'lunch':
+      return ['BREAKFAST']
+    case 'early_afternoon':
+    case 'late_afternoon':
+      return ['BREAKFAST', 'LUNCH']
+    case 'evening':
+    case 'late_evening':
+    case 'night':
+      return ['BREAKFAST', 'LUNCH', 'DINNER']
+    default:
+      return ['BREAKFAST', 'LUNCH', 'DINNER']
+  }
+}
+
 /**
  * Crée automatiquement les sélections de repas pour un bénévole accepté
  * Filtre selon ses disponibilités (setup/event/teardown) et ses dates d'arrivée/départ
@@ -46,18 +102,32 @@ export async function createVolunteerMealSelections(
 
     if (volunteer.arrivalDateTime) {
       // Format: YYYY-MM-DD_timeOfDay
-      const arrivalDatePart = volunteer.arrivalDateTime.split('_')[0]
+      const [arrivalDatePart, arrivalTimeOfDay] = volunteer.arrivalDateTime.split('_')
       const arrivalDate = new Date(arrivalDatePart)
       arrivalDate.setUTCHours(0, 0, 0, 0)
+
       if (mealDate < arrivalDate) return false
+
+      // Si c'est le jour d'arrivée, vérifier l'heure
+      if (mealDate.getTime() === arrivalDate.getTime()) {
+        const availableMeals = getAvailableMealsOnArrival(arrivalTimeOfDay)
+        if (!availableMeals.includes(meal.type)) return false
+      }
     }
 
     if (volunteer.departureDateTime) {
       // Format: YYYY-MM-DD_timeOfDay
-      const departureDatePart = volunteer.departureDateTime.split('_')[0]
+      const [departureDatePart, departureTimeOfDay] = volunteer.departureDateTime.split('_')
       const departureDate = new Date(departureDatePart)
       departureDate.setUTCHours(0, 0, 0, 0)
+
       if (mealDate > departureDate) return false
+
+      // Si c'est le jour de départ, vérifier l'heure
+      if (mealDate.getTime() === departureDate.getTime()) {
+        const availableMeals = getAvailableMealsOnDeparture(departureTimeOfDay)
+        if (!availableMeals.includes(meal.type)) return false
+      }
     }
 
     return true
