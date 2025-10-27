@@ -778,8 +778,8 @@ const openEditTeamsModal = (app: any) => {
   currentApplication.value = app
 
   // Si l'application a des équipes dans le nouveau système, les utiliser
-  if (app.teams && app.teams.length > 0) {
-    selectedTeams.value = app.teams.map((team: any) => team.id)
+  if (app.teamAssignments && app.teamAssignments.length > 0) {
+    selectedTeams.value = app.teamAssignments.map((ta: any) => ta.teamId)
   } else {
     // Par défaut, aucune équipe sélectionnée
     selectedTeams.value = []
