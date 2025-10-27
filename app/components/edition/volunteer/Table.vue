@@ -1130,8 +1130,64 @@ const columns = computed((): TableColumn<any>[] => [
   },
   // Colonne présence
   {
-    accessorKey: 'presence',
-    header: t('editions.volunteers.table_presence'),
+    accessorKey: 'arrivalDateTime',
+    header: ({ column }) => getSortableHeader(column, t('editions.volunteers.table_presence')),
+    enableSorting: true,
+    sortingFn: (rowA: any, rowB: any, _columnId: string) => {
+      const arrivalA = rowA.original.arrivalDateTime
+      const arrivalB = rowB.original.arrivalDateTime
+      const departureA = rowA.original.departureDateTime
+      const departureB = rowB.original.departureDateTime
+
+      // Fonction pour convertir le format personnalisé en timestamp
+      const parseCustomDate = (dateStr: string | null): number => {
+        if (!dateStr) return Number.MAX_SAFE_INTEGER
+
+        // Format: YYYY-MM-DD_timeOfDay (ex: "2025-10-30_afternoon")
+        const parts = dateStr.split('_')
+        const datePart = parts[0]
+        const timePart = parts[1] || 'noon'
+
+        // Convertir timeOfDay en heures
+        const timeMap: Record<string, number> = {
+          morning: 6,
+          noon: 12,
+          afternoon: 14,
+          evening: 18,
+        }
+
+        const hours = timeMap[timePart] || 12
+        const date = new Date(`${datePart}T${hours.toString().padStart(2, '0')}:00:00`)
+
+        return date.getTime()
+      }
+
+      // Vérifier le sens du tri actuel pour cette colonne
+      const currentSort = sorting.value.find((s) => s.id === 'arrivalDateTime')
+      const isDescending = currentSort?.desc === true
+
+      if (isDescending) {
+        // Tri décroissant: se baser uniquement sur la date de départ
+        const depTimeA = parseCustomDate(departureA)
+        const depTimeB = parseCustomDate(departureB)
+        return depTimeA - depTimeB
+      } else {
+        // Tri croissant: se baser sur la date d'arrivée, puis sur la date de départ
+        const timeA = parseCustomDate(arrivalA)
+        const timeB = parseCustomDate(arrivalB)
+
+        // Comparer d'abord les dates d'arrivée
+        if (timeA !== timeB) {
+          return timeA - timeB
+        }
+
+        // Si dates d'arrivée identiques, comparer les dates de départ
+        const depTimeA = parseCustomDate(departureA)
+        const depTimeB = parseCustomDate(departureB)
+
+        return depTimeA - depTimeB
+      }
+    },
     cell: ({ row }: any) => {
       const hasSetupAvailability = row.original.setupAvailability
       const hasTeardownAvailability = row.original.teardownAvailability
