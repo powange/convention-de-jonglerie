@@ -93,6 +93,11 @@
                   {{ $t('edition.shows.artists') }}
                 </th>
                 <th
+                  class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  {{ $t('edition.shows.artists_to_return') }}
+                </th>
+                <th
                   v-if="canEdit"
                   class="px-4 py-3 text-right text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
@@ -141,6 +146,43 @@
                   <span v-else class="text-gray-400">{{
                     $t('edition.shows.no_artists_selected')
                   }}</span>
+                </td>
+                <td class="px-4 py-3 text-sm">
+                  <div
+                    v-if="
+                      show.returnableItems &&
+                      show.returnableItems.length > 0 &&
+                      show.artists &&
+                      show.artists.length > 0
+                    "
+                    class="space-y-2"
+                  >
+                    <div class="flex flex-wrap gap-1">
+                      <UBadge
+                        v-for="showArtist in show.artists"
+                        :key="showArtist.artist.id"
+                        color="orange"
+                        variant="subtle"
+                        size="sm"
+                      >
+                        {{ showArtist.artist.user.prenom }} {{ showArtist.artist.user.nom }}
+                      </UBadge>
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                      <UIcon name="i-heroicons-arrow-path" class="inline-block w-3 h-3" />
+                      {{ show.returnableItems.length }}
+                      {{ show.returnableItems.length === 1 ? 'article' : 'articles' }}
+                    </div>
+                  </div>
+                  <span
+                    v-else-if="!show.returnableItems || show.returnableItems.length === 0"
+                    class="text-gray-400 text-xs"
+                  >
+                    {{ $t('edition.shows.no_returnable_items') }}
+                  </span>
+                  <span v-else class="text-gray-400 text-xs">
+                    {{ $t('edition.shows.no_artists_selected') }}
+                  </span>
                 </td>
                 <td v-if="canEdit" class="px-4 py-3 text-sm text-right">
                   <div class="flex items-center justify-end gap-2">

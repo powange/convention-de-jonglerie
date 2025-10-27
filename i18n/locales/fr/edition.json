@@ -758,6 +758,7 @@
     "shows": {
       "add_show": "Ajouter un spectacle",
       "artists": "Artistes",
+      "artists_to_return": "Artistes à restituer",
       "delete_confirm": "Êtes-vous sûr de vouloir supprimer ce spectacle ?",
       "delete_show": "Supprimer le spectacle",
       "description": "Description",
@@ -766,11 +767,13 @@
       "error_create": "Erreur lors de la création du spectacle",
       "error_delete": "Erreur lors de la suppression du spectacle",
       "error_update": "Erreur lors de la modification du spectacle",
+      "items_to_receive": "Articles à récupérer",
       "list_title": "Gestion des spectacles",
       "location": "Lieu",
       "manage_shows_description": "Gérez les spectacles programmés pour cette édition",
       "no_artists_selected": "Aucun artiste sélectionné",
       "no_items_selected": "Aucun article sélectionné",
+      "no_returnable_items": "Aucun article à restituer",
       "no_shows": "Aucun spectacle pour le moment",
       "returnable_items": "Articles à remettre aux artistes",
       "select_artists": "Sélectionner des artistes",
@@ -780,8 +783,7 @@
       "show_title": "Titre du spectacle",
       "show_updated": "Spectacle modifié avec succès",
       "start_datetime": "Date et heure de début",
-      "title": "Spectacles",
-      "items_to_receive": "Articles à récupérer"
+      "title": "Spectacles"
     }
   }
 }

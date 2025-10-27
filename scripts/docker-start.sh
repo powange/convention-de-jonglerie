@@ -4,8 +4,7 @@
 echo "Starting app initialization..."
 
 # Créer les dossiers avec les bonnes permissions si nécessaire
-mkdir -p .nuxt .output
-chown -R node:node .nuxt .output 2>/dev/null || true
+mkdir -p .nuxt .output node_modules/.prisma
 
 # Exécuter les migrations Prisma
 npx prisma generate

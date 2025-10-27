@@ -30,7 +30,7 @@ services:
         BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:22-slim}
     container_name: convention-app-dev
     working_dir: /app
-    user: '${UID:-1000}:${GID:-1000}'
+    # Note: pas de user: spécifié pour éviter les problèmes de permissions avec les volumes
     # Exécuter les migrations Prisma (idempotent) puis démarrer Nuxt en mode dev.
     # Optimisé pour réduire les temps de démarrage avec gestion des permissions
     command: sh -lc "/app/scripts/docker-start.sh"
@@ -101,10 +101,10 @@ services:
       - ./tsconfig.json:/app/tsconfig.json:cached
       - ./vitest.config.ts:/app/vitest.config.ts:cached
       - ./vitest.config.ui.ts:/app/vitest.config.ui.ts:cached
-      # Caches/deps persistants côté Docker
-      - ./node_modules:/app/node_modules
-      - ./.nuxt:/app/.nuxt
-      - ./.output:/app/.output
+      # Caches/deps persistants côté Docker (volumes nommés pour éviter les problèmes de permissions)
+      - node_modules:/app/node_modules
+      # Note: .nuxt et .output ne sont PAS montés comme volumes pour éviter les problèmes de permissions
+      # Ces dossiers restent dans le conteneur
     ports:
       - '3000:3000'
       - '24678:24678'
@@ -149,6 +149,8 @@ volumes:
   uploads_data:
     driver: local
   uploads:
+    driver: local
+  node_modules:
     driver: local
   # ollama_data:
   #   driver: local
