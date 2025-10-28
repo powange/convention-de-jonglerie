@@ -1,125 +1,133 @@
 <template>
   <UModal v-model:open="isOpen" :title="title">
     <template #body>
-      <form class="space-y-4" @submit.prevent="handleSubmit">
-        <!-- Titre -->
-        <UFormField :label="$t('edition.shows.show_title')" required>
-          <UInput
-            v-model="formData.title"
-            :placeholder="$t('edition.shows.show_title')"
-            required
-            class="w-full"
-          />
-        </UFormField>
+      <form @submit.prevent="handleSubmit">
+        <div class="space-y-4">
+          <!-- Titre -->
+          <UFormField :label="$t('edition.shows.show_title')" required>
+            <UInput
+              v-model="formData.title"
+              :placeholder="$t('edition.shows.show_title')"
+              required
+              class="w-full"
+            />
+          </UFormField>
 
-        <!-- Description -->
-        <UFormField :label="$t('edition.shows.description')">
-          <UTextarea
-            v-model="formData.description"
-            :placeholder="$t('edition.shows.description')"
-            rows="3"
-            class="w-full"
-          />
-        </UFormField>
+          <!-- Description -->
+          <UFormField :label="$t('edition.shows.description')">
+            <UTextarea
+              v-model="formData.description"
+              :placeholder="$t('edition.shows.description')"
+              rows="3"
+              class="w-full"
+            />
+          </UFormField>
 
-        <!-- Date et heure -->
-        <UFormField :label="$t('edition.shows.start_datetime')" required>
-          <UInput
-            v-model="formData.startDateTime"
-            type="datetime-local"
-            :placeholder="$t('edition.shows.start_datetime')"
-            required
-          />
-        </UFormField>
+          <!-- Date et heure -->
+          <UFormField :label="$t('edition.shows.start_datetime')" required>
+            <UInput
+              v-model="formData.startDateTime"
+              type="datetime-local"
+              :placeholder="$t('edition.shows.start_datetime')"
+              required
+            />
+          </UFormField>
 
-        <!-- Durée -->
-        <UFormField :label="$t('edition.shows.duration')">
-          <UInput
-            v-model.number="formData.duration"
-            type="number"
-            min="0"
-            :placeholder="$t('edition.shows.duration')"
-          />
-        </UFormField>
+          <!-- Durée -->
+          <UFormField :label="$t('edition.shows.duration')">
+            <UInput
+              v-model.number="formData.duration"
+              type="number"
+              min="0"
+              :placeholder="$t('edition.shows.duration')"
+            />
+          </UFormField>
 
-        <!-- Lieu -->
-        <UFormField :label="$t('edition.shows.location')">
-          <UInput
-            v-model="formData.location"
-            :placeholder="$t('edition.shows.location')"
-            class="w-full"
-          />
-        </UFormField>
+          <!-- Lieu -->
+          <UFormField :label="$t('edition.shows.location')">
+            <UInput
+              v-model="formData.location"
+              :placeholder="$t('edition.shows.location')"
+              class="w-full"
+            />
+          </UFormField>
 
-        <!-- Sélection des artistes -->
-        <UFormField :label="$t('edition.shows.artists')">
-          <USelect
-            v-model="formData.artistIds"
-            :items="artistOptions"
-            value-key="value"
-            multiple
-            :placeholder="$t('edition.shows.select_artists')"
-            class="w-full"
-          />
-        </UFormField>
+          <!-- Sélection des artistes -->
+          <UFormField :label="$t('edition.shows.artists')">
+            <USelectMenu
+              v-model="formData.artistIds"
+              :items="artistOptions"
+              value-key="value"
+              multiple
+              :placeholder="$t('edition.shows.select_artists')"
+              class="w-full"
+            >
+              <template #label>
+                <span v-if="formData.artistIds.length === 0">
+                  {{ $t('edition.shows.no_artists_selected') }}
+                </span>
+                <span v-else>{{ formData.artistIds.length }} artiste(s) sélectionné(s)</span>
+              </template>
+            </USelectMenu>
+          </UFormField>
 
-        <!-- Liste des artistes sélectionnés -->
-        <div v-if="selectedArtists.length > 0" class="flex flex-wrap gap-2">
-          <UBadge
-            v-for="artist in selectedArtists"
-            :key="artist.id"
-            color="warning"
-            variant="subtle"
-          >
-            {{ artist.user.prenom }} {{ artist.user.nom }}
-          </UBadge>
-        </div>
-        <p v-else class="text-sm text-gray-500">
-          {{ $t('edition.shows.no_artists_selected') }}
-        </p>
+          <!-- Liste des artistes sélectionnés -->
+          <div v-if="selectedArtists.length > 0" class="flex flex-wrap gap-2">
+            <UBadge
+              v-for="artist in selectedArtists"
+              :key="artist.id"
+              color="warning"
+              variant="subtle"
+            >
+              {{ artist.user.prenom }} {{ artist.user.nom }}
+            </UBadge>
+          </div>
+          <p v-else class="text-sm text-gray-500">
+            {{ $t('edition.shows.no_artists_selected') }}
+          </p>
 
-        <!-- Sélection des articles à restituer -->
-        <UFormField :label="$t('edition.shows.returnable_items')">
-          <USelectMenu
-            v-model="formData.returnableItemIds"
-            :items="returnableItemOptions"
-            value-key="value"
-            multiple
-            searchable
-            :placeholder="$t('edition.shows.select_returnable_items')"
-            class="w-full"
-          >
-            <template #label>
-              <span v-if="formData.returnableItemIds.length === 0">
-                {{ $t('edition.shows.no_items_selected') }}
-              </span>
-              <span v-else>{{ formData.returnableItemIds.length }} article(s) sélectionné(s)</span>
-            </template>
-          </USelectMenu>
-        </UFormField>
+          <!-- Sélection des articles à restituer -->
+          <UFormField :label="$t('edition.shows.returnable_items')">
+            <USelectMenu
+              v-model="formData.returnableItemIds"
+              :items="returnableItemOptions"
+              value-key="value"
+              multiple
+              :placeholder="$t('edition.shows.select_returnable_items')"
+              class="w-full"
+            >
+              <template #label>
+                <span v-if="formData.returnableItemIds.length === 0">
+                  {{ $t('edition.shows.no_items_selected') }}
+                </span>
+                <span v-else
+                  >{{ formData.returnableItemIds.length }} article(s) sélectionné(s)</span
+                >
+              </template>
+            </USelectMenu>
+          </UFormField>
 
-        <!-- Liste des articles sélectionnés -->
-        <div v-if="selectedReturnableItems.length > 0" class="flex flex-wrap gap-2">
-          <UBadge
-            v-for="item in selectedReturnableItems"
-            :key="item.id"
-            color="info"
-            variant="subtle"
-          >
-            {{ item.name }}
-          </UBadge>
-        </div>
-
-        <!-- Actions -->
-        <div class="flex justify-end gap-2 pt-4">
-          <UButton color="neutral" variant="soft" @click="closeModal">
-            {{ $t('common.cancel') }}
-          </UButton>
-          <UButton type="submit" color="primary" :loading="loading">
-            {{ show ? $t('common.save') : $t('common.add') }}
-          </UButton>
+          <!-- Liste des articles sélectionnés -->
+          <div v-if="selectedReturnableItems.length > 0" class="flex flex-wrap gap-2">
+            <UBadge
+              v-for="item in selectedReturnableItems"
+              :key="item.id"
+              color="info"
+              variant="subtle"
+            >
+              {{ item.name }}
+            </UBadge>
+          </div>
         </div>
       </form>
+    </template>
+
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <UButton type="button" color="primary" :loading="loading" @click="handleSubmit">
+          {{ show ? $t('common.save') : $t('common.add') }}
+        </UButton>
+      </div>
     </template>
   </UModal>
 </template>
@@ -200,7 +208,7 @@ const fetchArtists = async () => {
 const fetchReturnableItems = async () => {
   try {
     const response = await $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`)
-    returnableItems.value = response || []
+    returnableItems.value = response?.returnableItems || []
   } catch (error) {
     console.error('Error fetching returnable items:', error)
   }
@@ -252,8 +260,8 @@ const handleSubmit = async () => {
 }
 
 const closeModal = () => {
-  isOpen.value = false
   resetForm()
+  isOpen.value = false
 }
 
 const resetForm = () => {
@@ -293,13 +301,21 @@ watch(
     } else {
       resetForm()
     }
+  }
+)
+
+// Charger les données au montage et quand le modal s'ouvre
+watch(
+  () => props.modelValue,
+  async (isOpen) => {
+    if (isOpen) {
+      // Charger les artistes et items si pas encore chargés
+      await Promise.all([
+        artists.value.length === 0 ? fetchArtists() : Promise.resolve(),
+        returnableItems.value.length === 0 ? fetchReturnableItems() : Promise.resolve(),
+      ])
+    }
   },
   { immediate: true }
 )
-
-// Charger les données au montage
-onMounted(() => {
-  fetchArtists()
-  fetchReturnableItems()
-})
 </script>
