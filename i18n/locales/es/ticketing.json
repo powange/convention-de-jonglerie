@@ -15,6 +15,20 @@
       "how_to_use_title": "Cómo usar este código QR",
       "logo_alt": "HelloAsso"
     },
+    "orders": {
+      "cancel_order": "Cancelar pedido",
+      "cancel_order_confirm": "¿Está seguro de que desea cancelar este pedido?",
+      "cancel_order_confirm_message": "Esta acción cancelará el pedido y bloqueará todos los tickets asociados. Los tickets ya no se podrán utilizar.",
+      "canceling_order": "Cancelación en curso...",
+      "cancel_order_error": "Error al cancelar la orden",
+      "order_canceled": "Pedido anulado",
+      "delete_order": "Eliminar comando",
+      "delete_order_confirm": "¿Estás seguro de que quieres borrar este comando?",
+      "delete_order_confirm_message": "Esta acción borrará permanentemente el pedido y todos los tickets asociados de la base de datos. Esta acción no se puede deshacer.",
+      "deleting_order": "Supresión en curso...",
+      "delete_order_error": "Error al borrar la orden",
+      "order_deleted": "Pedido suprimido"
+    },
     "options": {
       "list": {
         "loading": "Cargando...",
@@ -38,20 +52,6 @@
         "type_label": "Tipo de opción"
       }
     },
-    "orders": {
-      "cancel_order": "[TODO] Cancelar pedido",
-      "cancel_order_confirm": "[TODO] ¿Está seguro de que desea cancelar este pedido?",
-      "cancel_order_confirm_message": "[TODO] Esta acción eliminará permanentemente el pedido y todas las entradas asociadas. Esta acción no se puede deshacer.",
-      "cancel_order_error": "[TODO] Erreur lors de l'annulation de la commande",
-      "canceling_order": "[TODO] Cancelando...",
-      "delete_order": "[TODO] Supprimer la commande",
-      "delete_order_confirm": "[TODO] Êtes-vous sûr de vouloir supprimer cette commande ?",
-      "delete_order_confirm_message": "[TODO] Cette action supprimera définitivement la commande et tous les billets associés de la base de données. Cette action ne peut pas être annulée.",
-      "delete_order_error": "[TODO] Erreur lors de la suppression de la commande",
-      "deleting_order": "[TODO] Suppression en cours...",
-      "order_canceled": "[TODO] Commande annulée",
-      "order_deleted": "[TODO] Commande supprimée"
-    },
     "participant": {
       "entry_validated": "Entrada ya validada",
       "logo_alt": "HelloAsso",
@@ -69,10 +69,10 @@
         "title": "Gestión de cuotas"
       },
       "stats": {
-        "exceeded": "[TODO] DÉPASSEMENT",
         "title": "Estadísticas de cuotas",
         "used": "Utilizado",
-        "validated": "Validado"
+        "validated": "Validado",
+        "exceeded": "OVERRIDE"
       }
     },
     "returnable_items": {
@@ -92,9 +92,9 @@
       }
     },
     "stats": {
-      "artists": "[TODO] Artistes",
       "participants": "Participantes",
-      "volunteers": "Voluntarios"
+      "volunteers": "Voluntarios",
+      "artists": "Artistas"
     },
     "tiers": {
       "list": {
@@ -113,8 +113,8 @@
         "min_amount_placeholder": "0,00",
         "name_label": "Nombre de la tarifa",
         "name_placeholder": "Ej: Pase de 3 días",
-        "no_item_selected": "No se ha seleccionado ningún artículo",
         "no_quota_selected": "No se ha seleccionado ninguna cuota",
+        "no_item_selected": "No se ha seleccionado ningún artículo",
         "position_label": "Posición de visualización",
         "position_placeholder": "0",
         "price_label": "Precio (€)",

@@ -1,59 +1,56 @@
 {
   "gestion": {
-    "edit_edition": "[TODO]",
-    "delete_edition": "[TODO]",
-    "confirm_delete_edition": "[TODO]",
-    "manage_lost_found": "[TODO]",
-    "lost_found_active_description": "[TODO]",
+    "edit_edition": "Modify editing",
+    "delete_edition": "Delete edit",
+    "confirm_delete_edition": "Are you sure you want to scrap this edition?",
+    "manage_lost_found": "Managing lost property",
+    "lost_found_active_description": "Participants can report lost and found items",
     "volunteers": {
-      "management_mode": "[TODO]",
-      "management_mode_description": "[TODO]",
-      "mode_internal": "[TODO]",
-      "mode_external": "[TODO]",
-      "external_link": "[TODO]",
-      "external_url_placeholder": "[TODO]",
-      "external_url_description": "[TODO]",
-      "applications_open": "[TODO]",
-      "applications_open_description": "[TODO]",
-      "workshops_enabled": "[TODO]",
-      "workshops_enabled_description": "[TODO]",
-      "workshops_active_message": "[TODO]",
-      "workshops_active_description": "[TODO]"
+      "management_mode": "Volunteer management",
+      "management_mode_description": "Choose how to manage volunteers for this edition",
+      "mode_internal": "Internal",
+      "mode_external": "External",
+      "mode_internal_badge": "Internal",
+      "mode_external_badge": "External",
+      "external_link": "External link",
+      "external_url_placeholder": "https://exemple.com/benevoles",
+      "external_url_description": "Link to your form or external volunteer management tool",
+      "applications_open": "Opening of applications",
+      "applications_open_description": "Activate or deactivate volunteer applications",
+      "applications_description": "Viewing and processing applications",
+      "teams_description": "Organising teams of volunteers",
+      "planning_description": "Planning slots and missions",
+      "notifications_description": "Send notifications to volunteers",
+      "tools_description": "Advanced tools and document generation"
     },
     "meals": {
-      "title": "[TODO]",
-      "configuration_title": "[TODO]",
-      "configuration_description": "[TODO]",
-      "list_title": "[TODO]",
-      "list_description": "[TODO]"
+      "title": "Meals",
+      "configuration_title": "Meal configuration",
+      "configuration_description": "Managing meals for volunteers and artists",
+      "list_title": "List of meals",
+      "list_description": "View the list of all meal participants"
     },
     "ticketing": {
-      "title": "[TODO]",
-      "external_link_title": "[TODO]",
-      "external_link_description": "[TODO]",
-      "tiers_title": "[TODO]",
-      "tiers_description": "[TODO]",
-      "orders_title": "[TODO]",
-      "orders_description": "[TODO]",
-      "access_control_title": "[TODO]",
-      "access_control_description": "[TODO]"
+      "title": "Tickets",
+      "external_link_title": "Linking an external ticketing service",
+      "external_link_description": "Connect HelloAsso or another platform",
+      "tiers_title": "Rates, options & quotas",
+      "tiers_description": "Manage tariffs, options, quotas and items to be returned",
+      "orders_title": "Controls",
+      "orders_description": "View orders and participants",
+      "access_control_title": "Access control",
+      "access_control_description": "Scan and validate tickets at the entrance"
     },
     "artists": {
-      "title": "[TODO]",
-      "shows_title": "[TODO]",
-      "shows_description": "[TODO]"
+      "title": "Artist management",
+      "list_title": "Artist management",
+      "manage_artists_description": "Manage the artists invited to this edition"
     },
     "workshops": {
-      "title": "[TODO]",
-      "locations_management": "[TODO]",
-      "location_mode_label": "[TODO]",
-      "location_mode_free_description": "[TODO]",
-      "location_mode_exclusive_description": "[TODO]",
-      "no_locations_yet": "[TODO]",
-      "add_location_placeholder": "[TODO]",
-      "organize_teams": "[TODO]",
-      "plan_shifts": "[TODO]",
-      "advanced_tools": "[TODO]"
+      "title": "Workshops",
+      "enable_workshops": "Activate workshops",
+      "workshops_enabled_notice": "Workshops are activated",
+      "workshops_enabled_description": "Participants and volunteers can now create workshops for this edition."
     }
   }
 }

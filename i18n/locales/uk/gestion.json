@@ -1,59 +1,56 @@
 {
   "gestion": {
-    "edit_edition": "[TODO]",
-    "delete_edition": "[TODO]",
-    "confirm_delete_edition": "[TODO]",
-    "manage_lost_found": "[TODO]",
-    "lost_found_active_description": "[TODO]",
+    "edit_edition": "Змінити редагування",
+    "delete_edition": "Видалити редагування",
+    "confirm_delete_edition": "Ви впевнені, що хочете списати це видання?",
+    "manage_lost_found": "Управління втраченим майном",
+    "lost_found_active_description": "Учасники можуть повідомляти про загублені та знайдені речі",
     "volunteers": {
-      "management_mode": "[TODO]",
-      "management_mode_description": "[TODO]",
-      "mode_internal": "[TODO]",
-      "mode_external": "[TODO]",
-      "external_link": "[TODO]",
-      "external_url_placeholder": "[TODO]",
-      "external_url_description": "[TODO]",
-      "applications_open": "[TODO]",
-      "applications_open_description": "[TODO]",
-      "workshops_enabled": "[TODO]",
-      "workshops_enabled_description": "[TODO]",
-      "workshops_active_message": "[TODO]",
-      "workshops_active_description": "[TODO]"
+      "management_mode": "Управління волонтерами",
+      "management_mode_description": "Виберіть, як керувати волонтерами для цього видання",
+      "mode_internal": "Внутрішній",
+      "mode_external": "Зовнішні",
+      "mode_internal_badge": "Внутрішній",
+      "mode_external_badge": "Зовнішні",
+      "external_link": "Зовнішнє посилання",
+      "external_url_placeholder": "https://exemple.com/benevoles",
+      "external_url_description": "Посилання на вашу форму або зовнішній інструмент управління волонтерами",
+      "applications_open": "Відкриття заявок",
+      "applications_open_description": "Активувати або деактивувати заявки волонтерів",
+      "applications_description": "Перегляд та обробка заявок",
+      "teams_description": "Організація команд волонтерів",
+      "planning_description": "Планування слотів і місій",
+      "notifications_description": "Надсилайте сповіщення волонтерам",
+      "tools_description": "Розширені інструменти та генерація документів"
     },
     "meals": {
-      "title": "[TODO]",
-      "configuration_title": "[TODO]",
-      "configuration_description": "[TODO]",
-      "list_title": "[TODO]",
-      "list_description": "[TODO]"
+      "title": "Харчування",
+      "configuration_title": "Конфігурація харчування",
+      "configuration_description": "Організація харчування для волонтерів та митців",
+      "list_title": "Перелік страв",
+      "list_description": "Переглянути список всіх учасників обіду"
     },
     "ticketing": {
-      "title": "[TODO]",
-      "external_link_title": "[TODO]",
-      "external_link_description": "[TODO]",
-      "tiers_title": "[TODO]",
-      "tiers_description": "[TODO]",
-      "orders_title": "[TODO]",
-      "orders_description": "[TODO]",
-      "access_control_title": "[TODO]",
-      "access_control_description": "[TODO]"
+      "title": "Квитки",
+      "external_link_title": "Підключення зовнішнього сервісу продажу квитків",
+      "external_link_description": "Підключіть HelloAsso або іншу платформу",
+      "tiers_title": "Ставки, опції та квоти",
+      "tiers_description": "Керуйте тарифами, опціями, квотами та товарами, що підлягають поверненню",
+      "orders_title": "Керування",
+      "orders_description": "Перегляд замовлень та учасників",
+      "access_control_title": "Контроль доступу",
+      "access_control_description": "Скануйте та перевіряйте квитки на вході"
     },
     "artists": {
-      "title": "[TODO]",
-      "shows_title": "[TODO]",
-      "shows_description": "[TODO]"
+      "title": "Менеджмент артистів",
+      "list_title": "Менеджмент артистів",
+      "manage_artists_description": "Керуйте художниками, запрошеними до цього видання"
     },
     "workshops": {
-      "title": "[TODO]",
-      "locations_management": "[TODO]",
-      "location_mode_label": "[TODO]",
-      "location_mode_free_description": "[TODO]",
-      "location_mode_exclusive_description": "[TODO]",
-      "no_locations_yet": "[TODO]",
-      "add_location_placeholder": "[TODO]",
-      "organize_teams": "[TODO]",
-      "plan_shifts": "[TODO]",
-      "advanced_tools": "[TODO]"
+      "title": "Майстер-класи",
+      "enable_workshops": "Активувати воркшопи",
+      "workshops_enabled_notice": "Активуються воркшопи",
+      "workshops_enabled_description": "Учасники та волонтери тепер можуть створювати воркшопи для цього видання."
     }
   }
 }

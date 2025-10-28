@@ -14,7 +14,6 @@
   },
   "pages": {
     "access_denied": {
-      "confirm_delete_edition": "Are you sure you want to delete this edition?",
       "description": "You don't have the rights to access this page.",
       "title": "Access denied"
     },
@@ -54,12 +53,6 @@
     "favorites": {
       "editions_in_favorites": "{count} edition | {count} editions in favorites",
       "no_favorites_added": "You haven't added any edition to your favorites yet."
-    },
-    "management": {
-      "delete_edition": "Delete edition",
-      "edit_edition": "Edit edition",
-      "lost_found_active_description": "You can manage lost & found items while the edition is running.",
-      "manage_lost_found": "Manage lost & found"
     },
     "objets_trouves": {
       "photo_alt": "Photo of found item"

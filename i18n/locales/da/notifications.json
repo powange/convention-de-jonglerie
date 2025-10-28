@@ -1,4 +1,22 @@
 {
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Få besked om samkørsel-bookinger og beskeder",
+        "important": "Gå ikke glip af vigtig information der vedrører dig",
+        "reminders": "Modtag påmindelser om dine yndlings-konventioner",
+        "volunteer": "Modtag opdateringer om dine frivillig-ansøgninger"
+      },
+      "description": "Aktivér push-notifikationer for at holde dig opdateret om dine samkørsler, frivillig-ansøgninger og yndlings-konventioner.",
+      "enable": "Aktivér notifikationer",
+      "not_now": "Ikke nu",
+      "privacy": {
+        "description": "Du kan deaktivere notifikationer når som helst i dine indstillinger.",
+        "title": "Respekterer dit privatliv"
+      },
+      "title": "Hold dig informeret i realtid"
+    }
+  },
   "notifications": {
     "carpool": {
       "booking_accepted": {
@@ -88,24 +106,6 @@
       "action": "Se festivaler",
       "message": "Din konto er blevet oprettet. Opdag jongleringsfestivaler tæt på dig!",
       "title": "Velkommen! 🎉"
-    }
-  },
-  "push_notifications": {
-    "promo_modal": {
-      "benefits": {
-        "carpool": "Få besked om samkørsel-bookinger og beskeder",
-        "important": "Gå ikke glip af vigtig information der vedrører dig",
-        "reminders": "Modtag påmindelser om dine yndlings-konventioner",
-        "volunteer": "Modtag opdateringer om dine frivillig-ansøgninger"
-      },
-      "description": "Aktivér push-notifikationer for at holde dig opdateret om dine samkørsler, frivillig-ansøgninger og yndlings-konventioner.",
-      "enable": "Aktivér notifikationer",
-      "not_now": "Ikke nu",
-      "privacy": {
-        "description": "Du kan deaktivere notifikationer når som helst i dine indstillinger.",
-        "title": "Respekterer dit privatliv"
-      },
-      "title": "Hold dig informeret i realtid"
     }
   }
 }

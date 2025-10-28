@@ -14,7 +14,6 @@
   },
   "pages": {
     "access_denied": {
-      "confirm_delete_edition": "Вы уверены, что хотите удалить это издание?",
       "description": "У вас нет прав доступа к этой странице.",
       "title": "Доступ запрещен"
     },
@@ -54,12 +53,6 @@
     "favorites": {
       "editions_in_favorites": "{count} издание | {count} изданий в избранных",
       "no_favorites_added": "Вы еще не добавили ни одного издания в избранные."
-    },
-    "management": {
-      "delete_edition": "Удалить издание",
-      "edit_edition": "Редактировать издание",
-      "lost_found_active_description": "Вы можете управлять найденными вещами во время проведения издания.",
-      "manage_lost_found": "Управлять потерянными вещами"
     },
     "objets_trouves": {
       "photo_alt": "Фото найденного предмета"

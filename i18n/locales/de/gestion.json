@@ -1,59 +1,56 @@
 {
   "gestion": {
-    "edit_edition": "[TODO]",
-    "delete_edition": "[TODO]",
-    "confirm_delete_edition": "[TODO]",
-    "manage_lost_found": "[TODO]",
-    "lost_found_active_description": "[TODO]",
+    "edit_edition": "Bearbeiten der Ausgabe",
+    "delete_edition": "Ausgabe löschen",
+    "confirm_delete_edition": "Sind Sie sicher, dass Sie diese Ausgabe löschen möchten?",
+    "manage_lost_found": "Fundsachen verwalten",
+    "lost_found_active_description": "Teilnehmer können gefundene oder verlorene Gegenstände melden",
     "volunteers": {
-      "management_mode": "[TODO]",
-      "management_mode_description": "[TODO]",
-      "mode_internal": "[TODO]",
-      "mode_external": "[TODO]",
-      "external_link": "[TODO]",
-      "external_url_placeholder": "[TODO]",
-      "external_url_description": "[TODO]",
-      "applications_open": "[TODO]",
-      "applications_open_description": "[TODO]",
-      "workshops_enabled": "[TODO]",
-      "workshops_enabled_description": "[TODO]",
-      "workshops_active_message": "[TODO]",
-      "workshops_active_description": "[TODO]"
+      "management_mode": "Art der Verwaltung von Freiwilligen",
+      "management_mode_description": "Wählen Sie, wie Sie die Freiwilligen für diese Ausgabe verwalten möchten",
+      "mode_internal": "Intern",
+      "mode_external": "Extern",
+      "mode_internal_badge": "Intern",
+      "mode_external_badge": "Extern",
+      "external_link": "Externer Link",
+      "external_url_placeholder": "https://exemple.com/benevoles",
+      "external_url_description": "Link zu Ihrem Formular oder externen Tool für das Freiwilligenmanagement",
+      "applications_open": "Eröffnung der Bewerbungen",
+      "applications_open_description": "Aktivieren oder deaktivieren Sie Bewerbungen von Freiwilligen",
+      "applications_description": "Bewerbungen einsehen und bearbeiten",
+      "teams_description": "Organisation von Freiwilligenteams",
+      "planning_description": "Zeitnischen und Missionen planen",
+      "notifications_description": "Benachrichtigungen an Freiwillige senden",
+      "tools_description": "Erweiterte Tools und Dokumentengenerierung"
     },
     "meals": {
-      "title": "[TODO]",
-      "configuration_title": "[TODO]",
-      "configuration_description": "[TODO]",
-      "list_title": "[TODO]",
-      "list_description": "[TODO]"
+      "title": "Mahlzeit",
+      "configuration_title": "Einrichten von Mahlzeiten",
+      "configuration_description": "Verwalten Sie die Mahlzeiten für Freiwillige und Künstler",
+      "list_title": "Liste der Mahlzeiten",
+      "list_description": "Sehen Sie sich die Liste aller Teilnehmer an den Mahlzeiten an."
     },
     "ticketing": {
-      "title": "[TODO]",
-      "external_link_title": "[TODO]",
-      "external_link_description": "[TODO]",
-      "tiers_title": "[TODO]",
-      "tiers_description": "[TODO]",
-      "orders_title": "[TODO]",
-      "orders_description": "[TODO]",
-      "access_control_title": "[TODO]",
-      "access_control_description": "[TODO]"
+      "title": "Eintrittskarten",
+      "external_link_title": "Externes Ticketing verknüpfen",
+      "external_link_description": "HelloAsso oder andere Plattform anmelden",
+      "tiers_title": "Tarife, Optionen & Quoten",
+      "tiers_description": "Verwalten von Tarifen, Optionen, Quoten und zurückzugebenden Artikeln",
+      "orders_title": "Befehle",
+      "orders_description": "Bestellungen und Teilnehmer einsehen",
+      "access_control_title": "Zugangskontrolle",
+      "access_control_description": "Tickets am Eingang scannen und validieren"
     },
     "artists": {
-      "title": "[TODO]",
-      "shows_title": "[TODO]",
-      "shows_description": "[TODO]"
+      "title": "Verwaltung von Künstlern",
+      "list_title": "Verwaltung von Künstlern",
+      "manage_artists_description": "Verwalten Sie die zu dieser Ausgabe eingeladenen Künstler"
     },
     "workshops": {
-      "title": "[TODO]",
-      "locations_management": "[TODO]",
-      "location_mode_label": "[TODO]",
-      "location_mode_free_description": "[TODO]",
-      "location_mode_exclusive_description": "[TODO]",
-      "no_locations_yet": "[TODO]",
-      "add_location_placeholder": "[TODO]",
-      "organize_teams": "[TODO]",
-      "plan_shifts": "[TODO]",
-      "advanced_tools": "[TODO]"
+      "title": "Workshops",
+      "enable_workshops": "Workshops aktivieren",
+      "workshops_enabled_notice": "Workshops werden aktiviert",
+      "workshops_enabled_description": "Teilnehmer und Freiwillige können nun Workshops für diese Ausgabe erstellen."
     }
   }
 }

@@ -656,7 +656,16 @@
       "table_arrival": "Arrivée",
       "table_departure": "Départ",
       "meals": {
-        "not_eligible_reason": "Hors période de présence"
+        "title": "TODO: Repas",
+        "no_meals": "TODO: Aucun repas disponible",
+        "description": "TODO: Description",
+        "not_eligible": "TODO: Non éligible",
+        "not_eligible_reason": "Hors période de présence",
+        "unsaved_changes": "TODO: Modifications non enregistrées",
+        "error_loading": "TODO: Erreur lors du chargement",
+        "saved_success": "TODO: Enregistrement réussi",
+        "error_saving": "TODO: Erreur lors de l'enregistrement",
+        "confirm_close_unsaved": "TODO: Confirmer la fermeture avec modifications non enregistrées"
       },
       "targeted_teams": "Équipes ciblées",
       "team_assignment": "Assignation d'équipe",

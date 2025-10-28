@@ -14,7 +14,6 @@
   },
   "pages": {
     "access_denied": {
-      "confirm_delete_edition": "Är du säker på att du vill skrota den här utgåvan?",
       "description": "Du har inte rätt att komma åt den här sidan.",
       "title": "Åtkomst nekad"
     },
@@ -54,12 +53,6 @@
     "favorites": {
       "editions_in_favorites": "{count} favoritutgåvor | {count} favoritutgåvor",
       "no_favorites_added": "Du har ännu inte lagt till en utgåva bland dina favoriter."
-    },
-    "management": {
-      "delete_edition": "Radera redigera",
-      "edit_edition": "Ändra redigering",
-      "lost_found_active_description": "Du kan hantera upphittade objekt medan redigeringen pågår.",
-      "manage_lost_found": "Hantering av hittegods"
     },
     "objets_trouves": {
       "photo_alt": "Foto av upphittat föremål"

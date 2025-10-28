@@ -14,7 +14,6 @@
   },
   "pages": {
     "access_denied": {
-      "confirm_delete_edition": "Bist du sicher, dass du diese Auflage löschen möchtest?",
       "description": "Du hast keine Berechtigung, auf diese Seite zuzugreifen.",
       "title": "Zugang verweigert"
     },
@@ -54,12 +53,6 @@
     "favorites": {
       "editions_in_favorites": "{count} Auflage in Favoriten | {count} Auflagen in Favoriten",
       "no_favorites_added": "Du hast noch keine Auflage zu deinen Favoriten hinzugefügt."
-    },
-    "management": {
-      "delete_edition": "Auflage löschen",
-      "edit_edition": "Auflage bearbeiten",
-      "lost_found_active_description": "Du kannst Fundsachen während der laufenden Auflage verwalten.",
-      "manage_lost_found": "Fundsachen verwalten"
     },
     "objets_trouves": {
       "photo_alt": "Foto des gefundenen Gegenstands"

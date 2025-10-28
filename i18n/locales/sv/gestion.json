@@ -1,59 +1,56 @@
 {
   "gestion": {
-    "edit_edition": "[TODO]",
-    "delete_edition": "[TODO]",
-    "confirm_delete_edition": "[TODO]",
-    "manage_lost_found": "[TODO]",
-    "lost_found_active_description": "[TODO]",
+    "edit_edition": "Ändra redigering",
+    "delete_edition": "Radera redigera",
+    "confirm_delete_edition": "Är du säker på att du vill skrota den här utgåvan?",
+    "manage_lost_found": "Hantering av hittegods",
+    "lost_found_active_description": "Deltagarna kan rapportera borttappade och upphittade föremål",
     "volunteers": {
-      "management_mode": "[TODO]",
-      "management_mode_description": "[TODO]",
-      "mode_internal": "[TODO]",
-      "mode_external": "[TODO]",
-      "external_link": "[TODO]",
-      "external_url_placeholder": "[TODO]",
-      "external_url_description": "[TODO]",
-      "applications_open": "[TODO]",
-      "applications_open_description": "[TODO]",
-      "workshops_enabled": "[TODO]",
-      "workshops_enabled_description": "[TODO]",
-      "workshops_active_message": "[TODO]",
-      "workshops_active_description": "[TODO]"
+      "management_mode": "Hantering av volontärer",
+      "management_mode_description": "Välj hur du vill hantera volontärer för den här utgåvan",
+      "mode_internal": "Internt",
+      "mode_external": "Extern",
+      "mode_internal_badge": "Internt",
+      "mode_external_badge": "Extern",
+      "external_link": "Extern länk",
+      "external_url_placeholder": "https://exemple.com/benevoles",
+      "external_url_description": "Länk till ditt formulär eller ett externt verktyg för hantering av volontärer",
+      "applications_open": "Öppnande av ansökningar",
+      "applications_open_description": "Aktivera eller avaktivera volontäransökningar",
+      "applications_description": "Visning och behandling av ansökningar",
+      "teams_description": "Organisera team av volontärer",
+      "planning_description": "Planering av slots och uppdrag",
+      "notifications_description": "Skicka meddelanden till volontärer",
+      "tools_description": "Avancerade verktyg och dokumentgenerering"
     },
     "meals": {
-      "title": "[TODO]",
-      "configuration_title": "[TODO]",
-      "configuration_description": "[TODO]",
-      "list_title": "[TODO]",
-      "list_description": "[TODO]"
+      "title": "Måltider",
+      "configuration_title": "Måltidskonfiguration",
+      "configuration_description": "Hantering av måltider för volontärer och konstnärer",
+      "list_title": "Lista över måltider",
+      "list_description": "Visa listan över alla deltagare i måltiden"
     },
     "ticketing": {
-      "title": "[TODO]",
-      "external_link_title": "[TODO]",
-      "external_link_description": "[TODO]",
-      "tiers_title": "[TODO]",
-      "tiers_description": "[TODO]",
-      "orders_title": "[TODO]",
-      "orders_description": "[TODO]",
-      "access_control_title": "[TODO]",
-      "access_control_description": "[TODO]"
+      "title": "Biljetter",
+      "external_link_title": "Länka till en extern biljettjänst",
+      "external_link_description": "Anslut HelloAsso eller annan plattform",
+      "tiers_title": "Priser, optioner och kvoter",
+      "tiers_description": "Hantera tariffer, optioner, kvoter och artiklar som ska returneras",
+      "orders_title": "Kontroller",
+      "orders_description": "Visa order och deltagare",
+      "access_control_title": "Åtkomstkontroll",
+      "access_control_description": "Skanna och validera biljetter vid entrén"
     },
     "artists": {
-      "title": "[TODO]",
-      "shows_title": "[TODO]",
-      "shows_description": "[TODO]"
+      "title": "Artisthantering",
+      "list_title": "Artisthantering",
+      "manage_artists_description": "Hantera de inbjudna konstnärerna till denna utgåva"
     },
     "workshops": {
-      "title": "[TODO]",
-      "locations_management": "[TODO]",
-      "location_mode_label": "[TODO]",
-      "location_mode_free_description": "[TODO]",
-      "location_mode_exclusive_description": "[TODO]",
-      "no_locations_yet": "[TODO]",
-      "add_location_placeholder": "[TODO]",
-      "organize_teams": "[TODO]",
-      "plan_shifts": "[TODO]",
-      "advanced_tools": "[TODO]"
+      "title": "Verkstäder",
+      "enable_workshops": "Aktivera workshops",
+      "workshops_enabled_notice": "Verkstäderna är aktiverade",
+      "workshops_enabled_description": "Deltagare och volontärer kan nu skapa workshops för denna utgåva."
     }
   }
 }

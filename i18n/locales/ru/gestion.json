@@ -1,59 +1,56 @@
 {
   "gestion": {
-    "edit_edition": "[TODO]",
-    "delete_edition": "[TODO]",
-    "confirm_delete_edition": "[TODO]",
-    "manage_lost_found": "[TODO]",
-    "lost_found_active_description": "[TODO]",
+    "edit_edition": "Изменить редактирование",
+    "delete_edition": "Удалить редактирование",
+    "confirm_delete_edition": "Вы уверены, что хотите сдать это издание в утиль?",
+    "manage_lost_found": "Управление потерянным имуществом",
+    "lost_found_active_description": "Участники могут сообщить о потерянных и найденных вещах",
     "volunteers": {
-      "management_mode": "[TODO]",
-      "management_mode_description": "[TODO]",
-      "mode_internal": "[TODO]",
-      "mode_external": "[TODO]",
-      "external_link": "[TODO]",
-      "external_url_placeholder": "[TODO]",
-      "external_url_description": "[TODO]",
-      "applications_open": "[TODO]",
-      "applications_open_description": "[TODO]",
-      "workshops_enabled": "[TODO]",
-      "workshops_enabled_description": "[TODO]",
-      "workshops_active_message": "[TODO]",
-      "workshops_active_description": "[TODO]"
+      "management_mode": "Управление добровольцами",
+      "management_mode_description": "Выберите способ управления волонтерами для этого издания",
+      "mode_internal": "Внутренний",
+      "mode_external": "Внешний",
+      "mode_internal_badge": "Внутренний",
+      "mode_external_badge": "Внешний",
+      "external_link": "Внешняя ссылка",
+      "external_url_placeholder": "https://exemple.com/benevoles",
+      "external_url_description": "Ссылка на вашу форму или внешний инструмент управления волонтерами",
+      "applications_open": "Открытие приема заявок",
+      "applications_open_description": "Активировать или деактивировать заявки добровольцев",
+      "applications_description": "Просмотр и обработка заявок",
+      "teams_description": "Организация команд добровольцев",
+      "planning_description": "Планирование слотов и миссий",
+      "notifications_description": "Рассылка уведомлений волонтерам",
+      "tools_description": "Расширенные инструменты и создание документов"
     },
     "meals": {
-      "title": "[TODO]",
-      "configuration_title": "[TODO]",
-      "configuration_description": "[TODO]",
-      "list_title": "[TODO]",
-      "list_description": "[TODO]"
+      "title": "Питание",
+      "configuration_title": "Конфигурация блюд",
+      "configuration_description": "Организация питания для волонтеров и артистов",
+      "list_title": "Список блюд",
+      "list_description": "Просмотрите список всех участников обеда"
     },
     "ticketing": {
-      "title": "[TODO]",
-      "external_link_title": "[TODO]",
-      "external_link_description": "[TODO]",
-      "tiers_title": "[TODO]",
-      "tiers_description": "[TODO]",
-      "orders_title": "[TODO]",
-      "orders_description": "[TODO]",
-      "access_control_title": "[TODO]",
-      "access_control_description": "[TODO]"
+      "title": "Билеты",
+      "external_link_title": "Подключение внешнего сервиса продажи билетов",
+      "external_link_description": "Подключите HelloAsso или другую платформу",
+      "tiers_title": "Тарифы, опционы и квоты",
+      "tiers_description": "Управление тарифами, опциями, квотами и товарами, подлежащими возврату",
+      "orders_title": "Контролирует",
+      "orders_description": "Просмотр заказов и участников",
+      "access_control_title": "Контроль доступа",
+      "access_control_description": "Сканирование и проверка билетов на входе"
     },
     "artists": {
-      "title": "[TODO]",
-      "shows_title": "[TODO]",
-      "shows_description": "[TODO]"
+      "title": "Управление артистами",
+      "list_title": "Управление артистами",
+      "manage_artists_description": "Управляйте художниками, приглашенными для участия в этом издании"
     },
     "workshops": {
-      "title": "[TODO]",
-      "locations_management": "[TODO]",
-      "location_mode_label": "[TODO]",
-      "location_mode_free_description": "[TODO]",
-      "location_mode_exclusive_description": "[TODO]",
-      "no_locations_yet": "[TODO]",
-      "add_location_placeholder": "[TODO]",
-      "organize_teams": "[TODO]",
-      "plan_shifts": "[TODO]",
-      "advanced_tools": "[TODO]"
+      "title": "Семинары",
+      "enable_workshops": "Активировать семинары",
+      "workshops_enabled_notice": "Мастерские активированы",
+      "workshops_enabled_description": "Участники и волонтеры теперь могут создавать мастер-классы для этого издания."
     }
   }
 }

@@ -1,59 +1,56 @@
 {
   "gestion": {
-    "edit_edition": "[TODO]",
-    "delete_edition": "[TODO]",
-    "confirm_delete_edition": "[TODO]",
-    "manage_lost_found": "[TODO]",
-    "lost_found_active_description": "[TODO]",
+    "edit_edition": "Modificer redigering",
+    "delete_edition": "Slet redigering",
+    "confirm_delete_edition": "Er du sikker på, at du vil skrotte denne udgave?",
+    "manage_lost_found": "Håndtering af hittegods",
+    "lost_found_active_description": "Deltagere kan rapportere tabte og fundne genstande",
     "volunteers": {
-      "management_mode": "[TODO]",
-      "management_mode_description": "[TODO]",
-      "mode_internal": "[TODO]",
-      "mode_external": "[TODO]",
-      "external_link": "[TODO]",
-      "external_url_placeholder": "[TODO]",
-      "external_url_description": "[TODO]",
-      "applications_open": "[TODO]",
-      "applications_open_description": "[TODO]",
-      "workshops_enabled": "[TODO]",
-      "workshops_enabled_description": "[TODO]",
-      "workshops_active_message": "[TODO]",
-      "workshops_active_description": "[TODO]"
+      "management_mode": "Ledelse af frivillige",
+      "management_mode_description": "Vælg, hvordan du vil administrere frivillige til denne udgave",
+      "mode_internal": "Internt",
+      "mode_external": "Eksternt",
+      "mode_internal_badge": "Internt",
+      "mode_external_badge": "Eksternt",
+      "external_link": "Eksternt link",
+      "external_url_placeholder": "https://exemple.com/benevoles",
+      "external_url_description": "Link til din formular eller et eksternt værktøj til styring af frivillige",
+      "applications_open": "Åbning af ansøgninger",
+      "applications_open_description": "Aktiver eller deaktiver frivillige ansøgninger",
+      "applications_description": "Visning og behandling af ansøgninger",
+      "teams_description": "Organisering af hold af frivillige",
+      "planning_description": "Planlægning af slots og missioner",
+      "notifications_description": "Send meddelelser til frivillige",
+      "tools_description": "Avancerede værktøjer og dokumentgenerering"
     },
     "meals": {
-      "title": "[TODO]",
-      "configuration_title": "[TODO]",
-      "configuration_description": "[TODO]",
-      "list_title": "[TODO]",
-      "list_description": "[TODO]"
+      "title": "Måltider",
+      "configuration_title": "Konfiguration af måltider",
+      "configuration_description": "Håndtering af måltider for frivillige og kunstnere",
+      "list_title": "Liste over måltider",
+      "list_description": "Se listen over alle deltagere i måltidet"
     },
     "ticketing": {
-      "title": "[TODO]",
-      "external_link_title": "[TODO]",
-      "external_link_description": "[TODO]",
-      "tiers_title": "[TODO]",
-      "tiers_description": "[TODO]",
-      "orders_title": "[TODO]",
-      "orders_description": "[TODO]",
-      "access_control_title": "[TODO]",
-      "access_control_description": "[TODO]"
+      "title": "Billetter",
+      "external_link_title": "Link til en ekstern billettjeneste",
+      "external_link_description": "Tilslut HelloAsso eller en anden platform",
+      "tiers_title": "Priser, optioner og kvoter",
+      "tiers_description": "Administrer tariffer, optioner, kvoter og varer, der skal returneres",
+      "orders_title": "Kontroller",
+      "orders_description": "Se ordrer og deltagere",
+      "access_control_title": "Adgangskontrol",
+      "access_control_description": "Scan og valider billetter ved indgangen"
     },
     "artists": {
-      "title": "[TODO]",
-      "shows_title": "[TODO]",
-      "shows_description": "[TODO]"
+      "title": "Management af kunstnere",
+      "list_title": "Management af kunstnere",
+      "manage_artists_description": "Administrer de kunstnere, der er inviteret til denne udgave"
     },
     "workshops": {
-      "title": "[TODO]",
-      "locations_management": "[TODO]",
-      "location_mode_label": "[TODO]",
-      "location_mode_free_description": "[TODO]",
-      "location_mode_exclusive_description": "[TODO]",
-      "no_locations_yet": "[TODO]",
-      "add_location_placeholder": "[TODO]",
-      "organize_teams": "[TODO]",
-      "plan_shifts": "[TODO]",
-      "advanced_tools": "[TODO]"
+      "title": "Værksteder",
+      "enable_workshops": "Aktiver workshops",
+      "workshops_enabled_notice": "Workshops er aktiveret",
+      "workshops_enabled_description": "Deltagere og frivillige kan nu oprette workshops til denne udgave."
     }
   }
 }

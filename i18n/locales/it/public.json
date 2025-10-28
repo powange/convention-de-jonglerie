@@ -14,7 +14,6 @@
   },
   "pages": {
     "access_denied": {
-      "confirm_delete_edition": "Sei sicuro di voler eliminare questa edizione?",
       "description": "Non hai i diritti per accedere a questa pagina.",
       "title": "Accesso negato"
     },
@@ -54,12 +53,6 @@
     "favorites": {
       "editions_in_favorites": "{count} edizione nei preferiti | {count} edizioni nei preferiti",
       "no_favorites_added": "Non hai ancora aggiunto edizioni ai tuoi preferiti."
-    },
-    "management": {
-      "delete_edition": "Elimina edizione",
-      "edit_edition": "Modifica edizione",
-      "lost_found_active_description": "Puoi gestire gli oggetti smarriti mentre l'edizione è in corso.",
-      "manage_lost_found": "Gestisci oggetti smarriti"
     },
     "objets_trouves": {
       "photo_alt": "Foto dell'oggetto trovato"

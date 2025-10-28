@@ -1,4 +1,22 @@
 {
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Få information om bokningar och meddelanden om samåkning",
+        "important": "Missa inte viktig information om dig själv",
+        "reminders": "Få påminnelser om dina favoritkonventioner",
+        "volunteer": "Få uppdateringar om dina volontäransökningar"
+      },
+      "description": "Aktivera pushnotiser för att hålla dig uppdaterad om dina bilpooler, volontäransökningar och favoritkonvent.",
+      "enable": "Aktivera meddelanden",
+      "not_now": "Inte nu",
+      "privacy": {
+        "description": "Du kan när som helst avaktivera aviseringar i dina inställningar.",
+        "title": "Respekt för din integritet"
+      },
+      "title": "Håll dig informerad i realtid"
+    }
+  },
   "notifications": {
     "carpool": {
       "booking_accepted": {
@@ -88,24 +106,6 @@
       "action": "Se avtalen",
       "message": "Ditt konto har skapats framgångsrikt. Ta reda på mer om jongleringskongresser nära dig!",
       "title": "Välkomna! 🎉"
-    }
-  },
-  "push_notifications": {
-    "promo_modal": {
-      "benefits": {
-        "carpool": "Få information om bokningar och meddelanden om samåkning",
-        "important": "Missa inte viktig information om dig själv",
-        "reminders": "Få påminnelser om dina favoritkonventioner",
-        "volunteer": "Få uppdateringar om dina volontäransökningar"
-      },
-      "description": "Aktivera pushnotiser för att hålla dig uppdaterad om dina bilpooler, volontäransökningar och favoritkonvent.",
-      "enable": "Aktivera meddelanden",
-      "not_now": "Inte nu",
-      "privacy": {
-        "description": "Du kan när som helst avaktivera aviseringar i dina inställningar.",
-        "title": "Respekt för din integritet"
-      },
-      "title": "Håll dig informerad i realtid"
     }
   }
 }

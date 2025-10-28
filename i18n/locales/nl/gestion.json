@@ -1,59 +1,56 @@
 {
   "gestion": {
-    "edit_edition": "[TODO]",
-    "delete_edition": "[TODO]",
-    "confirm_delete_edition": "[TODO]",
-    "manage_lost_found": "[TODO]",
-    "lost_found_active_description": "[TODO]",
+    "edit_edition": "Bewerken aanpassen",
+    "delete_edition": "Bewerken verwijderen",
+    "confirm_delete_edition": "Weet je zeker dat je deze editie wilt schrappen?",
+    "manage_lost_found": "Verloren voorwerpen beheren",
+    "lost_found_active_description": "Deelnemers kunnen verloren en gevonden voorwerpen melden",
     "volunteers": {
-      "management_mode": "[TODO]",
-      "management_mode_description": "[TODO]",
-      "mode_internal": "[TODO]",
-      "mode_external": "[TODO]",
-      "external_link": "[TODO]",
-      "external_url_placeholder": "[TODO]",
-      "external_url_description": "[TODO]",
-      "applications_open": "[TODO]",
-      "applications_open_description": "[TODO]",
-      "workshops_enabled": "[TODO]",
-      "workshops_enabled_description": "[TODO]",
-      "workshops_active_message": "[TODO]",
-      "workshops_active_description": "[TODO]"
+      "management_mode": "Beheer van vrijwilligers",
+      "management_mode_description": "Kies hoe je vrijwilligers voor deze editie wilt beheren",
+      "mode_internal": "Intern",
+      "mode_external": "Extern",
+      "mode_internal_badge": "Intern",
+      "mode_external_badge": "Extern",
+      "external_link": "Externe link",
+      "external_url_placeholder": "https://exemple.com/benevoles",
+      "external_url_description": "Link naar je formulier of externe vrijwilligersmanagementtool",
+      "applications_open": "Opening van aanvragen",
+      "applications_open_description": "Vrijwilligerstoepassingen activeren of deactiveren",
+      "applications_description": "Applicaties bekijken en verwerken",
+      "teams_description": "Vrijwilligersteams organiseren",
+      "planning_description": "Planningsslots en missies",
+      "notifications_description": "Meldingen naar vrijwilligers sturen",
+      "tools_description": "Geavanceerde tools en documentgeneratie"
     },
     "meals": {
-      "title": "[TODO]",
-      "configuration_title": "[TODO]",
-      "configuration_description": "[TODO]",
-      "list_title": "[TODO]",
-      "list_description": "[TODO]"
+      "title": "Maaltijden",
+      "configuration_title": "Maaltijdconfiguratie",
+      "configuration_description": "Maaltijden beheren voor vrijwilligers en artiesten",
+      "list_title": "Lijst van maaltijden",
+      "list_description": "Bekijk de lijst met alle deelnemers aan de maaltijd"
     },
     "ticketing": {
-      "title": "[TODO]",
-      "external_link_title": "[TODO]",
-      "external_link_description": "[TODO]",
-      "tiers_title": "[TODO]",
-      "tiers_description": "[TODO]",
-      "orders_title": "[TODO]",
-      "orders_description": "[TODO]",
-      "access_control_title": "[TODO]",
-      "access_control_description": "[TODO]"
+      "title": "Tickets",
+      "external_link_title": "Een externe ticketingdienst koppelen",
+      "external_link_description": "Verbind HelloAsso of een ander platform",
+      "tiers_title": "Tarieven, opties & quota",
+      "tiers_description": "Tarieven, opties, quota en te retourneren items beheren",
+      "orders_title": "Besturingselementen",
+      "orders_description": "Bestellingen en deelnemers bekijken",
+      "access_control_title": "Toegangscontrole",
+      "access_control_description": "Tickets scannen en valideren bij de ingang"
     },
     "artists": {
-      "title": "[TODO]",
-      "shows_title": "[TODO]",
-      "shows_description": "[TODO]"
+      "title": "Artiestenmanagement",
+      "list_title": "Artiestenmanagement",
+      "manage_artists_description": "Beheer de kunstenaars die zijn uitgenodigd voor deze editie"
     },
     "workshops": {
-      "title": "[TODO]",
-      "locations_management": "[TODO]",
-      "location_mode_label": "[TODO]",
-      "location_mode_free_description": "[TODO]",
-      "location_mode_exclusive_description": "[TODO]",
-      "no_locations_yet": "[TODO]",
-      "add_location_placeholder": "[TODO]",
-      "organize_teams": "[TODO]",
-      "plan_shifts": "[TODO]",
-      "advanced_tools": "[TODO]"
+      "title": "Workshops",
+      "enable_workshops": "Workshops activeren",
+      "workshops_enabled_notice": "Workshops worden geactiveerd",
+      "workshops_enabled_description": "Deelnemers en vrijwilligers kunnen nu workshops maken voor deze editie."
     }
   }
 }

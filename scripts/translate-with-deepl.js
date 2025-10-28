@@ -107,11 +107,13 @@ const SOURCE_DIR = join(I18N_DIR, 'fr')
 const FILES_TO_TRANSLATE = [
   'admin.json',
   'app.json',
+  'artists.json',
   'auth.json',
   'common.json',
   'components.json',
   'edition.json',
   'feedback.json',
+  'gestion.json',
   'notifications.json',
   'permissions.json',
   'public.json',
@@ -138,7 +140,10 @@ async function translateObject(obj, targetLang, path = '', existingObj = {}) {
 
     if (typeof value === 'string') {
       // Vérifier si on doit traduire ou préserver
-      const shouldTranslate = FORCE_MODE || !existingValue || typeof existingValue !== 'string'
+      const isTodoKey =
+        existingValue && typeof existingValue === 'string' && existingValue.startsWith('[TODO]')
+      const shouldTranslate =
+        FORCE_MODE || !existingValue || typeof existingValue !== 'string' || isTodoKey
 
       if (shouldTranslate) {
         // Traduire la chaîne

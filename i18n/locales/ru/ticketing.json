@@ -15,6 +15,20 @@
       "how_to_use_title": "Как использовать этот QR-код",
       "logo_alt": "HelloAsso"
     },
+    "orders": {
+      "cancel_order": "Отменить заказ",
+      "cancel_order_confirm": "Вы уверены, что хотите отменить этот заказ?",
+      "cancel_order_confirm_message": "Это действие отменит заказ и заблокирует все связанные с ним билеты. Билеты больше не могут быть использованы.",
+      "canceling_order": "Отмена в процессе...",
+      "cancel_order_error": "Ошибка при отмене ордера",
+      "order_canceled": "Заказ отменен",
+      "delete_order": "Удалить команду",
+      "delete_order_confirm": "Вы уверены, что хотите удалить эту команду?",
+      "delete_order_confirm_message": "Это действие приведет к окончательному удалению заказа и всех связанных с ним билетов из базы данных. Это действие нельзя отменить.",
+      "deleting_order": "Удаление в процессе...",
+      "delete_order_error": "Ошибка при удалении заказа",
+      "order_deleted": "Заказ удален"
+    },
     "options": {
       "list": {
         "loading": "Загрузка...",
@@ -38,20 +52,6 @@
         "type_label": "Тип параметра"
       }
     },
-    "orders": {
-      "cancel_order": "[TODO]",
-      "cancel_order_confirm": "[TODO]",
-      "cancel_order_confirm_message": "[TODO]",
-      "cancel_order_error": "[TODO] Erreur lors de l'annulation de la commande",
-      "canceling_order": "[TODO]",
-      "delete_order": "[TODO] Supprimer la commande",
-      "delete_order_confirm": "[TODO] Êtes-vous sûr de vouloir supprimer cette commande ?",
-      "delete_order_confirm_message": "[TODO] Cette action supprimera définitivement la commande et tous les billets associés de la base de données. Cette action ne peut pas être annulée.",
-      "delete_order_error": "[TODO] Erreur lors de la suppression de la commande",
-      "deleting_order": "[TODO] Suppression en cours...",
-      "order_canceled": "[TODO] Commande annulée",
-      "order_deleted": "[TODO] Commande supprimée"
-    },
     "participant": {
       "entry_validated": "Вход уже подтвержден",
       "logo_alt": "HelloAsso",
@@ -69,10 +69,10 @@
         "title": "Управление квотами"
       },
       "stats": {
-        "exceeded": "[TODO] DÉPASSEMENT",
         "title": "Статистика квот",
         "used": "Использовано",
-        "validated": "Подтверждено"
+        "validated": "Подтверждено",
+        "exceeded": "OVERRIDE"
       }
     },
     "returnable_items": {
@@ -92,9 +92,9 @@
       }
     },
     "stats": {
-      "artists": "[TODO] Artistes",
       "participants": "Участники",
-      "volunteers": "Волонтёры"
+      "volunteers": "Волонтёры",
+      "artists": "Художники"
     },
     "tiers": {
       "list": {
@@ -113,8 +113,8 @@
         "min_amount_placeholder": "0,00",
         "name_label": "Название тарифа",
         "name_placeholder": "Напр: 3-дневный пропуск",
-        "no_item_selected": "Предмет не выбран",
         "no_quota_selected": "Квота не выбрана",
+        "no_item_selected": "Предмет не выбран",
         "position_label": "Позиция отображения",
         "position_placeholder": "0",
         "price_label": "Цена (€)",

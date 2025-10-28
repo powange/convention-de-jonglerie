@@ -1,59 +1,56 @@
 {
   "gestion": {
-    "edit_edition": "[TODO]",
-    "delete_edition": "[TODO]",
-    "confirm_delete_edition": "[TODO]",
-    "manage_lost_found": "[TODO]",
-    "lost_found_active_description": "[TODO]",
+    "edit_edition": "Úprava úprav",
+    "delete_edition": "Smazat upravit",
+    "confirm_delete_edition": "Jste si jistí, že chcete toto vydání vyřadit?",
+    "manage_lost_found": "Správa ztraceného majetku",
+    "lost_found_active_description": "Účastníci mohou nahlásit ztracené a nalezené předměty",
     "volunteers": {
-      "management_mode": "[TODO]",
-      "management_mode_description": "[TODO]",
-      "mode_internal": "[TODO]",
-      "mode_external": "[TODO]",
-      "external_link": "[TODO]",
-      "external_url_placeholder": "[TODO]",
-      "external_url_description": "[TODO]",
-      "applications_open": "[TODO]",
-      "applications_open_description": "[TODO]",
-      "workshops_enabled": "[TODO]",
-      "workshops_enabled_description": "[TODO]",
-      "workshops_active_message": "[TODO]",
-      "workshops_active_description": "[TODO]"
+      "management_mode": "Řízení dobrovolníků",
+      "management_mode_description": "Zvolte, jak spravovat dobrovolníky pro toto vydání",
+      "mode_internal": "Interní",
+      "mode_external": "Externí",
+      "mode_internal_badge": "Interní",
+      "mode_external_badge": "Externí",
+      "external_link": "Externí odkaz",
+      "external_url_placeholder": "https://exemple.com/benevoles",
+      "external_url_description": "Odkaz na váš formulář nebo externí nástroj pro správu dobrovolníků",
+      "applications_open": "Otevření žádostí",
+      "applications_open_description": "Aktivace nebo deaktivace dobrovolnických aplikací",
+      "applications_description": "Prohlížení a zpracování žádostí",
+      "teams_description": "Organizování týmů dobrovolníků",
+      "planning_description": "Plánování slotů a misí",
+      "notifications_description": "Zasílání oznámení dobrovolníkům",
+      "tools_description": "Pokročilé nástroje a generování dokumentů"
     },
     "meals": {
-      "title": "[TODO]",
-      "configuration_title": "[TODO]",
-      "configuration_description": "[TODO]",
-      "list_title": "[TODO]",
-      "list_description": "[TODO]"
+      "title": "Stravování",
+      "configuration_title": "Konfigurace jídla",
+      "configuration_description": "Správa stravování dobrovolníků a umělců",
+      "list_title": "Seznam jídel",
+      "list_description": "Zobrazení seznamu všech účastníků stravování"
     },
     "ticketing": {
-      "title": "[TODO]",
-      "external_link_title": "[TODO]",
-      "external_link_description": "[TODO]",
-      "tiers_title": "[TODO]",
-      "tiers_description": "[TODO]",
-      "orders_title": "[TODO]",
-      "orders_description": "[TODO]",
-      "access_control_title": "[TODO]",
-      "access_control_description": "[TODO]"
+      "title": "Vstupenky",
+      "external_link_title": "Propojení externí služby prodeje letenek",
+      "external_link_description": "Připojení HelloAsso nebo jiné platformy",
+      "tiers_title": "Sazby, opce a kvóty",
+      "tiers_description": "Správa tarifů, možností, kvót a položek k vrácení",
+      "orders_title": "Ovládací prvky",
+      "orders_description": "Zobrazení objednávek a účastníků",
+      "access_control_title": "Kontrola přístupu",
+      "access_control_description": "Skenování a ověřování vstupenek u vstupu"
     },
     "artists": {
-      "title": "[TODO]",
-      "shows_title": "[TODO]",
-      "shows_description": "[TODO]"
+      "title": "Správa umělců",
+      "list_title": "Správa umělců",
+      "manage_artists_description": "Správa umělců pozvaných do tohoto vydání"
     },
     "workshops": {
-      "title": "[TODO]",
-      "locations_management": "[TODO]",
-      "location_mode_label": "[TODO]",
-      "location_mode_free_description": "[TODO]",
-      "location_mode_exclusive_description": "[TODO]",
-      "no_locations_yet": "[TODO]",
-      "add_location_placeholder": "[TODO]",
-      "organize_teams": "[TODO]",
-      "plan_shifts": "[TODO]",
-      "advanced_tools": "[TODO]"
+      "title": "Workshopy",
+      "enable_workshops": "Aktivační workshopy",
+      "workshops_enabled_notice": "Workshopy jsou aktivovány",
+      "workshops_enabled_description": "Účastníci a dobrovolníci mohou nyní vytvářet workshopy pro toto vydání."
     }
   }
 }

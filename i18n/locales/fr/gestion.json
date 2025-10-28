@@ -21,11 +21,7 @@
       "teams_description": "Organiser les équipes de bénévoles",
       "planning_description": "Planifier les créneaux et missions",
       "notifications_description": "Envoyer des notifications aux bénévoles",
-      "tools_description": "Outils avancés et génération de documents",
-      "workshops_enabled": "Activer les workshops",
-      "workshops_enabled_description": "Permettre aux participants et bénévoles de créer des workshops",
-      "workshops_active_message": "Les workshops sont activés",
-      "workshops_active_description": "Les participants et bénévoles peuvent maintenant créer des workshops pour cette édition"
+      "tools_description": "Outils avancés et génération de documents"
     },
     "meals": {
       "title": "Repas",
@@ -48,22 +44,13 @@
     "artists": {
       "title": "Gestion des artistes",
       "list_title": "Gestion des artistes",
-      "manage_artists_description": "Gérez les artistes invités à cette édition",
-      "shows_title": "Gestion des spectacles",
-      "shows_description": "Créer et organiser les spectacles"
+      "manage_artists_description": "Gérez les artistes invités à cette édition"
     },
     "workshops": {
       "title": "Workshops",
       "enable_workshops": "Activer les workshops",
-      "enable_workshops_description": "Permettre aux participants et bénévoles de créer des workshops",
       "workshops_enabled_notice": "Les workshops sont activés",
-      "workshops_enabled_description": "Les participants et bénévoles peuvent maintenant créer des workshops pour cette édition",
-      "locations_management": "Gestion des lieux",
-      "location_mode_label": "Mode de saisie des lieux",
-      "location_mode_free_description": "Les créateurs peuvent saisir librement le lieu du workshop",
-      "location_mode_exclusive_description": "Les créateurs doivent choisir parmi les lieux prédéfinis",
-      "no_locations_yet": "Aucun lieu configuré pour le moment",
-      "add_location_placeholder": "Nom du lieu"
+      "workshops_enabled_description": "Les participants et bénévoles peuvent maintenant créer des workshops pour cette édition"
     }
   }
 }

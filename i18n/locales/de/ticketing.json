@@ -15,6 +15,20 @@
       "how_to_use_title": "So verwenden Sie diesen QR-Code",
       "logo_alt": "HelloAsso"
     },
+    "orders": {
+      "cancel_order": "Bestellung abbrechen",
+      "cancel_order_confirm": "Sind Sie sicher, dass Sie diese Bestellung stornieren möchten?",
+      "cancel_order_confirm_message": "Dadurch wird die Bestellung storniert und alle zugehörigen Tickets werden gesperrt. Die Tickets können nicht mehr verwendet werden.",
+      "canceling_order": "Abbruch im Gange...",
+      "cancel_order_error": "Fehler bei der Stornierung der Bestellung",
+      "order_canceled": "Bestellung storniert",
+      "delete_order": "Bestellung löschen",
+      "delete_order_confirm": "Sind Sie sicher, dass Sie diesen Befehl löschen möchten?",
+      "delete_order_confirm_message": "Diese Aktion wird die Bestellung und alle zugehörigen Tickets dauerhaft aus der Datenbank löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "deleting_order": "Löschen im Gange...",
+      "delete_order_error": "Fehler beim Löschen der Bestellung",
+      "order_deleted": "Gelöschte Bestellung"
+    },
     "options": {
       "list": {
         "loading": "Lädt...",
@@ -38,20 +52,6 @@
         "type_label": "Optionstyp"
       }
     },
-    "orders": {
-      "cancel_order": "[TODO]",
-      "cancel_order_confirm": "[TODO]",
-      "cancel_order_confirm_message": "[TODO]",
-      "cancel_order_error": "[TODO] Erreur lors de l'annulation de la commande",
-      "canceling_order": "[TODO]",
-      "delete_order": "[TODO] Supprimer la commande",
-      "delete_order_confirm": "[TODO] Êtes-vous sûr de vouloir supprimer cette commande ?",
-      "delete_order_confirm_message": "[TODO] Cette action supprimera définitivement la commande et tous les billets associés de la base de données. Cette action ne peut pas être annulée.",
-      "delete_order_error": "[TODO] Erreur lors de la suppression de la commande",
-      "deleting_order": "[TODO] Suppression en cours...",
-      "order_canceled": "[TODO] Commande annulée",
-      "order_deleted": "[TODO] Commande supprimée"
-    },
     "participant": {
       "entry_validated": "Eintritt bereits validiert",
       "logo_alt": "HelloAsso",
@@ -69,10 +69,10 @@
         "title": "Kontingentverwaltung"
       },
       "stats": {
-        "exceeded": "[TODO] DÉPASSEMENT",
         "title": "Kontingentstatistiken",
         "used": "Verwendet",
-        "validated": "Validiert"
+        "validated": "Validiert",
+        "exceeded": "ÜBERSCHREITUNG"
       }
     },
     "returnable_items": {
@@ -92,9 +92,9 @@
       }
     },
     "stats": {
-      "artists": "[TODO] Artistes",
       "participants": "Teilnehmer",
-      "volunteers": "Freiwillige"
+      "volunteers": "Freiwillige",
+      "artists": "Künstler"
     },
     "tiers": {
       "list": {
@@ -113,8 +113,8 @@
         "min_amount_placeholder": "0,00",
         "name_label": "Name des Tarifs",
         "name_placeholder": "Z.B.: 3-Tages-Pass",
-        "no_item_selected": "Kein Artikel ausgewählt",
         "no_quota_selected": "Kein Kontingent ausgewählt",
+        "no_item_selected": "Kein Artikel ausgewählt",
         "position_label": "Anzeigeposition",
         "position_placeholder": "0",
         "price_label": "Preis (€)",

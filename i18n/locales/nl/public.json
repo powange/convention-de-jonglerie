@@ -14,7 +14,6 @@
   },
   "pages": {
     "access_denied": {
-      "confirm_delete_edition": "Weet je zeker dat je deze editie wilt verwijderen?",
       "description": "Je hebt niet de rechten om deze pagina te bekijken.",
       "title": "Toegang geweigerd"
     },
@@ -54,12 +53,6 @@
     "favorites": {
       "editions_in_favorites": "{count} editie | {count} edities in favorieten",
       "no_favorites_added": "Je hebt nog geen editie aan je favorieten toegevoegd."
-    },
-    "management": {
-      "delete_edition": "Editie verwijderen",
-      "edit_edition": "Editie bewerken",
-      "lost_found_active_description": "Je kunt gevonden voorwerpen beheren terwijl de editie bezig is.",
-      "manage_lost_found": "Gevonden voorwerpen beheren"
     },
     "objets_trouves": {
       "photo_alt": "Foto van het gevonden voorwerp"

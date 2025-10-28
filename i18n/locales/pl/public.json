@@ -14,7 +14,6 @@
   },
   "pages": {
     "access_denied": {
-      "confirm_delete_edition": "Czy na pewno chcesz usunąć tę edycję?",
       "description": "Nie masz uprawnień do tej strony.",
       "title": "Dostęp zabroniony"
     },
@@ -54,12 +53,6 @@
     "favorites": {
       "editions_in_favorites": "{count} edycja w ulubionych | {count} edycji w ulubionych",
       "no_favorites_added": "Nie dodałeś jeszcze żadnej edycji do ulubionych."
-    },
-    "management": {
-      "delete_edition": "Usuń edycję",
-      "edit_edition": "Edytuj edycję",
-      "lost_found_active_description": "Możesz zarządzać rzeczami znalezionymi w trakcie trwania edycji.",
-      "manage_lost_found": "Zarządzaj rzeczami znalezionymi"
     },
     "objets_trouves": {
       "photo_alt": "Zdjęcie znalezionego przedmiotu"

@@ -1,4 +1,22 @@
 {
+  "push_notifications": {
+    "promo_modal": {
+      "benefits": {
+        "carpool": "Otrzymuj powiadomienia o rezerwacjach i wiadomościach dotyczących wspólnych przejazdów",
+        "important": "Nie przegap ważnych informacji dotyczących Ciebie",
+        "reminders": "Otrzymuj przypomnienia o swoich ulubionych konwentach",
+        "volunteer": "Otrzymuj aktualizacje dotyczące swoich aplikacji wolontariuszy"
+      },
+      "description": "Włącz powiadomienia push, aby być na bieżąco z wspólnymi przejazdami, aplikacjami wolontariuszy i ulubionymi konwentami.",
+      "enable": "Włącz powiadomienia",
+      "not_now": "Nie teraz",
+      "privacy": {
+        "description": "Możesz wyłączyć powiadomienia w każdej chwili w swoich ustawieniach.",
+        "title": "Szanuje prywatność"
+      },
+      "title": "Bądź informowany w czasie rzeczywistym"
+    }
+  },
   "notifications": {
     "carpool": {
       "booking_accepted": {
@@ -88,24 +106,6 @@
       "action": "Zobacz konwencje",
       "message": "Twoje konto zostało pomyślnie utworzone. Odkryj konwencje żonglerskie w Twojej okolicy!",
       "title": "Witamy! 🎉"
-    }
-  },
-  "push_notifications": {
-    "promo_modal": {
-      "benefits": {
-        "carpool": "Otrzymuj powiadomienia o rezerwacjach i wiadomościach dotyczących wspólnych przejazdów",
-        "important": "Nie przegap ważnych informacji dotyczących Ciebie",
-        "reminders": "Otrzymuj przypomnienia o swoich ulubionych konwentach",
-        "volunteer": "Otrzymuj aktualizacje dotyczące swoich aplikacji wolontariuszy"
-      },
-      "description": "Włącz powiadomienia push, aby być na bieżąco z wspólnymi przejazdami, aplikacjami wolontariuszy i ulubionymi konwentami.",
-      "enable": "Włącz powiadomienia",
-      "not_now": "Nie teraz",
-      "privacy": {
-        "description": "Możesz wyłączyć powiadomienia w każdej chwili w swoich ustawieniach.",
-        "title": "Szanuje prywatność"
-      },
-      "title": "Bądź informowany w czasie rzeczywistym"
     }
   }
 }

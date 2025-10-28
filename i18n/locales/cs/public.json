@@ -14,7 +14,6 @@
   },
   "pages": {
     "access_denied": {
-      "confirm_delete_edition": "Jste si jistí, že chcete toto vydání vyřadit?",
       "description": "K přístupu na tuto stránku nemáte práva.",
       "title": "Přístup odepřen"
     },
@@ -54,12 +53,6 @@
     "favorites": {
       "editions_in_favorites": "{count} oblíbená vydání | {count} oblíbená vydání",
       "no_favorites_added": "Zatím jste si nepřidali edici do oblíbených."
-    },
-    "management": {
-      "delete_edition": "Smazat upravit",
-      "edit_edition": "Úprava úprav",
-      "lost_found_active_description": "Nalezené objekty můžete spravovat i během úprav.",
-      "manage_lost_found": "Správa ztraceného majetku"
     },
     "objets_trouves": {
       "photo_alt": "Fotografie nalezeného předmětu"

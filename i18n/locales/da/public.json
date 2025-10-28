@@ -14,7 +14,6 @@
   },
   "pages": {
     "access_denied": {
-      "confirm_delete_edition": "Er du sikker på, at du vil slette denne udgave?",
       "description": "Du har ikke rettigheder til at få adgang til denne side.",
       "title": "Adgang nægtet"
     },
@@ -54,12 +53,6 @@
     "favorites": {
       "editions_in_favorites": "{count} udgave i favoritter | {count} udgaver i favoritter",
       "no_favorites_added": "Du har endnu ikke tilføjet nogen udgaver til dine favoritter."
-    },
-    "management": {
-      "delete_edition": "Slet udgaven",
-      "edit_edition": "Rediger udgaven",
-      "lost_found_active_description": "Du kan administrere hittegods mens udgaven er i gang.",
-      "manage_lost_found": "Administrer hittegods"
     },
     "objets_trouves": {
       "photo_alt": "Foto af den fundne genstand"
