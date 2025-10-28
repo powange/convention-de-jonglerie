@@ -91,7 +91,7 @@ export default defineEventHandler(async (event) => {
     mealId: number
     mealDate: Date
     mealType: string
-    mealPhase: string
+    mealPhases: string[]
     dietaryPreference: string | null
     allergies: string | null
     allergySeverity: string | null
@@ -111,7 +111,7 @@ export default defineEventHandler(async (event) => {
         mealId: meal.id,
         mealDate: meal.date,
         mealType: meal.mealType,
-        mealPhase: meal.phase,
+        mealPhases: meal.phases,
         dietaryPreference: selection.volunteer.dietaryPreference,
         allergies: selection.volunteer.allergies,
         allergySeverity: selection.volunteer.allergySeverity,
@@ -131,7 +131,7 @@ export default defineEventHandler(async (event) => {
         mealId: meal.id,
         mealDate: meal.date,
         mealType: meal.mealType,
-        mealPhase: meal.phase,
+        mealPhases: meal.phases,
         dietaryPreference: selection.artist.dietaryPreference,
         allergies: selection.artist.allergies,
         allergySeverity: selection.artist.allergySeverity,

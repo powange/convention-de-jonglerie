@@ -48,7 +48,7 @@
     "invalid_color": "Neplatná barva",
     "invalid_credentials": "Nesprávná e-mailová adresa, uživatelské jméno nebo heslo",
     "invalid_email": "Neplatný e-mail",
-    "invalid_file_type": "Nesprávný typ souboru. Přijatelné formáty: {typy}",
+    "invalid_file_type": "Nesprávný typ souboru. Přijatelné formáty: {types}",
     "invalid_phone_number": "Neplatné telefonní číslo",
     "last_name_required": "Název je povinný",
     "loading_error": "Chyba načítání",

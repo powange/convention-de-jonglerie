@@ -405,7 +405,9 @@ const generateCateringPdf = async () => {
 
       const mealLabel =
         mealTypeLabels[meal.mealType as keyof typeof mealTypeLabels] || meal.mealType
-      const phaseLabel = phaseLabels[meal.phase as keyof typeof phaseLabels] || meal.phase
+      const phaseLabel = meal.phases
+        .map((phase: string) => phaseLabels[phase as keyof typeof phaseLabels] || phase)
+        .join(' + ')
 
       // Calculer le nombre d'artistes qui mangent après le spectacle
       const artistsAfterShowCount = meal.participants.filter(
@@ -507,7 +509,9 @@ const generateCateringPdf = async () => {
 
       const mealLabel =
         mealTypeLabels[meal.mealType as keyof typeof mealTypeLabels] || meal.mealType
-      const phaseLabel = phaseLabels[meal.phase as keyof typeof phaseLabels] || meal.phase
+      const phaseLabel = meal.phases
+        .map((phase: string) => phaseLabels[phase as keyof typeof phaseLabels] || phase)
+        .join(' + ')
 
       // Titre du repas
       doc.setFontSize(16)

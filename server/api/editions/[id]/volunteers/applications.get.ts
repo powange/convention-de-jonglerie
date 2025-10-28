@@ -270,7 +270,7 @@ export default defineEventHandler(async (event) => {
             id: true,
             date: true,
             mealType: true,
-            phase: true,
+            phases: true,
           },
         },
       },

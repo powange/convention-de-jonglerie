@@ -63,7 +63,7 @@
     "import_success_description": "{count} dílny úspěšně importovány",
     "import_error": "Chyba při importu",
     "import_partial_error": "Částečně úspěšný import",
-    "import_partial_error_description": "{úspěch} dovezený(é) workshop(y), {neúspěch} neúspěch(y)",
+    "import_partial_error_description": "{success} dovezený(é) workshop(y), {fail} neúspěch(y)",
     "only_images_allowed": "Přijímají se pouze obrázky",
     "max_file_size": "Maximální velikost souboru je 10 MB",
     "import_complete": "Import dokončen",

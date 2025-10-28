@@ -63,7 +63,7 @@
     "import_success_description": "{count} officina/e importata/e con successo",
     "import_error": "Errore durante l'importazione",
     "import_partial_error": "Importazione parzialmente riuscita",
-    "import_partial_error_description": "{successo} laboratorio/i importato/i, {fallimento} fallimento/i",
+    "import_partial_error_description": "{success} laboratorio/i importato/i, {fail} fallimento/i",
     "only_images_allowed": "Si accettano solo immagini",
     "max_file_size": "La dimensione massima del file è di 10 MB",
     "import_complete": "Importazione completata",

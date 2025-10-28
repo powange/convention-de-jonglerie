@@ -21,7 +21,7 @@
     "list_title": "Zarządzanie artystami",
     "manage_artists_description": "Zarządzaj artystami zaproszonymi do tej edycji",
     "meals": {
-      "title": "Posiłek od {nazwa}",
+      "title": "Posiłek od {name}",
       "meals_updated": "Posiłki zostały pomyślnie zaktualizowane",
       "after_show": "Po pokazie",
       "description": "Wybierz posiłki, w których będzie uczestniczył artysta",
@@ -35,7 +35,7 @@
     "my_artist_pass": "Moja przepustka dla artystów",
     "no_artists": "Na razie nie ma artysty",
     "no_notes": "Brak notatek",
-    "notes_for_artist": "Prywatne notatki organizatora dla {imię}",
+    "notes_for_artist": "Prywatne notatki organizatora dla {name}",
     "notes_label": "Uwagi",
     "notes_placeholder": "Prywatne notatki od organizatora...",
     "notes_saved": "Zapisane notatki",

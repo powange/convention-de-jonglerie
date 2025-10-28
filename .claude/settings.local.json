@@ -146,7 +146,9 @@
       "WebFetch(domain:nitro.build)",
       "mcp__nuxt-ui__list_documentation_pages",
       "mcp__nuxt-ui__search_components_by_category",
-      "mcp__nuxt-ui__get_component_metadata"
+      "mcp__nuxt-ui__get_component_metadata",
+      "Read(//proc/98900/fd/**)",
+      "Bash(wait)"
     ],
     "deny": [],
     "ask": [],

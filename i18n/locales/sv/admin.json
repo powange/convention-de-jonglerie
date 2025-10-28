@@ -23,12 +23,12 @@
     "backup_create_description": "Skapa en fullständig säkerhetskopia av databasen i SQL-format",
     "backup_create_error": "Fel under skapandet av säkerhetskopian",
     "backup_create_success": "Säkerhetskopian har skapats framgångsrikt",
-    "backup_create_success_description": "Säkerhetskopian {filnamn} har skapats framgångsrikt",
+    "backup_create_success_description": "Säkerhetskopian {filename} har skapats framgångsrikt",
     "backup_creating": "Skapande pågår...",
-    "backup_delete_confirm": "Är du säker på att du vill ta bort säkerhetskopian {filnamn}?",
+    "backup_delete_confirm": "Är du säker på att du vill ta bort säkerhetskopian {filename}?",
     "backup_delete_error": "Fel vid borttagning av säkerhetskopia",
     "backup_delete_success": "Säkerhetskopian har raderats framgångsrikt",
-    "backup_delete_success_description": "Säkerhetskopian {filnamn} har raderats framgångsrikt",
+    "backup_delete_success_description": "Säkerhetskopian {filename} har raderats framgångsrikt",
     "backup_empty": "Ingen backup tillgänglig",
     "backup_invalid_file": "Ogiltig fil. Endast .sql-filer accepteras",
     "backup_list": "Tillgängliga säkerhetskopior",
@@ -204,7 +204,7 @@
       "import_success": "En lyckad import!",
       "import_success_message": "Konventionen och utgåvan importerades framgångsrikt.",
       "import_success_toast": "Uppgifterna har importerats till databasen",
-      "invalid_date": "Datumet i {fält} är ogiltigt (format YYYY-MM-DD)",
+      "invalid_date": "Datumet i {field} är ogiltigt (format YYYY-MM-DD)",
       "invalid_json": "JSON är ogiltig",
       "json_format": "JSON-format",
       "json_input": "JSON-data",
@@ -261,7 +261,7 @@
     "original_user": "Ursprunglig användare",
     "pages": {
       "conventions": {
-        "confirm_delete_convention_permanently": "⚠️ OBSERVERA: Är du säker att du vill ta bort \"{name}\"-konventionen permanent?\n\nDenna åtgärd kommer att radera :\n- {utgåvorRäkna} utgåva(r)\n- {collaboratorsCount} medarbetare(s)\n- Alla associerade data\n\nDenna åtgärd är IRREVERSIBEL!",
+        "confirm_delete_convention_permanently": "⚠️ OBSERVERA: Är du säker att du vill ta bort \"{name}\"-konventionen permanent?\n\nDenna åtgärd kommer att radera :\n- {editionsCount} utgåva(r)\n- {collaboratorsCount} medarbetare(s)\n- Alla associerade data\n\nDenna åtgärd är IRREVERSIBEL!",
         "convention_deleted_permanently": "Avtal framgångsrikt återkallat",
         "delete_convention_permanently": "Ta bort permanent",
         "error_deleting_convention": "Fel vid borttagning av avtalet"
@@ -328,6 +328,6 @@
     "view_profile": "Visa profil",
     "view_profiles": "Visa profiler",
     "volunteer_reminders": "Påminnelser om volontärarbete",
-    "volunteers_count": "{antal frivilliga"
+    "volunteers_count": "{count} volontärer"
   }
 }

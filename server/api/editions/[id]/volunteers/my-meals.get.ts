@@ -56,10 +56,18 @@ export default defineEventHandler(async (event) => {
 
     // Filtrer les repas selon les disponibilités du bénévole
     const filteredMeals = allMeals.filter((meal) => {
-      // Filtrer par phase selon les disponibilités
-      if (meal.phase === 'SETUP' && !volunteer.setupAvailability) return false
-      if (meal.phase === 'TEARDOWN' && !volunteer.teardownAvailability) return false
-      if (meal.phase === 'EVENT' && !volunteer.eventAvailability) return false
+      // Filtrer par phases selon les disponibilités
+      // Le bénévole est éligible si AU MOINS UNE des phases correspond à ses disponibilités
+      const hasSetup = meal.phases.includes('SETUP')
+      const hasEvent = meal.phases.includes('EVENT')
+      const hasTeardown = meal.phases.includes('TEARDOWN')
+
+      const isEligibleForPhases =
+        (hasSetup && volunteer.setupAvailability) ||
+        (hasEvent && volunteer.eventAvailability) ||
+        (hasTeardown && volunteer.teardownAvailability)
+
+      if (!isEligibleForPhases) return false
 
       // Filtrer par dates d'arrivée et de départ si renseignées
       const mealDate = new Date(meal.date)
@@ -146,7 +154,7 @@ export default defineEventHandler(async (event) => {
         id: meal.id,
         date: meal.date,
         mealType: meal.mealType,
-        phase: meal.phase,
+        phases: meal.phases,
         selectionId: selection?.id,
         accepted: selection?.accepted ?? true,
       }

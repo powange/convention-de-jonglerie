@@ -741,18 +741,12 @@
                       </span>
                     </div>
                     <UBadge
-                      :color="meal.phase === 'EVENT' ? 'primary' : 'neutral'"
+                      :color="meal.phases.includes('EVENT') ? 'primary' : 'neutral'"
                       variant="subtle"
                       size="xs"
                       class="self-start"
                     >
-                      {{
-                        meal.phase === 'SETUP'
-                          ? 'Montage'
-                          : meal.phase === 'EVENT'
-                            ? 'Édition'
-                            : 'Démontage'
-                      }}
+                      {{ formatPhases(meal.phases) }}
                     </UBadge>
                   </div>
                 </div>
@@ -951,18 +945,12 @@
                       </span>
                     </div>
                     <UBadge
-                      :color="meal.phase === 'EVENT' ? 'primary' : 'neutral'"
+                      :color="meal.phases.includes('EVENT') ? 'primary' : 'neutral'"
                       variant="subtle"
                       size="xs"
                       class="self-start"
                     >
-                      {{
-                        meal.phase === 'SETUP'
-                          ? 'Montage'
-                          : meal.phase === 'EVENT'
-                            ? 'Édition'
-                            : 'Démontage'
-                      }}
+                      {{ formatPhases(meal.phases) }}
                     </UBadge>
                   </div>
                 </div>
@@ -1541,6 +1529,17 @@ const showValidateConfirm = () => {
   }
 
   showValidateModal.value = true
+}
+
+// Helper pour formater les phases multiples
+const formatPhases = (phases: string[]) => {
+  if (!phases || phases.length === 0) return ''
+  const phaseLabels: Record<string, string> = {
+    SETUP: 'Montage',
+    EVENT: 'Édition',
+    TEARDOWN: 'Démontage',
+  }
+  return phases.map((phase) => phaseLabels[phase] || phase).join(' + ')
 }
 
 const confirmValidateEntry = async () => {

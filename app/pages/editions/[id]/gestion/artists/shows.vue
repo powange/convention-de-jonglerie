@@ -285,6 +285,7 @@ const openAddShowModal = () => {
 // Ouvrir le modal d'édition
 const openEditShowModal = (show: any) => {
   selectedShow.value = show
+  console.log('Editing show:', show)
   showShowModal.value = true
 }
 

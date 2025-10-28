@@ -73,7 +73,7 @@ export default defineEventHandler(async (event) => {
         },
         data: {
           enabled: meal.enabled ?? undefined,
-          phase: meal.phase ?? undefined,
+          phases: meal.phases ?? undefined,
         },
       })
     })
@@ -100,7 +100,7 @@ export default defineEventHandler(async (event) => {
           select: {
             date: true,
             mealType: true,
-            phase: true,
+            phases: true,
           },
         })
 
@@ -135,14 +135,30 @@ export default defineEventHandler(async (event) => {
           },
         })
 
+        // S'assurer que phases est un tableau de strings
+        const phases = Array.isArray(mealData.phases) ? (mealData.phases as string[]) : []
+
         // Filtrer les bénévoles éligibles selon les règles
         const eligibleVolunteers = acceptedVolunteers.filter((volunteer) =>
-          isVolunteerEligibleForMeal(mealData, volunteer)
+          isVolunteerEligibleForMeal(
+            {
+              date: mealData.date,
+              mealType: mealData.mealType,
+              phases,
+            },
+            volunteer
+          )
         )
 
         // Filtrer les artistes éligibles selon les règles
         const eligibleArtists = artists.filter((artist) =>
-          isArtistEligibleForMeal(mealData, artist)
+          isArtistEligibleForMeal(
+            {
+              date: mealData.date,
+              mealType: mealData.mealType,
+            },
+            artist
+          )
         )
 
         // Créer les sélections de repas pour les bénévoles éligibles (si pas déjà existantes)

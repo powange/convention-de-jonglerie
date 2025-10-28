@@ -21,7 +21,7 @@
     "list_title": "Management af kunstnere",
     "manage_artists_description": "Administrer de kunstnere, der er inviteret til denne udgave",
     "meals": {
-      "title": "Måltid fra {navn}",
+      "title": "Måltid fra {name}",
       "meals_updated": "Måltider opdateret med succes",
       "after_show": "Efter forestillingen",
       "description": "Vælg de måltider, som kunstneren skal deltage i",
@@ -35,7 +35,7 @@
     "my_artist_pass": "Mit kunstnerpas",
     "no_artists": "Ingen kunstner i øjeblikket",
     "no_notes": "Ingen noter",
-    "notes_for_artist": "Arrangørens private noter til {navn}",
+    "notes_for_artist": "Arrangørens private noter til {name}",
     "notes_label": "Noter",
     "notes_placeholder": "Private noter fra arrangøren...",
     "notes_saved": "Gemte noter",

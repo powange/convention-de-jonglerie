@@ -63,7 +63,7 @@
     "import_success_description": "Pomyślnie zaimportowano {count} warsztatów",
     "import_error": "Błąd podczas importowania",
     "import_partial_error": "Częściowo udany import",
-    "import_partial_error_description": "{sukces} zaimportowane warsztaty, {niepowodzenie} niepowodzenie(a)",
+    "import_partial_error_description": "{success} zaimportowane warsztaty, {fail} niepowodzenie(a)",
     "only_images_allowed": "Akceptowane są tylko obrazy",
     "max_file_size": "Maksymalny rozmiar pliku to 10 MB",
     "import_complete": "Import zakończony",

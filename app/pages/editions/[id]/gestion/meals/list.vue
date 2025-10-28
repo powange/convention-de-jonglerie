@@ -196,7 +196,10 @@ const dietLabels: Record<string, string> = {
 }
 
 const getMealTypeLabel = (mealType: string) => mealTypeLabels[mealType] || mealType
-const getPhaseLabel = (phase: string) => phaseLabels[phase] || phase
+const getPhasesLabel = (phases: string[]) => {
+  if (!phases || phases.length === 0) return ''
+  return phases.map((phase) => phaseLabels[phase] || phase).join(' + ')
+}
 const getDietLabel = (diet: string) => dietLabels[diet] || diet
 
 // Formatage de date
@@ -218,7 +221,7 @@ const formattedParticipants = computed(() => {
     type: p.type === 'volunteer' ? t('common.volunteer') : t('common.artist'),
     mealDate: formatDate(p.mealDate),
     mealType: getMealTypeLabel(p.mealType),
-    mealPhase: getPhaseLabel(p.mealPhase),
+    mealPhase: getPhasesLabel(p.mealPhases),
     dietaryPreference: p.dietaryPreference ? getDietLabel(p.dietaryPreference) : '-',
     afterShow: p.type === 'artist' && p.afterShow ? '✓' : '-',
   }))

@@ -21,7 +21,7 @@
     "list_title": "Správa umělců",
     "manage_artists_description": "Správa umělců pozvaných do tohoto vydání",
     "meals": {
-      "title": "Jídlo od {jméno}",
+      "title": "Jídlo od {name}",
       "meals_updated": "Jídla byla úspěšně aktualizována",
       "after_show": "Po výstavě",
       "description": "Vyberte jídla, kterých se umělec zúčastní",
@@ -35,7 +35,7 @@
     "my_artist_pass": "Můj umělecký průkaz",
     "no_artists": "Prozatím žádný umělec",
     "no_notes": "Žádné poznámky",
-    "notes_for_artist": "Soukromé poznámky organizátora pro {jméno}",
+    "notes_for_artist": "Soukromé poznámky organizátora pro {name}",
     "notes_label": "Poznámky",
     "notes_placeholder": "Soukromé poznámky organizátora...",
     "notes_saved": "Uložené poznámky",

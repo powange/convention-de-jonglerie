@@ -544,7 +544,7 @@
       "notification_sent_count": "Sent to {count} volunteer | Sent to {count} volunteers",
       "notification_sent_success": "Notification sent!",
       "notification_sent_to_volunteer": "Volunteer has been notified of the changes",
-      "notification_title_info": "The title will automatically be \"Volunteers - {'edition name'}\"",
+      "notification_title_info": "The title will automatically be \"Volunteers - {'nom de l`édition ou de la convention'}\"",
       "notification_title_prefix": "Volunteers",
       "notifications": "Volunteer notifications",
       "notifications_history": "Notification history",

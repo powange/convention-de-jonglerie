@@ -160,7 +160,7 @@ export default defineEventHandler(async (event) => {
         id: meal.id,
         date: meal.date,
         mealType: meal.mealType,
-        phase: meal.phase,
+        phases: meal.phases,
         selectionId: selection?.id,
         accepted: selection?.accepted ?? true,
         afterShow: selection?.afterShow ?? false,

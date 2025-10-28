@@ -255,7 +255,7 @@ export default defineEventHandler(async (event) => {
     const returnableItemsByVolunteerId = new Map<number, Array<{ id: number; name: string }>>()
     const mealsByVolunteerId = new Map<
       number,
-      Array<{ id: number; date: Date; mealType: string; phase: string }>
+      Array<{ id: number; date: Date; mealType: string; phases: string[] }>
     >()
 
     for (const volunteer of volunteers) {
@@ -341,7 +341,7 @@ export default defineEventHandler(async (event) => {
           id: selection.meal.id,
           date: selection.meal.date,
           mealType: selection.meal.mealType,
-          phase: selection.meal.phase,
+          phases: selection.meal.phases,
         }))
       )
 
@@ -369,7 +369,7 @@ export default defineEventHandler(async (event) => {
     const returnableItemsByArtistId = new Map<number, Array<{ id: number; name: string }>>()
     const mealsByArtistId = new Map<
       number,
-      Array<{ id: number; date: Date; mealType: string; phase: string }>
+      Array<{ id: number; date: Date; mealType: string; phases: string[] }>
     >()
 
     for (const artist of artists) {
@@ -416,7 +416,7 @@ export default defineEventHandler(async (event) => {
           id: selection.meal.id,
           date: selection.meal.date,
           mealType: selection.meal.mealType,
-          phase: selection.meal.phase,
+          phases: selection.meal.phases,
         }))
       )
 

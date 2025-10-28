@@ -48,7 +48,7 @@
     "invalid_color": "Ugyldig farve",
     "invalid_credentials": "Ugyldige legitimationsoplysninger",
     "invalid_email": "Ugyldig email",
-    "invalid_file_type": "Ugyldig filtype. Accepterede formater: {typer}",
+    "invalid_file_type": "Ugyldig filtype. Accepterede formater: {types}",
     "invalid_phone_number": "Ugyldigt telefonnummer",
     "last_name_required": "Efternavn påkrævet",
     "loading_error": "Indlæsningsfejl",

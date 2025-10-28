@@ -18,6 +18,7 @@
     "help": "node scripts/show-help.mjs",
     "check-i18n": "node scripts/check-i18n.js",
     "check-translations": "node scripts/check-i18n-translations.js",
+    "check-i18n-vars": "node scripts/check-i18n-variables.cjs",
     "i18n:add": "node scripts/add-translation.js",
     "i18n:translate": "node scripts/translate-with-deepl.js",
     "i18n:translate:force": "node scripts/translate-with-deepl.js --force",

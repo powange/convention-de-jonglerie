@@ -63,7 +63,7 @@
     "import_success_description": "{count} workshop(s) importado(s) com sucesso",
     "import_error": "Erro durante a importação",
     "import_partial_error": "Importação parcialmente bem sucedida",
-    "import_partial_error_description": "{sucesso} seminário(s) importado(s), {falha} fracasso(s)",
+    "import_partial_error_description": "{success} seminário(s) importado(s), {fail} fracasso(s)",
     "only_images_allowed": "Só são aceites imagens",
     "max_file_size": "O tamanho máximo do ficheiro é de 10 MB",
     "import_complete": "Importação concluída",

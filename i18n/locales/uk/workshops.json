@@ -63,7 +63,7 @@
     "import_success_description": "{count} майстерню(и) успішно імпортовано",
     "import_error": "Помилка під час імпорту",
     "import_partial_error": "Частково успішний імпорт",
-    "import_partial_error_description": "{успіх} імпортовано майстерню(и), {неуспіх} відмова(и)",
+    "import_partial_error_description": "{success} імпортовано майстерню(и), {fail} відмова(и)",
     "only_images_allowed": "Приймаються лише зображення",
     "max_file_size": "Максимальний розмір файлу - 10 МБ",
     "import_complete": "Імпорт завершено",

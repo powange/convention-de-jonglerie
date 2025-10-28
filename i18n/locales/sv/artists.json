@@ -21,7 +21,7 @@
     "list_title": "Artisthantering",
     "manage_artists_description": "Hantera de inbjudna konstnärerna till denna utgåva",
     "meals": {
-      "title": "Måltid från {namn}",
+      "title": "Måltid från {name}",
       "meals_updated": "Måltider framgångsrikt uppdaterade",
       "after_show": "Efter föreställningen",
       "description": "Välj de måltider som konstnären kommer att delta i",
@@ -35,7 +35,7 @@
     "my_artist_pass": "Mitt artistpass",
     "no_artists": "Ingen artist för tillfället",
     "no_notes": "Inga anteckningar",
-    "notes_for_artist": "Organisatörens privata anteckningar för {namn}",
+    "notes_for_artist": "Organisatörens privata anteckningar för {name}",
     "notes_label": "Anteckningar",
     "notes_placeholder": "Privata anteckningar från arrangören...",
     "notes_saved": "Sparade anteckningar",

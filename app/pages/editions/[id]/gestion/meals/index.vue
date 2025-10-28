@@ -90,9 +90,10 @@
                             {{ getMealTypeLabel(meal.mealType) }}
                           </p>
                           <USelectMenu
-                            v-model="meal.phase"
+                            v-model="meal.phases"
                             :items="mealPhaseOptions"
                             value-key="value"
+                            multiple
                             :disabled="savingMeals"
                             :search-input="false"
                             size="xs"
@@ -291,7 +292,7 @@ const handleMealChange = async (meal: any) => {
           {
             id: meal.id,
             enabled: meal.enabled,
-            phase: meal.phase,
+            phases: meal.phases,
             returnableItemIds,
           },
         ],

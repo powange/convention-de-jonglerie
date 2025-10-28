@@ -21,7 +21,7 @@
     "list_title": "Gestão de artistas",
     "manage_artists_description": "Gerir os artistas convidados para esta edição",
     "meals": {
-      "title": "Refeição de {nome}",
+      "title": "Refeição de {name}",
       "meals_updated": "Refeições actualizadas com sucesso",
       "after_show": "Depois do espetáculo",
       "description": "Selecionar as refeições a que o artista vai assistir",
@@ -35,7 +35,7 @@
     "my_artist_pass": "O meu passe de artista",
     "no_artists": "Nenhum artista por enquanto",
     "no_notes": "Sem notas",
-    "notes_for_artist": "Notas privadas do organizador para {nome}",
+    "notes_for_artist": "Notas privadas do organizador para {name}",
     "notes_label": "Notas",
     "notes_placeholder": "Notas privadas do organizador...",
     "notes_saved": "Notas guardadas",

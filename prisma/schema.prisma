@@ -1320,7 +1320,7 @@ model VolunteerMeal {
   date      DateTime           @db.Date
   mealType  VolunteerMealType
   enabled   Boolean            @default(true)
-  phase     VolunteerMealPhase
+  phases    Json               @default("[]")
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
 

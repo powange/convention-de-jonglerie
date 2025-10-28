@@ -40,7 +40,7 @@
                       {{ getMealTypeLabel(meal.mealType) }}
                     </p>
                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                      {{ getPhaseLabel(meal.phase) }}
+                      {{ getPhasesLabel(meal.phases) }}
                     </p>
                   </div>
                 </div>
@@ -137,7 +137,10 @@ const phaseLabels: Record<string, string> = {
 }
 
 const getMealTypeLabel = (mealType: string) => mealTypeLabels[mealType] || mealType
-const getPhaseLabel = (phase: string) => phaseLabels[phase] || phase
+const getPhasesLabel = (phases: string[]) => {
+  if (!phases || phases.length === 0) return ''
+  return phases.map((phase) => phaseLabels[phase] || phase).join(' + ')
+}
 
 // Grouper les repas par date
 const groupedMeals = computed(() => {

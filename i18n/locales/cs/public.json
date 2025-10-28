@@ -179,7 +179,7 @@
   "seo": {
     "edition": {
       "description": "Objevte {name}, který se koná {date} na {location}. Informace, program a registrace na tuto žonglérskou akci.",
-      "keywords": "žonglování, konvence, {konference}, {location}, událost, festival, show, workshop",
+      "keywords": "žonglování, konvence, {convention}, {location}, událost, festival, show, workshop",
       "og_description": "Připojte se k nám na {name} - {date}. Program, workshopy a žonglérské show.",
       "twitter_description": "{name} - {date}. Objevte program tohoto žonglérského setkání.",
       "twitter_title": "{name} - Žonglérská konvence"

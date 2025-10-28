@@ -21,7 +21,7 @@
     "list_title": "Artiestenmanagement",
     "manage_artists_description": "Beheer de kunstenaars die zijn uitgenodigd voor deze editie",
     "meals": {
-      "title": "Maaltijd van {naam}",
+      "title": "Maaltijd van {name}",
       "meals_updated": "Maaltijden succesvol bijgewerkt",
       "after_show": "Na de show",
       "description": "Selecteer de maaltijden die de artiest zal bijwonen",
@@ -35,7 +35,7 @@
     "my_artist_pass": "Mijn artiestenpas",
     "no_artists": "Voorlopig geen artiest",
     "no_notes": "Geen opmerkingen",
-    "notes_for_artist": "Privé-opmerkingen van de organisator voor {naam}",
+    "notes_for_artist": "Privé-opmerkingen van de organisator voor {name}",
     "notes_label": "Opmerkingen",
     "notes_placeholder": "Privé-notities van de organisator...",
     "notes_saved": "Opgeslagen notities",

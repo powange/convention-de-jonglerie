@@ -21,7 +21,7 @@
     "list_title": "Gestione degli artisti",
     "manage_artists_description": "Gestisci gli artisti invitati a questa edizione",
     "meals": {
-      "title": "Pasto da {nome}",
+      "title": "Pasto da {name}",
       "meals_updated": "Pasti aggiornati con successo",
       "after_show": "Dopo lo spettacolo",
       "description": "Selezionare i pasti a cui l'artista parteciperà",
@@ -35,7 +35,7 @@
     "my_artist_pass": "Il mio pass per artisti",
     "no_artists": "Nessun artista per il momento",
     "no_notes": "Nessuna nota",
-    "notes_for_artist": "Note private dell'organizzatore per {nome}",
+    "notes_for_artist": "Note private dell'organizzatore per {name}",
     "notes_label": "Note",
     "notes_placeholder": "Note private dell'organizzatore...",
     "notes_saved": "Note salvate",

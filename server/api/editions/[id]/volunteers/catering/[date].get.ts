@@ -76,7 +76,7 @@ export default defineEventHandler(async (event) => {
   // Construire le résultat avec un résumé et les détails par repas
   const summary = {
     totalMeals: meals.length,
-    mealCounts: {} as Record<string, { total: number; phase: string }>,
+    mealCounts: {} as Record<string, { total: number; phases: string[] }>,
     totalParticipants: 0,
     dietaryCounts: {} as Record<string, number>,
     allergies: [] as Array<{
@@ -124,9 +124,9 @@ export default defineEventHandler(async (event) => {
     })
 
     // Mettre à jour le résumé
-    const mealKey = `${meal.mealType}_${meal.phase}`
+    const mealKey = `${meal.mealType}_${meal.phases.join('_')}`
     if (!summary.mealCounts[mealKey]) {
-      summary.mealCounts[mealKey] = { total: 0, phase: meal.phase }
+      summary.mealCounts[mealKey] = { total: 0, phases: meal.phases }
     }
     summary.mealCounts[mealKey].total += allParticipants.length
     summary.totalParticipants += allParticipants.length
@@ -152,7 +152,7 @@ export default defineEventHandler(async (event) => {
     return {
       mealId: meal.id,
       mealType: meal.mealType,
-      phase: meal.phase,
+      phases: meal.phases,
       totalParticipants: allParticipants.length,
       volunteerCount: volunteers.length,
       artistCount: artists.length,

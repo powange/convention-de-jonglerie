@@ -51,7 +51,7 @@ export function getAvailableMealsOnDeparture(timeOfDay: string): VolunteerMealTy
  * en fonction de ses disponibilités et dates d'arrivée/départ
  */
 export function isVolunteerEligibleForMeal(
-  meal: { date: Date; mealType: VolunteerMealType; phase: string },
+  meal: { date: Date; mealType: VolunteerMealType; phases: string[] },
   volunteer: {
     setupAvailability: boolean
     teardownAvailability: boolean
@@ -60,10 +60,21 @@ export function isVolunteerEligibleForMeal(
     departureDateTime: string | null
   }
 ): boolean {
-  // Filtrer par phase selon les disponibilités
-  if (meal.phase === 'SETUP' && !volunteer.setupAvailability) return false
-  if (meal.phase === 'TEARDOWN' && !volunteer.teardownAvailability) return false
-  if (meal.phase === 'EVENT' && !volunteer.eventAvailability) return false
+  // Filtrer par phases selon les disponibilités
+  // Le bénévole est éligible si AU MOINS UNE des phases correspond à ses disponibilités
+  const hasSetup = meal.phases.includes('SETUP')
+  const hasEvent = meal.phases.includes('EVENT')
+  const hasTeardown = meal.phases.includes('TEARDOWN')
+
+  // Si le repas a une phase SETUP, le bénévole doit être disponible pour le montage
+  // Si le repas a une phase EVENT, le bénévole doit être disponible pour l'événement
+  // Si le repas a une phase TEARDOWN, le bénévole doit être disponible pour le démontage
+  const isEligibleForPhases =
+    (hasSetup && volunteer.setupAvailability) ||
+    (hasEvent && volunteer.eventAvailability) ||
+    (hasTeardown && volunteer.teardownAvailability)
+
+  if (!isEligibleForPhases) return false
 
   // Filtrer par dates d'arrivée et de départ si renseignées
   const mealDate = new Date(meal.date)
@@ -184,7 +195,18 @@ export async function createVolunteerMealSelections(
   })
 
   // Filtrer les repas selon les disponibilités du bénévole
-  const eligibleMeals = allMeals.filter((meal) => isVolunteerEligibleForMeal(meal, volunteer))
+  const eligibleMeals = allMeals.filter((meal) => {
+    // S'assurer que phases est un tableau de strings
+    const phases = Array.isArray(meal.phases) ? (meal.phases as string[]) : []
+    return isVolunteerEligibleForMeal(
+      {
+        date: meal.date,
+        mealType: meal.mealType,
+        phases,
+      },
+      volunteer
+    )
+  })
 
   // Vérifier quelles sélections existent déjà
   const existingSelections = await prisma.volunteerMealSelection.findMany({

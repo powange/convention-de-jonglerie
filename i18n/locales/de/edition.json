@@ -544,7 +544,7 @@
       "notification_sent_count": "An {count} Freiwilligen gesendet | An {count} Freiwillige gesendet",
       "notification_sent_success": "Benachrichtigung gesendet!",
       "notification_sent_to_volunteer": "Volunteer has been notified of the changes",
-      "notification_title_info": "Der Titel wird automatisch \"Freiwillige - {'Editions- oder Konventionsname'}\" sein",
+      "notification_title_info": "Der Titel wird automatisch \"Freiwillige - {'nom de l`édition ou de la convention'}\" sein",
       "notification_title_prefix": "Freiwillige",
       "notifications": "Freiwilligen-Benachrichtigungen",
       "notifications_history": "Benachrichtigungsverlauf",

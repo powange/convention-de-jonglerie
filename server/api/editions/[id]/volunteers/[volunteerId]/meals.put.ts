@@ -108,13 +108,16 @@ export default defineEventHandler(async (event) => {
     const formattedMeals = meals.map((meal) => {
       const selection = meal.mealSelections[0]
 
+      // S'assurer que phases est un tableau de strings
+      const phases = Array.isArray(meal.phases) ? (meal.phases as string[]) : []
+
       // Vérifier l'éligibilité du bénévole pour ce repas
       const eligible = volunteerInfo
         ? isVolunteerEligibleForMeal(
             {
               date: meal.date,
               mealType: meal.mealType,
-              phase: meal.phase,
+              phases,
             },
             {
               setupAvailability: volunteerInfo.setupAvailability,
@@ -130,7 +133,7 @@ export default defineEventHandler(async (event) => {
         id: meal.id,
         date: meal.date,
         mealType: meal.mealType,
-        phase: meal.phase,
+        phases,
         selectionId: selection?.id || null,
         accepted: selection?.accepted || false,
         eligible,

@@ -74,14 +74,15 @@ export default defineEventHandler(async (event) => {
     while (currentDate <= endDate) {
       const currentDateStr = currentDate.toISOString()
 
-      // Déterminer la phase (SETUP, EVENT, TEARDOWN)
-      let phase: 'SETUP' | 'EVENT' | 'TEARDOWN'
+      // Déterminer les phases (SETUP, EVENT, TEARDOWN)
+      // Par défaut, chaque repas est associé à une seule phase
+      let phases: string[]
       if (currentDate < editionStart) {
-        phase = 'SETUP'
+        phases = ['SETUP']
       } else if (currentDate > editionEnd) {
-        phase = 'TEARDOWN'
+        phases = ['TEARDOWN']
       } else {
-        phase = 'EVENT'
+        phases = ['EVENT']
       }
 
       // Créer les 3 repas pour cette journée
@@ -90,7 +91,7 @@ export default defineEventHandler(async (event) => {
         date: currentDateStr,
         mealType: 'BREAKFAST',
         enabled: true,
-        phase,
+        phases,
       })
 
       mealsToCreate.push({
@@ -98,7 +99,7 @@ export default defineEventHandler(async (event) => {
         date: currentDateStr,
         mealType: 'LUNCH',
         enabled: true,
-        phase,
+        phases,
       })
 
       mealsToCreate.push({
@@ -106,7 +107,7 @@ export default defineEventHandler(async (event) => {
         date: currentDateStr,
         mealType: 'DINNER',
         enabled: true,
-        phase,
+        phases,
       })
 
       // Passer au jour suivant

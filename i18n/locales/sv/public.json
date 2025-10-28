@@ -179,7 +179,7 @@
   "seo": {
     "edition": {
       "description": "Upptäck {name} som äger rum {date} på {location}. Information, program och anmälan till detta jongleringskonvent.",
-      "keywords": "jonglering, konvent, {konvent}, {location}, evenemang, festival, show, workshop",
+      "keywords": "jonglering, konvent, {convention}, {location}, evenemang, festival, show, workshop",
       "og_description": "Följ med oss till {name} - {date}. Program, workshops och jongleringsshower.",
       "twitter_description": "{name} - {date}. Upptäck programmet för detta jongleringskonvent.",
       "twitter_title": "{name} - Jongleringskonvention"
