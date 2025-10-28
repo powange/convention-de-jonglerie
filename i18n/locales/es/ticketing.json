@@ -69,6 +69,7 @@
         "title": "Gestión de cuotas"
       },
       "stats": {
+        "exceeded": "[TODO] DÉPASSEMENT",
         "title": "Estadísticas de cuotas",
         "used": "Utilizado",
         "validated": "Validado"
@@ -91,6 +92,7 @@
       }
     },
     "stats": {
+      "artists": "[TODO] Artistes",
       "participants": "Participantes",
       "volunteers": "Voluntarios"
     },

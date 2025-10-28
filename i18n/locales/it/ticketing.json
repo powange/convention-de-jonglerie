@@ -69,6 +69,7 @@
         "title": "Gestione delle quote"
       },
       "stats": {
+        "exceeded": "[TODO] DÉPASSEMENT",
         "title": "Statistiche delle quote",
         "used": "Utilizzato",
         "validated": "Convalidato"
@@ -91,6 +92,7 @@
       }
     },
     "stats": {
+      "artists": "[TODO] Artistes",
       "participants": "Partecipanti",
       "volunteers": "Volontari"
     },

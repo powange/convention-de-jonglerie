@@ -194,7 +194,20 @@
     "view_more": "Voir plus",
     "volunteers_short": "Bénévoles",
     "week": "Semaine",
-    "yes": "Oui"
+    "yes": "Oui",
+    "breakfast": "Petit-déjeuner",
+    "lunch": "Déjeuner",
+    "dinner": "Dîner",
+    "setup": "Montage",
+    "event": "Évènement",
+    "teardown": "Démontage",
+    "volunteer": "Bénévole",
+    "artist": "Artiste",
+    "type": "Type",
+    "phase": "Phase",
+    "dietary_preference": "Préférence alimentaire",
+    "vegetarian": "Végétarien",
+    "vegan": "Végan"
   },
   "countries": {
     "czech_republic": "République Tchèque"

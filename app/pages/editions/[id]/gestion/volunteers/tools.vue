@@ -334,122 +334,162 @@ const generateCateringPdf = async () => {
 
   generatingCateringPdf.value = true
   try {
-    // Importer jsPDF dynamiquement
+    // Importer jsPDF et autoTable dynamiquement
     const { jsPDF } = await import('jspdf')
+    const { applyPlugin } = await import('jspdf-autotable')
+
+    applyPlugin(jsPDF)
 
     // Récupérer les données depuis l'API
     const cateringData = (await $fetch(
       `/api/editions/${editionId}/volunteers/catering/${selectedCateringDate.value}`
     )) as any
 
-    // Créer le PDF
+    // Créer le PDF en format portrait pour la première page
     const doc = new jsPDF()
+
+    // === PAGE 1: RÉSUMÉ ===
     let yPosition = 20
 
     // Titre du document
     doc.setFontSize(18)
+    doc.setFont('helvetica', 'bold')
     doc.text(
-      `Informations Restauration - ${new Date(selectedCateringDate.value).toLocaleDateString(
-        'fr-FR',
-        {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }
-      )}`,
-      20,
-      yPosition
+      `Restauration - ${new Date(selectedCateringDate.value).toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })}`,
+      105,
+      yPosition,
+      { align: 'center' }
     )
-    yPosition += 20
+    yPosition += 15
 
     // Informations générales
-    doc.setFontSize(12)
+    doc.setFontSize(11)
+    doc.setFont('helvetica', 'normal')
     doc.text(`Convention: ${edition.value?.convention?.name || 'N/A'}`, 20, yPosition)
-    yPosition += 8
+    yPosition += 7
     doc.text(`Édition: ${edition.value?.name || 'N/A'}`, 20, yPosition)
     yPosition += 15
 
-    // Labels des créneaux temporels en français
-    const timeSlotLabels = {
-      morning: 'Matin',
-      noon: 'Midi',
-      evening: 'Soir',
+    // Résumé des repas
+    doc.setFontSize(14)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Résumé des repas', 20, yPosition)
+    yPosition += 10
+
+    const mealTypeLabels = { BREAKFAST: 'Matin', LUNCH: 'Midi', DINNER: 'Soir' }
+    const phaseLabels = { SETUP: 'Montage', EVENT: 'Édition', TEARDOWN: 'Démontage' }
+    const dietLabels = {
+      NONE: 'Aucun régime spécial',
+      VEGETARIAN: 'Végétarien',
+      VEGAN: 'Végan',
+    }
+    const severityLabels = {
+      LIGHT: 'légère',
+      MODERATE: 'modérée',
+      SEVERE: 'sévère',
+      CRITICAL: 'critique',
     }
 
-    for (const [slotKey, slotLabel] of Object.entries(timeSlotLabels)) {
-      const slotData = (cateringData as any).slots[slotKey]
-
-      // Vérifier que le slot existe avant d'y accéder
-      if (!slotData) {
-        continue
-      }
-
-      if (yPosition > 250) {
+    // Afficher chaque repas avec ses détails
+    for (const meal of cateringData.meals) {
+      // Vérifier si on a besoin d'une nouvelle page
+      if (yPosition > 240) {
         doc.addPage()
         yPosition = 20
       }
 
-      // Titre du créneau
-      doc.setFontSize(14)
+      const mealLabel =
+        mealTypeLabels[meal.mealType as keyof typeof mealTypeLabels] || meal.mealType
+      const phaseLabel = phaseLabels[meal.phase as keyof typeof phaseLabels] || meal.phase
+
+      // Calculer le nombre d'artistes qui mangent après le spectacle
+      const artistsAfterShowCount = meal.participants.filter(
+        (p: any) => p.type === 'artist' && p.afterShow
+      ).length
+
+      // Titre du repas
+      doc.setFontSize(12)
       doc.setFont('helvetica', 'bold')
-      doc.text(`${slotLabel}`, 20, yPosition)
-      yPosition += 10
+      doc.text(`${mealLabel} (${phaseLabel})`, 25, yPosition)
+      yPosition += 7
 
+      doc.setFontSize(10)
       doc.setFont('helvetica', 'normal')
-      doc.setFontSize(11)
+      doc.text(
+        `Total: ${meal.totalParticipants} participants (${meal.volunteerCount} bénévoles, ${meal.artistCount} artistes)`,
+        30,
+        yPosition
+      )
+      yPosition += 5
 
-      // Nombre total de bénévoles
-      doc.text(`Total bénévoles: ${slotData.totalVolunteers}`, 25, yPosition)
-      yPosition += 8
-
-      // Répartition par régime
-      if (slotData.dietaryCounts && Object.keys(slotData.dietaryCounts).length > 0) {
-        doc.text('Régimes alimentaires:', 25, yPosition)
-        yPosition += 6
-
-        // Ordre spécifique : NONE, VEGETARIAN, VEGAN
-        const dietOrder = ['NONE', 'VEGETARIAN', 'VEGAN']
-        const dietLabels = {
-          NONE: 'Aucun régime spécial',
-          VEGETARIAN: 'Végétarien',
-          VEGAN: 'Végan',
-        }
-
-        for (const diet of dietOrder) {
-          if (slotData.dietaryCounts[diet]) {
-            doc.text(
-              `  • ${dietLabels[diet as keyof typeof dietLabels]}: ${slotData.dietaryCounts[diet]}`,
-              30,
-              yPosition
-            )
-            yPosition += 6
-          }
-        }
-        yPosition += 3
+      // Afficher le nombre d'artistes qui mangent après le spectacle
+      if (artistsAfterShowCount > 0) {
+        doc.setFontSize(9)
+        doc.setFont('helvetica', 'italic')
+        doc.text(`  dont ${artistsAfterShowCount} artiste(s) après spectacle`, 30, yPosition)
+        yPosition += 5
+      } else {
+        yPosition += 1
       }
 
-      // Allergies
-      if (slotData.allergies && slotData.allergies.length > 0) {
-        doc.text('Allergies:', 25, yPosition)
-        yPosition += 6
+      // Calculer les régimes pour ce repas
+      const mealDietCounts: Record<string, number> = {}
+      meal.participants.forEach((p: any) => {
+        const diet = p.dietaryPreference || 'NONE'
+        mealDietCounts[diet] = (mealDietCounts[diet] || 0) + 1
+      })
 
-        // Labels pour les niveaux de sévérité
-        const severityLabels = {
-          LIGHT: 'légère',
-          MODERATE: 'modérée',
-          SEVERE: 'sévère',
-          CRITICAL: 'critique',
+      // Afficher les régimes alimentaires
+      if (Object.keys(mealDietCounts).length > 0) {
+        doc.setFontSize(9)
+        doc.setFont('helvetica', 'italic')
+        doc.text('Régimes:', 30, yPosition)
+        yPosition += 5
+
+        const dietOrder = ['NONE', 'VEGETARIAN', 'VEGAN']
+        for (const diet of dietOrder) {
+          if (mealDietCounts[diet]) {
+            doc.text(
+              `  ${dietLabels[diet as keyof typeof dietLabels]}: ${mealDietCounts[diet]}`,
+              32,
+              yPosition
+            )
+            yPosition += 4
+          }
         }
+      }
 
-        for (const allergy of slotData.allergies) {
-          const name = `${allergy.volunteer.prenom} ${allergy.volunteer.nom}`
-          const severityText = allergy.allergySeverity
-            ? ` (sévérité: ${severityLabels[allergy.allergySeverity as keyof typeof severityLabels] || allergy.allergySeverity})`
+      // Filtrer les allergies pour ce repas
+      const mealAllergies = meal.participants.filter((p: any) => p.allergies && p.allergies.trim())
+
+      if (mealAllergies.length > 0) {
+        yPosition += 2
+        doc.setFontSize(9)
+        doc.setFont('helvetica', 'italic')
+        doc.text('Allergies:', 30, yPosition)
+        yPosition += 5
+
+        for (const participant of mealAllergies) {
+          const name = `${participant.prenom || ''} ${participant.nom || ''}`.trim()
+          const severityText = participant.allergySeverity
+            ? ` (${severityLabels[participant.allergySeverity as keyof typeof severityLabels] || participant.allergySeverity})`
             : ''
-          doc.text(`  • ${name}: ${allergy.allergies}${severityText}`, 30, yPosition)
-          yPosition += 6
 
+          doc.setFontSize(8)
+          doc.text(`  • ${name}${severityText}: ${participant.allergies}`, 32, yPosition)
+          yPosition += 4
+
+          if (participant.emergencyContactPhone) {
+            doc.text(`    Tel urgence: ${participant.emergencyContactPhone}`, 34, yPosition)
+            yPosition += 4
+          }
+
+          // Vérifier si on dépasse la page
           if (yPosition > 270) {
             doc.addPage()
             yPosition = 20
@@ -457,7 +497,114 @@ const generateCateringPdf = async () => {
         }
       }
 
-      yPosition += 10
+      yPosition += 5
+    }
+
+    // === PAGES SUIVANTES: TABLEAUX PAR REPAS (FORMAT PAYSAGE) ===
+    for (const meal of cateringData.meals) {
+      // Ajouter une nouvelle page en format paysage
+      doc.addPage('a4', 'landscape')
+
+      const mealLabel =
+        mealTypeLabels[meal.mealType as keyof typeof mealTypeLabels] || meal.mealType
+      const phaseLabel = phaseLabels[meal.phase as keyof typeof phaseLabels] || meal.phase
+
+      // Titre du repas
+      doc.setFontSize(16)
+      doc.setFont('helvetica', 'bold')
+      doc.text(`${mealLabel} - ${phaseLabel}`, 20, 20)
+
+      doc.setFontSize(11)
+      doc.setFont('helvetica', 'normal')
+      doc.text(`Total: ${meal.totalParticipants} participants`, 20, 28)
+
+      // Préparer les données du tableau
+      const tableData = meal.participants.map((p: any) => {
+        const typeLabel = p.type === 'volunteer' ? 'Bénévole' : 'Artiste'
+        const dietLabel =
+          p.dietaryPreference === 'VEGETARIAN'
+            ? 'Végétarien'
+            : p.dietaryPreference === 'VEGAN'
+              ? 'Végan'
+              : '-'
+        const severityLabel =
+          p.allergySeverity === 'LIGHT'
+            ? 'Légère'
+            : p.allergySeverity === 'MODERATE'
+              ? 'Modérée'
+              : p.allergySeverity === 'SEVERE'
+                ? 'Sévère'
+                : p.allergySeverity === 'CRITICAL'
+                  ? 'Critique'
+                  : '-'
+        const afterShowLabel = p.type === 'artist' && p.afterShow ? 'Oui' : '-'
+
+        return [
+          '', // Case à cocher vide en première position
+          p.nom || '',
+          p.prenom || '',
+          typeLabel,
+          afterShowLabel,
+          p.email || '',
+          p.phone || '',
+          dietLabel,
+          p.allergies || '-',
+          p.allergies ? severityLabel : '-',
+        ]
+      })
+
+      // Générer le tableau
+      // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
+      doc.autoTable({
+        startY: 35,
+        head: [
+          [
+            '',
+            'Nom',
+            'Prénom',
+            'Type',
+            'Après spectacle',
+            'Email',
+            'Téléphone',
+            'Régime',
+            'Allergies',
+            'Sévérité',
+          ],
+        ],
+        body: tableData,
+        styles: {
+          fontSize: 7,
+          cellPadding: 2,
+        },
+        headStyles: {
+          fillColor: [66, 139, 202],
+          textColor: 255,
+          fontStyle: 'bold',
+          fontSize: 7,
+        },
+        columnStyles: {
+          0: { cellWidth: 8 }, // Case à cocher
+          1: { cellWidth: 25 }, // Nom
+          2: { cellWidth: 25 }, // Prénom
+          3: { cellWidth: 20 }, // Type
+          4: { cellWidth: 18 }, // Après spectacle
+          5: { cellWidth: 42 }, // Email
+          6: { cellWidth: 25 }, // Téléphone
+          7: { cellWidth: 18 }, // Régime
+          8: { cellWidth: 32 }, // Allergies
+          9: { cellWidth: 16 }, // Sévérité
+        },
+        margin: { left: 20, right: 20 },
+        didDrawCell: (data: any) => {
+          // Dessiner un carré dans la première colonne pour chaque ligne de données
+          if (data.column.index === 0 && data.section === 'body') {
+            const squareSize = 4
+            const x = data.cell.x + (data.cell.width - squareSize) / 2
+            const y = data.cell.y + (data.cell.height - squareSize) / 2
+            doc.rect(x, y, squareSize, squareSize, 'S')
+          }
+        },
+      })
     }
 
     // Télécharger le PDF
@@ -469,6 +616,7 @@ const generateCateringPdf = async () => {
       color: 'success',
     })
   } catch (e: any) {
+    console.error('PDF generation error:', e)
     toast.add({
       title: e?.message || t('common.error'),
       color: 'error',

@@ -427,6 +427,7 @@
       "confirm_action": "Confirmer l'action",
       "confirm_back_pending": "Êtes-vous sûr de vouloir remettre cette candidature en attente ?",
       "confirm_delete": "Confirmer la suppression",
+      "delete_application": "Supprimer la candidature",
       "confirm_delete_description": "Cette action est irréversible. Le bénévole sera définitivement retiré de cette édition et toutes ses assignations seront supprimées.",
       "confirm_delete_slot": "Êtes-vous sûr de vouloir supprimer ce créneau ?",
       "confirm_delete_team": "Êtes-vous sûr de vouloir supprimer cette équipe ?",
@@ -757,9 +758,17 @@
       "list_title": "Gestion des artistes",
       "manage_artists_description": "Gérez les artistes invités à cette édition",
       "meals": {
-        "title": "Repas",
+        "title": "Repas de {name}",
         "manage_meals": "Gérer les repas",
-        "meals_updated": "Repas mis à jour avec succès"
+        "meals_updated": "Repas mis à jour avec succès",
+        "after_show": "Après spectacle",
+        "description": "Sélectionnez les repas auxquels l'artiste participera",
+        "no_meals": "Aucun repas configuré pour cette édition",
+        "unsaved_changes": "Vous avez des modifications non sauvegardées",
+        "confirm_close_unsaved": "Vous avez des modifications non sauvegardées. Voulez-vous vraiment fermer ?",
+        "error_loading": "Erreur lors du chargement des repas",
+        "error_saving": "Erreur lors de la sauvegarde des repas",
+        "saved_success": "Les repas ont été sauvegardés avec succès"
       },
       "my_artist_pass": "Mon pass artiste",
       "no_artists": "Aucun artiste pour le moment",
@@ -806,6 +815,19 @@
       "user_info": "Informations de l'utilisateur",
       "user_info_readonly": "Les informations de l'utilisateur ne peuvent pas être modifiées car il ne s'agit pas d'un utilisateur créé manuellement",
       "user_lastname": "Nom"
+    },
+    "meals": {
+      "list_title": "Liste des repas",
+      "search_placeholder": "Rechercher par nom, prénom ou email",
+      "filter_phase": "Filtrer par phase",
+      "filter_type": "Filtrer par type",
+      "all_phases": "Toutes les phases",
+      "all_types": "Tous les types",
+      "total_participants": "Total participants",
+      "volunteers": "Bénévoles",
+      "artists": "Artistes",
+      "no_participants": "Aucun participant trouvé",
+      "meal_type": "Type de repas"
     },
     "shows": {
       "add_show": "Ajouter un spectacle",

@@ -1353,6 +1353,7 @@ model ArtistMealSelection {
   artistId  Int
   mealId    Int
   accepted  Boolean  @default(true)
+  afterShow Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

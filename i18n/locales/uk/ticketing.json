@@ -69,6 +69,7 @@
         "title": "Управління квотами"
       },
       "stats": {
+        "exceeded": "[TODO] DÉPASSEMENT",
         "title": "Статистика квот",
         "used": "Використано",
         "validated": "Підтверджено"
@@ -91,6 +92,7 @@
       }
     },
     "stats": {
+      "artists": "[TODO] Artistes",
       "participants": "Учасники",
       "volunteers": "Волонтери"
     },

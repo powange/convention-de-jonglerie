@@ -27,20 +27,30 @@
                 v-for="meal in dayMeals"
                 :key="meal.id"
                 :class="[
-                  'flex items-center gap-3 p-3 border rounded-lg transition-opacity',
+                  'flex flex-col gap-2 p-3 border rounded-lg transition-opacity',
                   meal.accepted
                     ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
                     : 'border-gray-200/50 dark:border-gray-700/50 bg-gray-100/50 dark:bg-gray-900/50 opacity-60',
                 ]"
               >
-                <UCheckbox v-model="meal.accepted" :disabled="savingMeals" />
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">
-                    {{ getMealTypeLabel(meal.mealType) }}
-                  </p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
-                    {{ getPhaseLabel(meal.phase) }}
-                  </p>
+                <div class="flex items-center gap-3">
+                  <UCheckbox v-model="meal.accepted" :disabled="savingMeals" />
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ getMealTypeLabel(meal.mealType) }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      {{ getPhaseLabel(meal.phase) }}
+                    </p>
+                  </div>
+                </div>
+                <div v-if="meal.accepted" class="flex items-center gap-2 pl-7">
+                  <USwitch
+                    v-model="meal.afterShow"
+                    :disabled="savingMeals"
+                    size="xs"
+                    :label="$t('edition.artists.meals.after_show')"
+                  />
                 </div>
               </div>
             </div>
@@ -159,7 +169,7 @@ const hasUnsavedMealChanges = computed(() => {
 
   return meals.value.some((meal, index) => {
     const initialMeal = initialMeals.value[index]
-    return meal.accepted !== initialMeal?.accepted
+    return meal.accepted !== initialMeal?.accepted || meal.afterShow !== initialMeal?.afterShow
   })
 })
 
@@ -198,6 +208,7 @@ const saveMealSelections = async () => {
     const selections = meals.value.map((meal) => ({
       selectionId: meal.selectionId,
       accepted: meal.accepted,
+      afterShow: meal.afterShow || false,
     }))
 
     const response = await $fetch(

@@ -69,6 +69,7 @@
         "title": "Kvoterstyring"
       },
       "stats": {
+        "exceeded": "[TODO] DÉPASSEMENT",
         "title": "Kvotestatistik",
         "used": "Brugt",
         "validated": "Valideret"
@@ -91,6 +92,7 @@
       }
     },
     "stats": {
+      "artists": "[TODO] Artistes",
       "participants": "Deltagere",
       "volunteers": "Frivillige"
     },

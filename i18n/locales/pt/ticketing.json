@@ -69,6 +69,7 @@
         "title": "Gestão de quotas"
       },
       "stats": {
+        "exceeded": "[TODO] DÉPASSEMENT",
         "title": "Estatísticas de quotas",
         "used": "Usado",
         "validated": "Validado"
@@ -91,6 +92,7 @@
       }
     },
     "stats": {
+      "artists": "[TODO] Artistes",
       "participants": "Participantes",
       "volunteers": "Voluntários"
     },

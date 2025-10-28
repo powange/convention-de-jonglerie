@@ -163,6 +163,7 @@ export default defineEventHandler(async (event) => {
         phase: meal.phase,
         selectionId: selection?.id,
         accepted: selection?.accepted ?? true,
+        afterShow: selection?.afterShow ?? false,
       }
     })
 

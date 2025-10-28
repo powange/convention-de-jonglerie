@@ -69,6 +69,7 @@
         "title": "Kontingentverwaltung"
       },
       "stats": {
+        "exceeded": "[TODO] DÉPASSEMENT",
         "title": "Kontingentstatistiken",
         "used": "Verwendet",
         "validated": "Validiert"
@@ -91,6 +92,7 @@
       }
     },
     "stats": {
+      "artists": "[TODO] Artistes",
       "participants": "Teilnehmer",
       "volunteers": "Freiwillige"
     },

@@ -69,6 +69,7 @@
         "title": "Hantering av kvoter"
       },
       "stats": {
+        "exceeded": "[TODO] DÉPASSEMENT",
         "title": "Kvotstatistik",
         "used": "Begagnad",
         "validated": "Validerad"
@@ -91,6 +92,7 @@
       }
     },
     "stats": {
+      "artists": "[TODO] Artistes",
       "participants": "Deltagare",
       "volunteers": "Volontärer"
     },

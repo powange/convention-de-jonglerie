@@ -82,6 +82,7 @@ export default defineEventHandler(async (event) => {
         },
         data: {
           accepted: selection.accepted ?? undefined,
+          afterShow: selection.afterShow ?? undefined,
         },
       })
     })
@@ -107,6 +108,7 @@ export default defineEventHandler(async (event) => {
       phase: selection.meal.phase,
       selectionId: selection.id,
       accepted: selection.accepted,
+      afterShow: selection.afterShow,
     }))
 
     return {

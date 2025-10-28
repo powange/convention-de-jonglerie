@@ -69,6 +69,7 @@
         "title": "Quota management"
       },
       "stats": {
+        "exceeded": "[TODO] DÉPASSEMENT",
         "title": "Quota statistics",
         "used": "Used",
         "validated": "Validated"
@@ -91,6 +92,7 @@
       }
     },
     "stats": {
+      "artists": "[TODO] Artistes",
       "participants": "Participants",
       "volunteers": "Volunteers"
     },

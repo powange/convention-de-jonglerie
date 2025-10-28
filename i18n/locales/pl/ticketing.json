@@ -69,6 +69,7 @@
         "title": "Zarządzanie kwotami"
       },
       "stats": {
+        "exceeded": "[TODO] DÉPASSEMENT",
         "title": "Statystyki kwot",
         "used": "Używany",
         "validated": "Zwalidowany"
@@ -91,6 +92,7 @@
       }
     },
     "stats": {
+      "artists": "[TODO] Artistes",
       "participants": "Uczestnicy",
       "volunteers": "Wolontariusze"
     },

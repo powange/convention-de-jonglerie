@@ -327,6 +327,15 @@
                 description="Gérer les repas pour bénévoles et artistes"
                 color="orange"
               />
+
+              <!-- Liste des repas -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/meals/list`"
+                icon="i-heroicons-list-bullet"
+                title="Liste des repas"
+                description="Consulter la liste de tous les participants aux repas"
+                color="purple"
+              />
             </div>
           </div>
         </UCard>

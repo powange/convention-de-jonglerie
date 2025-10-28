@@ -69,6 +69,7 @@
         "title": "Správa kvót"
       },
       "stats": {
+        "exceeded": "[TODO] DÉPASSEMENT",
         "title": "Statistiky kvót",
         "used": "Použité",
         "validated": "Ověřeno"
@@ -91,6 +92,7 @@
       }
     },
     "stats": {
+      "artists": "[TODO] Artistes",
       "participants": "Účastníci",
       "volunteers": "Dobrovolníci"
     },

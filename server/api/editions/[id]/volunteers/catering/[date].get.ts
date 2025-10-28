@@ -2,29 +2,6 @@ import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
-import type { Prisma } from '@prisma/client'
-
-type VolunteerApplication = Prisma.EditionVolunteerApplicationGetPayload<{
-  select: {
-    id: true
-    userId: true
-    arrivalDateTime: true
-    departureDateTime: true
-    setupAvailability: true
-    teardownAvailability: true
-    dietaryPreference: true
-    allergies: true
-    allergySeverity: true
-    user: {
-      select: {
-        prenom: true
-        nom: true
-        pseudo: true
-      }
-    }
-  }
-}>
-
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
 
@@ -42,198 +19,150 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Récupérer les informations de l'édition
-  const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
-    select: {
-      id: true,
-      startDate: true,
-      endDate: true,
-      volunteersSetupStartDate: true,
-      volunteersTeardownEndDate: true,
-    },
-  })
-
-  if (!edition) throw createError({ statusCode: 404, message: 'Edition introuvable' })
-
-  // Récupérer toutes les candidatures acceptées avec les infos utilisateur
-  const applications = await prisma.editionVolunteerApplication.findMany({
+  // Récupérer les repas configurés pour cette date
+  const meals = await prisma.volunteerMeal.findMany({
     where: {
       editionId,
-      status: 'ACCEPTED',
+      date: new Date(targetDate),
+      enabled: true,
     },
-    select: {
-      id: true,
-      userId: true,
-      arrivalDateTime: true,
-      departureDateTime: true,
-      setupAvailability: true,
-      teardownAvailability: true,
-      dietaryPreference: true,
-      allergies: true,
-      allergySeverity: true,
-      user: {
-        select: {
-          prenom: true,
-          nom: true,
-          pseudo: true,
+    include: {
+      mealSelections: {
+        where: {
+          accepted: true,
+        },
+        include: {
+          volunteer: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  nom: true,
+                  prenom: true,
+                  email: true,
+                  phone: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      artistMealSelections: {
+        where: {
+          accepted: true,
+        },
+        include: {
+          artist: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  nom: true,
+                  prenom: true,
+                  email: true,
+                  phone: true,
+                },
+              },
+            },
+          },
         },
       },
     },
+    orderBy: {
+      mealType: 'asc',
+    },
   })
 
-  // Déterminer le type de la date cible
-  const targetDateObj = new Date(targetDate)
-  const editionStart = new Date(edition.startDate)
-  const editionEnd = new Date(edition.endDate)
-  const setupStart = edition.volunteersSetupStartDate
-    ? new Date(edition.volunteersSetupStartDate)
-    : null
-  const teardownEnd = edition.volunteersTeardownEndDate
-    ? new Date(edition.volunteersTeardownEndDate)
-    : null
-
-  let dateType: 'setup' | 'event' | 'teardown'
-
-  if (setupStart && targetDateObj < editionStart) {
-    dateType = 'setup'
-  } else if (teardownEnd && targetDateObj > editionEnd) {
-    dateType = 'teardown'
-  } else {
-    dateType = 'event'
+  // Construire le résultat avec un résumé et les détails par repas
+  const summary = {
+    totalMeals: meals.length,
+    mealCounts: {} as Record<string, { total: number; phase: string }>,
+    totalParticipants: 0,
+    dietaryCounts: {} as Record<string, number>,
+    allergies: [] as Array<{
+      participantName: string
+      participantType: 'volunteer' | 'artist'
+      allergies: string
+      allergySeverity: string | null
+      emergencyContactName?: string | null
+      emergencyContactPhone?: string | null
+    }>,
   }
 
-  // Filtrer les bénévoles selon leur disponibilité pour ce type de date
-  const relevantApplications = applications.filter((app) => {
-    switch (dateType) {
-      case 'setup':
-        return app.setupAvailability
-      case 'teardown':
-        return app.teardownAvailability
-      case 'event': {
-        // Disponible pour l'événement = soit pas de disponibilité spécifique (donc événement par défaut)
-        // soit explicitement montage ET/OU démontage mais pas SEULEMENT montage ou SEULEMENT démontage
-        const neitherSetupNorTeardown = !app.setupAvailability && !app.teardownAvailability
+  const mealDetails = meals.map((meal) => {
+    const volunteers = meal.mealSelections.map((selection) => ({
+      type: 'volunteer' as const,
+      nom: selection.volunteer.user.nom,
+      prenom: selection.volunteer.user.prenom,
+      email: selection.volunteer.user.email,
+      phone: selection.volunteer.user.phone,
+      dietaryPreference: selection.volunteer.dietaryPreference,
+      allergies: selection.volunteer.allergies,
+      allergySeverity: selection.volunteer.allergySeverity,
+      emergencyContactName: selection.volunteer.emergencyContactName,
+      emergencyContactPhone: selection.volunteer.emergencyContactPhone,
+    }))
 
-        // Disponible pour l'événement si :
-        // - Ni montage ni démontage (donc événement principal)
-        // - Les deux (montage + événement + démontage)
-        return neitherSetupNorTeardown || (app.setupAvailability && app.teardownAvailability)
-      }
-      default:
-        return false
-    }
-  })
+    const artists = meal.artistMealSelections.map((selection) => ({
+      type: 'artist' as const,
+      nom: selection.artist.user.nom,
+      prenom: selection.artist.user.prenom,
+      email: selection.artist.user.email,
+      phone: selection.artist.user.phone,
+      dietaryPreference: selection.artist.dietaryPreference,
+      allergies: selection.artist.allergies,
+      allergySeverity: selection.artist.allergySeverity,
+      emergencyContactName: null,
+      emergencyContactPhone: null,
+      afterShow: selection.afterShow,
+    }))
 
-  // Analyser la présence par créneaux (matin, midi, soir)
-  const analyzeTimeSlotPresence = (app: VolunteerApplication) => {
-    const presence = { morning: false, noon: false, evening: false }
-
-    // Vérifier si le bénévole est présent ce jour-là
-    if (!app.arrivalDateTime || !app.departureDateTime) return presence
-
-    const [arrivalDate, arrivalTime] = app.arrivalDateTime.split('_')
-    const [departureDate, departureTime] = app.departureDateTime.split('_')
-
-    const arrivalDateObj = new Date(arrivalDate)
-    const departureDateObj = new Date(departureDate)
-
-    // Le bénévole n'est pas présent ce jour-là
-    if (targetDateObj < arrivalDateObj || targetDateObj > departureDateObj) {
-      return presence
-    }
-
-    // Jour d'arrivée : selon l'heure d'arrivée
-    if (targetDateObj.getTime() === arrivalDateObj.getTime()) {
-      switch (arrivalTime) {
-        case 'morning':
-          presence.morning = presence.noon = presence.evening = true
-          break
-        case 'noon':
-          presence.noon = presence.evening = true
-          break
-        case 'afternoon':
-        case 'evening':
-          presence.evening = true
-          break
-      }
-    }
-    // Jour de départ : selon l'heure de départ
-    else if (targetDateObj.getTime() === departureDateObj.getTime()) {
-      switch (departureTime) {
-        case 'morning':
-          // Part le matin, donc pas présent pour les repas
-          break
-        case 'noon':
-          presence.morning = true
-          break
-        case 'afternoon':
-        case 'evening':
-          presence.morning = presence.noon = true
-          break
-      }
-    }
-    // Jour intermédiaire : présent toute la journée
-    else {
-      presence.morning = presence.noon = presence.evening = true
-    }
-
-    return presence
-  }
-
-  // Analyser les données pour chaque créneau
-  const timeSlots = ['morning', 'noon', 'evening'] as const
-  const result = {
-    date: targetDate,
-    dateType,
-    slots: {} as Record<
-      string,
-      {
-        totalVolunteers: number
-        dietaryCounts: Record<string, number>
-        allergies: Array<{
-          volunteer: { prenom: string; nom: string; pseudo: string }
-          allergies: string | null
-        }>
-      }
-    >,
-  }
-
-  for (const slot of timeSlots) {
-    const presentVolunteers = relevantApplications.filter((app) => {
-      const presence = analyzeTimeSlotPresence(app)
-      return presence[slot]
+    const allParticipants = [...volunteers, ...artists].sort((a, b) => {
+      const nameA = `${a.nom || ''} ${a.prenom || ''}`
+      const nameB = `${b.nom || ''} ${b.prenom || ''}`
+      return nameA.localeCompare(nameB)
     })
 
-    // Compter les régimes alimentaires
-    const dietaryCounts = presentVolunteers.reduce(
-      (counts, app) => {
-        const diet = app.dietaryPreference || 'NONE'
-        counts[diet] = (counts[diet] || 0) + 1
-        return counts
-      },
-      {} as Record<string, number>
-    )
-
-    // Lister les allergies avec détails
-    const allergies = presentVolunteers
-      .filter((app) => app.allergies && app.allergies.trim())
-      .map((app) => ({
-        volunteer: {
-          prenom: app.user.prenom,
-          nom: app.user.nom,
-          pseudo: app.user.pseudo,
-        },
-        allergies: app.allergies,
-        allergySeverity: app.allergySeverity,
-      }))
-
-    result.slots[slot] = {
-      totalVolunteers: presentVolunteers.length,
-      dietaryCounts,
-      allergies,
+    // Mettre à jour le résumé
+    const mealKey = `${meal.mealType}_${meal.phase}`
+    if (!summary.mealCounts[mealKey]) {
+      summary.mealCounts[mealKey] = { total: 0, phase: meal.phase }
     }
-  }
+    summary.mealCounts[mealKey].total += allParticipants.length
+    summary.totalParticipants += allParticipants.length
 
-  return result
+    // Compter les régimes
+    allParticipants.forEach((p) => {
+      const diet = p.dietaryPreference || 'NONE'
+      summary.dietaryCounts[diet] = (summary.dietaryCounts[diet] || 0) + 1
+
+      // Ajouter les allergies au résumé
+      if (p.allergies && p.allergies.trim()) {
+        summary.allergies.push({
+          participantName: `${p.prenom || ''} ${p.nom || ''}`.trim(),
+          participantType: p.type,
+          allergies: p.allergies,
+          allergySeverity: p.allergySeverity,
+          emergencyContactName: p.emergencyContactName,
+          emergencyContactPhone: p.emergencyContactPhone,
+        })
+      }
+    })
+
+    return {
+      mealId: meal.id,
+      mealType: meal.mealType,
+      phase: meal.phase,
+      totalParticipants: allParticipants.length,
+      volunteerCount: volunteers.length,
+      artistCount: artists.length,
+      participants: allParticipants,
+    }
+  })
+
+  return {
+    date: targetDate,
+    summary,
+    meals: mealDetails,
+  }
 })

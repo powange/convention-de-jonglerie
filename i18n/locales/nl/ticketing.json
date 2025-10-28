@@ -69,6 +69,7 @@
         "title": "Quotumbeheer"
       },
       "stats": {
+        "exceeded": "[TODO] DÉPASSEMENT",
         "title": "Quotumstatistieken",
         "used": "Gebruikt",
         "validated": "Gevalideerd"
@@ -91,6 +92,7 @@
       }
     },
     "stats": {
+      "artists": "[TODO] Artistes",
       "participants": "Deelnemers",
       "volunteers": "Vrijwilligers"
     },

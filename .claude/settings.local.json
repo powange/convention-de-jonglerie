@@ -144,7 +144,9 @@
       "Bash(sudo rm:*)",
       "WebFetch(domain:nitro.unjs.io)",
       "WebFetch(domain:nitro.build)",
-      "mcp__nuxt-ui__list_documentation_pages"
+      "mcp__nuxt-ui__list_documentation_pages",
+      "mcp__nuxt-ui__search_components_by_category",
+      "mcp__nuxt-ui__get_component_metadata"
     ],
     "deny": [],
     "ask": [],
