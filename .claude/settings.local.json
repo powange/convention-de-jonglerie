@@ -141,7 +141,10 @@
       "WebFetch(domain:juggling-convention.com)",
       "Bash(sudo chmod:*)",
       "Bash(tee:*)",
-      "Bash(sudo rm:*)"
+      "Bash(sudo rm:*)",
+      "WebFetch(domain:nitro.unjs.io)",
+      "WebFetch(domain:nitro.build)",
+      "mcp__nuxt-ui__list_documentation_pages"
     ],
     "deny": [],
     "ask": [],
