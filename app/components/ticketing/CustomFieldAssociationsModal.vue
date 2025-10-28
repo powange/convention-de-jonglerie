@@ -42,7 +42,7 @@
           <p v-else class="text-sm text-gray-500">Aucun tarif disponible</p>
         </div>
 
-        <UDivider />
+        <USeparator />
 
         <!-- Section Quotas -->
         <div class="space-y-4">
@@ -80,10 +80,10 @@
                 <UFormField label="Quota" required>
                   <USelect
                     v-model="assoc.quotaId"
-                    :items="availableQuotas"
+                    :items="quotaItems"
                     placeholder="Sélectionnez un quota"
                     value-key="id"
-                    label-key="title"
+                    :ui="{ content: 'min-w-fit' }"
                   />
                 </UFormField>
 
@@ -93,6 +93,7 @@
                     :items="choiceOptions"
                     placeholder="Tous les choix"
                     value-key="value"
+                    :ui="{ content: 'min-w-fit' }"
                   />
                 </UFormField>
               </div>
@@ -112,7 +113,7 @@
           </div>
         </div>
 
-        <UDivider />
+        <USeparator />
 
         <!-- Section Articles à restituer -->
         <div class="space-y-4">
@@ -150,10 +151,10 @@
                 <UFormField label="Article" required>
                   <USelect
                     v-model="assoc.returnableItemId"
-                    :items="availableReturnableItems"
+                    :items="returnableItemItems"
                     placeholder="Sélectionnez un article"
                     value-key="id"
-                    label-key="name"
+                    :ui="{ content: 'min-w-fit' }"
                   />
                 </UFormField>
 
@@ -163,6 +164,7 @@
                     :items="choiceOptions"
                     placeholder="Tous les choix"
                     value-key="value"
+                    :ui="{ content: 'min-w-fit' }"
                   />
                 </UFormField>
               </div>
@@ -203,6 +205,12 @@ interface CustomField {
   label: string
   type: string
   values?: string[]
+  tiers?: Array<{
+    tier: {
+      id: number
+      name: string
+    }
+  }>
   quotas?: Array<{
     quota: {
       id: number
@@ -280,6 +288,24 @@ const tierItems = computed(() =>
   }))
 )
 
+// Items pour les quotas (avec label au lieu de title)
+const quotaItems = computed(() => {
+  if (!Array.isArray(availableQuotas.value)) return []
+  return availableQuotas.value.map((quota) => ({
+    label: quota.title,
+    id: quota.id,
+  }))
+})
+
+// Items pour les articles à restituer (avec label au lieu de name)
+const returnableItemItems = computed(() => {
+  if (!Array.isArray(availableReturnableItems.value)) return []
+  return availableReturnableItems.value.map((item) => ({
+    label: item.name,
+    id: item.id,
+  }))
+})
+
 // Options de choix pour les selects
 const choiceOptions = computed(() => {
   if (!props.customField?.values || props.customField.type !== 'ChoiceList') {
@@ -317,7 +343,9 @@ const removeReturnableItemAssociation = (index: number) => {
 const loadTiers = async () => {
   loadingTiers.value = true
   try {
-    const response = await $fetch(`/api/editions/${props.editionId}/ticketing/tiers/available`)
+    const response = await $fetch<{ tiers: Tier[] }>(
+      `/api/editions/${props.editionId}/ticketing/tiers/available`
+    )
     availableTiers.value = response.tiers || []
   } catch (error) {
     console.error('Erreur lors du chargement des tarifs:', error)
@@ -342,7 +370,7 @@ const loadReturnableItems = async () => {
   loadingReturnableItems.value = true
   try {
     const response = await $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`)
-    availableReturnableItems.value = response || []
+    availableReturnableItems.value = response?.returnableItems || []
   } catch (error) {
     console.error('Erreur lors du chargement des articles:', error)
   } finally {

@@ -63,7 +63,7 @@
           </UFormField>
         </div>
 
-        <UDivider />
+        <USeparator />
 
         <!-- Association aux tarifs -->
         <div class="space-y-3">
