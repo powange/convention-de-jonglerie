@@ -5,23 +5,19 @@ import type { VolunteerMealType } from '@prisma/client'
 /**
  * Détermine quels types de repas sont disponibles selon l'heure d'arrivée
  * Règles :
- * - Arrivée matin (early_morning, morning) → petit-déj + déjeuner + dîner
- * - Arrivée midi (lunch) → déjeuner + dîner
- * - Arrivée après-midi (early_afternoon, late_afternoon) → dîner seulement
- * - Arrivée soir (evening, late_evening, night) → dîner seulement
+ * - Arrivée matin (morning) → petit-déj + déjeuner + dîner
+ * - Arrivée midi (noon) → déjeuner + dîner
+ * - Arrivée après-midi (afternoon) → dîner seulement
+ * - Arrivée soir (evening) → dîner seulement
  */
 export function getAvailableMealsOnArrival(timeOfDay: string): VolunteerMealType[] {
   switch (timeOfDay) {
-    case 'early_morning':
     case 'morning':
       return ['BREAKFAST', 'LUNCH', 'DINNER']
-    case 'lunch':
+    case 'noon':
       return ['LUNCH', 'DINNER']
-    case 'early_afternoon':
-    case 'late_afternoon':
+    case 'afternoon':
     case 'evening':
-    case 'late_evening':
-    case 'night':
       return ['DINNER']
     default:
       return ['BREAKFAST', 'LUNCH', 'DINNER']
@@ -31,23 +27,19 @@ export function getAvailableMealsOnArrival(timeOfDay: string): VolunteerMealType
 /**
  * Détermine quels types de repas sont disponibles selon l'heure de départ
  * Règles inverses :
- * - Départ matin (early_morning, morning) → petit-déj
- * - Départ midi (lunch) → petit-déj + déjeuner
- * - Départ après-midi (early_afternoon, late_afternoon) → petit-déj + déjeuner
- * - Départ soir (evening, late_evening, night) → petit-déj + déjeuner + dîner
+ * - Départ matin (morning) → petit-déj
+ * - Départ midi (noon) → petit-déj + déjeuner
+ * - Départ après-midi (afternoon) → petit-déj + déjeuner
+ * - Départ soir (evening) → petit-déj + déjeuner + dîner
  */
 export function getAvailableMealsOnDeparture(timeOfDay: string): VolunteerMealType[] {
   switch (timeOfDay) {
-    case 'early_morning':
     case 'morning':
       return ['BREAKFAST']
-    case 'lunch':
-    case 'early_afternoon':
-    case 'late_afternoon':
+    case 'noon':
+    case 'afternoon':
       return ['BREAKFAST', 'LUNCH']
     case 'evening':
-    case 'late_evening':
-    case 'night':
       return ['BREAKFAST', 'LUNCH', 'DINNER']
     default:
       return ['BREAKFAST', 'LUNCH', 'DINNER']

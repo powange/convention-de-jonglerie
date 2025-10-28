@@ -42,13 +42,24 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Mettre à jour les sélections de repas
-    const updatePromises = body.selections.map((selection: any) => {
-      if (!selection.selectionId) {
-        // Si pas de selectionId, ignorer (le repas n'existait pas)
-        return Promise.resolve()
+    // Mettre à jour ou créer les sélections de repas
+    const updatePromises = body.selections.map(async (selection: any) => {
+      if (!selection.mealId) {
+        return
       }
 
+      if (!selection.selectionId) {
+        // Si pas de selectionId, créer une nouvelle sélection
+        return prisma.volunteerMealSelection.create({
+          data: {
+            volunteerId,
+            mealId: selection.mealId,
+            accepted: selection.accepted,
+          },
+        })
+      }
+
+      // Sinon, mettre à jour la sélection existante
       return prisma.volunteerMealSelection.update({
         where: {
           id: selection.selectionId,
@@ -61,6 +72,18 @@ export default defineEventHandler(async (event) => {
     })
 
     await Promise.all(updatePromises)
+
+    // Récupérer les informations du bénévole pour calculer l'éligibilité
+    const volunteerInfo = await prisma.editionVolunteerApplication.findUnique({
+      where: { id: volunteerId },
+      select: {
+        setupAvailability: true,
+        eventAvailability: true,
+        teardownAvailability: true,
+        arrivalDateTime: true,
+        departureDateTime: true,
+      },
+    })
 
     // Récupérer les repas mis à jour
     const meals = await prisma.volunteerMeal.findMany({
@@ -78,9 +101,31 @@ export default defineEventHandler(async (event) => {
       orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
     })
 
-    // Formater les repas avec les sélections du bénévole
+    // Import de la fonction d'éligibilité
+    const { isVolunteerEligibleForMeal } = await import('@@/server/utils/volunteer-meals')
+
+    // Formater les repas avec les sélections du bénévole et l'éligibilité
     const formattedMeals = meals.map((meal) => {
       const selection = meal.mealSelections[0]
+
+      // Vérifier l'éligibilité du bénévole pour ce repas
+      const eligible = volunteerInfo
+        ? isVolunteerEligibleForMeal(
+            {
+              date: meal.date,
+              mealType: meal.mealType,
+              phase: meal.phase,
+            },
+            {
+              setupAvailability: volunteerInfo.setupAvailability,
+              eventAvailability: volunteerInfo.eventAvailability,
+              teardownAvailability: volunteerInfo.teardownAvailability,
+              arrivalDateTime: volunteerInfo.arrivalDateTime,
+              departureDateTime: volunteerInfo.departureDateTime,
+            }
+          )
+        : true
+
       return {
         id: meal.id,
         date: meal.date,
@@ -88,6 +133,7 @@ export default defineEventHandler(async (event) => {
         phase: meal.phase,
         selectionId: selection?.id || null,
         accepted: selection?.accepted || false,
+        eligible,
       }
     })
 

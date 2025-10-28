@@ -1291,7 +1291,7 @@ const columns = computed((): TableColumn<any>[] => [
   // Colonne Repas
   {
     accessorKey: 'meals',
-    header: t('edition.volunteers.meals.column_title'),
+    header: t('editions.volunteers.table_meals'),
     cell: ({ row }: any) => {
       const mealSelections = row.original.mealSelections || []
       const acceptedMealsCount = mealSelections.filter((s: any) => s.accepted).length
