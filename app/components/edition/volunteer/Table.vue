@@ -461,6 +461,7 @@ interface Props {
 const emit = defineEmits<{
   refreshVolunteersInfo: []
   refreshTeamAssignments: []
+  'open-meals-modal': [volunteer: any]
 }>()
 
 const props = defineProps<Props>()
@@ -1131,78 +1132,15 @@ const columns = computed((): TableColumn<any>[] => [
   },
   // Colonne présence
   {
-    accessorKey: 'arrivalDateTime',
-    header: ({ column }) => getSortableHeader(column, t('editions.volunteers.table_presence')),
-    enableSorting: true,
-    sortingFn: (rowA: any, rowB: any, _columnId: string) => {
-      const arrivalA = rowA.original.arrivalDateTime
-      const arrivalB = rowB.original.arrivalDateTime
-      const departureA = rowA.original.departureDateTime
-      const departureB = rowB.original.departureDateTime
-
-      // Fonction pour convertir le format personnalisé en timestamp
-      const parseCustomDate = (dateStr: string | null): number => {
-        if (!dateStr) return Number.MAX_SAFE_INTEGER
-
-        // Format: YYYY-MM-DD_timeOfDay (ex: "2025-10-30_afternoon")
-        const parts = dateStr.split('_')
-        const datePart = parts[0]
-        const timePart = parts[1] || 'noon'
-
-        // Convertir timeOfDay en heures
-        const timeMap: Record<string, number> = {
-          morning: 6,
-          noon: 12,
-          afternoon: 14,
-          evening: 18,
-        }
-
-        const hours = timeMap[timePart] || 12
-        const date = new Date(`${datePart}T${hours.toString().padStart(2, '0')}:00:00`)
-
-        return date.getTime()
-      }
-
-      // Vérifier le sens du tri actuel pour cette colonne
-      const currentSort = sorting.value.find((s) => s.id === 'arrivalDateTime')
-      const isDescending = currentSort?.desc === true
-
-      if (isDescending) {
-        // Tri décroissant: se baser uniquement sur la date de départ
-        const depTimeA = parseCustomDate(departureA)
-        const depTimeB = parseCustomDate(departureB)
-        return depTimeA - depTimeB
-      } else {
-        // Tri croissant: se baser sur la date d'arrivée, puis sur la date de départ
-        const timeA = parseCustomDate(arrivalA)
-        const timeB = parseCustomDate(arrivalB)
-
-        // Comparer d'abord les dates d'arrivée
-        if (timeA !== timeB) {
-          return timeA - timeB
-        }
-
-        // Si dates d'arrivée identiques, comparer les dates de départ
-        const depTimeA = parseCustomDate(departureA)
-        const depTimeB = parseCustomDate(departureB)
-
-        return depTimeA - depTimeB
-      }
-    },
+    accessorKey: 'presence',
+    header: t('editions.volunteers.table_presence'),
+    enableSorting: false,
     cell: ({ row }: any) => {
       const hasSetupAvailability = row.original.setupAvailability
       const hasTeardownAvailability = row.original.teardownAvailability
       const hasEventAvailability = row.original.eventAvailability
-      const arrivalDateTime = row.original.arrivalDateTime
-      const departureDateTime = row.original.departureDateTime
 
-      if (
-        !hasSetupAvailability &&
-        !hasTeardownAvailability &&
-        !hasEventAvailability &&
-        !arrivalDateTime &&
-        !departureDateTime
-      ) {
+      if (!hasSetupAvailability && !hasTeardownAvailability && !hasEventAvailability) {
         return h('span', '—')
       }
 
@@ -1254,34 +1192,6 @@ const columns = computed((): TableColumn<any>[] => [
         ])
       )
 
-      // 2. Date d'arrivée avec granularité et icône
-      if (arrivalDateTime) {
-        lines.push(
-          h('div', { class: 'flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400' }, [
-            h(resolveComponent('UIcon'), {
-              name: 'i-heroicons-arrow-right-end-on-rectangle',
-              class: 'text-gray-500',
-              size: '12',
-            }),
-            h('span', formatDateTimeWithGranularity(arrivalDateTime)),
-          ])
-        )
-      }
-
-      // 3. Date de départ avec granularité et icône
-      if (departureDateTime) {
-        lines.push(
-          h('div', { class: 'flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400' }, [
-            h(resolveComponent('UIcon'), {
-              name: 'i-heroicons-arrow-left-start-on-rectangle',
-              class: 'text-gray-500',
-              size: '12',
-            }),
-            h('span', formatDateTimeWithGranularity(departureDateTime)),
-          ])
-        )
-      }
-
       return h(
         'div',
         {
@@ -1290,7 +1200,120 @@ const columns = computed((): TableColumn<any>[] => [
         lines
       )
     },
-    size: 180,
+    size: 100,
+  } as TableColumn<any>,
+  // Colonne Date d'arrivée
+  {
+    accessorKey: 'arrivalDateTime',
+    header: ({ column }) => getSortableHeader(column, t('editions.volunteers.table_arrival')),
+    enableSorting: true,
+    sortingFn: (rowA: any, rowB: any, _columnId: string) => {
+      const dateA = rowA.original.arrivalDateTime
+      const dateB = rowB.original.arrivalDateTime
+
+      const parseCustomDate = (dateStr: string | null): number => {
+        if (!dateStr) return Number.MAX_SAFE_INTEGER
+
+        const parts = dateStr.split('_')
+        const datePart = parts[0]
+        const timePart = parts[1] || 'noon'
+
+        const timeMap: Record<string, number> = {
+          morning: 6,
+          noon: 12,
+          afternoon: 14,
+          evening: 18,
+        }
+
+        const hours = timeMap[timePart] || 12
+        const date = new Date(`${datePart}T${hours.toString().padStart(2, '0')}:00:00`)
+
+        return date.getTime()
+      }
+
+      const timeA = parseCustomDate(dateA)
+      const timeB = parseCustomDate(dateB)
+
+      return timeA - timeB
+    },
+    cell: ({ row }: any) => {
+      const dateTime = row.original.arrivalDateTime
+      if (!dateTime) return h('span', { class: 'text-gray-400 text-sm' }, '-')
+
+      const formatted = formatDateTimeWithGranularity(dateTime)
+      return h('span', { class: 'text-sm' }, formatted)
+    },
+    size: 130,
+  } as TableColumn<any>,
+  // Colonne Date de départ
+  {
+    accessorKey: 'departureDateTime',
+    header: ({ column }) => getSortableHeader(column, t('editions.volunteers.table_departure')),
+    enableSorting: true,
+    sortingFn: (rowA: any, rowB: any, _columnId: string) => {
+      const dateA = rowA.original.departureDateTime
+      const dateB = rowB.original.departureDateTime
+
+      const parseCustomDate = (dateStr: string | null): number => {
+        if (!dateStr) return Number.MAX_SAFE_INTEGER
+
+        const parts = dateStr.split('_')
+        const datePart = parts[0]
+        const timePart = parts[1] || 'noon'
+
+        const timeMap: Record<string, number> = {
+          morning: 6,
+          noon: 12,
+          afternoon: 14,
+          evening: 18,
+        }
+
+        const hours = timeMap[timePart] || 12
+        const date = new Date(`${datePart}T${hours.toString().padStart(2, '0')}:00:00`)
+
+        return date.getTime()
+      }
+
+      const timeA = parseCustomDate(dateA)
+      const timeB = parseCustomDate(dateB)
+
+      return timeA - timeB
+    },
+    cell: ({ row }: any) => {
+      const dateTime = row.original.departureDateTime
+      if (!dateTime) return h('span', { class: 'text-gray-400 text-sm' }, '-')
+
+      const formatted = formatDateTimeWithGranularity(dateTime)
+      return h('span', { class: 'text-sm' }, formatted)
+    },
+    size: 130,
+  } as TableColumn<any>,
+  // Colonne Repas
+  {
+    accessorKey: 'meals',
+    header: t('edition.volunteers.meals.column_title'),
+    cell: ({ row }: any) => {
+      const mealSelections = row.original.mealSelections || []
+      const acceptedMealsCount = mealSelections.filter((s: any) => s.accepted).length
+
+      return h(
+        resolveComponent('UButton'),
+        {
+          color: acceptedMealsCount > 0 ? 'primary' : 'neutral',
+          variant: 'soft',
+          size: 'sm',
+          onClick: () => emit('open-meals-modal', row.original),
+        },
+        () => [
+          h('span', { class: 'font-medium' }, acceptedMealsCount.toString()),
+          h(resolveComponent('UIcon'), {
+            name: 'i-heroicons-chevron-right',
+            class: 'ml-1 h-4 w-4',
+          }),
+        ]
+      )
+    },
+    size: 100,
   } as TableColumn<any>,
   // Colonne préférences horaires si activée (déplacée après Présence)
   ...(props.volunteersInfo?.askTimePreferences

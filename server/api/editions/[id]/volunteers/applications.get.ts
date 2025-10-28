@@ -7,6 +7,30 @@ import type { Prisma } from '@prisma/client'
 
 const DEFAULT_PAGE_SIZE = 20
 
+// Fonction pour convertir une date avec granularité en timestamp comparable
+// Format: "YYYY-MM-DD_granularity" où granularity peut être:
+// morning, noon, afternoon, evening
+function parseDateTime(dateTimeStr: string | null): number {
+  if (!dateTimeStr) return 0 // Les valeurs null vont à la fin
+
+  const [datePart, timePart] = dateTimeStr.split('_')
+  if (!datePart) return 0
+
+  const date = new Date(datePart)
+  const baseTime = date.getTime()
+
+  // Ajouter des heures selon la granularité pour avoir un ordre chronologique correct
+  const timeOffsets: Record<string, number> = {
+    morning: 8 * 60 * 60 * 1000, // 8h
+    noon: 12 * 60 * 60 * 1000, // 12h
+    afternoon: 14 * 60 * 60 * 1000, // 14h
+    evening: 19 * 60 * 60 * 1000, // 19h
+  }
+
+  const offset = timePart ? timeOffsets[timePart] || 0 : 0
+  return baseTime + offset
+}
+
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
   const editionId = parseInt(getRouterParam(event, 'id') || '0')
@@ -146,12 +170,20 @@ export default defineEventHandler(async (event) => {
 
   const where = conditions.length === 1 ? conditions[0] : { AND: conditions }
   const total = await prisma.editionVolunteerApplication.count({ where })
+
+  // Pour les champs de date avec granularité, on ne peut pas utiliser orderBy simple
+  // car le format string "YYYY-MM-DD_granularity" n'est pas trié correctement
+  // On va donc utiliser une requête avec ORDER BY SQL personnalisé
+  const needsCustomSort = sortFieldRaw === 'arrivalDateTime' || sortFieldRaw === 'departureDateTime'
+
   const primary: Prisma.EditionVolunteerApplicationOrderByWithRelationInput = (() => {
     if (sortFieldRaw === 'pseudo') return { user: { pseudo: sortDirRaw } }
     if (sortFieldRaw === 'prenom') return { user: { prenom: sortDirRaw } }
     if (sortFieldRaw === 'nom') return { user: { nom: sortDirRaw } }
     if (sortFieldRaw === 'allergies') return { allergies: sortDirRaw }
     if (sortFieldRaw === 'status') return { status: sortDirRaw }
+    if (sortFieldRaw === 'arrivalDateTime') return { arrivalDateTime: sortDirRaw }
+    if (sortFieldRaw === 'departureDateTime') return { departureDateTime: sortDirRaw }
     return { createdAt: sortDirRaw }
   })()
   const orderBy: Prisma.EditionVolunteerApplicationOrderByWithRelationInput[] = [primary]
@@ -169,6 +201,8 @@ export default defineEventHandler(async (event) => {
       else if (f === 'allergies') orderBy.push({ allergies: dir })
       else if (f === 'status') orderBy.push({ status: dir })
       else if (f === 'createdAt') orderBy.push({ createdAt: dir })
+      else if (f === 'arrivalDateTime') orderBy.push({ arrivalDateTime: dir })
+      else if (f === 'departureDateTime') orderBy.push({ departureDateTime: dir })
     }
   }
 
@@ -227,6 +261,20 @@ export default defineEventHandler(async (event) => {
         nom: true,
       },
     },
+    mealSelections: {
+      select: {
+        id: true,
+        accepted: true,
+        meal: {
+          select: {
+            id: true,
+            date: true,
+            mealType: true,
+            phase: true,
+          },
+        },
+      },
+    },
   }
 
   if (includeTeams) {
@@ -248,13 +296,36 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const applications = await prisma.editionVolunteerApplication.findMany({
+  let applications = await prisma.editionVolunteerApplication.findMany({
     where,
-    orderBy,
-    // En cas d'export, pas de pagination
-    ...(isExport ? {} : { skip: (page - 1) * pageSize, take: pageSize }),
+    orderBy: needsCustomSort ? { createdAt: 'desc' } : orderBy, // Si tri custom, on récupère tout d'abord
+    // En cas d'export ou de tri custom, pas de pagination (on pagine après le tri)
+    ...(isExport || needsCustomSort ? {} : { skip: (page - 1) * pageSize, take: pageSize }),
     select: selectFields,
   })
+
+  // Si tri par date avec granularité, trier en mémoire
+  if (needsCustomSort) {
+    const field = sortFieldRaw as 'arrivalDateTime' | 'departureDateTime'
+    applications = applications.sort((a, b) => {
+      const timeA = parseDateTime(a[field])
+      const timeB = parseDateTime(b[field])
+
+      // Gérer les valeurs null (0) - les mettre à la fin
+      if (timeA === 0 && timeB === 0) return 0
+      if (timeA === 0) return 1 // a va à la fin
+      if (timeB === 0) return -1 // b va à la fin
+
+      const diff = timeA - timeB
+      return sortDirRaw === 'asc' ? diff : -diff
+    })
+
+    // Appliquer la pagination après le tri
+    if (!isExport) {
+      const start = (page - 1) * pageSize
+      applications = applications.slice(start, start + pageSize)
+    }
+  }
 
   // Si c'est un export, générer le CSV
   if (isExport) {

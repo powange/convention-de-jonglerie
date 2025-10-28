@@ -99,6 +99,7 @@
                   :can-manage-volunteers="canManageVolunteers"
                   @refresh-volunteers-info="fetchVolunteersInfo"
                   @refresh-team-assignments="fetchTeamAssignments"
+                  @open-meals-modal="handleOpenMealsModal"
                 />
                 <div v-else class="flex justify-center py-8">
                   <p class="text-gray-500">{{ $t('common.loading') }}...</p>
@@ -606,6 +607,15 @@
       :edition-id="editionId"
       @volunteer-added="handleVolunteerAdded"
     />
+
+    <!-- Modal de gestion des repas -->
+    <VolunteersMealsModal
+      v-if="selectedVolunteerForMeals"
+      v-model="showVolunteerMealsModal"
+      :edition-id="editionId"
+      :volunteer="selectedVolunteerForMeals"
+      @meals-saved="handleMealsUpdated"
+    />
   </div>
 </template>
 
@@ -654,6 +664,8 @@ const showMoveModal = ref(false)
 const showTeamSelectionModal = ref(false)
 const isProcessingMove = ref(false)
 const showAddVolunteerModal = ref(false)
+const showVolunteerMealsModal = ref(false)
+const selectedVolunteerForMeals = ref<any>(null)
 const isMobile = ref(false)
 
 // Fonction pour récupérer les assignations d'équipes
@@ -1178,6 +1190,20 @@ const handleVolunteerAdded = async () => {
   // Recharger les données
   await fetchVolunteersInfo()
   await fetchTeamAssignments()
+  // Rafraîchir le tableau si la méthode existe
+  if (volunteerTableRef.value?.refreshApplications) {
+    await volunteerTableRef.value.refreshApplications()
+  }
+}
+
+// Fonction pour ouvrir le modal de gestion des repas
+const handleOpenMealsModal = (volunteer: any) => {
+  selectedVolunteerForMeals.value = volunteer
+  showVolunteerMealsModal.value = true
+}
+
+// Fonction après la mise à jour des repas
+const handleMealsUpdated = async () => {
   // Rafraîchir le tableau si la méthode existe
   if (volunteerTableRef.value?.refreshApplications) {
     await volunteerTableRef.value.refreshApplications()

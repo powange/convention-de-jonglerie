@@ -1,6 +1,10 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
 import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
+import {
+  isVolunteerEligibleForMeal,
+  isArtistEligibleForMeal,
+} from '@@/server/utils/volunteer-meals'
 
 export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
@@ -87,26 +91,62 @@ export default defineEventHandler(async (event) => {
       }
 
       if (isNowEnabled) {
-        // Repas activé : ajouter aux bénévoles acceptés et artistes
+        // Repas activé : ajouter aux bénévoles et artistes éligibles
         console.log(`[Meals] Activation du repas ${meal.id} pour l'édition ${editionId}`)
 
-        // Récupérer tous les bénévoles acceptés
+        // Récupérer les informations complètes du repas
+        const mealData = await prisma.volunteerMeal.findUnique({
+          where: { id: meal.id },
+          select: {
+            date: true,
+            mealType: true,
+            phase: true,
+          },
+        })
+
+        if (!mealData) {
+          console.error(`[Meals] Repas ${meal.id} introuvable`)
+          return
+        }
+
+        // Récupérer tous les bénévoles acceptés avec leurs données d'éligibilité
         const acceptedVolunteers = await prisma.editionVolunteerApplication.findMany({
           where: {
             editionId,
             status: 'ACCEPTED',
           },
-          select: { id: true },
+          select: {
+            id: true,
+            setupAvailability: true,
+            teardownAvailability: true,
+            eventAvailability: true,
+            arrivalDateTime: true,
+            departureDateTime: true,
+          },
         })
 
-        // Récupérer tous les artistes
+        // Récupérer tous les artistes avec leurs données d'éligibilité
         const artists = await prisma.editionArtist.findMany({
           where: { editionId },
-          select: { id: true },
+          select: {
+            id: true,
+            arrivalDateTime: true,
+            departureDateTime: true,
+          },
         })
 
-        // Créer les sélections de repas pour les bénévoles (si pas déjà existantes)
-        const volunteerSelections = acceptedVolunteers.map((volunteer) =>
+        // Filtrer les bénévoles éligibles selon les règles
+        const eligibleVolunteers = acceptedVolunteers.filter((volunteer) =>
+          isVolunteerEligibleForMeal(mealData, volunteer)
+        )
+
+        // Filtrer les artistes éligibles selon les règles
+        const eligibleArtists = artists.filter((artist) =>
+          isArtistEligibleForMeal(mealData, artist)
+        )
+
+        // Créer les sélections de repas pour les bénévoles éligibles (si pas déjà existantes)
+        const volunteerSelections = eligibleVolunteers.map((volunteer) =>
           prisma.volunteerMealSelection.upsert({
             where: {
               volunteerId_mealId: {
@@ -125,8 +165,8 @@ export default defineEventHandler(async (event) => {
           })
         )
 
-        // Créer les sélections de repas pour les artistes (si pas déjà existantes)
-        const artistSelections = artists.map((artist) =>
+        // Créer les sélections de repas pour les artistes éligibles (si pas déjà existantes)
+        const artistSelections = eligibleArtists.map((artist) =>
           prisma.artistMealSelection.upsert({
             where: {
               artistId_mealId: {
@@ -147,7 +187,7 @@ export default defineEventHandler(async (event) => {
 
         await Promise.all([...volunteerSelections, ...artistSelections])
         console.log(
-          `[Meals] Repas ${meal.id} ajouté à ${acceptedVolunteers.length} bénévoles et ${artists.length} artistes`
+          `[Meals] Repas ${meal.id} ajouté à ${eligibleVolunteers.length}/${acceptedVolunteers.length} bénévoles éligibles et ${eligibleArtists.length}/${artists.length} artistes éligibles`
         )
       } else {
         // Repas désactivé : supprimer toutes les sélections

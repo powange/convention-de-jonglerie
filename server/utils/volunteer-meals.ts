@@ -55,6 +55,110 @@ export function getAvailableMealsOnDeparture(timeOfDay: string): VolunteerMealTy
 }
 
 /**
+ * Vérifie si un bénévole est éligible à un repas spécifique
+ * en fonction de ses disponibilités et dates d'arrivée/départ
+ */
+export function isVolunteerEligibleForMeal(
+  meal: { date: Date; mealType: VolunteerMealType; phase: string },
+  volunteer: {
+    setupAvailability: boolean
+    teardownAvailability: boolean
+    eventAvailability: boolean
+    arrivalDateTime: string | null
+    departureDateTime: string | null
+  }
+): boolean {
+  // Filtrer par phase selon les disponibilités
+  if (meal.phase === 'SETUP' && !volunteer.setupAvailability) return false
+  if (meal.phase === 'TEARDOWN' && !volunteer.teardownAvailability) return false
+  if (meal.phase === 'EVENT' && !volunteer.eventAvailability) return false
+
+  // Filtrer par dates d'arrivée et de départ si renseignées
+  const mealDate = new Date(meal.date)
+  mealDate.setUTCHours(0, 0, 0, 0)
+
+  if (volunteer.arrivalDateTime) {
+    // Format: YYYY-MM-DD_timeOfDay
+    const [arrivalDatePart, arrivalTimeOfDay] = volunteer.arrivalDateTime.split('_')
+    const arrivalDate = new Date(arrivalDatePart)
+    arrivalDate.setUTCHours(0, 0, 0, 0)
+
+    if (mealDate < arrivalDate) return false
+
+    // Si c'est le jour d'arrivée, vérifier l'heure
+    if (mealDate.getTime() === arrivalDate.getTime()) {
+      const availableMeals = getAvailableMealsOnArrival(arrivalTimeOfDay)
+      if (!availableMeals.includes(meal.mealType)) return false
+    }
+  }
+
+  if (volunteer.departureDateTime) {
+    // Format: YYYY-MM-DD_timeOfDay
+    const [departureDatePart, departureTimeOfDay] = volunteer.departureDateTime.split('_')
+    const departureDate = new Date(departureDatePart)
+    departureDate.setUTCHours(0, 0, 0, 0)
+
+    if (mealDate > departureDate) return false
+
+    // Si c'est le jour de départ, vérifier l'heure
+    if (mealDate.getTime() === departureDate.getTime()) {
+      const availableMeals = getAvailableMealsOnDeparture(departureTimeOfDay)
+      if (!availableMeals.includes(meal.mealType)) return false
+    }
+  }
+
+  return true
+}
+
+/**
+ * Vérifie si un artiste est éligible à un repas spécifique
+ * en fonction de ses dates d'arrivée/départ
+ */
+export function isArtistEligibleForMeal(
+  meal: { date: Date; mealType: VolunteerMealType },
+  artist: {
+    arrivalDateTime: string | null
+    departureDateTime: string | null
+  }
+): boolean {
+  // Filtrer par dates d'arrivée et de départ si renseignées
+  const mealDate = new Date(meal.date)
+  mealDate.setUTCHours(0, 0, 0, 0)
+
+  if (artist.arrivalDateTime) {
+    // Format: YYYY-MM-DD_timeOfDay
+    const [arrivalDatePart, arrivalTimeOfDay] = artist.arrivalDateTime.split('_')
+    const arrivalDate = new Date(arrivalDatePart)
+    arrivalDate.setUTCHours(0, 0, 0, 0)
+
+    if (mealDate < arrivalDate) return false
+
+    // Si c'est le jour d'arrivée, vérifier l'heure
+    if (mealDate.getTime() === arrivalDate.getTime()) {
+      const availableMeals = getAvailableMealsOnArrival(arrivalTimeOfDay)
+      if (!availableMeals.includes(meal.mealType)) return false
+    }
+  }
+
+  if (artist.departureDateTime) {
+    // Format: YYYY-MM-DD_timeOfDay
+    const [departureDatePart, departureTimeOfDay] = artist.departureDateTime.split('_')
+    const departureDate = new Date(departureDatePart)
+    departureDate.setUTCHours(0, 0, 0, 0)
+
+    if (mealDate > departureDate) return false
+
+    // Si c'est le jour de départ, vérifier l'heure
+    if (mealDate.getTime() === departureDate.getTime()) {
+      const availableMeals = getAvailableMealsOnDeparture(departureTimeOfDay)
+      if (!availableMeals.includes(meal.mealType)) return false
+    }
+  }
+
+  return true
+}
+
+/**
  * Crée automatiquement les sélections de repas pour un bénévole accepté
  * Filtre selon ses disponibilités (setup/event/teardown) et ses dates d'arrivée/départ
  */
@@ -88,48 +192,7 @@ export async function createVolunteerMealSelections(
   })
 
   // Filtrer les repas selon les disponibilités du bénévole
-  const eligibleMeals = allMeals.filter((meal) => {
-    // Filtrer par phase selon les disponibilités
-    if (meal.phase === 'SETUP' && !volunteer.setupAvailability) return false
-    if (meal.phase === 'TEARDOWN' && !volunteer.teardownAvailability) return false
-    if (meal.phase === 'EVENT' && !volunteer.eventAvailability) return false
-
-    // Filtrer par dates d'arrivée et de départ si renseignées
-    const mealDate = new Date(meal.date)
-    mealDate.setUTCHours(0, 0, 0, 0)
-
-    if (volunteer.arrivalDateTime) {
-      // Format: YYYY-MM-DD_timeOfDay
-      const [arrivalDatePart, arrivalTimeOfDay] = volunteer.arrivalDateTime.split('_')
-      const arrivalDate = new Date(arrivalDatePart)
-      arrivalDate.setUTCHours(0, 0, 0, 0)
-
-      if (mealDate < arrivalDate) return false
-
-      // Si c'est le jour d'arrivée, vérifier l'heure
-      if (mealDate.getTime() === arrivalDate.getTime()) {
-        const availableMeals = getAvailableMealsOnArrival(arrivalTimeOfDay)
-        if (!availableMeals.includes(meal.mealType)) return false
-      }
-    }
-
-    if (volunteer.departureDateTime) {
-      // Format: YYYY-MM-DD_timeOfDay
-      const [departureDatePart, departureTimeOfDay] = volunteer.departureDateTime.split('_')
-      const departureDate = new Date(departureDatePart)
-      departureDate.setUTCHours(0, 0, 0, 0)
-
-      if (mealDate > departureDate) return false
-
-      // Si c'est le jour de départ, vérifier l'heure
-      if (mealDate.getTime() === departureDate.getTime()) {
-        const availableMeals = getAvailableMealsOnDeparture(departureTimeOfDay)
-        if (!availableMeals.includes(meal.mealType)) return false
-      }
-    }
-
-    return true
-  })
+  const eligibleMeals = allMeals.filter((meal) => isVolunteerEligibleForMeal(meal, volunteer))
 
   // Vérifier quelles sélections existent déjà
   const existingSelections = await prisma.volunteerMealSelection.findMany({
