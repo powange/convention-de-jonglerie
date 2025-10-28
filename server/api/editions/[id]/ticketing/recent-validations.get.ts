@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
     // Récupérer les validations de billets (externes et manuels)
     const ticketValidations = await prisma.ticketingOrderItem.findMany({
       where: {
+        state: { in: ['Processed', 'Pending'] }, // Exclure les billets remboursés
         order: {
           editionId: editionId,
         },

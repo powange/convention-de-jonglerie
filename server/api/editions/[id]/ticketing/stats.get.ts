@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
     // Compter les validations de billets (uniquement les tarifs avec countAsParticipant = true)
     const ticketsValidatedToday = await prisma.ticketingOrderItem.count({
       where: {
+        state: { in: ['Processed', 'Pending'] }, // Exclure les billets remboursés
         order: {
           editionId: editionId,
         },
@@ -38,6 +39,7 @@ export default defineEventHandler(async (event) => {
 
     const totalTicketsValidated = await prisma.ticketingOrderItem.count({
       where: {
+        state: { in: ['Processed', 'Pending'] }, // Exclure les billets remboursés
         order: {
           editionId: editionId,
         },
@@ -105,6 +107,7 @@ export default defineEventHandler(async (event) => {
     // Compter le nombre total de billets (uniquement les tarifs avec countAsParticipant = true)
     const totalTickets = await prisma.ticketingOrderItem.count({
       where: {
+        state: { in: ['Processed', 'Pending'] }, // Exclure les billets remboursés
         order: {
           editionId: editionId,
         },

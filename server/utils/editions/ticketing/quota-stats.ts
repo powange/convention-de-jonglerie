@@ -24,7 +24,7 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
             include: {
               orderItems: {
                 where: {
-                  state: 'Processed', // Uniquement les billets payés
+                  state: { in: ['Processed', 'Pending'] }, // Billets payés et en attente
                 },
               },
             },
@@ -46,13 +46,13 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
   })
 
   // Récupérer tous les order items avec leurs customFields pour analyser les options
+  // On inclut les billets payés (Processed) et en attente de paiement (Pending)
+  // On inclut les billets externes (HelloAsso) ET manuels
   const allOrderItems = await prisma.ticketingOrderItem.findMany({
     where: {
-      state: 'Processed',
+      state: { in: ['Processed', 'Pending'] },
       order: {
-        externalTicketing: {
-          editionId: editionId,
-        },
+        editionId: editionId,
       },
     },
     select: {
@@ -64,16 +64,16 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
 
   // Calculer les stats pour chaque quota
   return quotas.map((quota) => {
-    // Compter le nombre de participants ayant un billet lié à un tarif de ce quota
-    let currentCount = 0
-    let validatedCount = 0
+    // Utiliser des Sets pour éviter de compter plusieurs fois le même billet
+    const matchingOrderItemIds = new Set<number>()
+    const validatedOrderItemIds = new Set<number>()
 
     // 1. Compter les participants via les tarifs
     for (const tierQuota of quota.tiers) {
       for (const orderItem of tierQuota.tier.orderItems) {
-        currentCount++
+        matchingOrderItemIds.add(orderItem.id)
         if (orderItem.entryValidated) {
-          validatedCount++
+          validatedOrderItemIds.add(orderItem.id)
         }
       }
     }
@@ -90,9 +90,9 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
           )
 
           if (hasOption) {
-            currentCount++
+            matchingOrderItemIds.add(orderItem.id)
             if (orderItem.entryValidated) {
-              validatedCount++
+              validatedOrderItemIds.add(orderItem.id)
             }
           }
         }
@@ -122,14 +122,18 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
           })
 
           if (hasCustomField) {
-            currentCount++
+            matchingOrderItemIds.add(orderItem.id)
             if (orderItem.entryValidated) {
-              validatedCount++
+              validatedOrderItemIds.add(orderItem.id)
             }
           }
         }
       }
     }
+
+    // Convertir les Sets en nombre
+    const currentCount = matchingOrderItemIds.size
+    const validatedCount = validatedOrderItemIds.size
 
     const percentage = quota.quantity > 0 ? Math.round((currentCount / quota.quantity) * 100) : 0
 

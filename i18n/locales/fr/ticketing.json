@@ -71,7 +71,8 @@
       "stats": {
         "title": "Statistiques des quotas",
         "used": "Utilisé",
-        "validated": "Validés"
+        "validated": "Validés",
+        "exceeded": "DÉPASSEMENT"
       }
     },
     "returnable_items": {

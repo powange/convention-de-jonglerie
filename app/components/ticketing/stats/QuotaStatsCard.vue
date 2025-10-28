@@ -20,9 +20,19 @@
           "
         >
           <div class="space-y-3">
-            <h3 class="font-semibold text-gray-900 dark:text-white text-sm">
-              {{ quota.title }}
-            </h3>
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-semibold text-gray-900 dark:text-white text-sm">
+                {{ quota.title }}
+              </h3>
+              <UBadge
+                v-if="quota.currentCount > quota.quantity"
+                color="red"
+                variant="solid"
+                size="xs"
+              >
+                {{ $t('ticketing.quotas.stats.exceeded') }}
+              </UBadge>
+            </div>
 
             <p v-if="quota.description" class="text-xs text-gray-600 dark:text-gray-400">
               {{ quota.description }}
