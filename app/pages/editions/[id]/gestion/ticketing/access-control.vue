@@ -416,6 +416,9 @@ const { t } = useI18n()
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
+// SSE pour rafraîchissement automatique
+const { lastUpdate } = useRealtimeStats(editionId)
+
 const ticketCode = ref('')
 const scannerOpen = ref(false)
 const participantModalOpen = ref(false)
@@ -783,4 +786,12 @@ const formatValidationTime = (dateString: string) => {
   const diffDays = Math.floor(diffHours / 24)
   return `Il y a ${diffDays}j`
 }
+
+// Rafraîchir automatiquement quand une mise à jour SSE arrive
+watch(lastUpdate, () => {
+  if (lastUpdate.value) {
+    // Rafraîchir les stats et les validations récentes
+    Promise.all([loadStats(), loadRecentValidations()])
+  }
+})
 </script>

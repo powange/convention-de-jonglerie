@@ -136,6 +136,26 @@ export default defineEventHandler(async (event) => {
         }
       }
 
+      // Notifier via SSE
+      try {
+        const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+        for (const participantId of body.participantIds) {
+          broadcastToEditionSSE(editionId, {
+            type: 'entry-validated',
+            editionId,
+            participantType: 'volunteer',
+            participantId,
+          })
+        }
+        // Notifier aussi que les stats ont changé
+        broadcastToEditionSSE(editionId, {
+          type: 'stats-updated',
+          editionId,
+        })
+      } catch (sseError) {
+        console.error('[SSE] Failed to notify SSE clients:', sseError)
+      }
+
       return {
         success: true,
         validated: result.count,
@@ -185,6 +205,26 @@ export default defineEventHandler(async (event) => {
             phone: body.phone,
           },
         })
+      }
+
+      // Notifier via SSE
+      try {
+        const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+        for (const participantId of body.participantIds) {
+          broadcastToEditionSSE(editionId, {
+            type: 'entry-validated',
+            editionId,
+            participantType: 'artist',
+            participantId,
+          })
+        }
+        // Notifier aussi que les stats ont changé
+        broadcastToEditionSSE(editionId, {
+          type: 'stats-updated',
+          editionId,
+        })
+      } catch (sseError) {
+        console.error('[SSE] Failed to notify SSE clients:', sseError)
       }
 
       return {
@@ -253,6 +293,26 @@ export default defineEventHandler(async (event) => {
             state: 'Processed',
           },
         })
+      }
+
+      // Notifier via SSE
+      try {
+        const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+        for (const participantId of body.participantIds) {
+          broadcastToEditionSSE(editionId, {
+            type: 'entry-validated',
+            editionId,
+            participantType: 'ticket',
+            participantId,
+          })
+        }
+        // Notifier aussi que les stats ont changé
+        broadcastToEditionSSE(editionId, {
+          type: 'stats-updated',
+          editionId,
+        })
+      } catch (sseError) {
+        console.error('[SSE] Failed to notify SSE clients:', sseError)
       }
 
       return {

@@ -309,7 +309,7 @@ const teamOptions = computed(() => {
 const loadAllReturnableItems = async () => {
   try {
     const response = await $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`)
-    allReturnableItems.value = response
+    allReturnableItems.value = response.returnableItems || []
   } catch (error) {
     console.error('Failed to load all returnable items:', error)
   }

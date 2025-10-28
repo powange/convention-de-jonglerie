@@ -341,70 +341,6 @@
       </div>
     </div>
 
-    <!-- Repas bénévoles -->
-    <div class="mt-6 space-y-4">
-      <div class="flex items-center justify-between">
-        <div class="space-y-2">
-          <h4 class="font-medium text-gray-700 dark:text-gray-300">Repas bénévoles</h4>
-          <p class="text-xs text-gray-500">
-            Configuration des repas proposés aux bénévoles pendant l'événement
-          </p>
-        </div>
-      </div>
-
-      <div v-if="loadingMeals" class="flex items-center justify-center py-8">
-        <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 text-primary-500" />
-      </div>
-
-      <div
-        v-else-if="volunteerMeals.length === 0"
-        class="text-sm text-gray-500 italic p-4 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center"
-      >
-        Aucun repas configuré. Les repas seront générés automatiquement en fonction des dates de
-        l'événement.
-      </div>
-
-      <div v-else class="space-y-4">
-        <div v-for="(dayMeals, date) in groupedMeals" :key="date" class="space-y-2">
-          <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {{ formatDate(date) }}
-          </h5>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div
-              v-for="meal in dayMeals"
-              :key="meal.id"
-              :class="[
-                'flex items-center gap-3 p-3 border rounded-lg transition-opacity',
-                meal.enabled
-                  ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
-                  : 'border-gray-200/50 dark:border-gray-700/50 bg-gray-100/50 dark:bg-gray-900/50 opacity-60',
-              ]"
-            >
-              <UCheckbox
-                v-model="meal.enabled"
-                :disabled="savingMeals"
-                @update:model-value="handleMealChange(meal)"
-              />
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 dark:text-white">
-                  {{ getMealTypeLabel(meal.mealType) }}
-                </p>
-                <USelect
-                  v-model="meal.phase"
-                  :items="mealPhaseOptions"
-                  value-key="value"
-                  :disabled="savingMeals"
-                  size="xs"
-                  class="mt-1"
-                  @update:model-value="handleMealChange(meal)"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Indicateur de sauvegarde -->
     <div v-if="saving" class="flex gap-2 text-xs text-gray-500 items-center">
       <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
@@ -415,7 +351,7 @@
 
 <script setup lang="ts">
 import { type DateValue, fromDate, toCalendarDate } from '@internationalized/date'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { useVolunteerSettings } from '~/composables/useVolunteerSettings'
 import { useVolunteerTeams } from '~/composables/useVolunteerTeams'
@@ -577,118 +513,6 @@ const persistSettings = async (data: any) => {
     }
   }
 }
-
-// Gestion des repas bénévoles
-const volunteerMeals = ref<any[]>([])
-const loadingMeals = ref(false)
-const savingMeals = ref(false)
-
-// Options pour le select de phase
-const mealPhaseOptions = [
-  { value: 'SETUP', label: 'Montage' },
-  { value: 'EVENT', label: 'Édition' },
-  { value: 'TEARDOWN', label: 'Démontage' },
-]
-
-// Grouper les repas par date
-const groupedMeals = computed(() => {
-  const grouped: Record<string, any[]> = {}
-  volunteerMeals.value.forEach((meal) => {
-    const dateKey = meal.date.split('T')[0]
-    if (!grouped[dateKey]) {
-      grouped[dateKey] = []
-    }
-    grouped[dateKey].push(meal)
-  })
-  return grouped
-})
-
-// Formater la date pour l'affichage
-const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('fr-FR', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
-
-// Obtenir le label du type de repas
-const getMealTypeLabel = (mealType: string) => {
-  const labels: Record<string, string> = {
-    BREAKFAST: 'Matin',
-    LUNCH: 'Midi',
-    DINNER: 'Soir',
-  }
-  return labels[mealType] || mealType
-}
-
-// Charger les repas
-const fetchVolunteerMeals = async () => {
-  if (!props.editionId) return
-
-  loadingMeals.value = true
-  try {
-    const response = await $fetch(`/api/editions/${props.editionId}/volunteers/meals`)
-    if (response.success && response.meals) {
-      volunteerMeals.value = response.meals
-    }
-  } catch (error) {
-    console.error('Failed to fetch volunteer meals:', error)
-    toast.add({
-      title: 'Erreur',
-      description: 'Impossible de charger les repas bénévoles',
-      color: 'error',
-    })
-  } finally {
-    loadingMeals.value = false
-  }
-}
-
-// Gérer le changement d'un repas (enabled ou phase)
-const handleMealChange = async (meal: any) => {
-  savingMeals.value = true
-  try {
-    const response = await $fetch(`/api/editions/${props.editionId}/volunteers/meals`, {
-      method: 'PUT',
-      body: {
-        meals: [
-          {
-            id: meal.id,
-            enabled: meal.enabled,
-            phase: meal.phase,
-          },
-        ],
-      },
-    })
-
-    if (response.success && response.meals) {
-      volunteerMeals.value = response.meals
-      toast.add({
-        title: 'Sauvegardé',
-        color: 'success',
-        icon: 'i-heroicons-check-circle',
-      })
-    }
-  } catch (error) {
-    console.error('Failed to update volunteer meal:', error)
-    toast.add({
-      title: 'Erreur',
-      description: 'Impossible de sauvegarder le repas',
-      color: 'error',
-    })
-    // Recharger les repas pour annuler le changement
-    await fetchVolunteerMeals()
-  } finally {
-    savingMeals.value = false
-  }
-}
-
-// Charger les repas au montage
-onMounted(() => {
-  fetchVolunteerMeals()
-})
 
 // Watcher pour mettre à jour les données depuis l'extérieur
 watch(

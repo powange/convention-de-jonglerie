@@ -80,8 +80,20 @@ const props = defineProps<{
   editionId: number
 }>()
 
-const { data: quotaStatsData, pending } = await useFetch(
-  `/api/editions/${props.editionId}/ticketing/quotas/stats`
-)
+// SSE pour rafraîchissement automatique
+const { lastUpdate } = useRealtimeStats(props.editionId)
+
+const {
+  data: quotaStatsData,
+  pending,
+  refresh,
+} = await useFetch(`/api/editions/${props.editionId}/ticketing/quotas/stats`)
 const quotaStats = computed(() => quotaStatsData.value?.stats || [])
+
+// Rafraîchir quand une mise à jour SSE arrive
+watch(lastUpdate, () => {
+  if (lastUpdate.value) {
+    refresh()
+  }
+})
 </script>

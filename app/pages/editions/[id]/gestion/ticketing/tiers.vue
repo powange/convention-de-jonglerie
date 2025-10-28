@@ -403,7 +403,8 @@ const loadQuotas = async () => {
 const loadReturnableItems = async () => {
   loadingReturnableItems.value = true
   try {
-    returnableItems.value = await $fetch(`/api/editions/${editionId}/ticketing/returnable-items`)
+    const response = await $fetch(`/api/editions/${editionId}/ticketing/returnable-items`)
+    returnableItems.value = response.returnableItems || []
   } catch (error) {
     console.error('Failed to load returnable items:', error)
   } finally {

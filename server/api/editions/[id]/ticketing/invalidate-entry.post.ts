@@ -51,6 +51,23 @@ export default defineEventHandler(async (event) => {
           entryValidatedBy: null,
         },
       })
+
+      // Notifier via SSE
+      try {
+        const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+        broadcastToEditionSSE(editionId, {
+          type: 'entry-invalidated',
+          editionId,
+          participantType: 'volunteer',
+          participantId: body.participantId,
+        })
+        broadcastToEditionSSE(editionId, {
+          type: 'stats-updated',
+          editionId,
+        })
+      } catch (sseError) {
+        console.error('[SSE] Failed to notify SSE clients:', sseError)
+      }
     } else if (body.type === 'artist') {
       // Dévalider l'entrée d'un artiste
       const artist = await prisma.editionArtist.findFirst({
@@ -75,6 +92,23 @@ export default defineEventHandler(async (event) => {
           entryValidatedBy: null,
         },
       })
+
+      // Notifier via SSE
+      try {
+        const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+        broadcastToEditionSSE(editionId, {
+          type: 'entry-invalidated',
+          editionId,
+          participantType: 'artist',
+          participantId: body.participantId,
+        })
+        broadcastToEditionSSE(editionId, {
+          type: 'stats-updated',
+          editionId,
+        })
+      } catch (sseError) {
+        console.error('[SSE] Failed to notify SSE clients:', sseError)
+      }
     } else {
       // Dévalider l'entrée d'un participant (ticket) en utilisant l'ID de OrderItem
       const orderItem = await prisma.ticketingOrderItem.findFirst({
@@ -100,6 +134,23 @@ export default defineEventHandler(async (event) => {
           entryValidatedAt: null,
         },
       })
+
+      // Notifier via SSE
+      try {
+        const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')
+        broadcastToEditionSSE(editionId, {
+          type: 'entry-invalidated',
+          editionId,
+          participantType: 'ticket',
+          participantId: body.participantId,
+        })
+        broadcastToEditionSSE(editionId, {
+          type: 'stats-updated',
+          editionId,
+        })
+      } catch (sseError) {
+        console.error('[SSE] Failed to notify SSE clients:', sseError)
+      }
     }
 
     return {

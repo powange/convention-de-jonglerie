@@ -156,7 +156,43 @@ export default defineEventHandler(async (event) => {
             uniqueItems.set(item.returnableItem.id, item.returnableItem)
           }
         })
-        const deduplicatedItems = Array.from(uniqueItems.values())
+
+        // Récupérer les repas associés au bénévole
+        const volunteerMeals = await prisma.volunteerMealSelection.findMany({
+          where: {
+            volunteerId: application.id,
+            accepted: true,
+            meal: {
+              enabled: true,
+            },
+          },
+          include: {
+            meal: {
+              include: {
+                returnableItems: {
+                  include: {
+                    returnableItem: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            meal: {
+              date: 'asc',
+            },
+          },
+        })
+
+        // Ajouter les articles à restituer des repas aux articles existants
+        volunteerMeals.forEach((selection) => {
+          selection.meal.returnableItems.forEach((mealItem) => {
+            if (!uniqueItems.has(mealItem.returnableItem.id)) {
+              uniqueItems.set(mealItem.returnableItem.id, mealItem.returnableItem)
+            }
+          })
+        })
+        const allDeduplicatedItems = Array.from(uniqueItems.values())
 
         return {
           success: true,
@@ -184,9 +220,15 @@ export default defineEventHandler(async (event) => {
                 startDateTime: assignment.timeSlot.startDateTime,
                 endDateTime: assignment.timeSlot.endDateTime,
               })),
-              returnableItems: deduplicatedItems.map((item) => ({
+              returnableItems: allDeduplicatedItems.map((item) => ({
                 id: item.id,
                 name: item.name,
+              })),
+              meals: volunteerMeals.map((selection) => ({
+                id: selection.meal.id,
+                date: selection.meal.date,
+                mealType: selection.meal.mealType,
+                phase: selection.meal.phase,
               })),
               entryValidated: application.entryValidated,
               entryValidatedAt: application.entryValidatedAt,
@@ -271,7 +313,43 @@ export default defineEventHandler(async (event) => {
             }
           })
         })
-        const deduplicatedItems = Array.from(uniqueItems.values())
+
+        // Récupérer les repas associés à l'artiste
+        const artistMeals = await prisma.artistMealSelection.findMany({
+          where: {
+            artistId: artist.id,
+            accepted: true,
+            meal: {
+              enabled: true,
+            },
+          },
+          include: {
+            meal: {
+              include: {
+                returnableItems: {
+                  include: {
+                    returnableItem: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            meal: {
+              date: 'asc',
+            },
+          },
+        })
+
+        // Ajouter les articles à restituer des repas aux articles existants
+        artistMeals.forEach((selection) => {
+          selection.meal.returnableItems.forEach((mealItem) => {
+            if (!uniqueItems.has(mealItem.returnableItem.id)) {
+              uniqueItems.set(mealItem.returnableItem.id, mealItem.returnableItem)
+            }
+          })
+        })
+        const allDeduplicatedItems = Array.from(uniqueItems.values())
 
         return {
           success: true,
@@ -293,9 +371,15 @@ export default defineEventHandler(async (event) => {
                 startDateTime: showArtist.show.startDateTime,
                 location: showArtist.show.location,
               })),
-              returnableItems: deduplicatedItems.map((item) => ({
+              returnableItems: allDeduplicatedItems.map((item) => ({
                 id: item.id,
                 name: item.name,
+              })),
+              meals: artistMeals.map((selection) => ({
+                id: selection.meal.id,
+                date: selection.meal.date,
+                mealType: selection.meal.mealType,
+                phase: selection.meal.phase,
               })),
               entryValidated: artist.entryValidated,
               entryValidatedAt: artist.entryValidatedAt,

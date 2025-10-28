@@ -310,6 +310,27 @@
           </div>
         </UCard>
 
+        <!-- Repas -->
+        <UCard v-if="isCollaborator">
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-cake" class="text-orange-500" />
+              <h2 class="text-lg font-semibold">Repas</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <!-- Configuration des repas -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/meals`"
+                icon="i-heroicons-cake"
+                title="Configuration des repas"
+                description="Gérer les repas pour bénévoles et artistes"
+                color="orange"
+              />
+            </div>
+          </div>
+        </UCard>
+
         <!-- Billeterie -->
         <UCard v-if="isCollaborator">
           <div class="space-y-4">

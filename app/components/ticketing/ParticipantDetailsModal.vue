@@ -693,6 +693,73 @@
             <p class="text-sm">{{ $t('ticketing.participant.no_slot_assigned') }}</p>
           </div>
         </div>
+
+        <!-- Repas du bénévole -->
+        <div v-if="volunteerMealsByDay.length > 0" class="space-y-4">
+          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+            <UIcon name="i-heroicons-cake" class="text-orange-600 dark:text-orange-400" />
+            <h4 class="font-semibold text-gray-900 dark:text-white">Repas</h4>
+          </div>
+
+          <div class="space-y-4">
+            <div v-for="dayGroup in volunteerMealsByDay" :key="dayGroup.date" class="space-y-2">
+              <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {{
+                  new Date(dayGroup.date).toLocaleDateString('fr-FR', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                  })
+                }}
+              </h5>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div
+                  v-for="meal in dayGroup.meals"
+                  :key="meal.id"
+                  class="p-3 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/10 border border-orange-200 dark:border-orange-800/30"
+                >
+                  <div class="flex flex-col gap-2">
+                    <div class="flex items-center gap-2">
+                      <UIcon
+                        :name="
+                          meal.mealType === 'BREAKFAST'
+                            ? 'i-heroicons-sun'
+                            : meal.mealType === 'LUNCH'
+                              ? 'i-heroicons-sun-solid'
+                              : 'i-heroicons-moon'
+                        "
+                        class="h-4 w-4 text-orange-600 dark:text-orange-400"
+                      />
+                      <span class="text-sm font-medium text-gray-900 dark:text-white">
+                        {{
+                          meal.mealType === 'BREAKFAST'
+                            ? 'Matin'
+                            : meal.mealType === 'LUNCH'
+                              ? 'Midi'
+                              : 'Soir'
+                        }}
+                      </span>
+                    </div>
+                    <UBadge
+                      :color="meal.phase === 'EVENT' ? 'primary' : 'neutral'"
+                      variant="subtle"
+                      size="xs"
+                      class="self-start"
+                    >
+                      {{
+                        meal.phase === 'SETUP'
+                          ? 'Montage'
+                          : meal.phase === 'EVENT'
+                            ? 'Édition'
+                            : 'Démontage'
+                      }}
+                    </UBadge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Affichage pour un artiste -->
@@ -835,6 +902,73 @@
         >
           <UIcon name="i-heroicons-star" class="mx-auto h-8 w-8 mb-2 text-gray-400" />
           <p class="text-sm">Aucun spectacle assigné</p>
+        </div>
+
+        <!-- Repas de l'artiste -->
+        <div v-if="artistMealsByDay.length > 0" class="space-y-4">
+          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+            <UIcon name="i-heroicons-cake" class="text-orange-600 dark:text-orange-400" />
+            <h4 class="font-semibold text-gray-900 dark:text-white">Repas</h4>
+          </div>
+
+          <div class="space-y-4">
+            <div v-for="dayGroup in artistMealsByDay" :key="dayGroup.date" class="space-y-2">
+              <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {{
+                  new Date(dayGroup.date).toLocaleDateString('fr-FR', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                  })
+                }}
+              </h5>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div
+                  v-for="meal in dayGroup.meals"
+                  :key="meal.id"
+                  class="p-3 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/10 border border-orange-200 dark:border-orange-800/30"
+                >
+                  <div class="flex flex-col gap-2">
+                    <div class="flex items-center gap-2">
+                      <UIcon
+                        :name="
+                          meal.mealType === 'BREAKFAST'
+                            ? 'i-heroicons-sun'
+                            : meal.mealType === 'LUNCH'
+                              ? 'i-heroicons-sun-solid'
+                              : 'i-heroicons-moon'
+                        "
+                        class="h-4 w-4 text-orange-600 dark:text-orange-400"
+                      />
+                      <span class="text-sm font-medium text-gray-900 dark:text-white">
+                        {{
+                          meal.mealType === 'BREAKFAST'
+                            ? 'Matin'
+                            : meal.mealType === 'LUNCH'
+                              ? 'Midi'
+                              : 'Soir'
+                        }}
+                      </span>
+                    </div>
+                    <UBadge
+                      :color="meal.phase === 'EVENT' ? 'primary' : 'neutral'"
+                      variant="subtle"
+                      size="xs"
+                      class="self-start"
+                    >
+                      {{
+                        meal.phase === 'SETUP'
+                          ? 'Montage'
+                          : meal.phase === 'EVENT'
+                            ? 'Édition'
+                            : 'Démontage'
+                      }}
+                    </UBadge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1116,6 +1250,12 @@ interface VolunteerData {
       id: number
       name: string
     }>
+    meals?: Array<{
+      id: number
+      date: Date | string
+      mealType: string
+      phase: string
+    }>
     entryValidated?: boolean
     entryValidatedAt?: Date | string
     entryValidatedBy?: {
@@ -1143,6 +1283,12 @@ interface ArtistData {
     returnableItems?: Array<{
       id: number
       name: string
+    }>
+    meals?: Array<{
+      id: number
+      date: Date | string
+      mealType: string
+      phase: string
     }>
     entryValidated?: boolean
     entryValidatedAt?: Date | string
@@ -1260,6 +1406,64 @@ const returnableItemsToDistribute = computed(() => {
   }
 
   return itemsList
+})
+
+// Grouper les repas des bénévoles par jour
+const volunteerMealsByDay = computed(() => {
+  if (
+    !props.participant ||
+    !('volunteer' in props.participant) ||
+    !props.participant.volunteer.meals
+  ) {
+    return []
+  }
+
+  const grouped: Record<string, Array<any>> = {}
+  props.participant.volunteer.meals.forEach((meal) => {
+    const dateKey = new Date(meal.date).toISOString().split('T')[0]
+    if (!grouped[dateKey]) {
+      grouped[dateKey] = []
+    }
+    grouped[dateKey].push(meal)
+  })
+
+  // Trier les repas de chaque jour par type (BREAKFAST, LUNCH, DINNER)
+  const mealOrder = { BREAKFAST: 1, LUNCH: 2, DINNER: 3 }
+  Object.keys(grouped).forEach((dateKey) => {
+    grouped[dateKey].sort((a, b) => (mealOrder[a.mealType] || 999) - (mealOrder[b.mealType] || 999))
+  })
+
+  // Convertir en tableau et trier par date
+  return Object.entries(grouped)
+    .map(([date, meals]) => ({ date, meals }))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+})
+
+// Grouper les repas des artistes par jour
+const artistMealsByDay = computed(() => {
+  if (!props.participant || !('artist' in props.participant) || !props.participant.artist.meals) {
+    return []
+  }
+
+  const grouped: Record<string, Array<any>> = {}
+  props.participant.artist.meals.forEach((meal) => {
+    const dateKey = new Date(meal.date).toISOString().split('T')[0]
+    if (!grouped[dateKey]) {
+      grouped[dateKey] = []
+    }
+    grouped[dateKey].push(meal)
+  })
+
+  // Trier les repas de chaque jour par type (BREAKFAST, LUNCH, DINNER)
+  const mealOrder = { BREAKFAST: 1, LUNCH: 2, DINNER: 3 }
+  Object.keys(grouped).forEach((dateKey) => {
+    grouped[dateKey].sort((a, b) => (mealOrder[a.mealType] || 999) - (mealOrder[b.mealType] || 999))
+  })
+
+  // Convertir en tableau et trier par date
+  return Object.entries(grouped)
+    .map(([date, meals]) => ({ date, meals }))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 })
 
 // Réinitialiser la sélection quand la modal s'ouvre

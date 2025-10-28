@@ -937,6 +937,7 @@ model TicketingReturnableItem {
   volunteerTicketingReturnableItems EditionVolunteerReturnableItem[]
   customFields                      TicketingTierCustomFieldReturnableItem[]
   shows                             ShowReturnableItem[]
+  meals                             VolunteerMealReturnableItem[]
 
   @@index([editionId])
 }
@@ -1321,9 +1322,10 @@ model VolunteerMeal {
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
 
-  edition              Edition                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  edition              Edition                       @relation(fields: [editionId], references: [id], onDelete: Cascade)
   mealSelections       VolunteerMealSelection[]
   artistMealSelections ArtistMealSelection[]
+  returnableItems      VolunteerMealReturnableItem[]
 
   @@unique([editionId, date, mealType])
   @@index([editionId])
@@ -1360,4 +1362,20 @@ model ArtistMealSelection {
   @@unique([artistId, mealId])
   @@index([artistId])
   @@index([mealId])
+}
+
+// Association repas -> articles à restituer
+model VolunteerMealReturnableItem {
+  id               Int      @id @default(autoincrement())
+  mealId           Int
+  returnableItemId Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  meal           VolunteerMeal           @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  returnableItem TicketingReturnableItem @relation(fields: [returnableItemId], references: [id], onDelete: Cascade)
+
+  @@unique([mealId, returnableItemId])
+  @@index([mealId])
+  @@index([returnableItemId])
 }

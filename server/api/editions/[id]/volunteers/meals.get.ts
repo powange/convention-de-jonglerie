@@ -43,6 +43,13 @@ export default defineEventHandler(async (event) => {
     // Vérifier si des repas existent déjà
     const existingMeals = await prisma.volunteerMeal.findMany({
       where: { editionId },
+      include: {
+        returnableItems: {
+          include: {
+            returnableItem: true,
+          },
+        },
+      },
       orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
     })
 
@@ -114,6 +121,13 @@ export default defineEventHandler(async (event) => {
     // Récupérer les repas créés
     const createdMeals = await prisma.volunteerMeal.findMany({
       where: { editionId },
+      include: {
+        returnableItems: {
+          include: {
+            returnableItem: true,
+          },
+        },
+      },
       orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
     })
 

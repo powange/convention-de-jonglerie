@@ -253,6 +253,10 @@ export default defineEventHandler(async (event) => {
 
     // Récupérer les articles à restituer pour chaque bénévole
     const returnableItemsByVolunteerId = new Map<number, Array<{ id: number; name: string }>>()
+    const mealsByVolunteerId = new Map<
+      number,
+      Array<{ id: number; date: Date; mealType: string; phase: string }>
+    >()
 
     for (const volunteer of volunteers) {
       const teamIds = volunteer.teamAssignments.map((assignment) => assignment.team.id)
@@ -303,10 +307,70 @@ export default defineEventHandler(async (event) => {
           name: item.name,
         }))
       )
+
+      // Récupérer les repas associés au bénévole
+      const volunteerMeals = await prisma.volunteerMealSelection.findMany({
+        where: {
+          volunteerId: volunteer.id,
+          accepted: true,
+          meal: {
+            enabled: true,
+          },
+        },
+        include: {
+          meal: {
+            include: {
+              returnableItems: {
+                include: {
+                  returnableItem: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          meal: {
+            date: 'asc',
+          },
+        },
+      })
+
+      mealsByVolunteerId.set(
+        volunteer.id,
+        volunteerMeals.map((selection) => ({
+          id: selection.meal.id,
+          date: selection.meal.date,
+          mealType: selection.meal.mealType,
+          phase: selection.meal.phase,
+        }))
+      )
+
+      // Ajouter les articles à restituer des repas aux articles existants
+      volunteerMeals.forEach((selection) => {
+        selection.meal.returnableItems.forEach((mealItem) => {
+          if (!uniqueItems.has(mealItem.returnableItem.id)) {
+            uniqueItems.set(mealItem.returnableItem.id, mealItem.returnableItem)
+          }
+        })
+      })
+
+      // Mettre à jour les articles dédupliqués avec les articles des repas
+      const allDeduplicatedItems = Array.from(uniqueItems.values())
+      returnableItemsByVolunteerId.set(
+        volunteer.id,
+        allDeduplicatedItems.map((item) => ({
+          id: item.id,
+          name: item.name,
+        }))
+      )
     }
 
     // Récupérer les articles à restituer pour chaque artiste
     const returnableItemsByArtistId = new Map<number, Array<{ id: number; name: string }>>()
+    const mealsByArtistId = new Map<
+      number,
+      Array<{ id: number; date: Date; mealType: string; phase: string }>
+    >()
 
     for (const artist of artists) {
       // Récupérer et dédupliquer les articles à restituer depuis tous les spectacles
@@ -318,11 +382,58 @@ export default defineEventHandler(async (event) => {
           }
         })
       })
-      const deduplicatedItems = Array.from(uniqueItems.values())
 
+      // Récupérer les repas associés à l'artiste
+      const artistMeals = await prisma.artistMealSelection.findMany({
+        where: {
+          artistId: artist.id,
+          accepted: true,
+          meal: {
+            enabled: true,
+          },
+        },
+        include: {
+          meal: {
+            include: {
+              returnableItems: {
+                include: {
+                  returnableItem: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          meal: {
+            date: 'asc',
+          },
+        },
+      })
+
+      mealsByArtistId.set(
+        artist.id,
+        artistMeals.map((selection) => ({
+          id: selection.meal.id,
+          date: selection.meal.date,
+          mealType: selection.meal.mealType,
+          phase: selection.meal.phase,
+        }))
+      )
+
+      // Ajouter les articles à restituer des repas aux articles existants
+      artistMeals.forEach((selection) => {
+        selection.meal.returnableItems.forEach((mealItem) => {
+          if (!uniqueItems.has(mealItem.returnableItem.id)) {
+            uniqueItems.set(mealItem.returnableItem.id, mealItem.returnableItem)
+          }
+        })
+      })
+
+      // Mettre à jour les articles dédupliqués avec les articles des repas
+      const allDeduplicatedItems = Array.from(uniqueItems.values())
       returnableItemsByArtistId.set(
         artist.id,
-        deduplicatedItems.map((item) => ({
+        allDeduplicatedItems.map((item) => ({
           id: item.id,
           name: item.name,
         }))
@@ -390,6 +501,7 @@ export default defineEventHandler(async (event) => {
           : null
         const assignments = assignmentsByUserId.get(application.user.id) || []
         const returnableItems = returnableItemsByVolunteerId.get(application.id) || []
+        const meals = mealsByVolunteerId.get(application.id) || []
         return {
           type: 'volunteer',
           participant: {
@@ -415,6 +527,7 @@ export default defineEventHandler(async (event) => {
                 endDateTime: assignment.timeSlot.endDateTime,
               })),
               returnableItems: returnableItems,
+              meals: meals,
               entryValidated: application.entryValidated,
               entryValidatedAt: application.entryValidatedAt,
               entryValidatedBy: validator
@@ -432,6 +545,7 @@ export default defineEventHandler(async (event) => {
           ? artistValidatorMap.get(artist.entryValidatedBy)
           : null
         const returnableItems = returnableItemsByArtistId.get(artist.id) || []
+        const meals = mealsByArtistId.get(artist.id) || []
         return {
           type: 'artist',
           participant: {
@@ -451,6 +565,7 @@ export default defineEventHandler(async (event) => {
                 location: showArtist.show.location,
               })),
               returnableItems: returnableItems,
+              meals: meals,
               entryValidated: artist.entryValidated,
               entryValidatedAt: artist.entryValidatedAt,
               entryValidatedBy: validator
