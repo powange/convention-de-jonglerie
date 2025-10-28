@@ -16,8 +16,8 @@
           <span class="hidden sm:inline">{{ t('common.refresh') }}</span>
         </UButton>
 
-        <!-- Filtres -->
-        <UModal>
+        <!-- Bouton filtres (mobile uniquement) -->
+        <UModal class="xl:hidden">
           <UButton
             color="neutral"
             variant="subtle"
@@ -119,6 +119,79 @@
             </div>
           </template>
         </UModal>
+
+        <!-- Filtres directs (desktop uniquement) -->
+        <div class="hidden xl:flex xl:items-center xl:gap-2 xl:flex-1">
+          <UInput
+            v-model="globalFilter"
+            :placeholder="t('editions.volunteers.search_placeholder')"
+            icon="i-heroicons-magnifying-glass"
+            size="md"
+            class="w-48"
+            @keydown.enter.prevent="applySearch"
+          />
+
+          <USelect
+            v-model="applicationsFilterStatus"
+            :items="volunteerStatusItems"
+            :placeholder="t('editions.volunteers.status_all')"
+            icon="i-heroicons-funnel"
+            size="md"
+            variant="soft"
+            class="w-36"
+            :ui="{ content: 'min-w-fit' }"
+            @change="onStatusFilterChange"
+          />
+
+          <USelect
+            v-model="applicationsFilterPresence"
+            :items="volunteerPresenceItems"
+            :placeholder="t('editions.volunteers.presence_all')"
+            icon="i-heroicons-clock"
+            size="md"
+            variant="soft"
+            class="w-40"
+            :ui="{ content: 'min-w-fit' }"
+            multiple
+            @change="onPresenceFilterChange"
+          />
+
+          <USelect
+            v-if="volunteersInfo?.askTeamPreferences && volunteerTeamItems.length > 0"
+            v-model="applicationsFilterTeams"
+            :items="volunteerTeamItems"
+            :placeholder="t('editions.volunteers.teams_empty')"
+            icon="i-heroicons-user-group"
+            size="md"
+            variant="soft"
+            class="w-40"
+            :ui="{ content: 'min-w-fit' }"
+            multiple
+            @change="onTeamsFilterChange"
+          />
+
+          <USelect
+            v-if="assignedTeamItems.length > 1"
+            v-model="applicationsFilterAssignedTeams"
+            :items="assignedTeamItems"
+            :placeholder="t('editions.volunteers.assigned_teams_all')"
+            icon="i-heroicons-users"
+            size="md"
+            variant="soft"
+            class="w-40"
+            :ui="{ content: 'min-w-fit' }"
+            multiple
+            @change="onAssignedTeamsFilterChange"
+          />
+
+          <UButton
+            size="md"
+            variant="ghost"
+            icon="i-heroicons-arrow-uturn-left"
+            :title="t('common.reset')"
+            @click="resetApplicationsFilters"
+          />
+        </div>
       </div>
 
       <UDropdownMenu
