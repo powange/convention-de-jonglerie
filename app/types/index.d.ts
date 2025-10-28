@@ -120,6 +120,7 @@ export interface ConventionCollaboratorWithRights {
     canEdit?: boolean
     canDelete?: boolean
     canManageVolunteers?: boolean
+    canManageArtists?: boolean
   }[]
   title?: string | null // résumé (ex: Administrateur, Éditeur...)
 }
@@ -133,6 +134,7 @@ export interface EditionCollaborator {
     canEdit?: boolean
     canDelete?: boolean
     canManageVolunteers?: boolean
+    canManageArtists?: boolean
   }[]
   title?: string | null
 }

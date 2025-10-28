@@ -35,6 +35,7 @@ export type ConventionRight =
   | 'canDeleteConvention'
   | 'canManageCollaborators'
   | 'canManageVolunteers'
+  | 'canManageArtists'
   | 'canAddEdition'
   | 'canEditAllEditions'
   | 'canDeleteAllEditions'

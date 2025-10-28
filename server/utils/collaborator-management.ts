@@ -189,6 +189,7 @@ interface AddConventionCollaboratorInput {
     editAllEditions: boolean
     deleteAllEditions: boolean
     manageVolunteers: boolean
+    manageArtists: boolean
   }>
   title?: string
   perEdition?: Array<{
@@ -196,6 +197,7 @@ interface AddConventionCollaboratorInput {
     canEdit?: boolean
     canDelete?: boolean
     canManageVolunteers?: boolean
+    canManageArtists?: boolean
   }>
 }
 
@@ -239,13 +241,14 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
         canEditAllEditions: rights?.editAllEditions ?? false,
         canDeleteAllEditions: rights?.deleteAllEditions ?? false,
         canManageVolunteers: rights?.manageVolunteers ?? false,
+        canManageArtists: rights?.manageArtists ?? false,
       },
       include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
     })
 
     if (perEdition && perEdition.length) {
       const filtered = perEdition.filter(
-        (p) => p && (p.canEdit || p.canDelete || p.canManageVolunteers)
+        (p) => p && (p.canEdit || p.canDelete || p.canManageVolunteers || p.canManageArtists)
       )
       if (filtered.length) {
         await tx.editionCollaboratorPermission.createMany({
@@ -255,6 +258,7 @@ export async function addConventionCollaborator(input: AddConventionCollaborator
             canEdit: !!p.canEdit,
             canDelete: !!p.canDelete,
             canManageVolunteers: !!p.canManageVolunteers,
+            canManageArtists: !!p.canManageArtists,
           })),
           skipDuplicates: true,
         })
@@ -441,6 +445,7 @@ export async function updateCollaboratorRights(params: {
     editAllEditions: boolean
     deleteAllEditions: boolean
     manageVolunteers: boolean
+    manageArtists: boolean
   }>
   title?: string
   perEdition?: Array<{
@@ -448,6 +453,7 @@ export async function updateCollaboratorRights(params: {
     canEdit?: boolean
     canDelete?: boolean
     canManageVolunteers?: boolean
+    canManageArtists?: boolean
   }>
 }) {
   const { conventionId, collaboratorId, userId, rights, title, perEdition } = params
@@ -470,6 +476,7 @@ export async function updateCollaboratorRights(params: {
         canEditAllEditions: rights?.editAllEditions ?? collaborator.canEditAllEditions,
         canDeleteAllEditions: rights?.deleteAllEditions ?? collaborator.canDeleteAllEditions,
         canManageVolunteers: rights?.manageVolunteers ?? collaborator.canManageVolunteers,
+        canManageArtists: rights?.manageArtists ?? collaborator.canManageArtists,
       },
       include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
     })
@@ -483,7 +490,7 @@ export async function updateCollaboratorRights(params: {
 
       // Ajouter les nouvelles permissions (filtrer les vides)
       const filtered = perEdition.filter(
-        (p) => p && (p.canEdit || p.canDelete || p.canManageVolunteers)
+        (p) => p && (p.canEdit || p.canDelete || p.canManageVolunteers || p.canManageArtists)
       )
       if (filtered.length > 0) {
         await tx.editionCollaboratorPermission.createMany({
@@ -493,6 +500,7 @@ export async function updateCollaboratorRights(params: {
             canEdit: !!p.canEdit,
             canDelete: !!p.canDelete,
             canManageVolunteers: !!p.canManageVolunteers,
+            canManageArtists: !!p.canManageArtists,
           })),
           skipDuplicates: true,
         })

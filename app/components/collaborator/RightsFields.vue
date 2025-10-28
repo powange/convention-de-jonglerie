@@ -62,6 +62,9 @@
                 <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
                   {{ $t('common.volunteers_short') }}
                 </th>
+                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
+                  {{ $t('common.artists') }}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -113,9 +116,21 @@
                     />
                   </div>
                 </td>
+                <td class="px-2 py-1 align-top">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('common.artists')"
+                      :size="switchSize"
+                      color="primary"
+                      :disabled="localValue.rights.manageArtists"
+                      :model-value="hasEditionFlag(ed.id, 'canManageArtists')"
+                      @update:model-value="(val) => toggleEdition(ed.id, 'canManageArtists', val)"
+                    />
+                  </div>
+                </td>
               </tr>
               <tr v-if="!localValue.perEdition.length">
-                <td colspan="4" class="px-2 py-2 italic text-gray-500">
+                <td colspan="5" class="px-2 py-2 italic text-gray-500">
                   {{ $t('components.collaborators_rights_panel.per_edition_hint') }}
                 </td>
               </tr>
@@ -140,6 +155,7 @@ interface PerEditionRight {
   canEdit?: boolean
   canDelete?: boolean
   canManageVolunteers?: boolean
+  canManageArtists?: boolean
 }
 interface ModelValue {
   title: string | null
@@ -172,6 +188,7 @@ const props = withDefaults(
       { key: 'editAllEditions', label: 'permissions.editAllEditions' },
       { key: 'deleteAllEditions', label: 'permissions.deleteAllEditions' },
       { key: 'manageVolunteers', label: 'permissions.manageVolunteers' },
+      { key: 'manageArtists', label: 'permissions.manageArtists' },
     ],
     hideTitle: false,
     size: 'xs',
@@ -269,30 +286,45 @@ function updateRight(key: string, value: any) {
       if (p.canManageVolunteers) p.canManageVolunteers = false
     })
   }
+  // If enabling manageArtists we clean perEdition artist flags
+  if (key === 'manageArtists' && localValue.rights.manageArtists) {
+    localValue.perEdition.forEach((p) => {
+      if (p.canManageArtists) p.canManageArtists = false
+    })
+  }
   // Clean up empty entries
   localValue.perEdition = localValue.perEdition.filter(
-    (p) => p.canEdit || p.canDelete || p.canManageVolunteers
+    (p) => p.canEdit || p.canDelete || p.canManageVolunteers || p.canManageArtists
   )
   if (!syncingFromParent) emit('update:modelValue', JSON.parse(JSON.stringify(localValue)))
 }
-function hasEditionFlag(editionId: number, field: 'canEdit' | 'canDelete' | 'canManageVolunteers') {
+function hasEditionFlag(
+  editionId: number,
+  field: 'canEdit' | 'canDelete' | 'canManageVolunteers' | 'canManageArtists'
+) {
   return !!localValue.perEdition.find((p) => p.editionId === editionId && (p as any)[field])
 }
 function toggleEdition(
   editionId: number,
-  field: 'canEdit' | 'canDelete' | 'canManageVolunteers',
+  field: 'canEdit' | 'canDelete' | 'canManageVolunteers' | 'canManageArtists',
   value: any
 ) {
   const boolVal = !!value
   let entry = localValue.perEdition.find((p) => p.editionId === editionId)
   if (!entry && boolVal) {
-    entry = { editionId, canEdit: false, canDelete: false, canManageVolunteers: false }
+    entry = {
+      editionId,
+      canEdit: false,
+      canDelete: false,
+      canManageVolunteers: false,
+      canManageArtists: false,
+    }
     localValue.perEdition.push(entry)
   }
   if (!entry) return
   ;(entry as any)[field] = boolVal
   // cleaning
-  if (!entry.canEdit && !entry.canDelete && !entry.canManageVolunteers) {
+  if (!entry.canEdit && !entry.canDelete && !entry.canManageVolunteers && !entry.canManageArtists) {
     localValue.perEdition = localValue.perEdition.filter((p) => p !== entry)
   }
   if (!syncingFromParent) emit('update:modelValue', JSON.parse(JSON.stringify(localValue)))
