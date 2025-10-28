@@ -9,12 +9,12 @@
         v-else-if="meals.length === 0"
         class="text-sm text-gray-500 italic p-4 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center"
       >
-        {{ $t('edition.artists.meals.no_meals') }}
+        {{ $t('artists.meals.no_meals') }}
       </div>
 
       <div v-else class="space-y-6">
         <div class="text-sm text-gray-600 dark:text-gray-400">
-          {{ $t('edition.artists.meals.description') }}
+          {{ $t('artists.meals.description') }}
         </div>
 
         <div class="space-y-4">
@@ -49,7 +49,7 @@
                     v-model="meal.afterShow"
                     :disabled="savingMeals"
                     size="xs"
-                    :label="$t('edition.artists.meals.after_show')"
+                    :label="$t('artists.meals.after_show')"
                   />
                 </div>
               </div>
@@ -66,7 +66,7 @@
             class="text-yellow-600 dark:text-yellow-400"
           />
           <span class="text-sm text-yellow-800 dark:text-yellow-200">
-            {{ $t('edition.artists.meals.unsaved_changes') }}
+            {{ $t('artists.meals.unsaved_changes') }}
           </span>
         </div>
       </div>
@@ -112,7 +112,7 @@ const isOpen = computed({
 
 const title = computed(() => {
   if (!props.artist) return ''
-  return t('edition.artists.meals.title', {
+  return t('artists.meals.title', {
     name: `${props.artist.user.prenom} ${props.artist.user.nom}`,
   })
 })
@@ -191,7 +191,7 @@ const fetchMeals = async () => {
     console.error('Failed to fetch meals:', error)
     toast.add({
       title: t('common.error'),
-      description: error?.data?.message || t('edition.artists.meals.error_loading'),
+      description: error?.data?.message || t('artists.meals.error_loading'),
       color: 'error',
     })
   } finally {
@@ -226,7 +226,7 @@ const saveMealSelections = async () => {
 
       toast.add({
         title: t('common.saved'),
-        description: t('edition.artists.meals.saved_success'),
+        description: t('artists.meals.saved_success'),
         color: 'success',
         icon: 'i-heroicons-check-circle',
       })
@@ -237,7 +237,7 @@ const saveMealSelections = async () => {
     console.error('Failed to save meal selections:', error)
     toast.add({
       title: t('common.error'),
-      description: error?.data?.message || t('edition.artists.meals.error_saving'),
+      description: error?.data?.message || t('artists.meals.error_saving'),
       color: 'error',
     })
   } finally {
@@ -247,7 +247,7 @@ const saveMealSelections = async () => {
 
 const closeModal = () => {
   if (hasUnsavedMealChanges.value) {
-    const confirmed = confirm(t('edition.artists.meals.confirm_close_unsaved'))
+    const confirmed = confirm(t('artists.meals.confirm_close_unsaved'))
     if (!confirmed) return
   }
   isOpen.value = false

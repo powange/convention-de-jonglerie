@@ -23,10 +23,10 @@
       <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <UIcon name="i-heroicons-star" class="text-yellow-600 dark:text-yellow-400" />
-          {{ $t('edition.artists.list_title') }}
+          {{ $t('artists.list_title') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('edition.artists.manage_artists_description') }}
+          {{ $t('artists.manage_artists_description') }}
         </p>
       </div>
 
@@ -34,14 +34,14 @@
       <UCard>
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold">{{ $t('edition.artists.title') }}</h2>
+            <h2 class="text-lg font-semibold">{{ $t('artists.title') }}</h2>
             <UButton
               v-if="canEdit"
               color="primary"
               icon="i-heroicons-plus"
               @click="openAddArtistModal"
             >
-              {{ $t('edition.artists.add_artist') }}
+              {{ $t('artists.add_artist') }}
             </UButton>
           </div>
         </template>
@@ -60,7 +60,7 @@
 
         <div v-else-if="artists.length === 0" class="text-center py-8">
           <UIcon name="i-heroicons-user-group" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <p class="text-gray-500">{{ $t('edition.artists.no_artists') }}</p>
+          <p class="text-gray-500">{{ $t('artists.no_artists') }}</p>
         </div>
 
         <div v-else class="overflow-x-auto">
@@ -85,43 +85,43 @@
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('edition.artists.arrival') }}
+                  {{ $t('artists.arrival') }}
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('edition.artists.departure') }}
+                  {{ $t('artists.departure') }}
                 </th>
                 <th
                   class="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('edition.artists.meals.title') }}
+                  {{ $t('artists.meals.title') }}
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('edition.artists.shows') }}
+                  {{ $t('artists.shows') }}
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('edition.artists.payment_amount') }}
+                  {{ $t('artists.payment_amount') }}
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('edition.artists.reimbursement_max_actual') }}
+                  {{ $t('artists.reimbursement_max_actual') }}
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('edition.artists.accommodation') }}
+                  {{ $t('artists.accommodation') }}
                 </th>
                 <th
                   v-if="canEdit"
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[300px]"
                 >
-                  {{ $t('edition.artists.organizer_notes') }}
+                  {{ $t('artists.organizer_notes') }}
                 </th>
                 <th
                   v-if="canEdit"
@@ -226,7 +226,7 @@
                   <div v-if="artist.accommodationAutonomous" class="flex items-center gap-2">
                     <UIcon name="i-heroicons-check-circle" class="h-5 w-5 text-success-500" />
                     <span class="text-sm text-gray-700 dark:text-gray-300">
-                      {{ $t('edition.artists.accommodation_autonomous_yes') }}
+                      {{ $t('artists.accommodation_autonomous_yes') }}
                     </span>
                   </div>
                   <button
@@ -243,7 +243,7 @@
                   <div v-else class="flex items-center gap-2">
                     <UIcon name="i-heroicons-question-mark-circle" class="h-5 w-5 text-gray-400" />
                     <span class="text-sm text-gray-400">
-                      {{ $t('edition.artists.accommodation_not_specified') }}
+                      {{ $t('artists.accommodation_not_specified') }}
                     </span>
                   </div>
                 </td>
@@ -267,7 +267,7 @@
                     @click="openNotesModal(artist)"
                   >
                     <p class="text-gray-400 italic text-xs">
-                      {{ $t('edition.artists.no_notes') }}
+                      {{ $t('artists.no_notes') }}
                     </p>
                     <div class="flex items-center gap-1 text-xs text-primary-500 mt-1">
                       <span>{{ $t('common.add') }}</span>
@@ -337,8 +337,8 @@
     <!-- Modal confirmation suppression -->
     <UiConfirmModal
       v-model="showDeleteConfirm"
-      :title="$t('edition.artists.delete_artist')"
-      :message="$t('edition.artists.delete_confirm')"
+      :title="$t('artists.delete_artist')"
+      :message="$t('artists.delete_confirm')"
       confirm-color="error"
       @confirm="deleteArtist"
     />
@@ -442,14 +442,14 @@ const deleteArtist = async () => {
       method: 'DELETE',
     })
     toast.add({
-      title: t('edition.artists.artist_deleted'),
+      title: t('artists.artist_deleted'),
       color: 'success',
     })
     await fetchArtists()
   } catch (error) {
     console.error('Error deleting artist:', error)
     toast.add({
-      title: t('edition.artists.error_delete'),
+      title: t('artists.error_delete'),
       color: 'error',
     })
   } finally {
@@ -468,7 +468,7 @@ const handleMealsSaved = () => {
   // Rafraîchir les artistes pour obtenir les repas mis à jour
   fetchArtists()
   toast.add({
-    title: t('edition.artists.meals.meals_updated'),
+    title: t('artists.meals.meals_updated'),
     color: 'success',
   })
 }

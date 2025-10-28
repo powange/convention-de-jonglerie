@@ -41,6 +41,8 @@ export const SPLIT_CONFIG = {
   notifications: ['notifications', 'push_notifications'],
   ticketing: ['ticketing'],
   workshops: ['workshops'],
+  artists: ['artists'],
+  gestion: ['gestion'],
   app: ['app', 'pwa', 'services'],
 }
 

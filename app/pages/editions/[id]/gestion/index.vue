@@ -32,7 +32,7 @@
                 color="warning"
                 :to="`/editions/${edition.id}/edit`"
               >
-                {{ $t('pages.management.edit_edition') }}
+                {{ $t('gestion.edit_edition') }}
               </UButton>
               <UButton
                 v-if="canEdit && edition.isOnline"
@@ -58,7 +58,7 @@
                 variant="soft"
                 @click="deleteEdition(edition.id)"
               >
-                {{ $t('pages.management.delete_edition') }}
+                {{ $t('gestion.delete_edition') }}
               </UButton>
             </div>
           </div>
@@ -136,10 +136,10 @@
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="font-medium text-gray-900 dark:text-white">
-                    {{ $t('editions.volunteers.management_mode') }}
+                    {{ $t('gestion.volunteers.management_mode') }}
                   </h3>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
-                    Choisissez comment gérer les bénévoles pour cette édition
+                    {{ $t('gestion.volunteers.management_mode_description') }}
                   </p>
                 </div>
                 <UBadge
@@ -147,7 +147,11 @@
                   variant="soft"
                   size="sm"
                 >
-                  {{ volunteersModeLocal === 'INTERNAL' ? 'Interne' : 'Externe' }}
+                  {{
+                    volunteersModeLocal === 'INTERNAL'
+                      ? $t('gestion.volunteers.mode_internal_badge')
+                      : $t('gestion.volunteers.mode_external_badge')
+                  }}
                 </UBadge>
               </div>
 
@@ -165,12 +169,12 @@
               <!-- Lien externe pour mode externe -->
               <div v-if="volunteersModeLocal === 'EXTERNAL'" class="pt-2">
                 <UFormField
-                  :label="$t('editions.volunteers.external_link')"
+                  :label="$t('gestion.volunteers.external_link')"
                   :error="fieldErrors.externalUrl"
                 >
                   <UInput
                     v-model="volunteersExternalUrlLocal"
-                    :placeholder="$t('editions.volunteers.external_url_placeholder')"
+                    :placeholder="$t('gestion.volunteers.external_url_placeholder')"
                     :disabled="!(canEdit || canManageVolunteers)"
                     class="w-full"
                     @blur="(canEdit || canManageVolunteers) && persistVolunteerSettings()"
@@ -180,7 +184,7 @@
                   />
                 </UFormField>
                 <p class="text-xs text-gray-500 mt-1">
-                  Lien vers votre formulaire ou outil externe de gestion des bénévoles
+                  {{ $t('gestion.volunteers.external_url_description') }}
                 </p>
               </div>
             </div>
@@ -193,10 +197,10 @@
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="font-medium text-gray-900 dark:text-white">
-                    Ouverture des candidatures
+                    {{ $t('gestion.volunteers.applications_open') }}
                   </h3>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
-                    Activez ou désactivez les candidatures de bénévoles
+                    {{ $t('gestion.volunteers.applications_open_description') }}
                   </p>
                 </div>
                 <div class="flex items-center gap-2">
@@ -262,7 +266,7 @@
                   :to="`/editions/${edition.id}/gestion/volunteers/applications`"
                   icon="i-heroicons-document-text"
                   :title="$t('editions.volunteers.application_management')"
-                  description="Consulter et traiter les candidatures"
+                  :description="$t('gestion.volunteers.applications_description')"
                   color="green"
                 />
 
@@ -272,7 +276,7 @@
                   :to="`/editions/${edition.id}/gestion/volunteers/teams`"
                   icon="i-heroicons-user-group"
                   :title="$t('editions.volunteers.teams')"
-                  description="Organiser les équipes de bénévoles"
+                  :description="$t('gestion.volunteers.teams_description')"
                   color="purple"
                 />
 
@@ -282,7 +286,7 @@
                   :to="`/editions/${edition.id}/gestion/volunteers/planning`"
                   icon="i-heroicons-calendar-days"
                   :title="$t('editions.volunteers.planning')"
-                  description="Planifier les créneaux et missions"
+                  :description="$t('gestion.volunteers.planning_description')"
                   color="orange"
                 />
 
@@ -292,7 +296,7 @@
                   :to="`/editions/${edition.id}/gestion/volunteers/notifications`"
                   icon="i-heroicons-bell"
                   :title="$t('editions.volunteers.volunteer_notifications')"
-                  description="Envoyer des notifications aux bénévoles"
+                  :description="$t('gestion.volunteers.notifications_description')"
                   color="yellow"
                 />
 
@@ -302,7 +306,7 @@
                   :to="`/editions/${edition.id}/gestion/volunteers/tools`"
                   icon="i-heroicons-wrench-screwdriver"
                   :title="$t('editions.volunteers.management_tools')"
-                  description="Outils avancés et génération de documents"
+                  :description="$t('gestion.volunteers.tools_description')"
                   color="gray"
                 />
               </template>
@@ -315,7 +319,7 @@
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-cake" class="text-orange-500" />
-              <h2 class="text-lg font-semibold">Repas</h2>
+              <h2 class="text-lg font-semibold">{{ $t('gestion.meals.title') }}</h2>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -323,8 +327,8 @@
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/meals`"
                 icon="i-heroicons-cake"
-                title="Configuration des repas"
-                description="Gérer les repas pour bénévoles et artistes"
+                :title="$t('gestion.meals.configuration_title')"
+                :description="$t('gestion.meals.configuration_description')"
                 color="orange"
               />
 
@@ -332,8 +336,8 @@
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/meals/list`"
                 icon="i-heroicons-list-bullet"
-                title="Liste des repas"
-                description="Consulter la liste de tous les participants aux repas"
+                :title="$t('gestion.meals.list_title')"
+                :description="$t('gestion.meals.list_description')"
                 color="purple"
               />
             </div>
@@ -345,7 +349,7 @@
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-ticket" class="text-blue-500" />
-              <h2 class="text-lg font-semibold">Billeterie</h2>
+              <h2 class="text-lg font-semibold">{{ $t('gestion.ticketing.title') }}</h2>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -353,8 +357,8 @@
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/ticketing/external`"
                 icon="i-heroicons-link"
-                title="Lier une billeterie externe"
-                description="Connecter HelloAsso ou autre plateforme"
+                :title="$t('gestion.ticketing.external_link_title')"
+                :description="$t('gestion.ticketing.external_link_description')"
                 color="purple"
               />
 
@@ -362,8 +366,8 @@
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/ticketing/tiers`"
                 icon="i-heroicons-currency-euro"
-                title="Tarifs, options & quotas"
-                description="Gérer les tarifs, options, quotas et articles à restituer"
+                :title="$t('gestion.ticketing.tiers_title')"
+                :description="$t('gestion.ticketing.tiers_description')"
                 color="orange"
               />
 
@@ -371,8 +375,8 @@
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/ticketing/orders`"
                 icon="i-heroicons-shopping-cart"
-                title="Commandes"
-                description="Consulter les commandes et participants"
+                :title="$t('gestion.ticketing.orders_title')"
+                :description="$t('gestion.ticketing.orders_description')"
                 color="green"
               />
 
@@ -380,8 +384,8 @@
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/ticketing/access-control`"
                 icon="i-heroicons-shield-check"
-                title="Contrôle d'accès"
-                description="Scanner et valider les billets à l'entrée"
+                :title="$t('gestion.ticketing.access_control_title')"
+                :description="$t('gestion.ticketing.access_control_description')"
                 color="blue"
               />
             </div>
@@ -393,7 +397,7 @@
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-star" class="text-yellow-500" />
-              <h2 class="text-lg font-semibold">{{ $t('edition.artists.title') }}</h2>
+              <h2 class="text-lg font-semibold">{{ $t('gestion.artists.title') }}</h2>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -401,10 +405,10 @@
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/artists`"
                 icon="i-heroicons-users"
-                :title="$t('edition.artists.list_title')"
+                :title="$t('gestion.artists.list_title')"
                 :description="
                   $t(
-                    'edition.artists.manage_artists_description',
+                    'gestion.artists.manage_artists_description',
                     'Gérer les artistes et leurs informations'
                   )
                 "
@@ -431,7 +435,7 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-academic-cap" class="text-green-500" />
-                <h2 class="text-lg font-semibold">Workshops</h2>
+                <h2 class="text-lg font-semibold">{{ $t('gestion.workshops.title') }}</h2>
               </div>
               <div class="flex items-center gap-2">
                 <UButton
@@ -459,7 +463,9 @@
               class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
             >
               <div>
-                <h3 class="font-medium text-gray-900 dark:text-white">Activer les workshops</h3>
+                <h3 class="font-medium text-gray-900 dark:text-white">
+                  {{ $t('gestion.workshops.enable_workshops') }}
+                </h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   Permettre aux participants et bénévoles de créer des workshops
                 </p>
@@ -474,8 +480,8 @@
 
             <div v-if="workshopsEnabledLocal">
               <UAlert
-                title="Les workshops sont activés"
-                description="Les participants et bénévoles peuvent maintenant créer des workshops pour cette édition"
+                :title="$t('gestion.workshops.workshops_enabled_notice')"
+                :description="$t('gestion.workshops.workshops_enabled_description')"
                 icon="i-heroicons-academic-cap"
                 color="success"
                 variant="subtle"
@@ -599,8 +605,8 @@
 
             <div v-else>
               <UAlert
-                :title="t('pages.management.manage_lost_found')"
-                :description="t('pages.management.lost_found_active_description')"
+                :title="t('gestion.manage_lost_found')"
+                :description="t('gestion.lost_found_active_description')"
                 icon="i-heroicons-magnifying-glass"
                 color="info"
                 variant="subtle"
@@ -766,8 +772,8 @@ const volunteersUpdatedAt = ref<Date | null>(null)
 const volunteersInitialized = ref(false)
 // Nuxt UI URadioGroup utilise la prop `items` (pas `options`)
 const volunteerModeItems = computed(() => [
-  { value: 'INTERNAL', label: t('editions.volunteers.mode_internal') || 'Interne' },
-  { value: 'EXTERNAL', label: t('editions.volunteers.mode_external') || 'Externe' },
+  { value: 'INTERNAL', label: t('gestion.volunteers.mode_internal') || 'Interne' },
+  { value: 'EXTERNAL', label: t('gestion.volunteers.mode_external') || 'Externe' },
 ])
 
 // Watchers pour effacer les erreurs quand les champs sont modifiés
@@ -1338,7 +1344,7 @@ const hasEditionStarted = computed(() => {
 })
 
 const deleteEdition = async (id: number) => {
-  if (confirm(t('pages.access_denied.confirm_delete_edition'))) {
+  if (confirm(t('gestion.confirm_delete_edition'))) {
     try {
       await editionStore.deleteEdition(id)
       toast.add({

@@ -4,13 +4,13 @@
       <form class="space-y-4" @submit.prevent="handleSubmit">
         <!-- Sélection utilisateur existant OU création nouveau (mode ajout) -->
         <div v-if="!artist" class="space-y-4">
-          <UFormField :label="$t('edition.artists.search_user')">
+          <UFormField :label="$t('artists.search_user')">
             <UserSelector
               v-model="selectedUser"
               v-model:search-term="searchTerm"
               :searched-users="searchedUsers"
               :searching-users="searchingUsers"
-              :placeholder="$t('edition.artists.select_user')"
+              :placeholder="$t('artists.select_user')"
               @update:model-value="handleUserSelection"
             />
           </UFormField>
@@ -21,32 +21,32 @@
             </div>
             <div class="relative flex justify-center text-sm">
               <span class="px-2 bg-white dark:bg-gray-900 text-gray-500">
-                {{ $t('edition.artists.or_create_new') }}
+                {{ $t('artists.or_create_new') }}
               </span>
             </div>
           </div>
 
-          <UFormField :label="$t('edition.artists.user_email')">
+          <UFormField :label="$t('artists.user_email')">
             <UInput
               v-model="formData.email"
               type="email"
-              :placeholder="$t('edition.artists.user_email')"
+              :placeholder="$t('artists.user_email')"
               :disabled="!!selectedUser"
             />
           </UFormField>
 
-          <UFormField :label="$t('edition.artists.user_firstname')">
+          <UFormField :label="$t('artists.user_firstname')">
             <UInput
               v-model="formData.prenom"
-              :placeholder="$t('edition.artists.user_firstname')"
+              :placeholder="$t('artists.user_firstname')"
               :disabled="!!selectedUser"
             />
           </UFormField>
 
-          <UFormField :label="$t('edition.artists.user_lastname')">
+          <UFormField :label="$t('artists.user_lastname')">
             <UInput
               v-model="formData.nom"
-              :placeholder="$t('edition.artists.user_lastname')"
+              :placeholder="$t('artists.user_lastname')"
               :disabled="!!selectedUser"
             />
           </UFormField>
@@ -55,30 +55,30 @@
         <!-- Informations utilisateur (mode édition) -->
         <div v-else class="space-y-4 pb-4 border-b border-gray-200 dark:border-gray-700">
           <h3 class="text-sm font-medium text-gray-900 dark:text-white">
-            {{ $t('edition.artists.user_info') }}
+            {{ $t('artists.user_info') }}
           </h3>
 
-          <UFormField :label="$t('edition.artists.user_email')">
+          <UFormField :label="$t('artists.user_email')">
             <UInput
               v-model="formData.email"
               type="email"
-              :placeholder="$t('edition.artists.user_email')"
+              :placeholder="$t('artists.user_email')"
               :disabled="!isManualUser"
             />
           </UFormField>
 
-          <UFormField :label="$t('edition.artists.user_firstname')">
+          <UFormField :label="$t('artists.user_firstname')">
             <UInput
               v-model="formData.prenom"
-              :placeholder="$t('edition.artists.user_firstname')"
+              :placeholder="$t('artists.user_firstname')"
               :disabled="!isManualUser"
             />
           </UFormField>
 
-          <UFormField :label="$t('edition.artists.user_lastname')">
+          <UFormField :label="$t('artists.user_lastname')">
             <UInput
               v-model="formData.nom"
-              :placeholder="$t('edition.artists.user_lastname')"
+              :placeholder="$t('artists.user_lastname')"
               :disabled="!isManualUser"
             />
           </UFormField>
@@ -93,40 +93,36 @@
           </UFormField>
 
           <div v-if="!isManualUser" class="text-xs text-gray-500 dark:text-gray-400">
-            {{ $t('edition.artists.user_info_readonly') }}
+            {{ $t('artists.user_info_readonly') }}
           </div>
         </div>
 
         <!-- Informations artiste -->
-        <UFormField :label="$t('edition.artists.arrival')">
+        <UFormField :label="$t('artists.arrival')">
           <UInput
             v-model="formData.arrivalDateTime"
             type="datetime-local"
-            :placeholder="$t('edition.artists.arrival')"
+            :placeholder="$t('artists.arrival')"
           />
         </UFormField>
 
-        <UFormField :label="$t('edition.artists.departure')">
+        <UFormField :label="$t('artists.departure')">
           <UInput
             v-model="formData.departureDateTime"
             type="datetime-local"
-            :placeholder="$t('edition.artists.departure')"
+            :placeholder="$t('artists.departure')"
           />
         </UFormField>
 
-        <UFormField :label="$t('edition.artists.dietary_preference')">
+        <UFormField :label="$t('artists.dietary_preference')">
           <USelect v-model="formData.dietaryPreference" :items="dietaryOptions" value-key="value" />
         </UFormField>
 
-        <UFormField :label="$t('edition.artists.allergies')">
-          <UTextarea
-            v-model="formData.allergies"
-            :placeholder="$t('edition.artists.allergies')"
-            rows="3"
-          />
+        <UFormField :label="$t('artists.allergies')">
+          <UTextarea v-model="formData.allergies" :placeholder="$t('artists.allergies')" rows="3" />
         </UFormField>
 
-        <UFormField v-if="formData.allergies" :label="$t('edition.artists.allergy_severity')">
+        <UFormField v-if="formData.allergies" :label="$t('artists.allergy_severity')">
           <USelect
             v-model="formData.allergySeverity"
             :items="allergySeverityOptions"
@@ -137,17 +133,17 @@
         <!-- Paiement et défraiement -->
         <div class="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           <h3 class="text-sm font-medium text-gray-900 dark:text-white">
-            {{ $t('edition.artists.payment_section') }}
+            {{ $t('artists.payment_section') }}
           </h3>
 
           <div class="grid grid-cols-2 gap-4">
-            <UFormField :label="$t('edition.artists.payment_amount')">
+            <UFormField :label="$t('artists.payment_amount')">
               <UInput
                 v-model="formData.payment"
                 type="number"
                 step="0.01"
                 min="0"
-                :placeholder="$t('edition.artists.payment_amount_placeholder')"
+                :placeholder="$t('artists.payment_amount_placeholder')"
               >
                 <template #trailing>
                   <span class="text-gray-500 dark:text-gray-400 text-sm">€</span>
@@ -155,22 +151,19 @@
               </UInput>
             </UFormField>
 
-            <UFormField :label="$t('edition.artists.payment_status')">
-              <UCheckbox
-                v-model="formData.paymentPaid"
-                :label="$t('edition.artists.payment_paid')"
-              />
+            <UFormField :label="$t('artists.payment_status')">
+              <UCheckbox v-model="formData.paymentPaid" :label="$t('artists.payment_paid')" />
             </UFormField>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
-            <UFormField :label="$t('edition.artists.reimbursement_max')">
+            <UFormField :label="$t('artists.reimbursement_max')">
               <UInput
                 v-model="formData.reimbursementMax"
                 type="number"
                 step="0.01"
                 min="0"
-                :placeholder="$t('edition.artists.reimbursement_max_placeholder')"
+                :placeholder="$t('artists.reimbursement_max_placeholder')"
               >
                 <template #trailing>
                   <span class="text-gray-500 dark:text-gray-400 text-sm">€</span>
@@ -178,13 +171,13 @@
               </UInput>
             </UFormField>
 
-            <UFormField :label="$t('edition.artists.reimbursement_actual')">
+            <UFormField :label="$t('artists.reimbursement_actual')">
               <UInput
                 v-model="formData.reimbursementActual"
                 type="number"
                 step="0.01"
                 min="0"
-                :placeholder="$t('edition.artists.reimbursement_actual_placeholder')"
+                :placeholder="$t('artists.reimbursement_actual_placeholder')"
               >
                 <template #trailing>
                   <span class="text-gray-500 dark:text-gray-400 text-sm">€</span>
@@ -195,31 +188,31 @@
 
           <div v-if="formData.reimbursementActual" class="grid grid-cols-2 gap-4">
             <div></div>
-            <UFormField :label="$t('edition.artists.reimbursement_status')">
+            <UFormField :label="$t('artists.reimbursement_status')">
               <UCheckbox
                 v-model="formData.reimbursementActualPaid"
-                :label="$t('edition.artists.reimbursement_paid')"
+                :label="$t('artists.reimbursement_paid')"
               />
             </UFormField>
           </div>
 
           <!-- Hébergement -->
           <h3 class="text-lg font-semibold mb-3">
-            {{ $t('edition.artists.accommodation_section') }}
+            {{ $t('artists.accommodation_section') }}
           </h3>
 
-          <UFormField :label="$t('edition.artists.accommodation_autonomous')">
+          <UFormField :label="$t('artists.accommodation_autonomous')">
             <UCheckbox
               v-model="formData.accommodationAutonomous"
-              :label="$t('edition.artists.accommodation_autonomous_label')"
+              :label="$t('artists.accommodation_autonomous_label')"
             />
           </UFormField>
 
           <div v-if="!formData.accommodationAutonomous">
-            <UFormField :label="$t('edition.artists.accommodation_proposal')">
+            <UFormField :label="$t('artists.accommodation_proposal')">
               <UTextarea
                 v-model="formData.accommodationProposal"
-                :placeholder="$t('edition.artists.accommodation_proposal_placeholder')"
+                :placeholder="$t('artists.accommodation_proposal_placeholder')"
                 :rows="3"
               />
             </UFormField>
@@ -263,9 +256,7 @@ const isOpen = computed({
   set: (value) => emit('update:modelValue', value),
 })
 
-const title = computed(() =>
-  props.artist ? t('edition.artists.edit_artist') : t('edition.artists.add_artist')
-)
+const title = computed(() => (props.artist ? t('artists.edit_artist') : t('artists.add_artist')))
 
 const selectedUser = ref<any>(null)
 const searchTerm = ref('')
@@ -391,7 +382,7 @@ const handleSubmit = async () => {
         method: 'PUT',
         body: payload,
       })
-      toast.add({ title: t('edition.artists.artist_updated'), color: 'success' })
+      toast.add({ title: t('artists.artist_updated'), color: 'success' })
     } else {
       // Mode ajout
       if (selectedUser.value) {
@@ -406,7 +397,7 @@ const handleSubmit = async () => {
         method: 'POST',
         body: payload,
       })
-      toast.add({ title: t('edition.artists.artist_added'), color: 'success' })
+      toast.add({ title: t('artists.artist_added'), color: 'success' })
     }
 
     emit('artist-saved')
@@ -414,7 +405,7 @@ const handleSubmit = async () => {
   } catch (error: any) {
     console.error('Error saving artist:', error)
     toast.add({
-      title: props.artist ? t('edition.artists.error_update') : t('edition.artists.error_add'),
+      title: props.artist ? t('artists.error_update') : t('artists.error_add'),
       color: 'error',
     })
   } finally {

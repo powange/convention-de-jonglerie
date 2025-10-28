@@ -11,10 +11,10 @@
           </div>
           <div>
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ $t('edition.artists.my_artist_pass', 'Pass Artiste') }}
+              {{ $t('artists.my_artist_pass', 'Pass Artiste') }}
             </h2>
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ $t('edition.artists.artist_access', 'Accès réservé aux artistes') }}
+              {{ $t('artists.artist_access', 'Accès réservé aux artistes') }}
             </p>
           </div>
         </div>
@@ -109,10 +109,7 @@
   </UCard>
 
   <!-- Modal QR Code -->
-  <UModal
-    v-model:open="qrModalOpen"
-    :title="$t('edition.artists.artist_qr_code', 'QR Code Artiste')"
-  >
+  <UModal v-model:open="qrModalOpen" :title="$t('artists.artist_qr_code', 'QR Code Artiste')">
     <template #body>
       <div v-if="artist" class="space-y-4">
         <!-- Instructions -->
@@ -126,14 +123,12 @@
             />
             <div class="text-sm text-yellow-700 dark:text-yellow-300">
               <p class="font-medium mb-1">
-                {{
-                  $t('edition.artists.qr_code_instructions_title', 'Comment utiliser ce QR code')
-                }}
+                {{ $t('artists.qr_code_instructions_title', 'Comment utiliser ce QR code') }}
               </p>
               <p>
                 {{
                   $t(
-                    'edition.artists.qr_code_instructions',
+                    'artists.qr_code_instructions',
                     "Présentez ce QR code au contrôle d'accès pour valider votre entrée en tant qu'artiste."
                   )
                 }}
@@ -153,7 +148,7 @@
         <!-- Informations de l'artiste -->
         <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
           <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-            {{ $t('edition.artists.details', 'Détails') }}
+            {{ $t('artists.details', 'Détails') }}
           </h4>
           <div class="space-y-2 text-sm">
             <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">

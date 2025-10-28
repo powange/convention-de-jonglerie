@@ -1,15 +1,15 @@
 <template>
   <UModal
     v-model:open="isOpen"
-    :title="$t('edition.artists.organizer_notes')"
-    :description="$t('edition.artists.notes_for_artist', { name: artistName })"
+    :title="$t('artists.organizer_notes')"
+    :description="$t('artists.notes_for_artist', { name: artistName })"
     :ui="{ footer: 'justify-end' }"
   >
     <template #body>
-      <UFormField :label="$t('edition.artists.notes_label')">
+      <UFormField :label="$t('artists.notes_label')">
         <UTextarea
           v-model="localNotes"
-          :placeholder="$t('edition.artists.notes_placeholder')"
+          :placeholder="$t('artists.notes_placeholder')"
           :rows="8"
           class="w-full"
           autofocus
@@ -75,7 +75,7 @@ const saveNotes = async () => {
     })
 
     toast.add({
-      title: t('edition.artists.notes_saved'),
+      title: t('artists.notes_saved'),
       color: 'success',
     })
 
@@ -84,7 +84,7 @@ const saveNotes = async () => {
   } catch (error) {
     console.error('Error saving notes:', error)
     toast.add({
-      title: t('edition.artists.error_save_notes'),
+      title: t('artists.error_save_notes'),
       color: 'error',
     })
   } finally {

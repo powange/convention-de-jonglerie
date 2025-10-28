@@ -1,0 +1,59 @@
+{
+  "gestion": {
+    "edit_edition": "[TODO]",
+    "delete_edition": "[TODO]",
+    "confirm_delete_edition": "[TODO]",
+    "manage_lost_found": "[TODO]",
+    "lost_found_active_description": "[TODO]",
+    "volunteers": {
+      "management_mode": "[TODO]",
+      "management_mode_description": "[TODO]",
+      "mode_internal": "[TODO]",
+      "mode_external": "[TODO]",
+      "external_link": "[TODO]",
+      "external_url_placeholder": "[TODO]",
+      "external_url_description": "[TODO]",
+      "applications_open": "[TODO]",
+      "applications_open_description": "[TODO]",
+      "workshops_enabled": "[TODO]",
+      "workshops_enabled_description": "[TODO]",
+      "workshops_active_message": "[TODO]",
+      "workshops_active_description": "[TODO]"
+    },
+    "meals": {
+      "title": "[TODO]",
+      "configuration_title": "[TODO]",
+      "configuration_description": "[TODO]",
+      "list_title": "[TODO]",
+      "list_description": "[TODO]"
+    },
+    "ticketing": {
+      "title": "[TODO]",
+      "external_link_title": "[TODO]",
+      "external_link_description": "[TODO]",
+      "tiers_title": "[TODO]",
+      "tiers_description": "[TODO]",
+      "orders_title": "[TODO]",
+      "orders_description": "[TODO]",
+      "access_control_title": "[TODO]",
+      "access_control_description": "[TODO]"
+    },
+    "artists": {
+      "title": "[TODO]",
+      "shows_title": "[TODO]",
+      "shows_description": "[TODO]"
+    },
+    "workshops": {
+      "title": "[TODO]",
+      "locations_management": "[TODO]",
+      "location_mode_label": "[TODO]",
+      "location_mode_free_description": "[TODO]",
+      "location_mode_exclusive_description": "[TODO]",
+      "no_locations_yet": "[TODO]",
+      "add_location_placeholder": "[TODO]",
+      "organize_teams": "[TODO]",
+      "plan_shifts": "[TODO]",
+      "advanced_tools": "[TODO]"
+    }
+  }
+}
