@@ -94,6 +94,14 @@ export default defineEventHandler(async (event) => {
     // Récupérer la configuration
     const config = useRuntimeConfig()
 
+    console.log('[DEBUG] RuntimeConfig AI settings:')
+    console.log('  aiProvider:', config.aiProvider)
+    console.log('  lmstudioBaseUrl:', config.lmstudioBaseUrl)
+    console.log('  lmstudioModel:', config.lmstudioModel)
+    console.log('  process.env.AI_PROVIDER:', process.env.AI_PROVIDER)
+    console.log('  process.env.LMSTUDIO_BASE_URL:', process.env.LMSTUDIO_BASE_URL)
+    console.log('  process.env.LMSTUDIO_MODEL:', process.env.LMSTUDIO_MODEL)
+
     // Créer le provider IA approprié selon la configuration
     const aiProvider = createAIProvider({
       provider: (config.aiProvider as 'anthropic' | 'ollama' | 'lmstudio') || 'anthropic',
