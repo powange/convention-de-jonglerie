@@ -383,8 +383,11 @@ const extractWorkshops = async () => {
     )
 
     // Marquer tous les workshops comme sélectionnés par défaut
+    // Convertir les dates ISO en format datetime-local (YYYY-MM-DDTHH:mm)
     extractedWorkshops.value = response.workshops.map((w) => ({
       ...w,
+      startDateTime: w.startDateTime ? new Date(w.startDateTime).toISOString().slice(0, 16) : '',
+      endDateTime: w.endDateTime ? new Date(w.endDateTime).toISOString().slice(0, 16) : '',
       selected: true,
     }))
 

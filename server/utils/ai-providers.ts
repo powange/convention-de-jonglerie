@@ -191,8 +191,48 @@ export class LMStudioProvider implements AIProvider {
     imageType: string,
     prompt: string
   ): Promise<AIVisionResponse> {
+    console.log('[LM Studio] === Début de l\'extraction de workshops ===')
+
     try {
+      const requestPayload = {
+        model: this.model,
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: prompt,
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: `data:image/${imageType};base64,${imageBase64.substring(0, 50)}...`, // Tronqué pour les logs
+                },
+              },
+            ],
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 4096,
+        stream: false,
+      }
+
+      console.log('[LM Studio] Requête envoyée:')
+      console.log('  URL:', `${this.baseUrl}/v1/chat/completions`)
+      console.log('  Model:', this.model)
+      console.log('  Prompt length:', prompt.length, 'caractères')
+      console.log('  Image type:', imageType)
+      console.log('  Image size:', imageBase64.length, 'caractères base64')
+      console.log('  Temperature:', requestPayload.temperature)
+      console.log('  Max tokens:', requestPayload.max_tokens)
+      console.log('\n[LM Studio] Prompt complet:')
+      console.log('--- DÉBUT DU PROMPT ---')
+      console.log(prompt)
+      console.log('--- FIN DU PROMPT ---\n')
+
       // LM Studio utilise l'API compatible OpenAI
+      const startTime = Date.now()
       const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
         method: 'POST',
         headers: {
@@ -222,24 +262,51 @@ export class LMStudioProvider implements AIProvider {
           stream: false,
         }),
       })
+      const responseTime = Date.now() - startTime
+
+      console.log('[LM Studio] Réponse reçue:')
+      console.log('  Status:', response.status, response.statusText)
+      console.log('  Response time:', responseTime, 'ms')
 
       if (!response.ok) {
         const errorData = await response.text()
+        console.error('[LM Studio] Erreur API:', errorData)
         throw new Error(`LM Studio API error: ${response.statusText} - ${errorData}`)
       }
 
       const data = await response.json()
+      console.log('[LM Studio] Données brutes:')
+      console.log('  Choices:', data.choices?.length || 0)
+      console.log('  Model:', data.model)
+      console.log('  Usage:', data.usage)
+
       const responseText = data.choices[0]?.message?.content || ''
+      console.log('[LM Studio] Contenu de la réponse:')
+      console.log('  Length:', responseText.length, 'caractères')
+      console.log('  Preview:', responseText)
 
       // Parser la réponse JSON
       const jsonMatch = responseText.match(/\{[\s\S]*\}/)
       if (!jsonMatch) {
+        console.error('[LM Studio] Pas de JSON trouvé dans la réponse complète:', responseText)
         throw new Error('Pas de JSON trouvé dans la réponse')
       }
 
-      return JSON.parse(jsonMatch[0])
+      const parsedData = JSON.parse(jsonMatch[0])
+      console.log('[LM Studio] JSON parsé avec succès:')
+      console.log('  Workshops trouvés:', parsedData.workshops?.length || 0)
+      console.log('[LM Studio] Détails des workshops:')
+      console.log(JSON.stringify(parsedData.workshops, null, 2))
+
+      return parsedData
     } catch (error: any) {
+      console.error('[LM Studio] Erreur lors de l\'extraction:')
+      console.error('  Error code:', error.code)
+      console.error('  Error message:', error.message)
+      console.error('  Error stack:', error.stack)
+
       if (error.code === 'ECONNREFUSED' || error.message?.includes('fetch failed')) {
+        console.error('[LM Studio] Service non accessible. Vérifiez que LM Studio est démarré.')
         throw createError({
           statusCode: 503,
           message:
@@ -248,12 +315,14 @@ export class LMStudioProvider implements AIProvider {
       }
 
       if (error.message?.includes('API error')) {
+        console.error('[LM Studio] Erreur API:', error.message)
         throw createError({
           statusCode: 503,
           message: `Erreur LM Studio : ${error.message}. Assurez-vous qu'un modèle avec support vision (comme LLaVA) est chargé.`,
         })
       }
 
+      console.error('[LM Studio] Erreur non gérée:', error)
       throw error
     }
   }
