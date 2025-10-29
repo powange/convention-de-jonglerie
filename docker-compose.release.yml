@@ -66,10 +66,12 @@ services:
       HELLOASSO_API_URL: '${HELLOASSO_API_URL:-https://api.helloasso.com}'
       # Clé API Anthropic Claude pour l'extraction de workshops depuis images
       ANTHROPIC_API_KEY: '${ANTHROPIC_API_KEY}'
-      # Configuration du provider IA (anthropic ou ollama)
+      # Configuration du provider IA (anthropic, ollama ou lmstudio)
       AI_PROVIDER: '${AI_PROVIDER:-anthropic}'
       OLLAMA_BASE_URL: '${OLLAMA_BASE_URL:-http://ollama:11434}'
       OLLAMA_MODEL: '${OLLAMA_MODEL:-llava}'
+      LMSTUDIO_BASE_URL: '${LMSTUDIO_BASE_URL:-http://localhost:1234}'
+      LMSTUDIO_MODEL: '${LMSTUDIO_MODEL:-auto}'
     volumes:
       - /home/powange/docker_workspaces/convention-de-jonglerie-release/backups:/app/backups
       - /home/powange/docker_workspaces/convention-de-jonglerie-release/uploads_data:/app/public/uploads
