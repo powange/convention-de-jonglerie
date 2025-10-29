@@ -174,13 +174,101 @@ export class OllamaProvider implements AIProvider {
 }
 
 /**
+ * Provider LM Studio (local, API compatible OpenAI)
+ */
+export class LMStudioProvider implements AIProvider {
+  name = 'lmstudio'
+  private baseUrl: string
+  private model: string
+
+  constructor(baseUrl: string = 'http://localhost:1234', model: string = 'auto') {
+    this.baseUrl = baseUrl
+    this.model = model
+  }
+
+  async extractWorkshopsFromImage(
+    imageBase64: string,
+    imageType: string,
+    prompt: string
+  ): Promise<AIVisionResponse> {
+    try {
+      // LM Studio utilise l'API compatible OpenAI
+      const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: this.model,
+          messages: [
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: prompt,
+                },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: `data:image/${imageType};base64,${imageBase64}`,
+                  },
+                },
+              ],
+            },
+          ],
+          temperature: 0.7,
+          max_tokens: 4096,
+          stream: false,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.text()
+        throw new Error(`LM Studio API error: ${response.statusText} - ${errorData}`)
+      }
+
+      const data = await response.json()
+      const responseText = data.choices[0]?.message?.content || ''
+
+      // Parser la réponse JSON
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) {
+        throw new Error('Pas de JSON trouvé dans la réponse')
+      }
+
+      return JSON.parse(jsonMatch[0])
+    } catch (error: any) {
+      if (error.code === 'ECONNREFUSED' || error.message?.includes('fetch failed')) {
+        throw createError({
+          statusCode: 503,
+          message:
+            "Le service d'extraction par IA (LM Studio) n'est pas accessible. Vérifiez que LM Studio est démarré et qu'un modèle vision est chargé.",
+        })
+      }
+
+      if (error.message?.includes('API error')) {
+        throw createError({
+          statusCode: 503,
+          message: `Erreur LM Studio : ${error.message}. Assurez-vous qu'un modèle avec support vision (comme LLaVA) est chargé.`,
+        })
+      }
+
+      throw error
+    }
+  }
+}
+
+/**
  * Factory pour créer le provider approprié selon la configuration
  */
 export function createAIProvider(config: {
-  provider?: 'anthropic' | 'ollama'
+  provider?: 'anthropic' | 'ollama' | 'lmstudio'
   anthropicApiKey?: string
   ollamaBaseUrl?: string
   ollamaModel?: string
+  lmstudioBaseUrl?: string
+  lmstudioModel?: string
 }): AIProvider {
   const provider = config.provider || 'anthropic'
 
@@ -196,6 +284,9 @@ export function createAIProvider(config: {
 
     case 'ollama':
       return new OllamaProvider(config.ollamaBaseUrl, config.ollamaModel)
+
+    case 'lmstudio':
+      return new LMStudioProvider(config.lmstudioBaseUrl, config.lmstudioModel)
 
     default:
       throw createError({

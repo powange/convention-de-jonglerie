@@ -1,13 +1,14 @@
-# Configuration des Providers IA (Anthropic & Ollama)
+# Configuration des Providers IA (Anthropic, Ollama & LM Studio)
 
 Cette documentation explique comment configurer et utiliser les différents providers d'IA pour l'extraction de workshops depuis des images.
 
 ## Vue d'ensemble
 
-L'application supporte deux providers d'IA pour l'extraction de workshops depuis des images :
+L'application supporte trois providers d'IA pour l'extraction de workshops depuis des images :
 
 1. **Anthropic Claude** (par défaut) - API cloud payante, très performante
-2. **Ollama** - Modèles open-source locaux, gratuits, nécessite des ressources locales
+2. **Ollama** - Modèles open-source locaux, gratuits, ligne de commande
+3. **LM Studio** - Modèles locaux avec interface graphique, gratuit, facile à utiliser
 
 ## Configuration
 
@@ -16,7 +17,7 @@ L'application supporte deux providers d'IA pour l'extraction de workshops depuis
 Ajoutez ces variables dans votre fichier `.env` :
 
 ```env
-# Provider IA à utiliser (anthropic ou ollama)
+# Provider IA à utiliser (anthropic, ollama ou lmstudio)
 AI_PROVIDER=anthropic
 
 # Configuration Anthropic (si AI_PROVIDER=anthropic)
@@ -25,6 +26,10 @@ ANTHROPIC_API_KEY=sk-ant-api03-...
 # Configuration Ollama (si AI_PROVIDER=ollama)
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=llava
+
+# Configuration LM Studio (si AI_PROVIDER=lmstudio)
+LMSTUDIO_BASE_URL=http://localhost:1234
+LMSTUDIO_MODEL=auto
 ```
 
 ## Option 1 : Utiliser Anthropic Claude (par défaut)

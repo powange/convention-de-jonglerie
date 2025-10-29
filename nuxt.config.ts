@@ -309,10 +309,12 @@ export default defineNuxtConfig({
     smtpUser: process.env.SMTP_USER || '', // SMTP username for email sending
     smtpPass: process.env.SMTP_PASS || '', // SMTP password for email sending
     anthropicApiKey: process.env.ANTHROPIC_API_KEY || '', // Anthropic Claude API key for AI features
-    // Configuration du provider IA (anthropic ou ollama)
+    // Configuration du provider IA (anthropic, ollama ou lmstudio)
     aiProvider: process.env.AI_PROVIDER || 'anthropic', // Provider IA à utiliser (anthropic par défaut)
     ollamaBaseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434', // URL de base d'Ollama
     ollamaModel: process.env.OLLAMA_MODEL || 'llava', // Modèle Ollama avec vision
+    lmstudioBaseUrl: process.env.LMSTUDIO_BASE_URL || 'http://localhost:1234', // URL de base de LM Studio
+    lmstudioModel: process.env.LMSTUDIO_MODEL || 'auto', // Modèle LM Studio (auto = utilise le modèle chargé)
     // Supporte aussi la convention Nuxt NUXT_*
     recaptchaSecretKey: process.env.NUXT_RECAPTCHA_SECRET_KEY || '', // reCAPTCHA secret key for server-side verification
     recaptchaMinScore: Number(process.env.NUXT_RECAPTCHA_MIN_SCORE || '0.5'), // seuil configurable pour v3

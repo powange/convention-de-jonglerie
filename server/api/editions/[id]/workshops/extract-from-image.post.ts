@@ -96,10 +96,12 @@ export default defineEventHandler(async (event) => {
 
     // Créer le provider IA approprié selon la configuration
     const aiProvider = createAIProvider({
-      provider: (config.aiProvider as 'anthropic' | 'ollama') || 'anthropic',
+      provider: (config.aiProvider as 'anthropic' | 'ollama' | 'lmstudio') || 'anthropic',
       anthropicApiKey: config.anthropicApiKey,
       ollamaBaseUrl: config.ollamaBaseUrl,
       ollamaModel: config.ollamaModel,
+      lmstudioBaseUrl: config.lmstudioBaseUrl,
+      lmstudioModel: config.lmstudioModel,
     })
 
     // Créer le prompt pour l'IA
