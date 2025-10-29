@@ -341,6 +341,13 @@ export function createAIProvider(config: {
 }): AIProvider {
   const provider = config.provider || 'anthropic'
 
+  console.log('[AI Provider] Configuration du provider IA:', provider)
+  console.log('[AI Provider] Config complète:', {
+    provider,
+    lmstudioBaseUrl: config.lmstudioBaseUrl,
+    lmstudioModel: config.lmstudioModel,
+  })
+
   switch (provider) {
     case 'anthropic':
       if (!config.anthropicApiKey) {
