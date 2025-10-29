@@ -20,7 +20,7 @@
         <div class="space-y-4">
           <div v-for="(dayMeals, date) in groupedMeals" :key="date" class="space-y-2">
             <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ formatMealDate(date) }}
+              {{ formatMealDate(date as string) }}
             </h5>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div
@@ -114,6 +114,10 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const toast = useToast()
 
+// Utiliser les utilitaires meals
+const { getMealTypeLabel } = useMealTypeLabel()
+const { getPhasesLabel } = useMealPhaseLabel()
+
 const isOpen = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value),
@@ -132,48 +136,8 @@ const initialMeals = ref<any[]>([])
 const loadingMeals = ref(false)
 const savingMeals = ref(false)
 
-// Labels pour les repas
-const mealTypeLabels: Record<string, string> = {
-  BREAKFAST: t('common.breakfast'),
-  LUNCH: t('common.lunch'),
-  DINNER: t('common.dinner'),
-}
-
-const phaseLabels: Record<string, string> = {
-  SETUP: t('common.setup'),
-  EVENT: t('common.event'),
-  TEARDOWN: t('common.teardown'),
-}
-
-const getMealTypeLabel = (mealType: string) => mealTypeLabels[mealType] || mealType
-const getPhasesLabel = (phases: string[]) => {
-  if (!phases || phases.length === 0) return ''
-  return phases.map((phase) => phaseLabels[phase] || phase).join(' + ')
-}
-
 // Grouper les repas par date
-const groupedMeals = computed(() => {
-  const grouped: Record<string, any[]> = {}
-  meals.value.forEach((meal) => {
-    const dateKey = meal.date.split('T')[0]
-    if (!grouped[dateKey]) {
-      grouped[dateKey] = []
-    }
-    grouped[dateKey].push(meal)
-  })
-  return grouped
-})
-
-// Formater la date pour l'affichage
-const formatMealDate = (dateStr: string) => {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('fr-FR', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
+const groupedMeals = computed(() => groupMealsByDate(meals.value))
 
 // Détection des modifications non sauvegardées pour les repas
 const hasUnsavedMealChanges = computed(() => {

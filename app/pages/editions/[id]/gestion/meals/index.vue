@@ -224,15 +224,8 @@ const formatDate = (dateStr: string) => {
   })
 }
 
-// Obtenir le label du type de repas
-const getMealTypeLabel = (mealType: string) => {
-  const labels: Record<string, string> = {
-    BREAKFAST: 'Matin',
-    LUNCH: 'Midi',
-    DINNER: 'Soir',
-  }
-  return labels[mealType] || mealType
-}
+// Utiliser les utilitaires meals
+const { getMealTypeLabel } = useMealTypeLabel()
 
 // Charger les repas
 const fetchVolunteerMeals = async () => {

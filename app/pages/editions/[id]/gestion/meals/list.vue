@@ -177,29 +177,16 @@ const columns = [
   { accessorKey: 'afterShow', header: 'Après spectacle' },
 ]
 
-// Labels
-const mealTypeLabels: Record<string, string> = {
-  BREAKFAST: t('common.breakfast'),
-  LUNCH: t('common.lunch'),
-  DINNER: t('common.dinner'),
-}
+// Utiliser les utilitaires meals
+const { getMealTypeLabel } = useMealTypeLabel()
+const { getPhasesLabel } = useMealPhaseLabel()
 
-const phaseLabels: Record<string, string> = {
-  SETUP: t('common.setup'),
-  EVENT: t('common.event'),
-  TEARDOWN: t('common.teardown'),
-}
-
+// Labels pour les régimes alimentaires
 const dietLabels: Record<string, string> = {
   VEGETARIAN: t('common.vegetarian'),
   VEGAN: t('common.vegan'),
 }
 
-const getMealTypeLabel = (mealType: string) => mealTypeLabels[mealType] || mealType
-const getPhasesLabel = (phases: string[]) => {
-  if (!phases || phases.length === 0) return ''
-  return phases.map((phase) => phaseLabels[phase] || phase).join(' + ')
-}
 const getDietLabel = (diet: string) => dietLabels[diet] || diet
 
 // Formatage de date

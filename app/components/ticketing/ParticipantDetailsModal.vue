@@ -510,522 +510,38 @@
       </div>
 
       <!-- Affichage pour un bénévole -->
-      <div v-else-if="isVolunteer && participant && 'volunteer' in participant" class="space-y-6">
-        <!-- Badge bénévole -->
-        <div
-          class="flex items-center justify-between p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20"
-        >
-          <div>
-            <p class="text-sm text-purple-600 dark:text-purple-400">
-              {{ $t('editions.ticketing.access_type') }}
-            </p>
-            <p class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ $t('editions.ticketing.volunteer') }}
-            </p>
-          </div>
-          <UBadge color="primary" variant="soft" size="lg">
-            {{ $t('editions.ticketing.volunteer_accepted') }}
-          </UBadge>
-        </div>
-
-        <!-- Statut de validation d'entrée -->
-        <div
-          v-if="participant.volunteer.entryValidated"
-          class="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800"
-        >
-          <div class="flex items-start gap-3">
-            <UIcon
-              name="i-heroicons-check-circle-solid"
-              class="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5"
-            />
-            <div class="flex-1">
-              <p class="font-medium text-green-900 dark:text-green-100">
-                {{ $t('ticketing.participant.entry_validated') }}
-              </p>
-              <p class="text-sm text-green-700 dark:text-green-300 mt-1">
-                <span v-if="participant.volunteer.entryValidatedBy">
-                  Validé par {{ participant.volunteer.entryValidatedBy.firstName }}
-                  {{ participant.volunteer.entryValidatedBy.lastName }}
-                </span>
-                <span v-else>{{ $t('ticketing.participant.volunteer_validated') }}</span>
-                {{
-                  participant.volunteer.entryValidatedAt
-                    ? `le ${new Date(participant.volunteer.entryValidatedAt).toLocaleDateString(
-                        'fr-FR',
-                        {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        }
-                      )}`
-                    : ''
-                }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Informations du bénévole -->
-        <div class="space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon name="i-heroicons-user" class="text-primary-600 dark:text-primary-400" />
-            <h4 class="font-semibold text-gray-900 dark:text-white">
-              {{ $t('editions.ticketing.volunteer') }}
-            </h4>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.first_name') }}
-              </p>
-              <UInput
-                v-model="editableFirstName"
-                type="text"
-                :placeholder="$t('editions.ticketing.first_name')"
-                icon="i-heroicons-user"
-                size="sm"
-              />
-            </div>
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.last_name') }}
-              </p>
-              <UInput
-                v-model="editableLastName"
-                type="text"
-                :placeholder="$t('editions.ticketing.last_name')"
-                icon="i-heroicons-user"
-                size="sm"
-              />
-            </div>
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.email') }}
-              </p>
-              <UInput
-                v-model="editableEmail"
-                type="email"
-                :placeholder="$t('editions.ticketing.email')"
-                icon="i-heroicons-envelope"
-                size="sm"
-                :color="emailValidation.isValid ? undefined : 'error'"
-              />
-              <p
-                v-if="emailValidation.message"
-                class="text-xs mt-1"
-                :class="{
-                  'text-green-600 dark:text-green-400':
-                    emailValidation.isValid && !emailValidation.checking,
-                  'text-red-600 dark:text-red-400':
-                    !emailValidation.isValid && !emailValidation.checking,
-                  'text-gray-500 dark:text-gray-400': emailValidation.checking,
-                }"
-              >
-                {{ emailValidation.message }}
-              </p>
-            </div>
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.phone') }}
-              </p>
-              <UInput
-                v-model="editablePhone"
-                type="tel"
-                placeholder="06 12 34 56 78"
-                icon="i-heroicons-phone"
-                size="sm"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Équipes assignées -->
-        <div
-          v-if="participant.volunteer.teams && participant.volunteer.teams.length > 0"
-          class="space-y-4"
-        >
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon name="i-heroicons-user-group" class="text-blue-600 dark:text-blue-400" />
-            <h4 class="font-semibold text-gray-900 dark:text-white">
-              {{ $t('editions.ticketing.teams') }}
-            </h4>
-          </div>
-
-          <div class="space-y-2">
-            <div
-              v-for="team in participant.volunteer.teams"
-              :key="team.id"
-              class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-900"
-            >
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-user-group" class="h-4 w-4 text-blue-500" />
-                <span class="text-sm font-medium text-gray-900 dark:text-white">
-                  {{ team.name }}
-                </span>
-              </div>
-              <UBadge v-if="team.isLeader" color="primary" variant="soft" size="sm">
-                Responsable
-              </UBadge>
-            </div>
-          </div>
-        </div>
-
-        <!-- Créneaux assignés -->
-        <div class="space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon name="i-heroicons-clock" class="text-orange-600 dark:text-orange-400" />
-            <h4 class="font-semibold text-gray-900 dark:text-white">
-              {{ $t('editions.ticketing.time_slots') }}
-            </h4>
-          </div>
-
-          <div
-            v-if="participant.volunteer.timeSlots && participant.volunteer.timeSlots.length > 0"
-            class="space-y-2"
-          >
-            <div
-              v-for="slot in participant.volunteer.timeSlots"
-              :key="slot.id"
-              class="p-3 rounded-lg bg-gray-50 dark:bg-gray-900"
-            >
-              <div class="flex items-start justify-between gap-2 mb-2">
-                <div class="flex items-center gap-2">
-                  <UIcon
-                    name="i-heroicons-calendar"
-                    class="h-4 w-4 text-orange-500 flex-shrink-0"
-                  />
-                  <span class="text-sm font-medium text-gray-900 dark:text-white">
-                    {{ slot.title }}
-                  </span>
-                </div>
-                <UBadge v-if="slot.team" color="neutral" variant="subtle" size="xs">
-                  {{ slot.team }}
-                </UBadge>
-              </div>
-              <div class="text-xs text-gray-600 dark:text-gray-400 ml-6">
-                {{
-                  new Date(slot.startDateTime).toLocaleString('fr-FR', {
-                    dateStyle: 'short',
-                    timeStyle: 'short',
-                  })
-                }}
-                -
-                {{ new Date(slot.endDateTime).toLocaleString('fr-FR', { timeStyle: 'short' }) }}
-              </div>
-            </div>
-          </div>
-
-          <div
-            v-else
-            class="p-4 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-lg"
-          >
-            <UIcon name="i-heroicons-calendar-days" class="mx-auto h-8 w-8 mb-2 text-gray-400" />
-            <p class="text-sm">{{ $t('ticketing.participant.no_slot_assigned') }}</p>
-          </div>
-        </div>
-
-        <!-- Repas du bénévole -->
-        <div v-if="volunteerMealsByDay.length > 0" class="space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon name="i-heroicons-cake" class="text-orange-600 dark:text-orange-400" />
-            <h4 class="font-semibold text-gray-900 dark:text-white">Repas</h4>
-          </div>
-
-          <div class="space-y-4">
-            <div v-for="dayGroup in volunteerMealsByDay" :key="dayGroup.date" class="space-y-2">
-              <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{
-                  new Date(dayGroup.date).toLocaleDateString('fr-FR', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                  })
-                }}
-              </h5>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <div
-                  v-for="meal in dayGroup.meals"
-                  :key="meal.id"
-                  class="p-3 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/10 border border-orange-200 dark:border-orange-800/30"
-                >
-                  <div class="flex flex-col gap-2">
-                    <div class="flex items-center gap-2">
-                      <UIcon
-                        :name="
-                          meal.mealType === 'BREAKFAST'
-                            ? 'i-heroicons-sun'
-                            : meal.mealType === 'LUNCH'
-                              ? 'i-heroicons-sun-solid'
-                              : 'i-heroicons-moon'
-                        "
-                        class="h-4 w-4 text-orange-600 dark:text-orange-400"
-                      />
-                      <span class="text-sm font-medium text-gray-900 dark:text-white">
-                        {{
-                          meal.mealType === 'BREAKFAST'
-                            ? 'Matin'
-                            : meal.mealType === 'LUNCH'
-                              ? 'Midi'
-                              : 'Soir'
-                        }}
-                      </span>
-                    </div>
-                    <UBadge
-                      :color="meal.phases.includes('EVENT') ? 'primary' : 'neutral'"
-                      variant="subtle"
-                      size="xs"
-                      class="self-start"
-                    >
-                      {{ formatPhases(meal.phases) }}
-                    </UBadge>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <VolunteerDetailsCard
+        v-else-if="isVolunteer && participant && 'volunteer' in participant"
+        :volunteer="participant.volunteer"
+        :editable-first-name="editableFirstName"
+        :editable-last-name="editableLastName"
+        :editable-email="editableEmail"
+        :editable-phone="editablePhone"
+        :validating="validating"
+        @update:first-name="editableFirstName = $event"
+        @update:last-name="editableLastName = $event"
+        @update:email="editableEmail = $event"
+        @update:phone="editablePhone = $event"
+        @validate="showValidateConfirm"
+        @invalidate="showInvalidateConfirm"
+      />
 
       <!-- Affichage pour un artiste -->
-      <div v-else-if="isArtist && participant && 'artist' in participant" class="space-y-6">
-        <!-- Badge artiste -->
-        <div
-          class="flex items-center justify-between p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20"
-        >
-          <div>
-            <p class="text-sm text-yellow-600 dark:text-yellow-400">
-              {{ $t('editions.ticketing.access_type') }}
-            </p>
-            <p class="text-lg font-semibold text-gray-900 dark:text-white">Artiste</p>
-          </div>
-          <UBadge color="yellow" variant="soft" size="lg"> Artiste invité </UBadge>
-        </div>
-
-        <!-- Statut de validation d'entrée -->
-        <div
-          v-if="participant.artist.entryValidated"
-          class="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800"
-        >
-          <div class="flex items-start gap-3">
-            <UIcon
-              name="i-heroicons-check-circle-solid"
-              class="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5"
-            />
-            <div class="flex-1">
-              <p class="font-medium text-green-900 dark:text-green-100">
-                {{ $t('ticketing.participant.entry_validated') }}
-              </p>
-              <p class="text-sm text-green-700 dark:text-green-300 mt-1">
-                <span v-if="participant.artist.entryValidatedBy">
-                  Validé par {{ participant.artist.entryValidatedBy.firstName }}
-                  {{ participant.artist.entryValidatedBy.lastName }}
-                </span>
-                <span v-else>Entrée validée</span>
-                {{
-                  participant.artist.entryValidatedAt
-                    ? `le ${new Date(participant.artist.entryValidatedAt).toLocaleDateString(
-                        'fr-FR',
-                        {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        }
-                      )}`
-                    : ''
-                }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Informations de l'artiste -->
-        <div class="space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon name="i-heroicons-user" class="text-primary-600 dark:text-primary-400" />
-            <h4 class="font-semibold text-gray-900 dark:text-white">Artiste</h4>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.first_name') }}
-              </p>
-              <UInput
-                v-model="editableFirstName"
-                type="text"
-                :placeholder="$t('editions.ticketing.first_name')"
-                icon="i-heroicons-user"
-                size="sm"
-              />
-            </div>
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.last_name') }}
-              </p>
-              <UInput
-                v-model="editableLastName"
-                type="text"
-                :placeholder="$t('editions.ticketing.last_name')"
-                icon="i-heroicons-user"
-                size="sm"
-              />
-            </div>
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.email') }}
-              </p>
-              <UInput
-                v-model="editableEmail"
-                type="email"
-                :placeholder="$t('editions.ticketing.email')"
-                icon="i-heroicons-envelope"
-                size="sm"
-                :color="emailValidation.isValid ? undefined : 'error'"
-              />
-              <p
-                v-if="emailValidation.message"
-                class="text-xs mt-1"
-                :class="{
-                  'text-green-600 dark:text-green-400':
-                    emailValidation.isValid && !emailValidation.checking,
-                  'text-red-600 dark:text-red-400':
-                    !emailValidation.isValid && !emailValidation.checking,
-                  'text-gray-500 dark:text-gray-400': emailValidation.checking,
-                }"
-              >
-                {{ emailValidation.message }}
-              </p>
-            </div>
-            <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.phone') }}
-              </p>
-              <UInput
-                v-model="editablePhone"
-                type="tel"
-                placeholder="06 12 34 56 78"
-                icon="i-heroicons-phone"
-                size="sm"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Spectacles assignés -->
-        <div
-          v-if="participant.artist.shows && participant.artist.shows.length > 0"
-          class="space-y-4"
-        >
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon name="i-heroicons-star" class="text-yellow-600 dark:text-yellow-400" />
-            <h4 class="font-semibold text-gray-900 dark:text-white">Spectacles</h4>
-          </div>
-
-          <div class="space-y-2">
-            <div
-              v-for="show in participant.artist.shows"
-              :key="show.id"
-              class="p-3 rounded-lg bg-gray-50 dark:bg-gray-900"
-            >
-              <div class="flex items-start justify-between gap-2 mb-2">
-                <div class="flex items-center gap-2">
-                  <UIcon
-                    name="i-heroicons-sparkles"
-                    class="h-4 w-4 text-yellow-500 flex-shrink-0"
-                  />
-                  <span class="text-sm font-medium text-gray-900 dark:text-white">
-                    {{ show.title }}
-                  </span>
-                </div>
-              </div>
-              <div class="text-xs text-gray-600 dark:text-gray-400 ml-6">
-                {{
-                  new Date(show.startDateTime).toLocaleString('fr-FR', {
-                    dateStyle: 'short',
-                    timeStyle: 'short',
-                  })
-                }}
-                <span v-if="show.location"> - {{ show.location }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Message si aucun spectacle -->
-        <div
-          v-else
-          class="p-4 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-lg"
-        >
-          <UIcon name="i-heroicons-star" class="mx-auto h-8 w-8 mb-2 text-gray-400" />
-          <p class="text-sm">Aucun spectacle assigné</p>
-        </div>
-
-        <!-- Repas de l'artiste -->
-        <div v-if="artistMealsByDay.length > 0" class="space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-            <UIcon name="i-heroicons-cake" class="text-orange-600 dark:text-orange-400" />
-            <h4 class="font-semibold text-gray-900 dark:text-white">Repas</h4>
-          </div>
-
-          <div class="space-y-4">
-            <div v-for="dayGroup in artistMealsByDay" :key="dayGroup.date" class="space-y-2">
-              <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{
-                  new Date(dayGroup.date).toLocaleDateString('fr-FR', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                  })
-                }}
-              </h5>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <div
-                  v-for="meal in dayGroup.meals"
-                  :key="meal.id"
-                  class="p-3 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/10 border border-orange-200 dark:border-orange-800/30"
-                >
-                  <div class="flex flex-col gap-2">
-                    <div class="flex items-center gap-2">
-                      <UIcon
-                        :name="
-                          meal.mealType === 'BREAKFAST'
-                            ? 'i-heroicons-sun'
-                            : meal.mealType === 'LUNCH'
-                              ? 'i-heroicons-sun-solid'
-                              : 'i-heroicons-moon'
-                        "
-                        class="h-4 w-4 text-orange-600 dark:text-orange-400"
-                      />
-                      <span class="text-sm font-medium text-gray-900 dark:text-white">
-                        {{
-                          meal.mealType === 'BREAKFAST'
-                            ? 'Matin'
-                            : meal.mealType === 'LUNCH'
-                              ? 'Midi'
-                              : 'Soir'
-                        }}
-                      </span>
-                    </div>
-                    <UBadge
-                      :color="meal.phases.includes('EVENT') ? 'primary' : 'neutral'"
-                      variant="subtle"
-                      size="xs"
-                      class="self-start"
-                    >
-                      {{ formatPhases(meal.phases) }}
-                    </UBadge>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ArtistDetailsCard
+        v-else-if="isArtist && participant && 'artist' in participant"
+        :artist="participant.artist"
+        :editable-first-name="editableFirstName"
+        :editable-last-name="editableLastName"
+        :editable-email="editableEmail"
+        :editable-phone="editablePhone"
+        :validating="validating"
+        @update:first-name="editableFirstName = $event"
+        @update:last-name="editableLastName = $event"
+        @update:email="editableEmail = $event"
+        @update:phone="editablePhone = $event"
+        @validate="showValidateConfirm"
+        @invalidate="showInvalidateConfirm"
+      />
 
       <!-- Message si aucun participant -->
       <div v-else class="py-8 text-center">
@@ -1034,62 +550,23 @@
       </div>
     </template>
 
-    <template #footer>
-      <div class="flex justify-between items-center">
-        <div
-          v-if="isTicket && selectedParticipants.length > 0"
-          class="text-sm text-gray-600 dark:text-gray-400"
-        >
+    <template v-if="isTicket && selectedParticipants.length > 0" #footer>
+      <div class="flex justify-end items-center gap-2 w-full">
+        <div class="text-sm text-gray-600 dark:text-gray-400">
           {{ selectedParticipants.length }} participant{{
             selectedParticipants.length > 1 ? 's' : ''
           }}
           sélectionné{{ selectedParticipants.length > 1 ? 's' : '' }}
         </div>
-        <div v-else></div>
-        <div class="flex gap-2">
-          <UButton color="neutral" variant="soft" @click="isOpen = false"> Fermer </UButton>
-          <UButton
-            v-if="isTicket && selectedParticipants.length > 0 && !isRefunded"
-            color="success"
-            icon="i-heroicons-check-circle"
-            :loading="validating"
-            @click="showValidateTicketsConfirm"
-          >
-            Valider l'entrée ({{ selectedParticipants.length }})
-          </UButton>
-          <UButton
-            v-if="isVolunteer && participant && 'volunteer' in participant"
-            :color="participant.volunteer.entryValidated ? 'error' : 'success'"
-            :icon="
-              participant.volunteer.entryValidated
-                ? 'i-heroicons-x-circle'
-                : 'i-heroicons-check-circle'
-            "
-            :loading="validating"
-            :disabled="!participant.volunteer.entryValidated && !emailValidation.isValid"
-            @click="
-              participant.volunteer.entryValidated ? showInvalidateConfirm() : showValidateConfirm()
-            "
-          >
-            {{ participant.volunteer.entryValidated ? "Dévalider l'entrée" : "Valider l'entrée" }}
-          </UButton>
-          <UButton
-            v-if="isArtist && participant && 'artist' in participant"
-            :color="participant.artist.entryValidated ? 'error' : 'success'"
-            :icon="
-              participant.artist.entryValidated
-                ? 'i-heroicons-x-circle'
-                : 'i-heroicons-check-circle'
-            "
-            :loading="validating"
-            :disabled="!participant.artist.entryValidated && !emailValidation.isValid"
-            @click="
-              participant.artist.entryValidated ? showInvalidateConfirm() : showValidateConfirm()
-            "
-          >
-            {{ participant.artist.entryValidated ? "Dévalider l'entrée" : "Valider l'entrée" }}
-          </UButton>
-        </div>
+        <UButton
+          v-if="!isRefunded"
+          color="success"
+          icon="i-heroicons-check-circle"
+          :loading="validating"
+          @click="showValidateTicketsConfirm"
+        >
+          Valider l'entrée ({{ selectedParticipants.length }})
+        </UButton>
       </div>
     </template>
   </UModal>
@@ -1224,6 +701,9 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+
+import ArtistDetailsCard from './ArtistDetailsCard.vue'
+import VolunteerDetailsCard from './VolunteerDetailsCard.vue'
 
 interface TicketData {
   ticket: {
@@ -1406,103 +886,6 @@ const editableLastName = ref<string | null>(null)
 const editableEmail = ref<string | null>(null)
 const editablePhone = ref<string | null>(null)
 
-// Validation de l'email en temps réel
-const emailValidation = ref<{
-  checking: boolean
-  isValid: boolean
-  message: string
-}>({
-  checking: false,
-  isValid: true,
-  message: '',
-})
-
-// ID de l'utilisateur à exclure lors de la vérification d'email
-const currentUserId = computed(() => {
-  if (props.participant && 'volunteer' in props.participant) {
-    return props.participant.volunteer.user.id
-  } else if (props.participant && 'artist' in props.participant) {
-    return props.participant.artist.user.id
-  }
-  return null
-})
-
-// Debounce pour la vérification d'email
-let emailCheckTimeout: ReturnType<typeof setTimeout> | null = null
-
-watch(editableEmail, async (newEmail) => {
-  // Réinitialiser le timeout précédent
-  if (emailCheckTimeout) {
-    clearTimeout(emailCheckTimeout)
-  }
-
-  // Réinitialiser la validation si l'email est vide ou identique à l'original
-  if (!newEmail || !newEmail.trim()) {
-    emailValidation.value = { checking: false, isValid: true, message: '' }
-    return
-  }
-
-  // Vérifier si l'email a changé par rapport à l'original
-  const originalEmail =
-    props.participant && 'volunteer' in props.participant
-      ? props.participant.volunteer.user.email
-      : props.participant && 'artist' in props.participant
-        ? props.participant.artist.user.email
-        : null
-
-  if (newEmail === originalEmail) {
-    emailValidation.value = { checking: false, isValid: true, message: '' }
-    return
-  }
-
-  // Vérifier le format de l'email
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(newEmail)) {
-    emailValidation.value = {
-      checking: false,
-      isValid: false,
-      message: "Format d'email invalide",
-    }
-    return
-  }
-
-  // Attendre 500ms avant de vérifier (debounce)
-  emailValidation.value = { checking: true, isValid: true, message: 'Vérification...' }
-
-  emailCheckTimeout = setTimeout(async () => {
-    try {
-      const response = await $fetch('/api/auth/check-email', {
-        method: 'POST',
-        body: {
-          email: newEmail,
-          excludeUserIds: currentUserId.value ? [currentUserId.value] : [],
-        },
-      })
-
-      if (response.exists) {
-        emailValidation.value = {
-          checking: false,
-          isValid: false,
-          message: 'Cet email est déjà utilisé par un autre utilisateur',
-        }
-      } else {
-        emailValidation.value = {
-          checking: false,
-          isValid: true,
-          message: 'Email disponible',
-        }
-      }
-    } catch (error) {
-      console.error("Erreur lors de la vérification de l'email:", error)
-      emailValidation.value = {
-        checking: false,
-        isValid: false,
-        message: 'Erreur lors de la vérification',
-      }
-    }
-  }, 500)
-})
-
 // Gestion des articles à restituer
 const returnableItemsToDistribute = computed(() => {
   const itemsList: Array<{ id: string; name: string; participantName?: string }> = []
@@ -1572,64 +955,6 @@ const returnableItemsToDistribute = computed(() => {
   }
 
   return itemsList
-})
-
-// Grouper les repas des bénévoles par jour
-const volunteerMealsByDay = computed(() => {
-  if (
-    !props.participant ||
-    !('volunteer' in props.participant) ||
-    !props.participant.volunteer.meals
-  ) {
-    return []
-  }
-
-  const grouped: Record<string, Array<any>> = {}
-  props.participant.volunteer.meals.forEach((meal) => {
-    const dateKey = new Date(meal.date).toISOString().split('T')[0]
-    if (!grouped[dateKey]) {
-      grouped[dateKey] = []
-    }
-    grouped[dateKey].push(meal)
-  })
-
-  // Trier les repas de chaque jour par type (BREAKFAST, LUNCH, DINNER)
-  const mealOrder = { BREAKFAST: 1, LUNCH: 2, DINNER: 3 }
-  Object.keys(grouped).forEach((dateKey) => {
-    grouped[dateKey].sort((a, b) => (mealOrder[a.mealType] || 999) - (mealOrder[b.mealType] || 999))
-  })
-
-  // Convertir en tableau et trier par date
-  return Object.entries(grouped)
-    .map(([date, meals]) => ({ date, meals }))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-})
-
-// Grouper les repas des artistes par jour
-const artistMealsByDay = computed(() => {
-  if (!props.participant || !('artist' in props.participant) || !props.participant.artist.meals) {
-    return []
-  }
-
-  const grouped: Record<string, Array<any>> = {}
-  props.participant.artist.meals.forEach((meal) => {
-    const dateKey = new Date(meal.date).toISOString().split('T')[0]
-    if (!grouped[dateKey]) {
-      grouped[dateKey] = []
-    }
-    grouped[dateKey].push(meal)
-  })
-
-  // Trier les repas de chaque jour par type (BREAKFAST, LUNCH, DINNER)
-  const mealOrder = { BREAKFAST: 1, LUNCH: 2, DINNER: 3 }
-  Object.keys(grouped).forEach((dateKey) => {
-    grouped[dateKey].sort((a, b) => (mealOrder[a.mealType] || 999) - (mealOrder[b.mealType] || 999))
-  })
-
-  // Convertir en tableau et trier par date
-  return Object.entries(grouped)
-    .map(([date, meals]) => ({ date, meals }))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 })
 
 // Réinitialiser la sélection quand la modal s'ouvre
@@ -1707,17 +1032,6 @@ const showValidateTicketsConfirm = () => {
 }
 
 const showValidateConfirm = () => {
-  // Vérifier si l'email est valide (pour bénévoles et artistes)
-  if (
-    (props.participant && 'volunteer' in props.participant) ||
-    (props.participant && 'artist' in props.participant)
-  ) {
-    if (!emailValidation.value.isValid) {
-      // Ne pas permettre la validation si l'email n'est pas valide
-      return
-    }
-  }
-
   // Vérifier si la commande est en attente de paiement
   if (props.participant && 'ticket' in props.participant) {
     if (props.participant.ticket.state === 'Pending') {
@@ -1727,17 +1041,6 @@ const showValidateConfirm = () => {
   }
 
   showValidateModal.value = true
-}
-
-// Helper pour formater les phases multiples
-const formatPhases = (phases: string[]) => {
-  if (!phases || phases.length === 0) return ''
-  const phaseLabels: Record<string, string> = {
-    SETUP: 'Montage',
-    EVENT: 'Édition',
-    TEARDOWN: 'Démontage',
-  }
-  return phases.map((phase) => phaseLabels[phase] || phase).join(' + ')
 }
 
 const confirmValidateEntry = async () => {
