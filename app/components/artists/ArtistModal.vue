@@ -217,6 +217,40 @@
               />
             </UFormField>
           </div>
+
+          <!-- Facture et cachet -->
+          <h3 class="text-lg font-semibold mb-3 mt-4">
+            {{ $t('artists.invoice_fee_section') }}
+          </h3>
+
+          <div class="grid grid-cols-2 gap-4">
+            <UFormField :label="$t('artists.invoice_requested')">
+              <UCheckbox
+                v-model="formData.invoiceRequested"
+                :label="$t('artists.invoice_requested_label')"
+              />
+            </UFormField>
+
+            <UFormField :label="$t('artists.invoice_provided')">
+              <UCheckbox
+                v-model="formData.invoiceProvided"
+                :label="$t('artists.invoice_provided_label')"
+              />
+            </UFormField>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <UFormField :label="$t('artists.fee_requested')">
+              <UCheckbox
+                v-model="formData.feeRequested"
+                :label="$t('artists.fee_requested_label')"
+              />
+            </UFormField>
+
+            <UFormField :label="$t('artists.fee_provided')">
+              <UCheckbox v-model="formData.feeProvided" :label="$t('artists.fee_provided_label')" />
+            </UFormField>
+          </div>
         </div>
 
         <!-- Actions -->
@@ -281,6 +315,10 @@ const formData = ref({
   reimbursementActualPaid: false,
   accommodationAutonomous: false,
   accommodationProposal: '',
+  invoiceRequested: false,
+  invoiceProvided: false,
+  feeRequested: false,
+  feeProvided: false,
 })
 
 // Vérifier si l'utilisateur est créé manuellement (authProvider = MANUAL)
@@ -366,6 +404,10 @@ const handleSubmit = async () => {
       reimbursementActualPaid: formData.value.reimbursementActualPaid,
       accommodationAutonomous: formData.value.accommodationAutonomous,
       accommodationProposal: formData.value.accommodationProposal || null,
+      invoiceRequested: formData.value.invoiceRequested,
+      invoiceProvided: formData.value.invoiceProvided,
+      feeRequested: formData.value.feeRequested,
+      feeProvided: formData.value.feeProvided,
     }
 
     if (props.artist) {
@@ -439,6 +481,10 @@ const resetForm = () => {
     reimbursementActualPaid: false,
     accommodationAutonomous: false,
     accommodationProposal: '',
+    invoiceRequested: false,
+    invoiceProvided: false,
+    feeRequested: false,
+    feeProvided: false,
   }
 }
 
@@ -485,6 +531,10 @@ watch(
         reimbursementActualPaid: newArtist.reimbursementActualPaid || false,
         accommodationAutonomous: newArtist.accommodationAutonomous || false,
         accommodationProposal: newArtist.accommodationProposal || '',
+        invoiceRequested: newArtist.invoiceRequested || false,
+        invoiceProvided: newArtist.invoiceProvided || false,
+        feeRequested: newArtist.feeRequested || false,
+        feeProvided: newArtist.feeProvided || false,
       }
     } else {
       resetForm()

@@ -16,6 +16,10 @@ const updateArtistSchema = z.object({
   reimbursementActualPaid: z.boolean().optional(),
   accommodationAutonomous: z.boolean().optional(),
   accommodationProposal: z.string().optional().nullable(),
+  invoiceRequested: z.boolean().optional(),
+  invoiceProvided: z.boolean().optional(),
+  feeRequested: z.boolean().optional(),
+  feeProvided: z.boolean().optional(),
   // Champs utilisateur (modifiables uniquement si authProvider = MANUAL)
   userEmail: z.string().email().optional(),
   userPrenom: z.string().min(1).optional(),
@@ -143,6 +147,10 @@ export default defineEventHandler(async (event) => {
         reimbursementActualPaid: validatedData.reimbursementActualPaid,
         accommodationAutonomous: validatedData.accommodationAutonomous,
         accommodationProposal: validatedData.accommodationProposal,
+        invoiceRequested: validatedData.invoiceRequested,
+        invoiceProvided: validatedData.invoiceProvided,
+        feeRequested: validatedData.feeRequested,
+        feeProvided: validatedData.feeProvided,
       },
       include: {
         user: {

@@ -118,6 +118,16 @@
                   {{ $t('artists.accommodation') }}
                 </th>
                 <th
+                  class="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  {{ $t('artists.invoice_short') }}
+                </th>
+                <th
+                  class="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  {{ $t('artists.fee_short') }}
+                </th>
+                <th
                   v-if="canEdit"
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[300px]"
                 >
@@ -242,6 +252,40 @@
                       {{ $t('artists.accommodation_not_specified') }}
                     </span>
                   </div>
+                </td>
+                <td class="px-4 py-3 text-sm text-center">
+                  <UPopover :popper="{ placement: 'top' }">
+                    <UBadge
+                      :color="getInvoiceStatusColor(artist)"
+                      variant="soft"
+                      size="sm"
+                      class="cursor-help"
+                    >
+                      {{ getInvoiceStatusIcon(artist) }}
+                    </UBadge>
+                    <template #content>
+                      <div class="p-2 text-sm">
+                        {{ getInvoiceStatusText(artist) }}
+                      </div>
+                    </template>
+                  </UPopover>
+                </td>
+                <td class="px-4 py-3 text-sm text-center">
+                  <UPopover :popper="{ placement: 'top' }">
+                    <UBadge
+                      :color="getFeeStatusColor(artist)"
+                      variant="soft"
+                      size="sm"
+                      class="cursor-help"
+                    >
+                      {{ getFeeStatusIcon(artist) }}
+                    </UBadge>
+                    <template #content>
+                      <div class="p-2 text-sm">
+                        {{ getFeeStatusText(artist) }}
+                      </div>
+                    </template>
+                  </UPopover>
                 </td>
                 <td v-if="canEdit" class="px-4 py-3 text-sm min-w-[300px]">
                   <button
@@ -499,5 +543,43 @@ const getMealsDisplayText = (artist: any) => {
   const acceptedCount = artist.mealSelections.filter((selection: any) => selection.accepted).length
   const totalCount = artist.mealSelections.length
   return `${acceptedCount}/${totalCount}`
+}
+
+// Fonctions pour l'état de la facture
+const getInvoiceStatusIcon = (artist: any) => {
+  if (!artist.invoiceRequested) return '○' // Non demandé
+  if (artist.invoiceRequested && !artist.invoiceProvided) return '⏳' // Demandé
+  return '✓' // Fourni
+}
+
+const getInvoiceStatusColor = (artist: any) => {
+  if (!artist.invoiceRequested) return 'neutral' // Non demandé
+  if (artist.invoiceRequested && !artist.invoiceProvided) return 'warning' // Demandé
+  return 'success' // Fourni
+}
+
+const getInvoiceStatusText = (artist: any) => {
+  if (!artist.invoiceRequested) return t('artists.invoice_not_requested')
+  if (artist.invoiceRequested && !artist.invoiceProvided) return t('artists.invoice_requested')
+  return t('artists.invoice_provided')
+}
+
+// Fonctions pour l'état du cachet
+const getFeeStatusIcon = (artist: any) => {
+  if (!artist.feeRequested) return '○' // Non demandé
+  if (artist.feeRequested && !artist.feeProvided) return '⏳' // Demandé
+  return '✓' // Fourni
+}
+
+const getFeeStatusColor = (artist: any) => {
+  if (!artist.feeRequested) return 'neutral' // Non demandé
+  if (artist.feeRequested && !artist.feeProvided) return 'warning' // Demandé
+  return 'success' // Fourni
+}
+
+const getFeeStatusText = (artist: any) => {
+  if (!artist.feeRequested) return t('artists.fee_not_requested')
+  if (artist.feeRequested && !artist.feeProvided) return t('artists.fee_requested')
+  return t('artists.fee_provided')
 }
 </script>

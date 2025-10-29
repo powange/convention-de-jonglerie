@@ -20,6 +20,10 @@ const artistSchema = z.object({
   reimbursementActualPaid: z.boolean().optional(),
   accommodationAutonomous: z.boolean().optional(),
   accommodationProposal: z.string().optional().nullable(),
+  invoiceRequested: z.boolean().optional(),
+  invoiceProvided: z.boolean().optional(),
+  feeRequested: z.boolean().optional(),
+  feeProvided: z.boolean().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -134,6 +138,10 @@ export default defineEventHandler(async (event) => {
         reimbursementActualPaid: validatedData.reimbursementActualPaid ?? false,
         accommodationAutonomous: validatedData.accommodationAutonomous ?? false,
         accommodationProposal: validatedData.accommodationProposal,
+        invoiceRequested: validatedData.invoiceRequested ?? false,
+        invoiceProvided: validatedData.invoiceProvided ?? false,
+        feeRequested: validatedData.feeRequested ?? false,
+        feeProvided: validatedData.feeProvided ?? false,
       },
       include: {
         user: {

@@ -5,8 +5,8 @@ Mutualiser la Validation du mot de passe
 faire les tests d'ajout de candidat (utilisateur existant ou création d'utilisateur)
 notification 30 min avant un workshop
 Artistes : distinction défraiement max et défraiement réel {cm:2025-10-27}
-Artistes : champ "Demande de cachet" (oui/non)
-Artistes : champ "Demande de facture" (oui/non)
+Artistes : champ "Demande de cachet" (oui/non) {cm:2025-10-29}
+Artistes : champ "Demande de facture" (oui/non) {cm:2025-10-29}
 Artistes : récupération - lieu, heure, responsable
 Artistes : ramener - lieu, heure, responsable
 Artistes : autonomie logement/hébergement (commentaire) {cm:2025-10-27}

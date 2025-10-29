@@ -1183,6 +1183,10 @@ model EditionArtist {
   organizerNotes          String?           @db.Text
   accommodationAutonomous Boolean           @default(false)
   accommodationProposal   String?           @db.Text
+  invoiceRequested        Boolean           @default(false)
+  invoiceProvided         Boolean           @default(false)
+  feeRequested            Boolean           @default(false)
+  feeProvided             Boolean           @default(false)
   createdAt               DateTime          @default(now())
   updatedAt               DateTime          @updatedAt
 
