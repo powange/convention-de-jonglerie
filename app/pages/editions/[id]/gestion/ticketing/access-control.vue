@@ -554,7 +554,12 @@ const validateTicket = async () => {
 const handleValidateParticipants = async (
   participantIds: number[],
   markAsPaid = false,
-  phone: string | null = null
+  userInfo?: {
+    firstName?: string | null
+    lastName?: string | null
+    email?: string | null
+    phone?: string | null
+  }
 ) => {
   try {
     // Appeler l'API pour valider les participants
@@ -564,7 +569,7 @@ const handleValidateParticipants = async (
         participantIds,
         type: participantType.value,
         markAsPaid,
-        phone,
+        userInfo,
       },
     })
 

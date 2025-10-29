@@ -579,20 +579,39 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.full_name') }}
+                {{ $t('editions.ticketing.first_name') }}
               </p>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ participant.volunteer.user.firstName }}
-                {{ participant.volunteer.user.lastName }}
+              <UInput
+                v-model="editableFirstName"
+                type="text"
+                :placeholder="$t('editions.ticketing.first_name')"
+                icon="i-heroicons-user"
+                size="sm"
+              />
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                {{ $t('editions.ticketing.last_name') }}
               </p>
+              <UInput
+                v-model="editableLastName"
+                type="text"
+                :placeholder="$t('editions.ticketing.last_name')"
+                icon="i-heroicons-user"
+                size="sm"
+              />
             </div>
             <div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
                 {{ $t('editions.ticketing.email') }}
               </p>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ participant.volunteer.user.email }}
-              </p>
+              <UInput
+                v-model="editableEmail"
+                type="email"
+                :placeholder="$t('editions.ticketing.email')"
+                icon="i-heroicons-envelope"
+                size="sm"
+              />
             </div>
             <div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
@@ -820,19 +839,39 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                {{ $t('editions.ticketing.full_name') }}
+                {{ $t('editions.ticketing.first_name') }}
               </p>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ participant.artist.user.firstName }} {{ participant.artist.user.lastName }}
+              <UInput
+                v-model="editableFirstName"
+                type="text"
+                :placeholder="$t('editions.ticketing.first_name')"
+                icon="i-heroicons-user"
+                size="sm"
+              />
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                {{ $t('editions.ticketing.last_name') }}
               </p>
+              <UInput
+                v-model="editableLastName"
+                type="text"
+                :placeholder="$t('editions.ticketing.last_name')"
+                icon="i-heroicons-user"
+                size="sm"
+              />
             </div>
             <div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
                 {{ $t('editions.ticketing.email') }}
               </p>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ participant.artist.user.email }}
-              </p>
+              <UInput
+                v-model="editableEmail"
+                type="email"
+                :placeholder="$t('editions.ticketing.email')"
+                icon="i-heroicons-envelope"
+                size="sm"
+              />
             </div>
             <div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
@@ -1298,7 +1337,16 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  validate: [participantIds: number[], markAsPaid?: boolean, phone?: string | null]
+  validate: [
+    participantIds: number[],
+    markAsPaid?: boolean,
+    userInfo?: {
+      firstName?: string | null
+      lastName?: string | null
+      email?: string | null
+      phone?: string | null
+    },
+  ]
   invalidate: [participantId: number]
 }>()
 
@@ -1322,7 +1370,10 @@ const showPaymentConfirmModal = ref(false)
 const paymentConfirmedChoice = ref(true)
 const ticketToInvalidate = ref<number | null>(null)
 
-// Gestion du téléphone éditable pour artistes et bénévoles
+// Gestion des informations éditables pour artistes et bénévoles
+const editableFirstName = ref<string | null>(null)
+const editableLastName = ref<string | null>(null)
+const editableEmail = ref<string | null>(null)
 const editablePhone = ref<string | null>(null)
 
 // Gestion des articles à restituer
@@ -1460,12 +1511,21 @@ watch(
   (newValue) => {
     if (newValue) {
       selectedParticipants.value = []
-      // Initialiser le téléphone éditable
+      // Initialiser les champs éditables pour bénévoles et artistes
       if (props.participant && 'volunteer' in props.participant) {
+        editableFirstName.value = props.participant.volunteer.user.firstName || null
+        editableLastName.value = props.participant.volunteer.user.lastName || null
+        editableEmail.value = props.participant.volunteer.user.email || null
         editablePhone.value = props.participant.volunteer.user.phone || null
       } else if (props.participant && 'artist' in props.participant) {
+        editableFirstName.value = props.participant.artist.user.firstName || null
+        editableLastName.value = props.participant.artist.user.lastName || null
+        editableEmail.value = props.participant.artist.user.email || null
         editablePhone.value = props.participant.artist.user.phone || null
       } else {
+        editableFirstName.value = null
+        editableLastName.value = null
+        editableEmail.value = null
         editablePhone.value = null
       }
     }
@@ -1547,25 +1607,25 @@ const confirmValidateEntry = async () => {
   try {
     // Si c'est un bénévole
     if (props.participant && 'volunteer' in props.participant) {
-      emit(
-        'validate',
-        [props.participant.volunteer.id],
-        paymentConfirmedChoice.value,
-        editablePhone.value
-      )
+      emit('validate', [props.participant.volunteer.id], paymentConfirmedChoice.value, {
+        firstName: editableFirstName.value,
+        lastName: editableLastName.value,
+        email: editableEmail.value,
+        phone: editablePhone.value,
+      })
     }
     // Si c'est un artiste
     else if (props.participant && 'artist' in props.participant) {
-      emit(
-        'validate',
-        [props.participant.artist.id],
-        paymentConfirmedChoice.value,
-        editablePhone.value
-      )
+      emit('validate', [props.participant.artist.id], paymentConfirmedChoice.value, {
+        firstName: editableFirstName.value,
+        lastName: editableLastName.value,
+        email: editableEmail.value,
+        phone: editablePhone.value,
+      })
     }
     // Si ce sont des tickets sélectionnés
     else if (selectedParticipants.value.length > 0) {
-      emit('validate', selectedParticipants.value, paymentConfirmedChoice.value, null)
+      emit('validate', selectedParticipants.value, paymentConfirmedChoice.value, undefined)
       // Réinitialiser la sélection après validation
       selectedParticipants.value = []
     }

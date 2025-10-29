@@ -1,4 +1,5 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
+import { updateUserInfo } from '@@/server/utils/editions/ticketing/user-info-update'
 import { NotificationService } from '@@/server/utils/notification-service'
 import { canAccessEditionDataOrAccessControl } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
@@ -8,7 +9,14 @@ const bodySchema = z.object({
   participantIds: z.array(z.number()).min(1),
   type: z.enum(['ticket', 'volunteer', 'artist']).optional().default('ticket'),
   markAsPaid: z.boolean().optional().default(false),
-  phone: z.string().nullable().optional(),
+  userInfo: z
+    .object({
+      firstName: z.string().nullable().optional(),
+      lastName: z.string().nullable().optional(),
+      email: z.string().email().nullable().optional(),
+      phone: z.string().nullable().optional(),
+    })
+    .optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -43,8 +51,8 @@ export default defineEventHandler(async (event) => {
       }
 
       // Mettre à jour le téléphone snapshot si fourni
-      if (body.phone !== undefined) {
-        updateData.userSnapshotPhone = body.phone
+      if (body.userInfo?.phone !== undefined) {
+        updateData.userSnapshotPhone = body.userInfo.phone
       }
 
       const result = await prisma.editionVolunteerApplication.updateMany({
@@ -57,6 +65,27 @@ export default defineEventHandler(async (event) => {
         },
         data: updateData,
       })
+
+      // Mettre à jour les informations utilisateur si fournies
+      if (body.userInfo && Object.keys(body.userInfo).length > 0) {
+        // Récupérer les applications pour obtenir les userIds
+        const applications = await prisma.editionVolunteerApplication.findMany({
+          where: {
+            id: {
+              in: body.participantIds,
+            },
+            editionId: editionId,
+          },
+          select: {
+            userId: true,
+          },
+        })
+
+        const userIds = applications.map((app) => app.userId)
+
+        // Mettre à jour les informations utilisateur
+        await updateUserInfo(userIds, body.userInfo)
+      }
 
       // Envoyer des notifications aux responsables d'équipes
       // Pour chaque bénévole validé
@@ -177,8 +206,8 @@ export default defineEventHandler(async (event) => {
         },
       })
 
-      // Mettre à jour le téléphone de l'artiste si fourni
-      if (body.phone !== undefined) {
+      // Mettre à jour les informations utilisateur si fournies
+      if (body.userInfo && Object.keys(body.userInfo).length > 0) {
         // Récupérer les artistes pour obtenir leurs userIds
         const artists = await prisma.editionArtist.findMany({
           where: {
@@ -194,17 +223,8 @@ export default defineEventHandler(async (event) => {
 
         const userIds = artists.map((artist) => artist.userId)
 
-        // Mettre à jour le téléphone dans la table User
-        await prisma.user.updateMany({
-          where: {
-            id: {
-              in: userIds,
-            },
-          },
-          data: {
-            phone: body.phone,
-          },
-        })
+        // Mettre à jour les informations utilisateur
+        await updateUserInfo(userIds, body.userInfo)
       }
 
       // Notifier via SSE
