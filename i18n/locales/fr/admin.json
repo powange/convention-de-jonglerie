@@ -328,6 +328,17 @@
     "view_profile": "Voir le profil",
     "view_profiles": "Voir les profils",
     "volunteer_reminders": "Rappels bénévoles",
-    "volunteers_count": "{count} bénévoles"
+    "volunteers_count": "{count} bénévoles",
+    "config": {
+      "title": "Configuration Système",
+      "server": "Configuration Serveur",
+      "public": "Configuration Publique",
+      "environment": "Environnement",
+      "ai": "Intelligence Artificielle",
+      "email": "Email",
+      "env_variables": "Variables d'environnement (process.env)",
+      "load_error": "Erreur lors du chargement de la configuration",
+      "view_config": "Voir la configuration"
+    }
   }
 }
