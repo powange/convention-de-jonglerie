@@ -58,7 +58,10 @@
       "no_slot_assigned": "No slot assigned",
       "ticket_type": "Ticket type",
       "type": "Type",
-      "volunteer_validated": "The volunteer has validated their entry"
+      "volunteer_validated": "The volunteer has validated their entry",
+      "first_name": "First Name",
+      "last_name": "Last Name",
+      "phone": "Phone"
     },
     "quotas": {
       "list": {

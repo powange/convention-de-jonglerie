@@ -52,63 +52,20 @@
     </div>
 
     <!-- Informations du bénévole -->
-    <div class="space-y-4">
-      <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-        <UIcon name="i-heroicons-user" class="text-primary-600 dark:text-primary-400" />
-        <h4 class="font-semibold text-gray-900 dark:text-white">
-          {{ $t('editions.ticketing.volunteer') }}
-        </h4>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-            {{ $t('editions.ticketing.first_name') }}
-          </p>
-          <UInput
-            :model-value="editableFirstName"
-            type="text"
-            :placeholder="$t('editions.ticketing.first_name')"
-            icon="i-heroicons-user"
-            size="sm"
-            @update:model-value="$emit('update:firstName', $event)"
-          />
-        </div>
-        <div>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-            {{ $t('editions.ticketing.last_name') }}
-          </p>
-          <UInput
-            :model-value="editableLastName"
-            type="text"
-            :placeholder="$t('editions.ticketing.last_name')"
-            icon="i-heroicons-user"
-            size="sm"
-            @update:model-value="$emit('update:lastName', $event)"
-          />
-        </div>
-        <EmailValidationInput
-          ref="emailInput"
-          :model-value="editableEmail"
-          :original-email="volunteer.user.email"
-          :user-id="volunteer.user.id"
-          @update:model-value="$emit('update:email', $event)"
-        />
-        <div>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-            {{ $t('editions.ticketing.phone') }}
-          </p>
-          <UInput
-            :model-value="editablePhone"
-            type="tel"
-            placeholder="06 12 34 56 78"
-            icon="i-heroicons-phone"
-            size="sm"
-            @update:model-value="$emit('update:phone', $event)"
-          />
-        </div>
-      </div>
-    </div>
+    <TicketingUserInfoSection
+      ref="userInfoSection"
+      :title="$t('editions.ticketing.volunteer')"
+      :first-name="editableFirstName"
+      :last-name="editableLastName"
+      :email="editableEmail"
+      :phone="editablePhone"
+      :original-email="volunteer.user.email"
+      :user-id="volunteer.user.id"
+      @update:first-name="$emit('update:firstName', $event)"
+      @update:last-name="$emit('update:lastName', $event)"
+      @update:email="$emit('update:email', $event)"
+      @update:phone="$emit('update:phone', $event)"
+    />
 
     <!-- Équipes assignées -->
     <div v-if="volunteer.teams && volunteer.teams.length > 0" class="space-y-4">
@@ -205,7 +162,7 @@
 </template>
 
 <script setup lang="ts">
-import EmailValidationInput from './EmailValidationInput.vue'
+import type TicketingUserInfoSection from './TicketingUserInfoSection.vue'
 
 interface Volunteer {
   id: number
@@ -260,11 +217,11 @@ defineEmits<{
   invalidate: []
 }>()
 
-// Référence au composant EmailValidationInput pour accéder à l'état de validation
-const emailInput = ref<InstanceType<typeof EmailValidationInput> | null>(null)
+// Référence au composant TicketingUserInfoSection qui contient EmailValidationInput
+const userInfoSection = ref<InstanceType<typeof TicketingUserInfoSection> | null>(null)
 
-// Vérifier si l'email est valide
+// Vérifier si l'email est valide en accédant à emailInput via userInfoSection
 const isEmailValid = computed(() => {
-  return emailInput.value?.emailValidation?.isValid ?? true
+  return userInfoSection.value?.emailInput?.emailValidation?.isValid ?? true
 })
 </script>

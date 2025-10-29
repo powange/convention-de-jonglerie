@@ -58,7 +58,10 @@
       "no_slot_assigned": "Aucun créneau assigné",
       "ticket_type": "Type de billet",
       "type": "Type",
-      "volunteer_validated": "Le bénévole a validé son entrée"
+      "volunteer_validated": "Le bénévole a validé son entrée",
+      "first_name": "Prénom",
+      "last_name": "Nom",
+      "phone": "Téléphone"
     },
     "quotas": {
       "list": {

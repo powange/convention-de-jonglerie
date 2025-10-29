@@ -58,7 +58,10 @@
       "no_slot_assigned": "Nie przypisano przedziału czasowego",
       "ticket_type": "Typ biletu",
       "type": "Typ",
-      "volunteer_validated": "Wolontariusz zwalidował swoje wejście"
+      "volunteer_validated": "Wolontariusz zwalidował swoje wejście",
+      "first_name": "Imię",
+      "last_name": "Nazwisko",
+      "phone": "Telefon"
     },
     "quotas": {
       "list": {

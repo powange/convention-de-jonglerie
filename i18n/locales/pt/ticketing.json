@@ -58,7 +58,10 @@
       "no_slot_assigned": "Nenhum horário atribuído",
       "ticket_type": "Tipo de bilhete",
       "type": "Tipo",
-      "volunteer_validated": "O voluntário validou a sua entrada"
+      "volunteer_validated": "O voluntário validou a sua entrada",
+      "first_name": "Nome",
+      "last_name": "Sobrenome",
+      "phone": "Telefone"
     },
     "quotas": {
       "list": {

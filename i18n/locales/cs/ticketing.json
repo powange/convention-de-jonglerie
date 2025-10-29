@@ -58,7 +58,10 @@
       "no_slot_assigned": "Žádný přidělený slot",
       "ticket_type": "Typ letenky",
       "type": "Typ",
-      "volunteer_validated": "Dobrovolník potvrdil svůj vstup"
+      "volunteer_validated": "Dobrovolník potvrdil svůj vstup",
+      "first_name": "Jméno",
+      "last_name": "Příjmení",
+      "phone": "Telefon"
     },
     "quotas": {
       "list": {

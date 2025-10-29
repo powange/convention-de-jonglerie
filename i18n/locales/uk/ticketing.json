@@ -58,7 +58,10 @@
       "no_slot_assigned": "Часовий проміжок не призначено",
       "ticket_type": "Тип квитка",
       "type": "Тип",
-      "volunteer_validated": "Волонтер підтвердив свій вхід"
+      "volunteer_validated": "Волонтер підтвердив свій вхід",
+      "first_name": "Ім'я",
+      "last_name": "Прізвище",
+      "phone": "Телефон"
     },
     "quotas": {
       "list": {

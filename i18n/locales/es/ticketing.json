@@ -58,7 +58,10 @@
       "no_slot_assigned": "No se ha asignado ninguna franja",
       "ticket_type": "Tipo de entrada",
       "type": "Tipo",
-      "volunteer_validated": "El voluntario ha validado su entrada"
+      "volunteer_validated": "El voluntario ha validado su entrada",
+      "first_name": "Nombre",
+      "last_name": "Apellido",
+      "phone": "Teléfono"
     },
     "quotas": {
       "list": {

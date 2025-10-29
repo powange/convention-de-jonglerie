@@ -58,7 +58,10 @@
       "no_slot_assigned": "Kein Zeitfenster zugewiesen",
       "ticket_type": "Ticketart",
       "type": "Typ",
-      "volunteer_validated": "Der Freiwillige hat seinen Eintritt validiert"
+      "volunteer_validated": "Der Freiwillige hat seinen Eintritt validiert",
+      "first_name": "Vorname",
+      "last_name": "Nachname",
+      "phone": "Telefon"
     },
     "quotas": {
       "list": {

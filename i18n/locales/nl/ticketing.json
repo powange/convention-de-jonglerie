@@ -58,7 +58,10 @@
       "no_slot_assigned": "Geen tijdslot toegewezen",
       "ticket_type": "Tickettype",
       "type": "Type",
-      "volunteer_validated": "De vrijwilliger heeft zijn toegang gevalideerd"
+      "volunteer_validated": "De vrijwilliger heeft zijn toegang gevalideerd",
+      "first_name": "Voornaam",
+      "last_name": "Achternaam",
+      "phone": "Telefoon"
     },
     "quotas": {
       "list": {

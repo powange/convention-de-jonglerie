@@ -58,7 +58,10 @@
       "no_slot_assigned": "Ingen tidsrum tildelt",
       "ticket_type": "Billettype",
       "type": "Type",
-      "volunteer_validated": "Frivillig har valideret sin adgang"
+      "volunteer_validated": "Frivillig har valideret sin adgang",
+      "first_name": "Fornavn",
+      "last_name": "Efternavn",
+      "phone": "Telefon"
     },
     "quotas": {
       "list": {

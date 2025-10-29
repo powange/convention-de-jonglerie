@@ -50,70 +50,29 @@
     </div>
 
     <!-- Informations de l'artiste -->
-    <div class="space-y-4">
-      <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-        <UIcon name="i-heroicons-user" class="text-primary-600 dark:text-primary-400" />
-        <h4 class="font-semibold text-gray-900 dark:text-white">Artiste</h4>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-            {{ $t('editions.ticketing.first_name') }}
-          </p>
-          <UInput
-            :model-value="editableFirstName"
-            type="text"
-            :placeholder="$t('editions.ticketing.first_name')"
-            icon="i-heroicons-user"
-            size="sm"
-            @update:model-value="$emit('update:firstName', $event)"
-          />
-        </div>
-        <div>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-            {{ $t('editions.ticketing.last_name') }}
-          </p>
-          <UInput
-            :model-value="editableLastName"
-            type="text"
-            :placeholder="$t('editions.ticketing.last_name')"
-            icon="i-heroicons-user"
-            size="sm"
-            @update:model-value="$emit('update:lastName', $event)"
-          />
-        </div>
-        <EmailValidationInput
-          ref="emailInput"
-          :model-value="editableEmail"
-          :original-email="artist.user.email"
-          :user-id="artist.user.id"
-          @update:model-value="$emit('update:email', $event)"
-        />
-        <div>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-            {{ $t('editions.ticketing.phone') }}
-          </p>
-          <UInput
-            :model-value="editablePhone"
-            type="tel"
-            placeholder="06 12 34 56 78"
-            icon="i-heroicons-phone"
-            size="sm"
-            @update:model-value="$emit('update:phone', $event)"
-          />
-        </div>
-      </div>
-    </div>
+    <TicketingUserInfoSection
+      ref="userInfoSection"
+      title="Artiste"
+      :first-name="editableFirstName"
+      :last-name="editableLastName"
+      :email="editableEmail"
+      :phone="editablePhone"
+      :original-email="artist.user.email"
+      :user-id="artist.user.id"
+      @update:first-name="$emit('update:firstName', $event)"
+      @update:last-name="$emit('update:lastName', $event)"
+      @update:email="$emit('update:email', $event)"
+      @update:phone="$emit('update:phone', $event)"
+    />
 
     <!-- Spectacles assignés -->
-    <div v-if="artist.shows && artist.shows.length > 0" class="space-y-4">
+    <div class="space-y-4">
       <div class="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
         <UIcon name="i-heroicons-star" class="text-yellow-600 dark:text-yellow-400" />
         <h4 class="font-semibold text-gray-900 dark:text-white">Spectacles</h4>
       </div>
 
-      <div class="space-y-2">
+      <div v-if="artist.shows && artist.shows.length > 0" class="space-y-2">
         <div
           v-for="show in artist.shows"
           :key="show.id"
@@ -138,15 +97,15 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Message si aucun spectacle -->
-    <div
-      v-else
-      class="p-4 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-lg"
-    >
-      <UIcon name="i-heroicons-star" class="mx-auto h-8 w-8 mb-2 text-gray-400" />
-      <p class="text-sm">Aucun spectacle assigné</p>
+      <!-- Message si aucun spectacle -->
+      <div
+        v-else
+        class="p-4 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-lg"
+      >
+        <UIcon name="i-heroicons-star" class="mx-auto h-8 w-8 mb-2 text-gray-400" />
+        <p class="text-sm">Aucun spectacle assigné</p>
+      </div>
     </div>
 
     <!-- Repas de l'artiste -->
@@ -180,9 +139,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-
-import EmailValidationInput from './EmailValidationInput.vue'
+import type TicketingUserInfoSection from './TicketingUserInfoSection.vue'
 
 interface Artist {
   id: number
@@ -235,11 +192,11 @@ defineEmits<{
   invalidate: []
 }>()
 
-// Référence au composant de validation d'email
-const emailInput = ref<InstanceType<typeof EmailValidationInput> | null>(null)
+// Référence au composant TicketingUserInfoSection qui contient EmailValidationInput
+const userInfoSection = ref<InstanceType<typeof TicketingUserInfoSection> | null>(null)
 
-// Computed pour vérifier si l'email est valide
+// Computed pour vérifier si l'email est valide en accédant à emailInput via userInfoSection
 const isEmailValid = computed(() => {
-  return emailInput.value?.emailValidation?.isValid ?? true
+  return userInfoSection.value?.emailInput?.emailValidation?.isValid ?? true
 })
 </script>

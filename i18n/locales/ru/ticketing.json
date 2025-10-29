@@ -58,7 +58,10 @@
       "no_slot_assigned": "Временной интервал не назначен",
       "ticket_type": "Тип билета",
       "type": "Тип",
-      "volunteer_validated": "Волонтёр подтвердил свой вход"
+      "volunteer_validated": "Волонтёр подтвердил свой вход",
+      "first_name": "Имя",
+      "last_name": "Фамилия",
+      "phone": "Телефон"
     },
     "quotas": {
       "list": {
