@@ -14,7 +14,7 @@ Artistes : besoins techniques (zone de texte)
 Artistes : type d'artiste (zone de texte libre)
 Artistes : liens utiles (Instagram, Facebook, Drive)
 Artistes : nom et description des numéros pour gala
-Artistes : préférence repas avant/après spectacle
+Artistes : préférence repas avant/après spectacle {cm:2025-10-29}
 Artistes : workshop proposé (oui/non + description)
 Artistes : commentaire particulier visible par l'artiste
 Ajouter le nombre achetés sur les tarifs {cm:2025-10-27}

@@ -251,6 +251,75 @@
               <UCheckbox v-model="formData.feeProvided" :label="$t('artists.fee_provided_label')" />
             </UFormField>
           </div>
+
+          <!-- Récupération et retour -->
+          <h3 class="text-lg font-semibold mb-3 mt-4">
+            {{ $t('artists.pickup_dropoff_section') }}
+          </h3>
+
+          <!-- Récupération -->
+          <div class="space-y-3">
+            <UFormField :label="$t('artists.pickup_required')">
+              <UCheckbox
+                v-model="formData.pickupRequired"
+                :label="$t('artists.pickup_required_label')"
+              />
+            </UFormField>
+
+            <div
+              v-if="formData.pickupRequired"
+              class="space-y-3 pl-6 border-l-2 border-primary-200"
+            >
+              <UFormField :label="$t('artists.pickup_location')">
+                <UInput
+                  v-model="formData.pickupLocation"
+                  :placeholder="$t('artists.pickup_location_placeholder')"
+                />
+              </UFormField>
+
+              <UFormField :label="$t('artists.pickup_responsible')">
+                <UserSelector
+                  v-model="formData.pickupResponsible"
+                  v-model:search-term="pickupSearchTerm"
+                  :searched-users="pickupSearchedUsers"
+                  :searching-users="searchingPickupUsers"
+                  :placeholder="$t('artists.pickup_responsible_placeholder')"
+                />
+              </UFormField>
+            </div>
+          </div>
+
+          <!-- Retour -->
+          <div class="space-y-3 mt-4">
+            <UFormField :label="$t('artists.dropoff_required')">
+              <UCheckbox
+                v-model="formData.dropoffRequired"
+                :label="$t('artists.dropoff_required_label')"
+              />
+            </UFormField>
+
+            <div
+              v-if="formData.dropoffRequired"
+              class="space-y-3 pl-6 border-l-2 border-primary-200"
+            >
+              <UFormField :label="$t('artists.dropoff_location')">
+                <UInput
+                  v-model="formData.dropoffLocation"
+                  :placeholder="$t('artists.dropoff_location_placeholder')"
+                />
+              </UFormField>
+
+              <UFormField :label="$t('artists.dropoff_responsible')">
+                <UserSelector
+                  v-model="formData.dropoffResponsible"
+                  v-model:search-term="dropoffSearchTerm"
+                  :searched-users="dropoffSearchedUsers"
+                  :searching-users="searchingDropoffUsers"
+                  :placeholder="$t('artists.dropoff_responsible_placeholder')"
+                />
+              </UFormField>
+            </div>
+          </div>
         </div>
 
         <!-- Actions -->
@@ -298,6 +367,14 @@ const searchedUsers = ref<any[]>([])
 const searchingUsers = ref(false)
 const loading = ref(false)
 
+// Variables pour la recherche des responsables pickup/dropoff
+const pickupSearchTerm = ref('')
+const pickupSearchedUsers = ref<any[]>([])
+const searchingPickupUsers = ref(false)
+const dropoffSearchTerm = ref('')
+const dropoffSearchedUsers = ref<any[]>([])
+const searchingDropoffUsers = ref(false)
+
 const formData = ref({
   email: '',
   prenom: '',
@@ -319,6 +396,12 @@ const formData = ref({
   invoiceProvided: false,
   feeRequested: false,
   feeProvided: false,
+  pickupRequired: false,
+  pickupLocation: '',
+  pickupResponsible: null as any,
+  dropoffRequired: false,
+  dropoffLocation: '',
+  dropoffResponsible: null as any,
 })
 
 // Vérifier si l'utilisateur est créé manuellement (authProvider = MANUAL)
@@ -339,19 +422,14 @@ const allergySeverityOptions = computed(() =>
   }))
 )
 
-// Recherche d'utilisateurs
-watch(searchTerm, async (newTerm) => {
-  if (newTerm.length < 2) {
-    searchedUsers.value = []
-    return
-  }
-
-  searchingUsers.value = true
+// Fonction helper pour rechercher des utilisateurs
+const searchUsers = async (term: string) => {
+  if (term.length < 2) return []
   try {
     const response = await $fetch<{ users: any[] }>('/api/users/search', {
-      params: { q: newTerm },
+      params: { q: term },
     })
-    searchedUsers.value = (response.users || []).map((user) => ({
+    return (response.users || []).map((user) => ({
       id: user.id,
       label: `${user.pseudo} (${user.email})`,
       pseudo: user.pseudo,
@@ -363,10 +441,41 @@ watch(searchTerm, async (newTerm) => {
     }))
   } catch (error) {
     console.error('Error searching users:', error)
-    searchedUsers.value = []
-  } finally {
-    searchingUsers.value = false
+    return []
   }
+}
+
+// Recherche d'utilisateurs
+watch(searchTerm, async (newTerm) => {
+  if (newTerm.length < 2) {
+    searchedUsers.value = []
+    return
+  }
+  searchingUsers.value = true
+  searchedUsers.value = await searchUsers(newTerm)
+  searchingUsers.value = false
+})
+
+// Recherche des responsables pickup
+watch(pickupSearchTerm, async (newTerm) => {
+  if (newTerm.length < 2) {
+    pickupSearchedUsers.value = []
+    return
+  }
+  searchingPickupUsers.value = true
+  pickupSearchedUsers.value = await searchUsers(newTerm)
+  searchingPickupUsers.value = false
+})
+
+// Recherche des responsables dropoff
+watch(dropoffSearchTerm, async (newTerm) => {
+  if (newTerm.length < 2) {
+    dropoffSearchedUsers.value = []
+    return
+  }
+  searchingDropoffUsers.value = true
+  dropoffSearchedUsers.value = await searchUsers(newTerm)
+  searchingDropoffUsers.value = false
 })
 
 const handleUserSelection = (user: any) => {
@@ -408,6 +517,12 @@ const handleSubmit = async () => {
       invoiceProvided: formData.value.invoiceProvided,
       feeRequested: formData.value.feeRequested,
       feeProvided: formData.value.feeProvided,
+      pickupRequired: formData.value.pickupRequired,
+      pickupLocation: formData.value.pickupLocation || null,
+      pickupResponsibleId: formData.value.pickupResponsible?.id || null,
+      dropoffRequired: formData.value.dropoffRequired,
+      dropoffLocation: formData.value.dropoffLocation || null,
+      dropoffResponsibleId: formData.value.dropoffResponsible?.id || null,
     }
 
     if (props.artist) {
@@ -464,6 +579,10 @@ const resetForm = () => {
   selectedUser.value = null
   searchTerm.value = ''
   searchedUsers.value = []
+  pickupSearchTerm.value = ''
+  pickupSearchedUsers.value = []
+  dropoffSearchTerm.value = ''
+  dropoffSearchedUsers.value = []
   formData.value = {
     email: '',
     prenom: '',
@@ -485,6 +604,12 @@ const resetForm = () => {
     invoiceProvided: false,
     feeRequested: false,
     feeProvided: false,
+    pickupRequired: false,
+    pickupLocation: '',
+    pickupResponsible: null,
+    dropoffRequired: false,
+    dropoffLocation: '',
+    dropoffResponsible: null,
   }
 }
 
@@ -535,6 +660,12 @@ watch(
         invoiceProvided: newArtist.invoiceProvided || false,
         feeRequested: newArtist.feeRequested || false,
         feeProvided: newArtist.feeProvided || false,
+        pickupRequired: newArtist.pickupRequired || false,
+        pickupLocation: newArtist.pickupLocation || '',
+        pickupResponsible: newArtist.pickupResponsible || null,
+        dropoffRequired: newArtist.dropoffRequired || false,
+        dropoffLocation: newArtist.dropoffLocation || '',
+        dropoffResponsible: newArtist.dropoffResponsible || null,
       }
     } else {
       resetForm()

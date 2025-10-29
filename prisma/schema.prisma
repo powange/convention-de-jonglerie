@@ -62,6 +62,8 @@ model User {
   workshopFavorites                  WorkshopFavorite[]
   artistProfiles                     EditionArtist[]
   validatedArtistEntries             EditionArtist[]                     @relation("ArtistEntryValidator")
+  artistPickupResponsibilities       EditionArtist[]                     @relation("ArtistPickupResponsible")
+  artistDropoffResponsibilities      EditionArtist[]                     @relation("ArtistDropoffResponsible")
 }
 
 model Edition {
@@ -1187,12 +1189,20 @@ model EditionArtist {
   invoiceProvided         Boolean           @default(false)
   feeRequested            Boolean           @default(false)
   feeProvided             Boolean           @default(false)
+  pickupRequired          Boolean           @default(false)
+  pickupLocation          String?
+  pickupResponsibleId     Int?
+  dropoffRequired         Boolean           @default(false)
+  dropoffLocation         String?
+  dropoffResponsibleId    Int?
   createdAt               DateTime          @default(now())
   updatedAt               DateTime          @updatedAt
 
   edition              Edition               @relation(fields: [editionId], references: [id], onDelete: Cascade)
   user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   entryValidatedByUser User?                 @relation("ArtistEntryValidator", fields: [entryValidatedBy], references: [id], onDelete: SetNull)
+  pickupResponsible    User?                 @relation("ArtistPickupResponsible", fields: [pickupResponsibleId], references: [id], onDelete: SetNull)
+  dropoffResponsible   User?                 @relation("ArtistDropoffResponsible", fields: [dropoffResponsibleId], references: [id], onDelete: SetNull)
   shows                ShowArtist[]
   mealSelections       ArtistMealSelection[]
 
@@ -1200,6 +1210,8 @@ model EditionArtist {
   @@index([editionId])
   @@index([userId])
   @@index([entryValidatedBy])
+  @@index([pickupResponsibleId])
+  @@index([dropoffResponsibleId])
 }
 
 model Show {

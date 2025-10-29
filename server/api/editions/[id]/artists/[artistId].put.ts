@@ -20,6 +20,12 @@ const updateArtistSchema = z.object({
   invoiceProvided: z.boolean().optional(),
   feeRequested: z.boolean().optional(),
   feeProvided: z.boolean().optional(),
+  pickupRequired: z.boolean().optional(),
+  pickupLocation: z.string().optional().nullable(),
+  pickupResponsibleId: z.number().int().positive().optional().nullable(),
+  dropoffRequired: z.boolean().optional(),
+  dropoffLocation: z.string().optional().nullable(),
+  dropoffResponsibleId: z.number().int().positive().optional().nullable(),
   // Champs utilisateur (modifiables uniquement si authProvider = MANUAL)
   userEmail: z.string().email().optional(),
   userPrenom: z.string().min(1).optional(),
@@ -151,6 +157,12 @@ export default defineEventHandler(async (event) => {
         invoiceProvided: validatedData.invoiceProvided,
         feeRequested: validatedData.feeRequested,
         feeProvided: validatedData.feeProvided,
+        pickupRequired: validatedData.pickupRequired,
+        pickupLocation: validatedData.pickupLocation,
+        pickupResponsibleId: validatedData.pickupResponsibleId,
+        dropoffRequired: validatedData.dropoffRequired,
+        dropoffLocation: validatedData.dropoffLocation,
+        dropoffResponsibleId: validatedData.dropoffResponsibleId,
       },
       include: {
         user: {

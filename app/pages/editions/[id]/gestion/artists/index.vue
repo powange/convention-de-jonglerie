@@ -161,11 +161,47 @@
                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                   {{ artist.user.phone || '-' }}
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                  {{ artist.arrivalDateTime ? formatDateTime(artist.arrivalDateTime) : '-' }}
+                <td class="px-4 py-3 text-sm">
+                  <div v-if="artist.arrivalDateTime" class="space-y-1">
+                    <div class="text-gray-900 dark:text-white font-medium">
+                      {{ formatDateTime(artist.arrivalDateTime) }}
+                    </div>
+                    <div v-if="artist.pickupRequired" class="text-xs space-y-0.5">
+                      <div class="flex items-center gap-1 text-primary-600 dark:text-primary-400">
+                        <UIcon name="i-heroicons-map-pin" class="h-3 w-3" />
+                        <span>{{ artist.pickupLocation || $t('artists.pickup_location') }}</span>
+                      </div>
+                      <div
+                        v-if="artist.pickupResponsible"
+                        class="flex items-center gap-1 text-gray-600 dark:text-gray-400"
+                      >
+                        <UIcon name="i-heroicons-user" class="h-3 w-3" />
+                        <span>{{ artist.pickupResponsible.pseudo }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span v-else class="text-gray-400">-</span>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                  {{ artist.departureDateTime ? formatDateTime(artist.departureDateTime) : '-' }}
+                <td class="px-4 py-3 text-sm">
+                  <div v-if="artist.departureDateTime" class="space-y-1">
+                    <div class="text-gray-900 dark:text-white font-medium">
+                      {{ formatDateTime(artist.departureDateTime) }}
+                    </div>
+                    <div v-if="artist.dropoffRequired" class="text-xs space-y-0.5">
+                      <div class="flex items-center gap-1 text-primary-600 dark:text-primary-400">
+                        <UIcon name="i-heroicons-map-pin" class="h-3 w-3" />
+                        <span>{{ artist.dropoffLocation || $t('artists.dropoff_location') }}</span>
+                      </div>
+                      <div
+                        v-if="artist.dropoffResponsible"
+                        class="flex items-center gap-1 text-gray-600 dark:text-gray-400"
+                      >
+                        <UIcon name="i-heroicons-user" class="h-3 w-3" />
+                        <span>{{ artist.dropoffResponsible.pseudo }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span v-else class="text-gray-400">-</span>
                 </td>
                 <td class="px-4 py-3 text-sm text-center">
                   <UButton

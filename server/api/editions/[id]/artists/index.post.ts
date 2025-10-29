@@ -24,6 +24,12 @@ const artistSchema = z.object({
   invoiceProvided: z.boolean().optional(),
   feeRequested: z.boolean().optional(),
   feeProvided: z.boolean().optional(),
+  pickupRequired: z.boolean().optional(),
+  pickupLocation: z.string().optional().nullable(),
+  pickupResponsibleId: z.number().int().positive().optional().nullable(),
+  dropoffRequired: z.boolean().optional(),
+  dropoffLocation: z.string().optional().nullable(),
+  dropoffResponsibleId: z.number().int().positive().optional().nullable(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -142,6 +148,12 @@ export default defineEventHandler(async (event) => {
         invoiceProvided: validatedData.invoiceProvided ?? false,
         feeRequested: validatedData.feeRequested ?? false,
         feeProvided: validatedData.feeProvided ?? false,
+        pickupRequired: validatedData.pickupRequired ?? false,
+        pickupLocation: validatedData.pickupLocation,
+        pickupResponsibleId: validatedData.pickupResponsibleId,
+        dropoffRequired: validatedData.dropoffRequired ?? false,
+        dropoffLocation: validatedData.dropoffLocation,
+        dropoffResponsibleId: validatedData.dropoffResponsibleId,
       },
       include: {
         user: {

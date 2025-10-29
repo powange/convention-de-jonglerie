@@ -34,6 +34,24 @@ export default defineEventHandler(async (event) => {
             authProvider: true,
           },
         },
+        pickupResponsible: {
+          select: {
+            id: true,
+            pseudo: true,
+            email: true,
+            prenom: true,
+            nom: true,
+          },
+        },
+        dropoffResponsible: {
+          select: {
+            id: true,
+            pseudo: true,
+            email: true,
+            prenom: true,
+            nom: true,
+          },
+        },
         shows: {
           include: {
             show: {
