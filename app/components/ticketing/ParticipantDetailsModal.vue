@@ -611,7 +611,21 @@
                 :placeholder="$t('editions.ticketing.email')"
                 icon="i-heroicons-envelope"
                 size="sm"
+                :color="emailValidation.isValid ? undefined : 'error'"
               />
+              <p
+                v-if="emailValidation.message"
+                class="text-xs mt-1"
+                :class="{
+                  'text-green-600 dark:text-green-400':
+                    emailValidation.isValid && !emailValidation.checking,
+                  'text-red-600 dark:text-red-400':
+                    !emailValidation.isValid && !emailValidation.checking,
+                  'text-gray-500 dark:text-gray-400': emailValidation.checking,
+                }"
+              >
+                {{ emailValidation.message }}
+              </p>
             </div>
             <div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
@@ -871,7 +885,21 @@
                 :placeholder="$t('editions.ticketing.email')"
                 icon="i-heroicons-envelope"
                 size="sm"
+                :color="emailValidation.isValid ? undefined : 'error'"
               />
+              <p
+                v-if="emailValidation.message"
+                class="text-xs mt-1"
+                :class="{
+                  'text-green-600 dark:text-green-400':
+                    emailValidation.isValid && !emailValidation.checking,
+                  'text-red-600 dark:text-red-400':
+                    !emailValidation.isValid && !emailValidation.checking,
+                  'text-gray-500 dark:text-gray-400': emailValidation.checking,
+                }"
+              >
+                {{ emailValidation.message }}
+              </p>
             </div>
             <div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
@@ -1038,6 +1066,7 @@
                 : 'i-heroicons-check-circle'
             "
             :loading="validating"
+            :disabled="!participant.volunteer.entryValidated && !emailValidation.isValid"
             @click="
               participant.volunteer.entryValidated ? showInvalidateConfirm() : showValidateConfirm()
             "
@@ -1053,6 +1082,7 @@
                 : 'i-heroicons-check-circle'
             "
             :loading="validating"
+            :disabled="!participant.artist.entryValidated && !emailValidation.isValid"
             @click="
               participant.artist.entryValidated ? showInvalidateConfirm() : showValidateConfirm()
             "
@@ -1376,6 +1406,103 @@ const editableLastName = ref<string | null>(null)
 const editableEmail = ref<string | null>(null)
 const editablePhone = ref<string | null>(null)
 
+// Validation de l'email en temps réel
+const emailValidation = ref<{
+  checking: boolean
+  isValid: boolean
+  message: string
+}>({
+  checking: false,
+  isValid: true,
+  message: '',
+})
+
+// ID de l'utilisateur à exclure lors de la vérification d'email
+const currentUserId = computed(() => {
+  if (props.participant && 'volunteer' in props.participant) {
+    return props.participant.volunteer.user.id
+  } else if (props.participant && 'artist' in props.participant) {
+    return props.participant.artist.user.id
+  }
+  return null
+})
+
+// Debounce pour la vérification d'email
+let emailCheckTimeout: ReturnType<typeof setTimeout> | null = null
+
+watch(editableEmail, async (newEmail) => {
+  // Réinitialiser le timeout précédent
+  if (emailCheckTimeout) {
+    clearTimeout(emailCheckTimeout)
+  }
+
+  // Réinitialiser la validation si l'email est vide ou identique à l'original
+  if (!newEmail || !newEmail.trim()) {
+    emailValidation.value = { checking: false, isValid: true, message: '' }
+    return
+  }
+
+  // Vérifier si l'email a changé par rapport à l'original
+  const originalEmail =
+    props.participant && 'volunteer' in props.participant
+      ? props.participant.volunteer.user.email
+      : props.participant && 'artist' in props.participant
+        ? props.participant.artist.user.email
+        : null
+
+  if (newEmail === originalEmail) {
+    emailValidation.value = { checking: false, isValid: true, message: '' }
+    return
+  }
+
+  // Vérifier le format de l'email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(newEmail)) {
+    emailValidation.value = {
+      checking: false,
+      isValid: false,
+      message: "Format d'email invalide",
+    }
+    return
+  }
+
+  // Attendre 500ms avant de vérifier (debounce)
+  emailValidation.value = { checking: true, isValid: true, message: 'Vérification...' }
+
+  emailCheckTimeout = setTimeout(async () => {
+    try {
+      const response = await $fetch('/api/auth/check-email', {
+        method: 'POST',
+        body: {
+          email: newEmail,
+          excludeUserIds: currentUserId.value ? [currentUserId.value] : [],
+        },
+      })
+
+      if (response.exists) {
+        emailValidation.value = {
+          checking: false,
+          isValid: false,
+          message: 'Cet email est déjà utilisé par un autre utilisateur',
+        }
+      } else {
+        emailValidation.value = {
+          checking: false,
+          isValid: true,
+          message: 'Email disponible',
+        }
+      }
+    } catch (error) {
+      console.error("Erreur lors de la vérification de l'email:", error)
+      emailValidation.value = {
+        checking: false,
+        isValid: false,
+        message: 'Erreur lors de la vérification',
+      }
+    }
+  }, 500)
+})
+
 // Gestion des articles à restituer
 const returnableItemsToDistribute = computed(() => {
   const itemsList: Array<{ id: string; name: string; participantName?: string }> = []
@@ -1580,6 +1707,17 @@ const showValidateTicketsConfirm = () => {
 }
 
 const showValidateConfirm = () => {
+  // Vérifier si l'email est valide (pour bénévoles et artistes)
+  if (
+    (props.participant && 'volunteer' in props.participant) ||
+    (props.participant && 'artist' in props.participant)
+  ) {
+    if (!emailValidation.value.isValid) {
+      // Ne pas permettre la validation si l'email n'est pas valide
+      return
+    }
+  }
+
   // Vérifier si la commande est en attente de paiement
   if (props.participant && 'ticket' in props.participant) {
     if (props.participant.ticket.state === 'Pending') {
