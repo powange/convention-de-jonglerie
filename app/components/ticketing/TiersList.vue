@@ -134,22 +134,13 @@
           <div class="md:col-span-2 min-w-0">
             <div v-if="tier.quotas && tier.quotas.length > 0" class="flex flex-wrap gap-1">
               <UBadge
-                v-for="quotaRelation in tier.quotas.slice(0, 2)"
+                v-for="quotaRelation in tier.quotas"
                 :key="quotaRelation.quota.id"
                 color="warning"
                 variant="soft"
                 size="xs"
               >
                 {{ quotaRelation.quota.title }}
-              </UBadge>
-              <UBadge
-                v-if="tier.quotas.length > 2"
-                color="warning"
-                variant="soft"
-                size="xs"
-                :title="tier.quotas.map((q) => q.quota.title).join(', ')"
-              >
-                +{{ tier.quotas.length - 2 }}
               </UBadge>
             </div>
             <span v-else class="text-xs text-gray-400">-</span>
@@ -162,22 +153,13 @@
               class="flex flex-wrap gap-1"
             >
               <UBadge
-                v-for="itemRelation in tier.returnableItems.slice(0, 2)"
+                v-for="itemRelation in tier.returnableItems"
                 :key="itemRelation.returnableItem.id"
                 color="info"
                 variant="soft"
                 size="xs"
               >
                 {{ itemRelation.returnableItem.name }}
-              </UBadge>
-              <UBadge
-                v-if="tier.returnableItems.length > 2"
-                color="info"
-                variant="soft"
-                size="xs"
-                :title="tier.returnableItems.map((i) => i.returnableItem.name).join(', ')"
-              >
-                +{{ tier.returnableItems.length - 2 }}
               </UBadge>
             </div>
             <span v-else class="text-xs text-gray-400">-</span>

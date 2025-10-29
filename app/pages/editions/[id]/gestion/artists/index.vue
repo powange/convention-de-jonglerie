@@ -159,11 +159,7 @@
                 </td>
                 <td class="px-4 py-3 text-sm text-center">
                   <UButton
-                    :color="
-                      getAcceptedMealsCount(artist) > 0
-                        ? 'primary'
-                        : 'neutral'
-                    "
+                    :color="getAcceptedMealsCount(artist) > 0 ? 'primary' : 'neutral'"
                     variant="soft"
                     size="sm"
                     @click="openMealsModal(artist)"

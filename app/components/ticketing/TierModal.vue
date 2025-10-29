@@ -218,7 +218,7 @@
         <UFormField :label="$t('ticketing.tiers.modal.quotas_label')" name="quotas">
           <USelectMenu
             v-model="form.quotaIds"
-            :items="quotas.map((q) => ({ label: q.title, value: q.id }))"
+            :items="(quotas || []).map((q) => ({ label: q.title, value: q.id }))"
             value-key="value"
             multiple
             searchable
@@ -240,7 +240,7 @@
         >
           <USelectMenu
             v-model="form.returnableItemIds"
-            :items="returnableItems.map((item) => ({ label: item.name, value: item.id }))"
+            :items="(returnableItems || []).map((item) => ({ label: item.name, value: item.id }))"
             value-key="value"
             multiple
             searchable
@@ -389,12 +389,14 @@ const returnableItems = ref<any[]>([])
 
 const loadQuotasAndItems = async () => {
   try {
-    const [quotasData, itemsData] = await Promise.all([
+    const [quotasData, itemsResponse] = await Promise.all([
       $fetch(`/api/editions/${props.editionId}/ticketing/quotas`),
       $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`),
     ])
-    quotas.value = quotasData
-    returnableItems.value = itemsData
+    quotas.value = Array.isArray(quotasData) ? quotasData : []
+    returnableItems.value = Array.isArray(itemsResponse?.returnableItems)
+      ? itemsResponse.returnableItems
+      : []
   } catch (error) {
     console.error('Failed to load quotas and items:', error)
   }
