@@ -112,15 +112,36 @@ export default defineEventHandler(async (event) => {
       return true
     })
 
-    // Récupérer les sélections existantes
-    const existingSelections = await prisma.artistMealSelection.findMany({
+    // Récupérer TOUTES les sélections existantes de l'artiste
+    const allExistingSelections = await prisma.artistMealSelection.findMany({
       where: {
         artistId: artist.id,
-        mealId: {
-          in: filteredMeals.map((m) => m.id),
-        },
       },
     })
+
+    // Identifier les IDs de repas éligibles
+    const eligibleMealIds = new Set(filteredMeals.map((m) => m.id))
+
+    // Identifier les sélections à supprimer (repas non éligibles)
+    const selectionsToDelete = allExistingSelections.filter(
+      (selection) => !eligibleMealIds.has(selection.mealId)
+    )
+
+    // Supprimer les sélections non éligibles
+    if (selectionsToDelete.length > 0) {
+      await prisma.artistMealSelection.deleteMany({
+        where: {
+          id: {
+            in: selectionsToDelete.map((s) => s.id),
+          },
+        },
+      })
+    }
+
+    // Filtrer les sélections existantes pour ne garder que celles éligibles
+    const existingSelections = allExistingSelections.filter((selection) =>
+      eligibleMealIds.has(selection.mealId)
+    )
 
     // Créer un map des sélections existantes
     const selectionsMap = new Map(existingSelections.map((s) => [s.mealId, s]))

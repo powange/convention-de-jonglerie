@@ -95,7 +95,7 @@
                 <th
                   class="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  {{ $t('artists.meals.title') }}
+                  Repas
                 </th>
                 <th
                   class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -160,7 +160,7 @@
                 <td class="px-4 py-3 text-sm text-center">
                   <UButton
                     :color="
-                      artist.mealSelections && artist.mealSelections.length > 0
+                      getAcceptedMealsCount(artist) > 0
                         ? 'primary'
                         : 'neutral'
                     "
@@ -168,7 +168,7 @@
                     size="sm"
                     @click="openMealsModal(artist)"
                   >
-                    <span class="font-medium">{{ artist.mealSelections?.length || 0 }}</span>
+                    <span class="font-medium">{{ getMealsDisplayText(artist) }}</span>
                     <UIcon name="i-heroicons-chevron-right" class="ml-1 h-4 w-4" />
                   </UButton>
                 </td>
@@ -489,5 +489,19 @@ const handleNotesSaved = () => {
 const openAccommodationModal = (artist: any) => {
   selectedArtistForAccommodation.value = artist
   showAccommodationModal.value = true
+}
+
+// Compter les repas acceptés (cochés)
+const getAcceptedMealsCount = (artist: any) => {
+  if (!artist.mealSelections || artist.mealSelections.length === 0) return 0
+  return artist.mealSelections.filter((selection: any) => selection.accepted).length
+}
+
+// Obtenir le texte d'affichage des repas (acceptés/total)
+const getMealsDisplayText = (artist: any) => {
+  if (!artist.mealSelections || artist.mealSelections.length === 0) return '0/0'
+  const acceptedCount = artist.mealSelections.filter((selection: any) => selection.accepted).length
+  const totalCount = artist.mealSelections.length
+  return `${acceptedCount}/${totalCount}`
 }
 </script>
