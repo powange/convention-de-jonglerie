@@ -20,7 +20,11 @@ export default defineEventHandler(async (event) => {
       // Configuration IA
       ai: {
         provider: process.env.AI_PROVIDER || config.aiProvider || 'non défini',
-        anthropicApiKey: process.env.ANTHROPIC_API_KEY ? '***SET***' : config.anthropicApiKey ? '***SET***' : 'non défini',
+        anthropicApiKey: process.env.ANTHROPIC_API_KEY
+          ? '***SET***'
+          : config.anthropicApiKey
+            ? '***SET***'
+            : 'non défini',
         ollamaBaseUrl: process.env.OLLAMA_BASE_URL || config.ollamaBaseUrl || 'non défini',
         ollamaModel: process.env.OLLAMA_MODEL || config.ollamaModel || 'non défini',
         lmstudioBaseUrl: process.env.LMSTUDIO_BASE_URL || config.lmstudioBaseUrl || 'non défini',
@@ -30,7 +34,11 @@ export default defineEventHandler(async (event) => {
       email: {
         enabled: process.env.SEND_EMAILS || config.emailEnabled || 'false',
         smtpUser: process.env.SMTP_USER || config.smtpUser || 'non défini',
-        smtpPass: process.env.SMTP_PASS ? '***SET***' : config.smtpPass ? '***SET***' : 'non défini',
+        smtpPass: process.env.SMTP_PASS
+          ? '***SET***'
+          : config.smtpPass
+            ? '***SET***'
+            : 'non défini',
       },
       // Configuration OAuth
       oauth: {

@@ -262,7 +262,10 @@
         </NuxtLink>
 
         <!-- Configuration Système -->
-        <UCard class="hover:shadow-lg transition-shadow cursor-pointer" @click="showConfigModal = true">
+        <UCard
+          class="hover:shadow-lg transition-shadow cursor-pointer"
+          @click="showConfigModal = true"
+        >
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <div class="flex items-center gap-3 mb-3">

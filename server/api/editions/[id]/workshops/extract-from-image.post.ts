@@ -96,7 +96,10 @@ export default defineEventHandler(async (event) => {
 
     // Lire directement depuis process.env au runtime (plus fiable en production)
     const aiProvider = createAIProvider({
-      provider: (process.env.AI_PROVIDER as 'anthropic' | 'ollama' | 'lmstudio') || config.aiProvider as 'anthropic' | 'ollama' | 'lmstudio' || 'anthropic',
+      provider:
+        (process.env.AI_PROVIDER as 'anthropic' | 'ollama' | 'lmstudio') ||
+        (config.aiProvider as 'anthropic' | 'ollama' | 'lmstudio') ||
+        'anthropic',
       anthropicApiKey: process.env.ANTHROPIC_API_KEY || config.anthropicApiKey,
       ollamaBaseUrl: process.env.OLLAMA_BASE_URL || config.ollamaBaseUrl,
       ollamaModel: process.env.OLLAMA_MODEL || config.ollamaModel,

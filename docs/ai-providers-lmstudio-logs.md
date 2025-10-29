@@ -41,6 +41,7 @@ docker-compose -f docker-compose.dev.yml logs -f app
 ```
 
 **Informations fournies :**
+
 - **URL** : Point d'accès de l'API LM Studio
 - **Model** : Modèle utilisé (`auto` = modèle chargé dans LM Studio)
 - **Prompt length** : Taille du prompt en caractères
@@ -70,6 +71,7 @@ docker-compose -f docker-compose.dev.yml logs -f app
 ```
 
 **Informations fournies :**
+
 - **Status** : Code de statut HTTP (200 = succès)
 - **Response time** : Temps de réponse en millisecondes
 - **Choices** : Nombre de choix retournés (normalement 1)
@@ -92,42 +94,54 @@ docker-compose -f docker-compose.dev.yml logs -f app
 **Types d'erreurs courantes :**
 
 #### 1. Service non accessible (ECONNREFUSED)
+
 ```
 Error code: ECONNREFUSED
 ```
+
 **Causes :**
+
 - LM Studio n'est pas démarré
 - Mauvaise URL (vérifier `LMSTUDIO_BASE_URL`)
 - Port bloqué par un firewall
 
 **Solutions :**
+
 - Démarrer LM Studio
 - Vérifier que le serveur API est actif (onglet "Local Server")
 - Vérifier l'URL : `curl http://localhost:1234/v1/models`
 
 #### 2. Erreur API
+
 ```
 [LM Studio] Erreur API: LM Studio API error: 400 Bad Request - ...
 ```
+
 **Causes :**
+
 - Modèle non chargé
 - Modèle sans support vision
 - Format de requête incorrect
 
 **Solutions :**
+
 - Charger un modèle avec support vision (LLaVA, BakLLaVA)
 - Vérifier que le modèle est bien chargé dans l'onglet "Chat"
 
 #### 3. Pas de JSON dans la réponse
+
 ```
 [LM Studio] Pas de JSON trouvé dans la réponse complète: Some text without JSON...
 ```
+
 **Causes :**
+
 - Modèle non adapté (pas de vision)
 - Prompt mal interprété
 - Modèle trop petit/faible
 
 **Solutions :**
+
 - Utiliser un modèle avec support vision (LLaVA recommandé)
 - Vérifier le preview de la réponse dans les logs
 - Essayer un modèle plus performant
@@ -137,28 +151,33 @@ Error code: ECONNREFUSED
 ### 1. Vérifier que LM Studio reçoit bien les requêtes
 
 **Logs à surveiller :**
+
 ```
 [LM Studio] Requête envoyée:
   URL: http://localhost:1234/v1/chat/completions
 ```
 
 **Vérification supplémentaire :**
+
 - Aller dans LM Studio > Local Server
 - Les requêtes doivent apparaître en temps réel
 
 ### 2. Diagnostiquer un temps de réponse lent
 
 **Logs à surveiller :**
+
 ```
 [LM Studio] Réponse reçue:
   Response time: 45000 ms
 ```
 
 **Temps normaux :**
+
 - **Avec GPU** : 5-15 secondes (5000-15000 ms)
 - **Sans GPU** : 15-45 secondes (15000-45000 ms)
 
 **Si trop lent :**
+
 - Vérifier l'utilisation GPU dans LM Studio
 - Essayer un modèle plus petit (LLaVA 7B)
 - Augmenter GPU Offload dans les paramètres
@@ -166,6 +185,7 @@ Error code: ECONNREFUSED
 ### 3. Vérifier la qualité de l'extraction
 
 **Logs à surveiller :**
+
 ```
 [LM Studio] Contenu de la réponse:
   Preview: {"workshops":[{"title":"Atelier...
@@ -175,6 +195,7 @@ Error code: ECONNREFUSED
 ```
 
 **Vérifications :**
+
 - Le JSON est-il bien formé dans le preview ?
 - Le nombre de workshops correspond-il à l'image ?
 - Si 0 workshops : vérifier le preview pour comprendre la réponse
@@ -182,12 +203,14 @@ Error code: ECONNREFUSED
 ### 4. Déboguer les problèmes de tokens
 
 **Logs à surveiller :**
+
 ```
 [LM Studio] Données brutes:
   Usage: { prompt_tokens: 2500, completion_tokens: 3500, total_tokens: 6000 }
 ```
 
 **Vérifications :**
+
 - **prompt_tokens** : Taille du prompt + image
   - Trop élevé (>3000) : image très grande ou prompt très long
 - **completion_tokens** : Taille de la réponse
@@ -198,9 +221,11 @@ Error code: ECONNREFUSED
 ## Logs dans les différents environnements
 
 ### Développement local (npm run dev)
+
 Les logs s'affichent directement dans le terminal où le serveur tourne.
 
 ### Docker développement
+
 ```bash
 # Logs en temps réel
 npm run docker:dev:logs
@@ -213,6 +238,7 @@ docker-compose -f docker-compose.dev.yml logs --tail=50 app
 ```
 
 ### Production/Release
+
 ```bash
 # Logs du conteneur
 docker logs convention-app-prod
@@ -273,6 +299,7 @@ Cependant, ces logs sont utiles pour diagnostiquer les problèmes, même en prod
 ```
 
 **Analyse :**
+
 - ✅ Connexion établie (200 OK)
 - ✅ Temps de réponse raisonnable (~12 secondes)
 - ✅ Modèle LLaVA utilisé (support vision)

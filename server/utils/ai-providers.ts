@@ -191,7 +191,7 @@ export class LMStudioProvider implements AIProvider {
     imageType: string,
     prompt: string
   ): Promise<AIVisionResponse> {
-    console.log('[LM Studio] === Début de l\'extraction de workshops ===')
+    console.log("[LM Studio] === Début de l'extraction de workshops ===")
 
     try {
       const requestPayload = {
@@ -300,7 +300,7 @@ export class LMStudioProvider implements AIProvider {
 
       return parsedData
     } catch (error: any) {
-      console.error('[LM Studio] Erreur lors de l\'extraction:')
+      console.error("[LM Studio] Erreur lors de l'extraction:")
       console.error('  Error code:', error.code)
       console.error('  Error message:', error.message)
       console.error('  Error stack:', error.stack)
