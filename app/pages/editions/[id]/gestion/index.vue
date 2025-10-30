@@ -340,6 +340,15 @@
                 :description="$t('gestion.meals.list_description')"
                 color="purple"
               />
+
+              <!-- Validation des repas -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/meals/validate`"
+                icon="i-heroicons-check-badge"
+                :title="$t('gestion.meals.validation_title')"
+                :description="$t('gestion.meals.validation_description')"
+                color="green"
+              />
             </div>
           </div>
         </UCard>
