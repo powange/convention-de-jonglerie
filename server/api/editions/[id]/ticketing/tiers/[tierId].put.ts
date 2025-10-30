@@ -17,6 +17,7 @@ const bodySchema = z.object({
   validUntil: z.string().nullable().optional(),
   quotaIds: z.array(z.number().int()).optional().default([]),
   returnableItemIds: z.array(z.number().int()).optional().default([]),
+  mealIds: z.array(z.number().int()).optional().default([]),
 })
 
 export default defineEventHandler(async (event) => {

@@ -67,6 +67,22 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
+      tiers: {
+        include: {
+          tier: {
+            include: {
+              orderItems: {
+                where: {
+                  state: 'Processed',
+                },
+                include: {
+                  order: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
     orderBy: {
       mealType: 'asc',
@@ -117,7 +133,23 @@ export default defineEventHandler(async (event) => {
       afterShow: selection.afterShow,
     }))
 
-    const allParticipants = [...volunteers, ...artists].sort((a, b) => {
+    // Récupérer les participants via les tarifs avec repas
+    const ticketParticipants = meal.tiers.flatMap((tierMeal) =>
+      tierMeal.tier.orderItems.map((orderItem) => ({
+        type: 'ticket' as const,
+        nom: orderItem.lastName || orderItem.order.payerLastName || '',
+        prenom: orderItem.firstName || orderItem.order.payerFirstName || '',
+        email: orderItem.email || orderItem.order.payerEmail || '',
+        phone: '',
+        dietaryPreference: null,
+        allergies: null,
+        allergySeverity: null,
+        emergencyContactName: null,
+        emergencyContactPhone: null,
+      }))
+    )
+
+    const allParticipants = [...volunteers, ...artists, ...ticketParticipants].sort((a, b) => {
       const nameA = `${a.nom || ''} ${a.prenom || ''}`
       const nameB = `${b.nom || ''} ${b.prenom || ''}`
       return nameA.localeCompare(nameB)
@@ -156,6 +188,7 @@ export default defineEventHandler(async (event) => {
       totalParticipants: allParticipants.length,
       volunteerCount: volunteers.length,
       artistCount: artists.length,
+      ticketParticipantCount: ticketParticipants.length,
       participants: allParticipants,
     }
   })

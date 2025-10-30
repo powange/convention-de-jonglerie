@@ -904,6 +904,7 @@ model TicketingTier {
   returnableItems   TicketingTierReturnableItem[]
   orderItems        TicketingOrderItem[]
   customFields      TicketingTierCustomFieldAssociation[]
+  meals             TicketingTierMeal[]
 
   @@unique([externalTicketingId, helloAssoTierId])
   @@index([externalTicketingId])
@@ -1344,6 +1345,7 @@ model VolunteerMeal {
   mealSelections       VolunteerMealSelection[]
   artistMealSelections ArtistMealSelection[]
   returnableItems      VolunteerMealReturnableItem[]
+  tiers                TicketingTierMeal[]
 
   @@unique([editionId, date, mealType])
   @@index([editionId])
@@ -1397,4 +1399,20 @@ model VolunteerMealReturnableItem {
   @@unique([mealId, returnableItemId])
   @@index([mealId])
   @@index([returnableItemId])
+}
+
+// Association tarif -> repas
+model TicketingTierMeal {
+  id        Int      @id @default(autoincrement())
+  tierId    Int
+  mealId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tier TicketingTier  @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  meal VolunteerMeal  @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([tierId, mealId])
+  @@index([tierId])
+  @@index([mealId])
 }

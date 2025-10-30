@@ -255,6 +255,25 @@
             </template>
           </USelectMenu>
         </UFormField>
+
+        <UFormField :label="$t('ticketing.tiers.modal.meals_label')" name="meals">
+          <USelectMenu
+            v-model="form.mealIds"
+            :items="mealsOptions"
+            value-key="value"
+            multiple
+            searchable
+            :placeholder="$t('ticketing.tiers.modal.meals_placeholder')"
+            class="w-full"
+          >
+            <template #label>
+              <span v-if="form.mealIds.length === 0">{{
+                $t('ticketing.tiers.modal.no_meal_selected')
+              }}</span>
+              <span v-else>{{ form.mealIds.length }} repas sélectionné(s)</span>
+            </template>
+          </USelectMenu>
+        </UFormField>
       </form>
     </template>
 
@@ -381,24 +400,50 @@ const form = ref({
   isAllDay: false,
   quotaIds: [] as number[],
   returnableItemIds: [] as number[],
+  mealIds: [] as number[],
 })
 
-// Charger les quotas et items disponibles
+// Charger les quotas, items et repas disponibles
 const quotas = ref<any[]>([])
 const returnableItems = ref<any[]>([])
+const meals = ref<any[]>([])
+
+// Utiliser les utilitaires meals pour formater les labels
+const { getMealTypeLabel } = useMealTypeLabel()
+const { getPhasesLabel } = useMealPhaseLabel()
+
+// Computed pour formater les options de repas
+const mealsOptions = computed(() => {
+  return meals.value.map((meal) => {
+    const dateStr = new Date(meal.date).toLocaleDateString('fr-FR', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    })
+    const mealTypeLabel = getMealTypeLabel(meal.mealType)
+    const phasesLabel = getPhasesLabel(meal.phases)
+
+    return {
+      label: `${dateStr} - ${mealTypeLabel} (${phasesLabel})`,
+      value: meal.id,
+    }
+  })
+})
 
 const loadQuotasAndItems = async () => {
   try {
-    const [quotasData, itemsResponse] = await Promise.all([
+    const [quotasData, itemsResponse, mealsResponse] = await Promise.all([
       $fetch(`/api/editions/${props.editionId}/ticketing/quotas`),
       $fetch(`/api/editions/${props.editionId}/ticketing/returnable-items`),
+      $fetch(`/api/editions/${props.editionId}/volunteers/meals`),
     ])
     quotas.value = Array.isArray(quotasData) ? quotasData : []
     returnableItems.value = Array.isArray(itemsResponse?.returnableItems)
       ? itemsResponse.returnableItems
       : []
+    meals.value = Array.isArray(mealsResponse?.meals) ? mealsResponse.meals : []
   } catch (error) {
-    console.error('Failed to load quotas and items:', error)
+    console.error('Failed to load quotas, items and meals:', error)
   }
 }
 
@@ -433,6 +478,7 @@ watch(
           isAllDay,
           quotaIds: props.tier.quotas?.map((q: any) => q.quotaId) || [],
           returnableItemIds: props.tier.returnableItems?.map((r: any) => r.returnableItemId) || [],
+          mealIds: props.tier.meals?.map((m: any) => m.mealId) || [],
         }
       } else {
         // Mode création
@@ -452,6 +498,7 @@ watch(
           isAllDay: false,
           quotaIds: [],
           returnableItemIds: [],
+          mealIds: [],
         }
       }
     }
@@ -555,6 +602,7 @@ const handleSubmit = async () => {
       validUntil: finalValidUntil.value,
       quotaIds: form.value.quotaIds,
       returnableItemIds: form.value.returnableItemIds,
+      mealIds: form.value.mealIds,
     }
 
     if (props.tier) {

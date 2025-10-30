@@ -14,6 +14,7 @@ export interface TierData {
   validUntil?: string | null
   quotaIds?: number[]
   returnableItemIds?: number[]
+  mealIds?: number[]
 }
 
 /**
@@ -60,6 +61,11 @@ export async function getEditionTiers(
       customFields: {
         include: {
           customField: true,
+        },
+      },
+      meals: {
+        include: {
+          meal: true,
         },
       },
       _count: {
@@ -114,6 +120,9 @@ export async function createTier(editionId: number, data: TierData) {
           returnableItemId,
         })),
       },
+      meals: {
+        create: (data.mealIds || []).map((mealId) => ({ mealId })),
+      },
     },
   })
 }
@@ -144,6 +153,7 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
     // Supprimer les anciennes relations
     await tx.ticketingTierQuota.deleteMany({ where: { tierId } })
     await tx.ticketingTierReturnableItem.deleteMany({ where: { tierId } })
+    await tx.ticketingTierMeal.deleteMany({ where: { tierId } })
 
     // Pour les tarifs HelloAsso, on met à jour le customName, les dates de validité et les relations
     // Pour les tarifs manuels, on met à jour tout
@@ -162,6 +172,9 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
             create: (data.returnableItemIds || []).map((returnableItemId) => ({
               returnableItemId,
             })),
+          },
+          meals: {
+            create: (data.mealIds || []).map((mealId) => ({ mealId })),
           },
         },
       })
@@ -187,6 +200,9 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
             create: (data.returnableItemIds || []).map((returnableItemId) => ({
               returnableItemId,
             })),
+          },
+          meals: {
+            create: (data.mealIds || []).map((mealId) => ({ mealId })),
           },
         },
       })

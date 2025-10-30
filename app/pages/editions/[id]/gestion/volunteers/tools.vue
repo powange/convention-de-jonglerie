@@ -422,11 +422,20 @@ const generateCateringPdf = async () => {
 
       doc.setFontSize(10)
       doc.setFont('helvetica', 'normal')
-      doc.text(
-        `Total: ${meal.totalParticipants} participants (${meal.volunteerCount} bénévoles, ${meal.artistCount} artistes)`,
-        30,
-        yPosition
-      )
+
+      // Construire le texte avec les différents types de participants
+      const participantsParts = [
+        `${meal.volunteerCount} bénévole${meal.volunteerCount > 1 ? 's' : ''}`,
+        `${meal.artistCount} artiste${meal.artistCount > 1 ? 's' : ''}`,
+      ]
+
+      if (meal.ticketParticipantCount > 0) {
+        participantsParts.push(
+          `${meal.ticketParticipantCount} participant${meal.ticketParticipantCount > 1 ? 's' : ''}`
+        )
+      }
+
+      doc.text(`Total: ${meal.totalParticipants} (${participantsParts.join(', ')})`, 30, yPosition)
       yPosition += 5
 
       // Afficher le nombre d'artistes qui mangent après le spectacle
@@ -502,10 +511,10 @@ const generateCateringPdf = async () => {
       yPosition += 5
     }
 
-    // === PAGES SUIVANTES: TABLEAUX PAR REPAS (FORMAT PAYSAGE) ===
+    // === PAGES SUIVANTES: TABLEAUX PAR REPAS (FORMAT PORTRAIT) ===
     for (const meal of cateringData.meals) {
-      // Ajouter une nouvelle page en format paysage
-      doc.addPage('a4', 'landscape')
+      // Ajouter une nouvelle page en format portrait
+      doc.addPage('a4', 'portrait')
 
       const mealLabel =
         mealTypeLabels[meal.mealType as keyof typeof mealTypeLabels] || meal.mealType
@@ -524,7 +533,8 @@ const generateCateringPdf = async () => {
 
       // Préparer les données du tableau
       const tableData = meal.participants.map((p: any) => {
-        const typeLabel = p.type === 'volunteer' ? 'Bénévole' : 'Artiste'
+        const typeLabel =
+          p.type === 'volunteer' ? 'Bénévole' : p.type === 'artist' ? 'Artiste' : 'Participant'
         const dietLabel =
           p.dietaryPreference === 'VEGETARIAN'
             ? 'Végétarien'
@@ -587,16 +597,16 @@ const generateCateringPdf = async () => {
           fontSize: 7,
         },
         columnStyles: {
-          0: { cellWidth: 8 }, // Case à cocher
-          1: { cellWidth: 25 }, // Nom
-          2: { cellWidth: 25 }, // Prénom
-          3: { cellWidth: 20 }, // Type
-          4: { cellWidth: 18 }, // Après spectacle
-          5: { cellWidth: 42 }, // Email
-          6: { cellWidth: 25 }, // Téléphone
-          7: { cellWidth: 18 }, // Régime
-          8: { cellWidth: 32 }, // Allergies
-          9: { cellWidth: 16 }, // Sévérité
+          0: { cellWidth: 6 }, // Case à cocher
+          1: { cellWidth: 20 }, // Nom
+          2: { cellWidth: 20 }, // Prénom
+          3: { cellWidth: 16 }, // Type
+          4: { cellWidth: 14 }, // Après spectacle
+          5: { cellWidth: 35 }, // Email
+          6: { cellWidth: 20 }, // Téléphone
+          7: { cellWidth: 15 }, // Régime
+          8: { cellWidth: 'auto' }, // Allergies (prend l'espace restant)
+          9: { cellWidth: 14 }, // Sévérité
         },
         margin: { left: 20, right: 20 },
         didDrawCell: (data: any) => {
