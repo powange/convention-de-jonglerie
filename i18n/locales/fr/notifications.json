@@ -77,6 +77,14 @@
     },
     "this_week": "Cette semaine",
     "unread": "Non lues",
+    "artist": {
+      "arrival": {
+        "action": "Voir les artistes",
+        "message": "{artistName} vient de scanner son billet et est arrivé sur la convention.",
+        "message_with_shows": "{artistName} vient de scanner son billet et est arrivé sur la convention.\n\nSpectacles associés :\n• {shows}",
+        "title": "Arrivée d'un artiste 🎭"
+      }
+    },
     "volunteer": {
       "application_accepted": {
         "action": "Voir les détails",

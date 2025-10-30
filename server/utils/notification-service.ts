@@ -725,4 +725,40 @@ export const NotificationHelpers = {
       notificationType: 'carpool_booking_cancelled',
     })
   },
+
+  /**
+   * Notification d'arrivée d'un artiste
+   */
+  async artistArrival(
+    userId: number,
+    artistName: string,
+    editionId: number,
+    artistId: number,
+    shows?: string[]
+  ) {
+    // Choisir la bonne clé de message selon si il y a des spectacles ou non
+    const messageKey =
+      shows && shows.length > 0
+        ? 'notifications.artist.arrival.message_with_shows'
+        : 'notifications.artist.arrival.message'
+
+    const translationParams: Record<string, any> = { artistName }
+    if (shows && shows.length > 0) {
+      translationParams.shows = shows.join('\n• ')
+    }
+
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      titleKey: 'notifications.artist.arrival.title',
+      messageKey,
+      translationParams,
+      actionTextKey: 'notifications.artist.arrival.action',
+      category: 'artist',
+      entityType: 'EditionArtist',
+      entityId: artistId.toString(),
+      actionUrl: `/editions/${editionId}/gestion/artists`,
+      notificationType: 'artist_arrival',
+    })
+  },
 }

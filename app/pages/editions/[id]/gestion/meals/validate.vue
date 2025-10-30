@@ -193,9 +193,9 @@ import { useRoute } from 'vue-router'
 
 import { useDebounce } from '~/composables/useDebounce'
 import { useMealTypeLabel } from '~/composables/useMeals'
-import { formatMealDate } from '~/utils/meals'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { formatMealDate } from '~/utils/meals'
 
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -281,7 +281,9 @@ const getPersonTypeBadgeColor = (type: string) => {
 const fetchMeals = async () => {
   loadingMeals.value = true
   try {
-    const data = await $fetch<{ success: boolean; meals: any[] }>(`/api/editions/${editionId}/meals`)
+    const data = await $fetch<{ success: boolean; meals: any[] }>(
+      `/api/editions/${editionId}/meals`
+    )
     meals.value = data.meals || []
   } catch (error) {
     console.error('Error fetching meals:', error)
@@ -304,9 +306,12 @@ const searchPeople = async () => {
 
   searching.value = true
   try {
-    const data = await $fetch<{ results: any[] }>(`/api/editions/${editionId}/meals/${selectedMeal.value.id}/search`, {
-      params: { q: searchQuery.value },
-    })
+    const data = await $fetch<{ results: any[] }>(
+      `/api/editions/${editionId}/meals/${selectedMeal.value.id}/search`,
+      {
+        params: { q: searchQuery.value },
+      }
+    )
     searchResults.value = data.results || []
   } catch (error) {
     console.error('Error searching people:', error)

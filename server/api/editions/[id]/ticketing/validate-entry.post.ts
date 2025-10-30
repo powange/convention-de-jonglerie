@@ -227,6 +227,75 @@ export default defineEventHandler(async (event) => {
         await updateUserInfo(userIds, body.userInfo)
       }
 
+      // Envoyer des notifications aux responsables artistes
+      // Pour chaque artiste validé
+      for (const artistId of body.participantIds) {
+        try {
+          // Récupérer les informations de l'artiste et ses spectacles
+          const artist = await prisma.editionArtist.findUnique({
+            where: { id: artistId },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  pseudo: true,
+                  prenom: true,
+                  nom: true,
+                },
+              },
+              shows: {
+                include: {
+                  show: {
+                    select: {
+                      id: true,
+                      title: true,
+                    },
+                  },
+                },
+              },
+            },
+          })
+
+          if (!artist) continue
+
+          // Récupérer tous les collaborateurs avec droits de gestion des artistes
+          const artistManagers = await prisma.editionCollaborator.findMany({
+            where: {
+              editionId: editionId,
+              canManageArtists: true,
+            },
+            select: {
+              userId: true,
+            },
+          })
+
+          // Construire le nom de l'artiste
+          const artistName =
+            `${artist.user.prenom || ''} ${artist.user.nom || ''}`.trim() || artist.user.pseudo
+
+          // Construire la liste des spectacles
+          const shows = artist.shows.map((showArtist) => showArtist.show.title)
+
+          // Envoyer une notification à chaque responsable artiste
+          const { NotificationHelpers } = await import('@@/server/utils/notification-service')
+          for (const manager of artistManagers) {
+            await NotificationHelpers.artistArrival(
+              manager.userId,
+              artistName,
+              editionId,
+              artist.id,
+              shows.length > 0 ? shows : undefined
+            )
+          }
+        } catch (notifError) {
+          // Ne pas bloquer la validation si l'envoi de notification échoue
+          console.error(
+            `Erreur lors de l'envoi de notification pour l'artiste ${artistId}:`,
+            notifError
+          )
+        }
+      }
+
       // Notifier via SSE
       try {
         const { broadcastToEditionSSE } = await import('@@/server/utils/sse-manager')

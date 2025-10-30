@@ -6,12 +6,14 @@ export interface NotificationPreferences {
   conventionNews: boolean
   systemNotifications: boolean
   carpoolUpdates: boolean
+  artistUpdates: boolean
   // Préférences email pour chaque type de notification
   emailVolunteerReminders: boolean
   emailApplicationUpdates: boolean
   emailConventionNews: boolean
   emailSystemNotifications: boolean
   emailCarpoolUpdates: boolean
+  emailArtistUpdates: boolean
 }
 
 // Préférences par défaut (tout activé)
@@ -21,12 +23,14 @@ const defaultPreferences: NotificationPreferences = {
   conventionNews: true,
   systemNotifications: true,
   carpoolUpdates: true,
+  artistUpdates: true,
   // Par défaut, les notifications email sont activées
   emailVolunteerReminders: true,
   emailApplicationUpdates: true,
   emailConventionNews: true,
   emailSystemNotifications: true,
   emailCarpoolUpdates: true,
+  emailArtistUpdates: true,
 }
 
 /**
@@ -103,6 +107,9 @@ export const NotificationTypeMapping = {
   carpool_booking_accepted: 'carpoolUpdates' as const,
   carpool_booking_rejected: 'carpoolUpdates' as const,
   carpool_booking_cancelled: 'carpoolUpdates' as const,
+
+  // Artistes
+  artist_arrival: 'artistUpdates' as const,
 
   // Système
   system_notification: 'systemNotifications' as const,
