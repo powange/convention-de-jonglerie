@@ -329,6 +329,9 @@ const isAcceptedVolunteer = ref(false)
 // État pour vérifier si l'utilisateur peut accéder à la validation des repas
 const canAccessMealValidation = ref(false)
 
+// État pour vérifier si l'utilisateur a un créneau actif de contrôle d'accès
+const canAccessAccessControlPage = ref(false)
+
 // Description de la convention en HTML (rendu Markdown)
 const conventionDescriptionHtml = computedAsync(async () => {
   if (!props.edition?.convention?.description) {
@@ -370,6 +373,11 @@ const canAccess = computed(() => {
 
   // Bénévoles avec accès à la validation des repas
   if (canAccessMealValidation.value) {
+    return true
+  }
+
+  // Bénévoles avec créneau actif de contrôle d'accès
+  if (canAccessAccessControlPage.value) {
     return true
   }
 
@@ -452,10 +460,21 @@ watch(
       } catch {
         canAccessMealValidation.value = false
       }
+
+      // Vérifier si l'utilisateur a un créneau actif de contrôle d'accès
+      try {
+        const response = await $fetch<{ isActive: boolean }>(
+          `/api/editions/${props.edition.id}/volunteers/access-control/status`
+        )
+        canAccessAccessControlPage.value = response.isActive
+      } catch {
+        canAccessAccessControlPage.value = false
+      }
     } else {
       isTeamLeaderValue.value = false
       isAcceptedVolunteer.value = false
       canAccessMealValidation.value = false
+      canAccessAccessControlPage.value = false
     }
   },
   { immediate: true }
