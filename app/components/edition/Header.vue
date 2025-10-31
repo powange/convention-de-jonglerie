@@ -326,6 +326,9 @@ const isTeamLeaderValue = ref(false)
 // État pour vérifier si l'utilisateur est un bénévole accepté
 const isAcceptedVolunteer = ref(false)
 
+// État pour vérifier si l'utilisateur peut accéder à la validation des repas
+const canAccessMealValidation = ref(false)
+
 // Description de la convention en HTML (rendu Markdown)
 const conventionDescriptionHtml = computedAsync(async () => {
   if (!props.edition?.convention?.description) {
@@ -362,6 +365,11 @@ const canAccess = computed(() => {
 
   // Responsables d'équipe de bénévoles
   if (isTeamLeaderValue.value) {
+    return true
+  }
+
+  // Bénévoles avec accès à la validation des repas
+  if (canAccessMealValidation.value) {
     return true
   }
 
@@ -434,9 +442,20 @@ watch(
       } catch {
         isAcceptedVolunteer.value = false
       }
+
+      // Vérifier si l'utilisateur peut accéder à la validation des repas
+      try {
+        const response = await $fetch<{ canAccess: boolean }>(
+          `/api/editions/${props.edition.id}/permissions/can-access-meal-validation`
+        )
+        canAccessMealValidation.value = response.canAccess
+      } catch {
+        canAccessMealValidation.value = false
+      }
     } else {
       isTeamLeaderValue.value = false
       isAcceptedVolunteer.value = false
+      canAccessMealValidation.value = false
     }
   },
   { immediate: true }

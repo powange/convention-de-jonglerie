@@ -314,7 +314,7 @@
           </div>
         </UCard>
 
-        <!-- Repas -->
+        <!-- Repas (accès complet pour collaborateurs) -->
         <UCard v-if="isCollaborator">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
@@ -342,6 +342,27 @@
               />
 
               <!-- Validation des repas -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/meals/validate`"
+                icon="i-heroicons-check-badge"
+                :title="$t('gestion.meals.validation_title')"
+                :description="$t('gestion.meals.validation_description')"
+                color="green"
+              />
+            </div>
+          </div>
+        </UCard>
+
+        <!-- Validation des repas (accès pour bénévoles d'équipes de validation) -->
+        <UCard v-else-if="canAccessMealValidation">
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-cake" class="text-orange-500" />
+              <h2 class="text-lg font-semibold">{{ $t('gestion.meals.title') }}</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <!-- Validation des repas uniquement -->
               <ManagementNavigationCard
                 :to="`/editions/${edition.id}/gestion/meals/validate`"
                 icon="i-heroicons-check-badge"
@@ -976,6 +997,19 @@ onMounted(async () => {
   if (authStore.user?.id) {
     isTeamLeaderValue.value = await editionStore.isTeamLeader(editionId, authStore.user.id)
   }
+
+  // Vérifier si l'utilisateur peut accéder à la validation des repas
+  if (authStore.user?.id) {
+    try {
+      const response = await $fetch<{ canAccess: boolean }>(
+        `/api/editions/${editionId}/permissions/can-access-meal-validation`
+      )
+      canAccessMealValidation.value = response.canAccess
+    } catch (error) {
+      console.error('Error checking meal validation access:', error)
+      canAccessMealValidation.value = false
+    }
+  }
 })
 
 watch(volunteersSettings, () => {
@@ -1084,6 +1118,9 @@ const canAccess = computed(() => {
   // Responsables d'équipe de bénévoles
   if (isTeamLeaderValue.value) return true
 
+  // Bénévoles avec accès à la validation des repas
+  if (canAccessMealValidation.value) return true
+
   // Tous les collaborateurs de la convention (même sans droits)
   if (edition.value.convention?.collaborators) {
     return edition.value.convention.collaborators.some(
@@ -1120,6 +1157,10 @@ const isCollaborator = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.isCollaborator(edition.value, authStore.user.id)
 })
+
+// Vérifier si l'utilisateur peut accéder à la validation des repas
+// (bénévole d'équipe de validation des repas)
+const canAccessMealValidation = ref(false)
 
 // État pour les modals de collaborateurs
 const addCollaboratorModalOpen = ref(false)

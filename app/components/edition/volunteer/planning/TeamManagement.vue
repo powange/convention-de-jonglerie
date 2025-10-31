@@ -256,6 +256,20 @@
               </USwitch>
             </UFormField>
 
+            <!-- Équipe de validation des repas -->
+            <UFormField
+              name="isMealValidationTeam"
+              :label="t('editions.volunteers.meal_validation_team')"
+            >
+              <USwitch v-model="teamFormState.isMealValidationTeam">
+                <template #label>
+                  <span class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ t('editions.volunteers.meal_validation_team_hint') }}
+                  </span>
+                </template>
+              </USwitch>
+            </UFormField>
+
             <!-- Visibilité pour les bénévoles -->
             <UFormField name="isVisibleToVolunteers" label="Visibilité pour les bénévoles">
               <USwitch v-model="teamFormState.isVisibleToVolunteers">
@@ -347,6 +361,7 @@ const teamSchema = z.object({
   maxVolunteers: z.number().int().positive().optional(),
   isRequired: z.boolean().optional(),
   isAccessControlTeam: z.boolean().optional(),
+  isMealValidationTeam: z.boolean().optional(),
   isVisibleToVolunteers: z.boolean().optional(),
 })
 
@@ -358,6 +373,7 @@ const teamFormState = ref({
   maxVolunteers: undefined as number | undefined,
   isRequired: false,
   isAccessControlTeam: false,
+  isMealValidationTeam: false,
   isVisibleToVolunteers: true,
 })
 
@@ -408,6 +424,7 @@ const openCreateTeamModal = () => {
     maxVolunteers: undefined,
     isRequired: false,
     isAccessControlTeam: false,
+    isMealValidationTeam: false,
     isVisibleToVolunteers: true,
   }
   teamModalOpen.value = true
@@ -422,6 +439,7 @@ const openEditTeamModal = (team: VolunteerTeam) => {
     maxVolunteers: team.maxVolunteers,
     isRequired: team.isRequired || false,
     isAccessControlTeam: team.isAccessControlTeam || false,
+    isMealValidationTeam: team.isMealValidationTeam || false,
     isVisibleToVolunteers: team.isVisibleToVolunteers ?? true,
   }
   teamModalOpen.value = true

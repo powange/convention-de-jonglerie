@@ -6,6 +6,7 @@ export interface VolunteerTeam {
   maxVolunteers?: number
   isRequired?: boolean
   isAccessControlTeam?: boolean
+  isMealValidationTeam?: boolean
   isVisibleToVolunteers?: boolean
   createdAt: string
   updatedAt: string
@@ -22,6 +23,7 @@ export interface CreateTeamData {
   maxVolunteers?: number
   isRequired?: boolean
   isAccessControlTeam?: boolean
+  isMealValidationTeam?: boolean
   isVisibleToVolunteers?: boolean
 }
 

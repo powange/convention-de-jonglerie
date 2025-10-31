@@ -726,6 +726,7 @@ model VolunteerTeam {
   maxVolunteers         Int?
   isRequired            Boolean  @default(false)
   isAccessControlTeam   Boolean  @default(false)
+  isMealValidationTeam  Boolean  @default(false)
   isVisibleToVolunteers Boolean  @default(true)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt

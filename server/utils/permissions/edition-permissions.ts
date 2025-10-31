@@ -341,3 +341,23 @@ export async function canAccessEditionDataOrAccessControl(
 
   return hasAccessControlAccess
 }
+
+/**
+ * Vérifie si un utilisateur peut accéder aux données d'une édition
+ * en tant que gestionnaire OU en tant que bénévole/leader de validation des repas
+ */
+export async function canAccessEditionDataOrMealValidation(
+  editionId: number,
+  userId: number,
+  event?: any
+): Promise<boolean> {
+  // Vérifier d'abord les permissions de gestion classiques
+  const hasManagementAccess = await canAccessEditionData(editionId, userId, event)
+  if (hasManagementAccess) return true
+
+  // Si pas d'accès en gestion, vérifier si l'utilisateur peut accéder à la validation des repas
+  const { canAccessMealValidation } = await import('./meal-validation-permissions')
+  const hasMealValidationAccess = await canAccessMealValidation(userId, editionId)
+
+  return hasMealValidationAccess
+}

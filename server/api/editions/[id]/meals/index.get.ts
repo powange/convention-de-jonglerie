@@ -1,5 +1,5 @@
 import { requireAuth } from '@@/server/utils/auth-utils'
-import { canAccessEditionData } from '@@/server/utils/permissions/edition-permissions'
+import { canAccessEditionDataOrMealValidation } from '@@/server/utils/permissions/edition-permissions'
 import { prisma } from '@@/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Edition invalide' })
   }
 
-  const allowed = await canAccessEditionData(editionId, user.id, event)
+  const allowed = await canAccessEditionDataOrMealValidation(editionId, user.id, event)
   if (!allowed) {
     throw createError({
       statusCode: 403,

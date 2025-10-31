@@ -297,6 +297,8 @@
       "acceptance_note_title": "Note d'acceptation",
       "access_control_team": "Équipe de contrôle d'accès",
       "access_control_team_hint": "Cette équipe s'occupe du contrôle d'accès et de la validation des entrées",
+      "meal_validation_team": "Équipe de validation des repas",
+      "meal_validation_team_hint": "Cette équipe s'occupe de la validation des repas des participants",
       "action_accept": "Accepter",
       "action_back_pending": "Remettre en attente",
       "action_delete": "Supprimer",
