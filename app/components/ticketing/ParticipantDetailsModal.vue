@@ -624,6 +624,26 @@
           description="Cette commande n'a pas encore été marquée comme payée. Souhaitez-vous confirmer le paiement avant de valider l'entrée ?"
         />
 
+        <!-- Montant à payer -->
+        <div
+          class="p-4 rounded-lg bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 border border-primary-200 dark:border-primary-800"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <UIcon
+                name="i-heroicons-banknotes"
+                class="text-primary-600 dark:text-primary-400 h-5 w-5"
+              />
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Montant à payer
+              </span>
+            </div>
+            <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">
+              {{ (amountToPay / 100).toFixed(2) }} €
+            </span>
+          </div>
+        </div>
+
         <div class="space-y-3">
           <div
             class="p-4 rounded-lg border-2 cursor-pointer transition-all"
@@ -1016,6 +1036,23 @@ const selectAllParticipants = () => {
       participantItems.value.filter((item) => !item.entryValidated).map((item) => item.id) || []
   }
 }
+
+// Computed pour calculer le montant total à payer
+const amountToPay = computed(() => {
+  if (!props.participant || !('ticket' in props.participant)) return 0
+
+  // Si des participants sont sélectionnés, calculer uniquement leur total
+  if (selectedParticipants.value.length > 0) {
+    return participantItems.value
+      .filter((item) => selectedParticipants.value.includes(item.id))
+      .reduce((total, item) => total + item.amount, 0)
+  }
+
+  // Sinon, calculer le total de la commande (seulement les items non validés)
+  return participantItems.value
+    .filter((item) => !item.entryValidated)
+    .reduce((total, item) => total + item.amount, 0)
+})
 
 const showValidateTicketsConfirm = () => {
   if (selectedParticipants.value.length === 0) return
