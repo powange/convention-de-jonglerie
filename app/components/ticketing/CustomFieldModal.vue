@@ -208,7 +208,11 @@ const removeValue = (index: number) => {
 const loadTiers = async () => {
   loadingTiers.value = true
   try {
-    const response = await $fetch(`/api/editions/${props.editionId}/ticketing/tiers/available`)
+    const response = await $fetch(`/api/editions/${props.editionId}/ticketing/tiers/available`, {
+      query: {
+        showAll: true,
+      },
+    })
     availableTiers.value = response.tiers || []
   } catch (error) {
     console.error('Erreur lors du chargement des tarifs:', error)
