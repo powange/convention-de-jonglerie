@@ -160,6 +160,7 @@ export default defineEventHandler(async (event) => {
       const orderItems = await prisma.ticketingOrderItem.findMany({
         where: {
           tierId: { in: tierIds },
+          state: { in: ['Valid', 'Processed'] },
           order: {
             editionId,
             status: 'Processed',

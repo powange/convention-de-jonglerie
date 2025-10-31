@@ -108,7 +108,10 @@
               </div>
 
               <!-- Bouton de synchronisation HelloAsso -->
-              <div v-if="hasHelloAssoConfig" class="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div
+                v-if="hasHelloAssoConfig"
+                class="pt-4 border-t border-gray-200 dark:border-gray-700"
+              >
                 <UButton
                   icon="i-heroicons-arrow-path"
                   color="primary"
@@ -812,7 +815,8 @@ const formatValidationTime = (dateString: string) => {
 const checkHelloAssoConfig = async () => {
   try {
     const result: any = await $fetch(`/api/editions/${editionId}/ticketing/external`)
-    hasHelloAssoConfig.value = result?.hasConfig && result?.config?.provider?.toUpperCase() === 'HELLOASSO'
+    hasHelloAssoConfig.value =
+      result?.hasConfig && result?.config?.provider?.toUpperCase() === 'HELLOASSO'
   } catch {
     // Pas de configuration HelloAsso
     hasHelloAssoConfig.value = false

@@ -50,7 +50,15 @@
       "error_loading_meals": "Erreur lors du chargement des repas",
       "error_searching": "Erreur lors de la recherche",
       "error_validating": "Erreur lors de la validation du repas",
-      "error_cancelling": "Erreur lors de l'annulation de la validation"
+      "error_cancelling": "Erreur lors de l'annulation de la validation",
+      "progress": "Avancement",
+      "validated_lowercase": "validés",
+      "volunteers": "Bénévoles",
+      "artists": "Artistes",
+      "participants": "Participants",
+      "pending_validations": "Personnes en attente de validation",
+      "all_validated": "Tous les repas ont été validés",
+      "error_loading_pending": "Erreur lors du chargement de la liste"
     },
     "ticketing": {
       "title": "Billeterie",

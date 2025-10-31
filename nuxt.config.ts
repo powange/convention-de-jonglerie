@@ -172,6 +172,7 @@ export default defineNuxtConfig({
           'fr/app.json',
           'fr/public.json',
           'fr/feedback.json',
+          'fr/gestion.json',
         ],
       },
       {

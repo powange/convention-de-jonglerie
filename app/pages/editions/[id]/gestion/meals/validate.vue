@@ -61,6 +61,159 @@
             </USelectMenu>
           </div>
 
+          <!-- Statistiques du repas sélectionné -->
+          <div v-if="selectedMeal && mealStats" class="mb-6">
+            <div
+              class="bg-gradient-to-r from-primary-50 to-blue-50 dark:from-primary-900/20 dark:to-blue-900/20 rounded-lg p-4 border border-primary-200 dark:border-primary-800"
+            >
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <UIcon
+                    name="i-heroicons-chart-bar"
+                    class="text-primary-600 dark:text-primary-400 h-5 w-5"
+                  />
+                  <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
+                    {{ $t('gestion.meals.progress') }}
+                  </h3>
+                </div>
+                <div class="text-right">
+                  <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                    {{ mealStats.validated }} / {{ mealStats.total }}
+                  </div>
+                  <div class="text-xs text-gray-600 dark:text-gray-400">
+                    {{ mealStats.percentage }}% {{ $t('gestion.meals.validated_lowercase') }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Barre de progression -->
+              <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                <div
+                  class="h-full bg-gradient-to-r from-primary-500 to-blue-500 transition-all duration-500 ease-out rounded-full flex items-center justify-end pr-2"
+                  :style="{ width: `${mealStats.percentage}%` }"
+                >
+                  <span v-if="mealStats.percentage > 15" class="text-white text-xs font-semibold">
+                    {{ mealStats.percentage }}%
+                  </span>
+                </div>
+              </div>
+
+              <!-- Détails par catégorie -->
+              <div class="grid grid-cols-3 gap-4 mt-4">
+                <button
+                  class="text-center p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors cursor-pointer group"
+                  :disabled="
+                    mealStats.breakdown.volunteers.total ===
+                    mealStats.breakdown.volunteers.validated
+                  "
+                  @click="openPendingModal('volunteer')"
+                >
+                  <div
+                    class="text-xs text-gray-600 dark:text-gray-400 mb-1 group-hover:text-primary-600 dark:group-hover:text-primary-400"
+                  >
+                    {{ $t('gestion.meals.volunteers') }}
+                  </div>
+                  <div
+                    class="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400"
+                  >
+                    {{ mealStats.breakdown.volunteers.validated }} /
+                    {{ mealStats.breakdown.volunteers.total }}
+                  </div>
+                  <div
+                    v-if="
+                      mealStats.breakdown.volunteers.total >
+                      mealStats.breakdown.volunteers.validated
+                    "
+                    class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    {{
+                      mealStats.breakdown.volunteers.total -
+                      mealStats.breakdown.volunteers.validated
+                    }}
+                    restant{{
+                      mealStats.breakdown.volunteers.total -
+                        mealStats.breakdown.volunteers.validated >
+                      1
+                        ? 's'
+                        : ''
+                    }}
+                  </div>
+                </button>
+                <button
+                  class="text-center p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors cursor-pointer border-x border-primary-200 dark:border-primary-800 group"
+                  :disabled="
+                    mealStats.breakdown.artists.total === mealStats.breakdown.artists.validated
+                  "
+                  @click="openPendingModal('artist')"
+                >
+                  <div
+                    class="text-xs text-gray-600 dark:text-gray-400 mb-1 group-hover:text-primary-600 dark:group-hover:text-primary-400"
+                  >
+                    {{ $t('gestion.meals.artists') }}
+                  </div>
+                  <div
+                    class="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400"
+                  >
+                    {{ mealStats.breakdown.artists.validated }} /
+                    {{ mealStats.breakdown.artists.total }}
+                  </div>
+                  <div
+                    v-if="mealStats.breakdown.artists.total > mealStats.breakdown.artists.validated"
+                    class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    {{
+                      mealStats.breakdown.artists.total - mealStats.breakdown.artists.validated
+                    }}
+                    restant{{
+                      mealStats.breakdown.artists.total - mealStats.breakdown.artists.validated > 1
+                        ? 's'
+                        : ''
+                    }}
+                  </div>
+                </button>
+                <button
+                  class="text-center p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors cursor-pointer group"
+                  :disabled="
+                    mealStats.breakdown.participants.total ===
+                    mealStats.breakdown.participants.validated
+                  "
+                  @click="openPendingModal('participant')"
+                >
+                  <div
+                    class="text-xs text-gray-600 dark:text-gray-400 mb-1 group-hover:text-primary-600 dark:group-hover:text-primary-400"
+                  >
+                    {{ $t('gestion.meals.participants') }}
+                  </div>
+                  <div
+                    class="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400"
+                  >
+                    {{ mealStats.breakdown.participants.validated }} /
+                    {{ mealStats.breakdown.participants.total }}
+                  </div>
+                  <div
+                    v-if="
+                      mealStats.breakdown.participants.total >
+                      mealStats.breakdown.participants.validated
+                    "
+                    class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    {{
+                      mealStats.breakdown.participants.total -
+                      mealStats.breakdown.participants.validated
+                    }}
+                    restant{{
+                      mealStats.breakdown.participants.total -
+                        mealStats.breakdown.participants.validated >
+                      1
+                        ? 's'
+                        : ''
+                    }}
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Étape 2: Recherche de personne (si un repas est sélectionné) -->
           <div v-if="selectedMeal" class="space-y-4">
             <div>
@@ -183,6 +336,83 @@
           </div>
         </UCard>
       </div>
+
+      <!-- Modal des personnes non validées -->
+      <UModal v-model:open="pendingModalOpen" :ui="{ content: 'sm:max-w-4xl' }">
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-users" class="text-primary-500" />
+            <span>
+              {{ $t('gestion.meals.pending_validations') }}
+              <span v-if="pendingType === 'volunteer'">- {{ $t('gestion.meals.volunteers') }}</span>
+              <span v-else-if="pendingType === 'artist'">- {{ $t('gestion.meals.artists') }}</span>
+              <span v-else-if="pendingType === 'participant'"
+                >- {{ $t('gestion.meals.participants') }}</span
+              >
+            </span>
+          </div>
+        </template>
+
+        <template #body>
+          <div v-if="loadingPending" class="flex items-center justify-center py-8">
+            <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 text-primary-500" />
+          </div>
+
+          <div v-else-if="pendingList.length === 0" class="text-center py-8 text-gray-500">
+            {{ $t('gestion.meals.all_validated') }}
+          </div>
+
+          <div v-else class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead class="bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    {{ $t('common.name') }}
+                  </th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    {{ $t('common.firstname') }}
+                  </th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    {{ $t('common.email') }}
+                  </th>
+                  <th
+                    v-if="pendingType !== 'participant'"
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                  >
+                    {{ $t('common.pseudo') }}
+                  </th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                    {{ $t('common.actions') }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody
+                class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700"
+              >
+                <tr v-for="person in pendingList" :key="person.uniqueId">
+                  <td class="px-4 py-3 text-sm">{{ person.lastName || '-' }}</td>
+                  <td class="px-4 py-3 text-sm">{{ person.firstName || '-' }}</td>
+                  <td class="px-4 py-3 text-sm">{{ person.email || '-' }}</td>
+                  <td v-if="pendingType !== 'participant'" class="px-4 py-3 text-sm">
+                    {{ person.pseudo || '-' }}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-center">
+                    <UButton
+                      size="xs"
+                      color="success"
+                      icon="i-heroicons-check"
+                      :loading="validatingIds.includes(person.uniqueId)"
+                      @click="validateMealFromModal(person)"
+                    >
+                      {{ $t('gestion.meals.validate') }}
+                    </UButton>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
+      </UModal>
     </div>
   </div>
 </template>
@@ -215,6 +445,12 @@ const searchQuery = ref('')
 const searching = ref(false)
 const searchResults = ref<any[]>([])
 const validatingIds = ref<string[]>([])
+const mealStats = ref<any>(null)
+const loadingStats = ref(false)
+const pendingModalOpen = ref(false)
+const pendingType = ref<'volunteer' | 'artist' | 'participant'>('volunteer')
+const pendingList = ref<any[]>([])
+const loadingPending = ref(false)
 
 // Debounce pour la recherche
 const debouncedSearchQuery = useDebounce(searchQuery, 300)
@@ -326,6 +562,27 @@ const searchPeople = async () => {
   }
 }
 
+// Charger les statistiques du repas sélectionné
+const fetchMealStats = async () => {
+  if (!selectedMeal.value) {
+    mealStats.value = null
+    return
+  }
+
+  loadingStats.value = true
+  try {
+    const data = await $fetch<{ success: boolean; stats: any }>(
+      `/api/editions/${editionId}/meals/${selectedMeal.value.id}/stats`
+    )
+    mealStats.value = data.stats || null
+  } catch (error) {
+    console.error('Error fetching meal stats:', error)
+    mealStats.value = null
+  } finally {
+    loadingStats.value = false
+  }
+}
+
 // Valider un repas
 const validateMeal = async (person: any) => {
   validatingIds.value.push(person.uniqueId)
@@ -344,8 +601,8 @@ const validateMeal = async (person: any) => {
       icon: 'i-heroicons-check-circle',
     })
 
-    // Rafraîchir la recherche pour mettre à jour le statut
-    await searchPeople()
+    // Rafraîchir la recherche et les stats pour mettre à jour le statut
+    await Promise.all([searchPeople(), fetchMealStats()])
   } catch (error: any) {
     console.error('Error validating meal:', error)
     toast.add({
@@ -356,6 +613,46 @@ const validateMeal = async (person: any) => {
   } finally {
     validatingIds.value = validatingIds.value.filter((id) => id !== person.uniqueId)
   }
+}
+
+// Ouvrir la modal des personnes non validées
+const openPendingModal = async (type: 'volunteer' | 'artist' | 'participant') => {
+  pendingType.value = type
+  pendingModalOpen.value = true
+  await fetchPendingList(type)
+}
+
+// Récupérer la liste des personnes non validées
+const fetchPendingList = async (type: 'volunteer' | 'artist' | 'participant') => {
+  if (!selectedMeal.value) return
+
+  loadingPending.value = true
+  try {
+    const data = await $fetch<{ success: boolean; pending: any[] }>(
+      `/api/editions/${editionId}/meals/${selectedMeal.value.id}/pending`,
+      {
+        params: { type },
+      }
+    )
+    pendingList.value = data.pending || []
+  } catch (error) {
+    console.error('Error fetching pending list:', error)
+    toast.add({
+      title: t('gestion.meals.error_loading_pending'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
+    pendingList.value = []
+  } finally {
+    loadingPending.value = false
+  }
+}
+
+// Valider un repas depuis la modal
+const validateMealFromModal = async (person: any) => {
+  await validateMeal(person)
+  // Rafraîchir la liste des personnes non validées
+  await fetchPendingList(pendingType.value)
 }
 
 // Annuler un repas
@@ -376,8 +673,8 @@ const cancelMeal = async (person: any) => {
       icon: 'i-heroicons-check-circle',
     })
 
-    // Rafraîchir la recherche pour mettre à jour le statut
-    await searchPeople()
+    // Rafraîchir la recherche et les stats pour mettre à jour le statut
+    await Promise.all([searchPeople(), fetchMealStats()])
   } catch (error: any) {
     console.error('Error cancelling meal:', error)
     toast.add({
@@ -399,6 +696,15 @@ watch(selectedMeal, () => {
   // Réinitialiser la recherche quand on change de repas
   searchQuery.value = ''
   searchResults.value = []
+  // Charger les statistiques du nouveau repas
+  fetchMealStats()
+})
+
+// Recharger la liste des personnes non validées à chaque ouverture de la modal
+watch(pendingModalOpen, (isOpen) => {
+  if (isOpen && selectedMeal.value) {
+    fetchPendingList(pendingType.value)
+  }
 })
 
 // Lifecycle
