@@ -342,7 +342,9 @@ const conventionDescriptionHtml = computedAsync(async () => {
 
 // Vérifier l'accès à la page gestion
 const canAccess = computed(() => {
-  if (!props.edition || !authStore.user?.id) return false
+  if (!props.edition || !authStore.user?.id) {
+    return false
+  }
 
   // Les admins globaux en mode admin peuvent accéder à la gestion
   if (authStore.isAdminModeActive) {
@@ -383,9 +385,12 @@ const canAccess = computed(() => {
 
   // Tous les collaborateurs de la convention (même sans droits)
   if (props.edition.convention?.collaborators) {
-    return props.edition.convention.collaborators.some(
+    const isCollaborator = props.edition.convention.collaborators.some(
       (collab) => collab.user.id === authStore.user?.id
     )
+    if (isCollaborator) {
+      return true
+    }
   }
 
   return false
@@ -463,7 +468,7 @@ watch(
 
       // Vérifier si l'utilisateur a un créneau actif de contrôle d'accès
       try {
-        const response = await $fetch<{ isActive: boolean }>(
+        const response = await $fetch<{ isActive: boolean; activeSlot: any }>(
           `/api/editions/${props.edition.id}/volunteers/access-control/status`
         )
         canAccessAccessControlPage.value = response.isActive

@@ -461,6 +461,7 @@ const onTeamSubmit = async () => {
       maxVolunteers: teamFormState.value.maxVolunteers,
       isRequired: teamFormState.value.isRequired,
       isAccessControlTeam: teamFormState.value.isAccessControlTeam,
+      isMealValidationTeam: teamFormState.value.isMealValidationTeam,
       isVisibleToVolunteers: teamFormState.value.isVisibleToVolunteers,
     }
 

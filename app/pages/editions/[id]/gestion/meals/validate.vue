@@ -161,9 +161,7 @@
                     v-if="mealStats.breakdown.artists.total > mealStats.breakdown.artists.validated"
                     class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    {{
-                      mealStats.breakdown.artists.total - mealStats.breakdown.artists.validated
-                    }}
+                    {{ mealStats.breakdown.artists.total - mealStats.breakdown.artists.validated }}
                     restant{{
                       mealStats.breakdown.artists.total - mealStats.breakdown.artists.validated > 1
                         ? 's'
@@ -412,6 +410,13 @@
             </table>
           </div>
         </template>
+        <template #footer>
+          <div class="flex justify-end">
+            <UButton color="neutral" variant="soft" @click="pendingModalOpen = false">
+              {{ $t('common.close') }}
+            </UButton>
+          </div>
+        </template>
       </UModal>
     </div>
   </div>
@@ -464,6 +469,9 @@ const mealsOptions = computed(() => {
   }))
 })
 
+// État pour les permissions de validation des repas
+const canAccessMealValidation = ref(false)
+
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
@@ -473,13 +481,37 @@ const canAccess = computed(() => {
 
   // Collaborateurs de la convention
   if (edition.value.convention?.collaborators) {
-    return edition.value.convention.collaborators.some(
+    const isCollaborator = edition.value.convention.collaborators.some(
       (collab) => collab.user.id === authStore.user?.id
     )
+    if (isCollaborator) return true
   }
+
+  // Bénévoles avec accès à la validation des repas (leader ou créneau actif)
+  if (canAccessMealValidation.value) return true
 
   return false
 })
+
+// Vérifier les permissions de validation des repas au montage
+watch(
+  () => authStore.isAuthenticated,
+  async (isAuthenticated) => {
+    if (isAuthenticated && authStore.user?.id && edition.value?.id) {
+      try {
+        const response = await $fetch<{ canAccess: boolean }>(
+          `/api/editions/${edition.value.id}/permissions/can-access-meal-validation`
+        )
+        canAccessMealValidation.value = response.canAccess
+      } catch {
+        canAccessMealValidation.value = false
+      }
+    } else {
+      canAccessMealValidation.value = false
+    }
+  },
+  { immediate: true }
+)
 
 // Formater le label d'un repas
 const formatMealLabel = (meal: any) => {
