@@ -13,7 +13,45 @@
 
         <!-- Étape 1 : Informations acheteur -->
         <div v-if="currentStep === 0" class="space-y-4">
+          <!-- Email en premier -->
           <UFormField
+            :label="$t('editions.ticketing.payer_email')"
+            required
+            :error="errors.payerEmail"
+          >
+            <UFieldGroup class="w-full">
+              <UInput
+                v-model="form.payerEmail"
+                type="email"
+                :placeholder="$t('editions.ticketing.email_placeholder')"
+                class="w-full"
+                @keydown.enter="searchUserByEmail"
+              />
+              <UButton
+                icon="i-heroicons-magnifying-glass"
+                color="primary"
+                :disabled="!form.payerEmail || searchingUser"
+                :loading="searchingUser"
+                @click="searchUserByEmail"
+              >
+                Vérifier
+              </UButton>
+            </UFieldGroup>
+          </UFormField>
+
+          <!-- Message si utilisateur trouvé -->
+          <UAlert
+            v-if="userFound"
+            icon="i-heroicons-check-circle"
+            color="success"
+            variant="soft"
+            title="Utilisateur trouvé"
+            description="Les informations ont été pré-remplies automatiquement"
+          />
+
+          <!-- Prénom -->
+          <UFormField
+            v-if="showNameFields"
             :label="$t('editions.ticketing.payer_first_name')"
             required
             :error="errors.payerFirstName"
@@ -25,7 +63,9 @@
             />
           </UFormField>
 
+          <!-- Nom -->
           <UFormField
+            v-if="showNameFields"
             :label="$t('editions.ticketing.payer_last_name')"
             required
             :error="errors.payerLastName"
@@ -33,19 +73,6 @@
             <UInput
               v-model="form.payerLastName"
               :placeholder="$t('editions.ticketing.last_name_placeholder')"
-              class="w-full"
-            />
-          </UFormField>
-
-          <UFormField
-            :label="$t('editions.ticketing.payer_email')"
-            required
-            :error="errors.payerEmail"
-          >
-            <UInput
-              v-model="form.payerEmail"
-              type="email"
-              :placeholder="$t('editions.ticketing.email_placeholder')"
               class="w-full"
             />
           </UFormField>
@@ -752,6 +779,9 @@ const loading = ref(false)
 const loadingTiers = ref(false)
 const error = ref('')
 const paymentConfirmed = ref(true)
+const searchingUser = ref(false)
+const userFound = ref(false)
+const showNameFields = ref(false)
 
 const stepperItems = computed(() => {
   const steps = [
@@ -1196,6 +1226,53 @@ const submitOrder = async () => {
   }
 }
 
+const searchUserByEmail = async () => {
+  const email = form.value.payerEmail.trim()
+
+  // Réinitialiser l'état
+  userFound.value = false
+  showNameFields.value = false
+
+  // Vérifier que l'email est valide
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    // Si l'email n'est pas valide, afficher quand même les champs nom/prénom
+    showNameFields.value = true
+    return
+  }
+
+  searchingUser.value = true
+
+  try {
+    const response = await $fetch<{ users: Array<{ prenom: string; nom: string; email: string }> }>(
+      '/api/users/search',
+      {
+        query: {
+          email,
+        },
+      }
+    )
+
+    // Chercher une correspondance exacte avec l'email
+    const matchingUser = response.users.find((u) => u.email.toLowerCase() === email.toLowerCase())
+
+    if (matchingUser) {
+      // Utilisateur trouvé : préremplir les champs
+      form.value.payerFirstName = matchingUser.prenom
+      form.value.payerLastName = matchingUser.nom
+      userFound.value = true
+    }
+
+    // Toujours afficher les champs nom/prénom après la recherche
+    showNameFields.value = true
+  } catch (err) {
+    console.error('Error searching user:', err)
+    // En cas d'erreur, afficher quand même les champs
+    showNameFields.value = true
+  } finally {
+    searchingUser.value = false
+  }
+}
+
 const closeModal = () => {
   isOpen.value = false
   currentStep.value = 0
@@ -1213,6 +1290,9 @@ const closeModal = () => {
   tierQuantities.value = {}
   selectedItems.value = []
   error.value = ''
+  searchingUser.value = false
+  userFound.value = false
+  showNameFields.value = false
 }
 
 // Charger les tarifs et options quand le modal s'ouvre
