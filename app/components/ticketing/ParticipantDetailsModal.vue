@@ -909,6 +909,7 @@ const editablePhone = ref<string | null>(null)
 // Gestion des articles à restituer
 const returnableItemsToDistribute = computed(() => {
   const itemsList: Array<{ id: string; name: string; participantName?: string }> = []
+  let globalIndex = 0 // Compteur global pour garantir l'unicité
 
   // Articles pour les billets
   if (props.participant && 'ticket' in props.participant) {
@@ -929,9 +930,10 @@ const returnableItemsToDistribute = computed(() => {
             itemName = `${tierItem.returnableItem.name} (${tierItem.customFieldName})`
           }
 
-          // Créer un ID unique par participant et article
+          // Créer un ID unique en utilisant un index global pour éviter les collisions
+          // même si plusieurs billets ont le même tarif et la même réponse au champ personnalisé
           itemsList.push({
-            id: `${item.id}-${tierItem.returnableItem.id}`,
+            id: `${item.id}-${tierItem.returnableItem.id}-${globalIndex++}`,
             name: `${itemName} - ${participantName}`,
             participantName,
           })
@@ -949,7 +951,7 @@ const returnableItemsToDistribute = computed(() => {
     if (props.participant.volunteer.returnableItems) {
       for (const item of props.participant.volunteer.returnableItems) {
         itemsList.push({
-          id: `volunteer-${item.id}`,
+          id: `volunteer-${item.id}-${globalIndex++}`,
           name: `${item.name} - ${volunteerName}`,
           participantName: volunteerName,
         })
@@ -966,7 +968,7 @@ const returnableItemsToDistribute = computed(() => {
     if (props.participant.artist.returnableItems) {
       for (const item of props.participant.artist.returnableItems) {
         itemsList.push({
-          id: `artist-${item.id}`,
+          id: `artist-${item.id}-${globalIndex++}`,
           name: `${item.name} - ${artistName}`,
           participantName: artistName,
         })
