@@ -106,6 +106,20 @@
                   </UFieldGroup>
                 </UFormField>
               </div>
+
+              <!-- Bouton de synchronisation HelloAsso -->
+              <div v-if="hasHelloAssoConfig" class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <UButton
+                  icon="i-heroicons-arrow-path"
+                  color="primary"
+                  variant="soft"
+                  class="w-full justify-center"
+                  :loading="syncingHelloAsso"
+                  @click="syncHelloAsso"
+                >
+                  <span class="font-medium">Synchroniser HelloAsso</span>
+                </UButton>
+              </div>
             </div>
           </UCard>
 
@@ -445,6 +459,8 @@ const stats = ref({
   totalVolunteers: 0,
   totalArtists: 0,
 })
+const hasHelloAssoConfig = ref(false)
+const syncingHelloAsso = ref(false)
 
 onMounted(async () => {
   if (!edition.value) {
@@ -456,7 +472,7 @@ onMounted(async () => {
   }
 
   // Charger les statistiques et les dernières validations
-  await Promise.all([loadStats(), loadRecentValidations()])
+  await Promise.all([loadStats(), loadRecentValidations(), checkHelloAssoConfig()])
 })
 
 // Permissions calculées
@@ -790,6 +806,52 @@ const formatValidationTime = (dateString: string) => {
 
   const diffDays = Math.floor(diffHours / 24)
   return `Il y a ${diffDays}j`
+}
+
+// Vérifier si HelloAsso est configuré
+const checkHelloAssoConfig = async () => {
+  try {
+    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/external`)
+    hasHelloAssoConfig.value = result?.hasConfig && result?.config?.provider?.toUpperCase() === 'HELLOASSO'
+  } catch {
+    // Pas de configuration HelloAsso
+    hasHelloAssoConfig.value = false
+  }
+}
+
+// Synchroniser les participants depuis HelloAsso
+const syncHelloAsso = async () => {
+  if (syncingHelloAsso.value) return
+
+  syncingHelloAsso.value = true
+
+  try {
+    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/helloasso/orders`)
+
+    if (result.success) {
+      const totalParticipants = result.stats?.totalItems || 0
+
+      toast.add({
+        title: 'Synchronisation réussie',
+        description: `${totalParticipants} participant${totalParticipants > 1 ? 's' : ''} synchronisé${totalParticipants > 1 ? 's' : ''} depuis HelloAsso`,
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+
+      // Recharger les statistiques et les dernières validations
+      await Promise.all([loadStats(), loadRecentValidations()])
+    }
+  } catch (error: any) {
+    console.error('Failed to sync HelloAsso:', error)
+    toast.add({
+      title: 'Erreur de synchronisation',
+      description: error.data?.message || 'Impossible de synchroniser les participants HelloAsso',
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    syncingHelloAsso.value = false
+  }
 }
 
 // Rafraîchir automatiquement quand une mise à jour SSE arrive
