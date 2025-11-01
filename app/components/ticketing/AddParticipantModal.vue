@@ -174,15 +174,40 @@
                     </span>
                   </p>
                 </div>
-                <div class="w-24">
-                  <UFormField :label="$t('common.quantity')">
-                    <UInput
-                      v-model.number="tierQuantities[tier.id]"
-                      type="number"
-                      min="0"
-                      :placeholder="'0'"
+                <div class="flex flex-col items-center gap-2">
+                  <span class="text-xs font-medium text-gray-600 dark:text-gray-400">
+                    {{ $t('common.quantity') }}
+                  </span>
+                  <div class="flex items-center gap-2">
+                    <UButton
+                      icon="i-heroicons-minus"
+                      size="lg"
+                      color="neutral"
+                      variant="outline"
+                      :disabled="!tierQuantities[tier.id] || tierQuantities[tier.id] === 0"
+                      @click="decrementQuantity(tier.id)"
                     />
-                  </UFormField>
+                    <div
+                      class="w-14 h-11 flex items-center justify-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
+                    >
+                      <span class="text-xl font-semibold text-gray-900 dark:text-white">
+                        {{ tierQuantities[tier.id] || 0 }}
+                      </span>
+                    </div>
+                    <UButton
+                      icon="i-heroicons-plus"
+                      size="lg"
+                      color="primary"
+                      variant="outline"
+                      @click="incrementQuantity(tier.id)"
+                    />
+                  </div>
+                  <span
+                    v-if="tierQuantities[tier.id] && tierQuantities[tier.id] > 0"
+                    class="text-xs font-semibold text-primary-600 dark:text-primary-400"
+                  >
+                    Total: {{ formatPrice(tier.price * tierQuantities[tier.id]) }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -885,23 +910,17 @@ const stepperItems = computed(() => {
 // Indices des étapes (s'adaptent selon le type de participant et la présence d'options)
 const hasOptions = computed(() => editionOptions.value && editionOptions.value.length > 0)
 
-// Calculer l'index de base (1 pour anonyme car pas d'étape info, 2 pour identifié)
-const baseStepIndex = computed(() => (participantType.value === 'anonymous' ? 1 : 2))
-
-const optionsStepIndex = computed(() => baseStepIndex.value)
-const summaryStepIndex = computed(() =>
-  hasOptions.value ? baseStepIndex.value + 1 : baseStepIndex.value
-)
-const paymentStepIndex = computed(() =>
-  hasOptions.value ? baseStepIndex.value + 2 : baseStepIndex.value + 1
-)
+// Pour identifié: étape 0 (info) -> 1 (tarifs) -> 2 (options si présentes) -> récap -> paiement
+// Pour anonyme: étape 1 (tarifs) -> 2 (options si présentes) -> récap -> paiement
+const optionsStepIndex = 2
+const summaryStepIndex = computed(() => (hasOptions.value ? 3 : 2))
+const paymentStepIndex = computed(() => (hasOptions.value ? 4 : 3))
 
 const currentStepTitle = computed(() => {
   if (currentStep.value === -1) return 'Type de participant'
   if (currentStep.value === 0) return t('editions.ticketing.add_participant_title')
   if (currentStep.value === 1) return t('editions.ticketing.select_tiers')
-  if (hasOptions.value && currentStep.value === optionsStepIndex.value)
-    return 'Sélection des options'
+  if (hasOptions.value && currentStep.value === optionsStepIndex) return 'Sélection des options'
   if (currentStep.value === summaryStepIndex.value)
     return t('editions.ticketing.summary_and_customize')
   return 'Confirmation du paiement'
@@ -925,6 +944,20 @@ const selectedItems = ref<SelectedItem[]>([])
 const showAllTiers = ref(false)
 const editionOptions = ref<TicketingOption[]>([])
 
+// Fonctions pour gérer les quantités avec boutons +/-
+const incrementQuantity = (tierId: number) => {
+  if (!tierQuantities.value[tierId]) {
+    tierQuantities.value[tierId] = 0
+  }
+  tierQuantities.value[tierId]++
+}
+
+const decrementQuantity = (tierId: number) => {
+  if (tierQuantities.value[tierId] && tierQuantities.value[tierId] > 0) {
+    tierQuantities.value[tierId]--
+  }
+}
+
 const canGoNext = computed(() => {
   if (currentStep.value === 0) {
     return (
@@ -937,7 +970,7 @@ const canGoNext = computed(() => {
     // Au moins un tarif sélectionné
     return Object.values(tierQuantities.value).some((qty) => qty > 0)
   }
-  if (hasOptions.value && currentStep.value === optionsStepIndex.value) {
+  if (hasOptions.value && currentStep.value === optionsStepIndex) {
     // Vérifier que toutes les options activées sont remplies
     return selectedItems.value.every((item) => {
       const options = getOptionsForTier(item.tierId) || []

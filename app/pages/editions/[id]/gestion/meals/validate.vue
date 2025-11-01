@@ -49,11 +49,12 @@
               {{ $t('gestion.meals.select_meal') }}
             </label>
             <USelectMenu
-              v-model="selectedMeal"
+              v-model="selectedMealId"
               :items="mealsOptions"
               :loading="loadingMeals"
               :placeholder="$t('gestion.meals.select_meal_placeholder')"
               size="xl"
+              value-key="id"
               :popper="{ placement: 'bottom-start' }"
               :ui="{
                 width: 'w-full',
@@ -278,7 +279,7 @@
                       </UBadge>
                     </div>
                     <h3 class="font-semibold text-gray-900 dark:text-white text-lg">
-                      {{ person.firstName }} {{ person.lastName }}
+                      {{ person.lastName }} {{ person.firstName }}
                     </h3>
                     <p v-if="person.pseudo" class="text-sm text-gray-600 dark:text-gray-400">
                       @{{ person.pseudo }}
@@ -369,7 +370,7 @@
               <div class="flex items-start justify-between gap-3">
                 <div class="flex-1 min-w-0">
                   <h3 class="font-semibold text-gray-900 dark:text-white text-lg mb-1">
-                    {{ person.firstName }} {{ person.lastName }}
+                    {{ person.lastName }} {{ person.firstName }}
                   </h3>
                   <p
                     v-if="person.pseudo && pendingType !== 'participant'"
@@ -428,7 +429,7 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 // État
 const loadingMeals = ref(false)
 const meals = ref<any[]>([])
-const selectedMeal = ref<any>(null)
+const selectedMealId = ref<number | null>(null) // Stocker l'ID au lieu de l'objet
 const searchQuery = ref('')
 const searching = ref(false)
 const searchResults = ref<any[]>([])
@@ -450,6 +451,12 @@ const mealsOptions = computed(() => {
     value: meal.id,
     ...meal,
   }))
+})
+
+// Computed pour récupérer l'objet meal complet à partir de l'ID
+const selectedMeal = computed(() => {
+  if (!selectedMealId.value) return null
+  return meals.value.find((meal) => meal.id === selectedMealId.value) || null
 })
 
 // État pour les permissions de validation des repas
@@ -538,7 +545,7 @@ const fetchMeals = async () => {
     meals.value = data.meals || []
 
     // Sélectionner automatiquement le repas en cours ou à venir
-    if (meals.value.length > 0 && !selectedMeal.value) {
+    if (meals.value.length > 0 && !selectedMealId.value) {
       const now = new Date()
 
       // Chercher le repas en cours ou le prochain repas à venir
@@ -552,20 +559,20 @@ const fetchMeals = async () => {
 
       if (currentOrUpcomingMeal) {
         // Repas en cours trouvé
-        selectedMeal.value = currentOrUpcomingMeal
+        selectedMealId.value = currentOrUpcomingMeal.id
       } else {
         // Sinon, chercher le prochain repas à venir
         const upcomingMeals = meals.value.filter((meal) => new Date(meal.date) > now)
         if (upcomingMeals.length > 0) {
           // Trier par date croissante et prendre le premier
           upcomingMeals.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-          selectedMeal.value = upcomingMeals[0]
+          selectedMealId.value = upcomingMeals[0].id
         } else {
           // Sinon, prendre le dernier repas (le plus récent)
           const sortedMeals = [...meals.value].sort(
             (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
           )
-          selectedMeal.value = sortedMeals[0]
+          selectedMealId.value = sortedMeals[0].id
         }
       }
     }
@@ -682,7 +689,13 @@ const fetchPendingList = async (type: 'volunteer' | 'artist' | 'participant') =>
         params: { type },
       }
     )
-    pendingList.value = data.pending || []
+    // Trier par nom de famille, puis prénom
+    const pending = data.pending || []
+    pendingList.value = pending.sort((a, b) => {
+      const lastNameCompare = (a.lastName || '').localeCompare(b.lastName || '', 'fr')
+      if (lastNameCompare !== 0) return lastNameCompare
+      return (a.firstName || '').localeCompare(b.firstName || '', 'fr')
+    })
   } catch (error) {
     console.error('Error fetching pending list:', error)
     toast.add({
