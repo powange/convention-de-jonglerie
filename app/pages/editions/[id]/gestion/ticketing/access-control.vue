@@ -433,6 +433,9 @@ const { t } = useI18n()
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
+// Vérifier les permissions de contrôle d'accès pour les bénévoles en créneau
+const { canAccessAccessControl } = useAccessControlPermissions(editionId)
+
 // SSE pour rafraîchissement automatique
 const { lastUpdate } = useRealtimeStats(editionId)
 
@@ -498,6 +501,9 @@ const canAccess = computed(() => {
 
   // Utilisateurs avec des droits spécifiques
   if (canEdit.value || canManageVolunteers.value) return true
+
+  // Bénévoles avec créneau actif de contrôle d'accès (±15 minutes)
+  if (canAccessAccessControl.value) return true
 
   // Tous les collaborateurs de la convention (même sans droits)
   if (edition.value.convention?.collaborators) {
