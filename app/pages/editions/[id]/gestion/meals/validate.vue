@@ -40,8 +40,12 @@
           </template>
 
           <!-- Étape 1: Sélection du repas -->
-          <div class="mb-6">
-            <label class="block text-sm font-medium mb-2">
+          <div
+            class="mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 sm:p-6 rounded-lg border-2 border-gray-200 dark:border-gray-700"
+          >
+            <label
+              class="block text-base sm:text-lg font-semibold mb-3 text-gray-900 dark:text-white"
+            >
               {{ $t('gestion.meals.select_meal') }}
             </label>
             <USelectMenu
@@ -49,12 +53,17 @@
               :items="mealsOptions"
               :loading="loadingMeals"
               :placeholder="$t('gestion.meals.select_meal_placeholder')"
-              size="lg"
+              size="xl"
               :popper="{ placement: 'bottom-start' }"
-              :ui="{ width: 'w-full', height: 'max-h-96', content: 'min-w-fit' }"
+              :ui="{
+                width: 'w-full',
+                height: 'max-h-96',
+                content: 'min-w-fit',
+                base: 'text-base sm:text-lg',
+              }"
             >
               <template #label>
-                <span v-if="selectedMeal">
+                <span v-if="selectedMeal" class="text-base sm:text-lg font-medium">
                   {{ formatMealLabel(selectedMeal) }}
                 </span>
               </template>
@@ -245,91 +254,81 @@
               </p>
             </div>
 
-            <div v-else-if="searchResults.length > 0" class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-800">
-                  <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      {{ $t('gestion.meals.person_type') }}
-                    </th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      {{ $t('common.name') }}
-                    </th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      {{ $t('common.firstname') }}
-                    </th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      {{ $t('common.pseudo') }}
-                    </th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      {{ $t('common.email') }}
-                    </th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      {{ $t('common.phone') }}
-                    </th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      {{ $t('gestion.meals.meal_status') }}
-                    </th>
-                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                      {{ $t('common.actions') }}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody
-                  class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700"
-                >
-                  <tr v-for="person in searchResults" :key="person.uniqueId">
-                    <td class="px-4 py-3 text-sm">
+            <!-- Affichage en cartes (mobile-friendly) -->
+            <div v-else-if="searchResults.length > 0" class="space-y-3">
+              <div
+                v-for="person in searchResults"
+                :key="person.uniqueId"
+                class="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
+              >
+                <div class="flex items-start justify-between gap-3 mb-3">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-2">
                       <UBadge :color="getPersonTypeBadgeColor(person.type)" variant="soft">
                         {{ $t(`gestion.meals.person_type_${person.type}`) }}
                       </UBadge>
-                    </td>
-                    <td class="px-4 py-3 text-sm">{{ person.lastName || '-' }}</td>
-                    <td class="px-4 py-3 text-sm">{{ person.firstName || '-' }}</td>
-                    <td class="px-4 py-3 text-sm">{{ person.pseudo || '-' }}</td>
-                    <td class="px-4 py-3 text-sm">{{ person.email || '-' }}</td>
-                    <td class="px-4 py-3 text-sm">{{ person.phone || '-' }}</td>
-                    <td class="px-4 py-3 text-sm">
                       <UBadge
                         v-if="person.consumedAt"
                         color="success"
                         variant="soft"
-                        class="flex items-center gap-1 w-fit"
+                        class="flex items-center gap-1"
                       >
                         <UIcon name="i-heroicons-check-circle" class="h-4 w-4" />
-                        {{ $t('gestion.meals.consumed_at') }}
-                        {{ formatDateTime(person.consumedAt) }}
+                        {{ $t('gestion.meals.consumed') }}
                       </UBadge>
-                      <UBadge v-else color="neutral" variant="soft">
-                        {{ $t('gestion.meals.not_consumed') }}
-                      </UBadge>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-center">
-                      <UButton
-                        v-if="!person.consumedAt"
-                        size="xs"
-                        color="success"
-                        icon="i-heroicons-check"
-                        :loading="validatingIds.includes(person.uniqueId)"
-                        @click="validateMeal(person)"
-                      >
-                        {{ $t('gestion.meals.validate') }}
-                      </UButton>
-                      <UButton
-                        v-else
-                        size="xs"
-                        color="error"
-                        variant="soft"
-                        icon="i-heroicons-x-mark"
-                        :loading="validatingIds.includes(person.uniqueId)"
-                        @click="cancelMeal(person)"
-                      >
-                        {{ $t('gestion.meals.cancel') }}
-                      </UButton>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white text-lg">
+                      {{ person.firstName }} {{ person.lastName }}
+                    </h3>
+                    <p v-if="person.pseudo" class="text-sm text-gray-600 dark:text-gray-400">
+                      @{{ person.pseudo }}
+                    </p>
+                  </div>
+                  <UButton
+                    v-if="!person.consumedAt"
+                    color="success"
+                    icon="i-heroicons-check"
+                    :loading="validatingIds.includes(person.uniqueId)"
+                    @click="validateMeal(person)"
+                  >
+                    {{ $t('gestion.meals.validate') }}
+                  </UButton>
+                  <UButton
+                    v-else
+                    color="error"
+                    variant="soft"
+                    icon="i-heroicons-x-mark"
+                    :loading="validatingIds.includes(person.uniqueId)"
+                    @click="cancelMeal(person)"
+                  >
+                    {{ $t('gestion.meals.cancel') }}
+                  </UButton>
+                </div>
+
+                <!-- Informations détaillées -->
+                <div
+                  class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm mt-3 pt-3 border-t border-gray-200 dark:border-gray-700"
+                >
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400">{{ $t('common.email') }}:</span>
+                    <span class="ml-2 text-gray-900 dark:text-white">{{
+                      person.email || '-'
+                    }}</span>
+                  </div>
+                  <div v-if="person.phone">
+                    <span class="text-gray-500 dark:text-gray-400">{{ $t('common.phone') }}:</span>
+                    <span class="ml-2 text-gray-900 dark:text-white">{{ person.phone }}</span>
+                  </div>
+                  <div v-if="person.consumedAt" class="sm:col-span-2">
+                    <span class="text-gray-500 dark:text-gray-400"
+                      >{{ $t('gestion.meals.consumed_at') }}:</span
+                    >
+                    <span class="ml-2 text-success-600 dark:text-success-400 font-medium">
+                      {{ formatDateTime(person.consumedAt) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </UCard>
@@ -360,54 +359,38 @@
             {{ $t('gestion.meals.all_validated') }}
           </div>
 
-          <div v-else class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead class="bg-gray-50 dark:bg-gray-800">
-                <tr>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    {{ $t('common.name') }}
-                  </th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    {{ $t('common.firstname') }}
-                  </th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    {{ $t('common.email') }}
-                  </th>
-                  <th
-                    v-if="pendingType !== 'participant'"
-                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+          <!-- Affichage en cartes (mobile-friendly) -->
+          <div v-else class="space-y-3">
+            <div
+              v-for="person in pendingList"
+              :key="person.uniqueId"
+              class="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
+            >
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex-1 min-w-0">
+                  <h3 class="font-semibold text-gray-900 dark:text-white text-lg mb-1">
+                    {{ person.firstName }} {{ person.lastName }}
+                  </h3>
+                  <p
+                    v-if="person.pseudo && pendingType !== 'participant'"
+                    class="text-sm text-gray-600 dark:text-gray-400"
                   >
-                    {{ $t('common.pseudo') }}
-                  </th>
-                  <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                    {{ $t('common.actions') }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody
-                class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700"
-              >
-                <tr v-for="person in pendingList" :key="person.uniqueId">
-                  <td class="px-4 py-3 text-sm">{{ person.lastName || '-' }}</td>
-                  <td class="px-4 py-3 text-sm">{{ person.firstName || '-' }}</td>
-                  <td class="px-4 py-3 text-sm">{{ person.email || '-' }}</td>
-                  <td v-if="pendingType !== 'participant'" class="px-4 py-3 text-sm">
-                    {{ person.pseudo || '-' }}
-                  </td>
-                  <td class="px-4 py-3 text-sm text-center">
-                    <UButton
-                      size="xs"
-                      color="success"
-                      icon="i-heroicons-check"
-                      :loading="validatingIds.includes(person.uniqueId)"
-                      @click="validateMealFromModal(person)"
-                    >
-                      {{ $t('gestion.meals.validate') }}
-                    </UButton>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    @{{ person.pseudo }}
+                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    {{ person.email || '-' }}
+                  </p>
+                </div>
+                <UButton
+                  color="success"
+                  icon="i-heroicons-check"
+                  :loading="validatingIds.includes(person.uniqueId)"
+                  @click="validateMealFromModal(person)"
+                >
+                  {{ $t('gestion.meals.validate') }}
+                </UButton>
+              </div>
+            </div>
           </div>
         </template>
         <template #footer>
@@ -553,6 +536,39 @@ const fetchMeals = async () => {
       `/api/editions/${editionId}/meals`
     )
     meals.value = data.meals || []
+
+    // Sélectionner automatiquement le repas en cours ou à venir
+    if (meals.value.length > 0 && !selectedMeal.value) {
+      const now = new Date()
+
+      // Chercher le repas en cours ou le prochain repas à venir
+      const currentOrUpcomingMeal = meals.value.find((meal) => {
+        const mealDate = new Date(meal.date)
+        // Considérer un repas comme "en cours" s'il est dans les 3 heures avant ou après l'heure actuelle
+        const threeHoursBefore = new Date(mealDate.getTime() - 3 * 60 * 60 * 1000)
+        const threeHoursAfter = new Date(mealDate.getTime() + 3 * 60 * 60 * 1000)
+        return now >= threeHoursBefore && now <= threeHoursAfter
+      })
+
+      if (currentOrUpcomingMeal) {
+        // Repas en cours trouvé
+        selectedMeal.value = currentOrUpcomingMeal
+      } else {
+        // Sinon, chercher le prochain repas à venir
+        const upcomingMeals = meals.value.filter((meal) => new Date(meal.date) > now)
+        if (upcomingMeals.length > 0) {
+          // Trier par date croissante et prendre le premier
+          upcomingMeals.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+          selectedMeal.value = upcomingMeals[0]
+        } else {
+          // Sinon, prendre le dernier repas (le plus récent)
+          const sortedMeals = [...meals.value].sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          )
+          selectedMeal.value = sortedMeals[0]
+        }
+      }
+    }
   } catch (error) {
     console.error('Error fetching meals:', error)
     toast.add({

@@ -8,10 +8,54 @@
   >
     <template #body>
       <div class="space-y-4">
-        <!-- Indicateur d'étapes -->
-        <UStepper v-model="currentStep" :items="stepperItems" class="mb-6" />
+        <!-- Indicateur d'étapes (masqué pour l'étape de choix du type) -->
+        <UStepper
+          v-if="currentStep >= 0"
+          v-model="currentStep"
+          :items="stepperItems"
+          class="mb-6"
+        />
 
-        <!-- Étape 1 : Informations acheteur -->
+        <!-- Étape -1 : Choix du type de participant -->
+        <div v-if="currentStep === -1" class="space-y-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400 text-center">
+            Choisissez le type de participant à ajouter
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Option 1 : Participant avec informations -->
+            <button
+              class="p-6 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 transition-all hover:bg-primary-50 dark:hover:bg-primary-900/20"
+              @click="selectParticipantType('identified')"
+            >
+              <UIcon
+                name="i-heroicons-user"
+                class="h-12 w-12 mx-auto mb-3 text-primary-600 dark:text-primary-400"
+              />
+              <h3 class="font-semibold text-gray-900 dark:text-white">Avec informations</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                Participant identifié avec nom, prénom et email
+              </p>
+            </button>
+
+            <!-- Option 2 : Participant anonyme -->
+            <button
+              class="p-6 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 transition-all hover:bg-gray-50 dark:hover:bg-gray-800"
+              @click="selectParticipantType('anonymous')"
+            >
+              <UIcon
+                name="i-heroicons-user-circle"
+                class="h-12 w-12 mx-auto mb-3 text-gray-600 dark:text-gray-400"
+              />
+              <h3 class="font-semibold text-gray-900 dark:text-white">Anonyme</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                Participant sans informations personnelles
+              </p>
+            </button>
+          </div>
+        </div>
+
+        <!-- Étape 0 : Informations acheteur -->
         <div v-if="currentStep === 0" class="space-y-4">
           <!-- Email en premier -->
           <UFormField
@@ -653,12 +697,17 @@
 
     <template #footer>
       <div class="flex justify-between">
-        <UButton v-if="currentStep > 0" color="neutral" variant="ghost" @click="previousStep">
+        <UButton
+          v-if="currentStep > 0 || (currentStep === 0 && participantType === 'identified')"
+          color="neutral"
+          variant="ghost"
+          @click="previousStep"
+        >
           {{ $t('common.previous') }}
         </UButton>
         <div v-else />
 
-        <div class="flex gap-2">
+        <div v-if="currentStep >= 0" class="flex gap-2">
           <UButton color="neutral" variant="ghost" @click="closeModal">
             {{ $t('common.cancel') }}
           </UButton>
@@ -774,7 +823,8 @@ const isOpen = computed({
   set: (value) => emit('update:open', value),
 })
 
-const currentStep = ref(0)
+const currentStep = ref(-1) // Démarrer à -1 pour l'étape de choix du type
+const participantType = ref<'identified' | 'anonymous'>('identified')
 const loading = ref(false)
 const loadingTiers = ref(false)
 const error = ref('')
@@ -783,11 +833,43 @@ const searchingUser = ref(false)
 const userFound = ref(false)
 const showNameFields = ref(false)
 
+// Fonction pour sélectionner le type de participant
+const selectParticipantType = (type: 'identified' | 'anonymous') => {
+  participantType.value = type
+
+  if (type === 'anonymous') {
+    // Utiliser des valeurs fixes pour tous les participants anonymes
+    form.value.payerEmail = 'anonyme@convention.local'
+    form.value.payerFirstName = 'Anonyme'
+    form.value.payerLastName = 'Anonyme'
+
+    showNameFields.value = true
+    userFound.value = false
+
+    // Passer directement à l'étape de sélection des tarifs
+    currentStep.value = 1
+  } else {
+    // Réinitialiser les champs pour le flux normal
+    form.value.payerEmail = ''
+    form.value.payerFirstName = ''
+    form.value.payerLastName = ''
+    showNameFields.value = false
+    userFound.value = false
+
+    // Passer à l'étape de saisie des informations
+    currentStep.value = 0
+  }
+}
+
 const stepperItems = computed(() => {
-  const steps = [
-    { title: t('editions.ticketing.buyer_info') },
-    { title: t('editions.ticketing.select_tiers') },
-  ]
+  const steps = []
+
+  // Ne pas afficher l'étape "Informations acheteur" pour les anonymes
+  if (participantType.value === 'identified') {
+    steps.push({ title: t('editions.ticketing.buyer_info') })
+  }
+
+  steps.push({ title: t('editions.ticketing.select_tiers') })
 
   // N'ajouter l'étape "Options" que s'il y a des options disponibles
   if (editionOptions.value && editionOptions.value.length > 0) {
@@ -800,16 +882,26 @@ const stepperItems = computed(() => {
   return steps
 })
 
-// Indices des étapes (s'adaptent si l'étape Options est absente)
+// Indices des étapes (s'adaptent selon le type de participant et la présence d'options)
 const hasOptions = computed(() => editionOptions.value && editionOptions.value.length > 0)
-const optionsStepIndex = 2
-const summaryStepIndex = computed(() => (hasOptions.value ? 3 : 2))
-const paymentStepIndex = computed(() => (hasOptions.value ? 4 : 3))
+
+// Calculer l'index de base (1 pour anonyme car pas d'étape info, 2 pour identifié)
+const baseStepIndex = computed(() => (participantType.value === 'anonymous' ? 1 : 2))
+
+const optionsStepIndex = computed(() => baseStepIndex.value)
+const summaryStepIndex = computed(() =>
+  hasOptions.value ? baseStepIndex.value + 1 : baseStepIndex.value
+)
+const paymentStepIndex = computed(() =>
+  hasOptions.value ? baseStepIndex.value + 2 : baseStepIndex.value + 1
+)
 
 const currentStepTitle = computed(() => {
+  if (currentStep.value === -1) return 'Type de participant'
   if (currentStep.value === 0) return t('editions.ticketing.add_participant_title')
   if (currentStep.value === 1) return t('editions.ticketing.select_tiers')
-  if (hasOptions.value && currentStep.value === optionsStepIndex) return 'Sélection des options'
+  if (hasOptions.value && currentStep.value === optionsStepIndex.value)
+    return 'Sélection des options'
   if (currentStep.value === summaryStepIndex.value)
     return t('editions.ticketing.summary_and_customize')
   return 'Confirmation du paiement'
@@ -845,7 +937,7 @@ const canGoNext = computed(() => {
     // Au moins un tarif sélectionné
     return Object.values(tierQuantities.value).some((qty) => qty > 0)
   }
-  if (hasOptions.value && currentStep.value === optionsStepIndex) {
+  if (hasOptions.value && currentStep.value === optionsStepIndex.value) {
     // Vérifier que toutes les options activées sont remplies
     return selectedItems.value.every((item) => {
       const options = getOptionsForTier(item.tierId) || []
@@ -1152,6 +1244,16 @@ const previousStep = () => {
     } else {
       currentStep.value--
     }
+  } else if (currentStep.value === 0) {
+    // Retour à l'étape de choix du type de participant
+    currentStep.value = -1
+    participantType.value = 'identified'
+    // Réinitialiser le formulaire
+    form.value.payerEmail = ''
+    form.value.payerFirstName = ''
+    form.value.payerLastName = ''
+    showNameFields.value = false
+    userFound.value = false
   }
 }
 
@@ -1275,7 +1377,8 @@ const searchUserByEmail = async () => {
 
 const closeModal = () => {
   isOpen.value = false
-  currentStep.value = 0
+  currentStep.value = -1 // Retour à l'étape de choix du type
+  participantType.value = 'identified' // Réinitialiser au type par défaut
   paymentConfirmed.value = true
   form.value = {
     payerFirstName: '',

@@ -196,6 +196,18 @@ const isOpen = computed({
   },
 })
 
+// Réinitialiser checkedItems quand la modal s'ouvre ou que les items changent
+watch(
+  [() => props.modelValue, () => props.checklistItems],
+  ([isOpen]) => {
+    if (isOpen) {
+      // Réinitialiser les items cochés quand la modal s'ouvre
+      checkedItems.value = []
+    }
+  },
+  { immediate: true }
+)
+
 // Gestion de la confirmation avec validation
 const handleConfirm = () => {
   if (isConfirmDisabled.value) {
